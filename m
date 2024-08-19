@@ -1,40 +1,74 @@
-Return-Path: <kvm+bounces-24532-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24533-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 749C2956DD6
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 16:51:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DE07956E4F
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 17:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3F631C22DF8
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 14:51:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D73FEB25E91
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E308F1741FD;
-	Mon, 19 Aug 2024 14:51:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8EDF17C233;
+	Mon, 19 Aug 2024 15:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QoLpuYSu"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E6F1741C3;
-	Mon, 19 Aug 2024 14:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9E6173355
+	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 15:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724079068; cv=none; b=IZ7Wz/UttsF/y/gYngWlt7PZFxh9y2iREwESO27AqV2/DiUstOxmlNY518cIITW71yzyxxvnouQFq2vjCLG6cluwOfPjPQih7OBB2Kgfwypw+SV1aO4gnmImN+V+xOoHFf0SsOU//QB+IHbtD7+TQlp9DpOYkKVdupWn7HFxYdI=
+	t=1724080153; cv=none; b=YKM6haXfdRAqAW/AszwLHmLG4uklavLWX90bQzP+d/a23BFtPABD21nDrpRJ18bv4qniPMnYgI11+ghFfip6HMwKCGkKtR0icqjVYKTLd8/3SDeDKsBAJNyuWAfWmtuyDkTQ1I4a954rEjviNM4vU85oeR4AFpZQ4ok21A6nlq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724079068; c=relaxed/simple;
-	bh=HFDtVUbqcgxGPIhTo0mOjNnRgr8Jm5CamJxnE7bYkbw=;
+	s=arc-20240116; t=1724080153; c=relaxed/simple;
+	bh=y0XSF0NisbbkaFQeED4S8cRsocv1dZdob/BaUW1EJF4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gQNRh3aQvyD4E8otls0iMXb+5LG4hHJyAOA3A8bIo4zhIuVhNZcIsMxjWCaXC7euvRpQ0bnzvimoLMoDeQlze8HF4p1CaFIW49S0xHUQx/BjWgtDUwzed+1jclmp1ZQqiOUoUx1s2TbD7Hqpj+HxaWgs7276mtEX4/M8JEzsTRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 96F2A339;
-	Mon, 19 Aug 2024 07:51:30 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 120E03F66E;
-	Mon, 19 Aug 2024 07:51:01 -0700 (PDT)
-Message-ID: <beff9162-e1ba-4f72-91ea-329eaed48dbc@arm.com>
-Date: Mon, 19 Aug 2024 15:51:00 +0100
+	 In-Reply-To:Content-Type; b=a7UEKff8UCED12F3M2kUcaXY54XbD+H++UC7NdK7gu7rFXGRvfVnZV9G7uD75D8mcpPkfzrDASe4VCmnlSxH2qDvXnBU9hOImssCj+x7zzgiZaP2Sf0Gx9W4revn5d/buv6ngLPdJPONXOh0aqaQwQyKJ0OU3z2XW+PKTZQEdCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QoLpuYSu; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a7abe5aa9d5so468173366b.1
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 08:09:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1724080148; x=1724684948; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rCuddyNf+0ZBHgPNUo3DWqvGchoe0lCOn0I22CKBsbE=;
+        b=QoLpuYSuX42+nbHD8vS17Qk05O7r7zGSfrB6xWcq4AZzaMGTcfix3h3vyXfLoCNXdn
+         Fn/XCa430WewZLrfJKyU60UHBN3JIPOGAkc6MPMfE/WCfrjWxjK5u6ccqG6Kl/T3obGC
+         rmo88CESff3B+XyDzEbID/cPNeXWcXLMwKtxJ47mK607tTQrASQn/FCtV2BN72yTlbt1
+         Udqr1n+GKBMYtKfkIJdCnBD3OyiHIOrByhfAI1OmaJ5idnaIYlIsVPISXJkWaHh3psDf
+         H8qaApxJ31pWy0p7+VngAGffcEFpvW7h+eb92ExD8N7nXJOPtp3nDD7H2OLyuxS+FY0o
+         4M1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724080148; x=1724684948;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rCuddyNf+0ZBHgPNUo3DWqvGchoe0lCOn0I22CKBsbE=;
+        b=VZgPPOZis7U5JK2NaHgVUp7z15VGmHBD+yc3rXMMmEYOtQd8sZfmsKjQPe7OqFylp5
+         TcBHjVHJZ1NNoOz74hu9unfbWt7FxhZfFyh2Z7emncJE0z6OO9uMLFijGjBQp7rjLaui
+         N+dy7JUEt/u4QqnPnI1mQU5SnCFiYLKkfY4OuMRkLB/9kmNFdGM56mypOGi3hJv67kPk
+         QrsrZQ10mujvbjPJQgyRFd7u5W373EWgJjnPFXO+8WqfmIHAVN1sIlLSEe+JvH54/a8G
+         TVRzO7F1H0WKgtr0pVmUsJ/f32CGtFFssrnlXMoToznYsZBF3sW1HkJFMBcq9GfreuOH
+         sanw==
+X-Forwarded-Encrypted: i=1; AJvYcCWdMXFm8PBClUKn3aAU2g1qlCEMW9Mu5qgz9/tsPoofckz1Mk3Ae1Vdt2Lglc5rqzst4W3SpiaGFYvrB9pKfAWUOlA8
+X-Gm-Message-State: AOJu0YwLF7qLp3FqxChQaX2z3fRelx57RDPOqAcN29jxcmv/YqecP3yB
+	3CXop7Zr//ZS92wznDn1VUykNA6cVJVcgPYF6zhrYKRUD5+ovGPnoCPIwisPLT8=
+X-Google-Smtp-Source: AGHT+IGDU5mZ5AzwP0fXDOYNPfdvWhEp0ajZn5PNntcXvLi6kCPsCwyGkuVzzxEvykY8Qqa+GSXArQ==
+X-Received: by 2002:a17:907:2d0f:b0:a7d:23e8:94e9 with SMTP id a640c23a62f3a-a839293ef04mr821074766b.34.1724080147872;
+        Mon, 19 Aug 2024 08:09:07 -0700 (PDT)
+Received: from ?IPV6:2a10:bac0:b000:7717:7285:c2ff:fedd:7e3a? ([2a10:bac0:b000:7717:7285:c2ff:fedd:7e3a])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8383946a7dsm647544266b.181.2024.08.19.08.09.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2024 08:09:07 -0700 (PDT)
+Message-ID: <e7c16241-100a-4830-9628-65edb44ca78d@suse.com>
+Date: Mon, 19 Aug 2024 18:09:06 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,438 +76,299 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 17/19] irqchip/gic-v3-its: Share ITS tables with a
- non-trusted hypervisor
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>
-References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-18-steven.price@arm.com>
+Subject: Re: [PATCH 13/25] KVM: TDX: create/destroy VM structure
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org
+Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
+ linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Yan Zhao <yan.y.zhao@intel.com>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-14-rick.p.edgecombe@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
 Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240819131924.372366-18-steven.price@arm.com>
+In-Reply-To: <20240812224820.34826-14-rick.p.edgecombe@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Steven,
 
-On 19/08/2024 14:19, Steven Price wrote:
-> Within a realm guest the ITS is emulated by the host. This means the
-> allocations must have been made available to the host by a call to
-> set_memory_decrypted(). Introduce an allocation function which performs
-> this extra call.
+
+On 13.08.24 г. 1:48 ч., Rick Edgecombe wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> For the ITT use a custom genpool-based allocator that calls
-> set_memory_decrypted() for each page allocated, but then suballocates
-> the size needed for each ITT. Note that there is no mechanism
-> implemented to return pages from the genpool, but it is unlikely the
-> peak number of devices will so much larger than the normal level - so
-> this isn't expected to be an issue.
+> Implement managing the TDX private KeyID to implement, create, destroy
+> and free for a TDX guest.
 > 
-
-This may not be sufficient to make it future proof. We need to detect if
-the GIC is private vs shared, before we make the allocation choice. 
-Please see below :
-
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Tested-by: Will Deacon <will@kernel.org>
-> Signed-off-by: Steven Price <steven.price@arm.com>
+> When creating at TDX guest, assign a TDX private KeyID for the TDX guest
+> for memory encryption, and allocate pages for the guest. These are used
+> for the Trust Domain Root (TDR) and Trust Domain Control Structure (TDCS).
+> 
+> On destruction, free the allocated pages, and the KeyID.
+> 
+> Before tearing down the private page tables, TDX requires the guest TD to
+> be destroyed by reclaiming the KeyID. Do it at vm_destroy() kvm_x86_ops
+> hook.
+> 
+> Add a call for vm_free() at the end of kvm_arch_destroy_vm() because the
+> per-VM TDR needs to be freed after the KeyID.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Co-developed-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > ---
-> Changes since v3:
->   * Use BIT() macro.
->   * Use a genpool based allocator in its_create_device() to avoid
->     allocating a full page.
->   * Fix subject to drop "realm" and use gic-v3-its.
->   * Add error handling to ITS alloc/free.
-> Changes since v2:
->   * Drop 'shared' from the new its_xxx function names as they are used
->     for non-realm guests too.
->   * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
->     should do the right thing.
->   * Drop a pointless (void *) cast.
-> ---
->   drivers/irqchip/irq-gic-v3-its.c | 139 ++++++++++++++++++++++++++-----
->   1 file changed, 116 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 9b34596b3542..557214c774c3 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -12,12 +12,14 @@
->   #include <linux/crash_dump.h>
->   #include <linux/delay.h>
->   #include <linux/efi.h>
-> +#include <linux/genalloc.h>
->   #include <linux/interrupt.h>
->   #include <linux/iommu.h>
->   #include <linux/iopoll.h>
->   #include <linux/irqdomain.h>
->   #include <linux/list.h>
->   #include <linux/log2.h>
-> +#include <linux/mem_encrypt.h>
->   #include <linux/memblock.h>
->   #include <linux/mm.h>
->   #include <linux/msi.h>
-> @@ -27,6 +29,7 @@
->   #include <linux/of_pci.h>
->   #include <linux/of_platform.h>
->   #include <linux/percpu.h>
-> +#include <linux/set_memory.h>
->   #include <linux/slab.h>
->   #include <linux/syscore_ops.h>
+
+<snip>
+
+
+> @@ -19,14 +20,14 @@ static const struct tdx_sysinfo *tdx_sysinfo;
+>   /* TDX KeyID pool */
+>   static DEFINE_IDA(tdx_guest_keyid_pool);
 >   
-> @@ -164,6 +167,7 @@ struct its_device {
->   	struct its_node		*its;
->   	struct event_lpi_map	event_map;
->   	void			*itt;
-> +	u32			itt_sz;
->   	u32			nr_ites;
->   	u32			device_id;
->   	bool			shared;
-> @@ -199,6 +203,81 @@ static DEFINE_IDA(its_vpeid_ida);
->   #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
->   #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
+> -static int __used tdx_guest_keyid_alloc(void)
+> +static int tdx_guest_keyid_alloc(void)
+>   {
+>   	return ida_alloc_range(&tdx_guest_keyid_pool, tdx_guest_keyid_start,
+>   			       tdx_guest_keyid_start + tdx_nr_guest_keyids - 1,
+>   			       GFP_KERNEL);
+>   }
 >   
-> +static struct page *its_alloc_pages_node(int node, gfp_t gfp,
-> +					 unsigned int order)
+> -static void __used tdx_guest_keyid_free(int keyid)
+> +static void tdx_guest_keyid_free(int keyid)
+>   {
+>   	ida_free(&tdx_guest_keyid_pool, keyid);
+>   }
+> @@ -73,6 +74,305 @@ int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>   	return r;
+>   }
+>   
+> +/*
+> + * Some SEAMCALLs acquire the TDX module globally, and can fail with
+> + * TDX_OPERAND_BUSY.  Use a global mutex to serialize these SEAMCALLs.
+> + */
+> +static DEFINE_MUTEX(tdx_lock);
+
+The way this lock is used is very ugly. So it essentially mimics a lock 
+which already lives in the tdx module. So why not simply gracefully 
+handle the TDX_OPERAND_BUSY return value or change the interface of the 
+module (yeah, it's probably late for this now) so expose the lock. This 
+lock breaks one of the main rules of locking - "Lock data and not code"
+
+> +
+> +/* Maximum number of retries to attempt for SEAMCALLs. */
+> +#define TDX_SEAMCALL_RETRIES	10000
+> +
+> +static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
 > +{
-> +	struct page *page;
-> +	int ret = 0;
-> +
-> +	page = alloc_pages_node(node, gfp, order);
-> +
-> +	if (!page)
-> +		return NULL;
-> +
-> +	ret = set_memory_decrypted((unsigned long)page_address(page),
-> +				   1 << order);
-> +	if (WARN_ON(ret))
-> +		return NULL;
-> +
-> +	return page;
+> +	return pa | ((hpa_t)hkid << boot_cpu_data.x86_phys_bits);
 > +}
 > +
-> +static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+> +static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
 > +{
-> +	return its_alloc_pages_node(NUMA_NO_NODE, gfp, order);
+> +	return kvm_tdx->tdr_pa;
 > +}
 > +
-> +static void its_free_pages(void *addr, unsigned int order)
+> +static inline void tdx_hkid_free(struct kvm_tdx *kvm_tdx)
 > +{
-> +	if (WARN_ON(set_memory_encrypted((unsigned long)addr, 1 << order)))
-> +		return;
-> +	free_pages((unsigned long)addr, order);
+> +	tdx_guest_keyid_free(kvm_tdx->hkid);
+> +	kvm_tdx->hkid = -1;
 > +}
 > +
-> +static struct gen_pool *itt_pool;
-> +
-> +static void *itt_alloc_pool(int node, int size)
+> +static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
 > +{
-> +	unsigned long addr;
-> +	struct page *page;
+> +	return kvm_tdx->hkid > 0;
+> +}
 > +
-> +	if (size >= PAGE_SIZE) {
-> +		page = its_alloc_pages_node(node,
-> +					    GFP_KERNEL | __GFP_ZERO,
-> +					    get_order(size));
+> +static void tdx_clear_page(unsigned long page_pa)
+> +{
+> +	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
+> +	void *page = __va(page_pa);
+> +	unsigned long i;
 > +
-> +		return page_address(page);
+> +	/*
+> +	 * The page could have been poisoned.  MOVDIR64B also clears
+> +	 * the poison bit so the kernel can safely use the page again.
+> +	 */
+> +	for (i = 0; i < PAGE_SIZE; i += 64)
+> +		movdir64b(page + i, zero_page);
+> +	/*
+> +	 * MOVDIR64B store uses WC buffer.  Prevent following memory reads
+> +	 * from seeing potentially poisoned cache.
+> +	 */
+> +	__mb();
+> +}
+> +
+> +static u64 ____tdx_reclaim_page(hpa_t pa, u64 *rcx, u64 *rdx, u64 *r8)
+
+Just inline this into its sole caller. Yes each specific function is 
+rather small but if you have to go through several levels of indirection 
+then there's no point in splitting it...
+
+
+> +{
+> +	u64 err;
+> +	int i;
+> +
+> +	for (i = TDX_SEAMCALL_RETRIES; i > 0; i--) {
+> +		err = tdh_phymem_page_reclaim(pa, rcx, rdx, r8);
+> +		switch (err) {
+> +		case TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX:
+> +		case TDX_OPERAND_BUSY | TDX_OPERAND_ID_TDR:
+> +			cond_resched();
+> +			continue;
+> +		default:
+> +			goto out;
+> +		}
 > +	}
 > +
-> +	do {
-> +		addr = gen_pool_alloc(itt_pool, size);
-> +		if (addr)
-> +			break;
-> +
-> +		page = its_alloc_pages_node(node, GFP_KERNEL | __GFP_ZERO, 1);
-> +		if (!page)
-> +			break;
-> +
-> +		gen_pool_add(itt_pool, (unsigned long)page_address(page),
-> +			     PAGE_SIZE, node);
-> +	} while (!addr);
-> +
-> +	return (void *)addr;
+> +out:
+> +	return err;
 > +}
 > +
-> +static void itt_free_pool(void *addr, int size)
+
+<snip>
+
+> +
+> +void tdx_mmu_release_hkid(struct kvm *kvm)
 > +{
-> +	if (!addr)
+> +	bool packages_allocated, targets_allocated;
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	cpumask_var_t packages, targets;
+> +	u64 err;
+> +	int i;
+> +
+> +	if (!is_hkid_assigned(kvm_tdx))
 > +		return;
 > +
-> +	if (size >= PAGE_SIZE) {
-> +		its_free_pages(addr, get_order(size));
+> +	/* KeyID has been allocated but guest is not yet configured */
+> +	if (!is_td_created(kvm_tdx)) {
+> +		tdx_hkid_free(kvm_tdx);
 > +		return;
 > +	}
 > +
-> +	gen_pool_free(itt_pool, (unsigned long)addr, size);
+> +	packages_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
+> +	targets_allocated = zalloc_cpumask_var(&targets, GFP_KERNEL);
+> +	cpus_read_lock();
+> +
+> +	/*
+> +	 * TDH.PHYMEM.CACHE.WB tries to acquire the TDX module global lock
+> +	 * and can fail with TDX_OPERAND_BUSY when it fails to get the lock.
+> +	 * Multiple TDX guests can be destroyed simultaneously. Take the
+> +	 * mutex to prevent it from getting error.
+> +	 */
+> +	mutex_lock(&tdx_lock);
+> +
+> +	/*
+> +	 * We need three SEAMCALLs, TDH.MNG.VPFLUSHDONE(), TDH.PHYMEM.CACHE.WB(),
+> +	 * and TDH.MNG.KEY.FREEID() to free the HKID. When the HKID is assigned,
+> +	 * we need to use TDH.MEM.SEPT.REMOVE() or TDH.MEM.PAGE.REMOVE(). When
+> +	 * the HKID is free, we need to use TDH.PHYMEM.PAGE.RECLAIM().  Get lock
+> +	 * to not present transient state of HKID.
+> +	 */
+> +	write_lock(&kvm->mmu_lock);
+> +
+> +	for_each_online_cpu(i) {
+> +		if (packages_allocated &&
+> +		    cpumask_test_and_set_cpu(topology_physical_package_id(i),
+> +					     packages))
+> +			continue;
+> +		if (targets_allocated)
+> +			cpumask_set_cpu(i, targets);
+> +	}
+> +	if (targets_allocated)
+> +		on_each_cpu_mask(targets, smp_func_do_phymem_cache_wb, NULL, true);
+> +	else
+> +		on_each_cpu(smp_func_do_phymem_cache_wb, NULL, true);
+> +	/*
+> +	 * In the case of error in smp_func_do_phymem_cache_wb(), the following
+> +	 * tdh_mng_key_freeid() will fail.
+> +	 */
+> +	err = tdh_mng_key_freeid(kvm_tdx);
+> +	if (KVM_BUG_ON(err, kvm)) {
+> +		pr_tdx_error(TDH_MNG_KEY_FREEID, err);
+> +		pr_err("tdh_mng_key_freeid() failed. HKID %d is leaked.\n",
+> +		       kvm_tdx->hkid);
+> +	} else {
+> +		tdx_hkid_free(kvm_tdx);
+> +	}
+> +
+> +	write_unlock(&kvm->mmu_lock);
+> +	mutex_unlock(&tdx_lock);
+> +	cpus_read_unlock();
+> +	free_cpumask_var(targets);
+> +	free_cpumask_var(packages);
 > +}
 > +
->   /*
->    * Skip ITSs that have no vLPIs mapped, unless we're on GICv4.1, as we
->    * always have vSGIs mapped.
-> @@ -2187,7 +2266,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
->   {
->   	struct page *prop_page;
->   
-> -	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
-> +	prop_page = its_alloc_pages(gfp_flags,
-> +				    get_order(LPI_PROPBASE_SZ));
->   	if (!prop_page)
->   		return NULL;
->   
-> @@ -2198,8 +2278,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
->   
->   static void its_free_prop_table(struct page *prop_page)
->   {
-> -	free_pages((unsigned long)page_address(prop_page),
-> -		   get_order(LPI_PROPBASE_SZ));
-> +	its_free_pages(page_address(prop_page),
-> +		       get_order(LPI_PROPBASE_SZ));
->   }
->   
->   static bool gic_check_reserved_range(phys_addr_t addr, unsigned long size)
-> @@ -2321,7 +2401,8 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
->   		order = get_order(GITS_BASER_PAGES_MAX * psz);
->   	}
->   
-> -	page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO, order);
-> +	page = its_alloc_pages_node(its->numa_node,
-> +				    GFP_KERNEL | __GFP_ZERO, order);
->   	if (!page)
->   		return -ENOMEM;
->   
-> @@ -2334,7 +2415,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
->   		/* 52bit PA is supported only when PageSize=64K */
->   		if (psz != SZ_64K) {
->   			pr_err("ITS: no 52bit PA support when psz=%d\n", psz);
-> -			free_pages((unsigned long)base, order);
-> +			its_free_pages(base, order);
->   			return -ENXIO;
->   		}
->   
-> @@ -2390,7 +2471,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
->   		pr_err("ITS@%pa: %s doesn't stick: %llx %llx\n",
->   		       &its->phys_base, its_base_type_string[type],
->   		       val, tmp);
-> -		free_pages((unsigned long)base, order);
-> +		its_free_pages(base, order);
->   		return -ENXIO;
->   	}
->   
-> @@ -2529,8 +2610,8 @@ static void its_free_tables(struct its_node *its)
->   
->   	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
->   		if (its->tables[i].base) {
-> -			free_pages((unsigned long)its->tables[i].base,
-> -				   its->tables[i].order);
-> +			its_free_pages(its->tables[i].base,
-> +				       its->tables[i].order);
->   			its->tables[i].base = NULL;
->   		}
->   	}
-> @@ -2796,7 +2877,8 @@ static bool allocate_vpe_l2_table(int cpu, u32 id)
->   
->   	/* Allocate memory for 2nd level table */
->   	if (!table[idx]) {
-> -		page = alloc_pages(GFP_KERNEL | __GFP_ZERO, get_order(psz));
-> +		page = its_alloc_pages(GFP_KERNEL | __GFP_ZERO,
-> +				       get_order(psz));
->   		if (!page)
->   			return false;
->   
-> @@ -2915,7 +2997,8 @@ static int allocate_vpe_l1_table(void)
->   
->   	pr_debug("np = %d, npg = %lld, psz = %d, epp = %d, esz = %d\n",
->   		 np, npg, psz, epp, esz);
-> -	page = alloc_pages(GFP_ATOMIC | __GFP_ZERO, get_order(np * PAGE_SIZE));
-> +	page = its_alloc_pages(GFP_ATOMIC | __GFP_ZERO,
-> +			       get_order(np * PAGE_SIZE));
->   	if (!page)
->   		return -ENOMEM;
->   
-> @@ -2961,8 +3044,8 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
->   {
->   	struct page *pend_page;
->   
-> -	pend_page = alloc_pages(gfp_flags | __GFP_ZERO,
-> -				get_order(LPI_PENDBASE_SZ));
-> +	pend_page = its_alloc_pages(gfp_flags | __GFP_ZERO,
-> +				    get_order(LPI_PENDBASE_SZ));
->   	if (!pend_page)
->   		return NULL;
->   
-> @@ -2974,7 +3057,7 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
->   
->   static void its_free_pending_table(struct page *pt)
->   {
-> -	free_pages((unsigned long)page_address(pt), get_order(LPI_PENDBASE_SZ));
-> +	its_free_pages(page_address(pt), get_order(LPI_PENDBASE_SZ));
->   }
->   
->   /*
-> @@ -3309,8 +3392,9 @@ static bool its_alloc_table_entry(struct its_node *its,
->   
->   	/* Allocate memory for 2nd level table */
->   	if (!table[idx]) {
-> -		page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
-> -					get_order(baser->psz));
-> +		page = its_alloc_pages_node(its->numa_node,
-> +					    GFP_KERNEL | __GFP_ZERO,
-> +					    get_order(baser->psz));
->   		if (!page)
->   			return false;
->   
-> @@ -3405,7 +3489,6 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
->   	if (WARN_ON(!is_power_of_2(nvecs)))
->   		nvecs = roundup_pow_of_two(nvecs);
->   
-> -	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
->   	/*
->   	 * Even if the device wants a single LPI, the ITT must be
->   	 * sized as a power of two (and you need at least one bit...).
-> @@ -3413,7 +3496,11 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
->   	nr_ites = max(2, nvecs);
->   	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
->   	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
-> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+> +static inline u8 tdx_sysinfo_nr_tdcs_pages(void)
+> +{
+> +	return tdx_sysinfo->td_ctrl.tdcs_base_size / PAGE_SIZE;
+> +}
+
+Just add a nr_tdcs_pages to struct tdx_sysinfo_td_ctrl and claculate 
+this value in get_tdx_td_ctrl() rather than having this long-named 
+non-sense. This value can't be calculated at compiletime anyway.
+
 > +
-> +	itt = itt_alloc_pool(its->numa_node, sz);
+> +void tdx_vm_free(struct kvm *kvm)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	u64 err;
+> +	int i;
 > +
-> +	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+> +	/*
+> +	 * tdx_mmu_release_hkid() failed to reclaim HKID.  Something went wrong
+> +	 * heavily with TDX module.  Give up freeing TD pages.  As the function
+> +	 * already warned, don't warn it again.
+> +	 */
+> +	if (is_hkid_assigned(kvm_tdx))
+> +		return;
 > +
->   	if (alloc_lpis) {
->   		lpi_map = its_lpi_alloc(nvecs, &lpi_base, &nr_lpis);
->   		if (lpi_map)
-> @@ -3425,9 +3512,9 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
->   		lpi_base = 0;
->   	}
->   
-> -	if (!dev || !itt ||  !col_map || (!lpi_map && alloc_lpis)) {
-> +	if (!dev || !itt || !col_map || (!lpi_map && alloc_lpis)) {
->   		kfree(dev);
-> -		kfree(itt);
-> +		itt_free_pool(itt, sz);
->   		bitmap_free(lpi_map);
->   		kfree(col_map);
->   		return NULL;
-> @@ -3437,6 +3524,7 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
->   
->   	dev->its = its;
->   	dev->itt = itt;
-> +	dev->itt_sz = sz;
->   	dev->nr_ites = nr_ites;
->   	dev->event_map.lpi_map = lpi_map;
->   	dev->event_map.col_map = col_map;
-> @@ -3464,7 +3552,7 @@ static void its_free_device(struct its_device *its_dev)
->   	list_del(&its_dev->entry);
->   	raw_spin_unlock_irqrestore(&its_dev->its->lock, flags);
->   	kfree(its_dev->event_map.col_map);
-> -	kfree(its_dev->itt);
-> +	itt_free_pool(its_dev->itt, its_dev->itt_sz);
->   	kfree(its_dev);
->   }
->   
-> @@ -5112,8 +5200,9 @@ static int __init its_probe_one(struct its_node *its)
->   		}
->   	}
->   
-> -	page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
-> -				get_order(ITS_CMD_QUEUE_SZ));
-> +	page = its_alloc_pages_node(its->numa_node,
-> +				    GFP_KERNEL | __GFP_ZERO,
-> +				    get_order(ITS_CMD_QUEUE_SZ));
->   	if (!page) {
->   		err = -ENOMEM;
->   		goto out_unmap_sgir;
-> @@ -5177,7 +5266,7 @@ static int __init its_probe_one(struct its_node *its)
->   out_free_tables:
->   	its_free_tables(its);
->   out_free_cmd:
-> -	free_pages((unsigned long)its->cmd_base, get_order(ITS_CMD_QUEUE_SZ));
-> +	its_free_pages(its->cmd_base, get_order(ITS_CMD_QUEUE_SZ));
->   out_unmap_sgir:
->   	if (its->sgir_base)
->   		iounmap(its->sgir_base);
-> @@ -5663,6 +5752,10 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
->   	bool has_v4_1 = false;
->   	int err;
->   
-> +	itt_pool = gen_pool_create(get_order(ITS_ITT_ALIGN), -1);
-> +	if (!itt_pool)
-> +		return -ENOMEM;
+> +	if (kvm_tdx->tdcs_pa) {
+> +		for (i = 0; i < tdx_sysinfo_nr_tdcs_pages(); i++) {
+> +			if (!kvm_tdx->tdcs_pa[i])
+> +				continue;
 > +
->   	gic_rdists = rdists;
->   
->   	lpi_prop_prio = irq_prio;
+> +			tdx_reclaim_control_page(kvm_tdx->tdcs_pa[i]);
+> +		}
+> +		kfree(kvm_tdx->tdcs_pa);
+> +		kvm_tdx->tdcs_pa = NULL;
+> +	}
+> +
+> +	if (!kvm_tdx->tdr_pa)
+> +		return;
 
+Use is_td_created() helper. Also isn't this check redundant since you've 
+already executed is_hkid_assigned() and if the VM is not properly 
+created i.e __tdx_td_init() has failed for whatever reason then the 
+is_hkid_assigned check will also fail?
 
-How about something like this folded into this patch ? Or if this patch 
-goes in independently, we could carry the following as part of the CCA
-series.
+> +
+> +	if (__tdx_reclaim_page(kvm_tdx->tdr_pa))
+> +		return;
+> +
+> +	/*
+> +	 * Use a SEAMCALL to ask the TDX module to flush the cache based on the
+> +	 * KeyID. TDX module may access TDR while operating on TD (Especially
+> +	 * when it is reclaiming TDCS).
+> +	 */
+> +	err = tdh_phymem_page_wbinvd(set_hkid_to_hpa(kvm_tdx->tdr_pa,
+> +						     tdx_global_keyid));
+> +	if (KVM_BUG_ON(err, kvm)) {
+> +		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err);
+> +		return;
+> +	}
+> +	tdx_clear_page(kvm_tdx->tdr_pa);
+> +
+> +	free_page((unsigned long)__va(kvm_tdx->tdr_pa));
+> +	kvm_tdx->tdr_pa = 0;
+> +}
+> +
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-b/drivers/irqchip/irq-gic-v3-its.c
-index 6f4ddf7faed1..f1a779b52210 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -209,7 +209,7 @@ static struct page *its_alloc_pages_node(int node, 
-gfp_t gfp,
-
-  	page = alloc_pages_node(node, gfp, order);
-
--	if (page)
-+	if (gic_rdists->is_shared && page)
-  		set_memory_decrypted((unsigned long)page_address(page),
-  				     BIT(order));
-  	return page;
-@@ -222,7 +222,8 @@ static struct page *its_alloc_pages(gfp_t gfp, 
-unsigned int order)
-
-  static void its_free_pages(void *addr, unsigned int order)
-  {
--	set_memory_encrypted((unsigned long)addr, BIT(order));
-+	if (gic_rdists->is_shared)
-+		set_memory_encrypted((unsigned long)addr, BIT(order));
-  	free_pages((unsigned long)addr, order);
-  }
-
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index 6fb276504bcc..48c6b2c8dd8c 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -2015,6 +2015,8 @@ static int __init gic_init_bases(phys_addr_t 
-dist_phys_base,
-  	typer = readl_relaxed(gic_data.dist_base + GICD_TYPER);
-  	gic_data.rdists.gicd_typer = typer;
-
-+	gic_data.rdists.is_shared = 
-!arm64_is_iomem_private(gic_data.dist_phys_base,
-+							    PAGE_SIZE);
-  	gic_enable_quirks(readl_relaxed(gic_data.dist_base + GICD_IIDR),
-  			  gic_quirks, &gic_data);
-
-diff --git a/include/linux/irqchip/arm-gic-v3.h 
-b/include/linux/irqchip/arm-gic-v3.h
-index 728691365464..1edc33608d52 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -631,6 +631,7 @@ struct rdists {
-  	bool			has_rvpeid;
-  	bool			has_direct_lpi;
-  	bool			has_vpend_valid_dirty;
-+	bool			is_shared;
-  };
-
-  struct irq_domain;
+<snip>
 
