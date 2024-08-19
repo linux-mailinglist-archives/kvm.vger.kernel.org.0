@@ -1,457 +1,204 @@
-Return-Path: <kvm+bounces-24537-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24538-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294ED956EDF
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 17:35:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F3E5956F46
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 17:53:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D6F51F22609
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:35:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C41061C21D27
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDCB7E0E4;
-	Mon, 19 Aug 2024 15:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35297131BAF;
+	Mon, 19 Aug 2024 15:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="gFbNXDUg"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ca3iYC0+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2086.outbound.protection.outlook.com [40.107.237.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CF560DCF
-	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 15:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724081712; cv=none; b=rApxBg6EI49yYqWFOYUy4REPJrjIooSp0COBcaysiRJhjEXKZJ9gJBvQscWrblmJTN6vZm9EXLWcq7j2kayKVspMGPLyPLDPaHtPvgudDtOMPnbiMDVFbk1/Fx13QcdDBmKoRPIyjWnQTLkDYHhzkvmH8P6epJsxxnYh42gNRRU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724081712; c=relaxed/simple;
-	bh=YLF37eAQvh5lgzpaTo0MKTkIxfxfpfBfhUqCi+d75HA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k9dGI93HlhERbHgMQIwj/mDxkbA9hWkh2AqHZVm2dvbKPsOx0znTzlPwd42WJYd/ZmmjA9Szo5b6n9pWUJ97rSI6spZCvDBzhzURWKm2rw8Mlw9Y+heecPrJBp9udng1FSJOmIwZUFB52juDGt8jyzh/NDhbkQ0RgNXQKydiIFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=gFbNXDUg; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5bed83487aeso3157398a12.2
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 08:35:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724081707; x=1724686507; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dm5ql1wu8/2cGvWBZTZR9lu7EO5dAqH855O0OBVNN/Y=;
-        b=gFbNXDUgnLP3rWouvHy6v1C7QKnYuuW6hYV91JEmvFEjvjKshWwCyBMTrq/QQbwlrM
-         xnSxdtrO+OT0A3EPIn47BagCyqnlCi93aBVjWwwLrZkDQOWYv1kcc1Uvgl2AphT9J1qP
-         Avo7pX948Pml5v3VBh6SYYPHjhuL1gC/6yFnYeGZmE4b2OKFc+JNQ8ZEz7kYhJ2v5nps
-         yfVxZdDhxftypX1IR9rJN9I8KsxHnjB6ZxsneuOX8j+BuDlDMvXaZis1arlWLjvDuPh/
-         essX4hSenyO6KWIm4To2pDEVeCyXY07N0q9v2uttPZ0cSiio3nfrfl4aJzw+pQ5K8Gx7
-         uwqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724081707; x=1724686507;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dm5ql1wu8/2cGvWBZTZR9lu7EO5dAqH855O0OBVNN/Y=;
-        b=DPsoDhvXkX50Fcku+FY3s73ylvfEs3aoocOQhISZcmj2r+7wxhUdrCsEklZfqU0cgD
-         WNwLz2DwG+HTqz9UNnGtm8lIovtK1Gp+sLoBGE/5no7roz4/yV1KbBi6EhdQplaN6ZoQ
-         F0XIfE9lwQiS+52rkDQpl80hv3quVHRIxo968WdSA8RsstwPg1V2BGYnF871RRK9vsLk
-         jleF57qGIeJdXL7Udgp+RCajO6o6gzsMQPiPkQmn1tk8Q06MPXmo3upFtpxK0P3B1H0h
-         Wjec8p0ettdQYtY8fnox+MghJQB6KCpNGtscUM6ps9zir9OtLwTy4s1x3SFzLTS7oeFu
-         rMiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWijshqYhgJV/l/AayVWr6NKMRTsSMBbAshN5QkRVAIvJOYJX2qPsA1tLDf4k7ZbnCUToGOs+0ngQAwCxu2ytlmIXGb
-X-Gm-Message-State: AOJu0YxyIXFBHGlBqoX1R8/GMP8A3IH1rVYf5ZMHsumaDzMjwi0k2edt
-	YiB0+4hIU9ZRtJzIc6MAxnrxxDdlW67ovh/aH76qX2vRFfzrOw2/RxZWDSDo200=
-X-Google-Smtp-Source: AGHT+IHQZLpXQGD7OozKacrfpk6EoO3Ok9YaSaMuer8G09xpVdnjAu1IukKXkwLshDH8A+aKZzWi1g==
-X-Received: by 2002:a05:6402:274d:b0:5be:dbbb:2d49 with SMTP id 4fb4d7f45d1cf-5bedbbb33b9mr6414525a12.1.1724081707068;
-        Mon, 19 Aug 2024 08:35:07 -0700 (PDT)
-Received: from ?IPV6:2a10:bac0:b000:7717:7285:c2ff:fedd:7e3a? ([2a10:bac0:b000:7717:7285:c2ff:fedd:7e3a])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbbe2707sm5686408a12.7.2024.08.19.08.35.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Aug 2024 08:35:06 -0700 (PDT)
-Message-ID: <822766d1-746a-4b15-b790-d1e331e4d9aa@suse.com>
-Date: Mon, 19 Aug 2024 18:35:05 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC11A3BBF2
+	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 15:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724082797; cv=fail; b=fVatwkRR//Tv8lDjNuQZsRRsO9VdhbyrqvKZVWaQTiVK0RiDcNg9rIt5cwX/eLa/yzTLPYNKARoTpiZ04jiZyiWTMWRzF9pNlQ10w5OJvUAqc7zKpMKFGa9nedLsE9pDdxpLkNIStLHh36+mA+MwcUUuCCF/gPfhFQA92njQAZc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724082797; c=relaxed/simple;
+	bh=c8JhS/IRCm9uk9riaft7twIBApY5EDw1YCUZ7U+rqFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=dMTwe+IKnDZ9j2KQq57Rnr0GmL5qAoJ/8IsK9W421bG8HC5UID63NDKxSCtmaoqePAjkqGfNbqeRXRWrxkeGG3slzrlt8uxx0NOgQtHlvQlJJdtpd6IiJBg/9TD4jpmz5wCn5PV+0PUN5EAFTR5X0MDLi8v37AqGUZFrR56yFO8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ca3iYC0+; arc=fail smtp.client-ip=40.107.237.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zEXyRtEE4pQiHUO9fSJJsRH9yJ2uc5GO+Rp75tOrZhKxCjvHL85z1Eo+L2K0zm7LPiWSKkX1XqkEqlRMum4f+gJovq4CIrfMxYi9Fej10fH/9RgSuX3sojhYoHN2uDNRfV0I6bEZuUVS806j7eEJdi6mp+OWuYSXbT4yZB20M68jEnz0UGveCsZAyKkQUv/1aE5ZtKTsL6uy8tODPqG3DVnqosTcEM+Fjfz8S4iY58YbLywCo3raF/dmh6cuJasBcNivt2vo+Gf0QO8h+QG2RgR+MQpZSDoyZv8bfDul8t/mqt1pnvojrDinJek1CbTN1kfKOTR/7uv1int+WyftXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uuLFPxgfJUmswZZHRrmJR2na5MN3mDCPd98lsO/E0E0=;
+ b=TC+zBHhw2EvyLeeDlUsDDtBsyPT/Th8j0nvMr4vvspZWntLXO4CKIBGLZxDK2pKL723pGTM9uqHjYGML8bhrhGaYmkm4ZlJa+s9714wQKkl2TvxZ891STss0dzwyn433SDOtg/a93F3r14pgBsIm7KCd2Xuj4QeKrC2eMqFa1CUbeTeVGzZWfTFFBems8YMqvJ2c7PivG8UhJjIZEh8XKChnXy2s36SNGhnqTZjXyGymEAqeICwEyaFCbN4WOW3MalAGuW0w4s1QGumgYic1YmIBT6oN8GJBUCzg6krPNrMqc/sutZlufho2lXRzhXABRntNdB1ik+MlJZNTF80Q8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uuLFPxgfJUmswZZHRrmJR2na5MN3mDCPd98lsO/E0E0=;
+ b=ca3iYC0+JOl7i8hdMTh/ZKvr5U5S1cc+5ULpUut00RLJ1wwNSMVQGTYw78/J+m1j4WI68VPdast1lq0gUlVKS3aa4ggq4pJjlXEuEj7yVOM0zD1T2R3MGzvtY+4ZZ1NREUVGMUaPWY1bbr1ihy/oIJ97n4Al7M+rcWVI1bcF6kJo3QidVADQMwErHNDPyTCCJHpZENklqyEd1dMtTx06Vf4mzxFcZC1K31+ikIdiJepSyHnXOugjXJ4P4aXE1o8JBlTtrhI62S+voWu7YSp3QwS+0DxKIOWBe2usr0aTgSRyMibDzoaFalA6zeRKgauVy2o3b0RrI6l42sN2z7c7Iw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
+ by MN0PR12MB6151.namprd12.prod.outlook.com (2603:10b6:208:3c5::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Mon, 19 Aug
+ 2024 15:53:12 +0000
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7875.019; Mon, 19 Aug 2024
+ 15:53:11 +0000
+Date: Mon, 19 Aug 2024 12:53:10 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: "Zhang, Tina" <tina.zhang@intel.com>
+Cc: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	David Hildenbrand <david@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Peter Xu <peterx@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 16/16] iommupt: Add the Intel VT-D second stage page
+ table format
+Message-ID: <20240819155310.GB3094258@nvidia.com>
+References: <0-v1-01fa10580981+1d-iommu_pt_jgg@nvidia.com>
+ <16-v1-01fa10580981+1d-iommu_pt_jgg@nvidia.com>
+ <MW5PR11MB588168AE58B215896793E83C898C2@MW5PR11MB5881.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MW5PR11MB588168AE58B215896793E83C898C2@MW5PR11MB5881.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BN6PR17CA0040.namprd17.prod.outlook.com
+ (2603:10b6:405:75::29) To CH3PR12MB7763.namprd12.prod.outlook.com
+ (2603:10b6:610:145::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 14/25] KVM: TDX: initialize VM with TDX specific
- parameters
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
- tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
- linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-15-rick.p.edgecombe@intel.com>
-From: Nikolay Borisov <nik.borisov@suse.com>
-Content-Language: en-US
-In-Reply-To: <20240812224820.34826-15-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|MN0PR12MB6151:EE_
+X-MS-Office365-Filtering-Correlation-Id: 511ee770-83b7-41ff-ab45-08dcc0670741
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?uGW9VUUBSc51STX2h5ES7w5jGMh2fwAsf12HBpGdmd7K9gRrZl4jP4pPq06U?=
+ =?us-ascii?Q?qUCOqpEgS2gOGwtyjyweILmwCSWCw8tewRcgDr1wFCtdIg7k9OyYwioMitCn?=
+ =?us-ascii?Q?nxE39FOnfO2BXvDkyS4cI9a0OuOtOz4teOwNN0BYvHe8j++xkVqFWdEw0dlk?=
+ =?us-ascii?Q?9TRvn5m7Y2a9KrqNmuCYTf80hx6CpK+ZWbnwiuNXiHAFhhRNwANapAIkQi3b?=
+ =?us-ascii?Q?6FfOVk9kocXjKb188zmeQN6pg0X61/Ye/4DhtM88YMc5+A37/k0uOr0AitRZ?=
+ =?us-ascii?Q?UPjLPB1shdIWaNag0SYzwp2b3KtYURw/UMg4fS7leLZJ93Sb2o9p0irGuqNX?=
+ =?us-ascii?Q?jw4gDA1TSX1pon0fMENdwM6WSwRnzi3HONp6DmRNoEigtChVm8CL0MZwTI4h?=
+ =?us-ascii?Q?VzGXjDZFmxl/KhT6U8nFcwkiveBnZQU6HB4Xa3NpviZKOHKbakfUK0LEMGQ8?=
+ =?us-ascii?Q?dsJ3R1GfbPuX1Sl5xV9I7l9g+/1TOnfaRHde6Ei5VYqQlCW+jaODuPcxncGJ?=
+ =?us-ascii?Q?KNZjftSo/XXf86hn/+Vr006bcfNqk9MA1M3Nb1jtZUDnKtsAbqrLNyhFuQvj?=
+ =?us-ascii?Q?1nADD/TPYjLZ5FgYJmXyqlKHW7Sh9/Vf/cVqA3QqDlquhIjrSrbQ7d8imTyl?=
+ =?us-ascii?Q?czFYrriKVmiHmgbEms2c8UuOuRQTo5lz7AGs+CrBVLTu8h4/0HJGZ5DZXK7N?=
+ =?us-ascii?Q?6pCmgCh+PxJGK1Xq9fmPUcUxjatkfOmSoRL1Mwwar0c/gLhT6znPpSTKvOC+?=
+ =?us-ascii?Q?HqK2VBYCqCwTwaVVNrU27M75WZ0LyJMaiq+SidDDNdcsrI6qD7VUj8yOAS7+?=
+ =?us-ascii?Q?3sj00Y4fKNccJ+rZ1GPX9FjiJ2wMGXR6zl8Cn6bK9m18uz8cR/vuwn4O/0AM?=
+ =?us-ascii?Q?mo7yTJUO3YN5sPPLVzgrp7M6XjYLl8BayqXnoxUiT3tRSUJjSzLl3CINzCmp?=
+ =?us-ascii?Q?hjFlG7INOn8MfUMH2oi6b2wqJPztLWH6PSZvBInJ/05IP7pfFRMzlPAnrUEb?=
+ =?us-ascii?Q?MDp9o4jt9iU5npjjWVuT2mQ7VIPHGuyxd36oCPBYE8uNGAN9n08Fv/6B00p3?=
+ =?us-ascii?Q?/fAaZJNmdIVOrcVpRCF+wChU+O+NePBtefNR3kwc1hduvO2zoM7oBYHw1XWm?=
+ =?us-ascii?Q?GVVbtxOtqkyER3zvEC5NrRFICYOTFUIiWbzxk7NES6YF3jDySROHAP5DZuZS?=
+ =?us-ascii?Q?rioFzhJm70SkzvlpwNHlzcNECMO4JylIu0iDD3jO/YdoMPmFAyu2NSjXSPgN?=
+ =?us-ascii?Q?y4TpZcF0jYNqlhPKYW3L9jbe2kAFrnZFc8xYwuwDj2g/l2s7K5Pzgagvy87e?=
+ =?us-ascii?Q?HE8S+a5tZyN8SO36RlKjrlUwjIClHjOYDo7xizaNbNsFBg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?+75UqftvWxk5yxMqLgZP+uCe/Hw7eEV+nGUewMH71vKfZbbWvBT7VEeE8Vyv?=
+ =?us-ascii?Q?V1Cjn+xzAeDrvFSy9GqCPkXj0GVMFE2wSCQkK1SlklWSKkeMm5m45Ppst3ux?=
+ =?us-ascii?Q?UU3wIB/GfMseMDVcIHuwap1xYn/nP+5n5WK/Uf6S6fNrpCd7NW8TGfmKPWoU?=
+ =?us-ascii?Q?d+LAwj1v9G4Q3rmSmJ+qm/lY2IkmzBy0xsU8ZB73KCUMVoQLht7ugQd1WJhu?=
+ =?us-ascii?Q?A6THxj8x+eUWXocKUka1tekcHNduoV8zG1pZ/8kYOa31xsJ6TMcDgsIZoZPw?=
+ =?us-ascii?Q?2d6Sf2iLxTxlSwZ7eKe7GSnOIDZUAyTK4KD0z01dDKjuB8UdIqUXVim7KpTr?=
+ =?us-ascii?Q?te5em+9fXIz/MiWJJNXUUDQMtzeOVkr41Tu8BixxPD7auMrgqdRO8EIKzU9m?=
+ =?us-ascii?Q?/Cyuzw6pQw3FK68OH9+5K89ff4WaK7DdaWVmTTqlpA3Re34fiMGogKNg8+p5?=
+ =?us-ascii?Q?6Ugyn73lq0yHfAtgc4Jts+zaXYLFWfkLSwNG5xUXKRSCpWp8I5dudMsMlHda?=
+ =?us-ascii?Q?cL2NVMbttmfWqCjAo937tkvIrL0ubnoYiUuIuiVlZTukb3AeVOulNBXBCJGs?=
+ =?us-ascii?Q?oe9SfyMm1MCHMYmFTi5//bjyXziVnqhj0ca5BGBd1u06rI9w188Fgqx4cMDZ?=
+ =?us-ascii?Q?74EV2QM9ucCv1af1jw12/O5YNB4o8KPyK+Pnt6hQljJew8Lz5A2IQRQ4T1+u?=
+ =?us-ascii?Q?lG0CMcjW/MR0ebcbhoTOuWVLQC7Oz/FhswvcFLNF5hJHj3Aw5Q2JUGnkMM7X?=
+ =?us-ascii?Q?vBsC0fM91sUcNj0/wliXmK/Lafy+KFxN/lA+gbjsKl6qTmwpzL6lb8bA6pWH?=
+ =?us-ascii?Q?K47rzHRB2mLjavp3FKGQQyNGvQh6rMnbYcYUFhouj2XGAUJjh3BWOtuycNrE?=
+ =?us-ascii?Q?cP7Mz6ytgOtqsrSvids3mmHd+15RqpdTB60rFEwGYnob7j0RNozoP/oF2Qpd?=
+ =?us-ascii?Q?2J0HpH7bNxqIBW9kVEMUPwYLaQhULX9Dq9yltYdZmuAtFTI5Ce/tWoIiuQHQ?=
+ =?us-ascii?Q?t49rz8FY+G9b7Sy9s3yN2Pwdm7DZFyAXNjsf2aC6RBQjGg32YpSd+G4sQFZW?=
+ =?us-ascii?Q?zyA0WMmlb/8dLQQj66bWptbytLF0jhey6LEXdkVUwJTBaQT5cb/ugBbvir3L?=
+ =?us-ascii?Q?zm+g1hWmPhjSRdX2JCNwh1oUt2AZexZIoal8r9v1fVhDI3IfSwfS8WgEH/dh?=
+ =?us-ascii?Q?qX71jEE5iZp2U40Mh3b6JU5PA+ZnU274+ts1RqH5dOeLOlzUi5xGagzV+nD1?=
+ =?us-ascii?Q?FetRG8f4gbMH7NpAnkJG7IivZ1TPx+yJcoHfwECTFUrM9OBt0qZ/rzm42bT9?=
+ =?us-ascii?Q?U+ZS/hEQ5PJ0I/h3XrrsaQJynx8A6/yb1ea25ZktmAE4WmPbeBSsthaVzAn7?=
+ =?us-ascii?Q?S6nxSyGeonZ7uPco+w3u4nGP7AwuqfN4e1Eb0xTrrMsTbUoj3vjzQAeyM9dC?=
+ =?us-ascii?Q?IRBU22vCjd/Ij1ogalM4PLNKBas7YJp1070R3oRwKQtTphYXKu6zD2/LRHzk?=
+ =?us-ascii?Q?S2k9WHDQYZVBgiPY2RlWr7/DRa9PEfvGE/yHBY0iwfCzstv28oZeToFBU3NW?=
+ =?us-ascii?Q?b1MCHaAp1phvk4TO6mSKuFbeEBXh+Uc3u7x45x1+?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 511ee770-83b7-41ff-ab45-08dcc0670741
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2024 15:53:11.6976
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gedn1y/4PQDtDRzXqhwM5YoTQ/FqzDY6II+6kNKMIaJcSdL5LD1b9kazJw+H/yz5
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6151
 
+On Mon, Aug 19, 2024 at 02:51:11AM +0000, Zhang, Tina wrote:
 
-
-On 13.08.24 г. 1:48 ч., Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > +/* Shared descriptor bits */
+> > +enum {
+> > +	VTDSS_FMT_R = BIT(0),
+> > +	VTDSS_FMT_W = BIT(1),
+> > +	VTDSS_FMT_X = BIT(2),
 > 
-> After the crypto-protection key has been configured, TDX requires a
-> VM-scope initialization as a step of creating the TDX guest.  This
-> "per-VM" TDX initialization does the global configurations/features that
-> the TDX guest can support, such as guest's CPUIDs (emulated by the TDX
-> module), the maximum number of vcpus etc.
-> 
-> This "per-VM" TDX initialization must be done before any "vcpu-scope" TDX
-> initialization.  To match this better, require the KVM_TDX_INIT_VM IOCTL()
-> to be done before KVM creates any vcpus.
-> 
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
-> uAPI breakout v1:
->   - Drop TDX_TD_XFAM_CET and use XFEATURE_MASK_CET_{USER, KERNEL}.
->   - Update for the wrapper functions for SEAMCALLs. (Sean)
->   - Move gfn_shared_mask settings into this patch due to MMU section move
->   - Fix bisectability issues in headers (Kai)
->   - Updates from seamcall overhaul (Kai)
->   - Allow userspace configure xfam directly
->   - Check if user sets non-configurable bits in CPUIDs
->   - Rename error->hw_error
->   - Move code change to tdx_module_setup() to __tdx_bringup() due to
->     initializing is done in post hardware_setup() now and
->     tdx_module_setup() is removed.  Remove the code to use API to read
->     global metadata but use exported 'struct tdx_sysinfo' pointer.
->   - Replace 'tdx_info->nr_tdcs_pages' with a wrapper
->     tdx_sysinfo_nr_tdcs_pages() because the 'struct tdx_sysinfo' doesn't
->     have nr_tdcs_pages directly.
->   - Replace tdx_info->max_vcpus_per_td with the new exported pointer in
->     tdx_vm_init().
->   - Decrease the reserved space for struct kvm_tdx_init_vm (Kai)
->   - Use sizeof_field() for struct kvm_tdx_init_vm cpuids (Tony)
->   - No need to init init_vm, it gets copied over in tdx_td_init() (Chao)
->   - Use kmalloc() instead of () kzalloc for init_vm in tdx_td_init() (Chao)
->   - Add more line breaks to tdx_td_init() to make code easier to read (Tony)
->   - Clarify patch description (Kai)
-> 
-> v19:
->   - Check NO_RBP_MOD of feature0 and set it
->   - Update the comment for PT and CET
-> 
-> v18:
->   - remove the change of tools/arch/x86/include/uapi/asm/kvm.h
->   - typo in comment. sha348 => sha384
->   - updated comment in setup_tdparams_xfam()
->   - fix setup_tdparams_xfam() to use init_vm instead of td_params
-> 
-> v16:
->   - Removed AMX check as the KVM upstream supports AMX.
->   - Added CET flag to guest supported xss
-> ---
->   arch/x86/include/uapi/asm/kvm.h |  24 ++++
->   arch/x86/kvm/cpuid.c            |   7 +
->   arch/x86/kvm/cpuid.h            |   2 +
->   arch/x86/kvm/vmx/tdx.c          | 237 ++++++++++++++++++++++++++++++--
->   arch/x86/kvm/vmx/tdx.h          |   4 +
->   arch/x86/kvm/vmx/tdx_ops.h      |  12 ++
->   6 files changed, 276 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 2e3caa5a58fd..95ae2d4a4697 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -929,6 +929,7 @@ struct kvm_hyperv_eventfd {
->   /* Trust Domain eXtension sub-ioctl() commands. */
->   enum kvm_tdx_cmd_id {
->   	KVM_TDX_CAPABILITIES = 0,
-> +	KVM_TDX_INIT_VM,
->   
->   	KVM_TDX_CMD_NR_MAX,
->   };
-> @@ -970,4 +971,27 @@ struct kvm_tdx_capabilities {
->   	struct kvm_tdx_cpuid_config cpuid_configs[];
->   };
->   
-> +struct kvm_tdx_init_vm {
-> +	__u64 attributes;
-> +	__u64 xfam;
-> +	__u64 mrconfigid[6];	/* sha384 digest */
-> +	__u64 mrowner[6];	/* sha384 digest */
-> +	__u64 mrownerconfig[6];	/* sha384 digest */
-> +
-> +	/* The total space for TD_PARAMS before the CPUIDs is 256 bytes */
-> +	__u64 reserved[12];
-> +
-> +	/*
-> +	 * Call KVM_TDX_INIT_VM before vcpu creation, thus before
-> +	 * KVM_SET_CPUID2.
-> +	 * This configuration supersedes KVM_SET_CPUID2s for VCPUs because the
-> +	 * TDX module directly virtualizes those CPUIDs without VMM.  The user
-> +	 * space VMM, e.g. qemu, should make KVM_SET_CPUID2 consistent with
-> +	 * those values.  If it doesn't, KVM may have wrong idea of vCPUIDs of
-> +	 * the guest, and KVM may wrongly emulate CPUIDs or MSRs that the TDX
-> +	 * module doesn't virtualize.
-> +	 */
-> +	struct kvm_cpuid2 cpuid;
-> +};
-> +
->   #endif /* _ASM_X86_KVM_H */
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 2617be544480..7310d8a8a503 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1487,6 +1487,13 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->   	return r;
->   }
->   
-> +struct kvm_cpuid_entry2 *kvm_find_cpuid_entry2(
-> +	struct kvm_cpuid_entry2 *entries, int nent, u32 function, u64 index)
-> +{
-> +	return cpuid_entry2_find(entries, nent, function, index);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_find_cpuid_entry2);
-> +
->   struct kvm_cpuid_entry2 *kvm_find_cpuid_entry_index(struct kvm_vcpu *vcpu,
->   						    u32 function, u32 index)
->   {
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index 41697cca354e..00570227e2ae 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -13,6 +13,8 @@ void kvm_set_cpu_caps(void);
->   
->   void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu);
->   void kvm_update_pv_runtime(struct kvm_vcpu *vcpu);
-> +struct kvm_cpuid_entry2 *kvm_find_cpuid_entry2(struct kvm_cpuid_entry2 *entries,
-> +					       int nent, u32 function, u64 index);
->   struct kvm_cpuid_entry2 *kvm_find_cpuid_entry_index(struct kvm_vcpu *vcpu,
->   						    u32 function, u32 index);
->   struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index a0954c3928e2..a6c711715a4a 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -7,6 +7,7 @@
->   #include "tdx.h"
->   #include "tdx_ops.h"
->   
-> +
->   #undef pr_fmt
->   #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
->   
-> @@ -356,12 +357,16 @@ static int tdx_do_tdh_mng_key_config(void *param)
->   	return 0;
->   }
->   
-> -static int __tdx_td_init(struct kvm *kvm);
-> -
->   int tdx_vm_init(struct kvm *kvm)
->   {
->   	kvm->arch.has_private_mem = true;
->   
-> +	/*
-> +	 * This function initializes only KVM software construct.  It doesn't
-> +	 * initialize TDX stuff, e.g. TDCS, TDR, TDCX, HKID etc.
-> +	 * It is handled by KVM_TDX_INIT_VM, __tdx_td_init().
-> +	 */
+> VT-d Spec doesn't have this BIT(2) defined.
 
-If you need to put a comment like that it means the function has the 
-wrong name.
+It does:
 
-> +
->   	/*
->   	 * TDX has its own limit of the number of vcpus in addition to
->   	 * KVM_MAX_VCPUS.
+ Figure 9-8. Format for Second-Stage Paging Entries
 
-<snip>
+ Bit 2 = X^1
 
-> +
-> +static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
-> +			 u64 *seamcall_err)
+ 1. X field is ignored by hardware if Execute Request Support (ERS) is
+ reported as Clear in the Extended Capability Register or if SSEE=0 in
+ the scalable-mode PASID-table entry referencing the second-stage
+ paging entries.
 
-What criteria did you use to split __tdx_td_init from tdx_td_init? Seems 
-somewhar arbitrary, I think it's best if the TD VM init code is in a 
-single function, yet it will be rather large but the code should be 
-self-explanatory and fairly linear. Additionally I think some of the 
-code can be factored out in more specific helpers i.e the key 
-programming bits can be a separate helper.
+> > +static struct io_pgtable_ops *
+> > +vtdss_pt_iommu_alloc_io_pgtable(struct pt_iommu_vtdss_cfg *cfg,
+> > +				struct device *iommu_dev,
+> > +				struct io_pgtable_cfg **unused_pgtbl_cfg) {
+> > +	struct io_pgtable_cfg pgtbl_cfg = {};
+> > +
+> > +	pgtbl_cfg.ias = 48;
+> > +	pgtbl_cfg.oas = 52;
+> 
+> Since the alloca_io_pgtable_ops() is used for PT allocation, the
+> pgtbl_cfg.ias and pgtbl_cfg.oas can be provided with the theoretical
+> max address sizes or simply leave them unassigned here.
 
->   {
->   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
->   	cpumask_var_t packages;
-> @@ -427,8 +547,9 @@ static int __tdx_td_init(struct kvm *kvm)
->   	unsigned long tdr_pa = 0;
->   	unsigned long va;
->   	int ret, i;
-> -	u64 err;
-> +	u64 err, rcx;
->   
-> +	*seamcall_err = 0;
->   	ret = tdx_guest_keyid_alloc();
->   	if (ret < 0)
->   		return ret;
-> @@ -543,10 +664,23 @@ static int __tdx_td_init(struct kvm *kvm)
->   		}
->   	}
->   
-> -	/*
-> -	 * Note, TDH_MNG_INIT cannot be invoked here.  TDH_MNG_INIT requires a dedicated
-> -	 * ioctl() to define the configure CPUID values for the TD.
-> -	 */
-> +	err = tdh_mng_init(kvm_tdx, __pa(td_params), &rcx);
-> +	if ((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_INVALID) {
-> +		/*
-> +		 * Because a user gives operands, don't warn.
-> +		 * Return a hint to the user because it's sometimes hard for the
-> +		 * user to figure out which operand is invalid.  SEAMCALL status
-> +		 * code includes which operand caused invalid operand error.
-> +		 */
-> +		*seamcall_err = err;
-> +		ret = -EINVAL;
-> +		goto teardown;
-> +	} else if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error_1(TDH_MNG_INIT, err, rcx);
-> +		ret = -EIO;
-> +		goto teardown;
-> +	}
-> +
->   	return 0;
->   
->   	/*
-> @@ -592,6 +726,86 @@ static int __tdx_td_init(struct kvm *kvm)
->   	return ret;
->   }
->   
-> +static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	struct kvm_tdx_init_vm *init_vm;
-> +	struct td_params *td_params = NULL;
-> +	int ret;
-> +
-> +	BUILD_BUG_ON(sizeof(*init_vm) != 256 + sizeof_field(struct kvm_tdx_init_vm, cpuid));
-> +	BUILD_BUG_ON(sizeof(struct td_params) != 1024);
-> +
-> +	if (is_hkid_assigned(kvm_tdx))
-> +		return -EINVAL;
-> +
-> +	if (cmd->flags)
-> +		return -EINVAL;
-> +
-> +	init_vm = kmalloc(sizeof(*init_vm) +
-> +			  sizeof(init_vm->cpuid.entries[0]) * KVM_MAX_CPUID_ENTRIES,
-> +			  GFP_KERNEL);
-> +	if (!init_vm)
-> +		return -ENOMEM;
-> +
-> +	if (copy_from_user(init_vm, u64_to_user_ptr(cmd->data), sizeof(*init_vm))) {
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	if (init_vm->cpuid.nent > KVM_MAX_CPUID_ENTRIES) {
-> +		ret = -E2BIG;
-> +		goto out;
-> +	}
-> +
-> +	if (copy_from_user(init_vm->cpuid.entries,
-> +			   u64_to_user_ptr(cmd->data) + sizeof(*init_vm),
-> +			   flex_array_size(init_vm, cpuid.entries, init_vm->cpuid.nent))) {
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	if (memchr_inv(init_vm->reserved, 0, sizeof(init_vm->reserved))) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	if (init_vm->cpuid.padding) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	td_params = kzalloc(sizeof(struct td_params), GFP_KERNEL);
-> +	if (!td_params) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	ret = setup_tdparams(kvm, td_params, init_vm);
-> +	if (ret)
-> +		goto out;
-> +
-> +	ret = __tdx_td_init(kvm, td_params, &cmd->hw_error);
-> +	if (ret)
-> +		goto out;
-> +
-> +	kvm_tdx->tsc_offset = td_tdcs_exec_read64(kvm_tdx, TD_TDCS_EXEC_TSC_OFFSET);
-> +	kvm_tdx->attributes = td_params->attributes;
-> +	kvm_tdx->xfam = td_params->xfam;
-> +
-> +	if (td_params->exec_controls & TDX_EXEC_CONTROL_MAX_GPAW)
-> +		kvm->arch.gfn_direct_bits = gpa_to_gfn(BIT_ULL(51));
-> +	else
-> +		kvm->arch.gfn_direct_bits = gpa_to_gfn(BIT_ULL(47));
-> +
-> +out:
-> +	/* kfree() accepts NULL. */
-> +	kfree(init_vm);
-> +	kfree(td_params);
-> +
-> +	return ret;
-> +}
-> +
->   int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->   {
->   	struct kvm_tdx_cmd tdx_cmd;
-> @@ -613,6 +827,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->   	case KVM_TDX_CAPABILITIES:
->   		r = tdx_get_capabilities(&tdx_cmd);
->   		break;
-> +	case KVM_TDX_INIT_VM:
-> +		r = tdx_td_init(kvm, &tdx_cmd);
-> +		break;
->   	default:
->   		r = -EINVAL;
->   		goto out;
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 268959d0f74f..8912cb6d5bc2 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -16,7 +16,11 @@ struct kvm_tdx {
->   	unsigned long tdr_pa;
->   	unsigned long *tdcs_pa;
->   
-> +	u64 attributes;
-> +	u64 xfam;
->   	int hkid;
-> +
-> +	u64 tsc_offset;
->   };
->   
->   struct vcpu_tdx {
-> diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
-> index 3f64c871a3f2..0363d8544f42 100644
-> --- a/arch/x86/kvm/vmx/tdx_ops.h
-> +++ b/arch/x86/kvm/vmx/tdx_ops.h
-> @@ -399,4 +399,16 @@ static inline u64 tdh_vp_wr(struct vcpu_tdx *tdx, u64 field, u64 val, u64 mask)
->   	return seamcall(TDH_VP_WR, &in);
->   }
->   
-> +static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
-> +{
-> +	u64 err, data;
-> +
-> +	err = tdh_mng_rd(kvm_tdx, TDCS_EXEC(field), &data);
-> +	if (unlikely(err)) {
-> +		pr_err("TDH_MNG_RD[EXEC.0x%x] failed: 0x%llx\n", field, err);
-> +		return 0;
-> +	}
-> +	return data;
-> +}
-> +
->   #endif /* __KVM_X86_TDX_OPS_H */
+It doesn't work if they are unassigned. The map op returns EFAULT.
+
+Thanks,
+Jason
 
