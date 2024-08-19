@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-24512-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24513-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDA56956BDD
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:26:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC673956BDF
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:26:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 835032850A3
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 13:26:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 706BC1F24187
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 13:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8782616D30C;
-	Mon, 19 Aug 2024 13:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD821891A8;
+	Mon, 19 Aug 2024 13:20:56 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6854E16D300;
-	Mon, 19 Aug 2024 13:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925B1188CD8;
+	Mon, 19 Aug 2024 13:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724073652; cv=none; b=VfsMCadaHI3fEcLnlQuIuhkGo81N8ec4JvHi1VyjVIAPfcJFimdKNWVzVRu738QrVHThBEnn/U1ocHLBIeMT7ep7eAzAey1LFjLhW3lJrd9Ubk6Gs/1mN8mqm2an2DszVp2B4BwmK5EF+nwVcLqB1wYD8A+DbQ61MocKuef8uPE=
+	t=1724073656; cv=none; b=UPNovRBr1lv1Cwu+8Vq/vGJ9QBLjMVH8VVyLmAFadWasLLStgRLgZhh1lW9DtXCR9KkHe0Fain+Gn0aMKnyEaZ6uKBXQphIkPYx90kU9Ur2uajXxhvcl3HVrXCyR+ggcsbZewPtURo85suZhaKeMMB4sfpe8iD9e/+Fd70qHYpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724073652; c=relaxed/simple;
-	bh=6o6USzuetgUicKKrZ2hyyo8VvWPJ8tHPDLLhQsjqUXM=;
+	s=arc-20240116; t=1724073656; c=relaxed/simple;
+	bh=L7d0QOsIblt5jTLM0//EA/WHUOT46VMmtEiZ4akbngE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=D6mt8+A9rjv15lZ7lHbj4YqAxvnmkLUtTPWbnYqh8qd/WuykmlMRHp8OuXaEAwXWWd54p+ZCs7lu/BxXPbj6zZpSprK5p2Nku/jpaZevSTs4hwD70+gJyg7ze6eh168nIsRSmdeireSFiDQ8eMDm8QNgfAJOX69Ae7TCxaeExj4=
+	 MIME-Version; b=De05BA1HQTQeZrWUngv+WPL0uhC78rEXIygFmLoxvZjLDhVgB6GSDX0PMcoDW8a7WsONHroFr2vxKTOFbxS/c9pE231rFe3KHrHVDy/GRvMyqRKoGy884KqaS4iWozP87/FX66eCQc5QC3SZhP8BAQhzbPb8g/uCjZzS+B3jZ5s=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14EFB1063;
-	Mon, 19 Aug 2024 06:21:16 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43792339;
+	Mon, 19 Aug 2024 06:21:20 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.85.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 182F93F73B;
-	Mon, 19 Aug 2024 06:20:45 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6CD523F73B;
+	Mon, 19 Aug 2024 06:20:50 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -55,9 +55,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>
-Subject: [PATCH v5 16/19] arm64: Enable memory encrypt for Realms
-Date: Mon, 19 Aug 2024 14:19:21 +0100
-Message-Id: <20240819131924.372366-17-steven.price@arm.com>
+Subject: [PATCH v5 17/19] irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor
+Date: Mon, 19 Aug 2024 14:19:22 +0100
+Message-Id: <20240819131924.372366-18-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240819131924.372366-1-steven.price@arm.com>
 References: <20240819131924.372366-1-steven.price@arm.com>
@@ -69,264 +69,350 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Within a realm guest the ITS is emulated by the host. This means the
+allocations must have been made available to the host by a call to
+set_memory_decrypted(). Introduce an allocation function which performs
+this extra call.
 
-Use the memory encryption APIs to trigger a RSI call to request a
-transition between protected memory and shared memory (or vice versa)
-and updating the kernel's linear map of modified pages to flip the top
-bit of the IPA. This requires that block mappings are not used in the
-direct map for realm guests.
+For the ITT use a custom genpool-based allocator that calls
+set_memory_decrypted() for each page allocated, but then suballocates
+the size needed for each ITT. Note that there is no mechanism
+implemented to return pages from the genpool, but it is unlikely the
+peak number of devices will so much larger than the normal level - so
+this isn't expected to be an issue.
 
+Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Co-developed-by: Steven Price <steven.price@arm.com>
+Tested-by: Will Deacon <will@kernel.org>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-Changed since v4:
- * Reworked to use the new dispatcher for the mem_encrypt API
 Changes since v3:
- * Provide pgprot_{de,en}crypted() macros
- * Rename __set_memory_encrypted() to __set_memory_enc_dec() since it
-   both encrypts and decrypts.
+ * Use BIT() macro.
+ * Use a genpool based allocator in its_create_device() to avoid
+   allocating a full page.
+ * Fix subject to drop "realm" and use gic-v3-its.
+ * Add error handling to ITS alloc/free.
 Changes since v2:
- * Fix location of set_memory_{en,de}crypted() and export them.
- * Break-before-make when changing the top bit of the IPA for
-   transitioning to/from shared.
+ * Drop 'shared' from the new its_xxx function names as they are used
+   for non-realm guests too.
+ * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
+   should do the right thing.
+ * Drop a pointless (void *) cast.
 ---
- arch/arm64/Kconfig                   |  3 ++
- arch/arm64/include/asm/mem_encrypt.h |  9 ++++
- arch/arm64/include/asm/pgtable.h     |  5 ++
- arch/arm64/include/asm/set_memory.h  |  3 ++
- arch/arm64/kernel/rsi.c              | 16 ++++++
- arch/arm64/mm/pageattr.c             | 76 ++++++++++++++++++++++++++--
- 6 files changed, 109 insertions(+), 3 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 139 ++++++++++++++++++++++++++-----
+ 1 file changed, 116 insertions(+), 23 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 68d77a2f4d1a..03d3dae34277 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -21,6 +21,7 @@ config ARM64
- 	select ARCH_ENABLE_SPLIT_PMD_PTLOCK if PGTABLE_LEVELS > 2
- 	select ARCH_ENABLE_THP_MIGRATION if TRANSPARENT_HUGEPAGE
- 	select ARCH_HAS_CACHE_LINE_SIZE
-+	select ARCH_HAS_CC_PLATFORM
- 	select ARCH_HAS_CURRENT_STACK_POINTER
- 	select ARCH_HAS_DEBUG_VIRTUAL
- 	select ARCH_HAS_DEBUG_VM_PGTABLE
-@@ -43,6 +44,8 @@ config ARM64
- 	select ARCH_HAS_SETUP_DMA_OPS
- 	select ARCH_HAS_SET_DIRECT_MAP
- 	select ARCH_HAS_SET_MEMORY
-+	select ARCH_HAS_MEM_ENCRYPT
-+	select ARCH_HAS_FORCE_DMA_UNENCRYPTED
- 	select ARCH_STACKWALK
- 	select ARCH_HAS_STRICT_KERNEL_RWX
- 	select ARCH_HAS_STRICT_MODULE_RWX
-diff --git a/arch/arm64/include/asm/mem_encrypt.h b/arch/arm64/include/asm/mem_encrypt.h
-index b0c9a86b13a4..f8f78f622dd2 100644
---- a/arch/arm64/include/asm/mem_encrypt.h
-+++ b/arch/arm64/include/asm/mem_encrypt.h
-@@ -2,6 +2,8 @@
- #ifndef __ASM_MEM_ENCRYPT_H
- #define __ASM_MEM_ENCRYPT_H
- 
-+#include <asm/rsi.h>
-+
- struct arm64_mem_crypt_ops {
- 	int (*encrypt)(unsigned long addr, int numpages);
- 	int (*decrypt)(unsigned long addr, int numpages);
-@@ -12,4 +14,11 @@ int arm64_mem_crypt_ops_register(const struct arm64_mem_crypt_ops *ops);
- int set_memory_encrypted(unsigned long addr, int numpages);
- int set_memory_decrypted(unsigned long addr, int numpages);
- 
-+int realm_register_memory_enc_ops(void);
-+
-+static inline bool force_dma_unencrypted(struct device *dev)
-+{
-+	return is_realm_world();
-+}
-+
- #endif	/* __ASM_MEM_ENCRYPT_H */
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index f39a4cbbf73a..4e8c648f5213 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -636,6 +636,11 @@ static inline void set_pud_at(struct mm_struct *mm, unsigned long addr,
- #define pgprot_nx(prot) \
- 	__pgprot_modify(prot, PTE_MAYBE_GP, PTE_PXN)
- 
-+#define pgprot_decrypted(prot) \
-+	__pgprot_modify(prot, PROT_NS_SHARED, PROT_NS_SHARED)
-+#define pgprot_encrypted(prot) \
-+	__pgprot_modify(prot, PROT_NS_SHARED, 0)
-+
- /*
-  * Mark the prot value as uncacheable and unbufferable.
-  */
-diff --git a/arch/arm64/include/asm/set_memory.h b/arch/arm64/include/asm/set_memory.h
-index 917761feeffd..37774c793006 100644
---- a/arch/arm64/include/asm/set_memory.h
-+++ b/arch/arm64/include/asm/set_memory.h
-@@ -15,4 +15,7 @@ int set_direct_map_invalid_noflush(struct page *page);
- int set_direct_map_default_noflush(struct page *page);
- bool kernel_page_present(struct page *page);
- 
-+int set_memory_encrypted(unsigned long addr, int numpages);
-+int set_memory_decrypted(unsigned long addr, int numpages);
-+
- #endif /* _ASM_ARM64_SET_MEMORY_H */
-diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-index 69d8d9791c65..9cb3353e5cbf 100644
---- a/arch/arm64/kernel/rsi.c
-+++ b/arch/arm64/kernel/rsi.c
-@@ -7,8 +7,10 @@
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 9b34596b3542..557214c774c3 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -12,12 +12,14 @@
+ #include <linux/crash_dump.h>
+ #include <linux/delay.h>
+ #include <linux/efi.h>
++#include <linux/genalloc.h>
+ #include <linux/interrupt.h>
+ #include <linux/iommu.h>
+ #include <linux/iopoll.h>
+ #include <linux/irqdomain.h>
+ #include <linux/list.h>
+ #include <linux/log2.h>
++#include <linux/mem_encrypt.h>
  #include <linux/memblock.h>
- #include <linux/psci.h>
- #include <linux/swiotlb.h>
-+#include <linux/cc_platform.h>
+ #include <linux/mm.h>
+ #include <linux/msi.h>
+@@ -27,6 +29,7 @@
+ #include <linux/of_pci.h>
+ #include <linux/of_platform.h>
+ #include <linux/percpu.h>
++#include <linux/set_memory.h>
+ #include <linux/slab.h>
+ #include <linux/syscore_ops.h>
  
- #include <asm/io.h>
-+#include <asm/mem_encrypt.h>
- #include <asm/rsi.h>
+@@ -164,6 +167,7 @@ struct its_device {
+ 	struct its_node		*its;
+ 	struct event_lpi_map	event_map;
+ 	void			*itt;
++	u32			itt_sz;
+ 	u32			nr_ites;
+ 	u32			device_id;
+ 	bool			shared;
+@@ -199,6 +203,81 @@ static DEFINE_IDA(its_vpeid_ida);
+ #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+ #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
  
- struct realm_config config;
-@@ -21,6 +23,17 @@ unsigned int phys_mask_shift = CONFIG_ARM64_PA_BITS;
- DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
- EXPORT_SYMBOL(rsi_present);
- 
-+bool cc_platform_has(enum cc_attr attr)
++static struct page *its_alloc_pages_node(int node, gfp_t gfp,
++					 unsigned int order)
 +{
-+	switch (attr) {
-+	case CC_ATTR_MEM_ENCRYPT:
-+		return is_realm_world();
-+	default:
-+		return false;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(cc_platform_has);
++	struct page *page;
++	int ret = 0;
 +
- static bool rsi_version_matches(void)
- {
- 	unsigned long ver_lower, ver_higher;
-@@ -128,6 +141,9 @@ void __init arm64_rsi_init(void)
- 	if (arm64_ioremap_prot_hook_register(realm_ioremap_hook))
- 		return;
- 
-+	if (realm_register_memory_enc_ops())
++	page = alloc_pages_node(node, gfp, order);
++
++	if (!page)
++		return NULL;
++
++	ret = set_memory_decrypted((unsigned long)page_address(page),
++				   1 << order);
++	if (WARN_ON(ret))
++		return NULL;
++
++	return page;
++}
++
++static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
++{
++	return its_alloc_pages_node(NUMA_NO_NODE, gfp, order);
++}
++
++static void its_free_pages(void *addr, unsigned int order)
++{
++	if (WARN_ON(set_memory_encrypted((unsigned long)addr, 1 << order)))
++		return;
++	free_pages((unsigned long)addr, order);
++}
++
++static struct gen_pool *itt_pool;
++
++static void *itt_alloc_pool(int node, int size)
++{
++	unsigned long addr;
++	struct page *page;
++
++	if (size >= PAGE_SIZE) {
++		page = its_alloc_pages_node(node,
++					    GFP_KERNEL | __GFP_ZERO,
++					    get_order(size));
++
++		return page_address(page);
++	}
++
++	do {
++		addr = gen_pool_alloc(itt_pool, size);
++		if (addr)
++			break;
++
++		page = its_alloc_pages_node(node, GFP_KERNEL | __GFP_ZERO, 1);
++		if (!page)
++			break;
++
++		gen_pool_add(itt_pool, (unsigned long)page_address(page),
++			     PAGE_SIZE, node);
++	} while (!addr);
++
++	return (void *)addr;
++}
++
++static void itt_free_pool(void *addr, int size)
++{
++	if (!addr)
 +		return;
 +
- 	static_branch_enable(&rsi_present);
++	if (size >= PAGE_SIZE) {
++		its_free_pages(addr, get_order(size));
++		return;
++	}
++
++	gen_pool_free(itt_pool, (unsigned long)addr, size);
++}
++
+ /*
+  * Skip ITSs that have no vLPIs mapped, unless we're on GICv4.1, as we
+  * always have vSGIs mapped.
+@@ -2187,7 +2266,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+ {
+ 	struct page *prop_page;
+ 
+-	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
++	prop_page = its_alloc_pages(gfp_flags,
++				    get_order(LPI_PROPBASE_SZ));
+ 	if (!prop_page)
+ 		return NULL;
+ 
+@@ -2198,8 +2278,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+ 
+ static void its_free_prop_table(struct page *prop_page)
+ {
+-	free_pages((unsigned long)page_address(prop_page),
+-		   get_order(LPI_PROPBASE_SZ));
++	its_free_pages(page_address(prop_page),
++		       get_order(LPI_PROPBASE_SZ));
  }
  
-diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
-index 547a9e0b46c2..d11f5dc4c2c5 100644
---- a/arch/arm64/mm/pageattr.c
-+++ b/arch/arm64/mm/pageattr.c
-@@ -5,10 +5,12 @@
- #include <linux/kernel.h>
- #include <linux/mm.h>
- #include <linux/module.h>
-+#include <linux/mem_encrypt.h>
- #include <linux/sched.h>
- #include <linux/vmalloc.h>
+ static bool gic_check_reserved_range(phys_addr_t addr, unsigned long size)
+@@ -2321,7 +2401,8 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+ 		order = get_order(GITS_BASER_PAGES_MAX * psz);
+ 	}
  
- #include <asm/cacheflush.h>
-+#include <asm/pgtable-prot.h>
- #include <asm/set_memory.h>
- #include <asm/tlbflush.h>
- #include <asm/kfence.h>
-@@ -23,14 +25,16 @@ bool rodata_full __ro_after_init = IS_ENABLED(CONFIG_RODATA_FULL_DEFAULT_ENABLED
- bool can_set_direct_map(void)
+-	page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO, order);
++	page = its_alloc_pages_node(its->numa_node,
++				    GFP_KERNEL | __GFP_ZERO, order);
+ 	if (!page)
+ 		return -ENOMEM;
+ 
+@@ -2334,7 +2415,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+ 		/* 52bit PA is supported only when PageSize=64K */
+ 		if (psz != SZ_64K) {
+ 			pr_err("ITS: no 52bit PA support when psz=%d\n", psz);
+-			free_pages((unsigned long)base, order);
++			its_free_pages(base, order);
+ 			return -ENXIO;
+ 		}
+ 
+@@ -2390,7 +2471,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+ 		pr_err("ITS@%pa: %s doesn't stick: %llx %llx\n",
+ 		       &its->phys_base, its_base_type_string[type],
+ 		       val, tmp);
+-		free_pages((unsigned long)base, order);
++		its_free_pages(base, order);
+ 		return -ENXIO;
+ 	}
+ 
+@@ -2529,8 +2610,8 @@ static void its_free_tables(struct its_node *its)
+ 
+ 	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+ 		if (its->tables[i].base) {
+-			free_pages((unsigned long)its->tables[i].base,
+-				   its->tables[i].order);
++			its_free_pages(its->tables[i].base,
++				       its->tables[i].order);
+ 			its->tables[i].base = NULL;
+ 		}
+ 	}
+@@ -2796,7 +2877,8 @@ static bool allocate_vpe_l2_table(int cpu, u32 id)
+ 
+ 	/* Allocate memory for 2nd level table */
+ 	if (!table[idx]) {
+-		page = alloc_pages(GFP_KERNEL | __GFP_ZERO, get_order(psz));
++		page = its_alloc_pages(GFP_KERNEL | __GFP_ZERO,
++				       get_order(psz));
+ 		if (!page)
+ 			return false;
+ 
+@@ -2915,7 +2997,8 @@ static int allocate_vpe_l1_table(void)
+ 
+ 	pr_debug("np = %d, npg = %lld, psz = %d, epp = %d, esz = %d\n",
+ 		 np, npg, psz, epp, esz);
+-	page = alloc_pages(GFP_ATOMIC | __GFP_ZERO, get_order(np * PAGE_SIZE));
++	page = its_alloc_pages(GFP_ATOMIC | __GFP_ZERO,
++			       get_order(np * PAGE_SIZE));
+ 	if (!page)
+ 		return -ENOMEM;
+ 
+@@ -2961,8 +3044,8 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
  {
+ 	struct page *pend_page;
+ 
+-	pend_page = alloc_pages(gfp_flags | __GFP_ZERO,
+-				get_order(LPI_PENDBASE_SZ));
++	pend_page = its_alloc_pages(gfp_flags | __GFP_ZERO,
++				    get_order(LPI_PENDBASE_SZ));
+ 	if (!pend_page)
+ 		return NULL;
+ 
+@@ -2974,7 +3057,7 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
+ 
+ static void its_free_pending_table(struct page *pt)
+ {
+-	free_pages((unsigned long)page_address(pt), get_order(LPI_PENDBASE_SZ));
++	its_free_pages(page_address(pt), get_order(LPI_PENDBASE_SZ));
+ }
+ 
+ /*
+@@ -3309,8 +3392,9 @@ static bool its_alloc_table_entry(struct its_node *its,
+ 
+ 	/* Allocate memory for 2nd level table */
+ 	if (!table[idx]) {
+-		page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
+-					get_order(baser->psz));
++		page = its_alloc_pages_node(its->numa_node,
++					    GFP_KERNEL | __GFP_ZERO,
++					    get_order(baser->psz));
+ 		if (!page)
+ 			return false;
+ 
+@@ -3405,7 +3489,6 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+ 	if (WARN_ON(!is_power_of_2(nvecs)))
+ 		nvecs = roundup_pow_of_two(nvecs);
+ 
+-	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
  	/*
--	 * rodata_full and DEBUG_PAGEALLOC require linear map to be
--	 * mapped at page granularity, so that it is possible to
-+	 * rodata_full, DEBUG_PAGEALLOC and a Realm guest all require linear
-+	 * map to be mapped at page granularity, so that it is possible to
- 	 * protect/unprotect single pages.
- 	 *
- 	 * KFENCE pool requires page-granular mapping if initialized late.
-+	 *
-+	 * Realms need to make pages shared/protected at page granularity.
- 	 */
- 	return rodata_full || debug_pagealloc_enabled() ||
--	       arm64_kfence_can_set_direct_map();
-+		arm64_kfence_can_set_direct_map() || is_realm_world();
+ 	 * Even if the device wants a single LPI, the ITT must be
+ 	 * sized as a power of two (and you need at least one bit...).
+@@ -3413,7 +3496,11 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+ 	nr_ites = max(2, nvecs);
+ 	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+ 	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+-	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
++
++	itt = itt_alloc_pool(its->numa_node, sz);
++
++	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
++
+ 	if (alloc_lpis) {
+ 		lpi_map = its_lpi_alloc(nvecs, &lpi_base, &nr_lpis);
+ 		if (lpi_map)
+@@ -3425,9 +3512,9 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+ 		lpi_base = 0;
+ 	}
+ 
+-	if (!dev || !itt ||  !col_map || (!lpi_map && alloc_lpis)) {
++	if (!dev || !itt || !col_map || (!lpi_map && alloc_lpis)) {
+ 		kfree(dev);
+-		kfree(itt);
++		itt_free_pool(itt, sz);
+ 		bitmap_free(lpi_map);
+ 		kfree(col_map);
+ 		return NULL;
+@@ -3437,6 +3524,7 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+ 
+ 	dev->its = its;
+ 	dev->itt = itt;
++	dev->itt_sz = sz;
+ 	dev->nr_ites = nr_ites;
+ 	dev->event_map.lpi_map = lpi_map;
+ 	dev->event_map.col_map = col_map;
+@@ -3464,7 +3552,7 @@ static void its_free_device(struct its_device *its_dev)
+ 	list_del(&its_dev->entry);
+ 	raw_spin_unlock_irqrestore(&its_dev->its->lock, flags);
+ 	kfree(its_dev->event_map.col_map);
+-	kfree(its_dev->itt);
++	itt_free_pool(its_dev->itt, its_dev->itt_sz);
+ 	kfree(its_dev);
  }
  
- static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
-@@ -198,6 +202,72 @@ int set_direct_map_default_noflush(struct page *page)
- 				   PAGE_SIZE, change_page_range, &data);
- }
+@@ -5112,8 +5200,9 @@ static int __init its_probe_one(struct its_node *its)
+ 		}
+ 	}
  
-+static int __set_memory_enc_dec(unsigned long addr,
-+				int numpages,
-+				bool encrypt)
-+{
-+	unsigned long set_prot = 0, clear_prot = 0;
-+	phys_addr_t start, end;
-+	int ret;
+-	page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
+-				get_order(ITS_CMD_QUEUE_SZ));
++	page = its_alloc_pages_node(its->numa_node,
++				    GFP_KERNEL | __GFP_ZERO,
++				    get_order(ITS_CMD_QUEUE_SZ));
+ 	if (!page) {
+ 		err = -ENOMEM;
+ 		goto out_unmap_sgir;
+@@ -5177,7 +5266,7 @@ static int __init its_probe_one(struct its_node *its)
+ out_free_tables:
+ 	its_free_tables(its);
+ out_free_cmd:
+-	free_pages((unsigned long)its->cmd_base, get_order(ITS_CMD_QUEUE_SZ));
++	its_free_pages(its->cmd_base, get_order(ITS_CMD_QUEUE_SZ));
+ out_unmap_sgir:
+ 	if (its->sgir_base)
+ 		iounmap(its->sgir_base);
+@@ -5663,6 +5752,10 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
+ 	bool has_v4_1 = false;
+ 	int err;
+ 
++	itt_pool = gen_pool_create(get_order(ITS_ITT_ALIGN), -1);
++	if (!itt_pool)
++		return -ENOMEM;
 +
-+	if (!is_realm_world())
-+		return 0;
-+
-+	if (!__is_lm_address(addr))
-+		return -EINVAL;
-+
-+	start = __virt_to_phys(addr);
-+	end = start + numpages * PAGE_SIZE;
-+
-+	if (encrypt)
-+		clear_prot = PROT_NS_SHARED;
-+	else
-+		set_prot = PROT_NS_SHARED;
-+
-+	/*
-+	 * Break the mapping before we make any changes to avoid stale TLB
-+	 * entries or Synchronous External Aborts caused by RIPAS_EMPTY
-+	 */
-+	ret = __change_memory_common(addr, PAGE_SIZE * numpages,
-+				     __pgprot(set_prot),
-+				     __pgprot(clear_prot | PTE_VALID));
-+
-+	if (ret)
-+		return ret;
-+
-+	if (encrypt)
-+		ret = rsi_set_memory_range_protected(start, end);
-+	else
-+		ret = rsi_set_memory_range_shared(start, end);
-+
-+	if (ret)
-+		return ret;
-+
-+	return __change_memory_common(addr, PAGE_SIZE * numpages,
-+				      __pgprot(PTE_VALID),
-+				      __pgprot(0));
-+}
-+
-+static int realm_set_memory_encrypted(unsigned long addr, int numpages)
-+{
-+	return __set_memory_enc_dec(addr, numpages, true);
-+}
-+
-+static int realm_set_memory_decrypted(unsigned long addr, int numpages)
-+{
-+	return __set_memory_enc_dec(addr, numpages, false);
-+}
-+
-+static const struct arm64_mem_crypt_ops realm_crypt_ops = {
-+	.encrypt = realm_set_memory_encrypted,
-+	.decrypt = realm_set_memory_decrypted,
-+};
-+
-+int realm_register_memory_enc_ops(void)
-+{
-+	return arm64_mem_crypt_ops_register(&realm_crypt_ops);
-+}
-+
- #ifdef CONFIG_DEBUG_PAGEALLOC
- void __kernel_map_pages(struct page *page, int numpages, int enable)
- {
+ 	gic_rdists = rdists;
+ 
+ 	lpi_prop_prio = irq_prio;
 -- 
 2.34.1
 
