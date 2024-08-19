@@ -1,187 +1,190 @@
-Return-Path: <kvm+bounces-24523-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24524-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC305956C97
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 16:02:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEE61956C9F
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 16:04:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D093B1C22C61
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 14:02:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B90B11C21F19
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 14:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3391216F0CE;
-	Mon, 19 Aug 2024 14:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ruW8GVhG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD42316CD10;
+	Mon, 19 Aug 2024 14:04:37 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3227516E890;
-	Mon, 19 Aug 2024 14:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAEFD166F14;
+	Mon, 19 Aug 2024 14:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724076067; cv=none; b=QQY9RbvqHm1HoVPlt4BLhde9qqzATmJ8fVLX/hl4NwAMbQfa20aAbldooDZu3GQ9+OWkY/kT/pWmx6Lwcu3vRHp0B4JTAY40CBpcBvFrIGXnuyqhYvekdLztGXlWjqJlosJacs7WWq/qd0y0MSXxGyMHThPqKEiJ0uyxW86djiE=
+	t=1724076277; cv=none; b=ZbrJr6ws9qx+VXr5gKYdCIWd1EVdt95dlI4jEAZw3XL9QtBxtCmiWpfYy0bvUQZg4x8UZiJC7PPMXT3Q6iezfhN+lnvx7FpmG8FOw80GsAGRywSmZtrz6oRfhDlRGRV2GxCgoW1DbGFSKf8OD4EuG+GwWuFmpjvPO9d3HeGetfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724076067; c=relaxed/simple;
-	bh=s1iE6xPMzKFRmhLcLWROW0r/llJKq3e5Izp2wphWybI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hEVdHMCsC1NLO1o+nFEKjs40vgaJwcsFe21T4HCf+Zi5GnqN6C256HuaDzILcB6eFx2h5SX7t4hmzG6r7QGxbEG1bq8VFYiZ0Z/35bC0JyJ2msxNqP1VUq8/htxJJnbqxkJYd7X3HQkpQ1e8vYk/GagfXYBa/JMBVWgw78iXMa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ruW8GVhG; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47JE0ThH006794;
-	Mon, 19 Aug 2024 14:01:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=Q7mFDQQWHBgea
-	oXEshsA3gFOlZBODJhgzOd/TyK16qM=; b=ruW8GVhGejiYVXw1SasWZeSkonl9a
-	GFyVJp8NPYlOkO2MGLhqaHCeNa4rlv6T/F/m7ytvyoVd0tHGtg30jcUyiuPTeQJz
-	CfBhBF4k1ZPmB3e/JkpUk5Co/+ybCTzLQVEXqQgtW9lkxbmf7URi0f2eaeBzmcxz
-	D1v9hMBs9B9Vv2lEvUbg/AYMHkUEep9NI8n2+eiTAXZeF/xdJAKe5tYKCIOUsrmr
-	MN8t+FcwFscUK3tpfF2TTmkZtumlDeBHeSAXTZzwYRVOjTFE1YydCcYcVSQ0FIEG
-	CyuOmy5F4yEoQ/vsdfM0hAaZ0aBFPCxq7nLax4pcqoF5Y/x9LKHtv5Gsg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mcy8n7q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 14:01:01 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47JE11j8031036;
-	Mon, 19 Aug 2024 14:01:01 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mcy8n7g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 14:01:01 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47JCrLjC019105;
-	Mon, 19 Aug 2024 14:01:00 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41376ppcsn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 Aug 2024 14:01:00 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47JE0s5147579454
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 19 Aug 2024 14:00:56 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 522A62004B;
-	Mon, 19 Aug 2024 14:00:54 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2ED4620043;
-	Mon, 19 Aug 2024 14:00:54 +0000 (GMT)
-Received: from a46lp38.lnxne.boe (unknown [9.152.108.100])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 19 Aug 2024 14:00:54 +0000 (GMT)
-From: Hariharan Mari <hari55@linux.ibm.com>
-To: linux-kselftest@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, shuah@kernel.org,
-        frankja@linux.ibm.com, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, pbonzini@redhat.com
-Subject: [PATCH v1 5/5] KVM: s390: selftests: Add regression tests for PLO subfunctions
-Date: Mon, 19 Aug 2024 15:54:26 +0200
-Message-ID: <20240819140040.1087552-6-hari55@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240819140040.1087552-1-hari55@linux.ibm.com>
-References: <20240819140040.1087552-1-hari55@linux.ibm.com>
+	s=arc-20240116; t=1724076277; c=relaxed/simple;
+	bh=XLs5mWwOe//LOpNWPEWluBimnD/2iOrU99fgDSewvhY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kemL/cvmtGvTQQYcR74Hk5tJ7ADbZ2oBrBGkHo4BwqwjGC/048WNsupgz1vjKMdyCl1vvU0xmCE56cRaZe153ewtEB4CBbIKKMDd20tdW60VgrKsb9FJ7+5eHxI78xDBMeAbyvP6I8V0UMKyBOSPc5giBZufldO03NagkmaHCvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED059339;
+	Mon, 19 Aug 2024 07:04:59 -0700 (PDT)
+Received: from [10.1.36.36] (FVFF763DQ05P.cambridge.arm.com [10.1.36.36])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A59D3F73B;
+	Mon, 19 Aug 2024 07:04:31 -0700 (PDT)
+Message-ID: <ff5a11d6-8208-4987-af03-f67b10cc5904@arm.com>
+Date: Mon, 19 Aug 2024 15:04:30 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: znkhn4mQ0BmSZgUWvl1xAvKRl3kLRiMq
-X-Proofpoint-GUID: 3CFScvYy-Bwq1ZUNjm71HJlDcAb8LVep
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-19_11,2024-08-19_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 spamscore=0 lowpriorityscore=0 clxscore=1015
- suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408190090
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 05/19] arm64: Detect if in a realm and set RIPAS RAM
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>
+References: <20240819131924.372366-1-steven.price@arm.com>
+ <20240819131924.372366-6-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240819131924.372366-6-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Extend the existing regression test framework for s390x CPU subfunctions
-to include tests for the Perform Locked Operation (PLO) subfunction
-functions.
+Hi Steven
 
-PLO was introduced in the very first 64-bit machine generation.
-Hence it is assumed PLO is always installed in the Z Arch.
-The test procedure follows the established pattern.
+On 19/08/2024 14:19, Steven Price wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 
+> Detect that the VM is a realm guest by the presence of the RSI
+> interface.
+> 
+> If in a realm then all memory needs to be marked as RIPAS RAM initially,
+> the loader may or may not have done this for us. To be sure iterate over
+> all RAM and mark it as such. Any failure is fatal as that implies the
+> RAM regions passed to Linux are incorrect - which would mean failing
+> later when attempting to access non-existent RAM.
+> 
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Co-developed-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v4:
+>   * Minor tidy ups.
+> Changes since v3:
+>   * Provide safe/unsafe versions for converting memory to protected,
+>     using the safer version only for the early boot.
+>   * Use the new psci_early_test_conduit() function to avoid calling an
+>     SMC if EL3 is not present (or not configured to handle an SMC).
+> Changes since v2:
+>   * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
+>     static_key_false".
+>   * Rename set_memory_range() to rsi_set_memory_range().
+>   * Downgrade some BUG()s to WARN()s and handle the condition by
+>     propagating up the stack. Comment the remaining case that ends in a
+>     BUG() to explain why.
+>   * Rely on the return from rsi_request_version() rather than checking
+>     the version the RMM claims to support.
+>   * Rename the generic sounding arm64_setup_memory() to
+>     arm64_rsi_setup_memory() and move the call site to setup_arch().
+> ---
+>   arch/arm64/include/asm/rsi.h | 65 ++++++++++++++++++++++++++++++
+>   arch/arm64/kernel/Makefile   |  3 +-
+>   arch/arm64/kernel/rsi.c      | 78 ++++++++++++++++++++++++++++++++++++
+>   arch/arm64/kernel/setup.c    |  8 ++++
+>   4 files changed, 153 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/arm64/include/asm/rsi.h
+>   create mode 100644 arch/arm64/kernel/rsi.c
+> 
+> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
+> new file mode 100644
+> index 000000000000..2bc013badbc3
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rsi.h
+> @@ -0,0 +1,65 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2024 ARM Ltd.
+> + */
+> +
+> +#ifndef __ASM_RSI_H_
+> +#define __ASM_RSI_H_
+> +
+> +#include <linux/jump_label.h>
+> +#include <asm/rsi_cmds.h>
+> +
+> +DECLARE_STATIC_KEY_FALSE(rsi_present);
+> +
+> +void __init arm64_rsi_init(void);
+> +void __init arm64_rsi_setup_memory(void);
+> +static inline bool is_realm_world(void)
+> +{
+> +	return static_branch_unlikely(&rsi_present);
+> +}
+> +
+> +static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t end,
+> +				       enum ripas state, unsigned long flags)
+> +{
+> +	unsigned long ret;
+> +	phys_addr_t top;
+> +
+> +	while (start != end) {
+> +		ret = rsi_set_addr_range_state(start, end, state, flags, &top);
+> +		if (WARN_ON(ret || top < start || top > end))
+> +			return -EINVAL;
+> +		start = top;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Convert the specified range to RAM. Do not use this if you rely on the
+> + * contents of a page that may already be in RAM state.
+> + */
+> +static inline int rsi_set_memory_range_protected(phys_addr_t start,
+> +						 phys_addr_t end)
+> +{
+> +	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
+> +				    RSI_CHANGE_DESTROYED);
+> +}
+> +
+> +/*
+> + * Convert the specified range to RAM. Do not convert any pages that may have
+> + * been DESTROYED, without our permission.
+> + */
+> +static inline int rsi_set_memory_range_protected_safe(phys_addr_t start,
+> +						      phys_addr_t end)
+> +{
+> +	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
+> +				    RSI_NO_CHANGE_DESTROYED);
+> +}
+> +
+> +static inline int rsi_set_memory_range_shared(phys_addr_t start,
+> +					      phys_addr_t end)
+> +{
+> +	return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY,
+> +				    RSI_NO_CHANGE_DESTROYED);
 
-Suggested-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Hariharan Mari <hari55@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
----
- .../kvm/s390x/cpumodel_subfuncs_test.c        | 36 ++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+I think this should be RSI_CHANGE_DESTROYED, as we are transitioning a 
+page to "shared" (i.e, IPA state to EMPTY) and we do not expect the data
+to be retained over the transition. Thus we do not care if the IPA was
+in RIPAS_DESTROYED.
 
-diff --git a/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c b/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-index 901c99fe79d9..255984a52365 100644
---- a/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-+++ b/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-@@ -20,6 +20,8 @@
- 
- #include "kvm_util.h"
- 
-+#define U8_MAX  ((u8)~0U)
-+
- /**
-  * Query available CPU subfunctions
-  */
-@@ -37,6 +39,33 @@ static void get_cpu_machine_subfuntions(struct kvm_vm *vm,
- 	TEST_ASSERT(!r, "Get cpu subfunctions failed r=%d errno=%d", r, errno);
- }
- 
-+static inline int plo_test_bit(unsigned char nr)
-+{
-+	unsigned long function = (unsigned long)nr | 0x100;
-+	int cc;
-+
-+	asm volatile("	lgr	0,%[function]\n"
-+			/* Parameter registers are ignored for "test bit" */
-+			"	plo	0,0,0,0(0)\n"
-+			"	ipm	%0\n"
-+			"	srl	%0,28\n"
-+			: "=d" (cc)
-+			: [function] "d" (function)
-+			: "cc", "0");
-+	return cc == 0;
-+}
-+
-+/*
-+ * Testing Perform Locked Operation (PLO) CPU subfunction's ASM block
-+ */
-+static void test_plo_asm_block(u8 (*query)[32])
-+{
-+	for (int i = 0; i <= U8_MAX; ++i) {
-+		if (plo_test_bit(i))
-+			(*query)[i >> 3] |= 0x80 >> (i & 7);
-+	}
-+}
-+
- /*
-  * Testing Crypto Compute Message Authentication Code (KMAC) CPU subfunction's
-  * ASM block
-@@ -235,8 +264,13 @@ struct testdef {
- 	u8 *subfunc_array;
- 	size_t array_size;
- 	testfunc_t test;
--	bool facility_bit;
-+	int facility_bit;
- } testlist[] = {
-+	/*  PLO was introduced in the very first 64-bit machine generation.
-+	 *  Hence it is assumed PLO is always installed in Z Arch .
-+	 */
-+	{ "PLO", cpu_subfunc.plo, sizeof(cpu_subfunc.plo),
-+		test_plo_asm_block, 1 },
- 	/* MSA - Facility bit 17 */
- 	{ "KMAC", cpu_subfunc.kmac, sizeof(cpu_subfunc.kmac),
- 		test_kmac_asm_block, 17 },
--- 
-2.45.2
+Rest looks good to me.
 
+
+Suzuki
 
