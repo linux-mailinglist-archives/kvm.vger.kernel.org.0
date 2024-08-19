@@ -1,98 +1,199 @@
-Return-Path: <kvm+bounces-24535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA55956E9B
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 17:20:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35BB7956EAA
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 17:24:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF10F282E7C
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:20:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68FDD1C2220D
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A5C3CF73;
-	Mon, 19 Aug 2024 15:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528673FBA7;
+	Mon, 19 Aug 2024 15:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1r/cj+i"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA043AC2B
-	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 15:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E1E26AD3;
+	Mon, 19 Aug 2024 15:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724080846; cv=none; b=meGkwWg6Xdc694Uii2cMUJKkv29+VYlig/iN+YQZ480cJ5p97ZjwziYaLOEU2hhUGfQRRssPTv4DQ6R/6oSL7odykIu3CSjk7nlFeOxVgbhTAzVppi1rpR0ZQZ59Bh2R64AzsjCsgjWFvrIDgece+SWW8XO/Cjf0bnbR5OtPV3k=
+	t=1724081075; cv=none; b=Tw45/+Iq+kzxFdUWtMhKSVimM2uOIWEbNIOvPyFKkgIAwPxdD5Sp8FcvCgAQIUSwaGEBywvskpCOJMNtLtOcseLBXiyjAUYNHTchEv9S0Vz3ef1rARiJOHx5IM+nEPk9u4NQKDz2V6xK/23p4IoeZJf20z3S/lIeZoe3Il/4kTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724080846; c=relaxed/simple;
-	bh=H/iWQbOFtHgMP/wqC5TO2211vKyUB5vV7KL+6O6khxE=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=HnZCAmHO/0wKw78ACcnad1iwtzkHk9CNRKWvAc+bFHP24vNnl7GdUTzt4dDKOYjSniQ4IN7sq1TVEZEECuIOba1wGhJsW1xCihrwmNSTpsNQMqsPoBkPTMA0CDbVbf85pSYqbifaqLtyaTbeKdLTo6BbL0lmsRED1jqkyiN3Mjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WnblM07hrz20m3K;
-	Mon, 19 Aug 2024 23:15:59 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id A88581A0188;
-	Mon, 19 Aug 2024 23:20:38 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 19 Aug 2024 23:20:37 +0800
-Subject: Re: [PATCH] KVM: arm64: vgic: Don't hold config_lock while
- unregistering redistributors
-To: Marc Zyngier <maz@kernel.org>
-CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton
-	<oliver.upton@linux.dev>
-References: <20240819125045.3474845-1-maz@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <b3e2e05b-7ce1-5bf6-f400-c0dff652796c@huawei.com>
-Date: Mon, 19 Aug 2024 23:20:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	s=arc-20240116; t=1724081075; c=relaxed/simple;
+	bh=9SrzYFYWu8XTyOkpWU8KfwdY1kOQ4PufChUBufGqjQE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EnzM9Z06Yhsab2Lkcq/F6q/rVQIvA51j9V6bEyXhHrilFtwMV64s8Zmz7wmK70c7BZauEB1gz2PQWREN61Ru1yzhr+Y5GVRXlf33jrMHJRepPMdTlDZFIuKR2MaDKeCMGC8NM/cRS1uQT6Keh1YQ+IB80FHzThzDtjJ/vpdx3uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1r/cj+i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 452CDC32782;
+	Mon, 19 Aug 2024 15:24:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724081075;
+	bh=9SrzYFYWu8XTyOkpWU8KfwdY1kOQ4PufChUBufGqjQE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=S1r/cj+i/j/Y2h9GHVksnTVsgr0Hom/4Ghqr8HlW9/MjECmiL9CrjkDqewI30ufe4
+	 zqOEXKMR3jOOliR7XDYljdxoAvJaP4GAEzSr8vwSUyTKI8xwLag5JS6DS37NEUZ49h
+	 60Q5L8hpFVCnRUenuNnyBHgV3bRvbWdh2qmN9XAuC3mE5WI8DvvGXiDlkNwHeQENUb
+	 YYYaTKgl5jF0zwwJYSyhqDubEcElzPSYGJt9FS0BoaBxWzeLabsXM3DpOllyyFYRVN
+	 lvHlppSzmYo+tsiaYVRRvpMvJVKZdSwibA8GGoprSXEOC6Kn4f67pKfiSAGKKPoBhJ
+	 jdkJpuBp1a6Sg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sg4FE-004y1j-OU;
+	Mon, 19 Aug 2024 16:24:32 +0100
+Date: Mon, 19 Aug 2024 16:24:31 +0100
+Message-ID: <86y14sy1qo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Steven Price <steven.price@arm.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei
+ <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>
+Subject: Re: [PATCH v5 17/19] irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor
+In-Reply-To: <beff9162-e1ba-4f72-91ea-329eaed48dbc@arm.com>
+References: <20240819131924.372366-1-steven.price@arm.com>
+	<20240819131924.372366-18-steven.price@arm.com>
+	<beff9162-e1ba-4f72-91ea-329eaed48dbc@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20240819125045.3474845-1-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2024/8/19 20:50, Marc Zyngier wrote:
-> We recently moved the teardown of the vgic part of a vcpu inside
-> a critical section guarded by the config_lock. This teardown phase
-> involves calling into kvm_io_bus_unregister_dev(), which takes the
-> kvm->srcu lock.
+On Mon, 19 Aug 2024 15:51:00 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> However, this violates the established order where kvm->srcu is
-> taken on a memory fault (such as an MMIO access), possibly
-> followed by taking the config_lock if the GIC emulation requires
-> mutual exclusion from the other vcpus.
+> Hi Steven,
 > 
-> It therefore results in a bad lockdep splat, as reported by Zenghui.
+> On 19/08/2024 14:19, Steven Price wrote:
+> > Within a realm guest the ITS is emulated by the host. This means the
+> > allocations must have been made available to the host by a call to
+> > set_memory_decrypted(). Introduce an allocation function which performs
+> > this extra call.
+> > 
+> > For the ITT use a custom genpool-based allocator that calls
+> > set_memory_decrypted() for each page allocated, but then suballocates
+> > the size needed for each ITT. Note that there is no mechanism
+> > implemented to return pages from the genpool, but it is unlikely the
+> > peak number of devices will so much larger than the normal level - so
+> > this isn't expected to be an issue.
+> > 
 > 
-> Fix this by moving the call to kvm_io_bus_unregister_dev() outside
-> of the config_lock critical section. At this stage, there shouln't
-> be any need to hold the config_lock.
-> 
-> As an additional bonus, document the ordering between kvm->slots_lock,
-> kvm->srcu and kvm->arch.config_lock so that I cannot pretend I didn't
-> know about those anymore.
-> 
-> Fixes: 9eb18136af9f ("KVM: arm64: vgic: Hold config_lock while tearing down a CPU interface")
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> This may not be sufficient to make it future proof. We need to detect if
+> the GIC is private vs shared, before we make the allocation
+> choice. Please see below :
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-Tested-by: Zenghui Yu <yuzenghui@huawei.com>
+What do you mean by that? Do you foresee a *GICv3* implementation on
+the realm side?
+
+[...]
+
+> How about something like this folded into this patch ? Or if this
+> patch goes in independently, we could carry the following as part of
+> the CCA
+> series.
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c
+> b/drivers/irqchip/irq-gic-v3-its.c
+> index 6f4ddf7faed1..f1a779b52210 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -209,7 +209,7 @@ static struct page *its_alloc_pages_node(int node,
+> gfp_t gfp,
+> 
+>  	page = alloc_pages_node(node, gfp, order);
+> 
+> -	if (page)
+> +	if (gic_rdists->is_shared && page)
+>  		set_memory_decrypted((unsigned long)page_address(page),
+>  				     BIT(order));
+>  	return page;
+> @@ -222,7 +222,8 @@ static struct page *its_alloc_pages(gfp_t gfp,
+> unsigned int order)
+> 
+>  static void its_free_pages(void *addr, unsigned int order)
+>  {
+> -	set_memory_encrypted((unsigned long)addr, BIT(order));
+> +	if (gic_rdists->is_shared)
+> +		set_memory_encrypted((unsigned long)addr, BIT(order));
+>  	free_pages((unsigned long)addr, order);
+>  }
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index 6fb276504bcc..48c6b2c8dd8c 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -2015,6 +2015,8 @@ static int __init gic_init_bases(phys_addr_t
+> dist_phys_base,
+>  	typer = readl_relaxed(gic_data.dist_base + GICD_TYPER);
+>  	gic_data.rdists.gicd_typer = typer;
+> 
+> +	gic_data.rdists.is_shared =
+> !arm64_is_iomem_private(gic_data.dist_phys_base,
+> +							    PAGE_SIZE);
+
+Why would you base the status of the RDs on that of the distributor?
+
+>  	gic_enable_quirks(readl_relaxed(gic_data.dist_base + GICD_IIDR),
+>  			  gic_quirks, &gic_data);
+> 
+> diff --git a/include/linux/irqchip/arm-gic-v3.h
+> b/include/linux/irqchip/arm-gic-v3.h
+> index 728691365464..1edc33608d52 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -631,6 +631,7 @@ struct rdists {
+>  	bool			has_rvpeid;
+>  	bool			has_direct_lpi;
+>  	bool			has_vpend_valid_dirty;
+> +	bool			is_shared;
+>  };
+> 
+>  struct irq_domain;
+> 
+
+I really don't like this.
+
+If we have to go down the route of identifying whether the GIC needs
+encryption or not based on the platform, then maybe we should bite the
+bullet and treat it as a first class device, given that we expect
+devices to be either realm or non-secure.
 
 Thanks,
-Zenghui
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
