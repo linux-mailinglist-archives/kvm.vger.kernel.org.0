@@ -1,123 +1,97 @@
-Return-Path: <kvm+bounces-24484-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24485-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73607956300
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 07:05:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17A1695636C
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 08:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6A9C1C2153B
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 05:05:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6A691F2195F
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 06:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC7914A0A4;
-	Mon, 19 Aug 2024 05:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8543C14C58C;
+	Mon, 19 Aug 2024 06:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hG/oQ7mC"
+	dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b="dA2CPl+h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4AB42049;
-	Mon, 19 Aug 2024 05:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724043900; cv=none; b=LL4GV2D8M5MCg74YkOIngcqtjSRBgECPm8U3Kmxr8Pv6FQ3FPGp5b48L4EcKoTYLb4QmnAbK5Bml/A58A1wZlRI09mTaO+6vyIb5uXUhNEOC18LxBcYYWoY2c2hZIp5VdpxfWFV67aW7hqZg5Z0I9RJLGKlTjcqX/rqVsvYhcTE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724043900; c=relaxed/simple;
-	bh=0kUCArxtC2FaObCka5uR2x8dxjtgH9daEqowp/Nr1t8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X9tId+YlqQrm81Kcrldlhx5k/Ygo2cZZlh10AF/wBItdg7h4B9P0SUB8+sgfIX2xIS0bksW62JjVpojavixnlinaSxYvll0XLk9sqUBjN0XNtM8GcOaA9b0+BtD+oIlf2tz2/S+ngnD1a4Lk8+O3caN8k/Xk42ip5LCjxLlzWDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hG/oQ7mC; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724043898; x=1755579898;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0kUCArxtC2FaObCka5uR2x8dxjtgH9daEqowp/Nr1t8=;
-  b=hG/oQ7mC+Ga5+VJ0pyhVG1uVQbLMe1zlAcTH1mFwbV8Zwc3YhcR2M8ZX
-   3F/j0MF59TwtCldcoFB6TZrOYsNASR2ZT8lXi2mTrGytsyu2aueoUDoL6
-   4IJjuG3O8VejMCvA3T11tUyTHPaMD0PviuwnMVtsVb9yr1tbJfgBwDMmU
-   nT3KFjxZcfVmSnjbVF7WlziMH4og8c0nqHUH7E3cd6cdeBs4PndoVnwZi
-   C+EGIpkCgaDa6cMZrO1e71xsCHT80Mc9+ZiEWI0ys0SLbARBevoT4RvX5
-   agrqsjVoT1Qhlnd7X7bvunBnfS1FpTcbey00SFg8sOHo5CluUvMTVEeBV
-   Q==;
-X-CSE-ConnectionGUID: GwKIglXSR728rmf/YzrmgA==
-X-CSE-MsgGUID: AgetedXcSLuTVUAdf3F1rA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11168"; a="33419011"
-X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="33419011"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 22:04:58 -0700
-X-CSE-ConnectionGUID: n+EO5u/qRROCOJSZKGS0cg==
-X-CSE-MsgGUID: uEPrZLJjQ4u8IPwxthErEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="60085661"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa010.jf.intel.com with ESMTP; 18 Aug 2024 22:04:56 -0700
-Date: Mon, 19 Aug 2024 13:02:41 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kai.huang@intel.com, isaku.yamahata@gmail.com,
-	tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 24/25] KVM: x86: Filter directly configurable TDX CPUID
- bits
-Message-ID: <ZsLR8RxAsTT8yTUo@yilunxu-OptiPlex-7050>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-25-rick.p.edgecombe@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F094171CD
+	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 05:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724047203; cv=pass; b=RmlInYIbDFIpO1ZMtsa2dwY2wGFJ8BsVuucbaBsFM47HYqGlGi7b8TBcMpzjqlm9zWCy9yiSnKhNIMM4JNi8zg6nJb3j/smLyGC4621pMip+YbRJAGeyPTotcJ3NY+EUzxNQuAZr3r4B8Xhz726XUGZ9nzWHwifew7rEaUrBwwM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724047203; c=relaxed/simple;
+	bh=4ejzT6e53MucdWs+qFl2gyfsASnPywS+mjTcq68/G7k=;
+	h=Date:Message-ID:From:To:Subject:MIME-Version:Content-Type; b=XmIXdOSmPTajKesZvU2FWH+UlvF/aldGAdwrUnn0LAHTkL1LTnpfLDNS6yfiYZbrlVix7xiQyR9IojSkuK365P1GXbIyOyvF3GYH5aUq8KVJuruHaN9+c6rCepSK40kQt/AyJ1AT07JJr5s0h6qSHtyjmGGEeqimsCl6RfQSJdU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty; spf=pass smtp.mailfrom=linux.beauty; dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b=dA2CPl+h; arc=pass smtp.client-ip=136.143.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.beauty
+ARC-Seal: i=1; a=rsa-sha256; t=1724047180; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=X7qvGq8RnnKzM1CiYhRPUTQXGjkd1delkIo++dBwYn/mbWjQroz+U/hXvNa95f/st9RzvRg4YCKMwE9VIhlWpBfPei4WDpvXsWAWfYl97qmHREVCx9tQw6fACTLRQ60v6L0KX0A5lGLKnNOxUnoyVfp+KyUiLI0EH0olHtCP1fI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1724047180; h=Content-Type:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
+	bh=Isl0Eo7nePSAEExZ7KyQFLazzTlcCbZ8bgjRhjQcQuU=; 
+	b=C3f03omIKRRnTA1VYtHmxprrsyVuJ0Uv+xXRVgHCp2KUBqNbiHhgYxhJ8wvqvs/DXKNtR00rJmvxvxAt0N71LdS9fXEJi3XsSsFggjT3ayJ/E9hjfxtSQw9lZUi+Mb3ckuLhwiggg6fXMWnckjUNrK9b0NGP0MnGbBY8Oq7Vnfc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=linux.beauty;
+	spf=pass  smtp.mailfrom=me@linux.beauty;
+	dmarc=pass header.from=<me@linux.beauty>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724047180;
+	s=zmail; d=linux.beauty; i=me@linux.beauty;
+	h=Date:Date:Message-ID:From:From:To:To:Subject:Subject:MIME-Version:Content-Type:Message-Id:Reply-To:Cc;
+	bh=Isl0Eo7nePSAEExZ7KyQFLazzTlcCbZ8bgjRhjQcQuU=;
+	b=dA2CPl+hBOPbVPGiuopTrQ4dA1Us3G4QJNDORwvKWL5+0rZ8FEQHbFZRp6rziHVo
+	O6yhbZW/HWlIg7iZLhPRZ5DPCA5K3Kg6TODLFe+yakTjaL2ZjzZEasctJ1JNAMqFIII
+	N6H7lSqasSTwWpLXSOLjpXcUIPBFyyN10bZP/ylM=
+Received: by mx.zohomail.com with SMTPS id 1724047179542690.9790731350549;
+	Sun, 18 Aug 2024 22:59:39 -0700 (PDT)
+Date: Mon, 19 Aug 2024 13:59:27 +0800
+Message-ID: <87zfp96ojk.wl-me@linux.beauty>
+From: Li Chen <me@linux.beauty>
+To: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH] KVM: x86: Use this_cpu_ptr() in kvm_user_return_msr_cpu_online
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL-LB/10.8 EasyPG/1.0.0
+ Emacs/29.4 (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812224820.34826-25-rick.p.edgecombe@intel.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-ZohoMailClient: External
 
-On Mon, Aug 12, 2024 at 03:48:19PM -0700, Rick Edgecombe wrote:
-> Future TDX modules may provide support for future HW features, but run with
-> KVM versions that lack support for them. In this case, userspace may try to
-> use features that KVM does not have support, and develop assumptions around
-> KVM's behavior. Then KVM would have to deal with not breaking such
-> userspace.
-> 
-> Simplify KVM's job by preventing userspace from configuring any unsupported
-> CPUID feature bits.
-> 
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
-> uAPI breakout v1:
->  - New patch
-> ---
->  arch/x86/kvm/vmx/tdx.c | 25 ++++++++++++++++++++++---
->  1 file changed, 22 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index c6bfeb0b3cc9..d45b4f7b69ba 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1086,8 +1086,9 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
->  	return ret;
->  }
->  
-> -static int __maybe_unused tdx_get_kvm_supported_cpuid(struct kvm_cpuid2 **cpuid)
-> +static int tdx_get_kvm_supported_cpuid(struct kvm_cpuid2 **cpuid)
+From: Li Chen <chenl311@chinatelecom.cn>
 
-This func is already used in patch #21, put the change in that patch.
+Use this_cpu_ptr() instead of open coding the equivalent in
+kvm_user_return_msr_cpu_online.
 
->  {
-> +
+Signed-off-by: Li Chen <chenl311@chinatelecom.cn>
+---
+ arch/x86/kvm/x86.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-remove the blank line.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 70219e4069874..ffdf251bfef5b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -413,8 +413,7 @@ EXPORT_SYMBOL_GPL(kvm_find_user_return_msr);
+ 
+ static void kvm_user_return_msr_cpu_online(void)
+ {
+-	unsigned int cpu = smp_processor_id();
+-	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
++	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
+ 	u64 value;
+ 	int i;
+ 
+-- 
+2.46.0
 
->  	int r;
-
-Thanks,
-Yilun
 
