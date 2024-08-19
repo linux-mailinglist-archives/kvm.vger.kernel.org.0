@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-24482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91DA795614E
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 05:05:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 276379562FD
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 07:04:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1ED2281340
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 03:05:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C1301C212C5
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 05:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED0E13BAC3;
-	Mon, 19 Aug 2024 03:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB67149C57;
+	Mon, 19 Aug 2024 05:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VP9GuazG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lTU2W4dB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E0C1CA8D;
-	Mon, 19 Aug 2024 03:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353602556E;
+	Mon, 19 Aug 2024 05:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724036708; cv=none; b=K8+wUpbA5P+QoOtED6Xqb2xbJG8MQG/mK4gM+C7LHVcG0fRn73N0YP+CO1BilE8IMeLgXzqTY/zpcviVP3Ynn1MV3ZPW2PDcRgRDnrfqHPcRJ982F8eiJDm2kr407oeRZ+MgoQx9nJlq8D718ybhTJqMWusQlwMvS1cqvS/PiCs=
+	t=1724043862; cv=none; b=VCbHJoickP/mMvBuTP+2KNwpQVzNkyCS981LEnYIYaUI8XmBCCjoahtEfRPomx/Psz7PkXXo+TebvuZDS7L3JEsWLV8tDH1IJLKFcTIbSg5HswnGk6hsCUfCr7WGKPBUxRp9qEkaBy+i9TXZ4Y7Pgw6kcChjs9S71vnfBvpmQZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724036708; c=relaxed/simple;
-	bh=IrbpoFtZg9yDzWOu06DEHE2Ffob1DwNty5eagtHqG5k=;
+	s=arc-20240116; t=1724043862; c=relaxed/simple;
+	bh=DB9WcJmbBlrGDUK/yLs+kZJ47/oOQAEYWS9fKe1ktAg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rvoTw5hoWaXLdpOXSfMrJDNN7Pk9r5SjdmUU8n3PkhL48dMBsGEFvdgeZ67V6zhRMkH0FMa08tTt/02DrheDwYMFlWwifHLq8oeVf42jAoC+UWQyaThg0Mf6xGI5c7vuXKr38l648AcxnM9SIHiEn0438GAonPA6JoEjlPuK1NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VP9GuazG; arc=none smtp.client-ip=192.198.163.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=q8VdMUH26mhax+3RYlW2DUxkDGWprxXyRkOhKKGxfpHJgFMAhf3rz+L3YZG1c1y5Ksh3BxcJ8BfjpiFTJ9LXmZ2Sr3EUyEIvaLPGbCeh++v7NtFYmxNQVZ03HFwUrcXl+nVEHvjj5KAM6roi7f7X5FhrO/N8v3cX+kwZlPXTp0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lTU2W4dB; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724036706; x=1755572706;
+  t=1724043860; x=1755579860;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=IrbpoFtZg9yDzWOu06DEHE2Ffob1DwNty5eagtHqG5k=;
-  b=VP9GuazGpSaqGA11gbcdG/x6ijxUAAZRt9f817tykVfl44QXQmD2g2/Y
-   rYOgq7V6/Id2MH1dysk+m8gMOl0elhevWZEnWjSAq4RYjbyBkGtVFb6/F
-   0zPrW+mAtiXkLN24jXHzfhkNQidFJhCmaaf6WWAXt4fRhqTvfzJDjan0z
-   eUayZ9UFPELPiJFiUkaMVJ12Wh6MtiU8J8uAc4W1QcYEYROQzs+0Fy9O5
-   rkKgK+DgHb5XKFbkjga+2iOBv09JGF8lZmqup54Lwa1EY6Oc79PzGbZ2A
-   ddkl3LLKE5XUclcvyMtEIUlFHrOGb4ojxImjVR0iBDKk5JEzKSa8wJNb7
+  bh=DB9WcJmbBlrGDUK/yLs+kZJ47/oOQAEYWS9fKe1ktAg=;
+  b=lTU2W4dBJWjXIdtK/omQUts6k99h/XDHHK65rusKjr8eA8BUE+hVAcjS
+   d3shGtTDlX2u9PdZH9u1+k0mmYZNmSRa1HjoHl7Ug6LmW6GWSjTjpT5My
+   GeHE2hf0tmowdSTZDA9WOd8LIgBlGI8eQZign+DdvS9zYJTR980Nr8YZs
+   6aGt/lD6EY9KmVdU0RwDbGlPxbGzOWd62Vd6wZFtzjFSc7ZfAoyDBmKPq
+   yjjoGhvPAqKOuN4GBFlqQiu4WPPaFls7KEUoIdbI1If10Ro2on6Fjv0FI
+   eOncqhwMc1vGDCFF+Xi7Lv6EODqQIIXSpsoBTuxVo3XauILa6TQdPmE2d
    g==;
-X-CSE-ConnectionGUID: UDgKOseSRbOkx9g33gob8A==
-X-CSE-MsgGUID: xj0c+FFXTSKYYom1pZDU7g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11168"; a="22416073"
+X-CSE-ConnectionGUID: m+tjxytIQz+4FEuz2krePg==
+X-CSE-MsgGUID: UBm0QfAPQJSVX8G2ekWCfA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11168"; a="21889708"
 X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="22416073"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 20:05:05 -0700
-X-CSE-ConnectionGUID: mQfS+lWhQ/aD4chIBURFbQ==
-X-CSE-MsgGUID: GQ17RcayQFucBNz3zJ9sog==
+   d="scan'208";a="21889708"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 22:04:20 -0700
+X-CSE-ConnectionGUID: kyftsm2yQziOwMY9s8PX6g==
+X-CSE-MsgGUID: UdKmdW3PRImYy96mGm6DfQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="60516213"
-Received: from linux.bj.intel.com ([10.238.157.71])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 20:05:02 -0700
-Date: Mon, 19 Aug 2024 10:59:49 +0800
-From: Tao Su <tao1.su@linux.intel.com>
+   d="scan'208";a="61021709"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa008.jf.intel.com with ESMTP; 18 Aug 2024 22:04:17 -0700
+Date: Mon, 19 Aug 2024 13:02:02 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
 To: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
 	kai.huang@intel.com, isaku.yamahata@gmail.com,
 	tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 21/25] KVM: x86: Introduce KVM_TDX_GET_CPUID
-Message-ID: <ZsK1JRf1amTEAW6q@linux.bj.intel.com>
+Message-ID: <ZsLRyk5F9SRgafIO@yilunxu-OptiPlex-7050>
 References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
  <20240812224820.34826-22-rick.p.edgecombe@intel.com>
 Precedence: bulk
@@ -174,6 +174,10 @@ On Mon, Aug 12, 2024 at 03:48:16PM -0700, Rick Edgecombe wrote:
 > +
 > +	entry->eax &= (u32) ebx_eax;
 > +	entry->ebx &= (u32) (ebx_eax >> 32);
+
+Some fields contains a N-bits wide value instead of a bitmask, why a &=
+just work?
+
 > +
 > +	field_id++;
 > +	err = tdx_td_metadata_field_read(tdx, field_id, &edx_ecx);
@@ -219,6 +223,15 @@ On Mon, Aug 12, 2024 at 03:48:16PM -0700, Rick Edgecombe wrote:
 > +		return -ENOMEM;
 > +
 > +	r = tdx_get_kvm_supported_cpuid(&supported_cpuid);
+
+Personally I don't like the definition of this function. I need to look
+into the inner implementation to see if kfree(supported_cpuid); is needed
+or safe. How about:
+
+  supported_cpuid = tdx_get_kvm_supported_cpuid();
+  if (!supported_cpuid)
+	goto out_td_cpuid;
+
 > +	if (r)
 > +		goto out;
 > +
@@ -242,11 +255,10 @@ On Mon, Aug 12, 2024 at 03:48:16PM -0700, Rick Edgecombe wrote:
 > +
 > +			output_e->eax &= ~0x00ff0000;
 > +			output_e->eax |= g_maxpa << 16;
+
+Is it possible this workaround escapes the KVM supported bits check?
+
 > +		}
-
-I suggest putting all guest_phys_bits related WA in a WA-only patch, which will
-be clearer.
-
 > +
 > +		j++;
 > +	}
@@ -263,6 +275,17 @@ be clearer.
 > +out:
 > +	kfree(td_cpuid);
 > +	kfree(supported_cpuid);
+
+Traditionally we do:
+
+  out_supported_cpuid:
+	kfree(supported_cpuid);
+  out_td_cpuid:
+	kfree(td_cpuid);
+
+I'm not sure what's the advantage to make people think more about whether
+kfree is safe.
+
 > +	return r;
 > +}
 > +
@@ -291,10 +314,16 @@ be clearer.
 > +	/* For KVM_MAP_MEMORY and KVM_TDX_INIT_MEM_REGION. */
 > +	atomic64_t nr_premapped;
 
-I don't see it is used in this patch set.
+This doesn't belong to this patch.
 
 > +
 > +	struct kvm_cpuid2 *cpuid;
+
+Didn't find the usage of this field.
+
+Thanks,
+Yilun
+
 >  };
 >  
 >  struct vcpu_tdx {
