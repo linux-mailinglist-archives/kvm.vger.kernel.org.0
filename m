@@ -1,211 +1,122 @@
-Return-Path: <kvm+bounces-24544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24545-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EB459570A9
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 18:46:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 217679571FC
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 19:20:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D9621C20C70
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 16:46:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A37AB1F20FCE
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 17:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40393177998;
-	Mon, 19 Aug 2024 16:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ACCF18757F;
+	Mon, 19 Aug 2024 17:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Bhfv68Wb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XtJzVT5V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711E21A270
-	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 16:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457852628C
+	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 17:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724085979; cv=none; b=O1NlvNCO/9NbqV014F4uqgtmdkfYWJMO4Bm+Po3NoT/z1ZQHxuUZNoK+Nzevc0CdGHkNo/fK3OKhokzqQOfwSn8mu0e+YmABrERGFBzyKnL9MaMEZApJ8tazK4a7M2O+PqfsoXqQgMqFhqzxd8PPMHYcJU35FcuuUlrCjqW2f/Q=
+	t=1724088032; cv=none; b=E/ut91nnZjwackPN8VQEHN4QtJ5qt6QeiPR8vQ66+Du/U1Y1U25WwH6Cv/kf5a1z0FOg2USBzzWqT6PB/WEV5JsbyeoX/197Xb7cnAFMNfB6hhXjoVLy9dFpmxyPOSKZR5P0Y+z2rGWZa/GuTlXV2j8BMygYiPdhKuhQ16DBLzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724085979; c=relaxed/simple;
-	bh=4Zm2aY38wQUKInxgHuMrVp3FTi32iwRINTkf8PLyzIU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X44PuhGkLF01N5O9FcDMf4zM5SHVQlhNml1cvzCbkDVfMKZ3i3pXaUo/vO1jJT/vMscIS+9KAE6pnV5fBSfH8wWs13jmO+zINHjkrLyeejAv4IM+YmGIQZ2VIMxSXRLI1p29rhzy9sQ9OsvZkuCLkbUds+tjJ6roa9GBHRwZU6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Bhfv68Wb; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2ef2d96164aso53520061fa.3
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 09:46:17 -0700 (PDT)
+	s=arc-20240116; t=1724088032; c=relaxed/simple;
+	bh=Fz7RTpNNAkygD/A9lFyA3Zpql12yI9+L0oMJ/FFal1g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f2H4o0Jbv+G7G7g5SiEWhVKz+IysWtFStNPWp3WPGPDksc4jn1LpaDd71rDUuZa6I3/t20BDhtlGFxqnecllA22tkNB9Veu9N6dy9aeS02Sqlx0tPEJlNVurzIbM4OhR93b4YImsv5fSAMhUyHnImGarNGQPlGqnpG6Uzv7IiKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XtJzVT5V; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-710e39961f4so2999490b3a.3
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 10:20:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724085975; x=1724690775; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9Z7g9H1uuN368sbZwFL2P/UunOJpGy+71L7MEI5Gqco=;
-        b=Bhfv68Wbv9Smj0Llmr2FCqT2yK0fyMG8+cCqauvogxQyMcYGzt/corJd4Awfrt984J
-         EwHRlpT4DJ1ZIlmKuowlw11RyrfgDHp+xnVIIpcyxlb6pGb1pof/7e0lhGyxhew9fgol
-         B/xQo5kqR4x3AECNUDgzlNVO/TJ+NpL2Nqn8V5RoUCOuYvDzaBLiNHwtc4KQ4Nv5puBE
-         s7FdbG9iD8GVxIvB8gbvBhHHff6hRsONYisSoBK9DR4HeRdXVPvQAYP4eAIt8v/4CtUd
-         PnzDVtCeFUXlz557ySU1moYc9B5L1G4UKkJH7+GBM3qvVoBRxAp2p5YAUrJfh3yaS20M
-         WVrQ==
+        d=google.com; s=20230601; t=1724088030; x=1724692830; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=44Ddv6twXoWtXHXqa94jX8MItnSbPFQyPRlP6d3WoMc=;
+        b=XtJzVT5V42VeWVsfPy+nYw9EH//FYpjyX0x63hbYNFKj11U/N8aoRUBuFe0rrqgYN3
+         ZN+/vq33Lm3y+KucwQFRSeZcXLh0oUoQ6Bt/R1kgTJ/aLGlk7coyLV2Jkx+7k947lD4X
+         OUJ9LY9yvQkAzKFeYIneGCjW+mZcJCU1ewLt8SOZCOmf0jhWYllSJSVpMCiZiSA6VYAl
+         B5JpiGQZHR3OGyC+oQ/tOcIT0vBoK6ZX4r2GmX0/rlyZcXjVzvhOaDD9waRXss4ORN6N
+         Ex73KLgIkWh/iSXdYG3zzeRWZUlXfe3pKS0qhDPU0+PoJ9tue4E6HjBgxLSZwod7BUM/
+         +9dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724085975; x=1724690775;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Z7g9H1uuN368sbZwFL2P/UunOJpGy+71L7MEI5Gqco=;
-        b=siJsrde+/hjhzy8lwRCziEwftGx+SFp1AlkixHNepOzKMmTMv0F48xzZIIAllDqd7T
-         qJoqi0iI0rae2B/l85PjcLFGHltzm5kkaWbb8UAsXWZtCR5jG8l+gkF6z7rkbD9BDwKt
-         E9OTZwdzql2/DeN7xSU+0b5Rzi+peqJC7Hx0MOBoxzvpcmRsFfm0GAHAj/GOh8w+IeZw
-         rMtyZlm1q/hCi9NS1TquaUsBp6JfPBIpRBCczVVuJh1xgn4dNhP4FM1a0gjtnfjd+6cx
-         C7A2LETioEJ7RXAVTSDcJigAFQtTRVrr4ZyJQS+hXqVl3nL2Mpy8ppA9lSSOEM0C+/uZ
-         O+Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCWERkcSCZPxhuzXu1farYh2jjpdDjdy0G0YsOX+TkPiQc9xK9lNWc32RWlFK4AdObrpEpmfMQrH8bEMv/4oYHwBT7P6
-X-Gm-Message-State: AOJu0Yx8l+pGso28rA3ByBTWdlexKuwxzObHkcd8WzXOqeRbpkztUprY
-	vmvHG0kiEZ9Zv2Ot7Kbvq8bwSy52HXyVjeCU15GhFZoTcVqLaEszdxcsHHdIB5Q=
-X-Google-Smtp-Source: AGHT+IGuv7SyKEaIn/yQTA5OF0LPxA1KQdVqiDZ65XXA3A41gdwd0QgZ27gUJmx+DBdupjL/FSj4UA==
-X-Received: by 2002:a05:651c:544:b0:2f1:a7f8:810f with SMTP id 38308e7fff4ca-2f3be5de18cmr80508331fa.36.1724085975365;
-        Mon, 19 Aug 2024 09:46:15 -0700 (PDT)
-Received: from ?IPV6:2a10:bac0:b000:7717:7285:c2ff:fedd:7e3a? ([2a10:bac0:b000:7717:7285:c2ff:fedd:7e3a])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbbe29a6sm5772026a12.13.2024.08.19.09.46.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Aug 2024 09:46:15 -0700 (PDT)
-Message-ID: <4fcff880-30e2-44f8-aa45-6444a3eaa398@suse.com>
-Date: Mon, 19 Aug 2024 19:46:13 +0300
+        d=1e100.net; s=20230601; t=1724088030; x=1724692830;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=44Ddv6twXoWtXHXqa94jX8MItnSbPFQyPRlP6d3WoMc=;
+        b=hFj/NDwr6NEE707CJu8vdZBhTXSyU8/Y/h0xkvAhjbg2xXRvCTL2gTH5dhlUQvW+AX
+         JsT++qsZrRF2VK0C4rmyxYWTd9ZDNsp0RNfN5yYam5pqmG1S2AuRwkFJ1caBFLFWPWMy
+         dDExjYakB6cHyiOiLjdH2vyKQLM6UITwEhqWsiaPlMI48PWUTyFvj72aFIRafnN59II0
+         STW8IcIer7fsDkHEPOl6tLkufVg/JYMSner/jjXFaZ5hVCzcZvn7BU96ZGVAvJatcEKz
+         TcHifoATcSPW9QAcjpPLBL49AK8eTFs0CT4did5PDIeBIaNr2fv0nZIWjzuK76Vgn1lb
+         HZ2w==
+X-Forwarded-Encrypted: i=1; AJvYcCVAsAflpr5E1o4ovNI00c50m577x4yDuGv6WwI4zN8rQX4fxhYB+zOBpVP/QuFN5Wi5vZMDibqoUalB5rzVOFX5OfrY
+X-Gm-Message-State: AOJu0YwG6nyrpv1KpazjvuCLymkRZhF1UZNFwRYnCWFXO//We59o51D+
+	zN2Vr5iFmT6a5iOJotCJOTkN43TWW1sREDc4bE19vnljInwQTtCZGHGkJwBhBQ==
+X-Google-Smtp-Source: AGHT+IFS46LqBKrm1MdFbLBCDRNytMMCr+3Tf953El5f+v9RCyTiFYwlhKpSQEfz+hDM+sJYIKpX8Q==
+X-Received: by 2002:a05:6a21:3406:b0:1c4:d438:7dd2 with SMTP id adf61e73a8af0-1c904fb6496mr10239753637.32.1724088030116;
+        Mon, 19 Aug 2024 10:20:30 -0700 (PDT)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127addf5f5sm6801769b3a.6.2024.08.19.10.20.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 10:20:29 -0700 (PDT)
+Date: Mon, 19 Aug 2024 10:20:23 -0700
+From: Vipin Sharma <vipinsh@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, dmatlack@google.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: x86/mmu: Split NX hugepage recovery flow into
+ TDP and non-TDP flow
+Message-ID: <20240819172023.GA2210585.vipinsh@google.com>
+References: <20240812171341.1763297-1-vipinsh@google.com>
+ <20240812171341.1763297-2-vipinsh@google.com>
+ <Zr_gx1Xi1TAyYkqb@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 17/25] KVM: TDX: create/free TDX vcpu structure
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
- tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
- linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-18-rick.p.edgecombe@intel.com>
-From: Nikolay Borisov <nik.borisov@suse.com>
-Content-Language: en-US
-In-Reply-To: <20240812224820.34826-18-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zr_gx1Xi1TAyYkqb@google.com>
 
+On 2024-08-16 16:29:11, Sean Christopherson wrote:
+> On Mon, Aug 12, 2024, Vipin Sharma wrote:
+> > +	list_for_each_entry(sp, &kvm->arch.possible_nx_huge_pages, possible_nx_huge_page_link) {
+> > +		if (i++ >= max)
+> > +			break;
+> > +		if (is_tdp_mmu_page(sp) == tdp_mmu)
+> > +			return sp;
+> > +	}
+> 
+> This is silly and wasteful.  E.g. in the (unlikely) case there's one TDP MMU
+> page amongst hundreds/thousands of shadow MMU pages, this will walk the list
+> until @max, and then move on to the shadow MMU.
+> 
+> Why not just use separate lists?
 
+Before this patch, NX huge page recovery calculates "to_zap" and then it
+zaps first "to_zap" pages from the common list. This series is trying to
+maintain that invarient.
 
-On 13.08.24 г. 1:48 ч., Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> Implement vcpu related stubs for TDX for create, reset and free.
-> 
-> For now, create only the features that do not require the TDX SEAMCALL.
-> The TDX specific vcpu initialization will be handled by KVM_TDX_INIT_VCPU.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
-> uAPI breakout v1:
->   - Dropped unnecessary WARN_ON_ONCE() in tdx_vcpu_create().
->     WARN_ON_ONCE(vcpu->arch.cpuid_entries),
->     WARN_ON_ONCE(vcpu->arch.cpuid_nent)
->   - Use kvm_tdx instead of to_kvm_tdx() in tdx_vcpu_create() (Chao)
-> 
-> v19:
->   - removed stale comment in tdx_vcpu_create().
-> 
-> v18:
->   - update commit log to use create instead of allocate because the patch
->     doesn't newly allocate memory for TDX vcpu.
-> 
-> v16:
->   - Add AMX support as the KVM upstream supports it.
-> --
-> 2.46.0
-> ---
->   arch/x86/kvm/vmx/main.c    | 44 ++++++++++++++++++++++++++++++++++----
->   arch/x86/kvm/vmx/tdx.c     | 41 +++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/x86_ops.h | 10 +++++++++
->   arch/x86/kvm/x86.c         |  2 ++
->   4 files changed, 93 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index c079a5b057d8..d40de73d2bd3 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -72,6 +72,42 @@ static void vt_vm_free(struct kvm *kvm)
->   		tdx_vm_free(kvm);
->   }
->   
-> +static int vt_vcpu_precreate(struct kvm *kvm)
-> +{
-> +	if (is_td(kvm))
-> +		return 0;
-> +
-> +	return vmx_vcpu_precreate(kvm);
-> +}
-> +
-> +static int vt_vcpu_create(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return tdx_vcpu_create(vcpu);
-> +
-> +	return vmx_vcpu_create(vcpu);
-> +}
-> +
-> +static void vt_vcpu_free(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu)) {
-> +		tdx_vcpu_free(vcpu);
-> +		return;
-> +	}
-> +
-> +	vmx_vcpu_free(vcpu);
-> +}
-> +
-> +static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> +{
-> +	if (is_td_vcpu(vcpu)) {
-> +		tdx_vcpu_reset(vcpu, init_event);
-> +		return;
-> +	}
-> +
-> +	vmx_vcpu_reset(vcpu, init_event);
-> +}
-> +
->   static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->   {
->   	if (!is_td(kvm))
-> @@ -108,10 +144,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.vm_destroy = vt_vm_destroy,
->   	.vm_free = vt_vm_free,
->   
-> -	.vcpu_precreate = vmx_vcpu_precreate,
-> -	.vcpu_create = vmx_vcpu_create,
-> -	.vcpu_free = vmx_vcpu_free,
-> -	.vcpu_reset = vmx_vcpu_reset,
-> +	.vcpu_precreate = vt_vcpu_precreate,
-> +	.vcpu_create = vt_vcpu_create,
-> +	.vcpu_free = vt_vcpu_free,
-> +	.vcpu_reset = vt_vcpu_reset,
->   
->   	.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
->   	.vcpu_load = vmx_vcpu_load,
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 531e87983b90..18738cacbc87 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -377,6 +377,47 @@ int tdx_vm_init(struct kvm *kvm)
->   	return 0;
->   }
->   
-> +int tdx_vcpu_create(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> +
-> +	/* TDX only supports x2APIC, which requires an in-kernel local APIC. */
-> +	if (!vcpu->arch.apic)
-> +		return -EINVAL;
+If we use two separate lists then we have to decide how many pages
+should be zapped from TDP MMU and shadow MMU list. Few options I can
+think of:
 
-nit: Use kvm_apic_present()
+1. Zap "to_zap" pages from both TDP MMU and shadow MMU list separately.
+   Effectively, this might double the work for recovery thread.
+2. Try zapping "to_zap" page from one list and if there are not enough
+   pages to zap then zap from the other list. This can cause starvation.
+3. Do half of "to_zap" from one list and another half from the other
+   list. This can lead to situations where only half work is being done
+   by the recovery worker thread.
 
-<snip>
+Option (1) above seems more reasonable to me.
 
