@@ -1,126 +1,152 @@
-Return-Path: <kvm+bounces-24550-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24551-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE039574AC
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 21:44:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FCE59575E3
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 22:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 380F0283FBF
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 19:44:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C306E1C22BB3
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 20:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EFA1DC48F;
-	Mon, 19 Aug 2024 19:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8EA15A843;
+	Mon, 19 Aug 2024 20:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kyg//etU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QjckSWmi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489201DC47F
-	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 19:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4094159583
+	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 20:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724096655; cv=none; b=Inx7Kdn7FakA3BSGMpN9CEPBlduC4qPT6PhzdkEIyzLK6PNBjAM/C1HGou4vGH0laWVbqywpwlWwXtMbU8omDP/0/cU/GTgOP6F3f3/afb167DLMqb99tGVG/4ddjpmHgdOi/V5LNtJpLLMrOIcOC+0X0LHd8n9/pjrzCbTma3I=
+	t=1724100127; cv=none; b=NMbEGG3yldix3PFKm/W0N8IZiOwDwd1HYn5KzmP1xU864Yfg5b9Smf+qX85ZTqsf54p3R3wGFW8wFW/FYlbTOkALVGLSuIn6abMjE/tP32vUwFaJqaMF1k6ZAXGea018KvjBC2Jr2l6tnLWU+cM7BWuMjxUFSWd4+o00jZa7ttc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724096655; c=relaxed/simple;
-	bh=w83ocErDZIzCw8c8O7vL+g1+VP5ZM2OU81Qz7bqaBRA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iugCILvFOhDOBGL7M8EgsMWUlonfe9q0OX9h+rGzVNrmG/OzdYr+qRIHsty6H+AMRgvrGG6KNYskx45ujchyoZX86YSWH41g+pPSAe3fKul9TeX3T1JnKyNmofQcF9hqUJqc1pf2GEvoyhrHzyBBFetIG7pkzQ1L7VLCx0Sg+iU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kyg//etU; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-530d0882370so4878423e87.3
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 12:44:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724096652; x=1724701452; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sDiz02fpJ0BHDvVXU18To+N8ajErks/Wn/P49vHS5RA=;
-        b=Kyg//etUfl0pXEFI1K5vRdrvtTNHadCSLXJdcUhGYYklIkB3SEOX27TfADQDnjqA31
-         2F1OSgLeTj6+o0oP1pQ5/o5ejkhHZn/84gGwE5lVGIMaaBfDGm+UmLV5sl/ThQbcfWBj
-         sZtjiWZnsZKFm7wLZo1NjrCmKiSzF5tb9xct9I3jjiEJB1KRT/lJsibZg3ZXEv8ZXGzk
-         f3OnplQE7LS2ec0qLtp/7UNc9c+5L6w7tOJYA275+5HBOqi5ax5ECZMA9Gg3GMZw39GM
-         W7dK+5JXiyjPIq4Koxt0cFwKdz+HfEYHBrYDpoqLm8TBHrWlj9Zk4NYE0m86/x+gzHUx
-         dSWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724096652; x=1724701452;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sDiz02fpJ0BHDvVXU18To+N8ajErks/Wn/P49vHS5RA=;
-        b=iJ93iYejpNVfzdyL/+iaWcmmRzur7kSBT7QGp8+sMqZPbkuIfrR/Dofo4Vs6609y5v
-         CXZya0npitXNT3AWQ1ka6Pyd92uvl0X7gSb5dP/lt8P2AiCdvWOL2WOf1ou3+J7v2X3r
-         Irj4UNhfhCLifPNRuMIIFG8Jzp9veUSr28+kwA0ZTG2R7+KkqKCXmCHUmFGnF/6ZCqoO
-         h0akgwaFbbVClEJWYoU8F/DbaZOom7yiETCnbWJNuXIG5sRpPlvB+WTLwJBZWy6LK0Ne
-         Qqdk/biUrCxjQhk1mG5doc0ZgjtqqiQUq1ASI7nQWv5rbt8oZTu7gsWWNy/YZ1Ncxm9s
-         DU8g==
-X-Gm-Message-State: AOJu0YzY2ib7KcEP/ZMpoI1MdeQnshQfSCUWSVsegW70YxB/Drqwn96i
-	4geIVhdzd1dEyfEYXOjV6ktXpq0Us/sfhxSqA+/8RhsxEq8BvnqMeKfk7JjeGvLxd48eCjyLY3g
-	sYEooVUg6LadtyITsRgwCAhidYJ0NO7zs0MuG
-X-Google-Smtp-Source: AGHT+IG1BaOgHVZEdvbKaXGctP//pb7CyT3HJWWrHjhhlPOcCZVibicxUbUt9KdvzqmsEwfys0s9oPhOXTmbq0LTH3Q=
-X-Received: by 2002:a05:6512:33d5:b0:530:e228:276f with SMTP id
- 2adb3069b0e04-5331c6ba93dmr8709338e87.36.1724096652012; Mon, 19 Aug 2024
- 12:44:12 -0700 (PDT)
+	s=arc-20240116; t=1724100127; c=relaxed/simple;
+	bh=Dt1Ff7fKLLYPfMaJ4kJTzH4evyvUMfCz59lijmotGOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kuoHFNxbr+VgPb0DbzjP0nUEMB9a4suL9Rtl6aXXmCpU1X8Z0a5tPROpOulyEIo1Z8ar2FO8pGy5n552lQ39ONQ0hZZpMOqTNZyoAwmEY0Eu2XntailjaHqrEJ25xqx0TySvZM9EXWpSQMmecCj4uyT+Hkmv/qYwTckQo5sO1jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QjckSWmi; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 19 Aug 2024 20:41:52 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724100121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9Y168q5crzOyuR0vBXeOnFBth7VvFqg3LAjS8RW/lCM=;
+	b=QjckSWmi/C6logVG6INyLTdl2yFG7ehaLWTfObZBDHmH29dWtGBfep0KYv6Z9gBDYeh9S+
+	B6R9XRrjvorKQxuRIfjSMJWax726Gq0p6dIEjHG9Ct8t5QfdejAKRHlb7mGX73T27kmL/f
+	3zLPC94bHuABE9SXOJjRNTeVEwEQcVA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Yu Zhao <yuzhao@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	James Houghton <jthoughton@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Matlack <dmatlack@google.com>,
+	David Rientjes <rientjes@google.com>,
+	James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
+ and kvm_age_gfn
+Message-ID: <ZsOuEP6P0v45ffC0@linux.dev>
+References: <20240724011037.3671523-1-jthoughton@google.com>
+ <20240724011037.3671523-4-jthoughton@google.com>
+ <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
+ <Zr_y7Fn63hdowfYM@google.com>
+ <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240816192310.117456-1-pratikrajesh.sampat@amd.com>
-In-Reply-To: <20240816192310.117456-1-pratikrajesh.sampat@amd.com>
-From: Peter Gonda <pgonda@google.com>
-Date: Mon, 19 Aug 2024 13:43:59 -0600
-Message-ID: <CAMkAt6o1KZH=fTWWOoPf+Z0j12xUYrbqj=Qob4E1LxJBtivo4w@mail.gmail.com>
-Subject: Re: [PATCH v2 0/9] SEV Kernel Selftests
-To: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>
-Cc: kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com, 
-	thomas.lendacky@amd.com, michael.roth@amd.com, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Aug 16, 2024 at 1:23=E2=80=AFPM Pratik R. Sampat
-<pratikrajesh.sampat@amd.com> wrote:
->
-> This series primarily introduces SEV-SNP test for the kernel selftest
-> framework. It tests boot, ioctl, pre fault, and fallocate in various
-> combinations to exercise both positive and negative launch flow paths.
->
-> Patch 1 - Adds a wrapper for the ioctl calls that decouple ioctl and
-> asserts which enables the use of negative test cases. No functional
-> change intended.
-> Patch 2 - Extend the sev smoke tests to use the SNP specific ioctl
-> calls and sets up memory to boot a SNP guest VM
-> Patch 3 - Adds SNP to shutdown testing
-> Patch 4, 5 - Tests the ioctl path for SEV, SEV-ES and SNP
-> Patch 6 - Adds support for SNP in KVM_SEV_INIT2 tests
-> Patch 7,8,9 - Enable Prefault tests for SEV, SEV-ES and SNP
->
-> The patchset is rebased on top of kvm/queue and and over the
-> "KVM: selftests: Add SEV-ES shutdown test" patch.
-> https://lore.kernel.org/kvm/20240709182936.146487-1-pgonda@google.com/
->
-> v2:
-> 1. Add SMT parsing check to populate SNP policy flags
-> 2. Extend Peter Gonda's shutdown test to include SNP
+On Fri, Aug 16, 2024 at 07:03:27PM -0600, Yu Zhao wrote:
+> On Fri, Aug 16, 2024 at 6:46 PM Sean Christopherson <seanjc@google.com> wrote:
 
-Thanks for this.
+[...]
 
-> 3. Introduce new tests for prefault which include exercising prefault,
->    fallocate, hole-punch in various combinations.
-> 4. Decouple ioctl patch reworked to introduce private variants of the
->    the functions that call into the ioctl. Also reordered the patch for
->    it to arrive first so that new APIs are not written right after
->    their introduction.
-> 5. General cleanups - adding comments, avoiding local booleans, better
->    error message. Suggestions incorporated from Peter, Tom, and Sean.
->
+> > Were you expecting vCPU runtime to improve (more)?  If so, lack of movement could
+> > be due to KVM arm64 taking mmap_lock for read when handling faults:
+> >
+> > https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
+> 
+> For the above test, I don't think it's mmap_lock
 
-Tested the entire series
+Yeah, I don't think this is related to the mmap_lock.
 
-Tested-by: Peter Gonda <pgonda@google.com>
+James is likely using hardware that has FEAT_HAFDBS, so vCPUs won't
+fault for an Access flag update. Even if he's on a machine w/o it,
+Access flag faults are handled outside the mmap_lock.
+
+Forcing SW management of the AF at stage-2 would be the best case for
+demonstrating the locking improvement:
+
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index a24a2a857456..a640e8a8c6ea 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -669,8 +669,6 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+ 	 * happen to be running on a design that has unadvertised support for
+ 	 * HAFDBS. Here be dragons.
+ 	 */
+-	if (!cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+-		vtcr |= VTCR_EL2_HA;
+ #endif /* CONFIG_ARM64_HW_AFDBM */
+ 
+ 	if (kvm_lpa2_is_enabled())
+
+Changing the config option would work too, but I wasn't sure if
+FEAT_HAFDBS on the primary MMU influenced MGLRU heuristics.
+
+> -- the reclaim path,
+> e.g., when zswapping guest memory, has two stages: aging (scanning
+> PTEs) and eviction (unmapping PTEs). Only testing the former isn't
+> realistic at all.
+
+AIUI, the intention of this test data is to provide some justification
+for why Marc + I should consider the locking change *outside* of any
+MMU notifier changes. So from that POV, this is meant as a hacked
+up microbenchmark and not meant to be realistic.
+
+And really, the arm64 change has nothing to do with this series at
+this point, which is disappointing. In the interest of moving this
+feature along for both architectures, would you be able help James
+with:
+
+ - Identifying a benchmark that you believe is realistic
+
+ - Suggestions on how to run that benchmark on Google infrastructure
+
+Asking since you had a setup / data earlier on when you were carrying
+the series. Hopefully with supportive data we can get arm64 to opt-in
+to HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY as well.
+
+-- 
+Thanks,
+Oliver
 
