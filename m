@@ -1,243 +1,300 @@
-Return-Path: <kvm+bounces-24477-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24478-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63FEA9560C6
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 03:16:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E847B9560E3
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 03:22:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F155B21D09
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 01:16:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0042281944
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 01:22:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A451C695;
-	Mon, 19 Aug 2024 01:16:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5751C6A8;
+	Mon, 19 Aug 2024 01:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AxmXWGWu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BMGu/kiQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE132634
-	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 01:16:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E777522F19;
+	Mon, 19 Aug 2024 01:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724030192; cv=none; b=t7ACa9RACm31JACZkmTX+cHYsA7o5eVPO7cfoQhpYWV932d77c4JLtq/zMGATGtlOib5Bv7jdjgBJNoaAhtw0jxTMdYLKVSDxOJSWAlpuW7xDibvglRckZ2hFwDJc0q+Nnm+chW+ZUE4EHFKRH9s9acZ2TWyO9vYep892PYO5kQ=
+	t=1724030547; cv=none; b=QclHTxmksIStpdOcO8i4S8W0cSfakiERfkYX0WWZwHjA3QzKHMow8uy0JZM7tsauJ5Nac75HXPOO20ZcTiAwUw4axRkCPUNzHYxEDGvHzGNLATxXreb8E41TWlgOTey3X9+1F/aUPZWcSaif1V3J//EcSlKvkLQ1WDpLHn6lF5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724030192; c=relaxed/simple;
-	bh=wud/lzZfaqiZcBUke1v0LUt4rtqjgH5UxA2qf/1dxU4=;
+	s=arc-20240116; t=1724030547; c=relaxed/simple;
+	bh=pFAiDn+2JIcEC9UJ62RC7SxPm5KhMUI5vx7Q+nPpyNs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bi0NM7ZCffSdbJsBL3AZBmfFOaY9Az5nry/94BwxqyRWxvBYNFbugdMB8+2rMvEwxa2RLQL5iOVIOYCEurdkhEh8rJZpOOK9ZcTNLfKoKHiMYcGbl6+SxLVyG7Ii1SKEP4C/yRUVIy3hu2FjZT0XkxSKx1JYwJOc8N+54Hgvu7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AxmXWGWu; arc=none smtp.client-ip=198.175.65.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=uShPQJcOTRMU3NutJVW8GrOKenzUZ47fOAA51mlujPVZafH8QuYBLi3O9fn8o9GoazPC7VLUh4U5vZgmrb3OXWdrEcJu/WH4b50ZrvjDOdpRO18OIRldSGvdPR2+hYm1N6vNPcweh7GJwCdNHF9iiNWuBhyjS3Bwv6sTsvDj+Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BMGu/kiQ; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724030190; x=1755566190;
+  t=1724030546; x=1755566546;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=wud/lzZfaqiZcBUke1v0LUt4rtqjgH5UxA2qf/1dxU4=;
-  b=AxmXWGWuPulfBNgwZLhQuSHYoWiMeXANNTHiAzqxcWZrzdSb6tFrsA1p
-   agsRTlf7oyMokLlIXd0maO9nYTY18xWE9ybog3JS96KQGiVe2S3Eo30iY
-   ih1i9L8K//7rBhlHRQ50YPR0VK34slBMDEbrNBBP1cyLGnnr3b56z0fpZ
-   eeW3Iign9BAaLnbqq61z+eED3DCL/c6vU25rwj4uXI14/aZp1i0B2sYId
-   d83WT5W4EjYhAlN9S0m8ouKc+akRbQKugmBtBoMYoo7EE2B6OYaNSSzxf
-   HYOAaEp01dh3fu0XKZOdpnLg+hU35gRtYzWrmBBlz/hqhMsq58tZ0rnsN
-   Q==;
-X-CSE-ConnectionGUID: XDzoItZOSB+P5Vlw+fm/Ow==
-X-CSE-MsgGUID: HqT7u2VkRTObl1YxDXn1ow==
-X-IronPort-AV: E=McAfee;i="6700,10204,11168"; a="26009860"
+   mime-version:in-reply-to;
+  bh=pFAiDn+2JIcEC9UJ62RC7SxPm5KhMUI5vx7Q+nPpyNs=;
+  b=BMGu/kiQU+Ik2cS2mNs170rg8z4nzytNSZAsj1j6Cy6BdOaOApgcUYqF
+   r+zJLxq2jZn3a0dEc8Itnv9nvVAdfTrOyzu8Tx8UyMz08aN0oRhkPlGYc
+   SFejSrGXBN6CU7RpNEciNtZ/Nq29XnasuhEChzwqc0CgqF0hkLoteE896
+   YOIZyPJMH9SbatpB3ey+UGt2XujHPB2tr1TETILVyuSBtPShstOPnq3EO
+   GnE1j3Y+Oo7qKQA+gnP/VEJW6kEF+K+KVoCbJl5NtRuBmYLjzAFv1McRm
+   xy/wigyeDiTCc/mOjPSyJu0UUYTLeW2gMOifq8CNbqIHj01VGGhbMBGmx
+   g==;
+X-CSE-ConnectionGUID: z5MC58iCQ0C+CVtbgaszKg==
+X-CSE-MsgGUID: AUY9mX9oRCmD+J87DLyMCw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11168"; a="26051222"
 X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="26009860"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 18:16:29 -0700
-X-CSE-ConnectionGUID: 788Jq+8HTrOGMU4jV1DxLg==
-X-CSE-MsgGUID: CqylEcTWTyS1AFSAGqT9Gg==
+   d="scan'208";a="26051222"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 18:22:25 -0700
+X-CSE-ConnectionGUID: p57hoqnQR2Sr7OPZ28zoHw==
+X-CSE-MsgGUID: LZ8YWdT3Tu27Ybx2NfDK3g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,158,1719903600"; 
-   d="scan'208";a="65100278"
+   d="scan'208";a="60370379"
 Received: from linux.bj.intel.com ([10.238.157.71])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 18:16:28 -0700
-Date: Mon, 19 Aug 2024 09:11:15 +0800
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2024 18:22:22 -0700
+Date: Mon, 19 Aug 2024 09:17:10 +0800
 From: Tao Su <tao1.su@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com,
-	xiaoyao.li@intel.com
-Subject: Re: [PATCH v2] KVM: x86: Advertise AVX10.1 CPUID to userspace
-Message-ID: <ZsKbsx2K0CxSUT2/@linux.bj.intel.com>
-References: <20240603064002.266116-1-tao1.su@linux.intel.com>
- <Zr9nhCqerpmXjvGc@google.com>
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+	kai.huang@intel.com, isaku.yamahata@gmail.com,
+	tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
+	linux-kernel@vger.kernel.org,
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Subject: Re: [PATCH 12/25] KVM: TDX: Allow userspace to configure maximum
+ vCPUs for TDX guests
+Message-ID: <ZsKdFu9KTdoLJEBV@linux.bj.intel.com>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-13-rick.p.edgecombe@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Zr9nhCqerpmXjvGc@google.com>
+In-Reply-To: <20240812224820.34826-13-rick.p.edgecombe@intel.com>
 
-On Fri, Aug 16, 2024 at 07:51:48AM -0700, Sean Christopherson wrote:
-> On Mon, Jun 03, 2024, Tao Su wrote:
-> > Advertise AVX10.1 related CPUIDs, i.e. report AVX10 support bit via
-> > CPUID.(EAX=07H, ECX=01H):EDX[bit 19] and new CPUID leaf 0x24H so that
-> > guest OS and applications can query the AVX10.1 CPUIDs directly. Intel
-> > AVX10 represents the first major new vector ISA since the introduction of
-> > Intel AVX512, which will establish a common, converged vector instruction
-> > set across all Intel architectures[1].
-> > 
-> > AVX10.1 is an early version of AVX10, that enumerates the Intel AVX512
-> > instruction set at 128, 256, and 512 bits which is enabled on
-> > Granite Rapids. I.e., AVX10.1 is only a new CPUID enumeration with no
-> > VMX capability, Embedded rounding and Suppress All Exceptions (SAE),
-> > which will be introduced in AVX10.2.
-> >
-> > Advertising AVX10.1 is safe because kernel doesn't enable AVX10.1 which is
+On Mon, Aug 12, 2024 at 03:48:07PM -0700, Rick Edgecombe wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> I thought there is nothing to enable for AVX10.1?  I.e. it's purely a new way to
-> enumerate support, thus there will never be anything for the kernel to enable.
+> TDX has its own mechanism to control the maximum number of vCPUs that
+> the TDX guest can use.  When creating a TDX guest, the maximum number of
+> vCPUs of the guest needs to be passed to the TDX module as part of the
+> measurement of the guest.  Depending on TDX module's version, it may
+> also report the maximum vCPUs it can support for all TDX guests.
 > 
+> Because the maximum number of vCPUs is part of the measurement, thus
+> part of attestation, it's better to allow the userspace to be able to
+> configure it.  E.g. the users may want to precisely control the maximum
+> number of vCPUs their precious VMs can use.
+> 
+> The actual control itself must be done via the TDH.MNG.INIT SEAMCALL,
+> where the number of maximum cpus is part of the input to the TDX module,
+> but KVM needs to support the "per-VM maximum number of vCPUs" and
+> reflect that in the KVM_CAP_MAX_VCPUS.
+> 
+> Currently, the KVM x86 always reports KVM_MAX_VCPUS for all VMs but
+> doesn't allow to enable KVM_CAP_MAX_VCPUS to configure the number of
+> maximum vCPUs on VM-basis.
+> 
+> Add "per-VM maximum number of vCPUs" to KVM x86/TDX to accommodate TDX's
+> needs.
+> 
+> Specifically, use KVM's existing KVM_ENABLE_CAP IOCTL() to allow the
+> userspace to configure the maximum vCPUs by making KVM x86 support
+> enabling the KVM_CAP_MAX_VCPUS cap on VM-basis.
+> 
+> For that, add a new 'kvm_x86_ops::vm_enable_cap()' callback and call
+> it from kvm_vm_ioctl_enable_cap() as a placeholder to handle the
+> KVM_CAP_MAX_VCPUS for TDX guests (and other KVM_CAP_xx for TDX and/or
+> other VMs if needed in the future).
+> 
+> Implement the callback for TDX guest to check whether the maximum vCPUs
+> passed from usrspace can be supported by TDX, and if it can, override
+> the 'struct kvm::max_vcpus'.  Leave VMX guests and all AMD guests
+> unsupported to avoid any side-effect for those VMs.
+> 
+> Accordingly, in the KVM_CHECK_EXTENSION IOCTL(), change to return the
+> 'struct kvm::max_vcpus' for a given VM for the KVM_CAP_MAX_VCPUS.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> ---
+> uAPI breakout v1:
+>  - Change to use exported 'struct tdx_sysinfo' pointer.
+>  - Remove the code to read 'max_vcpus_per_td' since it is now done in
+>    TDX host code.
+>  - Drop max_vcpu ops to use kvm.max_vcpus
+>  - Remove TDX_MAX_VCPUS (Kai)
+>  - Use type cast (u16) instead of calling memcpy() when reading the
+>    'max_vcpus_per_td' (Kai)
+>  - Improve change log and change patch title from "KVM: TDX: Make
+>    KVM_CAP_MAX_VCPUS backend specific" (Kai)
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>  arch/x86/include/asm/kvm_host.h    |  1 +
+>  arch/x86/kvm/vmx/main.c            | 10 ++++++++++
+>  arch/x86/kvm/vmx/tdx.c             | 29 +++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/x86_ops.h         |  5 +++++
+>  arch/x86/kvm/x86.c                 |  4 ++++
+>  6 files changed, 50 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index 538f50eee86d..bd7434fe5d37 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -19,6 +19,7 @@ KVM_X86_OP(hardware_disable)
+>  KVM_X86_OP(hardware_unsetup)
+>  KVM_X86_OP(has_emulated_msr)
+>  KVM_X86_OP(vcpu_after_set_cpuid)
+> +KVM_X86_OP_OPTIONAL(vm_enable_cap)
+>  KVM_X86_OP(vm_init)
+>  KVM_X86_OP_OPTIONAL(vm_destroy)
+>  KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index c754183e0932..9d15f810f046 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1648,6 +1648,7 @@ struct kvm_x86_ops {
+>  	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
+>  
+>  	unsigned int vm_size;
+> +	int (*vm_enable_cap)(struct kvm *kvm, struct kvm_enable_cap *cap);
+>  	int (*vm_init)(struct kvm *kvm);
+>  	void (*vm_destroy)(struct kvm *kvm);
+>  
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 59f4d2d42620..cd53091ddaab 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -7,6 +7,7 @@
+>  #include "pmu.h"
+>  #include "posted_intr.h"
+>  #include "tdx.h"
+> +#include "tdx_arch.h"
+>  
+>  static __init int vt_hardware_setup(void)
+>  {
+> @@ -41,6 +42,14 @@ static __init int vt_hardware_setup(void)
+>  	return 0;
+>  }
+>  
+> +static int vt_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+> +{
+> +	if (is_td(kvm))
+> +		return tdx_vm_enable_cap(kvm, cap);
+> +
+> +	return -EINVAL;
+> +}
+> +
+>  static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  {
+>  	if (!is_td(kvm))
+> @@ -72,6 +81,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>  	.has_emulated_msr = vmx_has_emulated_msr,
+>  
+>  	.vm_size = sizeof(struct kvm_vmx),
+> +	.vm_enable_cap = vt_vm_enable_cap,
+>  	.vm_init = vmx_vm_init,
+>  	.vm_destroy = vmx_vm_destroy,
+>  
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index f9faec217ea9..84cd9b4f90b5 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -44,6 +44,35 @@ struct kvm_tdx_caps {
+>  
+>  static struct kvm_tdx_caps *kvm_tdx_caps;
+>  
+> +int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+> +{
+> +	int r;
+> +
+> +	switch (cap->cap) {
+> +	case KVM_CAP_MAX_VCPUS: {
 
-Yes, AVX10.1 is just a new enumeration way.
+How about delete the curly braces on the case?
 
-> > on KVM-only leaf now, just the CPUID checking is changed when using AVX512
-> > related instructions, e.g. if using one AVX512 instruction needs to check
-> > (AVX512 AND AVX512DQ), it can check ((AVX512 AND AVX512DQ) OR AVX10.1)
-> > after checking XCR0[7:5].
-> > 
-> > The versions of AVX10 are expected to be inclusive, e.g. version N+1 is
-> > a superset of version N. Per the spec, the version can never be 0, just
-> > advertise AVX10.1 if it's supported in hardware.
-> 
-> I think it's also worth calling out that advertising AVX10_{128,256,512} needs
-> to land in the same patch (this patch) as AVX10 (and thus AVX10.1), because
-> otherwise KVM would advertise an impossible CPU model, e.g. with AVX512 but not
-> AVX10.1/512, which per "Feature Differences Between Intel® AVX-512 and Intel® AVX10"
-> should be impossible.
-> 
+> +		if (cap->flags || cap->args[0] == 0)
+> +			return -EINVAL;
+> +		if (cap->args[0] > KVM_MAX_VCPUS ||
+> +		    cap->args[0] > tdx_sysinfo->td_conf.max_vcpus_per_td)
+> +			return -E2BIG;
+> +
+> +		mutex_lock(&kvm->lock);
+> +		if (kvm->created_vcpus)
+> +			r = -EBUSY;
+> +		else {
+> +			kvm->max_vcpus = cap->args[0];
+> +			r = 0;
+> +		}
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+> +	}
+> +	default:
+> +		r = -EINVAL;
+> +		break;
+> +	}
+> +	return r;
+> +}
+> +
+>  static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+>  {
+>  	const struct tdx_sysinfo_td_conf *td_conf = &tdx_sysinfo->td_conf;
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index c69ca640abe6..c1bdf7d8fee3 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -119,8 +119,13 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
+>  void vmx_setup_mce(struct kvm_vcpu *vcpu);
+>  
+>  #ifdef CONFIG_INTEL_TDX_HOST
+> +int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+>  #else
+> +static inline int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+> +{
+> +	return -EINVAL;
+> +};
+>  static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+>  #endif
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7914ea50fd04..751b3841c48f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4754,6 +4754,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		break;
+>  	case KVM_CAP_MAX_VCPUS:
+>  		r = KVM_MAX_VCPUS;
+> +		if (kvm)
+> +			r = kvm->max_vcpus;
+>  		break;
+>  	case KVM_CAP_MAX_VCPU_ID:
+>  		r = KVM_MAX_VCPU_IDS;
+> @@ -6772,6 +6774,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  	}
+>  	default:
+>  		r = -EINVAL;
+> +		if (kvm_x86_ops.vm_enable_cap)
+> +			r = static_call(kvm_x86_vm_enable_cap)(kvm, cap);
 
-Indeed, that's the reason why I only used one patch, will do in v3, thanks!
+Can we use kvm_x86_call(vm_enable_cap)(kvm, cap)? Patch18 has similar situation
+for "vcpu_mem_enc_ioctl", maybe we can also use kvm_x86_call there if static
+call optimization is needed.
 
-> > As more and more AVX related CPUIDs are added (it would have resulted in
-> > around 40-50 CPUID flags when developing AVX10), the versioning approach
-> > is introduced. But incrementing version numbers are bad for virtualization.
-> > E.g. if AVX10.2 has a feature that shouldn't be enumerated to guests for
-> > whatever reason, then KVM can't enumerate any "later" features either,
-> > because the only way to hide the problematic AVX10.2 feature is to set the
-> > version to AVX10.1 or lower[2]. But most AVX features are just passed
-> > through and don’t have virtualization controls, so AVX10 should not be
-> > problematic in practice.
-> > 
-> > [1] https://cdrdv2.intel.com/v1/dl/getContent/784267
-> > [2] https://lore.kernel.org/all/Zkz5Ak0PQlAN8DxK@google.com/
-> > 
-> > Signed-off-by: Tao Su <tao1.su@linux.intel.com>
-> > ---
-> > Changelog:
-> > v1 -> v2:
-> >  - Directly advertise version 1 because version can never be 0.
-> >  - Add and advertise feature bits for the supported vector sizes.
-> > 
-> > v1: https://lore.kernel.org/all/20240520022002.1494056-1-tao1.su@linux.intel.com/
-> > ---
-> >  arch/x86/include/asm/cpuid.h |  1 +
-> >  arch/x86/kvm/cpuid.c         | 21 +++++++++++++++++++--
-> >  arch/x86/kvm/reverse_cpuid.h |  8 ++++++++
-> >  3 files changed, 28 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/cpuid.h b/arch/x86/include/asm/cpuid.h
-> > index 6b122a31da06..aa21c105eef1 100644
-> > --- a/arch/x86/include/asm/cpuid.h
-> > +++ b/arch/x86/include/asm/cpuid.h
-> > @@ -179,6 +179,7 @@ static __always_inline bool cpuid_function_is_indexed(u32 function)
-> >  	case 0x1d:
-> >  	case 0x1e:
-> >  	case 0x1f:
-> > +	case 0x24:
-> >  	case 0x8000001d:
-> >  		return true;
-> >  	}
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index f2f2be5d1141..6717a5b7d9cd 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -693,7 +693,7 @@ void kvm_set_cpu_caps(void)
-> >  
-> >  	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
-> >  		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI) |
-> > -		F(AMX_COMPLEX)
-> > +		F(AMX_COMPLEX) | F(AVX10)
-> >  	);
-> >  
-> >  	kvm_cpu_cap_init_kvm_defined(CPUID_7_2_EDX,
-> > @@ -709,6 +709,10 @@ void kvm_set_cpu_caps(void)
-> >  		SF(SGX1) | SF(SGX2) | SF(SGX_EDECCSSA)
-> >  	);
-> >  
-> > +	kvm_cpu_cap_init_kvm_defined(CPUID_24_0_EBX,
-> > +		F(AVX10_128) | F(AVX10_256) | F(AVX10_512)
-> > +	);
-> > +
-> >  	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
-> >  		F(LAHF_LM) | F(CMP_LEGACY) | 0 /*SVM*/ | 0 /* ExtApicSpace */ |
-> >  		F(CR8_LEGACY) | F(ABM) | F(SSE4A) | F(MISALIGNSSE) |
-> > @@ -937,7 +941,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-> >  	switch (function) {
-> >  	case 0:
-> >  		/* Limited to the highest leaf implemented in KVM. */
-> > -		entry->eax = min(entry->eax, 0x1fU);
-> > +		entry->eax = min(entry->eax, 0x24U);
-> >  		break;
-> >  	case 1:
-> >  		cpuid_entry_override(entry, CPUID_1_EDX);
-> > @@ -1162,6 +1166,19 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-> >  			break;
-> >  		}
-> >  		break;
-> > +	case 0x24: {
+>  		break;
+>  	}
+>  	return r;
+> -- 
+> 2.34.1
 > 
-> No need for the curly braces on the case.  But, my suggestion below will change
-> that ;-)
 > 
-
-I got it :-)
-
-> > +		if (!kvm_cpu_cap_has(X86_FEATURE_AVX10)) {
-> > +			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> > +			break;
-> > +		}
-> > +		entry->eax = 0;
-> > +		cpuid_entry_override(entry, CPUID_24_0_EBX);
-> > +		/* EBX[7:0] hold the AVX10 version; KVM supports version '1'. */
-> > +		entry->ebx |= 1;
-> 
-> Ah, rather than hardcode this to '1', I think we should do:
-> 
-> 		u8 avx10_version;
-> 
-> 		if (!kvm_cpu_cap_has(X86_FEATURE_AVX10)) {
-> 			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> 			break;
-> 		}
-> 
-> 		/*
-> 		 * The AVX10 version is encoded in EBX[7:0].  Note, the version
-> 		 * is guaranteed to be >=1 if AVX10 is supported.  Note #2, the
-> 		 * version needs to be captured before overriding EBX features!
-> 		 */
-> 		avx10_version = min_t(u8, entry->ebx & 0xff, 1);
-> 
-> 		cpuid_entry_override(entry, CPUID_24_0_EBX);
-> 		entry->ebx |= avx10_version;
-> 
-> I.e. use the same approach as limiting the max leaf, which does:
-> 
-> 		entry->eax = min(entry->eax, 0x1fU);
-> 
-> Unless I'm misunderstanding how all of this is expected to play out, we're going
-> to need the min_t() code for AVX10.2 anyways, might as well implement it now.
-
-Yes, that's better for the upcoming AVX10.2, thanks for the suggestions!
-
 
