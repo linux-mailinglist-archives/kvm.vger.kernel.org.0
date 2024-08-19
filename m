@@ -1,193 +1,211 @@
-Return-Path: <kvm+bounces-24543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D7795705E
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 18:33:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EB459570A9
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 18:46:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DE8C283296
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 16:33:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D9621C20C70
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 16:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436BD177999;
-	Mon, 19 Aug 2024 16:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40393177998;
+	Mon, 19 Aug 2024 16:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mQ+tIkjT"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Bhfv68Wb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4824AEF2
-	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 16:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711E21A270
+	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 16:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724085202; cv=none; b=ZIUX7iZ0NfNl9KxIhcNaZXbKpYnompE1PUcQbriYKTfz6BrwFOn1xfIVdoBmVtdHOMJ686NPGPOs0ooZ8caiFr022RaTMf2yWmDS96O7Ndt/x0WPizMsFR12sz7+JrhXLIRMG7YDS4jkWNtDejuIGvT85Tx2/auRhp2fa3AsjcQ=
+	t=1724085979; cv=none; b=O1NlvNCO/9NbqV014F4uqgtmdkfYWJMO4Bm+Po3NoT/z1ZQHxuUZNoK+Nzevc0CdGHkNo/fK3OKhokzqQOfwSn8mu0e+YmABrERGFBzyKnL9MaMEZApJ8tazK4a7M2O+PqfsoXqQgMqFhqzxd8PPMHYcJU35FcuuUlrCjqW2f/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724085202; c=relaxed/simple;
-	bh=5w/ixzaqd2fEJi7mnvChP6vlKzaed3No1gqLFeWVQUw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G/V1EN3gjL3+nvSy7Din/p0Uf1gFqXy9RTEV05asdzhXwGRL8CGPnqXrXAUW9vT8o7gcQ2oTb3eTKPuTR08qYWQOxr7Wa4LRSVG4SoTR4ghqTYQNdWUY5MDUcE90UtOoBCKr5AVB9CUtVc7fFxRQQM2xwjcfw617OHG8ZE5uA7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mQ+tIkjT; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2d45935fed4so854152a91.3
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 09:33:19 -0700 (PDT)
+	s=arc-20240116; t=1724085979; c=relaxed/simple;
+	bh=4Zm2aY38wQUKInxgHuMrVp3FTi32iwRINTkf8PLyzIU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X44PuhGkLF01N5O9FcDMf4zM5SHVQlhNml1cvzCbkDVfMKZ3i3pXaUo/vO1jJT/vMscIS+9KAE6pnV5fBSfH8wWs13jmO+zINHjkrLyeejAv4IM+YmGIQZ2VIMxSXRLI1p29rhzy9sQ9OsvZkuCLkbUds+tjJ6roa9GBHRwZU6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Bhfv68Wb; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2ef2d96164aso53520061fa.3
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 09:46:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724085199; x=1724689999; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4p2SIjYuIlCaoRIolQv5TgyKbOPsqVSXeOcL6uydFc0=;
-        b=mQ+tIkjTtwGGfbr0G9zsuHBk1n3lByfH+WIZ05TG4Vqtrq4B/Hn2lUxlEnwG09+Qct
-         7wkR0K8C/AOotu4EIM3uABjHk/i7HqC3KoU/FuvxYX17hEGhZT/OS1VrlcsRgrDv+Vo0
-         DyNDthl2QDRlIHu0LLk/IswUGecYnZAF4FXXYjhkslEiWqe5/vwBPNOoA3AKkMDbAvPo
-         YixS2nsiShfC/FveD436Q0ua39C2oOOEnhJckCc3kCgOAQeD16z5rclscyWfvifJo/bR
-         hiKEyVKXPYAKsGCJfP6xD70Phnr2QKAFq+O5FJGVhvMD5SU5YAZmyedV2uF8xvp7cMow
-         hLeA==
+        d=suse.com; s=google; t=1724085975; x=1724690775; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9Z7g9H1uuN368sbZwFL2P/UunOJpGy+71L7MEI5Gqco=;
+        b=Bhfv68Wbv9Smj0Llmr2FCqT2yK0fyMG8+cCqauvogxQyMcYGzt/corJd4Awfrt984J
+         EwHRlpT4DJ1ZIlmKuowlw11RyrfgDHp+xnVIIpcyxlb6pGb1pof/7e0lhGyxhew9fgol
+         B/xQo5kqR4x3AECNUDgzlNVO/TJ+NpL2Nqn8V5RoUCOuYvDzaBLiNHwtc4KQ4Nv5puBE
+         s7FdbG9iD8GVxIvB8gbvBhHHff6hRsONYisSoBK9DR4HeRdXVPvQAYP4eAIt8v/4CtUd
+         PnzDVtCeFUXlz557ySU1moYc9B5L1G4UKkJH7+GBM3qvVoBRxAp2p5YAUrJfh3yaS20M
+         WVrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724085199; x=1724689999;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4p2SIjYuIlCaoRIolQv5TgyKbOPsqVSXeOcL6uydFc0=;
-        b=LMhD6Yy8NwwD92lnIbB09YbSJW1QDxMT3Wjmi67oxj45U+S9fUl0s7U6N4HpvNdpK5
-         zE7IfIGf9cuveI8sXI2SqtOA/q6HZCtEyD3/BfeD3Rfmi9AbU5X2RFzSgp1X8ofl3V8S
-         67B1NEjkahdu1+HbAxB3dKBzbge+WNO0zHyL6rl6DaNnCaUnlzKu3tHlQ0qmUkFt2p8E
-         MvjNAlyCNTMIw6Vq65062V8kzjJBS+PV2KSxCGMScxpC/NutLXBY5Y/f0tmIyXN6AXBM
-         0EpHDcVRtMP8ZUCcXvSGfixVvoDisvCXgTbqpvbwnpzUXpxnxDi3VfBtm5h0+rnKsOKg
-         TPOA==
-X-Forwarded-Encrypted: i=1; AJvYcCXvW+IhGZovngtNC150aXPoqtZc61DBWOh9RSv1Rf+oruaV3kkXmfj0BMSqq2I+/dccQqFVzyL2s9Kzw4LdZi07MVxS
-X-Gm-Message-State: AOJu0YxVQfrEX1YVTGWuWdYVcBrBPoJ/VGbNm2PJnK3bbJDDqEgcNc0c
-	LW1EvxY+F/5F4OPCvQFkOzzLi1nTJ/PZMATGeOAPDqWfT7zFsOPaf0uYNlk2vvN3rHJZgOTZj2Z
-	jiw==
-X-Google-Smtp-Source: AGHT+IHXXUvDjnIGWgNHi6tPM6TODiIIkBZkAGdWWZ2nPO179CxiELhSLItCjUB3DxMPDqXY1QGYzaRxHYg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1043:b0:2cd:1e0d:a4c7 with SMTP id
- 98e67ed59e1d1-2d3dfc1e9b8mr52362a91.1.1724085199152; Mon, 19 Aug 2024
- 09:33:19 -0700 (PDT)
-Date: Mon, 19 Aug 2024 09:33:17 -0700
-In-Reply-To: <20240819093030.2864163-1-usama.anjum@collabora.com>
+        d=1e100.net; s=20230601; t=1724085975; x=1724690775;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Z7g9H1uuN368sbZwFL2P/UunOJpGy+71L7MEI5Gqco=;
+        b=siJsrde+/hjhzy8lwRCziEwftGx+SFp1AlkixHNepOzKMmTMv0F48xzZIIAllDqd7T
+         qJoqi0iI0rae2B/l85PjcLFGHltzm5kkaWbb8UAsXWZtCR5jG8l+gkF6z7rkbD9BDwKt
+         E9OTZwdzql2/DeN7xSU+0b5Rzi+peqJC7Hx0MOBoxzvpcmRsFfm0GAHAj/GOh8w+IeZw
+         rMtyZlm1q/hCi9NS1TquaUsBp6JfPBIpRBCczVVuJh1xgn4dNhP4FM1a0gjtnfjd+6cx
+         C7A2LETioEJ7RXAVTSDcJigAFQtTRVrr4ZyJQS+hXqVl3nL2Mpy8ppA9lSSOEM0C+/uZ
+         O+Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCWERkcSCZPxhuzXu1farYh2jjpdDjdy0G0YsOX+TkPiQc9xK9lNWc32RWlFK4AdObrpEpmfMQrH8bEMv/4oYHwBT7P6
+X-Gm-Message-State: AOJu0Yx8l+pGso28rA3ByBTWdlexKuwxzObHkcd8WzXOqeRbpkztUprY
+	vmvHG0kiEZ9Zv2Ot7Kbvq8bwSy52HXyVjeCU15GhFZoTcVqLaEszdxcsHHdIB5Q=
+X-Google-Smtp-Source: AGHT+IGuv7SyKEaIn/yQTA5OF0LPxA1KQdVqiDZ65XXA3A41gdwd0QgZ27gUJmx+DBdupjL/FSj4UA==
+X-Received: by 2002:a05:651c:544:b0:2f1:a7f8:810f with SMTP id 38308e7fff4ca-2f3be5de18cmr80508331fa.36.1724085975365;
+        Mon, 19 Aug 2024 09:46:15 -0700 (PDT)
+Received: from ?IPV6:2a10:bac0:b000:7717:7285:c2ff:fedd:7e3a? ([2a10:bac0:b000:7717:7285:c2ff:fedd:7e3a])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bebbbe29a6sm5772026a12.13.2024.08.19.09.46.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2024 09:46:15 -0700 (PDT)
+Message-ID: <4fcff880-30e2-44f8-aa45-6444a3eaa398@suse.com>
+Date: Mon, 19 Aug 2024 19:46:13 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240819093030.2864163-1-usama.anjum@collabora.com>
-Message-ID: <ZsNzzajqBkmuu5Xm@google.com>
-Subject: Re: [PATCH v2] selftests: kvm: fix mkdir error when building for
- unsupported arch
-From: Sean Christopherson <seanjc@google.com>
-To: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, kernel@collabora.com, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Anup Patel <anup@brainfault.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 17/25] KVM: TDX: create/free TDX vcpu structure
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org
+Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
+ linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-18-rick.p.edgecombe@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+In-Reply-To: <20240812224820.34826-18-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-+KVM arch maintainers
 
-On Mon, Aug 19, 2024, Muhammad Usama Anjum wrote:
-> The tests are built on per architecture basis. When unsupported
-> architecture is specified, it has no tests and TEST_GEN_PROGS is empty.
-> The lib.mk has support for not building anything for such case. But KVM
-> makefile doesn't handle such case correctly. It doesn't check if
-> TEST_GEN_PROGS is empty or not and try to create directory by mkdir.
-> Hence mkdir generates the error.
+
+On 13.08.24 г. 1:48 ч., Rick Edgecombe wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> mkdir: missing operand
-> Try 'mkdir --help' for more information.
+> Implement vcpu related stubs for TDX for create, reset and free.
 > 
-> This can be easily fixed by checking if TEST_GEN_PROGS isn't empty
-> before calling mkdir.
+> For now, create only the features that do not require the TDX SEAMCALL.
+> The TDX specific vcpu initialization will be handled by KVM_TDX_INIT_VCPU.
 > 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > ---
-> Changes since v1:
-> - Instead of ignoring error, check TEST_GEN_PROGS's validity first
-> ---
->  tools/testing/selftests/kvm/Makefile | 2 ++
->  1 file changed, 2 insertions(+)
+> uAPI breakout v1:
+>   - Dropped unnecessary WARN_ON_ONCE() in tdx_vcpu_create().
+>     WARN_ON_ONCE(vcpu->arch.cpuid_entries),
+>     WARN_ON_ONCE(vcpu->arch.cpuid_nent)
+>   - Use kvm_tdx instead of to_kvm_tdx() in tdx_vcpu_create() (Chao)
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 48d32c5aa3eb7..9f8ed82ff1d65 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -317,7 +317,9 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S $(GEN_HDRS)
->  $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
->  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
->  
-> +ifneq ($(strip $(TEST_GEN_PROGS)),)
->  $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
-> +endif
+> v19:
+>   - removed stale comment in tdx_vcpu_create().
+> 
+> v18:
+>   - update commit log to use create instead of allocate because the patch
+>     doesn't newly allocate memory for TDX vcpu.
+> 
+> v16:
+>   - Add AMX support as the KVM upstream supports it.
+> --
+> 2.46.0
+> ---
+>   arch/x86/kvm/vmx/main.c    | 44 ++++++++++++++++++++++++++++++++++----
+>   arch/x86/kvm/vmx/tdx.c     | 41 +++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/x86_ops.h | 10 +++++++++
+>   arch/x86/kvm/x86.c         |  2 ++
+>   4 files changed, 93 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index c079a5b057d8..d40de73d2bd3 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -72,6 +72,42 @@ static void vt_vm_free(struct kvm *kvm)
+>   		tdx_vm_free(kvm);
+>   }
+>   
+> +static int vt_vcpu_precreate(struct kvm *kvm)
+> +{
+> +	if (is_td(kvm))
+> +		return 0;
+> +
+> +	return vmx_vcpu_precreate(kvm);
+> +}
+> +
+> +static int vt_vcpu_create(struct kvm_vcpu *vcpu)
+> +{
+> +	if (is_td_vcpu(vcpu))
+> +		return tdx_vcpu_create(vcpu);
+> +
+> +	return vmx_vcpu_create(vcpu);
+> +}
+> +
+> +static void vt_vcpu_free(struct kvm_vcpu *vcpu)
+> +{
+> +	if (is_td_vcpu(vcpu)) {
+> +		tdx_vcpu_free(vcpu);
+> +		return;
+> +	}
+> +
+> +	vmx_vcpu_free(vcpu);
+> +}
+> +
+> +static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> +{
+> +	if (is_td_vcpu(vcpu)) {
+> +		tdx_vcpu_reset(vcpu, init_event);
+> +		return;
+> +	}
+> +
+> +	vmx_vcpu_reset(vcpu, init_event);
+> +}
+> +
+>   static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>   {
+>   	if (!is_td(kvm))
+> @@ -108,10 +144,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   	.vm_destroy = vt_vm_destroy,
+>   	.vm_free = vt_vm_free,
+>   
+> -	.vcpu_precreate = vmx_vcpu_precreate,
+> -	.vcpu_create = vmx_vcpu_create,
+> -	.vcpu_free = vmx_vcpu_free,
+> -	.vcpu_reset = vmx_vcpu_reset,
+> +	.vcpu_precreate = vt_vcpu_precreate,
+> +	.vcpu_create = vt_vcpu_create,
+> +	.vcpu_free = vt_vcpu_free,
+> +	.vcpu_reset = vt_vcpu_reset,
+>   
+>   	.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
+>   	.vcpu_load = vmx_vcpu_load,
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 531e87983b90..18738cacbc87 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -377,6 +377,47 @@ int tdx_vm_init(struct kvm *kvm)
+>   	return 0;
+>   }
+>   
+> +int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+> +
+> +	/* TDX only supports x2APIC, which requires an in-kernel local APIC. */
+> +	if (!vcpu->arch.apic)
+> +		return -EINVAL;
 
-This just suppresses an error, it doesn't fix the underlying problem.  E.g. there
-are other weird side effects, such as an above mkdir creating the $(ARCH) directory
-even though it shouldn't exist in the end.
+nit: Use kvm_apic_present()
 
-It's also very opaque, e.g. without a comment or the context of the changelog,
-I'd have no idea what purpose the above serves.
-
-Rather than bury the effective "is this arch supported" check in the middle of
-the Makefile, what if we wrap the "real" makefile and include it only for
-supported architectures, and provide dummy targets for everything else?
-
-E.g.
-
----
-# SPDX-License-Identifier: GPL-2.0-only
-top_srcdir = ../../../..
-include $(top_srcdir)/scripts/subarch.include
-ARCH            ?= $(SUBARCH)
-
-ifeq ($(ARCH),$(filter $(ARCH),arm64 s390 riscv x86 x86_64))
-ifeq ($(ARCH),x86)
-        ARCH_DIR := x86_64
-else ifeq ($(ARCH),arm64)
-        ARCH_DIR := aarch64
-else ifeq ($(ARCH),s390)
-        ARCH_DIR := s390x
-else
-        ARCH_DIR := $(ARCH)
-endif
-
-include Makefile.kvm
-else
-all:
-clean:
-endif
----
-
-And other KVM maintainers, the big question is: if we do the above, would now be
-a decent time to bite the bullet and switch to the kernel's canonical arch paths,
-i.e. arm64, s390, and x86?  I feel like if we're ever going to get away from
-using aarch64, x86_64, and s390x, this is as about a good of an opportunity as
-we're going to get.
-
-The annoying x86_64=>x86 alias still needs to be handled to avoid breaking explicit
-ARCH=x86_64 builds (which apparently are allowed, *sigh*), but we can ditch ARCH_DIR
-and the KVM selftests dirs match tools' include paths.
-
----
-# SPDX-License-Identifier: GPL-2.0-only
-top_srcdir = ../../../..
-include $(top_srcdir)/scripts/subarch.include
-ARCH            ?= $(SUBARCH)
-
-ifeq ($(ARCH),$(filter $(ARCH),arm64 s390 riscv x86 x86_64))
-# Top-level selftests allows ARCH=x86_64 :-(
-ifeq ($(ARCH),x86_64)
-	ARCH := x86
-endif
-include Makefile.kvm
-else
-all:
-clean:
-endif
----
-
-If no one objects or has a better idea, I'll post a series to do the above.
+<snip>
 
