@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-24474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3A809560B3
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 03:04:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8139C9560B5
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 03:07:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 154B2B21E11
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 01:04:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE4601F214AC
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 01:06:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78021B5AA;
-	Mon, 19 Aug 2024 01:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00451B5AA;
+	Mon, 19 Aug 2024 01:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+XAcUxD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGEFkBcJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com [209.85.167.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F1110A0C
-	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 01:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C815D1BC20
+	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 01:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724029485; cv=none; b=sb0SQB6htrIZX42JNvQ0BXwNn7yQYZQ3wIhKa7rjY/iTUlNZBlUh+mB1uXBWznNNjFRKTj32aLXNCsRU61tTeHaB7AnVwC4jZPYkeoLL4gR7FF5waqrcyD82pQStoEb5G64cB05PGEYRFkprs0G6ojIWmepcOfCad9vw/rolrts=
+	t=1724029613; cv=none; b=WAJaRHAvpuXgBjnup12TU+oE+gwi4l31ax9qjDFrB00NpNWDWi+EpTiut7SbSn+Q19TSMSEcLyOhkxSxmZ9+lR9f52w5gRvsMk8okMQVEWV8cMFcIQoycG6Y+T2sSpavGnabRCIDFOvU21VXllH+J+hA/x0Q9bK8cPahJtYEwX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724029485; c=relaxed/simple;
-	bh=Y4/pvjoHgRFY6mCbKH+DK/2YiMcMuVOofpCFyOolc6E=;
+	s=arc-20240116; t=1724029613; c=relaxed/simple;
+	bh=yQtneJNu6ZagGjhdtfRQoyCJf5yMN8rUVsK9/kqzDzM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r59NraUXyN0I8ki7+0pGFD9Gojw3WLwLnH7vP84jeZ7uivRe0njlYDVuCgPBa91ZZCJrXTo7ufpj+AiwfxoqlR0lUxCEsP8xkPj6FMrk4DtrTg4xKO+7UafUov+57ubPs/LMUA4UCu5su7R3mie59SNSiJcd2i8T+IdymxVJc0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U+XAcUxD; arc=none smtp.client-ip=209.85.214.196
+	 MIME-Version; b=OLU08i/8+xR5/ZPa4SinYZ5AbAAXqLHbIGMXnkF4joIF1G02wWpfR/ImZDhV+4GzMYzilZ+mIzmfzHBr/tcrGqB5UwtHX9WbNRqstw7AaHkC1XvS75WBxQMoE/cF2v6YbJ9PsP3PORgOno0PDJ5Hv+vvSgYLq+s5UxvZuM7R9IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dGEFkBcJ; arc=none smtp.client-ip=209.85.167.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2021a99af5eso12360875ad.1
-        for <kvm@vger.kernel.org>; Sun, 18 Aug 2024 18:04:43 -0700 (PDT)
+Received: by mail-oi1-f196.google.com with SMTP id 5614622812f47-3db16a98d16so2358255b6e.0
+        for <kvm@vger.kernel.org>; Sun, 18 Aug 2024 18:06:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724029483; x=1724634283; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724029611; x=1724634411; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qTe4pMoweYqHTL0yLGfICkCC/EGnVC9HjE1ZA80wPxM=;
-        b=U+XAcUxD6iBDF96vfzHvvtK6HgMBkEuby8RGA9OzPePlvCl5c8PyYM+ibWd0PpSaq5
-         ln+sXiqYeH6yQfhGnE+a66tC4D6UDSIdqTxhgEfXkQj3dtSnFZvm1TZ9wa2UEEjobJLj
-         KE6mdZZ3FEkbpdc2COweE6K7SubaoCFyL9fw9KDDSBCJcBrTxOiKRlHjVdMTB46l/nOm
-         QqTV+3I4RSUURjEbuPLy0QBirw0azmEIRVrfXOwv8Tvwb1a8Qa5m76Gm43VFeRhwX11E
-         EXfZ8SR0xF1ovY7Qb6GCz53oJGzbaOYEazmiUOnYayjI8jjWYfOWo4YORMx2YukFP00S
-         WW9g==
+        bh=h8DMONrCq5KQTQXp7Rw7pTf0+PDkeHOFVckSuH74uqc=;
+        b=dGEFkBcJg+blDvo4ocGApUgg7ae1rpy3IammipMKUwhrSv8iRcvWCuFrVQrShPh3Or
+         +rTg2+6NU/YDQTZ+u91fU6ZvgrbQaDVqddhnlVilfo7wSLbDUvPJmkRfXm99pjs81C6j
+         VznPP6hwof0WAf52+fffIZqCI3SSqfPE6DfBQYPuX1sm7Lxfzy83A9nyxHVCqVIA+gW/
+         CKzSd69nfJ/UO5jYEsjPCbA1snrQm7dEhDkd5vNndOsA2IUc2Cu91Z6gKiFWtx2IV4VA
+         uV4Zb+c9R3xe5esT6Qjd/3QZRhnVMCPujCfxNivE37ZnGyw+uq9zi7XqPu9WFFa0n58j
+         srrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724029483; x=1724634283;
+        d=1e100.net; s=20230601; t=1724029611; x=1724634411;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qTe4pMoweYqHTL0yLGfICkCC/EGnVC9HjE1ZA80wPxM=;
-        b=kGX/xFTsBzR05cCSW96yBcsQ7MuBt3EdQ+Pj0SZOHWYITnpNLGObpnpCTQPVPCFQYJ
-         wdcpg7gxiyBFGPdOXcyTQAbXOzHBjRYMRnB40+SdVWosMYvlHOZQSGLzAr4GQLhapmZC
-         bqStCQ1NusNHfFlRiFE3yPd4VGjjMXH59ETOPGqDgfJAKdhmYSDLmV+Z4kn5P+4WjvnR
-         uVGSPoHjyiudeZe7/c66zEl8rKL4KQ575rlSjjPrMWHLDvV3UpXDaJPvP3XQ8+qvR3ms
-         dxdzuusR/rQbay6ZSsAiI5huhdhoBGuqsfz/tM6SysoqDL0D2wZlrTe3j3jHckMLB/gI
-         6g3A==
-X-Gm-Message-State: AOJu0Yw0fxKI/AUwuBIgQvVD/8HCsALh+KqPoEyB18+HU0TjKxbZbC9h
-	P7lfg8I9CXZGB4o0Y10DgGdajJodSSziLBCxgd/mT/QvvrmV7TsktV0ZuFkm4Es=
-X-Google-Smtp-Source: AGHT+IHiPWTS02fh9JtViKU1lI/aGNz1dHX3GgRgQMMl6xkpywWskON3Dw/tOBTkwXK3uph6/swewg==
-X-Received: by 2002:a17:903:32c9:b0:202:bc3:3e6e with SMTP id d9443c01a7336-2020bc33fc8mr108220625ad.33.1724029482880;
-        Sun, 18 Aug 2024 18:04:42 -0700 (PDT)
+        bh=h8DMONrCq5KQTQXp7Rw7pTf0+PDkeHOFVckSuH74uqc=;
+        b=hwoyyDKWHjdethmgR8edPNVEkjubaHkXSl65oR0KyiFlzd/1NylWvfqAGo60XgUPST
+         obj65TW3Vos0CNtaFf/ujbnf1i6wo2vl4O8JGcvSubabgSnZgsTKAhFTnSOrGDlCyfKz
+         PximqlaBSC5BVh5wg91jh7DW7rWbjPswzE27WeXf5EvQVr86HuFHxfQ1lM9raX7VODRq
+         RrFbgoWGSsw3n34pMGtX2DxW7ZTKmitNCwT/EFsYPzUf8SBmIlI9uy+sjl6Ij3drzWh4
+         ZAN96BNdRTtPM43uogdpTDpt2xT0HrHTPNSZ4IjxpnSGYypLKiUPYo3FwRgL1/FVr8kV
+         FFmQ==
+X-Gm-Message-State: AOJu0YyGBsuniLFmLogZVlqi2tJS7MIrWh1MMJSKOxioqv01s0j+hbeQ
+	bOdvQ5v3zTwBBCNni0Dgws8TcS7+rdrvXjT/Of3koCpUDTYWNQr0
+X-Google-Smtp-Source: AGHT+IEFiTrUDZN3WYOajNbC7RewQtzXTod6o4ykKgLxRNilTkKP81hAi3+iM6S/JifxwfTyCDFCzw==
+X-Received: by 2002:a05:6808:1147:b0:3db:2fe8:691e with SMTP id 5614622812f47-3dd3ae430acmr10938867b6e.42.1724029610778;
+        Sun, 18 Aug 2024 18:06:50 -0700 (PDT)
 Received: from localhost.localdomain ([45.63.58.14])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f0375626sm54501495ad.156.2024.08.18.18.04.41
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c6b61a93aesm6519897a12.17.2024.08.18.18.06.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Aug 2024 18:04:42 -0700 (PDT)
+        Sun, 18 Aug 2024 18:06:50 -0700 (PDT)
 From: Dongli Si <sidongli1997@gmail.com>
 To: sidongli1997@gmail.com
 Cc: kvm@vger.kernel.org
-Subject: [PATCH kvmtool 2/4] x86: Add the ISA I/O interrupt assignment entries of mptable
-Date: Mon, 19 Aug 2024 09:04:21 +0800
-Message-ID: <20240819010421.13843-1-sidongli1997@gmail.com>
+Subject: [PATCH kvmtool 3/4] x86: Remove the noapic option from the kernel command line
+Date: Mon, 19 Aug 2024 09:06:42 +0800
+Message-ID: <20240819010642.13897-1-sidongli1997@gmail.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240819010154.13808-1-sidongli1997@gmail.com>
 References: <20240819010154.13808-1-sidongli1997@gmail.com>
@@ -83,58 +83,31 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-According to Intel MultiProcessor Specification:
-"There is one entry for each I/O APIC interrupt input that is connected."
+When running guest kernel 6.9 and later and above and the number of vCPUs
+is greater than 1, dmesg reports:
 
-Missing this will cause the guest kernel to report some
-warnings or errors when enabling the io apic.
+[    0.009932] CPU topo: CPU limit of 1 reached. Ignoring further CPUs
 
-Fixes: 0c7c14a7 ("kvm tools: Add MP tables support")
+Only one CPU is available at this point, solve this problem by enabling io apic.
+
 Signed-off-by: Dongli Si <sidongli1997@gmail.com>
 ---
- x86/mptable.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ x86/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/x86/mptable.c b/x86/mptable.c
-index f4753bd..82b692e 100644
---- a/x86/mptable.c
-+++ b/x86/mptable.c
-@@ -171,10 +171,8 @@ int mptable__init(struct kvm *kvm)
- 	nentries++;
- 
- 	/*
--	 * IRQ sources.
--	 * Also note we use PCI irqs here, no for ISA bus yet.
-+	 * PCI IRQ sources.
- 	 */
--
- 	dev_hdr = device__first_dev(DEVICE_BUS_PCI);
- 	while (dev_hdr) {
- 		unsigned char srcbusirq;
-@@ -189,6 +187,23 @@ int mptable__init(struct kvm *kvm)
- 		dev_hdr = device__next_dev(dev_hdr);
- 	}
- 
-+	/*
-+	 * ISA IRQ sources.
-+	 */
-+	for (i = 0; i < 16; i++) {
-+		if (i == 2)
-+			continue;
-+
-+		mpc_intsrc = last_addr;
-+		if (i == 0)
-+			mptable_add_irq_src(mpc_intsrc, isabusid, i, ioapicid, 2);
-+		else
-+			mptable_add_irq_src(mpc_intsrc, isabusid, i, ioapicid, i);
-+
-+		last_addr = (void *)&mpc_intsrc[1];
-+		nentries++;
-+	}
-+
- 	/*
- 	 * Local IRQs assignment (LINT0, LINT1)
- 	 */
+diff --git a/x86/kvm.c b/x86/kvm.c
+index 71ebb1e..e07d964 100644
+--- a/x86/kvm.c
++++ b/x86/kvm.c
+@@ -130,7 +130,7 @@ void kvm__init_ram(struct kvm *kvm)
+ /* Arch-specific commandline setup */
+ void kvm__arch_set_cmdline(char *cmdline, bool video)
+ {
+-	strcpy(cmdline, "noapic noacpi pci=conf1 reboot=k panic=1 i8042.direct=1 "
++	strcpy(cmdline, "noacpi pci=conf1 reboot=k panic=1 i8042.direct=1 "
+ 				"i8042.dumbkbd=1 i8042.nopnp=1");
+ 	if (video)
+ 		strcat(cmdline, " video=vesafb");
 -- 
 2.44.0
 
