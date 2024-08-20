@@ -1,185 +1,193 @@
-Return-Path: <kvm+bounces-24580-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24581-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DCA0957ED2
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 08:58:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16DAC957F8E
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 09:27:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E287B1F2500D
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 06:58:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B8B91C22AC0
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 07:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836A818C03C;
-	Tue, 20 Aug 2024 06:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA3A189519;
+	Tue, 20 Aug 2024 07:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eKMoGsUT"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b="FXsfGJ90"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA4014A0A8;
-	Tue, 20 Aug 2024 06:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724137046; cv=none; b=OlRsPHlK2NnqfZAgK1GU5F9R+8GZYy5GZC9H/rQ2qq+quxbGaFaFKi9SxYo7U0pNUoSEriRbWgXgxdQ/0mpn3h4423EXpiBL/7TMNFNflzTTpOcs+Mpydiy6kSN1orkjAx3uwlge/RURWwfSqRtoGKs1wEiQkW49iT1imGaFtdI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724137046; c=relaxed/simple;
-	bh=/3QiCfWzXD0JuQ07E2OaHg1/GNJknXvBDnczYuoIrjY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E4GanzHtkACH11Eh7K+e3LUSBHBI1gMPYwqdXd2JREKctsqTfWnDrtlVCx3F6nlLSNgYyVtRTzl4ofSAx81qqRGjbNNAecGvz3PndNZgiQVbuQ0nFelOgrDIYNy9v1U665lELuEmE/bEjywqywfd+NUbIvo95n1SKcRS9OD318g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eKMoGsUT; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47JKwsYZ001579;
-	Tue, 20 Aug 2024 06:57:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=HGts0Gt6y5L7e
-	vdYkmU46zedS1a2zP/etggf7yDsHbE=; b=eKMoGsUTID4dRxN5YXeUVolO8b74s
-	89ZMEDkovM62YabXWw3s6kxon4hTuo34Y69Od03TyqsyMFy0ybRYG0tCiG1Xw+KD
-	07/WYH4DF5O+B22Yj+VoUo4z+4mWsIB4BoijaL8AMgzbkeyVH2ixDUsiPHd6fDhi
-	iw9hki1lq67lVonNGek47uRKRZqHq2zhhmT/4dzoL5E81FWaCrlCE43zT1ybB+Zr
-	gaxg9lpSzoPy3wAgde4vgfE7S09GwM02L+RZc4BSYGYARmqM4LbEFnrjLoWV2teD
-	CVqs7lL38udRfv37o2qfVOHMplEoO5qu/sBLTuX1qQzIPvzEDnh3up6bQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412ma04e4e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 06:57:22 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47K6vM2m014080;
-	Tue, 20 Aug 2024 06:57:22 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412ma04e4b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 06:57:22 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47K5VGPM013089;
-	Tue, 20 Aug 2024 06:57:21 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41366u1wm6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 06:57:21 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47K6vF9E47645140
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 Aug 2024 06:57:17 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8F3C42005A;
-	Tue, 20 Aug 2024 06:57:15 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 69EE720043;
-	Tue, 20 Aug 2024 06:57:15 +0000 (GMT)
-Received: from a46lp38.lnxne.boe (unknown [9.152.108.100])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 20 Aug 2024 06:57:15 +0000 (GMT)
-From: Hariharan Mari <hari55@linux.ibm.com>
-To: linux-kselftest@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, shuah@kernel.org,
-        frankja@linux.ibm.com, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, pbonzini@redhat.com,
-        schlameuss@linux.ibm.com
-Subject: [PATCH v2 5/5] KVM: s390: selftests: Add regression tests for PLO subfunctions
-Date: Tue, 20 Aug 2024 08:48:37 +0200
-Message-ID: <20240820065623.1140399-6-hari55@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240820065623.1140399-1-hari55@linux.ibm.com>
-References: <20240820065623.1140399-1-hari55@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8F9132124;
+	Tue, 20 Aug 2024 07:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724138825; cv=pass; b=O7w7XL5VeJTIwroCZy56ShIn9hTC5x4GHNhfmYZeBMl/JEHURPenLVDP+AsR2U2UqmyTe/XM7d0zA3hbGIDdx5GqMT6ypuRC0ellLhcqBSe/IyLEct72LTfVg230YPVYMPSqL5F0wnO0UrsWFppA/s5QyVUe+8bc58fojCE1ua4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724138825; c=relaxed/simple;
+	bh=OAb3vC/Zkyg/SdJ1TD//avWUs8En4MbQVlb8+2cI4Ik=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Zb7nHTqanV+ttPYz5118Q9BYyY67CDpTqX+9Qtag6+xPJ3P6vCJEypy63bRR0d0P6R7vo4rd06Oha/nBeMM+wrAd1TRGyCV2v1ohQ12FRaUKUIjMp0Bh7k1nVQp2fe1O8aNygvSBGAAxcTHxOQESduJ5ZEU1jqnVsCtusYwHwVU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b=FXsfGJ90; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Delivered-To: Usama.Anjum@collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1724138796; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=EXzAsN4bP2BCe2iQJANEH2sdLh3DN0xIyP/X76hyuuO1IhRNgdetegrZyYZ8ujk8c0PyyBRKFCnnQ+TBBEIwC1B2iy0rFvfNK3wFgZs/kBqjlbT8v4T+OpSmHZmwqiMMqmM3taEhk824PwIKbw9PhoVaVTXa/4UwU1WfguiYfBg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1724138796; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=M8D0uEeC8XYss0szLPUlb5Lps9IGtnYOrv/FK6gxMhI=; 
+	b=QuVLpv+XsnQUm+asJhqoBfNbgJmpn29JUQjPW4g8QeAA1q04zjkw3phmU6xX26DKIX3HTmd16yzcyQHMSeDDBS7VmdK476SgW6cGplRtkUqJ84Bz3DFSpLcAny6wtHGHSNdpvOzfDxrZcCHqn4JA81M/1fU/ThxdpMW9uPkr1PE=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=Usama.Anjum@collabora.com;
+	dmarc=pass header.from=<Usama.Anjum@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724138796;
+	s=zohomail; d=collabora.com; i=Usama.Anjum@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Cc:Cc:Subject:Subject:To:To:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=M8D0uEeC8XYss0szLPUlb5Lps9IGtnYOrv/FK6gxMhI=;
+	b=FXsfGJ90DaxKUyBr/7kjy5Vz6cA1IyTmA9Y8dR4dXL0JaUNqf3dGc7HYCcyGwZYC
+	eHbZGA98tPFCgfJUUwGdq/VzamRhzm1ew0bPhrYlBEcRg+AXIjMJ4gYDhfNkGrU0M2z
+	NOR4Qa10gQVAgX+tP2ZhVBHtX9Oj6F8huDjedKbo=
+Received: by mx.zohomail.com with SMTPS id 1724138794399675.3975600570174;
+	Tue, 20 Aug 2024 00:26:34 -0700 (PDT)
+Message-ID: <379673da-9f2f-484a-be04-a62d916fa25e@collabora.com>
+Date: Tue, 20 Aug 2024 12:26:23 +0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: Usama.Anjum@collabora.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, kernel@collabora.com, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Anup Patel <anup@brainfault.org>
+Subject: Re: [PATCH v2] selftests: kvm: fix mkdir error when building for
+ unsupported arch
+To: Sean Christopherson <seanjc@google.com>
+References: <20240819093030.2864163-1-usama.anjum@collabora.com>
+ <ZsNzzajqBkmuu5Xm@google.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <Usama.Anjum@collabora.com>
+In-Reply-To: <ZsNzzajqBkmuu5Xm@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bX9kmX9Mfc5okd500TIAlUobm1B42jTW
-X-Proofpoint-ORIG-GUID: wwc8znrCMXOxjBPDM8BH-QDkN8ewa4Cz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-19_16,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- mlxlogscore=999 lowpriorityscore=0 phishscore=0 spamscore=0 malwarescore=0
- bulkscore=0 adultscore=0 impostorscore=0 suspectscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408200048
+X-ZohoMailClient: External
 
-Extend the existing regression test framework for s390x CPU subfunctions
-to include tests for the Perform Locked Operation (PLO) subfunction
-functions.
+On 8/19/24 9:33 PM, Sean Christopherson wrote:
+> +KVM arch maintainers
+> 
+> On Mon, Aug 19, 2024, Muhammad Usama Anjum wrote:
+>> The tests are built on per architecture basis. When unsupported
+>> architecture is specified, it has no tests and TEST_GEN_PROGS is empty.
+>> The lib.mk has support for not building anything for such case. But KVM
+>> makefile doesn't handle such case correctly. It doesn't check if
+>> TEST_GEN_PROGS is empty or not and try to create directory by mkdir.
+>> Hence mkdir generates the error.
+>>
+>> mkdir: missing operand
+>> Try 'mkdir --help' for more information.
+>>
+>> This can be easily fixed by checking if TEST_GEN_PROGS isn't empty
+>> before calling mkdir.
+>>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+>> ---
+>> Changes since v1:
+>> - Instead of ignoring error, check TEST_GEN_PROGS's validity first
+>> ---
+>>  tools/testing/selftests/kvm/Makefile | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>> index 48d32c5aa3eb7..9f8ed82ff1d65 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -317,7 +317,9 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S $(GEN_HDRS)
+>>  $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+>>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
+>>  
+>> +ifneq ($(strip $(TEST_GEN_PROGS)),)
+>>  $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+>> +endif
+> This just suppresses an error, it doesn't fix the underlying problem.  E.g. there
+> are other weird side effects, such as an above mkdir creating the $(ARCH) directory
+> even though it shouldn't exist in the end.
+> 
+> It's also very opaque, e.g. without a comment or the context of the changelog,
+> I'd have no idea what purpose the above serves.
+> 
+> Rather than bury the effective "is this arch supported" check in the middle of
+> the Makefile, what if we wrap the "real" makefile and include it only for
+> supported architectures, and provide dummy targets for everything else?
+> 
+> E.g.
+> 
+> ---
+> # SPDX-License-Identifier: GPL-2.0-only
+> top_srcdir = ../../../..
+> include $(top_srcdir)/scripts/subarch.include
+> ARCH            ?= $(SUBARCH)
+> 
+> ifeq ($(ARCH),$(filter $(ARCH),arm64 s390 riscv x86 x86_64))
+> ifeq ($(ARCH),x86)
+>         ARCH_DIR := x86_64
+> else ifeq ($(ARCH),arm64)
+>         ARCH_DIR := aarch64
+> else ifeq ($(ARCH),s390)
+>         ARCH_DIR := s390x
+> else
+>         ARCH_DIR := $(ARCH)
+> endif
+> 
+> include Makefile.kvm
+> else
+> all:
+> clean:
+> endif
+> ---
+> 
+> And other KVM maintainers, the big question is: if we do the above, would now be
+> a decent time to bite the bullet and switch to the kernel's canonical arch paths,
+> i.e. arm64, s390, and x86?  I feel like if we're ever going to get away from
+> using aarch64, x86_64, and s390x, this is as about a good of an opportunity as
+> we're going to get.
+> 
+> The annoying x86_64=>x86 alias still needs to be handled to avoid breaking explicit
+> ARCH=x86_64 builds (which apparently are allowed, *sigh*), but we can ditch ARCH_DIR
+> and the KVM selftests dirs match tools' include paths.
+> 
+> ---
+> # SPDX-License-Identifier: GPL-2.0-only
+> top_srcdir = ../../../..
+> include $(top_srcdir)/scripts/subarch.include
+> ARCH            ?= $(SUBARCH)
+> 
+> ifeq ($(ARCH),$(filter $(ARCH),arm64 s390 riscv x86 x86_64))
+> # Top-level selftests allows ARCH=x86_64 🙁
+> ifeq ($(ARCH),x86_64)
+> 	ARCH := x86
+> endif
+> include Makefile.kvm
+> else
+> all:
+> clean:
+> endif
+> ---
+> 
+> If no one objects or has a better idea, I'll post a series to do the above.
+I didn't had enough knowledge to attempt a better fix. Thank you.
 
-PLO was introduced in the very first 64-bit machine generation.
-Hence it is assumed PLO is always installed in the Z Arch.
-The test procedure follows the established pattern.
-
-Suggested-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Hariharan Mari <hari55@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
----
- .../kvm/s390x/cpumodel_subfuncs_test.c        | 34 +++++++++++++++++++
- 1 file changed, 34 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c b/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-index c31f445c6f03..255984a52365 100644
---- a/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-+++ b/tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_test.c
-@@ -20,6 +20,8 @@
- 
- #include "kvm_util.h"
- 
-+#define U8_MAX  ((u8)~0U)
-+
- /**
-  * Query available CPU subfunctions
-  */
-@@ -37,6 +39,33 @@ static void get_cpu_machine_subfuntions(struct kvm_vm *vm,
- 	TEST_ASSERT(!r, "Get cpu subfunctions failed r=%d errno=%d", r, errno);
- }
- 
-+static inline int plo_test_bit(unsigned char nr)
-+{
-+	unsigned long function = (unsigned long)nr | 0x100;
-+	int cc;
-+
-+	asm volatile("	lgr	0,%[function]\n"
-+			/* Parameter registers are ignored for "test bit" */
-+			"	plo	0,0,0,0(0)\n"
-+			"	ipm	%0\n"
-+			"	srl	%0,28\n"
-+			: "=d" (cc)
-+			: [function] "d" (function)
-+			: "cc", "0");
-+	return cc == 0;
-+}
-+
-+/*
-+ * Testing Perform Locked Operation (PLO) CPU subfunction's ASM block
-+ */
-+static void test_plo_asm_block(u8 (*query)[32])
-+{
-+	for (int i = 0; i <= U8_MAX; ++i) {
-+		if (plo_test_bit(i))
-+			(*query)[i >> 3] |= 0x80 >> (i & 7);
-+	}
-+}
-+
- /*
-  * Testing Crypto Compute Message Authentication Code (KMAC) CPU subfunction's
-  * ASM block
-@@ -237,6 +266,11 @@ struct testdef {
- 	testfunc_t test;
- 	int facility_bit;
- } testlist[] = {
-+	/*  PLO was introduced in the very first 64-bit machine generation.
-+	 *  Hence it is assumed PLO is always installed in Z Arch .
-+	 */
-+	{ "PLO", cpu_subfunc.plo, sizeof(cpu_subfunc.plo),
-+		test_plo_asm_block, 1 },
- 	/* MSA - Facility bit 17 */
- 	{ "KMAC", cpu_subfunc.kmac, sizeof(cpu_subfunc.kmac),
- 		test_kmac_asm_block, 17 },
 -- 
-2.45.2
+BR,
+Muhammad Usama Anjum
 
 
