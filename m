@@ -1,116 +1,142 @@
-Return-Path: <kvm+bounces-24568-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24569-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E59EC957C7C
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 06:39:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F26957CC0
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 07:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A4511F245BF
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 04:39:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8887C284B7E
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 05:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF7514B086;
-	Tue, 20 Aug 2024 04:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F8B1459F6;
+	Tue, 20 Aug 2024 05:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uCCXfjgB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hIxa1VWY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294B914A0B3
-	for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 04:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B63E1862;
+	Tue, 20 Aug 2024 05:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724128702; cv=none; b=nwKDvOos5oilKqPxzGmqAxXMy5q0kxDZ+ssJ3jXLQcT4+qWFdvLRwPjynINRRUDa5EegM8eBqWnloeDszPMTPZEu6pFohQHLW7IiXqXiVdbMicsXGSG6G1TQ+KervmoMCquZIJiBGx09N8BaqV/WX7/utcbarhkIb3lgi8XMIL4=
+	t=1724131957; cv=none; b=IBis/cjSm5PdJHTPZEe0AOYHWh/pGsv1zko+GwH4lttXt6E7/AIRXzoSk6JUseuOtn9unD8HmHUV0juRFNS2N2y80SZKz0FVO3aMpGkJILLtFM4JCErkr7A4PKPP9YHDV8uk6Kw3R2FBJNUKAi7DoPd5khcH52dZ4dx9BDbLSjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724128702; c=relaxed/simple;
-	bh=KhyS8lX/LLl+hyGdd5SPZp0IVwMMSQOPguoeq4EtDCE=;
-	h=Date:In-Reply-To:Message-Id:Mime-Version:References:Subject:From:
-	 To:Cc:Content-Type; b=VGqe3ULf6/NTtmPigCc224/ImzP+IJT6ySFzH8YR3/TzePCZZt5vKw6lfBDp80wNQB1VocO8D//E4IpB5FwMw0jY9veecdeKRZEIIGNFU7KWrafGDxMfF1yb8vfCphUkn046fupYeIZZAPQ8+hOSot2MP1SAP9SpPE7L4RAnEvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uCCXfjgB; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e1159159528so4143425276.1
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 21:38:20 -0700 (PDT)
+	s=arc-20240116; t=1724131957; c=relaxed/simple;
+	bh=fzafTY+hMgu+Mmsh1SAc4j1kBbrC7lh0Ogb3zZdXivc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e9v9ZrGutDv+Weuwi6kaeQjWuA701EiV/pZTPNV0/MT6KxtTG04we7GlnZI7xfAtQ9+pGvfAd64Nnp5QJMi37A7StpSN/CDzzhdIIaK8mPVajfC4Hm6mWwvyMCGiQvZ6bXe6AZnRkhB53n1QIoxoQNOdrQMR+KU8cqBdadPSzUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hIxa1VWY; arc=none smtp.client-ip=209.85.217.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-49294bbd279so1847775137.0;
+        Mon, 19 Aug 2024 22:32:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724128700; x=1724733500; darn=vger.kernel.org;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qNDCnS5K1Pk0TOt/H51ksBrj3Ct5dgsW0PJU7Ovd3Rk=;
-        b=uCCXfjgBzVuteMgqdMXJx92VAvJF6+8ibKqLjoU1HwfZwCmM7c9l0df1eTOVXfAvfv
-         OYJ5hTuvWQO/Z3+po1SJ3U/lNv4MU3P/xkpzc6ncfAIihGyTD6SHhPlJeOOjUpP0yMph
-         Tz6jsg9pOt6S64DfqAL2Nh39fcpBd8zAwphEpr4jcbYyMm+QgtmbhXNdgxstcWhjQX8E
-         gTPsuJol+FQFM6QkneM/FQqvquPDjs00qJSuSZAXNd12+C0K9q7IjOjECKjLsX/zkFkt
-         DAARrczHqEoxNzIjevqCMQzXK4KT+PzwJJjMNgOeIln2mcWE6ZU/M839sss/tpW3IVi8
-         ST8w==
+        d=gmail.com; s=20230601; t=1724131955; x=1724736755; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=i6QfqVruNv0KeYjR1T2Xi8sKHkpHxg8Q0ePcqumb5I0=;
+        b=hIxa1VWYHH0mgxTWHzxLCVhDir30qLsZ/yQQ0NnpDCzbXTJ66sDpruAgp/zxqX/D4s
+         kCZsz2a/eqomc6cbXYkLV1tCLMhBW9LNDJY+ko3KOUfsVj1Mt1Jr66qhC/wsoZd/e9dk
+         1IJUhG+an3ijLCBmrfYRQw9FHN2H9YuMNigpNWvKMfrg46q/9hyjKk3/UMbACV3sEV+z
+         TExEEHyC9xOjjIPeDJ3GiZsz53WEhp20MO2B+s8qnni/ds8EyYK54wneBkOiXCK6qTpl
+         G9HEoa5c1RJ3Ua9bTQd7xRMTMtnxezXIAXzDNvwCXJm1GLIpa1aMZQnOY3daqtWpPvx+
+         s7Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724128700; x=1724733500;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qNDCnS5K1Pk0TOt/H51ksBrj3Ct5dgsW0PJU7Ovd3Rk=;
-        b=EXyBXuodoLlyzdh53x2P4zibI1Qpd4XZVwJ9vBwBhbkJT3D4CSzJo4spXGovQY0xdQ
-         gRg0jzHBqNxb7TFY3qwETXcUO8O1OFB25J40uvdpVWVthLcP3IsRFqbFvF2PTD2jI/V2
-         MTB7hACYeBQgrHjvyGVCDCYRb/g1Aaaj8cSFZZ9zsb/2aJvTaWVqymD5zgVCJaQwjW1g
-         f5rLWOGpqWa+bFyYj6QGZpg+u/E1mn3iSUSW7uIpi5TIMCCL8HJyfgjOt/io5D+n/Oby
-         pHFCkaXVdkG4KuFujkTIO+UYb8R8xN7yOKNHCM8dVmDbtuGPiaos82X45D7MlEv+7yNh
-         Dbug==
-X-Forwarded-Encrypted: i=1; AJvYcCVir811CYcAeLCarc9yeBTDtuglGHb/zHqf7JJ81uKI3MRgbuXwjZ1dwjzPsTs+EfUVPG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdWTbZBVTwBjOdQHHqEQYQ/Zl+nqRTxpsOBDi6g5K39cP9j5y9
-	vHvAxgMNGVA4Htlcvm2kH4Q/DaCU8qkZJ2qBmRYOYX0mYbc4wTg+7g6HHNbdrKg++Y7GN4ngQYv
-	2xRtTdhaugQ==
-X-Google-Smtp-Source: AGHT+IHPhKfnyXpFhVq0R4vg3+eMT/2Vl0KfVD5sy7EldgzlYqzQx5123h4uD0zjvjOy+hF0Z61eezyg0WQfwg==
-X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:7c18:89e3:3db:64bf])
- (user=suleiman job=sendgmr) by 2002:a5b:207:0:b0:e0b:acc7:b1fd with SMTP id
- 3f1490d57ef6-e164a9cecccmr57101276.4.1724128700014; Mon, 19 Aug 2024 21:38:20
- -0700 (PDT)
-Date: Tue, 20 Aug 2024 13:35:43 +0900
-In-Reply-To: <20240820043543.837914-1-suleiman@google.com>
-Message-Id: <20240820043543.837914-4-suleiman@google.com>
+        d=1e100.net; s=20230601; t=1724131955; x=1724736755;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i6QfqVruNv0KeYjR1T2Xi8sKHkpHxg8Q0ePcqumb5I0=;
+        b=C5KllHDkwBjsM1PrqjivsZnmZP2+R8NcyNjO3j4k2gQzlKvaDXZ+BoAwsZT4r1asrw
+         oE+/uxG4EUGeWeL5lMAyJSVPZkYXRyDf3Rh16QP37jIZvXjYAxpcH7AnoIOK5qkZzVs1
+         cvd2fvNV2Ut23jizs6Z2jLifdh8j6kTL06RjrbAg34t+40IBCjTGlJ9ugq0NGwpIFa+q
+         0xYWvp4vdvSkt5cIQHCO08qF16ZNMmLvEHiTb56mzEgy0sv3TW2rWHWLXORxBTWh/GtH
+         zS3PPV6SYqgu+5k1Ij271bdSm6FEA8xvV06iFsiMG9DFau+ezLL+FwWOz3Z7fPq3C9BT
+         Ewew==
+X-Forwarded-Encrypted: i=1; AJvYcCVt7cy6vzU5ZwhJ+nuVNlxaQjLOo9caREMxBRmOKeVYUl1Z2qRLLOIIm/HZj1j5oIfnYI3rITKjqCf6IwVoq6TINcEeaTvT1GnjaOCjBMnoNY6fIRajp8/x4upMLuaef8ff
+X-Gm-Message-State: AOJu0YxLsa1lBUJh47LGnNhRHheI52VrO7VyGEtdmSxG+CvZcbI90ezo
+	/+pL6irvWHdS6ag+NqCtUSuYYuN7NFNRjkPAM+Gh68zZd9OiMDeXp8YvPuHkqro=
+X-Google-Smtp-Source: AGHT+IFJDEiZQFdQnB6vuxIC34BX3BZcDCcfpLYE+XFHrNvR7Th7DV+B5/CHTpV28VWGDBTQx21Scw==
+X-Received: by 2002:a05:6102:3ece:b0:493:b9f8:82f2 with SMTP id ada2fe7eead31-497799e4d64mr15948858137.25.1724131954628;
+        Mon, 19 Aug 2024 22:32:34 -0700 (PDT)
+Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-842fb9c6015sm1431092241.26.2024.08.19.22.32.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2024 22:32:34 -0700 (PDT)
+From: David Hunter <david.hunter.linux@gmail.com>
+To: stable@vger.kernel.org
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	javier.carrasco.cruz@gmail.com,
+	shuah@kernel.org,
+	David Hunter <david.hunter.linux@gmail.com>,
+	Peter Shier <pshier@google.com>,
+	Jim Mattson <jmattson@google.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Li RongQing <lirongqing@baidu.com>
+Subject: [PATCH 6.1.y] KVM: x86: fire timer when it is migrated and expired, and in oneshot mode
+Date: Tue, 20 Aug 2024 01:32:29 -0400
+Message-ID: <20240820053229.2858-1-david.hunter.linux@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240820043543.837914-1-suleiman@google.com>
-X-Mailer: git-send-email 2.46.0.184.g6999bdac58-goog
-Subject: [PATCH v2 3/3] KVM: x86: Document host suspend being included in
- steal time.
-From: Suleiman Souhlal <suleiman@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ssouhlal@freebsd.org, 
-	Suleiman Souhlal <suleiman@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Steal time now includes the time that the host was suspended.
+From: Li RongQing <lirongqing@baidu.com>
 
-Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+[ Upstream Commit 8e6ed96cdd5001c55fccc80a17f651741c1ca7d2]
+
+when the vCPU was migrated, if its timer is expired, KVM _should_ fire
+the timer ASAP, zeroing the deadline here will cause the timer to
+immediately fire on the destination
+
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Peter Shier <pshier@google.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+Link: https://lore.kernel.org/r/20230106040625.8404-1-lirongqing@baidu.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+(cherry picked from commit 8e6ed96cdd5001c55fccc80a17f651741c1ca7d2)
+The code was able to compile without errors or warnings. 
+Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
 ---
- Documentation/virt/kvm/x86/msr.rst | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/x86/kvm/lapic.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virt/kvm/x86/msr.rst b/Documentation/virt/kvm/x86/msr.rst
-index 3aecf2a70e7b43..81c17c2200ca2f 100644
---- a/Documentation/virt/kvm/x86/msr.rst
-+++ b/Documentation/virt/kvm/x86/msr.rst
-@@ -294,8 +294,10 @@ data:
- 
- 	steal:
- 		the amount of time in which this vCPU did not run, in
--		nanoseconds. Time during which the vcpu is idle, will not be
--		reported as steal time.
-+		nanoseconds. This includes the time during which the host is
-+		suspended. However, the case where the host suspends during a
-+		VM migration might not be correctly accounted. Time during
-+		which the vcpu is idle, will not be reported as steal time.
- 
- 	preempted:
- 		indicate the vCPU who owns this struct is running or
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index c90fef0258c5..3cd590ace95a 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1843,8 +1843,12 @@ static bool set_target_expiration(struct kvm_lapic *apic, u32 count_reg)
+ 		if (unlikely(count_reg != APIC_TMICT)) {
+ 			deadline = tmict_to_ns(apic,
+ 				     kvm_lapic_get_reg(apic, count_reg));
+-			if (unlikely(deadline <= 0))
+-				deadline = apic->lapic_timer.period;
++			if (unlikely(deadline <= 0)) {
++				if (apic_lvtt_period(apic))
++					deadline = apic->lapic_timer.period;
++				else
++					deadline = 0;
++			}
+ 			else if (unlikely(deadline > apic->lapic_timer.period)) {
+ 				pr_info_ratelimited(
+ 				    "kvm: vcpu %i: requested lapic timer restore with "
 -- 
-2.46.0.184.g6999bdac58-goog
+2.43.0
 
 
