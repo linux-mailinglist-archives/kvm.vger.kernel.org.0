@@ -1,185 +1,156 @@
-Return-Path: <kvm+bounces-24587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 083FD958320
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 11:46:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F9EB958391
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2468C1C22722
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 09:46:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FFD31C23EDE
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EBC18C34A;
-	Tue, 20 Aug 2024 09:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B91D18CBED;
+	Tue, 20 Aug 2024 10:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="o2CD5c9y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jked5c9Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861BA18B462;
-	Tue, 20 Aug 2024 09:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A1318E37C;
+	Tue, 20 Aug 2024 10:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724147182; cv=none; b=fmQBEzDd02HSDNYJLToJjuKunXyCVdJNYbgSr3Y2E5MILL21q7LlV7fQPtS8hPJbeNa0pOPxEaAeDm+01Mm0Mo8byOmjGs0ZVVWiKfdSpwPAeqCweeoMFDL6EjS6W6UOQ+WEOFDXzdI86jJolAwQ/lJE+0ivAq2AfhQotLYoZB0=
+	t=1724148371; cv=none; b=sgk4LzMXXXlwjy+he3SS2NtD2SAR7Li/Vv2mGubVdiu0uBxlOUGqlzxpv1V78qKJUOJmrDEW2q3lHeP+zaTdr2sTAU0d3bciWzVhQJCYohTJoZMhIhXcQdRGXIAoEjuNFJHCYe7tutfCSEq8QMo6IKeurv9zCZmKsQitMXrNMYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724147182; c=relaxed/simple;
-	bh=zOhBCXDijLbkaaV0VuMpXml9yRj/U1TCZ6LmM+RlFkA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iWwWUJGPI1PhWrXGPMovguquUud/DrT2b77bHWIVze8YjcAs6VyPKJVsBwgYoddR4AJontpaygHaPTXY7BHg4UHA5lfBk7WZUdGO4jzskHGKE0x6wZf5Uk5vhCJOzQ8E6rzKfUYaybJOrfe7KtwOVHeluT2u9eaP12g1VXOh3Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=o2CD5c9y; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47K8UGsg011684;
-	Tue, 20 Aug 2024 09:46:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:reply-to:references:mime-version
-	:content-type:in-reply-to; s=pp1; bh=vXFjPbmLIkqJtZVOGX2dXuKrjee
-	sqOxCF4R5ltJkiNY=; b=o2CD5c9ynpfo8K/V7B4Jg7KCX4/I7xHOfMD/sAnTtjR
-	9BaMBxQiI1yt+PEr4gqZlHhdGJHqTCWuJLd6IBGR2fYYhNMbZ3ZdMISzYBfc+mjO
-	9nEWljhBESfLHaaD76+1mRfWWQKgEGFdR4tfcwGcemjeXec58QszHyhPrbMfsr2a
-	0Ea2PtkhXFQmtxP7eNlWE1/WOhVX8vYRbp5w6g1oVfQxQWK5PipHNvv14KrrJWHF
-	i7o58Zd7uIeLLY1ZCoUZweL7hE8t37cUyQwHugG8NMmHqV9p7qI2JIaWUNGaadnj
-	Ca85Edyy5ztloPiuSls3+hjP7cFI3sqepxK25CrdZ0A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mcychak-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 09:46:05 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47K9k5Mu020704;
-	Tue, 20 Aug 2024 09:46:05 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mcychaf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 09:46:05 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47K709j0019050;
-	Tue, 20 Aug 2024 09:46:03 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41376pt8mn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Aug 2024 09:46:03 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47K9jx1n44564880
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 Aug 2024 09:46:01 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9FDC920040;
-	Tue, 20 Aug 2024 09:45:59 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8BDB720043;
-	Tue, 20 Aug 2024 09:45:56 +0000 (GMT)
-Received: from linux.ibm.com (unknown [9.126.150.29])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Tue, 20 Aug 2024 09:45:56 +0000 (GMT)
-Date: Tue, 20 Aug 2024 15:15:55 +0530
-From: Srikar Dronamraju <srikar@linux.ibm.com>
-To: Suleiman Souhlal <suleiman@google.com>
-Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>,
-        Mel Gorman <mgorman@suse.de>, Valentin Schneider <vschneid@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, joelaf@google.com,
-        vineethrp@google.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, ssouhlal@freebsd.org
-Subject: Re: [PATCH] sched: Don't try to catch up excess steal time.
-Message-ID: <20240820094555.7gdb5ado35syu5me@linux.ibm.com>
-Reply-To: Srikar Dronamraju <srikar@linux.ibm.com>
-References: <20240806111157.1336532-1-suleiman@google.com>
+	s=arc-20240116; t=1724148371; c=relaxed/simple;
+	bh=t6UjUCrk7iYKNeT1/6lJ/Hw6tKG7Wt94gouQstR7+5Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZIwtNwhu0zWB2mnwMmu/l5A9OamNYxvf98qVle9E3QneD3/ayFob70BqhpTeFdeVswdDQ3y2+GmSYG3UBAafSVpm7r7ZjksuDR+3AQNXMzckHE/VVjOLqwT8/KdtKS+r/BFJIv4rX7nUGtPNaRZNSfmpENGCKbZG5FqRn9ZXoBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jked5c9Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E95CC4AF10;
+	Tue, 20 Aug 2024 10:06:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724148371;
+	bh=t6UjUCrk7iYKNeT1/6lJ/Hw6tKG7Wt94gouQstR7+5Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Jked5c9YXbRbDBn8D4vQzWbHx1b81PIpjBvFmOKaSV3M7jbR6/i+CmFu6yonxLwS2
+	 LAYapBtVU4rvwFPixF3cTDP0LP1Im7xJ4B79Uwrak8XX4fQ6AWatgTW0Ow4jbQ/D3M
+	 h3EZGatbQbPINLkzGVKkWwrcfvwd4bnBpIqcLNZ2xMNMptVbII1EuAFYX0ucqKEYn8
+	 1Rb4AXEQeuSQiNHCx13eFnz5+WnA+hpGTTQgnUUYN942k/l4Qvi2eWpHkCRnI8NpqR
+	 SFysrdBeCkw28PIt5HQjIO1ZnCMFMVh5QVxBeEbjR3lz/ZMoT8MsKp2PI6wW40fdNb
+	 7aj0Ybr/xsACQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sgLil-005Dk2-Oc;
+	Tue, 20 Aug 2024 11:06:07 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexander Potapenko <glider@google.com>
+Subject: [PATCH 00/12] KVM: arm64: Handle the lack of GICv3 exposed to a guest
+Date: Tue, 20 Aug 2024 11:03:37 +0100
+Message-Id: <20240820100349.3544850-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20240806111157.1336532-1-suleiman@google.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: cPxn1kO2NvksYzEG0w_TjSPI6hmDCQuS
-X-Proofpoint-GUID: KVE_SRLuu4Ch3kvSR4pJOS9Lq3ER3o1y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-20_09,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- mlxlogscore=853 spamscore=0 lowpriorityscore=0 clxscore=1011
- suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408200070
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, glider@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-* Suleiman Souhlal <suleiman@google.com> [2024-08-06 20:11:57]:
+It recently appeared that, when running on a GICv3-equipped platform
+(which is what non-ancient arm64 HW has), *not* configuring a GICv3
+for the guest could result in less than desirable outcomes.
 
-> When steal time exceeds the measured delta when updating clock_task, we
-> currently try to catch up the excess in future updates.
-> However, this results in inaccurate run times for the future clock_task
-> measurements, as they end up getting additional steal time that did not
-> actually happen, from the previous excess steal time being paid back.
-> 
-> For example, suppose a task in a VM runs for 10ms and had 15ms of steal
-> time reported while it ran. clock_task rightly doesn't advance. Then, a
-> different task runs on the same rq for 10ms without any time stolen.
-> Because of the current catch up mechanism, clock_sched inaccurately ends
-> up advancing by only 5ms instead of 10ms even though there wasn't any
-> actual time stolen. The second task is getting charged for less time
-> than it ran, even though it didn't deserve it.
-> In other words, tasks can end up getting more run time than they should
-> actually get.
-> 
-> So, we instead don't make future updates pay back past excess stolen time.
-> 
-> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
-> ---
->  kernel/sched/core.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> index bcf2c4cc0522..42b37da2bda6 100644
-> --- a/kernel/sched/core.c
-> +++ b/kernel/sched/core.c
-> @@ -728,13 +728,15 @@ static void update_rq_clock_task(struct rq *rq, s64 delta)
->  #endif
->  #ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
->  	if (static_key_false((&paravirt_steal_rq_enabled))) {
-> -		steal = paravirt_steal_clock(cpu_of(rq));
-> +		u64 prev_steal;
-> +
-> +		steal = prev_steal = paravirt_steal_clock(cpu_of(rq));
->  		steal -= rq->prev_steal_time_rq;
->  
->  		if (unlikely(steal > delta))
->  			steal = delta;
->  
-> -		rq->prev_steal_time_rq += steal;
-> +		rq->prev_steal_time_rq = prev_steal;
->  		delta -= steal;
->  	}
->  #endif
+We have multiple issues to fix:
 
+- for registers that *always* trap (the SGI registers) or that *may*
+  trap (the SRE register), we need to check whether a GICv3 has been
+  instantiated before acting upon the trap.
 
-Agree with the change.
+- for registers that only conditionally trap, we must actively trap
+  them even in the absence of a GICv3 being instantiated, and handle
+  those traps accordingly.
 
-Probably, we could have achieved by just moving a line above
-Something like this?
+- finally, ID registers must reflect the absence of a GICv3, so that
+  we are consistent.
 
-#ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
-	if (static_key_false((&paravirt_steal_rq_enabled))) {
-		steal = paravirt_steal_clock(cpu_of(rq));
-		steal -= rq->prev_steal_time_rq;
-		rq->prev_steal_time_rq += steal;
+This series goes through all these requirements. The main complexity
+here is to apply a GICv3 configuration on the host in the absence of a
+GICv3 in the guest. This is pretty hackish, but I don't have a much
+better solution so far.
 
-		if (unlikely(steal > delta))
-			steal = delta;
+As part of making wider use of of the trap bits, we fully define the
+trap routing as per the architecture, something that we eventually
+need for NV anyway.
 
-		delta -= steal;
-	}
-#endif
+Note that patch #1 is a candidate for immediate merge in 6.11 as a
+fix, to be backported to all stable versions. We can live without the
+rest.
 
+Finally, I have added two additional changes:
+
+- a file-wide cleanup of sys_regs.c, unifying the way we inject an
+  UNDEF from the trap handling array
+
+- a selftest that checks for the implemented trapping behaviour (yes,
+  I actually wrote a test -- hated every minute of it).
+
+Note that the effects of this series when a GICv2 is configured on a
+GICv3 host capable of emulation are imperfect: For some of the
+registers, the guest may take a system register trap at EL1 (EC=0x18),
+and there is nothing that KVM can do about it (this is a consequence
+of ICC_SRE_EL1.SRE being 0, which GICv2 requires). But at least that's
+a guest problem, not the host's.
+
+PAtches on top of v6.11-rc4, tested on the usual lot of terrible HW:
+Synquacer, TX1 and M1.
+
+Marc Zyngier (12):
+  KVM: arm64: Make ICC_*SGI*_EL1 undef in the absence of a vGICv3
+  KVM: arm64: Move GICv3 trap configuration to kvm_calculate_traps()
+  KVM: arm64: Force SRE traps when SRE access is not enabled
+  KVM: arm64: Force GICv3 traps activa when no irqchip is configured on
+    VHE
+  KVM: arm64: Add helper for last ditch idreg adjustments
+  KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is presented to the
+    guest
+  KVM: arm64: Add ICH_HCR_EL2 to the vcpu state
+  KVM: arm64: Add trap routing information for ICH_HCR_EL2
+  KVM: arm64: Honor guest requested traps in GICv3 emulation
+  KVM: arm64: Make most GICv3 accesses UNDEF if they trap
+  KVM: arm64: Unify UNDEF injection helpers
+  KVM: arm64: Add selftest checking how the absence of GICv3 is handled
+
+ arch/arm64/include/asm/kvm_host.h             |   2 +
+ arch/arm64/kvm/arm.c                          |  10 +-
+ arch/arm64/kvm/emulate-nested.c               |  77 +++++-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |  97 ++++++-
+ arch/arm64/kvm/nested.c                       |  15 +-
+ arch/arm64/kvm/sys_regs.c                     | 236 +++++++++++-------
+ arch/arm64/kvm/sys_regs.h                     |   9 +
+ arch/arm64/kvm/vgic/vgic-v3.c                 |  12 +
+ arch/arm64/kvm/vgic/vgic.c                    |  14 +-
+ arch/arm64/kvm/vgic/vgic.h                    |   9 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/no-vgic-v3.c        | 170 +++++++++++++
+ 12 files changed, 526 insertions(+), 126 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
 
 -- 
-Thanks and Regards
-Srikar Dronamraju
+2.39.2
+
 
