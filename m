@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-24596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4195A958398
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:07:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECA9958399
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:07:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF7DB1F24317
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:07:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 298971C23C90
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E02418E027;
-	Tue, 20 Aug 2024 10:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3AB18E044;
+	Tue, 20 Aug 2024 10:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oFuDPLqc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p62dr4lJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C0F18DF9C;
-	Tue, 20 Aug 2024 10:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628FA18E033;
+	Tue, 20 Aug 2024 10:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724148376; cv=none; b=GO92QYcmg5H/quPKq/OagJk/ZNwL5TqR/5+SXhDWbjy+GOV/WZ+5r81KC3uFE3mBjJv2UfeHAlXomh7bJ2AQm+zjegnNvBpf7aGI0FU4k3NnGM+sf9RkXKqliHgzpItiCAKFiqFv4CtwzccZcm1feWC3/4ABvZrWFNJfXE/W9jU=
+	t=1724148379; cv=none; b=QgJsNyzxgl72iVs8sIbteTzbM1aJOgBdh1QT+ZHhteTP58q/BXK3dCDDfY1pfK04s9TDVSY+HySeyzni9Cw4E6OdY1tk4W/J+qBUGZ8r93TnDZxSsooqHNuPQFKAozVTIY0HK4C/aXRyabiaIAUp1lrK/t2HDOeVXorSzOIhN8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724148376; c=relaxed/simple;
-	bh=N/NszJnC50UIOKoSwK5FhseAsipaQ50EUH0eqkLU8+E=;
+	s=arc-20240116; t=1724148379; c=relaxed/simple;
+	bh=OTQWz+14CWJzbCdaBvVt32KcLcs3BWNnPhezDAhJ4rE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=U4mfhhZks8Wopynn0+6rLaT1Ho0oos/EpuSWrKX7sUZmqwQPk79EM0j7f1yCmdo5u/luFees5euQT4UTF+1L1DeuRSsosW9/WNCeRqXGae7eadx/Qy+a6dcJd/lN0gYzvEi4rUFtmeGC4T+taV0Flym7gHEjAroFDlG8hpjWvDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oFuDPLqc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 252AAC4AF09;
-	Tue, 20 Aug 2024 10:06:16 +0000 (UTC)
+	 MIME-Version; b=kzWBYMu1leWJBE3LNhEmov3y8vRBYK2Vt4729nYWKqTep5EZSUu9cEaYTM1+xY9F3m1CJvToN4IMvmXHW+CGpdWGnVHuJAWsv0MqtuQFOd2AYBtrZpvfqUsnJ0PLPdMEnYnpSM8UnoA+5XvXMf6Kx4LR1LcX95AgFZeG/2CCJpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p62dr4lJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45386C4AF09;
+	Tue, 20 Aug 2024 10:06:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724148376;
-	bh=N/NszJnC50UIOKoSwK5FhseAsipaQ50EUH0eqkLU8+E=;
+	s=k20201202; t=1724148379;
+	bh=OTQWz+14CWJzbCdaBvVt32KcLcs3BWNnPhezDAhJ4rE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oFuDPLqcyzjeWo577iKYpUVIMa+vgBUopR+WC64j7VVEU9KWpa5KqIW7rELpP2NDu
-	 phjNZipJbzLyoAPIGVhiTmx8+Sa0HYQgI8jf7maXfo1B0lj4kFQOz9qWy9L5RrAq+Q
-	 G7R2QMSWkStB98ME4/XIGU3/t5R/JfmxVYHjkdDq2tCI2UggxJVlr/OPSJSIzRV8nq
-	 zIb25/QbDHGAypw2N23jGZcv+PmsU9vV62v9L9t+ScL63uvI/lP1+lu8HtL2Ueq6Cn
-	 t70VdJNBoXVRu/ps6aQKQC0bl8CE3tXTal8j1hx2DEJgVAIP+A5uxRy2Zcl+8cx2r+
-	 EGyv589xKqQgw==
+	b=p62dr4lJGXNmdxGrFa59qSi07RYH5qJVe6VPxr/GkVncUsyghvkl+5H/SBjRSeCTO
+	 5gJdDGA+RZFzWN695IOWtxVOfHAIpppHnvJyp9KDi7c7dq08SoGJfJeyzLhU7d9yoj
+	 LcmlabxTAtgeYwV1OcgueZ8cUNYcxvUZhxNHiOBRF4l+6QVp0k//FbV72D4M13OOx4
+	 1kpGuP5ayyHEYBQGOf2jzfrpljnPYdw2b9imsb/K4mF8VXMZKNn9zzsQNUN3es+FmN
+	 k4RX5zHGhyqnGuXRPoGyxQTAf2Vb9TOvEFC8opCceaGXIWa8CPZetkzd2ycBflKrVG
+	 Cxej1IDdGoY2g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgLki-005Dk2-Gi;
-	Tue, 20 Aug 2024 11:06:14 +0100
+	id 1sgLkk-005Dk2-9e;
+	Tue, 20 Aug 2024 11:06:16 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -56,9 +56,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexander Potapenko <glider@google.com>
-Subject: [PATCH 08/12] KVM: arm64: Add trap routing information for ICH_HCR_EL2
-Date: Tue, 20 Aug 2024 11:03:45 +0100
-Message-Id: <20240820100349.3544850-9-maz@kernel.org>
+Subject: [PATCH 09/12] KVM: arm64: Honor guest requested traps in GICv3 emulation
+Date: Tue, 20 Aug 2024 11:03:46 +0100
+Message-Id: <20240820100349.3544850-10-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240820100349.3544850-1-maz@kernel.org>
 References: <20240820100349.3544850-1-maz@kernel.org>
@@ -74,150 +74,107 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The usual song and dance. Anything that is a trap, any register
-it traps. Note that we don't handle the registers added by
-FEAT_NMI for now.
+On platforms that require emulation of the CPU interface, we still
+need to honor the traps requested by the guest (ICH_HCR_EL2 as well
+as the FGTs for ICC_IGRPEN{0,1}_EL1.
+
+Check for these bits early and lail out if any trap applies.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 77 ++++++++++++++++++++++++++++++---
- 1 file changed, 72 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 72 +++++++++++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 05166eccea0a..63a2ce76619f 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -85,12 +85,17 @@ enum cgt_group_id {
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index a184def8f5ad..a01138a663ae 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -1042,6 +1042,75 @@ static void __vgic_v3_write_ctlr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+ 	write_gicreg(vmcr, ICH_VMCR_EL2);
+ }
  
- 	CGT_HCRX_TCR2En,
- 
-+	CGT_ICH_HCR_TC,
-+	CGT_ICH_HCR_TALL0,
-+	CGT_ICH_HCR_TALL1,
-+	CGT_ICH_HCR_TDIR,
++static bool __vgic_v3_check_trap_forwarding(struct kvm_vcpu *vcpu,
++					    u32 sysreg, bool is_read)
++{
++	u64 ich_hcr;
 +
- 	/*
- 	 * Anything after this point is a combination of coarse trap
- 	 * controls, which must all be evaluated to decide what to do.
- 	 */
- 	__MULTIPLE_CONTROL_BITS__,
--	CGT_HCR_IMO_FMO = __MULTIPLE_CONTROL_BITS__,
-+	CGT_HCR_IMO_FMO_ICH_HCR_TC = __MULTIPLE_CONTROL_BITS__,
- 	CGT_HCR_TID2_TID4,
- 	CGT_HCR_TTLB_TTLBIS,
- 	CGT_HCR_TTLB_TTLBOS,
-@@ -105,6 +110,8 @@ enum cgt_group_id {
- 	CGT_MDCR_TDE_TDRA,
- 	CGT_MDCR_TDCC_TDE_TDA,
- 
-+	CGT_ICH_HCR_TC_TDIR,
++	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
++		return false;
 +
- 	/*
- 	 * Anything after this point requires a callback evaluating a
- 	 * complex trap condition. Ugly stuff.
-@@ -378,6 +385,36 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		.mask		= HCRX_EL2_TCR2En,
- 		.behaviour	= BEHAVE_FORWARD_ANY,
- 	},
-+	[CGT_ICH_HCR_TC] = {
-+		.index		= ICH_HCR_EL2,
-+		.value		= ICH_HCR_TC,
-+		.mask		= ICH_HCR_TC,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_ICH_HCR_TALL0] = {
-+		.index		= ICH_HCR_EL2,
-+		.value		= ICH_HCR_TALL0,
-+		.mask		= ICH_HCR_TALL0,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_ICH_HCR_TALL1] = {
-+		.index		= ICH_HCR_EL2,
-+		.value		= ICH_HCR_TALL1,
-+		.mask		= ICH_HCR_TALL1,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_ICH_HCR_TALL0] = {
-+		.index		= ICH_HCR_EL2,
-+		.value		= ICH_HCR_TALL0,
-+		.mask		= ICH_HCR_TALL0,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_ICH_HCR_TDIR] = {
-+		.index		= ICH_HCR_EL2,
-+		.value		= ICH_HCR_TDIR,
-+		.mask		= ICH_HCR_TDIR,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
- };
- 
- #define MCB(id, ...)						\
-@@ -387,7 +424,6 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		}
- 
- static const enum cgt_group_id *coarse_control_combo[] = {
--	MCB(CGT_HCR_IMO_FMO,		CGT_HCR_IMO, CGT_HCR_FMO),
- 	MCB(CGT_HCR_TID2_TID4,		CGT_HCR_TID2, CGT_HCR_TID4),
- 	MCB(CGT_HCR_TTLB_TTLBIS,	CGT_HCR_TTLB, CGT_HCR_TTLBIS),
- 	MCB(CGT_HCR_TTLB_TTLBOS,	CGT_HCR_TTLB, CGT_HCR_TTLBOS),
-@@ -402,6 +438,9 @@ static const enum cgt_group_id *coarse_control_combo[] = {
- 	MCB(CGT_MDCR_TDE_TDOSA,		CGT_MDCR_TDE, CGT_MDCR_TDOSA),
- 	MCB(CGT_MDCR_TDE_TDRA,		CGT_MDCR_TDE, CGT_MDCR_TDRA),
- 	MCB(CGT_MDCR_TDCC_TDE_TDA,	CGT_MDCR_TDCC, CGT_MDCR_TDE, CGT_MDCR_TDA),
++	ich_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
 +
-+	MCB(CGT_HCR_IMO_FMO_ICH_HCR_TC,	CGT_HCR_IMO, CGT_HCR_FMO, CGT_ICH_HCR_TC),
-+	MCB(CGT_ICH_HCR_TC_TDIR,	CGT_ICH_HCR_TC, CGT_ICH_HCR_TDIR),
- };
++	switch (sysreg) {
++	case SYS_ICC_IGRPEN0_EL1:
++		if (is_read &&
++		    (__vcpu_sys_reg(vcpu, HFGRTR_EL2) & HFGxTR_EL2_ICC_IGRPENn_EL1))
++			return true;
++
++		if (!is_read &&
++		    (__vcpu_sys_reg(vcpu, HFGWTR_EL2) & HFGxTR_EL2_ICC_IGRPENn_EL1))
++			return true;
++
++		fallthrough;
++
++	case SYS_ICC_AP0Rn_EL1(0):
++	case SYS_ICC_AP0Rn_EL1(1):
++	case SYS_ICC_AP0Rn_EL1(2):
++	case SYS_ICC_AP0Rn_EL1(3):
++	case SYS_ICC_BPR0_EL1:
++	case SYS_ICC_EOIR0_EL1:
++	case SYS_ICC_HPPIR0_EL1:
++	case SYS_ICC_IAR0_EL1:
++		return ich_hcr & ICH_HCR_TALL0;
++
++	case SYS_ICC_IGRPEN1_EL1:
++		if (is_read &&
++		    (__vcpu_sys_reg(vcpu, HFGRTR_EL2) & HFGxTR_EL2_ICC_IGRPENn_EL1))
++			return true;
++
++		if (!is_read &&
++		    (__vcpu_sys_reg(vcpu, HFGWTR_EL2) & HFGxTR_EL2_ICC_IGRPENn_EL1))
++			return true;
++
++		fallthrough;
++
++	case SYS_ICC_AP1Rn_EL1(0):
++	case SYS_ICC_AP1Rn_EL1(1):
++	case SYS_ICC_AP1Rn_EL1(2):
++	case SYS_ICC_AP1Rn_EL1(3):
++	case SYS_ICC_BPR1_EL1:
++	case SYS_ICC_EOIR1_EL1:
++	case SYS_ICC_HPPIR1_EL1:
++	case SYS_ICC_IAR1_EL1:
++		return ich_hcr & ICH_HCR_TALL1;
++
++	case SYS_ICC_DIR_EL1:
++		if (ich_hcr & ICH_HCR_TDIR)
++			return true;
++
++		fallthrough;
++
++	case SYS_ICC_RPR_EL1:
++	case SYS_ICC_CTLR_EL1:
++	case SYS_ICC_PMR_EL1:
++		return ich_hcr & ICH_HCR_TC;
++
++	default:
++		return false;
++	}
++}
++
+ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ {
+ 	int rt;
+@@ -1065,6 +1134,9 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
  
- typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
-@@ -536,9 +575,9 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(SYS_CSSELR_EL1,		CGT_HCR_TID2_TID4),
- 	SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
- 		      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
--	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO),
--	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO),
--	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO),
-+	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
-+	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
-+	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
- 	SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
- 		      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
- 	SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
-@@ -1108,6 +1147,34 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
- 	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
- 	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
-+	/*
-+	 * IMPDEF choice:
-+	 * We treat ICC_SRE_EL2.{SRE,Enable) and ICV_SRE_EL1.SRE as
-+	 * RAO/WI. We therefore never consider ICC_SRE_EL2.Enable for
-+	 * ICC_SRE_EL1 access, and always handle it locally.
-+	 */
-+	SR_TRAP(SYS_ICC_AP0R0_EL1,	CGT_ICH_HCR_TALL0),
-+	SR_TRAP(SYS_ICC_AP0R1_EL1,	CGT_ICH_HCR_TALL0),
-+	SR_TRAP(SYS_ICC_AP0R2_EL1,	CGT_ICH_HCR_TALL0),
-+	SR_TRAP(SYS_ICC_AP0R3_EL1,	CGT_ICH_HCR_TALL0),
-+	SR_TRAP(SYS_ICC_AP1R0_EL1,	CGT_ICH_HCR_TALL1),
-+	SR_TRAP(SYS_ICC_AP1R1_EL1,	CGT_ICH_HCR_TALL1),
-+	SR_TRAP(SYS_ICC_AP1R2_EL1,	CGT_ICH_HCR_TALL1),
-+	SR_TRAP(SYS_ICC_AP1R3_EL1,	CGT_ICH_HCR_TALL1),
-+	SR_TRAP(SYS_ICC_BPR0_EL1,	CGT_ICH_HCR_TALL0),
-+	SR_TRAP(SYS_ICC_BPR1_EL1,	CGT_ICH_HCR_TALL1),
-+	SR_TRAP(SYS_ICC_CTLR_EL1,	CGT_ICH_HCR_TC),
-+	SR_TRAP(SYS_ICC_DIR_EL1,	CGT_ICH_HCR_TC_TDIR),
-+	SR_TRAP(SYS_ICC_EOIR0_EL1,	CGT_ICH_HCR_TALL0),
-+	SR_TRAP(SYS_ICC_EOIR1_EL1,	CGT_ICH_HCR_TALL1),
-+	SR_TRAP(SYS_ICC_HPPIR0_EL1,	CGT_ICH_HCR_TALL0),
-+	SR_TRAP(SYS_ICC_HPPIR1_EL1,	CGT_ICH_HCR_TALL1),
-+	SR_TRAP(SYS_ICC_IAR0_EL1,	CGT_ICH_HCR_TALL0),
-+	SR_TRAP(SYS_ICC_IAR1_EL1,	CGT_ICH_HCR_TALL1),
-+	SR_TRAP(SYS_ICC_IGRPEN0_EL1,	CGT_ICH_HCR_TALL0),
-+	SR_TRAP(SYS_ICC_IGRPEN1_EL1,	CGT_ICH_HCR_TALL1),
-+	SR_TRAP(SYS_ICC_PMR_EL1,	CGT_ICH_HCR_TC),
-+	SR_TRAP(SYS_ICC_RPR_EL1,	CGT_ICH_HCR_TC),
- };
+ 	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
  
- static DEFINE_XARRAY(sr_forward_xa);
++	if (__vgic_v3_check_trap_forwarding(vcpu, sysreg, is_read))
++		return 0;
++
+ 	switch (sysreg) {
+ 	case SYS_ICC_IAR0_EL1:
+ 	case SYS_ICC_IAR1_EL1:
 -- 
 2.39.2
 
