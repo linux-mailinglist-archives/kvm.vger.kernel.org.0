@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-24603-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24606-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2523F9584BF
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:38:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEA679584C2
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:38:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55A1E1C23E54
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:38:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A23528881C
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E690E18DF7B;
-	Tue, 20 Aug 2024 10:38:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5157B18E048;
+	Tue, 20 Aug 2024 10:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GxqCrpu3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1UazADM"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEF618A6BA;
-	Tue, 20 Aug 2024 10:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7883118DF95;
+	Tue, 20 Aug 2024 10:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724150285; cv=none; b=elFJMazzjuOu9fGMZRfrao7CppXwP2+FScK1F2YCJdBrN+1IWuLWIqrBi2PgdpRe4FiQXh6ISrcmM8jc52L9wYNWVJhLqGvoc1yN8KNhSccdJoybp+14YQql2WNAzvndQlhzY+ifs/BKEb9kyfeqlo78FGhvwpWzAHjpulr77DA=
+	t=1724150286; cv=none; b=ClqlQ6U6dU9qcGq7fkCl+JonRzJTpzpjI59TJuq8++ODNR5pTy5JafiyoS/UE3OX0zP5m6KLI4ihv6urNTunN4ofsZhUG1YmEr5NDQIdjPeZsydoYFGnSon7A+e4XOyBULn75xK3uzyORuu9oKEZFeFqC3NmgapzKvVPXB4yCuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724150285; c=relaxed/simple;
-	bh=6AJ3yfD98r+FO9E5vQFX7wbiwlpQp9Jx1Chm1J9PyGU=;
+	s=arc-20240116; t=1724150286; c=relaxed/simple;
+	bh=N1dfuCYFccAOdWqTfVzbuHnh1OCX3eKrk8hFfdOBjwA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ApjiS6jzYPuJLbVgdgak5O2q4R8g/LvLV7gBOxRh6QtfWbjDn+qFk7D0PDI6QFVahV1MxIcwpgN5mz4n9M9tdmfZFfTetD2N1y65fiER7KrVj3T4DbfVJ/uz6bc5VJnN6BWfFuvGOezV80aUy7NU9hD91e4pA3LtaU4Q8CL+WQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GxqCrpu3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2CB6C4AF09;
-	Tue, 20 Aug 2024 10:38:04 +0000 (UTC)
+	 MIME-Version; b=CSzrjR+SsWnrDM2qCBGpXzSHjLB8mRMpUHlljL7Xl9kPOqn5I7CWHCFVY9yHoH3D6l6IxmBd7IUS1ic40R6CsE7GFQtmXrwXxZmJeEMTFKaGiRCOSXuYhmzWTax/+/704FVHUpw5KcF6EJUr5Xs0S84nL5Eks4fZ6eB2ZRVQFuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1UazADM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D520C4AF12;
+	Tue, 20 Aug 2024 10:38:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724150284;
-	bh=6AJ3yfD98r+FO9E5vQFX7wbiwlpQp9Jx1Chm1J9PyGU=;
+	s=k20201202; t=1724150286;
+	bh=N1dfuCYFccAOdWqTfVzbuHnh1OCX3eKrk8hFfdOBjwA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GxqCrpu31vHyO8AjOkbjc2XIm4+75zmnLE/3d5HX9Znrxx57yA7372AYOBzMK0TEV
-	 2MhTiQupMSmuzqSHHquza44lcDU4bWabJH4Q3BzSgx7j9OCgjTGTcPixtzlK64Ineg
-	 t+4w8v8g2jCxEuKiWcjzBzAytsuk7bgbsZof2Hjm5sBNlUF7AhC/BedohGPJimSvkD
-	 rjGzVx3WrDVdJBdX/k21sVTnE1PARuQTQt4oV4MI/iZ+VR4tYC1BrgxSchKs5AnaSs
-	 KDe9zM6qFYxCLqHAB2u9Awd/fdvI6vl2ANb2jCAy7HftNrF1e5Svzpho4pkIgG6dfP
-	 LT5VqbRWKuefQ==
+	b=Z1UazADMRPi7E+H1rj3TlUL+Szr7Tj7TG5qkhK7Po3jimebGFj2jUaprCg133NzHw
+	 EDnIWZc2DIqXn6gD+wq+UjwgqVwpu1QHYEFIryjA6NrKSFBNCwJ8919BpzM0LVm2Hj
+	 DVPU3ekRqH0F+62eNFtPCCWDoU/fYlekScz3pFuJPs9jNSI74jEEUEqPYkVW7+Y1yp
+	 z7KA5q+5Q6XTKK2HDJJcZDvnsPLOMhdU57OKBf7TxryK+Y0eFrSAzMsFFD5rfrQSj0
+	 ZDV/YbobBu0sfwPuWpNGD2ZP/3wcYmy+uGNKEDAQ2ItOmmOPxjperi018v3kOSuh9U
+	 zRt2PK1vyvCLQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgMFW-005Ea3-Tr;
-	Tue, 20 Aug 2024 11:38:02 +0100
+	id 1sgMFX-005Ea3-3x;
+	Tue, 20 Aug 2024 11:38:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -59,9 +59,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v4 01/18] arm64: Add missing APTable and TCR_ELx.HPD masks
-Date: Tue, 20 Aug 2024 11:37:39 +0100
-Message-Id: <20240820103756.3545976-2-maz@kernel.org>
+Subject: [PATCH v4 02/18] arm64: Add PAR_EL1 field description
+Date: Tue, 20 Aug 2024 11:37:40 +0100
+Message-Id: <20240820103756.3545976-3-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240820103756.3545976-1-maz@kernel.org>
 References: <20240820103756.3545976-1-maz@kernel.org>
@@ -77,57 +77,47 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Although Linux doesn't make use of hierarchical permissions (TFFT!),
-KVM needs to know where the various bits related to this feature
-live in the TCR_ELx registers as well as in the page tables.
+As KVM is about to grow a full emulation for the AT instructions,
+add the layout of the PAR_EL1 register in its non-D128 configuration.
 
-Add the missing bits.
+Note that the constants are a bit ugly, as the register has two
+layouts, based on the state of the F bit.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h       | 1 +
- arch/arm64/include/asm/pgtable-hwdef.h | 9 +++++++++
- 2 files changed, 10 insertions(+)
+ arch/arm64/include/asm/sysreg.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index d81cc746e0eb..109a85ee6910 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -107,6 +107,7 @@
- /* TCR_EL2 Registers bits */
- #define TCR_EL2_DS		(1UL << 32)
- #define TCR_EL2_RES1		((1U << 31) | (1 << 23))
-+#define TCR_EL2_HPD		(1 << 24)
- #define TCR_EL2_TBI		(1 << 20)
- #define TCR_EL2_PS_SHIFT	16
- #define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index 1f60aa1bc750..07dfbdb14bab 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -204,6 +204,11 @@
-  */
- #define PTE_S2_MEMATTR(t)	(_AT(pteval_t, (t)) << 2)
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 4a9ea103817e..d9d5e07f768d 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -325,7 +325,25 @@
+ #define SYS_PAR_EL1			sys_reg(3, 0, 7, 4, 0)
  
-+/*
-+ * Hierarchical permission for Stage-1 tables
-+ */
-+#define S1_TABLE_AP		(_AT(pmdval_t, 3) << 61)
-+
- /*
-  * Highest possible physical address supported.
-  */
-@@ -298,6 +303,10 @@
- #define TCR_TBI1		(UL(1) << 38)
- #define TCR_HA			(UL(1) << 39)
- #define TCR_HD			(UL(1) << 40)
-+#define TCR_HPD0_SHIFT		41
-+#define TCR_HPD0		(UL(1) << TCR_HPD0_SHIFT)
-+#define TCR_HPD1_SHIFT		42
-+#define TCR_HPD1		(UL(1) << TCR_HPD1_SHIFT)
- #define TCR_TBID0		(UL(1) << 51)
- #define TCR_TBID1		(UL(1) << 52)
- #define TCR_NFD0		(UL(1) << 53)
+ #define SYS_PAR_EL1_F			BIT(0)
++/* When PAR_EL1.F == 1 */
+ #define SYS_PAR_EL1_FST			GENMASK(6, 1)
++#define SYS_PAR_EL1_PTW			BIT(8)
++#define SYS_PAR_EL1_S			BIT(9)
++#define SYS_PAR_EL1_AssuredOnly		BIT(12)
++#define SYS_PAR_EL1_TopLevel		BIT(13)
++#define SYS_PAR_EL1_Overlay		BIT(14)
++#define SYS_PAR_EL1_DirtyBit		BIT(15)
++#define SYS_PAR_EL1_F1_IMPDEF		GENMASK_ULL(63, 48)
++#define SYS_PAR_EL1_F1_RES0		(BIT(7) | BIT(10) | GENMASK_ULL(47, 16))
++#define SYS_PAR_EL1_RES1		BIT(11)
++/* When PAR_EL1.F == 0 */
++#define SYS_PAR_EL1_SH			GENMASK_ULL(8, 7)
++#define SYS_PAR_EL1_NS			BIT(9)
++#define SYS_PAR_EL1_F0_IMPDEF		BIT(10)
++#define SYS_PAR_EL1_NSE			BIT(11)
++#define SYS_PAR_EL1_PA			GENMASK_ULL(51, 12)
++#define SYS_PAR_EL1_ATTR		GENMASK_ULL(63, 56)
++#define SYS_PAR_EL1_F0_RES0		(GENMASK_ULL(6, 1) | GENMASK_ULL(55, 52))
+ 
+ /*** Statistical Profiling Extension ***/
+ #define PMSEVFR_EL1_RES0_IMP	\
 -- 
 2.39.2
 
