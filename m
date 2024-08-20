@@ -1,143 +1,117 @@
-Return-Path: <kvm+bounces-24561-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24562-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E662895780A
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 00:47:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED935957B1C
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 03:46:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75DE5B21582
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 22:47:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 938271F22F26
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 01:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C811DF661;
-	Mon, 19 Aug 2024 22:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9F41BF58;
+	Tue, 20 Aug 2024 01:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GRib77bB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VBLER97S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709EA15B99E
-	for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 22:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167603D6A
+	for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 01:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724107640; cv=none; b=HmIXv+FS4E1YyNjNp6jBEUaddKp0NAq5zesT/A5CVdQlqfXGYfM6zmsgfcMQNSTT9ESVE47JB7iU8eVl7ZUsp4WuPhTkDK2yCpThux3/SUIjzXubtKqqJtDYCIl0Ainr6wwfOsVAB7+kXFRehdSKPYBkDPjXiGxJoGIPnvs9+wU=
+	t=1724118385; cv=none; b=X4xZjbn8dJtGJBX+Se9h7hO10siVHen17pS0JsupOYEkTK3Rh8fTd+8Vo2tMuv3ca1LMRbrVsrKq9hTtqx337dNAe3VPRHvoDH1g2ggElzTXAqxyaJum57Jeq1HpIjdFNkX9FoHlc8Fo+QnED5OBe6kf0q9w6NnZtbCykQJrUi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724107640; c=relaxed/simple;
-	bh=VDHlprhqwjCM5N4nwmrW+/M8UE6X+2dcwSHCzgZZckE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G6Y3/spf+MDM4RWbGsLlIyVCdJXIu3wsDxPRD1+jN4qBdnroshRqIM2jIYx8B6jh0mPEe0JoO330IplIcaGiVa5Fx7Rj8YL7y0jA+bGbPRCSruErL3XWK6w39XGVp45c4UfG0/fnzTEIKCpMNNTHBmNmjbx8kbqHEfVLTeemnM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GRib77bB; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1724118385; c=relaxed/simple;
+	bh=NLGXyzyDRCMtFVsCX31SlmRX2OqGRUiNPEeUGshVGe4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VjVTfGXV0FjCnqkOQjgw+rpdOeKLMu2v2IfqDMoqzrJw+V5c3LNMzbI1bbg7o5ZP/UlsevUNnNP9yCnPyUOdPXA+XwRmRiWvaycpoQ9oc77dVJ0k9xA/G1+AMatBFV7ZI5GGdYYuxLEjhubmccLiE3Q9T9DmE+VPvRlWUdZ/STY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VBLER97S; arc=none smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7163489149fso4406512a12.3
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 15:47:19 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-44ff7cc5432so38560911cf.3
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 18:46:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724107639; x=1724712439; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0mpr7864OCZvv9Hj0Yv++YX+VmARQzYZRUR5rU9bOeY=;
-        b=GRib77bBvuS54zVEHsxcUHiR1ATqHPtnZ0xESmawQTlLv1Ib7SqbQkkMxRunQmPA0B
-         W0GHItnH3tz5SofclG0kBJoNYYXCplWh/PTDaIarpYxUsoRdoymc/5a62C50UifSmjJ8
-         OCevUGwGgv5nLbYihzWy2PftYtd8bx8cuEnOV7+649T3sS1DhEst/f+DLD43dHN8NpSD
-         OEBzZQHc8Y1QIx57Yjo+HmMWLNEu1XBp8lBJOUduEOpDShDWf0edME8PdxO/iG62CmEr
-         OvdYeU3PHgvDD8iYgxuGlBnXUFrIvX13G/+HFdT/cIenuchJWXa6Gi/BbRIIwxsvg/Ls
-         WxoQ==
+        d=google.com; s=20230601; t=1724118383; x=1724723183; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NLGXyzyDRCMtFVsCX31SlmRX2OqGRUiNPEeUGshVGe4=;
+        b=VBLER97Sewr+qmrTUsVjbhJdDzMgAQNFmzwxJiV0g2LHP6+gHC47TuWFBEw8QFQ2Sd
+         LjDz9bMPs+YEPv6Vo6ZMVjP74DFx+894rtCgqlrxO9TtkvFv5ZBqiaI3R9Ub9GhCLTCC
+         3WHiEW4nVdMe9SHxul6dAbfy2yUwp83thwLcz7tafMfy/lWjqdEl06SrLA87J3DJ749/
+         K8aEQCi/fV8H+nuzs/K2OXeEBE/tfty3I3OH2CxrENp7WFSffY8IiRkG96Ji/cndFSbq
+         j3/VQ0mxP0REnbZMDtaLrfB0XG8x7MLhXj1hInuMrzNyo18GrBjAG8PJe1KkP3beEFN4
+         XQWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724107639; x=1724712439;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0mpr7864OCZvv9Hj0Yv++YX+VmARQzYZRUR5rU9bOeY=;
-        b=mYj8mKxwh0gltPI44TjqSg2vhIFQ8zkiKHBytC09NW7kpVZUmcKuip1bIZm1zIZ+/l
-         qoZgZ72VBhrlVl1Fhe4eSGKnRuJbk4CjLbVN1Pb6X9A2SahcC8pdTBxpvABtRVnevzqz
-         CCKjnDjLFwqQIpPWR0H30dDqKmvZBOycv29I43evv2bw05VkBKF3mjSd+8ib5mCcS4Ea
-         LWjasV/8DNznoVuLG1MgRq+KCpIbXv5BIoh+96p/XiLLFwfpKqRxt+sQxW37XPl7GHem
-         U5OfrdWuVhQgszEFJycK1sVjCCw17ueAoKdUHZSlY2xcTAhfcsdxtTlCG7VitHRZho+J
-         6/ew==
-X-Forwarded-Encrypted: i=1; AJvYcCUhBBd30U8ya0UAlz9nxHafQgtnB7LmVzp/0Jb2V7mMGwUTC6tg1b0b1/FlFWSn+zSo9UI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBI8pFZ5kvvrQFG9qEPIZhjMobsYU9Wn9fRDZcooWndqpDGCOc
-	Ct3+vhYLFL7bKCx+u+fCOP9uCR8fGWBmCTNmvdzKgVDuhBuPv0pSDweZ9DYsMoZbhS+cZ34i16a
-	9gw==
-X-Google-Smtp-Source: AGHT+IGngB58TyyXwtykQy2TchYmizV3K6F19AJubcP5aFPXxhvBteRSy0IDpLShOfEeLOPTdkLjdiTkkuE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:247:b0:1fd:8e8d:8695 with SMTP id
- d9443c01a7336-20203f27f39mr13121725ad.12.1724107638639; Mon, 19 Aug 2024
- 15:47:18 -0700 (PDT)
-Date: Mon, 19 Aug 2024 15:47:17 -0700
-In-Reply-To: <ZsOuEP6P0v45ffC0@linux.dev>
+        d=1e100.net; s=20230601; t=1724118383; x=1724723183;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NLGXyzyDRCMtFVsCX31SlmRX2OqGRUiNPEeUGshVGe4=;
+        b=uNv4eq2ADbG631y+b16TpsbdAbwZHVxArAvjkYUTWCkgF7Dth2nWIBnPGly41iCD+o
+         N4WX0WHpNsxfR7gRaWiplMpUxIXV3Ap+Nzfpkysr2/xR2KDy7tCzDQ3sOJ+qYfYf5dqX
+         dTC7tEyhXVFmZkzXiz0BmqGHQt/dYwgC2ebQycPhLwh1Du4Ei7GZgBMPR8uUQEUEUwv3
+         uO6PfU+Mmo3FSo9OcUbi26MhwcLX24HclOh8s4amW/PS5QfPG2YcCR5zqC9z75L8LgAv
+         UICkyvkh8+NRhBl8npPBU+ogDV2wyFgHAVRT14cYTLF7TIZU8s4tVqZxevBPPFzggoew
+         SyfA==
+X-Forwarded-Encrypted: i=1; AJvYcCX088u9qSZwaMB61yJYTcD2uEF6WJQI1XbOW5eVAvJxJTv11/bcXIgQF7pH6l0hYxKoIv8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUvoO5ukovoz98/V1cMrjqBvda1jcq/8eEudzioECrb/1oL3F9
+	IH49L/8BjvcB0LEkr916q2PHuPMvK4KPWBH/Xov+TWq+9LuR0nbMmKPUSAADK7ejPMgEJz/aewv
+	O4ag5zvt4rJhErgKIOuwvZvlC5DmuX7JK3evJ
+X-Google-Smtp-Source: AGHT+IGPb3dLfD9raq+gJcco+vCZhESSKSc/TL2rumYK9styepg9BQ19KUfATIjpX/4u48oIpmni43L+UJMs61R8/As=
+X-Received: by 2002:a05:622a:5c13:b0:447:ee02:220 with SMTP id
+ d75a77b69052e-453742b9ee9mr166792741cf.30.1724118382851; Mon, 19 Aug 2024
+ 18:46:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-4-jthoughton@google.com> <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
- <Zr_y7Fn63hdowfYM@google.com> <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
- <ZsOuEP6P0v45ffC0@linux.dev>
-Message-ID: <ZsPLdUC44-DHKAON@google.com>
-Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
- and kvm_age_gfn
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Yu Zhao <yuzhao@google.com>, James Houghton <jthoughton@google.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20240806111157.1336532-1-suleiman@google.com>
+In-Reply-To: <20240806111157.1336532-1-suleiman@google.com>
+From: Suleiman Souhlal <suleiman@google.com>
+Date: Tue, 20 Aug 2024 10:46:11 +0900
+Message-ID: <CABCjUKA1nm+=eiHZu-0g5qstko9XdnwbJa3YgowV=L1t2Qa5mA@mail.gmail.com>
+Subject: Re: [PATCH] sched: Don't try to catch up excess steal time.
+To: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>
+Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Valentin Schneider <vschneid@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, joelaf@google.com, 
+	vineethrp@google.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	ssouhlal@freebsd.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 19, 2024, Oliver Upton wrote:
-> On Fri, Aug 16, 2024 at 07:03:27PM -0600, Yu Zhao wrote:
-> > On Fri, Aug 16, 2024 at 6:46=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
->=20
-> [...]
->=20
-> > > Were you expecting vCPU runtime to improve (more)?  If so, lack of mo=
-vement could
-> > > be due to KVM arm64 taking mmap_lock for read when handling faults:
-> > >
-> > > https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
-> >=20
-> > For the above test, I don't think it's mmap_lock
->=20
-> Yeah, I don't think this is related to the mmap_lock.
->=20
-> James is likely using hardware that has FEAT_HAFDBS, so vCPUs won't
-> fault for an Access flag update.
+On Tue, Aug 6, 2024 at 8:13=E2=80=AFPM Suleiman Souhlal <suleiman@google.co=
+m> wrote:
+>
+> When steal time exceeds the measured delta when updating clock_task, we
+> currently try to catch up the excess in future updates.
+> However, this results in inaccurate run times for the future clock_task
+> measurements, as they end up getting additional steal time that did not
+> actually happen, from the previous excess steal time being paid back.
+>
+> For example, suppose a task in a VM runs for 10ms and had 15ms of steal
+> time reported while it ran. clock_task rightly doesn't advance. Then, a
+> different task runs on the same rq for 10ms without any time stolen.
+> Because of the current catch up mechanism, clock_sched inaccurately ends
+> up advancing by only 5ms instead of 10ms even though there wasn't any
+> actual time stolen. The second task is getting charged for less time
+> than it ran, even though it didn't deserve it.
+> In other words, tasks can end up getting more run time than they should
+> actually get.
+>
+> So, we instead don't make future updates pay back past excess stolen time=
+.
+>
+> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
 
-Huh, didn't know that was a thing on ARM.  Ooh, that lends even more creden=
-ce to
-my assertion that marking folios accessed in handle_access_fault() can go a=
-way[*].
-I assume hardware-assisted updates means this code in handle_access_fault()=
- will
-no longer be hit, as KVM simply won't ever get access faults?  If so, I'll =
-add
-that info to the changelog.
+Gentle ping.
 
-	if (kvm_pte_valid(pte))
-		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
-
-[*] https://lore.kernel.org/all/20240726235234.228822-83-seanjc@google.com
-
-> Even if he's on a machine w/o it, Access flag faults are handled outside =
-the
-> mmap_lock.
-
-Oh, right, they go down handle_access_fault(), not user_mem_abort().
-
-Reviewing late Friday afternoon, never a good idea ;-)
+-- Suleiman
 
