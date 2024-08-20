@@ -1,72 +1,73 @@
-Return-Path: <kvm+bounces-24584-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24585-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83CE09580DA
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:23:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 516DC9580FE
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFDBB1C239DA
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 08:23:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05A4D1F25440
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 08:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D50918A6C5;
-	Tue, 20 Aug 2024 08:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F5418A923;
+	Tue, 20 Aug 2024 08:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lQUdVOxV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pKn9DcGL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB09286AFA
-	for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 08:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE9418A6B6
+	for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 08:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724142225; cv=none; b=Na6faVVyQ5pZmR6nQiUqfkRr3dOabubLY53L8c4EIRmN6vaVHBsJHOprFwbO0AjoviYyPM9A7Y/Ax3mqW1G42Vk43VYGF4KozKIP7UG5bdeyJTWv+bEFhiGFKappTS/ozLwGOlB31qdoBQ+jHmX1Uz29NFrQKYOxRRaDI582FpI=
+	t=1724142615; cv=none; b=ciYYsaIBhVXrI0IHqCfXE/f/6nQzwPUpWkD/bnXJ+nYMCIspLty+Af64BE67bHkbYH4WIcc2uPQjbNLi3aUJ6nZuXxTLKvt3vbIXrMbfMZ99OpJy48o6u1ApE5fYwnE+MpPG91f50mWxqdRPSYXkbtEDGnVGASzmoZMOwVJ+mWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724142225; c=relaxed/simple;
-	bh=FPPHCemr0uCUKSLHjdH88rKTw4GJg240+VSGlRjeztA=;
+	s=arc-20240116; t=1724142615; c=relaxed/simple;
+	bh=C97kW6GO0b184jP3Z6JLzvY+X/IbBXrnJu7dwpjsKjc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bgW8ig3gqyAbSEpECaOlpZg9MuVcNHuA3XaNRewbvnJK5COVdH3EvWNb6TdXp4HM7MT/kTWroLek/0IoZUWoJam8kfKURAlEXoZj/NCbXTYcenZcOWlAiMoImRPx/HkH0OWEF8VfGSNJebnUbaME2FdwsZAH+Le+p8SY/U/SH7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lQUdVOxV; arc=none smtp.client-ip=209.85.208.51
+	 Content-Type:Content-Disposition:In-Reply-To; b=rM6YgZHMYabRYzGfj6sM7y/0sWxrgN8BopOzK8/g3T7ZZ54xrrUKpCFvkKOnn6J1t2PtM/gFtlc/hOzKm7wCOlAw1nxg6jBKAmEuxOiIHTV0QXJ17bgjEoYwDOdtVc4KF845AnRnC6QuA4mGEKfrpIMsdvJJqifPxd3KYoGpc8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pKn9DcGL; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5bec507f4ddso5739a12.0
-        for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 01:23:42 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5bec7c5af2aso3978a12.1
+        for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 01:30:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724142221; x=1724747021; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7yYZms4nWMftjc2pVrYEdJNFCZkagzW9V2Bs0FQm0o0=;
-        b=lQUdVOxVWweB1mGg/6OYiIt+XQebf4pi4jTRCQZGNdg8qd3xzeRfP+xBQH2XV7HJLN
-         o2t5lBDEMOltQNOuzEHHKcBiqgJt59AGTVjz7aHcTInfbB89ZpVIRGyrUncTTLb63kl2
-         o0Ap/kglYuy4NgFHlAHx7AdxQe3OQO0DzS7ds858bso//rv6BggW8knY2N7hAS/iUveT
-         uLkqY5gpYYmOuDGiJ6fyqmyUTRQ4ei7rJuoPJYzmhaLhcTtiquYfqzvczAmXPMt+ZL3s
-         ghK/8Xx02D6x7BD60Mdr6p1HsIpXBNxtufAKbrmM+vBR4NlJh93mfiGQb21871tPZjjl
-         lu9g==
+        d=google.com; s=20230601; t=1724142611; x=1724747411; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Nmtk1HP3ErSXQsoJaqLN7JzX8v0kJjj6aEOiqGrjDL0=;
+        b=pKn9DcGLLiviww6ifTB3Ix+x8us8PEWmpDLYmggg9LDImdTqz2/3ecCuuSpPFiD0Dv
+         vU05sSGYpwywwsU4C5cZ3IeONctAoNDyDd+SbXpApgTjjet9lXNCi1T+fIlAYoITNaTP
+         ditfMIsBhC/S8EDuDmt2NaVe93ew6tAT56s8zZ2fyhiFLCjFCp3HLNC+oE+2fIRJUtFJ
+         IY31ks3cDD6UlRUHq0zPqAamWMoDjbOfAfngi2Hq52dcdB9JpOTNX8U9n9bLykMn/YGS
+         041hGgOxWZtN2OQu+MnGRtc8Q41j14thW9ylyHr4/3cNIcNpUZw+64vvGgnRh0Z3Dr0D
+         Sc4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724142221; x=1724747021;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7yYZms4nWMftjc2pVrYEdJNFCZkagzW9V2Bs0FQm0o0=;
-        b=h3+GD2ijqkXmevKtnOnKNFcplgQavYUKTkXFIg9p9DVc5yawvACfNkcU8vNeJpBHct
-         8ry4sq9T5AVlF+8Kr7uX974A0CcwNRxdNlbs045JvGuDN3QkfvkVAsvbME7w8RSjyQth
-         aVwQ0O5wXNleU7ovgNqKUom4rq3ZiUZsCm3yr7Z14RiewBo3U07rcfKuSIG+J0cPb4Yx
-         6+RBT+x5BKu8cpOMzo9R+D3Sc6Tc4oJ1zhmYBDpsyTEYzy78YAGxWoIeHvJy+VlNKdks
-         kjUNbRPJvg/XyxbbLG8eJjtMJmwUCI72Pgmu2eZ/LTp8B1bOLWukxtfKqczpws3hY90M
-         XpBw==
-X-Forwarded-Encrypted: i=1; AJvYcCVfsG/JoCwLGspmtE55dnIA9JgFz5gSrZ6vicvLGxZi4zpqrPBxRufZbz671U/EdudIGb0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRqvnJbzX1oQupjA/yYkQeCh/YDZ5GiR0PgZoZ0LthjKHLMsh4
-	HcrxU4i+GToaisQvQuipt1NDocHMPHejTjggsjAoldMnlPKtcdvSZxWoAJhocw==
-X-Google-Smtp-Source: AGHT+IH+M+BUx+hTERAp4I+MQSYeLfG9vweVXeC0ahwt6XpthChPmh+nBlyadH02xTIypPgNh7wLHw==
-X-Received: by 2002:a05:6402:27d2:b0:57d:32ff:73ef with SMTP id 4fb4d7f45d1cf-5bf0c26364cmr68223a12.6.1724142220462;
-        Tue, 20 Aug 2024 01:23:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724142611; x=1724747411;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nmtk1HP3ErSXQsoJaqLN7JzX8v0kJjj6aEOiqGrjDL0=;
+        b=ZH8NY4DJeMw9oJM67IRQBhVkypboDNFNkb3l7Cv2AE7kkNdfiZLbtTIsRWDFeEp9Ti
+         mWkOI14EiK7lAyN9KDwq15W8D8AFONGCCC1JNHSVz4QaU23u5ZIyauKP3GVJ1KxtMD82
+         W/SJ+rWstHjb+CXsY8LJmfBj2Wks9jAl/zOZm+QGagce2bO+K08OSm/d7U5OYghS2eVR
+         a+W56r4wrpMg+nNmQnNepx3yuFTUszP7miNyY/VVzqgBPx80KwmwMQjd0ovJcFMBDLy5
+         FxhosPvZ7JyMdRo8ReZx3uFQu8RrTzaPh/AJlhCdVKqzNYFxxdVvDo5Jg6BrvQ4Bkr+x
+         bz5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX3wwBjN02KHtR7Xz/2orhXfbbMRZ6RXs8saFw5xP//U8ua80+zeVsnBOGk5TIOtU7CM64=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfdXoljrPpHITJyBBo0AFFstI4lF4Vw5KYh11tT3wM44BaFBcB
+	38i3ZJdn+jZG30F7FQ32q/5G0P50tIR/17MbXZcu+rX8xB9nZxXHosyQLkA6RQ==
+X-Google-Smtp-Source: AGHT+IGPziUVy8HDcHfDeem3AWflQvAYWNj8eBFcuwDV7RIOne/5+5CR2e95OR/3zOh5eRn0jG6aJw==
+X-Received: by 2002:a05:6402:3546:b0:5be:c28a:97cf with SMTP id 4fb4d7f45d1cf-5bf0e5a28eemr37487a12.5.1724142610293;
+        Tue, 20 Aug 2024 01:30:10 -0700 (PDT)
 Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded36051sm187002145e9.24.2024.08.20.01.23.39
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ed7945b8sm135707085e9.44.2024.08.20.01.30.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 01:23:40 -0700 (PDT)
-Date: Tue, 20 Aug 2024 08:23:35 +0000
+        Tue, 20 Aug 2024 01:30:09 -0700 (PDT)
+Date: Tue, 20 Aug 2024 08:30:05 +0000
 From: Mostafa Saleh <smostafa@google.com>
 To: Jason Gunthorpe <jgg@nvidia.com>
 Cc: acpica-devel@lists.linux.dev,
@@ -86,252 +87,185 @@ Cc: acpica-devel@lists.linux.dev,
 	Michael Shavit <mshavit@google.com>,
 	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
 	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH 1/8] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
-Message-ID: <ZsRSh-Kgfzevv8jv@google.com>
+Subject: Re: [PATCH 2/8] iommu/arm-smmu-v3: Use S2FWB when available
+Message-ID: <ZsRUDaFLd85O8u4Z@google.com>
 References: <0-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
- <1-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
+ <2-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
 
 Hi Jason,
 
-On Tue, Aug 06, 2024 at 08:41:14PM -0300, Jason Gunthorpe wrote:
-> This control causes the ARM SMMU drivers to choose a stage 2
-> implementation for the IO pagetable (vs the stage 1 usual default),
-> however this choice has no significant visible impact to the VFIO
-> user. Further qemu never implemented this and no other userspace user is
-> known.
+On Tue, Aug 06, 2024 at 08:41:15PM -0300, Jason Gunthorpe wrote:
+> Force Write Back (FWB) changes how the S2 IOPTE's MemAttr field
+> works. When S2FWB is supported and enabled the IOPTE will force cachable
+> access to IOMMU_CACHE memory and deny cachable access otherwise.
 > 
-> The original description in commit f5c9ecebaf2a ("vfio/iommu_type1: add
-> new VFIO_TYPE1_NESTING_IOMMU IOMMU type") suggested this was to "provide
-> SMMU translation services to the guest operating system" however the rest
-> of the API to set the guest table pointer for the stage 1 and manage
-> invalidation was never completed, or at least never upstreamed, rendering
-> this part useless dead code.
+> This is not especially meaningful for simple S2 domains, it apparently
+> doesn't even force PCI no-snoop access to be coherent.
 > 
-> Upstream has now settled on iommufd as the uAPI for controlling nested
-> translation. Choosing the stage 2 implementation should be done by through
-> the IOMMU_HWPT_ALLOC_NEST_PARENT flag during domain allocation.
+> However, when used with a nested S1, FWB has the effect of preventing the
+> guest from choosing a MemAttr that would cause ordinary DMA to bypass the
+> cache. Consistent with KVM we wish to deny the guest the ability to become
+> incoherent with cached memory the hypervisor believes is cachable so we
+> don't have to flush it.
 > 
-> Remove VFIO_TYPE1_NESTING_IOMMU and everything under it including the
-> enable_nesting iommu_domain_op.
-> 
-> Just in-case there is some userspace using this continue to treat
-> requesting it as a NOP, but do not advertise support any more.
-> 
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Mostafa Saleh <smostafa@google.com>
+> Turn on S2FWB whenever the SMMU supports it and use it for all S2
+> mappings.
 
+I have been looking into this recently from the KVM side as it will
+use FWB for the CPU stage-2 unconditionally for guests(if supported),
+however that breaks for non-coherent devices when assigned, and
+limiting assigned devices to be coherent seems too restrictive.
+I have been looking into ways to notify KVM from VFIO as early as
+possible so it can configure the page table properly.
+
+But for SMMUv3, S2FWB is per stream, can’t we just use it if the master
+is DMA coherent?
+
+Thanks,
+Mostafa
+
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ----------------
->  drivers/iommu/arm/arm-smmu/arm-smmu.c       | 16 ----------------
->  drivers/iommu/iommu.c                       | 10 ----------
->  drivers/iommu/iommufd/vfio_compat.c         |  7 +------
->  drivers/vfio/vfio_iommu_type1.c             | 12 +-----------
->  include/linux/iommu.h                       |  3 ---
->  include/uapi/linux/vfio.h                   |  2 +-
->  7 files changed, 3 insertions(+), 63 deletions(-)
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  6 ++++++
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  3 +++
+>  drivers/iommu/io-pgtable-arm.c              | 24 +++++++++++++++++----
+>  include/linux/io-pgtable.h                  |  2 ++
+>  4 files changed, 31 insertions(+), 4 deletions(-)
 > 
 > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index e5db5325f7eaed..531125f231b662 100644
+> index 531125f231b662..7fe1e27d11586c 100644
 > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -3331,21 +3331,6 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
->  	return group;
->  }
+> @@ -1612,6 +1612,8 @@ void arm_smmu_make_s2_domain_ste(struct arm_smmu_ste *target,
+>  		FIELD_PREP(STRTAB_STE_1_EATS,
+>  			   ats_enabled ? STRTAB_STE_1_EATS_TRANS : 0));
 >  
-> -static int arm_smmu_enable_nesting(struct iommu_domain *domain)
-> -{
-> -	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> -	int ret = 0;
-> -
-> -	mutex_lock(&smmu_domain->init_mutex);
-> -	if (smmu_domain->smmu)
-> -		ret = -EPERM;
-> -	else
-> -		smmu_domain->stage = ARM_SMMU_DOMAIN_S2;
-> -	mutex_unlock(&smmu_domain->init_mutex);
-> -
-> -	return ret;
-> -}
-> -
->  static int arm_smmu_of_xlate(struct device *dev,
->  			     const struct of_phandle_args *args)
->  {
-> @@ -3467,7 +3452,6 @@ static struct iommu_ops arm_smmu_ops = {
->  		.flush_iotlb_all	= arm_smmu_flush_iotlb_all,
->  		.iotlb_sync		= arm_smmu_iotlb_sync,
->  		.iova_to_phys		= arm_smmu_iova_to_phys,
-> -		.enable_nesting		= arm_smmu_enable_nesting,
->  		.free			= arm_smmu_domain_free_paging,
->  	}
->  };
-> diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
-> index 723273440c2118..38dad1fd53b80a 100644
-> --- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
-> +++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
-> @@ -1558,21 +1558,6 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
->  	return group;
->  }
->  
-> -static int arm_smmu_enable_nesting(struct iommu_domain *domain)
-> -{
-> -	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> -	int ret = 0;
-> -
-> -	mutex_lock(&smmu_domain->init_mutex);
-> -	if (smmu_domain->smmu)
-> -		ret = -EPERM;
-> -	else
-> -		smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
-> -	mutex_unlock(&smmu_domain->init_mutex);
-> -
-> -	return ret;
-> -}
-> -
->  static int arm_smmu_set_pgtable_quirks(struct iommu_domain *domain,
->  		unsigned long quirks)
->  {
-> @@ -1656,7 +1641,6 @@ static struct iommu_ops arm_smmu_ops = {
->  		.flush_iotlb_all	= arm_smmu_flush_iotlb_all,
->  		.iotlb_sync		= arm_smmu_iotlb_sync,
->  		.iova_to_phys		= arm_smmu_iova_to_phys,
-> -		.enable_nesting		= arm_smmu_enable_nesting,
->  		.set_pgtable_quirks	= arm_smmu_set_pgtable_quirks,
->  		.free			= arm_smmu_domain_free,
->  	}
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index ed6c5cb60c5aee..9da63d57a53cd7 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2723,16 +2723,6 @@ static int __init iommu_init(void)
->  }
->  core_initcall(iommu_init);
->  
-> -int iommu_enable_nesting(struct iommu_domain *domain)
-> -{
-> -	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
-> -		return -EINVAL;
-> -	if (!domain->ops->enable_nesting)
-> -		return -EINVAL;
-> -	return domain->ops->enable_nesting(domain);
-> -}
-> -EXPORT_SYMBOL_GPL(iommu_enable_nesting);
-> -
->  int iommu_set_pgtable_quirks(struct iommu_domain *domain,
->  		unsigned long quirk)
->  {
-> diff --git a/drivers/iommu/iommufd/vfio_compat.c b/drivers/iommu/iommufd/vfio_compat.c
-> index a3ad5f0b6c59dd..514aacd6400949 100644
-> --- a/drivers/iommu/iommufd/vfio_compat.c
-> +++ b/drivers/iommu/iommufd/vfio_compat.c
-> @@ -291,12 +291,7 @@ static int iommufd_vfio_check_extension(struct iommufd_ctx *ictx,
->  	case VFIO_DMA_CC_IOMMU:
->  		return iommufd_vfio_cc_iommu(ictx);
->  
-> -	/*
-> -	 * This is obsolete, and to be removed from VFIO. It was an incomplete
-> -	 * idea that got merged.
-> -	 * https://lore.kernel.org/kvm/0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com/
-> -	 */
-> -	case VFIO_TYPE1_NESTING_IOMMU:
-> +	case __VFIO_RESERVED_TYPE1_NESTING_IOMMU:
->  		return 0;
->  
->  	/*
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 0960699e75543e..13cf6851cc2718 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -72,7 +72,6 @@ struct vfio_iommu {
->  	uint64_t		pgsize_bitmap;
->  	uint64_t		num_non_pinned_groups;
->  	bool			v2;
-> -	bool			nesting;
->  	bool			dirty_page_tracking;
->  	struct list_head	emulated_iommu_groups;
->  };
-> @@ -2199,12 +2198,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  		goto out_free_domain;
->  	}
->  
-> -	if (iommu->nesting) {
-> -		ret = iommu_enable_nesting(domain->domain);
-> -		if (ret)
-> -			goto out_domain;
-> -	}
-> -
->  	ret = iommu_attach_group(domain->domain, group->iommu_group);
->  	if (ret)
->  		goto out_domain;
-> @@ -2545,9 +2538,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
->  	switch (arg) {
->  	case VFIO_TYPE1_IOMMU:
+> +	if (smmu->features & ARM_SMMU_FEAT_S2FWB)
+> +		target->data[1] |= cpu_to_le64(STRTAB_STE_1_S2FWB);
+>  	if (smmu->features & ARM_SMMU_FEAT_ATTR_TYPES_OVR)
+>  		target->data[1] |= cpu_to_le64(FIELD_PREP(STRTAB_STE_1_SHCFG,
+>  							  STRTAB_STE_1_SHCFG_INCOMING));
+> @@ -2400,6 +2402,8 @@ static int arm_smmu_domain_finalise(struct arm_smmu_domain *smmu_domain,
+>  		pgtbl_cfg.oas = smmu->oas;
+>  		fmt = ARM_64_LPAE_S2;
+>  		finalise_stage_fn = arm_smmu_domain_finalise_s2;
+> +		if (smmu->features & ARM_SMMU_FEAT_S2FWB)
+> +			pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_ARM_S2FWB;
 >  		break;
-> -	case VFIO_TYPE1_NESTING_IOMMU:
-> -		iommu->nesting = true;
-> -		fallthrough;
-> +	case __VFIO_RESERVED_TYPE1_NESTING_IOMMU:
->  	case VFIO_TYPE1v2_IOMMU:
->  		iommu->v2 = true;
->  		break;
-> @@ -2642,7 +2633,6 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->  	switch (arg) {
->  	case VFIO_TYPE1_IOMMU:
->  	case VFIO_TYPE1v2_IOMMU:
-> -	case VFIO_TYPE1_NESTING_IOMMU:
->  	case VFIO_UNMAP_ALL:
->  		return 1;
->  	case VFIO_UPDATE_VADDR:
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index 4d47f2c3331185..15d7657509f662 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -635,7 +635,6 @@ struct iommu_ops {
->   * @enforce_cache_coherency: Prevent any kind of DMA from bypassing IOMMU_CACHE,
->   *                           including no-snoop TLPs on PCIe or other platform
->   *                           specific mechanisms.
-> - * @enable_nesting: Enable nesting
->   * @set_pgtable_quirks: Set io page table quirks (IO_PGTABLE_QUIRK_*)
->   * @free: Release the domain after use.
->   */
-> @@ -663,7 +662,6 @@ struct iommu_domain_ops {
->  				    dma_addr_t iova);
+>  	default:
+>  		return -EINVAL;
+> @@ -4189,6 +4193,8 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
 >  
->  	bool (*enforce_cache_coherency)(struct iommu_domain *domain);
-> -	int (*enable_nesting)(struct iommu_domain *domain);
->  	int (*set_pgtable_quirks)(struct iommu_domain *domain,
->  				  unsigned long quirks);
+>  	/* IDR3 */
+>  	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR3);
+> +	if (FIELD_GET(IDR3_FWB, reg))
+> +		smmu->features |= ARM_SMMU_FEAT_S2FWB;
+>  	if (FIELD_GET(IDR3_RIL, reg))
+>  		smmu->features |= ARM_SMMU_FEAT_RANGE_INV;
 >  
-> @@ -846,7 +844,6 @@ extern void iommu_group_put(struct iommu_group *group);
->  extern int iommu_group_id(struct iommu_group *group);
->  extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> index 8851a7abb5f0f3..7e8d2f36faebf3 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> @@ -55,6 +55,7 @@
+>  #define IDR1_SIDSIZE			GENMASK(5, 0)
 >  
-> -int iommu_enable_nesting(struct iommu_domain *domain);
->  int iommu_set_pgtable_quirks(struct iommu_domain *domain,
->  		unsigned long quirks);
+>  #define ARM_SMMU_IDR3			0xc
+> +#define IDR3_FWB			(1 << 8)
+>  #define IDR3_RIL			(1 << 10)
 >  
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 2b68e6cdf1902f..c8dbf8219c4fcb 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -35,7 +35,7 @@
->  #define VFIO_EEH			5
+>  #define ARM_SMMU_IDR5			0x14
+> @@ -258,6 +259,7 @@ static inline u32 arm_smmu_strtab_l2_idx(u32 sid)
+>  #define STRTAB_STE_1_S1CSH		GENMASK_ULL(7, 6)
 >  
->  /* Two-stage IOMMU */
-> -#define VFIO_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
-> +#define __VFIO_RESERVED_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
+>  #define STRTAB_STE_1_S1STALLD		(1UL << 27)
+> +#define STRTAB_STE_1_S2FWB		(1UL << 25)
 >  
->  #define VFIO_SPAPR_TCE_v2_IOMMU		7
+>  #define STRTAB_STE_1_EATS		GENMASK_ULL(29, 28)
+>  #define STRTAB_STE_1_EATS_ABT		0UL
+> @@ -700,6 +702,7 @@ struct arm_smmu_device {
+>  #define ARM_SMMU_FEAT_ATTR_TYPES_OVR	(1 << 20)
+>  #define ARM_SMMU_FEAT_HA		(1 << 21)
+>  #define ARM_SMMU_FEAT_HD		(1 << 22)
+> +#define ARM_SMMU_FEAT_S2FWB		(1 << 23)
+>  	u32				features;
 >  
+>  #define ARM_SMMU_OPT_SKIP_PREFETCH	(1 << 0)
+> diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
+> index f5d9fd1f45bf49..62bbb6037e1686 100644
+> --- a/drivers/iommu/io-pgtable-arm.c
+> +++ b/drivers/iommu/io-pgtable-arm.c
+> @@ -106,6 +106,18 @@
+>  #define ARM_LPAE_PTE_HAP_FAULT		(((arm_lpae_iopte)0) << 6)
+>  #define ARM_LPAE_PTE_HAP_READ		(((arm_lpae_iopte)1) << 6)
+>  #define ARM_LPAE_PTE_HAP_WRITE		(((arm_lpae_iopte)2) << 6)
+> +/*
+> + * For !FWB these code to:
+> + *  1111 = Normal outer write back cachable / Inner Write Back Cachable
+> + *         Permit S1 to override
+> + *  0101 = Normal Non-cachable / Inner Non-cachable
+> + *  0001 = Device / Device-nGnRE
+> + * For S2FWB these code:
+> + *  0110 Force Normal Write Back
+> + *  0101 Normal* is forced Normal-NC, Device unchanged
+> + *  0001 Force Device-nGnRE
+> + */
+> +#define ARM_LPAE_PTE_MEMATTR_FWB_WB	(((arm_lpae_iopte)0x6) << 2)
+>  #define ARM_LPAE_PTE_MEMATTR_OIWB	(((arm_lpae_iopte)0xf) << 2)
+>  #define ARM_LPAE_PTE_MEMATTR_NC		(((arm_lpae_iopte)0x5) << 2)
+>  #define ARM_LPAE_PTE_MEMATTR_DEV	(((arm_lpae_iopte)0x1) << 2)
+> @@ -458,12 +470,16 @@ static arm_lpae_iopte arm_lpae_prot_to_pte(struct arm_lpae_io_pgtable *data,
+>  	 */
+>  	if (data->iop.fmt == ARM_64_LPAE_S2 ||
+>  	    data->iop.fmt == ARM_32_LPAE_S2) {
+> -		if (prot & IOMMU_MMIO)
+> +		if (prot & IOMMU_MMIO) {
+>  			pte |= ARM_LPAE_PTE_MEMATTR_DEV;
+> -		else if (prot & IOMMU_CACHE)
+> -			pte |= ARM_LPAE_PTE_MEMATTR_OIWB;
+> -		else
+> +		} else if (prot & IOMMU_CACHE) {
+> +			if (data->iop.cfg.quirks & IO_PGTABLE_QUIRK_ARM_S2FWB)
+> +				pte |= ARM_LPAE_PTE_MEMATTR_FWB_WB;
+> +			else
+> +				pte |= ARM_LPAE_PTE_MEMATTR_OIWB;
+> +		} else {
+>  			pte |= ARM_LPAE_PTE_MEMATTR_NC;
+> +		}
+>  	} else {
+>  		if (prot & IOMMU_MMIO)
+>  			pte |= (ARM_LPAE_MAIR_ATTR_IDX_DEV
+> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
+> index f9a81761bfceda..aff9b020b6dcc7 100644
+> --- a/include/linux/io-pgtable.h
+> +++ b/include/linux/io-pgtable.h
+> @@ -87,6 +87,7 @@ struct io_pgtable_cfg {
+>  	 *	attributes set in the TCR for a non-coherent page-table walker.
+>  	 *
+>  	 * IO_PGTABLE_QUIRK_ARM_HD: Enables dirty tracking in stage 1 pagetable.
+> +	 * IO_PGTABLE_QUIRK_ARM_S2FWB: Use the FWB format for the MemAttrs bits
+>  	 */
+>  	#define IO_PGTABLE_QUIRK_ARM_NS			BIT(0)
+>  	#define IO_PGTABLE_QUIRK_NO_PERMS		BIT(1)
+> @@ -95,6 +96,7 @@ struct io_pgtable_cfg {
+>  	#define IO_PGTABLE_QUIRK_ARM_TTBR1		BIT(5)
+>  	#define IO_PGTABLE_QUIRK_ARM_OUTER_WBWA		BIT(6)
+>  	#define IO_PGTABLE_QUIRK_ARM_HD			BIT(7)
+> +	#define IO_PGTABLE_QUIRK_ARM_S2FWB		BIT(8)
+>  	unsigned long			quirks;
+>  	unsigned long			pgsize_bitmap;
+>  	unsigned int			ias;
 > -- 
 > 2.46.0
 > 
