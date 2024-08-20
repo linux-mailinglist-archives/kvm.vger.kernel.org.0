@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-24593-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24594-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B20958395
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:06:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46996958396
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA9431C21440
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:06:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F54A1C2422D
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FA018DF77;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3A518DF78;
 	Tue, 20 Aug 2024 10:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvLW+ven"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qxODEaQf"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307FB18CC11;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 338C018CC16;
 	Tue, 20 Aug 2024 10:06:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724148374; cv=none; b=kkr3SpUk5XYSPSuo4brEUWlI6Vo94beyn9NAgLXo5iAOyUn+acT4LEgz4Q99L2ClVLVjYih6RdwOg/ZAz/pDYHZp9mhTE+yyvIObQCG+HPV2P6FH2bxeCUMUlo5gj/wZ1nVjIwOc1DUHdkdpktPDpupqEapln2uI4bCXOj3iTxs=
+	t=1724148374; cv=none; b=D2QAe6/tOyV8iiVx9yz0HVX1oIUtp5iKnjoRimXKR8Fpo4AMeHyep6FSP90rhZ1wNG+iP3DZt06F6F6okYT60RYiznvk1gFJtUwyldLif0/96WXaaWYcXOga+uYy+5SvKWiP+KlO0Xo8SuYAxjqWLed2hJCzsCc/Bu1Jd97uZIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724148374; c=relaxed/simple;
-	bh=E/nM2POA+NHfwljXrvdH/h3sCeH2WrlMJBrRxe2DE3Q=;
+	bh=qHwFNQ8dKApmlAFsslahYxWMFTOJcOgUzm2R88iPdFA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=c9f5n7VbiSaCE8lS1uSy7hEI0R2sw1gsiyYyidZISIdNq+b7h0OTeiQHXJD/exuuFEVJKWigvkm60e7m2VS5oW00y9/R6NXTsumQ1YlfQEJJENZZW6Vc2PMnAi9uoI8+WcdAw6Gdu1GLtPP/3rEmHYCuYviH0G53LSaN5mKnCZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvLW+ven; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E6CDC4AF09;
+	 MIME-Version; b=mEwf5holn3D6bxNtWS73Fdag+UthJ8VdePiW01EJDSugucSRujHDAQ/tw1cxyGvYMtW6uqDp8Lo3A9D/zyH9C4ca2TuA9ZA5dVSy4Q5A4JqAbPmn2FGz8VloyygxMip/oMKXJgx7qY8Jgmd5g8lreBFfocAJEXYuKkID6tWtNHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qxODEaQf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13B08C4AF10;
 	Tue, 20 Aug 2024 10:06:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1724148374;
-	bh=E/nM2POA+NHfwljXrvdH/h3sCeH2WrlMJBrRxe2DE3Q=;
+	bh=qHwFNQ8dKApmlAFsslahYxWMFTOJcOgUzm2R88iPdFA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DvLW+venMugjBN9tE9/DVQaHmIKVBdRPqOvldK1YfJfy+l4W/U4TFGDGL8S/cHK1E
-	 5A+aTOX405kRoeL+xYLuVhmJQucnNyTa1+Z2l95BB98Tyd8XFPQVgisV202C6A4O1N
-	 rXi/acM8WkXGEjHAEmcNSIVEjH7o3G2321oa+ZESDvgOkB9Wjp/z/S7kp6Bl5g8mxM
-	 43FetMu3l98hjdjE4CpPq5SbYosLhYslPFd+KGdMbu2YgHaWnfLHOyLBfKzpmarWCt
-	 Tx/IbWoY4DdeU0O0QVWDZtl1ZWiRAPNnVmQB4d62wnrHkWW7mLRpppZjDFZchWKBFA
-	 W1R/ZYQvUhBjQ==
+	b=qxODEaQflJmqd5mLJ9uPBiR6V7mTn4FtVUMWalpsJ3wmpwOSI4MOUBiOdX/N8CRx6
+	 0DWmaHFucUXg7GaRZxpCUpyeuGshSlLTGb9sfVilsxArXa8PVhTl27q0TQQi29svGH
+	 38rTJPF3sDl2s5yoH5NYFF21XdI6DeKsssQHOrTx4E66JMYxjRO4mMVRYuleJpwh4a
+	 EraJYY4hzwW1sFCb4Q+SmEMPe404MTakZ4H2HDdPr/XeDxoIPivPRV9wrLabmnic2F
+	 H/JoD0UDK0bhIzNQRlr1C/jXHcAOkLHxGOlXdkGVlxAT+vD4LnMA8xzYJGHWn5B1NW
+	 q2dFkQifTWeiw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgLki-005Dk2-3i;
+	id 1sgLki-005Dk2-B6;
 	Tue, 20 Aug 2024 11:06:12 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -56,9 +56,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexander Potapenko <glider@google.com>
-Subject: [PATCH 06/12] KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is presented to the guest
-Date: Tue, 20 Aug 2024 11:03:43 +0100
-Message-Id: <20240820100349.3544850-7-maz@kernel.org>
+Subject: [PATCH 07/12] KVM: arm64: Add ICH_HCR_EL2 to the vcpu state
+Date: Tue, 20 Aug 2024 11:03:44 +0100
+Message-Id: <20240820100349.3544850-8-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240820100349.3544850-1-maz@kernel.org>
 References: <20240820100349.3544850-1-maz@kernel.org>
@@ -74,41 +74,41 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-In order to be consistent, we shouldn't advertise a GICv3 when none
-is actually usable by the guest.
-
-Wipe the feature when these conditions apply, and allow the field
-to be written from userspace.
+As we are about to describe the trap routing for ICH_HCR_EL2, add
+the register to the vcpu state in its VNCR form, as well as reset
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h | 2 ++
+ arch/arm64/kvm/sys_regs.c         | 2 ++
+ 2 files changed, 4 insertions(+)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a33f5996ca9f..16cd59362b3d 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -530,6 +530,8 @@ enum vcpu_sysreg {
+ 	VNCR(CNTP_CVAL_EL0),
+ 	VNCR(CNTP_CTL_EL0),
+ 
++	VNCR(ICH_HCR_EL2),
++
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
+ 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index bc2d54da3827..7d00d7e359e1 100644
+index 7d00d7e359e1..c14fea3abc1b 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2365,7 +2365,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 		   ID_AA64PFR0_EL1_MPAM |
- 		   ID_AA64PFR0_EL1_SVE |
- 		   ID_AA64PFR0_EL1_RAS |
--		   ID_AA64PFR0_EL1_GIC |
- 		   ID_AA64PFR0_EL1_AdvSIMD |
- 		   ID_AA64PFR0_EL1_FP), },
- 	ID_SANITISED(ID_AA64PFR1_EL1),
-@@ -4634,6 +4633,11 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+@@ -2797,6 +2797,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(RVBAR_EL2, access_rw, reset_val, 0),
+ 	{ SYS_DESC(SYS_RMR_EL2), trap_undef },
  
- 	guard(mutex)(&kvm->arch.config_lock);
- 
-+	if (!kvm_has_gicv3(kvm)) {
-+		kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] &= ~ID_AA64PFR0_EL1_GIC_MASK;
-+		kvm->arch.id_regs[IDREG_IDX(SYS_ID_PFR1_EL1)] &= ~ID_PFR1_EL1_GIC_MASK;
-+	}
++	EL2_REG_VNCR(ICH_HCR_EL2, reset_val, 0),
 +
- 	if (vcpu_has_nv(vcpu)) {
- 		int ret = kvm_init_nv_sysregs(kvm);
- 		if (ret)
+ 	EL2_REG(CONTEXTIDR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(TPIDR_EL2, access_rw, reset_val, 0),
+ 
 -- 
 2.39.2
 
