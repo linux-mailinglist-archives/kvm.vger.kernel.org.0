@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-24609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE849584C5
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:38:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDABF9584C6
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CE09288C25
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:38:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A054288EA5
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EB918E751;
-	Tue, 20 Aug 2024 10:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E65E18E77F;
+	Tue, 20 Aug 2024 10:38:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i3bx9JIb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vny7WfUR"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDC118E02F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9541F18E05C;
 	Tue, 20 Aug 2024 10:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724150287; cv=none; b=WUNNWmzXkGKAuZcDRw6/AhGpCht0q5+XpI9ZWu8uwGfKck2AeVtTzUxtGZ5UaCt77sU2YYwwlDJ6Nl0dARWFq5jpKISLX6QECjh5ZJSbENcQFoJSrKPaFDMlhlLSpw+CpOqS4iIPtWkfng5pGoWnFyy6BKnK1WY5nH0PC0FOzmg=
+	t=1724150287; cv=none; b=i1jrhARP3B3cSLOuGzKjMn+pYalY/MkKsHSgIbzs0fck3jUQkfbsAhMgNiOZq3iiSA0TOEdBR1AfuN/2tdQCWNpxl3pjzDFG8KcbtJEqaWxMDLWxsk7dXKxdcfIWNkkAkBPaicw6TDQZpdbCQDGzo3mGb3loWlB2oEsLjWvT0zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724150287; c=relaxed/simple;
-	bh=ijjHGJ58g2jOZfzq/14I14N79CDn4u/DA0ZZETz1D/Q=;
+	bh=ieTMTaAqPI0uXqUb/t7GfVXDy9HiKnxjPwOFgy9V0hk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FEnJUNeLVrdo7EkM/zpM61lEZH4W88JG/qr5v7weQVTr2sVaFXWWzBQTvQMzBA8SFFtlaI5Bmu3nlkYMULyElDJjasR5N3Nfv69MSilU5E/WCGWur9KVbXQjjKfoqw//ZtS1MWlpBzGi5Q6ibpjo3rfI7KF3w4YDq3FHezfiGLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i3bx9JIb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5B46C4AF17;
-	Tue, 20 Aug 2024 10:38:06 +0000 (UTC)
+	 MIME-Version; b=ruoFntL37XOp3/oiGEwwd0ZaEUeMXA7GQ0xHRX5LfVPHYzC2zzUbeAi/zFjPxHxaAO+rZW2Ft7T32AEgaNAQpUG3pGeVOr3RmOIKWH5df+ei7T2cxy3pGIRQ8l+GMlOAGUDoBKgfhtlERGxfWcQcQMv+cN8/VteqasdNxlaaSTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vny7WfUR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25174C4AF09;
+	Tue, 20 Aug 2024 10:38:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724150286;
-	bh=ijjHGJ58g2jOZfzq/14I14N79CDn4u/DA0ZZETz1D/Q=;
+	s=k20201202; t=1724150287;
+	bh=ieTMTaAqPI0uXqUb/t7GfVXDy9HiKnxjPwOFgy9V0hk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=i3bx9JIb3niMu7HmT8FqYJphgZitkVN2CcSoLBsb5r4TWNUnKUt+98dm3Hkse++wn
-	 5AU+HuIaUwH5ekqW+tucvbO47Abb9AAZLTvQUZy9/C00/aYmYuIZugPLUwPaaZVM4E
-	 /U2DmVNRGNJ4L4RPKHeNSgTjcf5juQsmAK/F1FpkQeemujrevM8GxsYP8js+cux/p5
-	 DwyblbL7rj4vrrvEIibFTCNPom09h4GhFPvClMzi57daRO42/M7x+q5wEbwS60WUt4
-	 vMggqbezwLPLTEt+pTn0be6J100PRUmoB8285zt6LwRLzCGmYeQTEkUrEDHBHwgqK/
-	 6mfBQ08R1FGtA==
+	b=Vny7WfURgQ1Kj9VJ4wCld+AEP73hHwTSWDNMhPfUUHW2aww+7n7JmnvvzY8lt4JCF
+	 9Zqw6Yve/WYuOdGiXIO8+seGBoJP1vuxfj//Bm2gYluRBKs5OIVlL+6rr+vmGlgjdy
+	 1YEFTxFW+LtbNb4s5vz5kH7IuBrbXTvwLR3/qiLRPNJugwCr71shb+iAmUo7A/v9qh
+	 7qejrvKA77vVCkbvA6+mqHJqvu3zX/ERr+uMKVAykbKPEfbA3mB8IwExNtoVm8yW0m
+	 4IO74ROpkvO8eyOkaBLjlT1Pno8amXveLc8+IgCeTgThRUgNryHrQ+7iu7SjfgPUN4
+	 CJzEzP6JWtNoA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgMFZ-005Ea3-6V;
+	id 1sgMFZ-005Ea3-Cp;
 	Tue, 20 Aug 2024 11:38:05 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -59,9 +59,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v4 06/18] KVM: arm64: nv: Enforce S2 alignment when contiguous bit is set
-Date: Tue, 20 Aug 2024 11:37:44 +0100
-Message-Id: <20240820103756.3545976-7-maz@kernel.org>
+Subject: [PATCH v4 07/18] KVM: arm64: nv: Turn upper_attr for S2 walk into the full descriptor
+Date: Tue, 20 Aug 2024 11:37:45 +0100
+Message-Id: <20240820103756.3545976-8-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240820103756.3545976-1-maz@kernel.org>
 References: <20240820103756.3545976-1-maz@kernel.org>
@@ -77,76 +77,94 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Despite KVM not using the contiguous bit for anything related to
-TLBs, the spec does require that the alignment defined by the
-contiguous bit for the page size and the level is enforced.
+The upper_attr attribute has been badly named, as it most of the
+time carries the full "last walked descriptor".
 
-Add the required checks to offset the point where PA and VA merge.
+Rename it to "desc" and make ti contain the full 64bit descriptor.
+This will be used by the S1 PTW.
 
-Fixes: 61e30b9eef7f ("KVM: arm64: nv: Implement nested Stage-2 page table walk logic")
-Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 22 ++++++++++++++++++++++
- arch/arm64/kvm/nested.c             |  7 ++-----
- 2 files changed, 24 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  4 ++--
+ arch/arm64/kvm/nested.c             | 12 ++++++------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 5b06c31035a2..6e163501f13e 100644
+index 6e163501f13e..43e531c67311 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -205,4 +205,26 @@ static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
- 	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
+@@ -85,7 +85,7 @@ struct kvm_s2_trans {
+ 	bool readable;
+ 	int level;
+ 	u32 esr;
+-	u64 upper_attr;
++	u64 desc;
+ };
+ 
+ static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
+@@ -115,7 +115,7 @@ static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
+ 
+ static inline bool kvm_s2_trans_executable(struct kvm_s2_trans *trans)
+ {
+-	return !(trans->upper_attr & BIT(54));
++	return !(trans->desc & BIT(54));
  }
  
-+/* Adjust alignment for the contiguous bit as per StageOA() */
-+#define contiguous_bit_shift(d, wi, l)					\
-+	({								\
-+		u8 shift = 0;						\
-+									\
-+		if ((d) & PTE_CONT) {					\
-+			switch (BIT((wi)->pgshift)) {			\
-+			case SZ_4K:					\
-+				shift = 4;				\
-+				break;					\
-+			case SZ_16K:					\
-+				shift = (l) == 2 ? 5 : 7;		\
-+				break;					\
-+			case SZ_64K:					\
-+				shift = 5;				\
-+				break;					\
-+			}						\
-+		}							\
-+									\
-+		shift;							\
-+	})
-+
- #endif /* __ARM64_KVM_NESTED_H */
+ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index de789e0f1ae9..49a7832a3fb1 100644
+index 49a7832a3fb1..234d0f6006c6 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -282,11 +282,6 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
+@@ -256,7 +256,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
+ 		/* Check for valid descriptor at this point */
+ 		if (!(desc & 1) || ((desc & 3) == 1 && level == 3)) {
+ 			out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
+-			out->upper_attr = desc;
++			out->desc = desc;
+ 			return 1;
+ 		}
+ 
+@@ -266,7 +266,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
+ 
+ 		if (check_output_size(wi, desc)) {
+ 			out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
+-			out->upper_attr = desc;
++			out->desc = desc;
+ 			return 1;
+ 		}
+ 
+@@ -278,19 +278,19 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
+ 
+ 	if (level < first_block_level) {
+ 		out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
+-		out->upper_attr = desc;
++		out->desc = desc;
  		return 1;
  	}
  
--	/*
--	 * We don't use the contiguous bit in the stage-2 ptes, so skip check
--	 * for misprogramming of the contiguous bit.
--	 */
--
  	if (check_output_size(wi, desc)) {
  		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
- 		out->upper_attr = desc;
-@@ -299,6 +294,8 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
+-		out->upper_attr = desc;
++		out->desc = desc;
  		return 1;
  	}
  
-+	addr_bottom += contiguous_bit_shift(desc, wi, level);
-+
- 	/* Calculate and return the result */
- 	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
- 		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
+ 	if (!(desc & BIT(10))) {
+ 		out->esr = compute_fsc(level, ESR_ELx_FSC_ACCESS);
+-		out->upper_attr = desc;
++		out->desc = desc;
+ 		return 1;
+ 	}
+ 
+@@ -304,7 +304,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
+ 	out->readable = desc & (0b01 << 6);
+ 	out->writable = desc & (0b10 << 6);
+ 	out->level = level;
+-	out->upper_attr = desc & GENMASK_ULL(63, 52);
++	out->desc = desc;
+ 	return 0;
+ }
+ 
 -- 
 2.39.2
 
