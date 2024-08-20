@@ -1,142 +1,187 @@
-Return-Path: <kvm+bounces-24569-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24570-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F26957CC0
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 07:32:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0F7B957CD2
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 07:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8887C284B7E
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 05:32:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9681D1F22A3D
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 05:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F8B1459F6;
-	Tue, 20 Aug 2024 05:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A3A148FF7;
+	Tue, 20 Aug 2024 05:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hIxa1VWY"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="gFVG8xrE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B63E1862;
-	Tue, 20 Aug 2024 05:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCB11465AB
+	for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 05:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724131957; cv=none; b=IBis/cjSm5PdJHTPZEe0AOYHWh/pGsv1zko+GwH4lttXt6E7/AIRXzoSk6JUseuOtn9unD8HmHUV0juRFNS2N2y80SZKz0FVO3aMpGkJILLtFM4JCErkr7A4PKPP9YHDV8uk6Kw3R2FBJNUKAi7DoPd5khcH52dZ4dx9BDbLSjA=
+	t=1724132412; cv=none; b=WKA6IScu3N0vDDgD/D/JN8Sr4ucR01cnvFSxeWwEXqflCCeJ0oXqiCkecNvb/SKL7SHvKMQe7+j5erkLjxZRWdndhY6tNFaFkJ93e2++qOkHG6eKSCoUSE09V5e8BG9mPBoad4CWrfYNq5wVQ+VUHD03PurpUaO3uGMdj4gftBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724131957; c=relaxed/simple;
-	bh=fzafTY+hMgu+Mmsh1SAc4j1kBbrC7lh0Ogb3zZdXivc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e9v9ZrGutDv+Weuwi6kaeQjWuA701EiV/pZTPNV0/MT6KxtTG04we7GlnZI7xfAtQ9+pGvfAd64Nnp5QJMi37A7StpSN/CDzzhdIIaK8mPVajfC4Hm6mWwvyMCGiQvZ6bXe6AZnRkhB53n1QIoxoQNOdrQMR+KU8cqBdadPSzUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hIxa1VWY; arc=none smtp.client-ip=209.85.217.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-49294bbd279so1847775137.0;
-        Mon, 19 Aug 2024 22:32:36 -0700 (PDT)
+	s=arc-20240116; t=1724132412; c=relaxed/simple;
+	bh=TmqSlHuNCG5BV6PO8p+ZMn3NpnE2nRZLHMMy9H1K7fk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UFAcYBXsxfBoe7yu+Gx8JqWuLsaZORsNRXaN+gLqg+hYiBY/BF/GMqTxsCwEGlxGbb8I0fAeCSWXtl2yVj11ScUBJnx9RJrq2jqhMnk5kfhGxtvtBMdJaYOG0/gjYXxRsP+R8Hvps0OkILyqZkkJXaLhpoRGogkagoEf/rwABgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=gFVG8xrE; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-39d22965434so13436465ab.0
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 22:40:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724131955; x=1724736755; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=i6QfqVruNv0KeYjR1T2Xi8sKHkpHxg8Q0ePcqumb5I0=;
-        b=hIxa1VWYHH0mgxTWHzxLCVhDir30qLsZ/yQQ0NnpDCzbXTJ66sDpruAgp/zxqX/D4s
-         kCZsz2a/eqomc6cbXYkLV1tCLMhBW9LNDJY+ko3KOUfsVj1Mt1Jr66qhC/wsoZd/e9dk
-         1IJUhG+an3ijLCBmrfYRQw9FHN2H9YuMNigpNWvKMfrg46q/9hyjKk3/UMbACV3sEV+z
-         TExEEHyC9xOjjIPeDJ3GiZsz53WEhp20MO2B+s8qnni/ds8EyYK54wneBkOiXCK6qTpl
-         G9HEoa5c1RJ3Ua9bTQd7xRMTMtnxezXIAXzDNvwCXJm1GLIpa1aMZQnOY3daqtWpPvx+
-         s7Ug==
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1724132409; x=1724737209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AHUnwVKAbv6cDNfDJWpm3qE8ItdHvxgE8FlI7r00tew=;
+        b=gFVG8xrEjeQCmRMtF/Q2cYebg48eFQHCSYbVK2kFYGJ3hEq7kL7EnB+bCZDUcO08Dz
+         0hzn3LhBRq0lRDdMfrQeBS71GGSuoVJSCMnI3W1E7OjkRi0qeldtENZt6M+zPhRcPnev
+         jh/foYWKw2LLyS0L+Bx6RE87P2RTl1BzgqIcPF12R3VZZndIkURHMwPz7i72ir6CTWVW
+         LY4MGlBp9gNQC6Zdn7Ar2L8UhKqiTBALbl7pTux4mNd/nij17qXV+OWsvk2PYdUsSYoE
+         /nfzUtAE8qYMdjJzqXndAlLj6nSQxMPWpvmc5wkRnVgcpypUul2lCJ/RzAb8XCr54drH
+         F49w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724131955; x=1724736755;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=i6QfqVruNv0KeYjR1T2Xi8sKHkpHxg8Q0ePcqumb5I0=;
-        b=C5KllHDkwBjsM1PrqjivsZnmZP2+R8NcyNjO3j4k2gQzlKvaDXZ+BoAwsZT4r1asrw
-         oE+/uxG4EUGeWeL5lMAyJSVPZkYXRyDf3Rh16QP37jIZvXjYAxpcH7AnoIOK5qkZzVs1
-         cvd2fvNV2Ut23jizs6Z2jLifdh8j6kTL06RjrbAg34t+40IBCjTGlJ9ugq0NGwpIFa+q
-         0xYWvp4vdvSkt5cIQHCO08qF16ZNMmLvEHiTb56mzEgy0sv3TW2rWHWLXORxBTWh/GtH
-         zS3PPV6SYqgu+5k1Ij271bdSm6FEA8xvV06iFsiMG9DFau+ezLL+FwWOz3Z7fPq3C9BT
-         Ewew==
-X-Forwarded-Encrypted: i=1; AJvYcCVt7cy6vzU5ZwhJ+nuVNlxaQjLOo9caREMxBRmOKeVYUl1Z2qRLLOIIm/HZj1j5oIfnYI3rITKjqCf6IwVoq6TINcEeaTvT1GnjaOCjBMnoNY6fIRajp8/x4upMLuaef8ff
-X-Gm-Message-State: AOJu0YxLsa1lBUJh47LGnNhRHheI52VrO7VyGEtdmSxG+CvZcbI90ezo
-	/+pL6irvWHdS6ag+NqCtUSuYYuN7NFNRjkPAM+Gh68zZd9OiMDeXp8YvPuHkqro=
-X-Google-Smtp-Source: AGHT+IFJDEiZQFdQnB6vuxIC34BX3BZcDCcfpLYE+XFHrNvR7Th7DV+B5/CHTpV28VWGDBTQx21Scw==
-X-Received: by 2002:a05:6102:3ece:b0:493:b9f8:82f2 with SMTP id ada2fe7eead31-497799e4d64mr15948858137.25.1724131954628;
-        Mon, 19 Aug 2024 22:32:34 -0700 (PDT)
-Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-842fb9c6015sm1431092241.26.2024.08.19.22.32.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 22:32:34 -0700 (PDT)
-From: David Hunter <david.hunter.linux@gmail.com>
-To: stable@vger.kernel.org
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	javier.carrasco.cruz@gmail.com,
-	shuah@kernel.org,
-	David Hunter <david.hunter.linux@gmail.com>,
-	Peter Shier <pshier@google.com>,
-	Jim Mattson <jmattson@google.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH 6.1.y] KVM: x86: fire timer when it is migrated and expired, and in oneshot mode
-Date: Tue, 20 Aug 2024 01:32:29 -0400
-Message-ID: <20240820053229.2858-1-david.hunter.linux@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1724132409; x=1724737209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AHUnwVKAbv6cDNfDJWpm3qE8ItdHvxgE8FlI7r00tew=;
+        b=L5BGq8xpl+YnAEeotEdzXMemLAA9KXZv0kwksmrFTkZp7UWvI51itd0seT9SN+4sbE
+         UReJjoY8XTlhE9BFA9pDRaktSrfGgVZS1X0PPfhbATC89YLt2MNp3Gf6Yk3sRVYIM0I5
+         Ihk34lKBZ3mKO+Dxj0tzxrJFDVEsBWIpCptaZtiVzssE9HNHSG/qhn626BcMrzARiIhP
+         7ymh9eJlO+i9bjQQBA07qud2Yu6rT9cQ7pG6BKqPqhpZlz1Vq8tj8wYjRdrNVS5MToo9
+         h7r2aZxJr1q3L4L0mahFhWnZlz0pfEGlh1GbEihFJm1Xc1zZLoRhJPi2kMw7uSA33Nqt
+         PTZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVNkAVVYu/Tdii8HWD2SaJmJto8MyaL0C7UCC0VZhnGYXGzLuvNYSkGRM4aRWNXXWmrs5piluzGtQWq22ZhunYa/V8O
+X-Gm-Message-State: AOJu0YxNbSMRGPNOOCyy7jR6m8REDWsS7fbLSykgxMgYni2IhE+JbbfD
+	tX7kjqocjZDGNICjuw2mUdqZRY1AnnWHBmLJ1um5n36mRZUb5TOlfItro5YJAUmuo3kGW9rxF4H
+	W+Kbg94CDX6jorXhEwfyjBiqth9TjIOtXiXxg6A==
+X-Google-Smtp-Source: AGHT+IE40VLUA+0xzyRlFpDTLoBgS8NtqsfjjIDibE9AsUZhr1cOV4VV1OW1QVjrbj6XPgBas9HhL/Y6bqd46Rnlx14=
+X-Received: by 2002:a05:6e02:19c9:b0:39b:3724:6038 with SMTP id
+ e9e14a558f8ab-39d56f87e9emr18824685ab.14.1724132408705; Mon, 19 Aug 2024
+ 22:40:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240815170907.2792229-1-apatel@ventanamicro.com>
+In-Reply-To: <20240815170907.2792229-1-apatel@ventanamicro.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 20 Aug 2024 11:09:57 +0530
+Message-ID: <CAAhSdy0x8X8cuXe+zYKmUousr4cCHUZPb1gL=go28U_6LKK-dg@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: KVM: Don't zero-out PMU snapshot area before
+ freeing data
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Atish Patra <atishp@atishpatra.org>, Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Li RongQing <lirongqing@baidu.com>
+On Thu, Aug 15, 2024 at 10:39=E2=80=AFPM Anup Patel <apatel@ventanamicro.co=
+m> wrote:
+>
+> With the latest Linux-6.11-rc3, the below NULL pointer crash is observed
+> when SBI PMU snapshot is enabled for the guest and the guest is forcefull=
+y
+> powered-off.
+>
+>   Unable to handle kernel NULL pointer dereference at virtual address 000=
+0000000000508
+>   Oops [#1]
+>   Modules linked in: kvm
+>   CPU: 0 UID: 0 PID: 61 Comm: term-poll Not tainted 6.11.0-rc3-00018-g44d=
+7178dd77a #3
+>   Hardware name: riscv-virtio,qemu (DT)
+>   epc : __kvm_write_guest_page+0x94/0xa6 [kvm]
+>    ra : __kvm_write_guest_page+0x54/0xa6 [kvm]
+>   epc : ffffffff01590e98 ra : ffffffff01590e58 sp : ffff8f80001f39b0
+>    gp : ffffffff81512a60 tp : ffffaf80024872c0 t0 : ffffaf800247e000
+>    t1 : 00000000000007e0 t2 : 0000000000000000 s0 : ffff8f80001f39f0
+>    s1 : 00007fff89ac4000 a0 : ffffffff015dd7e8 a1 : 0000000000000086
+>    a2 : 0000000000000000 a3 : ffffaf8000000000 a4 : ffffaf80024882c0
+>    a5 : 0000000000000000 a6 : ffffaf800328d780 a7 : 00000000000001cc
+>    s2 : ffffaf800197bd00 s3 : 00000000000828c4 s4 : ffffaf800248c000
+>    s5 : ffffaf800247d000 s6 : 0000000000001000 s7 : 0000000000001000
+>    s8 : 0000000000000000 s9 : 00007fff861fd500 s10: 0000000000000001
+>    s11: 0000000000800000 t3 : 00000000000004d3 t4 : 00000000000004d3
+>    t5 : ffffffff814126e0 t6 : ffffffff81412700
+>   status: 0000000200000120 badaddr: 0000000000000508 cause: 0000000000000=
+00d
+>   [<ffffffff01590e98>] __kvm_write_guest_page+0x94/0xa6 [kvm]
+>   [<ffffffff015943a6>] kvm_vcpu_write_guest+0x56/0x90 [kvm]
+>   [<ffffffff015a175c>] kvm_pmu_clear_snapshot_area+0x42/0x7e [kvm]
+>   [<ffffffff015a1972>] kvm_riscv_vcpu_pmu_deinit.part.0+0xe0/0x14e [kvm]
+>   [<ffffffff015a2ad0>] kvm_riscv_vcpu_pmu_deinit+0x1a/0x24 [kvm]
+>   [<ffffffff0159b344>] kvm_arch_vcpu_destroy+0x28/0x4c [kvm]
+>   [<ffffffff0158e420>] kvm_destroy_vcpus+0x5a/0xda [kvm]
+>   [<ffffffff0159930c>] kvm_arch_destroy_vm+0x14/0x28 [kvm]
+>   [<ffffffff01593260>] kvm_destroy_vm+0x168/0x2a0 [kvm]
+>   [<ffffffff015933d4>] kvm_put_kvm+0x3c/0x58 [kvm]
+>   [<ffffffff01593412>] kvm_vm_release+0x22/0x2e [kvm]
+>
+> Clearly, the kvm_vcpu_write_guest() function is crashing because it is
+> being called from kvm_pmu_clear_snapshot_area() upon guest tear down.
+>
+> To address the above issue, simplify the kvm_pmu_clear_snapshot_area() to
+> not zero-out PMU snapshot area from kvm_pmu_clear_snapshot_area() because
+> the guest is anyway being tore down.
+>
+> The kvm_pmu_clear_snapshot_area() is also called when guest changes
+> PMU snapshot area of a VCPU but even in this case the previous PMU
+> snaphsot area must not be zeroed-out because the guest might have
+> reclaimed the pervious PMU snapshot area for some other purpose.
+>
+> Fixes: c2f41ddbcdd7 ("RISC-V: KVM: Implement SBI PMU Snapshot feature")
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 
-[ Upstream Commit 8e6ed96cdd5001c55fccc80a17f651741c1ca7d2]
+Queued this patch for Linux-6.11 fixes.
 
-when the vCPU was migrated, if its timer is expired, KVM _should_ fire
-the timer ASAP, zeroing the deadline here will cause the timer to
-immediately fire on the destination
+Regards,
+Anup
 
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Peter Shier <pshier@google.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
-Link: https://lore.kernel.org/r/20230106040625.8404-1-lirongqing@baidu.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-(cherry picked from commit 8e6ed96cdd5001c55fccc80a17f651741c1ca7d2)
-The code was able to compile without errors or warnings. 
-Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
----
- arch/x86/kvm/lapic.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index c90fef0258c5..3cd590ace95a 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1843,8 +1843,12 @@ static bool set_target_expiration(struct kvm_lapic *apic, u32 count_reg)
- 		if (unlikely(count_reg != APIC_TMICT)) {
- 			deadline = tmict_to_ns(apic,
- 				     kvm_lapic_get_reg(apic, count_reg));
--			if (unlikely(deadline <= 0))
--				deadline = apic->lapic_timer.period;
-+			if (unlikely(deadline <= 0)) {
-+				if (apic_lvtt_period(apic))
-+					deadline = apic->lapic_timer.period;
-+				else
-+					deadline = 0;
-+			}
- 			else if (unlikely(deadline > apic->lapic_timer.period)) {
- 				pr_info_ratelimited(
- 				    "kvm: vcpu %i: requested lapic timer restore with "
--- 
-2.43.0
-
+> ---
+>  arch/riscv/kvm/vcpu_pmu.c | 14 ++------------
+>  1 file changed, 2 insertions(+), 12 deletions(-)
+>
+> diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
+> index bcf41d6e0df0..2707a51b082c 100644
+> --- a/arch/riscv/kvm/vcpu_pmu.c
+> +++ b/arch/riscv/kvm/vcpu_pmu.c
+> @@ -391,19 +391,9 @@ int kvm_riscv_vcpu_pmu_read_hpm(struct kvm_vcpu *vcp=
+u, unsigned int csr_num,
+>  static void kvm_pmu_clear_snapshot_area(struct kvm_vcpu *vcpu)
+>  {
+>         struct kvm_pmu *kvpmu =3D vcpu_to_pmu(vcpu);
+> -       int snapshot_area_size =3D sizeof(struct riscv_pmu_snapshot_data)=
+;
+>
+> -       if (kvpmu->sdata) {
+> -               if (kvpmu->snapshot_addr !=3D INVALID_GPA) {
+> -                       memset(kvpmu->sdata, 0, snapshot_area_size);
+> -                       kvm_vcpu_write_guest(vcpu, kvpmu->snapshot_addr,
+> -                                            kvpmu->sdata, snapshot_area_=
+size);
+> -               } else {
+> -                       pr_warn("snapshot address invalid\n");
+> -               }
+> -               kfree(kvpmu->sdata);
+> -               kvpmu->sdata =3D NULL;
+> -       }
+> +       kfree(kvpmu->sdata);
+> +       kvpmu->sdata =3D NULL;
+>         kvpmu->snapshot_addr =3D INVALID_GPA;
+>  }
+>
+> --
+> 2.34.1
+>
 
