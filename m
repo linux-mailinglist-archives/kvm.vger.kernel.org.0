@@ -1,203 +1,135 @@
-Return-Path: <kvm+bounces-24627-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24628-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71E4D958793
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 15:07:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC999587B2
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 15:18:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95E9C1C21C4E
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 13:07:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D2CF283ABD
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 13:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD2D19047D;
-	Tue, 20 Aug 2024 13:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79904190675;
+	Tue, 20 Aug 2024 13:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gYjJQoS/"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B06189F5A;
-	Tue, 20 Aug 2024 13:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A55318CC08;
+	Tue, 20 Aug 2024 13:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724159255; cv=none; b=uQYudh7Bguee8hUSBHnhm/7P3I9DeENFq1FCG6YapKw+pKoCdBja2OqDtZuauWRcU4hEqJ6nP9QzGHq9UzQpXTmWKA7oadxVZTN3c8gGmEpWpOjhjNsVBkl+eUle5A1QOMSjbP3lhr3kBWNae9WSoXbw1ORr2Zg7DQWn6oYZfbA=
+	t=1724159888; cv=none; b=rUnV0jeMQ0SToxkXKe+Bh/tXv9Qqw1fkQ1AisEzcEKHmSSv7435e4nGQrfeYaHX3seNZkCJlR9EkQgLOI/lm9AIPjoWsnem6JecAR3F0zZtDf0JDKFZPRGeegnS9TiVyxTQVYHVPpMJGE753ZD3+4rh8ZFIJvs8IEJxSkHT5nho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724159255; c=relaxed/simple;
-	bh=JO6RWeMlWaObYRyseZlU/Pqn9dKedWmcF4CIwKnCdJ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=pGOusUpPe+QO4Gc8MDgqPcxHv62SyKw0M6vq/AJn9hh6UopFtbUXLcFps6wa6l3u2oCSxFzqLwd/w0XRs256MjOi7GzAtsRvw61yPZdBvl65mTSWlB36SU0Nqrp5lTA3fj4d1iwkd5kG+3iVgVS4TyplHWZFJzN1SOdcYhCj/40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Wp8rD3W5wzyR2p;
-	Tue, 20 Aug 2024 21:07:08 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1EF6B140138;
-	Tue, 20 Aug 2024 21:07:30 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 20 Aug 2024 21:07:29 +0800
-Message-ID: <98ceade3-8d60-45bf-a419-ff3982a96101@huawei.com>
-Date: Tue, 20 Aug 2024 21:07:29 +0800
+	s=arc-20240116; t=1724159888; c=relaxed/simple;
+	bh=w66lr3+fWgepBhO+Q8813/VtQfHj20xrCsLXmI3bW6M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Vf+BRLAhEDTtEAAxEufmEDhuDcNn6EApQlExH1dMM+09PS7DUzsifeGcqYluwOs7UYPGvch2+BVAg9cHWCIvH7wKobImW2fzDePqZ8rd+HwujethjuTV5NPquaYH+wxh7OHt5IzvlvFZmzflOZnl6uWI5iN49WjeIDvn4uj7oQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gYjJQoS/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02C9AC4AF10;
+	Tue, 20 Aug 2024 13:18:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724159888;
+	bh=w66lr3+fWgepBhO+Q8813/VtQfHj20xrCsLXmI3bW6M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gYjJQoS/JlQ57qP/qoqHQrvHgHuROkqDRoZLKpK5ymiqdRO8TrybmbFgITU1R48bX
+	 RnUCq15ehC2D1VHfL3QlGS1M+8f0cj4tN2h0Uf1zBLEFHYVw6QWd2A1YVJNtJvn9m3
+	 l3GJrswoIO26nqN/Xe6ZiHbfB0A2ix3qXMzGxB8psqHvqoSuFgkXnuARDtitLGJ96+
+	 +rCEmOJd0xI/Z+9l0e6gHScBpVHZlaTFcy365K9GupYey9qae4GFATlRMmJDoH77Yy
+	 h1p3uVBgO3LygW09xvIwkQaCBwWitUMqmwxecIvpi/cx+8TawvxU9misNXUs+OuTl3
+	 degyNHG4XA1pw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sgOkP-005HMQ-Qf;
+	Tue, 20 Aug 2024 14:18:05 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 0/8] KVM: arm64: Add support for FP8
+Date: Tue, 20 Aug 2024 14:17:54 +0100
+Message-Id: <20240820131802.3547589-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Subbaraya Sundeep
-	<sbhatta@marvell.com>, Chuck Lever <chuck.lever@oracle.com>, Sagi Grimberg
-	<sagi@grimberg.me>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
-	<hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga
- Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-References: <20240808123714.462740-1-linyunsheng@huawei.com>
- <20240808123714.462740-5-linyunsheng@huawei.com>
- <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
- <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com>
- <CAKgT0Uct5ptfs9ZEoe-9u-fOVz4HLf+5MS-YidKV+xELCBHKNw@mail.gmail.com>
- <3e069c81-a728-4d72-a5bb-3be00d182107@huawei.com>
- <CAKgT0UcDDFeMqD_eRe1-2Og0GEEFyNP90E9SDxDjskdgtMe0Uw@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0UcDDFeMqD_eRe1-2Og0GEEFyNP90E9SDxDjskdgtMe0Uw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2024/8/19 23:54, Alexander Duyck wrote:
+Although FP8 support was merged in 6.9, the KVM side was dropped, with
+no sign of it being picked up again. Given that its absence is getting
+in the way of NV upstreaming (HCRX_EL2 needs fleshing out), here's a
+small series addressing it.
 
-...
+The support is following the save/restore model established for the
+rest of the FP code, with FPMR being tied to it. The sole additions
+are the handling of traps in a nested context, and the corresponding
+ID registers being made writable. As an extra cleanup, SVCR and FPMR
+are moved into the sysreg array.
 
->>>>
->>>> "There are three types of API as proposed in this patchset instead of
->>>> two types of API:
->>>> 1. page_frag_alloc_va() returns [va].
->>>> 2. page_frag_alloc_pg() returns [page, offset].
->>>> 3. page_frag_alloc() returns [va] & [page, offset].
->>>>
->>>> You seemed to miss that we need a third naming for the type 3 API.
->>>> Do you see type 3 API as a valid API? if yes, what naming are you
->>>> suggesting for it? if no, why it is not a valid API?"
->>>
->>> I didn't. I just don't see the point in pushing out the existing API
->>> to support that. In reality 2 and 3 are redundant. You probably only
->>> need 3. Like I mentioned earlier you can essentially just pass a
->>
->> If the caller just expect [page, offset], do you expect the caller also
->> type 3 API, which return both [va] and [page, offset]?
->>
->> I am not sure if I understand why you think 2 and 3 are redundant here?
->> If you think 2 and 3 are redundant here, aren't 1 and 3 also redundant
->> as the similar agrument?
-> 
-> The big difference is the need to return page and offset. Basically to
-> support returning page and offset you need to pass at least one value
-> as a pointer so you can store the return there.
-> 
-> The reason why 3 is just a redundant form of 2 is that you will
-> normally just be converting from a va to a page and offset so the va
-> should already be easily accessible.
+Patches are on top of v6.11-rc1. Note that this is compile-tested
+only, as I have no access to FP8 HW or model (and running NV in a
+model is not something I wish to entertain ever again).
 
-I am assuming that by 'easily accessible', you meant the 'va' can be
-calculated as below, right?
+* From v3 [3]
 
-va = encoded_page_address(encoded_va) +
-		(page_frag_cache_page_size(encoded_va) - remaining);
+  - Simplify handling of SYS_ID_AA64PFR2_EL1
 
-I guess it is easily accessible, but it is not without some overhead
-to calculate the 'va' here.
+* From v2 [2]
 
-> 
->>> page_frag via pointer to the function. With that you could also look
->>> at just returning a virtual address as well if you insist on having
->>> something that returns all of the above. No point in having 2 and 3 be
->>> seperate functions.
->>
->> Let's be more specific about what are your suggestion here: which way
->> is the prefer way to return the virtual address. It seems there are two
->> options:
->>
->> 1. Return the virtual address by function returning as below:
->> void *page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio);
->>
->> 2. Return the virtual address by double pointer as below:
->> int page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio,
->>                         void **va);
-> 
-> I was thinking more of option 1. Basically this is a superset of
-> page_frag_alloc_va that is also returning the page and offset via a
-> page frag. However instead of bio_vec I would be good with "struct
-> page_frag *" being the value passed to the function to play the role
-> of container. Basically the big difference between 1 and 2/3 if I am
-> not mistaken is the fact that for 1 you pass the size, whereas with
-> 2/3 you are peeling off the page frag from the larger page frag cache
+  - Add missing kern_hyp_va() when dereferencing vcpu->kvm on nVHE
+    setups
 
-Let's be clear here: The callers just expecting [page, offset] also need
-to call type 3 API, which return both [va] and [page, offset]? and it
-is ok to ignore the overhead of calculating the 'va' for those kinds
-of callers just because we don't want to do the renaming for a existing
-API and can't come up with good naming for that?
+* From v1 [1]
 
-> after the fact via a commit type action.
+  - Correctly save/restore the guest state (duh), including pKVM
+    (double duh)
 
-Just be clear here, there is no commit type action for some subtype of
-type 2/3 API.
+  - Add a predicate for FPMR support in a VM, as this gets used more
+    than twice...
 
-For example, for type 2 API in this patchset, it has below subtypes:
+[1] https://lore.kernel.org/r/20240708154438.1218186-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20240708154438.1218186-1-maz@kernel.org
+[3] https://lore.kernel.org/r/20240813104400.1956132-1-maz@kernel.org
 
-subtype 1: it does not need a commit type action, it just return
-           [page, offset] instead of page_frag_alloc_va() returning [va],
-           and it does not return the allocated fragsz back to the caller
-           as page_frag_alloc_va() does not too:
-struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
-                                unsigned int *offset, unsigned int fragsz,
-                                gfp_t gfp)
+Marc Zyngier (8):
+  KVM: arm64: Move SVCR into the sysreg array
+  KVM: arm64: Add predicate for FPMR support in a VM
+  KVM: arm64: Move FPMR into the sysreg array
+  KVM: arm64: Add save/restore support for FPMR
+  KVM: arm64: Honor trap routing for FPMR
+  KVM: arm64: Expose ID_AA64FPFR0_EL1 as a writable ID reg
+  KVM: arm64: Enable FP8 support when available and configured
+  KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
 
-subtype 2: it does need a commit type action, and @fragsz is returned to
-           the caller and caller used that to commit how much fragsz to
-           commit.
-struct page *page_frag_alloc_pg_prepare(struct page_frag_cache *nc,
-                                        unsigned int *offset,
-                                        unsigned int *fragsz, gfp_t gfp)
+ arch/arm64/include/asm/kvm_host.h       | 20 ++++++++++++++--
+ arch/arm64/kvm/emulate-nested.c         |  8 +++++++
+ arch/arm64/kvm/fpsimd.c                 |  5 ++--
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  3 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  9 +++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  9 +++++++
+ arch/arm64/kvm/hyp/vhe/switch.c         |  3 +++
+ arch/arm64/kvm/sys_regs.c               | 32 ++++++++++++++++++++++---
+ 8 files changed, 82 insertions(+), 7 deletions(-)
 
-Do you see subtype 1 as valid API? If no, why?
-If yes, do you also expect the caller to use "struct page_frag *" as the
-container? If yes, what is the caller expected to do with the size field in
-"struct page_frag *" from API perspective? Just ignore it?
+-- 
+2.39.2
 
 
