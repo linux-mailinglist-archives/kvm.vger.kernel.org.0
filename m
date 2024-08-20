@@ -1,70 +1,75 @@
-Return-Path: <kvm+bounces-24601-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24602-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9C19583C0
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:12:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3578958442
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:24:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C00D2825B7
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:12:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76F241F25C1E
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:24:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8131818CBEA;
-	Tue, 20 Aug 2024 10:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1174918E773;
+	Tue, 20 Aug 2024 10:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="H03aBhu+"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ol921JKo"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E17018E34B;
-	Tue, 20 Aug 2024 10:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1304E18DF69;
+	Tue, 20 Aug 2024 10:22:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724148730; cv=none; b=nXCjG8oLvIp+Wlkcf25BcnRTdC+7iVq7ulrqAh2AMx/lXtisG6ueNFAraYiHQKCUNyoszodUKqjULvjvz3G5WZ7+1mXmJUekbXLRHWflSf2LnPfNLXx5F+VtnEqRBTxbY2txWB75BCcsOQXSRd+vCCVwvg4LYjiuhM/8jijS1w0=
+	t=1724149363; cv=none; b=eefDmQk5eYsEW0dxsNvxsO/wx+wDGgO6btJvkhD98ZKZoNojOyU4PB9GvtIUk0q2VH4GX4npDHzlf2QpTS/P7yo3S+FmBaLjOGnJIb6OohzUbARri8kkk6Qqus/GCkBCxjvLlJg5fdUhk6V/Wyy1WIDb0FR2P/nNNhAkNq3Enko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724148730; c=relaxed/simple;
-	bh=X1ovsn2F+ANZD6UJeGZbZ6bCQyiWt1CWfIHYtFKX4R4=;
+	s=arc-20240116; t=1724149363; c=relaxed/simple;
+	bh=XS+8WERDtsMEceegcgjfPEZieTsaOhoTBJUGV3qfyR0=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HrTth7AcpTifwMJwZ8vvDTdm3eAh+1/waC7sHJh+y09VVQebNPGaTeZKtUsJS2mNw9tALNMZOjjETp9i/EZ1beYwQMrTv0yqBfB0ZYSs8Rd7LWJLDuJRqU+lk3gTQ5HvwHHd+h7SyAOUnzQLa+VcYhOwr18ms78gOWb1933KP3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=H03aBhu+; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=ewSzJ1LKQX9JWkww6QC3HiqGpdIYNRcfYFVVW6YTckQ0tuL65A+fK/M0c8N+Rh2z79BBynaPBMTfagifRkc/vdHkTIKEI1YO9KArx/xgw7UcQJINUXDT91LxQTgrc7kb/m5sSpeGiLxM35w09cEfa1tTXSQCjr5dS8rwFyTkX4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ol921JKo; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=X1ovsn2F+ANZD6UJeGZbZ6bCQyiWt1CWfIHYtFKX4R4=; b=H03aBhu+/ooTAnXvsf0XBN9WH8
-	eJT5v5iXWxt1bpKXppB6/z1JAlikjMmXeoVkOZZ1UsGuUor5IQcdFpCRh2Rl+fvsUJX/a5oQvdjYg
-	Hpvd06QXhhsyw+LhF06kZHAaxvs2seyH/AQwLHb6iNgs0cbnLjOkZP7f5IbiZyZNvY+Zo6fZmhW+w
-	DKrY5KY/XTH1W6/Fb2UQDyOLviCzvIB8ja2DxQ861bAam7nHmKuj6jF0lAEwWYus+qNGMD3VFQ57+
-	Q0PMHSrl2cbjeHYS1uhwnkRshTtPGPCAFbJqd+1k6NgCgDM1NaUgn4eJ8qB4yybgB4jS3Jk1vc9MT
-	BShgI83A==;
+	bh=XS+8WERDtsMEceegcgjfPEZieTsaOhoTBJUGV3qfyR0=; b=Ol921JKoIi0uOgZWcx2zcMhgVf
+	qxvzyoqke0IR8tahMEQV2v3bANOka4puTVuGVBBYckS5T/yHVU9CMdFeNF3+6zuzhel2mmdeqW95Z
+	kxspSEIdKWIgDQ9FBqFfmXM2Tjk3gBfP8VK4XNlbtJ7lbPv+nCba4wZE7Q5oo/6aGu1/azlARXQh0
+	4gCvNfuLjpijCADMDw861p2XL4xn3A8CaA12iqGwv1VZx8xcu8myvIEsyJ/Uogp/szvo/m4xQVtfX
+	wMDFlalDyoyS5Uk5dMyjFuX47MKsalIYLgOiNMn3pzYuPQQM0p0+OkWlIMj+z91Un1oM8MDzde1Av
+	ZQ03cBYg==;
 Received: from [2001:8b0:10b:5:cb53:8564:1f06:36f6] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sgLq9-00000007pNx-25Om;
-	Tue, 20 Aug 2024 10:11:49 +0000
-Message-ID: <b69ed9d08eb86a346a1d092575abe99512fa875a.camel@infradead.org>
-Subject: Re: [PATCH] KVM: x86: Use gfn_to_pfn_cache for steal_time
+	id 1sgM0W-00000007q3Z-1tKp;
+	Tue, 20 Aug 2024 10:22:32 +0000
+Message-ID: <6f805099c5751a3092ee5f198fffb83673ba91ee.camel@infradead.org>
+Subject: Re: [RFC PATCH v3 20/21] KVM: x86/xen: Prevent runstate times from
+ becoming negative
 From: David Woodhouse <dwmw2@infradead.org>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Carsten Stollmaier <stollmc@amazon.com>, Paolo Bonzini
- <pbonzini@redhat.com>,  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
  <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
  <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>,  nh-open-source@amazon.com, Peter Xu <peterx@redhat.com>,
- Sebastian Biemueller <sbiemue@amazon.de>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org,  Matthew Wilcox <willy@infradead.org>, Andrew
- Morton <akpm@linux-foundation.org>, "linux-mm@kvack.org"
- <linux-mm@kvack.org>
-Date: Tue, 20 Aug 2024 11:11:48 +0100
-In-Reply-To: <Zr_tRjKgPtk-uHjq@google.com>
-References: <20240802114402.96669-1-stollmc@amazon.com>
-	 <b40f244f50ce3a14d637fd1769a9b3f709b0842e.camel@infradead.org>
-	 <Zr_tRjKgPtk-uHjq@google.com>
+ <hpa@zytor.com>,  Paul Durrant <paul@xen.org>, Peter Zijlstra
+ <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot
+ <vincent.guittot@linaro.org>,  Dietmar Eggemann <dietmar.eggemann@arm.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>,  Mel
+ Gorman <mgorman@suse.de>, Daniel Bristot de Oliveira <bristot@redhat.com>,
+ Valentin Schneider <vschneid@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ jalliste@amazon.co.uk, sveith@amazon.de,  zide.chen@intel.com, Dongli Zhang
+ <dongli.zhang@oracle.com>, Chenyi Qiang <chenyi.qiang@intel.com>
+Date: Tue, 20 Aug 2024 11:22:31 +0100
+In-Reply-To: <Zr7X-5qK8sRXxyDP@google.com>
+References: <20240522001817.619072-1-dwmw2@infradead.org>
+	 <20240522001817.619072-21-dwmw2@infradead.org>
+	 <Zr7X-5qK8sRXxyDP@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Z0KpPo4xLge13VdjKAaC"
+	boundary="=-0SCGpi4QUKT41x7aa5zo"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,58 +80,33 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-Z0KpPo4xLge13VdjKAaC
+--=-0SCGpi4QUKT41x7aa5zo
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2024-08-16 at 17:22 -0700, Sean Christopherson wrote:
-> On Fri, Aug 02, 2024, David Woodhouse wrote:
-> > On Fri, 2024-08-02 at 11:44 +0000, Carsten Stollmaier wrote:
-> > > On vcpu_run, before entering the guest, the update of the steal time
-> > > information causes a page-fault if the page is not present. In our
-> > > scenario, this gets handled by do_user_addr_fault and successively
-> > > handle_userfault since we have the region registered to that.
-> > >=20
-> > > handle_userfault uses TASK_INTERRUPTIBLE, so it is interruptible by
-> > > signals. do_user_addr_fault then busy-retries it if the pending signa=
-l
-> > > is non-fatal. This leads to contention of the mmap_lock.
-> >=20
-> > The busy-loop causes so much contention on mmap_lock that post-copy
-> > live migration fails to make progress, and is leading to failures. Yes?
-> >=20
-> > > This patch replaces the use of gfn_to_hva_cache with gfn_to_pfn_cache=
-,
-> > > as gfn_to_pfn_cache ensures page presence for the memory access,
-> > > preventing the contention of the mmap_lock.
-> > >=20
-> > > Signed-off-by: Carsten Stollmaier <stollmc@amazon.com>
-> >=20
-> > Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > I think this makes sense on its own, as it addresses the specific case
-> > where KVM is *likely* to be touching a userfaulted (guest) page. And it
-> > allows us to ditch yet another explicit asm exception handler.
+On Thu, 2024-08-15 at 21:39 -0700, Sean Christopherson wrote:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vx->last_steal =3D run_delay=
+;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * If KVM clock time went ba=
+ckwards, stop updating until it
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * catches up (or the runsta=
+tes are reset by userspace).
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
 >=20
-> At the cost of using a gpc, which has its own complexities.
->=20
-> But I don't understand why steal_time is special.=C2=A0 If the issue is e=
-ssentially
-> with handle_userfault(), can't this happen on any KVM uaccess?
+> I take it this is a legitimate scenario where userpace sets KVM clock and=
+ then
+> the runstates, and KVM needs to lend a hand because userspace can't do th=
+ose two
+> things atomically?
 
-Theoretically, yes. The steal time is only special in that it happens
-so *often*, every time the vCPU is scheduled in.
+Indeed. Will update the comment to make that more obvious.
 
-We should *also* address the general case, perhaps making by
-interruptible user access functions as discussed. But this solves the
-immediate issue which is being observed, *and* lets us ditch the last
-explicit asm exception handling in kvm/x86.c which is why I think it's
-worth doing anyway, even if there's an upcoming fix for the general
-case.
+Thanks for the rest of the review on this series. I'll go through in
+detail and update it, hopefully this week.
 
-
-
---=-Z0KpPo4xLge13VdjKAaC
+--=-0SCGpi4QUKT41x7aa5zo
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -218,25 +198,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwODIwMTAxMTQ4WjAvBgkqhkiG9w0BCQQxIgQgo/Ykd0+y
-Axu06DyU+IMJJNe+NDc0koLS+GUjWJSqpiQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwODIwMTAyMjMxWjAvBgkqhkiG9w0BCQQxIgQgS3CFqt3t
+tnS2vvcUrcMYYqmIgKdwC7jgXm/maPmiE88wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBlDX7VvSdI6i/FwPvvspgI8qOlH660h6LZ
-2vDoingJrGJb7n9moCtackJhWVlEujRLJA8SYo2CbmjzjAqEHZQ9PUaJ14USpoOzNH5Tdj8XA5FR
-zgLLERrBAepIKZtiSEdfEidw1idt1K60bvGqLvim1jAsgGbeKt5bLPe4NhSsBrOeoz00/gTU4Gz5
-bDmX8zlEuz9tA1jMeRLbKFHO2sIXvz/OtruPVaSPcO0SSwyRtW8xYWP+t6EFhvXZBzydIRTS02uY
-ItEa6mQHnUVlntLNycTHaRH3xLzIp0WT2juKp79D7bpWGll1tQC/v887lgz3UB5fd/gA21BgyXYr
-nKWRl2NIPcXdAV+ootN1VSQtMARu2dKa2PrSaWbSC38O3UReCmwzxmZgiPp3723KKaSqsVcmGYui
-g1LYAdCnadxGXXxBY76d/CKoZDY7VMrI+TlwrKhrWf4fYq3Tv/Ii4cjV/ZL2CTd03A3p75eVynzJ
-T1Ct8RQmY9VhQXAwkSkQo/2izzo2xU+2/Rlzj6U/tcl62jWb69QzPdECBFYrE99Cf6bWIi0/GgjG
-sV0fdN5/sPzGOh0o8gN7iHsYePHY+fngQGdmvRSFV5e5Y3B6ch/aQw6W9/P/UM1farVH8FUjxKqM
-evpsA0wtrp7CYq0n8FbKrZ67YAKKuNMZRBspOvdLJgAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAwlCTt9hgoAYhDoGRbX6i7Zqav4cDNzXAk
+N0wXydgrrhg0hX8IFtovxM/luQp2ntcNIzSGb2C/RUIl4ocu3OsRvC4yzpX0cdKqSCtpqdZrMhi7
+d1N1q1CAnZwv/CAvah03/0+BXeeaBmevkET/TCklWnSvxaCKnxWlBHjZJw5OmP1bmgWXHQ7ufMxm
+JPwuwRLSIlUIbRidC613+mq4W78iTanQ9UlklIdnChPB1lvgc8Tg2gSbxbGW1H3kA3qAAM6eJmyE
+ky/OHRttIE+8ftrzXxdOBwx1TSPw5xGT1EnXneM7Ux93GOmLIvXVF4gfUXwxI3z1sdG8W0QWy/Rh
+kER8+0JSZp9P2F1EJpJuXlZqPbPsi84RKAA0v6DGsfuvFNO/ySP0vFgzXwVrojgbJXwEqLlT0Ndu
+P/Bh9uDn3yLEddMcQW3W76afNeWtrjDieahLifSizT4C32ihZ5TUduSh9PPI3NiSG0/WRenaI7na
+ayJAgh1OamOl97eY6KUPy9AuutGcPoy3Bi+oKMIRtvABsPz0pqKNNktmh604yhWGfhGCMNzGMRwe
+YkQ8wG3O2GLzLsnDsja8exo+sV6+KE9Pb8KOd62Zd90PFRv+a0nuTxDIhfoCNBpIh17i+ZpqvZKJ
+pDCztiz1WpdckvPiEypE8YqQ4J5spm0/nH/dY4bzNgAAAAAAAA==
 
 
---=-Z0KpPo4xLge13VdjKAaC--
+--=-0SCGpi4QUKT41x7aa5zo--
 
