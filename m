@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-24635-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24637-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D51629587B9
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 15:18:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A16BE958805
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 15:35:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13FBE1C21D13
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 13:18:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAD761C21A79
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 13:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30C71917FB;
-	Tue, 20 Aug 2024 13:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACCB18EFEE;
+	Tue, 20 Aug 2024 13:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KgwyPb05"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BeyOR4vA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C963B19146E;
-	Tue, 20 Aug 2024 13:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BA818A6D1
+	for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 13:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724159889; cv=none; b=Zit/djd8kpfWJC1O1A2v6lLtsFPpZueAedMz14qcmk5aR9a4ZyJQlCzgUV0gegF7eE4s2koOMyJnpxdvAbEjA1pCmj1ZpoB8psejRNi01CUQ7vDIZQSZLvl3mQCViUxUQdfG4mentCAzl9RrYw/D6tuZUKWrPlgJ8Xt/KaoDCMs=
+	t=1724160907; cv=none; b=E1kSutAmBaEBWS71fv30HYNHWYxdRF4m6Pow9BiNDyi/mXkKTzz98KWzat6GAv8V43kx7mzbcyac+FCvGvPrGPa0/4wSq7jHZ4xruYimr4aLy1JczaAwLjN9YpaZNQdkz6UHzJWzS3yCSKF2SVxCdbZBCSeNm8Bkrn77m5ogTHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724159889; c=relaxed/simple;
-	bh=cFqreJ/QbxIcyFcklwuEN/SmjI5Xc8eDvAlus4TNHLI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=R7W85rM+jWCHzMWR3r+4eWFsJmiwLRIlJwvx382oSmptCwct0ghfSMkSZhZ/nZ3uJLf9IYIsoVrQLSnzuUV+Gda50Pw7s90iUOXGo4CZruMrI+PyfYGE77Ljpp3gcapU83+Rng6tddCd0zf3Dhi/8TYYPZV6EOFwnzmdNGgIeDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KgwyPb05; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A77A2C4AF0C;
-	Tue, 20 Aug 2024 13:18:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724159889;
-	bh=cFqreJ/QbxIcyFcklwuEN/SmjI5Xc8eDvAlus4TNHLI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KgwyPb05YoSan4ON9gfuNdapsHaPM9npzM3H0ZH/m4O3KRnEyoadshkDtB233ebIR
-	 l8V7iQC8GkUeYUCnbJ/x00WH1UH0qhlfoyGn2pSbQz6vTZRgb0+U/WpCMfb90TdY74
-	 s4enKzKZsyx379Sg9G8wFo80Zp9Y405/VkTj6FQjpRkn+Q41YWpSk6AUuk6JWAzH1+
-	 CN5ArTvsAtQGA6P1SdbY9OvtutMj9psdlP64RYs/80c+OEaIvYA3HSuvuI3cUYOzeb
-	 X+ZNOyhLWsega/HYmQu3vOu2ZwFlGJnbJMEVBTrfUbJUAc2h906YLJ5rL+oF8F6ouc
-	 sDGyG6V9ZOVDQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sgOkR-005HMQ-Jr;
-	Tue, 20 Aug 2024 14:18:07 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
-Date: Tue, 20 Aug 2024 14:18:02 +0100
-Message-Id: <20240820131802.3547589-9-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240820131802.3547589-1-maz@kernel.org>
-References: <20240820131802.3547589-1-maz@kernel.org>
+	s=arc-20240116; t=1724160907; c=relaxed/simple;
+	bh=eDlOvs7s0hvqqUbA2KxNUdARJ6vvFVdhPE13uoJ1Vts=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r/LbM+muU0jdOTMLQBR9eWK9j5tYVLj0K1YFrVfuYAYYcCWicM6W9m8d1n59tVtzzVsYWyYjlx2lmPZ+QQC9FRt5X2JMhwiRRcFVlOIDYaimwTrPcJ2ytfxCsCec/53MO7ecLW6X06UdGNhYQIrkrHEyt08uqulzRVDzlBrjag4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BeyOR4vA; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1724160903; x=1755696903;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1SJeF/u166tjTOo7xoAGpb4832yUY3Jf9IDYbfxoSck=;
+  b=BeyOR4vAWN+2u+zdB2Eq6zIbDy/wJDqdyZvjbxSYUOL9rt6On8X3Xj46
+   2yIGKSnNfwsGBWJCIFUJxsCKup3E+qOF2BJaKnzFtWQvmudzVK8I/OU+X
+   Pn8GpjOyCzCmT3pWvP3bUDVX0XYM63S0WVjB74gQFFXeP9VnXx/qIuibR
+   w=;
+X-IronPort-AV: E=Sophos;i="6.10,162,1719878400"; 
+   d="scan'208";a="117200682"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 13:35:00 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:11620]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.11.126:2525] with esmtp (Farcaster)
+ id e16951a5-5f1e-4580-839a-61aaad654d33; Tue, 20 Aug 2024 13:34:59 +0000 (UTC)
+X-Farcaster-Flow-ID: e16951a5-5f1e-4580-839a-61aaad654d33
+Received: from EX19D018EUA002.ant.amazon.com (10.252.50.146) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 20 Aug 2024 13:34:59 +0000
+Received: from u94b036d6357a55.ant.amazon.com (10.106.82.48) by
+ EX19D018EUA002.ant.amazon.com (10.252.50.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 20 Aug 2024 13:34:56 +0000
+From: Ilias Stamatis <ilstam@amazon.com>
+To: <kvm@vger.kernel.org>, <pbonzini@redhat.com>
+CC: <pdurrant@amazon.co.uk>, <dwmw@amazon.co.uk>, <seanjc@google.com>,
+	<nh-open-source@amazon.com>, Ilias Stamatis <ilstam@amazon.com>
+Subject: [PATCH v3 0/6] KVM: Improve MMIO Coalescing API
+Date: Tue, 20 Aug 2024 14:33:27 +0100
+Message-ID: <20240820133333.1724191-1-ilstam@amazon.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,48 +71,63 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+ EX19D018EUA002.ant.amazon.com (10.252.50.146)
 
-Everything is now in place for a guest to "enjoy" FP8 support.
-Expose ID_AA64PFR2_EL1 to both userspace and guests, with the
-explicit restriction of only being able to clear FPMR.
+The current MMIO coalescing design has a few drawbacks which limit its
+usefulness. Currently all coalesced MMIO zones use the same ring buffer.
+That means that upon a userspace exit we have to handle potentially
+unrelated MMIO writes synchronously. And a VM-wide lock needs to be
+taken in the kernel when an MMIO exit occurs.
 
-All other features (MTE* at the time of writing) are hidden
-and not writable.
+Additionally, there is no direct way for userspace to be notified about
+coalesced MMIO writes. If the next MMIO exit to userspace is when the
+ring buffer has filled then a substantial (and unbounded) amount of time
+may have passed since the first coalesced MMIO.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+This series adds new ioctls to KVM that allow for greater control by
+making it possible to associate different MMIO zones with different ring
+buffers. It also allows userspace to use poll() to check for coalesced
+writes in order to avoid userspace exits in vCPU threads (see patch 3
+for why this can be useful).
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 51627add0a72..2d1e45178422 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1539,6 +1539,10 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
- 		break;
-+	case SYS_ID_AA64PFR2_EL1:
-+		/* We only expose FPMR */
-+		val &= ID_AA64PFR2_EL1_FPMR;
-+		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
- 			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA) |
-@@ -2381,7 +2385,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 		   ID_AA64PFR0_EL1_AdvSIMD |
- 		   ID_AA64PFR0_EL1_FP), },
- 	ID_SANITISED(ID_AA64PFR1_EL1),
--	ID_UNALLOCATED(4,2),
-+	ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR),
- 	ID_UNALLOCATED(4,3),
- 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
- 	ID_HIDDEN(ID_AA64SMFR0_EL1),
+The idea of improving the API in this way originally came from Paul
+Durrant (pdurrant@amazon.co.uk) but the implementation is mine.
+
+The first patch in the series is a bug in the existing code that I
+discovered while writing a selftest and can be merged independently.
+
+Changelog:
+
+v3:
+  - Fixed test robot build warning and made small changes suggested by
+    Sean Christopherson
+
+v2: https://lore.kernel.org/kvm/20240718193543.624039-1-ilstam@amazon.com/T/
+
+v1: https://lore.kernel.org/kvm/20240710085259.2125131-1-ilstam@amazon.com/T/
+
+Ilias Stamatis (6):
+  KVM: Fix coalesced_mmio_has_room()
+  KVM: Add KVM_CREATE_COALESCED_MMIO_BUFFER ioctl
+  KVM: Support poll() on coalesced mmio buffer fds
+  KVM: Add KVM_(UN)REGISTER_COALESCED_MMIO2 ioctls
+  KVM: Documentation: Document v2 of coalesced MMIO API
+  KVM: selftests: Add coalesced_mmio_test
+
+ Documentation/virt/kvm/api.rst                |  91 +++++
+ include/linux/kvm_host.h                      |   1 +
+ include/uapi/linux/kvm.h                      |  18 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/coalesced_mmio_test.c       | 313 ++++++++++++++++++
+ virt/kvm/coalesced_mmio.c                     | 203 +++++++++++-
+ virt/kvm/coalesced_mmio.h                     |  17 +-
+ virt/kvm/kvm_main.c                           |  37 ++-
+ 8 files changed, 661 insertions(+), 20 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/coalesced_mmio_test.c
+
 -- 
-2.39.2
+2.34.1
 
 
