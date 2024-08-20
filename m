@@ -1,133 +1,376 @@
-Return-Path: <kvm+bounces-24655-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24656-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3494D958BFB
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 18:12:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3373B958C28
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 18:24:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A39282CBF
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 16:12:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DECC82856E8
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 16:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0076119D8BB;
-	Tue, 20 Aug 2024 16:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13DA3194145;
+	Tue, 20 Aug 2024 16:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mBg+uRVy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NZ7m3yf8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4387191F89
-	for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 16:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2ECD1AC425
+	for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 16:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724170327; cv=none; b=BvEGldI63Q9P8bICTeXPLZ4ZJ1tm9NQzGZfbkbsk6AL6TWn23mS4OBccOyYKlmZqcZw8MyPImm2gLVl9WiOGGR6VSS2Z7Nqynww565zTE87MC52iO3EmmpskXjeVf23Kr+mqqNtPjUVvO8uBie/z3WV2r1Sz2a4OrFqJfKX5kkc=
+	t=1724171061; cv=none; b=KsTQJFPlhPBVZSt7QiAuQtt1nnt8/stxuNEw2fGNS9ON2lGmWKUzu81Wi1EYuU96xI+jtCxkKrUQw/ajDOGzNfehgboFbVNGp0IQPG72tkj1vwyGbUXbdE7AW/wjAbkolBuv5rp6WJy786PfQr5MYbdx9f0xNvg2MMEFszq1GKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724170327; c=relaxed/simple;
-	bh=xDYkri/7jTuLqwePZwxb6rBZv38bm+WMZP8lwIWYY8s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dpWVCVYJmexnF9zwutVobmPQcu2NblaTqlZM3hvg6L3/FX4XNQX6cpy9qMHX5fe+77SL3Y4s26alUrKBF6Ww2p37u3xUTaCIOPzFO7yv0D1StRu/B5qrEKwP48LJuphp8WMI2DFPG2us/F0hrFBIW0dXeB+ydZcUIjd8c5zrRWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mBg+uRVy; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cfe9270d4aso5857923a91.0
-        for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 09:12:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724170325; x=1724775125; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mEGfKffA8k25KTN9hjG+1Czg335p9pzfLGZ0r6ISLdQ=;
-        b=mBg+uRVyqPeElGh77Iqe9cz67W4mQjw0AFerd88COpMU1gyyoq4g12at6w60i+UqWs
-         cNi9v6iRfB6glHI+k6QiZ4CWWolH0hLnZRQfkGpJXl/ztpm6ej9M0mz/9y43zkXs+E7l
-         SwUccIFrnWCy79pn8IEPTwWtHsmclg64xxLWVosrajvbqwmERbCE134drFugeRHN8h4l
-         uGGg3Y5yt21hdKP0nhUprnZ9Gp52T3xJDs27eeLVP8clXPilfQ40WtbsHAKOXsyjsZ1U
-         jBXkWylTMzSksOamcPXwIGWvI/cv15B2HKekHJsul7xTjf6iVXVmpndYUbxJ0dhSvzwe
-         ri6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724170325; x=1724775125;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mEGfKffA8k25KTN9hjG+1Czg335p9pzfLGZ0r6ISLdQ=;
-        b=DtkmcSee6U/awkhuDSr4OGSsU20pIZMm2r5o//wFyYBrgjTIAV4Wl4AnY6snRpabKM
-         3ZaPdt9OwtHXsE1zrgMFTqdXNhrhPitSyTFwb3VnuMUF0t9AGYvwuAKq+T9ekPksE6pl
-         fSp82oiVnnmkyp3qgep7FxNLdyuCsI5URsaNg9J/gFYmXijlP8pwlIuvp5W9TRnj5Dvx
-         SB0EFOsLTTkvKy6/sWXMki8Nl5OkIuu65062f5h2Ct9GvgovgI/a8XEuxNQxaNG/TRwA
-         PKgg5fqDbGb2O66GbX252NUZgJNACPVKmjwPBnjzjVd3VrwTECznE+V++bNjbEs+8bO+
-         qwZQ==
-X-Gm-Message-State: AOJu0YwjQpfaRzdTyBTSSLhsAWPX+RKWVnq0+X9wPEuo+DtfawRWwak/
-	K2+VsxRadkLccCFFtRtoQwL1kDH1ag8qLjjiOJmj6l2LIufnr0ndmRWsAB5GDzvsF7elngyn2si
-	wgw==
-X-Google-Smtp-Source: AGHT+IEAAN2Y0yVXFnGWS3O1jcL8IhFceJXuAl87lXtczud4Q3G1ILQCVLF2/rPx9IRrrraoAPdNb64AF1I=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:1bcf:b0:2c8:b576:2822 with SMTP id
- 98e67ed59e1d1-2d3e03e698dmr110268a91.8.1724170324996; Tue, 20 Aug 2024
- 09:12:04 -0700 (PDT)
-Date: Tue, 20 Aug 2024 09:12:03 -0700
-In-Reply-To: <c603c0c3-36cb-4429-9799-ed50bba4a59e@amd.com>
+	s=arc-20240116; t=1724171061; c=relaxed/simple;
+	bh=kmuJyMk8yZGpKwZ0x0RtQkFnQaLMtQRgZmRi9RAl+zM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TeZz1RO3m4Wh2VYogKE6bxgzajO4u23UZUoih+Wuhd4bvCZg2FFzjyc68BRw4qt/eYXur64Oljo4/DJqsT+HDLEgQ3JhyDBOwvAz1hhrzsPVBkf2V+JVO4+dBmeK6C4McgDErpfB/azlq0MSZmF8yHC/kd2MiaCsEnbYvPXINKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NZ7m3yf8; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 20 Aug 2024 18:24:13 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724171056;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mBzHIpLfS6ctIZzeaG05fuBPDU2QM0pGqmIU4K+X3GM=;
+	b=NZ7m3yf8PsN7A6JNp0xcU0e4HHLh99D7pEnjXPztPjxqclOaWSP0dKAEoJE7tjvrjnro9g
+	Baz7K/wNU7iwQpwIz6DbpBjKw2dTcs7BmOsswsE/RPAPt4OZZ+QbtlNVebZUOfAaCZUdA4
+	4JOYK3roy1CylOpRNKJ9N358COndf+8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Cade Richard <cade.richard@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu, jamestiotio@gmail.com
+Subject: Re: [kvm-unit-tests PATCH] riscv: sbi: Add IPI extension tests.
+Message-ID: <20240820-e5197fe04581b3c03e24c681@orel>
+References: <20240819020129.26095-1-cade.richard@berkeley.edu>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240802015732.3192877-1-kim.phillips@amd.com>
- <20240802015732.3192877-3-kim.phillips@amd.com> <Zr_ZwLsqqOTlxGl2@google.com>
- <7208a5ac-282c-4ff5-9df2-87af6bcbcc8a@amd.com> <ZsPF7FYl3xYwpJiZ@google.com> <c603c0c3-36cb-4429-9799-ed50bba4a59e@amd.com>
-Message-ID: <ZsTAU2hVyI-4WDK3@google.com>
-Subject: Re: [PATCH 2/2] KVM: SEV: Configure "ALLOWED_SEV_FEATURES" VMCB Field
-From: Sean Christopherson <seanjc@google.com>
-To: Kim Phillips <kim.phillips@amd.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Kishon Vijay Abraham I <kvijayab@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240819020129.26095-1-cade.richard@berkeley.edu>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Aug 20, 2024, Kim Phillips wrote:
-> On 8/19/24 5:23 PM, Sean Christopherson wrote:
-> > On Mon, Aug 19, 2024, Kim Phillips wrote:
-> > > but since commit ac5c48027bac ("KVM: SEV: publish supported VMSA features"),
-> > > userspace can retrieve sev_supported_vmsa_features via an ioctl.
-> > > 
-> > > > And based on this blurb:
-> > > > 
-> > > >     Some SEV features can only be used if the Allowed SEV Features Mask is enabled,
-> > > >     and the mask is configured to permit the corresponding feature. If the Allowed
-> > > >     SEV Features Mask is not enabled, these features are not available (see SEV_FEATURES
-> > > >     in Appendix B, Table B-4).
-> > > > 
-> > > > and the appendix, this only applies to PmcVirtualization and SecureAvic.  Adding
-> > > > that info in the changelog would be *very* helpful.
-> > > 
-> > > Ok, how about adding:
-> > > 
-> > > "The PmcVirtualization and SecureAvic features explicitly require
-> > > ALLOWED_SEV_FEATURES to enable them before they can be used."
-> > > 
-> > > > And I see that SVM_SEV_FEAT_DEBUG_SWAP, a.k.a. DebugVirtualization, is a guest
-> > > > controlled feature and doesn't honor ALLOWED_SEV_FEATURES.  Doesn't that mean
-> > > > sev_vcpu_has_debug_swap() is broken, i.e. that KVM must assume the guest can
-> > > > DebugVirtualization on and off at will?  Or am I missing something?
-> > > 
-> > > My understanding is that users control KVM's DEBUG_SWAP setting
-> > > with a module parameter since commit 4dd5ecacb9a4 ("KVM: SEV: allow
-> > > SEV-ES DebugSwap again").  If the module parameter is not set, with
-> > > this patch, VMRUN will fail since the host doesn't allow DEBUG_SWAP.
-> > 
-> > But that's just KVM's view of vmsa_features.  With SNP's wonderful
-> > SVM_VMGEXIT_AP_CREATE, can't the guest create a VMSA with whatever sev_features
-> > it wants, so long as they aren't host-controllable, i.e. aren't PmcVirtualization
-> > or SecureAvic?
+On Sun, Aug 18, 2024 at 07:01:29PM GMT, Cade Richard wrote:
+> Add tests for the RISC-V OpenSBI inter-processor interrupt extension.
 > 
-> No, as above, if the guest tries any silly business the host will
-> get a VMEXIT_INVALID, no matter if using the feature *requires*
-> ALLOWED_SEV_FEATURES to be enabled and explicitly allow it (currently
-> PmcVirtualization or SecureAvic).
+> Signed-off-by: Cade Richard <cade.richard@berkeley.edu>
+> ---
+>  lib/riscv/asm/sbi.h |   5 ++
+>  riscv/sbi.c         | 138 ++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 143 insertions(+)
+> 
+> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+> index 47e91025..d0abeefc 100644
+> --- a/lib/riscv/asm/sbi.h
+> +++ b/lib/riscv/asm/sbi.h
+> @@ -20,6 +20,7 @@ enum sbi_ext_id {
+>  	SBI_EXT_HSM = 0x48534d,
+>  	SBI_EXT_SRST = 0x53525354,
+>  	SBI_EXT_DBCN = 0x4442434E,
+> +	SBI_EXT_IPI = 0x735049,
 
-Oooh, I finally get it.  PmcVirtualization and SecureAvic require an opt-in via
-ALLOWED_SEV_FEATURES, i.e. are off-by-default, whereas all other features are
-effectively on-by-default, but still honor ALLOWED_SEV_FEATURES.
+We're trying to list these in spec chapter order, so IPI should come
+before HSM.
+
+>  };
+>  
+>  enum sbi_ext_base_fid {
+> @@ -49,6 +50,10 @@ enum sbi_ext_dbcn_fid {
+>  	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
+>  };
+>  
+> +enum sbi_ext_ipi_fid {
+> +	SBI_EXT_IPI_SEND = 0,
+> +};
+> +
+>  struct sbiret {
+>  	long error;
+>  	long value;
+> diff --git a/riscv/sbi.c b/riscv/sbi.c
+> index 36ddfd48..c339b330 100644
+> --- a/riscv/sbi.c
+> +++ b/riscv/sbi.c
+> @@ -6,11 +6,14 @@
+>   */
+>  #include <libcflat.h>
+>  #include <alloc_page.h>
+> +#include <cpumask.h>
+>  #include <stdlib.h>
+>  #include <string.h>
+>  #include <limits.h>
+>  #include <vmalloc.h>
+>  #include <memregions.h>
+> +#include <on-cpus.h>
+> +#include <rand.h>
+>  #include <asm/barrier.h>
+>  #include <asm/csr.h>
+>  #include <asm/delay.h>
+> @@ -23,6 +26,9 @@
+>  #include <asm/timer.h>
+>  
+>  #define	HIGH_ADDR_BOUNDARY	((phys_addr_t)1 << 32)
+> +static prng_state ps;
+> +static bool ipi_received[__riscv_xlen];
+> +static bool ipi_timeout[__riscv_xlen];
+>  
+>  static void help(void)
+>  {
+> @@ -45,6 +51,11 @@ static struct sbiret __dbcn_sbi_ecall(int fid, unsigned long arg0, unsigned long
+>  	return sbi_ecall(SBI_EXT_DBCN, fid, arg0, arg1, arg2, 0, 0, 0);
+>  }
+>  
+> +static struct sbiret __ipi_sbi_ecall(unsigned long arg0, unsigned long arg1)
+
+This function is specific to IPI so we should use specific parameter
+names: hart_mask, hart_mask_base
+
+> +{
+> +	return sbi_ecall(SBI_EXT_IPI, SBI_EXT_IPI_SEND, arg0, arg1, 0, 0, 0, 0);
+> +}
+> +
+>  static void split_phys_addr(phys_addr_t paddr, unsigned long *hi, unsigned long *lo)
+>  {
+>  	*lo = (unsigned long)paddr;
+> @@ -420,6 +431,132 @@ static void check_dbcn(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static int rand_online_cpu(prng_state* ps) {
+
+'{' on its own line. Same comment for other functions below.
+
+> +	int me = smp_processor_id();
+> +	int num_iters = prng32(ps);
+
+Do we really want to iterate up to 4294967295 times? I guess you want
+apply a mod with some max number of iterations to this.
+
+> +	int rand_cpu = cpumask_next(me, &cpu_online_mask);
+
+If me was the last cpu ID, then rand_cpu will be 'nr_cpus'
+
+> +
+> +	for (int i = 0; i < num_iters; i++) {
+> +		rand_cpu = cpumask_next(me, &cpu_online_mask);
+> +	}
+
+This must be incomplete. It does the exact same thing over and over for no
+reason.
+
+> +
+> +	return rand_cpu;
+> +}
+> +
+> +static void ipi_timeout_handler(struct pt_regs *regs) {
+> +	int me = smp_processor_id();
+> +	ipi_timeout[me] = true;
+> +	report_fail("ipi timed out on hart %d", me);
+
+Let's not call stuff like report* from interrupt handlers. Just
+setting the boolean is enough. We can check that boolean and
+call report somewhere else which is outside interrupt context.
+
+> +}
+> +
+> +static void ipi_irq_handler(struct pt_regs *regs) {
+> +	int me = smp_processor_id();
+> +	ipi_received[me] = true;
+> +	report_pass("ipi received on hart %d", me);
+
+Same comment as above about no report calls in interrupt context.
+
+> +	
+
+extra blank line here
+
+> +}
+> +
+> +static void ipi_hart_init(void *irq_func) {
+> +	int me = smp_processor_id();
+> +	printf("Installing IPI IRQ handler on hart %d", me);
+
+Drop this print message since it's not useful.
+
+> +	install_irq_handler(IRQ_S_IPI, (void *)ipi_irq_handler);
+
+IRQ_S_IPI is not defined anywhere so this can't compile.
+
+> +	install_irq_handler(IRQ_S_TIMER, (void *)ipi_timeout_handler);
+> +	timer_irq_enable();
+> +	while (!ipi_received[me] && !ipi_timeout[me]) {
+> +		cpu_relax();
+> +	}
+
+I don't think this loop will ever end because I don't see where
+local_irq_enable() is called.
+
+No {} around single statements.
+
+> +}
+> +
+> +static int offline_cpu(void) {
+> +	for (int i = 0; i < __riscv_xlen; i++) {
+
+Looking ahead it looks like you want to find a cpu number which
+isn't valid. You should probably be looking at the cpu_present_mask
+instead in that case. Also there's no need to try cpus < nr_cpus
+since those should all be present.
+
+> +		if (!cpumask_test_cpu(i, &cpu_online_mask)) {
+> +			return i;
+> +		}
+> +	}
+> +	return -1;
+> +}
+> +
+> +static void print_bits(size_t const size, void const * const ptr)
+> +{
+> +    unsigned char *b = (unsigned char*) ptr;
+                                          ^ no space here
+> +    unsigned char byte;
+> +    int i, j;
+> +    
+> +    for (i = size-1; i >= 0; i--) {
+> +        for (j = 7; j >= 0; j--) {
+> +            byte = (b[i] >> j) & 1;
+
+s/byte/bit/
+
+> +            printf("%u", byte);
+> +        }
+> +    }
+> +    puts("");
+> +}
+> +
+> +static void set_flags_false(bool arr[])
+> +{
+> +	for (int i = 0; i < __riscv_xlen; i++) {
+> +		arr[i] = 0;
+> +	}
+> +}
+
+We don't need this function. We have memset().
+
+> +
+> +static void check_ipi(void)
+> +{
+> +	int cpu = smp_processor_id();
+> +	unsigned long me = (unsigned long)cpu;
+> +	struct sbiret ret;
+> +	ps = prng_init(0xDEADBEEF);
+> +
+> +	report_prefix_push("ipi");
+> +
+> +	if (!sbi_probe(SBI_EXT_IPI)) {
+> +		report_skip("ipi extension not available");
+> +		report_prefix_pop();
+> +		return;
+> +	}
+> +
+> +	if (cpu_has_extension(smp_processor_id(), ISA_SSTC)) {
+> +		csr_write(CSR_STIMECMP, ULONG_MAX);
+> +		if (__riscv_xlen == 32)
+> +			csr_write(CSR_STIMECMPH, ULONG_MAX);
+> +	}
+> +
+> +	report_prefix_push("send to one random hart");
+> +	set_flags_false(ipi_received);
+> +	set_flags_false(ipi_timeout);
+
+memset(ipi_received, 0, sizeof(ipi_received));
+memset(ipi_timeout, 0, sizeof(ipi_timeout));
+
+> +	int rand_hartid = rand_online_cpu(&ps);
+> +	on_cpu(rand_hartid, (void *)ipi_hart_init, NULL);
+> +	unsigned long ipi_rand_mask = 1 << rand_hartid;
+
+If rand_hartid > xlen then this shift will overflow. We use use a cpumask.
+
+We should be setting the timeout here before doing the test below.
+
+> +
+> +	ret = __ipi_sbi_ecall(ipi_rand_mask, me);
+
+rand_hartid is relative to zero, but 'me' doesn't have to be zero, so we
+can't use 'me' for the base, we need to use zero or, if trying to specify
+harts with IDs larger than xlen, we need some other multiple of xlen here.
+
+> +	report(ret.error == SBI_SUCCESS, "send to one randomly chosen hart");
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("broadcast");
+> +	set_flags_false(ipi_received);
+> +	set_flags_false(ipi_timeout);
+> +	on_cpus((void *)ipi_hart_init, NULL);
+> +	unsigned long ipi_broadcast_mask = (unsigned long)(cpumask_bits(&cpu_online_mask)[me]);
+
+I'm not sure what this is trying to do, but since we should be using
+actual cpumasks instead of unsigned longs called masks, then, if
+we want a mask of all online harts, just do
+
+cpumask_copy(&ipi_broadcast_mask, &cpu_online_mask);
+
+> +	puts("online cpu mask: ");
+> +	print_bits(CPUMASK_NR_LONGS*sizeof(long), &ipi_broadcast_mask);
+
+Let's drop print_bits. I'll provide a cpumask_to_list() function which
+returns a cpumask as cpu-list, e.g. 0,2,3-5,7-9 type of format.
+
+> +	puts("\n");
+> +
+> +	ret = __ipi_sbi_ecall(ipi_broadcast_mask, me);
+
+This is fine to test broadcasting to a subset of all harts, but we should
+also have a test using (0, -1) for the parameters. See section 3.1 of the
+SBI spec.
+
+> +	report(ret.error == SBI_SUCCESS, "send to all available harts");
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("invalid parameters");
+> +	unsigned long invalid_hart_mask_base = offline_cpu();
+> +	ret = __ipi_sbi_ecall(ipi_rand_mask, invalid_hart_mask_base);
+> +	report(ret.error == SBI_ERR_INVALID_PARAM, "hart_mask_base");
+> +
+> +	unsigned long invalid_cpu_mask = 1 << invalid_hart_mask_base;
+> +	ret = __ipi_sbi_ecall(invalid_cpu_mask, me);
+
+This may work to construct an invalid mask, if we don't have an xlen
+multiple of harts available. Another test might be to use a mask
+of zero with a mask-base that is *not* -1.
+
+> +	report(ret.error == SBI_ERR_INVALID_PARAM, "hart_mask");
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +	report_prefix_pop();
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>  	if (argc > 1 && !strcmp(argv[1], "-h")) {
+> @@ -431,6 +568,7 @@ int main(int argc, char **argv)
+>  	check_base();
+>  	check_time();
+>  	check_dbcn();
+> +	check_ipi();
+>  
+>  	return report_summary();
+>  }
+> -- 
+> 2.43.0
+>
+
+Thanks,
+drew
 
