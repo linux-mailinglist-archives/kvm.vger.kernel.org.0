@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-24619-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24618-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BA719584CF
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:39:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 072DF9584D0
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 12:39:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6836F1C24234
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:39:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5E161F26BF6
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 10:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3342318FC7B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3350518FC80;
 	Tue, 20 Aug 2024 10:38:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UNdYx8ae"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iU7Xo/L7"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C13318F2D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485C818F2D8;
 	Tue, 20 Aug 2024 10:38:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724150289; cv=none; b=skJLaUtPx1FEVaNmo8UbCYv/U0osJNsF1LYi17ka7D29Iv5XQ9sP/a3P+4g9nqjdUmBKfwLHE0QRK6I3xPR80v7fPA+xtIUlHObDo/qBD6dsUHho8m7NpRwxTE5WAfkIJXyrfKmDwcNUnvwczYnpsVZr/Z6M21pOUOV2ucBewEQ=
+	t=1724150289; cv=none; b=KzwzSTLBmNlfajplVEeXcrurr//bMsTdOeCE8d/c74vrShMCut/3JX0K5FCn4vQ0oJWTyoeScr3d13qFG4wkCUzNNocrQqEFTLzg8tIv0rEXIlusCeYJmnSsc/5v9UV88JAJBGQYKw74wIawa325ALka8l05dWgU3ORKkpko7Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724150289; c=relaxed/simple;
-	bh=k5pYh1Yp0jxWFeMrnF7ay2rjkHNJ1NpYhUlOrVS5zOE=;
+	bh=6SeSlBKre70JlYSsR3NUDKXmQLYyayjyrUpmUy8J5ms=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GmxhdY6uXPoGOGBPeFOHE2zWU0xHTPrnockTQBA5koIyn8UMcVxFgLw58FBH4CTS1RTvFV9FdSpirzsWOIobMHlV1OZ1MEQhcUMBqnxt97lFuRJgoFdcSF8m9EZi52/o5IIPbYFZcZn8kWXe5R6lL7QTECGakW7h+7WVSmi7nrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UNdYx8ae; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD20BC4AF15;
-	Tue, 20 Aug 2024 10:38:08 +0000 (UTC)
+	 MIME-Version; b=mgcVQHfAq9Fnnj9nmUUQCwiD8hrbM4UE389kK5ILMQ6KX1Rl3YrWjuzP1nyd8Q9t+f/xvAz8fRMwjy+LWBtSEQfHJj0fRsMfZSiJRb30aD5hWO81mO+aUmvujmbS7aD/bCZvjV3Zx1Q+2GRAmQfnFAPPbfp56s8lnum9MDboOnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iU7Xo/L7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D54EC4AF12;
+	Tue, 20 Aug 2024 10:38:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724150288;
-	bh=k5pYh1Yp0jxWFeMrnF7ay2rjkHNJ1NpYhUlOrVS5zOE=;
+	s=k20201202; t=1724150289;
+	bh=6SeSlBKre70JlYSsR3NUDKXmQLYyayjyrUpmUy8J5ms=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UNdYx8ae1FeS9wBMHFq80Bad1BmdSagcDX0UaMwSqUysZWHg3E+RkkgG7d1qud6Mx
-	 BeTjfVMVK/yD0QlfwTWCoer1YYLnT+R9hUkmPDtp073OMRVRGKVGbxQ7fZqj97yk+/
-	 MzwHFZOmRwsmWG6ubKtEtPuFXSh8omKEKRKd1DJcUfyjT7i0nIA+7trhkGM9jI68ad
-	 HxNp0PYt5Nl3XSyypQd0wBJKERFUF76+f0OYwQ7aAHII/uTUFxR4mua8d0216TNnAx
-	 ew373uh3YvvN6cBLgpIpj/446EeajDWBzIepCzCQCl68yTAmHdGNl2KYqoEknPr5lu
-	 fvPE3jDRL74nw==
+	b=iU7Xo/L7CWmNsbkjFYZHyK3I5D9xPMpNE4FsaG/yBLRXsq02aNZWWJFyOy6yqLcWt
+	 sgAsKyndR2QdQZDbfZicpBdv5ydfRGqXeC7MFaVyFMgZGWQJonMYTtB7peWW+T76A3
+	 mUNglgCJ567/+ULuH8T5bLDbxXW0taKs8GMrunQHaJtmj3IBXbqATjcZc9uxMArevu
+	 w8eZGWj6Mwn4hBE7yTYe6lDNFQq8px7J3AWtw8+DPt7La1PfPDSKnr0FDO46BV+4SU
+	 vHX9X3fhg0XVU0T0od49l9YSOtLMQNGnzApJ5haI7xPVCJ+AGI/dNIMc8WnvOTIS/Z
+	 owaKKFgc1V/iA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgMFb-005Ea3-77;
+	id 1sgMFb-005Ea3-Df;
 	Tue, 20 Aug 2024 11:38:07 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -59,9 +59,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v4 15/18] KVM: arm64: nv: Sanitise SCTLR_EL1.EPAN according to VM configuration
-Date: Tue, 20 Aug 2024 11:37:53 +0100
-Message-Id: <20240820103756.3545976-16-maz@kernel.org>
+Subject: [PATCH v4 16/18] KVM: arm64: nv: Make AT+PAN instructions aware of FEAT_PAN3
+Date: Tue, 20 Aug 2024 11:37:54 +0100
+Message-Id: <20240820103756.3545976-17-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240820103756.3545976-1-maz@kernel.org>
 References: <20240820103756.3545976-1-maz@kernel.org>
@@ -77,32 +77,51 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Ensure that SCTLR_EL1.EPAN is RES0 when FEAT_PAN3 isn't supported.
+FEAT_PAN3 added a check for executable permissions to FEAT_PAN2.
+Add the required SCTLR_ELx.EPAN and descriptor checks to handle
+this correctly.
 
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kvm/at.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 9c8573493d80..133cc2f9530d 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1178,6 +1178,14 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
- 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, V1P1))
- 		res0 |= ~(res0 | res1);
- 	set_sysreg_masks(kvm, HAFGRTR_EL2, res0, res1);
-+
-+	/* SCTLR_EL1 */
-+	res0 = SCTLR_EL1_RES0;
-+	res1 = SCTLR_EL1_RES1;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN3))
-+		res0 |= SCTLR_EL1_EPAN;
-+	set_sysreg_masks(kvm, SCTLR_EL1, res0, res1);
-+
- out:
- 	mutex_unlock(&kvm->arch.config_lock);
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index e037eb73738a..60f1ca3a897d 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -731,6 +731,21 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr,
+ 	return par;
+ }
  
++static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
++{
++	u64 sctlr;
++
++	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, PAN3))
++		return false;
++
++	if (regime == TR_EL10)
++		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
++	else
++		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
++
++	return sctlr & SCTLR_EL1_EPAN;
++}
++
+ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ {
+ 	bool perm_fail, ur, uw, ux, pr, pw, px;
+@@ -797,7 +812,7 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 			bool pan;
+ 
+ 			pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
+-			pan &= ur || uw;
++			pan &= ur || uw || (pan3_enabled(vcpu, wi.regime) && ux);
+ 			pw &= !pan;
+ 			pr &= !pan;
+ 		}
 -- 
 2.39.2
 
