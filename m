@@ -1,280 +1,606 @@
-Return-Path: <kvm+bounces-24664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56BC958F26
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 22:21:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5308958F35
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 22:35:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB5AB1C21119
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 20:21:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 310BC1F22FE2
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 20:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324251C0DCA;
-	Tue, 20 Aug 2024 20:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195F41C461C;
+	Tue, 20 Aug 2024 20:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GWh1fDzT"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WWShBPYN"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2085.outbound.protection.outlook.com [40.107.93.85])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888CD1662F4;
-	Tue, 20 Aug 2024 20:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724185306; cv=fail; b=dkvVYqh3J8l0X1BqCldIEeMYizHzWw2V5IMxxxEEjd79uzLBDQhFeBflMhmEmrl8A2OHG0Rluyc3z2MPbtcdOhk9I4mhA6Go7v6FWKtv+lw7FnAGNJPt1Kz86eKqIJHAQw53RbghAm8azkU58mdfcM5PjDdg97jqmwWoNKLrBnk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724185306; c=relaxed/simple;
-	bh=Lm9lj5QlMyYDej3ifJW7CVewo+OklnveGkLIBx6YG48=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=jqlJ7XQbhE+EYksQOaAHwJ2KfAUVvTzJp467KypH1e7gfCgfKWCbAt1EmVlZ1ijbDHUPsnbgX0+P6/YivwAuOmHS27SjQ/fDxasZuIuIt9V8QnjYQHGPQqIft7+jOdKlQcxERsdf1nIpC7xb5SoQWJR0qP//C7Qrd/2kpEs0lC4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GWh1fDzT; arc=fail smtp.client-ip=40.107.93.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aTIBEIgh3lWuJ+hCjL2mXOQ+rnzJJpEcRRZJIulKZoMy/fNlknTxUKNx1zgtR1xtPKEWq6vbi+rb60HnuCeVB3Npzjij9XYl7twtMDGrMuaePhliIKZDQk3abJ/Mmc+OWF8ZyHUIcWeV6/e2fZEAs0Xw6N0wxb0I8kDNy8rrdg08FXzD32wtJ88jtJm1fSa6q0LY1KfUErQ7RH8yQkjPpizHbjwfeoDzCM+FTWz+ZyKnKaaOVgkPB5P6w91cCPiVStszWPPLGYrjomnYIYg/MwdejmvMLerKLdHaMebucbA6Zy7r5eWpzUWmb5o69gGoGMaSX1MIn6G8xi8K5Qrbqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TOP6ZND+MP+IMskSg4Hkv9aCthfnj1P/RlfttAs11Gs=;
- b=qGdp7dbHI8ni8tAb5z6l2aPnGr50WaZVx3IDHyaGa6F5sMCxmzkFnphU0rvPiJ4QJFAz7Iz9GoXV5PJb4ZKIFk/1emgrh4KOxW2iJDa8xBeOvPuEd6s7gRcZQMCO3M3py/+m2/ecjUW8arhyk3ZoHhKVvMSgEP/8ysvMyGjode75jEAiXpTpD4qkolUEsf2lXnnMSwEBEpA6wM5s/6LbTbRT+3qdQElN8haKOBI15pP0VBwBBsWqKRSq+W+qkCvxicDnlOpxO91UM0Fwb/ApRtJzaMpdj8vdyTp7atC4fxGFHeDaFLa87aTYGpYUkFsIY1tGorkMLdXBceGpWrtkSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TOP6ZND+MP+IMskSg4Hkv9aCthfnj1P/RlfttAs11Gs=;
- b=GWh1fDzTwVfYMZGxqQNitlGSRaNJKKpNSh2/yJuYy2smKaISpZzn/1FNPRnEjJKwxpWvSynQ8xagUiGnB4r+MoaUAK0QrsoGp26FRMnEbTm8AEptDxpHMRApCrjFGFlxMcJQYz0kJa338XUl4zvJJ1IrSPCxkYIAgGy39i6G9gg0cDF4a8myh5sLFdcW0Rno3Osj+IXXk7PAbPJeeBUoF60NzYqfk7pE8jP/4Mwm/hklkhsLqi48FQIg7BgpmxX8gnWruUiPH0hoN7GIWFynPi3kZ86bssBHarsbMf2aNdf35Tl+eCrCRZnMDK3IlvFHaObsJtR9WSs96Py1Lg9M8A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
- by SJ0PR12MB6927.namprd12.prod.outlook.com (2603:10b6:a03:483::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Tue, 20 Aug
- 2024 20:21:39 +0000
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7875.023; Tue, 20 Aug 2024
- 20:21:39 +0000
-Date: Tue, 20 Aug 2024 17:21:38 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: acpica-devel@lists.linux.dev,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Hanjun Guo <guohanjun@huawei.com>, iommu@lists.linux.dev,
-	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
-	kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
-	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Robert Moore <robert.moore@intel.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
-	Eric Auger <eric.auger@redhat.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Moritz Fischer <mdf@kernel.org>,
-	Michael Shavit <mshavit@google.com>,
-	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH 2/8] iommu/arm-smmu-v3: Use S2FWB when available
-Message-ID: <20240820202138.GH3773488@nvidia.com>
-References: <0-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
- <2-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
- <ZsRUDaFLd85O8u4Z@google.com>
- <20240820120102.GB3773488@nvidia.com>
- <ZsT0Fd5FHS47gm0-@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZsT0Fd5FHS47gm0-@google.com>
-X-ClientProxiedBy: BL1PR13CA0001.namprd13.prod.outlook.com
- (2603:10b6:208:256::6) To CH3PR12MB7763.namprd12.prod.outlook.com
- (2603:10b6:610:145::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456A51B86F8;
+	Tue, 20 Aug 2024 20:35:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724186116; cv=none; b=QDbfaN5CNoClkujw1OIuaKin3PjV/w+Y9KqhgM7yf/dSCXUeRlqVoBwvcbQTfzE6beS56aIUrzGCxa3mo4UZ+vY/3/jOdncjYwO4RGMHjfNCt5ywGwlUMeRYrCzrmYBx5fD/dTVsMMoC7UKqeuMrSIDXr4FTtI0dfIEHdFMSH/o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724186116; c=relaxed/simple;
+	bh=MGMA81T4YmzbdFsPkaV1PkSIDiQ4tVixnTrVYvOJU8w=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=oybKLeAN57T9TnMhMs4ajmL1rPg17mjULbBorEwEOv5tTRLfp00mLxF0CF3dlPCdMADj25UQVSYPy1ZbjYEDHHIQdubdia4gqF5JBxkwCd++FVAd1IJsBzc4xip8bgOMX2qSq7OpxgpzsvWSMxTqjOVwVXtzV3kjyD90vt3/KUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WWShBPYN; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
+	From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=0SWc1274y6UTZON/gZ6tkr7X/lABDMbH36NdjKzAmbQ=; b=WWShBPYNI28846OtngOSpWpHXI
+	406VYBLMCorJLAnR/QeIKAH1myLnvBB/SxJGoucpPZnjegWWExpZ+b+XjGGMBudzwRH3PQWoVTlUQ
+	3GrLnrUbV8hH/u/YC+dYzOcbZPicrElB2FyTpK/SphvptqhyZajJEgmlFmUGjontHETQgYCpbRqCA
+	bLiB27M72Q4U0DnEx82jTLXH6PcgVAx6jZhuXSQyI76UwcodUFAl2sndoiGeNCQn/DeoigP5KhBJJ
+	eU4AC6YHyCTuYA3ge0jIfSpiBRGz5rR8/nqh1ThE1sft+shGI1DqknIg8j9bZQqBpYeNfOP+QFWcB
+	+Rnarbrw==;
+Received: from [2001:8b0:10b:5:cb53:8564:1f06:36f6] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sgVZD-00000008NiV-0W9p;
+	Tue, 20 Aug 2024 20:34:59 +0000
+Message-ID: <04f67b56610fc0122f44468d6c330eede67b54d9.camel@infradead.org>
+Subject: [PATCH v2] KVM: Move gfn_to_pfn_cache invalidation to
+ invalidate_range_end hook
+From: David Woodhouse <dwmw2@infradead.org>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>,  "Hussain, Mushahid" <hmushi@amazon.co.uk>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li
+ <wanpengli@tencent.com>,  Jim Mattson <jmattson@google.com>, Joerg Roedel
+ <joro@8bytes.org>, kvm@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ Mingwei Zhang <mizhang@google.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Date: Tue, 20 Aug 2024 21:34:58 +0100
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-eQauqdbr86jGHD3EBdgN"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|SJ0PR12MB6927:EE_
-X-MS-Office365-Filtering-Correlation-Id: d35ca7c0-5e56-4e8a-9712-08dcc155b2ac
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OGJaWUxweU5ueDZvMlNrRTF3OHhRdmhEVnVKYTJhTUU0OXAzM0NRYUZHYU14?=
- =?utf-8?B?MVIxOUh4N2dFcWU0d2JEeWp5d09HZGhteGdDMENJZkRMUXVIeEtmWGRlTmtG?=
- =?utf-8?B?T1FwVGhEMkhhdWIzMFlyOFpjUXJVRk5PN1BvYmpQR2lTejV1NUx0Y29Wb3Vq?=
- =?utf-8?B?d0tOYldCT1FYc3ZkaHIxT1NTTHZOc0tvMmxDZyt0clVCS3ZVS1lmQjBMZFhs?=
- =?utf-8?B?WTdBdjFLMmZxTHpZK0xWNG0rL3FOM0R4enlQZ1psTHN6emxUTTZ1VmVyYkM5?=
- =?utf-8?B?c1U2UUwrQ3BtUW1RVTFtZHV2eklxM0RCckJxY0JDeEQ0WS9IYU5rS0UvRnBZ?=
- =?utf-8?B?S0FBc20rWURuUENIQTE0VlZWeHpSVERFZDVyZWhDbmd3RW1iL2Rtb0Y4NDk4?=
- =?utf-8?B?T1ZCaUVSVWNrU1J6ei9nZ1IzbCs0bktydTNFb2RyeXdZK2dzZnN5b0xUVktL?=
- =?utf-8?B?OFNROWdmVlg1M1pjb2tYRGlKMndMR3hRUW9VVGhQK0c4RlhyWnA3emtOSVFz?=
- =?utf-8?B?MXBWZmNDV1ZBZ0VDdTJCZFAwYW5WWEpWZ3h1L0lLQnh2SlFMRlNlUWMyQ0k2?=
- =?utf-8?B?S1VTajRNbVVGVWM2WEZxd0VaQmpnZXNNUTc4bzM3Q01malc0c01yWEwzVXZC?=
- =?utf-8?B?WTU0dU5KMTdIY2lraHNsUVdnTFhhWnNzalRVTjNLKzBsRXNOZ0wyRC93bGlT?=
- =?utf-8?B?a0tnT1E2UmZCWjRJSGNOaVVnaUIrRFZETUVxRWM2OHZPV0xXeS9pcU9tczI4?=
- =?utf-8?B?bTJNZGhqVEwzeTMyVnh5b0RZNDI3RDNZNFl5VmRSWlVtdU5oUkowVVcxTkpN?=
- =?utf-8?B?REhVZ2JMb0s1eHU1L2hncmpEcGJyNUtkV0RUV2ZSSEIxakx6cE01MFl2Wit4?=
- =?utf-8?B?ZEN6R0RiZlhDQUpaVTJvM2tBZVBKaUIzSDlxRFpsY3BCMXVObFdSZHFRaUFa?=
- =?utf-8?B?RTBqRGlGWmd5bjNwNVgxSEpjZTBhUmpTMVMxZGcvNnhmeGlRUGNNYnVnUndT?=
- =?utf-8?B?Z2V6RXZOYnh0VnVhU1I2Vkh2eEh5a3pXN0krS0liOVJSWDlLK3ppMFliWlVx?=
- =?utf-8?B?Mk1yVEI2dWZ3MXNncnkrVFhjQ051RWk3TFMwVW5Nbms1Snp3Ri9lWVFOT0U1?=
- =?utf-8?B?TGl6a2Uxd1FVbk9ZWHRMYzEwcm1XQWJzc0p6SzNMUCt5VXo1SjhXd3Zyc1hO?=
- =?utf-8?B?UXdMTlRvZ21aVDVyTUoxVU9sSStwamMxSG9kbHhZM2VWK3J3eHNXRnBZR1BR?=
- =?utf-8?B?aTlZZUpVYVRFK0lOaWJta1dwWTdzSGp0SVVHSXRjalN0bDhPc3lOOG1TM01J?=
- =?utf-8?B?TDluY2NvQlRxNi9kUE02V1JCeFZVYmdXK3JlYnpwRDAxYmNFc3d6M0dEVFhM?=
- =?utf-8?B?aEJRYmRyWVdDejhDcU10ekY5dDZtaEc0NlQvREE4RWVITEZzZ2ZxMTJJbDI1?=
- =?utf-8?B?UjNNMWdWRDFkMTU0cWVGeGpXVHRvR3hwbkFCUDJsN1RHVC9zUjB4NFpSU21z?=
- =?utf-8?B?bDArb0MySEF5blVDTEt0dGNDMXlveGt1VVBEQ3hObHhYQXZYR0pLbHF4OURX?=
- =?utf-8?B?K2l1UmJIMWRlQTAvdFNEbUowQ1dGY3ZDSE5nUFEzV0ZtdjVNZWIwUzNkWW1F?=
- =?utf-8?B?REVidWN1aDcwdHczSnpwTXNlV1BHWjBONEYwa0F1c0RmZ3lQUVU3ZEc5aExB?=
- =?utf-8?B?c3RIN0YwODVzUjZMR1JFUTZ4YkFlQXFWU1d1cmExUFNqSDNPcTVQTW83QWJW?=
- =?utf-8?B?cUo1Q0pQb2JBUjExT0Rla2dhU0RTK0JNN0d6T1BYWWVFUVNiYzV2Tk5tOU5T?=
- =?utf-8?Q?bOPeaR8ty37eSjJiZ8D9jf3YsDga929ywJ/IQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SzJvVVJYd2Q1Nk5YT1h5dmtZV1NoTk5iMnA0UGxHZWNHRWtId1dUUGswNTNF?=
- =?utf-8?B?YlNEelUwQmNrUVlxRGJrd2kvYksrczR2YXdxZDFSM3p6bVhxOUxtRyt0YWFa?=
- =?utf-8?B?dGZvL1QrSk5vRHFZNGMzaEoxaDA5MzVjVnMwSkVDZTdjVWtvK1JBZDJYRHFT?=
- =?utf-8?B?dnZwNlJETnJBaTJmNm9oLy9Jbk5UMWpsYjBTQXMra1dJQXM5UVNpeklpbDQ4?=
- =?utf-8?B?aGh1RnFNMVg2aEllV25oeWtjaW10TWZSeFBxZlRCdkZ0U1dKVTlWdjRla0Qy?=
- =?utf-8?B?b0srYXIzazZERy8rL3c3amMwOExac3lUbFNLVUNibjFZSks4bGY2WGNHK0Vl?=
- =?utf-8?B?VzFXTkgxK2pFVFU2dlUxMkJZQzdiNm1jUHl6VXdWenZhb2xmeU9DUm5xTjk5?=
- =?utf-8?B?dFh2SnF1emQrVGhIQVF5ODcwcWxseElqSmZUYjhTN2cyVmxSanBSbVlGc0cw?=
- =?utf-8?B?UFRxbFhWT3dzaHpqTVkvR1BXWjVpRkZBNklEc3BoU3F0MTZLYzBwYzhFOW5E?=
- =?utf-8?B?RWRDS3c0QnVMM3NNUkF0VW4vbHNnYkg3K0F4bWFzTkp2akNxZ2Fydlo2eStt?=
- =?utf-8?B?cDJCMm5qWU9UaW1lRUlTbFFqS3pHd0haS2ZQYTNaSUdCT1RxdjZKa0ZIWUpm?=
- =?utf-8?B?VmJvQU5yYnVqL3RPejd2RVFpc1ZzMDAzakNtTm51REhKcUgwS2E2MStHb0Ew?=
- =?utf-8?B?VE1WdjZ4SUlNakxzenpjajVOS0xpZHFqTVdOWklIS2pZcGdoNzlsUUQ3cm43?=
- =?utf-8?B?NnVVekltNkZnbWpwK09XRDFjV0FuSGxKeG9EanBHY3FuY1IvT3FBekZVdGs0?=
- =?utf-8?B?MDZJcWt4WnRkZXhPUG5odzNnY3Vock5WVkFlUVdEY1llNWxNeDV5NGdWY29s?=
- =?utf-8?B?VnBWYit5WEQvdTJjbWlqSjhpR3VQQUlzS0ZHTGQ4L05lamh2YkZtWXFORW4w?=
- =?utf-8?B?UncxK0Z4UlN4WVE5Nmk2RkMyNkduMTZTOXYweXZONmxwL2FTRTNBSHhZSGEy?=
- =?utf-8?B?b0xlRFZIUkdNTWR5bFFiaVlSMWx0Mnd4RTV2Q09ya2pmNUVPWGZRNmI1L1BC?=
- =?utf-8?B?ZS9vajdrSFlYcXJpU0t4ZzNjRWVieUZpUXFRbkNpNUhpejJFNWQ3c3Q5eUxE?=
- =?utf-8?B?LzV1NS9YMGs5dWtUeGFJd3NNTHBJb1MvL2E4SXlpNkJ6M3RzVXBoaFRIejl2?=
- =?utf-8?B?bjNWVTN0c05KYnZPUTU5bWNUM1lqN2RDZ0NucFNpNEI0dno4UHlDTGNrRUd2?=
- =?utf-8?B?VFZFcUt3QjJpcG1HVzBsZ3pOQlN4VG4rdzQyYWlpcmdvT2k4RVdVRFI0UU1L?=
- =?utf-8?B?MU1TY1loVW9jTkhQZ1cwMWN3Q2cyMFlVdVhYQkx5S0hBd1dqY2ZsT1VRaFpZ?=
- =?utf-8?B?Wkl2R1h5ekNoWFJZNk0wbE1BbjI5VjBncDdGMVJpbU1aSStzUmo1MFUwUW1L?=
- =?utf-8?B?OVVQMXBqdlNDYWhKZWlzeGpXVUU2VkVXZHYxcEZaS2lzUVdvU1RNTE8yM0dv?=
- =?utf-8?B?NDQwbW5MWnE0WEZoWFhyRUlBSDFqZHJnY0NPeDVXWHdUbXVzRU5CRCswQ0Iv?=
- =?utf-8?B?a1J5a1hTYXdZNGdncGJpZTRDRTJ6RG9DcGRVekFZMkM4aWZUZmthUWIvL2wv?=
- =?utf-8?B?K3I3Y3hORlRZWWlFcnlsaDd2bXJ6MVBIMEwxVmZpTlVzN0lBLzlUR0gzdmFL?=
- =?utf-8?B?dDk3eEp0Y21FZnlUbDlWSGF0YVF5bE1CNGkrYWJFUDdXUm4yYmU4S054UEJq?=
- =?utf-8?B?MzM4TUdNMzVRenlFQU1HbDVDcDluM3NTdXNPTEpCblAyWTNPN3hQaXp4U2ky?=
- =?utf-8?B?QmVrMVlCYVFueU83S3VyVDUyaWZsUEY5eVZrVGlSWVZDQXdrbmFJT0tJdjEv?=
- =?utf-8?B?VG5vL1BNTnBnTFNxZ2c1WUNOVU5TSDV5M2VRRytJZFRnRUc2bUYxcC9rbU9h?=
- =?utf-8?B?MkpML3MyUFVWc3dQandQRmFUSUhrR0FSaWw3TW1OdTdRN3ozRlVrY0FGQ3RI?=
- =?utf-8?B?M09CTUtob3ZSbTcrYzI4UU9GbHAzNE8ycFQvKzNkaEJJQVdnNzRSaFBDRlJC?=
- =?utf-8?B?M20wbHI5U09xZjVrSVdMR256a25DWFY3ZG9qM2tXZXYwd3J1M1puRklOcHR0?=
- =?utf-8?Q?QvmOrnM081T9LEGUaEBT/TU0Y?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d35ca7c0-5e56-4e8a-9712-08dcc155b2ac
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2024 20:21:39.5366
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VsSBFM3T/b1GvIma0j19XkmtI4eSj+o3qMiN50jh07+XvT9MXBmNHjPImx6vOt/y
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6927
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Aug 20, 2024 at 07:52:53PM +0000, Mostafa Saleh wrote:
-> On Tue, Aug 20, 2024 at 09:01:02AM -0300, Jason Gunthorpe wrote:
-> > On Tue, Aug 20, 2024 at 08:30:05AM +0000, Mostafa Saleh wrote:
-> > > Hi Jason,
-> > > 
-> > > On Tue, Aug 06, 2024 at 08:41:15PM -0300, Jason Gunthorpe wrote:
-> > > > Force Write Back (FWB) changes how the S2 IOPTE's MemAttr field
-> > > > works. When S2FWB is supported and enabled the IOPTE will force cachable
-> > > > access to IOMMU_CACHE memory and deny cachable access otherwise.
-> > > > 
-> > > > This is not especially meaningful for simple S2 domains, it apparently
-> > > > doesn't even force PCI no-snoop access to be coherent.
-> > > > 
-> > > > However, when used with a nested S1, FWB has the effect of preventing the
-> > > > guest from choosing a MemAttr that would cause ordinary DMA to bypass the
-> > > > cache. Consistent with KVM we wish to deny the guest the ability to become
-> > > > incoherent with cached memory the hypervisor believes is cachable so we
-> > > > don't have to flush it.
-> > > > 
-> > > > Turn on S2FWB whenever the SMMU supports it and use it for all S2
-> > > > mappings.
-> > > 
-> > > I have been looking into this recently from the KVM side as it will
-> > > use FWB for the CPU stage-2 unconditionally for guests(if supported),
-> > > however that breaks for non-coherent devices when assigned, and
-> > > limiting assigned devices to be coherent seems too restrictive.
-> > 
-> > kvm's CPU S2 doesn't care about non-DMA-coherent devices though? That
-> > concept is only relevant to the SMMU.
->
-> Why not? That would be a problem if a device is not dma coherent,
-> and the VM knows that and maps it’s DMA memory as non cacheable.
-> But it would be overridden by FWB in stage-2 to be cacheable,
-> it would lead to coherency issues.
 
-Oh, from that perspective yes, but the entire point of S2FWB is that
-VM's can not create non-coherent access so it is a bit nonsense to ask
-for both S2FWB and try to assign a non-DMA coherent device.
+--=-eQauqdbr86jGHD3EBdgN
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Yes, that also breaks (although I think this is an easier problem to
-> solve)
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Well, it is easy to solve, just don't use S2FWB and manually flush the
-caches before the hypervisor touches any memory. :)
+The existing retry loop in hva_to_pfn_retry() is extremely pessimistic.
+If there are any concurrent invalidations running, it's effectively just
+a complex busy wait loop because its local mmu_notifier_retry_cache()
+function will always return true.
 
-> What I mean is the master itself not the SMMU (the SID basically),
-> so in that case the STE shouldn’t have FWB enabled.
+Since multiple invalidations can be running in parallel, this can result
+in a situation where hva_to_pfn_retry() just backs off and keep retrying
+for ever, not making any progress.
 
-That doesn't matter, those cases will not pass in IOMMU_CACHE and they
-will work fine with S2FWB turned on.
+Solve this by being a bit more selective about when to retry.
 
-> > Also bear in mind VFIO won't run unless ARM_SMMU_FEAT_COHERENCY is set
-> > so we won't even get a chance to ask for a S2 domain.
-> 
-> Oh, I think that is only for the SMMU, not for the master, the
-> SMMU can be coherent (for pte, ste …) but the master can still be
-> non coherent. Looking at how VFIO uses it, that seems to be a bug?
+Introduce a separate 'needs invalidation' flag to the GPC, which allows
+it to be marked invalid even while hva_to_pfn_retry() has dropped the
+lock to map the newly-found PFN. This allows the invalidation to moved
+to the range_end hook, and the retry loop only occurs for a given GPC if
+its particular uHVA is affected.
 
-If there are mixes of SMMU feature and dev_is_dma_coherent() then it
-would be a bug yes..
+However, the contract for invalidate_range_{start,end} is not like a
+simple TLB; the pages may have been freed by the time the end hook is
+called. A "device" may not create new mappings after the _start_ hook is
+called. To meet this requirement, hva_to_pfn_retry() now waits until no
+invalidations are currently running which may affect its uHVA, before
+finally setting the ->valid flag and returning.
 
-I recall we started out trying to use dev_is_dma_coherent() but
-Christoph explained it doesn't work that generally:
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+v2:=20
+ =E2=80=A2 Do not mark the nascent cache as valid until there are no pendin=
+g
+   invalidations which could affect it.
 
-https://lore.kernel.org/kvm/20220406135150.GA21532@lst.de/
+Tested with Sean's torture test, forward ported and in the tip of the
+tree at
+https://git.infradead.org/?p=3Dusers/dwmw2/linux.git;a=3Dshortlog;h=3Drefs/=
+heads/pfncache-2
 
-Seems we sort of gave up on it, too complicated. Robin had a nice
-observation of the complexity:
+ include/linux/kvm_host.h  |   3 ++
+ include/linux/kvm_types.h |   1 +
+ virt/kvm/kvm_main.c       |  54 +++++++++++++------
+ virt/kvm/kvm_mm.h         |  12 ++---
+ virt/kvm/pfncache.c       | 106 ++++++++++++++++++++++++++------------
+ 5 files changed, 122 insertions(+), 54 deletions(-)
 
-    Disregarding the complete disaster of PCIe No Snoop on Arm-Based 
-    systems, there's the more interesting effectively-opposite scenario 
-    where an SMMU bridges non-coherent devices to a coherent interconnect. 
-    It's not something we take advantage of yet in Linux, and it can only be 
-    properly described in ACPI, but there do exist situations where 
-    IOMMU_CACHE is capable of making the device's traffic snoop, but 
-    dev_is_dma_coherent() - and device_get_dma_attr() for external users - 
-    would still say non-coherent because they can't assume that the SMMU is 
-    enabled and programmed in just the right way.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 79a6b1a63027..a0739c343da5 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -770,6 +770,9 @@ struct kvm {
+ 	/* For management / invalidation of gfn_to_pfn_caches */
+ 	spinlock_t gpc_lock;
+ 	struct list_head gpc_list;
++	u64 mmu_gpc_invalidate_range_start;
++	u64 mmu_gpc_invalidate_range_end;
++	wait_queue_head_t gpc_invalidate_wq;
+=20
+ 	/*
+ 	 * created_vcpus is protected by kvm->lock, and is incremented
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index 827ecc0b7e10..4d8fbd87c320 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -69,6 +69,7 @@ struct gfn_to_pfn_cache {
+ 	void *khva;
+ 	kvm_pfn_t pfn;
+ 	bool active;
++	bool needs_invalidation;
+ 	bool valid;
+ };
+=20
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 92901656a0d4..01cde6284180 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -775,20 +775,26 @@ static int kvm_mmu_notifier_invalidate_range_start(st=
+ruct mmu_notifier *mn,
+ 	 */
+ 	spin_lock(&kvm->mn_invalidate_lock);
+ 	kvm->mn_active_invalidate_count++;
++	if (likely(kvm->mn_active_invalidate_count =3D=3D 1)) {
++		kvm->mmu_gpc_invalidate_range_start =3D range->start;
++		kvm->mmu_gpc_invalidate_range_end =3D range->end;
++	} else {
++		/*
++		 * Fully tracking multiple concurrent ranges has diminishing
++		 * returns. Keep things simple and just find the minimal range
++		 * which includes the current and new ranges. As there won't be
++		 * enough information to subtract a range after its invalidate
++		 * completes, any ranges invalidated concurrently will
++		 * accumulate and persist until all outstanding invalidates
++		 * complete.
++		 */
++		kvm->mmu_gpc_invalidate_range_start =3D
++			min(kvm->mmu_gpc_invalidate_range_start, range->start);
++		kvm->mmu_gpc_invalidate_range_end =3D
++			max(kvm->mmu_gpc_invalidate_range_end, range->end);
++	}
+ 	spin_unlock(&kvm->mn_invalidate_lock);
+=20
+-	/*
+-	 * Invalidate pfn caches _before_ invalidating the secondary MMUs, i.e.
+-	 * before acquiring mmu_lock, to avoid holding mmu_lock while acquiring
+-	 * each cache's lock.  There are relatively few caches in existence at
+-	 * any given time, and the caches themselves can check for hva overlap,
+-	 * i.e. don't need to rely on memslot overlap checks for performance.
+-	 * Because this runs without holding mmu_lock, the pfn caches must use
+-	 * mn_active_invalidate_count (see above) instead of
+-	 * mmu_invalidate_in_progress.
+-	 */
+-	gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end);
+-
+ 	/*
+ 	 * If one or more memslots were found and thus zapped, notify arch code
+ 	 * that guest memory has been reclaimed.  This needs to be done *after*
+@@ -842,19 +848,33 @@ static void kvm_mmu_notifier_invalidate_range_end(str=
+uct mmu_notifier *mn,
+=20
+ 	__kvm_handle_hva_range(kvm, &hva_range);
+=20
++	/*
++	 * It's safe to invalidate the gfn_to_pfn_caches from this 'end'
++	 * hook, because hva_to_pfn_retry() will wait until no active
++	 * invalidations could be affecting the corresponding uHVA
++	 * before before allowing a newly mapped GPC to become valid.
++	 */
++	gfn_to_pfn_cache_invalidate(kvm, range->start, range->end);
++
+ 	/* Pairs with the increment in range_start(). */
+ 	spin_lock(&kvm->mn_invalidate_lock);
+ 	if (!WARN_ON_ONCE(!kvm->mn_active_invalidate_count))
+ 		--kvm->mn_active_invalidate_count;
+ 	wake =3D !kvm->mn_active_invalidate_count;
++	if (wake) {
++		kvm->mmu_gpc_invalidate_range_start =3D KVM_HVA_ERR_BAD;
++		kvm->mmu_gpc_invalidate_range_end =3D KVM_HVA_ERR_BAD;
++	}
+ 	spin_unlock(&kvm->mn_invalidate_lock);
+=20
+ 	/*
+ 	 * There can only be one waiter, since the wait happens under
+ 	 * slots_lock.
+ 	 */
+-	if (wake)
++	if (wake) {
++		wake_up(&kvm->gpc_invalidate_wq);
+ 		rcuwait_wake_up(&kvm->mn_memslots_update_rcuwait);
++	}
+ }
+=20
+ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
+@@ -1164,7 +1184,9 @@ static struct kvm *kvm_create_vm(unsigned long type, =
+const char *fdname)
+=20
+ 	INIT_LIST_HEAD(&kvm->gpc_list);
+ 	spin_lock_init(&kvm->gpc_lock);
+-
++	init_waitqueue_head(&kvm->gpc_invalidate_wq);
++	kvm->mmu_gpc_invalidate_range_start =3D KVM_HVA_ERR_BAD;
++	kvm->mmu_gpc_invalidate_range_end =3D KVM_HVA_ERR_BAD;
+ 	INIT_LIST_HEAD(&kvm->devices);
+ 	kvm->max_vcpus =3D KVM_MAX_VCPUS;
+=20
+@@ -1340,8 +1362,10 @@ static void kvm_destroy_vm(struct kvm *kvm)
+ 	 * in-progress invalidations.
+ 	 */
+ 	WARN_ON(rcuwait_active(&kvm->mn_memslots_update_rcuwait));
+-	if (kvm->mn_active_invalidate_count)
++	if (kvm->mn_active_invalidate_count) {
+ 		kvm->mn_active_invalidate_count =3D 0;
++		wake_up(&kvm->gpc_invalidate_wq);
++	}
+ 	else
+ 		WARN_ON(kvm->mmu_invalidate_in_progress);
+ #else
+diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+index 715f19669d01..34e4e67f09f8 100644
+--- a/virt/kvm/kvm_mm.h
++++ b/virt/kvm/kvm_mm.h
+@@ -24,13 +24,13 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, b=
+ool interruptible,
+ 		     bool *async, bool write_fault, bool *writable);
+=20
+ #ifdef CONFIG_HAVE_KVM_PFNCACHE
+-void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
+-				       unsigned long start,
+-				       unsigned long end);
++void gfn_to_pfn_cache_invalidate(struct kvm *kvm,
++				 unsigned long start,
++				 unsigned long end);
+ #else
+-static inline void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
+-						     unsigned long start,
+-						     unsigned long end)
++static inline void gfn_to_pfn_cache_invalidate(struct kvm *kvm,
++					       unsigned long start,
++					       unsigned long end)
+ {
+ }
+ #endif /* HAVE_KVM_PFNCACHE */
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index f0039efb9e1e..3f48df8cd6e5 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -20,10 +20,15 @@
+ #include "kvm_mm.h"
+=20
+ /*
+- * MMU notifier 'invalidate_range_start' hook.
++ * MMU notifier 'invalidate_range_end' hook. The hva_to_pfn_retry() functi=
+on
++ * below may look up a PFN just before it is zapped, and may be mapping it
++ * concurrently with the actual invalidation (with the GPC lock dropped). =
+By
++ * using a separate 'needs_invalidation' flag, the concurrent invalidation
++ * can handle this case, causing hva_to_pfn_retry() to drop its result and
++ * retry correctly.
+  */
+-void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long star=
+t,
+-				       unsigned long end)
++void gfn_to_pfn_cache_invalidate(struct kvm *kvm, unsigned long start,
++				 unsigned long end)
+ {
+ 	struct gfn_to_pfn_cache *gpc;
+=20
+@@ -32,7 +37,7 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, u=
+nsigned long start,
+ 		read_lock_irq(&gpc->lock);
+=20
+ 		/* Only a single page so no need to care about length */
+-		if (gpc->valid && !is_error_noslot_pfn(gpc->pfn) &&
++		if (gpc->needs_invalidation && !is_error_noslot_pfn(gpc->pfn) &&
+ 		    gpc->uhva >=3D start && gpc->uhva < end) {
+ 			read_unlock_irq(&gpc->lock);
+=20
+@@ -45,9 +50,11 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, =
+unsigned long start,
+ 			 */
+=20
+ 			write_lock_irq(&gpc->lock);
+-			if (gpc->valid && !is_error_noslot_pfn(gpc->pfn) &&
+-			    gpc->uhva >=3D start && gpc->uhva < end)
++			if (gpc->needs_invalidation && !is_error_noslot_pfn(gpc->pfn) &&
++			    gpc->uhva >=3D start && gpc->uhva < end) {
++				gpc->needs_invalidation =3D false;
+ 				gpc->valid =3D false;
++			}
+ 			write_unlock_irq(&gpc->lock);
+ 			continue;
+ 		}
+@@ -93,6 +100,9 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigne=
+d long len)
+ 	if (!gpc->valid)
+ 		return false;
+=20
++	/* If it's valid, it needs invalidation! */
++	WARN_ON_ONCE(!gpc->needs_invalidation);
++
+ 	return true;
+ }
+=20
+@@ -124,32 +134,37 @@ static void gpc_unmap(kvm_pfn_t pfn, void *khva)
+ #endif
+ }
+=20
+-static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long=
+ mmu_seq)
++static bool gpc_invalidations_pending(struct gfn_to_pfn_cache *gpc)
+ {
+ 	/*
+-	 * mn_active_invalidate_count acts for all intents and purposes
+-	 * like mmu_invalidate_in_progress here; but the latter cannot
+-	 * be used here because the invalidation of caches in the
+-	 * mmu_notifier event occurs _before_ mmu_invalidate_in_progress
+-	 * is elevated.
+-	 *
+-	 * Note, it does not matter that mn_active_invalidate_count
+-	 * is not protected by gpc->lock.  It is guaranteed to
+-	 * be elevated before the mmu_notifier acquires gpc->lock, and
+-	 * isn't dropped until after mmu_invalidate_seq is updated.
++	 * No need for locking on GPC here because these fields are protected
++	 * by gpc->refresh_lock.
+ 	 */
+-	if (kvm->mn_active_invalidate_count)
+-		return true;
++	return unlikely(gpc->kvm->mn_active_invalidate_count) &&
++		(gpc->kvm->mmu_gpc_invalidate_range_start <=3D gpc->uhva) &&
++		(gpc->kvm->mmu_gpc_invalidate_range_end > gpc->uhva);
++}
+=20
+-	/*
+-	 * Ensure mn_active_invalidate_count is read before
+-	 * mmu_invalidate_seq.  This pairs with the smp_wmb() in
+-	 * mmu_notifier_invalidate_range_end() to guarantee either the
+-	 * old (non-zero) value of mn_active_invalidate_count or the
+-	 * new (incremented) value of mmu_invalidate_seq is observed.
+-	 */
+-	smp_rmb();
+-	return kvm->mmu_invalidate_seq !=3D mmu_seq;
++static void gpc_wait_for_invalidations(struct gfn_to_pfn_cache *gpc)
++{
++	spin_lock(&gpc->kvm->mn_invalidate_lock);
++	if (gpc_invalidations_pending(gpc)) {
++		DEFINE_WAIT(wait);
++
++		for (;;) {
++			prepare_to_wait(&gpc->kvm->gpc_invalidate_wq, &wait,
++					TASK_UNINTERRUPTIBLE);
++
++			if (!gpc_invalidations_pending(gpc))
++				break;
++
++			spin_unlock(&gpc->kvm->mn_invalidate_lock);
++			schedule();
++			spin_lock(&gpc->kvm->mn_invalidate_lock);
++		}
++		finish_wait(&gpc->kvm->gpc_invalidate_wq, &wait);
++	}
++	spin_unlock(&gpc->kvm->mn_invalidate_lock);
+ }
+=20
+ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+@@ -158,7 +173,6 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cac=
+he *gpc)
+ 	void *old_khva =3D (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
+ 	kvm_pfn_t new_pfn =3D KVM_PFN_ERR_FAULT;
+ 	void *new_khva =3D NULL;
+-	unsigned long mmu_seq;
+=20
+ 	lockdep_assert_held(&gpc->refresh_lock);
+=20
+@@ -172,8 +186,16 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_ca=
+che *gpc)
+ 	gpc->valid =3D false;
+=20
+ 	do {
+-		mmu_seq =3D gpc->kvm->mmu_invalidate_seq;
+-		smp_rmb();
++		/*
++		 * The translation made by hva_to_pfn() below could be made
++		 * invalid as soon as it's mapped. But the uhva is already
++		 * known and that's all that gfn_to_pfn_cache_invalidate()
++		 * looks at. So set the 'needs_invalidation' flag to allow
++		 * the GPC to be marked invalid from the moment the lock is
++		 * dropped, before the corresponding PFN is even found (and,
++		 * more to the point, immediately afterwards).
++		 */
++		gpc->needs_invalidation =3D true;
+=20
+ 		write_unlock_irq(&gpc->lock);
+=20
+@@ -217,6 +239,15 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_ca=
+che *gpc)
+ 			goto out_error;
+ 		}
+=20
++		/*
++		 * Avoid populating a GPC with a user address which is already
++		 * being invalidated, if the invalidate_range_start() notifier
++		 * has already been called. The actual invalidation happens in
++		 * the invalidate_range_end() callback, so wait until there are
++		 * no active invalidations (for the relevant HVA).
++		 */
++		gpc_wait_for_invalidations(gpc);
++
+ 		write_lock_irq(&gpc->lock);
+=20
+ 		/*
+@@ -224,7 +255,14 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_ca=
+che *gpc)
+ 		 * attempting to refresh.
+ 		 */
+ 		WARN_ON_ONCE(gpc->valid);
+-	} while (mmu_notifier_retry_cache(gpc->kvm, mmu_seq));
++
++		/*
++		 * Since gfn_to_pfn_cache_invalidate() is called from the
++		 * kvm_mmu_notifier_invalidate_range_end() callback, it can
++		 * invalidate the GPC the moment after hva_to_pfn() returned
++		 * a valid PFN. If that happens, retry.
++		 */
++	} while (!gpc->needs_invalidation);
+=20
+ 	gpc->valid =3D true;
+ 	gpc->pfn =3D new_pfn;
+@@ -339,6 +377,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *g=
+pc, gpa_t gpa, unsigned l
+ 	 */
+ 	if (ret) {
+ 		gpc->valid =3D false;
++		gpc->needs_invalidation =3D false;
+ 		gpc->pfn =3D KVM_PFN_ERR_FAULT;
+ 		gpc->khva =3D NULL;
+ 	}
+@@ -383,7 +422,7 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct =
+kvm *kvm)
+ 	gpc->pfn =3D KVM_PFN_ERR_FAULT;
+ 	gpc->gpa =3D INVALID_GPA;
+ 	gpc->uhva =3D KVM_HVA_ERR_BAD;
+-	gpc->active =3D gpc->valid =3D false;
++	gpc->active =3D gpc->valid =3D gpc->needs_invalidation =3D false;
+ }
+=20
+ static int __kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, uns=
+igned long uhva,
+@@ -453,6 +492,7 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
+ 		write_lock_irq(&gpc->lock);
+ 		gpc->active =3D false;
+ 		gpc->valid =3D false;
++		gpc->needs_invalidation =3D false;
+=20
+ 		/*
+ 		 * Leave the GPA =3D> uHVA cache intact, it's protected by the
+--=20
+2.44.0
 
-Anyhow, for the purposes of KVM and VFIO, devices that don't work with
-IOMMU_CACHE are not allowed. From an API perspective
-IOMMU_CAP_CACHE_COHERENCY is supposed to return if the struct device
-can use IOMMU_CACHE.
 
-The corner case where we have a ARM_SMMU_FEAT_COHERENCY SMMU but
-somehow specific devices don't support IOMMU_CACHE is not properly
-reflected in IOMMU_CAP_CACHE_COHERENCY. I don't know how to fix that,
-and we've been ignoring it for a long time now :)
 
-Jason
+--=-eQauqdbr86jGHD3EBdgN
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwODIwMjAzNDU4WjAvBgkqhkiG9w0BCQQxIgQg9FWh/bf5
+9CcoAIFWikPCi58/ogYvfnvrEMkaLz0p+X0wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCpsuphW4qQpjZ6YkWEmhoR/Y3IGJcYAWVA
+/b8y3WocIJ9UN9RUmYNOmVzxr7OJcpmCiG9ELQwCBxQd2M569nrjHH8wavyC2WeV26lShNYH042Z
+Akm58G5HIIsxuc4syCNFYKlYuQhYug8jk90S3Xwic/7ODpTY8JFY5Jt5DbFsu6y1aoxBkAl11hSx
+BecMHAhAs1GaemyJd/djKMaWeHvheDGsAVa/pXsrKNv4DBIbT9YsRDAQSICW2npV322m8ApaNNd3
+ADtX98jDmDYzloZr6nrtC5QflVdR1wqTdBRu3TyBjzGLzKvj/fwBx8w8lrQxfBfcuQC13uEl2Jlc
+eHyyXQUPbOUIrFtk0Nqg0sILGLBRQUHX5xEEN+JQ6VOTvqozk0NW1NvuQvuoof3hzfv8QIc/GPtu
+asJ23bI2oFqtSCSge2GP0Skf0fP91Ei/d3j7DoxjNEI1B3aaqjclpMK48177vYzCJPnH0WPHUD7Q
+GXbK+y6kZsYfDCSs+t+KnSg0B7pW6Czp1wB+w7n48T6XDi9IgwD2bJZ2+kgceVoiAdE4e7Le3lUe
+Tb0BXTRmD9LP1V/++/0VHe76m3oVAyu94k6Hl1eaTbpUnvLBXjikWs3I3JFzYmhO/IrBOHad+grl
+LJ+ZoYt/PZFK6x+22ce+zSIeE347LgPiEX4jBLJ9vwAAAAAAAA==
+
+
+--=-eQauqdbr86jGHD3EBdgN--
 
