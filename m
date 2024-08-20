@@ -1,118 +1,150 @@
-Return-Path: <kvm+bounces-24571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24573-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A66C957CD4
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 07:40:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED1D9957E67
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 08:40:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E347E1F2413B
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 05:40:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74456B225E8
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2024 06:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82AAC148FE8;
-	Tue, 20 Aug 2024 05:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="27JyjCVU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 715421EB4A3;
+	Tue, 20 Aug 2024 06:34:59 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496DE1465A2
-	for <kvm@vger.kernel.org>; Tue, 20 Aug 2024 05:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAAB81EB48F;
+	Tue, 20 Aug 2024 06:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724132425; cv=none; b=cfT2/Rki+dpE7uE2jYcWdAGB405hL/HQNL1mEEl5bhjHlLHWMqdm8yqMqImaDlIx1eTrYSYYBUUsLEN6cqxcfpMwe8JhzzcNieho+IN3HLCmXh3WNUBFxA1fx9JBEC6iSENOgzS6Ehr8zY4SkuJVkO/AhSud+QVO//BVKclxL8Q=
+	t=1724135698; cv=none; b=Rsi3o2LtR+U+uYgkVIoSp9euENJcdw7nrSmp+ZurE9OjmoMdRY8VMQQ0G7SuLvC7d5orSrP0XEhbtiAA1CY3zupyiM2PgpZvp70NVTai2DthG5MtU+AnKqzikCg9DtsVXjjYfnrh+UgGGGF6XwQ+T9ueGxwSuRAtGsMFU2uSajE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724132425; c=relaxed/simple;
-	bh=EwYRKj3OkbU3CrMKamHMEEEe0n4YknB01OQxscBvsDw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MuiCBae5EI9C2c7UJ2F7+GtKTMbr31/I7dbKXq3ciCP53piPsyA8SEst+2/RV8fY382Lam6XeRSH72TRgCZAvoMXqUpVQhIPMWylX4lvbG3Ii9iGHG2lhw+2JrvjXc81aLAHUPlAooKwP3V1KTthR0IUYG+mx+zeqCdU8Z48DB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=27JyjCVU; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-81f921c418eso118671439f.0
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2024 22:40:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1724132423; x=1724737223; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/GHJdsQ/Q26V4Dt/c4tmH8VqkuznizJko1phacknKag=;
-        b=27JyjCVU9oktXk0aIHFCIoZCrz9o+iWPxG4v8F5Vw0w9jpD6kORB668X2BWtxtJIPF
-         lQQDiiewadvfA2bzk/52Y7nmr2PlW9wTcCJAt+TJ5eIQvxYCcarstDXwRiDpfJsxjZZk
-         NoBr0P1BzY2xFY9jFkXd739Zy/v+oLaK/7NG7ofklhEAGiBmQoRClKRvVh/3GNHfFw0Z
-         n7SXsiO6RNTKVnajCILBbMRjX5iK/I3OOuvzBf2hLq6ye71OCUChuWmFiw0wT/POttUS
-         SJynKwkMIrfVg4nA0/o+QblWJUqVHnX9hi0+WRwNol6g52QwP3bzuyT5DkuYDQ25psJX
-         tNyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724132423; x=1724737223;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/GHJdsQ/Q26V4Dt/c4tmH8VqkuznizJko1phacknKag=;
-        b=FGZSgW41MhI3TtWgHZNOeGMh/IsOU1+J1CzPSsWAnq18OFUlnwXMBxYtgjiT55jcsg
-         jQvOjb+q5pj/PieGbr32iaQTJn4VCwG0mm2SCRd3ZPCtXi7ouJRxqQSQkE0scgGsyFGs
-         /vAQhq7ZVuI9svfNbIFw7SoWH7ql+Lh5YbO4DXoV8YaZ7rvmkoLgDHqBv9EVfviad1xN
-         jF3dvruQSCAV77fVXr25kX1hFVANiILcQg5hia36xIzA3E8vuZR7TNmqKSkHz/BX3oh5
-         W41TdmNT/gnyycjTt7O+KE5f00ytvOD6sIkF0SPoiZ/HZ17VZU6er5Kvz6ovU/1vIh90
-         sy3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXM+dGdEPHXWe7oUAYJC8aWzeq+D+b/KVDhT5kVt5F2k5jn5/Yz/nXNoYRVcF+gPREfGjk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOSja0IePa24TLBKPgVx2yeqzpRZjxGStuWaRxSN5zLwjtsgol
-	+iPjJ+H1Ntem4i+aKuYQDkjnU1H/8QrbkALjbmdcByBxbWGCa699I7pxLLYCrz7IfYQX4f57+gD
-	GvwfGktM/ZlZYxbom84B/V3WKCPV5hAdAExmVRQ==
-X-Google-Smtp-Source: AGHT+IEpOyPwY1ti/ApjMw6FrfiNvrsrXNrEkxYxWphvGLVII6n7y4noKSFLykCAOH2pvk/Gik3Hh6G9f8HZPxG/4Es=
-X-Received: by 2002:a05:6e02:1d8c:b0:395:e85e:f2fa with SMTP id
- e9e14a558f8ab-39d56de7f0emr22309735ab.1.1724132423336; Mon, 19 Aug 2024
- 22:40:23 -0700 (PDT)
+	s=arc-20240116; t=1724135698; c=relaxed/simple;
+	bh=eEissjANIlAjE6Dg4Lc8cpl/0QBn146mQDgtCJtqqCM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NisY1U8SpsyAT9s8uw8YrDZ/3ToDa6sDnM2c41cqyKwpDC43gWT6ReXu53t9b6RXeu2EjNj/HgNBsee+LMDkS8Cc16cEhSUMZjQQ8KzFMnHPIF4qI402npirArfPePBm0WAB59/Rbvw8HdnYL9/QK5rkAj4jgLNbPyFckdo3J9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: David Hunter <david.hunter.linux@gmail.com>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+CC: "seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>,
+	"hpa@zytor.com" <hpa@zytor.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"javier.carrasco.cruz@gmail.com" <javier.carrasco.cruz@gmail.com>,
+	"shuah@kernel.org" <shuah@kernel.org>, Peter Shier <pshier@google.com>, "Jim
+ Mattson" <jmattson@google.com>, Wanpeng Li <wanpengli@tencent.com>
+Subject: =?gb2312?B?tPC4tDogW83isr/Tyrz+XSBbUEFUQ0ggNi4xLnldIEtWTTogeDg2OiBmaXJl?=
+ =?gb2312?B?IHRpbWVyIHdoZW4gaXQgaXMgbWlncmF0ZWQgYW5kIGV4cGlyZWQsIGFuZCBp?=
+ =?gb2312?Q?n_oneshot_mode?=
+Thread-Topic: =?gb2312?B?W83isr/Tyrz+XSBbUEFUQ0ggNi4xLnldIEtWTTogeDg2OiBmaXJlIHRpbWVy?=
+ =?gb2312?B?IHdoZW4gaXQgaXMgbWlncmF0ZWQgYW5kIGV4cGlyZWQsIGFuZCBpbiBvbmVz?=
+ =?gb2312?Q?hot_mode?=
+Thread-Index: AQHa8sJeC0W224tlhE2Nz9bQU8HZe7IvqO8Q
+Date: Tue, 20 Aug 2024 06:18:41 +0000
+Message-ID: <57141688d6c94c789aa416906cacf08f@baidu.com>
+References: <20240820053229.2858-1-david.hunter.linux@gmail.com>
+In-Reply-To: <20240820053229.2858-1-david.hunter.linux@gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex14_2024-08-20 14:18:41:876
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240816-kvm_pmu_fixes-v1-0-cdfce386dd93@rivosinc.com>
-In-Reply-To: <20240816-kvm_pmu_fixes-v1-0-cdfce386dd93@rivosinc.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 20 Aug 2024 11:10:11 +0530
-Message-ID: <CAAhSdy33bSGOr6122MBzuLFP1-dQ45LRbd9zQMDPXf_zQDVNvA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Fixes for KVM PMU trap/emulation
-To: Atish Patra <atishp@rivosinc.com>
-Cc: Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-FEAS-Client-IP: 10.127.64.37
+X-FE-Last-Public-Client-IP: 100.100.100.38
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-On Fri, Aug 16, 2024 at 12:38=E2=80=AFPM Atish Patra <atishp@rivosinc.com> =
-wrote:
->
-> This series contains two small fixes to improve the KVM PMU trap/emulatio=
-n
-> code. The issue can be observed if SBI PMU is disabled or forced the kvm
-> to use hpmcounter31.
->
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
-> Atish Patra (2):
->       RISC-V: KVM: Allow legacy PMU access from guest
->       RISC-V: KVM: Fix to allow hpmcounter31 from the guest
-
-Queued this patch for Linux-6.11 fixes.
-
-Regards,
-Anup
-
->
->  arch/riscv/include/asm/kvm_vcpu_pmu.h | 21 +++++++++++++++++----
->  1 file changed, 17 insertions(+), 4 deletions(-)
-> ---
-> base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
-> change-id: 20240729-kvm_pmu_fixes-26754d2a077d
-> --
-> Regards,
-> Atish patra
->
+PiANCj4gRnJvbTogTGkgUm9uZ1FpbmcgPGxpcm9uZ3FpbmdAYmFpZHUuY29tPg0KPiANCj4gWyBV
+cHN0cmVhbSBDb21taXQgOGU2ZWQ5NmNkZDUwMDFjNTVmY2NjODBhMTdmNjUxNzQxYzFjYTdkMl0N
+Cj4gDQo+IHdoZW4gdGhlIHZDUFUgd2FzIG1pZ3JhdGVkLCBpZiBpdHMgdGltZXIgaXMgZXhwaXJl
+ZCwgS1ZNIF9zaG91bGRfIGZpcmUgdGhlDQo+IHRpbWVyIEFTQVAsIHplcm9pbmcgdGhlIGRlYWRs
+aW5lIGhlcmUgd2lsbCBjYXVzZSB0aGUgdGltZXIgdG8gaW1tZWRpYXRlbHkgZmlyZQ0KPiBvbiB0
+aGUgZGVzdGluYXRpb24NCj4gDQoNClRoaXMgcGF0Y2ggaW5jcmVhc2VkIHRoZSByZXByb2R1Y2Ug
+cmF0aW8gb2YgbGFwaWMgdGltZXIgaW50ZXJydXB0IGxvc2luZywgd2hpY2ggaGFzIGJlZW4gZml4
+ZWQgYnkgdGhlIGZvbGxvd2luZyBwYXRjaDsNCnNvIEkgdGhpbmsgcGF0Y2ggc2hvdWxkIG5vdCBt
+ZXJnZSBpdCBpbnRvIDYuMQ0KDQoNCmNvbW1pdCA5Y2ZlYzZkMDk3YzYwN2UzNjE5OWNmMGNmYmI4
+Y2Y1YWNiZDhlOWIyDQpBdXRob3I6IEhhaXRhbyBTaGFuIDxoc2hhbkBnb29nbGUuY29tPg0KRGF0
+ZTogICBUdWUgU2VwIDEyIDE2OjU1OjQ1IDIwMjMgLTA3MDANCg0KICAgIEtWTTogeDg2OiBGaXgg
+bGFwaWMgdGltZXIgaW50ZXJydXB0IGxvc3QgYWZ0ZXIgbG9hZGluZyBhIHNuYXBzaG90Lg0KDQog
+ICAgV2hlbiBydW5uaW5nIGFuZHJvaWQgZW11bGF0b3IgKHdoaWNoIGlzIGJhc2VkIG9uIFFFTVUg
+Mi4xMikgb24NCiAgICBjZXJ0YWluIEludGVsIGhvc3RzIHdpdGgga2VybmVsIHZlcnNpb24gNi4z
+LXJjMSBvciBhYm92ZSwgZ3Vlc3QNCiAgICB3aWxsIGZyZWV6ZSBhZnRlciBsb2FkaW5nIGEgc25h
+cHNob3QuIFRoaXMgaXMgYWxtb3N0IDEwMCUNCiAgICByZXByb2R1Y2libGUuIEJ5IGRlZmF1bHQs
+IHRoZSBhbmRyb2lkIGVtdWxhdG9yIHdpbGwgdXNlIHNuYXBzaG90DQogICAgdG8gc3BlZWQgdXAg
+dGhlIG5leHQgbGF1bmNoaW5nIG9mIHRoZSBzYW1lIGFuZHJvaWQgZ3Vlc3QuIFNvDQogICAgdGhp
+cyBicmVha3MgdGhlIGFuZHJvaWQgZW11bGF0b3IgYmFkbHkuDQoNCiAgICBJIHRlc3RlZCBRRU1V
+IDguMC40IGZyb20gRGViaWFuIDEyIHdpdGggYW4gVWJ1bnR1IDIyLjA0IGd1ZXN0IGJ5DQogICAg
+cnVubmluZyBjb21tYW5kICJsb2Fkdm0iIGFmdGVyICJzYXZldm0iLiBUaGUgc2FtZSBpc3N1ZSBp
+cw0KICAgIG9ic2VydmVkLiBBdCB0aGUgc2FtZSB0aW1lLCBub25lIG9mIG91ciBBTUQgcGxhdGZv
+cm1zIGlzIGltcGFjdGVkLg0KICAgIE1vcmUgZXhwZXJpbWVudHMgc2hvdyB0aGF0IGxvYWRpbmcg
+dGhlIEtWTSBtb2R1bGUgd2l0aA0KICAgICJlbmFibGVfYXBpY3Y9ZmFsc2UiIGNhbiB3b3JrYXJv
+dW5kIGl0Lg0KDQogICAgVGhlIGlzc3VlIHN0YXJ0ZWQgdG8gc2hvdyB1cCBhZnRlciBjb21taXQg
+OGU2ZWQ5NmNkZDUwICgiS1ZNOiB4ODY6DQogICAgZmlyZSB0aW1lciB3aGVuIGl0IGlzIG1pZ3Jh
+dGVkIGFuZCBleHBpcmVkLCBhbmQgaW4gb25lc2hvdCBtb2RlIikuDQogICAgSG93ZXZlciwgYXMg
+aXMgcG9pbnRlZCBvdXQgYnkgU2VhbiBDaHJpc3RvcGhlcnNvbiwgaXQgaXMgaW50cm9kdWNlZA0K
+ICAgIGJ5IGNvbW1pdCA5NjcyMzVkMzIwMzIgKCJLVk06IHZteDogY2xlYXIgcGVuZGluZyBpbnRl
+cnJ1cHRzIG9uDQogICAgS1ZNX1NFVF9MQVBJQyIpLiBjb21taXQgOGU2ZWQ5NmNkZDUwICgiS1ZN
+OiB4ODY6IGZpcmUgdGltZXIgd2hlbg0KICAgIGl0IGlzIG1pZ3JhdGVkIGFuZCBleHBpcmVkLCBh
+bmQgaW4gb25lc2hvdCBtb2RlIikganVzdCBtYWtlcyBpdA0KICAgIGVhc2llciB0byBoaXQgdGhl
+IGlzc3VlLg0KDQogICAgSGF2aW5nIGJvdGggY29tbWl0cywgdGhlIG9uZXNob3QgbGFwaWMgdGlt
+ZXIgZ2V0cyBmaXJlZCBpbW1lZGlhdGVseQ0KICAgIGluc2lkZSB0aGUgS1ZNX1NFVF9MQVBJQyBj
+YWxsIHdoZW4gbG9hZGluZyB0aGUgc25hcHNob3QuIE9uIEludGVsDQogICAgcGxhdGZvcm1zIHdp
+dGggQVBJQyB2aXJ0dWFsaXphdGlvbiBhbmQgcG9zdGVkIGludGVycnVwdCBwcm9jZXNzaW5nLA0K
+ICAgIHRoaXMgZXZlbnR1YWxseSBsZWFkcyB0byBzZXR0aW5nIHRoZSBjb3JyZXNwb25kaW5nIFBJ
+UiBiaXQuIEhvd2V2ZXIsDQogICAgdGhlIHdob2xlIFBJUiBiaXRzIGdldCBjbGVhcmVkIGxhdGVy
+IGluIHRoZSBzYW1lIEtWTV9TRVRfTEFQSUMgY2FsbA0KICAgIGJ5IGFwaWN2X3Bvc3Rfc3RhdGVf
+cmVzdG9yZS4gVGhpcyBsZWFkcyB0byB0aW1lciBpbnRlcnJ1cHQgbG9zdC4NCg0KICAgIFRoZSBm
+aXggaXMgdG8gbW92ZSB2bXhfYXBpY3ZfcG9zdF9zdGF0ZV9yZXN0b3JlIHRvIHRoZSBiZWdpbm5p
+bmcgb2YNCiAgICB0aGUgS1ZNX1NFVF9MQVBJQyBjYWxsIGFuZCByZW5hbWUgdG8gdm14X2FwaWN2
+X3ByZV9zdGF0ZV9yZXN0b3JlLg0KICAgIFdoYXQgdm14X2FwaWN2X3Bvc3Rfc3RhdGVfcmVzdG9y
+ZSBkb2VzIGlzIGFjdHVhbGx5IGNsZWFyaW5nIGFueQ0KICAgIGZvcm1lciBhcGljdiBzdGF0ZSBh
+bmQgdGhpcyBiZWhhdmlvciBpcyBtb3JlIHN1aXRhYmxlIHRvIGNhcnJ5IG91dA0KICAgIGluIHRo
+ZSBiZWdpbm5pbmcuDQoNCiAgICBGaXhlczogOTY3MjM1ZDMyMDMyICgiS1ZNOiB2bXg6IGNsZWFy
+IHBlbmRpbmcgaW50ZXJydXB0cyBvbiBLVk1fU0VUX0xBUElDIikNCiAgICBDYzogc3RhYmxlQHZn
+ZXIua2VybmVsLm9yZw0KICAgIFN1Z2dlc3RlZC1ieTogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2Vh
+bmpjQGdvb2dsZS5jb20+DQogICAgU2lnbmVkLW9mZi1ieTogSGFpdGFvIFNoYW4gPGhzaGFuQGdv
+b2dsZS5jb20+DQogICAgTGluazogaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvci8yMDIzMDkxMzAw
+MDIxNS40NzgzODctMS1oc2hhbkBnb29nbGUuY29tDQogICAgU2lnbmVkLW9mZi1ieTogU2VhbiBD
+aHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQoNCg0KDQo+IENjOiBTZWFuIENocmlz
+dG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT4NCj4gQ2M6IFBldGVyIFNoaWVyIDxwc2hpZXJA
+Z29vZ2xlLmNvbT4NCj4gQ2M6IEppbSBNYXR0c29uIDxqbWF0dHNvbkBnb29nbGUuY29tPg0KPiBD
+YzogV2FucGVuZyBMaSA8d2FucGVuZ2xpQHRlbmNlbnQuY29tPg0KPiBDYzogUGFvbG8gQm9uemlu
+aSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogTGkgUm9uZ1FpbmcgPGxp
+cm9uZ3FpbmdAYmFpZHUuY29tPg0KPiBMaW5rOg0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9y
+LzIwMjMwMTA2MDQwNjI1Ljg0MDQtMS1saXJvbmdxaW5nQGJhaWR1LmNvbQ0KPiBTaWduZWQtb2Zm
+LWJ5OiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT4NCj4gDQo+IChjaGVy
+cnkgcGlja2VkIGZyb20gY29tbWl0IDhlNmVkOTZjZGQ1MDAxYzU1ZmNjYzgwYTE3ZjY1MTc0MWMx
+Y2E3ZDIpDQo+IFRoZSBjb2RlIHdhcyBhYmxlIHRvIGNvbXBpbGUgd2l0aG91dCBlcnJvcnMgb3Ig
+d2FybmluZ3MuDQo+IFNpZ25lZC1vZmYtYnk6IERhdmlkIEh1bnRlciA8ZGF2aWQuaHVudGVyLmxp
+bnV4QGdtYWlsLmNvbT4NCj4gLS0tDQo+ICBhcmNoL3g4Ni9rdm0vbGFwaWMuYyB8IDggKysrKysr
+LS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+
+IA0KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL2xhcGljLmMgYi9hcmNoL3g4Ni9rdm0vbGFw
+aWMuYyBpbmRleA0KPiBjOTBmZWYwMjU4YzUuLjNjZDU5MGFjZTk1YSAxMDA2NDQNCj4gLS0tIGEv
+YXJjaC94ODYva3ZtL2xhcGljLmMNCj4gKysrIGIvYXJjaC94ODYva3ZtL2xhcGljLmMNCj4gQEAg
+LTE4NDMsOCArMTg0MywxMiBAQCBzdGF0aWMgYm9vbCBzZXRfdGFyZ2V0X2V4cGlyYXRpb24oc3Ry
+dWN0IGt2bV9sYXBpYw0KPiAqYXBpYywgdTMyIGNvdW50X3JlZykNCj4gIAkJaWYgKHVubGlrZWx5
+KGNvdW50X3JlZyAhPSBBUElDX1RNSUNUKSkgew0KPiAgCQkJZGVhZGxpbmUgPSB0bWljdF90b19u
+cyhhcGljLA0KPiAgCQkJCSAgICAga3ZtX2xhcGljX2dldF9yZWcoYXBpYywgY291bnRfcmVnKSk7
+DQo+IC0JCQlpZiAodW5saWtlbHkoZGVhZGxpbmUgPD0gMCkpDQo+IC0JCQkJZGVhZGxpbmUgPSBh
+cGljLT5sYXBpY190aW1lci5wZXJpb2Q7DQo+ICsJCQlpZiAodW5saWtlbHkoZGVhZGxpbmUgPD0g
+MCkpIHsNCj4gKwkJCQlpZiAoYXBpY19sdnR0X3BlcmlvZChhcGljKSkNCj4gKwkJCQkJZGVhZGxp
+bmUgPSBhcGljLT5sYXBpY190aW1lci5wZXJpb2Q7DQo+ICsJCQkJZWxzZQ0KPiArCQkJCQlkZWFk
+bGluZSA9IDA7DQo+ICsJCQl9DQo+ICAJCQllbHNlIGlmICh1bmxpa2VseShkZWFkbGluZSA+IGFw
+aWMtPmxhcGljX3RpbWVyLnBlcmlvZCkpIHsNCj4gIAkJCQlwcl9pbmZvX3JhdGVsaW1pdGVkKA0K
+PiAgCQkJCSAgICAia3ZtOiB2Y3B1ICVpOiByZXF1ZXN0ZWQgbGFwaWMgdGltZXIgcmVzdG9yZSB3
+aXRoICINCj4gLS0NCj4gMi40My4wDQoNCg==
 
