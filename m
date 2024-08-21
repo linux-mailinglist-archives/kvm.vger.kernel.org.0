@@ -1,214 +1,227 @@
-Return-Path: <kvm+bounces-24676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB23995919C
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 02:10:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F37A95919D
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 02:11:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FFC5B218DA
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 00:10:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55482287044
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 00:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2940C1C01;
-	Wed, 21 Aug 2024 00:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089A12905;
+	Wed, 21 Aug 2024 00:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mpFFMxkq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VBUZ45Oe"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24484A1D
-	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 00:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724199034; cv=none; b=KecXdTp8A/1NTXDLKbPGZf8OrHOwbAxbLkjo/ZzoOZXo/EFFRrmCGurCEnYGQ0tyrAGHUoFlQkPMGpqWIbt/XIgGG4666E0zOwP0IXm4U+yM5Enlnn9tNI4l0NFgt3LzSts3HL0Vd2+zYNXPqEmq+n3PmJoFaZCqVwr+AQgfm7A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724199034; c=relaxed/simple;
-	bh=cFp6zVnnyev+q9Q/XuLRa0Y8qA580u8V4E2+HDmzHuc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q493RLT5XEOredoY3JWqK+8uvK+pKOo23A7NlMUPiqiMblr+QEqOcRhRUlciVIvY0T7gEGQAcxwHqGwtGh/TbZrhw29I57Y8Ky52btf/ZbbDaP/IcpTwQpJ8UtBcVb/+uLNDPlGuqOq3WyWeTCz65PR5X9u/xNH2e2mk4XYQvwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mpFFMxkq; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 20 Aug 2024 17:10:23 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724199029;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pfBZF71vB+efgUAfC9rXR0u22NZxOfbgAngHkzBGvhM=;
-	b=mpFFMxkqYDmDeD1BF7jbbvcU9SZfqNoMmapPytT9ZGD9pJdcZcuf+1X3EYJokym7+2eXdD
-	4Cdp3RPIYLq7uw+EYRKOsnQkjovBCVLDkIKW7EFMzJLqPL1Nb3v1DwuvCOSKnE5daltqzv
-	xeiHiSsyQVSnSzEDs8R4b+VJGn0osc8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH 12/12] KVM: arm64: Add selftest checking how the absence
- of GICv3 is handled
-Message-ID: <ZsUwb2pEUNQt2arR@linux.dev>
-References: <20240820100349.3544850-1-maz@kernel.org>
- <20240820100349.3544850-13-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7033B81E;
+	Wed, 21 Aug 2024 00:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724199086; cv=fail; b=hbceg2N96RqepnLH1FcZqQW9HuF58iK9z1qqMqrG50EDOWVei5KriSQdsZZruSPPG0V0xnZ+uFktIIbJ/lL/1ZZ4PzbOgJnArYlZcMFzPLOtxRhA5V+9CVgaqYvaZC7Y2gTzO4dCcEFDRIO6puhMYAS1AAPl3rNjtT7oUAqfPkk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724199086; c=relaxed/simple;
+	bh=YSzK+UgPVCXWZTd/PeCMecWFUJv7JoL/YbQ9aD9bY1o=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=IUPJeGcL/tON26p8oVIA7lfTjRYLw/mtwhEGbczR5n7nhhch8Hk7ezQoGwPGWWvMeDuqmkUuepGwBCYEd8nMLN+h0bSdxKhIBCYS/XMG/PNo64S37gji5h8tYEKIaM0bWZEHOrRBkai1Dco9u30zNfdbNyPp/tboW8UcN45JnCo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VBUZ45Oe; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724199084; x=1755735084;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=YSzK+UgPVCXWZTd/PeCMecWFUJv7JoL/YbQ9aD9bY1o=;
+  b=VBUZ45Oe2dPVmjldSuKSmovKXf9DZZxFgk0VbdTz76iGx3RkAO9wxrYM
+   kmhC58eWyDqaYNp9DRPtbQszsMkcYwI4HJ9Znn9LKUZG5+aAibls5Xach
+   r3mGFtqHGDQII/nyl3lleJmhY+oZmTfunnX7vdxgFUDTjdaX/468ftaQu
+   373ihfooDQhemL4Ef9vRJ2KnTsaBM9EAIWeE8gmYBEkWXjzfobiUcheCl
+   3KtrEqehxWSwwPreqAps/vNA9LMsNi/MQSz9EufuPkvHfotnZ9y5GcFA8
+   ZwAXGJOww0uy8hVU0lzXGLqViltzivwFiUT9KSmLaohs3N2kGR9XjsZ0h
+   Q==;
+X-CSE-ConnectionGUID: ukEJv9kNS36J1L+z9B7EYQ==
+X-CSE-MsgGUID: +5FDWiZ5TUKUgn/wKqjJWg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11170"; a="39992066"
+X-IronPort-AV: E=Sophos;i="6.10,163,1719903600"; 
+   d="scan'208";a="39992066"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2024 17:11:24 -0700
+X-CSE-ConnectionGUID: dg2vBGRASISTEBkUQrdnbA==
+X-CSE-MsgGUID: Pl1UitBCTZKxN5wpy4/G2w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,163,1719903600"; 
+   d="scan'208";a="65863736"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Aug 2024 17:11:24 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 20 Aug 2024 17:11:23 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 20 Aug 2024 17:11:23 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.43) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 20 Aug 2024 17:11:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SeaTTbrRBe/qp9VvaGy56PCOgzK3YrINhNjhijG1QbLYh0hpS9WAyR5HmgOOyFjdLu4EB6IwRXLH3d57/q98t6ud3tg1aVVJ0yhZHa5HQ0wqc/XzbGF5QzdvDqRopInYlfx/MlMCBA/y/phq4rZkzF2ysIi4Ar1DzBnY/a0u8i299esWK9KOp0w2usdSpaVsgO1KNMCZC7WuDMSHkDY0DlXYEIfy+8PVQb16tcU3eoegiuPLu1tAEQRGeHnVFZxblYwzKcHdRI1wr6q2RrTLTz5+wYstl+9Opp0ANbFnCIZ02GvEvwcfcuyqnaNK5saym1qdKnE0L6xsdqgocZk6bQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YSzK+UgPVCXWZTd/PeCMecWFUJv7JoL/YbQ9aD9bY1o=;
+ b=TnIdKOmK+zOX59jHHZ24QHKrWoFLq5TRJPPkUXQ7xxDUXr68PMPMu40OCObVS+hfWpP955WnkHW9jK6hBY1ZUGWPMWVHRUCULKW9Lgdgu7DboHaOUvyzRMdN4T8zmuGQamjXBrg55Q5TUh5Q9uEcW64GHR4S6hmeIVIN73GLTxVDPSL+m4ccgo6fqje39B1Y9Tuxhaj9+v6iN4nNGbIfQpFWVsX+fCkgduM8K0q8d89UuDwow35q4xk9wOL13vAlKaw3g8AGzvY4TIHUC0cWJROaOU24btaLTKgHfrz/iuAHLul8SANjVqPWl115WK2n/Ti6k8Sl4niAopcAOy7lKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
+ by SJ2PR11MB8588.namprd11.prod.outlook.com (2603:10b6:a03:56c::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Wed, 21 Aug
+ 2024 00:11:16 +0000
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::edb2:a242:e0b8:5ac9%6]) with mapi id 15.20.7897.014; Wed, 21 Aug 2024
+ 00:11:16 +0000
+From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+To: "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
+CC: "seanjc@google.com" <seanjc@google.com>, "Huang, Kai"
+	<kai.huang@intel.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Subject: Re: [PATCH 09/25] KVM: TDX: Get system-wide info about TDX module on
+ initialization
+Thread-Topic: [PATCH 09/25] KVM: TDX: Get system-wide info about TDX module on
+ initialization
+Thread-Index: AQHa7QnLnLdgweSHG0+IS+go/dLgALImSYyAgAqZpwA=
+Date: Wed, 21 Aug 2024 00:11:16 +0000
+Message-ID: <0591ce2b1470bc5495ca0b6a5aa1376262714e97.camel@intel.com>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+	 <20240812224820.34826-10-rick.p.edgecombe@intel.com>
+	 <3779ae2f-610e-40b9-ad87-3882e9d88060@linux.intel.com>
+In-Reply-To: <3779ae2f-610e-40b9-ad87-3882e9d88060@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.44.4-0ubuntu2 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|SJ2PR11MB8588:EE_
+x-ms-office365-filtering-correlation-id: 2a5d9464-d4c3-4d0b-27c8-08dcc175c680
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?TFpxMDZiS2VqUFlyMXFQUmtCcCtITzlqYTRiZU9nWjRZcFBTNllRS3M3aDJ3?=
+ =?utf-8?B?bk5nTzNXRGR5cHgwbTZLMnBXOGVtUWNmMFJPdkhCeHhKTU91WFlGUW44OHJM?=
+ =?utf-8?B?cUEzaWpKSFJmMmxVZGF5a2Vjc0ZUbnl4bTN2TzhIc3hVWnB6QWVWSWdpWVo0?=
+ =?utf-8?B?RUROYloxOEJiMnlmNnkzRzE1LzY1b3pkZkI4aWZFdEJUQlByRGNWZ1lwT3Bx?=
+ =?utf-8?B?TzFBcWNhdUpXcWtMcTQwcXFrby94cjZLQ0JJK2ZNUm5VQWpKSGo2bkdEOEU1?=
+ =?utf-8?B?YjVaaTVrVW5TVHh3K3BUdjRKbnp1d3RzNkhZelVXVkVISGE2QUlKQkQ3akl5?=
+ =?utf-8?B?d1ZyNjF4NXRiZjZpallIQWVoYmMxSnF1aUlvcnBkQ0ZEbFVjRDFmMmR5Ulll?=
+ =?utf-8?B?TjVoTzQvbzN4TEY3a3pZNjJUM3ZTbDh3NFBuY2tuQytwVy9Bb2I5YSsvOGox?=
+ =?utf-8?B?Ulp0RXRFYlhTOXpnSmI1a0x3SExBUURycnp1cE9QNklVVEQzTG5ZQ3ZnS3Rh?=
+ =?utf-8?B?bFd4MG9rOE1NNEhuMXV4OFNOaU14ZHBZMzRpaUJ2ZXZxa2swdWlIYUQ4ZjFC?=
+ =?utf-8?B?elh2bis0T0F1ZXF2YTBMaUlWL2lsVFFlSWQzZWdjbWk2eDJqSm9obmJtOVN2?=
+ =?utf-8?B?c0QvL2w3OWg1N0Mwb2tnQVEzUnNqdVpTdVRQMjBtV0NYZ1owMzhYcTBNcUdY?=
+ =?utf-8?B?SFIrSnp3OTJvUTBIZVh5bzVhSUp1OEdsYXBJN3FWREppQXgrc0hQNWx6cnM1?=
+ =?utf-8?B?MDJBYy90RGRFRXpxeTVVNjdDK1g4bnNCQTk5V0YzK3NEYmpBYUpFcmtNdWly?=
+ =?utf-8?B?QlNrVTlRNEZnWWtSdmVyNS9NK2t5NDBxaTVrSzYxSmhGaGRHeE9IampNMFhv?=
+ =?utf-8?B?N1RtTWMxdlZHdkVES2lkTnJTR2FqZUZuZHZ0WldtMjNnVHMvYzZ4OStRVHlK?=
+ =?utf-8?B?Q2l1Nm9jQXhMUElScmxscWV0cnlOZGg3eEtKRTByQkN4MUhjZHdJWGtRUjBo?=
+ =?utf-8?B?OFZ2Y294VVMwcEloS1hOMWs2U1JiTVZVUmhERUlmOTVIU3AxVzF3VW1lT1M1?=
+ =?utf-8?B?a2s2cTdWb3gvdEVlaDR6R3UwanVvZVFoOHdhV3FMeGdXcVppOEZzSW1HUC82?=
+ =?utf-8?B?Q2lDcVBXM3RWcVpTSFRFNzlTMTZORFRTR3lyUzFCYXZORHNGSTkwbTBxZGh6?=
+ =?utf-8?B?UFF3K25QZUFBR056L0w0RUN6WFVZRHhQQWcxb3BGeFR5d05vOEwyczZjRHM1?=
+ =?utf-8?B?VCs1Yks2V3VLMjZhWTJjam9FbmhxTDdrZlJLSW1LQzJHeUR3T2tNUE5sRUgv?=
+ =?utf-8?B?V2ZXUFN0SXdkc3UrNUsyVWlMUUxxaDRMekw0NGNMNklRbW5oZjVlcGNmMlI4?=
+ =?utf-8?B?ZkdVZTdjNnhrUng2OUhkVUJEd05VQTlIeXRLU0hteTUyMkVKSDVDMkJLQ1Q2?=
+ =?utf-8?B?UmUzbnZBdWc4Z0dibjBlRXpGSVkxa0hTTmZBZTBPUWtSZ3E5d1ZNVmIrRHRo?=
+ =?utf-8?B?VkpEUnBnSkZtWkxVdjZHRXQva2RnaXFISWxaeU1CR2JjMTA2dGZOREo2MkFE?=
+ =?utf-8?B?VGJOeUZCMDRIdkpSajliKzdVcXdXeTRyRUQ0R0xWVktGUkNSMERrUldvVU1L?=
+ =?utf-8?B?bXJvS2xqOGZGVklzT200WUoyWW1EREdORmxXdENmNzhjNjU3TDJWMkJmY1k4?=
+ =?utf-8?B?cmNtdEtOcEQzZS9OM1NSY29BQjlqM3pGRTN1amZQVVJOWWtDeEc5aHE1aFcx?=
+ =?utf-8?B?KzJlR21Dc2FjUGl2bmVzNnp5bWlZNHcrVGQrL3RWQ3ZNUDhuMWVMQmwxMXdz?=
+ =?utf-8?B?SGhQVGpLUktOeDVTbVVCeDlHL1NjeHRTdGMwcEpacE51clZucTJpaENVajlW?=
+ =?utf-8?B?N2Q5eHRTTVpld25Ka3RzSUpKbllISVcrTGZ5NHdkMFFRR2c9PQ==?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Yk5YSU41SXFaa2E2K2FNYTZFN1NBK1JERExxWjJWdEtzOERUNG1WeHkvb1VP?=
+ =?utf-8?B?NE0zSm8rN2dEUmczM2R2UTlYYndEYlJ2UG9TQjM4RUFLVTh0am9YRy8vZlRz?=
+ =?utf-8?B?OHFxK2szd3hWMStlZzhCMWpNR2pML0Z3cUdjVzEvQTQxdHkzelJvWEtEaEE4?=
+ =?utf-8?B?SjNHaVlzZDVNYngxSVY1TXpEdWxjMytVK1BCaFR3R3FSQmJKbXVtT0tVckow?=
+ =?utf-8?B?clhPMXIxRkxUQXhQU2hHT1oyN2FYU1NwdU4vUDRMM0dteWl0dmlKbTJVZkR1?=
+ =?utf-8?B?UVV0Q3ljWUozTXBMbTI4ZlJtMVJJWnE4UkwvSVFGdFM1Rk9pNmZGMjZkb0xr?=
+ =?utf-8?B?Y1YvSE9paC9sMVVYaUNvMUEra05zdWxnaWhiWDAvTEo1Qk9lc2ZzRnJQTW44?=
+ =?utf-8?B?NWZpdW9hZVZiREpkaEVRK1FyRHhGT1c0M1NqbFFWL1NvRzJXMmR6OXFxay9Y?=
+ =?utf-8?B?ZzdQSGF6R0Jna0JlTHdSUE5neE9uVXhpNXp1bTZlUFl0T242Y1Y0NTM5elBY?=
+ =?utf-8?B?SWFuVCtid3V1bXI4aVFKcW5xSjBtNVFGSlljb3E0czE4eGs5NGdBWDNJZDNx?=
+ =?utf-8?B?SVE4ZURoM3NyUittRGptQThMczNQRHVaR2hSUEJidUdWTy9uam84eFd2ZTF2?=
+ =?utf-8?B?OENDajZZQW9sMVgwZ2J4b3g1NlFhdmRnRkorRFFhWTRNWmIvc2xBVGpXV2Iz?=
+ =?utf-8?B?VERxWHF0L0ladVNNTGVzc0pJdUNpbklNZHhuTWsvOUFRZHl3cndwRW4zWldi?=
+ =?utf-8?B?UXZueWx0clhVTmpzTU9va1lSbEpEYXR1cVpSOWc5VnFnckhlZEQ2Y2ZKSTlR?=
+ =?utf-8?B?UVNyZnR4OXRnK1FFa2g0bGRGZ3pIM0lwZzl6cnhvM0UxbnUxK3pEWWtJckND?=
+ =?utf-8?B?Vm9kT2xXZlRBZkFBMzdKcUxJRUN3S29ZUnRreUxWZnRkWUM0VFE1dzY4bS91?=
+ =?utf-8?B?QmVORGVLbDc3VDR5OVVEZUZZYVVqbW5ZSFFLRGdhNXgyZVJwc1pYNThmdHFr?=
+ =?utf-8?B?TVVGZEwveStKejNnYnE4TnUwSTVHeFpCckFHbU1nWDhtYnlJSCt4ZHdzWFVu?=
+ =?utf-8?B?SkM4dzJLT1diTzRlRGRScmNtLzNEcjFrZ3F5OWZNbzlXWkxrUFMxRHk2am4x?=
+ =?utf-8?B?UzFEcm12bUhERjdBalZXWG1jWjlOODlKZnRReVJma0tGQnNzTk1yYkw0dHNt?=
+ =?utf-8?B?RU1abW5ybUFPY0UveVBmZEx0c2ZNZ3lzQng3QTRwa1MxOWRpMGd4Uk4vdUNK?=
+ =?utf-8?B?S04xdkNWTlo3SWYyaHUyT2NidndNRDluenRzUmVNWFBPbmw4RWNpa2ZTWitt?=
+ =?utf-8?B?Tk1lNVJITG96ODNub3hHWEVDRXR2M3BFdDQ1Nk82TXJaWjdxVTg3QTlFL3lJ?=
+ =?utf-8?B?Nk9WZFdNT3pTeXc3Wmt0ZS8xTzF2cDYrbmZ0M2RIOG9IOGl5TVFySW5Sb1R5?=
+ =?utf-8?B?VXpBQWlhVWtXeXE1N2JhaUJiRjVFRStvcXVuaUhENGhad29iUHBaYnBXcnNG?=
+ =?utf-8?B?QUVhVTQydzFBakc4aHpWcXVnOVV2ZGdNanhVUzJRYUxTQmFiaWFwYjdGU01W?=
+ =?utf-8?B?QVEweEFxODljUTJpZlVoZTFNd3F0ZnhjR3pnUkpudGwzak9za0R0VDR3d1RO?=
+ =?utf-8?B?cTViM2RVMEtvQWJVc2NUNVNSSVFiUkozY2lsaG1jL1JxaVpvczM2TERzbHZa?=
+ =?utf-8?B?M2NCWkJFZDZsQkdsbnc3TWE1N0lzSHFzSXEvdkF4MmRMNlFpcitsS0p4V3ls?=
+ =?utf-8?B?WGx2OEF2bFgwaEptRXlUaTAvTXBNNDZlTnVRMXhTZG9PeVQ3QU5vOVpYT0M0?=
+ =?utf-8?B?TnFKMWRpTkZOWDBXMVFreFArNWxyNlRWVjlQNGxnMXZrUnhqM2hZWGRzRitO?=
+ =?utf-8?B?WDFMc2g0eDNjeTdSMEZWVG51S2VZb3ZCVTdTUFhBL24vZ0hBdUNJTHpFZEtQ?=
+ =?utf-8?B?Q2VHMjAyYW43SnJkL296YzhOVHlpeXZSbXNwOVNmWElVUDcwdTBUVG10amZD?=
+ =?utf-8?B?cjI2cldSU3RIWkNUQ1pQVFF6RjY5dTZWR2dIOUtJcTV6VzlIMUhXQnBoM3ZP?=
+ =?utf-8?B?VmdGT0NlZzBPeWV0czIyVWt2d09NYXNrZG9rRUhxNzRTMFpta3J0MVF3Vm1l?=
+ =?utf-8?B?NUhjL1NOWVlLOFpzZGpYQXJYZUE1bmQyZUlNUTJxS3F2MU1HRVhJNnFOeEdJ?=
+ =?utf-8?B?WVE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <55A53431179A6844A6F6653D0E106B59@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240820100349.3544850-13-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a5d9464-d4c3-4d0b-27c8-08dcc175c680
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Aug 2024 00:11:16.4935
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LYtxRaSc5TPG0l8tinyklkAiP0bDud2bB/Od4Pqr9Li7sXRFRDzATKa3eNzdqfQF2ESYnkNvTPgANgxLR8dcm+eU4fI8X8DWmSPCOypy7I8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8588
+X-OriginatorOrg: intel.com
 
-On Tue, Aug 20, 2024 at 11:03:49AM +0100, Marc Zyngier wrote:
-> Given how tortuous and fragile the whole lack-of-GICv3 story is,
-> add a selftest checking that we don't regress it.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/aarch64/no-vgic-v3.c        | 170 ++++++++++++++++++
->  2 files changed, 171 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 48d32c5aa3eb..f66b37acc0b0 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -163,6 +163,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
->  TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
->  TEST_GEN_PROGS_aarch64 += aarch64/vgic_lpi_stress
->  TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
-> +TEST_GEN_PROGS_aarch64 += aarch64/no-vgic-v3
->  TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
->  TEST_GEN_PROGS_aarch64 += arch_timer
->  TEST_GEN_PROGS_aarch64 += demand_paging_test
-> diff --git a/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
-> new file mode 100644
-> index 000000000000..27169afc94c6
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
-> @@ -0,0 +1,170 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +// Check that, on a GICv3 system, not configuring GICv3 correctly
-> +// results in all of the sysregs generating an UNDEF exception.
-> +
-> +#include <test_util.h>
-> +#include <kvm_util.h>
-> +#include <processor.h>
-> +
-> +static volatile bool handled;
-> +
-> +#define __check_sr_read(r)					\
-> +	do {							\
-> +		uint64_t val;					\
-> +								\
-> +		handled = false;				\
-> +		dsb(sy);					\
-> +		val = read_sysreg_s(SYS_ ## r);			\
-> +		(void)val;					\
-> +	} while(0)
-> +
-> +#define __check_sr_write(r)					\
-> +	do {							\
-> +		handled = false;				\
-> +		dsb(sy);					\
-> +		write_sysreg_s(0, SYS_ ## r);			\
-> +		isb();						\
-> +	} while(0)
-> +
-> +/* Fatal checks */
-> +#define check_sr_read(r)					\
-> +	do {							\
-> +		__check_sr_read(r);				\
-> +		__GUEST_ASSERT(handled, #r " no read trap");	\
-> +	} while(0)
-> +
-> +#define check_sr_write(r)					\
-> +	do {							\
-> +		__check_sr_write(r);				\
-> +		__GUEST_ASSERT(handled, #r " no write trap");	\
-> +	} while(0)
-> +
-> +#define check_sr_rw(r)				\
-> +	do {					\
-> +		check_sr_read(r);		\
-> +		check_sr_write(r);		\
-> +	} while(0)
-> +
-> +/* Non-fatal checks */
-> +#define check_sr_read_maybe(r)						\
-> +	do {								\
-> +		__check_sr_read(r);					\
-> +		if (!handled)						\
-> +			GUEST_PRINTF(#r " read not trapping (OK)\n");	\
-> +	} while(0)
-> +
-> +#define check_sr_write_maybe(r)						\
-> +	do {								\
-> +		__check_sr_write(r);					\
-> +		if (!handled)						\
-> +			GUEST_PRINTF(#r " write not trapping (OK)\n");	\
-> +	} while(0)
-> +
-> +static void guest_code(void)
-> +{
-> +	/*
-> +	 * Check that we advertise that ID_AA64PFR0_EL1.GIC == 0, having
-> +	 * hidden the feature at runtime without any other userspace action.
-> +	 */
-> +	__GUEST_ASSERT(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC),
-> +				 read_sysreg(id_aa64pfr0_el1)) == 0,
-> +		       "GICv3 wrongly advertised");
-> +
-> +	/*
-> +	 * Access all GICv3 registers, and fail if we don't get an UNDEF.
-> +	 * Note that we happily access all the APxRn registers without
-> +	 * checking their existance, as all we want to see is a failure.
-> +	 */
-> +	check_sr_rw(ICC_PMR_EL1);
-> +	check_sr_read(ICC_IAR0_EL1);
-> +	check_sr_write(ICC_EOIR0_EL1);
-> +	check_sr_rw(ICC_HPPIR0_EL1);
-> +	check_sr_rw(ICC_BPR0_EL1);
-> +	check_sr_rw(ICC_AP0R0_EL1);
-> +	check_sr_rw(ICC_AP0R1_EL1);
-> +	check_sr_rw(ICC_AP0R2_EL1);
-> +	check_sr_rw(ICC_AP0R3_EL1);
-> +	check_sr_rw(ICC_AP1R0_EL1);
-> +	check_sr_rw(ICC_AP1R1_EL1);
-> +	check_sr_rw(ICC_AP1R2_EL1);
-> +	check_sr_rw(ICC_AP1R3_EL1);
-> +	check_sr_write(ICC_DIR_EL1);
-> +	check_sr_read(ICC_RPR_EL1);
-> +	check_sr_write(ICC_SGI1R_EL1);
-> +	check_sr_write(ICC_ASGI1R_EL1);
-> +	check_sr_write(ICC_SGI0R_EL1);
-> +	check_sr_read(ICC_IAR1_EL1);
-> +	check_sr_write(ICC_EOIR1_EL1);
-> +	check_sr_rw(ICC_HPPIR1_EL1);
-> +	check_sr_rw(ICC_BPR1_EL1);
-> +	check_sr_rw(ICC_CTLR_EL1);
-> +	check_sr_rw(ICC_IGRPEN0_EL1);
-> +	check_sr_rw(ICC_IGRPEN1_EL1);
-> +
-> +	/*
-> +	 * ICC_SRE_EL1 may not be trappable, as ICC_SRE_EL2.Enable can
-> +	 * be RAO/WI
-> +	 */
-> +	check_sr_read_maybe(ICC_SRE_EL1);
-> +	check_sr_write_maybe(ICC_SRE_EL1);
-
-In the case that a write does not UNDEF, should we check that
-ICC_SRE_EL1.SRE is also RAO/WI?
-
--- 
-Thanks,
-Oliver
+T24gV2VkLCAyMDI0LTA4LTE0IGF0IDE0OjE4ICswODAwLCBCaW5iaW4gV3Ugd3JvdGU6Cj4gPiAr
+I2RlZmluZSBLVk1fVERYX0NQVUlEX05PX1NVQkxFQUbCoMKgwqDCoMKgwqDCoCgoX191MzIpLTEp
+Cj4gPiArCj4gPiArc3RydWN0IGt2bV90ZHhfY3B1aWRfY29uZmlnIHsKPiA+ICvCoMKgwqDCoMKg
+wqDCoF9fdTMyIGxlYWY7Cj4gPiArwqDCoMKgwqDCoMKgwqBfX3UzMiBzdWJfbGVhZjsKPiA+ICvC
+oMKgwqDCoMKgwqDCoF9fdTMyIGVheDsKPiA+ICvCoMKgwqDCoMKgwqDCoF9fdTMyIGVieDsKPiA+
+ICvCoMKgwqDCoMKgwqDCoF9fdTMyIGVjeDsKPiA+ICvCoMKgwqDCoMKgwqDCoF9fdTMyIGVkeDsK
+PiA+ICt9Owo+IAo+IEkgYW0gd29uZGVyaW5nIGlmIHRoZXJlIGlzIGFueSBzcGVjaWZpYyByZWFz
+b24gdG8gZGVmaW5lIGEgbmV3IHN0cnVjdHVyZQo+IGluc3RlYWQgb2YgdXNpbmcgJ3N0cnVjdCBr
+dm1fY3B1aWRfZW50cnkyJz8KCkdPb2QgcXVlc3Rpb24uIEkgZG9uJ3QgdGhpbmsgc28uIAo=
 
