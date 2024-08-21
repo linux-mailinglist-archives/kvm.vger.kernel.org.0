@@ -1,123 +1,100 @@
-Return-Path: <kvm+bounces-24733-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24735-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB013959FD2
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 16:28:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F081495A002
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 16:34:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2501C21998
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 14:28:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F1891C226E8
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 14:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399441B2EDB;
-	Wed, 21 Aug 2024 14:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1470D136E37;
+	Wed, 21 Aug 2024 14:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="dRyajogO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7jmxiwB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6C21AD5F4
-	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 14:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCC51607B0;
+	Wed, 21 Aug 2024 14:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724250422; cv=none; b=jA8I8TGM/Pe9Q3bvZGyqFdbYhg5nEvShpCRrvj1xSsAWZPJHOmmn6kXLFRs1QYPCou4AbDJiZTvh4PwyQf2M3MxNkrwdk4ICgsyNgO2fKSpt62eWK1TvbzswcgHGX6XhRO6/vSzZLii0N4OESkYbtYm439d/lJm2pDSgdjdQh4o=
+	t=1724250852; cv=none; b=dWlr+p5ulRktZiO6q6gR3VZYcvo1AlnX2WOYp7PeE+FErk/H93bKcU0gPlb9wImev+Y3IZuLOortNEBqaWlukOnYG2EPHQFy22RHjEt6o4jV2nFnJGS9HzRKlHhXFu4RCiwUI6tsF8dCJ1s3D6GgRw5ECHiv3WHfiFTHvMHdd7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724250422; c=relaxed/simple;
-	bh=IONQ9K+ncgBQnOswyimKlfv7KszvEvtd3KO+g7AOqXA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZCrk0srsn2qt4KrGMgQAyrvOoYJNXYx2v8UD/WGn+DwQmpSnxulqmtCLDfEXDk6UW4itBpLLcChGbH6tABnTyyPPFa3V6tYHvpEWgoen7X73IUMuFQQRTtighL9rkubNymAOe0mBO3YO63Yl60FQEfAKWdpj1M46+wQ3JyIR3Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=dRyajogO; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3719753d365so3893658f8f.2
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 07:27:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1724250419; x=1724855219; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5KqTGxW8AKVPvkiuwUCASJeIM7PQDb/Zh6a+fYZvgHw=;
-        b=dRyajogOoxiecOQLLJvLbFzH4IVNO+VSsyvoag2qcWXx8YXa2DHkoPjms2QGsvlbfC
-         gROBLTQqxR0e+6bK0GHWuFBYN5hg2uWUO6J/7qKgg8HJJzlhz4u7Y5uRmkNK3D7SJBjP
-         gnx2+cc3EyUv7ibiITaDV6buJAiCb+yEPOg8PEOEHpsQGCc9Yh30TraOCaBbzBMQM/dZ
-         IKSURhTsFzE41XNQ27eAkgK1MF2h8qqoXaglqeKvSy8GZE/ZDlRZ92peXP+U09GeH0aG
-         QP9DezvhLL8/BST+oIIri0706kSm6JjFea1GspaW0r3OTAfmn8a3dZAvcZAttktkYX3k
-         poYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724250419; x=1724855219;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5KqTGxW8AKVPvkiuwUCASJeIM7PQDb/Zh6a+fYZvgHw=;
-        b=CnDkwr7y+Qz8culkdwzmJtEc6ufyeK54m2ZuMYzxVko31SJvFhpME+2HBkQnBCLzlO
-         pyhmwaqYci/VqVjjgK8NSKIs1GPOhzyBIsA2PBLh+knUSa2XnxUMi4FGZzrKDthfpbez
-         36RZ0F8F2GnIfPL/tF4T3LEq1Mh96GBrIf8+VHhTeqCcmgm81UD8zXNwL4NqliyfoM4D
-         zmMEAT9/KF2OBXtTnhMUWMg6IMi1V2TJwh0RRKPMM+l2L7ojeGrjuSwRfLnTskOkK5Ug
-         Wj/0/nCM8OLBcA+8gI5hY+7jqj0Axe/OVYU545YoqvOREApgwkW5YIo2XqXksR170IL+
-         90YA==
-X-Forwarded-Encrypted: i=1; AJvYcCXJ3boP4AsQyx+yW1r6Ct6I9uRUEGQLmtapPs+W1p1+s/0cSR0GNL3lLfAgTLfv/j/Kob0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVIHp8cXorIhvf9pp68cCWTAlMOV0Nr3FF9tKyPiTpUP+UTJhs
-	XvnATx/Zl/Mzs27VuuyKUTW8I0iksJKoNEp3V3Xr5EroYqVGnn0kHDZ8OtrpQJk=
-X-Google-Smtp-Source: AGHT+IGafRGb247lD1GrwccfwBXd98zL9sW8f4ol63M7LSb6wWS+TrhwVQYhVrUkyGsLrvYd0XQeKw==
-X-Received: by 2002:a5d:4c51:0:b0:368:2f01:307a with SMTP id ffacd0b85a97d-372fd70f4e4mr1778474f8f.46.1724250418743;
-        Wed, 21 Aug 2024 07:26:58 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abebc34ddsm28646765e9.0.2024.08.21.07.26.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 07:26:58 -0700 (PDT)
-From: Anup Patel <apatel@ventanamicro.com>
-To: Will Deacon <will@kernel.org>,
-	julien.thierry.kdev@gmail.com,
-	maz@kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	Anup Patel <apatel@ventanamicro.com>
-Subject: [kvmtool PATCH v3 4/4] riscv: Correct number of hart bits
-Date: Wed, 21 Aug 2024 19:56:10 +0530
-Message-Id: <20240821142610.3297483-5-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240821142610.3297483-1-apatel@ventanamicro.com>
-References: <20240821142610.3297483-1-apatel@ventanamicro.com>
+	s=arc-20240116; t=1724250852; c=relaxed/simple;
+	bh=P0mlLXIUnVQlyK7lCZO60213nO6YY8Dwxta1Sdk/oZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W4eDqu0WXkbh2XMgYnTpI82h9pFiFXhf9R2TXWDZF1vNWo5+7pW4TT8HA8O6GqiF26J55WsxyqKaGr7JVYzI4cb29iRYihIe+sABPbsY5zfL1qjYzwLs7Pu4gVnQ7/Y6qPw3zDASD640I24ihD6jq2E50FXyLtp45B+prOkxyf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7jmxiwB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90ECAC4AF11;
+	Wed, 21 Aug 2024 14:34:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724250851;
+	bh=P0mlLXIUnVQlyK7lCZO60213nO6YY8Dwxta1Sdk/oZ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g7jmxiwBKeJoRalYN/a72ZO1Zfrr07mXXETNlAsIo65Wc9BJB22kMvFBWqhhXGZJK
+	 9n5ZptCK3paVUy9mP4lPz5p00fgv/OjVBgC2hJdbTKSxHJWalmydSQBTiaLmdBa4tK
+	 8Cr8E5MwG9y8x2tOxviPXhPS0gwhrL72CI8c7wV/vHEhORlS+kdiAlz6/kAgDri+9F
+	 8CNH+hKbQlLpu2zazeQdwhRetUNY4UpFAuDDVg52IbLibprmQjOGLTB80L6Tvm/CRO
+	 mocsk/2V8DlIggF2WCq/OUrZmLKcjsr4IQ56hIGv3/I7wIKTIG02EV/RojpOk8gaDk
+	 66fAoPBxRlACw==
+Date: Wed, 21 Aug 2024 15:34:06 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH v4 0/8] KVM: arm64: Add support for FP8
+Message-ID: <8113b175-054d-4793-80b9-c9fe20fa9f9f@sirena.org.uk>
+References: <20240820131802.3547589-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="WCIAYnmD4iBdUtKW"
+Content-Disposition: inline
+In-Reply-To: <20240820131802.3547589-1-maz@kernel.org>
+X-Cookie: You are false data.
 
-From: Andrew Jones <ajones@ventanamicro.com>
 
-The number of hart bits should be obtained from the highest hart ID,
-not the number of harts. For example, if a guest has 2 harts, then
-the number of bits should be fls(1) == 1.
+--WCIAYnmD4iBdUtKW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- riscv/aia.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Aug 20, 2024 at 02:17:54PM +0100, Marc Zyngier wrote:
+> Although FP8 support was merged in 6.9, the KVM side was dropped, with
+> no sign of it being picked up again. Given that its absence is getting
+> in the way of NV upstreaming (HCRX_EL2 needs fleshing out), here's a
+> small series addressing it.
 
-diff --git a/riscv/aia.c b/riscv/aia.c
-index fe9399a..21d9704 100644
---- a/riscv/aia.c
-+++ b/riscv/aia.c
-@@ -164,7 +164,7 @@ static int aia__init(struct kvm *kvm)
- 	ret = ioctl(aia_fd, KVM_SET_DEVICE_ATTR, &aia_nr_sources_attr);
- 	if (ret)
- 		return ret;
--	aia_hart_bits = fls_long(kvm->nrcpus);
-+	aia_hart_bits = fls_long(kvm->nrcpus - 1);
- 	ret = ioctl(aia_fd, KVM_SET_DEVICE_ATTR, &aia_hart_bits_attr);
- 	if (ret)
- 		return ret;
--- 
-2.34.1
+The code looks good to me and I didn't spot any problems in testing so:
 
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Tested-by: Mark Brown <broonie@kernel.org>
+
+--WCIAYnmD4iBdUtKW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbF+t0ACgkQJNaLcl1U
+h9BN8gf/ciUedK7TLd2mdnpzZCKzRTnE44AFDMf9meFAzv0B94LnQAYh97UIawGg
+pignxgeyyMqbfwRlvsM087vghJt+irapXgHuOs9I82CNDcQEzDK/s59WUr+VSf/3
+JvA8e1w/rsmPAq4EM8wz+2rAWbfxVeb5vCzikY2QjRPEty0rXSUhMzF4HsGlwIti
+7Njp4Z6wBo0DKEcyaBahI1g7EAjCX3guGgFL5E3E+3kb2FXVX5n15ZwiooFaGUJ9
+u+kEzxnnViD7JEwIOzFI3FRVucY0rn/ERDPiSGLzaDxaTxqb+K/PptkDNBKSQs7c
+cid6Lq/3yXFM2C7c51OZHLeAQqTEWQ==
+=xYtS
+-----END PGP SIGNATURE-----
+
+--WCIAYnmD4iBdUtKW--
 
