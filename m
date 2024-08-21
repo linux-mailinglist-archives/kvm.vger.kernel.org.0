@@ -1,235 +1,90 @@
-Return-Path: <kvm+bounces-24710-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24711-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71FFB959AAB
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 13:50:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6A76959A94
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 13:47:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E41D2B292B1
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 11:44:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7319428185F
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 11:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339FE1C4EC1;
-	Wed, 21 Aug 2024 11:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iolTlsfz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D921B5EC8;
+	Wed, 21 Aug 2024 11:27:44 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF2B19ABA9;
-	Wed, 21 Aug 2024 11:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8577614C5BD;
+	Wed, 21 Aug 2024 11:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724239033; cv=none; b=naMO6R+QHTIUvoXxIq0awIbygd7KXqDIWeoXM1Xcxv+j4parLSYEegYW6wGPWKuP+nqvjQprCIReqVrFfGpsiHquUv3UNW42VmjqGNsGKn4NAMWc2Bt8aZGp5Ku8C3qNG4HtRDgIeDe4+0i1a5eXF48Pj+OuzTv4PttxTEIb9J4=
+	t=1724239664; cv=none; b=AP36e24IVHa6ZoxxzpX+BZpm9McGrxiFsuSCtTP7iIzm7RprgEVGBgfyXk3PAcybs1Htq7FFATAnYUVuppCBEFhIk6haVgACXYGrr7aiMXj938hXxoQIX1SfMxPxme6tY7ByvS/Cq9nN7coY6X8sOn3fr+b4oNWY78gzQOLG2IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724239033; c=relaxed/simple;
-	bh=yvBm5Op+YSekN97APkbwxofU0731HJMRH6D5GkEM9HQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N8V6y3uZnK39lYaHMcAfI9iXzKoAehamVhyojIAf5Fz2X/I5XD7TYiMyO35RAB8w8+HZowiVIMy6K7jbKvUGZWqwkxIgiIyvDMMG3VH8pj+eDac6BrQQycuv4kJvQoaIoLt5y2my2FFMSyB56yNdfxOF5BPvVBz9Y9/Da2zJW88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iolTlsfz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE93FC4AF09;
-	Wed, 21 Aug 2024 11:17:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724239032;
-	bh=yvBm5Op+YSekN97APkbwxofU0731HJMRH6D5GkEM9HQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iolTlsfzPsGxbZwYhuSR3YU2fsc9a86mh27VKfbHtXBkbzvXYgSz3SBzpK03O07NJ
-	 P+7AMVHw4nGgRhDKwoXCU4/JTE9QfeK+WFyp7dUFZEv5Rlr6TmytokolcfDXWTtf8o
-	 XkdvTG6zc2rK1nuvk0RQjM19xv7uxNl8d//dbe5vLYV9Ya1lzg1ZJFB6N8VymT6m/t
-	 hyhfo5yQd3C0boWATq8XIu9UcsczqdCVm/ocvgMLMeY9PFEKHDyjwBJK5wdRnEKdc0
-	 bdJGjA4zKH2vCDj3TcjvyNeT+olb4d7NCjgCUqfSAsTs3fh3700f53Mmm/DSDZA+fX
-	 UcBNpUrM+AkSQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sgjKw-005YkH-UT;
-	Wed, 21 Aug 2024 12:17:11 +0100
-Date: Wed, 21 Aug 2024 12:17:10 +0100
-Message-ID: <86frqyxgzt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH 12/12] KVM: arm64: Add selftest checking how the absence of GICv3 is handled
-In-Reply-To: <ZsUwb2pEUNQt2arR@linux.dev>
-References: <20240820100349.3544850-1-maz@kernel.org>
-	<20240820100349.3544850-13-maz@kernel.org>
-	<ZsUwb2pEUNQt2arR@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1724239664; c=relaxed/simple;
+	bh=k+wI27GqsGnBaCjuAIHqFhYnhQ6n7mgQgpX76GKua1I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hjFxKeM9vT0ubsI50V65nPOMTTD7LraHCy9koU8Y26zUVNucbJsU0FdpOCbXbVQQrflVa0xNTIiyzSuib5uWTa7c3Q1E3Bnwnxl8Gu8m4Aqiq/raciVMcHPxEgJnYCCj+A2aECTPIHDxKhfQJ0MQrdHkSNjkmolnhFBeZFSpQRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WpkTX6VHpz20lPs;
+	Wed, 21 Aug 2024 19:22:56 +0800 (CST)
+Received: from dggpeml500005.china.huawei.com (unknown [7.185.36.59])
+	by mail.maildlp.com (Postfix) with ESMTPS id 976381401F3;
+	Wed, 21 Aug 2024 19:27:38 +0800 (CST)
+Received: from huawei.com (10.175.112.125) by dggpeml500005.china.huawei.com
+ (7.185.36.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 21 Aug
+ 2024 19:27:37 +0800
+From: Yongqiang Liu <liuyongqiang13@huawei.com>
+To: <kvm@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <zhangxiaoxu5@huawei.com>,
+	<hpa@zytor.com>, <x86@kernel.org>, <dave.hansen@linux.intel.com>,
+	<bp@alien8.de>, <mingo@redhat.com>, <tglx@linutronix.de>,
+	<pbonzini@redhat.com>, <seanjc@google.com>, <liuyongqiang13@huawei.com>
+Subject: [PATCH -next] KVM: SVM: Remove unnecessary GFP_KERNEL_ACCOUNT in svm_set_nested_state()
+Date: Wed, 21 Aug 2024 19:27:37 +0800
+Message-ID: <20240821112737.3649937-1-liuyongqiang13@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, glider@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500005.china.huawei.com (7.185.36.59)
 
-On Wed, 21 Aug 2024 01:10:23 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Tue, Aug 20, 2024 at 11:03:49AM +0100, Marc Zyngier wrote:
-> > Given how tortuous and fragile the whole lack-of-GICv3 story is,
-> > add a selftest checking that we don't regress it.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  tools/testing/selftests/kvm/Makefile          |   1 +
-> >  .../selftests/kvm/aarch64/no-vgic-v3.c        | 170 ++++++++++++++++++
-> >  2 files changed, 171 insertions(+)
-> >  create mode 100644 tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
-> > 
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > index 48d32c5aa3eb..f66b37acc0b0 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -163,6 +163,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
-> >  TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-> >  TEST_GEN_PROGS_aarch64 += aarch64/vgic_lpi_stress
-> >  TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
-> > +TEST_GEN_PROGS_aarch64 += aarch64/no-vgic-v3
-> >  TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
-> >  TEST_GEN_PROGS_aarch64 += arch_timer
-> >  TEST_GEN_PROGS_aarch64 += demand_paging_test
-> > diff --git a/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
-> > new file mode 100644
-> > index 000000000000..27169afc94c6
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
-> > @@ -0,0 +1,170 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +
-> > +// Check that, on a GICv3 system, not configuring GICv3 correctly
-> > +// results in all of the sysregs generating an UNDEF exception.
-> > +
-> > +#include <test_util.h>
-> > +#include <kvm_util.h>
-> > +#include <processor.h>
-> > +
-> > +static volatile bool handled;
-> > +
-> > +#define __check_sr_read(r)					\
-> > +	do {							\
-> > +		uint64_t val;					\
-> > +								\
-> > +		handled = false;				\
-> > +		dsb(sy);					\
-> > +		val = read_sysreg_s(SYS_ ## r);			\
-> > +		(void)val;					\
-> > +	} while(0)
-> > +
-> > +#define __check_sr_write(r)					\
-> > +	do {							\
-> > +		handled = false;				\
-> > +		dsb(sy);					\
-> > +		write_sysreg_s(0, SYS_ ## r);			\
-> > +		isb();						\
-> > +	} while(0)
-> > +
-> > +/* Fatal checks */
-> > +#define check_sr_read(r)					\
-> > +	do {							\
-> > +		__check_sr_read(r);				\
-> > +		__GUEST_ASSERT(handled, #r " no read trap");	\
-> > +	} while(0)
-> > +
-> > +#define check_sr_write(r)					\
-> > +	do {							\
-> > +		__check_sr_write(r);				\
-> > +		__GUEST_ASSERT(handled, #r " no write trap");	\
-> > +	} while(0)
-> > +
-> > +#define check_sr_rw(r)				\
-> > +	do {					\
-> > +		check_sr_read(r);		\
-> > +		check_sr_write(r);		\
-> > +	} while(0)
-> > +
-> > +/* Non-fatal checks */
-> > +#define check_sr_read_maybe(r)						\
-> > +	do {								\
-> > +		__check_sr_read(r);					\
-> > +		if (!handled)						\
-> > +			GUEST_PRINTF(#r " read not trapping (OK)\n");	\
-> > +	} while(0)
-> > +
-> > +#define check_sr_write_maybe(r)						\
-> > +	do {								\
-> > +		__check_sr_write(r);					\
-> > +		if (!handled)						\
-> > +			GUEST_PRINTF(#r " write not trapping (OK)\n");	\
-> > +	} while(0)
-> > +
-> > +static void guest_code(void)
-> > +{
-> > +	/*
-> > +	 * Check that we advertise that ID_AA64PFR0_EL1.GIC == 0, having
-> > +	 * hidden the feature at runtime without any other userspace action.
-> > +	 */
-> > +	__GUEST_ASSERT(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC),
-> > +				 read_sysreg(id_aa64pfr0_el1)) == 0,
-> > +		       "GICv3 wrongly advertised");
-> > +
-> > +	/*
-> > +	 * Access all GICv3 registers, and fail if we don't get an UNDEF.
-> > +	 * Note that we happily access all the APxRn registers without
-> > +	 * checking their existance, as all we want to see is a failure.
-> > +	 */
-> > +	check_sr_rw(ICC_PMR_EL1);
-> > +	check_sr_read(ICC_IAR0_EL1);
-> > +	check_sr_write(ICC_EOIR0_EL1);
-> > +	check_sr_rw(ICC_HPPIR0_EL1);
-> > +	check_sr_rw(ICC_BPR0_EL1);
-> > +	check_sr_rw(ICC_AP0R0_EL1);
-> > +	check_sr_rw(ICC_AP0R1_EL1);
-> > +	check_sr_rw(ICC_AP0R2_EL1);
-> > +	check_sr_rw(ICC_AP0R3_EL1);
-> > +	check_sr_rw(ICC_AP1R0_EL1);
-> > +	check_sr_rw(ICC_AP1R1_EL1);
-> > +	check_sr_rw(ICC_AP1R2_EL1);
-> > +	check_sr_rw(ICC_AP1R3_EL1);
-> > +	check_sr_write(ICC_DIR_EL1);
-> > +	check_sr_read(ICC_RPR_EL1);
-> > +	check_sr_write(ICC_SGI1R_EL1);
-> > +	check_sr_write(ICC_ASGI1R_EL1);
-> > +	check_sr_write(ICC_SGI0R_EL1);
-> > +	check_sr_read(ICC_IAR1_EL1);
-> > +	check_sr_write(ICC_EOIR1_EL1);
-> > +	check_sr_rw(ICC_HPPIR1_EL1);
-> > +	check_sr_rw(ICC_BPR1_EL1);
-> > +	check_sr_rw(ICC_CTLR_EL1);
-> > +	check_sr_rw(ICC_IGRPEN0_EL1);
-> > +	check_sr_rw(ICC_IGRPEN1_EL1);
-> > +
-> > +	/*
-> > +	 * ICC_SRE_EL1 may not be trappable, as ICC_SRE_EL2.Enable can
-> > +	 * be RAO/WI
-> > +	 */
-> > +	check_sr_read_maybe(ICC_SRE_EL1);
-> > +	check_sr_write_maybe(ICC_SRE_EL1);
-> 
-> In the case that a write does not UNDEF, should we check that
-> ICC_SRE_EL1.SRE is also RAO/WI?
+The fixed size temporary variables vmcb_control_area and vmcb_save_area
+allocated in svm_set_nested_state() are released when the function exits.
+Meanwhile, svm_set_nested_state() also have vcpu mutex held to avoid
+massive concurrency allocation, so we don't need to set GFP_KERNEL_ACCOUNT.
 
-Ah, not a bad idea. I'll add that.
+Signed-off-by: Yongqiang Liu <liuyongqiang13@huawei.com>
+---
+ arch/x86/kvm/svm/nested.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks,
-
-	M.
-
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 6f704c1037e5..d5314cb7dff4 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -1693,8 +1693,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+ 
+ 	ret  = -ENOMEM;
+-	ctl  = kzalloc(sizeof(*ctl),  GFP_KERNEL_ACCOUNT);
+-	save = kzalloc(sizeof(*save), GFP_KERNEL_ACCOUNT);
++	ctl  = kzalloc(sizeof(*ctl),  GFP_KERNEL);
++	save = kzalloc(sizeof(*save), GFP_KERNEL);
+ 	if (!ctl || !save)
+ 		goto out_free;
+ 
 -- 
-Without deviation from the norm, progress is not possible.
+2.25.1
+
 
