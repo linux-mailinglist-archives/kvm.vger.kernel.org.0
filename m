@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-24706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EB76959A1E
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 13:35:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B9F6959A4D
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 13:40:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFB2BB23528
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 11:35:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02E731F2255B
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 11:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E885C1B532F;
-	Wed, 21 Aug 2024 10:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E946C1A7AD2;
+	Wed, 21 Aug 2024 11:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CFUdtImv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gi54C1GR"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130601B5314;
-	Wed, 21 Aug 2024 10:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10239188A2A;
+	Wed, 21 Aug 2024 11:05:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724237996; cv=none; b=QAVbfLWbOKrCaxAD5cYzRVrJ/tnmma/3Q6IcHTGkSd7PPn2hUCKLpB2FQrKUVMdXD7V3dPh/7jpZsqG925JnxYas02xByG8IAQIWyWeTCCCeGQdVCZ+MY3xGQnqekGRyPQUhAVzgfXvocqgYc6z5HU2Lm7scTfePPDMu64PfsKM=
+	t=1724238341; cv=none; b=tE6WbcFnrwWRd9L/x1rg9tIOWMBhZJ6rDVbE/i8yC5uG68ObGHhmvcAPBJpNJ4fl0pG6qDIFJ5SIS76+bn8gs2mxufbTYDBbm1kyAeZ3+v2hId1fFob15lIvAX/XzqomxKjE5eu4D08Lps0Iu7UgiGjw4ybC/eB9okdkL4NzHb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724237996; c=relaxed/simple;
-	bh=oG3C/CyEhEg8t+4o65Fl/gjP36ABhhIxycBx70x7ZH8=;
+	s=arc-20240116; t=1724238341; c=relaxed/simple;
+	bh=lMBMESst7bCQ8jyHOpfcD43sVWhjcjmCuJ+vIN49mNI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eR5FhhmoqFRgcK9mkBazr6avzmsmFJdq4iHRhWqjnHHCaYzQtullk18LoFWtHNdgwYJ9DBcgaK1/y9nxizESPOLY4ozBlmmHH5L9XdDJs9qKRa7e9ihSPm6NHVO3XByj0cs8ECIQ9clcfy4VAek6Gzj4b8kKpc3NROTysAMsC4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CFUdtImv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A9E0C4AF0C;
-	Wed, 21 Aug 2024 10:59:55 +0000 (UTC)
+	 MIME-Version:Content-Type; b=RCuslXaL6/z5uHNzr0eObPb/4YSRYlz3Yt5tL0chufXpmEnLWbabbQ5qfmYJKL/0OZvizWKgqA9JACKcqHDztJddsif49tVDBNNDAtP9eIo7hZmQHmKwcdqnQ+eHfeEiMH040fm4ii2sbaiMnLK31q4nGXJuZ4giX6Bo5N8QSxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gi54C1GR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BA4BC32782;
+	Wed, 21 Aug 2024 11:05:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724237995;
-	bh=oG3C/CyEhEg8t+4o65Fl/gjP36ABhhIxycBx70x7ZH8=;
+	s=k20201202; t=1724238340;
+	bh=lMBMESst7bCQ8jyHOpfcD43sVWhjcjmCuJ+vIN49mNI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CFUdtImvk8zS41kpFawufI6p4JNkgaHn5CMkgARWa4eIdl/F0mEWRMSgGJvnUF3Ml
-	 0esBag33idw/qWD+W40FjGSH8+8Sfk7NJFkbh0zuA15k07uFu30JGlMee86Hf+UqUy
-	 BrbmUg1bsrpabAt9ktKw3y+h+hyW05Z5h6750luRf0gmb0TmRaHJgh8nu/9320KKMb
-	 +2CxKHvpk3Nk4rGh51B9ROhB/nmWPYCTjFgwN147Z32uMDxwiI+7K2DjxRup/hG7G/
-	 bgrlu826uk5P64OejOaJusJddyJUAd6EFLQ28Ed8igCSRJs28oVqVZg05iNEh3+mRV
-	 iBRe0IoFg0mnQ==
+	b=Gi54C1GRfwslotpV/SidoL40SWzfZTuaW1N7B2/2+SPUBfuuAgcKqH2Gaaz82ffNp
+	 DVj3zMcAskSSoMQ+HWZH17Fy33kTl1EaK+zrHiaK4fDeOuKo4JnLNr7n7ltQBkqB3g
+	 pe+JSfJBqustD1e5ovNUML4Hn2P/wtov7hg1eSp+5I5sfLr5ptyeVIzt55dj6/NLUQ
+	 YZPVZAicQQvEH6TUTycx+CcLAHSVkVSfQ/O/dwY62S6xROA5njmRnlePCbQPtPdhZO
+	 JM1dHNbtLA5pQ2TcQd7FD30nw3KV/e+YLYRFen4Rch+SBuKU+Fn8gi8o2jZhB8Rj47
+	 fNf1Zj0jKUf1A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgj4D-005YAo-3D;
-	Wed, 21 Aug 2024 11:59:53 +0100
-Date: Wed, 21 Aug 2024 11:59:52 +0100
-Message-ID: <86le0qxhsn.wl-maz@kernel.org>
+	id 1sgj9m-005YQT-7q;
+	Wed, 21 Aug 2024 12:05:38 +0100
+Date: Wed, 21 Aug 2024 12:05:37 +0100
+Message-ID: <86jzgaxhj2.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -57,13 +57,12 @@ Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexander Potapenko <glider@google.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 01/12] KVM: arm64: Make ICC_*SGI*_EL1 undef in the absence of a vGICv3
-In-Reply-To: <ZsUOtp9kfpqm1enx@linux.dev>
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH 03/12] KVM: arm64: Force SRE traps when SRE access is not enabled
+In-Reply-To: <ZsUkhIuA5T4BfeJ6@linux.dev>
 References: <20240820100349.3544850-1-maz@kernel.org>
-	<20240820100349.3544850-2-maz@kernel.org>
-	<ZsUOtp9kfpqm1enx@linux.dev>
+	<20240820100349.3544850-4-maz@kernel.org>
+	<ZsUkhIuA5T4BfeJ6@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -75,32 +74,118 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, glider@google.com, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, glider@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 20 Aug 2024 22:46:30 +0100,
+On Wed, 21 Aug 2024 00:19:32 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On Tue, Aug 20, 2024 at 11:03:38AM +0100, Marc Zyngier wrote:
-> > On a system with a GICv3, if a guest hasn't been configured with
-> > GICv3 and that the host is not capable of GICv2 emulation,
-> > a write to any of the ICC_*SGI*_EL1 registers is trapped to EL2.
-> > 
-> > We therefore try to emulate the SGI access, only to hit a NULL
-> > pointer as no private interrupt is allocated (no GIC, remember?).
-> > 
-> > The obvious fix is to give the guest what it deserves, in the
-> > shape of a UNDEF exception.
-> > 
-> > Reported-by: Alexander Potapenko <glider@google.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Cc: stable@vger.kernel.org
+> Hey,
 > 
-> LGTM, and just as an FYI I do plan on grabbing this for 6.11
+> On Tue, Aug 20, 2024 at 11:03:40AM +0100, Marc Zyngier wrote:
+> > We so far only write the ICH_HCR_EL2 config in two situations:
+> > 
+> > - when we need to emulate the GICv3 CPU interface due to HW bugs
+> > 
+> > - when we do direct injection, as the virtual CPU interface needs
+> >   to be enabled
+> > 
+> > This is all good. But it also means that we don't do anything special
+> > when we emulate a GICv2, or that there is no GIC at all.
+> > 
+> > What happens in this case when the guest uses the GICv3 system
+> > registers? The *guest* gets a trap for a sysreg access (EC=0x18)
+> > while we'd really like it to get an UNDEF.
+> > 
+> > Fixing this is a bit involved:
+> > 
+> > - we need to set all the required trap bits (TC, TALL0, TALL1, TDIR)
+> > 
+> > - for these traps to take effect, we need to (counter-intuitively)
+> >   set ICC_SRE_EL1.SRE to 1 so that the above traps take priority.
+> > 
+> > Note that doesn't fully work when GICv2 emulation is enabled, as
+> > we cannot set ICC_SRE_EL1.SRE to 1 (it breaks Group0 delivery as
+> > IRQ).
+> 
+> Just to make sure I'm following completely, GICv2-on-GICv3 guest sees
+> the (barf) architected behavior of sysreg traps going to EL1.
 
-Great, thanks. Are you planning to route this via arm64, given that
-Paolo is away for a bit?
+Indeed. There isn't anything we can do about that, short of changing
+the behaviour of GICv2 emulation. I'll add something to that effect in
+the commit message.
+
+> 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/vgic-v3-sr.c | 22 ++++++++++++++++------
+> >  arch/arm64/kvm/vgic/vgic-v3.c   |  5 ++++-
+> >  2 files changed, 20 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> > index 7b397fad26f2..a184def8f5ad 100644
+> > --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> > +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> > @@ -268,8 +268,16 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
+> >  	 * starting to mess with the rest of the GIC, and VMCR_EL2 in
+> >  	 * particular.  This logic must be called before
+> >  	 * __vgic_v3_restore_state().
+> > +	 *
+> > +	 * However, if the vgic is disabled (ICH_HCR_EL2.EN==0), no GIC is
+> > +	 * provisionned at all. In order to prevent illegal accesses to the
+> 
+> typo: provisioned
+> 
+> > +	 * system registers to trap to EL1 (duh), force ICC_SRE_EL1.SRE to 1
+> > +	 * so that the trap bits can take effect. Yes, we *loves* the GIC.
+> >  	 */
+> > -	if (!cpu_if->vgic_sre) {
+> > +	if (!(cpu_if->vgic_hcr & ICH_HCR_EN)) {
+> > +		write_gicreg(ICC_SRE_EL1_SRE, ICC_SRE_EL1);
+> > +		isb();
+> > +	} else if (!cpu_if->vgic_sre) {
+> >  		write_gicreg(0, ICC_SRE_EL1);
+> >  		isb();
+> >  		write_gicreg(cpu_if->vgic_vmcr, ICH_VMCR_EL2);
+> > @@ -288,8 +296,9 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
+> >  	}
+> >  
+> >  	/*
+> > -	 * Prevent the guest from touching the GIC system registers if
+> > -	 * SRE isn't enabled for GICv3 emulation.
+> > +	 * Prevent the guest from touching the ICC_SRE_EL1 system
+> > +	 * register. Note that this may not have any effect, as
+> > +	 * ICC_SRE_EL2.Enable being RAO/WI is a valid implementation.
+> 
+> So this behavior is weird but still 'safe' as, ICC_SRE_EL1.SRE is also RAO/WI
+> and the HCR traps are still effective. Right?
+
+Exactly. All the traps are working, *except* for ICC_SRE_EL1 itself. A
+guest can then infer that it runs under a hypervisor, but not much more.
+
+> 
+> >  	 */
+> >  	write_gicreg(read_gicreg(ICC_SRE_EL2) & ~ICC_SRE_EL2_ENABLE,
+> >  		     ICC_SRE_EL2);
+> > @@ -297,10 +306,11 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
+> >  	/*
+> >  	 * If we need to trap system registers, we must write
+> >  	 * ICH_HCR_EL2 anyway, even if no interrupts are being
+> > -	 * injected,
+> > +	 * injected. Note that this also applies if we don't expect
+> > +	 * any system register access (GICv2 or no vgic at all).
+> 
+> We don't expect the traps to come in the GICv2 case, though, right?
+
+Yup. I'll fix the comment, as it is misleading.
+
+> Looks alright to me otherwise, but blech!
+
+Yeah. It's the sort of code that makes you feel dirty just looking at
+it.
+
+Thanks,
 
 	M.
 
