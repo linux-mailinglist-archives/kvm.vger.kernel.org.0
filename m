@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-24708-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24709-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 822A0959A68
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 13:44:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9C89959A6A
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 13:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 411E3282576
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 11:44:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 820B31F21D3C
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 11:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C451C93BE;
-	Wed, 21 Aug 2024 11:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEBB1CCEDC;
+	Wed, 21 Aug 2024 11:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QP5H6CuX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJhxJt02"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47AA1B7913;
-	Wed, 21 Aug 2024 11:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30001B3B2B;
+	Wed, 21 Aug 2024 11:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724238840; cv=none; b=oCnZR8Jbati33LUbUvYiojik0IpUjpRORK0QAWoP62yS6ymL+eRNzlXxkSn7ShOqBQ5QDh8C34eIT1szaENbkI0Xx6N/A9DtXV1ED8KffZnFaSdbSR85gMbsnlUAmiDI6zkVtY7wB6ysssixH17sEsqcELpz65KGHI4iYlVSwzc=
+	t=1724238987; cv=none; b=GTtMPPhmuaRt72168StGbs+G+frX9hSt+BDNO8muJlyuOW+8LSjIg4cChw9znYfNOdO62Z+IdEr/A9BIUpcmcdA/YXM/w8a19BVeQkBfQH0/klNG5Gbx5mmWiWxMbhXQNPsgyJNgV5qpe3WZQ1p5IonLkaD9XMV9nAXPL+bTG60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724238840; c=relaxed/simple;
-	bh=ltZxB1ov+Y4a3/+KK1P2wxvY2WYfLUrfItKSecJnu9c=;
+	s=arc-20240116; t=1724238987; c=relaxed/simple;
+	bh=PQJeXUClWIAPxChh0edfyISaZ9J1rH+OUORmO3eT5qE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m4w/xWebHsym9pqNCUfSkvKHLUyYgmTk/WwvDeS6GkzT+8xQWeLk/MUI8JUpuetX2AlnWpvkTE2jqHU2WL9+g5LQzI0Ij8lSX09A4nxc+Ti5sYhV/2mcl8L34YYASmbSJRcvBHGJRrUjVa5qfWGtggTfk30ZiUTaMsiKTr7qmyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QP5H6CuX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 240F1C32782;
-	Wed, 21 Aug 2024 11:14:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=e7wKQ+0qOuVLLRJhdsHuLpvB38JyfFKxIBAxGyR54BjARrfmcRtMuNUcJWehKlKPOALHsoC39ARuTimLVpJcqt3d8EK8vj3hpkQzhBE8ciXOkP2Os4AAu3R2GUDXrDWjKFSBCJBRslvtsG38Xkvd38bEEAn39TH47joI24AchrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJhxJt02; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 450FDC32782;
+	Wed, 21 Aug 2024 11:16:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724238840;
-	bh=ltZxB1ov+Y4a3/+KK1P2wxvY2WYfLUrfItKSecJnu9c=;
+	s=k20201202; t=1724238987;
+	bh=PQJeXUClWIAPxChh0edfyISaZ9J1rH+OUORmO3eT5qE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QP5H6CuXkR6voKv0xKrbGXHYzT17/dj688f7YYjoSxC0YZuVsJgzoHlNAtO5FxydI
-	 HJrMQ2X4Ja08uH65aGI8YSzooKxgKJUXxScKCNSWooXnXXx+oPxr4PnJ7VYol5/Wkm
-	 FpBO0NXoCZPSn+QKV4jCXaxKxSWpm6H6ANKFCDtqCHe/P4BG8MDuJy2ysBuzIwzEuQ
-	 tT3GOePu0sK/Ag7sGMl4kmLb4CNTtgZ/YQc/+ugkX58AJuEB+IMASjm+3n0aQf3wC2
-	 9zYnKXDFn6NIwPCqPkn0hauuF6ibjVb0aDVfX0PGbjl/NFCkA50IU9drShtm49Nhnn
-	 GGF6Ch2b01EOg==
+	b=FJhxJt02rS7eOjXO6WMjIA2afl2W3RPa2hQxNRh9ASYDKoNVMcShIV6R5cRGkt3A7
+	 UC+EZUNOiBhjPQFxvUuAaJUanS14akEEfAlOXhDWA/shohcACzaxojrFiAHXnPMDJL
+	 bkhyvi4Bd3xV4T/Kw4nhtKxxIVyLT0/4tzwPh9e7GzFGGuWU3EWuc/42vdA4CYUn+E
+	 KAjolLBZ/L5444f74z1Kz4fcqUUlF6VcbGu5+Ma9jVjgG6TvHKsVkRvbo4Kq/CVo+H
+	 H37h/LYuQw/D5WiNt5p5Wxuk44T6//AYWWhsGqIqxT7P3qTrdt86gizHulSF9Jpkiu
+	 q/9SLMnEV+eag==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgjHp-005Yem-R6;
-	Wed, 21 Aug 2024 12:13:57 +0100
-Date: Wed, 21 Aug 2024 12:13:57 +0100
-Message-ID: <86ikvuxh56.wl-maz@kernel.org>
+	id 1sgjKD-005Yj5-1a;
+	Wed, 21 Aug 2024 12:16:25 +0100
+Date: Wed, 21 Aug 2024 12:16:24 +0100
+Message-ID: <86h6bexh13.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -58,11 +58,11 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH 04/12] KVM: arm64: Force GICv3 traps activa when no irqchip is configured on VHE
-In-Reply-To: <ZsUn1E6Gytu40iOW@linux.dev>
+Subject: Re: [PATCH 06/12] KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is presented to the guest
+In-Reply-To: <ZsUrukQpWqal9Zfm@linux.dev>
 References: <20240820100349.3544850-1-maz@kernel.org>
-	<20240820100349.3544850-5-maz@kernel.org>
-	<ZsUn1E6Gytu40iOW@linux.dev>
+	<20240820100349.3544850-7-maz@kernel.org>
+	<ZsUrukQpWqal9Zfm@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -78,39 +78,58 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-ker
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 21 Aug 2024 00:33:40 +0100,
+On Wed, 21 Aug 2024 00:50:18 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> s/activa/active/
-> 
-> On Tue, Aug 20, 2024 at 11:03:41AM +0100, Marc Zyngier wrote:
-> > On a VHE system, no GICv3 traps get configured when no irqchip is
-> > present. This is not quite matching the "no GICv3" semantics that
-> > we want to present.
+> On Tue, Aug 20, 2024 at 11:03:43AM +0100, Marc Zyngier wrote:
+> > In order to be consistent, we shouldn't advertise a GICv3 when none
+> > is actually usable by the guest.
 > > 
-> > Force such traps to be configured in this case.
+> > Wipe the feature when these conditions apply, and allow the field
+> > to be written from userspace.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/vgic/vgic.c | 14 ++++++++++----
-> >  1 file changed, 10 insertions(+), 4 deletions(-)
+> >  arch/arm64/kvm/sys_regs.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> > index 974849ea7101..2caa64415ff3 100644
-> > --- a/arch/arm64/kvm/vgic/vgic.c
-> > +++ b/arch/arm64/kvm/vgic/vgic.c
-> > @@ -917,10 +917,13 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index bc2d54da3827..7d00d7e359e1 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2365,7 +2365,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  		   ID_AA64PFR0_EL1_MPAM |
+> >  		   ID_AA64PFR0_EL1_SVE |
+> >  		   ID_AA64PFR0_EL1_RAS |
+> > -		   ID_AA64PFR0_EL1_GIC |
+> >  		   ID_AA64PFR0_EL1_AdvSIMD |
+> >  		   ID_AA64PFR0_EL1_FP), },
+> >  	ID_SANITISED(ID_AA64PFR1_EL1),
+> > @@ -4634,6 +4633,11 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
 > >  
-> >  void kvm_vgic_load(struct kvm_vcpu *vcpu)
-> >  {
-> > -	if (unlikely(!vgic_initialized(vcpu->kvm)))
-> > +	if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))) {
+> >  	guard(mutex)(&kvm->arch.config_lock);
+> >  
+> > +	if (!kvm_has_gicv3(kvm)) {
+> > +		kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] &= ~ID_AA64PFR0_EL1_GIC_MASK;
+> > +		kvm->arch.id_regs[IDREG_IDX(SYS_ID_PFR1_EL1)] &= ~ID_PFR1_EL1_GIC_MASK;
+> > +	}
+> > +
 > 
-> Doesn't !vgic_initialized(vcpu->kvm) also cover the case of no irqchip
-> in kernel?
+> Hmm, should we use the ID register field as the source of truth for
+> kvm_has_gicv3() at this point?
+> 
+> I think what you have in patch #1 makes good sense for a stable
+> backport. Using the ID register from this point forward would make the
+> behavior consistent for a stupid userspace instantiated GICv3 for the VM
+> but clobbered it from the ID register.
+> 
+> AFAICT all other usage of kvm_has_gicv3() happens after
+> kvm_finalize_sys_regs(), so it should take this last-minute fixup into
+> account.
 
-It does, but that's purely accidental. I can drop that, but it is
-really fragile.
+Right, so changing the definition of kvm_has_gicv3() in this patch,
+and using the "old" definition here only. Yup, this seems like a
+reasonable thing to do.
 
 Thanks,
 
