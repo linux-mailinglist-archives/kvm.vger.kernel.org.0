@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-24724-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24725-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56088959C50
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 14:48:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 797E1959C5B
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 14:51:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B1ED1C21771
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 12:48:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31C5F2828FF
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 12:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5D2192D90;
-	Wed, 21 Aug 2024 12:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C67192D84;
+	Wed, 21 Aug 2024 12:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="fmFZKt4+"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="gIlM+c9U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D98E18C35C
-	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 12:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7B418FDC2
+	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 12:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724244496; cv=none; b=NwYbJTctn1QJnvuxMoOxUp+71Kz+r6s6ryvYkizVciFJv3rLMnQWfzO21ueDFa3/lMrU9g8+cIZaWETYl6c4EHPQaW+qEKUKScKY+ka42U8htolF5Blemfk8hStGSsVLNe2tjJDtimIFu9LJ10Aze9MfecU4gUhy6cslLZ0MIgg=
+	t=1724244674; cv=none; b=tnPX9Cvzx9RIDLNxLQrCEE7SDWn34ZcdNG6ZvdTFNxtWOkdyHwMJUopQ+s/MW3To/zXJaKjt0G27ji4h0up5/f3GU8cv38eVpsVcCk1+97tXKaXMwOtUf4+AS1Wy9rFFrTB295wK5ZFn/JfnFEZ1tpHlWOg60tH2Tpo2X5eSTVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724244496; c=relaxed/simple;
-	bh=NZ1G9QalOD4q3lb9VPf4Bnu2xhhNbO2CqFkeuFlGODE=;
+	s=arc-20240116; t=1724244674; c=relaxed/simple;
+	bh=3kk9FB2Qg9EQluc1yWJwlVnjqomuB8gqG6ulP4gTqB4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=liS5zbuP5RQG3mTziAJlD2A+icXLhj8DIbhFU0N2HqGacpRztObWC9c2tAT7T/HmT6kbHoFuKHJ28TIYD7xeFY0Q1QEsw0uqWOmsh8ESp6kESCUxfXz5Xm+kfBvvwMEZuhHmTArJDoUn0XihB7UvxFSVV2INTZSBf1dI4R8PLF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=fmFZKt4+; arc=none smtp.client-ip=209.85.218.48
+	 Content-Type:Content-Disposition:In-Reply-To; b=IKWFXl9eCLxucqiTaob+vJAb66QObdieDUjWBQvh6uMyJpjtMqEaFH6mR+ZkYxNZ6Aw8M9y5vy+8Wzyl0SCmo3Ww/Bjb/MXKfPv2dKT7pkvmns31JzHjwPyxasJgPiTr3ifln1zMU0yuZjorvNy3rLD7+mtYu/3yhDr9TO/uIhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=gIlM+c9U; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a7a8a4f21aeso810168666b.2
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 05:48:13 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a83562f9be9so606910566b.0
+        for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 05:51:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1724244492; x=1724849292; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1724244671; x=1724849471; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=owctU5UF/MrOqJiKH/wjLFTDxdDZZM8Or/kAuo7tn/8=;
-        b=fmFZKt4+Qe2zrlQ78EPEHtw4+LNl0jGtLwxC1fRFSYjbLlGiQYy7Ov1kgXh0v1wg3I
-         9Wd5dFG8cm9pieAnqIpk2hMi447YX9ukGvM+qxnlyiRXxZE/whESXAsIxmpB+8epoil+
-         mebb9OeVklrCTYLLi/V/QRPIyDxycjZaPqkHW2YgL6ukFCzDdn95FjuRtzv29VZh72S6
-         WgbGu2/sMSsrb6dHPHIoozavjlQWE3VwthvDh+c8z2fQ5DNrYQgBkXGeK0zZsRumDDFT
-         s9JpTI3U81NOZWNcTXHyNtE/NydCXRGbqOCsFJcpeluDJ5+/sE9qLnWfXVPOmM5G/JKA
-         IxMw==
+        bh=raDu59AbuTAiHZu2m2E9hviyqY7JsE7FECBT8mn6n1o=;
+        b=gIlM+c9UPyt7JUNXz6nXtohD7M6PUiEIvU3M/RHCZXZgCAEFRv66BnlpyH3x/BTSzY
+         r6irwhIdDWqGjZfp8tN+WqZXZpkVWZp+mWeFr52+TcYer8lnTQ/ZIsECYPqCkcmc5HWd
+         cBGuEkyBIiF0PZXYj3+QXfNsjcTjXcJOUsbNeGScm5E9q8zlydLrBJz/ulkDBwR3fnpp
+         rXSs1ooFaDPXCpljdByxhQIpxOmRR2enJvbqxZrxygbPX6TsK1Tdq6ZBIwufOppGbvgY
+         QySRvs2MiTFva1ruDNUBgss6s0BhEnVFh6uL062wdCNEYwKZUHt8+52UZz78Na74DDJ1
+         Tqrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724244492; x=1724849292;
+        d=1e100.net; s=20230601; t=1724244671; x=1724849471;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=owctU5UF/MrOqJiKH/wjLFTDxdDZZM8Or/kAuo7tn/8=;
-        b=w7h+FUZtP2w/YuvFBNTNaNWkzLqu8WqftXzSbaklFXHGmZwMWNr+wbrvCb2ssxIyaD
-         qncgoXVi3BeC0UHl/gl6FOA0KjQpO2SKYisMRKX+n+1tdzF9rpXy9GLYJRFFQ0pQGG8w
-         NHTs7bP+7Rsvkmt5R4AetnJMMkDHWan7wg2891BzcL8ovT+vNE4/5jcBGSYoEPwAlfLY
-         HKYFng4ywnuOfM8u+3uuMVtwqxbT8D9fGeF/VUecV7tc0s2F9n84lsSlnOMo5YXluwgn
-         FN6h6JZy2eFOh5PJv/Ago10riH2NHyOC8jBGTgOhJ1DNy+v70z+oBfMliM4SDR3ue/dd
-         5n+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWX0nvWcYluoqXJblEI3tb0xd22UW4B6a/s8uL33SyQkac8t4PIY+8Ik8VnN2q/J/OeT5s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywnl/+a89zCwdQGtaT6mBk5jDKN2FKXv6TUIDxGiYNCqBoI5EZE
-	RNtqv24QXAF5Ha3tobsRbbFMwglq+QI1AptNIm3NOCRVwzC5BQZ/4PNJezeoG6o=
-X-Google-Smtp-Source: AGHT+IEBHJpECbZj9IKLd7v7eqsKAcU06neT/8vBwwygqFiwFCmvnkErVfPeY9IwiKfaKQItm4XXxw==
-X-Received: by 2002:a17:907:a41:b0:a7d:3de1:4ab2 with SMTP id a640c23a62f3a-a866f3616a2mr165794866b.27.1724244491373;
-        Wed, 21 Aug 2024 05:48:11 -0700 (PDT)
+        bh=raDu59AbuTAiHZu2m2E9hviyqY7JsE7FECBT8mn6n1o=;
+        b=ui3lZJ5j6R1X/EV06VTa2FafoO1NlqLj444t0eSv/zr+zve1OIaJDNXMYFS3iyrfJC
+         9R8Rhumv170m/Fa5v8eWcWa5HUR87lBjRhSE2LzF6nktJNhUVBJBr1CwJqsvjDAI5Ekw
+         2asmSUYWEt0Ztqn535mXz3meRYqMX5md5AbcJSi+wIHelo7zVoMuEMrSA8sJb06KGcBI
+         BVntzMBoAay96uu4J8DZDgChHc4nTPBLtTbOInEPvO6RpdsbA8C/IAfdA2EW00tfluO/
+         8ynsGxCsL0Aeq+DNooM4EbIGebjbhU/KbAnv/q2hnoQFcs2nKncOiy3X9oCNSd3Od7ae
+         w7Sg==
+X-Forwarded-Encrypted: i=1; AJvYcCWHqrieCa87fzZEB8Z21H0hAjYSq+tlJ4SrnaC4/byFAj9PdF9n2dIC+vzS8Cjjif4/zB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf3QpV+m+9xAjm423XCFWUpD/33V/X2ypN92wlWsg0kFKpZvuj
+	VnZ95nr//J1IvnYSP/GGtPZgMar8ZWjd+wVx7bVc0kjMs+gYcXv2D4kD1DLaKzI=
+X-Google-Smtp-Source: AGHT+IGMx+niZTB1tXBn3Y538ogJDgh4dcZ/uFfeMe6k354e5J0N3e8sWtPvtt2hfSLE4kakV9lvzw==
+X-Received: by 2002:a17:907:7fac:b0:a86:817e:d27b with SMTP id a640c23a62f3a-a86817edc76mr63107466b.43.1724244670578;
+        Wed, 21 Aug 2024 05:51:10 -0700 (PDT)
 Received: from localhost (cst2-173-13.cust.vodafone.cz. [31.30.173.13])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838c69easm901792366b.40.2024.08.21.05.48.10
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838cfb69sm894459266b.88.2024.08.21.05.51.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 05:48:10 -0700 (PDT)
-Date: Wed, 21 Aug 2024 14:48:10 +0200
+        Wed, 21 Aug 2024 05:51:10 -0700 (PDT)
+Date: Wed, 21 Aug 2024 14:51:09 +0200
 From: Andrew Jones <ajones@ventanamicro.com>
 To: zhouquan@iscas.ac.cn
 Cc: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
@@ -74,10 +74,11 @@ Cc: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com,
 	alexander.shishkin@linux.intel.com, jolsa@kernel.org, linux-kernel@vger.kernel.org, 
 	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
 	linux-perf-users@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] riscv: perf: add guest vs host distinction
-Message-ID: <20240821-f5e1d6afb0d2230c1256a75b@orel>
+Subject: Re: [PATCH v2 2/2] riscv: KVM: add basic support for host vs guest
+ profiling
+Message-ID: <20240821-5284bf727abbb08a379e1d06@orel>
 References: <cover.1723518282.git.zhouquan@iscas.ac.cn>
- <3729354b59658535c4370d3c1c7e2f162433807b.1723518282.git.zhouquan@iscas.ac.cn>
+ <7eb3e1a8fc9f9aa0340a6a1fb88a127b767480ea.1723518282.git.zhouquan@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,109 +87,114 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3729354b59658535c4370d3c1c7e2f162433807b.1723518282.git.zhouquan@iscas.ac.cn>
+In-Reply-To: <7eb3e1a8fc9f9aa0340a6a1fb88a127b767480ea.1723518282.git.zhouquan@iscas.ac.cn>
 
-On Tue, Aug 13, 2024 at 09:23:54PM GMT, zhouquan@iscas.ac.cn wrote:
+On Tue, Aug 13, 2024 at 09:24:10PM GMT, zhouquan@iscas.ac.cn wrote:
 > From: Quan Zhou <zhouquan@iscas.ac.cn>
 > 
-> Introduce basic guest support in perf, enabling it to distinguish
-> between PMU interrupts in the host or guest, and collect
-> fundamental information.
+> For the information collected on the host side, we need to
+> identify which data originates from the guest and record
+> these events separately, this can be achieved by having
+> KVM register perf callbacks.
 > 
 > Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
 > ---
->  arch/riscv/include/asm/perf_event.h |  7 ++++++
->  arch/riscv/kernel/perf_callchain.c  | 38 +++++++++++++++++++++++++++++
->  2 files changed, 45 insertions(+)
+>  arch/riscv/include/asm/kvm_host.h |  5 +++++
+>  arch/riscv/kvm/Kconfig            |  1 +
+>  arch/riscv/kvm/main.c             | 12 ++++++++++--
+>  arch/riscv/kvm/vcpu.c             |  7 +++++++
+>  4 files changed, 23 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/riscv/include/asm/perf_event.h b/arch/riscv/include/asm/perf_event.h
-> index 665bbc9b2f84..c2b73c3aefe4 100644
-> --- a/arch/riscv/include/asm/perf_event.h
-> +++ b/arch/riscv/include/asm/perf_event.h
-> @@ -8,13 +8,20 @@
->  #ifndef _ASM_RISCV_PERF_EVENT_H
->  #define _ASM_RISCV_PERF_EVENT_H
->  
-> +#ifdef CONFIG_PERF_EVENTS
->  #include <linux/perf_event.h>
->  #define perf_arch_bpf_user_pt_regs(regs) (struct user_regs_struct *)regs
->  
-> +extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-> +extern unsigned short perf_misc_flags(struct pt_regs *regs);
-> +#define perf_misc_flags(regs) perf_misc_flags(regs)
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> index 2e2254fd2a2a..d2350b08a3f4 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -286,6 +286,11 @@ struct kvm_vcpu_arch {
+>  	} sta;
+>  };
+>
+
+Let's add the same comment here that arm64 has unless you determine
+that 'any event that arrives while a vCPU is loaded is considered to be
+"in guest"' is not true for riscv.
+
+> +static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
+> +{
+> +	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
+> +}
 > +
->  #define perf_arch_fetch_caller_regs(regs, __ip) { \
->  	(regs)->epc = (__ip); \
->  	(regs)->s0 = (unsigned long) __builtin_frame_address(0); \
->  	(regs)->sp = current_stack_pointer; \
->  	(regs)->status = SR_PP; \
+>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  
+>  #define KVM_RISCV_GSTAGE_TLB_MIN_ORDER		12
+> diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
+> index 26d1727f0550..0c3cbb0915ff 100644
+> --- a/arch/riscv/kvm/Kconfig
+> +++ b/arch/riscv/kvm/Kconfig
+> @@ -32,6 +32,7 @@ config KVM
+>  	select KVM_XFER_TO_GUEST_WORK
+>  	select KVM_GENERIC_MMU_NOTIFIER
+>  	select SCHED_INFO
+> +	select GUEST_PERF_EVENTS if PERF_EVENTS
+>  	help
+>  	  Support hosting virtualized guest machines.
+>  
+> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+> index bab2ec34cd87..734b48d8f6dd 100644
+> --- a/arch/riscv/kvm/main.c
+> +++ b/arch/riscv/kvm/main.c
+> @@ -51,6 +51,12 @@ void kvm_arch_hardware_disable(void)
+>  	csr_write(CSR_HIDELEG, 0);
 >  }
+>  
+> +static void kvm_riscv_teardown(void)
+> +{
+> +	kvm_riscv_aia_exit();
+> +	kvm_unregister_perf_callbacks();
+> +}
+> +
+>  static int __init riscv_kvm_init(void)
+>  {
+>  	int rc;
+> @@ -105,9 +111,11 @@ static int __init riscv_kvm_init(void)
+>  		kvm_info("AIA available with %d guest external interrupts\n",
+>  			 kvm_riscv_aia_nr_hgei);
+>  
+> +	kvm_register_perf_callbacks(NULL);
+> +
+>  	rc = kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+>  	if (rc) {
+> -		kvm_riscv_aia_exit();
+> +		kvm_riscv_teardown();
+>  		return rc;
+>  	}
+>  
+> @@ -117,7 +125,7 @@ module_init(riscv_kvm_init);
+>  
+>  static void __exit riscv_kvm_exit(void)
+>  {
+> -	kvm_riscv_aia_exit();
+> +	kvm_riscv_teardown();
+>  
+>  	kvm_exit();
+>  }
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 8d7d381737ee..e8ffb3456898 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -226,6 +226,13 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+>  	return (vcpu->arch.guest_context.sstatus & SR_SPP) ? true : false;
+>  }
+>  
+> +#ifdef CONFIG_GUEST_PERF_EVENTS
+> +unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.guest_context.sepc;
+> +}
 > +#endif
 > +
->  #endif /* _ASM_RISCV_PERF_EVENT_H */
-> diff --git a/arch/riscv/kernel/perf_callchain.c b/arch/riscv/kernel/perf_callchain.c
-> index 3348a61de7d9..7af90a3bb373 100644
-> --- a/arch/riscv/kernel/perf_callchain.c
-> +++ b/arch/riscv/kernel/perf_callchain.c
-> @@ -58,6 +58,11 @@ void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
+>  vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
 >  {
->  	unsigned long fp = 0;
->  
-> +	if (perf_guest_state()) {
-> +		/* TODO: We don't support guest os callchain now */
-> +		return;
-> +	}
-> +
->  	fp = regs->s0;
->  	perf_callchain_store(entry, regs->epc);
->  
-> @@ -74,5 +79,38 @@ static bool fill_callchain(void *entry, unsigned long pc)
->  void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
->  			   struct pt_regs *regs)
->  {
-> +	if (perf_guest_state()) {
-> +		/* TODO: We don't support guest os callchain now */
-> +		return;
-> +	}
-> +
->  	walk_stackframe(NULL, regs, fill_callchain, entry);
->  }
-> +
-> +unsigned long perf_instruction_pointer(struct pt_regs *regs)
-> +{
-> +	if (perf_guest_state())
-> +		return perf_guest_get_ip();
-> +
-> +	return instruction_pointer(regs);
-> +}
-> +
-> +unsigned short perf_misc_flags(struct pt_regs *regs)
-
-I see that the consumer of perf_misc_flags is only a u16, but all other
-architectures define this function as returning an unsigned long, and
-your last version did as well. My comment in the last version was that
-we should use an unsigned long for the 'misc' variable to match the
-return type of the function. I still think we should do that instead
-since the function should be consistent with the other architectures.
-
-> +{
-> +	unsigned int guest_state = perf_guest_state();
-> +	unsigned short misc = 0;
-> +
-> +	if (guest_state) {
-> +		if (guest_state & PERF_GUEST_USER)
-> +			misc |= PERF_RECORD_MISC_GUEST_USER;
-> +		else
-> +			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
-> +	} else {
-> +		if (user_mode(regs))
-> +			misc |= PERF_RECORD_MISC_USER;
-> +		else
-> +			misc |= PERF_RECORD_MISC_KERNEL;
-> +	}
-> +
-> +	return misc;
-> +}
+>  	return VM_FAULT_SIGBUS;
 > -- 
 > 2.34.1
 >
