@@ -1,190 +1,142 @@
-Return-Path: <kvm+bounces-24792-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24793-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25B5E95A51C
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 21:11:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7C1695A51D
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 21:11:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BA5C283CE4
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 19:11:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1449B1C212D8
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 19:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E74616E87D;
-	Wed, 21 Aug 2024 19:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hG+FoLKV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D75016E860;
+	Wed, 21 Aug 2024 19:11:24 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A209C16DEB5
-	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 19:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DC616DEB5
+	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 19:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724267453; cv=none; b=s3QTDPvTrt449qL18ajVpiiwXFoD4z1LWs3+MZg4UuwYjBEc1k2ZYP4scXJHWphYvVuD9XneWSaNyBmHMyN0/XeMP+Z/KDzBA70AHU3nND9A5yakugAnsAD0rr/iKjDR2rNix+z/Hnnh8aiMJWsO7onG2WPieZe/JWgQ6M7v7Rw=
+	t=1724267484; cv=none; b=BLNETLRIgT+rKlfqz1efAoZKB/xMuTZuOY5gcxR1beLN4Z9tGKBKwjBfyaG0o8hPeq4O7ZqsneD5lg3NVLAii7UlLYnp5Ft5RE3HLD1p0FtDR/oGY8Zpso6hc62VtCRcw+/ydAmJm20NJv2kyrdb8KPz/x9N+iG1ZoIDMhQlXc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724267453; c=relaxed/simple;
-	bh=hL4gVnMX0lonKO+Xr56sF/EGBpa9lOCldCHEZWgHhnI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M04HjULlQp+zpYieaO9atVg8o9IheO/0ycneaLw03OjlZDqlZzCkhbf9MimaeJ8awmeY3Z3muUXC0seNytmpPd9JxXgbMnqKUimNTtMaQXuo5owObnhpNw/v7OoU4iDydbBNlQoSLn8V9vG4pXWEtOfjWZXZhyVFEto4XV/V96k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hG+FoLKV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724267450;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BAq367Lg1/3EfbDlw0i1dZv1l3nmGW6xuUPajxTPQeg=;
-	b=hG+FoLKVuTIMvQov1W8xqodNd0cGHoOzuLOp2TnO6z1/gO7ibvtWRWY3Kqu+jQo1rpO9nV
-	yJ755+oSRWH+ZBupu4wLh6OD9pJqrOP/T9WXEZmnlTV6veuhT2wwy7jX1mkWoyh4V86Sde
-	KOq/1h9uxIn5PnLMpfc9SdFeAhuTO9A=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-427-38on6KcqNyWeZHbzkYl1nA-1; Wed, 21 Aug 2024 15:10:47 -0400
-X-MC-Unique: 38on6KcqNyWeZHbzkYl1nA-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6bf6bcee8ccso76277256d6.0
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 12:10:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724267447; x=1724872247;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BAq367Lg1/3EfbDlw0i1dZv1l3nmGW6xuUPajxTPQeg=;
-        b=IH1ckRC1tCUGQ/fyToi7f9GDgIZ4pT3LmgqDJ4hSzm0rEDh1q9YR83Z4pCwEVY+naA
-         a09wo4cOT0toOf6fs8bCuPlcrj5w+kg3CvoIiuEtESFhryd3Yn42TVHjwGPNh1QqqjEZ
-         8nDskrFvtsToD0A1G6fMC0ozHfESFc4LoYZMgEUrBDbZTl2QqUq0ACbpFL/Z678iTMzv
-         Foz0wTAyRt7I9ZpnY5Kp9fB7frtlH2eqlXfgoO37UlamISZFw3t8Z3IR9e7mzLPv6ytD
-         +XRRJGrfogs1ddS44GeGH8reJNpXCT61tzHBC3AU5L6ygyUbpzQcCaGGMQpyq91AsrtO
-         tu2w==
-X-Forwarded-Encrypted: i=1; AJvYcCU74+q6qHzpkOCLhsxCCk73sFdXXJ3Jzamp6o4A7naKd1ESdHmWWGgGApErrPBx23JznIA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0i73gS4gn1DPSVZ5f6aNns0H03ZvUH93hwxgMq8pwot/3fZcv
-	tQ3WT+T5xVqUAwJ9Kj2w7b5ofUveAprVveuv1d2tVIlAZ+7JtvZQYngRcLtAArdh0b/ZFmqfeD7
-	sLCzCNbm7AesYxpfU/qs0PZTrd25uyQ06sjd4ion5v1aHXBcCjQ==
-X-Received: by 2002:a05:6214:4881:b0:6bf:7cc0:7283 with SMTP id 6a1803df08f44-6c155d5b159mr43529446d6.6.1724267447171;
-        Wed, 21 Aug 2024 12:10:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF0EFUeCwlBx0qAmDzBtd+l4FNnqw758KbLszeGCNNuUW9zuat7gLyeNsx6mlWpwsnSymqf3g==
-X-Received: by 2002:a05:6214:4881:b0:6bf:7cc0:7283 with SMTP id 6a1803df08f44-6c155d5b159mr43529176d6.6.1724267446788;
-        Wed, 21 Aug 2024 12:10:46 -0700 (PDT)
-Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fe1bb00sm64630186d6.55.2024.08.21.12.10.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 12:10:46 -0700 (PDT)
-Date: Wed, 21 Aug 2024 15:10:43 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Oscar Salvador <osalvador@suse.de>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
-	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Borislav Petkov <bp@alien8.de>,
-	David Hildenbrand <david@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 09/19] mm: New follow_pfnmap API
-Message-ID: <ZsY7swHd4ldRmBle@x1n>
-References: <20240809160909.1023470-1-peterx@redhat.com>
- <20240809160909.1023470-10-peterx@redhat.com>
- <Zr_c2C06eusc_b1l@google.com>
+	s=arc-20240116; t=1724267484; c=relaxed/simple;
+	bh=j3gdv4g7J8okfzQiw1uFjdKzl/lU4fCBgnTCcKpluVI=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=RGqNGmfMUi3GQn6kopWGjWT5vCVRbQc62s9JWIVyvppHVM2gk8vSnbORmU9v23gfc9CQpzowxFXwyb0vxBbczzofqG6DJIWqze0M8WHdernI7HPe9qJSA+CAvbq0HDpyXROdVkB2kZd4+5SuV/G482gUJSjRP/hpJBmDgJq2VUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WpwrB5B8WzpTZ7;
+	Thu, 22 Aug 2024 03:09:46 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 99AF11800A7;
+	Thu, 22 Aug 2024 03:11:18 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 22 Aug 2024 03:11:17 +0800
+Subject: Re: [PATCH v3 03/16] KVM: arm64: nv: Handle shadow stage 2 page
+ faults
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton
+	<oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+	<alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240614144552.2773592-1-maz@kernel.org>
+ <20240614144552.2773592-4-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <9ba30187-6630-02e6-d755-7d1b39118a32@huawei.com>
+Date: Thu, 22 Aug 2024 03:11:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Zr_c2C06eusc_b1l@google.com>
+In-Reply-To: <20240614144552.2773592-4-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Fri, Aug 16, 2024 at 04:12:24PM -0700, Sean Christopherson wrote:
-> On Fri, Aug 09, 2024, Peter Xu wrote:
-> > Introduce a pair of APIs to follow pfn mappings to get entry information.
-> > It's very similar to what follow_pte() does before, but different in that
-> > it recognizes huge pfn mappings.
-> 
-> ...
-> 
-> > +int follow_pfnmap_start(struct follow_pfnmap_args *args);
-> > +void follow_pfnmap_end(struct follow_pfnmap_args *args);
-> 
-> I find the start+end() terminology to be unintuitive.  E.g. I had to look at the
-> implementation to understand why KVM invoke fixup_user_fault() if follow_pfnmap_start()
-> failed.
-> 
-> What about follow_pfnmap_and_lock()?  And then maybe follow_pfnmap_unlock()?
-> Though that second one reads a little weird.
+On 2024/6/14 22:45, Marc Zyngier wrote:
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 8984b7c213e1..5aed2e9d380d 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1407,6 +1407,7 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+>  }
+>  
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> +			  struct kvm_s2_trans *nested,
+>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+>  			  bool fault_is_perm)
+>  {
+> @@ -1415,6 +1416,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	bool exec_fault, mte_allowed;
+>  	bool device = false, vfio_allow_any_uc = false;
+>  	unsigned long mmu_seq;
+> +	phys_addr_t ipa = fault_ipa;
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>  	struct vm_area_struct *vma;
+> @@ -1498,10 +1500,38 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	}
+>  
+>  	vma_pagesize = 1UL << vma_shift;
+> +
+> +	if (nested) {
+> +		unsigned long max_map_size;
+> +
+> +		max_map_size = force_pte ? PAGE_SIZE : PUD_SIZE;
+> +
+> +		ipa = kvm_s2_trans_output(nested);
+> +
+> +		/*
+> +		 * If we're about to create a shadow stage 2 entry, then we
+> +		 * can only create a block mapping if the guest stage 2 page
+> +		 * table uses at least as big a mapping.
+> +		 */
+> +		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
+> +
+> +		/*
+> +		 * Be careful that if the mapping size falls between
+> +		 * two host sizes, take the smallest of the two.
+> +		 */
+> +		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
+> +			max_map_size = PMD_SIZE;
+> +		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
+> +			max_map_size = PAGE_SIZE;
+> +
+> +		force_pte = (max_map_size == PAGE_SIZE);
+> +		vma_pagesize = min(vma_pagesize, (long)max_map_size);
+> +	}
+> +
+>  	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+>  		fault_ipa &= ~(vma_pagesize - 1);
+>  
+> -	gfn = fault_ipa >> PAGE_SHIFT;
+> +	gfn = ipa >> PAGE_SHIFT;
 
-If to go with the _lock() I tend to drop "and" to follow_pfnmap_[un]lock().
-However looks like David preferred me keeping the name, so we don't reach a
-quorum yet.  I'm happy to change the name as long as we have enough votes..
+I had seen a non-nested guest boot failure (with vma_pagesize ==
+PUD_SIZE) and bisection led me here.
 
-> 
-> > + * Return: zero on success, -ve otherwise.
-> 
-> ve?
+Is it intentional to ignore the fault_ipa adjustment when calculating
+gfn if the guest memory is backed by hugetlbfs? This looks broken for
+the non-nested case.
 
-This one came from the old follow_pte() and I kept it. I only knew this
-after search: a short way to write "negative" (while positive is "+ve").
-
-Doesn't look like something productive.. I'll spell it out in the next
-version.
-
-> 
-> > +int follow_pfnmap_start(struct follow_pfnmap_args *args)
-> > +{
-> > +	struct vm_area_struct *vma = args->vma;
-> > +	unsigned long address = args->address;
-> > +	struct mm_struct *mm = vma->vm_mm;
-> > +	spinlock_t *lock;
-> > +	pgd_t *pgdp;
-> > +	p4d_t *p4dp, p4d;
-> > +	pud_t *pudp, pud;
-> > +	pmd_t *pmdp, pmd;
-> > +	pte_t *ptep, pte;
-> > +
-> > +	pfnmap_lockdep_assert(vma);
-> > +
-> > +	if (unlikely(address < vma->vm_start || address >= vma->vm_end))
-> > +		goto out;
-> > +
-> > +	if (!(vma->vm_flags & (VM_IO | VM_PFNMAP)))
-> > +		goto out;
-> 
-> Why use goto intead of simply?
-> 
-> 		return -EINVAL;
-> 
-> That's relevant because I think the cases where no PxE is found should return
-> -ENOENT, not -EINVAL.  E.g. if the caller doesn't precheck, then it can bail
-> immediately on EINVAL, but know that it's worth trying to fault-in the pfn on
-> ENOENT. 
-
-I tend to avoid changing the retval in this series to make the goal of this
-patchset simple.
-
-One issue is I _think_ there's one ioctl() that will rely on this retval:
-
-      acrn_dev_ioctl ->
-        acrn_vm_memseg_map ->
-          acrn_vm_ram_map ->
-            follow_pfnmap_start
-
-So we may want to try check with people to not break it..
+But since I haven't looked at user_mem_abort() for a long time, I'm not
+sure if I'd missed something...
 
 Thanks,
-
--- 
-Peter Xu
-
+Zenghui
 
