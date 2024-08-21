@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-24709-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24710-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9C89959A6A
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 13:44:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71FFB959AAB
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 13:50:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 820B31F21D3C
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 11:44:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E41D2B292B1
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 11:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEBB1CCEDC;
-	Wed, 21 Aug 2024 11:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339FE1C4EC1;
+	Wed, 21 Aug 2024 11:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJhxJt02"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iolTlsfz"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30001B3B2B;
-	Wed, 21 Aug 2024 11:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF2B19ABA9;
+	Wed, 21 Aug 2024 11:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724238987; cv=none; b=GTtMPPhmuaRt72168StGbs+G+frX9hSt+BDNO8muJlyuOW+8LSjIg4cChw9znYfNOdO62Z+IdEr/A9BIUpcmcdA/YXM/w8a19BVeQkBfQH0/klNG5Gbx5mmWiWxMbhXQNPsgyJNgV5qpe3WZQ1p5IonLkaD9XMV9nAXPL+bTG60=
+	t=1724239033; cv=none; b=naMO6R+QHTIUvoXxIq0awIbygd7KXqDIWeoXM1Xcxv+j4parLSYEegYW6wGPWKuP+nqvjQprCIReqVrFfGpsiHquUv3UNW42VmjqGNsGKn4NAMWc2Bt8aZGp5Ku8C3qNG4HtRDgIeDe4+0i1a5eXF48Pj+OuzTv4PttxTEIb9J4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724238987; c=relaxed/simple;
-	bh=PQJeXUClWIAPxChh0edfyISaZ9J1rH+OUORmO3eT5qE=;
+	s=arc-20240116; t=1724239033; c=relaxed/simple;
+	bh=yvBm5Op+YSekN97APkbwxofU0731HJMRH6D5GkEM9HQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e7wKQ+0qOuVLLRJhdsHuLpvB38JyfFKxIBAxGyR54BjARrfmcRtMuNUcJWehKlKPOALHsoC39ARuTimLVpJcqt3d8EK8vj3hpkQzhBE8ciXOkP2Os4AAu3R2GUDXrDWjKFSBCJBRslvtsG38Xkvd38bEEAn39TH47joI24AchrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJhxJt02; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 450FDC32782;
-	Wed, 21 Aug 2024 11:16:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=N8V6y3uZnK39lYaHMcAfI9iXzKoAehamVhyojIAf5Fz2X/I5XD7TYiMyO35RAB8w8+HZowiVIMy6K7jbKvUGZWqwkxIgiIyvDMMG3VH8pj+eDac6BrQQycuv4kJvQoaIoLt5y2my2FFMSyB56yNdfxOF5BPvVBz9Y9/Da2zJW88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iolTlsfz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE93FC4AF09;
+	Wed, 21 Aug 2024 11:17:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724238987;
-	bh=PQJeXUClWIAPxChh0edfyISaZ9J1rH+OUORmO3eT5qE=;
+	s=k20201202; t=1724239032;
+	bh=yvBm5Op+YSekN97APkbwxofU0731HJMRH6D5GkEM9HQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FJhxJt02rS7eOjXO6WMjIA2afl2W3RPa2hQxNRh9ASYDKoNVMcShIV6R5cRGkt3A7
-	 UC+EZUNOiBhjPQFxvUuAaJUanS14akEEfAlOXhDWA/shohcACzaxojrFiAHXnPMDJL
-	 bkhyvi4Bd3xV4T/Kw4nhtKxxIVyLT0/4tzwPh9e7GzFGGuWU3EWuc/42vdA4CYUn+E
-	 KAjolLBZ/L5444f74z1Kz4fcqUUlF6VcbGu5+Ma9jVjgG6TvHKsVkRvbo4Kq/CVo+H
-	 H37h/LYuQw/D5WiNt5p5Wxuk44T6//AYWWhsGqIqxT7P3qTrdt86gizHulSF9Jpkiu
-	 q/9SLMnEV+eag==
+	b=iolTlsfzPsGxbZwYhuSR3YU2fsc9a86mh27VKfbHtXBkbzvXYgSz3SBzpK03O07NJ
+	 P+7AMVHw4nGgRhDKwoXCU4/JTE9QfeK+WFyp7dUFZEv5Rlr6TmytokolcfDXWTtf8o
+	 XkdvTG6zc2rK1nuvk0RQjM19xv7uxNl8d//dbe5vLYV9Ya1lzg1ZJFB6N8VymT6m/t
+	 hyhfo5yQd3C0boWATq8XIu9UcsczqdCVm/ocvgMLMeY9PFEKHDyjwBJK5wdRnEKdc0
+	 bdJGjA4zKH2vCDj3TcjvyNeT+olb4d7NCjgCUqfSAsTs3fh3700f53Mmm/DSDZA+fX
+	 UcBNpUrM+AkSQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sgjKD-005Yj5-1a;
-	Wed, 21 Aug 2024 12:16:25 +0100
-Date: Wed, 21 Aug 2024 12:16:24 +0100
-Message-ID: <86h6bexh13.wl-maz@kernel.org>
+	id 1sgjKw-005YkH-UT;
+	Wed, 21 Aug 2024 12:17:11 +0100
+Date: Wed, 21 Aug 2024 12:17:10 +0100
+Message-ID: <86frqyxgzt.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -58,11 +58,11 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH 06/12] KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is presented to the guest
-In-Reply-To: <ZsUrukQpWqal9Zfm@linux.dev>
+Subject: Re: [PATCH 12/12] KVM: arm64: Add selftest checking how the absence of GICv3 is handled
+In-Reply-To: <ZsUwb2pEUNQt2arR@linux.dev>
 References: <20240820100349.3544850-1-maz@kernel.org>
-	<20240820100349.3544850-7-maz@kernel.org>
-	<ZsUrukQpWqal9Zfm@linux.dev>
+	<20240820100349.3544850-13-maz@kernel.org>
+	<ZsUwb2pEUNQt2arR@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -78,58 +78,153 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-ker
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 21 Aug 2024 00:50:18 +0100,
+On Wed, 21 Aug 2024 01:10:23 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On Tue, Aug 20, 2024 at 11:03:43AM +0100, Marc Zyngier wrote:
-> > In order to be consistent, we shouldn't advertise a GICv3 when none
-> > is actually usable by the guest.
-> > 
-> > Wipe the feature when these conditions apply, and allow the field
-> > to be written from userspace.
+> On Tue, Aug 20, 2024 at 11:03:49AM +0100, Marc Zyngier wrote:
+> > Given how tortuous and fragile the whole lack-of-GICv3 story is,
+> > add a selftest checking that we don't regress it.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/sys_regs.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> >  tools/testing/selftests/kvm/Makefile          |   1 +
+> >  .../selftests/kvm/aarch64/no-vgic-v3.c        | 170 ++++++++++++++++++
+> >  2 files changed, 171 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
 > > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index bc2d54da3827..7d00d7e359e1 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -2365,7 +2365,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  		   ID_AA64PFR0_EL1_MPAM |
-> >  		   ID_AA64PFR0_EL1_SVE |
-> >  		   ID_AA64PFR0_EL1_RAS |
-> > -		   ID_AA64PFR0_EL1_GIC |
-> >  		   ID_AA64PFR0_EL1_AdvSIMD |
-> >  		   ID_AA64PFR0_EL1_FP), },
-> >  	ID_SANITISED(ID_AA64PFR1_EL1),
-> > @@ -4634,6 +4633,11 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
-> >  
-> >  	guard(mutex)(&kvm->arch.config_lock);
-> >  
-> > +	if (!kvm_has_gicv3(kvm)) {
-> > +		kvm->arch.id_regs[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] &= ~ID_AA64PFR0_EL1_GIC_MASK;
-> > +		kvm->arch.id_regs[IDREG_IDX(SYS_ID_PFR1_EL1)] &= ~ID_PFR1_EL1_GIC_MASK;
-> > +	}
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index 48d32c5aa3eb..f66b37acc0b0 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -163,6 +163,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
+> >  TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
+> >  TEST_GEN_PROGS_aarch64 += aarch64/vgic_lpi_stress
+> >  TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
+> > +TEST_GEN_PROGS_aarch64 += aarch64/no-vgic-v3
+> >  TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
+> >  TEST_GEN_PROGS_aarch64 += arch_timer
+> >  TEST_GEN_PROGS_aarch64 += demand_paging_test
+> > diff --git a/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
+> > new file mode 100644
+> > index 000000000000..27169afc94c6
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/aarch64/no-vgic-v3.c
+> > @@ -0,0 +1,170 @@
+> > +// SPDX-License-Identifier: GPL-2.0
 > > +
+> > +// Check that, on a GICv3 system, not configuring GICv3 correctly
+> > +// results in all of the sysregs generating an UNDEF exception.
+> > +
+> > +#include <test_util.h>
+> > +#include <kvm_util.h>
+> > +#include <processor.h>
+> > +
+> > +static volatile bool handled;
+> > +
+> > +#define __check_sr_read(r)					\
+> > +	do {							\
+> > +		uint64_t val;					\
+> > +								\
+> > +		handled = false;				\
+> > +		dsb(sy);					\
+> > +		val = read_sysreg_s(SYS_ ## r);			\
+> > +		(void)val;					\
+> > +	} while(0)
+> > +
+> > +#define __check_sr_write(r)					\
+> > +	do {							\
+> > +		handled = false;				\
+> > +		dsb(sy);					\
+> > +		write_sysreg_s(0, SYS_ ## r);			\
+> > +		isb();						\
+> > +	} while(0)
+> > +
+> > +/* Fatal checks */
+> > +#define check_sr_read(r)					\
+> > +	do {							\
+> > +		__check_sr_read(r);				\
+> > +		__GUEST_ASSERT(handled, #r " no read trap");	\
+> > +	} while(0)
+> > +
+> > +#define check_sr_write(r)					\
+> > +	do {							\
+> > +		__check_sr_write(r);				\
+> > +		__GUEST_ASSERT(handled, #r " no write trap");	\
+> > +	} while(0)
+> > +
+> > +#define check_sr_rw(r)				\
+> > +	do {					\
+> > +		check_sr_read(r);		\
+> > +		check_sr_write(r);		\
+> > +	} while(0)
+> > +
+> > +/* Non-fatal checks */
+> > +#define check_sr_read_maybe(r)						\
+> > +	do {								\
+> > +		__check_sr_read(r);					\
+> > +		if (!handled)						\
+> > +			GUEST_PRINTF(#r " read not trapping (OK)\n");	\
+> > +	} while(0)
+> > +
+> > +#define check_sr_write_maybe(r)						\
+> > +	do {								\
+> > +		__check_sr_write(r);					\
+> > +		if (!handled)						\
+> > +			GUEST_PRINTF(#r " write not trapping (OK)\n");	\
+> > +	} while(0)
+> > +
+> > +static void guest_code(void)
+> > +{
+> > +	/*
+> > +	 * Check that we advertise that ID_AA64PFR0_EL1.GIC == 0, having
+> > +	 * hidden the feature at runtime without any other userspace action.
+> > +	 */
+> > +	__GUEST_ASSERT(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC),
+> > +				 read_sysreg(id_aa64pfr0_el1)) == 0,
+> > +		       "GICv3 wrongly advertised");
+> > +
+> > +	/*
+> > +	 * Access all GICv3 registers, and fail if we don't get an UNDEF.
+> > +	 * Note that we happily access all the APxRn registers without
+> > +	 * checking their existance, as all we want to see is a failure.
+> > +	 */
+> > +	check_sr_rw(ICC_PMR_EL1);
+> > +	check_sr_read(ICC_IAR0_EL1);
+> > +	check_sr_write(ICC_EOIR0_EL1);
+> > +	check_sr_rw(ICC_HPPIR0_EL1);
+> > +	check_sr_rw(ICC_BPR0_EL1);
+> > +	check_sr_rw(ICC_AP0R0_EL1);
+> > +	check_sr_rw(ICC_AP0R1_EL1);
+> > +	check_sr_rw(ICC_AP0R2_EL1);
+> > +	check_sr_rw(ICC_AP0R3_EL1);
+> > +	check_sr_rw(ICC_AP1R0_EL1);
+> > +	check_sr_rw(ICC_AP1R1_EL1);
+> > +	check_sr_rw(ICC_AP1R2_EL1);
+> > +	check_sr_rw(ICC_AP1R3_EL1);
+> > +	check_sr_write(ICC_DIR_EL1);
+> > +	check_sr_read(ICC_RPR_EL1);
+> > +	check_sr_write(ICC_SGI1R_EL1);
+> > +	check_sr_write(ICC_ASGI1R_EL1);
+> > +	check_sr_write(ICC_SGI0R_EL1);
+> > +	check_sr_read(ICC_IAR1_EL1);
+> > +	check_sr_write(ICC_EOIR1_EL1);
+> > +	check_sr_rw(ICC_HPPIR1_EL1);
+> > +	check_sr_rw(ICC_BPR1_EL1);
+> > +	check_sr_rw(ICC_CTLR_EL1);
+> > +	check_sr_rw(ICC_IGRPEN0_EL1);
+> > +	check_sr_rw(ICC_IGRPEN1_EL1);
+> > +
+> > +	/*
+> > +	 * ICC_SRE_EL1 may not be trappable, as ICC_SRE_EL2.Enable can
+> > +	 * be RAO/WI
+> > +	 */
+> > +	check_sr_read_maybe(ICC_SRE_EL1);
+> > +	check_sr_write_maybe(ICC_SRE_EL1);
 > 
-> Hmm, should we use the ID register field as the source of truth for
-> kvm_has_gicv3() at this point?
-> 
-> I think what you have in patch #1 makes good sense for a stable
-> backport. Using the ID register from this point forward would make the
-> behavior consistent for a stupid userspace instantiated GICv3 for the VM
-> but clobbered it from the ID register.
-> 
-> AFAICT all other usage of kvm_has_gicv3() happens after
-> kvm_finalize_sys_regs(), so it should take this last-minute fixup into
-> account.
+> In the case that a write does not UNDEF, should we check that
+> ICC_SRE_EL1.SRE is also RAO/WI?
 
-Right, so changing the definition of kvm_has_gicv3() in this patch,
-and using the "old" definition here only. Yup, this seems like a
-reasonable thing to do.
+Ah, not a bad idea. I'll add that.
 
 Thanks,
 
