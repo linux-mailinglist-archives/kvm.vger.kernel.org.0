@@ -1,233 +1,152 @@
-Return-Path: <kvm+bounces-24692-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24693-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43753959543
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 09:03:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DA379595E7
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 09:22:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C85EC1F24EDD
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 07:03:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA19B284368
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 07:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1241199FAB;
-	Wed, 21 Aug 2024 07:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0EFB1B6551;
+	Wed, 21 Aug 2024 07:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fPtZKrDh"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AlWGtbCH"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E34199FA6
-	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 07:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E621B6530;
+	Wed, 21 Aug 2024 07:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724223777; cv=none; b=C4e6EJ2U03j4o7DJ4hHNUXIXTId8ovYeYpDwPWySse7l8JOO1q4Jb1xt0n6uFBaayP8OD739VEaAw8qOLM6+NPCpha+4wYeqpmPAi8JIP7UY2XIqHnnU1VeA4z8AgSN5Cl6fF2JGi3b00eWPHXejVLWpUWPrd6FR/oK/183dJZ8=
+	t=1724224792; cv=none; b=eRRenr1HTV6gTpX52QhW3l//masLLh22VCuToNohMrTgCG7cs3xN3aBg7NKAs4i+9sVnb4oKorolNGY6dBZLy82ZkC97yyShBA1qhcKBQ9//6STVUn71yLXzvt3HK2VW/61vmuY8oPBgJuQzEefNN1bhqgLVgw4xuEDjxNEhivg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724223777; c=relaxed/simple;
-	bh=ts4hzDpLD3PAaFr9EexWCRGqUS2r5RW/Wy1BfJWlo7U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TLAHRTaxAZHzqxXyA+Tp4kxn8u0G8OdFVsXC8+Y12rGrq11FX3jbrPxAaeTkPD3L98JFdk+biZpzg7lTE2lMpYAAQcLnVWzTwVFS6OB2tI5HAEluRUVnN/mpGbn/npBBEVss457PwKKlt509VZw1sFuECgIXU90dR30naV1Uqzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fPtZKrDh; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 21 Aug 2024 07:02:44 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724223772;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U+crhYyjUYjbHiYn/PrY8K/Jrp7sjKcMzlcG9HdVR08=;
-	b=fPtZKrDh2ajWDIW3Afcc6l0OQOu46maUbHI6I6DOmIcck/kAesLeCqmIClh0gr86PToJJO
-	pSDl56YSqB9jcYWPeTEvqGOPJtcMRqGh2XN9HhuRN2KKiu16JBR6P/7Z7M0xq+/zSMGvic
-	LkVZhSWuGdHcpjFJkwfkTdaxgiVV5Ro=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: Re: [PATCH v4 00/18] KVM: arm64: nv: Add support for address
- translation instructions
-Message-ID: <ZsWRFGifEUJrUj7G@linux.dev>
-References: <20240820103756.3545976-1-maz@kernel.org>
- <b3e34ca2-911e-471f-8418-5a3144044e56@os.amperecomputing.com>
+	s=arc-20240116; t=1724224792; c=relaxed/simple;
+	bh=dFNrwOcElm5n9rX99Ez5N6RZ+RZYJ3dYcXbj7IhbC2g=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
+	 References:In-Reply-To; b=b1rmC2ItLTd1u++tkG7EpJCLodfPoQ07725b5QAxMhikoPcfVC0Be/M3hzKWGk7+fkxXRuacqCSXRMG1RyQ5zpWxtvSJuPIZqDGeGBA8/5FifPmBw6IxDWh3bb11Agkk189wlDogxiyXDjG5KcV++KyUyZUDs1UyslXBNhfALKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AlWGtbCH; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47L2SZdb014304;
+	Wed, 21 Aug 2024 07:19:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	mime-version:content-transfer-encoding:content-type:date
+	:message-id:from:cc:to:subject:references:in-reply-to; s=pp1;
+	 bh=8B39Z+dWL8T3wh7kUpsLCvWDtm+/C5D+bAl7SRBMnkM=; b=AlWGtbCH3wQv
+	Fv+113TW6RIHu6m/KO3NGrmcUFMM6e46kii/KBhPXv8cpVMIfaJdjFBT6ZLm7Riw
+	p1qYNYhVZGVDWBOemlr2oqIuXL4Qn0gLpzHS/jT4y8Ip1JqwlWuH2S9mVUk7LT+f
+	EFWhuVBtprggjeTOxXrv7gfUBva23K+B8FnZO7xk3hVQ33Hx73iyxkLaEaaOZc4r
+	fH9d9JCiTi/Lft7dlw0qkT0xB1k13ZyDL1ApoBfjRMWcsU7g7JLQqyXTPbOKExT2
+	0vPvTHgOB7A0qiGVZIkgjYwttkkXSbRWXbRs2HfVHceBSidGOuc2UtNsCqb9XArC
+	XvBWJAzqVg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mbg0taa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 07:19:43 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47L7JhqZ032265;
+	Wed, 21 Aug 2024 07:19:43 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mbg0ta5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 07:19:43 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47L6Cq40017663;
+	Wed, 21 Aug 2024 07:19:42 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4138w3695m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 07:19:42 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47L7Jaam51183930
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 Aug 2024 07:19:38 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BABEF2004E;
+	Wed, 21 Aug 2024 07:19:36 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 90D3F2004D;
+	Wed, 21 Aug 2024 07:19:36 +0000 (GMT)
+Received: from darkmoore (unknown [9.171.47.216])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 21 Aug 2024 07:19:36 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b3e34ca2-911e-471f-8418-5a3144044e56@os.amperecomputing.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 21 Aug 2024 09:19:31 +0200
+Message-Id: <D3LEO4WHFT3W.1REW6G0NE9RVS@linux.ibm.com>
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <shuah@kernel.org>,
+        <frankja@linux.ibm.com>, <borntraeger@linux.ibm.com>,
+        <imbrenda@linux.ibm.com>, <david@redhat.com>, <pbonzini@redhat.com>
+To: "Hariharan Mari" <hari55@linux.ibm.com>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH v2 1/5] KVM: s390: selftests: Add regression tests for
+ SORTL and DFLTCC CPU subfunctions
+X-Mailer: aerc 0.17.0
+References: <20240820065623.1140399-1-hari55@linux.ibm.com>
+ <20240820065623.1140399-2-hari55@linux.ibm.com>
+In-Reply-To: <20240820065623.1140399-2-hari55@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: pMR6oa6MXxyMlRRFM0YKnNmYm-gNma-T
+X-Proofpoint-ORIG-GUID: 2Utzfy0qKrYYSK-0LVGsi3AtCQXk9tBA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-21_07,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 bulkscore=0 mlxlogscore=567 adultscore=0 malwarescore=0
+ phishscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408210050
 
-Hi Ganapat,
+On Tue Aug 20, 2024 at 8:48 AM CEST, Hariharan Mari wrote:
+> Introduce new regression tests to verify the ASM inline block in the SORT=
+L
+> and DFLTCC CPU subfunctions for the s390x architecture. These tests ensur=
+e
+> that future changes to the ASM code are properly validated.
+>
+> The test procedure:
+>
+> 1. Create a VM and request the KVM_S390_VM_CPU_MACHINE_SUBFUNC attribute
+>    from the KVM_S390_VM_CPU_MODEL group for this VM. This SUBFUNC attribu=
+te
+>    contains the results of all CPU subfunction instructions.
+> 2. For each tested subfunction (SORTL and DFLTCC), execute the
+>    corresponding ASM instruction and capture the result array.
+> 3. Perform a memory comparison between the results stored in the SUBFUNC
+>    attribute (obtained in step 1) and the ASM instruction results (obtain=
+ed
+>    in step 2) for each tested subfunction.
+>
+> This process ensures that the KVM implementation accurately reflects the
+> behavior of the actual CPU instructions for the tested subfunctions.
+>
+> Suggested-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Hariharan Mari <hari55@linux.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-On Wed, Aug 21, 2024 at 09:55:37AM +0530, Ganapatrao Kulkarni wrote:
-> Have you tested/tried NV with host/L0 booted with GICv4.x enabled?
-> We do see L2 boot hang and I don't have much debug info at the moment.
+LGTM
 
-Sorry, I've been sitting on a fix for this that I've been meaning to
-send out.
+Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
-The issue has to do with the fact that the vpe is marked as runnable
-(its_vpe::pending_last = true) when descheduled w/o requesting a
-doorbell IRQ. Once KVM completes the nested ERET, it believes an IRQ is
-pending for L1 (kvm_vgic_vcpu_pending_irq() returns true), and injects
-the nested exception.
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/include/s390x/facility.h    |  50 ++++++++
+>  .../kvm/s390x/cpumodel_subfuncs_test.c        | 115 ++++++++++++++++++
+>  3 files changed, 166 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/include/s390x/facility.h
+>  create mode 100644 tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_t=
+est.c
 
-This can be papered over by requesting the doorbell IRQ, which we need
-anyway to kick us out of the L2 when an IRQ becomes pending for L1.
-
-Could you take this diff for a spin?
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 0ae093bae054..9d07184d79b1 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -613,6 +613,12 @@ struct cpu_sve_state {
-  * field.
-  */
- struct kvm_host_data {
-+	/* SVE enabled for EL0 */
-+#define HOST_SVE_ENABLED	0
-+	/* SME enabled for EL0 */
-+#define HOST_SME_ENABLED	1
-+	unsigned long flags;
-+
- 	struct kvm_cpu_context host_ctxt;
- 
- 	/*
-@@ -908,10 +914,8 @@ struct kvm_vcpu_arch {
- /* Save TRBE context if active  */
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
- 
--/* SVE enabled for host EL0 */
--#define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
--/* SME enabled for EL0 */
--#define HOST_SME_ENABLED	__vcpu_single_flag(sflags, BIT(1))
-+/* KVM is currently emulating a nested ERET */
-+#define IN_NESTED_ERET		__vcpu_single_flag(sflags, BIT(0))
- /* Physical CPU not in supported_cpus */
- #define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(2))
- /* WFIT instruction trapped */
-@@ -1294,6 +1298,10 @@ DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
- 	 &this_cpu_ptr_hyp_sym(kvm_host_data)->f)
- #endif
- 
-+#define host_data_set_flag(nr)		set_bit(nr, host_data_ptr(flags))
-+#define host_data_test_flag(nr)		test_bit(nr, host_data_ptr(flags))
-+#define host_data_clear_flag(nr)	clear_bit(nr, host_data_ptr(flags))
-+
- /* Check whether the FP regs are owned by the guest */
- static inline bool guest_owns_fp_regs(void)
- {
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 05166eccea0a..fd3d6275b777 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2310,6 +2310,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	}
- 
- 	preempt_disable();
-+	vcpu_set_flag(vcpu, IN_NESTED_ERET);
- 	kvm_arch_vcpu_put(vcpu);
- 
- 	if (!esr_iss_is_eretax(esr))
-@@ -2321,6 +2322,7 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	*vcpu_cpsr(vcpu) = spsr;
- 
- 	kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+	vcpu_clear_flag(vcpu, IN_NESTED_ERET);
- 	preempt_enable();
- }
- 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index c53e5b14038d..f7712c89adef 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -64,14 +64,14 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
- 	*host_data_ptr(fpsimd_state) = kern_hyp_va(&current->thread.uw.fpsimd_state);
- 
--	vcpu_clear_flag(vcpu, HOST_SVE_ENABLED);
-+	host_data_clear_flag(HOST_SVE_ENABLED);
- 	if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
--		vcpu_set_flag(vcpu, HOST_SVE_ENABLED);
-+		host_data_set_flag(HOST_SVE_ENABLED);
- 
- 	if (system_supports_sme()) {
--		vcpu_clear_flag(vcpu, HOST_SME_ENABLED);
-+		host_data_clear_flag(HOST_SME_ENABLED);
- 		if (read_sysreg(cpacr_el1) & CPACR_EL1_SMEN_EL0EN)
--			vcpu_set_flag(vcpu, HOST_SME_ENABLED);
-+			host_data_set_flag(HOST_SME_ENABLED);
- 
- 		/*
- 		 * If PSTATE.SM is enabled then save any pending FP
-@@ -167,7 +167,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 	 */
- 	if (has_vhe() && system_supports_sme()) {
- 		/* Also restore EL0 state seen on entry */
--		if (vcpu_get_flag(vcpu, HOST_SME_ENABLED))
-+		if (host_data_test_flag(HOST_SME_ENABLED))
- 			sysreg_clear_set(CPACR_EL1, 0, CPACR_ELx_SMEN);
- 		else
- 			sysreg_clear_set(CPACR_EL1,
-@@ -226,7 +226,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 		 * for EL0.  To avoid spurious traps, restore the trap state
- 		 * seen by kvm_arch_vcpu_load_fp():
- 		 */
--		if (vcpu_get_flag(vcpu, HOST_SVE_ENABLED))
-+		if (host_data_test_flag(HOST_SVE_ENABLED))
- 			sysreg_clear_set(CPACR_EL1, 0, CPACR_EL1_ZEN_EL0EN);
- 		else
- 			sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index 74a67ad87f29..9f3f06ac76cc 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -336,6 +336,22 @@ void vgic_v4_teardown(struct kvm *kvm)
- 	its_vm->vpes = NULL;
- }
- 
-+static inline bool vgic_v4_want_doorbell(struct kvm_vcpu *vcpu)
-+{
-+	if (vcpu_get_flag(vcpu, IN_WFI))
-+		return true;
-+
-+	if (likely(!vcpu_has_nv(vcpu)))
-+		return false;
-+
-+	/*
-+	 * GICv4 hardware is only ever used for the L1. Mark the vPE (i.e. the
-+	 * L1 context) nonresident and request a doorbell to kick us out of the
-+	 * L2 when an IRQ becomes pending.
-+	 */
-+	return vcpu_get_flag(vcpu, IN_NESTED_ERET);
-+}
-+
- int vgic_v4_put(struct kvm_vcpu *vcpu)
- {
- 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-@@ -343,7 +359,7 @@ int vgic_v4_put(struct kvm_vcpu *vcpu)
- 	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
--	return its_make_vpe_non_resident(vpe, !!vcpu_get_flag(vcpu, IN_WFI));
-+	return its_make_vpe_non_resident(vpe, vgic_v4_want_doorbell(vcpu));
- }
- 
- int vgic_v4_load(struct kvm_vcpu *vcpu)
-
--- 
-Thanks,
-Oliver
+[...]
 
