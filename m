@@ -1,292 +1,245 @@
-Return-Path: <kvm+bounces-24721-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24722-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 148D1959B33
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 14:04:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5FFA959B3D
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 14:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A6AE1C20BC2
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 12:04:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65E6A1F22B49
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 12:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100CB1531D2;
-	Wed, 21 Aug 2024 12:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037281531C6;
+	Wed, 21 Aug 2024 12:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NCCP1KE7"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XHzYi9r3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2061.outbound.protection.outlook.com [40.107.220.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218161D12EB
-	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 12:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724241875; cv=none; b=M106ga1Tkz8WeKHF4c2HV/iW9uJ+ao9dB0hOoHZNH4EKzE7DECcVdR/Z/cjt2EZxJgK1mUIHWT3KEupqcDL35UFdBOhHkbnlcYmyXE8MpIHi3lRRWMQq0P8oC0HdH3Iyuw5E3d/FYHK7nhM0vKKdAglC6irdz3mtKZRd5x4n0zc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724241875; c=relaxed/simple;
-	bh=zwViz+cDX5Wlmtlmh0etFc3VA4oYXlkcnj36b20isDA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EqXtHCIDyW2dJLY6IsUoYQjktdOT2t1MH719uSYhJCfQRipQ2RN+nvRUxl/IZpVfIUd2ZmlJ1mv24MUzjmDjXF5iXLjnbKd2W54fMLCpjdXfLCu6xIZnvz/mHihddPgAYHCpPCUv1UGIeunSMu2HP2LAB54srXJjBtG+uPDj0Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NCCP1KE7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724241870;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DTYxC5stVAn7RUQffO585gPSW0SmZvsMOm6WShzhmrk=;
-	b=NCCP1KE7UrAue16oWBmT4s4X2pQhGNW7Ux/QnRiHAOdchWd+1UaCjfhrtYeFq9g45GLjRp
-	P5Qc3h3E4cX5GxVuyiigzYTE3aWFBWPfg5DgRA7vOaXFKGwebDaVTVnvQ3YBjSh8cF2wVu
-	YiqxNumEQqo3sMCTCrHzAYWfVRCSoWc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-439-7_yhHBKLNPepMDttUd0YYA-1; Wed, 21 Aug 2024 08:04:29 -0400
-X-MC-Unique: 7_yhHBKLNPepMDttUd0YYA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3718eb22836so3683266f8f.3
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 05:04:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724241866; x=1724846666;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DTYxC5stVAn7RUQffO585gPSW0SmZvsMOm6WShzhmrk=;
-        b=DhBBhK6CjRXOH8kkDKYv714OhO3QEOVzPXzBbnMetzMKGRG+qCdWtvWnQhcYb7BJXz
-         AIGgr2f3RsRpgqIRTbGSERvxHh0i8oLsmWxsyFcbr4ZOy/3aPfSNxjj+eNvUWuWT/Re2
-         dY9myojL+9lxA0bX8zP3R5DcsfD/1RWrhkn6PJXjLt0uS7hF2a9OwlT34z1531OY2S0x
-         hqVU29qqFOI514Cq93fEcc4w1byGqSNulcUygsrbywLWMi6yXYiUO+xff4QYypmyrnSx
-         RGvuIWv7bo8D5+o9fP+HUKnstd+qVbJf3FJkPkZS1aBXL8BS/vhv4x2BUZ4KM7vjBlYS
-         AAnA==
-X-Gm-Message-State: AOJu0Yz4QMPNUYj5csvFSIdGaWkHKC+yHk9V6JRCf9/ZHGzJhWQXhHMo
-	1pcxUrrRk2gU9hYR1+qxI+4oeFsge8N6BP1m5RKCv/CH+NGqmCFT92EZjA3lN+Flm+YDH3shMNh
-	6Ndn09FEn071xhjrH5oleYumt4WPbjnia62HciSV23edklwRHKw==
-X-Received: by 2002:a05:6000:bc8:b0:368:633d:f111 with SMTP id ffacd0b85a97d-372fd70c9e6mr1306229f8f.40.1724241866069;
-        Wed, 21 Aug 2024 05:04:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEpOlwP6wBW+wwNrrqUXuerWvGK9h0RHBd4PvxaOJN5M5uqqrzWsvoKlK0aaAuFDves3oZ3nQ==
-X-Received: by 2002:a05:6000:bc8:b0:368:633d:f111 with SMTP id ffacd0b85a97d-372fd70c9e6mr1306213f8f.40.1724241865477;
-        Wed, 21 Aug 2024 05:04:25 -0700 (PDT)
-Received: from intellaptop.lan ([2a06:c701:77ab:3101:d6e6:2b8f:46b:7344])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3718985a48asm15558013f8f.62.2024.08.21.05.04.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 05:04:25 -0700 (PDT)
-Message-ID: <0d41afa70bd97d399f71cf8be80854f13fe7286c.camel@redhat.com>
-Subject: Re: [PATCH v3 1/4] KVM: x86: relax canonical check for some x86
- architectural msrs
-From: mlevitsk@redhat.com
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, Borislav Petkov <bp@alien8.de>, 
- linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Chao Gao
- <chao.gao@intel.com>
-Date: Wed, 21 Aug 2024 15:04:23 +0300
-In-Reply-To: <fa69866979cdb8ad445d0dffe98d6158288af339.camel@redhat.com>
-References: <20240815123349.729017-1-mlevitsk@redhat.com>
-	 <20240815123349.729017-2-mlevitsk@redhat.com> <Zr_JX1z8xWNAxHmz@google.com>
-	 <fa69866979cdb8ad445d0dffe98d6158288af339.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-3.fc36) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DDD1D1306;
+	Wed, 21 Aug 2024 12:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724241974; cv=fail; b=jrGQxentM25gHVX0bupskd7QtIN/42vgUW6EmRUsdczX3BlZLa2HyM6C11RBmxyILV858cTCPfR2RYgSC5UhcGYFmiq2D057HSi2+EZWpV3ar5PIvZTB2QQvZTMv00JnugtMAzrYywC4FFXApjuSwoaVDGDaoCC6XN8yusHyqtg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724241974; c=relaxed/simple;
+	bh=7jxjyJyoWucF/lQnxh5+qfQ8snssX5V71QOb2Sbq9LU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Sxk+NcPJb7aoKpXF0UN6j/HrmDLNOY+hqhqfD1EA6FiWaVxBjEGDDQq1EMvL5Bij8vog7MGRbGdMzm/0lsNIMe+gvozeFj1Lzg8zyvj9yRGdFHjIGxvZrO2vZxbmiuSsjtKKikGyXw346JE9hrUEG3qebnxrbU5Dqq6TRpyqeNw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XHzYi9r3; arc=fail smtp.client-ip=40.107.220.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QB5NHoTM45Lk7Z7xsXfJAkK0XNQ3V4gkvJe4gwnzVNPh1HkrPprHuZwzUVQLlZD5BW83MEb4ib8nG0e5BT26iIjpA2cMPbs9+c2TYDC8PxUp1FGZ/8DV47DDs4DfTzqRUDJ4CRsvPw0Gmt61iKQq7lliBJkE/C8bwlIHUVW3t8vam78ktNHHDm273/3jqDFEvSUnHTRQQ3i49uSec+YsP0T/QziGLfWzpIdp6hJ+6thSIwzRdwHtfGFJrugoYlZR4hkXuwOXvuvmt9kH/sqKleFzZiyJD2aYTM/dr9F705aNmYrwmzGhu3xnRW1w6sVzJxSYY7Wr4BbAMktOmL+OhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V7+v8nb/xfVy5mAqLlpzuv0u+fOXWKRqbEKZz6c2OE0=;
+ b=fTh0xTtMLqC28wHk28IilnYSHMH7+hPLaBLEJXMF8l40qn5GK3wecI3q2cux7efBveDkpYJ/vPh+HpzVvQaxGml/1VKHtZVu+IvXfYh1cy+pae0aTIaPoJAAJd59hx1mNaCw/pIeAyZIx4MFpvlFXDJ8VDKYEyDy3dSsB35dkK4E0Sj+z1DtwrRo1RUKngsGj5EB508RIUqKWG20KafZRYqDHkNyUqr5Iw9z2S5f2an3wPl9RaBzuMs/1tZJMd850qdKCfqdaPLRf09/GOcev2+MRbiZbUN4xNRtEHfBrvLvdV/iOaOVlbZqt/jzj7iKb3aqPm3Hhh7uwJIc1AU/Tg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=V7+v8nb/xfVy5mAqLlpzuv0u+fOXWKRqbEKZz6c2OE0=;
+ b=XHzYi9r3qq7wJbsF/Rh38F4s84wjhKWGkssP8mD8UxUlk+FXnCHY5a2SyQHpJAbrfBWCE586kNJmMzloCoQAXInKADFV1mvnIlsQWCOiZLRWYOyF8VFBcdbdJx/LWNNCY4X/tjHhcUfuWc/6kIuQlfZ6/MHnYuFglJ/nzP8sroVk1jogwo5d2u+wS4E2HJ8gPiwFASB0qBeRLMiEoB7Ze1c9AZxARAr6slf2KvWmgz2IuqIjMAsPCwFA0BbhDTYg+DVt0aOFTw3QXRafWv+WLcWRSzm+LhKSCpm9AjqAGqJsPpECbETTUi1iDLhlrvvuD6PrE1nFw6oUTg1LYOuRQA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
+ by SN7PR12MB6887.namprd12.prod.outlook.com (2603:10b6:806:261::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Wed, 21 Aug
+ 2024 12:06:09 +0000
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7875.023; Wed, 21 Aug 2024
+ 12:06:09 +0000
+Date: Wed, 21 Aug 2024 09:06:07 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: acpica-devel@lists.linux.dev,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Hanjun Guo <guohanjun@huawei.com>, iommu@lists.linux.dev,
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
+	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
+	Eric Auger <eric.auger@redhat.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Moritz Fischer <mdf@kernel.org>,
+	Michael Shavit <mshavit@google.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 2/8] iommu/arm-smmu-v3: Use S2FWB when available
+Message-ID: <20240821120607.GI3773488@nvidia.com>
+References: <0-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
+ <2-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
+ <ZsRUDaFLd85O8u4Z@google.com>
+ <20240820120102.GB3773488@nvidia.com>
+ <ZsT0Fd5FHS47gm0-@google.com>
+ <20240820202138.GH3773488@nvidia.com>
+ <ZsW5HRZj2O2hGQYc@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZsW5HRZj2O2hGQYc@google.com>
+X-ClientProxiedBy: BN0PR10CA0016.namprd10.prod.outlook.com
+ (2603:10b6:408:143::23) To CH3PR12MB7763.namprd12.prod.outlook.com
+ (2603:10b6:610:145::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|SN7PR12MB6887:EE_
+X-MS-Office365-Filtering-Correlation-Id: 13128dca-b254-4f75-89fd-08dcc1d9a440
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?djI1TUpoUUZOY2VZMDBvMGVFRFBsdlJSdncrWnhJNGVseFNTRGVWSTE5WVRk?=
+ =?utf-8?B?UUlCWDJvSFRNRU1TUkRYSWcyb01EVitPcFFFRGVPekhtdXA3Q2ZsVjI1MHNQ?=
+ =?utf-8?B?TWxPWFdVNlZuOHNxZ0pwQ0pZaWE2MUVLWk5WRnpEUkYrUjBLdEV3Y0F4cU55?=
+ =?utf-8?B?Qm9hM3diSkg1RklGTklXaDRXRTQyVlJwRUczZFVqNmZESWxQVzRNc2hmMlJn?=
+ =?utf-8?B?WnVuMEtiUFBoazhCWkVKeG10VU9pN1AvVW1QcGJEZFhVa2VieTVTNGhuam44?=
+ =?utf-8?B?cFR6MGlENkRuZHJ0Y0NVUjZZMVNPMFdCZC9CRUtMQWVDbmJ4dWh0ejhCNEU0?=
+ =?utf-8?B?MXI4bGZHS3BNSE1QNm9ROTY3QTNlVThDUUM5MGRKTDdQcDVRYUNMRkYxUHk5?=
+ =?utf-8?B?TlF5eW9JVkVqMXZUeExvNHhodnBvZ3JpK3JyWFpyVDI3WXZzWUtRc1RXcTFT?=
+ =?utf-8?B?Q0pPeEcwMitya3A0M3JJckhMUVFIYjYyalUzM1U1Ny9qN3l6S0ptYTA5MlZz?=
+ =?utf-8?B?WW01c3JteTZ0UngrVXZPU3hxYmhzRmtnd29USHhFcmhNZHdQNXBFeDNwM3NU?=
+ =?utf-8?B?bUpQTjlOUmpKZGV5biswREt3RjNnaEM3WXk2YkIrQURJQWl2MExyNEpsMXVG?=
+ =?utf-8?B?ajhCY3gvQWwvamdWcU1pUWQweVFaRFNuaHZiOFZ4OGJ0Z3FtNkh0TXZYOWdw?=
+ =?utf-8?B?M3dIU0FEOFZNdzZJZ3JZS1p2Wk04U3dDdGMxcXViU2FHT1p0RDJwS3AwbmV3?=
+ =?utf-8?B?NE04dDZ0ZUtFNHJxL2szNWxwWjZxd2Q3Qk9zenhhZEZzbE9keldEZkF2OWRs?=
+ =?utf-8?B?Mzhwa0hVdC9ScmRXVm1BdXROakJwS3lTR2pYVU9HVGhKN2t0anUyN1U4dk1C?=
+ =?utf-8?B?U3BWUG9GTU9va2lLbmNhUGtJcXIzZTZVd05mWFVUSk5oNXNKNU10Szd0c1NC?=
+ =?utf-8?B?N2ttTGxucW9JTVA3QjNrUUpXTk1iU2EzMHhmb0I1Tk84ZnBXN2szekdFQ1F3?=
+ =?utf-8?B?ZHFjODhiZWhCQzM5bHFadmw1K0tPSXB1NHorYTR4cndXQmNTYk1wNVdaWG9P?=
+ =?utf-8?B?MDVPbXUzaDdPK2JJOW1OUnhheHVXL1J3dVFBM0F2cC9sMEw3UmdBYldYRU5x?=
+ =?utf-8?B?cW9xdmdCanh0UFgzRE91UjQyQnFZNWN5d2xYVSt0WWRVbFl3NkhRemVJVktL?=
+ =?utf-8?B?YUpaczIzZWs4RFloT0VUdkM3Tm1RS2RBQXU5YjlTTElSTG1MaldSdWZYSDY3?=
+ =?utf-8?B?b0svK3loVVhzMlpuL3pna0VkNkhNYUhlVHZvMVg5SjZ1U1VhcmNQcFdnMXpX?=
+ =?utf-8?B?SGNDdS9QWVlMaU9NRzVJaFhOazRMTDB2SDY2bkdOeXVzN0NWMmFkTkZTcDFh?=
+ =?utf-8?B?VVVMVzhwK1hJeUVsUFdsK0tWeUdMNzY0WG5GZ2VKMEdYbDVwTm12clgrcnNu?=
+ =?utf-8?B?TjhtM0RQdWlEOGsza0kyOVVYWElpckZqanZkallWdW5UTGdZZHJsS2k5R3oz?=
+ =?utf-8?B?MmVMWFpQbXJFbmdTSjJmaUo5bEwrLzhhOFpONXB1dmpPdGROUG1hbStwZkt3?=
+ =?utf-8?B?Nnhmc3Jqd1ZuSkdsdTRRdDB0eHNDZUtLbU9JQUNNSjlraUFDMDNaY3Nnb3JB?=
+ =?utf-8?B?YTMrY0F4TkZGaVFIc25Lcm1yOHdHVHNGMmtQMlduOHhieWZISkgrZmh2ZE9U?=
+ =?utf-8?B?aVEwQks4R29YUWt3dzdISXh0Q0JtR1ZEU2haOEZZQWN1NG1Ga2E4cDFaUWF2?=
+ =?utf-8?B?QldZLzFXYnRSSHMxSi85ME5iRmgvOE5RV1RmTDV5RnFHU2tGZlVMOEI4eWNZ?=
+ =?utf-8?B?eDA0Nk5IS09jbGhXNXNBUT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ajJGVCtqWWhkM3ZNejlKNmJwc3BNRk5LcGh5N3lKSGVFM3lnYlhmRE92T3BF?=
+ =?utf-8?B?RTFxZFkreUw0KzlsVC9uZ1M4bkNpRXF1bWhLVTBtZWlyRS94UGFQSUd0RWR3?=
+ =?utf-8?B?dDA1QnUzOTJaVTFsM3pSdUNzcGdDYkY4UzFFa1RYMGRNSEcwUFJxcUkwVTE3?=
+ =?utf-8?B?UW1uL0VtRWV5N09MTGI1c0Nid2dlNHk5dFVzWGF6WE1XOEoxREl5UTA1WmJH?=
+ =?utf-8?B?SzZ5bVBkSEhvdVBCSllzRThKNmhVWFFOUFdEYnljMXhnQTZ3blZCM05XaStX?=
+ =?utf-8?B?dnBkblNRelFNN1g4b0FPMjVTSmw2UitxRHJ4MzFnUVgxV04xQmF6N1hIVURB?=
+ =?utf-8?B?WDlDUjcxR210dDR0TzU1eHR5REY3L3d1c2ZJTTJkQ1lRNEF4Z0Zsbk1aT2E0?=
+ =?utf-8?B?ejJyUERkd0g1cTBFeFcyNWNFTDIrdHR2STU2QklqTDZkVlVmRWpLUitWNjJB?=
+ =?utf-8?B?NitVV29laFY1aVpBZ0ovenZKUTZIWFJxQzBoQ3IxM1Y2czRlSHZveGgxQnBL?=
+ =?utf-8?B?QWhYK2xXK3ZzQ2pTeUdoWU9IL2FHckthTG9sRUZycXhkRVhMTDhOMUpBZXc5?=
+ =?utf-8?B?aFhoSmJ2SUhpNnFjc3dBM2lRdnlhb2dVNEZ6bGFFaTQxZXY3TVJMMWttTzgv?=
+ =?utf-8?B?VkpieGRhQ010S25uYkhmMXh3cEU2ckdkZ1lKYkpDYUJReGtmUEw1dlFNU00r?=
+ =?utf-8?B?RlFIYTJObzYxdTNzRGwvM2h6eE1ia1UwOGJBUFpIS3RMdWpMT3Q4cGgvOGxh?=
+ =?utf-8?B?azUyWEQ2RUVmU0lvQVFkc25MeStZd2I0S0xXRGY2VzIvSFRDLzQvVVo2S2RG?=
+ =?utf-8?B?OXlIc3Q4NFk2UmRaeHNPZ1FjRWcxTVZYQkxRWGZtck95VW1SejF1anFFbDF4?=
+ =?utf-8?B?NVNCM3NMa3JQTk9maXRRVWpZWGF2STgzL3dNMHpBYkNoVWlhMVJSRm96clEz?=
+ =?utf-8?B?bzh5K0hvaytsSzhURC96RzNtVlpLMDIxWHU2K0Z4UWptVFU4VUwrbEJUZERl?=
+ =?utf-8?B?LzBGRGd6bW9pTkFsTWdQMUZ6bWY3cFN6MTY4VWsyaWtzbzZ0TVd3VkM0TE9y?=
+ =?utf-8?B?TUVjQ0Ntc0tnc1dPc2I2WlBTSjFCSWFOaGo4Ky95UU1sdGo3ZDV2SU14OEh0?=
+ =?utf-8?B?WDRpWHBoMkJ6dDR3RnI2SW5lZ0VvaG00QWhrU3ZUUHZWN2VBL0FKZFJvRlI0?=
+ =?utf-8?B?V1U2bVFhUjhlVUNHUkxtckYwL2grcjNyZ09YZmNvSmR2Sk1QR2NWOFNVaW1w?=
+ =?utf-8?B?aTIvMjRUOTZzWDloZGpJQTZuem5McDM2N2tBaitac0lsUUdCYnBqM3JSZkll?=
+ =?utf-8?B?aC9rTmtZYW1rSXBzcGwyUEU5TlFBMXNKLzdWMUlhS0Y1SUJTUEhBemJWWWxJ?=
+ =?utf-8?B?a1BwQzMxNitjRTBYVVNFTE0zMnBFNHlWdnIrK00rcTRyN21mNzR3ZDNGbXoy?=
+ =?utf-8?B?RWRLNWNEdkV4T1dHVkFjck9ZVlVBODFBZVdhVFFWaFJ4OHQvV00yMDA5YTMx?=
+ =?utf-8?B?TUsrYTgzQUpERERyN0FiQWdXMDlEK2Z1eWQveFpVTThrWVk2RkZLZHJ0TVJn?=
+ =?utf-8?B?dWl1bnVkd1dVZUovNUtrYjJoSkR5bGRJbkdPY09kcnUvUUJVWTFLL1M0aGll?=
+ =?utf-8?B?eGVaRkxYL29jcDJMa2doREJYdm5wakk5Wnp1bEFib09IcXlhUDFtbVdhSU1k?=
+ =?utf-8?B?emQrdU1WNGpSOEJ1cE9uQ3B0RnFSOENMM08ra2txZndacTgxbzhISVB1bnRM?=
+ =?utf-8?B?NVptNzdjS3hKbkhzV284aC9CSkwrQzlXeGhqcHlxVnRpY2FjekRhM0VWelNk?=
+ =?utf-8?B?MFFDdEFSNThqRHhFVWt4SU5WdEV5cmdRd2c0WnpkYzVKS1RsL2dFT0dUM093?=
+ =?utf-8?B?UE5BUi9OR3Jrekp2U3R6dWQ5ZW5YUlowcE5CN0dwL0FnYmRNWW1CeWZYa2Uz?=
+ =?utf-8?B?dEZ4OUZhOC9kK1IxMG0wcnJFRjNLZklocko3RGdybk9pblNaWjZHeUloZnRq?=
+ =?utf-8?B?R1VlbTN3OTZGd0R3NUt1RC9iT0dlVHlrSjR5UVlIVnc1MWxBQzQzaFR0OTZO?=
+ =?utf-8?B?MWQyWTFLR1h0KzI0dXNLV3FmR0N3OWpjcXI0S3BTTk5RRlB3dHQ5UGJiZmZU?=
+ =?utf-8?Q?mq6joiOUXF3ERlYdBhRXvW4Hs?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13128dca-b254-4f75-89fd-08dcc1d9a440
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 12:06:08.8992
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8u4xQe6aPdPmB6kV86Mdk/DYpN7dQozJdHUs5Ld49EuGufoug1h19UmvVhZkMP0r
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6887
 
-=D0=A3 =D0=B2=D1=82, 2024-08-20 =D1=83 15:13 +0300, mlevitsk@redhat.com =D0=
-=BF=D0=B8=D1=88=D0=B5:
-> =D0=A3 =D0=BF=D1=82, 2024-08-16 =D1=83 14:49 -0700, Sean Christopherson =
-=D0=BF=D0=B8=D1=88=D0=B5:
-> > > > > On Thu, Aug 15, 2024, Maxim Levitsky wrote:
-> > > > > > > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > > > > > > index ce7c00894f32..2e83f7d74591 100644
-> > > > > > > > > --- a/arch/x86/kvm/x86.c
-> > > > > > > > > +++ b/arch/x86/kvm/x86.c
-> > > > > > > > > @@ -302,6 +302,31 @@ const struct kvm_stats_header kvm_vc=
-pu_stats_header =3D {
-> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- sizeof(kvm_vcpu_stats_desc),
-> > > > > > > > > =C2=A0};
-> > > > > > > > > =C2=A0
-> > > > > > > > > +
-> > > > > > > > > +/*
-> > > > > > > > > + * Most x86 arch MSR values which contain linear address=
-es like
-> > > > >=20
-> > > > > Is it most, or all?=C2=A0 I'm guessing all?
->=20
-> I can't be sure that all of them are like that - there could be some outl=
-iers that behave differently.
->=20
-> One of the things my work at Intel taught me is that there is nothing con=
-sistent
-> in x86 spec, anything is possible and nothing can be assumed.
->=20
-> I dealt only with those msrs, that KVM checks for canonicality, therefore=
- I use the word=C2=A0
-> 'most'. There could be other msrs that are not known to me and/or to KVM.
->=20
-> I can write 'some' if you prefer.
+On Wed, Aug 21, 2024 at 09:53:33AM +0000, Mostafa Saleh wrote:
+> > Oh, from that perspective yes, but the entire point of S2FWB is that
+> > VM's can not create non-coherent access so it is a bit nonsense to ask
+> > for both S2FWB and try to assign a non-DMA coherent device.
+> 
+> Yes, but KVM sets FWB unconditionally and would use cacheable mapping
+> for stage-2, and I expect the same for the nested SMMU.
 
-Hi,
+Yes, you'd need some kind of handshake like Intel built for their GPU
+cache incoherence to turn that off.
 
+> > > What I mean is the master itself not the SMMU (the SID basically),
+> > > so in that case the STE shouldn’t have FWB enabled.
+> > 
+> > That doesn't matter, those cases will not pass in IOMMU_CACHE and they
+> > will work fine with S2FWB turned on.
+> 
+> But that won’t be the case in nested? Otherwise why we use FWB in the
+> first place.
 
-So I did some more reverse engineering and indeed, 'some' is the right word=
-:
+Right, without KVM support for guest cachability selection and cache
+flushing in VFIO, is infeasible to allow non-coherent devices. It is a
+medium sized problem if someone wants to tackle it.
 
-I audited all places in KVM which check an linear address for being canonic=
-al and this is what I found:
+> Maybe the SMMUv3 .capable, should be changed to check if the device is
+> coherent (instead of using dev_is_dma_coherent, it can use lower level
+> functions from the supported buses)
 
-- MSR_IA32_BNDCFGS - since it is not supported on CPUs with 5 level paging,=
- its not possible to know
-  what the hardware does.
+That would be the fix I expect. Either SMMUv3 does it, or the core
+code adds it on top in the .capable wrapper. It makes sense to me that
+the iommu driver should be aware of per-master coherence capability.
 
+> Also, I think supporting IOMMU_CACHE is not enough, as the SMMU can
+> support it but the device is still not coherent.
 
-- MSR_IA32_DS_AREA: - Ignores CR4.LA57 as expected. Tested by booting into =
-kernel with 5 level paging
-  disabled and then using userspace 'wrmsr' program to set this msr.
-  I attached the bash script that I used
+IOMMU_CACHE is defined as requiring no cache maintenance on that
+memory.
 
-- MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B: - Exactly the same story=
-, but for some reason the
-  host doesn't suport (not even read) from MSR_IA32_RTIT_ADDR2_*, MSR_IA32_=
-RTIT_ADDR3_*.
-  Probably the system is not new enough for these.
+If specific devices can't guarentee that then IOMMU_CACHE should not
+be used on those devices and IOMMU_CAP_CACHE_COHERENCY for that device
+should be false.
 
+That is what I mean by support.
 
-- invpcid instruction. It is exposed to the guest without interception (unl=
-ess !npt or !ept),
-  and yes, it works just fine on 57-canonical address without CR4.LA57 set.=
-...
+Anyhow, I'm going to continue to leave this problem alone for
+nesting. Nothing gets worse by adding nesting on top of this. Even if
+we wrongly permit VFIO to open non-coherent devices they won't
+actually work correctly (VFIO forces IOMMU_CACHE and S2FWB). Most
+likely anything trying to use them will just crash/malfunction due to
+missing cache flushing.
 
-
-- invvpid - this one belongs to VMX set, so technically its for nesting alt=
-hough it is run by L1,
-  it is always emulated by KVM, but still executed on the host just with di=
-fferent vpid,
-  so I booted the host without 5 level paging, and patched KVM to avoid can=
-onical check.
-
-  Also 57-canonical adddress worked just fine, and fully non canonical addr=
-ess failed.
-  and gave a warning in 'invvpid_error'
-
-
-Should I fix all of these too?
-
-
-About fixing the emulator this is what see:
-
-	emul_is_noncanonical_address
-		__load_segment_descriptor
-			load_segment_descriptor
-				em_lldt
-				em_ltr
-
-		em_lgdt_lidt
-
-
-
-While em_lgdt_lidt should be easy to fix because it calls emul_is_noncanoni=
-cal_address
-directly, the em_lldt, em_ltr will be harder because these use load_segment=
-_descriptor
-which calls __load_segment_descriptor which in turn is also used for emulat=
-ing of far jumps/calls/rets,
-for which I do believe that canonical check does respect CR4.LA57, but can'=
-t be sure either.
-
-It is possible that far jumps/calls/rets also ignore CR4.LA57, and instead =
-set RIP to
-non canonical instruction, and then on first fetch, #GP happens.
-
-I'll setup another unit test for this. RIP of the #GP will determine if the=
- instruction
-failed or the next fetch.
-
-Best regards,
-	Maxim Levitsky
-
-
->=20
-> > > > >=20
-> > > > > > > > > + * segment bases, addresses that are used in instruction=
-s (e.g SYSENTER),
-> > > > > > > > > + * have static canonicality checks,
-> > > > >=20
-> > > > > Weird and early line breaks.
-> > > > >=20
-> > > > > How about this?
-> > > > >=20
-> > > > > /*
-> > > > > =C2=A0* The canonicality checks for MSRs that hold linear address=
-es, e.g. segment
-> > > > > =C2=A0* bases, SYSENTER targets, etc., are static, in the sense t=
-hat they are based
-> > > > > =C2=A0* on CPU _support_ for 5-level paging, not the state of CR4=
-.LA57.
-> > > > >=20
-> > > > > > > > > + * size of whose depends only on CPU's support for 5-lev=
-el
-> > > > > > > > > + * paging, rather than state of CR4.LA57.
-> > > > > > > > > + *
-> > > > > > > > > + * In addition to that, some of these MSRS are directly =
-passed
-> > > > > > > > > + * to the guest (e.g MSR_KERNEL_GS_BASE) thus even if th=
-e guest
-> > > > > > > > > + * doen't have LA57 enabled in its CPUID, for consistenc=
-y with
-> > > > > > > > > + * CPUs' ucode, it is better to pivot the check around h=
-ost
-> > > > > > > > > + * support for 5 level paging.
-> > > > >=20
-> > > > > I think we should elaborate on why it's better.=C2=A0 It only tak=
-es another line or
-> > > > > two, and that way we don't forget the edge cases that make proper=
-ly emulating
-> > > > > guest CPUID a bad idea.
->=20
-> OK, will do.
->=20
-> > > > >=20
-> > > > > =C2=A0* This creates a virtualization hole where a guest writes t=
-o passthrough MSRs
-> > > > > =C2=A0* may incorrectly succeed if the CPU supports LA57, but the=
- vCPU does not
-> > > > > =C2=A0* (because hardware has no awareness of guest CPUID).=C2=A0=
- Do not try to plug this
-> > > > > =C2=A0* hole, i.e. emulate the behavior for intercepted accesses,=
- as injecting #GP
-> > > > > =C2=A0* depending on whether or not KVM happens to emulate a WRMS=
-R would result in
-> > > > > =C2=A0* non-deterministic behavior, and could even allow L2 to cr=
-ash L1, e.g. if L1
-> > > > > =C2=A0* passes through an MSR to L2, and then tries to save+resto=
-re L2's value.
-> > > > > =C2=A0*/
-> > > > >=20
-> > > > > > > > > +
-> > > > > > > > > +static u8=C2=A0 max_host_supported_virt_addr_bits(void)
-> > > > >=20
-> > > > > Any objection to dropping the "supported", i.e. going with max_ho=
-st_virt_addr_bits()?
-> > > > > Mostly to shorten the name, but also because "supported" suggests=
- there's software
-> > > > > involvement, e.g. the max supported by the kernel/KVM, which isn'=
-t the case.
->=20
-> Doesn't matter to me.
->=20
-> > > > >=20
-> > > > > If you're ok with the above, I'll fixup when applying.
-> > > > >=20
->=20
-> Best regards,
-> =C2=A0=C2=A0 Maxim Levitsky
-
+Jason
 
