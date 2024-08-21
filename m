@@ -1,61 +1,83 @@
-Return-Path: <kvm+bounces-24789-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24790-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C479495A336
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 18:54:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7385495A4A1
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 20:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D6CE1F22EF0
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 16:54:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C370AB2184D
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2024 18:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65E91AF4D7;
-	Wed, 21 Aug 2024 16:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9574D1B3B32;
+	Wed, 21 Aug 2024 18:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DtfrdYkV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="To6gR4n0"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22406139597
-	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 16:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF8616B725
+	for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 18:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724259240; cv=none; b=pUMyfySqyv3X0lKB9pnAw29T55SOUxBefAaaMRTE+Eoe0zzUNhp3rSLJe1mzXUMGURkJD7NMwcUL6y4hO8DxVjB1KNIjptSK+yWjIrCS7eyzvMMRMawd5OnrvAkmE7C6w9hoCM2u+koL1MUIUshFL2YB+WvuCKDRW2CyoSqYLRo=
+	t=1724264479; cv=none; b=N+f10tYRQqgroZTHCavg04IUlmfOruzUbcKD1+K1Nrj9RLq+M0R11gbjngA/2GmTpT7bpjQN8Une9mEe0TSn2sP6yrq9YH+lUn4Q2f7SakuJGPHJS5a7YaQKc9RrSu4HfjMAKrcxbhY6CB5AX+JkM0J5cr6ONiI/pYCWDjv05C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724259240; c=relaxed/simple;
-	bh=KRqYf0D7qKIvZDRldP2GF+vIYtADtDZc+uaNUudfuhA=;
+	s=arc-20240116; t=1724264479; c=relaxed/simple;
+	bh=NSkAYr7bCmb3Whw3daQ77DB27/Rap81/w8JLe5qOJiU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W5mgicshLoLVRFDhEIMjhrAkNT04lwJUYzqAYw8uOLUbtCGmdHPbYnw/As+H6+XekY9wadzd87VwykhVrGRMCWcSgKfxeqlP0NGN9frWd0PWWIMHjgKDIUIJ+5fI8DZ5pNA+QbpDTYNzKKJ3DkbdouXQglhvNe5YdVlssFwg9d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DtfrdYkV; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 21 Aug 2024 09:53:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724259236;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vlQGzGWk8tm0muGf8AU98KPFAWS2rZ3ejTpHnzVFAeM=;
-	b=DtfrdYkV68G2vLS7xazpLrwqXKOB8+hUKiu+fgS9cXylowM4cw6AsBFHKCeKSSbmzxZFTk
-	eLeti0zxH3xtakjmF9lVvK29Ebh/Wfse6rz7P47ZItEpRwXu/cE4RCSjCeq2jdVFNVfpWn
-	gUZw1wFLoOLWmOXVa1H2J3aETUp18cE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexander Potapenko <glider@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 01/12] KVM: arm64: Make ICC_*SGI*_EL1 undef in the
- absence of a vGICv3
-Message-ID: <ZsYbm1PSqQMGmNyt@linux.dev>
-References: <20240820100349.3544850-1-maz@kernel.org>
- <20240820100349.3544850-2-maz@kernel.org>
- <ZsUOtp9kfpqm1enx@linux.dev>
- <86le0qxhsn.wl-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bxe9OW4isWfM4ZLmKu+S6rNa0Q8kC2MRoHijoKLrA9G85LUi6vySz76yt6se5fQRYVBXISVckgDEVD9+WewpFIvcFULuX1v5eSwxft5M7OgfObVuPONAZumasC0Tid3hULzvhbB7skdGAa0Q1O0n6ffBW2EPGCuX2VzjNqtH/Sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=To6gR4n0; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-714184b23d1so1547794b3a.0
+        for <kvm@vger.kernel.org>; Wed, 21 Aug 2024 11:21:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724264478; x=1724869278; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rLaHZXNQ7BrbOIHjJhTXeFkX6/m+9PAM08pS1uhnqTc=;
+        b=To6gR4n0/NxZgq5CmUwwHcgS5sxPFKjrEWc5zzTBAmfvBCS214HO62SX1zzS7fdMZh
+         8YtdnbKOYpx+rpdLFZR+eqdt5zZmgpF+tlZGhfFQZ/u4gmP9PIW/YvxBk5DF0a4BbKCC
+         TxhYUdFNkwitLmqkjBZZewx6xzrIR7kts8KrZKHg/wYLbB0Z9Xbmwad270kv2nxm/joE
+         Wzd8QCI0glUkQ9OPh9gRyarJJvsXdUXWpR9R188LBpqFebeZhKFwwooOnQM4/wt0vhQ5
+         MBcFNJoOAJBcRXgGBixs0HPuY7LkcGpbVS2NBs6pWbdlyz2eBzO8L9m8yWqZpo8EqvsG
+         3WRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724264478; x=1724869278;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rLaHZXNQ7BrbOIHjJhTXeFkX6/m+9PAM08pS1uhnqTc=;
+        b=aSVX/RLtRJtAoRkB0DPydOvwbal41e5dceYxxF3vHYH1UtviimC4f80FtAXdyIfIPU
+         qj+b3ofqPdbj5Wx+qaN8cZZ9ohfmrrmAePGGMFcdefisB+Ifv+oy5epIAzjrO4Imr22U
+         TDlccO6p8Z01MPQFdoAsKGVEKduXH0tObiEBCjc1Njzn6UWlTaTl8o4DVkjOKDmlpips
+         69eLiw9FzXxpbvx/v0tsk26NjB+eg4521AQBxzkwPfVzRpLEKJcvw19pWcfbI6KEz2nz
+         ixftRTZpLr0dsm8wndUP2n+cMddRNYKwzHAm/R10Z9HxDssmH/dWjTJVIptVzBkSiQK4
+         9rJw==
+X-Gm-Message-State: AOJu0Yw8EczmUvlIgmQ8iAhIs6HhHRnjsJB/1BeaWPKDlRoSEPes/xLv
+	W8mvGhK2bpAJ46PXG4M6n1/GjIeoY3OfPIFLsc+Ru60IjLYp9ZFxknbdqrRN7g==
+X-Google-Smtp-Source: AGHT+IEm1ZehgvYO1cvgACbjrPTylob0tJBTNrg8E6mB8b6jByYU12rCK6TYepFT8mmhNG1+9jhoTw==
+X-Received: by 2002:a05:6a20:b598:b0:1c4:919f:3675 with SMTP id adf61e73a8af0-1cad81a731fmr3349633637.35.1724264477214;
+        Wed, 21 Aug 2024 11:21:17 -0700 (PDT)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127af3aeaasm10248967b3a.191.2024.08.21.11.21.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 11:21:16 -0700 (PDT)
+Date: Wed, 21 Aug 2024 18:21:11 +0000
+From: Mingwei Zhang <mizhang@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Jinrong Liang <ljr.kernel@gmail.com>,
+	Jim Mattson <jmattson@google.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/6] KVM: x86: selftests: Fix typos in macro variable use
+Message-ID: <ZsYwF5QJ8gqto8Mm@google.com>
+References: <20240813164244.751597-1-coltonlewis@google.com>
+ <20240813164244.751597-2-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -64,37 +86,51 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86le0qxhsn.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240813164244.751597-2-coltonlewis@google.com>
 
-On Wed, Aug 21, 2024 at 11:59:52AM +0100, Marc Zyngier wrote:
-> On Tue, 20 Aug 2024 22:46:30 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > On Tue, Aug 20, 2024 at 11:03:38AM +0100, Marc Zyngier wrote:
-> > > On a system with a GICv3, if a guest hasn't been configured with
-> > > GICv3 and that the host is not capable of GICv2 emulation,
-> > > a write to any of the ICC_*SGI*_EL1 registers is trapped to EL2.
-> > > 
-> > > We therefore try to emulate the SGI access, only to hit a NULL
-> > > pointer as no private interrupt is allocated (no GIC, remember?).
-> > > 
-> > > The obvious fix is to give the guest what it deserves, in the
-> > > shape of a UNDEF exception.
-> > > 
-> > > Reported-by: Alexander Potapenko <glider@google.com>
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > Cc: stable@vger.kernel.org
-> > 
-> > LGTM, and just as an FYI I do plan on grabbing this for 6.11
+On Tue, Aug 13, 2024, Colton Lewis wrote:
+> Without the leading underscore, these variables are referencing a
+> variable in the calling scope. It only worked before by accident
+> because all calling scopes had a variable with the right name.
 > 
-> Great, thanks. Are you planning to route this via arm64, given that
-> Paolo is away for a bit?
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 
-Yup, exactly that. I'll send the PR in the next day or two when I have
-some time to kick the tires on everything.
+This might need a fixes tag, right?
+Fixes: cd34fd8c758e ("KVM: selftests: Test PMC virtualization with forced emulation")
 
--- 
-Thanks,
-Oliver
+no need to cc stable tree though, since this is very minor.
+
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  tools/testing/selftests/kvm/x86_64/pmu_counters_test.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> index 698cb36989db..0e305e43a93b 100644
+> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> @@ -174,7 +174,7 @@ do {										\
+>  
+>  #define GUEST_TEST_EVENT(_idx, _event, _pmc, _pmc_msr, _ctrl_msr, _value, FEP)	\
+>  do {										\
+> -	wrmsr(pmc_msr, 0);							\
+> +	wrmsr(_pmc_msr, 0);							\
+>  										\
+>  	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))				\
+>  		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt .", FEP);	\
+> @@ -331,9 +331,9 @@ __GUEST_ASSERT(expect_gp ? vector == GP_VECTOR : !vector,			\
+>  	       expect_gp ? "#GP" : "no fault", msr, vector)			\
+>  
+>  #define GUEST_ASSERT_PMC_VALUE(insn, msr, val, expected)			\
+> -	__GUEST_ASSERT(val == expected_val,					\
+> +	__GUEST_ASSERT(val == expected,					\
+>  		       "Expected " #insn "(0x%x) to yield 0x%lx, got 0x%lx",	\
+> -		       msr, expected_val, val);
+> +		       msr, expected, val);
+>  
+>  static void guest_test_rdpmc(uint32_t rdpmc_idx, bool expect_success,
+>  			     uint64_t expected_val)
+> -- 
+> 2.46.0.76.ge559c4bf1a-goog
+> 
 
