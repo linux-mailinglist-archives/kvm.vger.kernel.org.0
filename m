@@ -1,122 +1,154 @@
-Return-Path: <kvm+bounces-24806-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24807-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55C3195AC5A
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 06:05:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39C8C95AD89
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 08:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1E40B21804
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 04:05:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CE471C21C6E
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 06:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BB037165;
-	Thu, 22 Aug 2024 04:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E82613A879;
+	Thu, 22 Aug 2024 06:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFj5BQt9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RvmEtmEW"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEEB1B970;
-	Thu, 22 Aug 2024 04:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F12249F9
+	for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 06:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724299495; cv=none; b=BwLqTyAWsG8EUBY8w0IYdicozm7vLmeb/q0uXXlURIL8y5Lkqq8tajl66uPHUObmfZBWJS+2XOENaMV44o6inWeX1HRqutarMgklnXzwi4zv4cxaYIV2Y5+Mrhi9JyWPF4SaG5yo0AnVmz+G8NxBB0jcy7DqhAKFv2UM4XMYhQM=
+	t=1724308289; cv=none; b=rMSYQ6tim6dvsqYdvmss0080bGuYndqn4oEY1JVmoGXLdV46KzmywgtJdIyRo5N2WXqUY7rVY9BKD/tejsU2EDHS7VxvUVw1gEHZF5C2EYSXneC8rTeH2AYFUcQUn8o98AcyCOdp8Kytjp/U+gg06cjw2tmo1uey/G4Vs9JSK48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724299495; c=relaxed/simple;
-	bh=tbe4FZUkzz+iVMQdUiF9BG9MZYXNRR57xKnKHiajJZc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=RWpESdh3hlouej7aiE7YGkqpWD7ygmIUqy+sS+/7yEyNiWo53SvJs+jPmzxz+ySLhikibAo1Oa35C6EJlPEke9RxcS4HO0LbNZvNje8udyNP7On4tY9+ilMtNCdakO375zcxu/GcXc8VMDhxL//c8Zyz010yi7lbfkwSIow2rZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFj5BQt9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72061C4AF09;
-	Thu, 22 Aug 2024 04:04:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724299495;
-	bh=tbe4FZUkzz+iVMQdUiF9BG9MZYXNRR57xKnKHiajJZc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=JFj5BQt989BcieRka9JzUyKpbJpUE0ShZUw/SCgbsDVG7uHs3xVHiYDmFXJm5PNz7
-	 VhpYE3iW91v6e88TQuGd+3ftgW2HnMcU2GKmTfT/aKjGkg0Q+ry4tRQ8W96s0a/9XU
-	 KOpvr2PyR/0YUnJEIQ9MeeIJ46O+IDZil9a6/PWmL5BV5anmL5ZbQLFCHYPhdGOqIf
-	 rB60oYFxM69i+IUGKwVXS4BEnSaRnk98pDx7HFyRuOwM7kXyz97CkLOMvyqbyWvria
-	 WR/cvPhETy/rvHHTBBEBa7RrEn9okX+M8/jxpqD8JLlcTxTK6a38nLqDivtIawDoPO
-	 W4tkDpgsMWNdw==
-X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	s=arc-20240116; t=1724308289; c=relaxed/simple;
+	bh=jbC0DB5wuASWk06GDLKHtiUlHALW2rUUePq5AdShjM4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J6j1BCpRUHo69hTESEbOrobZ7o7bTEDVhUNnG03dIUvO7fNSydzfRva2d/hCexfFzmcK5WrySvqB67cTtdtTcmgETNnPLjLGeFMYaFQglrmV4R/6brFAzaGFbDfLuU2eMGTqnErQGoz7lvAA2JF5bkXBBlmdo2+Bqmm3ydwKNt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RvmEtmEW; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 22 Aug 2024 06:31:16 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724308285;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v9L+ux6eqpfs8HzsN5Mc/twSCks2uxys4IF0TgSNQbs=;
+	b=RvmEtmEWo3qrdEPjK0SFllLxQkoGLfOYCr3K1MEV0ZjxRzgIURV9s1vbQoXCQJzDJ1duMt
+	sSnffekuUeXRsaafxh/3HzZC0+r2s17FUjz0UodRzfKAXUVtENu164VbYiWAHZC+1BK+aB
+	gY/zvvLXMOInTeVNdfCWhKgDTpTgrOY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>
-Subject: Re: [PATCH v4 18/43] arm64: RME: Handle realm enter/exit
-In-Reply-To: <20240821153844.60084-19-steven.price@arm.com>
-References: <20240821153844.60084-1-steven.price@arm.com>
- <20240821153844.60084-19-steven.price@arm.com>
-Date: Thu, 22 Aug 2024 09:34:44 +0530
-Message-ID: <yq5a34mx2of7.fsf@kernel.org>
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v3 03/16] KVM: arm64: nv: Handle shadow stage 2 page
+ faults
+Message-ID: <ZsbbNNPEjUq1ndt5@linux.dev>
+References: <20240614144552.2773592-1-maz@kernel.org>
+ <20240614144552.2773592-4-maz@kernel.org>
+ <9ba30187-6630-02e6-d755-7d1b39118a32@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9ba30187-6630-02e6-d755-7d1b39118a32@huawei.com>
+X-Migadu-Flow: FLOW_OUT
 
-Steven Price <steven.price@arm.com> writes:
+On Thu, Aug 22, 2024 at 03:11:16AM +0800, Zenghui Yu wrote:
+> > +
+> > +	if (nested) {
+> > +		unsigned long max_map_size;
+> > +
+> > +		max_map_size = force_pte ? PAGE_SIZE : PUD_SIZE;
+> > +
+> > +		ipa = kvm_s2_trans_output(nested);
+> > +
+> > +		/*
+> > +		 * If we're about to create a shadow stage 2 entry, then we
+> > +		 * can only create a block mapping if the guest stage 2 page
+> > +		 * table uses at least as big a mapping.
+> > +		 */
+> > +		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
+> > +
+> > +		/*
+> > +		 * Be careful that if the mapping size falls between
+> > +		 * two host sizes, take the smallest of the two.
+> > +		 */
+> > +		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
+> > +			max_map_size = PMD_SIZE;
+> > +		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
+> > +			max_map_size = PAGE_SIZE;
+> > +
+> > +		force_pte = (max_map_size == PAGE_SIZE);
+> > +		vma_pagesize = min(vma_pagesize, (long)max_map_size);
+> > +	}
+> > +
+> >  	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+> >  		fault_ipa &= ~(vma_pagesize - 1);
+> >  
+> > -	gfn = fault_ipa >> PAGE_SHIFT;
+> > +	gfn = ipa >> PAGE_SHIFT;
+> 
+> I had seen a non-nested guest boot failure (with vma_pagesize ==
+> PUD_SIZE) and bisection led me here.
+> 
+> Is it intentional to ignore the fault_ipa adjustment when calculating
+> gfn if the guest memory is backed by hugetlbfs? This looks broken for
+> the non-nested case.
+> 
+> But since I haven't looked at user_mem_abort() for a long time, I'm not
+> sure if I'd missed something...
 
-....
+Nope, you're spot on as usual.
 
-> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct realm_rec *rec = &vcpu->arch.rec;
-> +	unsigned long base = rec->run->exit.ripas_base;
-> +	unsigned long top = rec->run->exit.ripas_top;
-> +	unsigned long ripas = rec->run->exit.ripas_value & 1;
-> +	unsigned long top_ipa;
-> +	int ret = -EINVAL;
-> +
-> +	if (realm_is_addr_protected(realm, base) &&
-> +	    realm_is_addr_protected(realm, top - 1)) {
-> +		kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
-> +					   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
-> +		write_lock(&kvm->mmu_lock);
-> +		ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
-> +		write_unlock(&kvm->mmu_lock);
-> +	}
-> +
-> +	WARN(ret && ret != -ENOMEM,
-> +	     "Unable to satisfy SET_IPAS for %#lx - %#lx, ripas: %#lx\n",
-> +	     base, top, ripas);
-> +
-> +	/* Exit to VMM to complete the change */
-> +	kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false, false,
-> +				      ripas == 1);
-> +
-> +	return 0;
-> +}
-> +
+Seems like we'd want to make sure both the canonical IPA and fault IPA
+are hugepage-aligned to get the right PFN and map it at the right place.
 
-arch/arm64/kvm/rme-exit.c:100:6: warning: variable 'top_ipa' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-        if (realm_is_addr_protected(realm, base) &&
-            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-arch/arm64/kvm/rme-exit.c:114:44: note: uninitialized use occurs here
-        kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false, false,
-                                                  ^~~~~~~
+I repro'ed the boot failure, the following diff gets me back in
+business. I was _just_ about to send the second batch of fixes, but this
+is a rather smelly one.
 
--aneesh
+Unless someone screams, this is getting stuffed on top.
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 6981b1bc0946..a509b63bd4dd 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1540,8 +1540,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		vma_pagesize = min(vma_pagesize, (long)max_map_size);
+ 	}
+ 
+-	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
++	/*
++	 * Both the canonical IPA and fault IPA must be hugepage-aligned to
++	 * ensure we find the right PFN and lay down the mapping in the right
++	 * place.
++	 */
++	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE) {
+ 		fault_ipa &= ~(vma_pagesize - 1);
++		ipa &= ~(vma_pagesize - 1);
++	}
+ 
+ 	gfn = ipa >> PAGE_SHIFT;
+ 	mte_allowed = kvm_vma_mte_allowed(vma);
+
+
+-- 
+Thanks,
+Oliver
 
