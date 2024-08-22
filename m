@@ -1,118 +1,162 @@
-Return-Path: <kvm+bounces-24828-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24829-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68AC695B94D
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 17:07:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B310095B956
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 17:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 982341C20B52
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 15:07:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A712285405
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 15:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912A51CCB3C;
-	Thu, 22 Aug 2024 15:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAEC61CC8AB;
+	Thu, 22 Aug 2024 15:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UMtp4cPd"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B506C1CC89B;
-	Thu, 22 Aug 2024 15:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5631CC899
+	for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 15:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724339185; cv=none; b=lFVpbtUohBcPy+Tc5D9lsTuWkLn2eGwFSuNXowWi4jGtiyg7zGpGjJVBjjS6HxXrFEh2Ut/yrMMYlNBQHJhlo+dwg4wqFZVwP5n9FFSic7u0zpUNsBJu1pTaxbwk8y7EE91qiqy1hD5C9lfCzRr9uaL0y6pXNuIyvzW06ZD4k5U=
+	t=1724339408; cv=none; b=cymJrwO9v3kv05lGub/ITcyIUf5jZQNzjqSazsYqhLrsmXD1PV1D3pc+A3WWLMNFG/gu5VbSmaq9KkkFzg8BCHL7MZwwWKmxmb7a/my+rp+ie5yRSm4x9bXMVO/TMTxr9pTeMmnKveEXUHVPd8N9rMfQJV5TsXS0WT0OgRpHiw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724339185; c=relaxed/simple;
-	bh=QCgSudnWYAHAbhwqPzcmGR64pvLJdT3jGrGJ7AS7PPI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BDe3WhN4OJw3dt0tDh2YRow0tXrHIW2yUfJ6XP47MHBrhrEYi2gNwckRpg95oS8bghGyumaGFBAF90Zwj5TN0d8SpUwoofgFcSCu9vp4fdEgvlKDJpFFeGGQ/tXy6JGOoGhjtdwPoZO4g4n+cWNNJh1E4ThqaekTrQJMvGcykDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 51FF5DA7;
-	Thu, 22 Aug 2024 08:06:49 -0700 (PDT)
-Received: from [10.57.85.214] (unknown [10.57.85.214])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 608E83F58B;
-	Thu, 22 Aug 2024 08:06:18 -0700 (PDT)
-Message-ID: <282a765a-3b42-4175-8d9f-58456d13a37d@arm.com>
-Date: Thu, 22 Aug 2024 16:06:16 +0100
+	s=arc-20240116; t=1724339408; c=relaxed/simple;
+	bh=c3I7buk4tUQcr/u25swN2CXyF+WBbofaqBKNbfFLBsM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oLu/F8smGortIkYJW3GNI3dUCguEGM6Gf2xeLclGyPqKukgnfm4/9F/jdB6hydboJ1Y4cMxLdGwB9QCAc73NHLa4MjlUIcos6mzpHRiWz89S1VauyrpgsYfMIvqkhkJ3QArk+ve9gurdykSCUk5B7qzQw7xtNoetBOybIlWAzkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UMtp4cPd; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7cd7614d826so1579096a12.1
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 08:10:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724339407; x=1724944207; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=643YWobn45dY5QcBzGk3WYdfoAeJ4WQTeZn0Zjx4tzM=;
+        b=UMtp4cPdPH5AjVLrOw1p3BSB2vcuSwUMWd6lJ2XtMksmwIMsKg8zlDIu/0/R5D/oad
+         o5TPeB2SbxWeIlCRNlttLGCvi5J1vedS93NxZHIOU57rU8AubiY7D1FSIAgysjOhJho0
+         Gn2a6exbI14c3RbUHop9hn53ZZFJp3OZYiC+w6GF4bENlDnwnejgvnq6rG7Qvc+bImeU
+         WefvbCkR9wClmS5nVFMZiU7+iKutNXFGpnpSPcO+rDoKlFjrEtPonQIGa/SgoW0zKXK8
+         IjRHsxretuJaCPCvfuQqI3cHjLi37fbja2qvdUnQIzDAF7sfIgTgLffZiTs2kt+nblxz
+         tfjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724339407; x=1724944207;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=643YWobn45dY5QcBzGk3WYdfoAeJ4WQTeZn0Zjx4tzM=;
+        b=D3ipz1qSkia9KZ/UXvONxIs+exh4KkqFIDBsHn2kM7yr2ZmHhMOxKtNTcg1GcCg1VT
+         RiAe7XrTWb9tGaFmGNxroONUluTxlWGrkUA4VFOPRqJyjJdK4KlNw6l/scKB1gNE/IZf
+         k3/1qj5pdPeZU41BbA7DuxQ/XPIfzvbTAwRSoouCSURxCGn5QlCvKRvi4PBcIa5TPWvl
+         Og6PniebwMjbuUOaocbgVz5M4z8X4sbA7IL/sSquJ41wP/LPp9Ebpg4Ehd24VIVMTIeg
+         lQ1YpO4XCYBgxQKBdZgaHdW2UHaU/Fgr5/lrxj4OQ2iUzoPMZEHmKBlIfn+7/bjzLAxc
+         G6AA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJsd3/KNNwBgJOa3P54ZD+b40kARmlX834i4svJ7LvXdVpuuGcyVgJFcHBJ1EMgHG1V40=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/EK02gXinvKPBKj9QSynKhWpTdlfDBjIV6cRWixtFbBBJsAKR
+	saMwQCGl/9H0AfUe0mIKgb53fyisMVmd/D0cJyO+tJpsi27xxfJS+19YibugQpFWbpdunBc8m9Q
+	j1g==
+X-Google-Smtp-Source: AGHT+IFUQxJ95NYOhTSaiiBKCDpgjReT2ojuWAszN/BKnOXN4Uvnr6HpbA+zv+mFGZkFF+fqJw9PcQeNPfE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:8c88:b0:2c5:2b19:4218 with SMTP id
+ 98e67ed59e1d1-2d6164d5f46mr23335a91.3.1724339406644; Thu, 22 Aug 2024
+ 08:10:06 -0700 (PDT)
+Date: Thu, 22 Aug 2024 08:10:05 -0700
+In-Reply-To: <CALzav=ckxa9iP8zc9oOu69DxVhEjxrqMamv6HwGB+AzRxOf0vQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 18/43] arm64: RME: Handle realm enter/exit
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>
-References: <20240821153844.60084-1-steven.price@arm.com>
- <20240821153844.60084-19-steven.price@arm.com> <yq5a34mx2of7.fsf@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <yq5a34mx2of7.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240805233114.4060019-1-dmatlack@google.com> <20240805233114.4060019-2-dmatlack@google.com>
+ <Zr_XE6NG1c-rNXEl@google.com> <CALzav=ckxa9iP8zc9oOu69DxVhEjxrqMamv6HwGB+AzRxOf0vQ@mail.gmail.com>
+Message-ID: <ZsdUze9lqEARxgyI@google.com>
+Subject: Re: [PATCH 1/7] Revert "KVM: x86/mmu: Don't bottom out on leafs when
+ zapping collapsible SPTEs"
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 22/08/2024 05:04, Aneesh Kumar K.V wrote:
-> Steven Price <steven.price@arm.com> writes:
-> 
-> ....
-> 
->> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm *kvm = vcpu->kvm;
->> +	struct realm *realm = &kvm->arch.realm;
->> +	struct realm_rec *rec = &vcpu->arch.rec;
->> +	unsigned long base = rec->run->exit.ripas_base;
->> +	unsigned long top = rec->run->exit.ripas_top;
->> +	unsigned long ripas = rec->run->exit.ripas_value & 1;
->> +	unsigned long top_ipa;
->> +	int ret = -EINVAL;
->> +
->> +	if (realm_is_addr_protected(realm, base) &&
->> +	    realm_is_addr_protected(realm, top - 1)) {
->> +		kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
->> +					   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
->> +		write_lock(&kvm->mmu_lock);
->> +		ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
->> +		write_unlock(&kvm->mmu_lock);
->> +	}
->> +
->> +	WARN(ret && ret != -ENOMEM,
->> +	     "Unable to satisfy SET_IPAS for %#lx - %#lx, ripas: %#lx\n",
->> +	     base, top, ripas);
->> +
->> +	/* Exit to VMM to complete the change */
->> +	kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false, false,
->> +				      ripas == 1);
->> +
->> +	return 0;
->> +}
->> +
-> 
-> arch/arm64/kvm/rme-exit.c:100:6: warning: variable 'top_ipa' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
->         if (realm_is_addr_protected(realm, base) &&
->             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> arch/arm64/kvm/rme-exit.c:114:44: note: uninitialized use occurs here
->         kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false, false,
->                                                   ^~~~~~~
+On Fri, Aug 16, 2024, David Matlack wrote:
+> On Fri, Aug 16, 2024 at 3:47=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > The proposed approach will also ignore nx_huge_page_disallowed, and jus=
+t always
+> > create a huge NX page.  On the plus side, "free" NX hugepage recovery! =
+ The
+> > downside is that it means KVM is pretty much guaranteed to force the gu=
+est to
+> > re-fault all of its code pages, and zap a non-trivial number of huge pa=
+ges that
+> > were just created.  IIRC, we deliberately did that for the zapping case=
+, e.g. to
+> > use the opportunity to recover NX huge pages, but zap+create+zap+create=
+ is a bit
+> > different than zap+create (if the guest is still using the region for c=
+ode).
+>=20
+> I'm ok with skipping nx_huge_page_disallowed pages during disable-dirty-l=
+og.
+>=20
+> But why is recovering in-place is worse/different than zapping? They
+> both incur the same TLB flushes. And recovering might even result in
+> less vCPU faults, since vCPU faults use tdp_mmu_split_huge_page() to
+> install a fully populated lower level page table (vs faulting on a
+> zapped mapping will just install a 4K SPTE).
 
-I'm not sure why I didn't notice this before, if the condition is false
-then we're hitting the WARN (i.e. this shouldn't happen), but I should
-fix that up to handle the situation better.
+Doh, never mind, I was thinking zapping collapsible SPTEs zapped leafs to i=
+nduce
+faults, but it does the opposite and zaps at the level KVM thinks can be hu=
+ge.
 
-Steve
+> > So rather than looking for a present leaf SPTE, what about "stopping" a=
+s soon as
+> > KVM find a SP that can be replaced with a huge SPTE, pre-checking
+> > nx_huge_page_disallowed, and invoking kvm_mmu_do_page_fault() to instal=
+l a new
+> > SPTE?  Or maybe even use kvm_tdp_map_page()?  Though it might be more w=
+ork to
+> > massage kvm_tdp_map_page() into a usable form.
+>=20
+> My intuition is that going through the full page fault flow would be
+> more expensive than just stepping down+up in 99.99999% of cases.
 
+Hmm, yeah, doing the full fault flow isn't the right place to hook in.  Ugh=
+, right,
+and it's the whole problem with not having a vCPU for tdp_mmu_map_handle_ta=
+rget_level().
+But that's solvable as it's really just is_rsvd_spte(), which I would be a-=
+ok
+skipping.  Ah, no, host_writable is also problematic.  Blech.
+
+That's solvable too, e.g. host_pfn_mapping_level() could get the protection=
+, but
+that would require checking for an ongoing mmu_notifier invalidation.  So a=
+gain,
+probably not worth it.  Double blech.
+
+> And will require more code churn.
+
+I'm not terribly concerned with code churn.  I care much more about long-te=
+rm
+maintenance, and especially about having multiple ways of doing the same th=
+ing
+(installing a shadow-present leaf SPTE).  But I agree that trying to remedy=
+ that
+last point (similar flows) is probably a fool's errand in this case, as cre=
+ating
+a new SPTE from scratch really is different than up-leveling an existing SP=
+TE.
+
+I still have concerns about the step-up code, but I'll respond to those in =
+the
+context of the patch I think is problematic.
 
