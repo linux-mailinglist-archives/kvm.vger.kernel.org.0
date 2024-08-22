@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-24805-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24806-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A90995AC50
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 05:59:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C3195AC5A
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 06:05:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06221281A0A
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 03:59:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1E40B21804
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 04:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4370A381C8;
-	Thu, 22 Aug 2024 03:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BB037165;
+	Thu, 22 Aug 2024 04:04:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IqaFpXLa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFj5BQt9"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1F62E644;
-	Thu, 22 Aug 2024 03:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEEB1B970;
+	Thu, 22 Aug 2024 04:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724299148; cv=none; b=QHmviTHzt1SLzjloPLHi8NhZ33Karsas0cwis/9fJGwLbG/4WRjLagZKxW45D8b5hR8hync/AITRkIiKaJfmBmxcga4VdOG2YyFXFvMsznl2imyDCSI4Ihkv4bLSf9dfHfqFKdTqc3xO2jLiCkO5tNMJsYbATJAQUGn8J0fIqJo=
+	t=1724299495; cv=none; b=BwLqTyAWsG8EUBY8w0IYdicozm7vLmeb/q0uXXlURIL8y5Lkqq8tajl66uPHUObmfZBWJS+2XOENaMV44o6inWeX1HRqutarMgklnXzwi4zv4cxaYIV2Y5+Mrhi9JyWPF4SaG5yo0AnVmz+G8NxBB0jcy7DqhAKFv2UM4XMYhQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724299148; c=relaxed/simple;
-	bh=MeUaIymMWet32UJr/UCPvNt4T3nq4nqzI61CVdg0XFc=;
+	s=arc-20240116; t=1724299495; c=relaxed/simple;
+	bh=tbe4FZUkzz+iVMQdUiF9BG9MZYXNRR57xKnKHiajJZc=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hdD0xbRhopy0D4MBZRKbou+FBW9W0pkXXQlPc9X4XM3rvLjK1bNuY7iBcOC9GoQGCjSFkimqVMh0HGR3bKMtRE7H9I59ezRihzWe2db/wBsUnf7AL55njt/YrYM1fXqTwdmfG8Mvylc2BwWmS3n3iOsjR5jSrf44Xwrl9D0uqY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IqaFpXLa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D854C4AF09;
-	Thu, 22 Aug 2024 03:59:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=RWpESdh3hlouej7aiE7YGkqpWD7ygmIUqy+sS+/7yEyNiWo53SvJs+jPmzxz+ySLhikibAo1Oa35C6EJlPEke9RxcS4HO0LbNZvNje8udyNP7On4tY9+ilMtNCdakO375zcxu/GcXc8VMDhxL//c8Zyz010yi7lbfkwSIow2rZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFj5BQt9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72061C4AF09;
+	Thu, 22 Aug 2024 04:04:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724299147;
-	bh=MeUaIymMWet32UJr/UCPvNt4T3nq4nqzI61CVdg0XFc=;
+	s=k20201202; t=1724299495;
+	bh=tbe4FZUkzz+iVMQdUiF9BG9MZYXNRR57xKnKHiajJZc=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=IqaFpXLafjAn3gFHbE3Avza/+ergXjXsURmfn1nc96I21IgbyAp3IFHUfKBJ8IkrM
-	 KbPZvIH8QwNb5lI4zjYq40LMvg6oJ2fwPJprnRKLnMlZZZ3+xzRK8DROCHWddfiNe2
-	 02Jhvckthxrri4w888p1nL3A/zNBeK8TVrMnoh1TGoB8lpJKb048k00MlHzC0XAj4h
-	 haqjQ8nkxVyayvp8ght5uS4Li/Svb7f9uatYHSOS/zfVZRbqlxJgNBPDD5vxdLNHr9
-	 bc/QCVAWFsSwhqtsDmvOBKu6wv0C2oH9W4MzRfbfp88VLGN7lFyvUIdIoKK7f6kMVs
-	 80fZdHBTViAsw==
+	b=JFj5BQt989BcieRka9JzUyKpbJpUE0ShZUw/SCgbsDVG7uHs3xVHiYDmFXJm5PNz7
+	 VhpYE3iW91v6e88TQuGd+3ftgW2HnMcU2GKmTfT/aKjGkg0Q+ry4tRQ8W96s0a/9XU
+	 KOpvr2PyR/0YUnJEIQ9MeeIJ46O+IDZil9a6/PWmL5BV5anmL5ZbQLFCHYPhdGOqIf
+	 rB60oYFxM69i+IUGKwVXS4BEnSaRnk98pDx7HFyRuOwM7kXyz97CkLOMvyqbyWvria
+	 WR/cvPhETy/rvHHTBBEBa7RrEn9okX+M8/jxpqD8JLlcTxTK6a38nLqDivtIawDoPO
+	 W4tkDpgsMWNdw==
 X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
 From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
@@ -65,8 +65,8 @@ Subject: Re: [PATCH v4 18/43] arm64: RME: Handle realm enter/exit
 In-Reply-To: <20240821153844.60084-19-steven.price@arm.com>
 References: <20240821153844.60084-1-steven.price@arm.com>
  <20240821153844.60084-19-steven.price@arm.com>
-Date: Thu, 22 Aug 2024 09:28:56 +0530
-Message-ID: <yq5a5xrt2oov.fsf@kernel.org>
+Date: Thu, 22 Aug 2024 09:34:44 +0530
+Message-ID: <yq5a34mx2of7.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,40 +77,46 @@ Content-Type: text/plain
 
 Steven Price <steven.price@arm.com> writes:
 
+....
+
+> +static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct realm *realm = &kvm->arch.realm;
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	unsigned long base = rec->run->exit.ripas_base;
+> +	unsigned long top = rec->run->exit.ripas_top;
+> +	unsigned long ripas = rec->run->exit.ripas_value & 1;
+> +	unsigned long top_ipa;
+> +	int ret = -EINVAL;
+> +
+> +	if (realm_is_addr_protected(realm, base) &&
+> +	    realm_is_addr_protected(realm, top - 1)) {
+> +		kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
+> +					   kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
+> +		write_lock(&kvm->mmu_lock);
+> +		ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
+> +		write_unlock(&kvm->mmu_lock);
+> +	}
+> +
+> +	WARN(ret && ret != -ENOMEM,
+> +	     "Unable to satisfy SET_IPAS for %#lx - %#lx, ripas: %#lx\n",
+> +	     base, top, ripas);
+> +
 > +	/* Exit to VMM to complete the change */
 > +	kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false, false,
 > +				      ripas == 1);
 > +
+> +	return 0;
+> +}
+> +
 
+arch/arm64/kvm/rme-exit.c:100:6: warning: variable 'top_ipa' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+        if (realm_is_addr_protected(realm, base) &&
+            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arch/arm64/kvm/rme-exit.c:114:44: note: uninitialized use occurs here
+        kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false, false,
+                                                  ^~~~~~~
 
-s/1/RMI_RAM ?
-
-May be we can make it an enum like rsi_ripas
-
-modified   arch/arm64/include/asm/rmi_smc.h
-@@ -62,9 +62,11 @@
- #define RMI_ERROR_REC		3
- #define RMI_ERROR_RTT		4
- 
--#define RMI_EMPTY		0
--#define RMI_RAM			1
--#define RMI_DESTROYED		2
-+enum rmi_ripas {
-+	RMI_EMPTY,
-+	RMI_RAM,
-+	RMI_DESTROYED,
-+};
- 
- #define RMI_NO_MEASURE_CONTENT	0
- #define RMI_MEASURE_CONTENT	1
-modified   arch/arm64/kvm/rme-exit.c
-@@ -112,7 +112,7 @@ static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
- 
- 	/* Exit to VMM to complete the change */
- 	kvm_prepare_memory_fault_exit(vcpu, base, top_ipa - base, false, false,
--				      ripas == 1);
-+				      ripas == RMI_RAM);
- 
- 	return 0;
- }
+-aneesh
 
