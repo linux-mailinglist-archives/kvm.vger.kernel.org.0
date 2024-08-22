@@ -1,579 +1,370 @@
-Return-Path: <kvm+bounces-24835-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24836-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6074F95BBFC
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 18:32:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B42C95BC6E
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 18:50:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51466B25155
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 16:32:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BC901C22A63
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 16:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE441CDA11;
-	Thu, 22 Aug 2024 16:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89DA71CB31B;
+	Thu, 22 Aug 2024 16:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="cPfwhELY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l1hb+IfY"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C43282FC;
-	Thu, 22 Aug 2024 16:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724344330; cv=fail; b=Q+8jxJ+q4jSV3s9+k532bTgLL+Gtw+DPMmBn+Y9Q7N80bu3HzAfIqmyB8mm+dUUtulUUxubnwxes5vJneXb/PUUnnN9Gb/t4VaJLydZPFOrfcykjAhchCihoRWUPeDs/nMhc+ZApLkNAu4RAOWgmboOtU8p+Wr9GiPGSBv2cUEE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724344330; c=relaxed/simple;
-	bh=lwY+jG3lJRVNXtoEoxUvc4EDYm8cR7A4eGjnEXzCMrw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RvPeHAFChBrwRkEjXY4SZO/PDnfjK2fgLTX7y+Jb/yVJCtrqAgfJQJtWnHnSKn6a1oUPGJixrUJjff/CiKYa59SQST86iJfYLHIE93wylupn8Ch1okrH/6n6ztrhnJjt6YidcaMweCCrOVkRzB6zip218ECTVBRLZS9tog+8tas=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=cPfwhELY; arc=fail smtp.client-ip=40.107.223.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VZaQ7PFDVeVa3XyO92otXg1aHXTHgPhPoXLKD8Rm0ksmo7Q3P2+vvKLOw5K3ah16A0Hvf7NKuomd/dJiBivApRLJQS8WuIRZ5tQybUldZCAWJhYxQ675Pyneu8bn7vh5jmS7dmJuNXF8HX5kKpglg7jUfyAqu4c6sWqYlMyKON7Nnsiz+lLpvieaFIhp8DOrFGCPWdqypCMxq9qHNQAxXvnDaNsaAIxGoumgC+DRnPr3RhLqRiGtx3RhSm3dktete34wMR+RLqslm6/Oy9HuQWk4rkdKQ6BXokWTwnIup9vfX0f//lT52Xf84Im1kvf4TOb1vKJsfK6WLd6rRRVccg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S8H1fOQPDLdTnOsXgRh/BkThRnzW3N3HPDN35VhlHzI=;
- b=n681KoY1Bs2sCizpNRM1CnZYOIArN6x25Zrkr7yYIorZbWsiCId9lb9Y5IoePQxBkCGNmwHWdwbMQ4L8EPfb9XNelyhu1xNqOUJOErCWfctnmP2S4i/+NC1gibP4P4De7GU9YzqDyhOZRPXscigGElQxwO/BaFLi+/A0zrSETHJ1BJmqCo3g2hS5X7/1yDJ/triky8qdeYZWM/Z9IYBxgskuMPIBkRF+XMnSA0E5ZucHBrYGnDM+yiNS+ESmKr1PA0m+QAhUS+ZWQZDxblD6L5++cdCy/uuu3xHFOpO2D2fLim4+KMyhRDOTOsQhoaf1IiF2ximhZK7C8JK+7nwqAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S8H1fOQPDLdTnOsXgRh/BkThRnzW3N3HPDN35VhlHzI=;
- b=cPfwhELYZU4utm2yBEMfcYQI+P+9yb7Pz2cm864/AEsQEqfRDu+atuqc1GSczvRbc82xS7zOXaQCxe71ceLoziJ6Gs0GRccl6KGhRb10+N7M+uEPf8V0oOAxN6pyej6lVWqpp/nbuIUJZcvpfCYEvOjnh9lpXBr2ZG8IyRebcR8=
-Received: from SN7PR04CA0179.namprd04.prod.outlook.com (2603:10b6:806:125::34)
- by MW3PR12MB4410.namprd12.prod.outlook.com (2603:10b6:303:5b::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.18; Thu, 22 Aug
- 2024 16:32:05 +0000
-Received: from SA2PEPF00001509.namprd04.prod.outlook.com
- (2603:10b6:806:125:cafe::d8) by SN7PR04CA0179.outlook.office365.com
- (2603:10b6:806:125::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19 via Frontend
- Transport; Thu, 22 Aug 2024 16:32:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF00001509.mail.protection.outlook.com (10.167.242.41) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7897.11 via Frontend Transport; Thu, 22 Aug 2024 16:32:05 +0000
-Received: from [10.236.31.51] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 22 Aug
- 2024 11:32:04 -0500
-Message-ID: <05e8d2ae-e978-44b0-b433-b72f38aed60e@amd.com>
-Date: Thu, 22 Aug 2024 11:32:04 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C471CDA27
+	for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 16:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724345406; cv=none; b=ZH9WcdJ7t+Wy22os00KUFkmbW4S1oTUdy7XGLLU4GBQ1t32e0QCPCLIeFHQJZkzqvtyPSerTU2TA+cvoBalKkx8V/Z5ifPSzWB3lFkq5Vi5CFdHGP9RNI/oBeowFT6S1zXJyXx188ImBvnXJyLIoOVcK7CBknHjD4UK6WZSMORQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724345406; c=relaxed/simple;
+	bh=5q7SQGrz78cONc3+vAJKNwyD+blDjOvgwxV73Th25ss=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fnSImDxi94ldrzJ7FRzKHdPSVEg3FrB1QNNVP+761o3iilaW3NOTgrCPZulLBKrC/yBgbAkwYuwqvOhhh5d85Z79piP6imdqs8IS75AfBHd3ULEe94zHwm3JvHeti9OPvugwmxJPE1hpeNzy0VlajDxlOHLE1fo6PJbCxDGXkq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l1hb+IfY; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6b8f13f2965so21453757b3.1
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 09:50:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724345404; x=1724950204; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IRYUwayMAx0W0p6sT68bMO4Q5/OUGBikQLNg50L0268=;
+        b=l1hb+IfYEAfWjOpSgG4RvEVK5HB+iXSlojrkTI7CVR4sbkxLTJF1BImvNMlMJ3H52l
+         BxzW8xs3B2vb2rYUpFVEsqhT96iNIgiPZ1oRyfXq/gKr6n41+7EnKn8lXGiuBDra4LdW
+         i80GKTkaqUS8Z2y+qeinaWYgWPRiAXG7PMTuD5shYQ2silAZtFJXyzO/1ybToZzK5r7O
+         8e6qAaeEa0eArG25U6Wh23NbtY4yMPrp41beiftURok7lrwGDhGd0xm/rQRU48svfhni
+         Mkt9OK2pGEPPmX9rxtXIG+MLnNhmZLbuvMLBACP/EG1S+efoWAk0xhPx3Xyif6pfpj15
+         +nHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724345404; x=1724950204;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IRYUwayMAx0W0p6sT68bMO4Q5/OUGBikQLNg50L0268=;
+        b=nvObU8gajUASvlr6A9jNr0CWNRQKveLREjzOF+8lrR1aepfJBXxaZbea9TrlEESjS4
+         K+ULEKgriG61CTtlqcCnm9JJfdcL7+OLlhJsRMeW+YBJOxr4t2yvCuwXYkNYbNnlpBx3
+         ec+4K0EKvkWNuofGHg0MyGa5OeET7C0dRplBeKwaxeXl58WBbX69XJODW6KnFUoK+umr
+         Ix7OOmQsDXMt2I6One+1zhyVWfkUP/sy3dU94faLW+mzs5qtcOyB4eEofNgY1Os2h+KI
+         KMIJhqNpiY1V6u2Q95fRoMmXcNr9VPl3CdVcZwREokOMnb4j7LHl6Q3gQdZ91DB+jnsQ
+         V1GA==
+X-Forwarded-Encrypted: i=1; AJvYcCUjRqBhjQx5dPfmZT77Ij/aUCJv1KXTXOzq34F3A6moyBeaMQQETZtF495AnbFTBsnYlaQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyz3/r32X+Ci2a1CCxTR9SZzmEo5M/wBcIOhmat6YXhxC/kLOHo
+	BilX7hOEhVQ4sgp6Eocx575wciUqedQ7egPIQl8EzVnM3LrySXS0iwKq6LlYZvvPfGbkfNz3XrI
+	m9g==
+X-Google-Smtp-Source: AGHT+IGFXjasoevdzk3dGqcU4WgmV0zAfOOPTJNn6l2sQV1iMonWGnm//WMahBT9ePqLt8AuFOh/9I3XbYY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:6487:b0:622:cd7d:fec4 with SMTP id
+ 00721157ae682-6c5bfecf536mr407b3.9.1724345403777; Thu, 22 Aug 2024 09:50:03
+ -0700 (PDT)
+Date: Thu, 22 Aug 2024 09:50:02 -0700
+In-Reply-To: <20240805233114.4060019-8-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 8/9] KVM: selftests: Add a CoCo-specific test for
- KVM_PRE_FAULT_MEMORY
-To: "Aithal, Srikanth" <sraithal@amd.com>, <kvm@vger.kernel.org>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <pgonda@google.com>,
-	<thomas.lendacky@amd.com>, <michael.roth@amd.com>, <shuah@kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240816192310.117456-1-pratikrajesh.sampat@amd.com>
- <20240816192310.117456-9-pratikrajesh.sampat@amd.com>
- <2996bcee-4687-4822-a5a0-e83d89301477@amd.com>
-Content-Language: en-US
-From: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>
-In-Reply-To: <2996bcee-4687-4822-a5a0-e83d89301477@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00001509:EE_|MW3PR12MB4410:EE_
-X-MS-Office365-Filtering-Correlation-Id: 685310b1-f643-4d0b-7ad3-08dcc2c7f59a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?eFRpZ3hQNDJtUStLNmRYd0lkSzVGWVJleWpVWFJ2ajJmT2I2WmpxMFNXeHBT?=
- =?utf-8?B?UGdVTUlTYmtKNW5IU21hcTlrSXFXM3NOYWhXTU1seTcrcW1IVDVVcHhQYjBV?=
- =?utf-8?B?S1hBV2prVVUxU0RyRWJuTE81dGlIVzAycnJ2eHJReFE4S1liMkVtMy84N3hX?=
- =?utf-8?B?VGdUZFZMcXZRNlJUd3ZYbHB6SFFraVNETkVTd1MwUGxwaExjRFEvbUllNGJV?=
- =?utf-8?B?VkVHb1YrWE4wTFZ1a2lQdGpxdjNubEtpNDlKTysvZm5nVG9PL2xFSlhjdlV6?=
- =?utf-8?B?K09pT1ZLYkhheE1mZXNhS1NaK2pXMi9PT3FweWNqV1BBRzczdDZ0SXBJc2Ja?=
- =?utf-8?B?K3YzZ2JuRnptclBaZnVYTndmZUE4Y0lZZnpSM2gwaFVwWCtnM3ZlVGlnMXph?=
- =?utf-8?B?RWszdEExR3I5RDhIZ0p1MUJwQm12Q3lYVEx3QzREaFlIT2tIUDNZZVFlMW4z?=
- =?utf-8?B?aWxjNkdxaGtsS3N4K1dkcnlaa3FQZ2ZuV1V5cy8xMGRoOVVHMHliS25nQjRK?=
- =?utf-8?B?NlU3aDMvM2pYTFErS0UvcFB5Ris3MG80N1E4SFZmK2dwdUxhcEtJTTUxYUxp?=
- =?utf-8?B?Z2Zrd3M1S3dsNkFyQmE3elQzWml6blZQT1Jyb1ZzcnE1Mkx3T2s0RUErSzli?=
- =?utf-8?B?ZDBXa2g3a1Y3NTkrT1dyTHI5cEx1ZjJIUGxPeFpNMkx4dWh6WDJBWFQrUlhK?=
- =?utf-8?B?dlZubFpOVVJnQmUvQzd4ZnFpdmpmR0pmSkJ1akZtZzl2UWdRczhGaTZTQlMx?=
- =?utf-8?B?WTZ2Y2h2SXhLQklqMys0T1NyQnYydWF6eVVOdkhzWm1NVWQ4aFpnZ3NyUWkw?=
- =?utf-8?B?eS9kS3ZEbzMyR09mZFltdmpIVCt2aVBwd2kvbW8rNmFYWU5MNHF6MllXQXUr?=
- =?utf-8?B?NWFiUDY4VmRUbTh4T0dabWpDZ2RScitLaCtMNC9nMFdueEl3UnRXYmdKZVVH?=
- =?utf-8?B?SHRtRjlCbTVKdDFXbVlwMUpJNjFINkVabDdsMXRXdzRSMjNqZFJUaGh0RXZY?=
- =?utf-8?B?OHcrQlZDcjA1TGxid0RoaHp2bTkxK0tpVUdEUWVlV1N5OWJGbUVicndPYjhz?=
- =?utf-8?B?T29DL1ZXOGZWSXlYMG5ucVN4T0dEMjl1TzVlcVZGYWlUY1BxSkxuQ3U4YzFL?=
- =?utf-8?B?T2VJMXVubWJYUkZjSU4zck92d3RVVk1PYzlKeXNFcDVVRkxvYlI0Uk4wN0s5?=
- =?utf-8?B?R0txQXI1L1hDUUwyQmhRekozL3JhZUczSlEvWmlEZFd0dWtSeS9KMDVWMVFN?=
- =?utf-8?B?UHdzWFVXSFM1OUtCT1hhMSt4aitrblBGa0ZCRlpZa2dNaDJsTTVLT1o3Ukhq?=
- =?utf-8?B?U0tYU3RCaTUwYk8vSlNqbm1YVytRUlZVaXBsK3crelZyaHZKR3dHTTgxUHFh?=
- =?utf-8?B?bVhRRGtyVmhWbUxSZ2kvSnJIQkhPUm04TGhDUzNjeUwwcGpSbzl4alNuY01X?=
- =?utf-8?B?Mm55NXFXRzRXV1FsYW1YQTl3OGFHcjdEU21MdmNmV1pMdHI2WEhibS8vNkIy?=
- =?utf-8?B?YTRpSXNvdjdiVjFicU5tZHFLRE9zdzRRSEErZEVNTS9mNE5Gek5WeVJIaVVR?=
- =?utf-8?B?VEx1VEpnY3dmSEc1ZUMzMkdrT3VKMDVpZGRCRDNvS1VrMktBZzlRNGNnRitF?=
- =?utf-8?B?THRTaDZ5UVZpZ0xBTk9QWGFsZExnTXJMTHY1aE4rSHZQSVl6R1JDdi9yZ1ZK?=
- =?utf-8?B?dHhLRUFJaW11OC92d0tLUVBja3dsMm5pRmNhTEMzNGh5RWdHVlUrMFpxOFFE?=
- =?utf-8?B?MFQ0SEMvTS9lMjdjSDl0RUdCZ29ReW4zQzVUdXZaT0RzR0U4aXlHUStLV1dq?=
- =?utf-8?B?bW81M3pJTnhBMU14bDY1Nk1TejZzZkQvNnlzTG5rVFZFQlBSU1kzY3hlSnZq?=
- =?utf-8?B?SFc1VSttcUpLbGVwZ1o0VE1zTWM3bnpPMEN3VzI3SjJDV3FhbllUT0xHY0tP?=
- =?utf-8?Q?enyMPh3pOCfk0EXR4Zy1STA7WiIEA4jK?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2024 16:32:05.3183
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 685310b1-f643-4d0b-7ad3-08dcc2c7f59a
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00001509.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4410
+Mime-Version: 1.0
+References: <20240805233114.4060019-1-dmatlack@google.com> <20240805233114.4060019-8-dmatlack@google.com>
+Message-ID: <ZsdsOpWnZY47J5sU@google.com>
+Subject: Re: [PATCH 7/7] KVM: x86/mmu: Recheck SPTE points to a PT during huge
+ page recovery
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-
-
-On 8/20/2024 1:24 AM, Aithal, Srikanth wrote:
-> On 8/17/2024 12:53 AM, Pratik R. Sampat wrote:
->> From: Michael Roth <michael.roth@amd.com>
->>
->> SEV, SEV-ES, and SNP have a few corner cases where there is potential
->> for KVM_PRE_FAULT_MEMORY to behave differently depending on when it is
->> issued during initial guest setup. Exercising these various paths
->> requires a bit more fine-grained control over when the
->> KVM_PRE_FAULT_MEMORY requests are issued while setting up the guests.
->>
->> Since these CoCo-specific events are likely to be architecture-specific
->> KST helpers, take the existing generic test in pre_fault_memory_test.c
->> as a starting template, and then introduce an x86-specific version of
->> it with expanded coverage for SEV, SEV-ES, and SNP.
->>
->> Since there's a reasonable chance that TDX could extend this for similar
->> testing of TDX, give it a "coco-" prefix rather than an SEV-specific
->> one.
->>
->> Signed-off-by: Michael Roth <michael.roth@amd.com>
->> Co-developed-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
->> Signed-off-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
->> ---
->>   tools/testing/selftests/kvm/Makefile          |   1 +
->>   .../kvm/x86_64/coco_pre_fault_memory_test.c   | 314 ++++++++++++++++++
->>   2 files changed, 315 insertions(+)
->>   create mode 100644 tools/testing/selftests/kvm/x86_64/
->> coco_pre_fault_memory_test.c
->>
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/
->> selftests/kvm/Makefile
->> index 48d32c5aa3eb..65d19b277b06 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -129,6 +129,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/amx_test
->>   TEST_GEN_PROGS_x86_64 += x86_64/max_vcpuid_cap_test
->>   TEST_GEN_PROGS_x86_64 += x86_64/triple_fault_event_test
->>   TEST_GEN_PROGS_x86_64 += x86_64/recalc_apic_map_test
->> +TEST_GEN_PROGS_x86_64 += x86_64/coco_pre_fault_memory_test
->>   TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
->>   TEST_GEN_PROGS_x86_64 += demand_paging_test
->>   TEST_GEN_PROGS_x86_64 += dirty_log_test
->> diff --git a/tools/testing/selftests/kvm/x86_64/
->> coco_pre_fault_memory_test.c b/tools/testing/selftests/kvm/x86_64/
->> coco_pre_fault_memory_test.c
->> new file mode 100644
->> index 000000000000..e16fe185fb5a
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/x86_64/coco_pre_fault_memory_test.c
->> @@ -0,0 +1,314 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +#include <linux/sizes.h>
->> +
->> +#include <test_util.h>
->> +#include <kvm_util.h>
->> +#include <processor.h>
->> +#include "sev.h"
->> +
->> +/* Arbitrarily chosen values */
->> +#define TEST_SIZE        (SZ_2M + PAGE_SIZE)
->> +#define TEST_NPAGES        (TEST_SIZE / PAGE_SIZE)
->> +#define TEST_SLOT        10
->> +#define TEST_GPA        0x100000000ul
->> +#define TEST_GVA        0x100000000ul
->> +
->> +enum prefault_snp_test_type {
->> +    /* Skip pre-faulting tests. */
->> +    NO_PREFAULT_TYPE = 0,
->> +    /*
->> +     * Issue KVM_PRE_FAULT_MEMORY for GFNs mapping non-private memory
->> +     * before finalizing the initial guest contents (e.g. via
->> +     * KVM_SEV_SNP_LAUNCH_FINISH for SNP guests).
->> +     *
->> +     * This should result in failure since KVM explicitly disallows
->> +     * KVM_PRE_FAULT_MEMORY from being issued prior to finalizing the
->> +     * initial guest contents.
->> +     */
->> +    PREFAULT_SHARED_BEFORE_FINALIZING = 0,
->> +    /*
->> +     * Issue KVM_PRE_FAULT_MEMORY for GFNs mapping private memory
->> +     * before finalizing the initial guest contents (e.g. via
->> +     * KVM_SEV_SNP_LAUNCH_FINISH for SNP guests).
->> +     *
->> +     * This should result in failure since KVM explicitly disallows
->> +     * KVM_PRE_FAULT_MEMORY from being issued prior to finalizing the
->> +     * initial guest contents.
->> +     */
->> +    PREFAULT_PRIVATE_BEFORE_FINALIZING,
->> +    /*
->> +     * Issue KVM_PRE_FAULT_MEMORY for GFNs mapping shared/private
->> +     * memory after finalizing the initial guest contents
->> +     * (e.g. via * KVM_SEV_SNP_LAUNCH_FINISH for SNP guests).
->> +     *
->> +     * This should succeed since pre-faulting is supported for both
->> +     * non-private/private memory once the guest contents are finalized.
->> +     */
->> +    PREFAULT_PRIVATE_SHARED_AFTER_FINALIZING
->> +};
->> +
->> +static void guest_code_sev(void)
->> +{
->> +    int i;
->> +
->> +    GUEST_ASSERT(rdmsr(MSR_AMD64_SEV) & MSR_AMD64_SEV_ENABLED);
->> +
->> +    for (i = 0; i < TEST_NPAGES; i++) {
->> +        uint64_t *src = (uint64_t *)(TEST_GVA + i * PAGE_SIZE);
->> +        uint64_t val = *src;
->> +
->> +        /* Validate the data stored in the pages */
->> +        if ((i < TEST_NPAGES / 2 && val != i + 1) ||
->> +            (i >= TEST_NPAGES / 2 && val != 0)) {
->> +            GUEST_FAIL("Inconsistent view of memory values in guest");
->> +        }
->> +    }
->> +
->> +    if (rdmsr(MSR_AMD64_SEV) & MSR_AMD64_SEV_ES_ENABLED) {
->> +        wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
->> +        __asm__ __volatile__("rep; vmmcall");
->> +        GUEST_FAIL("This should be unreachable.");
->> +    }
->> +
->> +    GUEST_DONE();
->> +}
->> +
->> +static void __pre_fault_memory(struct kvm_vcpu *vcpu, u64 gpa, u64 size,
->> +                   u64 left, bool expect_fail)
->> +{
->> +    struct kvm_pre_fault_memory range = {
->> +        .gpa = gpa,
->> +        .size = size,
->> +        .flags = 0,
->> +    };
->> +    int ret, save_errno;
->> +    u64 prev;
->> +
->> +    do {
->> +        prev = range.size;
->> +        ret = __vcpu_ioctl(vcpu, KVM_PRE_FAULT_MEMORY, &range);
->> +        save_errno = errno;
->> +        TEST_ASSERT((range.size < prev) ^ (ret < 0),
->> +                "%sexpecting range.size to change on %s",
->> +                ret < 0 ? "not " : "",
->> +                ret < 0 ? "failure" : "success");
->> +    } while (ret >= 0 ? range.size : save_errno == EINTR);
->> +
->> +    TEST_ASSERT(expect_fail ? !(range.size == left) : (range.size ==
->> left),
->> +            "[EXPECT %s] completed with %lld bytes left, expected %"
->> PRId64,
->> +            expect_fail ? "FAIL" : "PASS",
->> +            range.size, left);
->> +
->> +    if (left == 0) {
->> +        TEST_ASSERT(expect_fail ? ret : !ret,
->> +                "[EXPECT %s] KVM_PRE_FAULT_MEMORY",
->> +                expect_fail ? "FAIL" : "PASS");
->> +    } else {
->> +        /*
->> +         * For shared memory, no memory slot causes RET_PF_EMULATE. It
->> +         * results in -ENOENT.
->> +         *
->> +         * For private memory, no memory slot is an error case returning
->> +         * -EFAULT, but it also possible the only the GPA ranges backed
->> +         *  by a slot are marked as private, in which case the noslot
->> +         *  range will also result in -ENOENT.
->> +         *
->> +         *  So allow both errors for now, but in the future it would be
->> +         *  good to distinguish between these cases to tighten up the
->> +         *  error-checking.
->> +         */
->> +        TEST_ASSERT(expect_fail ? !ret :
->> +                (ret && (save_errno == EFAULT || save_errno == ENOENT)),
->> +                "[EXPECT %s] KVM_PRE_FAULT_MEMORY",
->> +                expect_fail ? "FAIL" : "PASS");
->> +    }
->> +}
->> +
->> +static void pre_fault_memory(struct kvm_vcpu *vcpu, u64 gpa,
->> +                 u64 size, u64 left)
->> +{
->> +    __pre_fault_memory(vcpu, gpa, size, left, false);
->> +}
->> +
->> +static void pre_fault_memory_negative(struct kvm_vcpu *vcpu, u64 gpa,
->> +                      u64 size, u64 left)
->> +{
->> +    __pre_fault_memory(vcpu, gpa, size, left, true);
->> +}
->> +
->> +static void pre_fault_memory_snp(struct kvm_vcpu *vcpu, struct kvm_vm
->> *vm,
->> +                 bool private, enum prefault_snp_test_type p_type)
->> +{
->> +    if (p_type == PREFAULT_SHARED_BEFORE_FINALIZING)
->> +        pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
->> +
->> +    snp_vm_launch_start(vm, SNP_POLICY);
->> +
->> +    if (p_type == PREFAULT_SHARED_BEFORE_FINALIZING)
->> +        pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
->> +
->> +    if (private) {
->> +        /*
->> +         * Make sure when pages are pre-faulted later after
->> +         * finalization they are treated the same as a private
->> +         * access by the guest so that the expected gmem
->> +         * backing pages are used.
->> +         */
->> +        vm_mem_set_private(vm, TEST_GPA, TEST_SIZE);
->> +        if (p_type == PREFAULT_PRIVATE_BEFORE_FINALIZING)
->> +            pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
->> +    } else {
->> +        if (p_type == PREFAULT_SHARED_BEFORE_FINALIZING)
->> +            pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
->> +    }
->> +
->> +    snp_vm_launch_update(vm);
->> +
->> +    if (p_type == PREFAULT_SHARED_BEFORE_FINALIZING)
->> +        pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
->> +
->> +    snp_vm_launch_finish(vm);
->> +
->> +    /*
->> +     * After finalization, pre-faulting either private or shared
->> +     * ranges should work regardless of whether the pages were
->> +     * encrypted as part of setting up initial guest state.
->> +     */
->> +    if (p_type == PREFAULT_PRIVATE_SHARED_AFTER_FINALIZING) {
->> +        pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
->> +        pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2,
->> PAGE_SIZE);
->> +        pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE,
->> PAGE_SIZE);
->> +    }
->> +}
->> +
->> +static void pre_fault_memory_sev(unsigned long vm_type, struct
->> kvm_vcpu *vcpu,
->> +                 struct kvm_vm *vm)
->> +{
->> +    uint32_t policy = (vm_type == KVM_X86_SEV_ES_VM) ?
->> SEV_POLICY_ES : 0;
->> +
->> +    pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
->> +    pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
->> +    pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
->> +
->> +    sev_vm_launch(vm, policy);
->> +
->> +    pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
->> +    pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
->> +    pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
->> +
->> +    sev_vm_launch_measure(vm, alloca(256));
->> +
->> +    pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
->> +    pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
->> +    pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
->> +
->> +    sev_vm_launch_finish(vm);
->> +
->> +    pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
->> +    pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
->> +    pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
->> +}
->> +
->> +static void test_pre_fault_memory_sev(unsigned long vm_type, bool
->> private,
->> +                      enum prefault_snp_test_type p_type)
->> +{
->> +    struct kvm_vcpu *vcpu;
->> +    struct kvm_vm *vm;
->> +    struct ucall uc;
->> +    int i;
->> +
->> +    vm = vm_sev_create_with_one_vcpu(vm_type, guest_code_sev, &vcpu);
->> +
->> +    vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
->> +                    TEST_GPA, TEST_SLOT, TEST_NPAGES,
->> +                    (vm_type == KVM_X86_SNP_VM) ?
->> KVM_MEM_GUEST_MEMFD : 0);
->> +
->> +    /*
->> +     * Make sure guest page table is in agreement with what pages
->> will be
->> +     * initially encrypted by the ASP.
->> +     */
->> +    if (private)
->> +        vm_mem_set_protected(vm, TEST_SLOT, TEST_GPA, TEST_NPAGES);
->> +
->> +    virt_map(vm, TEST_GVA, TEST_GPA, TEST_NPAGES);
->> +
->> +    /*
->> +     * Populate the pages to compare data read from the guest
->> +     * Populate the first half with data and second half as all zeros.
->> +     */
->> +    for (i = 0; i < TEST_NPAGES; i++) {
->> +        uint64_t *hva = addr_gva2hva(vm, TEST_GVA + i * PAGE_SIZE);
->> +
->> +        if (i < TEST_NPAGES / 2)
->> +            *hva = i + 1;
->> +        else
->> +            *hva = 0;
->> +    }
->> +
->> +    if (vm_type == KVM_X86_SNP_VM)
->> +        pre_fault_memory_snp(vcpu, vm, private, p_type);
->> +    else
->> +        pre_fault_memory_sev(vm_type, vcpu, vm);
->> +
->> +    vcpu_run(vcpu);
->> +
->> +    if (vm->type == KVM_X86_SEV_ES_VM || vm->type == KVM_X86_SNP_VM) {
->> +        TEST_ASSERT(vcpu->run->exit_reason == KVM_EXIT_SYSTEM_EVENT,
->> +                "Wanted SYSTEM_EVENT, got %s",
->> +                exit_reason_str(vcpu->run->exit_reason));
->> +        TEST_ASSERT_EQ(vcpu->run->system_event.type,
->> KVM_SYSTEM_EVENT_SEV_TERM);
->> +        TEST_ASSERT_EQ(vcpu->run->system_event.ndata, 1);
->> +        TEST_ASSERT_EQ(vcpu->run->system_event.data[0],
->> GHCB_MSR_TERM_REQ);
->> +        goto out;
->> +    }
->> +
->> +    switch (get_ucall(vcpu, &uc)) {
->> +    case UCALL_DONE:
->> +        break;
->> +    case UCALL_ABORT:
->> +        REPORT_GUEST_ASSERT(uc);
->> +    default:
->> +        TEST_FAIL("Unexpected exit: %s",
->> +              exit_reason_str(vcpu->run->exit_reason));
->> +    }
->> +
->> +out:
->> +    kvm_vm_free(vm);
->> +}
->> +
->> +static void test_pre_fault_memory(unsigned long vm_type, bool private)
->> +{
->> +    int pt;
->> +
->> +    if (vm_type && !(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type))) {
->> +        pr_info("Skipping tests for vm_type 0x%lx\n", vm_type);
->> +        return;
->> +    }
->> +
->> +    switch (vm_type) {
->> +    case KVM_X86_SEV_VM:
->> +    case KVM_X86_SEV_ES_VM:
->> +        test_pre_fault_memory_sev(vm_type, private, NO_PREFAULT_TYPE);
->> +        break;
->> +    case KVM_X86_SNP_VM:
->> +        for (pt = 0; pt <= PREFAULT_PRIVATE_SHARED_AFTER_FINALIZING;
->> pt++)
->> +            test_pre_fault_memory_sev(vm_type, private, pt);
->> +        break;
->> +    default:
->> +        abort();
->> +    }
->> +}
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +    TEST_REQUIRE(kvm_check_cap(KVM_CAP_PRE_FAULT_MEMORY));
->> +
->> +    test_pre_fault_memory(KVM_X86_SEV_VM, false);
->> +    test_pre_fault_memory(KVM_X86_SEV_VM, true);
->> +    test_pre_fault_memory(KVM_X86_SEV_ES_VM, false);
->> +    test_pre_fault_memory(KVM_X86_SEV_ES_VM, true);
->> +    test_pre_fault_memory(KVM_X86_SNP_VM, false);
->> +    test_pre_fault_memory(KVM_X86_SNP_VM, true);
->> +
->> +    return 0;
->> +}
+On Mon, Aug 05, 2024, David Matlack wrote:
+> Recheck the iter.old_spte still points to a page table when recovering
+> huge pages. Since mmu_lock is held for read and tdp_iter_step_up()
+> re-reads iter.sptep, it's possible the SPTE was zapped or recovered by
+> another CPU in between stepping down and back up.
 > 
-> Hello Pratik,
-> I see below failure while running this test [kvm-x86/next + mentioned
-> patches]:
+> This could avoids a useless cmpxchg (and possibly a remote TLB flush) if
+> another CPU is recovering huge SPTEs in parallel (e.g. the NX huge page
+> recovery worker, or vCPUs taking faults on the huge page region).
 > 
-> # selftests: kvm: coco_pre_fault_memory_test
-> # Random seed: 0x6b8b4567
-> # ==== Test Assertion Failure ====
-> #   x86_64/coco_pre_fault_memory_test.c:145: expect_fail ? !(range.size
-> == left) : (range.size == left)
-> #   pid=202665 tid=202665 errno=9 - Bad file descriptor
-> #      1        0x0000000000402870: __pre_fault_memory at
-> coco_pre_fault_memory_test.c:145
-> #      2        0x00000000004031c9: pre_fault_memory_negative at
-> coco_pre_fault_memory_test.c:184
-> #      3         (inlined by) pre_fault_memory_snp at
-> coco_pre_fault_memory_test.c:202
-> #      4         (inlined by) test_pre_fault_memory_sev at
-> coco_pre_fault_memory_test.c:344
-> #      5        0x00000000004033c0: test_pre_fault_memory at
-> coco_pre_fault_memory_test.c:401 (discriminator 3)
-> #      6        0x00000000004024d7: main at
-> coco_pre_fault_memory_test.c:417 (discriminator 2)
-> #      7        0x00007f9474829d8f: ?? ??:0
-> #      8        0x00007f9474829e3f: ?? ??:0
-> #      9        0x0000000000402574: _start at ??:?
-> #   [EXPECT FAIL] completed with 0 bytes left, expected 0
-> not ok 66 selftests: kvm: coco_pre_fault_memory_test # exit=254
+> This also makes it clear that tdp_iter_step_up() re-reads the SPTE and
+> thus can see a different value, which is not immediately obvious when
+> reading the code.
 > 
-
-Hi Srikanth,
-
-Thanks for testing these patches.
-
-I believe that you may have to test these patches either over the
-kvm-x86/fixes branch or over kvm/[queue/next] since there are a few
-fixes (eg. KVM: x86: disallow pre-fault for SNP VMs before
-initialization, etc.) which are not present in kvm-x86/next.
-
-Do let me know if that works for you instead for the tests?
-
-Thanks!
-Pratik
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
-> 
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 07d5363c9db7..bdc7fd476721 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1619,6 +1619,17 @@ static void recover_huge_pages_range(struct kvm *kvm,
+>  		while (max_mapping_level > iter.level)
+>  			tdp_iter_step_up(&iter);
+>  
+> +		/*
+> +		 * Re-check that iter.old_spte still points to a page table.
+> +		 * Since mmu_lock is held for read and tdp_iter_step_up()
+> +		 * re-reads iter.sptep, it's possible the SPTE was zapped or
+> +		 * recovered by another CPU in between stepping down and
+> +		 * stepping back up.
+> +		 */
+> +		if (!is_shadow_present_pte(iter.old_spte) ||
+> +		    is_last_spte(iter.old_spte, iter.level))
+> +			continue;
 
+This is the part of the step-up logic that I do not like.  Even this check doesn't
+guarantee that the SPTE that is being replaced is the same non-leaf SPTE that was
+used to reach the leaf SPTE.  E.g. in an absurdly theoretical situation, the SPTE
+could be zapped and then re-set with another non-leaf SPTE.  Which is fine, but
+only because of several very subtle mechanisms.
+
+kvm_mmu_max_mapping_level() ensures that there are no write-tracked gfns anywhere
+in the huge range, so it's safe to propagate any and all WRITABLE bits.  This
+requires knowing/remembering that KVM disallows huge pages when a gfn is write-
+tracked, and relies on that never changing (which is a fairly safe bet, but the
+behavior isn't fully set in stone).
+not set.
+
+And the presence of a shadow-present leaf SPTE ensures there are no in-flight
+mmu_notifier invalidations, as kvm_mmu_notifier_invalidate_range_start() won't
+return until all relevant leaf SPTEs have been zapped.
+
+And even more subtly, recover_huge_pages_range() can install a huge SPTE while
+tdp_mmu_zap_leafs() is running, e.g. if tdp_mmu_zap_leafs() is processing 4KiB
+SPTEs because the greater 2MiB page is being unmapped by the primary MMU, and
+tdp_mmu_zap_leafs() yields.   That's again safe only because upon regaining
+control, tdp_mmu_zap_leafs() will restart at the root and thus observe and zap
+the new huge SPTE.
+
+So while I'm pretty sure this logic is functionally ok, its safety is extremely
+dependent on a number of behaviors in KVM.
+
+That said, I can't tell which option I dislike less.  E.g. we could do something
+like this, where kvm_mmu_name_tbd() grabs the pfn+writable information from the
+primary MMU's PTE/PMD/PUD.  Ideally, KVM would use GUP, but then KVM wouldn't
+be able to create huge SPTEs for non-GUP-able memory, e.g. PFNMAP'd memory.
+
+I don't love this either, primarily because not using GUP makes this yet another
+custom flow, i.e. isn't any less tricky than reusing a child SPTE.  It does have
+the advantage of not having to find a shadow-present child though, i.e. is likely
+the most performant option.  I agree that that likely doesn't matter in practice,
+especially since the raw latency of disabling dirty logging isn't terribly
+important.
+
+	rcu_read_lock();
+
+	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_2M, start, end) {
+retry:
+		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
+			continue;
+
+		if (iter.level > KVM_MAX_HUGEPAGE_LEVEL ||
+		    !is_shadow_present_pte(iter.old_spte))
+			continue;
+
+		/* 
+		 * TODO: this should skip to the end of the parent, because if
+		 * the first SPTE can't be made huger, then no SPTEs at this
+		 * level can be huger.
+		 */
+		if (is_last_spte(iter.old_spte, iter.level))
+			continue;
+
+		/*
+		 * If iter.gfn resides outside of the slot, i.e. the page for
+		 * the current level overlaps but is not contained by the slot,
+		 * then the SPTE can't be made huge.  More importantly, trying
+		 * to query that info from slot->arch.lpage_info will cause an
+		 * out-of-bounds access.
+		 */
+		if (iter.gfn < start || iter.gfn >= end)
+			continue;
+
+		if (kvm_mmu_name_tbd(kvm, slot, iter.gfn, &pfn, &writable,
+				     &max_mapping_level))
+			continue;
+
+		/*
+		 * If the range is being invalidated, do not install a SPTE as
+		 * KVM may have already zapped this specific gfn, e.g. if KVM's
+		 * unmapping has run to completion, but the primary MMU hasn't
+		 * zapped its PTEs.  There is no need to check for *past*
+		 * invalidations, because all information is gathered while
+		 * holding mmu_lock, i.e. it can't have become stale due to a
+		 * entire mmu_notifier invalidation sequence completing.
+		 */
+		if (mmu_invalidate_retry_gfn(kvm, kvm->mmu_invalidate_seq, iter.gfn))
+			continue;
+
+		/*
+		 * KVM disallows huge pages for write-protected gfns, it should
+		 * impossible for make_spte() to encounter such a gfn since
+		 * write-protecting a gfn requires holding mmu_lock for write.
+		 */
+		flush |= __tdp_mmu_map_gfn(...);
+		WARN_ON_ONCE(r == RET_PF_EMULATE);
+	}
+
+	rcu_read_unlock();
+
+Assuming you don't like the above idea (I'm not sure I do), what if instead of
+doing the step-up, KVM starts a second iteration using the shadow page it wants
+to replace as the root of the walk?
+
+This has the same subtle dependencies on kvm_mmu_max_mapping_level() and the
+ordering with respect to an mmu_notifier invalidation, but it at least avoids
+having to reason about the correctness of re-reading a SPTE and modifying the
+iteration level within the body of an interation loop.
+
+It should also yield smaller diffs overall, e.g. no revert, no separate commit
+to recheck the SPTE, etc.  And I believe it's more performant that the step-up
+approach when there are SPTE that _can't_ be huge, as KVM won't traverse down
+into the leafs in that case.
+
+An alternative to the tdp_mmu_iter_needs_reched() logic would be to pass in
+&flush, but I think that ends up being more confusing and harder to follow.
+
+static int tdp_mmu_make_huge_spte(struct kvm *kvm, struct tdp_iter *parent,
+				  u64 *huge_spte)
+{
+	struct kvm_mmu_page *root = sptep_to_sp(parent->sptep);
+	gfn_t start = parent->gfn;
+	gfn_t end = start + ???; /* use parent's level */
+	struct tdp_iter iter;
+
+	tdp_root_for_each_leaf_pte(iter, root, start, end) 	{
+		/*
+		 * Use the parent iterator when checking for forward progress,
+		 * so that KVM doesn't get stuck due to always yielding while
+		 * walking child SPTEs.
+		 */
+		if (tdp_mmu_iter_needs_reched(kvm, parent))
+			return -EAGAIN;
+
+		*huge_spte = make_huge_spte(kvm, iter.old_spte);
+		return 0;
+	}
+
+	return -ENOENT;
+}
+
+static void recover_huge_pages_range(struct kvm *kvm,
+				     struct kvm_mmu_page *root,
+				     const struct kvm_memory_slot *slot)
+{
+	gfn_t start = slot->base_gfn;
+	gfn_t end = start + slot->npages;
+	struct tdp_iter iter;
+	int max_mapping_level;
+	bool flush = false;
+	u64 huge_spte;
+
+	if (WARN_ON_ONCE(kvm_slot_dirty_track_enabled(slot)))
+		return;
+
+	rcu_read_lock();
+
+	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_2M, start, end) {
+restart:
+		if (tdp_mmu_iter_cond_resched(kvm, &iter, flush, true)) {
+			flush = false;
+			continue;
+		}
+
+		if (iter.level > KVM_MAX_HUGEPAGE_LEVEL ||
+		    !is_shadow_present_pte(iter.old_spte))
+			continue;
+
+                /*
+                 * If iter.gfn resides outside of the slot, i.e. the page for
+                 * the current level overlaps but is not contained by the slot,
+                 * then the SPTE can't be made huge.  More importantly, trying
+                 * to query that info from slot->arch.lpage_info will cause an
+                 * out-of-bounds access.
+                 */
+                if (iter.gfn < start || iter.gfn >= end)
+                        continue;
+
+                max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot, iter.gfn);
+                if (max_mapping_level < iter.level)
+                        continue;
+
+		r = tdp_mmu_make_huge_spte(kvm, &iter, &huge_spte);
+		if (r == -EAGAIN)
+			goto restart;
+		else if (r)
+			continue;
+
+		/*
+		 * If setting the SPTE fails, e.g. because it has been modified
+		 * by a different task, iteration will naturally continue with
+		 * the next SPTE.  Don't bother retrying this SPTE, races are
+		 * uncommon and odds are good the SPTE 
+		 */
+		if (!tdp_mmu_set_spte_atomic(kvm, &iter, huge_spte))
+			flush = true;
+	}
+
+	if (flush)
+		kvm_flush_remote_tlbs_memslot(kvm, slot);
+
+	rcu_read_unlock();
+}
+
+static inline bool tdp_mmu_iter_needs_reched(struct kvm *kvm,
+					     struct tdp_iter *iter)
+{
+	/* Ensure forward progress has been made before yielding. */
+	return iter->next_last_level_gfn != iter->yielded_gfn &&
+	       (need_resched() || rwlock_needbreak(&kvm->mmu_lock));
+
+}
+
+/*
+ * Yield if the MMU lock is contended or this thread needs to return control
+ * to the scheduler.
+ *
+ * If this function should yield and flush is set, it will perform a remote
+ * TLB flush before yielding.
+ *
+ * If this function yields, iter->yielded is set and the caller must skip to
+ * the next iteration, where tdp_iter_next() will reset the tdp_iter's walk
+ * over the paging structures to allow the iterator to continue its traversal
+ * from the paging structure root.
+ *
+ * Returns true if this function yielded.
+ */
+static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
+							  struct tdp_iter *iter,
+							  bool flush, bool shared)
+{
+	WARN_ON_ONCE(iter->yielded);
+
+	if (!tdp_mmu_iter_needs_reched(kvm, iter))
+		return false;
+
+	if (flush)
+		kvm_flush_remote_tlbs(kvm);
+
+	rcu_read_unlock();
+
+	if (shared)
+		cond_resched_rwlock_read(&kvm->mmu_lock);
+	else
+		cond_resched_rwlock_write(&kvm->mmu_lock);
+
+	rcu_read_lock();
+
+	WARN_ON_ONCE(iter->gfn > iter->next_last_level_gfn);
+
+	iter->yielded = true;
+	return true;
+}
 
