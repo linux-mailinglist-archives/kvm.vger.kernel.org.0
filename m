@@ -1,112 +1,131 @@
-Return-Path: <kvm+bounces-24830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33D5E95B9CB
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 17:15:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AAA195B9FA
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 17:21:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9BDB287DED
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 15:15:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C62BB282ED2
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 15:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B981CCB37;
-	Thu, 22 Aug 2024 15:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FDC1CBE9A;
+	Thu, 22 Aug 2024 15:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Nb3175Ni"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D471CB31B;
-	Thu, 22 Aug 2024 15:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6570D2C87A;
+	Thu, 22 Aug 2024 15:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724339666; cv=none; b=ZgKvT8hf1c6dQEqftfFPibH7V8g2kKlPGdkBYEaCAWfmT8ioaWgTRN8aZ8RbzrPoEr8welU22OMMsPt9thhc6CM80T61yuz7JIH4OkPiSWUm2pTxSA24ZTjKP4ZsGmO6lqP0IS+IHuL7VdRjTou8iqOJHugo6tBYW1dhRcWcWZQ=
+	t=1724340077; cv=none; b=OKS6VDokbvBVkGPHL0j3/qg1VSJPhxwyPXXdoN5qUSeXdp4mNamARu2YhgqxTXQUmpwcUO2STYNTjeM86Bp8ugpiBxc+llos8LKsccW/BagKdAL8OVeWa0kduZalqlCE93yW9PDyeb3wJkEps/gu3RJuHg4mrWG8xX7iKCS1SK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724339666; c=relaxed/simple;
-	bh=Z0x+iQbZGRupwKlqBCAsGrzbaayYp2vs4jBrbc+BHTI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JLuWTz7M/AUMSM5kQDyeisdZsXE/dSa7EOJWYZ+HwpiD7MbsN7noVWuxY3+ASZadiJuLq0uo65LOyB45yf2W5bx81bg8Ce0mUJYkWFlmapROmwT6KX+6K/HQ45FL7Np5QJH7WdbGmqNWJZAk1p+pAY/s7IAYlkzTqFyoz6kv38Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DB36F169E;
-	Thu, 22 Aug 2024 08:14:50 -0700 (PDT)
-Received: from [10.57.85.214] (unknown [10.57.85.214])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58C693F58B;
-	Thu, 22 Aug 2024 08:14:20 -0700 (PDT)
-Message-ID: <8c0f787c-35d4-4cb1-84d3-ff3f2e3f003a@arm.com>
-Date: Thu, 22 Aug 2024 16:14:18 +0100
+	s=arc-20240116; t=1724340077; c=relaxed/simple;
+	bh=0ebK4nIoa5BOEpjmy0XRvJ7VKPjWzhDV62tWEIf3CvI=;
+	h=MIME-Version:Content-Type:Date:Message-ID:Subject:From:To:CC:
+	 References:In-Reply-To; b=f3cMRQPypWpP9xBgt2Yu3WsqFxPxlPIVUBlPzi4r5chT5co6HVQFM+lhN+IPx9Ez+ChreuQ7S6v1K/L3Pu2qKWi+WFkOQSz4DDjp4IPULbxANbZ5qD746M/RFiqvLD4ttxvY45XQ859TGj7h1KUI+TiXDKztwg96w3KGefUqf88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Nb3175Ni; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1724340076; x=1755876076;
+  h=mime-version:content-transfer-encoding:date:message-id:
+   subject:from:to:cc:references:in-reply-to;
+  bh=f2eZRkmfeS+Cis+NAGo9bRj42tCz3s9a2o3q7s6DBDI=;
+  b=Nb3175NisnR/bLRTZF5JH6RsxlhnLRl4jkdVvDYmOEDpb1BAzPLVGMhd
+   riJlEe8TVeazzg14jUnoxOq6nFTd/eNN7MtsOZr1T0Iw32dIZBRS+bclh
+   NcMXkPQJLulj8VcPAjbLFUiAokMerKtGAtuY912QW53BvmS0BQ+GL9U/5
+   A=;
+X-IronPort-AV: E=Sophos;i="6.10,167,1719878400"; 
+   d="scan'208";a="20619224"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 15:21:13 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:7014]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.33.212:2525] with esmtp (Farcaster)
+ id a3167566-1ec3-4ce8-b883-c56528e2878a; Thu, 22 Aug 2024 15:21:12 +0000 (UTC)
+X-Farcaster-Flow-ID: a3167566-1ec3-4ce8-b883-c56528e2878a
+Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 22 Aug 2024 15:21:11 +0000
+Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
+ (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Thu, 22 Aug 2024
+ 15:21:05 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 21/43] arm64: RME: Runtime faulting of memory
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>
-References: <20240821153844.60084-1-steven.price@arm.com>
- <20240821153844.60084-22-steven.price@arm.com> <yq5afrqx2pxr.fsf@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <yq5afrqx2pxr.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 22 Aug 2024 15:21:02 +0000
+Message-ID: <D3MJJCTNY7OM.WOB5W8AVBH9G@amazon.com>
+Subject: Re: [PATCH 16/18] KVM: x86: Take mem attributes into account when
+ faulting memory
+From: Nicolas Saenz Julienne <nsaenz@amazon.com>
+To: Nicolas Saenz Julienne <nsaenz@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC: <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+	<linux-doc@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
+	<graf@amazon.de>, <dwmw2@infradead.org>, <pdurrant@amazon.com>,
+	<mlevitsk@redhat.com>, <jgowans@amazon.com>, <corbet@lwn.net>,
+	<decui@microsoft.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+	<amoorthy@google.com>
+X-Mailer: aerc 0.18.2-22-gfff69046b02f-dirty
+References: <20240609154945.55332-1-nsaenz@amazon.com>
+ <20240609154945.55332-17-nsaenz@amazon.com>
+In-Reply-To: <20240609154945.55332-17-nsaenz@amazon.com>
+X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
+ EX19D004EUC001.ant.amazon.com (10.252.51.190)
 
-On 22/08/2024 04:32, Aneesh Kumar K.V wrote:
-> Steven Price <steven.price@arm.com> writes:
-> 
->> At runtime if the realm guest accesses memory which hasn't yet been
->> mapped then KVM needs to either populate the region or fault the guest.
->>
->> For memory in the lower (protected) region of IPA a fresh page is
->> provided to the RMM which will zero the contents. For memory in the
->> upper (shared) region of IPA, the memory from the memslot is mapped
->> into the realm VM non secure.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v2:
->>  * Avoid leaking memory if failing to map it in the realm.
->>  * Correctly mask RTT based on LPA2 flag (see rtt_get_phys()).
->>  * Adapt to changes in previous patches.
->>
-> 
-> ....
-> 
->> -	gfn = ipa >> PAGE_SHIFT;
->> +	gfn = (ipa & ~gpa_stolen_mask) >> PAGE_SHIFT;
->>  	memslot = gfn_to_memslot(vcpu->kvm, gfn);
->> +
->> +	if (kvm_slot_can_be_private(memslot)) {
->> +		ret = private_memslot_fault(vcpu, fault_ipa, memslot);
->> +		if (ret != -EAGAIN)
->> +			goto out;
->> +	}
->>
-> 
-> Shouldn't this be s/fault_ipa/ipa ?
+On Sun Jun 9, 2024 at 3:49 PM UTC, Nicolas Saenz Julienne wrote:
+> Take into account access restrictions memory attributes when faulting
+> guest memory. Prohibited memory accesses will cause an user-space fault
+> exit.
+>
+> Additionally, bypass a warning in the !tdp case. Access restrictions in
+> guest page tables might not necessarily match the host pte's when memory
+> attributes are in use.
+>
+> Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
 
-Well they should both be the same unless we're in some scary parallel
-universe where we have nested virtualisation *and* realms at the same
-time (shudder!). But yes "ipa" would be more consistent so I'll change it!
+I now realize that only taking into account memory attributes during
+faults isn't good enough for VSM. We should check the attributes anytime
+KVM takes GPAs as input for any action initiated by the guest. If the
+memory attributes are incompatible with such action, it should be
+stopped. Failure to do so opens side channels that unprivileged VTLs can
+abuse to infer information about privileged VTL. Some examples I came up
+with:
+- Guest page walks: VTL0 could install malicious directory entries that
+  point to GPAs only visible to VTL1. KVM will happily continue the
+  walk. Among other things, this could be use to infer VTL1's GVA->GPA
+  mappings.
+- PV interfaces like the Hyper-V TSC page or VP assist page, could be
+  used to modify portions of VTL1 memory.
+- Hyper-V hypercalls that take GPAs as input/output can be abused in a
+  myriad of ways. Including ones that exit into user-space.
 
-Steve
+We would be protected against all these if we implemented the memory
+access restrictions through the memory slots API. As is, it has the
+drawback of having to quiesce the whole VM for any non-trivial slot
+modification (i.e. VSM's memory protections). But if we found a way to
+speed up the slot updates we could rely on that, and avoid having to
+teach kvm_read/write_guest() and friends to deal with memattrs. Note
+that we would still need to use memory attributes to request for faults
+to exit onto user-space on those select GPAs. Any opinions or
+suggestions?
 
-> 	ret = private_memslot_fault(vcpu, ipa, memslot);
-> 
-> -aneesh
+Note that, for now, I'll stick with the memory attributes approach to
+see what the full solution looks like.
 
+Nicolas
 
