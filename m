@@ -1,383 +1,172 @@
-Return-Path: <kvm+bounces-24841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAEA495BCBC
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 19:06:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED6495BD13
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 19:24:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF90BB23D99
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 17:03:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E05E61C220ED
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 17:24:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603C41CDFD4;
-	Thu, 22 Aug 2024 17:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7C21CEACB;
+	Thu, 22 Aug 2024 17:24:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="m/FB6ZFt";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="CJHTUzDE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UqpQhBq+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92171CCEFB;
-	Thu, 22 Aug 2024 17:02:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724346178; cv=fail; b=Geetb5Ahgfrf3nVuA8K3QT2S3wjxnn5PW2eUvVDVnmC/S8pB4FmW9B4Gjwg7DqxO9+97i1/tpwR/oWxmKujGfDxROLCEQJwlyfKhtB6j8zAcjLUV9pXDXhbQ1QFdUSlOpI7HnvlVzrZNxhBc7kBd1al+y65Mf7GtqYP9ggdt9VA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724346178; c=relaxed/simple;
-	bh=KQ4Qq54WtuP07aw6sbc5gyRP/q/eC3EY6C9RgafnS70=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Pwisf1nVz5goIqMgbF/KvOwSSf4ZGplBq3EfUJrjVs8lqRhcAvXkcIiKh/9DJ3jH0nxcsnWgFRG9jeVpfPUW8xKQmG9P0oS7ULmFb4eyo2JxIIM4v6U7NNSIS7FMdqbnQpy5Yyi30n63xDkNoybga7J6yKSB7cHIjZfOYaTsxEc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=m/FB6ZFt; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=CJHTUzDE; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47MEQb6s008281;
-	Thu, 22 Aug 2024 17:02:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	date:from:to:cc:subject:message-id:references:content-type
-	:content-transfer-encoding:in-reply-to:mime-version; s=
-	corp-2023-11-20; bh=BE3KYGhgpXVBBPSOYNWgGYdyaAFa9A9F6evta5ZQvkw=; b=
-	m/FB6ZFtnZchjTJmRI5B8Z8zhxZFnzJzPvR6Hh9DUz+YJQoM1hL8PDRSMEtVOhoF
-	McnPApGqcXALn/oM6lgVR0UVaXwfQiG3i/LxzBQYvIP0aY3cgxpXY3SJfegwipaU
-	M6zhl+AvdJd+4MTSV63rdqWIaOXXZFd/V34xJEWKDt0/grsKuWGI0/z5MG2A2b7j
-	NN4LP2XhCdbrMHtTBmufU4Ilw42yOxBqxb5i71V+foR3LGmjlNJ8xockj6KT62he
-	M/hgYXcvzd+wZIDQ/uUtzPzQbFGtRp3bDLQE5XPHCPwT/6vEVBZyeEIvGtFKv2db
-	WQ3b4OmmiZVkbgiIF63nLQ==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 412m4v2k22-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 Aug 2024 17:02:32 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 47MGwxll018849;
-	Thu, 22 Aug 2024 17:02:31 GMT
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2049.outbound.protection.outlook.com [104.47.56.49])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4169b4g7y7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 Aug 2024 17:02:31 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Y51lIor5FvRmhDQipf5wum44Ent6SPEw/5aMdGyuWYAnTt2nuY7R563CVbjJwNNXlCQLvyZMsFgJfUwnxckQOD1ZemOBPB5gDzjC1laHVOsIitOoUgTzkLCRwImfvBBRv6G32tdVwMt0dIs3Ey/FIlYInAIvIDTZvQWUEgTqvJ2EGBh5fzGwbGHjEl8FTDMhTMbNIxekI7LUIxkHzwHWGL6UbbGxruzF3Ca7XngVlRhG+Mh796LP/0Mp/OvijKNWQkfDH1oyh1Q0SKDNM3AyB/zGd4sfGCWRmN6IVE05WxI2yxrfLeHHsqDTmEAXwoLRvUDwkKlzGDbxJTImtw6Rcg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BE3KYGhgpXVBBPSOYNWgGYdyaAFa9A9F6evta5ZQvkw=;
- b=io0Kka/CZcyLm+cNzgMS6VREKb9C9ksqWYMGnyvCwtDokYfjT+obgm9QYNRBoKt09s2TvgTuNeZ1kMfi/0dW7nywlPKLX8ye7QNtewbV3fMYWknqWUXjCn1qajn3q98dl9e4/MXRQNKxs78o/LXarQ0HsVBeFlmwr+8Fek2864rKhy5zb3ff2MVblqIwGbru3dBQk71QC/5dyDJs8o54XPz+GhGDImBjy+eF/sLBvyCQ8kRGcnWvLVEZB7gSl7QZiWJDl/dtKn+h1GLT9EhhP76mWt0GRTYq/nj42PIJJsFbSmRCaNoBs1qvDe4ZFfZ1zJFta2fubAGCLcm7F/7EWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E1D1CEAC6
+	for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 17:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724347474; cv=none; b=jF76cRAzuer87MX501zgDohzC0TVkMWCpQkr7Ax20M8X5s5NIR+8AIvqjro51HrL3TlN1qkliz3FYyvjKx2TfNr9zESz5pzt+QTQcVP8SQ8HkNnYnuO/XW7I50DA+U+2TTaPe7CjMcjNapZphF12RmcXsZ7zfMWWv95ZwkBq2G4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724347474; c=relaxed/simple;
+	bh=FNnRXc/XyYm2YcL44hGop5y6Z9wNRycvY1nLGUoPqJk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GmOmcInBsmQ3QmOD6KCBFYFOdH1pJ5nPfoUcSEEwR++lTHUEByw+DnZwAyKHppPCjUuDYo1zhwoZQ9X5J3db5IfRrDkk/fF88WFZwkpphlBpoMnkR7Rm2Z7itjhjAzmaE7AD4QUygkFaSYX9j1YA305rVQ9Df1XY4g2VlfnNUpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UqpQhBq+; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0b3742b309so1831262276.1
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 10:24:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BE3KYGhgpXVBBPSOYNWgGYdyaAFa9A9F6evta5ZQvkw=;
- b=CJHTUzDEW1muFN1kuMv+rMBmj3yCEPXV/aUAGm7hp9UWlOIoNKVdAZfPWUZ5a/h0nLQgrih2Ffro64TaiijIThVC85bT8bxXSZh9mbvOVMKiX0TbSTAefm3c5WqyOXCeoEnfosJA/qtNKy1SXAZiMNqph/rxO8uQIwLpvbk/kHM=
-Received: from DS0PR10MB7933.namprd10.prod.outlook.com (2603:10b6:8:1b8::15)
- by SA1PR10MB6613.namprd10.prod.outlook.com (2603:10b6:806:2be::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.16; Thu, 22 Aug
- 2024 17:02:26 +0000
-Received: from DS0PR10MB7933.namprd10.prod.outlook.com
- ([fe80::2561:85b0:ae8f:9490]) by DS0PR10MB7933.namprd10.prod.outlook.com
- ([fe80::2561:85b0:ae8f:9490%3]) with mapi id 15.20.7897.014; Thu, 22 Aug 2024
- 17:02:24 +0000
-Date: Thu, 22 Aug 2024 13:02:22 -0400
-From: "Liam R. Howlett" <Liam.Howlett@oracle.com>
-To: Peng Zhang <zhangpeng.00@bytedance.com>
-Cc: pbonzini@redhat.com, chao.p.peng@linux.intel.com, seanjc@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        maple-tree@lists.infradead.org
-Subject: Re: [PATCH RFC] KVM: Use maple tree to manage memory attributes.
-Message-ID: <ybl7pmkjbjkuaqzpmsq53yvcxmayc3lyslftwojddmhj6k23xf@xnuevrpgsrjf>
-References: <20240822065544.65013-1-zhangpeng.00@bytedance.com>
- <8eb1b3c4-5797-4497-b80f-3735a6bf1564@bytedance.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <8eb1b3c4-5797-4497-b80f-3735a6bf1564@bytedance.com>
-User-Agent: NeoMutt/20240425
-X-ClientProxiedBy: YT4PR01CA0468.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:d6::10) To DS0PR10MB7933.namprd10.prod.outlook.com
- (2603:10b6:8:1b8::15)
+        d=google.com; s=20230601; t=1724347472; x=1724952272; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=p9LDICzt8/AlrjXhgJo1A5epNuZdtFyz7+SWPHqTnTM=;
+        b=UqpQhBq+mw1nYYwHgqiIeCoByY0DvlUaOowjrF8KJClhdzeLN3s5D2doSbBefO6Gch
+         cSU9NNoy4JFlG2OBw9+SvNWQuRLYEUZFyCzetW/IwL/PgFVTUpuk61zRI21nh7JNYTIb
+         minW91xIxRc7qDCu6q8/DuaiFoRIN2xnvQGTOyKiFfInfu72v2/ZNWnPqfArWjcsCiWe
+         Zb0tLLPnQV6or6YrFWbQUjW+k2Ck8/WsZOLdPOJNZ+/2HlZcANbMxOPjC6FOt21VTPrw
+         sq9DHZcIqr134swDfT7iYE6VXJcaWOCeBl4d+WN6QvmYtLI7LDFJ/F7w2UpOhVJRM6EQ
+         N8aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724347472; x=1724952272;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p9LDICzt8/AlrjXhgJo1A5epNuZdtFyz7+SWPHqTnTM=;
+        b=ADw4p2aZNE+duz0dVNM2hBZkt8DDpK+yfIlvgNHvw30cx3TfjeAiiODRtnw/7tehlz
+         z/9dKi3sS2+puWkQSgd9b7crEBi+itpQYuttvpN88RC8mh48zqjV1Cuvpv1Tsuqn1PIv
+         Tmth9ojNzSsu/6n1sj7FS3hpv3vCAYfzATZtuxMgL0VTxqK5Ixqk1d0u471StIUonw5E
+         uEomcp6nK4oSGiaY65DSOIKmLW1LtPcr8iv5tYlhClHThCfFRiH0j+M2I4jXEHk1jEw1
+         5FNzFvdngikC9R5uxU/BtplToZU5sMz3MJf/zAU+UyR7Bab0izTWLPPlsAA+x8KuFsdz
+         kPTQ==
+X-Gm-Message-State: AOJu0YzIlvC5KZXCIqfcnO8XCOkfg05Y9bFs/9D7IiF4fcB77q2yATIM
+	cQYXYr6Rv9P28KQnKmwx0wxEocCk1Tw9g6JhnsObUlA7L1fBsczokX05Oku6dzvPJ24yFkQfmIT
+	nTQ==
+X-Google-Smtp-Source: AGHT+IFpRmyAKzAAwXvy/NbLsL5lVy1d1AR/RBoeGiL9rcELXtRpcBlMCxK5Cc303D478Hkk9FtYHcjHTPI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ace3:0:b0:e11:5f87:1e3c with SMTP id
+ 3f1490d57ef6-e17a451c2e8mr3839276.11.1724347471987; Thu, 22 Aug 2024 10:24:31
+ -0700 (PDT)
+Date: Thu, 22 Aug 2024 10:24:30 -0700
+In-Reply-To: <20240703175618.2304869-2-aaronlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR10MB7933:EE_|SA1PR10MB6613:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6228f8cd-dfd7-4ecc-3e49-08dcc2cc31ed
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|27256017;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Qk9yOEVxQWFaTEMzQmJFcVZyRzAyQ0xvNXdVbUg4MU1NZjIwZFc1WEQ0dUJO?=
- =?utf-8?B?bjB6ekdoSFBHbHp3NjlZQjMwSjJJbFg1TFZ4UVRlTVl3Tk1VeHFWeXBNMUJk?=
- =?utf-8?B?TlBPL2w4VDRkc0tLRnhuWnRLT293RWlyTm5tanZhV3hjS1hST3lHZWxYUjlk?=
- =?utf-8?B?eE44dXl0aDNVazAzUUhFcDhhRmZsNERKVjdZa1dpSDUxQy95Mm0wdkRCLzB1?=
- =?utf-8?B?aUVTaUJ4djZxNTdZcmRrTFdBd0RyckJZU3ovYlpWZVVWb0VoRThIdjBCT0Mv?=
- =?utf-8?B?My83elVEMWw4SVFDSFArTi8zRVhITCttQ3RPYzF2cjZZLzNxVjJCRW94NWxl?=
- =?utf-8?B?VnZ2aXNsNldZQllGSnRRVU5wWlJnU3pUQURwSXhRL0hxUmdvUnI5aFZnZVhj?=
- =?utf-8?B?aXRrb0ZvR2p4azdtd0dxVkYxUkk5bDlQaXZaS3VQb3I2a2hJbjYwZGR1UWp5?=
- =?utf-8?B?bFd3S0N6cEpqby9CQTZYZTZhcm1POFFpTklZYlVVeWZuSlFaelF2a1VsbG1L?=
- =?utf-8?B?WWFSWDBNNnphcFJsclE4TkhBM3FYMnJsdnBJWUVpM00wM2M4d2hhMzN1Uk5Z?=
- =?utf-8?B?WlZVQWhoUklaT052Tm4wRHRkVS8zTzZ4bmp0T3Jkd3ZDbUpaaFVlcFhqM0V4?=
- =?utf-8?B?UGJlR0lhZDRaSjJCNHdOcEdTZmZNTXVvN3BZeHg5bnMyWTZ3SEZpdUV6ZU51?=
- =?utf-8?B?K2l6dFBiVmVMTlhQVUlYUFNTajFlZEw1UzRiUURXUiszNFAzMWQyc0U5N1hQ?=
- =?utf-8?B?Zm5vSHdUY0ZBRVlhUVhQbWVMOG5iUWNLYkg3cTJpaXVYNTRCV1RpRXJ1OUlI?=
- =?utf-8?B?cktJclp0TWJkdThzTndXdHhUNlNONzJ3b0Z1SFRXa1dVT2RNbDNsQXRtMVpl?=
- =?utf-8?B?QzQ2dE9OS1poRG1RR1E4STkvTnlpRzRMb1RRU3VUdVNML2hpQnhPQkU4UDJF?=
- =?utf-8?B?eGVpVjBLN3BVck9CTnhHVFpISjlVNWxGVVZuVndkckczZGtQdWZLbGlGTzha?=
- =?utf-8?B?REw1c2xIeVNsYjQ0RGsvUmNFMFJzNTBnUVc5a3FZcDhPbVhhNVMyWEdRQ2Ez?=
- =?utf-8?B?VVlvZ2RVTmd2T2NNdjFvT2xDcG8rSXV2dzZyWWZwQmUxQ2U0S0UyTzhyOHMv?=
- =?utf-8?B?QVdsVE53U1F3RDNDR3JjTTQ5Wk10b2txTzZ4T2xKUG4veHlST3o0cTE0Rndo?=
- =?utf-8?B?TDZJeFZRUjEvUGdwMVpwZGFZV1U3Z0VrMFh6SVBwUXJoSDhyZGp1d1JVM2ti?=
- =?utf-8?B?bngvMDRmbzFGRGVhQktBM2g5TGU5RlRJNS9WaVVZemt1MlVJMzBDMFV4ekJW?=
- =?utf-8?B?bHZMdExDeW5mWWVZQk51UkgzdWR2aHlaeG4yYm9LRWh5anJpWnM4VXZXR1k0?=
- =?utf-8?B?ZGNiSUJhRkJNQlo0VXE2cmNTU3k3aGFmNExsaVNnUGJkdWsvbjRsbmYvREJK?=
- =?utf-8?B?RG1wb01FQmgwUTVSWVdRakVkWWRlYk5aOFV2Z24zS1pRQnBENlVZMmJXWnl4?=
- =?utf-8?B?NXFQaHl6eUZVVWZDNVZGUkVpd3BTMTNnejhSUmlpZ3lGUVg0SlVWUkk0ck5s?=
- =?utf-8?B?RnpQTGh3RzV6WnRlUlh3LzJZM2NTYXUvdlVuNEdnUG5SVnBvT2JVbFVBckEx?=
- =?utf-8?B?aitockMxclJhV3VHalhwRk9DUUZvb3liUVd5Sm11Y0MvWWwxSURNcnFJQVlD?=
- =?utf-8?B?ZE8xTE05RHhidUNVc1UxMk1aTXliNUo0MjVOUVZ5UTdhVWJvbFVSUzZlWmJV?=
- =?utf-8?B?ZlZoODVYY04yUnQ1elFaWEZwZy9DSmhYaGNWcTNmTTVqRmIzQTZXK1ovcFcv?=
- =?utf-8?B?N2xPMWcwaGNlNHRjVk4xT1JMYy9EaUpJWEpwdWFTczhTYlJ6RlJyN3M2TjN4?=
- =?utf-8?B?OHBNWTJ6aHIxT0FJYzhubDNlUGU3KzZrZ0VaMGR0MkNPbFE9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB7933.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(27256017);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RU9ISno5UXJ6NEhaUWZ3Rm40ZVFuOWpiY2J5aDFuTmlrZDdaZTU5WERBbnhs?=
- =?utf-8?B?ZnZOS0tTR2NFUWt5cDd0RFZaTlMyM1Z3VjVkbVpDaG1QZmxWVklSaGhzOTl2?=
- =?utf-8?B?SUdxVEIxRmpOMzkzRHgyRTg1dnJFZDl2clduV2FKUkcwMVVXK0ZpTUFmdGNX?=
- =?utf-8?B?Q05GeWUyUzBNODVzY1RlV0hLaXVpaGU3WENSY2JLSWxIb3hscGJmUWFPZWgy?=
- =?utf-8?B?VnExNUUydlhlS2Vnelcyd3RsamVNbFNCbGJmU2tWbng5RWEzaDRuVUd1WElM?=
- =?utf-8?B?aHBxZG9PNzFtR0JuUHFkUUNQVTdaMGFPcUYyb0NXeUh6Tlp6ZWlZRENqcGI4?=
- =?utf-8?B?WFVGbXJOU3VlRFRTMGx0bWNZeWkwQks4a1dScEVaVERXczlDQVNzUGIzRjdn?=
- =?utf-8?B?OVhCcDdMOGtLSEJWbUJlaWNZTzQwYTNnckFMdUxadmI5VExFa1JUOWRWNWlV?=
- =?utf-8?B?b1RzWmNEUnhlY2ZnMm9EK2RwZHFQeUNFckdvSFoyNlkxWnU4cTJXUnRKd3Va?=
- =?utf-8?B?TytwbVBqMUwrU0lFRXQxaGYyR2pwTTlLV0RoUDVLS2ZMQUVBbG11b0o1OFRt?=
- =?utf-8?B?Z2tjUmhCdEEvbjhyRGJXclRoVDVLZTFuRTJZeDVVNWZQSGJNUVVPSzNhMUNt?=
- =?utf-8?B?SDNzaEZlNTZlMlI2b0tPYkJVNEdPQm9JYlc5SERIejh5NlU1S1A2dy9jb1dB?=
- =?utf-8?B?Sjg0dFhOamV3cHh3YnZmVUFIR0lpVmxBakk3S3doREtTekd4dnJwdmdTUmRy?=
- =?utf-8?B?c01naW9vdUpFSTd3SFhzc2dBaHBmY244K05Wd3RYSys5N3Q4WVNlOTAxaDQ5?=
- =?utf-8?B?WnFQUkdtRWJ6bC9GT1p2OUdNcGpoZFdzTkJVS3RUbU9LQ3ZuWDVwREhzU2dV?=
- =?utf-8?B?Zkl0V1ZlaS9BVW14QzQvQTdTNFNxc0NWV3BZTHBoVmVnR2VBVG9jcnlrUWpp?=
- =?utf-8?B?cCtFRmhsKzVQSW5XVnRBU254VWdHcWxzb3NmL3ZJSG1ZL211TW1ESUtGamRH?=
- =?utf-8?B?RVpsNzA2bTlxWk9JUEx2VE5KK1RGbXc0NnNEQVpSSWt4bVB5d3lud2FZZ1dp?=
- =?utf-8?B?MDZ6bnZZOWhQcjVKalZZUTNnaTJ0QXdJN1JocWIxY0p2R3h2Y2dObWs0RXJu?=
- =?utf-8?B?b2QwUzVDQy9YVmZpbEIrR2dydjdmL0MwWVpEemNrbHl1KzhleGw5VUplamNa?=
- =?utf-8?B?am9zaGtES0x4UVN4Qi9icXQ3MXo4aHdDQXhVc214aTFvL2Z5WkxFSGtPd3hl?=
- =?utf-8?B?TjRuaERpczluRTVZeHdMdVZsT1ExQUt4b3ZnMnFOQVBtTDlMQ3NxcW5DRzlv?=
- =?utf-8?B?bUtUNDZscGViTUgzLytOSDNkcGZaZzZUZ1FjOWs4bVF5MzlYU3B0cjhGSXdK?=
- =?utf-8?B?enowdHViRWhjWExpWkl2YSsya1FBQUpreVU4MUkyUjlGS2hDOG11SHAyZ09P?=
- =?utf-8?B?V2sra0ZHWmY1aW1CSjBtRWRGR2wwQm5yTDl5cmluRWtKRXNZVmxhUWk1SnJl?=
- =?utf-8?B?SDNpT2Njc0huN0NOQTNJYldlbGd3YU1oK2pmNzVROVN6L1V2dXhnZzIyVWk4?=
- =?utf-8?B?eGE1UHJodVFpTUV1MmdhZEVwN0ZNa1UrVFI5WmpKRkdXUzcxMW1ibDFlVFF0?=
- =?utf-8?B?UGFtL1NrUzBvVkFFWFZnbjVwZmcyMjc5YXBqK21rZDRxZnFnT0F6NDQvSTlY?=
- =?utf-8?B?UlN4M0JvTlhSbU80RHQyalpmV1VFQnF0ZjdFcUtleWxaSEFSeDFGRFJGMGVx?=
- =?utf-8?B?cHhMRFRoRG9oZXR5T3JmT1h6Z1pMdGtRRzkvYk12SU40RHYvOWl4cXNJZnFh?=
- =?utf-8?B?ZVorRnNzTlluNENkV3BRd1N5cGFIcFE4MHduZExucEJEWnc0U2gybTRmTDVz?=
- =?utf-8?B?UlBmVGkwUVQxL1lpdktWRU8zdW5UVXgyYjhNMkVxdG8wUzlWTmx2eUdvQkZv?=
- =?utf-8?B?WFNKUDZPelNJbkwxWFVWeXFLeDdOckRmV08vTUM1SCszYS9yV1lEUW5aUkky?=
- =?utf-8?B?WHk5dTM4cmh5L2hWeDdzYktDRlBqVmhicFVYMWlCMUtFZmZCajJTQ2lDZXM3?=
- =?utf-8?B?S3Yxa0o5elcveTZLU2wxVkE5UzF5UXBQai9pNU93NTEzT3JrNjNScm03Nnk5?=
- =?utf-8?Q?oQmsp+jdtamc2voU2pU60yEHg?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	OxLC9DSRKulObZH1wBvxZP2DonP6jk5+Vmt890NvfnVbYRgPo+TmmDkDgHS0BSkc3t7tifUd28x/+N4VJCAFjckaRBP+Wbdt9kUg9cut2rZZBXJysE10Ejxh6OQcpnj/jh+6sEnAnalCweF4hXuyqrOtnYsOFk1HiYScxHKrOqiwrlBn7jg/CP/5Vyga/ygIly3TGrtM9ifIRV6//HoCn/xqrvYySlzt/a1jfYhz/E50U8hQfCfqgVWN3+USSNaizx93+apgxua5ziBfZShpRJP0xmO2lnKUX2TF06j+dQQwm+fEnhUcoRloQ/bSDyrn5RM+1ecyzoHTlVBhUu8EbhjrvTaPhwlPlfv1OeG0WnjlGsGhEjA8dCwN/HKRtvke9JSpyr+7VKPU7il96km5vwUznFwSXoksi//DEf25aLPhHC/YCYx2iNsENhh2k2kbU5GuWp8nLs+zH2B3XFEuwwd1+++OqpiEFqNnu9xx00MEzdTgFT4WMNGwDtvbEaxbCwmHoEvwrlsSN1ImqMJMBQgdU0XvQdVJv0JZbSjwIm80SITAEELI6v2TjA4fZ3V5N9vcogPDyHozQk7JMZsBPm57blpiIfOusOLRAZRYU/g=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6228f8cd-dfd7-4ecc-3e49-08dcc2cc31ed
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7933.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2024 17:02:24.7700
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AZmhaIRY80Bs82uD284Ltatkc6H6c9jp6Ks6E/09320JIqYrSwUQrMR2oPfbsEW3GDoV8zhtikiN4oda6wSJ6A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB6613
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-22_10,2024-08-22_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 bulkscore=0
- spamscore=0 adultscore=0 phishscore=0 suspectscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2407110000
- definitions=main-2408220127
-X-Proofpoint-ORIG-GUID: wv4Pt3pxRBWvuWkT88lhXHXSMx-XH5Zs
-X-Proofpoint-GUID: wv4Pt3pxRBWvuWkT88lhXHXSMx-XH5Zs
+Mime-Version: 1.0
+References: <20240703175618.2304869-2-aaronlewis@google.com>
+Message-ID: <Zsd0TqCeY3B5Sb5b@google.com>
+Subject: Re: [PATCH] KVM: x86: Free the MSR filter after destorying VCPUs
+From: Sean Christopherson <seanjc@google.com>
+To: Aaron Lewis <aaronlewis@google.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-* Peng Zhang <zhangpeng.00@bytedance.com> [240822 03:30]:
->=20
->=20
-> =E5=9C=A8 2024/8/22 14:55, Peng Zhang =E5=86=99=E9=81=93:
-> > Currently, xarray is used to manage memory attributes. The memory
-> > attributes management here is an interval problem. However, xarray is
-> > not suitable for handling interval problems. It may cause memory waste
-> > and is not efficient. Switching it to maple tree is more elegant. Using
-> > maple tree here has the following three advantages:
-> > 1. Less memory overhead.
-> > 2. More efficient interval operations.
-> > 3. Simpler code.
-> >=20
-> > This is the first user of the maple tree interface mas_find_range(),
-> > and it does not have any test cases yet, so its stability is unclear.
-> >=20
-> > Signed-off-by: Peng Zhang <zhangpeng.00@bytedance.com>
-> > ---
-> >   include/linux/kvm_host.h |  5 +++--
-> >   virt/kvm/kvm_main.c      | 47 ++++++++++++++-------------------------=
--
-> >   2 files changed, 19 insertions(+), 33 deletions(-)
-> >=20
-> > I haven't tested this code yet, and I'm not very familiar with kvm, so =
-I'd
-> > be happy if someone could help test it. This is just an RFC now. Any co=
-mments
-> > are welcome.
-> >=20
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 79a6b1a63027..9b3351d88d64 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -35,6 +35,7 @@
-> >   #include <linux/interval_tree.h>
-> >   #include <linux/rbtree.h>
-> >   #include <linux/xarray.h>
-> The header file of xarray can be deleted.
->=20
-> > +#include <linux/maple_tree.h>
-> >   #include <asm/signal.h>
-> >   #include <linux/kvm.h>
-> > @@ -839,7 +840,7 @@ struct kvm {
-> >   #endif
-> >   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> >   	/* Protected by slots_locks (for writes) and RCU (for reads) */
-> > -	struct xarray mem_attr_array;
-> > +	struct maple_tree mem_attr_mtree;
-> >   #endif
-> >   	char stats_id[KVM_STATS_NAME_SIZE];
-> >   };
-> > @@ -2410,7 +2411,7 @@ static inline void kvm_prepare_memory_fault_exit(=
-struct kvm_vcpu *vcpu,
-> >   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> >   static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm=
-, gfn_t gfn)
-> >   {
-> > -	return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
-> > +	return xa_to_value(mtree_load(&kvm->mem_attr_mtree, gfn));
-> >   }
-> >   bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gf=
-n_t end,
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 92901656a0d4..9a99c334f4af 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -10,6 +10,7 @@
-> >    *   Yaniv Kamay  <yaniv@qumranet.com>
-> >    */
-> > +#include "linux/maple_tree.h"
-> This line should be deleted.
-> >   #include <kvm/iodev.h>
-> >   #include <linux/kvm_host.h>
-> > @@ -1159,7 +1160,8 @@ static struct kvm *kvm_create_vm(unsigned long ty=
-pe, const char *fdname)
-> >   	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
-> >   	xa_init(&kvm->vcpu_array);
-> >   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> > -	xa_init(&kvm->mem_attr_array);
-> > +	mt_init_flags(&kvm->mem_attr_mtree, MT_FLAGS_LOCK_EXTERN);
-> There is a flag missing here, should be:
-> mt_init_flags(&kvm->mem_attr_mtree, MT_FLAGS_LOCK_EXTERN | MT_FLAGS_USE_R=
-CU);
+On Wed, Jul 03, 2024, Aaron Lewis wrote:
+> Delay freeing the MSR filter until after the VCPUs are destroyed to
+> avoid a possible use-after-free when freeing a nested guest.
+> 
+> This callstack is from a 5.15 kernel, but the issue still appears to be
+> possible upstream.
+> 
+> kvm_msr_allowed+0x4c/0xd0
+> __kvm_set_msr+0x12d/0x1e0
+> kvm_set_msr+0x19/0x40
+> load_vmcs12_host_state+0x2d8/0x6e0 [kvm_intel]
+> nested_vmx_vmexit+0x715/0xbd0 [kvm_intel]
+> nested_vmx_free_vcpu+0x33/0x50 [kvm_intel]
+> vmx_free_vcpu+0x54/0xc0 [kvm_intel]
+> kvm_arch_vcpu_destroy+0x28/0xf0
+> kvm_vcpu_destroy+0x12/0x50
+> kvm_arch_destroy_vm+0x12c/0x1c0
+> kvm_put_kvm+0x263/0x3c0
+> kvm_vm_release+0x21/0x30
+> __fput+0xb9/0x240
+> ____fput+0xe/0x20
+> task_work_run+0x6f/0xd0
+> syscall_exit_to_user_mode+0x123/0x300
+> do_syscall_64+0x72/0xb0
+> entry_SYSCALL_64_after_hwframe+0x61/0xc6
+> 
+> Fixes: b318e8decf6b ("KVM: x86: Protect userspace MSR filter with SRCU, and set atomically-ish")
+> 
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 66c4381460dc..638696efa17e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12711,12 +12711,12 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>  	}
+>  	kvm_unload_vcpu_mmus(kvm);
+>  	static_call_cond(kvm_x86_vm_destroy)(kvm);
+> -	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
+>  	kvm_pic_destroy(kvm);
+>  	kvm_ioapic_destroy(kvm);
+>  	kvm_destroy_vcpus(kvm);
+>  	kvfree(rcu_dereference_check(kvm->arch.apic_map, 1));
+>  	kfree(srcu_dereference_check(kvm->arch.pmu_event_filter, &kvm->srcu, 1));
+> +	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
 
-I'm not sure rcu is needed as the readers are under the mutex lock in
-kvm?  That is, this flag is used so that lookups are rcu safe, but I
-don't think it is needed (but I'm not sure).
+This makes the KFENCE/KASAN issues go away, but I'm not so sure it actually fixes
+the main problem, which is that doing nested_vmx_vmexit() when freeing a vCPU is
+insane.  E.g. it can do VMWRITEs, VMPTRLD, read and write guest memory, write
+guest MSRs (which could theoretically write _host_ MSRs), and so on and so fort.
 
->=20
-> > +	mt_set_external_lock(&kvm->mem_attr_mtree, &kvm->slots_lock);
-> >   #endif
-> >   	INIT_LIST_HEAD(&kvm->gpc_list);
-> > @@ -1356,7 +1358,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
-> >   	cleanup_srcu_struct(&kvm->irq_srcu);
-> >   	cleanup_srcu_struct(&kvm->srcu);
-> >   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> > -	xa_destroy(&kvm->mem_attr_array);
-> > +	mutex_lock(&kvm->slots_lock);
-> > +	__mt_destroy(&kvm->mem_attr_mtree);
-> > +	mutex_unlock(&kvm->slots_lock);
-> >   #endif
-> >   	kvm_arch_free_vm(kvm);
-> >   	preempt_notifier_dec();
-> > @@ -2413,30 +2417,20 @@ static u64 kvm_supported_mem_attributes(struct =
-kvm *kvm)
-> >   bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gf=
-n_t end,
-> >   				     unsigned long mask, unsigned long attrs)
-> >   {
-> > -	XA_STATE(xas, &kvm->mem_attr_array, start);
-> > -	unsigned long index;
-> > +	MA_STATE(mas, &kvm->mem_attr_mtree, start, start);
-> >   	void *entry;
-> >   	mask &=3D kvm_supported_mem_attributes(kvm);
-> >   	if (attrs & ~mask)
-> >   		return false;
-> > -	if (end =3D=3D start + 1)
-> > -		return (kvm_get_memory_attributes(kvm, start) & mask) =3D=3D attrs;
-> > -
-> >   	guard(rcu)();
-> > -	if (!attrs)
-> > -		return !xas_find(&xas, end - 1);
-> > -
-> > -	for (index =3D start; index < end; index++) {
-> > -		do {
-> > -			entry =3D xas_next(&xas);
-> > -		} while (xas_retry(&xas, entry));
-> > -		if (xas.xa_index !=3D index ||
-> > -		    (xa_to_value(entry) & mask) !=3D attrs)
-> > +	do {
-> > +		entry =3D mas_find_range(&mas, end - 1);
-> > +		if ((xa_to_value(entry) & mask) !=3D attrs)
-> >   			return false;
-> > -	}
-> > +	} while (mas.last < end - 1);
-> >   	return true;
-> >   }
-> > @@ -2524,9 +2518,9 @@ static int kvm_vm_set_mem_attributes(struct kvm *=
-kvm, gfn_t start, gfn_t end,
-> >   		.on_lock =3D kvm_mmu_invalidate_end,
-> >   		.may_block =3D true,
-> >   	};
-> > -	unsigned long i;
-> >   	void *entry;
-> >   	int r =3D 0;
-> > +	MA_STATE(mas, &kvm->mem_attr_mtree, start, end - 1);
-> >   	entry =3D attributes ? xa_mk_value(attributes) : NULL;
-> > @@ -2540,20 +2534,11 @@ static int kvm_vm_set_mem_attributes(struct kvm=
- *kvm, gfn_t start, gfn_t end,
-> >   	 * Reserve memory ahead of time to avoid having to deal with failure=
-s
-> >   	 * partway through setting the new attributes.
-> >   	 */
-> > -	for (i =3D start; i < end; i++) {
-> > -		r =3D xa_reserve(&kvm->mem_attr_array, i, GFP_KERNEL_ACCOUNT);
-> > -		if (r)
-> > -			goto out_unlock;
-> > -	}
-> > -
-> > +	r =3D mas_preallocate(&mas, entry, GFP_KERNEL_ACCOUNT);
-> > +	if (r)
-> > +		goto out_unlock;
-> >   	kvm_handle_gfn_range(kvm, &pre_set_range);
-> > -
-> > -	for (i =3D start; i < end; i++) {
-> > -		r =3D xa_err(xa_store(&kvm->mem_attr_array, i, entry,
-> > -				    GFP_KERNEL_ACCOUNT));
-> > -		KVM_BUG_ON(r, kvm);
-> > -	}
-> > -
-> > +	mas_store_prealloc(&mas, entry);
-> >   	kvm_handle_gfn_range(kvm, &post_set_range);
-> >   out_unlock:
+And free_nested() really should free _everything_, i.e. it shouldn't rely on
+nested_vmx_vmexit() to do things like cancel hrtimers.
+
+Completely untested, but at a glance I think we can/should do this.  If we need
+a fix for stable, then we can move the MSR filter freeing, but going forward, I
+think we need to fix the underlying mess.
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 2392a7ef254d..f5210834a246 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -359,6 +359,8 @@ static void free_nested(struct kvm_vcpu *vcpu)
+        kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
+        vmx->nested.pi_desc = NULL;
+ 
++       hrtimer_cancel(&to_vmx(vcpu)->nested.preemption_timer);
++
+        kvm_mmu_free_roots(vcpu->kvm, &vcpu->arch.guest_mmu, KVM_MMU_ROOTS_ALL);
+ 
+        nested_release_evmcs(vcpu);
+@@ -372,9 +374,10 @@ static void free_nested(struct kvm_vcpu *vcpu)
+  */
+ void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu)
+ {
+-       vcpu_load(vcpu);
+-       vmx_leave_nested(vcpu);
+-       vcpu_put(vcpu);
++       struct vcpu_vmx *vmx = to_vmx(vcpu);
++
++       vmx->loaded_vmcs = &vmx->vmcs01;
++       free_nested(vcpu);
+ }
+ 
+ #define EPTP_PA_MASK   GENMASK_ULL(51, 12)
+
 
