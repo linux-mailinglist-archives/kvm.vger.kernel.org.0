@@ -1,118 +1,118 @@
-Return-Path: <kvm+bounces-24817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24818-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBA1D95B2C1
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 12:19:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7452995B332
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 12:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA38C283665
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 10:19:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BAAB1F23637
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 10:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E006117DFE8;
-	Thu, 22 Aug 2024 10:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA20183CB6;
+	Thu, 22 Aug 2024 10:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iUYA5Yq+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hck3XNUs"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1999C14F9DA
-	for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 10:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8676317CA16;
+	Thu, 22 Aug 2024 10:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724321966; cv=none; b=LE0hmXGyfcXlzFUfmhmy8mTw8sAHHO3jkvOXU6shUryNjv355ncCeU8OhYUb4Cg3xN3813WArRryEmAeYp+dYIapncaQ/xo9PDlGqCI+NusCBj4nenmA6vhzj56z7sWd4wlsr0onHkYC8CVwcf0x8/cVs+WlhUTI3iQkymIjLlQ=
+	t=1724323745; cv=none; b=An//fE5zmScyXYaqf90qYvat1q8ZsXvzXdYRL8YGqnxc8FRJvKFYpw8cIEdtPGJN+gsRyowc5nigfvK453w+Ciz0288bPvElZwBjZVcTdT5kq0f37mo0RlUR5C5OGWeSRIyPaLXZOogkI+19XkzauLouO1XehNTq5piL25FP5NM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724321966; c=relaxed/simple;
-	bh=p9/hN7jqxFX81YbZ6dK104KttUvmW0EyToeOFhj4o9E=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=bjjdZmxuSM/aK56oQNNbM6j/xxTsWp5Mgqujg223m/HiB5TiRqM+TmaZr5T5nhCccZbgLM/HSRJDSGi9QsWqRQ4Wk9+V43+Br1/WdEQFwIiGxS+eMPIEPFimJP2GI4p4bN5losEBxtAaxl2f3ZNGbbr0B/KsfjOUICHppbT3lZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iUYA5Yq+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9CB42C4AF09
-	for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 10:19:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724321965;
-	bh=p9/hN7jqxFX81YbZ6dK104KttUvmW0EyToeOFhj4o9E=;
-	h=From:To:Subject:Date:From;
-	b=iUYA5Yq+Hsx9HScY8LujJDZp8km2nUa6bC62ROwjJ6eYSEIdzfEyr8ZytWTwrivTM
-	 BLH3QjPcusdIRvcVA/eiu+h0Z4m6PGFuhmzuuui1coVpbDGNqpQS47Mb1i9TbKZokO
-	 5fXSaCmVyx97kSdeWV0oXBEQCRmbDpOPGFoA1/7J9qKogkp+uLwzjZLbEEbO+cAZdP
-	 k5BHCtcfOcd3h3gIw0yu4sMBE0PmF50iL5XoVCm1G2Ps2F6W84aeToS2ZmpoCJp2VG
-	 zEX8+lHV5O1fr+x1cVHPVDfxbib9nnWcAFDPCv3LuREgo4buj2TtC4yPfsSVyLAlVF
-	 pXTK574hHhp3Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 90B1DC53B7E; Thu, 22 Aug 2024 10:19:25 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219190] New: Kernel USB device namespacing
-Date: Thu, 22 Aug 2024 10:19:25 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: weiss_julian@outlook.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-219190-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1724323745; c=relaxed/simple;
+	bh=pcJbZbqHKck86vA7euPkLTW0Qpjz3e4EM8AdEqVYB54=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GLvaQRvATc/eOAy4OtpprkNurEuAdsULUzsT8s6QT+Ze7W6RvhZaxdBNZAiezKDRabvTCjwC9gRSIjdi/VLzCTRwltjPJy6Ov9CMHjdoyqSan4wxVR1Y1cpXOPwdBtNZiv6z9UArZA47sH5+DWsWDmxvYTx+AhrfAjzd+7UhPeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hck3XNUs; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724323744; x=1755859744;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pcJbZbqHKck86vA7euPkLTW0Qpjz3e4EM8AdEqVYB54=;
+  b=hck3XNUsgE03t3tSwE5tHyEhGG1GExxH5hcQgbSBFncj8ATqRILX4Dvm
+   A1dqb3QW+1NTAsRBKDMm8wkGxqW4hjru/G+N/wofDfsskJp2iDJOBrdag
+   fEBPP9cej0jjwg0d82GmbXUpEsk1lcOzWkJtc/udcRSVqwPtaYv2hQ2rA
+   Eaox/7/7gjA2MSb7BjkhBl9DC5Keyz7A7q/4I59ZbRWgaj4J2Mu27R+qi
+   J+VD2EngpyM9bObwVIhutOcvQttMhUyX38pbsele9178ZMrYYchZv58xa
+   3BjbM+hdIbaEfKptNQC1N/QosnpwOVSeZ4LBxmg0W5gLUjGMAaiVOekHX
+   w==;
+X-CSE-ConnectionGUID: iizzxVfzSfSxXkgCphoIbw==
+X-CSE-MsgGUID: uW+/zczrTBKxIvkYMEWypA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="26595941"
+X-IronPort-AV: E=Sophos;i="6.10,166,1719903600"; 
+   d="scan'208";a="26595941"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 03:49:03 -0700
+X-CSE-ConnectionGUID: U1qYWecDT1+euIBUjlvmdA==
+X-CSE-MsgGUID: zB+4lPy8QGegn0qmUqp0zA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,166,1719903600"; 
+   d="scan'208";a="84575188"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 22 Aug 2024 03:49:02 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sh5ND-000CgG-2c;
+	Thu, 22 Aug 2024 10:48:59 +0000
+Date: Thu, 22 Aug 2024 18:48:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH 1/1] KVM: selftestsi: Create KVM selftests runnner to run
+ interesting tests
+Message-ID: <202408221838.XU8LHJDm-lkp@intel.com>
+References: <20240821223012.3757828-2-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240821223012.3757828-2-vipinsh@google.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219190
+Hi Vipin,
 
-            Bug ID: 219190
-           Summary: Kernel USB device namespacing
-           Product: Virtualization
-           Version: unspecified
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: weiss_julian@outlook.de
-        Regression: No
+kernel test robot noticed the following build warnings:
 
-When trying to bring a Rpi Compute Module 4 into flashable state. One has to
-connect the CM4 via USB to e.g. another Linux PC and exeecute rpiboot. Rpib=
-oot
-will probe for the correct USB device, writes something to it, makes the de=
-vice
-reconnect the USB connection and writes to the device again.=20
+[auto build test WARNING on de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed]
 
-When executing the rpiboot tool from within a podman container, which is
-started in privileged mode, rpiboot will successful probe the device and
-execute the first write. However, after resetting the device, strace shows
-rpiboot is about to open an USB device, which does not exist inside the
-container. When checking the hosts filesystem, the USB device exists at that
-specific location.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vipin-Sharma/KVM-selftestsi-Create-KVM-selftests-runnner-to-run-interesting-tests/20240822-063157
+base:   de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed
+patch link:    https://lore.kernel.org/r/20240821223012.3757828-2-vipinsh%40google.com
+patch subject: [PATCH 1/1] KVM: selftestsi: Create KVM selftests runnner to run interesting tests
+config: openrisc-allnoconfig (https://download.01.org/0day-ci/archive/20240822/202408221838.XU8LHJDm-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240822/202408221838.XU8LHJDm-lkp@intel.com/reproduce)
 
-How is it possible that my container knows the correct location of the outs=
-ides
-USB device, but is unable to find the filename of the USB device inside the
-container?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408221838.XU8LHJDm-lkp@intel.com/
 
---=20
-You may reply to this email to add a comment.
+All warnings (new ones prefixed by >>):
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+   tools/testing/selftests/arm64/tags/.gitignore: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/arm64/tags/Makefile: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/arm64/tags/tags_test.c: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/kvm/.gitignore: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/kvm/Makefile: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/kvm/config: warning: ignored by one of the .gitignore files
+>> tools/testing/selftests/kvm/runner.py: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/kvm/settings: warning: ignored by one of the .gitignore files
+>> tools/testing/selftests/kvm/tests.json: warning: ignored by one of the .gitignore files
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
