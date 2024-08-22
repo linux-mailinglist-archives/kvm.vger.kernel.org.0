@@ -1,76 +1,85 @@
-Return-Path: <kvm+bounces-24818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7452995B332
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 12:49:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A88495B708
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 15:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BAAB1F23637
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 10:49:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD81EB2821C
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2024 13:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA20183CB6;
-	Thu, 22 Aug 2024 10:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0531CB32D;
+	Thu, 22 Aug 2024 13:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hck3XNUs"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="leY0vOD6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8676317CA16;
-	Thu, 22 Aug 2024 10:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295AA1DDF4
+	for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 13:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724323745; cv=none; b=An//fE5zmScyXYaqf90qYvat1q8ZsXvzXdYRL8YGqnxc8FRJvKFYpw8cIEdtPGJN+gsRyowc5nigfvK453w+Ciz0288bPvElZwBjZVcTdT5kq0f37mo0RlUR5C5OGWeSRIyPaLXZOogkI+19XkzauLouO1XehNTq5piL25FP5NM=
+	t=1724334103; cv=none; b=QndrX10Q7vPf9rzKBX6+7eM4MtOpdvf2zHNbn6/10A55ROJYVbhGndoOfTA5qoXk8NzdalDht0FOK2jBSkmSOxLkhN808XQHZGb9Z2o4vgd2Q6oIvCSv74w/LMc9is80KndT/cFkzun825r5O3iD5r7/BdctXcLDpFT3t1eQEFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724323745; c=relaxed/simple;
-	bh=pcJbZbqHKck86vA7euPkLTW0Qpjz3e4EM8AdEqVYB54=;
+	s=arc-20240116; t=1724334103; c=relaxed/simple;
+	bh=O8xaZOTuj5ce8Wj2OeH273OxcvlRdNasHXbOjSdFy3E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GLvaQRvATc/eOAy4OtpprkNurEuAdsULUzsT8s6QT+Ze7W6RvhZaxdBNZAiezKDRabvTCjwC9gRSIjdi/VLzCTRwltjPJy6Ov9CMHjdoyqSan4wxVR1Y1cpXOPwdBtNZiv6z9UArZA47sH5+DWsWDmxvYTx+AhrfAjzd+7UhPeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hck3XNUs; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724323744; x=1755859744;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pcJbZbqHKck86vA7euPkLTW0Qpjz3e4EM8AdEqVYB54=;
-  b=hck3XNUsgE03t3tSwE5tHyEhGG1GExxH5hcQgbSBFncj8ATqRILX4Dvm
-   A1dqb3QW+1NTAsRBKDMm8wkGxqW4hjru/G+N/wofDfsskJp2iDJOBrdag
-   fEBPP9cej0jjwg0d82GmbXUpEsk1lcOzWkJtc/udcRSVqwPtaYv2hQ2rA
-   Eaox/7/7gjA2MSb7BjkhBl9DC5Keyz7A7q/4I59ZbRWgaj4J2Mu27R+qi
-   J+VD2EngpyM9bObwVIhutOcvQttMhUyX38pbsele9178ZMrYYchZv58xa
-   3BjbM+hdIbaEfKptNQC1N/QosnpwOVSeZ4LBxmg0W5gLUjGMAaiVOekHX
-   w==;
-X-CSE-ConnectionGUID: iizzxVfzSfSxXkgCphoIbw==
-X-CSE-MsgGUID: uW+/zczrTBKxIvkYMEWypA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="26595941"
-X-IronPort-AV: E=Sophos;i="6.10,166,1719903600"; 
-   d="scan'208";a="26595941"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 03:49:03 -0700
-X-CSE-ConnectionGUID: U1qYWecDT1+euIBUjlvmdA==
-X-CSE-MsgGUID: zB+4lPy8QGegn0qmUqp0zA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,166,1719903600"; 
-   d="scan'208";a="84575188"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 22 Aug 2024 03:49:02 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sh5ND-000CgG-2c;
-	Thu, 22 Aug 2024 10:48:59 +0000
-Date: Thu, 22 Aug 2024 18:48:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH 1/1] KVM: selftestsi: Create KVM selftests runnner to run
- interesting tests
-Message-ID: <202408221838.XU8LHJDm-lkp@intel.com>
-References: <20240821223012.3757828-2-vipinsh@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=N4JwVi+dpMUz8HOrmnVnzQl+GQXHtriBe52kkz7x3uYZ8G7bq4ocIsQGxWs7lu+Kmk5UDKPO0ZUrqfgh8NcdXm2/FFqQCBdfPud1ikkW04bE72B4pF5QDZDy3sIMrAIC+FjzVaLXyey3nsJI/soVBwJo77EXaiYh0XCGLZU7Jcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=leY0vOD6; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-52efdf02d13so1093708e87.2
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 06:41:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1724334100; x=1724938900; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=imZf6FTHHFv1jc8blHwhJuknb8qH4z1prHELoYZxzpU=;
+        b=leY0vOD6tVLEWSVgn164KtdekXejhKKBiHh2n9G9rtdLH1pso+gw2EwyWmDLugWrbk
+         908wn2inhm6y/gy/20xEqvWWuX2sZUbNjQpfU0LfzIJto9Yt9jyB6b5A7Wt/zJrcUy/B
+         7wl/90iW200YB+G0lQZlT52++Rhd4PG0GkStGDS0DnHOnd2WvGTDX1z10o4WvguPXHC+
+         KQx0ona0Adu1utGHyGvqJkhvWU0PMuk1Zb/Gq76+IHG5JgWeCN6bYkiVa8ibCmApvlR6
+         ZFsQzRIZTLqoDWx3l9xiflQCPT8TIWcG31WcWhwh2vRdATswExjVeQ8WRcKOWSJGw/Qu
+         oR+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724334100; x=1724938900;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=imZf6FTHHFv1jc8blHwhJuknb8qH4z1prHELoYZxzpU=;
+        b=e5mZn9bVQNelqM9MGXEsh34lVBWgz6gzDtXi9JSTL87qfotYv3+GTJYVPbMo1nWoi3
+         86f6mMe9C3ADaxTvJ78uKWlNODHSpIgSZV4ji0fDB64zo0hV+TOQSFcrTCfxjEW/wpo+
+         Z5TyX7RX3e0hL3DSNilyVJec60VxvO+XLASu1gFI4csIt+MPZng9+zOVQxUqOByUrbmQ
+         In9zdmaY/MvPYxK7YS2VVl0kIv2PP/EllZgzFm62paYtAAf7ZPSCrmkuI3TAgVHRhWKO
+         GZXENazT6e4GLzEORu8oEsd8YuMnv4BLm1ziGjlxwAjrTu+pHbtzlKOS8Mx/DWjdcZFu
+         jdnw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtuM6XWRhKTIdIlydmXcZYFaOZlZvtyiH//SueQqs/DImCfSZq1P8re67ZoNVGAC8UYZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzz7JRta5zCluaHdCG0KLW3gfySnoZD833oY+8mGC2rb6KDN0GQ
+	V89xau51Hiu0LnhuOSNMP/DWF97u0wx7doZttYMvzoX6UWT62vMRVYtbea6t6Y4=
+X-Google-Smtp-Source: AGHT+IH32O883q08dUa5KOEo4YvEjt3Mp2Ar6drhkiJlCswVQ0XO6rq1iTaTl5tp3/AuAH3rpAo2EQ==
+X-Received: by 2002:a05:6512:3c89:b0:52e:d0f8:2d43 with SMTP id 2adb3069b0e04-5334fbe593emr1743888e87.17.1724334099444;
+        Thu, 22 Aug 2024 06:41:39 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f220ccbsm123140966b.36.2024.08.22.06.41.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Aug 2024 06:41:38 -0700 (PDT)
+Date: Thu, 22 Aug 2024 15:41:38 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Quan Zhou <zhouquan@iscas.ac.cn>
+Cc: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, mark.rutland@arm.com, 
+	alexander.shishkin@linux.intel.com, jolsa@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] riscv: perf: add guest vs host distinction
+Message-ID: <20240822-a03a7c96ebceb658325e7fce@orel>
+References: <cover.1723518282.git.zhouquan@iscas.ac.cn>
+ <3729354b59658535c4370d3c1c7e2f162433807b.1723518282.git.zhouquan@iscas.ac.cn>
+ <20240821-f5e1d6afb0d2230c1256a75b@orel>
+ <430f3d38-b12e-4ac8-8040-33bab40380ab@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,40 +88,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240821223012.3757828-2-vipinsh@google.com>
+In-Reply-To: <430f3d38-b12e-4ac8-8040-33bab40380ab@iscas.ac.cn>
 
-Hi Vipin,
+On Thu, Aug 22, 2024 at 02:38:44PM GMT, Quan Zhou wrote:
+...
+> > > +unsigned short perf_misc_flags(struct pt_regs *regs)
+> > 
+> > I see that the consumer of perf_misc_flags is only a u16, but all other
+> > architectures define this function as returning an unsigned long, and
+> > your last version did as well. My comment in the last version was that
+> > we should use an unsigned long for the 'misc' variable to match the
+> > return type of the function. I still think we should do that instead
+> > since the function should be consistent with the other architectures.
+> > 
+> 
+> I agree with your point that the type of `misc` should be consistent with
+> other architectures.
+> 
+> However, one thing confuses me. The return value of perf_misc_flags
+> is assigned to the `misc` field of the perf_event_header structure,
+> and the field is defined as `u16`. I checked the return type of
 
-kernel test robot noticed the following build warnings:
+Yes, that's what I mentioned above.
 
-[auto build test WARNING on de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed]
+> `perf_misc_flags` in other architectures, and I found that for x86/arm/s390,
+> the type is `unsigned long`, while for powerpc, it is `u32`.
+> These do not match `u16`, which seems to pose a risk of type truncation and
+> feels a bit unconventional. Or is there some other reasonable consideration
+> behind this?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vipin-Sharma/KVM-selftestsi-Create-KVM-selftests-runnner-to-run-interesting-tests/20240822-063157
-base:   de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed
-patch link:    https://lore.kernel.org/r/20240821223012.3757828-2-vipinsh%40google.com
-patch subject: [PATCH 1/1] KVM: selftestsi: Create KVM selftests runnner to run interesting tests
-config: openrisc-allnoconfig (https://download.01.org/0day-ci/archive/20240822/202408221838.XU8LHJDm-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240822/202408221838.XU8LHJDm-lkp@intel.com/reproduce)
+No, it's just historic. I see three paths, one is use 'unsigned long' like
+the other architectures and assume we'll never have flags touching bits
+over 15, so it's fine. Or, same as the first path, but also add
+'#define PERF_RECORD_MISC_MAX 15' with a comment explaining misc flags
+must be 15 or less as a separate patch. Or, for the third, add patches to
+this series that first change all architectures to return u16s.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408221838.XU8LHJDm-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   tools/testing/selftests/arm64/tags/.gitignore: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/arm64/tags/Makefile: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/arm64/tags/tags_test.c: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/kvm/.gitignore: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/kvm/Makefile: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/kvm/config: warning: ignored by one of the .gitignore files
->> tools/testing/selftests/kvm/runner.py: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/kvm/settings: warning: ignored by one of the .gitignore files
->> tools/testing/selftests/kvm/tests.json: warning: ignored by one of the .gitignore files
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+drew
 
