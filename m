@@ -1,124 +1,190 @@
-Return-Path: <kvm+bounces-24887-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24888-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 872BE95CC39
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 14:15:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAAC795CD1E
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 15:03:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FE5828255A
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 12:15:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37E27B229DF
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 13:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF16185B55;
-	Fri, 23 Aug 2024 12:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB96F1865EE;
+	Fri, 23 Aug 2024 13:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1Skkx5s"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OG1zedAI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BF3358A7;
-	Fri, 23 Aug 2024 12:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC75E1448E3;
+	Fri, 23 Aug 2024 13:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724415343; cv=none; b=j03TXI1cCYNrRqLf6J7AxXlk2ayIMdSR+yfx2VE+5iEsggBF7317TUlM2XbWAXq0s2YjAexuZ8STiVBrcbgtofp9OqlqzCSLPDYgFK+4R+bWGoeE8t2ngVZHRniQn1A4QsgRAoacPD5xtxzvqWoQngKgmyRg2CArglz/p2NUgk8=
+	t=1724418219; cv=none; b=rrXKva/DS1vUBxmA6ZnTa2e3s02140Jpz64uccBDGtUb3oNhUzRlABv7k7FxCZAUuprivO2YHfoycqYjThICXnw5SujSCYmOkvStJiUz+I6pI11G45yVWuAAYz4lK3r0DvD6yg+EPd+32BcVmGD7/78Mm8qZn0RIlU6NqcBqFmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724415343; c=relaxed/simple;
-	bh=QSwBy/mtxU5PQEV0qc+NWWpaKehQRcAiGZXxDif/GcM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UcyoL9xt4X65P/YcK7HtvUnIrhmFV8zVhPhkGktHC7lsd0QdJ6bod9wFNmZ9cGttND9B52DyT9x3hvoqDcY8Lae9Y91T8DCPC1rf95tutODGe8hon4zhk4spf1GUfG8rkeS2S576cV/tym73e0ale331/rpVfpxDmbxMzytffM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1Skkx5s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A489AC32786;
-	Fri, 23 Aug 2024 12:15:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724415342;
-	bh=QSwBy/mtxU5PQEV0qc+NWWpaKehQRcAiGZXxDif/GcM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T1Skkx5sYt3Grbjh67xETdslEani4TBJqgeWd8AajJv1OcyeopWDTUF5qG6K8oUjB
-	 YQIVyWcZSTdxcLJOq+O/6XQ2dftgK8y0xfTGr5eQUbkZMrj32Wv26HILtebpX56Rlv
-	 tAIZkaYSevVNBWAHtso7keRAbAOUbaTmmlcQRbVpgrIvUkS6MkI1yuHvnPp+5FGbEO
-	 FZjaHQ7uwIKk4neNvmNVkkezJbd+zLqg5YNMVRk2jK9ummmJTqUAU3YVBnzcy9qDKd
-	 UlcNU8NTLr9kYROzDZgxeecu2c/Synb91cfNu2g129MDCGQ0ybQY8YZ97Pn1alLBXb
-	 7xS1jQRvqNo1A==
-Date: Fri, 23 Aug 2024 13:15:38 +0100
-From: Will Deacon <will@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: Use precise range-based flush in mmu_notifier hooks
- when possible
-Message-ID: <20240823121538.GA32110@willie-the-truck>
-References: <20240802191617.312752-1-seanjc@google.com>
- <20240820154150.GA28750@willie-the-truck>
- <ZsS_OmxwFzrqDcfY@google.com>
- <20240820163213.GD28750@willie-the-truck>
- <ZsTM-Olv8aT2rql6@google.com>
+	s=arc-20240116; t=1724418219; c=relaxed/simple;
+	bh=FJtvPrnrnepURGaxInYmsEE+3DmtM/ijCioKxsX05us=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
+	 References:In-Reply-To; b=Iysj7wo9ksZqLovRelQ08HKgbC7iLYruMHWfI69hPZyOVGVuwZAKmuQXVLaq7S4mmh6sKl6q+ciYwnJ3uJlDF+Xnk3JwX7HdU81ESZbYYQ9Asl6rt5V0nhlGjEsCeqUxy2P7EnKjmVImnkjoJ6scbIgqjXOmmyuUsBlBd3Aau8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OG1zedAI; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47N6jDbs027508;
+	Fri, 23 Aug 2024 13:03:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	mime-version:content-transfer-encoding:content-type:date
+	:message-id:from:cc:to:subject:references:in-reply-to; s=pp1;
+	 bh=t5sHaqw+Qm7GG+J7BCxqCavP5aKQbQDGA6C1iK8gS1M=; b=OG1zedAIolbj
+	UHf3Hv1hyKk2vA2WJNVBAEjlrHPPpWL50896C7hemQ3HvalNA3HWjWqdPP2vohv8
+	wzDqCXeelUMfYTR2XALrsBq2unrLCTI9LExH87t4Vi1TL92xHDov5snSgYyYmaBE
+	uSEfiKCPLSnVtR0hDnznBtekaug3c+525uQJ3Fcgwxi5eb/6+M4ERCE8JCLUlZ4W
+	qrHSUTTQrpmi9pE+yCbuwKXpH7o6BVamJD9t+bwc7pbwtjRYhq7cKTF4p/IXE9Y0
+	2WR71qEgq5LOeFjMIJUCMdiakMgPdvCK0NkFSLmy9I1AiH7Ugxtp4xTLKTBdoVkY
+	lvIvdSldyA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4141y25dq2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Aug 2024 13:03:32 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47ND3WZV016693;
+	Fri, 23 Aug 2024 13:03:32 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4141y25dpx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Aug 2024 13:03:32 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47NCAtae029710;
+	Fri, 23 Aug 2024 13:03:31 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4138dmspu8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Aug 2024 13:03:31 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47ND3PFE55312844
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 23 Aug 2024 13:03:27 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C4B992004B;
+	Fri, 23 Aug 2024 13:03:25 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9297D20040;
+	Fri, 23 Aug 2024 13:03:25 +0000 (GMT)
+Received: from darkmoore (unknown [9.171.45.196])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 23 Aug 2024 13:03:25 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZsTM-Olv8aT2rql6@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 23 Aug 2024 15:03:20 +0200
+Message-Id: <D3NB8GXIKS75.2AR1GNELFUIBE@linux.ibm.com>
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <linux-s390@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        "Paolo
+ Bonzini" <pbonzini@redhat.com>,
+        "Shuah Khan" <shuah@kernel.org>,
+        "Christian
+ Borntraeger" <borntraeger@linux.ibm.com>,
+        "Claudio Imbrenda"
+ <imbrenda@linux.ibm.com>,
+        "David Hildenbrand" <david@redhat.com>,
+        "Nina
+ Schoetterl-Glausch" <nsg@linux.ibm.com>
+To: "Janosch Frank" <frankja@linux.ibm.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH 1/3] selftests: kvm: s390: Add uc_map_unmap VM test case
+X-Mailer: aerc 0.17.0
+References: <20240815154529.628087-1-schlameuss@linux.ibm.com>
+ <20240815154529.628087-2-schlameuss@linux.ibm.com>
+ <4c049b39-af28-488c-9e19-f22691b43585@linux.ibm.com>
+ <ZsNs0sN7rWqaviZE@darkmoore>
+ <884367dd-fba0-4acd-a614-f657768b662a@linux.ibm.com>
+In-Reply-To: <884367dd-fba0-4acd-a614-f657768b662a@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: xSbd3g6ktdC65JTg1bz6FI_bVm1lvIcq
+X-Proofpoint-ORIG-GUID: Xg8nTaFVtTxu5p9zZ8rj6cPHeI9KG5e-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-23_10,2024-08-22_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ suspectscore=0 spamscore=0 mlxlogscore=721 bulkscore=0 impostorscore=0
+ malwarescore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408230095
 
-On Tue, Aug 20, 2024 at 10:06:00AM -0700, Sean Christopherson wrote:
-> On Tue, Aug 20, 2024, Will Deacon wrote:
-> > On Tue, Aug 20, 2024 at 09:07:22AM -0700, Sean Christopherson wrote:
-> > > On Tue, Aug 20, 2024, Will Deacon wrote:
-> > > > handler could do the invalidation as part of its page-table walk (for
-> > > > example, it could use information about the page-table structure such
-> > > > as the level of the leaves to optimise the invalidation further), but
-> > > > this does at least avoid zapping the whole VMID on CPUs with range
-> > > > support.
-> > > > 
-> > > > My only slight concern is that, should clear_flush_young() be extended
-> > > > to operate on more than a single page-at-a-time in future, this will
-> > > > silently end up invalidating the entire VMID for each memslot unless we
-> > > > teach kvm_arch_flush_remote_tlbs_range() to return !0 in that case.
-> > > 
-> > > I'm not sure I follow the "entire VMID for each memslot" concern.  Are you
-> > > worried about kvm_arch_flush_remote_tlbs_range() failing and triggering a VM-wide
-> > > flush?
-> > 
-> > The arm64 implementation of kvm_arch_flush_remote_tlbs_range()
-> > unconditionally returns 0, so we could end up over-invalidating pretty
-> > badly if that doesn't change. It should be straightforward to fix, but
-> > I just wanted to point it out because it would be easy to miss too!
-> 
-> Sorry, I'm still not following.  0==success, and gfn_range.{start,end} is scoped
-> precisely to the overlap between the memslot and hva range.  Regardless of the
-> number of pages that are passed into clear_flush_young(), KVM should naturally
-> flush only the exact range being aged.  The only hiccup would be if the hva range
-> straddles multiple memslots, but if userspace creates multiple memslots for a
-> single vma, then that's a userspace problem.
+On Fri Aug 23, 2024 at 10:02 AM CEST, Janosch Frank wrote:
+> On 8/19/24 6:03 PM, Christoph Schlameuss wrote:
+> > On Fri Aug 16, 2024 at 4:29 PM CEST, Janosch Frank wrote:
+> >> On 8/15/24 5:45 PM, Christoph Schlameuss wrote:
+> >>> Add a test case verifying basic running and interaction of ucontrol V=
+Ms.
+> >>> Fill the segment and page tables for allocated memory and map memory =
+on
+> >>> first access.
+> >>>
+> >>> * uc_map_unmap
+> >>>     Store and load data to mapped and unmapped memory and use pic seg=
+ment
+> >>>     translation handling to map memory on access.
+> >>>
+> >>> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> >>> ---
+> >>>    .../selftests/kvm/s390x/ucontrol_test.c       | 120 ++++++++++++++=
++++-
+> >>>    1 file changed, 119 insertions(+), 1 deletion(-)
+> >>>
+> >>
+> >>> +static void uc_handle_exit_ucontrol(FIXTURE_DATA(uc_kvm) * self)
+> >>> +{
+> >>> +	struct kvm_run *run =3D self->run;
+> >>> +
+> >>> +	TEST_ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
+> >>> +	switch (run->s390_ucontrol.pgm_code) {
+> >>> +	case PGM_SEGMENT_TRANSLATION:
+> >>> +		pr_info("ucontrol pic segment translation 0x%llx\n",
+> >>> +			run->s390_ucontrol.trans_exc_code);
+> >>> +		/* map / make additional memory available */
+> >>> +		struct kvm_s390_ucas_mapping map2 =3D {
+> >>> +			.user_addr =3D (u64)gpa2hva(self, run->s390_ucontrol.trans_exc_co=
+de),
+> >>> +			.vcpu_addr =3D run->s390_ucontrol.trans_exc_code,
+> >>> +			.length =3D VM_MEM_EXT_SIZE,
+> >>> +		};
+> >>> +		pr_info("ucas map %p %p 0x%llx\n",
+> >>> +			(void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
+> >>> +		TEST_ASSERT_EQ(0, ioctl(self->vcpu_fd, KVM_S390_UCAS_MAP, &map2));
+> >>> +		break;
+> >>
+> >> Why is this necessary if you fix up the mapping in the test?
+> >>
+> >=20
+> > This is also used within the uc_skey test to make sure the remap does
+> > work after the unmap.
+>
+> Maybe I'm blind because I'm still recovering but where exactly?
 
-Fair enough, but it's not a lot of effort to fix this (untested diff
-below) and if the code were to change in future so that
-__kvm_handle_hva_range() was more commonly used to span multiple
-memslots we probably wouldn't otherwise notice the silent
-over-invalidation for a while.
+It is literally used in the last line of the test case. Calling uc_handle_e=
+xit()
+again re-maps previously unmapped memory.
 
-Will
+I can try to make that a little bit more obvious.
 
---->8
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6981b1bc0946..1e34127f79b0 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -175,6 +175,9 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
- int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
-                                      gfn_t gfn, u64 nr_pages)
- {
-+       if (!system_supports_tlb_range())
-+               return -EOPNOTSUPP;
-+
-        kvm_tlb_flush_vmid_range(&kvm->arch.mmu,
-                                gfn << PAGE_SHIFT, nr_pages << PAGE_SHIFT);
-        return 0;
++	/* unmap and run loop again */
++	TH_LOG("ucas unmap %p %p 0x%llx",
++	       (void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
++	rc =3D ioctl(self->vcpu_fd, KVM_S390_UCAS_UNMAP, &map2);
++	ASSERT_EQ(0, rc)
++		TH_LOG("ucas map result %d not expected, %s", rc, strerror(errno));
++	ASSERT_EQ(0, uc_run_once(self));
++	ASSERT_EQ(3, sync_regs->gprs[0]);
++	ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
++	ASSERT_EQ(true, uc_handle_exit(self));  // <--- HERE
++}
 
 
