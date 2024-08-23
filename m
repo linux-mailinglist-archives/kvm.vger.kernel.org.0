@@ -1,235 +1,210 @@
-Return-Path: <kvm+bounces-24960-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24961-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD89B95D952
-	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:38:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C463195D956
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:49:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CD9F1F23A9F
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 22:38:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50DC01F23B85
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 22:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C848F1C8FD4;
-	Fri, 23 Aug 2024 22:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0A81C8FDC;
+	Fri, 23 Aug 2024 22:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yt6aVqzW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HetAaw1O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2E2195
-	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 22:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F28194AD5
+	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 22:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724452689; cv=none; b=dSbk21OleqOPFNB+TeN0ga3AdwaO7hHramSODrCSE6HHXFVNdgP1OzNJiqFz5Up77zoGD3mLm9yNUq2X+jdxO5C8GCGezNVwCsyBqfFI6B3FpOz3AFXZw/UwChPoBEz3DeXgBqyxut+1NMW8YzCxd6hd1woePHvpvd5oUi6tuSQ=
+	t=1724453346; cv=none; b=kI6U4eLgMtz/BR4CRbLnt+qpR++tuAglEhK3g1nWJ/jqODPKtQ8v3c0L2Y6paWu/oSUnlZ3Gr0LsIF9JdufiEQfFMZ1Z4H3OkElpA2amjwjzwQMbXL7sj3nD4Un/o9o4pMJw7gSv4FNeZd+q3ekCWmBj5BdvuWMg1PjC43xioMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724452689; c=relaxed/simple;
-	bh=YhT6sdc4+kGrsxvXVGZjTuTgwTTR6fDKBgQ74KqzVrM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WLAbXmse9Mi0UTXNvxNXVB8E4rZ1mG3+Hok2HF5OiPwIXlxTp5HSbdF5F75JKu9nsfcykx/OabLenDv7rLyyuRtyxEpxA43UKOB0mu7JvLNbEeq67cZKxKcNX3e2qn0vAgk9xaeFc+rG/bZ7bR+Bq1ISuPp1XufBb2FBWpoSB4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yt6aVqzW; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1724453346; c=relaxed/simple;
+	bh=BxbVTKfcrEVjaGlyBbRgzsmV2oBpw2iEJhOH8QSMsnQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SlG8awx0TJrwm1eOx+ZUlyJNJwsbx21vt4GeOUSH7ZRHKIEyFtAdl+n0UpgsfSVlow/7RElH7Mq7zwk+lwWGSGT73XssDA7Kexjl9R3vjwsCx96fnwLR7SeYJLhQQRuJnaDfb9Qvrraz+jheoL31/17ix2C/nK6gfjewO1QPCcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HetAaw1O; arc=none smtp.client-ip=209.85.166.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-202018541afso31655ad.1
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 15:38:07 -0700 (PDT)
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-39d2a107aebso56545ab.0
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 15:49:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724452687; x=1725057487; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=67SkyJsl/iWoGiV4vOIFiOAGuN0Lng8flO08TUKRykU=;
-        b=yt6aVqzW/WJ4EY0VU/T40zGL5lNQ8O+OCg17R5d1P1UG08ujZdiFko90voaYzdIGNT
-         x/D5pStyAxmlJCWrXXl2GtsI7NygYB5h3kj1pudG8PNQxo6i5a6d3HoyGEMjwU/1GW5Y
-         pl0ku75uVjrZAw2Q2e+4mwVbwJwL3XCGtu3y2YO9GeCFSzFNKMrkS+BIMWIXAOI7xw3K
-         I5W2EeohaNxbluIF/MPxmjy8CNq1dT7SgnG7EZ1CcQbUQbR3lX75rec1De5HcSL38yBW
-         qqUoALVqHK15IN4/EKAkSSAFl9CWrzxpBn+ZuyNCuFvuXl/E2ryaCvw5hrKmmEK4G7U2
-         ZSLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724452687; x=1725057487;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1724453343; x=1725058143; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=67SkyJsl/iWoGiV4vOIFiOAGuN0Lng8flO08TUKRykU=;
-        b=Tb3ZrW1I3+7vpx9lZ/pcTSCVS/JV9m0VmWYZtCsymgC+Bqw9TB9D11n9mPZuiXYHuf
-         HZ82FVRdCH/mvgM1qqhKa7cjDB/FT21fknE8ONfWBu2mvHnea0SwOfec7SvdEBbmH4cY
-         39e0MAKZK869+PNPoDavypx2LS1q7qFsqgtYwnlUsigtShxq+bCHDI4uBWfCX6ujxxAI
-         wEjaSWiFp/zAjL/bCPeYG2fDcVPFwkgor0t1vM6jaXylRg9jXYSEXwV4YakOpMMZjbTc
-         zNpmg4DmjJE8YNXFjA1+bzZ3pnoT0IT/jijWledmcgXVlsgsVFfr4pgWs24ilvt1KOen
-         w0hQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGyO4BiUwUxNJeiSOzbRYiQtFgUdcUS0mTfYQKcyjScPPobNUsGTV12LCEq0T1hHMx5To=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhGNaLnhfjXMeBuxHe/a6Cf4diH8ThBDbUxufnUf1eFMl97fyW
-	igoz9+8NyNS/+zyoHxtg+4+c7Fzkq5MeUM8YrF8Pf+dJ+2a2FiV6Zh1+g1NbMxwqKs+EWvW+Skg
-	shQ==
-X-Google-Smtp-Source: AGHT+IFpfavPcBPprGtWGC73E5dDeBeGQmqT4yNrvSoTORu6KeMugQQYzHlHE+HxJGyoCV4tG78cZA==
-X-Received: by 2002:a17:902:e74e:b0:202:445:3c82 with SMTP id d9443c01a7336-203b2bf6c7amr1003465ad.4.1724452686407;
-        Fri, 23 Aug 2024 15:38:06 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7143422ebe7sm3633392b3a.14.2024.08.23.15.38.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 15:38:05 -0700 (PDT)
-Date: Fri, 23 Aug 2024 15:38:00 -0700
-From: Vipin Sharma <vipinsh@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, dmatlack@google.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Recover NX Huge pages belonging to TDP
- MMU under MMU read lock
-Message-ID: <20240823223800.GB678289.vipinsh@google.com>
-References: <20240812171341.1763297-1-vipinsh@google.com>
- <20240812171341.1763297-3-vipinsh@google.com>
- <Zr_i3caXmIZgQL0t@google.com>
- <20240819173453.GB2210585.vipinsh@google.com>
- <ZsPDWqOiv_g7Wh_H@google.com>
+        bh=1mSDEtxYic5lCbq3mrk6af83rFghOTZGlDbAI56siaA=;
+        b=HetAaw1OyQ5tSfgVEgoadWaglkNAb0pUr++Hq0mKDi+ObOIukMBjbrWJ08zUmR2NBw
+         QocD3VHcFpDKp/zWGtcC8EGkGkKJBPx5HN51RQVzos0tOyYt5nhAON9eqs9UAVEgx2eh
+         4drDHs/VHy8S598TwF+pCCRTI779JhX8TNAKdFodmOMdTPf190pY3+ArAJCqK6Ygptqd
+         6vN+jdJ0dsZjOwnl++0wMpHqVZM8xmcuKRH5hXxH/b37AUNE3ZheiAKQ2wGCOR1gd/CM
+         CxHAf6MD2dTo9DcDn7srEMWDcNuDzgW3CSWf7hPGzLVSdkYuryCuboI3TBscAhc5gXYu
+         cKGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724453343; x=1725058143;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1mSDEtxYic5lCbq3mrk6af83rFghOTZGlDbAI56siaA=;
+        b=ghgT0KFIYlkxqLh2WDbik4t19/a/ajLPQ4W0fi8NXcI3O81PqLQs23jskrb7vjkVAS
+         NB6DKHu0nv4BDPPeYX+oVM0Paa+aIuj3+CcJOck8oxUlOZgWxD9NVOElFNGAlNb3E4Dz
+         Ydl/J9D0UJzqdyuqWR45BI33X+ZA8CFtkDJy+AFzHZyYiuTBk7CLSxNSB6JaPfloDrYx
+         K8jAaErU1/tS5QKuXBNU9cYLz6VDOf79au5NIlv91Tv201a+/SiA5VM47bMkVydqcMaW
+         bC0o+NCRaaAyojEdngdS9rHSF13L/nP04Y3VUIGj4wm7yHEBXiKqHHWnGAExR8TuubN5
+         +L/g==
+X-Forwarded-Encrypted: i=1; AJvYcCW+D79cVgl1i0Opp/gVPwguklhXUYOsnxbtl+k7mY4qtapvWGccC2C7prooAFId8PuhL7o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAX7mShrwYcjodaKaBwGuXr8Cv/K66hzLwj4WyALt1umjbp+O2
+	LDJOvpI14zFuiP7Gxc8bbt1xc0Uc5SE2xq9mdeBxqIOYYx5LgXoYNRHadLAzjng9LKCH16k8W+0
+	Q3Qz5BFKmC4sr8dsqVsy7+Tj9LXowjQbtcd2B
+X-Google-Smtp-Source: AGHT+IHNrllfRjSQuMnlcItv9GICaHtqFC7j3OYb2ipkMG75SjFCnWvG3zfxlchngKtQF9VeVnYlujAE/eD4in0ib3Q=
+X-Received: by 2002:a05:6e02:1582:b0:377:15c7:1aa0 with SMTP id
+ e9e14a558f8ab-39e45110653mr304725ab.25.1724453342561; Fri, 23 Aug 2024
+ 15:49:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZsPDWqOiv_g7Wh_H@google.com>
+References: <20240823185323.2563194-1-jmattson@google.com> <20240823185323.2563194-5-jmattson@google.com>
+ <26e72673-350c-a02d-7b77-ebfd42612ae6@amd.com> <Zsj2anWub8v9kwBA@google.com> <59449778-ad4e-69c6-d1dc-73dacb538e02@amd.com>
+In-Reply-To: <59449778-ad4e-69c6-d1dc-73dacb538e02@amd.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 23 Aug 2024 15:48:51 -0700
+Message-ID: <CALMp9eTNX7=siC=DtBOSDLr6Aswzsq0d6UAHQpEdTd2J8xXHuQ@mail.gmail.com>
+Subject: Re: [PATCH v3 4/4] KVM: x86: AMD's IBPB is not equivalent to Intel's IBPB
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Sandipan Das <sandipan.das@amd.com>, 
+	Kai Huang <kai.huang@intel.com>, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Venkatesh Srinivas <venkateshs@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-08-19 15:12:42, Sean Christopherson wrote:
-> On Mon, Aug 19, 2024, Vipin Sharma wrote:
-> > On 2024-08-16 16:38:05, Sean Christopherson wrote:
-> > In this patch, tdp_mmu_zap_sp() has been modified to retry failures,
-> > which is similar to other retry mechanism in TDP MMU. Won't it be the
-> > same issue with other TDP MMU retry flows?
-> 
-> Similar, but not exactly the same.  The other flows are guarnateed to make forward
-> progress, as they'll never revisit a SPTE.  I.e. once a SPTE is observed to be
-> !shadow-present, that SPTE will never again be processed.
-> 
-> This is spinning on a pre-computed variable, and waiting until that many SPs have
-> been zapped.  The early break if the list is empty mostly protects against an
-> infinite loop, but it's theoretically possible other tasks could keep adding and
-> deleting from the list, in perpetuity.
+On Fri, Aug 23, 2024 at 3:12=E2=80=AFPM Tom Lendacky <thomas.lendacky@amd.c=
+om> wrote:
+>
+> On 8/23/24 15:51, Sean Christopherson wrote:
+> > On Fri, Aug 23, 2024, Tom Lendacky wrote:
+> >> On 8/23/24 13:53, Jim Mattson wrote:
+> >>> From Intel's documention [1], "CPUID.(EAX=3D07H,ECX=3D0):EDX[26]
+> >>> enumerates support for indirect branch restricted speculation (IBRS)
+> >>> and the indirect branch predictor barrier (IBPB)." Further, from [2],
+> >>> "Software that executed before the IBPB command cannot control the
+> >>> predicted targets of indirect branches (4) executed after the command
+> >>> on the same logical processor," where footnote 4 reads, "Note that
+> >>> indirect branches include near call indirect, near jump indirect and
+> >>> near return instructions. Because it includes near returns, it follow=
+s
+> >>> that **RSB entries created before an IBPB command cannot control the
+> >>> predicted targets of returns executed after the command on the same
+> >>> logical processor.**" [emphasis mine]
+> >>>
+> >>> On the other hand, AMD's IBPB "may not prevent return branch
+> >>> predictions from being specified by pre-IBPB branch targets" [3].
+> >>>
+> >>> However, some AMD processors have an "enhanced IBPB" [terminology
+> >>> mine] which does clear the return address predictor. This feature is
+> >>> enumerated by CPUID.80000008:EDX.IBPB_RET[bit 30] [4].
+> >>>
+> >>> Adjust the cross-vendor features enumerated by KVM_GET_SUPPORTED_CPUI=
+D
+> >>> accordingly.
+> >>>
+> >>> [1] https://www.intel.com/content/www/us/en/developer/articles/techni=
+cal/software-security-guidance/technical-documentation/cpuid-enumeration-an=
+d-architectural-msrs.html
+> >>> [2] https://www.intel.com/content/www/us/en/developer/articles/techni=
+cal/software-security-guidance/technical-documentation/speculative-executio=
+n-side-channel-mitigations.html#Footnotes
+> >>> [3] https://www.amd.com/en/resources/product-security/bulletin/amd-sb=
+-1040.html
+> >>> [4] https://www.amd.com/content/dam/amd/en/documents/processor-tech-d=
+ocs/programmer-references/24594.pdf
+> >>>
+> >>> Fixes: 0c54914d0c52 ("KVM: x86: use Intel speculation bugs and featur=
+es as derived in generic x86 code")
+> >>> Suggested-by: Venkatesh Srinivas <venkateshs@chromium.org>
+> >>> Signed-off-by: Jim Mattson <jmattson@google.com>
+> >>> ---
+> >>>  arch/x86/kvm/cpuid.c | 6 +++++-
+> >>>  1 file changed, 5 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> >>> index ec7b2ca3b4d3..c8d7d928ffc7 100644
+> >>> --- a/arch/x86/kvm/cpuid.c
+> >>> +++ b/arch/x86/kvm/cpuid.c
+> >>> @@ -690,7 +690,9 @@ void kvm_set_cpu_caps(void)
+> >>>     kvm_cpu_cap_set(X86_FEATURE_TSC_ADJUST);
+> >>>     kvm_cpu_cap_set(X86_FEATURE_ARCH_CAPABILITIES);
+> >>>
+> >>> -   if (boot_cpu_has(X86_FEATURE_IBPB) && boot_cpu_has(X86_FEATURE_IB=
+RS))
+> >>> +   if (boot_cpu_has(X86_FEATURE_AMD_IBPB_RET) &&
+> >>> +       boot_cpu_has(X86_FEATURE_AMD_IBPB) &&
+> >>> +       boot_cpu_has(X86_FEATURE_AMD_IBRS))
+> >>>             kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
+> >>>     if (boot_cpu_has(X86_FEATURE_STIBP))
+> >>>             kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
+> >>> @@ -759,6 +761,8 @@ void kvm_set_cpu_caps(void)
+> >>>      * arch/x86/kernel/cpu/bugs.c is kind enough to
+> >>>      * record that in cpufeatures so use them.
+> >>>      */
+> >>> +   if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
+> >>> +           kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
+> >>
+> >> If SPEC_CTRL is set, then IBPB is set, so you can't have AMD_IBPB_RET
+> >> without AMD_IBPB, but it just looks odd seeing them set with separate
+> >> checks with no relationship dependency for AMD_IBPB_RET on AMD_IBPB.
+> >> That's just me, though, not worth a v4 unless others feel the same.
+> >
+> > You thinking something like this (at the end, after the dust settles)?
+> >
+> >       if (WARN_ON_ONCE(kvm_cpu_cap_has(X86_FEATURE_AMD_IBPB_RET) &&
+> >                        !kvm_cpu_cap_has(X86_FEATURE_AMD_IBPB)))
+> >               kvm_cpu_cap_clear(X86_FEATURE_AMD_IBPB_RET);
+>
+> I was just thinking more along the lines of:
+>
+>         if (boot_cpu_has(X86_FEATURE_IBPB)) {
+>                 kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB);
+>                 if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
+>                         kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
+>         }
 
-Got it.
+AFAICT, there are just two reasons that X86_FEATURE_IBPB gets set:
+1. The CPU reports CPUID.(EAX=3D7,ECX=3D0):EDX[bit 26] (aka X86_FEATURE_SPE=
+C_CTRL)
+2. The CPU reports CPUID Fn8000_0008_EBX[IBPB] (aka X86_FEATURE_AMD_IBPB)
 
-> What about something like this?  If the shadow page can't be zapped because
-> something else was modifying it, just move on and deal with it next time.
+Clearly, in the second case, the KVM cpu capability for AMD_IBPB will
+already be set, since it's specified in the mask for
+CPUID_8000_0008_EBX.
 
-This sounds good. I was trying to force zapping "to_zap" times
-shadow pages to make it similar to existing NX huge page recovery
-approach.
+If this block of code is just trying to populate CPUID Fn8000_0008_EBX
+on Intel processors, I'd rather change all of the predicates to test
+for Intel features, rather than vendor-neutral features, so that the
+derivation is clear. But maybe this block of code is also trying to
+populate CPUID Fn8000_0008_EBX on AMD processors that may have some of
+these features, but don't enumerate them via CPUID?
 
-> But jumping back to the "we actually can [hold tdp_mmu_pages_lock]", if the zap
-> is split into the actually CMPXCHG vs. handle_removed_pt() call, then the lock
-> can be held while walking+zapping.  And it's quite straightforward, if we're
-> willing to forego the sanity checks on the old_spte, which would require wrapping
-> the sp in a struct to create a tuple.
-> 
-> The only part that gives me pause is the fact that it's not super obvious that,
-> ignoring the tracepoint, handle_changed_spte() is just a fat wrapper for
-> handle_removed_pt() when zapping a SP.
-> 
-> Huh.  Actually, after a lot of fiddling and staring, there's a simpler solution,
-> and it would force us to comment/document an existing race that's subly ok.
-> 
-> For the dirty logging case, the result of kvm_mmu_sp_dirty_logging_enabled() is
-> visible to the NX recovery thread before the memslot update task is guaranteed
-> to finish (or even start) kvm_mmu_zap_collapsible_sptes().  I.e. KVM could
-> unaccount an NX shadow page before it is zapped, and that could lead to a vCPU
-> replacing the shadow page with an NX huge page.
-> 
-> Functionally, that's a-ok, because the accounting doesn't provide protection
-> against iTLB multi-hit bug, it's there purely to prevent KVM from bouncing a gfn
-> between an NX hugepage and an execute small page.  The only downside to the vCPU
-> doing the replacement is that the vCPU will get saddle with tearing down all the
-> child SPTEs.  But this should be a very rare race, so I can't imagine that would
-> be problematic in practice.
-
-I am worried that whenever this happens it might cause guest jitter
-which we are trying to avoid as handle_changed_spte() might be keep a
-vCPU busy for sometime.
-
-> static bool tdp_mmu_zap_possible_nx_huge_page(struct kvm *kvm,
-> 					      struct kvm_mmu_page *sp)
-> {
-> 	/*
-> 	 * If a different task modified the SPTE, then it should be impossible
-> 	 * for the SPTE to still be used for the to-be-zapped SP.  Non-leaf
-> 	 * SPTEs don't have Dirty bits, KVM always sets the Accessed bit when
-> 	 * creating non-leaf SPTEs, and all other bits are immutable for non-
-> 	 * leaf SPTEs, i.e. the only legal operations for non-leaf SPTEs are
-> 	 * zapping and replacement.
-> 	 */
-> 	if (tdp_mmu_set_spte_atomic(kvm, &iter, SHADOW_NONPRESENT_VALUE)) {
-> 		WARN_ON_ONCE(sp->spt == spte_to_child_pt(iter.old_spte, iter.level));
-
-I responded in another patch before reading all this here. This looks
-good.
-
-> void kvm_tdp_mmu_recover_nx_huge_pages(struct kvm *kvm, unsigned long to_zap)
-> 
-> 		/*
-> 		 * Unaccount the shadow page before zapping its SPTE so as to
-> 		 * avoid bouncing tdp_mmu_pages_lock() more than is necessary.
-> 		 * Clearing nx_huge_page_disallowed before zapping is safe, as
-> 		 * the flag doesn't protect against iTLB multi-hit, it's there
-> 		 * purely to prevent bouncing the gfn between an NX huge page
-> 		 * and an X small spage.  A vCPU could get stuck tearing down
-> 		 * the shadow page, e.g. if it happens to fault on the region
-> 		 * before the SPTE is zapped and replaces the shadow page with
-> 		 * an NX huge page and get stuck tearing down the child SPTEs,
-> 		 * but that is a rare race, i.e. shouldn't impact performance.
-> 		 */
-> 		unaccount_nx_huge_page(kvm, sp);
-
-Might cause jitter. A long jitter might cause an escalation.
-
-What if I do not unaccount in the beginning, and  move page to the end
-of the list only if it is still in the list? If zapping failed because
-some other flow might be removing this page but it still in the
-possible_nx_huge_pages list, then just move it to the end. The thread
-which is removing will remove it from the list eventually.
-
-for ( ; to_zap; --to_zap) {
-	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-	if (list_empty(&kvm->arch.possible_tdp_mmu_nx_huge_pages)) {
-		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-		break;
-	}
-
-	sp = list_first_entry(&kvm->arch.possible_tdp_mmu_nx_huge_pages,
-			      struct kvm_mmu_page,
-			      possible_nx_huge_page_link);
-
-	WARN_ON_ONCE(!sp->nx_huge_page_disallowed);
-	WARN_ON_ONCE(!sp->role.direct);
-
-	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-
-
-	/*
-	 * Don't bother zapping shadow pages if the memslot is being
-	 * dirty logged, as the relevant pages would just be faulted
-	 * back in as 4KiB pages.  Potential NX Huge Pages in this slot
-	 * will be recovered, along with all the other huge pages in
-	 * the slot, when dirty logging is disabled.
-	 */
-	if (kvm_mmu_sp_dirty_logging_enabled(kvm, sp)) {
-		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-		unaccount_nx_huge_page(kvm, sp);
-		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-		WARN_ON_ONCE(sp->nx_huge_page_disallowed);
-	} else if (tdp_mmu_zap_possible_nx_huge_page(kvm, sp)) {
-		flush = true;
-		WARN_ON_ONCE(sp->nx_huge_page_disallowed);
-	} else {
-		/*
-		 * Try again in future if the page is still in the
-		 * list
-		 */
-		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-		if (!list_empty(&sp->possible_nx_huge_page_link))
-			list_move_tail(&sp->possible_nx_huge_page_link,
-			kvm-> &kvm->arch.possible_nx_huge_pages);
-		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-	}
-
-	/* Resched code below */
-}
+> Thanks,
+> Tom
+>
+> >>
+> >
+> >> Thanks,
+> >> Tom
+> >>
+> >>>     if (boot_cpu_has(X86_FEATURE_IBPB))
+> >>>             kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB);
+> >>>     if (boot_cpu_has(X86_FEATURE_IBRS))
 
