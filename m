@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-24871-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24872-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDA6895C69D
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 09:36:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 761D195C6B0
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 09:38:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10F3B1C21E99
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 07:36:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3191C2860D4
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 07:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9FA13C9C0;
-	Fri, 23 Aug 2024 07:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D83F13D610;
+	Fri, 23 Aug 2024 07:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rf3kvsCr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MaOafHKw"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9459913C80A
-	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 07:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A436813D521
+	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 07:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724398601; cv=none; b=rtUxUc+KHS+Rp7LRchisMrx0JWqqqwr87gqzhkf5dNkIVpoU7gyGIVoKrZbFTmNA+i+GKsyv23OaE+p701tvbEJHUGxf22ytsBB3+Bdjy6LhwVmt5ucCLteDS9ort8rs7o9xGgoCvwGyLPlgVe7NcIpdipf4+JnxP2Vsgx5hFOE=
+	t=1724398652; cv=none; b=O5V5jb+X2zaxLmOKUEAiINOon/eWpPI1NxQJdkbc108Tl4EpPWtsv95uF/CMERWGcEHmynD39+psiIr+0KdPxJj+cIQ2p+xj1r7TIGs+mgznQk23ScuZtaZPei9BsdKSEIChRhUVvCr7vlauo7AvpyTwydpxm86Fv1033tJ9ygM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724398601; c=relaxed/simple;
-	bh=3ClOOmK7xT/Z8dXev7TKwvLbGU842KBsJYdXmyyFgVo=;
+	s=arc-20240116; t=1724398652; c=relaxed/simple;
+	bh=iewNyCaHY0gX6CX7O07F/JdOT+ugWH0EOnC0ugBJpJ0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sRp4tPTu+R22l2RnczNAFpsp2uSQ9vmqy4C6xWO8zD8NKQzyUVoAziT68y1H1HFwXhi3O+P5Swb1+fbD8xQTWbjDTIjs55tyyYoiS7ypfZbAmQuUu2eni4UaS0Em5M6aHD2JbgNPf9eFPztKVXGSxa5vOzaLa7kT5gVhK9MzLvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rf3kvsCr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2536BC4AF15
-	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 07:36:41 +0000 (UTC)
+	 Content-Type:MIME-Version; b=P8uVqAXIdwov0QSSo4r4lkeujwi+szMOIsD9kk3Vs0JicLCJXMd5T4FYi3LdmROkJEYPKiIx5/emtmGXWmnDGiUrGhb1HYzSZI6NOXWsDXCcR2Dn5t7GcP/nmjAKZy04DlUAU465Jptd4UB1ZMwIQv5ObvcOSooX1hpC47Dqun8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaOafHKw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C8C1C4AF12
+	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 07:37:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724398601;
-	bh=3ClOOmK7xT/Z8dXev7TKwvLbGU842KBsJYdXmyyFgVo=;
+	s=k20201202; t=1724398652;
+	bh=iewNyCaHY0gX6CX7O07F/JdOT+ugWH0EOnC0ugBJpJ0=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=rf3kvsCrayqAN8bL3bB/O42wBTZ7XI9Jmk7LO7Vt52UDFpcv2e2GxyMkCDllBOhxE
-	 9CldF6boJdfccgCRYP5q1lz6pYjzB1u3CkiqWQj1c4HqAcEQdeh/VoUdn2NxVyirMW
-	 mAc3YZyP9VoqKKPUeQlMuGjxuj0rYeOk3KarK+z6o/9oMSASKtaKZfiRIdWzXmIM+w
-	 Lq4hHY14Ak16whzJttBxCLIdmnbqo2nSznZjO7thSilyIJMdTUhi2wkw4VFCVdUyzY
-	 snaxBVPanr50NfjAX/5XJol/VDoLnHMQZU42K7LokiUYRPp+KQlJ53YTaaPR9LMkRd
-	 ktie5s7/ImNNg==
+	b=MaOafHKwPf9be02FhrnqPAcjmr4L3s/F02evQtj7Upg6MLWJC8rY99BGF81/iMxjY
+	 cnAIJaMweOaZ2qLK89ibXi0uQ+p+Nx/vweinadqjRrIRqnDh1clMm/G7lQfJtYvTdf
+	 SAZyh6Hx8nFuDDbOsTIr5XUII+PON6bnoXEZcYvI62lNhPRV1ZTvGzwRAGn7FabqNd
+	 Tocm07r4vTX3D0q7xkvObLIrl2I19Hnn7dv4WroUrcuacIdf6gduWszzVPkyUO8Rgj
+	 ymKKGk7AtZut89z1MrfJ/S3WRJMXSiUBIS+kwTt8k122jeNm3EFAx1QPM6i3+yTt5g
+	 fswXyuuXU4zyw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 1D2A6C53BB9; Fri, 23 Aug 2024 07:36:41 +0000 (UTC)
+	id 45465C53B7E; Fri, 23 Aug 2024 07:37:32 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
 Subject: [Bug 219009] Random host reboots on Ryzen 7000/8000 using nested VMs
  (vls suspected)
-Date: Fri, 23 Aug 2024 07:36:40 +0000
+Date: Fri, 23 Aug 2024 07:37:31 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -62,8 +62,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219009-28872-48o1Iec4Pf@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219009-28872-lBpDRJwesQ@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219009-28872@https.bugzilla.kernel.org/>
 References: <bug-219009-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -79,17 +79,14 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219009
 
-Ben Hirlston (ozonehelix@gmail.com) changed:
+--- Comment #3 from Ben Hirlston (ozonehelix@gmail.com) ---
+(In reply to Ben Hirlston from comment #2)
+> I can confirm on my Ryzen 9 7900X30 system disabling aspm helps. kind of
+> relieved this is a bug. I was having this issue on my Ryzen 7 5700G system
+> but to a lessor extent and it got worse when I upgraded to Ryzen 7000 ser=
+ies
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |ozonehelix@gmail.com
-
---- Comment #2 from Ben Hirlston (ozonehelix@gmail.com) ---
-I can confirm on my Ryzen 9 7900X30 system disabling aspm helps. kind of
-relieved this is a bug. I was having this issue on my Ryzen 7 5700G system =
-but
-to a lessor extent and it got worse when I upgraded to Ryzen 7000 series
+there is a typo I meant 7900X3D sorry about that
 
 --=20
 You may reply to this email to add a comment.
