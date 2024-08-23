@@ -1,101 +1,106 @@
-Return-Path: <kvm+bounces-24972-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24973-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C1595D9EC
-	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 01:54:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3512095D9F0
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 01:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFA6F1F23216
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 23:54:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B11BEB2415C
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 23:54:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7582A1C93AF;
-	Fri, 23 Aug 2024 23:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A3B1CCB3B;
+	Fri, 23 Aug 2024 23:54:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oTcSSNh5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0osuhRQ7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7E41C8FB0
-	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 23:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24731C9446
+	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 23:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724457269; cv=none; b=vFckN59mcFuhe8Y/J0rwIeTsWlDET/xJHpZNII045eS4Bj9G+VqC7xNEFuY2JOOE2G7Tol9OvOOw1V4zqZuULsUpac0wk2Zoqi2ySlN6acGu2XoKF40Mx27KFnt7Jt2ePm89sq4OKDUujAT/Zdgki7Hz3hZyIkPQYdadhF26re8=
+	t=1724457274; cv=none; b=P+z0MOBxvf8ZqW/bgeTKPDIaKXc1gMmI/aH+UyAHCX/r7FRxpm66kEu3h4Yys9e8CzXN7j7+ihR9obNq9k1+a+SW0IXvCPbqXyFBnI2LKcCJL7kiGH88aFY5L3P10NMMFxeV2MHpwc/u+FbpEf4mFyjUP3F5HxCsFM8NffviNSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724457269; c=relaxed/simple;
-	bh=NFrH6QKQdAm7hqhMi1X6Y/Mb5BH/zBlLUwLwoHG2TGw=;
+	s=arc-20240116; t=1724457274; c=relaxed/simple;
+	bh=ZsGbrVfo9OkjdxgpqSfk8utdzoF8z3yMoR3uwvLyy2E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=O1D/YRxx3gfSOfBPCoC3R3JHjKtKTyNIg0rf7PcpkgZdbUILVqJdL1SFjM3pX++Z9YVP5r5xgPu4f6mzSQ1qr7XWgeFfDUboGXX/bhaggOuA/G9/frkmJmUYvO655YafwWdfUf2zLPBJUYTjprSG9B2HY/0PVS7Ul3S+//emxpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oTcSSNh5; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=Ym0qCGp4MvWofmCJ13bVCmBTcuGSEcWAr5IA6XrafUK2Iz14SW3B9n8G5HhxS91D4vQnAiJpsLmMVjZAqflKk2ShMcvLEheGETVqOUNtnFgDcN3qAbjVHJ36jLKNc9vMyTVP8hRhkZBMN6ivWowoZsWsPTHfQ/JHixh+TPdkyqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0osuhRQ7; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6b41e02c293so48660867b3.0
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 16:54:27 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2d3d413c4edso2774474a91.0
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 16:54:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724457266; x=1725062066; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1724457272; x=1725062072; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XUG/VbNxzCYgL5k/uczQ4c0VmpcWo0PYIg3efsPlOFk=;
-        b=oTcSSNh5yhhsq1DFNTCP0RbI+QyhH1VTTM3cPwjPc1qrLTpocMyjEX/zeixBjvZv8d
-         e0MC3+1USoJ6u7AUOKqUBhVMu1cuznuu3cDhJmxcVKs/8hqyBBHzxDa1zt7SzoKjkD/h
-         sqd53D1ImYxS87xRMSW+7ZxQ+pql49nro4iZSU45vRBgzxHDHgeA35vNXLihs1fgGrsg
-         J29S3FKQbLrwjxUBCvc5DlKpZLNvKgN51WCPsRm3GgDpCw3dvi60vedXCbSUkHSYk5z+
-         m6f2VrSE2ueeF3qL4kg/3WIoUq4SDPTtNyDZXOqxaOekMbtfNJ1LFUaBy69mqpyyJH8p
-         FKDQ==
+        bh=I2v2MHDt4esEOK/DxuPwtgfOFZoYYQTEeuqo4M+jXGM=;
+        b=0osuhRQ7sH7zrk5U3BvtbkFoo1CCbywysNtofdxaYniBe2yX9rKlaUsJ6ox+Hj+wCg
+         e6ylKsFwbl9GQHXF3aA4IiY2PWkBVk0/wUHVDodGtta5kuWMQLTXusk/aGe1zykSHFwm
+         /OkPMpGc/kcVOeJ6lY+coHZ6ZL+bb48AaSFrW1eiHQpdyvdQqlg3LFNt2qV7tg1IcRal
+         +rGkBtpSzst4sJ2cy6unSzCDOTVbtJ06wLPIaTQCDP6nbWnX2c4eCevv8XCoHiXOo6rb
+         Zt/r5oi0N4K37FQ6P3Fqgc2uhdRao3QD9hPqlCrO1jK0aN0nt+lxVrplw6EoxsE5j4Mi
+         IJhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724457266; x=1725062066;
+        d=1e100.net; s=20230601; t=1724457272; x=1725062072;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XUG/VbNxzCYgL5k/uczQ4c0VmpcWo0PYIg3efsPlOFk=;
-        b=ah5qXXmASkjuPSmue1+EqjJp1gd3XSVVbSo9qCzKwmJhIonAf1ytrQO4LehhxSq+uK
-         ACgW0yvd7ECr6WcZvebmJ6TO3vwotc+pgnsV8E3Ip0oTFzui+nCKV3K1pe8G00amstie
-         NpLjuTG5cFSeRVDcvvmZeDeEvGe44BI495t5itVjrfkg05+oSntXFqhp5VU+4ZoIYcIb
-         QC36Sqqt4s0sJbSpwNZd9RxUsrnZ9NxFn1k+dzGUYWwU/rJbD/Zl/JlyRbjc/7ivFaby
-         Il+jDzVQyWyWQZ5EEyTQHAn8GZ96eVlqxLKvTBs4SzXTl2R5+iKhWZc5+YZT86CYJwXE
-         a58w==
-X-Gm-Message-State: AOJu0Yy9IrJuuo37tsuBwNTiUGQMYX9nUOy1qRL8ckP6ow/rb9hQC3TB
-	lEzSNg0CR6tUMQdILI+zI9RSaSYzUvadgjRoRgAppapMLTtz9D3XZaanB1/qpbQ3cl1V2oBfbDh
-	EEw==
-X-Google-Smtp-Source: AGHT+IGS7BvoZUmzKrI7jiLE5DmLS4L7wkzo8CGb427MM110ZTx0sqvu9MQ9sxKwDppX+ynGW5ty+xXVnxA=
+        bh=I2v2MHDt4esEOK/DxuPwtgfOFZoYYQTEeuqo4M+jXGM=;
+        b=IJhZ8iwbG4xf27tGl8HjBAYjkzOOEI9cXpA22KQNQpIE6Cs2ooGUbACWzb76tVFllm
+         pLT1qPeBHMepF/acLfZn5S/aV4F1nBSdCuw8ITnwCRWsrnMzOvH7ibqB8XyXS/HSmGrd
+         D1oDODDHWJJiNZSwahFtGrshc2VrsQbd1YbcenDTTKV3IsqMhBOJ6NdLK0dz536HTOF9
+         w4iSM/ysRfZuRtuq5r/Hjfy8b6OcqWEbTMT+U7j433foJKWsDTNZORe/5zzS+4v0T2r+
+         kErok5MlZzWUVdgfgPkXI0Vd5Y4XyBly3thSE6uDPWNTyiI4bTWUc6PAMuTTR5WIR430
+         hy5A==
+X-Gm-Message-State: AOJu0YzKTNjrihyr+u7ToB2LwGGZbWApSLWapwyOmuQ78OwotxCyJ20/
+	dAiGrrS9yN9moZUDFgBCie3RKSS9LyCd5ymxmbvr4c+2Wfc0Pg9E2yl57T85gUxuLJBCjIDZzcr
+	mGQ==
+X-Google-Smtp-Source: AGHT+IHm1c1eC7EMuzeGgtY+z7vJ1lrOuEaIgxUAfa1UDufYAd0VdDhBdDFlj2e3bEGajgU0/zU2XZlhzo4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ff08:0:b0:64a:8aec:617c with SMTP id
- 00721157ae682-6c61e8fcf4dmr1253387b3.0.1724457266663; Fri, 23 Aug 2024
- 16:54:26 -0700 (PDT)
-Date: Fri, 23 Aug 2024 16:47:51 -0700
-In-Reply-To: <20240814203345.2234-2-thorsten.blum@toblux.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:fa86:b0:2d3:ce45:9148 with SMTP id
+ 98e67ed59e1d1-2d646d81615mr54476a91.7.1724457271818; Fri, 23 Aug 2024
+ 16:54:31 -0700 (PDT)
+Date: Fri, 23 Aug 2024 16:47:53 -0700
+In-Reply-To: <20240802202006.340854-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240814203345.2234-2-thorsten.blum@toblux.com>
+References: <20240802202006.340854-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
-Message-ID: <172443883227.4128803.4411198613341670589.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86: Optimize local variable in start_sw_tscdeadline()
+Message-ID: <172443896940.4129936.14195284777076363677.b4-ty@google.com>
+Subject: Re: [PATCH v2] KVM: x86/mmu: Clean up function comments for dirty
+ logging APIs
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, Thorsten Blum <thorsten.blum@toblux.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Wed, 14 Aug 2024 22:33:46 +0200, Thorsten Blum wrote:
-> Change the data type of the local variable this_tsc_khz to u32 because
-> virtual_tsc_khz is also declared as u32.
+On Fri, 02 Aug 2024 13:20:06 -0700, Sean Christopherson wrote:
+> Rework the function comment for kvm_arch_mmu_enable_log_dirty_pt_masked()
+> into the body of the function, as it has gotten a bit stale, is harder to
+> read without the code context, and is the last source of warnings for W=1
+> builds in KVM x86 due to using a kernel-doc comment without documenting
+> all parameters.
 > 
-> Since do_div() casts the divisor to u32 anyway, changing the data type
-> of this_tsc_khz to u32 also removes the following Coccinelle/coccicheck
-> warning reported by do_div.cocci:
+> Opportunistically subsume the functions comments for
+> kvm_mmu_write_protect_pt_masked() and kvm_mmu_clear_dirty_pt_masked(), as
+> there is no value in regurgitating similar information at a higher level,
+> and capturing the differences between write-protection and PML-based dirty
+> logging is best done in a common location.
 > 
 > [...]
 
-Applied to kvm-x86 misc, thanks!
+Applied to kvm-x86 mmu, thanks!
 
-[1/1] KVM: x86: Optimize local variable in start_sw_tscdeadline()
-      https://github.com/kvm-x86/linux/commit/1448d4a935ab
+[1/1] KVM: x86/mmu: Clean up function comments for dirty logging APIs
+      https://github.com/kvm-x86/linux/commit/acf2923271ef
 
 --
 https://github.com/kvm-x86/linux/tree/next
