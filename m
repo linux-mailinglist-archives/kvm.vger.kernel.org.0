@@ -1,210 +1,236 @@
-Return-Path: <kvm+bounces-24961-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24962-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C463195D956
-	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:49:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 887DD95D9D7
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 01:46:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50DC01F23B85
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 22:49:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40EA62844A8
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 23:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0A81C8FDC;
-	Fri, 23 Aug 2024 22:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4CA1C93B9;
+	Fri, 23 Aug 2024 23:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HetAaw1O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NZJ3KtQ6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F28194AD5
-	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 22:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1366149C4C
+	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 23:46:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724453346; cv=none; b=kI6U4eLgMtz/BR4CRbLnt+qpR++tuAglEhK3g1nWJ/jqODPKtQ8v3c0L2Y6paWu/oSUnlZ3Gr0LsIF9JdufiEQfFMZ1Z4H3OkElpA2amjwjzwQMbXL7sj3nD4Un/o9o4pMJw7gSv4FNeZd+q3ekCWmBj5BdvuWMg1PjC43xioMk=
+	t=1724456807; cv=none; b=RAq2J5c4D0nYcIRTQFPr+/sO1w0gwt5FQ0StQQHWR0s5EkmOpGWwfF/18ci1l9Qf5qP1VpskRmfn/3iaXZ5nTEUvrYFg4+HfO2fE9GdunhFiT9jzrJ/8ASCX8tGc3HpOFkbxCBbEJhYZrYZKP1xxI/wpRDE2Y6ryOD3brlKy4rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724453346; c=relaxed/simple;
-	bh=BxbVTKfcrEVjaGlyBbRgzsmV2oBpw2iEJhOH8QSMsnQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SlG8awx0TJrwm1eOx+ZUlyJNJwsbx21vt4GeOUSH7ZRHKIEyFtAdl+n0UpgsfSVlow/7RElH7Mq7zwk+lwWGSGT73XssDA7Kexjl9R3vjwsCx96fnwLR7SeYJLhQQRuJnaDfb9Qvrraz+jheoL31/17ix2C/nK6gfjewO1QPCcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HetAaw1O; arc=none smtp.client-ip=209.85.166.180
+	s=arc-20240116; t=1724456807; c=relaxed/simple;
+	bh=dHOchrkL6fAecNkuUUXA3/+o41T9FjUdMVi/uBBrCmw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=h6SfLiDfRPNG7P+h2Yo9O6evcHgkXWh+0Ud1YCmiXoEZIDCK3z9UuG3s7UFd0dth6JRxPGw/XYAphzScLlm6TwnKLascBXJ3ZXolx42KSc5uE89mpOz0aoF2160FMqYy+KhIJS1lJXnB5P8yhrzdlzCNMpIxbQeqT+KPebRh6mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NZJ3KtQ6; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-39d2a107aebso56545ab.0
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 15:49:03 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6b2249bf2d0so51666827b3.2
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 16:46:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724453343; x=1725058143; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1mSDEtxYic5lCbq3mrk6af83rFghOTZGlDbAI56siaA=;
-        b=HetAaw1OyQ5tSfgVEgoadWaglkNAb0pUr++Hq0mKDi+ObOIukMBjbrWJ08zUmR2NBw
-         QocD3VHcFpDKp/zWGtcC8EGkGkKJBPx5HN51RQVzos0tOyYt5nhAON9eqs9UAVEgx2eh
-         4drDHs/VHy8S598TwF+pCCRTI779JhX8TNAKdFodmOMdTPf190pY3+ArAJCqK6Ygptqd
-         6vN+jdJ0dsZjOwnl++0wMpHqVZM8xmcuKRH5hXxH/b37AUNE3ZheiAKQ2wGCOR1gd/CM
-         CxHAf6MD2dTo9DcDn7srEMWDcNuDzgW3CSWf7hPGzLVSdkYuryCuboI3TBscAhc5gXYu
-         cKGA==
+        d=google.com; s=20230601; t=1724456805; x=1725061605; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=N3H6wXI36PqvYyb5KsmlapRLwsCWfbVGz3QYy6oSpQU=;
+        b=NZJ3KtQ62Bh99lMs79hLZE49yvL7zSQzSYaLmRdqGwyeU+dVt3Q3XVVT2l0Jt3h749
+         3euknddmk95cT0L3LtJjFoasxe5Y35/00YUgyS6NjEToCM/EM8LqAkwGU8AvnRlyTUT7
+         1kl1U53+7G0NkUTX9+WZY7VsU67M0BHdAVOs3kax0ts6ABkQ0DfJiPIg8WrhZMNeVni8
+         xwtAhLXxQGDag/oIWbQtYP0HTLC2nbOfVFps4NeLuKpRnpsb7V0PDghjq1BkWf6vZK5S
+         xuTT1sNDNDhM7VODpWPASeB6nVvYrTzwAhKwN9ZVse6i8f3ZYWDRrVv/IM1q5WFu8KCG
+         h1uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724453343; x=1725058143;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1mSDEtxYic5lCbq3mrk6af83rFghOTZGlDbAI56siaA=;
-        b=ghgT0KFIYlkxqLh2WDbik4t19/a/ajLPQ4W0fi8NXcI3O81PqLQs23jskrb7vjkVAS
-         NB6DKHu0nv4BDPPeYX+oVM0Paa+aIuj3+CcJOck8oxUlOZgWxD9NVOElFNGAlNb3E4Dz
-         Ydl/J9D0UJzqdyuqWR45BI33X+ZA8CFtkDJy+AFzHZyYiuTBk7CLSxNSB6JaPfloDrYx
-         K8jAaErU1/tS5QKuXBNU9cYLz6VDOf79au5NIlv91Tv201a+/SiA5VM47bMkVydqcMaW
-         bC0o+NCRaaAyojEdngdS9rHSF13L/nP04Y3VUIGj4wm7yHEBXiKqHHWnGAExR8TuubN5
-         +L/g==
-X-Forwarded-Encrypted: i=1; AJvYcCW+D79cVgl1i0Opp/gVPwguklhXUYOsnxbtl+k7mY4qtapvWGccC2C7prooAFId8PuhL7o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAX7mShrwYcjodaKaBwGuXr8Cv/K66hzLwj4WyALt1umjbp+O2
-	LDJOvpI14zFuiP7Gxc8bbt1xc0Uc5SE2xq9mdeBxqIOYYx5LgXoYNRHadLAzjng9LKCH16k8W+0
-	Q3Qz5BFKmC4sr8dsqVsy7+Tj9LXowjQbtcd2B
-X-Google-Smtp-Source: AGHT+IHNrllfRjSQuMnlcItv9GICaHtqFC7j3OYb2ipkMG75SjFCnWvG3zfxlchngKtQF9VeVnYlujAE/eD4in0ib3Q=
-X-Received: by 2002:a05:6e02:1582:b0:377:15c7:1aa0 with SMTP id
- e9e14a558f8ab-39e45110653mr304725ab.25.1724453342561; Fri, 23 Aug 2024
- 15:49:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724456805; x=1725061605;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N3H6wXI36PqvYyb5KsmlapRLwsCWfbVGz3QYy6oSpQU=;
+        b=kRQ4XlOFxyxdamuJaJap36AfPLAQ77XvF3gllha6VMLCKSigb+WTSld6WEHoEaULy+
+         xpU/yhJJwCq37TBtUxYFhf/PgXuyUmT3WF+7LDPMo3j5j6rBGIWUqQSJFmzo7n3/NhZV
+         koVFLwLMo+6g5U4Hv7UVgMqT9uaslBAYzY2UlrH+ryI2M2UdLD105R8doEY2IixdDi49
+         0W9H3mtD4MxJYi2VOGcb0u7Tj1EUEOUqalwr0u/BYiYf2P6vKu4RM/vtUt6r5x3JbSYy
+         zsCIVovi6xPAiygbeCoVlSU6772SHYTBi6Y1xM9U609+l46qfIjLx8TH2JwbuXia1SY3
+         47hg==
+X-Forwarded-Encrypted: i=1; AJvYcCUvE+Wn+SRLxtoNvXRho7U58f5Yg52hKjXz6UTmPi+T2hIto943owsGxZQIs+268f4U0Bc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhgS5W1QloqafOg991ucoXULEWxzzS8aneot0qPf+H9frClWoi
+	0SsxFo47oAb/JPqcc+KtkKnhqVjH6QZSInwnACwCquQfXLo1yAGPYue48aKc7FqPw1koost/Cc9
+	uvw==
+X-Google-Smtp-Source: AGHT+IHdhH8ITRv9cW8KgH5/tqkfKTR20I9VNYg2JDiGnFwPr7gUYlsI7lzp5a8sI4DElo4dVOJ70r/0NWw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:2a92:b0:62d:1142:83a5 with SMTP id
+ 00721157ae682-6c62943b009mr76967b3.8.1724456804696; Fri, 23 Aug 2024 16:46:44
+ -0700 (PDT)
+Date: Fri, 23 Aug 2024 16:46:43 -0700
+In-Reply-To: <ZsfaMes4Atc3-O7h@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240823185323.2563194-1-jmattson@google.com> <20240823185323.2563194-5-jmattson@google.com>
- <26e72673-350c-a02d-7b77-ebfd42612ae6@amd.com> <Zsj2anWub8v9kwBA@google.com> <59449778-ad4e-69c6-d1dc-73dacb538e02@amd.com>
-In-Reply-To: <59449778-ad4e-69c6-d1dc-73dacb538e02@amd.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Fri, 23 Aug 2024 15:48:51 -0700
-Message-ID: <CALMp9eTNX7=siC=DtBOSDLr6Aswzsq0d6UAHQpEdTd2J8xXHuQ@mail.gmail.com>
-Subject: Re: [PATCH v3 4/4] KVM: x86: AMD's IBPB is not equivalent to Intel's IBPB
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Sandipan Das <sandipan.das@amd.com>, 
-	Kai Huang <kai.huang@intel.com>, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Venkatesh Srinivas <venkateshs@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240809190319.1710470-1-seanjc@google.com> <20240809190319.1710470-5-seanjc@google.com>
+ <20240814142256.7neuthobi7k2ilr6@yy-desk-7060> <6fsgci4fceoin7fp3ejeulbaybaitx3yo3nylzecanoba5gvhd@3ubrvlykgonn>
+ <ZsfaMes4Atc3-O7h@google.com>
+Message-ID: <ZskfY2XOken50etZ@google.com>
+Subject: Re: [PATCH 04/22] KVM: x86/mmu: Skip emulation on page fault iff 1+
+ SPs were unprotected
+From: Sean Christopherson <seanjc@google.com>
+To: Yao Yuan <yaoyuan0329os@gmail.com>
+Cc: Yuan Yao <yuan.yao@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerly Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Aug 23, 2024 at 3:12=E2=80=AFPM Tom Lendacky <thomas.lendacky@amd.c=
-om> wrote:
->
-> On 8/23/24 15:51, Sean Christopherson wrote:
-> > On Fri, Aug 23, 2024, Tom Lendacky wrote:
-> >> On 8/23/24 13:53, Jim Mattson wrote:
-> >>> From Intel's documention [1], "CPUID.(EAX=3D07H,ECX=3D0):EDX[26]
-> >>> enumerates support for indirect branch restricted speculation (IBRS)
-> >>> and the indirect branch predictor barrier (IBPB)." Further, from [2],
-> >>> "Software that executed before the IBPB command cannot control the
-> >>> predicted targets of indirect branches (4) executed after the command
-> >>> on the same logical processor," where footnote 4 reads, "Note that
-> >>> indirect branches include near call indirect, near jump indirect and
-> >>> near return instructions. Because it includes near returns, it follow=
-s
-> >>> that **RSB entries created before an IBPB command cannot control the
-> >>> predicted targets of returns executed after the command on the same
-> >>> logical processor.**" [emphasis mine]
-> >>>
-> >>> On the other hand, AMD's IBPB "may not prevent return branch
-> >>> predictions from being specified by pre-IBPB branch targets" [3].
-> >>>
-> >>> However, some AMD processors have an "enhanced IBPB" [terminology
-> >>> mine] which does clear the return address predictor. This feature is
-> >>> enumerated by CPUID.80000008:EDX.IBPB_RET[bit 30] [4].
-> >>>
-> >>> Adjust the cross-vendor features enumerated by KVM_GET_SUPPORTED_CPUI=
-D
-> >>> accordingly.
-> >>>
-> >>> [1] https://www.intel.com/content/www/us/en/developer/articles/techni=
-cal/software-security-guidance/technical-documentation/cpuid-enumeration-an=
-d-architectural-msrs.html
-> >>> [2] https://www.intel.com/content/www/us/en/developer/articles/techni=
-cal/software-security-guidance/technical-documentation/speculative-executio=
-n-side-channel-mitigations.html#Footnotes
-> >>> [3] https://www.amd.com/en/resources/product-security/bulletin/amd-sb=
--1040.html
-> >>> [4] https://www.amd.com/content/dam/amd/en/documents/processor-tech-d=
-ocs/programmer-references/24594.pdf
-> >>>
-> >>> Fixes: 0c54914d0c52 ("KVM: x86: use Intel speculation bugs and featur=
-es as derived in generic x86 code")
-> >>> Suggested-by: Venkatesh Srinivas <venkateshs@chromium.org>
-> >>> Signed-off-by: Jim Mattson <jmattson@google.com>
-> >>> ---
-> >>>  arch/x86/kvm/cpuid.c | 6 +++++-
-> >>>  1 file changed, 5 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> >>> index ec7b2ca3b4d3..c8d7d928ffc7 100644
-> >>> --- a/arch/x86/kvm/cpuid.c
-> >>> +++ b/arch/x86/kvm/cpuid.c
-> >>> @@ -690,7 +690,9 @@ void kvm_set_cpu_caps(void)
-> >>>     kvm_cpu_cap_set(X86_FEATURE_TSC_ADJUST);
-> >>>     kvm_cpu_cap_set(X86_FEATURE_ARCH_CAPABILITIES);
-> >>>
-> >>> -   if (boot_cpu_has(X86_FEATURE_IBPB) && boot_cpu_has(X86_FEATURE_IB=
-RS))
-> >>> +   if (boot_cpu_has(X86_FEATURE_AMD_IBPB_RET) &&
-> >>> +       boot_cpu_has(X86_FEATURE_AMD_IBPB) &&
-> >>> +       boot_cpu_has(X86_FEATURE_AMD_IBRS))
-> >>>             kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
-> >>>     if (boot_cpu_has(X86_FEATURE_STIBP))
-> >>>             kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
-> >>> @@ -759,6 +761,8 @@ void kvm_set_cpu_caps(void)
-> >>>      * arch/x86/kernel/cpu/bugs.c is kind enough to
-> >>>      * record that in cpufeatures so use them.
-> >>>      */
-> >>> +   if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
-> >>> +           kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
-> >>
-> >> If SPEC_CTRL is set, then IBPB is set, so you can't have AMD_IBPB_RET
-> >> without AMD_IBPB, but it just looks odd seeing them set with separate
-> >> checks with no relationship dependency for AMD_IBPB_RET on AMD_IBPB.
-> >> That's just me, though, not worth a v4 unless others feel the same.
-> >
-> > You thinking something like this (at the end, after the dust settles)?
-> >
-> >       if (WARN_ON_ONCE(kvm_cpu_cap_has(X86_FEATURE_AMD_IBPB_RET) &&
-> >                        !kvm_cpu_cap_has(X86_FEATURE_AMD_IBPB)))
-> >               kvm_cpu_cap_clear(X86_FEATURE_AMD_IBPB_RET);
->
-> I was just thinking more along the lines of:
->
->         if (boot_cpu_has(X86_FEATURE_IBPB)) {
->                 kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB);
->                 if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
->                         kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
->         }
+On Thu, Aug 22, 2024, Sean Christopherson wrote:
+> On Fri, Aug 16, 2024, Yao Yuan wrote:
+> > On Wed, Aug 14, 2024 at 10:22:56PM GMT, Yuan Yao wrote:
+> > > On Fri, Aug 09, 2024 at 12:03:01PM -0700, Sean Christopherson wrote:
+> > > > When doing "fast unprotection" of nested TDP page tables, skip emulation
+> > > > if and only if at least one gfn was unprotected, i.e. continue with
+> > > > emulation if simply resuming is likely to hit the same fault and risk
+> > > > putting the vCPU into an infinite loop.
+> > > >
+> > > > Note, it's entirely possible to get a false negative, e.g. if a different
+> > > > vCPU faults on the same gfn and unprotects the gfn first, but that's a
+> > > > relatively rare edge case, and emulating is still functionally ok, i.e.
+> > > > the risk of putting the vCPU isn't an infinite loop isn't justified.
+> > > >
+> > > > Fixes: 147277540bbc ("kvm: svm: Add support for additional SVM NPF error codes")
+> > > > Cc: stable@vger.kernel.org
+> > > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > > ---
+> > > >  arch/x86/kvm/mmu/mmu.c | 28 ++++++++++++++++++++--------
+> > > >  1 file changed, 20 insertions(+), 8 deletions(-)
+> > > >
+> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > > index e3aa04c498ea..95058ac4b78c 100644
+> > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > @@ -5967,17 +5967,29 @@ static int kvm_mmu_write_protect_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> > > >  	bool direct = vcpu->arch.mmu->root_role.direct;
+> > > >
+> > > >  	/*
+> > > > -	 * Before emulating the instruction, check if the error code
+> > > > -	 * was due to a RO violation while translating the guest page.
+> > > > -	 * This can occur when using nested virtualization with nested
+> > > > -	 * paging in both guests. If true, we simply unprotect the page
+> > > > -	 * and resume the guest.
+> > > > +	 * Before emulating the instruction, check to see if the access may be
+> > > > +	 * due to L1 accessing nested NPT/EPT entries used for L2, i.e. if the
+> > > > +	 * gfn being written is for gPTEs that KVM is shadowing and has write-
+> > > > +	 * protected.  Because AMD CPUs walk nested page table using a write
+> > 
+> > Hi Sean,
+> > 
+> > I Just want to consult how often of this on EPT:
+> > 
+> > The PFERR_GUEST_PAGE_MASK is set when EPT violation happens
+> > in middle of walking the guest CR3 page table, and the guest
+> > CR3 page table page is write-protected on EPT01, are these
+> > guest CR3 page table pages also are EPT12 page table pages
+> > often?  I just think most of time they should be data page
+> > on guest CR3 table for L1 to access them by L1 GVA, if so
+> > the PFERR_GUEST_FINAL_MASK should be set but not
+> > PFERR_GUEST_PAGE_MASK.
+> 
+> Hmm, now I'm confused too.  I thought this was handling the case where L1 is
+> accessing EPT12/NTP12 entries, but as you say, that doesn't make sense because
+> those accesses would be PFERR_GUEST_FINAL_MASK.  And the EPT12/NPT12 entries
+> should never be used by hardware.
+> 
+> The only thing that I can think of is if L1 stops using the pages for EPT/NPT
+> entries, and instead reallocates them for IA32 page tables.  But that doesn't
+> make much sense either, because KVM's write-flooding detection should kick in
+> when L1 repurposes the page for its own page tables, before L1 actually starts
+> using the page tables.
+> 
+> I'll try to reproduce the excessive emulation that this code is handling, because
+> I think I'm missing something too.
 
-AFAICT, there are just two reasons that X86_FEATURE_IBPB gets set:
-1. The CPU reports CPUID.(EAX=3D7,ECX=3D0):EDX[bit 26] (aka X86_FEATURE_SPE=
-C_CTRL)
-2. The CPU reports CPUID Fn8000_0008_EBX[IBPB] (aka X86_FEATURE_AMD_IBPB)
+*sigh*
 
-Clearly, in the second case, the KVM cpu capability for AMD_IBPB will
-already be set, since it's specified in the mask for
-CPUID_8000_0008_EBX.
+After poking for an hour and never being able to hit that error code, _period_,
+even if without the vcpu->arch.mmu->root_role.direct guard, I came to the conclusion
+that the only way to hit this is if L1 is reusing its own page tables for L2.
 
-If this block of code is just trying to populate CPUID Fn8000_0008_EBX
-on Intel processors, I'd rather change all of the predicates to test
-for Intel features, rather than vendor-neutral features, so that the
-derivation is clear. But maybe this block of code is also trying to
-populate CPUID Fn8000_0008_EBX on AMD processors that may have some of
-these features, but don't enumerate them via CPUID?
+And then I finally wised up and went hunting on lore, and indeed that appears to
+be what this is trying to handle[1]:
 
-> Thanks,
-> Tom
->
-> >>
-> >
-> >> Thanks,
-> >> Tom
-> >>
-> >>>     if (boot_cpu_has(X86_FEATURE_IBPB))
-> >>>             kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB);
-> >>>     if (boot_cpu_has(X86_FEATURE_IBRS))
+ : I think this patch is necessary for functional reasons (not just perf),
+ : because we added the other patch to look at the GPA and stop walking the
+ : guest page tables on a NPF.
+ : 
+ : The issue I think was that hardware has taken an NPF because the page
+ : table is marked RO, and it saves the GPA in the VMCB.  KVM was then
+ : going and emulating the instruction and it saw that a GPA was available.
+ : But that GPA was not the GPA of the instruction it is emulating, since
+ : it was the GPA of the tablewalk page that had the fault. It was debugged
+ : that at the time and realized that emulating the instruction was
+ : unnecessary so we added this new code in there which fixed the functional
+ : issue and helps perf.
+ : 
+ : I don't have any data on how much perf, as I recall it was most effective
+ : when the L1 guest page tables and L2 nested page tables were exactly the
+ : same.  In that case, it avoided emulations for code that L1 executes which
+ : I think could be as much as one emulation per 4kb code page.
+
+To muddy the waters more, the vcpu->arch.mmu->root_role.direct was a proactive
+suggestion from Paolo[2], i.e. not in response to an actual failure that someone
+encountered.
+
+Further adding to the confusion was Paolo's commit that extended the behavior
+to Intel CPUs.  The AuthorDate vs. CommitDate is particularly interesting, as
+it suggests that Paolo wrote the patch in response to the SVM series being
+posted:
+
+  Subject: [PATCH v2 1/3] kvm: svm: Add support for additional SVM NPF error codes
+  Date: Wed, 23 Nov 2016 12:01:38 -0500	[thread overview]
+
+  commit eebed2438923f8df465c27f8fa41303771fdb2e8
+  Author:     Paolo Bonzini <pbonzini@redhat.com>
+  AuthorDate: Mon Nov 28 14:39:58 2016 +0100
+
+and then commited after asking many of the same questions we just asked, with
+Brijesh's reply[1] coming just a few days before:
+
+  Subject: Re: [PATCH v2 1/3] kvm: svm: Add support for additional SVM NPF error codes
+  Date: Wed, 2 Aug 2017 12:42:20 +0200	[thread overview]
+
+
+  Commit:     Paolo Bonzini <pbonzini@redhat.com>
+  CommitDate: Thu Aug 10 16:44:04 2017 +0200
+
+    kvm: nVMX: Add support for fast unprotection of nested guest page tables
+    
+    This is the same as commit 147277540bbc ("kvm: svm: Add support for
+    additional SVM NPF error codes", 2016-11-23), but for Intel processors.
+    In this case, the exit qualification field's bit 8 says whether the
+    EPT violation occurred while translating the guest's final physical
+    address or rather while translating the guest page tables.
+
+
+  Subject: [PATCH v2 1/3] kvm: svm: Add support for additional SVM NPF error codes
+  Date: Wed, 23 Nov 2016 12:01:38 -0500	[thread overview]
+
+Intel support is especially misleading, because sharing page tables between EPT
+and IA32 is rather nonsensical due to them having different formats.  I.e. I doubt
+Paolo had a use case for the VMX changes, and was just providing parity with SVM.
+Of course, reusing L1's page tables as the NPT tables for L2 is quite crazy too,
+but at least the PTE formats are identical. 
+
+Given that the patches were original posted as part the SEV enabling series[3],
+my best guest is that the AMD folks were doing some prototyping or emulation
+hackery that involved running a nested guest by simply reusing CR3 as hCR3.
+
+So, I'll rewrite the comment to make it clear that practically speaking, this
+scenario can be hit if and only if L1 is reusing its own page tables for L2's NPT.
+
+[1] https://lore.kernel.org/all/f8a2c258-0b53-b33c-1dae-a6f6e0e68239@amd.com
+[2] https://lore.kernel.org/all/21b9f4db-f929-80f6-6ad2-6fa3b77f82c0@redhat.com
+[3] https://lore.kernel.org/all/147190822443.9523.7814744422402462127.stgit__43469.155036337$1471909238$gmane$org@brijesh-build-machine
 
