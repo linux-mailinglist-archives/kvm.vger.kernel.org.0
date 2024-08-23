@@ -1,217 +1,147 @@
-Return-Path: <kvm+bounces-24866-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8308395C4F0
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 07:43:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485AD95C598
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 08:40:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 068971F21A03
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 05:43:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AF921C21C05
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 06:40:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29F454720;
-	Fri, 23 Aug 2024 05:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PBMHB1sR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD681369B1;
+	Fri, 23 Aug 2024 06:39:57 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B4460275
-	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 05:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CD44D8BA;
+	Fri, 23 Aug 2024 06:39:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724391794; cv=none; b=d5dVwdUYUtfQg9yWRFAa2CxOIGEEtMewEKzq+W4mj5MB2CkMQpgRDKR3X1Pk4MEQAcsqWiQ4/9QCMjqahcxGj+ZKghCMKPaYK1Gil9D1Xn74HaAiv1aCSNLU4OJxeDOoWU1nwzXKYuNA9OtyhPTWljAcBOdIff8kFkoDgZWMM2k=
+	t=1724395197; cv=none; b=j5agsG9Cydvz1NR+YEzh/IbjP0fdBdPzcDUeGPRNvoDKucOhw+CX6pu4p6gZ84ZTQnjAu2Zrcn87SYWBK6eEgtSz0Diug07oeWGq1YmSjGrTlZhkkPKfz/u4YcQ4h0Lw9jsi7xEVMbOs7cyIisVrpWIlYZVubdlaw36w+6dLEjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724391794; c=relaxed/simple;
-	bh=ykhjlYyxcyN7pzrz6lrlZAJQo+HVYW3Ljq324L0AhKA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C8cGTcOKJJlmZUMZA6ZrTQxMbt6AIXu11N6hqQl6z1pvqHrkjtfg24Qss+1zKD7L4BtQUDYdLNAxPDoE9C8MeYyMmQjGOomM7ZHQLdbmwJEOCIsHIRksPam5/njuUcKr2jjwFPdMgh2D77LBFru742NWrqu7l1Y124bGDFCZhwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PBMHB1sR; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4503ccbc218so21282121cf.1
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2024 22:43:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724391791; x=1724996591; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9W2beeAjD9qLCpyKv4/ad4dgFRN7iQbmZy3bMH70jX4=;
-        b=PBMHB1sRJaZGVKDddx1qft/s+aQK9acVsjTc+i6r+zrAXF+B0Ld4QKvvtOLc0IKcS8
-         d2g6Om2FWeA9J+JfCy5PIllKVXwI4f+ckGQ3rqD/4AuTKXF5yyo0NS0WXurL6r0dsMMv
-         clFmNllpxEFwPFpowfxP9JaB9fyyznWVZQ+tjTpxV94JcPQHUj1pdlpj4F+gB8PKUAZP
-         rbn0CXDQqFPqVSkVm/grnmHGV+N1MKwi6ma1B97BATG2yGP0qCumb/sMfS6k3Muf9M5+
-         QetNojpgsACraMVuEJ4cpQOJ5UQB4K1KV37YVXW+ZX69wf4H86r8fkYeVx4RY9rPIzR1
-         Un1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724391791; x=1724996591;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9W2beeAjD9qLCpyKv4/ad4dgFRN7iQbmZy3bMH70jX4=;
-        b=GkXsYD1pUmdleC3UM14f0xt8LfIJPddLjxDF+VvTGtplZ3QgZ9bBydgidthL0W72au
-         6LrZqli77FhTTl1g+b+EjsCVpckH8QN0TIs78rCLATsp2cxnKgX7ZxLiH5MPfcph+zpl
-         lN6n36mms3atA6e6GxBRhdSMrCb5iZORdhr8IKIsCPZpYZf1T4+QG5r3FkJ72dYJhPEX
-         x2/GEcNE408puwgmcKXhI9eZM3aAqRx2W2pw7gLJHF4+6hegL9vZeO/EdmazfJuAsaS9
-         PeDWWJJhdxI1R86YMwwvn+YldnuF9O+b0BcwvpfUKppjY7CIutFyeDFDpOsF2P5C2suH
-         V1fw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1MXodMobVRyakcZZKY49JckvGSIgVSNDIyXgHVkP+c5K/Lr1MDcLCuHtqrs4WuAQ846o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHdqMG32ZFDHpoB/zFulBHSkqF+zi5g+27Pk/jE758tohZDFhx
-	HjpUsbX7nmZz44GviJU7Z7GdcIWklEJ1neNqJXU80yz/FYpoiaOP6/lPPvTkMpQQdGb7+eoIkq3
-	xZxiNr/baAJCzxK5jhTq6zVFGD3IixBsgUqF1Pz4vGFOYCcsc/wer
-X-Google-Smtp-Source: AGHT+IGhKE7lfw67kM6GRdbIh3E1OqOH39TY+JqF3bKeDOj4H7SSyH7gfj/AR2FVe4LcTS8l+CoS2QbVfICwxkmiJVU=
-X-Received: by 2002:ac8:5f07:0:b0:453:749e:9693 with SMTP id
- d75a77b69052e-454fae49cdfmr90576581cf.11.1724391791253; Thu, 22 Aug 2024
- 22:43:11 -0700 (PDT)
+	s=arc-20240116; t=1724395197; c=relaxed/simple;
+	bh=tDRlbZQkEh6EaTQpQlbIFGu7reNtKZ5DdfTQpHKuM88=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UqWFcM4Qg0jhZmy9lA8ffnkzYU1rAxAD8CSZSZUIfOiJPql0uYirO6OKD1P7XQzmlu6d6MsobIhoTQov85LB2PdIeDhujDaYzS8TwcKb+Mc4TwfRTg7hTrIkc5kK2gfNSMNtFu9iGriBVqJ72gT3P+7wnVBX6dol6WG1I5k7l6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8AxipqxLshmyR8dAA--.24997S3;
+	Fri, 23 Aug 2024 14:39:45 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowMDxnWevLshmUPoeAA--.41360S2;
+	Fri, 23 Aug 2024 14:39:44 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>
+Cc: WANG Xuerui <kernel@xen0n.name>,
+	kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	x86@kernel.org,
+	Song Gao <gaosong@loongson.cn>
+Subject: [PATCH v7 0/3] Add extioi virt extension support
+Date: Fri, 23 Aug 2024 14:39:40 +0800
+Message-Id: <20240823063943.2618675-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240820043543.837914-1-suleiman@google.com> <20240820043543.837914-3-suleiman@google.com>
- <ZsWJsPkrhDReU4ez@intel.com> <CABCjUKCBQq9AMCVd0BqOSViPn=Q3wiVByOvJNhNpHvqx=Ef-4g@mail.gmail.com>
- <ZsgdPljClmKrGIff@intel.com>
-In-Reply-To: <ZsgdPljClmKrGIff@intel.com>
-From: Suleiman Souhlal <suleiman@google.com>
-Date: Fri, 23 Aug 2024 14:43:00 +0900
-Message-ID: <CABCjUKAV0ycQH9YFXwLAsJDO22=STxFqONAqO=DY3F6bi+3xAA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] KVM: x86: Include host suspended time in steal time.
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ssouhlal@freebsd.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMDxnWevLshmUPoeAA--.41360S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On Fri, Aug 23, 2024 at 2:25=E2=80=AFPM Chao Gao <chao.gao@intel.com> wrote=
-:
->
-> On Fri, Aug 23, 2024 at 01:17:31PM +0900, Suleiman Souhlal wrote:
-> >On Wed, Aug 21, 2024 at 3:31=E2=80=AFPM Chao Gao <chao.gao@intel.com> wr=
-ote:
-> >>
-> >> On Tue, Aug 20, 2024 at 01:35:42PM +0900, Suleiman Souhlal wrote:
-> >> >When the host resumes from a suspend, the guest thinks any task
-> >> >that was running during the suspend ran for a long time, even though
-> >> >the effective run time was much shorter, which can end up having
-> >> >negative effects with scheduling. This can be particularly noticeable
-> >> >if the guest task was RT, as it can end up getting throttled for a
-> >> >long time.
-> >> >
-> >> >To mitigate this issue, we include the time that the host was
-> >> >suspended in steal time, which lets the guest subtract the duration f=
-rom
-> >> >the tasks' runtime.
-> >> >
-> >> >Note that the case of a suspend happening during a VM migration
-> >> >might not be accounted.
-> >> >
-> >> >Signed-off-by: Suleiman Souhlal <suleiman@google.com>
-> >> >---
-> >> > arch/x86/include/asm/kvm_host.h |  1 +
-> >> > arch/x86/kvm/x86.c              | 11 ++++++++++-
-> >> > 2 files changed, 11 insertions(+), 1 deletion(-)
-> >> >
-> >> >diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/k=
-vm_host.h
-> >> >index 4a68cb3eba78f8..728798decb6d12 100644
-> >> >--- a/arch/x86/include/asm/kvm_host.h
-> >> >+++ b/arch/x86/include/asm/kvm_host.h
-> >> >@@ -898,6 +898,7 @@ struct kvm_vcpu_arch {
-> >> >               u8 preempted;
-> >> >               u64 msr_val;
-> >> >               u64 last_steal;
-> >> >+              u64 last_suspend_ns;
-> >> >               struct gfn_to_hva_cache cache;
-> >> >       } st;
-> >> >
-> >> >diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> >> >index 70219e4069874a..104f3d318026fa 100644
-> >> >--- a/arch/x86/kvm/x86.c
-> >> >+++ b/arch/x86/kvm/x86.c
-> >> >@@ -3654,7 +3654,7 @@ static void record_steal_time(struct kvm_vcpu *=
-vcpu)
-> >> >       struct kvm_steal_time __user *st;
-> >> >       struct kvm_memslots *slots;
-> >> >       gpa_t gpa =3D vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
-> >> >-      u64 steal;
-> >> >+      u64 steal, suspend_ns;
-> >> >       u32 version;
-> >> >
-> >> >       if (kvm_xen_msr_enabled(vcpu->kvm)) {
-> >> >@@ -3735,6 +3735,14 @@ static void record_steal_time(struct kvm_vcpu =
-*vcpu)
-> >> >       steal +=3D current->sched_info.run_delay -
-> >> >               vcpu->arch.st.last_steal;
-> >> >       vcpu->arch.st.last_steal =3D current->sched_info.run_delay;
-> >> >+      /*
-> >> >+       * Include the time that the host was suspended in steal time.
-> >> >+       * Note that the case of a suspend happening during a VM migra=
-tion
-> >> >+       * might not be accounted.
-> >> >+       */
-> >> >+      suspend_ns =3D kvm_total_suspend_ns();
-> >> >+      steal +=3D suspend_ns - vcpu->arch.st.last_suspend_ns;
-> >> >+      vcpu->arch.st.last_suspend_ns =3D suspend_ns;
-> >>
-> >> The document in patch 3 states:
-> >>
-> >>   Time during which the vcpu is idle, will not be reported as steal ti=
-me
-> >>
-> >> I'm wondering if all host suspend time should be reported as steal tim=
-e,
-> >> or if the suspend time during a vCPU halt should be excluded.
-> >
-> >I think the statement about idle time not being reported as steal isn't
-> >completely accurate, so I'm not sure if it's worth the extra complexity.
-> >
-> >>
-> >> >       unsafe_put_user(steal, &st->steal, out);
-> >> >
-> >> >       version +=3D 1;
-> >> >@@ -12280,6 +12288,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcp=
-u)
-> >> >
-> >> >       vcpu->arch.arch_capabilities =3D kvm_get_arch_capabilities();
-> >> >       vcpu->arch.msr_platform_info =3D MSR_PLATFORM_INFO_CPUID_FAULT=
-;
-> >> >+      vcpu->arch.st.last_suspend_ns =3D kvm_total_suspend_ns();
-> >>
-> >> is this necessary? I doubt this because KVM doesn't capture
-> >> current->sched_info.run_delay here.
-> >
-> >Isn't run_delay being captured by the scheduler at all time?
->
-> I meant KVM doesn't do:
->
->         vcpu->arch.st.last_steal =3D current->sched_info.run_delay;
->
-> at vCPU creation time.
+KVM_FEATURE_VIRT_EXTIOI is paravirt feature defined with EXTIOI
+interrupt controller, it can route interrupt to 256 vCPUs and CPU
+interrupt pin IP0-IP7. Now EXTIOI irqchip is emulated in user space
+rather than kernel space, here interface is provided for VMM to pass
+this feature to KVM hypervisor.
 
-I think for run_delay it's different because run_delay is a time
-difference. It's something that gets added to steal, not relative
-to the previous steal value.
-From what I can tell, it's correct for last_steal to be initialized to 0.
+Also interface is provided for user-mode VMM to detect and enable/disable
+paravirt features from KVM hypervisor. And api kvm_para_has_feature() is
+available on LoongArch for device driver to detect paravirt features and
+do some optimization.
 
->
-> >
-> >We need to initialize last_suspend_ns otherwise the first call to
-> >record_steal_time() for a VCPU would report a wrong value if
-> >the VCPU is started after the host has already had a suspend.
->
-> But initializing last_suspend_ns here doesn't guarantee KVM won't report =
-a
-> "wrong" value because a suspend can happen after vCPU creation and before
-> its first VM-enter.
+---
+v6 ... v7:
+  1. Replase function name guest_pv_has() to check whether paravirt feature
+     is supported with kvm_guest_has_pv_feature(), since there is
+     similiar function kvm_guest_has_lsx/lasx
+  2. Keep notation about CPUCFG area 0x40000000 -- 0x400000ff in header
+     file arch/loongarch/include/asm/loongarch.h
+  3. Remove function kvm_eiointc_init() and inline it with caller
+     function.
 
-I see what you're saying.
-I'm not sure how much this matters in practice.
+v5 ... v6:
+  1. Put KVM hypervisor type checking function kvm_para_available()
+     inside function kvm_arch_para_features(), so that upper caller
+     is easy to use.
+  2. Add inline function guest_pv_has() in KVM module to judge whether
+     the specific paravirt feature is supported or not. And do valid
+     checking at hypercall and user space ioctl entrance with it.
+  3. Fix some coding style issue such as variable declarations and spell
+     checking.
 
--- Suleiman
+v4 ... v5:
+  1. Refresh annotation "WITH Linux-syscall-note" about uapi header file
+     arch/loongarch/include/uapi/asm/kvm_para.h
+
+v3 ... v4:
+  1. Implement function kvm_para_has_feature() on LoongArch platform,
+     and redefine feature with normal number rather than bitmap number,
+     since function kvm_para_has_feature() requires this.
+  2. Add extioi virt extension support in this patch set.
+  3. Update extioi virt extension support patch with review comments,
+     including documentation, using kvm_para_has_feature() to detect
+     features etc.
+
+v2 ... v3:
+  1. Add interface to detect and enable/disable paravirt features in
+     KVM hypervisor.
+  2. Implement function kvm_arch_para_features() for device driver in
+     VM side to detected supported paravirt features.
+
+v1 ... v2:
+  1. Update changelog suggested by WangXuerui.
+  2. Fix typo issue in function kvm_loongarch_cpucfg_set_attr(),
+     usr_features should be assigned directly, also suggested by
+     WangXueRui.
+---
+Bibo Mao (3):
+  LoongArch: KVM: Enable paravirt feature control from VMM
+  LoongArch: KVM: Implement function kvm_para_has_feature
+  irqchip/loongson-eiointc: Add extioi virt extension support
+
+ .../arch/loongarch/irq-chip-model.rst         |  64 +++++++++++
+ .../zh_CN/arch/loongarch/irq-chip-model.rst   |  55 +++++++++
+ arch/loongarch/include/asm/irq.h              |   1 +
+ arch/loongarch/include/asm/kvm_host.h         |   7 ++
+ arch/loongarch/include/asm/kvm_para.h         |  11 ++
+ arch/loongarch/include/asm/kvm_vcpu.h         |   4 +
+ arch/loongarch/include/asm/loongarch.h        |  11 +-
+ arch/loongarch/include/uapi/asm/Kbuild        |   2 -
+ arch/loongarch/include/uapi/asm/kvm.h         |   5 +
+ arch/loongarch/include/uapi/asm/kvm_para.h    |  24 ++++
+ arch/loongarch/kernel/paravirt.c              |  35 +++---
+ arch/loongarch/kvm/exit.c                     |  19 ++--
+ arch/loongarch/kvm/vcpu.c                     |  47 ++++++--
+ arch/loongarch/kvm/vm.c                       |  43 ++++++-
+ drivers/irqchip/irq-loongson-eiointc.c        | 106 ++++++++++++++----
+ 15 files changed, 368 insertions(+), 66 deletions(-)
+ create mode 100644 arch/loongarch/include/uapi/asm/kvm_para.h
+
+
+base-commit: aa0743a229366e8c1963f1b72a1c974a9d15f08f
+-- 
+2.39.3
+
 
