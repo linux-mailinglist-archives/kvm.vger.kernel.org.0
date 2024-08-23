@@ -1,203 +1,186 @@
-Return-Path: <kvm+bounces-24874-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ECF395C732
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 10:03:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDE3D95C9AB
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 11:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEF13B20B79
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 08:03:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 870F01F25685
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 09:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224DC13D520;
-	Fri, 23 Aug 2024 08:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Dso400aa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E527183CA5;
+	Fri, 23 Aug 2024 09:51:40 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A144F88C;
-	Fri, 23 Aug 2024 08:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D4D9156C69;
+	Fri, 23 Aug 2024 09:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724400174; cv=none; b=K6MLdKZ73iZyT1pEysn/uvWlNs8JjheCQVLemBgTrke75KDqZKSEU9wK+mPwFeTfR31aWTapYj6a7jeRzUjQIJAUp+JOk9PiFFUCOGsfwHY2PQSnNUarq0r2mUzaV8ioTz8KdC9LPAlw16BXcdhz/RBfY31lAoLWUFnL6yzWrfw=
+	t=1724406699; cv=none; b=oAXl+Gz5FlcAeTpdlck3clEqzReCOLm2EmZGkX230ac/qZVyk6thhSfOTg/qD0X1YoGYCVPVghSNXU/l/gH5zdP/ZHKh11hmwHY/4rh+ct7MTz7nVrHz7APdlLhBBkaTt2DiZsQhGgo4Z5g3IzvGptcowG9gketkuBhDCSw66Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724400174; c=relaxed/simple;
-	bh=g8RG1pctyErYdhY53Ked9GSMPa1LXZKLoRqQ9tVYBME=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hJHa/M2OdRcHSAyn2sLXysd2cQGg/LxoL6dmrnoP8plFeKy2FxeewVm8aXq9GM4GkfI0j6fmHC6pV2ylC9QOxZcwpcVx0v7SCb5jezLSkNdZEN9mPHtAR141ekKsmbFYG0KOVW3rBNvrk5UkKrUeXkvftAP2EyFqDXQzjheHLlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Dso400aa; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47MHPWY9011506;
-	Fri, 23 Aug 2024 08:02:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=q
-	JFEhJVuv1wgcIWgrzxygwvL90jtMucC0ObELMpGxRQ=; b=Dso400aaIqP+hFUNU
-	sXcC3SiYPx7KwXbLNxeuPEnl3IszMmtQ0X3dFXRkeqnTmzyTurI6+ck85cnUMwOI
-	7gD7kDAgHMULievpjliMMTrZR5zf2tRh/YwgIyW/CQvvsoL6oROdgJz69jrIw9QA
-	rqQ6eL6u9C0CHf241J5pFbklT1jzg+RD9Re8DWIoGjazFQ15Lby5ZJR054TGjwJn
-	9X6BnX89Vdg2Mz2Qpo/wO9gOrdKXaJFGLDKBi40nYcEwzDNZvQZ3JjzJMswcFSVB
-	SyzlLAE5/mcYEXXlz4Eu/Wr19bZlU0hPGf8ti5Pj7JwC1WJ/e9FpKPqITO6J1NDN
-	foYig==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mc531pc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Aug 2024 08:02:48 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47N82lQK002698;
-	Fri, 23 Aug 2024 08:02:47 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mc531p9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Aug 2024 08:02:47 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47N4eoTX017649;
-	Fri, 23 Aug 2024 08:02:47 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4138w3ghg8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Aug 2024 08:02:46 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47N82f9A51839264
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 23 Aug 2024 08:02:43 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 784F52004B;
-	Fri, 23 Aug 2024 08:02:41 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 027012005A;
-	Fri, 23 Aug 2024 08:02:41 +0000 (GMT)
-Received: from [9.179.27.211] (unknown [9.179.27.211])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 23 Aug 2024 08:02:40 +0000 (GMT)
-Message-ID: <884367dd-fba0-4acd-a614-f657768b662a@linux.ibm.com>
-Date: Fri, 23 Aug 2024 10:02:40 +0200
+	s=arc-20240116; t=1724406699; c=relaxed/simple;
+	bh=C8gCDi4bx7K5dvL9d6JMbn5lWQebebIemiNddyZcteg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QOspu8OqE/2rA8OPgTZ1pirkM1zIvbV3bog2EI88ME7kk4R9rL1NpjiZRlImk7/ASdL9+gGWjzJbpruv9NBE5fP0j29ixymkJQJvxBxOeWoVNrKczu1ffYTDVI6OaLh79LQBwEFSQNALl4+c/neprAp6RMxuA3jaxTVObv5oSPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.185])
+	by gateway (Coremail) with SMTP id _____8AxSZqmW8hmCEodAA--.25019S3;
+	Fri, 23 Aug 2024 17:51:34 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+	by front1 (Coremail) with SMTP id qMiowMCxC2ekW8hm2SsfAA--.39816S2;
+	Fri, 23 Aug 2024 17:51:32 +0800 (CST)
+From: Xianglai Li <lixianglai@loongson.cn>
+To: linux-kernel@vger.kernel.org
+Cc: Bibo Mao <maobibo@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Xianglai li <lixianglai@loongson.cn>
+Subject: [[PATCH V2 00/10] Added Interrupt controller emulation for loongarch kvm
+Date: Fri, 23 Aug 2024 17:33:54 +0800
+Message-Id: <20240823093404.204450-1-lixianglai@loongson.cn>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] selftests: kvm: s390: Add uc_map_unmap VM test case
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-References: <20240815154529.628087-1-schlameuss@linux.ibm.com>
- <20240815154529.628087-2-schlameuss@linux.ibm.com>
- <4c049b39-af28-488c-9e19-f22691b43585@linux.ibm.com>
- <ZsNs0sN7rWqaviZE@darkmoore>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <ZsNs0sN7rWqaviZE@darkmoore>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4lS3qkgYxwR11SjQSdGByQ07u_fr5LqZ
-X-Proofpoint-GUID: uGnbWV6KQTY5pBgnZNIetxJl7TeKfYL_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-23_04,2024-08-22_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- clxscore=1015 priorityscore=1501 mlxlogscore=944 adultscore=0 phishscore=0
- impostorscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408230053
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMCxC2ekW8hm2SsfAA--.39816S2
+X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On 8/19/24 6:03 PM, Christoph Schlameuss wrote:
-> On Fri Aug 16, 2024 at 4:29 PM CEST, Janosch Frank wrote:
->> On 8/15/24 5:45 PM, Christoph Schlameuss wrote:
->>> Add a test case verifying basic running and interaction of ucontrol VMs.
->>> Fill the segment and page tables for allocated memory and map memory on
->>> first access.
->>>
->>> * uc_map_unmap
->>>     Store and load data to mapped and unmapped memory and use pic segment
->>>     translation handling to map memory on access.
->>>
->>> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->>> ---
->>>    .../selftests/kvm/s390x/ucontrol_test.c       | 120 +++++++++++++++++-
->>>    1 file changed, 119 insertions(+), 1 deletion(-)
->>>
->>
->>> +static void uc_handle_exit_ucontrol(FIXTURE_DATA(uc_kvm) * self)
->>> +{
->>> +	struct kvm_run *run = self->run;
->>> +
->>> +	TEST_ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
->>> +	switch (run->s390_ucontrol.pgm_code) {
->>> +	case PGM_SEGMENT_TRANSLATION:
->>> +		pr_info("ucontrol pic segment translation 0x%llx\n",
->>> +			run->s390_ucontrol.trans_exc_code);
->>> +		/* map / make additional memory available */
->>> +		struct kvm_s390_ucas_mapping map2 = {
->>> +			.user_addr = (u64)gpa2hva(self, run->s390_ucontrol.trans_exc_code),
->>> +			.vcpu_addr = run->s390_ucontrol.trans_exc_code,
->>> +			.length = VM_MEM_EXT_SIZE,
->>> +		};
->>> +		pr_info("ucas map %p %p 0x%llx\n",
->>> +			(void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
->>> +		TEST_ASSERT_EQ(0, ioctl(self->vcpu_fd, KVM_S390_UCAS_MAP, &map2));
->>> +		break;
->>
->> Why is this necessary if you fix up the mapping in the test?
->>
-> 
-> This is also used within the uc_skey test to make sure the remap does
-> work after the unmap.
+Before this, the interrupt controller simulation has been completed
+in the user mode program. In order to reduce the loss caused by frequent
+switching of the virtual machine monitor from kernel mode to user mode
+when the guest accesses the interrupt controller, we add the interrupt
+controller simulation in kvm.
 
-Maybe I'm blind because I'm still recovering but where exactly?
+The following is a virtual machine simulation diagram of interrupted
+connections:
+  +-----+    +---------+     +-------+
+  | IPI |--> | CPUINTC | <-- | Timer |
+  +-----+    +---------+     +-------+
+                 ^
+                 |
+           +---------+
+           | EIOINTC |
+           +---------+
+            ^       ^
+            |       |
+     +---------+ +---------+
+     | PCH-PIC | | PCH-MSI |
+     +---------+ +---------+
+       ^      ^          ^
+       |      |          |
++--------+ +---------+ +---------+
+| UARTs  | | Devices | | Devices |
++--------+ +---------+ +---------+
+
+In this series of patches, we mainly realized the simulation of
+IPI EXTIOI PCH-PIC interrupt controller.
+
+The simulation of IPI EXTIOI PCH-PIC interrupt controller mainly
+completes the creation simulation of the interrupt controller,
+the register address space read and write simulation,
+and the interface with user mode to obtain and set the interrupt
+controller state for the preservation,
+recovery and migration of virtual machines.
+
+IPI simulation implementation reference:
+https://github.com/loongson/LoongArch-Documentation/tree/main/docs/Loongson-3A5000-usermanual-EN/inter-processor-interrupts-and-communication
+
+EXTIOI simulation implementation reference:
+https://github.com/loongson/LoongArch-Documentation/tree/main/docs/Loongson-3A5000-usermanual-EN/io-interrupts/extended-io-interrupts
+
+PCH-PIC simulation implementation reference:
+https://github.com/loongson/LoongArch-Documentation/blob/main/docs/Loongson-7A1000-usermanual-EN/interrupt-controller.adoc
+
+For PCH-MSI, we used irqfd mechanism to send the interrupt signal
+generated by user state to kernel state and then to EXTIOI without
+maintaining PCH-MSI state in kernel state.
+
+You can easily get the code from the link below:
+the kernel:
+https://github.com/lixianglai/linux
+the branch is: interrupt
+
+the qemu:
+https://github.com/lixianglai/qemu
+the branch is: interrupt
+
+Please note that the code above is regularly updated based on community
+reviews.
+
+change log:
+V1->V2:
+1.Remove redundant blank lines according to community comments
+2.Remove simplified redundant code
+3.Adds 16 bits of read/write interface to the extioi iocsr address space
+4.Optimize user - and kernel-mode data access interfaces: Access
+fixed length data each time to prevent memory overruns
+5.Added virtual extioi, where interrupts can be routed to cpus other than cpu 4
+
+Cc: Bibo Mao <maobibo@loongson.cn> 
+Cc: Huacai Chen <chenhuacai@kernel.org> 
+Cc: kvm@vger.kernel.org 
+Cc: loongarch@lists.linux.dev 
+Cc: Paolo Bonzini <pbonzini@redhat.com> 
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn> 
+Cc: WANG Xuerui <kernel@xen0n.name> 
+Cc: Xianglai li <lixianglai@loongson.cn> 
+
+Xianglai Li (10):
+  LoongArch: KVM: Add iocsr and mmio bus simulation in kernel
+  LoongArch: KVM: Add IPI device support
+  LoongArch: KVM: Add IPI read and write function
+  LoongArch: KVM: Add IPI user mode read and write function
+  LoongArch: KVM: Add EXTIOI device support
+  LoongArch: KVM: Add EXTIOI read and write functions
+  LoongArch: KVM: Add PCHPIC device support
+  LoongArch: KVM: Add PCHPIC read and write functions
+  LoongArch: KVM: Add PCHPIC user mode read and write functions
+  LoongArch: KVM: Add irqfd support
+
+ arch/loongarch/include/asm/kvm_extioi.h  |  122 +++
+ arch/loongarch/include/asm/kvm_host.h    |   30 +
+ arch/loongarch/include/asm/kvm_ipi.h     |   52 ++
+ arch/loongarch/include/asm/kvm_pch_pic.h |   61 ++
+ arch/loongarch/include/uapi/asm/kvm.h    |   19 +
+ arch/loongarch/kvm/Kconfig               |    3 +
+ arch/loongarch/kvm/Makefile              |    4 +
+ arch/loongarch/kvm/exit.c                |   86 +-
+ arch/loongarch/kvm/intc/extioi.c         | 1056 ++++++++++++++++++++++
+ arch/loongarch/kvm/intc/ipi.c            |  510 +++++++++++
+ arch/loongarch/kvm/intc/pch_pic.c        |  521 +++++++++++
+ arch/loongarch/kvm/irqfd.c               |   87 ++
+ arch/loongarch/kvm/main.c                |   18 +-
+ arch/loongarch/kvm/vcpu.c                |    3 +
+ arch/loongarch/kvm/vm.c                  |   53 +-
+ include/linux/kvm_host.h                 |    1 +
+ include/trace/events/kvm.h               |   35 +
+ include/uapi/linux/kvm.h                 |    8 +
+ 18 files changed, 2641 insertions(+), 28 deletions(-)
+ create mode 100644 arch/loongarch/include/asm/kvm_extioi.h
+ create mode 100644 arch/loongarch/include/asm/kvm_ipi.h
+ create mode 100644 arch/loongarch/include/asm/kvm_pch_pic.h
+ create mode 100644 arch/loongarch/kvm/intc/extioi.c
+ create mode 100644 arch/loongarch/kvm/intc/ipi.c
+ create mode 100644 arch/loongarch/kvm/intc/pch_pic.c
+ create mode 100644 arch/loongarch/kvm/irqfd.c
+
+
+base-commit: 872cf28b8df9c5c3a1e71a88ee750df7c2513971
+-- 
+2.39.1
 
 
