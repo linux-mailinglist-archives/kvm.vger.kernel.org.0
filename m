@@ -1,154 +1,163 @@
-Return-Path: <kvm+bounces-24922-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24923-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0590A95D058
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 16:47:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A6D495D068
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 16:51:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5FA12864AC
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 14:47:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F43B1F22D22
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 14:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C593A188912;
-	Fri, 23 Aug 2024 14:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E326188918;
+	Fri, 23 Aug 2024 14:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="r49CN/aQ"
+	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="JresqEmc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46CE91865ED;
-	Fri, 23 Aug 2024 14:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD541885AB
+	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 14:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724424463; cv=none; b=DN9TlWcgY10Hgtp1k33nWTmRIPtFTzwqCtyLf5NiW7oZj+phmErPphGsGvB6SBgk1OglHh2Cgwj0kRc6tS5t6aFQbgZT7/tcDteL+QZSBsGD5O82vZXwZK7iz/DyUDZBxucCt0wtJ3uhhOuAT8RQyT/yU+nO57vGY9RGzzmqUB8=
+	t=1724424689; cv=none; b=mqySwH3n9wYCUPkLL4sQD4tgFZXU8PHlFlnxehnA+Z/HCVt1EyhWxKSG52rMrkr22qiHTxK88RB6Vy8ntE57qrlTjugGw9I9ce7+aN4CUj6jED/6yaximrXEy7CpT4vxs6APUJJuzg9AKjE9uzXPvOWezgQL5QtY02h7YRKlA2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724424463; c=relaxed/simple;
-	bh=QkVDrRG+bwVo2Que5A45k+H96lRpMPjMgglMy/BFh4Q=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:From:Cc:
-	 References:In-Reply-To; b=dqWP07Z56W1vPlJzfr9yKDc8uiExV+qyHX/BOw5Jzneer43VEPZyknwiYu202gp3PmRIWsyEweL40YxNtkeUiVBYGqLC76fzxJliBqmkGG7uzOcXzNg6sF05XDpwquWCvO0ksWW6hXBXyytKWarBIVp7k01CHrKUWdtMMx5iAPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=r49CN/aQ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47NEdgVV013718;
-	Fri, 23 Aug 2024 14:47:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	mime-version:content-transfer-encoding:content-type:date
-	:message-id:to:subject:from:cc:references:in-reply-to; s=pp1;
-	 bh=UHCoi8H9SkJyWN+bg3VEga0aQtVxmmJrvg/q91th08M=; b=r49CN/aQWgqY
-	j2AUdWjl8Ngjr8AZ1IWoV3IxsWoUTlYa6x0Yrp4msTsicTm3fDxuVNKfGiP2pyaN
-	28OgaytO3CI2ocOYtFgGAa9pT5NRvYtOYRiCfBY9SAsbwSQPDqhWtlpH9vtGpPPb
-	X73kqh3BXJ1j+Nk3FCtJckZcAwFiNYcHWkeX5Tb53SSSolMsZFbSplcQQRYy/x95
-	iGIiJeJfLgX4ynn0rrhWequtQZUAHhNSF3K0Czs6Xm+nAYNKNR9RhK58N3L0h/4s
-	1Y8EN1SyaFhG3YWHTMdR+ulR8o/gkPMcsFB+WjT2hdtWRvtPwK91NGvTaH32Y5YI
-	1IHgvG+5Jg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 416vc6r0yr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Aug 2024 14:47:31 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47NElVtM028079;
-	Fri, 23 Aug 2024 14:47:31 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 416vc6r0yk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Aug 2024 14:47:31 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47NB61Wc019044;
-	Fri, 23 Aug 2024 14:47:29 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41376qaayf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Aug 2024 14:47:29 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47NElOUZ54591752
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 23 Aug 2024 14:47:26 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 14A7D20043;
-	Fri, 23 Aug 2024 14:47:24 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DF5B320040;
-	Fri, 23 Aug 2024 14:47:23 +0000 (GMT)
-Received: from darkmoore (unknown [9.171.45.196])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 23 Aug 2024 14:47:23 +0000 (GMT)
+	s=arc-20240116; t=1724424689; c=relaxed/simple;
+	bh=b4C+Oy37DV2Kzj7Jrf0dTC698njLjd23JNwPJG1/FcU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=fW4vSJBoZF3LDkREASkopishJAtAl0pxojYiDsNKQcwkdtoZpnS4b6PyLcmh8KkTUO6V71/BByUFvgFX+0dF38V2gM7od2JEG/CGyOmQFMnywqqLfhI1eR6Y5Kfo9iNthHyBR3sYjYY9C1/bRHtHW10vPOgzzu1Rq4iSQbyp0rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=JresqEmc; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e116a5c3922so2027655276.1
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 07:51:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digitalocean.com; s=google; t=1724424687; x=1725029487; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=b4C+Oy37DV2Kzj7Jrf0dTC698njLjd23JNwPJG1/FcU=;
+        b=JresqEmchm4QsXu/uyAZnt1107TGahPZDwlpVIfE/KV+eifVwEf5tOJ+0/Fm90ncEx
+         vpbFABNXjFN0A2sRpDkqymTkGccw7Cs7f9ai34NBnaJXtC6n1uHjT9vdoHFIcEkpGVJV
+         CnUsjWycyOffaA+2uhL0NAvA8nhO3aUrncIpI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724424687; x=1725029487;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b4C+Oy37DV2Kzj7Jrf0dTC698njLjd23JNwPJG1/FcU=;
+        b=lfP/GZRodt5BWNz4Mo65RxqVLpJH+DA5d5iUipQFyiy6dtz2Q8hR0R8oRTm+FK8tAw
+         lWSNiY9lQWNUWmfJL9Rsa9zbEIHpko9InA1t/BbxOqDBcLedYb8Es4v19RguwA0cJU+L
+         4c5JbP8Io/bY1VyiNf2UOe9lr44ghIepQwCpvimfDAn0G8upTywJNSoYB1ZlPRP3Gqc2
+         uxlFseMj9pAgIm66rKjsyeKenLUGouTxxqgcTlqTpSc9PdkOIsUJ5NblOblb2B1SHB7n
+         WPePVo+21LNUA8NfrLKGUzhkcEUv/xDHxw5DHIihCWvQdw8nnDSs2/UpSEbT/1Bf5SRV
+         9KQw==
+X-Gm-Message-State: AOJu0YyecytguS9Upb6cmTX45KFUnQFboPS6H/fVQWbl9+HfVqpQsq1R
+	A6TZTwA2A4+vMTJPKx5U2oOx006PKZ5z8BZGPmCXJzlemrTJZ10CRNeRlaxk4sk=
+X-Google-Smtp-Source: AGHT+IG6JLoQwXGBZb5kz/05HTW1+oRlGRg0Y8dCBjJ8Cxj2vuoaOWbYxxL+QDFhLPXt07y77oLlWw==
+X-Received: by 2002:a05:6902:1109:b0:e16:6b7e:94b5 with SMTP id 3f1490d57ef6-e17a86a517emr3398358276.48.1724424686570;
+        Fri, 23 Aug 2024 07:51:26 -0700 (PDT)
+Received: from ?IPV6:2603:8080:7400:36da:45f:f211:3a7c:9377? ([2603:8080:7400:36da:45f:f211:3a7c:9377])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e178e46361csm707782276.19.2024.08.23.07.51.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Aug 2024 07:51:26 -0700 (PDT)
+Message-ID: <e7ba91a7-2ba6-4532-a59a-03c2023309c6@digitalocean.com>
+Date: Fri, 23 Aug 2024 09:51:24 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] vDPA: Trying to make sense of config data
+From: Carlos Bilbao <cbilbao@digitalocean.com>
+To: virtualization@lists.linux-foundation.org, mst@redhat.com,
+ jasowang@redhat.com
+Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <4f4572c8-1d8c-4ec6-96a1-fb74848475af@digitalocean.com>
+Content-Language: en-US
+In-Reply-To: <4f4572c8-1d8c-4ec6-96a1-fb74848475af@digitalocean.com>
 Content-Type: text/plain; charset=UTF-8
-Date: Fri, 23 Aug 2024 16:47:18 +0200
-Message-Id: <D3NDG2T6LAPQ.2NWIY72YYTM3F@linux.ibm.com>
-To: "Hariharan Mari" <hari55@linux.ibm.com>, <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH v3 1/5] KVM: s390: selftests: Add regression tests for
- SORTL and DFLTCC CPU subfunctions
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <shuah@kernel.org>,
-        <frankja@linux.ibm.com>, <borntraeger@linux.ibm.com>,
-        <imbrenda@linux.ibm.com>, <david@redhat.com>, <pbonzini@redhat.com>
-X-Mailer: aerc 0.17.0
-References: <20240823130947.38323-1-hari55@linux.ibm.com>
- <20240823130947.38323-2-hari55@linux.ibm.com>
-In-Reply-To: <20240823130947.38323-2-hari55@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: joBWqXu38rRWeSJVLAbCt0vd2B5HOrnU
-X-Proofpoint-GUID: feQMs60FA9k7UMgDuvCz7jUoq6a6etmR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-23_10,2024-08-22_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- spamscore=0 bulkscore=0 clxscore=1015 impostorscore=0 malwarescore=0
- mlxlogscore=593 suspectscore=0 priorityscore=1501 lowpriorityscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408230107
+Content-Transfer-Encoding: 8bit
 
-On Fri Aug 23, 2024 at 3:05 PM CEST, Hariharan Mari wrote:
-> Introduce new regression tests to verify the ASM inline block in the SORT=
-L
-> and DFLTCC CPU subfunctions for the s390x architecture. These tests ensur=
-e
-> that future changes to the ASM code are properly validated.
->
-> The test procedure:
->
-> 1. Create a VM and request the KVM_S390_VM_CPU_MACHINE_SUBFUNC attribute
->    from the KVM_S390_VM_CPU_MODEL group for this VM. This SUBFUNC attribu=
-te
->    contains the results of all CPU subfunction instructions.
-> 2. For each tested subfunction (SORTL and DFLTCC), execute the
->    corresponding ASM instruction and capture the result array.
-> 3. Perform a memory comparison between the results stored in the SUBFUNC
->    attribute (obtained in step 1) and the ASM instruction results (obtain=
-ed
->    in step 2) for each tested subfunction.
->
-> This process ensures that the KVM implementation accurately reflects the
-> behavior of the actual CPU instructions for the tested subfunctions.
->
-> Suggested-by: Janosch Frank <frankja@linux.ibm.com>
-> Signed-off-by: Hariharan Mari <hari55@linux.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Hello again, 
 
-LGTM
+Answering my own question:
 
-Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+https://elixir.bootlin.com/linux/v6.10.2/source/include/uapi/linux/virtio_net.h#L92
 
+Thanks, Carlos
+
+On 8/22/24 1:21 PM, Carlos Bilbao wrote:
+> Hello folks,
+>
+> I'm using the code below to retrieve configuration data for my vDPA file
+> via ioctl. I get as output:
+>
+> Configuration data (24 bytes):
+> 5a c3 5f 68 48 a9 01 00 08 00 dc 05 00 00 00 00
+> 00 00 00 00 00 00 00 00
+> ASCII representation:
+> Z._hH...................
+>
+> Could a good Samaritan point me in the right direction for the docs I need
+> to understand these values and convert them to a human-readable format?
+> hank you in advance!
+>
+> Regards,
+> Carlos
+>
 > ---
->  tools/testing/selftests/kvm/Makefile          |   2 +
->  .../selftests/kvm/include/s390x/facility.h    |  50 +++++++++
->  .../selftests/kvm/lib/s390x/facility.c        |  14 +++
->  .../kvm/s390x/cpumodel_subfuncs_test.c        | 105 ++++++++++++++++++
->  4 files changed, 171 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/include/s390x/facility.h
->  create mode 100644 tools/testing/selftests/kvm/lib/s390x/facility.c
->  create mode 100644 tools/testing/selftests/kvm/s390x/cpumodel_subfuncs_t=
-est.c
-
-[...]
+>
+> void check_config(int fd) {
+>
+>     uint32_t size;
+>     struct vhost_vdpa_config *config;
+>     uint8_t *buf;
+>
+>     if (ioctl(fd, VHOST_VDPA_GET_CONFIG_SIZE, &size) < 0) {
+>         perror("ioctl failed");
+>         return;
+>     }
+>
+>     config = malloc(sizeof(struct vhost_vdpa_config) + size);
+>     if (!config) {
+>         perror("malloc failed");
+>         return;
+>     }
+>
+>     memset(config, 0, sizeof(struct vhost_vdpa_config) + size);
+>     config->len = size;
+>     config->off = 0;
+>
+>     buf = config->buf;
+>
+>     if (ioctl(fd, VHOST_VDPA_GET_CONFIG, config) < 0) {
+>         perror("ioctl failed");
+>     } else {
+>         printf("Configuration data (%u bytes):\n", size);
+>
+>         /* Print the data in a human-readable format */
+>         for (unsigned int i = 0; i < size; i++) {
+>             if (i % 16 == 0 && i != 0) printf("\n");
+>             printf("%02x ", buf[i]);
+>         }
+>         printf("\n");
+>
+>         printf("ASCII representation:\n");
+>         for (unsigned int i = 0; i < size; i++) {
+>             if (buf[i] >= 32 && buf[i] <= 126) {
+>                 printf("%c", buf[i]);
+>             } else {
+>                 printf(".");
+>             }
+>         }
+>         printf("\n");
+>     }
+>
+>     free(config);
+> }
 
