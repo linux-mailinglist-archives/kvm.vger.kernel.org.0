@@ -1,87 +1,81 @@
-Return-Path: <kvm+bounces-24952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C1895D91B
-	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:12:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF13995D925
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DECE828290C
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 22:12:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FD43B21856
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 22:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3BB1C8709;
-	Fri, 23 Aug 2024 22:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9F5C1C870B;
+	Fri, 23 Aug 2024 22:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QSxw98S4"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Bi2oDTbF"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2067.outbound.protection.outlook.com [40.107.237.67])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2055.outbound.protection.outlook.com [40.107.237.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E767195;
-	Fri, 23 Aug 2024 22:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0886E15098A;
+	Fri, 23 Aug 2024 22:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.55
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724451164; cv=fail; b=eY5Nfp7Y49DbSwxwMZBucE0OKEr+S3tYLOgCh/bHgrBJmd+SeM6Mr8hdTa9xU8QJJ3ynJOLpTcxK8z1WJcTKwtj+jJc/Mb60s0a7UBOHJPpuv1TfWs7J3dk9EP89dppFVrQeDjZxB0erbMSBLUNV+4uYej7XtPn3sJnEt/wiVdM=
+	t=1724451398; cv=fail; b=Sa4gDQO/E0gM2l68+u3y/Fv4CdVZCGVuTu/rg1QtwAHOlK0vIo6Ovx0x/TRc3GXSzNSEYbeEMYmBWF3BEyoI1jDX7MPUH5nHW8ZxeaF0Kr2lOgqpaT5BTG5p80ecA9IizvNMRFRPABRWFmaZJgV6IIiC1a5aS40mZN2NkRUWDsY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724451164; c=relaxed/simple;
-	bh=+gs0ajvs1dAdWe98iP2AOuUBYdTIM98fmrm/MXrLzAE=;
+	s=arc-20240116; t=1724451398; c=relaxed/simple;
+	bh=iix4Yy+PlFeCI6SeHobPedV7eS2o0OvGA5lkzgtVo9M=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=U2EmC5nqCO0MQR1k9aRq+SrBXTiDI+A/RtuRIiGz4RAW4YpNDGlZU18CLlH2pQLTldp6OB/cxdvtxdp6glK8k81bJuTsAYAOXRJIJskufPbEHEjPHNadRcS1BCW4gfntkQS/FyJkmIy+RL+MR/f7DLOsppgiHFcyEOQlXEBcJok=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QSxw98S4; arc=fail smtp.client-ip=40.107.237.67
+	 Content-Type:MIME-Version; b=XLZqzO/Z2ShekAcSrCW+mRUcmVFFIZqGzGvb6e2DKZjKP2fQTThpIUX6RTSYmbuNXh6s0hxqhmrFiPh4geEnhrN2TfIQXRHay9vDmIM4cfSOmSSsaGYXiYevhZPwu++h3zO26sinrCrPZBOtFEEjEa7spM5+g5AdMGDxBsqVNAY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Bi2oDTbF; arc=fail smtp.client-ip=40.107.237.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nbkW3sBhfL3187y36H63dncgb5AXB6u8PT3bXaAX5O3RCv4oiBqi/rN3dAtbZepC80w7R7SfQZx9lodtr6SNNgi4MJZlrh5GDMcLRxXRunBqkH1Sv7UyKanCnr3nHLB+r6kzDEA4+zVPbsGz/OviPXwAqg89R8Xz9gJQLxh/0YojG5ibGOSibeBWCW9dU39g4Suuafnn+ud6tSAu0RpBUcMceJZxCdwUArytxsjCjrYkqv2VB7l8SOIp50Q7muXhgMYwfwrg9sIkRgORHwLGdy827wQdDKWiaS0Fmh+V4ysoJbRihf++5p7zx93Kjz6LxgAECzeeiS+TKFag5OW8DQ==
+ b=kULme4T7tdTsJhdN1BKiUROxRjV08gJPo+h5SY7aai2PEHWhYhR36tEk/JuhHN7YZXJAwrfeYCz0DT233LQldYoo5Yy6E0krzdHMU2cn4hsgs7CsK6yeQM2/YsA90FtatoQmYawRJpFkuTF/0sZoKvXeIxyJa8hOr44pA/i1vOZ8UGIQSpaVy65KVoPaEbe4mHVQV4ggS6wE2oxNtwvm9rkmQr1wn5kdRK5c0JTKXajYxgbVConAX3VPIY4aWgIvlIZS8FR/2f+m3dkaciT4Zbkakg5IxlfbH42D5f0ATfjdlBsuk8lmWmkDz7pFMr3DHkychf04OHpiTAI9ugQAyw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Gp5r77ATFaoae72AgQjGsi88QOtMf8xwi6WvB69PjtU=;
- b=tEislHvb0wGd9djROSs0FkI53LWZOpeqV/Y/MN9G1scmy4mbD8K1xNACAl3To/mcMcHx1O+AiR3Ja7LPOpT6jekpfw98rNSY8J+nDQwBZfuqzscCVBqVqVjk7r39vzFB133pG8TRBugCcRtoCGQefv/BTFpCK/Hb8zxll8iHmgHoomFi7Nf0xHHyW1+todW3oWmD4n25Oyr/lyjcahfotLn7A4OP/gS/Vd4d6HwzQgSqPsB34rFwcO1GEKD6mpY0FqnUJZI03ykpwQox/uhORzyTrKyl0swczuogs2h5/6JFpUwx635S7V7ZoydsQAfZ+Z1CZK3RU27Geh4BRNVEcA==
+ bh=o0ynk2pS4y48G0T26ya/rtutNTCq1rc5gUieQcSaGrw=;
+ b=hJAE6/gjsa6ZMavrINDhd5LVygARV2d5viWzNnexCo/Rsa0TtrOEeCrZV7lMxO7HrPiJ4mIUH30b1mf3+8eJhauVB4eAQfS7khx1lCj6aYaJZ7yZPT6vrjyfLXx5s+rY/Ftt1s/3yVW7kyxD63fInQUyzTizkZz99T9v0Q+5mjYYKCa5H608TvkAmxwRBabZOU7nKhuyL9VXhjT4jNZLqZibXtrUHExs4vdUDh6UMnM0gnaiy5IRsluOu+TUh8tT5B7rk7nYktavbleJfaLmxjAUl4y6Uu5bOQX3s6ZqWizFID3NgHLvXugISwg0mddfFXfep3lXpqIHdN7jgwC8Jg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gp5r77ATFaoae72AgQjGsi88QOtMf8xwi6WvB69PjtU=;
- b=QSxw98S4nT7yE7j2Z+U/WR41MMMruaHxXgy3IsHWaQWUXiHvmpe3fPei9S5w3Ks3JZZB74BQvtK6aKUrdTsuNIqwgDQQ/7dSDlpkzO8mAiL8h1RhWEmL8snZXut3w2yOGCV6P9iF33KDglxOL5+lFT3PlPYPtILeNfgQ3Vg6A64=
+ bh=o0ynk2pS4y48G0T26ya/rtutNTCq1rc5gUieQcSaGrw=;
+ b=Bi2oDTbFl418QT7f/1Oa/uGiT7BGXn+jBAjWVhQccc349WE2oG/uTD5tYiEa9294OoMKWEGFZ8kZZnW7C5bkfRslQvT0yO3mJeXesnyvkMbBct9zWMI12ohfkj9WaB5eila/Qr3y5OPjv8gI//CcLS3a6cuF0HDF9DHc3FYff8A=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by BY5PR12MB4322.namprd12.prod.outlook.com (2603:10b6:a03:20a::20) with
+ by PH8PR12MB7133.namprd12.prod.outlook.com (2603:10b6:510:22e::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19; Fri, 23 Aug
- 2024 22:12:38 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.16; Fri, 23 Aug
+ 2024 22:16:33 +0000
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.7897.014; Fri, 23 Aug 2024
- 22:12:37 +0000
-Message-ID: <59449778-ad4e-69c6-d1dc-73dacb538e02@amd.com>
-Date: Fri, 23 Aug 2024 17:12:40 -0500
+ 22:16:33 +0000
+Message-ID: <9079a7e7-17e6-72eb-3510-b07a60ce78df@amd.com>
+Date: Fri, 23 Aug 2024 17:16:36 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH v3 4/4] KVM: x86: AMD's IBPB is not equivalent to Intel's
- IBPB
+Subject: Re: [PATCH v2 8/9] KVM: selftests: Add a CoCo-specific test for
+ KVM_PRE_FAULT_MEMORY
 Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: Jim Mattson <jmattson@google.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Sandipan Das <sandipan.das@amd.com>,
- Kai Huang <kai.huang@intel.com>, x86@kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Venkatesh Srinivas <venkateshs@chromium.org>
-References: <20240823185323.2563194-1-jmattson@google.com>
- <20240823185323.2563194-5-jmattson@google.com>
- <26e72673-350c-a02d-7b77-ebfd42612ae6@amd.com> <Zsj2anWub8v9kwBA@google.com>
+To: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, pgonda@google.com,
+ michael.roth@amd.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240816192310.117456-1-pratikrajesh.sampat@amd.com>
+ <20240816192310.117456-9-pratikrajesh.sampat@amd.com>
+ <607e76c0-6e9a-4961-873b-0b952b51faff@amd.com>
 From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <Zsj2anWub8v9kwBA@google.com>
+In-Reply-To: <607e76c0-6e9a-4961-873b-0b952b51faff@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0182.namprd11.prod.outlook.com
- (2603:10b6:806:1bc::7) To DM4PR12MB5070.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA9PR13CA0059.namprd13.prod.outlook.com
+ (2603:10b6:806:22::34) To DM4PR12MB5070.namprd12.prod.outlook.com
  (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -90,181 +84,470 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|BY5PR12MB4322:EE_
-X-MS-Office365-Filtering-Correlation-Id: 623052b1-9eaa-46f6-95f8-08dcc3c0b2a5
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|PH8PR12MB7133:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5bbba122-a72f-4b05-aa62-08dcc3c13ec3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SHA3WXkyREFVbkhZb2lTeFpXOEpFaEpHTXNxc2M3dmFicWFFODNkV2J2MklO?=
- =?utf-8?B?U1JpZG5HYWtnT1QwQm1Da2V5MlI0UEUwNXM5eFRZZlVrVE12bTB4MzNjKzNr?=
- =?utf-8?B?UDVYYnpkNCtQaEJHR2R6TWViSWlDVnY5QTVnTThKa1hxK0x5SzJLMUpTZFdM?=
- =?utf-8?B?M05sUXFSRGNTdlZIa1dHMzk0bUYxN2RSQjBJRUIvdTQ3eTRyWG5FdGFCMi85?=
- =?utf-8?B?NHlpUldPbStvS3dKbkx3SnJSakEvLy9JRzF6VG4zTk9pc2tWZU8welZBK2RU?=
- =?utf-8?B?cWJFTGRRcjhGUktmQk8zMFJoTHlIVi9mbCs2L3pyZmJqL3BVNURRcGNhVE9T?=
- =?utf-8?B?M3FTRVVuNFlEMUZVUFdyU0FpZWUwWDd3cEl3citoWDN2UVI0VUhrQm15NnYx?=
- =?utf-8?B?K053OWFqMFkvR1RRT0p2cGtIS29sb3gwejhVOTJSNHovYllzTVF5Sy9FZEFR?=
- =?utf-8?B?RFBXRmc0UzJsZmxVdjhrNk9mVENwMzJFLzRiUWoxWU1EbGRuYUh2UEMzWE9a?=
- =?utf-8?B?aFZ3b1R4ZHdZVEJUVm44a0h4WTN0dS83alJHVVBONVRkSno0bFJvbHNyUFZH?=
- =?utf-8?B?ai9TbnNSd1hyaUNsbFZHODFsaFZDWWZISi9QbUF2RERNVUpRd2QxYzMwNDFo?=
- =?utf-8?B?eHlDaVdRYi82bCtEcGxNNks3cER2blhEWUMzSWlWUUZibks1dFB3K1JBWDBz?=
- =?utf-8?B?QzZwVmlvYTI5b0RUUzVGT2ROUFpSTzNNVkJMOUthWFVGQVFqeFhDMDZKem9S?=
- =?utf-8?B?K1FEMkI5dThTUWZJTWJUampLSGMwQ3N6K3k2ekk4MWRmT3FxMVFrM21LS1JS?=
- =?utf-8?B?dEI4MjBaMTFVbWIvbDM4aWxlc211UWdEZ2NTMDlWT0lFK0lpQ1ZpRVA2bU1u?=
- =?utf-8?B?VjRuRkVydDNLU2NzcXp1OFBDbDhaeEtsN1dldExPSFJDS3hhQ3VuN3gxZHNF?=
- =?utf-8?B?UWZrdm5PU0FHS2luVHVVU24rcTVjb0lzajRYWmVadFByVTE1eGRuKzFDTnlS?=
- =?utf-8?B?Szl2QXBrMUJNbS9PdzB2cFk2YXJWRjlwejhNZmRMNUt6ajh5NEMyZXoxbkJp?=
- =?utf-8?B?MzFHSVdvT3p3VEU0bStWRStxQnBZNVdwdE5pTGhqL3pjZkMxZXBzcnJnWUVR?=
- =?utf-8?B?bG5YL0t1SmlxOGJQM2lobEk5bkdrcEtBcHZrOUlFRHY2ZFpHcHQ5RDdneHhh?=
- =?utf-8?B?NFlmTDY5bGV1cmt6L2ZOSGZpNm9wRDBQTit1QlRKL253YjNLdUlIMndubFVw?=
- =?utf-8?B?MzI0SHdLM1V4RHRhb1F3QW1SdWxZb0RIcXNmRGVxbitaWkwzenhMck13NTVy?=
- =?utf-8?B?R1lFUC94ekRYY0tCTWJ6Mzd5bUtsanBtS0xWNlpXMktNN3BhbVA1NGRqNm5k?=
- =?utf-8?B?TzlRcW9FRTZXUy95dGQzRGhUcDlWd0pPR2JRR3J1eHF3bm0vOHVqVlNoOXdk?=
- =?utf-8?B?YklXb0dXTEYrTU5CTFZ3U1ErL2UwL1I0SElleG5MTzQ5Sks4bWlSbFVzNEhz?=
- =?utf-8?B?OGtTdmtlWTJreXBBQ2lQY0Y3TkZWQWpoN0tWM2trTDNTMzczNFJqWHEyTnRI?=
- =?utf-8?B?RDNHVzcyMmlwSkhKRXVHOTNaa0dneGlKQnhUUmNXZVZZeTEvc2hlRlFTaktU?=
- =?utf-8?B?OGVwTnVSMDlaQ1ZaclpDL2hlVlY2TmVId1lLZGdKeEtFK1l3L0hLVXVTdTF0?=
- =?utf-8?B?RkpIaDN6WUI2TzhOazdockEybmhLSk9idmlhR2VMdUF6TmtmVmxUOXR6SzY3?=
- =?utf-8?Q?NSBllrK4UtRbof+3wr5LINCRMJYkiRo91+s5Uec?=
+	=?utf-8?B?Q1NJcURwMmhUY0NFRjZHOEI0dXhvYUlSd2lhNENDNjNzdGRoMndyM1Jsd0pX?=
+ =?utf-8?B?aXJvU2RSSitaN21wSiswY1dreWp4Q2lIVDRJVmF0dmw0NDJLRXpZSHpvblJV?=
+ =?utf-8?B?bG5EMjZKQ2UwRW8wY3BzbmsvZ2MwM1FOMjBycnZwZS9QWGxqcVhHYzQyK0x3?=
+ =?utf-8?B?bTdTaUtidDZYNWJ0VXJRdW9aNGtEeTRWYXk2ZjlTWklGR1pLdVltT2FrTXpq?=
+ =?utf-8?B?R0dKenA2MUdJVGM5aTJ3a0N3dENuVEdCUzhQVTUvbnlXYnl0VXhwNkFkZXQ3?=
+ =?utf-8?B?dGQyYWdSRWdZM202akZ3dFdCTkJGWXhsMzZTSTJDK2ZYRDN2T3RJUmFEWkY5?=
+ =?utf-8?B?dmRDeGw1ais3OWRUbHl0TnBvRVpMNnBtWHBHT09ZaTN3cjEvbWh0c0VjYUZ2?=
+ =?utf-8?B?cFBGeTJVZ0FMb2RrLzFWc1FwMi9ZUjBKT1pjOWhLYk5jZy9YUHRKRU8yVDJh?=
+ =?utf-8?B?cXFaNTVCQzdhQXhNemQ5R2grTG05eUF2NEt0OHZQU1FRNlhKV3RqcnFtM1hq?=
+ =?utf-8?B?bGFGUE9PclVGSXMvTndhWEFQMGFrbGFPT3IzendLY2R5MTNTaFdXT01yRERk?=
+ =?utf-8?B?MXNxWFNJNWtqa1hKdng5QjEzaG5QWVljQ0pGTGZFeUxucS9hbXJzU1gvcFVa?=
+ =?utf-8?B?YjlNYXo0WklBRmU1Vkw4Z2dJMU5PYWY3RWtvMkwwM3VWenIwb2NBQUtHcE01?=
+ =?utf-8?B?QUVZbFp4TzZnREJjemRpQXFSUVRyYWRySkdIL0NiVzBjTlFZK2VZNmh0NmVV?=
+ =?utf-8?B?dnlnUHB3aTNJc25UeU93QU5UYXBNUHBvVE9UbHIwVllaaXFMYWFZSXNHZC9k?=
+ =?utf-8?B?aFQvQzZBNXdTUjZzTkZTS1RCTnRpdENqQStQYzl5Y1NoeTRjN3ZQcmdmWUdQ?=
+ =?utf-8?B?T3h4M0VIZ2t2UFBoQWtrYXdaR1VUUFNLMWg5RmJVLzlnZndEZEFWTUpiZXJO?=
+ =?utf-8?B?VEZlbm5HWTBFRFVDMDdWZVlzNE10UmNETm5VSTI5amt2RUllR2pYSG5MN1Rs?=
+ =?utf-8?B?dCtmVFduakRpMWZEbUJrY3BMZkMrUnd3czlxTXkwWldla1hmSkxDS0dyNGlY?=
+ =?utf-8?B?T1RkSDRIek9IWHdlQWtCTWZpUnRLUjRCZlUvUmRhWDllMzRjYjRsWGwzN2dY?=
+ =?utf-8?B?dEZJQ0Zwd0RZYnBkRGRJZy9VMXhrU2lkZjlaVTVDRjJpNGpDMWNJL3Qyend4?=
+ =?utf-8?B?WGFRSHc3WVVxcVdWQWdYakJCTUcrUnBBK3pTUno0bXdjbE92VlBkWXI3a2dH?=
+ =?utf-8?B?cVBPZElVUG8zZHA5MUYwakFuUHRzRm9HK3pmcjhJeWZzam05OHJBVE5MTDBZ?=
+ =?utf-8?B?QTRmVzBZWVhLVDFiTndQRWtjMDZmRjhGcjJFeTFmUTU2SnhqS2x2U3dCMW8y?=
+ =?utf-8?B?VWczQWVFSjZPN2ZhYmZzcTN3WE9FZ0ZyVmZveTJLODZzd2U0NlhwTGhSZG92?=
+ =?utf-8?B?VlBlLzFHWXVyWUtFY2IwRkFzTGJzdXRRVml1Si9ldnI0U0lTdUJ0dG1OaHVN?=
+ =?utf-8?B?KzZKMkp3dVdOMUN4ZjhrL0tLMEZSZFQrelBCSUNLZUljVW1udlNqVlYxeml4?=
+ =?utf-8?B?dlN0UXdkNVlhWTc5ZmxIWElOa2tTb3pKSUlhREsza1JXTnpFR3oyTGd2ZW1r?=
+ =?utf-8?B?YVQ0ZWlGZkFPM2JHSUVyT3NhUi95NkNjUDdBeUZqdGpZRHpZNVluZWV0dTJN?=
+ =?utf-8?B?WG1GSzRPK0hzQStvQ1BVQlV4M0J4Uy8rWnkyRHpoZFdBOThVK3hFeFZHMjZO?=
+ =?utf-8?B?Wk1zSW05cEN5aWxUWmJPM2ZpMEVUL3pvTVVFUVNZQ0Q3ZFZWRVdaVHdqNTdj?=
+ =?utf-8?B?M2laM1lSMktXbzY4Q0hqdz09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?alU2dmlGYXhaMmpHR3FHK3pBTHkzWTFXaGVhMlJMRVg4eTM1Zm04NzMxZS94?=
- =?utf-8?B?R3JqQ0R3NFhlTk55QkNFMG9UdUl4WHpHa28ydEg1MFNGeEJHd3hzWFZSREl6?=
- =?utf-8?B?UzVJTHBFaThReGZlNDAzTDdhKzdlS2gyeFo5blI4aXJRQjk3Y1N3L3FtZHY1?=
- =?utf-8?B?SmpPSDY3L1lIdXlEZFdGZ24yU0t0OXVKREx6V0F5aGdNMmRNKzhkNUh1dTQv?=
- =?utf-8?B?bWZEN3A0Wk9mU2xkZ0p1VFJJWG55YWZlTGorbkhCaXcwZVZkR2hMa1FNT21z?=
- =?utf-8?B?K2orUlRkVGNISXBhTXcxS1YrdDJydFhvKy9BV2lmTmhmUnVJU3BOaW05ajBK?=
- =?utf-8?B?cU1ObW9XVmFJcFZNbjF4ejVqL2V5dldCdlBjbmNUUmZjU1JMaE1hckErT0Vr?=
- =?utf-8?B?OFpXV3IyTENTc3ZMZGFSWXpCWUxXUHFCYnc1MGUraXFtQUc5VGk2VVQvOStR?=
- =?utf-8?B?QnRXZ3Y0WHpVVThVZlh0bXNFQzJkc3ZZL3VNUGJFZ0IzZ2ZRNUpNQ09JT1ZV?=
- =?utf-8?B?T1RiR09JcFpLbHgvemh1UTNROXBYQ3dXQXJpanB1RXF5SkU5S2RGTkdLK1U2?=
- =?utf-8?B?akxQVkxRcWJvdm1ITlowZ0M4TE8zUE4wSU5jSXcxbDdNbXUxYVViWnZhVnFa?=
- =?utf-8?B?cmJ4RXFsQXVpR0p5ZDd5Z05GMVN0TTUrT01WY3RWVkl1d1ZPdGpiMFJ3ZWor?=
- =?utf-8?B?Qk5Rcmw4VE1OZ1FuLzFHaDBaZ1o2L1ZSZ01iaHJqVnl2ZzNKMTFpaHBCaFlF?=
- =?utf-8?B?SkhUamlmck5XWFpWVFI0ZUd5QzRXZUVyNE5ub0lzdXU4QUNjN0xCeEw3MnlL?=
- =?utf-8?B?UFpFb0o3ZkdsRy84R0JScVFic2JockJSM3Bib1pVOGd5eEo2L0ErTktyN0o4?=
- =?utf-8?B?L3lpUUxrZHN3UXdlNFFOTXZ3akhRWGtFVlhmalVoaGx2cTF0cmdqV0tlQkVs?=
- =?utf-8?B?OW1WSHFpL1V6bmVUbGdha1VJbk12MXBoQURVRHBtYWlwelBsN2xreTBlaUdY?=
- =?utf-8?B?Yi91R09qVk9BWTRsSmZsbnhtcEFjdmZSNWNrU0o2R2REYVBSMkhUdm5mamp0?=
- =?utf-8?B?OHFWZ2l3VUV6ZlljR3VFU0tOTUFrdldQMktyNlU2aWlqK2RzenU2cldqSnpL?=
- =?utf-8?B?OWhNQ0Zid3BXSGpINkNycWR0cjlqaHR3U3NrRFdrYlBQbUJMTmtGcHM2RWRq?=
- =?utf-8?B?UnFmdlo2eTBvNGtjWE5EMGJiNmZva2pMK0s2cEhoSW1FU0hmUGZoRC91cEVo?=
- =?utf-8?B?cU9HSm1lSzcycVh1MWxaTjNuUmZrc3hmNHVWR2o0VDJQeVZTQUk3dW50Tjhy?=
- =?utf-8?B?YW5zM2s3ZE0wTThXR0NTU1JPR3JPRUFPQ2VxQUVhRWFuU0o0RmpQMXdPbFpB?=
- =?utf-8?B?WEIrUGQ0YVNpMWpHTld5NUFRS09CL1VqQkh4bE81dmRJLytjQ3gvM3ZGSHhl?=
- =?utf-8?B?ZndUWlBBa0lsYzFEL0dzR1dLZ1BiOXpOZTYzZkQvdEw3RmZLbzI4WS9oVjc2?=
- =?utf-8?B?Lzl4VllZODVEU2F5a3RPOHVaL25RRU8yclJYZFIzbVFkYUY1YjEzU0tVZkZv?=
- =?utf-8?B?YkpIOHp0N2hwYTlHSFd4eEZDVGRjbElLbFEveE5QTi9BZTdMTW16c1JGdUFC?=
- =?utf-8?B?MVh2MlA0Q2xBTWpleDV6UkMzSG4wS251RnRiT1oyekNXY09zQVlPcGxsSnlV?=
- =?utf-8?B?YldtTHUrVlNkaUordFNMRUpsWm0rdGc2K2JQamtkNXpWeDlrTHg1WWZ6Y3ZP?=
- =?utf-8?B?SndmWUJ5T1Y3L1hLQ3lIbnp6NVp5SmxhajZ1dWkxNHdJaDhUemk5R2lUaU5P?=
- =?utf-8?B?MCtySFdiRlhNU1JxVXk1YUhMQVd2TFZGTnp5bFBkNkhPV1RFcDg5dmJyRnI3?=
- =?utf-8?B?SE5LYi80RlFNSVdKa3JHejJXNVEwc1Y1bWtIMTUrOXlRVkRJTWR6TkY2MmdG?=
- =?utf-8?B?c0JzY2IxQXNZc0tHVTMyKzRsclJRZGlyYm0vRmdpT3RUcHpJTnEzWHhYYVhk?=
- =?utf-8?B?TkdGemRBbnQxOHArQ0pmNmRqQnNEZkR0L1hyZUtHMGxtRWZUb1pWQVliMmxK?=
- =?utf-8?B?azBQV3dnWm9kcG1YL3c3MUFST3ZkbDlmVnN1TG9GTGJuSG1VL0R0SnJPRHFE?=
- =?utf-8?Q?Usdac+SSwOqukEED28HMvbaIL?=
+	=?utf-8?B?azA2dWdJUE0yQ1R3Q2NlMDJLVFpDSWFMU2JxMmkxdEVmOEhDVFBrTFZ3MC83?=
+ =?utf-8?B?TXdDYjlSTTFuMW9MNng1TFliTWJjclpDdjFDV2I4K3lycXluRUhTeFZ4WEN6?=
+ =?utf-8?B?WEFocUZ1QzBwc3lQRktFZ1JMSGo2OCtFRk5obUw3SEZDSVdaL0diUkNmZUo5?=
+ =?utf-8?B?MnEwaFhBdGhrVXQ0TCt0MHhZWkkva21QQUs1Qnd0Qkl2MlFFRGtPQ3pKRXVY?=
+ =?utf-8?B?NnlJWGtYOENSOFU3MmU3aEw3dW9FZy95cmRqVUF5Q1FTMHlWaStpYnVnKzZW?=
+ =?utf-8?B?Y2NDOFNWVDZ2L2F5azZyMDhoQ1IzbkZNR3dEeldKekRtTTZlRzMzeVBUdCtF?=
+ =?utf-8?B?RUtUYTdkZDYyZFdYdWZETDFzelZLUC8xSXI3SkV4UzhCbDN6blhaeWEyc2c5?=
+ =?utf-8?B?dTlXZHFnRmU5bmRRRUZZZXZqaEN1MU5CbHlQa0QyK05ycnpMaXJ3alJhOG1w?=
+ =?utf-8?B?a09SWUxCS0xCZjZidmdRek5pVDg2WWg0U2h1STd2eC9waStQa1NmdFhueU5D?=
+ =?utf-8?B?dndJR1BnSS9WQWVwbVJsMlhrb3RJZTkyNnAvQ1NTbVlIK1BIVG9Ub1Y5c1Iy?=
+ =?utf-8?B?a2VFNlNTV0hhV2RDNkxXTWUvSjd1NGZiN2hOZG9WVHJLWVZlZlRNd3gvVHF4?=
+ =?utf-8?B?S1Z6bTEybmRjMjlGRVZOWFVzT2xia1pOVmVtNCtmaDltU3ZXM2Y4ako4MVRx?=
+ =?utf-8?B?TXhEZmhDaWV1ZTZqT3ZaVXk1c3NiU09qalhDQU5oWEJVQWFBRldPQmF6WGxv?=
+ =?utf-8?B?QmJpaDNjdGx0SFdoQ1Q5MmhTQUhrRDZWblpIbG1xR2NNb2dqc0ZrWm1PNUdG?=
+ =?utf-8?B?K3c4RnhXVkdLVzdSTlhLdWQ2bzJ5c0dVSDJRZXMzTG5wMVhpYytSRVZKNlFH?=
+ =?utf-8?B?bnNiM0kxQllSb3NDSndoZUNaNzM3ZjVYU3lmbFIxSzQvUDB0MkZuQW5DWkw0?=
+ =?utf-8?B?eTFoc2lhZVVwcDRyLzVKV2RIWkRpRTM4Ym1iLy83cTZnRGd1VVNxZWpER1lI?=
+ =?utf-8?B?Ym9zQ1UyTXhmeFJkeWlNQVk3ZkFTM2c3UlIwazRBTGpQS0t5dnovYUcwUkxI?=
+ =?utf-8?B?cFBtUlVXTThzdEFib1phdlVuTmx0a1NVNi8ydGhQK1ltelVQZEQ5OVJZQlJB?=
+ =?utf-8?B?N0MrTlVMTUlKbm5TNDJoRGJ6UnZaRjlGQXRiQlNNMkZMZDV2bjJCa3VHNC9j?=
+ =?utf-8?B?L251NVo5MzhjNHFWNnVGQ0d1bGxMRHh0YXZhc2FZODVlN2dnMnhJMGNTYjQ3?=
+ =?utf-8?B?MkVXRmkzNUF4VTRDaEFoT3owdmtQWDNYemtTMm0wcEpUMUkrRWsxYk1NWjdj?=
+ =?utf-8?B?RE1nTTdpYmk5bWFibW1oYkVaU1BQaG5Pd3VOeENscGxtOU9nMDJORWJRcEFG?=
+ =?utf-8?B?c29NVXhlZ3hvci9sMVFJZ3dZTndVTSs3VkF1RCtnL3NMSG1ERUVmNXNtOFpl?=
+ =?utf-8?B?eU1zRm1XMUJNcXd0RUR5ZVhhZG1RZzYrYXpsRkRMc0VLb3V6Y0dTUVBsbHFy?=
+ =?utf-8?B?b1VkY0pPaUFkQlluMlc1ZG5FaHhxTkN2aFc5azJob084M2FkbVdpT01GRVQy?=
+ =?utf-8?B?TEhWMEs5MGVMSmRBbXJ6a21Nak5FYnBqR3p1RDFDTlp0ZEhma2REblRubXh5?=
+ =?utf-8?B?RHlueCtGR1lCRXB1TWFRa0NPc29SMTNWZ2hlZEZFcjYyL0dDTmVodFN0RVpy?=
+ =?utf-8?B?U2djTTZxa0dEQkRoOWtlZ2JlemFSUjRiNDFMUTB5d2lKaExrbVNLbmhlOENR?=
+ =?utf-8?B?bFJQamVuQXcxcmN2UU9FOFB2WWhMV1czSTVUcXJSVmhwN0s4akwvU2MrVUt6?=
+ =?utf-8?B?cGVHNGFhQUJaQ01LY2NtZHQrbnNsTnNKT2QrUmtzV0ltbzVSdTJlZ1A3TG1M?=
+ =?utf-8?B?Q1l4Wld0TTVmNDRXWDhuRmZVc01RSCtQU1dKTWF0RndIRXRtL1B5UFN4emU4?=
+ =?utf-8?B?bmpVZkZ2R29xSk0xTFNYNUdqZTlpYS9QOXE3MHROY3FxWHJud3VwNmVVSDZS?=
+ =?utf-8?B?QXVtNUlMV1lsSzNCM0lyaVFjOGlXOEFmU0ZsTFFwZDJ2YjNwV25BK2dzTFRN?=
+ =?utf-8?B?Yi9ZT3Q4RGNqT0NENjFoejhqOEsvajJuNkF2RWFqak9nekxxS3VpZGxqYURX?=
+ =?utf-8?Q?/fxl8JrAku61ojyJ8RgktdVqB?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 623052b1-9eaa-46f6-95f8-08dcc3c0b2a5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5bbba122-a72f-4b05-aa62-08dcc3c13ec3
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 22:12:37.9160
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 22:16:32.9773
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gi3xcoi1jkXFl9YY2V7K9qnbxkokqi549NlIrr2KVs5aXqUIu0AL6mfuOUfkVdjZfZ7xs0sB9ZZKk48dJmYuHA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4322
+X-MS-Exchange-CrossTenant-UserPrincipalName: VmhRQvLZGAqmWTJSjuTiAq655laJhI5AmNDfhFQpLZ3xruhWOUBWmyoSYUt3Qnb2BnxkolcNjWS43kpUMW4PIg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7133
 
-On 8/23/24 15:51, Sean Christopherson wrote:
-> On Fri, Aug 23, 2024, Tom Lendacky wrote:
->> On 8/23/24 13:53, Jim Mattson wrote:
->>> From Intel's documention [1], "CPUID.(EAX=07H,ECX=0):EDX[26]
->>> enumerates support for indirect branch restricted speculation (IBRS)
->>> and the indirect branch predictor barrier (IBPB)." Further, from [2],
->>> "Software that executed before the IBPB command cannot control the
->>> predicted targets of indirect branches (4) executed after the command
->>> on the same logical processor," where footnote 4 reads, "Note that
->>> indirect branches include near call indirect, near jump indirect and
->>> near return instructions. Because it includes near returns, it follows
->>> that **RSB entries created before an IBPB command cannot control the
->>> predicted targets of returns executed after the command on the same
->>> logical processor.**" [emphasis mine]
->>>
->>> On the other hand, AMD's IBPB "may not prevent return branch
->>> predictions from being specified by pre-IBPB branch targets" [3].
->>>
->>> However, some AMD processors have an "enhanced IBPB" [terminology
->>> mine] which does clear the return address predictor. This feature is
->>> enumerated by CPUID.80000008:EDX.IBPB_RET[bit 30] [4].
->>>
->>> Adjust the cross-vendor features enumerated by KVM_GET_SUPPORTED_CPUID
->>> accordingly.
->>>
->>> [1] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/cpuid-enumeration-and-architectural-msrs.html
->>> [2] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/speculative-execution-side-channel-mitigations.html#Footnotes
->>> [3] https://www.amd.com/en/resources/product-security/bulletin/amd-sb-1040.html
->>> [4] https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24594.pdf
->>>
->>> Fixes: 0c54914d0c52 ("KVM: x86: use Intel speculation bugs and features as derived in generic x86 code")
->>> Suggested-by: Venkatesh Srinivas <venkateshs@chromium.org>
->>> Signed-off-by: Jim Mattson <jmattson@google.com>
->>> ---
->>>  arch/x86/kvm/cpuid.c | 6 +++++-
->>>  1 file changed, 5 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->>> index ec7b2ca3b4d3..c8d7d928ffc7 100644
->>> --- a/arch/x86/kvm/cpuid.c
->>> +++ b/arch/x86/kvm/cpuid.c
->>> @@ -690,7 +690,9 @@ void kvm_set_cpu_caps(void)
->>>  	kvm_cpu_cap_set(X86_FEATURE_TSC_ADJUST);
->>>  	kvm_cpu_cap_set(X86_FEATURE_ARCH_CAPABILITIES);
->>>  
->>> -	if (boot_cpu_has(X86_FEATURE_IBPB) && boot_cpu_has(X86_FEATURE_IBRS))
->>> +	if (boot_cpu_has(X86_FEATURE_AMD_IBPB_RET) &&
->>> +	    boot_cpu_has(X86_FEATURE_AMD_IBPB) &&
->>> +	    boot_cpu_has(X86_FEATURE_AMD_IBRS))
->>>  		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
->>>  	if (boot_cpu_has(X86_FEATURE_STIBP))
->>>  		kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
->>> @@ -759,6 +761,8 @@ void kvm_set_cpu_caps(void)
->>>  	 * arch/x86/kernel/cpu/bugs.c is kind enough to
->>>  	 * record that in cpufeatures so use them.
->>>  	 */
->>> +	if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
->>> +		kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
+On 8/23/24 15:23, Pratik R. Sampat wrote:
+> 
+> 
+> On 8/16/2024 2:23 PM, Pratik R. Sampat wrote:
+>> From: Michael Roth <michael.roth@amd.com>
 >>
->> If SPEC_CTRL is set, then IBPB is set, so you can't have AMD_IBPB_RET
->> without AMD_IBPB, but it just looks odd seeing them set with separate
->> checks with no relationship dependency for AMD_IBPB_RET on AMD_IBPB.
->> That's just me, though, not worth a v4 unless others feel the same.
+>> SEV, SEV-ES, and SNP have a few corner cases where there is potential
+>> for KVM_PRE_FAULT_MEMORY to behave differently depending on when it is
+>> issued during initial guest setup. Exercising these various paths
+>> requires a bit more fine-grained control over when the
+>> KVM_PRE_FAULT_MEMORY requests are issued while setting up the guests.
+>>
+>> Since these CoCo-specific events are likely to be architecture-specific
+>> KST helpers, take the existing generic test in pre_fault_memory_test.c
+>> as a starting template, and then introduce an x86-specific version of
+>> it with expanded coverage for SEV, SEV-ES, and SNP.
+>>
+>> Since there's a reasonable chance that TDX could extend this for similar
+>> testing of TDX, give it a "coco-" prefix rather than an SEV-specific
+>> one.
+>>
+>> Signed-off-by: Michael Roth <michael.roth@amd.com>
+>> Co-developed-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
+>> Signed-off-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
+>> ---
+>>  tools/testing/selftests/kvm/Makefile          |   1 +
+>>  .../kvm/x86_64/coco_pre_fault_memory_test.c   | 314 ++++++++++++++++++
+>>  2 files changed, 315 insertions(+)
+>>  create mode 100644 tools/testing/selftests/kvm/x86_64/coco_pre_fault_memory_test.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>> index 48d32c5aa3eb..65d19b277b06 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -129,6 +129,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/amx_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/max_vcpuid_cap_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/triple_fault_event_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/recalc_apic_map_test
+>> +TEST_GEN_PROGS_x86_64 += x86_64/coco_pre_fault_memory_test
+>>  TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
+>>  TEST_GEN_PROGS_x86_64 += demand_paging_test
+>>  TEST_GEN_PROGS_x86_64 += dirty_log_test
+>> diff --git a/tools/testing/selftests/kvm/x86_64/coco_pre_fault_memory_test.c b/tools/testing/selftests/kvm/x86_64/coco_pre_fault_memory_test.c
+>> new file mode 100644
+>> index 000000000000..e16fe185fb5a
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/x86_64/coco_pre_fault_memory_test.c
+>> @@ -0,0 +1,314 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +#include <linux/sizes.h>
+>> +
+>> +#include <test_util.h>
+>> +#include <kvm_util.h>
+>> +#include <processor.h>
+>> +#include "sev.h"
+>> +
+>> +/* Arbitrarily chosen values */
+>> +#define TEST_SIZE		(SZ_2M + PAGE_SIZE)
+>> +#define TEST_NPAGES		(TEST_SIZE / PAGE_SIZE)
+>> +#define TEST_SLOT		10
+>> +#define TEST_GPA		0x100000000ul
+>> +#define TEST_GVA		0x100000000ul
+>> +
+>> +enum prefault_snp_test_type {
+>> +	/* Skip pre-faulting tests. */
+>> +	NO_PREFAULT_TYPE = 0,
+>> +	/*
+>> +	 * Issue KVM_PRE_FAULT_MEMORY for GFNs mapping non-private memory
+>> +	 * before finalizing the initial guest contents (e.g. via
+>> +	 * KVM_SEV_SNP_LAUNCH_FINISH for SNP guests).
+>> +	 *
+>> +	 * This should result in failure since KVM explicitly disallows
+>> +	 * KVM_PRE_FAULT_MEMORY from being issued prior to finalizing the
+>> +	 * initial guest contents.
+>> +	 */
+>> +	PREFAULT_SHARED_BEFORE_FINALIZING = 0,
 > 
-> You thinking something like this (at the end, after the dust settles)?
-> 
-> 	if (WARN_ON_ONCE(kvm_cpu_cap_has(X86_FEATURE_AMD_IBPB_RET) &&
-> 			 !kvm_cpu_cap_has(X86_FEATURE_AMD_IBPB)))
-> 		kvm_cpu_cap_clear(X86_FEATURE_AMD_IBPB_RET);		
+> Just spotted that I have initialized both NO_PREFAULT_TYPE and
+> PREFAULT_SHARED_BEFORE_FINALIZING to 0, effectively running the latter
+> test type twice. I will fix in the next iteration that I post.
 
-I was just thinking more along the lines of:
-
-	if (boot_cpu_has(X86_FEATURE_IBPB)) {
-		kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB);
-		if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
-			kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
-	}
+Enums start at 0, so you can just eliminate the assignments.
 
 Thanks,
 Tom
 
->>
 > 
->> Thanks,
->> Tom
->>
->>>  	if (boot_cpu_has(X86_FEATURE_IBPB))
->>>  		kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB);
->>>  	if (boot_cpu_has(X86_FEATURE_IBRS))
+> Thanks!
+> Pratik
+> 
+>> +	/*
+>> +	 * Issue KVM_PRE_FAULT_MEMORY for GFNs mapping private memory
+>> +	 * before finalizing the initial guest contents (e.g. via
+>> +	 * KVM_SEV_SNP_LAUNCH_FINISH for SNP guests).
+>> +	 *
+>> +	 * This should result in failure since KVM explicitly disallows
+>> +	 * KVM_PRE_FAULT_MEMORY from being issued prior to finalizing the
+>> +	 * initial guest contents.
+>> +	 */
+>> +	PREFAULT_PRIVATE_BEFORE_FINALIZING,
+>> +	/*
+>> +	 * Issue KVM_PRE_FAULT_MEMORY for GFNs mapping shared/private
+>> +	 * memory after finalizing the initial guest contents
+>> +	 * (e.g. via * KVM_SEV_SNP_LAUNCH_FINISH for SNP guests).
+>> +	 *
+>> +	 * This should succeed since pre-faulting is supported for both
+>> +	 * non-private/private memory once the guest contents are finalized.
+>> +	 */
+>> +	PREFAULT_PRIVATE_SHARED_AFTER_FINALIZING
+>> +};
+>> +
+>> +static void guest_code_sev(void)
+>> +{
+>> +	int i;
+>> +
+>> +	GUEST_ASSERT(rdmsr(MSR_AMD64_SEV) & MSR_AMD64_SEV_ENABLED);
+>> +
+>> +	for (i = 0; i < TEST_NPAGES; i++) {
+>> +		uint64_t *src = (uint64_t *)(TEST_GVA + i * PAGE_SIZE);
+>> +		uint64_t val = *src;
+>> +
+>> +		/* Validate the data stored in the pages */
+>> +		if ((i < TEST_NPAGES / 2 && val != i + 1) ||
+>> +		    (i >= TEST_NPAGES / 2 && val != 0)) {
+>> +			GUEST_FAIL("Inconsistent view of memory values in guest");
+>> +		}
+>> +	}
+>> +
+>> +	if (rdmsr(MSR_AMD64_SEV) & MSR_AMD64_SEV_ES_ENABLED) {
+>> +		wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
+>> +		__asm__ __volatile__("rep; vmmcall");
+>> +		GUEST_FAIL("This should be unreachable.");
+>> +	}
+>> +
+>> +	GUEST_DONE();
+>> +}
+>> +
+>> +static void __pre_fault_memory(struct kvm_vcpu *vcpu, u64 gpa, u64 size,
+>> +			       u64 left, bool expect_fail)
+>> +{
+>> +	struct kvm_pre_fault_memory range = {
+>> +		.gpa = gpa,
+>> +		.size = size,
+>> +		.flags = 0,
+>> +	};
+>> +	int ret, save_errno;
+>> +	u64 prev;
+>> +
+>> +	do {
+>> +		prev = range.size;
+>> +		ret = __vcpu_ioctl(vcpu, KVM_PRE_FAULT_MEMORY, &range);
+>> +		save_errno = errno;
+>> +		TEST_ASSERT((range.size < prev) ^ (ret < 0),
+>> +			    "%sexpecting range.size to change on %s",
+>> +			    ret < 0 ? "not " : "",
+>> +			    ret < 0 ? "failure" : "success");
+>> +	} while (ret >= 0 ? range.size : save_errno == EINTR);
+>> +
+>> +	TEST_ASSERT(expect_fail ? !(range.size == left) : (range.size == left),
+>> +		    "[EXPECT %s] completed with %lld bytes left, expected %" PRId64,
+>> +		    expect_fail ? "FAIL" : "PASS",
+>> +		    range.size, left);
+>> +
+>> +	if (left == 0) {
+>> +		TEST_ASSERT(expect_fail ? ret : !ret,
+>> +			    "[EXPECT %s] KVM_PRE_FAULT_MEMORY",
+>> +			    expect_fail ? "FAIL" : "PASS");
+>> +	} else {
+>> +		/*
+>> +		 * For shared memory, no memory slot causes RET_PF_EMULATE. It
+>> +		 * results in -ENOENT.
+>> +		 *
+>> +		 * For private memory, no memory slot is an error case returning
+>> +		 * -EFAULT, but it also possible the only the GPA ranges backed
+>> +		 *  by a slot are marked as private, in which case the noslot
+>> +		 *  range will also result in -ENOENT.
+>> +		 *
+>> +		 *  So allow both errors for now, but in the future it would be
+>> +		 *  good to distinguish between these cases to tighten up the
+>> +		 *  error-checking.
+>> +		 */
+>> +		TEST_ASSERT(expect_fail ? !ret :
+>> +			    (ret && (save_errno == EFAULT || save_errno == ENOENT)),
+>> +			    "[EXPECT %s] KVM_PRE_FAULT_MEMORY",
+>> +			    expect_fail ? "FAIL" : "PASS");
+>> +	}
+>> +}
+>> +
+>> +static void pre_fault_memory(struct kvm_vcpu *vcpu, u64 gpa,
+>> +			     u64 size, u64 left)
+>> +{
+>> +	__pre_fault_memory(vcpu, gpa, size, left, false);
+>> +}
+>> +
+>> +static void pre_fault_memory_negative(struct kvm_vcpu *vcpu, u64 gpa,
+>> +				      u64 size, u64 left)
+>> +{
+>> +	__pre_fault_memory(vcpu, gpa, size, left, true);
+>> +}
+>> +
+>> +static void pre_fault_memory_snp(struct kvm_vcpu *vcpu, struct kvm_vm *vm,
+>> +				 bool private, enum prefault_snp_test_type p_type)
+>> +{
+>> +	if (p_type == PREFAULT_SHARED_BEFORE_FINALIZING)
+>> +		pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
+>> +
+>> +	snp_vm_launch_start(vm, SNP_POLICY);
+>> +
+>> +	if (p_type == PREFAULT_SHARED_BEFORE_FINALIZING)
+>> +		pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
+>> +
+>> +	if (private) {
+>> +		/*
+>> +		 * Make sure when pages are pre-faulted later after
+>> +		 * finalization they are treated the same as a private
+>> +		 * access by the guest so that the expected gmem
+>> +		 * backing pages are used.
+>> +		 */
+>> +		vm_mem_set_private(vm, TEST_GPA, TEST_SIZE);
+>> +		if (p_type == PREFAULT_PRIVATE_BEFORE_FINALIZING)
+>> +			pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
+>> +	} else {
+>> +		if (p_type == PREFAULT_SHARED_BEFORE_FINALIZING)
+>> +			pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
+>> +	}
+>> +
+>> +	snp_vm_launch_update(vm);
+>> +
+>> +	if (p_type == PREFAULT_SHARED_BEFORE_FINALIZING)
+>> +		pre_fault_memory_negative(vcpu, TEST_GPA, SZ_2M, 0);
+>> +
+>> +	snp_vm_launch_finish(vm);
+>> +
+>> +	/*
+>> +	 * After finalization, pre-faulting either private or shared
+>> +	 * ranges should work regardless of whether the pages were
+>> +	 * encrypted as part of setting up initial guest state.
+>> +	 */
+>> +	if (p_type == PREFAULT_PRIVATE_SHARED_AFTER_FINALIZING) {
+>> +		pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
+>> +		pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
+>> +		pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
+>> +	}
+>> +}
+>> +
+>> +static void pre_fault_memory_sev(unsigned long vm_type, struct kvm_vcpu *vcpu,
+>> +				 struct kvm_vm *vm)
+>> +{
+>> +	uint32_t policy = (vm_type == KVM_X86_SEV_ES_VM) ? SEV_POLICY_ES : 0;
+>> +
+>> +	pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
+>> +	pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
+>> +	pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
+>> +
+>> +	sev_vm_launch(vm, policy);
+>> +
+>> +	pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
+>> +	pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
+>> +	pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
+>> +
+>> +	sev_vm_launch_measure(vm, alloca(256));
+>> +
+>> +	pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
+>> +	pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
+>> +	pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
+>> +
+>> +	sev_vm_launch_finish(vm);
+>> +
+>> +	pre_fault_memory(vcpu, TEST_GPA, SZ_2M, 0);
+>> +	pre_fault_memory(vcpu, TEST_GPA + SZ_2M, PAGE_SIZE * 2, PAGE_SIZE);
+>> +	pre_fault_memory(vcpu, TEST_GPA + TEST_SIZE, PAGE_SIZE, PAGE_SIZE);
+>> +}
+>> +
+>> +static void test_pre_fault_memory_sev(unsigned long vm_type, bool private,
+>> +				      enum prefault_snp_test_type p_type)
+>> +{
+>> +	struct kvm_vcpu *vcpu;
+>> +	struct kvm_vm *vm;
+>> +	struct ucall uc;
+>> +	int i;
+>> +
+>> +	vm = vm_sev_create_with_one_vcpu(vm_type, guest_code_sev, &vcpu);
+>> +
+>> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+>> +				    TEST_GPA, TEST_SLOT, TEST_NPAGES,
+>> +				    (vm_type == KVM_X86_SNP_VM) ? KVM_MEM_GUEST_MEMFD : 0);
+>> +
+>> +	/*
+>> +	 * Make sure guest page table is in agreement with what pages will be
+>> +	 * initially encrypted by the ASP.
+>> +	 */
+>> +	if (private)
+>> +		vm_mem_set_protected(vm, TEST_SLOT, TEST_GPA, TEST_NPAGES);
+>> +
+>> +	virt_map(vm, TEST_GVA, TEST_GPA, TEST_NPAGES);
+>> +
+>> +	/*
+>> +	 * Populate the pages to compare data read from the guest
+>> +	 * Populate the first half with data and second half as all zeros.
+>> +	 */
+>> +	for (i = 0; i < TEST_NPAGES; i++) {
+>> +		uint64_t *hva = addr_gva2hva(vm, TEST_GVA + i * PAGE_SIZE);
+>> +
+>> +		if (i < TEST_NPAGES / 2)
+>> +			*hva = i + 1;
+>> +		else
+>> +			*hva = 0;
+>> +	}
+>> +
+>> +	if (vm_type == KVM_X86_SNP_VM)
+>> +		pre_fault_memory_snp(vcpu, vm, private, p_type);
+>> +	else
+>> +		pre_fault_memory_sev(vm_type, vcpu, vm);
+>> +
+>> +	vcpu_run(vcpu);
+>> +
+>> +	if (vm->type == KVM_X86_SEV_ES_VM || vm->type == KVM_X86_SNP_VM) {
+>> +		TEST_ASSERT(vcpu->run->exit_reason == KVM_EXIT_SYSTEM_EVENT,
+>> +			    "Wanted SYSTEM_EVENT, got %s",
+>> +			    exit_reason_str(vcpu->run->exit_reason));
+>> +		TEST_ASSERT_EQ(vcpu->run->system_event.type, KVM_SYSTEM_EVENT_SEV_TERM);
+>> +		TEST_ASSERT_EQ(vcpu->run->system_event.ndata, 1);
+>> +		TEST_ASSERT_EQ(vcpu->run->system_event.data[0], GHCB_MSR_TERM_REQ);
+>> +		goto out;
+>> +	}
+>> +
+>> +	switch (get_ucall(vcpu, &uc)) {
+>> +	case UCALL_DONE:
+>> +		break;
+>> +	case UCALL_ABORT:
+>> +		REPORT_GUEST_ASSERT(uc);
+>> +	default:
+>> +		TEST_FAIL("Unexpected exit: %s",
+>> +			  exit_reason_str(vcpu->run->exit_reason));
+>> +	}
+>> +
+>> +out:
+>> +	kvm_vm_free(vm);
+>> +}
+>> +
+>> +static void test_pre_fault_memory(unsigned long vm_type, bool private)
+>> +{
+>> +	int pt;
+>> +
+>> +	if (vm_type && !(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type))) {
+>> +		pr_info("Skipping tests for vm_type 0x%lx\n", vm_type);
+>> +		return;
+>> +	}
+>> +
+>> +	switch (vm_type) {
+>> +	case KVM_X86_SEV_VM:
+>> +	case KVM_X86_SEV_ES_VM:
+>> +		test_pre_fault_memory_sev(vm_type, private, NO_PREFAULT_TYPE);
+>> +		break;
+>> +	case KVM_X86_SNP_VM:
+>> +		for (pt = 0; pt <= PREFAULT_PRIVATE_SHARED_AFTER_FINALIZING; pt++)
+>> +			test_pre_fault_memory_sev(vm_type, private, pt);
+>> +		break;
+>> +	default:
+>> +		abort();
+>> +	}
+>> +}
+>> +
+>> +int main(int argc, char *argv[])
+>> +{
+>> +	TEST_REQUIRE(kvm_check_cap(KVM_CAP_PRE_FAULT_MEMORY));
+>> +
+>> +	test_pre_fault_memory(KVM_X86_SEV_VM, false);
+>> +	test_pre_fault_memory(KVM_X86_SEV_VM, true);
+>> +	test_pre_fault_memory(KVM_X86_SEV_ES_VM, false);
+>> +	test_pre_fault_memory(KVM_X86_SEV_ES_VM, true);
+>> +	test_pre_fault_memory(KVM_X86_SNP_VM, false);
+>> +	test_pre_fault_memory(KVM_X86_SNP_VM, true);
+>> +
+>> +	return 0;
+>> +}
+> 
 
