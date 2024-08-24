@@ -1,105 +1,122 @@
-Return-Path: <kvm+bounces-24989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C0595DA13
-	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 02:00:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6930F95DA14
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 02:04:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C3481F21517
-	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:00:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18E4E283718
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:04:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FEF4AEF4;
-	Sat, 24 Aug 2024 00:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C73CA32;
+	Sat, 24 Aug 2024 00:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GBF1P9Eu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fvzXj+CR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FBA5CB8
-	for <kvm@vger.kernel.org>; Sat, 24 Aug 2024 00:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2043A1388
+	for <kvm@vger.kernel.org>; Sat, 24 Aug 2024 00:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724457626; cv=none; b=gtesXcds1peYSJFEajmjbrHlOJL1EBRJmCwJq9CJ2MaJx2UJU8TnFnyWq1Z/up0AEnVs+AZHDBs8vBcNYJtIK8aaLvP23R+ZD8TYpxQFnFUhYxIisM3wTRpFMRupzrqLpx0vkzgS5MCyRCzZp2H8Tch2noKT1kNn/Vi5MC6q1/k=
+	t=1724457867; cv=none; b=D9sEESohkPW6i3O1auwv9ZfZLKcvJl87PX09RVP0X1wfK/cGf32GQ5CrkesSmnPgRn++1Id6x24IcBRwYTvGROWhN1S1FDUo3+xjWbKR6/0E4AI3oAFDFlGY+NH54whkk78tuiFK5ARefgW2CjK2xPrgXCu5mEx+5GNUyQbMCgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724457626; c=relaxed/simple;
-	bh=CBlzlCej0jlDEn2XXcD3WNh08kLlrh+iXs5vQ8oBStk=;
+	s=arc-20240116; t=1724457867; c=relaxed/simple;
+	bh=0xG0S8/UkIkI/nRYACzCp8C8N7AggLP5xaj59lpIjPI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=toyVjSGL+DHF2qqrmqa4RoUpWmjHitzxiIXGW6TYLKfCU/Z4rVTkJhv8yXHpK8Dzp2YlQBD/dLcPWwk5BB44x81VKA3PCMHqwUiRYHUHs6Y1hCHzatRxbOiUTPIHJBpmtRwSStX11Ctlc8sqrHtaDZNsqIDk/axxr+WKMDGVooE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GBF1P9Eu; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=V+gy4skPh7RfEdksaec4PHqWbYgrpgJS1V9VSmwWRWqev+rOipliQizShQ6tIzohTCHF+CgbuLLMeVuSnljmi/mfC6SW0N339N5gbOtRnsOUwQjAqNxsviuAGPoaxXTkFIR9JGcVvzJR/FqwXszcpnJYpUCk49RsMZWw+bYuoJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fvzXj+CR; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7143e0e4cdbso1913293b3a.1
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 17:00:25 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-778702b9f8fso1744520a12.1
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 17:04:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724457625; x=1725062425; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1724457865; x=1725062665; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1ca0bECA5aRr3r9kHtnZQuHEvw2Ot4ILpPTiRBu+Z1Q=;
-        b=GBF1P9EuTOpyWDE5cKqORrvUUgQFQGil7uLVcn0oPl422K3TofMXc8BM2+gjUIRm+l
-         AeFxXAX7Cqyv0CWQsXnbBgS0b2moFxK07WTW2yj4Kh+ho4AEvRPQg6DIZ8D2z7qtC2u6
-         8Xwo+w9WVYQahXCpew/Zxj4YO8lNj9c6Gvvy46EzarSItCD34LHP++2QYRXfW3aRY1b5
-         bZTHIVB9+lGo1rZyTMfdjNBQksgUAnTy0EVV2X30AcMjXJWjrHo/oxG5FZO0jvbb39mS
-         bfJCxuHZ2eGraKGbopvfCsemq7ZcgpkR2VK07QjOCNTt58nEyZhIQhwbZ75BcXbn26h/
-         e0mA==
+        bh=HPpi6gGER7s47NXj3m6rQIuD6YvzPvzRxn85EJyyePU=;
+        b=fvzXj+CRfspDc7ZLIX+Nt5R8fFJW9TLJgcSM8RuFdPUE26VEJcSzZjTInNUZ+sUp9S
+         G61cNof05US/UNFfq4Q4DxNYM7tWn8wfqAVqQ0dtlYHcztGmLjD1cP869d/YWY4xvGIL
+         Y1VSzDgIxFbDSuBd3W0JDj8wTK2oJ+H5Vb63ffx8Tkf7EK9MKOajWDv+GNRMBO3AmNGs
+         CYFPe/oztEdC0bhfu/XiN3zKYjZh6v5509vR4BTLKR+y8Ap1tEKb9i/uWWpVRbrk4RI9
+         c7YWyOdc2nIrUoNtrCV4hPKnAFqZ9x/VvoOsVGQimE1g46Ii6xKqN4B9LLrql6d5XOZK
+         /XTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724457625; x=1725062425;
+        d=1e100.net; s=20230601; t=1724457865; x=1725062665;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1ca0bECA5aRr3r9kHtnZQuHEvw2Ot4ILpPTiRBu+Z1Q=;
-        b=uRlon1vxTGAMS1uIwYaittlFVqODzhwXtVf8yHZbnEIfhOC43zChG96k1vYN2EHXAK
-         6h+TSTaD8DEBt8tls3GibTe+8rjNgauSaquGk6NGORn+A88by4ESwhF/iedTqegVsY/7
-         dGCUQ3wxuFef3bhhrXuq4gAb8mpt67EqnEkvBl4KbXS6xiBkEdRuQ2q21qTAYTfxwc4k
-         kWCn2D4JE7CU/Ubwdiv7wPJJx8BbtX5Rj12ihZ3WmaQj5RuB9H7Zd6rU1iVMLcZSZs2W
-         +hb+RGCD41vqk/fbZTvrSksyVeYdHTVg+z4YH92l+nHGKFreC0GpNBmBTjcFeNmRu9nG
-         as+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXr8DjxSdcG2DXZ+YxPUM3nDIxHbnH0ys9A38ox1e973szZ+9gOQ33ze31M6eIA/pRETEA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzO9aW/6L37KuM6avgcMhvEX2B13Tcn+JtiT3lNmmCeSAL4lNqm
-	80a3H+jo8rztPbUmGrpDzPHWok6uK1ITuVD/YvTUVZOTGntF2InxgD+HO6CNZ1vTXUfIgDeJw1T
-	mAA==
-X-Google-Smtp-Source: AGHT+IFjH1L+yx6ePew+AVPSI6ETQhn78QMIuKkHsHXFR08QFYT6Z4rKQmWThVz1lyeaqhvB+H2v7V4R2l4=
+        bh=HPpi6gGER7s47NXj3m6rQIuD6YvzPvzRxn85EJyyePU=;
+        b=Fy43INxG97YmfeGiiUVYp6my+Ubc4CARv+Y7WjHRjSz740hyzaReDS4CLIKD+4Kugp
+         lT62ZKSC6fLZOndHLMiVLdLGu/iHjJcnfYuQ/RwQR8oZVQ/nEGvLzkOF9INCGdaMRmss
+         JdqL16sIZKodzvJZXLsUk5voLFBtF+avzC8ZTvOmcPpQ3LEKxYlpq4CfYUAANkRzwu6j
+         CrC/y0kpVvhgqunFVHiieKd7kSUVbCkQbijaaRyDB36b1XA9DRfw03cRb30I6hiHplIA
+         yPrHq8qxyKvxXeV/+Y503iwBzn8L1tJ7Omw/4Ncf2Y49Dj1fLFpiYn3gY+vQILdDLvHz
+         qwZw==
+X-Gm-Message-State: AOJu0YzxJh2+R1l8EArrJVUPdfj8vFptJR0cdgUPOVMe6Dc1NXqEjoK9
+	/qyVSDAqh5Nk99i+nW7R9c8IVRFhGMufrTHZAz9JLwFyDyQuHfMNvWLQp5EV4FHfn9NyMcdFeBM
+	wEw==
+X-Google-Smtp-Source: AGHT+IHe496PpSnfuOMQTES9fQcEL6/TNuTZtcXDXXiDKRk8vaQvcRM5m7aPHP5L/bz8nt2U9LNdgkKYoM4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:8b93:b0:714:37ed:dcb3 with SMTP id
- d2e1a72fcca58-714458baf14mr14478b3a.4.1724457624368; Fri, 23 Aug 2024
- 17:00:24 -0700 (PDT)
-Date: Fri, 23 Aug 2024 17:00:23 -0700
-In-Reply-To: <b3c27ca7-a409-4df5-bb55-3c3314347d7d@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:483:b0:7b8:b174:3200 with SMTP id
+ 41be03b00d2f7-7cd97d0cc9bmr28126a12.5.1724457864978; Fri, 23 Aug 2024
+ 17:04:24 -0700 (PDT)
+Date: Fri, 23 Aug 2024 17:04:23 -0700
+In-Reply-To: <20240820133333.1724191-2-ilstam@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240821112737.3649937-1-liuyongqiang13@huawei.com> <b3c27ca7-a409-4df5-bb55-3c3314347d7d@intel.com>
-Message-ID: <Zskil6dbwJmL93cO@google.com>
-Subject: Re: [PATCH -next] KVM: SVM: Remove unnecessary GFP_KERNEL_ACCOUNT in svm_set_nested_state()
+References: <20240820133333.1724191-1-ilstam@amazon.com> <20240820133333.1724191-2-ilstam@amazon.com>
+Message-ID: <ZskjhzkfQDtJVnDI@google.com>
+Subject: Re: [PATCH v3 1/6] KVM: Fix coalesced_mmio_has_room()
 From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Yongqiang Liu <liuyongqiang13@huawei.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhangxiaoxu5@huawei.com, hpa@zytor.com, 
-	x86@kernel.org, dave.hansen@linux.intel.com, bp@alien8.de, mingo@redhat.com, 
-	tglx@linutronix.de, pbonzini@redhat.com
+To: Ilias Stamatis <ilstam@amazon.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	dwmw@amazon.co.uk, nh-open-source@amazon.com, Paul Durrant <paul@xen.org>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Aug 23, 2024, Kai Huang wrote:
+On Tue, Aug 20, 2024, Ilias Stamatis wrote:
+> The following calculation used in coalesced_mmio_has_room() to check
+> whether the ring buffer is full is wrong and only allows half the buffer
+> to be used.
 > 
+> avail = (ring->first - last - 1) % KVM_COALESCED_MMIO_MAX;
+> if (avail == 0)
+> 	/* full */
 > 
-> On 21/08/2024 11:27 pm, Yongqiang Liu wrote:
-> > The fixed size temporary variables vmcb_control_area and vmcb_save_area
-> > allocated in svm_set_nested_state() are released when the function exits.
-> > Meanwhile, svm_set_nested_state() also have vcpu mutex held to avoid
-> > massive concurrency allocation, so we don't need to set GFP_KERNEL_ACCOUNT.
+> The % operator in C is not the modulo operator but the remainder
+> operator. Modulo and remainder operators differ with respect to negative
+> values. But all values are unsigned in this case anyway.
 > 
-> Hi Sean/Paolo,
+> The above might have worked as expected in python for example:
+> >>> (-86) % 170
+> 84
 > 
-> Seems more patches are popping up regarding to whether to use _ACCOUNT for
-> temporary memory allocation.  Could we have a definitive guide on this?
+> However it doesn't work the same way in C.
+> 
+> printf("avail: %d\n", (-86) % 170);
+> printf("avail: %u\n", (-86) % 170);
+> printf("avail: %u\n", (-86u) % 170u);
+> 
+> Using gcc-11 these print:
+> 
+> avail: -86
+> avail: 4294967210
+> avail: 0
+> 
+> Fix the calculation and allow all but one entries in the buffer to be
+> used as originally intended.
+> 
+> Fixes: 105f8d40a737 ("KVM: Calculate available entries in coalesced mmio ring")
+> Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
+> Reviewed-by: Paul Durrant <paul@xen.org>
+> ---
 
-If the allocations are temporary, e.g. scoped to exactly one function, not massive
-(use best judgment), and can't be used in any kind of novel DDoS attack, e.g. are
-limited to one per vCPU or so, then they don't need to be accounted.
-
-At least, that's my take on things.
+Doh, I applied v2 instead of v3.  Though unless mine eyes deceive me, they're
+the same.
 
