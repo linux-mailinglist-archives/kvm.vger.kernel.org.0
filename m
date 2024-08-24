@@ -1,120 +1,105 @@
-Return-Path: <kvm+bounces-24981-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA1295D9FE
-	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 01:57:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C0595DA13
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 02:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 509B61C22A7A
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2024 23:57:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C3481F21517
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF2F1CDA3C;
-	Fri, 23 Aug 2024 23:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FEF4AEF4;
+	Sat, 24 Aug 2024 00:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c+jKn06Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GBF1P9Eu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717E11CC8B2
-	for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 23:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FBA5CB8
+	for <kvm@vger.kernel.org>; Sat, 24 Aug 2024 00:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724457423; cv=none; b=OI7VRKjr9nWvgLcrwt1zcaX5dV8pa60HAldy10yOze9H4viqP6n5AgLfAa+YT3yx/ISPcdkKdrPlzUuGSWIbdtGiuRQE9LZoHCZHgAk0JkMzIvTfg3Qst/60d6VmhOEyJHwmkOOI8Gf2ALir5gpkNSU4CWF9cstVlF5+v/jn4bM=
+	t=1724457626; cv=none; b=gtesXcds1peYSJFEajmjbrHlOJL1EBRJmCwJq9CJ2MaJx2UJU8TnFnyWq1Z/up0AEnVs+AZHDBs8vBcNYJtIK8aaLvP23R+ZD8TYpxQFnFUhYxIisM3wTRpFMRupzrqLpx0vkzgS5MCyRCzZp2H8Tch2noKT1kNn/Vi5MC6q1/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724457423; c=relaxed/simple;
-	bh=4XD4l3U3wYnBD7f0qYtCqEDXW9p9w81RczhincQurds=;
+	s=arc-20240116; t=1724457626; c=relaxed/simple;
+	bh=CBlzlCej0jlDEn2XXcD3WNh08kLlrh+iXs5vQ8oBStk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GOqln30R3ZkO0XT5GW2YJGS3OFJKBnXxH+V/gZZg3gynf5pkfGUb8P121YTqzs65wDkWEAz11E6Bl4G2I3ZMwg/lcYDHxZKoxWy+U1RzHq3ZwBvIvcdgBrRbrrr/ATZD7J2PFBq8T1M8kQU3v3OPF8f1keDnPkmv9jVLQow1J8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c+jKn06Z; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=toyVjSGL+DHF2qqrmqa4RoUpWmjHitzxiIXGW6TYLKfCU/Z4rVTkJhv8yXHpK8Dzp2YlQBD/dLcPWwk5BB44x81VKA3PCMHqwUiRYHUHs6Y1hCHzatRxbOiUTPIHJBpmtRwSStX11Ctlc8sqrHtaDZNsqIDk/axxr+WKMDGVooE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GBF1P9Eu; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6c3982a0c65so45055257b3.1
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 16:57:02 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7143e0e4cdbso1913293b3a.1
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 17:00:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724457421; x=1725062221; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1724457625; x=1725062425; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W2SOE6tX7v/OlcyQI0vQz2k5OLAtSjTk1r+cXVAyDEI=;
-        b=c+jKn06Zvuj0xzJBWSyfWAkQAXJP2+/o+4Tidk68LBC0cuISu7QWsShPmAZHE2YEP2
-         ALmUMPxCSRBw8GNA0fpoDXf/069ZwWAaG54yonieRy4fdr55BfvTquyz2ZvsTAUpGeYB
-         xDij7T0rewyxHCpD7ZcQEnadj9prfRHX6qyoU3YN8sP3b/tywGEFB7WCyYGTDVYuwPHN
-         CTAidYvnprbwS9djJMTn4Pc0QMU3Sas6N2Ni10UJ6oYsOtb1GipuEqclpFWTLprZLPW6
-         48VzvdTBzrV8Dn2GrnqrhtPKEem8JVfykGoLgjSalV8ac1+ValxvTLXQ8beygA59+tGm
-         YvoA==
+        bh=1ca0bECA5aRr3r9kHtnZQuHEvw2Ot4ILpPTiRBu+Z1Q=;
+        b=GBF1P9EuTOpyWDE5cKqORrvUUgQFQGil7uLVcn0oPl422K3TofMXc8BM2+gjUIRm+l
+         AeFxXAX7Cqyv0CWQsXnbBgS0b2moFxK07WTW2yj4Kh+ho4AEvRPQg6DIZ8D2z7qtC2u6
+         8Xwo+w9WVYQahXCpew/Zxj4YO8lNj9c6Gvvy46EzarSItCD34LHP++2QYRXfW3aRY1b5
+         bZTHIVB9+lGo1rZyTMfdjNBQksgUAnTy0EVV2X30AcMjXJWjrHo/oxG5FZO0jvbb39mS
+         bfJCxuHZ2eGraKGbopvfCsemq7ZcgpkR2VK07QjOCNTt58nEyZhIQhwbZ75BcXbn26h/
+         e0mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724457421; x=1725062221;
+        d=1e100.net; s=20230601; t=1724457625; x=1725062425;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W2SOE6tX7v/OlcyQI0vQz2k5OLAtSjTk1r+cXVAyDEI=;
-        b=vwsFGICBYU/4JuDQgC0v18eN2aAoYUjDlFRuhiUGYXSOlauiPxs2iS889jtwcybWbt
-         lXE9J9QRMV7cv5Rh+7moY0ahLSgwNHSWW5xjAB2xsu/DUmp58CoriMuaxTDNviylYH64
-         gwRBcrjX63phnagvX9flP18Xc5NhpNyTG++mNRia25hNp4JxFNXmceMH5Dth0LGi00YF
-         AIuMNHBXA4BipMLA626X4DDRQpHXnJK4AOC/rD0yd9SkRU6nKUtOPBiz/ANcyRnYBTco
-         T0Lu/iyunTJO/qNTJ+OjKHs6hUj005OajKpWPJeLCVst7+Y39tviN3qo8utcDfG0wJtM
-         Aulg==
-X-Gm-Message-State: AOJu0YxahGlM5MAolXRXQjP8rzsWwq5qTpCINPEF4dyPpjqhl3Et/wY8
-	ZqcVWjfJFUeRmOKIv/UMc30wH+gspj5e6od4FPse97WOQjfwpH77CT0oPQphZyB/o3kIsQljzFg
-	CGkOpnx9BpA==
-X-Google-Smtp-Source: AGHT+IFzMvv8Jh0nbvaPUtheFnuf6z4lW4doJwlm5sqQx6U26IiKBfIXR3l5asqPwBrTmqUus/GB3TbEaR/EAQ==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a5b:92:0:b0:e11:7039:ff92 with SMTP id
- 3f1490d57ef6-e17a8666f19mr5295276.11.1724457421572; Fri, 23 Aug 2024 16:57:01
- -0700 (PDT)
-Date: Fri, 23 Aug 2024 16:56:48 -0700
-In-Reply-To: <20240823235648.3236880-1-dmatlack@google.com>
+        bh=1ca0bECA5aRr3r9kHtnZQuHEvw2Ot4ILpPTiRBu+Z1Q=;
+        b=uRlon1vxTGAMS1uIwYaittlFVqODzhwXtVf8yHZbnEIfhOC43zChG96k1vYN2EHXAK
+         6h+TSTaD8DEBt8tls3GibTe+8rjNgauSaquGk6NGORn+A88by4ESwhF/iedTqegVsY/7
+         dGCUQ3wxuFef3bhhrXuq4gAb8mpt67EqnEkvBl4KbXS6xiBkEdRuQ2q21qTAYTfxwc4k
+         kWCn2D4JE7CU/Ubwdiv7wPJJx8BbtX5Rj12ihZ3WmaQj5RuB9H7Zd6rU1iVMLcZSZs2W
+         +hb+RGCD41vqk/fbZTvrSksyVeYdHTVg+z4YH92l+nHGKFreC0GpNBmBTjcFeNmRu9nG
+         as+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXr8DjxSdcG2DXZ+YxPUM3nDIxHbnH0ys9A38ox1e973szZ+9gOQ33ze31M6eIA/pRETEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzO9aW/6L37KuM6avgcMhvEX2B13Tcn+JtiT3lNmmCeSAL4lNqm
+	80a3H+jo8rztPbUmGrpDzPHWok6uK1ITuVD/YvTUVZOTGntF2InxgD+HO6CNZ1vTXUfIgDeJw1T
+	mAA==
+X-Google-Smtp-Source: AGHT+IFjH1L+yx6ePew+AVPSI6ETQhn78QMIuKkHsHXFR08QFYT6Z4rKQmWThVz1lyeaqhvB+H2v7V4R2l4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:8b93:b0:714:37ed:dcb3 with SMTP id
+ d2e1a72fcca58-714458baf14mr14478b3a.4.1724457624368; Fri, 23 Aug 2024
+ 17:00:24 -0700 (PDT)
+Date: Fri, 23 Aug 2024 17:00:23 -0700
+In-Reply-To: <b3c27ca7-a409-4df5-bb55-3c3314347d7d@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240823235648.3236880-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
-Message-ID: <20240823235648.3236880-7-dmatlack@google.com>
-Subject: [PATCH v2 6/6] KVM: x86/mmu: WARN if huge page recovery triggered
- during dirty logging
-From: David Matlack <dmatlack@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20240821112737.3649937-1-liuyongqiang13@huawei.com> <b3c27ca7-a409-4df5-bb55-3c3314347d7d@intel.com>
+Message-ID: <Zskil6dbwJmL93cO@google.com>
+Subject: Re: [PATCH -next] KVM: SVM: Remove unnecessary GFP_KERNEL_ACCOUNT in svm_set_nested_state()
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: Yongqiang Liu <liuyongqiang13@huawei.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhangxiaoxu5@huawei.com, hpa@zytor.com, 
+	x86@kernel.org, dave.hansen@linux.intel.com, bp@alien8.de, mingo@redhat.com, 
+	tglx@linutronix.de, pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"
 
-WARN and bail out of recover_huge_pages_range() if dirty logging is
-enabled. KVM shouldn't be recovering huge pages during dirty logging
-anyway, since KVM needs to track writes at 4KiB. However its not out of
-the possibility that that changes in the future.
+On Fri, Aug 23, 2024, Kai Huang wrote:
+> 
+> 
+> On 21/08/2024 11:27 pm, Yongqiang Liu wrote:
+> > The fixed size temporary variables vmcb_control_area and vmcb_save_area
+> > allocated in svm_set_nested_state() are released when the function exits.
+> > Meanwhile, svm_set_nested_state() also have vcpu mutex held to avoid
+> > massive concurrency allocation, so we don't need to set GFP_KERNEL_ACCOUNT.
+> 
+> Hi Sean/Paolo,
+> 
+> Seems more patches are popping up regarding to whether to use _ACCOUNT for
+> temporary memory allocation.  Could we have a definitive guide on this?
 
-If KVM wants to recover huge pages during dirty logging,
-make_huge_spte() must be updated to write-protect the new huge page
-mapping. Otherwise, writes through the newly recovered huge page mapping
-will not be tracked.
+If the allocations are temporary, e.g. scoped to exactly one function, not massive
+(use best judgment), and can't be used in any kind of novel DDoS attack, e.g. are
+limited to one per vCPU or so, then they don't need to be accounted.
 
-Note that this potential risk did not exist back when KVM zapped to
-recover huge page mappings, since subsequent accesses would just be
-faulted in at PG_LEVEL_4K if dirty logging was enabled.
-
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 4c1cd41750ad..301a2c19bfe9 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1619,6 +1619,9 @@ static void recover_huge_pages_range(struct kvm *kvm,
- 	u64 huge_spte;
- 	int r;
- 
-+	if (WARN_ON_ONCE(kvm_slot_dirty_track_enabled(slot)))
-+		return;
-+
- 	rcu_read_lock();
- 
- 	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_2M, start, end) {
--- 
-2.46.0.295.g3b9ea8a38a-goog
-
+At least, that's my take on things.
 
