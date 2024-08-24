@@ -1,122 +1,101 @@
-Return-Path: <kvm+bounces-24990-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24991-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6930F95DA14
-	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 02:04:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3815395DA16
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 02:07:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18E4E283718
-	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:04:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAEA4B21D47
+	for <lists+kvm@lfdr.de>; Sat, 24 Aug 2024 00:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C73CA32;
-	Sat, 24 Aug 2024 00:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 984381362;
+	Sat, 24 Aug 2024 00:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fvzXj+CR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lrJv3Enc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2043A1388
-	for <kvm@vger.kernel.org>; Sat, 24 Aug 2024 00:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850D8161
+	for <kvm@vger.kernel.org>; Sat, 24 Aug 2024 00:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724457867; cv=none; b=D9sEESohkPW6i3O1auwv9ZfZLKcvJl87PX09RVP0X1wfK/cGf32GQ5CrkesSmnPgRn++1Id6x24IcBRwYTvGROWhN1S1FDUo3+xjWbKR6/0E4AI3oAFDFlGY+NH54whkk78tuiFK5ARefgW2CjK2xPrgXCu5mEx+5GNUyQbMCgs=
+	t=1724458042; cv=none; b=nd/bNvx5U48ggn5gtZqIYGxe2pPNtDO7lTe6X/dqMK/gArDcaRYxx7Bz0+9bHHCx6zb2Vm0oJKlD1Fq67YSzAE4WWRM09/XWJJqu0bVZS9ZjeaOWul4zhaKtVoZZXGfP/9BY3uSo2RXHFnZAr+/oekyOo0ITF8AwnHzgbzET7Fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724457867; c=relaxed/simple;
-	bh=0xG0S8/UkIkI/nRYACzCp8C8N7AggLP5xaj59lpIjPI=;
+	s=arc-20240116; t=1724458042; c=relaxed/simple;
+	bh=UxLc+reGhnIYZ/XmNZ/MTTNcsHGvZUf9GNv+aLMVeRY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=V+gy4skPh7RfEdksaec4PHqWbYgrpgJS1V9VSmwWRWqev+rOipliQizShQ6tIzohTCHF+CgbuLLMeVuSnljmi/mfC6SW0N339N5gbOtRnsOUwQjAqNxsviuAGPoaxXTkFIR9JGcVvzJR/FqwXszcpnJYpUCk49RsMZWw+bYuoJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fvzXj+CR; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=BA96hC4FEZGlcQ0tWZ7FUW67Frhi00Q6Cxzr+u7niHeA8AqhdafUILQoei0n3/OhC3dKMkXXVINeWlRl5ud0ATNHpEY60uERjg8VSNtwFr8CZvKoeFJalMdg9L16Z2GVsZmFQ3T45/5R8ArZ8u1CJ0xd5EaoNdBei7N16hBihio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lrJv3Enc; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-778702b9f8fso1744520a12.1
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 17:04:25 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1fd9a0efe4eso27085545ad.0
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2024 17:07:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724457865; x=1725062665; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1724458041; x=1725062841; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HPpi6gGER7s47NXj3m6rQIuD6YvzPvzRxn85EJyyePU=;
-        b=fvzXj+CRfspDc7ZLIX+Nt5R8fFJW9TLJgcSM8RuFdPUE26VEJcSzZjTInNUZ+sUp9S
-         G61cNof05US/UNFfq4Q4DxNYM7tWn8wfqAVqQ0dtlYHcztGmLjD1cP869d/YWY4xvGIL
-         Y1VSzDgIxFbDSuBd3W0JDj8wTK2oJ+H5Vb63ffx8Tkf7EK9MKOajWDv+GNRMBO3AmNGs
-         CYFPe/oztEdC0bhfu/XiN3zKYjZh6v5509vR4BTLKR+y8Ap1tEKb9i/uWWpVRbrk4RI9
-         c7YWyOdc2nIrUoNtrCV4hPKnAFqZ9x/VvoOsVGQimE1g46Ii6xKqN4B9LLrql6d5XOZK
-         /XTw==
+        bh=cl0NP/cfexcLY+3i5gFKc8CW6ky57wXGpDj5wl38pcY=;
+        b=lrJv3Enc1xWNqErK6kk9TrfrxgYgsJQ5kWAGAD4fYIL+4qPgXTPEpE7e6QZ4sxCIFS
+         fGq0PONX1YfFRbp/+G5E7vBN/evZs3n+Fy0wfZF8GQrNkwyFMeYrZcCUPhkOFw/Ftpz/
+         LejQZMsWnIA66pchZD1nK2lXG+1985rsDURp9QGC2KF5uUg1RgtqmkLZBcfHp63wHKDx
+         ncB6Fy1VSkKCPiGIPcOe9BRy+g0Pp6rFa45DPhzTOXo5DBJO/uVy3TOddonHb5lkRzF3
+         2En2/B+vTz/BRoTZewvV2ygTefr63FRVSxHOYsTqtbYl2pH9Li0Ba73QmtHx1MwMz6rn
+         fxcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724457865; x=1725062665;
+        d=1e100.net; s=20230601; t=1724458041; x=1725062841;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HPpi6gGER7s47NXj3m6rQIuD6YvzPvzRxn85EJyyePU=;
-        b=Fy43INxG97YmfeGiiUVYp6my+Ubc4CARv+Y7WjHRjSz740hyzaReDS4CLIKD+4Kugp
-         lT62ZKSC6fLZOndHLMiVLdLGu/iHjJcnfYuQ/RwQR8oZVQ/nEGvLzkOF9INCGdaMRmss
-         JdqL16sIZKodzvJZXLsUk5voLFBtF+avzC8ZTvOmcPpQ3LEKxYlpq4CfYUAANkRzwu6j
-         CrC/y0kpVvhgqunFVHiieKd7kSUVbCkQbijaaRyDB36b1XA9DRfw03cRb30I6hiHplIA
-         yPrHq8qxyKvxXeV/+Y503iwBzn8L1tJ7Omw/4Ncf2Y49Dj1fLFpiYn3gY+vQILdDLvHz
-         qwZw==
-X-Gm-Message-State: AOJu0YzxJh2+R1l8EArrJVUPdfj8vFptJR0cdgUPOVMe6Dc1NXqEjoK9
-	/qyVSDAqh5Nk99i+nW7R9c8IVRFhGMufrTHZAz9JLwFyDyQuHfMNvWLQp5EV4FHfn9NyMcdFeBM
-	wEw==
-X-Google-Smtp-Source: AGHT+IHe496PpSnfuOMQTES9fQcEL6/TNuTZtcXDXXiDKRk8vaQvcRM5m7aPHP5L/bz8nt2U9LNdgkKYoM4=
+        bh=cl0NP/cfexcLY+3i5gFKc8CW6ky57wXGpDj5wl38pcY=;
+        b=k7pPwUuQmYRBke75F145ciwQ0nj14eiuCGaX26OkiziNmlfLNlk35U8JMKzhn1ioNs
+         6oGbACmpcqBRSQg35umwv/K4mO0gVHF8F+E0G59OSF4U3RHStr3wpS/iQrNAfkq+uXNO
+         rW9OrFCJugphWhwiKoAzQNdPILfMyxQLlAFS9Irr/JNbDrT5onT5L/j6Jq0kNT4EEAUg
+         phz9LL+lBEZVBJNaOnLOKHi9OXGdYg1bUFulji2UddumU3Lk//kfWJheNJ2HIP4EMc0u
+         MGqSwrs8tbqUfv+cepphAt3+HvS3FXq+0ELi+/zvtZr9qaogc+wx2zrovn1b3CnQXWUy
+         jZwQ==
+X-Gm-Message-State: AOJu0YxQyM7SwmX/pCUUCNLncNbqHeBly/zTn5UtIxhGawO/ousKuwGZ
+	NkVIFRDtycOFD47RTGj3DxBuHz6VWXcgjNrSuCX4l9kDcfvaIrj/6noTf9544/7FeCYB8iPC0P9
+	eTw==
+X-Google-Smtp-Source: AGHT+IEm1MG0noaQz6f9egaj2JTStGrKDvJgtPOeJ9adqBSydYJilv9O6/dOicg7d/F+0wqnqZBXruBF3sk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:483:b0:7b8:b174:3200 with SMTP id
- 41be03b00d2f7-7cd97d0cc9bmr28126a12.5.1724457864978; Fri, 23 Aug 2024
- 17:04:24 -0700 (PDT)
-Date: Fri, 23 Aug 2024 17:04:23 -0700
-In-Reply-To: <20240820133333.1724191-2-ilstam@amazon.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:c40e:b0:200:86f4:fa1b with SMTP id
+ d9443c01a7336-2039e4a7403mr3085345ad.4.1724458040544; Fri, 23 Aug 2024
+ 17:07:20 -0700 (PDT)
+Date: Fri, 23 Aug 2024 17:07:19 -0700
+In-Reply-To: <Zr_M4Gp9oEXx4hzW@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240820133333.1724191-1-ilstam@amazon.com> <20240820133333.1724191-2-ilstam@amazon.com>
-Message-ID: <ZskjhzkfQDtJVnDI@google.com>
-Subject: Re: [PATCH v3 1/6] KVM: Fix coalesced_mmio_has_room()
+References: <20240815123349.729017-1-mlevitsk@redhat.com> <20240815123349.729017-5-mlevitsk@redhat.com>
+ <Zr_M4Gp9oEXx4hzW@google.com>
+Message-ID: <ZskkNyOoQqiOYKM7@google.com>
+Subject: Re: [PATCH v3 4/4] KVM: SVM: fix emulation of msr reads/writes of
+ MSR_FS_BASE and MSR_GS_BASE
 From: Sean Christopherson <seanjc@google.com>
-To: Ilias Stamatis <ilstam@amazon.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	dwmw@amazon.co.uk, nh-open-source@amazon.com, Paul Durrant <paul@xen.org>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Aug 20, 2024, Ilias Stamatis wrote:
-> The following calculation used in coalesced_mmio_has_room() to check
-> whether the ring buffer is full is wrong and only allows half the buffer
-> to be used.
+On Fri, Aug 16, 2024, Sean Christopherson wrote:
+> On Thu, Aug 15, 2024, Maxim Levitsky wrote:
+> > If these msrs are read by the emulator (e.g due to 'force emulation'
+> > prefix), SVM code currently fails to extract the corresponding segment
+> > bases, and return them to the emulator.
 > 
-> avail = (ring->first - last - 1) % KVM_COALESCED_MMIO_MAX;
-> if (avail == 0)
-> 	/* full */
-> 
-> The % operator in C is not the modulo operator but the remainder
-> operator. Modulo and remainder operators differ with respect to negative
-> values. But all values are unsigned in this case anyway.
-> 
-> The above might have worked as expected in python for example:
-> >>> (-86) % 170
-> 84
-> 
-> However it doesn't work the same way in C.
-> 
-> printf("avail: %d\n", (-86) % 170);
-> printf("avail: %u\n", (-86) % 170);
-> printf("avail: %u\n", (-86u) % 170u);
-> 
-> Using gcc-11 these print:
-> 
-> avail: -86
-> avail: 4294967210
-> avail: 0
-> 
-> Fix the calculation and allow all but one entries in the buffer to be
-> used as originally intended.
-> 
-> Fixes: 105f8d40a737 ("KVM: Calculate available entries in coalesced mmio ring")
-> Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
-> Reviewed-by: Paul Durrant <paul@xen.org>
-> ---
+> I'll apply this one for 6.11 and tag it for stable, i.e. no need to include this
+> patch in v4.
 
-Doh, I applied v2 instead of v3.  Though unless mine eyes deceive me, they're
-the same.
+I appear to have missed my normal "thank you" for this, so here it is, in kvm-x86
+fixes:
+
+[1/4] KVM: SVM: fix emulation of msr reads/writes of MSR_FS_BASE and MSR_GS_BASE
+      https://github.com/kvm-x86/linux/commit/dad1613e0533
 
