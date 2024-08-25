@@ -1,219 +1,266 @@
-Return-Path: <kvm+bounces-24995-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24998-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CD8C95E0CC
-	for <lists+kvm@lfdr.de>; Sun, 25 Aug 2024 05:15:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B36295E0F4
+	for <lists+kvm@lfdr.de>; Sun, 25 Aug 2024 05:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A00A1C20EE0
-	for <lists+kvm@lfdr.de>; Sun, 25 Aug 2024 03:15:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 529D428232F
+	for <lists+kvm@lfdr.de>; Sun, 25 Aug 2024 03:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789BE4A3E;
-	Sun, 25 Aug 2024 03:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68854EB51;
+	Sun, 25 Aug 2024 03:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hVxo5nPm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q7HAFj8k"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6082209B
-	for <kvm@vger.kernel.org>; Sun, 25 Aug 2024 03:15:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724555733; cv=fail; b=gub9BU3wdl8IKBfwDsOAu/ze8SSXDcmfrsk2URQkUtUpYn3rQnLh2Fu0pdsXza/wHN0fTCBKjBMOF/Jf9heU1TV0YUzR0Mhn84vXAlJwRvVl8599icKJvvG6CP/Hu7feD3t6I0n7RHQfr5K0AgI98gun149nQGxeO41FUfD0PVA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724555733; c=relaxed/simple;
-	bh=6PcS6yUnOjaLljLPeDgUYLxGe/HjQDvnCeNHMbscOwg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YqFE5X5G86LRaQLYKXGdvKWCQRq+FfgX5xXtSGEvApG3mbd/jQrMi07U1S5q6XLLpSfT8M2Ansth0c7P08TE0m1a/uOn+LChPaXW29VEVs0fDdNVcZMvJWAeuBrCE73jRY+hkXbXocRxWJkTHH0gNw5mU7vxJwsNdD39oOMaxmA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hVxo5nPm; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724555731; x=1756091731;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=6PcS6yUnOjaLljLPeDgUYLxGe/HjQDvnCeNHMbscOwg=;
-  b=hVxo5nPmV4qjr1D625UEvIT+yd//esnjW603Ro2SDdgN754soIS5hvUp
-   qd6GfeXZjyCr299cHzoPQsFxsVl+SIdq+4UzK0sSSKZr40q26KM4PMZnG
-   36SSFnjohe8har2CeginHEADQb6qth6pCh22eaZlesuRJJ9NjBav96pvA
-   pwsDQep0Vx3hpFtg32HCW3yAh4mvB9C1nZJ2SuoCcMQ1uFaXlTJSDYs9c
-   im9qinB5CfmxyH5PymD7e6GDVxTC4qb06BsWhnvRhXuz1T5QNb9gu8/V/
-   Wf5kdzYD8d3nRvHJtMrBuNK2VG4pce0lOhH99o51f9tHIU+CKKiTB0DDZ
-   w==;
-X-CSE-ConnectionGUID: AbH34J3YSj2oHuP/3c25qA==
-X-CSE-MsgGUID: +mSxFngcQI2TtY9KKiCzHg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11173"; a="26872833"
-X-IronPort-AV: E=Sophos;i="6.10,174,1719903600"; 
-   d="scan'208";a="26872833"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2024 20:15:31 -0700
-X-CSE-ConnectionGUID: 5l5IiQn1QymEwEtqJfP1EQ==
-X-CSE-MsgGUID: B2b67yT7QkS4nUbB1oOM5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,174,1719903600"; 
-   d="scan'208";a="66975943"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Aug 2024 20:15:31 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 24 Aug 2024 20:15:30 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 24 Aug 2024 20:15:30 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Sat, 24 Aug 2024 20:15:30 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sat, 24 Aug 2024 20:15:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Jxt3FVv/lABjjoA6VatUzvxLZTvb3qEAC89TkPnjDWn7MY46Gr5P4FPdaSi1hdlOgswKYk7GIaeItix8N9dy7Q6hOMfGb8KByEZFzLor4oOWUlPcylMivpISTR619AMRscNCRPsIpcp38QgYU8BuWksI2lWstrCHVR4nxSJy2R1ykef2YA0ERdMqFG4+kToUMuvWCsjScp7vA1B690yFClAaYswZ1LYNVwpNVBPq9muVO63pI+uTgXMsXl23aSiiBYTA7vExvftvk6o26K8o+7OgIapo1r9I3HzrlQ5Gth1czCl2vBtFU5hWIvtlLbN15jT9xqBOrvA7b8WMjpeAsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6PcS6yUnOjaLljLPeDgUYLxGe/HjQDvnCeNHMbscOwg=;
- b=oebIZO5zSvaI2JGLFye2da+9p2tK+BzJhIbJHgUAgDSny0kl5ZkbKHhqwTQIcNsQUb3imI3pp945/HacscDa6V9eFxCJB3BScZSt4oz5hY8yk50PnvUjL9CDU1tSKiA1OGy9ghSx8ejiBuvmvaCehjZdWvXh9q/Yr+8fcs5HJJdwDWRLnCEC1tIe2D/CVtB93/ozqiJ3tsu44TG8tk4HOZMqzAY79fugFjLMVCERIDpsEONeyhbJ2oXuSjBeL2BdUd+9gSvszf89Ts1hcagtqe+9gD+YLb1Q43Nfr/KXTskR1zPPLFG2w2OeulpG3C8Z2N/2x976IREpisKEQcl9kA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by CH3PR11MB8436.namprd11.prod.outlook.com (2603:10b6:610:173::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.23; Sun, 25 Aug
- 2024 03:15:23 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%6]) with mapi id 15.20.7897.021; Sun, 25 Aug 2024
- 03:15:23 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "seanjc@google.com" <seanjc@google.com>
-CC: "Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH] fixup! KVM: x86/tdp_mmu: Rename REMOVED_SPTE to
- FROZEN_SPTE
-Thread-Topic: [PATCH] fixup! KVM: x86/tdp_mmu: Rename REMOVED_SPTE to
- FROZEN_SPTE
-Thread-Index: AQHa1LQsz3A5pP4HqUyV8fUiTsdy3bI1xEGAgAHMYQA=
-Date: Sun, 25 Aug 2024 03:15:23 +0000
-Message-ID: <c5b569c9b1ac417c359468689cc7af5499385e73.camel@intel.com>
-References: <20240712233438.518591-1-rick.p.edgecombe@intel.com>
-	 <172442171206.3955037.12407652634764433628.b4-ty@google.com>
-In-Reply-To: <172442171206.3955037.12407652634764433628.b4-ty@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CH3PR11MB8436:EE_
-x-ms-office365-filtering-correlation-id: b2f5e4fd-d557-4e69-ec3a-08dcc4b42878
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?a0JXdkN5OTVhU3FHNWhTMzZUejJWM2diMFNhV3JMbGc5eE43RGZaRFYwRzlN?=
- =?utf-8?B?dTg2YkpMUUVwZlhkT1dUem9HczJ5eW1Xd1lDUFdqOE5EVzZ5cW1odnhoZ2pj?=
- =?utf-8?B?czZ6SFJXY05vZk04RXJMbmpDaWNvS2hzUDgreS8ySzlFQ0JXRDJsSGpxcFFP?=
- =?utf-8?B?aC9QWW1WVlZmUVJiNi8wS1FaRUpwWmErb3FyK0hhM1lEZVBNNTlzMXFkVTZq?=
- =?utf-8?B?b1VrUnpjc0cxSTdlUW9reEhBMEpCUHVROFkzcHZFaGNqY3JKZUxSK0o4Rmp3?=
- =?utf-8?B?R05HdEZRMnJpRmRDZy9zQXlSMXR2cVRkWDExYVhZNXFnUTVxRXVNT1Ftcmgz?=
- =?utf-8?B?NnJZK3o4V3Vjaml2NG1ab0xSZHZXaHoxbkE1ak9nNThjKytVNnpYYUxkdUp6?=
- =?utf-8?B?WmVYTGQ0Qlo1end0RXAwVmxvVlBpM1JhTlVlak9XRHYrTEdSTlFVeUNUSG5l?=
- =?utf-8?B?UGV4b05PdmxxOW5LTVY4bFpsb0tzTlFuQTZvKzRmNDM5M3BERGN1L0JWVU82?=
- =?utf-8?B?YTFRUElSSEJkaEgwQWpHSFNjV1RKeUQrZTd5cHprMmNSNStYZkV3REFpVnZi?=
- =?utf-8?B?ZjluTEtWVTBiNjhCQ1llYno4bzNualRtVjZBamk2NjlPN1h6WTRQWG5XTk9F?=
- =?utf-8?B?VXlxWXZhbWlmN0VvQWtlOU1IZldmMzcrcVg1dzRxL1NBWGdqajhheERxMkM5?=
- =?utf-8?B?M0pTbmc3cEJTQjYrK3hFWjFMTFpDZ3Vsb2RVejFJWHdJVVM5UmVJUTh1Vzlm?=
- =?utf-8?B?QkJFVDlGaC9QY3NWVGFjeGJoeUYzdkhpQUxEallYRzJrdE80NzFCNG81emJm?=
- =?utf-8?B?Z1ZRVDlETHNSMTE5bXM0eE1QUFB1VUYwTElRUUlJYURYaG1yM05Za2EvTEVL?=
- =?utf-8?B?b1JLWGVmRnpwTEpxQk82ZTl2dHZWczJ2UGdRSGpaaVFRVm9pZ2Z3bG8yR3FJ?=
- =?utf-8?B?Yk5JQklWUTZsWDRwdytXeHY2anpETGlhOTlNUDhKUCtkSkhPaHM3a1lCcE5U?=
- =?utf-8?B?aHk4OXB1eDZHWWJZYmpISVpRZi9hL1hnSU9leVVTcWVMNFo1dm5tS3RkazJH?=
- =?utf-8?B?cEJqWEJxYWZXbnY3Ry9tV1dHdWhyUGVnQ2pxL0tmOTZqelhvOVc0SGE5WjVo?=
- =?utf-8?B?elJlNDY3OGNFdnEwNDRrME96YW56citVeFJVR21FVXpZTlZJOWtlOVQ5cTFk?=
- =?utf-8?B?cFc5T2FLS0NMT3c5Q2IyVzBzZXpjbmI2MlZjMHVFRVZTTG5YRGU2NnlPUzZ5?=
- =?utf-8?B?RUZCclI0bHMvbkl2NlNqLzd5czVXSlhvRDRhSVY5Zm9ka2xVVFJIVnB5TG9O?=
- =?utf-8?B?VjFEUU9oYUZncjRKQ3NkeDkxK1N1NzIwWnFjOGJkWnZzMVJCM1YxWFZTNUlM?=
- =?utf-8?B?N3h3TWsvZkRNdXdTcVNYaXBNWnprNHJKME5ybUJRV002cEhtUCtzMm5MU29m?=
- =?utf-8?B?YWh4RSs0L1BpNndHVWVHRjc3dVZTMzlQL0txQUUrcFE5VmpYenlFcnhhcUlH?=
- =?utf-8?B?ZkExM1FLc2JpNHloc0VjYnNnQTJQeDZGb3dFK3YybXlQdWZpQ0UwRENCUzNY?=
- =?utf-8?B?SlMwUUs1ZFc0Y1VWYlQxODRwTzVPYjdPeUxHNFJyWnlvL1JlQ1FEU2dRZEhZ?=
- =?utf-8?B?Zy8zNDZRQ1RCN2hCbDc3VGF1ZVM0cFp4RERYZG9OUUoyRTd4SEJnSlV4MmFY?=
- =?utf-8?B?RVBIL3E4WXNoZEFYZ2NmM1hCL0N0cno4eWtVZXUrVEtFLy9qelJ0MWl2K0d0?=
- =?utf-8?B?b0R0VjF0VElDK1Z4dlBCV29WUEU5Smd3QTNEYjFaTkx5S0xxRmJSbzlyRndx?=
- =?utf-8?B?ZU9YSXc1RVVZc0trSk5ISVVRYzFkM0hmRzExb1pGZ3hUdmo3dlZ6SEQxU01Z?=
- =?utf-8?B?WVVUTDJQd1dzaEd3R3NaczVCNWV5NHlEOHpoR1ZrRC9hMnc9PQ==?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?eXk2ZTFZU2JwZkdWYkhMdGFINk1pUi9hSWplOHlPV3BZbGNFL3VkWGJlRS9U?=
- =?utf-8?B?L1RXRnp3VWg5Ym9JdTJRcnhTSkhZTUNDYk50NnJzQ1Z4OG9QUGR3c3Z5ZThN?=
- =?utf-8?B?dnJqdFlTMTh0TGJIb3QzcnAwdXFaT2FzYkgwZ2Fldi90MWF4TnJ5SnRwYlpP?=
- =?utf-8?B?ZnMyd0VITlp2TXNVZ2dxSnZTRzNHcExTOERqT2Z3MWVOaWJqc2xjVUlVY2ZM?=
- =?utf-8?B?KzRPZnRlQzF2U2h5K2pVRzdadFV4cEpIZnJ6SHJSbXJzQmwxU213ZGZ4cmo1?=
- =?utf-8?B?blJPUGd3RnRFcUhOdmEySHhDRWthYU1tb0VWclBPQWFFVUg0cU5BN3cxNktz?=
- =?utf-8?B?OHRUaVlTeS9MS2ZtOEFYRk5PN1cxNUxuaHcwY1hzanE3R3N3Z3FESWpxT09p?=
- =?utf-8?B?K0t3TEJvQXk0VTFMYURoVlJ0MHFXR1hzenJpYVpVN1Z0WDUzN2x4L25WQ0JJ?=
- =?utf-8?B?V2VyVEFrUFl2U0RsUE11dnVlcE1jOWd1UWljQ2t6VVJIL1ZseHVFaHA4QkxW?=
- =?utf-8?B?U1NnbXNqRHlZRXMyaXFYTFlGUkdEREYyZGplQjREcFVDSEFKMHA2SkxMVnRV?=
- =?utf-8?B?clA5RXJYczhzeisrZ016a011aVhZa0JNbU5Vbmw1ZTFINGxHenR5djJST1Rt?=
- =?utf-8?B?ZkpyNnFhdFBFdHIwaFNMZWdQT2F6dXFmOFZUVjJNNVR6K0R4cjRLNkhyVEcv?=
- =?utf-8?B?UDA3TFBkbENKc0ZHTHNhaGtsT2VaNzRacG9EajFWcTI1T1V0OTQxNWNOTlpv?=
- =?utf-8?B?NHB1czN4R0pyVHlhaVhtT3QraERXcWd4YU5Gam1GQmptUVRkb1FCQW5ONDhQ?=
- =?utf-8?B?cGFrdGxPTXBqODdnQURTa3BIVmJLczVWanZtTVFRRXVLVE01MTNnY3R5aWlB?=
- =?utf-8?B?c0RGa2RPalUvYXNCWXp4ZmRESThrRk5NTyszNkJZK3VxUm1kZWNnS3A0UWZP?=
- =?utf-8?B?VytLTkNwbE91ZEl6UysxU2RFWk5uVjFtTm1UaVVUSnN3elZ0NHoreldPZ014?=
- =?utf-8?B?Wk1EWlZFdmVlK2ZULzNveWhVUTYzbXFaVE9QNTV1bDhzS3VZY012ZVExeG9w?=
- =?utf-8?B?Vk5EK0xmd3czd2Z0cEZKTkhERGxzTG1KVnl4ZFZoNTVsa2pRQldVdWtwNUhT?=
- =?utf-8?B?T2ZmOE9LNXhBdU92YlQxMW9hT2pCT3pxNlBuWEI3cHZKdVlsdnVHK0VPeHox?=
- =?utf-8?B?N2VVQzNhcTFhdDRlN1ltLzdjRDcyajRNY1BPTDFud0orRnM3YnJ5TlVLWDcz?=
- =?utf-8?B?SjJKWHFONzdUakFXM1BHTnZNb1dUTmtmM2FVeENNRmxXdnNkM0JvbHJvcVVF?=
- =?utf-8?B?aGI0L1VBOHUrS2E2bjNnS0N2eExYSEpSTTlDK0cwMnhnVTVlTXpsYU1ER1ZC?=
- =?utf-8?B?cnJCWk40b21TQ3d0UFhTU2lkQWExRXVxdTV1OXdGZ3crck1rSFhuUEVnTzIx?=
- =?utf-8?B?UXlNTE9DNEY5Z3RRdHNzSC9vb1FSSi85V1B6MURUUlAzNmphdnlreTY3bE9W?=
- =?utf-8?B?eFhJa0JYcVVnZlo1b0l0K2I4NnplSUdxK1R5VDQ1MWMzcmhuTTJGNVg0b3Uv?=
- =?utf-8?B?LzFUUTREbVVKdno5VzByTUx3bzNrcWpDV0I1TndiY0JsWThmQytXN0NRdlIy?=
- =?utf-8?B?OGtraEVsS0pTV3I4b0NOb2pOVk1oS0poWmxydnIyaEt5UjhuWmE3VWE2YTNa?=
- =?utf-8?B?cmRTKzdEUG9mazF6OGEwM0dhZktNOXpMRXdjTXdxd1lGN2Z0UjVrUSthNXFT?=
- =?utf-8?B?VXpPd0FxTVpWSzJjakttYTNtUEZaZGRBc0loeG9mU2hDWG93NnVsMytwNTEx?=
- =?utf-8?B?bHJBOE9sdjlWSzZET3dmMC9aNEVHOFcrbWlUQnFZNG56d3VzQmpIanpMeG1u?=
- =?utf-8?B?U2dzVlNsMWxmSmZNL2VCNUI4VUJJWkVKbk5kTXN1SllkaVprdU5ISFF3WHph?=
- =?utf-8?B?MjFDeDgyUHVsYWI3YXlYM3ZZU2orQlpKNmloM2hRS0w1cWFMOWRLZjFacm9T?=
- =?utf-8?B?VFVjb2xrWGdsaVUzaFhwc0FuWWJpMUt6aFlySVZqOWVhS2o2ZW9ZMHlDYnNv?=
- =?utf-8?B?Zy9vYlBtWXpFZFkvbFVueVRZRFdPZFFHSEMxRDR0ZEVrSC9XWGRDa294cnBw?=
- =?utf-8?B?ZmZRcHk3RU9FUkxiWDNXeHFYeURvVGUzQWNSK2lVNFF1N2Y2U0l6VDFqeFRR?=
- =?utf-8?B?dXc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <478BC8D0E6AB48488705C8A465FE8D3D@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF08D3BB24;
+	Sun, 25 Aug 2024 03:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724557673; cv=none; b=atUA6tb0FMD79PdyUt/RX2j5rWhLpW84ZTgiJQ02dAM8EgKB6BNDHK66fZGJwRPKoyrATYIIw+nhknRCIeUQXlJaD77PLnvcu6tmlHT/HXa3deWteSUyfySMxrW4Jy4qhK4FcR8Pg2zZRgKG7oL+efrwRePK/92zTDacboRLzyk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724557673; c=relaxed/simple;
+	bh=cwotV459PaV3Ve/HitSaedrlUF8y42brdmvLbhIUyaQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UBIvwFRElGdg5fR/tqUWnTv2KNzVw8As4Rb9ntddqtm64JjOiNC0XD1kerkHiRZRudEGlROkgZS+rd5e6ChsWKIxaJ6/KSMBzM08ts7a3H1JXSFJ1cjrqcWg7+NddJ8ZL4aQilaw+DWf7DOF/5ckzJ5pqyPSLbTEQw8h5XhIuFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q7HAFj8k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC762C32782;
+	Sun, 25 Aug 2024 03:47:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724557672;
+	bh=cwotV459PaV3Ve/HitSaedrlUF8y42brdmvLbhIUyaQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=q7HAFj8koZV/+5SuxuSLG1pfajDqQZY+JYRMlGGJ9/YIjn1Ih85UBcqNLZ0OAbqhW
+	 LIib0PZnOnCkVFAf7iTxDzH2vIFkVVD4JzWIe7KEgnUNwVyGfsYdV8rA3Zi1ZZ1tIl
+	 PZnlD/IU/xTmUdpBOt51vFGZ+BJOjqeBrUqf8OFck/zgzRb67SgNGfi1XxXNKdTGj8
+	 /g/AKMzjDUSzbkyh75qHJCzwcXDYw0Y+aGF0Q6wZB2VZ2AzaxvCEbDjCWGpMkLaTKv
+	 RO6CIR+VDGr6+oHseBZq+X+M5ukbdK1D2Qpx7xF67oJT/YIR0Z2PuNteKKBK57Xuez
+	 YdsvnbDJp5kZA==
+Received: from mchehab by mail.kernel.org with local (Exim 4.98)
+	(envelope-from <mchehab@kernel.org>)
+	id 1si4Ch-00000001RMU-24kO;
+	Sun, 25 Aug 2024 05:46:11 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: 
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Cleber Rosa <crosa@redhat.com>,
+	Dongjiu Geng <gengdongjiu1@gmail.com>,
+	Eric Blake <eblake@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	John Snow <jsnow@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Shannon Zhao <shannon.zhaosl@gmail.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH v9 00/12] Add ACPI CPER firmware first error injection on ARM emulation
+Date: Sun, 25 Aug 2024 05:45:55 +0200
+Message-ID: <cover.1724556967.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2f5e4fd-d557-4e69-ec3a-08dcc4b42878
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2024 03:15:23.1676
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RJ3Z4ToLYknTpNkx7/528FD/krd4FN+QLi8voKkHsUayh5ItPaK9xigjzpXQgzLFobf7hGU8G1q/faMVjspS2oeR3iaARVEf8dX7Ti/wuYI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8436
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
 
-T24gRnJpLCAyMDI0LTA4LTIzIGF0IDE2OjQ3IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiDCoHdpdGggYW4gYXBwcm9wcmlhdGUgc2hvcnRsb2csIGNoYW5nZWxvZywNCg0KVGhh
-bmtzIQ0K
+This series add support for injecting generic CPER records.  Such records
+are generated outside QEMU via a provided script.
+
+On this  version, patches were reorganized to follow this pattern:
+
+1. Addition of hest_add_le, mapping to the beginning of the HEST
+   error source structure size. This is the part of the HEST table that
+   contains the error source IDs to be notified;
+2. GHESv2 code rework. It is basically a merge of all changes from v8,
+   except for GPIO notify, QEMU notifier and renames;
+3. cleanups and renames for hw/acpi/ghes.c;
+4. GPIO GED device creation logic;
+5. Logic to inject errors via QMP;
+6. Error injection script 
+
+On this version, the logic now better navigates the source IDs, 
+double-checking them at error injecting time. It is now easier to
+add other HEST types if ever needed.
+
+Also, the source ID is now guest-OS specific: ARM will use SEA and GPIO,
+but x86 will likely use other notifiers and source IDs. Same will apply
+to other processor types.
+
+---
+
+v9:
+- Patches reorganized to make easier for reviewers;
+- source ID is now guest-OS specific;
+- Some patches got a revision history since v8;
+- Several minor cleanups.
+
+v8:
+- Fix one of the BIOS links that were incorrect;
+- Changed mem error internal injection to use a common code;
+- No more hardcoded values for CPER: instead of using just the
+  payload at the QAPI, it now has the full raw CPER there;
+- Error injection script now supports changing fields at the
+  Generic Error Data section of the CPER;
+- Several minor cleanups.
+
+v7:
+- Change the way offsets are calculated and used on HEST table.
+  Now, it is compatible with migrations as all offsets are relative
+  to the HEST table;
+- GHES interface is now more generic: the entire CPER is sent via
+  QMP, instead of just the payload;
+- Some code cleanups to make the code more robust;
+- The python script now uses QEMUMonitorProtocol class.
+
+v6:
+- PNP0C33 device creation moved to aml-build.c;
+- acpi_ghes record functions now use ACPI notify parameter,
+  instead of source ID;
+- the number of source IDs is now automatically calculated;
+- some code cleanups and function/var renames;
+- some fixes and cleanups at the error injection script;
+- ghes cper stub now produces an error if cper JSON is not compiled;
+- Offset calculation logic for GHES was refactored;
+- Updated documentation to reflect the GHES allocated size;
+- Added a x-mpidr object for QOM usage;
+- Added a patch making usage of x-mpidr field at ARM injection
+  script;
+
+v5:
+- CPER guid is now passing as string;
+- raw-data is now passed with base64 encode;
+- Removed several GPIO left-overs from arm/virt.c changes;
+- Lots of cleanups and improvements at the error injection script.
+  It now better handles QMP dialog and doesn't print debug messages.
+  Also, code was split on two modules, to make easier to add more
+  error injection commands.
+
+v4:
+- CPER generation moved to happen outside QEMU;
+- One patch adding support for mpidr query was removed.
+
+v3:
+- patch 1 cleanups with some comment changes and adding another place where
+  the poweroff GPIO define should be used. No changes on other patches (except
+  due to conflict resolution).
+
+v2:
+- added a new patch using a define for GPIO power pin;
+- patch 2 changed to also use a define for generic error GPIO pin;
+- a couple cleanups at patch 2 removing uneeded else clauses.
+
+Example of generating a CPER record:
+
+$ scripts/ghes_inject.py -d arm -p 0xdeadbeef
+GUID: e19e3d16-bc11-11e4-9caa-c2051d5d46b0
+Generic Error Status Block (20 bytes):
+      00000000  01 00 00 00 00 00 00 00 00 00 00 00 90 00 00 00   ................
+      00000010  00 00 00 00                                       ....
+
+Generic Error Data Entry (72 bytes):
+      00000000  16 3d 9e e1 11 bc e4 11 9c aa c2 05 1d 5d 46 b0   .=...........]F.
+      00000010  00 00 00 00 00 03 00 00 48 00 00 00 00 00 00 00   ........H.......
+      00000020  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+      00000030  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+      00000040  00 00 00 00 00 00 00 00                           ........
+
+Payload (72 bytes):
+      00000000  05 00 00 00 01 00 00 00 48 00 00 00 00 00 00 00   ........H.......
+      00000010  00 00 00 80 00 00 00 00 10 05 0f 00 00 00 00 00   ................
+      00000020  00 00 00 00 00 00 00 00 00 20 14 00 02 01 00 03   ......... ......
+      00000030  0f 00 91 00 00 00 00 00 ef be ad de 00 00 00 00   ................
+      00000040  ef be ad de 00 00 00 00                           ........
+
+Error injected.
+
+[    9.358364] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+[    9.359027] {1}[Hardware Error]: event severity: recoverable
+[    9.359586] {1}[Hardware Error]:  Error 0, type: recoverable
+[    9.360124] {1}[Hardware Error]:   section_type: ARM processor error
+[    9.360561] {1}[Hardware Error]:   MIDR: 0x00000000000f0510
+[    9.361160] {1}[Hardware Error]:   Multiprocessor Affinity Register (MPIDR): 0x0000000080000000
+[    9.361643] {1}[Hardware Error]:   running state: 0x0
+[    9.362142] {1}[Hardware Error]:   Power State Coordination Interface state: 0
+[    9.362682] {1}[Hardware Error]:   Error info structure 0:
+[    9.363030] {1}[Hardware Error]:   num errors: 2
+[    9.363656] {1}[Hardware Error]:    error_type: 0x02: cache error
+[    9.364163] {1}[Hardware Error]:    error_info: 0x000000000091000f
+[    9.364834] {1}[Hardware Error]:     transaction type: Data Access
+[    9.365599] {1}[Hardware Error]:     cache error, operation type: Data write
+[    9.366441] {1}[Hardware Error]:     cache level: 2
+[    9.367005] {1}[Hardware Error]:     processor context not corrupted
+[    9.367753] {1}[Hardware Error]:    physical fault address: 0x00000000deadbeef
+[    9.374267] Memory failure: 0xdeadb: recovery action for free buddy page: Recovered
+
+Such script currently supports arm processor error CPER, but can easily be
+extended to other GHES notification types.
+
+
+Mauro Carvalho Chehab (12):
+  acpi/ghes: add a firmware file with HEST address
+  acpi/ghes: rework the logic to handle HEST source ID
+  acpi/ghes: rename etc/hardware_error file macros
+  acpi/ghes: better name GHES memory error function
+  acpi/ghes: add a notifier to notify when error data is ready
+  acpi/generic_event_device: add an APEI error device
+  arm/virt: Wire up a GED error device for ACPI / GHES
+  qapi/acpi-hest: add an interface to do generic CPER error injection
+  docs: acpi_hest_ghes: fix documentation for CPER size
+  scripts/ghes_inject: add a script to generate GHES error inject
+  target/arm: add an experimental mpidr arm cpu property object
+  scripts/arm_processor_error.py: retrieve mpidr if not filled
+
+ MAINTAINERS                            |  10 +
+ docs/specs/acpi_hest_ghes.rst          |   6 +-
+ hw/acpi/Kconfig                        |   5 +
+ hw/acpi/aml-build.c                    |  10 +
+ hw/acpi/generic_event_device.c         |   8 +
+ hw/acpi/ghes-stub.c                    |   2 +-
+ hw/acpi/ghes.c                         | 309 +++++++----
+ hw/acpi/ghes_cper.c                    |  32 ++
+ hw/acpi/ghes_cper_stub.c               |  19 +
+ hw/acpi/meson.build                    |   2 +
+ hw/arm/Kconfig                         |   5 +
+ hw/arm/virt-acpi-build.c               |  12 +-
+ hw/arm/virt.c                          |  12 +-
+ include/hw/acpi/acpi_dev_interface.h   |   1 +
+ include/hw/acpi/aml-build.h            |   2 +
+ include/hw/acpi/generic_event_device.h |   1 +
+ include/hw/acpi/ghes.h                 |  28 +-
+ include/hw/arm/virt.h                  |  10 +
+ qapi/acpi-hest.json                    |  36 ++
+ qapi/meson.build                       |   1 +
+ qapi/qapi-schema.json                  |   1 +
+ scripts/arm_processor_error.py         | 388 ++++++++++++++
+ scripts/ghes_inject.py                 |  51 ++
+ scripts/qmp_helper.py                  | 702 +++++++++++++++++++++++++
+ target/arm/cpu.c                       |   1 +
+ target/arm/cpu.h                       |   1 +
+ target/arm/helper.c                    |  10 +-
+ target/arm/kvm.c                       |   3 +-
+ 28 files changed, 1539 insertions(+), 129 deletions(-)
+ create mode 100644 hw/acpi/ghes_cper.c
+ create mode 100644 hw/acpi/ghes_cper_stub.c
+ create mode 100644 qapi/acpi-hest.json
+ create mode 100644 scripts/arm_processor_error.py
+ create mode 100755 scripts/ghes_inject.py
+ create mode 100644 scripts/qmp_helper.py
+
+-- 
+2.46.0
+
+
 
