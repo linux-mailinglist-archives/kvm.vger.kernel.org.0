@@ -1,95 +1,98 @@
-Return-Path: <kvm+bounces-25003-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB59195E326
-	for <lists+kvm@lfdr.de>; Sun, 25 Aug 2024 13:45:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FBD95E340
+	for <lists+kvm@lfdr.de>; Sun, 25 Aug 2024 14:17:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D9B5B21340
-	for <lists+kvm@lfdr.de>; Sun, 25 Aug 2024 11:45:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E136281F42
+	for <lists+kvm@lfdr.de>; Sun, 25 Aug 2024 12:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C2F14262C;
-	Sun, 25 Aug 2024 11:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D14214F9FD;
+	Sun, 25 Aug 2024 12:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ABCqI3TS"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FhEsXY1d";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="A851qVVR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17CB31422D9
-	for <kvm@vger.kernel.org>; Sun, 25 Aug 2024 11:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2425838F91;
+	Sun, 25 Aug 2024 12:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724586306; cv=none; b=Z/uzDqJL9OhEdh3Dr9rMObv6bq7lL9iHlY3PaXhcTPfiaAAbeGhyT/srrM2bDdRqD3iA+kE0yyin/nC8Hh0Nj9vepPlEqd8lWx9X/ZuBEcYKml2LjTn2bVGtiuxU3xMa1Va/6IchAVnneakVrefQcRJbZwnMSdlx1KrMeN/zX0Y=
+	t=1724588228; cv=none; b=DYzeTCDEsOIPiglVvcJyguRfthexB7Qy3GFwTrdA1JrMzMTK2qlgdEmFsPR85XfwQH7O9aZnoip1TF30RzD4FwCRyWbN7cBsHw3HRX2JFOqCS+WpJ5MgWoiE+Uk6GayYc6njIxewNQ7OKe8fD7XmmAJgGIKxq4teO4Yr7MLz6hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724586306; c=relaxed/simple;
-	bh=mcQo+jxqqY5DYu5Ugixjs4h3A7J+sGQReSN7C+4hhBU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Y2FJupGBOKrOQk+8Jz2yM3ddiOBObawyZCsRLK3Jyi1Sr82/luFxVYBSkni6Yflx8UHybW3WwkenjthW5z3uIlPHXcHgfUcO2+po0xt1nMJAubyCk6PFOiImnJKjzr1PuygTVHYr7dtR05rhNMNhNr5FzBr0oj6g7x3b3xsgZEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ABCqI3TS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8D97AC4AF13
-	for <kvm@vger.kernel.org>; Sun, 25 Aug 2024 11:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724586305;
-	bh=mcQo+jxqqY5DYu5Ugixjs4h3A7J+sGQReSN7C+4hhBU=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ABCqI3TS5POZ8ZnF0TB+hQFKSPUUSYtMxhRIO9SpWQNZbNHLT9M01yOmwfmJbcEJy
-	 keQSyLmE7lnYN8X/48ejGc5vx5vmbcAL1/57gjy9KWQ3YvF7f96pGeFb5AnbnD6KgX
-	 LrT11L/O4zQoIBY9NRskheCARix2zDkxV/fiUSiW0Ja8ATEwd9H0QfnjI9guXPlL3T
-	 7NAr+h9Q68KuUX9JLjpJpaydJO0+Z2syL8gPSmr8pJfajcZuyWVlBLYPEEi34zTR2A
-	 tOIHqG5w8qIJRZahRKeseUOalADPcYhZuAovGSSSb4FENPuHpKL5qkTb+7IIlKeI2t
-	 yLt+/qSinHcAA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 80157C53B7E; Sun, 25 Aug 2024 11:45:05 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219009] Random host reboots on Ryzen 7000/8000 using nested VMs
- (vls suspected)
-Date: Sun, 25 Aug 2024 11:45:05 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: michal.litwinczuk@op.pl
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219009-28872-Zy21PXbRsk@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219009-28872@https.bugzilla.kernel.org/>
-References: <bug-219009-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1724588228; c=relaxed/simple;
+	bh=SNbfbbSUKrznPv18ybDcSGmA5gJHpDEIxpd5Cen4qvg=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JWfLZvzkx/ZmhwXfFkYF9CPQjmM26tfHtGgHS5WNQwyYfJtffPLRi08pxJf6BQ4u2sX7r4+ulOxSZ8SHp25d5oDoevu3+w1sxJxE6/N05nVulZVnvxBA0OVm6N8Pobo2wc9h8b7Z9FZmyVD0oJ5vNfI3TmRlVPBbzCvCnnPjzOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FhEsXY1d; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=A851qVVR; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1724588225;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AeNlc9u1Naz8RxKnWq+uaZlUoAL+ztVV3VZDXQn2oyU=;
+	b=FhEsXY1dd4M5YmnIqNCh3ksXih5agOwvcSfiwBEoA0koDjCz34N69njzqXPATZ1CLSnCYO
+	EQXAiBHiNldErggLmv7aGwVyhg+MvIropdb8aWSDwiKt+/H8iLPg0vITZED1TV7xeustsA
+	1R9UD40RnvB/PgMmrbS/ueuFJLWvpKVLvNmtyR919TKi0/fJo0xEdxKoKiFAemhCiJXsTx
+	WyFKhPPrIVChhHkM6F3Vl8qwAve+hyS249O22dAzuUoAzOL5cGKEMTfalNMIkFNCrhtPQA
+	sNBUX8jw5EiobIXKKDCP5yS0twgJ1SQL5fYm3UzPiFAknobKaoClwiuDSvXolw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1724588225;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AeNlc9u1Naz8RxKnWq+uaZlUoAL+ztVV3VZDXQn2oyU=;
+	b=A851qVVR+CazHNEDCAR7lFt1/o6edx0+is9z5Q5ZUUFjWlTuvzSWYLFy37qF1R9css5kuB
+	ZckTk9SggzCqUqBg==
+To: Jim Mattson <jmattson@google.com>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Pawan Gupta
+ <pawan.kumar.gupta@linux.intel.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jim Mattson <jmattson@google.com>, Sandipan Das <sandipan.das@amd.com>,
+ Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 0/4] Distinguish between variants of IBPB
+In-Reply-To: <20240823185323.2563194-1-jmattson@google.com>
+References: <20240823185323.2563194-1-jmattson@google.com>
+Date: Sun, 25 Aug 2024 14:17:04 +0200
+Message-ID: <875xrog5kv.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219009
+On Fri, Aug 23 2024 at 11:53, Jim Mattson wrote:
 
---- Comment #8 from h4ck3r (michal.litwinczuk@op.pl) ---
-(In reply to Ben Hirlston from comment #6)
-> do we know if Ryzen 9000 has this issue? I know I had this issue on Ryzen
-> 5000 but to a lessor extent
+> Prior to Zen4, AMD's IBPB did not flush the RAS (or, in Intel
+> terminology, the RSB). Hence, the older version of AMD's IBPB was not
+> equivalent to Intel's IBPB. However, KVM has been treating them as
+> equivalent, synthesizing Intel's CPUID.(EAX=7,ECX=0):EDX[bit 26] on any
+> platform that supports the synthetic features X86_FEATURE_IBPB and
+> X86_FEATURE_IBRS.
+>
+> Equivalence also requires a previously ignored feature on the AMD side,
+> CPUID Fn8000_0008_EBX[IBPB_RET], which is enumerated on Zen4.
+>
+> v3: Pass through IBPB_RET from hardware to userspace. [Tom]
+>     Derive AMD_IBPB from X86_FEATURE_SPEC_CTRL rather than
+>     X86_FEATURE_IBPB. [Tom]
+>     Clarify semantics of X86_FEATURE_IBPB.
+>
+> v2: Use IBPB_RET to identify semantic equality. [Venkatesh]
 
-Could you elaborate on what was happening with 5000?
-(reboots, mce, something other)
+Assuming this goes through the KVM tree:
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 
