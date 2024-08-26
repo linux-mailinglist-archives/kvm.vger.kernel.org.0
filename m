@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-25098-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25099-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0063C95FAEA
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 22:49:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1892395FAEC
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 22:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09D8F1C22799
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 20:49:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09B421C22259
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 20:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7EE1A2557;
-	Mon, 26 Aug 2024 20:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911611A2577;
+	Mon, 26 Aug 2024 20:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GCF8AjKH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FhySGljM"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671C81A0B05
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498A31A0B16
 	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 20:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724705078; cv=none; b=TNJ1jZ38ZxNfxnNec317Y49o/1KmqMJ1265ywTJNJhRuQm9JZjRZGAXek05o/sgRdgS7098qBfUUBHCVWioAnabBpxpKK42ABV8vmok22akaDnw+sMALhBtOWmVQ+2Fu7uPs3qplfrlJ16CfWcMzLTTB8B8JrZrHfIH//Y+lBo0=
+	t=1724705079; cv=none; b=W5zAbWsvkIn62ZdbxbOhP7Y93b90HThhMyKoBesSp5ZYMdxxXx+Sd/smDtpfGd//UqhOUVkoPGtWWusCw+oPLi7DshZTYHqA9J/lDqKf/3Qt7UsswsqYYkq31k/+UAaU1tucgxlmZu8ncbVGhF1Zzu9XTL7AGj/oKsp4kk5zF/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724705078; c=relaxed/simple;
-	bh=5/RkLDpH7n+0lRZdC6d7Fr9a2r7GbmT3sDiSd48lk+g=;
+	s=arc-20240116; t=1724705079; c=relaxed/simple;
+	bh=Dmoew7i8XEW+gHBA0zJyGyEzte9fLwrtktcen/8enVY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EauaLnJvIn5nr+ThMaaoYB5WWFQWFcBeSzC+2Xd6UgGOjQTorG0msBtKMWqMgUYL5jmWMWKeP46GtMkwKsUzx0ZVKqVHFO5rMdKng5RzLedYeJL+m9fziOODVZ3oYOH5phIkPSImC9+iztNC0pZNyxrdm7fl3o7WppQ8wk/d5+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GCF8AjKH; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=siQWQxqAAidqgmIoQVZj4PlgMjqPqD5ILXB+SRDBw/8DebIzBPGNuftx6MbjnaB/vlvjtSrQdN1c4v9tUFnq7m8srwuz7W1idHRP1mKKnj7hs5G4UFg3pGpW+iCRVGknG8RYpjWxyHFDAkxyfwk64Z5LgJv1GeGGjD5TTL62X7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FhySGljM; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724705076;
+	s=mimecast20190719; t=1724705077;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FEAM9DK74WZYySVYhL7YnC2YOY0xQ42haB8uzH2x2BY=;
-	b=GCF8AjKHkwg96mBkzB2sBebZgDfnSkfAC0Za1lGOGjnaARDiYvn7h31mMK4R43Te9VqYmQ
-	Uc30PlxK0U5SpwL9R4mfZ/JwKMxa4scuSYHxRyDNSGbSpQv+CYMbapSu2r9wC9bx1XUOJc
-	g2gy2flvaF1+ohE+gwB/A0Dx0QH2dec=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=9MPOki3YF/wyEgBnejzItxwjIF1moGifGifGb5OwzY4=;
+	b=FhySGljMbpHAB9+fOXckwB3PHKcnCG4nxvJpUlFUCVLdYAj/nbkeYKgNMqPIEpnfvUoNb9
+	dH7JrygPjxonljj4/QaAFCfZbclT/wN7GDnyG3JBM6s9TgUfmHPPoX4LUJSoOs0TrhEIBg
+	9R71iuO6fqzROWWEB1IGt67NCtMuvuM=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-126-f4fLNMtDP7efYHp5vxZkAg-1; Mon, 26 Aug 2024 16:44:33 -0400
-X-MC-Unique: f4fLNMtDP7efYHp5vxZkAg-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7a1e9a3825aso606412085a.2
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 13:44:33 -0700 (PDT)
+ us-mta-214-E_U0CEgeM8WhKhO0OFpY-w-1; Mon, 26 Aug 2024 16:44:35 -0400
+X-MC-Unique: E_U0CEgeM8WhKhO0OFpY-w-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7a1dc1e5662so663447185a.2
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 13:44:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724705072; x=1725309872;
+        d=1e100.net; s=20230601; t=1724705075; x=1725309875;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FEAM9DK74WZYySVYhL7YnC2YOY0xQ42haB8uzH2x2BY=;
-        b=D9gi/WTJRtmaaG6itass9Cb0eiThguXzdubRNbjFMQ/LSTPpYGflmtMutMKs6LM2TY
-         SbcrqXhmAiYOELVaaI5Atho4AaWdDa/NI21zPqJxn753/ufDqcyYc2ZqZXUxGZlfrOD/
-         WzfVhoVI/jd1L5O5q7YyBmnZF+vWfHot12FIF7M0eU2BF5QYuQHRV31zXp15JX9Aikwa
-         +xjBEKX6+CMuXFbCEkZMk+XmEmcWfpPlW9U4MUUXpU0xHmGPpaVuKu93uXjF0MAO7uQl
-         AaJDTrmZZq8rKCvdLznjIe4HyqwtZpKlILvi9BQ/48HVTRRiX/4s3E1wLtK6vKb92Ofc
-         eopA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2wMGfmeH23+qEA1vq2yCcW1xGI9YGrQrGx95yq+JMPQPi5voNaJuw9lKcAKJnZ2WLv3s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrAsmfRoZUgUscjrjxdXdIMNbd4vJKxcD+Q/AoG39KoVqWwA8G
-	lyNulllykyPdAPue9PijdNhMlNIDNAmbjMxjajmkiopzDvsXzQRFxQmTNry48l+HHGiX1pwqEK/
-	+a1bNIW/D7/ruceViRSArJks61uS3xPqg9zAQxjfi4FcRWtQ0JQ==
-X-Received: by 2002:a05:620a:430a:b0:7a4:faab:fc79 with SMTP id af79cd13be357-7a6896d1835mr1392500685a.8.1724705072553;
-        Mon, 26 Aug 2024 13:44:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHDiJ56urcvTKu8a4/ieO25ZyreTkMfmYYALFQqTS8OY3wwzzWFQolk9khXQC+xv0hRJc4KwA==
-X-Received: by 2002:a05:620a:430a:b0:7a4:faab:fc79 with SMTP id af79cd13be357-7a6896d1835mr1392497485a.8.1724705072141;
-        Mon, 26 Aug 2024 13:44:32 -0700 (PDT)
+        bh=9MPOki3YF/wyEgBnejzItxwjIF1moGifGifGb5OwzY4=;
+        b=GGxrv98hA0zVxL6T7a56iwxcydkJ+HQSSjLaUuJBKY+lnhLbWasJ+fjtu/RESeXqmL
+         azAxG4YK5H3/VIH47O1ZmrqFgsPm1o75tff3PCkeY0BxfW7BNtXUSNyCat6NUFDg9GIv
+         6lGT/9AxzfV6ub4eD/M4VfZRyqhNd6hbPMC+yC11cXFk8B84p6K/pypp2uqECxgZg0Xp
+         M9GUiCNMfqvF4vWoJfaFg1HqTGwwJXhOOu44JaN4GxNlyb3zlFlk0S2tEVrVS1Oh3YF2
+         Y4VpgHnnIn2NwMwwJ2ji7E4lkZeifP/6//GgrEraRopqX4YUc2eGQ1GRVrxkozw/e/0/
+         6ZHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVo25Aq14vqQuLOV5j72nH3vq6aIIlmm0nSMva8glPfkm/BW06ypKaGjTILv+WRevw6wu4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpO2GbQLx+XrFdybGqHzdz3xbxGX9ZWW++TQl9T+rSUP5V6Qm3
+	i8H0IkaXk8dp+FuBXmTUKjx7tZy/BCFk+Lz4lhSV/GZKYOhfdh6qMf3feEKXKiXMEFF0nJVsLFW
+	NqkaiAwhaSt6AWknCA9V6ueJ4dwbKKRQSt1RU6pdOsDobzL6jLQ==
+X-Received: by 2002:a05:620a:4007:b0:79f:595:f64a with SMTP id af79cd13be357-7a6897b7b14mr1477183485a.58.1724705074689;
+        Mon, 26 Aug 2024 13:44:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHpx2qE8XXNwFA/VbcshgEEhM7utf/nDzzwdfyOyUpm1p8Kz8GxiojqL+PSarI5vXlPZn99hQ==
+X-Received: by 2002:a05:620a:4007:b0:79f:595:f64a with SMTP id af79cd13be357-7a6897b7b14mr1477180385a.58.1724705074328;
+        Mon, 26 Aug 2024 13:44:34 -0700 (PDT)
 Received: from x1n.redhat.com (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a67f3fd6c1sm491055185a.121.2024.08.26.13.44.30
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a67f3fd6c1sm491055185a.121.2024.08.26.13.44.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 13:44:31 -0700 (PDT)
+        Mon, 26 Aug 2024 13:44:33 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org
@@ -99,9 +99,9 @@ Cc: Gavin Shan <gshan@redhat.com>,
 	Will Deacon <will@kernel.org>,
 	Kefeng Wang <wangkefeng.wang@huawei.com>,
 	Alex Williamson <alex.williamson@redhat.com>
-Subject: [PATCH v2 18/19] mm/arm64: Support large pfn mappings
-Date: Mon, 26 Aug 2024 16:43:52 -0400
-Message-ID: <20240826204353.2228736-19-peterx@redhat.com>
+Subject: [PATCH v2 19/19] vfio/pci: Implement huge_fault support
+Date: Mon, 26 Aug 2024 16:43:53 -0400
+Message-ID: <20240826204353.2228736-20-peterx@redhat.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240826204353.2228736-1-peterx@redhat.com>
 References: <20240826204353.2228736-1-peterx@redhat.com>
@@ -113,87 +113,129 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Support huge pfnmaps by using bit 56 (PTE_SPECIAL) for "special" on
-pmds/puds.  Provide the pmd/pud helpers to set/get special bit.
+From: Alex Williamson <alex.williamson@redhat.com>
 
-There's one more thing missing for arm64 which is the pxx_pgprot() for
-pmd/pud.  Add them too, which is mostly the same as the pte version by
-dropping the pfn field.  These helpers are essential to be used in the new
-follow_pfnmap*() API to report valid pgprot_t results.
+With the addition of pfnmap support in vmf_insert_pfn_{pmd,pud}() we
+can take advantage of PMD and PUD faults to PCI BAR mmaps and create
+more efficient mappings.  PCI BARs are always a power of two and will
+typically get at least PMD alignment without userspace even trying.
+Userspace alignment for PUD mappings is also not too difficult.
 
-Note that arm64 doesn't yet support huge PUD yet, but it's still
-straightforward to provide the pud helpers that we need altogether.  Only
-PMD helpers will make an immediate benefit until arm64 will support huge
-PUDs first in general (e.g. in THPs).
+Consolidate faults through a single handler with a new wrapper for
+standard single page faults.  The pre-faulting behavior of commit
+d71a989cf5d9 ("vfio/pci: Insert full vma on mmap'd MMIO fault") is
+removed in this refactoring since huge_fault will cover the bulk of
+the faults and results in more efficient page table usage.  We also
+want to avoid that pre-faulted single page mappings preempt huge page
+mappings.
 
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
+Cc: kvm@vger.kernel.org
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- arch/arm64/Kconfig               |  1 +
- arch/arm64/include/asm/pgtable.h | 29 +++++++++++++++++++++++++++++
- 2 files changed, 30 insertions(+)
+ drivers/vfio/pci/vfio_pci_core.c | 60 +++++++++++++++++++++++---------
+ 1 file changed, 43 insertions(+), 17 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 6494848019a0..6607ed8fdbb4 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -99,6 +99,7 @@ config ARM64
- 	select ARCH_SUPPORTS_NUMA_BALANCING
- 	select ARCH_SUPPORTS_PAGE_TABLE_CHECK
- 	select ARCH_SUPPORTS_PER_VMA_LOCK
-+	select ARCH_SUPPORTS_HUGE_PFNMAP if TRANSPARENT_HUGEPAGE
- 	select ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
- 	select ARCH_WANT_COMPAT_IPC_PARSE_VERSION if COMPAT
- 	select ARCH_WANT_DEFAULT_BPF_JIT
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index b78cc4a6758b..2faecc033a19 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -578,6 +578,14 @@ static inline pmd_t pmd_mkdevmap(pmd_t pmd)
- 	return pte_pmd(set_pte_bit(pmd_pte(pmd), __pgprot(PTE_DEVMAP)));
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index ba0ce0075b2f..2d7478e9a62d 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -20,6 +20,7 @@
+ #include <linux/mutex.h>
+ #include <linux/notifier.h>
+ #include <linux/pci.h>
++#include <linux/pfn_t.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+@@ -1657,14 +1658,20 @@ static unsigned long vma_to_pfn(struct vm_area_struct *vma)
+ 	return (pci_resource_start(vdev->pdev, index) >> PAGE_SHIFT) + pgoff;
  }
  
-+#ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
-+#define pmd_special(pte)	(!!((pmd_val(pte) & PTE_SPECIAL)))
-+static inline pmd_t pmd_mkspecial(pmd_t pmd)
-+{
-+	return set_pmd_bit(pmd, __pgprot(PTE_SPECIAL));
-+}
-+#endif
-+
- #define __pmd_to_phys(pmd)	__pte_to_phys(pmd_pte(pmd))
- #define __phys_to_pmd_val(phys)	__phys_to_pte_val(phys)
- #define pmd_pfn(pmd)		((__pmd_to_phys(pmd) & PMD_MASK) >> PAGE_SHIFT)
-@@ -595,6 +603,27 @@ static inline pmd_t pmd_mkdevmap(pmd_t pmd)
- #define pud_pfn(pud)		((__pud_to_phys(pud) & PUD_MASK) >> PAGE_SHIFT)
- #define pfn_pud(pfn,prot)	__pud(__phys_to_pud_val((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot))
+-static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
++static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
++					   unsigned int order)
+ {
+ 	struct vm_area_struct *vma = vmf->vma;
+ 	struct vfio_pci_core_device *vdev = vma->vm_private_data;
+ 	unsigned long pfn, pgoff = vmf->pgoff - vma->vm_pgoff;
+-	unsigned long addr = vma->vm_start;
+ 	vm_fault_t ret = VM_FAULT_SIGBUS;
  
-+#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
-+#define pud_special(pte)	pte_special(pud_pte(pud))
-+#define pud_mkspecial(pte)	pte_pud(pte_mkspecial(pud_pte(pud)))
++	if (order && (vmf->address & ((PAGE_SIZE << order) - 1) ||
++		      vmf->address + (PAGE_SIZE << order) > vma->vm_end)) {
++		ret = VM_FAULT_FALLBACK;
++		goto out;
++	}
++
+ 	pfn = vma_to_pfn(vma);
+ 
+ 	down_read(&vdev->memory_lock);
+@@ -1672,30 +1679,49 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+ 	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev))
+ 		goto out_unlock;
+ 
+-	ret = vmf_insert_pfn(vma, vmf->address, pfn + pgoff);
+-	if (ret & VM_FAULT_ERROR)
+-		goto out_unlock;
+-
+-	/*
+-	 * Pre-fault the remainder of the vma, abort further insertions and
+-	 * supress error if fault is encountered during pre-fault.
+-	 */
+-	for (; addr < vma->vm_end; addr += PAGE_SIZE, pfn++) {
+-		if (addr == vmf->address)
+-			continue;
+-
+-		if (vmf_insert_pfn(vma, addr, pfn) & VM_FAULT_ERROR)
+-			break;
++	switch (order) {
++	case 0:
++		ret = vmf_insert_pfn(vma, vmf->address, pfn + pgoff);
++		break;
++#ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
++	case PMD_ORDER:
++		ret = vmf_insert_pfn_pmd(vmf, __pfn_to_pfn_t(pfn + pgoff,
++							     PFN_DEV), false);
++		break;
 +#endif
-+
-+#define pmd_pgprot pmd_pgprot
-+static inline pgprot_t pmd_pgprot(pmd_t pmd)
++#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
++	case PUD_ORDER:
++		ret = vmf_insert_pfn_pud(vmf, __pfn_to_pfn_t(pfn + pgoff,
++							     PFN_DEV), false);
++		break;
++#endif
++	default:
++		ret = VM_FAULT_FALLBACK;
+ 	}
+ 
+ out_unlock:
+ 	up_read(&vdev->memory_lock);
++out:
++	dev_dbg_ratelimited(&vdev->pdev->dev,
++			   "%s(,order = %d) BAR %ld page offset 0x%lx: 0x%x\n",
++			    __func__, order,
++			    vma->vm_pgoff >>
++				(VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT),
++			    pgoff, (unsigned int)ret);
+ 
+ 	return ret;
+ }
+ 
++static vm_fault_t vfio_pci_mmap_page_fault(struct vm_fault *vmf)
 +{
-+	unsigned long pfn = pmd_pfn(pmd);
-+
-+	return __pgprot(pmd_val(pfn_pmd(pfn, __pgprot(0))) ^ pmd_val(pmd));
++	return vfio_pci_mmap_huge_fault(vmf, 0);
 +}
 +
-+#define pud_pgprot pud_pgprot
-+static inline pgprot_t pud_pgprot(pud_t pud)
-+{
-+	unsigned long pfn = pud_pfn(pud);
-+
-+	return __pgprot(pud_val(pfn_pud(pfn, __pgprot(0))) ^ pud_val(pud));
-+}
-+
- static inline void __set_pte_at(struct mm_struct *mm,
- 				unsigned long __always_unused addr,
- 				pte_t *ptep, pte_t pte, unsigned int nr)
+ static const struct vm_operations_struct vfio_pci_mmap_ops = {
+-	.fault = vfio_pci_mmap_fault,
++	.fault = vfio_pci_mmap_page_fault,
++#ifdef CONFIG_ARCH_SUPPORTS_HUGE_PFNMAP
++	.huge_fault = vfio_pci_mmap_huge_fault,
++#endif
+ };
+ 
+ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma)
 -- 
 2.45.0
 
