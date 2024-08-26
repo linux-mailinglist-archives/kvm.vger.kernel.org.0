@@ -1,107 +1,86 @@
-Return-Path: <kvm+bounces-25018-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25019-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A61F95E5F1
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 02:08:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A4595E672
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 03:48:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D9241C20938
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 00:08:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FEBE1F212AB
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 01:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C487163C;
-	Mon, 26 Aug 2024 00:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC788B672;
+	Mon, 26 Aug 2024 01:48:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ooQTM/eV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mXdr6Rlm"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C5A173
-	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 00:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7329E23C9;
+	Mon, 26 Aug 2024 01:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724630913; cv=none; b=VicVeMRtih0nDB6F928NU5POQZ+bc5IdyIf7HbcedOoGD0AALyudh3Gmv5Uq/zYPRw//ZHF8H1Rdpd9AmY11NWqhuldlYd24EREbR0ykdwOfMAyOEmxdNZES8ZNogJzZFGHF6FUY8m3g1vI+NdnvlapFMlsJYWsj6H47w2JqsDk=
+	t=1724636925; cv=none; b=GxBdIHEYttr5QdyMzvsbeSaNfrq9mRL+TdKYyWXwgXP+Xd1Ck1UEBUHichiXS4Ooa9LZO8itawEizgAopKuxpYEDqdETZe30Rlx0b9Z23nD51Nx7jr49I9sJXKAmzCM4SCzvpQTANN5+759t727BnSdo0J3sgInDRjbYohRUTgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724630913; c=relaxed/simple;
-	bh=/ZrB80bRurHxvKfWL4l0Vq0ytP5z5g8cWciN1ECznYM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=VeWX+zbdBrfJp2ooojjp/izypJs1RDNZfv1H92EYnrUyeb4lECkwjQviu6nDlgaOAYE/Gt+I6YloUElX2mWCY5MBYcrKmNe7KXmhzBVR0jM8BQV/B+SdMpT18se4LAtkTh+EjOVqPcgOTgqKKv8vHb9XxUA5aLevJIuAv5r2u/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ooQTM/eV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 67913C4AF62
-	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 00:08:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724630910;
-	bh=/ZrB80bRurHxvKfWL4l0Vq0ytP5z5g8cWciN1ECznYM=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ooQTM/eVLNUjx/hniA1hH0ERl+FIoy2aGBNyffA3IC1iNADD/LJtVsfDJrnUImWxL
-	 TE+POnQBYGf2JyrXpud8D35SLx4nYk3gIuCoTWivFQ7MRVayd6rsD7wR1w7YQ9WQLQ
-	 /SEuM5s4iJwpKiDr/NnXpjpNsgRHVrnZ5w4cheXS3gkw6z/Nv4YeZHO+vYV7t1PBHn
-	 yfz6yOnaVRO1ys4I75Cn8JXMAbMuWOGbqOVUMqmppe6GE6oolErQ+zJ7Ouv4YNe8sA
-	 OQSl5LG2eOBSo3yzAzPCdnnA4JrXw80DhNrUxl+7xvCq5ADiAz74k+PZKUZc/MrakP
-	 T1e+L/cQROBUg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 639ACC53B7F; Mon, 26 Aug 2024 00:08:30 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219009] Random host reboots on Ryzen 7000/8000 using nested VMs
- (vls suspected)
-Date: Mon, 26 Aug 2024 00:08:29 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: ozonehelix@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219009-28872-WmwDANtU5D@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219009-28872@https.bugzilla.kernel.org/>
-References: <bug-219009-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1724636925; c=relaxed/simple;
+	bh=IFpIjq7M4Q8HeW5xUDg2Mnv7OtXsD56oTLv+w/F+s04=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6HTE0yQAfT2s49PRL1T/zVV1j1qABJ8Tlaz2nkFnmPBmyodEo5yHrlY7x2FS/KOHHn6aTpYr9x4DlghxvX2kz55y8MJAIo0RJKEL5+y/0vHEShh9h2bWFf1uJuWWPsc1IY01/JFcw/I0jCw7ANDSYWUqTJI7ImBexC0Qeykb3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mXdr6Rlm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=iv6ZEUuPPqeOj8zp4uUVvcR1G/kNOJR6TPjSTE0A0Eg=; b=mX
+	dr6RlmAgSezIxhXPY1aayBO0uRGpArjLeF6sACQPASjHPD8v4kQLI3PbIlXtOJ3fSBSAwgDAtApa/
+	0yHr8iHZI/XuKlK65/scrLyh4ksw8AUNjt8kwIqQBquFqJfoQbxl5pxZgTee+j6mP2LB3lKEF5cht
+	2NPQFr6ggugHuw4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1siOqK-005fFg-NM; Mon, 26 Aug 2024 03:48:28 +0200
+Date: Mon, 26 Aug 2024 03:48:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Carlos Bilbao <cbilbao@digitalocean.com>
+Cc: eli@mellanox.com, mst@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, dtatulea@nvidia.com,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	eperezma@redhat.com, sashal@kernel.org, yuehaibing@huawei.com,
+	steven.sistare@oracle.com
+Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
+Message-ID: <d9695755-c0e6-4bbd-af5a-9fc78fac4512@lunn.ch>
+References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219009
+On Fri, Aug 23, 2024 at 11:54:13AM -0500, Carlos Bilbao wrote:
+> Hello,
+> 
+> I'm debugging my vDPA setup, and when using ioctl to retrieve the
+> configuration, I noticed that it's running in half duplex mode:
+> 
+> Configuration data (24 bytes):
+>   MAC address: (Mac address)
+>   Status: 0x0001
+>   Max virtqueue pairs: 8
+>   MTU: 1500
+>   Speed: 0 Mb
+>   Duplex: Half Duplex
 
---- Comment #10 from Ben Hirlston (ozonehelix@gmail.com) ---
-(In reply to Ben Hirlston from comment #9)
-> (In reply to h4ck3r from comment #8)
-> > (In reply to Ben Hirlston from comment #6)
-> > > do we know if Ryzen 9000 has this issue? I know I had this issue on R=
-yzen
-> > > 5000 but to a lessor extent
-> >=20
-> > Could you elaborate on what was happening with 5000?
-> > (reboots, mce, something other)
->=20
-> I would be using my Virtual Machine to Windows Windows 11 and would be do=
-ing
-> something intensive that was using vls and the machine would reset just l=
-ike
-> 7000 but it happened way less often
+If the speed is 0, does duplex even matter?
 
-I no longer have that machine anymore so I can't test it anymore but I have
-memory of it happening on a bi weekly to monthly occurrence
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+	Andrew
 
