@@ -1,168 +1,156 @@
-Return-Path: <kvm+bounces-25106-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25107-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0640095FC8B
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 00:14:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B42DE95FCBB
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 00:27:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79A061F2254B
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 22:14:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E94A283C18
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 22:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7890619DF47;
-	Mon, 26 Aug 2024 22:14:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F6619D881;
+	Mon, 26 Aug 2024 22:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HnyFN48k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KdKHPEhe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2209019D079;
-	Mon, 26 Aug 2024 22:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF15819D8B8
+	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 22:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724710447; cv=none; b=LmbXP1zIAwND1SxK7/Z5A01+HXaB11Fth6WU6fnB/GylAYAqKVw+OiSzfOSWVZ0mBCTtMGp1z5uVI+XTxfGEhFvaKvRopfuei7zsAz5cwK2OW+Y+akfhtEO1x3ojIOOAjHHUg/5EPYl1UyxXSZalBDQ2Bfq8D0lbwpwBwRhUAvg=
+	t=1724711248; cv=none; b=KIpMFI8XFk+W9LVRo86HKNKaQe8XSX3KEgAD0sB30OztacOqakZSYTWN4DWUJqZgq6h4vJXrhNW6xw5AsfMXOv3e0OOTq8pV5QBbhZAlXxSxKUsgLLfSFT5Alf906+W6T7zCUVj191igdLtFvGE2psOOnreXBT54ZG6zmPE+yBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724710447; c=relaxed/simple;
-	bh=zwpBfgNIO88HbBaEDXGpa/LI2zBKT1BO/U4s1Sk7qiM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qc0eCJssU6Ob1GIU/p87I04GCUDzNcBG9bGjn2KQGBRBi5qyu3kyWJzq89DE715bEDiau+RXZGf7bsGEsTRYVI3MBN6IJlnT0FzJdnEgJzbQMPMaygqRMPpDaBjtlzoil11g96S3sANwKUSGitQ4EQ7Wbv+CSyR46cmqgh272D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HnyFN48k; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-4fd0a012aadso1479185e0c.3;
-        Mon, 26 Aug 2024 15:14:05 -0700 (PDT)
+	s=arc-20240116; t=1724711248; c=relaxed/simple;
+	bh=tWBI1CEvcAyhociJ69GxLrZa7hka3+t0jWXGhE06iv8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eo6ZF8ybgO9wEVu7P1rpNIPzPEovWJoetDt94mswdwAtfPsVfUr5PAWLmQqtlSuKVro9Lir5APb7QjY2x4sNQ2dDeTOkaxzAKAqVR62rdfAgfpPZz14OkxCUjLAKG4J+2Ru/bKz4tla7f7W/Kzn7VTe5t5RPqPtmZhg2wFSU3B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KdKHPEhe; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-714226888dfso4375769b3a.1
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 15:27:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724710445; x=1725315245; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wcjk2h/iH/KoUml+g/8LwbeRmveLqJ+O9vO+r1w3P5A=;
-        b=HnyFN48kQhMergWAlV2RUofNQKxD5sAhSaH1uBDbgKappTt1GIZFGS2S464cUwyP4i
-         bYTQK7j/t3NBYOIW/jbkNrXykufdvEzsbspk6Ai9jIOy9G6L5eSVy5wTbFo8TFyhmucf
-         n2cE066GRyzfPqoY8862FP7LXdb6R+PfoLqtFkB+5OSH7QzofBHnVazh0qATZu8MKGjD
-         0WqY8S9jYrySslXUK9fA4eeF+xzrT7L1t9WH94QtQRlIzRA01hZQ46vfsVrmdeG8uE67
-         +7+6rtHyouXxpmgIB/5zm+N0plv0ohLOW7Z17nClxPoKngkR9VCtX2R9kRYqmK7YXVsM
-         ss8A==
+        d=google.com; s=20230601; t=1724711246; x=1725316046; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6efL/F1kuzyqYczbG3K6fnVaN6D4LGghnY70VHvVZ5o=;
+        b=KdKHPEhed1wfJECckm6wP831qbjDBGQoQqMdnCKQF3VoSf8k8fKpHeDtibNm0M0N+6
+         k6Ni9Cc1dZEc86+L17oDO+jXgzjAmMshot8ZucZfe7w7QpMcXt+Zs0/pQaXHK2ANhan/
+         XFXom/jy7U/TJAXydK+WZLSXlkQfwfK+9Ych4WTw0GGQyKwSIWEps9QwCzZM6a2iayv1
+         Yvf1ZW1h8FhXwOYydlhuOWAFDETWIyulurLgLbKh4gIuj7+FJpiUj1/vRADrI5C8sjGG
+         4AIcr9epl2S7WHnlhuLlnvcDsc/qGBAbM+as9yJm5Es7BMLIXHMwRbDSyFbkB1bm+E5z
+         Yx+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724710445; x=1725315245;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wcjk2h/iH/KoUml+g/8LwbeRmveLqJ+O9vO+r1w3P5A=;
-        b=LtYyd6me5JQ6w8wnO8SWPZS8ySo+ouLpx2SMBQUdu0O2sbATJfPMkvYl1/HkZYCMfv
-         eYux9McmVu+jaD88knUFT14BXps/uJsATUfI8D3iBj2Nv0fMOWr/ZpAJVkV6USNLGKO6
-         G8nGPR2LdS3EKcZpQK9cvQW0UVBdLy6qOuWxXUwFrowCK9ZEZILfbNVIBHvIcQbthgTX
-         SzA4A0Bqtv1ZuMIjlPbUAAFjhomRopph68RsiMk8Cawit+llyTMaMJ11LASgXr4zIp4a
-         DcPHi1prmsw7pGqhFesJMtLZRNnnr0SnS9Q+O7RvHEBrF2+93yC7dBajlTvZXhTAfpqJ
-         oGqA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbiT4X9rHRGx6RHBUcFjcrbMvL2FgctKjMwzM1xOwaWqW+0gaVKMaZEV3/9Cd5E3BL4qyMJCmMKsPZ86Go@vger.kernel.org, AJvYcCWP+MEWI/6eRr0Enmso2O0uszFtSONg1wfSuk7PaDhmLVBo21CCrJPIpNyoe8/299YJBbLjp7UH@vger.kernel.org, AJvYcCX9ehwKYWWZQsh4NDXHdcHom3QPSz8+8wwHhCNdbXNg47NkVg+zE1HhmlNT3fA93sFJ/NQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxemoaN8d4lC3mNosqC2ZrJIoVlLw9fry3DTwrNvSekuV4u7Mqe
-	y73ogQk0GNgpdgRwVjTRadV2MkDCQFyaAXEPwyaoAm+hK6pUrkr5
-X-Google-Smtp-Source: AGHT+IGjYlpIJZH+Sbpr6xRxOkDH5ZQYnxPANTXa2LX4x4yBhPNp39fud0oj76DMSz1wxbwmW6J2mA==
-X-Received: by 2002:a05:6122:7d1:b0:4ef:53ad:97bd with SMTP id 71dfb90a1353d-4fd1a5106fdmr13792427e0c.3.1724710444811;
-        Mon, 26 Aug 2024 15:14:04 -0700 (PDT)
-Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4fd0838111dsm1020351e0c.50.2024.08.26.15.14.03
+        d=1e100.net; s=20230601; t=1724711246; x=1725316046;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6efL/F1kuzyqYczbG3K6fnVaN6D4LGghnY70VHvVZ5o=;
+        b=Z4PMe3sQgwoCAnfe2/MY9C3aU8sIqsgWnn2qqiAP0GSwo8jYVNW4JcbqV6b+BFFu6K
+         DMfZleIpCyiHFnejmuzOmVHAZVREFCEvVVIH45sme7pwn+3xlZFGDTqsbo2d3960DQTm
+         a5gO8BFe3/mKsCFOiwnuTriFbxDLvxG0wzc9Awe2sVXda/oO4ho1qSfD+CHlpg4zzgi1
+         F66m2JdgXKy3VjrETkxlj9Lry2Kx3AoSVDNtxLhOgIp9EMFmnz2NTsdcdYKBBHLWXj1z
+         1kRpIjYVfwb/EP4eyGipSVns+W727yruXL5pHiwIiY2IZpP6h1Q0RsBrHREeFz28eqzj
+         NInQ==
+X-Gm-Message-State: AOJu0YwaFKabc+7OfVLSNJLBvIFtQ0QwX3YiAGXX8PqAj9j7KlJiS4K3
+	S+DB4NiZSDYJlEE4KCp79YSUHT1bH+Q4oBU5gswHR5nogoJFKxjtYE153qsQ8w==
+X-Google-Smtp-Source: AGHT+IFXBXnPx9KUJPgGCZuBF2pi6WskFdoQLOqLbWTVKDqZHz2/7M/H+7VpUWRwf7chThrTS0I+iw==
+X-Received: by 2002:a05:6a00:2e29:b0:70d:1b17:3c5e with SMTP id d2e1a72fcca58-71445758d3cmr11996200b3a.6.1724711245654;
+        Mon, 26 Aug 2024 15:27:25 -0700 (PDT)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7cd9ad55fe9sm7994982a12.60.2024.08.26.15.27.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 15:14:04 -0700 (PDT)
-From: David Hunter <david.hunter.linux@gmail.com>
-To: seanjc@google.com
-Cc: dave.hansen@linux.intel.com,
-	david.hunter.linux@gmail.com,
-	hpa@zytor.com,
-	javier.carrasco.cruz@gmail.com,
-	jmattson@google.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lirongqing@baidu.com,
-	pbonzini@redhat.com,
-	pshier@google.com,
-	shuah@kernel.org,
-	stable@vger.kernel.org,
-	x86@kernel.org,
-	Haitao Shan <hshan@google.com>
-Subject: [PATCH 6.1.y 2/2 V2] KVM: x86: Fix lapic timer interrupt lost after loading a snapshot.
-Date: Mon, 26 Aug 2024 18:13:36 -0400
-Message-ID: <20240826221336.14023-3-david.hunter.linux@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240826221336.14023-1-david.hunter.linux@gmail.com>
-References: <ZsSiQkQVSz0DarYC@google.com>
- <20240826221336.14023-1-david.hunter.linux@gmail.com>
+        Mon, 26 Aug 2024 15:27:24 -0700 (PDT)
+Date: Mon, 26 Aug 2024 22:27:20 +0000
+From: Mingwei Zhang <mizhang@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Jinrong Liang <ljr.kernel@gmail.com>,
+	Jim Mattson <jmattson@google.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/6] KVM: x86: selftests: Define AMD PMU CPUID leaves
+Message-ID: <Zs0BSCb_Khyxg08x@google.com>
+References: <20240813164244.751597-1-coltonlewis@google.com>
+ <20240813164244.751597-3-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240813164244.751597-3-coltonlewis@google.com>
 
+On Tue, Aug 13, 2024, Colton Lewis wrote:
+> This defined the CPUID calls to determine what extensions and
+> properties are available. AMD reference manual names listed below.
+> 
+> * PerfCtrExtCore (six core counters instead of four)
+> * PerfCtrExtNB (four counters for northbridge events)
+> * PerfCtrExtL2I (four counters for L2 cache events)
+> * PerfMonV2 (support for registers to control multiple
+>   counters with a single register write)
+> * LbrAndPmcFreeze (support for freezing last branch recorded stack on
+>   performance counter overflow)
+> * NumPerfCtrCore (number of core counters)
+> * NumPerfCtrNB (number of northbridge counters)
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  tools/testing/selftests/kvm/include/x86_64/processor.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index a0c1440017bb..9d87b5f8974f 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -183,6 +183,9 @@ struct kvm_x86_cpu_feature {
+>  #define	X86_FEATURE_GBPAGES		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
+>  #define	X86_FEATURE_RDTSCP		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 27)
+>  #define	X86_FEATURE_LM			KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 29)
+> +#define	X86_FEATURE_PERF_CTR_EXT_CORE	KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 23)
+> +#define	X86_FEATURE_PERF_CTR_EXT_NB	KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 24)
+> +#define	X86_FEATURE_PERF_CTR_EXT_L2I	KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 28)
 
-[ Upstream Commit 9cfec6d097c607e36199cf0cfbb8cf5acbd8e9b2]
-From: Haitao Shan <hshan@google.com>
-Date:   Tue Sep 12 16:55:45 2023 -0700 
+You won't be testing Northbridge counters and L2I counters, so these two
+could be optional to the patch.
+>  #define	X86_FEATURE_INVTSC		KVM_X86_CPU_FEATURE(0x80000007, 0, EDX, 8)
+>  #define	X86_FEATURE_RDPRU		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 4)
+>  #define	X86_FEATURE_AMD_IBPB		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 12)
+> @@ -195,6 +198,8 @@ struct kvm_x86_cpu_feature {
+>  #define	X86_FEATURE_VGIF		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
+>  #define X86_FEATURE_SEV			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 1)
+>  #define X86_FEATURE_SEV_ES		KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 3)
+> +#define	X86_FEATURE_PERF_MON_V2		KVM_X86_CPU_FEATURE(0x80000022, 0, EAX, 0)
 
-When running android emulator (which is based on QEMU 2.12) on
-certain Intel hosts with kernel version 6.3-rc1 or above, guest
-will freeze after loading a snapshot. This is almost 100%
-reproducible. By default, the android emulator will use snapshot
-to speed up the next launching of the same android guest. So
-this breaks the android emulator badly.
+Let's use X86_FEATURE_PERFMON_V2 instead.
 
-I tested QEMU 8.0.4 from Debian 12 with an Ubuntu 22.04 guest by
-running command "loadvm" after "savevm". The same issue is
-observed. At the same time, none of our AMD platforms is impacted.
-More experiments show that loading the KVM module with
-"enable_apicv=false" can workaround it.
+> +#define	X86_FEATURE_PERF_LBR_PMC_FREEZE	KVM_X86_CPU_FEATURE(0x80000022, 0, EAX, 2)
 
-The issue started to show up after commit 8e6ed96cdd50 ("KVM: x86:
-fire timer when it is migrated and expired, and in oneshot mode").
-However, as is pointed out by Sean Christopherson, it is introduced
-by commit 967235d32032 ("KVM: vmx: clear pending interrupts on
-KVM_SET_LAPIC"). commit 8e6ed96cdd50 ("KVM: x86: fire timer when
-it is migrated and expired, and in oneshot mode") just makes it
-easier to hit the issue.
+You don't use this feature, do you? If not, this can be optional for the
+patch.
+>  
+>  /*
+>   * KVM defined paravirt features.
+> @@ -281,6 +286,8 @@ struct kvm_x86_cpu_property {
+>  #define X86_PROPERTY_GUEST_MAX_PHY_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 16, 23)
+>  #define X86_PROPERTY_SEV_C_BIT			KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 0, 5)
+>  #define X86_PROPERTY_PHYS_ADDR_REDUCTION	KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 6, 11)
+> +#define X86_PROPERTY_NUM_PERF_CTR_CORE		KVM_X86_CPU_PROPERTY(0x80000022, 0, EBX, 0, 3)
+> +#define X86_PROPERTY_NUM_PERF_CTR_NB		KVM_X86_CPU_PROPERTY(0x80000022, 0, EBX, 10, 15)
+>  
 
-Having both commits, the oneshot lapic timer gets fired immediately
-inside the KVM_SET_LAPIC call when loading the snapshot. On Intel
-platforms with APIC virtualization and posted interrupt processing,
-this eventually leads to setting the corresponding PIR bit. However,
-the whole PIR bits get cleared later in the same KVM_SET_LAPIC call
-by apicv_post_state_restore. This leads to timer interrupt lost.
-
-The fix is to move vmx_apicv_post_state_restore to the beginning of
-the KVM_SET_LAPIC call and rename to vmx_apicv_pre_state_restore.
-What vmx_apicv_post_state_restore does is actually clearing any
-former apicv state and this behavior is more suitable to carry out
-in the beginning.
-
-Fixes: 967235d32032 ("KVM: vmx: clear pending interrupts on KVM_SET_LAPIC")
-Cc: stable@vger.kernel.org
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Haitao Shan <hshan@google.com>
-Link: https://lore.kernel.org/r/20230913000215.478387-1-hshan@google.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-(Cherry-Picked from commit 9cfec6d097c607e36199cf0cfbb8cf5acbd8e9b2)
-Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
----
- arch/x86/kvm/vmx/vmx.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 87abf4eebf8a..4040075bbd5a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8203,6 +8203,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.load_eoi_exitmap = vmx_load_eoi_exitmap,
- 	.apicv_pre_state_restore = vmx_apicv_pre_state_restore,
- 	.check_apicv_inhibit_reasons = vmx_check_apicv_inhibit_reasons,
-+	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
- 	.hwapic_irr_update = vmx_hwapic_irr_update,
- 	.hwapic_isr_update = vmx_hwapic_isr_update,
- 	.guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
--- 
-2.43.0
-
+ditto.
+>  #define X86_PROPERTY_MAX_CENTAUR_LEAF		KVM_X86_CPU_PROPERTY(0xC0000000, 0, EAX, 0, 31)
+>  
+> -- 
+> 2.46.0.76.ge559c4bf1a-goog
+> 
 
