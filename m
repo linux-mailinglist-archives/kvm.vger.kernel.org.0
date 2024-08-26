@@ -1,101 +1,112 @@
-Return-Path: <kvm+bounces-25078-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25079-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E92995FAA7
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 22:28:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9747B95FAB6
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 22:33:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 217EA282E5E
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 20:28:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B2B628396E
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 20:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D76419AD56;
-	Mon, 26 Aug 2024 20:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFF419AA4E;
+	Mon, 26 Aug 2024 20:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c3sDyybO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FqzNZqQr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF30E19A281
-	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 20:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A48713A3F6;
+	Mon, 26 Aug 2024 20:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724704109; cv=none; b=qsb7PSDieBHlXJ1YeP3dCk6xpb8yS/92YOQjeFz83IFEa34J4isKg9w16lmZ6XBfeVET9EMl2tgn/ZQJbbdyP3GjqvE7jC57UrLaXJbc1tRR6iC6PER7jmerPtQlD9zON45M0xpc1ePplRbTGiuKvCmRrLTIiMwE5clbgx4uB3I=
+	t=1724704398; cv=none; b=V/oJpUgI7KLm7vY+2st3xZQJ6Uo/Z3kEdpWqfaY/Abl+zVJ/cEFdMhilufJUzg2dwKdz0+PhGRUjrniWgOem/+mPl/MgbikBNLfze5FXrZJ5kCZpbbquoGsoxcVznkDqjYG4HxPuP3dUzDoGOcY7dHW6dT8H8IzSmCs7ZbLdKUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724704109; c=relaxed/simple;
-	bh=3aLGWNFml1fs6ET7vU4TR6a4dUKkunevdgnP5XM6DFU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=L6dIx/Q3MWdbhLpdNercRx97MHOFVLbRC3UKnnUJ1+wo4EhPL3RXUnqxbwigjP0X4RojVrUjr0K/IkRU/PvYMXwwuS5898ZX4W6iJyeP/ajIdrVyjGOuADIXkdIqP0uoqRBJnOI3m+MNrOr5gXRz6VGesB954vpwYe2LqV/90B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c3sDyybO; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6b991a4727eso86234117b3.1
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 13:28:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724704107; x=1725308907; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4CuIS2O9/fj+lBdt8ymvV+Stc9+h4xTSSAPFKw9WU0=;
-        b=c3sDyybOX74t6cnLJ7vu6bytaZ/pfDV6f3RqG11bxF7Z/PuY1pYdPHkIDyxhMr5Au/
-         p/uIvSzDTr5ozdbcR7n2PjR1wIwmIQY53QX3K1XS5CtrnxgO0SmhqMEriGnvyl0gWM74
-         dKrPBP8W7m1aUM/jllUUs6e19cPeioW6Hj2E0M3pBSJyErI/JbUfugalnfQsfyyR3e3v
-         /PpEvX7V13Ft1nGLBn1Fb6F4A1lq9zaEf2En4P/hTA8GBfB6sa49GLKAcLpyoialNNRT
-         ghyHscflNlfsTnHhZxISyXT4SBDgOaj7V57SAkf+gMRXxS2dcXyFTFkxm/pLYktyY02w
-         bHJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724704107; x=1725308907;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4CuIS2O9/fj+lBdt8ymvV+Stc9+h4xTSSAPFKw9WU0=;
-        b=vVGMFQsRMVQNxLiDxyBwwVTY6/8177S750EWVkNuPcRgy2thk/ELm3S4Cbs6EQRQ/x
-         XPdaCviHjVO9PThmSPbDKGJJtnDAhLAsSvbdTHBgsTtS3x4j0UIq8sjdL85nj91OZXyX
-         vdBGxF3vigKsHo3JGkCRBkZaK6zUsMZqXrueDs9x98xyndvy/6bKSdsoqQZrkaPKTITD
-         +2HQGSSjfcMzEf5AC03G2mN7bZhCNPo0QSAPIRG5mrnYnmwcMygZB5vQTKpSK98FDzSh
-         EPYm7RiZeFJMiqd7MyWc1CCDjFujHmo3qEnnhcKrnonJlLfqvQZRcQtYteACRCF2Y/FF
-         qKhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKYB6t8dlorcsPVuurRd2v3ETLD8jEPF5/sGwThRWR0gFsce+OJ9BMFpnIFi/PPnaF6GE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnCi7qhlS2zyC3rNJawzvm4PQ2QWvQoy5mzFBAaY8FhP/+PHbp
-	9vZG8z+2gza4yOJk4beEEKp2qQpuLhrXkbFU6ifH93Z8+7dDeHghzWtmnH3Bd6A9vIsAA3yTLO6
-	7qQ==
-X-Google-Smtp-Source: AGHT+IE3PaHVFO73GTuBHSkg/Bp1BYVf64Z5BDMiZlAp1N72Zy30VoStroBvnjGNz6tOuhVG9XuSt7nX3dw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:202:b0:e0b:a712:2ceb with SMTP id
- 3f1490d57ef6-e1a2a5a664cmr12509276.5.1724704106889; Mon, 26 Aug 2024 13:28:26
- -0700 (PDT)
-Date: Mon, 26 Aug 2024 13:28:25 -0700
-In-Reply-To: <ZskfY2XOken50etZ@google.com>
+	s=arc-20240116; t=1724704398; c=relaxed/simple;
+	bh=zidfGQagCPvVo5KYzTaWkFltmj5YSwV8SyVpz4qJII0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oms5NjTueVfI+A7z7XcwV/8pl/e5nf+wfy8I+NM9oB0LedoSphxxn2BYgCYCLu096i+8TZQWq9hWIpS3cp3VRs21UhMzda2NDmSD1mz5pD8mz9XEHug4wsSdAIE3wSiXMORWiBvnn4+DaV3sRPOPkczntVpGHo/zl2cJfIuSgew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FqzNZqQr; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724704397; x=1756240397;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zidfGQagCPvVo5KYzTaWkFltmj5YSwV8SyVpz4qJII0=;
+  b=FqzNZqQrGwc1dOoe26U8aRwhbS9cSalJET3N5F9WdyLMziCfDguVHZ3R
+   IgAPpUOkQkgN518jJI9+cQdIvtW66M0EbU57/cRJxYAGwnJslcLpZ8Iv+
+   mBAEevx6hJMDvS8KLwSAuNEGphPAbx2aqu+vEBD45xLtudj8f6rkk9qHS
+   m1IxMln3Cr7/nMpiGNBK/ayJnhaBPsoXKHBhkTpUmT+cymI5aihwMNsz0
+   lVPrGpfphn092SrMObcdski0BM+OJAw3sqUpuuMWyWw/kkWhQYxDrvXpg
+   iEvxjaqg6yTJSzhM8M9J//V3rlgkpt+wfYk36FQRxBiiw5Tff7hYHObex
+   g==;
+X-CSE-ConnectionGUID: ZmJzFKDESki6kNAMtVNoqQ==
+X-CSE-MsgGUID: PkIp+WRfTjKLI34TrFtDFQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="23329888"
+X-IronPort-AV: E=Sophos;i="6.10,178,1719903600"; 
+   d="scan'208";a="23329888"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 13:33:16 -0700
+X-CSE-ConnectionGUID: dbgOfCT9RbyNKfbaJt3t7Q==
+X-CSE-MsgGUID: MKdPP9egTOG6zYHM6OFVSw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,178,1719903600"; 
+   d="scan'208";a="85822083"
+Received: from jsolisoc-mobl.amr.corp.intel.com (HELO desk) ([10.125.16.169])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 13:33:17 -0700
+Date: Mon, 26 Aug 2024 13:33:08 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 1/4] x86/cpufeatures: Clarify semantics of
+ X86_FEATURE_IBPB
+Message-ID: <20240826203308.litigvo6zomwapws@desk>
+References: <20240823185323.2563194-1-jmattson@google.com>
+ <20240823185323.2563194-2-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240809190319.1710470-1-seanjc@google.com> <20240809190319.1710470-5-seanjc@google.com>
- <20240814142256.7neuthobi7k2ilr6@yy-desk-7060> <6fsgci4fceoin7fp3ejeulbaybaitx3yo3nylzecanoba5gvhd@3ubrvlykgonn>
- <ZsfaMes4Atc3-O7h@google.com> <ZskfY2XOken50etZ@google.com>
-Message-ID: <Zszlab0BMPKmnOsy@google.com>
-Subject: Re: [PATCH 04/22] KVM: x86/mmu: Skip emulation on page fault iff 1+
- SPs were unprotected
-From: Sean Christopherson <seanjc@google.com>
-To: Yao Yuan <yaoyuan0329os@gmail.com>
-Cc: Yuan Yao <yuan.yao@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerly Tng <ackerleytng@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240823185323.2563194-2-jmattson@google.com>
 
-On Fri, Aug 23, 2024, Sean Christopherson wrote:
-> On Thu, Aug 22, 2024, Sean Christopherson wrote:
-> Intel support is especially misleading, because sharing page tables between EPT
-> and IA32 is rather nonsensical due to them having different formats.  I.e. I doubt
-> Paolo had a use case for the VMX changes, and was just providing parity with SVM.
-> Of course, reusing L1's page tables as the NPT tables for L2 is quite crazy too,
+On Fri, Aug 23, 2024 at 11:53:10AM -0700, Jim Mattson wrote:
+> Since this synthetic feature bit is set on AMD CPUs that don't flush
+> the RSB on an IBPB, indicate as much in the comment, to avoid
+> potential confusion with the Intel IBPB semantics.
+> 
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/include/asm/cpufeatures.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index dd4682857c12..cabd6b58e8ec 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -215,7 +215,7 @@
+>  #define X86_FEATURE_SPEC_STORE_BYPASS_DISABLE	( 7*32+23) /* Disable Speculative Store Bypass. */
+>  #define X86_FEATURE_LS_CFG_SSBD		( 7*32+24)  /* AMD SSBD implementation via LS_CFG MSR */
+>  #define X86_FEATURE_IBRS		( 7*32+25) /* "ibrs" Indirect Branch Restricted Speculation */
+> -#define X86_FEATURE_IBPB		( 7*32+26) /* "ibpb" Indirect Branch Prediction Barrier */
+> +#define X86_FEATURE_IBPB		( 7*32+26) /* "ibpb" Indirect Branch Prediction Barrier without RSB flush */
 
-Actually, it's not _that_ crazy, e.g. KVM s390 does this for last-level page tables
-so that changes to the host userspace mappings don't require mmu_notifier-induced
-changes in KVM.
-
-> but at least the PTE formats are identical. 
+I don't think the comment is accurate for Intel. Maybe you meant to modify
+X86_FEATURE_AMD_IBPB?
 
