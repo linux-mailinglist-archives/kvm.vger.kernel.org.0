@@ -1,225 +1,345 @@
-Return-Path: <kvm+bounces-25051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C20C995F1CA
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 14:47:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D783A95F396
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 16:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E98C91C21CE4
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 12:47:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7FA81F234A8
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 14:09:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7182189B9B;
-	Mon, 26 Aug 2024 12:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008F6188923;
+	Mon, 26 Aug 2024 14:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="IocZ5KLa"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB0B186298;
-	Mon, 26 Aug 2024 12:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54F243AA4
+	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 14:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724676381; cv=none; b=OdUogBMF4SZkhru2cXUqcgoK5F9wAvSIIdpPZLrwSAUtYikM5RmoW5xidN0Hwh7wJJLoU+af3yoHLYEkph5NZcPyjwb03ZVA5pJq61O9dIVb2x70A38jwtGP1QDb1K7J/da7z3dibKstIpo7d4mQNvtoHz1DLraIW3vuZBcEFzA=
+	t=1724681353; cv=none; b=BgK2YD5IMb5YGrrGnc9PilvPmpVkJCQYzkYIkUsQZbXGBCq9ghoEMlu5Z1NX6B08kJhqF2aXZxH3pLvUnG6e7Py5psigJOtCEbtFIubXPEAPYlvHR2X0Uo+xk6PEn7cmpW7IuhzPyfJqvqLlKZe2jYc4+7KbP/b+MqIJs80aMQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724676381; c=relaxed/simple;
-	bh=O/DobHs4cYQFtolMYJAHtrh6UhI7iy5XA2iTj6BBe74=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=syxW87QQ6z7mItMw3LO58UFinUekQgmbEJ08eDfXKRWElda75e7kyI6hxfERwq88moNLo1BWdFDqAPeeFSyfMzVT9DAiCXIHUaSv7iCV7pGdUOzK0d2oRxpv3DeoQt6mojAZriXi9X0b9lEj17+V1qHYWJx71GjYanrQjaqCHog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wsr304ZsSzfZ36;
-	Mon, 26 Aug 2024 20:44:12 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 976E81800A5;
-	Mon, 26 Aug 2024 20:46:15 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 26 Aug 2024 20:46:15 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	Alexander Duyck <alexanderduyck@fb.com>, Chuck Lever
-	<chuck.lever@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, =?UTF-8?q?Eugenio=20P=C3=A9rez?=
-	<eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
- Dumazet <edumazet@google.com>, David Howells <dhowells@redhat.com>, Marc
- Dionne <marc.dionne@auristor.com>, Trond Myklebust <trondmy@kernel.org>, Anna
- Schumaker <anna@kernel.org>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Shuah Khan
-	<shuah@kernel.org>, <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-Subject: [PATCH net-next v15 04/13] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
-Date: Mon, 26 Aug 2024 20:40:11 +0800
-Message-ID: <20240826124021.2635705-5-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240826124021.2635705-1-linyunsheng@huawei.com>
-References: <20240826124021.2635705-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1724681353; c=relaxed/simple;
+	bh=XvMomLbp+Utw2v7rKqRoOL4vRnSW2uiHImQ6kaNfPYg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nXVVpAY4S5/OL5MbS6z65TKFZSpXBgVUyPRq4O7P34ddmO42C5ThiTsGihinhQmE8phDrD/76zHAOZy0WLeZ1oaRMFEFQewEf3c8qJ587UwcEE2XEQqPvnPwD0/x6VMf7Imh602InDtrNJHE8oQvdZH89AyKdR3Vdqb1+zvz1bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=IocZ5KLa; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-428119da952so39148285e9.0
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 07:09:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1724681349; x=1725286149; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JOlPOukelc3E1XWw2/xouoTXedAW+iaLXT8hTINFd2g=;
+        b=IocZ5KLaF96qg4bZJtCkW/DoTewV5F7Y0CXBh6wW82ZFh6jGOSKAgrvU67i5Uqtzu5
+         8sMLgp1JuQkwRhZKt8dCXb7AcFGq1af5pgrnJiUiR9YVtbM828n+yETAe4W2VnS72iKu
+         yGXUWX4N8ShJQQYpOYbhM0YDCtNjhwv/ET992uNvfKYbfYACZRlf1aspZz2Vtk53b2MV
+         pYhUlZbuVI3ha4rqldTiJzs3siiZYFK04ozXQSrv0t33t0S23aoMdLN0TAnQ0rQVm1te
+         QcjhUKBkxSXb3/54igCWnGK2ZDgdeVRbSQ7HzDwZx9PirIn66maBiABgaFHAA2nZ6Bq0
+         NxdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724681349; x=1725286149;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JOlPOukelc3E1XWw2/xouoTXedAW+iaLXT8hTINFd2g=;
+        b=kLw8Wvnr7xkSEMUWdeSPtIdI/6eXvrdDq6NCLg+MeCWrTLq9clme8w0qbCrwyaiiPy
+         eqbOYk+KPorYwKuNF5vSA4QbEtWXaHOBJhYsJVvXHeHIKy5bHGRSeIdZaZovCyQAgial
+         TSUkcjfrmdLlz6OiFyjahlLaJqRx+Rl/P5DrUUa8GBXiHQuWNHOOF96tT+80A1mXWu1k
+         YTNt3AM6o0vrYb3EOQkAufoLxbkBjEGiNSzimoELh7b9oO4nyNybZEssbfetIFm/uvn2
+         fzzW9w96Vi77MpcUiXGgajvxFD7WQkYEw/xvj0ciUtJkmJA+vDjZdhlEwmlRwHXa5lrd
+         Jd1w==
+X-Forwarded-Encrypted: i=1; AJvYcCU7eDHBtBGdholcGOLxr+fwblgBD18qAE57l1PK3T4eO/04KiOaTyuRDBSgjE0b4oqXFa8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTsTg4i0raBri7mABB7GW46ZOi+lYHfUQGqtEdu0HZa6ubazLH
+	OmF+HYmWDQNrmhe/LdvEDgGmROY92GrW+U4G7pRU71yz4OqoyP99XzDbGiFuZPw=
+X-Google-Smtp-Source: AGHT+IHs8/DJQ/kQBlrbHNO8RLT4vXIQlYKCngTeVFgUlJz82GvhYzErNP34fdr+2lFz7C7z2EmZeQ==
+X-Received: by 2002:a05:600c:1e01:b0:428:f79:1836 with SMTP id 5b1f17b1804b1-42acc9f66bemr73666255e9.26.1724681348835;
+        Mon, 26 Aug 2024 07:09:08 -0700 (PDT)
+Received: from [10.20.4.146] (212-5-158-72.ip.btc-net.bg. [212.5.158.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abefc61dbsm191236985e9.33.2024.08.26.07.09.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Aug 2024 07:09:08 -0700 (PDT)
+Message-ID: <a52010f2-d71c-47ee-aa56-b74fd716ec7b@suse.com>
+Date: Mon, 26 Aug 2024 17:09:06 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 21/25] KVM: x86: Introduce KVM_TDX_GET_CPUID
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org
+Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
+ linux-kernel@vger.kernel.org
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-22-rick.p.edgecombe@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+In-Reply-To: <20240812224820.34826-22-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
 
-Use appropriate frag_page API instead of caller accessing
-'page_frag_cache' directly.
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
-Acked-by: Chuck Lever <chuck.lever@oracle.com>
----
- drivers/vhost/net.c                                   |  2 +-
- include/linux/page_frag_cache.h                       | 10 ++++++++++
- net/core/skbuff.c                                     |  6 +++---
- net/rxrpc/conn_object.c                               |  4 +---
- net/rxrpc/local_object.c                              |  4 +---
- net/sunrpc/svcsock.c                                  |  6 ++----
- tools/testing/selftests/mm/page_frag/page_frag_test.c |  2 +-
- 7 files changed, 19 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index f16279351db5..9ad37c012189 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->pf_cache.va = NULL;
-+	page_frag_cache_init(&n->pf_cache);
- 
- 	return 0;
- }
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index 67ac8626ed9b..0a52f7a179c8 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -7,6 +7,16 @@
- #include <linux/mm_types_task.h>
- #include <linux/types.h>
- 
-+static inline void page_frag_cache_init(struct page_frag_cache *nc)
-+{
-+	nc->va = NULL;
-+}
-+
-+static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
-+{
-+	return !!nc->pfmemalloc;
-+}
-+
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 1748673e1fe0..9352fcf8cda3 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -752,14 +752,14 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
- 	if (in_hardirq() || irqs_disabled()) {
- 		nc = this_cpu_ptr(&netdev_alloc_cache);
- 		data = page_frag_alloc(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 	} else {
- 		local_bh_disable();
- 		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 
- 		nc = this_cpu_ptr(&napi_alloc_cache.page);
- 		data = page_frag_alloc(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 
- 		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 		local_bh_enable();
-@@ -849,7 +849,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		len = SKB_HEAD_ALIGN(len);
- 
- 		data = page_frag_alloc(&nc->page, len, gfp_mask);
--		pfmemalloc = nc->page.pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	}
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe7..694c4df7a1a3 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
- 	 */
- 	rxrpc_purge_queue(&conn->rx_queue);
- 
--	if (conn->tx_data_alloc.va)
--		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
--					conn->tx_data_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&conn->tx_data_alloc);
- 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
- }
- 
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..a8cffe47cf01 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
- #endif
- 	rxrpc_purge_queue(&local->rx_queue);
- 	rxrpc_purge_client_connections(local);
--	if (local->tx_alloc.va)
--		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
--					local->tx_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&local->tx_alloc);
- }
- 
- /*
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 6b3f01beb294..dcfd84cf0694 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1609,7 +1609,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1619,8 +1618,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
--	if (pfc->va)
--		__page_frag_cache_drain(virt_to_head_page(pfc->va),
--					pfc->pagecnt_bias);
-+
-+	page_frag_cache_drain(&svsk->sk_frag_cache);
- 	kfree(svsk);
- }
-diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-index 4a009122991e..c52598eaf7e7 100644
---- a/tools/testing/selftests/mm/page_frag/page_frag_test.c
-+++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-@@ -117,7 +117,7 @@ static int __init page_frag_test_init(void)
- 	u64 duration;
- 	int ret;
- 
--	test_frag.va = NULL;
-+	page_frag_cache_init(&test_frag);
- 	atomic_set(&nthreads, 2);
- 	init_completion(&wait);
- 
--- 
-2.33.0
+On 13.08.24 г. 1:48 ч., Rick Edgecombe wrote:
+> From: Xiaoyao Li <xiaoyao.li@intel.com>
+> 
+> Implement an IOCTL to allow userspace to read the CPUID bit values for a
+> configured TD.
+> 
+> The TDX module doesn't provide the ability to set all CPUID bits. Instead
+> some are configured indirectly, or have fixed values. But it does allow
+> for the final resulting CPUID bits to be read. This information will be
+> useful for userspace to understand the configuration of the TD, and set
+> KVM's copy via KVM_SET_CPUID2.
+> 
+> To prevent userspace from starting to use features that might not have KVM
+> support yet, filter the reported values by KVM's support CPUID bits.
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> ---
+> uAPI breakout v1:
+>   - New patch
+> ---
+>   arch/x86/include/uapi/asm/kvm.h |   1 +
+>   arch/x86/kvm/vmx/tdx.c          | 131 ++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/tdx.h          |   5 ++
+>   arch/x86/kvm/vmx/tdx_arch.h     |   5 ++
+>   arch/x86/kvm/vmx/tdx_errno.h    |   1 +
+>   5 files changed, 143 insertions(+)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index b4f12997052d..39636be5c891 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -931,6 +931,7 @@ enum kvm_tdx_cmd_id {
+>   	KVM_TDX_CAPABILITIES = 0,
+>   	KVM_TDX_INIT_VM,
+>   	KVM_TDX_INIT_VCPU,
+> +	KVM_TDX_GET_CPUID,
+>   
+>   	KVM_TDX_CMD_NR_MAX,
+>   };
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index b2ed031ac0d6..fe2bbc2ced41 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -813,6 +813,76 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+>   	return ret;
+>   }
+>   
+> +static u64 tdx_td_metadata_field_read(struct kvm_tdx *tdx, u64 field_id,
+> +				      u64 *data)
+> +{
+> +	u64 err;
+> +
+> +	err = tdh_mng_rd(tdx, field_id, data);
+> +
+> +	return err;
+> +}
+> +
+> +#define TDX_MD_UNREADABLE_LEAF_MASK	GENMASK(30, 7)
+> +#define TDX_MD_UNREADABLE_SUBLEAF_MASK	GENMASK(31, 7)
+> +
+> +static int tdx_mask_cpuid(struct kvm_tdx *tdx, struct kvm_cpuid_entry2 *entry)
+> +{
+> +	u64 field_id = TD_MD_FIELD_ID_CPUID_VALUES;
+> +	u64 ebx_eax, edx_ecx;
+> +	u64 err = 0;
+> +
+> +	if (entry->function & TDX_MD_UNREADABLE_LEAF_MASK ||
+> +	    entry->index & TDX_MD_UNREADABLE_SUBLEAF_MASK)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * bit 23:17, REVSERVED: reserved, must be 0;
+> +	 * bit 16,    LEAF_31: leaf number bit 31;
+> +	 * bit 15:9,  LEAF_6_0: leaf number bits 6:0, leaf bits 30:7 are
+> +	 *                      implicitly 0;
+> +	 * bit 8,     SUBLEAF_NA: sub-leaf not applicable flag;
+> +	 * bit 7:1,   SUBLEAF_6_0: sub-leaf number bits 6:0. If SUBLEAF_NA is 1,
+> +	 *                         the SUBLEAF_6_0 is all-1.
+> +	 *                         sub-leaf bits 31:7 are implicitly 0;
+> +	 * bit 0,     ELEMENT_I: Element index within field;
+> +	 */
+> +	field_id |= ((entry->function & 0x80000000) ? 1 : 0) << 16;
+> +	field_id |= (entry->function & 0x7f) << 9;
+> +	if (entry->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX)
+> +		field_id |= (entry->index & 0x7f) << 1;
+> +	else
+> +		field_id |= 0x1fe;
+> +
+> +	err = tdx_td_metadata_field_read(tdx, field_id, &ebx_eax);
+> +	if (err) //TODO check for specific errors
+> +		goto err_out;
+> +
+> +	entry->eax &= (u32) ebx_eax;
+> +	entry->ebx &= (u32) (ebx_eax >> 32);
+> +
+> +	field_id++;
+> +	err = tdx_td_metadata_field_read(tdx, field_id, &edx_ecx);
+> +	/*
+> +	 * It's weird that reading edx_ecx fails while reading ebx_eax
+> +	 * succeeded.
+> +	 */
+> +	if (WARN_ON_ONCE(err))
+> +		goto err_out;
+> +
+> +	entry->ecx &= (u32) edx_ecx;
+> +	entry->edx &= (u32) (edx_ecx >> 32);
+> +	return 0;
+> +
+> +err_out:
+> +	entry->eax = 0;
+> +	entry->ebx = 0;
+> +	entry->ecx = 0;
+> +	entry->edx = 0;
+> +
+> +	return -EIO;
+> +}
+> +
+>   static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+>   {
+>   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> @@ -1038,6 +1108,64 @@ static int __maybe_unused tdx_get_kvm_supported_cpuid(struct kvm_cpuid2 **cpuid)
+>   	return r;
+>   }
+>   
+> +static int tdx_vcpu_get_cpuid(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
+> +{
+> +	struct kvm_cpuid2 __user *output, *td_cpuid;
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+> +	struct kvm_cpuid2 *supported_cpuid;
+> +	int r = 0, i, j = 0;
+> +
+> +	output = u64_to_user_ptr(cmd->data);
+> +	td_cpuid = kzalloc(sizeof(*td_cpuid) +
+> +			sizeof(output->entries[0]) * KVM_MAX_CPUID_ENTRIES,
+> +			GFP_KERNEL);
+> +	if (!td_cpuid)
+> +		return -ENOMEM;
+> +
+> +	r = tdx_get_kvm_supported_cpuid(&supported_cpuid);
+> +	if (r)
+> +		goto out;
+> +
+> +	for (i = 0; i < supported_cpuid->nent; i++) {
+> +		struct kvm_cpuid_entry2 *supported = &supported_cpuid->entries[i];
+> +		struct kvm_cpuid_entry2 *output_e = &td_cpuid->entries[j];
+> +
+> +		*output_e = *supported;
+> +
+> +		/* Only allow values of bits that KVM's supports to be exposed */
+> +		if (tdx_mask_cpuid(kvm_tdx, output_e))
+> +			continue;
+> +
+> +		/*
+> +		 * Work around missing support on old TDX modules, fetch
+> +		 * guest maxpa from gfn_direct_bits.
+> +		 */
 
+
+Define old TDX module? I believe the minimum supported TDX version is 
+1.5 as EMR are the first public CPUs to support this, no? Module 1.0 was 
+used for private previews etc? Can this be dropped altogether? It is 
+much easier to mandate the minimum supported version now when nothing 
+has been merged. Furthermore, in some of the earlier patches it's 
+specifically required that the TDX module support NO_RBP_MOD which 
+became available in 1.5, which already dictates that the minimum version 
+we should care about is 1.5.
+
+
+> +		if (output_e->function == 0x80000008) {
+> +			gpa_t gpa_bits = gfn_to_gpa(kvm_gfn_direct_bits(vcpu->kvm));
+> +			unsigned int g_maxpa = __ffs(gpa_bits) + 1;
+> +
+> +			output_e->eax &= ~0x00ff0000;
+> +			output_e->eax |= g_maxpa << 16;
+> +		}
+> +
+> +		j++;
+> +	}
+> +	td_cpuid->nent = j;
+> +
+> +	if (copy_to_user(output, td_cpuid, sizeof(*output))) {
+> +		r = -EFAULT;
+> +		goto out;
+> +	}
+> +	if (copy_to_user(output->entries, td_cpuid->entries,
+> +			 td_cpuid->nent * sizeof(struct kvm_cpuid_entry2)))
+> +		r = -EFAULT;
+> +
+> +out:
+> +	kfree(td_cpuid);
+> +	kfree(supported_cpuid);
+> +	return r;
+> +}
+> +
+>   static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
+>   {
+>   	struct msr_data apic_base_msr;
+> @@ -1089,6 +1217,9 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+>   	case KVM_TDX_INIT_VCPU:
+>   		ret = tdx_vcpu_init(vcpu, &cmd);
+>   		break;
+> +	case KVM_TDX_GET_CPUID:
+> +		ret = tdx_vcpu_get_cpuid(vcpu, &cmd);
+> +		break;
+>   	default:
+>   		ret = -EINVAL;
+>   		break;
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index 8349b542836e..7eeb54fbcae1 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -25,6 +25,11 @@ struct kvm_tdx {
+>   	bool finalized;
+>   
+>   	u64 tsc_offset;
+> +
+> +	/* For KVM_MAP_MEMORY and KVM_TDX_INIT_MEM_REGION. */
+> +	atomic64_t nr_premapped;
+> +
+> +	struct kvm_cpuid2 *cpuid;
+>   };
+>   
+>   struct vcpu_tdx {
+> diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+> index d2d7f9cab740..815e74408a34 100644
+> --- a/arch/x86/kvm/vmx/tdx_arch.h
+> +++ b/arch/x86/kvm/vmx/tdx_arch.h
+> @@ -157,4 +157,9 @@ struct td_params {
+>   
+>   #define MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM	BIT_ULL(20)
+>   
+> +/*
+> + * TD scope metadata field ID.
+> + */
+> +#define TD_MD_FIELD_ID_CPUID_VALUES		0x9410000300000000ULL
+> +
+>   #endif /* __KVM_X86_TDX_ARCH_H */
+> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
+> index dc3fa2a58c2c..f9dbb3a065cc 100644
+> --- a/arch/x86/kvm/vmx/tdx_errno.h
+> +++ b/arch/x86/kvm/vmx/tdx_errno.h
+> @@ -23,6 +23,7 @@
+>   #define TDX_FLUSHVP_NOT_DONE			0x8000082400000000ULL
+>   #define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
+>   #define TDX_EPT_ENTRY_STATE_INCORRECT		0xC0000B0D00000000ULL
+> +#define TDX_METADATA_FIELD_NOT_READABLE		0xC0000C0200000000ULL
+>   
+>   /*
+>    * TDX module operand ID, appears in 31:0 part of error code as
 
