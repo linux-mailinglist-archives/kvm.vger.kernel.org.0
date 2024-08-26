@@ -1,152 +1,259 @@
-Return-Path: <kvm+bounces-25056-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25057-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1943795F459
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 16:50:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 234E895F544
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 17:38:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7331BB21907
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 14:50:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DD681F22751
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 15:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF931940B1;
-	Mon, 26 Aug 2024 14:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC88193416;
+	Mon, 26 Aug 2024 15:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BKFV+e3n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UrMMyaLz"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E0718E743;
-	Mon, 26 Aug 2024 14:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E50153812;
+	Mon, 26 Aug 2024 15:38:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724683755; cv=none; b=FIr9YxOPjLTMuoYeLQNzsLHn7jd67G4yqxCyk868GhgiSQZ9KpfrEuVWfNTVTvKyml7HGMlxKNuZ0uWLeCqPqPpmJ7bIuMDf62EZZp6qeMMBIoroUEBHa5kMLJbltDODiikCdFG9Hv8Jern26IBzms+W99pK9LoZPe7dFQ8bUnU=
+	t=1724686723; cv=none; b=fuYeKXVk0jR9RuH5fGoQG9O4Fv4ydM5RBWeJHx3tXtUgeWcZpO4CoZ73vjQYB+oSK4UP4M6vLQN/2K+yOye6gLrjNMXKiWDyi8jkdpGBGpYAQ9vSH+KWhOPPLZ02sJmLqqSe40NUPPPRyEATH4V6l4Ip0DgNIn+3sCfAhB27XhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724683755; c=relaxed/simple;
-	bh=uJYKJP5u52gdFIEA/SVCvB+nGTPXrfaICxlVLoVHi2s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rECpEEpTnEcgs4wJzkwgtKN2uLDsf9nXbAxmwCxh6KRdMTxXIZ/JPO+n53BjmTVVCuFdKfcPfCicYz82slGkcMyGXBgB2+TvaBjU035U7SBgvAzK6jYg1F2aiOmQWU10P/pxX82YnxwC+JJL+y5du9zqfTDT4vMWusyEkeoQdEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKFV+e3n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 709ECC4AF12;
-	Mon, 26 Aug 2024 14:49:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724683755;
-	bh=uJYKJP5u52gdFIEA/SVCvB+nGTPXrfaICxlVLoVHi2s=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=BKFV+e3nTLbba7IfKYx158sxITogkHLfTfOtpil0XHPhMV9Zmrrx7saeH7i0FatzN
-	 pH4dfnLKKDajT5BGfYPv6qcGfjsJrfwLUZfbMQ3VX9HqBHvG3++Km3rXSREFYrRu69
-	 QAz/VWsd3lp2t44BXlXvVpapyjkrh7f3xlFSXRSWjxzG4LomGQvcuwmmUe4wwbhBmR
-	 lXlwydJITijynzn75CON8Gn6S65QzsmWK/Sy8QF+cWZIjWyJYuTVIihgh+rBGPh7eH
-	 yNWTCXrqyzC3/QTg397PRzCCNfbol+NWeq+FLFX7brKLCUwH7DlqjN+ee/rjV6Spyg
-	 K4Du7yX91obcA==
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5a108354819so5613873a12.0;
-        Mon, 26 Aug 2024 07:49:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUAlc1wxIpicN33V/jKfnRa10awp0XlW5Y/ibM1rZ1OA+Vy6uUlnuA10cH7cY5vf2W3Js0=@vger.kernel.org, AJvYcCWIe0tu0fsUmuSuJvw59Pm25EyCKfjexHTEPhXj/xw+NCpBhavABgcONstsbCGaWOkKbGoPTTdKD88k0SqY@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoPDu5z9iEAv+VqwB2/S/Ry3ZC++/T6db18Q2SgbBKR2n+NCpT
-	7MQTdDG+3Nd2aQ6bSo3AJoifueBb+afsb/bgc6a6qfYmURJt0mpSPAsLLTw9UKtR1MYLlSQQksJ
-	CgmmwdcVJHR4x31VnOu6oTqRjQFo=
-X-Google-Smtp-Source: AGHT+IEKLWSILwx6ptoGTQB05HFx+Gqpr+sIMMEXlrHqdZkcGukYw7IXUkPbpM5O4I3GA/JSm4pX8x1fFvrSKY7gjU4=
-X-Received: by 2002:a05:6402:5cc:b0:5bf:50:266b with SMTP id
- 4fb4d7f45d1cf-5c089171b3fmr6351964a12.19.1724683753967; Mon, 26 Aug 2024
- 07:49:13 -0700 (PDT)
+	s=arc-20240116; t=1724686723; c=relaxed/simple;
+	bh=reqE2nlzaPtBX5zRYpjXeyzr7y7rrdXASpCd2pGylKs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QGT1YFJY7D0olSYfaCfhUHg+S+xdVo4OBUI7pXXxlGl6VGsFagDvHjLTJ3OKFWxOkRutDjmhXsDZGh0ywcyRN0ymD7bnHhqd3+Bc7W86QAxx/Rr26xUmbVoKBwjaxOrMFbUdX060dmi/p+MwKh3mVekMjMNqvXP9br8vuUzdVFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UrMMyaLz; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724686721; x=1756222721;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=reqE2nlzaPtBX5zRYpjXeyzr7y7rrdXASpCd2pGylKs=;
+  b=UrMMyaLztBMBy2MxIVAysBrtLe+I+zYVIXSf61a33+O9omK2rf4S88Ha
+   p4GLo4IVXOsIEV6/WULOEaTR4QHav1YsypxGVhD2sktTEwcZtMvG5J4VB
+   cA+d+GzoVVE7jBZIktp/q834ixqGt/kf7yFTQagPPpi83UuJnYB1UgMba
+   daJUGk0X5WYmJWcNHDfnXpsaaf4ndBVQVN0rLkPcladh6e0PLHx+C2U0g
+   Z4dm+VRqEMMnWxyvROYQCqYEMQBD2MXJSkabXvZrxOuYYKQv8n40EZVeF
+   nTJUlq+jKs4AapOxv3xpR6OxhQxsqulBPbxcBITdgSIrfPjXD6K6/r4/Y
+   w==;
+X-CSE-ConnectionGUID: zTQ37vPoQ7G7zCt5Vz9uBg==
+X-CSE-MsgGUID: aq6UloJ+Q96MS7DbX7ioxg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="34275443"
+X-IronPort-AV: E=Sophos;i="6.10,177,1719903600"; 
+   d="scan'208";a="34275443"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 08:38:41 -0700
+X-CSE-ConnectionGUID: W6pplc1lSGKmzafFv+bB0w==
+X-CSE-MsgGUID: n5D4oaD2SBCYw6yCXYgRqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,177,1719903600"; 
+   d="scan'208";a="62542822"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.246.0.178])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 08:38:34 -0700
+Message-ID: <a107b067-861d-43f4-86b5-29271cb93dad@intel.com>
+Date: Mon, 26 Aug 2024 18:38:28 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815071545.925867-1-maobibo@loongson.cn> <20240815071545.925867-3-maobibo@loongson.cn>
-In-Reply-To: <20240815071545.925867-3-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 26 Aug 2024 22:49:02 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5_xrmDVTiB=un7LzdLHQDjD564tVmVcHLrgGhhX6Omaw@mail.gmail.com>
-Message-ID: <CAAhV-H5_xrmDVTiB=un7LzdLHQDjD564tVmVcHLrgGhhX6Omaw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] LoongArch: KVM: Invalid guest steal time address
- on vCPU reset
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 02/10] x86/virt/tdx: Unbind global metadata read with
+ 'struct tdx_tdmr_sysinfo'
+To: "Huang, Kai" <kai.huang@intel.com>, "Hansen, Dave"
+ <dave.hansen@intel.com>, "seanjc@google.com" <seanjc@google.com>,
+ "bp@alien8.de" <bp@alien8.de>, "peterz@infradead.org"
+ <peterz@infradead.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "mingo@redhat.com" <mingo@redhat.com>,
+ "Williams, Dan J" <dan.j.williams@intel.com>,
+ "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>
+Cc: "Gao, Chao" <chao.gao@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "Yamahata, Isaku"
+ <isaku.yamahata@intel.com>
+References: <cover.1721186590.git.kai.huang@intel.com>
+ <7af2b06ec26e2964d8d5da21e2e9fa412e4ed6f8.1721186590.git.kai.huang@intel.com>
+ <66b16121c48f4_4fc729424@dwillia2-xfh.jf.intel.com.notmuch>
+ <7b65b317-397d-4a72-beac-6b0140b1d8dd@intel.com>
+ <66b178d4cfae4_4fc72944b@dwillia2-xfh.jf.intel.com.notmuch>
+ <96c248b790907b14efcb0885c78e4000ba5b9694.camel@intel.com>
+Content-Language: en-US
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <96c248b790907b14efcb0885c78e4000ba5b9694.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Applied, thanks.
+On 7/08/24 15:09, Huang, Kai wrote:
+> On Mon, 2024-08-05 at 18:13 -0700, Dan Williams wrote:
+>> Huang, Kai wrote:
+>> [..]
+>>>> The unrolled loop is the same amount of work as maintaining @fields.
+>>>
+>>> Hi Dan,
+>>>
+>>> Thanks for the feedback.
+>>>
+>>> AFAICT Dave didn't like this way:
+>>>
+>>> https://lore.kernel.org/lkml/cover.1699527082.git.kai.huang@intel.com/T/#me6f615d7845215c278753b57a0bce1162960209d
+>>
+>> I agree with Dave that the original was unreadable. However, I also
+>> think he glossed over the loss of type-safety and the silliness of
+>> defining an array to precisely map fields only to turn around and do a
+>> runtime check that the statically defined array was filled out
+>> correctly. So I think lets solve the readability problem *and* make the
+>> array definition identical in appearance to unrolled type-safe
+>> execution, something like (UNTESTED!):
+>>
+>>
+> [...]
+> 
+>> +/*
+>> + * Assumes locally defined @ret and @ts to convey the error code and the
+>> + * 'struct tdx_tdmr_sysinfo' instance to fill out
+>> + */
+>> +#define TD_SYSINFO_MAP(_field_id, _offset)                              \
+>> +	({                                                              \
+>> +		if (ret == 0)                                           \
+>> +			ret = read_sys_metadata_field16(                \
+>> +				MD_FIELD_ID_##_field_id, &ts->_offset); \
+>> +	})
+>> +
+> 
+> We need to support u16/u32/u64 metadata field sizes, but not just u16.
+> 
+> E.g.:
+> 
+> struct tdx_sysinfo_module_info {                                        
+>         u32 sys_attributes;                                             
+>         u64 tdx_features0;                                              
+> };
+> 
+> has both u32 and u64 in one structure.
+> 
+> To achieve type-safety for all field sizes, I think we need one helper
+> for each field size.  E.g.,
+> 
+> #define READ_SYSMD_FIELD_FUNC(_size)                            \
+> static inline int                                               \
+> read_sys_metadata_field##_size(u64 field_id, u##_size *data)    \
+> {                                                               \
+>         u64 tmp;                                                \
+>         int ret;                                                \
+>                                                                 \
+>         ret = read_sys_metadata_field(field_id, &tmp);          \
+>         if (ret)                                                \
+>                 return ret;                                     \
+>                                                                 \
+>         *data = tmp;                                            \
+>         return 0;                                               \
+> }                                                                       
+> 
+> /* For now only u16/u32/u64 are needed */
+> READ_SYSMD_FIELD_FUNC(16)                                               
+> READ_SYSMD_FIELD_FUNC(32)                                               
+> READ_SYSMD_FIELD_FUNC(64)                                               
+> 
+> Is this what you were thinking?
+> 
+> (Btw, I recall that I tried this before for internal review, but AFAICT
+> Dave didn't like this.)
+> 
+> For the build time check as you replied to the next patch, I agree it's
+> better than the runtime warning check as done in the current code.
+> 
+> If we still use the type-less 'void *stbuf' function to read metadata
+> fields for all sizes, then I think we can do below:
+> 
+> /*
+>  * Read one global metadata field and store the data to a location of a 
+>  * given buffer specified by the offset and size (in bytes).            
+>  */
+> static int stbuf_read_sysmd_field(u64 field_id, void *stbuf, int offset,
+>                                   int size)                             
+> {       
+>         void *member = stbuf + offset;                                  
+>         u64 tmp;                                                        
+>         int ret;                                                        
+> 
+>         ret = read_sys_metadata_field(field_id, &tmp);                  
+>         if (ret)
+>                 return ret;                                             
+>         
+>         memcpy(member, &tmp, size);                                     
+>         
+>         return 0;                                                       
+> }                                                                       
+> 
+> /* Wrapper to read one metadata field to u8/u16/u32/u64 */              
+> #define stbuf_read_sysmd_single(_field_id, _pdata)      \
+>         stbuf_read_sysmd_field(_field_id, _pdata, 0, 	\
+> 		sizeof(typeof(*(_pdata)))) 
+> 
+> #define CHECK_MD_FIELD_SIZE(_field_id, _st, _member)    \
+>         BUILD_BUG_ON(MD_FIELD_ELE_SIZE(MD_FIELD_ID_##_field_id) != \
+>                         sizeof(_st->_member))
+> 
+> #define TD_SYSINFO_MAP_TEST(_field_id, _st, _member)                    \
+>         ({                                                              \
+>                 if (ret) {                                              \
+>                         CHECK_MD_FIELD_SIZE(_field_id, _st, _member);   \
+>                         ret = stbuf_read_sysmd_single(                  \
+>                                         MD_FIELD_ID_##_field_id,        \
+>                                         &_st->_member);                 \
+>                 }                                                       \
+>          })
+> 
+> static int get_tdx_module_info(struct tdx_sysinfo_module_info *modinfo)
+> {
+>         int ret = 0;
+> 
+> #define TD_SYSINFO_MAP_MOD_INFO(_field_id, _member)     \
+>         TD_SYSINFO_MAP_TEST(_field_id, modinfo, _member)
+> 
+>         TD_SYSINFO_MAP_MOD_INFO(SYS_ATTRIBUTES, sys_attributes);
+>         TD_SYSINFO_MAP_MOD_INFO(TDX_FEATURES0,  tdx_features0);
+> 
+>         return ret;
+> }
+> 
+> With the build time check above, I think it's OK to lose the type-safe
+> inside the stbuf_read_sysmd_field(), and the code is simpler IMHO.
+> 
+> Any comments?
 
-Huacai
+BUILD_BUG_ON() requires a function, but it is still
+be possible to add a build time check in TD_SYSINFO_MAP
+e.g.
 
-On Thu, Aug 15, 2024 at 3:15=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
-> If paravirt steal time feature is enabled, there is percpu gpa address
-> passed from guest vcpu and host modified guest memory space with this gpa
-> address. When vcpu is reset normally, it will notify host and invalidate
-> gpa address.
->
-> However if VM is crashed and VMM reboots VM forcely, vcpu reboot
-> notification callback will not be called in VM, host needs invalid the
-> gpa address, else host will modify guest memory during VM reboots. Here i=
-t
-> is invalidated from vCPU KVM_REG_LOONGARCH_VCPU_RESET ioctl interface.
->
-> Also funciton kvm_reset_timer() is removed at vCPU reset stage, since SW
-> emulated timer is only used in vCPU block state. When vCPU is removed
-> from block waiting queue, kvm_restore_timer() is called and SW timer
-> is cancelled. And timer register is cleared at VMM when vCPU is reset.
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
->  arch/loongarch/include/asm/kvm_vcpu.h | 1 -
->  arch/loongarch/kvm/timer.c            | 7 -------
->  arch/loongarch/kvm/vcpu.c             | 2 +-
->  3 files changed, 1 insertion(+), 9 deletions(-)
->
-> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/inclu=
-de/asm/kvm_vcpu.h
-> index c416cb7125c0..86570084e05a 100644
-> --- a/arch/loongarch/include/asm/kvm_vcpu.h
-> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
-> @@ -76,7 +76,6 @@ static inline void kvm_restore_lasx(struct loongarch_fp=
-u *fpu) { }
->  #endif
->
->  void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
-> -void kvm_reset_timer(struct kvm_vcpu *vcpu);
->  void kvm_save_timer(struct kvm_vcpu *vcpu);
->  void kvm_restore_timer(struct kvm_vcpu *vcpu);
->
-> diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
-> index bcc6b6d063d9..74a4b5c272d6 100644
-> --- a/arch/loongarch/kvm/timer.c
-> +++ b/arch/loongarch/kvm/timer.c
-> @@ -188,10 +188,3 @@ void kvm_save_timer(struct kvm_vcpu *vcpu)
->         kvm_save_hw_gcsr(csr, LOONGARCH_CSR_ESTAT);
->         preempt_enable();
->  }
-> -
-> -void kvm_reset_timer(struct kvm_vcpu *vcpu)
-> -{
-> -       write_gcsr_timercfg(0);
-> -       kvm_write_sw_gcsr(vcpu->arch.csr, LOONGARCH_CSR_TCFG, 0);
-> -       hrtimer_cancel(&vcpu->arch.swtimer);
-> -}
-> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> index 16756ffb55e8..6905283f535b 100644
-> --- a/arch/loongarch/kvm/vcpu.c
-> +++ b/arch/loongarch/kvm/vcpu.c
-> @@ -647,7 +647,7 @@ static int kvm_set_one_reg(struct kvm_vcpu *vcpu,
->                                 vcpu->kvm->arch.time_offset =3D (signed l=
-ong)(v - drdtime());
->                         break;
->                 case KVM_REG_LOONGARCH_VCPU_RESET:
-> -                       kvm_reset_timer(vcpu);
-> +                       vcpu->arch.st.guest_addr =3D 0;
->                         memset(&vcpu->arch.irq_pending, 0, sizeof(vcpu->a=
-rch.irq_pending));
->                         memset(&vcpu->arch.irq_clear, 0, sizeof(vcpu->arc=
-h.irq_clear));
->                         break;
-> --
-> 2.39.3
->
+#define TD_SYSINFO_CHECK_SIZE(_field_id, _size)			\
+	__builtin_choose_expr(MD_FIELD_ELE_SIZE(_field_id) == _size, _size, (void)0)
+
+#define _TD_SYSINFO_MAP(_field_id, _offset, _size)		\
+	{ .field_id = _field_id,				\
+	  .offset   = _offset,					\
+	  .size	    = TD_SYSINFO_CHECK_SIZE(_field_id, _size) }
+
+#define TD_SYSINFO_MAP(_field_id, _struct, _member)		\
+	_TD_SYSINFO_MAP(MD_FIELD_ID_##_field_id,		\
+			offsetof(_struct, _member),		\
+			sizeof(typeof(((_struct *)0)->_member)))
+
+
 
