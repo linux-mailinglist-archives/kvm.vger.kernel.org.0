@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-25105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AA7F95FC87
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 00:14:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0640095FC8B
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 00:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A61A1C20BAC
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 22:14:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79A061F2254B
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 22:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1321819D06A;
-	Mon, 26 Aug 2024 22:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7890619DF47;
+	Mon, 26 Aug 2024 22:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HKsYxG9H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HnyFN48k"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C725C129E93;
-	Mon, 26 Aug 2024 22:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2209019D079;
+	Mon, 26 Aug 2024 22:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724710442; cv=none; b=bEwix7q7k0DGa4MsNJIUvK/OvaIqKjlOffLdb/ipIXaZ0OD+acSQ/cwzfcTxM5L9w2IYQ1LyLOEbqc5941TgmsoRzaUpR7crKxVildMhPRYY6PnBnirxHLoEuxEZ9Bm84RT2NMCY+bkDSpeol2kcK/tk395uOapc1U9AGX5Dkgc=
+	t=1724710447; cv=none; b=LmbXP1zIAwND1SxK7/Z5A01+HXaB11Fth6WU6fnB/GylAYAqKVw+OiSzfOSWVZ0mBCTtMGp1z5uVI+XTxfGEhFvaKvRopfuei7zsAz5cwK2OW+Y+akfhtEO1x3ojIOOAjHHUg/5EPYl1UyxXSZalBDQ2Bfq8D0lbwpwBwRhUAvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724710442; c=relaxed/simple;
-	bh=Tw0FvpJeVTngT3MzbWoaiZUL246yALTdADNOAPtFOP0=;
+	s=arc-20240116; t=1724710447; c=relaxed/simple;
+	bh=zwpBfgNIO88HbBaEDXGpa/LI2zBKT1BO/U4s1Sk7qiM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eVjOd4Qj/qhekCQCq3ddTuwcc0EgyFmSH/cDYsifjm3JpT2hTvnnivr+VtsZzYn/kG3frRWo7+XsS7hCP3IPJUHE/IzeUuCHpKisM75+L9cukJS2phpjqQyKc5094HENT/gv7JdUpFHJSriHCbcHYshJIBxVJZRtzHL98KX/AZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HKsYxG9H; arc=none smtp.client-ip=209.85.217.48
+	 MIME-Version; b=Qc0eCJssU6Ob1GIU/p87I04GCUDzNcBG9bGjn2KQGBRBi5qyu3kyWJzq89DE715bEDiau+RXZGf7bsGEsTRYVI3MBN6IJlnT0FzJdnEgJzbQMPMaygqRMPpDaBjtlzoil11g96S3sANwKUSGitQ4EQ7Wbv+CSyR46cmqgh272D8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HnyFN48k; arc=none smtp.client-ip=209.85.221.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-498cfbc0b05so1701064137.1;
-        Mon, 26 Aug 2024 15:14:00 -0700 (PDT)
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-4fd0a012aadso1479185e0c.3;
+        Mon, 26 Aug 2024 15:14:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724710439; x=1725315239; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724710445; x=1725315245; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Oa9FJlzpzEnTWXFf9+QlmwJ5wNhi6ZIyOsCW5VlVcQA=;
-        b=HKsYxG9HEPE0RAnqP/uQeGKRpx7EdPPpXzhTUjJ8LkDJ0W77FjrrtP4/qQl2bGxBLC
-         GUpDGVCnMP4JxquCl+XGkW+b4DnfzAQa1Juz+w10Q/1d/rfcWR9TV701RxHmN725GqdS
-         3HqTmuCnvdIQZJNG3r6xvHAl1wcb3yE3Em9qKe1HcYFEdy7vBzzk1AxV493XGsEXL/MH
-         nm/qDxe073aPYFnKQZliOd5HrpuBJmkHn3ewFvm45+qsS2xEW0LRpcwKOsK/+OeVflET
-         YjBweFkxsKiJXOw/Zhoczq3H7JQbFzd1/QtnAvd7pxcmEZWgyO3mk+BuhOiTBx+mdvEw
-         9uyw==
+        bh=wcjk2h/iH/KoUml+g/8LwbeRmveLqJ+O9vO+r1w3P5A=;
+        b=HnyFN48kQhMergWAlV2RUofNQKxD5sAhSaH1uBDbgKappTt1GIZFGS2S464cUwyP4i
+         bYTQK7j/t3NBYOIW/jbkNrXykufdvEzsbspk6Ai9jIOy9G6L5eSVy5wTbFo8TFyhmucf
+         n2cE066GRyzfPqoY8862FP7LXdb6R+PfoLqtFkB+5OSH7QzofBHnVazh0qATZu8MKGjD
+         0WqY8S9jYrySslXUK9fA4eeF+xzrT7L1t9WH94QtQRlIzRA01hZQ46vfsVrmdeG8uE67
+         +7+6rtHyouXxpmgIB/5zm+N0plv0ohLOW7Z17nClxPoKngkR9VCtX2R9kRYqmK7YXVsM
+         ss8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724710439; x=1725315239;
+        d=1e100.net; s=20230601; t=1724710445; x=1725315245;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Oa9FJlzpzEnTWXFf9+QlmwJ5wNhi6ZIyOsCW5VlVcQA=;
-        b=cc1MuxoXuLZilsSXPkH2Fp7WAuDS2fWzGtdKFIcnmoNocwJZCx6kQqXrRbEqenx7oa
-         qpFrb+LiUHztnsM3oT7wkieURatOR+Zw5tAmg8/FOFv+TDcgr3mpErKdXFnIixMN8WK/
-         7mZ18w8NQ5hrOmKHBSSx1DH4oaaGLjFXcU9sOtXqww+8BWFr/BA2oJDeKOHW0Hyvdybs
-         /uxVd+rQdumgIV4aLkyUdfn1bBm0ZebceFUDaGJ5qHCv6sO8roaXq8OrGsiSr7xhr6Jx
-         /2iGp5D3Mbg6ICLZz4kZbfV+74gmlQDomUkLtn/HqC0NFwYknakKFL9FPssmz2cnBGzr
-         vW1g==
-X-Forwarded-Encrypted: i=1; AJvYcCVn8afaxS7qekPq0nT+X24fa9xOdnErmwz3Hchd4gjH1enCY70fp1Mk7klmhx6HchH/hnQOQshP@vger.kernel.org, AJvYcCXeMqMtVBKDAqYnnkdjzR6LGvWGYv6Nq2yxzqs8J+mFD2EIz/zeU/iGSdP43IwOyg+1Yek=@vger.kernel.org, AJvYcCXqA4TiLVD8esLjoh3vumdS3BcbMCEk1dcoNKRfvdc3fgGkQ08QAZMJY93zhaAyhIMrwJpgTalnKBgwi2nv@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvXRto1yYcCUKDaeMYBVZwsbacC4QIYq4FV/hS+bMFVPQfSLeF
-	2GuTnzVn1rcoNU79UV2+euqk4Kgm2UdtiduVzT6ARXTuZNsB6PxS
-X-Google-Smtp-Source: AGHT+IHRivxmUJjWFXCXdqLJ6mTW1JWGSc+v7TGL/GmPmcwd8ggh0Nkc8m0JxdSTqTbYcI1ZhbAdWQ==
-X-Received: by 2002:a05:6102:50a6:b0:494:2c2:e2c6 with SMTP id ada2fe7eead31-498f4b3636bmr15112941137.7.1724710439549;
-        Mon, 26 Aug 2024 15:13:59 -0700 (PDT)
+        bh=wcjk2h/iH/KoUml+g/8LwbeRmveLqJ+O9vO+r1w3P5A=;
+        b=LtYyd6me5JQ6w8wnO8SWPZS8ySo+ouLpx2SMBQUdu0O2sbATJfPMkvYl1/HkZYCMfv
+         eYux9McmVu+jaD88knUFT14BXps/uJsATUfI8D3iBj2Nv0fMOWr/ZpAJVkV6USNLGKO6
+         G8nGPR2LdS3EKcZpQK9cvQW0UVBdLy6qOuWxXUwFrowCK9ZEZILfbNVIBHvIcQbthgTX
+         SzA4A0Bqtv1ZuMIjlPbUAAFjhomRopph68RsiMk8Cawit+llyTMaMJ11LASgXr4zIp4a
+         DcPHi1prmsw7pGqhFesJMtLZRNnnr0SnS9Q+O7RvHEBrF2+93yC7dBajlTvZXhTAfpqJ
+         oGqA==
+X-Forwarded-Encrypted: i=1; AJvYcCVbiT4X9rHRGx6RHBUcFjcrbMvL2FgctKjMwzM1xOwaWqW+0gaVKMaZEV3/9Cd5E3BL4qyMJCmMKsPZ86Go@vger.kernel.org, AJvYcCWP+MEWI/6eRr0Enmso2O0uszFtSONg1wfSuk7PaDhmLVBo21CCrJPIpNyoe8/299YJBbLjp7UH@vger.kernel.org, AJvYcCX9ehwKYWWZQsh4NDXHdcHom3QPSz8+8wwHhCNdbXNg47NkVg+zE1HhmlNT3fA93sFJ/NQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxemoaN8d4lC3mNosqC2ZrJIoVlLw9fry3DTwrNvSekuV4u7Mqe
+	y73ogQk0GNgpdgRwVjTRadV2MkDCQFyaAXEPwyaoAm+hK6pUrkr5
+X-Google-Smtp-Source: AGHT+IGjYlpIJZH+Sbpr6xRxOkDH5ZQYnxPANTXa2LX4x4yBhPNp39fud0oj76DMSz1wxbwmW6J2mA==
+X-Received: by 2002:a05:6122:7d1:b0:4ef:53ad:97bd with SMTP id 71dfb90a1353d-4fd1a5106fdmr13792427e0c.3.1724710444811;
+        Mon, 26 Aug 2024 15:14:04 -0700 (PDT)
 Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-498e479a7bcsm1416446137.4.2024.08.26.15.13.58
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4fd0838111dsm1020351e0c.50.2024.08.26.15.14.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 15:13:59 -0700 (PDT)
+        Mon, 26 Aug 2024 15:14:04 -0700 (PDT)
 From: David Hunter <david.hunter.linux@gmail.com>
 To: seanjc@google.com
 Cc: dave.hansen@linux.intel.com,
@@ -82,10 +82,10 @@ Cc: dave.hansen@linux.intel.com,
 	shuah@kernel.org,
 	stable@vger.kernel.org,
 	x86@kernel.org,
-	Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH 6.1.y 1/2 V2] KVM: x86: fire timer when it is migrated and expired, and in oneshot mode
-Date: Mon, 26 Aug 2024 18:13:35 -0400
-Message-ID: <20240826221336.14023-2-david.hunter.linux@gmail.com>
+	Haitao Shan <hshan@google.com>
+Subject: [PATCH 6.1.y 2/2 V2] KVM: x86: Fix lapic timer interrupt lost after loading a snapshot.
+Date: Mon, 26 Aug 2024 18:13:36 -0400
+Message-ID: <20240826221336.14023-3-david.hunter.linux@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240826221336.14023-1-david.hunter.linux@gmail.com>
 References: <ZsSiQkQVSz0DarYC@google.com>
@@ -98,47 +98,70 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-[Upstream Commit 8e6ed96cdd5001c55fccc80a17f651741c1ca7d2
-From: Li RongQing <lirongqing@baidu.com>
 
-when the vCPU was migrated, if its timer is expired, KVM _should_ fire
-the timer ASAP, zeroing the deadline here will cause the timer to
-immediately fire on the destination
+[ Upstream Commit 9cfec6d097c607e36199cf0cfbb8cf5acbd8e9b2]
+From: Haitao Shan <hshan@google.com>
+Date:   Tue Sep 12 16:55:45 2023 -0700 
 
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Peter Shier <pshier@google.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
-Link: https://lore.kernel.org/r/20230106040625.8404-1-lirongqing@baidu.com
+When running android emulator (which is based on QEMU 2.12) on
+certain Intel hosts with kernel version 6.3-rc1 or above, guest
+will freeze after loading a snapshot. This is almost 100%
+reproducible. By default, the android emulator will use snapshot
+to speed up the next launching of the same android guest. So
+this breaks the android emulator badly.
+
+I tested QEMU 8.0.4 from Debian 12 with an Ubuntu 22.04 guest by
+running command "loadvm" after "savevm". The same issue is
+observed. At the same time, none of our AMD platforms is impacted.
+More experiments show that loading the KVM module with
+"enable_apicv=false" can workaround it.
+
+The issue started to show up after commit 8e6ed96cdd50 ("KVM: x86:
+fire timer when it is migrated and expired, and in oneshot mode").
+However, as is pointed out by Sean Christopherson, it is introduced
+by commit 967235d32032 ("KVM: vmx: clear pending interrupts on
+KVM_SET_LAPIC"). commit 8e6ed96cdd50 ("KVM: x86: fire timer when
+it is migrated and expired, and in oneshot mode") just makes it
+easier to hit the issue.
+
+Having both commits, the oneshot lapic timer gets fired immediately
+inside the KVM_SET_LAPIC call when loading the snapshot. On Intel
+platforms with APIC virtualization and posted interrupt processing,
+this eventually leads to setting the corresponding PIR bit. However,
+the whole PIR bits get cleared later in the same KVM_SET_LAPIC call
+by apicv_post_state_restore. This leads to timer interrupt lost.
+
+The fix is to move vmx_apicv_post_state_restore to the beginning of
+the KVM_SET_LAPIC call and rename to vmx_apicv_pre_state_restore.
+What vmx_apicv_post_state_restore does is actually clearing any
+former apicv state and this behavior is more suitable to carry out
+in the beginning.
+
+Fixes: 967235d32032 ("KVM: vmx: clear pending interrupts on KVM_SET_LAPIC")
+Cc: stable@vger.kernel.org
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Haitao Shan <hshan@google.com>
+Link: https://lore.kernel.org/r/20230913000215.478387-1-hshan@google.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Cherry-picked from commit 8e6ed96cdd5001c55fccc80a17f651741c1ca7d2]
+(Cherry-Picked from commit 9cfec6d097c607e36199cf0cfbb8cf5acbd8e9b2)
 Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
 ---
- arch/x86/kvm/lapic.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index c90fef0258c5..3cd590ace95a 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1843,8 +1843,12 @@ static bool set_target_expiration(struct kvm_lapic *apic, u32 count_reg)
- 		if (unlikely(count_reg != APIC_TMICT)) {
- 			deadline = tmict_to_ns(apic,
- 				     kvm_lapic_get_reg(apic, count_reg));
--			if (unlikely(deadline <= 0))
--				deadline = apic->lapic_timer.period;
-+			if (unlikely(deadline <= 0)) {
-+				if (apic_lvtt_period(apic))
-+					deadline = apic->lapic_timer.period;
-+				else
-+					deadline = 0;
-+			}
- 			else if (unlikely(deadline > apic->lapic_timer.period)) {
- 				pr_info_ratelimited(
- 				    "kvm: vcpu %i: requested lapic timer restore with "
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 87abf4eebf8a..4040075bbd5a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8203,6 +8203,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.load_eoi_exitmap = vmx_load_eoi_exitmap,
+ 	.apicv_pre_state_restore = vmx_apicv_pre_state_restore,
+ 	.check_apicv_inhibit_reasons = vmx_check_apicv_inhibit_reasons,
++	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
+ 	.hwapic_irr_update = vmx_hwapic_irr_update,
+ 	.hwapic_isr_update = vmx_hwapic_isr_update,
+ 	.guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
 -- 
 2.43.0
 
