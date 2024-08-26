@@ -1,193 +1,230 @@
-Return-Path: <kvm+bounces-25074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7378195F950
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 21:02:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4865995F996
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 21:23:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3276528402F
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 19:02:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC591C2218C
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 19:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9464199E9C;
-	Mon, 26 Aug 2024 19:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECAE3199234;
+	Mon, 26 Aug 2024 19:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NPhetXZS"
+	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="QoLu3gs3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2872C1993AD
-	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 19:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312DE1991AB
+	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 19:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724698889; cv=none; b=Sa/Pge/04zb19YrMKibN1Jkw/91HrSmkugQWEMnMuwU7K1BGEfT5W/ZQ2cpDVzST1yVh2cBxZjtRqfuTm/rZwvTnHjfT9Bwt/3pZpGJgMOJPQCZRUklxi1EDDk4dDglDvE3/QgDbC7b8+JnieAQAqIAATSwoSxW5RqhHTBjW38g=
+	t=1724700182; cv=none; b=D8bLIfamHUjITdzxNrJ6M03SOY0R6Dmh5jOefujx7q6zHRkKZOvfiqf7qcAJ/1VsPgmFhPfLYhVPig8TB6Dh+Z2QZoCDMDAGPVCuYfOOR8Pdcq8LahYNzGxxLVQaGI9D043tq7A6JOltrG4VvC2WSHtPXwEwbEUgrtn/+B5B6BI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724698889; c=relaxed/simple;
-	bh=Lk53fKPoiIBMswuBHQk1iCnTGbDOOstP2qQpL1OIsUI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ULOXG8mE3HpenzeoqJf7veEggrGvSLqzxq1qvcOhMWvNTnm3WkQQBAVxu+Lnk3l2z6kFZPLX4IoVd6VrPncjnj3N+XlgEdizF9HmAzKUps9pA9+Zxepr5DoDrQbIc56l0pdWWmzUMeqn3CDoNv7a0DGAa8hHTi13FFOTo4jjzJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NPhetXZS; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6b991a4727eso84730497b3.1
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 12:01:27 -0700 (PDT)
+	s=arc-20240116; t=1724700182; c=relaxed/simple;
+	bh=tDJNUr27zxTQ4SUunjdZ0ylIYlgXCyM8c00NYRgGDuw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j6Xa7xytuRgjBWxYzKZwxFahyffvrjvbfNPRNQh7VyEexT61nON7lL0r3n4A/9yE3u2E8XF0jcvQaUM/hqtGBPOFf+zCvlp/9Te+849NaiBv2wjoHOWeZ57A8T9LS4CC9+pAkyGLfpBLlNgKdyBJWJKn2cIyGlCQ5zAV/2CVqpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=QoLu3gs3; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6b44dd520ceso45465637b3.0
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 12:22:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724698887; x=1725303687; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=wlfMvk8YP/kQvzhrtnMiI9Fgfb/TBne1V0LIqcoAt2M=;
-        b=NPhetXZSynFxAM425vnGM2I3fircKnodtaPlREK1cFYXm8VkYZ6xIgqi/wai2M3LuC
-         /iVK34TFwAn1DKHry+LPTWj6/EeepiqAmiBzfuG5mQo8U2uMeimA6xyiFawCMSGKh+Cp
-         WB3aynb59QgIM7fN8cb4WbbWo9fb/DExtEykCSNJFxk5OhS7Yx/ZE8ZGtRxGmJp2jbHa
-         fROgvXdL1QLrg21n0kKXB8AAYaTQrrp+BxMn/6elHH7z3I2OC0PC24qxkv5c4yygQ3eG
-         95qBBq/yh80M2UCuQ75R1e5Q9Ga9mPz5U+cfyyppvrhsYqo3JVZuTSwPz3rQ0KD5vcd/
-         XX7g==
+        d=digitalocean.com; s=google; t=1724700179; x=1725304979; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F6LqBt/cgf5saFNqougCditEz5JCrr5uJaPi0WKZXWo=;
+        b=QoLu3gs3omZpy7j6KkBNyUm3+qvqE79ETW/WoWzgFM8DpjcC/stY01owVBqrrG06R/
+         yazR1E8Rqfcixds5QsYgnvSLwJzTyPsIggAjENAfUqBaEGfrXmOOkqOzw5ZPsNAx64rL
+         W6dHYp2+kE2q8Ax+/bEvzlIYDX27IUqWBJKkA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724698887; x=1725303687;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wlfMvk8YP/kQvzhrtnMiI9Fgfb/TBne1V0LIqcoAt2M=;
-        b=kDLTTYUowoshkY9Y1oaPTfD3bhsLaIU4qyUvVDwEyeBTPO/MF6AtlH1DdBnnvnBTiq
-         TlWLGeGCfMxyGzXr3fybJgu81rUUmuXFHksmedsKQBlH9IYQaX+lBa1hSkG+XfKA5cLL
-         gQo6kbNl4StfbJOH84MgMGoPcWCznO3mtx2kWGyUDgWZSj3bK3zR4/y1Bf5OuDtyYpRg
-         WjFaYoRb8nfxNq52bMarA9Pr4TfTKjbDuzWUqTuIrarZjHhavxC+4KuUBb+Elfu86UKR
-         iJxEUkozBmHbI4pNGJ8Afnuh+6yx/KihbNOk84DrKYuUJ/gadWqRpBVSvQ4sV/egs5eW
-         okSA==
-X-Gm-Message-State: AOJu0YxW6DPNcaHVRrvfoDgduL/0Ac0mb/5UKh5O1zcYIfXAAdoVcG2f
-	QGmc0X5Z5ZIluDnaS8xvvRsnlzQbDl5lVKjV3ILUgvHf+JSozMDuD8UCS7LlGrlHm/tJkq36iUP
-	5Qw==
-X-Google-Smtp-Source: AGHT+IEBA6sQPWzAdi8CzCDBzNF24Q7LCGUPm+EBp+JckJEMXbI5RjdBt7EA/qQscaFI/JvHbD6L23p5ztg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:fc0d:0:b0:e0b:f69b:da30 with SMTP id
- 3f1490d57ef6-e1a2a9430d2mr615276.9.1724698887108; Mon, 26 Aug 2024 12:01:27
- -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 26 Aug 2024 12:01:16 -0700
-In-Reply-To: <20240826190116.145945-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1724700179; x=1725304979;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F6LqBt/cgf5saFNqougCditEz5JCrr5uJaPi0WKZXWo=;
+        b=uxaC4DG9a/iY3hLfSsqQgoBuAWkNwOXzZ+0QVm37q81EN+OW5tsWodR3/orKUodGWW
+         FAsoSsZSXkTC79Cc1KZNTRaPn36yMb+fbgTDwXlmID/QK2ba3dpwy7mjn88pINQ79i9o
+         x94T56pPbIDJzOwoTlyvBJeiwEZNNKv+eUA/SZ2bOvst0YJ0YsEnlClFX7v+SAp6Pf89
+         AfBJ5pPwSO4A5NfpD6Lgp7bRUodz5cP6ImMJAkSmW6WGN9eA9L1lsDbGmV3U50uplxzZ
+         gq5POq0XDckWUyp1ydR99HAWaXchcVEfGha73j0UIK+GNSEi4ZL9xwDk2hno3Ri27+Oy
+         reqg==
+X-Forwarded-Encrypted: i=1; AJvYcCXzag4OmAKglQ9jHV/y9gFbD4yxVHOPdNGMWwvrXWCHzrexwwJkpugLZrdewGxOfAPW7Cs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCmUrqYEi/etkhYW//iC5oZsoc02KxsPled8yt3ysc590eI+3l
+	zuL7sfWoicD9bX9Ks6PRhto0V9ef54iFzByv9lZi4FiwJ6GjjnO8YEzblKBXWY4=
+X-Google-Smtp-Source: AGHT+IENvO39dZD8SM8XQUS6jkNMVVXZUu4Li0XJ01QpUNqrH5VA9EYbqM15qZGvjmYzMuTP3QTLBw==
+X-Received: by 2002:a05:690c:1d:b0:664:5957:f7a with SMTP id 00721157ae682-6c624dca095mr146931867b3.15.1724700179081;
+        Mon, 26 Aug 2024 12:22:59 -0700 (PDT)
+Received: from ?IPV6:2603:8080:7400:36da:45f:f211:3a7c:9377? ([2603:8080:7400:36da:45f:f211:3a7c:9377])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6c39d3a9a93sm16400567b3.89.2024.08.26.12.22.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Aug 2024 12:22:58 -0700 (PDT)
+Message-ID: <1cb17652-3437-472e-b8d5-8078ba232d60@digitalocean.com>
+Date: Mon, 26 Aug 2024 14:22:57 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240826190116.145945-1-seanjc@google.com>
-X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
-Message-ID: <20240826190116.145945-4-seanjc@google.com>
-Subject: [PATCH 3/3] KVM: selftests: Override ARCH for x86_64 instead of using ARCH_DIR
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Sean Christopherson <seanjc@google.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
+To: Dragos Tatulea <dtatulea@nvidia.com>, eli@mellanox.com, mst@redhat.com,
+ jasowang@redhat.com, xuanzhuo@linux.alibaba.com
+Cc: virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com,
+ sashal@kernel.org, yuehaibing@huawei.com, steven.sistare@oracle.com
+References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
+ <afcbf041-7613-48e6-8088-9d52edd907ff@nvidia.com>
+ <8a15a46a-2744-4474-8add-7f6fb35552b3@digitalocean.com>
+ <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
+Content-Language: en-US
+From: Carlos Bilbao <cbilbao@digitalocean.com>
+In-Reply-To: <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Now that KVM selftests uses the kernel's canonical arch paths, directly
-override ARCH to 'x86' when targeting x86_64 instead of defining ARCH_DIR
-to redirect to appropriate paths.  ARCH_DIR was originally added to deal
-with KVM selftests using the target triple ARCH for directories, e.g.
-s390x and aarch64; keeping it around just to deal with the one-off alias
-from x86_64=>x86 is unnecessary and confusing.
+Hello,
 
-Note, even when selftests are built from the top-level Makefile, ARCH is
-scoped to KVM's makefiles, i.e. overriding ARCH won't trip up some other
-selftests that (somehow) expects x86_64 and can't work with x86.
+On 8/26/24 10:53 AM, Dragos Tatulea wrote:
+>
+> On 26.08.24 16:26, Carlos Bilbao wrote:
+>> Hello Dragos,
+>>
+>> On 8/26/24 4:06 AM, Dragos Tatulea wrote:
+>>> On 23.08.24 18:54, Carlos Bilbao wrote:
+>>>> Hello,
+>>>>
+>>>> I'm debugging my vDPA setup, and when using ioctl to retrieve the
+>>>> configuration, I noticed that it's running in half duplex mode:
+>>>>
+>>>> Configuration data (24 bytes):
+>>>>   MAC address: (Mac address)
+>>>>   Status: 0x0001
+>>>>   Max virtqueue pairs: 8
+>>>>   MTU: 1500
+>>>>   Speed: 0 Mb
+>>>>   Duplex: Half Duplex
+>>>>   RSS max key size: 0
+>>>>   RSS max indirection table length: 0
+>>>>   Supported hash types: 0x00000000
+>>>>
+>>>> I believe this might be contributing to the underperformance of vDPA.
+>>> mlx5_vdpa vDPA devicess currently do not support the VIRTIO_NET_F_SPEED_DUPLEX
+>>> feature which reports speed and duplex. You can check the state on the
+>>> PF.
+>>
+>> According to ethtool, all my devices are running at full duplex. I assume I
+>> can disregard this configuration output from the module then.
+>>
+> Yep.
+>
+>>>> While looking into how to change this option for Mellanox, I read the following
+>>>> kernel code in mlx5_vnet.c:
+>>>>
+>>>> static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
+>>>>                  unsigned int len)
+>>>> {
+>>>>     /* not supported */
+>>>> }
+>>>>
+>>>> I was wondering why this is the case.
+>>> TBH, I don't know why it was not added. But in general, the control VQ is the
+>>> better way as it's dynamic.
+>>>
+>>>> Is there another way for me to change
+>>>> these configuration settings?
+>>>>
+>>> The configuration is done using control VQ for most things (MTU, MAC, VQs,
+>>> etc). Make sure that you have the CTRL_VQ feature set (should be on by
+>>> default). It should appear in `vdpa mgmtdev show` and `vdpa dev config
+>>> show`.
+>>
+>> I see that CTRL_VQ is indeed enabled. Is there any documentation on how to
+>> use the control VQ to get/set vDPA configuration values?
+>>
+>>
+> You are most likely using it already through through qemu. You can check
+> if the CTR_VQ feature also shows up in the output of `vdpa dev config show`.
+>
+> What values are you trying to configure btw?
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Yes, CTRL_VQ also shows up in vdpa dev config show. There isn't a specific
+value I want to configure ATM, but my vDPA isn't performing as expected, so
+I'm investigating potential issues. Below is the code I used to retrieve
+the configuration from the driver; I'd be happy to send it as a patch if
+you or someone else reviews it.
+
+
+>
+> Thanks,
+> Dragos
+
+
+Thanks,
+Carlos
+
 ---
- tools/testing/selftests/kvm/Makefile     |  4 +---
- tools/testing/selftests/kvm/Makefile.kvm | 20 ++++++++++----------
- 2 files changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a9c1d85905d8..30b1a88aea2e 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -6,9 +6,7 @@ ARCH            ?= $(SUBARCH)
- ifeq ($(ARCH),$(filter $(ARCH),arm64 s390 riscv x86 x86_64))
- # Top-level selftests allows ARCH=x86_64 :-(
- ifeq ($(ARCH),x86_64)
--	ARCH_DIR := x86
--else
--	ARCH_DIR := $(ARCH)
-+	ARCH := x86
- endif
- include Makefile.kvm
- else
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 27f4e100c6ac..c8bfd0815a57 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -197,10 +197,10 @@ TEST_GEN_PROGS_riscv += steal_time
- SPLIT_TESTS += arch_timer
- SPLIT_TESTS += get-reg-list
- 
--TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
--TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
--TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
--LIBKVM += $(LIBKVM_$(ARCH_DIR))
-+TEST_PROGS += $(TEST_PROGS_$(ARCH))
-+TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH))
-+TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH))
-+LIBKVM += $(LIBKVM_$(ARCH))
- 
- OVERRIDE_TARGETS = 1
- 
-@@ -212,14 +212,14 @@ include ../lib.mk
- INSTALL_HDR_PATH = $(top_srcdir)/usr
- LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
- LINUX_TOOL_INCLUDE = $(top_srcdir)/tools/include
--LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH_DIR)/include
-+LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
- CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
- 	-Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCONFIG_64BIT \
- 	-fno-builtin-memcmp -fno-builtin-memcpy \
- 	-fno-builtin-memset -fno-builtin-strnlen \
- 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
- 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
--	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
-+	-I$(<D) -Iinclude/$(ARCH) -I ../rseq -I.. $(EXTRA_CFLAGS) \
- 	$(KHDR_INCLUDES)
- ifeq ($(ARCH),s390)
- 	CFLAGS += -march=z10
-@@ -258,7 +258,7 @@ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
- LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
- LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
- SPLIT_TEST_GEN_PROGS := $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
--SPLIT_TEST_GEN_OBJ := $(patsubst %, $(OUTPUT)/$(ARCH_DIR)/%.o, $(SPLIT_TESTS))
-+SPLIT_TEST_GEN_OBJ := $(patsubst %, $(OUTPUT)/$(ARCH)/%.o, $(SPLIT_TESTS))
- 
- TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
- TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
-@@ -267,7 +267,7 @@ TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
- TEST_DEP_FILES += $(patsubst %.o, %.d, $(SPLIT_TEST_GEN_OBJ))
- -include $(TEST_DEP_FILES)
- 
--$(shell mkdir -p $(sort $(OUTPUT)/$(ARCH_DIR) $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
-+$(shell mkdir -p $(sort $(OUTPUT)/$(ARCH) $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
- 
- $(filter-out $(SPLIT_TEST_GEN_PROGS), $(TEST_GEN_PROGS)) \
- $(TEST_GEN_PROGS_EXTENDED): %: %.o
-@@ -275,9 +275,9 @@ $(TEST_GEN_PROGS_EXTENDED): %: %.o
- $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
- 
--$(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH_DIR)/%.o
-+$(SPLIT_TEST_GEN_PROGS): $(OUTPUT)/%: $(OUTPUT)/%.o $(OUTPUT)/$(ARCH)/%.o
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
--$(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH_DIR)/%.o: $(ARCH_DIR)/%.c
-+$(SPLIT_TEST_GEN_OBJ): $(OUTPUT)/$(ARCH)/%.o: $(ARCH)/%.c
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
- 
- EXTRA_CLEAN += $(GEN_HDRS) \
--- 
-2.46.0.295.g3b9ea8a38a-goog
+From ab6ea66c926eaf1e95eb5d73bc23183e0021ee27 Mon Sep 17 00:00:00 2001
+From: Carlos Bilbao <bilbao@vt.edu>
+Date: Sat, 24 Aug 2024 00:24:56 +0000
+Subject: [PATCH] mlx5: Add support to update the vDPA configuration
+
+This is needed for VHOST_VDPA_SET_CONFIG.
+
+Signed-off-by: Carlos Bilbao <cbilbao@digitalocean.com>
+---
+ drivers/vdpa/mlx5/net/mlx5_vnet.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+index b56aae3f7be3..da31c743b2b9 100644
+--- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
++++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+@@ -2909,14 +2909,32 @@ static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset,
+     struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
+     struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
+
+-    if (offset + len <= sizeof(struct virtio_net_config))
++    if (offset + len <= sizeof(struct virtio_net_config)) {
+         memcpy(buf, (u8 *)&ndev->config + offset, len);
++        }
++        else
++        {
++            printk(KERN_ERR "%s: Offset and length out of bounds\n",
++            __func__);
++        }
++
+ }
+
+ static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
+                  unsigned int len)
+ {
+-    /* not supported */
++    struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
++    struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
++
++    if (offset + len <= sizeof(struct virtio_net_config))
++    {
++        memcpy((u8 *)&ndev->config + offset, buf, len);
++    }
++    else
++    {
++        printk(KERN_ERR "%s: Offset and length out of bounds\n",
++        __func__);
++    }
+ }
+
+ static u32 mlx5_vdpa_get_generation(struct vdpa_device *vdev)
+--
+2.34.1
+
 
 
