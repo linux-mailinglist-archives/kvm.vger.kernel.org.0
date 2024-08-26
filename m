@@ -1,259 +1,246 @@
-Return-Path: <kvm+bounces-25057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25058-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 234E895F544
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 17:38:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0545195F59E
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 17:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DD681F22751
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 15:38:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B74A1F22BF9
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 15:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC88193416;
-	Mon, 26 Aug 2024 15:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA1FB1946A2;
+	Mon, 26 Aug 2024 15:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UrMMyaLz"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TAFJaw25"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2077.outbound.protection.outlook.com [40.107.223.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E50153812;
-	Mon, 26 Aug 2024 15:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724686723; cv=none; b=fuYeKXVk0jR9RuH5fGoQG9O4Fv4ydM5RBWeJHx3tXtUgeWcZpO4CoZ73vjQYB+oSK4UP4M6vLQN/2K+yOye6gLrjNMXKiWDyi8jkdpGBGpYAQ9vSH+KWhOPPLZ02sJmLqqSe40NUPPPRyEATH4V6l4Ip0DgNIn+3sCfAhB27XhU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724686723; c=relaxed/simple;
-	bh=reqE2nlzaPtBX5zRYpjXeyzr7y7rrdXASpCd2pGylKs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QGT1YFJY7D0olSYfaCfhUHg+S+xdVo4OBUI7pXXxlGl6VGsFagDvHjLTJ3OKFWxOkRutDjmhXsDZGh0ywcyRN0ymD7bnHhqd3+Bc7W86QAxx/Rr26xUmbVoKBwjaxOrMFbUdX060dmi/p+MwKh3mVekMjMNqvXP9br8vuUzdVFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UrMMyaLz; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724686721; x=1756222721;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=reqE2nlzaPtBX5zRYpjXeyzr7y7rrdXASpCd2pGylKs=;
-  b=UrMMyaLztBMBy2MxIVAysBrtLe+I+zYVIXSf61a33+O9omK2rf4S88Ha
-   p4GLo4IVXOsIEV6/WULOEaTR4QHav1YsypxGVhD2sktTEwcZtMvG5J4VB
-   cA+d+GzoVVE7jBZIktp/q834ixqGt/kf7yFTQagPPpi83UuJnYB1UgMba
-   daJUGk0X5WYmJWcNHDfnXpsaaf4ndBVQVN0rLkPcladh6e0PLHx+C2U0g
-   Z4dm+VRqEMMnWxyvROYQCqYEMQBD2MXJSkabXvZrxOuYYKQv8n40EZVeF
-   nTJUlq+jKs4AapOxv3xpR6OxhQxsqulBPbxcBITdgSIrfPjXD6K6/r4/Y
-   w==;
-X-CSE-ConnectionGUID: zTQ37vPoQ7G7zCt5Vz9uBg==
-X-CSE-MsgGUID: aq6UloJ+Q96MS7DbX7ioxg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="34275443"
-X-IronPort-AV: E=Sophos;i="6.10,177,1719903600"; 
-   d="scan'208";a="34275443"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 08:38:41 -0700
-X-CSE-ConnectionGUID: W6pplc1lSGKmzafFv+bB0w==
-X-CSE-MsgGUID: n5D4oaD2SBCYw6yCXYgRqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,177,1719903600"; 
-   d="scan'208";a="62542822"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.246.0.178])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 08:38:34 -0700
-Message-ID: <a107b067-861d-43f4-86b5-29271cb93dad@intel.com>
-Date: Mon, 26 Aug 2024 18:38:28 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FAE145B1D;
+	Mon, 26 Aug 2024 15:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724687639; cv=fail; b=QpVwd+5xRnQDZgOXSVOoa0LTkE0pNkt86dzbsaO4P3HFBBpJvL74ZFB2i68A1WfNAJik01mxxORinhkyvtGciYCHhZpRUasYEtsNjptF0Nu6It1i+MD0nmSI3HSc2Dvfwvj4/xNTeqvegWg2E7zahLDy8VYbtDlZDEIo5T7h5nE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724687639; c=relaxed/simple;
+	bh=FdFn0bys+BjcAl0p272kphb/gXWPwVCP9oKJGjkT6n8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=lnpc2IUalW5LZVKq/mAytcHkTh1qVXuMEQW0GQ696DyIRfNlTOtMuxCwq/SBLoUUvnyRtKCXkoIdikE1aLGq5nCclwRDy1onyqhrW37VvYxVBtyxL/l2N8Us4DlWPZVLynOAtv8QiHWiu25txMW9LH3fA1wpnX/bKq0R9wPAdjw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TAFJaw25; arc=fail smtp.client-ip=40.107.223.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HMsROeDB+vouVYVRdZQ9Ua0I5QVjjst/PucItOxmmQaqJmTRzEpZU/EsSoYTXaUl9UOTQjdI2d+rzkQLJv6BBztHzGQ974BgN10fB9BDj6rXAB/EDPHnCAPNPFzcHjP5WIdepYFRZG4uCcdOVZZu72YSm/OuJzbMhU1TQeAfXGeLn9l6yl+I4C1eylpVaGj/DW6Z8Vp0IpjVud4Sw1iMNMT1tV8vwrlGrYDrLIW5T+Aue4j1MT9FZ+7W/hbQ4h1BnExe0lG4e17Md/M8O784pNR6N1i48qWyxFVMMT1+ZI1OEI31Q5Dv8csaKQciLoq8qQvtnZ5l1HK/i07j1QBJuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YtYigxZYCTWOeVSVD2jPZOAHnw05tYsFTxZpAdwO9Tc=;
+ b=Q62QpTBXY3poGFKt1nrIXAfNdiP3dEbLOxQEJdlI1lGNpbJu3hHjElzNIH9Y0YJ3enYjPORhVwc+4EJ4lpHacLyUvnedlibL2aUn6rh182T6U3jx5HIxle5eAHGf4Qnbj39mCCrACxp0GMRzO+v0uAeBriH92sT8E5QthI3+phSiA5h4+kKLcfPipwo97SVQCFe8kkca33xS6gFe7B0/2zz+ESK9xlyUXl6ueFi2NYDud44vJIaPk+WydPkny/vgkftJ1slqapjs76MeMOlKdvCtNmabufnQBcqJouLkBGq/aZneXYzmI9NXpVsxdZk3L2zRu36NvI+mhgspTq/4Fw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YtYigxZYCTWOeVSVD2jPZOAHnw05tYsFTxZpAdwO9Tc=;
+ b=TAFJaw25JZDntK7T+Awr5juvsiMipGq4BE+KLd96ja8QuzfwmeY9UX6ogSIvobvNY4bZhqf7dFmac4K0kI0GziuHetnY1iX6JiCuoXa7GJ8D39eE9WF9fpBrVzcdszOD+6grndjJBiisxsvJSPLri+GZAH639znNtiVPyxHqrjrs0VeN3SRxuOznuq/etvVf+NPR7imHrzXBD4b1HFH8AXwyx8FVnPVoAvALZxzABPcDjWbJmm8o4tG/lrxssOfOVye1bC5vswhcTE5rrRbTPsxYPIDoUVbzHKhn1r/0PpKQCdSOAX9zZ/9BCWjjUuzD5w/GztyPazA4f5WHcYUqnQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8297.namprd12.prod.outlook.com (2603:10b6:930:79::18)
+ by IA1PR12MB8190.namprd12.prod.outlook.com (2603:10b6:208:3f2::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Mon, 26 Aug
+ 2024 15:53:53 +0000
+Received: from CY8PR12MB8297.namprd12.prod.outlook.com
+ ([fe80::b313:73f4:6e6b:74a4]) by CY8PR12MB8297.namprd12.prod.outlook.com
+ ([fe80::b313:73f4:6e6b:74a4%5]) with mapi id 15.20.7897.021; Mon, 26 Aug 2024
+ 15:53:53 +0000
+Message-ID: <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
+Date: Mon, 26 Aug 2024 17:53:48 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
+To: Carlos Bilbao <cbilbao@digitalocean.com>, eli@mellanox.com,
+ mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com
+Cc: virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com,
+ sashal@kernel.org, yuehaibing@huawei.com, steven.sistare@oracle.com
+References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
+ <afcbf041-7613-48e6-8088-9d52edd907ff@nvidia.com>
+ <8a15a46a-2744-4474-8add-7f6fb35552b3@digitalocean.com>
+Content-Language: en-US
+From: Dragos Tatulea <dtatulea@nvidia.com>
+In-Reply-To: <8a15a46a-2744-4474-8add-7f6fb35552b3@digitalocean.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0275.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:e6::17) To CY8PR12MB8297.namprd12.prod.outlook.com
+ (2603:10b6:930:79::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 02/10] x86/virt/tdx: Unbind global metadata read with
- 'struct tdx_tdmr_sysinfo'
-To: "Huang, Kai" <kai.huang@intel.com>, "Hansen, Dave"
- <dave.hansen@intel.com>, "seanjc@google.com" <seanjc@google.com>,
- "bp@alien8.de" <bp@alien8.de>, "peterz@infradead.org"
- <peterz@infradead.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "mingo@redhat.com" <mingo@redhat.com>,
- "Williams, Dan J" <dan.j.williams@intel.com>,
- "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>
-Cc: "Gao, Chao" <chao.gao@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "Yamahata, Isaku"
- <isaku.yamahata@intel.com>
-References: <cover.1721186590.git.kai.huang@intel.com>
- <7af2b06ec26e2964d8d5da21e2e9fa412e4ed6f8.1721186590.git.kai.huang@intel.com>
- <66b16121c48f4_4fc729424@dwillia2-xfh.jf.intel.com.notmuch>
- <7b65b317-397d-4a72-beac-6b0140b1d8dd@intel.com>
- <66b178d4cfae4_4fc72944b@dwillia2-xfh.jf.intel.com.notmuch>
- <96c248b790907b14efcb0885c78e4000ba5b9694.camel@intel.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <96c248b790907b14efcb0885c78e4000ba5b9694.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8297:EE_|IA1PR12MB8190:EE_
+X-MS-Office365-Filtering-Correlation-Id: a3389f60-d84a-4fa5-8b5b-08dcc5e74927
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WWFheTU5dkR0Nk91UEJYNXRJbDdFTnYyTzJCZmppZXBsN1BmZUhXSUo4WkZN?=
+ =?utf-8?B?V0VVL1c5K1BUd2FGbnYrRDhycG9QbmN2SzZHOUN1alFsM095Qzlxd09DUHBx?=
+ =?utf-8?B?dktoQmJPNGplMzJQZTBjNkl6OHVwTXc3S1AraVFFc3p6c0cwQ1NJRVNONzhx?=
+ =?utf-8?B?dHMrSjc2NlRsRnVJd1hJdWs4eTBydDMweHM5Y0hNK0RVVlAwUWs2bzFpbHMz?=
+ =?utf-8?B?bTlBTnhCOHdBWXpKKzllYk55VFpObk1IU2w4a2tyT0w5YUhwaGpCNUk4RVk2?=
+ =?utf-8?B?UVo5N3dTZUhmSFhNRVNXQ3Z1Mkl5TDQ3eitTZEo1V1RtQ0Q3OVRpaEhoblV1?=
+ =?utf-8?B?Q24zUzFHbWwyakVBV1U3aDJMcmVsNGVIVDVwMmY3QndrQzNpUTVkK0JJMjY5?=
+ =?utf-8?B?UWlEWk5mRE8wblB3azZKN2N4VkptWk1leHlOOWhEcXFHczk1aTZmcXFidldl?=
+ =?utf-8?B?SlNuanl1YnIzd0MrRWxBZThNeWthd0cyVW4rV1pZR1hWOXZpOE5kcTVrcVRm?=
+ =?utf-8?B?TzVycWorelJHOEszN3pybGl0QTl6Y2lrQkVnODdxdFMxYlRoWEJYZEFOZjRp?=
+ =?utf-8?B?QkVJY2EwS0VTblJ1NHVRMERWSHRIZXJFOWxqTFB3aGVDU1BDbXpPZmJCbWJU?=
+ =?utf-8?B?YXd3ajRaaVkvVDhEUi9kZFcwMng3clV4K0V4emJCTGJ0NWNhRStETmh4SjVH?=
+ =?utf-8?B?UWtaMkgzRWNQVjl1TTlUZlhwWWpDQ3hpQlNvR1NHcDN0aGdVVW4rY0xnbk85?=
+ =?utf-8?B?d2NTVitOemVua09PY255ZlhTQUpVY2x6b2ZSYkFCclBENHRtaU9Dd09YZktz?=
+ =?utf-8?B?MjJXTEIrVVJRU0dZSmRUampjcFFjYmtpVEdacEFyV3FyeW0raFgxZUU2Q2lH?=
+ =?utf-8?B?b011K2ZjbTJjMEFIOTBHRjNnOUtESjhNVGZmOXlEY2N0RW00am5mNWtzRGd3?=
+ =?utf-8?B?d3ltWFF3WUpTZHhTK2hNdXRCdUM3WFpONUpEUUltczRvSXM1Z3FvV0gxRm8r?=
+ =?utf-8?B?dmh5TkJabEtaRDcyZmtIakFac3htclFyNzFpZG85c1RLY2NUVXE3U3RhZllW?=
+ =?utf-8?B?ZmdUWkY5VDB0N1hQWm1sYjR3VXBReWVsYUdjd215TGRVUzd4RlBTbkdWckVl?=
+ =?utf-8?B?QzBiQ2hDa1Y1cFQwd1FZK1VySEdRVVM0cFpFN3RxV2wrR0xHbm9zaExWQnZ4?=
+ =?utf-8?B?YzlzTFFKNy9RNFA1cWpCQnlaVnU0eng3RjVRYklLclNLdVgrdkYxNXZmbXZL?=
+ =?utf-8?B?VkJYWUxBb1V3V0l4K1cyeXBIc2N0KzIxWnZFWUN6MXVlQ21uNHFCWnplN2xK?=
+ =?utf-8?B?cTJUYmRwOHJMRVAranhnOGVNWGVTVkRtL01qdy9yQ3FVMHJCWHRWdDg4Rnln?=
+ =?utf-8?B?YXdONUlHN1ZpSFRLNXFMRkU1RWk2ZGNvRUNlS21jbktpSXI5blh5L1RYS2Z5?=
+ =?utf-8?B?VEo4b2dGYXBCU24rYk8rb3lNU3VkeFhmalZnc1lBQ3VuSkZXUGdMQWZrNzR3?=
+ =?utf-8?B?S2w5MmR4SHJDWnUrMDNmVVVJMjZUY2w2TERJNE9zZUJlYitKUllaSXpJWit4?=
+ =?utf-8?B?SE9FTTgrN0VzRU5kZmFZTTdNUWlzYW90cllFSkVsakpVOENPN3V1V0s5THlh?=
+ =?utf-8?B?K1FaTktnanc5a1FrVUpndlpEbWtTZlNZYXFwTnh3a2pjbHhvTFhoZDF4OENK?=
+ =?utf-8?B?Z0hLdHZuVS9vaTM4ZFYvMFdKcXZHbXdsNWpkM1czYXlmY05VM1lQRzVjTVBk?=
+ =?utf-8?B?Z0tybGt5eFBSeG5sRWNnbXlHNG9oYjRQbE44enJMdlZwaEc1aWNVc0d2aWhE?=
+ =?utf-8?B?bXJmRTB5SElxSWFrcWQydz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8297.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?akF3aW1tUHIyWXhONEpyMGFjVE1zbDAya3pWbFYvVWIxSlo3eHZYWDdsVUJ2?=
+ =?utf-8?B?UklyUnk0NDc0NWhNdWFGak8yOERSeEpvSEJtSTUrQlJySmk4VWlURFJLYzRk?=
+ =?utf-8?B?Mmp6QzdXajRrbnZkZTVNanVnSEhQa2hyOEsvMTUyWFdubHB5dnFINkwwbndH?=
+ =?utf-8?B?MWltOWpBYys0QmpqQ3luMzBlb3h3NE8wU0VCUWFNaVA4dFMrSFpxU3dhekRP?=
+ =?utf-8?B?cVN0QS9CM095dXVBd3pqc2NZZjduMmZQRHduR3ZORFZyb2dPRjc1cm1BTmkr?=
+ =?utf-8?B?UkFvbXhyUXFzNXNTUlhsMVlrd1lsQVVGNENCMGJXRlhhUTkycHRjdVJsZlJK?=
+ =?utf-8?B?d2s5TW5JSkFOa3JDM3BkRms2T09xekNkU01kOXBVdzZVTXY1VWx6L3V0TDVG?=
+ =?utf-8?B?dFRKRTNQMnIwczJFUURYK051ZlpwMHcxTEo0WW14SkhsczBpYVJFUVNqQWF4?=
+ =?utf-8?B?anNOWWdldU50SnBVdUEwUHNpN2pHNDd3RzQ5TTJ1dkxuSVJWc3NnbW9pOUdo?=
+ =?utf-8?B?S3RIVTBjd2hvbnUxRkM5a2tlZEE1cHplbjBSRm5OOWVDUlc3Q0lhMHkzUGN6?=
+ =?utf-8?B?bnFFSUtWcGpYV0tmTXZZVFE4L2xVQUpxYW85am9pNlRPaTFramE0NWpZNHN5?=
+ =?utf-8?B?TDMxUkNkeWZkcFBCSWZZaC9XYWc4ZktnOXZBb08wR0MyK2tWV1hFN3FCeEt0?=
+ =?utf-8?B?bXRBRkJNZ1A0dzBPT3Y2NmwreDVRajYyUXZkQ0NleTRQellET21aSlZnU1Vx?=
+ =?utf-8?B?UUtLeEFwbGdrV1NYa204OFVoYkk3UXlUcnNhUlY3MU96dmt5bnJEcHNlSXlU?=
+ =?utf-8?B?bUZNMlpwbmkrTUx5QXltbFlQenpraXlUdDVKT2hsd1A2aUhqU21xSHNBMU4y?=
+ =?utf-8?B?YkdreHBzRmwyNyt4alpvZEJsdFBUU3V0SXhOZTBhVXdUZGxDdGxWdEtURWJF?=
+ =?utf-8?B?NUdmSjIxNUVYQ2N1M0huTkNGdWt5czl0YUVuUHp3YytodTZGQjQ5Q0ZtNmxS?=
+ =?utf-8?B?Tkw5VDBpeE5OOXd1aXhsazhQSGJ4UE9lSzJ4RDNsUGltMTFrYUdBQTlXRHVG?=
+ =?utf-8?B?bjlwUlZiRHVPQWF4TDdnNjBlamMzelFMbDh0alI1MVBOTUhFcU80ZFVMVVoz?=
+ =?utf-8?B?dEVZMmRZZXcrbSt5cnFFdDZGOHBCQ2MyVllDYlZvQlZLUEUvaDhBNERpY1Z0?=
+ =?utf-8?B?ZGpvQ010ZTViVkNneFRUVDd3bk82bkpPZU1XNktPaVJyeW1rMHd3b0twQzQr?=
+ =?utf-8?B?ekV6SFJBYjVPaytDS1FCVUYzMGFaQXFqSXE5NEozYThHZWtlcHJwS1pybDFE?=
+ =?utf-8?B?eDM4STJYMWxnRHlVaTNYSDRHbWRwQXQ2bVJ5WUd2ZjZ3MjNZQyttNG01TlJl?=
+ =?utf-8?B?NEF1djdzcFZDcHdBTzFCY0lMRmNXY0F0YUJLdXlWOEdDeHlvWGVJWnJjNktj?=
+ =?utf-8?B?ZGJ1ZXVqSkRtSzFMWWRGYll4RWRiSFFWaGREZzVObGc0THZ1eFE3S2NkckFp?=
+ =?utf-8?B?cm9wQlZMQkdibWFhZTAvVWRNYkVBaGp0Z0hmUk9IcUw1Z2drUXFrSk9xU2Fq?=
+ =?utf-8?B?Tjc4WWpHbENqVi9YbW1COXNzU1NPTW9CdmZLYmZCeUVybXR5RmdQbm84anpK?=
+ =?utf-8?B?RlRNc2ZSMm9ZZXo1VHBTck91OExZbjRtVjZZYW5QeWxrUzVJZnIvb1VGdEw1?=
+ =?utf-8?B?ZVZCSmlrQ1VLdEVRZGhzUndVQ2lESzVpRWlUZGc4VW53d3JJd3JyRnQ4bmx6?=
+ =?utf-8?B?ZzFUTmJ6cDRzaytlT3BERzhFcjhlK1kxNkQ3Zm02WE5vdW5RUFZPcGFIMHV4?=
+ =?utf-8?B?bCsxME51clJka1BGQVFNZC9ON3dVVUo4TXVuL29FaGlJQmpCV3VsTHNxQlF0?=
+ =?utf-8?B?SWxERDlBWGRaQnNyeUphT25GZDIwS2F2OTVxeDlBWFQ1ZkN0aGxoOXYxeUMr?=
+ =?utf-8?B?aWc1b2l5ZWZzOUlhUmtVdzA2TFVyY3psaS9BL1NtSW1PVlFValdMQXJNcHNO?=
+ =?utf-8?B?bWtWbWNBbzE0ZDdGeXFvRjVGMllFcG5Nb2o4cDkwR1hiZERnd0pvcHkzT0Uz?=
+ =?utf-8?B?VFVtT3VFQzA1UXhGZ2tvc3phbjVHZ1RlOHhVYVRpSWNKcHBsLzdoSnVwT0Y1?=
+ =?utf-8?Q?W7Py12gMG5c2xsKOJe/ZZAMas?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3389f60-d84a-4fa5-8b5b-08dcc5e74927
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8297.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2024 15:53:53.7389
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: g5wgn+qvxUe3ut4tl4AiPo8hjtPYJ2uroeMLhVBO/5kpvvcjN36dQONeKpd4tu8LbRb825KgGIhHY6gpuaX/3Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8190
 
-On 7/08/24 15:09, Huang, Kai wrote:
-> On Mon, 2024-08-05 at 18:13 -0700, Dan Williams wrote:
->> Huang, Kai wrote:
->> [..]
->>>> The unrolled loop is the same amount of work as maintaining @fields.
->>>
->>> Hi Dan,
->>>
->>> Thanks for the feedback.
->>>
->>> AFAICT Dave didn't like this way:
->>>
->>> https://lore.kernel.org/lkml/cover.1699527082.git.kai.huang@intel.com/T/#me6f615d7845215c278753b57a0bce1162960209d
+
+
+On 26.08.24 16:26, Carlos Bilbao wrote:
+> Hello Dragos,
+> 
+> On 8/26/24 4:06 AM, Dragos Tatulea wrote:
 >>
->> I agree with Dave that the original was unreadable. However, I also
->> think he glossed over the loss of type-safety and the silliness of
->> defining an array to precisely map fields only to turn around and do a
->> runtime check that the statically defined array was filled out
->> correctly. So I think lets solve the readability problem *and* make the
->> array definition identical in appearance to unrolled type-safe
->> execution, something like (UNTESTED!):
+>> On 23.08.24 18:54, Carlos Bilbao wrote:
+>>> Hello,
+>>>
+>>> I'm debugging my vDPA setup, and when using ioctl to retrieve the
+>>> configuration, I noticed that it's running in half duplex mode:
+>>>
+>>> Configuration data (24 bytes):
+>>>   MAC address: (Mac address)
+>>>   Status: 0x0001
+>>>   Max virtqueue pairs: 8
+>>>   MTU: 1500
+>>>   Speed: 0 Mb
+>>>   Duplex: Half Duplex
+>>>   RSS max key size: 0
+>>>   RSS max indirection table length: 0
+>>>   Supported hash types: 0x00000000
+>>>
+>>> I believe this might be contributing to the underperformance of vDPA.
+>> mlx5_vdpa vDPA devicess currently do not support the VIRTIO_NET_F_SPEED_DUPLEX
+>> feature which reports speed and duplex. You can check the state on the
+>> PF.
+> 
+> 
+> According to ethtool, all my devices are running at full duplex. I assume I
+> can disregard this configuration output from the module then.
+> 
+Yep.
+
+> 
 >>
+>>> While looking into how to change this option for Mellanox, I read the following
+>>> kernel code in mlx5_vnet.c:
+>>>
+>>> static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
+>>>                  unsigned int len)
+>>> {
+>>>     /* not supported */
+>>> }
+>>>
+>>> I was wondering why this is the case.
+>> TBH, I don't know why it was not added. But in general, the control VQ is the
+>> better way as it's dynamic.
 >>
-> [...]
+>>> Is there another way for me to change
+>>> these configuration settings?
+>>>
+>> The configuration is done using control VQ for most things (MTU, MAC, VQs,
+>> etc). Make sure that you have the CTRL_VQ feature set (should be on by
+>> default). It should appear in `vdpa mgmtdev show` and `vdpa dev config
+>> show`.
 > 
->> +/*
->> + * Assumes locally defined @ret and @ts to convey the error code and the
->> + * 'struct tdx_tdmr_sysinfo' instance to fill out
->> + */
->> +#define TD_SYSINFO_MAP(_field_id, _offset)                              \
->> +	({                                                              \
->> +		if (ret == 0)                                           \
->> +			ret = read_sys_metadata_field16(                \
->> +				MD_FIELD_ID_##_field_id, &ts->_offset); \
->> +	})
->> +
 > 
-> We need to support u16/u32/u64 metadata field sizes, but not just u16.
+> I see that CTRL_VQ is indeed enabled. Is there any documentation on how to
+> use the control VQ to get/set vDPA configuration values?
 > 
-> E.g.:
-> 
-> struct tdx_sysinfo_module_info {                                        
->         u32 sys_attributes;                                             
->         u64 tdx_features0;                                              
-> };
-> 
-> has both u32 and u64 in one structure.
-> 
-> To achieve type-safety for all field sizes, I think we need one helper
-> for each field size.  E.g.,
-> 
-> #define READ_SYSMD_FIELD_FUNC(_size)                            \
-> static inline int                                               \
-> read_sys_metadata_field##_size(u64 field_id, u##_size *data)    \
-> {                                                               \
->         u64 tmp;                                                \
->         int ret;                                                \
->                                                                 \
->         ret = read_sys_metadata_field(field_id, &tmp);          \
->         if (ret)                                                \
->                 return ret;                                     \
->                                                                 \
->         *data = tmp;                                            \
->         return 0;                                               \
-> }                                                                       
-> 
-> /* For now only u16/u32/u64 are needed */
-> READ_SYSMD_FIELD_FUNC(16)                                               
-> READ_SYSMD_FIELD_FUNC(32)                                               
-> READ_SYSMD_FIELD_FUNC(64)                                               
-> 
-> Is this what you were thinking?
-> 
-> (Btw, I recall that I tried this before for internal review, but AFAICT
-> Dave didn't like this.)
-> 
-> For the build time check as you replied to the next patch, I agree it's
-> better than the runtime warning check as done in the current code.
-> 
-> If we still use the type-less 'void *stbuf' function to read metadata
-> fields for all sizes, then I think we can do below:
-> 
-> /*
->  * Read one global metadata field and store the data to a location of a 
->  * given buffer specified by the offset and size (in bytes).            
->  */
-> static int stbuf_read_sysmd_field(u64 field_id, void *stbuf, int offset,
->                                   int size)                             
-> {       
->         void *member = stbuf + offset;                                  
->         u64 tmp;                                                        
->         int ret;                                                        
-> 
->         ret = read_sys_metadata_field(field_id, &tmp);                  
->         if (ret)
->                 return ret;                                             
->         
->         memcpy(member, &tmp, size);                                     
->         
->         return 0;                                                       
-> }                                                                       
-> 
-> /* Wrapper to read one metadata field to u8/u16/u32/u64 */              
-> #define stbuf_read_sysmd_single(_field_id, _pdata)      \
->         stbuf_read_sysmd_field(_field_id, _pdata, 0, 	\
-> 		sizeof(typeof(*(_pdata)))) 
-> 
-> #define CHECK_MD_FIELD_SIZE(_field_id, _st, _member)    \
->         BUILD_BUG_ON(MD_FIELD_ELE_SIZE(MD_FIELD_ID_##_field_id) != \
->                         sizeof(_st->_member))
-> 
-> #define TD_SYSINFO_MAP_TEST(_field_id, _st, _member)                    \
->         ({                                                              \
->                 if (ret) {                                              \
->                         CHECK_MD_FIELD_SIZE(_field_id, _st, _member);   \
->                         ret = stbuf_read_sysmd_single(                  \
->                                         MD_FIELD_ID_##_field_id,        \
->                                         &_st->_member);                 \
->                 }                                                       \
->          })
-> 
-> static int get_tdx_module_info(struct tdx_sysinfo_module_info *modinfo)
-> {
->         int ret = 0;
-> 
-> #define TD_SYSINFO_MAP_MOD_INFO(_field_id, _member)     \
->         TD_SYSINFO_MAP_TEST(_field_id, modinfo, _member)
-> 
->         TD_SYSINFO_MAP_MOD_INFO(SYS_ATTRIBUTES, sys_attributes);
->         TD_SYSINFO_MAP_MOD_INFO(TDX_FEATURES0,  tdx_features0);
-> 
->         return ret;
-> }
-> 
-> With the build time check above, I think it's OK to lose the type-safe
-> inside the stbuf_read_sysmd_field(), and the code is simpler IMHO.
-> 
-> Any comments?
+>
+You are most likely using it already through through qemu. You can check
+if the CTR_VQ feature also shows up in the output of `vdpa dev config show`.
 
-BUILD_BUG_ON() requires a function, but it is still
-be possible to add a build time check in TD_SYSINFO_MAP
-e.g.
+What values are you trying to configure btw?
 
-#define TD_SYSINFO_CHECK_SIZE(_field_id, _size)			\
-	__builtin_choose_expr(MD_FIELD_ELE_SIZE(_field_id) == _size, _size, (void)0)
-
-#define _TD_SYSINFO_MAP(_field_id, _offset, _size)		\
-	{ .field_id = _field_id,				\
-	  .offset   = _offset,					\
-	  .size	    = TD_SYSINFO_CHECK_SIZE(_field_id, _size) }
-
-#define TD_SYSINFO_MAP(_field_id, _struct, _member)		\
-	_TD_SYSINFO_MAP(MD_FIELD_ID_##_field_id,		\
-			offsetof(_struct, _member),		\
-			sizeof(typeof(((_struct *)0)->_member)))
-
-
+Thanks,
+Dragos
 
