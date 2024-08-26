@@ -1,230 +1,158 @@
-Return-Path: <kvm+bounces-25075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25076-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4865995F996
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 21:23:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AEA495F99D
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 21:24:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC591C2218C
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 19:23:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31D51281128
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 19:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECAE3199234;
-	Mon, 26 Aug 2024 19:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A1B199238;
+	Mon, 26 Aug 2024 19:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="QoLu3gs3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sU24m04b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312DE1991AB
-	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 19:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B23A80034
+	for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 19:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724700182; cv=none; b=D8bLIfamHUjITdzxNrJ6M03SOY0R6Dmh5jOefujx7q6zHRkKZOvfiqf7qcAJ/1VsPgmFhPfLYhVPig8TB6Dh+Z2QZoCDMDAGPVCuYfOOR8Pdcq8LahYNzGxxLVQaGI9D043tq7A6JOltrG4VvC2WSHtPXwEwbEUgrtn/+B5B6BI=
+	t=1724700257; cv=none; b=rr8JoJTmEvXNkoWwQbmZir3GjfS5iXiy53Y0if8+rw/1pc/yMW5c2ArS7rYP77T0AIs76DFxk9keD+rvHu5EZR0MC02Bd0iw6gZLH4W0mwqrZ3XnTns67OCMi5JHnD0NQstfwT648aEfaLFYLhOrwWWNz1IejD/m5UML5GzGo/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724700182; c=relaxed/simple;
-	bh=tDJNUr27zxTQ4SUunjdZ0ylIYlgXCyM8c00NYRgGDuw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j6Xa7xytuRgjBWxYzKZwxFahyffvrjvbfNPRNQh7VyEexT61nON7lL0r3n4A/9yE3u2E8XF0jcvQaUM/hqtGBPOFf+zCvlp/9Te+849NaiBv2wjoHOWeZ57A8T9LS4CC9+pAkyGLfpBLlNgKdyBJWJKn2cIyGlCQ5zAV/2CVqpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=QoLu3gs3; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6b44dd520ceso45465637b3.0
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 12:22:59 -0700 (PDT)
+	s=arc-20240116; t=1724700257; c=relaxed/simple;
+	bh=1A+nVYG0Tb1c8dvEfK7/p1phh3Y/XKar3e86BArYU8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pJLjgYpqjkgL5727oRIwh9tXZ6ur5uwLdbkeIQIHpvRPhSwBkgymbt5jYPdVgvde93mqX/UUYLVxzPqVvHhI5P3UU62STbDwRJLxQiKO8ct0rYoSmZTf1okDs53IivT8DbqgKoF2pOxmdyEAYCyrPnFnCyd5Fhyz8WvH9xwpC0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sU24m04b; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-201fed75b38so2375ad.1
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2024 12:24:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=digitalocean.com; s=google; t=1724700179; x=1725304979; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=F6LqBt/cgf5saFNqougCditEz5JCrr5uJaPi0WKZXWo=;
-        b=QoLu3gs3omZpy7j6KkBNyUm3+qvqE79ETW/WoWzgFM8DpjcC/stY01owVBqrrG06R/
-         yazR1E8Rqfcixds5QsYgnvSLwJzTyPsIggAjENAfUqBaEGfrXmOOkqOzw5ZPsNAx64rL
-         W6dHYp2+kE2q8Ax+/bEvzlIYDX27IUqWBJKkA=
+        d=google.com; s=20230601; t=1724700256; x=1725305056; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5cAiW0RTaY38kbRY+UHtLrLxwjiEwXvtezS5fYGVIqk=;
+        b=sU24m04b54hoKrISeoHh97jMaF4xoaLyN5uC7gSY4PELpfYVF6TD0O3av9KuTaPU4/
+         EIH0Gy+1259ajH4U3mv5HBsayeJ46gKla+aL1zVf29NNXtVXvbbY/zlv9lIOgbt7E+XK
+         Uk2Onth921wlyG9AfSXFz8T+0nVM11rvvXdEiexqHIi/sD7tz8z/vJDz5OYGif/Axucw
+         y59ppumo3aREj3ygkwKn9H9u9U5qwexgkcjkx2IJ7Vox96XaP2oSlOii8nf9OedB87cP
+         OTdVDwzFnBj7uqbZX849jajJsQGJH+rcJfAOTiZ9jw+dMNBseI4d66jjBxOoX+OUbYIk
+         pvGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724700179; x=1725304979;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F6LqBt/cgf5saFNqougCditEz5JCrr5uJaPi0WKZXWo=;
-        b=uxaC4DG9a/iY3hLfSsqQgoBuAWkNwOXzZ+0QVm37q81EN+OW5tsWodR3/orKUodGWW
-         FAsoSsZSXkTC79Cc1KZNTRaPn36yMb+fbgTDwXlmID/QK2ba3dpwy7mjn88pINQ79i9o
-         x94T56pPbIDJzOwoTlyvBJeiwEZNNKv+eUA/SZ2bOvst0YJ0YsEnlClFX7v+SAp6Pf89
-         AfBJ5pPwSO4A5NfpD6Lgp7bRUodz5cP6ImMJAkSmW6WGN9eA9L1lsDbGmV3U50uplxzZ
-         gq5POq0XDckWUyp1ydR99HAWaXchcVEfGha73j0UIK+GNSEi4ZL9xwDk2hno3Ri27+Oy
-         reqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXzag4OmAKglQ9jHV/y9gFbD4yxVHOPdNGMWwvrXWCHzrexwwJkpugLZrdewGxOfAPW7Cs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCmUrqYEi/etkhYW//iC5oZsoc02KxsPled8yt3ysc590eI+3l
-	zuL7sfWoicD9bX9Ks6PRhto0V9ef54iFzByv9lZi4FiwJ6GjjnO8YEzblKBXWY4=
-X-Google-Smtp-Source: AGHT+IENvO39dZD8SM8XQUS6jkNMVVXZUu4Li0XJ01QpUNqrH5VA9EYbqM15qZGvjmYzMuTP3QTLBw==
-X-Received: by 2002:a05:690c:1d:b0:664:5957:f7a with SMTP id 00721157ae682-6c624dca095mr146931867b3.15.1724700179081;
-        Mon, 26 Aug 2024 12:22:59 -0700 (PDT)
-Received: from ?IPV6:2603:8080:7400:36da:45f:f211:3a7c:9377? ([2603:8080:7400:36da:45f:f211:3a7c:9377])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6c39d3a9a93sm16400567b3.89.2024.08.26.12.22.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Aug 2024 12:22:58 -0700 (PDT)
-Message-ID: <1cb17652-3437-472e-b8d5-8078ba232d60@digitalocean.com>
-Date: Mon, 26 Aug 2024 14:22:57 -0500
+        d=1e100.net; s=20230601; t=1724700256; x=1725305056;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5cAiW0RTaY38kbRY+UHtLrLxwjiEwXvtezS5fYGVIqk=;
+        b=HlJxOVkwQ+uUSFbAE8dlCRjg0717n0XqZ5cv+nbkdrUihed4/nQO7zzNbaObhirj38
+         CUWBZ6bzH6NoFyoLcQY+lIZxpi0M+Ueynruq16i2SZKiuTpN3C+tYdHDEjAVVaRNmWnv
+         dbl1XJesMTvJJ6ZFczdNfPhBDgwT2lQnh/EEP5jyBhYkJRZqT5lTyvSJPAOAtnFrbHWt
+         shTmN3JZ3GoLQP3yMR6uiag3crVI8BcBMd3giy55CREsOh2i5HHz44C1wZ17SlhfwL/W
+         s4mTB/hYUsNrcBRcvPwksG/+Ivw/e3kYnuzde4Bqqf+0+VX8tbqUQTsyLM9IMXCUDqhu
+         aHog==
+X-Forwarded-Encrypted: i=1; AJvYcCUzC5nTtr+Lvmi3udezIiP35tilpxdQZYdrNoXEduxybEk6/aZsslnMO+Xw2WMoVgLICjY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyAsuvH+7rTI7KHgHY9tpHqE6glNLhJEHxTHZEQde06FMO9HMs
+	td+dcPZNdZ9o48EysZ4f/4fS1GPR9ZO8Jlksb6vprwMsFNJLkY26z7JYKtRbkw==
+X-Google-Smtp-Source: AGHT+IHQZ+zENXR4aDwLapjt+4g/L+sPziKTRAY7OHVMbgkoIp09kMb8ctJOVPxwLy2A8+zM0Wqhnw==
+X-Received: by 2002:a17:902:db01:b0:1fb:52b1:27ca with SMTP id d9443c01a7336-204e19466e9mr389335ad.9.1724700255434;
+        Mon, 26 Aug 2024 12:24:15 -0700 (PDT)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71434335fc6sm7378514b3a.199.2024.08.26.12.24.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Aug 2024 12:24:14 -0700 (PDT)
+Date: Mon, 26 Aug 2024 12:24:10 -0700
+From: Vipin Sharma <vipinsh@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, dmatlack@google.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: x86/mmu: Recover NX Huge pages belonging to TDP
+ MMU under MMU read lock
+Message-ID: <20240826192410.GA2182008.vipinsh@google.com>
+References: <20240812171341.1763297-1-vipinsh@google.com>
+ <20240812171341.1763297-3-vipinsh@google.com>
+ <Zr_i3caXmIZgQL0t@google.com>
+ <20240819173453.GB2210585.vipinsh@google.com>
+ <ZsPDWqOiv_g7Wh_H@google.com>
+ <20240823223800.GB678289.vipinsh@google.com>
+ <ZsySe8tpDyZAvb6l@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
-To: Dragos Tatulea <dtatulea@nvidia.com>, eli@mellanox.com, mst@redhat.com,
- jasowang@redhat.com, xuanzhuo@linux.alibaba.com
-Cc: virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com,
- sashal@kernel.org, yuehaibing@huawei.com, steven.sistare@oracle.com
-References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
- <afcbf041-7613-48e6-8088-9d52edd907ff@nvidia.com>
- <8a15a46a-2744-4474-8add-7f6fb35552b3@digitalocean.com>
- <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
-Content-Language: en-US
-From: Carlos Bilbao <cbilbao@digitalocean.com>
-In-Reply-To: <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZsySe8tpDyZAvb6l@google.com>
 
-Hello,
+On 2024-08-26 07:34:35, Sean Christopherson wrote:
+> On Fri, Aug 23, 2024, Vipin Sharma wrote:
+> > On 2024-08-19 15:12:42, Sean Christopherson wrote:
+> > > On Mon, Aug 19, 2024, Vipin Sharma wrote:
+> > > Huh.  Actually, after a lot of fiddling and staring, there's a simpler solution,
+> > > and it would force us to comment/document an existing race that's subly ok.
+> > > 
+> > > For the dirty logging case, the result of kvm_mmu_sp_dirty_logging_enabled() is
+> > > visible to the NX recovery thread before the memslot update task is guaranteed
+> > > to finish (or even start) kvm_mmu_zap_collapsible_sptes().  I.e. KVM could
+> > > unaccount an NX shadow page before it is zapped, and that could lead to a vCPU
+> > > replacing the shadow page with an NX huge page.
+> > > 
+> > > Functionally, that's a-ok, because the accounting doesn't provide protection
+> > > against iTLB multi-hit bug, it's there purely to prevent KVM from bouncing a gfn
+> > > between an NX hugepage and an execute small page.  The only downside to the vCPU
+> > > doing the replacement is that the vCPU will get saddle with tearing down all the
+> > > child SPTEs.  But this should be a very rare race, so I can't imagine that would
+> > > be problematic in practice.
+> > 
+> > I am worried that whenever this happens it might cause guest jitter
+> > which we are trying to avoid as handle_changed_spte() might be keep a
+> > vCPU busy for sometime.
+> 
+> That race already exists today, and your series already extends the ways in which
+> the race can be hit.  My suggestion is to (a) explicit document that race and (b)
+> expand the window in which it can occur to also apply to dirty logging being off.
+> 
 
-On 8/26/24 10:53 AM, Dragos Tatulea wrote:
->
-> On 26.08.24 16:26, Carlos Bilbao wrote:
->> Hello Dragos,
->>
->> On 8/26/24 4:06 AM, Dragos Tatulea wrote:
->>> On 23.08.24 18:54, Carlos Bilbao wrote:
->>>> Hello,
->>>>
->>>> I'm debugging my vDPA setup, and when using ioctl to retrieve the
->>>> configuration, I noticed that it's running in half duplex mode:
->>>>
->>>> Configuration data (24 bytes):
->>>>   MAC address: (Mac address)
->>>>   Status: 0x0001
->>>>   Max virtqueue pairs: 8
->>>>   MTU: 1500
->>>>   Speed: 0 Mb
->>>>   Duplex: Half Duplex
->>>>   RSS max key size: 0
->>>>   RSS max indirection table length: 0
->>>>   Supported hash types: 0x00000000
->>>>
->>>> I believe this might be contributing to the underperformance of vDPA.
->>> mlx5_vdpa vDPA devicess currently do not support the VIRTIO_NET_F_SPEED_DUPLEX
->>> feature which reports speed and duplex. You can check the state on the
->>> PF.
->>
->> According to ethtool, all my devices are running at full duplex. I assume I
->> can disregard this configuration output from the module then.
->>
-> Yep.
->
->>>> While looking into how to change this option for Mellanox, I read the following
->>>> kernel code in mlx5_vnet.c:
->>>>
->>>> static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
->>>>                  unsigned int len)
->>>> {
->>>>     /* not supported */
->>>> }
->>>>
->>>> I was wondering why this is the case.
->>> TBH, I don't know why it was not added. But in general, the control VQ is the
->>> better way as it's dynamic.
->>>
->>>> Is there another way for me to change
->>>> these configuration settings?
->>>>
->>> The configuration is done using control VQ for most things (MTU, MAC, VQs,
->>> etc). Make sure that you have the CTRL_VQ feature set (should be on by
->>> default). It should appear in `vdpa mgmtdev show` and `vdpa dev config
->>> show`.
->>
->> I see that CTRL_VQ is indeed enabled. Is there any documentation on how to
->> use the control VQ to get/set vDPA configuration values?
->>
->>
-> You are most likely using it already through through qemu. You can check
-> if the CTR_VQ feature also shows up in the output of `vdpa dev config show`.
->
-> What values are you trying to configure btw?
+I was not clear about vCPU doing the replacement part. I see how this
+change is expanding the window.
 
+> > 	} else {
+> > 		/*
+> > 		 * Try again in future if the page is still in the
+> > 		 * list
+> > 		 */
+> > 		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+> > 		if (!list_empty(&sp->possible_nx_huge_page_link))
+> > 			list_move_tail(&sp->possible_nx_huge_page_link,
+> > 			kvm-> &kvm->arch.possible_nx_huge_pages);
+> 
+> This is unsafe.  The only thing that prevents a use-after-free of "sp" is the fact
+> that this task holds rcu_read_lock().  The sp could already been queued for freeing
+> via call_rcu().
 
-Yes, CTRL_VQ also shows up in vdpa dev config show. There isn't a specific
-value I want to configure ATM, but my vDPA isn't performing as expected, so
-I'm investigating potential issues. Below is the code I used to retrieve
-the configuration from the driver; I'd be happy to send it as a patch if
-you or someone else reviews it.
+Before call_rcu() happens, that page will be removed from
+kvm->arch.possible_nx_huge_pages list in handle_remove_pt() via
+tdp_mmu_unlink_sp() using kvm->arch.tdp_mmu_pages_lock. Here, we are
+using the same lock and checking if page is in the list or not. If it is
+in the list move to end and if it is not then don't do anything.
 
+Am I missing something else? Otherwise, this logic seems correct to me.
 
->
-> Thanks,
-> Dragos
+Overall, I will be using your example code, so you won't see this code
+in next version but just want to understand the concern with this else
+part.
 
-
-Thanks,
-Carlos
-
----
-
-From ab6ea66c926eaf1e95eb5d73bc23183e0021ee27 Mon Sep 17 00:00:00 2001
-From: Carlos Bilbao <bilbao@vt.edu>
-Date: Sat, 24 Aug 2024 00:24:56 +0000
-Subject: [PATCH] mlx5: Add support to update the vDPA configuration
-
-This is needed for VHOST_VDPA_SET_CONFIG.
-
-Signed-off-by: Carlos Bilbao <cbilbao@digitalocean.com>
----
- drivers/vdpa/mlx5/net/mlx5_vnet.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-index b56aae3f7be3..da31c743b2b9 100644
---- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-+++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-@@ -2909,14 +2909,32 @@ static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset,
-     struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
-     struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-
--    if (offset + len <= sizeof(struct virtio_net_config))
-+    if (offset + len <= sizeof(struct virtio_net_config)) {
-         memcpy(buf, (u8 *)&ndev->config + offset, len);
-+        }
-+        else
-+        {
-+            printk(KERN_ERR "%s: Offset and length out of bounds\n",
-+            __func__);
-+        }
-+
- }
-
- static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
-                  unsigned int len)
- {
--    /* not supported */
-+    struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
-+    struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-+
-+    if (offset + len <= sizeof(struct virtio_net_config))
-+    {
-+        memcpy((u8 *)&ndev->config + offset, buf, len);
-+    }
-+    else
-+    {
-+        printk(KERN_ERR "%s: Offset and length out of bounds\n",
-+        __func__);
-+    }
- }
-
- static u32 mlx5_vdpa_get_generation(struct vdpa_device *vdev)
---
-2.34.1
-
-
+> 
+> > 		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+> > 	}
+> > 
+> > 	/* Resched code below */
+> > }
 
