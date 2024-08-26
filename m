@@ -1,35 +1,35 @@
-Return-Path: <kvm+bounces-25042-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25043-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6926B95EE08
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 12:06:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9083C95EE32
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 12:13:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25544283D35
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 10:06:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D309282499
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2024 10:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1AAE146A97;
-	Mon, 26 Aug 2024 10:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E339514830D;
+	Mon, 26 Aug 2024 10:13:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41967142E67;
-	Mon, 26 Aug 2024 10:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497C91465A5;
+	Mon, 26 Aug 2024 10:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724666752; cv=none; b=opp6sbUuUu7uap2uKZSupjeD06IhySJaF060iBtLFoe2EnjAXm3jcMzVqhMgJ06kPRPj/DYsQqWbrVDeX4VWLhuV4YAYCb4ZjTupcI1iqUKXyTL56VMfxX7i1+pEhqr6oPBPNOn36dgeOpwYFv+zxC8GbH92bFFcUyXxy/Lul/E=
+	t=1724667183; cv=none; b=iP8axmpdMvOxG3dopLijW7oAsmHqpAlTc+6JIc7bq3Be6A5yJFYcchBmMiXqE1nDEDGiFc9SLX3jqMI7dTC6wfXzpTghBygD6shTCPZnomNGPu248IVkEOkgwat/T6OG1IO34Gs+5XSlXMgYjAZwPc/S89nbP8Y8uo+pJw6mMGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724666752; c=relaxed/simple;
-	bh=3zkM/JN53O8YZgyIzrLXt0aiDFnoumM41eh3ReDcN7U=;
+	s=arc-20240116; t=1724667183; c=relaxed/simple;
+	bh=0VFJjTZUkoAmfzcu4gQMaBLbHuaJDE7k+e7lEchBslQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkB+qgHLC/m0mvqRgJp8fglJ1en97S/Er0+yELLQ6hLJKtnLQ2kqIi9h8IEZp7uHN8czZ1Ub7vNeDee3MCKx30KUD/KMNS3Vppg/57gHm2ZBgi5KzdxDHkPpFgimq9ci32Ebam1v0fl+GqjOiIUAkQ5S+2mfSTKSFF/4YlA0TLs=
+	 Content-Type:Content-Disposition:In-Reply-To; b=RHE5zJgg5vL9haGrEqWIjNiLJVMd5PmhCDtFfBEkyJPY2NZ5EmNUEDeSZVADOWpRpXMPJDRdpszqRl8hjMhiwvfia131dIFM7umDF8hNXEdL/XWTwPtIyQo28M+I2g/hgq5x8AINmZq552+MSaa9Tfn/aeYxggfGEoZnCRHiea0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5BDEC51407;
-	Mon, 26 Aug 2024 10:05:47 +0000 (UTC)
-Date: Mon, 26 Aug 2024 13:05:56 +0300
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A11C51409;
+	Mon, 26 Aug 2024 10:12:58 +0000 (UTC)
+Date: Mon, 26 Aug 2024 13:13:06 +0300
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -47,11 +47,10 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>
-Subject: Re: [PATCH v5 09/19] fixmap: Pass down the full phys address for
- set_fixmap_io
-Message-ID: <ZsxThLaRK3omola1@arm.com>
+Subject: Re: [PATCH v5 12/19] efi: arm64: Map Device with Prot Shared
+Message-ID: <ZsxVMv2pA0bQzm3L@arm.com>
 References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-10-steven.price@arm.com>
+ <20240819131924.372366-13-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -60,33 +59,54 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240819131924.372366-10-steven.price@arm.com>
+In-Reply-To: <20240819131924.372366-13-steven.price@arm.com>
 
-On Mon, Aug 19, 2024 at 02:19:14PM +0100, Steven Price wrote:
+On Mon, Aug 19, 2024 at 02:19:17PM +0100, Steven Price wrote:
 > From: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> For early I/O mapping using fixmap, we mask the address by PAGE_MASK
-> base and then map it to the FIXMAP slot. However, with confidential
-> computing, the granularity at which "protections" (encrypted vs
-> decrypted) are applied may be finer than the PAGE_SIZE. e.g., for Arm
-> CCA it is 4K while an arm64 kernel could be using 64K pagesize. However
-> we need to know the exact address being mapped in.
-> 
-> Thus in-order to calculate the accurate protection, pass down the exact
-> phys address to the helpers. This would be later used by arm64 to detect
-> if the MMIO address is shared vs protected. The users of such drivers
-> already cope with running the same code with "4K" page size, thus
-> mapping a PAGE_SIZE covering the address range is considered acceptable.
+> Device mappings need to be emualted by the VMM so must be mapped shared
+> with the host.
 > 
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v4:
+>  * Reworked to use arm64_is_iomem_private() to decide whether the memory
+>    needs to be decrypted or not.
+> ---
+>  arch/arm64/kernel/efi.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/efi.c b/arch/arm64/kernel/efi.c
+> index 712718aed5dd..95f8e8bf07f8 100644
+> --- a/arch/arm64/kernel/efi.c
+> +++ b/arch/arm64/kernel/efi.c
+> @@ -34,8 +34,16 @@ static __init pteval_t create_mapping_protection(efi_memory_desc_t *md)
+>  	u64 attr = md->attribute;
+>  	u32 type = md->type;
+>  
+> -	if (type == EFI_MEMORY_MAPPED_IO)
+> -		return PROT_DEVICE_nGnRE;
+> +	if (type == EFI_MEMORY_MAPPED_IO) {
+> +		pgprot_t prot = __pgprot(PROT_DEVICE_nGnRE);
+> +
+> +		if (arm64_is_iomem_private(md->phys_addr,
+> +					   md->num_pages << EFI_PAGE_SHIFT))
+> +			prot = pgprot_encrypted(prot);
+> +		else
+> +			prot = pgprot_decrypted(prot);
+> +		return pgprot_val(prot);
 
-Will was keen (and I'd prefer it as well) to get rid of the early fixmap
-code, at least for the time being. Have you tried without these and the
-early RSI probing?
+Nit: This pattern appears in the previous patch as well. Maybe add a
+pgprot_maybe_decrypted().
 
-Apart from the earlycon I recall you mentioned EFI early maps. These
-would be more problematic.
+The patch looks fine other than the need for an early initialisation if
+we find any workaround. In the pKVM case, IIUC this would need to call
+into the hypervisor as well but that can be handled by the bootloader.
+For CCA, our problem is setting the top bit of the IPA.
+
+What's the x86 approach here? The EFI is a bigger problem than the
+earlycon.
 
 -- 
 Catalin
