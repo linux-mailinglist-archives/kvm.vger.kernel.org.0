@@ -1,201 +1,159 @@
-Return-Path: <kvm+bounces-25144-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25145-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2957C960A29
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 14:27:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39BEF960A82
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 14:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D60B928239A
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 12:27:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99B41B20A1D
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 12:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875011B4C58;
-	Tue, 27 Aug 2024 12:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0521BCA04;
+	Tue, 27 Aug 2024 12:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G4a2AZ1T"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="eltcPPAs"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD33A1B4C2E
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 12:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809651BC090
+	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 12:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724761588; cv=none; b=XeLaZ+w/IvHj2aMRy7qmp0hPket/0zHp8iWSjE0Ml+hAo5dSB+U4cdjUlMwox1LKFlZgBlw2wACi//Xi7vjx8PtuaXOtVwy0mNeiLu+p6sNekargQ+h6SNeMTa4GzCYUJ8jwNXTVaGxgjxuvP34qPziML0OpwuxVJPOUq7Dj1lQ=
+	t=1724761966; cv=none; b=Dga/4P6IDlXjtz/I+2WKhG7s43aYsrM3wRFZ9UV4eT7FYuAMOCjdGHhk+j+EhF5dmXTWE2xXa5oPVwOK9DMatojABA9gdJ4YhZZo6Zdr6QzRdh2sb79UhIo430B6hB6B8YH0LSdaBVqZmlBT1HlQfsEUzFiRDqXuPqi+xIi1rrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724761588; c=relaxed/simple;
-	bh=zIC1kd6xmYNGSXHmMs7yn4omvLXOwR7/BGz7+Du2s1U=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Tl4L8EdD+SL2qqEpCsq1LryWp6B6WIgcqeaMtnR8tc8t86+uM/2q1UEC/ULXFofjrzllYBbFlY/vDGG/BBarXAdkBKBYSq+zjfYZlvn3QzQ/Y+LJBgr30jsXALFDfXgopxkjwFvF492HnjtrC+/bbrp+8GoVYQcw2OcO9BAJ67I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G4a2AZ1T; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724761585;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3pqf4vIDiJZIq0NvzPPjp8hfkf3fzLyKRmzc9tkgSTY=;
-	b=G4a2AZ1T/hYmmJ7Ea3gxtcwbf9GqoGkDPZL8ldBsswXyb70AdUlOJteKZkjUyZ9Wnq58Y4
-	2rzINXcEvZwv35lFywGRoEh1TwfnEqK4euoWj7HoPsur4ihAySsejpSMlW1I/XnQmpr6Z5
-	7tvIqbiIEIxwetgX3l+sgBXz6NMWEcM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-303-y-Ul_CPtOw-27rCzWzUC0w-1; Tue,
- 27 Aug 2024 08:26:24 -0400
-X-MC-Unique: y-Ul_CPtOw-27rCzWzUC0w-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C20161955D54;
-	Tue, 27 Aug 2024 12:26:22 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.112])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6072119560A3;
-	Tue, 27 Aug 2024 12:26:20 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 05FFA21E6A28; Tue, 27 Aug 2024 14:26:18 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Ani Sinha <anisinha@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Paolo
- Bonzini
- <pbonzini@redhat.com>,  qemu-trivial@nongnu.org,  Zhao Liu
- <zhao1.liu@intel.com>,  kvm@vger.kernel.org,  qemu-devel
- <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v3] kvm: replace fprintf with error_report/printf() in
- kvm_init()
-In-Reply-To: <03C06183-B8ED-405D-8B9C-532E30B8E412@redhat.com> (Ani Sinha's
-	message of "Tue, 27 Aug 2024 17:47:44 +0530")
-References: <20240809064940.1788169-1-anisinha@redhat.com>
-	<8913b8c7-4103-4f69-8567-afdc29f8d0d3@linaro.org>
-	<87v7zmmq9f.fsf@pond.sub.org>
-	<03C06183-B8ED-405D-8B9C-532E30B8E412@redhat.com>
-Date: Tue, 27 Aug 2024 14:26:18 +0200
-Message-ID: <87plpui239.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1724761966; c=relaxed/simple;
+	bh=jhywql0i1Igm4tZ6CC7w55Fwugmoo13oCgW+x0dMPQ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n95GA0QmwI/SwoRhY+ApPV3h9E+7l12sf3I3CIHCsISLtzIV9fSkLIKOxTubZZ/aWElF+Q6Z04swt3lGpyQ3qXgXGFj62Zfi5nYqTcu4X9XaabWpzKCdKmHJBIb/0oqv5zGxWEjIMIjlQ8YyuaQiK7lYCsZ4wrWKqJLSr+jl22c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=eltcPPAs; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6bf999ac52bso27074386d6.2
+        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 05:32:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1724761963; x=1725366763; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L5jbjcbxUPPj9zYNKoE0eIYQhFCqfcFcc1QbGEVtWHE=;
+        b=eltcPPAstBJtZH8QFntLp0I/pWn4YHqczytIEQkcPd7iiEItdv3j/3XpqWwPlItvFL
+         7/hHVFecyCwYbBVrYqdlkz//9cpvlFlNi/IAKnq2QFml4PWKxQrfTrPKGzuJATygeCwh
+         zE7NUOSz2v59vJ0Oa1ahgEUL75DT6EEtPBzUtaQrh12O7vYDLAkyRuBFTWGghT3Gks2L
+         9Z/SH91xHU3DnMlmM17SAM84YLRihiwl42aMac+oVBuwoKwEBwmawI9qogYHyHU616+j
+         VGnqbW0MsHXPuv5UZLCvLf7zVoytsUX6evHriaE0F/Y2O9RG3NyHIkPzAQ4ionOOHizM
+         Kmnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724761963; x=1725366763;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L5jbjcbxUPPj9zYNKoE0eIYQhFCqfcFcc1QbGEVtWHE=;
+        b=rZzEEyD9+dprVzthD0vjZRHs9ht1QtYB0USfu1XS7gTwfphwOCPk142VoJmFyq6STn
+         zIRXmoHQkqNrwyIswS1m7rI0AOmSD4M1St5j7gP9yYweu/tHXCIw7KrLorDtVMmQeUZh
+         tFncrK3HyDEqSF+NOTUOGGOcneeN9yowZjtHAJZxNVSRoF/DoMWVvaduXhut4ssxhxzG
+         6fyRmKmI7Wj2U9xj7Xw8imTPeHyVYoC5Dppt6G6OyMM4fw9SLLqVc/SwTj9Ch+VaKbFd
+         MCmLW1CJPxf/rG5I/NVPEynKdQxDlCf6DleJj1kqZijciV+PsV1pcNVJyd3yijJlYuBp
+         udFQ==
+X-Gm-Message-State: AOJu0YzEMUJG3BgdoqR1n+o5+6hk+bw4T8m+HlgatHyfAG7SpDhxPuAI
+	dnRzg9B8VEdTnAZ9Tze28f6u0MFGVgFBm92Q2Hfhk29mfvpvL2QdqFqUki+gqc8=
+X-Google-Smtp-Source: AGHT+IFgABoyQ7opyAvWPQnFZTXKyke+4HJ1twIgh/+mRitM/qVkX72/Bi45aDM2XOpCwlcFx8pYwA==
+X-Received: by 2002:a05:6214:4381:b0:6c1:6a2e:afc6 with SMTP id 6a1803df08f44-6c16dc36d53mr159756336d6.15.1724761963298;
+        Tue, 27 Aug 2024 05:32:43 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c162dd1cfdsm55802226d6.129.2024.08.27.05.32.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Aug 2024 05:32:42 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sivNK-000dsU-Aq;
+	Tue, 27 Aug 2024 09:32:42 -0300
+Date: Tue, 27 Aug 2024 09:32:42 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	linux-pci@vger.kernel.org,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	pratikrajesh.sampat@amd.com, michael.day@amd.com,
+	david.kaplan@amd.com, dhaval.giani@amd.com,
+	Santosh Shukla <santosh.shukla@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Michael Roth <michael.roth@amd.com>, Alexander Graf <agraf@suse.de>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>
+Subject: Re: [RFC PATCH 07/21] pci/tdisp: Introduce tsm module
+Message-ID: <20240827123242.GM3468552@ziepe.ca>
+References: <20240823132137.336874-1-aik@amd.com>
+ <20240823132137.336874-8-aik@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240823132137.336874-8-aik@amd.com>
 
-Ani Sinha <anisinha@redhat.com> writes:
+On Fri, Aug 23, 2024 at 11:21:21PM +1000, Alexey Kardashevskiy wrote:
+> The module responsibilities are:
+> 1. detect TEE support in a device and create nodes in the device's sysfs
+> entry;
+> 2. allow binding a PCI device to a VM for passing it through in a trusted
+> manner;
 
->> On 27 Aug 2024, at 12:00=E2=80=AFPM, Markus Armbruster <armbru@redhat.co=
-m> wrote:
->>=20
->> Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> writes:
->>=20
->>> Hi Ani,
->>>=20
->>> On 9/8/24 08:49, Ani Sinha wrote:
->>>> error_report() is more appropriate for error situations. Replace fprin=
-tf with
->>>> error_report. Cosmetic. No functional change.
->>>> CC: qemu-trivial@nongnu.org
->>>> CC: zhao1.liu@intel.com
->>>=20
->>> (Pointless to carry Cc line when patch is already reviewed next line)
->>>=20
->>>> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
->>>> Signed-off-by: Ani Sinha <anisinha@redhat.com>
->>>> ---
->>>>  accel/kvm/kvm-all.c | 40 ++++++++++++++++++----------------------
->>>>  1 file changed, 18 insertions(+), 22 deletions(-)
->>>> changelog:
->>>> v2: fix a bug.
->>>> v3: replace one instance of error_report() with error_printf(). added =
-tags.
->>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->>>> index 75d11a07b2..5bc9d35b61 100644
->>>> --- a/accel/kvm/kvm-all.c
->>>> +++ b/accel/kvm/kvm-all.c
->>>> @@ -2427,7 +2427,7 @@ static int kvm_init(MachineState *ms)
->>>>      QLIST_INIT(&s->kvm_parked_vcpus);
->>>>      s->fd =3D qemu_open_old(s->device ?: "/dev/kvm", O_RDWR);
->>>>      if (s->fd =3D=3D -1) {
->>>> -        fprintf(stderr, "Could not access KVM kernel module: %m\n");
->>>> +        error_report("Could not access KVM kernel module: %m");
->>>>          ret =3D -errno;
->>>>          goto err;
->>>>      }
->>>> @@ -2437,13 +2437,13 @@ static int kvm_init(MachineState *ms)
->>>>          if (ret >=3D 0) {
->>>>              ret =3D -EINVAL;
->>>>          }
->>>> -        fprintf(stderr, "kvm version too old\n");
->>>> +        error_report("kvm version too old");
->>>>          goto err;
->>>>      }
->>>>        if (ret > KVM_API_VERSION) {
->>>>          ret =3D -EINVAL;
->>>> -        fprintf(stderr, "kvm version not supported\n");
->>>> +        error_report("kvm version not supported");
->>>>          goto err;
->>>>      }
->>>>  @@ -2488,26 +2488,22 @@ static int kvm_init(MachineState *ms)
->>>>      } while (ret =3D=3D -EINTR);
->>>>        if (ret < 0) {
->>>> -        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
->>>> -                strerror(-ret));
->>>> +        error_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
->>>> +                    strerror(-ret));
->>>>    #ifdef TARGET_S390X
->>>>          if (ret =3D=3D -EINVAL) {
->>>> -            fprintf(stderr,
->>>> -                    "Host kernel setup problem detected. Please verif=
-y:\n");
->>>> -            fprintf(stderr, "- for kernels supporting the switch_amod=
-e or"
->>>> -                    " user_mode parameters, whether\n");
->>>> -            fprintf(stderr,
->>>> -                    "  user space is running in primary address space=
-\n");
->>>> -            fprintf(stderr,
->>>> -                    "- for kernels supporting the vm.allocate_pgste s=
-ysctl, "
->>>> -                    "whether it is enabled\n");
->>>> +            error_report("Host kernel setup problem detected.
->>>=20
->>> \n"
->>>=20
->>> Should we use error_printf_unless_qmp() for the following?
->>>=20
->>> " Please verify:");
->>>> +            error_report("- for kernels supporting the switch_amode o=
-r"
->>>> +                        " user_mode parameters, whether");
->>>> +            error_report("  user space is running in primary address =
-space");
->>>> +            error_report("- for kernels supporting the vm.allocate_pg=
-ste "
->>>> +                        "sysctl, whether it is enabled");
->>=20
->> Do not put newlines into error messages.  error_report()'s function
->> comment demands "The resulting message should be a single phrase, with
->> no newline or trailing punctuation."
->>=20
->> You can do this:
->>=20
->>    error_report(... the actual error message ...);
->>    error_printf(... hints on what to do about it ...);
->>=20
->> Questions?
->
-> Do you see any newlines in my proposed patch?
+Binding devices to VMs and managing their lifecycle is the purvue of
+VFIO and iommufd, it should not be exposed via weird sysfs calls like
+this. You can't build the right security model without being inside
+the VFIO context.
 
-I see some in Philippe's suggestion.
+As I said in the other email, it seems like the PSP and the iommu
+driver need to coordinate to ensure the two DTEs are consistent, and
+solve the other sequencing problems you seem to have.
 
-Your patch's use of multiple error_report() for a single error condition
-is inappropriate.
+I'm not convinced this should be in some side module - it seems like
+this is possibly more logically integrated as part of the iommu..
 
-Questions?
+> +static ssize_t tsm_dev_connect_store(struct device *dev, struct device_attribute *attr,
+> +				     const char *buf, size_t count)
+> +{
+> +	struct tsm_dev *tdev = tsm_dev_get(dev);
+> +	unsigned long val;
+> +	ssize_t ret = -EIO;
+> +
+> +	if (kstrtoul(buf, 0, &val) < 0)
+> +		ret = -EINVAL;
+> +	else if (val && !tdev->connected)
+> +		ret = tsm_dev_connect(tdev, tsm.private_data, val);
+> +	else if (!val && tdev->connected)
+> +		ret = tsm_dev_reclaim(tdev, tsm.private_data);
+> +
+> +	if (!ret)
+> +		ret = count;
+> +
+> +	tsm_dev_put(tdev);
+> +
+> +	return ret;
+> +}
+> +
+> +static ssize_t tsm_dev_connect_show(struct device *dev, struct device_attribute *attr, char *buf)
+> +{
+> +	struct tsm_dev *tdev = tsm_dev_get(dev);
+> +	ssize_t ret = sysfs_emit(buf, "%u\n", tdev->connected);
+> +
+> +	tsm_dev_put(tdev);
+> +	return ret;
+> +}
+> +
+> +static DEVICE_ATTR_RW(tsm_dev_connect);
 
+Please do a much better job explaining the uAPIS you are trying to
+build in all the commit messages and how you expect them to be used.
+
+Picking this stuff out of a 6k loc series is a bit tricky
+
+Jason
 
