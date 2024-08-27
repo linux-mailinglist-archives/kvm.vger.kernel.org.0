@@ -1,181 +1,190 @@
-Return-Path: <kvm+bounces-25197-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1101961839
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 21:51:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D35C7961860
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 22:13:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EC021F239AD
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 19:51:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 039D31C23117
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 20:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30571D31BC;
-	Tue, 27 Aug 2024 19:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0EE1D362A;
+	Tue, 27 Aug 2024 20:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ao/4mZiW"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IoEbQxvg"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2077.outbound.protection.outlook.com [40.107.95.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B28B2E62B
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 19:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724788253; cv=none; b=GpAQKapB32Fw9yd2ZDP0yeLxTyZ+t+SLZCcPn92lz5WXGh6/KfpAAWxc5rEhHAK8EYc++ngv4OxrjIf3/UrSH61cneExnBgN79vX3eonc+KiFmCDTaXm0jO2aV8lY9wcCd4iZfEaA4+skL7nWJu4kv5Uyu1EW4eqhSv3/Ono1A8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724788253; c=relaxed/simple;
-	bh=PAa2iphw1cbZ+4J0LvndlZUJT94QiQinotFdX3u//os=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uB8qPJu8Y6/38ud1MFFKu3mrWmZL40l6WX0mIuRVHpbQBXXEE8zcOHnd72VwtWqoOVyUZGDn+YB4U0pSpYpOgSU2+4Gb2G9SrAEisb1v7VqAY43Y0iZ9Nh1X1IL+arLkuyCQaidvWe7qGSOC5swDXs82B9XiYTGtlCjhoAkRnSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ao/4mZiW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724788250;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PAa2iphw1cbZ+4J0LvndlZUJT94QiQinotFdX3u//os=;
-	b=ao/4mZiW0sv6wV23T9uwtoISFZKcAA8/SkFnfB6GX3dKtVWKrAE+stdEaZv4SldFuo4EUD
-	wvmWPv3wojaZ8eYry+ifxO+oDcCa4V7aJpn5bXtuJVe6mN7oEP2QtwrP/kF7D4GR5NmcW0
-	BTMiEYRip3MuKBxBUoKByALrqmDSDQA=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-499-588cxUEoM9-9RbuL91EO0w-1; Tue, 27 Aug 2024 15:50:49 -0400
-X-MC-Unique: 588cxUEoM9-9RbuL91EO0w-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4503564d2ebso85764341cf.0
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 12:50:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724788249; x=1725393049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PAa2iphw1cbZ+4J0LvndlZUJT94QiQinotFdX3u//os=;
-        b=XogHzS/OUif6YHFa6FZhnYj3SX+3h3+sbAXN89UFqRB6FLkziBOyTK+Zn57z89aA6f
-         hOKth5Uf0vg0N9vefBTmijE1oUYB02dav1j7itC5knoPORSBXQc6SksqXWV+Q78orBC8
-         fTM3USy2UfUAezIWhB/yOOMKQ52vkooA2kspCxxNYB3DGhE7Q5ubtvLyb0xEp6ZoUoun
-         Il3CpcaxBeGfffQOV0dxVUCpfnDbGc4C1h9pH3PkXHsDcluySuvtXiUwzYCgZy1/HaSJ
-         v0CWx3gXoqtTeH5iyj7q1NJ1coFNYC4fx7KFZYwz7muwvw1o/MCeAs4l+5UrcEr7AM2M
-         6mGg==
-X-Forwarded-Encrypted: i=1; AJvYcCXr5ySwcMRoDmTbbuOGJcsGSFwmPEK999Rd8dsFWysEcqz+2P5FbHqwBVfQCIC0UftWFNI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWpa2rqg0Pb7pYXDtf9+u4W9hcJ6HV7LdVnSylCGaziZCCLoXh
-	qa6F8+TKAcWTNqo85DtenPb5GbWYf8rAPn0zn6USCSbjboSFqrgTcirMA4O7dwVhIXotls5AXlX
-	GwbWwPgP/WeSaa/CylEMBxWoqd2q6KgkTy9wrAt/vnToXtQtx3aHqBKsAv33VWwkNnLXwG/9lKM
-	BGvFyiE+KCeYFJfiwXGrokQEq8
-X-Received: by 2002:a05:622a:5c0b:b0:451:caeb:8cfd with SMTP id d75a77b69052e-455096eb4b8mr188637101cf.31.1724788248797;
-        Tue, 27 Aug 2024 12:50:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFh/NuO46jyeabBgVTwTRwBQN4Upju2mh5cSkfpCWefpOcvdaKPzrnmLAnbpxWRE2R3FjdE8DPdMiNEDPoVjDg=
-X-Received: by 2002:a05:622a:5c0b:b0:451:caeb:8cfd with SMTP id
- d75a77b69052e-455096eb4b8mr188636811cf.31.1724788248324; Tue, 27 Aug 2024
- 12:50:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95212EAE6;
+	Tue, 27 Aug 2024 20:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724789572; cv=fail; b=KGj68RDhZXoNLZgVgCSeRAhz8BZIrhYzj2XzKPQUrsSNlqNqtadRwgzhoK0dRIoLfr0daK8FQNaw4vlk94pPGaOHM+NgvD6Pxrp8khvbJzJ+lX5qnSwgz7mpRqYbjl/0x5TbYzSRSE6pxuy8i5++mAnr2Hhjk9oYyb7/vrx1N6M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724789572; c=relaxed/simple;
+	bh=t/4piX2AZMe2JRHIcqOGMLXInoNa3pAZJ0kDRfULMOc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EUHjfSyHo8yPefOX/KYYbV+010CU3nPIWbZj0XMuQbYtRpP+s7YnD8v3HedG4HUYjkYQM4FZGCHbf1yumiAMyU25krVjMtIqsdZj/SZRB07VHowXDVMpIinWFHuhumvxTtj3MH+wW3aLxYe3Q5r6V80cevwjtCRAHMoznrC64ek=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IoEbQxvg; arc=fail smtp.client-ip=40.107.95.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Di6Go0uPVFSxrcvNhpaVej27lpLBsWePDz2SQkZaX9ngepf4KU0++9SfDazub1mCTHbv0AWqG3QjMtWlT6btBGehnj+EYj08SQ2mHQWkjvah2DKfHqr4BbuwN9NNTT50uvr568PHOAepb9Gn6Pd0nudeShZsYr4Ib+5ESP8m1N7+wXS6UnmDg85woUgufxq8wHlJ7LqjIN7rd2MnLa1y9SnVbPnFrCzSCP37/pkaIOq7ldRlGZeySMvglfBhsT1TplgDeK3TB4wJJHzuqT7/PS4AHU8xEdBBiI+RvqlACsf6scwVQZ6unI5rUZzubmCLigtWuQsx4g4DdVT7tnBS5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TL0cGEPoyYO19D122nKczwZQNc0bMXZvL84ljv08pdM=;
+ b=op4Pcf/8p3VVkNPYe9Hpav/LOiEKeFNgsOyk7HNVmNWsEvQOr0LNQBxNdR9QI7VP5SkIgscOvfdyk/Ow5ERpihgOFHBRRNHG5cQ70fw3zCAcxgMxnucFIwZFZWULnxOcQnGGXJM0g3/XucrAYbK77TsQv8phJLkz6vm4i+Vbs7CV7lsGACSKrzNw77Yw0Yt3FOvwluDtXxgje7VJsuCl8ia3DcVhYLXMXnUSpqNYGKKbdtRmVmJDkX2yzni13tRRlGZ/ONrGk1HHeEkAgf0/XARYRBOJMx9uNjXsCyESQeGUSEyeM/cDCY44AbfoRTRy5lM+u+XBwamHx7hIn//YIw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TL0cGEPoyYO19D122nKczwZQNc0bMXZvL84ljv08pdM=;
+ b=IoEbQxvgiTkuhJn4X5tj+8Og3z4QeYEXJxntgCMxh3YO8a+XIvCHaXVjbxMrJedukz7ssRZ66IPfa+DtSFiduDhV9tDNlsctEt+8xRHNEEOCL3QY5W6yLWTICffTR6kuBRRHIhuhtD44gfQgGH39XpHLPYo1z72f4aiZGRhxI5ZxzfLLYuAz0V+8qjj8jQJfkbOFCw/3xTdGcwNAZO9vzEtcCRiMGt37T3erHKKg88VnZJz6hCqpSuHDhr8r+wvs9etYlMgefgYMt/8oN03rhpGYLLlhTLOJvesx3RkluvJxFoWM2l6McyoE1pC/ybCbJiOsnBVwuILtrOG5vMImMA==
+Received: from BL0PR02CA0020.namprd02.prod.outlook.com (2603:10b6:207:3c::33)
+ by SA0PR12MB4368.namprd12.prod.outlook.com (2603:10b6:806:9f::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Tue, 27 Aug
+ 2024 20:12:47 +0000
+Received: from CH2PEPF00000142.namprd02.prod.outlook.com
+ (2603:10b6:207:3c:cafe::1c) by BL0PR02CA0020.outlook.office365.com
+ (2603:10b6:207:3c::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25 via Frontend
+ Transport; Tue, 27 Aug 2024 20:12:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF00000142.mail.protection.outlook.com (10.167.244.75) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7918.13 via Frontend Transport; Tue, 27 Aug 2024 20:12:46 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 27 Aug
+ 2024 13:12:31 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 27 Aug
+ 2024 13:12:31 -0700
+Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4 via Frontend
+ Transport; Tue, 27 Aug 2024 13:12:29 -0700
+Date: Tue, 27 Aug 2024 13:12:27 -0700
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: <acpica-devel@lists.linux.dev>, Hanjun Guo <guohanjun@huawei.com>,
+	<iommu@lists.linux.dev>, Joerg Roedel <joro@8bytes.org>, Kevin Tian
+	<kevin.tian@intel.com>, <kvm@vger.kernel.org>, Len Brown <lenb@kernel.org>,
+	<linux-acpi@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	"Lorenzo Pieralisi" <lpieralisi@kernel.org>, "Rafael J. Wysocki"
+	<rafael@kernel.org>, Robert Moore <robert.moore@intel.com>, Robin Murphy
+	<robin.murphy@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Will Deacon
+	<will@kernel.org>, "Alex Williamson" <alex.williamson@redhat.com>, Eric Auger
+	<eric.auger@redhat.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>,
+	<patches@lists.linux.dev>, Shameerali Kolothum Thodi
+	<shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH v2 5/8] iommu/arm-smmu-v3: Report
+ IOMMU_CAP_ENFORCE_CACHE_COHERENCY for CANWBS
+Message-ID: <Zs4zK/5TPHs555Vt@Asurada-Nvidia>
+References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ <5-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJ6HWG7pgMu7sAUPykFPtsDfq5Kfh1WecRcgN5wpKQj_EyrbJA@mail.gmail.com>
- <68c39823-6b1d-4368-bd1e-a521ade8889b@paulmck-laptop> <ZkQ97QcEw34aYOB1@LeoBras>
- <17ebd54d-a058-4bc8-bd65-a175d73b6d1a@paulmck-laptop> <ZnPUTGSdF7t0DCwR@LeoBras>
- <ec8088fa-0312-4e98-9e0e-ba9a60106d58@paulmck-laptop> <ZnosF0tqZF72XARQ@LeoBras>
- <ZnosnIHh3b2vbXgX@LeoBras> <Zo8WuwOBSeAcHMp9@LeoBras> <f06ef91d-7f8c-4f69-8535-fee372766a7f@redhat.com>
- <ZpGL1rEHNild9CG5@LeoBras> <CAJ6HWG75LYS6UtWebznZ-9wXZCJep_pj3rf-gt-W=PfR-D9b9Q@mail.gmail.com>
-In-Reply-To: <CAJ6HWG75LYS6UtWebznZ-9wXZCJep_pj3rf-gt-W=PfR-D9b9Q@mail.gmail.com>
-From: Leonardo Bras Soares Passos <leobras@redhat.com>
-Date: Tue, 27 Aug 2024 16:50:36 -0300
-Message-ID: <CAJ6HWG53vjhAKjPAFeyjdbopAWzSJTBDz5t5YY+2B13MUdPYfQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>, Leonardo Bras <leobras.c@gmail.com>, 
-	Sean Christopherson <seanjc@google.com>, Frederic Weisbecker <frederic@kernel.org>, 
-	Marcelo Tosatti <mtosatti@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <5-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000142:EE_|SA0PR12MB4368:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5168f874-1f85-4524-6e4a-08dcc6d49e46
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?4XjPfHDgHoUFL98wSgESy3ahbTm8hX01oHfnhEzO7LMVwocP76oFf5kpbe79?=
+ =?us-ascii?Q?pgBamQfT3HdeBTuStp/tE/RPOuedUSQvrzSmTuQPTctFyEOCHdEXVT4RQ4Hi?=
+ =?us-ascii?Q?DPufzwKVuX4aQKXxG5txue4TMu2sJyG934CNiz0czhwN4mL9r3VfUzpZb+jW?=
+ =?us-ascii?Q?2Z9Nfaj3NWUuHswOwDA8FdOsXN29uLDUHw1wWJ9GlWX+e64GJ8ATrQ+Mus1H?=
+ =?us-ascii?Q?i4NJGvWGdJfJbfjO0yBU3UB3TP9WB2Zu6rFoDDqW6756cvHgWaBstg8UxggT?=
+ =?us-ascii?Q?xRvKRr6RXfr+lPXvZUVJxIgQzrWhDCwU/VpdnW8kkM2bwJLS1JKcMjSN5HZv?=
+ =?us-ascii?Q?cIoRRziuhNhCR5/SOfGQ1dhcHcr0cQYnL0/hU+E7ujDYJSmPgF7iVs/Yl7eg?=
+ =?us-ascii?Q?Wh1vrg630yMLDG/Wn7bn5teJbSswlBH/XC9yEPJWo1+jTwsm9IeO++iDi1JW?=
+ =?us-ascii?Q?NJj6rSdYW3ufSn7aGWJyNvQed8MtxL1iiEEPtBLRuB2AES8Wg0aq63nC886u?=
+ =?us-ascii?Q?LkBYvCZobWmartalIvAjYkFxcXaiMUpzIS72bQECYNNXboIIVZgFF6v/wXOE?=
+ =?us-ascii?Q?Ud8is5IzDz1QkvWmnO9vh655VFdR4bAZHOY+MhMfRWt870PSoO6jcIR4z+d8?=
+ =?us-ascii?Q?tJqxk0ZIqSlMb+zOOsVbBec34DRoQpMoNdiymJSuWRIaKr0yTuxheK3uWXJB?=
+ =?us-ascii?Q?9FkGxAStC0PCKDl5XSrmxqkctVlys+yqBCHQ+gvHcpgTn+RdblbD+XXPWqN3?=
+ =?us-ascii?Q?0GDMr8eIOra8RKN+BMGzlE3P1HIPj1913CFFE10wR6jz7B+VKMwc9Qp5F3Tf?=
+ =?us-ascii?Q?7Q8SClOmompenZQKj3+wL9znqwsEyLUc/Gx2nXIjJRx68KRsmxWlZl+FRf7s?=
+ =?us-ascii?Q?y/noTsTXalg4kSOd5wZpdkdCNTiXe/bEXLim2SySv7MEeeKienUp7Y2Gn3kS?=
+ =?us-ascii?Q?pjJEskBIME4KfrorS9qgyH+iuGQkcIRK9CldQO49s7NmfGG0VQH9CbEDMgXi?=
+ =?us-ascii?Q?gcV6DpfcrTXD4gbl8fpdd1NbMtT+2IFZi9knUQmxHnyt8FYl/LHleGihOfCb?=
+ =?us-ascii?Q?XwwSVbpzP/y/HZ+keapW4MABOpJrR691oOjp+b1Ryjq5d1KQyZqYrF3+D3yI?=
+ =?us-ascii?Q?/O4PArT/lJRG1TAz4a7/ijSO3zvmDIlUBNkGsRkmIugLWIPnqiowHjc7MLIF?=
+ =?us-ascii?Q?yXpdkF8/Q5fdZrLpScqsXFKdISCJnmuwKRqU5EJrppsUo8QN7jzxTWG2olyz?=
+ =?us-ascii?Q?kiAHfidGrJ5xFS3q7rL9MMk63ZjBNPUN96b8eI877MEtjrUE+3uV8l6SlGbv?=
+ =?us-ascii?Q?go+1TIJmETqT2XbdtpRpZiClRIXjhtTH57281LUP60sLtiT29BuNU88L2Eha?=
+ =?us-ascii?Q?5KJjnRDiXxN+HffWW655aMGgOnjeNS0GfOr8GeYeP1geLvJQJkd3PiZJDOl0?=
+ =?us-ascii?Q?FwKne6jQt9GqT/R+vAQJ7fk2/7Bmtud/?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2024 20:12:46.8831
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5168f874-1f85-4524-6e4a-08dcc6d49e46
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000142.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4368
 
-Hi Sean,
+On Tue, Aug 27, 2024 at 12:51:35PM -0300, Jason Gunthorpe wrote:
+> HW with CANWBS is always cache coherent and ignores PCI No Snoop requests
+> as well. This meets the requirement for IOMMU_CAP_ENFORCE_CACHE_COHERENCY,
+> so let's return it.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Have you had the time to review this?
+Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
 
-QE team is hitting this bug a lot, and I am afraid that it will start
-to hit customers soon.
+With two very ignorable nits:
 
-Please let me know if you need any further data / assistance.
+> @@ -2693,6 +2718,15 @@ static int arm_smmu_attach_prepare(struct arm_smmu_attach_state *state,
+>  		 * one of them.
+>  		 */
+>  		spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+> +		if (smmu_domain->enforce_cache_coherency &&
+> +		    !(dev_iommu_fwspec_get(master->dev)->flags &
+> +		      IOMMU_FWSPEC_PCI_RC_CANWBS)) {
 
-Thanks!
-Leo
+How about a small dev_enforce_cache_coherency() helper?
 
+> +			kfree(master_domain);
+> +			spin_unlock_irqrestore(&smmu_domain->devices_lock,
+> +					       flags);
+> +			return -EINVAL;
 
-On Mon, Jul 29, 2024 at 8:28=E2=80=AFAM Leonardo Bras Soares Passos
-<leobras@redhat.com> wrote:
->
-> On Fri, Jul 12, 2024 at 5:02=E2=80=AFPM Leonardo Bras <leobras@redhat.com=
-> wrote:
-> >
-> > On Fri, Jul 12, 2024 at 05:57:10PM +0200, Paolo Bonzini wrote:
-> > > On 7/11/24 01:18, Leonardo Bras wrote:
-> > > > What are your thoughts on above results?
-> > > > Anything you would suggest changing?
-> > >
-> >
-> > Hello Paolo, thanks for the feedback!
-> >
-> > > Can you run the test with a conditional on "!tick_nohz_full_cpu(vcpu-=
->cpu)"?
-> > >
-> > > If your hunch is correct that nohz-full CPUs already avoid invoke_rcu=
-_core()
-> > > you might get the best of both worlds.
-> > >
-> > > tick_nohz_full_cpu() is very fast when there is no nohz-full CPU, bec=
-ause
-> > > then it shortcuts on context_tracking_enabled() (which is just a stat=
-ic
-> > > key).
-> >
-> > But that would mean not noting an RCU quiescent state in guest_exit of
-> > nohz_full cpus, right?
-> >
-> > The original issue we were dealing was having invoke_rcu_core() running=
- on
-> > nohz_full cpus, and messing up the latency of RT workloads inside the V=
-M.
-> >
-> > While most of the invoke_rcu_core() get ignored by the nohz_full rule,
-> > there are some scenarios in which it the vcpu thread may take more than=
- 1s
-> > between a guest_entry and the next one (VM busy), and those which did
-> > not get ignored have caused latency peaks in our tests.
-> >
-> > The main idea of this patch is to note RCU quiescent states on guest_ex=
-it
-> > at nohz_full cpus (and use rcu.patience) to avoid running invoke_rcu_co=
-re()
-> > between a guest_exit and the next guest_entry if it takes less than
-> > rcu.patience miliseconds between exit and entry, and thus avoiding the
-> > latency increase.
-> >
-> > What I tried to prove above is that it also improves non-Isolated cores=
- as
-> > well, since rcu_core will not be running as often, saving cpu cycles th=
-at
-> > can be used by the VM.
-> >
-> >
-> > What are your thoughts on that?
->
-> Hello Paolo, Sean,
-> Thanks for the feedback so far!
->
-> Do you have any thoughts or suggestions for this patch?
->
-> Thanks!
-> Leo
->
-> >
-> > Thanks!
-> > Leo
+kfree() doesn't need to be locked.
 
+Thanks
+Nicolin
 
