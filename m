@@ -1,256 +1,285 @@
-Return-Path: <kvm+bounces-25116-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25117-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3325C95FF25
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 04:32:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11669960093
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 06:55:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 579251C219F3
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 02:32:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E225B2179E
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 04:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E32912E5D;
-	Tue, 27 Aug 2024 02:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D9C71B3A;
+	Tue, 27 Aug 2024 04:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dJAKbceP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lbiCpdw4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A9B372;
-	Tue, 27 Aug 2024 02:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724725919; cv=fail; b=kYgUQ6PwqoqkGx/fivsHkBkY+4jHb7lHffW4K3SZhZQy/FffJiEn8T+xwjT5X7eSy6oKMJICJhFP58HSH6eMBLV8lxg5SyhSuw8qxWyWt5AuPCo0KPiSgDDlQZKHXGJZ1WnNy1uY1v25ScwgOqD59sXvmfPvOEFpbPcMoAr8ASY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724725919; c=relaxed/simple;
-	bh=+WJ9OKth6xBOueCuQPf33h1rBH0zKeyUbLoPD/U5ALY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GE0bgafYQSwS9VsIZaiPJl2BKsY9voHsrHQolYuvpVN7BgN1gicegNbkl5rLH0vKkA+JTRJNY7FZrvOiSv1WIHRctguYCLYBd9s/OzF/KSJohQu4rkH4dh+1foWaygBJ5sFQ/ftsLfZCczSUrocjJXRB0QnyDa8yArXM0+klEHc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dJAKbceP; arc=fail smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CFC45028;
+	Tue, 27 Aug 2024 04:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724734509; cv=none; b=Fu+LF7bbfbNtBSpwgvdFk4FcbROmqZwB3pKOELtsXxD/FblXZq4eNUAEzWODvOnUdNmqq7hG2xRcC1qGun+450cWnDgMTyIkwM+o6HfUXf5cpUlE043QgXK+OJodwd7mYF3rH7m3Vmz5uEOZjjFEVbG7fgzB8fzFtgHBNvOKJrM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724734509; c=relaxed/simple;
+	bh=PdA0EpTBc8PSnwnMVFJg2PvKQseIM/bCCQkx0W8vh2o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sjMgwf8J9lk6KzGZuCTkZ0hOdB9Wok1EoBGwupPUP0AqUm6BwyjoiW/fYiC16bXpDS+ED4TQrMFsOEy9J7EIcgO9V8KwcM7NzQZB+S6QfgE5yGpI5bxWnb0MLr2UYZPI8YlUM36AMxL0QHPPKAnCs+V2sJo0uZvFHR3E8GIuFu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lbiCpdw4; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724725918; x=1756261918;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=+WJ9OKth6xBOueCuQPf33h1rBH0zKeyUbLoPD/U5ALY=;
-  b=dJAKbceP9kO7iBhOeYiWECvPRw0UPrtGK2SI4CUIYNhzxXzt8qzSY0rP
-   LdwDghd6lGUusRIsFYb4gTXOBj8JL1Xnjp1K/pD69YmP9ztr696U4cCzh
-   /k2WzNkMQW6dAy+NTmP47rRo29hMUJ/ukP8D0sgaXaLA2I4YoUi6vDQa0
-   X+4qTTiXPin2pMqoX/FjUnpwEh8w1Dj/N44Av27y7EqS7hTQ+XgF7+b8K
-   UFbiv3XS2ZTBCC+H6jBjT1AqnviRLbj9aWp5xFEI8uEbtOUVrmeU7WPnL
-   jfLVlWSWXdt6azs/HxXhUe+cLwWiZcsSctz6FDG/z30JGIAxwRhW+AAU4
-   w==;
-X-CSE-ConnectionGUID: mlJhgXjDR62R2pofjvsbaA==
-X-CSE-MsgGUID: OHhVhaweQm2fG6LX27kL5Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="23342989"
+  t=1724734507; x=1756270507;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=PdA0EpTBc8PSnwnMVFJg2PvKQseIM/bCCQkx0W8vh2o=;
+  b=lbiCpdw4YNVBxJqtNNgOtMATvY6UXUarPBv67/P9m7RgUuZImowgIujU
+   8Xjc+pHhBYFI9B7Y4xYxEZiDfce+O4KAgGYEsyiRiYvM3o9Atk3REfoks
+   ecTmDuNU9lYVH5g1fP51n54THxX6QsP1Y6en+A5z4flcuQrEj89kvCe5J
+   kk/dJLhSpDK4rlodZxv2XTJSmECxBONypBJelU/4dk5azYtdtE054hVZm
+   3fkqAut5V88M+0jFC7O9xql/I3Soepwf3bRSlAk7fNFcS4CQ2V/Y6jVIL
+   gHhK8ZW7haqL+6a4BragZwRXrWm8M0uFdcDEiLer9t0Js8enBQL2QXDI/
+   A==;
+X-CSE-ConnectionGUID: c9l6BwfBQC+yyW0wlj4mFg==
+X-CSE-MsgGUID: iXNsJ658TvWYQrHM+V8AAw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="23073120"
 X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
-   d="scan'208";a="23342989"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 19:31:34 -0700
-X-CSE-ConnectionGUID: 9Lq65Ir/SDKUZIns6STl9A==
-X-CSE-MsgGUID: O3eeOC9kST2ajZtCIiSaNA==
+   d="scan'208";a="23073120"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 21:55:06 -0700
+X-CSE-ConnectionGUID: cqa0QI58RDSrmJUsNwlFIg==
+X-CSE-MsgGUID: lb8NBX+9SAeG4kCWpIu35A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
-   d="scan'208";a="62543414"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Aug 2024 19:31:33 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 26 Aug 2024 19:31:33 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 26 Aug 2024 19:31:33 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 26 Aug 2024 19:31:31 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=v06QbaKY06CdSVXeiShTQ1ISbwNBwOaGL0PEzaQPBKsHRp/HfMoZx4r54Wbfiw1qnz8/tSvQtNVkaI0Eqo8+j5/g8Q+BC8jxsn/Px2LJeDFRX+ot7kJyAo44WsyIRfOx1G+c6JhVb21NcWkQEFEEl5qcSz+KZS99psAUXrpe7PPnK8KbIkR31KnsDEI0jJxkMKyEF4cLb2yt4UjiIfxIJORq1cGfB2J0rRozY6uKpL8u/uFwxCbm7Zb0GuCxP3lZh7hF8yhvzPcoWeVY7tNgKk0wISDudW0s1qZXl5eENAacUQGNJHF42vZCNGL1UBsGQNxvLGztlVOsQvyVTsUeZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+WJ9OKth6xBOueCuQPf33h1rBH0zKeyUbLoPD/U5ALY=;
- b=JmVn6ohh3ioSECUdDPIJ+nkf0dVeSkj97/Tps0p8a5ThVyxmZBG+Pp+4ho361sEQyu01KyVGr6Vm+ZeJ0bFtvl7KtGFbLJp8VlUSi4sRa1TB2J/Irgb0hSMs4uxvw4dCi8RO0TzZK66cVz/t46LtAre3n7fOAj2iCGcGCBy1Mu18PORFzWEziCAfVr7fpsI90CXBnAfnZehwz/PfY2pwrlTh+w7ozOKH1me0olsEjeH54Z+suoyIUEZ6fTklIxzlJpHTZrw3sMMsfUIWsJL34nUbz9nN9W2mBqG13gi0WZ7qo/l0PFv3yo7pwygI5ePI9ip2RrE45gVegzgaRI5wig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SJ0PR11MB4957.namprd11.prod.outlook.com (2603:10b6:a03:2df::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Tue, 27 Aug
- 2024 02:31:28 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1%3]) with mapi id 15.20.7897.021; Tue, 27 Aug 2024
- 02:31:28 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Alexey Kardashevskiy <aik@amd.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>
-CC: "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "Suravee
- Suthikulpanit" <suravee.suthikulpanit@amd.com>, Alex Williamson
-	<alex.williamson@redhat.com>, "Williams, Dan J" <dan.j.williams@intel.com>,
-	"pratikrajesh.sampat@amd.com" <pratikrajesh.sampat@amd.com>,
-	"michael.day@amd.com" <michael.day@amd.com>, "david.kaplan@amd.com"
-	<david.kaplan@amd.com>, "dhaval.giani@amd.com" <dhaval.giani@amd.com>,
-	Santosh Shukla <santosh.shukla@amd.com>, Tom Lendacky
-	<thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, "Alexander
- Graf" <agraf@suse.de>, Nikunj A Dadhania <nikunj@amd.com>, Vasant Hegde
-	<vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>, Jason Gunthorpe
-	<jgg@nvidia.com>, "david@redhat.com" <david@redhat.com>
-Subject: RE: [RFC PATCH 12/21] KVM: IOMMUFD: MEMFD: Map private pages
-Thread-Topic: [RFC PATCH 12/21] KVM: IOMMUFD: MEMFD: Map private pages
-Thread-Index: AQHa9WDSA4/jzf2jak2pyUws2LsQ4bI5OEgwgAEuU4CAAACT4A==
-Date: Tue, 27 Aug 2024 02:31:28 +0000
-Message-ID: <BN9PR11MB527602D9A20BE8B60AD6B7E08C942@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240823132137.336874-1-aik@amd.com>
- <20240823132137.336874-13-aik@amd.com>
- <BN9PR11MB5276D14D4E3F9CB26FBDE36C8C8B2@BN9PR11MB5276.namprd11.prod.outlook.com>
- <477f3f50-0015-46ea-96c7-dae0971f9fc6@amd.com>
-In-Reply-To: <477f3f50-0015-46ea-96c7-dae0971f9fc6@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SJ0PR11MB4957:EE_
-x-ms-office365-filtering-correlation-id: ecb19417-ff9c-42eb-c71a-08dcc6405ad5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?RlB2QXdRNVpxU1F0elJGdWJucC9lYkpSOTFzTlJ1M3BjbGpHZGxROXdCeXJL?=
- =?utf-8?B?bjQzU1FLVlhwUEVLMG05Z0NiYm82VTBRc0tDNUNIZjhQTWlVRHNGWjBuc3lK?=
- =?utf-8?B?SlpPQ1JiVUp2MGRBRjQwaEVvMEs1dlhPTVlaVFg4aStPbjQvWUhRNWpXTnBr?=
- =?utf-8?B?RmROSUtqMzYweHFNYk9JQ1Z0elBheWF4bDh5dUNlZ2RueDRGK0EyRTV1K2FF?=
- =?utf-8?B?ZFl5WW9qcWJ6SitnSlpKNERoV0IvdDVtMzBKQ1YvUWdxd0FkN2xCR0pwWG1X?=
- =?utf-8?B?Q2R4OUZvRndZYnRUZFlhVDJqUkVEVjlJYTBza0pDdkNHdUNBa29jK3FVOTVt?=
- =?utf-8?B?QnpEUVk0VjFSbG5jdDhRLzh5aGZSMnZxbWJ6VzVGNWhlNEFCSlZQT1lQTjNl?=
- =?utf-8?B?NFEvd1NRWDdiTEI1WmFUeEo4OUgxTHd0K3Yyd1RQRkZzSHJXSm82U1FzZ2k2?=
- =?utf-8?B?ZTl4YVduVWs2cTl5Zm1DcUZSb3Q5ZmVGWEsxRXluVW50bW5qVjFLU0o2cGpI?=
- =?utf-8?B?RUdzRTluSHBHa2szNGFidE9NQ202dVJCblFqMDRNcmRMbkRIcDRIOUFYcWJq?=
- =?utf-8?B?TTlFNHkxQ0pLVzRlTllUZFhLSHRtSGZmOURvMUIzV0w1VVh4VnRPNWM0aWZp?=
- =?utf-8?B?VEhWa0JDb0lDWTlKdURjWXRwMDV2ZHMxTDhFdlpUWlowQlM4M2c2Uko2ZURE?=
- =?utf-8?B?bUVoOVZRcUVlUFJWcEQ0dTJEZkU3SjVhTHAvWFplcURMUzFTYVNmLzl0dUtB?=
- =?utf-8?B?dzQzRFQyZGpCcTJOM1Y4cXBnYk16YkthRGdPeDFCazRnTkczTFFQUEJJeWNi?=
- =?utf-8?B?a1dNNDhDV3IrYnRaRVkwM0kvaEdPZDd6T2g2ZkFHM2x3VEVpcmE4dXo3enAw?=
- =?utf-8?B?SHNoN29DbjRseFlZSnJRemwxc0NiQVVHc3lBNTEvc0xYNnJod1p0M2pIMW5i?=
- =?utf-8?B?cW5WR2dwK1BkYXFmeWFXdW1FRDNwbTNDbzBZUDJ0dGpmczBqQVF3NFFHUlVn?=
- =?utf-8?B?RWttK1dmOGRYZmQzeHh0dWlvV2lEWkVmQU12K3VBdHV4Ylg4K0pjRzI0UGIw?=
- =?utf-8?B?ZENDRnRGVXlHNjMxUU1BZGcrbDd1Q0dWTlZLVCtCYk5yb0kxUWFSZVVFazNh?=
- =?utf-8?B?UDlqbk1ULzhjcVhUVWRGV2NNeklBOStYMXFFNDluajYwZnR6RlErNURndnlE?=
- =?utf-8?B?bER6cko2Qnh6L3dNeVRRN1hDNTNYTkEwYTFrRzBZb0RDYVVuNC9PNy80ZGY2?=
- =?utf-8?B?K1pjVWpPNU84bDVuTFUrd2pveFZUWE40M0ZRYm5TWUsrMU1BMTU4Vzg0bFZ2?=
- =?utf-8?B?bXhjbWMxczFteFdEMzBUcGtsa3ZoRXBNNGdJRGE2U1JXNmVQNURRZWtFMW5w?=
- =?utf-8?B?WUpsT2kzWG15S2p4UjNsYWtoS3dncHJxYzg3WktzQjZ2L3hNQkJNYnd1K21r?=
- =?utf-8?B?ekdpMjBKZE04SkJDVXozTmRMS1M5TFZhNGRHNWFmanNEK3Z1RVNiajBwWFFi?=
- =?utf-8?B?OXRjWjBEVG9yZ0RONjZuRllwc2tMcHMrZWtoU01KNzVVN2FERXAvL2pNY0xR?=
- =?utf-8?B?Q3Bud3cwVDR1RHNrUzNrSTF3UHRaaU1MaWZ1TVB0T1pCQTFBWlZrODgyYkRo?=
- =?utf-8?B?aUljWXgrQ21VREdSQjlDNERlcDQ3NlhQSE9JTk5rZ21LaERMaHowRTkwL3dR?=
- =?utf-8?B?cUxJbkRFQTg0ZkhpTGozekJ0dlAybktLQXdKQk5QSERnK0RWa2hnTVY1Rjc5?=
- =?utf-8?B?ZWtDOFhudEduYjBKTG9ITW05eUZoc0hWTTdvcGxTM3NRZmtoTE1UUHJSZUlr?=
- =?utf-8?Q?PSOHT+ugEdWHPA54mhihqYHk1HIvQntYz6EuQ=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?aGNXVEhiZG04bjFZdTIzd1Fyem5MVi8xa1FIcW1jN1BrWXNMRGt1NlZTbEts?=
- =?utf-8?B?REV1cFB6R1dHbXg1azdYRU9kZS9Ed0ZjVjJPdkRMYm9SUUF5S3RsNGRKTWgr?=
- =?utf-8?B?aDNzQ3pGanM5aDRXd0E0Y1dDeENKMnhmZVV6OUhUbFhOL25USUVvbG52K29v?=
- =?utf-8?B?K01KZno3ekhoS1dMMFR5dHk0clJCMnJMTm9qa2ZOVjUybzcvb2NROG1meXRE?=
- =?utf-8?B?YjlueitHcndMSTRHR3NuRWN5L2k3RlV3bmQ2MjBKbXJOcFZYZTIyTzlFamFx?=
- =?utf-8?B?NlNQU0R0ZEZVRUYvMVgyZGtCelMrNUp0enhmSW5UTU1RWDNqeW5HbkRLcjd1?=
- =?utf-8?B?U3hmL2c3RGE1NEdESmg5UElMZlpWU255aGVPNjg5QlpoYXdRR29uSGJaSEF1?=
- =?utf-8?B?R2o1UnZDRmEyRUV5OWVZVy9Qa05XT0RKeit1dmVXZ21kSWhXSllkZE9rbERU?=
- =?utf-8?B?czdKcmlMZHJxS1hrcS9WTWVpQi9BTXRFQ1RkMDc2c2dXNDVLSmFaNmJBMlNl?=
- =?utf-8?B?MUZybkRJY3FHTU81UmgzSUo1TWh6aWYxZmo0eXlpK083WTAwNW40dStOemY0?=
- =?utf-8?B?Q0FGYm1KMW1VTWpTaFRvcSs2bGxQbEhlSzBtVkRPUk9UbkxYQnNJQlZBblli?=
- =?utf-8?B?OFNPcTVqTHhGZ3JyOHJvWnBEcnhjbFZ2TlJJUFIraEhZdzc0ckd0SUhmc3lM?=
- =?utf-8?B?SVJNdEQxZmx4TXpqR1ZLRE0zMGR5UkxOck5qSzlva2JXcTMreGMvd1dBWXJZ?=
- =?utf-8?B?bVNwUWdPa0srS2R6SjZsSmpFOFZ4cW90alpCNG5tS3FSSXNWQTBZaTE5enIr?=
- =?utf-8?B?SFFHYkdSOVNpNTNldFhjWjJMdWZ1MURFbWpxeHFSRFlIVnpRdXBpbFlIOHFi?=
- =?utf-8?B?SGE1TUdZVlhFb0pQVG9DcnU1ek1POEpzM29xSnd5YXgwdzQ0NWxPZ3ZEWnhZ?=
- =?utf-8?B?QmgybWx4bW5FWFFHaXdTb1JqZ2RBeEdPODJrRjI4RVphZEYxMW5qenlBWWhU?=
- =?utf-8?B?MnpoNzNRSjBDSWdOWWdKRTVmUWpsYkV3eTRKb3lYSk5mMVZMZXBuMjFOajg0?=
- =?utf-8?B?RWZTUTU1cVpPR1Y2bFFmcWVuWURHRy9QWlpUT1dhRHBVeWhvdGcvU0RWZFM0?=
- =?utf-8?B?Ris0M3ZnbDBMalZoN3l0a3k1b1VNU00wUXJnK09VeUN0K1o0VHZ0YVZFRnFC?=
- =?utf-8?B?T2h0ekRkbWNSb29ubU9yRUR6OU1DTTNaNFQxSndtQU5mbitGaHdYeis2ajBI?=
- =?utf-8?B?UDhoNXhiWlNjUFZZSlpMQTk5S2JjRWVFd29oR2NSZUwzcWtIMG9OOGFTYko1?=
- =?utf-8?B?QXgrc0Q0eVdTZ1dXK1dkSXRiNEFucVhSL2ZNQ05lZTJULy94WUtmQW1uYSsv?=
- =?utf-8?B?WkVtWXg3QVFWUFlpeDVLUUdMQTZPTjBOMzdaVHg3TmtUSHkzOEYyTDRzeWw5?=
- =?utf-8?B?MjJvazBWYzhINVBRTEN2aiswcDRjM0VORzVsMS8rRVV2MEdZQTRPTHpCbjU4?=
- =?utf-8?B?QlFoWVpYU2hWMUEvWDRSaUJkSC9XVFZQbm11K2xXdEZRWkZLc203a1JSbVNp?=
- =?utf-8?B?dkcrRHpYY3dBS0NubXZUeFpHUnNPUUZRRkwzb1o0MUIwRWI2SXBjenFBcWlj?=
- =?utf-8?B?enpSLzJQSU9GK1ZWelgyd3Qvc1pXdUk2ekVacEpEREdTOVlkUUhkQVpmbWNt?=
- =?utf-8?B?UjlOd3RBN0NuVzQ3NVA4QjZYNEsyQ293eEhEWlJCQnV6ZnVVZlE4M3EybHVF?=
- =?utf-8?B?NVlGRGdBWjU2Q01kbmcvVlFMTnJQNjhmeW5oeGRPdUJQMXBqdjZnTUlhREpw?=
- =?utf-8?B?c1ZyZmY5V0tPU2Z4NW9HRnhPdjNPUHo0emR0VENUbU83cUVqNm1vZWJXMnBE?=
- =?utf-8?B?b09STFo1am04WnNoNnhlblBMYkRDeXFLU1J1SXJrVUV6T2ZHV3JLWVUwTWVP?=
- =?utf-8?B?RU9wSUtZV0JobmZGWkt1clZrWnUwdGpqc1hYbTBNZEZqNHdsRnlGNnUvaDAv?=
- =?utf-8?B?VW9pdlMzZG55SDI1YUZiRjI1WUhnNVlhMURGa1pxbGtORWF4M0dHanc4UzZ4?=
- =?utf-8?B?VmlOeGlvY09xTlhHVWF3OHdqYUYrNTBEczFCZ3RZeFBNR1hHajhYeld6RHlz?=
- =?utf-8?Q?X5P28RU2Etq6/d0sBMpb/iyfw?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="100238910"
+Received: from unknown (HELO [10.0.2.15]) ([10.245.89.141])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 21:55:00 -0700
+Message-ID: <7ae1fcac-cbea-478c-b8c9-d2c2a5dd6f11@intel.com>
+Date: Tue, 27 Aug 2024 07:54:54 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ecb19417-ff9c-42eb-c71a-08dcc6405ad5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Aug 2024 02:31:28.3604
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QhgnJOckQ6QqyOxognwX+a6mVYPvimME4X+757xfSw0odBYap5PreotUFmXHtQj7ymIr7Shb2cjTKaeJnpuzqw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4957
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 02/10] x86/virt/tdx: Unbind global metadata read with
+ 'struct tdx_tdmr_sysinfo'
+To: "Huang, Kai" <kai.huang@intel.com>, "Hansen, Dave"
+ <dave.hansen@intel.com>, "seanjc@google.com" <seanjc@google.com>,
+ "bp@alien8.de" <bp@alien8.de>, "peterz@infradead.org"
+ <peterz@infradead.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "mingo@redhat.com" <mingo@redhat.com>,
+ "Williams, Dan J" <dan.j.williams@intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Gao, Chao" <chao.gao@intel.com>,
+ "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>
+References: <cover.1721186590.git.kai.huang@intel.com>
+ <7af2b06ec26e2964d8d5da21e2e9fa412e4ed6f8.1721186590.git.kai.huang@intel.com>
+ <66b16121c48f4_4fc729424@dwillia2-xfh.jf.intel.com.notmuch>
+ <7b65b317-397d-4a72-beac-6b0140b1d8dd@intel.com>
+ <66b178d4cfae4_4fc72944b@dwillia2-xfh.jf.intel.com.notmuch>
+ <96c248b790907b14efcb0885c78e4000ba5b9694.camel@intel.com>
+ <a107b067-861d-43f4-86b5-29271cb93dad@intel.com>
+ <49dabff079d0b55bd169353d9ef159495ff2893e.camel@intel.com>
+Content-Language: en-US
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <49dabff079d0b55bd169353d9ef159495ff2893e.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-PiBGcm9tOiBBbGV4ZXkgS2FyZGFzaGV2c2tpeSA8YWlrQGFtZC5jb20+DQo+IFNlbnQ6IFR1ZXNk
-YXksIEF1Z3VzdCAyNywgMjAyNCAxMDoyOCBBTQ0KPiANCj4gT24gMjYvOC8yNCAxODozOSwgVGlh
-biwgS2V2aW4gd3JvdGU6DQo+ID4gK0phc29uL0RhdmlkDQo+ID4NCj4gPj4gRnJvbTogQWxleGV5
-IEthcmRhc2hldnNraXkgPGFpa0BhbWQuY29tPg0KPiA+PiBTZW50OiBGcmlkYXksIEF1Z3VzdCAy
-MywgMjAyNCA5OjIxIFBNDQo+ID4+DQo+ID4+IElPTU1VRkQgY2FsbHMgZ2V0X3VzZXJfcGFnZXMo
-KSBmb3IgZXZlcnkgbWFwcGluZyB3aGljaCB3aWxsIGFsbG9jYXRlDQo+ID4+IHNoYXJlZCBtZW1v
-cnkgaW5zdGVhZCBvZiB1c2luZyBwcml2YXRlIG1lbW9yeSBtYW5hZ2VkIGJ5IHRoZSBLVk0NCj4g
-YW5kDQo+ID4+IE1FTUZELg0KPiA+Pg0KPiA+PiBBZGQgc3VwcG9ydCBmb3IgSU9NTVVGRCBmZCB0
-byB0aGUgVkZJTyBLVk0gZGV2aWNlJ3MNCj4gS1ZNX0RFVl9WRklPX0ZJTEUNCj4gPj4gQVBJDQo+
-ID4+IHNpbWlsYXIgdG8gYWxyZWFkeSBleGlzdGluZyBWRklPIGRldmljZSBhbmQgVkZJTyBncm91
-cCBmZHMuDQo+ID4+IFRoaXMgYWRkaXRpb24gcmVnaXN0ZXJzIHRoZSBLVk0gaW4gSU9NTVVGRCB3
-aXRoIGEgY2FsbGJhY2sgdG8gZ2V0IGEgcGZuDQo+ID4+IGZvciBndWVzdCBwcml2YXRlIG1lbW9y
-eSBmb3IgbWFwcGluZyBpdCBsYXRlciBpbiB0aGUgSU9NTVUuDQo+ID4+IE5vIGNhbGxiYWNrIGZv
-ciBmcmVlIGFzIGl0IGlzIGdlbmVyaWMgZm9saW9fcHV0KCkgZm9yIG5vdy4NCj4gPj4NCj4gPj4g
-VGhlIGFmb3JlbWVudGlvbmVkIGNhbGxiYWNrIHVzZXMgdXB0ciB0byBjYWxjdWxhdGUgdGhlIG9m
-ZnNldCBpbnRvDQo+ID4+IHRoZSBLVk0gbWVtb3J5IHNsb3QgYW5kIGZpbmQgcHJpdmF0ZSBiYWNr
-aW5nIHBmbiwgY29waWVzDQo+ID4+IGt2bV9nbWVtX2dldF9wZm4oKSBwcmV0dHkgbXVjaC4NCj4g
-Pj4NCj4gPj4gVGhpcyByZWxpZXMgb24gcHJpdmF0ZSBwYWdlcyB0byBiZSBwaW5uZWQgYmVmb3Jl
-aGFuZC4NCj4gPj4NCj4gPg0KPiA+IFRoZXJlIHdhcyBhIHJlbGF0ZWQgZGlzY3Vzc2lvbiBbMV0g
-d2hpY2ggbGVhbnMgdG93YXJkIHRoZSBjb25jbHVzaW9uDQo+IA0KPiBGb3Jnb3QgWzFdPw0KDQpb
-MV0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcva3ZtLzIwMjQwNjIwMTQzNDA2LkdKMjQ5NDUxMEBu
-dmlkaWEuY29tLw0KDQo+IA0KPiA+IHRoYXQgdGhlIElPTU1VIHBhZ2UgdGFibGUgZm9yIHByaXZh
-dGUgbWVtb3J5IHdpbGwgYmUgbWFuYWdlZCBieQ0KPiA+IHRoZSBzZWN1cmUgd29ybGQgaS5lLiB0
-aGUgS1ZNIHBhdGguDQo+ID4NCj4gPiBPYnZpb3VzbHkgdGhlIHdvcmsgaGVyZSBjb25maXJtcyB0
-aGF0IGl0IGRvZXNuJ3QgaG9sZCBmb3IgU0VWLVRJTw0KPiA+IHdoaWNoIHN0aWxsIGV4cGVjdHMg
-dGhlIGhvc3QgdG8gbWFuYWdlIHRoZSBJT01NVSBwYWdlIHRhYmxlLg0KPiA+DQo+ID4gYnR3IGdv
-aW5nIGRvd24gdGhpcyBwYXRoIGl0J3MgY2xlYXJlciB0byBleHRlbmQgdGhlIE1BUF9ETUENCj4g
-PiB1QVBJIHRvIGFjY2VwdCB7Z21lbWZkLCBvZmZzZXR9IHRoYW4gYWRkaW5nIGEgY2FsbGJhY2sg
-dG8gS1ZNLg0KPiANCj4gVGhhbmtzIGZvciB0aGUgY29tbWVudCwgbWFrZXMgc2Vuc2UsIHRoaXMg
-c2hvdWxkIG1ha2UgdGhlIGludGVyZmFjZQ0KPiBjbGVhbmVyLiBJdCB3YXMganVzdCBhIGJpdCBt
-ZXNzeSAoYnV0IGRvYWJsZSBuZXZlcnRoZWxlc3MpIGF0IHRoZSB0aW1lDQo+IHRvIHB1c2ggdGhp
-cyBuZXcgbWFwcGluZyBmbGFnL3R5cGUgYWxsIHRoZSB3YXkgZG93biB0bw0KPiBwZm5fcmVhZGVy
-X3VzZXJfcGluOg0KPiANCj4gaW9tbXVmZF9pb2FzX21hcCAtPiBpb3B0X21hcF91c2VyX3BhZ2Vz
-IC0+IGlvcHRfbWFwX3BhZ2VzIC0+DQo+IGlvcHRfZmlsbF9kb21haW5zX3BhZ2VzIC0+IGlvcHRf
-YXJlYV9maWxsX2RvbWFpbnMgLT4gcGZuX3JlYWRlcl9maXJzdCAtPg0KPiBwZm5fcmVhZGVyX25l
-eHQgLT4gcGZuX3JlYWRlcl9maWxsX3NwYW4gLT4gcGZuX3JlYWRlcl91c2VyX3Bpbg0KPiANCj4g
-DQo+IFRoYW5rcywNCj4gDQo+IC0tDQo+IEFsZXhleQ0KDQo=
+On 27/08/24 01:40, Huang, Kai wrote:
+> On Mon, 2024-08-26 at 18:38 +0300, Adrian Hunter wrote:
+>> On 7/08/24 15:09, Huang, Kai wrote:
+>>> On Mon, 2024-08-05 at 18:13 -0700, Dan Williams wrote:
+>>>> Huang, Kai wrote:
+>>>> [..]
+>>>>>> The unrolled loop is the same amount of work as maintaining @fields.
+>>>>>
+>>>>> Hi Dan,
+>>>>>
+>>>>> Thanks for the feedback.
+>>>>>
+>>>>> AFAICT Dave didn't like this way:
+>>>>>
+>>>>> https://lore.kernel.org/lkml/cover.1699527082.git.kai.huang@intel.com/T/#me6f615d7845215c278753b57a0bce1162960209d
+>>>>
+>>>> I agree with Dave that the original was unreadable. However, I also
+>>>> think he glossed over the loss of type-safety and the silliness of
+>>>> defining an array to precisely map fields only to turn around and do a
+>>>> runtime check that the statically defined array was filled out
+>>>> correctly. So I think lets solve the readability problem *and* make the
+>>>> array definition identical in appearance to unrolled type-safe
+>>>> execution, something like (UNTESTED!):
+>>>>
+>>>>
+>>> [...]
+>>>
+>>>> +/*
+>>>> + * Assumes locally defined @ret and @ts to convey the error code and the
+>>>> + * 'struct tdx_tdmr_sysinfo' instance to fill out
+>>>> + */
+>>>> +#define TD_SYSINFO_MAP(_field_id, _offset)                              \
+>>>> + ({                                                              \
+>>>> +         if (ret == 0)                                           \
+>>>> +                 ret = read_sys_metadata_field16(                \
+>>>> +                         MD_FIELD_ID_##_field_id, &ts->_offset); \
+>>>> + })
+>>>> +
+>>>
+>>> We need to support u16/u32/u64 metadata field sizes, but not just u16.
+>>>
+>>> E.g.:
+>>>
+>>> struct tdx_sysinfo_module_info {
+>>>         u32 sys_attributes;
+>>>         u64 tdx_features0;
+>>> };
+>>>
+>>> has both u32 and u64 in one structure.
+>>>
+>>> To achieve type-safety for all field sizes, I think we need one helper
+>>> for each field size.  E.g.,
+>>>
+>>> #define READ_SYSMD_FIELD_FUNC(_size)                            \
+>>> static inline int                                               \
+>>> read_sys_metadata_field##_size(u64 field_id, u##_size *data)    \
+>>> {                                                               \
+>>>         u64 tmp;                                                \
+>>>         int ret;                                                \
+>>>                                                                 \
+>>>         ret = read_sys_metadata_field(field_id, &tmp);          \
+>>>         if (ret)                                                \
+>>>                 return ret;                                     \
+>>>                                                                 \
+>>>         *data = tmp;                                            \
+>>>         return 0;                                               \
+>>> }
+>>>
+>>> /* For now only u16/u32/u64 are needed */
+>>> READ_SYSMD_FIELD_FUNC(16)
+>>> READ_SYSMD_FIELD_FUNC(32)
+>>> READ_SYSMD_FIELD_FUNC(64)
+>>>
+>>> Is this what you were thinking?
+>>>
+>>> (Btw, I recall that I tried this before for internal review, but AFAICT
+>>> Dave didn't like this.)
+>>>
+>>> For the build time check as you replied to the next patch, I agree it's
+>>> better than the runtime warning check as done in the current code.
+>>>
+>>> If we still use the type-less 'void *stbuf' function to read metadata
+>>> fields for all sizes, then I think we can do below:
+>>>
+>>> /*
+>>>  * Read one global metadata field and store the data to a location of a
+>>>  * given buffer specified by the offset and size (in bytes).
+>>>  */
+>>> static int stbuf_read_sysmd_field(u64 field_id, void *stbuf, int offset,
+>>>                                   int size)
+>>> {
+>>>         void *member = stbuf + offset;
+>>>         u64 tmp;
+>>>         int ret;
+>>>
+>>>         ret = read_sys_metadata_field(field_id, &tmp);
+>>>         if (ret)
+>>>                 return ret;
+>>>
+>>>         memcpy(member, &tmp, size);
+>>>
+>>>         return 0;
+>>> }
+>>>
+>>> /* Wrapper to read one metadata field to u8/u16/u32/u64 */
+>>> #define stbuf_read_sysmd_single(_field_id, _pdata)      \
+>>>         stbuf_read_sysmd_field(_field_id, _pdata, 0,        \
+>>>             sizeof(typeof(*(_pdata))))
+>>>
+>>> #define CHECK_MD_FIELD_SIZE(_field_id, _st, _member)    \
+>>>         BUILD_BUG_ON(MD_FIELD_ELE_SIZE(MD_FIELD_ID_##_field_id) != \
+>>>                         sizeof(_st->_member))
+>>>
+>>> #define TD_SYSINFO_MAP_TEST(_field_id, _st, _member)                    \
+>>>         ({                                                              \
+>>>                 if (ret) {                                              \
+>>>                         CHECK_MD_FIELD_SIZE(_field_id, _st, _member);   \
+>>>                         ret = stbuf_read_sysmd_single(                  \
+>>>                                         MD_FIELD_ID_##_field_id,        \
+>>>                                         &_st->_member);                 \
+>>>                 }                                                       \
+>>>          })
+>>>
+>>> static int get_tdx_module_info(struct tdx_sysinfo_module_info *modinfo)
+>>> {
+>>>         int ret = 0;
+>>>
+>>> #define TD_SYSINFO_MAP_MOD_INFO(_field_id, _member)     \
+>>>         TD_SYSINFO_MAP_TEST(_field_id, modinfo, _member)
+>>>
+>>>         TD_SYSINFO_MAP_MOD_INFO(SYS_ATTRIBUTES, sys_attributes);
+>>>         TD_SYSINFO_MAP_MOD_INFO(TDX_FEATURES0,  tdx_features0);
+>>>
+>>>         return ret;
+>>> }
+>>>
+>>> With the build time check above, I think it's OK to lose the type-safe
+>>> inside the stbuf_read_sysmd_field(), and the code is simpler IMHO.
+>>>
+>>> Any comments?
+>>
+>> BUILD_BUG_ON() requires a function, but it is still
+>> be possible to add a build time check in TD_SYSINFO_MAP
+>> e.g.
+>>
+>> #define TD_SYSINFO_CHECK_SIZE(_field_id, _size)                       \
+>>       __builtin_choose_expr(MD_FIELD_ELE_SIZE(_field_id) == _size, _size, (void)0)
+>>
+>> #define _TD_SYSINFO_MAP(_field_id, _offset, _size)            \
+>>       { .field_id = _field_id,                                \
+>>         .offset   = _offset,                                  \
+>>         .size     = TD_SYSINFO_CHECK_SIZE(_field_id, _size) }
+>>
+>> #define TD_SYSINFO_MAP(_field_id, _struct, _member)           \
+>>       _TD_SYSINFO_MAP(MD_FIELD_ID_##_field_id,                \
+>>                       offsetof(_struct, _member),             \
+>>                       sizeof(typeof(((_struct *)0)->_member)))
+>>
+>>
+> 
+> Thanks for the comment, but I don't think this meets for our purpose.
+> 
+> We want a build time "error" when the "MD_FIELD_ELE_SIZE(_field_id) == _size"
+> fails, but not "still initializing the size to 0".
+
+FWIW, it isn't 0, it is void.  Assignment to void is an error.  Could use
+anything that is correct syntax but would produce a compile-time error
+e.g. (1 / 0).
+
+> Otherwise, we might get
+> some unexpected issue (due to size is 0) at runtime, which is worse IMHO than
+> a runtime check as done in the current upstream code.
+> 
+> I have been trying to add a BUILD_BUG_ON() to the field_mapping structure
+> initializer, but I haven't found a reliable way to do so.
+> 
+> For now I have completed the new version based on Dan's suggestion, but still
+> need to work on changelog/coverletter etc, so I think I can send the new
+> version out and see whether people like it.  We can revert back if that's not
+> what people want.
+
 
