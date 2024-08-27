@@ -1,154 +1,201 @@
-Return-Path: <kvm+bounces-25143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25144-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAF1B9609EA
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 14:20:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2957C960A29
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 14:27:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A13EE282052
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 12:20:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D60B928239A
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 12:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4712D1A2548;
-	Tue, 27 Aug 2024 12:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875011B4C58;
+	Tue, 27 Aug 2024 12:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Ge/YhBas"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G4a2AZ1T"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C32519E838
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 12:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD33A1B4C2E
+	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 12:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724761188; cv=none; b=hFz9PoVYm8Ce2XHCayLWDNq6TWo8EkXORN5KgObD+Skki7leSCMmf7H5EU3OeAx4tEAsfeQtSqSdE9bsqVMDzlNfNRC7lt5seUe3fAlIoj+3D/XKllqSdFp05z9xCKCDSOUpdiEBOcUma7nH4hpZgE/NoyTgnSMZiSmtT7VF5kQ=
+	t=1724761588; cv=none; b=XeLaZ+w/IvHj2aMRy7qmp0hPket/0zHp8iWSjE0Ml+hAo5dSB+U4cdjUlMwox1LKFlZgBlw2wACi//Xi7vjx8PtuaXOtVwy0mNeiLu+p6sNekargQ+h6SNeMTa4GzCYUJ8jwNXTVaGxgjxuvP34qPziML0OpwuxVJPOUq7Dj1lQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724761188; c=relaxed/simple;
-	bh=twLkCssfgp+ODU10TY3w3gBfyanVw61WPzqH4w9Fg7c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q/RRmGS2nyS3t7fbJ/pROWGutoRJB9LeRFHbHuumVk5aEc/GzKZjJ1xo3BNR+sOJ2Vm99zb0dk7wE02mUAPvAUjBR/+DtxYaWiosAIrlGklNVNDqpJkMh9JdyW7dBm4wBh/cB4xvX+D2YhH1BiqGp0gv/aCwwwOTTU9AOay2bSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Ge/YhBas; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4281faefea9so46495975e9.2
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 05:19:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724761185; x=1725365985; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eqag3zaL6UgiUACaEJiE/DH1bZk03oy4FtP+8QLvcAU=;
-        b=Ge/YhBas8ZfUh95NqkzHPljEbVoNji7jOAGctsFd2oYRzjYfHwttv81gvWuhbJNKTv
-         OGOuu5TMksT+o/nDeiuNWqboaWZcrNvEhQpxbUlJUwJYKrfJk5oxHHebdhC0zQbvuWkT
-         Zrj7XV+jByLIjM1VWwddJG9aHRqVZdVK71QXVZMC0+6ECOrr/9FwrcFPqm/lmYYqqiCd
-         yQDDSjFDbPPQBSyINUYwMTwg8nJZb6JtsH1xFNAIOWvvpT/RrjaZhbbFmq3gfd6IJE4h
-         4oo+c7ZqoZQf4yXEA96uTcIlgbcZAE1L0xIDWwZGDYVgdQmrrhw7bnUDf3qVtksnLe0Q
-         OlBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724761185; x=1725365985;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eqag3zaL6UgiUACaEJiE/DH1bZk03oy4FtP+8QLvcAU=;
-        b=NQVMZtuOYjIMhkLU1JpM52AFG0oqqBfoNi0QZUWnon7pPE+aiZ0FzZK6uLm/wsAcvt
-         4KrcgTKL5WjZ1HnCsxbMXuW6jUzG4VU6rL1ea4v4hhW/ZxFw2BM4w5eliaN9xMREsR0A
-         CxPr32Lr3RZiOdTqInwwvoi1A3ZrZSawcoimeuBsn7UlBlsHXCwx17kvF3juY6OHjNqr
-         ZRj+R1km8OQPpeUAEr8+rFkPn0qDNBgYqIkAIUmb+W5bOXQFK4aTPdSEO4nEbCWdJdqQ
-         JjoRzgSBKMreeQdJA/KvSF/K4LbqlDB3OP6dMwwSTASTw5WE/mKOxo+/iO3oDeNWS9Ch
-         R6Tg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHiWSE2L2TSGzSNBit0Dkjqn/BVmPGL2QQCh4wnz+8qqxXrMGEfFt+C25LovvLf06irw0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqGmW92S76QCQ7pDtefGm6PsX4ddVUt6GClqKx6uBxoDLxAgjR
-	nVTzy6HLR7P68MS5L5k4/YpN5ScgPeEIGFuphU6EBFU4vBZmD64Bpu/3NbzMELY=
-X-Google-Smtp-Source: AGHT+IHBfHxaObeKoOFTTbKlgpyS/QzTHXZPaEZbYMF7sZwGDN2f27zNYxs8rB72hlCBxG2Bb8Qtww==
-X-Received: by 2002:a05:600c:5708:b0:428:1fa1:7b92 with SMTP id 5b1f17b1804b1-42b9e3e6d90mr12539535e9.19.1724761184388;
-        Tue, 27 Aug 2024 05:19:44 -0700 (PDT)
-Received: from [10.20.4.146] (212-5-158-46.ip.btc-net.bg. [212.5.158.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730810fdb0sm12940882f8f.15.2024.08.27.05.19.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Aug 2024 05:19:44 -0700 (PDT)
-Message-ID: <40fe0a1d-9ab8-4662-a781-002d70a1587b@suse.com>
-Date: Tue, 27 Aug 2024 15:19:41 +0300
+	s=arc-20240116; t=1724761588; c=relaxed/simple;
+	bh=zIC1kd6xmYNGSXHmMs7yn4omvLXOwR7/BGz7+Du2s1U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Tl4L8EdD+SL2qqEpCsq1LryWp6B6WIgcqeaMtnR8tc8t86+uM/2q1UEC/ULXFofjrzllYBbFlY/vDGG/BBarXAdkBKBYSq+zjfYZlvn3QzQ/Y+LJBgr30jsXALFDfXgopxkjwFvF492HnjtrC+/bbrp+8GoVYQcw2OcO9BAJ67I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G4a2AZ1T; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724761585;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3pqf4vIDiJZIq0NvzPPjp8hfkf3fzLyKRmzc9tkgSTY=;
+	b=G4a2AZ1T/hYmmJ7Ea3gxtcwbf9GqoGkDPZL8ldBsswXyb70AdUlOJteKZkjUyZ9Wnq58Y4
+	2rzINXcEvZwv35lFywGRoEh1TwfnEqK4euoWj7HoPsur4ihAySsejpSMlW1I/XnQmpr6Z5
+	7tvIqbiIEIxwetgX3l+sgBXz6NMWEcM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-303-y-Ul_CPtOw-27rCzWzUC0w-1; Tue,
+ 27 Aug 2024 08:26:24 -0400
+X-MC-Unique: y-Ul_CPtOw-27rCzWzUC0w-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C20161955D54;
+	Tue, 27 Aug 2024 12:26:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.192.112])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6072119560A3;
+	Tue, 27 Aug 2024 12:26:20 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 05FFA21E6A28; Tue, 27 Aug 2024 14:26:18 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Ani Sinha <anisinha@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Paolo
+ Bonzini
+ <pbonzini@redhat.com>,  qemu-trivial@nongnu.org,  Zhao Liu
+ <zhao1.liu@intel.com>,  kvm@vger.kernel.org,  qemu-devel
+ <qemu-devel@nongnu.org>
+Subject: Re: [PATCH v3] kvm: replace fprintf with error_report/printf() in
+ kvm_init()
+In-Reply-To: <03C06183-B8ED-405D-8B9C-532E30B8E412@redhat.com> (Ani Sinha's
+	message of "Tue, 27 Aug 2024 17:47:44 +0530")
+References: <20240809064940.1788169-1-anisinha@redhat.com>
+	<8913b8c7-4103-4f69-8567-afdc29f8d0d3@linaro.org>
+	<87v7zmmq9f.fsf@pond.sub.org>
+	<03C06183-B8ED-405D-8B9C-532E30B8E412@redhat.com>
+Date: Tue, 27 Aug 2024 14:26:18 +0200
+Message-ID: <87plpui239.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 21/25] KVM: x86: Introduce KVM_TDX_GET_CPUID
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "seanjc@google.com" <seanjc@google.com>
-Cc: "Li, Xiaoyao" <xiaoyao.li@intel.com>,
- "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
- "Huang, Kai" <kai.huang@intel.com>,
- "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-22-rick.p.edgecombe@intel.com>
- <a52010f2-d71c-47ee-aa56-b74fd716ec7b@suse.com>
- <2f9dd848f8ea5092a206906aa99928c2fa47389d.camel@intel.com>
-From: Nikolay Borisov <nik.borisov@suse.com>
-Content-Language: en-US
-In-Reply-To: <2f9dd848f8ea5092a206906aa99928c2fa47389d.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
+Ani Sinha <anisinha@redhat.com> writes:
 
+>> On 27 Aug 2024, at 12:00=E2=80=AFPM, Markus Armbruster <armbru@redhat.co=
+m> wrote:
+>>=20
+>> Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> writes:
+>>=20
+>>> Hi Ani,
+>>>=20
+>>> On 9/8/24 08:49, Ani Sinha wrote:
+>>>> error_report() is more appropriate for error situations. Replace fprin=
+tf with
+>>>> error_report. Cosmetic. No functional change.
+>>>> CC: qemu-trivial@nongnu.org
+>>>> CC: zhao1.liu@intel.com
+>>>=20
+>>> (Pointless to carry Cc line when patch is already reviewed next line)
+>>>=20
+>>>> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+>>>> Signed-off-by: Ani Sinha <anisinha@redhat.com>
+>>>> ---
+>>>>  accel/kvm/kvm-all.c | 40 ++++++++++++++++++----------------------
+>>>>  1 file changed, 18 insertions(+), 22 deletions(-)
+>>>> changelog:
+>>>> v2: fix a bug.
+>>>> v3: replace one instance of error_report() with error_printf(). added =
+tags.
+>>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>>>> index 75d11a07b2..5bc9d35b61 100644
+>>>> --- a/accel/kvm/kvm-all.c
+>>>> +++ b/accel/kvm/kvm-all.c
+>>>> @@ -2427,7 +2427,7 @@ static int kvm_init(MachineState *ms)
+>>>>      QLIST_INIT(&s->kvm_parked_vcpus);
+>>>>      s->fd =3D qemu_open_old(s->device ?: "/dev/kvm", O_RDWR);
+>>>>      if (s->fd =3D=3D -1) {
+>>>> -        fprintf(stderr, "Could not access KVM kernel module: %m\n");
+>>>> +        error_report("Could not access KVM kernel module: %m");
+>>>>          ret =3D -errno;
+>>>>          goto err;
+>>>>      }
+>>>> @@ -2437,13 +2437,13 @@ static int kvm_init(MachineState *ms)
+>>>>          if (ret >=3D 0) {
+>>>>              ret =3D -EINVAL;
+>>>>          }
+>>>> -        fprintf(stderr, "kvm version too old\n");
+>>>> +        error_report("kvm version too old");
+>>>>          goto err;
+>>>>      }
+>>>>        if (ret > KVM_API_VERSION) {
+>>>>          ret =3D -EINVAL;
+>>>> -        fprintf(stderr, "kvm version not supported\n");
+>>>> +        error_report("kvm version not supported");
+>>>>          goto err;
+>>>>      }
+>>>>  @@ -2488,26 +2488,22 @@ static int kvm_init(MachineState *ms)
+>>>>      } while (ret =3D=3D -EINTR);
+>>>>        if (ret < 0) {
+>>>> -        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
+>>>> -                strerror(-ret));
+>>>> +        error_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
+>>>> +                    strerror(-ret));
+>>>>    #ifdef TARGET_S390X
+>>>>          if (ret =3D=3D -EINVAL) {
+>>>> -            fprintf(stderr,
+>>>> -                    "Host kernel setup problem detected. Please verif=
+y:\n");
+>>>> -            fprintf(stderr, "- for kernels supporting the switch_amod=
+e or"
+>>>> -                    " user_mode parameters, whether\n");
+>>>> -            fprintf(stderr,
+>>>> -                    "  user space is running in primary address space=
+\n");
+>>>> -            fprintf(stderr,
+>>>> -                    "- for kernels supporting the vm.allocate_pgste s=
+ysctl, "
+>>>> -                    "whether it is enabled\n");
+>>>> +            error_report("Host kernel setup problem detected.
+>>>=20
+>>> \n"
+>>>=20
+>>> Should we use error_printf_unless_qmp() for the following?
+>>>=20
+>>> " Please verify:");
+>>>> +            error_report("- for kernels supporting the switch_amode o=
+r"
+>>>> +                        " user_mode parameters, whether");
+>>>> +            error_report("  user space is running in primary address =
+space");
+>>>> +            error_report("- for kernels supporting the vm.allocate_pg=
+ste "
+>>>> +                        "sysctl, whether it is enabled");
+>>=20
+>> Do not put newlines into error messages.  error_report()'s function
+>> comment demands "The resulting message should be a single phrase, with
+>> no newline or trailing punctuation."
+>>=20
+>> You can do this:
+>>=20
+>>    error_report(... the actual error message ...);
+>>    error_printf(... hints on what to do about it ...);
+>>=20
+>> Questions?
+>
+> Do you see any newlines in my proposed patch?
 
-On 26.08.24 г. 20:46 ч., Edgecombe, Rick P wrote:
-> On Mon, 2024-08-26 at 17:09 +0300, Nikolay Borisov wrote:
->>> +               /*
->>> +                * Work around missing support on old TDX modules, fetch
->>> +                * guest maxpa from gfn_direct_bits.
->>> +                */
->>
->>
->> Define old TDX module? I believe the minimum supported TDX version is
->> 1.5 as EMR are the first public CPUs to support this, no? Module 1.0 was
->> used for private previews etc? Can this be dropped altogether?
-> 
-> Well, today "old" means all released TDX modules. This is a new feature under
-> development, that KVM maintainers were ok working around being missing for now.
-> The comment should be improved.
-> 
-> See here for discussion of the design and purpose of the feature:
-> https://lore.kernel.org/kvm/f9f1da5dc94ad6b776490008dceee5963b451cda.camel@intel.com/
-> 
->> It is
->> much easier to mandate the minimum supported version now when nothing
->> has been merged. Furthermore, in some of the earlier patches it's
->> specifically required that the TDX module support NO_RBP_MOD which
->> became available in 1.5, which already dictates that the minimum version
->> we should care about is 1.5.
-> 
-> There is some checking in Kai's TDX module init patches:
-> https://lore.kernel.org/kvm/d307d82a52ef604cfff8c7745ad8613d3ddfa0c8.1721186590.git.kai.huang@intel.com/
+I see some in Philippe's suggestion.
 
-Yes, that's why I mentioned this. I have already reviewed those patches :)
+Your patch's use of multiple error_report() for a single error condition
+is inappropriate.
 
-> 
-> But beyond checking for supported features, there are also bug fixes that can
-> affect usability. In the NO_RBP_MOD case we need a specific recent TDX module in
-> order to remove the RBP workaround patches.
+Questions?
 
-My point was that if having the NO_RPB_MOD implied that the CPUID 
-0x8000000 configuration capability is also there (not that there is a 
-direct connection between the too but it seems the TDX module isn't 
-being updated that often, I might be wrong of course!), there is no 
-point in having the workaround as NO_RPB_MOD is the minimum required 
-version.
-
-Anyway, this was an assumption on my part.
-
-> 
-> We could just check for a specific TDX module version instead, but I'm not sure
-> whether KVM would want to get into the game of picking preferred TDX module
-> versions. I guess in the case of any bugs that affect the host it will have to
-> do it though. So we will have to add a version check before live KVM support
-> lands upstream.
-> 
-> Hmm, thanks for the question.
 
