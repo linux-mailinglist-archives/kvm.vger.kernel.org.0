@@ -1,105 +1,96 @@
-Return-Path: <kvm+bounces-25173-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25174-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFCB096121F
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 17:27:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E0DC96126E
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 17:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E9251C2385E
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 15:27:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 436191F22112
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 15:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D9C1C86FB;
-	Tue, 27 Aug 2024 15:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F7D1D175C;
+	Tue, 27 Aug 2024 15:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EAQD3Qxw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VdQ7jn1w"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34D11BFE07
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 15:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011621D174F
+	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 15:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724772351; cv=none; b=JxhL1VJbAEVn3JYdhLDmJ3U6UPQHKg5ZJJOCpokmNfUCdaxRlTzXHiYB9y1dQ97r4yK5mshlsoSUQ71XN9z2n5uahuknIYEGlot6VNF6tliHVVVYiYNky3CgygG+DKwvdxgzoP2jScZQqEimyOWi6lCN66wqokxDSmnyj+64vJ0=
+	t=1724772528; cv=none; b=sYRA1PNIBTTSwrRoJjRpliI5eQJSCDHg5BRvPYqYkSjCWdCuYM5xIUFUjY6rbbgDHRfsIQmZ03CJ0wXbsINc/soe4kZS4SWPE8V/94xdkgyxhcIV1Oh3nEk/KZQ+Gq5RN8TgALuasA4d1ZDPo9AuWjoYAnYO1Ji7V48RnbmGfRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724772351; c=relaxed/simple;
-	bh=3+QvEBa4uv7l/a5MQPY7+uvjT1ii80eJCdS4sVGH4GE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nEpOOXVxutpL0N0R2OYBYiT7BKsbT/2YM40i/1hHVVYaGJO2SgXSQ+z/hTjPDTKdaKdsWR35uurI8SHNMSKXuxMXov2yl0JteZV6LpmnWtSovHA4W65hx/sQytDB5siFkmc1Fg1wh6y4IpsGVpLZsZaR71r/RO0ZEJBgTeFu9aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EAQD3Qxw; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 27 Aug 2024 17:25:44 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724772347;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wMNSMSKGCcwLdG9pFGhHriyzPikWhB5ZJa2DXnKuoVg=;
-	b=EAQD3Qxw0DYwUenlMolaqx5OkVBEr84fuZ3AoKmPlaJgyfaA6VOteBI8Fkjed0uhcgaAuW
-	iBHUtfC22G0+qwiGy/FUGedEghQgQcO5+AM0TVV8flmPMSYFLU9aJIWwNTCfFX/MYJXYn8
-	G0mGc11+1zEpIaDH84Fv+wTePoJxOeU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Cade Richard <cade.richard@gmail.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	atishp@rivosinc.com, cade.richard@berkeley.edu, jamestiotio@gmail.com
-Subject: Re: [kvm-unit-tests PATCH] Added prefix pop at bottom of DBCN test
- function.
-Message-ID: <20240827-35ad2f4724351f0ee5512b8e@orel>
-References: <20240826053309.10802-1-cade.richard@berkeley.edu>
+	s=arc-20240116; t=1724772528; c=relaxed/simple;
+	bh=4yAlMlBA4ouTt0DGe3f9cAnewU9Z5AuKZeGQC3oO/yM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=texQyGEtkUpHf3++q7AoQsRJN3rzMrPWqf1u0UkwNUfU7RK+CtTepLsoew/QrCV9rRdzLagehSsmb38437pMB+06Joc48mxFQnbjaY0gp65XSTJffoXGszuNsskGK81lUc71/MnqkVjSYptSxl0fA5PJQd9y6SwDCyL/bIED7HU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VdQ7jn1w; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5a108354819so7213473a12.0
+        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 08:28:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1724772524; x=1725377324; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4yAlMlBA4ouTt0DGe3f9cAnewU9Z5AuKZeGQC3oO/yM=;
+        b=VdQ7jn1wip+jJkRbLVv/B7OdHaT0+Fa2uSC5kJ7EXx+IKP7WRULpzpW4qvqrT85ai9
+         Ln8YVmGzbrD4FJJYqNaAb/rlOEA17dcXL8wUY4wmzDIJSUeAXhgfIJCd61H25fSju3zc
+         /sjZ0NLHQCixsT7SeWtO9ofF6AdJoRR38NQFEreFc2biWNX+4mCgY1lFzqw8F+WAzhIu
+         U+aA93SffqUdlWBynGxgG1xFHDCheySAMeYrnT/EiR66W5E4Yr5ts0rYvLniJsjoOnNj
+         dryeLk3IuqEwzPC7p/tXecIAfgZYLPvve10Os2FNWlnOxnjzPk6iTzcFm8b93hMSML/4
+         4sAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724772524; x=1725377324;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4yAlMlBA4ouTt0DGe3f9cAnewU9Z5AuKZeGQC3oO/yM=;
+        b=Ex+1acErz0VAJL7E5ARZGZk7KeHDXlcqOTOensLviPh1YlUlyAvoTU5LKYpQ0yx849
+         OICwUMjCV7bTTyMBGTzwKI/Yt4D9KLLDXi4CSAe3mtQ8eFm5NqnWXcpasvCHqo+8CM/a
+         1dPoqknyByw+EZqFlgsOdmUVttJjfQ0BkC88LCJs2OPvokJEaISwbYLqCveQtvcpi6+b
+         EO8xDMqOOZGg+/HgsMd2g6qy9AXSLmBbi5usLcQTyACcDkV2sUC6xf3TznsAPA/ZglvF
+         dzbrHj58m4urTm7Sfm9T3JEhBJZfmOUDuuY9fJ5ibe8Jka5vlAU51ZmXwC4/sCLKA86c
+         PRJA==
+X-Forwarded-Encrypted: i=1; AJvYcCViAgqhTQXvjsxFrghUiebTN4kPRu81YSzvuNBndkp2pWb/ywEsYV61zugpqZ7FKmxFWUo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxdxuD0rALuqgWIBS4zLMwcRB5M72keI0wInpGYUeKZ/1SaRWY
+	eLbtMup5cAXEawWLFqwDgZB/rEzgaEZb5QeNppNZsUun5lgzd6dYOmndcabS5gW9gy9UTra68z9
+	U6tgXZ1ExKpOP3XO04yrDKfhLlqaYd2RLPrdCEw==
+X-Google-Smtp-Source: AGHT+IHNXYKP+BrjeVYDN3n2Nvk0pm4G3DyCjzZQTu06RSPdP2LyJjWIHGARVO3uX/jlq7P9dttqNx7mclhmD5yRb5U=
+X-Received: by 2002:a05:6402:1f4e:b0:5c0:c4d3:9017 with SMTP id
+ 4fb4d7f45d1cf-5c0c4d39303mr1334841a12.38.1724772524119; Tue, 27 Aug 2024
+ 08:28:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240826053309.10802-1-cade.richard@berkeley.edu>
-X-Migadu-Flow: FLOW_OUT
+References: <20240827151022.37992-1-anisinha@redhat.com> <20240827151022.37992-3-anisinha@redhat.com>
+In-Reply-To: <20240827151022.37992-3-anisinha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Aug 2024 16:28:33 +0100
+Message-ID: <CAFEAcA9Xq7S6_-hYkNYdv6-z7tM7xSgDGyC92L19kTm02qScAw@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] kvm: refactor core virtual machine creation into
+ its own function
+To: Ani Sinha <anisinha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, zhao1.liu@intel.com, cfontana@suse.de, 
+	armbru@redhat.com, qemu-trivial@nongnu.org, kvm@vger.kernel.org, 
+	qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
 
+On Tue, 27 Aug 2024 at 16:11, Ani Sinha <anisinha@redhat.com> wrote:
+>
+> Refactoring the core logic around KVM_CREATE_VM into its own separate function
+> so that it can be called from other functions in subsequent patches. There is
+> no functional change in this patch.
 
-This patch summary has a period. I've removed it. I also rewrote the
-commit message. Just repeating the summary isn't helpful. I wrote
+What subsequent patches? This is patch 2 of 2...
 
-    The number of pops needs to balance the number of pushes, but
-    check_dbcn was missing a pop, resulting in a dbcn prefix being output
-    on following non-dbcn tests. Add the pop.
-
-Thanks,
-drew
-
-On Sun, Aug 25, 2024 at 10:33:09PM GMT, Cade Richard wrote:
-> Added report prefix pop at bottom of DBCN test function.
-> 
-> Fixes: https://lore.kernel.org/kvm/20240812141354.119889-10-andrew.jones@linux.dev/#t
-> 
-> Signed-off-by: Cade Richard <cade.richard@berkeley.edu>
-> ---
->  riscv/sbi.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/riscv/sbi.c b/riscv/sbi.c
-> index 36ddfd48..01697aed 100644
-> --- a/riscv/sbi.c
-> +++ b/riscv/sbi.c
-> @@ -418,6 +418,7 @@ static void check_dbcn(void)
->  	report(ret.value == 0, "expected ret.value (%ld)", ret.value);
->  
->  	report_prefix_pop();
-> +	report_prefix_pop();
->  }
->  
->  int main(int argc, char **argv)
-> -- 
-> 2.43.0
-> 
-> 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+thanks
+-- PMM
 
