@@ -1,224 +1,220 @@
-Return-Path: <kvm+bounces-25203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6803D961944
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 23:32:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F679619A8
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 00:00:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB473B22D75
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 21:32:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 059B82852DD
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 22:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9211D27AC;
-	Tue, 27 Aug 2024 21:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFEC1D416F;
+	Tue, 27 Aug 2024 21:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CTjdfyxe"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WSx0/uZZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2064.outbound.protection.outlook.com [40.107.102.64])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2045.outbound.protection.outlook.com [40.107.236.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9485198E89;
-	Tue, 27 Aug 2024 21:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A801D415A;
+	Tue, 27 Aug 2024 21:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724794304; cv=fail; b=K0trud0RmbZ1uYzcCQQ2A0VGGavl1Q3yjXLW0Z8ZQ2xzCGR/UvONt7pR8tcsipiX6oRGr89MKrM2ymWTe0WUdvBk/8GKerjx2jyyX0flnfHQpl8MC5lu2Ik39uigln3K2+xVT2fZoOyIhM0gWKhf58tbIf6jXKZcYlYa1b1wZvw=
+	t=1724795992; cv=fail; b=uDbpEpLQN42Xj4FViSdA2NbvqQvoqX4StsxGWMRz93PZF0FU0qFteiyNmc9KZ3bvHlOCaXfS5m/ucgIKwOpzmIK2l55+kcVgH+h1TpqOnHK7vngxmBTPNde9ttu3M7CTCgjeEpUPeMPB5x2co4anyxpau0oC/pq8bztg8tu/IoQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724794304; c=relaxed/simple;
-	bh=YR0BG1p2Bz1YXuta3vG0N5Gz2wjf8pv21S9iF1CvQzM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UC740k3rHUr0aMJ7i8PBnqsjpg8ddvIOIPuIuVVicWEI07+0Cxo4WtKQqSn+Z3qr//iteH8ws+8p0+7EO9lMWNH+bgMjS1UcaEJ6g4dJPawMmw84+O0YqQjtQLF5Yv/+JTYg+yw34T6qz9bx077OhU8jQH9ESGQCbwk6+bCIVDs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CTjdfyxe; arc=fail smtp.client-ip=40.107.102.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1724795992; c=relaxed/simple;
+	bh=EKdJdVl+/au4iJtqr2jdUJ9T5YJvxhViWWZb9Pp4OWs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UrXKDfrNUrdx6onjR+4zcp8kHB8nvoEUG0wb6nXvHu5gZWYt4tjb3bTbBa64E4IurSPQUNQ7s+b+yG76Lvrsjfqf/pguE/nt5CQuUJIQBilYdlcwuI2DH46HQy1t3VrMIFA+DZIacFEiHyTi5V5qYr2FThPL4fLRsjJLMgRR5hA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WSx0/uZZ; arc=fail smtp.client-ip=40.107.236.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dBQsW10lqpxzmN0wg6cD7XYD90DzUZqt6HnQ6hRs4kB4fqu6c49Cu/ZZpVVa9xfXcBnt9RwhzJHXntHwslfiqHKDtBQPjpwNOuR1JZ+jdGVOz+6eqJzUwT7e4ObZVFE0o/tUH5aoCTfbx1LQCgDsmXa+drGtswhY04a+v33jFcweOU4saAQz5oDF5/RM1Yk3bMw9rCNkRSK2z7dTE1sTvYNyQGkEj601xelom5GZCBR2cbCWQwI2m6504Z2k9SoYhDP0tGOD7c5A1hFTipwZ+5FnptMOXCDoiFTbMQv9yNGtuzizc91zXUbtqk00kvahU0kpX82PmSHTXHAchTPmGw==
+ b=ZAQRz+Iq6KPjKxCew1FN9xeTC+hz/Bz/WbHf7Cb6jfX+E32h+vjmBYtZ8f2vNqsTLVcmrsDPzSGCH29nnmMjPg3vgTyShCUJV4aKVniAw8zPNXPyJoUuCYAiAs7NcW9dyUD92jdRikR2HMkbdTw6lO+XINHs8aHdaXliHJ1nDheQXxL9A2sV9zJjxw/88mUEf+MupDaftMlHGsdFGn268QqLPVuqPD3rI+b8bndFaDb0LiHbBSvqjLyEKNxpay60/HpsUjraJXg3nsKQcFtD9vErtItaSMK2dJchugxBeWeBILyosidZA0abqsEzxAp0JLAnENWMUFZXooMBjraE2g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hEDzPDTQfF3hHzWpXH3yZYmaCtHWQs1uC9TatCgB3Gk=;
- b=lQdYnkCDCi62xirdke8okA3ZoI6AIGI7/xKE+rk2BwHXeBphFOY6dP88QoWE2Hdg/fJacaXuPlfCJe5SwZi3nuZb+jyiQ0msYu0yhLTXoJJBK6aJUFGZQalPWdnazCxenNGjslp6JbpauQjqHMZCqi8/ZW0JQeUXsdD2XWZ7NJBcM1+8tfc6hUZp3vggptW/tIMFk26qyT0eWzwV5FVhE2crCjtcWOVMzeEsw20lAx+5w8yJwnS3Rq1Hxa7+1qubScA5UyeFuAHbLphZsgs9vOoZ9LDCbT6sgYVca+bIBeYL4Rq4fHkwePZ3hewCW5IOrNlKvFFC+hTgDPOKBv4poQ==
+ bh=fJC7XSKhdd7thNdK+sjbO4AAoN7ITpvePUn2PW8hKgw=;
+ b=YSSjj0nZkgTUoSdj66IbwUO9sVvYXR6kYV4w1LPPRAxC166tNnQSjUyupqq5hY3oHaGy1E/0eh4DlQgaz0OpF4O4IBIXQo8rNA2IrA2IiZ3i1bgHDbK9ZhVhV+O9FJyhVt1hwYe9g5c4uItbC/cM2ZJGWQwUTf4l3OMWdjiXqAQhjKXUk9yyUT7CLVtlwMOakcWlNVhRMD6er+ggiVOlcgx8wZsJwoTVZB53Ti2kmwmiWax+DV0ERgZxC/FWa3k5dJ2Exs0ykAs+2GcqmYZUSP2w/iWTxyXY+h8q+yCfwOyxJgLDOYbx+9+gWGpo80pRxlFRSfoqlCkI7lKJDKAIHw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hEDzPDTQfF3hHzWpXH3yZYmaCtHWQs1uC9TatCgB3Gk=;
- b=CTjdfyxeRodRP7TqoQb0rX8cB0IJ/f8EMxs6x4njYO5VotkI/ZjNrhMaKOT/GhhlzeU0M40gliwx+zzovUQufCKEs5KDiaR3Gw7WHUAMbS5V/WBwmTr/9kW4Bm0LkiUi9owhQxgnFNzxW21itdZNrm1QKzQ0xZACt51k0TyOhKGCKm2p43TixPXldGyk5zR2G+47nLY07zIk00urAQA5/N585L1NYlCtOd3BNPZ/7tcXh6vWsp2ZK+83AntfkmnDM2FwDcs7CB+luYSmfDCoGQzLeS7e7EIkn5bs1qTzXeUnjttpwoLqgS1oO3xC3xNMn8CPtgAO5qNQrEv2RfPuiQ==
-Received: from SJ0PR03CA0167.namprd03.prod.outlook.com (2603:10b6:a03:338::22)
- by DM4PR12MB6040.namprd12.prod.outlook.com (2603:10b6:8:af::14) with
+ bh=fJC7XSKhdd7thNdK+sjbO4AAoN7ITpvePUn2PW8hKgw=;
+ b=WSx0/uZZoPtlllankGKYvZXCQanig+uex74C3XGSdvoc5MJD53KvFPfSZoE3ztvicqMHx6ijYQiD8n+8gjiRhMkFR1OT9GqyhuGRe5nRSdUm66Ve1Uzj5VBBaEEu2o25rFUCqLdZEyEAeUhbvkU7OQsRaQFTakTCc1fp2XYLqm4=
+Received: from BN0PR03CA0038.namprd03.prod.outlook.com (2603:10b6:408:e7::13)
+ by CYYPR12MB8752.namprd12.prod.outlook.com (2603:10b6:930:b9::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.26; Tue, 27 Aug
- 2024 21:31:37 +0000
-Received: from SJ1PEPF00001CE5.namprd03.prod.outlook.com
- (2603:10b6:a03:338:cafe::72) by SJ0PR03CA0167.outlook.office365.com
- (2603:10b6:a03:338::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.33 via Frontend
- Transport; Tue, 27 Aug 2024 21:31:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ1PEPF00001CE5.mail.protection.outlook.com (10.167.242.21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.13 via Frontend Transport; Tue, 27 Aug 2024 21:31:34 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 27 Aug
- 2024 14:31:18 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 27 Aug
- 2024 14:31:17 -0700
-Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4 via Frontend
- Transport; Tue, 27 Aug 2024 14:31:16 -0700
-Date: Tue, 27 Aug 2024 14:31:14 -0700
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: <acpica-devel@lists.linux.dev>, Hanjun Guo <guohanjun@huawei.com>,
-	<iommu@lists.linux.dev>, Joerg Roedel <joro@8bytes.org>, Kevin Tian
-	<kevin.tian@intel.com>, <kvm@vger.kernel.org>, Len Brown <lenb@kernel.org>,
-	<linux-acpi@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	"Lorenzo Pieralisi" <lpieralisi@kernel.org>, "Rafael J. Wysocki"
-	<rafael@kernel.org>, Robert Moore <robert.moore@intel.com>, Robin Murphy
-	<robin.murphy@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Will Deacon
-	<will@kernel.org>, "Alex Williamson" <alex.williamson@redhat.com>, Eric Auger
-	<eric.auger@redhat.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>,
-	<patches@lists.linux.dev>, Shameerali Kolothum Thodi
-	<shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
-Message-ID: <Zs5Fom+JFZimFpeS@Asurada-Nvidia>
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Tue, 27 Aug
+ 2024 21:59:47 +0000
+Received: from BN3PEPF0000B06B.namprd21.prod.outlook.com
+ (2603:10b6:408:e7:cafe::29) by BN0PR03CA0038.outlook.office365.com
+ (2603:10b6:408:e7::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.20 via Frontend
+ Transport; Tue, 27 Aug 2024 21:59:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN3PEPF0000B06B.mail.protection.outlook.com (10.167.243.70) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7939.2 via Frontend Transport; Tue, 27 Aug 2024 21:59:46 +0000
+Received: from tlendack-t1.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 27 Aug
+ 2024 16:59:45 -0500
+From: Tom Lendacky <thomas.lendacky@amd.com>
+To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<linux-coco@lists.linux.dev>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+	<seanjc@google.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, "Thomas
+ Gleixner" <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>, "Ashish
+ Kalra" <ashish.kalra@amd.com>, Joerg Roedel <jroedel@suse.de>, Roy Hopkins
+	<roy.hopkins@suse.com>
+Subject: [RFC PATCH 0/7] KVM: SEV-SNP support for running an SVSM
+Date: Tue, 27 Aug 2024 16:59:24 -0500
+Message-ID: <cover.1724795970.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
-X-NV-OnPremToCloud: ExternallySecured
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE5:EE_|DM4PR12MB6040:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f5cb918-c102-4fc0-cf1f-08dcc6dfa064
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06B:EE_|CYYPR12MB8752:EE_
+X-MS-Office365-Filtering-Correlation-Id: 906b25ad-0c1f-4872-e912-08dcc6e390c1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014|7416014;
+	BCL:0;ARA:13230040|1800799024|7416014|36860700013|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?B7p4ohQzGwPgiepBi1jlgTzkc0pnT4jSKL605EkFeI7k+fwhHHS5lBdJR9Hq?=
- =?us-ascii?Q?Ud7+ZQQWJ4nVWt4UP7r69wMhy5EpEoBfYzlQ0tsvL8KdpABCi7h/7pmkCuG4?=
- =?us-ascii?Q?C9PwhEB+T3CxoqNiVoHxjGE1zs4wRuvRUf1oFzlNihrlvVg9wEFSTkY9EjYF?=
- =?us-ascii?Q?GXN0+1llBveZ3JTg7o/KLc+TC+dAA2lmfm4EU/BqPyESxvuNLDsTwmtSXvoj?=
- =?us-ascii?Q?UcVGsQEiMZojAs5jJ0DVSARVtOCWE5yziO547CTlaYnzQQr0TxA8rwWlJ6P8?=
- =?us-ascii?Q?QCJ17JCZpxuE0brjA/MX2ziBXKWvgBUTYpNlQKtuKHqaFcKtrk4bXAkorOl3?=
- =?us-ascii?Q?WB0aDZ1LC1EUwRjaLBSIYk5cNxbqtoCf5zBdRGJ59nZjLl7GSJjE7hQ9ZJwd?=
- =?us-ascii?Q?WOkFkE0J2XxbbRFUmMlG0jR5AhOYpKguO63M1tAK7Rxky7e3l+ndg2G6BzSi?=
- =?us-ascii?Q?mzqbNMDHjW66NOYX3fEj9e1lzhwHUGXek6/i+3FsGxjDuixWbr6aBQzXiZW2?=
- =?us-ascii?Q?JvAmHkSEhVqTsgcPzOblgxzRdLA1vY1+PodUyuWrO5fCblOgmZ/IVGgH8PXx?=
- =?us-ascii?Q?8XaPzXhIF3Zm0EYUeyhJ+BGH30jZ+9ktXlAQHUD1zoEf+odif7G3e8IM0/5q?=
- =?us-ascii?Q?GMEPppkBTtd6QG9CcNErd93Bv+Yo3gCd/v0wtNBg5tCtcUd6GsrzUHVfuPHN?=
- =?us-ascii?Q?nb27v8ycy3S2EpV1z37ScTPRLFvoYHMcLy9TY6tHSX+UH+s83k4Ns59fDojn?=
- =?us-ascii?Q?rftX1A5nX7mAGomRLSSw0pWzURMU+yo6IvmZ3Xipn2yhzouP4z5ERIYeu4QF?=
- =?us-ascii?Q?4Vh9TjFTI5AuDX5JnSF4jKX22gRKjHW+QKN82dYA3nsep9+uRPWfOuPCLz2a?=
- =?us-ascii?Q?DuhikwNj3wi/5DRXGWWqvjLVUwbX6x9N1Ofi9hzq2U0PxG1OFDAGbvMdFp/h?=
- =?us-ascii?Q?HoFHDdo784AtuYtCZwwyyKBXD0WMEbz12KCReQsn+do0Lo7XojZWSCS27Nvr?=
- =?us-ascii?Q?r+i10HumAw1ahXCGNcz0Hz2Izp3kZJm2KJPdt4YSHhK4vomXIl7KPX08aDlw?=
- =?us-ascii?Q?a2wr+Mw+pO8beT7m22k0BhinMN5ekdUU074Z7r8KCTaNhQ7tl79/V8FOgMnh?=
- =?us-ascii?Q?mu+rIXEhyE3+m2GyZWIDDcc0RykwN7TQjDvNykORqVgTiH7PnSus2hWAsg9R?=
- =?us-ascii?Q?+7X5HY/cg74X+lF8LMxwpGWzrsMIKCGbSGvMItDlGIPSqe3BKVq24brDxSEz?=
- =?us-ascii?Q?0lwCN8UPqGKgLNcm+KXunhQY0TRbbb6T9A+aIG0oRSlKUch2vfq05IGVaVUU?=
- =?us-ascii?Q?edAhHQTFMSGt5I36ybmkQz3MGrKscac5sVt2928ypZtKxfcsZNy7NzyLKdrL?=
- =?us-ascii?Q?JZKKJ6zYgx+lrRrzBcntqt5kMV8CekFbE/HHUriEZzBXGo8i0oehG9v2LIv9?=
- =?us-ascii?Q?wFxMbvwnrS46m8dMVuCVvEuBIpugM1Aj?=
+	=?us-ascii?Q?OEpnBu33TdRZHF2J8nAd6DKlhvrYTGmuscBqi0GkoreMnwpv9TjiTAZgunjL?=
+ =?us-ascii?Q?7zZFkGXLgNGpdy06dCT9KR9W5k5RlO8SnvGHWcUiZT4NUAnRQwLUZqQ+e5dg?=
+ =?us-ascii?Q?h1djG36rih8GRwLv67XKmz11wCV43BxyvqCMMmMmMzOF790VXmlSEOmweBOd?=
+ =?us-ascii?Q?4Vs+aiN345epmstaXpONIeqneffuZlRAmwsYQdBH4ZzTuZ0N/fU5UU5dCRK6?=
+ =?us-ascii?Q?eBOjNydw/biuhMxrOIqXZZpJeDYi3JYXczjqpudoLRk1lG6mw8XOK3//lLAN?=
+ =?us-ascii?Q?PWvnWd24vBB4t9QB8SScmDLDTFcnO5eyN+PKC0jGnx666VgJjucka0+7X9oE?=
+ =?us-ascii?Q?rlAlQ98xqZOPlD6uY54zoOQwGAEPYQTtXzOIObAe8NLBXYca0VLLumvRf58c?=
+ =?us-ascii?Q?ZRkIvo7ko/OzCL1/YI+O+mK2jVG9UbQpWYzfuMBR4V3UWSGAsuFMVQt+WxEA?=
+ =?us-ascii?Q?8/AE3y9esuPLqRHs2ztqHtoDO6agKoGGbeTXel9OPT8SqkPIRc6wFFjo630I?=
+ =?us-ascii?Q?Xo9vegoLobLaHsOmNLmb1VLxgkU+EHXGaMRW5YL3V1M+rlFtqmH2wCQmAj+6?=
+ =?us-ascii?Q?PH36/ms8npmVpPh5CHGsaDYNkdlDAapYuQKNS8y7arhKfsCk2tjCa/lgwM5t?=
+ =?us-ascii?Q?MdXvFJx1wNwmMSySZorvTsEXCeU8cWqklq8N321P4FzWAc6/RVnxLwsJliuG?=
+ =?us-ascii?Q?tOCF6JL5CNuUTtUFs7ENiPhiNzV0If90a014wudP03U5zSe6RDxvlRMQAdAm?=
+ =?us-ascii?Q?M0gjzyV407jsRkCCopi7MqbajRtfHVXDYeusW8OLih0ShEuy+OncVVVGrMSn?=
+ =?us-ascii?Q?flu+7hEenXtsmsgu+XfothXkypR5lD/KZDz/pBg9BqPY7jJe1e6VBN5XqmRd?=
+ =?us-ascii?Q?XgO+Ko+I6r/wuge+B30/67KTgDEdSE8fXniOyw7dNBpwqD9Vff+voPbSFSwB?=
+ =?us-ascii?Q?mzu3rwHSy5AWX3dbpDuLGQM4ZhdKfS9BWo3PH8l/VT3D/zKN8II7zrzlMLu2?=
+ =?us-ascii?Q?ndfV+KsSSIqwwhS98BNPQLloo5qzEUVp/IASlg+IYrTOUusctAp780TBRDmB?=
+ =?us-ascii?Q?aGqnDtvTm+Sn5wD66O1jgupVZIjJ7lq+9ahlJYA4KoF3cC8ID9XLUHXMGnBN?=
+ =?us-ascii?Q?YQcAA9lFFdou5c6HVYWnIqU0k5hJSQsTl1eIHgQ26AGGb0xxaOmu/RK2QPJu?=
+ =?us-ascii?Q?X7Fyk/+CE6BgKtWX6ELxoxVgq5kaNGdD/b8rHTN0TTkZ+GhmKs7YNWe/ZEM5?=
+ =?us-ascii?Q?gw5cH6b8348XQnXNc3UCr+wVkr4Euo9PAkAtE5EQsZzQKscf1wseRkwQpAF5?=
+ =?us-ascii?Q?fNVlfiKLMXwHDI/blNMmszhEaqQyq0lstktt3LZst7cYJDDRgrdlnilcPslX?=
+ =?us-ascii?Q?ZNrYbwwHVO0iE3TgSIbZUcO2+MIpGxaojYaNXk/eTauw9x8l7JGnUl7YWh/0?=
+ =?us-ascii?Q?wjjVR1uFMVC+bJjMphjYMu+zBqtU4t/4?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2024 21:31:34.9485
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2024 21:59:46.7489
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f5cb918-c102-4fc0-cf1f-08dcc6dfa064
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-Network-Message-Id: 906b25ad-0c1f-4872-e912-08dcc6e390c1
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE5.namprd03.prod.outlook.com
+	BN3PEPF0000B06B.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6040
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8752
 
-On Tue, Aug 27, 2024 at 12:51:30PM -0300, Jason Gunthorpe wrote:
-> This brings support for the IOMMFD ioctls:
-> 
->  - IOMMU_GET_HW_INFO
->  - IOMMU_HWPT_ALLOC_NEST_PARENT
->  - IOMMU_DOMAIN_NESTED
->  - ops->enforce_cache_coherency()
-> 
-> This is quite straightforward as the nested STE can just be built in the
-> special NESTED domain op and fed through the generic update machinery.
-> 
-> The design allows the user provided STE fragment to control several
-> aspects of the translation, including putting the STE into a "virtual
-> bypass" or a aborting state. This duplicates functionality available by
-> other means, but it allows trivially preserving the VMID in the STE as we
-> eventually move towards the VIOMMU owning the VMID.
-> 
-> Nesting support requires the system to either support S2FWB or the
-> stronger CANWBS ACPI flag. This is to ensure the VM cannot bypass the
-> cache and view incoherent data, currently VFIO lacks any cache flushing
-> that would make this safe.
-> 
-> Yan has a series to add some of the needed infrastructure for VFIO cache
-> flushing here:
-> 
->  https://lore.kernel.org/linux-iommu/20240507061802.20184-1-yan.y.zhao@intel.com/
-> 
-> Which may someday allow relaxing this further.
-> 
-> Remove VFIO_TYPE1_NESTING_IOMMU since it was never used and superseded by
-> this.
-> 
-> This is the first series in what will be several to complete nesting
-> support. At least:
->  - IOMMU_RESV_SW_MSI related fixups
->     https://lore.kernel.org/linux-iommu/cover.1722644866.git.nicolinc@nvidia.com/
->  - VIOMMU object support to allow ATS and CD invalidations
->     https://lore.kernel.org/linux-iommu/cover.1723061377.git.nicolinc@nvidia.com/
->  - vCMDQ hypervisor support for direct invalidation queue assignment
->     https://lore.kernel.org/linux-iommu/cover.1712978212.git.nicolinc@nvidia.com/
->  - KVM pinned VMID using VIOMMU for vBTM
->     https://lore.kernel.org/linux-iommu/20240208151837.35068-1-shameerali.kolothum.thodi@huawei.com/
->  - Cross instance S2 sharing
->  - Virtual Machine Structure using VIOMMU (for vMPAM?)
->  - Fault forwarding support through IOMMUFD's fault fd for vSVA
-> 
-> The VIOMMU series is essential to allow the invalidations to be processed
-> for the CD as well.
-> 
-> It is enough to allow qemu work to progress.
-> 
-> This is on github: https://github.com/jgunthorpe/linux/commits/smmuv3_nesting
-> 
-> v2:
+This series is meant to start the discussion around running a guest with
+a Secure VM Service Module (SVSM) and how to transition a vCPU between
+one VM Privilege Level (VMPL) and another. This is Proof-of-Concept level
+code, so definitely not something looking to be merged.
 
-As mentioned above, the VIOMMU series would be required to test
-the entire nesting feature, which now has a v2 rebasing on this
-series. I tested it with a paring QEMU branch. Please refer to:
-https://lore.kernel.org/linux-iommu/cover.1724776335.git.nicolinc@nvidia.com/
-Also, there is another new VIRQ series on top of the VIOMMU one
-and this nesting series. And I tested it too. Please refer to:
-https://lore.kernel.org/linux-iommu/cover.1724777091.git.nicolinc@nvidia.com/
+When running under an SVSM, VMPL switches are needed for validating memory
+and creating vCPU VM Save Area (VMSA) pages. Going forward, different
+services running in the SVSM will require VMPL switching, e.g. a virtual
+TPM service or Alternate Injection support. Therefore VMPL switches need
+to be as fast as possible. The implementation in this series has KVM
+managing the creation of VMPL levels and transitioning between the levels
+without transitioning to the userspace VMM.
 
-With that,
+Going forward, the userspace VMM may need to be aware of VMPL levels. It
+may be necessary to transition VMPL creation (AP Creation at a specific
+VMPL level) to the userspace VMM. But keeping VMPL switching within KVM
+is highly desired for performance reasons.
 
-Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+This PoC code does have some restrictions. For example, when running with
+Restricted Injection, all injections are blocked as the SVSM is not
+expecting any injections (currently). This allows for a single APIC
+instance for now.
+
+The patches can be further split and the change logs improved, but wanted
+to get this out and get the discussion going.
+
+Implemented in this RFC:
+  - APIC ID list retrieval to allow for only measuring the BSP and
+    allowing the guest to start all of the APs without having to use a
+    broadcast SIPI
+  - vCPU creation at a specific VMPL
+  - vCPU execution at a specific VMPL
+  - Maintain per-VMPL SEV features
+  - Implement minimal Restricted Injection
+    - Blocks all injection when enabled
+  - SVSM support
+     - SNP init flag for SVSM support
+     - Measuring data with specific VMPL permissions
+     - Measuring only the BSP
+
+Things not yet implemented:
+  - APIC instance separation
+  - Restricted Injection support that is multi-VMPL aware
+
+
+The series is based off of a slightly older kvm next branch:
+  git://git.kernel.org/pub/scm/virt/kvm/kvm.git next
+
+  7c626ce4bae1 ("Linux 6.11-rc3")
+
+---
+
+Carlos Bilbao (1):
+  KVM: SVM: Maintain per-VMPL SEV features in kvm_sev_info
+
+Tom Lendacky (6):
+  KVM: SVM: Implement GET_AP_APIC_IDS NAE event
+  KVM: SEV: Allow for VMPL level specification in AP create
+  KVM: SVM: Invoke a specified VMPL level VMSA for the vCPU
+  KVM: SVM: Prevent injection when restricted injection is active
+  KVM: SVM: Support launching an SVSM with Restricted Injection set
+  KVM: SVM: Support initialization of an SVSM
+
+ arch/x86/include/asm/sev-common.h |   7 +
+ arch/x86/include/asm/svm.h        |   9 +
+ arch/x86/include/uapi/asm/kvm.h   |  10 +
+ arch/x86/include/uapi/asm/svm.h   |   3 +
+ arch/x86/kvm/svm/sev.c            | 530 +++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.c            |  25 +-
+ arch/x86/kvm/svm/svm.h            |  71 +++-
+ arch/x86/kvm/x86.c                |   9 +
+ include/uapi/linux/kvm.h          |   3 +
+ 9 files changed, 575 insertions(+), 92 deletions(-)
+
+-- 
+2.43.2
+
 
