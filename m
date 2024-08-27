@@ -1,185 +1,121 @@
-Return-Path: <kvm+bounces-25119-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25120-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 490309601C4
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 08:32:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D16B9602B1
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 09:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0137C2842AF
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 06:32:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27ECE1F2344B
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 07:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7658146D68;
-	Tue, 27 Aug 2024 06:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 858B6149DF4;
+	Tue, 27 Aug 2024 07:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KkWGAd27"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jikjkFik"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0DA8289C
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 06:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6511428F3;
+	Tue, 27 Aug 2024 07:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724740248; cv=none; b=dg6XK3IzUmEaQVxxlVcg/bnZieNOwY65Pv9KTGiEgJZiNIVAUbCFxDtOwAM+u8KHnjhn1PuBu5xqHwqKI6EKUUzRdeHEWUTTkzM/vS0X5MwUZELYe24M+q7OPmhf133px8ipNoyQIgIHVANp4cpIFhzxXmsQAmJYyYde1KJt9JM=
+	t=1724742458; cv=none; b=n3StdrJC32vCjCcnwKHczNZyH2XZsgfDP7MuQjCIa4oT4GdVGG5IjNWFRSan07clG1yoyclScPOF31l1l327+VFtD6pftoGffNxXxSDP8Iho91jT/YyMjcMcYuKr31ElqgKZ5NVYgLfPuHR9ztn+wuNSCPRA2doB2cISe7ykwew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724740248; c=relaxed/simple;
-	bh=hq12jodiTUWQWGFIbgwgPrOsPWCD1Y3mkPhbX8CyPwI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=k5FYuQ1RfYQxXY3Eq4t+t389aV3lT1v6V7IAtuXnnp/dyBJ3SNmBQxW+jKHKgzYzacOmWK+Y9EemsjI706cXXsQAA3cLPNOvpAdizRPIxN7enSRxsJuBfDzqlQFacdTYb5YqYgteroarL3zKhhsxrEOWgm1ByQFkDDKLTFZ5JYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KkWGAd27; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724740245;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J7ee2KV+Lqz+23D3Fwl+N0nP1Ygl2fAs/LiLzNVq+xI=;
-	b=KkWGAd275JGRUGDkmnoX0pBHb1ELslFZIYT4WoOkSmiJxb3FFDtzd3mCgMAc4GMz9kEgyO
-	PPceu3KTY3S4EBEtjPI3UUtaiVY2DmLpKNk8st7uLlO7N/Nflg8juBO2JzP3iNUgMxo7vX
-	lZ67UQ9j8R8hAmwxUP2hR3DVGmAsp4w=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-I6ZRyGUsMTyzN4TmTB0tUw-1; Tue,
- 27 Aug 2024 02:30:41 -0400
-X-MC-Unique: I6ZRyGUsMTyzN4TmTB0tUw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 89AF11955BF6;
-	Tue, 27 Aug 2024 06:30:40 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.112])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EC1141956054;
-	Tue, 27 Aug 2024 06:30:38 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 9EA7421E6A28; Tue, 27 Aug 2024 08:30:36 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Cc: Ani Sinha <anisinha@redhat.com>,  Paolo Bonzini <pbonzini@redhat.com>,
-  qemu-trivial@nongnu.org,  zhao1.liu@intel.com,  kvm@vger.kernel.org,
-  qemu-devel@nongnu.org,  Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v3] kvm: replace fprintf with error_report/printf() in
- kvm_init()
-In-Reply-To: <8913b8c7-4103-4f69-8567-afdc29f8d0d3@linaro.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri, 9 Aug 2024 10:35:57
- +0200")
-References: <20240809064940.1788169-1-anisinha@redhat.com>
-	<8913b8c7-4103-4f69-8567-afdc29f8d0d3@linaro.org>
-Date: Tue, 27 Aug 2024 08:30:36 +0200
-Message-ID: <87v7zmmq9f.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1724742458; c=relaxed/simple;
+	bh=w7cxUhLIAzp2ombetFVrAYWSkIfI6Xs1DMlJ3n1Zcf4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WTB+9LR8NNmmONpWvYSqTYMosZNZV5ktHEIppk0yGZ0CfWwBdt3QV/yXK8JtOnSXX+ZLZFmiugBCQf0Z3AuhZ1qEYSPWLQbhbKGqeL3lbPcaHki1eJ2n75kyTAJGOANCbBARGgILVoPG8h/2MPXGhMLUK0pUnzy+twgB65Vx9J4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jikjkFik; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23394C8B7AA;
+	Tue, 27 Aug 2024 07:07:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724742458;
+	bh=w7cxUhLIAzp2ombetFVrAYWSkIfI6Xs1DMlJ3n1Zcf4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=jikjkFik7s5RnDb53CbhMDzOqygs8f1+bSff7o42MTzuuMoGF80LpeFSQFythukkQ
+	 uvs+ECE7wOBG679XDrs0n2A1BaF+o0IxRyY0dEPYsGvZF0XPONJVs8t0YI56r7VuI2
+	 haRN/LZU+sNz9Fv9O0DOxeJJdRGmgrP2TeWoyg7o6jnzhYpXjTutTvlF4yeYUdtLCC
+	 aGbIaY9t9m2mLTNW4Y96YHjX4boM/+gHkKyBTMeO+gbfTzwxqd6OkVjWX61I9fsbQ8
+	 LhT7bcxA5AzIExO1JavuJOT9ZAgTXT61lJu+5uwpAf/k8RgeJo0jf+uGpHYWf6j0Pp
+	 ylI0gy6/uO87A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1siqIh-0077cp-J6;
+	Tue, 27 Aug 2024 08:07:35 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 0/8] KVM: arm64: Add support for FP8
+Date: Tue, 27 Aug 2024 08:07:31 +0100
+Message-Id: <172474244499.3905348.3393130116483819167.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240820131802.3547589-1-maz@kernel.org>
+References: <20240820131802.3547589-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> writes:
+On Tue, 20 Aug 2024 14:17:54 +0100, Marc Zyngier wrote:
+> Although FP8 support was merged in 6.9, the KVM side was dropped, with
+> no sign of it being picked up again. Given that its absence is getting
+> in the way of NV upstreaming (HCRX_EL2 needs fleshing out), here's a
+> small series addressing it.
+> 
+> The support is following the save/restore model established for the
+> rest of the FP code, with FPMR being tied to it. The sole additions
+> are the handling of traps in a nested context, and the corresponding
+> ID registers being made writable. As an extra cleanup, SVCR and FPMR
+> are moved into the sysreg array.
+> 
+> [...]
 
-> Hi Ani,
->
-> On 9/8/24 08:49, Ani Sinha wrote:
->> error_report() is more appropriate for error situations. Replace fprintf=
- with
->> error_report. Cosmetic. No functional change.
->> CC: qemu-trivial@nongnu.org
->> CC: zhao1.liu@intel.com
->
-> (Pointless to carry Cc line when patch is already reviewed next line)
->
->> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
->> Signed-off-by: Ani Sinha <anisinha@redhat.com>
->> ---
->>   accel/kvm/kvm-all.c | 40 ++++++++++++++++++----------------------
->>   1 file changed, 18 insertions(+), 22 deletions(-)
->> changelog:
->> v2: fix a bug.
->> v3: replace one instance of error_report() with error_printf(). added ta=
-gs.
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index 75d11a07b2..5bc9d35b61 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -2427,7 +2427,7 @@ static int kvm_init(MachineState *ms)
->>       QLIST_INIT(&s->kvm_parked_vcpus);
->>       s->fd =3D qemu_open_old(s->device ?: "/dev/kvm", O_RDWR);
->>       if (s->fd =3D=3D -1) {
->> -        fprintf(stderr, "Could not access KVM kernel module: %m\n");
->> +        error_report("Could not access KVM kernel module: %m");
->>           ret =3D -errno;
->>           goto err;
->>       }
->> @@ -2437,13 +2437,13 @@ static int kvm_init(MachineState *ms)
->>           if (ret >=3D 0) {
->>               ret =3D -EINVAL;
->>           }
->> -        fprintf(stderr, "kvm version too old\n");
->> +        error_report("kvm version too old");
->>           goto err;
->>       }
->>         if (ret > KVM_API_VERSION) {
->>           ret =3D -EINVAL;
->> -        fprintf(stderr, "kvm version not supported\n");
->> +        error_report("kvm version not supported");
->>           goto err;
->>       }
->>   @@ -2488,26 +2488,22 @@ static int kvm_init(MachineState *ms)
->>       } while (ret =3D=3D -EINTR);
->>         if (ret < 0) {
->> -        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
->> -                strerror(-ret));
->> +        error_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
->> +                    strerror(-ret));
->>     #ifdef TARGET_S390X
->>           if (ret =3D=3D -EINVAL) {
->> -            fprintf(stderr,
->> -                    "Host kernel setup problem detected. Please verify:=
-\n");
->> -            fprintf(stderr, "- for kernels supporting the switch_amode =
-or"
->> -                    " user_mode parameters, whether\n");
->> -            fprintf(stderr,
->> -                    "  user space is running in primary address space\n=
-");
->> -            fprintf(stderr,
->> -                    "- for kernels supporting the vm.allocate_pgste sys=
-ctl, "
->> -                    "whether it is enabled\n");
->> +            error_report("Host kernel setup problem detected.
->
-> \n"
->
-> Should we use error_printf_unless_qmp() for the following?
->
-> " Please verify:");
->> +            error_report("- for kernels supporting the switch_amode or"
->> +                        " user_mode parameters, whether");
->> +            error_report("  user space is running in primary address sp=
-ace");
->> +            error_report("- for kernels supporting the vm.allocate_pgst=
-e "
->> +                        "sysctl, whether it is enabled");
+Applied to next, thanks!
 
-Do not put newlines into error messages.  error_report()'s function
-comment demands "The resulting message should be a single phrase, with
-no newline or trailing punctuation."
+[1/8] KVM: arm64: Move SVCR into the sysreg array
+      commit: b55688943597df06f202c67341da5b9b0ec54e93
+[2/8] KVM: arm64: Add predicate for FPMR support in a VM
+      commit: d4db98791aa5316677a1da9bfa0788068c9863dc
+[3/8] KVM: arm64: Move FPMR into the sysreg array
+      commit: 7d9c1ed6f4bfa8d5fcafad847ac64e2839a04301
+[4/8] KVM: arm64: Add save/restore support for FPMR
+      commit: ef3be86021c3bdf384c36d9d4aa1ee9fe65b95af
+[5/8] KVM: arm64: Honor trap routing for FPMR
+      commit: b8f669b491ec4693d07126b20db0fbe747556d11
+[6/8] KVM: arm64: Expose ID_AA64FPFR0_EL1 as a writable ID reg
+      commit: 6d7307651a8a021e7286e90264676b893cb6032d
+[7/8] KVM: arm64: Enable FP8 support when available and configured
+      commit: c9150a8ad9cdb69584d4ec5af61481df41498eb8
+[8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
+      commit: 13c7a51eeb747ec315485ac7b13d4ea03707f53e
 
-You can do this:
+Cheers,
 
-    error_report(... the actual error message ...);
-    error_printf(... hints on what to do about it ...);
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
-Questions?
-
-[...]
 
 
