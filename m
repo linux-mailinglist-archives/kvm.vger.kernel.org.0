@@ -1,247 +1,124 @@
-Return-Path: <kvm+bounces-25190-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25191-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10DA096159A
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 19:36:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD4A9615AD
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 19:41:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B9931C233D6
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 17:36:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCD49B22114
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 17:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102041D175D;
-	Tue, 27 Aug 2024 17:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44C91CDA3C;
+	Tue, 27 Aug 2024 17:41:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="H3R5Cia2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="etDD3jbD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7840C1C7B92
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 17:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87B01D174E;
+	Tue, 27 Aug 2024 17:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724780200; cv=none; b=mmguUMXHoUpaS4ZU5QWzJOqciDHtgfCucm5DyPwqBWK7sp4d6MaMTVPmcKZHjyHxbMealYvEcChi2ootcOGExESNuFIWnmFezdaNTtyOVofXt/q19vtzC/lHsxLFxcKZYSOOo4flNTvEf81SbcnUSfWa9ZzKHGTQIgmwCCIYl+g=
+	t=1724780471; cv=none; b=Tbj2QUyJ2NLCOfl3jsSsm2aGuttSnPTQgjxvK9T2g5aOo8OvYGaCTCMpXVlOoLRtYbbM8UtDSStdMGOize1nREZHuJNA8sANQ2Wmft+ZQnmAP95FC2akjfQiLPBK5x5iGNGMAv+K4hKkXZ+9SpamYNaoN4LwNM2Lg2p6YhIAvhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724780200; c=relaxed/simple;
-	bh=zdcEuao6Yueq9nynqlojGySRjewdllFC1HqW1BdVgew=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UUeMC3zHC+yAC3QCnuq/r+vBLp0nDynTgTIj/lhYR9NxzAbCpr6DsrD7AnfsZPxqpL+Des7CRvFsgQH4CPDwV7o3FElbj7oF3n2d4d7UXghylWfDR/nOTjYmq/b9CvjmKCtak7RzJqjOtf9SfrklQCiXxY85wSN+hs1wG0QhJFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=H3R5Cia2; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e116d2f5f7fso5049003276.1
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 10:36:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=digitalocean.com; s=google; t=1724780197; x=1725384997; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z6qsGfI7hgSvO5zF/HF4LG2tjSgMq9IY878EP4P7OTw=;
-        b=H3R5Cia2ZpMHDajPSSWAITsxYWASjarMiL+G320hw37hzLzAqCFKluquBb6kfoFrT5
-         3CxuLuVR2WLn8gZy2dUG5Bu8bKZtOC4d6lBKzp2mG0Ah58mI/I/P8BHfkR+YQMdCBaqq
-         p8+7kVPHwX0mJMbCj2FufMoOwFlCEMqCC/iKQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724780197; x=1725384997;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z6qsGfI7hgSvO5zF/HF4LG2tjSgMq9IY878EP4P7OTw=;
-        b=pKrNPC8OBPuVR0LStXvfm5FyZUjhlW6yJWzmtz6R1o82tN2NFmGdTRrgtUujYBeOvi
-         kBO6fZKHHEdPv+G6+Ed/lUWFmYVVu9o7AXsjganoG9+klFPfW9ew11vwMSp2qopn81yU
-         VMgl0RbpLVB3oDYoCqKt4n5UGCb7eeRBIWXUSBMYvwMPmzmxD3zM8j2h0++kF5bmzLGe
-         sU6YSlZscMpneEGHlz5BfReigQKCGkpOiAlubv4thzrfupdgC5lFgiTLcaHmc9QR2rTo
-         gRYJZLVhLqwombtNSbX6azXpO2eYGvS5mzGaYpmhGrszSzAfaa8G4qjGuBcczltbIK4N
-         uzqw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDzYdnL150gDmOZR6k1Mi2cfOb5C5IUpCth75r+YlV0H6rhso30WNAfyGvzC3P22ZWyZk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdDRb0Vdg8tMb2N1FOTyaKSCvlC0c6w6BDzthiHzu9Hinbf2LA
-	X8qNxdNPnVT9Emywzfi8HTJ8Gco18QLItpGipiGwMUtxul6tR8unG6O9IVacQVg=
-X-Google-Smtp-Source: AGHT+IEfVdmQhipnsiOiT6VThaW7IpCX0ncY4BPR8r+WLzd9JbFk7D8SGhOB6tc17o/phjE//9pqUw==
-X-Received: by 2002:a05:6902:1883:b0:e0e:83e1:d1 with SMTP id 3f1490d57ef6-e1a29824acemr3606390276.20.1724780197226;
-        Tue, 27 Aug 2024 10:36:37 -0700 (PDT)
-Received: from ?IPV6:2603:8080:7400:36da:45f:f211:3a7c:9377? ([2603:8080:7400:36da:45f:f211:3a7c:9377])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e178e4b71bbsm2622725276.37.2024.08.27.10.36.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Aug 2024 10:36:36 -0700 (PDT)
-Message-ID: <d3115e7a-6bd0-4d6d-b759-05c9b227013b@digitalocean.com>
-Date: Tue, 27 Aug 2024 12:36:35 -0500
+	s=arc-20240116; t=1724780471; c=relaxed/simple;
+	bh=2Dvq4GZvvDxmHQJvbFtFaGiDmWeBUJew29WRzq1TQvk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S7lBDYNYs1fPgNmEfNqyVFbxPasE4E0sm4n5Djplf7M/gggdXhntM9kADDGRb0BlFVyMQFzRm5S4abRVgnn0Ky4ufJKhpRcqHr2JSSEmcaFhQcbMmEuU4aClJ7brLmIpWXomTBPWt2ol2cgXA1G/kLnpJDPIdYCYVGtS6cnX+Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=etDD3jbD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B740EC567F2;
+	Tue, 27 Aug 2024 17:41:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724780470;
+	bh=2Dvq4GZvvDxmHQJvbFtFaGiDmWeBUJew29WRzq1TQvk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=etDD3jbDgZ+SRILbgMnE/vIVnMjmSUlTDB31wijltFe47mvBupdZwxVmnDErGEgWw
+	 P1U3evJLWch3mB+MEEeT6z+ePrJcG9W6P5JMV3ZBEBj+qyRAF206h6CRgnZvmACBYX
+	 EYnfGW0XABe1snzjKcJpu4XaWXT83DLc6HayyemZ65QsCgF18jbKFoRSVbDVrQ2GLf
+	 /WIc7Ur7plj/Aph4v4ieLx6QgtKZQTldWOaJnGYC5nzahkTH7/pkqv2V7MvP06iOns
+	 tsPw9af7fePrTjq2i2I9uakadx8ZfLe3qZxQ45xh4XeRJJT6/TFCGovE2IUCrOHCwy
+	 k2JUnP5P+X+EA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sj0Bo-007Jr4-Pg;
+	Tue, 27 Aug 2024 18:41:08 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH v2 00/11] KVM: arm64: Handle the lack of GICv3 exposed to a guest
+Date: Tue, 27 Aug 2024 18:41:05 +0100
+Message-Id: <172478045782.3912073.2560526498433188972.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240827152517.3909653-1-maz@kernel.org>
+References: <20240827152517.3909653-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
-To: Jason Wang <jasowang@redhat.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, eli@mellanox.com, mst@redhat.com,
- xuanzhuo@linux.alibaba.com, virtualization@lists.linux-foundation.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- eperezma@redhat.com, sashal@kernel.org, yuehaibing@huawei.com,
- steven.sistare@oracle.com
-References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
- <afcbf041-7613-48e6-8088-9d52edd907ff@nvidia.com>
- <8a15a46a-2744-4474-8add-7f6fb35552b3@digitalocean.com>
- <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
- <1cb17652-3437-472e-b8d5-8078ba232d60@digitalocean.com>
- <CACGkMEvbc_4_KrnkZb-owH1moauntBmoKhHp1tsE5SL4RCMPog@mail.gmail.com>
-Content-Language: en-US
-From: Carlos Bilbao <cbilbao@digitalocean.com>
-In-Reply-To: <CACGkMEvbc_4_KrnkZb-owH1moauntBmoKhHp1tsE5SL4RCMPog@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, glider@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hello,
+On Tue, 27 Aug 2024 16:25:06 +0100, Marc Zyngier wrote:
+> It recently appeared that, when running on a GICv3-equipped platform
+> (which is what non-ancient arm64 HW has), *not* configuring a GICv3
+> for the guest could result in less than desirable outcomes.
+> 
+> We have multiple issues to fix:
+> 
+> - for registers that *always* trap (the SGI registers) or that *may*
+>   trap (the SRE register), we need to check whether a GICv3 has been
+>   instantiated before acting upon the trap.
+> 
+> [...]
 
-On 8/26/24 9:07 PM, Jason Wang wrote:
-> On Tue, Aug 27, 2024 at 3:23 AM Carlos Bilbao <cbilbao@digitalocean.com> wrote:
->> Hello,
->>
->> On 8/26/24 10:53 AM, Dragos Tatulea wrote:
->>> On 26.08.24 16:26, Carlos Bilbao wrote:
->>>> Hello Dragos,
->>>>
->>>> On 8/26/24 4:06 AM, Dragos Tatulea wrote:
->>>>> On 23.08.24 18:54, Carlos Bilbao wrote:
->>>>>> Hello,
->>>>>>
->>>>>> I'm debugging my vDPA setup, and when using ioctl to retrieve the
->>>>>> configuration, I noticed that it's running in half duplex mode:
->>>>>>
->>>>>> Configuration data (24 bytes):
->>>>>>   MAC address: (Mac address)
->>>>>>   Status: 0x0001
->>>>>>   Max virtqueue pairs: 8
->>>>>>   MTU: 1500
->>>>>>   Speed: 0 Mb
->>>>>>   Duplex: Half Duplex
->>>>>>   RSS max key size: 0
->>>>>>   RSS max indirection table length: 0
->>>>>>   Supported hash types: 0x00000000
->>>>>>
->>>>>> I believe this might be contributing to the underperformance of vDPA.
->>>>> mlx5_vdpa vDPA devicess currently do not support the VIRTIO_NET_F_SPEED_DUPLEX
->>>>> feature which reports speed and duplex. You can check the state on the
->>>>> PF.
->>>> According to ethtool, all my devices are running at full duplex. I assume I
->>>> can disregard this configuration output from the module then.
->>>>
->>> Yep.
->>>
->>>>>> While looking into how to change this option for Mellanox, I read the following
->>>>>> kernel code in mlx5_vnet.c:
->>>>>>
->>>>>> static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
->>>>>>                  unsigned int len)
->>>>>> {
->>>>>>     /* not supported */
->>>>>> }
->>>>>>
->>>>>> I was wondering why this is the case.
->>>>> TBH, I don't know why it was not added. But in general, the control VQ is the
->>>>> better way as it's dynamic.
->>>>>
->>>>>> Is there another way for me to change
->>>>>> these configuration settings?
->>>>>>
->>>>> The configuration is done using control VQ for most things (MTU, MAC, VQs,
->>>>> etc). Make sure that you have the CTRL_VQ feature set (should be on by
->>>>> default). It should appear in `vdpa mgmtdev show` and `vdpa dev config
->>>>> show`.
->>>> I see that CTRL_VQ is indeed enabled. Is there any documentation on how to
->>>> use the control VQ to get/set vDPA configuration values?
->>>>
->>>>
->>> You are most likely using it already through through qemu. You can check
->>> if the CTR_VQ feature also shows up in the output of `vdpa dev config show`.
->>>
->>> What values are you trying to configure btw?
->>
->> Yes, CTRL_VQ also shows up in vdpa dev config show. There isn't a specific
->> value I want to configure ATM, but my vDPA isn't performing as expected, so
->> I'm investigating potential issues. Below is the code I used to retrieve
->> the configuration from the driver; I'd be happy to send it as a patch if
->> you or someone else reviews it.
->>
->>
->>> Thanks,
->>> Dragos
->>
->> Thanks,
->> Carlos
->>
->> ---
->>
->> From ab6ea66c926eaf1e95eb5d73bc23183e0021ee27 Mon Sep 17 00:00:00 2001
->> From: Carlos Bilbao <bilbao@vt.edu>
->> Date: Sat, 24 Aug 2024 00:24:56 +0000
->> Subject: [PATCH] mlx5: Add support to update the vDPA configuration
->>
->> This is needed for VHOST_VDPA_SET_CONFIG.
->>
->> Signed-off-by: Carlos Bilbao <cbilbao@digitalocean.com>
->> ---
->>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 22 ++++++++++++++++++++--
->>  1 file changed, 20 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> index b56aae3f7be3..da31c743b2b9 100644
->> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> @@ -2909,14 +2909,32 @@ static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset,
->>      struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
->>      struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
->>
->> -    if (offset + len <= sizeof(struct virtio_net_config))
->> +    if (offset + len <= sizeof(struct virtio_net_config)) {
->>          memcpy(buf, (u8 *)&ndev->config + offset, len);
->> +        }
->> +        else
->> +        {
->> +            printk(KERN_ERR "%s: Offset and length out of bounds\n",
->> +            __func__);
->> +        }
->> +
->>  }
->>
->>  static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
->>                   unsigned int len)
->>  {
->> -    /* not supported */
->> +    struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
->> +    struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
->> +
->> +    if (offset + len <= sizeof(struct virtio_net_config))
->> +    {
->> +        memcpy((u8 *)&ndev->config + offset, buf, len);
->> +    }
->> +    else
->> +    {
->> +        printk(KERN_ERR "%s: Offset and length out of bounds\n",
->> +        __func__);
->> +    }
->>  }
-> This should follow the virtio-spec, for modern virtio-net devices,
-> most of the fields are read only.
+Applied to next, thanks!
 
+[01/11] KVM: arm64: Move GICv3 trap configuration to kvm_calculate_traps()
+        commit: d2137ba8d8fe56cd2470c82b98e494cbcababd76
+[02/11] KVM: arm64: Force SRE traps when SRE access is not enabled
+        commit: 5739a961b542530626cb3afb721efa688b290cce
+[03/11] KVM: arm64: Force GICv3 trap activation when no irqchip is configured on VHE
+        commit: 8d917e0a8651377321c06513f42e2ab9a86161f4
+[04/11] KVM: arm64: Add helper for last ditch idreg adjustments
+        commit: 795a0bbaeee2aa993338166bc063fe3c89373d2a
+[05/11] KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no GICv3 is presented to the guest
+        commit: 5cb57a1aff7551bcb3b800d33141b06ef0ac178b
+[06/11] KVM: arm64: Add ICH_HCR_EL2 to the vcpu state
+        commit: 9f5deace58da737d67ec9c2d23534a475be68481
+[07/11] KVM: arm64: Add trap routing information for ICH_HCR_EL2
+        commit: 15a1ba8d049855c5ae454c84e6dd2d7657bacbe8
+[08/11] KVM: arm64: Honor guest requested traps in GICv3 emulation
+        commit: 59af011d001b836aa52a3dbb5c54daf6fffb511e
+[09/11] KVM: arm64: Make most GICv3 accesses UNDEF if they trap
+        commit: 4a999a1d7ae52592723a9a219aaa7a3406d66dd6
+[10/11] KVM: arm64: Unify UNDEF injection helpers
+        commit: cd08d3216fc4e684f05fe4cf696a275a975f6499
+[11/11] KVM: arm64: Add selftest checking how the absence of GICv3 is handled
+        commit: de2e75209303b98d3169a249a1bc847be9657d9b
 
-Ack, according to:
+Cheers,
 
-https://docs.oasis-open.org/virtio/virtio/v1.2/csd01/virtio-v1.2-csd01.html
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
-I believe only duplex and speed can be changed. Will resend patch.
-
-
-> Thanks
->
->>  static u32 mlx5_vdpa_get_generation(struct vdpa_device *vdev)
->> --
->> 2.34.1
->>
->>
-
-Thanks,
-Carlos
 
 
