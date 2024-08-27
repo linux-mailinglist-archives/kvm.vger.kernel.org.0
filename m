@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-25165-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD621961207
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 17:26:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1DFD961205
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 17:26:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 591A9B231DC
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 15:26:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96DEC281E88
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 15:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1BBF1C9EC5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2071C9EAF;
 	Tue, 27 Aug 2024 15:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJuIGJIi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KylIwLdT"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2B01C7B97;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2651C7B82;
 	Tue, 27 Aug 2024 15:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724772330; cv=none; b=sm1njVS79TBIHeo8xp0gkua0yWkWcFHhrBd0/wBQmOiymo+YZ3MTFcz50gaVKX/BGrNAVch/Sb38Nuq+YCtVDj/MdQAU6vURtUjHSUn5oc7IPiUQl78j/hq1x7n/vBAICUupDbFQKAuzyFb0T9Iiwxbd3JzKNZS6YyndAh5Of+8=
+	t=1724772330; cv=none; b=sI+6Fc6Jveqzs6zonUAS8+gYGCFGnq4VNsiA2oQc6DNbbaglzeM1kWcqX8Ksi5TZYMcIWZ5SNxtXzyikSwNDmPIBY3iyBKnjaegGh6pdfAg4fhweK3jE/IrUXl+/TsdkKO4ShcENIewc/8Pz/LBErpZWwdM9WyiDjTriPWzDCWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724772330; c=relaxed/simple;
-	bh=BLHqRlEtVdyFkvXOD5bpFwLzC1R/BZ+PStAiOyjpjRs=;
+	bh=F8okc6t0iSZwnR4FFgYJRiQd4jXOMYJgtLflxgGnfgU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EcEkx70BcNXDgoRwgaofVdoYyFoZuqrS/2iLRcPKh2L+zOrmrMsIk7XUT+5OUkKJSIoMoisvJe3pnEkhF7FQ5y3l4UujRxrA6YoA77ug7jreEyEHrlu0z/FIrznKn7VfWxfZnMMohXU4Lv/GoARzy14QXM5Lx4s+M8Fx/upUAd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJuIGJIi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3808C6107D;
+	 MIME-Version; b=mc1F3H4X2nF9G+71qPKaIrxOCsr19au3sBiVmUq0uqMloZRyrTpsSmdIGbJ9KKaMA+kNpXAEPqaiaCxEdwNo2GWhLUCaDe9r128T9YAb+XK1ocOr2INRim7G9QFaAxnpEdXS0NPtLOffv0J2mTeLiF7dxu5wOmwTQit/xwwB9Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KylIwLdT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E31F9C6107A;
 	Tue, 27 Aug 2024 15:25:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1724772329;
-	bh=BLHqRlEtVdyFkvXOD5bpFwLzC1R/BZ+PStAiOyjpjRs=;
+	bh=F8okc6t0iSZwnR4FFgYJRiQd4jXOMYJgtLflxgGnfgU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MJuIGJIia6/KJ2mCSm8jAmyCiuczqj4mBYPu6PAUnjQ4nLDQb0Xp+L1Nn6nWxk6oi
-	 2liJsy07rmpM7sCAine/TvEywlYQZqyi4MNyP1MuGRlkAfGLLUx2qovBet+e+h1jv7
-	 t7w7yN1uZPsSsLKqfzh5x8umvoV0MIG7uUHP1bKFQmob8dnaHU6J9tzGLJegIvuEOO
-	 HkdNqciW7QlsDT1faNog6E/0uE1qSu/ePnjynMvQIHpmPi48JyMemmLLslJxTtXPhL
-	 wYYY023zzM6BLsdVg0SGYvQQh1yyVbS9+DiUOrHikJLG6CdRgU8wJO8xQXoUl9G++0
-	 Ta/4ictdRu82g==
+	b=KylIwLdT+eoNKy5yC399UkixlOwMpVxhf26c8TacZu+tjJh1/G0tOnHuDc8yoYrss
+	 wRux5FajQOpKfCAWCFNzYqEQ8hkccBD3/rPWIfKBJ3RdtBQvf1s3qoqFtqiEbYLbgr
+	 Fc72dq6QuWR0HWPEVRQF6vlwQsbdFEkySKTPYy/EkePIMH1y6METXIIZfG2Jn9HoRA
+	 ZYQeHOYv/VjqnzqwEebUqqodr712aV/Qnzjlg43lcK++EPVSaiuxxlSUhwzOfh2N9d
+	 NrM9MA43PSpuqvtLin9wQVAw5krIdJWm6CUDM33dxaMA0ARfXCzgvmISDOA9oHqQoy
+	 xVKN6Hx+pNRyw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1siy4V-007HOs-Qc;
-	Tue, 27 Aug 2024 16:25:27 +0100
+	id 1siy4W-007HOs-0V;
+	Tue, 27 Aug 2024 16:25:28 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -56,9 +56,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Alexander Potapenko <glider@google.com>
-Subject: [PATCH v2 02/11] KVM: arm64: Force SRE traps when SRE access is not enabled
-Date: Tue, 27 Aug 2024 16:25:08 +0100
-Message-Id: <20240827152517.3909653-3-maz@kernel.org>
+Subject: [PATCH v2 03/11] KVM: arm64: Force GICv3 trap activation when no irqchip is configured on VHE
+Date: Tue, 27 Aug 2024 16:25:09 +0100
+Message-Id: <20240827152517.3909653-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240827152517.3909653-1-maz@kernel.org>
 References: <20240827152517.3909653-1-maz@kernel.org>
@@ -74,111 +74,53 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We so far only write the ICH_HCR_EL2 config in two situations:
+On a VHE system, no GICv3 traps get configured when no irqchip is
+present. This is not quite matching the "no GICv3" semantics that
+we want to present.
 
-- when we need to emulate the GICv3 CPU interface due to HW bugs
-
-- when we do direct injection, as the virtual CPU interface needs
-  to be enabled
-
-This is all good. But it also means that we don't do anything special
-when we emulate a GICv2, or that there is no GIC at all.
-
-What happens in this case when the guest uses the GICv3 system
-registers? The *guest* gets a trap for a sysreg access (EC=0x18)
-while we'd really like it to get an UNDEF.
-
-Fixing this is a bit involved:
-
-- we need to set all the required trap bits (TC, TALL0, TALL1, TDIR)
-
-- for these traps to take effect, we need to (counter-intuitively)
-  set ICC_SRE_EL1.SRE to 1 so that the above traps take priority.
-
-Note that doesn't fully work when GICv2 emulation is enabled, as
-we cannot set ICC_SRE_EL1.SRE to 1 (it breaks Group0 delivery as
-IRQ).
+Force such traps to be configured in this case.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 22 ++++++++++++++++------
- arch/arm64/kvm/vgic/vgic-v3.c   |  5 ++++-
- 2 files changed, 20 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/vgic/vgic.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 7b397fad26f2..c9ab76652c32 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -268,8 +268,16 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
- 	 * starting to mess with the rest of the GIC, and VMCR_EL2 in
- 	 * particular.  This logic must be called before
- 	 * __vgic_v3_restore_state().
-+	 *
-+	 * However, if the vgic is disabled (ICH_HCR_EL2.EN==0), no GIC is
-+	 * provisioned at all. In order to prevent illegal accesses to the
-+	 * system registers to trap to EL1 (duh), force ICC_SRE_EL1.SRE to 1
-+	 * so that the trap bits can take effect. Yes, we *loves* the GIC.
- 	 */
--	if (!cpu_if->vgic_sre) {
-+	if (!(cpu_if->vgic_hcr & ICH_HCR_EN)) {
-+		write_gicreg(ICC_SRE_EL1_SRE, ICC_SRE_EL1);
-+		isb();
-+	} else if (!cpu_if->vgic_sre) {
- 		write_gicreg(0, ICC_SRE_EL1);
- 		isb();
- 		write_gicreg(cpu_if->vgic_vmcr, ICH_VMCR_EL2);
-@@ -288,8 +296,9 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
- 	}
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index abe29c7d85d0..f50274fd5581 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -922,10 +922,13 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
  
- 	/*
--	 * Prevent the guest from touching the GIC system registers if
--	 * SRE isn't enabled for GICv3 emulation.
-+	 * Prevent the guest from touching the ICC_SRE_EL1 system
-+	 * register. Note that this may not have any effect, as
-+	 * ICC_SRE_EL2.Enable being RAO/WI is a valid implementation.
- 	 */
- 	write_gicreg(read_gicreg(ICC_SRE_EL2) & ~ICC_SRE_EL2_ENABLE,
- 		     ICC_SRE_EL2);
-@@ -297,10 +306,11 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
- 	/*
- 	 * If we need to trap system registers, we must write
- 	 * ICH_HCR_EL2 anyway, even if no interrupts are being
--	 * injected,
-+	 * injected. Note that this also applies if we don't expect
-+	 * any system register access (no vgic at all).
- 	 */
- 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) ||
--	    cpu_if->its_vpe.its_vm)
-+	    cpu_if->its_vpe.its_vm || !cpu_if->vgic_sre)
- 		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
- }
- 
-@@ -326,7 +336,7 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
- 	 * no interrupts were being injected, and we disable it again here.
- 	 */
- 	if (static_branch_unlikely(&vgic_v3_cpuif_trap) ||
--	    cpu_if->its_vpe.its_vm)
-+	    cpu_if->its_vpe.its_vm || !cpu_if->vgic_sre)
- 		write_gicreg(0, ICH_HCR_EL2);
- }
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 11718412921f..b217b256853c 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -298,8 +298,11 @@ void vcpu_set_ich_hcr(struct kvm_vcpu *vcpu)
+ void kvm_vgic_load(struct kvm_vcpu *vcpu)
  {
- 	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
- 
--	if (!kvm_has_gicv3(vcpu->kvm))
-+	/* Hide GICv3 sysreg if necessary */
-+	if (!kvm_has_gicv3(vcpu->kvm)) {
-+		vgic_v3->vgic_hcr |= ICH_HCR_TALL0 | ICH_HCR_TALL1 | ICH_HCR_TC;
+-	if (unlikely(!vgic_initialized(vcpu->kvm)))
++	if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))) {
++		if (has_vhe() && static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
++			__vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
  		return;
 +	}
  
- 	if (group0_trap)
- 		vgic_v3->vgic_hcr |= ICH_HCR_TALL0;
+-	if (kvm_vgic_global_state.type == VGIC_V2)
++	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+ 		vgic_v2_load(vcpu);
+ 	else
+ 		vgic_v3_load(vcpu);
+@@ -933,10 +936,13 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu)
+ 
+ void kvm_vgic_put(struct kvm_vcpu *vcpu)
+ {
+-	if (unlikely(!vgic_initialized(vcpu->kvm)))
++	if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !vgic_initialized(vcpu->kvm))) {
++		if (has_vhe() && static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
++			__vgic_v3_deactivate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+ 		return;
++	}
+ 
+-	if (kvm_vgic_global_state.type == VGIC_V2)
++	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+ 		vgic_v2_put(vcpu);
+ 	else
+ 		vgic_v3_put(vcpu);
 -- 
 2.39.2
 
