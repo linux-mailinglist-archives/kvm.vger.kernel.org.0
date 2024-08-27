@@ -1,112 +1,91 @@
-Return-Path: <kvm+bounces-25192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25193-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E359616A2
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 20:17:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 516BF9616A8
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 20:17:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 409251F24BDE
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 18:17:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06DD91F24DCB
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 18:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9401D2F7F;
-	Tue, 27 Aug 2024 18:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25891D2F6C;
+	Tue, 27 Aug 2024 18:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HAWbSply"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fwkNtpb4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C0F1D2F55
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 18:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C231D2788
+	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 18:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724782599; cv=none; b=dWXomUjd27Ln4sG/nIcKTMaRDDDBZiX1OCtqKKhnZBimEnRApq2FZiLy+pXitUaFHc+6P0mzfJBrujtGM1mBmLNxAqFLpk8XQxqJo6um90GthZlW9Cy+xmDhXSDdmlmuBNX/2BXgxkpASeTiX9io4oZzlmJ8kJeT76uQZCJ1t1Q=
+	t=1724782619; cv=none; b=HNTzBIt5M7MuXV2cq5IC95gqPB3gKQLYXH4EBjgvJ4uz/e00Ix0JcrTb63Vi5Hzb+PZnxMpAGWU4pFTriF0WMBeNPdnWoBZJYgeTcDoXmzsM4ply+9SeU03AQXZbufpKqJogd2AGM5XterOSeCrOUvvkyfwcddOr6QbMHvdJXIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724782599; c=relaxed/simple;
-	bh=X8QcjerdXUVJM0M6K25kjjudFG+vmIr5pWvEHt8N2WE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mev1sXXpEeyQhKT37jKc1olW5AYm91tiQ/43g7+12krYQ3DMpQ9YjrfCnAvxyizm4yD22ANeZcZEEd2qqURpOxTLYfaUQWc+LRZagmlk3jw/qfbg59jFGdPMPUk4Bsuxs49vbDjO9FxwbKBumtSuKOfi1OPRvTl0Fw2xzWbm0HQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HAWbSply; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724782596;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EHSBO7ll3rbZOfjXr1T8jodqp3tHRdp2gSRkpPRf9Tg=;
-	b=HAWbSplyNrpeIEgf2zP07+t0ix/WDNJlPtOuvgEa5ulDYPiMkT1eTdxCi6eJ8Skp+mpxKa
-	ZevXnnUNa5Ejd+701HRM26ylOY466mffgmBTGiXrHQHpVUoYgPnfzb0JrrNih3dw8NY/dZ
-	uEUBX7qi0zOw0LdiR8BBLAFN+0/Kqf0=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-WKnZzpyOPx2J8Yp1QpHCFQ-1; Tue, 27 Aug 2024 14:16:35 -0400
-X-MC-Unique: WKnZzpyOPx2J8Yp1QpHCFQ-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a86690270dcso555058466b.2
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 11:16:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724782594; x=1725387394;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHSBO7ll3rbZOfjXr1T8jodqp3tHRdp2gSRkpPRf9Tg=;
-        b=pc89YB6a0MC5iXEr4imO1hMA1dnYHnFD8Y5EQUFXGHyHj9FO79nVtRbZVyU+gNrU35
-         C35ekZN6fR3fOK8oCTTuqpyVPYPAMfPxUHnmt0VR08F72Q1vT2M/lBJ44iPGqlY3qLS3
-         nzVgYuiIuUbtXz1+pa/9J2w+99YjKv630TudSPXV0hSjo2LeCK/1WvLuNhmbVmwZagad
-         hyC72HSz2dSdAdNHWhuCVVI6CLoNLjdhIE+dSG9JgLTQOQ78XNjUX1WxaR2VjTG/brzW
-         MByoMbk6bdjce+TZ/CkA3BruOVMoVSnLB+vUr1eYyV6yNCL5pR2cPyOqA9Ifx4+bOydt
-         MLwg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ1LNkMBTWZy92FpoRRS7AT0z/ZnZFYKW4Tmkcf+RPH7uB3ac267GgsfVRi+egBginO/g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSA0AnCS7hNF6o0HyGHiWraW66LYhEQOYzNv91p/J15Ga2XF7C
-	d0/V0MCK/KhnLUGUm+1sP4P364tAZ3RrsrbDR8Q6jnsYdqkRBqZm2S5JVLOsFC/TRKunNysA1i/
-	wSlsNAfTHvIB1mYmSsqu3AuI1Wmn0wGis4nRSKIdyfKcP0Fto9g==
-X-Received: by 2002:a17:906:7315:b0:a86:99e9:ffa1 with SMTP id a640c23a62f3a-a86e3d3e9camr241758466b.64.1724782593697;
-        Tue, 27 Aug 2024 11:16:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHnDe3VluilgSG0vcrrqRKifn4o56qtamsjzIVVNpfdjfRpMszxTYEqVcY4D+Wi8k/eikH1ig==
-X-Received: by 2002:a17:906:7315:b0:a86:99e9:ffa1 with SMTP id a640c23a62f3a-a86e3d3e9camr241756666b.64.1724782592949;
-        Tue, 27 Aug 2024 11:16:32 -0700 (PDT)
-Received: from redhat.com ([2.55.185.222])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a86e588b39asm138757166b.159.2024.08.27.11.16.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 11:16:32 -0700 (PDT)
-Date: Tue, 27 Aug 2024 14:16:28 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Carlos Bilbao <cbilbao@digitalocean.com>
-Cc: virtualization@lists.linux-foundation.org, jasowang@redhat.com,
-	kvm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC] vDPA: Trying to make sense of config data
-Message-ID: <20240827141529-mutt-send-email-mst@kernel.org>
-References: <4f4572c8-1d8c-4ec6-96a1-fb74848475af@digitalocean.com>
- <e7ba91a7-2ba6-4532-a59a-03c2023309c6@digitalocean.com>
+	s=arc-20240116; t=1724782619; c=relaxed/simple;
+	bh=KBxdpkBq/Gt+Zn5bz5HezqsTfz90uEp4yWpE3GB75qs=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XIQ7vi1SkCLtWKdWesPzMuXaq2MtZgG5UTnp8gEEV7UUlTGYuhk+gdKRKmov7fm24FUuvcrIE1XfGY0UmtlQLF2O/NRFrwsMhqoT0UNTnpbepb1CtCrILyb3STCl9tFf3Cyl3BAMBP+vSuI7ZpkrcdXFmVq/gZXJ96kBrA+OKhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fwkNtpb4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 724D7C567E8
+	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 18:16:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724782617;
+	bh=KBxdpkBq/Gt+Zn5bz5HezqsTfz90uEp4yWpE3GB75qs=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=fwkNtpb4/GMkaOQYLIFILeSKVWAyWoPyvJyrYAbHQpq206Cd1MXlbsJNicpMCKItG
+	 oSEJ920unxrkSxnRZJHe8dRkvhlRQ2nC7vP7q5zM1QbXyWjW9j0f+4fKWDEzfY4A6j
+	 lI75nA25LJJM7T4NPoWHaqKYCz9lMoTFeynaB5StUM5T9tBZPXp/GmKD9/uF/cLKTs
+	 RSzLHoONi6+TW/HnQNHCDqWNDixEDFAQkMUU5+gYFhX4R33KYLBqETAjPOsmHvBEf0
+	 Qhlty6K8YHZrH234I2v/gkFtOCfuk/qGkmSrotus1MJ1D/HMs7q+FX0XSt4kd9BaVi
+	 kmBehln/YLuOQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 6C690C53BBF; Tue, 27 Aug 2024 18:16:57 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219009] Random host reboots on Ryzen 7000/8000 using nested VMs
+ (vls suspected)
+Date: Tue, 27 Aug 2024 18:16:57 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: michal.litwinczuk@op.pl
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219009-28872-hPWl6dnQ8B@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219009-28872@https.bugzilla.kernel.org/>
+References: <bug-219009-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e7ba91a7-2ba6-4532-a59a-03c2023309c6@digitalocean.com>
 
-On Fri, Aug 23, 2024 at 09:51:24AM -0500, Carlos Bilbao wrote:
-> Hello again, 
-> 
-> Answering my own question:
-> 
-> https://elixir.bootlin.com/linux/v6.10.2/source/include/uapi/linux/virtio_net.h#L92
-> 
-> Thanks, Carlos
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219009
 
-Right. kernel.org would be the official source for that header.
-Or if you want it in english, that would be the virtio spec.
+--- Comment #11 from h4ck3r (michal.litwinczuk@op.pl) ---
+Im afraid it might be overlooked issue that propagated to zen5.
+If there is someone with zen5 let know if nestes virt also breaks on it.
 
--- 
-MST
+--=20
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
