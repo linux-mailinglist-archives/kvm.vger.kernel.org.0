@@ -1,339 +1,557 @@
-Return-Path: <kvm+bounces-25138-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25139-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AA08960848
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 13:15:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F21C960889
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 13:26:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF6C91F22F38
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 11:15:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 282D528458D
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 11:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7F219644B;
-	Tue, 27 Aug 2024 11:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="R/OCfjaB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502DC1A01B7;
+	Tue, 27 Aug 2024 11:26:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49A3155CBD;
-	Tue, 27 Aug 2024 11:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0041A00D1;
+	Tue, 27 Aug 2024 11:26:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724757335; cv=none; b=u2/QD5h4ZOCHKZnzycDQVd0U/vF4hFamXYmLjbt+KJNivXe7jK/VzYwn8MfwqpmEgs7vxMulehQVvxoMQmXD3xbnrrXRkZerr+GapBL9Wb6TNaKQuFjVMqSpoqsDLCnvSgDQyCegcfxFqxtmTpSEjO4Vb9E4jCzR0MByTWo0S9E=
+	t=1724757979; cv=none; b=A+KJhGL6QUfhlWRmz8YICADkCdeSbGwYc/InheWRdw7QbeFvu7IapsUSGadW1U+pOLrTDh/VB+698jx/WsovGb6Af6YjthSbYY9piUcNAilIgXm4UfrdDol6XGE/eyvxMv3KOly5SePzRWe7gQfMVqkhNp5F2BpcslmapDn6HmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724757335; c=relaxed/simple;
-	bh=+KE69TIRNroblTDTTNSVfNTerzFptSkD+0HmxY4Bj4c=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=aTdzrtVzG8a5A05+T6oSjA4E8bYhV1flUaaJlwjKMJoGkJsY7mADmwp7pnWL2jhSOqa9BkwZgd5mo3SExMKB+NIQTOvwDCVCGn4NNwvkRC9ufJxJCI8oX/+eKXqy7eLEDIKSlHG7R6kVXm/Sm3qIzd/bovp3uMLz7y0npvDnuFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=R/OCfjaB; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1724757333; x=1756293333;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=+KE69TIRNroblTDTTNSVfNTerzFptSkD+0HmxY4Bj4c=;
-  b=R/OCfjaBa9enEnryDje8I1igd9i27zb0+RyAx6cxSWBQb3nnKmGuqh0i
-   D9ylaIBAerEd4rdv9daw5dnKRmG49lCKIOW0Bw1SiQLCdjK2sD41ErmJi
-   r/eTbsvSPOfxocw6ZbxvNRwr9DDr6kD6M7i4zCQq4c8FT4YBpP6m9Ol3f
-   k=;
-X-IronPort-AV: E=Sophos;i="6.10,180,1719878400"; 
-   d="scan'208";a="324917654"
-Subject: Re: [PATCH 1/2] KVM: selftests: Add a test for coalesced MMIO (and PIO on
- x86)
-Thread-Topic: [PATCH 1/2] KVM: selftests: Add a test for coalesced MMIO (and PIO on x86)
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 11:15:30 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:10768]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.47.25:2525] with esmtp (Farcaster)
- id a6f90fe3-b619-428f-95a6-e609490883f2; Tue, 27 Aug 2024 11:15:28 +0000 (UTC)
-X-Farcaster-Flow-ID: a6f90fe3-b619-428f-95a6-e609490883f2
-Received: from EX19D018EUA001.ant.amazon.com (10.252.50.145) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 27 Aug 2024 11:15:28 +0000
-Received: from EX19D018EUA002.ant.amazon.com (10.252.50.146) by
- EX19D018EUA001.ant.amazon.com (10.252.50.145) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 27 Aug 2024 11:15:28 +0000
-Received: from EX19D018EUA002.ant.amazon.com ([fe80::7a11:7dbb:2190:e2c1]) by
- EX19D018EUA002.ant.amazon.com ([fe80::7a11:7dbb:2190:e2c1%3]) with mapi id
- 15.02.1258.034; Tue, 27 Aug 2024 11:15:28 +0000
-From: "Stamatis, Ilias" <ilstam@amazon.co.uk>
-To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
-	<seanjc@google.com>
-CC: "maz@kernel.org" <maz@kernel.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "Stamatis, Ilias" <ilstam@amazon.co.uk>,
-	"anup@brainfault.org" <anup@brainfault.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "paul@xen.org" <paul@xen.org>
-Thread-Index: AQHa9ZC9zaMzHBKauE+QcfoY4lHgJrI6+DCA
-Date: Tue, 27 Aug 2024 11:15:28 +0000
-Message-ID: <31611f4136230893bbcffc98619bfb93c5a42ef1.camel@amazon.co.uk>
-References: <20240823191354.4141950-1-seanjc@google.com>
-	 <20240823191354.4141950-2-seanjc@google.com>
-In-Reply-To: <20240823191354.4141950-2-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BFD7EAA4A30CBF4CBC643C48ABC2DA02@amazon.com>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1724757979; c=relaxed/simple;
+	bh=oJfTsGg5dHqbpwl6kwhOVIYtecsmBw6Q4gO5inuiejg=;
+	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=fdLX0F0oz/3Z5bLngU2Mzv+PRvj6N9fRAU+uZ7wXp69D0knxOXvU+1jHfMDCWkxFrge4c+kCxC0gE6qa5V0xW2Eq296cyVnI6TAjgK+eq06a880wkefZooVKcZW9IMBowH1K+juMMJne/SzACs94zdIenAzcYx2LhB9HEJ9SiYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WtQ906CRrz20lvL;
+	Tue, 27 Aug 2024 19:21:24 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
+	by mail.maildlp.com (Postfix) with ESMTPS id 23E6E18002B;
+	Tue, 27 Aug 2024 19:26:13 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 27 Aug 2024 19:26:12 +0800
+Subject: Re: [PATCH v8 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
+ migration driver
+From: liulongfang <liulongfang@huawei.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+References: <20240806122928.46187-1-liulongfang@huawei.com>
+ <20240806122928.46187-4-liulongfang@huawei.com>
+ <20240826150635.113aba4c.alex.williamson@redhat.com>
+ <f881566f-ba70-7809-2486-786de6ebf543@huawei.com>
+Message-ID: <8526fdb4-6588-9d37-d1bc-84fb924e5736@huawei.com>
+Date: Tue, 27 Aug 2024 19:26:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <f881566f-ba70-7809-2486-786de6ebf543@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
 
-T24gRnJpLCAyMDI0LTA4LTIzIGF0IDEyOjEzIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBBZGQgYSB0ZXN0IHRvIHZlcmlmeSB0aGF0IEtWTSBjb3JyZWN0bHkgZXhpdHMgKG9y
-IG5vdCkgd2hlbiBhIHZDUFUncw0KPiBjb2FsZXNjZWQgSS9PIHJpbmcgaXMgZnVsbCAob3IgaXNu
-J3QpLiAgSXRlcmF0ZSBvdmVyIGFsbCBsZWdhbCBzdGFydGluZw0KPiBwb2ludHMgaW4gdGhlIHJp
-bmcgKHdpdGggYW4gZW1wdHkgcmluZyksIGFuZCB2ZXJpZnkgdGhhdCBLVk0gZG9lc24ndCBleGl0
-DQo+IHVudGlsIHRoZSByaW5nIGlzIGZ1bGwuDQo+IA0KPiBPcHBvcnR1bmlzdGljYWxseSB2ZXJp
-ZnkgdGhhdCBLVk0gZXhpdHMgaW1tZWRpYXRlbHkgb24gbm9uLWNvYWxlc2NlZCBJL08sDQo+IGVp
-dGhlciBiZWNhdXNlIHRoZSBNTUlPL1BJTyByZWdpb24gd2FzIG5ldmVyIHJlZ2lzdGVyZWQsIG9y
-IGJlY2F1c2UgYQ0KPiBwcmV2aW91cyByZWdpb24gd2FzIHVucmVnaXN0ZXJlZC4NCj4gDQo+IFRo
-aXMgaXMgYSByZWdyZXNzaW9uIHRlc3QgZm9yIGEgS1ZNIGJ1ZyB3aGVyZSBLVk0gd291bGQgcHJl
-bWF0dXJlbHkgZXhpdA0KPiBkdWUgdG8gYmFkIG1hdGggcmVzdWx0aW5nIGluIGEgZmFsc2UgcG9z
-aXRpdmUgaWYgdGhlIGZpcnN0IGVudHJ5IGluIHRoZQ0KPiByaW5nIHdhcyBiZWZvcmUgdGhlIGhh
-bGZ3YXkgbWFyay4gIFNlZSBjb21taXQgOTJmNmQ0MTMwNDk3ICgiS1ZNOiBGaXgNCj4gY29hbGVz
-Y2VkX21taW9faGFzX3Jvb20oKSB0byBhdm9pZCBwcmVtYXR1cmUgdXNlcnNwYWNlIGV4aXQiKS4N
-Cj4gDQo+IEVuYWJsZSB0aGUgdGVzdCBmb3IgeDg2LCBhcm02NCwgYW5kIHJpc2MtdiwgaS5lLiBh
-bGwgYXJjaGl0ZWN0dXJlcyBleGNlcHQNCj4gczM5MCwgd2hpY2ggZG9lc24ndCBoYXZlIE1NSU8u
-DQo+IA0KPiBPbiB4ODYsIHdoaWNoIGhhcyBib3RoIE1NSU8gYW5kIFBJTywgaW50ZXJsZWF2ZSBN
-TUlPIGFuZCBQSU8gaW50byB0aGUgc2FtZQ0KPiByaW5nLCBhcyBLVk0gc2hvdWxkbid0IGV4aXQg
-dW50aWwgYSBub24tY29hbGVzY2VkIEkvTyBpcyBlbmNvdW50ZXJlZCwNCj4gcmVnYXJkbGVzcyBv
-ZiB3aGV0aGVyIHRoZSByaW5nIGlzIGZpbGxlZCB3aXRoIE1NSU8sIFBJTywgb3IgYm90aC4NCg0K
-SSBndWVzcyB0aGVyZSBpcyBzb21lIG92ZXJsYXAgYmV0d2VlbiB0aGlzIHBhdGNoIGFuZCB0aGUg
-b25lIEkgcHJvcG9zZWQNCmhlcmU6DQpodHRwczovL2xvcmUua2VybmVsLm9yZy9rdm0vMjAyNDA4
-MjAxMzMzMzMuMTcyNDE5MS03LWlsc3RhbUBhbWF6b24uY29tLw0KDQpFdmVuIHRob3VnaCBteSB0
-ZXN0IGRlcGVuZHMgb24gdGhlIG5ldyBpb2N0bHMgdGhhdCB0aGUgc2VyaWVzDQppbnRyb2R1Y2Vz
-LiBIb3dldmVyLCBib3RoIHRoZSBleGlzdGluZyB2MSBBUEkgYW5kIHRoZSBuZXcgcHJvcG9zZWQg
-djINCkFQSSB0YWtlIHRoZSBzYW1lIGNvZGUgcGF0aCBpbnRlcm5hbGx5IHdoZW4gdHJ5aW5nIHRv
-IHB1c2ggdG8gdGhlIHJpbmcNCmJ1ZmZlci4NCg0KPiANCj4gQ2M6IElsaWFzIFN0YW1hdGlzIDxp
-bHN0YW1AYW1hem9uLmNvbT4NCj4gQ2M6IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+DQo+
-IENjOiBPbGl2ZXIgVXB0b24gPG9saXZlci51cHRvbkBsaW51eC5kZXY+DQo+IENjOiBBbnVwIFBh
-dGVsIDxhbnVwQGJyYWluZmF1bHQub3JnPg0KPiBTaWduZWQtb2ZmLWJ5OiBTZWFuIENocmlzdG9w
-aGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT4NCj4gLS0tDQo+ICB0b29scy90ZXN0aW5nL3NlbGZ0
-ZXN0cy9rdm0vTWFrZWZpbGUgICAgICAgICAgfCAgIDMgKw0KPiAgLi4uL3Rlc3Rpbmcvc2VsZnRl
-c3RzL2t2bS9jb2FsZXNjZWRfaW9fdGVzdC5jIHwgMjAyICsrKysrKysrKysrKysrKysrKw0KPiAg
-Li4uL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9pbmNsdWRlL2t2bV91dGlsLmggIHwgIDI2ICsrKw0K
-PiAgMyBmaWxlcyBjaGFuZ2VkLCAyMzEgaW5zZXJ0aW9ucygrKQ0KPiAgY3JlYXRlIG1vZGUgMTAw
-NjQ0IHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9jb2FsZXNjZWRfaW9fdGVzdC5jDQo+IA0K
-PiBkaWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL01ha2VmaWxlIGIvdG9v
-bHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL01ha2VmaWxlDQo+IGluZGV4IDQ4ZDMyYzVhYTNlYi4u
-NDVjYjcwYzA0OGJiIDEwMDY0NA0KPiAtLS0gYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0v
-TWFrZWZpbGUNCj4gKysrIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL01ha2VmaWxlDQo+
-IEBAIC0xMzAsNiArMTMwLDcgQEAgVEVTVF9HRU5fUFJPR1NfeDg2XzY0ICs9IHg4Nl82NC9tYXhf
-dmNwdWlkX2NhcF90ZXN0DQo+ICBURVNUX0dFTl9QUk9HU194ODZfNjQgKz0geDg2XzY0L3RyaXBs
-ZV9mYXVsdF9ldmVudF90ZXN0DQo+ICBURVNUX0dFTl9QUk9HU194ODZfNjQgKz0geDg2XzY0L3Jl
-Y2FsY19hcGljX21hcF90ZXN0DQo+ICBURVNUX0dFTl9QUk9HU194ODZfNjQgKz0gYWNjZXNzX3Ry
-YWNraW5nX3BlcmZfdGVzdA0KPiArVEVTVF9HRU5fUFJPR1NfeDg2XzY0ICs9IGNvYWxlc2NlZF9p
-b190ZXN0DQo+ICBURVNUX0dFTl9QUk9HU194ODZfNjQgKz0gZGVtYW5kX3BhZ2luZ190ZXN0DQo+
-ICBURVNUX0dFTl9QUk9HU194ODZfNjQgKz0gZGlydHlfbG9nX3Rlc3QNCj4gIFRFU1RfR0VOX1BS
-T0dTX3g4Nl82NCArPSBkaXJ0eV9sb2dfcGVyZl90ZXN0DQo+IEBAIC0xNjUsNiArMTY2LDcgQEAg
-VEVTVF9HRU5fUFJPR1NfYWFyY2g2NCArPSBhYXJjaDY0L3ZnaWNfbHBpX3N0cmVzcw0KPiAgVEVT
-VF9HRU5fUFJPR1NfYWFyY2g2NCArPSBhYXJjaDY0L3ZwbXVfY291bnRlcl9hY2Nlc3MNCj4gIFRF
-U1RfR0VOX1BST0dTX2FhcmNoNjQgKz0gYWNjZXNzX3RyYWNraW5nX3BlcmZfdGVzdA0KPiAgVEVT
-VF9HRU5fUFJPR1NfYWFyY2g2NCArPSBhcmNoX3RpbWVyDQo+ICtURVNUX0dFTl9QUk9HU19hYXJj
-aDY0ICs9IGNvYWxlc2NlZF9pb190ZXN0DQo+ICBURVNUX0dFTl9QUk9HU19hYXJjaDY0ICs9IGRl
-bWFuZF9wYWdpbmdfdGVzdA0KPiAgVEVTVF9HRU5fUFJPR1NfYWFyY2g2NCArPSBkaXJ0eV9sb2df
-dGVzdA0KPiAgVEVTVF9HRU5fUFJPR1NfYWFyY2g2NCArPSBkaXJ0eV9sb2dfcGVyZl90ZXN0DQo+
-IEBAIC0xOTgsNiArMjAwLDcgQEAgVEVTVF9HRU5fUFJPR1NfczM5MHggKz0ga3ZtX2JpbmFyeV9z
-dGF0c190ZXN0DQo+ICBURVNUX0dFTl9QUk9HU19yaXNjdiArPSByaXNjdi9zYmlfcG11X3Rlc3QN
-Cj4gIFRFU1RfR0VOX1BST0dTX3Jpc2N2ICs9IHJpc2N2L2VicmVha190ZXN0DQo+ICBURVNUX0dF
-Tl9QUk9HU19yaXNjdiArPSBhcmNoX3RpbWVyDQo+ICtURVNUX0dFTl9QUk9HU19yaXNjdiArPSBj
-b2FsZXNjZWRfaW9fdGVzdA0KPiAgVEVTVF9HRU5fUFJPR1NfcmlzY3YgKz0gZGVtYW5kX3BhZ2lu
-Z190ZXN0DQo+ICBURVNUX0dFTl9QUk9HU19yaXNjdiArPSBkaXJ0eV9sb2dfdGVzdA0KPiAgVEVT
-VF9HRU5fUFJPR1NfcmlzY3YgKz0gZ2V0LXJlZy1saXN0DQo+IGRpZmYgLS1naXQgYS90b29scy90
-ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vY29hbGVzY2VkX2lvX3Rlc3QuYyBiL3Rvb2xzL3Rlc3Rpbmcv
-c2VsZnRlc3RzL2t2bS9jb2FsZXNjZWRfaW9fdGVzdC5jDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0
-DQo+IGluZGV4IDAwMDAwMDAwMDAwMC4uM2Q1OTFhZjYzZWYwDQo+IC0tLSAvZGV2L251bGwNCj4g
-KysrIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2NvYWxlc2NlZF9pb190ZXN0LmMNCj4g
-QEAgLTAsMCArMSwyMDIgQEANCj4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4w
-DQo+ICsjaW5jbHVkZSA8c2lnbmFsLmg+DQo+ICsjaW5jbHVkZSA8c3RkaW8uaD4NCj4gKyNpbmNs
-dWRlIDxzdGRsaWIuaD4NCj4gKyNpbmNsdWRlIDxzdHJpbmcuaD4NCj4gKyNpbmNsdWRlIDxzeXMv
-aW9jdGwuaD4NCj4gKw0KPiArI2luY2x1ZGUgPGxpbnV4L3NpemVzLmg+DQo+ICsNCj4gKyNpbmNs
-dWRlIDxrdm1fdXRpbC5oPg0KPiArI2luY2x1ZGUgPHByb2Nlc3Nvci5oPg0KPiArDQo+ICsjaW5j
-bHVkZSAidWNhbGxfY29tbW9uLmgiDQo+ICsNCj4gKyNkZWZpbmUgTU1JT19HUEEgKDR1bGwgKiBT
-Wl8xRykNCj4gKyNkZWZpbmUgUElPX1BPUlQgMHg4MA0KPiArDQo+ICsvKg0KPiArICogS1ZNJ3Mg
-QUJJIHVzZXMgdGhlIGtlcm5lbCdzIFBBR0VfU0laRSwgdGh1cyB1c2Vyc3BhY2UgbXVzdCBxdWVy
-eSB0aGUgaG9zdCdzDQo+ICsgKiBwYWdlIHNpemUgYXQgcnVudGltZSB0byBjb21wdXRlIHRoZSBy
-ZWFsIG1heC4NCj4gKyAqLw0KPiArc3RhdGljIGludCBSRUFMX0tWTV9DT0FMRVNDRURfTU1JT19N
-QVg7DQo+ICtzdGF0aWMgaW50IGNvYWxlc2NlZF9tbWlvX3Jpbmdfb2Zmc2V0Ow0KPiArDQo+ICsj
-aWZkZWYgX194ODZfNjRfXw0KPiArc3RhdGljIGNvbnN0IGludCBoYXNfcGlvID0gMTsNCj4gKyNl
-bHNlDQo+ICtzdGF0aWMgY29uc3QgaW50IGhhc19waW8gPSAwOw0KPiArI2VuZGlmDQo+ICsNCj4g
-K3N0YXRpYyB2b2lkIGd1ZXN0X2NvZGUodm9pZCkNCj4gK3sNCj4gKyAgICAgICBpbnQgaSwgajsN
-Cj4gKw0KPiArICAgICAgIGZvciAoOzspIHsNCj4gKyAgICAgICAgICAgICAgIGZvciAoaiA9IDA7
-IGogPCAxICsgaGFzX3BpbzsgaisrKSB7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIC8qDQo+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAqIEtWTSBhbHdheXMgbGVhdmVzIG9uZSBmcmVlIGVu
-dHJ5LCBpLmUuIGV4aXRzIHRvDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAqIHVzZXJzcGFj
-ZSBiZWZvcmUgdGhlIGxhc3QgZW50cnkgaXMgZmlsbGVkLg0KPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgKi8NCj4gKyAgICAgICAgICAgICAgICAgICAgICAgZm9yIChpID0gMDsgaSA8IFJFQUxf
-S1ZNX0NPQUxFU0NFRF9NTUlPX01BWCAtIDE7IGkrKykgew0KPiArI2lmZGVmIF9feDg2XzY0X18N
-Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZiAoaSAmIDEpDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvdXRsKFBJT19QT1JULCBpKTsNCj4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlbHNlDQo+ICsjZW5kaWYNCj4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFdSSVRFX09OQ0UoKigodWludDY0X3QgKilN
-TUlPX0dQQSksIGkpOw0KPiArICAgICAgICAgICAgICAgICAgICAgICB9DQo+ICsjaWZkZWYgX194
-ODZfNjRfXw0KPiArICAgICAgICAgICAgICAgICAgICAgICBpZiAoaiAmIDEpDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgb3V0bChQSU9fUE9SVCwgaSk7DQo+ICsgICAgICAgICAg
-ICAgICAgICAgICAgIGVsc2UNCj4gKyNlbmRpZg0KPiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFdSSVRFX09OQ0UoKigodWludDY0X3QgKilNTUlPX0dQQSksIGkpOw0KPiArICAgICAg
-ICAgICAgICAgfQ0KPiArICAgICAgICAgICAgICAgR1VFU1RfU1lOQygwKTsNCj4gKw0KPiArICAg
-ICAgICAgICAgICAgV1JJVEVfT05DRSgqKCh1aW50NjRfdCAqKU1NSU9fR1BBKSwgaSk7DQo+ICsj
-aWZkZWYgX194ODZfNjRfXw0KPiArICAgICAgICAgICAgICAgb3V0bChQSU9fUE9SVCwgaSk7DQo+
-ICsjZW5kaWYNCj4gKyAgICAgICB9DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyB2b2lkIHZjcHVfcnVu
-X2FuZF92ZXJpZnlfaW9fZXhpdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+ICsgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCByaW5nX3N0YXJ0LA0KPiArICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDMyX3QgZXhwZWN0ZWRfZXhp
-dCkNCj4gK3sNCj4gKyAgICAgICBjb25zdCBib29sIHdhbnRfcGlvID0gZXhwZWN0ZWRfZXhpdCA9
-PSBLVk1fRVhJVF9JTzsNCj4gKyAgICAgICBzdHJ1Y3Qga3ZtX2NvYWxlc2NlZF9tbWlvX3Jpbmcg
-KnJpbmc7DQo+ICsgICAgICAgc3RydWN0IGt2bV9ydW4gKnJ1biA9IHZjcHUtPnJ1bjsNCj4gKw0K
-PiArICAgICAgIHJpbmcgPSAodm9pZCAqKXJ1biArIGNvYWxlc2NlZF9tbWlvX3Jpbmdfb2Zmc2V0
-Ow0KPiArDQo+ICsgICAgICAgV1JJVEVfT05DRShyaW5nLT5maXJzdCwgcmluZ19zdGFydCk7DQo+
-ICsgICAgICAgV1JJVEVfT05DRShyaW5nLT5sYXN0LCByaW5nX3N0YXJ0KTsNCj4gKyAgICAgICB2
-Y3B1X3J1bih2Y3B1KTsNCj4gKw0KPiArICAgICAgIFRFU1RfQVNTRVJUKCghd2FudF9waW8gJiYg
-KHJ1bi0+ZXhpdF9yZWFzb24gPT0gS1ZNX0VYSVRfTU1JTyAmJiBydW4tPm1taW8uaXNfd3JpdGUg
-JiYNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBydW4tPm1taW8ucGh5c19h
-ZGRyID09IE1NSU9fR1BBICYmIHJ1bi0+bW1pby5sZW4gPT0gOCAmJg0KPiArICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICoodWludDY0X3QgKilydW4tPm1taW8uZGF0YSA9PSBSRUFM
-X0tWTV9DT0FMRVNDRURfTU1JT19NQVggLSAxKSkgfHwNCj4gKyAgICAgICAgICAgICAgICAgICAo
-d2FudF9waW8gICYmIChydW4tPmV4aXRfcmVhc29uID09IEtWTV9FWElUX0lPICYmIHJ1bi0+aW8u
-cG9ydCA9PSBQSU9fUE9SVCAmJg0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHJ1bi0+aW8uZGlyZWN0aW9uID09IEtWTV9FWElUX0lPX09VVCAmJiBydW4tPmlvLmNvdW50ID09
-IDEgJiYNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAqKHVpbnQzMl90ICop
-KCh2b2lkICopcnVuICsgcnVuLT5pby5kYXRhX29mZnNldCkgPT0gUkVBTF9LVk1fQ09BTEVTQ0VE
-X01NSU9fTUFYIC0gMSkpLA0KPiArICAgICAgICAgICAgICAgICAgICJGb3Igc3RhcnQgPSAldSwg
-ZXhwZWN0ZWQgZXhpdCBvbiAldS1ieXRlICVzIHdyaXRlIDB4JWxseCA9ICV1LCBnbyBleGl0X3Jl
-YXNvbiA9ICV1ICglcylcbiAgIg0KDQpzL2dvL2dvdA0KDQo+ICsgICAgICAgICAgICAgICAgICAg
-IihNTUlPIGFkZHIgPSAweCVsbHgsIHdyaXRlID0gJXUsIGxlbiA9ICV1LCBkYXRhID0gJWx1KVxu
-ICAiDQo+ICsgICAgICAgICAgICAgICAgICAgIihQSU8gcG9ydCA9IDB4JXgsIHdyaXRlID0gJXUs
-IGxlbiA9ICV1LCBjb3VudCA9ICV1LCBkYXRhID0gJXUiLA0KPiArICAgICAgICAgICAgICAgICAg
-IHJpbmdfc3RhcnQsIHdhbnRfcGlvID8gNCA6IDgsIHdhbnRfcGlvID8gIlBJTyIgOiAiTU1JTyIs
-DQo+ICsgICAgICAgICAgICAgICAgICAgd2FudF9waW8gPyAodW5zaWduZWQgbG9uZyBsb25nKVBJ
-T19QT1JUIDogTU1JT19HUEEsDQo+ICsgICAgICAgICAgICAgICAgICAgUkVBTF9LVk1fQ09BTEVT
-Q0VEX01NSU9fTUFYIC0gMSwgcnVuLT5leGl0X3JlYXNvbiwNCj4gKyAgICAgICAgICAgICAgICAg
-ICBydW4tPmV4aXRfcmVhc29uID09IEtWTV9FWElUX01NSU8gPyAiTU1JTyIgOg0KPiArICAgICAg
-ICAgICAgICAgICAgIHJ1bi0+ZXhpdF9yZWFzb24gPT0gS1ZNX0VYSVRfSU8gPyAiUElPIiA6ICJv
-dGhlciIsDQo+ICsgICAgICAgICAgICAgICAgICAgcnVuLT5tbWlvLnBoeXNfYWRkciwgcnVuLT5t
-bWlvLmlzX3dyaXRlLCBydW4tPm1taW8ubGVuLCAqKHVpbnQ2NF90ICopcnVuLT5tbWlvLmRhdGEs
-DQo+ICsgICAgICAgICAgICAgICAgICAgcnVuLT5pby5wb3J0LCBydW4tPmlvLmRpcmVjdGlvbiwg
-cnVuLT5pby5zaXplLCBydW4tPmlvLmNvdW50LA0KPiArICAgICAgICAgICAgICAgICAgICoodWlu
-dDMyX3QgKikoKHZvaWQgKilydW4gKyBydW4tPmlvLmRhdGFfb2Zmc2V0KSk7DQo+ICt9DQo+ICsN
-Cj4gK3N0YXRpYyB2b2lkIHZjcHVfcnVuX2FuZF92ZXJpZnlfY29hbGVzY2VkX2lvKHN0cnVjdCBr
-dm1fdmNwdSAqdmNwdSwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgdWludDMyX3QgcmluZ19zdGFydCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgdWludDMyX3QgZXhwZWN0ZWRfZXhpdCkNCj4gK3sNCj4gKyAgICAg
-ICBzdHJ1Y3Qga3ZtX2NvYWxlc2NlZF9tbWlvX3JpbmcgKnJpbmc7DQo+ICsgICAgICAgc3RydWN0
-IGt2bV9ydW4gKnJ1biA9IHZjcHUtPnJ1bjsNCj4gKyAgICAgICBpbnQgaTsNCj4gKw0KPiArICAg
-ICAgIHZjcHVfcnVuX2FuZF92ZXJpZnlfaW9fZXhpdCh2Y3B1LCByaW5nX3N0YXJ0LCBleHBlY3Rl
-ZF9leGl0KTsNCj4gKw0KPiArICAgICAgIHJpbmcgPSAodm9pZCAqKXJ1biArIGNvYWxlc2NlZF9t
-bWlvX3Jpbmdfb2Zmc2V0Ow0KPiArICAgICAgIFRFU1RfQVNTRVJUKChyaW5nLT5sYXN0ICsgMSkg
-JSBSRUFMX0tWTV9DT0FMRVNDRURfTU1JT19NQVggPT0gcmluZy0+Zmlyc3QsDQo+ICsgICAgICAg
-ICAgICAgICAgICAgIkV4cGVjdGVkIHJpbmcgdG8gYmUgZnVsbCAobWludXMgMSksIGZpcnN0ID0g
-JXUsIGxhc3QgPSAldSwgbWF4ID0gJXUsIHN0YXJ0ID0gJXUiLA0KPiArICAgICAgICAgICAgICAg
-ICAgIHJpbmctPmZpcnN0LCByaW5nLT5sYXN0LCBSRUFMX0tWTV9DT0FMRVNDRURfTU1JT19NQVgs
-IHJpbmdfc3RhcnQpOw0KPiArDQo+ICsgICAgICAgZm9yIChpID0gMDsgaSA8IFJFQUxfS1ZNX0NP
-QUxFU0NFRF9NTUlPX01BWCAtIDE7IGkrKykgew0KPiArICAgICAgICAgICAgICAgdWludDMyX3Qg
-aWR4ID0gKHJpbmctPmZpcnN0ICsgaSkgJSBSRUFMX0tWTV9DT0FMRVNDRURfTU1JT19NQVg7DQo+
-ICsgICAgICAgICAgICAgICBzdHJ1Y3Qga3ZtX2NvYWxlc2NlZF9tbWlvICppbyA9ICZyaW5nLT5j
-b2FsZXNjZWRfbW1pb1tpZHhdOw0KPiArDQo+ICsjaWZkZWYgX194ODZfNjRfXw0KPiArICAgICAg
-ICAgICAgICAgaWYgKGkgJiAxKQ0KPiArICAgICAgICAgICAgICAgICAgICAgICBURVNUX0FTU0VS
-VChpby0+cGh5c19hZGRyID09IFBJT19QT1JUICYmDQo+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIGlvLT5sZW4gPT0gNCAmJiBpby0+cGlvLA0KPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAiV2FudGVkIDQtYnl0ZSBwb3J0IEkvTyB0byAweCV4IGluIGVu
-dHJ5ICV1LCBnb3QgJXUtYnl0ZSAlcyB0byAweCVsbHgiLA0KPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBQSU9fUE9SVCwgaSwgaW8tPmxlbiwgaW8tPnBpbyA/ICJQSU8iIDog
-Ik1NSU8iLCBpby0+cGh5c19hZGRyKTsNCj4gKyAgICAgICAgICAgICAgIGVsc2UNCj4gKyNlbmRp
-Zg0KPiArICAgICAgICAgICAgICAgICAgICAgICBURVNUX0FTU0VSVChpby0+cGh5c19hZGRyID09
-IE1NSU9fR1BBICYmDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlvLT5s
-ZW4gPT0gOCAmJiAhaW8tPnBpbywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIldhbnRlZCA4LWJ5dGUgTU1JTyB0byAweCVsbHggaW4gZW50cnkgJXUsIGdvdCAldS1ieXRl
-ICVzIHRvIDB4JWxseCIsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE1N
-SU9fR1BBLCBpLCBpby0+bGVuLCBpby0+cGlvID8gIlBJTyIgOiAiTU1JTyIsIGlvLT5waHlzX2Fk
-ZHIpOw0KPiArDQo+ICsgICAgICAgICAgICAgICBURVNUX0FTU0VSVF9FUSgqKHVpbnQ2NF90ICop
-aW8tPmRhdGEsIGkpOw0KPiArICAgICAgIH0NCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgdGVz
-dF9jb2FsZXNjZWRfaW8oc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1aW50MzJfdCByaW5nX3N0YXJ0
-KQ0KPiArew0KPiArICAgICAgIHN0cnVjdCBrdm1fcnVuICpydW4gPSB2Y3B1LT5ydW47DQo+ICsg
-ICAgICAgc3RydWN0IGt2bV9jb2FsZXNjZWRfbW1pb19yaW5nICpyaW5nOw0KPiArDQo+ICsgICAg
-ICAga3ZtX3ZtX3JlZ2lzdGVyX2NvYWxlc2NlZF9pbyh2Y3B1LT52bSwgTU1JT19HUEEsIDgsIGZh
-bHNlIC8qIHBpbyAqLyk7DQo+ICsjaWZkZWYgX194ODZfNjRfXw0KPiArICAgICAgIGt2bV92bV9y
-ZWdpc3Rlcl9jb2FsZXNjZWRfaW8odmNwdS0+dm0sIFBJT19QT1JULCA4LCB0cnVlIC8qIHBpbyAq
-Lyk7DQo+ICsjZW5kaWYNCj4gKw0KPiArICAgICAgIHZjcHVfcnVuX2FuZF92ZXJpZnlfY29hbGVz
-Y2VkX2lvKHZjcHUsIHJpbmdfc3RhcnQsIEtWTV9FWElUX01NSU8pOw0KPiArI2lmZGVmIF9feDg2
-XzY0X18NCj4gKyAgICAgICB2Y3B1X3J1bl9hbmRfdmVyaWZ5X2NvYWxlc2NlZF9pbyh2Y3B1LCBy
-aW5nX3N0YXJ0LCBLVk1fRVhJVF9JTyk7DQo+ICsjZW5kaWYNCj4gKw0KPiArICAgICAgIC8qDQo+
-ICsgICAgICAgICogVmVyaWZ5IHVjYWxsLCB3aGljaCBtYXkgdXNlIG5vbi1jb2FsZXNjZWQgTU1J
-TyBvciBQSU8sIGdlbmVyYXRlcyBhbg0KPiArICAgICAgICAqIGltbWVkaWF0ZSBleGl0Lg0KPiAr
-ICAgICAgICAqLw0KPiArICAgICAgIHJpbmcgPSAodm9pZCAqKXJ1biArIGNvYWxlc2NlZF9tbWlv
-X3Jpbmdfb2Zmc2V0Ow0KPiArICAgICAgIFdSSVRFX09OQ0UocmluZy0+Zmlyc3QsIHJpbmdfc3Rh
-cnQpOw0KPiArICAgICAgIFdSSVRFX09OQ0UocmluZy0+bGFzdCwgcmluZ19zdGFydCk7DQo+ICsg
-ICAgICAgdmNwdV9ydW4odmNwdSk7DQo+ICsgICAgICAgVEVTVF9BU1NFUlRfRVEoZ2V0X3VjYWxs
-KHZjcHUsIE5VTEwpLCBVQ0FMTF9TWU5DKTsNCj4gKyAgICAgICBURVNUX0FTU0VSVF9FUShyaW5n
-LT5maXJzdCwgcmluZ19zdGFydCk7DQo+ICsgICAgICAgVEVTVF9BU1NFUlRfRVEocmluZy0+bGFz
-dCwgcmluZ19zdGFydCk7DQo+ICsNCj4gKyAgICAgICAvKiBWZXJpZnkgdGhhdCBub24tY29hbGVz
-Y2VkIE1NSU8vUElPIGdlbmVyYXRlcyBhbiBleGl0IHRvIHVzZXJzcGFjZS4gKi8NCj4gKyAgICAg
-ICBrdm1fdm1fdW5yZWdpc3Rlcl9jb2FsZXNjZWRfaW8odmNwdS0+dm0sIE1NSU9fR1BBLCA4LCBm
-YWxzZSAvKiBwaW8gKi8pOw0KPiArICAgICAgIHZjcHVfcnVuX2FuZF92ZXJpZnlfaW9fZXhpdCh2
-Y3B1LCByaW5nX3N0YXJ0LCBLVk1fRVhJVF9NTUlPKTsNCj4gKw0KPiArI2lmZGVmIF9feDg2XzY0
-X18NCj4gKyAgICAgICBrdm1fdm1fdW5yZWdpc3Rlcl9jb2FsZXNjZWRfaW8odmNwdS0+dm0sIFBJ
-T19QT1JULCA4LCB0cnVlIC8qIHBpbyAqLyk7DQo+ICsgICAgICAgdmNwdV9ydW5fYW5kX3Zlcmlm
-eV9pb19leGl0KHZjcHUsIHJpbmdfc3RhcnQsIEtWTV9FWElUX0lPKTsNCj4gKyNlbmRpZg0KPiAr
-fQ0KPiArDQo+ICtpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQ0KPiArew0KPiArICAg
-ICAgIHN0cnVjdCBrdm1fdmNwdSAqdmNwdTsNCj4gKyAgICAgICBzdHJ1Y3Qga3ZtX3ZtICp2bTsN
-Cj4gKyAgICAgICBpbnQgaTsNCj4gKw0KPiArICAgICAgIFRFU1RfUkVRVUlSRShrdm1faGFzX2Nh
-cChLVk1fQ0FQX0NPQUxFU0NFRF9NTUlPKSk7DQo+ICsNCj4gKyNpZmRlZiBfX3g4Nl82NF9fDQo+
-ICsgICAgICAgVEVTVF9SRVFVSVJFKGt2bV9oYXNfY2FwKEtWTV9DQVBfQ09BTEVTQ0VEX1BJTykp
-Ow0KPiArI2VuZGlmDQo+ICsNCj4gKyAgICAgICAvKg0KPiArICAgICAgICAqIFRoZSBJL08gcmlu
-ZyBpcyBhIGtlcm5lbC1hbGxvY2F0ZWQgcGFnZSB3aG9zZSBhZGRyZXNzIGlzIHJlbGF0aXZlDQo+
-ICsgICAgICAgICogdG8gZWFjaCB2Q1BVJ3MgcnVuIHBhZ2UsIHdpdGggdGhlIHBhZ2Ugb2Zmc2V0
-IHByb3ZpZGVkIGJ5IEtWTSBpbiB0aGUNCj4gKyAgICAgICAgKiByZXR1cm4gb2YgS1ZNX0NBUF9D
-T0FMRVNDRURfTU1JTy4NCj4gKyAgICAgICAgKi8NCj4gKyAgICAgICBjb2FsZXNjZWRfbW1pb19y
-aW5nX29mZnNldCA9IChrdm1fY2hlY2tfY2FwKEtWTV9DQVBfQ09BTEVTQ0VEX01NSU8pICogZ2V0
-cGFnZXNpemUoKSk7DQo+ICsNCj4gKyAgICAgICB2bSA9IHZtX2NyZWF0ZV93aXRoX29uZV92Y3B1
-KCZ2Y3B1LCBndWVzdF9jb2RlKTsNCj4gKyAgICAgICB2aXJ0X21hcCh2bSwgTU1JT19HUEEsIE1N
-SU9fR1BBLCAxKTsNCj4gKw0KPiArICAgICAgIFJFQUxfS1ZNX0NPQUxFU0NFRF9NTUlPX01BWCA9
-IChnZXRwYWdlc2l6ZSgpIC0gc2l6ZW9mKHN0cnVjdCBrdm1fY29hbGVzY2VkX21taW9fcmluZykp
-IC8NCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzaXplb2Yoc3RydWN0
-IGt2bV9jb2FsZXNjZWRfbW1pbyk7DQo+ICsgICAgICAgc3luY19nbG9iYWxfdG9fZ3Vlc3Qodm0s
-IFJFQUxfS1ZNX0NPQUxFU0NFRF9NTUlPX01BWCk7DQo+ICsNCj4gKyAgICAgICBmb3IgKGkgPSAw
-OyBpIDwgUkVBTF9LVk1fQ09BTEVTQ0VEX01NSU9fTUFYOyBpKyspDQo+ICsgICAgICAgICAgICAg
-ICB0ZXN0X2NvYWxlc2NlZF9pbyh2Y3B1LCBpKTsNCj4gKw0KPiArICAgICAgIGt2bV92bV9mcmVl
-KHZtKTsNCj4gKyAgICAgICByZXR1cm4gMDsNCj4gK30NCj4gZGlmZiAtLWdpdCBhL3Rvb2xzL3Rl
-c3Rpbmcvc2VsZnRlc3RzL2t2bS9pbmNsdWRlL2t2bV91dGlsLmggYi90b29scy90ZXN0aW5nL3Nl
-bGZ0ZXN0cy9rdm0vaW5jbHVkZS9rdm1fdXRpbC5oDQo+IGluZGV4IDYzYzJhYWFlNTFmMy4uYjI5
-N2E4NGY3YmU1IDEwMDY0NA0KPiAtLS0gYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vaW5j
-bHVkZS9rdm1fdXRpbC5oDQo+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9pbmNs
-dWRlL2t2bV91dGlsLmgNCj4gQEAgLTQ2MCw2ICs0NjAsMzIgQEAgc3RhdGljIGlubGluZSB1aW50
-MzJfdCBrdm1fdm1fcmVzZXRfZGlydHlfcmluZyhzdHJ1Y3Qga3ZtX3ZtICp2bSkNCj4gICAgICAg
-ICByZXR1cm4gX192bV9pb2N0bCh2bSwgS1ZNX1JFU0VUX0RJUlRZX1JJTkdTLCBOVUxMKTsNCj4g
-IH0NCj4gDQo+ICtzdGF0aWMgaW5saW5lIHZvaWQga3ZtX3ZtX3JlZ2lzdGVyX2NvYWxlc2NlZF9p
-byhzdHJ1Y3Qga3ZtX3ZtICp2bSwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgdWludDY0X3QgYWRkcmVzcywNCj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3Qgc2l6ZSwgYm9vbCBwaW8pDQo+ICt7
-DQo+ICsgICAgICAgc3RydWN0IGt2bV9jb2FsZXNjZWRfbW1pb196b25lIHpvbmUgPSB7DQo+ICsg
-ICAgICAgICAgICAgICAuYWRkciA9IGFkZHJlc3MsDQo+ICsgICAgICAgICAgICAgICAuc2l6ZSA9
-IHNpemUsDQo+ICsgICAgICAgICAgICAgICAucGlvICA9IHBpbywNCj4gKyAgICAgICB9Ow0KPiAr
-DQo+ICsgICAgICAgdm1faW9jdGwodm0sIEtWTV9SRUdJU1RFUl9DT0FMRVNDRURfTU1JTywgJnpv
-bmUpOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgaW5saW5lIHZvaWQga3ZtX3ZtX3VucmVnaXN0ZXJf
-Y29hbGVzY2VkX2lvKHN0cnVjdCBrdm1fdm0gKnZtLA0KPiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQ2NF90IGFkZHJlc3MsDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3Qgc2l6ZSwg
-Ym9vbCBwaW8pDQo+ICt7DQo+ICsgICAgICAgc3RydWN0IGt2bV9jb2FsZXNjZWRfbW1pb196b25l
-IHpvbmUgPSB7DQo+ICsgICAgICAgICAgICAgICAuYWRkciA9IGFkZHJlc3MsDQo+ICsgICAgICAg
-ICAgICAgICAuc2l6ZSA9IHNpemUsDQo+ICsgICAgICAgICAgICAgICAucGlvICA9IHBpbywNCj4g
-KyAgICAgICB9Ow0KPiArDQo+ICsgICAgICAgdm1faW9jdGwodm0sIEtWTV9VTlJFR0lTVEVSX0NP
-QUxFU0NFRF9NTUlPLCAmem9uZSk7DQo+ICt9DQo+ICsNCj4gIHN0YXRpYyBpbmxpbmUgaW50IHZt
-X2dldF9zdGF0c19mZChzdHJ1Y3Qga3ZtX3ZtICp2bSkNCj4gIHsNCj4gICAgICAgICBpbnQgZmQg
-PSBfX3ZtX2lvY3RsKHZtLCBLVk1fR0VUX1NUQVRTX0ZELCBOVUxMKTsNCj4gLS0NCj4gMi40Ni4w
-LjI5NS5nM2I5ZWE4YTM4YS1nb29nDQo+IA0KDQpSZXZpZXdlZC1ieTogSWxpYXMgU3RhbWF0aXMg
-PGlsc3RhbUBhbWF6b24uY29tPg0K
+On 2024/8/27 17:35, liulongfang write:
+> On 2024/8/27 5:06, Alex Williamson wrote:
+>> On Tue, 6 Aug 2024 20:29:27 +0800
+>> Longfang Liu <liulongfang@huawei.com> wrote:
+>>
+>>> On the debugfs framework of VFIO, if the CONFIG_VFIO_DEBUGFS macro is
+>>> enabled, the debug function is registered for the live migration driver
+>>> of the HiSilicon accelerator device.
+>>>
+>>> After registering the HiSilicon accelerator device on the debugfs
+>>> framework of live migration of vfio, a directory file "hisi_acc"
+>>> of debugfs is created, and then three debug function files are
+>>> created in this directory:
+>>>
+>>>    vfio
+>>>     |
+>>>     +---<dev_name1>
+>>>     |    +---migration
+>>>     |        +--state
+>>>     |        +--hisi_acc
+>>>     |            +--dev_data
+>>>     |            +--migf_data
+>>>     |            +--cmd_state
+>>>     |
+>>>     +---<dev_name2>
+>>>          +---migration
+>>>              +--state
+>>>              +--hisi_acc
+>>>                  +--dev_data
+>>>                  +--migf_data
+>>>                  +--cmd_state
+>>>
+>>> dev_data file: read device data that needs to be migrated from the
+>>> current device in real time
+>>> migf_data file: read the migration data of the last live migration
+>>> from the current driver.
+>>> cmd_state: used to get the cmd channel state for the device.
+>>>
+>>> +----------------+        +--------------+       +---------------+
+>>> | migration dev  |        |   src  dev   |       |   dst  dev    |
+>>> +-------+--------+        +------+-------+       +-------+-------+
+>>>         |                        |                       |
+>>>         |                 +------v-------+       +-------v-------+
+>>>         |                 |  saving_migf |       | resuming_migf |
+>>>   read  |                 |     file     |       |     file      |
+>>>         |                 +------+-------+       +-------+-------+
+>>>         |                        |          copy         |
+>>>         |                        +------------+----------+
+>>>         |                                     |
+>>> +-------v--------+                    +-------v--------+
+>>> |   data buffer  |                    |   debug_migf   |
+>>> +-------+--------+                    +-------+--------+
+>>>         |                                     |
+>>>    cat  |                                 cat |
+>>> +-------v--------+                    +-------v--------+
+>>> |   dev_data     |                    |   migf_data    |
+>>> +----------------+                    +----------------+
+>>>
+>>> When accessing debugfs, user can obtain the most recent status data
+>>> of the device through the "dev_data" file. It can read recent
+>>> complete status data of the device. If the current device is being
+>>> migrated, it will wait for it to complete.
+>>> The data for the last completed migration function will be stored
+>>> in debug_migf. Users can read it via "migf_data".
+>>>
+>>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>>> ---
+>>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 209 ++++++++++++++++++
+>>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   6 +
+>>>  2 files changed, 215 insertions(+)
+>>>
+>>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> index a8c53952d82e..379657904f86 100644
+>>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>>> @@ -627,15 +627,30 @@ static void hisi_acc_vf_disable_fd(struct hisi_acc_vf_migration_file *migf)
+>>>  	mutex_unlock(&migf->lock);
+>>>  }
+>>>  
+>>> +static void hisi_acc_debug_migf_copy(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>> +	struct hisi_acc_vf_migration_file *src_migf)
+>>> +{
+>>> +	struct hisi_acc_vf_migration_file *dst_migf = hisi_acc_vdev->debug_migf;
+>>> +
+>>> +	if (!dst_migf)
+>>> +		return;
+>>> +
+>>> +	dst_migf->total_length = src_migf->total_length;
+>>> +	memcpy(&dst_migf->vf_data, &src_migf->vf_data,
+>>> +		sizeof(struct acc_vf_data));
+>>> +}
+>>> +
+>>>  static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>>>  {
+>>>  	if (hisi_acc_vdev->resuming_migf) {
+>>> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev->resuming_migf);
+>>>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->resuming_migf);
+>>>  		fput(hisi_acc_vdev->resuming_migf->filp);
+>>>  		hisi_acc_vdev->resuming_migf = NULL;
+>>>  	}
+>>>  
+>>>  	if (hisi_acc_vdev->saving_migf) {
+>>> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev->saving_migf);
+>>>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->saving_migf);
+>>>  		fput(hisi_acc_vdev->saving_migf->filp);
+>>>  		hisi_acc_vdev->saving_migf = NULL;
+>>> @@ -1294,6 +1309,191 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+>>>  	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+>>>  }
+>>>  
+>>> +static int hisi_acc_vf_debug_check(struct seq_file *seq, struct vfio_device *vdev)
+>>> +{
+>>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+>>> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>> +	int ret;
+>>> +
+>>> +	lockdep_assert_held(&hisi_acc_vdev->state_mutex);
+>>> +	if (!vdev->mig_ops) {
+>>> +		seq_printf(seq, "%s\n", "device does not support live migration!\n");
+>>> +		return -EINVAL;
+>>> +	}
+>>
+>> I don't think it's possible for this to be called with this condition,
+>> the debugfs files are only registered when this exists.
+>>
+>> Also, we don't need %s for a fixed string, nor do we need multiple new
+>> lines.  Please fix throughout.
+>>
+> 
+> Yes, I looked at the creation process. The debugfs directory only exists
+> when mig_ops is enabled.
+> The judgment here is not required.
+> 
+>>> +
+>>> +	/*
+>>> +	 * When the device is not opened, the io_base is not mapped.
+>>> +	 * The driver cannot perform device read and write operations.
+>>> +	 */
+>>> +	if (!hisi_acc_vdev->dev_opened) {
+>>> +		seq_printf(seq, "%s\n", "device not opened!\n");
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	ret = qm_wait_dev_not_ready(vf_qm);
+>>> +	if (ret) {
+>>> +		seq_printf(seq, "%s\n", "VF device not ready!\n");
+>>> +		return -EBUSY;
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static int hisi_acc_vf_debug_cmd(struct seq_file *seq, void *data)
+>>> +{
+>>> +	struct device *vf_dev = seq->private;
+>>> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+>>> +	struct vfio_device *vdev = &core_device->vdev;
+>>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+>>> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>> +	u64 value;
+>>> +	int ret;
+>>> +
+>>> +	mutex_lock(&hisi_acc_vdev->state_mutex);
+>>> +	ret = hisi_acc_vf_debug_check(seq, vdev);
+>>> +	if (ret) {
+>>> +		mutex_unlock(&hisi_acc_vdev->state_mutex);
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	value = readl(vf_qm->io_base + QM_MB_CMD_SEND_BASE);
+>>> +	if (value == QM_MB_CMD_NOT_READY) {
+>>> +		mutex_unlock(&hisi_acc_vdev->state_mutex);
+>>> +		seq_printf(seq, "mailbox cmd channel not ready!\n");
+>>> +		return -EINVAL;
+>>> +	}
+>>> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
+>>> +	seq_printf(seq, "mailbox cmd channel ready!\n");
+>>
+>> This debugfs entry seems pretty pointless to me.  Also we polled for
+>> the device to be ready in debug_check, so if the channel is not ready
+>> aren't we more likely to see any error (without a seq_printf) in the
+>> first error branch?
+>>
+> 
+> This cmd channel check is a means to assist problem location.
+> The accelerator IO device has some special exception errors,
+> which will cause the bus to become unresponsive and cause a long
+> period of silence.
+> In another scenario, after the live migration command is started,
+> dirty pages may be generated very quickly, causing the migration
+> to be silent for a long time.
+> The cmd channel check here is to deal with this type of problem and
+> is used to determine whether the bus is abnormal or dirty pages
+> are being migrated.
+> 
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static int hisi_acc_vf_dev_read(struct seq_file *seq, void *data)
+>>> +{
+>>> +	struct device *vf_dev = seq->private;
+>>> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+>>> +	struct vfio_device *vdev = &core_device->vdev;
+>>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+>>> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
+>>> +	struct acc_vf_data *vf_data = NULL;
+>>> +	int ret;
+>>> +
+>>> +	vf_data = kzalloc(sizeof(struct acc_vf_data), GFP_KERNEL);
+>>> +	if (!vf_data)
+>>> +		return -ENOMEM;
+>>> +
+>>> +	mutex_lock(&hisi_acc_vdev->state_mutex);
+>>> +	ret = hisi_acc_vf_debug_check(seq, vdev);
+>>> +	if (ret) {
+>>> +		mutex_unlock(&hisi_acc_vdev->state_mutex);
+>>> +		goto migf_err;
+>>> +	}
+>>> +
+>>> +	vf_data->vf_qm_state = hisi_acc_vdev->vf_qm_state;
+>>> +	ret = vf_qm_read_data(&hisi_acc_vdev->vf_qm, vf_data);
+>>> +	if (ret) {
+>>> +		mutex_unlock(&hisi_acc_vdev->state_mutex);
+>>> +		goto migf_err;
+>>> +	}
+>>> +
+>>> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
+>>> +
+>>> +	seq_hex_dump(seq, "Dev Data:", DUMP_PREFIX_OFFSET, 16, 1,
+>>> +			(unsigned char *)vf_data,
+>>> +			vf_data_sz, false);
+>>> +
+>>> +	seq_printf(seq,
+>>> +		 "acc device:\n"
+>>> +		 "device  ready: %u\n"
+>>> +		 "device  opened: %d\n"
+>>> +		 "data     size: %lu\n",
+>>> +		 hisi_acc_vdev->vf_qm_state,
+>>> +		 hisi_acc_vdev->dev_opened,
+>>> +		 sizeof(struct acc_vf_data));
+>>
+>> This function called hisi_acc_vf_debug_check() which requires the
+>> device to be opened, therefore except for the race where the unlock
+>> allowed the device to close, what is the purpose of printing the opened
+>> state here?  We can also tell from the hex dump the size of the data,
+>> so why is that value printed here?  vf_qm_state appears to be a state
+>> value rather than a bool, so labeling it as "ready" doesn't make much
+>> sense.  The arbitrary white space also doesn't make much sense.
+>>
+>
+dev_opened does not need to be output, but data_size is still needed.
+Querying data_size from hex_dump data requires matching against the code
+to parse the information.
+
+vf_qm_state is a very important piece of information. It is enabled in
+the accelerator Host device driver. At the beginning, there is a Processing
+state, indicating that it is loading or deleting.
+So there is no problem using the enumeration's status value representation
+here.
+
+What you said is changed to bool type. If the driver on the host is modified,
+it can be modified simultaneously here.
+
+Thanks.
+Longfang.
+
+> The purpose of vf_qm_state is not to indicate whether the current device
+> is open. It refers to whether the VF device in the VM has a
+> device driver loaded.
+> 
+> The operation process of live migration is different when the driver
+> is loaded and when the driver is not loaded.
+> If the driver is not loaded, then the current IO device must not be
+> running tasks, so the data migration of the IO device can be directly
+> skipped during live migration.
+> Therefore, this status is very useful.
+> 
+>>> +
+>>> +migf_err:
+>>> +	kfree(vf_data);
+>>> +
+>>> +	return ret;
+>>> +}
+>>> +
+>>> +static int hisi_acc_vf_migf_read(struct seq_file *seq, void *data)
+>>> +{
+>>> +	struct device *vf_dev = seq->private;
+>>> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+>>> +	struct vfio_device *vdev = &core_device->vdev;
+>>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+>>> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
+>>> +	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev->debug_migf;
+>>> +
+>>> +	/* Check whether the live migration operation has been performed */
+>>> +	if (debug_migf->total_length < QM_MATCH_SIZE) {
+>>> +		seq_printf(seq, "%s\n", "device not migrated!\n");
+>>> +		return -EAGAIN;
+>>> +	}
+>>> +
+>>> +	seq_hex_dump(seq, "Mig Data:", DUMP_PREFIX_OFFSET, 16, 1,
+>>> +			(unsigned char *)&debug_migf->vf_data,
+>>> +			vf_data_sz, false);
+>>
+>> Why doesn't this stop at total_length?
+>>
+> 
+> Next is the address data of the device.
+> The address data cannot be directly output to the log.
+> 
+>>> +
+>>> +	seq_printf(seq,
+>>> +		 "acc device:\n"
+>>> +		 "device  ready: %u\n"
+>>> +		 "device  opened: %d\n"
+>>> +		 "data     size: %lu\n",
+>>> +		 hisi_acc_vdev->vf_qm_state,
+>>> +		 hisi_acc_vdev->dev_opened,
+>>> +		 debug_migf->total_length);
+>>
+>> Again, "ready" seems more like a "state" value, here opened could be
+>> false, but why do we care(?), size could be inferred from the hex dump,
+>> and white spaces are arbitrary.
+>>
+> 
+> The spaces can be modified to keep the output results aligned.
+> 
+> When dev_opened here only has log, you can know whether the dump
+> operation was read before or after qemu was closed.
+> 
+> This detailed information is still necessary when only logs are used
+> for problem analysis.
+> 
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static int hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>>> +{
+>>> +	struct vfio_device *vdev = &hisi_acc_vdev->core_device.vdev;
+>>> +	struct dentry *vfio_dev_migration = NULL;
+>>> +	struct dentry *vfio_hisi_acc = NULL;
+>>> +	struct device *dev = vdev->dev;
+>>> +	void *migf = NULL;
+>>> +
+>>> +	if (!debugfs_initialized() ||
+>>> +	    !IS_ENABLED(CONFIG_VFIO_DEBUGFS))
+>>> +		return 0;
+>>> +
+>>> +	migf = kzalloc(sizeof(struct hisi_acc_vf_migration_file), GFP_KERNEL);
+>>> +	if (!migf)
+>>> +		return -ENOMEM;
+>>> +	hisi_acc_vdev->debug_migf = migf;
+>>> +
+>>> +	vfio_dev_migration = debugfs_lookup("migration", vdev->debug_root);
+>>
+>> Test this before anything is allocated or assigned.
+>>
+> 
+> OK.
+> 
+> Thanks.
+> Longfang.
+> 
+>>> +	if (!vfio_dev_migration) {
+>>> +		kfree(migf);
+>>> +		hisi_acc_vdev->debug_migf = NULL;
+>>> +		dev_err(dev, "failed to lookup migration debugfs file!\n");
+>>> +		return -ENODEV;
+>>> +	}
+>>> +
+>>> +	vfio_hisi_acc = debugfs_create_dir("hisi_acc", vfio_dev_migration);
+>>> +	debugfs_create_devm_seqfile(dev, "dev_data", vfio_hisi_acc,
+>>> +				  hisi_acc_vf_dev_read);
+>>> +	debugfs_create_devm_seqfile(dev, "migf_data", vfio_hisi_acc,
+>>> +				  hisi_acc_vf_migf_read);
+>>> +	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
+>>> +				  hisi_acc_vf_debug_cmd);
+>>> +
+>>> +	return 0;
+>>> +}
+>>
+>> Why does this function return an int when the only caller ignores the
+>> return value?
+>>
+>>> +
+>>> +static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+>>> +{
+>>> +	if (!debugfs_initialized() ||
+>>> +	    !IS_ENABLED(CONFIG_VFIO_DEBUGFS))
+>>> +		return;
+>>
+>> Do we really need to test these on the exit path?  debug_migf would not
+>> be allocated.
+>>
+>>> +
+>>> +	if (hisi_acc_vdev->debug_migf)
+>>> +		kfree(hisi_acc_vdev->debug_migf);
+>>
+>> I suppose this is not set NULL because this is only called in the
+>> device remove path.
+>>
+>>> +}
+>>> +
+>>>  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+>>>  {
+>>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(core_vdev);
+>>> @@ -1311,9 +1511,11 @@ static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+>>>  			return ret;
+>>>  		}
+>>>  		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
+>>> +		hisi_acc_vdev->dev_opened = true;
+>>>  	}
+>>>  
+>>>  	vfio_pci_core_finish_enable(vdev);
+>>> +
+>>>  	return 0;
+>>>  }
+>>>  
+>>> @@ -1322,7 +1524,10 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+>>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(core_vdev);
+>>>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>>  
+>>> +	mutex_lock(&hisi_acc_vdev->state_mutex);
+>>> +	hisi_acc_vdev->dev_opened = false;
+>>>  	iounmap(vf_qm->io_base);
+>>> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
+>>
+>> Co-opting the state_mutex to protect dev_opened is rather sketchy.
+>>
+>>>  	vfio_pci_core_close_device(core_vdev);
+>>>  }
+>>>  
+>>> @@ -1413,6 +1618,9 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device
+>>>  	ret = vfio_pci_core_register_device(&hisi_acc_vdev->core_device);
+>>>  	if (ret)
+>>>  		goto out_put_vdev;
+>>> +
+>>> +	if (ops == &hisi_acc_vfio_pci_migrn_ops)
+>>> +		hisi_acc_vfio_debug_init(hisi_acc_vdev);
+>>
+>> Call this unconditionally and test hisi_acc_vdev->mig_ops in the
+>> debug_init function.  That way init and exit are symmetric.
+>>
+>>>  	return 0;
+>>>  
+>>>  out_put_vdev:
+>>> @@ -1425,6 +1633,7 @@ static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev)
+>>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_drvdata(pdev);
+>>>  
+>>>  	vfio_pci_core_unregister_device(&hisi_acc_vdev->core_device);
+>>> +	hisi_acc_vf_debugfs_exit(hisi_acc_vdev);
+>>>  	vfio_put_device(&hisi_acc_vdev->core_device.vdev);
+>>>  }
+>>>  
+>>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> index 5bab46602fad..f86f3b88b09e 100644
+>>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>>> @@ -32,6 +32,7 @@
+>>>  #define QM_SQC_VFT_BASE_MASK_V2		GENMASK(15, 0)
+>>>  #define QM_SQC_VFT_NUM_SHIFT_V2		45
+>>>  #define QM_SQC_VFT_NUM_MASK_V2		GENMASK(9, 0)
+>>> +#define QM_MB_CMD_NOT_READY	0xffffffff
+>>>  
+>>>  /* RW regs */
+>>>  #define QM_REGS_MAX_LEN		7
+>>> @@ -111,5 +112,10 @@ struct hisi_acc_vf_core_device {
+>>>  	int vf_id;
+>>>  	struct hisi_acc_vf_migration_file *resuming_migf;
+>>>  	struct hisi_acc_vf_migration_file *saving_migf;
+>>> +
+>>> +	/* To make sure the device is opened */
+>>> +	bool dev_opened;
+>>> +	/* To save migration data */
+>>> +	struct hisi_acc_vf_migration_file *debug_migf;
+>>
+>> Poor structure packing.
+>>
+>>>  };
+>>>  #endif /* HISI_ACC_VFIO_PCI_H */
+>>
+>>
+>> .
+>>
+> 
+> .
+> 
 
