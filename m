@@ -1,197 +1,154 @@
-Return-Path: <kvm+bounces-25141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25143-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A149609D2
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 14:18:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAF1B9609EA
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 14:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37244B22173
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 12:18:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A13EE282052
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 12:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D5E1A0B07;
-	Tue, 27 Aug 2024 12:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4712D1A2548;
+	Tue, 27 Aug 2024 12:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="KHbVEIO/"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Ge/YhBas"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFB21A00E3
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 12:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C32519E838
+	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 12:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724761082; cv=none; b=BfuI8A8GL8IuhxqsmlrdNIwl107fU9YG+L4wpm8HDp5kSVNbI+bf7x0ORVThaa6Y7lwXZqLt/pgG+AnTuBC2MMRXMQkPCEsptJoECXJPuTkhfB5TBM08vwNZBXwqA8DKgfu+VKZeajbg50fwmui6mgpe7h/JO9Fn/7SeSv/HgTc=
+	t=1724761188; cv=none; b=hFz9PoVYm8Ce2XHCayLWDNq6TWo8EkXORN5KgObD+Skki7leSCMmf7H5EU3OeAx4tEAsfeQtSqSdE9bsqVMDzlNfNRC7lt5seUe3fAlIoj+3D/XKllqSdFp05z9xCKCDSOUpdiEBOcUma7nH4hpZgE/NoyTgnSMZiSmtT7VF5kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724761082; c=relaxed/simple;
-	bh=sUxTp3mdu6oCe57Y5LmIqO6B2YJIdByUCnPgZGXPspA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tz0W6owMkarDLw1LCo4ZvOZ8m/ewUqahZvwqai6f32tyO5tWDWoRs6FmWGXvr86PtqZC14txKoDzb/7gF1/8A5D2tMcO2uZ4ZHJmeYv2fNgdD5kaZLjUuSIV/PhGEQpgFL3glaKukhTyLfXGCle29TF5gQ0IA6PySQ3viLmft00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=KHbVEIO/; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6c130ffa0adso54714117b3.3
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 05:17:59 -0700 (PDT)
+	s=arc-20240116; t=1724761188; c=relaxed/simple;
+	bh=twLkCssfgp+ODU10TY3w3gBfyanVw61WPzqH4w9Fg7c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q/RRmGS2nyS3t7fbJ/pROWGutoRJB9LeRFHbHuumVk5aEc/GzKZjJ1xo3BNR+sOJ2Vm99zb0dk7wE02mUAPvAUjBR/+DtxYaWiosAIrlGklNVNDqpJkMh9JdyW7dBm4wBh/cB4xvX+D2YhH1BiqGp0gv/aCwwwOTTU9AOay2bSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Ge/YhBas; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4281faefea9so46495975e9.2
+        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 05:19:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1724761079; x=1725365879; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OSDtcbC+Sb+RM+QrNNHI6+BWQxb+R1S6HcMDikmIILs=;
-        b=KHbVEIO/QM4bIe1eojk8ZFbbCEqQ1LtgbCLiiiYDDVz0isNSm6QqHiSrB8oz0UVfB7
-         uzT6F9VoqExyRf+kaR/Ee2w0ZiUU8ynOJRVt+S0N81mGzsRGt/7aQ+WzkF7HhOpFqI7W
-         UGLscCn3QbCZCXI85giXegWynF/oRWYDCKFwVXjk+C61lnEm+pbWBAO0sTS+Rzf5eyT7
-         WbiCsnPId9w/p6xa3fV5uJaWzfJlflD3lMkYuTvuWoDzdYDivg0zuHyqI0kpniMDLsQg
-         mBD3LtIdD3FbW0OoI3JJvfzTuGCT2Wjbcs8M5DUXEiTY0gFeZutDo7BmNgUKX3rmEYTM
-         sRAg==
+        d=suse.com; s=google; t=1724761185; x=1725365985; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eqag3zaL6UgiUACaEJiE/DH1bZk03oy4FtP+8QLvcAU=;
+        b=Ge/YhBas8ZfUh95NqkzHPljEbVoNji7jOAGctsFd2oYRzjYfHwttv81gvWuhbJNKTv
+         OGOuu5TMksT+o/nDeiuNWqboaWZcrNvEhQpxbUlJUwJYKrfJk5oxHHebdhC0zQbvuWkT
+         Zrj7XV+jByLIjM1VWwddJG9aHRqVZdVK71QXVZMC0+6ECOrr/9FwrcFPqm/lmYYqqiCd
+         yQDDSjFDbPPQBSyINUYwMTwg8nJZb6JtsH1xFNAIOWvvpT/RrjaZhbbFmq3gfd6IJE4h
+         4oo+c7ZqoZQf4yXEA96uTcIlgbcZAE1L0xIDWwZGDYVgdQmrrhw7bnUDf3qVtksnLe0Q
+         OlBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724761079; x=1725365879;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OSDtcbC+Sb+RM+QrNNHI6+BWQxb+R1S6HcMDikmIILs=;
-        b=F8pZeZrkvMKphfz1JbQ26xVDpelwKyX392RSt5SS6lI6Cub6tpUe/n2UVESJqVYic5
-         m6+zD/YqgNBnbQzL3S1KEcIy4FT4IjL7ljRaPl4QPx1ZWsshO/0dephhqni8SCmWitQy
-         CKBNEqzM5wQeYImRJVas4tcInabNCdQ3xuPmnwnoEPLvCvyzhNXCOs1k5bRzCxQpjjTa
-         dXm1hZ97ge6XV6RVtwZlJ9IM35Ykxkbe0CmJhObWBjx1hoV7Un9omdiCNe8YKa1n0tXe
-         TXYnN3N/ZliK93/C65UP5UVLOGxcdH34xGN2pGu1kjO4xIh10OUtLNFe+5HvVYCONNqd
-         MWgQ==
-X-Gm-Message-State: AOJu0YzCFw7fsw8VMpzhe1pLMNxGBQ44rZ5+kwqJhWPMktzTjHOe7+8/
-	FkkXNVh3Nn5yDu+0PBmwqbxznkoFxH0WiShPsBA45wlFA5fsVIbyTlzzM0gp8Dk=
-X-Google-Smtp-Source: AGHT+IHG7Zt7HYJe2APHJBWsXsXzomPhCcOWxwx00rUDj9SbJTnkeOq8WZx6QjvFGHhSjLRLt1661g==
-X-Received: by 2002:a05:690c:d82:b0:62f:4149:7604 with SMTP id 00721157ae682-6cfb941590bmr33630357b3.4.1724761078886;
-        Tue, 27 Aug 2024 05:17:58 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a67f3fbfb9sm544475785a.120.2024.08.27.05.17.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 05:17:58 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1siv93-000ZUA-PD;
-	Tue, 27 Aug 2024 09:17:57 -0300
-Date: Tue, 27 Aug 2024 09:17:57 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	linux-pci@vger.kernel.org,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	pratikrajesh.sampat@amd.com, michael.day@amd.com,
-	david.kaplan@amd.com, dhaval.giani@amd.com,
-	Santosh Shukla <santosh.shukla@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Michael Roth <michael.roth@amd.com>, Alexander Graf <agraf@suse.de>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>
-Subject: Re: [RFC PATCH 14/21] RFC: iommu/iommufd/amd: Add IOMMU_HWPT_TRUSTED
- flag, tweak DTE's DomainID, IOTLB
-Message-ID: <20240827121757.GL3468552@ziepe.ca>
-References: <20240823132137.336874-1-aik@amd.com>
- <20240823132137.336874-15-aik@amd.com>
+        d=1e100.net; s=20230601; t=1724761185; x=1725365985;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eqag3zaL6UgiUACaEJiE/DH1bZk03oy4FtP+8QLvcAU=;
+        b=NQVMZtuOYjIMhkLU1JpM52AFG0oqqBfoNi0QZUWnon7pPE+aiZ0FzZK6uLm/wsAcvt
+         4KrcgTKL5WjZ1HnCsxbMXuW6jUzG4VU6rL1ea4v4hhW/ZxFw2BM4w5eliaN9xMREsR0A
+         CxPr32Lr3RZiOdTqInwwvoi1A3ZrZSawcoimeuBsn7UlBlsHXCwx17kvF3juY6OHjNqr
+         ZRj+R1km8OQPpeUAEr8+rFkPn0qDNBgYqIkAIUmb+W5bOXQFK4aTPdSEO4nEbCWdJdqQ
+         JjoRzgSBKMreeQdJA/KvSF/K4LbqlDB3OP6dMwwSTASTw5WE/mKOxo+/iO3oDeNWS9Ch
+         R6Tg==
+X-Forwarded-Encrypted: i=1; AJvYcCXHiWSE2L2TSGzSNBit0Dkjqn/BVmPGL2QQCh4wnz+8qqxXrMGEfFt+C25LovvLf06irw0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqGmW92S76QCQ7pDtefGm6PsX4ddVUt6GClqKx6uBxoDLxAgjR
+	nVTzy6HLR7P68MS5L5k4/YpN5ScgPeEIGFuphU6EBFU4vBZmD64Bpu/3NbzMELY=
+X-Google-Smtp-Source: AGHT+IHBfHxaObeKoOFTTbKlgpyS/QzTHXZPaEZbYMF7sZwGDN2f27zNYxs8rB72hlCBxG2Bb8Qtww==
+X-Received: by 2002:a05:600c:5708:b0:428:1fa1:7b92 with SMTP id 5b1f17b1804b1-42b9e3e6d90mr12539535e9.19.1724761184388;
+        Tue, 27 Aug 2024 05:19:44 -0700 (PDT)
+Received: from [10.20.4.146] (212-5-158-46.ip.btc-net.bg. [212.5.158.46])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730810fdb0sm12940882f8f.15.2024.08.27.05.19.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Aug 2024 05:19:44 -0700 (PDT)
+Message-ID: <40fe0a1d-9ab8-4662-a781-002d70a1587b@suse.com>
+Date: Tue, 27 Aug 2024 15:19:41 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240823132137.336874-15-aik@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 21/25] KVM: x86: Introduce KVM_TDX_GET_CPUID
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "seanjc@google.com" <seanjc@google.com>
+Cc: "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+ "tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
+ "Huang, Kai" <kai.huang@intel.com>,
+ "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-22-rick.p.edgecombe@intel.com>
+ <a52010f2-d71c-47ee-aa56-b74fd716ec7b@suse.com>
+ <2f9dd848f8ea5092a206906aa99928c2fa47389d.camel@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+In-Reply-To: <2f9dd848f8ea5092a206906aa99928c2fa47389d.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 23, 2024 at 11:21:28PM +1000, Alexey Kardashevskiy wrote:
-> AMD IOMMUs use a device table where one entry (DTE) describes IOMMU
-> setup per a PCI BDFn. DMA accesses via these DTEs are always
-> unencrypted.
+
+
+On 26.08.24 г. 20:46 ч., Edgecombe, Rick P wrote:
+> On Mon, 2024-08-26 at 17:09 +0300, Nikolay Borisov wrote:
+>>> +               /*
+>>> +                * Work around missing support on old TDX modules, fetch
+>>> +                * guest maxpa from gfn_direct_bits.
+>>> +                */
+>>
+>>
+>> Define old TDX module? I believe the minimum supported TDX version is
+>> 1.5 as EMR are the first public CPUs to support this, no? Module 1.0 was
+>> used for private previews etc? Can this be dropped altogether?
 > 
-> In order to allow DMA to/from private memory, AMD IOMMUs use another
-> memory structure called "secure device table" which entries (sDTEs)
-> are similar to DTE and contain configuration for private DMA operations.
-> The sDTE table is in the private memory and is managed by the PSP on
-> behalf of a SNP VM. So the host OS does not have access to it and
-> does not need to manage it.
+> Well, today "old" means all released TDX modules. This is a new feature under
+> development, that KVM maintainers were ok working around being missing for now.
+> The comment should be improved.
 > 
-> However if sDTE is enabled, some fields of a DTE are now marked as
-> reserved in a DTE and managed by an sDTE instead (such as DomainID),
-> other fields need to stay in sync (IR/IW).
+> See here for discussion of the design and purpose of the feature:
+> https://lore.kernel.org/kvm/f9f1da5dc94ad6b776490008dceee5963b451cda.camel@intel.com/
 > 
-> Mark IOMMU HW page table with a flag saying that the memory is
-> backed by KVM (effectively MEMFD).
+>> It is
+>> much easier to mandate the minimum supported version now when nothing
+>> has been merged. Furthermore, in some of the earlier patches it's
+>> specifically required that the TDX module support NO_RBP_MOD which
+>> became available in 1.5, which already dictates that the minimum version
+>> we should care about is 1.5.
 > 
-> Skip setting the DomainID in DTE. Enable IOTLB enable (bit 96) to
-> match what the PSP writes to sDTE.
+> There is some checking in Kai's TDX module init patches:
+> https://lore.kernel.org/kvm/d307d82a52ef604cfff8c7745ad8613d3ddfa0c8.1721186590.git.kai.huang@intel.com/
+
+Yes, that's why I mentioned this. I have already reviewed those patches :)
+
 > 
-> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-> ---
->  drivers/iommu/amd/amd_iommu_types.h  |  2 ++
->  include/uapi/linux/iommufd.h         |  1 +
->  drivers/iommu/amd/iommu.c            | 20 ++++++++++++++++++--
->  drivers/iommu/iommufd/hw_pagetable.c |  4 ++++
->  4 files changed, 25 insertions(+), 2 deletions(-)
+> But beyond checking for supported features, there are also bug fixes that can
+> affect usability. In the NO_RBP_MOD case we need a specific recent TDX module in
+> order to remove the RBP workaround patches.
+
+My point was that if having the NO_RPB_MOD implied that the CPUID 
+0x8000000 configuration capability is also there (not that there is a 
+direct connection between the too but it seems the TDX module isn't 
+being updated that often, I might be wrong of course!), there is no 
+point in having the workaround as NO_RPB_MOD is the minimum required 
+version.
+
+Anyway, this was an assumption on my part.
+
 > 
-> diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
-> index 2b76b5dedc1d..cf435c1f2839 100644
-> --- a/drivers/iommu/amd/amd_iommu_types.h
-> +++ b/drivers/iommu/amd/amd_iommu_types.h
-> @@ -588,6 +588,8 @@ struct protection_domain {
->  
->  	struct mmu_notifier mn;	/* mmu notifier for the SVA domain */
->  	struct list_head dev_data_list; /* List of pdom_dev_data */
-> +
-> +	u32 flags;
->  };
->  
->  /*
-> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-> index 4dde745cfb7e..c5536686b0b1 100644
-> --- a/include/uapi/linux/iommufd.h
-> +++ b/include/uapi/linux/iommufd.h
-> @@ -364,6 +364,7 @@ enum iommufd_hwpt_alloc_flags {
->  	IOMMU_HWPT_ALLOC_NEST_PARENT = 1 << 0,
->  	IOMMU_HWPT_ALLOC_DIRTY_TRACKING = 1 << 1,
->  	IOMMU_HWPT_FAULT_ID_VALID = 1 << 2,
-> +	IOMMU_HWPT_TRUSTED = 1 << 3,
->  };
-
-This looks so extremely specialized to AMD I think you should put this
-in an AMD specific struct.
-
-> diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-> index b19e8c0f48fa..e2f8fb79ee53 100644
-> --- a/drivers/iommu/amd/iommu.c
-> +++ b/drivers/iommu/amd/iommu.c
-> @@ -1930,7 +1930,20 @@ static void set_dte_entry(struct amd_iommu *iommu,
->  	}
->  
->  	flags &= ~DEV_DOMID_MASK;
-> -	flags |= domid;
-> +
-> +	if (dev_data->dev->tdi_enabled && (domain->flags & IOMMU_HWPT_TRUSTED)) {
-> +		/*
-> +		 * Do hack for VFIO with TSM enabled.
-> +		 * This runs when VFIO is being bound to a device and before TDI is bound.
-> +		 * Ideally TSM should change DTE only when TDI is bound.
-> +		 * Probably better test for (domain->domain.type & __IOMMU_DOMAIN_DMA_API)
-
-No, that wouldn't be better.
-
-This seems sketchy, shouldn't the iommu driver be confirming that the
-PSP has enabled the vDTE before making these assumptions?
-
-> diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
-> index aefde4443671..23ae95fc95ee 100644
-> --- a/drivers/iommu/iommufd/hw_pagetable.c
-> +++ b/drivers/iommu/iommufd/hw_pagetable.c
-> @@ -136,6 +136,10 @@ iommufd_hwpt_paging_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
->  	hwpt_paging->nest_parent = flags & IOMMU_HWPT_ALLOC_NEST_PARENT;
->  
->  	if (ops->domain_alloc_user) {
-> +		if (ictx->kvm) {
-> +			pr_info("Trusted domain");
-> +			flags |= IOMMU_HWPT_TRUSTED;
-> +		}
-
-Huh?
-
-Jason
+> We could just check for a specific TDX module version instead, but I'm not sure
+> whether KVM would want to get into the game of picking preferred TDX module
+> versions. I guess in the case of any bugs that affect the host it will have to
+> do it though. So we will have to add a version check before live KVM support
+> lands upstream.
+> 
+> Hmm, thanks for the question.
 
