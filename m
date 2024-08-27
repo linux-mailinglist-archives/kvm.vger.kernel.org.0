@@ -1,129 +1,146 @@
-Return-Path: <kvm+bounces-25135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78BC4960626
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 11:47:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DEF296067B
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 11:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABD431C221D1
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 09:47:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7457EB23ADD
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 09:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42F919CCE8;
-	Tue, 27 Aug 2024 09:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDA419DF9F;
+	Tue, 27 Aug 2024 09:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="XUFCTeM/"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="Top51QoP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18B41714B8
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 09:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B7219B3EE;
+	Tue, 27 Aug 2024 09:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724752033; cv=none; b=QqwTj6C36UYTuVrEmm4kTbYQYo4Zn4EWcoVmKLwIx0F4rLDTBQUCCrmQ+E4U+iyBCjHEwodHcCRod2HIBcq2VvyhmrrTzcilwng9G/ZEe/05Fsk1ZUDYg3pILYTVU9c16+ZEHgcavYLdbaWqFz0m5bt1qO5WsV1GXSAqNYjpJl8=
+	t=1724752621; cv=none; b=ECUROAQUr/84U6eCbTawUBlHlVMRxMO7/nSb0OsbZhLRZg+sWKo/5MbwMwQrXY2xZsdm/VmMriuVSqODcr/e78kQ3TXHTGx8RJ2ULkTW+SGhUOM9zpPMlHdeQjyzRoVeWxbIKhkPXM2IipNgVD7kt8ROfGpc7gi7IwGzmq7PmYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724752033; c=relaxed/simple;
-	bh=k9WFqgJq8YNLY3yLPeuESnqQ1zu1uRGqh/F3oNxP25M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oncMMCAKSfliRK3aS9Y1tdI9V3EwKvIe32Jm8Rv19pBO9kDN8Cx4mRgEL4eIX9CDglwEKXQHW1epACQSaGA9bvqe61s7jgCzfnN4ZXIGp8YXKeaYL6ObdmVWXbVGBx2gKeiFP6bPHYKhxK1fPwMFxJYMxqyy+MIzqUDsumwH+5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=XUFCTeM/; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-533496017f8so7019652e87.0
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 02:47:11 -0700 (PDT)
+	s=arc-20240116; t=1724752621; c=relaxed/simple;
+	bh=RWSZeaefIBg93jQXCXZ2QL3r8R7WrzWCZfNIjIo+xC0=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Rc9oSmBWiQGh5YJ9iBzmYP1JzntcqdB83GPU+Wx3lS9kGRE7S0pSdvNycY15irVgUf7JqCO0p4dweX0ao5W79YLQXWZ9uTBDg3ncpbEqvDZDKSdXoTIaa7mjn70FgMLaApLZ2pFan9g94De9V6/9ILDQOIBrETcFZo/mSkPUvfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=Top51QoP; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1724752030; x=1725356830; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=krcYT+Sxx9cy7wZ+GDpDwQzl7KC29Uxl2v0I2FW7x8E=;
-        b=XUFCTeM/vAx5FwX9juhM0D7dylaPR6ZA+ujb5OY3efo4U1Y41v0QDYUJRDh5ajJNKa
-         R7hm1+ympgZylG67fcoPZpBcaDZMObLqL64fcUKwOWXbI1/A3h45/PKF1KHaQtV/bsQA
-         wuZGYZTJKbxiCkhx4k59PiPHKBo2Mz601ZJneLl/MHxg70jDtUP8ULyjwrVQf1qMxhHt
-         dnjG35FRT17/xnBLOzo3pP16Ucn0fo1KzLnJ1NXPzhuCh5MXVzydg9K32cyeOSpXOuXA
-         Tc7gxzvZiMtSMeWcP0kd1N18PYtPCQK00meOp86ciFlM1VsPe/4rs9mgKdZAJGXULE8y
-         ssCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724752030; x=1725356830;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=krcYT+Sxx9cy7wZ+GDpDwQzl7KC29Uxl2v0I2FW7x8E=;
-        b=LRgGcPQFVfcDnNYcGcbBw6hK1eKEMAT5qTwm9EVi07ZzI3YKppkA2hpvB7Pa4zGaeX
-         ui/YCnKU0bTukd73RPBxepbCuz+SlDGN2MpCsvK8PZ34k5baATSnBFCoj5E9sAGx1jek
-         EvZ0tYGNw9R20G21Z+rAleGnscjE0bCBkb3YWWMTJRApWQor61XVBXfHv9Vfzhbpxup1
-         3jzzJFhZzfa1/CTQ5zDpwl1y1gOG/EfnjsszXi6BPMGRyWiQI8TmfYxEqaPYTtEsjvpa
-         pj1pdnbaUyiMaa54rsi6+OZAygSp9iPD3MLCOQbCcaxXRIqdl1LrlY/aPhdnDL2rpABj
-         ZTCA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0r7TkfgXyf4ai4AHSDlFJWUveN39oO4JdE7wIENojHndRw5ylyQ255DzzE+49wNnnBts=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztcbGlgpBtFuSsEaJqk6+FjvRWeDG3mW3c485J8sCmwxknfvGE
-	poPHahEVgFgu3hQwRkO6yBNbugKe65Uxmodbz6q2sqG0H3jXPRJRNIqScLItQLhCO9CIT1t7/Jy
-	ng3bVRv0IVtLRDahwS2LmXk8A6UtQsMmgk5Ccrg==
-X-Google-Smtp-Source: AGHT+IFgN4uMe/TWUtfkDg07dHpPLo6hNrgMOHYVjIlq8Xhi7pFABHxjFQUMcZGkoMK5OcZVtPCtjeXUXupsy9bTO6o=
-X-Received: by 2002:a05:6512:b96:b0:52e:7448:e137 with SMTP id
- 2adb3069b0e04-5343882d163mr9112183e87.6.1724752029279; Tue, 27 Aug 2024
- 02:47:09 -0700 (PDT)
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1724752620; x=1756288620;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=RWSZeaefIBg93jQXCXZ2QL3r8R7WrzWCZfNIjIo+xC0=;
+  b=Top51QoPQfkf+QEs+nwUoGYlOMmKMpnDjYWWLYOC2L6hpPSwNNjuyoaX
+   Hyck1hNERsFSXEf57MPRPCGYlOdgIDaDm5l+kwNaD0A6B+T/ZRmSHECVL
+   tK6HJLe/8quYvF48uvkQkIioZCqsd/dcbWGu6alEjUeI83MmOXH/5nRmD
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.10,180,1719878400"; 
+   d="scan'208";a="655053123"
+Subject: Re: [PATCH 2/2] KVM: Clean up coalesced MMIO ring full check
+Thread-Topic: [PATCH 2/2] KVM: Clean up coalesced MMIO ring full check
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 09:56:56 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.17.79:51087]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.6.142:2525] with esmtp (Farcaster)
+ id b398acf2-985f-4ee2-9dd7-f0d0cec5c951; Tue, 27 Aug 2024 09:56:54 +0000 (UTC)
+X-Farcaster-Flow-ID: b398acf2-985f-4ee2-9dd7-f0d0cec5c951
+Received: from EX19D018EUA002.ant.amazon.com (10.252.50.146) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 27 Aug 2024 09:56:54 +0000
+Received: from EX19D018EUA002.ant.amazon.com (10.252.50.146) by
+ EX19D018EUA002.ant.amazon.com (10.252.50.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 27 Aug 2024 09:56:54 +0000
+Received: from EX19D018EUA002.ant.amazon.com ([fe80::7a11:7dbb:2190:e2c1]) by
+ EX19D018EUA002.ant.amazon.com ([fe80::7a11:7dbb:2190:e2c1%3]) with mapi id
+ 15.02.1258.034; Tue, 27 Aug 2024 09:56:54 +0000
+From: "Stamatis, Ilias" <ilstam@amazon.co.uk>
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
+	<seanjc@google.com>
+CC: "maz@kernel.org" <maz@kernel.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "Stamatis, Ilias" <ilstam@amazon.co.uk>,
+	"anup@brainfault.org" <anup@brainfault.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "paul@xen.org" <paul@xen.org>
+Thread-Index: AQHa9ZCx8A2EzgbgdEWpUdHZm2E42rI644WA
+Date: Tue, 27 Aug 2024 09:56:54 +0000
+Message-ID: <f8ce24507b836170e1ca5df8586a3478c164386d.camel@amazon.co.uk>
+References: <20240823191354.4141950-1-seanjc@google.com>
+	 <20240823191354.4141950-3-seanjc@google.com>
+In-Reply-To: <20240823191354.4141950-3-seanjc@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BEE4F6C14E2545419D0E88C899647B43@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240821142610.3297483-1-apatel@ventanamicro.com>
-In-Reply-To: <20240821142610.3297483-1-apatel@ventanamicro.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Tue, 27 Aug 2024 15:16:57 +0530
-Message-ID: <CAK9=C2VkPGvCikBox33xxCUXjpFnsfKU7DefuWpXtUki+X7-Hw@mail.gmail.com>
-Subject: Re: [kvmtool PATCH v3 0/4] Add RISC-V ISA extensions based on Linux-6.10
-To: Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com, maz@kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Atish Patra <atishp@atishpatra.org>, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Will,
-
-On Wed, Aug 21, 2024 at 7:56=E2=80=AFPM Anup Patel <apatel@ventanamicro.com=
-> wrote:
->
-> This series adds support for new ISA extensions based on Linux-6.10 namel=
-y:
-> Sscofpmf.
->
-> These patches can also be found in the riscv_more_exts_round3_v3 branch
-> at: https://github.com/avpatel/kvmtool.git
->
-> Changes since v2:
->  - Include a fix to correct number of hart bits for AIA
->
-> Changes since v1:
->  - Included a fix for DBCN
->
-> Andrew Jones (2):
->   riscv: Set SBI_SUCCESS on successful DBCN call
->   riscv: Correct number of hart bits
->
-> Anup Patel (1):
->   Sync-up headers with Linux-6.10 kernel
->
-> Atish Patra (1):
->   riscv: Add Sscofpmf extensiona support
->
->  include/linux/kvm.h                 |   4 +-
->  include/linux/virtio_net.h          | 143 ++++++++++++++++++++++++++++
->  riscv/aia.c                         |   2 +-
->  riscv/fdt.c                         |   1 +
->  riscv/include/asm/kvm.h             |   1 +
->  riscv/include/kvm/kvm-config-arch.h |   3 +
->  riscv/kvm-cpu.c                     |   1 +
->  x86/include/asm/kvm.h               |  22 ++++-
->  8 files changed, 172 insertions(+), 5 deletions(-)
-
-Friendly ping !
-
-Regards,
-Anup
+T24gRnJpLCAyMDI0LTA4LTIzIGF0IDEyOjEzIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBGb2xkIGNvYWxlc2NlZF9tbWlvX2hhc19yb29tKCkgaW50byBpdHMgc29sZSBjYWxs
+ZXIsIGNvYWxlc2NlZF9tbWlvX3dyaXRlKCksDQo+IGFzIGl0J3MgcmVhbGx5IGp1c3QgYSBzaW5n
+bGUgbGluZSBvZiBjb2RlLCBoYXMgYSBnb29meSByZXR1cm4gdmFsdWUsIGFuZA0KPiBpcyB1bm5l
+Y2Vzc2FyaWx5IGJyaXR0bGUuDQo+IA0KPiBFLmcuIGlmIGNvYWxlc2NlZF9tbWlvX2hhc19yb29t
+KCkgd2VyZSB0byBjaGVjayByaW5nLT5sYXN0IGRpcmVjdGx5LCBvcg0KPiB0aGUgY2FsbGVyIGZh
+aWxlZCB0byB1c2UgUkVBRF9PTkNFKCksIEtWTSB3b3VsZCBiZSBzdXNjZXB0aWJsZSB0byBUT0NU
+T1UNCj4gYXR0YWNrcyBmcm9tIHVzZXJzcGFjZS4NCj4gDQo+IE9wcG9ydHVuaXN0aWNhbGx5IGFk
+ZCBhIGNvbW1lbnQgZXhwbGFpbmluZyB3aHkgb24gZWFydGggS1ZNIGxlYXZlcyBvbmUNCj4gZW50
+cnkgZnJlZSwgd2hpY2ggbWF5IG5vdCBiZSBvYnZpb3VzIHRvIHJlYWRlcnMgdGhhdCBhcmVuJ3Qg
+ZmFtYWlsaWFyIHdpdGgNCg0Kcy9mYW1haWxpYXIvZmFtaWxpYXINCg0KPiByaW5nIGJ1ZmZlcnMu
+DQo+IA0KPiBObyBmdW5jdGlvbmFsIGNoYW5nZSBpbnRlbmRlZC4NCj4gDQo+IENjOiBJbGlhcyBT
+dGFtYXRpcyA8aWxzdGFtQGFtYXpvbi5jb20+DQo+IENjOiBQYXVsIER1cnJhbnQgPHBhdWxAeGVu
+Lm9yZz4NCj4gU2lnbmVkLW9mZi1ieTogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2ds
+ZS5jb20+DQo+IC0tLQ0KPiAgdmlydC9rdm0vY29hbGVzY2VkX21taW8uYyB8IDI5ICsrKysrKysr
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCsp
+LCAyMSBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9jb2FsZXNjZWRf
+bW1pby5jIGIvdmlydC9rdm0vY29hbGVzY2VkX21taW8uYw0KPiBpbmRleCAxODRjNWM0MGM5YzEu
+LjM3NWQ2Mjg1NDc1ZSAxMDA2NDQNCj4gLS0tIGEvdmlydC9rdm0vY29hbGVzY2VkX21taW8uYw0K
+PiArKysgYi92aXJ0L2t2bS9jb2FsZXNjZWRfbW1pby5jDQo+IEBAIC00MCwyNSArNDAsNiBAQCBz
+dGF0aWMgaW50IGNvYWxlc2NlZF9tbWlvX2luX3JhbmdlKHN0cnVjdCBrdm1fY29hbGVzY2VkX21t
+aW9fZGV2ICpkZXYsDQo+ICAgICAgICAgcmV0dXJuIDE7DQo+ICB9DQo+IA0KPiAtc3RhdGljIGlu
+dCBjb2FsZXNjZWRfbW1pb19oYXNfcm9vbShzdHJ1Y3Qga3ZtX2NvYWxlc2NlZF9tbWlvX2RldiAq
+ZGV2LCB1MzIgbGFzdCkNCj4gLXsNCj4gLSAgICAgICBzdHJ1Y3Qga3ZtX2NvYWxlc2NlZF9tbWlv
+X3JpbmcgKnJpbmc7DQo+IC0NCj4gLSAgICAgICAvKiBBcmUgd2UgYWJsZSB0byBiYXRjaCBpdCA/
+ICovDQo+IC0NCj4gLSAgICAgICAvKiBsYXN0IGlzIHRoZSBmaXJzdCBmcmVlIGVudHJ5DQo+IC0g
+ICAgICAgICogY2hlY2sgaWYgd2UgZG9uJ3QgbWVldCB0aGUgZmlyc3QgdXNlZCBlbnRyeQ0KPiAt
+ICAgICAgICAqIHRoZXJlIGlzIGFsd2F5cyBvbmUgdW51c2VkIGVudHJ5IGluIHRoZSBidWZmZXIN
+Cj4gLSAgICAgICAgKi8NCj4gLSAgICAgICByaW5nID0gZGV2LT5rdm0tPmNvYWxlc2NlZF9tbWlv
+X3Jpbmc7DQo+IC0gICAgICAgaWYgKChsYXN0ICsgMSkgJSBLVk1fQ09BTEVTQ0VEX01NSU9fTUFY
+ID09IFJFQURfT05DRShyaW5nLT5maXJzdCkpIHsNCj4gLSAgICAgICAgICAgICAgIC8qIGZ1bGwg
+Ki8NCj4gLSAgICAgICAgICAgICAgIHJldHVybiAwOw0KPiAtICAgICAgIH0NCj4gLQ0KPiAtICAg
+ICAgIHJldHVybiAxOw0KPiAtfQ0KPiAtDQo+ICBzdGF0aWMgaW50IGNvYWxlc2NlZF9tbWlvX3dy
+aXRlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBzdHJ1Y3Qga3ZtX2lvX2RldmljZSAqdGhpcywgZ3BhX3QgYWRkciwNCj4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBpbnQgbGVuLCBjb25zdCB2b2lkICp2YWwpDQo+IEBAIC03
+Miw5ICs1MywxNSBAQCBzdGF0aWMgaW50IGNvYWxlc2NlZF9tbWlvX3dyaXRlKHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSwNCj4gDQo+ICAgICAgICAgc3Bpbl9sb2NrKCZkZXYtPmt2bS0+cmluZ19sb2Nr
+KTsNCj4gDQo+ICsgICAgICAgLyoNCj4gKyAgICAgICAgKiBsYXN0IGlzIHRoZSBpbmRleCBvZiB0
+aGUgZW50cnkgdG8gZmlsbC4gIFZlcmlmeSB1c2Vyc3BhY2UgaGFzbid0DQo+ICsgICAgICAgICog
+c2V0IGxhc3QgdG8gYmUgb3V0IG9mIHJhbmdlLCBhbmQgdGhhdCB0aGVyZSBpcyByb29tIGluIHRo
+ZSByaW5nLg0KPiArICAgICAgICAqIExlYXZlIG9uZSBlbnRyeSBmcmVlIGluIHRoZSByaW5nIHNv
+IHRoYXQgdXNlcnNwYWNlIGNhbiBkaWZmZXJlbnRpYXRlDQo+ICsgICAgICAgICogYmV0d2VlbiBh
+biBlbXB0eSByaW5nIGFuZCBhIGZ1bGwgcmluZy4NCj4gKyAgICAgICAgKi8NCj4gICAgICAgICBp
+bnNlcnQgPSBSRUFEX09OQ0UocmluZy0+bGFzdCk7DQo+IC0gICAgICAgaWYgKCFjb2FsZXNjZWRf
+bW1pb19oYXNfcm9vbShkZXYsIGluc2VydCkgfHwNCj4gLSAgICAgICAgICAgaW5zZXJ0ID49IEtW
+TV9DT0FMRVNDRURfTU1JT19NQVgpIHsNCj4gKyAgICAgICBpZiAoaW5zZXJ0ID49IEtWTV9DT0FM
+RVNDRURfTU1JT19NQVggfHwNCj4gKyAgICAgICAgICAgKGluc2VydCArIDEpICUgS1ZNX0NPQUxF
+U0NFRF9NTUlPX01BWCA9PSBSRUFEX09OQ0UocmluZy0+Zmlyc3QpKSB7DQo+ICAgICAgICAgICAg
+ICAgICBzcGluX3VubG9jaygmZGV2LT5rdm0tPnJpbmdfbG9jayk7DQo+ICAgICAgICAgICAgICAg
+ICByZXR1cm4gLUVPUE5PVFNVUFA7DQo+ICAgICAgICAgfQ0KPiAtLQ0KPiAyLjQ2LjAuMjk1Lmcz
+YjllYThhMzhhLWdvb2cNCj4gDQoNClJldmlld2VkLWJ5OiBJbGlhcyBTdGFtYXRpcyA8aWxzdGFt
+QGFtYXpvbi5jb20+DQo=
 
