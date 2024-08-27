@@ -1,258 +1,142 @@
-Return-Path: <kvm+bounces-25149-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25151-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9700960B6E
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 15:12:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7021F960B7A
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 15:13:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45DF1285C44
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 13:12:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D04128607B
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 13:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856391C7B8B;
-	Tue, 27 Aug 2024 13:08:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A95D19EED3;
+	Tue, 27 Aug 2024 13:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K3aCZ5jo"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="We6EHxD7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5971C68A7
-	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 13:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3BC1BA875;
+	Tue, 27 Aug 2024 13:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724764117; cv=none; b=WHQa8Aiv4Pbe973tnxQ0YkvXbWd01Ys/Bo0aokZa/dXdvRE1zetv6MU7K0MCFlz3BVTJGR1IN8MBjXJxvN1QWcIqlToOK5lJG3WCFbTvjcs0noix2RxWA4gCuZxJlmfxE14myIn51g9ltCxJDwkYYR7nKbZYKip6MlPSGz1eKfc=
+	t=1724764213; cv=none; b=rOxGaP1oSBKh+S4MXjzDrM3XMhZO2fRzv/01VZrRPl6i52wSaNfLGEliTfjnias1GtHMT9Nc6E2eUUhIZe/K+xE1sLc32GM99p9xe3y6YjXSRWMvWk7zBL8YrcWrXiSPi1YGmOgYlapFKVhQwVavu2hDV6CxjX9iDgukvut3smE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724764117; c=relaxed/simple;
-	bh=DKZ2PjINcn2iG38PL7e/2uFqlx0qNbPScgOvJPCEMaI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fX/boZfyHsKNMrsow9qJgYhTQmCGz+OZuQztV83y7l9UnDjge2UdcnRmqyzvcFCtnkBOC2sj2zpL3ziJMG7LU4t2373vkAUgs3J0r+Bscj9D1L7EU+niFzyasY1DHPeP9IVVlG6OV0Hh9uu2BR7M15HqkvJMAPdPWDJ0s8IMQPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=K3aCZ5jo; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3717ff2358eso3000944f8f.1
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 06:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724764113; x=1725368913; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7KqRcAFW8nUzDZ1FEN66jGQtx4LYaSNAvAG+5szB8q0=;
-        b=K3aCZ5jo8K2zlHgZPYjZIJGNJpUpr05l82Yv/lFxIrdlvjsJBAab1K9PPi6B2CYUUK
-         Tg8RFOCQPqG9ufKL1aqyktO7jsULYeTpNLLpkLSmbzf9ZeJ0cPmJ1AsoZOwtr5648feS
-         XBe033GcGQlsp0niXml7uoadWyxzutHwPNCLT8pmsTv6RNxr7kqKG1tPccqG4CbEAzMY
-         OGa/FVmKcKPhM6ixlSyXPwCNgl5QGVZbmuvCvAlg/EH7cM2u5FudVMkmXC13DYveDXiN
-         6R8mcz70LySzPXha9gpfxLwV7es1Tk9woyiDVBQxqFM29X2nXfKddpOblgLYcqRrbcOh
-         6OSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724764113; x=1725368913;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7KqRcAFW8nUzDZ1FEN66jGQtx4LYaSNAvAG+5szB8q0=;
-        b=sMBEkLLJlM8tdMd6WZFjT6OtDEldfVEan7PUrHwQh2Q68WfT9t6s35BnLshcuYU0fX
-         NEch3X7tCcbtIDQCkRM+4o599Ri+SVbBNSr1mPzh33jknyvP2QvqFWAVnThFhm3lAfmr
-         Da4dj9nKBWzbTyNx0jNEIh978z9q1emzKc+DO550OvGCsNmsrndFBU4P3h5mD/8/Jt6Z
-         NQ4boNGXKCQWGuxUhDmCvh/YbYN9pw8A1MZe7aEedpLqrr+GJnxxChEAAkhhTGGFXefV
-         fdotVF64IRDMrCAT+ZnK64AdF5Od/eaw7CRQ0SWXYI2ionuOnHXDBmB/Nna0Wym5GLBp
-         kl8w==
-X-Gm-Message-State: AOJu0Yxlf2hNaKdmM/yI+rljTa/H7c7Ytst/Lu+IOd4S5sHmgZcObmq9
-	EvOc3n9n+PL4nO0vGs3ZKTuw47YDikOLxAOBO19tiK7H9ZWRRySoru6l4MJ6b3M=
-X-Google-Smtp-Source: AGHT+IFlcKOK92s/UxJ1kIhXDpRFVT9AfPK9EVRV4+49EEVGWs+1h7/ccWiUMy3fn1r+RZMCd6eVbg==
-X-Received: by 2002:adf:a351:0:b0:371:7e46:68cb with SMTP id ffacd0b85a97d-373118c6b95mr7484089f8f.50.1724764112624;
-        Tue, 27 Aug 2024 06:08:32 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730813c1e3sm13012590f8f.35.2024.08.27.06.08.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 06:08:32 -0700 (PDT)
-Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 380E35F9FF;
-	Tue, 27 Aug 2024 14:08:30 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	maz@kernel.org,
-	arnd@linaro.org,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH 3/3] ampere/arm64: instrument the altra workarounds
-Date: Tue, 27 Aug 2024 14:08:29 +0100
-Message-Id: <20240827130829.43632-4-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240827130829.43632-1-alex.bennee@linaro.org>
-References: <20240827130829.43632-1-alex.bennee@linaro.org>
+	s=arc-20240116; t=1724764213; c=relaxed/simple;
+	bh=2huZQ9X3XwSEo8LeL5E6EMGsFsv20dAkqIQdgKsmyfY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UZ4Lnky6fT1/Znx01p5OYo+RbnHGgAhyFOIuQBOL7x9ErZGp8xtK6qmCHFIsoGArqkVAFlIyF3N9r2BpviuEH/2jGxEGwziyS7iOFECCI9EZ0Amc8+iCDv70EcQiEtjkEu1aI2mTC6+g0VCsUamKjXyh1t/vvth3RG+Pxy12s6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=We6EHxD7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92EE9C61047;
+	Tue, 27 Aug 2024 13:10:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1724764213;
+	bh=2huZQ9X3XwSEo8LeL5E6EMGsFsv20dAkqIQdgKsmyfY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=We6EHxD7WtHu+7vU4VpLYXWAPrJWszHtp0QDTBeln/dC5Doa9HUg+Uc41tS6mRX+h
+	 x82DeaG92201rsMH7L1vdBFRQgJ28+IHO4Qgt1SGgdXC+mu5ezwybSQhbYCZQ+e94M
+	 apFgl6Y52xqq4vcCOnVMwNjnnfA7301fbuwMlFhY=
+Date: Tue, 27 Aug 2024 15:10:10 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: David Hunter <david.hunter.linux@gmail.com>
+Cc: seanjc@google.com, dave.hansen@linux.intel.com, hpa@zytor.com,
+	javier.carrasco.cruz@gmail.com, jmattson@google.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	lirongqing@baidu.com, pbonzini@redhat.com, pshier@google.com,
+	shuah@kernel.org, stable@vger.kernel.org, x86@kernel.org,
+	Haitao Shan <hshan@google.com>
+Subject: Re: [PATCH 6.1.y 2/2 V2] KVM: x86: Fix lapic timer interrupt lost
+ after loading a snapshot.
+Message-ID: <2024082759-theatrics-sulk-85f2@gregkh>
+References: <ZsSiQkQVSz0DarYC@google.com>
+ <20240826221336.14023-1-david.hunter.linux@gmail.com>
+ <20240826221336.14023-3-david.hunter.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240826221336.14023-3-david.hunter.linux@gmail.com>
 
-This is mostly a debugging aid to measure the impact of workarounds.
+On Mon, Aug 26, 2024 at 06:13:36PM -0400, David Hunter wrote:
+> 
+> [ Upstream Commit 9cfec6d097c607e36199cf0cfbb8cf5acbd8e9b2]
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- arch/arm64/include/asm/pgtable.h   |  2 ++
- arch/arm64/mm/fault.c              |  9 +++--
- arch/arm64/mm/ioremap.c            | 11 ++++++
- include/trace/events/altra_fixup.h | 57 ++++++++++++++++++++++++++++++
- 4 files changed, 77 insertions(+), 2 deletions(-)
- create mode 100644 include/trace/events/altra_fixup.h
+This is already in the 6.1.66 release, so do you want it applied again?
 
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index f4603924390eb..26812b7fc6d93 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -679,6 +679,7 @@ static inline bool pud_table(pud_t pud) { return true; }
- 
- #ifdef CONFIG_ALTRA_ERRATUM_82288
- extern bool __read_mostly have_altra_erratum_82288;
-+void do_trace_altra_mkspecial(pte_t pte);
- #endif
- 
- static inline pte_t pte_mkspecial(pte_t pte)
-@@ -692,6 +693,7 @@ static inline pte_t pte_mkspecial(pte_t pte)
- 	     (phys >= 0x200000000000 && phys < 0x400000000000) ||
- 	     (phys >= 0x600000000000 && phys < 0x800000000000))) {
- 		pte = __pte(__phys_to_pte_val(phys) | pgprot_val(pgprot_device(prot)));
-+		do_trace_altra_mkspecial(pte);
- 	}
- #endif
- 
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 744e7b1664b1c..6cb3c600cc56a 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -45,6 +45,8 @@
- #include <asm/traps.h>
- #include <asm/patching.h>
- 
-+#include <trace/events/altra_fixup.h>
-+
- struct fault_info {
- 	/* fault handler, return 0 on successful handling */
- 	int	(*fn)(unsigned long far, unsigned long esr,
-@@ -1376,6 +1378,8 @@ static int fixup_alignment(unsigned long addr, unsigned int esr,
- 	u32 insn;
- 	int res;
- 
-+	trace_altra_fixup_alignment(addr, esr);
-+
- 	if (user_mode(regs)) {
- 		__le32 insn_le;
- 
-@@ -1414,8 +1418,9 @@ static int do_alignment_fault(unsigned long far, unsigned long esr,
- 			      struct pt_regs *regs)
- {
- #ifdef CONFIG_ALTRA_ERRATUM_82288
--	 if (!fixup_alignment(far, esr, regs))
--	 return 0;
-+	if (!fixup_alignment(far, esr, regs)) {
-+		return 0;
-+	}
- #endif
- 	if (IS_ENABLED(CONFIG_COMPAT_ALIGNMENT_FIXUPS) &&
- 	    compat_user_mode(regs))
-diff --git a/arch/arm64/mm/ioremap.c b/arch/arm64/mm/ioremap.c
-index 8965766181359..d38d903d8a063 100644
---- a/arch/arm64/mm/ioremap.c
-+++ b/arch/arm64/mm/ioremap.c
-@@ -5,9 +5,19 @@
- 
- #ifdef CONFIG_ALTRA_ERRATUM_82288
- 
-+#define CREATE_TRACE_POINTS
-+#include <trace/events/altra_fixup.h>
-+
- bool have_altra_erratum_82288 __read_mostly;
- EXPORT_SYMBOL(have_altra_erratum_82288);
- 
-+void do_trace_altra_mkspecial(pte_t pte)
-+{
-+	trace_altra_mkspecial(pte);
-+}
-+EXPORT_SYMBOL(do_trace_altra_mkspecial);
-+EXPORT_TRACEPOINT_SYMBOL(altra_mkspecial);
-+
- static bool is_altra_pci(phys_addr_t phys_addr, size_t size)
- {
- 	phys_addr_t end = phys_addr + size;
-@@ -25,6 +35,7 @@ pgprot_t ioremap_map_prot(phys_addr_t phys_addr, size_t size,
- #ifdef CONFIG_ALTRA_ERRATUM_82288
- 	if (unlikely(have_altra_erratum_82288 && is_altra_pci(phys_addr, size))) {
- 		prot = pgprot_device(prot);
-+		trace_altra_ioremap_prot(prot);
- 	}
- #endif
- 	return prot;
-diff --git a/include/trace/events/altra_fixup.h b/include/trace/events/altra_fixup.h
-new file mode 100644
-index 0000000000000..73115740c5d84
---- /dev/null
-+++ b/include/trace/events/altra_fixup.h
-@@ -0,0 +1,57 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM altra_fixup
-+
-+#if !defined(_ALTERA_FIXUP_H_) || defined(TRACE_HEADER_MULTI_READ)
-+#define _ALTRA_FIXUP_H_
-+
-+#include <linux/tracepoint.h>
-+#include <linux/io.h>
-+
-+#ifdef CONFIG_ALTRA_ERRATUM_82288
-+
-+TRACE_EVENT(altra_fixup_alignment,
-+	    TP_PROTO(unsigned long far, unsigned long esr),
-+	    TP_ARGS(far, esr),
-+	    TP_STRUCT__entry(
-+		__field(unsigned long, far)
-+		__field(unsigned long, esr)
-+	    ),
-+	    TP_fast_assign(
-+		__entry->far = far;
-+		__entry->esr = esr;
-+	    ),
-+	    TP_printk("far=0x%016lx esr=0x%016lx",
-+		      __entry->far, __entry->esr)
-+);
-+
-+TRACE_EVENT(altra_mkspecial,
-+	    TP_PROTO(pte_t pte),
-+	    TP_ARGS(pte),
-+	    TP_STRUCT__entry(
-+		__field(pteval_t, pte)
-+	    ),
-+	    TP_fast_assign(
-+		__entry->pte = pte_val(pte);
-+	    ),
-+	    TP_printk("pte=0x%016llx", __entry->pte)
-+);
-+
-+TRACE_EVENT(altra_ioremap_prot,
-+	    TP_PROTO(pgprot_t prot),
-+	    TP_ARGS(prot),
-+	    TP_STRUCT__entry(
-+		__field(pteval_t, pte)
-+	    ),
-+	    TP_fast_assign(
-+		__entry->pte = pgprot_val(prot);
-+	    ),
-+	    TP_printk("prot=0x%016llx", __entry->pte)
-+);
-+
-+#endif /* CONFIG_ALTRA_ERRATUM_82288 */
-+
-+#endif /* _ALTRA_FIXUP_H_ */
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
--- 
-2.39.2
+> From: Haitao Shan <hshan@google.com>
+> Date:   Tue Sep 12 16:55:45 2023 -0700 
+> 
+> When running android emulator (which is based on QEMU 2.12) on
+> certain Intel hosts with kernel version 6.3-rc1 or above, guest
+> will freeze after loading a snapshot. This is almost 100%
+> reproducible. By default, the android emulator will use snapshot
+> to speed up the next launching of the same android guest. So
+> this breaks the android emulator badly.
+> 
+> I tested QEMU 8.0.4 from Debian 12 with an Ubuntu 22.04 guest by
+> running command "loadvm" after "savevm". The same issue is
+> observed. At the same time, none of our AMD platforms is impacted.
+> More experiments show that loading the KVM module with
+> "enable_apicv=false" can workaround it.
+> 
+> The issue started to show up after commit 8e6ed96cdd50 ("KVM: x86:
+> fire timer when it is migrated and expired, and in oneshot mode").
+> However, as is pointed out by Sean Christopherson, it is introduced
+> by commit 967235d32032 ("KVM: vmx: clear pending interrupts on
+> KVM_SET_LAPIC"). commit 8e6ed96cdd50 ("KVM: x86: fire timer when
+> it is migrated and expired, and in oneshot mode") just makes it
+> easier to hit the issue.
+> 
+> Having both commits, the oneshot lapic timer gets fired immediately
+> inside the KVM_SET_LAPIC call when loading the snapshot. On Intel
+> platforms with APIC virtualization and posted interrupt processing,
+> this eventually leads to setting the corresponding PIR bit. However,
+> the whole PIR bits get cleared later in the same KVM_SET_LAPIC call
+> by apicv_post_state_restore. This leads to timer interrupt lost.
+> 
+> The fix is to move vmx_apicv_post_state_restore to the beginning of
+> the KVM_SET_LAPIC call and rename to vmx_apicv_pre_state_restore.
+> What vmx_apicv_post_state_restore does is actually clearing any
+> former apicv state and this behavior is more suitable to carry out
+> in the beginning.
+> 
+> Fixes: 967235d32032 ("KVM: vmx: clear pending interrupts on KVM_SET_LAPIC")
+> Cc: stable@vger.kernel.org
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Haitao Shan <hshan@google.com>
+> Link: https://lore.kernel.org/r/20230913000215.478387-1-hshan@google.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
+> (Cherry-Picked from commit 9cfec6d097c607e36199cf0cfbb8cf5acbd8e9b2)
+> Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 87abf4eebf8a..4040075bbd5a 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -8203,6 +8203,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  	.load_eoi_exitmap = vmx_load_eoi_exitmap,
+>  	.apicv_pre_state_restore = vmx_apicv_pre_state_restore,
+>  	.check_apicv_inhibit_reasons = vmx_check_apicv_inhibit_reasons,
+> +	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
+>  	.hwapic_irr_update = vmx_hwapic_irr_update,
+>  	.hwapic_isr_update = vmx_hwapic_isr_update,
+>  	.guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
 
+Wait, this is just one hunk?  This feels wrong, you didn't say why you
+modfied this from the original commit, or backport, what was wrong with
+that?
+
+thanks,
+
+greg k-h
 
