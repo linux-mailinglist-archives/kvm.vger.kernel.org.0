@@ -1,124 +1,141 @@
-Return-Path: <kvm+bounces-25132-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25133-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2BF69604A2
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 10:40:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1970A96051A
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 11:06:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E98CB23BD7
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 08:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9F892814D7
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2024 09:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E0C198E74;
-	Tue, 27 Aug 2024 08:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3983F1946B8;
+	Tue, 27 Aug 2024 09:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="q/ax28mg"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q0+YL/b/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1038D19644B;
-	Tue, 27 Aug 2024 08:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D19D13C9A9
+	for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 09:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724748021; cv=none; b=SH9vIDO+eK7ths/VnD9nWbpSJRuWpmNtoMrf2BuN5PNORMSeVP0BzB8eL/4V85M3QgSwkhQ3YThYJSkUh2VLDH4wrLAR0eE184EkGp27PAoQBIanZ7YPQC8S65v5S2FTSdsF6eeO42DTMDjiNmqGJTfIv7P4y4sXprW6gOA44nM=
+	t=1724749580; cv=none; b=Z2jrD6I9PkQagsxWHAwY8NHqx7QwbOWGFboln+cMjBHuMt762ynX1HL4crLRoBB9soMKKHiPB9rdgGGSAgbmm7zyqwjd7ugvp/EWP2/mta7cbTtvP/12XfI+YFhrQYuYxF6MecNMY/rTwVzBJpxKwWecG/V2eoTBec92rgo6pg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724748021; c=relaxed/simple;
-	bh=I/G91AzYyxJ/Qw/KczvEnmEbcxysBhEMePXpiCprlA8=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=U/b5qurw2wrV/ThUYiHBLXxTBlq2NcAnBrcE1xlRs0bcOtZPzUSdr8k5aNo2Vtqqg+5hAseoJwEHFoNd/mDjZotihkmu9zx9ZsjAfSRpOqltm6BJzgxsMxRFXAPc6vixnvnvqzK2vuCBg+iE+4HQXCozx3FL9UYmRjgdQRPU6mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=q/ax28mg; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47R1tLeT032160;
-	Tue, 27 Aug 2024 08:40:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	content-type:mime-version:content-transfer-encoding:in-reply-to
-	:references:subject:from:cc:to:date:message-id; s=pp1; bh=8ejJR8
-	KeyUEAz4M7HJQ3mnqPHzFbb/T1UuXcIom9Fi8=; b=q/ax28mgDJTEnQ14m+/x38
-	5LW6xlc+MUTWOmKWWDwSGC/PFWeCT6l2zWPxm1uB7iksfkxYZLONk7r61KAIKY/N
-	lTvtydF3e4HV9Fe4FFktgkL6W0xh/st8M/F8AwvIEIsFCzCyrdXeLWiesVKJS+hb
-	bOXIyCsxnuTffbY6kz3EDqJR2LBqx2vgUAvxPAvCO96SpT84nBe9MAo7QfYHJ2fS
-	ieL28oPl/TzOHXAqWz/padfX/gB3HHS+sDlx9+lUWHVVx8vBsbrFx5j6fwsrK0me
-	vWOqAoLFjCd3k4tCmH3nVsjps75n+G5I5WpAUBg7o5eLTFDWMLYJAoltYSMTgUlg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 417gedaenm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Aug 2024 08:40:16 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47R8eGC8027464;
-	Tue, 27 Aug 2024 08:40:16 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 417gedaenh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Aug 2024 08:40:16 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47R8GNID008228;
-	Tue, 27 Aug 2024 08:40:15 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 417v2mhs89-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Aug 2024 08:40:15 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47R8eBN338338816
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 27 Aug 2024 08:40:12 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B5BA52004D;
-	Tue, 27 Aug 2024 08:40:11 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9826520043;
-	Tue, 27 Aug 2024 08:40:11 +0000 (GMT)
-Received: from t14-nrb (unknown [9.179.19.253])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 27 Aug 2024 08:40:11 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1724749580; c=relaxed/simple;
+	bh=td6TsY+x1jF2bYWtgW1QVma5ZvKvJwuhzTvVDhTcxRU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=dNvrn/T7PnRGiNjMz3FFUdQUQW5K459vy2vGdHZaHxylVd+A6HAiyNna/CJtpUQWTGt6VZoLI34qPBsKGgnPjaAWWrM9cf8+GtgeksXzP7N6z7RiOBlhPrsaVBQhEPV3ucjj3uWU6yWmS5a6SMJkBHkIA7tnQ+VyueWwOHPtA2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Q0+YL/b/; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-37198a6da58so3659535f8f.0
+        for <kvm@vger.kernel.org>; Tue, 27 Aug 2024 02:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1724749576; x=1725354376; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ys5q7+xt7V4u8ZvUMbFPxHX+g0yKhziPVMVNXUTaajE=;
+        b=Q0+YL/b/rl5j1EuCKgYUI8/1tv7hP3ynaUFvOc6LAh2q5WZWdaUTrVCnPuqVCMYMq+
+         S29T2gYKSix5SIxrO6CryQW41Ci0QM6WVoGegsHxJVF0ABvKxkNvmdUHdQriV5Hspnau
+         24wrg+mqJt6J4ClbsIRvrt+h+Eh/bUdAWJWp13Ybp/CCsAcQPxOb53Qczsr4Qy8LqFoE
+         ZJsrfekr1cC6qSLWHDCuIAPy/cPmNmmux9yYVjqQyYsc3BV8SzdQVJQx93xnyv16c33q
+         S0KjBE4oScqKwwqaKgq8E4nBtMWdZEsx43skUVvqHD7vCmUsGe87ab3S2h7EHFRn8XJL
+         /Uww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724749576; x=1725354376;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ys5q7+xt7V4u8ZvUMbFPxHX+g0yKhziPVMVNXUTaajE=;
+        b=UjfdJ+RrwRLd4SLzy7kGsxdeqS03tdtEyVOPAvCJsd7OlI2ga/BcFafH7wxPoXt88N
+         7casdfvDGDTOLoOL8oX6f7gWLDbMVE6MaAZ2M9ex2IfuZT8aF0og8IRft4gbrJDqmtIm
+         T+P3tUWH93utnPicSs8CmiCRyHPxhx+G7fGHWIKZ6fIFNMcFYLlWWKsHGJPENas8AE7R
+         8hfThbJMqb4Q+fvSFychJqgmAuSl84gzkr+6DOrV5JAg9wskf7JG2WVUAlXR/HsJaSqS
+         Ib2ivaozZ/9HR40Od47q+ELtsiwjIedAcn66wXzG8WHevR8zqbGScVZjlUuHGaAzT9m/
+         Joow==
+X-Forwarded-Encrypted: i=1; AJvYcCUAUvlrck1WP5qHqiEKHK9cZnczE5Lq/vPbFsWiM+veAQalh0KWIckyjbuukiT1js9Bly8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPo+EPTviTkQ0waDdwobXLG+DKher3UryhetwkiwW6bg09DTml
+	R+h8xOK5XVnHcbAlKuJ2IP3HURWKUYvH2GQrmL5FzGN+KhOOnfzXxNzPavktCuk=
+X-Google-Smtp-Source: AGHT+IE+VDn5FOe01bWlunlr3Q/efu0PB9LC4RFl5VPjT0A0kz6PEXEkfZYstnAt53OJLkCDA/f1HA==
+X-Received: by 2002:adf:b311:0:b0:368:3f6a:1dea with SMTP id ffacd0b85a97d-37311840050mr9300691f8f.6.1724749575912;
+        Tue, 27 Aug 2024 02:06:15 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730826a3f7sm12533503f8f.112.2024.08.27.02.06.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Aug 2024 02:06:15 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 507E15F7A2;
+	Tue, 27 Aug 2024 10:06:14 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
+  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
+ <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
+ <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
+ Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
+  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
+  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
+ <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
+  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
+  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
+  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
+  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
+  David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 00/84] KVM: Stop grabbing references to PFNMAP'd pages
+In-Reply-To: <20240726235234.228822-1-seanjc@google.com> (Sean
+	Christopherson's message of "Fri, 26 Jul 2024 16:51:09 -0700")
+References: <20240726235234.228822-1-seanjc@google.com>
+Date: Tue, 27 Aug 2024 10:06:14 +0100
+Message-ID: <875xrme3nd.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240621102212.3311494-1-nsg@linux.ibm.com>
-References: <20240621102212.3311494-1-nsg@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: Split and rework cpacf query functions
-From: Nico Boehr <nrb@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Date: Tue, 27 Aug 2024 10:40:10 +0200
-Message-ID: <172474801046.31767.8212475479414171264@t14-nrb.local>
-User-Agent: alot/0.10
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: jOQXOBWgKVzwFIKWJawT8A0AUeQCfIL-
-X-Proofpoint-GUID: 9OQWNbNgE3jc1Psd89KKD0XhibNmn-h7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-27_05,2024-08-26_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=943
- priorityscore=1501 phishscore=0 mlxscore=0 clxscore=1011 impostorscore=0
- spamscore=0 adultscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408270063
 
-Quoting Nina Schoetterl-Glausch (2024-06-21 12:22:12)
-> Cherry-pick 830999bd7e72 ("s390/cpacf: Split and rework cpacf query funct=
-ions")
-> from the kernel:
->=20
->     Rework the cpacf query functions to use the correct RRE
->     or RRF instruction formats and set register fields within
->     instructions correctly.
->=20
-> Fixes: a555dc6b16bf ("s390x: add cpacf.h from Linux")
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Sean Christopherson <seanjc@google.com> writes:
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+> arm64 folks, the first two patches are bug fixes, but I have very low
+> confidence that they are correct and/or desirable.  If they are more or
+> less correct, I can post them separately if that'd make life easier.  I
+> included them here to avoid conflicts, and because I'm pretty sure how
+> KVM deals with MTE tags vs. dirty logging will impact what APIs KVM needs
+> to provide to arch code.
+>
+> On to the series...  The TL;DR is that I would like to get input on two
+> things:
+>
+>  1. Marking folios dirty/accessed only on the intial stage-2 page fault
+>  2. The new APIs for faulting, prefetching, and doing "lookups" on
+>  pfns
+
+I've finally managed to get virtio-vulkan working on my Arm64 devbox
+with an AMD graphics card plugged into the PCI. I'm confident that the
+graphics path is using the discrete card memory (as it has been mapped
+as device memory with alignment handlers to deal with the broken Altra
+PCI). However aside from running graphics workloads in KVM guests is
+their anything else I can check to see things are behaving as expected?
+
+The predecessor series did break launching some KVM guests on my x86
+system but with this series launching guests works fine and I haven't
+noticed any weirdness.
+
+So for those caveats you can certainly have a:
+
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+However if there is anything else I can do to further stress test this
+code do let me know.
+
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
