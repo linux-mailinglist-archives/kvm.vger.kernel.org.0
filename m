@@ -1,163 +1,184 @@
-Return-Path: <kvm+bounces-25283-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25284-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6D50962E7B
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 19:28:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89C2B962F53
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 20:06:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60FCF1F21AB7
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 17:28:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37935282D02
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 18:06:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2FD1A76BC;
-	Wed, 28 Aug 2024 17:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="YrieHuyL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8020D1A7ADE;
+	Wed, 28 Aug 2024 18:06:46 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467221A7043
-	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 17:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBFD1A071B;
+	Wed, 28 Aug 2024 18:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724866094; cv=none; b=UVMnuo8XGhLyaeeDFPz5FJFyNXLaix3Ytj6dFdpG/E1nQFISoHLBk1ltV87vG/Ix/iwbW1/j3QX0uTEZvo+ETcigcjnSMFCMO/r0EqwrtOKKe3EzF3X1KYttJphq0A6UWhsrQxYNxlIQdOX+BFVtZxYfGZF2PKfLrkkNRhEnD6w=
+	t=1724868406; cv=none; b=iH2CfkntTziivsD2hQECbtoY94OMqEzkZcHiC8LWkMYxoOWBqkeP7i+oMElrLiVPKCU07taL+8gDxN2ZZmVA+lDebV+BUMmTR9lebln+FE2iLQ8yycPN20yKX6uUbXRH8NvzzxIaUtJQt5Mg4vQ5N20QqXl937UcRHY5X2CUeDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724866094; c=relaxed/simple;
-	bh=HypgDgtB4ct/OuJkz4CzqDuTTpFOG82yJbB3Gp9Nl3A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gYWjZQpPBtqVAAGviRqftWlVoRI4+8UDcKS040qRqPrnI/cHNgWQoAOXAw4S94EOpR12HBge07mv7weGbQ2PG7l+Hep7TYFbDWoM1Az7K3X6Hne5KEUMEOadE3iUaOqchOMzlNpNvpHwrao2l9CH10sp7ZsF/Y5UqlEVLIwdssg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=YrieHuyL; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e05f25fb96eso6995140276.1
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 10:28:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=digitalocean.com; s=google; t=1724866092; x=1725470892; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zCPXRj4O3bcsketV9hnxl4fQbKxvadzaMLv4xTGbmvw=;
-        b=YrieHuyLcaRqzVQYQoFYLCTswDKpIhgqW+kiyQ4rLa3Xa5DyiG5ftqU35tnxwzWHqV
-         zl1BAx2Gv8ZgHhewgd14S5s1wtRw4q/H15nm/Y1mRq0Wt8eT5qG09aYYBwTjtuF8Rd9T
-         EXMGNqv8w7Y+M36LSZJxoaNng7qxlLKZ6n5N0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724866092; x=1725470892;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zCPXRj4O3bcsketV9hnxl4fQbKxvadzaMLv4xTGbmvw=;
-        b=JwNVmfpsvZXC/cGG7izpUOVT/fjBwhQg3s+Hu5nVbEZ4wkZOqcZZ8V7g+SlVIHgDx4
-         a797Xlj1jwxFsjSDsBS//ElyZvXilK+7YmgZxxMghyHSltBigTdbIArhiYzZgj1mE97M
-         E01afcHUlubG0ywHALwr5ps7KkFqbcH7f+aZxxS0boMClCD8+QXOl4bV/2V/r+D/cktF
-         4WId4vbdgtjB4q8hsv3oUt/76Z7Lxp+YOqY99h6KZhMQScA8MrgGIumdJA9CWZivDV2A
-         4TU2bUCw1/4C+nlgowx4JEJKqVTsTxe/EJNqsSriXF+crvYQGSHDJjrtXtw2qZp8vjOw
-         1YgA==
-X-Forwarded-Encrypted: i=1; AJvYcCV4BaWuwLXK3D9Fr6Wm46kk4XzzPBTF45La2JZexxOunDv5uqN+0cNADINLCPySoOLkZ40=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJ78wrnG/JRNNSz/1mCTtTgMgTzZJohxLL5mqxyk2iSNHmhrp9
-	PM2rn8uL/nZav9W9/kUnjVCJdXuE7i5U6Y8fNNkd5T59KVEQR9vk55Mf8vQjcrQ=
-X-Google-Smtp-Source: AGHT+IFPC41Qak2gZ0YGJ2D7BiYZJ3IUJn9Ef3OAyW792KU6hAe4yKyakK/6d00Omzjp9FW2G84t4Q==
-X-Received: by 2002:a05:690c:6512:b0:64a:4728:ef8 with SMTP id 00721157ae682-6d277f51e62mr651667b3.44.1724866092130;
-        Wed, 28 Aug 2024 10:28:12 -0700 (PDT)
-Received: from ?IPV6:2603:8080:7400:36da:b4f6:16b8:9118:2c1a? ([2603:8080:7400:36da:b4f6:16b8:9118:2c1a])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6c39de41cb8sm24217897b3.116.2024.08.28.10.28.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 10:28:11 -0700 (PDT)
-Message-ID: <41a2a533-549e-4f45-9d8d-68b5ef484b05@digitalocean.com>
-Date: Wed, 28 Aug 2024 12:28:09 -0500
+	s=arc-20240116; t=1724868406; c=relaxed/simple;
+	bh=w67xNAjthsSQ+48Jvvohao+Zq2bgRnT/FFrFz/z4Zb4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jF3HSmKan76uZptweywWlcZZVOB++v9U31Y+86I7KDrqwVw4sEIZ6HcpMfd5oXjIeCDpWo7L4HDfzrTE1K3T5BmLWSMQkYEFpzP+wnZP98utzp7HZgCNFS5gT7GSrRCmhCGy4/DW6UF5rqYvigUDwfhzxYD0G9Dp/cWnEf+RKjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WvC2H5yLlz1HHbh;
+	Thu, 29 Aug 2024 02:03:19 +0800 (CST)
+Received: from dggpemf200001.china.huawei.com (unknown [7.185.36.225])
+	by mail.maildlp.com (Postfix) with ESMTPS id E89691400CB;
+	Thu, 29 Aug 2024 02:06:39 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ dggpemf200001.china.huawei.com (7.185.36.225) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 29 Aug 2024 02:06:39 +0800
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
+ Wed, 28 Aug 2024 19:06:37 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+CC: Jason Gunthorpe <jgg@nvidia.com>, "acpica-devel@lists.linux.dev"
+	<acpica-devel@lists.linux.dev>, "Guohanjun (Hanjun Guo)"
+	<guohanjun@huawei.com>, "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Len Brown <lenb@kernel.org>,
+	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Lorenzo Pieralisi
+	<lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Robert
+ Moore" <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, "Sudeep
+ Holla" <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, Alex Williamson
+	<alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Moritz Fischer
+	<mdf@kernel.org>, Michael Shavit <mshavit@google.com>,
+	"patches@lists.linux.dev" <patches@lists.linux.dev>, Mostafa Saleh
+	<smostafa@google.com>
+Subject: RE: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
+Thread-Topic: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
+Thread-Index: AQHa+JkQkcFFSAeDsUqyXyGP6/LaZLI7ju0AgAFNDID///2PgIAAHqvg
+Date: Wed, 28 Aug 2024 18:06:36 +0000
+Message-ID: <cd36b0e460734df0ae95f5e82bfebaef@huawei.com>
+References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ <Zs5Fom+JFZimFpeS@Asurada-Nvidia>
+ <7debe8f99afa4e33aa1872be0d4a63e1@huawei.com>
+ <Zs9a9/Dc0vBxp/33@Asurada-Nvidia>
+In-Reply-To: <Zs9a9/Dc0vBxp/33@Asurada-Nvidia>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
-To: Dragos Tatulea <dtatulea@nvidia.com>, Jason Wang <jasowang@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, mst@redhat.com,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com,
- sashal@kernel.org, yuehaibing@huawei.com, steven.sistare@oracle.com
-References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
- <afcbf041-7613-48e6-8088-9d52edd907ff@nvidia.com>
- <fd8ad1d9-81a0-4155-abf5-627ef08afa9e@lunn.ch>
- <24dbecec-d114-4150-87df-33dfbacaec54@nvidia.com>
- <CACGkMEsKSUs77biUTF14vENM+AfrLUOHMVe4nitd9CQ-obXuCA@mail.gmail.com>
- <f7479a55-9eee-4dec-8e09-ca01fa933112@nvidia.com>
-Content-Language: en-US
-From: Carlos Bilbao <cbilbao@digitalocean.com>
-In-Reply-To: <f7479a55-9eee-4dec-8e09-ca01fa933112@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-Hello,
-
-On 8/27/24 11:54 AM, Dragos Tatulea wrote:
->
-> On 27.08.24 04:03, Jason Wang wrote:
->> On Tue, Aug 27, 2024 at 12:11 AM Dragos Tatulea <dtatulea@nvidia.com> wrote:
->>>
->>> On 26.08.24 16:24, Andrew Lunn wrote:
->>>> On Mon, Aug 26, 2024 at 11:06:09AM +0200, Dragos Tatulea wrote:
->>>>>
->>>>> On 23.08.24 18:54, Carlos Bilbao wrote:
->>>>>> Hello,
->>>>>>
->>>>>> I'm debugging my vDPA setup, and when using ioctl to retrieve the
->>>>>> configuration, I noticed that it's running in half duplex mode:
->>>>>>
->>>>>> Configuration data (24 bytes):
->>>>>>   MAC address: (Mac address)
->>>>>>   Status: 0x0001
->>>>>>   Max virtqueue pairs: 8
->>>>>>   MTU: 1500
->>>>>>   Speed: 0 Mb
->>>>>>   Duplex: Half Duplex
->>>>>>   RSS max key size: 0
->>>>>>   RSS max indirection table length: 0
->>>>>>   Supported hash types: 0x00000000
->>>>>>
->>>>>> I believe this might be contributing to the underperformance of vDPA.
->>>>> mlx5_vdpa vDPA devicess currently do not support the VIRTIO_NET_F_SPEED_DUPLEX
->>>>> feature which reports speed and duplex. You can check the state on the
->>>>> PF.
->>>> Then it should probably report DUPLEX_UNKNOWN.
->>>>
->>>> The speed of 0 also suggests SPEED_UNKNOWN is not being returned. So
->>>> this just looks buggy in general.
->>>>
->>> The virtio spec doesn't mention what those values should be when
->>> VIRTIO_NET_F_SPEED_DUPLEX is not supported.
->>>
->>> Jason, should vdpa_dev_net_config_fill() initialize the speed/duplex
->>> fields to SPEED/DUPLEX_UNKNOWN instead of 0?
->> Spec said
->>
->> """
->> The following two fields, speed and duplex, only exist if
->> VIRTIO_NET_F_SPEED_DUPLEX is set.
->> """
->>
->> So my understanding is that it is undefined behaviour, and those
->> fields seems useless before feature negotiation. For safety, it might
->> be better to initialize them as UNKOWN.
->>
-> After a closer look my statement doesn't make sense: the device will copy
-> the virtio_net_config bytes on top.
->
-> The solution is to initialize these fields to UNKNOWN in the driver. Will send
-> a patch to fix this.
 
 
-With Dragos' permission, I'm sending a first draft of this now.
 
+> -----Original Message-----
+> From: Nicolin Chen <nicolinc@nvidia.com>
+> Sent: Wednesday, August 28, 2024 6:15 PM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>; acpica-devel@lists.linux.dev;
+> Guohanjun (Hanjun Guo) <guohanjun@huawei.com>;
+> iommu@lists.linux.dev; Joerg Roedel <joro@8bytes.org>; Kevin Tian
+> <kevin.tian@intel.com>; kvm@vger.kernel.org; Len Brown
+> <lenb@kernel.org>; linux-acpi@vger.kernel.org; linux-arm-
+> kernel@lists.infradead.org; Lorenzo Pieralisi <lpieralisi@kernel.org>; Ra=
+fael J.
+> Wysocki <rafael@kernel.org>; Robert Moore <robert.moore@intel.com>;
+> Robin Murphy <robin.murphy@arm.com>; Sudeep Holla
+> <sudeep.holla@arm.com>; Will Deacon <will@kernel.org>; Alex Williamson
+> <alex.williamson@redhat.com>; Eric Auger <eric.auger@redhat.com>; Jean-
+> Philippe Brucker <jean-philippe@linaro.org>; Moritz Fischer
+> <mdf@kernel.org>; Michael Shavit <mshavit@google.com>;
+> patches@lists.linux.dev; Mostafa Saleh <smostafa@google.com>
+> Subject: Re: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
+>=20
+> Hi Shameer,
+>=20
+> On Wed, Aug 28, 2024 at 04:31:36PM +0000, Shameerali Kolothum Thodi
+> wrote:
+> > Hi Nicolin,
+> >
+> > > -----Original Message-----
+> > > From: Nicolin Chen <nicolinc@nvidia.com>
+> > > Sent: Tuesday, August 27, 2024 10:31 PM
+> > > To: Jason Gunthorpe <jgg@nvidia.com>
+> > > Cc: acpica-devel@lists.linux.dev; Guohanjun (Hanjun Guo)
+> > > <guohanjun@huawei.com>; iommu@lists.linux.dev; Joerg Roedel
+> > > <joro@8bytes.org>; Kevin Tian <kevin.tian@intel.com>;
+> > > kvm@vger.kernel.org; Len Brown <lenb@kernel.org>; linux-
+> > > acpi@vger.kernel.org; linux-arm-kernel@lists.infradead.org; Lorenzo
+> > > Pieralisi <lpieralisi@kernel.org>; Rafael J. Wysocki
+> > > <rafael@kernel.org>; Robert Moore <robert.moore@intel.com>; Robin
+> > > Murphy <robin.murphy@arm.com>; Sudeep Holla
+> <sudeep.holla@arm.com>;
+> > > Will Deacon <will@kernel.org>; Alex Williamson
+> > > <alex.williamson@redhat.com>; Eric Auger <eric.auger@redhat.com>;
+> > > Jean-Philippe Brucker <jean- philippe@linaro.org>; Moritz Fischer
+> > > <mdf@kernel.org>; Michael Shavit <mshavit@google.com>;
+> > > patches@lists.linux.dev; Shameerali Kolothum Thodi
+> > > <shameerali.kolothum.thodi@huawei.com>; Mostafa Saleh
+> > > <smostafa@google.com>
+> > > Subject: Re: [PATCH v2 0/8] Initial support for SMMUv3 nested
+> > > translation
+> > >
+> >
+> > > As mentioned above, the VIOMMU series would be required to test the
+> > > entire nesting feature, which now has a v2 rebasing on this series.
+> > > I tested it with a paring QEMU branch. Please refer to:
+> > > https://lore.kernel.org/linux-
+> > > iommu/cover.1724776335.git.nicolinc@nvidia.com/
+> >
+> > Thanks for this. I haven't gone through the viommu and its Qemu branch
+> > yet.  The way we present nested-smmuv3/iommufd to the Qemu seems to
+> > have changed  with the above Qemu branch(multiple nested SMMUs).
+> > The old Qemu command line for nested setup doesn't work anymore.
+> >
+> > Could you please share an example Qemu command line  to verify this
+> > series(Sorry, if I missed it in the links/git).
+>=20
+> My bad. I updated those two "for_iommufd_" QEMU branches with a
+> README commit on top of each for the reference command.
 
->
-> Thanks,
-> Dragos
+Thanks. I did give it a go and this is my command line based on above,
 
+./qemu-system-aarch64-nicolin-viommu -object iommufd,id=3Diommufd0 \
+-machine hmat=3Don \
+-machine virt,accel=3Dkvm,gic-version=3D3,iommu=3Dnested-smmuv3,ras=3Don \
+-cpu host -smp cpus=3D61 -m size=3D16G,slots=3D4,maxmem=3D256G -nographic \
+-object memory-backend-ram,size=3D8G,id=3Dm0 \
+-object memory-backend-ram,size=3D8G,id=3Dm1 \
+-numa node,memdev=3Dm0,cpus=3D0-60,nodeid=3D0  -numa node,memdev=3Dm1,nodei=
+d=3D1 \
+-device vfio-pci-nohotplug,host=3D0000:75:00.1,iommufd=3Diommufd0 \
+-bios QEMU_EFI.fd \
+-drive if=3Dnone,file=3Dubuntu-18.04-old.img,id=3Dfs \
+-device virtio-blk-device,drive=3Dfs \
+-kernel Image \
+-append "rdinit=3Dinit console=3DttyAMA0 root=3D/dev/vda rw earlycon=3Dpl01=
+1,0x9000000 kpti=3Doff" \
+-nographic
 
-Thanks, Carlos
+But it fails to boot very early:
 
+root@ubuntu:/home/shameer/qemu-test# ./qemu_run-simple-iommufd-nicolin-2
+qemu-system-aarch64-nicolin-viommu: Illegal numa node 2
+=20
+Any idea what am I missing? Do you any special config enabled while buildin=
+g Qemu?
+
+Thanks,
+Shameer
 
