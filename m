@@ -1,71 +1,81 @@
-Return-Path: <kvm+bounces-25264-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25265-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7467A962BF2
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 17:18:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E95E962C60
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 17:31:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96069B259ED
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 15:18:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B42271F222E0
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 15:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C481A4F03;
-	Wed, 28 Aug 2024 15:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F201A2C0F;
+	Wed, 28 Aug 2024 15:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="YkZHTNbc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VvEH+KOu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828021A3BAF
-	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 15:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407D918C322
+	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 15:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724858222; cv=none; b=hmGfYQlM1c+WNMquMhuLhmvI/BHrfAi9QK+Lhxr5TUuViOtOs+fqgEHwiKw7BMWYy5+sL6hFOV412uk7zdrZsJLBj2Uz2bo3kyGt+c8WPx4OF9pkoFlWoMzspobJmyREodunba4YcMxBkff+CBL4/XiKQzf/ZyKvLBI8uqBd0EY=
+	t=1724859054; cv=none; b=BbkPyb0IYZyhbB744AOo6OK3syw+Z0m2Ye7E2UVj4eVPrqW++Qvj11lEi7HXi0uiRUHgAbuiO4vxLRvJNKxOcawBBWE3kt2N0KdWf+PqUw9zLV06lsV/WlN+YUNCPz5DJYzwrGY4RoUfuykwBlaCtvX+/C4isE9svgtXXZID4U4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724858222; c=relaxed/simple;
-	bh=xPt1LWc7MsVJzs0jRtvJXkECKkEZFYHwZ0GlYLY3Xcs=;
+	s=arc-20240116; t=1724859054; c=relaxed/simple;
+	bh=xaeaqZl9Q4gDJsceMVKCzuIjb41VywrJfI4xjnEmVKU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LXnm4zWM7N/17NXoGYfIJ9jhTnsDc1c7hVifsX84x2qJFGXqUDbJgqYclo61Qn/737lNt6Yz5BxNSzswHECYXBjsPm9SeS72F1wNqb6rmmT4vU0xtmwEIxq4XQgrWlgT/5jlYEqjmJR8S3j2GXxXayKNwPklnBtnKihsWvTt8MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=YkZHTNbc; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-39e6a32ae15so5112605ab.3
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 08:17:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=digitalocean.com; s=google; t=1724858219; x=1725463019; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mnIeLd/tf7wU3lqEopn2g1kQhYPWYwkn8SEaIQNr7jE=;
-        b=YkZHTNbcxmbtoHs3t6f5/eCtGd9xHetp/mJMeJy1Dv2/Jarzy4Bq+3VLDkFkrMn8+j
-         9kfexvzvxAeK78vPuciM4iw8pOKBnVJL/ekaLS2PD32aOgMvu4Y1pb/GC0P+dd8QRNyR
-         dqCvaXWGziGdZZb6Ya4FnxjhOeBM69Xo6fo5o=
+	 In-Reply-To:Content-Type; b=iQvZesXTBl34dBeG/hVERuoW6N64nT0F2661apTV+rQ90qLpZX/hnwF6ERAqPUvBZt0xhEpkKLuxnM3roAAPNXi2VXKT1rOOXIFxThH+ReAjiZFlFgkIE4yJyx4ZML11Kh6SKCj8Nd7GG60/8GOF3hk0uTo603OLXqCOxXGIRWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VvEH+KOu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724859051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=JQrY6fTjtMffITk65cE3lIhCjtNWs7f3wl30Hqmd/6A=;
+	b=VvEH+KOuuZPOxEoUxwZqpNZg6hFtWS82tSCIMXWt9ZWUFs/9ZSXDkdUxP3uY/+a+ugLEtK
+	QZpKsc7ESS0yCuMpC2FYdqq+jg7EcpipSUqeRBhNMQXaO5fJKFnN6VnqVTHi5LbCtzulEt
+	Y8jqEN0MaGtZ54yjUuyBgEAaYfM13mc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-364-JJIIZgsBOTuNRCXg-5EV8w-1; Wed, 28 Aug 2024 11:30:48 -0400
+X-MC-Unique: JJIIZgsBOTuNRCXg-5EV8w-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-428207daff2so63221795e9.0
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 08:30:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724858219; x=1725463019;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mnIeLd/tf7wU3lqEopn2g1kQhYPWYwkn8SEaIQNr7jE=;
-        b=c0UDNTSrKnlNnnThUeermnswC6xfpslkyOxWsFVYhuoXQiZRZEjwg4EQ7xDGHo2QqH
-         2yiDMQ5nRJvWDzZGsGOY67sMoL93ZSLilxqkY0PmwaiPDO5OQDqNIECFTZhnszc73FKb
-         RqXGh9GzqbgdbggNj25duLoOdhAZFCti068c2BJSw9FhRT02OG+3Qbl1R4DHEX7AQ1DI
-         P4qDiJzP0jJ/8sbjTlFhIARCsrYWFvXfp93L7Cotn1J76K/VK1GpzXchc9COsqsm58q+
-         fZFgBL03fiTwN9j1tKXV/Fq4+yCWIIm7WZcF6Rc5lP/T0FBXKODx967YFWsOH4pVfAFj
-         hvYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeJ1540pjS7KtloMpkFttUF+3kJVjsljDz9WD00Zk6lEgv8G6bmXA+wt8I9M0lmHRrQUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlGIeYgdTyTerqWrIMmm63qdy1MaDrXQ4JO6Rdefnl36bvJ+cb
-	G+iIDBIc67+LyWmdStHAqS0ibnF0LnwJok/Eyt7kYT2b79mjjyPAftBlMlBWrOI=
-X-Google-Smtp-Source: AGHT+IFFFJNAlhPS13AnIj/tW7iov+sjr7N3hsOtZHXwa49VtxjQjSEcnDwRwcE4+yC6ns7x3yYTxg==
-X-Received: by 2002:a05:6e02:17cc:b0:39b:3c0c:c3a6 with SMTP id e9e14a558f8ab-39f3784c70dmr395835ab.22.1724858219330;
-        Wed, 28 Aug 2024 08:16:59 -0700 (PDT)
-Received: from ?IPV6:2603:8080:7400:36da:b4f6:16b8:9118:2c1a? ([2603:8080:7400:36da:b4f6:16b8:9118:2c1a])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6c399cb53f6sm23830027b3.3.2024.08.28.08.16.57
+        d=1e100.net; s=20230601; t=1724859047; x=1725463847;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JQrY6fTjtMffITk65cE3lIhCjtNWs7f3wl30Hqmd/6A=;
+        b=pOojNNX4wblsSJr+D6LciL7YV8cKwh9loItCp8+RGduCijzdLmJty3MTQdW3fFUSTy
+         0HxSq4rA3PXoLMpbiz4ZP9Zh+xsQ8BD3A6VmXtv3gf6TLOpDw+v9aPXVnxwzte0ILO6m
+         rGw39GRvFZUZJ9s6yqMKI1uTn1HiK1WxVs2vfP9tTqXbUXfjbkYLEANnDwprQS3lAmec
+         XWhMJqTcifJyn6+KtdmSeMdvL76ufVcDCM9W5IdJLAGRFVGl4ucG+25QNDRD5a97ALa1
+         vK4u9N2ObcHhajGGwl8UJzXrQ81vsfb7fQKaAvYE3IANN1MTEvD+ZwLQGkunlnSJ0+Re
+         /L0g==
+X-Forwarded-Encrypted: i=1; AJvYcCUZp1IQSI1lLp0PRdmWD20hd0f4WXPeut3+xOXS3m5cyRnfnn/JWPiNexMO/8Kvl2AuPAU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLWM3/UwiXMKFLVBEZyQrLL7hQp+M0ThQ2sBhEk5LFOlcbv0L2
+	xLU/NlC9PCGSjan28WTgWD96fm0rtbHEyAXL4yAGj1ia849GmWnvVhdAgUr/i7m03ZHuERgiUbA
+	NtH4kpGc0jSV2sjdbEn8lnk/XnaPkyLBmPXFF8YCBOqUfIatejg==
+X-Received: by 2002:a7b:c449:0:b0:42b:aecb:d280 with SMTP id 5b1f17b1804b1-42bb27a1021mr77595e9.27.1724859046902;
+        Wed, 28 Aug 2024 08:30:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGcYrQAeqH4qohLw4p+ce1kbOV4E+qFSa8CCj124NKCzqOMjYPmc8sWetHU7svLzvNl292dQQ==
+X-Received: by 2002:a7b:c449:0:b0:42b:aecb:d280 with SMTP id 5b1f17b1804b1-42bb27a1021mr76905e9.27.1724859045944;
+        Wed, 28 Aug 2024 08:30:45 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c706:1700:6b81:27cb:c9e2:a09a? (p200300cbc70617006b8127cbc9e2a09a.dip0.t-ipconnect.de. [2003:cb:c706:1700:6b81:27cb:c9e2:a09a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba639687csm24322545e9.8.2024.08.28.08.30.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 08:16:58 -0700 (PDT)
-Message-ID: <2b1ed697-ba3d-47d7-bda1-f4ef4790f11c@digitalocean.com>
-Date: Wed, 28 Aug 2024 10:16:56 -0500
+        Wed, 28 Aug 2024 08:30:45 -0700 (PDT)
+Message-ID: <c1d8220c-e292-48af-bbab-21f4bb9c7dc5@redhat.com>
+Date: Wed, 28 Aug 2024 17:30:43 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,180 +83,276 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
-To: Jason Wang <jasowang@redhat.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, eli@mellanox.com, mst@redhat.com,
- xuanzhuo@linux.alibaba.com, virtualization@lists.linux-foundation.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- eperezma@redhat.com, sashal@kernel.org, yuehaibing@huawei.com,
- steven.sistare@oracle.com
-References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
- <afcbf041-7613-48e6-8088-9d52edd907ff@nvidia.com>
- <8a15a46a-2744-4474-8add-7f6fb35552b3@digitalocean.com>
- <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
- <1cb17652-3437-472e-b8d5-8078ba232d60@digitalocean.com>
- <CACGkMEvbc_4_KrnkZb-owH1moauntBmoKhHp1tsE5SL4RCMPog@mail.gmail.com>
+Subject: Re: [PATCH v2 06/19] mm/pagewalk: Check pfnmap for folio_walk_start()
+To: Peter Xu <peterx@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ Gavin Shan <gshan@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ x86@kernel.org, Ingo Molnar <mingo@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Alistair Popple <apopple@nvidia.com>,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Sean Christopherson <seanjc@google.com>, Oscar Salvador <osalvador@suse.de>,
+ Jason Gunthorpe <jgg@nvidia.com>, Borislav Petkov <bp@alien8.de>,
+ Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>,
+ Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Alex Williamson <alex.williamson@redhat.com>
+References: <20240826204353.2228736-1-peterx@redhat.com>
+ <20240826204353.2228736-7-peterx@redhat.com>
+ <9f9d7e96-b135-4830-b528-37418ae7bbfd@redhat.com> <Zs8zBT1aDh1v9Eje@x1n>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Carlos Bilbao <cbilbao@digitalocean.com>
-In-Reply-To: <CACGkMEvbc_4_KrnkZb-owH1moauntBmoKhHp1tsE5SL4RCMPog@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <Zs8zBT1aDh1v9Eje@x1n>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+> This one is correct; I overlooked this comment which can be obsolete.  I
+> can either refine this patch or add one patch on top to refine the comment
+> at least.
 
-On 8/26/24 9:07 PM, Jason Wang wrote:
-> On Tue, Aug 27, 2024 at 3:23 AM Carlos Bilbao <cbilbao@digitalocean.com> wrote:
->> Hello,
->>
->> On 8/26/24 10:53 AM, Dragos Tatulea wrote:
->>> On 26.08.24 16:26, Carlos Bilbao wrote:
->>>> Hello Dragos,
->>>>
->>>> On 8/26/24 4:06 AM, Dragos Tatulea wrote:
->>>>> On 23.08.24 18:54, Carlos Bilbao wrote:
->>>>>> Hello,
->>>>>>
->>>>>> I'm debugging my vDPA setup, and when using ioctl to retrieve the
->>>>>> configuration, I noticed that it's running in half duplex mode:
->>>>>>
->>>>>> Configuration data (24 bytes):
->>>>>>   MAC address: (Mac address)
->>>>>>   Status: 0x0001
->>>>>>   Max virtqueue pairs: 8
->>>>>>   MTU: 1500
->>>>>>   Speed: 0 Mb
->>>>>>   Duplex: Half Duplex
->>>>>>   RSS max key size: 0
->>>>>>   RSS max indirection table length: 0
->>>>>>   Supported hash types: 0x00000000
->>>>>>
->>>>>> I believe this might be contributing to the underperformance of vDPA.
->>>>> mlx5_vdpa vDPA devicess currently do not support the VIRTIO_NET_F_SPEED_DUPLEX
->>>>> feature which reports speed and duplex. You can check the state on the
->>>>> PF.
->>>> According to ethtool, all my devices are running at full duplex. I assume I
->>>> can disregard this configuration output from the module then.
->>>>
->>> Yep.
->>>
->>>>>> While looking into how to change this option for Mellanox, I read the following
->>>>>> kernel code in mlx5_vnet.c:
->>>>>>
->>>>>> static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
->>>>>>                  unsigned int len)
->>>>>> {
->>>>>>     /* not supported */
->>>>>> }
->>>>>>
->>>>>> I was wondering why this is the case.
->>>>> TBH, I don't know why it was not added. But in general, the control VQ is the
->>>>> better way as it's dynamic.
->>>>>
->>>>>> Is there another way for me to change
->>>>>> these configuration settings?
->>>>>>
->>>>> The configuration is done using control VQ for most things (MTU, MAC, VQs,
->>>>> etc). Make sure that you have the CTRL_VQ feature set (should be on by
->>>>> default). It should appear in `vdpa mgmtdev show` and `vdpa dev config
->>>>> show`.
->>>> I see that CTRL_VQ is indeed enabled. Is there any documentation on how to
->>>> use the control VQ to get/set vDPA configuration values?
->>>>
->>>>
->>> You are most likely using it already through through qemu. You can check
->>> if the CTR_VQ feature also shows up in the output of `vdpa dev config show`.
->>>
->>> What values are you trying to configure btw?
->>
->> Yes, CTRL_VQ also shows up in vdpa dev config show. There isn't a specific
->> value I want to configure ATM, but my vDPA isn't performing as expected, so
->> I'm investigating potential issues. Below is the code I used to retrieve
->> the configuration from the driver; I'd be happy to send it as a patch if
->> you or someone else reviews it.
->>
->>
->>> Thanks,
->>> Dragos
->>
->> Thanks,
->> Carlos
->>
->> ---
->>
->> From ab6ea66c926eaf1e95eb5d73bc23183e0021ee27 Mon Sep 17 00:00:00 2001
->> From: Carlos Bilbao <bilbao@vt.edu>
->> Date: Sat, 24 Aug 2024 00:24:56 +0000
->> Subject: [PATCH] mlx5: Add support to update the vDPA configuration
->>
->> This is needed for VHOST_VDPA_SET_CONFIG.
->>
->> Signed-off-by: Carlos Bilbao <cbilbao@digitalocean.com>
->> ---
->>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 22 ++++++++++++++++++++--
->>  1 file changed, 20 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> index b56aae3f7be3..da31c743b2b9 100644
->> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> @@ -2909,14 +2909,32 @@ static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset,
->>      struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
->>      struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
->>
->> -    if (offset + len <= sizeof(struct virtio_net_config))
->> +    if (offset + len <= sizeof(struct virtio_net_config)) {
->>          memcpy(buf, (u8 *)&ndev->config + offset, len);
->> +        }
->> +        else
->> +        {
->> +            printk(KERN_ERR "%s: Offset and length out of bounds\n",
->> +            __func__);
->> +        }
+Probably best if you use what you consider reasonable in your patch.
+
+> 
+>> +       if (IS_ENABLED(CONFIG_ARCH_HAS_PMD_SPECIAL)) {
+> 
+> We don't yet have CONFIG_ARCH_HAS_PMD_SPECIAL, but I get your point.
+> 
+>> +               if (likely(!pmd_special(pmd)))
+>> +                       goto check_pfn;
+>> +               if (vma->vm_ops && vma->vm_ops->find_special_page)
+>> +                       return vma->vm_ops->find_special_page(vma, addr);
+> 
+> Why do we ever need this?  This is so far destined to be totally a waste of
+> cycles.  I think it's better we leave that until either xen/gntdev.c or any
+> new driver start to use it, rather than keeping dead code around.
+
+I just copy-pasted what we had in vm_normal_page() to showcase. If not 
+required, good, we can add a comment we this is not required.
+
+> 
+>> +               if (vma->vm_flags & (VM_PFNMAP | VM_MIXEDMAP))
+>> +                       return NULL;
+>> +               if (is_huge_zero_pmd(pmd))
+>> +                       return NULL;
+> 
+> This is meaningless too until we make huge zero pmd apply special bit
+> first, which does sound like to be outside the scope of this series.
+
+Again, copy-paste, but ...
+
+> 
+>> +               if (pmd_devmap(pmd))
+>> +                       /* See vm_normal_page() */
+>> +                       return NULL;
+> 
+> When will it be pmd_devmap() if it's already pmd_special()?
+> 
+>> +               return NULL;
+> 
+> And see this one.. it's after:
+> 
+>    if (xxx)
+>        return NULL;
+>    if (yyy)
+>        return NULL;
+>    if (zzz)
+>        return NULL;
+>    return NULL;
+> 
+> Hmm??  If so, what's the difference if we simply check pmd_special and
+> return NULL..
+
+Yes, they all return NULL. The compiler likely optimizes it all out. 
+Maybe we have it like that for pure documentation purposes. But yeah, we 
+should simply return NULL and think about cleaning up vm_normal_page() 
+as well, it does look strange.
+
+> 
+>> +       }
 >> +
->>  }
->>
->>  static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
->>                   unsigned int len)
->>  {
->> -    /* not supported */
->> +    struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
->> +    struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
+>> +       /* !CONFIG_ARCH_HAS_PMD_SPECIAL case follows: */
 >> +
->> +    if (offset + len <= sizeof(struct virtio_net_config))
->> +    {
->> +        memcpy((u8 *)&ndev->config + offset, buf, len);
->> +    }
->> +    else
->> +    {
->> +        printk(KERN_ERR "%s: Offset and length out of bounds\n",
->> +        __func__);
->> +    }
->>  }
-> This should follow the virtio-spec, for modern virtio-net devices,
-> most of the fields are read only.
+>>          if (unlikely(vma->vm_flags & (VM_PFNMAP|VM_MIXEDMAP))) {
+>>                  if (vma->vm_flags & VM_MIXEDMAP) {
+>>                          if (!pfn_valid(pfn))
+>>                                  return NULL;
+>> +                       if (is_huge_zero_pmd(pmd))
+>> +                               return NULL;
+> 
+> I'd rather not touch here as this series doesn't change anything for
+> MIXEDMAP yet..
 
+Yes, that can be a separate change.
 
-From mlx5_vnet.c function mlx5v_probe:
-
-mgtdev->mgtdev.config_attr_mask = BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR) |
-                    BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MAX_VQP) |
-                    BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MTU) |
-                    BIT_ULL(VDPA_ATTR_DEV_FEATURES);
-
-Does this mean these are the fields that set_config can update? I'm a bit
-confused because, according to the virtio spec, I thought only speed and
-duplex were not read-only -- but I was also told updating them isn't
-supported by vDPA devices.
-
-
-> Thanks
->
->>  static u32 mlx5_vdpa_get_generation(struct vdpa_device *vdev)
->> --
->> 2.34.1
+> 
+>>                          goto out;
+>>                  } else {
+>>                          unsigned long off;
+>> @@ -692,6 +706,11 @@ struct page *vm_normal_page_pmd(struct vm_area_struct *vma, unsigned long addr,
+>>                  }
+>>          }
+>> +       /*
+>> +        * For historical reasons, these might not have pmd_special() set,
+>> +        * so we'll check them manually, in contrast to vm_normal_page().
+>> +        */
+>> +check_pfn:
+>>          if (pmd_devmap(pmd))
+>>                  return NULL;
+>>          if (is_huge_zero_pmd(pmd))
 >>
 >>
+>>
+>> We should then look into mapping huge zeropages also with pmd_special.
+>> pmd_devmap we'll leave alone until removed. But that's indeoendent of your series.
+> 
+> This does look reasonable to match what we do with pte zeropage.  Could you
+> remind me what might be the benefit when we switch to using special bit for
+> pmd zero pages?
 
-Thanks, Carlos
+See below. It's the way to tell the VM that a page is special, so you 
+can avoid a separate check at relevant places, like GUP-fast or in 
+vm_normal_*.
+
+> 
+>>
+>> I wonder if CONFIG_ARCH_HAS_PTE_SPECIAL is sufficient and we don't need additional
+>> CONFIG_ARCH_HAS_PMD_SPECIAL.
+> 
+> The hope is we can always reuse the bit in the pte to work the same for
+> pmd/pud.
+> 
+> Now we require arch to select ARCH_SUPPORTS_HUGE_PFNMAP to say "pmd/pud has
+> the same special bit defined".
+
+Note that pte_special() is the way to signalize to the VM that a PTE 
+does not reference a refcounted page, or is similarly special and shall 
+mostly be ignored. It doesn't imply that it is a PFNAMP pte, not at all.
+
+The shared zeropage is usually not refcounted (except during GUP 
+FOLL_GET ... but not FOLL_PIN) and the huge zeropage is usually also not 
+refcounted (but FOLL_PIN still does it). Both are special.
+
+
+If you take a look at the history pte_special(), it was introduced for 
+VM_MIXEDMAP handling on s390x, because pfn_valid() to identify "special" 
+pages did not work:
+
+commit 7e675137a8e1a4d45822746456dd389b65745bf6
+Author: Nicholas Piggin <npiggin@gmail.com>
+Date:   Mon Apr 28 02:13:00 2008 -0700
+
+     mm: introduce pte_special pte bit
+
+
+In the meantime, it's required for architectures that wants to support 
+GUP-fast I think, to make GUP-fast bail out and fallback to the slow 
+path where we do a vm_normal_page() -- or fail right at the VMA check 
+for now (VM_PFNMAP).
+
+An architecture that doesn't implement pte_special() can support pfnmaps 
+but not GUP-fast. Similarly, an architecture that doesn't implement 
+pmd_special() can support huge pfnmaps, but not GUP-fast.
+
+If you take a closer look, really the only two code paths that look at 
+pte_special() are GUP-fast and vm_normal_page().
+
+If we use pmd_special/pud_special in other code than that, we are 
+diverging from the pte_special() model, and are likely doing something 
+wrong.
+
+I see how you arrived at the current approach, focusing exclusively on 
+x86. But I think this just adds inconsistency.
+
+So my point is that we use the same model, where we limit
+
+* pmd_special() to GUP-fast and vm_normal_page_pmd()
+* pud_special() to GUP-fast and vm_normal_page_pud()
+
+And simply do the exact same thing as we do for pte_special().
+
+If an arch supports pmd_special() and pud_special() we can support both 
+types of hugepfn mappings. If not, an architecture *might* support it, 
+depending on support for GUP-fast and maybe depending on MIXEDMAP 
+support (again, just like pte_special()). Not your task to worry about, 
+you will only "unlock" x86.
+
+So maybe we do want CONFIG_ARCH_HAS_PMD_SPECIAL as well, maybe it can be 
+glued to CONFIG_ARCH_HAS_PTE_SPECIAL (but I'm afraid it can't unless all 
+archs support both). I'll leave that up to you.
+
+> 
+>>
+>> As I said, if you need someone to add vm_normal_page_pud(), I can handle that.
+> 
+> I'm pretty confused why we need that for this series alone.
+
+See above.
+
+> 
+> If you prefer vm_normal_page_pud() to be defined and check pud_special()
+> there, I can do that.  But again, I don't yet see how that can make a
+> functional difference considering the so far very limited usage of the
+> special bit, and wonder whether we can do that on top when it became
+> necessary (and when we start to have functional requirement of such).
+
+I hope my explanation why pte_special() even exists and how it is used 
+makes it clearer.
+
+It's not that much code to handle it like pte_special(), really. I don't 
+expect you to teach GUP-slow about vm_normal_page() etc.
+
+If you want me to just takeover some stuff, let me know.
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
