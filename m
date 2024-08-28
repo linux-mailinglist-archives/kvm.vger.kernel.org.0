@@ -1,177 +1,485 @@
-Return-Path: <kvm+bounces-25267-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25268-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8F5962C6F
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 17:32:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 754B4962C90
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 17:39:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D9F31F21F95
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 15:32:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC3521F25544
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 15:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D469A1A3BA1;
-	Wed, 28 Aug 2024 15:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Am8/4/ut"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5031A2560;
+	Wed, 28 Aug 2024 15:39:39 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7E018787E
-	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 15:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DE813C3D5;
+	Wed, 28 Aug 2024 15:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724859123; cv=none; b=BS2vIaUOxw6OSNwtBTooWrApVsx/htxjdQOBGQOvEv8adeqtftD6cmp8gWIvAfAg2ARe801bs1ntmQLe5W+2OO/KGM1QGvnz4vrfdtayCfKykRim9HKJspIJEtrd9Hlv0LwsMBBddwzuthd8TcTPLg7v6YXeTcXpF+WFzTtPDfw=
+	t=1724859579; cv=none; b=PeHskwIk3Ke7PIwqsTJjcJd0Dl6H54+cVn9a3/m77BvwyJ4o6U1tmh1BYRWvNZItNo40bcrhikFTazvy0L0/+PGEnvwNu1uGhN4zcyqqIXBY+C8uGMIW/k+WcZXMW5w/4bP565771PaFPxRqlnni7e/hk+g9QnG7eVfyS8g/KCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724859123; c=relaxed/simple;
-	bh=cghE+f372lAxAmhazy+b9N6LXvy27JUnSd5DypYyOj8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=prnCQQtT+7Mo2ugWemmVdsu1BIZVNr+whs/moRYtho1vqdYK0Zp+Uc4AsZZAvHqH28/eGg5F3Zi1aSDBZ7yCyAELQm56BUVPgGtojV7aMX38y0im6SM3lwOWUnWeuK+nZQeckM94FXx/MScbaOY+xqMaY4PcnZ3OQicAkJg0GOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Am8/4/ut; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724859120;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=a7t+GJr97EOxs8Z5xnxc5LoGdSJWBISe/+/VEH88G9A=;
-	b=Am8/4/utULuczTP5GpcvSLemU4Z2Wg/8QYzwm/mNiLf6naAdTpDSTuwFVzaU9bE+IioQ9P
-	pVuhLo5RHCTIpQQ5I6c8JUkNWfJYJ22eNbUqU4KYZpITPZVoddlKMjb6Pl4OvKzLIxYKtS
-	QZKNyeKxPnosyYd6ezR2pJ0hsLhkPuI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-329-HFornoLXOZ2b5zN4lVtmEw-1; Wed, 28 Aug 2024 11:31:56 -0400
-X-MC-Unique: HFornoLXOZ2b5zN4lVtmEw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37189fa7ad6so4980444f8f.0
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 08:31:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724859115; x=1725463915;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=a7t+GJr97EOxs8Z5xnxc5LoGdSJWBISe/+/VEH88G9A=;
-        b=QRBfhNl2EiN3OJ3jRK+0FCjbcIEWP5LjewZZutU13a19pWY1KfPDC8GHBpUawmn2oi
-         /vIriq46d3uysu2F4j12pRprwl0hkfJJsJGLNsIObqNNeYwPgpJ8ZBosDxKnRcqDOjas
-         sKJccUD0OilsD4OkbqmjU1tTNrqI8sfb5WuBUeHO8965XtEsjlL1K/R6BjlXFvk6C/pa
-         EP7wdRw3V7Ha1DPRj4HNp662dhUYgu69/HwMYc4XM+nZiz1Gb8tOO3935ccOnrHdoN1F
-         Gi5vJ17MH++HcXiTXcecVwuGfQTOjEnbxPjSl6LxtIVhIGacxCzhR5AYW6NCo7bcIaRs
-         lTXg==
-X-Forwarded-Encrypted: i=1; AJvYcCUX3ttFrh+Pe/7k2TbCOG9DpsktNLpBNXpSyYEk6xhuaoUJZN0rZfPQfrj0ijRnhiyg0Rc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP1R0uqyLgGsiVTCq+LidmcntjGJ+aOheoKqj7dHMftjlw71YE
-	uonYnax81/YBgSq3ExoAVyqt2oeN53Gv3gUvXOcE0SzI8O86EO5ozhpMqA/4KJv4cs5h8H7y4Yx
-	m8wGJ8OqDNKIXtU+4vfEcNICrYFWH9l/tDfrlEvrSt+3WlqZUtQ==
-X-Received: by 2002:adf:a458:0:b0:368:7943:8b1f with SMTP id ffacd0b85a97d-373118c8a0fmr13450068f8f.43.1724859115030;
-        Wed, 28 Aug 2024 08:31:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGnKvH/I43gd6WSEZerf5YHGvpr5FI/L9/NXPKbC53cPdMtG6fH5U5Bf1pxSxGEY0t2dZLbaw==
-X-Received: by 2002:adf:a458:0:b0:368:7943:8b1f with SMTP id ffacd0b85a97d-373118c8a0fmr13450011f8f.43.1724859114132;
-        Wed, 28 Aug 2024 08:31:54 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c706:1700:6b81:27cb:c9e2:a09a? (p200300cbc70617006b8127cbc9e2a09a.dip0.t-ipconnect.de. [2003:cb:c706:1700:6b81:27cb:c9e2:a09a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749b22da7dsm94393f8f.7.2024.08.28.08.31.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 08:31:53 -0700 (PDT)
-Message-ID: <93850b27-d063-4783-b940-8aef8d5abe1e@redhat.com>
-Date: Wed, 28 Aug 2024 17:31:52 +0200
+	s=arc-20240116; t=1724859579; c=relaxed/simple;
+	bh=xbdydoh2u22vINByRrRMIya2lqnh9w4150zXJqURBUw=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OMq2Uv3WDywh7xtz9dX0IEiW4E7YJ9v81bWMRLNGwT9vFQCeo9uH0qIP6yHTlftZwhZ0qKHMKs6Nrv2DYhw0ZirZGVQWmsWDuUkvhiHnXJqBMcrXVx0KDXaQ6jWLaFVlTbVeYi3DMLdAfufC0fBMtcwrondRe6/omGT7XADpAvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wv7mZ3bWYz6K99Y;
+	Wed, 28 Aug 2024 23:36:14 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 236191400D4;
+	Wed, 28 Aug 2024 23:39:33 +0800 (CST)
+Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 28 Aug
+ 2024 16:39:32 +0100
+Date: Wed, 28 Aug 2024 16:39:31 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Alexey Kardashevskiy <aik@amd.com>
+CC: <kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
+	<linux-coco@lists.linux.dev>, <linux-pci@vger.kernel.org>, "Suravee
+ Suthikulpanit" <suravee.suthikulpanit@amd.com>, Alex Williamson
+	<alex.williamson@redhat.com>, Dan Williams <dan.j.williams@intel.com>,
+	<pratikrajesh.sampat@amd.com>, <michael.day@amd.com>, <david.kaplan@amd.com>,
+	<dhaval.giani@amd.com>, Santosh Shukla <santosh.shukla@amd.com>, Tom Lendacky
+	<thomas.lendacky@amd.com>, "Michael Roth" <michael.roth@amd.com>, Alexander
+ Graf <agraf@suse.de>, "Nikunj A Dadhania" <nikunj@amd.com>, Vasant Hegde
+	<vasant.hegde@amd.com>, "Lukas Wunner" <lukas@wunner.de>
+Subject: Re: [RFC PATCH 08/21] crypto/ccp: Implement SEV TIO firmware
+ interface
+Message-ID: <20240828163931.0000673b@Huawei.com>
+In-Reply-To: <20240823132137.336874-9-aik@amd.com>
+References: <20240823132137.336874-1-aik@amd.com>
+	<20240823132137.336874-9-aik@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/19] mm: Allow THP orders for PFNMAPs
-To: Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-Cc: Gavin Shan <gshan@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
- x86@kernel.org, Ingo Molnar <mingo@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Alistair Popple <apopple@nvidia.com>,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Sean Christopherson <seanjc@google.com>, Oscar Salvador <osalvador@suse.de>,
- Jason Gunthorpe <jgg@nvidia.com>, Borislav Petkov <bp@alien8.de>,
- Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>,
- Kefeng Wang <wangkefeng.wang@huawei.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Matthew Wilcox <willy@infradead.org>, Ryan Roberts <ryan.roberts@arm.com>
-References: <20240826204353.2228736-1-peterx@redhat.com>
- <20240826204353.2228736-5-peterx@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240826204353.2228736-5-peterx@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On 26.08.24 22:43, Peter Xu wrote:
-> This enables PFNMAPs to be mapped at either pmd/pud layers.  Generalize the
-> dax case into vma_is_special_huge() so as to cover both.  Meanwhile, rename
-> the macro to THP_ORDERS_ALL_SPECIAL.
+On Fri, 23 Aug 2024 23:21:22 +1000
+Alexey Kardashevskiy <aik@amd.com> wrote:
+
+> Implement SEV TIO PSP command wrappers in sev-dev-tio.c, these make
+> SPDM calls and store the data in the SEV-TIO-specific structs.
 > 
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Gavin Shan <gshan@redhat.com>
-> Cc: Ryan Roberts <ryan.roberts@arm.com>
-> Cc: David Hildenbrand <david@redhat.com>
-> Cc: Zi Yan <ziy@nvidia.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> Implement tsm_ops for the hypervisor, the TSM module will call these
+> when loaded on the host and its tsm_set_ops() is called. The HV ops
+> are implemented in sev-dev-tsm.c.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+Superficial comments online inline.
+
+Jonathan
+
 > ---
+>  drivers/crypto/ccp/Makefile      |    2 +
+>  arch/x86/include/asm/sev.h       |   20 +
+>  drivers/crypto/ccp/sev-dev-tio.h |  105 ++
+>  drivers/crypto/ccp/sev-dev.h     |    2 +
+>  include/linux/psp-sev.h          |   60 +
+>  drivers/crypto/ccp/sev-dev-tio.c | 1565 ++++++++++++++++++++
+>  drivers/crypto/ccp/sev-dev-tsm.c |  397 +++++
+>  drivers/crypto/ccp/sev-dev.c     |   10 +-
+>  8 files changed, 2159 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+> index 394484929dae..d9871465dd08 100644
+> --- a/drivers/crypto/ccp/Makefile
+> +++ b/drivers/crypto/ccp/Makefile
+> @@ -11,6 +11,8 @@ ccp-$(CONFIG_PCI) += sp-pci.o
+>  ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o \
+>                                     sev-dev.o \
+>                                     tee-dev.o \
+> +				   sev-dev-tio.o \
+> +				   sev-dev-tsm.o \
+spaces vs tabs. I guess go for consistency.
 
-Acked-by: David Hildenbrand <david@redhat.com>
+>                                     platform-access.o \
+>                                     dbc.o \
+>                                     hsti.o
 
--- 
-Cheers,
+> diff --git a/drivers/crypto/ccp/sev-dev-tio.c b/drivers/crypto/ccp/sev-dev-tio.c
+> new file mode 100644
+> index 000000000000..42741b17c747
+> --- /dev/null
+> +++ b/drivers/crypto/ccp/sev-dev-tio.c
+> @@ -0,0 +1,1565 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
 
-David / dhildenb
+> +static size_t sla_dobj_id_to_size(u8 id)
+> +{
+> +	size_t n;
+> +
+> +	BUILD_BUG_ON(sizeof(struct spdm_dobj_hdr_resp) != 0x10);
+> +	switch (id) {
+> +	case SPDM_DOBJ_ID_REQ:
+> +		n = sizeof(struct spdm_dobj_hdr_req);
+> +		break;
+> +	case SPDM_DOBJ_ID_RESP:
+> +		n = sizeof(struct spdm_dobj_hdr_resp);
+> +		break;
+> +	case SPDM_DOBJ_ID_CERTIFICATE:
+> +		n = sizeof(struct spdm_dobj_hdr_cert);
+> +		break;
+> +	case SPDM_DOBJ_ID_MEASUREMENT:
+> +		n = sizeof(struct spdm_dobj_hdr_meas);
+> +		break;
+> +	case SPDM_DOBJ_ID_REPORT:
+> +		n = sizeof(struct spdm_dobj_hdr_report);
+> +		break;
+> +	default:
+> +		WARN_ON(1);
+> +		n = 0;
+> +		break;
+> +	}
+> +
+> +	return n;
+
+Early returns will make this more readable.
+
+> +}
+
+
+> +/**
+> + * struct sev_data_tio_dev_connect - TIO_DEV_CONNECT
+> + *
+> + * @length: Length in bytes of this command buffer.
+> + * @spdm_ctrl: SPDM control structure defined in Section 5.1.
+> + * @device_id: The PCIe Routing Identifier of the device to connect to.
+> + * @root_port_id: The PCIe Routing Identifier of the root port of the device.
+> + * @segment_id: The PCIe Segment Identifier of the device to connect to.
+
+Doesn't seem to be there.
+
+> + * @dev_ctx_sla: Scatter list address of the device context buffer.
+> + * @tc_mask: Bitmask of the traffic classes to initialize for SEV-TIO usage.
+> + *           Setting the kth bit of the TC_MASK to 1 indicates that the traffic
+> + *           class k will be initialized.
+> + * @cert_slot: Slot number of the certificate requested for constructing the SPDM session.
+> + * @ide_stream_id: IDE stream IDs to be associated with this device.
+> + *                 Valid only if corresponding bit in TC_MASK is set.
+> + */
+> +struct sev_data_tio_dev_connect {
+> +	u32 length;
+> +	u32 reserved1;
+> +	struct spdm_ctrl spdm_ctrl;
+> +	u8 reserved2[8];
+> +	struct sla_addr_t dev_ctx_sla;
+> +	u8 tc_mask;
+> +	u8 cert_slot;
+> +	u8 reserved3[6];
+> +	u8 ide_stream_id[8];
+> +	u8 reserved4[8];
+> +} __packed;
+> +
+
+
+> +/**
+> + * struct sev_data_tio_guest_request - TIO_GUEST_REQUEST command
+> + *
+> + * @length: Length in bytes of this command buffer
+> + * @spdm_ctrl: SPDM control structure defined in Chapter 2.
+
+Some more fields that aren't documented.  They all should be for
+kernel-doc or the scripts will moan. 
+I'd just run the script and fixup all the warnings and errors.
+
+
+> + * @gctx_paddr: system physical address of guest context page
+> + * @tdi_ctx_paddr: SPA of page donated by hypervisor
+> + * @req_paddr: system physical address of request page
+> + * @res_paddr: system physical address of response page
+> + */
+> +struct sev_data_tio_guest_request {
+> +	u32 length;				/* In */
+> +	u32 reserved;
+> +	struct spdm_ctrl spdm_ctrl;		/* In */
+> +	struct sla_addr_t dev_ctx_sla;
+> +	struct sla_addr_t tdi_ctx_sla;
+> +	u64 gctx_paddr;
+> +	u64 req_paddr;				/* In */
+> +	u64 res_paddr;				/* In */
+> +} __packed;
+> +
+
+
+
+> +int sev_tio_tdi_status(struct tsm_dev_tio *dev_data, struct tsm_tdi_tio *tdi_data,
+> +		       struct tsm_spdm *spdm)
+> +{
+> +	struct sev_tio_tdi_status_data *data = (struct sev_tio_tdi_status_data *) dev_data->data;
+> +	struct sev_data_tio_tdi_status status = {
+> +		.length = sizeof(status),
+> +		.dev_ctx_sla = dev_data->dev_ctx,
+> +		.tdi_ctx_sla = tdi_data->tdi_ctx,
+> +	};
+> +	int ret;
+> +
+> +	if (IS_SLA_NULL(dev_data->dev_ctx) || IS_SLA_NULL(tdi_data->tdi_ctx))
+> +		return -ENXIO;
+> +
+> +	memset(data, 0, sizeof(*data));
+> +
+> +	spdm_ctrl_init(spdm, &status.spdm_ctrl, dev_data);
+> +	status.status_paddr = __psp_pa(data);
+> +
+> +	ret = sev_tio_do_cmd(SEV_CMD_TIO_TDI_STATUS, &status, sizeof(status),
+> +			     &dev_data->psp_ret, dev_data, spdm);
+> +
+> +	return ret;
+
+return sev_tio_do_cmd()
+
+Same in other similar cases.
+
+> +}
+
+
+> diff --git a/drivers/crypto/ccp/sev-dev-tsm.c b/drivers/crypto/ccp/sev-dev-tsm.c
+> new file mode 100644
+> index 000000000000..a11dea482d4b
+> --- /dev/null
+> +++ b/drivers/crypto/ccp/sev-dev-tsm.c
+> @@ -0,0 +1,397 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +// Interface to CCP/SEV-TIO for generic PCIe TDISP module
+> +
+> +#include <linux/pci.h>
+> +#include <linux/pci-doe.h>
+> +#include <linux/tsm.h>
+> +
+> +#include <linux/smp.h>
+> +#include <asm/sev-common.h>
+> +
+> +#include "psp-dev.h"
+> +#include "sev-dev.h"
+> +#include "sev-dev-tio.h"
+> +
+> +static int mkret(int ret, struct tsm_dev_tio *dev_data)
+> +{
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (dev_data->psp_ret == SEV_RET_SUCCESS)
+> +		return 0;
+> +
+> +	pr_err("PSP returned an error %d\n", dev_data->psp_ret);
+I'm not totally convinced this is worth while vs simply checking
+at call sites.
+
+> +	return -EINVAL;
+> +}
+> +
+> +static int dev_connect(struct tsm_dev *tdev, void *private_data)
+> +{
+> +	u16 device_id = pci_dev_id(tdev->pdev);
+> +	u16 root_port_id = 0; // FIXME: this is NOT PCI id, need to figure out how to calculate this
+> +	u8 segment_id = tdev->pdev->bus ? pci_domain_nr(tdev->pdev->bus) : 0;
+> +	struct tsm_dev_tio *dev_data = tdev->data;
+> +	int ret;
+> +
+> +	if (!dev_data) {
+> +		dev_data = kzalloc(sizeof(*dev_data), GFP_KERNEL);
+> +		if (!dev_data)
+> +			return -ENOMEM;
+> +
+> +		ret = sev_tio_dev_create(dev_data, device_id, root_port_id, segment_id);
+> +		if (ret)
+> +			goto free_exit;
+> +
+> +		tdev->data = dev_data;
+> +	}
+...
+
+> +
+> +free_exit:
+> +	sev_tio_dev_reclaim(dev_data, &tdev->spdm);
+> +	kfree(dev_data);
+
+Correct to free even if not allocated here?
+Perhaps a comment if so.
+
+> +
+> +	return ret;
+> +}
+> +
+
+
+> +static int ide_refresh(struct tsm_dev *tdev, void *private_data)
+> +{
+> +	struct tsm_dev_tio *dev_data = tdev->data;
+> +	int ret;
+> +
+> +	if (!dev_data)
+> +		return -ENODEV;
+> +
+> +	ret = sev_tio_ide_refresh(dev_data, &tdev->spdm);
+> +
+> +	return ret;
+
+	return sev_tio_ide_refresh()
+
+> +}
+
+> +
+> +static int tdi_create(struct tsm_tdi *tdi)
+> +{
+> +	struct tsm_tdi_tio *tdi_data = tdi->data;
+> +	int ret;
+> +
+> +	if (tdi_data)
+> +		return -EBUSY;
+> +
+> +	tdi_data = kzalloc(sizeof(*tdi_data), GFP_KERNEL);
+> +	if (!tdi_data)
+> +		return -ENOMEM;
+> +
+> +	ret = sev_tio_tdi_create(tdi->tdev->data, tdi_data, pci_dev_id(tdi->pdev),
+> +				 tdi->rseg, tdi->rseg_valid);
+> +	if (ret)
+> +		kfree(tdi_data);
+	if (ret) {
+		kfree(tdi_data);
+		return ret;
+	}
+
+	tid->data = tdi_data;
+
+	return 0;
+
+is slightly longer but a more standard form so easier to review.
+
+> +	else
+> +		tdi->data = tdi_data;
+> +
+> +	return ret;
+> +}
+> +
+
+> +
+> +static int guest_request(struct tsm_tdi *tdi, u32 guest_rid, u64 kvmid, void *req_data,
+
+Probably wrap nearer 80 chars.
+
+> +			 enum tsm_tdisp_state *state, void *private_data)
+> +{
+> +	struct tsm_dev_tio *dev_data = tdi->tdev->data;
+> +	struct tio_guest_request *req = req_data;
+> +	int ret;
+> +
+> +	if (!tdi->data)
+> +		return -EFAULT;
+> +
+> +	if (dev_data->cmd == 0) {
+> +		ret = sev_tio_guest_request(&req->data, guest_rid, kvmid,
+> +					    dev_data, tdi->data, &tdi->tdev->spdm);
+> +		req->fw_err = dev_data->psp_ret;
+
+If the above returned an error is psp_ret always set? I think not.
+So maybe separate if (ret) condition, then set this and finally call
+the code below.
+
+> +		ret = mkret(ret, dev_data);
+> +		if (ret > 0)
+> +			return ret;
+> +	} else if (dev_data->cmd == SEV_CMD_TIO_GUEST_REQUEST) {
+> +		ret = sev_tio_continue(dev_data, &tdi->tdev->spdm);
+> +		ret = mkret(ret, dev_data);
+> +		if (ret > 0)
+> +			return ret;
+> +	}
+> +
+> +	if (dev_data->cmd == 0 && state) {
+> +		ret = sev_tio_tdi_status(tdi->tdev->data, tdi->data, &tdi->tdev->spdm);
+> +		ret = mkret(ret, dev_data);
+> +		if (ret > 0)
+> +			return ret;
+> +	} else if (dev_data->cmd == SEV_CMD_TIO_TDI_STATUS) {
+> +		ret = sev_tio_continue(dev_data, &tdi->tdev->spdm);
+> +		ret = mkret(ret, dev_data);
+> +		if (ret > 0)
+> +			return ret;
+> +
+> +		ret = sev_tio_tdi_status_fin(tdi->tdev->data, tdi->data, state);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int tdi_status(struct tsm_tdi *tdi, void *private_data, struct tsm_tdi_status *ts)
+> +{
+> +	struct tsm_dev_tio *dev_data = tdi->tdev->data;
+> +	int ret;
+> +
+> +	if (!tdi->data)
+> +		return -ENODEV;
+> +
+> +#if 0 /* Not implemented yet */
+> +	if (dev_data->cmd == 0) {
+> +		ret = sev_tio_tdi_info(tdi->tdev->data, tdi->data, ts);
+> +		ret = mkret(ret, dev_data);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +#endif
+> +
+> +	if (dev_data->cmd == 0) {
+> +		ret = sev_tio_tdi_status(tdi->tdev->data, tdi->data, &tdi->tdev->spdm);
+> +		ret = mkret(ret, dev_data);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret = sev_tio_tdi_status_fin(tdi->tdev->data, tdi->data, &ts->state);
+
+Given code as it stands. Might as well return here.
+
+> +	} else if (dev_data->cmd == SEV_CMD_TIO_TDI_STATUS) {
+Making this just an if.
+
+> +		ret = sev_tio_continue(dev_data, &tdi->tdev->spdm);
+> +		ret = mkret(ret, dev_data);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret = sev_tio_tdi_status_fin(tdi->tdev->data, tdi->data, &ts->state);
+and here.
+
+> +	} else {
+
+Making this the inline code as no need for else.
+
+> +		pci_err(tdi->pdev, "Wrong state, cmd 0x%x in flight\n",
+> +			dev_data->cmd);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +struct tsm_ops sev_tsm_ops = {
+> +	.dev_connect = dev_connect,
+> +	.dev_reclaim = dev_reclaim,
+> +	.dev_status = dev_status,
+> +	.ide_refresh = ide_refresh,
+> +	.tdi_bind = tdi_bind,
+> +	.tdi_reclaim = tdi_reclaim,
+> +	.guest_request = guest_request,
+> +	.tdi_status = tdi_status,
+> +};
+
 
 
