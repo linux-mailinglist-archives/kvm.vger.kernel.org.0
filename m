@@ -1,135 +1,114 @@
-Return-Path: <kvm+bounces-25237-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25238-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D7EB9623EC
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 11:50:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6827C96242B
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 11:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FF781C23CAB
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 09:50:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25CD8287756
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 09:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCFD166F34;
-	Wed, 28 Aug 2024 09:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902F516B392;
+	Wed, 28 Aug 2024 09:57:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="jmG1sPeq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cLX516xz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBDE1547F2;
-	Wed, 28 Aug 2024 09:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3161A166F3A
+	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 09:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724838601; cv=none; b=oACtmsz+QVmpye4RmTL/5a5pMcsxF+AsJZjI1mh977CHPJ1SMeLpAsoj/+w7q6lHdCRcChxyzpiaUpBgGJFfYol/B93iqbhpjGy6ikR63WmGKX36jHicZiK+ISHPnKTIZsjakyVnYa9E58itVb1MtRDpRiuj4AbcaKYH/Ecg0MA=
+	t=1724839028; cv=none; b=lwVMFZm+YV5oKUMhEclzVB+yqIndwUtnQKnjhU08hhi2hfSuVV4YnW/6Mqtru/DKZcYwHFoPtPqoKbbreBy4e+HlX4U0FTU/wgtCuRq39mHIorEPlp4LXWx1R3IRIkcOu/E/6DcRRExvZ0FESvulKaGiTFGlSD5+wQ+fHfCGO5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724838601; c=relaxed/simple;
-	bh=yI8UGtDeDzq0ejW8pdr/qL9ax7t3BWnl+/WBFqgMGcU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OpsSR0O/zEF/6C/on3VP1aMDj7IQNwpRJMfcMjp5LPC0ZSj3vdTANA8q+ak1Jgzt9CR0fHP1ob9p7IEEcUDvD/bBdsor6HyaftVVbX7GGithwoXz2bE6i1uAifmmXIsM/5pgJAHQ7DqeSruGtJWNCrKtxPrRHI88scOyc1aVgk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=jmG1sPeq; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3B65D40E0169;
-	Wed, 28 Aug 2024 09:49:55 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id fs9lpMNWbvlK; Wed, 28 Aug 2024 09:49:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1724838590; bh=YvhPqudcoWPR0qgKjwOwmAY5MUaGOhjFnDWRorh3R24=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jmG1sPeqgZEqwW9gdYGJtbbQhlI9DPC2kDHs3DrhwvSdlsVaKfiKQfey1bVMfr78v
-	 TrmTAkuvvVEwqyHs+5u5pZqes1ouDQzQJkKeAzv1tiqqJxoP7m2wwtsu1tS/I7XNZv
-	 cHycddpT6IzEt+lp1QiX6pElAqN8R0wgI3lGM2NElYUQyp8n5GhqnG06y7EYOOAFt4
-	 GTzpCJUM97UfE6bk7K4+R6ALajym6uecwu4dFCVMFyZ8EF3cepc30hWL4PhBofKEVJ
-	 tl8GeNqooxyDv9h/VmMoX5mV1f85OpT8mBLAXFDBxmDiWCrbnhUx7ODtb82OKSDhOj
-	 bO3u+VCxgjKzATTW0o00TBVIEx6PW0ubnCZ5IcGncFBSzlmUkRFYTiFkheA92rz4ig
-	 Dauqo+YPPE2F/D/uSXfQ2AN/tEWUmtR9Vy88aOLWlVT4Uzdljl2QjoibN/RSjhdDwn
-	 RE+mbRZVChM1MB7AvccRnXJDNaqkELVPE2NS7b34N+DfLfPGRqZrNfp3qg6wnUVXte
-	 RtEaT8G2w45U6ytnfCS6Qyjh2yqSxRiFn0RAxhXRHwSQ8/mw3R50Ece0syzM861gQc
-	 rddoWF7Sib9F/xzhsiPVUX5eL4IxARtvEbiQ4rBbPBF0vBminszqY0x13gMQ7Tp0dy
-	 mkSkhlO9+BeJugnSVal3Yq64=
-Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BC9C340E01C5;
-	Wed, 28 Aug 2024 09:49:39 +0000 (UTC)
-Date: Wed, 28 Aug 2024 11:49:33 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v11 06/20] x86/sev: Handle failures from snp_init()
-Message-ID: <20240828094933.GAZs7yrbCHDJUeUWys@fat_crate.local>
-References: <20240731150811.156771-1-nikunj@amd.com>
- <20240731150811.156771-7-nikunj@amd.com>
- <20240827113227.GAZs25S8Ubep1CDYr8@fat_crate.local>
- <5b62f751-668f-714e-24a2-6bbc188c3ce8@amd.com>
+	s=arc-20240116; t=1724839028; c=relaxed/simple;
+	bh=LEy74Zw656dYSfiYEALOoHeYXujRIcOuH5SYkYP9nO0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s1lxWwwzkgYjV7n9/8HmDPuMwP4miuS7hqZDd07186zzlKP/zN8AvVR7EX47TLSrJPk0SUN13VvQ8n6UfATIcMY1pWwGynC3o0i5sx0A6mt2gtPfYo4adn2r4otuQTw1ECUf6ZLH8C6by6xwG+cLmDZi8t0YBAgH2uFBlbtnkOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cLX516xz; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-45654a915c3so16393031cf.1
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 02:57:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724839026; x=1725443826; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/w01ATfQ5iFSe5b+Ys5UtncabpXCouoyZAmSsqQh8mI=;
+        b=cLX516xzvE3CBMz4tbs7M2u1Iairn6uGkA6HEuzhK22tvcFewLbk9Yq6HEkML/Buc7
+         ENFIzvtvDJukwlW2hK04PeCSfFoU/MhMan6AfHWrXQE8+N4Fv05qo3p3xjEkdCJxCjSM
+         hpMc9PN4dBgTD98n1OBdTDDp18hKN5kcFxXks2kb8R7a6be/E5PrfA4+fF/1O5BuBZaH
+         pDj6wPDmUKGNR1ah3rd1MUOt5hAB7/HeWZV5yTn37VRCvopiUIyeU/CXMKVVFP5aDHLU
+         88vqbfyUiS8hR4V6K38pb7i3xfFGsnpTlkqKA4ybJ9lPB7yIvUBiOreAzfcioiKKlRSZ
+         EzqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724839026; x=1725443826;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/w01ATfQ5iFSe5b+Ys5UtncabpXCouoyZAmSsqQh8mI=;
+        b=ERrHuaYTpJro/ZnDh95XzYvxVF+8JW6+C6J+knJ/f37HCHCBHn34actMhaAaYk8GLy
+         QveqSnYHTgJ/Xdam07d/R0eiQYDvTgWx6ttZ6xZkc5iYbQqwOg3v/XJB7u8Qyd7ET9Ft
+         lbbI1QIBXMNyO6kANyCi4OEHe8f5GKqks/kCM/DzKToyyEy+UXhOCukMEEZl5ovDRfk+
+         cKRqtkjw1D+pMfz3eOXgciCpRlqvlQhW7EzRDoIYtvB2CBN62nGLN7xynec1xOhibHWm
+         tlW1AOqzksQ19RZL49r4QnOMNrbhhrPvYBtam9++W0fcvgfKs20ufNHakwDwuHDIIX+O
+         VWpA==
+X-Forwarded-Encrypted: i=1; AJvYcCW5xBzy+jZ4Mrc18zxEwNz7ne7xbkHq84JRxCFh1j+GlVamgctyQh71nlmKo/mo+Cj5iB0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS+14+gSptsSAwKojeHgonviUz7njqpmQLPL9e/a8SvPTiDnmG
+	kCykYp0zdbxgz0tsavTwMyxz43OLgumg+K69lWFcChJOjglfTILy7XdFcRLJT/No1AdTezCQIy5
+	J/l7eO+Ky0z2iqFV66RpRmk+O91GBgyUj5xy0
+X-Google-Smtp-Source: AGHT+IG755zhUmVaoZLR2dVE41e3w369EHxX+Xgc4offEnaxg3I9YM9h/fuYa94K8JqvIpoiiQBIzEUXugHQz/G1RHM=
+X-Received: by 2002:a05:622a:1f14:b0:44f:f06a:d6f5 with SMTP id
+ d75a77b69052e-4566e62d7c7mr15550821cf.36.1724839025818; Wed, 28 Aug 2024
+ 02:57:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5b62f751-668f-714e-24a2-6bbc188c3ce8@amd.com>
+References: <20240820043543.837914-1-suleiman@google.com> <20240820043543.837914-3-suleiman@google.com>
+In-Reply-To: <20240820043543.837914-3-suleiman@google.com>
+From: Suleiman Souhlal <suleiman@google.com>
+Date: Wed, 28 Aug 2024 18:56:54 +0900
+Message-ID: <CABCjUKAx7Q6BYqffVC=vUteeNEdjdtX7a45OP4FSGH7p5h23oA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] KVM: x86: Include host suspended time in steal time.
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, ssouhlal@freebsd.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 28, 2024 at 10:17:57AM +0530, Nikunj A. Dadhania wrote:
-> +	if ((snp && !snp_enabled) ||
-> +	    (!snp && snp_enabled))
->  		snp_abort();
+On Tue, Aug 20, 2024 at 1:38=E2=80=AFPM Suleiman Souhlal <suleiman@google.c=
+om> wrote:
+> @@ -3735,6 +3735,14 @@ static void record_steal_time(struct kvm_vcpu *vcp=
+u)
+>         steal +=3D current->sched_info.run_delay -
+>                 vcpu->arch.st.last_steal;
+>         vcpu->arch.st.last_steal =3D current->sched_info.run_delay;
+> +       /*
+> +        * Include the time that the host was suspended in steal time.
+> +        * Note that the case of a suspend happening during a VM migratio=
+n
+> +        * might not be accounted.
+> +        */
+> +       suspend_ns =3D kvm_total_suspend_ns();
+> +       steal +=3D suspend_ns - vcpu->arch.st.last_suspend_ns;
+> +       vcpu->arch.st.last_suspend_ns =3D suspend_ns;
+>         unsafe_put_user(steal, &st->steal, out);
+>
+>         version +=3D 1;
 
-And which boolean function is that?
+There is an issue here: We are calling a function under UACCESS, which
+raises an objtool warning.
+I'll be sending a v3 with that addressed (and the function return
+value wrapping in patch 1/3).
 
-diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
-index e83b363c5e68..706cb59851b0 100644
---- a/arch/x86/mm/mem_encrypt_identity.c
-+++ b/arch/x86/mm/mem_encrypt_identity.c
-@@ -495,10 +495,10 @@ void __head sme_enable(struct boot_params *bp)
- 	unsigned int eax, ebx, ecx, edx;
- 	unsigned long feature_mask;
- 	unsigned long me_mask;
--	bool snp;
-+	bool snp_en;
- 	u64 msr;
- 
--	snp = snp_init(bp);
-+	snp_en = snp_init(bp);
- 
- 	/* Check for the SME/SEV support leaf */
- 	eax = 0x80000000;
-@@ -531,15 +531,11 @@ void __head sme_enable(struct boot_params *bp)
- 	RIP_REL_REF(sev_status) = msr = __rdmsr(MSR_AMD64_SEV);
- 	feature_mask = (msr & MSR_AMD64_SEV_ENABLED) ? AMD_SEV_BIT : AMD_SME_BIT;
- 
--	/* The SEV-SNP CC blob should never be present unless SEV-SNP is enabled. */
--	if (snp && !(msr & MSR_AMD64_SEV_SNP_ENABLED))
--		snp_abort();
--
- 	/*
--	 * The SEV-SNP CC blob should be present and parsing CC blob should
--	 * succeed when SEV-SNP is enabled.
-+	 * Any discrepancies between the presence of a CC blob and SNP
-+	 * enablement abort the guest.
- 	 */
--	if (!snp && (msr & MSR_AMD64_SEV_SNP_ENABLED))
-+	if (snp_en ^ (msr & MSR_AMD64_SEV_SNP_ENABLED))
- 		snp_abort();
- 
- 	/* Check if memory encryption is enabled */
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+-- Suleiman
 
