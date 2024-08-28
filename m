@@ -1,56 +1,56 @@
-Return-Path: <kvm+bounces-25273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25274-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADDC1962D8C
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 18:22:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAD0A962D8D
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 18:22:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AA702868DF
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 16:22:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34819B2197D
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 16:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6731A4B82;
-	Wed, 28 Aug 2024 16:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDA41A4F16;
+	Wed, 28 Aug 2024 16:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UXhT3XsJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BYHqWJjT"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70611A3BA0
-	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 16:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E9F1A4B70
+	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 16:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724862131; cv=none; b=im1Q8BYd2ZtfBB5j322T+hMPLuy82IJQmWy+w1E8tLJXwQwuh+bYL/ueswbfvNBqkEGPu9KR24r5IdqLPL7GfIKRuGv77PpyEmOPWW/O5bbbAOwh7iT1Nw4fYTInYe6GH+ZRHUfGbLFE6TdlAzrpjm/XnOF22KnND/D2R+SNFt4=
+	t=1724862134; cv=none; b=MKJkoZNQPtpzCle2v7SLEthITmxtg2+bpjaP2t9sep5naaV+Gc36b862tkxAL4iil2Hfd7kcQlElO1RE/P+hRU6ka+uiaHXWPJXPP3PwgFx93Rl2S3tJFDfCIkl4nkSvJfhK2UXl7mK4uQnfLjh+ii3jp0tbN+StGIttPdmy2O4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724862131; c=relaxed/simple;
-	bh=fuoEwOpVumRo8h+UC3R1unaQWJs7YIQYRjDaAgU3tK4=;
+	s=arc-20240116; t=1724862134; c=relaxed/simple;
+	bh=F2DpSpMD1QNHoM5DzFDACUVb55Fqil98VN1tTLFGdNQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KJmKbWPGdJi8rio3hIGACkFBqH3i72J1fsUGPvyAPe0/NCCJTJCLqeZaBiz/OQgSXgfTCulE3mrRGPt+ZsJSIRiF0A2tdshrhASER/yjmpEfcQP9AL9AkmNN+WKgQOQ62IdH/K4Ox0kfULp6xxXwXr2Vgd+3bIi0t/kUf+yV8WA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UXhT3XsJ; arc=none smtp.client-ip=91.218.175.186
+	 MIME-Version; b=Q8Tei24uAm8NaRIVCxa94eWNhq8Dc0rQkr1agEWScroF9j1WjndxLM1VaRY7OIvvHaQpMf6lchaU0d9a9Jh395OTPefWbnQ5z6JmZenn4JfxxUbr2vvUYyW4xf3bCtZYSjZ90KFZzsUMcXp0RhoBKDWP9gdWIurWXiIKtjoQMfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BYHqWJjT; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724862126;
+	t=1724862129;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8p/IIk0B7Z3/xGeHNl/FhStqLK9xsXc/qtKenXWl9uU=;
-	b=UXhT3XsJTaw2cuprhvneey5UKwSRaeaoSpkgxP0e1QTLcYNp3xqan6/zW0APTi15K48Rpw
-	1kNZ7DIxMHdsE9lyoahiX1gPoZOXwUg3RjKwk1cnfS6U5IJ8DClVqQKNzBDw7DDbMm6ZHU
-	5HmLHCRgxQSlAvMnbi8jZICvAwG5gZQ=
+	bh=NeWC5wTVvl+NXpTbEp9Dir3lwfIZxO0SfLsx56bqwIs=;
+	b=BYHqWJjT1Z28//jQa7QbGLaWAGT6mFDS/wCOE7G13ScAJ1oM0ujtcZK+duQF6vVT09B5QM
+	HXH1uokT/Q8KGuFGFpZ8k2JpaczKcPvag6/+xtATXAulxVpwAsllY17yWSz6py76Puq3Il
+	s/rQ2dH5G1TDpI186kPeMiru9hWYjFM=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
 Cc: atishp@rivosinc.com,
 	cade.richard@berkeley.edu,
 	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH 1/3] riscv: Introduce local_timer_init
-Date: Wed, 28 Aug 2024 18:22:02 +0200
-Message-ID: <20240828162200.1384696-6-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 2/3] riscv: Share sbi_time_ecall with framework
+Date: Wed, 28 Aug 2024 18:22:03 +0200
+Message-ID: <20240828162200.1384696-7-andrew.jones@linux.dev>
 In-Reply-To: <20240828162200.1384696-5-andrew.jones@linux.dev>
 References: <20240828162200.1384696-5-andrew.jones@linux.dev>
 Precedence: bulk
@@ -62,118 +62,92 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-When Sstc is available make sure that even if we enable timer
-interrupts nothing will happen. This is necessary for cases where
-the unit tests actually intend to use the SBI TIME extension and
-aren't thinking about Sstc at all, like the SBI TIME test in
-riscv/sbi where we can now remove the initialization.
+Setting timers is a useful thing to do for all types of tests. Not
+every platform will have Sstc so make the SBI TIME extension
+available as well.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/riscv/asm/timer.h |  1 +
- lib/riscv/setup.c     |  2 ++
- lib/riscv/smp.c       |  2 ++
- lib/riscv/timer.c     | 13 +++++++++++++
- riscv/sbi.c           |  5 -----
- 5 files changed, 18 insertions(+), 5 deletions(-)
+ lib/riscv/asm/sbi.h |  1 +
+ lib/riscv/sbi.c     |  5 +++++
+ riscv/sbi.c         | 13 ++++---------
+ 3 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/lib/riscv/asm/timer.h b/lib/riscv/asm/timer.h
-index b3514d3f6a78..fd12251a3a6b 100644
---- a/lib/riscv/asm/timer.h
-+++ b/lib/riscv/asm/timer.h
-@@ -5,6 +5,7 @@
- #include <asm/csr.h>
+diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+index a864e268437b..4a35cf38da70 100644
+--- a/lib/riscv/asm/sbi.h
++++ b/lib/riscv/asm/sbi.h
+@@ -67,6 +67,7 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
+ void sbi_shutdown(void);
+ struct sbiret sbi_hart_start(unsigned long hartid, unsigned long entry, unsigned long sp);
+ struct sbiret sbi_send_ipi(unsigned long hart_mask, unsigned long hart_mask_base);
++struct sbiret sbi_set_timer(unsigned long stime_value);
+ long sbi_probe(int ext);
  
- extern void timer_get_frequency(void);
-+extern void local_timer_init(void);
- 
- static inline uint64_t timer_get_cycles(void)
- {
-diff --git a/lib/riscv/setup.c b/lib/riscv/setup.c
-index 9a16f00093d7..7c4321b1c30f 100644
---- a/lib/riscv/setup.c
-+++ b/lib/riscv/setup.c
-@@ -210,6 +210,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
- 	cpu_init();
- 	timer_get_frequency();
- 	thread_info_init();
-+	local_timer_init();
- 	io_init();
- 
- 	ret = dt_get_bootargs(&bootargs);
-@@ -276,6 +277,7 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 	cpu_init();
- 	timer_get_frequency();
- 	thread_info_init();
-+	local_timer_init();
- 	io_init();
- 	initrd_setup();
- 
-diff --git a/lib/riscv/smp.c b/lib/riscv/smp.c
-index 4d373e0a29a8..18d0393c0cc2 100644
---- a/lib/riscv/smp.c
-+++ b/lib/riscv/smp.c
-@@ -14,6 +14,7 @@
- #include <asm/processor.h>
- #include <asm/sbi.h>
- #include <asm/smp.h>
-+#include <asm/timer.h>
- 
- cpumask_t cpu_present_mask;
- cpumask_t cpu_online_mask;
-@@ -27,6 +28,7 @@ secondary_func_t secondary_cinit(struct secondary_data *data)
- 
- 	__mmu_enable(data->satp);
- 	thread_info_init();
-+	local_timer_init();
- 	info = current_thread_info();
- 	set_cpu_online(info->cpu, true);
- 	smp_send_event();
-diff --git a/lib/riscv/timer.c b/lib/riscv/timer.c
-index d78d254c8eca..92826d6ec3fe 100644
---- a/lib/riscv/timer.c
-+++ b/lib/riscv/timer.c
-@@ -4,7 +4,11 @@
-  */
- #include <libcflat.h>
- #include <devicetree.h>
-+#include <limits.h>
-+#include <asm/csr.h>
-+#include <asm/isa.h>
- #include <asm/setup.h>
-+#include <asm/smp.h>
- #include <asm/timer.h>
- 
- void timer_get_frequency(void)
-@@ -26,3 +30,12 @@ void timer_get_frequency(void)
- 	data = (u32 *)prop->data;
- 	timebase_frequency = fdt32_to_cpu(*data);
+ #endif /* !__ASSEMBLY__ */
+diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
+index 19d58ab73593..07660e422cbb 100644
+--- a/lib/riscv/sbi.c
++++ b/lib/riscv/sbi.c
+@@ -44,6 +44,11 @@ struct sbiret sbi_send_ipi(unsigned long hart_mask, unsigned long hart_mask_base
+ 	return sbi_ecall(SBI_EXT_IPI, SBI_EXT_IPI_SEND_IPI, hart_mask, hart_mask_base, 0, 0, 0, 0);
  }
-+
-+void local_timer_init(void)
+ 
++struct sbiret sbi_set_timer(unsigned long stime_value)
 +{
-+	if (cpu_has_extension(smp_processor_id(), ISA_SSTC)) {
-+		csr_write(CSR_STIMECMP, ULONG_MAX);
-+		if (__riscv_xlen == 32)
-+			csr_write(CSR_STIMECMPH, ULONG_MAX);
-+	}
++	return sbi_ecall(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, stime_value, 0, 0, 0, 0, 0);
 +}
++
+ long sbi_probe(int ext)
+ {
+ 	struct sbiret ret;
 diff --git a/riscv/sbi.c b/riscv/sbi.c
-index 01697aed3457..e8598fe721a6 100644
+index e8598fe721a6..85cb7e589bdc 100644
 --- a/riscv/sbi.c
 +++ b/riscv/sbi.c
-@@ -258,11 +258,6 @@ static void check_time(void)
+@@ -35,11 +35,6 @@ static struct sbiret __base_sbi_ecall(int fid, unsigned long arg0)
+ 	return sbi_ecall(SBI_EXT_BASE, fid, arg0, 0, 0, 0, 0, 0);
+ }
  
- 	install_irq_handler(IRQ_S_TIMER, timer_irq_handler);
- 	local_irq_enable();
--	if (cpu_has_extension(smp_processor_id(), ISA_SSTC)) {
--		csr_write(CSR_STIMECMP, ULONG_MAX);
--		if (__riscv_xlen == 32)
--			csr_write(CSR_STIMECMPH, ULONG_MAX);
--	}
- 	timer_irq_enable();
+-static struct sbiret __time_sbi_ecall(unsigned long stime_value)
+-{
+-	return sbi_ecall(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, stime_value, 0, 0, 0, 0, 0);
+-}
+-
+ static struct sbiret __dbcn_sbi_ecall(int fid, unsigned long arg0, unsigned long arg1, unsigned long arg2)
+ {
+ 	return sbi_ecall(SBI_EXT_DBCN, fid, arg0, arg1, arg2, 0, 0, 0);
+@@ -198,7 +193,7 @@ static void timer_irq_handler(struct pt_regs *regs)
+ 	if (timer_info.mask_timer_irq)
+ 		timer_irq_disable();
+ 	else
+-		__time_sbi_ecall(ULONG_MAX);
++		sbi_set_timer(ULONG_MAX);
  
- 	timer_check_set_timer(false);
+ 	if (!timer_irq_pending())
+ 		timer_info.timer_irq_cleared = true;
+@@ -217,7 +212,7 @@ static void timer_check_set_timer(bool mask_timer_irq)
+ 
+ 	timer_info = (struct timer_info){ .mask_timer_irq = mask_timer_irq };
+ 	begin = timer_get_cycles();
+-	ret = __time_sbi_ecall(begin + d);
++	ret = sbi_set_timer(begin + d);
+ 
+ 	report(!ret.error, "set timer%s", mask_test_str);
+ 	if (ret.error)
+@@ -268,10 +263,10 @@ static void check_time(void)
+ 		report_skip("timer irq enable bit is not writable, skipping mask irq test");
+ 
+ 	timer_irq_disable();
+-	__time_sbi_ecall(0);
++	sbi_set_timer(0);
+ 	pending = timer_irq_pending();
+ 	report(pending, "timer immediately pending by setting timer to 0");
+-	__time_sbi_ecall(ULONG_MAX);
++	sbi_set_timer(ULONG_MAX);
+ 	if (pending)
+ 		report(!timer_irq_pending(), "pending timer cleared while masked");
+ 	else
 -- 
 2.45.2
 
