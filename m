@@ -1,100 +1,228 @@
-Return-Path: <kvm+bounces-25241-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25242-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14D349624CD
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 12:24:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CD89625F0
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 13:23:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7F701F25585
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 10:24:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 455DB1C2370B
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 11:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A74ADDDC;
-	Wed, 28 Aug 2024 10:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CFB1553BC;
+	Wed, 28 Aug 2024 11:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ByTxmvBW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e5mGa8Qd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6E016630F;
-	Wed, 28 Aug 2024 10:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755BD3FEC
+	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 11:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724840630; cv=none; b=qDV8if1tTSfspYivUJ5VmOLVIsA97YxBxCS53mOtAYZiqmF4gYVaYxTOf7IY7RXsfYk3PqD1jMnyUGlrAdOJLLbOgPkU70Kd1qY0oEb/5gE+A+tzrB1TtLEzHLWY8DR+v7sEHiXIzdc49TQT677EXDQDbhphlfa5IDKhGri+aqI=
+	t=1724844199; cv=none; b=sonHqpVjieIEqVqXH699o86LxfrK3dtx7kX34mLX2ohjnfdltoD0pRW+01l3hAt/kExp+3E1S6VOPBr+unhUechm9DH53ihECVQI5MNhGfcv1pw0bBIDZLbGf5wSa7MqPGyW/5YQetV+PATOd72wCmxbb10LKepL7u2S67/J7w8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724840630; c=relaxed/simple;
-	bh=WkeWkMHT8wJffburwSLbbQl3fGKE0R0M5twr/hXzINw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G6wYmXJ9p/Pq5qqfkhKIemqOSBJYTcYMR0/OUZp/DDH9ww4mWXXPgs6vG0Ep49R0S1pnMJve0qo20jmCD/b9ZMzL9KPA+qD4vk+JB970IiIOFslyNKsrOI96djxc/FM0vSyeeNsMhBuYA55UEG7W7VSPQYRdUNu8JFJOwC8sxqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ByTxmvBW; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 073F240E025E;
-	Wed, 28 Aug 2024 10:23:46 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id QOgJoKfMJfor; Wed, 28 Aug 2024 10:23:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1724840621; bh=ddCbswtjTTHgDRFIT8XIkmnHRxR08h6tTIECtSm3fKw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ByTxmvBWJnONmGpOAoF2R0u4iMB1sYKum675i9AQIA9+bPv5zeaw1jtFjSHVAa3Um
-	 uED/jGJx+9BfCIvlSbmP5DGPfmnWJSxkvASJfgrMd7KkUGTL++siweoEcMe3aX0AFo
-	 E16XB3fjXRfjzLOX7c2QPHcVNy04K8Szs3bOsPlPKFdR7M0uI3ZtpZstwIv4d3P3CH
-	 yjIg1FpigC8i38XyvesjdOEN9zDspmgfXdzW3y32g/Lof8Z8svneKaBER2qkPZKh66
-	 GCgIq2THCfAb/1KkDVAgJlCMo/n3hz7Jpko35/l0qaiDizx4kiJPNOdEEGk63vz0kp
-	 86TaiSc3XhXTBqx4VZrRpT9+4JvaKzdYMlZd8Gxo1aHa60rioDr2OYIhewuF5R5Kzm
-	 CRXq5e38et/yIZyDd63sNDZ3MLOo3DtJtYmD1GiCkHWgIQ9zKBucLU8nyPCMDkAu3Z
-	 oEeaG0dHbQYNJR4PDjryh+4Qy7j8v9U5bPSDQuSv9Hlm32k2qUZX5rGletywyguOYn
-	 j/ndFBvvt9ikLbkw8mzxauWH8DDraJDQ7LXtlhpqieU9A3rIqDuyd4VC7gYpYKlA8w
-	 Ep7NcnS1NX2HWtSwqF+QjDdZrn9pHl+unNpvgE4bIJLdjVMPq0fahqRcARgSXGNqNm
-	 uJk2cjR8pq6rfYSS7RnW1R6U=
-Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
+	s=arc-20240116; t=1724844199; c=relaxed/simple;
+	bh=nbPQLzfzYM20rrwCtRiiclAxBxp1BUjK7SM3pjygeuM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fACb1nJImvwXuIHLoTJ/T9SaP3VP+2aToG/DIoaXxzCM/nUW91XS3k7jixXdUA88HuP+ByWCYf5VVyeVBuOJkMyChuuRvFg95CfmEhjw+U2A/RXnd5qF0LkS/1OoFkTyROfsTgNuIlAFeYFhBGo3FU1PDSOdS8hzPf5dDIgoUfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e5mGa8Qd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724844196;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sjPscny8RpBp/Hq/MF0Txq0RsmBmvhMA9j1IvksC6Zg=;
+	b=e5mGa8QdE95hpQF6Ga2GuAA0gFBc3mNVpX0mROmBDImpqd/h94GJvuDFtZAwdXlXq7RApd
+	dQvfJ+4PA5fqn6o7b4sGzko+RNFpUATdSOQcFOIIVDsgFZUTymApjGHgWBxmvT58i9HMvi
+	5S4XlNOdfq44BXirc6ovWCLiMLYGyp4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-644-VVMG9EtQNq6uKZ4tlwC9Sw-1; Wed,
+ 28 Aug 2024 07:23:13 -0400
+X-MC-Unique: VVMG9EtQNq6uKZ4tlwC9Sw-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B27C240E0169;
-	Wed, 28 Aug 2024 10:23:30 +0000 (UTC)
-Date: Wed, 28 Aug 2024 12:23:25 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v11 06/20] x86/sev: Handle failures from snp_init()
-Message-ID: <20240828102325.GBZs76nXJVyj-pILca@fat_crate.local>
-References: <20240731150811.156771-1-nikunj@amd.com>
- <20240731150811.156771-7-nikunj@amd.com>
- <20240827113227.GAZs25S8Ubep1CDYr8@fat_crate.local>
- <5b62f751-668f-714e-24a2-6bbc188c3ce8@amd.com>
- <20240828094933.GAZs7yrbCHDJUeUWys@fat_crate.local>
- <94899c78-97e3-230a-a7eb-d4d448d9fa75@amd.com>
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0AB3F1955F4A;
+	Wed, 28 Aug 2024 11:23:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.192.112])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 151FE19560A3;
+	Wed, 28 Aug 2024 11:23:11 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id E498221E6A28; Wed, 28 Aug 2024 13:23:08 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Ani Sinha <anisinha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  qemu-trivial@nongnu.org,
+  zhao1.liu@intel.com,  kvm@vger.kernel.org,  qemu-devel@nongnu.org
+Subject: Re: [PATCH v5 1/2] kvm: replace fprintf with
+ error_report()/printf() in kvm_init()
+In-Reply-To: <20240828075630.7754-2-anisinha@redhat.com> (Ani Sinha's message
+	of "Wed, 28 Aug 2024 13:26:28 +0530")
+References: <20240828075630.7754-1-anisinha@redhat.com>
+	<20240828075630.7754-2-anisinha@redhat.com>
+Date: Wed, 28 Aug 2024 13:23:08 +0200
+Message-ID: <87ikvkriw3.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <94899c78-97e3-230a-a7eb-d4d448d9fa75@amd.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Aug 28, 2024 at 03:46:23PM +0530, Nikunj A. Dadhania wrote:
-> Do you want me to send the patch again with above change?
+Ani Sinha <anisinha@redhat.com> writes:
 
-After I've gone through the whole set, sure.
+> error_report() is more appropriate for error situations. Replace fprintf with
+> error_report() and error_printf() as appropriate. Cosmetic. No functional
+> change.
 
-Thx.
+Uh, I missed this last time around: the change is more than just
+cosmetics!  The error messages change, e.g. from
 
--- 
-Regards/Gruss,
-    Boris.
+    $ qemu-system-x86_64 -nodefaults -S -display none --accel kvm
+    qemu-system-x86_64: --accel kvm: Could not access KVM kernel module: Permission denied
+    qemu-system-x86_64: --accel kvm: failed to initialize kvm: Permission denied
 
-https://people.kernel.org/tglx/notes-about-netiquette
+to
+
+    $ qemu-system-x86_64 -nodefaults -S -display none --accel kvm
+    Could not access KVM kernel module: Permission denied
+    qemu-system-x86_64: --accel kvm: failed to initialize kvm: Permission denied
+
+Note: the second message is from kvm_init()'s caller.  Reporting the
+same error twice is wrong, but not this patch's problem.
+
+Moreover, the patch tweaks an error message at [*].
+
+Suggest something like
+
+  Replace fprintf() with error_report() and error_printf() where
+  appropriate.  Error messages improve, e.g. from
+
+      Could not access KVM kernel module: Permission denied
+
+  to
+
+      qemu-system-x86_64: --accel kvm: Could not access KVM kernel module: Permission denied
+
+> CC: qemu-trivial@nongnu.org
+> CC: zhao1.liu@intel.com
+> CC: armbru@redhat.com
+> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+> Signed-off-by: Ani Sinha <anisinha@redhat.com>
+> ---
+>  accel/kvm/kvm-all.c | 40 ++++++++++++++++++----------------------
+>  1 file changed, 18 insertions(+), 22 deletions(-)
+>
+> changelog:
+> v2: fix a bug.
+> v3: replace one instance of error_report() with error_printf(). added tags.
+> v4: changes suggested by Markus.
+> v5: more changes from Markus's comments on v4.
+>
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 75d11a07b2..fcc157f0e6 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2427,7 +2427,7 @@ static int kvm_init(MachineState *ms)
+>      QLIST_INIT(&s->kvm_parked_vcpus);
+>      s->fd = qemu_open_old(s->device ?: "/dev/kvm", O_RDWR);
+>      if (s->fd == -1) {
+> -        fprintf(stderr, "Could not access KVM kernel module: %m\n");
+> +        error_report("Could not access KVM kernel module: %m");
+>          ret = -errno;
+>          goto err;
+>      }
+> @@ -2437,13 +2437,13 @@ static int kvm_init(MachineState *ms)
+>          if (ret >= 0) {
+>              ret = -EINVAL;
+>          }
+> -        fprintf(stderr, "kvm version too old\n");
+> +        error_report("kvm version too old");
+>          goto err;
+>      }
+>  
+>      if (ret > KVM_API_VERSION) {
+>          ret = -EINVAL;
+> -        fprintf(stderr, "kvm version not supported\n");
+> +        error_report("kvm version not supported");
+>          goto err;
+>      }
+>  
+> @@ -2488,26 +2488,22 @@ static int kvm_init(MachineState *ms)
+>      } while (ret == -EINTR);
+>  
+>      if (ret < 0) {
+> -        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
+> -                strerror(-ret));
+> +        error_report("ioctl(KVM_CREATE_VM) failed: %s", strerror(-ret));
+
+[*] This is where you change an error message.
+
+>  
+>  #ifdef TARGET_S390X
+>          if (ret == -EINVAL) {
+> -            fprintf(stderr,
+> -                    "Host kernel setup problem detected. Please verify:\n");
+> -            fprintf(stderr, "- for kernels supporting the switch_amode or"
+> -                    " user_mode parameters, whether\n");
+> -            fprintf(stderr,
+> -                    "  user space is running in primary address space\n");
+> -            fprintf(stderr,
+> -                    "- for kernels supporting the vm.allocate_pgste sysctl, "
+> -                    "whether it is enabled\n");
+> +            error_printf("Host kernel setup problem detected."
+> +                         " Please verify:\n");
+> +            error_printf("- for kernels supporting the"
+> +                        " switch_amode or user_mode parameters, whether");
+> +            error_printf(" user space is running in primary address space\n");
+> +            error_printf("- for kernels supporting the vm.allocate_pgste"
+> +                         " sysctl, whether it is enabled\n");
+>          }
+>  #elif defined(TARGET_PPC)
+>          if (ret == -EINVAL) {
+> -            fprintf(stderr,
+> -                    "PPC KVM module is not loaded. Try modprobe kvm_%s.\n",
+> -                    (type == 2) ? "pr" : "hv");
+> +            error_printf("PPC KVM module is not loaded. Try modprobe kvm_%s.\n",
+> +                         (type == 2) ? "pr" : "hv");
+>          }
+>  #endif
+>          goto err;
+> @@ -2526,9 +2522,9 @@ static int kvm_init(MachineState *ms)
+>                          nc->name, nc->num, soft_vcpus_limit);
+>  
+>              if (nc->num > hard_vcpus_limit) {
+> -                fprintf(stderr, "Number of %s cpus requested (%d) exceeds "
+> -                        "the maximum cpus supported by KVM (%d)\n",
+> -                        nc->name, nc->num, hard_vcpus_limit);
+> +                error_report("Number of %s cpus requested (%d) exceeds "
+> +                             "the maximum cpus supported by KVM (%d)",
+> +                             nc->name, nc->num, hard_vcpus_limit);
+>                  exit(1);
+>              }
+>          }
+> @@ -2542,8 +2538,8 @@ static int kvm_init(MachineState *ms)
+>      }
+>      if (missing_cap) {
+>          ret = -EINVAL;
+> -        fprintf(stderr, "kvm does not support %s\n%s",
+> -                missing_cap->name, upgrade_note);
+> +        error_report("kvm does not support %s", missing_cap->name);
+> +        error_printf("%s", upgrade_note);
+>          goto err;
+>      }
+
+With the commit message corrected:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
 
