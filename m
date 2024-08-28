@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-25266-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25267-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB28962C6C
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 17:32:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8F5962C6F
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 17:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05A12285876
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 15:32:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D9F31F21F95
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 15:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F021A2572;
-	Wed, 28 Aug 2024 15:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D469A1A3BA1;
+	Wed, 28 Aug 2024 15:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bZ1RG4pU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Am8/4/ut"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C8719ADB6
-	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 15:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7E018787E
+	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 15:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724859096; cv=none; b=o5sWNuAmtv/yfg9Mi8G5yhJQMQCJugQpCrtoc8a+KWg0hkeVykn7GCMFOV0vvI+t1iY2oHLHugRww0bzuVTFDf7fPqBM2DRGHdcImNTOTesVqbUQylL70jo7+MRJafP/jrjCA6vjbjh9alqvjYdIWjbd1+xLE7mt+amMFtWwlmw=
+	t=1724859123; cv=none; b=BS2vIaUOxw6OSNwtBTooWrApVsx/htxjdQOBGQOvEv8adeqtftD6cmp8gWIvAfAg2ARe801bs1ntmQLe5W+2OO/KGM1QGvnz4vrfdtayCfKykRim9HKJspIJEtrd9Hlv0LwsMBBddwzuthd8TcTPLg7v6YXeTcXpF+WFzTtPDfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724859096; c=relaxed/simple;
-	bh=HB83BpCSZwmFCFPQy1dp2nbaKNvjyY/GryE6N3K9Yn0=;
+	s=arc-20240116; t=1724859123; c=relaxed/simple;
+	bh=cghE+f372lAxAmhazy+b9N6LXvy27JUnSd5DypYyOj8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B7WiCeyBbkqHKda5/u8e9F7mkqJmG/7jZ/yqsz4+Nl/9riTsCfNAMOBpOj6SHH4nORkmC7FXk8Wl9q7TVGIrpLz9VZ12QRKAvLbq1PQ7r1R74gWBVM/pJvPq3ARWJFcdRwFkxJLz8vDtQfmNaWSOKeCZnI0Y7++KLomIxyCkZZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bZ1RG4pU; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=prnCQQtT+7Mo2ugWemmVdsu1BIZVNr+whs/moRYtho1vqdYK0Zp+Uc4AsZZAvHqH28/eGg5F3Zi1aSDBZ7yCyAELQm56BUVPgGtojV7aMX38y0im6SM3lwOWUnWeuK+nZQeckM94FXx/MScbaOY+xqMaY4PcnZ3OQicAkJg0GOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Am8/4/ut; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724859094;
+	s=mimecast20190719; t=1724859120;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=xOPKOsg5jv8jg6VD4xEjJRB23KAp6IEXnaWD2DP6S5o=;
-	b=bZ1RG4pUum5frJHIO5eQ3TcQUreusdPuPhl/1meflPv7DZzXdEDGqpGKpmKWn0gc5y57dJ
-	HNBhUWNcwI9ydJNdx1F8ibu5vLykUzhPvTWW2uqI96VV4lH98y08yKB2flrPw8YqBBGS9b
-	5fcQrRNBiw/OAN8oKw3bGXz4e96Dl+E=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=a7t+GJr97EOxs8Z5xnxc5LoGdSJWBISe/+/VEH88G9A=;
+	b=Am8/4/utULuczTP5GpcvSLemU4Z2Wg/8QYzwm/mNiLf6naAdTpDSTuwFVzaU9bE+IioQ9P
+	pVuhLo5RHCTIpQQ5I6c8JUkNWfJYJ22eNbUqU4KYZpITPZVoddlKMjb6Pl4OvKzLIxYKtS
+	QZKNyeKxPnosyYd6ezR2pJ0hsLhkPuI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-_Lueu6u8Pu-_vX-yUwFu6g-1; Wed, 28 Aug 2024 11:31:32 -0400
-X-MC-Unique: _Lueu6u8Pu-_vX-yUwFu6g-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-429e937ed39so63853195e9.1
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 08:31:32 -0700 (PDT)
+ us-mta-329-HFornoLXOZ2b5zN4lVtmEw-1; Wed, 28 Aug 2024 11:31:56 -0400
+X-MC-Unique: HFornoLXOZ2b5zN4lVtmEw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37189fa7ad6so4980444f8f.0
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 08:31:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724859091; x=1725463891;
+        d=1e100.net; s=20230601; t=1724859115; x=1725463915;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=xOPKOsg5jv8jg6VD4xEjJRB23KAp6IEXnaWD2DP6S5o=;
-        b=El2VRXYuwWpnkaI5LlVnRb7dcUAltPr8PyLenQdYit9zhPpLJlNHgO66pM4Ks8ZRMw
-         zusFMu2Mo5J63vn8DW8r+yI3HrvRwZe0mBnl7zSSP0XFeddiXnxpHFLPA7mzP2eRGXVg
-         6gwAldnV7L8W3akGu5jN1VW/QJJWN6YjoULdesgDPA+7Q0NkD5RDx+JbCI1ud7RrQUJt
-         P3orBuDaAX1mj5RMCOtX8dKRgDhmw2dSPVjz/XP0jaQrwLRo1Ei0LYfrp0TjZ3/E53AA
-         f5T0nqYgYRPByjTqjuslrDmNRUFasHSTlFmRd4eMr1Fl2hufxtlxsW91ivXPYGJ4+nDs
-         gwqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkK4RIGDovGgKmtJXc1u4VKjDtumZBDsTaqgmGdCGKm6fuKPXp4UgfZ2VKUtlAfS05jFM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRi5Jqlu7Zp59nasoeFcyCyWouWN5qPBI29c5cJ+1m2HHzRX8o
-	1jzibP6+htUv8PeKhHUoO3AyhU1pSl23u/T61ePRMLVqfP3XumZXVnepHttyVB9RVUVCvSNDfH4
-	EhwzquNS/5QQ81zRDqMGe0b+Ck5Fs5CSvU0L5qLOmuMGutQhR7g==
-X-Received: by 2002:a05:600c:3b97:b0:426:5c36:207c with SMTP id 5b1f17b1804b1-42bb27a9c77mr76465e9.25.1724859091173;
-        Wed, 28 Aug 2024 08:31:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6XqulJHuzc87ef1Sa38B+B4vXhV59jcrORNIKvdBRzM+hIg3NDU7pbYLM5WafNDZhZwqCXg==
-X-Received: by 2002:a05:600c:3b97:b0:426:5c36:207c with SMTP id 5b1f17b1804b1-42bb27a9c77mr75985e9.25.1724859090191;
-        Wed, 28 Aug 2024 08:31:30 -0700 (PDT)
+        bh=a7t+GJr97EOxs8Z5xnxc5LoGdSJWBISe/+/VEH88G9A=;
+        b=QRBfhNl2EiN3OJ3jRK+0FCjbcIEWP5LjewZZutU13a19pWY1KfPDC8GHBpUawmn2oi
+         /vIriq46d3uysu2F4j12pRprwl0hkfJJsJGLNsIObqNNeYwPgpJ8ZBosDxKnRcqDOjas
+         sKJccUD0OilsD4OkbqmjU1tTNrqI8sfb5WuBUeHO8965XtEsjlL1K/R6BjlXFvk6C/pa
+         EP7wdRw3V7Ha1DPRj4HNp662dhUYgu69/HwMYc4XM+nZiz1Gb8tOO3935ccOnrHdoN1F
+         Gi5vJ17MH++HcXiTXcecVwuGfQTOjEnbxPjSl6LxtIVhIGacxCzhR5AYW6NCo7bcIaRs
+         lTXg==
+X-Forwarded-Encrypted: i=1; AJvYcCUX3ttFrh+Pe/7k2TbCOG9DpsktNLpBNXpSyYEk6xhuaoUJZN0rZfPQfrj0ijRnhiyg0Rc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP1R0uqyLgGsiVTCq+LidmcntjGJ+aOheoKqj7dHMftjlw71YE
+	uonYnax81/YBgSq3ExoAVyqt2oeN53Gv3gUvXOcE0SzI8O86EO5ozhpMqA/4KJv4cs5h8H7y4Yx
+	m8wGJ8OqDNKIXtU+4vfEcNICrYFWH9l/tDfrlEvrSt+3WlqZUtQ==
+X-Received: by 2002:adf:a458:0:b0:368:7943:8b1f with SMTP id ffacd0b85a97d-373118c8a0fmr13450068f8f.43.1724859115030;
+        Wed, 28 Aug 2024 08:31:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGnKvH/I43gd6WSEZerf5YHGvpr5FI/L9/NXPKbC53cPdMtG6fH5U5Bf1pxSxGEY0t2dZLbaw==
+X-Received: by 2002:adf:a458:0:b0:368:7943:8b1f with SMTP id ffacd0b85a97d-373118c8a0fmr13450011f8f.43.1724859114132;
+        Wed, 28 Aug 2024 08:31:54 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c706:1700:6b81:27cb:c9e2:a09a? (p200300cbc70617006b8127cbc9e2a09a.dip0.t-ipconnect.de. [2003:cb:c706:1700:6b81:27cb:c9e2:a09a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb01d3029sm772145e9.42.2024.08.28.08.31.28
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749b22da7dsm94393f8f.7.2024.08.28.08.31.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 08:31:29 -0700 (PDT)
-Message-ID: <012789cd-90d0-4b3b-b48e-16990ee40fc4@redhat.com>
-Date: Wed, 28 Aug 2024 17:31:28 +0200
+        Wed, 28 Aug 2024 08:31:53 -0700 (PDT)
+Message-ID: <93850b27-d063-4783-b940-8aef8d5abe1e@redhat.com>
+Date: Wed, 28 Aug 2024 17:31:52 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/19] mm: Mark special bits for huge pfn mappings when
- inject
+Subject: Re: [PATCH v2 04/19] mm: Allow THP orders for PFNMAPs
 To: Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
  linux-mm@kvack.org
 Cc: Gavin Shan <gshan@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
@@ -99,9 +98,10 @@ Cc: Gavin Shan <gshan@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
  Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
  Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>,
  Kefeng Wang <wangkefeng.wang@huawei.com>,
- Alex Williamson <alex.williamson@redhat.com>
+ Alex Williamson <alex.williamson@redhat.com>,
+ Matthew Wilcox <willy@infradead.org>, Ryan Roberts <ryan.roberts@arm.com>
 References: <20240826204353.2228736-1-peterx@redhat.com>
- <20240826204353.2228736-4-peterx@redhat.com>
+ <20240826204353.2228736-5-peterx@redhat.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -149,42 +149,23 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20240826204353.2228736-4-peterx@redhat.com>
+In-Reply-To: <20240826204353.2228736-5-peterx@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 26.08.24 22:43, Peter Xu wrote:
-> We need these special bits to be around on pfnmaps.  Mark properly for
-> !devmap case, reflecting that there's no page struct backing the entry.
+> This enables PFNMAPs to be mapped at either pmd/pud layers.  Generalize the
+> dax case into vma_is_special_huge() so as to cover both.  Meanwhile, rename
+> the macro to THP_ORDERS_ALL_SPECIAL.
 > 
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: Gavin Shan <gshan@redhat.com>
+> Cc: Ryan Roberts <ryan.roberts@arm.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Zi Yan <ziy@nvidia.com>
 > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->   mm/huge_memory.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-> index 3f74b09ada38..dec17d09390f 100644
-> --- a/mm/huge_memory.c
-> +++ b/mm/huge_memory.c
-> @@ -1346,6 +1346,8 @@ static void insert_pfn_pmd(struct vm_area_struct *vma, unsigned long addr,
->   	entry = pmd_mkhuge(pfn_t_pmd(pfn, prot));
->   	if (pfn_t_devmap(pfn))
->   		entry = pmd_mkdevmap(entry);
-> +	else
-> +		entry = pmd_mkspecial(entry);
->   	if (write) {
->   		entry = pmd_mkyoung(pmd_mkdirty(entry));
->   		entry = maybe_pmd_mkwrite(entry, vma);
-> @@ -1442,6 +1444,8 @@ static void insert_pfn_pud(struct vm_area_struct *vma, unsigned long addr,
->   	entry = pud_mkhuge(pfn_t_pud(pfn, prot));
->   	if (pfn_t_devmap(pfn))
->   		entry = pud_mkdevmap(entry);
-> +	else
-> +		entry = pud_mkspecial(entry);
->   	if (write) {
->   		entry = pud_mkyoung(pud_mkdirty(entry));
->   		entry = maybe_pud_mkwrite(entry, vma);
 
 Acked-by: David Hildenbrand <david@redhat.com>
 
