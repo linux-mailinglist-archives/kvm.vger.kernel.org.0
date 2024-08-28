@@ -1,139 +1,126 @@
-Return-Path: <kvm+bounces-25299-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25300-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B87199633C5
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 23:24:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C00D96342F
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 23:58:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75F3F284603
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 21:24:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3939D283F05
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 21:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD441AD3E2;
-	Wed, 28 Aug 2024 21:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27881AD5C1;
+	Wed, 28 Aug 2024 21:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZBD3SG4v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="reRMVEIZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f74.google.com (mail-oa1-f74.google.com [209.85.160.74])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F35D1AC42F
-	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 21:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646FE156875
+	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 21:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724880243; cv=none; b=E6Ha/RkJ8ee5YNhJJlsbyA+nqj/cVMK/PQ+BnYbTqPeIsDXbZmuUtZhRNyQTwD3IC3ikiEm4xnYaic6sXQPvICGvB6lmFSavNnf+tA2xwDx5FAVYEbXJuYpNHWnzNc0VbB3evE/upfuwcJyTznW2Oq1r7bqSxTvydqCBNm3QVvs=
+	t=1724882285; cv=none; b=JlqSmV2hGo3WpyQGAB5LmnKvxiN/NUcRw88OEh/UnnJm0DdB16iWgAeqUGBBc5Raz/EgcgR3y2iv/bVIsskWbrgJqOfSDsolZmTvGeGySj2p+eWcC61V0uJNzoNojMYHWGLkWUfCc6K5bae+Zzs26DALiK2JSkaD/HAkECYGikk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724880243; c=relaxed/simple;
-	bh=VOkjTFoLXtGv0TViaHfsU+gppTJDsqZWATy+QAtbgww=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=YIKkp77MmOtT3z3KCJKL6INNNjPdqb7qQdXfMLjKkQhygWP7B6r8xuYpnhR7zuuyAQZMsm65iELBSI2skzvj0sG6hUi18XXLdkX+oEp6IC/e3+luUxtLoGb/FRIlHh7PlHBJ8h4IW/a93TKhIRsoOG+gguTD6uQLPk7nAIeUvSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZBD3SG4v; arc=none smtp.client-ip=209.85.160.74
+	s=arc-20240116; t=1724882285; c=relaxed/simple;
+	bh=OtyZGFXNJmaTgKJUaWxufZrcoMW8yy457X2gX7so+Y4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uciQnzveIteWkdDBxygoWI1k6mWeIdJ8HYNkltLXKhbTphMQlhK1BmaWdYMeodnHPc2K3T6VgPXqFqb3hD6FjrStJa6fwZtDyiCtyKg22FZv4vYy1pHqa4H8F2MaTuc/zSE/GyyypZ7DpXGXnBWkYeaBDuFi9yL1D1p4S1s+DA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=reRMVEIZ; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-oa1-f74.google.com with SMTP id 586e51a60fabf-2704e62f2b9so859114fac.0
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 14:24:01 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e03b3f48c65so52993276.0
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 14:58:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724880241; x=1725485041; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qZf5vS6nzeffxNNxcAI3Z4UnlXSlArXBSTkbZeQVRKE=;
-        b=ZBD3SG4vwGor5kTHUJDTK38i5m2Gw1R+hG/K4bLTbBl/0U5YhhNiEtmD4Bhvv00Phc
-         FSprKuFmci6OxbMeEfMOc3F0m+Qn7txlQ47Np6Q6FxFj/k/oxqpL8mNb5JK++wWZ1OMN
-         oDcRfh32mZbD55rHoljMOym8vrrSv4MwIYYvH5SkzgjeGSWOR2W7nCQ+ZLgJUgEaJjYl
-         JK0XQmipFzi6ED3GL0eYdVh7PI5FDHhd6mYrK3emJKSnHaITxsz4PRC+vuYVGY9VZGk0
-         TR6C8e1Rq0lTgZdQVnTYtvd7gtCbIgq1uSdtwCvN5woPqxFNaSrrc/bP0Ytuqnp67M8R
-         ld5A==
+        d=google.com; s=20230601; t=1724882283; x=1725487083; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wlgNMKNX5MS0ihntU6nNVvznZe2o+HmoUqQOC60ro98=;
+        b=reRMVEIZLIND/yNtWuAe2ivXGA+VH0sroWZVggOMM9WDku5BVbFOARd7plrACpQtLw
+         xHRRDE6C4f6X+epDoQRF1NJxP3VrOGEeRxlTGvDN9hoX12jcOHSuJDg4r5Pv9xf4z3Vo
+         BH6fmQDHmCBMD7d0/FXPGA07J3WaYp1vLIr3L9ParwHrPquiXzwYsx2BmjWQeNTs4LFq
+         a+A8Yl6UeOvp7cJeB8ui0rZdtSKn9ckBHVUpbnBGLbUOqEBqngtn9TduyCvLE5pzO5t5
+         dp99bcs43Fz88iMxX4j5cAfTrjolIqFZKD7pSAOQTsj+QCofKPloHMyUaZH3a9vS5S41
+         RPFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724880241; x=1725485041;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+        d=1e100.net; s=20230601; t=1724882283; x=1725487083;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qZf5vS6nzeffxNNxcAI3Z4UnlXSlArXBSTkbZeQVRKE=;
-        b=uyjEBoT3Qq8Sph5xzfx7galYv9ivR5Kkj32KdSGorbuwI+4dciEXV/tfz1000D1EdL
-         IOsYtTSV/KfMk64k0HO9BQsUhr+6W4l8QzPAmRtSBRIz9WQFz+kd/IcwIDpc1V1bEskK
-         GZezXvw0zgtae3SownG+RGwSpwZ3zYBa1NiWOyTam7u77rbEVTJLCEJKpiseopi0y3lb
-         d9ehbfgAmZuO1QewA3HO+Tb9jkah1rZ+pF5qVtz8zJD3NV+uuaI2vLIc48TxWwTI/ORK
-         eLTwtQhCGS+b2utQHfeu2sUIEB1e2m6B2ADI4dL0yReQpy5FVl4/gLSVeN3euCJWoLah
-         hgvg==
-X-Gm-Message-State: AOJu0YyMVp7OYLyFbBJEvwDs0t9xStQonGbV2g7PJ+LzM+Q8MDat1MDU
-	Rh0NxT7AMvyzgNrq7VLIeXwdGMzw2e/Ak0IsWHDwLwOP17jFDvRLbhaPcZ4VmApv7S/8wJERX8i
-	DtUXA5V7usyacS833eH/tBw==
-X-Google-Smtp-Source: AGHT+IHJilOsVOjcj476mr7NemZ02Wkts0F0ld7Ilool75wpEvDcZGSEQFGQLGm7UpH7JX3upxceg/2c0Occ46jKZg==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6871:e289:b0:270:1b61:48d9 with
- SMTP id 586e51a60fabf-277934e6bb7mr780fac.4.1724880241218; Wed, 28 Aug 2024
- 14:24:01 -0700 (PDT)
-Date: Wed, 28 Aug 2024 21:24:00 +0000
-In-Reply-To: <ZsYwF5QJ8gqto8Mm@google.com> (message from Mingwei Zhang on Wed,
- 21 Aug 2024 18:21:11 +0000)
+        bh=wlgNMKNX5MS0ihntU6nNVvznZe2o+HmoUqQOC60ro98=;
+        b=YY4F9SNMOUrqZl/RnjfEAQoNYEIy0egY1knDlBN1nOs1+aH2f83acWoCuUN+mohyc3
+         BeNA0VevJbsmB1oUpNDNTWJMdMHYaCshZlpvauO285gEGyA87szsxkdsg8QvNM5Srp9M
+         X5XCEKtXwCgPQy0QVXmRm3JoCl6JQ89LEvbyVyO4JLyIue75QDT0rjdJGfSOB1T6p5Md
+         bnewxNkXsWhPmPwVPUxAJY/Fp3zqXqxpbfCFxrJTHh15yqrDcMfMC3ktO9pk8bTJjTAB
+         GgbKNVGWhYAkGRp5Wrjj5t8kWMBHWbzK9gGBvA9p2u1yLXiscu4ijZ9WW4W0G8o8Et7c
+         NJ3g==
+X-Gm-Message-State: AOJu0YzFvWIGdZyBdxnZfoPrTnn4n5fNskvorHpsGQRxiJf0RYOn0Nf2
+	XkNCPuG2DcuB0O/GIOLAfivnTU+aeR0VfplmF0ncSblLjORySNnHchJJQJZ4S2qm4UsEkk2Obel
+	1wQ==
+X-Google-Smtp-Source: AGHT+IFt/U1L3elAJgmabyUwqBFMXxU/9PPvPxX8OhqgwG2AJc39YZ2qQsYr4fivt/vomf8f1YQpHuHB8ng=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:c54f:0:b0:e11:5f9f:f069 with SMTP id
+ 3f1490d57ef6-e1a5adf5550mr1448276.8.1724882282732; Wed, 28 Aug 2024 14:58:02
+ -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 28 Aug 2024 14:58:00 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <gsntmskw9w9b.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 1/6] KVM: x86: selftests: Fix typos in macro variable use
-From: Colton Lewis <coltonlewis@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: kvm@vger.kernel.org, ljr.kernel@gmail.com, jmattson@google.com, 
-	aaronlewis@google.com, seanjc@google.com, pbonzini@redhat.com, 
-	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
+Message-ID: <20240828215800.737042-1-seanjc@google.com>
+Subject: [PATCH] KVM: selftests: Explicitly include committed one-off assets
+ in .gitignore
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Mingwei Zhang <mizhang@google.com> writes:
+Add KVM selftests' one-off assets, e.g. the Makefile, to the .gitignore so
+that they are explicitly included.  The justification for omitting the
+one-offs was that including them wouldn't help prevent mistakes:
 
-> On Tue, Aug 13, 2024, Colton Lewis wrote:
->> Without the leading underscore, these variables are referencing a
->> variable in the calling scope. It only worked before by accident
->> because all calling scopes had a variable with the right name.
+  Deliberately do not include the one-off assets, e.g. config, settings,
+  .gitignore itself, etc as Git doesn't ignore files that are already in
+  the repository.  Adding the one-off assets won't prevent mistakes where
+  developers forget to --force add files that don't match the "allowed".
 
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+Turns out that's not the case, as W=1 will generate warnings, and the
+amazing-as-always kernel test bot reports new warnings:
 
-> This might need a fixes tag, right?
-> Fixes: cd34fd8c758e ("KVM: selftests: Test PMC virtualization with forced  
-> emulation")
+   tools/testing/selftests/kvm/.gitignore: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/kvm/Makefile: warning: ignored by one of the .gitignore files
+>> tools/testing/selftests/kvm/Makefile.kvm: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/kvm/config: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/kvm/settings: warning: ignored by one of the .gitignore files
 
-> no need to cc stable tree though, since this is very minor.
+Fixes: 43e96957e8b8 ("KVM: selftests: Use pattern matching in .gitignore")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202408211818.85zIkDEK-lkp@intel.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/.gitignore | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> Reviewed-by: Mingwei Zhang <mizhang@google.com>
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 6d9381d60172..7f57abf936e7 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -5,3 +5,7 @@
+ !*.h
+ !*.S
+ !*.sh
++!.gitignore
++!config
++!settings
++!Makefile
 
-Yes it does. Thanks for the catch.
-
->> ---
->>   tools/testing/selftests/kvm/x86_64/pmu_counters_test.c | 6 +++---
->>   1 file changed, 3 insertions(+), 3 deletions(-)
-
->> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c  
->> b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
->> index 698cb36989db..0e305e43a93b 100644
->> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
->> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
->> @@ -174,7 +174,7 @@ do {										\
-
->>   #define GUEST_TEST_EVENT(_idx, _event, _pmc, _pmc_msr, _ctrl_msr,  
->> _value, FEP)	\
->>   do {										\
->> -	wrmsr(pmc_msr, 0);							\
->> +	wrmsr(_pmc_msr, 0);							\
->>   										\
->>   	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))				\
->>   		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt .", FEP);	\
->> @@ -331,9 +331,9 @@ __GUEST_ASSERT(expect_gp ? vector ==  
->> GP_VECTOR : !vector,			\
->>   	       expect_gp ? "#GP" : "no fault", msr, vector)			\
-
->>   #define GUEST_ASSERT_PMC_VALUE(insn, msr, val, expected)			\
->> -	__GUEST_ASSERT(val == expected_val,					\
->> +	__GUEST_ASSERT(val == expected,					\
->>   		       "Expected " #insn "(0x%x) to yield 0x%lx, got 0x%lx",	\
->> -		       msr, expected_val, val);
->> +		       msr, expected, val);
-
->>   static void guest_test_rdpmc(uint32_t rdpmc_idx, bool expect_success,
->>   			     uint64_t expected_val)
->> --
->> 2.46.0.76.ge559c4bf1a-goog
+base-commit: 15e1c3d65975524c5c792fcd59f7d89f00402261
+-- 
+2.46.0.295.g3b9ea8a38a-goog
 
 
