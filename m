@@ -1,485 +1,212 @@
-Return-Path: <kvm+bounces-25268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 754B4962C90
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 17:39:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B36962D05
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 17:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC3521F25544
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 15:39:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC00D282710
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 15:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5031A2560;
-	Wed, 28 Aug 2024 15:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A9E36130;
+	Wed, 28 Aug 2024 15:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="oU5J48lm"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2064.outbound.protection.outlook.com [40.107.244.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DE813C3D5;
-	Wed, 28 Aug 2024 15:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724859579; cv=none; b=PeHskwIk3Ke7PIwqsTJjcJd0Dl6H54+cVn9a3/m77BvwyJ4o6U1tmh1BYRWvNZItNo40bcrhikFTazvy0L0/+PGEnvwNu1uGhN4zcyqqIXBY+C8uGMIW/k+WcZXMW5w/4bP565771PaFPxRqlnni7e/hk+g9QnG7eVfyS8g/KCc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724859579; c=relaxed/simple;
-	bh=xbdydoh2u22vINByRrRMIya2lqnh9w4150zXJqURBUw=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OMq2Uv3WDywh7xtz9dX0IEiW4E7YJ9v81bWMRLNGwT9vFQCeo9uH0qIP6yHTlftZwhZ0qKHMKs6Nrv2DYhw0ZirZGVQWmsWDuUkvhiHnXJqBMcrXVx0KDXaQ6jWLaFVlTbVeYi3DMLdAfufC0fBMtcwrondRe6/omGT7XADpAvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wv7mZ3bWYz6K99Y;
-	Wed, 28 Aug 2024 23:36:14 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 236191400D4;
-	Wed, 28 Aug 2024 23:39:33 +0800 (CST)
-Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 28 Aug
- 2024 16:39:32 +0100
-Date: Wed, 28 Aug 2024 16:39:31 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Alexey Kardashevskiy <aik@amd.com>
-CC: <kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
-	<linux-coco@lists.linux.dev>, <linux-pci@vger.kernel.org>, "Suravee
- Suthikulpanit" <suravee.suthikulpanit@amd.com>, Alex Williamson
-	<alex.williamson@redhat.com>, Dan Williams <dan.j.williams@intel.com>,
-	<pratikrajesh.sampat@amd.com>, <michael.day@amd.com>, <david.kaplan@amd.com>,
-	<dhaval.giani@amd.com>, Santosh Shukla <santosh.shukla@amd.com>, Tom Lendacky
-	<thomas.lendacky@amd.com>, "Michael Roth" <michael.roth@amd.com>, Alexander
- Graf <agraf@suse.de>, "Nikunj A Dadhania" <nikunj@amd.com>, Vasant Hegde
-	<vasant.hegde@amd.com>, "Lukas Wunner" <lukas@wunner.de>
-Subject: Re: [RFC PATCH 08/21] crypto/ccp: Implement SEV TIO firmware
- interface
-Message-ID: <20240828163931.0000673b@Huawei.com>
-In-Reply-To: <20240823132137.336874-9-aik@amd.com>
-References: <20240823132137.336874-1-aik@amd.com>
-	<20240823132137.336874-9-aik@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692371A2C38;
+	Wed, 28 Aug 2024 15:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724860378; cv=fail; b=mGu0CfaSMmbEvFJqoR1wFg+NGsiBwf2r3+zyLL/y/zp+FpFG6pzJ1YvsGkTmvz1fL4VqGAi1q14SiWiBI1gNtv73A42TKZ3FJcMLtzKO1ZTv4WQpEGI50VBi0cB2LDrrjxFMG7bBvTrT67h0nsusUz3msTjAhoIk5iBmVFkeM/Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724860378; c=relaxed/simple;
+	bh=3VJ3tXjVFWI5YaIp1pU0PcK8vOM/DvlqJrZPXSG1Huc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TkvNKget/KFUfVOAV5drd5MnV5U+zx1qFKSAwha5IXGQbW0CnC46QFtyxuLPUxkMIGXKSrvR65nSmACpFpCJcIcwyRSkR54l9hQ/+DSBm1YvOTKkD0I+B/+6UbRTiSYlQmKH/R64RF+FZHhhfrJdNlsmC6ssfMQGs6cA+41r9wY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=oU5J48lm; arc=fail smtp.client-ip=40.107.244.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nlYq3O396hDaTTiEjqdc5nHyPLI5EjTVgp2QgLa9ybd+JIiKSUalevIbjjpfJpczH1Y0XTKd9XeEXEIEjb0e0SQfo2PWgDFqNzJ2I0NgUt1fZzdhwQAL4nUv5hm3R8p9BJUDwF5e+O1AvZDCEjtXdDxA3vSJM6cCYoe5GTokCas2oRewLfj1QkLkFeisbB2A/OpUKl0eNTdie/keLJOg6FEQShqW9R4RBPVQyzmWHBvqgse64R/cfXd8F1wxOiPkgpSUlFoDKn4lxaH/s2XnCkiT0yePvZe7MTmOpAAttSi2UPhE1e130JQg1j66LnOKrZGwfGYCaLBPYfuKmW6zeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xSU85RHVOuVLE9yV1hjzkBowHkLGr6pc/3OZcaAdfhs=;
+ b=FLu6ceITXBKEFmfrdfo3ePJ99HlW1zE6b4/ExDV/W9NEqHCNMevrAQKai/uFEA09K2ZuVyBNrN8HBDI3/H1NnXFhovk6RxX3Ef2TUIXIOSJU299IrljnccIAR26EAuvBOEhtmnTfhEf7/8Ywak3vQySVVUQyUfngEMgBwKhUrGpqAATVaY2s++FlAoLaEdBbBzsjPXKXCkqfKOSD8JrVB62imEgHDs5wV8nQaQjdTVbmytZjF7tG2iKeQGiJHNwrjry+s62BGtvQB+ri5xagNjMGN0/HRfDbgI4X2PMey7+064Lo9EFjKZQvCGoZWcnTwk5YOAFS8+j4LX4jR1fV2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xSU85RHVOuVLE9yV1hjzkBowHkLGr6pc/3OZcaAdfhs=;
+ b=oU5J48lmtRb/qbbakwK2TO1EvjB0CLrFK1NzjZsfkCwoymBRQLQ345Z8GfCWX52f/cmdkekQyj2dRs9eU+CfoqCkS9LIc0Gna0SyT3mSuDGR85JgYcI4zEj446AxzfoD/imD9tobkhsA9iILBGJf93Nd7la8uYJrz2CrPE0lgJo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
+ IA1PR12MB8408.namprd12.prod.outlook.com (2603:10b6:208:3db::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.26; Wed, 28 Aug
+ 2024 15:52:53 +0000
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::17e6:16c7:6bc1:26fb%5]) with mapi id 15.20.7897.021; Wed, 28 Aug 2024
+ 15:52:53 +0000
+Message-ID: <017bed8d-c4cd-46a1-89ea-25dcbb20c7b4@amd.com>
+Date: Wed, 28 Aug 2024 21:22:43 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 3/4] KVM: x86: nSVM: Implement support for nested
+ Bus Lock Threshold
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ pbonzini@redhat.com, shuah@kernel.org, nikunj@amd.com,
+ thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de,
+ babu.moger@amd.com, Manali Shukla <manali.shukla@amd.com>
+References: <20240709175145.9986-1-manali.shukla@amd.com>
+ <20240709175145.9986-4-manali.shukla@amd.com> <Zr-xGHQJXc-S_jTP@google.com>
+Content-Language: en-US
+From: Manali Shukla <manali.shukla@amd.com>
+In-Reply-To: <Zr-xGHQJXc-S_jTP@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0061.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:99::6) To DS7PR12MB6214.namprd12.prod.outlook.com
+ (2603:10b6:8:96::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|IA1PR12MB8408:EE_
+X-MS-Office365-Filtering-Correlation-Id: 97299d4b-b4ed-4b02-7827-08dcc77979eb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bGdpYXZoaGhnOUphV2lNZGhQdXp3ZUhhQjBHZGdlRjZWVzgrdmpIRlBxZ3E3?=
+ =?utf-8?B?eE1vU0tzQkJLNFZobXNjOGg3U3piQ1MxRkpyd25VeEZnaUdhWmZjYVdaMnlC?=
+ =?utf-8?B?YmFSelI1MW9NS3BmelI4M015all6aEdoeW9uNnBsYnZrWDUxWHNPa1V4QnF3?=
+ =?utf-8?B?bjB0V2IvTE4rRFc4KzR1YWRRQ21uY3ZxbzZDRXFNcXc3dFdZN0cxWWZXS3JS?=
+ =?utf-8?B?d3A1cWNUZHRicXBWYzJSZGk1QldmT29CWFRqODdxWEdsYTgwemxpbE9sZXBL?=
+ =?utf-8?B?clYraGlGS0Q4VkhxVFRYOWtYTXJjc2VES2Z1SGJHRGFCWmJsSlJvSHZJKytT?=
+ =?utf-8?B?RFFNUlI0bU9JeEV3QjhSTGZIKzVTanFMeVZhQW0zenh4c09GSWZwUk1ydTVJ?=
+ =?utf-8?B?THhqSnhEekE4VzRYNVhTczQ2R1dvaVV3WHBLNWhFblhTTkRZekNZWko5QnhT?=
+ =?utf-8?B?MEVFZ29HZEhlUVN6UGgzUEx5aHdEQWdSMVR6UmFKSGJGYU9oelFIVk9FS3h3?=
+ =?utf-8?B?ZzFEaWlpOVBBcWl0WFNYN2EyUUxCZFNkTkFPdXlUQkZ6aXQ3cFVaMHJiS0Jr?=
+ =?utf-8?B?c2tTZS9YakU4b2NlMDhGK2xSVkp5VVlBZ1YyMVBzdzgzZE1NTldXRUdDMzQv?=
+ =?utf-8?B?Y2UxaXJ5M1IvZlBheUI0TWJFc1V2QUJKcVZUcXI1ekI4N0lzcnRyK2pDZVlj?=
+ =?utf-8?B?bHp0S1lCNDdzajdzbVRKMGo4YjFMQThMKzNHb0tYMzNWNGpocWhiVnp6T2VO?=
+ =?utf-8?B?b3NyNXZHNTVlanJrdEtSYXNnS3BUMFlFSGYyL1hBVFphV0dUazZ4RjVraXd0?=
+ =?utf-8?B?c0RvWFlzY3QvZ3prV0ZSWS9pazQzaVpERnJTQm15ajNiWnNoZVBIR3ZlbmZJ?=
+ =?utf-8?B?MCtnQytyVGw3emVNaTl6WExyUXlML1dmY3RBK2xUSk5YN1FLaXhEZ1hMNmZL?=
+ =?utf-8?B?UWJNUEs1WHB6V2tVR0tvYy9UWGgzMUp2L3pUY2dGVFlGYU0rVUdJcWlraDRo?=
+ =?utf-8?B?ZG1GQ0JKdDVBbmxjc1ZwdXlzUjdyNmZaTTJYemtqVTh3M3pYRlNhZ2NyU1Js?=
+ =?utf-8?B?MEoyZGtOaFdBMXBFUzZCSjF3K1JGb1ZXWkdjdUdiNGl1MDROS0hjNmZFT2VR?=
+ =?utf-8?B?Q3ltK2xVVXhPUW1FeUlRQ3pqTFdkK2V6WlVPb0xJSHN5SllsWDg4MG94WjZu?=
+ =?utf-8?B?TmVhL0FnR3ZCMGpSbVVRZzRpWDI5bTBvZzFmYkRmdjNrR2ZKWTFwMGtHM0dy?=
+ =?utf-8?B?SGxMcGduV2JNd2xnVmtGbng3VUhPZjdFWWhGUkFkVjVObzVuaTRzbWIxaE11?=
+ =?utf-8?B?UmpuT2tVRWtGcjJRQkFUNjlHdnJwODAzcSszdk5FZlJQMlBxcFdvV3FuekF2?=
+ =?utf-8?B?ZmU2NHhIT0lLOFNhQ1FEbE9tUVlVWkhwYzdJTDdtY2lja210NHJMMk0rQmhy?=
+ =?utf-8?B?RkJxZmJJeGp0dlo3ZzJXTTAzaFZlaWlLdHlsWGFNWmFIa2Z3RmlvT2NoQlVJ?=
+ =?utf-8?B?STZuYzlCM1NOSWJxZnRnTEkvSkxHQ2dVK01EWXhNcURmUnlKOUpXMDhMOGlG?=
+ =?utf-8?B?ZFV3STA3L1A3eHJIaCtEZGoxN3VycDJkaVYwZHN0ejdMTDFQS2tEZm5JSE1p?=
+ =?utf-8?B?VkNRalRqNitQOVU4NzhzRGlKdmw0akZIMmdXWHNwNDdpNWFwN09GdndUd3R6?=
+ =?utf-8?B?Y3puenliUWJiTjJaS2k5cjZ1UWt1aEpFOVJnVlV2MktIUTBoN21aYVdndVlj?=
+ =?utf-8?B?d1pKTFhqbTFlSTh5SWRyYzNPMzNYYkhmS3FyS2ZLYWFPK2xNa3VZeE4yaFA4?=
+ =?utf-8?B?MENRWGs1R1d4N2k3blRWdz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aXQzNGNtWHRaRXBKSmJ4dFBiWXdIMGFtZFRvN0Znd2dyaWhmVWYzZjM5dU9U?=
+ =?utf-8?B?Tzg4YkJKd2xvSDNocGl4VXYzMTFXZTNEdVJRUmQyNkhDN1FkcjJjZitGNTlL?=
+ =?utf-8?B?c2xrRjF0dXREMVN3U1N4THdrR1FQVWdNNmw3a3Q5M3czcDlUeFQ0S1h4eTht?=
+ =?utf-8?B?NTNpa1Roc0FrVlNUTkoyVVo2YmxWZGF5bFIwcHRsOW4zdjdwdXc0Vmp0cWF0?=
+ =?utf-8?B?M1IySUhEajRncnFyTjJocXIxRGYxbG00azRHdE14UmZLU0U1VzBnRUhVM2c4?=
+ =?utf-8?B?ZmwvU3FBc0g3WGhDczZ4Z21MSGsrbTJBSHpPejBpWEx1QzVBUU1iR3I0YU91?=
+ =?utf-8?B?Y3BDbU1kMzZaRGgveGpkSDdLenoyNVk0Qk5HcmNPWXdrVFdaWmh6UEtHWXY4?=
+ =?utf-8?B?V0VsU0xGbHdEVmo0K2grQ1VpQUN4NHRkT0hEcFY1ZVRuRy9melpBNG5aVjIv?=
+ =?utf-8?B?TGFwSDJQcnpuTlBDTHg5QXkwNVg0eFR0Z2R2Tk1XMTFIOWR2U3VRcDRWc0Vn?=
+ =?utf-8?B?K0YxRFVGQlFaSFRLUlcrVkNPVTdUY2xydUtyWXdJTERhczNadWF5aGtJeHJZ?=
+ =?utf-8?B?aUZaVlhQVWdJanpkYmMrcGRWc29OeXppcW4rNmJWazRjRWV3c3E2cGJDY0xh?=
+ =?utf-8?B?Yld5YTBlL1J6RGhIOFFmNGxJamcxR21FS21OazcxS2pyYmoyb2FZcHVheTZR?=
+ =?utf-8?B?cDdySnp0NXI3T21BckE4WE1pSzdYNk5sSytEWGdadTY5VjkvK2JZTjFHODcw?=
+ =?utf-8?B?NlNib1hmMHdqMklHVDVaV0xRUDYxSXppZk9UcjRvYzJRVUZ2SkU4bi94Q1ox?=
+ =?utf-8?B?eTZPVFdieFBkVDd0Vjd1QldTKytLR3BTZnFSYTJJVW9iR1h6bVVlMktsbFBk?=
+ =?utf-8?B?N0ZWUVBjUWhzTVVYR0RwY3RIVEJncnJpcC91dDBoY1pxS01KWDVhQ3ZvT2NT?=
+ =?utf-8?B?R3lEVk1xaFNRL0NPZk14YlFrZjVwNVEyaGZkZXV4SWtaRlFzVHI1eUVxQmtz?=
+ =?utf-8?B?ckZaaHNGWGcyOHhEZkJ6YWw3RHNnd0tBV3lCWE5mT3cwdUNKUmNmNFJpaGF3?=
+ =?utf-8?B?cXVHMWczOHBKWTIzVmtyeHhpc1ZHdjJ0L2lxREo2TjhDVW13T0pxT1ViWXFT?=
+ =?utf-8?B?b0NOSUxtV1ArTXR3ZElrTHpGNkROb2xyN2VGU05VMGE4ZkhQUHh4OUZtKzVq?=
+ =?utf-8?B?b3hBZm84czJtcE55S3QrSGdHajR5QmpoY2YvVFlUS2xoelh5am5EelpnOEtV?=
+ =?utf-8?B?ZE15dDNmcEdWMUFhMTVkSHFmRTBTYjR5clZJUjJ6ZXhJSldVNGJpV1hzVURm?=
+ =?utf-8?B?Yy9pWFNyQUNNK2ZqbytObE9zWkxnMEMxVFZtZEVVeWtTazVlZnhQenBYU2JK?=
+ =?utf-8?B?YmtmRmdZTVNnTUhrM3E5WXA1VTN1U0NXREMyWXZ3eHliQ0FhYTY2bTM1OWRa?=
+ =?utf-8?B?NS94bnN6dnFDY3NCa2FHUzZiWmN6RWdDRVRKTnR0VUFYOVUxY0luOWdXZm05?=
+ =?utf-8?B?YnJlUkJLQlRKUU5PdXV5M3dSclBNdmgwa2IyemdvdWJlVXh6NEJjRkRtZmFL?=
+ =?utf-8?B?d0xLNlRka1ROSnNTd2lNaEpIR1cwZnRBb1NhOHozeVJJQ042RHhYa2hnTWl3?=
+ =?utf-8?B?NU03K29ZZ1ptaWpjaXA5dUJRTVVCVWFxMDZra3NBNWVQMzhldFpncG45ZVRj?=
+ =?utf-8?B?by9HcVhLVUZRSDlYbGtMblZzREExZ1VXTTVIMWVSc0hQTmZNODB5dmRiTXF1?=
+ =?utf-8?B?YzZzNlZLejIxMnp1NEtSdWt3M0QrU0tBMVBDZ2ZtclpUQk03Tk5VbnFmYXJ0?=
+ =?utf-8?B?MXFnTlRlU0ZFbW11L3pBb2JCc1hLTEorR3pKWjZPcm42MjE1M0dzT0U0MEFQ?=
+ =?utf-8?B?U1pVWFZWWU92elNsbUpyYUhKdjluR0pMekhCVC8wRUJKM1NmYmY3bzRBSXBx?=
+ =?utf-8?B?c3VsVTFiMDdEVFNhWHUrbzZKSTdIOTRQc25pcWRXTWpCTXNsSENlVnJqUnBa?=
+ =?utf-8?B?anZkVmIrMkpydEVnQm9XdUgwTVp5SGM5RE42NmlldkhDOEhxdE1mTnhwQjc2?=
+ =?utf-8?B?R1JZZXoycCtJaGZYc0ZaK2RNUmdrMVY5UkM0Y1BEUURzMjZOT1JqdjF5R2w2?=
+ =?utf-8?Q?FgCODfyUzW4SuD3MUod+5l0Fw?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97299d4b-b4ed-4b02-7827-08dcc77979eb
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 15:52:53.3862
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uPi+Kn+aEbV5t7LsQifzfR5QmEAsLro2rrZprxmLeHCp77tNIAtGWQ2F/v9zdo/yY6Sq3gEiDn3uoW8salakqw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8408
 
-On Fri, 23 Aug 2024 23:21:22 +1000
-Alexey Kardashevskiy <aik@amd.com> wrote:
-
-> Implement SEV TIO PSP command wrappers in sev-dev-tio.c, these make
-> SPDM calls and store the data in the SEV-TIO-specific structs.
+On 8/17/2024 1:35 AM, Sean Christopherson wrote:
+> On Tue, Jul 09, 2024, Manali Shukla wrote:
+>> Expose the Bus Lock Threshold in the guest CPUID and support its
+>> functionality in nested guest.
 > 
-> Implement tsm_ops for the hypervisor, the TSM module will call these
-> when loaded on the host and its tsm_set_ops() is called. The HV ops
-> are implemented in sev-dev-tsm.c.
+> Why?  This is a rather messy feature to support in a nested setup, and I'd much
+> prefer to not open that can of worms unless there's a very good reason to do so.
+
+Agreed.
+
 > 
-> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-Superficial comments online inline.
-
-Jonathan
-
-> ---
->  drivers/crypto/ccp/Makefile      |    2 +
->  arch/x86/include/asm/sev.h       |   20 +
->  drivers/crypto/ccp/sev-dev-tio.h |  105 ++
->  drivers/crypto/ccp/sev-dev.h     |    2 +
->  include/linux/psp-sev.h          |   60 +
->  drivers/crypto/ccp/sev-dev-tio.c | 1565 ++++++++++++++++++++
->  drivers/crypto/ccp/sev-dev-tsm.c |  397 +++++
->  drivers/crypto/ccp/sev-dev.c     |   10 +-
->  8 files changed, 2159 insertions(+), 2 deletions(-)
+>> Ensure proper restoration and saving of the bus_lock_counter at VM
+>> Entry and VM Exit respectively in nested guest scenarios.
+>>
+>> Case 1:
+>> L0 supports buslock exit and L1 does not: use buslock counter from L0
+>> and exits happen to L0 VMM.
+>>
+>> Case 2:
+>> Both L0 and L1 supports buslock exit: use L1 buslock counter value and
+>> exits happen to L1 VMM.
 > 
-> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
-> index 394484929dae..d9871465dd08 100644
-> --- a/drivers/crypto/ccp/Makefile
-> +++ b/drivers/crypto/ccp/Makefile
-> @@ -11,6 +11,8 @@ ccp-$(CONFIG_PCI) += sp-pci.o
->  ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o \
->                                     sev-dev.o \
->                                     tee-dev.o \
-> +				   sev-dev-tio.o \
-> +				   sev-dev-tsm.o \
-spaces vs tabs. I guess go for consistency.
+> Yeah, no.  L1 wants to attack the host, so it runs L2 with buslock detection
+> enabled, but the highest possible threshold.  Game over.
+> 
+> If we take the min between the two, then we have to track the delta and shove
+> _that_ into the VMCB.  E.g. L1 wants every 4, L0 wants every 5.  After 4 locks,
+> KVM synthesizes a nested VM-Exit.  Then on nested VMRUN, KVM needs to remember
+> it should run L2 with a threshold of 1.
+> 
+> If we really want to support virtualizing bus lock detection for L1, the easiest
+> approach would be to do so if and only if it's NOT in use by L0.  But IMO that's
+> not worth doing.
 
->                                     platform-access.o \
->                                     dbc.o \
->                                     hsti.o
+I will drop the nested implementation in V2.
 
-> diff --git a/drivers/crypto/ccp/sev-dev-tio.c b/drivers/crypto/ccp/sev-dev-tio.c
-> new file mode 100644
-> index 000000000000..42741b17c747
-> --- /dev/null
-> +++ b/drivers/crypto/ccp/sev-dev-tio.c
-> @@ -0,0 +1,1565 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-
-> +static size_t sla_dobj_id_to_size(u8 id)
-> +{
-> +	size_t n;
-> +
-> +	BUILD_BUG_ON(sizeof(struct spdm_dobj_hdr_resp) != 0x10);
-> +	switch (id) {
-> +	case SPDM_DOBJ_ID_REQ:
-> +		n = sizeof(struct spdm_dobj_hdr_req);
-> +		break;
-> +	case SPDM_DOBJ_ID_RESP:
-> +		n = sizeof(struct spdm_dobj_hdr_resp);
-> +		break;
-> +	case SPDM_DOBJ_ID_CERTIFICATE:
-> +		n = sizeof(struct spdm_dobj_hdr_cert);
-> +		break;
-> +	case SPDM_DOBJ_ID_MEASUREMENT:
-> +		n = sizeof(struct spdm_dobj_hdr_meas);
-> +		break;
-> +	case SPDM_DOBJ_ID_REPORT:
-> +		n = sizeof(struct spdm_dobj_hdr_report);
-> +		break;
-> +	default:
-> +		WARN_ON(1);
-> +		n = 0;
-> +		break;
-> +	}
-> +
-> +	return n;
-
-Early returns will make this more readable.
-
-> +}
-
-
-> +/**
-> + * struct sev_data_tio_dev_connect - TIO_DEV_CONNECT
-> + *
-> + * @length: Length in bytes of this command buffer.
-> + * @spdm_ctrl: SPDM control structure defined in Section 5.1.
-> + * @device_id: The PCIe Routing Identifier of the device to connect to.
-> + * @root_port_id: The PCIe Routing Identifier of the root port of the device.
-> + * @segment_id: The PCIe Segment Identifier of the device to connect to.
-
-Doesn't seem to be there.
-
-> + * @dev_ctx_sla: Scatter list address of the device context buffer.
-> + * @tc_mask: Bitmask of the traffic classes to initialize for SEV-TIO usage.
-> + *           Setting the kth bit of the TC_MASK to 1 indicates that the traffic
-> + *           class k will be initialized.
-> + * @cert_slot: Slot number of the certificate requested for constructing the SPDM session.
-> + * @ide_stream_id: IDE stream IDs to be associated with this device.
-> + *                 Valid only if corresponding bit in TC_MASK is set.
-> + */
-> +struct sev_data_tio_dev_connect {
-> +	u32 length;
-> +	u32 reserved1;
-> +	struct spdm_ctrl spdm_ctrl;
-> +	u8 reserved2[8];
-> +	struct sla_addr_t dev_ctx_sla;
-> +	u8 tc_mask;
-> +	u8 cert_slot;
-> +	u8 reserved3[6];
-> +	u8 ide_stream_id[8];
-> +	u8 reserved4[8];
-> +} __packed;
-> +
-
-
-> +/**
-> + * struct sev_data_tio_guest_request - TIO_GUEST_REQUEST command
-> + *
-> + * @length: Length in bytes of this command buffer
-> + * @spdm_ctrl: SPDM control structure defined in Chapter 2.
-
-Some more fields that aren't documented.  They all should be for
-kernel-doc or the scripts will moan. 
-I'd just run the script and fixup all the warnings and errors.
-
-
-> + * @gctx_paddr: system physical address of guest context page
-> + * @tdi_ctx_paddr: SPA of page donated by hypervisor
-> + * @req_paddr: system physical address of request page
-> + * @res_paddr: system physical address of response page
-> + */
-> +struct sev_data_tio_guest_request {
-> +	u32 length;				/* In */
-> +	u32 reserved;
-> +	struct spdm_ctrl spdm_ctrl;		/* In */
-> +	struct sla_addr_t dev_ctx_sla;
-> +	struct sla_addr_t tdi_ctx_sla;
-> +	u64 gctx_paddr;
-> +	u64 req_paddr;				/* In */
-> +	u64 res_paddr;				/* In */
-> +} __packed;
-> +
-
-
-
-> +int sev_tio_tdi_status(struct tsm_dev_tio *dev_data, struct tsm_tdi_tio *tdi_data,
-> +		       struct tsm_spdm *spdm)
-> +{
-> +	struct sev_tio_tdi_status_data *data = (struct sev_tio_tdi_status_data *) dev_data->data;
-> +	struct sev_data_tio_tdi_status status = {
-> +		.length = sizeof(status),
-> +		.dev_ctx_sla = dev_data->dev_ctx,
-> +		.tdi_ctx_sla = tdi_data->tdi_ctx,
-> +	};
-> +	int ret;
-> +
-> +	if (IS_SLA_NULL(dev_data->dev_ctx) || IS_SLA_NULL(tdi_data->tdi_ctx))
-> +		return -ENXIO;
-> +
-> +	memset(data, 0, sizeof(*data));
-> +
-> +	spdm_ctrl_init(spdm, &status.spdm_ctrl, dev_data);
-> +	status.status_paddr = __psp_pa(data);
-> +
-> +	ret = sev_tio_do_cmd(SEV_CMD_TIO_TDI_STATUS, &status, sizeof(status),
-> +			     &dev_data->psp_ret, dev_data, spdm);
-> +
-> +	return ret;
-
-return sev_tio_do_cmd()
-
-Same in other similar cases.
-
-> +}
-
-
-> diff --git a/drivers/crypto/ccp/sev-dev-tsm.c b/drivers/crypto/ccp/sev-dev-tsm.c
-> new file mode 100644
-> index 000000000000..a11dea482d4b
-> --- /dev/null
-> +++ b/drivers/crypto/ccp/sev-dev-tsm.c
-> @@ -0,0 +1,397 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +// Interface to CCP/SEV-TIO for generic PCIe TDISP module
-> +
-> +#include <linux/pci.h>
-> +#include <linux/pci-doe.h>
-> +#include <linux/tsm.h>
-> +
-> +#include <linux/smp.h>
-> +#include <asm/sev-common.h>
-> +
-> +#include "psp-dev.h"
-> +#include "sev-dev.h"
-> +#include "sev-dev-tio.h"
-> +
-> +static int mkret(int ret, struct tsm_dev_tio *dev_data)
-> +{
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (dev_data->psp_ret == SEV_RET_SUCCESS)
-> +		return 0;
-> +
-> +	pr_err("PSP returned an error %d\n", dev_data->psp_ret);
-I'm not totally convinced this is worth while vs simply checking
-at call sites.
-
-> +	return -EINVAL;
-> +}
-> +
-> +static int dev_connect(struct tsm_dev *tdev, void *private_data)
-> +{
-> +	u16 device_id = pci_dev_id(tdev->pdev);
-> +	u16 root_port_id = 0; // FIXME: this is NOT PCI id, need to figure out how to calculate this
-> +	u8 segment_id = tdev->pdev->bus ? pci_domain_nr(tdev->pdev->bus) : 0;
-> +	struct tsm_dev_tio *dev_data = tdev->data;
-> +	int ret;
-> +
-> +	if (!dev_data) {
-> +		dev_data = kzalloc(sizeof(*dev_data), GFP_KERNEL);
-> +		if (!dev_data)
-> +			return -ENOMEM;
-> +
-> +		ret = sev_tio_dev_create(dev_data, device_id, root_port_id, segment_id);
-> +		if (ret)
-> +			goto free_exit;
-> +
-> +		tdev->data = dev_data;
-> +	}
-...
-
-> +
-> +free_exit:
-> +	sev_tio_dev_reclaim(dev_data, &tdev->spdm);
-> +	kfree(dev_data);
-
-Correct to free even if not allocated here?
-Perhaps a comment if so.
-
-> +
-> +	return ret;
-> +}
-> +
-
-
-> +static int ide_refresh(struct tsm_dev *tdev, void *private_data)
-> +{
-> +	struct tsm_dev_tio *dev_data = tdev->data;
-> +	int ret;
-> +
-> +	if (!dev_data)
-> +		return -ENODEV;
-> +
-> +	ret = sev_tio_ide_refresh(dev_data, &tdev->spdm);
-> +
-> +	return ret;
-
-	return sev_tio_ide_refresh()
-
-> +}
-
-> +
-> +static int tdi_create(struct tsm_tdi *tdi)
-> +{
-> +	struct tsm_tdi_tio *tdi_data = tdi->data;
-> +	int ret;
-> +
-> +	if (tdi_data)
-> +		return -EBUSY;
-> +
-> +	tdi_data = kzalloc(sizeof(*tdi_data), GFP_KERNEL);
-> +	if (!tdi_data)
-> +		return -ENOMEM;
-> +
-> +	ret = sev_tio_tdi_create(tdi->tdev->data, tdi_data, pci_dev_id(tdi->pdev),
-> +				 tdi->rseg, tdi->rseg_valid);
-> +	if (ret)
-> +		kfree(tdi_data);
-	if (ret) {
-		kfree(tdi_data);
-		return ret;
-	}
-
-	tid->data = tdi_data;
-
-	return 0;
-
-is slightly longer but a more standard form so easier to review.
-
-> +	else
-> +		tdi->data = tdi_data;
-> +
-> +	return ret;
-> +}
-> +
-
-> +
-> +static int guest_request(struct tsm_tdi *tdi, u32 guest_rid, u64 kvmid, void *req_data,
-
-Probably wrap nearer 80 chars.
-
-> +			 enum tsm_tdisp_state *state, void *private_data)
-> +{
-> +	struct tsm_dev_tio *dev_data = tdi->tdev->data;
-> +	struct tio_guest_request *req = req_data;
-> +	int ret;
-> +
-> +	if (!tdi->data)
-> +		return -EFAULT;
-> +
-> +	if (dev_data->cmd == 0) {
-> +		ret = sev_tio_guest_request(&req->data, guest_rid, kvmid,
-> +					    dev_data, tdi->data, &tdi->tdev->spdm);
-> +		req->fw_err = dev_data->psp_ret;
-
-If the above returned an error is psp_ret always set? I think not.
-So maybe separate if (ret) condition, then set this and finally call
-the code below.
-
-> +		ret = mkret(ret, dev_data);
-> +		if (ret > 0)
-> +			return ret;
-> +	} else if (dev_data->cmd == SEV_CMD_TIO_GUEST_REQUEST) {
-> +		ret = sev_tio_continue(dev_data, &tdi->tdev->spdm);
-> +		ret = mkret(ret, dev_data);
-> +		if (ret > 0)
-> +			return ret;
-> +	}
-> +
-> +	if (dev_data->cmd == 0 && state) {
-> +		ret = sev_tio_tdi_status(tdi->tdev->data, tdi->data, &tdi->tdev->spdm);
-> +		ret = mkret(ret, dev_data);
-> +		if (ret > 0)
-> +			return ret;
-> +	} else if (dev_data->cmd == SEV_CMD_TIO_TDI_STATUS) {
-> +		ret = sev_tio_continue(dev_data, &tdi->tdev->spdm);
-> +		ret = mkret(ret, dev_data);
-> +		if (ret > 0)
-> +			return ret;
-> +
-> +		ret = sev_tio_tdi_status_fin(tdi->tdev->data, tdi->data, state);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static int tdi_status(struct tsm_tdi *tdi, void *private_data, struct tsm_tdi_status *ts)
-> +{
-> +	struct tsm_dev_tio *dev_data = tdi->tdev->data;
-> +	int ret;
-> +
-> +	if (!tdi->data)
-> +		return -ENODEV;
-> +
-> +#if 0 /* Not implemented yet */
-> +	if (dev_data->cmd == 0) {
-> +		ret = sev_tio_tdi_info(tdi->tdev->data, tdi->data, ts);
-> +		ret = mkret(ret, dev_data);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +#endif
-> +
-> +	if (dev_data->cmd == 0) {
-> +		ret = sev_tio_tdi_status(tdi->tdev->data, tdi->data, &tdi->tdev->spdm);
-> +		ret = mkret(ret, dev_data);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = sev_tio_tdi_status_fin(tdi->tdev->data, tdi->data, &ts->state);
-
-Given code as it stands. Might as well return here.
-
-> +	} else if (dev_data->cmd == SEV_CMD_TIO_TDI_STATUS) {
-Making this just an if.
-
-> +		ret = sev_tio_continue(dev_data, &tdi->tdev->spdm);
-> +		ret = mkret(ret, dev_data);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = sev_tio_tdi_status_fin(tdi->tdev->data, tdi->data, &ts->state);
-and here.
-
-> +	} else {
-
-Making this the inline code as no need for else.
-
-> +		pci_err(tdi->pdev, "Wrong state, cmd 0x%x in flight\n",
-> +			dev_data->cmd);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +struct tsm_ops sev_tsm_ops = {
-> +	.dev_connect = dev_connect,
-> +	.dev_reclaim = dev_reclaim,
-> +	.dev_status = dev_status,
-> +	.ide_refresh = ide_refresh,
-> +	.tdi_bind = tdi_bind,
-> +	.tdi_reclaim = tdi_reclaim,
-> +	.guest_request = guest_request,
-> +	.tdi_status = tdi_status,
-> +};
-
-
+-Manali
 
