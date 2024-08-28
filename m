@@ -1,201 +1,149 @@
-Return-Path: <kvm+bounces-25293-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25294-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D82099630EE
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 21:27:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEC14963102
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 21:34:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08C5D1C22B2D
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 19:27:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF3B51C23648
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 19:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9761ABEB8;
-	Wed, 28 Aug 2024 19:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBACC1ABEC4;
+	Wed, 28 Aug 2024 19:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WC20kxtE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D5CFzl7t"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2055.outbound.protection.outlook.com [40.107.101.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28C61547DD;
-	Wed, 28 Aug 2024 19:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724873256; cv=fail; b=fwec96HxX86bYsGs0ivYnI3f5FuP6xLbMbQ4R+1TaH+OB5urkAO7Wwch4viaV+pAIIdUH4sS8miNZn5PDH7Bj8tpzhS8iyYE+0xWhggnpGxnDwuMbKNxQVSwxJAHhiVYPY6DSsX4OPFv4MCFL0owmj06QXT3rkTR13Tirh8o8Es=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724873256; c=relaxed/simple;
-	bh=zeFcb4q4a4pO9A2C+0bgW4Eq0+U763aIk1U8GG49oSY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TEBcZaMJziAkKbmKtm2Rad7aF/m5m7LGpn7lHZHTKVlrfPVobKDZGCdXrCyFx0awgnst5M7oiB7+02j0nM5lXHtO6cK968MrhbLIP4OBfvDMiuXv2j2SSMFFXQz4Dl282Ziwa0PPhsZqT2HWk7OzTNbTNnVPkCVR7xJtezsWIRY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WC20kxtE; arc=fail smtp.client-ip=40.107.101.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JuR0OKgo2CtbXK5lsn5jKgogCxHqb2ON4NuzjlB9BrvH6xVZEYdxEMEIfMxrp3Jid6oQ0rYTWuWOVeF5HOSfVwYW6hx8j/52TSFmvjGOVNNeUbzftwM9FG8RtvdyIiO7z1/MhK++mKOpAw7YYKfaujJ+wBTjRvKjJh9jTukXJqj7ibtX+lCXowfs7wrMiyta38yJxL4LtSQNNUgzsNGTDZZcM8x2xq4RY2TLrD/RLWBqNZnaowmEtJyWQOmlzC35EuhGYvzv/S/sAn1zMJs5vvZsUad3EQYjX1xt1VhN0D7nKNAfi9LXvbMd+RL5hdN2FEY5Pq1R/DkmWT5Qef8QxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u5o74GjldS76Aouu3F8J7rUSmu8qXl7a3Y4k/WLsGEA=;
- b=jCvwNuOr5us6GQvkMoIRE9PEG3cOMy3HJzPSrrDztDLmP98hGjYrxuVv4LoGmsuLs53w8JxlzkT11ra2ceq1Aro4K5OpLI1qHs6TFlioPyt+Ts0IjGWCTltrWFfVdkvB4CSiosq67W3tpn0ThzwYwJV612swuF20syh5MWGYgkSmYsXMJBzhSXAVb7G3zUq9qk2ytm6rNhOQb88KZl+ZS6QN1xte6Q1ENLvMjKLwgAEma+0nlDTFYwXyPHcGZGwZhrsXQJJB6y8A/twjIPza/zdnqr1Qoiay+1XeqGIfrfOeJ39zNsqyEZQeKiaNKuUuTT5dvIYvTYfkRvlL5vUVuw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u5o74GjldS76Aouu3F8J7rUSmu8qXl7a3Y4k/WLsGEA=;
- b=WC20kxtEzpYm8YPOFkoQpBqAWUwJCM9uLsDrYzMNX3DQofOOxUWzd7iJuUi7sAwR3eUbjD6D+ZO0aUTzJvNFP3TFLODjb/v6XGwovoEkyXklyPC94bHgjDi+kDIqQ9XdjsWPb0nd2EmcQcE8Yl2B+nFbZChAnBWP2681xjf6JNRwJd7aFE+fpMLQ/lf46pApE/z+ilFw3eoUyYjbHzv2ZcQtsEcBdGw66JZEjDfsi6uSDugb7E2cXqcxLKS2oo6W1IJOTULQm/mkYPgK+L3HEVOFWeXRWDOnVVMrr7vtVQZx2QNEYnrM+iHcdLV2ceudOZ3d59V5h3LxzHgr1jWefA==
-Received: from DS7PR03CA0079.namprd03.prod.outlook.com (2603:10b6:5:3bb::24)
- by SJ0PR12MB8137.namprd12.prod.outlook.com (2603:10b6:a03:4e5::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.26; Wed, 28 Aug
- 2024 19:27:30 +0000
-Received: from CH3PEPF00000014.namprd21.prod.outlook.com
- (2603:10b6:5:3bb:cafe::eb) by DS7PR03CA0079.outlook.office365.com
- (2603:10b6:5:3bb::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.28 via Frontend
- Transport; Wed, 28 Aug 2024 19:27:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH3PEPF00000014.mail.protection.outlook.com (10.167.244.119) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7939.2 via Frontend Transport; Wed, 28 Aug 2024 19:27:30 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 28 Aug
- 2024 12:27:15 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 28 Aug
- 2024 12:27:15 -0700
-Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4 via Frontend
- Transport; Wed, 28 Aug 2024 12:27:13 -0700
-Date: Wed, 28 Aug 2024 12:27:12 -0700
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: <acpica-devel@lists.linux.dev>, Hanjun Guo <guohanjun@huawei.com>,
-	<iommu@lists.linux.dev>, Joerg Roedel <joro@8bytes.org>, Kevin Tian
-	<kevin.tian@intel.com>, <kvm@vger.kernel.org>, Len Brown <lenb@kernel.org>,
-	<linux-acpi@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	"Lorenzo Pieralisi" <lpieralisi@kernel.org>, "Rafael J. Wysocki"
-	<rafael@kernel.org>, Robert Moore <robert.moore@intel.com>, Robin Murphy
-	<robin.murphy@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Will Deacon
-	<will@kernel.org>, "Alex Williamson" <alex.williamson@redhat.com>, Eric Auger
-	<eric.auger@redhat.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>,
-	<patches@lists.linux.dev>, Shameerali Kolothum Thodi
-	<shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH v2 8/8] iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED
-Message-ID: <Zs96EOG48M6AiDwf@Asurada-Nvidia>
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <8-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <Zs5Du208eSxU67wT@Asurada-Nvidia>
- <20240828190100.GA1373017@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27151547DD
+	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 19:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724873670; cv=none; b=qv49wvGZW0ZmINmREmeZqDdG84AwoveNraLdXQ5W/rHPWeFpWBHG3sBiePTIcWwu2NKNCUJYOH4lSe74eHaGqcLzkzTJqS9lV+XPaXkKwo3Ga7HX+W4O46wEHcEQv16j2h9IyOOZGdX5ISEr2sNvH+tbdn0xCCDjlfKw7Xyq9pc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724873670; c=relaxed/simple;
+	bh=U0nRJfuSYu2oeCnqg4TuSfGnDjuRmeMvB7KYV69MFlY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=XhmyOK1M0EB2DHRUWPKayboyqdaQm60AUwdKtqA2SX/K7DwFvQO4umB8GQ906HVR5YeyiWcZfMrwred8qKiFFuk/QJkdeC1S456ZwDhwpjt8DuAou5E9M0b1LzIXMtYQJ/1v0TcD0m2Ogqzgzg6fmBa+GjVUE5JSU+i0k5hx0hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D5CFzl7t; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7bbe0ab18caso6934562a12.0
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 12:34:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724873668; x=1725478468; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5v9jviBqnz5aAXffGbPI/pVMtwvNCYwzoWJJtUG+kNo=;
+        b=D5CFzl7t45rN4C/D/4gzn7Jfs9Z1aJRBuZasZhWJ+yrSEXpN/VQPEglJG7B0DtdCJx
+         M71qzL0IWAS9VWyOps6ml1y2+UIv9tc3gCLALJBpoWR20WhmsQxlJKvUNstd34LHcCU9
+         rR0OLVBxPptT23RmVvasWrsH8nmcSjq/b3wd71lfLJ4ZRWy0KqjTMd5MlWcq9gN7SktQ
+         RAA+22Kse58pH2xLIDFzOnFul9o+RJkO4m7GVUpp7GmDnnRxGZuXrRs1Yud5TutnR4+6
+         91NlZHa4ZImY9govLXlpxyijQSSaOj6ENyF43YPxRsSWOG4tdevxz8CogK0wpocUMlbU
+         BTZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724873668; x=1725478468;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5v9jviBqnz5aAXffGbPI/pVMtwvNCYwzoWJJtUG+kNo=;
+        b=SK0AQUFYKKxbj5HJwyypMxgayXE9sxSqycgTM3MTCJHT+PiVEYaDhjlW+oSNXwGvMY
+         ZfkzwxQRvGzpJJAsgdmqMBUXCgjSPAgYi6erUzZDuDFD9W7zpKSTPnWKzWvG/V+2Jeop
+         X+1JLCQstNotX5QA156T0AHyLYSFuLd6Y4meGua+4VWU3kOm+GzEV/WKIjGlvoWgYm1u
+         zDl53dvKq1tTo3ukyCacuwtr72mNplRtGaSwgHI+IgLUlX+Kf4WdZiiQ7s8Vtzs3Pxvt
+         PnQQZ3KXOLVDDM/VZFWjatJsZizc3qGpUOOJVVv5QIjGbA2v+PeWqK0EArpy5/iMFogf
+         zUvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYvdqJJnQaszoF/hRwT7RO/Xgrj1yWcLY/lXphSEaPMgyHkP3YxpPRVWGBgsHgLkbd17w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywpgmx8Dw6GqIkB+J33ApTBzKu5vQxnZ32B4osQRZKiPFV/5xQG
+	3QbJDlrBe4T/msUIoLJPf9itl4wGZldeW8V0w7u9jyE2o451S2Hkc6hyGirefub+32ElD5pXIBH
+	Atg==
+X-Google-Smtp-Source: AGHT+IFhurU2w7TOC2i2YTwMzYrDKPVl0I4SkeelnW34OxzACgmyVnofxdJB3JjrwrdP4YpCpvJQepXchXI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:200e:b0:2c8:b576:2822 with SMTP id
+ 98e67ed59e1d1-2d8564e70e6mr540a91.8.1724873667973; Wed, 28 Aug 2024 12:34:27
+ -0700 (PDT)
+Date: Wed, 28 Aug 2024 12:34:26 -0700
+In-Reply-To: <20240821095127.45d17b19@gandalf.local.home>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20240821095127.45d17b19@gandalf.local.home>
+Message-ID: <Zs97wp2-vIRjgk-e@google.com>
+Subject: Re: [RFC][PATCH] KVM: Remove HIGH_RES_TIMERS dependency
+From: Sean Christopherson <seanjc@google.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	"x86@kernel.org" <x86@kernel.org>, Joel Fernandes <joel@joelfernandes.org>, 
+	Suleiman Souhlal <ssouhlal@freebsd.org>, Vineeth Pillai <vineeth@bitbyteword.org>, 
+	Borislav Petkov <bp@alien8.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Peter Zijlstra <peterz@infradead.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Frederic Weisbecker <fweisbec@gmail.com>
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240828190100.GA1373017@nvidia.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000014:EE_|SJ0PR12MB8137:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7a07d0e7-8215-4eca-52e5-08dcc797754e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?m43J9tHwiEmR4s66slbZAyslcg1rx2QDu/KY7MhnTrmP3Dl69JBHxAnl+iuB?=
- =?us-ascii?Q?yuXiLiY2tACA4W+otP6giQ2Ce1tL2/Vdq1PfyKbn71z9dvJZzIIACQoNK7RF?=
- =?us-ascii?Q?RgX3cK4FQigvbBqpeKv9sofTzZ3PgnwaWOZhg1zuD6RxIYv1m6BgFKwThcvh?=
- =?us-ascii?Q?rjKLrOiztobljJp/t5JkGnuLwaAzMrtDpFDOTMUXfZM8xg4vzxnTpCpS6qXi?=
- =?us-ascii?Q?SE0YaJx0kGXpl3h3FpEWRwUY8kpLHlflJYG3ncY/RyQDghulM/8ftTyROGSc?=
- =?us-ascii?Q?5DpxxaTTbw3WSvpeJ/R+1PWlh5iCpCMqfrB4X6+Y6LtDffKubgv8lVaaXH49?=
- =?us-ascii?Q?vLUWglvaOunL3JOZ+yl+HwpJpCFxvwmMziZuJhHgnqgZD6rhzl3Jy1GHTfcP?=
- =?us-ascii?Q?JBAGKfr5H3+tkGsN0yLGBLXsDYOtxUZgbkWgAzNxy2YSHODFPdaK/TYPLaCa?=
- =?us-ascii?Q?omtWHPj/zTX2SzTabr1MGX+wIZexaLTr2btMTBv2E7FK7la2g93cenpbSHjQ?=
- =?us-ascii?Q?ThBOCSc5Y+JqkpFgUaigb+wtN3fR6H+cOAiEkymWmU051ApW2P4RZE9pa5zR?=
- =?us-ascii?Q?3hpWMYqIZd6R0rUa9oI7vPHSppbfVnCzg1UO+UeOSxG4P2q3N34UHlUHWiZQ?=
- =?us-ascii?Q?WS853Q95ihRxcjzHHa6Zj/EcuP5kY7QVlqE3FWcnwbgruxCEFXBg0j4w4eo5?=
- =?us-ascii?Q?Vs0nNOWhBuOx9QRRpiv9NscIeLrtcW2PlgQy3sG/X3rCyQCt92d5JIazDDvE?=
- =?us-ascii?Q?WYi+ojYjOdPHboeQ5FIYnYSKLCdwGBDELrT8naexAZ+8fHlE4CS9cyldDLu4?=
- =?us-ascii?Q?BBfFjx15qWqmKrEvV1nVXu2CAbk/aIfdAHhJtYTDaLShbWdvxmC/nd9FFlZj?=
- =?us-ascii?Q?JGGnM0RmXHhv+z4MwnVwPRCK80y04J2/Xtu1qMau4ZkZ+n2DGOLnPVhtRcHT?=
- =?us-ascii?Q?WkarN8F+RKK0P0nsSVEBZ+V98kJWpkcmQy7Po6ymafrXmGYz9iXZ0hdPUw/c?=
- =?us-ascii?Q?PrM+hkZcnGOAHGAzfTXs2ABYgFKvSoe/Hoz/zWkf6or2NSM8lI1sZDm1W2Wv?=
- =?us-ascii?Q?kJXl6rDjWrJW2acr8vWDKxzjhxX1VxWJf53jLgSA6HtzOIKh+TP5bOugYCCf?=
- =?us-ascii?Q?NcVreU+OH1dr6m1GmnZRc6CQttK8Gr9ekE9CAGfdMcwFwh/ee/9yrKEsNN4N?=
- =?us-ascii?Q?HWI29gxd11bO2SnDHUuA77kbOubSvcYXqFVX9SNQrL8OmuWxf2lqFlzWrHXm?=
- =?us-ascii?Q?9zWdKc9h/gYmgGzZ5Y/OjUfBR13gmljwtTOmoIa3RgLLdqSvMmxIpfDbV7s8?=
- =?us-ascii?Q?bUPjFRIJeMPNc33B0q4RU50oBvm5Ff8VyTuS2ECC7Gdj+o7t2NINJ5TbK4L+?=
- =?us-ascii?Q?FLWWW4GiUs4W/mZYzsYI2WjCI46Xe+Ce6ferk3eHJ5NId1cd2v+zg3JDs2QJ?=
- =?us-ascii?Q?nS7dPXItqnS6LmTPN3TwzexV3qQ6dgEk?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 19:27:30.0105
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a07d0e7-8215-4eca-52e5-08dcc797754e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF00000014.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8137
 
-On Wed, Aug 28, 2024 at 04:01:00PM -0300, Jason Gunthorpe wrote:
-
-> > > +
-> > > +	if (!(parent->type & __IOMMU_DOMAIN_PAGING))
-> > > +		return ERR_PTR(-EINVAL);
-> > > +
-> > > +	smmu_parent = to_smmu_domain(parent);
-> > > +	if (smmu_parent->stage != ARM_SMMU_DOMAIN_S2 ||
-> > 
-> > Maybe "!smmu_parent->nest_parent" instead.
+On Wed, Aug 21, 2024, Steven Rostedt wrote:
+> From: Steven Rostedt <rostedt@goodmis.org>
 > 
-> Hmm, yes.. Actually we can delete it, and the paging test above.
+> Commit 92b5265d38f6a ("KVM: Depend on HIGH_RES_TIMERS") added a dependency
+> to high resolution timers with the comment:
 > 
-> The core code checks it.
-
-Yea, we can rely on the core.
-
-> Though I think we missed owner validation there??
+>     KVM lapic timer and tsc deadline timer based on hrtimer,
+>     setting a leftmost node to rb tree and then do hrtimer reprogram.
+>     If hrtimer not configured as high resolution, hrtimer_enqueue_reprogram
+>     do nothing and then make kvm lapic timer and tsc deadline timer fail.
 > 
-> @@ -225,7 +225,8 @@ iommufd_hwpt_nested_alloc(struct iommufd_ctx *ictx,
->         if ((flags & ~IOMMU_HWPT_FAULT_ID_VALID) ||
->             !user_data->len || !ops->domain_alloc_user)
->                 return ERR_PTR(-EOPNOTSUPP);
-> -       if (parent->auto_domain || !parent->nest_parent)
-> +       if (parent->auto_domain || !parent->nest_parent ||
-> +           parent->common.domain->owner != ops)
->                 return ERR_PTR(-EINVAL);
+> That was back in 2012, where hrtimer_start_range_ns() would do the
+> reprogramming with hrtimer_enqueue_reprogram(). But as that was a nop with
+> high resolution timers disabled, this did not work. But a lot has changed
+> in the last 12 years.
 > 
-> Right??
+> For example, commit 49a2a07514a3a ("hrtimer: Kick lowres dynticks targets on
+> timer enqueue") modifies __hrtimer_start_range_ns() to work with low res
+> timers. There's been lots of other changes that make low res work.
+> 
+> I added this change to my main server that runs all my VMs (my mail
+> server, my web server, my ssh server) and disabled HIGH_RES_TIMERS and the
+> system has been running just fine for over a month.
+> 
+> ChromeOS has tested this before as well, and it hasn't seen any issues with
+> running KVM with high res timers disabled.
 
-Yea, this ensures the same driver.
+Can you provide some background on why this is desirable, and what the effective
+tradeoffs are?  Mostly so that future users have some chance of making an
+informed decision.  Realistically, anyone running with HIGH_RES_TIMERS=n is likely
+already aware of the tradeoffs, but it'd be nice to capture the info here.
 
-> > [---]
-> > > +	    smmu_parent->smmu != master->smmu)
-> > > +		return ERR_PTR(-EINVAL);
+> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+> ---
+>  arch/x86/kvm/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 472a1537b7a9..c65127e796a9 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -19,7 +19,6 @@ if VIRTUALIZATION
+>  
+>  config KVM
+>  	tristate "Kernel-based Virtual Machine (KVM) support"
+> -	depends on HIGH_RES_TIMERS
 
-Then, we only need this one.
+I did some very basic testing and nothing exploded on me either.  So long as
+nothing in the host catches fire, I don't see a good reason to make high resolution
+timers a hard requirement.
 
-Thanks
-Nicolin
+My only concern is that this could, at least in theory, result in people
+unintentionally breaking their setups, but that seems quite unlikely.
+
+One thought would be to require the user to enable EXPERT in order to break the
+HIGH_RES_TIMERS dependency.  In practice, I doubt that will be much of a deterrent
+since (IIRC) many distros ship with EXPERT=y.  But it would at least document that
+using KVM x86 without HIGH_RES_TIMERS may come with caveats.  E.g.
+
+	depends on HIGH_RES_TIMERS || EXPERT
 
