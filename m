@@ -1,126 +1,179 @@
-Return-Path: <kvm+bounces-25300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C00D96342F
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 23:58:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD0C9634A5
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 00:24:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3939D283F05
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 21:58:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 932D81C2155B
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 22:24:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27881AD5C1;
-	Wed, 28 Aug 2024 21:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4811AD9C6;
+	Wed, 28 Aug 2024 22:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="reRMVEIZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H48H5uRx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646FE156875
-	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 21:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1D9165F13
+	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 22:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724882285; cv=none; b=JlqSmV2hGo3WpyQGAB5LmnKvxiN/NUcRw88OEh/UnnJm0DdB16iWgAeqUGBBc5Raz/EgcgR3y2iv/bVIsskWbrgJqOfSDsolZmTvGeGySj2p+eWcC61V0uJNzoNojMYHWGLkWUfCc6K5bae+Zzs26DALiK2JSkaD/HAkECYGikk=
+	t=1724883869; cv=none; b=W15MRFZQPwzIhgnF3N4fSsIx4+VHenPGDqPjE+Kt5qGCREtr03R7XyfyEBtybSHQA0ddsDlna7AdSfcvoMgQONqxKTUFW5Nrlx9gvus6LnPtH/ykD2N5rfU8NCUu3w1riTAjMbC1TnvPX+BNO7F7NUl1z3D/fRCLyoJCWArkNEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724882285; c=relaxed/simple;
-	bh=OtyZGFXNJmaTgKJUaWxufZrcoMW8yy457X2gX7so+Y4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uciQnzveIteWkdDBxygoWI1k6mWeIdJ8HYNkltLXKhbTphMQlhK1BmaWdYMeodnHPc2K3T6VgPXqFqb3hD6FjrStJa6fwZtDyiCtyKg22FZv4vYy1pHqa4H8F2MaTuc/zSE/GyyypZ7DpXGXnBWkYeaBDuFi9yL1D1p4S1s+DA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=reRMVEIZ; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1724883869; c=relaxed/simple;
+	bh=/FVBdNtyaC5/bdSNVZaY3QGe9cC/Griq4Pzf7uJBcy8=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=P4kCQvi5/JTpHGP1fsODEBWiCcMWp6YTab5kFjzuUGsmPW75ME6r464+V86exY9CzSbLS/KCETqe3dX+0b1TRABUq9U9TWNgBjXAmYAbGhDHu4YPzSVhC7XliN8KzkXfRG7ZjC3fplMKiNdGSum59fCjo7Fpj2k3k830KSi3O6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H48H5uRx; arc=none smtp.client-ip=209.85.166.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e03b3f48c65so52993276.0
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 14:58:04 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-8252a16781eso9151939f.0
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 15:24:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724882283; x=1725487083; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wlgNMKNX5MS0ihntU6nNVvznZe2o+HmoUqQOC60ro98=;
-        b=reRMVEIZLIND/yNtWuAe2ivXGA+VH0sroWZVggOMM9WDku5BVbFOARd7plrACpQtLw
-         xHRRDE6C4f6X+epDoQRF1NJxP3VrOGEeRxlTGvDN9hoX12jcOHSuJDg4r5Pv9xf4z3Vo
-         BH6fmQDHmCBMD7d0/FXPGA07J3WaYp1vLIr3L9ParwHrPquiXzwYsx2BmjWQeNTs4LFq
-         a+A8Yl6UeOvp7cJeB8ui0rZdtSKn9ckBHVUpbnBGLbUOqEBqngtn9TduyCvLE5pzO5t5
-         dp99bcs43Fz88iMxX4j5cAfTrjolIqFZKD7pSAOQTsj+QCofKPloHMyUaZH3a9vS5S41
-         RPFQ==
+        d=google.com; s=20230601; t=1724883866; x=1725488666; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XHYhCs2O0yksxmyMVfjDVF3TT+HeTKA+kiWxfmzqVoQ=;
+        b=H48H5uRxHrZB2x5tq3W9zLw2vlvJ7aBzqWapTkqRC+sXcxqQgg+ny3/oxORd/U60E9
+         xzGMgK0aM7MynVCc6D8Rf2rmRho482ugpXvUmlxDWKpq9DAm+Z1LvYbDPInLkfjFPpkq
+         qbXswWRUBNmW2Am6MOqFPoKXrbbtmTPqFN0yMZ/CKeR6SaOy+b85Pn/b9w6ODnAulogm
+         Mpx9CZeQkNYDA9JuAwyjk/RV8AVN09ODD9I6HPWo7e6A2ldezjzVh5rP155mETJkrng8
+         UdfY7O5Kh/8yrH3oHeKpGqbvYeMImU1zWijz+ETNqdbMtrg8dyzvkSvoL7ecjBlxuHcF
+         GbDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724882283; x=1725487083;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+        d=1e100.net; s=20230601; t=1724883866; x=1725488666;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wlgNMKNX5MS0ihntU6nNVvznZe2o+HmoUqQOC60ro98=;
-        b=YY4F9SNMOUrqZl/RnjfEAQoNYEIy0egY1knDlBN1nOs1+aH2f83acWoCuUN+mohyc3
-         BeNA0VevJbsmB1oUpNDNTWJMdMHYaCshZlpvauO285gEGyA87szsxkdsg8QvNM5Srp9M
-         X5XCEKtXwCgPQy0QVXmRm3JoCl6JQ89LEvbyVyO4JLyIue75QDT0rjdJGfSOB1T6p5Md
-         bnewxNkXsWhPmPwVPUxAJY/Fp3zqXqxpbfCFxrJTHh15yqrDcMfMC3ktO9pk8bTJjTAB
-         GgbKNVGWhYAkGRp5Wrjj5t8kWMBHWbzK9gGBvA9p2u1yLXiscu4ijZ9WW4W0G8o8Et7c
-         NJ3g==
-X-Gm-Message-State: AOJu0YzFvWIGdZyBdxnZfoPrTnn4n5fNskvorHpsGQRxiJf0RYOn0Nf2
-	XkNCPuG2DcuB0O/GIOLAfivnTU+aeR0VfplmF0ncSblLjORySNnHchJJQJZ4S2qm4UsEkk2Obel
-	1wQ==
-X-Google-Smtp-Source: AGHT+IFt/U1L3elAJgmabyUwqBFMXxU/9PPvPxX8OhqgwG2AJc39YZ2qQsYr4fivt/vomf8f1YQpHuHB8ng=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:c54f:0:b0:e11:5f9f:f069 with SMTP id
- 3f1490d57ef6-e1a5adf5550mr1448276.8.1724882282732; Wed, 28 Aug 2024 14:58:02
- -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 28 Aug 2024 14:58:00 -0700
+        bh=XHYhCs2O0yksxmyMVfjDVF3TT+HeTKA+kiWxfmzqVoQ=;
+        b=O/WAC+u7kSBxHqNcT+7YEr9E6JRqmyVoAlZEz0p3w67XQZUTFMet6/iO7D/5yRl8cW
+         f4pCtALT+sq0WjGmwSPits5iGRoFcNYej23FB/ASjZt19So7GSQTX5h3ymMgPGiH9uzT
+         r6EyCwSCd7S47KIyeNalejEk2f3vSKvk2NObdE42hz6/Q962GAPOSA/JWYNoOxkKVlAw
+         B1QazvTNMSY6tAmt3VhiXHZsnlJx+cOvSsiiMtJmzRyFTnfs+a93wZMz85cee+C3AYoU
+         2GJZ6jXDLCW9/6Lq3SBLcMrLkYKpjMwDLzjMJxZkrYkcfOcrn03S7axSjzKssSmZFL5Q
+         whLA==
+X-Gm-Message-State: AOJu0YwfnVnJ25oBJmJqO0I89NzAgxmLF8DJvIHkUTFg0B3UMqk6Zx11
+	ZtU+O8Q+3BbQjYf9VE752a0ODRmSGJ0cA1Y2e27JUAn5PEjTJ0CAWntDu6ynoQpivri6iY4N/+2
+	7+pHFgBixHKuHt9NK9rTuYg==
+X-Google-Smtp-Source: AGHT+IFAhFfXyvt/CVO3KY8mV4BysnqtTjALoNCbyGNLAs/zZGUsWcIBtru/tMbAOpFzv3usnbCpVSZ5gXqQ1gaknw==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6638:25c4:b0:4b9:b122:d07d with
+ SMTP id 8926c6da1cb9f-4ced00465eemr27266173.4.1724883866023; Wed, 28 Aug 2024
+ 15:24:26 -0700 (PDT)
+Date: Wed, 28 Aug 2024 22:24:25 +0000
+In-Reply-To: <Zs0BSCb_Khyxg08x@google.com> (message from Mingwei Zhang on Mon,
+ 26 Aug 2024 22:27:20 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
-Message-ID: <20240828215800.737042-1-seanjc@google.com>
-Subject: [PATCH] KVM: selftests: Explicitly include committed one-off assets
- in .gitignore
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <gsntjzg09tgm.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 2/6] KVM: x86: selftests: Define AMD PMU CPUID leaves
+From: Colton Lewis <coltonlewis@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: kvm@vger.kernel.org, ljr.kernel@gmail.com, jmattson@google.com, 
+	aaronlewis@google.com, seanjc@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Add KVM selftests' one-off assets, e.g. the Makefile, to the .gitignore so
-that they are explicitly included.  The justification for omitting the
-one-offs was that including them wouldn't help prevent mistakes:
+Hi Mingwei, thanks for reviewing!
 
-  Deliberately do not include the one-off assets, e.g. config, settings,
-  .gitignore itself, etc as Git doesn't ignore files that are already in
-  the repository.  Adding the one-off assets won't prevent mistakes where
-  developers forget to --force add files that don't match the "allowed".
+Mingwei Zhang <mizhang@google.com> writes:
 
-Turns out that's not the case, as W=1 will generate warnings, and the
-amazing-as-always kernel test bot reports new warnings:
+> On Tue, Aug 13, 2024, Colton Lewis wrote:
+>> This defined the CPUID calls to determine what extensions and
+>> properties are available. AMD reference manual names listed below.
 
-   tools/testing/selftests/kvm/.gitignore: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/kvm/Makefile: warning: ignored by one of the .gitignore files
->> tools/testing/selftests/kvm/Makefile.kvm: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/kvm/config: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/kvm/settings: warning: ignored by one of the .gitignore files
+>> * PerfCtrExtCore (six core counters instead of four)
+>> * PerfCtrExtNB (four counters for northbridge events)
+>> * PerfCtrExtL2I (four counters for L2 cache events)
+>> * PerfMonV2 (support for registers to control multiple
+>>    counters with a single register write)
+>> * LbrAndPmcFreeze (support for freezing last branch recorded stack on
+>>    performance counter overflow)
+>> * NumPerfCtrCore (number of core counters)
+>> * NumPerfCtrNB (number of northbridge counters)
 
-Fixes: 43e96957e8b8 ("KVM: selftests: Use pattern matching in .gitignore")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202408211818.85zIkDEK-lkp@intel.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/.gitignore | 4 ++++
- 1 file changed, 4 insertions(+)
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>   tools/testing/selftests/kvm/include/x86_64/processor.h | 7 +++++++
+>>   1 file changed, 7 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 6d9381d60172..7f57abf936e7 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -5,3 +5,7 @@
- !*.h
- !*.S
- !*.sh
-+!.gitignore
-+!config
-+!settings
-+!Makefile
+>> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h  
+>> b/tools/testing/selftests/kvm/include/x86_64/processor.h
+>> index a0c1440017bb..9d87b5f8974f 100644
+>> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+>> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+>> @@ -183,6 +183,9 @@ struct kvm_x86_cpu_feature {
+>>   #define	X86_FEATURE_GBPAGES		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
+>>   #define	X86_FEATURE_RDTSCP		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 27)
+>>   #define	X86_FEATURE_LM			KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 29)
+>> +#define	X86_FEATURE_PERF_CTR_EXT_CORE	KVM_X86_CPU_FEATURE(0x80000001,  
+>> 0, ECX, 23)
+>> +#define	X86_FEATURE_PERF_CTR_EXT_NB	KVM_X86_CPU_FEATURE(0x80000001, 0,  
+>> ECX, 24)
+>> +#define	X86_FEATURE_PERF_CTR_EXT_L2I	KVM_X86_CPU_FEATURE(0x80000001, 0,  
+>> ECX, 28)
 
-base-commit: 15e1c3d65975524c5c792fcd59f7d89f00402261
--- 
-2.46.0.295.g3b9ea8a38a-goog
+> You won't be testing Northbridge counters and L2I counters, so these two
+> could be optional to the patch.
+
+That's correct. Since it was a small thing to include I thought it best
+to include and save someone in the future from digging through the
+reference manual again.
+
+When you say "optional" is that an endorsement of deleting?
+
+>>   #define	X86_FEATURE_INVTSC		KVM_X86_CPU_FEATURE(0x80000007, 0, EDX, 8)
+>>   #define	X86_FEATURE_RDPRU		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 4)
+>>   #define	X86_FEATURE_AMD_IBPB		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX,  
+>> 12)
+>> @@ -195,6 +198,8 @@ struct kvm_x86_cpu_feature {
+>>   #define	X86_FEATURE_VGIF		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
+>>   #define X86_FEATURE_SEV			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 1)
+>>   #define X86_FEATURE_SEV_ES		KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 3)
+>> +#define	X86_FEATURE_PERF_MON_V2		KVM_X86_CPU_FEATURE(0x80000022, 0,  
+>> EAX, 0)
+
+> Let's use X86_FEATURE_PERFMON_V2 instead.
+
+Done
+
+>> +#define	X86_FEATURE_PERF_LBR_PMC_FREEZE	KVM_X86_CPU_FEATURE(0x80000022,  
+>> 0, EAX, 2)
+
+> You don't use this feature, do you? If not, this can be optional for the
+> patch.
+
+Correct again, included for the same reasoning above.
+
+
+>>   /*
+>>    * KVM defined paravirt features.
+>> @@ -281,6 +286,8 @@ struct kvm_x86_cpu_property {
+>>   #define X86_PROPERTY_GUEST_MAX_PHY_ADDR		 
+>> KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 16, 23)
+>>   #define X86_PROPERTY_SEV_C_BIT			KVM_X86_CPU_PROPERTY(0x8000001F, 0,  
+>> EBX, 0, 5)
+>>   #define X86_PROPERTY_PHYS_ADDR_REDUCTION	 
+>> KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 6, 11)
+>> +#define X86_PROPERTY_NUM_PERF_CTR_CORE		 
+>> KVM_X86_CPU_PROPERTY(0x80000022, 0, EBX, 0, 3)
+>> +#define X86_PROPERTY_NUM_PERF_CTR_NB		KVM_X86_CPU_PROPERTY(0x80000022,  
+>> 0, EBX, 10, 15)
+
+
+> ditto.
+>>   #define X86_PROPERTY_MAX_CENTAUR_LEAF		KVM_X86_CPU_PROPERTY(0xC0000000,  
+>> 0, EAX, 0, 31)
+
+>> --
+>> 2.46.0.76.ge559c4bf1a-goog
 
 
