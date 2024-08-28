@@ -1,89 +1,78 @@
-Return-Path: <kvm+bounces-25236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAFA09623DC
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 11:47:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7EB9623EC
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 11:50:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 587AD1F24F38
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 09:47:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FF781C23CAB
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 09:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCF6169382;
-	Wed, 28 Aug 2024 09:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCFD166F34;
+	Wed, 28 Aug 2024 09:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="or4cHeG4"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="jmG1sPeq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681F1167296
-	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 09:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBDE1547F2;
+	Wed, 28 Aug 2024 09:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724838428; cv=none; b=VzXKflU3dDBJKAJ2YAc6016Wrwr8DufrL2YCz4LGKbwpe1xkoBUdI+96aZasmzVFMTdM/muCnxV9rKUmu5RfIjCyJRqVQECt0sR8XjtRd1WSdcySSsjTIhTE8tTZBGmqhB2YQvxW6maGGHn1JCbnHNGNqE82XPCU7NG2rB2WHa8=
+	t=1724838601; cv=none; b=oACtmsz+QVmpye4RmTL/5a5pMcsxF+AsJZjI1mh977CHPJ1SMeLpAsoj/+w7q6lHdCRcChxyzpiaUpBgGJFfYol/B93iqbhpjGy6ikR63WmGKX36jHicZiK+ISHPnKTIZsjakyVnYa9E58itVb1MtRDpRiuj4AbcaKYH/Ecg0MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724838428; c=relaxed/simple;
-	bh=JaahmtBNvMYpYGDI8TfWiHxXUqqgkc9FlY7+LPCUrzE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=p1BvBQ5ngs2TL1n8BGASZvLkag0JV4CCcspEf4Ok/yse08RuPp5EqSPcRKo+gJugDiEonv6sESwwtPzDCNyMr6o2fH4BaQ94BJLoWmajIRg4dSHgdUzOS8FdL/429imespg1upN+M9PH1BP5g/oks/zUV+qNRziVlcvOB91UQw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=or4cHeG4; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42819654737so55478745e9.1
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 02:47:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724838425; x=1725443225; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f4FnjsYFSElhR+3f7IugFyQV34/agqN5SguHwrwKdRE=;
-        b=or4cHeG4LREv2WCATRM1JdsEkUyYTm03bcdXlgfrhCGX7AhQY/hHX8ao5qn7FcSorp
-         8x6uYfJmWkMAJNUKHOzdPS0aCXEsYbXGf+vfPVjiQ7LHqIQC3Pigmin84W3YKpBbDHbz
-         bxB9d6eRmh69mx+NPI5KF20gGCthAlElKQDhid26YhB03C71tGGeAF2t3sZs3CtkzE1Y
-         WnqJouMgGhxNRABuLDkza4yfVVa8D/ERhDSmfhrx9Wnh7S3RVj9G7YoZ7czx8jmyc9AQ
-         Deyz1Jk/woPBYJhVHr4cBQRJUCKbupX2j/7hov/FMbYU2Zbpf80uou5q6/7NsyBgIVEj
-         4mxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724838425; x=1725443225;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f4FnjsYFSElhR+3f7IugFyQV34/agqN5SguHwrwKdRE=;
-        b=d8st6Cd3nEzM0Cb3rY5gKMIH43pUnTVMPapvCx3QphEU2ad79sh7N/f+pgLZhqiTC8
-         MpFxnjdDN5xlNgMz7w2v98eNDa4inA1uasVxBjlTLGuHLqX108LnsWgGXR3YgJ87tv5M
-         +456yRGdUByWdSsONIa0zyeuydTgkMDRvXsHP3mIaVG3plepFdUi+zjWgJDvHWuIQIX4
-         Zn6NCCwBrVDQvpt6p6nn7WOfXR1yFW61zpm2+IVSMI+52xVnkNL6v6Nl1Ngl62trt6ce
-         UegBZOP26m7KhshDh+4zpBX8IX1BAr9KVtmKwbWH47nvfAdFs48zVTISYiIwCP0/OiON
-         UwTg==
-X-Forwarded-Encrypted: i=1; AJvYcCVzvHBGvmxB0r3m9UKJlADuCtmtAIF1ebGb14PMqpRzFEcPfRjZk26jyc2ICIlvEAD+6gU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzySfJwFF8lD4V3UDaiGpy2LFFjggJl5FpwLiHl0WpryGeVo657
-	Imh2hUEQxMMcd2NH+zPqFg00JLZrSNltz2+IeJFtSVOZSQ2b9+8wNXB5fmMj/wc=
-X-Google-Smtp-Source: AGHT+IH0KC6Z0HHx3zEIhScnAd0zosTOFRut+SoaKBSOi0hUzOh0yIoDnTQbgYeiAVq0L8twAXC6cQ==
-X-Received: by 2002:adf:f7d2:0:b0:368:77f9:fb34 with SMTP id ffacd0b85a97d-37311857bf9mr9665467f8f.15.1724838424122;
-        Wed, 28 Aug 2024 02:47:04 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730813c0dcsm15170235f8f.37.2024.08.28.02.47.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 02:47:03 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 999935F796;
-	Wed, 28 Aug 2024 10:47:02 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: D Scott Phillips <scott@os.amperecomputing.com>
-Cc: linux-kernel@vger.kernel.org,  kvm@vger.kernel.org,
-  linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
-  maz@kernel.org,  arnd@linaro.org
-Subject: Re: [PATCH 1/3] ampere/arm64: Add a fixup handler for alignment
- faults in aarch64 code
-In-Reply-To: <86frqpk6d7.fsf@scott-ph-mail.amperecomputing.com> (D. Scott
-	Phillips's message of "Tue, 27 Aug 2024 14:23:16 -0700")
-References: <20240827130829.43632-1-alex.bennee@linaro.org>
-	<20240827130829.43632-2-alex.bennee@linaro.org>
-	<86frqpk6d7.fsf@scott-ph-mail.amperecomputing.com>
-Date: Wed, 28 Aug 2024 10:47:02 +0100
-Message-ID: <87plpt3rop.fsf@draig.linaro.org>
+	s=arc-20240116; t=1724838601; c=relaxed/simple;
+	bh=yI8UGtDeDzq0ejW8pdr/qL9ax7t3BWnl+/WBFqgMGcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OpsSR0O/zEF/6C/on3VP1aMDj7IQNwpRJMfcMjp5LPC0ZSj3vdTANA8q+ak1Jgzt9CR0fHP1ob9p7IEEcUDvD/bBdsor6HyaftVVbX7GGithwoXz2bE6i1uAifmmXIsM/5pgJAHQ7DqeSruGtJWNCrKtxPrRHI88scOyc1aVgk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=jmG1sPeq; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3B65D40E0169;
+	Wed, 28 Aug 2024 09:49:55 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id fs9lpMNWbvlK; Wed, 28 Aug 2024 09:49:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1724838590; bh=YvhPqudcoWPR0qgKjwOwmAY5MUaGOhjFnDWRorh3R24=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jmG1sPeqgZEqwW9gdYGJtbbQhlI9DPC2kDHs3DrhwvSdlsVaKfiKQfey1bVMfr78v
+	 TrmTAkuvvVEwqyHs+5u5pZqes1ouDQzQJkKeAzv1tiqqJxoP7m2wwtsu1tS/I7XNZv
+	 cHycddpT6IzEt+lp1QiX6pElAqN8R0wgI3lGM2NElYUQyp8n5GhqnG06y7EYOOAFt4
+	 GTzpCJUM97UfE6bk7K4+R6ALajym6uecwu4dFCVMFyZ8EF3cepc30hWL4PhBofKEVJ
+	 tl8GeNqooxyDv9h/VmMoX5mV1f85OpT8mBLAXFDBxmDiWCrbnhUx7ODtb82OKSDhOj
+	 bO3u+VCxgjKzATTW0o00TBVIEx6PW0ubnCZ5IcGncFBSzlmUkRFYTiFkheA92rz4ig
+	 Dauqo+YPPE2F/D/uSXfQ2AN/tEWUmtR9Vy88aOLWlVT4Uzdljl2QjoibN/RSjhdDwn
+	 RE+mbRZVChM1MB7AvccRnXJDNaqkELVPE2NS7b34N+DfLfPGRqZrNfp3qg6wnUVXte
+	 RtEaT8G2w45U6ytnfCS6Qyjh2yqSxRiFn0RAxhXRHwSQ8/mw3R50Ece0syzM861gQc
+	 rddoWF7Sib9F/xzhsiPVUX5eL4IxARtvEbiQ4rBbPBF0vBminszqY0x13gMQ7Tp0dy
+	 mkSkhlO9+BeJugnSVal3Yq64=
+Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BC9C340E01C5;
+	Wed, 28 Aug 2024 09:49:39 +0000 (UTC)
+Date: Wed, 28 Aug 2024 11:49:33 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v11 06/20] x86/sev: Handle failures from snp_init()
+Message-ID: <20240828094933.GAZs7yrbCHDJUeUWys@fat_crate.local>
+References: <20240731150811.156771-1-nikunj@amd.com>
+ <20240731150811.156771-7-nikunj@amd.com>
+ <20240827113227.GAZs25S8Ubep1CDYr8@fat_crate.local>
+ <5b62f751-668f-714e-24a2-6bbc188c3ce8@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,96 +80,56 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <5b62f751-668f-714e-24a2-6bbc188c3ce8@amd.com>
 
-D Scott Phillips <scott@os.amperecomputing.com> writes:
+On Wed, Aug 28, 2024 at 10:17:57AM +0530, Nikunj A. Dadhania wrote:
+> +	if ((snp && !snp_enabled) ||
+> +	    (!snp && snp_enabled))
+>  		snp_abort();
 
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->
->> From: D Scott Phillips <scott@os.amperecomputing.com>
->>
->> A later patch will hand out Device memory in some cases to code
->> which expects a Normal memory type, as an errata workaround.
->> Unaligned accesses to Device memory will fault though, so here we
->> add a fixup handler to emulate faulting accesses, at a performance
->> penalty.
->>
->> Many of the instructions in the Loads and Stores group are supported,
->> but these groups are not handled here:
->>
->>  * Advanced SIMD load/store multiple structures
->>  * Advanced SIMD load/store multiple structures (post-indexed)
->>  * Advanced SIMD load/store single structure
->>  * Advanced SIMD load/store single structure (post-indexed)
->
-> Hi Alex, I'm keeping my version of these patches here:
->
-> https://github.com/AmpereComputing/linux-ampere-altra-erratum-pcie-65
->
-> It looks like the difference to the version you've harvested is that
-> I've since added handling for these load/store types:
->
-> Advanced SIMD load/store multiple structure
-> Advanced SIMD load/store multiple structure (post-indexed)
-> Advanced SIMD load/store single structure
-> Advanced SIMD load/store single structure (post-indexed)
+And which boolean function is that?
 
-Are you going to roll in the fixes I added or should I re-spin with your
-additional handling?
+diff --git a/arch/x86/mm/mem_encrypt_identity.c b/arch/x86/mm/mem_encrypt_identity.c
+index e83b363c5e68..706cb59851b0 100644
+--- a/arch/x86/mm/mem_encrypt_identity.c
++++ b/arch/x86/mm/mem_encrypt_identity.c
+@@ -495,10 +495,10 @@ void __head sme_enable(struct boot_params *bp)
+ 	unsigned int eax, ebx, ecx, edx;
+ 	unsigned long feature_mask;
+ 	unsigned long me_mask;
+-	bool snp;
++	bool snp_en;
+ 	u64 msr;
+ 
+-	snp = snp_init(bp);
++	snp_en = snp_init(bp);
+ 
+ 	/* Check for the SME/SEV support leaf */
+ 	eax = 0x80000000;
+@@ -531,15 +531,11 @@ void __head sme_enable(struct boot_params *bp)
+ 	RIP_REL_REF(sev_status) = msr = __rdmsr(MSR_AMD64_SEV);
+ 	feature_mask = (msr & MSR_AMD64_SEV_ENABLED) ? AMD_SEV_BIT : AMD_SME_BIT;
+ 
+-	/* The SEV-SNP CC blob should never be present unless SEV-SNP is enabled. */
+-	if (snp && !(msr & MSR_AMD64_SEV_SNP_ENABLED))
+-		snp_abort();
+-
+ 	/*
+-	 * The SEV-SNP CC blob should be present and parsing CC blob should
+-	 * succeed when SEV-SNP is enabled.
++	 * Any discrepancies between the presence of a CC blob and SNP
++	 * enablement abort the guest.
+ 	 */
+-	if (!snp && (msr & MSR_AMD64_SEV_SNP_ENABLED))
++	if (snp_en ^ (msr & MSR_AMD64_SEV_SNP_ENABLED))
+ 		snp_abort();
+ 
+ 	/* Check if memory encryption is enabled */
 
-> I've never sent these patches because in my opinion there's too much
-> complexity to maintain upstream for this workaround, though now they're
-> here so we can have that conversation.
+-- 
+Regards/Gruss,
+    Boris.
 
-It's not totally out of the scope of the kernel to do instruction
-decoding to workaround things that can't be executed directly. There is
-already a bunch of instruction decode logic to handle stepping over
-instruction probes. The 32 bit ARM code even has a complete user-space
-alignment fixup handler driver by procfs.
-
-It might make sense to share some of the logic although of course the
-probe handler and the misaligned handler are targeting different sets of
-instructions.
-
-The core kernel code also has a bunch of unaligned load/store helper
-functions that could probably be re-used as well to further reduce the
-code delta.
-
-> Finally, I think a better approach overall would have been to have
-> device memory mapping in the stage 2 page table, then booting with pkvm
-> would have this workaround for both the host and guests. I don't think
-> that approach changes the fact that there's too much complexity here.
-
-That would be a cleaner solution for pKVM although we would like to see
-it ported to Xen as well. There is a tension there between having a
-generic fixup library and something tightly integrated into a given
-kernel/hypervisor.
-
-I don't think instruction decoding is fundamentally too complicated for
-a kernel - although I may be biased as a QEMU developer ;-). However if
-it is to be taken forward I think it should probably come with an
-exhaustive test case to exercise the decoder and fixup handler. The
-fixes so far were found by repeatedly iterating on vkmark and seeing
-were things failed and fixing when they came up.
-
-I will leave it to the kernel maintainers to decide if this is an
-acceptable workaround or not.
-
-I do have two remaining questions:
-
-  - Why do AMD GPUs trigger this and not nVidia? Do they just have their
-    own fixup code hidden in the binary blob? Would Nouveau suffer
-    similar problems?
-
-  - Will Arm SoC PCI implementations continue to see these edge cases
-    that don't affect the x86 world? This is not the first Arm machine
-    with PCI to see issues. In fact of the 3 machines I have (SynQuacer,
-    MachiatoBin and AVA) all have some measure of PCI "fun" to deal
-    with.
-
-Thanks,
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+https://people.kernel.org/tglx/notes-about-netiquette
 
