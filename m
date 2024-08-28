@@ -1,181 +1,447 @@
-Return-Path: <kvm+bounces-25254-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25256-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 148DC962A14
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 16:24:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 409D8962A18
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 16:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF4ED28602D
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 14:24:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDF111F242D7
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 14:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023EE189F52;
-	Wed, 28 Aug 2024 14:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="R0t3812U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FE119E7E0;
+	Wed, 28 Aug 2024 14:24:39 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2070.outbound.protection.outlook.com [40.107.237.70])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DCD381C2;
-	Wed, 28 Aug 2024 14:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724855069; cv=fail; b=SizRY7lG/sBPdeqPGYONGqgXoQChLRSpOSb+rybcnAvXpr6zOPyKsuB4yDLFKpSLoaSPztc9gPGd4ScpJUffI+vykYx7VnXpi9f6MQNcRb1Aq7Wk6hRMQf0FaADcosbFKneI8nAUUh1v/bCLQsau4kYJ+66sUd3YIzZ3l5V+A6s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724855069; c=relaxed/simple;
-	bh=e1MX7kwVjYOF/RM1nSdTggaiNW2JVSFmDfkDWbcFWDQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=oRSqfrAw3JO9WgPSDYlh70yxRjBnZOGKjWAbDJBancFlQto/2oFF6JLpuZwKlCyeCwsQwvIPDRcEyUAlvTvONoGKTvXs7R+bF6tF7XYRRt2zGVLG51zny5tZ5CT6FQsIo3jiVso2sQxZLiLPczq6W8cFI/HIRI/Wj/feXkxJ2S4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=R0t3812U; arc=fail smtp.client-ip=40.107.237.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a8s7rB716YJPTyfYSThhf2WVhWUuxHpMeqC5dEfcvPTCJs6nsWx6WHD1LosuLM5bu55irSALtY7ylJ2w1D/gjgfJLeVkI08LHesz56o1R6mQ94gO84C2rQXDvhKQsdye8d98El9HmbmsErM78E8n7+dxvTSSvUbVx2go/SecV4h23V9ayC2kK25/8IyaAiM9aLOo0EITq2KxPTZXjpLC3O2WwrIOYhnDgjLG+nwx/sYgDf2eLlt1gxayvsGTMFhxpOhuAGM3C2FodLP4th8CvLtsBs/RDicwjhc5sT9C33FKi3KM/GuYM1ILL/B+2COnHTf0F0S+F8p1extaVTqSzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e1MX7kwVjYOF/RM1nSdTggaiNW2JVSFmDfkDWbcFWDQ=;
- b=Fp5Ntm09K1vKk88NnIvQa+plOUSgQQuigBTA6cjDo7QRItkUvypLNyQHDEBKvXrblaR6aTrJTQ9CcQ8kLusenqVfnNlQJ3RqEGWeXwsN1ncZMkFXNs2gSiRf3kktiUDvlqvbGKM/lS+VeOI32JhIgXUiFPDFEnEJL59/YthMjGOjz1rS+g7Tu1iAuAhtSrTfa5ZFavoVrNnsZdOKLwWV01wxV0J5muVjCUQxNuVGUi9wLdIQwx84H2bxbVKt3UAVKjf2WDxQiEgtcmank0MscJUI8vZMaI/ls0/1OIQDbvwg67DI66IZmTm+XjaMqw9NUxkdLg6RmL0H/xSLX8xanw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e1MX7kwVjYOF/RM1nSdTggaiNW2JVSFmDfkDWbcFWDQ=;
- b=R0t3812UoMrN0MelU7C8LVickgJ3umVBG5uVeAvv21qPRGKpdV7AE6qYhLIdAMiuNLn64r5SkrxLWnfe/UF3ehe5JanU/RjidGbd7cydGiM3fbXTn8BUyXKotl9udRN4bdupu1cHYn/kF4mYDXLLpyrI5efOHSnu/wJk2gLrpEEmnDXcq2sV2E9XeweSa6UfM0JROnZDyFBvRk0jxsbuteNKWTMf9egOy2C5IpRDyqVkBXNbrf1+d2S50+tHbdIyAm3/rs1GbxD33L7yTeN5nOVzAcyppgU/qhm2DFpfKUgVrUM88OHcA8zpBytrYfSmCh5kfkVgM8q8rWOT/07vEA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
- by MN2PR12MB4439.namprd12.prod.outlook.com (2603:10b6:208:262::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.26; Wed, 28 Aug
- 2024 14:24:23 +0000
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7897.027; Wed, 28 Aug 2024
- 14:24:23 +0000
-Date: Wed, 28 Aug 2024 11:24:22 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Jiaqi Yan <jiaqiyan@google.com>
-Cc: Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, Gavin Shan <gshan@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, x86@kernel.org,
-	Ingo Molnar <mingo@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alistair Popple <apopple@nvidia.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Sean Christopherson <seanjc@google.com>,
-	Oscar Salvador <osalvador@suse.de>, Borislav Petkov <bp@alien8.de>,
-	Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
-	David Hildenbrand <david@redhat.com>,
-	Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>,
-	Kefeng Wang <wangkefeng.wang@huawei.com>,
-	Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v2 00/19] mm: Support huge pfnmaps
-Message-ID: <20240828142422.GU3773488@nvidia.com>
-References: <20240826204353.2228736-1-peterx@redhat.com>
- <CACw3F50Zi7CQsSOcCutRUy1h5p=7UBw7ZRGm4WayvsnuuEnKow@mail.gmail.com>
- <Zs5Z0Y8kiAEe3tSE@x1n>
- <CACw3F52_LtLzRD479piaFJSePjA-DKG08o-hGT-f8R5VV94S=Q@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACw3F52_LtLzRD479piaFJSePjA-DKG08o-hGT-f8R5VV94S=Q@mail.gmail.com>
-X-ClientProxiedBy: BL1PR13CA0224.namprd13.prod.outlook.com
- (2603:10b6:208:2bf::19) To CH3PR12MB7763.namprd12.prod.outlook.com
- (2603:10b6:610:145::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A550F17332A;
+	Wed, 28 Aug 2024 14:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724855079; cv=none; b=Gx1ycUqpTTm7tbkABgOumAkZJX1WozWqJ7NqAGvuilkE43udugoynssUF29G+miI/PYJwlBB/9/iGmALziAbBx2P5sUPqC1O0eCOqIkVK1kV4vUQ7wjXjz7SgGv40nLyNIb9IGHkxBdOY+GPuYggwzn5lCv5MiLCRfQnb5sA/6U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724855079; c=relaxed/simple;
+	bh=1p+bsXM240MMumUDN4hoBzo4pYJ0dk/sHWGaICaCFGE=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LbKtbd2GyU1HQL4l/n15sUnBuo+XkD1SNGrliWFFF5z4eybMsnC8lly28axOXshHbscK6I2nqQCeGZPOArionN7+0sONcj+k1pnHUD8z8DG+fSUtIaDMJc+PikNsQoVKWzw6tHg7yah8pnD/myCihlLbv/ERJ2gZnO/tTWNfgPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wv65D1QwGz6FGWn;
+	Wed, 28 Aug 2024 22:20:32 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id C4CBC1400D4;
+	Wed, 28 Aug 2024 22:24:33 +0800 (CST)
+Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 28 Aug
+ 2024 15:24:33 +0100
+Date: Wed, 28 Aug 2024 15:24:32 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Alexey Kardashevskiy <aik@amd.com>
+CC: <kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
+	<linux-coco@lists.linux.dev>, <linux-pci@vger.kernel.org>, "Suravee
+ Suthikulpanit" <suravee.suthikulpanit@amd.com>, Alex Williamson
+	<alex.williamson@redhat.com>, Dan Williams <dan.j.williams@intel.com>,
+	<pratikrajesh.sampat@amd.com>, <michael.day@amd.com>, <david.kaplan@amd.com>,
+	<dhaval.giani@amd.com>, Santosh Shukla <santosh.shukla@amd.com>, Tom Lendacky
+	<thomas.lendacky@amd.com>, "Michael Roth" <michael.roth@amd.com>, Alexander
+ Graf <agraf@suse.de>, "Nikunj A Dadhania" <nikunj@amd.com>, Vasant Hegde
+	<vasant.hegde@amd.com>, "Lukas Wunner" <lukas@wunner.de>
+Subject: Re: [RFC PATCH 04/21] PCI/IDE: Define Integrity and Data Encryption
+ (IDE) extended capability
+Message-ID: <20240828152432.00000208@Huawei.com>
+In-Reply-To: <20240823132137.336874-5-aik@amd.com>
+References: <20240823132137.336874-1-aik@amd.com>
+	<20240823132137.336874-5-aik@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|MN2PR12MB4439:EE_
-X-MS-Office365-Filtering-Correlation-Id: 08f9a8b8-1a27-4f30-ec32-08dcc76d1cfd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?okqMIcX5L0ZF72BefZSZw2/bTvH+Xgy7MdoGnnJClblaZNnWA+MRt/KcIUWN?=
- =?us-ascii?Q?MyzLHPkT54P48KDCUZDSdA/YBAjRSlPsVc6ulKQRJ/x+IijxPSLbNcBr7R2O?=
- =?us-ascii?Q?lfEis42R0vBegjWlSIC/QqB0KCMYe0Pcf7OAGcl2j4ErKyBpj1kBNQE/B9HQ?=
- =?us-ascii?Q?2ubQHQLF3aduqto5j4J9GVci2VDVn0JJR62UT5ZlJnJT6JdgjOdCfLwC54Ud?=
- =?us-ascii?Q?LnPpabz9E1z3eSDSLxFgIrCAyRpmkoF2lYnRGt6LIZ+bw9VFmZel1KAMNhL3?=
- =?us-ascii?Q?iFEAJp4172NPWROUGNjMZHmeIkUT4T6TEpF37ltQly3c5EjPY2kYEjsQm6aO?=
- =?us-ascii?Q?IRAcHElHJQJnOaCcGYApGEZbE06AaMekID46UMYV5ca8s2kx+San7ccxCVYd?=
- =?us-ascii?Q?27viPHhKTPEj2haR/1s5fsC/Pc9B7H0vbopuaVY0DZG44w/Kp4Ceu8mFph6G?=
- =?us-ascii?Q?d/b/d+zR0q33XKfGHlMC5He6JprqVCIMnFuhMpmi26GQRzqrXNqis2/QrK8q?=
- =?us-ascii?Q?S6bcrZDcHDDsSdxhQWfhkI/vqPcrk3Na1AcBvoHPixFEBgM1YNMZi61urO/k?=
- =?us-ascii?Q?gFvwFYiDpw75trEexguQ8ULoQBHe3qXHxcxTURd2qRGl5MR5OUGplCxmse2y?=
- =?us-ascii?Q?0AKAk+PnsMHtDTWv9RkRCSRD86YAJ4CDzR6kjglOwacZ/Jm3goCCydcbgzTD?=
- =?us-ascii?Q?wW3sNocd7ebDZ1DD7FWZpjmmNQMlcKtE3v4vYY1j5MX8Sdt7lTk2bI7OwGoI?=
- =?us-ascii?Q?Jg5hv47Mf4M5Q2rESvb2+sC8O9iSgmcL/5LRQxOm94FUzslwpM1HxMfxbFTk?=
- =?us-ascii?Q?DtoqRRGQZjxZtpUjKhZcVLb/eSA7Tpv4VzFWbIm0f2NTUdPigpaMLrWGakw6?=
- =?us-ascii?Q?9//gD2f3bc6qwlo7qcXPRzFsrUQNLf9wjoUXDSbJ1Jmtf6QE80FBUlOLkIEb?=
- =?us-ascii?Q?2xROtnzm1EMZLNkRaPKxrP0/z5sbnvfe7uXDzRWm3+Puvfn2t34PZTjA9IFv?=
- =?us-ascii?Q?c0IfzvH35KFNFrarQOjNKKxLf0S7SdDm3dfvfyZmbmctoGd0B0CNWrh2PSC7?=
- =?us-ascii?Q?RGk3KENiqAZboeh4KCYodEFxFu3TaikW3ZeMQvaASBHwNOUBCCCGgaOmRtCL?=
- =?us-ascii?Q?n18prB5NEF6m+gFd/dPUUZ61CUZIZlvBWnYeynq9T5TyZbEkK9SZHlLja70a?=
- =?us-ascii?Q?K76PSiRXWZQAItB17W2h3A1av6IMCxLX6KF0bJquiNUA9uNXvroT/3Oe3sJJ?=
- =?us-ascii?Q?4oHiDjAKKvM3ympFW1B1FJFE+5jKZ2vEVV5eSVS6jV+zEy+/sqcR8N/SwnmP?=
- =?us-ascii?Q?k+RIDHisVyUCuW9jFrG4uQEPcJlI8zPbcHfCqixaReipIg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9R5bJegcsZWWyYeicG2WfcUSJ/FlvI51DtM5E5q0IFNTfa9zkYHsEnKeVtWA?=
- =?us-ascii?Q?Yv+CNmPvps8GoiBNxOIcve7VoqCG4alcqZ9bQ5L/wBDECbyZfVNrNnRDJTsN?=
- =?us-ascii?Q?LDjXOB/Z7vJwnL3nbNu8AzwCTeg9rN5oJAg32jGbujazuQHdL+9ltnACcjzV?=
- =?us-ascii?Q?jKcmZ4jtl9k91Y1zdbw3TcU4AolprUFPy9mEpFevlkv4c/ZpRjiaSJo4ndah?=
- =?us-ascii?Q?XP6In4CLK+/gK7CpybW7q7dLe4nwVHiu7RE+vO9VM0KZyCAHEf02xekKc2ZX?=
- =?us-ascii?Q?S2GFEYoUkPD52PeZ2UuVfkQ0YC0yTJrK3lHSLXXj/9Xuf54YX1l0TiQg8Ee/?=
- =?us-ascii?Q?9Ln7pwdHov5A4WDSfaKZ5paGfcY1zbvm4xfA1NwSMz2sByYllwo+OTOhxALz?=
- =?us-ascii?Q?QnC9fpW/I/1Mn1t1LvPoDeXR5uCPFV2ufkFLEqXT8cUU2wbQlNWLd5d+6cZu?=
- =?us-ascii?Q?JUbtUM3BhpVq+toZUS9Nvg4IxC4qsJnx+9GDJETa+T3aTdMHiYVlYqXettm1?=
- =?us-ascii?Q?XhhBefsV5bi+jRwsNZjseURmy/VfGT79FGE5SEX2Zl8ihN5wCv+PLjq+enUP?=
- =?us-ascii?Q?fInlyohh5T/MwdSXqpitTFYadotq5+pDpvZjROWek4APM+G0ZbjhfQMnK6hV?=
- =?us-ascii?Q?wDAd81oGNWnvIU8RvS2rLpeX8425meTlrSYqrt4Za1EgZeJvaJbgtDsuHhFe?=
- =?us-ascii?Q?W4iRK5DkOLFddZC99FAh2fW6rwrexsMLSH2UrFIIGtUtKZjIfKm36OvEeepM?=
- =?us-ascii?Q?bZ63snGn0Yyeh4AARN1Eh/d7eMASZrHvYjvwi7S3yWs15VqfAbi+pk9QkJGX?=
- =?us-ascii?Q?CE16Oi7bXifHqg16cyM2YqLSHzByMMK+JJjoLzlsRkkib6+VF00AQJL7+oYx?=
- =?us-ascii?Q?z9TH5nezF425jSSEmQPljw9rvewaoNluA/bbmFKunsBPDwfQCNpqLMoriFOZ?=
- =?us-ascii?Q?0DfBQ/OJY1WdFVDWAeL3qP2oIxUFcT+2pSHX+f/spUGq8E3wYxFN5BgYMM+4?=
- =?us-ascii?Q?uMrJlcskhlByYJmc/JcRKKbm1a7frpQkxyKM2fgukdoS0tAXtcBT3ny5YCgY?=
- =?us-ascii?Q?saLxVEVIj+p8ZYMs5hA0IQ+oHe1/L5jjwjaZDtM6pvuHlhl8XS5yy9nWR7xZ?=
- =?us-ascii?Q?jgiLWLGjxkxYdupx7x/1oPrtDO+MDaC31tr23p4KtQxTXc+10KmaJdlMeC+h?=
- =?us-ascii?Q?1DH8c9pFxMyXsqEUfl+lSI6qCEfpJD77H/DyBoH7meU7fcwguZ46VKHyLV9Z?=
- =?us-ascii?Q?E2UYCFD/cImwG47JNCkX3WfILZZXdDHzhj2oyrhxxkK89ZkXP9RE6vQDPL6Q?=
- =?us-ascii?Q?uPTDSTJ/Jn4kyZf5xBEWK1v/0Jkj8g3EnwkKBHZh31gpPnSZNzMYS08YkefX?=
- =?us-ascii?Q?ed4lvdlqj/tBtBJ9A1Ur4WJWrUOS6mkXRrrJv4G9crU4chi+hvs+shH8/qUF?=
- =?us-ascii?Q?kylI5TVnRhFqseCJXvR2Jn5jOULn4CE1/Zg+bln6JjVt2RoVvG1VZECNa9sT?=
- =?us-ascii?Q?IUd/cqjc6DtjtLMeoB0SRJYCnHSe1fcU2ypEvjKvMvQMVpIDyIBZZ+ZdGCIg?=
- =?us-ascii?Q?P5kQQNVgP7JD+ASHtMdNgU+o+0kB9Jr2CXj155vg?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08f9a8b8-1a27-4f30-ec32-08dcc76d1cfd
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 14:24:23.2849
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3765aICsCBp3pzgEjoRk4Ch5OZjk8k5rbaZ3XSmlgRn+Wu/hIulrmHaYnqRipQIW
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4439
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Tue, Aug 27, 2024 at 05:42:21PM -0700, Jiaqi Yan wrote:
+On Fri, 23 Aug 2024 23:21:18 +1000
+Alexey Kardashevskiy <aik@amd.com> wrote:
 
-> Instead of removing the whole pud, can driver or memory_failure do
-> something similar to non-struct-page-version of split_huge_page? So
-> driver doesn't need to re-fault good pages back?
+> PCIe 6.0 introduces the "Integrity & Data Encryption (IDE)" feature which
+> adds a new capability with id=0x30.
+> 
+> Add the new id to the list of capabilities. Add new flags from pciutils.
+> Add a module with a helper to control selective IDE capability.
+> 
+> TODO: get rid of lots of magic numbers. It is one annoying flexible
+> capability to deal with.
 
-It would be far nicer if we didn't have to poke a hole in a 1G mapping
-just for memory failure reporting.
+Ah. I should read the patch description before reviewing.
+It is indeed horrible.
 
-Jason
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+Hi Alexey,
+
+Some comments inline.
+
+> ---
+>  drivers/pci/Makefile          |   1 +
+>  include/linux/pci-ide.h       |  18 ++
+>  include/uapi/linux/pci_regs.h |  76 +++++++-
+>  drivers/pci/ide.c             | 186 ++++++++++++++++++++
+>  drivers/pci/Kconfig           |   4 +
+>  5 files changed, 284 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/pci/Makefile b/drivers/pci/Makefile
+> index 1452e4ba7f00..034f17f9297a 100644
+> --- a/drivers/pci/Makefile
+> +++ b/drivers/pci/Makefile
+> @@ -34,6 +34,7 @@ obj-$(CONFIG_PCI_P2PDMA)	+= p2pdma.o
+>  obj-$(CONFIG_XEN_PCIDEV_FRONTEND) += xen-pcifront.o
+>  obj-$(CONFIG_VGA_ARB)		+= vgaarb.o
+>  obj-$(CONFIG_PCI_DOE)		+= doe.o
+> +obj-$(CONFIG_PCI_IDE)		+= ide.o
+>  obj-$(CONFIG_PCI_DYNAMIC_OF_NODES) += of_property.o
+>  
+>  obj-$(CONFIG_PCI_CMA)		+= cma.o cma.asn1.o
+> diff --git a/include/linux/pci-ide.h b/include/linux/pci-ide.h
+> new file mode 100644
+> index 000000000000..983a8daf1199
+> --- /dev/null
+> +++ b/include/linux/pci-ide.h
+> @@ -0,0 +1,18 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Integrity & Data Encryption (IDE)
+> + *	PCIe r6.0, sec 6.33 DOE
+> + */
+> +
+> +#ifndef LINUX_PCI_IDE_H
+> +#define LINUX_PCI_IDE_H
+> +
+> +int pci_ide_set_sel(struct pci_dev *pdev, unsigned int sel_index, unsigned int streamid,
+> +		    bool enable, bool def, bool tee_limited, bool ide_cfg);
+> +int pci_ide_set_sel_rid_assoc(struct pci_dev *pdev, unsigned int sel_index,
+> +			      bool valid, u8 seg_base, u16 rid_base, u16 rid_limit);
+> +int pci_ide_set_sel_addr_assoc(struct pci_dev *pdev, unsigned int sel_index, unsigned int blocknum,
+> +			       bool valid, u64 base, u64 limit);
+> +int pci_ide_get_sel_sta(struct pci_dev *pdev, unsigned int sel_index, u32 *status);
+> +
+> +#endif
+> diff --git a/include/uapi/linux/pci_regs.h b/include/uapi/linux/pci_regs.h
+> index 0011a301b8c5..80962b07719a 100644
+> --- a/include/uapi/linux/pci_regs.h
+> +++ b/include/uapi/linux/pci_regs.h
+> @@ -743,7 +743,8 @@
+>  #define PCI_EXT_CAP_ID_PL_16GT	0x26	/* Physical Layer 16.0 GT/s */
+>  #define PCI_EXT_CAP_ID_PL_32GT  0x2A    /* Physical Layer 32.0 GT/s */
+>  #define PCI_EXT_CAP_ID_DOE	0x2E	/* Data Object Exchange */
+> -#define PCI_EXT_CAP_ID_MAX	PCI_EXT_CAP_ID_DOE
+> +#define PCI_EXT_CAP_ID_IDE	0x30	/* Integrity and Data Encryption (IDE) */
+> +#define PCI_EXT_CAP_ID_MAX	PCI_EXT_CAP_ID_IDE
+>  
+>  #define PCI_EXT_CAP_DSN_SIZEOF	12
+>  #define PCI_EXT_CAP_MCAST_ENDPOINT_SIZEOF 40
+> @@ -1150,9 +1151,82 @@
+>  #define PCI_DOE_DATA_OBJECT_DISC_RSP_3_PROTOCOL		0x00ff0000
+>  #define PCI_DOE_DATA_OBJECT_DISC_RSP_3_NEXT_INDEX	0xff000000
+>  
+> +
+Check for accidental white space changes. They distract from real content
+so get rid of them before posting - even for an RFC.
+
+>  /* Compute Express Link (CXL r3.1, sec 8.1.5) */
+>  #define PCI_DVSEC_CXL_PORT				3
+>  #define PCI_DVSEC_CXL_PORT_CTL				0x0c
+>  #define PCI_DVSEC_CXL_PORT_CTL_UNMASK_SBR		0x00000001
+>  
+> +/* Integrity and Data Encryption Extended Capability */
+> +#define PCI_IDE_CAP		0x4
+> +#define  PCI_IDE_CAP_LINK_IDE_SUPP	0x1	/* Link IDE Stream Supported */
+> +#define  PCI_IDE_CAP_SELECTIVE_IDE_SUPP 0x2	/* Selective IDE Streams Supported */
+> +#define  PCI_IDE_CAP_FLOWTHROUGH_IDE_SUPP 0x4	/* Flow-Through IDE Stream Supported */
+> +#define  PCI_IDE_CAP_PARTIAL_HEADER_ENC_SUPP 0x8 /* Partial Header Encryption Supported */
+> +#define  PCI_IDE_CAP_AGGREGATION_SUPP	0x10	/* Aggregation Supported */
+> +#define  PCI_IDE_CAP_PCRC_SUPP		0x20	/* PCRC Supported */
+> +#define  PCI_IDE_CAP_IDE_KM_SUPP	0x40	/* IDE_KM Protocol Supported */
+> +#define  PCI_IDE_CAP_ALG(x)	(((x) >> 8) & 0x1f) /* Supported Algorithms */
+> +#define  PCI_IDE_CAP_ALG_AES_GCM_256	0	/* AES-GCM 256 key size, 96b MAC */
+> +#define  PCI_IDE_CAP_LINK_TC_NUM(x)		(((x) >> 13) & 0x7) /* Link IDE TCs */
+> +#define  PCI_IDE_CAP_SELECTIVE_STREAMS_NUM(x)	(((x) >> 16) & 0xff) /* Selective IDE Streams */
+> +#define  PCI_IDE_CAP_TEE_LIMITED_SUPP   0x1000000 /* TEE-Limited Stream Supported */
+> +#define PCI_IDE_CTL		0x8
+> +#define  PCI_IDE_CTL_FLOWTHROUGH_IDE	0x4	/* Flow-Through IDE Stream Enabled */
+> +#define PCI_IDE_LINK_STREAM		0xC
+
+> +/* Link IDE Stream block, up to PCI_IDE_CAP_LINK_TC_NUM */
+These are in a fixed location, so you can define an offset macro to get to each
+register.
+
+> +/* Link IDE Stream Control Register */
+...
+
+> +/* Link IDE Stream Status Register */
+
+
+> +/* Selective IDE Stream block, up to PCI_IDE_CAP_SELECTIVE_STREAMS_NUM */
+> +/* Selective IDE Stream Capability Register */
+> +#define  PCI_IDE_SEL_CAP_BLOCKS_NUM(x)	((x) & 0xf) /*Address Association Register Blocks Number */
+Space after /*
+
+
+>  #endif /* LINUX_PCI_REGS_H */
+> diff --git a/drivers/pci/ide.c b/drivers/pci/ide.c
+> new file mode 100644
+> index 000000000000..dc0632e836e7
+> --- /dev/null
+> +++ b/drivers/pci/ide.c
+> @@ -0,0 +1,186 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Integrity & Data Encryption (IDE)
+> + *	PCIe r6.0, sec 6.33 DOE
+> + */
+> +
+> +#define dev_fmt(fmt) "IDE: " fmt
+> +
+> +#include <linux/pci.h>
+> +#include <linux/pci-ide.h>
+> +#include <linux/bitfield.h>
+> +#include <linux/module.h>
+> +
+> +#define DRIVER_VERSION	"0.1"
+> +#define DRIVER_AUTHOR	"aik@amd.com"
+> +#define DRIVER_DESC	"Integrity and Data Encryption driver"
+> +
+> +/* Returns an offset of the specific IDE stream block */
+> +static u16 sel_off(struct pci_dev *pdev, unsigned int sel_index)
+Prefix functions with something to indicate they are local.
+
+ide_ or something like that.
+
+Not obvious what sel_index parameter is. So documentation probably
+needed for this function.
+
+Also return an error, not 0 to mean error as it will be easier to read.
+
+
+
+> +{
+> +	u16 offset = pci_find_next_ext_capability(pdev, 0, PCI_EXT_CAP_ID_IDE);
+> +	unsigned int linknum = 0, selnum = 0, i;
+
+I'd avoid mixing cases where the value is set and where it isn't.
+Better to have
+	unsigned int linknum = 0, selnum = 0;
+	unsigned int i;
+
+Though i might as well be int.
+
+
+> +	u16 seloff;
+> +	u32 cap = 0;
+> +
+> +	if (!offset)
+> +		return 0;
+Not an error? That probably needs a comment.
+> +
+> +	pci_read_config_dword(pdev, offset + PCI_IDE_CAP, &cap);
+> +	if (cap & PCI_IDE_CAP_SELECTIVE_IDE_SUPP)
+> +		selnum = PCI_IDE_CAP_SELECTIVE_STREAMS_NUM(cap) + 1;
+	if (!(cap & PCI_IDE_CAP_SELECTIVE_IDE_SUPP))
+		return -EINVAL; or whatever makes more sense.
+
+	sel_num = PCI_IDE_CAP_SELECTIVE_STREAMS_NUM(cap) + 1;
+	if (selnum < sel_index)
+		return -E...
+
+
+> +
+> +	if (!selnum || sel_index >= selnum)
+> +		return 0;
+> +
+> +	if (cap & PCI_IDE_CAP_LINK_IDE_SUPP)
+> +		linknum = PCI_IDE_CAP_LINK_TC_NUM(cap) + 1;
+> +
+> +	seloff = offset + PCI_IDE_LINK_STREAM + linknum * 2 * 4;
+
+2 and 4 have meaning. What are they? Use differences in addresses
+of registers defined in header.
+
+
+> +	for (i = 0; i < sel_index; ++i) {
+> +		u32 selcap = 0;
+> +
+> +		pci_read_config_dword(pdev, seloff, &selcap);
+> +
+> +		/* Selective Cap+Ctrl+Sta + Addr#*8 */
+> +		seloff += 3 * 4 + PCI_IDE_SEL_CAP_BLOCKS_NUM(selcap) * 2 * 4;
+
+Same here. All these offsets are in terms of real register differences,
+use those and you won't need comments to explain.
+
+> +	}
+> +
+> +	return seloff;
+> +}
+> +
+> +static u16 sel_off_addr_block(struct pci_dev *pdev, u16 offset, unsigned int blocknum)
+> +{
+> +	unsigned int blocks;
+> +	u32 selcap = 0;
+> +
+> +	pci_read_config_dword(pdev, offset, &selcap);
+> +
+> +	blocks = PCI_IDE_SEL_CAP_BLOCKS_NUM(selcap);
+> +	if (!blocks)
+> +		return 0;
+> +
+> +	return offset + 3 * 4 + // Skip Cap, Ctl, Sta
+> +		2 * 4 + // RID Association Register 1 and 2
+Defines should exist for the registers, use the differences between them to
+get these offsets.
+It gets a little trickier for these as there is a variable size
+field before them, but still good to do if possible.
+
+> +		blocknum * 3 * 4; // Each block is Address Association Register 1, 2, 3
+> +}
+> +
+> +static int set_sel(struct pci_dev *pdev, unsigned int sel_index, u32 value)
+> +{
+> +	u16 offset = sel_off(pdev, sel_index);
+	int offset = ide_sel_off(pdev, sel_inxed);
+> +	u32 status = 0;
+> +
+> +	if (!offset)
+> +		return -EINVAL;
+Return an error for sel_off not 0 on failure. Then pass that error on here.
+	if (offset < 0)
+		return -EINVAL;	
+> +
+> +	pci_read_config_dword(pdev, offset + 8, &status);
+> +	if (status & PCI_IDE_SEL_STS_RECVD_INTEGRITY_CHECK) {
+> +		pci_warn(pdev, "[%x] Clearing \"Received integrity check\"\n", offset + 4);
+> +		pci_write_config_dword(pdev, offset + 8,
+> +				       status & ~PCI_IDE_SEL_STS_RECVD_INTEGRITY_CHECK);
+> +	}
+> +
+> +	/* Selective IDE Stream Control Register */
+> +	pci_write_config_dword(pdev, offset + 4, value);
+> +	return 0;
+> +}
+
+> +
+> +int pci_ide_set_sel_addr_assoc(struct pci_dev *pdev, unsigned int sel_index, unsigned int blocknum,
+> +			       bool valid, u64 base, u64 limit)
+> +{
+> +	u16 offset = sel_off(pdev, sel_index), offset_ab;
+> +	u32 a1 = PCI_IDE_SEL_ADDR_1(1, base, limit);
+> +	u32 a2 = PCI_IDE_SEL_ADDR_2(limit);
+> +	u32 a3 = PCI_IDE_SEL_ADDR_3(base);
+> +
+> +	if (!offset)
+> +		return -EINVAL;
+> +
+> +	offset_ab = sel_off_addr_block(pdev, offset, blocknum);
+> +	if (!offset_ab || offset_ab <= offset)
+
+How would you get the second condition?   Also, better to return
+errors from these than 0 to indicate a problem.
+
+
+> +		return -EINVAL;
+> +
+> +	/* IDE Address Association Register 1 */
+> +	pci_write_config_dword(pdev, offset_ab, a1);
+
+Check for error error returns consistently.
+
+
+> +	/* IDE Address Association Register 2 */
+> +	pci_write_config_dword(pdev, offset_ab + 4, a2);
+> +	/* IDE Address Association Register 1 */
+> +	pci_write_config_dword(pdev, offset_ab + 8, a3);
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(pci_ide_set_sel_addr_assoc);
+> +
+> +int pci_ide_get_sel_sta(struct pci_dev *pdev, unsigned int sel_index, u32 *status)
+> +{
+> +	u16 offset = sel_off(pdev, sel_index);
+> +	u32 s = 0;
+> +	int ret;
+> +
+> +	if (!offset)
+> +		return -EINVAL;
+With changes suggested above return the error code form sel_off.
+
+> +
+> +
+> +	ret = pci_read_config_dword(pdev, offset + 8, &s);
+> +	if (ret)
+> +		return ret;
+> +
+> +	*status = s;
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(pci_ide_get_sel_sta);
+> +
+> +static int __init ide_init(void)
+> +{
+> +	int ret = 0;
+> +
+> +	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+
+Linux hasn't cared about driver versions for a long time
+which is why relatively few drivers bother with them.
+Why do we care here?
+
+Also too noisy.
+
+> +	return ret;
+> +}
+> +
+> +static void __exit ide_cleanup(void)
+> +{
+
+You don't have to have this until it has something in it.
+
+> +}
+> +
+> +module_init(ide_init);
+> +module_exit(ide_cleanup);
+> +
+> +MODULE_VERSION(DRIVER_VERSION);
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR(DRIVER_AUTHOR);
+> +MODULE_DESCRIPTION(DRIVER_DESC);
+
+With the print above gone away, just use strings here.
+
+> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+> index b0b14468ba5d..8e908d684c77 100644
+> --- a/drivers/pci/Kconfig
+> +++ b/drivers/pci/Kconfig
+> @@ -137,6 +137,10 @@ config PCI_CMA
+>  config PCI_DOE
+>  	bool
+>  
+> +config PCI_IDE
+> +	tristate
+> +	default m
+Don't set default.  Everything defaults to off and distro's
+get to turn them on.
+
+> +
+>  config PCI_ECAM
+>  	bool
+>  
+
 
