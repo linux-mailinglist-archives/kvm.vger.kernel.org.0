@@ -1,190 +1,158 @@
-Return-Path: <kvm+bounces-25305-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25306-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF29963554
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 01:23:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C37CE96356F
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 01:29:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E2ED1C220E8
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 23:23:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 031391C21D0D
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2024 23:29:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39ABC1AD9FC;
-	Wed, 28 Aug 2024 23:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49BFC1AE874;
+	Wed, 28 Aug 2024 23:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niLDzTj1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CpXZX8Np"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A451AD9E9;
-	Wed, 28 Aug 2024 23:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BE01AD9FC
+	for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 23:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724887378; cv=none; b=Rln9Hx+IP+KvlDbQ4DFNEX9MPshIVSk6fD4vn0Coq4d1KYUh2XNQt/Qd+UognmyNA7YST5fNfns+MkURWm+RBxuTpXnCGIIQ4XlkzLhaKEFqRA8nyuCythrpWIS01eg2x/oqaaXHWI+EUfhXQsC3Ic/uoDG9ZjjXRahd3Zkckdg=
+	t=1724887722; cv=none; b=GUfFl+0RQ6mMS/nSayTjn29m5sIpfHkUv77iH4yK3kHVu75o1e9q3Ao/6TzYr0WxooappBW4lxY4+NoxJJdUmVbUlybLERb0JEaGiQnYNG3QTqZ9sHvCuSGk4onyudEbvVvA6QvLfiyGl8X9i/2uQjbAWjzDQHjByOStDhnUGAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724887378; c=relaxed/simple;
-	bh=stYGe9beWSBEYcsSQRMZ32Ehkf+ocCoS50uBe3fjGoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J+C0Y8l5Jzf7umR4ogQjxoeJ/GKDamtvPOk8KZpj2cGfWQ90W2cvo58KB+LZbGKnsGwwhSh9ukHLBZgG0BeNgKiHlPdukZFTl2NGVLcljvCEWpQpcyulNw3ZtDZozfIDGdaEsDOJl5wInPZ77W8U8UkpkNFwuEc9/bpAZQfeJsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niLDzTj1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A11AAC4CEC0;
-	Wed, 28 Aug 2024 23:22:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724887377;
-	bh=stYGe9beWSBEYcsSQRMZ32Ehkf+ocCoS50uBe3fjGoQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=niLDzTj1m3PygOqJLIBumKUMHEZE4h/Uueo0h4OTGzVjuNw9Pozw3xhs6UnOyhAUr
-	 xDSj2NFrIWcF6bC3oT2owEgTZa7MwT4eUo1iQ+SzF0LnTUNv9wdVJZVE95Neak+ocY
-	 4JLJH5L3onnKvvg5qGD2+2ZXkHSJuTVdCEMoiL7NlXA/1DayXtIT1m7Nttff0/yvKq
-	 F8Y+GFbMFPrMLK7NGQzmoGgsL3+3u9RzZ/ZMM85f+K1NwZSrm/P1Cw1mIc87A9lI0N
-	 BC4X31d4lWjacj87AKfknrNd2RxM6h5bG3nDznz9yMc8iEWgk7axMZnpGyjAzD0yMv
-	 LywaMhAcqNnTQ==
-Date: Thu, 29 Aug 2024 00:22:52 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexander Potapenko <glider@google.com>
-Subject: Re: [PATCH v2 05/11] KVM: arm64: Zero ID_AA64PFR0_EL1.GIC when no
- GICv3 is presented to the guest
-Message-ID: <fa2ea6cf-0ee9-4208-8526-3426a78895a8@sirena.org.uk>
-References: <20240827152517.3909653-1-maz@kernel.org>
- <20240827152517.3909653-6-maz@kernel.org>
+	s=arc-20240116; t=1724887722; c=relaxed/simple;
+	bh=lBhx0FCEgRhOzz/AM48gubNsM32UrXU4v7bnkO/VbF0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=AEUlwvV/EAjCOZTYO2DySsHA0tOQrwB7dDUsy1Sk8pamgU82jpgFv+1U6mdrLsO2IFfszR+IdL3QY1k6YA5ox6+Nr0ve76pFCDIdwnT0mrCt4sH8yDTqKm3WSQRyRq51eaqQZ/3fr4gMtP4MEpPA5qfO0Cz2aDQ7PNbp+0M9mvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CpXZX8Np; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-201e24bd4d9so508495ad.0
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2024 16:28:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724887720; x=1725492520; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oxYEab6zxYFMI+0DGHubDHuUFu0b12AkR4fPJNH3Xb8=;
+        b=CpXZX8Npuwm4t4m5HkqdpJhGhnuF9ab2US55QIAIaDy5BMGL+H33CynKgua8ylWNyQ
+         jdwStKQzevzDrKrJnQbbjrH+jqWq/7CbSEX3YLzveMpogBgsabm3VIv/5GQSxD3/XsfF
+         8dHmE39yC5OSZWnxyBsddfdfs8wYOfP7cZRnvyvP5Yr4yubUEMr6pDqx39y9CjLARdMh
+         /1LXqYSiAO/GThjhs3MSdY5Ph+VgIOfHs29DNHY37xyK8TzWLFFunE5KCFfOyOwm3aTW
+         pSMlq3WtJOYhs3yFHEOou6xtP+SUkjwJZ3apwTVlJ8NlGO2Jh9itHRXnCT/ze+p1fcJf
+         C9Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724887720; x=1725492520;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oxYEab6zxYFMI+0DGHubDHuUFu0b12AkR4fPJNH3Xb8=;
+        b=ndOQp4MCuyKizdTerM/kd/J44DmyP73pgfHpriC8e9nDc7gcZOMNy5RLAjzz3RuhoG
+         cg2auTgMdY53xKKqYVhvkr57rRl8DmJJ3Q7V4S5hnuygByz6FINczxmkq20ea4PTScIZ
+         RCn7w1AD5/0kH1IfOOh5Z3gbKtjZh8f29awtWijc0eDiamtJW2o7MjtVQBbCO9pmImMn
+         PHc/YZz4QWix/VTkkL36KCAJSnSse5aYyto9VICMu2PPHTkgAUwSnnjJInP5yqIddj4H
+         /rjPltZfo3CkU0GoEuP0LqS/bbCjnmcy0Pb6Ckf7WZE8//AU9+iUJjENA7wbDiaNUV1Y
+         3EEw==
+X-Gm-Message-State: AOJu0YyjAdMYzxDKvoAUGWDznktUjQHPWEsRSyWIGduOPlBf+iD669YX
+	RjhMgJet7E++HO8r4/seYYDsOxlwNAlteRJ4FW6qNDfudqv8oJ3zjto2b3g8Cefvx1WqWjSo8WG
+	hpw==
+X-Google-Smtp-Source: AGHT+IHQWZfN/lWwUXU9lq2tHcwgrLgbrNayvmPAfcbGRgGUTyyJfmJ/nZsxcaRcU/NLevR+7Kpsm016RsA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:2281:b0:1fb:5a07:7977 with SMTP id
+ d9443c01a7336-2050c23beb8mr613695ad.3.1724887720231; Wed, 28 Aug 2024
+ 16:28:40 -0700 (PDT)
+Date: Wed, 28 Aug 2024 16:28:38 -0700
+In-Reply-To: <CABgObfbyJo2uYYkTTYdrrYQcB6XgB2+PhmfqwKrQ-g7D5UPr5A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mTeBIqFzdJh+yJcd"
-Content-Disposition: inline
-In-Reply-To: <20240827152517.3909653-6-maz@kernel.org>
-X-Cookie: You have no real enemies.
-
-
---mTeBIqFzdJh+yJcd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+References: <20240809190319.1710470-1-seanjc@google.com> <20240809190319.1710470-10-seanjc@google.com>
+ <e50240f9-a476-4ace-86aa-f2fd33fbe320@redhat.com> <Zr4L_4dzZl-qa3xu@google.com>
+ <CABgObfbyJo2uYYkTTYdrrYQcB6XgB2+PhmfqwKrQ-g7D5UPr5A@mail.gmail.com>
+Message-ID: <Zs-ypmZfGvCTcuBV@google.com>
+Subject: Re: [PATCH 09/22] KVM: x86/mmu: Try "unprotect for retry" iff there
+ are indirect SPs
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Peter Gonda <pgonda@google.com>, Michael Roth <michael.roth@amd.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerly Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 27, 2024 at 04:25:11PM +0100, Marc Zyngier wrote:
-> In order to be consistent, we shouldn't advertise a GICv3 when none
-> is actually usable by the guest.
+On Thu, Aug 15, 2024, Paolo Bonzini wrote:
+> On Thu, Aug 15, 2024 at 4:09=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > > (This is preexisting in reexecute_instruction() and goes away in patc=
+h 18, if
+> > > I'm pre-reading that part of the series correctly).
+> > >
+> > > Bonus points for opportunistically adding a READ_ONCE() here and in
+> > > kvm_mmu_track_write().
+> >
+> > Hmm, right, this one should have a READ_ONCE(), but I don't see any rea=
+son to
+> > add one in kvm_mmu_track_write().  If the compiler was crazy and genera=
+te multiple
+> > loads between the smp_mb() and write_lock(), _and_ the value transition=
+ed from
+> > 1->0, reading '0' on the second go is totally fine because it means the=
+ last
+> > shadow page was zapped.  Amusingly, it'd actually be "better" in that i=
+t would
+> > avoid unnecessary taking mmu_lock.
 >=20
-> Wipe the feature when these conditions apply, and allow the field
-> to be written from userspace.
+> Your call, but I have started leaning towards always using
+> READ_ONCE(), similar to all atomic_t accesses are done with
+> atomic_read(); that is, just as much as a marker for cross-thread
+> lock-free accesses, in addition to limiting the compiler's
+> optimizations.
 >=20
-> This now allows us to rewrite the kvm_has_gicv3 helper() in terms
-> of kvm_has_feat(), given that it is always evaluated at runtime.
+> tools/memory-model/Documentation/access-marking.txt also suggests
+> using READ_ONCE() and WRITE_ONCE() always except in special cases.
+> They are also more friendly to KCSAN (though I have never used it).
+>=20
+> This of course has the issue of being yet another unfinished transition.
 
-This patch, which is in -next, is causing the set_id_regs tests to fail
-on a variety of platforms including synquacer (it looks to be everything
-with GICv3 which wouldn't be surprising but I didn't confirm):
+I opted to fix the kvm_vcpu_exit_request() case[*], and add the READ_ONCE()=
+ to
+this patch, but left kvm_mmu_track_write() as-is.
 
-# selftests: kvm: set_id_regs
-# Random seed: 0x6b8b4567
-# TAP version 13
-# 1..81
-# ok 1 ID_AA64DFR0_EL1_PMUVer
-# ok 2 ID_AA64DFR0_EL1_DebugVer
+My reasoning, and what I think makes for a decent policy, is that while I 1=
+00%
+agree lockless accesses need _some_ form of protection/documentation, I thi=
+nk
+adding READ_ONCE() (and WRITE_ONCE()) on top adds confusion and makes the a=
+ctual
+requirement unclear.
 
-=2E..
+In other words, if there's already an smp_rmb() or smp_wmb() (or similar), =
+then
+don't add READ/WRITE_ONCE() (unless that's also necesary for some reason) b=
+ecause
+doing so detracts from the barriers that are actually necessary.
 
-# ok 79 ID_AA64ZFR0_EL1_SVEver
-# ok 80 test_vcpu_ftr_id_regs
-# =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-#   aarch64/set_id_regs.c:449: test_reg_vals[encoding_to_range_idx(uc.args[=
-2])] =3D=3D uc.args[3]
-#   pid=3D1716 tid=3D1716 errno=3D4 - Interrupted system call
-#      1	0x000000000040249f: test_guest_reg_read at set_id_regs.c:449
-#      2	0x0000000000401cc7: main at set_id_regs.c:580
-#      3	0x0000ffff9a737543: ?? ??:0
-#      4	0x0000ffff9a737617: ?? ??:0
-#      5	0x0000000000401e2f: _start at ??:?
-#   0x1001111 !=3D 0x1111 (test_reg_vals[encoding_to_range_idx(uc.args[2])]=
- !=3D uc.args[3])
-not ok 6 selftests: kvm: set_id_regs # exit=3D254
+[*] https://lore.kernel.org/all/20240828232013.768446-1-seanjc@google.com
 
-That's running test_reset_preserves_id_regs.
-
-Full log at:
-
-   https://lava.sirena.org.uk/scheduler/job/661438
-
-The bisection converges fairly smoothly:
-
-git bisect start
-# status: waiting for both good and bad commits
-# bad: [195a402a75791e6e0d96d9da27ca77671bc656a8] Add linux-next specific f=
-iles for 20240828
-git bisect bad 195a402a75791e6e0d96d9da27ca77671bc656a8
-# status: waiting for good commit(s), bad commit known
-# good: [0c78c247d6e9dddf53ea0ac009ccc3399f9203ae] Merge branch 'for-linux-=
-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
-git bisect good 0c78c247d6e9dddf53ea0ac009ccc3399f9203ae
-# good: [319121b3e57ddefccb36ca4af417ae602c9f97bc] Merge branch 'master' of=
- git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
-git bisect good 319121b3e57ddefccb36ca4af417ae602c9f97bc
-# good: [ed51c1e6d8adb0fc6ec023d7473627e03c6b0a2e] Merge branch 'for-next' =
-of git://git.kernel.org/pub/scm/linux/kernel/git/krzk/linux-dt.git
-git bisect good ed51c1e6d8adb0fc6ec023d7473627e03c6b0a2e
-# bad: [125bc49fbc0e1333b9602c1200153f2763cb0a3c] Merge branch 'char-misc-n=
-ext' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc.git
-git bisect bad 125bc49fbc0e1333b9602c1200153f2763cb0a3c
-# good: [c55ba156ad53e2b1f56b3cc53174b0860aef1b10] Merge branch 'next' of g=
-it://git.kernel.org/pub/scm/linux/kernel/git/rcu/linux.git
-git bisect good c55ba156ad53e2b1f56b3cc53174b0860aef1b10
-# bad: [8765b2fe7b05721f45e4320c2290c6a7e4f2ccd3] Merge branch 'for-next' o=
-f git://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86.=
-git
-git bisect bad 8765b2fe7b05721f45e4320c2290c6a7e4f2ccd3
-# bad: [bf8600945fa1536cea05731775d5f7d62e8632c8] Merge branch 'for-next' o=
-f git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git
-git bisect bad bf8600945fa1536cea05731775d5f7d62e8632c8
-# bad: [be43d82250a5d125e578065615ca805359dc58fe] Merge branch 'topic/ppc-k=
-vm' of git://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git
-git bisect bad be43d82250a5d125e578065615ca805359dc58fe
-# bad: [1093a3758142ce8613341ae39fb4591383d5df0a] Merge branch kvm-arm64/vg=
-ic-sre-traps into kvmarm-master/next
-git bisect bad 1093a3758142ce8613341ae39fb4591383d5df0a
-# good: [d17317a13fd0498cfa2b4bf9c4eebbe5adf929ab] Merge branch kvm-arm64/f=
-pmr into kvmarm-master/next
-git bisect good d17317a13fd0498cfa2b4bf9c4eebbe5adf929ab
-# bad: [9f5deace58da737d67ec9c2d23534a475be68481] KVM: arm64: Add ICH_HCR_E=
-L2 to the vcpu state
-git bisect bad 9f5deace58da737d67ec9c2d23534a475be68481
-# good: [8d917e0a8651377321c06513f42e2ab9a86161f4] KVM: arm64: Force GICv3 =
-trap activation when no irqchip is configured on VHE
-git bisect good 8d917e0a8651377321c06513f42e2ab9a86161f4
-# bad: [5cb57a1aff7551bcb3b800d33141b06ef0ac178b] KVM: arm64: Zero ID_AA64P=
-FR0_EL1.GIC when no GICv3 is presented to the guest
-git bisect bad 5cb57a1aff7551bcb3b800d33141b06ef0ac178b
-# good: [795a0bbaeee2aa993338166bc063fe3c89373d2a] KVM: arm64: Add helper f=
-or last ditch idreg adjustments
-git bisect good 795a0bbaeee2aa993338166bc063fe3c89373d2a
-# first bad commit: [5cb57a1aff7551bcb3b800d33141b06ef0ac178b] KVM: arm64: =
-Zero ID_AA64PFR0_EL1.GIC when no GICv3 is presented to the guest
-
---mTeBIqFzdJh+yJcd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbPsUsACgkQJNaLcl1U
-h9DU0Af+LIvuxsrDDxJ6Ab4DdLLyM0Tc1NlRZiDM1SOXpol1kKbFnqQ2ETvTGyGP
-Jr0Yh/WmMWJWmkJTDmE+/ko1PuvgNI6QR870wyYVCPZDOeFqKZBR8DoWqnIJwXKW
-vZgViDDtXxnooTsXaMw1c1f0LaeUbfA9oFbTGWd1IQPNJwERTqFb6lpHG5+sdSzn
-qE8JODMyNVL/Azr5kauyY6FY7pgh00ykGhNvB6f6LQk1gSMTuoARyFT26TqMG83r
-2Z2zNHHr/1WQhisM1JY2/KyeItaXaJ3epUzT3NwiHdVbErVbPEZ+WRJSFx7KsxtX
-ZsautBOZfp3jul0liuH3+X1ncsn3gQ==
-=hDBZ
------END PGP SIGNATURE-----
-
---mTeBIqFzdJh+yJcd--
+> > Obviously the READ_ONCE() would be harmless, but IMO it would be more c=
+onfusing
+> > than helpful, e.g. would beg the question of why kvm_vcpu_exit_request(=
+) doesn't
+> > wrap vcpu->mode with READ_ONCE().  Heh, though arguably vcpu->mode shou=
+ld be
+> > wrapped with READ_ONCE() since it's a helper and could be called multip=
+le times
+> > without any code in between that would guarantee a reload.
+>=20
+> Indeed, who said I wouldn't change that one as well? :)
+>=20
+> Paolo
+>=20
 
