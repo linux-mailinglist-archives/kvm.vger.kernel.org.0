@@ -1,134 +1,108 @@
-Return-Path: <kvm+bounces-25317-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25318-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C391D9638D2
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 05:33:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 959B5963986
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 06:52:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F01BB22BA4
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 03:33:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C87681C21C6C
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 04:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1474C3D0;
-	Thu, 29 Aug 2024 03:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CB11487F1;
+	Thu, 29 Aug 2024 04:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="fOt6inxP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BpKpL6gE"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597643D6A;
-	Thu, 29 Aug 2024 03:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75EB7581F;
+	Thu, 29 Aug 2024 04:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724902400; cv=none; b=QJSeJRbLYRGhs2REY4M4utYs1zecBNmGS9p1JSmgPZD81CkHk9U209GhB4McIK5M7spX6ALTragdqwmb/rx3OIo3EiLzuzUa2Uo/Qg0HP8Vu6ymX3f3JBLGyGLHxPhttLUmuqN0MdsAm5bkveQmpnLK65/0i0yiUnik4ZbMTEKU=
+	t=1724907121; cv=none; b=pQD4kGBUSBkM4OjlPr8OOG30pdEOTjGlF1PwMXWnDOToAixiRU0zL0FFTmltyofAVEluQ1CSGjyTOgSSM4SGGpd6x24IraNucqQDyubE73kJ/iNsKGuXkb2spQLb5jxgxNAv6Vi9QIys6WY4I91aKxlaBXdgQrqA0pVWDkt3QPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724902400; c=relaxed/simple;
-	bh=w1r+O8sWrSRbzGeYgOT8fFHmRB8r3kFv3utfoSt/qD8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ShdIyzj2Did74jWHsWhCHdBq2AJvgQ5SZ4vVBLrJiMSlaTA1NEmhgb+EozseRI9Rz0ST+WpuF6cWy5Azm9CjGft3/Qcn+39vBHJHEUD9seGOOx7c2nyhu6Sx2+G14pCDPveONaJ0O49e0HzVKQiF+vvVYnkH2gQS0zHAfHcCFAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=fOt6inxP; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1724902390;
-	bh=AOI+sFgYc+egpuvujXNsnccuz70B/MbEqwhv0oIczUc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=fOt6inxPxG4laRCW8cKOYA9WFcUzF0O8tIMTzXY0fkdmYr2dXygIEOBgpq7rLNhdi
-	 uxgPGLQvgC0fRFbMVSPnrHsGawJkObbOHlhq5UOTWq/+mGKN4HVk0Bk7Ui/34laA6m
-	 av6633jtfD2KmFJxqIAKwE+BJS+Uzbb/QBrao+m8=
-X-QQ-mid: bizesmtp91t1724902383toe2irx7
-X-QQ-Originating-IP: yiPdOobyPlWH/gtxewj0fNtc0cO7zzAP7U7r9lqh90U=
-Received: from [10.20.53.89] ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 29 Aug 2024 11:33:00 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 3163777189370156999
-Message-ID: <6B877E46C55A8A27+f98078be-8cde-46d2-9065-3f12e44ac603@uniontech.com>
-Date: Thu, 29 Aug 2024 11:33:00 +0800
+	s=arc-20240116; t=1724907121; c=relaxed/simple;
+	bh=WaZKLhi2JY5mxFC5iByEt/Wb3qK4TM0N4HwIuzX2Kik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tT7zu96sc39XB274zmDx3PGq9honmDjaWRc9w8z+1ZrD6/YDM53A/f7JtehE3s00GSSgn14gjq7Jjp/imb2khDOMvsLJY+En1uR+OGhDQiDkUMbRi5YbKYd4DfbKgdHJsTSUqg2iAV6f/n0JRzzKICaFJOpdI4JE5/eLV5ecTyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BpKpL6gE; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724907120; x=1756443120;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=WaZKLhi2JY5mxFC5iByEt/Wb3qK4TM0N4HwIuzX2Kik=;
+  b=BpKpL6gEDO3etBNNVQdw9vb5jimnKK+D3Nh5gNby9DEs6ieIPMRNWQkD
+   Msr5a6NPpu6eRh3dGC5WWyOo31SJllvYRll5KVLL+hDvU7Vy2HsEumCAn
+   8XmYWoMdELGLfGA4+5Yoo6OiYZJis24kLAK7rW+clxQ4MiLV6dOHZ4Vof
+   yAD0nXUlTCwGqnIWIV3hmVVKvaxppG7v61ex2hvdeSTC0e5O1iXn8+Vum
+   84YINDaTud/VGeADhq8phHhV5zjpmpHJX2HYPIz5ZpMXUC8BhScXwboSA
+   SVP1Y2+aLCcGdwY82N/9YjpYjE6tS5HIRPFKSV5nCDUHpFsh6GIqgxo1r
+   Q==;
+X-CSE-ConnectionGUID: ZGAkIsR4QTOS9f+S9JWjsA==
+X-CSE-MsgGUID: /yWaMTiKQqmFoz0QLvmfPw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="23360230"
+X-IronPort-AV: E=Sophos;i="6.10,184,1719903600"; 
+   d="scan'208";a="23360230"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 21:51:59 -0700
+X-CSE-ConnectionGUID: pDhZHg0zTtGJocqr+XHCaQ==
+X-CSE-MsgGUID: drmNX1dISdWd0whYKzaVlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,184,1719903600"; 
+   d="scan'208";a="63640588"
+Received: from bergbenj-mobl1.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.198])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 21:51:55 -0700
+Date: Thu, 29 Aug 2024 07:51:46 +0300
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Nikolay Borisov <nik.borisov@suse.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
+	isaku.yamahata@gmail.com, xiaoyao.li@intel.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/25] KVM: TDX: Initialize KVM supported capabilities
+ when module setup
+Message-ID: <Zs_-YqQ-9MUAEubx@tlindgre-MOBL1>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-11-rick.p.edgecombe@intel.com>
+ <b8ed694f-3ab1-453c-b14b-25113defbdb6@suse.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Loongarch: KVM: Add KVM hypercalls documentation for
- LoongArch
-To: YanTeng Si <si.yanteng@linux.dev>,
- Dandan Zhang <zhangdandan@uniontech.com>, pbonzini@redhat.com,
- corbet@lwn.net, zhaotianrui@loongson.cn, maobibo@loongson.cn,
- chenhuacai@kernel.org, zenghui.yu@linux.dev
-Cc: kernel@xen0n.name, kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- guanwentao@uniontech.com, baimingcong@uniontech.com,
- Xianglai Li <lixianglai@loongson.cn>, Mingcong Bai <jeffbai@aosc.io>
-References: <4769C036576F8816+20240828045950.3484113-1-zhangdandan@uniontech.com>
- <aa72bc73-b20d-4652-be89-37d01f291725@linux.dev>
-From: WangYuli <wangyuli@uniontech.com>
-Autocrypt: addr=wangyuli@uniontech.com; keydata=
- xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
- IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
- qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
- 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
- 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
- VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
- DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
- o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
-In-Reply-To: <aa72bc73-b20d-4652-be89-37d01f291725@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+In-Reply-To: <b8ed694f-3ab1-453c-b14b-25113defbdb6@suse.com>
 
+On Mon, Aug 26, 2024 at 02:04:27PM +0300, Nikolay Borisov wrote:
+> On 13.08.24 г. 1:48 ч., Rick Edgecombe wrote:
+> > From: Xiaoyao Li <xiaoyao.li@intel.com>
+> >   static int tdx_online_cpu(unsigned int cpu)
+> >   {
+> >   	unsigned long flags;
+> > @@ -217,11 +292,16 @@ static int __init __tdx_bringup(void)
+> >   		goto get_sysinfo_err;
+> >   	}
+> > +	r = setup_kvm_tdx_caps();
+> 
+> nit: Since there are other similarly named functions that come later how
+> about rename this to init_kvm_tdx_caps, so that it's clear that the
+> functions that are executed ones are prefixed with "init_" and those that
+> will be executed on every TDV boot up can be named prefixed with "setup_"
 
-On 2024/8/29 11:22, YanTeng Si wrote:
->
-> 在 2024/8/28 12:59, Dandan Zhang 写道:
->> From: Bibo Mao <maobibo@loongson.cn>
->>
->> Add documentation topic for using pv_virt when running as a guest
->> on KVM hypervisor.
->>
->> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
->> Co-developed-by: Mingcong Bai <jeffbai@aosc.io>
->> Signed-off-by: Mingcong Bai <jeffbai@aosc.io>
->> Link: 
->> https://lore.kernel.org/all/5c338084b1bcccc1d57dce9ddb1e7081@aosc.io/
->> Signed-off-by: Dandan Zhang <zhangdandan@uniontech.com>
->> ---
->>   Documentation/virt/kvm/index.rst              |  1 +
->>   .../virt/kvm/loongarch/hypercalls.rst         | 89 +++++++++++++++++++
->>   Documentation/virt/kvm/loongarch/index.rst    | 10 +++
->>   MAINTAINERS                                   |  1 +
->>   4 files changed, 101 insertions(+)
->>   create mode 100644 Documentation/virt/kvm/loongarch/hypercalls.rst
->>   create mode 100644 Documentation/virt/kvm/loongarch/index.rst
-> If you don't mind, how about translating these into Chinese? If
-> you decide to do so, you don't need to split the patch again,
-> just complete your translation in this patch and add your
-> Co-developed-by tag.
+We can call setup_kvm_tdx_caps() from from tdx_get_kvm_supported_cpuid(),
+and drop the struct kvm_tdx_caps. So then the setup_kvm_tdx_caps() should
+be OK.
 
+Regards,
 
-I'm afraid that's not feasible.
-
-The entire KVM subsystem documentation is currently lacking a Chinese 
-translation, not just for LoongArch.
-
-  A better approach would be to merge this English document first.
-
-In fact, I'm in the process of preparing Chinese translations for the 
-KVM subsystem documentation, and they're on their way.
-
->
-> Thanks,
-> Yanteng
->
-Thanks,
--- 
-WangYuli
-
+Tony
 
