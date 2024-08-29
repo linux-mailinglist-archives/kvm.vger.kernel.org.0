@@ -1,205 +1,248 @@
-Return-Path: <kvm+bounces-25363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25364-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A25096489D
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 16:35:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BA6D9648B2
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 16:39:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91A0BB25930
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 14:32:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17B59B26BDE
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 14:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E113B1AED23;
-	Thu, 29 Aug 2024 14:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC831B1405;
+	Thu, 29 Aug 2024 14:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MyiYKn98"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c5q0uDkz"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2049.outbound.protection.outlook.com [40.107.220.49])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13F21AAE28;
-	Thu, 29 Aug 2024 14:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724941948; cv=fail; b=SOk1M/7YV20z5euqzmQ94rQGFmsf7yua0q08kGKS/LJI7oFqmj+bIXoOsywHd+shGMrzF95JinDfwTtBVZ/zgj5GBQcT4/NckVY6ng1NjHgDalmm1Nno62zs5dE4J4CbcvyCNf4GGo/RXYGBJfaKSVqAp316+E3EHElqZBXD7fU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724941948; c=relaxed/simple;
-	bh=vfv5V3VBuWJmfNohu6KMaE61EHNtILeCq4qze21mShQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y7qxcQWfFXfGBTRll59cZq4SU/MpNzrnxgtKouf6Vxeu0+RXevQl89WPR4AcBhDNHRU/zqGKd94jWH5hZddojuLKXStw+CrBgPVvbP/XvF+f2c4fpmZXVe9oxKg2WDqHiqiEULJ80R4U7Q1PReAzr+P3+mlD56DukS1b+AtGU/k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MyiYKn98; arc=fail smtp.client-ip=40.107.220.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LFePmQhyTwrVO/Ea/TDORmzqYfC6F4bt8k/r4SscmR6sv/Ly1JOOnAPLBiCAV2BMMX8dSFJbWZRXWin+kc1QJxBOLCq/4prJDw3II7EtY3CKSIovscI7VQ2jr746W7d632sHPORZok5eIbip9ren4If/dN/FmIOv+diUSSs86YmERtZaEwHSlBkUQfOaB9F0wqmlWQGcW9App/5RcI5s0v7fD6InMMVacTVC190jfU/xdFQOhKYa/nKMHYQJfKCpzR3TFVnoQYq3XOG2NE5WFxIcphmx3SXL9NYp5Bz4kI/Epl7UNY/3vCSquPqq/yC7IF/kTtllLrpnOtLOQFE3CA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oNpHT2Yxe2NFbuJZ8poOjuFF162UA8VU/jxgVdsLRpI=;
- b=ZIYMaCpef5/BAJf+j+tdHQjRCcyxvXuqt7/1Q6DIJDB7armpi18p/1sfPIy5OfuBXEOhaNHSrtAErshgre5HnwsXIygLNb2q3aZAujO13WOSaRqef6E1dWZv+mdLaynGsZet2ZNbmC0hwMD+SIWn3EIZsJjRfmq2Wg8x1p2EqSh7FHysL4Qhdf+/scsrm8vnfXMr1DHc0Ch8vlWBhsXl61Soe4RV2qmLGs/Ktrg5BHBrByVumXg2KgzgrRoDH/c+0+Mu0Du4/24MYzoiKwQ9wQ520Q5oxudrQdC+ckn8LYZshbxjxzqvQIX1r+i/7tn3eWx30+ZuzEGdnt4wG3GP9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oNpHT2Yxe2NFbuJZ8poOjuFF162UA8VU/jxgVdsLRpI=;
- b=MyiYKn98Iro5BQJAAzXPxEnw38M0etGzcLsPG3aODB13GR3rCPAxP8DwQcoWY+plogTGm7HJbWN+e03TJY++ORutkRAmR3qu9+qXELrBK+w5ID+sbOxAHrEq9WYwACPm09BQX/ha2rCSYIcgOVGCXDpY3kQHPHnPXqjXdZgT7QQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- IA0PR12MB8716.namprd12.prod.outlook.com (2603:10b6:208:485::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.20; Thu, 29 Aug
- 2024 14:32:24 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb%5]) with mapi id 15.20.7897.021; Thu, 29 Aug 2024
- 14:32:23 +0000
-Message-ID: <a990d0db-119b-46c4-be56-86571d3ac184@amd.com>
-Date: Thu, 29 Aug 2024 20:02:15 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 3/4] KVM: x86: nSVM: Implement support for nested
- Bus Lock Threshold
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- pbonzini@redhat.com, shuah@kernel.org, nikunj@amd.com,
- thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de,
- babu.moger@amd.com, Manali Shukla <manali.shukla@amd.com>
-References: <20240709175145.9986-1-manali.shukla@amd.com>
- <20240709175145.9986-4-manali.shukla@amd.com> <Zr-zKxHiaFbnKvw_@google.com>
-Content-Language: en-US
-From: Manali Shukla <manali.shukla@amd.com>
-In-Reply-To: <Zr-zKxHiaFbnKvw_@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0055.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:22::30) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E898C19049D
+	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 14:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724942301; cv=none; b=ZXbY/qedlV5wwT9vOUpaWzEiFUbc6CmwyEQ+0Cmk5dHoMRhhsvUoK6GmdvCquih0HeVSPFvK1Kg8Z1AzFldRWqqaALAnWDzpFGJHeQNBpDgPYUwOISCyDhsBK+8rSio78Kj8iJOGWYJy3bJwwtnW6u0soiWLZ72Ldii8Zz1GRKY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724942301; c=relaxed/simple;
+	bh=dQT+LA/IzZSB8C3sdyssDAKv/Xg3VRBV4cRfN3pDZrk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j6ld7FKgwrYfTjnLs5iLh5MkABvitf1R+KRa9F5kFe37q23ROvwyoV8m8sxQKYDyH/DaEmcx7L5nHDtyAyKXZmp75Ld9OAjJfKDa/hoWFreHB4RKpbtEtDYP950Yvdk/Mp3W9wy/2rxVbI1J/2fhFQfwZposk9iRKjSnn1ngHXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c5q0uDkz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724942298;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a5UccTC0S6V3eGjBBJPNDrYhEx7B8yw4mGjSWxQn/Mg=;
+	b=c5q0uDkzwp2Sw32J2CFXqqVSa5So9lc+h6NOAr6XTx2ZvLKZ2kyWhpo/uj7yAzOMTt6so7
+	zeAb4yMMMaoACS8o3iq+jRREV1mquC5hSznrJKjEZpMSwWOCE6zhlucPYOs6iAewQY10ir
+	6bm3fbuG7cIptgtURv4TR7PgjUM4C/U=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-412-DhHEpfgDOqmpa7gQywlRPA-1; Thu, 29 Aug 2024 10:38:16 -0400
+X-MC-Unique: DhHEpfgDOqmpa7gQywlRPA-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a86824d2d12so70335766b.2
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 07:38:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724942295; x=1725547095;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a5UccTC0S6V3eGjBBJPNDrYhEx7B8yw4mGjSWxQn/Mg=;
+        b=YGdluKSlpaAhGMX7wm8ZucT/Admn77j0R+B8YLo+z/sipFpCkKIbqGEuVHQ3YdUpdU
+         RXrZbDNeZ1KZFsI1/sCVaIKHrMdRhWq+R4tfyoxZLDK2Vey83IFSh/aVncXuDHK3SoTQ
+         V4dlMYbi7FuF6HgklCJHWw3SsldBnDUDAEr2oB7gV3jua5jxSLvFeDfYxjlD9Er6dd22
+         kWHGKcW/shrGRXmFO9EXUuuEVLU1dX8WAaXCjcPnA7Kj2DBfARMg1z42osZzHVjHu8dR
+         OmA3oUqmXSGiGLd2OveEYOFfRkbd9i9EaBebalpGbAA9NF+/u+3oBlA4EoxrJSl2oGAa
+         h/yg==
+X-Forwarded-Encrypted: i=1; AJvYcCU5tgmJyqOnNfsusghzr97Md2AjBBLS0f/3i6lIE1/vGfh4ymJctlCb/ynhj+sGZK01pmw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Dt9TTQNFflXBK7BS31Dyms0fxW0f3fK81+1gxxA4TYPO5qWA
+	fgPAxdqAJneM1wCwvRNkX+wJ8OXw2CbW96Gvc/RaZHYzoqD7auORTJrHHcFcTPaepKznjVpwYZA
+	/15UUd0kFob7e7etNO8y6sfnnwek+Wbm9tQIn1OZjTk0ZrMNA9Zmpr+y2ykQsgJxbTgGX54tljE
+	exSCuEblBLQWWEnT6ScO0POBp8
+X-Received: by 2002:a17:907:6d03:b0:a86:84b8:1797 with SMTP id a640c23a62f3a-a897fad6213mr257355366b.67.1724942295422;
+        Thu, 29 Aug 2024 07:38:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGsvC4E6UsmVy/Ze5IGvygaFHFdEutsQpGstF70/D4htNreS9do5qHupMeEjRpKTrCSdG9K4ofLbVE6EHTsEbU=
+X-Received: by 2002:a17:907:6d03:b0:a86:84b8:1797 with SMTP id
+ a640c23a62f3a-a897fad6213mr257349266b.67.1724942294844; Thu, 29 Aug 2024
+ 07:38:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|IA0PR12MB8716:EE_
-X-MS-Office365-Filtering-Correlation-Id: 999e7bc3-88d3-432c-13a0-08dcc83765ae
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V3hucVJWQm5oeGcwQnhKMWVXMnNpRGUrQVh4NHdBcmJ4Z3MweXErMlFMcEhH?=
- =?utf-8?B?RDZJU0t4MEtCak1uN0JmVGRySDY2cWNJbGxxNkRxak5iRUozeDZZbnMvQ1ox?=
- =?utf-8?B?UlVyVTI4eE9WRlMvM0dweDRWWnhjOElXK0ZpRS9uZGV0djZPdWpNbk9pbUhF?=
- =?utf-8?B?UnZaRjBsdTF0MXFhL0E2aUFyUnZXRUFKdHI2cTdiVEZtaE9FQnkyNWJKZ0xm?=
- =?utf-8?B?RWdacjNkWjF4MTdNRFhhbHk0a0ZVemVPdlg0djdEbEhQcTZCTmVTbWdDMnhu?=
- =?utf-8?B?SWU3K3JBT1VTdGN5RG1veVpVQWppMjNJQjFrdmVqVm9pSW9nREI4cEU1ZUxa?=
- =?utf-8?B?eWo3UlpFejdUUmQ2UVpTUExmSjlwSHJiWkVRNDQwTGowaHZFcmhJZmZMamM5?=
- =?utf-8?B?dVlTaUI4NENwZ0thd2kyaTNUc1IvODhld2E3eWZqVzlLRmlxNUlaYzFaVzlo?=
- =?utf-8?B?MHVCZFBBdUNYbWd6WkJBbVFJUGsyMFMxK3d3ck4wbFp3bGVtbFJiS204WHgr?=
- =?utf-8?B?N2QrOEQxSm9LQncwTFpmTzVmRllJS01wMnNCQjd5VmtidWhONXIwbk50UGpL?=
- =?utf-8?B?MVBEb2RQRWVFZ1FrSDZzTFF5cmVieWREUUJtSE04WkhiZXROamwwTmlaV3Qv?=
- =?utf-8?B?aUl6ZTcyb05IZ3VLRFZlL0RUZm5mcXhvSDZ0cXhLeWNnM0dFb285UkRmZE1t?=
- =?utf-8?B?OXZUTEhNNzVJQU96U2phUDJpL2xIN3Q3eERld3BndFVQTkI4KzJLSHZWWnFC?=
- =?utf-8?B?UlZpN1lTSUJGWnFSUGZkS3ppaFNSZ1AyZGtxanBUTHJyaTh5ZW1IdWJlM3lz?=
- =?utf-8?B?VER4V3ZoU010NlBRQklXN0tlVTN2TE9GdjNSZmxYMW5TcWc1WWtnM3JRZ2dU?=
- =?utf-8?B?TzFhVHpLNVN6VHlZbXh4emkzOTZ3TEx6VUFLNVQzMU0rYVpTZWU5Q05CeHFt?=
- =?utf-8?B?M2FJV0w2eVM1bzI3a2syWjYwVHBvN21xUFpjNUFYeE1mbzQ1cWdiL3JhOGwr?=
- =?utf-8?B?cGhaRmpxWXVqNnFMS1l5c2NHK2t6Rzh3ekdmYkNDMVVrYUY1TkZZUUlYM0RY?=
- =?utf-8?B?L1gyR0NGdzQ2cTZXRXoyQk9nQUdXNVd4MmoyY2IxL2pQWUF0Uk5NSCthYy9R?=
- =?utf-8?B?QmViYjA3aTNiUHJtOUZQSVFkMFE0Z2hxNEF5WTV4YXdyeFVOVGV0a1pnOWpE?=
- =?utf-8?B?L2YyNHZicDJKUm1OUkNvTjBveDNnQjJzU1M2R0tNQy9yVS9TZFIzd2gvS0VD?=
- =?utf-8?B?Zm1vTVJ1dWhJYWdMdVR0R0syc2RIamVUcVlWeUFqdWN6MmQ5RWo5RU8zWFU4?=
- =?utf-8?B?RTRzUUk4eTNYOS9XTmVjT1pmVnNRaFVSZ3VkNmkxREhWSk1KeFFjQWtIMHRi?=
- =?utf-8?B?K05qZmRCWkRKdkxWMVY0aytvVkw2NUhNc2NMZXhEemR2R2F3WC9aR09TUyt5?=
- =?utf-8?B?WkhraS9SMnpxTkhhT3p3UHdCRGZHeHRQVjNjd01USFBtd1BzQktIWFVCV1J6?=
- =?utf-8?B?ay9uYXJ1Q1FDUVA1bXgxQnE3QTlZelVqdlRmSnZPdXJQdWVRYTVlYjh2S1FL?=
- =?utf-8?B?ZHJWbmhoeGFVYjBSTnh3Q2hVa1VHNk5DNERTK2lUV29lL3pGWFRJR0tqaERj?=
- =?utf-8?B?bFRCdDg3WlpESWFKTXdBTzM1cmZLS2FSLzd0cVVPZkw2WWwveWtjNkxPNHFo?=
- =?utf-8?B?d0s1bkx0S2hSYlg2cTlOZGdCNWJ3eHN5MjNXcUFxdDN4ekFJYVZYdm9WQTFJ?=
- =?utf-8?B?N0ppeWZsL0dVM0lsMy8xNHpGNXdWNkx4SUdTd1NOckFaRnF4QWl6cVlHNnd1?=
- =?utf-8?B?Ykt4VUFwUllXeTRvS3hSdz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?d3FabG5oQnBwY2hpMmZ1OGlvcTBmS2VuL2dYT3J6TWpVbXpyYUtqam9OeHBX?=
- =?utf-8?B?cnhkQk82N1RRQXpmQ21YVVZiVjUxdmUzZjJwNitSbXh1SXZLV0FOSXZsS3FI?=
- =?utf-8?B?RXNuTEZlUjZZV0s0TW5ISWlNYlltL0p6ekR3NkprOURGYjJhbVlrQjdnUjlC?=
- =?utf-8?B?WG1NNjNvSmNNVUlaYXZ6TDF5eEpTeVFleHpFMXBFS28wVHdFdjROVFpRZ3NB?=
- =?utf-8?B?M3UxaHhoVFUycUJIU3RiQ2syUmpiVW9pZExDSkhBY2trbUl4VENNcEl6UHVa?=
- =?utf-8?B?OUdHVmdvSjBIaEZITCtjNmREWHRrZkVkSER1Zy8wQmQ3SnB5WDIyOFFRT3kv?=
- =?utf-8?B?Qytic2ZMZ1BiVzlyLzlhaHgzeWhoMmljd3I3L1Q4c1hBM2Mwb3BoTFZFUGhK?=
- =?utf-8?B?aDhEc1NQNktGTlBlSVlTSUNtVUxvd2IwQVd0ZFljUW1VOEVHTFJjdEljbGIv?=
- =?utf-8?B?Tnlib2RnL25WTlhGUUpsUVJhVXJXTDd6WTBmM1ovK21OVEx5RnUwekxVeDR6?=
- =?utf-8?B?b3E0dWdFVVh2amFRL1Bib0c0L1B4WTBNQWt6VWdmUmg0aHJGaUJjWlJrei9w?=
- =?utf-8?B?bnRlNTFpYjU2SzU4TXBQK2NodGJDZlhOeXJZQ3lpNG84NWQzcmFPMXo2UFlS?=
- =?utf-8?B?YTk1bjJtWGR3RmM0VDhJWWl4VHVPZTNjVlk2RlFLZFV3ZTlocjdjWGhTcFl2?=
- =?utf-8?B?ZmNIeEZuNS83RmpEZUlXTTcyQ2hoR2ZjZ0poRVg5SkFjL2hxeU8vVHYwaWR6?=
- =?utf-8?B?ZUZEVDZSb3Q1d21TT0ZrREZONzBIV3RwMXpNc0FrZEo4V3BBWktWbVFCMzZl?=
- =?utf-8?B?b3hsSW1WUnZTbExYRE9QUG5ZaVRHNEN3THZuWnozQS8xVTc3cWFqT1pmNERy?=
- =?utf-8?B?cWpWY3BxMEsyR3B0TzFQYXcwdEdPc0VNZFlrQi9lMTVucW5HNUZWOUtMSHBs?=
- =?utf-8?B?WTZxaTNKazVPQ0FZZGlUNzIwYjFxeVRSTXY1cDIzOTE2bHlncDdyekdxajlN?=
- =?utf-8?B?Z3E5d09tdVp1Z0g1S1BMcG5OZGQ1aDQ2cU5LZk9uU2RNaDh2ZlpFbXFjQjU1?=
- =?utf-8?B?R1pMb0NWTUs0OHNha2VIOUYyV01jaTRYWGhQbzJBUmcrMzhHTy9iYXM2alZC?=
- =?utf-8?B?TkppN0NZWHY3MWxzaVFHS3Fya3k0dHgyMWNwWWU0czIrUjlXYVlqT0F5Q3g3?=
- =?utf-8?B?ZXZIeFM0bXp0REIyTUFkNWJYaGlLMDNHd2hVQTZwaW1PVXpwK1RkTk9sUVFF?=
- =?utf-8?B?SEdUU1VObk1kM2lMdXEvcjJaWHkzTzY3bFV3cUF1R2lzTjhCeXl2RXpzRkFa?=
- =?utf-8?B?WXV3MDJSTHg1cjRTMGRLWXRGYjVRVjA1RjlHWEQvcXNnOVJzbG5YRjZ4dkxZ?=
- =?utf-8?B?WEJUWEF3eFhGVks2djN4SityL2swNEhHVGxMRmV6MjA5UlFpQXB3SFhlT01q?=
- =?utf-8?B?NHAxeWc3dmxKZE1yWDRrSUZpeG1NTklSWUxrQ0t2aWc0RVJjYzBCZ2p2V3hp?=
- =?utf-8?B?SjQzeWh6SXAvZWphK2QxQllCdDQzZHVtSjlzMmRZTXJHS21rYWtyMTd4TDBu?=
- =?utf-8?B?VWtrTzR2TlhSb3QwS3NDc1FJYVhBb2VRZS9KRGQwZjNydll5NEN2a3pQeVJ1?=
- =?utf-8?B?TTBpK2M1dW9NVThheDFNajhBdjhxemRmTCt2NkdabytlYWhyWXhBWmVoei9U?=
- =?utf-8?B?TlQvbFFyTEFuWDNYYjh4NzkvdnZTNkhwOWRRQmtUUlU5blNOZ0dNL0xjTGJR?=
- =?utf-8?B?R3RBSy9qRDREUElucW5MN05FS1BZRllKSk0rdWp3TENhV1lEdlpIaTZjeWRs?=
- =?utf-8?B?YU5sWU5ob2FlVXRKTitaUXZMamRoenNVcExtR0lZTyszcmpYZXhxdHJWT2JB?=
- =?utf-8?B?WmZKNmU4UTQzd3JGUGlYZ0dRWDdXaE5wdjRtZGhwTGFxaGVIUmM0VWo2OUJk?=
- =?utf-8?B?YjhwcHViNWpCQk0rYTBtaVh0Um81dkc1cVVXMEtmKzA2a3RMT2RHcUE3L0xJ?=
- =?utf-8?B?M255L2ZDV25saVZpOWtIYkxxTUdwdUlxQ0sya1pqMWtlZkNEckIva1d6QTFk?=
- =?utf-8?B?ZzJGZFJYWklybUp6UU1oMm9jeklsZFlMcVBaSHJQZ28zb3BoVUgxR0x4K2Np?=
- =?utf-8?Q?1bK9RNwWbYioUeUGYSUO4opuj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 999e7bc3-88d3-432c-13a0-08dcc83765ae
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2024 14:32:23.8892
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4PfAQCAm/xKr0ezkHkrwGbaYoU0MfohnueCD8IFnXU13zkQF4J6sa7JDCxpExubiZ3VN9G6KnOQwoJzqq0wSTQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8716
+References: <20240821114100.2261167-2-dtatulea@nvidia.com> <20240821114100.2261167-8-dtatulea@nvidia.com>
+In-Reply-To: <20240821114100.2261167-8-dtatulea@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 29 Aug 2024 16:37:37 +0200
+Message-ID: <CAJaqyWe29MmDZgUkrOKibWN4MGjt+sWvsNfk6SeRHhEHPJYC5g@mail.gmail.com>
+Subject: Re: [PATCH vhost 6/7] vdpa/mlx5: Introduce init/destroy for MR resources
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Si-Wei Liu <si-wei.liu@oracle.com>, virtualization@lists.linux-foundation.org, 
+	Gal Pressman <gal@nvidia.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Parav Pandit <parav@nvidia.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Cosmin Ratiu <cratiu@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/17/2024 1:44 AM, Sean Christopherson wrote:
-> On Tue, Jul 09, 2024, Manali Shukla wrote:
->> @@ -758,6 +759,16 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
->>  		}
->>  	}
->>  
->> +	/*
->> +	 * If guest intercepts BUSLOCK, use guest's bus_lock_counter value,
->> +	 * otherwise use host bus_lock_counter value.
->> +	 */
->> +	if (guest_can_use(vcpu, X86_FEATURE_BUS_LOCK_THRESHOLD) &&
->> +	    vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_BUSLOCK))
->> +		vmcb02->control.bus_lock_counter = svm->nested.ctl.bus_lock_counter;
->> +	else
->> +		vmcb02->control.bus_lock_counter = vmcb01->control.bus_lock_counter;
-> 
-> Copying vmcb01's count to/from vmcb02 belongs in the core enabling patch.  From
-> KVM's perspective, the counter is associated with a vCPU, not a VMCB, and so the
-> count should keep running across nested transitions.
-> 
-> As written, taking only the core enabling patch will mean that L2 runs with the
-> wrong count.  Amusingly, because '0' means "always exit", L2 would run in a *more*
-> restrictive environment due to the VMCB being zero-allocated.
+On Wed, Aug 21, 2024 at 1:42=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> There's currently not a lot of action happening during
+> the init/destroy of MR resources. But more will be added
+> in the upcoming patches.
 
-Yeah. From my testing, with core enabling patch + copying vmcb01's count to/from vmcb02,
-L2 runs with correct value of bus lock counter and counter continues to run across
-nested transitions. The bus lock exit happens to L0 hypervisor when buslock is generated
-from L2 guest.
+If the series doesn't receive new patches, it is just the next patch :).
 
-- Manali
+>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> ---
+>  drivers/vdpa/mlx5/core/mlx5_vdpa.h |  2 ++
+>  drivers/vdpa/mlx5/core/mr.c        | 17 +++++++++++++++++
+>  drivers/vdpa/mlx5/core/resources.c |  3 ---
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c  | 10 ++++++++--
+>  4 files changed, 27 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/vdpa/mlx5/core/mlx5_vdpa.h b/drivers/vdpa/mlx5/core/=
+mlx5_vdpa.h
+> index 89b564cecddf..c3e17bc888e8 100644
+> --- a/drivers/vdpa/mlx5/core/mlx5_vdpa.h
+> +++ b/drivers/vdpa/mlx5/core/mlx5_vdpa.h
+> @@ -138,6 +138,8 @@ int mlx5_vdpa_create_mkey(struct mlx5_vdpa_dev *mvdev=
+, u32 *mkey, u32 *in,
+>  int mlx5_vdpa_destroy_mkey(struct mlx5_vdpa_dev *mvdev, u32 mkey);
+>  struct mlx5_vdpa_mr *mlx5_vdpa_create_mr(struct mlx5_vdpa_dev *mvdev,
+>                                          struct vhost_iotlb *iotlb);
+> +int mlx5_vdpa_init_mr_resources(struct mlx5_vdpa_dev *mvdev);
+> +void mlx5_vdpa_destroy_mr_resources(struct mlx5_vdpa_dev *mvdev);
+>  void mlx5_vdpa_clean_mrs(struct mlx5_vdpa_dev *mvdev);
+>  void mlx5_vdpa_get_mr(struct mlx5_vdpa_dev *mvdev,
+>                       struct mlx5_vdpa_mr *mr);
+> diff --git a/drivers/vdpa/mlx5/core/mr.c b/drivers/vdpa/mlx5/core/mr.c
+> index f20f2a8a701d..ec75f165f832 100644
+> --- a/drivers/vdpa/mlx5/core/mr.c
+> +++ b/drivers/vdpa/mlx5/core/mr.c
+> @@ -843,3 +843,20 @@ int mlx5_vdpa_reset_mr(struct mlx5_vdpa_dev *mvdev, =
+unsigned int asid)
+>
+>         return 0;
+>  }
+> +
+> +int mlx5_vdpa_init_mr_resources(struct mlx5_vdpa_dev *mvdev)
+> +{
+> +       struct mlx5_vdpa_mr_resources *mres =3D &mvdev->mres;
+> +
+> +       INIT_LIST_HEAD(&mres->mr_list_head);
+> +       mutex_init(&mres->lock);
+> +
+> +       return 0;
+
+I'd leave this function return void here and remove the caller error
+control path.
+
+> +}
+> +
+> +void mlx5_vdpa_destroy_mr_resources(struct mlx5_vdpa_dev *mvdev)
+> +{
+> +       struct mlx5_vdpa_mr_resources *mres =3D &mvdev->mres;
+> +
+> +       mutex_destroy(&mres->lock);
+> +}
+> diff --git a/drivers/vdpa/mlx5/core/resources.c b/drivers/vdpa/mlx5/core/=
+resources.c
+> index fe2ca3458f6c..aeae31d0cefa 100644
+> --- a/drivers/vdpa/mlx5/core/resources.c
+> +++ b/drivers/vdpa/mlx5/core/resources.c
+> @@ -256,7 +256,6 @@ int mlx5_vdpa_alloc_resources(struct mlx5_vdpa_dev *m=
+vdev)
+>                 mlx5_vdpa_warn(mvdev, "resources already allocated\n");
+>                 return -EINVAL;
+>         }
+> -       mutex_init(&mvdev->mres.lock);
+>         res->uar =3D mlx5_get_uars_page(mdev);
+>         if (IS_ERR(res->uar)) {
+>                 err =3D PTR_ERR(res->uar);
+> @@ -301,7 +300,6 @@ int mlx5_vdpa_alloc_resources(struct mlx5_vdpa_dev *m=
+vdev)
+>  err_uctx:
+>         mlx5_put_uars_page(mdev, res->uar);
+>  err_uars:
+> -       mutex_destroy(&mvdev->mres.lock);
+
+Maybe it is just me, but this patch is also moving the lock lifetime
+from mlx5_vdpa_alloc_resources / mlx5_vdpa_free_resources to
+mlx5_vdpa_dev_add / mlx5_vdpa_free. I guess it has a justification we
+can either clarify in the patch message or split in its own patch.
+
+>         return err;
+>  }
+>
+> @@ -318,7 +316,6 @@ void mlx5_vdpa_free_resources(struct mlx5_vdpa_dev *m=
+vdev)
+>         dealloc_pd(mvdev, res->pdn, res->uid);
+>         destroy_uctx(mvdev, res->uid);
+>         mlx5_put_uars_page(mvdev->mdev, res->uar);
+> -       mutex_destroy(&mvdev->mres.lock);
+>         res->valid =3D false;
+>  }
+>
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
+x5_vnet.c
+> index 8a51c492a62a..1cadcb05a5c7 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -3434,6 +3434,7 @@ static void mlx5_vdpa_free(struct vdpa_device *vdev=
+)
+>
+>         free_fixed_resources(ndev);
+>         mlx5_vdpa_clean_mrs(mvdev);
+> +       mlx5_vdpa_destroy_mr_resources(&ndev->mvdev);
+>         if (!is_zero_ether_addr(ndev->config.mac)) {
+>                 pfmdev =3D pci_get_drvdata(pci_physfn(mvdev->mdev->pdev))=
+;
+>                 mlx5_mpfs_del_mac(pfmdev, ndev->config.mac);
+> @@ -3962,12 +3963,15 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev=
+ *v_mdev, const char *name,
+>         if (err)
+>                 goto err_mpfs;
+>
+> -       INIT_LIST_HEAD(&mvdev->mres.mr_list_head);
+> +       err =3D mlx5_vdpa_init_mr_resources(mvdev);
+> +       if (err)
+> +               goto err_res;
+> +
+
+Extra newline here.
+
+>
+>         if (MLX5_CAP_GEN(mvdev->mdev, umem_uid_0)) {
+>                 err =3D mlx5_vdpa_create_dma_mr(mvdev);
+>                 if (err)
+> -                       goto err_res;
+> +                       goto err_mr_res;
+>         }
+>
+>         err =3D alloc_fixed_resources(ndev);
+> @@ -4009,6 +4013,8 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *=
+v_mdev, const char *name,
+>         free_fixed_resources(ndev);
+>  err_mr:
+>         mlx5_vdpa_clean_mrs(mvdev);
+> +err_mr_res:
+> +       mlx5_vdpa_destroy_mr_resources(mvdev);
+>  err_res:
+>         mlx5_vdpa_free_resources(&ndev->mvdev);
+>  err_mpfs:
+> --
+> 2.45.1
+>
+
 
