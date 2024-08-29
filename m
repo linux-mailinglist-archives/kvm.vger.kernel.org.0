@@ -1,156 +1,126 @@
-Return-Path: <kvm+bounces-25368-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25369-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C74D2964919
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 16:52:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 214F4964938
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 16:55:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8262B284C53
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 14:52:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 468381C22ED9
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 14:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2571B14F0;
-	Thu, 29 Aug 2024 14:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5831B14E1;
+	Thu, 29 Aug 2024 14:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lsfu843s"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940A11B1428;
-	Thu, 29 Aug 2024 14:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545161A7AE4
+	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 14:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724943151; cv=none; b=I7jYFRMbSlFdXrasg32v1nszNiGsp/l08iLV9oF9PaaqX5HyR2RlSrYtzL1M9EkdwnZ+NHx2d+nHGDdZjS4PjpCAYVBtj+elkGuSJ3WDcXBoZXiLn1rBf7Of62mdhwWvJyitypVjPHlTCnIMGIHMY9dybX6idjyM16FwpFhf/c4=
+	t=1724943307; cv=none; b=uzMPIRWln2iZjQiJjPJFY4Bc7DV5rAM93kPb4/eXB9ufjtdtNWI1Laf0UZzK9DGNUZWfSDU2JbASoSE3T7K+t7FA5nZmnDXVtYCSqLWRP/atUx1ZSGdz15uAXonCxbRhgBQYQVOmLKDgtrZ2qVaqsvNxTVoISGAYJ4XjgrDEsjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724943151; c=relaxed/simple;
-	bh=uS6ZUGkMELokJhjp5dBYR6LbnxF19SksPUR5GdIllFM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cbMAp4AxESOLxLwhbbHstube1b7QUa6XGp1yTN6RvAXY4wqgbd0kj+hS/k5HGfUmH9fAcJqCAvmHDaFPc2EpLyOg7fTZ1ESIxxdEAd9y7DeoIIK+mgkNPuZZuDuLMGxvteB7e3HaL17oHR9H3eCprnUflUDLQbZIekmzASjOt7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Wvkdy6wLJzQr6Y;
-	Thu, 29 Aug 2024 22:47:34 +0800 (CST)
-Received: from dggpemf500003.china.huawei.com (unknown [7.185.36.204])
-	by mail.maildlp.com (Postfix) with ESMTPS id 108351401E0;
-	Thu, 29 Aug 2024 22:52:26 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- dggpemf500003.china.huawei.com (7.185.36.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 29 Aug 2024 22:52:25 +0800
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Thu, 29 Aug 2024 15:52:23 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-CC: Jason Gunthorpe <jgg@nvidia.com>, "acpica-devel@lists.linux.dev"
-	<acpica-devel@lists.linux.dev>, "Guohanjun (Hanjun Guo)"
-	<guohanjun@huawei.com>, "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Len Brown <lenb@kernel.org>,
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Lorenzo Pieralisi
-	<lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Robert
- Moore" <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, "Sudeep
- Holla" <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, Alex Williamson
-	<alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Moritz Fischer
-	<mdf@kernel.org>, Michael Shavit <mshavit@google.com>,
-	"patches@lists.linux.dev" <patches@lists.linux.dev>, Mostafa Saleh
-	<smostafa@google.com>
-Subject: RE: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
-Thread-Topic: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
-Thread-Index: AQHa+JkQkcFFSAeDsUqyXyGP6/LaZLI7ju0AgAFNDID///2PgIAAHqvg///xn4CAAU4tEIAAHHjg
-Date: Thu, 29 Aug 2024 14:52:23 +0000
-Message-ID: <d1dc23f484784413bb3f6658717de516@huawei.com>
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <Zs5Fom+JFZimFpeS@Asurada-Nvidia>
- <7debe8f99afa4e33aa1872be0d4a63e1@huawei.com>
- <Zs9a9/Dc0vBxp/33@Asurada-Nvidia>
- <cd36b0e460734df0ae95f5e82bfebaef@huawei.com>
- <Zs9ooZLNtPZ8PwJh@Asurada-Nvidia>
- <d2ad792fe9dd44d38396c5646fa956c6@huawei.com>
-In-Reply-To: <d2ad792fe9dd44d38396c5646fa956c6@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1724943307; c=relaxed/simple;
+	bh=WuEtO6BmIl0gGlluQ8RcR2vhje+ZxPWcYV/Mr6S4Vk0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=C0I0ZCPorEclfGtge/5zEle/bFG7kHjHY23mDbproPp4gjPBAALNKbOj5tfUGDTmJlz1Iz7KaxxfW4ziusxnVB5SlKBTuaqlFhGWWLVfJEie2vRqQYIZ1dRD0w0DGie5BIEMy0s5w1FDgW5FfJd3J0s7pOmte0y45vzYrTt6KVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lsfu843s; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e035949cc4eso1206367276.1
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 07:55:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724943305; x=1725548105; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p3UuMYljCd91RJx727z2/DG7ns9tOYwJWF5xNUr/gNM=;
+        b=lsfu843sUb+KMSGUuKahecf12bZJfaNucqK29Gt6Ku0oY8XCKeeOIb1P1nNosrjf/u
+         fxSvbQEZLX59rkW8eRW7GRlKHUNgFHPFbl8QNct0B8G9/udrs8KXi2ShCMO3fuVBJJ6+
+         iujOlsTkO4ov5frghV5nL6zvTYV+Q1SzjF+BOsZm+BNkXTPEDW/3+uV88EqnIADns9fx
+         w4Md/hddxVxNVvsg7rs2nrDk1I9NVjfM4oJTa4LhFkBy9o2xSyRW/bGoAMiAq7VLXehm
+         vArzmVI94pfKDvVBQ5DsQ3n+KSz6eLcfNxVEoFxYAIa2v5+iSWUAw7LGRJZkaVNAZEOG
+         X4Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724943305; x=1725548105;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=p3UuMYljCd91RJx727z2/DG7ns9tOYwJWF5xNUr/gNM=;
+        b=wmHdhlRiNTs3BLMnDL/nHVEmceq0XPdTXSs3sVulSqMIDC/TaoOkfQ+jEfy+yq6qi7
+         O1+YEHFK4QaqoKh5AcJmXWoSbdWJWAfVV8spnLosdNojl2t3m56hdG/GjwzjwKvudKRX
+         XtzDVNBvlwknSIaEgV7E6jLasxuntyL1l4v9Jw+DI9nQTx9CVVQgWn3CjAma0EuDoEja
+         RHOL3HCvpwstDjFGQndtS1o5cGzi0mz/vgbOvPhzPdcYYEnd9CQDICNX/x++6t+1JK/H
+         /sc+Ei8tTjfcexD9u/k/LzKCMbR8Nr7YBAQX4viHcTYmHWOvjOLwZ2R0pV5MUsFMX+3l
+         pIdA==
+X-Gm-Message-State: AOJu0YwOSv/93yeotVxwPEL3LEx7+RXu6jCcN1J8rOQtn7wIon7Z45fu
+	PkNP6pgzB+/xS83akJKGpoHVQSQOErlP+VNTF1gkrE5PF5oxZVORwnJPFISF01V4x01wZ9PjXil
+	dOQ==
+X-Google-Smtp-Source: AGHT+IEOOM+fVkTxyRvwJSu8mdC7aHDwg3OAToByUHR/+hbltIEls5CoHUCIuCmJGffzDkQRr0JuSX4bVys=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:7cc4:0:b0:e11:69f2:e39 with SMTP id
+ 3f1490d57ef6-e1a5adee523mr36802276.9.1724943305173; Thu, 29 Aug 2024 07:55:05
+ -0700 (PDT)
+Date: Thu, 29 Aug 2024 07:55:03 -0700
+In-Reply-To: <7af072f062cb4df5aac10540d4af994dc2fcd466.camel@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20240820133333.1724191-1-ilstam@amazon.com> <20240820133333.1724191-3-ilstam@amazon.com>
+ <Zs8yV4M0e4nZSdni@google.com> <7af072f062cb4df5aac10540d4af994dc2fcd466.camel@amazon.co.uk>
+Message-ID: <ZtCLx3zn3QznN8La@google.com>
+Subject: Re: [PATCH v3 2/6] KVM: Add KVM_CREATE_COALESCED_MMIO_BUFFER ioctl
+From: Sean Christopherson <seanjc@google.com>
+To: Ilias Stamatis <ilstam@amazon.co.uk>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Paul Durrant <pdurrant@amazon.co.uk>, 
+	"nh-open-source@amazon.com" <nh-open-source@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>, 
+	"paul@xen.org" <paul@xen.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-> -----Original Message-----
-> From: Shameerali Kolothum Thodi
-> Sent: Thursday, August 29, 2024 2:15 PM
-> To: 'Nicolin Chen' <nicolinc@nvidia.com>
-> Cc: Jason Gunthorpe <jgg@nvidia.com>; acpica-devel@lists.linux.dev;
-> Guohanjun (Hanjun Guo) <guohanjun@huawei.com>;
-> iommu@lists.linux.dev; Joerg Roedel <joro@8bytes.org>; Kevin Tian
-> <kevin.tian@intel.com>; kvm@vger.kernel.org; Len Brown
-> <lenb@kernel.org>; linux-acpi@vger.kernel.org; linux-arm-
-> kernel@lists.infradead.org; Lorenzo Pieralisi <lpieralisi@kernel.org>; Ra=
-fael J.
-> Wysocki <rafael@kernel.org>; Robert Moore <robert.moore@intel.com>;
-> Robin Murphy <robin.murphy@arm.com>; Sudeep Holla
-> <sudeep.holla@arm.com>; Will Deacon <will@kernel.org>; Alex Williamson
-> <alex.williamson@redhat.com>; Eric Auger <eric.auger@redhat.com>; Jean-
-> Philippe Brucker <jean-philippe@linaro.org>; Moritz Fischer
-> <mdf@kernel.org>; Michael Shavit <mshavit@google.com>;
-> patches@lists.linux.dev; Mostafa Saleh <smostafa@google.com>
-> Subject: RE: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
+On Thu, Aug 29, 2024, Ilias Stamatis wrote:
+> On Wed, 2024-08-28 at 07:25 -0700, Sean Christopherson wrote:
+> > > returns a file descriptor to the caller but does not allocate a ring
+> > > buffer. Userspace can then pass this fd to mmap() to actually allocat=
+e a
+> > > buffer and map it to its address space.
+> > >=20
+> > > Subsequent patches will allow userspace to:
+> > >=20
+> > > - Associate the fd with a coalescing zone when registering it so that
+> > >   writes to that zone are accumulated in that specific ring buffer
+> > >   rather than the VM-wide one.
+> > > - Poll for MMIO writes using this fd.
+> >=20
+> > Why?  I get the desire for a doorbell, but KVM already supports "fast" =
+I/O for
+> > doorbells.=C2=A0
 >=20
-> That makes some progress. But still I am not seeing the assigned dev  in
-> Guest.
->=20
-> -device vfio-pci-nohotplug,host=3D0000:75:00.1,iommufd=3Diommufd0
->=20
-> root@ubuntu:/# lspci -tv#
->=20
-> root@ubuntu:/# lspci -tv
-> -+-[0000:ca]---00.0-[cb]--
->  \-[0000:00]-+-00.0  Red Hat, Inc. QEMU PCIe Host bridge
->              +-01.0  Red Hat, Inc Virtio network device
->              +-02.0  Red Hat, Inc. QEMU PCIe Expander bridge
->              +-03.0  Red Hat, Inc. QEMU PCIe Expander bridge
->              +-04.0  Red Hat, Inc. QEMU PCIe Expander bridge
->              +-05.0  Red Hat, Inc. QEMU PCIe Expander bridge
->              +-06.0  Red Hat, Inc. QEMU PCIe Expander bridge
->              +-07.0  Red Hat, Inc. QEMU PCIe Expander bridge
->              +-08.0  Red Hat, Inc. QEMU PCIe Expander bridge
->              \-09.0  Red Hat, Inc. QEMU PCIe Expander bridge
->=20
-> The new root port is created, but no device attached.
-It looks like Guest finds the config invalid:
+> What do you refer to here? ioeventfd?=20
 
-[    0.283618] PCI host bridge to bus 0000:ca
-[    0.284064] ACPI BIOS Error (bug): \_SB.PCF7.PCEE.PCE5.PCDC.PCD3.PCCA._D=
-SM: Excess arguments - ASL declared 5, ACPI requires 4 (20240322/nsargument=
-s-162)
-[    0.285533] pci_bus 0000:ca: root bus resource [bus ca]
-[    0.286214] pci 0000:ca:00.0: [1b36:000c] type 01 class 0x060400 PCIe Ro=
-ot Port
-[    0.287717] pci 0000:ca:00.0: BAR 0 [mem 0x00000000-0x00000fff]
-[    0.288431] pci 0000:ca:00.0: PCI bridge to [bus 00]
-[    0.290649] pci 0000:ca:00.0: bridge configuration invalid ([bus 00-00])=
-, reconfiguring
-[    0.292476] pci_bus 0000:cb: busn_res: can not insert [bus cb-ca] under =
-[bus ca] (conflicts with (null) [bus ca])
-[    0.293597] pci_bus 0000:cb: busn_res: [bus cb-ca] end is updated to cb
-[    0.294300] pci_bus 0000:cb: busn_res: can not insert [bus cb] under [bu=
-s ca] (conflicts with (null) [bus ca])
+Ya.
 
-Let me know if you have any clue.=20
+> Correct me if I am wrong, but my understanding is that with an
+> ioeventfd the write value is not available. And that is a problem when
+> that value is a head or tail pointer.=20
 
-Thanks,
-Shameer
+Ah.  Can you describe (or point at) an example device?  I don't read many d=
+evice
+specs (understatement).  It would be helpful to have a concrete use case fo=
+r
+reviewing the design itself.
 
+In a perfect world, poll() support would come from a third party file type,=
+ as
+this doesn't seem _that_ unique (to KVM).  But AFAICT there isn't an existi=
+ng
+type that is a good fit, probably because it's such a simple thing.
 
