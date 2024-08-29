@@ -1,112 +1,124 @@
-Return-Path: <kvm+bounces-25353-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25354-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EB296465C
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 15:22:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9BC0964668
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 15:26:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9E81F216E3
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 13:22:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C181B29688
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 13:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535B31A707F;
-	Thu, 29 Aug 2024 13:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2091AAE1A;
+	Thu, 29 Aug 2024 13:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="EqVLPlTy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ap6/COmG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD451A76A4
-	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 13:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B442A192B6F;
+	Thu, 29 Aug 2024 13:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724937745; cv=none; b=JND9HoanL3405/ohWx4uN4GGv6S+YUdI/JjeO03aJZhHXNn4jyca3EmtAcrdONCY92HEjZ+zHoqqikIFSueD+6JzrrBKWtqUELC0eqvgoOMAUkbLv7eKZppFptz0HGS2uDZLamNEaCKCXYdCymlfrcsZGuRb6w++NdJF8VT89po=
+	t=1724937919; cv=none; b=JSZ3U1M9nRuQ6AboPA4zIIvCXiNLFW3cdifwUUF4Ueea263mbzBvbOmY0huC4mzPSJWuq+lgYYZOKDMEIvuVLbB2+4TYB0iUp7lbXm4Cy5Jpxun98LBTHmlEnt3h3/ncp+FHgkey+X+AWw1UwiLnU7g1i5ZIl63ICbfOoRM8cAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724937745; c=relaxed/simple;
-	bh=oQj0KRBGMHjNHdPfh8Q8h3wMueXaodfE1dhhnO+N7fM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sYvDd7Z8dEYvHPrr63F05Pq22FbTO/rBmdPNy57ShzM0LzqFJoVG6Ya5fC5fbEELkYvPCnbI3Hs3CmI8fHyuQE/eo3CeJdU2Ij0y+s97shmXLdhxC3zB4c8+aos6cXIqCwCBMTpV84Ka12cCdj97l4z7NlLa4DzAZPA92wxj5Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=EqVLPlTy; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id BB46F40E0284;
-	Thu, 29 Aug 2024 13:22:19 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id q7TLeNyQaVLA; Thu, 29 Aug 2024 13:22:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1724937734; bh=ufGW6vocR0XGYpmUqWuOf+mbsV59/16zoa4Ts9IJi9E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EqVLPlTyX8MF8e4MiXVevI4A5jh6fwqGXwqPFMxgMcTq6L7uiguaGmrt6ZYEbbg6R
-	 LL2ux1GrHlzAfVODn8DSraEhMdm4h07CMWEQysAzJ2POMNSZmMWdM2rn1B9BNoPnja
-	 NTa8O2FUY07dYymf0zVbNOOaxo1MSBY+ZkAJmKbdG6uqgYwHy1sDRRKam3FaxLeIwZ
-	 Ia6RQmQpPW7puuvoPbXoRa2ElusGGUdMmN61B3b4wE3K2EMZ31HZW9YBtrnUk3cr6z
-	 l4IlxhwQUIihspxTAa1rWWmqec4OY+d4+5gy0OWt4OPwuvdlqYE7dryCVxx6m4oix0
-	 GJ9N6/3gUHZXKZ8ViB86JpZUkMvhMrsuSZs5YXh5ThmRmgTaZEP1xGvKCavUZIsVZJ
-	 mcfxqJweKeiaf5qR8IbvMdAlbreFLBLABvImjiWFYOZsrqOjgtW8NmPzTAGMdezSSF
-	 UbPy7C32j3nZLKf23v8vOG+6ovmPlM1X38jmbFUjq1yS9dU3j+Om1T8xEziGwFKdZR
-	 WnqPeQdPluXwY2qtwEIUYF5rc3wFn+uPt1yVYyxZjPSJB1kTIOCRiUu/5K/eoY3Vzl
-	 vo0tcP87GEt/SK6oKP/pmzNZg1AmJoH+KgtoOwthhsB566XDj0iee8BMDml6YppBnV
-	 Xyod1JMejOv0w+QyHLWwogC4=
-Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A711E40E0169;
-	Thu, 29 Aug 2024 13:22:07 +0000 (UTC)
-Date: Thu, 29 Aug 2024 15:22:01 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	thomas.lendacky@amd.com, santosh.shukla@amd.com, ketanch@iitk.ac.in
-Subject: Re: [RFC PATCH 1/5] x86/cpufeatures: Add SNP Secure TSC
-Message-ID: <20240829132201.GBZtB1-ZHQ8wW9-5fi@fat_crate.local>
-References: <20240829053748.8283-1-nikunj@amd.com>
- <20240829053748.8283-2-nikunj@amd.com>
+	s=arc-20240116; t=1724937919; c=relaxed/simple;
+	bh=n77bCPZhEhpA7pX7XHjUFUHJCMPAurXbxUj+f9Jyqa4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JG4P5eF/JkBq2j4PJMGYyW4VEYO2fnjCN8N817xGz7qxmMye7UMPnT8gX3Tc1AAb5MpiKWJ1EItKr4FDwd67RWsa4/hdDNekWtRFAjTz4WTQp2uLqcSqWGvSYf+xUG0FHdOYQCqQQvOonsolqUy0tzWOqVgztSVmnSPT9ALqY8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ap6/COmG; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724937918; x=1756473918;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=n77bCPZhEhpA7pX7XHjUFUHJCMPAurXbxUj+f9Jyqa4=;
+  b=Ap6/COmG0Vk7rqFXWDN9mrUqEXm/BdBpyJIxOdZqVgHkdopxI2OZ6Bt/
+   olfpCRy/Mx+tKXgGulf788nOkWWBU+ZDAohES6OQZfisSnCnW9MWSy0ig
+   KxqWazMV2nTT8QLhalfR8VENGCDU0qZdyrFvqT3vsBOR2TAIZstV2dYNP
+   rPrz7A1fn1p2wi4GUQe556wP1lXKS+Ousyy3lJQ9cGJGjSM+JEcBh5H+Y
+   ryQf+A5YjGWDlByN6Fff1fnP+luYk2TRaxhPCqTOe+PO1lwCT5FgD9hTL
+   G34lY4b0k2llqm9+AueI4kNbTAkGHim3dy6tVxzsudn210GsMMrY5Db5f
+   w==;
+X-CSE-ConnectionGUID: 6kMD3vlqTm6GyU9yFYOVrw==
+X-CSE-MsgGUID: EIi7kagJQOii18LAEAsXAQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="34185220"
+X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
+   d="scan'208";a="34185220"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 06:25:18 -0700
+X-CSE-ConnectionGUID: CMR8G9PlQnG+jJscNPSPbg==
+X-CSE-MsgGUID: 6p7D2YcFRryMDkc3Pk+Z9w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
+   d="scan'208";a="68462912"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.240.26]) ([10.124.240.26])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 06:25:15 -0700
+Message-ID: <4eb4a26e-ebad-478e-9635-93f7fbed103b@intel.com>
+Date: Thu, 29 Aug 2024 21:25:11 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240829053748.8283-2-nikunj@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/25] KVM: TDX: Define TDX architectural definitions
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org
+Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, linux-kernel@vger.kernel.org,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-3-rick.p.edgecombe@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20240812224820.34826-3-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 29, 2024 at 11:07:44AM +0530, Nikunj A Dadhania wrote:
-> The Secure TSC feature for SEV-SNP allows guests to securely use the RDTSC
-> and RDTSCP instructions, ensuring that the parameters used cannot be
-> altered by the hypervisor once the guest is launched. More details in the
-> AMD64 APM Vol 2, Section "Secure TSC".
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index dd4682857c12..ed61549e8a11 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -444,6 +444,7 @@
->  #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* VM Page Flush MSR is supported */
->  #define X86_FEATURE_SEV_ES		(19*32+ 3) /* "sev_es" AMD Secure Encrypted Virtualization - Encrypted State */
->  #define X86_FEATURE_SEV_SNP		(19*32+ 4) /* "sev_snp" AMD Secure Encrypted Virtualization - Secure Nested Paging */
-> +#define X86_FEATURE_SNP_SECURE_TSC	(19*32+ 8) /* "" AMD SEV-SNP Secure TSC */
+On 8/13/2024 6:47 AM, Rick Edgecombe wrote:
+> +/*
+> + * TD_PARAMS is provided as an input to TDH_MNG_INIT, the size of which is 1024B.
+> + */
+> +struct td_params {
+> +	u64 attributes;
+> +	u64 xfam;
+> +	u16 max_vcpus;
+> +	u8 reserved0[6];
+> +
+> +	u64 eptp_controls;
+> +	u64 exec_controls;
 
-There's a newline here on purpose - keep it.
+TDX 1.5 renames 'exec_controls' to 'config_flags', maybe we need update 
+it to match TDX 1.5 since the minimum supported TDX module of linux 
+starts from 1.5.
 
-Also, you don't need "" anymore.
+Besides, TDX 1.5 defines more fields that was reserved in TDX 1.0, but 
+most of them are not used by current TDX enabling patches. If we update 
+TD_PARAMS to match with TDX 1.5, should we add them as well?
 
--- 
-Regards/Gruss,
-    Boris.
+This leads to another topic that defining all the TDX structure in this 
+patch seems unfriendly for review. It seems better to put the 
+introduction of definition and its user in a single patch.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> +	u16 tsc_frequency;
+> +	u8  reserved1[38];
+> +
+> +	u64 mrconfigid[6];
+> +	u64 mrowner[6];
+> +	u64 mrownerconfig[6];
+> +	u64 reserved2[4];
+> +
+> +	union {
+> +		DECLARE_FLEX_ARRAY(struct tdx_cpuid_value, cpuid_values);
+> +		u8 reserved3[768];
+> +	};
+> +} __packed __aligned(1024);
+
 
