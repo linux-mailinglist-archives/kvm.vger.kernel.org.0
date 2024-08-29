@@ -1,143 +1,153 @@
-Return-Path: <kvm+bounces-25339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CE2A96410F
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 12:15:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D325696427C
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 13:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 000C1B21839
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 10:15:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3577D283908
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 11:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6324118E35D;
-	Thu, 29 Aug 2024 10:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79233190684;
+	Thu, 29 Aug 2024 11:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FIt/zQ5o"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="e1SPA6Zm"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05olkn2022.outbound.protection.outlook.com [40.92.90.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8514718E050;
-	Thu, 29 Aug 2024 10:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724926506; cv=none; b=t5rAsCpUJ9Y6JKi/rWwvwbzZrRY3CvmbqewpCbeHjR+bDwg3TkiHrYX9uorjb1sq0iduGNyX9skBhvhl3imPZoLzO80Mm0+ZhQ6YdkOleb787FlE+BTIvroUSJvSxqru7U/WObPypgQZ6c8AveAhFpjJ3XqBp6amn5APGwjwhlo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724926506; c=relaxed/simple;
-	bh=ja3k5hFICUQ46VNR/0UCHIUMXdkpQSTHbdMOS3QfItE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A5W215LmtIfmcsDvA29SL9JWXlYyBazC4xHMUzLZJfngDW/H3hNgecm60uhvv4zOKRQ2/tkgy3ba+9EIr/NXQhE04l1CqTdc7aUSTdh8vjB4DTqJ861yVf7u953m0Qb02j5ClfjtsFwgbf/OPqnRrHbGWALv3vLZWyhItcKV11g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FIt/zQ5o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F355C4CEC5;
-	Thu, 29 Aug 2024 10:15:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724926506;
-	bh=ja3k5hFICUQ46VNR/0UCHIUMXdkpQSTHbdMOS3QfItE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=FIt/zQ5okD2OnX/3U8XS7YxcRyv/6TQL2fIHw3oVa+7i9XNpDlvrTH6MJhhynFpvA
-	 8kQj4SB3cztOUNZa9JRRw9gh2PvNEEQVDOB8oDh05o1XOmsEP55g9YUaqG5iy3dBSB
-	 ZoGkskxApKAmbm0Y+27J6zH6yHBa/OskT7ad6O6EMZWc77Ydr4uV6nqGIaTCclDI4X
-	 qikL6ijv4YNUUNOuqxc0uyzD2dIiK5mfuK7Tqu2A1V+abeDFJor45fFHYrZGbKFgAv
-	 twQaALgBV/m8ekSYddGfXGC6igdrgEY75bTlSYZYtGv4pmBbcRjLRAMGRgO+cjskev
-	 VjTgrjgzVojTA==
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5dc93fa5639so258799eaf.1;
-        Thu, 29 Aug 2024 03:15:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUIsEvYjSxcoRWdyGL9+3sfvkgcEHKKkIBiC9kAhFBEFp8fZ2qPQGVtCG1dFtZCFJF57xo=@vger.kernel.org, AJvYcCUdjj7oV4gpnLXiKHqoj+xp6tdrPIC606RzGoXKeRZHDDx0PXhyfjuWknoMTHNQMmcEniswQOY6d7fYKA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHuUv7ia/A7TsHDEtr0Aov8VFQaefUJTpNfFdvGPTXYzp84vBK
-	aWW7aUo7/bLxsxQVvz0jvAPsP1deLowhrlF6ZbsgPI4PQAvgsTQGVIItr+5tpXRqK+1Ahhyy0JC
-	m/AZRC7jCSENl0UBs6kpH9K7ssYM=
-X-Google-Smtp-Source: AGHT+IH1iV6L1TGRMqY7jf4E7+LOi1yBY1y43SdO+ovsqtu6sddWwnbpbj08nm5SY9sGMdOM9bStbW37+fCJJzH/H0k=
-X-Received: by 2002:a05:6820:1610:b0:5da:a462:6a30 with SMTP id
- 006d021491bc7-5df97ebd7bdmr2719698eaf.1.1724926505401; Thu, 29 Aug 2024
- 03:15:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03B5189F3E;
+	Thu, 29 Aug 2024 11:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.90.22
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724929269; cv=fail; b=V2AwBpoM34NljWs3ZW6LLZIlQJbmLn4iMasPSKK/uZT+UUShrsiQ+6gC0DfeWdJFrFcnkEiTXl2jzF9jUmKzenx/rK+0OEtp7y2Ocs68RMeBaR6A8TnMxHbUPE6RgToDHJ238FBdkTk+kiFBmVmV2QNf1aKCfZGQ7ezBh7Ag4H0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724929269; c=relaxed/simple;
+	bh=8uPp23xD+y4ayX2+x75nIBCekbV5cto4cyMLZn8ntF4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fzwdtZDrzMFzBPLSAJNRp8HPZo1m7soHTbmBaaIdQyax8aoPamUzbzGyZWFQLMLZTEEFXO+EkQztc2mioWZQ8rdWRqHFgfHEgNwxGZdvo3Ny6AUnmaAvi50Bfmml12hlZq4U9H5W4TkjJrDhFBn2UQGzLaL6FvI/vFNIb7dPPv0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=e1SPA6Zm; arc=fail smtp.client-ip=40.92.90.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ygq/wVETJjWzhvX4RkZrx6P4Gj/tHLOd4gcebqSENPI/9Xb7Dc992URc8qLGmkUO1Mfpaw0jczT8pl+tziPsifdf2s4xrF+U0ycvIdnjmxm3UwIaDgRLxohlndsvpwCFoRNInclgRzBs/y/6KKp/EkY9x8mHI2KwwkGqSBc6VCTxUX5U/H5rMThxQ1gKrUZt82IlDl0SHbMRYaP5UQIXUAqtDEt6S20hAACY9OhgS4L3slel8ixqAZ5bgWBviAh2izYBF0NqhWpclQsiUVXt1VelQbf8fZKY4nRf/KIaS353iBi2a+tzRFdj6dxyym1gBBDpg50lH7xgwrGZWiAVkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8uPp23xD+y4ayX2+x75nIBCekbV5cto4cyMLZn8ntF4=;
+ b=fcTyFRDLDskSIuSnHZ496OZZftNLP07thCUnBWGjNrRt+LxJcCaqO20wXDd0dh5NBK1w0YExLnU1TPvg+oqfnTJ+vzJZOkOkAL/GVIjITYiWEa+ToUjsLDhfFXXQ4xQ0zu4iO0Kf8M2snP7/wEj923Tn9+EcAAb1U5ARKyL9z4KIMxwMHLJgXez2KjjeGCFD0ir4mK6HuvL4S5Eb+QicVA1pucLKk9BdACIhZ1WXy2UqfvMPpkYrWl/wzLZaDcfeHtvf+WaXWl51UdMvx5Oh17dgbAvyr+RyLY5gAoBlT5Kd6mp1KVVhNQx+DE4h+wvTB4zZIS7x29SOuclqB44JpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8uPp23xD+y4ayX2+x75nIBCekbV5cto4cyMLZn8ntF4=;
+ b=e1SPA6Zm3iwFIJ0t/L73wIT08+o4phNVFOIwZXpHcUHpYFtzw+n29ef1e4OqBdNxp5TarxFGi7uAQOAzIhNChPyq/abXo6M9EEGBXjcdg0XCRAPgcU3x/1rknBL4uK4PNoGvb+zVPWG2tmD1jsTzhScEgJ884X5QKGTmVOAk31dUwqcO34tXZYZ5ip3Vq7nMH0G1whwkQJKKzR+j0DgIiyO5wIeQ9/72dzw8FsjPdt82LToGCIjTIf4p7+ookirxW8KRmebC4YcNiqks7dEduoSOtwJ6iX6VIRnqCmt5UDrP4ZHXtKpSNKRdI1FZCKyE+WuzaFRTVaxiAC1errIU/g==
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
+ by AM9P194MB1394.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:3a0::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.27; Thu, 29 Aug
+ 2024 11:01:05 +0000
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930%3]) with mapi id 15.20.7897.027; Thu, 29 Aug 2024
+ 11:01:05 +0000
+From: Luigi Leonardi <luigi.leonardi@outlook.com>
+To: sgarzare@redhat.com,
+	mst@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luigi.leonardi@outlook.com,
+	marco.pinn95@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v4 0/2] vsock: avoid queuing on intermediate queue if possible
+Date: Thu, 29 Aug 2024 13:00:37 +0200
+Message-ID:
+ <DU2P194MB21741755B3D4CC5FE4A55F4E9A962@DU2P194MB2174.EURP194.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <tblrar34qivcwsvai7z5fepxhi4irknbyne5xqqoqowwf3nwt5@kyd2nmqghews>
+References: <tblrar34qivcwsvai7z5fepxhi4irknbyne5xqqoqowwf3nwt5@kyd2nmqghews>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [/YiQgoA9GBkBc6e8GivfADJ82SQ14uS0]
+X-ClientProxiedBy: MI2P293CA0012.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:45::10) To DU2P194MB2174.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:10:492::9)
+X-Microsoft-Original-Message-ID:
+ <20240829110037.10934-1-luigi.leonardi@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com> <3-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
-In-Reply-To: <3-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Thu, 29 Aug 2024 12:14:54 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0hZKs8QkjA=JMYwaXpPm8kQM91WnyMNP2Mcyk7s51NfyQ@mail.gmail.com>
-Message-ID: <CAJZ5v0hZKs8QkjA=JMYwaXpPm8kQM91WnyMNP2Mcyk7s51NfyQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/8] ACPICA: IORT: Update for revision E.f
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>, 
-	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, 
-	kvm@vger.kernel.org, Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
-	Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Moritz Fischer <mdf@kernel.org>, 
-	Michael Shavit <mshavit@google.com>, Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev, 
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|AM9P194MB1394:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1b1bb33e-3d7e-4100-691e-08dcc819dfeb
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|5072599009|8060799006|19110799003|461199028|15080799006|440099028|3412199025|4302099013|1602099012|1710799026;
+X-Microsoft-Antispam-Message-Info:
+	ZrMGjl/lw8Hx5WUDtxzP675NwtZP9CIkVLNnxWqsijKTma7nyHZ9LATMSQoqdE/s1XUooS4oAxu9s+bjdBf3rbjrmj/1MvGjTYIRVf8jm+NxmTUTf0QsLZIYI/OmWvogi07hZUBGmeGoVgvppNDf6nRvgI43WQcOEzNj7P9QrPZIqABoWkDrVX0Cafrh2l2Lii4iSQjpWT1pdQlp56KhTGS9oKS7c/y/r6tN4VBQHoH+5HdBywmP+c7fYTRsmknjVDISJTRGgxnWEQOHY0ig7n/B09LCLNoC2WsuCBK9pd2plJSxtNs1X+tLcjxoCuZU0N0y1mMjz/9OS3xdO2j+c0qYaa/v6iNOW7CkF/+PVY2TIZTZ1egHtEQLc/Ngv6iRbVygRnhgOQVIyNoY8t/VsFNdlIhLH/tMVHNipyF6EMpDec76X3i3LFM/7jaPETm5p+CSmpWl9GV0VH9xjESkaUeRUCTth9xqL+OPFN9LAmpKyeazNJVryCtEas2akx4jEHtUPKF+D0PFBemi0hjPaDwxOA22uzb0H0EXkorn9alXaPJxi/3Q9dYuLXm+XXC4zmcBTgVkhDYAQ3q4iMxu8phYYp9ZBR1eYvx+UnXPfvcGqVI7h4dt39HbkoDEBBJyAn9q5w0pp/2hOnPjl0v2tphy9vsKLvdDl1ICCByaAQ8FtUFbcx26fFbdCIWOanNCGm5oJs0SBX0QCGaPPuNKRnt/CKsClHc5Qc5svSryb48PgbVXPAPGi/H/pSHutfGh3mkwI9apXUpSvQcinNYvA0Dg0BrKitA2hCh9iq4mCcrtpRkFKYDXBUVzP69DaHZxN9qi050O85mm22a8aYE7sK/qjVOiniM0BYDY2Vfg756B6F+VtzP64BRXuBNJwCG3wMJVKca58ohyhhGOXhBrtA==
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?gL2WMwzDnz5q466eslKtSFsynsZ1clOw52WReURJMOrJ7KGIzqj99WoJmUx8?=
+ =?us-ascii?Q?CYVPlJSSHIWE1XvzFI/GCZUuD5BpsoEDMUYxVE27synmZKzrOz/t5c4rDBGz?=
+ =?us-ascii?Q?HS32YxqmEyFnOvuQPLaqFuPzAS/4NDo5gaIVIFliiTkbrhoMxGITI5FW1lCv?=
+ =?us-ascii?Q?aiAaq3g8+dFA2EGqAPQvo6PHR9yxIg3KFqCzGMPjemki8ZtTMJ/x+wN9ByBg?=
+ =?us-ascii?Q?04QR9zJNgdGxIBaauCLBzZhPJAY+yOyBd/TiCA9gb5Gt9EG05R63pj35aeQY?=
+ =?us-ascii?Q?gm5mV/YXWlvgZs7Bun8ckvJXOc9hZsidMjVnVxufof2aW74KLesLtOLsOdiM?=
+ =?us-ascii?Q?Yt+m2PErbrxM0vSmAfoMu3q7mZMvt/spn3FeWCXR0xJ9hq+GxzUABeeKeGOh?=
+ =?us-ascii?Q?oD19QajZNcKfBJz0v8XmHf3Q23Hz4FNqcQuvCvcjav7yd2iK3D0xRcNuIOWI?=
+ =?us-ascii?Q?qBuX1F5BREewtsVoevAY5fMiUpSE/IhwMxaEVa73l4PHPQQMPQPszbgFwtzG?=
+ =?us-ascii?Q?yNYXZmGB6YoS8RX5kYjLWmZmerZ5TjmZrT1GMwU4dJc7PfoBbjEk3a7pliz2?=
+ =?us-ascii?Q?rvOe5o8A7Z184KzEnGuixj7y0AGc/xEL+4SXQ1o0EImSd2oZ+be5AZ4Db4AA?=
+ =?us-ascii?Q?eRvXLLfoe0ATsBF44LrnCg8yiCi7EQnp3nlI5nJtXIVfg1irHY8kzIEB0SqI?=
+ =?us-ascii?Q?LdjXCscSNFBcNY545po9KdiTVRW7lkQEto/UAgPlIew+wk6U6EuZGkoVDuQk?=
+ =?us-ascii?Q?jgszkMlh9wJFrbxQUk0rEERT+L55VBgDVrJWqrFPwqtaOinaMS6Tq7ZeBCQh?=
+ =?us-ascii?Q?V7otCmGF3S8Rt/HVF3o7Qg+AF+y0z/g6kFP9CNQtKodRHm4QQ+8ukxH5vIAa?=
+ =?us-ascii?Q?7XbtC/jjqGofV7NTTGbOWNahYBF1DZIqO/aTgESq/581Z5sChns1ihQEpA3w?=
+ =?us-ascii?Q?wY+4eWuaV5B/YHnCmul7XICPr7RXD6wX3zhC0PxfILEQ2LOktEv8RQt8ohoz?=
+ =?us-ascii?Q?RhlFz5C8RaXfC4/IWEQm5XC3jGmj5YtKIoPOlRjMoM5vl+ummiAiZdb6X+Va?=
+ =?us-ascii?Q?mfrZ+UUJ6VsW+9gwOdi3TJIz5BuJRo5jL/PpZp2LCGHzwtREEtqRr3St5sWB?=
+ =?us-ascii?Q?N+5BMg7etOJ7/wzWnlioyYSR7I3SDMgWOFtZ1S/m+qWtNyp0fXLuNeo2qUNk?=
+ =?us-ascii?Q?BtH8HNbxyW2nNEZLdoLm5jgBdmFtqHiTqjetX0ypO3pHOi2S6FhzF2UdtinP?=
+ =?us-ascii?Q?44RakcIbSk0lCQyaxiNS?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b1bb33e-3d7e-4100-691e-08dcc819dfeb
+X-MS-Exchange-CrossTenant-AuthSource: DU2P194MB2174.EURP194.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2024 11:01:05.1268
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9P194MB1394
 
-On Tue, Aug 27, 2024 at 5:51=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
->
-> From: Nicolin Chen <nicolinc@nvidia.com>
->
-> ACPICA commit c4f5c083d24df9ddd71d5782c0988408cf0fc1ab
->
-> The IORT spec, Issue E.f (April 2024), adds a new CANWBS bit to the Memor=
-y
-> Access Flag field in the Memory Access Properties table, mainly for a PCI
-> Root Complex.
->
-> This CANWBS defines the coherency of memory accesses to be not marked IOW=
-B
-> cacheable/shareable. Its value further implies the coherency impact from =
-a
-> pair of mismatched memory attributes (e.g. in a nested translation case):
->   0x0: Use of mismatched memory attributes for accesses made by this
->        device may lead to a loss of coherency.
->   0x1: Coherency of accesses made by this device to locations in
->        Conventional memory are ensured as follows, even if the memory
->        attributes for the accesses presented by the device or provided by
->        the SMMU are different from Inner and Outer Write-back cacheable,
->        Shareable.
->
-> Link: https://github.com/acpica/acpica/commit/c4f5c083
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Hi All,
 
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+It has been a while since the last email and this patch has not been merged yet.
+This is just a gentle ping :)
 
-> ---
->  include/acpi/actbl2.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/include/acpi/actbl2.h b/include/acpi/actbl2.h
-> index e27958ef82642f..9a7acf403ed3c8 100644
-> --- a/include/acpi/actbl2.h
-> +++ b/include/acpi/actbl2.h
-> @@ -453,7 +453,7 @@ struct acpi_table_ccel {
->   * IORT - IO Remapping Table
->   *
->   * Conforms to "IO Remapping Table System Software on ARM Platforms",
-> - * Document number: ARM DEN 0049E.e, Sep 2022
-> + * Document number: ARM DEN 0049E.f, Apr 2024
->   *
->   ***********************************************************************=
-*******/
->
-> @@ -524,6 +524,7 @@ struct acpi_iort_memory_access {
->
->  #define ACPI_IORT_MF_COHERENCY          (1)
->  #define ACPI_IORT_MF_ATTRIBUTES         (1<<1)
-> +#define ACPI_IORT_MF_CANWBS             (1<<2)
->
->  /*
->   * IORT node specific subtables
-> --
-> 2.46.0
->
->
+Thanks,
+Luigi
+
+>Hi Michael,
+>this series is marked as "Not Applicable" for the net-next tree:
+>https://patchwork.kernel.org/project/netdevbpf/patch/20240730-pinna-v4-2-5c9179164db5@outlook.com/
+
+>Actually this is more about the virtio-vsock driver, so can you queue
+>this on your tree?
+
+>Thanks,
+>Stefano
 
