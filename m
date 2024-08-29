@@ -1,79 +1,57 @@
-Return-Path: <kvm+bounces-25381-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25382-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBBB6964A9E
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 17:51:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5612964AE2
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 18:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 978E2283D7A
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 15:51:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81D402881D5
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 16:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3531B5808;
-	Thu, 29 Aug 2024 15:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF4F19885D;
+	Thu, 29 Aug 2024 16:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NImxa3nI"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CfrrftqK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C861B3F01;
-	Thu, 29 Aug 2024 15:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E9F1B3749
+	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 16:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724946634; cv=none; b=Ic45sy5IAED0xTym3ETj7qs85B1+QAzsRB1lZiOfZnFHtMc7kMqtnkYHi18fnK8JsHX8o6gw8w5k40rTqtKhh7oC620kCw3pYFqmf2r9lpVeTagU7TfNNpfSeSYL3esQ3lodsX4OAhff8vnq0vSgzu7RwcBh7BDz22Ft7sgxbSw=
+	t=1724947241; cv=none; b=eImqv2X3n5JQcmLE15es1ZsJ2EccCosvrgbkdMGkcFrz2OSOBXWPjgaWS2vOVuWLYN6C/BpqD8JXxWmnfnVfbPLTvVCV2C+I0EbmzeBY06cMlXID4OM9IC9LQwfqm1U2wuRzV4uv5/uRDEh6oRzvb4HdAxAKkKzl+I2wGS64D7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724946634; c=relaxed/simple;
-	bh=Xwa41nPWXFk5ZvYn4P/GOc574DpMq9cTCMistG6DV14=;
+	s=arc-20240116; t=1724947241; c=relaxed/simple;
+	bh=9JHYMVIc9Cu/nFbvq+Ogf+hfJg1zsWcCgKicvIbWUMA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CxtKFKUe8pdDHxBFCKyexWGue+MR51yPgMGLjxptcR2tDd267diAi/67f/rN1L7u9c6oUkaxdS7zam61Vy/9ihcnBU0DF66zb0lUZRf9rTeKHlvP3vkrrSOAdzqiSF11tvd7euZGme7RcDh3Iy5vvmHVRlkL6HSeTXAXiMg/Oro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NImxa3nI; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724946632; x=1756482632;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Xwa41nPWXFk5ZvYn4P/GOc574DpMq9cTCMistG6DV14=;
-  b=NImxa3nIClo/jpMESSCQs4KUQCd5g84rNliAtgA8w5YPwwWRN5EAt2mD
-   lr4nwcVXFDffaQhxM7kBXg38WvAlU1IQXYsIm9pRGCQApYX46XbN6XMNa
-   3VoOKtqGEPbB5YLtQHh67mJ4Tx7TW+47tllnJncZtcr3eaQRE+x6nUCde
-   VVxd2l6yqi9ASq5FEBfkPxRDROf6/OkHAOD0O9iASd1iLUrdXQuIPjPw6
-   nVTNzu2lcx3N/dtB5XYY+P6lKi2DWwpXvyZxPdDW9Ih7JuMA97V4EPv0U
-   poMZdOSYiQ7W16Y7s+CMM+RkJsbslKu4+mkTEVIun+op7xJioOaRjQMkE
-   w==;
-X-CSE-ConnectionGUID: 7pi13zxGTWWoHw0gMzPEFg==
-X-CSE-MsgGUID: aNqwDa/ETqK4inqegAX0ww==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="34958255"
-X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
-   d="scan'208";a="34958255"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 08:50:31 -0700
-X-CSE-ConnectionGUID: SqhaKlPuSoS/Ppr9Z5wcWA==
-X-CSE-MsgGUID: caMfL994RjyUJRCwpirnWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
-   d="scan'208";a="101129077"
-Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 29 Aug 2024 08:50:28 -0700
-Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sjhPl-0000Q4-0p;
-	Thu, 29 Aug 2024 15:50:25 +0000
-Date: Thu, 29 Aug 2024 23:50:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
-	pbonzini@redhat.com, dave.hansen@linux.intel.com,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, hpa@zytor.com,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	thomas.lendacky@amd.com, michael.roth@amd.com,
-	kexec@lists.infradead.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH] x86/sev: Fix host kdump support for SNP
-Message-ID: <202408292344.yuQ5sYEz-lkp@intel.com>
-References: <20240827203804.4989-1-Ashish.Kalra@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=C7avyP9kIEh+QCMI+vtLwQTV1TwEaDR4KZcTspAJO1fK4kw3aVoigbdjUtstIkxH5HBt5KwTya1Okojd43UiRen0O47pw+rl1TpPcqo8HXvtyaDYW7HbNzb6tKWU4KYTD/IgjXM1OoUB2OStgulV0CTNWc7Kaco8eSOWvBBL1uY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CfrrftqK; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 29 Aug 2024 18:00:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724947237;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0rWikQVnNVqsvYzWEE1hdncdjr+jNRxpDhNDln7lIt0=;
+	b=CfrrftqK8Hn6vivryFU8QlAtHUHPlvidDJ0GwDGZYLjxSBGUMlkvKr/hkaoR80FHvfNSMo
+	apcA+Mqmu4fYZbVuyMqSE/0I/nxQVlwgDtNOz0pg02tqULfIgCP+utk+8rp9SmwbZRO4Qp
+	eSMm50/MTnuTb6Q5k8Y/OXefFC69efg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: James Raphael Tiovalen <jamestiotio@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu
+Subject: Re: [kvm-unit-tests PATCH v2 4/4] riscv: sbi: Add tests for HSM
+ extension
+Message-ID: <20240829-0f48e6c15a505fbb9fa1bae2@orel>
+References: <20240825170824.107467-1-jamestiotio@gmail.com>
+ <20240825170824.107467-5-jamestiotio@gmail.com>
+ <20240829-8860b495f7e50336fd8a2b90@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,72 +60,74 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240827203804.4989-1-Ashish.Kalra@amd.com>
+In-Reply-To: <20240829-8860b495f7e50336fd8a2b90@orel>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Ashish,
+On Thu, Aug 29, 2024 at 03:30:26PM GMT, Andrew Jones wrote:
+> On Mon, Aug 26, 2024 at 01:08:24AM GMT, James Raphael Tiovalen wrote:
+...
+> > +.section .data
+> > +.balign PAGE_SIZE
+> > +.global sbi_hsm_hart_start_checks
+> > +sbi_hsm_hart_start_checks:			.space CONFIG_NR_CPUS
+> > +.global sbi_hsm_non_retentive_hart_suspend_checks
+> > +sbi_hsm_non_retentive_hart_suspend_checks:	.space CONFIG_NR_CPUS
+> > +.global sbi_hsm_stop_hart
+> > +sbi_hsm_stop_hart:				.space CONFIG_NR_CPUS
+> 
+> I don't think it should be necessary to create these arrays in assembly.
+> We should be able to make global arrays in C in riscv/sbi.c and still
+> access them from the assembly as you've done.
+> 
+> CONFIG_NR_CPUS will support all possible cpuids, but hartids have their
+> own range and the code above is indexing these arrays by hartid. Since
+> we should be able to define the arrays in C, then we could also either
+> 
+>  1) assert that max_hartid + 1 <= NR_CPUS
+>  2) dynamically allocate the arrays using max_hartid + 1 for the size
+>     and then assign global variables the physical addresses of those
+>     allocated regions to use in the assembly
+> 
+> (1) is probably good enough
 
-kernel test robot noticed the following build warnings:
+Actually we have to do (1) unless we want to open a big can of worms
+because we're currently shoehorning hartids into cpumasks, but cpumasks
+are based on NR_CPUS for size. To do it right, we should have hartmasks,
+but they may be very large and/or sparse.
 
-[auto build test WARNING on kvm/queue]
-[also build test WARNING on linus/master v6.11-rc5 next-20240829]
-[cannot apply to kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> Seems on-cpus is missing an API for "all, but ...". How about, as a
+> separate patch, adding
+> 
+>  void on_cpus_async(cpumask_t *mask, void (*func)(void *data), void *data)
+> 
+> to lib/on-cpus.c
+> 
+> Then here you'd copy the present mask to your own mask and clear 'me' from
+> it for an 'all present, but me' mask.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ashish-Kalra/x86-sev-Fix-host-kdump-support-for-SNP/20240828-044035
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20240827203804.4989-1-Ashish.Kalra%40amd.com
-patch subject: [PATCH] x86/sev: Fix host kdump support for SNP
-config: x86_64-buildonly-randconfig-002-20240829 (https://download.01.org/0day-ci/archive/20240829/202408292344.yuQ5sYEz-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240829/202408292344.yuQ5sYEz-lkp@intel.com/reproduce)
+I'll write a patch for on_cpus_async() now.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408292344.yuQ5sYEz-lkp@intel.com/
+> but, instead, let's provide the following (untested) function in lib/riscv/sbi.c
+> 
+>    struct sbiret sbi_send_ipi_cpumask(cpumask_t *mask)
+>    {
+>         struct sbiret ret;
+> 
+> 	for (int i = 0; i < CPUMASK_NR_LONGS; ++i) {
+> 	    if (cpumask_bits(mask)[i]) {
+> 	       ret = sbi_send_ipi(cpumask_bits(mask)[i], i * BITS_PER_LONG);
+> 	       if (ret.error)
+> 	          break;
+> 	    }
+> 	}
+> 
+> 	return ret;
+>    }
+>
 
-All warnings (new ones prefixed by >>):
+I'll write a patch adding this now too.
 
-   In file included from arch/x86/kvm/svm/avic.c:28:
->> arch/x86/kvm/svm/svm.h:783:13: warning: 'snp_decommision_all' declared 'static' but never defined [-Wunused-function]
-     783 | static void snp_decommision_all(void);
-         |             ^~~~~~~~~~~~~~~~~~~
---
-   In file included from arch/x86/kvm/svm/svm.c:50:
->> arch/x86/kvm/svm/svm.h:783:13: warning: 'snp_decommision_all' used but never defined
-     783 | static void snp_decommision_all(void);
-         |             ^~~~~~~~~~~~~~~~~~~
-
-
-vim +783 arch/x86/kvm/svm/svm.h
-
-   763	
-   764	static inline void sev_free_vcpu(struct kvm_vcpu *vcpu) {}
-   765	static inline void sev_vm_destroy(struct kvm *kvm) {}
-   766	static inline void __init sev_set_cpu_caps(void) {}
-   767	static inline void __init sev_hardware_setup(void) {}
-   768	static inline void sev_hardware_unsetup(void) {}
-   769	static inline int sev_cpu_init(struct svm_cpu_data *sd) { return 0; }
-   770	static inline int sev_dev_get_attr(u32 group, u64 attr, u64 *val) { return -ENXIO; }
-   771	#define max_sev_asid 0
-   772	static inline void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code) {}
-   773	static inline void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu) {}
-   774	static inline int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order)
-   775	{
-   776		return 0;
-   777	}
-   778	static inline void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end) {}
-   779	static inline int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
-   780	{
-   781		return 0;
-   782	}
- > 783	static void snp_decommision_all(void);
-   784	#endif
-   785	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+drew
 
