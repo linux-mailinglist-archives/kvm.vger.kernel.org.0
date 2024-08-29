@@ -1,133 +1,211 @@
-Return-Path: <kvm+bounces-25344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E749643ED
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 14:08:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52DE7964406
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 14:13:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C37A1C24815
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 12:08:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A889BB24228
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 12:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D21194137;
-	Thu, 29 Aug 2024 12:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E0C195FD5;
+	Thu, 29 Aug 2024 12:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="QxoEX4PN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RVf1C8Hm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA14218EFC0
-	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 12:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BB5194C89
+	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 12:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724933278; cv=none; b=MkJly7dSifm9I2G2SNDGZFXJNEw5u3zCoYdKcVd7NzBUNSlwl1Wc1Zezx8Ye1/F7JJcNOD7CrM2c8MZjFYEgSZRmpVlGFB0XMhiLOvywJpH3Nv152WPQ3iHHsOKDTwWozMOihwFmVVoP3thneM0TdDjA3QF/xtlP7zfLDgODRdU=
+	t=1724933574; cv=none; b=I0q88heRJBQokStPZuWpC6MoKLvO/3QHWIiKWUqCJMgadK72ECnkpAebTrFGY5Ww0rfqPVPl5deA34Gv6U5SUYJ4SJpzWvOuYka7wBI4/iFVYg1O74y/r9QbWB7Yc6f4Oxw+Is/YUjitUKQIFMCe0KOuAy9tS1aO9WsY0rCKvMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724933278; c=relaxed/simple;
-	bh=Nf3CAxLtlz8uAbGAT+7taAPjope5qXY1PBkjsxs7vdA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=URiENSpa7Oga8BQvVNBJAshsZeEkQsRBQgB1WdryI+/NJJSDkJWKn4aMZDvD/czsXlSnw8I5q0A6ZDkeWcjCPm32Fc4z1Hwme2rhdIUc3C+qrwidPoH8JFL33pXqHgHyO/HwLG4tdIImI8ZRECt05qPWdLsZzf8s9n2dmzwxKtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=QxoEX4PN; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-456825b4314so4791961cf.0
-        for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 05:07:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1724933276; x=1725538076; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xb3+07iy9NTaVPK92198+wLvvVC/Nq0ZQtaVfVkE/gM=;
-        b=QxoEX4PNUEZxOp2MDr5MoxMkO/XF/AyTfqX6osDEVTWpZYlhvFAAAglI/+P2b0UUR/
-         puaI2DKhIkUV3ZHlz4S5VWNAxiIXhhaOPxIpMFUQWKHPAeI70FB5mUcOtRsfShfDsTJ0
-         UGVkq9vPu/iqSwLAcfHyQEbm8cybl27VXtXkcKdbnk52PuXyHhlzHgwf6TOLd4Fo+QIW
-         T1YrB2zNoeiUtmQum+tIWhibq9NsgxaaY86Ln+1xreEmgtvzfq7HaPJ1JyJ0jC2F5fzf
-         LMdKCSMXQC4cvj0UFqGz4uKMz3kI2606KikGiYHHEUh60Pl4JrinI7ZIQPibXViD0DY9
-         GcYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724933276; x=1725538076;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xb3+07iy9NTaVPK92198+wLvvVC/Nq0ZQtaVfVkE/gM=;
-        b=W2PE1TPYubJLUaYL3qqG96jY5yFT0147hTpHSCo7dDZIMD5UHRps0mEqM8FIjDj9vm
-         G1YOH4PXS6bkreelOloJJzbfiHCrazsQ6LesAXVk/6QJn2Bko564VdDduV08PRK9yYYi
-         puqVmi9ZhQvxXmjn/sY1rxMzz25yD1Qs1kwBioyoJpP5vivcCIOnRkW+SndoF/zHpLby
-         fC3HXtTWPKMh0XyVaBaX6Q5dxwv4y1mitMHx4w7GGZP7IVMhBAQlN3qiBhh1YlobebdX
-         vrEg8c/4ewdY5S+FzR6TJw8ZQT7sCrm3GewdQQTYvmNcFIt+NAXOuZII7xsGzIx7ll14
-         2uIA==
-X-Gm-Message-State: AOJu0Yw+ezTdvvnBdfj7bjh8De2errHPzb/vKLTHFy1Fxumom9A/03A7
-	AFQI2VsfKtC4/mL3/8q9kns++60SBJWqb5EqRAVBV6gdZvrIki0ORvrtLkZ+PE0=
-X-Google-Smtp-Source: AGHT+IH/5FQ+vPJhqbN9c15Uc86CJ39bOFxfZbCDjJIWH/ya9lQDuX9DcvEIhSSVh+BpE3Fy6Cl/pQ==
-X-Received: by 2002:ac8:7dc6:0:b0:456:4736:7dc1 with SMTP id d75a77b69052e-45680320e35mr32266511cf.29.1724933275823;
-        Thu, 29 Aug 2024 05:07:55 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45682c82882sm4308951cf.13.2024.08.29.05.07.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 05:07:54 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sjdwP-007TcX-Ew;
-	Thu, 29 Aug 2024 09:07:53 -0300
-Date: Thu, 29 Aug 2024 09:07:53 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	linux-pci@vger.kernel.org,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	pratikrajesh.sampat@amd.com, michael.day@amd.com,
-	david.kaplan@amd.com, dhaval.giani@amd.com,
-	Santosh Shukla <santosh.shukla@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Michael Roth <michael.roth@amd.com>, Alexander Graf <agraf@suse.de>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>
-Subject: Re: [RFC PATCH 07/21] pci/tdisp: Introduce tsm module
-Message-ID: <20240829120753.GU3468552@ziepe.ca>
-References: <20240823132137.336874-1-aik@amd.com>
- <20240823132137.336874-8-aik@amd.com>
- <20240827123242.GM3468552@ziepe.ca>
- <6e9e4945-8508-4f48-874e-9150fd2e38f3@amd.com>
- <20240828234240.GR3468552@ziepe.ca>
- <d9bd104b-e1a0-4619-977c-02a27fc2e5b0@amd.com>
+	s=arc-20240116; t=1724933574; c=relaxed/simple;
+	bh=PW0P6Xh11OlkVI1keUT9RhpzZkrKMuBxwYNo4CjZGEk=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Bu5j7Vzpq7zyE3MATo+CyalyuzV8C5yz1pSqMuEFla0Bp1a7sK2mXsLDl4O0Ilrm4lXDFmmigyzOYwIX5wlgiejWJFbR2BncuA1SVvNj8IeUnTgep8qy/4a/+WNxNfAvPsUFtGVNXli5Zh//VC0w6fPki9jajs+0slZLgndBAZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RVf1C8Hm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6B76C4CEC7
+	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 12:12:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724933573;
+	bh=PW0P6Xh11OlkVI1keUT9RhpzZkrKMuBxwYNo4CjZGEk=;
+	h=From:To:Subject:Date:From;
+	b=RVf1C8Hm0H9GwuMAndw0vaLKJoWWDrCRYMtJv6TnZOi3qMsA9UHIRNGwQFL0PciqC
+	 IWL84gPSpxTHdcfaKosGz85YOm2UIYXzCvSWkSa6pW61U41w8D4RpQU4XEFoySr1p3
+	 hVgfeQI+hMwJ8ttcBiJBRXR0i2ZN0bcx7FPVbWHxHS5atFG7TMrBGJWXx/+B/OeScZ
+	 xTjgVHG5c660imhfZi4RfPZ19f7BFkGcJitwVZGknr1ql963Z0KQ3PpRvabzcCbUAt
+	 DnUvL+d4k+uVJhkrffRv74KQGBgYDVcprIVxgxSfHpKVOEtLUYFVDwMMu8p3ThVLR8
+	 0MOF8a7TmYFnQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id A847AC53BC4; Thu, 29 Aug 2024 12:12:53 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219210] New: [kvm-unit-tests] kvm-unit-tests
+ vmx_posted_intr_test failed
+Date: Thu, 29 Aug 2024 12:12:53 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: xuelian.guo@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-219210-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d9bd104b-e1a0-4619-977c-02a27fc2e5b0@amd.com>
 
-On Thu, Aug 29, 2024 at 02:57:34PM +1000, Alexey Kardashevskiy wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219210
 
-> > > Is "extend the MAP_DMA uAPI to accept {gmemfd, offset}" enough for the VFIO
-> > > context, or there is more and I am missing it?
-> > 
-> > No, you need to have all the virtual PCI device creation stuff linked
-> > to a VFIO cdev to prove you have rights to do things to the physical
-> > device.
-> 
-> The VM-to-VFIOdevice binding is already in the KVM VFIO device, the rest is
-> the same old VFIO.
+            Bug ID: 219210
+           Summary: [kvm-unit-tests] kvm-unit-tests vmx_posted_intr_test
+                    failed
+           Product: Virtualization
+           Version: unspecified
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: xuelian.guo@intel.com
+        Regression: No
 
-Frankly, I'd rather not add any more VFIO stuff to KVM. Today KVM has
-no idea of a VFIO on most platforms.
+Environment:
+KVM commit/branch: 332d2c1d/next
+Qemu commit/branch: a7ddb48b/master
+kvm-unit-tests commit: 201b9e8bdc84c6436dd53b45d93a60c681b92719
 
-Given you already have an issue with iommu driver synchronization this
-looks like it might be a poor choice anyhow..
+Host OS: CentOS 9
+Host Kernel: 6.10.0-rc7
+Platforms: platform-independent=20
 
-> I wonder if there is enough value to try keeping the TIO_DEV_* and TIO_TDI_*
-> API together or having TIO_DEV_* in some PCI module and TIO_TDI_* in KVM is
-> a non-confusing way to proceed with this. Adding things to the PCI's sysfs
-> from more places bothers me more than this frankenmodule. Thanks,
+Bug detail description:=20
 
-I wouldn't mix them up, they are very different. Just because they are
-RPCs to the same bit of FW doesn't really mean they should be together
-in the same interfaces or ops structures.
+Failed to run kvm-unit-tests case vmx_posted_intr_test.
 
-Jason
+Reproduce steps:=20
+
+1. git clone https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+2. cd kvm-unit-tests; ./configure
+3. make standalone
+4. rmmod kvm_intel; rmmod kvm
+5. modprobe kvm enable_vmware_backdoor=3DY
+6. modprobe kvm_intel nested=3DY allow_smaller_maxphyaddr=3DY
+7. cd tests; ./vmx_posted_intr_test=20
+
+Error log:=20
+
+Test suite: vmx_posted_interrupts_test
+PASS: Set ISR for vectors 33-255.
+FAIL: x86/vmx_tests.c:2164: Assertion failed: (expected) =3D=3D (actual)
+        LHS: 0x0000000000000012 -
+0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0001'=
+0010
+- 18
+        RHS: 0x0000000000000001 -
+0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'=
+0001
+- 1
+Expected VMX_VMCALL, got VMX_EXTINT.
+        STACK: 406faa 40730c 417317 4177da 402039 403f11 4001bd
+filter =3D vmx_posted_interrupts_test, test =3D vmx_apic_passthrough_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_apic_passthrough_thread=
+_test
+filter =3D vmx_posted_interrupts_test, test =3D
+vmx_apic_passthrough_tpr_threshold_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_init_signal_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_sipi_signal_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_vmcs_shadow_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_ldtr_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_cr_load_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_cr4_osxsave_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_no_nm_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_db_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_nmi_window_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_intr_window_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_pending_event_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_pending_event_hlt_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_store_tsc_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_preemption_timer_zero_t=
+est
+filter =3D vmx_posted_interrupts_test, test =3D vmx_preemption_timer_tf_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_preemption_timer_expiry=
+_test
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_not_present
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_read_only
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_write_only
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_read_write
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_execute_only
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_read_execute
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_write_execu=
+te
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_read_write_=
+execute
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_reserved_bi=
+ts
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_ignored_bits
+filter =3D vmx_posted_interrupts_test, test =3D
+ept_access_test_paddr_not_present_ad_disabled
+filter =3D vmx_posted_interrupts_test, test =3D
+ept_access_test_paddr_not_present_ad_enabled
+filter =3D vmx_posted_interrupts_test, test =3D
+ept_access_test_paddr_read_only_ad_disabled
+filter =3D vmx_posted_interrupts_test, test =3D
+ept_access_test_paddr_read_only_ad_enabled
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_paddr_read_=
+write
+filter =3D vmx_posted_interrupts_test, test =3D
+ept_access_test_paddr_read_write_execute
+filter =3D vmx_posted_interrupts_test, test =3D
+ept_access_test_paddr_read_execute_ad_disabled
+filter =3D vmx_posted_interrupts_test, test =3D
+ept_access_test_paddr_read_execute_ad_enabled
+filter =3D vmx_posted_interrupts_test, test =3D
+ept_access_test_paddr_not_present_page_fault
+filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_force_2m_pa=
+ge
+filter =3D vmx_posted_interrupts_test, test =3D atomic_switch_max_msrs_test
+filter =3D vmx_posted_interrupts_test, test =3D atomic_switch_overflow_msrs=
+_test
+filter =3D vmx_posted_interrupts_test, test =3D rdtsc_vmexit_diff_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_mtf_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_mtf_pdpte_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_pf_exception_test
+filter =3D vmx_posted_interrupts_test, test =3D
+vmx_pf_exception_forced_emulation_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_pf_no_vpid_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_pf_invvpid_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_pf_vpid_test
+filter =3D vmx_posted_interrupts_test, test =3D vmx_exception_test
+SUMMARY: 674 tests, 1 unexpected failures
+FAIL vmx_posted_intr_test (674 tests, 1 unexpected failures)
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
