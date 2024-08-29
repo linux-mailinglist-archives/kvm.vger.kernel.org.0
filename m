@@ -1,211 +1,247 @@
-Return-Path: <kvm+bounces-25345-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25346-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52DE7964406
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 14:13:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F7296442E
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 14:17:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A889BB24228
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 12:13:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D827F1C2293A
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 12:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E0C195FD5;
-	Thu, 29 Aug 2024 12:12:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85FA197A99;
+	Thu, 29 Aug 2024 12:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RVf1C8Hm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bY/i1VDu"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2088.outbound.protection.outlook.com [40.107.93.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BB5194C89
-	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 12:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724933574; cv=none; b=I0q88heRJBQokStPZuWpC6MoKLvO/3QHWIiKWUqCJMgadK72ECnkpAebTrFGY5Ww0rfqPVPl5deA34Gv6U5SUYJ4SJpzWvOuYka7wBI4/iFVYg1O74y/r9QbWB7Yc6f4Oxw+Is/YUjitUKQIFMCe0KOuAy9tS1aO9WsY0rCKvMk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724933574; c=relaxed/simple;
-	bh=PW0P6Xh11OlkVI1keUT9RhpzZkrKMuBxwYNo4CjZGEk=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Bu5j7Vzpq7zyE3MATo+CyalyuzV8C5yz1pSqMuEFla0Bp1a7sK2mXsLDl4O0Ilrm4lXDFmmigyzOYwIX5wlgiejWJFbR2BncuA1SVvNj8IeUnTgep8qy/4a/+WNxNfAvPsUFtGVNXli5Zh//VC0w6fPki9jajs+0slZLgndBAZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RVf1C8Hm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B6B76C4CEC7
-	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 12:12:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724933573;
-	bh=PW0P6Xh11OlkVI1keUT9RhpzZkrKMuBxwYNo4CjZGEk=;
-	h=From:To:Subject:Date:From;
-	b=RVf1C8Hm0H9GwuMAndw0vaLKJoWWDrCRYMtJv6TnZOi3qMsA9UHIRNGwQFL0PciqC
-	 IWL84gPSpxTHdcfaKosGz85YOm2UIYXzCvSWkSa6pW61U41w8D4RpQU4XEFoySr1p3
-	 hVgfeQI+hMwJ8ttcBiJBRXR0i2ZN0bcx7FPVbWHxHS5atFG7TMrBGJWXx/+B/OeScZ
-	 xTjgVHG5c660imhfZi4RfPZ19f7BFkGcJitwVZGknr1ql963Z0KQ3PpRvabzcCbUAt
-	 DnUvL+d4k+uVJhkrffRv74KQGBgYDVcprIVxgxSfHpKVOEtLUYFVDwMMu8p3ThVLR8
-	 0MOF8a7TmYFnQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id A847AC53BC4; Thu, 29 Aug 2024 12:12:53 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219210] New: [kvm-unit-tests] kvm-unit-tests
- vmx_posted_intr_test failed
-Date: Thu, 29 Aug 2024 12:12:53 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: xuelian.guo@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-219210-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4592F194C86;
+	Thu, 29 Aug 2024 12:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724933766; cv=fail; b=tZDSW+egC3+87uAqSNlf3HKKR20sSExQC5W6dSP8t49zH6FZdG3Cro6X8QCsc5frW0U6fBp6teHy/5yIylpgnkXQ8lrfl9Jz4RqQCD4R8DAH25xU5AI4rYeLPI+tBdp3Kc2ePE0asbe+hLdSH6MGj1KPbbv4jsZ+/WcykvFHAgw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724933766; c=relaxed/simple;
+	bh=aWEQN24TeDkqjuTGdTv2SrBANXO7ODC++7n1ReG9HLU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=m9SP4xbKMSEYe4uIpuCnCEzLrrcdnbu/qgjcSqiuYM3f2E2yO7tYKTHXPb+NqOvBb08qaFAKe5VbMmObxiCmRSIEW0Xx4JgbBln+ODQ6/pIEnbpdGhcIlcweU/Sw9OL1FUNjWHKADPIS3cHcPXoQc5Q8NlRBO/JWtNxIBpmVZKc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bY/i1VDu; arc=fail smtp.client-ip=40.107.93.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HjssNvLyeer63z24otwazssA9fsJJ95zi/ndyVbZ4be+F8g1l3U1V4APLjbLg0V13PtQnVMTl6P68EEaAMMY3jE5A91/RUd39FVVkgY2e8kmZuR8LX2PwFwAdoWCWMt47lz+Y+50XZRvOHWUFDLrUB2AADgOBKKICFcQHZw+6G47D5JhTepHYsQQamauXDdOtMb27Wo4bD6T2ej/tKFjai5x9c7tYrhQrYruC8MdjNc45uT0IiHo1ahUdQ15LnxBCiHqB3et+2VURH7/TPZymWrw1xetLt/k32Mhct8YEphJMLjCLQ8FU89IbRUTMJ7jDsUC87t35U0NS2w1UMBfqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Lsa4FBNQVe3s95oCrtrrpASSp+IB43Ep+SntCCsJPAY=;
+ b=RZZQxevhGvGk1EN62op1avBt1Ujsu5VpXC3I+RmrJcFMauuvxp5Et7XFSX3f6hvtORAE5c0M9aIbY9Kd1F3sq9GBy7DfmZL3MInc6xavafJRyIcsh498rCBbdvSlNXXaNQMkgHDMjae8N38jlbLXYDvpn8wJY4vi0BORUxxAThhVO2ZKJCQGGQILt5ykgNtUZzCuKNmgVbpIZ5BgGy8xrRtlmURQ0ZaHBJnkK4+D+yjoXrZgK3scXDOmsT0mDjzZNHDS+KYRCqfaIWFP5xyAewiAp3gQVeHfvMbovm1y/+R1XhU0pSTixciQV2lmB+1Rbva/DoQqJMZMZ8tkdXw1SA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Lsa4FBNQVe3s95oCrtrrpASSp+IB43Ep+SntCCsJPAY=;
+ b=bY/i1VDuRWTFAmk0COxXf27KiiQiglMifCmwPvnYVlfp1doO2XPUwQR6mvEl11/hTelB20wkM59ndZqLSC6Z0GUyBZTdYmdS4oS5trG0DvzT2ts6gCxizt6EdPAvfM3LGmqvH1GPurRAyR8skASJSxbTfinwSLob6Vm4ZY6G4Z4PoXOKGbmB3OXj84i98uhWzgziAHM0gKxeAO+i0ksy1oM0739z6fKrKGHajZn1P8rz5FZcduH6Hm84QfQt+xwNHLnzFKEEd2IdDtq1qZGvl7dTUE3lZUjOk0PgBq6NfM6TU61NFTRigG/NcLkzOhIqquGFE6UsMJ1Upmc5sr/WpQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
+ by MN6PR12MB8542.namprd12.prod.outlook.com (2603:10b6:208:477::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Thu, 29 Aug
+ 2024 12:15:51 +0000
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7897.027; Thu, 29 Aug 2024
+ 12:15:50 +0000
+Date: Thu, 29 Aug 2024 09:15:49 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	"Williams, Dan J" <dan.j.williams@intel.com>,
+	"pratikrajesh.sampat@amd.com" <pratikrajesh.sampat@amd.com>,
+	"michael.day@amd.com" <michael.day@amd.com>,
+	"david.kaplan@amd.com" <david.kaplan@amd.com>,
+	"dhaval.giani@amd.com" <dhaval.giani@amd.com>,
+	Santosh Shukla <santosh.shukla@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Michael Roth <michael.roth@amd.com>, Alexander Graf <agraf@suse.de>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>,
+	"david@redhat.com" <david@redhat.com>
+Subject: Re: [RFC PATCH 12/21] KVM: IOMMUFD: MEMFD: Map private pages
+Message-ID: <20240829121549.GF3773488@nvidia.com>
+References: <20240823132137.336874-1-aik@amd.com>
+ <20240823132137.336874-13-aik@amd.com>
+ <BN9PR11MB5276D14D4E3F9CB26FBDE36C8C8B2@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20240826123024.GF3773488@nvidia.com>
+ <ZtBAvKyWWiF5mYqc@yilunxu-OptiPlex-7050>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZtBAvKyWWiF5mYqc@yilunxu-OptiPlex-7050>
+X-ClientProxiedBy: BN9PR03CA0800.namprd03.prod.outlook.com
+ (2603:10b6:408:13f::25) To CH3PR12MB7763.namprd12.prod.outlook.com
+ (2603:10b6:610:145::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|MN6PR12MB8542:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0e19f6a0-e130-4b40-9f7f-08dcc8245248
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?h0QEkAlgRqITR+vR9c3Q/2vKR7CqFuROrNXr/JkNqVIDKCtS+pc041SoWn8K?=
+ =?us-ascii?Q?ykX4vwtHxRJrEq7RBIN+Yh6nvxwBDl3NYnPKDaTO6lTJ/cl/pgza8Z9KwLcj?=
+ =?us-ascii?Q?9gMQVrZLhFBKDQh+KwMHt11ydB38mTHFn6kgk96deBaQMy+I9ligjJIdihei?=
+ =?us-ascii?Q?RUJw6xc8kwqzdjmIkz72du80eQBfjjoadRpMWaAG7mEeL/chlKFvNKRLgboR?=
+ =?us-ascii?Q?raRKu9wKvrC6Izorv6sAY7C0DjKrUvyGA99oK0S17WFWVt7X9zF4+w/EQSC4?=
+ =?us-ascii?Q?cObjSFz4n6aw+1sa1ENRdmGYORf3YS3rG2gjk82ULPK4MfG5cICf6oLKvmdl?=
+ =?us-ascii?Q?JOjGiq7dxaugndJMXg9tXWptSxK3MH8+bifMdGLn0e/0n9zp1cE0AsIwUMi2?=
+ =?us-ascii?Q?jbtVNd9PcODfkHkOnf1Vt7pxAlwwfezesqoX1LHhM2BRai57Hl2hNhqx93x7?=
+ =?us-ascii?Q?F1JQfPtPMQnGcTY3BijbM0vH7jZK4ObHzau7LIcj/R1UDlW4gCeS3nwEqiWH?=
+ =?us-ascii?Q?bNIrYy7b9TFNCRYppGtqHTuvnv3q7I4CcsUP+tLiuovKGLps5hETGjuOpo/t?=
+ =?us-ascii?Q?XepBeFxJyzxGFEyoKL537BKhTP/OtaqmykyM1g6lVzmrd+W28/jJdsGmIMsh?=
+ =?us-ascii?Q?whhXFkKGfQrglDCiII9Nksl3rVy2ZfPmOvfA/CzO14HG+ckdIykfHHPaCa93?=
+ =?us-ascii?Q?SAq5eItbLENGL8b1AQdD95VuEsD/kMoShWZbXfgB+o9X5/oZd6M/apVgUSp7?=
+ =?us-ascii?Q?/dCjSnwnK4c3c0QkzK7yecg6ZTg3R6fIDFIBWGC+6oXIzUPAxrF2wLtb7shr?=
+ =?us-ascii?Q?Yq/HB6fnN05qVv4JJtBQHsIKsx1pJbHcvT7lfZsbuKAfay8dm46SjtJSFmlF?=
+ =?us-ascii?Q?fypTgbhv40+m9X+N/cVMXpm4fMU/mMvqFRmteefvna5Rka1oAPkDtOggAogr?=
+ =?us-ascii?Q?hErJO/tUM8QIdFDfAbZmaSptP9phhujGs0dCwTWgv6L0JH7+I6y1iGeErqYj?=
+ =?us-ascii?Q?RWT2A/d6VubGqT66SdKLMV6X4eodMeTMYC6GrH5rMGYOII5PLEjJSatnF4Z9?=
+ =?us-ascii?Q?XsTKTaDX77Cym9ry0YT0M3i0xCOrGLl/A6+7ieO9lIsf5YrZl0rBh6bkXmL/?=
+ =?us-ascii?Q?FgpyFreccA6NZdvN3vq5qIX5a0AVpW/QNzUXDcndEjxrPohAj8X5DoviJzWk?=
+ =?us-ascii?Q?9gglLfHA+0NfcSvx2tzXGoEV/raOLSUzTBXrDvGPVVYQNtdmylz1VmuhB9K0?=
+ =?us-ascii?Q?N3jyEHKYHiVFRM9kEgOSnfUw+STmMu2UP9ClgtdiBxJhHfn8zytiXjxDL75g?=
+ =?us-ascii?Q?JDaWBJY9hnrnfMpp0jLMja58VmJxgePPap2JwoU9NU2/Ef6W5XQBnaXBjJYz?=
+ =?us-ascii?Q?Hbu6prI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?qky9ZxSLrYUos/GKd+gjrV0qawSlZzGo5CgbSxcz+jQiVPqr7ZF/UeMg/E/f?=
+ =?us-ascii?Q?j/283NwHFYacQhBF039YJQb4TaNUIZNwc1ssYlY5bSK89nuHPpm5c6HzH7+C?=
+ =?us-ascii?Q?eHn3TjaACBYPSVDc8XUSbAxsSrT2BBt0JrD3kt3Woo2jCMah79WjHJ67rAfv?=
+ =?us-ascii?Q?Uw6z4dHn+trpwp32/M3CgzqTogXwEW2A6hMf/8GmYfXJcyLMGLqhE3V6UqDx?=
+ =?us-ascii?Q?zqJhXmavjPrtcn1fn9elXM1z4Q/iif+MY03l3xs7lL7ZYE9QsNPh2eQ8sXgK?=
+ =?us-ascii?Q?pcvZRmXpn45inZlB1JLJ6ANpQwaqm53CtgAeRiY1+lr5sHXs7DCGehPBDPW8?=
+ =?us-ascii?Q?pQGB+KorJCXi1nxfArRr4VaLKeBqppwGv8D6OsrZjOKsolFSM9luBFOHsjZY?=
+ =?us-ascii?Q?LhsxANLmF3PIY8FJZky9mZHLZ9GjQQ0NG3VszcM+4HdXWNJndfAqwatOIpyt?=
+ =?us-ascii?Q?bDIsX4IaF7W3P1/ISn51hIy+mIMQSbNRixdJ/7mbujtZv03iMbjhUsDxRz3P?=
+ =?us-ascii?Q?6jaWH6LGsh9RocE6IEXFYYuxF6jDyvbZXrKgzXynSNFpZGmMinRTbd19UjrO?=
+ =?us-ascii?Q?mPiBFzgk5CDLNAHp4lHAiaQ5MC5raGAYLC6U1CXdlinzlbXIITIvLbTYASiO?=
+ =?us-ascii?Q?B903lP05ZR8fLhbWwLcpmvmgek54QNSpmNH3umHPh+ZMSm9KG1208v9SoFFA?=
+ =?us-ascii?Q?9m+XrhjEoMia5+mNiaLBvTtqFcHyTaTXUjqdrSYBWU8gdnCPB59PsRhwhZdC?=
+ =?us-ascii?Q?/g9/Q9e8e0CRcYPrTWB/8zMgolsgBtnPHHLTwX8MM7RWOWxhqH7dkyac4s9p?=
+ =?us-ascii?Q?tElG5re6oGqmi9cNwd98ooNlxEycaw12xYG/lsOtKZQa9Rmfuar2Com2O50U?=
+ =?us-ascii?Q?jyaCiit8EApwyF4KDXcO5W6jz9kq+u4BdU75ZyUybJdT12xM/xFV3zBJz0St?=
+ =?us-ascii?Q?Cz0QgrYLS/dZk6jO6JyLeBrOGrjif+Q08j9/x3ZqFqmgEWqJVvJL3fcfE/Lx?=
+ =?us-ascii?Q?3NkfHj2QGoLhk9qsk5lT/XYrBt3whFk02uFgoQUF7eFojV4YHEcwEVbBf7Go?=
+ =?us-ascii?Q?tOcPhTd3gQthaZXhmNqvmtckRhFJ/LDTungkLeS5RjFUdstqEF+ZO3HdTZYu?=
+ =?us-ascii?Q?AEmGVUIoxAZyc1qN4TSKfRyjsoMRC6sE+AeWj94odUN3mznxfpDZrN6fzxL4?=
+ =?us-ascii?Q?TwSzlub9/91ocAOLAgsmgx5Etw6TUZq+A0Ej5qnRJymxT284pJTsE5Klzemp?=
+ =?us-ascii?Q?lBAiBi7AaatWMClxMRt4F7E3I3HNxMFkNj2PrlkQZNFRkWWPtH+wVhwVzAGV?=
+ =?us-ascii?Q?gV6FZmSFnMfF1mlRHkHkzBsqM0QrQ5GppjBdinXnXhMPGJXNw7THgAM5GTpy?=
+ =?us-ascii?Q?2GHVXh3bXO7bkr8cR7UZlZb8fS+td7Ylq0LxbtS6bKImyvWinwQKiK+r2Tv9?=
+ =?us-ascii?Q?GpybB8jkQzcC6vC4a1as/Lb+5bCNcrQZma6AGUQE6DOgdlzkV0x/C4xXYDB6?=
+ =?us-ascii?Q?qEMXCrcsoYnpmQn1f80MROWLII6YySfK2+vXmDQPLtaM74TnfXQ0yAQB3iK1?=
+ =?us-ascii?Q?XlCa0ZF0YoQopAcCZOn9LsWHbB2HdF7GIvCKC3U6?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0e19f6a0-e130-4b40-9f7f-08dcc8245248
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2024 12:15:50.5995
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AYrdVeXatxSkx5I8PR2BE/5qRY7BAd/s6uT45i4K1uGg72HVcKfK163+BBUUt2r+
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8542
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219210
+On Thu, Aug 29, 2024 at 05:34:52PM +0800, Xu Yilun wrote:
+> On Mon, Aug 26, 2024 at 09:30:24AM -0300, Jason Gunthorpe wrote:
+> > On Mon, Aug 26, 2024 at 08:39:25AM +0000, Tian, Kevin wrote:
+> > > > IOMMUFD calls get_user_pages() for every mapping which will allocate
+> > > > shared memory instead of using private memory managed by the KVM and
+> > > > MEMFD.
+> > > > 
+> > > > Add support for IOMMUFD fd to the VFIO KVM device's KVM_DEV_VFIO_FILE
+> > > > API
+> > > > similar to already existing VFIO device and VFIO group fds.
+> > > > This addition registers the KVM in IOMMUFD with a callback to get a pfn
+> > > > for guest private memory for mapping it later in the IOMMU.
+> > > > No callback for free as it is generic folio_put() for now.
+> > > > 
+> > > > The aforementioned callback uses uptr to calculate the offset into
+> > > > the KVM memory slot and find private backing pfn, copies
+> > > > kvm_gmem_get_pfn() pretty much.
+> > > > 
+> > > > This relies on private pages to be pinned beforehand.
+> > > > 
+> > > 
+> > > There was a related discussion [1] which leans toward the conclusion
+> > > that the IOMMU page table for private memory will be managed by
+> > > the secure world i.e. the KVM path.
+> > 
+> > It is still effectively true, AMD's design has duplication, the RMP
+> > table has the mappings to validate GPA and that is all managed in the
+> > secure world.
+> > 
+> > They just want another copy of that information in the unsecure world
+> > in the form of page tables :\
+> > 
+> > > btw going down this path it's clearer to extend the MAP_DMA
+> > > uAPI to accept {gmemfd, offset} than adding a callback to KVM.
+> > 
+> > Yes, we want a DMA MAP from memfd sort of API in general. So it should
+> > go directly to guest memfd with no kvm entanglement.
+> 
+> A uAPI like ioctl(MAP_DMA, gmemfd, offset, iova) still means userspace
+> takes control of the IOMMU mapping in the unsecure world. 
 
-            Bug ID: 219210
-           Summary: [kvm-unit-tests] kvm-unit-tests vmx_posted_intr_test
-                    failed
-           Product: Virtualization
-           Version: unspecified
-          Hardware: Intel
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: xuelian.guo@intel.com
-        Regression: No
+Yes, such is how it seems to work.
 
-Environment:
-KVM commit/branch: 332d2c1d/next
-Qemu commit/branch: a7ddb48b/master
-kvm-unit-tests commit: 201b9e8bdc84c6436dd53b45d93a60c681b92719
+It doesn't actually have much control, it has to build a mapping that
+matches the RMP table exactly but still has to build it..
 
-Host OS: CentOS 9
-Host Kernel: 6.10.0-rc7
-Platforms: platform-independent=20
+> But as mentioned, the unsecure world mapping is just a "copy" and
+> has no generic meaning without the CoCo-VM context. Seems no need
+> for userspace to repeat the "copy" for IOMMU.
 
-Bug detail description:=20
+Well, here I say copy from the information already in the PSP secure
+world in the form fo their RMP, but in a different format.
 
-Failed to run kvm-unit-tests case vmx_posted_intr_test.
+There is another copy in KVM in it's stage 2 translation but..
 
-Reproduce steps:=20
+> Maybe userspace could just find a way to link the KVM context to IOMMU
+> at the first place, then let KVM & IOMMU directly negotiate the mapping
+> at runtime.
 
-1. git clone https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
-2. cd kvm-unit-tests; ./configure
-3. make standalone
-4. rmmod kvm_intel; rmmod kvm
-5. modprobe kvm enable_vmware_backdoor=3DY
-6. modprobe kvm_intel nested=3DY allow_smaller_maxphyaddr=3DY
-7. cd tests; ./vmx_posted_intr_test=20
+I think the KVM folks have said no to sharing the KVM stage 2 directly
+with the iommu. They do too many operations that are incompatible with
+the iommu requirements for the stage 2.
 
-Error log:=20
+If that is true for the confidential compute, I don't know.
 
-Test suite: vmx_posted_interrupts_test
-PASS: Set ISR for vectors 33-255.
-FAIL: x86/vmx_tests.c:2164: Assertion failed: (expected) =3D=3D (actual)
-        LHS: 0x0000000000000012 -
-0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0001'=
-0010
-- 18
-        RHS: 0x0000000000000001 -
-0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'=
-0001
-- 1
-Expected VMX_VMCALL, got VMX_EXTINT.
-        STACK: 406faa 40730c 417317 4177da 402039 403f11 4001bd
-filter =3D vmx_posted_interrupts_test, test =3D vmx_apic_passthrough_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_apic_passthrough_thread=
-_test
-filter =3D vmx_posted_interrupts_test, test =3D
-vmx_apic_passthrough_tpr_threshold_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_init_signal_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_sipi_signal_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_vmcs_shadow_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_ldtr_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_cr_load_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_cr4_osxsave_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_no_nm_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_db_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_nmi_window_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_intr_window_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_pending_event_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_pending_event_hlt_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_store_tsc_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_preemption_timer_zero_t=
-est
-filter =3D vmx_posted_interrupts_test, test =3D vmx_preemption_timer_tf_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_preemption_timer_expiry=
-_test
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_not_present
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_read_only
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_write_only
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_read_write
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_execute_only
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_read_execute
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_write_execu=
-te
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_read_write_=
-execute
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_reserved_bi=
-ts
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_ignored_bits
-filter =3D vmx_posted_interrupts_test, test =3D
-ept_access_test_paddr_not_present_ad_disabled
-filter =3D vmx_posted_interrupts_test, test =3D
-ept_access_test_paddr_not_present_ad_enabled
-filter =3D vmx_posted_interrupts_test, test =3D
-ept_access_test_paddr_read_only_ad_disabled
-filter =3D vmx_posted_interrupts_test, test =3D
-ept_access_test_paddr_read_only_ad_enabled
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_paddr_read_=
-write
-filter =3D vmx_posted_interrupts_test, test =3D
-ept_access_test_paddr_read_write_execute
-filter =3D vmx_posted_interrupts_test, test =3D
-ept_access_test_paddr_read_execute_ad_disabled
-filter =3D vmx_posted_interrupts_test, test =3D
-ept_access_test_paddr_read_execute_ad_enabled
-filter =3D vmx_posted_interrupts_test, test =3D
-ept_access_test_paddr_not_present_page_fault
-filter =3D vmx_posted_interrupts_test, test =3D ept_access_test_force_2m_pa=
-ge
-filter =3D vmx_posted_interrupts_test, test =3D atomic_switch_max_msrs_test
-filter =3D vmx_posted_interrupts_test, test =3D atomic_switch_overflow_msrs=
-_test
-filter =3D vmx_posted_interrupts_test, test =3D rdtsc_vmexit_diff_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_mtf_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_mtf_pdpte_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_pf_exception_test
-filter =3D vmx_posted_interrupts_test, test =3D
-vmx_pf_exception_forced_emulation_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_pf_no_vpid_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_pf_invvpid_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_pf_vpid_test
-filter =3D vmx_posted_interrupts_test, test =3D vmx_exception_test
-SUMMARY: 674 tests, 1 unexpected failures
-FAIL vmx_posted_intr_test (674 tests, 1 unexpected failures)
+Still, continuing to duplicate the two mappings as we have always done
+seems like a reasonable place to start and we want a memfd map anyhow
+for other reasons:
 
---=20
-You may reply to this email to add a comment.
+https://lore.kernel.org/linux-iommu/20240806125602.GJ478300@nvidia.com/
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Jason
 
