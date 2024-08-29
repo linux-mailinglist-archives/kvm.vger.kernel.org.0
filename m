@@ -1,202 +1,155 @@
-Return-Path: <kvm+bounces-25410-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25411-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D29A39650D3
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 22:38:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F6AF9650E4
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 22:45:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A71A284738
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 20:38:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F8821C2400A
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 20:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603C81BAEF1;
-	Thu, 29 Aug 2024 20:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6CC18B46C;
+	Thu, 29 Aug 2024 20:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="anW59re8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wkTXxSPP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836E9189F5A;
-	Thu, 29 Aug 2024 20:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F5F156F41
+	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 20:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724963898; cv=none; b=BjlzDdA/WKx+LXldThH8q4blG3tZX3TGZ5+V1DdIsFozNrKtcHev/PlEn09x+bWf9BPncjjA7XjhXJLmAn1PZKMiSMval2trr7FS6hURZxfNbtXyBYDSqWjUcG7abGzEDgWyYz3zSwFjazqHrfdSyGIdveFaqFqgYTyjV4waMq8=
+	t=1724964345; cv=none; b=cjmNxibX6n4BFu0kXA4vPew/n9yoy8U9wzT5aXb3WYtDxu0N+SPXjP9Us/mjLN/ndgQHXViB1AB2hXC43Lqo0ADx6bA5QGp/yX80LH7RUkIRusNhbs3qb2WtfocL6sRccFy3nBLLvJbASp8imcMDu2Esz4nfGx5oQyEpDq00axA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724963898; c=relaxed/simple;
-	bh=tscwRgI2saPDR7x1unDsFBI0xOp0fMmY1QDhyt+9PHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ss3sJVP4SYqLwK/aO06zGgpYIXDBCRWJUcU3tts3v05dtuccu3W6lTIpsrch2enAl6mrU9UtMpENgGxBD6dV8OKwCI9J1K4Li6P1ejHAk6A2FqmyCrkjXlPJkRi8wCSod51A5CUO7i2d4ChCx7uet/5Cf+TAP4lvEAe7OJqstHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=anW59re8; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724963897; x=1756499897;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tscwRgI2saPDR7x1unDsFBI0xOp0fMmY1QDhyt+9PHk=;
-  b=anW59re8g7E9kAelpNk+BBP1JV1PEOrPDKd7lZU3vM+SOIaCuXobj0e7
-   uP8jDX1W910+zN1waibuYTbWL94NJXYfhUx2AC9ZLDFiUSrgdhMxcwleh
-   OUEOtML7MWvmxWzN/kTUyo65swMO2bpGzo61/drgiQ/kPWsVZjOSyz2jV
-   RIylGzGYX7dHLL5pkZqeCHM9cIzq4NMLT1Lq1EiwtFMExxfQwx/P2Bse4
-   i3a5xxZANsNKbKJtTLaOEFDOOKEf1GGNI6f/lyXCoFIQCUAf4iwRPCoW8
-   GfNpg9+UU3sctCg7zK6YcjZCv0EM+Dipba01RU1n3VXzfgtzA+iajeMPQ
-   w==;
-X-CSE-ConnectionGUID: uMfpJ0muT5O3mIJDIuxDYw==
-X-CSE-MsgGUID: lbXaaTgCQVukWM3SIXoUVQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="34200571"
-X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
-   d="scan'208";a="34200571"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 13:37:41 -0700
-X-CSE-ConnectionGUID: +2I+PKpfTEWO7ZhOV/mdjw==
-X-CSE-MsgGUID: 9jFLsk+2R9icUo/uf7t0Ig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
-   d="scan'208";a="63325399"
-Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 29 Aug 2024 13:37:38 -0700
-Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sjltg-0000iM-02;
-	Thu, 29 Aug 2024 20:37:36 +0000
-Date: Fri, 30 Aug 2024 04:37:35 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vegard Nossum <vegard.nossum@oracle.com>,
-	Masahiro Yamada <masahiroy@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-omap@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-um@lists.infradead.org,
-	bpf@vger.kernel.org, llvm@lists.linux.dev,
-	Vegard Nossum <vegard.nossum@oracle.com>
-Subject: Re: [PATCH] kbuild: use objcopy to generate asm-offsets
-Message-ID: <202408300438.xObK98m5-lkp@intel.com>
-References: <20240828083605.3093701-1-vegard.nossum@oracle.com>
+	s=arc-20240116; t=1724964345; c=relaxed/simple;
+	bh=4TZEqBx7eWCdocTsLXNrFut7vdn8ko9P9heYPOQxy4I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=W3QwtkbTdFaXCFyE25+aon5IAfqixo1RAan+O5l0wPIAOU86mtu7RiLqEz5sQqtV2SvNKd3pYnvC321YOpo7L7duBZ1n67H6L8BQznentLgRabgpvQVgLyBdGTS+kRH5SwhUG3jj/3XYG7nTmSdLG+x0HANRjmqzdA/hI+YQuww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wkTXxSPP; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6d34c57a88eso14875337b3.0
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 13:45:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724964343; x=1725569143; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rF0JnnhJ+6UUAp3OAAeI13+/dbW5hEBVYSBB7nknrZM=;
+        b=wkTXxSPPWuTdbJwzK+wH0pG6X9mTeI/WqPtDHCCXeI01rzQliZQBj3plWJFQBZwdBH
+         Y+BeE0WPlkCK1MsUXjV2bL0YWQjkqMrJi61MM2rPPE7FNrPjLhYlTGkfY0FrIDqnO4CN
+         ogbybt4LPnj25Q5jer/mXPk4fdVz2J5/oT0e0DtK2Oz+5OOMZp+JmdbQT8Zef8NctcZF
+         TqXbGdZExySf46TDGHkCvFiVFGH/EmsDY92qIspI49nDkqM4vbgM2jcpNab8g30pEfSH
+         wV6cbIvyXxuQAKAfUyEr7qMnANubqkXznw4Aoc5q1XY5nnzfJiYa/qRZhIe/ohnMy5WW
+         Lxmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724964343; x=1725569143;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rF0JnnhJ+6UUAp3OAAeI13+/dbW5hEBVYSBB7nknrZM=;
+        b=gvkoCxj2OFVA69F6Rdn5c0DNq7PxAFVs/qeJm8esddEJkk+ylKz7i6NW9lFR+B7L+n
+         KhOP7XEnrIaK8IOBO19fngwTkzGr6MMNvI87bL+ZRKKw/zt1oPRJ/upz4coAGZfEcCyK
+         aMvULEQR7Y7q3yJ+SUwR0ra62NhBdgjEZHIxpUUgs5TgQN8rvLOXaY1eUrMc69tSHYpS
+         AoNnSD/lq/yV/eG0vN6FWT16647+paSe/71txNVSxeKiZ+L/UMrG8MKMQPLVI/ojo4SV
+         PmxCbYrKOprJs6OvozDgqsQ918iqF3PgX/1OpcCsFxuUu/L4390Ha3DQb8rWPjZlkGNp
+         YeMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUt7/KwI773h3RYd/xU3b1+VzFjl43yvNk+UbXVNUh50mYQWMgpKYAB0+JKvRAZ95d8VSs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRNLYPO1TtKXt80eYFrZCVa5X4YMVLu1ihSyKDOpEqrTolirgv
+	KlN9enmvHU6HdRdZimela2feN+dCT8mqUXQh2sA1I2zYv2WVLCWZu2oipwcbsk0HUo+ZztJ875U
+	C1w==
+X-Google-Smtp-Source: AGHT+IGVP3HvwnzOqRNa87UbyRnTdSkHHKG6AQXQsUhHE0H0PT9PCKyy3tNykxqKPYyhE/+825Ajpugsias=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:d10b:0:b0:6ad:feb0:d010 with SMTP id
+ 00721157ae682-6d2e94d0921mr569377b3.6.1724964342802; Thu, 29 Aug 2024
+ 13:45:42 -0700 (PDT)
+Date: Thu, 29 Aug 2024 13:45:41 -0700
+In-Reply-To: <CAL715W+NPP+mw=_C4b-4iUhML6yVZ=G3uMqXQgY+tjqRrNQusg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240828083605.3093701-1-vegard.nossum@oracle.com>
+Mime-Version: 1.0
+References: <Zs0FLglChWqsGa6w@google.com> <gsnth6b49srd.fsf@coltonlewis-kvm.c.googlers.com>
+ <CAL715W+NPP+mw=_C4b-4iUhML6yVZ=G3uMqXQgY+tjqRrNQusg@mail.gmail.com>
+Message-ID: <ZtDd9YVc33b8Qt__@google.com>
+Subject: Re: [PATCH 3/6] KVM: x86: selftests: Set up AMD VM in pmu_counters_test
+From: Sean Christopherson <seanjc@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org, ljr.kernel@gmail.com, 
+	jmattson@google.com, aaronlewis@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Vegard,
+On Wed, Aug 28, 2024, Mingwei Zhang wrote:
+> > >> +static void test_core_counters(void)
+> > >> +{
+> > >> +    uint8_t nr_counters = nr_core_counters();
+> > >> +    bool core_ext = kvm_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+> > >> +    bool perf_mon_v2 = kvm_cpu_has(X86_FEATURE_PERF_MON_V2);
+> > >> +    struct kvm_vcpu *vcpu;
+> > >> +    struct kvm_vm *vm;
+> >
+> > >> -    kvm_pmu_version = kvm_cpu_property(X86_PROPERTY_PMU_VERSION);
+> > >> -    kvm_has_perf_caps = kvm_cpu_has(X86_FEATURE_PDCM);
+> > >> +    vm = vm_create_with_one_vcpu(&vcpu, guest_test_core_counters);
+> >
+> > >> -    test_intel_counters();
+> > >> +    /* This property may not be there in older underlying CPUs,
+> > >> +     * but it simplifies the test code for it to be set
+> > >> +     * unconditionally.
 
-kernel test robot noticed the following build warnings:
+But then the test isn't verifying that KVM is honoring the architecture.  I.e.
+backdooring information to the guest risks getting false passes because KVM
+incorrectly peeks at the same information, which shouldn't exist.
 
-[auto build test WARNING on masahiroy-kbuild/for-next]
-[also build test WARNING on masahiroy-kbuild/fixes soc/for-next kvmarm/next kvm/queue uml/next krzk-mem-ctrl/for-next bpf-next/master bpf/master linus/master v6.11-rc5 next-20240829]
-[cannot apply to tmlind-omap/for-next kvm/linux-next uml/fixes]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> > >> +     */
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vegard-Nossum/kbuild-use-objcopy-to-generate-asm-offsets/20240828-163854
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
-patch link:    https://lore.kernel.org/r/20240828083605.3093701-1-vegard.nossum%40oracle.com
-patch subject: [PATCH] kbuild: use objcopy to generate asm-offsets
-config: mips-loongson3_defconfig (https://download.01.org/0day-ci/archive/20240830/202408300438.xObK98m5-lkp@intel.com/config)
-compiler: mips64el-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240830/202408300438.xObK98m5-lkp@intel.com/reproduce)
+	/*
+	 * Multi-line function comments should start on the line after the
+	 * opening slash-asterisk, like so.
+	 */
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408300438.xObK98m5-lkp@intel.com/
+> > >> +    vcpu_set_cpuid_property(vcpu, X86_PROPERTY_NUM_PERF_CTR_CORE,
+> > >> nr_counters);
+> > >> +    if (core_ext)
+> > >> +            vcpu_set_cpuid_feature(vcpu, X86_FEATURE_PERF_CTR_EXT_CORE);
+> > >> +    if (perf_mon_v2)
+> > >> +            vcpu_set_cpuid_feature(vcpu, X86_FEATURE_PERF_MON_V2);
+> >
+> > > hmm, I think this might not be enough. So, when the baremetal machine
+> > > supports Perfmon v2, this code is just testing v2. But we should be able
+> > > to test anything below v2, ie., v1, v1 without core_ext. So, three
+> > > cases need to be tested here: v1 with 4 counters; v1 with core_ext (6
+> > > counters); v2.
+> >
+> > > If, the machine running this selftest does not support v2 but it does
+> > > support core extension, then we fall back to test v1 with 4 counters and
+> > > v1 with 6 counters.
+> >
+> > This should cover all cases the way I wrote it. I detect the number of
+> > counters in nr_core_counters(). That tells me if I am dealing with 4 or
+> > 6 and then I set the cpuid property based on that so I can read that
+> > number in later code instead of duplicating the logic.
+> 
+> right. in the current code, you set up the counters properly according
+> to the hw capability. But the test can do more on a hw with perfmon
+> v2, right? Because it can test multiple combinations of setup for a
+> VM: say v1 + 4 counters and v1 + 6 counters etc. I am just following
+> the style of this selftest on Intel side, in which they do a similar
+> kind of enumeration of PMU version + PDCM capabilities. In each
+> configuration, it will invoke a VM and do the test.
 
-All warnings (new ones prefixed by >>):
+Ya.  This is similar my comments on setting NUM_PER_CTR_CORE when the field
+shouldn't exist.  One of the main goals of this test is to verify the KVM honors
+the architecture based on userspace's defined virtual CPU model, i.e. guest
+CPUID.  That means testing all (or at least, within reason) possible combinations
+that can feasibly be supported by KVM given the underlying hardware.
 
-   mips64el-linux-objcopy: /dev/stdout[.data.kbuild]: Illegal seek
-   In file included from include/linux/mm_types.h:18,
-                    from include/linux/uio.h:10,
-                    from include/linux/socket.h:8,
-                    from include/linux/compat.h:15,
-                    from arch/mips/kernel/asm-offsets.c:12:
-   include/linux/page-flags-layout.h:15:5: warning: "MAX_NR_ZONES" is not defined, evaluates to 0 [-Wundef]
-      15 | #if MAX_NR_ZONES < 2
-         |     ^~~~~~~~~~~~
-   include/linux/page-flags-layout.h:58:19: warning: "LRU_GEN_WIDTH" is not defined, evaluates to 0 [-Wundef]
-      58 | #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_SHIFT \
-         |                   ^~~~~~~~~~~~~
-   include/linux/page-flags-layout.h:59:28: warning: "NR_PAGEFLAGS" is not defined, evaluates to 0 [-Wundef]
-      59 |         <= BITS_PER_LONG - NR_PAGEFLAGS
-         |                            ^~~~~~~~~~~~
-   include/linux/page-flags-layout.h:93:19: warning: "LRU_GEN_WIDTH" is not defined, evaluates to 0 [-Wundef]
-      93 | #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_WIDTH + \
-         |                   ^~~~~~~~~~~~~
-   include/linux/page-flags-layout.h:94:64: warning: "NR_PAGEFLAGS" is not defined, evaluates to 0 [-Wundef]
-      94 |         KASAN_TAG_WIDTH + LAST_CPUPID_SHIFT <= BITS_PER_LONG - NR_PAGEFLAGS
-         |                                                                ^~~~~~~~~~~~
-   include/linux/page-flags-layout.h:104:19: warning: "LRU_GEN_WIDTH" is not defined, evaluates to 0 [-Wundef]
-     104 | #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_WIDTH + \
-         |                   ^~~~~~~~~~~~~
-   include/linux/page-flags-layout.h:105:63: warning: "NR_PAGEFLAGS" is not defined, evaluates to 0 [-Wundef]
-     105 |         KASAN_TAG_WIDTH + LAST_CPUPID_WIDTH > BITS_PER_LONG - NR_PAGEFLAGS
-         |                                                               ^~~~~~~~~~~~
-   In file included from include/linux/mm_types.h:5:
-   include/linux/mm_types_task.h:22:34: warning: "SPINLOCK_SIZE" is not defined, evaluates to 0 [-Wundef]
-      22 | #define ALLOC_SPLIT_PTLOCKS     (SPINLOCK_SIZE > BITS_PER_LONG/8)
-         |                                  ^~~~~~~~~~~~~
-   include/linux/mm_types.h:478:5: note: in expansion of macro 'ALLOC_SPLIT_PTLOCKS'
-     478 | #if ALLOC_SPLIT_PTLOCKS
-         |     ^~~~~~~~~~~~~~~~~~~
-   In file included from include/linux/dcache.h:14,
-                    from include/linux/fs.h:8,
-                    from include/linux/compat.h:17:
->> include/linux/lockref.h:23:36: warning: "SPINLOCK_SIZE" is not defined, evaluates to 0 [-Wundef]
-      23 |          IS_ENABLED(CONFIG_SMP) && SPINLOCK_SIZE <= 4)
-         |                                    ^~~~~~~~~~~~~
-   include/linux/lockref.h:27:5: note: in expansion of macro 'USE_CMPXCHG_LOCKREF'
-      27 | #if USE_CMPXCHG_LOCKREF
-         |     ^~~~~~~~~~~~~~~~~~~
-   In file included from include/linux/gfp.h:7,
-                    from include/linux/xarray.h:16,
-                    from include/linux/list_lru.h:14,
-                    from include/linux/fs.h:13:
-   include/linux/mmzone.h:842:29: error: 'MAX_NR_ZONES' undeclared here (not in a function); did you mean 'MAX_NR_GENS'?
-     842 |         long lowmem_reserve[MAX_NR_ZONES];
-         |                             ^~~~~~~~~~~~
-         |                             MAX_NR_GENS
-   include/linux/mm_types_task.h:22:34: warning: "SPINLOCK_SIZE" is not defined, evaluates to 0 [-Wundef]
-      22 | #define ALLOC_SPLIT_PTLOCKS     (SPINLOCK_SIZE > BITS_PER_LONG/8)
-         |                                  ^~~~~~~~~~~~~
-   include/linux/mm.h:2889:5: note: in expansion of macro 'ALLOC_SPLIT_PTLOCKS'
-    2889 | #if ALLOC_SPLIT_PTLOCKS
-         |     ^~~~~~~~~~~~~~~~~~~
-   In file included from include/linux/swap.h:9,
-                    from include/linux/suspend.h:5,
-                    from arch/mips/kernel/asm-offsets.c:17:
-   include/linux/memcontrol.h: In function 'mem_cgroup_get_zone_lru_size':
->> include/linux/memcontrol.h:914:31: warning: parameter 'lru' set but not used [-Wunused-but-set-parameter]
-     914 |                 enum lru_list lru, int zone_idx)
-         |                 ~~~~~~~~~~~~~~^~~
->> include/linux/memcontrol.h:914:40: warning: parameter 'zone_idx' set but not used [-Wunused-but-set-parameter]
-     914 |                 enum lru_list lru, int zone_idx)
-         |                                    ~~~~^~~~~~~~
-   make[3]: *** [scripts/Makefile.build:244: arch/mips/kernel/asm-offsets.o] Error 1
-   make[3]: Target 'missing-syscalls' not remade because of errors.
-   make[2]: *** [arch/mips/Makefile:432: archprepare] Error 2
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:224: __sub-make] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:224: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
-
-
-vim +/SPINLOCK_SIZE +23 include/linux/lockref.h
-
-57f4257eae33e0 Peter Zijlstra     2013-11-14  20  
-57f4257eae33e0 Peter Zijlstra     2013-11-14  21  #define USE_CMPXCHG_LOCKREF \
-57f4257eae33e0 Peter Zijlstra     2013-11-14  22  	(IS_ENABLED(CONFIG_ARCH_USE_CMPXCHG_LOCKREF) && \
-597d795a2a786d Kirill A. Shutemov 2013-12-20 @23  	 IS_ENABLED(CONFIG_SMP) && SPINLOCK_SIZE <= 4)
-0f8f2aaaab0b0f Waiman Long        2013-08-28  24  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+As written, this essentially just tests the maximal configuration that can be
+exposed to a guest, which isn't _that_ interesting because KVM tends to get plenty
+of coverage for such setups, e.g. by running "real" VMs.
 
