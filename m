@@ -1,309 +1,217 @@
-Return-Path: <kvm+bounces-25416-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25418-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE86A9652DC
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 00:25:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1201E96535F
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 01:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23291B22894
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 22:25:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8B892844F8
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 23:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B281BCA1E;
-	Thu, 29 Aug 2024 22:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5308F18EFE6;
+	Thu, 29 Aug 2024 23:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="eah9mlFU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JuFfkqyn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B23C1BAEEE;
-	Thu, 29 Aug 2024 22:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868E618A6DF
+	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 23:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724970279; cv=none; b=TkBvzJ35UljYA51JKQkgTqi4k0CK8P1m9iCganCUOBHOdG434IlyP/7FZ1Y33SPl0Fwa8lRwgt9RRUR1yu66FNKAjW9vXMuSrj+v7WAxHNQKleuUhH/NS4iYmYBBM8APH0Qptiiz9zaZB6g7GwQKtpKejcvaPbYA2N5lBPawm28=
+	t=1724973707; cv=none; b=oAgIH3V35ivk8Hoj1sP0qkmOzwyWt6h0Sa0r3CHxiRYAImMjRL6kuaU0TMubk9w3A5AyaJwxHsSqqL4Ic0YJUmeiV/B2ypoPOvZtSyKAHEE49RhnHTCjh+1Zs5acyhiqayxZpxbA73wL/BMp8cYaj3FwH9uDu23rIvAQVRZlDbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724970279; c=relaxed/simple;
-	bh=vNp4WCXRq96/jsbTyQi8C13HB80VQ5tpk67BkQVTMlQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=C0zPe599LFI6qBXEEZD6PtM5gkj3wg8jzel+2dag9jzeSErzW/FcYDxJ3Y5h/MxoCSBTxObY/K4tlG9Gv4JDmcUR3tLYX7FQSYM4h81RYbR4Y/kOYIyMmNGH2l9s6S/gveJh1bXmulIYnXIvdf3Gmc0R0RmydtvZ4kS65vIbt40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=eah9mlFU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47THWFOG026564;
-	Thu, 29 Aug 2024 22:24:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	OikWV/zxhCjbqlu1U3SrGEvR6lLB0Wn4slbdklJYTbQ=; b=eah9mlFUiP8U2VPm
-	C2fRIGHbALCXiJ2dg5iiSTWWGrrJG4hcOVmBlzZQgz9WSEhILxnJNru1yrxSn/N+
-	xGK7RThKNRyd17la0q+19UxJSgOgSUyq5gNFlqQknwFlNRs9AvBVj8NmN4av+7Qp
-	iuZzrb6HZ5WDmEhtpI2G5/R8Y4SNFfloKCL9byLSHyI7Zz7lTJOfcYn9jjg/3lXk
-	FWJ4eDnf5LeiXzF1rLop15EAggNmJNqP68Tlg83dpshOqp83pqH1PQqx/UBtaI5o
-	im5wW4b9CGjV6n8QVowjQtqOq5GaczfOntucqC085rm0NnZRr6azGqK4ixGlZA/X
-	NM6uuA==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 419puvesp0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Aug 2024 22:24:14 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47TMOD6e014638
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Aug 2024 22:24:13 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 29 Aug 2024 15:24:13 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-Date: Thu, 29 Aug 2024 15:24:13 -0700
-Subject: [PATCH RFC v2 5/5] mm: guest_memfd: Add option to remove
- inaccessible memory from direct map
+	s=arc-20240116; t=1724973707; c=relaxed/simple;
+	bh=AqHcWtuqCNAT29wDBP4vmDe6sFzp23LVp9gIvFYdeR0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Md5qtGZrm7Z0urRaDLlAMjjvZu7ekHeIGD9bjqG9vFq7j1oVryvMKbEG8hbMKfFAahUJ07o+ouIjvp47gqA4Cz7iUoMUFGb3mmpdZgYwt0pbciX/pFAO0c+Yxfy2WnUA1+m1nGJNi20FJuFdY+AbEqVqRW+xeW+cozOU4jwkbZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JuFfkqyn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724973704;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WkLW/GJXW025vC/zR7s6KWdbSZfTOu9zBPKEdmJOkMc=;
+	b=JuFfkqyn+ou3Iv+Qj+HAfdYX8XHeDoKAq8NFA+LN1A9xuQGC7lztPF3I5s//N9yv9u2bEq
+	4lBdaaa4LoITOP85M4Tk3vk3sur/i+QmBibKJaWTMK7CdMEkrDOPO7vWmn7s6wZ8wUee7r
+	TYcyn0GeRj5+7myxBfz1JbYtPJTqbM0=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-264-dJBqZibpM1q5v1DU4SbI-w-1; Thu, 29 Aug 2024 19:21:43 -0400
+X-MC-Unique: dJBqZibpM1q5v1DU4SbI-w-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-82787896c05so12470439f.1
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 16:21:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724973702; x=1725578502;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WkLW/GJXW025vC/zR7s6KWdbSZfTOu9zBPKEdmJOkMc=;
+        b=SWPlXW0VnL1Lr9hi/zHoGrSJfFfemIly8XAfRqm0/VaCR1jS6giDVTeEhEZBJhFB8S
+         24pdr1VTbZYxXnyXPXsrtXiUz9nSoaXKEbs+rA6A6eFzat31XqfqDwiHQvqn6qNXBEGY
+         YMuEpxoLoyFqYK2q5Brrx4yCUeyvVCvUyFfHHCTsIlNFR/JJNQ9EJ6RbCSPtB8jgzfs3
+         n28bl7W54MRHbkR32+T8rcqc5VxlVjye1MKvyyP0NUXbfA6UHh9euZ4NJOFDWMM9Txsb
+         8CC7FxUlL/Y5LF62p2i/Yui7HOV1jmpTcF1xS3SKfDS0D+llA9Y/ZtwxGrimSj2DYAZu
+         GBXA==
+X-Forwarded-Encrypted: i=1; AJvYcCXNNtyieZpbjxq2THy9PRCc7/9YefAlgvLP/h63WOAnUF0GEN/+yp990aJ6LBektSc9DoE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBGgf15n1qA+C81lUd1sTKZZvUE52sjkfPKT0ZOYwIXTXsTFv2
+	BcyVLTK/qrJhWZ9166qhw29ozqsU1BzMLoUkgoKxbOt0DcTQk6Ba+TnUK5lsl5Yx6FxcATOUQK0
+	+ypnOMsbsz0jydS0PTGXgh7l6+TTUgYV/Q6guFrlt73OBHhsa0Q==
+X-Received: by 2002:a5d:9c51:0:b0:81f:7f2d:8391 with SMTP id ca18e2360f4ac-82a262e0480mr34008239f.3.1724973702395;
+        Thu, 29 Aug 2024 16:21:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHaZvSkwWJar4Rqj8+g17+VPHiiSCIGu68s1hSoMmlVtVZB3E0uN+OY128eFxMU3Jp0pN94Cg==
+X-Received: by 2002:a5d:9c51:0:b0:81f:7f2d:8391 with SMTP id ca18e2360f4ac-82a262e0480mr34006639f.3.1724973701954;
+        Thu, 29 Aug 2024 16:21:41 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ced2e18812sm456400173.83.2024.08.29.16.21.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 16:21:41 -0700 (PDT)
+Date: Thu, 29 Aug 2024 17:21:40 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, treding@nvidia.com, vbhadram@nvidia.com,
+ jonathanh@nvidia.com, mperttunen@nvidia.com, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, clg@redhat.com, alexandre.torgue@foss.st.com,
+ joabreu@synopsys.com, msalter@redhat.com
+Subject: Re: [RFC PATCH 3/5] vfio_platform: reset: Introduce new open and
+ close callbacks
+Message-ID: <20240829172140.686a7aa7.alex.williamson@redhat.com>
+In-Reply-To: <20240829161302.607928-4-eric.auger@redhat.com>
+References: <20240829161302.607928-1-eric.auger@redhat.com>
+	<20240829161302.607928-4-eric.auger@redhat.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-ID: <20240829-guest-memfd-lib-v2-5-b9afc1ff3656@quicinc.com>
-References: <20240829-guest-memfd-lib-v2-0-b9afc1ff3656@quicinc.com>
-In-Reply-To: <20240829-guest-memfd-lib-v2-0-b9afc1ff3656@quicinc.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-        Sean Christopherson
-	<seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner
-	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov
-	<bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Fuad Tabba
-	<tabba@google.com>, David Hildenbrand <david@redhat.com>,
-        Patrick Roy
-	<roypat@amazon.co.uk>, <qperret@google.com>,
-        Ackerley Tng
-	<ackerleytng@google.com>,
-        Mike Rapoport <rppt@kernel.org>, <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>
-CC: <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-        <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-arm-msm@vger.kernel.org>,
-        Elliot Berman <quic_eberman@quicinc.com>
-X-Mailer: b4 0.14.1
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: VKocc11VXrfwDcfhSZyfG1SnIgFpRfUU
-X-Proofpoint-GUID: VKocc11VXrfwDcfhSZyfG1SnIgFpRfUU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-29_06,2024-08-29_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=721 priorityscore=1501 bulkscore=0 impostorscore=0
- adultscore=0 malwarescore=0 phishscore=0 lowpriorityscore=0 mlxscore=0
- spamscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408290158
 
-When memory is made inaccessible to the host, Linux may still
-speculatively access the folio if a load_unaligned_zeropad is performed
-at the end of the prior page. To ensure Linux itself catches such errors
-without hypervisor crashing Linux, unmap the guest-inaccessible pages
-from the direct map.
+On Thu, 29 Aug 2024 18:11:07 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
 
-This feature is made optional because arm64 pKVM can provide a special,
-detectable fault which can be fixed up directly.
+> Some devices may require resources such as clocks and resets
+> which cannot be handled in the vfio_platform agnostic code. Let's
+> add 2 new callbacks to handle those resources. Those new callbacks
+> are optional, as opposed to the reset callback. In case they are
+> implemented, both need to be.
+> 
+> They are not implemented by the existing reset modules.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  drivers/vfio/platform/vfio_platform_common.c  | 28 ++++++++++++++++++-
+>  drivers/vfio/platform/vfio_platform_private.h |  6 ++++
+>  2 files changed, 33 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+> index 3be08e58365b..2174e402dc70 100644
+> --- a/drivers/vfio/platform/vfio_platform_common.c
+> +++ b/drivers/vfio/platform/vfio_platform_common.c
+> @@ -228,6 +228,23 @@ static int vfio_platform_call_reset(struct vfio_platform_device *vdev,
+>  	return -EINVAL;
+>  }
+>  
+> +static void vfio_platform_reset_module_close(struct vfio_platform_device *vpdev)
+> +{
+> +	if (VFIO_PLATFORM_IS_ACPI(vpdev))
+> +		return;
+> +	if (vpdev->reset_ops && vpdev->reset_ops->close)
+> +		vpdev->reset_ops->close(vpdev);
+> +}
+> +
+> +static int vfio_platform_reset_module_open(struct vfio_platform_device *vpdev)
+> +{
+> +	if (VFIO_PLATFORM_IS_ACPI(vpdev))
+> +		return 0;
+> +	if (vpdev->reset_ops && vpdev->reset_ops->open)
+> +		return vpdev->reset_ops->open(vpdev);
+> +	return 0;
+> +}
 
-Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
----
- include/linux/guest_memfd.h |  1 +
- mm/guest_memfd.c            | 79 +++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 78 insertions(+), 2 deletions(-)
+Hi Eric,
 
-diff --git a/include/linux/guest_memfd.h b/include/linux/guest_memfd.h
-index 66e5d3ab42613..de53bce15db99 100644
---- a/include/linux/guest_memfd.h
-+++ b/include/linux/guest_memfd.h
-@@ -33,6 +33,7 @@ enum guest_memfd_grab_flags {
- 
- enum guest_memfd_create_flags {
- 	GUEST_MEMFD_FLAG_CLEAR_INACCESSIBLE = (1UL << 0),
-+	GUEST_MEMFD_FLAG_REMOVE_DIRECT_MAP = (1UL << 1),
- };
- 
- struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags);
-diff --git a/mm/guest_memfd.c b/mm/guest_memfd.c
-index 194b2c3ea1525..d4232739d4c5b 100644
---- a/mm/guest_memfd.c
-+++ b/mm/guest_memfd.c
-@@ -8,6 +8,7 @@
- #include <linux/falloc.h>
- #include <linux/guest_memfd.h>
- #include <linux/pagemap.h>
-+#include <linux/set_memory.h>
- #include <linux/wait.h>
- 
- #include "internal.h"
-@@ -26,6 +27,45 @@ struct guest_memfd_private {
- 	atomic_t safe;
- };
- 
-+static inline int folio_set_direct_map_invalid_noflush(struct folio *folio)
-+{
-+	unsigned long i, nr = folio_nr_pages(folio);
-+	int r;
-+
-+	for (i = 0; i < nr; i++) {
-+		struct page *page = folio_page(folio, i);
-+
-+		r = set_direct_map_invalid_noflush(page);
-+		if (r)
-+			goto out_remap;
-+	}
-+	/**
-+	 * Currently no need to flush as hypervisor will also be flushing
-+	 * tlb when giving the folio to guest.
-+	 */
-+
-+	return 0;
-+out_remap:
-+	for (; i > 0; i--) {
-+		struct page *page = folio_page(folio, i - 1);
-+
-+		BUG_ON(set_direct_map_default_noflush(page));
-+	}
-+
-+	return r;
-+}
-+
-+static inline void folio_set_direct_map_default_noflush(struct folio *folio)
-+{
-+	unsigned long i, nr = folio_nr_pages(folio);
-+
-+	for (i = 0; i < nr; i++) {
-+		struct page *page = folio_page(folio, i);
-+
-+		BUG_ON(set_direct_map_default_noflush(page));
-+	}
-+}
-+
- static inline int base_safe_refs(struct folio *folio)
- {
- 	/* 1 for filemap */
-@@ -131,6 +171,12 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
- 				goto out_free;
- 		}
- 	} else {
-+		if (gmem_flags & GUEST_MEMFD_FLAG_REMOVE_DIRECT_MAP) {
-+			r = folio_set_direct_map_invalid_noflush(folio);
-+			if (r < 0)
-+				goto out_free;
-+		}
-+
- 		if (ops->prepare_inaccessible) {
- 			r = ops->prepare_inaccessible(inode, folio);
- 			if (r < 0)
-@@ -203,6 +249,7 @@ int guest_memfd_make_accessible(struct folio *folio)
- 	struct guest_memfd_private *private = folio_get_private(folio);
- 	struct inode *inode = folio_inode(folio);
- 	struct guest_memfd_operations *ops = inode->i_private;
-+	unsigned long gmem_flags;
- 	int r;
- 
- 	/*
-@@ -218,6 +265,10 @@ int guest_memfd_make_accessible(struct folio *folio)
- 	if (!r)
- 		return -EBUSY;
- 
-+	gmem_flags = (unsigned long)inode->i_mapping->i_private_data;
-+	if (gmem_flags & GUEST_MEMFD_FLAG_REMOVE_DIRECT_MAP)
-+		folio_set_direct_map_default_noflush(folio);
-+
- 	if (ops->prepare_accessible) {
- 		r = ops->prepare_accessible(inode, folio);
- 		if (r)
-@@ -248,6 +299,7 @@ int guest_memfd_make_inaccessible(struct folio *folio)
- 	struct guest_memfd_private *private = folio_get_private(folio);
- 	struct inode *inode = folio_inode(folio);
- 	struct guest_memfd_operations *ops = inode->i_private;
-+	unsigned long gmem_flags;
- 	int r;
- 
- 	r = atomic_dec_if_positive(&private->accessible);
-@@ -266,6 +318,13 @@ int guest_memfd_make_inaccessible(struct folio *folio)
- 		goto err;
- 	}
- 
-+	gmem_flags = (unsigned long)inode->i_mapping->i_private_data;
-+	if (gmem_flags & GUEST_MEMFD_FLAG_REMOVE_DIRECT_MAP) {
-+		r = folio_set_direct_map_invalid_noflush(folio);
-+		if (r)
-+			goto err;
-+	}
-+
- 	if (ops->prepare_inaccessible) {
- 		r = ops->prepare_inaccessible(inode, folio);
- 		if (r)
-@@ -454,6 +513,7 @@ static int gmem_error_folio(struct address_space *mapping, struct folio *folio)
- 	struct guest_memfd_operations *ops = inode->i_private;
- 	off_t offset = folio->index;
- 	size_t nr = folio_nr_pages(folio);
-+	unsigned long gmem_flags;
- 	int ret;
- 
- 	filemap_invalidate_lock_shared(mapping);
-@@ -464,6 +524,10 @@ static int gmem_error_folio(struct address_space *mapping, struct folio *folio)
- 
- 	filemap_invalidate_unlock_shared(mapping);
- 
-+	gmem_flags = (unsigned long)inode->i_mapping->i_private_data;
-+	if (gmem_flags & GUEST_MEMFD_FLAG_REMOVE_DIRECT_MAP)
-+		folio_set_direct_map_default_noflush(folio);
-+
- 	return ret;
- }
- 
-@@ -474,7 +538,7 @@ static bool gmem_release_folio(struct folio *folio, gfp_t gfp)
- 	struct guest_memfd_operations *ops = inode->i_private;
- 	off_t offset = folio->index;
- 	size_t nr = folio_nr_pages(folio);
--	unsigned long val, expected;
-+	unsigned long val, expected, gmem_flags;
- 	int ret;
- 
- 	ret = ops->invalidate_begin(inode, offset, nr);
-@@ -483,6 +547,10 @@ static bool gmem_release_folio(struct folio *folio, gfp_t gfp)
- 	if (ops->invalidate_end)
- 		ops->invalidate_end(inode, offset, nr);
- 
-+	gmem_flags = (unsigned long)inode->i_mapping->i_private_data;
-+	if (gmem_flags & GUEST_MEMFD_FLAG_REMOVE_DIRECT_MAP)
-+		folio_set_direct_map_default_noflush(folio);
-+
- 	expected = base_safe_refs(folio);
- 	val = atomic_read(&private->safe);
- 	WARN_ONCE(val != expected, "folio[%x] safe ref: %d != expected %d\n",
-@@ -518,7 +586,14 @@ static inline bool guest_memfd_check_ops(const struct guest_memfd_operations *op
- 
- static inline unsigned long guest_memfd_valid_flags(void)
- {
--	return GUEST_MEMFD_FLAG_CLEAR_INACCESSIBLE;
-+	unsigned long flags = GUEST_MEMFD_FLAG_CLEAR_INACCESSIBLE;
-+
-+#ifdef CONFIG_ARCH_HAS_SET_DIRECT_MAP
-+	if (can_set_direct_map())
-+		flags |= GUEST_MEMFD_FLAG_REMOVE_DIRECT_MAP;
-+#endif
-+
-+	return flags;
- }
- 
- /**
+I didn't get why these are no-op'd on an ACPI platform.  Shouldn't it
+be up to the reset ops to decide whether to implement something based
+on the system firmware rather than vfio-platform-common?
 
--- 
-2.34.1
+> +
+>  void vfio_platform_close_device(struct vfio_device *core_vdev)
+>  {
+>  	struct vfio_platform_device *vdev =
+> @@ -242,6 +259,7 @@ void vfio_platform_close_device(struct vfio_device *core_vdev)
+>  			"reset driver is required and reset call failed in release (%d) %s\n",
+>  			ret, extra_dbg ? extra_dbg : "");
+>  	}
+> +	vfio_platform_reset_module_close(vdev);
+>  	pm_runtime_put(vdev->device);
+>  	vfio_platform_regions_cleanup(vdev);
+>  	vfio_platform_irq_cleanup(vdev);
+> @@ -265,7 +283,13 @@ int vfio_platform_open_device(struct vfio_device *core_vdev)
+>  
+>  	ret = pm_runtime_get_sync(vdev->device);
+>  	if (ret < 0)
+> -		goto err_rst;
+> +		goto err_rst_open;
+> +
+> +	ret = vfio_platform_reset_module_open(vdev);
+> +	if (ret) {
+> +		dev_info(vdev->device, "reset module load failed (%d)\n", ret);
+> +		goto err_rst_open;
+> +	}
+>  
+>  	ret = vfio_platform_call_reset(vdev, &extra_dbg);
+>  	if (ret && vdev->reset_required) {
+> @@ -278,6 +302,8 @@ int vfio_platform_open_device(struct vfio_device *core_vdev)
+>  	return 0;
+>  
+>  err_rst:
+> +	vfio_platform_reset_module_close(vdev);
+> +err_rst_open:
+>  	pm_runtime_put(vdev->device);
+>  	vfio_platform_irq_cleanup(vdev);
+>  err_irq:
+> diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+> index 90c99d2e70f4..528b01c56de6 100644
+> --- a/drivers/vfio/platform/vfio_platform_private.h
+> +++ b/drivers/vfio/platform/vfio_platform_private.h
+> @@ -74,9 +74,13 @@ struct vfio_platform_device {
+>   * struct vfio_platform_reset_ops - reset ops
+>   *
+>   * @reset:	reset function (required)
+> + * @open:	Called when the first fd is opened for this device (optional)
+> + * @close:	Called when the last fd is closed for this device (optional)
+
+This doesn't note any platform firmware dependency.  We should probably
+also note here the XOR requirement enforced below here.  Thanks,
+
+Alex
+
+>   */
+>  struct vfio_platform_reset_ops {
+>  	int (*reset)(struct vfio_platform_device *vdev);
+> +	int (*open)(struct vfio_platform_device *vdev);
+> +	void (*close)(struct vfio_platform_device *vdev);
+>  };
+>  
+>  
+> @@ -129,6 +133,8 @@ __vfio_platform_register_reset(&__ops ## _node)
+>  MODULE_ALIAS("vfio-reset:" compat);				\
+>  static int __init reset ## _module_init(void)			\
+>  {								\
+> +	if (!!ops.open ^ !!ops.close)				\
+> +		return -EINVAL;					\
+>  	vfio_platform_register_reset(compat, ops);		\
+>  	return 0;						\
+>  };								\
 
 
