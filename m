@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-25354-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25355-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9BC0964668
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 15:26:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 811D19646B1
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 15:34:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C181B29688
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 13:25:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A33D1F211D5
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 13:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2091AAE1A;
-	Thu, 29 Aug 2024 13:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DD71AED5E;
+	Thu, 29 Aug 2024 13:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ap6/COmG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aFhOSGW4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B442A192B6F;
-	Thu, 29 Aug 2024 13:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22841AED49;
+	Thu, 29 Aug 2024 13:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724937919; cv=none; b=JSZ3U1M9nRuQ6AboPA4zIIvCXiNLFW3cdifwUUF4Ueea263mbzBvbOmY0huC4mzPSJWuq+lgYYZOKDMEIvuVLbB2+4TYB0iUp7lbXm4Cy5Jpxun98LBTHmlEnt3h3/ncp+FHgkey+X+AWw1UwiLnU7g1i5ZIl63ICbfOoRM8cAo=
+	t=1724938122; cv=none; b=h+teVKvVSKiuNlKwT8y8quaJ37cq04+CwUUNJb4eIiJ+WlviVugwEC5dpnG0L6HvwiXwZpMbbmTCfUbSiZwMgTk2Ck7BLjZibYDeZUgJ7JDua5QFFYgFsZvj45YT9qy0HySMTZsWi4eachClz/RqL2AY/RgWenxuKXrofDuzDQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724937919; c=relaxed/simple;
-	bh=n77bCPZhEhpA7pX7XHjUFUHJCMPAurXbxUj+f9Jyqa4=;
+	s=arc-20240116; t=1724938122; c=relaxed/simple;
+	bh=XcZnN+sONOz86hmUv31FEtcHd4Mqk4wajnuJARJuoug=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JG4P5eF/JkBq2j4PJMGYyW4VEYO2fnjCN8N817xGz7qxmMye7UMPnT8gX3Tc1AAb5MpiKWJ1EItKr4FDwd67RWsa4/hdDNekWtRFAjTz4WTQp2uLqcSqWGvSYf+xUG0FHdOYQCqQQvOonsolqUy0tzWOqVgztSVmnSPT9ALqY8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ap6/COmG; arc=none smtp.client-ip=192.198.163.9
+	 In-Reply-To:Content-Type; b=W8mMmfjONTpJmLWFd1v1fL+Jhy5zkuCx3TSaxYpV/9unT1mVi8j38FrsvxxKoETm/E33o0VXXFU6x4/wYZXAqYwnKxtcY32tE3GUwL/tDrdihMH9DYDgPsT/KgxjQt6ng0aIXrcVEKLvXLD15FtRZOqUt3sL5qqiQk/SQvufUs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aFhOSGW4; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724937918; x=1756473918;
+  t=1724938121; x=1756474121;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=n77bCPZhEhpA7pX7XHjUFUHJCMPAurXbxUj+f9Jyqa4=;
-  b=Ap6/COmG0Vk7rqFXWDN9mrUqEXm/BdBpyJIxOdZqVgHkdopxI2OZ6Bt/
-   olfpCRy/Mx+tKXgGulf788nOkWWBU+ZDAohES6OQZfisSnCnW9MWSy0ig
-   KxqWazMV2nTT8QLhalfR8VENGCDU0qZdyrFvqT3vsBOR2TAIZstV2dYNP
-   rPrz7A1fn1p2wi4GUQe556wP1lXKS+Ousyy3lJQ9cGJGjSM+JEcBh5H+Y
-   ryQf+A5YjGWDlByN6Fff1fnP+luYk2TRaxhPCqTOe+PO1lwCT5FgD9hTL
-   G34lY4b0k2llqm9+AueI4kNbTAkGHim3dy6tVxzsudn210GsMMrY5Db5f
-   w==;
-X-CSE-ConnectionGUID: 6kMD3vlqTm6GyU9yFYOVrw==
-X-CSE-MsgGUID: EIi7kagJQOii18LAEAsXAQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="34185220"
+  bh=XcZnN+sONOz86hmUv31FEtcHd4Mqk4wajnuJARJuoug=;
+  b=aFhOSGW4YLAS6EImNHn/0wgQRnPqxVW2bfP1pwWfEukD5HFymby/QT9+
+   ZBrens/drKbZ8wHWCZuRHYE1WhWBjvm6YuggJhgkM74oPQMrFNvVIA70k
+   L5upXphCRVEj8VAcu4JmYljNnmubzLcUSsW1oqCgpTFgdqgrottu8fkP+
+   C0EBztVxM2CXLyMog7t+Pl7sgPCtjd5AjgoyCQY9IpWp7r4eB904/dAkv
+   vU+kZilp425A8PGXVUv5WytY23FZGFiYvWntD9GnmEdIrmJpKf91mZh6v
+   Uo4zjEo0r79L57MdG2ZVvNhE6utIYWTThxkrzi2mZIrV67W7TMO14tAEM
+   Q==;
+X-CSE-ConnectionGUID: zz/zAyB/RsS1Ul4Yeqpv5A==
+X-CSE-MsgGUID: q+FI3s6hSvGjeRLzXc0PHw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="26427368"
 X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="34185220"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 06:25:18 -0700
-X-CSE-ConnectionGUID: CMR8G9PlQnG+jJscNPSPbg==
-X-CSE-MsgGUID: 6p7D2YcFRryMDkc3Pk+Z9w==
+   d="scan'208";a="26427368"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 06:28:20 -0700
+X-CSE-ConnectionGUID: g2JK1xS0QlS21QbH2+cw+Q==
+X-CSE-MsgGUID: Ma4s0KDcROG8gm3cVo6j9w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="68462912"
+   d="scan'208";a="64060751"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.240.26]) ([10.124.240.26])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 06:25:15 -0700
-Message-ID: <4eb4a26e-ebad-478e-9635-93f7fbed103b@intel.com>
-Date: Thu, 29 Aug 2024 21:25:11 +0800
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 06:28:16 -0700
+Message-ID: <2947ba8d-cb5a-4db4-9c41-8ff60571e9e3@intel.com>
+Date: Thu, 29 Aug 2024 21:28:14 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,58 +67,50 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/25] KVM: TDX: Define TDX architectural definitions
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
- tony.lindgren@linux.intel.com, linux-kernel@vger.kernel.org,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH 10/25] KVM: TDX: Initialize KVM supported capabilities
+ when module setup
+To: Tao Su <tao1.su@linux.intel.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+ kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, linux-kernel@vger.kernel.org
 References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-3-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-11-rick.p.edgecombe@intel.com>
+ <ZsKg2fIjo41T0VTH@linux.bj.intel.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20240812224820.34826-3-rick.p.edgecombe@intel.com>
+In-Reply-To: <ZsKg2fIjo41T0VTH@linux.bj.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 8/13/2024 6:47 AM, Rick Edgecombe wrote:
-> +/*
-> + * TD_PARAMS is provided as an input to TDH_MNG_INIT, the size of which is 1024B.
-> + */
-> +struct td_params {
-> +	u64 attributes;
-> +	u64 xfam;
-> +	u16 max_vcpus;
-> +	u8 reserved0[6];
-> +
-> +	u64 eptp_controls;
-> +	u64 exec_controls;
+On 8/19/2024 9:33 AM, Tao Su wrote:
+> On Mon, Aug 12, 2024 at 03:48:05PM -0700, Rick Edgecombe wrote:
+>> From: Xiaoyao Li <xiaoyao.li@intel.com>
+>>
+>> While TDX module reports a set of capabilities/features that it
+>> supports, what KVM currently supports might be a subset of them.
+>> E.g., DEBUG and PERFMON are supported by TDX module but currently not
+>> supported by KVM.
+>>
+>> Introduce a new struct kvm_tdx_caps to store KVM's capabilities of TDX.
+>> supported_attrs and suppported_xfam are validated against fixed0/1
+>> values enumerated by TDX module. Configurable CPUID bits derive from TDX
+>> module plus applying KVM's capabilities (KVM_GET_SUPPORTED_CPUID),
+>> i.e., mask off the bits that are configurable in the view of TDX module
+>> but not supported by KVM yet.
+>>
+> 
+> But this mask is not implemented in this patch, which should be in patch24?
 
-TDX 1.5 renames 'exec_controls' to 'config_flags', maybe we need update 
-it to match TDX 1.5 since the minimum supported TDX module of linux 
-starts from 1.5.
+yes, the commit message needs to be updated. Even more the patches need 
+to be re-organized.
 
-Besides, TDX 1.5 defines more fields that was reserved in TDX 1.0, but 
-most of them are not used by current TDX enabling patches. If we update 
-TD_PARAMS to match with TDX 1.5, should we add them as well?
-
-This leads to another topic that defining all the TDX structure in this 
-patch seems unfriendly for review. It seems better to put the 
-introduction of definition and its user in a single patch.
-
-> +	u16 tsc_frequency;
-> +	u8  reserved1[38];
-> +
-> +	u64 mrconfigid[6];
-> +	u64 mrowner[6];
-> +	u64 mrownerconfig[6];
-> +	u64 reserved2[4];
-> +
-> +	union {
-> +		DECLARE_FLEX_ARRAY(struct tdx_cpuid_value, cpuid_values);
-> +		u8 reserved3[768];
-> +	};
-> +} __packed __aligned(1024);
+>> KVM_TDX_CPUID_NO_SUBLEAF is the concept from TDX module, switch it to 0
+>> and use KVM_CPUID_FLAG_SIGNIFCANT_INDEX, which are the concept of KVM.
+>>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> 
+> [...]
 
 
