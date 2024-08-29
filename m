@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-25392-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25393-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA923964DA1
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 20:26:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4DBA964E24
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 20:50:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CD251F26621
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 18:26:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E93021C2444D
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2024 18:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E66E1B86DB;
-	Thu, 29 Aug 2024 18:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5239D1B86CA;
+	Thu, 29 Aug 2024 18:45:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G+0Ucq/v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WlYJD/IB"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0661B533E
-	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 18:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E602414C59C
+	for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 18:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724955990; cv=none; b=jc1OkBnfhKe8rvnfZ5kUCvzpzf27y6TW83xCvKv+/AKq7kMo71jkrYlYu/ngj6RhPbGEtZb9WBQJ0LugfdQ353TCW8e3yfuq929dQGgPIF+X2sbQ/ryhgGbwyipqnKsX9Q5lByjhqfKoRXX3mS/2XQpxiSq4TRaKN8NiDEt0+B4=
+	t=1724957125; cv=none; b=oNzFj5SYEXHkJx9q9fKjf/SOaNgiu/LK+u3u7ryZK2JC4XAhnbrkQpfAoRh/Z4q/4U1R6R0m3kHOZZgiVy697E+8/KetOHO48h/pmCZJHMT3eIQtEHAFJjAiRiioGEiOws0+m3YKtsNEU1MFlCbzKUGnzAyvNu3ZNvE6KFCRf18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724955990; c=relaxed/simple;
-	bh=fjkHY08fUPxq/rg8AhHY5r6YbGUpJpaohkKFoXudyxE=;
+	s=arc-20240116; t=1724957125; c=relaxed/simple;
+	bh=hsPlgUCeHK3mdXewDVil9aM02ONl8d3NiaSvuNuNE4I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DNhtv9rORWEe3rUZT6toWIeLXnBheD1V3nRytSq8pg/4QrGsmsBuTwSp7yriIlHwi+gdgJJV4b78tIQlQQz9PwEOgsyYQqGVjCgceKE0zcup3S50QEuuB2CzslCdprnxsCNFBwutT3eQst+ejDzAlgHQEpvf3AyT8pV8BdJ4tng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G+0Ucq/v; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=O9vQ8RfhcZJ7vdCKOnsa009NWTpYOOVAHDT4JWiKHSMItab9RWDvFEV78cYGiCqwAhCP2e//9w+FHYaUQn1iRaQfCQaEx/iX9GcoUXYu9UX8mNWgCMIsjFsk7JkN4LCc4gjNzFniLJyUEzRaqo3a0rK2w1/MTzO1tYYgxXzlfzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WlYJD/IB; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724955988;
+	s=mimecast20190719; t=1724957122;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3WuSlRBbAE14ViqgSTitGeyCxk0WS9L/CSL99pAIvUI=;
-	b=G+0Ucq/vvNwq9i9jBPlcKjcqgNCFPZBAfW84OQfAIeXn17Wg6KOXR4bvywy+vsztRO/PXx
-	QORgei1jmq5YGmbU5CJtgIsaYbczt9CAvBt/+6OYMPKFaogBBzz+6hHuxxyW98mFjV+oa7
-	2Suo7mzwAXR0q0fFahVvbuRzgepiu2U=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=SNxKnt1pOeKeNbmB5uGX+KLSDH8VwXu6pBqcboAJCGg=;
+	b=WlYJD/IBCFfuI2L4ON1TkXF/ETWwhjlMXM+jKgRVi3rwdieP6NAzXgS+MhOFUN61qeh4qE
+	TCf77tY4MUmd6CipbRclmX2oYWuAZH7zvqN/glfrYFe+NRtLCrmQQJZVlKhLBkH7ar++jk
+	Vugr3q/utYPPZdGmEb/FlYxdHo+CHwY=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-d0QRLRNONLi7NnQdALkyeQ-1; Thu, 29 Aug 2024 14:26:26 -0400
-X-MC-Unique: d0QRLRNONLi7NnQdALkyeQ-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4500d2fe009so20582091cf.0
-        for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 11:26:26 -0700 (PDT)
+ us-mta-331-AnzrOhiYPbSxJHYbvJ6_ZQ-1; Thu, 29 Aug 2024 14:45:21 -0400
+X-MC-Unique: AnzrOhiYPbSxJHYbvJ6_ZQ-1
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-70932abea64so932257a34.1
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 11:45:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724955986; x=1725560786;
+        d=1e100.net; s=20230601; t=1724957120; x=1725561920;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3WuSlRBbAE14ViqgSTitGeyCxk0WS9L/CSL99pAIvUI=;
-        b=MdvRm0Cd/cZCyix9nqkSVJiaiAa7HXJWiBrL0eKYqUfR70rMcUPh4/OACvthHxWqRe
-         6zOIvwB5jRihDfAAmqUAmRnZlzzEb55cZCshWd6f+VFYXibUl5xXhP0OQVwD+W3JDYW6
-         2PpEkIxmG2Bm0E4XVnaTD7ot6lY2GzYCKGiPmbhUtW4Ikx5HrXy3GoB18mChtmErKmPW
-         oBx5GHz+r5ERCUrd98w0BQSKfOAK1O4+PKr6faKyg+8WY6ZB3RnOr4DQE1ASC5BuUdVP
-         2osfYZs+v2vAXIK4Yf95kzKoImQprpWkd/YRvOCQrEpJYEPw280colxJUZV5j3+r09vH
-         QD7g==
-X-Forwarded-Encrypted: i=1; AJvYcCW1BJfcq4RVsLyjgmx2SgFgED7sCi7N51CMZYcVabL7eBJtMTXvkaLrWoXb9KwVlK6wgnE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywo107+7jm8QKSmTDOVgzV14HufluBHrgD5zIdxwf7Lq3qw6Vvr
-	hIqjBWFXmfmi+vbhUs8x/nCvNnKIOOtF4Lg02+0Z7tRPoBsmQrhQTJ/M2fpecDgLKG+IMfdX+o8
-	k2LBTqmzbVPM0azmgiXJuMn83oMQZFAiSVESiYbd3w1fmSbveAA==
-X-Received: by 2002:a05:622a:4819:b0:456:45cc:2b5a with SMTP id d75a77b69052e-45680261427mr70106491cf.25.1724955985961;
-        Thu, 29 Aug 2024 11:26:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEzclADxCb1u5q8U+Sk7zwoAJ25wF2K4UbrNY0LglvkHgW5dZaI/1Ur1kfLF9ykMtA/fsqWzw==
-X-Received: by 2002:a05:622a:4819:b0:456:45cc:2b5a with SMTP id d75a77b69052e-45680261427mr70106031cf.25.1724955985521;
-        Thu, 29 Aug 2024 11:26:25 -0700 (PDT)
+        bh=SNxKnt1pOeKeNbmB5uGX+KLSDH8VwXu6pBqcboAJCGg=;
+        b=g2ZVbJGFhf5+3b6EbkqhZICnmD1UFGC/LEeT2En9VJe0vHlgr3L6z/AyYfs2FtbOl3
+         qKSz1qu7ztHicw69hFNGRH19/jT2IBFeg2tWtUSBW5a+r490ejkR0UE8Y4dnjbUPFn/B
+         5zr/boa5G9Ov5KL/xHeUvva84k/anvaigpS84U7lzpOb+8RIosaehbc80xUaZrbPCnpY
+         unRTyKBhu6JnLQIXOmIkS51HTKZlzPPcw4maVchJ8CVJOL8B88815c74XlaxLFlFGVfz
+         VjZqp3JznV6hOhPhmEYDMrJGnYEDVr/hQzKILkMA59ovfc+O/bQ/jFGbpbNxSkgjJiE6
+         qnKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvuEggL/NQ03rgp0xWqqu8lqeI84W+rNkuUtWzIm0DQiERf6m79NDXbzAKXkKxaUF5ecE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH9R93qC8WIINjzAAJsZjbOqaql1I6cYxblveuEirtXxcpO0E/
+	Y3lkn9f9gfYXU+ol2OX9SR6xBCF153kz1H4KN/OMcftkDAgHfPkH7/X+L4D/2H9KP75WZHNmSsV
+	mi31fXI7wa2tLx5sUJTQdWKPvOajuUY4iTwVdleuWr07M5e9vrw==
+X-Received: by 2002:a05:6830:4393:b0:70d:f23d:97fe with SMTP id 46e09a7af769-70f5c4b40admr3551779a34.33.1724957120530;
+        Thu, 29 Aug 2024 11:45:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHzQ8QvrwiOwTqzCT7fw2y797mlGiwpfpRY2dlwgwi44n8PyvYSGtPb7e0yosXO2yQoNYYadA==
+X-Received: by 2002:a05:6830:4393:b0:70d:f23d:97fe with SMTP id 46e09a7af769-70f5c4b40admr3551752a34.33.1724957120217;
+        Thu, 29 Aug 2024 11:45:20 -0700 (PDT)
 Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45682c82a52sm7101381cf.16.2024.08.29.11.26.23
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340bfa6d0sm7797286d6.1.2024.08.29.11.45.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 11:26:24 -0700 (PDT)
-Date: Thu, 29 Aug 2024 14:26:22 -0400
+        Thu, 29 Aug 2024 11:45:19 -0700 (PDT)
+Date: Thu, 29 Aug 2024 14:45:16 -0400
 From: Peter Xu <peterx@redhat.com>
 To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	Gavin Shan <gshan@redhat.com>,
+Cc: Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, Gavin Shan <gshan@redhat.com>,
 	Catalin Marinas <catalin.marinas@arm.com>, x86@kernel.org,
 	Ingo Molnar <mingo@redhat.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
@@ -86,17 +86,21 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	Alistair Popple <apopple@nvidia.com>, kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	Sean Christopherson <seanjc@google.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Jason Gunthorpe <jgg@nvidia.com>, Borislav Petkov <bp@alien8.de>,
+	Oscar Salvador <osalvador@suse.de>, Borislav Petkov <bp@alien8.de>,
 	Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
 	Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>,
 	Kefeng Wang <wangkefeng.wang@huawei.com>,
 	Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v2 07/19] mm/fork: Accept huge pfnmap entries
-Message-ID: <ZtC9ThIs7aSK7gdK@x1n>
+Subject: Re: [PATCH v2 06/19] mm/pagewalk: Check pfnmap for folio_walk_start()
+Message-ID: <ZtDBvAbcT-QI65Vt@x1n>
 References: <20240826204353.2228736-1-peterx@redhat.com>
- <20240826204353.2228736-8-peterx@redhat.com>
- <78d77162-11df-4437-b70b-fa04f868a494@redhat.com>
+ <20240826204353.2228736-7-peterx@redhat.com>
+ <9f9d7e96-b135-4830-b528-37418ae7bbfd@redhat.com>
+ <Zs8zBT1aDh1v9Eje@x1n>
+ <c1d8220c-e292-48af-bbab-21f4bb9c7dc5@redhat.com>
+ <Zs9-beA-eTuXTfN6@x1n>
+ <20240828234652.GD3773488@nvidia.com>
+ <2123f339-2487-4b1c-abb1-313e9a012242@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -105,35 +109,56 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <78d77162-11df-4437-b70b-fa04f868a494@redhat.com>
+In-Reply-To: <2123f339-2487-4b1c-abb1-313e9a012242@redhat.com>
 
-On Thu, Aug 29, 2024 at 05:10:42PM +0200, David Hildenbrand wrote:
-> On 26.08.24 22:43, Peter Xu wrote:
-> > Teach the fork code to properly copy pfnmaps for pmd/pud levels.  Pud is
-> > much easier, the write bit needs to be persisted though for writable and
-> > shared pud mappings like PFNMAP ones, otherwise a follow up write in either
-> > parent or child process will trigger a write fault.
-> > 
-> > Do the same for pmd level.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >   mm/huge_memory.c | 29 ++++++++++++++++++++++++++---
-> >   1 file changed, 26 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-> > index e2c314f631f3..15418ffdd377 100644
-> > --- a/mm/huge_memory.c
-> > +++ b/mm/huge_memory.c
-> > @@ -1559,6 +1559,24 @@ int copy_huge_pmd(struct mm_struct *dst_mm, struct mm_struct *src_mm,
-> >   	pgtable_t pgtable = NULL;
-> >   	int ret = -ENOMEM;
-> > +	pmd = pmdp_get_lockless(src_pmd);
-> > +	if (unlikely(pmd_special(pmd))) {
+On Thu, Aug 29, 2024 at 08:35:49AM +0200, David Hildenbrand wrote:
+> Fortunately, we did an excellent job at documenting vm_normal_page():
 > 
-> I assume I have to clean up your mess here as well?
+>  * There are 2 broad cases. Firstly, an architecture may define a pte_special()
+>  * pte bit, in which case this function is trivial. Secondly, an architecture
+>  * may not have a spare pte bit, which requires a more complicated scheme,
+>  * described below.
+>  *
+>  * A raw VM_PFNMAP mapping (ie. one that is not COWed) is always considered a
+>  * special mapping (even if there are underlying and valid "struct pages").
+>  * COWed pages of a VM_PFNMAP are always normal.
+>  *
+>  * The way we recognize COWed pages within VM_PFNMAP mappings is through the
+>  * rules set up by "remap_pfn_range()": the vma will have the VM_PFNMAP bit
+>  * set, and the vm_pgoff will point to the first PFN mapped: thus every special
+>  * mapping will always honor the rule
+>  *
+>  *	pfn_of_page == vma->vm_pgoff + ((addr - vma->vm_start) >> PAGE_SHIFT)
+>  *
+>  * And for normal mappings this is false.
+>  *
+> 
+> remap_pfn_range_notrack() will currently handle that for us:
+> 
+> if (is_cow_mapping(vma->vm_flags)) {
+> 	if (addr != vma->vm_start || end != vma->vm_end)
+> 		return -EINVAL;
+> }
+> 
+> Even if [1] would succeed, the is_cow_mapping() check will return NULL and it will
+> all work as expected, even without pte_special().
 
-Can you leave meaningful and explicit comment?  I'll try to address.
+IMHO referencing vm_pgoff is ambiguous, and could be wrong, if without a
+clear contract.
+
+For example, consider when the driver setup a MAP_PRIVATE + VM_PFNMAP vma,
+vm_pgoff to be not the "base PFN" but some random value, then for a COWed
+page it's possible the calculation accidentally satisfies "pfn ==
+vma->vm_pgoff + off".  Then it could wrongly return NULL rather than the
+COWed anonymous page here.  This is extremely unlikely, but just to show
+why it's wrong to reference it at all.
+
+> 
+> Because VM_PFNMAP is easy: in a !COW mapping, everything is special.
+
+Yes it's safe for vfio-pci, as vfio-pci doesn't have private mappings.  But
+still, I don't think it's clear enough now on how VM_PFNMAP should be
+mapped.
 
 -- 
 Peter Xu
