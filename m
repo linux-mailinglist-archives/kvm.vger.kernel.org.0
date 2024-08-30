@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-25543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 362F296662D
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 17:55:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42FA8966630
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 17:55:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCC31282B50
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 15:55:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 007A328225C
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 15:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837A01B86DD;
-	Fri, 30 Aug 2024 15:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF1F1B8EBD;
+	Fri, 30 Aug 2024 15:54:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D7B1B81C3;
-	Fri, 30 Aug 2024 15:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC9B1B8EA1;
+	Fri, 30 Aug 2024 15:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725033295; cv=none; b=hWo3vswH12IdIuZJThvqZ0V0FtS0K9ZxUHJG7g9/AbrsT7aAWYEDUyb2hTAhKMPMrsagen6iD5z7SV7iUrehQS+5bJvtf1J48/go63QIRHaBoFBoJU+Ln9lau9BZ0EBnsIzfg48NVY1GcTJzuFZk7H9FeHW8WoX5D4ud/Sjj65A=
+	t=1725033298; cv=none; b=KG85jHMLm/EfLM377u04kJCTptEPfCwCN483lIwHIrFoKpe7aJzagHl0jX1tJgTLbhBuBAqV/l09Ugz1gDHsnsmi3oBdcFNyMeVQCjhKTR9C2FYj5GS13g8PH313Mj/PJS8QcfRd0kN7FXMUG94vkmuGEp6yrogWU8NTEiGaOxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725033295; c=relaxed/simple;
-	bh=MRRYMjFn7aWtSBHCAj+sJCDuQyVpbXGWsKlTveW1QRw=;
+	s=arc-20240116; t=1725033298; c=relaxed/simple;
+	bh=OfBsrE3iZBkIkwjjy0b6HfGaTqdquI0VMMamxxmokUE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nQX02PD7ou3P11FmiEG5VQNY+zy7nXBQhs6BLb5IRwEhwfKe7vBD+rD96J9n41ltTJFlmvyfqnKLBtJfZTnEF6zmZIuha1iGbnxIzFjx/RVaCYuFvfKH9WykVXE+mEdfVq8FkPAANF1c5j+xMasCSLSAh0p4QY1qXA/irYWOqCQ=
+	 In-Reply-To:Content-Type; b=u9U/2Xod+6qyoCRmpdR6xVxo6FeuRil9iFWphII0DgbC51+E+ei/0FO6GPhKo/jkBnrKanDR+kS0wMeOHupJ05CWDq85bUIYoiwJTnjX7P3WfNrEsqUgZToVmmSaZ2O4tNlUr/wNsF0g65KzvQ1I9ig6kqf4uOd/h11Epy0Oo6g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18A4D1477;
-	Fri, 30 Aug 2024 08:55:19 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 63747153B;
+	Fri, 30 Aug 2024 08:55:22 -0700 (PDT)
 Received: from [10.1.30.22] (e122027.cambridge.arm.com [10.1.30.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EB3A13F762;
-	Fri, 30 Aug 2024 08:54:48 -0700 (PDT)
-Message-ID: <a0c8014a-48c1-44c6-a45e-75ca778a4642@arm.com>
-Date: Fri, 30 Aug 2024 16:54:45 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1BE573F762;
+	Fri, 30 Aug 2024 08:54:52 -0700 (PDT)
+Message-ID: <32159e6c-ad6a-4beb-b854-fbef9bdc9862@arm.com>
+Date: Fri, 30 Aug 2024 16:54:47 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,7 +42,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 10/19] arm64: Override set_fixmap_io
+Subject: Re: [PATCH v5 11/19] arm64: rsi: Map unprotected MMIO as decrypted
 To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -56,80 +56,85 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
  Alper Gun <alpergun@google.com>
 References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-11-steven.price@arm.com>
- <13bc77b7-5f68-44ca-93ce-578ffe029437@arm.com>
+ <20240819131924.372366-12-steven.price@arm.com>
+ <15213e51-e028-445e-a22f-f06fefd15fc8@arm.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <13bc77b7-5f68-44ca-93ce-578ffe029437@arm.com>
+In-Reply-To: <15213e51-e028-445e-a22f-f06fefd15fc8@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 19/08/2024 15:13, Suzuki K Poulose wrote:
+On 19/08/2024 15:11, Suzuki K Poulose wrote:
+> Hi Steven
+> 
 > On 19/08/2024 14:19, Steven Price wrote:
 >> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 >>
->> Override the set_fixmap_io to set shared permission for the host
->> in case of a CC guest. For now we mark it shared unconditionally.
->>
->> If/when support for device assignment and device emulation in the realm
->> is added in the future then this will need to filter the physical
->> address and make the decision accordingly.
+>> Instead of marking every MMIO as shared, check if the given region is
+>> "Protected" and apply the permissions accordingly.
 >>
 >> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
 >> New patch for v5
 >> ---
->>   arch/arm64/include/asm/fixmap.h |  2 ++
->>   arch/arm64/mm/mmu.c             | 17 +++++++++++++++++
->>   2 files changed, 19 insertions(+)
+>>   arch/arm64/kernel/rsi.c | 15 +++++++++++++++
+>>   arch/arm64/mm/mmu.c     |  2 +-
+>>   2 files changed, 16 insertions(+), 1 deletion(-)
 >>
->> diff --git a/arch/arm64/include/asm/fixmap.h
->> b/arch/arm64/include/asm/fixmap.h
->> index 87e307804b99..2c20da3a468c 100644
->> --- a/arch/arm64/include/asm/fixmap.h
->> +++ b/arch/arm64/include/asm/fixmap.h
->> @@ -108,6 +108,8 @@ void __init early_fixmap_init(void);
->>   #define __late_clear_fixmap(idx) __set_fixmap((idx), 0,
->> FIXMAP_PAGE_CLEAR)
->>     extern void __set_fixmap(enum fixed_addresses idx, phys_addr_t
->> phys, pgprot_t prot);
->> +#define set_fixmap_io set_fixmap_io
->> +void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys);
->>     #include <asm-generic/fixmap.h>
+>> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+>> index 381a5b9a5333..672dd6862298 100644
+>> --- a/arch/arm64/kernel/rsi.c
+>> +++ b/arch/arm64/kernel/rsi.c
+>> @@ -6,6 +6,8 @@
+>>   #include <linux/jump_label.h>
+>>   #include <linux/memblock.h>
+>>   #include <linux/psci.h>
+>> +
+>> +#include <asm/io.h>
+>>   #include <asm/rsi.h>
+>>     struct realm_config config;
+>> @@ -93,6 +95,16 @@ bool arm64_rsi_is_protected_mmio(phys_addr_t base,
+>> size_t size)
+>>   }
+>>   EXPORT_SYMBOL(arm64_rsi_is_protected_mmio);
+>>   +static int realm_ioremap_hook(phys_addr_t phys, size_t size,
+>> pgprot_t *prot)
+>> +{
+>> +    if (arm64_rsi_is_protected_mmio(phys, size))
+>> +        *prot = pgprot_encrypted(*prot);
+>> +    else
+>> +        *prot = pgprot_decrypted(*prot);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>   void __init arm64_rsi_init(void)
+>>   {
+>>       /*
+>> @@ -107,6 +119,9 @@ void __init arm64_rsi_init(void)
+>>           return;
+>>       prot_ns_shared = BIT(config.ipa_bits - 1);
+>>   +    if (arm64_ioremap_prot_hook_register(realm_ioremap_hook))
+>> +        return;
+>> +
+>>       static_branch_enable(&rsi_present);
+>>   }
 >>   diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
->> index 353ea5dc32b8..06b66c23c124 100644
+>> index 06b66c23c124..0c2fa35beca0 100644
 >> --- a/arch/arm64/mm/mmu.c
 >> +++ b/arch/arm64/mm/mmu.c
->> @@ -1193,6 +1193,23 @@ void vmemmap_free(unsigned long start, unsigned
->> long end,
->>   }
->>   #endif /* CONFIG_MEMORY_HOTPLUG */
->>   +void set_fixmap_io(enum fixed_addresses idx, phys_addr_t phys)
->> +{
->> +    pgprot_t prot = FIXMAP_PAGE_IO;
->> +
->> +    /*
->> +     * The set_fixmap_io maps a single Page covering phys.
->> +     * To make better decision, we stick to the smallest page
->> +     * size supported (4K).
->> +     */
->> +    if (!arm64_is_iomem_private(phys, SZ_4K))
->> +        prot = pgprot_decrypted(prot);
->> +    else
->> +        prot = pgprot_encrypted(prot);
+>> @@ -1207,7 +1207,7 @@ void set_fixmap_io(enum fixed_addresses idx,
+>> phys_addr_t phys)
+>>       else
+>>           prot = pgprot_encrypted(prot);
+>>   -    __set_fixmap(idx, phys, prot);
+>> +    __set_fixmap(idx, phys & PAGE_MASK, prot);
 > 
-> With the ioremap_prot_hook introduction, this one looks like should use
-> that, instead of open coding the same thing. Thoughts ?
+> This looks like it should be part of the previous patch ? Otherwise
+> looks good to me.
 
-I can see the logic, but it's not quite that simple to implement. Either
-the ioremap_prot_hook needs moving out (and presumably) renaming to be a
-more generic "override device pgprot" mechanism, we it would be a horrid
-hack to put ioremap code in arch/arm64/mm/ioremap.c to handle this.
-
-Given that we're not even sure that the set_fixmap hack is a good idea,
-I'll leave this alone for now - the open coding is clear even if it's a
-duplicate.
+Good spot - yes it should!
 
 Thanks,
 Steve
