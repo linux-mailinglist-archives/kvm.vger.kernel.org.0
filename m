@@ -1,84 +1,78 @@
-Return-Path: <kvm+bounces-25463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7634496580C
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 09:06:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A85096584A
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 09:22:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF994B22BF7
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 07:06:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18AA82817B3
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 07:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 810221581E2;
-	Fri, 30 Aug 2024 07:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B2015CD4D;
+	Fri, 30 Aug 2024 07:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hWPYb+WA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AWrdZfOV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C861531D0;
-	Fri, 30 Aug 2024 07:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF54F1509A0;
+	Fri, 30 Aug 2024 07:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725001523; cv=none; b=ekYou9y82dupQTBvhNvj69S5mDfwjxUWDA/XEQUWHRcVpDCjDleoOl/J4P+zFpY1mV2FK7nKLwbZZ7ZnGrPgDUfIh0mpnXMX3mmg+d3CUBcXq6GY/rVMRyjBnw4BKdQGQI1l4EEEcDWmPeFEs3BVhhUQFLCj/LfYFa0JzYxQ+r4=
+	t=1725002494; cv=none; b=rZt5LUCLxHri7Cp+P+IoMCgAEVAObw2OAR+HCQ7Mpio3b1MaKxbH/VpecZoyGWtMPyfQ/FcbkVg4Ljkgs23HSkxKoGfDZ8OCAcC7Dfk622Kc7KEz9SZOPxLP+D0TZYle90jh6CmJHY+CwtA5Psuu05v6mrGQH8e6M393TvYaK5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725001523; c=relaxed/simple;
-	bh=fs7dwCcIGstjP+8EDLC7kaBlHBE+/dzsUlL4+b4g1A8=;
+	s=arc-20240116; t=1725002494; c=relaxed/simple;
+	bh=FgWa3xuFBZIE8BaH1K88EEiex3imBuvR4h9fRGT+/Fo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rJW7VPk7qtCUmU54qD/1FGuNZfzJBcUP9qBefEaYlD7KWNy9Qr/h5Y21GoC/TBPl+ppIWT8G1JXdnFV7wWJDDOdX9UXk+bwRTYlUevBxhMqafIeTBngqEHaPA29ARCJPZC4Im5uVAixV+t3XIS8yZUHr2DAfw0ZRNZp40fiPqw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hWPYb+WA; arc=none smtp.client-ip=198.175.65.19
+	 Content-Type:Content-Disposition:In-Reply-To; b=dRtc0aRJ7wXwlM+EmgQDV3bs7XQMPeaeorj6lAviDWq5SQFxhD8B9bUlvyLKp+hzpAwCCZYOW4O7LgEBYFNTl0cnrL8zv4DiG/qu/6QcGdejdBOJMujmEjkhfeXnlObOH7A31rBGw+5BFOv/JKC7GoQmaZ8AfzoYBob7NMqHCg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AWrdZfOV; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725001522; x=1756537522;
+  t=1725002493; x=1756538493;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=fs7dwCcIGstjP+8EDLC7kaBlHBE+/dzsUlL4+b4g1A8=;
-  b=hWPYb+WAalEHSUYhF5wkvpvUUIY0QRtPmbCgh1IYQ/rVmxfn6K0Vo9J7
-   lvQZwRKi7Ju0lzhccIHyi99N5l/7YCa348cL6mkVSyAdpRjiYvSrtmn0Q
-   sua2BloyMmcrVymQRkk7FmkUBn7ZE+F9Gxk3D+Hh/sksS35eBOrv4HNvI
-   eJELDdXHMzcEwL+jVweVwSI27WUNnkSP0blPy+maQOm3zmQUatnUvnwOe
-   oc3pR1+oploRew5JLVEDxCXhW1k2iVCd18xdA/Wt+HF0KfGti1P9PEx9z
-   0ipjJ70ewFrg2GzFupB8GFuuwfesZ/VUSJh3v9idNpWgOPafMfxr3+lD7
-   A==;
-X-CSE-ConnectionGUID: 3Sj8UGVhRe2KnSUcahwSMw==
-X-CSE-MsgGUID: p6i2J6y1QNK47vb8z6aG3w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="23495459"
+  bh=FgWa3xuFBZIE8BaH1K88EEiex3imBuvR4h9fRGT+/Fo=;
+  b=AWrdZfOVq0PgCN38ChDKaKe81lxtZgo2V8vU4EZEJEFWfbPDq7zo0Gx6
+   0zsnzCFa+wdQhICBz8fCzJrFPDtb75qJC4hiPAG+ahqPLCNbFWuWAl5Ch
+   3i5idUyVuvWWe3tqO0/gNLOeq+rgYWdI2AsXfUvNhuvQV9/rHqrK96vnD
+   ZgjvL+XXaPLVEO29tic3Zn0BsujPeUDVC6HgwPx3Htkf2FuAXESoS63Jl
+   BZmtp+AaRCP9eOC6gIsIjdDtHobKmpN+bfmaVx6SjMvu+jIQ6tE23AqF/
+   rJFAaHNkpFGfHcnGWpGsGgu1nEbnCGl+NjBNsUb2rlPARrbMnJExuvM47
+   w==;
+X-CSE-ConnectionGUID: /YG2cg+vSrmUnGQhOW9SDg==
+X-CSE-MsgGUID: KirhShEaRRGc20MpOlviKQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="23787744"
 X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="23495459"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 00:05:22 -0700
-X-CSE-ConnectionGUID: gWAF0oB3R/iao1boJz3F7Q==
-X-CSE-MsgGUID: mb7SY/8sSaSNPXvLqiy6oA==
+   d="scan'208";a="23787744"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 00:21:32 -0700
+X-CSE-ConnectionGUID: C4U2RfBpSiCNz8mB1MsxOQ==
+X-CSE-MsgGUID: GCX5Jn/EQzSL7PNXvjzhkA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="68708882"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa004.jf.intel.com with ESMTP; 30 Aug 2024 00:05:17 -0700
-Date: Fri, 30 Aug 2024 15:02:49 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	linux-pci@vger.kernel.org,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	pratikrajesh.sampat@amd.com, michael.day@amd.com,
-	david.kaplan@amd.com, dhaval.giani@amd.com,
-	Santosh Shukla <santosh.shukla@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Michael Roth <michael.roth@amd.com>, Alexander Graf <agraf@suse.de>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>
-Subject: Re: [RFC PATCH 11/21] KVM: SEV: Add TIO VMGEXIT and bind TDI
-Message-ID: <ZtFumVbgXf9RBNxP@yilunxu-OptiPlex-7050>
-References: <20240823132137.336874-1-aik@amd.com>
- <20240823132137.336874-12-aik@amd.com>
- <ZtBIr5IrnZF4z3cp@yilunxu-OptiPlex-7050>
- <db05ceb5-d38b-45b8-81c9-c84c0d8fbd96@amd.com>
+   d="scan'208";a="63780727"
+Received: from sschumil-mobl2.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.63])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 00:21:28 -0700
+Date: Fri, 30 Aug 2024 10:21:23 +0300
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
+	isaku.yamahata@gmail.com, xiaoyao.li@intel.com,
+	linux-kernel@vger.kernel.org,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Binbin Wu <binbin.wu@linux.intel.com>
+Subject: Re: [PATCH 09/25] KVM: TDX: Get system-wide info about TDX module on
+ initialization
+Message-ID: <ZtFy8_etJ2tkQ8pm@tlindgre-MOBL1>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-10-rick.p.edgecombe@intel.com>
+ <Zr21XioOyi0CZ+FV@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,203 +81,74 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <db05ceb5-d38b-45b8-81c9-c84c0d8fbd96@amd.com>
+In-Reply-To: <Zr21XioOyi0CZ+FV@yilunxu-OptiPlex-7050>
 
-On Fri, Aug 30, 2024 at 02:00:30PM +1000, Alexey Kardashevskiy wrote:
+On Thu, Aug 15, 2024 at 03:59:26PM +0800, Xu Yilun wrote:
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -3,6 +3,7 @@
+> >  #include <asm/tdx.h>
+> >  #include "capabilities.h"
+> >  #include "x86_ops.h"
+> > +#include "mmu.h"
 > 
+> Is the header file still needed?
+
+It's needed for kvm_gfn_direct_bits(), but should have been added in a
+later patch.
+
+> > +static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+> > +{
+> > +	const struct tdx_sysinfo_td_conf *td_conf = &tdx_sysinfo->td_conf;
+> > +	struct kvm_tdx_capabilities __user *user_caps;
+> > +	struct kvm_tdx_capabilities *caps = NULL;
+> > +	int i, ret = 0;
+> > +
+> > +	/* flags is reserved for future use */
+> > +	if (cmd->flags)
+> > +		return -EINVAL;
+> > +
+> > +	caps = kmalloc(sizeof(*caps), GFP_KERNEL);
+> > +	if (!caps)
+> > +		return -ENOMEM;
+> > +
+> > +	user_caps = u64_to_user_ptr(cmd->data);
+> > +	if (copy_from_user(caps, user_caps, sizeof(*caps))) {
+> > +		ret = -EFAULT;
+> > +		goto out;
+> > +	}
+> > +
+> > +	if (caps->nr_cpuid_configs < td_conf->num_cpuid_config) {
+> > +		ret = -E2BIG;
 > 
-> On 29/8/24 20:08, Xu Yilun wrote:
-> > > diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
-> > > index 76b7f6085dcd..a4e9db212adc 100644
-> > > --- a/virt/kvm/vfio.c
-> > > +++ b/virt/kvm/vfio.c
-> > > @@ -15,6 +15,7 @@
-> > >   #include <linux/slab.h>
-> > >   #include <linux/uaccess.h>
-> > >   #include <linux/vfio.h>
-> > > +#include <linux/tsm.h>
-> > >   #include "vfio.h"
-> > >   #ifdef CONFIG_SPAPR_TCE_IOMMU
-> > > @@ -29,8 +30,14 @@ struct kvm_vfio_file {
-> > >   #endif
-> > >   };
-> > > +struct kvm_vfio_tdi {
-> > > +	struct list_head node;
-> > > +	struct vfio_device *vdev;
-> > > +};
-> > > +
-> > >   struct kvm_vfio {
-> > >   	struct list_head file_list;
-> > > +	struct list_head tdi_list;
-> > >   	struct mutex lock;
-> > >   	bool noncoherent;
-> > >   };
-> > > @@ -80,6 +87,22 @@ static bool kvm_vfio_file_is_valid(struct file *file)
-> > >   	return ret;
-> > >   }
-> > > +static struct vfio_device *kvm_vfio_file_device(struct file *file)
-> > > +{
-> > > +	struct vfio_device *(*fn)(struct file *file);
-> > > +	struct vfio_device *ret;
-> > > +
-> > > +	fn = symbol_get(vfio_file_device);
-> > > +	if (!fn)
-> > > +		return NULL;
-> > > +
-> > > +	ret = fn(file);
-> > > +
-> > > +	symbol_put(vfio_file_device);
-> > > +
-> > > +	return ret;
-> > > +}
-> > > +
-> > >   #ifdef CONFIG_SPAPR_TCE_IOMMU
-> > >   static struct iommu_group *kvm_vfio_file_iommu_group(struct file *file)
-> > >   {
-> > > @@ -297,6 +320,103 @@ static int kvm_vfio_set_file(struct kvm_device *dev, long attr,
-> > >   	return -ENXIO;
-> > >   }
-> > > +static int kvm_dev_tsm_bind(struct kvm_device *dev, void __user *arg)
-> > > +{
-> > > +	struct kvm_vfio *kv = dev->private;
-> > > +	struct kvm_vfio_tsm_bind tb;
-> > > +	struct kvm_vfio_tdi *ktdi;
-> > > +	struct vfio_device *vdev;
-> > > +	struct fd fdev;
-> > > +	int ret;
-> > > +
-> > > +	if (copy_from_user(&tb, arg, sizeof(tb)))
-> > > +		return -EFAULT;
-> > > +
-> > > +	ktdi = kzalloc(sizeof(*ktdi), GFP_KERNEL_ACCOUNT);
-> > > +	if (!ktdi)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	fdev = fdget(tb.devfd);
-> > > +	if (!fdev.file)
-> > > +		return -EBADF;
-> > > +
-> > > +	ret = -ENOENT;
-> > > +
-> > > +	mutex_lock(&kv->lock);
-> > > +
-> > > +	vdev = kvm_vfio_file_device(fdev.file);
-> > > +	if (vdev) {
-> > > +		ret = kvm_arch_tsm_bind(dev->kvm, vdev->dev, tb.guest_rid);
-> > > +		if (!ret) {
-> > > +			ktdi->vdev = vdev;
-> > > +			list_add_tail(&ktdi->node, &kv->tdi_list);
-> > > +		} else {
-> > > +			vfio_put_device(vdev);
-> > > +		}
-> > > +	}
-> > > +
-> > > +	fdput(fdev);
-> > > +	mutex_unlock(&kv->lock);
-> > > +	if (ret)
-> > > +		kfree(ktdi);
-> > > +
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +static int kvm_dev_tsm_unbind(struct kvm_device *dev, void __user *arg)
-> > > +{
-> > > +	struct kvm_vfio *kv = dev->private;
-> > > +	struct kvm_vfio_tsm_bind tb;
-> > > +	struct kvm_vfio_tdi *ktdi;
-> > > +	struct vfio_device *vdev;
-> > > +	struct fd fdev;
-> > > +	int ret;
-> > > +
-> > > +	if (copy_from_user(&tb, arg, sizeof(tb)))
-> > > +		return -EFAULT;
-> > > +
-> > > +	fdev = fdget(tb.devfd);
-> > > +	if (!fdev.file)
-> > > +		return -EBADF;
-> > > +
-> > > +	ret = -ENOENT;
-> > > +
-> > > +	mutex_lock(&kv->lock);
-> > > +
-> > > +	vdev = kvm_vfio_file_device(fdev.file);
-> > > +	if (vdev) {
-> > > +		list_for_each_entry(ktdi, &kv->tdi_list, node) {
-> > > +			if (ktdi->vdev != vdev)
-> > > +				continue;
-> > > +
-> > > +			kvm_arch_tsm_unbind(dev->kvm, vdev->dev);
-> > > +			list_del(&ktdi->node);
-> > > +			kfree(ktdi);
-> > > +			vfio_put_device(vdev);
-> > > +			ret = 0;
-> > > +			break;
-> > > +		}
-> > > +		vfio_put_device(vdev);
-> > > +	}
-> > > +
-> > > +	fdput(fdev);
-> > > +	mutex_unlock(&kv->lock);
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +static int kvm_vfio_set_device(struct kvm_device *dev, long attr,
-> > > +			       void __user *arg)
-> > > +{
-> > > +	switch (attr) {
-> > > +	case KVM_DEV_VFIO_DEVICE_TDI_BIND:
-> > > +		return kvm_dev_tsm_bind(dev, arg);
-> > 
-> > I think the TDI bind operation should be under the control of the device
-> > owner (i.e. VFIO driver), rather than in this bridge driver.
+> How about output the correct num_cpuid_config to userspace as a hint,
+> to avoid user blindly retries.
+
+Hmm do we want to add also positive numbers for errors for this function?
+
+> > +	for (i = 0; i < td_conf->num_cpuid_config; i++) {
+> > +		struct kvm_tdx_cpuid_config cpuid_config = {
+> > +			.leaf = (u32)td_conf->cpuid_config_leaves[i],
+> > +			.sub_leaf = td_conf->cpuid_config_leaves[i] >> 32,
+> > +			.eax = (u32)td_conf->cpuid_config_values[i].eax_ebx,
+> > +			.ebx = td_conf->cpuid_config_values[i].eax_ebx >> 32,
+> > +			.ecx = (u32)td_conf->cpuid_config_values[i].ecx_edx,
+> > +			.edx = td_conf->cpuid_config_values[i].ecx_edx >> 32,
+> > +		};
+> > +
+> > +		if (copy_to_user(&(user_caps->cpuid_configs[i]), &cpuid_config,
+>                                   ^                           ^
 > 
-> This is a valid point, although this means teaching VFIO about the KVM
-> lifetime (and KVM already holds references to VFIO groups) and
-
-Not sure if I understand, VFIO already knows KVM lifetime via
-vfio_device_get_kvm_safe(), is it?
-
-> guest BDFns (which have no meaning for VFIO in the host kernel).
-
-KVM is not aware of the guest BDF today.
-
-I think we need to pass a firmware recognizable TDI identifier, which
-is actually a magic number and specific to vendors. For TDX, it is the
-FUNCTION_ID. So I didn't think too much to whom the identifier is
-meaningful.
-
+> I think the brackets could be removed.
 > 
-> > The TDI bind
-> > means TDI would be transitioned to CONFIG_LOCKED state, and a bunch of
-> > device configurations breaks the state (TDISP spec 11.4.5/8/9). So the
-> > VFIO driver should be fully aware of the TDI bind and manage unwanted
-> > breakage.
+> > +					sizeof(struct kvm_tdx_cpuid_config))) {
 > 
-> VFIO has no control over TDI any way, cannot even know what state it is in
-> without talking to the firmware.
+> sizeof(cpuid_config) could be better.
 
-I think VFIO could talk to the firmware, that's part of the reason we are
-working on the TSM module independent to KVM.
+Looks like these both already changed in a later patch
+"KVM: TDX: Report kvm_tdx_caps in KVM_TDX_CAPABILITIES".
 
-> When TDI goes into ERROR, this needs to be
-> propagated to the VM. At the moment (afaik) it does not tell the
+Regards,
 
-I assume when TDISP ERROR happens, an interrupt (e.g. AER) would be sent
-to OS and VFIO driver is the one who handles it in the first place. So
-maybe there has to be some TDI stuff in VFIO?
-
-Thanks,
-Yilun
-
-> userspace/guest about IOMMU errors and it probably should but the existing
-> mechanism should be able to do so. Thanks,
-> 
-> 
-> > 
-> > Thanks,
-> > Yilun
-> 
-> -- 
-> Alexey
-> 
+Tony
 
