@@ -1,82 +1,83 @@
-Return-Path: <kvm+bounces-25497-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25498-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F60965FC2
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 12:59:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11174965FC4
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 13:00:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02A642834C8
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 10:59:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB177283344
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 11:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A786192D82;
-	Fri, 30 Aug 2024 10:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67A5192581;
+	Fri, 30 Aug 2024 10:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lxShZy/y"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="M75mCLYL"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2066.outbound.protection.outlook.com [40.107.243.66])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2051.outbound.protection.outlook.com [40.107.237.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA8018FDB3;
-	Fri, 30 Aug 2024 10:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F1018FDB3;
+	Fri, 30 Aug 2024 10:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725015552; cv=fail; b=J3/97DSVAENQB7y6HUWRS5K8uyMWCrao4yfnR+1ho7K6YeT3FqOD1RhS4iWNrHUTkxBX1GzU73hOTf3o8f4mL1R7kp0kYBJkzsrEJHdVXlT3NTqglCdoxhfH5IyzmEN1/iBEwC7n8wAV+KGZfBz1nmXnGxabNffQ1qKW4ImWHXk=
+	t=1725015562; cv=fail; b=NBn+pIXbCpqwZaYRRrgKuyZQmyRZkvaFnvhoedGm82VFPVLoumTyRKmFx3mSTwhnB72Db8/M6kp9OhaF0LFOHb0Ymxaxw7s4aZlXDV3KhRCKkM/jep4FRHj0OkfF6AlQJgwpB1fOB/pHkdlESsR+q/F4yZH2tlnBNfzPubJnPkA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725015552; c=relaxed/simple;
-	bh=tn4s4tBiYpj0n42TJGgEmRompR6wwKhbIOTQtGI/ciY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=spXJiQ2FZq47VQt78mB9puQfF++3aMx/GMOw3UTKuR1ff5WBuKCXUy5KvnzLEUOnsZdLdqjpfMzI+9F747ye9qpcxgdpPc4cXiDBP8P0MVhqqm0OLjkqO7pNwyU3rfiCLrXHWgFnawcrJfD3Yua7M596mWf0C4sn9+0FewgdN2U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lxShZy/y; arc=fail smtp.client-ip=40.107.243.66
+	s=arc-20240116; t=1725015562; c=relaxed/simple;
+	bh=JhYwu9b2jQ5taeRpJIv4YfqwMBmO2TEq/EcPU1sEI8c=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kR+zFGXDqnHYebvU7f5amZpau/Mkw4qL4dGtQywZrAA9EvhM6ycQETU7lnjGZ331UUCkIJejs3U4jKNyeZyEDijxWboWYQfYll/Bs5K+2sVTJOO088SRpfTDIcZ5b4fAE6ChmzudpN/6rSLra6iH48LtdH/D5hUm6SOCGCE7qUM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=M75mCLYL; arc=fail smtp.client-ip=40.107.237.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Mi0yTSCQduFN1UHeoASwb8MFwqD+wwMQUEmV2OvUQZMGIDRA1UaGlsMzC4QrUMWHNmxbTxAoEQYVcxaXuhZaANS6BCZTPFO+mgvFpb7zP+nFLnlsjYCpb8vi+m6VJ5u0Q382d5gTR4LwSvJvvID3lKKD5nspOJlvUB2R93VSrlm1FFoqGbfX9PiK+YU2P91+zrCBpZPq1aFTRXM2Ag/WzXAZTdycW0EnT69snyKw53fGVnIRaTida0vN1pyd/3kHeFmOoEaMiUY687jGJE0r4xXdp/MXDkekefTjJ1XRnisc0WrNnHlHfvPm5oMaoJCjUolHI2hr45t7KbeyQXQbIA==
+ b=FTMXIwanUIMFHDNwUj1wpgAHeG5T0X90v+l8k5Iox9Pf6eQIlDVhRg8Ip3U06PuYw6IqIDvdy04YILZJI/4yqPkmrScB5BhjrAW/4sqAosSwG/oQB3m8FDUmpSdsLGRVKeADisE2hSJ4NS15km8LKpkJhJfHJyvlPBKd/ygAhHdsOHHbBfNM4GMEOpZ2Rm99DKFkBFJzCkcTuK9LR5KjY+9sN+8M3dN6yB/b5Md3WFRhdzJL1ImT9JC+FM3sw7bt5PokR9efe096pguW6ZbZPQarFvTD84d3OCJtLryfAKLmuDyfUncSiWnbJ8L/o2RMHpaMSEaPKkXydmP4KqAdSQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=egFs1+3kyUNJg/u17qwVCGzVrA02WuTse/J9FhA3Kvo=;
- b=oUINRjOKIg9LPp6gtBfUhhqJR1tq57G7xDlKssgoBYrnIS70K8xJUD+Ayp/Ef8NH2W7nzIoZlMQWUonoypL4wZb3XndVuCzAEno2oPKI0wuV7RMSS7wreAJp34KZ+Yf7JNXGeRnmClvdqqiqokVQamrlzx4sxK4Y4+NBtMoLZyIXQLel+rVCfu4upg1nNoz0f/cI5rMUw2UKPV9uAefBM6FXfNJtlQ1bOA70/4x36/EPkW5V+EZT1ZzfFpPTvDKl0lhE7eLign+hL9nZbNFM23rm7AGmWYj6U8UsELTC3J3BjRYgZIPRggRP1GdXDP4ejuaNPzM/ebBao8kMaYUOJw==
+ bh=lI4VPs6YjSGudOBwsqJySD9gzp3FRPAJISfUi3TigDs=;
+ b=iHC/XDhtoGkttSZqoPJtmubMCy/usxwoMmx4AKDOEd1G6BR17hC4M2aema3hMoHQtdVA1ofViZa3cIL4C1GCbledTO6ttTPxZPM9yz2sqwjxwj9R8nDh7riGfj/E1fV6Dcw1kmRQi7rvCUZVplSjczhSkw1cwSJBR9w4v64yGNcYegN0USxQ1OB+ArMrkRnMlvH/43ai7QpsskIWxB7KmOGREI4XqDuB61hReEuR6zByNhyHGbuxdkTKIcW5WwdyuUn0eQFxZlTHp52em6ZHOfvj5/zVnOum8JQzhn6djIjQt99m3NsKMgdAdTR5BZVGGoN1CezDVDR/cFSH7hQEcA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=egFs1+3kyUNJg/u17qwVCGzVrA02WuTse/J9FhA3Kvo=;
- b=lxShZy/yy81WK6G82WZV5/ywz640uqL1J2UAbaSSs0Ywdrq8TDIUASyWoramnx32DhwI5c8TsNjLtdv8dyqH2GlWOMV+jYnPWYqKEWkv/NSuK33EiBjNvyEG0PXLY5x6tXIsV4s2s787bwghc5fQtXbtmZ+73TRCzmL3GyFq0NDh/hmGLhWoGr3qa3+bK+Jf0KWI+TOfe+vpeaqKJrfomhr0MUICrLGuvME//hHYeg8FVJ82J6hXg9N86978MQEm+o8wYmqfrQxLZIdqahqqXLypbBUqyH3W4qQcX1riQsJqkbWaysudRDwbeOX6qddzd/OHDN6SIIcYOImSHQ/NAg==
-Received: from MN2PR22CA0001.namprd22.prod.outlook.com (2603:10b6:208:238::6)
- by BL1PR12MB5899.namprd12.prod.outlook.com (2603:10b6:208:397::19) with
+ bh=lI4VPs6YjSGudOBwsqJySD9gzp3FRPAJISfUi3TigDs=;
+ b=M75mCLYL954KjPROJegPoPSYD3I34+hfbAoZvjtfro8IIaZuhUd2kzlDwA7gK98PZgAvkOw8NH8+OxveXX0wMJwy6a/d1jXNAaeLBODo/SmwbYpTgmYXBG7vU2ERjKtI1hduH2AiGzC3yFlYCCuUsGkebSZiFkm9gAu82PeY752LfmAoBua1fJNFHodDJxeJtVxkMW7J7APs4Oa6gp8IJCMKWLqPVc/GMq30JMHfweS2mJDcNCxSdgsuhjqqHxpMDYmagmxDQHeaLHY+X0H2Kyq5Vj1uKlJz2Ezq6pr4LtmPxcq7DFhVn41pNUkLnDKP8Lcep3aKec7yPBzzTWL7jA==
+Received: from PH1PEPF000132F8.NAMP220.PROD.OUTLOOK.COM (2603:10b6:518:1::29)
+ by PH8PR12MB8605.namprd12.prod.outlook.com (2603:10b6:510:1cc::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.28; Fri, 30 Aug
- 2024 10:59:06 +0000
-Received: from CH2PEPF000000A0.namprd02.prod.outlook.com
- (2603:10b6:208:238:cafe::f2) by MN2PR22CA0001.outlook.office365.com
- (2603:10b6:208:238::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.28 via Frontend
- Transport; Fri, 30 Aug 2024 10:59:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 2024 10:59:15 +0000
+Received: from CY4PEPF0000E9D6.namprd05.prod.outlook.com
+ (2a01:111:f403:f912::5) by PH1PEPF000132F8.outlook.office365.com
+ (2603:1036:903:47::3) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21 via Frontend
+ Transport; Fri, 30 Aug 2024 10:59:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH2PEPF000000A0.mail.protection.outlook.com (10.167.244.26) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9D6.mail.protection.outlook.com (10.167.241.69) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.13 via Frontend Transport; Fri, 30 Aug 2024 10:59:06 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.7918.13 via Frontend Transport; Fri, 30 Aug 2024 10:59:14 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 30 Aug
- 2024 03:58:56 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ 2024 03:59:03 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 30 Aug
- 2024 03:58:56 -0700
+ 2024 03:59:02 -0700
 Received: from c-237-113-220-225.mtl.labs.mlnx (10.127.8.12) by
  mail.nvidia.com (10.129.68.6) with Microsoft SMTP Server id 15.2.1544.4 via
- Frontend Transport; Fri, 30 Aug 2024 03:58:53 -0700
+ Frontend Transport; Fri, 30 Aug 2024 03:58:59 -0700
 From: Dragos Tatulea <dtatulea@nvidia.com>
 To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
 	Eugenio Perez Martin <eperezma@redhat.com>, Si-Wei Liu
@@ -84,135 +85,255 @@ To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
 	<gal@nvidia.com>
 CC: Dragos Tatulea <dtatulea@nvidia.com>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, Parav Pandit <parav@nvidia.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>
-Subject: [PATCH vhost v2 0/7] vdpa/mlx5: Optimze MKEY operations
-Date: Fri, 30 Aug 2024 13:58:31 +0300
-Message-ID: <20240830105838.2666587-2-dtatulea@nvidia.com>
+	<xuanzhuo@linux.alibaba.com>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: [PATCH vhost v2 1/7] vdpa/mlx5: Create direct MKEYs in parallel
+Date: Fri, 30 Aug 2024 13:58:32 +0300
+Message-ID: <20240830105838.2666587-3-dtatulea@nvidia.com>
 X-Mailer: git-send-email 2.45.1
+In-Reply-To: <20240830105838.2666587-2-dtatulea@nvidia.com>
+References: <20240830105838.2666587-2-dtatulea@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF000000A0:EE_|BL1PR12MB5899:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5be214a2-7cb9-4835-38ad-08dcc8e2c4a3
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D6:EE_|PH8PR12MB8605:EE_
+X-MS-Office365-Filtering-Correlation-Id: 470f05b3-dbdd-46fa-7a3c-08dcc8e2c983
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?K2RSMGxQV1FXRmZkZktwcWJRdVFvaU1ROTUrSUdKeGlzM2cxbUlmNy9QMTdj?=
- =?utf-8?B?QkEzbzIyNnVzc2NOcHJmQ1dORjdZUFhCKyt4d2dkY05QUEprNlFnQmxLR2dZ?=
- =?utf-8?B?WDFVWmdUVXFjQWcwbmlqc0VoQ0gweGhGYWprZi9lQ1I5N1U5YllOemt1a29I?=
- =?utf-8?B?eUt3TFp0QVdyV3R3SnBEUXFEbTlicXF2YVJISCsyVmlibmM5dkNOemJNcE1h?=
- =?utf-8?B?NXU0aWpRbXFXbytoRnNsaENEbm8wVVFtYmFPdDY0WFVZUW5GSm5KQk5YYWdz?=
- =?utf-8?B?ZEE1aG1ZWTdjYm85eFY4MDRhTnkvVGlBcnpCdTZCOWtqanN1WVo5dnBQQkxm?=
- =?utf-8?B?TDhrVmkydFg0YVM0VW1sdHp4bVRPZ21XNFd4T3daU1FsZFA5SzFWenova1Zq?=
- =?utf-8?B?VWp6TzdZZGlJczRGM2duemFSWjZ4V1lSUy9WR212WFdjbFJoOW55Q3BqaGt3?=
- =?utf-8?B?UEhDUi9STFE2eHkwOG1XWjVlS3hJZlRVSjMzVnorbU1zY3VTYmJGTDg2RkV5?=
- =?utf-8?B?c2t6dVg2bDFLR29sT3BiWFZjMGY4eko1cEVPMForK3IwRFRIMzJXSm9nUnBC?=
- =?utf-8?B?bGc0MEpkZUlkdjBBZ3RWcDRlcDdBV2NObWQyWVJjZDNwcjhsemlScDVFRkxN?=
- =?utf-8?B?RlpqbE1lc2VxOFVkTENkbENiVzl2WWlpd3llYzVCbU1kVHYrYk9ka3lXZU9E?=
- =?utf-8?B?UmxXRDZzQy8zMjduc0NzK3ljL0x3M0xPRzl4Unl1Q0UreHNpVWxkMDl4amFh?=
- =?utf-8?B?ODRtdGtRbTlLVzNWUU5OMTdZSitxU3NXWWJDWjd4dFA5TjZlMTdRcnkzb3FL?=
- =?utf-8?B?Y29Nd1UzRlB3cjFGSnVtUjVMbFoyQnVRNjY5L3JhRTBzYW5TNFVIWkg2MU4y?=
- =?utf-8?B?TDVXWHNyZWg0R0FIbldqWWFxSHQwM0dYSkJNMVhmQk1HYlFaaEo4OFpPRUp2?=
- =?utf-8?B?dlYyQzJLZ25ZVHBGUEczUDRqeU5FWG1oTGRRcllpK2lLdnJ0ZnEwMnJZN3hB?=
- =?utf-8?B?TllEWXRzTzlNNTRQaStYYno1SDVIbFV4eEFKcms4TWxXL0xRM2gxMGZaanRp?=
- =?utf-8?B?UkpwbGZZSTFBTlErejZFb29LeEs3azlnN3hwcWh5MmgzZTU2ejEzc1NpUGxC?=
- =?utf-8?B?aE1qa1lFeEp4bUdNT1JsZU1TclRSKzAvYU4zL0hOWlUzRlpvaVVBY0J2Q0Vr?=
- =?utf-8?B?THRZZG8xcmVzdHc2VmE3cC9pampmc0ZCeURzQk0yNHBkNUdnbmYxK1NUUFpq?=
- =?utf-8?B?WGc3cVJwSzNyLzlJcVpBcmxjWXI4N3k0YTRmQXkxOHBZWWhUamtNYnU1SXh4?=
- =?utf-8?B?SE5VaW5laEw0eWJOcGhKd1NIa0NqOTJEai90b0tUdDN5RS9XeHAyRCtkSDJY?=
- =?utf-8?B?VnA0SlJXUU5XV0xjenh6SENrdmxSTjd2SnA0cG1sTjlGZENLS0NRR1pNcDVK?=
- =?utf-8?B?aFVlaTdlZ1U0OTI2SkZVZklETnphNCtld3V4QWZCWGIrYVFsWmZnS084a0lw?=
- =?utf-8?B?ZnA5dzhudTdzcmMzQ3hyL1VBMnNxR1ZHbmdjUzgzUUFqeU5BTHdXQnNLT2tI?=
- =?utf-8?B?d1RwY0Nmc1ZEYTJ6SVFESlFGcHdXZThGd1VTUThxenhKbFBuRER6VnA4bHY5?=
- =?utf-8?B?d0IwaUZuZlFBWnNYY3BiU295b3lYNnJ3T01jazZuNE1DOFpyRWZ0NFRjV3k5?=
- =?utf-8?B?eVpUaGE4cms3RjBWaWFLY3RtTmNRdjk5TCtqUlIydHVFRml5cGhsVmg1bmox?=
- =?utf-8?B?S1l3TWpKeEh5L2xDUDRMVTZ6VEVZekR5dm42WUllYW5sMW9WZ2Npbitublhk?=
- =?utf-8?B?MTdPczUzeDh2NnZ0WFR2TCsrd0htOGRJajBqRGJIVmRWM0phL1hsc1ZTWXFn?=
- =?utf-8?B?MWJwMHlMQ3JmRnBuVnZ3TGdFMGFkSjBHT3hyelE5SklTM05KelNQaHZ5ek5z?=
- =?utf-8?Q?G9J/mdAg31Jp1jFq9GZpchvZK7Inxp80?=
+	=?us-ascii?Q?Jgan9NRarsWUntPqiRdx40hOyp9ea7e8V62zjYCsW9wexXExm41WVUU8KPms?=
+ =?us-ascii?Q?zIcX4gaF/H3zQjklDauYtx1GLT8Jb3Ue95nK5fUoH0gG/77Woujnraz2W8iP?=
+ =?us-ascii?Q?NQSzo1aoHsiNR184obzzvQ//fFwzm1saeuVZdvTpaDI/ZySEjxYLBEwID0jg?=
+ =?us-ascii?Q?mx3HjlPbiied8PO2jTOu9PB1QFAmdZo/C/nCRBTzNLCwmqp0Jqy5lEerWorQ?=
+ =?us-ascii?Q?11cP81UfbpVZXNdfckQzBpS0YksTccpUxuq5IBp/IX/kJRuTUXdwze7P95JH?=
+ =?us-ascii?Q?OmuKLzlGGKarTBgZCa0/WuSswmLRoCoK2emREq0whb2gkBRssEe8kYtKQML6?=
+ =?us-ascii?Q?ajlkKtTUi7D/5+yCjH8vGuEQDC2aqnqwBNpBWp7Z95d98S+mPTEWnP0N3/gu?=
+ =?us-ascii?Q?T1kZDAfztxH7Dc83GAuT0tiCh9eLfgHHRPiK+PLIcGu/6QX6ysCePHHykQdy?=
+ =?us-ascii?Q?QKTM/oYX2c2q7rTd/A7CqpcNwBWyYpSTP9cyS3oiau2t8KS0RMzliErhr4Mg?=
+ =?us-ascii?Q?atglbDDaJ7tWUH4egX5TpCYOO7SUMS/DryZgzQQ1NdRLv1RfOncSsv1GZ2eJ?=
+ =?us-ascii?Q?iQ+wz8uq3+IyR2O6ZFkK9xbIfGEQISYh8fZUjK5fIcgupIeduq1BWlLW4lwn?=
+ =?us-ascii?Q?LoQlwo2sZJLEYfm/E3HCi4qrTcYTmV11txsO9WwVBAwEZ+6tTEBEZLPWF+2p?=
+ =?us-ascii?Q?bA3SO0fPf1srMeIwkyRC3A46g9Nuj3H/eOWkt2g4uhPB9PUB3bE3SJTsfNuD?=
+ =?us-ascii?Q?eKXn05SkJmdWhvO4r16p+X6leoVAqpl3XIZUFszX4Ur3ZgpXMJ/wHXc2lSnW?=
+ =?us-ascii?Q?vc+52C/ghaIYLAx3ggGPhFdiXWvxWeJoegcatv/z/ScqOdvLv6st7T0+ECoe?=
+ =?us-ascii?Q?BGF9qEJIiIJn+Q9bKcrvpCXvAmMCWsf0V93tUTrXT1vIIyqdO0OaGGlRMImJ?=
+ =?us-ascii?Q?rkffC2Oxe/XuExcQG6/avJuTThx3bbjM+Xbf3TJ7EFWeq0HtIb2/2UIHt1Xk?=
+ =?us-ascii?Q?aPknuZ7I8iDHhVOjXdKp/6i5r9aKNaIXeqD1WCwWJo0ei50U8fKBnSCz5u3l?=
+ =?us-ascii?Q?N5fP3ycSiugrWHmAID+ZW2N+cDNHgeKg13jDsPMJAzpi+gGJst7FeMf/eTPu?=
+ =?us-ascii?Q?/q45Mebk5Ia5rSX9ghOZKeYEWL+T7USDZOyHPKNl5gQzguf72CDtFtQd1qTN?=
+ =?us-ascii?Q?HGz3HK6njC19yrnQqLGiDCfdO5kROo7pWe6Y6ehTSr06DMUTuRsaFavtCxIj?=
+ =?us-ascii?Q?Jw02Q1q5l835vXs/V2wAzapD+qzY24ZO+FvhTg2LswveZYQR7ZmwF//S+wTU?=
+ =?us-ascii?Q?xPkOFrT+bAY63xFM70kZkI+8lXtD2+uRAhHsnTxO2GONA4bpARUnHjJG4dD0?=
+ =?us-ascii?Q?RNOC1W25xD76M67pygH8YbmTpPIZ3vtvlr7A+HjzOhot3GE1GS4B1TWMds01?=
+ =?us-ascii?Q?pm/843vlChWWLyFZsPcz8ZnZuaHB42tQ?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2024 10:59:06.5400
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2024 10:59:14.7362
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5be214a2-7cb9-4835-38ad-08dcc8e2c4a3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 470f05b3-dbdd-46fa-7a3c-08dcc8e2c983
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF000000A0.namprd02.prod.outlook.com
+	CY4PEPF0000E9D6.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5899
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB8605
 
-This series improves the time of .set_map() operations by parallelizing
-the MKEY creation and deletion for direct MKEYs. Looking at the top
-level MKEY creation/deletion functions, the following improvement can be
-seen:
+Use the async interface to issue MTT MKEY creation.
+Extra care is taken at the allocation of FW input commands
+due to the MTT tables having variable sizes depending on
+MR.
 
-|-------------------+-------------|
-| operation         | improvement |
-|-------------------+-------------|
-| create_user_mr()  | 3-5x        |
-| destroy_user_mr() | 8x          |
-|-------------------+-------------|
+The indirect MKEY is still created synchronously at the
+end as the direct MKEYs need to be filled in.
 
-The last part of the series introduces lazy MKEY deletion which
-postpones the MKEY deletion to a later point in a workqueue.
+This makes create_user_mr() 3-5x faster, depending on
+the size of the MR.
 
-As this series and the previous ones were targeting live migration,
-we can also observe improvements on this front:
-
-|-------------------+------------------+------------------|
-| Stage             | Downtime #1 (ms) | Downtime #2 (ms) |
-|-------------------+------------------+------------------|
-| Baseline          | 3140             | 3630             |
-| Parallel MKEY ops | 1200             | 2000             |
-| Deferred deletion | 1014             | 1253             |
-|-------------------+------------------+------------------|
-
-Test configuration: 256 GB VM, 32 CPUs x 2 threads per core, 4 x mlx5
-vDPA devices x 32 VQs (16 VQPs)
-
-This series must be applied on top of the parallel VQ suspend/resume
-series [0].
-
-[0] https://lore.kernel.org/all/20240816090159.1967650-1-dtatulea@nvidia.com/
-
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
 ---
-v2:
-- Swapped flex array usage for plain zero length array in first patch.
-- Updated code to use Scope-Based Cleanup Helpers where appropriate
-  (only second patch).
-- Added macro define for MTT alignment in first patch.
-- Improved commit messages/comments based on review comments.
-- Removed extra newlines.
----
+ drivers/vdpa/mlx5/core/mr.c | 120 +++++++++++++++++++++++++++++-------
+ 1 file changed, 98 insertions(+), 22 deletions(-)
 
-Dragos Tatulea (7):
-  vdpa/mlx5: Create direct MKEYs in parallel
-  vdpa/mlx5: Delete direct MKEYs in parallel
-  vdpa/mlx5: Rename function
-  vdpa/mlx5: Extract mr members in own resource struct
-  vdpa/mlx5: Rename mr_mtx -> lock
-  vdpa/mlx5: Introduce init/destroy for MR resources
-  vdpa/mlx5: Postpone MR deletion
-
- drivers/vdpa/mlx5/core/mlx5_vdpa.h |  25 ++-
- drivers/vdpa/mlx5/core/mr.c        | 288 +++++++++++++++++++++++++----
- drivers/vdpa/mlx5/core/resources.c |   3 -
- drivers/vdpa/mlx5/net/mlx5_vnet.c  |  53 +++---
- 4 files changed, 296 insertions(+), 73 deletions(-)
-
+diff --git a/drivers/vdpa/mlx5/core/mr.c b/drivers/vdpa/mlx5/core/mr.c
+index 4758914ccf86..e72fb11e353d 100644
+--- a/drivers/vdpa/mlx5/core/mr.c
++++ b/drivers/vdpa/mlx5/core/mr.c
+@@ -49,17 +49,18 @@ static void populate_mtts(struct mlx5_vdpa_direct_mr *mr, __be64 *mtt)
+ 	}
+ }
+ 
+-static int create_direct_mr(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_direct_mr *mr)
++struct mlx5_create_mkey_mem {
++	u8 out[MLX5_ST_SZ_BYTES(create_mkey_out)];
++	u8 in[MLX5_ST_SZ_BYTES(create_mkey_in)];
++	__be64 mtt[];
++};
++
++static void fill_create_direct_mr(struct mlx5_vdpa_dev *mvdev,
++				  struct mlx5_vdpa_direct_mr *mr,
++				  struct mlx5_create_mkey_mem *mem)
+ {
+-	int inlen;
++	void *in = &mem->in;
+ 	void *mkc;
+-	void *in;
+-	int err;
+-
+-	inlen = MLX5_ST_SZ_BYTES(create_mkey_in) + roundup(MLX5_ST_SZ_BYTES(mtt) * mr->nsg, 16);
+-	in = kvzalloc(inlen, GFP_KERNEL);
+-	if (!in)
+-		return -ENOMEM;
+ 
+ 	MLX5_SET(create_mkey_in, in, uid, mvdev->res.uid);
+ 	mkc = MLX5_ADDR_OF(create_mkey_in, in, memory_key_mkey_entry);
+@@ -76,18 +77,25 @@ static int create_direct_mr(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_direct
+ 	MLX5_SET(create_mkey_in, in, translations_octword_actual_size,
+ 		 get_octo_len(mr->end - mr->start, mr->log_size));
+ 	populate_mtts(mr, MLX5_ADDR_OF(create_mkey_in, in, klm_pas_mtt));
+-	err = mlx5_vdpa_create_mkey(mvdev, &mr->mr, in, inlen);
+-	kvfree(in);
+-	if (err) {
+-		mlx5_vdpa_warn(mvdev, "Failed to create direct MR\n");
+-		return err;
+-	}
+ 
+-	return 0;
++	MLX5_SET(create_mkey_in, in, opcode, MLX5_CMD_OP_CREATE_MKEY);
++	MLX5_SET(create_mkey_in, in, uid, mvdev->res.uid);
++}
++
++static void create_direct_mr_end(struct mlx5_vdpa_dev *mvdev,
++				 struct mlx5_vdpa_direct_mr *mr,
++				 struct mlx5_create_mkey_mem *mem)
++{
++	u32 mkey_index = MLX5_GET(create_mkey_out, mem->out, mkey_index);
++
++	mr->mr = mlx5_idx_to_mkey(mkey_index);
+ }
+ 
+ static void destroy_direct_mr(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_direct_mr *mr)
+ {
++	if (!mr->mr)
++		return;
++
+ 	mlx5_vdpa_destroy_mkey(mvdev, mr->mr);
+ }
+ 
+@@ -179,6 +187,76 @@ static int klm_byte_size(int nklms)
+ 	return 16 * ALIGN(nklms, 4);
+ }
+ 
++#define MLX5_VDPA_MTT_ALIGN 16
++
++static int create_direct_keys(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_mr *mr)
++{
++	struct mlx5_vdpa_async_cmd *cmds;
++	struct mlx5_vdpa_direct_mr *dmr;
++	int err = 0;
++	int i = 0;
++
++	cmds = kvcalloc(mr->num_directs, sizeof(*cmds), GFP_KERNEL);
++	if (!cmds)
++		return -ENOMEM;
++
++	list_for_each_entry(dmr, &mr->head, list) {
++		struct mlx5_create_mkey_mem *cmd_mem;
++		int mttlen, mttcount;
++
++		mttlen = roundup(MLX5_ST_SZ_BYTES(mtt) * dmr->nsg, MLX5_VDPA_MTT_ALIGN);
++		mttcount = mttlen / sizeof(cmd_mem->mtt[0]);
++		cmd_mem = kvcalloc(1, struct_size(cmd_mem, mtt, mttcount), GFP_KERNEL);
++		if (!cmd_mem) {
++			err = -ENOMEM;
++			goto done;
++		}
++
++		cmds[i].out = cmd_mem->out;
++		cmds[i].outlen = sizeof(cmd_mem->out);
++		cmds[i].in = cmd_mem->in;
++		cmds[i].inlen = struct_size(cmd_mem, mtt, mttcount);
++
++		fill_create_direct_mr(mvdev, dmr, cmd_mem);
++
++		i++;
++	}
++
++	err = mlx5_vdpa_exec_async_cmds(mvdev, cmds, mr->num_directs);
++	if (err) {
++
++		mlx5_vdpa_err(mvdev, "error issuing MTT mkey creation for direct mrs: %d\n", err);
++		goto done;
++	}
++
++	i = 0;
++	list_for_each_entry(dmr, &mr->head, list) {
++		struct mlx5_vdpa_async_cmd *cmd = &cmds[i++];
++		struct mlx5_create_mkey_mem *cmd_mem;
++
++		cmd_mem = container_of(cmd->out, struct mlx5_create_mkey_mem, out);
++
++		if (!cmd->err) {
++			create_direct_mr_end(mvdev, dmr, cmd_mem);
++		} else {
++			err = err ? err : cmd->err;
++			mlx5_vdpa_err(mvdev, "error creating MTT mkey [0x%llx, 0x%llx]: %d\n",
++				dmr->start, dmr->end, cmd->err);
++		}
++	}
++
++done:
++	for (i = i-1; i >= 0; i--) {
++		struct mlx5_create_mkey_mem *cmd_mem;
++
++		cmd_mem = container_of(cmds[i].out, struct mlx5_create_mkey_mem, out);
++		kvfree(cmd_mem);
++	}
++
++	kvfree(cmds);
++	return err;
++}
++
+ static int create_indirect_key(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_mr *mr)
+ {
+ 	int inlen;
+@@ -279,14 +357,8 @@ static int map_direct_mr(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_direct_mr
+ 		goto err_map;
+ 	}
+ 
+-	err = create_direct_mr(mvdev, mr);
+-	if (err)
+-		goto err_direct;
+-
+ 	return 0;
+ 
+-err_direct:
+-	dma_unmap_sg_attrs(dma, mr->sg_head.sgl, mr->nsg, DMA_BIDIRECTIONAL, 0);
+ err_map:
+ 	sg_free_table(&mr->sg_head);
+ 	return err;
+@@ -401,6 +473,10 @@ static int create_user_mr(struct mlx5_vdpa_dev *mvdev,
+ 	if (err)
+ 		goto err_chain;
+ 
++	err = create_direct_keys(mvdev, mr);
++	if (err)
++		goto err_chain;
++
+ 	/* Create the memory key that defines the guests's address space. This
+ 	 * memory key refers to the direct keys that contain the MTT
+ 	 * translations
 -- 
 2.45.1
 
