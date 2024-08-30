@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-25503-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25504-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF6C965FD4
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 13:01:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC38F965FD8
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 13:02:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35899284865
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 11:01:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66FD41F235FC
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 11:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C75A19ABCE;
-	Fri, 30 Aug 2024 10:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21B61A4B8F;
+	Fri, 30 Aug 2024 10:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="S9SSCK9e"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Zy3lpdRZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2086.outbound.protection.outlook.com [40.107.237.86])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2045.outbound.protection.outlook.com [40.107.93.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812B1199FC1;
-	Fri, 30 Aug 2024 10:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551141A287B;
+	Fri, 30 Aug 2024 10:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725015580; cv=fail; b=Hkya80ozpD2W3vjdjfep4u1dYlM5JOu2ITYTyuObEavPNb/wkC8Vzus073ed1ehSj4x/+RJZjYPVIf9JfUCMWF/S760DmRzH4tcJahKBtuKUw84j6e+q3Z9F31DCTa4e9H7X0yx9w9w5uGDwW8djSsWAi0lsJFu+NxA3Vx8FPeQ=
+	t=1725015585; cv=fail; b=kS9KHDc6cbqUvo8LGkl7+IuwqaAVjt6EKiDGqxTDkvVTA4dpAmLb/MvKkgfNQe0gphOrnXQ4nRU0B7zZjX608p4Rgcj6JKK/OZDi39MoC0OQHRFaOYxIqKJq0227SM40dmXZ8p8/M+mlYAfEg55pJltCPCQxZmiV+A4IEygNZUg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725015580; c=relaxed/simple;
-	bh=/wwMlttLHDsVbK9xHunS0oIvPddiZWpVnj+K/dDI1KA=;
+	s=arc-20240116; t=1725015585; c=relaxed/simple;
+	bh=7yOK9FcltC82mZCU7xfVnl3LqAgRYMy5Wc/ISPyR8HQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PHeAJ8is4krAXeto89m+sUp5fLdSywwT6MYSK9ZTnpUb+1B1ZAgm5aYDl8en/ZnHsrV0hWuRMrzc0u59jClBBUc3EhZAqIry1E0QwSQdjalG3eug0ljSIAk+SiI0Ga6HjuOqiTFWTsb/gFPNLQYYDfI9/4EhvBBp/nbREr1L7oA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=S9SSCK9e; arc=fail smtp.client-ip=40.107.237.86
+	 MIME-Version:Content-Type; b=tm7C6OjCgiRaCyFGAZ4lEa6mieEvs3ms561LMF7BZLUR7iOXo87s40+hgthq6TE4sz53A+ifTFTkn2AJar9onlr6sErAuMCe7A0NPkIKbtdAib3i99e/nZX0ieEWrU362y5HE0+BqHCC/ytm/F3WkyBhqhB0CkoBBdS0aItoijM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Zy3lpdRZ; arc=fail smtp.client-ip=40.107.93.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=P6F6eGqEyil4hS50nKp6H9knWVEWSaXOg4iO6OgmQI5dqffWlbV0J4mHhneE4ZtE9zhFAdgiND6HENU/q+xxNdL4evTEF00qyLlXPJAHnZXB5RwMKx3zZddbxnxX6SgR0HbvhjIpDOu4uIM2Dv5koTAYnKhneoagmzEiC2oGuVLtZFZv0ijS4Yv/30iglmvL4LEBJcQejKd+mChVnc7ZzenyULbGmecJBUCPtggBszvFpvmu6qK5spvWj3JOgkm/FGxhgYw4CaeeKCr8jUaYjJDKWPfE1x2O1OA0ncSuy2Ttvx5YaDSr62ZLZJZHJP29vle8ZsMO2Oud/ynvN0G8vA==
+ b=UQtZlL4ZHpcrrw561gjANG7FkI/XKDhX0uK4QLRd3MSv6fGNDsoHyO+56USvyIIc3aUtHVkwKx2mXsjZlc1q4vxIqFmhqBo6ygEOTfacv3ViweWFQy9u0WK0v48/RvPWqe/i+1SwA4Q9vGkl0//KXk/iL1UQ9aFv10/ZgXGEk158MTwBW9i72A+f0Q8cfQfuIvb5wAqvldc6rJnydd/ZSRNrGQoDz+PvQbGnKmGC/hTzKIsSFWk9cm2FzqncBBqbvhOAb6OdbHILSa2YHQnSH94vTeYqASvGrUHyQ7IGEQj8iemHKhzuaZdwIEDUfobtXIsbO+mM77KIfsF425mIEw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iU7Aq2rGDrL2GGGmhNzGacTGEuvMlo1x3owaHepnepA=;
- b=x5Il4ytPXV3lnUGQgMfvvKo9BbcwZvS6DDWGvbTEs/65IBqtwiPXu16SZIpb6kyve7W3eiiFBCim2TlwKfQE1O8vw1Es85ZSO0JbXDx0cTKrutJtuse5XyWQ3MnLr/dkCmEzExuQeVmQeQ24pcs4deulxpWgWFxJcoNCr2SfY90AyQ/5Wz72Y/X7bfFWeEJ7K8pz28ZV7ICojzlmXXl/JMgBXfdAbDgBtgBGNgL1R80gKtbq0SJvdKrLbefGFpHG4HlpwcXjSFU5v6kxB0Zo8b5CiEaymSZOl4I0vJa0zJ+ky5oRaI3PuK3vTjqo8kmidvlP7IL5f2ACJCfD2GhRbw==
+ bh=481MRpxXPZFGiUq/tv3DyRO8i2ssxDsL/9RPJ6HgHJ4=;
+ b=LVwJOkawHiJRs2h3wSv3xIZt9bDN5V6+WLjTVOgBLSEVURGYloka+cOJZojNeRePVZNCgo/2M7snBy3tpXUr7dKdPJ4zAyqvukJaZAFMRbamArbn9SxPAt90GYhXg0drIDTzFjkZMBspsbERrurC4ntrHJ+tZBDRcJskGlLQjt+Lr1uq+S72vvNbbAq2dgFzSs4q35xDuzUi/aQ4/gDwAlPJTvtL2GQG6VKKPrlOazAoxI2phamUnL93QWDCKCdff/982UVFDVYslHeASpgrsymU0Ho/xd3PFm8VKydr7WVjOjwSj0hQ8r/HH4z4+ABypcZ/pk9S4TxzxWsd0SclnA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iU7Aq2rGDrL2GGGmhNzGacTGEuvMlo1x3owaHepnepA=;
- b=S9SSCK9eg06casC8KAimRyd+VoSK/cIAFcfR1n07UlPtPhk9S6z//6DFLyjS8IHJdoKXrmDrmg/glfclL0dF0kXd9a+r1r9ZRUQ7hXFMDvCsbfOuKnkgaaa3jcnwIOYhZO6Jbprj8h9IeriLkCCRcouY+vgNJQo3ZY+VKsSGVsGqDATWoziqDdEDKrmoQ6pUZeD6frqP/2xFr5PZUfyDwc35GUEPLLc+xYH7irT0jvsQAaL0nfM0kMHpGxWgi967863/xN3173N64b/2Hm0p86LBAPl0V5RG7Yu8MXRcFisbmsOT8dB8mCvHRIxWgAUqRHXbPeGStSbA9s9R7FpozQ==
-Received: from BN8PR03CA0030.namprd03.prod.outlook.com (2603:10b6:408:94::43)
- by IA1PR12MB7735.namprd12.prod.outlook.com (2603:10b6:208:421::8) with
+ bh=481MRpxXPZFGiUq/tv3DyRO8i2ssxDsL/9RPJ6HgHJ4=;
+ b=Zy3lpdRZH0ULTJhkY33lkV7+ohdeo58MdeS/b1hONGCKhLLnmQK9cEZ1CyKuJHkcks3tf6Aus6rsPizB/RD9iRKuQZXHYaB8beNW1vQFO7NdqFCEHOHGy9lRUPkmV5eVEd7FHhNe5WndV0QfaD9o7OcFyqpRe2z0aQT+2PVr+ajLGXn296/fvWzpQAx7fs3MkblPm3RXrSBqU0a7pHkS9B2IioOyWAmx85TW6yvgLhu9ev4cwGnhyQjOO8rbWAOPnb9F4cQzejCV+YaleoAbuO56g3vIaHmRm8KetFmEw1XizC/lCxFsMfrToWYxcz16+EctjjYoKAevSqypoOziFg==
+Received: from BN9PR03CA0459.namprd03.prod.outlook.com (2603:10b6:408:139::14)
+ by SA1PR12MB7200.namprd12.prod.outlook.com (2603:10b6:806:2bb::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.20; Fri, 30 Aug
- 2024 10:59:34 +0000
-Received: from BN2PEPF000044AC.namprd04.prod.outlook.com
- (2603:10b6:408:94:cafe::55) by BN8PR03CA0030.outlook.office365.com
- (2603:10b6:408:94::43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.28 via Frontend
- Transport; Fri, 30 Aug 2024 10:59:34 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Fri, 30 Aug
+ 2024 10:59:39 +0000
+Received: from BN2PEPF000044A5.namprd04.prod.outlook.com
+ (2603:10b6:408:139:cafe::4) by BN9PR03CA0459.outlook.office365.com
+ (2603:10b6:408:139::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.20 via Frontend
+ Transport; Fri, 30 Aug 2024 10:59:38 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,20 +64,20 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- BN2PEPF000044AC.mail.protection.outlook.com (10.167.243.107) with Microsoft
+ BN2PEPF000044A5.mail.protection.outlook.com (10.167.243.104) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.13 via Frontend Transport; Fri, 30 Aug 2024 10:59:33 +0000
+ 15.20.7918.13 via Frontend Transport; Fri, 30 Aug 2024 10:59:38 +0000
 Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 30 Aug
- 2024 03:59:21 -0700
+ 2024 03:59:24 -0700
 Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail203.nvidia.com
  (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 30 Aug
- 2024 03:59:20 -0700
+ 2024 03:59:24 -0700
 Received: from c-237-113-220-225.mtl.labs.mlnx (10.127.8.12) by
  mail.nvidia.com (10.129.68.6) with Microsoft SMTP Server id 15.2.1544.4 via
- Frontend Transport; Fri, 30 Aug 2024 03:59:17 -0700
+ Frontend Transport; Fri, 30 Aug 2024 03:59:21 -0700
 From: Dragos Tatulea <dtatulea@nvidia.com>
 To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
 	Eugenio Perez Martin <eperezma@redhat.com>, Si-Wei Liu
@@ -86,9 +86,9 @@ To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
 CC: Dragos Tatulea <dtatulea@nvidia.com>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, Parav Pandit <parav@nvidia.com>, Xuan Zhuo
 	<xuanzhuo@linux.alibaba.com>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: [PATCH vhost v2 6/7] vdpa/mlx5: Introduce init/destroy for MR resources
-Date: Fri, 30 Aug 2024 13:58:37 +0300
-Message-ID: <20240830105838.2666587-8-dtatulea@nvidia.com>
+Subject: [PATCH vhost v2 7/7] vdpa/mlx5: Postpone MR deletion
+Date: Fri, 30 Aug 2024 13:58:38 +0300
+Message-ID: <20240830105838.2666587-9-dtatulea@nvidia.com>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240830105838.2666587-2-dtatulea@nvidia.com>
 References: <20240830105838.2666587-2-dtatulea@nvidia.com>
@@ -103,176 +103,207 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044AC:EE_|IA1PR12MB7735:EE_
-X-MS-Office365-Filtering-Correlation-Id: e7e60480-b286-4bef-7e22-08dcc8e2d500
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A5:EE_|SA1PR12MB7200:EE_
+X-MS-Office365-Filtering-Correlation-Id: af183d05-a7eb-4083-d25f-08dcc8e2d7b7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?AsJcyAW2sUnzy90Ba/QnUkav9ARmhiwLpQsd2LvVArQkeIb6/4Tkx9ncV2Y1?=
- =?us-ascii?Q?0Gu6Ymf2JixaRlaUeegLDtV1n13wrKuyztyZvxk3aJBMYKyxm/Zk3XEyO3nQ?=
- =?us-ascii?Q?lmhOeDwovBs0++oDISMOdkAetWSGzjf7LSijrQgUl3WAZOka7EkfPtuAeq5Z?=
- =?us-ascii?Q?IPNYSG1Xy+sHSGLpNsgHoGoyUO188uMksn4Fcy5bGkbySNxo/gE48EnzM8r7?=
- =?us-ascii?Q?aF+MFudLpBlRr5eyVwOELzp1O9OwukdEQo9ct88JYyYMMrqB8EICWgSaYAq0?=
- =?us-ascii?Q?GSZP2rlpoEHjYxaVfWfIeVlvBeN0KeaK7UAVS1IoO98m68r22tiwkWLSN9av?=
- =?us-ascii?Q?G0ZpVD1YeDL5BksYOzEcfOuIk7IC+V48fsmcQQ/n1Ed7DuAbl5BPOFJ8GZ7+?=
- =?us-ascii?Q?gNztH6EryT3Kufs9l13sOEVzEiKHClTRb128ujsejFaN7VthSfgD3koNICme?=
- =?us-ascii?Q?d8z319ixnDdmrLZDRqdmMaJ0kpFC2phLalRjCSIcz3alQ4Bu7XFDA0Tf5Br1?=
- =?us-ascii?Q?TOz1Gp6ZZtog6Fn6ZedfjfhRkcaxfz5PZmrfVzCTOg7VLsgU4P1smP9jUZ8H?=
- =?us-ascii?Q?C1K6vglwdi1dj4SEHfNp8M/zlXQ1DwFDwRv0i213ZYoGD5dQJvWyVaGCISDO?=
- =?us-ascii?Q?KEhoDQfmV9bZZLEh1udx6+BSoDjxJ71WWraCC0SRhMrLDUVLy1HuOaBVL24Y?=
- =?us-ascii?Q?+THGCGsy4ovawYDPSTGUt0WZf/iRjDlAMOVFKvBsdop8GS114eEj4zA3/Kn7?=
- =?us-ascii?Q?6892gKuHzljGFIf2R1yyfkQOJx97qcDfatmRYD8eRfU5nnlhvJltcv1AZNYL?=
- =?us-ascii?Q?qHYkSBumrjL9dTzRZ+AHrrdH/Zt/hHdEdr9kF4OVkxh5ZkKEi8ez1dSJ7v1X?=
- =?us-ascii?Q?AtcqdIDWE+Yg6aobTEaRq1Hwu16Q9Igjw5sv4Hd3tu9XPFkmJ162HrhnfWKa?=
- =?us-ascii?Q?d0chV6j4zQx7FYDvsjpm4qnqFWnO6n+K7NBJ05RuPTx+ZXrg4bZmwnQ7lj7L?=
- =?us-ascii?Q?nCo39GlPlyxqT3ncIlZ27Skrlfw4qLwH5d7NYQCo0HwD1kyiWy9eHt7snIlp?=
- =?us-ascii?Q?k7KYiIebuSCXkEI3n8kASn6TMGSY0fH8Cds2DO6On6QawIUt4LNfBnHEdceQ?=
- =?us-ascii?Q?HHBqUIIgqqdM6cbLEQ+pLT5TCfSgihfogHiuk3O6wPKflaNaYa0WpEqTUsZ0?=
- =?us-ascii?Q?3r1rh8GI9+VzCGe7Q0WP086ZJXKIjY1BMtYx+N0ea/XGGma4BgFOBzbSbfLf?=
- =?us-ascii?Q?biepE5c08qLDG1Hd/ROVqK+nwQoIwhQfpAblL2nf6A1AuDfrYaFM/HzBOQta?=
- =?us-ascii?Q?U6TLZwSgsaIaSz4EWTv7wUit43ItXyHmlouTIOYAhxLCmiqnN3HdA3+jrF/n?=
- =?us-ascii?Q?MnXMEPrHY72k7tuPtYMevjpu0QL096/Ze5rz2hpqnsEbvMl+MM+U4MTSE3bh?=
- =?us-ascii?Q?/8Sio3/ZmvVo/IL7+qakmbi8UeBYx4pT?=
+	=?us-ascii?Q?XF8k4ariKkj64iHhDO66FsSjOwiHW7dtVXnHFcmvW+oXfBSyAk3HAMPKuCzz?=
+ =?us-ascii?Q?DUizF7qcTSOt9QPRyMXeWHYapbCtOWOEabMKq0Jp6u/mZ2UQpIhu2YNlEU/M?=
+ =?us-ascii?Q?qeHmtVY1r0oxdoTqnxDPUdrdqXkyar6ljkbBK2h+V86eNeKuRDdPaHRZZteL?=
+ =?us-ascii?Q?9CjxpvIFcCwMyInmWDSij1G+Gk/N07DQwtpNATa/ZP7eml0/y4/bi4qcgpR3?=
+ =?us-ascii?Q?lzNzu3X6QvSWIHSRTeYGdpfzUtdYDsuAGgAe7BrAzlxgG7GaKFa0lazGC0OG?=
+ =?us-ascii?Q?71TBX6NyDg5H9yIraWSfu09NJOPTUA9SaG/zYDBsgU1jHduosmlW7xosFUc8?=
+ =?us-ascii?Q?t+hmGWKGhhKqovQHUDsSiZ7JLzySwQ7gdC4VK48Nv74pYmdwnwdva5I2+cHG?=
+ =?us-ascii?Q?9fV7FikRDB5p5YZR8c+MIP1TBRMhbRVuz2AeNOoJSziRhlK+AUJUl7LB8X4L?=
+ =?us-ascii?Q?R2yack85FoFNSl3+78XmjDzpdgt9gKAK/Uv8zs2eEbXQJNXlxU/+Usg6Zu6A?=
+ =?us-ascii?Q?MS3+Gp9iMFNM9MXyJAISdqwVFKJQxJbLTmEFb6zxzBwCZxdZ5wWh8iWpj1Kp?=
+ =?us-ascii?Q?R1Z8+nXQYrCmKhkGRSKO++QtY0iR7YDgtZC2vR/8Z1iWTy/ebpr9YiKuRix+?=
+ =?us-ascii?Q?e/O49vZKdxxfn2JeVOcR/QoDsP5YlpTBrsF+nibTfmIAvZcRqDK9rf+iZe99?=
+ =?us-ascii?Q?dGvImvRPZVgwq4zYDv3YQG0UbYkrO5JoJdvDuXRqhp/BMTkl/nnjfKJjehZg?=
+ =?us-ascii?Q?qAzq5SELrsZ4gZ6YjjVnkDxuCLmkuC5dHgSCWepYGQGS0TpPZbSv3nV41eM2?=
+ =?us-ascii?Q?I2nV6Y5ckwp7bHt7AtDYj5JxQHyWzcPddjabxU51IjGR/AzhDxmBPSaQl5Oq?=
+ =?us-ascii?Q?xX/+Otgj6DF0i7+2IfXYNwn8oF5L/h8TzGIGRUGE3dY60SMw30NwvSxu4WDD?=
+ =?us-ascii?Q?ltrxJ4m+9nWXSzFsr+sMzEFFV1iK7Rsphk3pO0bYAixB1Z6uIO69741CzuIG?=
+ =?us-ascii?Q?pZE9ZUjN+pz7oPCcffLkR/bNYa9ZUo+aT6c+FKmQy8ZBh4NyGO2pnflOdzb4?=
+ =?us-ascii?Q?vYurF6WlMtxvuJ9xj/in86d6SI6NiCXNRYl3fthiuI+o6cbemyAFN0SIcMIr?=
+ =?us-ascii?Q?WTFKD2wwic0zLuG69fPM/sCWaTdn/4jQFOSOu3FuUiLvGwwvyzvfy0GdE0NT?=
+ =?us-ascii?Q?WCkAz/Nkn3L/DKlIjulRrgooXN7h50+bEq7cye7E+5JwzjFMm293D2dfhpZu?=
+ =?us-ascii?Q?ihPyqueu0wfq8a4aKy94kBn+LBe1Vjvv+0kTCb+Kqj1m9cRMMmhTGfU3BdaS?=
+ =?us-ascii?Q?/5bUL30kMYdfY6hTLiJxShPWJqTifC1FpnKUkw+3X4tD/NjznO+JWJHvh6BW?=
+ =?us-ascii?Q?jE9Pw5oklYvCN4ANckew4wa+ge3M/XhcAMyYaohBqRWS/u9f0qkKNQD1NUwJ?=
+ =?us-ascii?Q?TVelyHNVn8At7lBtquiyjpwDQmMOq1fg?=
 X-Forefront-Antispam-Report:
 	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2024 10:59:33.9479
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2024 10:59:38.5049
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7e60480-b286-4bef-7e22-08dcc8e2d500
+X-MS-Exchange-CrossTenant-Network-Message-Id: af183d05-a7eb-4083-d25f-08dcc8e2d7b7
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044AC.namprd04.prod.outlook.com
+	BN2PEPF000044A5.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7735
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7200
 
-There's currently not a lot of action happening during
-the init/destroy of MR resources. But more will be added
-in the upcoming patches.
+Currently, when a new MR is set up, the old MR is deleted. MR deletion
+is about 30-40% the time of MR creation. As deleting the old MR is not
+important for the process of setting up the new MR, this operation
+can be postponed.
 
-As the mr mutex lock init/destroy has been moved to these
-new functions, the lifetime has now shifted away from
-mlx5_vdpa_alloc_resources() / mlx5_vdpa_free_resources()
-into these new functions. However, the lifetime at the
-outer scope remains the same:
-mlx5_vdpa_dev_add() / mlx5_vdpa_dev_free()
+This series adds a workqueue that does MR garbage collection at a later
+point. If the MR lock is taken, the handler will back off and
+reschedule. The exception during shutdown: then the handler must
+not postpone the work.
+
+Note that this is only a speculative optimization: if there is some
+mapping operation that is triggered while the garbage collector handler
+has the lock taken, this operation it will have to wait for the handler
+to finish.
 
 Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
 ---
- drivers/vdpa/mlx5/core/mlx5_vdpa.h |  2 ++
- drivers/vdpa/mlx5/core/mr.c        | 17 +++++++++++++++++
- drivers/vdpa/mlx5/core/resources.c |  3 ---
- drivers/vdpa/mlx5/net/mlx5_vnet.c  |  9 +++++++--
- 4 files changed, 26 insertions(+), 5 deletions(-)
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h | 10 ++++++
+ drivers/vdpa/mlx5/core/mr.c        | 55 ++++++++++++++++++++++++++++--
+ drivers/vdpa/mlx5/net/mlx5_vnet.c  |  4 +--
+ 3 files changed, 64 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/vdpa/mlx5/core/mlx5_vdpa.h b/drivers/vdpa/mlx5/core/mlx5_vdpa.h
-index 89b564cecddf..c3e17bc888e8 100644
+index c3e17bc888e8..2cedf7e2dbc4 100644
 --- a/drivers/vdpa/mlx5/core/mlx5_vdpa.h
 +++ b/drivers/vdpa/mlx5/core/mlx5_vdpa.h
-@@ -138,6 +138,8 @@ int mlx5_vdpa_create_mkey(struct mlx5_vdpa_dev *mvdev, u32 *mkey, u32 *in,
- int mlx5_vdpa_destroy_mkey(struct mlx5_vdpa_dev *mvdev, u32 mkey);
- struct mlx5_vdpa_mr *mlx5_vdpa_create_mr(struct mlx5_vdpa_dev *mvdev,
- 					 struct vhost_iotlb *iotlb);
-+int mlx5_vdpa_init_mr_resources(struct mlx5_vdpa_dev *mvdev);
-+void mlx5_vdpa_destroy_mr_resources(struct mlx5_vdpa_dev *mvdev);
- void mlx5_vdpa_clean_mrs(struct mlx5_vdpa_dev *mvdev);
- void mlx5_vdpa_get_mr(struct mlx5_vdpa_dev *mvdev,
- 		      struct mlx5_vdpa_mr *mr);
+@@ -86,8 +86,18 @@ enum {
+ struct mlx5_vdpa_mr_resources {
+ 	struct mlx5_vdpa_mr *mr[MLX5_VDPA_NUM_AS];
+ 	unsigned int group2asid[MLX5_VDPA_NUMVQ_GROUPS];
++
++	/* Pre-deletion mr list */
+ 	struct list_head mr_list_head;
++
++	/* Deferred mr list */
++	struct list_head mr_gc_list_head;
++	struct workqueue_struct *wq_gc;
++	struct delayed_work gc_dwork_ent;
++
+ 	struct mutex lock;
++
++	atomic_t shutdown;
+ };
+ 
+ struct mlx5_vdpa_dev {
 diff --git a/drivers/vdpa/mlx5/core/mr.c b/drivers/vdpa/mlx5/core/mr.c
-index e0412297bae5..0bc99f159046 100644
+index 0bc99f159046..55755e97a946 100644
 --- a/drivers/vdpa/mlx5/core/mr.c
 +++ b/drivers/vdpa/mlx5/core/mr.c
-@@ -843,3 +843,20 @@ int mlx5_vdpa_reset_mr(struct mlx5_vdpa_dev *mvdev, unsigned int asid)
+@@ -653,14 +653,50 @@ static void _mlx5_vdpa_destroy_mr(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_
+ 	kfree(mr);
+ }
  
++/* There can be multiple .set_map() operations in quick succession.
++ * This large delay is a simple way to prevent the MR cleanup from blocking
++ * .set_map() MR creation in this scenario.
++ */
++#define MLX5_VDPA_MR_GC_TRIGGER_MS 2000
++
++static void mlx5_vdpa_mr_gc_handler(struct work_struct *work)
++{
++	struct mlx5_vdpa_mr_resources *mres;
++	struct mlx5_vdpa_mr *mr, *tmp;
++	struct mlx5_vdpa_dev *mvdev;
++
++	mres = container_of(work, struct mlx5_vdpa_mr_resources, gc_dwork_ent.work);
++
++	if (atomic_read(&mres->shutdown)) {
++		mutex_lock(&mres->lock);
++	} else if (!mutex_trylock(&mres->lock)) {
++		queue_delayed_work(mres->wq_gc, &mres->gc_dwork_ent,
++				   msecs_to_jiffies(MLX5_VDPA_MR_GC_TRIGGER_MS));
++		return;
++	}
++
++	mvdev = container_of(mres, struct mlx5_vdpa_dev, mres);
++
++	list_for_each_entry_safe(mr, tmp, &mres->mr_gc_list_head, mr_list) {
++		_mlx5_vdpa_destroy_mr(mvdev, mr);
++	}
++
++	mutex_unlock(&mres->lock);
++}
++
+ static void _mlx5_vdpa_put_mr(struct mlx5_vdpa_dev *mvdev,
+ 			      struct mlx5_vdpa_mr *mr)
+ {
++	struct mlx5_vdpa_mr_resources *mres = &mvdev->mres;
++
+ 	if (!mr)
+ 		return;
+ 
+-	if (refcount_dec_and_test(&mr->refcount))
+-		_mlx5_vdpa_destroy_mr(mvdev, mr);
++	if (refcount_dec_and_test(&mr->refcount)) {
++		list_move_tail(&mr->mr_list, &mres->mr_gc_list_head);
++		queue_delayed_work(mres->wq_gc, &mres->gc_dwork_ent,
++				   msecs_to_jiffies(MLX5_VDPA_MR_GC_TRIGGER_MS));
++	}
+ }
+ 
+ void mlx5_vdpa_put_mr(struct mlx5_vdpa_dev *mvdev,
+@@ -848,9 +884,17 @@ int mlx5_vdpa_init_mr_resources(struct mlx5_vdpa_dev *mvdev)
+ {
+ 	struct mlx5_vdpa_mr_resources *mres = &mvdev->mres;
+ 
+-	INIT_LIST_HEAD(&mres->mr_list_head);
++	mres->wq_gc = create_singlethread_workqueue("mlx5_vdpa_mr_gc");
++	if (!mres->wq_gc)
++		return -ENOMEM;
++
++	INIT_DELAYED_WORK(&mres->gc_dwork_ent, mlx5_vdpa_mr_gc_handler);
++
+ 	mutex_init(&mres->lock);
+ 
++	INIT_LIST_HEAD(&mres->mr_list_head);
++	INIT_LIST_HEAD(&mres->mr_gc_list_head);
++
  	return 0;
  }
-+
-+int mlx5_vdpa_init_mr_resources(struct mlx5_vdpa_dev *mvdev)
-+{
-+	struct mlx5_vdpa_mr_resources *mres = &mvdev->mres;
-+
-+	INIT_LIST_HEAD(&mres->mr_list_head);
-+	mutex_init(&mres->lock);
-+
-+	return 0;
-+}
-+
-+void mlx5_vdpa_destroy_mr_resources(struct mlx5_vdpa_dev *mvdev)
-+{
-+	struct mlx5_vdpa_mr_resources *mres = &mvdev->mres;
-+
-+	mutex_destroy(&mres->lock);
-+}
-diff --git a/drivers/vdpa/mlx5/core/resources.c b/drivers/vdpa/mlx5/core/resources.c
-index fe2ca3458f6c..aeae31d0cefa 100644
---- a/drivers/vdpa/mlx5/core/resources.c
-+++ b/drivers/vdpa/mlx5/core/resources.c
-@@ -256,7 +256,6 @@ int mlx5_vdpa_alloc_resources(struct mlx5_vdpa_dev *mvdev)
- 		mlx5_vdpa_warn(mvdev, "resources already allocated\n");
- 		return -EINVAL;
- 	}
--	mutex_init(&mvdev->mres.lock);
- 	res->uar = mlx5_get_uars_page(mdev);
- 	if (IS_ERR(res->uar)) {
- 		err = PTR_ERR(res->uar);
-@@ -301,7 +300,6 @@ int mlx5_vdpa_alloc_resources(struct mlx5_vdpa_dev *mvdev)
- err_uctx:
- 	mlx5_put_uars_page(mdev, res->uar);
- err_uars:
--	mutex_destroy(&mvdev->mres.lock);
- 	return err;
- }
  
-@@ -318,7 +316,6 @@ void mlx5_vdpa_free_resources(struct mlx5_vdpa_dev *mvdev)
- 	dealloc_pd(mvdev, res->pdn, res->uid);
- 	destroy_uctx(mvdev, res->uid);
- 	mlx5_put_uars_page(mvdev->mdev, res->uar);
--	mutex_destroy(&mvdev->mres.lock);
- 	res->valid = false;
- }
+@@ -858,5 +902,10 @@ void mlx5_vdpa_destroy_mr_resources(struct mlx5_vdpa_dev *mvdev)
+ {
+ 	struct mlx5_vdpa_mr_resources *mres = &mvdev->mres;
  
++	atomic_set(&mres->shutdown, 1);
++
++	flush_delayed_work(&mres->gc_dwork_ent);
++	destroy_workqueue(mres->wq_gc);
++	mres->wq_gc = NULL;
+ 	mutex_destroy(&mres->lock);
+ }
 diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-index 8a51c492a62a..fc86e33e620a 100644
+index fc86e33e620a..9ccbe1c1ec15 100644
 --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
 +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-@@ -3434,6 +3434,7 @@ static void mlx5_vdpa_free(struct vdpa_device *vdev)
- 
+@@ -3435,6 +3435,8 @@ static void mlx5_vdpa_free(struct vdpa_device *vdev)
  	free_fixed_resources(ndev);
  	mlx5_vdpa_clean_mrs(mvdev);
-+	mlx5_vdpa_destroy_mr_resources(&ndev->mvdev);
+ 	mlx5_vdpa_destroy_mr_resources(&ndev->mvdev);
++	mlx5_cmd_cleanup_async_ctx(&mvdev->async_ctx);
++
  	if (!is_zero_ether_addr(ndev->config.mac)) {
  		pfmdev = pci_get_drvdata(pci_physfn(mvdev->mdev->pdev));
  		mlx5_mpfs_del_mac(pfmdev, ndev->config.mac);
-@@ -3962,12 +3963,14 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *v_mdev, const char *name,
- 	if (err)
- 		goto err_mpfs;
+@@ -4042,8 +4044,6 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
+ 	mvdev->wq = NULL;
+ 	destroy_workqueue(wq);
+ 	mgtdev->ndev = NULL;
+-
+-	mlx5_cmd_cleanup_async_ctx(&mvdev->async_ctx);
+ }
  
--	INIT_LIST_HEAD(&mvdev->mres.mr_list_head);
-+	err = mlx5_vdpa_init_mr_resources(mvdev);
-+	if (err)
-+		goto err_res;
- 
- 	if (MLX5_CAP_GEN(mvdev->mdev, umem_uid_0)) {
- 		err = mlx5_vdpa_create_dma_mr(mvdev);
- 		if (err)
--			goto err_res;
-+			goto err_mr_res;
- 	}
- 
- 	err = alloc_fixed_resources(ndev);
-@@ -4009,6 +4012,8 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *v_mdev, const char *name,
- 	free_fixed_resources(ndev);
- err_mr:
- 	mlx5_vdpa_clean_mrs(mvdev);
-+err_mr_res:
-+	mlx5_vdpa_destroy_mr_resources(mvdev);
- err_res:
- 	mlx5_vdpa_free_resources(&ndev->mvdev);
- err_mpfs:
+ static const struct vdpa_mgmtdev_ops mdev_ops = {
 -- 
 2.45.1
 
