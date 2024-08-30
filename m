@@ -1,132 +1,124 @@
-Return-Path: <kvm+bounces-25455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C635096571B
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 07:48:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4BB996571F
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 07:53:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82E1028523B
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 05:48:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2378B1C229E0
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 05:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02CAC15098E;
-	Fri, 30 Aug 2024 05:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F01E14F9DC;
+	Fri, 30 Aug 2024 05:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Zj+yVsHg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eL3vLcNR"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD8D139597
-	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 05:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4191487F1;
+	Fri, 30 Aug 2024 05:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724996913; cv=none; b=BNarR4EqaXQGUh98tq2lMpxQVq7dAjSQXRnNeDWHvhUdnj43/rfoO0a7CJdVgIgk2fAZOjRiPMTkrIhIt748wuHmP2gsaIg0a+aoZiLLxdmuXjW2T86TyOhl1+TJ+Jf/33EYJRpXrCVJo+DCSymcxFsYbWEZsZoY6U76VE979/s=
+	t=1724997191; cv=none; b=DxxCiuIrOrYuJj1qnJSJPoOIOxXtgaph0IqCYLIj2BEmUageVX87ZmxnwM0WcZMnuu2fgQ36LrAOkfAp8EyPfpQOilig9LSL2Bu7l5+9Qib6hjRgS1w5pAZk3DT0XwwTiwbAeudaZ9mdi1ZOOHv71d9MPvuz3JvsFhTRf7iHmQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724996913; c=relaxed/simple;
-	bh=679NXg6id5PLytBa7BQ9IBt08iayYByB0eAiPWZ3jFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FL4mONxnPHP97qmNyckiv4lVY3ay+n4Hn2lxCvt0Q2gxLCvCItXROSDF1HYpb7MQcNiSh+bpBtDaTIUkXonXSzSPYZ+7Jx/2zULaHFv4+dhZqrja9e10VEpawuKUZDHpcJvW1Q0oDcy+DbI4Zlg7VYQeIU0u1yB1+enu/2g+8NU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Zj+yVsHg; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6da89601-35d8-44cf-88e7-db8f36635c66@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724996907;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WTa8e3/jM/RbQiQBkkhzGoSerbedvHw29OHSSmTgdcI=;
-	b=Zj+yVsHgOjAGYYcP0ikoB4ZHnR4fDKGlD/G+S1K2jEgIeB2mtW0b9dqOQqUtqCmPOVaRUY
-	o9MsEc4MN+Bzzs2FHlaS+2vKo/1yI35QZXDKAQ+UlXkEOaXizu4jVNM8syL/ZFGwZVuHk+
-	xiVQa7EuWMmKTymTu/StNthvpHgoGS8=
-Date: Fri, 30 Aug 2024 13:48:16 +0800
+	s=arc-20240116; t=1724997191; c=relaxed/simple;
+	bh=g8P8p7Incuz2BvQF4nESgVIUskOg6ugvxVwqtEVj/2g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NZ/0xyTKzIn5CoQfA/PiGrcYc1EekkiG5WkRu9qgl39k2OBTILOuY1tf6TKlJ86Q6q8ONQN0TvoC9upEUic4b5hDVWPCNanfFOog7ShsrFfUbBoxEH00Z/viqdt/rGQyzlcXGz6XzqZBsuQea8Y9vgmbPZ4bCCMV650VWAzTQvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eL3vLcNR; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724997189; x=1756533189;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=g8P8p7Incuz2BvQF4nESgVIUskOg6ugvxVwqtEVj/2g=;
+  b=eL3vLcNRKa+5slpWrJ08rGO8YKlC6QlHk/AcRci5/iIpnY32016r9fvj
+   jAnxZqXjgFTflWHrGXzwfBOa6qMKfPWU8OdjMKISLV6iooFXPoMauYMo+
+   QZjR38EeiNrJgN8vd/5dyWs2L6A7XK+4MKSG4CfmWP3mndtgHJdHY4HP7
+   KPT8Nej1G7CvV2iOJ2ZfR7tBmFNt2Ug4CrpNevrcMPGjjnmqKaY7USytd
+   hHD4UgQ+p2I78T3Th67Uk6H5MjHJy/XAfxtUJSIOWGRt4x3YKqqrdA4T+
+   EZsE6aWHXXdnVb05N3EAtJJgjRUOA+z+xa8ugeGhcQhhKDJSLW3IPOUxC
+   Q==;
+X-CSE-ConnectionGUID: irdajkvJT1Wcn7BifHwCng==
+X-CSE-MsgGUID: hEDYRST/Tx67HUNQBeCpyw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="23764227"
+X-IronPort-AV: E=Sophos;i="6.10,187,1719903600"; 
+   d="scan'208";a="23764227"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 22:53:09 -0700
+X-CSE-ConnectionGUID: MGE3kQIcQh+7YCVzklcIeQ==
+X-CSE-MsgGUID: BdANivYkSIaDMHdGcl+AUA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,187,1719903600"; 
+   d="scan'208";a="94538656"
+Received: from sschumil-mobl2.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.63])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 22:53:04 -0700
+Date: Fri, 30 Aug 2024 08:52:59 +0300
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
+	isaku.yamahata@gmail.com, xiaoyao.li@intel.com,
+	linux-kernel@vger.kernel.org,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Yuan Yao <yuan.yao@intel.com>
+Subject: Re: [PATCH 03/25] KVM: TDX: Add TDX "architectural" error codes
+Message-ID: <ZtFeO3hq6dpnXvmf@tlindgre-MOBL1>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-4-rick.p.edgecombe@intel.com>
+ <45cecaa1-d118-4465-98ae-8f63eb166c84@linux.intel.com>
+ <ZtAGCSslkH3XhM7a@tlindgre-MOBL1>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3] Loongarch: KVM: Add KVM hypercalls documentation for
- LoongArch
-To: WangYuli <wangyuli@uniontech.com>,
- Dandan Zhang <zhangdandan@uniontech.com>, pbonzini@redhat.com,
- corbet@lwn.net, zhaotianrui@loongson.cn, maobibo@loongson.cn,
- chenhuacai@kernel.org, zenghui.yu@linux.dev
-Cc: kernel@xen0n.name, kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- guanwentao@uniontech.com, baimingcong@uniontech.com,
- Xianglai Li <lixianglai@loongson.cn>, Mingcong Bai <jeffbai@aosc.io>
-References: <4769C036576F8816+20240828045950.3484113-1-zhangdandan@uniontech.com>
- <aa72bc73-b20d-4652-be89-37d01f291725@linux.dev>
- <6B877E46C55A8A27+f98078be-8cde-46d2-9065-3f12e44ac603@uniontech.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: YanTeng Si <si.yanteng@linux.dev>
-In-Reply-To: <6B877E46C55A8A27+f98078be-8cde-46d2-9065-3f12e44ac603@uniontech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <ZtAGCSslkH3XhM7a@tlindgre-MOBL1>
 
+On Thu, Aug 29, 2024 at 08:24:25AM +0300, Tony Lindgren wrote:
+> On Tue, Aug 13, 2024 at 02:08:40PM +0800, Binbin Wu wrote:
+> > On 8/13/2024 6:47 AM, Rick Edgecombe wrote:
+> > > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > > --- a/arch/x86/include/asm/shared/tdx.h
+> > > +++ b/arch/x86/include/asm/shared/tdx.h
+> > > @@ -28,6 +28,12 @@
+> > >   #define TDVMCALL_STATUS_RETRY		1
+> > > +/*
+> > > + * TDG.VP.VMCALL Status Codes (returned in R10)
+> > > + */
+> > > +#define TDVMCALL_SUCCESS		0x0000000000000000ULL
+> > > +#define TDVMCALL_INVALID_OPERAND	0x8000000000000000ULL
+> > > +
+> > TDX guest code has already defined/uses "TDVMCALL_STATUS_RETRY", which is
+> > one
+> > of the TDG.VP.VMCALL Status Codes.
+> > 
+> > IMHO, the style of the macros should be unified.
+> > How about using TDVMALL_STATUS_* for TDG.VP.VMCALL Status Codes?
+> > 
+> > +/*
+> > + * TDG.VP.VMCALL Status Codes (returned in R10)
+> > + */
+> > +#define TDVMCALL_STATUS_SUCCESS 0x0000000000000000ULL
+> > -#define TDVMCALL_STATUS_RETRY����������������� 1
+> > +#define TDVMCALL_STATUS_RETRY 0x0000000000000001ULL
+> > +#define TDVMCALL_STATUS_INVALID_OPERAND 0x8000000000000000ULL
+> 
+> Makes sense as they are the hardware status codes.
 
+I'll do a patch against the CoCo queue for the TDVMCALL_STATUS prefix FYI.
 
+Regards,
 
-在 2024/8/29 11:33, WangYuli 写道:
->
-> On 2024/8/29 11:22, YanTeng Si wrote:
->>
->> 在 2024/8/28 12:59, Dandan Zhang 写道:
->>> From: Bibo Mao <maobibo@loongson.cn>
->>>
->>> Add documentation topic for using pv_virt when running as a guest
->>> on KVM hypervisor.
->>>
->>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->>> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
->>> Co-developed-by: Mingcong Bai <jeffbai@aosc.io>
->>> Signed-off-by: Mingcong Bai <jeffbai@aosc.io>
->>> Link: 
->>> https://lore.kernel.org/all/5c338084b1bcccc1d57dce9ddb1e7081@aosc.io/
->>> Signed-off-by: Dandan Zhang <zhangdandan@uniontech.com>
->>> ---
->>>   Documentation/virt/kvm/index.rst              |  1 +
->>>   .../virt/kvm/loongarch/hypercalls.rst         | 89 
->>> +++++++++++++++++++
->>>   Documentation/virt/kvm/loongarch/index.rst    | 10 +++
->>>   MAINTAINERS                                   |  1 +
->>>   4 files changed, 101 insertions(+)
->>>   create mode 100644 Documentation/virt/kvm/loongarch/hypercalls.rst
->>>   create mode 100644 Documentation/virt/kvm/loongarch/index.rst
->> If you don't mind, how about translating these into Chinese? If
->> you decide to do so, you don't need to split the patch again,
->> just complete your translation in this patch and add your
->> Co-developed-by tag.
->
->
-> I'm afraid that's not feasible.
->
-> The entire KVM subsystem documentation is currently lacking a Chinese 
-> translation, not just for LoongArch.
-You can add other documents to TODOLIST.
->
->  A better approach would be to merge this English document first.
-It's up to you.
->
-> In fact, I'm in the process of preparing Chinese translations for the 
-> KVM subsystem documentation, and they're on their way.
-Nice！ To be honest, I've tried to translate kvm's API documentation more 
-than once in the past, but all of them have been halfway because it's 
-too long, and I'm guessing that the review process won't be too smooth 
-either.
-
-
-BTW, I've noticed that v2 is still a work in progress, so please reduce 
-the frequency of sending emails until the v2 and v3 reviews are over.
-
-
-Thanks,
-Yanteng
-
+Tony
 
