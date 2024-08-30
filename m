@@ -1,143 +1,123 @@
-Return-Path: <kvm+bounces-25523-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25524-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 348B69661FB
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 14:47:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F20B966356
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 15:47:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E636D285991
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 12:47:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B43CD1C204DA
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 13:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DFFC19ABC2;
-	Fri, 30 Aug 2024 12:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D49419ABB4;
+	Fri, 30 Aug 2024 13:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Tkqa/SAx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L+54MZ/s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D3D16D32D
-	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 12:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4AC1758F
+	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 13:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725022044; cv=none; b=cnAn5K/S2UZdv3MMS6TUCgK7uTs3hXJSK6lxmth1rkzbAb0DViBNH4j1FxdPqeLZ++J4SNOtz78gBulSpnwBhB7nehx8i+Pbr5ieZ/FFoTWgVdVc1b8vCB6bHOnXibCuHCPdk4xAF79xF2zz8his5NJ/GB0v1cXdyWmc9MMFIic=
+	t=1725025638; cv=none; b=oUEBzBlIWaYS2/V1ms6Zakiz3F6NvuHiaiwKH+Q2uQF1NtKC9wEa5b6dVToaQsuYJlGA4HINNXqWRUQCKnL035998mbSUwe27D3JUnNT5PcErlklbPYLMYuv+OmLDS/pupRC4gPQqKa0xciTNvVYK25kHZD69y1YjI21gjLaR1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725022044; c=relaxed/simple;
-	bh=lWiucSN6zXhG3X717OejSkyo1yUhj7w0KySk1SkYMIE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YCUpOxy17cbKCne/axpShm+KM4f6YjKaRYrSVwEktsJ5+bWMmd5gjVFiTUwh4JrouA+GYdLI/LrInEcJSmzDJa4+Zt1aRt17TTGopsU619I9ceJJyJ00sMR/ycRpiGTqsB19Obk0+MTC53912d+adfOA2UpoL5u84+2kRTyLxws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Tkqa/SAx; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6c35427935eso211306d6.3
-        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 05:47:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1725022042; x=1725626842; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WmShJpOz/GOmUnd0xKeTBcV3P2NCGM0BHpjZiSl8WN0=;
-        b=Tkqa/SAxC6hDf3jk2/+3faExVIsJ7T72464ofmlt/iDcnuqn04YWh5DDrhJ2OGQb2K
-         T/hsSz5znhzr84aWUSfbd8ajZp6+rv9X7rHnDxTUr5NVwYzTWwYhp/1Eu1jG4GX5M4zB
-         xe6Nxhatfhwz72HqYUIh/Bm9dQNLFWyUE4H9mGIx9nOdEnbIvAakkYxFHlI8m+uwknV2
-         U2XETOsxLAhmD5BopdFPH5LK3KCpgw7yYKvNXpnrmidNndddltHr3NhyQdz6ite1d/m1
-         QamqiVX/DX55ys+9+fwwOCc4KSb5TNeUd8GxXu3zi3u6ttSwDNVhtNEXAaWJSEYcIuHM
-         u56g==
+	s=arc-20240116; t=1725025638; c=relaxed/simple;
+	bh=OTpeEh2C+pBjQpLMmSeYbGjDRsZ/FIDacZjxriqKcCU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XZ85jqdjDDuuKXxzMBpC9NWCuPX41AFbjv8ZEZ2LAV9u2MrfgNfSHI/fYLJ7hiCOyF1FGaTnIctOmd0YwluNLh37N3aJyjQH1sgHeMtb2rdKTSWEov566H0uuaCToVu50MsHlQx+iNPRyPkX3b1otO5czahRrA5fIUzA5bpVsDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L+54MZ/s; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725025636;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VGA3KUuJjgRSpXeQ3xka2KCdJ1cKZa0/v3QiIokE+Z4=;
+	b=L+54MZ/sbsdzRTBx8iVlW2UUaAHpjto8nr53ma2p7j/thyFR7Usv50mZa5sVpRjJa1nJsw
+	hyTMJCqbpB3p5V3D9BZ5w5w0pyo6n998TY6DWX4rGdgaabh8i68qAPF3HA7y2B8FSEMk9S
+	h2Es8f810SqzGV8IPtCcwaRXSI7ZjRc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-79-9n2VIhjrNzaF8fcwVdEvpg-1; Fri, 30 Aug 2024 09:47:14 -0400
+X-MC-Unique: 9n2VIhjrNzaF8fcwVdEvpg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-371881b6de3so1250957f8f.2
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 06:47:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725022042; x=1725626842;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WmShJpOz/GOmUnd0xKeTBcV3P2NCGM0BHpjZiSl8WN0=;
-        b=egXN49b/hh7JdBadLZVA0gOL09OJRwkdRruJLTgerH1RlFtWKwywPMwIAFGkaNNROY
-         JB3XPAwW4eNQzqBH2flWu9SUt0VPMMCCV1Du/42atrsc40j/vGtVBI46iTFXp224J1EN
-         asnHLvFX9iLjsftgPnudH6BcQznzfGpHsZxZS90/dIrhr9cgzqU8qZ74yvfewDaUGF5j
-         IdzzStrhWdoUCNNaWG8SEM+QB5O/QT5v593UBrVk4gnXR+qCJY/01R8f+LUrU1FDE2ys
-         cVBixgIYm2zAqvL63wl4gBW6ThJJ5ew6eJ+pERbUY5DmExaiLpmPAx1WXuKuAW8oY44H
-         t6+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVWCqt60EVFnI79FtnyLBRYezQugw7WO7cRG9Rl9CHfCEcc9aj2DjDBYY/1YQb/XGL/cGo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwlLzcq02GwUFomxTtxIYTVdio4QPX8RKIHR2jbjQRD4oB+ugT
-	QMWDGtw+V6NNMNrzGNmQqFPG7MS18TGKMHTH6BhscdlMJ+Zs/1wamt2ARt7nbAk=
-X-Google-Smtp-Source: AGHT+IF1zgT2NlSjbSBC4mUiCoFIEUsoyt95nAEze677a3G7gSdAzBNVY6enBBsIy8xyElYIQbGvzA==
-X-Received: by 2002:a05:6214:3c8b:b0:6c1:70c8:ead6 with SMTP id 6a1803df08f44-6c33e69695bmr78641056d6.50.1725022041738;
-        Fri, 30 Aug 2024 05:47:21 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c34c04f512sm3869726d6.37.2024.08.30.05.47.21
+        d=1e100.net; s=20230601; t=1725025633; x=1725630433;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VGA3KUuJjgRSpXeQ3xka2KCdJ1cKZa0/v3QiIokE+Z4=;
+        b=T7cziulloomxeyHhQ52rSoQYrEs8fjGHxTw/nMAxyCjHFefRQNfYgK7jHTDfYd7auo
+         28jjH+xIEExI5ydcVKcDDhmd4HjZ2f6Hedgtp2haToFGcviPJk+50FwjKZgxyi1Khxn+
+         1skG5OgapUXuY9lE0K5ouYZ2u9ItDslGCrrHiaZ1EtlM5q9+1SQlxQEq8c0n2yA6mpVj
+         TUcfL0aLo9wrWUGWLO4tIYGjIPtcLvjVKNl9HBDBGtGss9SxAkZMMHWSE/kSRrN6hiRk
+         Sn6eKqVISnytTmJJoAUDmdv1TPu+vdzJJZgYh4/gBOnXeaJA5BrsyLfil4QWubwqaauJ
+         5RWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3/tu5ezdHDZTN7Mwb1VoV+xqg6GYeVvt0w8cGFmzhqMhhAzqqc28+fNRrs264nqee9Xc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfUTgf2aIAn6Sn1ik6FIeAyenRGwLaXUjd4kT6xtHRu3Ct6MeM
+	zpeFrmo01emJ2VIRCJhflu2FL2tI5gf3Gtf8W/I1/j+olhE9D8ucjqDmrSdcu5aoku0juHHZWmB
+	SSmzgzDv26XEy1dblsgQn4qReUAppOucGIX5vy51umvEL4H92vA==
+X-Received: by 2002:adf:b356:0:b0:368:6561:daba with SMTP id ffacd0b85a97d-374a95a0047mr1711073f8f.31.1725025633507;
+        Fri, 30 Aug 2024 06:47:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEXFfCyeKQTszCb1/6emJitppLXl0Ycds2dYm+zjh0Z/QfOM72vXtp88r7gHPjkSfi/i5eFdw==
+X-Received: by 2002:adf:b356:0:b0:368:6561:daba with SMTP id ffacd0b85a97d-374a95a0047mr1711044f8f.31.1725025632994;
+        Fri, 30 Aug 2024 06:47:12 -0700 (PDT)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374b9859486sm703874f8f.111.2024.08.30.06.47.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Aug 2024 05:47:21 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sk128-00DlJD-Gs;
-	Fri, 30 Aug 2024 09:47:20 -0300
-Date: Fri, 30 Aug 2024 09:47:20 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Sean Christopherson <seanjc@google.com>
-Cc: James Houghton <jthoughton@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	David Matlack <dmatlack@google.com>,
-	David Rientjes <rientjes@google.com>,
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
-	Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v6 02/11] KVM: x86: Relax locking for kvm_test_age_gfn
- and kvm_age_gfn
-Message-ID: <20240830124720.GX3468552@ziepe.ca>
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-3-jthoughton@google.com>
- <Zr_3Vohvzt0KmFiN@google.com>
- <CADrL8HWQqVm5VbNnR6iMEZF17+nuO_Y25m6uuScCBVSE_YCTdg@mail.gmail.com>
- <ZtFA79zreVt4GBri@google.com>
+        Fri, 30 Aug 2024 06:47:12 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ rcu@vger.kernel.org, linux-kernel@vger.kernel.org, Kevin Tian
+ <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>, Yiwei Zhang
+ <zzyiwei@google.com>, Lai Jiangshan <jiangshanlai@gmail.com>, "Paul E.
+ McKenney" <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>
+Subject: Re: [PATCH 5/5] KVM: VMX: Always honor guest PAT on CPUs that
+ support self-snoop
+In-Reply-To: <vuwlkftomgsnzsywjyxw6rcnycg3bve3o53svvxg3vd6xpok7o@k4ktmx5tqtmz>
+References: <20240309010929.1403984-1-seanjc@google.com>
+ <20240309010929.1403984-6-seanjc@google.com> <877cbyuzdn.fsf@redhat.com>
+ <vuwlkftomgsnzsywjyxw6rcnycg3bve3o53svvxg3vd6xpok7o@k4ktmx5tqtmz>
+Date: Fri, 30 Aug 2024 15:47:11 +0200
+Message-ID: <871q26unq8.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZtFA79zreVt4GBri@google.com>
+Content-Type: text/plain
 
-On Thu, Aug 29, 2024 at 08:47:59PM -0700, Sean Christopherson wrote:
-> On Thu, Aug 29, 2024, James Houghton wrote:
-> > On Fri, Aug 16, 2024 at 6:05 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > > +static __always_inline bool kvm_tdp_mmu_handle_gfn_lockless(
-> > > > +             struct kvm *kvm,
-> > > > +             struct kvm_gfn_range *range,
-> > > > +             tdp_handler_t handler)
-> > >
-> > > Please burn all the Google3 from your brain, and code ;-)
-> > 
-> > I indented this way to avoid going past the 80 character limit. I've
-> > adjusted it to be more like the other functions in this file.
-> > 
-> > Perhaps I should put `static __always_inline bool` on its own line?
-> 
-> Noooo. Do not wrap before the function name.  Linus has a nice explanation/rant
-> on this[1].
+Gerd Hoffmann <kraxel@redhat.com> writes:
 
-IMHO, run clang-format on your stuff and just be happy with 99% of
-what it spits out. Saves *so much time* and usually arguing..
+>> Necroposting!
+>> 
+>> Turns out that this change broke "bochs-display" driver in QEMU even
+>> when the guest is modern (don't ask me 'who the hell uses bochs for
+>> modern guests', it was basically a configuration error :-). E.g:
+>
+> qemu stdvga (the default display device) is affected too.
+>
 
-clang-format will occasionally decide to wrap in the GNU way, if it
-can put the arguments all on one line. People will never agree on
-small details of style, but it would be really nice if we can at least
-agree not to nitpick clang-format's decisions :) :)
+So far, I was only able to verify that the issue has nothing to do with
+OVMF and multi-vcpu, it reproduces very well with
 
-Jason
+$ qemu-kvm -machine q35,accel=kvm,kernel-irqchip=split -name guest=c10s
+-cpu host -smp 1 -m 16384 -drive file=/var/lib/libvirt/images/c10s-bios.qcow2,if=none,id=drive-ide0-0-0
+-device ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0,bootindex=1
+-vnc :0 -device VGA -monitor stdio --no-reboot
+
+Comparing traces of working and broken cases, I couldn't find anything
+suspicious but I may had missed something of course. For now, it seems
+like a userspace misbehavior resulting in a segfault.
+
+-- 
+Vitaly
+
 
