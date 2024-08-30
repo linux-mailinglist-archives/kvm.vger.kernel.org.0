@@ -1,141 +1,108 @@
-Return-Path: <kvm+bounces-25475-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25476-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19A2965A1F
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 10:22:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA89965A67
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 10:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00A891C22546
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 08:22:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE1882848DC
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 08:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201A216DEC8;
-	Fri, 30 Aug 2024 08:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC80216D4E5;
+	Fri, 30 Aug 2024 08:34:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Y3a1Cjzw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d8DrxBCD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006BB16726E;
-	Fri, 30 Aug 2024 08:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453FC1531F4;
+	Fri, 30 Aug 2024 08:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725006128; cv=none; b=jWoelqLs6aCbcZffnOyjrZa3lQtB9LHDPC3wZUNBf8xfk0nU29yZGkmLR+557AZvUFTiH8ed6Ur5DsWnfKkyM+f46yIq6fxqXiB/IhqfJezu4tgNLuT/EKmWU9PxZxErgHwIW5SnWLuF5aHDmBbT6Lw5LjKKORa1/LERS1V405E=
+	t=1725006864; cv=none; b=nCQJuzyz7szq0Q2vZrYL/bMcfMC7BJg877IF38C9QMQwC0BwFP4ndu0Od4GVeSY64kpObnGH6nDs32I8Ik3FZH0TNHZLVurFzw55sufGAmrcuQ1OP/LUPLkt3PH99TsnDLooyoie7PAJQGz+Pc7eG2Z1SAq/exUcnwC2HAso0A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725006128; c=relaxed/simple;
-	bh=PIcUkiafZtYG8sEz4v2SqQ0v9H86fyRvpH/0E+z0rJ0=;
+	s=arc-20240116; t=1725006864; c=relaxed/simple;
+	bh=qwsMEMHeerdWI1UTdx6FPqQoa8iGsLfB+Adm8JCDW7s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FCGs9oaAQutf0QxVWBGW8bFgM3WWSAVSB98fTBmixCzET6JSkn6OzN0Pv5Yqx0u4iSkLf55duai1fLA/FCmWhfV2CdLhvwGsBTDT0+YZRXV9/lR6i+eeQEWNwkDMEU59/p4i6sSCY0RpVf3YBEqShxo7mTFsBI/BaYHvrxIPdnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Y3a1Cjzw; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6712540E0263;
-	Fri, 30 Aug 2024 08:21:56 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id xMd7LO7waiqj; Fri, 30 Aug 2024 08:21:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1725006112; bh=EQylNExq6U1TeXqH5JUwqnWjVDhFHG4+fwK3JYt2zQo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y3a1CjzwrFw+9r4Be8p+BTmNvehFsMEpsg83mYtZ7dJUCC8W0arlziTYPfTctOmQb
-	 Pvh0GXtBhU7l4c0LU7i2ReFaEJ6hMozYNELSjTPORX/Zio/q52nIaxYbtAhCVnVZCZ
-	 XD5TPUdRiV2/rdG0oEMbjES7i4LnRnU3nBJXVtI0PDecZnC7raQxJgNY2oBPP4/f86
-	 v86mxwIpcfniQesE1RkLUOiU3pHXedPLXF5jMQYv/aEli3K7t7CNa13xCedrpjL/UM
-	 lrVINq2nwfVj5Qrn9vJERhnyZDUPvHSv7V5VoblslRV/COL7Q18rvXFv3PGGLBoZsG
-	 XmoScxQbAVRrVH85xhkwK3wj+oAjRi5b29mGHSRs0IBE9GgQYvM1Y1CcEU150ABEQ2
-	 in+YjLo4R336ZirR5PYg3AdVZK5AYZPmQiJDexzXaLcUa2A+Hw1l83IspD2apgUiNo
-	 SNNxb5zU+6TEOKKtdeD4bawnu9LpJ4KPB2SGb/kPl5/zlJ6GC5DN7sVhSxZ1urmzmH
-	 Hfxdd/db1wGv+VzueP2TxCDwliG3iF13iAWBEIxuZPxLhPT1+lGn8hBKPRSX1Y3fQL
-	 tcvVXHL9EDYXojhean9b5Fr9ZSlJgYUAT2X7Tj0sLYLEqidiFraonG2MALaeed7h7X
-	 K9AqdTUfq3a+W7GC5cRf5+nM=
-Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6032340E0275;
-	Fri, 30 Aug 2024 08:21:42 +0000 (UTC)
-Date: Fri, 30 Aug 2024 10:21:36 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com,
-	vkuznets@redhat.com, babu.moger@amd.com
-Subject: Re: [RFC PATCH v1 1/4] x86/cpufeatures: Add CPUID feature bit for
- the Bus Lock Threshold
-Message-ID: <20240830082136.GAZtGBEMyF-MbWXrPo@fat_crate.local>
-References: <20240709175145.9986-1-manali.shukla@amd.com>
- <20240709175145.9986-2-manali.shukla@amd.com>
- <Zr-qkJirOC_GM9o6@google.com>
- <20240829064811.GAZtAZqzWkmF79VOs7@fat_crate.local>
- <ZtFNwOG5oPwNF2bU@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cBEXHdxkAei6HTzoNMOmoguti1dvUT36l9aL96LPRUJMQGpcTOyNeZbq8XwmWW8li6xeHoUVRPoG2sqNyIt7LJgpfFa6jfkmOaUzW6bjMA38kFY5I3imqK9HhscuoPYAiPS0z2plWfxYnpGYIRRJItER/ZweOGev6UzxGdrVK4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d8DrxBCD; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725006863; x=1756542863;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qwsMEMHeerdWI1UTdx6FPqQoa8iGsLfB+Adm8JCDW7s=;
+  b=d8DrxBCDtKUoDPeW9CtAtlXnYj72+JqrG9DlrSDCjlSor+Z7xBYjUTFd
+   nikFTwvM+xyuD1VEzYiBwxRgCEPuu25L5e65qcffN72NoFwd38EEtMqi9
+   zvvb/44vhOIfMU+xjzIdfPnT8KDfOBjYj+WmAv5NHQ7CGv2agA2+aQkqP
+   JIFhOBAHs4iy2OJ2jeCojPXF2YLh8lH7IMZQqjTSAYoxUN0kVOclqtF2P
+   agZVmpNG0zXjMwPsDoyNH5nQEQcVODYXfasIiUl90iwta0W4wj1z2Xx2s
+   XueGIhthLfRrQ2ATWsrSwABnI1pUqd+oUIkcGqNubGdvCYeyXE8Vrw5nq
+   g==;
+X-CSE-ConnectionGUID: PKfm/2wnQu22gk09u3Bxsg==
+X-CSE-MsgGUID: ystzEsF3ReGQcC+U9Lj5Ug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="23777263"
+X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
+   d="scan'208";a="23777263"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 01:34:23 -0700
+X-CSE-ConnectionGUID: gyNQ+s63Q0K8UIXDemuNfQ==
+X-CSE-MsgGUID: kvsX+b0SRM6yeoK6hGACnA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
+   d="scan'208";a="64183943"
+Received: from sschumil-mobl2.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.63])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 01:34:19 -0700
+Date: Fri, 30 Aug 2024 11:34:14 +0300
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
+	isaku.yamahata@gmail.com, xiaoyao.li@intel.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/25] KVM: TDX: Initialize KVM supported capabilities
+ when module setup
+Message-ID: <ZtGEBiAS7-NzBIoE@tlindgre-MOBL1>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-11-rick.p.edgecombe@intel.com>
+ <ZrrSMaAxyqMBcp8a@chao-email>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZtFNwOG5oPwNF2bU@google.com>
+In-Reply-To: <ZrrSMaAxyqMBcp8a@chao-email>
 
-On Thu, Aug 29, 2024 at 09:42:40PM -0700, Sean Christopherson wrote:
-> Ah, sorry, if the platform+kernel supports the feature, not just raw CPU.
+On Tue, Aug 13, 2024 at 11:25:37AM +0800, Chao Gao wrote:
+> On Mon, Aug 12, 2024 at 03:48:05PM -0700, Rick Edgecombe wrote:
+> >From: Xiaoyao Li <xiaoyao.li@intel.com>
+> >+static int __init setup_kvm_tdx_caps(void)
+> >+{
+> >+	const struct tdx_sysinfo_td_conf *td_conf = &tdx_sysinfo->td_conf;
+> >+	u64 kvm_supported;
+> >+	int i;
+> >+
+> >+	kvm_tdx_caps = kzalloc(sizeof(*kvm_tdx_caps) +
+> >+			       sizeof(struct kvm_tdx_cpuid_config) * td_conf->num_cpuid_config,
+> 
+> struct_size()
+> 
+> >+			       GFP_KERNEL);
+> >+	if (!kvm_tdx_caps)
+> >+		return -ENOMEM;
 
-Yeah, that's not always trivial, as I'm sure you know. Especially if it is
-a complicated feature like, SNP, for example, which needs fw and platform to
-be configured properly and so on.
+This will go away with the dropping of struct kvm_tdx_caps. Should be checked
+for other places though.
 
-> And because that utility is not available by default on most targets I care
-> about, and having to build and copy over a binary is annoying (though this
-> is a minor gripe).
+Regards,
 
-I'm keeping that thing as simple as possible on purpose. So if you wanna make
-it available on such targets, I'm all ears.
- 
-> That said, what I really want in most cases is to know if _KVM_ supports
-> a feature.  I'll think more on this, I have a few vague ideas for getting
-> a pile of information out of KVM without needing to add more uABI.
-
-That's exactly my pet peeve - making it a uABI and then supporting it foreva.
-
-We have tried to explain what cpuinfo should be:
-
-Documentation/arch/x86/cpuinfo.rst
-
-The gist of it is:
-
-"So, the current use of /proc/cpuinfo is to show features which the kernel has
-*enabled* and *supports*. As in: the CPUID feature flag is there, there's an
-additional setup which the kernel has done while booting and the functionality
-is ready to use. A perfect example for that is "user_shstk" where additional
-code enablement is present in the kernel to support shadow stack for user
-programs."
-
-So if it is something that has been enabled and is actively supported, then
-sure, ofc. What I don't want to have there is a partial mirror of every
-possible CPUID flag which is going to be a senseless and useless madness.
-
-Dunno, I guess if we had a
-
-"virt: ..."
-
-line in /proc/cpuinfo which has flags of what the hypervisor has enabled as
-a feature, it might not be such a wrong idea... with the above caveats, ofc.
-I don't think you want a flurry of patches setting all possible flags just
-because.
-
-Or maybe somewhere else where you can query it conveniently...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Tony
 
