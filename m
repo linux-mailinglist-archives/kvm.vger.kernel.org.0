@@ -1,171 +1,116 @@
-Return-Path: <kvm+bounces-25506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25505-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A0A2965FE5
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 13:03:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45B75965FE3
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 13:03:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D7701C22DE1
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 11:03:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E59CD1F239C1
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 11:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3282C199949;
-	Fri, 30 Aug 2024 11:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA48E199942;
+	Fri, 30 Aug 2024 11:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h3M9Pqci"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qOJOf9FH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E68B19992E;
-	Fri, 30 Aug 2024 11:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6711D19992C
+	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 11:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725015704; cv=none; b=QPZsSY7NVYpDQMoQqgi9f3xGEeZaotJzzsr2uCxG09NrsJ7abZDBSExi2lRUszZnuY8R2tN3MFlMrXsPgA9ZJYVK2R/YCwYHk/KHYfMEUW5L1KM2nGkEm7x99JkLrE2WVeA3Z/hr3dX/CkefcQ+hj3yOypikZR7WjNoY3CQ8Xd0=
+	t=1725015703; cv=none; b=mYfDKW2I5m5XHfRgI8D/tKNG+wBgl/73rzMKC0fpJeOCol5twwn3OZUUhV6QlU/W9r2CitTvfRZEzzWRXs/K524txkF+N82dI+VWp9lgtuJ7TM6TqMVUwJoUiHthZSyaxdaJ9YbZZqXBvCxjI/zZZ9mEq9s887VvjiHozCanZXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725015704; c=relaxed/simple;
-	bh=GP9Bk2oV4XilDa9FmBZHZQPmp/feHl1DYZ3IzxwovvQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T1Ji/qKZhWpw2hXuTDbA95p+qsWrzh3KDz43xqQh76B4TzTIfZw0jZXw/7jmy3UWT97zpgDCKXa/vn6DlV32IBxpoTatDu98NObd/f84zgp52DCPvNfnEoruKWO0+W5a5d5cSI+mYtfcyEd0IOg+p34EiDJi/NQ5sI8tjzWZrYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h3M9Pqci; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725015702; x=1756551702;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=GP9Bk2oV4XilDa9FmBZHZQPmp/feHl1DYZ3IzxwovvQ=;
-  b=h3M9PqcizyWIk3XHa+UpMVDJ/r5ts7EMKLtApPTmd8os9dAagdXHIyEV
-   BZpPLc7txxYeTDNmyOmjf+XFtaupdcPgMyM24F9XsAEizWGGGgDwpOH5u
-   5l1H5lLDPdDdxcjN/LgalW0K97er/INR6vrclhj2GnphuH3nV89saj8UF
-   VWHuilZqLVWlh/XD0e4V/XOMbyOudg/KBjx7VqHM8a6Gv3AaZu3GjJxxf
-   HXMn52/61J6fC7FyQH75vcGjnAUCJlQjKSzdLkHYo0kqYx3pBO34oOhyr
-   ZBZgrNikx0kDLQA8216D6QnUlL0z4OXBYNoXRh7fzUGd0VB3fVDbC2T1j
-   A==;
-X-CSE-ConnectionGUID: YYKiBSRaRgiyy+FcisC1Iw==
-X-CSE-MsgGUID: 4eFB6s0aQ5ebtaVoGkiClg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="23809204"
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="23809204"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 04:01:40 -0700
-X-CSE-ConnectionGUID: +pYUoDjfTP6NqLBSGEA+iw==
-X-CSE-MsgGUID: c6+ZF1wSS5i6x/56jQdC8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="63492989"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.96.163])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 04:01:34 -0700
-Message-ID: <0a1a860f-cb46-426e-b586-f33d38b2c912@intel.com>
-Date: Fri, 30 Aug 2024 14:01:28 +0300
+	s=arc-20240116; t=1725015703; c=relaxed/simple;
+	bh=OU3ZD/tINDeCZzbqkPivzNhufEb02y3r9eN2e0aJmwU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=s5fseCZeBhRE6LkGzEZ76sk9jWz9K4W52ZXo3LyD+bqERUsinLNaW15a9+UKjX2OSGuUhBW4xwf4nUBX9MnF2cHnjey+kbO9utmTh13rpCG1aFvdmBxHjWVrAXASfYNdcsySgbigZgu5MmAgFKldreKSBToHer2Kbotcw38jPEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qOJOf9FH; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725015699;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N909z69GYkPeqBou+7oKeymfZidniJoL6acPvqa0aHg=;
+	b=qOJOf9FHZ51yqmsKwBUFLrW9jQ6a/Qlimn0+rylZLssY5oqmaFSuXZw0Gw6ZvQtRdW5xq9
+	Ep1c/gALxnv/rM0zbfdWs2NS66eh+PD0g8mi5pVOvw/jClEAaKnPMFmHwrUH6P6Hijdy9K
+	M2FJ1q4k1vTj2uo3RWaVA8SQ39oBW+8=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: atishp@rivosinc.com,
+	cade.richard@berkeley.edu,
+	jamestiotio@gmail.com
+Subject: [kvm-unit-tests PATCH 4/3] riscv: Provide helpers for IPIs
+Date: Fri, 30 Aug 2024 13:01:36 +0200
+Message-ID: <20240830110135.2232665-2-andrew.jones@linux.dev>
+In-Reply-To: <20240830101221.2202707-5-andrew.jones@linux.dev>
+References: <20240830101221.2202707-5-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 8/8] x86/virt/tdx: Don't initialize module that doesn't
- support NO_RBP_MOD feature
-To: Kai Huang <kai.huang@intel.com>, dave.hansen@intel.com,
- kirill.shutemov@linux.intel.com, tglx@linutronix.de, bp@alien8.de,
- peterz@infradead.org, mingo@redhat.com, hpa@zytor.com,
- dan.j.williams@intel.com, seanjc@google.com, pbonzini@redhat.com
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, chao.gao@intel.com,
- binbin.wu@linux.intel.com
-References: <cover.1724741926.git.kai.huang@intel.com>
- <0996e2f1b3e5c72150708b10bff57ad726c69e4b.1724741926.git.kai.huang@intel.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <0996e2f1b3e5c72150708b10bff57ad726c69e4b.1724741926.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 27/08/24 10:14, Kai Huang wrote:
-> Old TDX modules can clobber RBP in the TDH.VP.ENTER SEAMCALL.  However
-> RBP is used as frame pointer in the x86_64 calling convention, and
-> clobbering RBP could result in bad things like being unable to unwind
-> the stack if any non-maskable exceptions (NMI, #MC etc) happens in that
-> gap.
-> 
-> A new "NO_RBP_MOD" feature was introduced to more recent TDX modules to
-> not clobber RBP.  This feature is reported in the TDX_FEATURES0 global
-> metadata field via bit 18.
-> 
-> Don't initialize the TDX module if this feature is not supported [1].
-> 
-> Link: https://lore.kernel.org/all/c0067319-2653-4cbd-8fee-1ccf21b1e646@suse.com/T/#mef98469c51e2382ead2c537ea189752360bd2bef [1]
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+Provide a few functions to enable/disable/acknowledge IPIs.
 
-Reviewed-by: Adrian Hunter <adrian.hunter@intel.com>
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
+ lib/riscv/asm/csr.h       |  3 ++-
+ lib/riscv/asm/processor.h | 15 +++++++++++++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
-> ---
-> 
-> v2 -> v3:
->  - check_module_compatibility() -> check_features().
->  - Improve error message.
-> 
->  https://lore.kernel.org/kvm/cover.1721186590.git.kai.huang@intel.com/T/#md9e2eeef927838cbf20d7b361cdbea518b8aec50
-> 
-> ---
->  arch/x86/virt/vmx/tdx/tdx.c | 17 +++++++++++++++++
->  arch/x86/virt/vmx/tdx/tdx.h |  3 +++
->  2 files changed, 20 insertions(+)
-> 
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index fa335ab1ae92..032a53ddf5bc 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -454,6 +454,18 @@ static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
->  	return get_tdx_sys_info_tdmr(&sysinfo->tdmr);
->  }
->  
-> +static int check_features(struct tdx_sys_info *sysinfo)
-> +{
-> +	u64 tdx_features0 = sysinfo->features.tdx_features0;
-> +
-> +	if (!(tdx_features0 & TDX_FEATURES0_NO_RBP_MOD)) {
-> +		pr_err("frame pointer (RBP) clobber bug present, upgrade TDX module\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  /* Calculate the actual TDMR size */
->  static int tdmr_size_single(u16 max_reserved_per_tdmr)
->  {
-> @@ -1235,6 +1247,11 @@ static int init_tdx_module(void)
->  
->  	print_basic_sys_info(&sysinfo);
->  
-> +	/* Check whether the kernel can support this module */
-> +	ret = check_features(&sysinfo);
-> +	if (ret)
-> +		return ret;
-> +
->  	/*
->  	 * To keep things simple, assume that all TDX-protected memory
->  	 * will come from the page allocator.  Make sure all pages in the
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-> index e7bed9e717c7..831361e6d0fb 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.h
-> +++ b/arch/x86/virt/vmx/tdx/tdx.h
-> @@ -154,6 +154,9 @@ struct tdx_sys_info_features {
->  	u64 tdx_features0;
->  };
->  
-> +/* Architectural bit definitions of TDX_FEATURES0 metadata field */
-> +#define TDX_FEATURES0_NO_RBP_MOD	_BITULL(18)
-> +
->  /* Class "TDX Module Version" */
->  struct tdx_sys_info_version {
->  	u16 major;
+diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+index 24b333e02589..16f5ddd762de 100644
+--- a/lib/riscv/asm/csr.h
++++ b/lib/riscv/asm/csr.h
+@@ -51,7 +51,8 @@
+ #define IRQ_S_GEXT		12
+ #define IRQ_PMU_OVF		13
+ 
+-#define IE_TIE			(_AC(0x1, UL) << IRQ_S_TIMER)
++#define IE_SSIE			(_AC(1, UL) << IRQ_S_SOFT)
++#define IE_TIE			(_AC(1, UL) << IRQ_S_TIMER)
+ 
+ #define IP_TIP			IE_TIE
+ 
+diff --git a/lib/riscv/asm/processor.h b/lib/riscv/asm/processor.h
+index 4c9ad968460d..8989d8d686f9 100644
+--- a/lib/riscv/asm/processor.h
++++ b/lib/riscv/asm/processor.h
+@@ -32,6 +32,21 @@ static inline void local_irq_disable(void)
+ 	csr_clear(CSR_SSTATUS, SR_SIE);
+ }
+ 
++static inline void local_ipi_enable(void)
++{
++	csr_set(CSR_SIE, IE_SSIE);
++}
++
++static inline void local_ipi_disable(void)
++{
++	csr_clear(CSR_SIE, IE_SSIE);
++}
++
++static inline void ipi_ack(void)
++{
++	csr_clear(CSR_SIP, IE_SSIE);
++}
++
+ void install_exception_handler(unsigned long cause, void (*handler)(struct pt_regs *));
+ void install_irq_handler(unsigned long cause, void (*handler)(struct pt_regs *));
+ void do_handle_exception(struct pt_regs *regs);
+-- 
+2.45.2
 
 
