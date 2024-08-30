@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-25535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA63966546
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 17:23:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D020966567
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 17:27:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64DE01C20A3E
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 15:23:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4065B1C2168C
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 15:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D17E41B3B37;
-	Fri, 30 Aug 2024 15:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95231B5311;
+	Fri, 30 Aug 2024 15:27:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZKk4kt/Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yl5ilK0y"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AF11A7AC6
-	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 15:23:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B7E1B5818
+	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 15:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725031431; cv=none; b=DNMpQoq5TZ+Xs3tRgjQxK/vfes+826ycvTlpul+ac8yiXLHzn5mi8ih0Wq0Pld9dxkv2hPUTCUOwh/H3aPChfY2oPSYyhalJ01Vut/SSJ/whjKuxI+hJoANSsSRVvcKesYX+p3ZkGDVT2oGmFlVZwwZcc8ewgLQ3+OnSB0PysEY=
+	t=1725031628; cv=none; b=N3MW/fgixHOP7bwR4+G1wuIWT8Sp+04G0lto2OnMvx0Abg3GSTpbQwZ3JYjXG0LdKLooqnb782HFTEmtm72AglS36K3fLfODoCTavU1ap7n+L5x0I5gw25jFGEgUpjALNP07JLQ7zoCtT3eqP9SnWqY02P3tksHSlqua4X1+Fn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725031431; c=relaxed/simple;
-	bh=6vx2gq56ZM4qeqxj6ucMe1zrs+h9CSZFZQVXtBHV2qA=;
+	s=arc-20240116; t=1725031628; c=relaxed/simple;
+	bh=eW7ITzzwk9ygkd2IBGeFmo01XiG9+lP5rghpWtFyhxE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iqJLifKuACPhgczkDggH+uGbwPGSkDqBAkUZfEgxKAiRC4pQVnLjnn+yj2OyyGdxTMZcm1/kBSUrQn1/Kt05SYMd+yLdvTZz5rWZa6Ih6zYeNEhf6s7rou1VGCK64SvH3tPnin2PgKwgVimsByCDgEyooYVOsXw3mdkZUWNxvIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZKk4kt/Z; arc=none smtp.client-ip=209.85.128.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=isQkSwgJb4RSDpRY21hQDtc25ZEdr5mzGmJZ/NjHck0Ka3RuRmBnGqZ1Xar5MQVpEnAk6nXZ4yKQ0KqoG+q9ryMYdMBbkpbrSNII3PqDgr4dIQ8oV1Nf282XEk5Dyg+5+/UeN3wmdH/YxIDmWzCTylfrTsz5gMTVkIb8xucCQy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yl5ilK0y; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-429d1a9363aso53045e9.1
-        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 08:23:47 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42ba8928f1dso56125e9.1
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 08:27:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725031426; x=1725636226; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1725031624; x=1725636424; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WOU46aVnTgnZrtLuHoe3iJX7qiC4mddr2CSB3vbflRc=;
-        b=ZKk4kt/ZzxgLF2s2yXQTcCLhQoHFwPu89OEkR/wGpo4k9QklLB3n/vyAi0L7aJ+8Li
-         1h9z4nIdNQQuHwk0lAzJtcXoMOX4NssornIgoC7Il+V95dUMJAQqRoWW+DP9ZIlg/buw
-         DQcz8tCl7wT70u1ibFLmyBY+Ybioev082cQ7/clkfGCzwcCkwPe/Q6cg3X7/iVBFijq6
-         j5ptQYKCfXGr79yEZKbk9///9cpgC+4kAq6CI5AzQO2kIfo17YDiwFkDAJqADuZ363p5
-         1NtbMh6UXoTCZuT9aPBufC0Yr3c73kE+VEq66IdzB9d8+FEmL+JdXPrlsLg6SK/XrIUo
-         yrdA==
+        bh=H3AaOlacpjrdS6dYgrqk+vOy/n/WnhMvz5SZv0q3vtA=;
+        b=Yl5ilK0yFDVVNZacKclm1it0XxfCXclJlwfDZlvnRLI5YmUPLrcMrpVmMuYoyIMYTk
+         z1cqA+pvl6s3vdFcqyvsPeywvutuH7Maj0ptecGbRPS5XgDD4O2fznoPRdLW/f6IxVHe
+         3c6QehyRpLkM9dW5szSV7wZ1ETqQ+gGwTOTmpvQxSK0mjKjjSVvOWpBvUFjEgOKvGRiZ
+         mCVyHuOg3CSs5pafHtbP03CMY63eSKO6RonxTMY13N0f+KO0iRLhzOrHld5VyOvcI1h6
+         UTCf6G9/Ml1uY+QPOi5igA45M4016Qz48BMBJTofrVH4+b2H+aNb4VUATDRdRG6TwZdz
+         ITeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725031426; x=1725636226;
+        d=1e100.net; s=20230601; t=1725031624; x=1725636424;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WOU46aVnTgnZrtLuHoe3iJX7qiC4mddr2CSB3vbflRc=;
-        b=mNL4FxM+uu2gsWXqHtqOt5KwzJ1v/iHjgxLQofqQ2vt+585HcyvWfMqFZJkqMqsP4C
-         KGCmrLqxrNTU0OmwlgWH+D5Zv9tsv/GJl3ZiOOt9KMQJESMyNpLC6PpYHqifwzX7Iebn
-         769hK25HQsJgDfH7zYroEhwLsr+OR/df9jeTAXNZzh8NaX9FwPv2uJ8GKABon8vpBwTD
-         7vmKJbHfarS39obTRPd8e3AQdXxGHMj701ht2KR5H6YY5xYunySMJK/LcEM/dnp4VluA
-         XLxfUclOFAfMHX7d+E6L0AsgtCO18CPy+UVfLYutk8c3HvNv+I9NGI7fvqVWfnE8oXKd
-         NQkw==
-X-Forwarded-Encrypted: i=1; AJvYcCWG+6hVuDrBQiml8rW4lHJ/3VvoYcL2+YVjXIKfpiv9PJQS3JpR9cTQMwpqjx0TwNT0Hvg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG/s3EDDpoJ1k4FKYnzuDdLdpl2Yf2q9F36aEiICJmT2knyUfK
-	2dGH1MY+acrdYglFpP5B6YIKxXAirrqeTmmBl3E/bSFtA24lTwQ8qi90w1rtSg==
-X-Google-Smtp-Source: AGHT+IHDqRWS3lPGg0daxRyt2QBSUBhTzWgO4oFzGsmOgI5ybD+dtAarfBs2yjdiu5Fpbo6UhaT9Bw==
-X-Received: by 2002:a05:600c:384f:b0:426:6edd:61a7 with SMTP id 5b1f17b1804b1-42bbb6a35c2mr1103455e9.7.1725031425900;
-        Fri, 30 Aug 2024 08:23:45 -0700 (PDT)
+        bh=H3AaOlacpjrdS6dYgrqk+vOy/n/WnhMvz5SZv0q3vtA=;
+        b=EIE8X9CByR7iGpcjBHisv5RfIpCS3wkPLvBZqyzPC2D+ZJS2oG0yWc+gsf8zpKqyWm
+         60u2d8wt/3oDJAZI1610dc17/doQ9mKvkqQr3hBV8S8k9Uw+fcy7UMDx+VjfDEkCvV0m
+         dqjI+m9V+WoBGkskMjCFRgpW9XDxOcx75KzMIWX13RCWmYCibV9IFAFNujmK5FyZjd7m
+         qC28r9roLV78Us1JjN+VD0LPnTFXZji9boIxIsqjFU/hxfzzXaAt+uuKNw/V6GPbo36R
+         unU5axNXHUCjaWVUysj1w0Y2c8HmbjgUG7AiHT4tRFssbiKf6X1TzzoSbF3T/4r5aQfs
+         W5jw==
+X-Forwarded-Encrypted: i=1; AJvYcCX9GmkzYz+dTi+Elv2wpQH2+Xa6ff7S8qJTS8dM1nF9yh5SPNHheJE/S08SLR6nhGnT8YA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxogdrW6b3EEcFR1/nBUl8jG/fGG1kEQvngCn/sIVqOh8uP9oMp
+	M5fVCHSBmwe6I+nsVBAohtIC+cIkt9qg3KzImy2hkHO0UwX+u4FnvcdaGARywQ==
+X-Google-Smtp-Source: AGHT+IGXR29Kld8IDQGNVEA4AoJiwGiXxRFNMNP4VkTKAZ9VuEsRIqNCnFf+Xrf87qSHJgw8pR22qg==
+X-Received: by 2002:a05:600c:1da1:b0:42b:892a:333b with SMTP id 5b1f17b1804b1-42bbaa2b0a9mr1463235e9.2.1725031624257;
+        Fri, 30 Aug 2024 08:27:04 -0700 (PDT)
 Received: from google.com (109.36.187.35.bc.googleusercontent.com. [35.187.36.109])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6e27364sm48924815e9.34.2024.08.30.08.23.45
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba7b4271fsm78764955e9.29.2024.08.30.08.27.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Aug 2024 08:23:45 -0700 (PDT)
-Date: Fri, 30 Aug 2024 15:23:41 +0000
+        Fri, 30 Aug 2024 08:27:03 -0700 (PDT)
+Date: Fri, 30 Aug 2024 15:27:00 +0000
 From: Mostafa Saleh <smostafa@google.com>
 To: Jason Gunthorpe <jgg@nvidia.com>
 Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>,
@@ -86,11 +86,11 @@ Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>,
 	Michael Shavit <mshavit@google.com>,
 	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
 	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH v2 6/8] iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO via
- struct arm_smmu_hw_info
-Message-ID: <ZtHj_X6Gt91TlUZG@google.com>
+Subject: Re: [PATCH v2 7/8] iommu/arm-smmu-v3: Implement
+ IOMMU_HWPT_ALLOC_NEST_PARENT
+Message-ID: <ZtHkxFrojjXplvvn@google.com>
 References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <6-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ <7-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -99,150 +99,56 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+In-Reply-To: <7-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
 
 Hi Jason,
 
-On Tue, Aug 27, 2024 at 12:51:36PM -0300, Jason Gunthorpe wrote:
-> From: Nicolin Chen <nicolinc@nvidia.com>
+On Tue, Aug 27, 2024 at 12:51:37PM -0300, Jason Gunthorpe wrote:
+> For SMMUv3 the parent must be a S2 domain, which can be composed
+> into a IOMMU_DOMAIN_NESTED.
 > 
-> For virtualization cases the IDR/IIDR/AIDR values of the actual SMMU
-> instance need to be available to the VMM so it can construct an
-> appropriate vSMMUv3 that reflects the correct HW capabilities.
+> In future the S2 parent will also need a VMID linked to the VIOMMU and
+> even to KVM.
 > 
-> For userspace page tables these values are required to constrain the valid
-> values within the CD table and the IOPTEs.
-> 
-> The kernel does not sanitize these values. If building a VMM then
-> userspace is required to only forward bits into a VM that it knows it can
-> implement. Some bits will also require a VMM to detect if appropriate
-> kernel support is available such as for ATS and BTM.
-> 
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 24 ++++++++++++++
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  2 ++
->  include/uapi/linux/iommufd.h                | 35 +++++++++++++++++++++
->  3 files changed, 61 insertions(+)
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index c2021e821e5cb6..ec2fcdd4523a26 100644
+> index ec2fcdd4523a26..8db3db6328f8b7 100644
 > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2288,6 +2288,29 @@ static bool arm_smmu_enforce_cache_coherency(struct iommu_domain *domain)
->  	return ret;
->  }
->  
-> +static void *arm_smmu_hw_info(struct device *dev, u32 *length, u32 *type)
-> +{
-> +	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
-> +	struct iommu_hw_info_arm_smmuv3 *info;
-> +	u32 __iomem *base_idr;
-> +	unsigned int i;
-> +
-> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
-> +	if (!info)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	base_idr = master->smmu->base + ARM_SMMU_IDR0;
-> +	for (i = 0; i <= 5; i++)
-> +		info->idr[i] = readl_relaxed(base_idr + i);
-> +	info->iidr = readl_relaxed(master->smmu->base + ARM_SMMU_IIDR);
-> +	info->aidr = readl_relaxed(master->smmu->base + ARM_SMMU_AIDR);
-> +
-> +	*length = sizeof(*info);
-> +	*type = IOMMU_HW_INFO_TYPE_ARM_SMMUV3;
-> +
-> +	return info;
-> +}
-> +
->  struct arm_smmu_domain *arm_smmu_domain_alloc(void)
+> @@ -3103,7 +3103,8 @@ arm_smmu_domain_alloc_user(struct device *dev, u32 flags,
+>  			   const struct iommu_user_data *user_data)
 >  {
+>  	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
+> -	const u32 PAGING_FLAGS = IOMMU_HWPT_ALLOC_DIRTY_TRACKING;
+> +	const u32 PAGING_FLAGS = IOMMU_HWPT_ALLOC_DIRTY_TRACKING |
+> +				 IOMMU_HWPT_ALLOC_NEST_PARENT;
 >  	struct arm_smmu_domain *smmu_domain;
-> @@ -3467,6 +3490,7 @@ static struct iommu_ops arm_smmu_ops = {
->  	.identity_domain	= &arm_smmu_identity_domain,
->  	.blocked_domain		= &arm_smmu_blocked_domain,
->  	.capable		= arm_smmu_capable,
-> +	.hw_info		= arm_smmu_hw_info,
->  	.domain_alloc_paging    = arm_smmu_domain_alloc_paging,
->  	.domain_alloc_sva       = arm_smmu_sva_domain_alloc,
->  	.domain_alloc_user	= arm_smmu_domain_alloc_user,
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> index 45882f65bfcad0..4b05c81b181a82 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-> @@ -80,6 +80,8 @@
->  #define IIDR_REVISION			GENMASK(15, 12)
->  #define IIDR_IMPLEMENTER		GENMASK(11, 0)
+>  	int ret;
 >  
-> +#define ARM_SMMU_AIDR			0x1C
-> +
->  #define ARM_SMMU_CR0			0x20
->  #define CR0_ATSCHK			(1 << 4)
->  #define CR0_CMDQEN			(1 << 3)
-> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-> index 4dde745cfb7e29..83b6e1cd338d8f 100644
-> --- a/include/uapi/linux/iommufd.h
-> +++ b/include/uapi/linux/iommufd.h
-> @@ -484,15 +484,50 @@ struct iommu_hw_info_vtd {
->  	__aligned_u64 ecap_reg;
->  };
+> @@ -3116,6 +3117,14 @@ arm_smmu_domain_alloc_user(struct device *dev, u32 flags,
+>  	if (!smmu_domain)
+>  		return ERR_PTR(-ENOMEM);
 >  
-> +/**
-> + * struct iommu_hw_info_arm_smmuv3 - ARM SMMUv3 hardware information
-> + *                                   (IOMMU_HW_INFO_TYPE_ARM_SMMUV3)
-> + *
-> + * @flags: Must be set to 0
-> + * @__reserved: Must be 0
-> + * @idr: Implemented features for ARM SMMU Non-secure programming interface
-> + * @iidr: Information about the implementation and implementer of ARM SMMU,
-> + *        and architecture version supported
-> + * @aidr: ARM SMMU architecture version
-> + *
-> + * For the details of @idr, @iidr and @aidr, please refer to the chapters
-> + * from 6.3.1 to 6.3.6 in the SMMUv3 Spec.
-> + *
-> + * User space should read the underlying ARM SMMUv3 hardware information for
-> + * the list of supported features.
-> + *
-> + * Note that these values reflect the raw HW capability, without any insight if
-> + * any required kernel driver support is present. Bits may be set indicating the
-> + * HW has functionality that is lacking kernel software support, such as BTM. If
-> + * a VMM is using this information to construct emulated copies of these
-> + * registers it should only forward bits that it knows it can support.
-> + *
-> + * In future, presence of required kernel support will be indicated in flags.
-> + */
-> +struct iommu_hw_info_arm_smmuv3 {
-> +	__u32 flags;
-> +	__u32 __reserved;
-> +	__u32 idr[6];
-> +	__u32 iidr;
-> +	__u32 aidr;
-> +};
-There is a ton of information here, I think we might need to santitze the
-values for what user space needs to know (that's why I was asking about qemu)
-also SMMU_IDR4 is implementation define, not sure if we can unconditionally
-expose it to userspace.
+> +	if (flags & IOMMU_HWPT_ALLOC_NEST_PARENT) {
+> +		if (!(master->smmu->features & ARM_SMMU_FEAT_NESTING)) {
+> +			ret = -EOPNOTSUPP;
+I think that should be:
+	ret = ERR_PTR(-EOPNOTSUPP);
 
 Thanks,
 Mostafa
+> +			goto err_free;
+> +		}
+> +		smmu_domain->stage = ARM_SMMU_DOMAIN_S2;
+> +	}
 > +
->  /**
->   * enum iommu_hw_info_type - IOMMU Hardware Info Types
->   * @IOMMU_HW_INFO_TYPE_NONE: Used by the drivers that do not report hardware
->   *                           info
->   * @IOMMU_HW_INFO_TYPE_INTEL_VTD: Intel VT-d iommu info type
-> + * @IOMMU_HW_INFO_TYPE_ARM_SMMUV3: ARM SMMUv3 iommu info type
->   */
->  enum iommu_hw_info_type {
->  	IOMMU_HW_INFO_TYPE_NONE = 0,
->  	IOMMU_HW_INFO_TYPE_INTEL_VTD = 1,
-> +	IOMMU_HW_INFO_TYPE_ARM_SMMUV3 = 2,
->  };
->  
->  /**
+>  	smmu_domain->domain.type = IOMMU_DOMAIN_UNMANAGED;
+>  	smmu_domain->domain.ops = arm_smmu_ops.default_domain_ops;
+>  	ret = arm_smmu_domain_finalise(smmu_domain, master->smmu, flags);
 > -- 
 > 2.46.0
 > 
