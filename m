@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-25421-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25422-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424C0965404
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 02:33:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 82C02965409
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 02:35:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE8731F20219
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 00:33:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A1351F23CD2
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 00:35:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CCA4A2F;
-	Fri, 30 Aug 2024 00:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC89F4C98;
+	Fri, 30 Aug 2024 00:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y/mPb8MP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MDmnWAng"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A040B20EB
-	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 00:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12E82595
+	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 00:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724978020; cv=none; b=h1+NGQF1Xb1XZFdsjT+3BLSSC1MZbmE+VmroV60Yn/ZoOcTEP0bbRLKhUrGSnkYUcMhG7LDQL0QAaNJAdCjL5UUbWvBH6zTMR43cUVRV3FLyAVDuxIWLjETgUy4ByputWHEl6aZRkz6XkVKpsMz7Q1wEIsiNGfn3lkQAy8a5Y7A=
+	t=1724978092; cv=none; b=FhyU9xaELBBrT4b8lH+Pmukv7gDl6OKf7FS87eoAs1WK+rJ5H18nMN9iYYjRwF0nGj4ecovUrpw6rZXc80dJgZ61aviaWgEZVjAfN6JXH995gvAjDMcRhg7MvZL74wyr5Ob4JzVkC2G7DUi/jEPMcYGQo+d31s+Q0SFModaZ/Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724978020; c=relaxed/simple;
-	bh=SH85gWPyWDBMrPTxg5hwF9eFmgdFespsOtsowukOS9M=;
+	s=arc-20240116; t=1724978092; c=relaxed/simple;
+	bh=FqpnbV2f9pzqLhpgsHuN0fCsazH+X/gkpf6dLbPjAVo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cQpVtPUNgmyjmOJDRmPLAtnbsTuGx9q6XOrtP139DNLNWQJt7PUz73Xl3IYLl0mlScdA3BAMxR+1V4WxmpNM80SJ+ACcCNvomiRra85bQLbtJgnImVco8dFZQ3XbITcIsxp6yZ1U0KS9dKm1K/QvdQh0UapGvbs892r04+ZYLyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y/mPb8MP; arc=none smtp.client-ip=209.85.128.182
+	 To:Cc:Content-Type; b=AHvBol5yYe5hJ9envIpQU6lmV8LCBCxALeMTOJiSFBk2OLcBdJnj4LEggiCZa8DZ/50w1gK3vaPMo21ocZkxskHiZimqzoFznMm3r40yCp3GpyZzgwRk2ruCyxoL+TBagL9KMKW+fZ2LVKn4RUzc7kkYYNXfXYKs6BU5uf2VP1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MDmnWAng; arc=none smtp.client-ip=209.85.128.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6b8d96aa4c3so10828767b3.1
-        for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 17:33:38 -0700 (PDT)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6c130ffa0adso13046007b3.3
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2024 17:34:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724978017; x=1725582817; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1724978089; x=1725582889; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v0c5SIq1ErU8LqTXRTvzlDlvgCjUaMFsATO9CN846VQ=;
-        b=Y/mPb8MPTl65Z1Otvjjg8QrPKfmi9jSRHvdEgOC4zgsd4p7GjDnZPPK+nAl+fa5M2v
-         bxhTKYv8lTTavySyVmlsRerzHbY1ce40NVdgo6wvWBz69J1qSl6HWkyXCgLXEfo+PjmD
-         xtvpEXcJhpwWry7RF3rd4dmzrrX9GRVBp44gvGfgyU/o8cFBOWvgBzs7bCk/9qDus6Au
-         XWBUC+YMRPKEknZksVMA7thsO627YTW90nPl48XxIbrY0TJ2av0q4mhXczMBpR9vwtSL
-         GjsJn9jeTZbe84C0MpI//f6LPy7vWMONAUE4IEJ8+aIniS0H8M01TMdA20d9YSAAX9ss
-         oPtA==
+        bh=ScuyZghAxUsq77xlIUmB3FT5rIh3r/8m9ZVZaLG04YU=;
+        b=MDmnWAngL+nP73hzjjGKxpceEJdM8OWOTpTgpjSmyW0UaKUesZu3hB2zTJNwQmijRW
+         RXyM860vWZyJ6YXD/fJrbR7SLtAd+XxwZMntcu2IKITfj5G1/cCBoVBJgRWPeCzeLRWV
+         AYroBUfc2cTinfa3XrpjakCY2EF6JOU4jAIJCUWux4KFKTs3LN3jh4vnUfvgN7gJoHAq
+         k7b7PeX0xpEy4zHd2WIMhkSv7m78+GptqGcsWHl971cA3yHTr14zWPZwUWIgF4eTc4nU
+         XNiyq/A7gEnR7q5o5F1+79jS0GsBExfhhvYPFyKgd2ufZ+KyZeYMZYtCfkykO4KmSnbJ
+         2a+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724978017; x=1725582817;
+        d=1e100.net; s=20230601; t=1724978089; x=1725582889;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=v0c5SIq1ErU8LqTXRTvzlDlvgCjUaMFsATO9CN846VQ=;
-        b=BZTkA8C4Z3ct2DZy14W0uLMsP54MkOju/kmB8Mg7SASb+drXpIv2w6RdAfCSvkLxBp
-         YcZR8CVY0zChpLkOvFO8iRwsmFbVTP9S88aSNLBcD+mFfNNFHiVkKEGZOtat6Yumw3Do
-         daQMie2pTgewHbwGLRKsMEYMSA/d44l9zcEabZsUNHb9oNZ2K8MKXhgONF+xsXgS4Vo8
-         x62ySBVC7l1YhbhGS0cMwOXsHAih+//7BUEYEV+N+sW/7CsaChHsQBAdxWXMqeryPbik
-         Ducerayw+QWDEDg7OvwFOpjL3D/b6d0pBcDepeB+4Xpyp+wkfmLn/sXDzEyg8OaC0xOq
-         fz0A==
-X-Forwarded-Encrypted: i=1; AJvYcCU3Z3l0p+EVv3bA4ECohgUa5Okcfxx1uGIy2xLIUQJ3ELc/IQdv+0ITN9apKYge6gZnhtQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuZ12FDAyG/CaMqLjEWJvc8KEuJawjrC6z2Me0sSl+R+4tBmL1
-	wjpyWH6hvSj4lrUmAr1Ftz/uUbylGiCOU0dORLUJNLpEplBDAQ6AXfkW/FleonzW4KsuITfJnjL
-	GtDAcBj8xS4fQzIa18l/lRbvAW+DOm3wmMkyS
-X-Google-Smtp-Source: AGHT+IE56ditvMsqd+EwyV0AwwWQn10JX3FwGZqO74Otl79fYNdQirjfyiEfOM48/ZWOjAG0+PeTvxcA3jfyHAIhk/4=
-X-Received: by 2002:a05:690c:f84:b0:62c:e6c0:e887 with SMTP id
- 00721157ae682-6d40d88eabfmr4560677b3.9.1724978017312; Thu, 29 Aug 2024
- 17:33:37 -0700 (PDT)
+        bh=ScuyZghAxUsq77xlIUmB3FT5rIh3r/8m9ZVZaLG04YU=;
+        b=PpfsUlKCjw73Gk3zHTQjUrxern7RTphibWhHsinRwLx/jmIQGa4NvyJlxtSbZFeyW5
+         GRjfL9hfU7gwne0aNqKXyuSY+Ok4RQbGd40HC8CGUtcRwIKP9qeL7rJ9qOveUpXYSPYJ
+         3K9p99Zc0FrGJgIdJgjJ7Y9qzT8+iRb0PlTNOUkb+Z0SH0ZyBjHx8OWHwia/pQMagjFm
+         QIuRUeHd8iduzev9w+HB9Gl4Fn7Dc6yH9l60PWcG9OXy3idH6DzEzFS2S11cqNfkawrk
+         Ari+bs+fifO6HbQdsPk4EXV3uO43sY0+ZVYFd31BWgxuyFR+RSlKNtTQ858FwTz6hrUN
+         pbWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUJBIKyMtO2dRrs67aA6zNVGxkZ8ywpFhIUmNkyVs2ZdVoON/8UVsvIFTp0YKZohOCtnCY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzm4qMqWS11OmE5D4s2ijS7jPhfuJImGBd4crmHQxBsNe2a/Qpp
+	WC/lcvkOd0TpKmq/pmR9qZEBh2yJQwoSO8veX6NzE7IkfOMEXQ+kmERjwkzY4bFTOmabjDCDlqU
+	eVUjR/AsqHEReGWy2dSJvHPvtkCFRUAOvq5zL
+X-Google-Smtp-Source: AGHT+IEHfgQ7ITmpC9nLKgn2p9q5pKXn+MuPyh1yHF6iMxunaqm5ZCNB9dh715WRCvs589w6aHZcopQzVWBPqtznylA=
+X-Received: by 2002:a05:690c:7409:b0:6ae:d19f:8b62 with SMTP id
+ 00721157ae682-6d40ff0ca84mr4280747b3.43.1724978089470; Thu, 29 Aug 2024
+ 17:34:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,120 +72,74 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-4-jthoughton@google.com> <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
- <Zr_y7Fn63hdowfYM@google.com> <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
- <ZsOuEP6P0v45ffC0@linux.dev>
-In-Reply-To: <ZsOuEP6P0v45ffC0@linux.dev>
+ <20240724011037.3671523-9-jthoughton@google.com> <ZqKWxfqRoJzUWroG@google.com>
+ <Zr_2Qhflx5xBhFCY@google.com>
+In-Reply-To: <Zr_2Qhflx5xBhFCY@google.com>
 From: James Houghton <jthoughton@google.com>
-Date: Thu, 29 Aug 2024 17:33:00 -0700
-Message-ID: <CADrL8HWf-Onu=4ONBO1CFZ1Tqj5bee=+NnRC333aKqkUy+0Sxg@mail.gmail.com>
-Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
- and kvm_age_gfn
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Yu Zhao <yuzhao@google.com>, Sean Christopherson <seanjc@google.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
+Date: Thu, 29 Aug 2024 17:34:13 -0700
+Message-ID: <CADrL8HXnV8cmpytBSvGPvqvhjryWwT__MwWLbjzxX6hbd2UxFQ@mail.gmail.com>
+Subject: Re: [PATCH v6 08/11] KVM: x86: Optimize kvm_{test_,}age_gfn a little bit
+To: Sean Christopherson <seanjc@google.com>
+Cc: David Matlack <dmatlack@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
 	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
 	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
 	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 19, 2024 at 1:42=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
+On Fri, Aug 16, 2024 at 6:00=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> On Fri, Aug 16, 2024 at 07:03:27PM -0600, Yu Zhao wrote:
-> > On Fri, Aug 16, 2024 at 6:46=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
->
-> [...]
->
-> > > Were you expecting vCPU runtime to improve (more)?  If so, lack of mo=
-vement could
-> > > be due to KVM arm64 taking mmap_lock for read when handling faults:
-
-I had no real expectation. I was hoping that maybe there could be a
-vCPU runtime improvement, given that user_mem_abort() (being called
-because we're faulting memory in continuously in this test) has to
-take the KVM MMU lock for reading, and aging is taking it for reading
-vs. writing. I think that's why aging is a lot slower when using the
-write lock: it is waiting for the readers to drop the lock, but I
-guess the delay on the *readers* due to the pending writer seems to be
-pretty minimal.
-
-> > >
-> > > https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
+> On Thu, Jul 25, 2024, David Matlack wrote:
+> > On 2024-07-24 01:10 AM, James Houghton wrote:
+> > > Optimize both kvm_age_gfn and kvm_test_age_gfn's interaction with the
 > >
-> > For the above test, I don't think it's mmap_lock
+> > nit: Use () when referring to functions.
+> >
+> > > shadow MMU by, rather than checking if our memslot has rmaps, check i=
+f
+> > > there are any indirect_shadow_pages at all.
+> >
+> > What is optimized by checking indirect_shadow_pages instead of
+> > have_rmaps and what's the benefit? Smells like a premature optimization=
+.
 >
-> Yeah, I don't think this is related to the mmap_lock.
->
-> James is likely using hardware that has FEAT_HAFDBS, so vCPUs won't
-> fault for an Access flag update. Even if he's on a machine w/o it,
-> Access flag faults are handled outside the mmap_lock.
+> Checking indirect_shadow_pages avoids taking mmu_lock for write when KVM =
+doesn't
+> currently have shadow MMU pages, but did at some point in the past, where=
+as
+> kvm_memslots_have_rmaps() is sticky and will return true forever.
 
-Yeah I was running on Ampere Altra CPUs.
+Thanks for the clear explanation.
 
-> Forcing SW management of the AF at stage-2 would be the best case for
-> demonstrating the locking improvement:
->
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index a24a2a857456..a640e8a8c6ea 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -669,8 +669,6 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift=
-)
->          * happen to be running on a design that has unadvertised support=
- for
->          * HAFDBS. Here be dragons.
->          */
-> -       if (!cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-> -               vtcr |=3D VTCR_EL2_HA;
->  #endif /* CONFIG_ARM64_HW_AFDBM */
->
->         if (kvm_lpa2_is_enabled())
+> > > Also, for kvm_test_age_gfn, reorder the TDP MMU check to be first. If=
+ we
+> > > find that the range is young, we do not need to check the shadow MMU.
+> >
+> > This should be a separate commit since it's a logically distinct change
+> > and no dependency on the other change in this commit (other than both
+> > touch the same function).
 
-Thanks!
+Done.
 
-> Changing the config option would work too, but I wasn't sure if
-> FEAT_HAFDBS on the primary MMU influenced MGLRU heuristics.
+> > Splitting the commits up will also make it easier to write more specifi=
+c
+> > short logs (instead of "optimize a little bit" :)
+>
+> +1.  Especially code movement and refactoring, e.g. factoring out
+> tdp_mmu_clear_spte_bits_atomic() would ideally be in a standalone patch t=
+hat's
+> dead simple to review.
 
-Indeed, disabling CONFIG_ARM64_HW_AFDBM will cause MGLRU not to do aging.
-
-> > -- the reclaim path,
-> > e.g., when zswapping guest memory, has two stages: aging (scanning
-> > PTEs) and eviction (unmapping PTEs). Only testing the former isn't
-> > realistic at all.
->
-> AIUI, the intention of this test data is to provide some justification
-> for why Marc + I should consider the locking change *outside* of any
-> MMU notifier changes. So from that POV, this is meant as a hacked
-> up microbenchmark and not meant to be realistic.
->
-> And really, the arm64 change has nothing to do with this series at
-> this point, which is disappointing. In the interest of moving this
-> feature along for both architectures, would you be able help James
-> with:
->
->  - Identifying a benchmark that you believe is realistic
->
->  - Suggestions on how to run that benchmark on Google infrastructure
->
-> Asking since you had a setup / data earlier on when you were carrying
-> the series. Hopefully with supportive data we can get arm64 to opt-in
-> to HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY as well.
-
-I'll keep trying some other approaches I can take for getting similar
-testing that Yu had; it is somewhat difficult for me to reproduce
-those tests (and it really shouldn't be.... sorry).
-
-I think it makes most sense for me to drop the arm64 patch for now and
-re-propose it (or something stronger) alongside enabling aging. Does
-that sound ok?
+I have now split out the creation of tdp_mmu_clear_spte_bits_atomic()
+into its own patch. Though I'm not entirely convinced splitting out
+every refactor like that is always a good thing.
 
