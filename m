@@ -1,140 +1,162 @@
-Return-Path: <kvm+bounces-25580-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25581-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 681FF966CF3
-	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 01:41:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0A7966D00
+	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 01:45:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26104284153
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 23:41:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF12D281341
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 23:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A263A18FDB9;
-	Fri, 30 Aug 2024 23:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE32192B85;
+	Fri, 30 Aug 2024 23:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dJpHnabf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n5E5gcI8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C149615C150
-	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 23:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB7F18FC61
+	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 23:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725061249; cv=none; b=TZE3CXCLWeRnsHEc+Q2C4Z1Jl+sdymhJbQjnA9iQE3XXR/HdsAnf2FMkhiyNd+S8/SNc0VMcHB5a4tFJ2qZYSeeKyi03is9iqoNOYTmyJi0u3Q7Vy5HbegweUEtL2qQyUCfiU145AcuGf96t5PCT7/vkgOeVUF1ZdVAECuux2FI=
+	t=1725061520; cv=none; b=u2Tafnz2LCThBeLG7VEnyeSh30sUzHSmQZQwv2rMiDAC3aKmVPUY00L5V74Em222KbkgqMHZuU7jI2d/TI1IHMuNyhAr6PZbGTuCF8RqlQpPhnYQPUA47usF69/Efx+boFGu8Ed5H0iTVqthqqVzxYqDAcrUgNLSDcaySt474eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725061249; c=relaxed/simple;
-	bh=M7iA6Og7rkscgShI8ugCJiyFV+diig6JJ6ihasK6GVo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=f2OxxC5hDkn8cP2gntT/mpKF52ZS2qZBB8BkPxFuMFo6dnFb06aNcLxLp4ikdb46SEnkFZ0tY/WockgNQK1AnSo2UITn7IWtdMbwbOtYY5eE4oEq4K+gfNfybIyYrxOo5mdvKFkFa2jzn0w0Se5ZkOW2w6immoNfwNdCHDOBftM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dJpHnabf; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1725061520; c=relaxed/simple;
+	bh=wMq8fcpcUbfH9RqkPRWJri2Nj7kzPTs23AYrLOXTvkk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NJCZN2oBVqqm/8QPSHuoNitmYJRW9EPfK4cqT6szps0mHaO3AhFwLh9yOdSEwxNcnXV+6SoFshnHxFmJZVrYCgrOGm8pAojaa3cDgVoPAavtGMUR97L7ilT9Fa14JPrkWSeG7QmH3J58wIHdPjpiJ1MKAg7SuzX6xCa3UvgjAwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n5E5gcI8; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e1a8de19944so392710276.1
-        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 16:40:47 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e02fff66a83so3867566276.0
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 16:45:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725061247; x=1725666047; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fzg5+H8KkNoQ/oaD/mZ9dMAx+MaTWuSVzn0ffSsgaXc=;
-        b=dJpHnabfpXmQhFh4iC9/5+f2PL7Dq9xsZT2Ye+7wjc1KnzqiemzJaOPt7vyKAA0Na0
-         HX2wESe/fAhtgebFKLjSx2V6IgO8fHIebTp1cbX7Kjhetj1wY+bg13HRqZrZT0aZlleF
-         IwCYpPIlk1Tbcda8XANikLapEexFy8b9uY6hLHuRNP2YDDYUFBthXZrs9ACAFq0Ss8iF
-         KpHxdzt7sOK1GliNOmwDnDa5FQoQuVcQo8hT/z21AS9k/lb/Kdfu8xgE+rYk2P87r3bt
-         syREOCkUaW5zmLkR8KrEtX1NYhu/KNbEbb21xOefze2OJ4mKomtOub1NUHyHB5wDzHaU
-         kHDg==
+        d=google.com; s=20230601; t=1725061518; x=1725666318; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rJOwOLrN9fCKsj31ZOyoET6NEGryeoiVS8pcmwkgvZY=;
+        b=n5E5gcI83b6uAQivqmHbIds7cjNDsSTx3PZ/W+u4/PY/dkjMRvPen6mAwR9wk3cJ14
+         9AMEEPrB6kqbJ5cu2An8sP6HQL0b0PL/4gjFazpS5gs1XdWGvIloIg+27HH+YMUE0NhL
+         zsyHSmKiQfrUelXPXV5KHXZ3KQbb15fp9viAuAxkrHeqEWZxawelKH86+c3d1NqCH9h7
+         iLd0Pgo+6a2xsRZFzapOiFrPbGr1LSUadUur6NMXXoC5YL72GUcyWiE9D+hvfkikmRuh
+         ujJwzxQqZHOcNpTblUoEg9bOd8uwEGyV0iA6o9KXd56sJonojpTH6THnNlFzczqhWo2R
+         0iJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725061247; x=1725666047;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fzg5+H8KkNoQ/oaD/mZ9dMAx+MaTWuSVzn0ffSsgaXc=;
-        b=NuAArSdF1JZWXiUO4OC1VGf6KMPUIq3PG7uL7j1HtP7WOqZ688rtG5zmZ2jdIYGae3
-         0QYCA0WKwxVDJMQPG3siIj61Zlxxkz8wYvQbF+mGt+wfMcHLwRuVQrfMA+WTZttVfRGH
-         /X0+gUeZFkCbSyjZ+PESDzxDwlv7Noj4DQ2FQ73uELOFZy06uDo+TYXU03xWVlpqgtM1
-         8cc9O8xNzgzn3PNjzEwmTXuI8WdMYFzNfLDxAQ/BUv3h9kS1Z2/HmI+KA6Jog65KtPjn
-         1K4inNiHylaqr4t9BAyHG0vZ8dDGx+Zzo+p8C3tGP6xHBai+8WRQs0xtPJz90ERDtQ4G
-         B0MA==
-X-Gm-Message-State: AOJu0YzNk9PUTTKwYR7k+qDvbSriShBnN2ip7PSfDvuDsrQCTolFeU/C
-	EXls1Zt2iQjPl7oPFD7eJi+6b99/yd8dnFfCJrZl/sKcYqYDje0NzfOT7G+y1njmdpPn3Y4/msZ
-	M9Q==
-X-Google-Smtp-Source: AGHT+IFHGNIxU233H2j9s0EV/iSKYApQhaTCqlpgnaxkztZF5uywKsu0bHvHaA/yt91UoaCw96+3L5AbJv8=
+        d=1e100.net; s=20230601; t=1725061518; x=1725666318;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rJOwOLrN9fCKsj31ZOyoET6NEGryeoiVS8pcmwkgvZY=;
+        b=olrVYtmQYEkiOVjP94ssoqXUu+dBJkbJupBPONYUlQZA8sw8C2xr1AduU34m0RaPZ6
+         gCin5Lq8OO64SnT7tBXi7PcxUM/sFoEGjbK/eLeEHGB5fGSqxg5Y+pF2NcQAOXAiMOhY
+         Olp2ZF6K2mQ1/f3ABq410D2OjdoE/2IZv0TeniFTyU6+QGVb873iqQBuTBualz4t97xD
+         9CAcB8sZfTphanOmL7Q/X0X3+uzzX+rUrUKmg7izDMveA7vDO/YX1jidoyvoDRcqyrYl
+         lRVyqcP+/gLHJYmU3Nk6zPkZF6zHXahNM4V4Bqv6os8/t3j7RWuNYv+1u+OAD5tXxli8
+         t8iQ==
+X-Gm-Message-State: AOJu0YxfWihiL8YCPjURBiPc6BwMT2V6DbkKGk2kc7ycQmagQAidNCT/
+	a7siYCo5W5hppMWI2QG4OktrI/9skEqYXJ+p11odYZJv9YA+2X487kh2uhSN4+wEU1K1PZcAnee
+	v5g==
+X-Google-Smtp-Source: AGHT+IH1lPOudhT62PJGTofQxOruBAiqUYlrCNQI4oNs0c97UCsba7G2Vigk3ybkwDh2sT9EBq08lseCwvI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:dc8c:0:b0:e11:712d:9af8 with SMTP id
- 3f1490d57ef6-e1a79ffa017mr6085276.4.1725061246694; Fri, 30 Aug 2024 16:40:46
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2493:b0:e0e:4350:d7de with SMTP id
+ 3f1490d57ef6-e1a7a1786a0mr6613276.9.1725061518076; Fri, 30 Aug 2024 16:45:18
  -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 30 Aug 2024 16:40:42 -0700
+Date: Fri, 30 Aug 2024 16:45:16 -0700
+In-Reply-To: <CABgObfZSCZ-dgK3zWao573+RmZSPhnaoMsrify9-48UVhbKVdw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <20240830234042.322988-1-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: Fixes for 6.11-rcN
+References: <20240608000639.3295768-1-seanjc@google.com> <20240608000639.3295768-2-seanjc@google.com>
+ <efb9af41-21ed-4b97-8c67-40d6cda10484@redhat.com> <Zr4TPVQ_SNEKyfUz@google.com>
+ <CABgObfZSCZ-dgK3zWao573+RmZSPhnaoMsrify9-48UVhbKVdw@mail.gmail.com>
+Message-ID: <ZtJZjIRdiN8e5_Es@google.com>
+Subject: Re: [PATCH v3 1/8] KVM: Use dedicated mutex to protect
+ kvm_usage_count to avoid deadlock
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+	Chao Gao <chao.gao@intel.com>, Kai Huang <kai.huang@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please pull a handful of random fixes.  Details in the tag and changelogs.
+On Thu, Aug 15, 2024, Paolo Bonzini wrote:
+> On Thu, Aug 15, 2024 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Wed, Aug 14, 2024, Paolo Bonzini wrote:
+> > > On 6/8/24 02:06, Sean Christopherson wrote:
+> > > > Use a dedicated mutex to guard kvm_usage_count to fix a potential d=
+eadlock
+> > > > on x86 due to a chain of locks and SRCU synchronizations.  Translat=
+ing the
+> > > > below lockdep splat, CPU1 #6 will wait on CPU0 #1, CPU0 #8 will wai=
+t on
+> > > > CPU2 #3, and CPU2 #7 will wait on CPU1 #4 (if there's a writer, due=
+ to the
+> > > > fairness of r/w semaphores).
+> > > >
+> > > >      CPU0                     CPU1                     CPU2
+> > > > 1   lock(&kvm->slots_lock);
+> > > > 2                                                     lock(&vcpu->m=
+utex);
+> > > > 3                                                     lock(&kvm->sr=
+cu);
+> > > > 4                            lock(cpu_hotplug_lock);
+> > > > 5                            lock(kvm_lock);
+> > > > 6                            lock(&kvm->slots_lock);
+> > > > 7                                                     lock(cpu_hotp=
+lug_lock);
+> > > > 8   sync(&kvm->srcu);
+> > > >
+> > > > Note, there are likely more potential deadlocks in KVM x86, e.g. th=
+e same
+> > > > pattern of taking cpu_hotplug_lock outside of kvm_lock likely exist=
+s with
+> > > > __kvmclock_cpufreq_notifier()
+> > >
+> > > Offhand I couldn't see any places where {,__}cpufreq_driver_target() =
+is
+> > > called within cpus_read_lock().  I didn't look too closely though.
+> >
+> > Anyways...
+> >
+> >   cpuhp_cpufreq_online()
+> >   |
+> >   -> cpufreq_online()
+> >      |
+> >      -> cpufreq_gov_performance_limits()
+> >         |
+> >         -> __cpufreq_driver_target()
+> >            |
+> >            -> __target_index()
+>=20
+> Ah, I only looked in generic code.
+>=20
+> Can you add a comment to the comment message suggesting switching the vm_=
+list
+> to RCU? All the occurrences of list_for_each_entry(..., &vm_list, ...) se=
+em
+> amenable to that, and it should be as easy to stick all or part of
+> kvm_destroy_vm() behind call_rcu().
 
-The following changes since commit 47ac09b91befbb6a235ab620c32af719f8208399:
++1 to the idea of making vm_list RCU-protected, though I think we'd want to=
+ use
+SRCU, e.g. set_nx_huge_pages() currently takes eash VM's slots_lock while p=
+urging
+possible NX hugepages.
 
-  Linux 6.11-rc4 (2024-08-18 13:17:27 -0700)
-
-are available in the Git repository at:
-
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.11-rcN
-
-for you to fetch changes up to 5fa9f0480c7985e44e6ec32def0a395b768599cc:
-
-  KVM: SEV: Update KVM_AMD_SEV Kconfig entry and mention SEV-SNP (2024-08-28 05:46:25 -0700)
-
-----------------------------------------------------------------
-KVM x86 fixes for 6.11
-
- - Fixup missed comments from the REMOVED_SPTE=>FROZEN_SPTE rename.
-
- - Ensure a root is successfully loaded when pre-faulting SPTEs.
-
- - Grab kvm->srcu when handling KVM_SET_VCPU_EVENTS to guard against accessing
-   memslots if toggling SMM happens to force a VM-Exit.
-
- - Emulate MSR_{FS,GS}_BASE on SVM even though interception is always disabled,
-   so that KVM does the right thing if KVM's emulator encounters {RD,WR}MSR.
-
- - Explicitly clear BUS_LOCK_DETECT from KVM's caps on AMD, as KVM doesn't yet
-   virtualize BUS_LOCK_DETECT on AMD.
-
- - Cleanup the help message for CONFIG_KVM_AMD_SEV, and call out that KVM now
-   supports SEV-SNP too.
-
-----------------------------------------------------------------
-Maxim Levitsky (1):
-      KVM: SVM: fix emulation of msr reads/writes of MSR_FS_BASE and MSR_GS_BASE
-
-Ravi Bangoria (1):
-      KVM: SVM: Don't advertise Bus Lock Detect to guest if SVM support is missing
-
-Sean Christopherson (2):
-      KVM: x86/mmu: Check that root is valid/loaded when pre-faulting SPTEs
-      KVM: x86: Acquire kvm->srcu when handling KVM_SET_VCPU_EVENTS
-
-Vitaly Kuznetsov (1):
-      KVM: SEV: Update KVM_AMD_SEV Kconfig entry and mention SEV-SNP
-
-Yan Zhao (1):
-      KVM: x86/mmu: Fixup comments missed by the REMOVED_SPTE=>FROZEN_SPTE rename
-
- arch/x86/kvm/Kconfig       |  6 ++++--
- arch/x86/kvm/mmu/mmu.c     |  4 +++-
- arch/x86/kvm/mmu/spte.c    |  6 +++---
- arch/x86/kvm/mmu/spte.h    |  2 +-
- arch/x86/kvm/mmu/tdp_mmu.c |  8 ++++----
- arch/x86/kvm/svm/svm.c     | 15 +++++++++++++++
- arch/x86/kvm/x86.c         |  2 ++
- 7 files changed, 32 insertions(+), 11 deletions(-)
+And I think kvm_destroy_vm() can simply do a synchronize_srcu() after remov=
+ing
+the VM from the list.  Trying to put kvm_destroy_vm() into an RCU callback =
+would
+probably be a bit of a disaster, e.g. kvm-intel.ko in particular currently =
+does
+some rather nasty things while destory a VM.
 
