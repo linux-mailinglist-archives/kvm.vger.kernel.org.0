@@ -1,162 +1,147 @@
-Return-Path: <kvm+bounces-25581-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25582-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D0A7966D00
-	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 01:45:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72061966D04
+	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 01:55:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF12D281341
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 23:45:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E81F1F2451A
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 23:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE32192B85;
-	Fri, 30 Aug 2024 23:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2AD618F2D3;
+	Fri, 30 Aug 2024 23:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n5E5gcI8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xmwx6/X2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB7F18FC61
-	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 23:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A8A17B510
+	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 23:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725061520; cv=none; b=u2Tafnz2LCThBeLG7VEnyeSh30sUzHSmQZQwv2rMiDAC3aKmVPUY00L5V74Em222KbkgqMHZuU7jI2d/TI1IHMuNyhAr6PZbGTuCF8RqlQpPhnYQPUA47usF69/Efx+boFGu8Ed5H0iTVqthqqVzxYqDAcrUgNLSDcaySt474eg=
+	t=1725062100; cv=none; b=feAPgQvrKkrR2AxLJZa6UVS4XCR01qzVuTdoT5IbjZXks0hlFw++J/NZfj+YIrWIja3i6efl1BMofyhZh/fQTnEj8dcQpeGSJwNKQeGTEC+yd+6Wrtkuf10ZBBv4k08eOUxG22Oshuf6RvRbX4FDGUgcSMRtARu8U4QPUZONKj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725061520; c=relaxed/simple;
-	bh=wMq8fcpcUbfH9RqkPRWJri2Nj7kzPTs23AYrLOXTvkk=;
+	s=arc-20240116; t=1725062100; c=relaxed/simple;
+	bh=+EsYePFzMFNpF6erMIpOe0WO8D6FAuzs9/EQFCfVmyY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NJCZN2oBVqqm/8QPSHuoNitmYJRW9EPfK4cqT6szps0mHaO3AhFwLh9yOdSEwxNcnXV+6SoFshnHxFmJZVrYCgrOGm8pAojaa3cDgVoPAavtGMUR97L7ilT9Fa14JPrkWSeG7QmH3J58wIHdPjpiJ1MKAg7SuzX6xCa3UvgjAwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n5E5gcI8; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=mAe3P5QcSgYfsSxqqLTDDF2k+EwipWMbct09qczkF7fgN6rpSIWgW4BCgxNw6eq1XD2DOeqY2ogrN2wJSICJSGXRJKjUcd/icrkadnaxyZYoWPKyoihyAwQfgM0rVi0R3teaZ/9pGGdjoS5pq9gToFbdMSBkoDqeRubzLLI1elE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xmwx6/X2; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e02fff66a83so3867566276.0
-        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 16:45:18 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6d4426ad833so20538817b3.2
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 16:54:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725061518; x=1725666318; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rJOwOLrN9fCKsj31ZOyoET6NEGryeoiVS8pcmwkgvZY=;
-        b=n5E5gcI83b6uAQivqmHbIds7cjNDsSTx3PZ/W+u4/PY/dkjMRvPen6mAwR9wk3cJ14
-         9AMEEPrB6kqbJ5cu2An8sP6HQL0b0PL/4gjFazpS5gs1XdWGvIloIg+27HH+YMUE0NhL
-         zsyHSmKiQfrUelXPXV5KHXZ3KQbb15fp9viAuAxkrHeqEWZxawelKH86+c3d1NqCH9h7
-         iLd0Pgo+6a2xsRZFzapOiFrPbGr1LSUadUur6NMXXoC5YL72GUcyWiE9D+hvfkikmRuh
-         ujJwzxQqZHOcNpTblUoEg9bOd8uwEGyV0iA6o9KXd56sJonojpTH6THnNlFzczqhWo2R
-         0iJA==
+        d=google.com; s=20230601; t=1725062098; x=1725666898; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7mTp89YM4a+JZ2WxsvEPMQELbnbLphEGU34GUEc+1rE=;
+        b=xmwx6/X2yBrCzqrYhCN4r8qk6lOACar88BdriaApdOFv2ph9Y3BW7wiPuFGriElTNx
+         BqrWoVJ5zsgyioqD9XXTaRW4WEQgl5E3ogdiiGGapPjtBGhn/YO9U6h0h43lZWJASgte
+         TqkGO4h3uibNslpkOAwfB9ma9lDgIQ8KtMqO0CODyfwRnUZab+b1JxVT88RspsabsFP9
+         UGX6SwJuGFZ2m+qlU1Kp6CY4brEJDx6kNJTEXrNjaQ7ezNRmYRo6sd3Bs1oI7e804Ohn
+         6eFk8/MZx0If0vWcpSe2ugEnE/OpJdzvcM1oXfnvWnEzwyKmjZBRt80tcF6aTQN8EUuJ
+         /t3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725061518; x=1725666318;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rJOwOLrN9fCKsj31ZOyoET6NEGryeoiVS8pcmwkgvZY=;
-        b=olrVYtmQYEkiOVjP94ssoqXUu+dBJkbJupBPONYUlQZA8sw8C2xr1AduU34m0RaPZ6
-         gCin5Lq8OO64SnT7tBXi7PcxUM/sFoEGjbK/eLeEHGB5fGSqxg5Y+pF2NcQAOXAiMOhY
-         Olp2ZF6K2mQ1/f3ABq410D2OjdoE/2IZv0TeniFTyU6+QGVb873iqQBuTBualz4t97xD
-         9CAcB8sZfTphanOmL7Q/X0X3+uzzX+rUrUKmg7izDMveA7vDO/YX1jidoyvoDRcqyrYl
-         lRVyqcP+/gLHJYmU3Nk6zPkZF6zHXahNM4V4Bqv6os8/t3j7RWuNYv+1u+OAD5tXxli8
-         t8iQ==
-X-Gm-Message-State: AOJu0YxfWihiL8YCPjURBiPc6BwMT2V6DbkKGk2kc7ycQmagQAidNCT/
-	a7siYCo5W5hppMWI2QG4OktrI/9skEqYXJ+p11odYZJv9YA+2X487kh2uhSN4+wEU1K1PZcAnee
-	v5g==
-X-Google-Smtp-Source: AGHT+IH1lPOudhT62PJGTofQxOruBAiqUYlrCNQI4oNs0c97UCsba7G2Vigk3ybkwDh2sT9EBq08lseCwvI=
+        d=1e100.net; s=20230601; t=1725062098; x=1725666898;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7mTp89YM4a+JZ2WxsvEPMQELbnbLphEGU34GUEc+1rE=;
+        b=GnARswlGP5aH01KhCDwvdkfwnSbuS0k/XJxJvsn9r6jLpg0NbFbSv09j+QyGw5HaVi
+         CoCpoXi1mIKMI3yDlhjqKPRE3ZmIClvfBVC2yKSUW/auHWc2PeP0p7+IOFwxCHRLqXyD
+         O+R4xJ993BgFDGG4xK7+MOQ9nHbzkGJ8kx3t6QBxJI8x0J6aHAEm7j0Tx7K2obDaVRW6
+         CNUO8PzUXIoeX5DF9z/fpZ0xRslVfRNqRwEpZWwnv05fCwIFRbRKOB6v4LZi9cnXBaLm
+         4bhaVAYR3+NLo/Inpz0JyuPE6DiqwlWBbRisfFxBUbGG4F58cQs1KWWTHSkdKEHTyZfx
+         BfoA==
+X-Gm-Message-State: AOJu0YwRVxfTxfkZrbZXoAjqCDTDHgcW2BJfYhBixTSeXjztV6TlDzbW
+	xf+2qiKMWnaVdr61ktazlDk5D3VBnmIShy5VZwgZ9k96o2pryUfQc+H0VmmE4a0bJQGs83lbMDI
+	QnQ==
+X-Google-Smtp-Source: AGHT+IGwZxjO7ktsYm2v/oExs6JzBV3HAZ4YBOgUiAc3Zp4+M4L8o7WExR7rM/tO17TVCN5qdyaZadxEIjw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2493:b0:e0e:4350:d7de with SMTP id
- 3f1490d57ef6-e1a7a1786a0mr6613276.9.1725061518076; Fri, 30 Aug 2024 16:45:18
- -0700 (PDT)
-Date: Fri, 30 Aug 2024 16:45:16 -0700
-In-Reply-To: <CABgObfZSCZ-dgK3zWao573+RmZSPhnaoMsrify9-48UVhbKVdw@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a0d:dc07:0:b0:6b2:3ecc:817 with SMTP id
+ 00721157ae682-6d4118645a0mr107867b3.8.1725062098023; Fri, 30 Aug 2024
+ 16:54:58 -0700 (PDT)
+Date: Fri, 30 Aug 2024 16:54:56 -0700
+In-Reply-To: <Zr4P86YRZvefE95k@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240608000639.3295768-1-seanjc@google.com> <20240608000639.3295768-2-seanjc@google.com>
- <efb9af41-21ed-4b97-8c67-40d6cda10484@redhat.com> <Zr4TPVQ_SNEKyfUz@google.com>
- <CABgObfZSCZ-dgK3zWao573+RmZSPhnaoMsrify9-48UVhbKVdw@mail.gmail.com>
-Message-ID: <ZtJZjIRdiN8e5_Es@google.com>
-Subject: Re: [PATCH v3 1/8] KVM: Use dedicated mutex to protect
- kvm_usage_count to avoid deadlock
+References: <20240809190319.1710470-1-seanjc@google.com> <20240809190319.1710470-23-seanjc@google.com>
+ <5f8c0ca4-ae99-4d1c-8525-51c6f1096eaa@redhat.com> <Zr4P86YRZvefE95k@google.com>
+Message-ID: <ZtJb0M8Y3dRVlSaj@google.com>
+Subject: Re: [PATCH 22/22] KVM: x86/mmu: Detect if unprotect will do anything
+ based on invalid_list
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chao Gao <chao.gao@intel.com>, Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	Peter Gonda <pgonda@google.com>, Michael Roth <michael.roth@amd.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerly Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Aug 15, 2024, Paolo Bonzini wrote:
-> On Thu, Aug 15, 2024 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Wed, Aug 14, 2024, Paolo Bonzini wrote:
-> > > On 6/8/24 02:06, Sean Christopherson wrote:
-> > > > Use a dedicated mutex to guard kvm_usage_count to fix a potential d=
-eadlock
-> > > > on x86 due to a chain of locks and SRCU synchronizations.  Translat=
-ing the
-> > > > below lockdep splat, CPU1 #6 will wait on CPU0 #1, CPU0 #8 will wai=
-t on
-> > > > CPU2 #3, and CPU2 #7 will wait on CPU1 #4 (if there's a writer, due=
- to the
-> > > > fairness of r/w semaphores).
-> > > >
-> > > >      CPU0                     CPU1                     CPU2
-> > > > 1   lock(&kvm->slots_lock);
-> > > > 2                                                     lock(&vcpu->m=
-utex);
-> > > > 3                                                     lock(&kvm->sr=
-cu);
-> > > > 4                            lock(cpu_hotplug_lock);
-> > > > 5                            lock(kvm_lock);
-> > > > 6                            lock(&kvm->slots_lock);
-> > > > 7                                                     lock(cpu_hotp=
-lug_lock);
-> > > > 8   sync(&kvm->srcu);
-> > > >
-> > > > Note, there are likely more potential deadlocks in KVM x86, e.g. th=
-e same
-> > > > pattern of taking cpu_hotplug_lock outside of kvm_lock likely exist=
-s with
-> > > > __kvmclock_cpufreq_notifier()
-> > >
-> > > Offhand I couldn't see any places where {,__}cpufreq_driver_target() =
-is
-> > > called within cpus_read_lock().  I didn't look too closely though.
-> >
-> > Anyways...
-> >
-> >   cpuhp_cpufreq_online()
-> >   |
-> >   -> cpufreq_online()
-> >      |
-> >      -> cpufreq_gov_performance_limits()
-> >         |
-> >         -> __cpufreq_driver_target()
-> >            |
-> >            -> __target_index()
->=20
-> Ah, I only looked in generic code.
->=20
-> Can you add a comment to the comment message suggesting switching the vm_=
-list
-> to RCU? All the occurrences of list_for_each_entry(..., &vm_list, ...) se=
-em
-> amenable to that, and it should be as easy to stick all or part of
-> kvm_destroy_vm() behind call_rcu().
+On Thu, Aug 15, 2024, Sean Christopherson wrote:
+> On Wed, Aug 14, 2024, Paolo Bonzini wrote:
+> > On 8/9/24 21:03, Sean Christopherson wrote:
+> > > Explicitly query the list of to-be-zapped shadow pages when checking to
+> > > see if unprotecting a gfn for retry has succeeded, i.e. if KVM should
+> > > retry the faulting instruction.
+> > > 
+> > > Add a comment to explain why the list needs to be checked before zapping,
+> > > which is the primary motivation for this change.
+> > > 
+> > > No functional change intended.
+> > > 
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >   arch/x86/kvm/mmu/mmu.c | 11 +++++++----
+> > >   1 file changed, 7 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 300a47801685..50695eb2ee22 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -2731,12 +2731,15 @@ bool __kvm_mmu_unprotect_gfn_and_retry(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> > >   			goto out;
+> > >   	}
+> > > -	r = false;
+> > >   	write_lock(&kvm->mmu_lock);
+> > > -	for_each_gfn_valid_sp_with_gptes(kvm, sp, gpa_to_gfn(gpa)) {
+> > > -		r = true;
+> > > +	for_each_gfn_valid_sp_with_gptes(kvm, sp, gpa_to_gfn(gpa))
+> > >   		kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
+> > > -	}
+> > > +
+> > > +	/*
+> > > +	 * Snapshot the result before zapping, as zapping will remove all list
+> > > +	 * entries, i.e. checking the list later would yield a false negative.
+> > > +	 */
+> > 
+> > Hmm, the comment is kinda overkill?  Maybe just
+> > 
+> > 	/* Return whether there were sptes to zap.  */
+> > 	r = !list_empty(&invalid_test);
+> 
+> I would strongly prefer to keep the verbose comment.  I was "this" close to
+> removing the local variable and checking list_empty() after the commit phase.
+> If we made that goof, it would only show up at the worst time, i.e. when a guest
+> triggers retry and gets stuck.  And the logical outcome of fixing such a bug
+> would be to add a comment to prevent it from happening again, so I say just add
+> the comment straightaway.
+> 
+> > I'm not sure about patch 21 - I like the simple kvm_mmu_unprotect_page()
+> > function.
+> 
+> >From a code perspective, I kinda like having a separate helper too.  As you
+> likely suspect given your below suggestion, KVM should never unprotect a gfn
+> without retry protection, i.e. there should never be another caller, and I want
+> to enforce that.
 
-+1 to the idea of making vm_list RCU-protected, though I think we'd want to=
- use
-SRCU, e.g. set_nx_huge_pages() currently takes eash VM's slots_lock while p=
-urging
-possible NX hugepages.
-
-And I think kvm_destroy_vm() can simply do a synchronize_srcu() after remov=
-ing
-the VM from the list.  Trying to put kvm_destroy_vm() into an RCU callback =
-would
-probably be a bit of a disaster, e.g. kvm-intel.ko in particular currently =
-does
-some rather nasty things while destory a VM.
+Oh, another argument for eliminating the separate helper is that having a separate
+helper makes it really hard to write a comment for why reading indirect_shadow_pages
+outside of mmu_lock is ok (it reads/looks weird if mmu_lock is taken in a different
+helper).
 
