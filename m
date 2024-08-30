@@ -1,116 +1,151 @@
-Return-Path: <kvm+bounces-25482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D844F965CCE
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 11:27:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EA2C965CF3
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 11:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15FE81C22A67
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 09:27:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E505C1F25A4B
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 09:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9D517B508;
-	Fri, 30 Aug 2024 09:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kR3VoGT/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAEC6175D3A;
+	Fri, 30 Aug 2024 09:32:41 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C2A17B4F9;
-	Fri, 30 Aug 2024 09:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC186137745;
+	Fri, 30 Aug 2024 09:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725010009; cv=none; b=NmVsu7pzhNfAueMwRbvIghEDZN8vVFLsmT3pALe96xzlB/5VgNgTQweKcrs4psWEK5IeNoLlQWqFOSmEFKuv69dUbcACpQBXCAx+jG3FF7KpGOoieBCe+1T9RxtD2o6Jce9dGbMXXwWK0SDRpLigTBrkzSEp2rXFh9a/FhsBsww=
+	t=1725010361; cv=none; b=UTDkQ6GcBbBEEoD9ustVBR4ssm0zZdfJLVJEpQCITZyiWGm04z+7dLPIxOgkoMys1wIOVx9b/MwfJ12LvR3RU3LfghnevZyvbRNhhhPWH6/HgDtwoO6PRtgCIvrsEi0UgbiV6d0HYMy9LSu6QqvvGKNUPBG+IUUbhYrklJOmLRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725010009; c=relaxed/simple;
-	bh=d1lKZfcFNMLtS+NIATo7ARmto+5szlP2zG9TPe9nl8s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cDfO0hXjyTTdLx1gj/DfMb6UGge50fjBmleiQe/Lvvq/x21DdqamAOvPp17/6fTNBovAptc9wh0f3yvH4s+Iw2914wGt2KgHwZoVDvvfhgZeI/KW3AWGc5A6A/Jiiz2D96P7xnAqWFol1YT3CCNMkJLAzJ/FYwo13oB1DEqFQKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kR3VoGT/; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725010008; x=1756546008;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=d1lKZfcFNMLtS+NIATo7ARmto+5szlP2zG9TPe9nl8s=;
-  b=kR3VoGT/MDNnBnF/JnTNpHa7LcIm+C7HazqF05m2KqIUFs7T62FeK2Pi
-   fOga9sEzXZ6RN0rP9ktxLoD5PgYFTOQqYv2/Rwo9+0WFHaWX34na5bIax
-   YX7Xt00dYwk6zZ+rV7wbeuSPoZe7wyECe7YE2acNzzS0fOSPpHBp32U4e
-   MBVpzmj5ZKgabt/RIZKuNzUtc/FhExqLryde2I56XVHuBqnTdwT603gJI
-   Lzt0LVE9Eht/q+yYiQ90rLWuiZZac5bZZ6Xsk11eRzDuKDaZOJkCq+xxB
-   fNSTg7Wftj9GyPG7GOXhoKmSWxFolhljt+o0gZOufimkW9lgR9TdbM+L8
-   g==;
-X-CSE-ConnectionGUID: hVptpyrqSx+dM6o2QqvdJQ==
-X-CSE-MsgGUID: WOAwsBM6T6KdIuy4uUGa2w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="23798370"
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="23798370"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 02:26:47 -0700
-X-CSE-ConnectionGUID: Ouq5KDycS7ut6/aVCmNy+w==
-X-CSE-MsgGUID: mRradrWRSPyWdR2Kaj+YSg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="101358806"
-Received: from sschumil-mobl2.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.63])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 02:26:39 -0700
-Date: Fri, 30 Aug 2024 12:26:07 +0300
-From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
-	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
-	isaku.yamahata@gmail.com, xiaoyao.li@intel.com,
+	s=arc-20240116; t=1725010361; c=relaxed/simple;
+	bh=O67aehAYE/Q6ac7Md45oCuRtovVbTK5tZ13BU6sXblo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DbBPenxk2S+0fj9EAQuTz9GquiPztns+MBLH3P8Y2cIASNZTBrZrGDBnUbgkkR/LIXeTM8qOZTra9uHEmIGUUuxCOxi7Nu+IbBThuLVrblMWu3+0WRGDVvBEEKI74RiRqYkStGKgloFRljSFTb4enM+rG7nq3epRhTbO7YSjQK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8BxGJqvkdFmXQIlAA--.36762S3;
+	Fri, 30 Aug 2024 17:32:31 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowMAxrt6tkdFmizAAAA--.1421S2;
+	Fri, 30 Aug 2024 17:32:30 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>
+Cc: WANG Xuerui <kernel@xen0n.name>,
+	kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Sean Christopherson <sean.j.christopherson@intel.com>,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 13/25] KVM: TDX: create/destroy VM structure
-Message-ID: <ZtGQLwB6wfi0BfNI@tlindgre-MOBL1>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-14-rick.p.edgecombe@intel.com>
- <Zr8AYgZfInrwpAND@yilunxu-OptiPlex-7050>
+	virtualization@lists.linux.dev,
+	x86@kernel.org,
+	Song Gao <gaosong@loongson.cn>
+Subject: [PATCH v8 0/3] Add extioi virt extension support
+Date: Fri, 30 Aug 2024 17:32:26 +0800
+Message-Id: <20240830093229.4088354-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zr8AYgZfInrwpAND@yilunxu-OptiPlex-7050>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMAxrt6tkdFmizAAAA--.1421S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On Fri, Aug 16, 2024 at 03:31:46PM +0800, Xu Yilun wrote:
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 84cd9b4f90b5..a0954c3928e2 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -5,6 +5,7 @@
-> >  #include "x86_ops.h"
-> >  #include "mmu.h"
-> >  #include "tdx.h"
-> > +#include "tdx_ops.h"
-> 
-> I remember patch #4 says "C files should never include this header
-> directly"
-> 
->   +++ b/arch/x86/kvm/vmx/tdx_ops.h
->   @@ -0,0 +1,387 @@
->   +/* SPDX-License-Identifier: GPL-2.0 */
->   +/*
->   + * Constants/data definitions for TDX SEAMCALLs
->   + *
->   + * This file is included by "tdx.h" after declarations of 'struct
->   + * kvm_tdx' and 'struct vcpu_tdx'.  C file should never include
->   + * this header directly.
->   + */
-> 
-> maybe just remove it?
+KVM_FEATURE_VIRT_EXTIOI is paravirt feature defined with EXTIOI
+interrupt controller, it can route interrupt to 256 vCPUs and CPU
+interrupt pin IP0-IP7. Now EXTIOI irqchip is emulated in user space
+rather than kernel space, here interface is provided for VMM to pass
+this feature to KVM hypervisor.
 
-Yes doing patch to drop it thanks.
+Also interface is provided for user-mode VMM to detect and enable/disable
+paravirt features from KVM hypervisor. And api kvm_para_has_feature() is
+available on LoongArch for device driver to detect paravirt features and
+do some optimization.
+---
+v7 ... v8:
+  1. Rename function name virt_extioi_set_irq_route() with 
+     veiointc_set_irq_route() to keep consistent with that on real machine
+  2. Add comments before calling veiointc_set_irq_route()
 
-Tony
+v6 ... v7:
+  1. Replace function name guest_pv_has() to check whether paravirt feature
+     is supported with kvm_guest_has_pv_feature(), since there is
+     similiar function kvm_guest_has_lsx/lasx
+  2. Keep notation about CPUCFG area 0x40000000 -- 0x400000ff in header
+     file arch/loongarch/include/asm/loongarch.h
+  3. Remove function kvm_eiointc_init() and inline it with caller
+     function.
+
+v5 ... v6:
+  1. Put KVM hypervisor type checking function kvm_para_available()
+     inside function kvm_arch_para_features(), so that upper caller
+     is easy to use.
+  2. Add inline function guest_pv_has() in KVM module to judge whether
+     the specific paravirt feature is supported or not. And do valid
+     checking at hypercall and user space ioctl entrance with it.
+  3. Fix some coding style issue such as variable declarations and spell
+     checking.
+
+v4 ... v5:
+  1. Refresh annotation "WITH Linux-syscall-note" about uapi header file
+     arch/loongarch/include/uapi/asm/kvm_para.h
+
+v3 ... v4:
+  1. Implement function kvm_para_has_feature() on LoongArch platform,
+     and redefine feature with normal number rather than bitmap number,
+     since function kvm_para_has_feature() requires this.
+  2. Add extioi virt extension support in this patch set.
+  3. Update extioi virt extension support patch with review comments,
+     including documentation, using kvm_para_has_feature() to detect
+     features etc.
+
+v2 ... v3:
+  1. Add interface to detect and enable/disable paravirt features in
+     KVM hypervisor.
+  2. Implement function kvm_arch_para_features() for device driver in
+     VM side to detected supported paravirt features.
+
+v1 ... v2:
+  1. Update changelog suggested by WangXuerui.
+  2. Fix typo issue in function kvm_loongarch_cpucfg_set_attr(),
+     usr_features should be assigned directly, also suggested by
+     WangXueRui.
+---
+Bibo Mao (3):
+  LoongArch: KVM: Enable paravirt feature control from VMM
+  LoongArch: KVM: Implement function kvm_para_has_feature
+  irqchip/loongson-eiointc: Add extioi virt extension support
+
+ .../arch/loongarch/irq-chip-model.rst         |  64 ++++++++++
+ .../zh_CN/arch/loongarch/irq-chip-model.rst   |  55 +++++++++
+ arch/loongarch/include/asm/irq.h              |   1 +
+ arch/loongarch/include/asm/kvm_host.h         |   7 ++
+ arch/loongarch/include/asm/kvm_para.h         |  11 ++
+ arch/loongarch/include/asm/kvm_vcpu.h         |   4 +
+ arch/loongarch/include/asm/loongarch.h        |  11 +-
+ arch/loongarch/include/uapi/asm/Kbuild        |   2 -
+ arch/loongarch/include/uapi/asm/kvm.h         |   5 +
+ arch/loongarch/include/uapi/asm/kvm_para.h    |  24 ++++
+ arch/loongarch/kernel/paravirt.c              |  35 +++---
+ arch/loongarch/kvm/exit.c                     |  19 +--
+ arch/loongarch/kvm/vcpu.c                     |  47 ++++++--
+ arch/loongarch/kvm/vm.c                       |  43 ++++++-
+ drivers/irqchip/irq-loongson-eiointc.c        | 112 ++++++++++++++----
+ 15 files changed, 374 insertions(+), 66 deletions(-)
+ create mode 100644 arch/loongarch/include/uapi/asm/kvm_para.h
+
+
+base-commit: 1b5fe53681d9c388f1600310fe3488091701d4d0
+-- 
+2.39.3
+
 
