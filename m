@@ -1,135 +1,282 @@
-Return-Path: <kvm+bounces-25478-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25479-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E490B965C24
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 10:54:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4AD2965C47
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 11:05:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A42E7287607
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 08:54:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52262B210B7
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2024 09:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3787116EBE0;
-	Fri, 30 Aug 2024 08:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4EB16F0DF;
+	Fri, 30 Aug 2024 09:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S2wos1Ty"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="IwtTP+tE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCFD16DED4;
-	Fri, 30 Aug 2024 08:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C6A16DC3C
+	for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 09:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725008022; cv=none; b=E+9K+HaIhg37siKWyDM8U0bvtVmx2EUNU0tDd1cW5gfm7AfsnO9pMFu10JBMj7f03R0MTk1zLfsybhEv1SU56o52AJgqWNZFRdCo8miLNiUpJx5dUq2BkSO/DVP0XMwIvAr+OnkdA5sNuPA5/JmCx929hi+t4Yw9RF/XmBW+8Eg=
+	t=1725008722; cv=none; b=kaMq0Cpq0RltGl+hdDyJK38nwFPr3guS5ar0MSgw+zcsCAqLIn4QZjOBkIWA4ny1t6kCTckCzPZPyWGXa8HHMwus62eSVDyUjL2SF2c/wzvhWzJ912dH/PslSlA2h+kOW/6HH7jLQkAs/+46vsOFUzqrwqbCkN8iO3qXIkVLFsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725008022; c=relaxed/simple;
-	bh=TU3MSrwb8TrLODtBDsBEhrcdIGfc0V68Tw319uiHy2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rhjBr7a0+lZi9NyoYVhbB9Jto4hqJm9zbjR/j9nxwqf4UxsUscfvWw1x37Xry/oG+yzc4Og7RWEzXFSJEz6rZczalsDCnPSsPMBjZef/xyjNMdHXRnvfMOe3mwIUENkqO04E+ebftLNpmDtrteX3rEE8VHGZbSCHFFy86y+ckJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S2wos1Ty; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725008021; x=1756544021;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TU3MSrwb8TrLODtBDsBEhrcdIGfc0V68Tw319uiHy2o=;
-  b=S2wos1Tyu9VSsP1ejHADlJEwHVzEkcRMwfm5zvow6yMimxwmyUbZmg07
-   GIvqev8fHHmTBqES2ZVOMON9XWod0nhk5UTS42VP74iG+XV5zD7z8uq7I
-   zerKzP1gI9M3xdv4hB1MSAnBO3dAmVP5eXX93XEGublBMLhZEIsR8v4Ix
-   FnxCfOXqyrR9MkcK01JIrc07AgFDj+xpYxWRQPUn/rd+xcW0cvPoYTDni
-   N0Bkk6qSHAzoLuPPOjJn7DSEkW2Sruqlfvf5lsVP87Jel/kLho0d1B9dN
-   /rRkEg4p6HpOnT6P/0WJuYwfgoQ4e3gzSfS4y5wx6PCGe7avvkpZ3n1zY
-   g==;
-X-CSE-ConnectionGUID: SkmqpBNtSfi3w0+DklGxXQ==
-X-CSE-MsgGUID: 6nQTe/MeTB2w9jDb+/IRrA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="41120957"
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="41120957"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 01:53:40 -0700
-X-CSE-ConnectionGUID: /p3lcBR8QNG8crPNLRB9mQ==
-X-CSE-MsgGUID: umQ0sSEgRA6ZBUmG4rrPjA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="64186982"
-Received: from sschumil-mobl2.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.63])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 01:53:37 -0700
-Date: Fri, 30 Aug 2024 11:53:31 +0300
-From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Tao Su <tao1.su@linux.intel.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
-	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
-	isaku.yamahata@gmail.com, xiaoyao.li@intel.com,
-	linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Subject: Re: [PATCH 12/25] KVM: TDX: Allow userspace to configure maximum
- vCPUs for TDX guests
-Message-ID: <ZtGIi_G-3s17_n58@tlindgre-MOBL1>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-13-rick.p.edgecombe@intel.com>
- <ZsKdFu9KTdoLJEBV@linux.bj.intel.com>
+	s=arc-20240116; t=1725008722; c=relaxed/simple;
+	bh=3Wbtju0u+4fqvsCsLz29fQKY/B3vmJFPmQsW6setUn8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dy8+huLcmj+MtzJM8EGKcX1y9C3J+3yyPIxBcZ1i+mnRVw3fqfoNNYvDOQPHFvp6+IXkEuNaj7t5W1Y54epYATQcGXakiERKaarIjRfd1VtNpgmDOPrj/jBb+7WAzYWB7TxVTSL6GdB+sr9/jbPmxrBb3SAB8kWmZ0kCt4PwxMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=IwtTP+tE; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a8696e9bd24so195389166b.0
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 02:05:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1725008718; x=1725613518; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PYYXpww9BLoecZi7S6vRbZ1I0Y637G0WqXbbhcM+O0w=;
+        b=IwtTP+tEKrGFgYiyRaI58j+nDLoHcIOR4CaJv3sSpWzyCwx/BqE+YyDyQwIkwA2n+g
+         g2twA025rINersDzMyYVYxvqFB+u+pLWuib8au3bnKAf1Y+B0dFJ/uYom6nEJWGnaHie
+         yaHtslMZ1R4eMgmkBnooBOnFftwMMd2x5OZQqmLebqOgocFPWzN00teRKQps9KkN+QZ6
+         ebJFtvVxT0sCTFU0k/Ki2LtZFkmHlBbTyIVp0Ce3xdrihqNAmSPcCXh04oI2phipTOP0
+         fLu1hgAQ7riQ5uZE4q0dQf88+pCjIKJkjm4JvkbXrzDGkQkbcC1/dDE+fTl/Xdbo0LiL
+         ynRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725008718; x=1725613518;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PYYXpww9BLoecZi7S6vRbZ1I0Y637G0WqXbbhcM+O0w=;
+        b=XKizDGyGpWl1C7HO0ixIyKsUNk/sGfN51BuZO7l595j6MDEWppWpXztWN+bVju7PsT
+         uVsh45v0fZV00pvAVzcNRMSDLmguW/nNfyQZ9W6vXnZTFRy/JWPp7b9gbKnPOxuM7Uvr
+         eu9c0pC/hO6WnV9WM3DHAhngsKdPTsyzv+q/wFyzTb84iMMmA/WfwGmrPBiOXPgsrWrP
+         8zokTJTH3BVF49T9lyJdUTRmycOeMFloZLj1FBqjlbaEiDBU9OLjRpzLtITPwhXJoBhm
+         raIPWybBd5979eXTpT7tyvWpeI0/4vh+7JLVkbWPdz25Aaguy9iJl/XJ2Q0nyxFBMiUP
+         nv8g==
+X-Forwarded-Encrypted: i=1; AJvYcCXKx4TRgMIxTcad4Cif7qYIC53AtbK5gB9m/UQLJBH+uoQBsbjYW/74bn95PfQizpR/SFQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3Tf26bCvxmxJMCo1iqJV08XdYDLSY3dihUIi3Yymd+16ksgWC
+	DQlGw0CvkJb9x/zjwBH3ir8kFcwP3iSoBoAA0uyciXNW74C7/0Ba+v28uhvLWec=
+X-Google-Smtp-Source: AGHT+IGHLyc8N9LthDSdx2jpVrMxlnFbSRiGIxGh86NyE2UgEnvDT6yn74MwZAnCKM4+HamW3JBgbA==
+X-Received: by 2002:a17:907:6d28:b0:a86:a9a4:69fa with SMTP id a640c23a62f3a-a897fa72317mr476669266b.43.1725008716647;
+        Fri, 30 Aug 2024 02:05:16 -0700 (PDT)
+Received: from [10.20.4.146] (212-5-158-102.ip.btc-net.bg. [212.5.158.102])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8988feacbfsm190685966b.27.2024.08.30.02.05.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Aug 2024 02:05:16 -0700 (PDT)
+Message-ID: <de4e1842-1ca2-44aa-b028-359008b591fd@suse.com>
+Date: Fri, 30 Aug 2024 12:05:13 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZsKdFu9KTdoLJEBV@linux.bj.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/8] x86/virt/tdx: Prepare to support reading other
+ global metadata fields
+To: Kai Huang <kai.huang@intel.com>, dave.hansen@intel.com,
+ kirill.shutemov@linux.intel.com, tglx@linutronix.de, bp@alien8.de,
+ peterz@infradead.org, mingo@redhat.com, hpa@zytor.com,
+ dan.j.williams@intel.com, seanjc@google.com, pbonzini@redhat.com
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, chao.gao@intel.com,
+ binbin.wu@linux.intel.com, adrian.hunter@intel.com
+References: <cover.1724741926.git.kai.huang@intel.com>
+ <0403cdb142b40b9838feeb222eb75a4831f6b46d.1724741926.git.kai.huang@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+In-Reply-To: <0403cdb142b40b9838feeb222eb75a4831f6b46d.1724741926.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 19, 2024 at 09:17:10AM +0800, Tao Su wrote:
-> On Mon, Aug 12, 2024 at 03:48:07PM -0700, Rick Edgecombe wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -44,6 +44,35 @@ struct kvm_tdx_caps {
-> >  
-> >  static struct kvm_tdx_caps *kvm_tdx_caps;
-> >  
-> > +int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> > +{
-> > +	int r;
-> > +
-> > +	switch (cap->cap) {
-> > +	case KVM_CAP_MAX_VCPUS: {
+
+
+On 27.08.24 г. 10:14 ч., Kai Huang wrote:
+> The TDX module provides a set of "global metadata fields".  They report
+> things like TDX module version, supported features, and fields related
+> to create/run TDX guests and so on.
 > 
-> How about delete the curly braces on the case?
+> For now the kernel only reads "TD Memory Region" (TDMR) related fields
+> for module initialization.  There are both immediate needs to read more
+> fields for module initialization and near-future needs for other kernel
+> components like KVM to run TDX guests.
+> will be organized in different structures depending on their meanings.
+> 
+> For now the kernel only reads TDMR related fields.  The TD_SYSINFO_MAP()
+> macro hard-codes the 'struct tdx_sys_info_tdmr' instance name.  To make
+> it work with different instances of different structures, extend it to
+> take the structure instance name as an argument.
+> 
+> This also means the current code which uses TD_SYSINFO_MAP() must type
+> 'struct tdx_sys_info_tdmr' instance name explicitly for each use.  To
+> make the code easier to read, add a wrapper TD_SYSINFO_MAP_TDMR_INFO()
+> which hides the instance name.
+> 
+> TDX also support 8/16/32/64 bits metadata field element sizes.  For now
+> all TDMR related fields are 16-bit long thus the kernel only has one
+> helper:
+> 
+>    static int read_sys_metadata_field16(u64 field_id, u16 *val) {}
+> 
+> Future changes will need to read more metadata fields with different
+> element sizes.  To make the code short, extend the helper to take a
+> 'void *' buffer and the buffer size so it can work with all element
+> sizes.
+> 
+> Note in this way the helper loses the type safety and the build-time
+> check inside the helper cannot work anymore because the compiler cannot
+> determine the exact value of the buffer size.
+> 
+> To resolve those, add a wrapper of the helper which only works with
+> u8/u16/u32/u64 directly and do build-time check, where the compiler
+> can easily know both the element size (from field ID) and the buffer
+> size(using sizeof()), before calling the helper.
+> 
+> An alternative option is to provide one helper for each element size:
+> 
+>    static int read_sys_metadata_field8(u64 field_id, u8 *val) {}
+>    static int read_sys_metadata_field16(u64 field_id, u16 *val) {}
+>    ...
+> 
+> But this will result in duplicated code given those helpers will look
+> exactly the same except for the type of buffer pointer.  It's feasible
+> to define a macro for the body of the helper and define one entry for
+> each element size to reduce the code, but it is a little bit
+> over-engineering.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+> 
+> v2 -> v3:
+>   - Rename read_sys_metadata_field() to tdh_sys_rd() so the former can be
+>     used as the high level wrapper.  Get rid of "stbuf_" prefix since
+>     people don't like it.
+>   
+>   - Rewrite after removing 'struct field_mapping' and reimplementing
+>     TD_SYSINFO_MAP().
+>   
+> ---
+>   arch/x86/virt/vmx/tdx/tdx.c | 45 +++++++++++++++++++++----------------
+>   arch/x86/virt/vmx/tdx/tdx.h |  3 ++-
+>   2 files changed, 28 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index 7e75c1b10838..1cd9035c783f 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -250,7 +250,7 @@ static int build_tdx_memlist(struct list_head *tmb_list)
+>   	return ret;
+>   }
+>   
+> -static int read_sys_metadata_field(u64 field_id, u64 *data)
+> +static int tdh_sys_rd(u64 field_id, u64 *data)
+>   {
+>   	struct tdx_module_args args = {};
+>   	int ret;
+> @@ -270,43 +270,50 @@ static int read_sys_metadata_field(u64 field_id, u64 *data)
+>   	return 0;
+>   }
+>   
+> -static int read_sys_metadata_field16(u64 field_id, u16 *val)
+> +static int __read_sys_metadata_field(u64 field_id, void *val, int size)
 
-Thanks I'll do a patch to drop these. And there's an unpaired if else
-bracket cosmetic issue there too.
+The type of 'size' should be size_t.
 
-> > +		if (cap->flags || cap->args[0] == 0)
-> > +			return -EINVAL;
-> > +		if (cap->args[0] > KVM_MAX_VCPUS ||
-> > +		    cap->args[0] > tdx_sysinfo->td_conf.max_vcpus_per_td)
-> > +			return -E2BIG;
-> > +
-> > +		mutex_lock(&kvm->lock);
-> > +		if (kvm->created_vcpus)
-> > +			r = -EBUSY;
-> > +		else {
-> > +			kvm->max_vcpus = cap->args[0];
-> > +			r = 0;
-> > +		}
-> > +		mutex_unlock(&kvm->lock);
-> > +		break;
-> > +	}
-> > +	default:
-> > +		r = -EINVAL;
-> > +		break;
-> > +	}
+>   {
+>   	u64 tmp;
+>   	int ret;
+>   
+> -	BUILD_BUG_ON(MD_FIELD_ID_ELE_SIZE_CODE(field_id) !=
+> -			MD_FIELD_ID_ELE_SIZE_16BIT);
+> -
+> -	ret = read_sys_metadata_field(field_id, &tmp);
+> +	ret = tdh_sys_rd(field_id, &tmp);
+>   	if (ret)
+>   		return ret;
+>   
+> -	*val = tmp;
+> +	memcpy(val, &tmp, size);
+>   
+>   	return 0;
+>   }
+>   
+> +/* Wrapper to read one global metadata to u8/u16/u32/u64 */
+> +#define read_sys_metadata_field(_field_id, _val)					\
+> +	({										\
+> +		BUILD_BUG_ON(MD_FIELD_ELE_SIZE(_field_id) != sizeof(typeof(*(_val))));	\
+> +		__read_sys_metadata_field(_field_id, _val, sizeof(typeof(*(_val))));	\
+> +	})
+> +
+>   /*
+> - * Assumes locally defined @ret and @sysinfo_tdmr to convey the error
+> - * code and the 'struct tdx_sys_info_tdmr' instance to fill out.
+> + * Read one global metadata field to a member of a structure instance,
+> + * assuming locally defined @ret to convey the error code.
+>    */
+> -#define TD_SYSINFO_MAP(_field_id, _member)						\
+> -	({										\
+> -		if (!ret)								\
+> -			ret = read_sys_metadata_field16(MD_FIELD_ID_##_field_id,	\
+> -					&sysinfo_tdmr->_member);			\
+> +#define TD_SYSINFO_MAP(_field_id, _stbuf, _member)				\
+> +	({									\
+> +		if (!ret)							\
+> +			ret = read_sys_metadata_field(MD_FIELD_ID_##_field_id,	\
+> +					&_stbuf->_member);			\
+>   	})
+>   
+>   static int get_tdx_sys_info_tdmr(struct tdx_sys_info_tdmr *sysinfo_tdmr)
+>   {
+>   	int ret = 0;
+>   
+> -	TD_SYSINFO_MAP(MAX_TDMRS,	      max_tdmrs);
+> -	TD_SYSINFO_MAP(MAX_RESERVED_PER_TDMR, max_reserved_per_tdmr);
+> -	TD_SYSINFO_MAP(PAMT_4K_ENTRY_SIZE,    pamt_entry_size[TDX_PS_4K]);
+> -	TD_SYSINFO_MAP(PAMT_2M_ENTRY_SIZE,    pamt_entry_size[TDX_PS_2M]);
+> -	TD_SYSINFO_MAP(PAMT_1G_ENTRY_SIZE,    pamt_entry_size[TDX_PS_1G]);
+> +#define TD_SYSINFO_MAP_TDMR_INFO(_field_id, _member)	\
+> +	TD_SYSINFO_MAP(_field_id, sysinfo_tdmr, _member)
 
-And adding a line break here after the switch.
+nit: I guess its a personal preference but honestly I think the amount 
+of macro indirection (3 levels) here is crazy, despite each being rather 
+simple. Just use TD_SYSINFO_MAP directly, saving the typing of 
+"sysinfo_tdmr" doesn't seem like a big deal.
 
-> > +	return r;
-> > +}
+You can probably take it even a bit further and simply opencode 
+read_sys_metadata_field macro inside TD_SYSINFO_MAP and be left with 
+just it, no ? No other patch in this series uses read_sys_metadata_field 
+stand alone, if anything factoring it out could be deferred until the 
+first users gets introduced.
 
-Regards,
+> +
+> +	TD_SYSINFO_MAP_TDMR_INFO(MAX_TDMRS,	        max_tdmrs);
+> +	TD_SYSINFO_MAP_TDMR_INFO(MAX_RESERVED_PER_TDMR, max_reserved_per_tdmr);
+> +	TD_SYSINFO_MAP_TDMR_INFO(PAMT_4K_ENTRY_SIZE,    pamt_entry_size[TDX_PS_4K]);
+> +	TD_SYSINFO_MAP_TDMR_INFO(PAMT_2M_ENTRY_SIZE,    pamt_entry_size[TDX_PS_2M]);
+> +	TD_SYSINFO_MAP_TDMR_INFO(PAMT_1G_ENTRY_SIZE,    pamt_entry_size[TDX_PS_1G]);
+>   
+>   	return ret;
+>   }
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> index 148f9b4d1140..7458f6717873 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -53,7 +53,8 @@
+>   #define MD_FIELD_ID_ELE_SIZE_CODE(_field_id)	\
+>   		(((_field_id) & GENMASK_ULL(33, 32)) >> 32)
+>   
+> -#define MD_FIELD_ID_ELE_SIZE_16BIT	1
+> +#define MD_FIELD_ELE_SIZE(_field_id)	\
 
-Tony
+That ELE seems a bit ambiguous, ELEM seems more natural and is in line 
+with other macros in the kernel.
+
+> +	(1 << MD_FIELD_ID_ELE_SIZE_CODE(_field_id))
+>   
+>   struct tdmr_reserved_area {
+>   	u64 offset;
 
