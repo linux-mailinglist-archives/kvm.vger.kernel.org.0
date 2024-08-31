@@ -1,122 +1,106 @@
-Return-Path: <kvm+bounces-25610-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25611-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A825D966D73
-	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 02:23:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAFEB966D74
+	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 02:24:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB6EF1C22309
-	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 00:23:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 804582827D9
+	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 00:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7F6208AD;
-	Sat, 31 Aug 2024 00:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C317922F1E;
+	Sat, 31 Aug 2024 00:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wwl3OF8T"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p31RDI1R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C85C1F959
-	for <kvm@vger.kernel.org>; Sat, 31 Aug 2024 00:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B22C23749
+	for <kvm@vger.kernel.org>; Sat, 31 Aug 2024 00:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725063697; cv=none; b=Q3I10ynx6f8e1qaHUuKtKYi/YgKfbIlXmrruqLWkGtj+MbBa1qbDj2oGqWuryl0eeDU1JX4C40xhRtEHvC204XZkq7YAKeqRoZJ613Y6MIZKlKoKfIlEnZHnJytPagHeZ2M1gui0TkbyR4n5gJHmXQi8ANO4+4yjwilcIefgjvs=
+	t=1725063703; cv=none; b=WnSrvJoQYbJwPbVFFV3cc3HfXbISI4WhcTp+Cre3uD+a6KE4oy4p8c3R1ei+tYPFGl2m6Pe2wkdctD/PloJQZvGLOMlyZ4ryjsjN3lDtxabVPpjml8QMnx39UXVYKXj69/MrsZgJ/k8UzEooRSngbut7WT6s+mHNn6lpc9v52hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725063697; c=relaxed/simple;
-	bh=3vXhrmDJEnvXRrG5wN4+Rj0ALvXRVC7+qovanTKX3Hk=;
+	s=arc-20240116; t=1725063703; c=relaxed/simple;
+	bh=/wdKel1aSrBmj9802LMSDDEvGq2PjPxbrU3uI863aVg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FAW4nT6u5ZnBSHN/j83tOvncnRK4GYzZDSS4gVkHwOqdWbdh9GWSNj6ISeS6XEkrjEmVR6r2jHJsER+n/LiGdQ6lX96Yyh+orqTQNUZuQUf3XpmVboDpxpPWScQL52UN7+RyxPXnSCSdfAOLh1nimT5kxq3b8ZqOPDWPnVMFN9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wwl3OF8T; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=cK9NiLLTGKHCKN31854R+pBDF/cefEFinncMJogI77BFBRgVH3ZjUSdyp7/RpuD/4WxWDR3cq3ddSF0YuY+85TO7LLmF/ulhDcAUtH6z9ngJrW9jD4nY9YTG+2bJqNj6EPf3wm5zcrNg2DFv5cNoVBH9vYbEnU3Fet7ZzOCnQow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p31RDI1R; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-778702b9f8fso1454938a12.1
-        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 17:21:35 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2053f49d0c9so4711035ad.1
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 17:21:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725063695; x=1725668495; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1725063701; x=1725668501; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wfZaQrJ9bQCLmLdc965VyJLEqRz0VYMmjQCDb7HMOwo=;
-        b=Wwl3OF8TMmsyfLkWrcASPrq5IFPxY18WeHNx/s0dwrTJ+uTguVRz80mArwga4QWYIr
-         lPBRhPldSznRXlwVHuKsTPO8MdoD19IK5pXGnZtBe4WYglfpwRv24EC/pyQ791SWdw5j
-         V9cG1N+9e4QgVXS4TrTRUKj25xIYL3bL96J/c3ztpg3vLL73ObP/7OJqJ/xEaJzrOOgP
-         RvbT68nAbGpBCvGN7k16eRJsF9oTlkQuGqn9RsmSyBXvY3wHkmnMyQFZL+ga/4YapVii
-         TQA9XacaAIzi6XR++M0RRl9ut6oZNwPXSbc17ZXONYoIVQ4W/JgxADk1Olhflu2I6h7R
-         /u9w==
+        bh=cjA+z7q8loku4LvOBKYYpqX6RoC5fSx8Vq6jSIkf/kM=;
+        b=p31RDI1Rpe5qpBwQIN0f04Ies68uIkIJvowFoLrQYgei/3KDVW2nIlImGM/U/Fgkdu
+         CdAqb/PLhupSIbnz6OitbhemgnBCunP8KtojAuMzirkpYY713AkZN6j4xr9w99Tnion3
+         AoU648okufQCogIQKUoj8x2tU2uBC6q15metqsckbQRk5i5oDee7K8GgsEO6Tak04BYB
+         AKaRjST9IucQj1hI+6uDlhHb/6996WjfUJx+jaAzbnV/gFRuhUD53M3CYo6Hn7e8AB9K
+         /lYlkyHla2Y2/d5dfokErEgV6NjnQnIqzt2kPMZ4ErhLFu+9HNua3SETVlF2PVn/sz6T
+         kClg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725063695; x=1725668495;
+        d=1e100.net; s=20230601; t=1725063701; x=1725668501;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wfZaQrJ9bQCLmLdc965VyJLEqRz0VYMmjQCDb7HMOwo=;
-        b=R1OWLH+5r6EJTyET2MW9Z4y7hggeiKGH/n9MqbgVf1uah7pUOPPP4jxKzL3x1wpks3
-         wRjz1RQ7Tut4+HhS9m9LBGPrAkfKlsnLO/s1CjZsJ3py9rzqxRjtc4UMWZWuyhYSHHFu
-         /2/Rr10LwwAA/iBTExT4HOjbDkYzM2lhE5dxmBcdV04BWZVeMxWqgy71wQsiRy+ANv2S
-         m5In20252vIjloqORNJfrFvhQP0x3xwDuZaX3iEvn8llhuSg5HwFKXhGKWMMpkkj6jNz
-         eWpRDDRF5qFGdBc0XWMxb4uN7Qe+DdLUWhN13TZB4awoVIOEV7Mancd7+eRDoYGtcNEH
-         EIug==
-X-Gm-Message-State: AOJu0YxSv7uMYHecuKotgEBSuN5iXNzubl+SoFR9np6OTxc2Ma82jnpr
-	gCszkoYFDDGt5fmW+cxPQb5JQnE4rt0qilsbSu7NvwvPCu11uBdxe0dpNKJu/t3891UWq2pW7QB
-	MhA==
-X-Google-Smtp-Source: AGHT+IFVTgxvGwsaOwi8zxa84wVlO1vh0D+mqC1XhwaihWWv9cS0aYXp3pWEr2ireJ8z8L6H4kC8QjyohJM=
+        bh=cjA+z7q8loku4LvOBKYYpqX6RoC5fSx8Vq6jSIkf/kM=;
+        b=Y0PTeGA1Gn7pIwh0uttOnwDV+K6aKL+8itaP4R3g7DOkaXjNqOY3gB3qA8/jW2p83k
+         8f/3i+sVoc9Dh02I47fONnA6OdWcg+At3cd5drQ6+yPhxs4pdYRtIt4PWRfHQsGVXaKF
+         sVfc1MR2zSN0w1Nwr7gi/t2dwlQcDYPMtrwag/p5S0DoSu4bMINvyR0kvZdMw6CWwy2U
+         SZypzGqKHntvg1DH6LmvGDG095BUebQ7O7Nwd/1lH1r7JGetH0KdXx22pkuzRD09an+z
+         SNG4uHb92tOQNNA1ocnG3Hv0BZpb7RZRfRvhAcOmpEuz20b9aoFhpR/zecIveUU8xAx4
+         sFbw==
+X-Gm-Message-State: AOJu0YzFoGzO/F95BhSnseUV0W1abZaBp3AzEf5CzOqDxon8psXk2ZUN
+	Poh/czghbtR3q3mQKibB0BWgjXMPvIjrjEL9OW2xLGGrA58/9ICnEladv/G5XblOXQ9Wpxf6qmD
+	wBQ==
+X-Google-Smtp-Source: AGHT+IFIwzby144KSsd4gfVYXr/GeuNPWDDFEHr12PDOWSx2iayMxNXVoZWHEAj0QdceAdDmPA6K61xVOeI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6904:0:b0:702:4fb6:8724 with SMTP id
- 41be03b00d2f7-7d447110166mr17149a12.1.1725063693090; Fri, 30 Aug 2024
- 17:21:33 -0700 (PDT)
-Date: Fri, 30 Aug 2024 17:20:55 -0700
-In-Reply-To: <20240719235107.3023592-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:27c6:b0:205:3bc6:bf1 with SMTP id
+ d9443c01a7336-2053bc60ffcmr40685ad.4.1725063700787; Fri, 30 Aug 2024 17:21:40
+ -0700 (PDT)
+Date: Fri, 30 Aug 2024 17:20:57 -0700
+In-Reply-To: <20240802203900.348808-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240719235107.3023592-1-seanjc@google.com>
+References: <20240802203900.348808-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <172506346660.337709.9371266874053711771.b4-ty@google.com>
-Subject: Re: [PATCH v2 00/10] KVM: x86: Fix ICR handling when x2AVIC is active
+Message-ID: <172506354608.338443.7550017619173819898.b4-ty@google.com>
+Subject: Re: [PATCH 0/3] KVM: x86/mmu: Misc shadow paging cleanups
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 19 Jul 2024 16:50:57 -0700, Sean Christopherson wrote:
-> I made the mistake of expanding my testing to run with and without AVIC
-> enabled, and to my surprise (wow, sarcasm), x2AVIC failed hard on the
-> xapic_state_test due to ICR issues.
+On Fri, 02 Aug 2024 13:38:57 -0700, Sean Christopherson wrote:
+> A handful of loosely related shadow paging cleanups I unearthed.  I believe
+> I wrote them when reviewing eager page splitting?
 > 
-> AFAICT, the issue is that AMD splits the 64-bit ICR into the legacy ICR
-> and ICR2 fields when storing the ICR in the vAPIC (apparently "it's a
-> single 64-bit register" is open to intepretation).  Aside from causing
-> the selftest failure and potential live migration issues, botching the
-> format is quite bad, as KVM will mishandle incomplete virtualized IPIs,
-> e.g. generate IRQs to the wrong vCPU, drop IRQs, etc.
+> Sean Christopherson (3):
+>   KVM: x86/mmu: Decrease indentation in logic to sync new indirect
+>     shadow page
+>   KVM: x86/mmu: Drop pointless "return" wrapper label in FNAME(fetch)
+>   KVM: x86/mmu: Reword a misleading comment about checking
+>     gpte_changed()
 > 
 > [...]
 
-Applied to kvm-x86 misc, thanks!
+Applied to kvm-x86 mmu, thanks!
 
-[01/10] KVM: x86: Enforce x2APIC's must-be-zero reserved ICR bits
-        https://github.com/kvm-x86/linux/commit/71bf395a276f
-[02/10] KVM: x86: Move x2APIC ICR helper above kvm_apic_write_nodecode()
-        https://github.com/kvm-x86/linux/commit/d33234342f8b
-[03/10] KVM: x86: Re-split x2APIC ICR into ICR+ICR2 for AMD (x2AVIC)
-        https://github.com/kvm-x86/linux/commit/73b42dc69be8
-[04/10] KVM: selftests: Open code vcpu_run() equivalent in guest_printf test
-        https://github.com/kvm-x86/linux/commit/d1c2cdca5a08
-[05/10] KVM: selftests: Report unhandled exceptions on x86 as regular guest asserts
-        https://github.com/kvm-x86/linux/commit/ed24ba6c2c34
-[06/10] KVM: selftests: Add x86 helpers to play nice with x2APIC MSR #GPs
-        https://github.com/kvm-x86/linux/commit/f2e91e874179
-[07/10] KVM: selftests: Skip ICR.BUSY test in xapic_state_test if x2APIC is enabled
-        https://github.com/kvm-x86/linux/commit/faf06a238254
-[08/10] KVM: selftests: Test x2APIC ICR reserved bits
-        https://github.com/kvm-x86/linux/commit/3426cb48adb4
-[09/10] KVM: selftests: Verify the guest can read back the x2APIC ICR it wrote
-        https://github.com/kvm-x86/linux/commit/0cb26ec32085
-[10/10] KVM: selftests: Play nice with AMD's AVIC errata
-        https://github.com/kvm-x86/linux/commit/5a7c7d148e48
+[1/3] KVM: x86/mmu: Decrease indentation in logic to sync new indirect shadow page
+      https://github.com/kvm-x86/linux/commit/174b6e4a25ea
+[2/3] KVM: x86/mmu: Drop pointless "return" wrapper label in FNAME(fetch)
+      https://github.com/kvm-x86/linux/commit/7d67b03e6fff
+[3/3] KVM: x86/mmu: Reword a misleading comment about checking gpte_changed()
+      https://github.com/kvm-x86/linux/commit/1dc9cc1c4c23
 
 --
 https://github.com/kvm-x86/linux/tree/next
