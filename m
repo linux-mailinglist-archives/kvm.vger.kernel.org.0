@@ -1,106 +1,97 @@
-Return-Path: <kvm+bounces-25611-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25612-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAFEB966D74
-	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 02:24:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CD79966D77
+	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 02:24:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 804582827D9
-	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 00:24:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A63C2836DC
+	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2024 00:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C317922F1E;
-	Sat, 31 Aug 2024 00:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B1029CE8;
+	Sat, 31 Aug 2024 00:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p31RDI1R"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="acB0VQAr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B22C23749
-	for <kvm@vger.kernel.org>; Sat, 31 Aug 2024 00:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D73412E4A
+	for <kvm@vger.kernel.org>; Sat, 31 Aug 2024 00:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725063703; cv=none; b=WnSrvJoQYbJwPbVFFV3cc3HfXbISI4WhcTp+Cre3uD+a6KE4oy4p8c3R1ei+tYPFGl2m6Pe2wkdctD/PloJQZvGLOMlyZ4ryjsjN3lDtxabVPpjml8QMnx39UXVYKXj69/MrsZgJ/k8UzEooRSngbut7WT6s+mHNn6lpc9v52hk=
+	t=1725063717; cv=none; b=OKJ8lu93HHWO/eNXwdV01c5UADDkpKRN2R1h+oSl29jcHkSX58xv4aQ15PuXqdURPgFiFon+S3meLD/krSM/Jv2F7HVkIafiwceLGZ24US72gCaQYew4Mdbb+gIzdHEGHtyt7TPIqGjTAuEZ21gKgweUoHg8j6ZLPa7Lwti6g9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725063703; c=relaxed/simple;
-	bh=/wdKel1aSrBmj9802LMSDDEvGq2PjPxbrU3uI863aVg=;
+	s=arc-20240116; t=1725063717; c=relaxed/simple;
+	bh=uikcsbcYWTizg70A9pXTDrH6Aq2HwfIpluSe5pLzm3U=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cK9NiLLTGKHCKN31854R+pBDF/cefEFinncMJogI77BFBRgVH3ZjUSdyp7/RpuD/4WxWDR3cq3ddSF0YuY+85TO7LLmF/ulhDcAUtH6z9ngJrW9jD4nY9YTG+2bJqNj6EPf3wm5zcrNg2DFv5cNoVBH9vYbEnU3Fet7ZzOCnQow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p31RDI1R; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=lTe8xSLmaK/BvoKyLg2ZICbIZyzCqsAOAOujca9oeY87Y+Qsp3N2V0TFa0b15JuWNEKX6vPijMO09sfHbJNk0MvOIdXTPt6jNBFLQZE4aHvhnjsk4Av2MXYwU2rZrQ9uu8p6T+vwFNv79XxMPFRx52HBpbBl6BI68jX53xIhvn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=acB0VQAr; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2053f49d0c9so4711035ad.1
-        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 17:21:41 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2052e7836a0so10403815ad.0
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2024 17:21:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725063701; x=1725668501; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1725063716; x=1725668516; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cjA+z7q8loku4LvOBKYYpqX6RoC5fSx8Vq6jSIkf/kM=;
-        b=p31RDI1Rpe5qpBwQIN0f04Ies68uIkIJvowFoLrQYgei/3KDVW2nIlImGM/U/Fgkdu
-         CdAqb/PLhupSIbnz6OitbhemgnBCunP8KtojAuMzirkpYY713AkZN6j4xr9w99Tnion3
-         AoU648okufQCogIQKUoj8x2tU2uBC6q15metqsckbQRk5i5oDee7K8GgsEO6Tak04BYB
-         AKaRjST9IucQj1hI+6uDlhHb/6996WjfUJx+jaAzbnV/gFRuhUD53M3CYo6Hn7e8AB9K
-         /lYlkyHla2Y2/d5dfokErEgV6NjnQnIqzt2kPMZ4ErhLFu+9HNua3SETVlF2PVn/sz6T
-         kClg==
+        bh=jQ0cv7Qd+gmdijk0mM0rETDzMYm/E79aKdx8FgcPeVI=;
+        b=acB0VQArEtQmvLBS7CTAru7iGkooPoOoysItT3pQmAbm26BeEO641z74NzMR7itdzG
+         eORY/TwjCzRA+xwJ3Q0l+raVgC5L8dF/S5cbgZO/nV0VoQZr2CWFMJHS0DoedEq+DeH8
+         455Q/RRc6FDoAp8/3aMv2rGj6/TgnTPURkIHVjf2BfUBr3Lh6vvClouJcRzudmsR8JtN
+         sxETvedqzNtx5zX9kvPU1GkPFmHSZSzKo1/0UBd1ybK+3RgpcyFmDbTH9nA8ITyxglPm
+         5NF9BcPxC1IvGHS994eVGQLYgJKDS2GIMkjaqnXmr85noCX4OFaSYKQtlUVkAqzpsemT
+         P8GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725063701; x=1725668501;
+        d=1e100.net; s=20230601; t=1725063716; x=1725668516;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cjA+z7q8loku4LvOBKYYpqX6RoC5fSx8Vq6jSIkf/kM=;
-        b=Y0PTeGA1Gn7pIwh0uttOnwDV+K6aKL+8itaP4R3g7DOkaXjNqOY3gB3qA8/jW2p83k
-         8f/3i+sVoc9Dh02I47fONnA6OdWcg+At3cd5drQ6+yPhxs4pdYRtIt4PWRfHQsGVXaKF
-         sVfc1MR2zSN0w1Nwr7gi/t2dwlQcDYPMtrwag/p5S0DoSu4bMINvyR0kvZdMw6CWwy2U
-         SZypzGqKHntvg1DH6LmvGDG095BUebQ7O7Nwd/1lH1r7JGetH0KdXx22pkuzRD09an+z
-         SNG4uHb92tOQNNA1ocnG3Hv0BZpb7RZRfRvhAcOmpEuz20b9aoFhpR/zecIveUU8xAx4
-         sFbw==
-X-Gm-Message-State: AOJu0YzFoGzO/F95BhSnseUV0W1abZaBp3AzEf5CzOqDxon8psXk2ZUN
-	Poh/czghbtR3q3mQKibB0BWgjXMPvIjrjEL9OW2xLGGrA58/9ICnEladv/G5XblOXQ9Wpxf6qmD
-	wBQ==
-X-Google-Smtp-Source: AGHT+IFIwzby144KSsd4gfVYXr/GeuNPWDDFEHr12PDOWSx2iayMxNXVoZWHEAj0QdceAdDmPA6K61xVOeI=
+        bh=jQ0cv7Qd+gmdijk0mM0rETDzMYm/E79aKdx8FgcPeVI=;
+        b=VeRjPyQ6JsETym9NI7GTdd9AQViYDiPLYuDx7VKJ06rWogHFdXkqCt+Bf4vJshu7QQ
+         1FlkOhlQ/0VY0pt9SEcLPDKK+3DzVQ8mGtz63V4N9tURD9NxxbzJ4ggjlEEt/40a89mY
+         quaYHX3JqzA99GY+V82+RhVWJuEsRJnoJOS67x6tErowMFlD/gXTDeoN4+QYCfwIFAFC
+         dROifScON5Jp6RPcdHg1S2rs52Nvy54G2Irzz3GTTN0Z3lqfiaMduitf3wUZYqTp/cgK
+         lc/yOR442P3J82+7avx4fwhRgeehXFzy2nmS8BJKsW7f838U/TRdSgMbVMaxATC0dY8s
+         QFJg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBuRZyRWBUUlZYBkJ5Q1sKFSG6GcHrxD6uL8lNHldOlyHei+sN+ng+nzXTAniXJQUkQrg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8Nx+Hv5db0GYT7QwOBkOF39d9RnFVD17eluYg5GpYlv6iqXfM
+	yvM5/Td1p/7JEM5N01W5Lov3xYRzTd0Fwxjp06D4FVYHuJTSc18LT6IYZOsvvYpOYSii/RnsCyg
+	aUA==
+X-Google-Smtp-Source: AGHT+IG1zZXwwzR1gaXHIo5VHk6KMji21CeC5APkFgCfFzhzxXAK9Z+KmZlxoO+VmmEZORM0HuKDi9jjeoo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:27c6:b0:205:3bc6:bf1 with SMTP id
- d9443c01a7336-2053bc60ffcmr40685ad.4.1725063700787; Fri, 30 Aug 2024 17:21:40
- -0700 (PDT)
-Date: Fri, 30 Aug 2024 17:20:57 -0700
-In-Reply-To: <20240802203900.348808-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:c405:b0:1fa:fc15:c513 with SMTP id
+ d9443c01a7336-20527e7da59mr2460095ad.9.1725063715836; Fri, 30 Aug 2024
+ 17:21:55 -0700 (PDT)
+Date: Fri, 30 Aug 2024 17:20:59 -0700
+In-Reply-To: <20240709182936.146487-1-pgonda@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240802203900.348808-1-seanjc@google.com>
+References: <20240709182936.146487-1-pgonda@google.com>
 X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <172506354608.338443.7550017619173819898.b4-ty@google.com>
-Subject: Re: [PATCH 0/3] KVM: x86/mmu: Misc shadow paging cleanups
+Message-ID: <172506355899.338644.7289334225291315172.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: selftests: Add SEV-ES shutdown test
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, Peter Gonda <pgonda@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alper Gun <alpergun@google.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 02 Aug 2024 13:38:57 -0700, Sean Christopherson wrote:
-> A handful of loosely related shadow paging cleanups I unearthed.  I believe
-> I wrote them when reviewing eager page splitting?
-> 
-> Sean Christopherson (3):
->   KVM: x86/mmu: Decrease indentation in logic to sync new indirect
->     shadow page
->   KVM: x86/mmu: Drop pointless "return" wrapper label in FNAME(fetch)
->   KVM: x86/mmu: Reword a misleading comment about checking
->     gpte_changed()
-> 
-> [...]
+On Tue, 09 Jul 2024 11:29:36 -0700, Peter Gonda wrote:
+> Regression test for ae20eef5 ("KVM: SVM: Update SEV-ES shutdown intercepts
+> with more metadata"). Test confirms userspace is correctly indicated of
+> a guest shutdown not previous behavior of an EINVAL from KVM_RUN.
 
-Applied to kvm-x86 mmu, thanks!
+Applied to kvm-x86 selftests, with the IDT clobbering.  Thanks!
 
-[1/3] KVM: x86/mmu: Decrease indentation in logic to sync new indirect shadow page
-      https://github.com/kvm-x86/linux/commit/174b6e4a25ea
-[2/3] KVM: x86/mmu: Drop pointless "return" wrapper label in FNAME(fetch)
-      https://github.com/kvm-x86/linux/commit/7d67b03e6fff
-[3/3] KVM: x86/mmu: Reword a misleading comment about checking gpte_changed()
-      https://github.com/kvm-x86/linux/commit/1dc9cc1c4c23
+[1/1] KVM: selftests: Add SEV-ES shutdown test
+      https://github.com/kvm-x86/linux/commit/2f6fcfa1f426
 
 --
 https://github.com/kvm-x86/linux/tree/next
