@@ -1,316 +1,208 @@
-Return-Path: <kvm+bounces-25649-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25650-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AE90967E65
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 06:16:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7A4967E68
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 06:17:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 956161C2185F
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 04:16:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA268282190
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 04:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC2CD14D702;
-	Mon,  2 Sep 2024 04:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01FEC1494B3;
+	Mon,  2 Sep 2024 04:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="L61+LWbh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4F738396;
-	Mon,  2 Sep 2024 04:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725250572; cv=none; b=h31ykJSLGD8TGsnqxeW86Nnj8BZ3swi4udt1A0H1pxeRJUGp6iAYdSK7KKw27UoDm1zM3meFFhUFSeJBOmn29O9mwtJ2rsw2f9v4H/xichlaxdcBMRBTOjsYS7gQfxeueb4fDwnUZKhoIo3l0D7ClYgTigvhcEjT4RIVKTtRQE8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725250572; c=relaxed/simple;
-	bh=NgVsYTymfZiWrYhoDSkR8pl6Dj6pDcv85TAeU+Sjc58=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=EIDhzdELPP4/X5E8nxvMoD5LAPiMgzosTCJXUFSH3OOSVEHpf6JBntx4iUrSWlovXZFIvPJC+8EEeWk6NX3/MxfeqxFQS917i6R1v9dEXAP5o2P3FQAmFH74wa/46rdsQDr0HvdSelj9yvJZIeN67VFEMC7fxyIKzTrrbTOktMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8BxWZoGPNVmePcnAA--.41226S3;
-	Mon, 02 Sep 2024 12:16:06 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front2 (Coremail) with SMTP id qciowMBxjcUFPNVmzK0DAA--.9505S3;
-	Mon, 02 Sep 2024 12:16:05 +0800 (CST)
-Subject: Re: [PATCH v6 3/3] LoongArch: KVM: Add vm migration support for LBT
- registers
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, Jiaxun Yang <jiaxun.yang@flygoat.com>
-References: <20240730075744.1215856-1-maobibo@loongson.cn>
- <20240730075744.1215856-4-maobibo@loongson.cn>
- <CAAhV-H7D80huYzF6ewZqcgx8MTzWZNFXJHOahoJ33zJYX1kyAw@mail.gmail.com>
- <13276416-c62b-b33d-1824-7764122ef863@loongson.cn>
- <CAAhV-H4RhhYB0LHeOs+Cjr6LZj6np_S4-neEtYnLUU_K=upV_w@mail.gmail.com>
- <1daacc02-2bdc-928b-6291-7604c841d219@loongson.cn>
- <CAAhV-H5mwdCp9pX53Pu2GKA48+9k0HMAR0cEBB3BPTBjySPwKA@mail.gmail.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <cf461609-5dfb-431c-4764-065aa884f28f@loongson.cn>
-Date: Mon, 2 Sep 2024 12:15:35 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2048.outbound.protection.outlook.com [40.107.92.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A244625
+	for <kvm@vger.kernel.org>; Mon,  2 Sep 2024 04:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725250629; cv=fail; b=Ytg+BSp+cdc0teteWG2tHvsNn6BZo78NFe2evVM4fncokgIAl7y9bg5npjqZApyynDXLMsX5PyGX4otxo3oTn7u+UXH4SkEmYTfOxYI7m3nn73iWtlc0QqNDn7AjKD0INSuq6iNUhB2GiZtJJ3WWBBCO/mICo0k37eTKUjMjZac=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725250629; c=relaxed/simple;
+	bh=QYrvxd6Y7ltQHyqVIXTbKzzZqSQgmFWMhh8TIyJWuCA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JtzxXwqC61NA0G/ObcHJDun57WoFZQsIqsqxTRvBP1Jcc33iCPzl1MrRZpUid1dV8f+KloqFNqMU9AHyCxiLDpulT4nwJvlFyij9SRI67o+Wj39V2ip5HGaBJ5MlvLXlGBFZ4K1gKapIaBQlzG9ih5bcyrl+EzD2OGeOp/pJ2VM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=L61+LWbh; arc=fail smtp.client-ip=40.107.92.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ArbQ9EqPWeya6GBzko2+D6tDVGJLrGNeyFTxGHbWjxJ8JiOhPMGCel/9m1zZUbzJcWWQt29kMCpQO4/DquVdJzMJ5XPP3UKniOsUte9AYTFVel+lxlFGOC04zabka0jP7AeJmOQR8i9x1TsFdHFuSK7uHkNwURbP8dD10Q3dqR/O9SM5icYOJdVd6eq5wLse4zYEzA+Tbea1NsURSn8csWOWooWZfKIE6krEhQlmClnNrrD14vkBbS9sjz/5jkqhTTjA4BJWA4cGvWxN0h104bzod6x3qcAbe9qCis/eqy6IOwrxEmVKLmek5+fA+tl7pDZeyQMLsZJh8vXrl75X1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iqFxM4RehLAi66fvw3NRt+c4ixqCgmJ7tpRH3ko/XeE=;
+ b=FAn45oGg7f611M50tM0Uz0HBJ26+NIOwHnIuILWJW3Vrj0erIkdDbyQkd9gFYPMdMwapyZs/Z0Y9U4CS2lVsrQ4h/G/ondV/WZaLmYUjxio205SrKsXdoinfpaaPcmYRxtbsnDpttBZ/J364Vu5Kt+CALMQ7P2q8yb5WvipQ102SBtZh/ID5UklqUyPVuZFDLhgholY51RQ1W+1fnts94/vOxFoLtQPG7O5DALpyTbsYPhbpUEkPo2CDMOOW/sI5+DS9d1hAOPQPoFJ3g6egJZYX4lo3VY+W7jDs8zBQpKiztwSbmWXHUiIsoOrpD9wn/D9dYBhYSpOwry6yU+V+fg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iqFxM4RehLAi66fvw3NRt+c4ixqCgmJ7tpRH3ko/XeE=;
+ b=L61+LWbhGap94GECx78XrMpthpzAlSuc9o/3H5PHRK42xvBj5tmX7sZRskpBHzyVsOUveCPpe3SjyyrHyULNtqYsIRv/EcJlCkOzEDyv0tN1zg5//GfwGrEOJszsWeHplS9q+MHrg8YyeTynvvRk/XT1O64SQcE3ncQyC7BVF1Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN0PR12MB6317.namprd12.prod.outlook.com (2603:10b6:208:3c2::12)
+ by MN2PR12MB4335.namprd12.prod.outlook.com (2603:10b6:208:1d4::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.20; Mon, 2 Sep
+ 2024 04:17:05 +0000
+Received: from MN0PR12MB6317.namprd12.prod.outlook.com
+ ([fe80::6946:6aa5:d057:ff4]) by MN0PR12MB6317.namprd12.prod.outlook.com
+ ([fe80::6946:6aa5:d057:ff4%5]) with mapi id 15.20.7918.020; Mon, 2 Sep 2024
+ 04:17:04 +0000
+Message-ID: <1bea8191-b0f2-9b22-7e7b-a24d640e47a2@amd.com>
+Date: Mon, 2 Sep 2024 09:46:57 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [RFC PATCH 1/5] x86/cpufeatures: Add SNP Secure TSC
+To: Borislav Petkov <bp@alien8.de>
+Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+ thomas.lendacky@amd.com, santosh.shukla@amd.com, ketanch@iitk.ac.in
+References: <20240829053748.8283-1-nikunj@amd.com>
+ <20240829053748.8283-2-nikunj@amd.com>
+ <20240829132201.GBZtB1-ZHQ8wW9-5fi@fat_crate.local>
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <20240829132201.GBZtB1-ZHQ8wW9-5fi@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0107.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:27::22) To MN0PR12MB6317.namprd12.prod.outlook.com
+ (2603:10b6:208:3c2::12)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H5mwdCp9pX53Pu2GKA48+9k0HMAR0cEBB3BPTBjySPwKA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qciowMBxjcUFPNVmzK0DAA--.9505S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxKF4DXFW3Zr4fCF43tFWftFc_yoWfJrW8pr
-	1UAF4fGr48Jr1xC3y0g3Wq9rnFqr18Jr1kZFyIqay8tryDtryftw48trnxCFyfJr18CrWx
-	Z3Wqyw42kFyfJ3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
-	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
-	67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
-	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
-	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw
-	1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
-	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
-	4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07j0
-	sjUUUUUU=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6317:EE_|MN2PR12MB4335:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4880adb6-3f6c-4274-fce3-08dccb0619f7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QWlGNk5kVmgxWFZBeWszMzhxbDltRHJLdnNONE5GM3VVcFNacXdVa3NhaHJY?=
+ =?utf-8?B?ZjBjelBVUFlEOUwwNklJMVZuV0pWNWttdmlXRU1JUHVRaEI3RXJEcUwrbjhE?=
+ =?utf-8?B?WUZOU0h2M1RvWFJITFQzdjN4QTRQaU0vWFhNeURIK1VGTTY5dzdvMXBoKzE5?=
+ =?utf-8?B?aHVrWTM4TkViaUR2MEQ5dE9DZjMyWnBjUk91SW9SNTJRTUVXYTNFcHVaQXli?=
+ =?utf-8?B?djlNYWpnL1hTODRFbkhYSlowRFVzMG9iU1BURUJNWWc4QVhHMm9INzNsSkM5?=
+ =?utf-8?B?V25SR3ZBMSszOWFpMlNmb0p6Mms2UU1RZGZndXlUTmdzVkljSGwvZktZUjFp?=
+ =?utf-8?B?UUNhRTc0STlqbTQveWs2SWl5NHBtWWR5RkJTWW12d1F5VHlsRnJDQUg5Vmo2?=
+ =?utf-8?B?em56WHRMMy9KYlBYWlM3dGsycUt5UHZtc2RLWnhTQmNPNHcxUDNLdUFJMHM1?=
+ =?utf-8?B?blFBT3E1Ync2T1dxUmRWeXpmODE3U0FUdlhVa05lNTk2QkZFa3hob083bHhE?=
+ =?utf-8?B?bUdMNXlqQjNJazMxNG82Skx6UkdkcmdQaUpOczQxRDUxS1NqbWFtVnBoVW5K?=
+ =?utf-8?B?WlpGZXhrelZsRHJIekhzN2dlNHdTMmtpRnh2NjVMQi85K053MlVtWlhRV3pU?=
+ =?utf-8?B?NjhST3doUTc4WlJuK3NtdkxYc2kvRGVQMnViYzN3YndwMlhHZEhvVHZvV3pY?=
+ =?utf-8?B?VWFJcTNKVDdZVmhISWVJcWhPUXpWcDhsK0hMRVZ2VVp4Z2ZQbkw2cWFyOUwz?=
+ =?utf-8?B?MkdPTWFUYk9IeGlkaHUwV0RsK2VvQ3ZaWXlVUENJUDRtYSs5STkxZHV6UGh4?=
+ =?utf-8?B?Z3gzaDhiZW90TFFNK1R4VElZNXBJT3dKdTFYaVQ3dUlLQnpsZXQrYWlwK1ps?=
+ =?utf-8?B?S3VpQ3E2RUkycHhiMnBQZUd4M1doUml5TG51K0ZjNmlYSWtiZ0MzcEFNNndY?=
+ =?utf-8?B?Y3RUNkMwZVp1YTVSU0dULzJ6QUVUQmxOdlRxTFA1aEZHN0M1MkpJU3haSEl5?=
+ =?utf-8?B?ZnZjK2IwMGhteW1oM2NjUUtVWitZZnpEQ0x6WTUxSnQ5QU5ySVFBMnhrRFpy?=
+ =?utf-8?B?bHBkb2EzRVQwL20zR2d1cExHMURkTkIvSGcxZkZBVVo0VUFsWnYzd0NNck5O?=
+ =?utf-8?B?bmtid3RQeWcraFZoTXVzdlY2aFpnSy9SOCtScFRuTmxhVXdUREJmY1ZweThK?=
+ =?utf-8?B?dG1BQjQvdlJMWlViSzROR0pqZVdKL252T0VxL09vWEl1cWIzbnZjNVBJZ1hO?=
+ =?utf-8?B?TnNZaFBpTlpUNTJFY2xLVzV2ZE55Um9CUkhOQUtBU3ExMXJTdTdXVVpFVmNS?=
+ =?utf-8?B?eDQ5emVkKzVYa0RWZUVMcXRqcnYxRDFiZmpuZjNzNjlNSmc1aUZ1ODlFSkhX?=
+ =?utf-8?B?N3lnZGF1WGhIcWgxWENqZUVmYUo1RkpZTUZXcTZyUDdoLytWM3JTanYyMG9a?=
+ =?utf-8?B?RGE5YmFUL3hHLzBFNGJqbzlRWXUzYUxpb1RKS25nRVBab1lDUDRqaWpHUzBy?=
+ =?utf-8?B?K1g0WXJNTHRWb1kxWUM5VUk1ZWdvNFcwMjhRck13KzJteitBTEdOZDYyNlJY?=
+ =?utf-8?B?Tm5rWXZXOVR2YXZXYUhTcW9rczVSd0doRStCVTlUVm9ibG5WVzkzWWlCMHFW?=
+ =?utf-8?B?ZTU1dDQ5akd0MlRtcUhoTzl3eC9VRTFmL01xMithMFdGdXkyMWtTN3RRR1Ft?=
+ =?utf-8?B?ZStXRyt5c044aC9RSWVZOElYeG5NZERPdXA2V1E0eHFQeWJFc3ZyTXlhck55?=
+ =?utf-8?B?TXp2OFUvWVVxUWpZRjNZNEszMTZ0QzNQMjJoZjU2a2ExaUpjSnhZTjBNbmJY?=
+ =?utf-8?B?QjNlOFZhS3lTU2RFZ1hsUT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6317.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VHcrRCtwSnFMaG5yUlNIU216em1WMEY0dVhEWXJLNzJWd2E0N2tZN1EyZHh5?=
+ =?utf-8?B?NVJhNnlUNmtzdi9udytpK1JYdXgxVzFqMUV5dEcxRVJlMkJSY2RKU1g5T3ZF?=
+ =?utf-8?B?dVllQVZCa2c1Z0twcWhrM1JzQThUOXlEL0hyRlBKOGxJbW41RmVybDFPQXJn?=
+ =?utf-8?B?RXh5amlsL0ZwYkNESnJkNm9weDZ5MUVCS1FCaVVZSDd4RXJrcTZpdFJHNlFr?=
+ =?utf-8?B?bkV3NWNiNTU3NmFkeTJoUGZNRWF3cVdUMU5CYm81T2JEb25UbXBYTUdEREVa?=
+ =?utf-8?B?STMrOG5TYmppR2xkVE91YTRvK09mS3pNTk10b1V5WngwMGRvOWNGSm1NTmt4?=
+ =?utf-8?B?QUVuZGcxUzRLcFhPZWQ2dlVkTElJYUhuY2N4MTVkUU96R1lkMjRSenYycDVN?=
+ =?utf-8?B?UlJhbWZWYTBaYU9LbldiOExidml6azNlVWRmWU84c2RpWTZmbGJJSk90Mk14?=
+ =?utf-8?B?SnBKUUlnSGlGOFFqL0o2Qklia0xqNnZOcnp5V3B3RysyNEt4azN4cnVZOTlq?=
+ =?utf-8?B?YUMrWHVBeDJmSTF3WjI0amxDMFA2aUpBelQrbjY0b3Q4OVFIc01CR2Y5YkpZ?=
+ =?utf-8?B?aDBCMDdxMXo1cGo2eGZhWEROM0pLTlJIWWNHNFh4T0RCd3hxTWkzVVZwNUhZ?=
+ =?utf-8?B?VnhNYk8vbUIyU0dncVZlbEs4eWErRnFWZGlLOE9nVXQ3VThFMkdWY1pqOU81?=
+ =?utf-8?B?QVhyWkcxK1pmeHM2bmpjalUrUHNWMTF3N1NmQVVHcVY3bUFZT2ZjVm50aDJi?=
+ =?utf-8?B?bG9FT2tCbERIRElWY3ZydDNteU40VkFDZXJrS2tWUHo5djhOblZsbG94T1JI?=
+ =?utf-8?B?N2NjOUI0dkpqd2I3NVlDNndNQUpCUnVDbG5BMElrTmFkUmg2UjlzTjFUNXhM?=
+ =?utf-8?B?YU1XblB4amdQYTM3VmR3VThrQVZvR2MxOGVRK3pEWlpyLzIwZmNJUDdzZm96?=
+ =?utf-8?B?YnR6RC9YeC9pdmhIdWdiRHg2VjVvZ2J2WDlsZTEwL3VGeTVYVXozT25MUDhX?=
+ =?utf-8?B?Um90WmtVcDRaZURJYlZHSTZ3SWRPVnByYW1YWEthZWJ3L0ZVdjI2blV0V1cz?=
+ =?utf-8?B?NTU5SERRbWpxL2VtVmxDbWJZR2h3YnBqL1RqVlRueWtFOFptRDF4UkZlbmxu?=
+ =?utf-8?B?VUQyNHNwaVhKWUZtckR2WVpCbEhES1BsL3MzQzFLbTl5ajdQa2FxWm4xTGRC?=
+ =?utf-8?B?NWNrS0swOU5nZjR4M0xERXZLSGgyVkxOUHhTblBWVXR5ZDgzK2FhaFRoczNz?=
+ =?utf-8?B?ekRKdzMxRmhBZEUwekFrSWdsVjkyNmtOL1VVTlhpSDZHRUV0RWhnN1VRZk1R?=
+ =?utf-8?B?Q205ODZnL1oyZ2pWemlhZFUxUVd5dVdZcWJhcWxrblVuV1kxWFB4MEtoMmFk?=
+ =?utf-8?B?dERsYUFKWG53WER1K1IzM2hjaUFaUFlCYmlEclZBeVYrZWF6Syt4N2VUMzRJ?=
+ =?utf-8?B?SE03N01RUTNoL09xaDhMVjZhdmYreXpubFBxbHJ0eldLYUpKZ1VhT25iendO?=
+ =?utf-8?B?a1E3aGNmUk1LT3dhQkNTZisyUWJxR1JQckpsUTdYTWgrR0lXUjl1K081NWhN?=
+ =?utf-8?B?a2tvUW9rc2dYa3Fqei9BcWd4Ym1VNGhFUmVuTmtsays0S2xOUHZGUDc4cDZV?=
+ =?utf-8?B?cjR4OGdWdDR6bFFmTFhMdnhyeVNHR3B5SnZnc1ozMnBHRTkxNk8vNk1kb0Fq?=
+ =?utf-8?B?VXZXbGpFMGp0eDBWWEt5TVh0bWRjeWxocnJ4WkJ0akxmSW12RDlhSGR4dyt0?=
+ =?utf-8?B?MnRwMjNmNFV2MnNhdjlWaUx6WUpTUndHeGhjV0JscU5aOU5oUG5BcXdWa3Vv?=
+ =?utf-8?B?TUh1THFzZXh0aUpsNGYvWFJKRkJvQ0wvTExQTFVuMFdvMnpsRDc4SkJSaUJM?=
+ =?utf-8?B?WW90UGlWUXVuTDNMK29XbEs5eDBLd3o2M0g4R1h6ZGtWeStPQVdBckI4ZVVz?=
+ =?utf-8?B?dldWNStRamhQM0lqS0hvbktkYnJyMFBJRDVMREwvdUQzV0NFMmtCVSs2YzBs?=
+ =?utf-8?B?Qm9RZlcrYjl3MFpVeVlWcGZYK1dDNXNNNDREbW1FWW9TK2crSzNtM0VacUcv?=
+ =?utf-8?B?RG1nMGJ1MVRmTWhYam1qZHFkcTAvaUIvL05CL0pzUW83dDNmaUV6OGZiU29F?=
+ =?utf-8?Q?DMbqNfnUqjzJoWFukZIBAa256?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4880adb6-3f6c-4274-fce3-08dccb0619f7
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6317.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2024 04:17:04.8489
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m98/iMNafCwoiq39FDPyi0neEK4e3WNabMCWpfW/XPUDLTZcqipPhjxS8Gb/2nbHQ2avV0irXkVtACSkzASq7g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4335
 
 
 
-On 2024/9/2 下午12:04, Huacai Chen wrote:
-> On Mon, Sep 2, 2024 at 10:45 AM maobibo <maobibo@loongson.cn> wrote:
+On 8/29/2024 6:52 PM, Borislav Petkov wrote:
+> On Thu, Aug 29, 2024 at 11:07:44AM +0530, Nikunj A Dadhania wrote:
+>> The Secure TSC feature for SEV-SNP allows guests to securely use the RDTSC
+>> and RDTSCP instructions, ensuring that the parameters used cannot be
+>> altered by the hypervisor once the guest is launched. More details in the
+>> AMD64 APM Vol 2, Section "Secure TSC".
 >>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>> ---
+>>  arch/x86/include/asm/cpufeatures.h | 1 +
+>>  1 file changed, 1 insertion(+)
 >>
->>
->> On 2024/9/2 上午10:20, Huacai Chen wrote:
->>> On Mon, Sep 2, 2024 at 9:56 AM maobibo <maobibo@loongson.cn> wrote:
->>>>
->>>>
->>>> Hi Huacai,
->>>>
->>>> On 2024/8/31 下午10:49, Huacai Chen wrote:
->>>>> Hi, Bibo,
->>>>>
->>>>> On Tue, Jul 30, 2024 at 3:57 PM Bibo Mao <maobibo@loongson.cn> wrote:
->>>>>>
->>>>>> Every vcpu has separate LBT registers. And there are four scr registers,
->>>>>> one flags and ftop register for LBT extension. When VM migrates, VMM
->>>>>> needs to get LBT registers for every vcpu.
->>>>>>
->>>>>> Here macro KVM_REG_LOONGARCH_LBT is added for new vcpu lbt register type,
->>>>>> the following macro is added to get/put LBT registers.
->>>>>>      KVM_REG_LOONGARCH_LBT_SCR0
->>>>>>      KVM_REG_LOONGARCH_LBT_SCR1
->>>>>>      KVM_REG_LOONGARCH_LBT_SCR2
->>>>>>      KVM_REG_LOONGARCH_LBT_SCR3
->>>>>>      KVM_REG_LOONGARCH_LBT_EFLAGS
->>>>>>      KVM_REG_LOONGARCH_LBT_FTOP
->>>>>>
->>>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->>>>>> ---
->>>>>>     arch/loongarch/include/uapi/asm/kvm.h |  9 +++++
->>>>>>     arch/loongarch/kvm/vcpu.c             | 56 +++++++++++++++++++++++++++
->>>>>>     2 files changed, 65 insertions(+)
->>>>>>
->>>>>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
->>>>>> index 49bafac8b22d..003fb766c93f 100644
->>>>>> --- a/arch/loongarch/include/uapi/asm/kvm.h
->>>>>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
->>>>>> @@ -64,6 +64,7 @@ struct kvm_fpu {
->>>>>>     #define KVM_REG_LOONGARCH_KVM          (KVM_REG_LOONGARCH | 0x20000ULL)
->>>>>>     #define KVM_REG_LOONGARCH_FPSIMD       (KVM_REG_LOONGARCH | 0x30000ULL)
->>>>>>     #define KVM_REG_LOONGARCH_CPUCFG       (KVM_REG_LOONGARCH | 0x40000ULL)
->>>>>> +#define KVM_REG_LOONGARCH_LBT          (KVM_REG_LOONGARCH | 0x50000ULL)
->>>>>>     #define KVM_REG_LOONGARCH_MASK         (KVM_REG_LOONGARCH | 0x70000ULL)
->>>>> I think KVM_REG_LOONGARCH_MASK should contain all above register
->>>>> classes, so should it be  (KVM_REG_LOONGARCH | 0x370000ULL)?
->>>> Sorry, maybe I miss something. What is the meaning of 0x370000ULL? How
->>>> does the value come from?
->>> It seems I misunderstood the mask, please ignore.
->>>
->>>>
->>>>>
->>>>>>     #define KVM_CSR_IDX_MASK               0x7fff
->>>>>>     #define KVM_CPUCFG_IDX_MASK            0x7fff
->>>>>> @@ -77,6 +78,14 @@ struct kvm_fpu {
->>>>>>     /* Debugging: Special instruction for software breakpoint */
->>>>>>     #define KVM_REG_LOONGARCH_DEBUG_INST   (KVM_REG_LOONGARCH_KVM | KVM_REG_SIZE_U64 | 3)
->>>>>>
->>>>>> +/* LBT registers */
->>>>>> +#define KVM_REG_LOONGARCH_LBT_SCR0     (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | 1)
->>>>>> +#define KVM_REG_LOONGARCH_LBT_SCR1     (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | 2)
->>>>>> +#define KVM_REG_LOONGARCH_LBT_SCR2     (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | 3)
->>>>>> +#define KVM_REG_LOONGARCH_LBT_SCR3     (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | 4)
->>>>>> +#define KVM_REG_LOONGARCH_LBT_EFLAGS   (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | 5)
->>>>>> +#define KVM_REG_LOONGARCH_LBT_FTOP     (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | 6)
->>>>> FTOP is a 32bit register in other place of the kernel, is it correct
->>>>> to use U64 here?
->>>> It is deliberate and there is no 32bit compat requirement for kvm. ALL
->>>> regiester interfaces are defined as 64-bit.
->>>> On kernel and qemu side, ftop can be defined as 32bit still, however the
->>>> interface is 64-bit. So there is forced type conversion between u32 and
->>>> u64. There is no problem here.
->>> If you are sure, then no problem. But there is indeed KVM_REG_SIZE_U32
->>> in include/uapi/linux/kvm.h, and if we append more fields after ftop,
->>> define it as U64 may break memcpy().
->> yes, there is KVM_REG_SIZE_U32 definition, however LoongArch KVM does
->> not use it, else the safer checking is a little complicated. Now
->> parameter with KVM_REG_SIZE_U32 is simply treated as illegal.
-> I think just add a "case KVM_REG_SIZE_U32" in kvm_set_reg/kvm_get_reg
-> is OK, kvm_set_one_reg/kvm_get_one_reg don't need any modifications.
-> No?
-No, it is not so simple. If KVM_REG_SIZE_U32 is supported, if such user 
-application passes such parameters KVM_REG_LOONGARCH_LBT_FTOP64 or 
-KVM_REG_LOONGARCH_LBT_EFLAGS32 , should it be treated as illegal or 
-normal?  If it is illegal, where should the safety checking code be put?
+>> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+>> index dd4682857c12..ed61549e8a11 100644
+>> --- a/arch/x86/include/asm/cpufeatures.h
+>> +++ b/arch/x86/include/asm/cpufeatures.h
+>> @@ -444,6 +444,7 @@
+>>  #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* VM Page Flush MSR is supported */
+>>  #define X86_FEATURE_SEV_ES		(19*32+ 3) /* "sev_es" AMD Secure Encrypted Virtualization - Encrypted State */
+>>  #define X86_FEATURE_SEV_SNP		(19*32+ 4) /* "sev_snp" AMD Secure Encrypted Virtualization - Secure Nested Paging */
+>> +#define X86_FEATURE_SNP_SECURE_TSC	(19*32+ 8) /* "" AMD SEV-SNP Secure TSC */
+> 
+> There's a newline here on purpose - keep it.
 
-#define KVM_REG_LOONGARCH_LBT_FTOP64     (KVM_REG_LOONGARCH_LBT | 
-KVM_REG_SIZE_U64 | 6)
-#define KVM_REG_LOONGARCH_LBT_FTOP32     (KVM_REG_LOONGARCH_LBT | 
-KVM_REG_SIZE_U32 | 6)
+Sure
 
-#define KVM_REG_LOONGARCH_LBT_EFLAGS64   (KVM_REG_LOONGARCH_LBT | 
-KVM_REG_SIZE_U64 | 5)
-#define KVM_REG_LOONGARCH_LBT_EFLAGS32   (KVM_REG_LOONGARCH_LBT | 
-KVM_REG_SIZE_U32 | 5)
+> Also, you don't need "" anymore.
+
+Ok, do we need to add an entry to tools/arch/x86/kcpuid/cpuid.csv ?
 
 Regards
-Bibo Mao
-> 
-> Huacai
->>
->> And no memcpy() is used for ftop/cpucfg, there is assignment for every
->> single register like this:
->>
->> For cpucfg read/write:
->>     vcpu->arch.cpucfg[id] = (u32)v;
->>     *v = vcpu->arch.cpucfg[id];
->> For ftop read/write:
->>     vcpu->arch.fpu.ftop = v;
->>     *v = vcpu->arch.fpu.ftop;
->>
->> Regards
->> Bibo Mao
->>>
->>>>
->>>>>
->>>>>> +
->>>>>>     #define LOONGARCH_REG_SHIFT            3
->>>>>>     #define LOONGARCH_REG_64(TYPE, REG)    (TYPE | KVM_REG_SIZE_U64 | (REG << LOONGARCH_REG_SHIFT))
->>>>>>     #define KVM_IOC_CSRID(REG)             LOONGARCH_REG_64(KVM_REG_LOONGARCH_CSR, REG)
->>>>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->>>>>> index b5324885a81a..b2500d4fa729 100644
->>>>>> --- a/arch/loongarch/kvm/vcpu.c
->>>>>> +++ b/arch/loongarch/kvm/vcpu.c
->>>>>> @@ -597,6 +597,34 @@ static int kvm_get_one_reg(struct kvm_vcpu *vcpu,
->>>>>>                            break;
->>>>>>                    }
->>>>>>                    break;
->>>>>> +       case KVM_REG_LOONGARCH_LBT:
->>>>> What about adding FPU/LSX/LASX registers (if needed for migration) in
->>>>> kvm_{get, set}_one_reg() here?
->>>> If there is 512bit SIMD or other requirement, it will be added in
->>>> kvm_{get, set}_one_reg(). For FPU/LSX/LASX registers, there is common
->>>> API KVM_GET_FPU/KVM_SET_FPU here. The impmentation of QEMU only gets
->>>> FPU, the upper LSX/LASX is lost, we will submit a patch in qemu side,
->>>> the kvm kernel side is ok.
->>> OK, no problem.
->>>
->>> Huacai
->>>>
->>>> /*
->>>>     * for KVM_GET_FPU and KVM_SET_FPU
->>>>     */
->>>> struct kvm_fpu {
->>>>            __u32 fcsr;
->>>>            __u64 fcc;    /* 8x8 */
->>>>            struct kvm_fpureg {
->>>>                    __u64 val64[4];
->>>>            } fpr[32];
->>>> };
->>>>
->>>> Regards
->>>> Bibo Mao
->>>>>
->>>>> Huacai
->>>>>
->>>>>> +               if (!kvm_guest_has_lbt(&vcpu->arch))
->>>>>> +                       return -ENXIO;
->>>>>> +
->>>>>> +               switch (reg->id) {
->>>>>> +               case KVM_REG_LOONGARCH_LBT_SCR0:
->>>>>> +                       *v = vcpu->arch.lbt.scr0;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_SCR1:
->>>>>> +                       *v = vcpu->arch.lbt.scr1;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_SCR2:
->>>>>> +                       *v = vcpu->arch.lbt.scr2;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_SCR3:
->>>>>> +                       *v = vcpu->arch.lbt.scr3;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_EFLAGS:
->>>>>> +                       *v = vcpu->arch.lbt.eflags;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_FTOP:
->>>>>> +                       *v = vcpu->arch.fpu.ftop;
->>>>>> +                       break;
->>>>>> +               default:
->>>>>> +                       ret = -EINVAL;
->>>>>> +                       break;
->>>>>> +               }
->>>>>> +               break;
->>>>>>            default:
->>>>>>                    ret = -EINVAL;
->>>>>>                    break;
->>>>>> @@ -663,6 +691,34 @@ static int kvm_set_one_reg(struct kvm_vcpu *vcpu,
->>>>>>                            break;
->>>>>>                    }
->>>>>>                    break;
->>>>>> +       case KVM_REG_LOONGARCH_LBT:
->>>>>> +               if (!kvm_guest_has_lbt(&vcpu->arch))
->>>>>> +                       return -ENXIO;
->>>>>> +
->>>>>> +               switch (reg->id) {
->>>>>> +               case KVM_REG_LOONGARCH_LBT_SCR0:
->>>>>> +                       vcpu->arch.lbt.scr0 = v;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_SCR1:
->>>>>> +                       vcpu->arch.lbt.scr1 = v;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_SCR2:
->>>>>> +                       vcpu->arch.lbt.scr2 = v;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_SCR3:
->>>>>> +                       vcpu->arch.lbt.scr3 = v;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_EFLAGS:
->>>>>> +                       vcpu->arch.lbt.eflags = v;
->>>>>> +                       break;
->>>>>> +               case KVM_REG_LOONGARCH_LBT_FTOP:
->>>>>> +                       vcpu->arch.fpu.ftop = v;
->>>>>> +                       break;
->>>>>> +               default:
->>>>>> +                       ret = -EINVAL;
->>>>>> +                       break;
->>>>>> +               }
->>>>>> +               break;
->>>>>>            default:
->>>>>>                    ret = -EINVAL;
->>>>>>                    break;
->>>>>> --
->>>>>> 2.39.3
->>>>>>
->>>>
->>>>
->>
->>
-
+Nikunj
+ 
 
