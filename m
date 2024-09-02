@@ -1,225 +1,130 @@
-Return-Path: <kvm+bounces-25678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD067968731
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 14:10:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67943968859
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 15:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B7201F245A8
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 12:10:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AF3A1C2267F
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 13:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB4A20FA9C;
-	Mon,  2 Sep 2024 12:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4D5205E28;
+	Mon,  2 Sep 2024 13:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fQA8IE0n"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676A5205E25;
-	Mon,  2 Sep 2024 12:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9643200136
+	for <kvm@vger.kernel.org>; Mon,  2 Sep 2024 13:03:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725278958; cv=none; b=b9nkBYdVgfs5/qgQctdYONDpNeA0Wl0P/89cCH6hU+Zjbz+TIrJBfzgkeaO1g7wZUiWboe67RIWyQXN0Z3WWssEbLZq2nTxK9njWPFletnrl/CBw1jfTQJMNYYI11WOdBkqVy8ZEwfSA8L2lZukggpQWcLIDF272uVYToT5faEg=
+	t=1725282219; cv=none; b=iBDNm8FqXbt4VvI/tjjDxXlTnSECJWvT8SDkKruwibYe6YiHFEzxBPMZfjJlBZKY84BatfCSdXv8JpeQUSC4YVusXwrXNmhRCACk+F73kII+iA3OunyJ9Xc1JussSCZLIMpaes70uFwICGk2aP4BH/HqKdGSu0fa/W3WHoVjwwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725278958; c=relaxed/simple;
-	bh=T6XLUoAFcXSxruwAYQmBy6F0E6rBy/538u2+YcV2SNc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IVScF6OGXzdbS5f3DwPcBrEZicHMtvy/XlYOmnbJNpuMLTnjWuq2AkoimpJwvRdWQ3SWl1EzOThcSk/cFmDjkiU1cIytnARpO/gc/5EZ3phyrNvBIBATKdiG1Va03I0GraMs4EN98/QYn6w2FWft3mhWu+orerhJ0ifaLEcm15M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Wy6sS4bs0z1HJ3y;
-	Mon,  2 Sep 2024 20:05:48 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id F1AA518001B;
-	Mon,  2 Sep 2024 20:09:13 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 2 Sep 2024 20:09:13 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	Alexander Duyck <alexanderduyck@fb.com>, Chuck Lever
-	<chuck.lever@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, =?UTF-8?q?Eugenio=20P=C3=A9rez?=
-	<eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
- Dumazet <edumazet@google.com>, David Howells <dhowells@redhat.com>, Marc
- Dionne <marc.dionne@auristor.com>, Trond Myklebust <trondmy@kernel.org>, Anna
- Schumaker <anna@kernel.org>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Shuah Khan
-	<shuah@kernel.org>, <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-Subject: [PATCH net-next v17 04/14] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
-Date: Mon, 2 Sep 2024 20:03:03 +0800
-Message-ID: <20240902120314.508180-5-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240902120314.508180-1-linyunsheng@huawei.com>
-References: <20240902120314.508180-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1725282219; c=relaxed/simple;
+	bh=LbAS4FZyS6/+38yTr+obAQZuT3vj6lpAY3dxb6rP7K8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KfseWe0akh/nAL2w5hvvic7v0YZRV7u3lWnx0kDFBfwOEKPrjOyH3mj2HN5xe85WOiT/hvANx7L69n0CLxWYy5wIEIjxYJh4obBz5tZWkoHITlaZoFXQ9hrOHQNOvxql8DPPOpTfUCSuFkk5bQKu1OF7K8WCvDpL8fUcDEYvxuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fQA8IE0n; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725282214;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gQAIKVHexr0ml0E9tU9s6jAH+3r1zviEqDoOy8RQCGk=;
+	b=fQA8IE0nJ7Sue7l3E1CeUqOtH2g6pO4iXOP/RxKW/CE8gMoiVkPC37J4SidR/fpeg15Au4
+	qcZpM0rWLKwkXjuQEMjUWJxWX8iMqpbNkuKT0TC8GLeneQeH5Sz0WO5ELZyHGG+G0GI+Vo
+	9hVdtdv4PcTD5F1Aow0DaEkTP8uB+2A=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-152-9WNjJ4D4Nhu6TyqQN77q1A-1; Mon, 02 Sep 2024 09:03:33 -0400
+X-MC-Unique: 9WNjJ4D4Nhu6TyqQN77q1A-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4280b119a74so37360805e9.3
+        for <kvm@vger.kernel.org>; Mon, 02 Sep 2024 06:03:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725282212; x=1725887012;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gQAIKVHexr0ml0E9tU9s6jAH+3r1zviEqDoOy8RQCGk=;
+        b=T3pGlSg6/IFvi9sFrvt6+Zuy7sP8qkKKZ6Wtod6jZ2MNDDePy1ob35ytinbsznHPu3
+         QF0HZB1r/NzGHKZK74dTNlH11wEtJedTLogQap6mXQmiRTxyIVyQrGncSpGKu5WD2bjg
+         RX8wCoOFqxez6Rm1f+0XXiZQhwo61ZlWEMDQAKXTU+rcF+OM7KPjn/eJh8vMK9qNfw2+
+         LvPDzZAR7oGeh99WiQ6TrvSFySYexdS1NV2WMYA3ig+R8sHd7J3/fUI/dX++9Gb/b+Jt
+         S4sSsiH0bqNOvwo78MUWbPYBPUlOA5Y1ZNH10rRRIepDA+rtRfbH6bKyOV3HceulebIZ
+         zk/w==
+X-Gm-Message-State: AOJu0YzRX6JqviWLl/GkJpAOrmSdhyEs+grAqQzckrMXfaW9Op58s9G0
+	oZ2Lllx+i+wI1Yx0vcLj2TE9ZnSYIb+U6QFIGJeEzDEyh2P1qOKVRSQG26fc/Rn8oOLImRxFfdL
+	XgeFLhyWz8oaxmCXEkv1vfO7JJjkVhGP+m1Uwk4MX8hZY9hiIenWst91cKFxpuo+wpP4yYN7bml
+	+F+3vOUTof4hvxFj35NqBzBNuT
+X-Received: by 2002:a05:6000:144e:b0:374:d2a3:9806 with SMTP id ffacd0b85a97d-374d2a3989cmr170720f8f.2.1725282211721;
+        Mon, 02 Sep 2024 06:03:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHCPqJZ/CvAvLM7TGzyZHJgxy1cF8dLQS4WbCTRfzmv3GCHS1hWrWyE639VzeQdgwR4dXgAIimd0g/UARxnRXE=
+X-Received: by 2002:a05:6000:144e:b0:374:d2a3:9806 with SMTP id
+ ffacd0b85a97d-374d2a3989cmr170686f8f.2.1725282211256; Mon, 02 Sep 2024
+ 06:03:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+References: <20240608000639.3295768-1-seanjc@google.com> <20240608000639.3295768-2-seanjc@google.com>
+ <efb9af41-21ed-4b97-8c67-40d6cda10484@redhat.com> <Zr4TPVQ_SNEKyfUz@google.com>
+ <CABgObfZSCZ-dgK3zWao573+RmZSPhnaoMsrify9-48UVhbKVdw@mail.gmail.com> <ZtJZjIRdiN8e5_Es@google.com>
+In-Reply-To: <ZtJZjIRdiN8e5_Es@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 2 Sep 2024 15:03:19 +0200
+Message-ID: <CABgObfZ4XD=yQ3kRiNnMfd=w0ZbGY3yzTz49s-Kq4CKE+QJXxg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/8] KVM: Use dedicated mutex to protect
+ kvm_usage_count to avoid deadlock
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Gao <chao.gao@intel.com>, Kai Huang <kai.huang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use appropriate frag_page API instead of caller accessing
-'page_frag_cache' directly.
+On Sat, Aug 31, 2024 at 1:45=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+> > Can you add a comment to the comment message suggesting switching the v=
+m_list
+> > to RCU? All the occurrences of list_for_each_entry(..., &vm_list, ...) =
+seem
+> > amenable to that, and it should be as easy to stick all or part of
+> > kvm_destroy_vm() behind call_rcu().
+>
+> +1 to the idea of making vm_list RCU-protected, though I think we'd want =
+to use
+> SRCU, e.g. set_nx_huge_pages() currently takes eash VM's slots_lock while=
+ purging
+> possible NX hugepages.
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
-Acked-by: Chuck Lever <chuck.lever@oracle.com>
----
- drivers/vhost/net.c                                   |  2 +-
- include/linux/page_frag_cache.h                       | 10 ++++++++++
- net/core/skbuff.c                                     |  6 +++---
- net/rxrpc/conn_object.c                               |  4 +---
- net/rxrpc/local_object.c                              |  4 +---
- net/sunrpc/svcsock.c                                  |  6 ++----
- tools/testing/selftests/mm/page_frag/page_frag_test.c |  2 +-
- 7 files changed, 19 insertions(+), 15 deletions(-)
+Ah, for that I was thinking of wrapping everything with
+kvm_get_kvm_safe()/rcu_read_unlock() and kvm_put_kvm/rcu_read_lock().
+Avoiding zero refcounts is safer and generally these visits are not
+hot code.
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index f16279351db5..9ad37c012189 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->pf_cache.va = NULL;
-+	page_frag_cache_init(&n->pf_cache);
- 
- 	return 0;
- }
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index 67ac8626ed9b..0a52f7a179c8 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -7,6 +7,16 @@
- #include <linux/mm_types_task.h>
- #include <linux/types.h>
- 
-+static inline void page_frag_cache_init(struct page_frag_cache *nc)
-+{
-+	nc->va = NULL;
-+}
-+
-+static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
-+{
-+	return !!nc->pfmemalloc;
-+}
-+
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index a52638363ea5..a5f8e4e0c649 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -752,14 +752,14 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
- 	if (in_hardirq() || irqs_disabled()) {
- 		nc = this_cpu_ptr(&netdev_alloc_cache);
- 		data = page_frag_alloc(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 	} else {
- 		local_bh_disable();
- 		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 
- 		nc = this_cpu_ptr(&napi_alloc_cache.page);
- 		data = page_frag_alloc(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 
- 		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 		local_bh_enable();
-@@ -849,7 +849,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		len = SKB_HEAD_ALIGN(len);
- 
- 		data = page_frag_alloc(&nc->page, len, gfp_mask);
--		pfmemalloc = nc->page.pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	}
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe7..694c4df7a1a3 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
- 	 */
- 	rxrpc_purge_queue(&conn->rx_queue);
- 
--	if (conn->tx_data_alloc.va)
--		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
--					conn->tx_data_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&conn->tx_data_alloc);
- 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
- }
- 
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..a8cffe47cf01 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
- #endif
- 	rxrpc_purge_queue(&local->rx_queue);
- 	rxrpc_purge_client_connections(local);
--	if (local->tx_alloc.va)
--		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
--					local->tx_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&local->tx_alloc);
- }
- 
- /*
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 6b3f01beb294..dcfd84cf0694 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1609,7 +1609,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1619,8 +1618,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
--	if (pfc->va)
--		__page_frag_cache_drain(virt_to_head_page(pfc->va),
--					pfc->pagecnt_bias);
-+
-+	page_frag_cache_drain(&svsk->sk_frag_cache);
- 	kfree(svsk);
- }
-diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-index 5395a36e4030..a4bd543d6950 100644
---- a/tools/testing/selftests/mm/page_frag/page_frag_test.c
-+++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-@@ -117,7 +117,7 @@ static int __init page_frag_test_init(void)
- 	u64 duration;
- 	int ret;
- 
--	test_nc.va = NULL;
-+	page_frag_cache_init(&test_nc);
- 	atomic_set(&nthreads, 2);
- 	init_completion(&wait);
- 
--- 
-2.33.0
+> And I think kvm_destroy_vm() can simply do a synchronize_srcu() after rem=
+oving
+> the VM from the list.  Trying to put kvm_destroy_vm() into an RCU callbac=
+k would
+> probably be a bit of a disaster, e.g. kvm-intel.ko in particular currentl=
+y does
+> some rather nasty things while destory a VM.
+
+If all iteration is guarded by kvm_get_kvm_safe(), probably you can
+defer only the reclaiming part  (i.e. the part after
+kvm_destroy_devices()) which is a lot easier to audit.
+
+Anyhow, I took a look at the v2 and it looks good.
+
+Paolo
 
 
