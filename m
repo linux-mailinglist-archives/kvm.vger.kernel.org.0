@@ -1,169 +1,149 @@
-Return-Path: <kvm+bounces-25689-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25690-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE9F968D98
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 20:38:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E99F3969084
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 01:45:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D6571F24415
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 18:37:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7709B1F22C88
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 23:45:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD55F1C62C9;
-	Mon,  2 Sep 2024 18:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B325188587;
+	Mon,  2 Sep 2024 23:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p81gWxaR"
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="SVJPlBNP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F5B1AB6DE
-	for <kvm@vger.kernel.org>; Mon,  2 Sep 2024 18:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F25F13C684;
+	Mon,  2 Sep 2024 23:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725302260; cv=none; b=EwxxziwdiCvMJkZb4hj0P9+gOb7uzJIuLqccPGj1DCkLk3G9fPzncPvhp9HSFEpvEdVe6Dc530xG956asuYdbUHdT/QDZKPgHc/y9qxqY/DQPXdDkfxuVuABipd+u/Ezs/O2ywF4ZMr2kqe5ozB/0v4lk9WgG2WizElK9bYsDYs=
+	t=1725320716; cv=none; b=meqJWsiRTTY2aILDHte2oZkZ8UCEFcouU4Sez8igCf2i089SqDsc0JjiILmGPGttrymoS7HjK/6N0tsW0ezxaWAQpD8RfbMmTWgnVLhW6lgUDz+sZeBPG1uaMVytVtbEcTxIIHe9igDeGw4nev1R4a09u0r/M15TrK3I2Au+zSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725302260; c=relaxed/simple;
-	bh=0f1aN9HLbWF92dFi99NsPlbmjKqZ++MNJBcwsjyzqWg=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=l6zNmU6CyHS/by5LiE8iShyzy8pGGwYGRnjPm6povQGABHza+T+QcKtRh84nSaQzerdFJmZLL6AiDrc3pegy+n8jje2krPG6rKPbP3OAyo3eVaDzm37C/6Qj19g3rf3G9pvWp5siSquJVXsS5/S5SI044SHyjs2aIg9RsQSB0/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p81gWxaR; arc=none smtp.client-ip=209.85.166.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-82a1fbaba4aso321000339f.0
-        for <kvm@vger.kernel.org>; Mon, 02 Sep 2024 11:37:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725302257; x=1725907057; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nAO/71uT5RCAsBJVu4g+dwe4+a2p2kFZ1jdndEbhd+o=;
-        b=p81gWxaR6mfBj2uJUybRfMAov24UYxjpQVk+WPzMhg6b4ab+wFJGq5oJUdGcD1aKO1
-         NjXiAWZVBr+8rLJwxpwubnA7izc6vBey+XXUluAtuRRF/zSBUPZ6TKV9hP5b10MIbuko
-         obTrpFy7xsgEV2e2v0gom7RVSma4CJMQ8FT+WsVCuyHWZrQu4JDIv8uxbPtr8yeQOOj4
-         yAhoLlep9fK71AaHD+x4U3uzBntIrngHn27rs1wbXMCQrz9+2UZgHmI53BRcg5Q8yH3t
-         UmIfIdST5/8L5Z0/+Yx/OvCSyX+00DI9MzsIduTwxyrVUIkAJA1qvqm1ScX6jD4Z1wKr
-         ZTlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725302257; x=1725907057;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nAO/71uT5RCAsBJVu4g+dwe4+a2p2kFZ1jdndEbhd+o=;
-        b=BNxBilEBeHf6w5Wsyi7ln0omJSLLr4n9LpT1DT1gcuvC/xkv+A884II12RjFz20PBv
-         GImiqaW+4MZByA3t9qrVHKZyNasZ9RvkM8MLTvniwTIUP2m8a9uzhgRfC6KLTsAlO037
-         S40PXuUk/jLAlWLEGlm3kpw4rIKn3F3vhGTEqLBNW6kUVG8Nu1QlUCTXmtgiAOwSma9c
-         5RIIRtKKegWfumAq4O7GWhSclWsYcylvalJ9HQEgQ2uBFGkfP8wfmPm6GqHj/Mkuw803
-         985MHgh0o/z7qRvNqhmJi+eYJ2ZFpdn/RhfPSwrblm6RXjbYix3n3RG1jtmx9aoDWl7e
-         iV4w==
-X-Forwarded-Encrypted: i=1; AJvYcCU8npqGLUBLqXbtrNNWp6c+/rnUfeFlB3EUIaqUDfYVGYjtmMagW7psSqQMp9LoKg2R/bE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyosR3jzoh8zOWNdX4wYTe+VPiZom2SFbwv4gmTUWmZ1J5ATw/O
-	4VtDDTYabSbRWqJOvfPYDY6DfUAPVXb8KvK76On5zZj0LC0/5M+IXowycjaxitMGUkkJTtGMI1G
-	jROf6EMInZ8BvpCHl0cloBg==
-X-Google-Smtp-Source: AGHT+IEklshSlPXSKl7m3pGgCZOFN2urZDLNUZ1eyTQmaZKHwzCs7QJN/43WSSevJlLHSgMuDO6x0IIt8x1YU2sS7w==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:3494:b0:4ce:928f:ad9a with
- SMTP id 8926c6da1cb9f-4d017a1e518mr490136173.1.1725302257619; Mon, 02 Sep
- 2024 11:37:37 -0700 (PDT)
-Date: Mon, 02 Sep 2024 18:37:37 +0000
-In-Reply-To: <ZtDd9YVc33b8Qt__@google.com> (message from Sean Christopherson
- on Thu, 29 Aug 2024 13:45:41 -0700)
+	s=arc-20240116; t=1725320716; c=relaxed/simple;
+	bh=Q+f+B1Jwe/vmxiVTW7NQhx5vIjICvDdunj5m6k0q6ok=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ucMyzrqDaE6GMsYbMyvmuE7CxeTTIQ5sOWHdyayiTdO6VarCTHyGIGwS5t6fzD/15vOj0UdOMcbkAk6h/AdYLMESW4peZdTnimMlk40TaemzdXRgGhu+7Jo24BjqSbJYdKXXa1twGQzez2fnen8qU0+6zek1jE1bOfbQvN4l/9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=SVJPlBNP; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1725320712;
+	bh=UaJezUaY19zxJWqob2w1cOAk5qiAPl5VHmtR3xKChPw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=SVJPlBNP8APfuR/jBD4BjKXOasjSRZ3dbEv80YacUUHbcdDw+XM6x2QOEMOi1xx0G
+	 2YI84S67i5/r6XZ2EhcaDv98rdhCTGlEoi1jECCm64pD3ZPLG9/H5Q/8B0fDuEFnn0
+	 ODaujSs7E9rewRWin3OvP+Wi7kVFPTMXmkAtlOVngxeC9c92hxF0K9sD5LWYyiAqz9
+	 XX/5QjfzVMkzcIC5jr62Zzp+L4JnzRecg6m4Zt5sMtEE1k/SNxRAfgO7Uhbr4eH27d
+	 TDyAw6f/mrTclwB3jDJ3y1IQnfoXHfFk61zd0A7zo2gIuket9WZa/x4aJ3zVCrY44b
+	 JAHuQDXFAf6gQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WyQNR6tgxz4x1V;
+	Tue,  3 Sep 2024 09:45:11 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Vegard Nossum <vegard.nossum@oracle.com>, Masahiro Yamada
+ <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-um@lists.infradead.org,
+ bpf@vger.kernel.org, llvm@lists.linux.dev, Vegard Nossum
+ <vegard.nossum@oracle.com>
+Subject: Re: [PATCH] kbuild: use objcopy to generate asm-offsets
+In-Reply-To: <20240828083605.3093701-1-vegard.nossum@oracle.com>
+References: <20240828083605.3093701-1-vegard.nossum@oracle.com>
+Date: Tue, 03 Sep 2024 09:45:11 +1000
+Message-ID: <875xrd7h88.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsntcyllaolq.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 3/6] KVM: x86: selftests: Set up AMD VM in pmu_counters_test
-From: Colton Lewis <coltonlewis@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: mizhang@google.com, kvm@vger.kernel.org, ljr.kernel@gmail.com, 
-	jmattson@google.com, aaronlewis@google.com, pbonzini@redhat.com, 
-	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain
 
-Sean Christopherson <seanjc@google.com> writes:
+Vegard Nossum <vegard.nossum@oracle.com> writes:
+> In order to give assembly code access to C structs without having to
+> hardcore member offsets, the kernel compiles a C source file listing all
+> the structs and offsets that are needed in assembly code. Using some
+> C preprocessor trickery and a sed script, the compiled assembly code is
+> turned back into C preprocessor code that in turn can be used by the
+> asssembly code.
+>
+> This sed script is very hard to read and understand.
+>
+> Remove the sed script and compile the C source listing structs and
+> offsets to an object file (instead of assembly code) that embeds C source
+> directly. Then extract the C source using objcopy.
+>
 
-> On Wed, Aug 28, 2024, Mingwei Zhang wrote:
->> > >> +static void test_core_counters(void)
->> > >> +{
->> > >> +    uint8_t nr_counters = nr_core_counters();
->> > >> +    bool core_ext = kvm_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
->> > >> +    bool perf_mon_v2 = kvm_cpu_has(X86_FEATURE_PERF_MON_V2);
->> > >> +    struct kvm_vcpu *vcpu;
->> > >> +    struct kvm_vm *vm;
->> >
->> > >> -    kvm_pmu_version = kvm_cpu_property(X86_PROPERTY_PMU_VERSION);
->> > >> -    kvm_has_perf_caps = kvm_cpu_has(X86_FEATURE_PDCM);
->> > >> +    vm = vm_create_with_one_vcpu(&vcpu, guest_test_core_counters);
->> >
->> > >> -    test_intel_counters();
->> > >> +    /* This property may not be there in older underlying CPUs,
->> > >> +     * but it simplifies the test code for it to be set
->> > >> +     * unconditionally.
+I threw some builders at this and hit a few errors:
 
-> But then the test isn't verifying that KVM is honoring the architecture.   
-> I.e.
-> backdooring information to the guest risks getting false passes because  
-> KVM
-> incorrectly peeks at the same information, which shouldn't exist.
+parisc:
+  # make -s -j 160 ARCH=parisc64 O=/kisskb/build/mpe_generic-64bit_defconfig_parisc64-gcc13 CROSS_COMPILE=/opt/cross/kisskb/korg/gcc-13.1.0-nolibc/hppa-linux/bin/hppa64-linux-  
+  {standard input}: Assembler messages:
+  {standard input}: Error: .size expression for main does not evaluate to a constant
+  make[3]: *** [/kisskb/src/scripts/Makefile.build:244: scripts/mod/devicetable-offsets.o] Error 1
 
->> > >> +     */
+s390:
+  # make -s -j 32 ARCH=s390 O=/kisskb/build/mpe_defconfig_s390x-gcc13 CROSS_COMPILE=/opt/cross/kisskb/korg/gcc-13.1.0-nolibc/s390-linux/bin/s390-linux-  
+  In file included from /kisskb/src/arch/s390/include/asm/ptrace.h:11,
+                   from /kisskb/src/arch/s390/kernel/vdso64/vdso_user_wrapper.S:7:
+  /kisskb/src/arch/s390/include/uapi/asm/ptrace.h:167: warning: "STACK_FRAME_OVERHEAD" redefined
+    167 | #define STACK_FRAME_OVERHEAD    160      /* size of minimum stack frame */
+        | 
+  In file included from /kisskb/src/include/asm-generic/asm-offsets.h:1,
+                   from ./arch/s390/include/generated/asm/asm-offsets.h:1,
+                   from /kisskb/src/arch/s390/kernel/vdso64/vdso_user_wrapper.S:5:
+  ./include/generated/asm-offsets.h:51: note: this is the location of the previous definition
+     51 | #define STACK_FRAME_OVERHEAD -96 /* sizeof(struct stack_frame) */
 
-> 	/*
-> 	 * Multi-line function comments should start on the line after the
-> 	 * opening slash-asterisk, like so.
-> 	 */
+mips:
+  # make -s -j 32 ARCH=mips O=/kisskb/build/mpe_defconfig_mips-gcc13 CROSS_COMPILE=/opt/cross/kisskb/korg/gcc-13.1.0-nolibc/mips-linux/bin/mips-linux-  
+  {standard input}: Assembler messages:
+  {standard input}:27: Error: junk at end of line, first unrecognized character is `M'
+  {standard input}:212: Error: junk at end of line, first unrecognized character is `M'
+  {standard input}:265: Error: junk at end of line, first unrecognized character is `M'
+  {standard input}:338: Error: junk at end of line, first unrecognized character is `M'
+  {standard input}:596: Error: junk at end of line, first unrecognized character is `S'
+  {standard input}:608: Error: junk at end of line, first unrecognized character is `L'
+  {standard input}:721: Error: junk at end of line, first unrecognized character is `L'
+  {standard input}:806: Error: junk at end of line, first unrecognized character is `L'
+  {standard input}:963: Error: junk at end of line, first unrecognized character is `P'
+  {standard input}:996: Error: junk at end of line, first unrecognized character is `K'
+  {standard input}:1161: Error: junk at end of line, first unrecognized character is `M'
+  make[3]: *** [/kisskb/src/scripts/Makefile.build:244: arch/mips/kernel/asm-offsets.o] Error 1
 
->> > >> +    vcpu_set_cpuid_property(vcpu, X86_PROPERTY_NUM_PERF_CTR_CORE,
->> > >> nr_counters);
->> > >> +    if (core_ext)
->> > >> +            vcpu_set_cpuid_feature(vcpu,  
->> X86_FEATURE_PERF_CTR_EXT_CORE);
->> > >> +    if (perf_mon_v2)
->> > >> +            vcpu_set_cpuid_feature(vcpu, X86_FEATURE_PERF_MON_V2);
->> >
->> > > hmm, I think this might not be enough. So, when the baremetal machine
->> > > supports Perfmon v2, this code is just testing v2. But we should be  
->> able
->> > > to test anything below v2, ie., v1, v1 without core_ext. So, three
->> > > cases need to be tested here: v1 with 4 counters; v1 with core_ext (6
->> > > counters); v2.
->> >
->> > > If, the machine running this selftest does not support v2 but it does
->> > > support core extension, then we fall back to test v1 with 4 counters  
->> and
->> > > v1 with 6 counters.
->> >
->> > This should cover all cases the way I wrote it. I detect the number of
->> > counters in nr_core_counters(). That tells me if I am dealing with 4 or
->> > 6 and then I set the cpuid property based on that so I can read that
->> > number in later code instead of duplicating the logic.
+riscv:
+  # make -s -j 160 ARCH=riscv O=/kisskb/build/mpe_defconfig_riscv-gcc13 CROSS_COMPILE=/opt/cross/kisskb/korg/gcc-13.1.0-nolibc/riscv64-linux/bin/riscv64-linux-  
+  In file included from /kisskb/src/arch/riscv/kernel/asm-offsets.c:9:
+  /kisskb/src/arch/riscv/kernel/asm-offsets.c: In function 'asm_offsets':
+  /kisskb/src/include/linux/kbuild.h:6:9: error: invalid 'asm': invalid use of '%c'
+      6 |         asm volatile( \
+        |         ^~~
+  /kisskb/src/include/linux/kbuild.h:12:9: note: in expansion of macro '_LINE'
+     12 |         _LINE("#define " #sym " %c0 /* " #val " */", "i" (val))
+        |         ^~~~~
+  /kisskb/src/include/linux/kbuild.h:15:9: note: in expansion of macro 'DEFINE'
+     15 |         DEFINE(sym, offsetof(struct str, mem))
+        |         ^~~~~~
+  /kisskb/src/arch/riscv/kernel/asm-offsets.c:25:9: note: in expansion of macro 'OFFSET'
+     25 |         OFFSET(TASK_THREAD_RA, task_struct, thread.ra);
+        |         ^~~~~~
+  /kisskb/src/include/linux/kbuild.h:6:9: error: invalid 'asm': invalid use of '%c'
+      6 |         asm volatile( \
+        |         ^~~
 
->> right. in the current code, you set up the counters properly according
->> to the hw capability. But the test can do more on a hw with perfmon
->> v2, right? Because it can test multiple combinations of setup for a
->> VM: say v1 + 4 counters and v1 + 6 counters etc. I am just following
->> the style of this selftest on Intel side, in which they do a similar
->> kind of enumeration of PMU version + PDCM capabilities. In each
->> configuration, it will invoke a VM and do the test.
 
-> Ya.  This is similar my comments on setting NUM_PER_CTR_CORE when the  
-> field
-> shouldn't exist.  One of the main goals of this test is to verify the KVM  
-> honors
-> the architecture based on userspace's defined virtual CPU model, i.e.  
-> guest
-> CPUID.  That means testing all (or at least, within reason) possible  
-> combinations
-> that can feasibly be supported by KVM given the underlying hardware.
+Full list here, but note there are some unrelated pre-existing failures:
+  http://kisskb.ellerman.id.au/kisskb/head/259bba3447faaf5e5b12ae41a26a62978d4c1965/
 
-> As written, this essentially just tests the maximal configuration that  
-> can be
-> exposed to a guest, which isn't _that_ interesting because KVM tends to  
-> get plenty
-> of coverage for such setups, e.g. by running "real" VMs.
 
-Ok. I get what you and Mingwei are saying. I can test those combinations.
+cheers
 
