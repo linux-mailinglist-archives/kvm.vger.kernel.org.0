@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-25656-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25657-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83121968115
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 09:56:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04475968126
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 09:59:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 347F4280F46
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 07:56:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24A4D1C2200C
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 07:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8A118595B;
-	Mon,  2 Sep 2024 07:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A032E17D378;
+	Mon,  2 Sep 2024 07:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j6L36sKh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IfsTNY8u"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B59183088;
-	Mon,  2 Sep 2024 07:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F380182D2;
+	Mon,  2 Sep 2024 07:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725263770; cv=none; b=XqWtm6WZdSjA2h1WEOyG3alRfQrhxpCuY8o6e/7jKNmiT4FV3iSR+DLa94+6Y0zdGElDNLbny6AJGHWDWcBBKtkInw3kItwbw0tEV8ig3kZpKknNXXxq57MTEjkAaKu9ww/Tf+wE8Tm6W1jQbSoF9gpSpqVBZWWOrcYr+dD7cM8=
+	t=1725263960; cv=none; b=IyicSIQWRTpJPN9thxEiOucbBgw9ra5AVb8pCHWhiD8neQHpdddSltjxcwGXhdBHYdmSqQYtJ8l/qffJmU9h1PlRHG+e+wjErddJXj/q6gZJjM6K6s2KZa+68kYtNsgMIvYJe4airw0bq/xTi7z2F7/aAu8PEtX6MsfTxx69ldA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725263770; c=relaxed/simple;
-	bh=mNVd9yMxaPlxyRQ5E4mBicL71m6tQvJDfRSneOUiyUI=;
+	s=arc-20240116; t=1725263960; c=relaxed/simple;
+	bh=6Dk7gywO2Xx99j80xEtAcVsdd5Ll/b1XFetXma4XnVM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tTY9A4jcAotzLYys3GAdLrpd1tQiqu+w9IwWdBrBowHQVWlBIGgk7cW5r5Q5P7Jr/Im5xlmqGEB+c3sFXI4L+8dwDpUDd5yJS4/hqKPAAkYxx1CLmsWK9aVhQpmtJw2kbPeFmyFYv4t/O4d7QnPgql8WQcsaoChz92dQERDK/4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j6L36sKh; arc=none smtp.client-ip=192.198.163.17
+	 In-Reply-To:Content-Type; b=CKOMvAHrnt99mWs4Fyq5bxnHMVxt9dCfvsU+iHldLdI+rd5XsgoyAdvJxQKYb+jfrHlQTzVfch9TyQMODTSCGTNMxyTasn5pX6UZfX/M6Usw237Kt9SnF7U1V67ox6SONxXjs2NtSFlLuzKsrBxhqMDxtCRvXImQHN80NpNClbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IfsTNY8u; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725263769; x=1756799769;
+  t=1725263959; x=1756799959;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=mNVd9yMxaPlxyRQ5E4mBicL71m6tQvJDfRSneOUiyUI=;
-  b=j6L36sKhbeU9bMQ/Vq39lWOsaQN6sFU006qEZ59Mhg+yOOXugjbAO3rk
-   RyrTLbuDEjQWrkhxxUzCLLdzSV/f9JBsLtuWS8nHcvEZTFnk7+s4vK+xL
-   BUmq1WnTfb42k/2wTYpcn6YtRzbvcHhWdatp4On8Gqmr9i1I/Si0rmNls
-   aRbnHzWi29DyhswtYihPaEjbLNZeoPpiins9S8PUeE2EFUtebhEj8RWoR
-   eDYwBmNfItYPaAArnQIbw17LEFJGnqZ0nJ18cEiO0x94IXYcTk5Qfyzt7
-   pGa54e2C/mp7sKC4DaL3ceMLfw76cfbWImq2cyf5/KfEIo2ThrVicmWyI
+  bh=6Dk7gywO2Xx99j80xEtAcVsdd5Ll/b1XFetXma4XnVM=;
+  b=IfsTNY8uO2c8AS+iP9wtaDKs3SGfxhoFbcwhHhGuQu3jfxagU85tGwhh
+   ONQL/CPYoXdhPy5T4SI/pCqg3EsD8vk5FCmOAwfj0w249DKhHjURWwSM7
+   t/YSyqgjNflVid2WWS7AQFLVcjaz6eZ6FQxlFV6Twk3lKdOvj/aML1Ft7
+   sfzWYAlbmUv5BtTjeYwYqJNsg0778GXFE5kVEDhJ+dOBnzsFOEe+NHxDn
+   YMY23BCd3sFGH9DYyNxcIDOLrEEJh933Ppcl565raPNoQYtyzhO78yw6d
+   THoJQe6Vs/pBHNJUBbcrYUvkK0mSSw9vajBS8nGGnn+RuJyJvvrGNu8t8
    A==;
-X-CSE-ConnectionGUID: vAQQH+A8QpCiEYgv6syxUQ==
-X-CSE-MsgGUID: poyKx7iORiSR7mJNf2SdQQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11182"; a="23708472"
+X-CSE-ConnectionGUID: F1zjWOBnT0SC8WxuDnayyw==
+X-CSE-MsgGUID: 3qHqsm7hTiegIvBp/mG42A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11182"; a="24015282"
 X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
-   d="scan'208";a="23708472"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 00:56:08 -0700
-X-CSE-ConnectionGUID: RgNGk6W5RvC0iMQ7EfpUYw==
-X-CSE-MsgGUID: g0s6D3ZhQ3+Z8kGNO9J0eg==
+   d="scan'208";a="24015282"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 00:59:18 -0700
+X-CSE-ConnectionGUID: vP9/s6qvQ6GstJARSKghCQ==
+X-CSE-MsgGUID: MRVTKgBhSw+jJvHam9/WaA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
-   d="scan'208";a="65257887"
+   d="scan'208";a="69161080"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.233.125]) ([10.124.233.125])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 00:56:03 -0700
-Message-ID: <79bef05f-34f8-4540-ae64-f1aa8e2b9f63@linux.intel.com>
-Date: Mon, 2 Sep 2024 15:56:00 +0800
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 00:59:12 -0700
+Message-ID: <0c8d4bcf-5589-4371-b171-3ae90de15121@linux.intel.com>
+Date: Mon, 2 Sep 2024 15:59:10 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 16/58] perf/x86: Forbid PMI handler when guest own
- PMU
+Subject: Re: [RFC PATCH v3 36/58] KVM: x86/pmu: Allow writing to fixed counter
+ selector if counter is exposed
 To: Mingwei Zhang <mizhang@google.com>,
  Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
@@ -82,95 +82,131 @@ Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
  Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
  linux-perf-users@vger.kernel.org
 References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-17-mizhang@google.com>
+ <20240801045907.4010984-37-mizhang@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20240801045907.4010984-17-mizhang@google.com>
+In-Reply-To: <20240801045907.4010984-37-mizhang@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 
 On 8/1/2024 12:58 PM, Mingwei Zhang wrote:
-> If a guest PMI is delivered after VM-exit, the KVM maskable interrupt will
-> be held pending until EFLAGS.IF is set. In the meantime, if the logical
-> processor receives an NMI for any reason at all, perf_event_nmi_handler()
-> will be invoked. If there is any active perf event anywhere on the system,
-> x86_pmu_handle_irq() will be invoked, and it will clear
-> IA32_PERF_GLOBAL_STATUS. By the time KVM's PMI handler is invoked, it will
-> be a mystery which counter(s) overflowed.
+> Allow writing to fixed counter selector if counter is exposed. If this
+> fixed counter is filtered out, this counter won't be enabled on HW.
 >
-> When LVTPC is using KVM PMI vecotr, PMU is owned by guest, Host NMI let
-> x86_pmu_handle_irq() run, x86_pmu_handle_irq() restore PMU vector to NMI
-> and clear IA32_PERF_GLOBAL_STATUS, this breaks guest vPMU passthrough
-> environment.
+> Passthrough PMU implements the context switch at VM Enter/Exit boundary the
+> guest value cannot be directly written to HW since the HW PMU is owned by
+> the host. Introduce a new field fixed_ctr_ctrl_hw in kvm_pmu to cache the
+> guest value.  which will be assigne to HW at PMU context restore.
 >
-> So modify perf_event_nmi_handler() to check perf_in_guest per cpu variable,
-> and if so, to simply return without calling x86_pmu_handle_irq().
+> Since passthrough PMU intercept writes to fixed counter selector, there is
+> no need to read the value at pmu context save, but still clear the fix
+> counter ctrl MSR and counters when switching out to host PMU.
 >
-> Suggested-by: Jim Mattson <jmattson@google.com>
 > Signed-off-by: Mingwei Zhang <mizhang@google.com>
 > Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
 > ---
->  arch/x86/events/core.c | 27 +++++++++++++++++++++++++--
->  1 file changed, 25 insertions(+), 2 deletions(-)
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/vmx/pmu_intel.c    | 28 ++++++++++++++++++++++++----
+>  2 files changed, 25 insertions(+), 4 deletions(-)
 >
-> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> index b17ef8b6c1a6..cb5d8f5fd9ce 100644
-> --- a/arch/x86/events/core.c
-> +++ b/arch/x86/events/core.c
-> @@ -52,6 +52,8 @@ DEFINE_PER_CPU(struct cpu_hw_events, cpu_hw_events) = {
->  	.pmu = &pmu,
->  };
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index e5c288d4264f..93c17da8271d 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -549,6 +549,7 @@ struct kvm_pmu {
+>  	unsigned nr_arch_fixed_counters;
+>  	unsigned available_event_types;
+>  	u64 fixed_ctr_ctrl;
+> +	u64 fixed_ctr_ctrl_hw;
+>  	u64 fixed_ctr_ctrl_mask;
+>  	u64 global_ctrl;
+>  	u64 global_status;
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 0cd38c5632ee..c61936266cbd 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -34,6 +34,25 @@
 >  
-> +DEFINE_PER_CPU(bool, pmi_vector_is_nmi) = true;
+>  #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
+>  
+> +static void reprogram_fixed_counters_in_passthrough_pmu(struct kvm_pmu *pmu, u64 data)
+> +{
+> +	struct kvm_pmc *pmc;
+> +	u64 new_data = 0;
+> +	int i;
 > +
->  DEFINE_STATIC_KEY_FALSE(rdpmc_never_available_key);
->  DEFINE_STATIC_KEY_FALSE(rdpmc_always_available_key);
->  DEFINE_STATIC_KEY_FALSE(perf_is_hybrid);
-> @@ -1733,6 +1735,24 @@ perf_event_nmi_handler(unsigned int cmd, struct pt_regs *regs)
->  	u64 finish_clock;
->  	int ret;
->  
-> +	/*
-> +	 * When guest pmu context is loaded this handler should be forbidden from
-> +	 * running, the reasons are:
-> +	 * 1. After perf_guest_enter() is called, and before cpu enter into
-> +	 *    non-root mode, NMI could happen, but x86_pmu_handle_irq() restore PMU
-> +	 *    to use NMI vector, which destroy KVM PMI vector setting.
-> +	 * 2. When VM is running, host NMI other than PMI causes VM exit, KVM will
-> +	 *    call host NMI handler (vmx_vcpu_enter_exit()) first before KVM save
-> +	 *    guest PMU context (kvm_pmu_save_pmu_context()), as x86_pmu_handle_irq()
-> +	 *    clear global_status MSR which has guest status now, then this destroy
-> +	 *    guest PMU status.
-> +	 * 3. After VM exit, but before KVM save guest PMU context, host NMI other
-> +	 *    than PMI could happen, x86_pmu_handle_irq() clear global_status MSR
-> +	 *    which has guest status now, then this destroy guest PMU status.
-> +	 */
-> +	if (!this_cpu_read(pmi_vector_is_nmi))
-> +		return 0;
+> +	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+> +		pmc = get_fixed_pmc(pmu, MSR_CORE_PERF_FIXED_CTR0 + i);
+> +		if (check_pmu_event_filter(pmc)) {
+> +			pmc->current_config = fixed_ctrl_field(data, i);
+> +			new_data |= (pmc->current_config << (i * 4));
 
-0 -> NMI_DONE
+Since we already have macro intel_fixed_bits_by_idx() to manipulate
+fixed_cntr_ctrl, we 'd better to use it.
+
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 3dbeb41b85ab..0aa58bffb99d 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -44,7 +44,7 @@ static void
+reprogram_fixed_counters_in_passthrough_pmu(struct kvm_pmu *pmu, u64
+                pmc = get_fixed_pmc(pmu, MSR_CORE_PERF_FIXED_CTR0 + i);
+                if (check_pmu_event_filter(pmc)) {
+                        pmc->current_config = fixed_ctrl_field(data, i);
+-                       new_data |= (pmc->current_config << (i * 4));
++                       new_data |= intel_fixed_bits_by_idx(i,
+pmc->current_config);
+                } else {
+                        pmc->counter = 0;
+                }
 
 
-> +
->  	/*
->  	 * All PMUs/events that share this PMI handler should make sure to
->  	 * increment active_events for their events.
-> @@ -2675,11 +2695,14 @@ static bool x86_pmu_filter(struct pmu *pmu, int cpu)
->  
->  static void x86_pmu_switch_interrupt(bool enter, u32 guest_lvtpc)
->  {
-> -	if (enter)
-> +	if (enter) {
->  		apic_write(APIC_LVTPC, APIC_DM_FIXED | KVM_GUEST_PMI_VECTOR |
->  			   (guest_lvtpc & APIC_LVT_MASKED));
-> -	else
-> +		this_cpu_write(pmi_vector_is_nmi, false);
-> +	} else {
->  		apic_write(APIC_LVTPC, APIC_DM_NMI);
-> +		this_cpu_write(pmi_vector_is_nmi, true);
+> +		} else {
+> +			pmc->counter = 0;
+> +		}
 > +	}
+> +	pmu->fixed_ctr_ctrl_hw = new_data;
+> +	pmu->fixed_ctr_ctrl = data;
+> +}
+> +
+>  static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
+>  {
+>  	struct kvm_pmc *pmc;
+> @@ -351,7 +370,9 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		if (data & pmu->fixed_ctr_ctrl_mask)
+>  			return 1;
+>  
+> -		if (pmu->fixed_ctr_ctrl != data)
+> +		if (is_passthrough_pmu_enabled(vcpu))
+> +			reprogram_fixed_counters_in_passthrough_pmu(pmu, data);
+> +		else if (pmu->fixed_ctr_ctrl != data)
+>  			reprogram_fixed_counters(pmu, data);
+>  		break;
+>  	case MSR_IA32_PEBS_ENABLE:
+> @@ -820,13 +841,12 @@ static void intel_save_guest_pmu_context(struct kvm_vcpu *vcpu)
+>  	if (pmu->global_status)
+>  		wrmsrl(MSR_CORE_PERF_GLOBAL_OVF_CTRL, pmu->global_status);
+>  
+> -	rdmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl);
+>  	/*
+>  	 * Clear hardware FIXED_CTR_CTRL MSR to avoid information leakage and
+>  	 * also avoid these guest fixed counters get accidentially enabled
+>  	 * during host running when host enable global ctrl.
+>  	 */
+> -	if (pmu->fixed_ctr_ctrl)
+> +	if (pmu->fixed_ctr_ctrl_hw)
+>  		wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
 >  }
 >  
->  static struct pmu pmu = {
+> @@ -844,7 +864,7 @@ static void intel_restore_guest_pmu_context(struct kvm_vcpu *vcpu)
+>  	if (pmu->global_status & toggle)
+>  		wrmsrl(MSR_CORE_PERF_GLOBAL_STATUS_SET, pmu->global_status & toggle);
+>  
+> -	wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl);
+> +	wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl_hw);
+>  }
+>  
+>  struct kvm_pmu_ops intel_pmu_ops __initdata = {
 
