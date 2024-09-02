@@ -1,114 +1,169 @@
-Return-Path: <kvm+bounces-25688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25689-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBCAE968C53
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 18:43:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AE9F968D98
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 20:38:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07BEF1C2099B
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 16:43:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D6571F24415
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 18:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF5C1A3036;
-	Mon,  2 Sep 2024 16:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD55F1C62C9;
+	Mon,  2 Sep 2024 18:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Q0lfsSdO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p81gWxaR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2EFD38DC0
-	for <kvm@vger.kernel.org>; Mon,  2 Sep 2024 16:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F5B1AB6DE
+	for <kvm@vger.kernel.org>; Mon,  2 Sep 2024 18:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725295393; cv=none; b=ZFyw4d4xCrq7DVlYw6XxWMMAKMWWm0c8I/Odv1Bt7FIYz0p8TG3QPCNp7ABgGW1hB7jfoU+Yayg689R4FMhgh22NCSDfysqkvXJVxR97p+S5cCGS3Gy/KwgGC6cJ0YV8u0K4lQWuibTXvs+RPgvLSQq44O4hc4OH6eFurG5KErI=
+	t=1725302260; cv=none; b=EwxxziwdiCvMJkZb4hj0P9+gOb7uzJIuLqccPGj1DCkLk3G9fPzncPvhp9HSFEpvEdVe6Dc530xG956asuYdbUHdT/QDZKPgHc/y9qxqY/DQPXdDkfxuVuABipd+u/Ezs/O2ywF4ZMr2kqe5ozB/0v4lk9WgG2WizElK9bYsDYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725295393; c=relaxed/simple;
-	bh=PoF0OhXKY5OcwmNuM3GcCzLlQlVK9juL0vDhehT/O8o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HptRrYwFqhA6nZftVLvBS52692nSymoe5jg86qgKl6Iktx/U9fqjjh1FqTiVA1Ow1S702I5++HVz4RWxK39Be271c3nIuvA1qz1DYcchsDtsGOtewNuu2Y+joMDbpW70bmjUfCObVZOEHID7K92Kc+orh5lRhIeppsgvyBdQLpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Q0lfsSdO; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 95FED40E0191;
-	Mon,  2 Sep 2024 16:43:08 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id ckKYtZ9P00XF; Mon,  2 Sep 2024 16:43:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1725295384; bh=cWpd/W7jP0bfUkNNR90JgbXqJ3F5sjGSlF/w3xJCA6A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q0lfsSdO0csEsw0UQx/ldFv+peIdrERgAc/rexBb+vRhj4hsT2cKsxJpz+Z+ubvcL
-	 y8BDHW5rHoXh6P4O5Qs8wlvbfgr/mm7pnI4KqyWShhZ51Hz+k20bq8wBGYRLrNdSil
-	 4eA1kPV8EpW+kXefxDAr7/7cVP7QrlQOKbPM9KsCiL86PYjYLln7CW2TKDPNm7RcNZ
-	 m9ICdb9taIXfm8S6OgySPLYTatodpiReeBInrzfoBebLbXK8IV44S5AHepwZ1LGfz9
-	 q1JRYyjH9b+lehc63/jXZ5bdeXmeCQvznGmfK5h886qrEo0wmWSXoMo3jVuU+SxVLj
-	 CXnZbrQsdl5Pbp02j43vcvGkJ995RvbD6btibPJdpcM24Q1w5uIPagvSqy0AEwij4c
-	 edaBDxWBmalUrf6uezFfuGo8uzRcMEvicWF6gTaskZ8v1EhpJRRoljVaeMJS9XXCKN
-	 Y34sE4Xiia6kedfyYCu0GXiGln2mqNiSqvoJpQWkxZDtli/Tnh01vL4+YRxgDDzM5J
-	 zoLbg/cJyX4TCn4/kasYBmONxTj26P8KOaumGhBOFURWgqJ4At5fA4N8ybclC+hDFx
-	 CS2MiOLzvMnDzRk0ivueIXbrgYjGxNB1JdUI7zoao2b0pZWzFVzjC7lELoj6JfFKPH
-	 pOoIxmJGIOdbcEOU7IO+0fiw=
-Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4854340E0081;
-	Mon,  2 Sep 2024 16:42:57 +0000 (UTC)
-Date: Mon, 2 Sep 2024 18:42:51 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	thomas.lendacky@amd.com, santosh.shukla@amd.com, ketanch@iitk.ac.in
-Subject: Re: [RFC PATCH 1/5] x86/cpufeatures: Add SNP Secure TSC
-Message-ID: <20240902164251.GBZtXrC79ZX13-eGqx@fat_crate.local>
-References: <20240829053748.8283-1-nikunj@amd.com>
- <20240829053748.8283-2-nikunj@amd.com>
- <20240829132201.GBZtB1-ZHQ8wW9-5fi@fat_crate.local>
- <1bea8191-b0f2-9b22-7e7b-a24d640e47a2@amd.com>
+	s=arc-20240116; t=1725302260; c=relaxed/simple;
+	bh=0f1aN9HLbWF92dFi99NsPlbmjKqZ++MNJBcwsjyzqWg=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=l6zNmU6CyHS/by5LiE8iShyzy8pGGwYGRnjPm6povQGABHza+T+QcKtRh84nSaQzerdFJmZLL6AiDrc3pegy+n8jje2krPG6rKPbP3OAyo3eVaDzm37C/6Qj19g3rf3G9pvWp5siSquJVXsS5/S5SI044SHyjs2aIg9RsQSB0/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p81gWxaR; arc=none smtp.client-ip=209.85.166.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-82a1fbaba4aso321000339f.0
+        for <kvm@vger.kernel.org>; Mon, 02 Sep 2024 11:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725302257; x=1725907057; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nAO/71uT5RCAsBJVu4g+dwe4+a2p2kFZ1jdndEbhd+o=;
+        b=p81gWxaR6mfBj2uJUybRfMAov24UYxjpQVk+WPzMhg6b4ab+wFJGq5oJUdGcD1aKO1
+         NjXiAWZVBr+8rLJwxpwubnA7izc6vBey+XXUluAtuRRF/zSBUPZ6TKV9hP5b10MIbuko
+         obTrpFy7xsgEV2e2v0gom7RVSma4CJMQ8FT+WsVCuyHWZrQu4JDIv8uxbPtr8yeQOOj4
+         yAhoLlep9fK71AaHD+x4U3uzBntIrngHn27rs1wbXMCQrz9+2UZgHmI53BRcg5Q8yH3t
+         UmIfIdST5/8L5Z0/+Yx/OvCSyX+00DI9MzsIduTwxyrVUIkAJA1qvqm1ScX6jD4Z1wKr
+         ZTlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725302257; x=1725907057;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nAO/71uT5RCAsBJVu4g+dwe4+a2p2kFZ1jdndEbhd+o=;
+        b=BNxBilEBeHf6w5Wsyi7ln0omJSLLr4n9LpT1DT1gcuvC/xkv+A884II12RjFz20PBv
+         GImiqaW+4MZByA3t9qrVHKZyNasZ9RvkM8MLTvniwTIUP2m8a9uzhgRfC6KLTsAlO037
+         S40PXuUk/jLAlWLEGlm3kpw4rIKn3F3vhGTEqLBNW6kUVG8Nu1QlUCTXmtgiAOwSma9c
+         5RIIRtKKegWfumAq4O7GWhSclWsYcylvalJ9HQEgQ2uBFGkfP8wfmPm6GqHj/Mkuw803
+         985MHgh0o/z7qRvNqhmJi+eYJ2ZFpdn/RhfPSwrblm6RXjbYix3n3RG1jtmx9aoDWl7e
+         iV4w==
+X-Forwarded-Encrypted: i=1; AJvYcCU8npqGLUBLqXbtrNNWp6c+/rnUfeFlB3EUIaqUDfYVGYjtmMagW7psSqQMp9LoKg2R/bE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyosR3jzoh8zOWNdX4wYTe+VPiZom2SFbwv4gmTUWmZ1J5ATw/O
+	4VtDDTYabSbRWqJOvfPYDY6DfUAPVXb8KvK76On5zZj0LC0/5M+IXowycjaxitMGUkkJTtGMI1G
+	jROf6EMInZ8BvpCHl0cloBg==
+X-Google-Smtp-Source: AGHT+IEklshSlPXSKl7m3pGgCZOFN2urZDLNUZ1eyTQmaZKHwzCs7QJN/43WSSevJlLHSgMuDO6x0IIt8x1YU2sS7w==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6638:3494:b0:4ce:928f:ad9a with
+ SMTP id 8926c6da1cb9f-4d017a1e518mr490136173.1.1725302257619; Mon, 02 Sep
+ 2024 11:37:37 -0700 (PDT)
+Date: Mon, 02 Sep 2024 18:37:37 +0000
+In-Reply-To: <ZtDd9YVc33b8Qt__@google.com> (message from Sean Christopherson
+ on Thu, 29 Aug 2024 13:45:41 -0700)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1bea8191-b0f2-9b22-7e7b-a24d640e47a2@amd.com>
+Mime-Version: 1.0
+Message-ID: <gsntcyllaolq.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 3/6] KVM: x86: selftests: Set up AMD VM in pmu_counters_test
+From: Colton Lewis <coltonlewis@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: mizhang@google.com, kvm@vger.kernel.org, ljr.kernel@gmail.com, 
+	jmattson@google.com, aaronlewis@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Mon, Sep 02, 2024 at 09:46:57AM +0530, Nikunj A. Dadhania wrote:
-> Ok, do we need to add an entry to tools/arch/x86/kcpuid/cpuid.csv ?
+Sean Christopherson <seanjc@google.com> writes:
 
-Already there:
+> On Wed, Aug 28, 2024, Mingwei Zhang wrote:
+>> > >> +static void test_core_counters(void)
+>> > >> +{
+>> > >> +    uint8_t nr_counters = nr_core_counters();
+>> > >> +    bool core_ext = kvm_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+>> > >> +    bool perf_mon_v2 = kvm_cpu_has(X86_FEATURE_PERF_MON_V2);
+>> > >> +    struct kvm_vcpu *vcpu;
+>> > >> +    struct kvm_vm *vm;
+>> >
+>> > >> -    kvm_pmu_version = kvm_cpu_property(X86_PROPERTY_PMU_VERSION);
+>> > >> -    kvm_has_perf_caps = kvm_cpu_has(X86_FEATURE_PDCM);
+>> > >> +    vm = vm_create_with_one_vcpu(&vcpu, guest_test_core_counters);
+>> >
+>> > >> -    test_intel_counters();
+>> > >> +    /* This property may not be there in older underlying CPUs,
+>> > >> +     * but it simplifies the test code for it to be set
+>> > >> +     * unconditionally.
 
-# Leaf 8000001FH
-# AMD encrypted memory capabilities enumeration (SME/SEV)
+> But then the test isn't verifying that KVM is honoring the architecture.   
+> I.e.
+> backdooring information to the guest risks getting false passes because  
+> KVM
+> incorrectly peeks at the same information, which shouldn't exist.
 
-0x8000001f,         0,  eax,       0,    sme                    , Secure Memory Encryption supported
-0x8000001f,         0,  eax,       1,    sev                    , Secure Encrypted Virtualization supported
-0x8000001f,         0,  eax,       2,    vm_page_flush          , VM Page Flush MSR (0xc001011e) available
-0x8000001f,         0,  eax,       3,    sev_es                 , SEV Encrypted State supported
-0x8000001f,         0,  eax,       4,    sev_nested_paging      , SEV secure nested paging supported
-0x8000001f,         0,  eax,       5,    vm_permission_levels   , VMPL supported
-0x8000001f,         0,  eax,       6,    rpmquery               , RPMQUERY instruction supported
-0x8000001f,         0,  eax,       7,    vmpl_sss               , VMPL supervisor shadwo stack supported
-0x8000001f,         0,  eax,       8,    secure_tsc             , Secure TSC supported
-^^^^
+>> > >> +     */
 
-but in general if it is not there, most definitely.
+> 	/*
+> 	 * Multi-line function comments should start on the line after the
+> 	 * opening slash-asterisk, like so.
+> 	 */
 
-This list should contain *all* CPUID definitions.
+>> > >> +    vcpu_set_cpuid_property(vcpu, X86_PROPERTY_NUM_PERF_CTR_CORE,
+>> > >> nr_counters);
+>> > >> +    if (core_ext)
+>> > >> +            vcpu_set_cpuid_feature(vcpu,  
+>> X86_FEATURE_PERF_CTR_EXT_CORE);
+>> > >> +    if (perf_mon_v2)
+>> > >> +            vcpu_set_cpuid_feature(vcpu, X86_FEATURE_PERF_MON_V2);
+>> >
+>> > > hmm, I think this might not be enough. So, when the baremetal machine
+>> > > supports Perfmon v2, this code is just testing v2. But we should be  
+>> able
+>> > > to test anything below v2, ie., v1, v1 without core_ext. So, three
+>> > > cases need to be tested here: v1 with 4 counters; v1 with core_ext (6
+>> > > counters); v2.
+>> >
+>> > > If, the machine running this selftest does not support v2 but it does
+>> > > support core extension, then we fall back to test v1 with 4 counters  
+>> and
+>> > > v1 with 6 counters.
+>> >
+>> > This should cover all cases the way I wrote it. I detect the number of
+>> > counters in nr_core_counters(). That tells me if I am dealing with 4 or
+>> > 6 and then I set the cpuid property based on that so I can read that
+>> > number in later code instead of duplicating the logic.
 
-Thx.
+>> right. in the current code, you set up the counters properly according
+>> to the hw capability. But the test can do more on a hw with perfmon
+>> v2, right? Because it can test multiple combinations of setup for a
+>> VM: say v1 + 4 counters and v1 + 6 counters etc. I am just following
+>> the style of this selftest on Intel side, in which they do a similar
+>> kind of enumeration of PMU version + PDCM capabilities. In each
+>> configuration, it will invoke a VM and do the test.
 
--- 
-Regards/Gruss,
-    Boris.
+> Ya.  This is similar my comments on setting NUM_PER_CTR_CORE when the  
+> field
+> shouldn't exist.  One of the main goals of this test is to verify the KVM  
+> honors
+> the architecture based on userspace's defined virtual CPU model, i.e.  
+> guest
+> CPUID.  That means testing all (or at least, within reason) possible  
+> combinations
+> that can feasibly be supported by KVM given the underlying hardware.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> As written, this essentially just tests the maximal configuration that  
+> can be
+> exposed to a guest, which isn't _that_ interesting because KVM tends to  
+> get plenty
+> of coverage for such setups, e.g. by running "real" VMs.
+
+Ok. I get what you and Mingwei are saying. I can test those combinations.
 
