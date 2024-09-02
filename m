@@ -1,235 +1,114 @@
-Return-Path: <kvm+bounces-25687-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25688-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47FBB968B85
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 18:03:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBCAE968C53
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 18:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0049028384F
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 16:03:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07BEF1C2099B
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2024 16:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79ED41A3047;
-	Mon,  2 Sep 2024 16:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF5C1A3036;
+	Mon,  2 Sep 2024 16:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Guq6UQSp"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Q0lfsSdO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67791A3024
-	for <kvm@vger.kernel.org>; Mon,  2 Sep 2024 16:03:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2EFD38DC0
+	for <kvm@vger.kernel.org>; Mon,  2 Sep 2024 16:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725293014; cv=none; b=rG9F1Eqdq2J+f0y43+mm+p9U9+j+6DfVFjoobwMBJr+Germr679uF44/2yiUwNf8cgWMrAchrnocRmf1R7ZOp7AQVuXU7JU7m/AyKFwnyYw4Ov7UacTImAzpII4kqJPAVtZlwo+DAQ3DffMrthRm/gYq0pThCUAfeKrbCfStQRo=
+	t=1725295393; cv=none; b=ZFyw4d4xCrq7DVlYw6XxWMMAKMWWm0c8I/Odv1Bt7FIYz0p8TG3QPCNp7ABgGW1hB7jfoU+Yayg689R4FMhgh22NCSDfysqkvXJVxR97p+S5cCGS3Gy/KwgGC6cJ0YV8u0K4lQWuibTXvs+RPgvLSQq44O4hc4OH6eFurG5KErI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725293014; c=relaxed/simple;
-	bh=QkCBGS2sXiAPn2JyccF0UCgSeMeG2oRyf6qQZDXkBPo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GlFtO/NIhLF5/tss0TUZSbMsv6frg0FthjdzQboZCNGPNI57G6NJraU3Jd8/UsEn8i79sEbiQqPtxVRvq5qtw83bNvlu14iBR+JDybxb16FBtlegc/GgfEK3VvWB2dx45z/L7MptpVUZwk00AlMIKdmN0z2+PQPLO3y5CVqs2x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Guq6UQSp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725293009;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yc/XZqRZkYvpK5BS/4Oz3twFrDBzb7MYtEWJE/on1P4=;
-	b=Guq6UQSp8DuMPLGtdIHjZqHby6jGkHu5KVQiT6zvrzEjZhuarI2pPoAilyuX0qoUIDr1Na
-	19hmC5YmW43ow0JDQceAvaOV5Yb/VqBYR4xcDcTzAGB6LmtDdGd2aMfoU27h6N4fuQ7HIn
-	K1XEzvENB3/SfMFxbhLkSQFejdCovDQ=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-37-M_xHlinYP5meWHV8VqTNGw-1; Mon, 02 Sep 2024 12:03:28 -0400
-X-MC-Unique: M_xHlinYP5meWHV8VqTNGw-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7a80599c404so659835485a.3
-        for <kvm@vger.kernel.org>; Mon, 02 Sep 2024 09:03:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725293008; x=1725897808;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yc/XZqRZkYvpK5BS/4Oz3twFrDBzb7MYtEWJE/on1P4=;
-        b=HN2+UY2c76fH3C3Fqa4y/iDq24Chi78uAVIOu4syy/1M0PodWppo4NlrtjeUnn2Y2R
-         oHvchTvH2/q7YIpuvutiJTH+NV+3L3zu3Nni3dEs1UrRKducJm1TcrJ26WiR9ZBByls4
-         dsRDoVBqZQ1zx7H9gbhRaFfzbE0EdEnYRUBtc1KgxvYPMlrCIgPHWmhniKwgL2+CPozG
-         TXSXtIFH5n8T9ZjNUPmRORu7BffwajM33MdrjihDq1+OxHPzmatdPeIsUtCOfl1KQnC6
-         1ob88R+BOakPnvkiSAFblAsV9j6OyeEGy70vuGizXvrZF+NBFFRI82pUWaxug1uiNgE9
-         WVBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV462miftBnFf5xOgePyDwHxVaoQvhk3Z+4Ah4/GWr8tw161aVN8o5hPx1o9kGdNc6shzg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQYWy/drwOWBjUp2uAgnFIzv78gEx4p2WfF0RurKnsON3d5g70
-	RpvmShBdSPAL74MHZy0p44WliPcntqT5BZ1uxWZpMfxO0AuHFhjAcSLWzOH4gdffp5l5KDgD4LP
-	Rc1jyrj/uizrJ7I0PHxnDt9tcuoptpVK1aKpJ+W5puu+86mbzLw==
-X-Received: by 2002:a05:620a:370d:b0:7a4:dfd6:5fb8 with SMTP id af79cd13be357-7a81d67f978mr1121076685a.23.1725293007896;
-        Mon, 02 Sep 2024 09:03:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHM3apCD4sp4+nR7bLQeDK99T/1mpDtwbgEMl+f8Ekn/hxJs+sZSvADILuK047UXSJy/fohsg==
-X-Received: by 2002:a05:620a:370d:b0:7a4:dfd6:5fb8 with SMTP id af79cd13be357-7a81d67f978mr1121072785a.23.1725293007445;
-        Mon, 02 Sep 2024 09:03:27 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a806c4cb8asm429554685a.67.2024.09.02.09.03.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Sep 2024 09:03:26 -0700 (PDT)
-Message-ID: <60841b43-878a-4467-99a4-12b6e503063c@redhat.com>
-Date: Mon, 2 Sep 2024 18:03:23 +0200
+	s=arc-20240116; t=1725295393; c=relaxed/simple;
+	bh=PoF0OhXKY5OcwmNuM3GcCzLlQlVK9juL0vDhehT/O8o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HptRrYwFqhA6nZftVLvBS52692nSymoe5jg86qgKl6Iktx/U9fqjjh1FqTiVA1Ow1S702I5++HVz4RWxK39Be271c3nIuvA1qz1DYcchsDtsGOtewNuu2Y+joMDbpW70bmjUfCObVZOEHID7K92Kc+orh5lRhIeppsgvyBdQLpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Q0lfsSdO; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 95FED40E0191;
+	Mon,  2 Sep 2024 16:43:08 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ckKYtZ9P00XF; Mon,  2 Sep 2024 16:43:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1725295384; bh=cWpd/W7jP0bfUkNNR90JgbXqJ3F5sjGSlF/w3xJCA6A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q0lfsSdO0csEsw0UQx/ldFv+peIdrERgAc/rexBb+vRhj4hsT2cKsxJpz+Z+ubvcL
+	 y8BDHW5rHoXh6P4O5Qs8wlvbfgr/mm7pnI4KqyWShhZ51Hz+k20bq8wBGYRLrNdSil
+	 4eA1kPV8EpW+kXefxDAr7/7cVP7QrlQOKbPM9KsCiL86PYjYLln7CW2TKDPNm7RcNZ
+	 m9ICdb9taIXfm8S6OgySPLYTatodpiReeBInrzfoBebLbXK8IV44S5AHepwZ1LGfz9
+	 q1JRYyjH9b+lehc63/jXZ5bdeXmeCQvznGmfK5h886qrEo0wmWSXoMo3jVuU+SxVLj
+	 CXnZbrQsdl5Pbp02j43vcvGkJ995RvbD6btibPJdpcM24Q1w5uIPagvSqy0AEwij4c
+	 edaBDxWBmalUrf6uezFfuGo8uzRcMEvicWF6gTaskZ8v1EhpJRRoljVaeMJS9XXCKN
+	 Y34sE4Xiia6kedfyYCu0GXiGln2mqNiSqvoJpQWkxZDtli/Tnh01vL4+YRxgDDzM5J
+	 zoLbg/cJyX4TCn4/kasYBmONxTj26P8KOaumGhBOFURWgqJ4At5fA4N8ybclC+hDFx
+	 CS2MiOLzvMnDzRk0ivueIXbrgYjGxNB1JdUI7zoao2b0pZWzFVzjC7lELoj6JfFKPH
+	 pOoIxmJGIOdbcEOU7IO+0fiw=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4854340E0081;
+	Mon,  2 Sep 2024 16:42:57 +0000 (UTC)
+Date: Mon, 2 Sep 2024 18:42:51 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+	thomas.lendacky@amd.com, santosh.shukla@amd.com, ketanch@iitk.ac.in
+Subject: Re: [RFC PATCH 1/5] x86/cpufeatures: Add SNP Secure TSC
+Message-ID: <20240902164251.GBZtXrC79ZX13-eGqx@fat_crate.local>
+References: <20240829053748.8283-1-nikunj@amd.com>
+ <20240829053748.8283-2-nikunj@amd.com>
+ <20240829132201.GBZtB1-ZHQ8wW9-5fi@fat_crate.local>
+ <1bea8191-b0f2-9b22-7e7b-a24d640e47a2@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH 3/5] vfio_platform: reset: Introduce new open and
- close callbacks
-Content-Language: en-US
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: eric.auger.pro@gmail.com, treding@nvidia.com, vbhadram@nvidia.com,
- jonathanh@nvidia.com, mperttunen@nvidia.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, clg@redhat.com, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, msalter@redhat.com
-References: <20240829161302.607928-1-eric.auger@redhat.com>
- <20240829161302.607928-4-eric.auger@redhat.com>
- <20240829172140.686a7aa7.alex.williamson@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20240829172140.686a7aa7.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1bea8191-b0f2-9b22-7e7b-a24d640e47a2@amd.com>
 
-Hi Alex,
+On Mon, Sep 02, 2024 at 09:46:57AM +0530, Nikunj A. Dadhania wrote:
+> Ok, do we need to add an entry to tools/arch/x86/kcpuid/cpuid.csv ?
 
-On 8/30/24 01:21, Alex Williamson wrote:
-> On Thu, 29 Aug 2024 18:11:07 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
->
->> Some devices may require resources such as clocks and resets
->> which cannot be handled in the vfio_platform agnostic code. Let's
->> add 2 new callbacks to handle those resources. Those new callbacks
->> are optional, as opposed to the reset callback. In case they are
->> implemented, both need to be.
->>
->> They are not implemented by the existing reset modules.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  drivers/vfio/platform/vfio_platform_common.c  | 28 ++++++++++++++++++-
->>  drivers/vfio/platform/vfio_platform_private.h |  6 ++++
->>  2 files changed, 33 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
->> index 3be08e58365b..2174e402dc70 100644
->> --- a/drivers/vfio/platform/vfio_platform_common.c
->> +++ b/drivers/vfio/platform/vfio_platform_common.c
->> @@ -228,6 +228,23 @@ static int vfio_platform_call_reset(struct vfio_platform_device *vdev,
->>  	return -EINVAL;
->>  }
->>  
->> +static void vfio_platform_reset_module_close(struct vfio_platform_device *vpdev)
->> +{
->> +	if (VFIO_PLATFORM_IS_ACPI(vpdev))
->> +		return;
->> +	if (vpdev->reset_ops && vpdev->reset_ops->close)
->> +		vpdev->reset_ops->close(vpdev);
->> +}
->> +
->> +static int vfio_platform_reset_module_open(struct vfio_platform_device *vpdev)
->> +{
->> +	if (VFIO_PLATFORM_IS_ACPI(vpdev))
->> +		return 0;
->> +	if (vpdev->reset_ops && vpdev->reset_ops->open)
->> +		return vpdev->reset_ops->open(vpdev);
->> +	return 0;
->> +}
-> Hi Eric,
->
-> I didn't get why these are no-op'd on an ACPI platform.  Shouldn't it
-> be up to the reset ops to decide whether to implement something based
-> on the system firmware rather than vfio-platform-common?
+Already there:
 
-In case of ACPI boot, ie. VFIO_PLATFORM_IS_ACPI(vpdev) is set, I
-understand we don't use the vfio platform reset module but the ACPI _RST
-method. see vfio_platform_acpi_call_reset() and
-vfio_platform_acpi_has_reset() introduced by d30daa33ec1d ("vfio:
-platform: call _RST method when using ACPI"). I have never had the
-opportunity to test acpi boot reset though.
->
->> +
->>  void vfio_platform_close_device(struct vfio_device *core_vdev)
->>  {
->>  	struct vfio_platform_device *vdev =
->> @@ -242,6 +259,7 @@ void vfio_platform_close_device(struct vfio_device *core_vdev)
->>  			"reset driver is required and reset call failed in release (%d) %s\n",
->>  			ret, extra_dbg ? extra_dbg : "");
->>  	}
->> +	vfio_platform_reset_module_close(vdev);
->>  	pm_runtime_put(vdev->device);
->>  	vfio_platform_regions_cleanup(vdev);
->>  	vfio_platform_irq_cleanup(vdev);
->> @@ -265,7 +283,13 @@ int vfio_platform_open_device(struct vfio_device *core_vdev)
->>  
->>  	ret = pm_runtime_get_sync(vdev->device);
->>  	if (ret < 0)
->> -		goto err_rst;
->> +		goto err_rst_open;
->> +
->> +	ret = vfio_platform_reset_module_open(vdev);
->> +	if (ret) {
->> +		dev_info(vdev->device, "reset module load failed (%d)\n", ret);
->> +		goto err_rst_open;
->> +	}
->>  
->>  	ret = vfio_platform_call_reset(vdev, &extra_dbg);
->>  	if (ret && vdev->reset_required) {
->> @@ -278,6 +302,8 @@ int vfio_platform_open_device(struct vfio_device *core_vdev)
->>  	return 0;
->>  
->>  err_rst:
->> +	vfio_platform_reset_module_close(vdev);
->> +err_rst_open:
->>  	pm_runtime_put(vdev->device);
->>  	vfio_platform_irq_cleanup(vdev);
->>  err_irq:
->> diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
->> index 90c99d2e70f4..528b01c56de6 100644
->> --- a/drivers/vfio/platform/vfio_platform_private.h
->> +++ b/drivers/vfio/platform/vfio_platform_private.h
->> @@ -74,9 +74,13 @@ struct vfio_platform_device {
->>   * struct vfio_platform_reset_ops - reset ops
->>   *
->>   * @reset:	reset function (required)
->> + * @open:	Called when the first fd is opened for this device (optional)
->> + * @close:	Called when the last fd is closed for this device (optional)
-> This doesn't note any platform firmware dependency.  We should probably
-> also note here the XOR requirement enforced below here.  Thanks,
-To me this is just used along with dt boot, hence the lack of check.
+# Leaf 8000001FH
+# AMD encrypted memory capabilities enumeration (SME/SEV)
 
-Thanks
+0x8000001f,         0,  eax,       0,    sme                    , Secure Memory Encryption supported
+0x8000001f,         0,  eax,       1,    sev                    , Secure Encrypted Virtualization supported
+0x8000001f,         0,  eax,       2,    vm_page_flush          , VM Page Flush MSR (0xc001011e) available
+0x8000001f,         0,  eax,       3,    sev_es                 , SEV Encrypted State supported
+0x8000001f,         0,  eax,       4,    sev_nested_paging      , SEV secure nested paging supported
+0x8000001f,         0,  eax,       5,    vm_permission_levels   , VMPL supported
+0x8000001f,         0,  eax,       6,    rpmquery               , RPMQUERY instruction supported
+0x8000001f,         0,  eax,       7,    vmpl_sss               , VMPL supervisor shadwo stack supported
+0x8000001f,         0,  eax,       8,    secure_tsc             , Secure TSC supported
+^^^^
 
-Eric
->
-> Alex
->
->>   */
->>  struct vfio_platform_reset_ops {
->>  	int (*reset)(struct vfio_platform_device *vdev);
->> +	int (*open)(struct vfio_platform_device *vdev);
->> +	void (*close)(struct vfio_platform_device *vdev);
->>  };
->>  
->>  
->> @@ -129,6 +133,8 @@ __vfio_platform_register_reset(&__ops ## _node)
->>  MODULE_ALIAS("vfio-reset:" compat);				\
->>  static int __init reset ## _module_init(void)			\
->>  {								\
->> +	if (!!ops.open ^ !!ops.close)				\
->> +		return -EINVAL;					\
->>  	vfio_platform_register_reset(compat, ops);		\
->>  	return 0;						\
->>  };								\
+but in general if it is not there, most definitely.
 
+This list should contain *all* CPUID definitions.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
