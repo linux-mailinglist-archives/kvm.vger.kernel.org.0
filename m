@@ -1,117 +1,90 @@
-Return-Path: <kvm+bounces-25770-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25771-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D8A96A421
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 18:20:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6D6496A45C
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 18:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2774E1C23FED
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 16:20:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 763E82878D6
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 16:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33A618BBA0;
-	Tue,  3 Sep 2024 16:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A74A18BC13;
+	Tue,  3 Sep 2024 16:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDEpuqsv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wCxhUgXy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690B14CB2B
-	for <kvm@vger.kernel.org>; Tue,  3 Sep 2024 16:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B011885A0
+	for <kvm@vger.kernel.org>; Tue,  3 Sep 2024 16:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725380433; cv=none; b=ggYmjC6Cflh9SOBUXWtdSfU+EBcqNa/3weY6XvKqib/JQuh5xSqIadnlz2eb39Nga9soYAjKPmzOHc8d9ReVKckVcGEFZLeSlxhLNvkSvsvKbWcXNMed2Xnrlc4fWT1hpnhCR6Kac69BTL9sOYEKy6uDla2eP5A+3WJnXe2A0Bs=
+	t=1725381057; cv=none; b=IuaIrUBSvi9v4Ssv3nwm8lvtULTrx3Psb7A7dixZoWwRgBKLXS7V5bhnE2HWrWiUtxCMxmxM6MHx9Dhw9WGoi1jHJ47oXq3VCWwOIyhKN3mXTvHBwYjJpmAqEZFIxYzzzEDa0greUCC4NuM/Q6CBXi0zMKierCiUyeLh7JY9SgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725380433; c=relaxed/simple;
-	bh=OAPXgA26vcCvFh11octbJS1kd1LOYAh0ZLkW8SJrsuA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Lh7JYQRMfXyI8IIb9ncgE/Kg1/is43sCFKlUEhVLj+iR017I31JRPnBZi+wRcnf7zknujpDEyIlrDOTcTubbE7UoxOA42+Gs/GGJbYP4crICz+EVxwyBl8sXHoCYSSA4uSXn6OjmNIUZOibm9SpS4SSZeebKp3QR5xoY4fXKWf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YDEpuqsv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725380431;
+	s=arc-20240116; t=1725381057; c=relaxed/simple;
+	bh=DVNaHrhGdeeNDyxAyeSdLv3wZlzpfgoOzo7WchAjbq8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xem9XZPPqv77phe6EIhq3jXlwhnBrqPmnMrWIhp5mZm96Jk3GIxBmgBjEJlppWzJNXCNBz5OskyYLwOVvkxtyUkiqpleFknotV/GYeK9idcS124hZunU1Sj1PSjInz1Y5KCYX3zhQ8p/JmxZcZLUo8iOAkiw83ztYFESvC+mB1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wCxhUgXy; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725381053;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XdmA5Tid/74wv02V6AnoSmfNmJjNITfTGTTXlL20Rx4=;
-	b=YDEpuqsvhzdT1cWKo5UDkiLqKXKh22eEE9koU0zFsIY9eLjzRggk3t42tU3qYhmBK1IDu/
-	0N30WyCr/Y6C3KDMr1ynI/87XEPDWnhUDszgGotqt2Y6uF9VsdAPIexroUq646dzlB8nSW
-	gk+iVYRF9wPvsGNeBrUlXYhVDjbL6Cc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-BTSre7AEO8WBkr-StGqqpQ-1; Tue, 03 Sep 2024 12:20:30 -0400
-X-MC-Unique: BTSre7AEO8WBkr-StGqqpQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42c7a5563cfso4282195e9.2
-        for <kvm@vger.kernel.org>; Tue, 03 Sep 2024 09:20:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725380429; x=1725985229;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XdmA5Tid/74wv02V6AnoSmfNmJjNITfTGTTXlL20Rx4=;
-        b=aSPgbygwaoRD6GlPeXsYWKUw9IxILGkOXYzce6b9SLucwcbytUsuizpPFjPkxhY2LL
-         UnbH1vUUOdUbF4PnJg125z60LfcXuuObZfk78LLH7tu1er7RR5b9J9YqKVWO/r2V01vW
-         VYmBgDvXrBOWeFYQ5dO4hsAYG097Hgo/fBSW168EOmzYZ1lP3F1nhkuiYUlQDBlxZMcI
-         Gzj8WLmqpIaEN+tvyV9F3pihHTClaHCP7dSZFRizq4F4gFm0lkMPnTFJYIq88D1H4AL8
-         DA9cc+wyltyb6L1Ut6OtomYn9qZY2wMZf7sADkUKQ1Jm4g1CJUoQtqz0uvUwApHIQBto
-         WctQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUUOnlsWMaOdQM3Wsa5sKwk/rq7FnpOSWZN8IbVkS0OVjxG27nBN2KuYrQIlI4fhs9NDqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwA55wFFIz9GU6MEBcG6nM6ZocnGLvPBEejT4IpismQt4xAsNCs
-	/wzpk8Ubfa1ywBqFy1+2OGHRVzLHIdn1rTm4BvOlSwmgShn6+x4f76SStJYFgZTMEftxKiX8j3J
-	sfBNSa1cqPQZzqcnlb/cYs9tjwW6hG07B76OD7gkTB22tO69JPg==
-X-Received: by 2002:a05:600c:154a:b0:428:1b0d:8657 with SMTP id 5b1f17b1804b1-42bb01c1136mr133191375e9.22.1725380428997;
-        Tue, 03 Sep 2024 09:20:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFt969PrCDn6htrQ/H40UrhQS7X/fYPo/AjcJYavG+h5+5YVtDQLDh+BGH5pAZgb9g0m3LBUw==
-X-Received: by 2002:a05:600c:154a:b0:428:1b0d:8657 with SMTP id 5b1f17b1804b1-42bb01c1136mr133191155e9.22.1725380428491;
-        Tue, 03 Sep 2024 09:20:28 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bbef54b23sm141833145e9.44.2024.09.03.09.20.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 09:20:27 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- rcu@vger.kernel.org, linux-kernel@vger.kernel.org, Kevin Tian
- <kevin.tian@intel.com>, Yiwei Zhang <zzyiwei@google.com>, Lai Jiangshan
- <jiangshanlai@gmail.com>, "Paul E. McKenney" <paulmck@kernel.org>, Josh
- Triplett <josh@joshtriplett.org>
-Subject: Re: [PATCH 5/5] KVM: VMX: Always honor guest PAT on CPUs that
- support self-snoop
-In-Reply-To: <Ztcrs2U8RrI3PCzM@google.com>
-References: <20240309010929.1403984-1-seanjc@google.com>
- <20240309010929.1403984-6-seanjc@google.com> <877cbyuzdn.fsf@redhat.com>
- <vuwlkftomgsnzsywjyxw6rcnycg3bve3o53svvxg3vd6xpok7o@k4ktmx5tqtmz>
- <871q26unq8.fsf@redhat.com> <ZtUYZE6t3COCwvg0@yzhao56-desk.sh.intel.com>
- <87jzfutmfc.fsf@redhat.com> <Ztcrs2U8RrI3PCzM@google.com>
-Date: Tue, 03 Sep 2024 18:20:27 +0200
-Message-ID: <87frqgu2t0.fsf@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ItTT1ofl67Qx6qoM/paB6gC9h88l9uMn+lTF4xll28I=;
+	b=wCxhUgXywgh+iCSp5MYg6y1jvSHm2x6diiCwreF2/QMspOI24IUZvviIXnFNZ11wawMDci
+	3Nz4MnXUCSaklvWm8V8TqnIff8oAwwCmd2J9Q1zJGal5hQB0Dr6SHRgUOONajgn4bpxXSB
+	+z8T3JToDc0X+uzmbf5/QTNUkjfaPYU=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org
+Cc: pbonzini@redhat.com,
+	thuth@redhat.com,
+	lvivier@redhat.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com,
+	atishp@rivosinc.com,
+	cade.richard@berkeley.edu,
+	jamestiotio@gmail.com
+Subject: [kvm-unit-tests PATCH 0/3] Support cross compiling with clang
+Date: Tue,  3 Sep 2024 18:30:47 +0200
+Message-ID: <20240903163046.869262-5-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Sean Christopherson <seanjc@google.com> writes:
+Modify configure to allow --cc=clang and a cross-prefix to be specified
+together (as well as --cflags). This allows compiling with clang, but
+using cross binutils for everything else, including the linker. So far
+tested on riscv 32- and 64-bit and aarch64 (with some hacks to the code
+to get it to compile - which is why there's no gitlab-ci patch for aarch64
+in this series). I suspect it should work for other architectures too.
 
-> On Mon, Sep 02, 2024, Vitaly Kuznetsov wrote:
->> FWIW, I use QEMU-9.0 from the same C10S (qemu-kvm-9.0.0-7.el10.x86_64)
->> but I don't think it matters in this case. My CPU is "Intel(R) Xeon(R)
->> Silver 4410Y".
->
-> Has this been reproduced on any other hardware besides SPR?  I.e. did we stumble
-> on another hardware issue?
+Andrew Jones (3):
+  riscv: Drop mstrict-align
+  configure: Support cross compiling with clang
+  riscv: gitlab-ci: Add clang build tests
 
-Very possible, as according to Yan Zhao this doesn't reproduce on at
-least "Coffee Lake-S". Let me try to grab some random hardware around
-and I'll be back with my observations.
+ .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
+ configure      | 11 ++++++++---
+ riscv/Makefile |  2 +-
+ 3 files changed, 37 insertions(+), 4 deletions(-)
 
 -- 
-Vitaly
+2.46.0
 
 
