@@ -1,122 +1,104 @@
-Return-Path: <kvm+bounces-25735-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25736-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8FE0969DF3
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 14:43:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 968FF969ED0
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 15:15:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC4AD1C2306C
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 12:43:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 393D51F23D6C
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 13:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF031D0940;
-	Tue,  3 Sep 2024 12:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218B51A42C5;
+	Tue,  3 Sep 2024 13:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ep74w+/n"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AFlp+OGL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF4B1DA0E5
-	for <kvm@vger.kernel.org>; Tue,  3 Sep 2024 12:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A0C1878
+	for <kvm@vger.kernel.org>; Tue,  3 Sep 2024 13:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725367338; cv=none; b=JGGZ5Zt63Z2KJX7WqArc3EQ98X1A5Cr2LqJ9q+ohhCrsL8bjst04Lkng6yDrMMLmrD3/XJdZIkqNhqEV56keKAcs3L1EkwUCdtG3mY+G7eHp8J4k9no8LURQVSyn49dhmylf/oNoAhgmda+EhGxHN5rF4VbsYUumgPFcGiRgs1g=
+	t=1725369342; cv=none; b=oQfuPDzATAjdjgS6IWp9N0mk9KMrWicR5Ej/w7LQYO3/zD+JbXZC3ioNzqr9ROrVBGh/Ap2HCBf/PneIahu3AuypHziQm9/9VE0y6Zj3RnfS6/vRZVkcj4j8HMHugagixjO35gfm49GfFU00txtFPdvmqGnJHHnpKogALreobvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725367338; c=relaxed/simple;
-	bh=mw8V5ABVal6H/51A8SV/WT9wsnRiZv8L22RniTuFJIU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rPwhpAxdq4sjL+WcVRyKDvqEFUi9KyzkP0EqvifsN0QzeVzk/uWRSYb0HHmmM0aS8NYeDNwuVdKS1xH1j8FCG2lIpHsWhSnEgc7Zt1FN58FLLvNMAlGFA/PsCUmOoty4fiBy8VOZfOHqt5lJgYxt1cmVwo7/mmoBvpW1ixDc4WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ep74w+/n; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725367335;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QrIEiVhLJ9bUrmnEnLksh9UeyYXSB1B5dyjmrN1LcAo=;
-	b=Ep74w+/ncHP9+mYmjT4oJhbfEg7687yYEz1Ya9sA9qoYS0YD4XJS0vAsD1JUugmMCOlIns
-	Pa1hZYKnayNsRMvCr5jP3bD6hsIcryspKnUG2I3Z4bKE3O8Z6CecmLxcPimdlefxZT8U2Y
-	LJMn/QXQJ4ezjw8P2mZYjUhzvrhK6TM=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-213-xR2mzhz7OsOK-jnYWhVKiQ-1; Tue, 03 Sep 2024 08:42:14 -0400
-X-MC-Unique: xR2mzhz7OsOK-jnYWhVKiQ-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-7d1fe1dd173so4184995a12.0
-        for <kvm@vger.kernel.org>; Tue, 03 Sep 2024 05:42:14 -0700 (PDT)
+	s=arc-20240116; t=1725369342; c=relaxed/simple;
+	bh=ZUpmcNC+Ah7wMmQtuIot59Zbqb3NzhBzCZuS4tF/w4U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BAnxWhxyVu0LpjuZZGAkmBZcjikd0jQZU4bDsSCRENb0mur1Rohr1Lw3cmmBqndMWsO5uS/BvQdNNDdOgGgy7YyBxG4VQtonL6/hIToqS+7ltuKqtA7A5u3cWBhAQPRc0FkuLBLjcqjxzURTZEmRZjBT5SaUPMlK5XE1qh63Tgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AFlp+OGL; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-428e0d18666so45383765e9.3
+        for <kvm@vger.kernel.org>; Tue, 03 Sep 2024 06:15:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725369339; x=1725974139; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N2LD41fBqc4MjqU6fbyBgu4Sh5uUK5vzOa4pB56KxVk=;
+        b=AFlp+OGLcFJw3DZ0+a/S/0fPc0COubMWx115/FX+33rBJap6SXHaT1xSSg8ZeNe3lN
+         IbfpcC3GLvTRyYtih1S1/6MFaiz0ZZamoh8GrJeKQwpIj/pAcs8l1S9BbKK62iUJVNzo
+         kZNyDqXpwEKSqe0Egem9p5UPfzlcw+A0D8XuYHIFXpbFaIcxFcj7Xt1u2UZBHBlpFa6y
+         mTjdJh/PF08Em/sOggOUXsMXCOcm/krLxcq0CGLfJvY90MYaafkLtvr4ed2oW1eaiiM/
+         QmKqDQ57ebxspU5cBzKjG1lEj3HXU936nQpXcv1szsrwNtgMT9KOwrzgErV+j85qYlo4
+         gKPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725367333; x=1725972133;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QrIEiVhLJ9bUrmnEnLksh9UeyYXSB1B5dyjmrN1LcAo=;
-        b=Q5BVzud1xlq+IPb9+y4Xn7ZyjvNmR9NSahXAkO+hwKQwehAoJwWwLfHhhYOeX1fnxi
-         OcR0XNdgWXUgz7sHIKf4v+83iqJidcN96YZ9x3zgHLpwvHCRnE0UdRBl4qP8HshLblC7
-         gik9VcASbI3OGJojiSGKi7eeymXsIMwlSqpuwTQMdMfPUNlM+jbJFpBrs+lFfDPGZwYi
-         KLGUWwzFWdomqlNA/or7SBoxlfNUc6TxIpU7sG2oKeHLgkuxWxoc/SX2mnilm/0okMJ1
-         ZbZwaflLqldDaM/KUV2vOQ/veSnGIMHh3byXHnSHDsqvVRCSWYxnsrJ+mprQUJ7j2v9y
-         uanw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdJqyZgLyie5unbOYye5SZMVw/NwB8MnFvcfrmH7N8oiymtESvSOojtnHhmExBtZFwnOE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIwUFrddMeTVGv14xRt4S1pvA3JvwiconQpVKwC/r/u5tbZ+Z5
-	wfiqg3QuHFB1rpSo60GL8cIkqnR9Kls1TY69dWzEyA7IRzbwUs6VSLKFyLo4IdtMxnq6qExyWjR
-	TpXxaGtd9qtpiaTZTXahIsmq1SzHyIFNc04TVJ0qizensKHL1oA==
-X-Received: by 2002:a17:902:e5c3:b0:205:951b:5636 with SMTP id d9443c01a7336-205951b590fmr39929255ad.47.1725367333556;
-        Tue, 03 Sep 2024 05:42:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFeUiEaFLE5xXFPPRXAqOYMGgp5Lxxy1rmWivLg51XXli2/ChgQ0liP3LPA9T2uchXW0oL+Jw==
-X-Received: by 2002:a17:902:e5c3:b0:205:951b:5636 with SMTP id d9443c01a7336-205951b590fmr39929065ad.47.1725367333140;
-        Tue, 03 Sep 2024 05:42:13 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.207.26])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-20515542350sm80222025ad.213.2024.09.03.05.42.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 05:42:12 -0700 (PDT)
-From: Ani Sinha <anisinha@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>
-Cc: Ani Sinha <anisinha@redhat.com>,
-	kvm@vger.kernel.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 2/2] kvm/i386: do not initialize identity_base variable
-Date: Tue,  3 Sep 2024 18:11:43 +0530
-Message-ID: <20240903124143.39345-3-anisinha@redhat.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240903124143.39345-1-anisinha@redhat.com>
-References: <20240903124143.39345-1-anisinha@redhat.com>
+        d=1e100.net; s=20230601; t=1725369339; x=1725974139;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N2LD41fBqc4MjqU6fbyBgu4Sh5uUK5vzOa4pB56KxVk=;
+        b=WF7Jc165dcSLHyutu/0aky0t64SxSLy/PyYtbFvCvYIDr7ehlALFOVse81LSfjwY9F
+         ZyPKn5jkyFoW5uFYhzQE70MTjZ1ZTquLhU645DUnRgiHcZOGR/U3eT1IcJkmVxhuqRbO
+         oeSzfDSGI3Eib53N7hG8XygaEF78IlnSnPw5P9OHzgLgpfdTqaRJhNhH7QqvT9ZVI0CO
+         ZlyDxHTPjLu8Ali5CkXx/UOzqHPEtN5MDt8VdQcOJm8Yyvfvnamn5wPf4Vy1JTcXIJMe
+         gC7QEmezDBW5pQCXzqXKzYE8or2WULykWaoOrrnekDWYp/uNyB7o2HFULBB264YwZMDG
+         masQ==
+X-Gm-Message-State: AOJu0YysvZMOLooDwL1yK+RZ4LxDiH1FFydMvpXFrhrD7GshpMq6yZLH
+	qq75kgTZ/8BI9NX6jE8iVPWfzK2Ah5ChqRm0VTUVmIbqyrRHO0c3SRgaKbSiCoC2vsAgZqW3MEx
+	6/n0=
+X-Google-Smtp-Source: AGHT+IGJA9jOm8dKh0eYPl6ERpSkZ+8uzbyXP7VqnnhhWI9sureiIzSzpSdlvzmXPs1VAP4TemaKGw==
+X-Received: by 2002:a05:6000:1143:b0:374:d25f:101 with SMTP id ffacd0b85a97d-374d25f0282mr2569257f8f.18.1725369338542;
+        Tue, 03 Sep 2024 06:15:38 -0700 (PDT)
+Received: from [192.168.1.67] ([78.196.4.158])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6df954asm169945835e9.26.2024.09.03.06.15.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Sep 2024 06:15:38 -0700 (PDT)
+Message-ID: <0388418e-ad94-43fa-a375-73cbff27a2e4@linaro.org>
+Date: Tue, 3 Sep 2024 15:15:36 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kvm/i386: refactor kvm_arch_init and split it into
+ smaller functions
+To: Ani Sinha <anisinha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org
+References: <20240903113418.38475-1-anisinha@redhat.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20240903113418.38475-1-anisinha@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-identity_base variable is first initialzied to address 0xfffbc000 and then
-kvm_vm_set_identity_map_addr() overrides this value to address 0xfeffc000.
-The initial address to which the variable was initialized was never used. Clean
-it up.
+On 3/9/24 13:34, Ani Sinha wrote:
+> kvm_arch_init() enables a lot of vm capabilities. Refactor them into separate
+> smaller functions. Energy MSR related operations also moved to its own
+> function. There should be no functional impact.
+> 
+> Signed-off-by: Ani Sinha <anisinha@redhat.com>
+> ---
+>   target/i386/kvm/kvm.c | 337 ++++++++++++++++++++++++++----------------
+>   1 file changed, 211 insertions(+), 126 deletions(-)
 
-Signed-off-by: Ani Sinha <anisinha@redhat.com>
----
- target/i386/kvm/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 574c62c21a..c8face0eeb 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -3187,7 +3187,7 @@ static void kvm_vm_enable_energy_msrs(KVMState *s)
- 
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
--    uint64_t identity_base = 0xfffbc000;
-+    uint64_t identity_base;
-     int ret;
-     struct utsname utsname;
-     Error *local_err = NULL;
--- 
-2.42.0
-
+Nice cleanup, however it would be easier to review as a series
+of dumb "extract FOO function" patches instead of a single one.
+Up to the maintainer.
 
