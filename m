@@ -1,201 +1,158 @@
-Return-Path: <kvm+bounces-25718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6510C969645
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 09:57:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEDD96965E
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 10:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D942285B12
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 07:57:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 085551F24BDA
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 08:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FBF71DAC7D;
-	Tue,  3 Sep 2024 07:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81493200133;
+	Tue,  3 Sep 2024 08:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sUIERxrd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XjQUp6ql"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EB31CE6E9
-	for <kvm@vger.kernel.org>; Tue,  3 Sep 2024 07:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13191AB6C3
+	for <kvm@vger.kernel.org>; Tue,  3 Sep 2024 08:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725350229; cv=none; b=n3XYLi42DTC5CRBPXgyTw0ELhhwakns1i3bpM7wGqT78TjjAY7WOzVZS+eqW/U3y5va480oCkzw4yIrQk6DImlGVUlxQuCI8GM+r5F2WkvroD2jDs7mwAzL085UCRUYaTb1e4fykvgl1m5ud+ulo9mX9l+iwpK2HIxP/HCd0m68=
+	t=1725350421; cv=none; b=ZjMwGeWuzjvfY280SZq0DBkFFn2o7/ZNt/C3+Sf8fPBy0TiE4GL12zRm4m3jnr/+/hPTpibsZWjd+k/WoDB2wBTIDv/XT1HYNnshReldTMXNyc6lX6IXs1qlQ71621IOuvHjdKtzi6G+dPbqH1XV4s0vyNoATBs9T9eVCdmpn8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725350229; c=relaxed/simple;
-	bh=bLFrm8+W36cFU2HdRdXUPsjNB7gq91ms8m5UZQZPs/g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kwLB7ljMkvSmWBn7ObIZ204cCQ4EPhzhTD0dDHlHTdf6nG/EvARa6TMzYNk9DQluFg9Zq5Ib4Yn72Ms6XduPeEo0XpYTdfib1SuZglC/ZSOaH9CRilVZhgev6zI0W1KLONFrlv13lqsDZW42pRJDXHK9CspZwChCvWt3r7NOAP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sUIERxrd; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42ba8928f1dso111315e9.1
-        for <kvm@vger.kernel.org>; Tue, 03 Sep 2024 00:57:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725350226; x=1725955026; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EpqgvHYsrTqtiBbD2gubTtjEbMzyUsaQNI2kDwROGw4=;
-        b=sUIERxrdziVbJN/kLzKKsm7V+lUrKiVu8EtUePN+WWhHCYVfFUOpIBcMhI0o3QdDCk
-         Cr1VAgcuiUNroaLvjMrLMXvzvJ0Mz5BuyQtNF2ur1iQz3Cs1HXopYJ5nfDLUvsr06GxX
-         4h1fjT53u13KxTkEP7A6gy6ipR5UyTCEV+8txfirXJ6N4eaRz+ufheGgWbVI+Qfozgu1
-         tIgGc4dwm1WRv1YEvvRXLJxulepCyV7kRj1GOE71SapGxNI1xObA/uLHIN+Z0AsAz84m
-         2fZ/g81E5feDe3pNpy+B3cBSK3gIMDH/UlK5KjACCrgMkF65Ghldz3lbjw6WNNBuJXa4
-         J6xA==
+	s=arc-20240116; t=1725350421; c=relaxed/simple;
+	bh=X/ybF8of5ZWw6NonSsxmmRBddtuOKe/CozbIFrk9nTE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JcuwyYZwpKa8b7Vz6D3aftrbqDFzoUy/FK6o7uh2I8Olw4+3qvoN4D1h6MWUSWaQVkYj/n4IIeHdyRfJG3gjU/bYF6hZrTU1hD2ejuSCeqyiufibDCJRmZ4c22bo5RVoJP+BndKGP5gB0yktp6kfssvLZns3Roc3za2EUCP1QtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XjQUp6ql; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725350418;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=g9gMF5nZosX4YpZl1BMI7RIZtJmjwIKTODTm+IlxJgU=;
+	b=XjQUp6qlmNFX2BnDUjDJks+RLlE9RPFD6CU4dmerU/HbY41Ip3VHRFXIG9bJyP4di9S+6/
+	yVvGi2vup2bap+eJGy/yF+RZAFf3DqwIbiDFiQSSjM9jEZVsvpFaBCIqEXJgwlX91N0K6q
+	jOHDYvt2+fkeIa1FZnk0q5U1CMH2hog=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-517-TRCzLp2PNMqfTgp5E0T6Uw-1; Tue, 03 Sep 2024 04:00:17 -0400
+X-MC-Unique: TRCzLp2PNMqfTgp5E0T6Uw-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2d8b7c662ccso2613213a91.0
+        for <kvm@vger.kernel.org>; Tue, 03 Sep 2024 01:00:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725350226; x=1725955026;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EpqgvHYsrTqtiBbD2gubTtjEbMzyUsaQNI2kDwROGw4=;
-        b=D8dKKBoaZcqIrhVb7NIvCrzRmudh2etoCWCvRRSjqWCouCyH6UWKW5UcHVG1tchRcR
-         9QLx5KN/7wGLu/90eclYp7IGUz3/8Am8UMlvEdEmM+H2puGxboIqi8Y9JUKUEln4Rq+0
-         r1b1wcSee4r5p8j+ek7gTu55/I2faps7QKwTbE695yFR3hCsg9Xylk+cFZrVbkY6HFX0
-         mh6jM8JGp+DxkHlwdbVMv1LIj0GqETUJnSg2ze/IWBcdSu7gbnkYohmwhIbV3fzRVixa
-         6d8Lq3JE+9UpzXZGr5GPIO2++0Y9HocodgCx3QnJRVTqPt5kwKLU+aeaANxfHSiKDl2I
-         EA/w==
-X-Forwarded-Encrypted: i=1; AJvYcCX8ApTwK7JGLmEJr+AWkwJCHslwvabpVibIhWhnBQKXsnbmTELL+RF1J+8t7xjdqe9cSss=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3TSB4753gQiJANAs2lrEHIvJe9c+o9wEBCB1T/uGPrk9wZrrN
-	3Pin6YbC6jDO7urZnSvN6pFl8B9FwBJPWk/H+tEQ3gIKZzaOHTbOoUNbXPliGA==
-X-Google-Smtp-Source: AGHT+IHgA6nmHG1PnRdTR7J4T9ZeBV+88BPig2e5l9HlhMUvcfgRj5uIoCkj4peI2Tcgr2az2ArssQ==
-X-Received: by 2002:a05:600c:1d9f:b0:428:e6eb:1340 with SMTP id 5b1f17b1804b1-42c33a5fb71mr3188345e9.4.1725350225593;
-        Tue, 03 Sep 2024 00:57:05 -0700 (PDT)
-Received: from google.com (109.36.187.35.bc.googleusercontent.com. [35.187.36.109])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb5969234sm165927345e9.17.2024.09.03.00.57.04
+        d=1e100.net; s=20230601; t=1725350415; x=1725955215;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g9gMF5nZosX4YpZl1BMI7RIZtJmjwIKTODTm+IlxJgU=;
+        b=EMhN9Nxcoygf1PLuO3GoElfPWQTLtdSYArQ1bkOm/c0ww8lx3z9mW+BUb0g/5mOqgp
+         D67y74FpItnS0QFFVlft1EA8GY8IHwydxme3bXezzGyG0gTZ2rvTaUpasb+5mh1YjLm5
+         +pFdEulGceSRBARuhGJVn3dxiEnPG4VgYn2YHhn3NK5vEzUC2gTdf8XWFd2K2SOZX1dv
+         WYXDYi0W7t324/73VlOzEjFBIq6yNNj1ZMd1AKIDr2STjXj7gOHvyjoDOWeVJRZuk5ON
+         6HEc7iPRSYss54jPKhSScxyOQh2SBsZg1VEb6vG5XfWAOKkEhGhwY3uuP37fe+BZFRdm
+         m+CA==
+X-Forwarded-Encrypted: i=1; AJvYcCXv/5p0LxdobgsuFgN7ujA5SE5wBhrDSUWGSR9eo4MdXfgWW2msvdz8rJNuisGvjjA1XoU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJDKm3hvVe0GJl3JLHS1HJ5D0ap2J9cnPtugxKDYziHv/9TPgl
+	hZJKCCn5A3bdw+YzhvZuva2zk3GGP+ms1kJzkSaWGcCDyFGrqGJAZIv8pIpKu7FO7tao9/p29LR
+	HhsN2QRvOPiO1XO5WwY7fN2eKN8p82cZO/vT0WXK6LuOrW16BaTIUyXkpAAE5
+X-Received: by 2002:a17:90a:1c17:b0:2c9:6f06:8005 with SMTP id 98e67ed59e1d1-2d856383fdemr18245907a91.26.1725350415409;
+        Tue, 03 Sep 2024 01:00:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFgp3jyb0JRyqdYlU153uTlOouysm2/8u5v4zt+2XiMXPK739+XzYYL6QlH7ASSM6+7XmH0JA==
+X-Received: by 2002:a17:90a:1c17:b0:2c9:6f06:8005 with SMTP id 98e67ed59e1d1-2d856383fdemr18245877a91.26.1725350415002;
+        Tue, 03 Sep 2024 01:00:15 -0700 (PDT)
+Received: from localhost.localdomain ([115.96.207.26])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2d8edadf788sm2998821a91.15.2024.09.03.01.00.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 00:57:05 -0700 (PDT)
-Date: Tue, 3 Sep 2024 07:57:01 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>,
-	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
-	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Robert Moore <robert.moore@intel.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Moritz Fischer <mdf@kernel.org>,
-	Michael Shavit <mshavit@google.com>,
-	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH v2 2/8] iommu/arm-smmu-v3: Use S2FWB when available
-Message-ID: <ZtbBTX96OWdONhaQ@google.com>
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <2-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <ZtHhdj6RAKACBCUG@google.com>
- <20240830164019.GU3773488@nvidia.com>
- <ZtWFkR0eSRM4ogJL@google.com>
- <20240903000546.GD3773488@nvidia.com>
+        Tue, 03 Sep 2024 01:00:14 -0700 (PDT)
+From: Ani Sinha <anisinha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Ani Sinha <anisinha@redhat.com>,
+	kvm@vger.kernel.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2] kvm/i386: fix return values of is_host_cpu_intel()
+Date: Tue,  3 Sep 2024 13:30:04 +0530
+Message-ID: <20240903080004.33746-1-anisinha@redhat.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240903000546.GD3773488@nvidia.com>
 
-On Mon, Sep 02, 2024 at 09:05:46PM -0300, Jason Gunthorpe wrote:
-> On Mon, Sep 02, 2024 at 09:29:53AM +0000, Mostafa Saleh wrote:
-> > On Fri, Aug 30, 2024 at 01:40:19PM -0300, Jason Gunthorpe wrote:
-> > > On Fri, Aug 30, 2024 at 03:12:54PM +0000, Mostafa Saleh wrote:
-> > > > > +	/*
-> > > > > +	 * If for some reason the HW does not support DMA coherency then using
-> > > > > +	 * S2FWB won't work. This will also disable nesting support.
-> > > > > +	 */
-> > > > > +	if (FIELD_GET(IDR3_FWB, reg) &&
-> > > > > +	    (smmu->features & ARM_SMMU_FEAT_COHERENCY))
-> > > > > +		smmu->features |= ARM_SMMU_FEAT_S2FWB;
-> > > > I think that’s for the SMMU coherency which in theory is not related to the
-> > > > master which FWB overrides, so this check is not correct.
-> > > 
-> > > Yes, I agree, in theory.
-> > > 
-> > > However the driver today already links them together:
-> > > 
-> > > 	case IOMMU_CAP_CACHE_COHERENCY:
-> > > 		/* Assume that a coherent TCU implies coherent TBUs */
-> > > 		return master->smmu->features & ARM_SMMU_FEAT_COHERENCY;
-> > > 
-> > > So this hunk was a continuation of that design.
-> > > 
-> > > > What I meant in the previous thread that we should set FWB only for coherent
-> > > > masters as (in attach s2):
-> > > > 	if (smmu->features & ARM_SMMU_FEAT_S2FWB && dev_is_dma_coherent(master->dev)
-> > > > 		// set S2FWB in STE
-> > > 
-> > > I think as I explained in that thread, it is not really correct
-> > > either. There is no reason to block using S2FWB for non-coherent
-> > > masters that are not used with VFIO. The page table will still place
-> > > the correct memattr according to the IOMMU_CACHE flag, S2FWB just
-> > > slightly changes the encoding.
-> > 
-> > It’s not just the encoding that changes, as
-> > - Without FWB, stage-2 combine attributes
-> > - While with FWB, it overrides them.
-> 
-> You mean there is some incomming attribute in the transaction
-> (obviously not talking PCI here) and S2FWB combines with that?
+is_host_cpu_intel() should return TRUE if the host cpu in Intel based, otherwise
+it should return FALSE. Currently, it returns zero (FALSE) when the host CPU
+is INTEL and non-zero otherwise. Fix the function so that it agrees more with
+the semantics. Adjust the calling logic accordingly. RAPL needs Intel host cpus.
+If the host CPU is not Intel baseed, we should report error.
 
-Yes, stuff as cacheability (as defined by Arm spec)
-I am not sure about PCI, but according to the spec:
-	“PCIe does not contain memory type attributes, and each transaction
-	takes a system-defined memory type when it progresses into the system”
+Signed-off-by: Ani Sinha <anisinha@redhat.com>
+---
+ target/i386/kvm/kvm.c         | 2 +-
+ target/i386/kvm/vmsr_energy.c | 4 ++--
+ target/i386/kvm/vmsr_energy.h | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+ 
+changelog:
+v2: fix comparison logic in is_host_cpu_intel so that it returns
+boolean TRUE for Intel host CPU and false otherwise.
 
-> 
-> > So a cacheable mapping in stage-2 can lead to a non-cacheable
-> > (or with different cachableitiy attributes) transaction based on the
-> > input. I am not sure though if there is such case in the kernel.
-> 
-> If the kernel supplies IOMMU_CACHE then the kernel also skips all the
-> cache flushing. So it would be a functional problem if combining was
-> causing a non-cachable access through a IOMMU_CACHE S2 already. The
-> DMA API would fail if that was the case.
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 11c7619bfd..503e8d956e 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -2898,7 +2898,7 @@ static int kvm_msr_energy_thread_init(KVMState *s, MachineState *ms)
+      * 1. Host cpu must be Intel cpu
+      * 2. RAPL must be enabled on the Host
+      */
+-    if (is_host_cpu_intel()) {
++    if (!is_host_cpu_intel()) {
+         error_report("The RAPL feature can only be enabled on hosts\
+                       with Intel CPU models");
+         ret = 1;
+diff --git a/target/i386/kvm/vmsr_energy.c b/target/i386/kvm/vmsr_energy.c
+index 7e064c5aef..ce7eecb02d 100644
+--- a/target/i386/kvm/vmsr_energy.c
++++ b/target/i386/kvm/vmsr_energy.c
+@@ -27,14 +27,14 @@ char *vmsr_compute_default_paths(void)
+     return g_build_filename(state, "run", "qemu-vmsr-helper.sock", NULL);
+ }
+ 
+-bool is_host_cpu_intel(void)
++gboolean is_host_cpu_intel(void)
+ {
+     int family, model, stepping;
+     char vendor[CPUID_VENDOR_SZ + 1];
+ 
+     host_cpu_vendor_fms(vendor, &family, &model, &stepping);
+ 
+-    return strcmp(vendor, CPUID_VENDOR_INTEL);
++    return g_str_equal(vendor, CPUID_VENDOR_INTEL);
+ }
+ 
+ int is_rapl_enabled(void)
+diff --git a/target/i386/kvm/vmsr_energy.h b/target/i386/kvm/vmsr_energy.h
+index 16cc1f4814..97045986b7 100644
+--- a/target/i386/kvm/vmsr_energy.h
++++ b/target/i386/kvm/vmsr_energy.h
+@@ -94,6 +94,6 @@ double vmsr_get_ratio(uint64_t e_delta,
+                       unsigned long long delta_ticks,
+                       unsigned int maxticks);
+ void vmsr_init_topo_info(X86CPUTopoInfo *topo_info, const MachineState *ms);
+-bool is_host_cpu_intel(void);
++gboolean is_host_cpu_intel(void);
+ int is_rapl_enabled(void);
+ #endif /* VMSR_ENERGY_H */
+-- 
+2.42.0
 
-Correct, but it’s not just about cacheable/non-cacheable, as I mentioned
-it’s about other attributes also, this is a very niche case, and again I
-am not sure if there are devices affected in the kernel, but I just
-wanted to highlight it’s not just a different encoding for stage-2.
-
-> 
-> > > If anything should be changed then it would be the above
-> > > IOMMU_CAP_CACHE_COHERENCY test, and I don't know if
-> > > dev_is_dma_coherent() would be correct there, or if it should do some
-> > > ACPI inspection or what.
-> > 
-> > I agree, I believe that this assumption is not accurate, I am not sure
-> > what is the right approach here, but in concept I think we shouldn’t
-> > enable FWB for non-coherent devices (using dev_is_dma_coherent() or
-> > other check)
-> 
-> The DMA API requires that the cachability rules it sets via
-> IOMMU_CACHE are followed. In this way the stricter behavior of S2FWB
-> is a benefit, not a draw back.
-> 
-> I'm still not seeing a problm here??
-
-Basically, I believe we shouldn’t set FWB blindly just because it’s supported,
-I don’t see how it’s useful for stage-2 only domains.
-
-And I believe making assumptions about VFIO (which actually is not correctly
-enforced at the moment) is fragile, and we should only set FWB for coherent
-devices in nested setup only where the VMM(or hypervisor) knows better than
-the VM.
-
-Thanks,
-Mostafa
-
-> 
-> Jason
 
