@@ -1,115 +1,110 @@
-Return-Path: <kvm+bounces-25702-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25703-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A612969331
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 07:23:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A56F4969339
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 07:34:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A2AB1C21748
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 05:23:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DEE21F21CE0
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 05:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409AC1CE713;
-	Tue,  3 Sep 2024 05:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F56D1CE71A;
+	Tue,  3 Sep 2024 05:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AaqTYWK2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b+GP7t8e"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E0D195;
-	Tue,  3 Sep 2024 05:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C194CA32;
+	Tue,  3 Sep 2024 05:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725341022; cv=none; b=TW2a9pFHKBEJ62Ez7HwB9udLXkZSOgyv0BwBRyAAkOV2cQab82CJ2nvxUdQDsSr+mQTmyHVClBSrLM4PkzRqqVl6bl491ZSaxr4f/Aq8SmpIw3JK5VJ8wzmCx7rdmEKuUpwcsdugXVRIVnSYpPZ/I+HJHBICbU8qisfQeB1UrYI=
+	t=1725341680; cv=none; b=Y4ejy2MvtKE4RoiuuuwubJy2IyB+uahdMV7TGvU2BHYGCm5WGUWOkWHEQic3YWq/CM6VZyWDHI9jzM9a6jXQz/qGeOU0OgdUNCcdpZWMcqts8jboBlY/0ILM/9sBWWgSXrno7iwIuXWpbCBoYb2Ii5sEKlVxrWe9/IwZwoBF704=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725341022; c=relaxed/simple;
-	bh=atI1igT+Vz8ssCWz+Rt5jVIJeGElv6cm0euSN7lJGCE=;
+	s=arc-20240116; t=1725341680; c=relaxed/simple;
+	bh=c8KcBxPELnVU1lz0D5LCPWKXq/fZGhu7ld+hoWo1ZXo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PfVTLP6C0Sa0zm0Oyg075mI8ukvULRcRjRBtxmRS8ykvvBiCP3iSyeACFQJqQCocqZEcmbzDzhM3i61Yt7WmRuaQtgRm5eAG1gkuszOwcKZvEZmEUv3zKeQ/hQdELfx/pEdnfGlw5LJq44cgil0fomKPZ0kGo/v2KH4lsXJTjLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AaqTYWK2; arc=none smtp.client-ip=198.175.65.12
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yn5S9oMyM/XIEHEPlYHb2u2uKQka2jnLyAxumBC0MHccmlsTsL/UnxwlRpTsEjhvMPELEmcMn5ZvqIj/dxb8Yvef1x82dddr0EWWmD5Xhz9DHeWhAMCA3yl3u4/Djp6tNzUcNFSKsUFhxo0sj29sC4Sa7ikVHD4oROPzEjBkLB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b+GP7t8e; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725341021; x=1756877021;
+  t=1725341679; x=1756877679;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=atI1igT+Vz8ssCWz+Rt5jVIJeGElv6cm0euSN7lJGCE=;
-  b=AaqTYWK2WabW7r2mYaLqdmL6nBmrqP/szM3JGqQ7E+QXfsOh+6b/65NE
-   53zjJXg+tybLEsbTRtaJ2go4eROZuFkB2tH8GLYIt/gULxnOv35F1BYe2
-   epnCXifwqBYhsMnEWGjqHN/lotXeL2WsxMRe/pye6j6KBXanDV3Fw9guX
-   10mNz+PwRmaLqB6SUwhss3FRu6qK+sPmguHRJTT3BdlcJmECMUD/LCLdH
-   wcCPu2v58shEMJsdPWZl5duO9zX5yU3tljsw+4Am+uuNE9f6lFvH2XjwK
-   HrLNhdLFuOwY5sj0E58qFnGHdjr0wZvkljcIV4wYKG0F8URFxriptYuRi
-   w==;
-X-CSE-ConnectionGUID: B+fqAOn5SHuJwyhheU7iLw==
-X-CSE-MsgGUID: EiAN1Jv4RlyvV3uUXa015Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11183"; a="35285732"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=c8KcBxPELnVU1lz0D5LCPWKXq/fZGhu7ld+hoWo1ZXo=;
+  b=b+GP7t8eBHUOSIXkZt3gwLTAki3zP3q2MsGw2wfBEh/64TdoODX/06FE
+   iFcbNha76+oJscqu//x1EeCrK5hn2QBnhnA6RgOg5l8ifCu0/+PcKGuz5
+   rxl1xbCrwyWVHVf0XlvmXyDPAxEXcLPVpcIeF2IPgPxL8Hz7PgGsgqj7U
+   FqEX6aqezBTMOZ25W1QW1GYxvZ5NzGlwrcP6339+S7KqPFe1H4SX8gfGo
+   oQOiYFfF2UdHK5iiJgE37yLldQeam/mrRISOjSL9bY8e54T+9oqW/oajp
+   ZWPq/R0Aqgnv7FP9FiI9kUJ0p9j7XokxQ2YmfdJZkpBKjOJHGHS7k+VzR
+   g==;
+X-CSE-ConnectionGUID: JPPahUtFSpeyK3KHr2N8zg==
+X-CSE-MsgGUID: lsfrBdK+SPqtnbFRT0EwcQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11183"; a="34487650"
 X-IronPort-AV: E=Sophos;i="6.10,197,1719903600"; 
-   d="scan'208";a="35285732"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 22:23:40 -0700
-X-CSE-ConnectionGUID: VXb1BOb7R++KIuWagky1bA==
-X-CSE-MsgGUID: B8d/sKaHTUmmcJongjftYA==
+   d="scan'208";a="34487650"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 22:34:35 -0700
+X-CSE-ConnectionGUID: apwivu79Tkq5kOy45tn23w==
+X-CSE-MsgGUID: RErpYkIaTYWpzimcLkBq3A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,197,1719903600"; 
-   d="scan'208";a="64823159"
+   d="scan'208";a="69648032"
 Received: from cpetruta-mobl1.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.115])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 22:23:35 -0700
-Date: Tue, 3 Sep 2024 08:23:29 +0300
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 22:34:31 -0700
+Date: Tue, 3 Sep 2024 08:34:24 +0300
 From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Yuan Yao <yuan.yao@linux.intel.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
-	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
-	isaku.yamahata@gmail.com, xiaoyao.li@intel.com,
-	linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Sean Christopherson <sean.j.christopherson@intel.com>,
-	Nikolay Borisov <nik.borisov@suse.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Li, Xiaoyao" <xiaoyao.li@intel.com>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+	"Huang, Kai" <kai.huang@intel.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH 18/25] KVM: TDX: Do TDX specific vcpu initialization
-Message-ID: <ZtadUapr1rU_kwqV@tlindgre-MOBL1>
+Message-ID: <Ztaf4PbPNxeMIg7J@tlindgre-MOBL1>
 References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
  <20240812224820.34826-19-rick.p.edgecombe@intel.com>
- <20240813080009.zowu3woyffwlyazu@yy-desk-7060>
+ <bb67e7315b443ad2f1cf0b0687c3412b9224122b.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240813080009.zowu3woyffwlyazu@yy-desk-7060>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bb67e7315b443ad2f1cf0b0687c3412b9224122b.camel@intel.com>
 
-On Tue, Aug 13, 2024 at 04:00:09PM +0800, Yuan Yao wrote:
-> On Mon, Aug 12, 2024 at 03:48:13PM -0700, Rick Edgecombe wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > @@ -293,6 +303,15 @@ static inline u8 tdx_sysinfo_nr_tdcs_pages(void)
-> >  	return tdx_sysinfo->td_ctrl.tdcs_base_size / PAGE_SIZE;
-> >  }
-> >
-> > +static inline u8 tdx_sysinfo_nr_tdcx_pages(void)
+On Wed, Aug 28, 2024 at 02:34:21PM +0000, Edgecombe, Rick P wrote:
+> On Mon, 2024-08-12 at 15:48 -0700, Rick Edgecombe wrote:
+> > +static inline bool is_td_vcpu_created(struct vcpu_tdx *tdx)
+> > +{
+> > +       return tdx->td_vcpu_created;
+> > +}
 > 
-> tdx_sysinfo_nr_tdcx_pages() is very similar to
-> tdx_sysinfo_nr_tdcs_pages() which is introduced in patch 13.
-> 
-> It's easy to use either of them in wrong place and hard to
-> review, these 2 functions have same signature so compiler
-> has no way to prevent us from using them incorrectly.
-> TDX 1.5 spec defines these additional pages for TD and vCPU to
-> "TDCX" pages, so how about we name them like:
-> 
-> u8 tdx_sysinfo_nr_td_tdcx_pages(void);
-> u8 tdx_sysinfo_nr_vcpu_tdcx_pages(void);
-> 
-> Above name matchs spec more, and easy to distinguish and review.
+> This and is_td_finalized() seem like unneeded helpers. The field name is clear
+> enough.
 
-Good idea to clarify the naming. For patch 13/25, Nikolay suggested
-precalculating the values and dropping the helpers. So we could have
-kvm_tdx->nr_td_tdcx_pages and kvm_tdx->nr_vcpu_tdcx_pages following
-your naming suggestion.
+I'll do a patch for this.
+
+> >  static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
+> >  {
+> >         return kvm_tdx->tdr_pa;
+> 
+> Not this one though, the helper makes the caller code clearer.
+
+Yes this makes things more readable.
 
 Regards,
 
