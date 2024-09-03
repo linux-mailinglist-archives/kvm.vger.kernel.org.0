@@ -1,81 +1,98 @@
-Return-Path: <kvm+bounces-25799-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25800-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A2E96AC91
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 00:59:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0241396ACE9
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 01:33:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 747CB1C2478C
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 22:59:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 272211C2424D
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 23:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1B41D5CC6;
-	Tue,  3 Sep 2024 22:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC1A1D7986;
+	Tue,  3 Sep 2024 23:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1Gtyrltt"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rFi2cF7r"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2052.outbound.protection.outlook.com [40.107.237.52])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2046.outbound.protection.outlook.com [40.107.237.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C78126BE8;
-	Tue,  3 Sep 2024 22:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFD61B12FA;
+	Tue,  3 Sep 2024 23:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725404332; cv=fail; b=eWfDcjhUXMpRDO5P1H60Jghy6RWDxeyS2vQcFu0MH3/54h0qspoOfvIKEZq+gUp+R+M5yomPEoxvy5LxzYv6iZ1KmzR7Np9+7QDYx4vwfH3qpH3gTSiTFUnZMALmTBChXxpcKbvNMJvbTA84ZEK4mwGBdnFXt4HfRJ06cCciLaw=
+	t=1725406427; cv=fail; b=pyo2RbXnCfRpSLPUtT/KvnwjvsZl65iQOMU55rXcGGS7ZCFV011m4SaaXzKH4BFs9EBgnA9ChVQ1vJ10z1uydM5WJ9c8kym9YFJbBQTDOxrr/Q0IqyLo8xGGD2crHPxqevL8gwIaSZV9EzsX2EmvGmU2HrGV6JtnN+rv3ysSSqs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725404332; c=relaxed/simple;
-	bh=vGB1gawiEcnkl3hQgVNZp49ifnkCdaOZy0La8ar4V5w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CYy+0W3EzQ9B7TP9zxczJk2N9dIphtbjjUufajE6gvOnDXM5Axfiy8HCI6gKplZcpKZiOEQ9TSh6ucxdcX9QsZx2eHyFS9muI03KgRcjcE2VAYF9tPvjgwDKfNlOwsU1Illiv5Cfkzu8U/7VtShxAfL3ZCAM8IvGlz2GqIw+ogo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1Gtyrltt; arc=fail smtp.client-ip=40.107.237.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1725406427; c=relaxed/simple;
+	bh=nuDJ9tendgPYTg1DcMnXoJTHRXoysmbYb+yCD3pM3dQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ALbvmen5xpisN+dMGtEtrgNPbUQk155HVM35q3a5WUVlaCw33arNXS5FTNKwBI63+N827tk3GqQSb4XwlAH+SgAR9VpoDFR2xh5nbIoACX6LDV6UyVH+VHrON8GMbMoPcPS14Ee5wxoLCSRvwhQuFDYAXcFbWvToyZZIOE8hDy0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rFi2cF7r; arc=fail smtp.client-ip=40.107.237.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YnndKO18zx+gbR89KVyb9P0Y+T7n+ghEa5C/uLD1P4vwpr3BBL/YM3xO2rcYqAXQxUvhanNUvKpKtD9joU1QZ7GTdxIS9GAvOfmkFI4QFarYx+pQ+kc0DeykPYG0yz5AhAU3Xz8r1p6hTSe7QEUXLZ/Z83PPWigwOGwEx7LdTTDKU4BZNuRyQ8JzqUUcn2ovmqzCPHHmceQFy5bPOG6mYqQ5fdNrcPxjr82Bzb2ugsmAOjCdT7KYGIDA+EPoxgVIExYCsRAXL+1FDVmmlT/mvIDhtxVJxXVDnP9q6Hvw4g2tQesmr91tJ3D85kBy6P3iBqxE+rQ2NIh6MfD9sTS/rA==
+ b=R+EmyrgK/EuG6cYrZbJNtO8LKTif/QsZJuSxMsoH935id0Bj/H+ZZrww3O28aW87HR3pPPOGjy+0Tau7i9RT95PAMAIX21K2xY1qPBYxcCzuLGL50gfNRNIXNykorG62ttGmosgUKaPdbcYwSbNE0MEbj4RKCwVnQOjuHgcb86ujudXfaPstJ9JXIyofEjwXBYwjah/ERqdIoevEQUCgPO+4frL9Q5AekkuXbbKwYTOPNRDOj+NRY7Iqv1KiYHQPIWaFDbKQU4r8h5AqT/55inzJNQADaBH4L28nZYoKUzIppJ2JKL+WY/6r6em12LHJ+y8j3Vvp7tSLqE7WA2sSqw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oiA516XHq8NEIpYKYb2pw92MONMjL1AihOluMb5ho+E=;
- b=lQHI9POcV2uZ7DxQr2+PsPB+gcjasZXNkxjoAkb4mjpsQvJr/oK8fZaq2cThQfFj5MYatDTVb2ugiq5Q77FJJm5YbIBT3hcUKQql5bBL0XcpV8rx+Oanf+yfsCiptYxiHSbp33smoFAUwEWu5LYWx69m1+3h6B/i8yR52yvsE2TcDB48rKYHuGoQ0f+1coUT8Hi04/CH+TmuIiPVQW8ldUTrDxVYWWFZjJMlUsWr4ncDDavCNhxwYGrerMwcVaka+4u/J8HaHZxjjWgUVxiZUULC916Q+pQcQ+TqzDzFvxmC4qNSuAE0QXKsarCuugOQ+x56redmyZgcn/7NfVkrfw==
+ bh=Mmrwcrix7gx3anfAClcD6u4mliCdf+qdQoemNeIQY5c=;
+ b=dqg8HUWet75FjkdOc/M9WzLlohpfPfILOkHzeobQd1ZCNnTXIOJkPPsGRNB7DhVCRziDyqEyznEqYC2T59JAaM6Ou7bHOlhRkF9TwRYN9z4slRezauYjrBIlpa5whIS0h626WTmDc7uFAszOjxU59Qqk+66CGzBxBLcqiiK85vE02haLJZt7gqKoLXVPTuq19yzO1acDASZA72Iq3xkk0Eh9pyyvFPgbwPTDCVTZJ9say3k2aV0LYD6KYc/ID0+Sdvfjh9EdbwaP5ExWzSkg3apIdnDIIngLbodT/m02krWX3iICwHx6yoIsQNEU2XEzAHkSY0fU9CShNW2bq8s3Mw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oiA516XHq8NEIpYKYb2pw92MONMjL1AihOluMb5ho+E=;
- b=1GtyrlttgZcMjSfI5y66L4MAeZ0azt2w1oI0h3xw0KlkWn8GfEZBjIIZApLyGX9PIkJ4EO2acNSK44AoTCoD2Z+KszZzr7pSSRUt92dxnwHHDWzrTbB3aHE1HWWGje21CKfGLzLYqV+zQ8ELCRW0zEekdND/a4LezoXtwRAQK0c=
+ bh=Mmrwcrix7gx3anfAClcD6u4mliCdf+qdQoemNeIQY5c=;
+ b=rFi2cF7rASBaSVBKwIRt+MuPauBa7XUgdC1WKg2w3SmZK4G+qCtuHJYRxbkibKu+A+wuSRV0Cl0YZiFeg52tIiJW05P5AFg0fTPv0x0Jt0fue9LCmwdYJewyYcFLLcegZ8+iUY1G7tRj7jEqRIZ1DtA+WvwZ8jbwR82TCVkyuZCoL+nWeNzZhdQXWz/12k5LVQgOh2++xAQwXXvCf5lW2wVIK4TIQ1WEp4tEXTTTa+Rp6AUtrWaW8md7gkbF9PuT2ksVYFrP9hfn2Sd5Ku5xYh/7iofG8zn/mBMbmf3g0cHx5uhiID22DESePemnWqxU4y4Vz2L9Ag9IxVH1A3COYQ==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
- by CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
+ by PH8PR12MB6938.namprd12.prod.outlook.com (2603:10b6:510:1bd::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.23; Tue, 3 Sep
- 2024 22:58:47 +0000
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::954d:ca3a:4eac:213f]) by PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::954d:ca3a:4eac:213f%3]) with mapi id 15.20.7918.024; Tue, 3 Sep 2024
- 22:58:46 +0000
-Message-ID: <fbde9567-d235-459b-a80b-b2dbaf9d1acb@amd.com>
-Date: Tue, 3 Sep 2024 17:58:44 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] x86/sev: Fix host kdump support for SNP
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, dave.hansen@linux.intel.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
- peterz@infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- thomas.lendacky@amd.com, michael.roth@amd.com, kexec@lists.infradead.org,
- linux-coco@lists.linux.dev
-References: <20240903191033.28365-1-Ashish.Kalra@amd.com>
- <ZtdpDwT8S_llR9Zn@google.com>
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <ZtdpDwT8S_llR9Zn@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0211.namprd04.prod.outlook.com
- (2603:10b6:806:127::6) To PH7PR12MB9066.namprd12.prod.outlook.com
- (2603:10b6:510:1f6::5)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27; Tue, 3 Sep
+ 2024 23:33:42 +0000
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7918.024; Tue, 3 Sep 2024
+ 23:33:42 +0000
+Date: Tue, 3 Sep 2024 20:33:40 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>,
+	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Moritz Fischer <mdf@kernel.org>,
+	Michael Shavit <mshavit@google.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v2 2/8] iommu/arm-smmu-v3: Use S2FWB when available
+Message-ID: <20240903233340.GH3773488@nvidia.com>
+References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ <2-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ <ZtHhdj6RAKACBCUG@google.com>
+ <20240830164019.GU3773488@nvidia.com>
+ <ZtWFkR0eSRM4ogJL@google.com>
+ <20240903000546.GD3773488@nvidia.com>
+ <ZtbBTX96OWdONhaQ@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZtbBTX96OWdONhaQ@google.com>
+X-ClientProxiedBy: BN9PR03CA0800.namprd03.prod.outlook.com
+ (2603:10b6:408:13f::25) To CH3PR12MB7763.namprd12.prod.outlook.com
+ (2603:10b6:610:145::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,361 +100,128 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|CH2PR12MB4133:EE_
-X-MS-Office365-Filtering-Correlation-Id: 135a9c13-cb1f-4766-6fe5-08dccc6bf76d
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|PH8PR12MB6938:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4b385402-1620-4702-92c0-08dccc70d869
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cy8vSHpPck13eGdtRWlxNi9NN3FjSUl6OThqM3lZMFAwRG1VRG9pY0dxNUFM?=
- =?utf-8?B?TEM2ajBiN0lpSElhSWZVc2psNzdhaVp3KytOS1VTQytadENkcElhUEVUTE9Z?=
- =?utf-8?B?dXlLN05LTTZrTjF5QjFlQWVtR3phWW5SZmlvaHh3UlFVUTdBclo1ZlpEOGI1?=
- =?utf-8?B?dnpVVG9ickpTRUF4RXJmNkRJSUMwcEYwRHBib3ZMSkZ1NXNuTzgrclpQYzhx?=
- =?utf-8?B?ajE3ZWxWYmI2NFZ6THpoWWtQZWczSUhVaW1Mb21wdVpOakhWVEZKVEhuUXU0?=
- =?utf-8?B?akhQeTVINytjVVJaemJYWExxWWQrOTJJdnUvVlNOQlpaNGVGZm1CeHF6OHpG?=
- =?utf-8?B?ZjNxZWh4N1E3YnRDeDZGcUpTVHNDSHhsNzNIVWpqZUszaW9iL09mYklUQmly?=
- =?utf-8?B?Tlk1VmY3MXdTNE1TWko4MXlCcE94UmpBcU41UHBPZkVGa0lOZmpKU09kSUFC?=
- =?utf-8?B?Um5HRW1ES3BVb1JLRUJKUWxUZWc1NnRNK3JucUV3bG1zL2NRSVRlcDVsRUR2?=
- =?utf-8?B?bG1Oc1NHWmlFdDNhVm9PWHIzRExlNkNkRjIxcEJEK0h5QTliNXVGSElaYWpG?=
- =?utf-8?B?Q0JFV0RJcUpuK2Z6S29NcEdabU1LT081Zy84bXp4SFFwaFoyVHQrL0thcmhw?=
- =?utf-8?B?SGxLVXVzQUNOc1JaVHdkRFZsbjcremQ0NnExcHR3QUJ3WFUzdVhOalRzNGpl?=
- =?utf-8?B?RGRDdkhZRWxzNDV3a28wcnFzV1ZQeGlTMkhtQ2R2LzBoaWtQS3UwVDNSTkdD?=
- =?utf-8?B?STJnVnlJRVdWU29LYk11eVZTdUVWb2VkcFY5TUI1ekFGNmtLMFFrZFZ3VXBK?=
- =?utf-8?B?Mks4a3YrcFlUSzFxSjZXTG1vSVlINkNncVp3dTE2ellOTUZMNmp6Y2xodkZp?=
- =?utf-8?B?OGkwVENmZWNMdzJEV3g3RzlscmF5M1JIdEZDQk5LNHh0c1NtNlNiL2JFbWY4?=
- =?utf-8?B?WGUydVJZellFTGI1c2dnbnRQZmhaN09RWDZSTTkrbnF2NTBOT2Q1b2o5VFA2?=
- =?utf-8?B?UitKdHoyOW04eGcwU0tiUXJCd3FBdUl1OFFVRmhwc0tyY1dRSHV0Z2trdllP?=
- =?utf-8?B?NUR4TUJMMVA3Tjh6RDkxbnFoMm9oYkVrZmdSbWw0d0lQNURGSVcxVUowRjlE?=
- =?utf-8?B?RDl1azIzbWU2Q2JicmhZVEl5akovSG5ERnlpTlZrZGNqQ3YxcXZvckRMUldt?=
- =?utf-8?B?Wm1mVmpxaEhTQ2VPL0g0N0ovNVRKMFJGOE5kUmdwd2dHQWFpd0JLZGhNSm1r?=
- =?utf-8?B?SjlDWUZZMlR5MksyaUphdGpxcGExV2Q1cjlkR3Y1WEk0SHM5MVVKam5HdEk2?=
- =?utf-8?B?MmRlRytIR1YvOGxYY2Z6VlJFdWVZODY1MjFHalVqaFBDbjNvN1hqTDRieVRM?=
- =?utf-8?B?S0FWYmtVcDFmK2o1cmZlZ1luS0JyT0NMUEpQMkZlR2tvUlg4c2NBU0YweHlX?=
- =?utf-8?B?eHVienUxMU5pRkFTVWdERGNjNFJKY1JGWnJ4UUJSdWpybGdWNGJtYlhkM2s2?=
- =?utf-8?B?M1N6K0hwUElWNmNaUEw2VVVrdEJ2VjNFSUZsUVBuK3VoQzNUeTByakdJdGcz?=
- =?utf-8?B?dDZGOHErR0tsV2JTZHM1SjRJKzhjQk5FQVJneU4venJMZWZJbUQwU3RHMUZT?=
- =?utf-8?B?N1piOFp5aXJyQVliQU1iKzFnNDJlU0M5ZWdmRk5lY1ZEb1lBL2U3dVhwRVVx?=
- =?utf-8?B?WEtlUWhlZjlneUszejR3ODhuTXNMOHlMYlFETFJaaTZMdnlQZkdSNVJOQ1My?=
- =?utf-8?B?eGhpZndGT2FTdDgwanJ1TVR6Ylc2L3pGaExIcmJsS0Q0Z3BIQW9rR25VVzlh?=
- =?utf-8?B?U09SZGpVVVM1cEJqRWtFUT09?=
+	=?utf-8?B?dklJOFYxZjVITFMxNWc2Rm8wSVZ2YXhDYTEvYlpSZkFTN01OKzRETGwrTDFh?=
+ =?utf-8?B?MWwvaEdVVkxmbkZGNnJ6YmswNFJ4SUVkOXJhZEF6M0ZtK0trMlo3WjRCU2dJ?=
+ =?utf-8?B?WVErTGF2Q24xMzFGSHlCSUMxaWZuMTFJSnkzM3RFTitmZVNka1c1bFJnVWFS?=
+ =?utf-8?B?cng0UlN5cXZXT1F5QjhiVFlheHFlWjJHWWZnWlduVkhWRlJWaVJCbWlhRVdX?=
+ =?utf-8?B?dkExKzJSaytNV0NFR3c2RkkzRU5GcVg2NjhYc0xtd1FVMll0TytXME9CQU8v?=
+ =?utf-8?B?NThwUFJ4a0lSdEFsa2hZYW9ZTVZJNVN5dVp0TWMyTkg3ekNBUUtVUGlOV1pw?=
+ =?utf-8?B?anVvN0h0ZlpYNmVPMWVEQmRaNldPOXJiNEdrUnBjZ1UrY1p5RzhpNi9pYVA4?=
+ =?utf-8?B?WndtZ0lYNzVlTVVKK3dXTjE3TU1STHRTSEwyMFEzZ0lPMlpCcHZYS2xMNXFY?=
+ =?utf-8?B?VzlHaTNTeWRoeVRvRVRBdnJPU2IrS2ljVWh2YUVjTENKNDI3K0hGa1R0TllV?=
+ =?utf-8?B?bndieUFoWlhqc2VrbXk1aU56NVI1aXdiSnlNdzh2OU9iaHBleldMV203Q1hH?=
+ =?utf-8?B?czZidzdLS0ExdFBpZWN2cUZIVGo2Vzl2UzRVUlpoeW5hZXJwSGh3MTVkUVlE?=
+ =?utf-8?B?K1lQb1dWaWhDR3habWcveVRId3AwcjZ1eVNvOEluWWcxR2JKN3Q0aUp4SXpr?=
+ =?utf-8?B?NUZrNHZmOGhmNTVHVGo2ZTNmbzd1OVJwUGZGV3RMMEdNanhDaFoxd2NDWlJQ?=
+ =?utf-8?B?TWRONGZPUWw4cllzQmNoSm1acG85SW5IakhlMEJNSW1KVzF5dTBXdGZrTHln?=
+ =?utf-8?B?RWZyYXlWbHhCRVVpWEVZdTZyNjJhcm13eFFtbEE3MkZxYW8zVVQxSUZoTmdx?=
+ =?utf-8?B?NHMrQW53SWJiV01JbWtaQmJDWnh3SFk0QkYrZ1BaeERDODg3M2hGK2RINmcz?=
+ =?utf-8?B?anZSc0VWSHVKN0JMb1RrZ25EeTQ3anpEMXhoOVA0NkFZR2wvNVZhTUltN1Zw?=
+ =?utf-8?B?Qno3YUFzb1k0dEo0dm1lVUNDTkxDSUNKWEI4WHdUMXBMMVdmQmR3UnQ3SHh0?=
+ =?utf-8?B?dEwrZENBSmhLbXNua1EyTW9ITkxKUElXUkQxdk1FeGJNdjAwNTlMRVB1eDd1?=
+ =?utf-8?B?T3BkMEE3bzBWZWhhT2k2NlFZWFRpZWlLcVF5cDBuQ1R5VDVlaXNJMXRJYWdG?=
+ =?utf-8?B?VUQ0aXNuRGh4TFJiTkdxeVgrUUJxbU54ZXNRWDJldTZYSFA0ajNscHBSMmJL?=
+ =?utf-8?B?YTBSUmgxcFA1STJROUpQNkJGUTlmRExtSFQyY0dTSlZlaDFpbEFJeW9WTkYz?=
+ =?utf-8?B?Um9mR0N4Y0MzdGpXZ0ZEM05HMDlDZVdtd1Z5SnNUbnY0ZVNMUGdYbndrV0VN?=
+ =?utf-8?B?cnJZZmI3c0RYUVAxM050OUQ3Y1VzQXFoS0M5ei9XcG52a0Q2K2pzMXdLcy9y?=
+ =?utf-8?B?eHFpOWFwSnIwQzRZUlUvUkRBSjZHUWhWRXJJYm4yQWFucVlzZDFYTmFlR0w0?=
+ =?utf-8?B?Mjg0cnFRNXNtMEN0UWJNOWJueVNUU2dNdmRsbWhEMVhMSjlLOTFLREZjemF1?=
+ =?utf-8?B?UHFlbWJjN01tTnpHTHRpU1NnLzJoUWp3NDZvM2c3akticHZYWTNxMHMyL0Ju?=
+ =?utf-8?B?T2dPR2dlQkxTVEJnak1WU2JFOXNxbzUzaE1xaENJdzI2VG9KTDI0WWdYajJ4?=
+ =?utf-8?B?SXdOWWZiNTFZNUdSYWxJSmtvVyt2L1VHdmx0OTU1QUREZkVhbEJ0NlhwQ3pO?=
+ =?utf-8?B?VjB2VWhVM1g2WGhzN0NVZlQwRHRLVGVKdjdscnFnMVlVMWhYRzdoTjFnRU1o?=
+ =?utf-8?B?UVZJQmlISEY1SzJ0Qmd6QT09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bS8vbGpteWRTUGZBeHBLakZTdmx2STV5UHJYY1JFZUZMK00wc2g2OCsrQ2JQ?=
- =?utf-8?B?ZFY4STZZellpaGlOdHdqYmxLeUhNdkU1b0Vlb0N0MlArM3NlZ1UvNUhwZ1NQ?=
- =?utf-8?B?STNCVk5SY0RISFJRbkxXcEVvNnRaYlpvNllrVzNwaE5TVStZb01DSVRHd3dQ?=
- =?utf-8?B?VWhaNHlVUW1jWnVzUXVzODIwZ3gwTnRiM21Ic0pJMGZad2NhMEdRWkhiTllY?=
- =?utf-8?B?SmdOUHZzS21yOFpwTFp3RlVyc3Q4WjBRTkF0eXpVZ2FxRVlPQU5TaExBTEFI?=
- =?utf-8?B?VTdvQ3FyTGJiazNSbkh2bzBaWTZMbzVZSXJUOUdNS3hMNi9jWElEUGlPL2Vs?=
- =?utf-8?B?bFJoVVUyMldUU3A0RTJjM1F5K3A0cS9qcXNCT1d0Um9XYm43NVNNdkRoNXVm?=
- =?utf-8?B?VWdwR2lSSnZFaENNbmVyUThrWnRyVSt6aE5WR29BOTJoaTVRNlRhRlZrQXJs?=
- =?utf-8?B?b3hTRm9SdlYza2dYbkt2RHkxRjR2QTV6SUlNaUFsY0tFV252eSsrMVNDL2Nw?=
- =?utf-8?B?SVBkSHAwWkZtejgyVEtqaXBDYzA4Z3I5R2Y2U1RrWG5mNUp6amlDc21sMlFs?=
- =?utf-8?B?YjVqNEdqWlRzV1o3VnVKZnkzM2ttMTdZOHVDSlJsdE5FYklPWmlCN3FUYnND?=
- =?utf-8?B?THBPeDZ4amtnWnQ1YWlxNnNWMStXUDlIVTg3SlY3SU82SlpFMGVNWlFObWF6?=
- =?utf-8?B?T0ZSZ3RRRDN1ZU53UkgrREZFS0NxUDMyOFRrQnhVems4ZE1NQkp5TWY3cXRy?=
- =?utf-8?B?bjQ0UzdVSDNnNVdvRnRzekFLbS9neHM2NW53NHpPVXh6Q3E1TWRPajEra0Rz?=
- =?utf-8?B?N0Exdk1qc2FiU0lIMFBmZXkrS2xvMEVzMWF3S1MwbCszdFAydnVKeUF2TFVO?=
- =?utf-8?B?TExwbGMwK0pjMkROdGVFVUVJNE9lS216VU5GdEJobVFwcCtoeWRTQmx5RTgx?=
- =?utf-8?B?MHhLVEtJY3ZVd2QydnZnbTJvOU5MTml1eVF5azFaZUt1MTVJaURyYTlEanUv?=
- =?utf-8?B?Q25icFY3TkxLdVJ3M0tJdVVEYXVtMU96ci9IaHJQdk5nVHB2UDVReGdEYzQ1?=
- =?utf-8?B?NXpOemFNMlNTdGJ2elhqcGRjTW9zdU8vZy85TVEvSFJ1ZmNDalluZ2ZjN0I2?=
- =?utf-8?B?Qnoxd2pDM1lPTEhQUzV4MHdsNmJvbXJUQmhBaC9HQkg0SHRIWFFMV2lkM1Nu?=
- =?utf-8?B?VWt2V3djcXJ5a0tWQTFnSlc0cUdianpMb2JRYzlZMmVPWGxmK3Z2amVycXBG?=
- =?utf-8?B?VE51Z29ZUWFRSEdMbWxIZmVONVVTQ0YrYjM3dFFUQWI4aWIyZEZHUS9Ic2p0?=
- =?utf-8?B?WUF2YTYvY0l4ek4rTStRMk9KRVJ2Nm1UdFNGKzJhTUVoVEEzcUlrSGFYQWNa?=
- =?utf-8?B?UzVWM1VBb1dtWnQ4aFZ6SEQ1ZVhHbFM2Qi9Kbnh6d0JpR0EwUmZNc25QWUpI?=
- =?utf-8?B?Si9UOTRObExnNzJacldSOE1WMU94bFFjU1ZSSkVFeHZYY3RCTHgwaFFOc0VO?=
- =?utf-8?B?UFZEeVBxeVpQQ09McXA4ckl5L2U1dERsNkcvalYzbFdSRzNhbG9yK3VNNzY1?=
- =?utf-8?B?T0RWMUpIcU54VnFQblFUWGxoTGg5cExiRzJaV2hDVitoTWZvRnEra1J6ODNr?=
- =?utf-8?B?WE8rdzBBYlB4UHNMeFYzWFMyOEVveU9IaFVTb3Q4V1ZmNE12bW5iMm90bk9I?=
- =?utf-8?B?NVRoT2t3ZG5GcUtDaXJLdlJXUFFESWE2ZkptK0ZqWUh1eXpyUGw0TWtISTFB?=
- =?utf-8?B?WHk2UTB5Q3NWMWVqNDYxZmJOZlJHK3FtQld5NWJDNXM4bkJCcHNpZ1A3M1FL?=
- =?utf-8?B?ZkNQVzdmMlRVUFk5ek1tblY1VTRiY0lSOWZuR2tDbXRiWXBmbFhzU2RLb3Ny?=
- =?utf-8?B?eHFKZElZNEhiZjZxSUdVZHZ2Q21lQlJaMmxTQkRKL0h3UlZXWTBtMGFPMXRk?=
- =?utf-8?B?dVVXTFpETUtvakxxam5EOVJCdWNzM1F4SjlLVy9XeU82NGl1U2RHM3ZHTXNp?=
- =?utf-8?B?ZjN4c0RLUURXSFhOdHg2TTJHY24xZmNEcGYyVjQxaTRDdjZObU0xWU56QzdG?=
- =?utf-8?B?b1E5b2xMVkFDNFpKUmhpYzlqMko3Qks1OGpGUDU3SkhCbkE4NEdnSlY1d2Zl?=
- =?utf-8?Q?VLUU6nchc8zYHJbI36Q76q0x7?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 135a9c13-cb1f-4766-6fe5-08dccc6bf76d
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
+	=?utf-8?B?dmpXQmw0OUZQREFkdHN0VDhpYzR1aXBCMlo4OVgyVkZZU1gzbHlLUXUyR0wz?=
+ =?utf-8?B?U0xYb0l6L1JxdXlCakw4Skc0a0I4ZXo0b2FTU1dHNFZPWVZrMkc4QmJMeFJn?=
+ =?utf-8?B?VVBmNGVZeEJqc09vRW5nQTdiTEx4d1RWRHR3ZHdkQXo1amdYY1VyNmpibVhl?=
+ =?utf-8?B?ZElwSGg4b3I5b240ZlU4dXVMWFlycEsrZUphdlR4SlBVRXNzVi9BTHRWNEVN?=
+ =?utf-8?B?bXIzSklOd2RBUithYkNaT2dRSGpVcUdtV0wvejZSbmF1MHdiTEJkd0FFZUdu?=
+ =?utf-8?B?N3N5M2NBZnp5clkySm1IQlR3MjA1OVJxRitBTmVyWlVTaDlkNkxNL1ovR293?=
+ =?utf-8?B?Z3o4aFcyTk5KWVFKMHZkdktPaXd4ZmlZZTJYMEdaMUx3cVJJZ0lPS2lXcXlQ?=
+ =?utf-8?B?OUdZUFlZRURwQlg1QW5tQjhPNThEcGF3UXNjWXVSeVB2T1NzcmxaanhOMDVu?=
+ =?utf-8?B?OFllejhxWE11Sy9XWE5iSU5Zc3pYOVpvTFc4a3k2bGdQb3Z5SnFYYUJudWI4?=
+ =?utf-8?B?M0d5ZCt3MDQzdXBlVUYxTkhyMVVad1kxZi9jUkdjcjFldXFLQWdRZjVaNmFB?=
+ =?utf-8?B?MUYyUEhJdHdPTzg2WEdkb21jK0l4NTdISlZkVEFhdGZ0ZTVnRHhVL1pncTVI?=
+ =?utf-8?B?cDIwZTJxMjU3S3pQdFM4WG9ZRWlkcWxrSFo4aG8rRStLd004UkNMRkduYW4w?=
+ =?utf-8?B?TENRazJqeXdzUEFndmEyOCtYdWJVRWErMEJCVDVjcno1Uy9CbEpGenZBSldD?=
+ =?utf-8?B?d3JuRVVLcjI3RjN1c1NqS2FQS3RSOXhyQmYzdGR2aVJwZ1J2eWtYWTFUeStT?=
+ =?utf-8?B?QkVyNjdxM0hZMnN5UzFjY2tzODRuZHZLUFFWTTVqOHRBYzl4dGlVWlRRSXpJ?=
+ =?utf-8?B?Ykt1Zk5veFVlWlREZCtoR1kzZ3FhVWdHQUc0aElzbWVDUUZEWkZsaFp5MmtV?=
+ =?utf-8?B?SlIwZy9QT0kvRlRxanprajdMNXVDQnR0dThLNUt1Unk2NHAxVjk0SjhFOTdp?=
+ =?utf-8?B?dExzZ0ZnOW50bEROdzg2VmI3Rms1ZW5pbDdqL3RwYTFQYVhqcUJmMlpxV3gz?=
+ =?utf-8?B?S2U1djNZNXZ1YmhUUlNvZEh2VU5JT0JJaXBrVDlHdEFBL1gxbmRVbUlRZEhw?=
+ =?utf-8?B?M2luMGx3UHVzc3R5RkJxZndhRnBEOVM3VXhRUkxuNmJkNUdPL2J2QlZJU1hQ?=
+ =?utf-8?B?ZTEyV3dTY2xOT2RWYm1aTHhtOGJyWm5objRTUTVVckRVb1B1Qm43NmczQmF1?=
+ =?utf-8?B?Ri9HR1hBbk9Va1BLSUE3NVRqRkd2V1pFa3NLcGF5N3JHQmFXYkh5M3BGSFY3?=
+ =?utf-8?B?cS9YS21WUXlnY0kyTVowMkJScW4xd0JUaWpTR0YxNTlOZk1Ubjhtekl4Z0Fp?=
+ =?utf-8?B?MWlIVkpLb0Y1Y05TdVFtckVJNjBrTjA0UzdMdUlwVWZDWG9TTndnRE1RRkdy?=
+ =?utf-8?B?cFlNK2ZkSlNXaWRacHc4OWNqN2RaZ2ZtNjl1SmYzeEVVUVZOQ1QyM1hzVWdn?=
+ =?utf-8?B?WHF2azhZcmY0Vnh0MTQzNmdLZkNZNlZsUG9aRW9xV1FyVmFROTRUc2hudG96?=
+ =?utf-8?B?MXZJckNpbHdaR3c0dys4VjdxWkZhb0l5QW9ySUpxSDNTTHVqajlONWNPZzM2?=
+ =?utf-8?B?eFd5UWUzWU95WEsvNW1aWnN5R2J0QUJ4d0ZqZ283RDhONVRxS0o2amVrOVho?=
+ =?utf-8?B?KzUzb0tPaHZCRjNiR0NDQTBuL0ZERllMVWVwNHNKc1Z6eDBwcGEwUHpFd3FL?=
+ =?utf-8?B?Uk0wTjM1U1htV1pnSytpcGZjRUJ4dVhUQ1hjc2JZMmRiRWwzdVFEUkVhQVF0?=
+ =?utf-8?B?Rk5CNGFwQS9WNVRCdnI3ZUhTV2wyRXJXQy94L2VNTm5HeDYzbmVPc29OOVlu?=
+ =?utf-8?B?Z1FuNjRwVmM1elJrMjBLblB6TmxZZzNJcUZJUkZzWjFXUlN2bncwQ2dvREU1?=
+ =?utf-8?B?M2Z2MklWaXhVeEdQeTFmV1NxS290SDZWTlJOVGNMcmpDbmV5ZTBxZ3gxeVVo?=
+ =?utf-8?B?VDNwQ0RjZ3dZNXkyNXFZZWxIYVZJamxRd0NicUhScjl6dVllMGs0bUtFMFJ4?=
+ =?utf-8?B?aTBXQ3JDWHBLNmpHcmRUalZVVlNJTERtck52anIyc3ArSy9UWmM3aXNUZlVZ?=
+ =?utf-8?Q?0bsyrSs0SLekEB0XHgABt03Ud?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b385402-1620-4702-92c0-08dccc70d869
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2024 22:58:46.6934
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2024 23:33:42.0362
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ApayoxXxr7JyaB6YPladAr5TDcHxsT4yRzbQwsh79wLz7J3p2JVymFDHc1eVO3+XO5ZYCFsAMATn8AQGg1DmWQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4133
+X-MS-Exchange-CrossTenant-UserPrincipalName: kTDpyX0DLYxh3jzO5HTtLjYI7g37OSZEvHe31xY3Mgxwq0XrKeyw3ao6BYWvxG69
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6938
 
-Hello Sean,
+On Tue, Sep 03, 2024 at 07:57:01AM +0000, Mostafa Saleh wrote:
 
-On 9/3/2024 2:52 PM, Sean Christopherson wrote:
-> On Tue, Sep 03, 2024, Ashish Kalra wrote:
->> From: Ashish Kalra <ashish.kalra@amd.com>
->> [    1.671804] AMD-Vi: Using global IVHD EFR:0x841f77e022094ace, EFR2:0x0
->> [    1.679835] AMD-Vi: Translation is already enabled - trying to copy translation structures
->> [    1.689363] AMD-Vi: Copied DEV table from previous kernel.
->> [    1.864369] AMD-Vi: Completion-Wait loop timed out
->> [    2.038289] AMD-Vi: Completion-Wait loop timed out
->> [    2.212215] AMD-Vi: Completion-Wait loop timed out
->> [    2.386141] AMD-Vi: Completion-Wait loop timed out
->> [    2.560068] AMD-Vi: Completion-Wait loop timed out
->> [    2.733997] AMD-Vi: Completion-Wait loop timed out
->> [    2.907927] AMD-Vi: Completion-Wait loop timed out
->> [    3.081855] AMD-Vi: Completion-Wait loop timed out
->> [    3.225500] AMD-Vi: Completion-Wait loop timed out
->> [    3.231083] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
->> d out
->> [    3.579592] AMD-Vi: Completion-Wait loop timed out
->> [    3.753164] AMD-Vi: Completion-Wait loop timed out
->> [    3.815762] Kernel panic - not syncing: timer doesn't work through Interrupt-remapped IO-APIC
->> [    3.825347] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.11.0-rc3-next-20240813-snp-host-f2a41ff576cc-dirty #61
->> [    3.837188] Hardware name: AMD Corporation ETHANOL_X/ETHANOL_X, BIOS RXM100AB 10/17/2022
->> [    3.846215] Call Trace:
->> [    3.848939]  <TASK>
->> [    3.851277]  dump_stack_lvl+0x2b/0x90
->> [    3.855354]  dump_stack+0x14/0x20
->> [    3.859050]  panic+0x3b9/0x400
->> [    3.862454]  panic_if_irq_remap+0x21/0x30
->> [    3.866925]  setup_IO_APIC+0x8aa/0xa50
->> [    3.871106]  ? __pfx_amd_iommu_enable_faulting+0x10/0x10
->> [    3.877032]  ? __cpuhp_setup_state+0x5e/0xd0
->> [    3.881793]  apic_intr_mode_init+0x6a/0xf0
->> [    3.886360]  x86_late_time_init+0x28/0x40
->> [    3.890832]  start_kernel+0x6a8/0xb50
->> [    3.894914]  x86_64_start_reservations+0x1c/0x30
->> [    3.900064]  x86_64_start_kernel+0xbf/0x110
->> [    3.904729]  ? setup_ghcb+0x12/0x130
->> [    3.908716]  common_startup_64+0x13e/0x141
->> [    3.913283]  </TASK>
->> [    3.915715] in panic
->> [    3.918149] in panic_other_cpus_shutdown
->> [    3.922523] ---[ end Kernel panic - not syncing: timer doesn't work through Interrupt-remapped IO-APIC ]---
->>
->> This happens as SNP_SHUTDOWN_EX fails
-> Exactly what happens?  I.e. why does the PSP (sorry, ASP) need to be full shutdown
-> in order to get a kdump?  The changelogs for the original SNP panic/kdump support
-> are frustratingly unhelpful.  They all describe what the patch does, but say
-> nothing about _why_.
+> Basically, I believe we shouldn’t set FWB blindly just because it’s supported,
+> I don’t see how it’s useful for stage-2 only domains.
 
-If SNP_SHUTDOWN_EX is not issued, or more accurately if SNP_SHUTDOWN_EX is not issued with IOMMU_SNP_SHUTDOWN set to 1, i.e, to disable SNP enforcement by IOMMU, then IOMMUs are initialized in an IRQ remapping configuration by early_enable_iommus() during crashkernel boot, which causes the above crash in check_timer().
+And the only problem we can see is some niche scenario where incoming
+memory attributes that are already requesting cachable combine to a
+different kind of cachable?
 
-Also, SNP_SHUTDOWN_EX is required to tear down the RMP CPU/IOMMU TMRs.
+> And I believe making assumptions about VFIO (which actually is not correctly
+> enforced at the moment) is fragile.
 
-Additionally, if IOMMU SNP_SHUTDOWN is not done and all pages associated with the IOMMU are not transitioned to Reclaim state (and then subsequently by HV to hypervisor state) there is a really high probability of a fatal RMP page fault due to collision with a new page allocation during kexec boot due to collision with one of these IOMMU pages.
+VFIO requiring cachable is definately not fragile, and it also sets
+the IOMMU_CACHE flag to indicate this. Revising VFIO to allow
+non-cachable would be a signficant change and would also change what
+IOMMU_CACHE flag it sets.
 
-So we really need SNP_SHUTDOWN_EX with IOMMU_SNP_SHUTDOWN=1 for kexec/crashkernel boot.
+> and we should only set FWB for coherent
+> devices in nested setup only where the VMM(or hypervisor) knows better than
+> the VM.
 
->
->> when SNP VMs are active as the firmware checks every encryption-capable ASID
->> to verify that it is not in use by a guest and a DF_FLUSH is not required. If
->> a DF_FLUSH is required, the firmware returns DFFLUSH_REQUIRED.
->>
->> To fix this, added support to do SNP_DECOMMISSION of all active SNP VMs
->> in the panic notifier before doing SNP_SHUTDOWN_EX, but then
->> SNP_DECOMMISSION tags all CPUs on which guest has been activated to do
->> a WBINVD. This causes SNP_DF_FLUSH command failure with the following
->> flow: SNP_DECOMMISSION -> SNP_SHUTDOWN_EX -> SNP_DF_FLUSH ->
->> failure with WBINVD_REQUIRED.
->>
->> When panic notifier is invoked all other CPUs have already been
->> shutdown, so it is not possible to do a wbinvd_on_all_cpus() after
->> SNP_DECOMMISSION has been executed. This eventually causes SNP_SHUTDOWN_EX
->> to fail after SNP_DECOMMISSION.
->>
->> Adding fix to do SNP_DECOMMISSION and subsequent WBINVD on all CPUs
->> during NMI shutdown of CPUs as part of disabling virtualization on
->> all CPUs via cpu_emergency_disable_virtualization ->
->> svm_emergency_disable().
->>
->> SNP_DECOMMISSION unbinds the ASID from SNP context and marks the ASID
->> as unusable and then transitions the SNP guest context page to a
->> firmware page and SNP_SHUTDOWN_EX transitions all pages associated
->> with the IOMMU to reclaim state which the hypervisor then transitions
->> to hypervisor state, all these page state changes are in the RMP
->> table, so there is no loss of guest data as such and the complete
->> host memory is captured with the crashkernel boot. There are no
->> processes which are being killed and host/guest memory is not
->> being altered or modified in any way.
->>
->> This fixes and enables crashkernel/kdump on SNP host.
-> ...
->
->> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->> index 714c517dd4b7..30f286a3afb0 100644
->> --- a/arch/x86/kvm/svm/sev.c
->> +++ b/arch/x86/kvm/svm/sev.c
->> @@ -16,6 +16,7 @@
->>  #include <linux/psp-sev.h>
->>  #include <linux/pagemap.h>
->>  #include <linux/swap.h>
->> +#include <linux/delay.h>
->>  #include <linux/misc_cgroup.h>
->>  #include <linux/processor.h>
->>  #include <linux/trace_events.h>
->> @@ -89,6 +90,8 @@ static unsigned int nr_asids;
->>  static unsigned long *sev_asid_bitmap;
->>  static unsigned long *sev_reclaim_asid_bitmap;
->>  
->> +static DEFINE_SPINLOCK(snp_decommission_lock);
->> +static void **snp_asid_to_gctx_pages_map;
->>  static int snp_decommission_context(struct kvm *kvm);
->>  
->>  struct enc_region {
->> @@ -2248,6 +2251,9 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>  		goto e_free_context;
->>  	}
->>  
->> +	if (snp_asid_to_gctx_pages_map)
->> +		snp_asid_to_gctx_pages_map[sev_get_asid(kvm)] = sev->snp_context;
->> +
->>  	return 0;
->>  
->>  e_free_context:
->> @@ -2884,9 +2890,126 @@ static int snp_decommission_context(struct kvm *kvm)
->>  	snp_free_firmware_page(sev->snp_context);
->>  	sev->snp_context = NULL;
->>  
->> +	if (snp_asid_to_gctx_pages_map)
->> +		snp_asid_to_gctx_pages_map[sev_get_asid(kvm)] = NULL;
->> +
->>  	return 0;
->>  }
->>  
->> +static void __snp_decommission_all(void)
->> +{
->> +	struct sev_data_snp_addr data = {};
->> +	int ret, asid;
->> +
->> +	if (!snp_asid_to_gctx_pages_map)
->> +		return;
->> +
->> +	for (asid = 1; asid < min_sev_asid; asid++) {
->> +		if (snp_asid_to_gctx_pages_map[asid]) {
->> +			data.address = __sme_pa(snp_asid_to_gctx_pages_map[asid]);
-> NULL pointer deref if this races with snp_decommission_context() from task
-> context.
+I don't want to touch the 'only coherent devices' question. Last time
+I tried to do that I got told every option was wrong.
 
-Yes this race needs to be handled.
+I would be fine to only enable for nesting parent domains. It is
+mandatory here and we definitely don't support non-cachable nesting
+today.  Can we agree on that?
 
-I am looking at if i can do SNP_DECOMMISSION on all (SNP) ASIDs, and continue with the loop if SNP_DECOMMISSION fails with INVALID_GUEST error as the guest has already been decommissioned via snp_decommission_context().
+Keep in mind SMMU S2FWB is really new and probably very little HW
+supports it right now. So we are not breaking anything existing
+here. IMHO it is better to always enable the stricter features going
+forward, and then evaluate an in-kernel opt-out if someone comes with
+a concrete use case.
 
->> +			ret = sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, &data, NULL);
->> +			if (!ret) {
-> And what happens if SEV_CMD_SNP_DECOMMISSION fails?
-
-As mentioned above, will add additional handling for cases where INVALID_GUEST kind of errors are returned.
-
-But, if errors like UPDATE_FAILED are returned, this will eventually cause SNP_SHUTDOWN failure and then lead to crashkernel boot failure as discussed above.
-
->
->> +				snp_free_firmware_page(snp_asid_to_gctx_pages_map[asid]);
->> +				snp_asid_to_gctx_pages_map[asid] = NULL;
->> +			}
->> +		}
->> +	}
->> +}
->> +
->> +/*
->> + * NOTE: called in NMI context from svm_emergency_disable().
->> + */
->> +void sev_emergency_disable(void)
->> +{
->> +	static atomic_t waiting_for_cpus_synchronized;
->> +	static bool synchronize_cpus_initiated;
->> +	static bool snp_decommission_handled;
->> +	static atomic_t cpus_synchronized;
->> +
->> +	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
->> +		return;
->> +
->> +	/*
->> +	 * SNP_SHUTDOWN_EX fails when SNP VMs are active as the firmware checks
-> Define "active".
->
->> +	 * every encryption-capable ASID to verify that it is not in use by a
->> +	 * guest and a DF_FLUSH is not required. If a DF_FLUSH is required,
->> +	 * the firmware returns DFFLUSH_REQUIRED. To address this, SNP_DECOMMISSION
->> +	 * is required to shutdown all active SNP VMs, but SNP_DECOMMISSION tags all
->> +	 * CPUs that guest was activated on to do a WBINVD. When panic notifier
->> +	 * is invoked all other CPUs have already been shutdown, so it is not
->> +	 * possible to do a wbinvd_on_all_cpus() after SNP_DECOMMISSION has been
->> +	 * executed. This eventually causes SNP_SHUTDOWN_EX to fail after
->> +	 * SNP_DECOMMISSION. To fix this, do SNP_DECOMMISSION and subsequent WBINVD
->> +	 * on all CPUs during NMI shutdown of CPUs as part of disabling
->> +	 * virtualization on all CPUs via cpu_emergency_disable_virtualization().
->> +	 */
->> +
->> +	spin_lock(&snp_decommission_lock);
->> +
->> +	/*
->> +	 * exit early for call from native_machine_crash_shutdown()
->> +	 * as SNP_DECOMMISSION has already been done as part of
->> +	 * NMI shutdown of the CPUs.
->> +	 */
->> +	if (snp_decommission_handled) {
->> +		spin_unlock(&snp_decommission_lock);
->> +		return;
->> +	}
->> +
->> +	/*
->> +	 * Synchronize all CPUs handling NMI before issuing
->> +	 * SNP_DECOMMISSION.
->> +	 */
->> +	if (!synchronize_cpus_initiated) {
->> +		/*
->> +		 * one CPU handling panic, the other CPU is initiator for
->> +		 * CPU synchronization.
->> +		 */
->> +		atomic_set(&waiting_for_cpus_synchronized, num_online_cpus() - 2);
-> And what happens when num_online_cpus() == 1?
-Yes, will add fix for that.
->> +		synchronize_cpus_initiated = true;
->> +		/*
->> +		 * Ensure CPU synchronization parameters are setup before dropping
->> +		 * the lock to let other CPUs continue to reach synchronization.
->> +		 */
->> +		wmb();
->> +
->> +		spin_unlock(&snp_decommission_lock);
->> +
->> +		/*
->> +		 * This will not cause system to hang forever as the CPU
->> +		 * handling panic waits for maximum one second for
->> +		 * other CPUs to stop in nmi_shootdown_cpus().
->> +		 */
->> +		while (atomic_read(&waiting_for_cpus_synchronized) > 0)
->> +		       mdelay(1);
->> +
->> +		/* Reacquire the lock once CPUs are synchronized */
->> +		spin_lock(&snp_decommission_lock);
->> +
->> +		atomic_set(&cpus_synchronized, 1);
->> +	} else {
->> +		atomic_dec(&waiting_for_cpus_synchronized);
->> +		/*
->> +		 * drop the lock to let other CPUs contiune to reach
->> +		 * synchronization.
->> +		 */
->> +		spin_unlock(&snp_decommission_lock);
->> +
->> +		while (atomic_read(&cpus_synchronized) == 0)
->> +		       mdelay(1);
->> +
->> +		/* Try to re-acquire lock after CPUs are synchronized */
->> +		spin_lock(&snp_decommission_lock);
->> +	}
-> Yeah, no.  This is horrific.  If the panic path doesn't provide the necessary
-> infrastructure to ensure the necessary ordering between the initiating CPU and
-> responding CPUs, then rework the panic path.
-
-The issue here is that panic path will ensure that all (other) CPUs have been shutdown via NMI by checking that they have executed the NMI shutdown callback.
-
-But the above synchronization is specifically required for SNP case, as we don't want to execute the SNP_DECOMMISSION command (to destroy SNP guest context) while one or more CPUs are still in the NMI VMEXIT path and still in the process of saving the vCPU state (and still modifying SNP guest context?) during this VMEXIT path. Therefore, we ensure that all the CPUs have saved the vCPU state and entered NMI context before issuing SNP_DECOMMISSION. The point is that this is a specific SNP requirement (and that's why this specific handling in sev_emergency_disable()) and i don't know how we will be able to enforce it in the generic panic path ?
-
-Thanks, Ashish
-
+Jason
 
