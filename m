@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-25756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C117B96A2F6
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 17:39:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89C7A96A2F9
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 17:39:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F35D81C238C8
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 15:39:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 358B11F29E9A
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 15:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8735C18BC0C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9050818BC14;
 	Tue,  3 Sep 2024 15:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XDPvAKSo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JxPfzbqH"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3AF189BB8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FC818B466;
 	Tue,  3 Sep 2024 15:38:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725377922; cv=none; b=GSHur7DkSJhGfJ6hi71AvxMH4wp0ZO8UJNIcenAUp0h0cZ85FqLkt4H/sfUbgxx4rl46ZqgcdoArHEen+FDgTdFB1OF6F7CaRlxrfvppLEthZks4lC8sQq6q+zJiv9TV52EKU/Md5rNmAyGLvB/BIvnOInG+liNXGgyYcxEerSw=
+	t=1725377922; cv=none; b=YvLZxYW3m5rmGXHFWeXU3oR2WOyLIayh+JkXocOCLN2xwVTZOCt8lGTOnk769r8PHJKjNi74TjzZu1yScQ7WFgkUqEtNhbJ9hP8pLPrAeTRPNI3MnzNrrJVdu+7ZvmrLXPK+BUOxbHppPkJbEWJz+iIkf9Sc4GRFyGaOTagScyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725377922; c=relaxed/simple;
-	bh=tDRpVJnKSGbTp94sIqdZHe3gw4UqLUNpMQRM+CvB4Uk=;
+	bh=3hq9V1F6GHZbXXg8saZsb1o9QP9sp/62P1fdCT+OhbU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iwWn+edLvLr4hTxAPN/IVs7ABApWyK0rcz50abPmrROxh5h2KAAtUICFzoU4kJLL/uIct2bc3FVSIBAQH0wk5jyu2KwHX/1KwUH9AWgOcIhF+dBeLAsQSHDIX7B0TeNBHzrnko0iwJjfjE0wwuAgPobWJAuZ1Ys3qR4eJaXopNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XDPvAKSo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F6EFC4CECB;
+	 MIME-Version; b=nmXVJSCMit9UwEb2FpskkEAh41mJP1FDCgRRHv6cNFDfjtGWcrXgVm8CT8VHK6EsAgb5lo499GlLEzQSxKSCDeZbLod/7R+uocaWes5hNoTnUfOVaZk2CMotzR9RtlFF7tT3Ml7GoEqlcBZaUZ06sIi87Ke3TjqogoINybEs0/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JxPfzbqH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E23CC4CED2;
 	Tue,  3 Sep 2024 15:38:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1725377922;
-	bh=tDRpVJnKSGbTp94sIqdZHe3gw4UqLUNpMQRM+CvB4Uk=;
+	bh=3hq9V1F6GHZbXXg8saZsb1o9QP9sp/62P1fdCT+OhbU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XDPvAKSoXM3Bvtyd2H6sJNSxD1IfhjRR84ng6deBf2QIR4wTUmyLjmtpUhkaOq6bp
-	 YD0BaycWYrv9n51LVM0eyrDQwG+skGpKpHjm6Pv0PlG804c8ru56lin3mZejhds8Sl
-	 3uv1qPzbiOA6jho6hsIeUdx7UiaaCMqNDd/AaLJvjQ3BqoKgqjLayIEobeSH4Ol0mt
-	 iqw+r9UmS31OG48YsgNkPbJQlyx6+5r+OssU4WUj9dQdvCaPajuEzub7wHJ+kDnGa9
-	 Nswj1bWz6ZTk4WiNtjIuo8GFywPtvJePFriXiKZH1/dIcmlED9OO8nQRB4X6EU1Yyc
-	 bqDbEuf9dH7LQ==
+	b=JxPfzbqHES9DH1wZqMzPAEcH0u8OU9/Cdbdes01TEMCtSasBSCA46HDLydDaQpTN+
+	 dmrG4uw/s+dZLpmPzFq7GORZo50EWicxA7URRbDzab0yXPXdHPqccNSxKC9R5UrNLq
+	 LDoG8yzGplJWpYNocv0XXvb6n/w5vn+7OgLnBvYRaJUkH2hzw70l9rZJ+oKqlhh0qt
+	 08uqtxAerJq+fV9nblquvkAzjYEJOovskyZC8qbPcPTAsFAybZtYQUq8XYbHktDCtz
+	 HDhWyy82WOJEtTQOi/gWAgvFiCUGAO42ceyq5njiw2hVULZtqOWS8mJclSTn84SJbD
+	 mXxkLxWUVkCag==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1slVc8-009Hr9-Fb;
+	id 1slVc8-009Hr9-Lh;
 	Tue, 03 Sep 2024 16:38:40 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -58,9 +58,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 09/16] KVM: arm64: Handle  PIR{,E0}_EL2 traps
-Date: Tue,  3 Sep 2024 16:38:27 +0100
-Message-Id: <20240903153834.1909472-10-maz@kernel.org>
+Subject: [PATCH v2 10/16] KVM: arm64: Sanitise ID_AA64MMFR3_EL1
+Date: Tue,  3 Sep 2024 16:38:28 +0100
+Message-Id: <20240903153834.1909472-11-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240903153834.1909472-1-maz@kernel.org>
 References: <20240903153834.1909472-1-maz@kernel.org>
@@ -76,53 +76,39 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the FEAT_S1PIE EL2 registers the sysreg descriptor array so that
-they can be handled as a trap.
+Add the missing sanitisation of ID_AA64MMFR3_EL1, making sure we
+solely expose S1PIE and TCRX (we currently don't support anything
+else).
 
-Access to these registers is conditional based on ID_AA64MMFR3_EL1.S1PIE
-being advertised.
-
-Similarly to other other changes, PIRE0_EL2 is guaranteed to trap
-thanks to the D22677 update to the architecture.
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 0510e96f732a..a6bc20c238bf 100644
+index a6bc20c238bf..7f4f69351e89 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -346,6 +346,18 @@ static bool access_rw(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
-+static bool check_s1pie_access_rw(struct kvm_vcpu *vcpu,
-+				  struct sys_reg_params *p,
-+				  const struct sys_reg_desc *r)
-+{
-+	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
-+		kvm_inject_undefined(vcpu);
-+		return false;
-+	}
-+
-+	return access_rw(vcpu, p, r);
-+}
-+
- /*
-  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-  */
-@@ -2827,6 +2839,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
- 
- 	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(PIRE0_EL2, check_s1pie_access_rw, reset_val, 0),
-+	EL2_REG(PIR_EL2, check_s1pie_access_rw, reset_val, 0),
- 	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
- 
- 	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
+@@ -1608,6 +1608,9 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+ 	case SYS_ID_AA64MMFR2_EL1:
+ 		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
+ 		break;
++	case SYS_ID_AA64MMFR3_EL1:
++		val &= ID_AA64MMFR3_EL1_TCRX | ID_AA64MMFR3_EL1_S1PIE;
++		break;
+ 	case SYS_ID_MMFR4_EL1:
+ 		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
+ 		break;
+@@ -2470,7 +2473,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 					ID_AA64MMFR2_EL1_IDS |
+ 					ID_AA64MMFR2_EL1_NV |
+ 					ID_AA64MMFR2_EL1_CCIDX)),
+-	ID_SANITISED(ID_AA64MMFR3_EL1),
++	ID_WRITABLE(ID_AA64MMFR3_EL1, (ID_AA64MMFR3_EL1_TCRX	|
++				       ID_AA64MMFR3_EL1_S1PIE)),
+ 	ID_SANITISED(ID_AA64MMFR4_EL1),
+ 	ID_UNALLOCATED(7,5),
+ 	ID_UNALLOCATED(7,6),
 -- 
 2.39.2
 
