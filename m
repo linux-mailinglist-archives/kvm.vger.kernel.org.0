@@ -1,125 +1,138 @@
-Return-Path: <kvm+bounces-25774-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25775-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 036B996A463
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 18:31:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72E0296A4D7
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 18:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B57D9286DAE
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 16:31:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30B1D28550C
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2024 16:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABFB718BBB5;
-	Tue,  3 Sep 2024 16:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9BE18BC3A;
+	Tue,  3 Sep 2024 16:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fnHXhWjW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="icPJAgfL"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A84D18BB9F
-	for <kvm@vger.kernel.org>; Tue,  3 Sep 2024 16:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A993D17A90F
+	for <kvm@vger.kernel.org>; Tue,  3 Sep 2024 16:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725381066; cv=none; b=OaZw/HKMSXC7nfrE8FipJ1YHia/Blg9/9zGz0RW36kQFli4+iaeiMv8UMan8ygQEfy0DNDWmTOTMLuF2PG1l+QskPB6V5ZA9/XSTfAZuhoDgodSSSPw4RMuXbglt3lfGQx6PZJKZVwHWkBJmmb7bvKsnqNmWtO7RNlEcQl0uxas=
+	t=1725382209; cv=none; b=YkQjIqMnzN3aaNFynlLvHz103neq4kdqMqVmfFHezCfJybulCjDVNSHYdIQ/3rWmiqM+fyrU8hve5pto5W5eIZ2c5lux7H8QhxY4fZKz8c6d1ZgkEuP+ND5jA/QWG12+WurhnmORYTlzpCjfJbFiZmFhM5+R8/mMoaoAgkhuLSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725381066; c=relaxed/simple;
-	bh=1e2PJ9C4cSjp3/AMqt3JlJ1Cx1fmp2V4q5C273sWOSk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AGyYZ8XVTt2aIPn6eBazO++mqTMIrYZP8eYz+NzhQ8mO3iYZiUVmMLjRwPtwkItg6bwhPTNOYbDolQdPk43HTXSlnTfBeaEhP4uBFOVORQDSikBBXFPvqbYmir7OBbHMNXizl2uLTkV33P21ye209eaVJSw7689fW+d5pqbWZvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fnHXhWjW; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725381063;
+	s=arc-20240116; t=1725382209; c=relaxed/simple;
+	bh=nqmuOyJXosNjfxFp47rk8c/6P1gHeGLK+0RE43HXhZ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R+OUukztYX1DGf67gTwiEIFOpuEqSO35S1WTxsHKyxbCGQg6CsRaURR3niECGP06qHqh+ibH9To510Sz2RXWgIq3GeKCzHf4oldy4IRDa8wZuShCdYAR3pCu0TSgOTW52T1eKeaeD3BPt/LzL0mhyboHwZokG+ESthiY3jjXypA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=icPJAgfL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725382206;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3BZJkoNgFN6URY+7lN/rD+PAMiteNcprRb2IpocXJAk=;
-	b=fnHXhWjWeEn3rcGrQ/Z+7smSSzd/z9fh1Rnug/H9guDSc4s33GknopNiQVzNKy5PuQFyIs
-	lUoEGLn1k6hs+3yDmWrR2nEIJHY1TctbeZQLU/9yK8DdjZ8Q7W4H6vDdr228KqSUmG7Lmz
-	ed4VefAucFdC2jsCKGcgx0TDyicuR/4=
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org
-Cc: pbonzini@redhat.com,
-	thuth@redhat.com,
-	lvivier@redhat.com,
-	frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com,
-	nrb@linux.ibm.com,
-	atishp@rivosinc.com,
-	cade.richard@berkeley.edu,
-	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH 3/3] riscv: gitlab-ci: Add clang build tests
-Date: Tue,  3 Sep 2024 18:30:50 +0200
-Message-ID: <20240903163046.869262-8-andrew.jones@linux.dev>
-In-Reply-To: <20240903163046.869262-5-andrew.jones@linux.dev>
-References: <20240903163046.869262-5-andrew.jones@linux.dev>
+	bh=vt3R45yng9MI1JlX9x1QeReU6N6vf5Xvk3elVudJjyU=;
+	b=icPJAgfLMzxapCbYLu1AtK41aYKR7kT3Nu6ql62ACzFOkZtdBWEXmfg4AkhxtaOnU/Sad2
+	hBQj4g1I/pJAUAHCU5fRQGXHYGPqR/HvFnT/NoLHH1hi0tF6obi9IyprGqMheAoX7hyg2V
+	yWNVrR9lSIm5isTFC7e1PE6LQdypibk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-TP-YJOIbPcaSJL8L6Di71w-1; Tue, 03 Sep 2024 12:50:05 -0400
+X-MC-Unique: TP-YJOIbPcaSJL8L6Di71w-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42bbff6a0aeso36585445e9.3
+        for <kvm@vger.kernel.org>; Tue, 03 Sep 2024 09:50:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725382204; x=1725987004;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vt3R45yng9MI1JlX9x1QeReU6N6vf5Xvk3elVudJjyU=;
+        b=Bff7SGxxPBsT6vZ+CIQptlu7Q5oG1cmIispAKOz2iGJBgMHu/S5opNiP2nDECoVGNq
+         smVRssqXRcUkDPon8CvNgjuFP84t0dgir4mk/IyH7ym2kys913RJAkIcN2xzSLOi3TRC
+         rJQtCrEBlaxzPLYND4EUr2WuMxY2Q4DwtVcOpPxNDYmJwkQaMkh3C7hgFTNJCZvGgICM
+         w4STUYt6DORyiX69N3vk86bh97ypvpGYncvEnbarkJMVVb6ebh/Aisb+9h/Pf2wY8FGo
+         XuO+Wnc1tfUGacYbwTfapfXF1bkBBfpnFCOf7/KaRe1mirURgW9qpMEyDI19a7Yj5c4o
+         7hrw==
+X-Gm-Message-State: AOJu0Yx9tjWZzy+PzhwcWWXbc8ORTErPxHtU+cM9OqNZwtb43AuN3fPD
+	63qd4mBVm64bs5+nL1KSN4Eu7V75diwXxR5Z8BS2oIZziN3O5NffAoILyZ63BGQVvYgFwWm9O6n
+	7fMfzyZoaOX8EEzZRETFS4IlgjWsr4fQJVI2C51hfiXUFLIwjCFrtvuIOd45M3Q+IwRkxxXDjmZ
+	ZxaurH4KvFNrz7iJFdJyEmusMDD7hHK2Vwfjaqdw==
+X-Received: by 2002:a05:600c:524f:b0:426:6551:3174 with SMTP id 5b1f17b1804b1-42c8de9ddd7mr11449715e9.29.1725382204128;
+        Tue, 03 Sep 2024 09:50:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGxNjqhzJAIg14CVUQX1gVg2ZwKA4TIQQGzXpxWRObTbG7cqWuModpsnWjHvba+Flu3OYEU8hqc/R6SRI6NG7g=
+X-Received: by 2002:a05:600c:524f:b0:426:6551:3174 with SMTP id
+ 5b1f17b1804b1-42c8de9ddd7mr11449515e9.29.1725382203627; Tue, 03 Sep 2024
+ 09:50:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240802195120.325560-1-seanjc@google.com> <20240802195120.325560-2-seanjc@google.com>
+ <CABgObfYT_X3-Qjb_ouNAGX1OOL2ULT2aEA6SDKessSbJxGZEOQ@mail.gmail.com> <ZtcmtFlX83g7C8Vd@google.com>
+In-Reply-To: <ZtcmtFlX83g7C8Vd@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 3 Sep 2024 18:49:50 +0200
+Message-ID: <CABgObfbwFPDiRbmVMtQZ9HipiT=4zXRqrE1fd7d44EeHt8b7=A@mail.gmail.com>
+Subject: Re: [PATCH 1/5] KVM: x86: Re-enter guest if WRMSR(X2APIC_ICR)
+ fastpath is successful
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Test building 32 and 64-bit with clang. Throw a test of in- and out-
-of-tree building in too by swapping which is done to which (32-bit
-vs. 64-bit) with respect to the gcc build tests.
+On Tue, Sep 3, 2024 at 5:09=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+> On Mon, Sep 02, 2024, Paolo Bonzini wrote:
+> > On Fri, Aug 2, 2024 at 9:51=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > > Re-enter the guest in the fastpath if WRMSR emulation for x2APIC's IC=
+R is
+> > > successful, as no additional work is needed, i.e. there is no code un=
+ique
+> > > for WRMSR exits between the fastpath and the "!=3D EXIT_FASTPATH_NONE=
+" check
+> > > in __vmx_handle_exit().
+> >
+> > What about if you send an IPI to yourself?  Doesn't that return true
+> > for kvm_vcpu_exit_request() if posted interrupts are disabled?
+>
+> Yes, but that doesn't have anything to do with WRMSR itself, as KVM needs=
+ to morph
+> EXIT_FASTPATH_EXIT_HANDLED =3D> EXIT_FASTPATH_REENTER_GUEST if there's a =
+pending
+> event that needs requires injection.
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+The other way round? i.e. treat EXIT_FASTPATH_REENTER_GUEST as
+EXIT_FASTPATH_EXIT_HANDLED to go through event injection.
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 67a9a15733f1..033ed65aec26 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -176,6 +176,34 @@ build-riscv64-efi:
-       | tee results.txt
-  - grep -q PASS results.txt && ! grep -q FAIL results.txt
- 
-+build-riscv64-clang:
-+ extends: .outoftree_template
-+ script:
-+ - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu clang
-+ - mkdir build
-+ - cd build
-+ - ../configure --arch=riscv64 --cc=clang --cflags='--target=riscv64' --cross-prefix=riscv64-linux-gnu-
-+ - make -j2
-+ - printf "FOO=foo\nBAR=bar\nBAZ=baz\nMVENDORID=0\nMARCHID=0\nMIMPID=0\n" >test-env
-+ - ACCEL=tcg KVM_UNIT_TESTS_ENV=test-env ./run_tests.sh
-+      selftest
-+      sbi
-+      | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+
-+build-riscv32-clang:
-+ extends: .intree_template
-+ script:
-+ - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu clang
-+ - ./configure --arch=riscv32 --cc=clang --cflags='--target=riscv32' --cross-prefix=riscv64-linux-gnu-
-+ - make -j2
-+ - printf "FOO=foo\nBAR=bar\nBAZ=baz\nMVENDORID=0\nMARCHID=0\nMIMPID=0\n" >test-env
-+ - ACCEL=tcg KVM_UNIT_TESTS_ENV=test-env ./run_tests.sh
-+      selftest
-+      sbi
-+      | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+
- build-s390x:
-  extends: .outoftree_template
-  script:
--- 
-2.46.0
+> Given that kvm_x86_ops.sync_pir_to_irr is likely NULL if virtual interrup=
+t delivery
+> is enabled, the overhead of the trying to re-enter the guest it essential=
+ly a few
+> cycles, e.g. check vcpu->mode and kvm_request_pending().
+
+No, I wasn't worried about performance. Probably I misread
+
+                if (likely(exit_fastpath !=3D EXIT_FASTPATH_REENTER_GUEST))
+                        break;
+
+as something like
+
+                if (likely(exit_fastpath =3D=3D EXIT_FASTPATH_REENTER_GUEST=
+))
+                        continue;
+
+EXIT_FASTPATH_REENTER_GUEST is exactly what's needed here.
+
+Paolo
 
 
