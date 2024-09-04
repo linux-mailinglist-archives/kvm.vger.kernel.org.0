@@ -1,131 +1,181 @@
-Return-Path: <kvm+bounces-25834-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25835-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0964F96B272
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 09:11:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D4E96B2F9
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 09:35:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F396B25C57
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 07:11:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB8F2281BA1
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 07:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6137214658D;
-	Wed,  4 Sep 2024 07:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C617146A9F;
+	Wed,  4 Sep 2024 07:35:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=freebsd.org header.i=@freebsd.org header.b="uvF7FEHv"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mx2.freebsd.org (mx2.freebsd.org [96.47.72.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E91413B295;
-	Wed,  4 Sep 2024 07:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725433887; cv=none; b=EQKwgrSY3IzI2owztw/Jec02rOWIfOQ7bDSl//ulXQsF83j+GBrYS2LoawbPWW+926xkgAB9qYPyK8D5MRj2IK9ke9m0EoAHpJgvXqa0j0Ie0moxkBIu+cdrFe5tNklm4/nQcoG5I8mCOeaAYz9uTQ+heT0Z4+0iC64VhA+XgKs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725433887; c=relaxed/simple;
-	bh=XUia+7rc1rUXT14/Otf2vEXD49C/QKG8Z2n50lG3/SI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=kRXp3+Ms7w+ge6M0aLWOmUXhsD3fmkNo6gUVBsvMO0/IDSK+pJ2rneeTC7EDal+O6t6pCHP5423B87EmTq20vBaJAkQ3XAiz9MYzVOdgjltLhH8w73Vf5zYkutELBW/AfqIiJxOnKUnEBVj0pXv/l3p/MEJke2ZbHmzjTFVUgA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WzD8q1Tdvz1HJ84;
-	Wed,  4 Sep 2024 15:07:55 +0800 (CST)
-Received: from dggpemf200002.china.huawei.com (unknown [7.185.36.244])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8227714011D;
-	Wed,  4 Sep 2024 15:11:22 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- dggpemf200002.china.huawei.com (7.185.36.244) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 4 Sep 2024 15:11:21 +0800
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Wed, 4 Sep 2024 08:11:19 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Jason Gunthorpe <jgg@nvidia.com>, Mostafa Saleh <smostafa@google.com>
-CC: "acpica-devel@lists.linux.dev" <acpica-devel@lists.linux.dev>, "Guohanjun
- (Hanjun Guo)" <guohanjun@huawei.com>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, Joerg Roedel <joro@8bytes.org>, Kevin Tian
-	<kevin.tian@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Len
- Brown" <lenb@kernel.org>, "linux-acpi@vger.kernel.org"
-	<linux-acpi@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Lorenzo Pieralisi
-	<lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Robert
- Moore" <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, "Sudeep
- Holla" <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, Alex Williamson
-	<alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Moritz Fischer
-	<mdf@kernel.org>, Michael Shavit <mshavit@google.com>, Nicolin Chen
-	<nicolinc@nvidia.com>, "patches@lists.linux.dev" <patches@lists.linux.dev>
-Subject: RE: [PATCH v2 6/8] iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO via
- struct arm_smmu_hw_info
-Thread-Topic: [PATCH v2 6/8] iommu/arm-smmu-v3: Support IOMMU_GET_HW_INFO via
- struct arm_smmu_hw_info
-Thread-Index: AQHa+JkM44hgQT3eCE+0H/cNBDIGbrI/3zqAgAAfZACABEBRAIAA7EQAgACK+ICAAP0kgIAAil8A
-Date: Wed, 4 Sep 2024 07:11:19 +0000
-Message-ID: <9e8153c95b664726bd7fcb6d0605610a@huawei.com>
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <6-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <ZtHj_X6Gt91TlUZG@google.com> <20240830171602.GX3773488@nvidia.com>
- <ZtWPRDsQ-VV-6juL@google.com> <20240903001654.GE3773488@nvidia.com>
- <ZtbKCb9FTt5gjERf@google.com> <20240903234019.GI3773488@nvidia.com>
-In-Reply-To: <20240903234019.GI3773488@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCD23C17;
+	Wed,  4 Sep 2024 07:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=96.47.72.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725435310; cv=pass; b=jKFoc30xM/6/nAgwoszcHULyzkYoPO50/HAmdfnIN9lF2w3YwVN0gztDNmdoRskOu8/CVbwvoms2nJcp6pyPK/r7BUjH0qnnvqsklZtvH9JL03BVEdFWvIdibe2YDYxlheUONZMKwA2Op+eu8+u8uwQEPi2jTz1Z1WMoMeJmIHI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725435310; c=relaxed/simple;
+	bh=s7G+1cU3wFHWsB8CGbBC3PlRmQZrTCS8Gt5gpjh1b4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ys4go+w5gU6lu3Hu9Bmh/rykddNjQ/KiXoNZgBW3PsTRk8trWOiaRppZyYR9q5/t8d8PXhjSeP3CFP8I6tfNLkrHJlzfDHPfRbLxn1T3molQ63S/1Dw4d6jc13F2r32ns2H7pBT657b+/PWnWF3RNL4tKHSJl0dwJ3U3v+BG9mk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=freebsd.org; spf=pass smtp.mailfrom=freebsd.org; dkim=pass (2048-bit key) header.d=freebsd.org header.i=@freebsd.org header.b=uvF7FEHv; arc=pass smtp.client-ip=96.47.72.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=freebsd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freebsd.org
+Received: from mx1.freebsd.org (mx1.freebsd.org [IPv6:2610:1c1:1:606c::19:1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits)
+	 client-signature RSA-PSS (4096 bits))
+	(Client CN "mx1.freebsd.org", Issuer "R10" (verified OK))
+	by mx2.freebsd.org (Postfix) with ESMTPS id 4WzDmB3cl5z41Mm;
+	Wed,  4 Sep 2024 07:35:06 +0000 (UTC)
+	(envelope-from ssouhlal@freebsd.org)
+Received: from freefall.freebsd.org (freefall.freebsd.org [96.47.72.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "freefall.freebsd.org", Issuer "R11" (verified OK))
+	by mx1.freebsd.org (Postfix) with ESMTPS id 4WzDmB2r4Xz4FLK;
+	Wed,  4 Sep 2024 07:35:06 +0000 (UTC)
+	(envelope-from ssouhlal@freebsd.org)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=freebsd.org; s=dkim;
+	t=1725435306;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZD0avwa5MUoFI9ov7p+i7pt8IH9D8rPh/o0IcOG42vs=;
+	b=uvF7FEHvhzz9uf3fwh4REMIymiNOtxdPtlC31MlzrkS8A/AwPutDcMO3mQ/zOwuZ5Ef8zZ
+	Hzn/Ur13ba/pFambgYeclyHcvkyQVWaXem36VaJlKRlOuJiWuFL+rcaouNqpsYx7s7Ofxh
+	LzHcLjUTu+HXqQvZ7tW+aJ0g6hq76XhqcGbQ1ZRlHwFOgUotz0yCSOnBToL9EDUO/xd6Sf
+	F4wtiahLGydzkAmAYaMgRwzMYH4hgDmpMWNOaPVS1tpzb66vHj9RSpmoddz4dN0wKkTsBa
+	NA077cvVHCnsPwAOjP+RXQShWBE9NG58PttjTkMddEsrycIIRpBtYyPaZjVPNg==
+ARC-Seal: i=1; s=dkim; d=freebsd.org; t=1725435306; a=rsa-sha256; cv=none;
+	b=r/pwZMPKJlOmyGAdM4fBcsKiNwzYC+3CcDm1anedtKnQdEkLd+gu/lKNoYN/BBBWs8ln8b
+	LnGsqPKVrYHnB3/A3QsrbZYDN11qo4npOMYj1fqIFrV5bOQdADHWzSq3M82VDib51bbyHM
+	0Tyd0veks9nF0B+k2oIvVQxURNhSOJZt7dx6aolUSJGiJRVZurX6kDDQ5kPBwmtZq83NcV
+	H9MuZP9OGtGByCAu6HltQs62gxDY+rLDEEnXkYJzkaQjjWmUsPgeqsDEjphJF1tBtuLbFk
+	MeQ+B+1JHYplmSEVu3a8ib7sJGAF+FqwjNy3wobWwtJ2GdJ9gkLdeXZcHgEdmg==
+ARC-Authentication-Results: i=1;
+	mx1.freebsd.org;
+	none
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=freebsd.org;
+	s=dkim; t=1725435306;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZD0avwa5MUoFI9ov7p+i7pt8IH9D8rPh/o0IcOG42vs=;
+	b=PnZh/3ptInZkoNAm6Ob+lF2xlhYwvkWQoLnEJpBZg/+MvZmYnyKoK+lGSyZq4te18daip2
+	KwVmsjTqsy+KIF2kOWQVnF9y1AzOdoq1dH8ACa0RR1DYhwAzCmjndK08tu+Nnro5stNm3a
+	NVC4uz0MXu+rmB2yCz/DEG8ljCGQOQ9t9fRS1IfVpTGAi4emNHGlieLWqxPva4byDVfLfK
+	kc6sgrT8fnPBQEougsLxxulErma2WjLmtwRBPdw3A27fDPEkG2WvQFayhKJNV8woU2PKD7
+	lg2+C9vcGE9lwZKl7pqW62XrDovh+8+iAyCR3kkJJ3cRltApfkrrI5x3O31jDw==
+Received: by freefall.freebsd.org (Postfix, from userid 1026)
+	id 4487C23F12; Wed, 04 Sep 2024 07:35:06 +0000 (UTC)
+Date: Wed, 4 Sep 2024 07:35:06 +0000
+From: Suleiman Souhlal <ssouhlal@freebsd.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+	LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	"x86@kernel.org" <x86@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Vineeth Pillai <vineeth@bitbyteword.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Frederic Weisbecker <fweisbec@gmail.com>, suleiman@google.com
+Subject: Re: [RFC][PATCH] KVM: Remove HIGH_RES_TIMERS dependency
+Message-ID: <ZtgNqv1r7S738osp@freefall.freebsd.org>
+References: <20240821095127.45d17b19@gandalf.local.home>
+ <Zs97wp2-vIRjgk-e@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zs97wp2-vIRjgk-e@google.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gR3VudGhvcnBl
-IDxqZ2dAbnZpZGlhLmNvbT4NCj4gU2VudDogV2VkbmVzZGF5LCBTZXB0ZW1iZXIgNCwgMjAyNCAx
-Mjo0MCBBTQ0KPiBUbzogTW9zdGFmYSBTYWxlaCA8c21vc3RhZmFAZ29vZ2xlLmNvbT4NCj4gQ2M6
-IGFjcGljYS1kZXZlbEBsaXN0cy5saW51eC5kZXY7IEd1b2hhbmp1biAoSGFuanVuIEd1bykNCj4g
-PGd1b2hhbmp1bkBodWF3ZWkuY29tPjsgaW9tbXVAbGlzdHMubGludXguZGV2OyBKb2VyZyBSb2Vk
-ZWwNCj4gPGpvcm9AOGJ5dGVzLm9yZz47IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwuY29t
-PjsNCj4ga3ZtQHZnZXIua2VybmVsLm9yZzsgTGVuIEJyb3duIDxsZW5iQGtlcm5lbC5vcmc+OyBs
-aW51eC0NCj4gYWNwaUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5m
-cmFkZWFkLm9yZzsgTG9yZW56byBQaWVyYWxpc2kNCj4gPGxwaWVyYWxpc2lAa2VybmVsLm9yZz47
-IFJhZmFlbCBKLiBXeXNvY2tpIDxyYWZhZWxAa2VybmVsLm9yZz47IFJvYmVydA0KPiBNb29yZSA8
-cm9iZXJ0Lm1vb3JlQGludGVsLmNvbT47IFJvYmluIE11cnBoeQ0KPiA8cm9iaW4ubXVycGh5QGFy
-bS5jb20+OyBTdWRlZXAgSG9sbGEgPHN1ZGVlcC5ob2xsYUBhcm0uY29tPjsgV2lsbA0KPiBEZWFj
-b24gPHdpbGxAa2VybmVsLm9yZz47IEFsZXggV2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJl
-ZGhhdC5jb20+Ow0KPiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+OyBKZWFuLVBo
-aWxpcHBlIEJydWNrZXIgPGplYW4tDQo+IHBoaWxpcHBlQGxpbmFyby5vcmc+OyBNb3JpdHogRmlz
-Y2hlciA8bWRmQGtlcm5lbC5vcmc+OyBNaWNoYWVsIFNoYXZpdA0KPiA8bXNoYXZpdEBnb29nbGUu
-Y29tPjsgTmljb2xpbiBDaGVuIDxuaWNvbGluY0BudmlkaWEuY29tPjsNCj4gcGF0Y2hlc0BsaXN0
-cy5saW51eC5kZXY7IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gPHNoYW1lZXJhbGkua29s
-b3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiA2LzhdIGlv
-bW11L2FybS1zbW11LXYzOiBTdXBwb3J0DQo+IElPTU1VX0dFVF9IV19JTkZPIHZpYSBzdHJ1Y3Qg
-YXJtX3NtbXVfaHdfaW5mbw0KPiANCj4gT24gVHVlLCBTZXAgMDMsIDIwMjQgYXQgMDg6MzQ6MTdB
-TSArMDAwMCwgTW9zdGFmYSBTYWxlaCB3cm90ZToNCj4gDQo+ID4gPiA+IEZvciBleGFtcGxlLCBL
-Vk0gZG9lc27igJl0IGFsbG93IHJlYWRpbmcgcmVhZGluZyB0aGUgQ1BVIHN5c3RlbQ0KPiA+ID4g
-PiByZWdpc3RlcnMgdG8ga25vdyBpZiBTVkUob3Igb3RoZXIgZmVhdHVyZXMpIGlzIHN1cHBvcnRl
-ZCBidXQgaGlkZXMNCj4gPiA+ID4gdGhhdCBieSBhIENBUCBpbiBLVk1fQ0hFQ0tfRVhURU5TSU9O
-DQo+ID4gPg0KPiA+ID4gRG8geW91IGtub3cgd2h5Pw0KPiA+DQo+ID4gSSBhbSBub3QgcmVhbGx5
-IHN1cmUsIGJ1dCBJIGJlbGlldmUgaXTigJlzIGEgdXNlZnVsIGFic3RyYWN0aW9uDQo+IA0KPiBJ
-dCBzZWVtcyBvZGQgdG8gbWUsIHVucHJpdiB1c2Vyc3BhY2UgY2FuIGxvb2sgaW4gL3Byb2MvY3B1
-aW5mbyBhbmQgc2VlDQo+IFNFViwgd2h5IHdvdWxkIGt2bSBoaWRlIHRoZSBzYW1lIGluZm9ybWF0
-aW9uIGJlaGluZCBhDQo+IENBUF9TWVNfQURNSU4vd2hhdGV2ZXIgY2hlY2s/DQoNCkkgZG9u4oCZ
-dCB0aGluayBLVk0gaGlkZXMgU1ZFIGFsd2F5cy4gSXQgYWxzbyBkZXBlbmRzIG9uIHdoZXRoZXIg
-dGhlIFZNTSBoYXMNCnJlcXVlc3RlZCBzdmUgZm9yIGEgc3BlY2lmaWMgR3Vlc3Qgb3Igbm90KFFl
-bXUgaGFzIG9wdGlvbiB0byB0dXJuIHN2ZSBvbi9vZmYsIHNpbWlsYXJseSBwbXUNCmFzIHdlbGwp
-LiAgQmFzZWQgb24gdGhhdCBLVk0gcG9wdWxhdGVzIHRoZSBHdWVzdCBzcGVjaWZpYyBJRCByZWdp
-c3RlcnMuICBBbmQgR3Vlc3QNCi9wcm9jL2NwdWluZm8gcmVmbGVjdHMgdGhhdC4NCg0KQW5kIGZv
-ciBzb21lIGZlYXR1cmVzIGlmIEtWTSBpcyBub3QgaGFuZGxpbmcgdGhlIGZlYXR1cmUgcHJvcGVy
-bHkgb3Igbm90IG1ha2luZyBhbnkgc2Vuc2UNCnRvIGJlIGV4cG9zZWQgdG8gR3Vlc3QsIHRob3Nl
-IGZlYXR1cmVzIGFyZSBtYXNrZWQgaW4gSUQgcmVnaXN0ZXJzLg0KDQpSZWNlbnRseSBBUk02NCBJ
-RCByZWdpc3RlcnMgaGFzIGJlZW4gbWFkZSB3cml0YWJsZSBmcm9tIHVzZXJzcGFjZSB0byBhbGxv
-dyBWTU0gdG8gdHVybg0Kb24vb2ZmIGZlYXR1cmVzLCBzbyB0aGF0IFZNcyBjYW4gYmUgbWlncmF0
-ZWQgYmV0d2VlbiBob3N0cyB0aGF0IGRpZmZlciBpbiBmZWF0dXJlIHN1cHBvcnQuDQoNCmh0dHBz
-Oi8vbG9yZS5rZXJuZWwub3JnL2FsbC9aUjJZZkFpeFpnYkNGbmI4QGxpbnV4LmRldi9ULyNtN2My
-NDkzZmQyZDQzYzEzYTMzMzZkMTlmMmRjMDZhODk4MDNjNmZkYg0KDQpUaGFua3MsDQpTaGFtZWVy
-DQo=
+On Wed, Aug 28, 2024 at 12:34:26PM -0700, Sean Christopherson wrote:
+> On Wed, Aug 21, 2024, Steven Rostedt wrote:
+> > From: Steven Rostedt <rostedt@goodmis.org>
+> > 
+> > Commit 92b5265d38f6a ("KVM: Depend on HIGH_RES_TIMERS") added a dependency
+> > to high resolution timers with the comment:
+> > 
+> >     KVM lapic timer and tsc deadline timer based on hrtimer,
+> >     setting a leftmost node to rb tree and then do hrtimer reprogram.
+> >     If hrtimer not configured as high resolution, hrtimer_enqueue_reprogram
+> >     do nothing and then make kvm lapic timer and tsc deadline timer fail.
+> > 
+> > That was back in 2012, where hrtimer_start_range_ns() would do the
+> > reprogramming with hrtimer_enqueue_reprogram(). But as that was a nop with
+> > high resolution timers disabled, this did not work. But a lot has changed
+> > in the last 12 years.
+> > 
+> > For example, commit 49a2a07514a3a ("hrtimer: Kick lowres dynticks targets on
+> > timer enqueue") modifies __hrtimer_start_range_ns() to work with low res
+> > timers. There's been lots of other changes that make low res work.
+> > 
+> > I added this change to my main server that runs all my VMs (my mail
+> > server, my web server, my ssh server) and disabled HIGH_RES_TIMERS and the
+> > system has been running just fine for over a month.
+> > 
+> > ChromeOS has tested this before as well, and it hasn't seen any issues with
+> > running KVM with high res timers disabled.
+> 
+> Can you provide some background on why this is desirable, and what the effective
+> tradeoffs are?  Mostly so that future users have some chance of making an
+> informed decision.  Realistically, anyone running with HIGH_RES_TIMERS=n is likely
+> already aware of the tradeoffs, but it'd be nice to capture the info here.
+
+We have found that disabling HR timers saves power without degrading
+the user experience too much.
+
+> 
+> > Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+> > ---
+> >  arch/x86/kvm/Kconfig | 1 -
+> >  1 file changed, 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> > index 472a1537b7a9..c65127e796a9 100644
+> > --- a/arch/x86/kvm/Kconfig
+> > +++ b/arch/x86/kvm/Kconfig
+> > @@ -19,7 +19,6 @@ if VIRTUALIZATION
+> >  
+> >  config KVM
+> >  	tristate "Kernel-based Virtual Machine (KVM) support"
+> > -	depends on HIGH_RES_TIMERS
+> 
+> I did some very basic testing and nothing exploded on me either.  So long as
+> nothing in the host catches fire, I don't see a good reason to make high resolution
+> timers a hard requirement.
+> 
+> My only concern is that this could, at least in theory, result in people
+> unintentionally breaking their setups, but that seems quite unlikely.
+> 
+> One thought would be to require the user to enable EXPERT in order to break the
+> HIGH_RES_TIMERS dependency.  In practice, I doubt that will be much of a deterrent
+> since (IIRC) many distros ship with EXPERT=y.  But it would at least document that
+> using KVM x86 without HIGH_RES_TIMERS may come with caveats.  E.g.
+> 
+> 	depends on HIGH_RES_TIMERS || EXPERT
+
+This sounds like a good compromise.
+
+-- Suleiman
 
