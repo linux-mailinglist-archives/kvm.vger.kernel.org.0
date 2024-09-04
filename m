@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-25851-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25869-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AD1D96BA42
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 13:23:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 322B696BA56
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 13:24:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4192D285602
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 11:23:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56D151C22933
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 11:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E2F1D54DC;
-	Wed,  4 Sep 2024 11:18:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D7C1DB522;
+	Wed,  4 Sep 2024 11:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="az4tY5ay"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SGGtDQhf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639911D0966
-	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 11:18:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B2C1DA2F1
+	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 11:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725448735; cv=none; b=Z5C7Fw81mYNgs/Y2bgpRd93PlVx2vXxgkaKctyWTlbASQh7A9dV0dHBmfW74TAUATJSlH6KUtOB/Vab08aisaadumptopHWsZDRVXvkYwkr8Kg777CLBWBGHg3jEmFMa82NV/h6/CMKRt8FS0FJYhA360MuMC7QSfSrsGqZI7EY=
+	t=1725448741; cv=none; b=KWyyCKityGhis2cAKUgOS3BQ8lZxD5e919n6PIU1Jeq2X4IdbltsK18dvAAN/7hVuRFwppyHhc4LMAE6XESP5Cca+M5/JO0SnTdiwY+N3+c9EaghO7dBmpYR/TyXINZ4YER4GUwMls9FpSwvVXtzpBYMqOow4oR5Zb5i41WN5PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725448735; c=relaxed/simple;
-	bh=5DADHnOdVY8Q6Qbi2QPije39VC68w82G4KmJNbc5aRA=;
+	s=arc-20240116; t=1725448741; c=relaxed/simple;
+	bh=cLe2CtGHMvHhEnBeaKWCKZnP+W3HBt0fDmmzhNodvBI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BdDIoszeMRpOigfo89YiRrwCyrryLUnLCHg1sJXFqB959va65XFXTbQ3XGqCKDMViSRW6sFObFYEnrSbbI69To6ISEH1YeCub3YWleP+/hptOMi3tM+PQzuA7IVBGUO8dCyeujTPsGiiBPb5XvFc1TMqwmPNcD1FOY2f01ZKO6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=az4tY5ay; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=dEX+9zSPJ4GeKo4zB73EFvAONcU/SZoNjEyphdrbqYnbOAvI3et0GLn+PizPyA+8QYhiTA/0yBp69gXyod87IL9CotWQxP9ATIzBz/ZvfJ+lKIEGHs8XCuLacgooxbE9zzvmQ+A9Cz8JO3spDN4bHJmRFMU9ZEqXDNZz0G5qrQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SGGtDQhf; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725448732;
+	s=mimecast20190719; t=1725448738;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XgpYkJsaI9m1H5zaH4zbGBX7PFklNC5stqAFMp25Csk=;
-	b=az4tY5ayDrYTcgd21UGOH4pAHSjRNd400MXKgSdFhOWnzoI7ajyme+j5Tf0o/4w0eh87QR
-	z8blj4i/h8ylVy4eMestUnQZBXMioNTwEJzoO0GxXxh4wSTPsLULvqkJNGx/+UQncoHrHH
-	HE4ZeouFCmkFALM1qQAWPytAec9HFNM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=exP//E9i5wK2gHhGXlaYilKR5VvVnUFMPHblLY32rno=;
+	b=SGGtDQhfxxntbgN4X+4BqNacSsoNHOE62q1kw1gpBiUGGOfgmMJbiZsk0N2McTa9FACP+b
+	CfxT6sMjuQdKrCdXqYTnJ+KuZuyVbbZwK+k1WNEPqJH65FhGPVTTaSCOUSKRLppnT63Knk
+	e2jmFcbDY6jnqYCffBjh+isKB/w7UI4=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-526-63Bd3otfNrOJFq-UnnzLfw-1; Wed,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-523-PrQIcrxeMyCg09Ng8bdaoQ-1; Wed,
  04 Sep 2024 07:18:49 -0400
-X-MC-Unique: 63Bd3otfNrOJFq-UnnzLfw-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+X-MC-Unique: PrQIcrxeMyCg09Ng8bdaoQ-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 42F9D1955D57;
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 066021955D59;
 	Wed,  4 Sep 2024 11:18:45 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.39.192.112])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 27DC419560AE;
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1688730001AB;
 	Wed,  4 Sep 2024 11:18:44 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id B4BE621E681F; Wed,  4 Sep 2024 13:18:36 +0200 (CEST)
+	id B976521E6828; Wed,  4 Sep 2024 13:18:36 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: alex.williamson@redhat.com,
@@ -109,9 +109,9 @@ Cc: alex.williamson@redhat.com,
 	qemu-s390x@nongnu.org,
 	kvm@vger.kernel.org,
 	avihaih@nvidia.com
-Subject: [PATCH v2 09/19] qapi/machine: Rename CpuS390* to S390Cpu*, and drop 'prefix'
-Date: Wed,  4 Sep 2024 13:18:26 +0200
-Message-ID: <20240904111836.3273842-10-armbru@redhat.com>
+Subject: [PATCH v2 10/19] qapi/crypto: Drop unwanted 'prefix'
+Date: Wed,  4 Sep 2024 13:18:27 +0200
+Message-ID: <20240904111836.3273842-11-armbru@redhat.com>
 In-Reply-To: <20240904111836.3273842-1-armbru@redhat.com>
 References: <20240904111836.3273842-1-armbru@redhat.com>
 Precedence: bulk
@@ -122,252 +122,331 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 QAPI's 'prefix' feature can make the connection between enumeration
 type and its constants less than obvious.  It's best used with
 restraint.
 
-CpuS390Entitlement has a 'prefix' to change the generated enumeration
-constants' prefix from CPU_S390_ENTITLEMENT to S390_CPU_ENTITLEMENT.
-Rename the type to S390CpuEntitlement, so that 'prefix' is not needed.
+QCryptoAkCipherKeyType has a 'prefix' that overrides the generated
+enumeration constants' prefix to QCRYPTO_AKCIPHER_KEY_TYPE.
 
-Likewise change CpuS390Polarization to S390CpuPolarization, and
-CpuS390State to S390CpuState.
+Drop it.  The prefix becomes QCRYPTO_AK_CIPHER_KEY_TYPE.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- qapi/machine-common.json            |  5 ++---
- qapi/machine-target.json            | 11 +++++------
- qapi/machine.json                   |  9 ++++-----
- qapi/pragma.json                    |  6 +++---
- include/hw/qdev-properties-system.h |  2 +-
- include/hw/s390x/cpu-topology.h     |  2 +-
- target/s390x/cpu.h                  |  2 +-
- hw/core/qdev-properties-system.c    |  6 +++---
- hw/s390x/cpu-topology.c             |  6 +++---
- 9 files changed, 23 insertions(+), 26 deletions(-)
+ qapi/crypto.json                        |  1 -
+ backends/cryptodev-builtin.c            |  4 ++--
+ backends/cryptodev-lkcf.c               |  6 +++---
+ tests/bench/benchmark-crypto-akcipher.c |  2 +-
+ tests/unit/test-crypto-akcipher.c       | 28 ++++++++++++-------------
+ crypto/akcipher-gcrypt.c.inc            |  8 +++----
+ crypto/akcipher-nettle.c.inc            |  8 +++----
+ crypto/rsakey-builtin.c.inc             |  4 ++--
+ crypto/rsakey-nettle.c.inc              |  4 ++--
+ 9 files changed, 32 insertions(+), 33 deletions(-)
 
-diff --git a/qapi/machine-common.json b/qapi/machine-common.json
-index fa6bd71d12..b64e4895cf 100644
---- a/qapi/machine-common.json
-+++ b/qapi/machine-common.json
-@@ -9,13 +9,12 @@
+diff --git a/qapi/crypto.json b/qapi/crypto.json
+index fb00c706b2..b5c25e7cd9 100644
+--- a/qapi/crypto.json
++++ b/qapi/crypto.json
+@@ -609,7 +609,6 @@
+ # Since: 7.1
  ##
+ { 'enum': 'QCryptoAkCipherKeyType',
+-  'prefix': 'QCRYPTO_AKCIPHER_KEY_TYPE',
+   'data': ['public', 'private']}
  
  ##
--# @CpuS390Entitlement:
-+# @S390CpuEntitlement:
- #
- # An enumeration of CPU entitlements that can be assumed by a virtual
- # S390 CPU
- #
- # Since: 8.2
- ##
--{ 'enum': 'CpuS390Entitlement',
--  'prefix': 'S390_CPU_ENTITLEMENT',
-+{ 'enum': 'S390CpuEntitlement',
-   'data': [ 'auto', 'low', 'medium', 'high' ] }
-diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-index 1a394c08f5..541f93eeb7 100644
---- a/qapi/machine-target.json
-+++ b/qapi/machine-target.json
-@@ -405,15 +405,14 @@
-                    'TARGET_RISCV' ] } }
+diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
+index 940104ee55..e95af9bb72 100644
+--- a/backends/cryptodev-builtin.c
++++ b/backends/cryptodev-builtin.c
+@@ -334,11 +334,11 @@ static int cryptodev_builtin_create_akcipher_session(
  
- ##
--# @CpuS390Polarization:
-+# @S390CpuPolarization:
- #
- # An enumeration of CPU polarization that can be assumed by a virtual
- # S390 CPU
- #
- # Since: 8.2
- ##
--{ 'enum': 'CpuS390Polarization',
--  'prefix': 'S390_CPU_POLARIZATION',
-+{ 'enum': 'S390CpuPolarization',
-   'data': [ 'horizontal', 'vertical' ],
-   'if': 'TARGET_S390X'
+     switch (sess_info->keytype) {
+     case VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PUBLIC:
+-        type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC;
++        type = QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC;
+         break;
+ 
+     case VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PRIVATE:
+-        type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE;
++        type = QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE;
+         break;
+ 
+     default:
+diff --git a/backends/cryptodev-lkcf.c b/backends/cryptodev-lkcf.c
+index 45aba1ff67..e1ee11a158 100644
+--- a/backends/cryptodev-lkcf.c
++++ b/backends/cryptodev-lkcf.c
+@@ -322,7 +322,7 @@ static void cryptodev_lkcf_execute_task(CryptoDevLKCFTask *task)
+      * 2. generally, public key related compution is fast, just compute it with
+      * thread-pool.
+      */
+-    if (session->keytype == QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE) {
++    if (session->keytype == QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE) {
+         if (qcrypto_akcipher_export_p8info(&session->akcipher_opts,
+                                            session->key, session->keylen,
+                                            &p8info, &p8info_len,
+@@ -534,11 +534,11 @@ static int cryptodev_lkcf_create_asym_session(
+ 
+     switch (sess_info->keytype) {
+     case VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PUBLIC:
+-        sess->keytype = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC;
++        sess->keytype = QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC;
+         break;
+ 
+     case VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PRIVATE:
+-        sess->keytype = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE;
++        sess->keytype = QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE;
+         break;
+ 
+     default:
+diff --git a/tests/bench/benchmark-crypto-akcipher.c b/tests/bench/benchmark-crypto-akcipher.c
+index 5e68cb0a1c..bbc29c9b12 100644
+--- a/tests/bench/benchmark-crypto-akcipher.c
++++ b/tests/bench/benchmark-crypto-akcipher.c
+@@ -28,7 +28,7 @@ static QCryptoAkCipher *create_rsa_akcipher(const uint8_t *priv_key,
+     opt.alg = QCRYPTO_AKCIPHER_ALG_RSA;
+     opt.u.rsa.padding_alg = padding;
+     opt.u.rsa.hash_alg = hash;
+-    return qcrypto_akcipher_new(&opt, QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++    return qcrypto_akcipher_new(&opt, QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE,
+                                 priv_key, keylen, &error_abort);
  }
-@@ -450,7 +449,7 @@
-       '*socket-id': 'uint16',
-       '*book-id': 'uint16',
-       '*drawer-id': 'uint16',
--      '*entitlement': 'CpuS390Entitlement',
-+      '*entitlement': 'S390CpuEntitlement',
-       '*dedicated': 'bool'
-   },
-   'features': [ 'unstable' ],
-@@ -488,7 +487,7 @@
- #          "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
- ##
- { 'event': 'CPU_POLARIZATION_CHANGE',
--  'data': { 'polarization': 'CpuS390Polarization' },
-+  'data': { 'polarization': 'S390CpuPolarization' },
-   'features': [ 'unstable' ],
-   'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
- }
-@@ -503,7 +502,7 @@
- # Since: 8.2
- ##
- { 'struct': 'CpuPolarizationInfo',
--  'data': { 'polarization': 'CpuS390Polarization' },
-+  'data': { 'polarization': 'S390CpuPolarization' },
-   'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
- }
  
-diff --git a/qapi/machine.json b/qapi/machine.json
-index d4317435e7..63a5eb0070 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -41,15 +41,14 @@
-              'x86_64', 'xtensa', 'xtensaeb' ] }
- 
- ##
--# @CpuS390State:
-+# @S390CpuState:
- #
- # An enumeration of cpu states that can be assumed by a virtual S390
- # CPU
- #
- # Since: 2.12
- ##
--{ 'enum': 'CpuS390State',
--  'prefix': 'S390_CPU_STATE',
-+{ 'enum': 'S390CpuState',
-   'data': [ 'uninitialized', 'stopped', 'check-stop', 'operating', 'load' ] }
- 
- ##
-@@ -66,9 +65,9 @@
- # Since: 2.12
- ##
- { 'struct': 'CpuInfoS390',
--  'data': { 'cpu-state': 'CpuS390State',
-+  'data': { 'cpu-state': 'S390CpuState',
-             '*dedicated': 'bool',
--            '*entitlement': 'CpuS390Entitlement' } }
-+            '*entitlement': 'S390CpuEntitlement' } }
- 
- ##
- # @CpuInfoFast:
-diff --git a/qapi/pragma.json b/qapi/pragma.json
-index 59fbe74b8c..fad3a31628 100644
---- a/qapi/pragma.json
-+++ b/qapi/pragma.json
-@@ -47,9 +47,6 @@
-         'BlockdevSnapshotWrapper',
-         'BlockdevVmdkAdapterType',
-         'ChardevBackendKind',
--        'CpuS390Entitlement',
--        'CpuS390Polarization',
--        'CpuS390State',
-         'CxlCorErrorType',
-         'DisplayProtocol',
-         'DriveBackupWrapper',
-@@ -74,6 +71,9 @@
-         'QKeyCode',
-         'RbdAuthMode',
-         'RbdImageEncryptionFormat',
-+        'S390CpuEntitlement',
-+        'S390CpuPolarization',
-+        'S390CpuState',
-         'String',
-         'StringWrapper',
-         'SysEmuTarget',
-diff --git a/include/hw/qdev-properties-system.h b/include/hw/qdev-properties-system.h
-index 438f65389f..cdcc63056e 100644
---- a/include/hw/qdev-properties-system.h
-+++ b/include/hw/qdev-properties-system.h
-@@ -88,7 +88,7 @@ extern const PropertyInfo qdev_prop_iothread_vq_mapping_list;
- 
- #define DEFINE_PROP_CPUS390ENTITLEMENT(_n, _s, _f, _d) \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_cpus390entitlement, \
--                       CpuS390Entitlement)
-+                       S390CpuEntitlement)
- 
- #define DEFINE_PROP_IOTHREAD_VQ_MAPPING_LIST(_name, _state, _field) \
-     DEFINE_PROP(_name, _state, _field, qdev_prop_iothread_vq_mapping_list, \
-diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
-index c064f427e9..a11b1baa77 100644
---- a/include/hw/s390x/cpu-topology.h
-+++ b/include/hw/s390x/cpu-topology.h
-@@ -37,7 +37,7 @@ typedef struct S390TopologyEntry {
- 
- typedef struct S390Topology {
-     uint8_t *cores_per_socket;
--    CpuS390Polarization polarization;
-+    S390CpuPolarization polarization;
- } S390Topology;
- 
- typedef QTAILQ_HEAD(, S390TopologyEntry) S390TopologyList;
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index d6b75ad0e0..6cbd77dfdf 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -133,7 +133,7 @@ typedef struct CPUArchState {
-     int32_t book_id;
-     int32_t drawer_id;
-     bool dedicated;
--    CpuS390Entitlement entitlement; /* Used only for vertical polarization */
-+    S390CpuEntitlement entitlement; /* Used only for vertical polarization */
-     uint64_t cpuid;
- #endif
- 
-diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index f13350b4fb..f2db20417a 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -1188,12 +1188,12 @@ const PropertyInfo qdev_prop_uuid = {
- 
- /* --- s390 cpu entitlement policy --- */
- 
--QEMU_BUILD_BUG_ON(sizeof(CpuS390Entitlement) != sizeof(int));
-+QEMU_BUILD_BUG_ON(sizeof(S390CpuEntitlement) != sizeof(int));
- 
- const PropertyInfo qdev_prop_cpus390entitlement = {
--    .name  = "CpuS390Entitlement",
-+    .name  = "S390CpuEntitlement",
-     .description = "low/medium (default)/high",
--    .enum_table  = &CpuS390Entitlement_lookup,
-+    .enum_table  = &S390CpuEntitlement_lookup,
-     .get   = qdev_propinfo_get_enum,
-     .set   = qdev_propinfo_set_enum,
-     .set_default_value = qdev_propinfo_set_default_value_enum,
-diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-index f16bdf65fa..7d4e1f5472 100644
---- a/hw/s390x/cpu-topology.c
-+++ b/hw/s390x/cpu-topology.c
-@@ -105,7 +105,7 @@ static void s390_topology_init(MachineState *ms)
-  */
- void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
+diff --git a/tests/unit/test-crypto-akcipher.c b/tests/unit/test-crypto-akcipher.c
+index 4f1f4214dd..59bc6f1e69 100644
+--- a/tests/unit/test-crypto-akcipher.c
++++ b/tests/unit/test-crypto-akcipher.c
+@@ -692,7 +692,7 @@ struct QCryptoAkCipherTestData {
+ static QCryptoRSAKeyTestData rsakey_test_data[] = {
+     {
+         .path = "/crypto/akcipher/rsakey-1024-public",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC,
+         .key = rsa1024_public_key,
+         .keylen = sizeof(rsa1024_public_key),
+         .is_valid_key = true,
+@@ -700,7 +700,7 @@ static QCryptoRSAKeyTestData rsakey_test_data[] = {
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-1024-private",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE,
+         .key = rsa1024_private_key,
+         .keylen = sizeof(rsa1024_private_key),
+         .is_valid_key = true,
+@@ -708,7 +708,7 @@ static QCryptoRSAKeyTestData rsakey_test_data[] = {
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-2048-public",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC,
+         .key = rsa2048_public_key,
+         .keylen = sizeof(rsa2048_public_key),
+         .is_valid_key = true,
+@@ -716,7 +716,7 @@ static QCryptoRSAKeyTestData rsakey_test_data[] = {
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-2048-private",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE,
+         .key = rsa2048_private_key,
+         .keylen = sizeof(rsa2048_private_key),
+         .is_valid_key = true,
+@@ -724,56 +724,56 @@ static QCryptoRSAKeyTestData rsakey_test_data[] = {
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-public-lack-elem",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC,
+         .key = rsa_public_key_lack_element,
+         .keylen = sizeof(rsa_public_key_lack_element),
+         .is_valid_key = false,
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-private-lack-elem",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE,
+         .key = rsa_private_key_lack_element,
+         .keylen = sizeof(rsa_private_key_lack_element),
+         .is_valid_key = false,
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-public-empty-elem",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC,
+         .key = rsa_public_key_empty_element,
+         .keylen = sizeof(rsa_public_key_empty_element),
+         .is_valid_key = false,
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-private-empty-elem",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE,
+         .key = rsa_private_key_empty_element,
+         .keylen = sizeof(rsa_private_key_empty_element),
+         .is_valid_key = false,
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-public-empty-key",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC,
+         .key = NULL,
+         .keylen = 0,
+         .is_valid_key = false,
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-private-empty-key",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE,
+         .key = NULL,
+         .keylen = 0,
+         .is_valid_key = false,
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-public-invalid-length-val",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC,
+         .key = rsa_public_key_invalid_length_val,
+         .keylen = sizeof(rsa_public_key_invalid_length_val),
+         .is_valid_key = false,
+     },
+     {
+         .path = "/crypto/akcipher/rsakey-public-extra-elem",
+-        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key_type = QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC,
+         .key = rsa_public_key_extra_elem,
+         .keylen = sizeof(rsa_public_key_extra_elem),
+         .is_valid_key = false,
+@@ -885,12 +885,12 @@ static void test_akcipher(const void *opaque)
+         return;
+     }
+     pub_key = qcrypto_akcipher_new(&data->opt,
+-                                   QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++                                   QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC,
+                                    data->pub_key, data->pub_key_len,
+                                    &error_abort);
+     g_assert(pub_key != NULL);
+     priv_key = qcrypto_akcipher_new(&data->opt,
+-                                    QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++                                    QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE,
+                                     data->priv_key, data->priv_key_len,
+                                     &error_abort);
+     g_assert(priv_key != NULL);
+diff --git a/crypto/akcipher-gcrypt.c.inc b/crypto/akcipher-gcrypt.c.inc
+index abb1fb272e..e942d43421 100644
+--- a/crypto/akcipher-gcrypt.c.inc
++++ b/crypto/akcipher-gcrypt.c.inc
+@@ -85,7 +85,7 @@ static int qcrypto_gcrypt_parse_rsa_private_key(
+     const uint8_t *key, size_t keylen, Error **errp)
  {
--    CpuS390Polarization polarization;
-+    S390CpuPolarization polarization;
-     CPUS390XState *env = &cpu->env;
-     uint64_t reg = env->regs[r1];
-     int fc = reg & S390_TOPO_FC_MASK;
-@@ -357,7 +357,7 @@ static void s390_change_topology(uint16_t core_id,
-                                  bool has_book_id, uint16_t book_id,
-                                  bool has_drawer_id, uint16_t drawer_id,
-                                  bool has_entitlement,
--                                 CpuS390Entitlement entitlement,
-+                                 S390CpuEntitlement entitlement,
-                                  bool has_dedicated, bool dedicated,
-                                  Error **errp)
+     g_autoptr(QCryptoAkCipherRSAKey) rsa_key = qcrypto_akcipher_rsakey_parse(
+-        QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE, key, keylen, errp);
++        QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE, key, keylen, errp);
+     gcry_mpi_t n = NULL, e = NULL, d = NULL, p = NULL, q = NULL, u = NULL;
+     bool compute_mul_inv = false;
+     int ret = -1;
+@@ -178,7 +178,7 @@ static int qcrypto_gcrypt_parse_rsa_public_key(QCryptoGcryptRSA *rsa,
  {
-@@ -446,7 +446,7 @@ void qmp_set_cpu_topology(uint16_t core,
-                           bool has_socket, uint16_t socket,
-                           bool has_book, uint16_t book,
-                           bool has_drawer, uint16_t drawer,
--                          bool has_entitlement, CpuS390Entitlement entitlement,
-+                          bool has_entitlement, S390CpuEntitlement entitlement,
-                           bool has_dedicated, bool dedicated,
-                           Error **errp)
+ 
+     g_autoptr(QCryptoAkCipherRSAKey) rsa_key = qcrypto_akcipher_rsakey_parse(
+-        QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC, key, keylen, errp);
++        QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC, key, keylen, errp);
+     gcry_mpi_t n = NULL, e = NULL;
+     int ret = -1;
+     gcry_error_t err;
+@@ -540,13 +540,13 @@ static QCryptoGcryptRSA *qcrypto_gcrypt_rsa_new(
+     rsa->akcipher.driver = &gcrypt_rsa;
+ 
+     switch (type) {
+-    case QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE:
++    case QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE:
+         if (qcrypto_gcrypt_parse_rsa_private_key(rsa, key, keylen, errp) != 0) {
+             goto error;
+         }
+         break;
+ 
+-    case QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC:
++    case QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC:
+         if (qcrypto_gcrypt_parse_rsa_public_key(rsa, key, keylen, errp) != 0) {
+             goto error;
+         }
+diff --git a/crypto/akcipher-nettle.c.inc b/crypto/akcipher-nettle.c.inc
+index 02699e6e6d..62ac8699c4 100644
+--- a/crypto/akcipher-nettle.c.inc
++++ b/crypto/akcipher-nettle.c.inc
+@@ -87,7 +87,7 @@ static int qcrypt_nettle_parse_rsa_private_key(QCryptoNettleRSA *rsa,
+                                                Error **errp)
  {
+     g_autoptr(QCryptoAkCipherRSAKey) rsa_key = qcrypto_akcipher_rsakey_parse(
+-        QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE, key, keylen, errp);
++        QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE, key, keylen, errp);
+ 
+     if (!rsa_key) {
+         return -1;
+@@ -137,7 +137,7 @@ static int qcrypt_nettle_parse_rsa_public_key(QCryptoNettleRSA *rsa,
+                                               Error **errp)
+ {
+     g_autoptr(QCryptoAkCipherRSAKey) rsa_key = qcrypto_akcipher_rsakey_parse(
+-        QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC, key, keylen, errp);
++        QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC, key, keylen, errp);
+ 
+     if (!rsa_key) {
+         return -1;
+@@ -397,13 +397,13 @@ static QCryptoAkCipher *qcrypto_nettle_rsa_new(
+     rsa_private_key_init(&rsa->priv);
+ 
+     switch (type) {
+-    case QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE:
++    case QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE:
+         if (qcrypt_nettle_parse_rsa_private_key(rsa, key, keylen, errp) != 0) {
+             goto error;
+         }
+         break;
+ 
+-    case QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC:
++    case QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC:
+         if (qcrypt_nettle_parse_rsa_public_key(rsa, key, keylen, errp) != 0) {
+             goto error;
+         }
+diff --git a/crypto/rsakey-builtin.c.inc b/crypto/rsakey-builtin.c.inc
+index 46cc7afe87..6337b84c54 100644
+--- a/crypto/rsakey-builtin.c.inc
++++ b/crypto/rsakey-builtin.c.inc
+@@ -183,10 +183,10 @@ QCryptoAkCipherRSAKey *qcrypto_akcipher_rsakey_parse(
+     size_t keylen, Error **errp)
+ {
+     switch (type) {
+-    case QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE:
++    case QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE:
+         return qcrypto_builtin_rsa_private_key_parse(key, keylen, errp);
+ 
+-    case QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC:
++    case QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC:
+         return qcrypto_builtin_rsa_public_key_parse(key, keylen, errp);
+ 
+     default:
+diff --git a/crypto/rsakey-nettle.c.inc b/crypto/rsakey-nettle.c.inc
+index cc49872e78..b7f34b0234 100644
+--- a/crypto/rsakey-nettle.c.inc
++++ b/crypto/rsakey-nettle.c.inc
+@@ -145,10 +145,10 @@ QCryptoAkCipherRSAKey *qcrypto_akcipher_rsakey_parse(
+     size_t keylen, Error **errp)
+ {
+     switch (type) {
+-    case QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE:
++    case QCRYPTO_AK_CIPHER_KEY_TYPE_PRIVATE:
+         return qcrypto_nettle_rsa_private_key_parse(key, keylen, errp);
+ 
+-    case QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC:
++    case QCRYPTO_AK_CIPHER_KEY_TYPE_PUBLIC:
+         return qcrypto_nettle_rsa_public_key_parse(key, keylen, errp);
+ 
+     default:
 -- 
 2.46.0
 
