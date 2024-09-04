@@ -1,156 +1,298 @@
-Return-Path: <kvm+bounces-25901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AF2C96C4EE
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 19:07:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D461696C58A
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 19:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DC311C24D27
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 17:07:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DDC8287FA7
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 17:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3471E1300;
-	Wed,  4 Sep 2024 17:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488C31E1330;
+	Wed,  4 Sep 2024 17:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NjhDPTtW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="q7L6i9ob"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2068.outbound.protection.outlook.com [40.107.244.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617DC1CC171
-	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 17:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725469654; cv=none; b=BpDr6IFgp8zSVatwhPpcwtp1ZouZjfGT2DvkKRZ3ZIIawZT2A65M0j+mUypsvkDW73XI86Hk8N70Trmw6A+1WnlfkiD+C8CvAzWbxKD3V1vaaS+E1VIx2y6PxenHR6iY3iqoQOfULoWOWOnwSn28R5W8OD8NUQF6scyGFbAIarU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725469654; c=relaxed/simple;
-	bh=Xlgw2GMMp/03ibSeh6HYCn+WWH+tFS60FEPDSbg/2pU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L37OThbHPPhsu6h+Db7BbPWV/bve9CJ9iTZlHlqCZv02Dw/8heR4X19N7eP5cpp9p6g7fa8H6ZnQ2RDfGyuor/3xAHKRU4s3afDgA9VS9poFM6g/WBmZUXd2uXwdo1fPnQueJ/FyWs4OkRW3VoIGTRUUwrEVMraYqvrHYOLiNAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NjhDPTtW; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-429d1a9363aso2095e9.1
-        for <kvm@vger.kernel.org>; Wed, 04 Sep 2024 10:07:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725469651; x=1726074451; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xlgw2GMMp/03ibSeh6HYCn+WWH+tFS60FEPDSbg/2pU=;
-        b=NjhDPTtWW2UcqBHap1r/7zYnUZl6zQCFA1orP55YjGA+qnzKSlU7J3Jl9nAeWWWLuL
-         JazpnOhC4B6DzU25/0m+ph4MVwhxqOsTqQ3X3YDXJED91p/UtSr02yZrwXCRkc41Neht
-         Dp7DIRzQMQAZUxmlEzHFv6LiohMq4u3rlELA/5RlQKavNhj5yadie360HHspDtg7RSN+
-         jnoeVpVkplmyyKu3LazrpyQ0Uz1oNNa0k8d8CjGOu5s08DOHKjBPxOWcsWT4AQA58cwP
-         3pBuN2FHJspjoLTsHmaJgHk9kHIOhOsI8ud09Ld1CQOn7cYpb8w+UNHvgrETk6Fg45Lz
-         /2Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725469651; x=1726074451;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xlgw2GMMp/03ibSeh6HYCn+WWH+tFS60FEPDSbg/2pU=;
-        b=qEaMZNEAQhhV9Ys2KqJhwowBQCypglUK2LniJhbh8AhObJC7yY4t0Fnt+2BLzrDfwm
-         yARY6+frGmIAHi5kafrqILbmuezJwUbGG15uu5XlRoUEdoui8jOPLJTZswjG9RNOWqRD
-         y1trva2RVplP/hgG6Uvw7gTPen1crbeaKwODYgNyEThEydvV6NXn4/ZM/uIJQNurxgfJ
-         RvCkSL4b/tbhapldgAH6ND5t45XwdPDLVQ58I90N7ypJV/ublofUId/XnLdZz3Ya2SqL
-         R+ZgwRzurvBo5iO35t/6riqEdkuzQb7o31gxbRB9zkyPkXxudR892F3nHnDpUPveN8Dj
-         cSLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdHADxL12QTRNjuat9JN9TSfWKIpG3Q+WArj1O3YF1YkQpWI0JqI/6hizqkXehvrGnGA0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR50DzbEi1BcylBnCtc8H0SM3ogPpsvJb4Xp8OdEFXmLwRWrhX
-	dIQuUSr/2v8tFh1hJa3jQdOSm8t0MPjrqgNYG9ves1viwARkkOkd9cznoyhomecTlq68jvM+DSi
-	4Dth81dD9VeGBKFpTB3LjzM2TbvZodZoFDd9q
-X-Google-Smtp-Source: AGHT+IGDPmKBCRMKvig2+wSno2hrrMerXw5gQJsXdFfViNnACMu5y6zs3h8saPjc7a+y+FozaMvEKkcpnkLIwPGgoyM=
-X-Received: by 2002:a05:600c:4e4e:b0:426:6edd:61a7 with SMTP id
- 5b1f17b1804b1-42c95599759mr1450555e9.7.1725469650395; Wed, 04 Sep 2024
- 10:07:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBEC1E00B9;
+	Wed,  4 Sep 2024 17:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725471448; cv=fail; b=rgcoBeaWzj7p2JbRmlhqFC52G+cLuw8oFOyefA/Vk6R2wu4s1GabmMwdG3RCUXPfvTHkzFPGSwyij484dXYR68qjgbh0gq3J9e9rWQIGGme32h3TVPqvBPhU+etY8QI2NsyZ+dgYYeBP/gbicCmDw8Qn00iqy86QXqGUj4LkIqE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725471448; c=relaxed/simple;
+	bh=XMTT09jMOOGoOB+eZ4FJWI4jVmaZjHkvEUu57TVxaAA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bzwrmZ2PiqayGViKIB2IdrjNUHcNyPv1uSe1DcJ5dSzG8N0XrtrZbFcpctdoax9eYqRorHBaiqan4Yoi/3rD33npIb9+Yhwq9gwCJxkVFbCZDJsp8A6sGPZw4tmnj4j3TLmwfuN1Jtkgqz7rHgIsnsvC7sqJLVwKTI4ce/UkE7I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=q7L6i9ob; arc=fail smtp.client-ip=40.107.244.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JkdjNjoEOSwUjBj0BQqc9Dkd0Mtvrt9ehSwzWFXaO20mn6kWByQCPp8/punHn2lFdvbY9zGKZIMEGFPQHiUBDJhdLw7cqoFluuvL6OCi+kY7i6/DscsYdKvCdK2NrPMR9FcDwdUmlxXDH30e8oQrkoYr6UBfUbcdB1JVbgSplUNKS3CxpaKxFhmrBsyvhzqiCHIruE+uyAMzEExq5xE/uGqc5TPVGdJy7Z6YQG80/sx+7poE7tRrIG+3TJ/rjbgOqIpZybUtTVgxwHpfhD+uqT3fQK7hRBaQiiDRSVr4GvZu4+kZqo3CTkX80fB124oOFo7wfH+akMU7zlyogJ1JSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XMTT09jMOOGoOB+eZ4FJWI4jVmaZjHkvEUu57TVxaAA=;
+ b=JZk5Fb8IiitN5ccFGWgZYijWfoc0K8WdvLp/ZYCq2GgiN1RweDN0MNNoNCCiZRvBN/yCSjQR0i7cG0Q6osGxkPlgVrXzs1D/HJdEkRaianVCoRjCCcxmmhYr2/FM3jRonG91Eszj4bqO8RADAmHwggkNGQRZKi0wwK6YhY70qFOAZquKBLhZcmq4tS0qXr4fo1u1LnfUdCu0bjPIAxmBorcuqIYDwFzkQo5vBtbX9Cdl59OG2PQbTYZaF5khxrOeKoBjIwdF5/kTOJG/bD8BqsVTMme0mlpau2Z4pB7Yp4QxNDaVi6QDDcapmW55/D9pJK1MBJYOT/QA7FBVMgqY+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XMTT09jMOOGoOB+eZ4FJWI4jVmaZjHkvEUu57TVxaAA=;
+ b=q7L6i9obC16Kvl/GC5As1wI3sfgKRkmljiO4EU+++ePA6+RvUVmWMCn5zM5Aq/2jOVj3tcOnwi0igfoETZfk1dRVB0ONqpipkcL52l5oMse8G38QBZVCNJ87T5R10UPTIY/ZzMKRkChokawcAPPdh2JLVRidUwR82MZA+tJnzxA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by DS7PR12MB6117.namprd12.prod.outlook.com (2603:10b6:8:9b::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7918.27; Wed, 4 Sep 2024 17:37:22 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef%7]) with mapi id 15.20.7918.024; Wed, 4 Sep 2024
+ 17:37:22 +0000
+Message-ID: <14b0bc83-f645-408f-b8af-13f49fe6155d@amd.com>
+Date: Wed, 4 Sep 2024 12:37:17 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] x86/sev: Fix host kdump support for SNP
+Content-Language: en-US
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: dave.hansen@linux.intel.com, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, thomas.lendacky@amd.com,
+ michael.roth@amd.com, kexec@lists.infradead.org, linux-coco@lists.linux.dev
+References: <20240903191033.28365-1-Ashish.Kalra@amd.com>
+ <ZtdpDwT8S_llR9Zn@google.com> <fbde9567-d235-459b-a80b-b2dbaf9d1acb@amd.com>
+ <25ca73c9-e4ba-4a95-82c8-0d6cf8d0ff78@redhat.com>
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <25ca73c9-e4ba-4a95-82c8-0d6cf8d0ff78@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN6PR04CA0106.namprd04.prod.outlook.com
+ (2603:10b6:805:f2::47) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Zs5Z0Y8kiAEe3tSE@x1n> <CACw3F52_LtLzRD479piaFJSePjA-DKG08o-hGT-f8R5VV94S=Q@mail.gmail.com>
- <20240828142422.GU3773488@nvidia.com> <CACw3F53QfJ4anR0Fk=MHJv8ad_vcG-575DX=bp7mfPpzLgUxbQ@mail.gmail.com>
- <20240828234958.GE3773488@nvidia.com> <CACw3F52dyiAyo1ijKfLUGLbh+kquwoUhGMwg4-RObSDvqxreJw@mail.gmail.com>
- <20240904155203.GJ3915968@nvidia.com> <CACw3F52qyX-Ea99zV4c8NjyWKgtqAKtNc8GP0JTcLOCOjnEajg@mail.gmail.com>
- <20240904164324.GO3915968@nvidia.com> <CACw3F53ojc+m9Xq_2go3Fdn8aVumxwmBvPgiUJgmrQP3ExdT-g@mail.gmail.com>
- <20240904170041.GR3915968@nvidia.com>
-In-Reply-To: <20240904170041.GR3915968@nvidia.com>
-From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Wed, 4 Sep 2024 10:07:19 -0700
-Message-ID: <CACw3F51F9J0UYva56TYo4pVbM0XrtHnx9AkBbfUVL1rnHzhaHA@mail.gmail.com>
-Subject: Re: [PATCH v2 00/19] mm: Support huge pfnmaps
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	Gavin Shan <gshan@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, x86@kernel.org, 
-	Ingo Molnar <mingo@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Alistair Popple <apopple@nvidia.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Sean Christopherson <seanjc@google.com>, 
-	Oscar Salvador <osalvador@suse.de>, Borislav Petkov <bp@alien8.de>, Zi Yan <ziy@nvidia.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, David Hildenbrand <david@redhat.com>, 
-	Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>, 
-	Kefeng Wang <wangkefeng.wang@huawei.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	ankita@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|DS7PR12MB6117:EE_
+X-MS-Office365-Filtering-Correlation-Id: d0b4aa8f-98ae-4603-de66-08dccd083b9d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TTgzbDVWTTJzemVRaEpOQ0xKUEtvbXVWTmJEZHJrS2crUE44WHllNFBrRmlS?=
+ =?utf-8?B?c1dNTDhWdXRyM2d5L0lBdllPUTcwWm40NEtqSS9HR3pnWXVkcnJsTVhZNXFT?=
+ =?utf-8?B?QVRNdVdnd296dXViV21pSkk2dGlZdTM4ckxvZVBXVUcyUXNoMUtqcWdvQzJq?=
+ =?utf-8?B?Y2xYbWUzZUt3S3lSdjRmODJrb0h4dGFGVTlxZW5OTnFPNDVVcHY1OXVDb3lm?=
+ =?utf-8?B?VVMxK3I2aDJPdnFMUUtaQllDUU1wTmU1cGpkRXMrQmwvZVVTNkpCWVdCMy9u?=
+ =?utf-8?B?QUZDTko5bGcwSlIyRXR3ZE8xN3loTU4wWUtUcktSbVRLcENOQmlMOC9tbXJC?=
+ =?utf-8?B?bEovWUJURktOTzk2NnZTcUZLRlJkdlo0ZFJKVDV5U3A4ZlVVL0FENmNsWXRq?=
+ =?utf-8?B?VjFUamVlOERVMWM0QzRPUGc4VFhhbUc4c21SM3JkMm9pdXRvcWovSERBYVpa?=
+ =?utf-8?B?eWFaUVFSb0JEVTFjYWJnTEY2V3hYRjVSVHBDRzAyUkF0dEUrYXkzQ2dyZEU5?=
+ =?utf-8?B?eFNmaHE0M2thTlQ2cUdseWtiVjVpSC9WNDhWUEhRQi91K3NWeDJOb3hHc0hG?=
+ =?utf-8?B?Nzh0eHZOa2wrQStqZXUrVzg5UHl6Rm9rY0NxaHhiWGVUK0FVdDI0VEhPZC9S?=
+ =?utf-8?B?eGdLZVVGUzdxT1NOd242LzhaWjlYaGZUQW9kbzBkUFZkbjhHdmp3VVd4TXNQ?=
+ =?utf-8?B?aTAyRUI3cUxsQTBoQjdYUS9TcnJKWktXNHFoeGFLOVd5cHZIMmxtYUtnQkY0?=
+ =?utf-8?B?REdoZjZKaldraHU2blZkTUpOOStoVXY0ZCtDVC9jOC9PZWlEZzZRN3FKK3gz?=
+ =?utf-8?B?MHpScjhVMWcvUmh6dUhyR2RBalJBSUowTWZsa1NqS2p3OEtYY1luKzRVL0Zo?=
+ =?utf-8?B?bVpKUXFyN21mcUlIc3QzRE9jdzRRMXJBMXFYZHY4S3MwVDdhNVpxT2pWRWtR?=
+ =?utf-8?B?RGdUc29wVncyWVlXVUpsTGdOM2tENC9kbytDNzZYWTdkSWtmTFc2cndUd0dW?=
+ =?utf-8?B?VFV6V0ZCTEVSRm1TK1g1TG00eUljemtteXFlZDFLVTRJUlJEVEg2dnZjWm9w?=
+ =?utf-8?B?ZkVXU0praEpoRW1WT2xCL293MWxRTmIxTTdJVjdVRjZGNE15M1B1Y3JpWjdX?=
+ =?utf-8?B?ZUl6SVp0YlN1SzFDRy9YbU1FZGxJRnF1L3ZvNGpyQmdpZ3lvSmZ2aGZZM0hE?=
+ =?utf-8?B?Y2J6YWVnS09LZnJXZm9uSm5HWnFGNDhZOUdVZExjSS9haTBFTUV4aU1ldzMz?=
+ =?utf-8?B?ejd4QVM4bUU3UEFSbWN2ZFppSW5RUE5INzdYbWJmelcrcWlIb0lid2tpNENG?=
+ =?utf-8?B?TWduSTAzQUpieHdYczVacVlTUmpzaVNJaXVSUEY3QlJTTWxsRmpScGNuK095?=
+ =?utf-8?B?enZDZ2RuSVlpUHJRSTZua1U0empNRTVwZUs4Q0NOdDNzK2RRb2s3ZTVua245?=
+ =?utf-8?B?RnV5UGFLZ1RRM1l2cVFramZZbEpkSGk1Q3FUUWtpd1dWa1h4NjIrRDlCb3lT?=
+ =?utf-8?B?dXFuSCtNYWhlaEJYWDcyVVhKbFdCYzVqdEtPT3RtS0R6a1VWNEVkRWw5VUNC?=
+ =?utf-8?B?TkJvZmZCcUdRVXNuRVgwd1laNG40TWw5ZjZsV29mc2tUMExuVXFWRlpvZ0c3?=
+ =?utf-8?B?S1JlZFVKMyt3VkFsZXRjNit0UHFvTHN4b2EwUGxlalc5WE9VZUxYeUh1Q1d1?=
+ =?utf-8?B?WTh5OHZ4OExRbkx6cEdudFZGQ3NoNDJZWlR3V2dpcHdaQU9KQTErcXh4aTFy?=
+ =?utf-8?B?bGFFZHdTallLN1ZZck5oZTk5S0ZLb3NYSlJmQW1pKzVEdWNyM2VpZ1ZHRGxE?=
+ =?utf-8?B?SnRORWEyYzh1ME95K3JQdz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?N0E5QzM5SUxYUGJhdkJjQmRiWEszelhncGxVR21JakczZ3NhTHFIOFBvYnJM?=
+ =?utf-8?B?V1orQytrUlVJVGdsNy9YYUZDUUpWU3Jma2FjL2tkdXBWZ1ZpUk1JVnlnZ0NL?=
+ =?utf-8?B?TXQ5SUNyNGxFdVRya3cvdmdiMTdCdHNGSVJCaEppNUhOT1pMMXJhNEFmNUxn?=
+ =?utf-8?B?Y2VLMlEvU0thSWhtYVh2RXZZa1ZVaDkvMm95N0dpLzVJZlVWemcyRE1WNWQx?=
+ =?utf-8?B?RmtKVVdQdHNLWUZZUHNCbHJMazRkNXhlOFl6Um5kSUg0NVIyV0xMTXU4S053?=
+ =?utf-8?B?djZ6bmJ1RGdrZW9qdW4ybHhHYVBYSVVEdk1zaEY3UlVLZkZDcllSOVNYeHhE?=
+ =?utf-8?B?LzU4bG1zcEJEeHJUZ3ZoZGJWdXFYYnJNVGIzdmgwZlRXcDdWSXRBV3l4M1d2?=
+ =?utf-8?B?bnVENjJ4dEhydG1jY0ZUWTNOWHpXRkxtMERmbG5hQ1ZGT0h0Ui8wWGRXY0dG?=
+ =?utf-8?B?MXhFYVUxei9OMGx0NWVsTXEvSXdLcXk4T1VzUnYrVnpiNklVTjlGbmFWc3Bp?=
+ =?utf-8?B?QW8vTEprc0l4NnlldDJIdTRCYlVad3dvMWIrcHZVSmc0TGNBWGRuUWo4LzVR?=
+ =?utf-8?B?djRPQmNZWVhETXQwWTcvMEE4T28vaTFJNjhma25FQzQvd3dXK2wzNysvWGgw?=
+ =?utf-8?B?aWxFNTRPLzhCeVl1eGtyYWlWUmlyY3hoNGJhaWhkaGJiaG44dmxVQ05LVi9L?=
+ =?utf-8?B?SFF3bGt1OVdPMEk5Q0hFYjZQUTNGMUVWM3hBbC8wSDJIRmxJcUkxVE9kaCt4?=
+ =?utf-8?B?cGZpQ2RiK2dXZEN3aXF4dHk0WkhZZGhISTRuZTRaZ0tHZ0x6dFE5enFZZlFj?=
+ =?utf-8?B?WVlIYmlKWEhmcGdYY3o4dHdkcXFaQ0o4OXlOYS9ZVTZ2cE1yWHdZcm83UUxC?=
+ =?utf-8?B?d0R0RUZ5dzBZR0k5NWUxN1ovMEF2d2hUbzcyMEpNbGg3RUFoYW1qalRRZmFl?=
+ =?utf-8?B?eSsxaHAySFkrcm5ZbzQ3eEVTb1JrUloycEtweFlndW13M1FPa3MvYVg4MGN5?=
+ =?utf-8?B?M2lvRmZuSWNmenEvcXBIVjN1L2hxZDBrTitTYkJTektOL1MrY2F5TlVnd3ds?=
+ =?utf-8?B?Q0NYRzJtdjVLbmdsLzFrNmhZckMyR0E5RFpaNFliRkRZU2IwWE01UFptZzcv?=
+ =?utf-8?B?WmkzK3Jza2JqdUhXaFRqRzgvVkg1Y0Z1Q0hZaFFmMTkyWjVsQTNJclpKd3Jw?=
+ =?utf-8?B?S0FLWTZWNGFvT1ZhMUdjSGxMaFhzc1BZZHUwRVdmMkV6S2JWZjFqVUZFMW5N?=
+ =?utf-8?B?aHQ3T2I4QmtOajNteTBRSEZNUElxaWVjSkdFVHY3bjZwV0xTb0pVWjRFdW9i?=
+ =?utf-8?B?RUk5WU1SQlRxMFdvYXdIeGRlZkd0SVRWdThCQkFvMXVHSHFmRXc1U0pXZ1ln?=
+ =?utf-8?B?YVpqTnM5cjBHc2hwUVk3bTdCZ3ZSY1cyYiszRUNsTUdwb1phRWZoM3E5MEV5?=
+ =?utf-8?B?aU51Tzc2Tlp4ZlZwNVd5Vk5RcVNVQ05VajBoaWVFT3NUUWRMVW96SlRJZ2RW?=
+ =?utf-8?B?K1lOK3U4VlRMdWE1bUFQZGtDdy93SjdsSDBnM0ZEQUhrU1hCd1B1WkhRa0pu?=
+ =?utf-8?B?SmVZY3A5Uk93THhZQlpMSFprdDBvSkdwcUxxVlo1R3pENzU2dlQyeTBIdkR6?=
+ =?utf-8?B?VCs0V2dMN2ttQzI1bUtadjdFdTY1VTZSQXJCQlpldDZXa0xqQ3ZaVkxKUHNl?=
+ =?utf-8?B?OHNwZlpoeUpuVHFkMGJYVUJxUE05VU9EaTl6N3kwL3o0a1kyeHE1QWJtd2RF?=
+ =?utf-8?B?Zm5TQ0JzMWJlYUJLQTVkYkdJanFxSk4yeHh4bDg1TldQZ0k5VFloYzgvbmg1?=
+ =?utf-8?B?cDhWdkFuc2cwMU1lL09PY2pIQXpabE5vRmlVQjFxQ1lsQ1R0d3dpYTBHb1dV?=
+ =?utf-8?B?dmdWOGpmT1dYUHE1UTVLczJuWi9BSHBtV3FKR0NlWHdodkNaWlQySzQ2bVVT?=
+ =?utf-8?B?anhIaUNNMllvejlJL1Jabmx2b1Fwb2VzMXVVRlpLMU04cFZ5RElFNmcveXRi?=
+ =?utf-8?B?MzFCc3JvV3dWWldCZ244ZGVWS2svQjBMUUExNDZCZGMvS1NOS0pMNlBCR2dT?=
+ =?utf-8?B?WUZtYWFkQjllREFmODFFU2ZBRkZ5aWVwNktkWXVJbWEvUlMzTC85dTMwc3Jk?=
+ =?utf-8?Q?29lbDlZuJ+gU88ulVvYZTxxRE?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0b4aa8f-98ae-4603-de66-08dccd083b9d
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2024 17:37:22.5473
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9D3VS/cwl2IYhbvu6I4h0FYcgPDCyF8xq2AfA1B0PZ7XPZzBEcYD6EtO93ZREICffQOzNT9d+J9V39td70mrNQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6117
 
-On Wed, Sep 4, 2024 at 10:00=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
->
-> On Wed, Sep 04, 2024 at 09:58:54AM -0700, Jiaqi Yan wrote:
-> > On Wed, Sep 4, 2024 at 9:43=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com>=
- wrote:
-> > >
-> > > On Wed, Sep 04, 2024 at 09:38:22AM -0700, Jiaqi Yan wrote:
-> > > > On Wed, Sep 4, 2024 at 8:52=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.=
-com> wrote:
-> > > > >
-> > > > > On Thu, Aug 29, 2024 at 12:21:39PM -0700, Jiaqi Yan wrote:
-> > > > >
-> > > > > > I think we still want to attempt to SIGBUS userspace, regardles=
-s of
-> > > > > > doing unmap_mapping_range or not.
-> > > > >
-> > > > > IMHO we need to eliminate this path if we actually want to keep t=
-hings
-> > > > > mapped.
-> > > > >
-> > > > > There is no way to generate the SIGBUS without poking a 4k hole i=
-n the
-> > > > > 1G page, as only that 4k should get SIGBUS, every other byte of t=
-he 1G
-> > > > > is clean.
-> > > >
-> > > > Ah, sorry I wasn't clear. The SIGBUS will be only for poisoned PFN;
-> > > > clean PFNs under the same PUD/PMD for sure don't need any SIGBUS,
-> > > > which is the whole purpose of not unmapping.
-> > >
-> > > You can't get a SIGBUS if the things are still mapped. This is why th=
-e
-> > > SIGBUS flow requires poking a non-present hole around the poisoned
-> > > memory.
-> > >
-> > > So keeping things mapped at 1G also means giving up on SIGBUS.
-> >
-> > SIGBUS during page fault is definitely impossible when memory is still
-> > mapped, but the platform still MCE or SEA in case of poison
-> > consumption, right? So I wanted to propose new code to SIGBUS (either
-> > BUS_MCEERR_AR or BUS_OBJERR) as long as the platform notifies the
-> > kernel in the synchronous poison consumption context, e.g. MCE on X86
-> > and SEA on ARM64.
->
-> So you want a SIGBUS that is delivered asynchronously instead of via
-> the page fault handler? Something like that is sort of what I ment by
-> "eliminate this path", though I didn't think keeping an async SIGBUS
-> was an option?
+Hello Paolo,
 
-Not really, I don't think an SIGBUS *async* to the poison consuming
-thread is critical, at least not as useful as SIGBUS *sync* to the
-poison consuming thread.
-
+On 9/4/2024 5:29 AM, Paolo Bonzini wrote:
+> On 9/4/24 00:58, Kalra, Ashish wrote:
+>> The issue here is that panic path will ensure that all (other) CPUs
+>> have been shutdown via NMI by checking that they have executed the
+>> NMI shutdown callback.
+>>
+>> But the above synchronization is specifically required for SNP case,
+>> as we don't want to execute the SNP_DECOMMISSION command (to destroy
+>> SNP guest context) while one or more CPUs are still in the NMI VMEXIT
+>> path and still in the process of saving the vCPU state (and still
+>> modifying SNP guest context?) during this VMEXIT path. Therefore, we
+>> ensure that all the CPUs have saved the vCPU state and entered NMI
+>> context before issuing SNP_DECOMMISSION. The point is that this is a
+>> specific SNP requirement (and that's why this specific handling in
+>> sev_emergency_disable()) and i don't know how we will be able to
+>> enforce it in the generic panic path ?
 >
-> Jason
+> I think a simple way to do this is to _first_ kick out other
+> CPUs through NMI, and then the one that is executing
+> emergency_reboot_disable_virtualization().  This also makes
+> emergency_reboot_disable_virtualization() and
+> native_machine_crash_shutdown() more similar, in that
+> the latter already stops other CPUs before disabling
+> virtualization on the one that orchestrates the shutdown.
+>
+> Something like (incomplete, it has to also add the bool argument
+> to cpu_emergency_virt_callback and the actual callbacks):
+>
+> diff --git a/arch/x86/kernel/crash.c b/arch/x86/kernel/crash.c
+> index 340af8155658..3df25fbe969d 100644
+> --- a/arch/x86/kernel/crash.c
+> +++ b/arch/x86/kernel/crash.c
+> @@ -111,7 +111,7 @@ void native_machine_crash_shutdown(struct pt_regs *regs)
+>  
+>      crash_smp_send_stop();
+>  
+> -    cpu_emergency_disable_virtualization();
+> +    cpu_emergency_disable_virtualization(true);
+>  
+>      /*
+>       * Disable Intel PT to stop its logging
+> diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
+> index 0e0a4cf6b5eb..7a86ec786987 100644
+> --- a/arch/x86/kernel/reboot.c
+> +++ b/arch/x86/kernel/reboot.c
+> @@ -558,7 +558,7 @@ EXPORT_SYMBOL_GPL(cpu_emergency_unregister_virt_callback);
+>   * reboot.  VMX blocks INIT if the CPU is post-VMXON, and SVM blocks INIT if
+>   * GIF=0, i.e. if the crash occurred between CLGI and STGI.
+>   */
+> -void cpu_emergency_disable_virtualization(void)
+> +void cpu_emergency_disable_virtualization(bool last)
+>  {
+>      cpu_emergency_virt_cb *callback;
+>  
+> @@ -572,7 +572,7 @@ void cpu_emergency_disable_virtualization(void)
+>      rcu_read_lock();
+>      callback = rcu_dereference(cpu_emergency_virt_callback);
+>      if (callback)
+> -        callback();
+> +        callback(last);
+>      rcu_read_unlock();
+>  }
+>  
+> @@ -591,11 +591,11 @@ static void emergency_reboot_disable_virtualization(void)
+>       * other CPUs may have virtualization enabled.
+>       */
+>      if (rcu_access_pointer(cpu_emergency_virt_callback)) {
+> -        /* Safely force _this_ CPU out of VMX/SVM operation. */
+> -        cpu_emergency_disable_virtualization();
+> -
+>          /* Disable VMX/SVM and halt on other CPUs. */
+>          nmi_shootdown_cpus_on_restart();
+> +
+> +        /* Safely force _this_ CPU out of VMX/SVM operation. */
+> +        cpu_emergency_disable_virtualization(true);
+>      }
+>  }
+>  #else
+> @@ -877,7 +877,7 @@ static int crash_nmi_callback(unsigned int val, struct pt_regs *regs)
+>       * Prepare the CPU for reboot _after_ invoking the callback so that the
+>       * callback can safely use virtualization instructions, e.g. VMCLEAR.
+>       */
+> -    cpu_emergency_disable_virtualization();
+> +    cpu_emergency_disable_virtualization(false);
+>  
+>      atomic_dec(&waiting_for_crash_ipi);
+>  
+> diff --git a/arch/x86/kernel/smp.c b/arch/x86/kernel/smp.c
+> index 18266cc3d98c..9a863348d1a7 100644
+> --- a/arch/x86/kernel/smp.c
+> +++ b/arch/x86/kernel/smp.c
+> @@ -124,7 +124,7 @@ static int smp_stop_nmi_callback(unsigned int val, struct pt_regs *regs)
+>      if (raw_smp_processor_id() == atomic_read(&stopping_cpu))
+>          return NMI_HANDLED;
+>  
+> -    cpu_emergency_disable_virtualization();
+> +    cpu_emergency_disable_virtualization(false);
+>      stop_this_cpu(NULL);
+>  
+>      return NMI_HANDLED;
+> @@ -136,7 +136,7 @@ static int smp_stop_nmi_callback(unsigned int val, struct pt_regs *regs)
+>  DEFINE_IDTENTRY_SYSVEC(sysvec_reboot)
+>  {
+>      apic_eoi();
+> -    cpu_emergency_disable_virtualization();
+> +    cpu_emergency_disable_virtualization(false);
+>      stop_this_cpu(NULL);
+>  }
+>  
+>
+> And then a second patch adds sev_emergency_disable() and only
+> executes it if last == true.
+>
+This implementation will not work as we need to do wbinvd on all other CPUs after SNP_DECOMMISSION has been issued.
+
+When the last CPU executes sev_emergency_disable() and issues SNP_DECOMMISSION, by that time all other CPUs have entered the NMI halt loop and then they won't be able to do a wbinvd and hence SNP_SHUTDOWN will eventually fail.
+
+One way this can work is if all other CPUs can still execute sev_emergency_disable() and in case of last == false, do a spin busy till the last cpu kicks them out of the spin loop and then they do a wbinvd after exiting the spin busy, but then cpu_emergency_disable_virtualization() is/has to be called before atomic_dec(&waiting_for_crash_ipi) in crash_nmi_callback(), so this spin busy in other CPUs will force the last CPU to wait forever (or till it times out waiting for all other CPUs to execute the NMI callback) which makes all of this looks quite fragile.
+
+Thanks, Ashish
+
 
