@@ -1,218 +1,338 @@
-Return-Path: <kvm+bounces-25904-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25905-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2172896C7D0
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 21:44:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB1196C801
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 21:54:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A43951F2631B
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 19:44:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCF871F239B1
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 19:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0F91E6DE7;
-	Wed,  4 Sep 2024 19:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDAF71E6DFF;
+	Wed,  4 Sep 2024 19:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DOfvnLOd"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dLG8Wdiy"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2074.outbound.protection.outlook.com [40.107.223.74])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2062.outbound.protection.outlook.com [40.107.102.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B768684A27;
-	Wed,  4 Sep 2024 19:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8D91E00A3;
+	Wed,  4 Sep 2024 19:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.62
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725479081; cv=fail; b=f6ELlDZHGMRUAkUYqomCcaJcEyv8SXOUzc0sD8eHvR1AuMwtmwPILnz6Ujz8teCLuzFRn6z5+VV8SwNqFXhERJbuF/UYA5N09L0fY3yUC7ou5iRltBYq1FrAvxeouXch1uPVr8arCRqPQovuN3vVZMp3ah7oloQl0zj1E5+S3yQ=
+	t=1725479670; cv=fail; b=b3YorKmg+MI56gsrXJQD7k4ghKXKZ96u/jG4lVY6d0U8GQYpyiruF1DfVA7WrI7lUCjEF9rLwpyqN6Jkmsy+DS+qE6O9WXgMXngLLjSxi3OPLNgZSQNeApIdPcdLr2UJw0GSYZR4MlNxCpPd23SCyqDkB8TOtVnqvhBQBk2Nex4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725479081; c=relaxed/simple;
-	bh=EjYCAIO6s7wRvdStOsT3+lbLTegRy0Sxj7CNOy4m0cQ=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YYP64TDKg1F4hLyeCUL9I7S9G4FzCCBFStTOqGKYAHwo6iTa9R7A31BFnxKdS85PQah+3FHqSt4mR/o8iolldviZzlCTlRywvulCTTolej3XPflM3/Ybheek3eKwvvwxoRPTKZDFkVSi1VZprL8dwCoNdEUke68/Ya4AX+WvnFQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DOfvnLOd; arc=fail smtp.client-ip=40.107.223.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+	s=arc-20240116; t=1725479670; c=relaxed/simple;
+	bh=PPW5+uG1LL9Sj0TVl3hfEVlm+CYevC0Vic5bMhXi8kA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AiEYS00770mQamh+VCduW2ZJQ8treTvQYCYJ4aIFbeHHjUrS/ya1AsFilDl1HUSWdO4ko9lfP/MiLy8Vhm94ClJXYfbdcLIi/3k3C4b7qUa2+cEIR0o1LyXAyROKhvjPGxfz/Wo29dnK2elGmNHbwOvjlcST9xNhKvuLH1M2SWM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=fail (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dLG8Wdiy reason="signature verification failed"; arc=fail smtp.client-ip=40.107.102.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XuCuhKBJIA5llSq7UBokYAHZJCi6xEcsUrTrS5K+ujurGj7ybHo2LlLUtlH/qtkkwnK0jB3q5oU9s8GlCNB7jyg3Xc3j9LP7Q4JUIX5C6F7Fl3p25kFf04afISTMUs/5EmugB8WYmLEuVxM9IBjm95oXtHB28AYYZXZcaRC25RZlntnGGHVJ8AXHxIRnrP0n1Gww+4O5NJGwDg4Vdld8ioF4QUSFzPCAmEcrfAOWS60aam7byvmGYWNoF4VEF24kwnnTtGn4wRxByBv8B7RbdLJKmijI4R1pce7STXXorewH7L+2Fd8/wp9xk31gp/J0fy8ntip7wGU91lNgxObCIA==
+ b=flkDS8B3goj3dXPAjgasdYyqCj0lnzr6vgJgAoCHVX1VYuDHMhBp87wolOAFat+VKCQQ2vkb6eezWdRJ4ltqat2s9GeDydOaLrad7pSwltF8sAeYuM0sOIy0iC7CmtR1w6ZE7PsMxf9C4JIsdVRBoLQxsfENEAfUPIzakxS/8XFP7hH9klAwNiIuc9FCUm/Y2QJ5Mu2YChIdDYUpL6+n93PTWbS5QLYguhtaqQMIq//hQj6krpeF9YQHJ6uXTGGX4N++f53MwzTnpWfEMS/2SXGnyYlomfJj/xf/HIbfGDpqao4+NemFIU+h4EmehQfCmFf+Ql1OX1gRZ8x2DggPuw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AsibxcKAXN+bv18fkS85nWEFtgQgqC+Gu/L2q8r5ixk=;
- b=u+o6LywKtBKegNNL9iLa30byIQb2Jq+q1VOyAAziUD39/PCB/NJtD9/qXkHNelXB4YV4zmoQSsoOXZZDVSEC7fNSaNTrM+vnfMOWiS+DPwZfayT6U0Rk9r68ivJoxeIjSuiEO3kr4pXI2xXo0NMa303OOnpnDanS3cDzdx1AU27PLbzOjqXTpeUuLjJM2+VDchmJpN9fqCEBBYuUThwbIeKR9GYxO7l6a74u4qMXIEwS5UBVqARozCkl3niPGzhvudVQo4tH87G6qaU7uHiou0qcKZlrV9a9AQpHbrMCClpBtPgvrfz5dtetLkc1DlxVWtCpLzQYxsmKhgXW5kdWfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ bh=TlmM40QNbT3cxXF+3cYIczlcwlAUdqPeGyetevigcJ8=;
+ b=GuT9v1G2KfCHb1CARc4FhOmhupB940cKeL3WGrw7lg8aC+StucP27RbRbMiefPX2iaRnw/nM9tEQcFSYzA82FjiedbwtwGBzXb0KJtMsnaDEKRivIVszR7PID/B0VP30FYch3ja45OD3HcDc5MXU9lWK4pDu9ukH2BR3UT+dxo/uwA1qixKoeKzEfqLU3/OC1P5fdlp3wVEmEnf0enR6jNN04U1X+YgE7tKYOlMO9bL2i6BmgjQkMWP4dAAvXazNLGr8Gcz+mqPat2NutCi9S2ZcQfU+f4ufSk/QBqoTx99ngUgP1dm//NCsHHogTw1FcneIEEAPVOucfpJOunrfJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AsibxcKAXN+bv18fkS85nWEFtgQgqC+Gu/L2q8r5ixk=;
- b=DOfvnLOdMThku2eCqcKDEmLLhXA4+6z/J36rP6a2BcxftAsej0LJ7sId5j+kFXAOKJzCYvzNfxTw5rIh7l6QbSa4NNRvgmpOS5R3uCCHJfoVnWbX0GK6gFUSExKvZCdRb2ZH/kOD0Uljsq6DEbGW+zNvTLmItaDbT2o26y5OxAQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7) with
+ bh=TlmM40QNbT3cxXF+3cYIczlcwlAUdqPeGyetevigcJ8=;
+ b=dLG8WdiyFR+1eJeVBEmLt2B3CdFHRVV5XfGGeRZLazmvokzn8BGnioReOdGoZBZxOE0s9lLZ9/Bbx3QoxvljpFXjOxyxphPUVLjX3BhoMGLVTU/CbfJYAnBtlyeiQ3+DQbaHs7Df+ST2fJK4r/6vZOCKlUGPNAbEItmpBv46wks=
+Received: from CH0PR03CA0097.namprd03.prod.outlook.com (2603:10b6:610:cd::12)
+ by LV3PR12MB9094.namprd12.prod.outlook.com (2603:10b6:408:19e::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27; Wed, 4 Sep
- 2024 19:44:37 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef%7]) with mapi id 15.20.7918.024; Wed, 4 Sep 2024
- 19:44:37 +0000
-Message-ID: <89cef849-4309-478c-8250-3e668943fa15@amd.com>
-Date: Wed, 4 Sep 2024 14:44:33 -0500
-User-Agent: Mozilla Thunderbird
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.24; Wed, 4 Sep
+ 2024 19:54:24 +0000
+Received: from CH1PEPF0000A349.namprd04.prod.outlook.com
+ (2603:10b6:610:cd:cafe::9) by CH0PR03CA0097.outlook.office365.com
+ (2603:10b6:610:cd::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27 via Frontend
+ Transport; Wed, 4 Sep 2024 19:54:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CH1PEPF0000A349.mail.protection.outlook.com (10.167.244.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7918.13 via Frontend Transport; Wed, 4 Sep 2024 19:54:24 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 4 Sep
+ 2024 14:54:23 -0500
+Date: Wed, 4 Sep 2024 14:54:08 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: "Kalra, Ashish" <ashish.kalra@amd.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+	<seanjc@google.com>, <dave.hansen@linux.intel.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <x86@kernel.org>, <hpa@zytor.com>,
+	<peterz@infradead.org>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <thomas.lendacky@amd.com>,
+	<kexec@lists.infradead.org>, <linux-coco@lists.linux.dev>
 Subject: Re: [PATCH v2] x86/sev: Fix host kdump support for SNP
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, dave.hansen@linux.intel.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
- peterz@infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- thomas.lendacky@amd.com, michael.roth@amd.com, kexec@lists.infradead.org,
- linux-coco@lists.linux.dev
+Message-ID: <20240904195408.wfaukcphpw5iwjcg@amd.com>
 References: <20240903191033.28365-1-Ashish.Kalra@amd.com>
- <ZtdpDwT8S_llR9Zn@google.com> <fbde9567-d235-459b-a80b-b2dbaf9d1acb@amd.com>
-In-Reply-To: <fbde9567-d235-459b-a80b-b2dbaf9d1acb@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN7PR04CA0161.namprd04.prod.outlook.com
- (2603:10b6:806:125::16) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+ <ZtdpDwT8S_llR9Zn@google.com>
+ <fbde9567-d235-459b-a80b-b2dbaf9d1acb@amd.com>
+ <25ca73c9-e4ba-4a95-82c8-0d6cf8d0ff78@redhat.com>
+ <14b0bc83-f645-408f-b8af-13f49fe6155d@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <14b0bc83-f645-408f-b8af-13f49fe6155d@amd.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
+ (10.181.40.144)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|CH3PR12MB9194:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0606b37c-a72b-4cac-8c65-08dccd1a0236
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A349:EE_|LV3PR12MB9094:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd8c7df3-fa27-4c3a-0aed-08dccd1b608c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|7416014|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?eHppYlZxOGp5bFVDM0ZEWEZWeWlKeEtBS1dmZXIrc0RjMW0zTEk5QTRoWnJW?=
- =?utf-8?B?eVRXV0N5dUJtMXZZUEh6dzVISDdBdlM3VGxyd0ZqajBmS1ZQYWEzbllVS1lT?=
- =?utf-8?B?R3VGeWJzUktsN3I1eGhuMGdLK3VWdlJQV3BxdjI5aVBSOW0xdVJPektCSEVC?=
- =?utf-8?B?NW5IWWdyNHg0aFU3NUR1YmFDTHgxeFdaTVh6OENPS3Z3WFBaL3NJaTd3cWhr?=
- =?utf-8?B?ZG5Ib0RKYS8vTjBqSk02UXBTWVVpM0RHVStWZnJjLzNZVTczWnJ3VldsMEcz?=
- =?utf-8?B?WXRsRWFXTXBnQUlwRTRIMWx4bkFVRjQvQ2grNjRMSEVFKzE4VzBpY211bnVy?=
- =?utf-8?B?TEtVMWJ6NDFOMkR5b2MxRzdDZ1RVZ0R2YVAraEd5TnVSVWtrd0E1ZmlRRCsx?=
- =?utf-8?B?ZG00ekt6dnRBNTU1R011azh5RzRaTUpnZTdNSG1OZDVyUGt1WngrQXdGaGVa?=
- =?utf-8?B?b3N2TUlxckhxbDZ2TUZNeml6UVlVTy9Ra3kwVUZDREtmYWhDYyt0MUFxSkdn?=
- =?utf-8?B?M0VSZ2tPd3pPVklEUWpkazRHNktIVmtHQ3dvRWRSM1lqaHVQZUtRbHQzQys3?=
- =?utf-8?B?amcvdUdrWFJHcFkxWWZ6Ti90SkNkMVlrdm9aU25TclU0UTFJUCtEVURLN0Va?=
- =?utf-8?B?ZEpDdTU2UDEvcDdUNStMUjVNWkdBN1VIY1g1eUdrdVV3emJHUHN2anFtU21s?=
- =?utf-8?B?NHhGNmZJTkQrbDk2VmRpWkpveDQ1VVNESERyTHpZdGR0enRFc2RLYUdNeGNZ?=
- =?utf-8?B?MGs3MHJMZjI3TVY1OWJjQVZuSlVLazQvS1VheEEwZk1HOE1WWitxdXdNK1hX?=
- =?utf-8?B?ZWFJTmx2WFRVVzR3MVd5YnhaMCtpRFFrZkxKZlZpSzhUNk5YZE4yUnU1djQy?=
- =?utf-8?B?SDBNNC9lUVdValJIbWtQTVJhaXBDaGpqb1JmSUFka3dkb0JYOXhndGlvS093?=
- =?utf-8?B?c2dOb25QQUkwaERCRjhrWVJyTlVNTCtmM1JjRjNBNVJhODc4NFZONG1nNm05?=
- =?utf-8?B?Rk5IbXlIbDdiVitrRmdrYTFGOUx4cEszK29qU050ZFo1aUZ3cm9OTTI3Yi9Q?=
- =?utf-8?B?ZWU1VHVYVGMxWHFWMzk5ZmFOQzdtTkJWL2RXYStxRUxWRUJBNkhsR1l1T2xz?=
- =?utf-8?B?clVkbzIwaDh4RG04YXNqTjRmN0I0OE51dEQ5aGo5YmpyREJudlZkVDYwUlMw?=
- =?utf-8?B?NzhZOVJlMXhkd0hXMTN0SzltQVRUZkVaQ2VsSTNPQ3lLUmxnejlnbzlvYVpq?=
- =?utf-8?B?WUdoelZ1ZjBva0tQclMxYlVJTEFtaSthT1ErczhkZXlPVG5tTzRhZ2VaU1ln?=
- =?utf-8?B?N3lLRUxjQkxQZHh5b21aUE5YMGJnN3AwcWV1bS9PcWY0R2RvV01JSVorSjhF?=
- =?utf-8?B?YkVkeXJjUFBzcFpVMWF6dWx0RERVWGowdCtMRTF3WmhRMWw2cVA0OWx2V2RP?=
- =?utf-8?B?eWJ4cE9YUGdQdHB3bG5VbGlsV3lzU0RHd1pDekdvRXB3MVJHZVdIRURsdEVz?=
- =?utf-8?B?UTA3WWRRWmhBR0FyZUZEeVFIMWVEQkRQMUU4ZkRoK0QrODVZVWZzTlBnenBI?=
- =?utf-8?B?dGhNZ3REVGd3Y3BIVkxhVlBycnl3RUd6Y2Y3aDFJbUpLR1pTdW9OOW5PK2RJ?=
- =?utf-8?B?Z2I4NSsrdFBNNTU1VjBaRlNPTzJtTFQ2N1RqcmZvNHdwejF5SzFlWmR2L25K?=
- =?utf-8?B?YjZiSUpCSVV2NWxCZjRKb2NlZ1pDUkk1M2pib251ZUVhZXJXYmhVaGJFVUw0?=
- =?utf-8?B?cURqcHR2TlQvcnExeVBtMUpyOXhxWlB0WFJvbVBFcHVVM0ROOUJwMTdZOWJw?=
- =?utf-8?B?YWtpaDV3S3A1Si9uWXhyUT09?=
+	=?iso-8859-1?Q?nMBzkm46r0gYcwFLXv+q3MDOVa3lOZLocJagB+DwUwlLs4UIVCT9a+slZq?=
+ =?iso-8859-1?Q?QMhgM57GDLclzRXjN27sCC7vFbdH13roD0g5sj+2/7lgAStT4bqXdOASnZ?=
+ =?iso-8859-1?Q?qP8CtrB0bPK/MuUaIbQL4oeiLukW1UxN0tpd60OA21x8CZcO0reIFXZzqo?=
+ =?iso-8859-1?Q?hZ6MOHAkSfhQFWeuEch9voiercdlfnYiyr9Age6UvfhmbhZaea8Rb1ZOe5?=
+ =?iso-8859-1?Q?sNyiUBfXqv8G5YtQnEVHo7gwcTSswVA2ULh4llEtTYHP0T4LTB0W9xoxke?=
+ =?iso-8859-1?Q?D2V82WSvHNFMJEQjmvw1opefhwrftcWyTDYuPyanGLHxg5Z6XAu06IubYO?=
+ =?iso-8859-1?Q?IwcIDVNxbfAoxUq5RoYsgFfoP+/ci+i4ggdzKnFyhAPnclZH0gv5S34mlL?=
+ =?iso-8859-1?Q?Gq+gXUGHGRkiQpoo4UY5uOqBT6966mvB+itk+2BudC26Cgd70Nt+0h/3Jk?=
+ =?iso-8859-1?Q?WUwnRZejc5V44NQRKoiU6Z/6eb9TUUmUxOijHlFjatBGTNBeSKD2wzbadb?=
+ =?iso-8859-1?Q?XFzNxLA/VF+E8if/tKX+XzudnBsWJ5tu4YFfUi4Ld75Ok3wz+tEDl59LHb?=
+ =?iso-8859-1?Q?w0CSPIUPdtpcTAiTkVJ3Y0XMb9RDyhJPhz/RVnacJNz8wlrN02sKouDrFI?=
+ =?iso-8859-1?Q?Ioz6niTCO+O6ODXtCF/LcpK2LAH0TtRpYIHq4l7ZOpdl0fI5u8RNBVS3Cw?=
+ =?iso-8859-1?Q?ATGNypZa8rsRyHwHmGhqNOx5S15j8v0kY1qB+eurk8WSlkxiSdAlQDFznJ?=
+ =?iso-8859-1?Q?5EYIWLrTCyptaR++qCdB9EHjiM+hDY+Lkhh3BqKi5XKFpnSBD4B2VUGEdm?=
+ =?iso-8859-1?Q?1OJXvTyZ1zZWQQaeesafyGbCOh7KVxyzZS3TsiH5FEMn2NAhC3FI21Ktkv?=
+ =?iso-8859-1?Q?jPmiyqHQ1mfe28EZnADjrpaoWzbA0LQHuVz1Cg3rCuohTdOTqj+lAdksOU?=
+ =?iso-8859-1?Q?u4rAtV23EQs81Oz5D8e4L4f41Gp2ydmCTLmbsCf1JAV6Q6sL+j64YBWlh8?=
+ =?iso-8859-1?Q?9dWiyM2d3Xm8+Asim8tHbFyhaehwZGkXuSZAcC2cb4A/rriK6WTgyIBpsx?=
+ =?iso-8859-1?Q?uQyLlsZtXc6n/h25/T840ZXVhOfIwHt/8D04VJSjn06a8/rm+93sfOHZG+?=
+ =?iso-8859-1?Q?5dz94H+h7jlIfbrjY1VBJeXaMKQQhah0sLlAcqw3x1+2nV+cq1BXXttZq1?=
+ =?iso-8859-1?Q?68kbnDCyF2lCbp0VLKm+NxqfJNVf2b0KxxHgBZRWS+R9W86TOr3YhdYzUg?=
+ =?iso-8859-1?Q?/mIMeT0q6lGMldAyIPKAO5VbUfCdV3MpSbmyLhP9ouujfFCC4iZf2SPMuD?=
+ =?iso-8859-1?Q?7fc4y491d3evo1PKEruLNRAoVc+Ccn7045DkxbQ8xfRLDs/zp23fpPa6Sb?=
+ =?iso-8859-1?Q?hKeosT08VF4sNOtXLv+8uRacEA4hS1zjoUEIGbT2CsmCDnXFGN2Zl0NR1n?=
+ =?iso-8859-1?Q?A6yOPnx1ynPoOxXZZOcO+0XH75P5PjADlf4VdiMZc1y1RAUVlpt4F+HZyx?=
+ =?iso-8859-1?Q?tNVjaolYe+7frK2CF1HK44?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WENDZzRWYjhUa3p6N1JVWDJNWXc0RXFMelptSlB6YWdXNHNQelJaRXJoSXZI?=
- =?utf-8?B?Ym1lbWRlZlFQZGF6S1Jnc1FXNkZZMnJaek9NYUFBRGYwVU5BREIwbXZFUjE2?=
- =?utf-8?B?NmM4N01uMHdWT0swSVp3dE5uUFZBWlk0eURLcUtNTW9KTXgyQzYrdUpBdnhk?=
- =?utf-8?B?ai9IYVM2L084RDEwNDJrcTgvL2NubEhJN3dHR3hNeENJc3g0bHV0QjVUc2N4?=
- =?utf-8?B?YWdTWE1PNmZweTVsUE9rUUl0VlMyUit2YklLOW1jb0xtMTluSHBQeTRLZi9C?=
- =?utf-8?B?YXppQU5NVVk3SmxHbDdPbXM4YlVya1BCYjZ5bmhTTHNDVk4yeXovUjdZVWVm?=
- =?utf-8?B?UDhBM3UzNDdwN2hweWVFV0V4TU5qazNiQU03NVZqei95dlNMa01pWFRqMmFm?=
- =?utf-8?B?Ykw4Snk4UGtxQS9PTjkvWm5HSTcxLzZVdGxBNyt6NFJPT0k1czFFblp4eXdq?=
- =?utf-8?B?UTljU29UWjJORERSNThyMHdSNUFnNnpDT2dMMWdjYkROejFPODltR0RSMWho?=
- =?utf-8?B?bTh5YmNLYUlNMW1meTZjS2VhdUI1L0VYa3A0U011RisxS2JXSFVvNmlYYTJ4?=
- =?utf-8?B?N0c1U0g2eEp2dEVWMXdmQm1jdngzdStsRHcwNmdCbkRsbSt6ZWxLR3FBM2FD?=
- =?utf-8?B?QnE4ZWVJQi8rMEprR0dZN01hUHlaUjZZeTVydUM3YW0rOTRrbHJpcUg2blcx?=
- =?utf-8?B?RTliUkRjS05YbGtVRkhGZ29xSlI5SmpENDd0U2xwY28rU3FZWWpQNWZEUko3?=
- =?utf-8?B?R0NlRmlBQ3RoaEFxYldzSUZESWdsemRVNEFxZUNnb3RXVk8zOVkvZzdPTmVO?=
- =?utf-8?B?V2dyc1MyZi95ZU42OXRpOFNZQitqU1MwWmU2UU96SysrQ3Y3L2EwcDN2U2dt?=
- =?utf-8?B?ZDVMT1dpWEF1ZnZMY3R0RzVZQzVsL2FZS2dtSFZTMVZkSVRLZ2NvNVNPck8x?=
- =?utf-8?B?cmF1Ly84ZXBaVHc1dmpnc0VqaHBUc0NPY25aZTRCQUpwVmM5NlI5dTZzcmpG?=
- =?utf-8?B?MFAvVHRGQ0NwYWJoTjdqb2VIc0s2UXhlMFRhMkp6MFgyUXFzQ2JBa2ZIc1Y5?=
- =?utf-8?B?djJMdHYycE1BTnZBNWdFbUJxSm5WK0thOGFyVmdEaFJUYmxIcWFqWGRGWC9a?=
- =?utf-8?B?WFFOcWdMeEx3Ym5EMGs3UGs4a2NzTmJwWFFVUFFacGJXeStyeVdnY1JvcTli?=
- =?utf-8?B?YWgwZEhNUXFZWWRLdnV6MVo0MndqbjhCY01WaXZjbm9hVHc3STFaa1gwZHov?=
- =?utf-8?B?YnAxU1h5bjVxMzZXdE8vVTFHcnA3cGVoS2k5aEZZRk41ZzlzSGl5dXhJUXpK?=
- =?utf-8?B?ekVVckdXTWQzdWVsNkRKa0gyUzAzM2MxWnpocElFMGh3dS9pajEwQ2tHSm45?=
- =?utf-8?B?dHl3QTVsT2xCcEFGRXJaSWsyT2FabFVaSkJ6SUpNd0tLbm52cjhMYjl1SzJu?=
- =?utf-8?B?bFAydGNMME5NOWpWREY5WDRTOFVza3dNNllHWk1nRGs1U09WWEhrenVyNU82?=
- =?utf-8?B?aWJEbmtReWNCMmY4bWtFdnNMYXR5dmxORjl0WnMzejJ6NlcvbEJaWDBVSUU2?=
- =?utf-8?B?UmRVSm5UYXJUN0lraEF3UjlIZHlCRmp1VWdSdlBRSlhLQlJCa0VuSjdiVU1v?=
- =?utf-8?B?Qkx6ME1UMnF4OXQ0cXlIZHJRS3RWMXVwY1VETmhCYWxkWVVwTGNWS1lkc09O?=
- =?utf-8?B?T2VNZnhuUXp4alVhR0cyRmIvRDA0QXlvaGVIV1ZnN0JuTndHMFlSbHptRDha?=
- =?utf-8?B?cWswbnBLRmJqUHpLRktiMUo2R2pjZENPM3VXeEVZaXJLUk1FOFZMVHh0Zlds?=
- =?utf-8?B?Y2tiMzFHalZFVUZBaVMxT05PMlpqWGVBdGlaSFdSampYcFNPZ1B6ZnlYdzJE?=
- =?utf-8?B?TXhGQ0FHOEtWVjJORlc4a3N6Z0JWTVd0aWdwaWs3eSthNndGQ2YwZEh5c2Za?=
- =?utf-8?B?KzdxRk85SHRHYkNpTVM0NFB4RGUvRFpTYTBmR2FIN2ZNZjFNSlR3NXNYSkNn?=
- =?utf-8?B?d2I3YUxzeStMRW5EVm1yWTFjQ3Q4Nk55YmN3UWN4MHJCOUE5UVVwZU9yUjFV?=
- =?utf-8?B?MmlvbXRoUm5QTWsvclduNnBwczB6eDI0alc4Szc3UWlhY1FsQ0t6R2xHZndi?=
- =?utf-8?Q?hnAPkdhuyDNKp+gifDIYPKprJ?=
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0606b37c-a72b-4cac-8c65-08dccd1a0236
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2024 19:44:37.1653
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2024 19:54:24.6588
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd8c7df3-fa27-4c3a-0aed-08dccd1b608c
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: f/R8szOA/lcG3KEcdHVCafNprfKqnmqPqBLcAgluOaQQkRYCR8OOQ3zEU27PN2fa2/LbnLM6XP4NXE3iqnrG9w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9194
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000A349.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9094
 
-Hello Sean,
+On Wed, Sep 04, 2024 at 12:37:17PM -0500, Kalra, Ashish wrote:
+> Hello Paolo,
+> 
+> On 9/4/2024 5:29 AM, Paolo Bonzini wrote:
+> > On 9/4/24 00:58, Kalra, Ashish wrote:
+> >> The issue here is that panic path will ensure that all (other) CPUs
+> >> have been shutdown via NMI by checking that they have executed the
+> >> NMI shutdown callback.
+> >>
+> >> But the above synchronization is specifically required for SNP case,
+> >> as we don't want to execute the SNP_DECOMMISSION command (to destroy
+> >> SNP guest context) while one or more CPUs are still in the NMI VMEXIT
+> >> path and still in the process of saving the vCPU state (and still
+> >> modifying SNP guest context?) during this VMEXIT path. Therefore, we
+> >> ensure that all the CPUs have saved the vCPU state and entered NMI
+> >> context before issuing SNP_DECOMMISSION. The point is that this is a
+> >> specific SNP requirement (and that's why this specific handling in
+> >> sev_emergency_disable()) and i don't know how we will be able to
+> >> enforce it in the generic panic path ?
+> >
+> > I think a simple way to do this is to _first_ kick out other
+> > CPUs through NMI, and then the one that is executing
+> > emergency_reboot_disable_virtualization().  This also makes
+> > emergency_reboot_disable_virtualization() and
+> > native_machine_crash_shutdown() more similar, in that
+> > the latter already stops other CPUs before disabling
+> > virtualization on the one that orchestrates the shutdown.
+> >
+> > Something like (incomplete, it has to also add the bool argument
+> > to cpu_emergency_virt_callback and the actual callbacks):
+> >
+> > diff --git a/arch/x86/kernel/crash.c b/arch/x86/kernel/crash.c
+> > index 340af8155658..3df25fbe969d 100644
+> > --- a/arch/x86/kernel/crash.c
+> > +++ b/arch/x86/kernel/crash.c
+> > @@ -111,7 +111,7 @@ void native_machine_crash_shutdown(struct pt_regs *regs)
+> >  
+> >      crash_smp_send_stop();
+> >  
+> > -    cpu_emergency_disable_virtualization();
+> > +    cpu_emergency_disable_virtualization(true);
+> >  
+> >      /*
+> >       * Disable Intel PT to stop its logging
+> > diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
+> > index 0e0a4cf6b5eb..7a86ec786987 100644
+> > --- a/arch/x86/kernel/reboot.c
+> > +++ b/arch/x86/kernel/reboot.c
+> > @@ -558,7 +558,7 @@ EXPORT_SYMBOL_GPL(cpu_emergency_unregister_virt_callback);
+> >   * reboot.  VMX blocks INIT if the CPU is post-VMXON, and SVM blocks INIT if
+> >   * GIF=0, i.e. if the crash occurred between CLGI and STGI.
+> >   */
+> > -void cpu_emergency_disable_virtualization(void)
+> > +void cpu_emergency_disable_virtualization(bool last)
+> >  {
+> >      cpu_emergency_virt_cb *callback;
+> >  
+> > @@ -572,7 +572,7 @@ void cpu_emergency_disable_virtualization(void)
+> >      rcu_read_lock();
+> >      callback = rcu_dereference(cpu_emergency_virt_callback);
+> >      if (callback)
+> > -        callback();
+> > +        callback(last);
+> >      rcu_read_unlock();
+> >  }
+> >  
+> > @@ -591,11 +591,11 @@ static void emergency_reboot_disable_virtualization(void)
+> >       * other CPUs may have virtualization enabled.
+> >       */
+> >      if (rcu_access_pointer(cpu_emergency_virt_callback)) {
+> > -        /* Safely force _this_ CPU out of VMX/SVM operation. */
+> > -        cpu_emergency_disable_virtualization();
+> > -
+> >          /* Disable VMX/SVM and halt on other CPUs. */
+> >          nmi_shootdown_cpus_on_restart();
+> > +
+> > +        /* Safely force _this_ CPU out of VMX/SVM operation. */
+> > +        cpu_emergency_disable_virtualization(true);
+> >      }
+> >  }
+> >  #else
+> > @@ -877,7 +877,7 @@ static int crash_nmi_callback(unsigned int val, struct pt_regs *regs)
+> >       * Prepare the CPU for reboot _after_ invoking the callback so that the
+> >       * callback can safely use virtualization instructions, e.g. VMCLEAR.
+> >       */
+> > -    cpu_emergency_disable_virtualization();
+> > +    cpu_emergency_disable_virtualization(false);
+> >  
+> >      atomic_dec(&waiting_for_crash_ipi);
+> >  
+> > diff --git a/arch/x86/kernel/smp.c b/arch/x86/kernel/smp.c
+> > index 18266cc3d98c..9a863348d1a7 100644
+> > --- a/arch/x86/kernel/smp.c
+> > +++ b/arch/x86/kernel/smp.c
+> > @@ -124,7 +124,7 @@ static int smp_stop_nmi_callback(unsigned int val, struct pt_regs *regs)
+> >      if (raw_smp_processor_id() == atomic_read(&stopping_cpu))
+> >          return NMI_HANDLED;
+> >  
+> > -    cpu_emergency_disable_virtualization();
+> > +    cpu_emergency_disable_virtualization(false);
+> >      stop_this_cpu(NULL);
+> >  
+> >      return NMI_HANDLED;
+> > @@ -136,7 +136,7 @@ static int smp_stop_nmi_callback(unsigned int val, struct pt_regs *regs)
+> >  DEFINE_IDTENTRY_SYSVEC(sysvec_reboot)
+> >  {
+> >      apic_eoi();
+> > -    cpu_emergency_disable_virtualization();
+> > +    cpu_emergency_disable_virtualization(false);
+> >      stop_this_cpu(NULL);
+> >  }
+> >  
+> >
+> > And then a second patch adds sev_emergency_disable() and only
+> > executes it if last == true.
+> >
+> This implementation will not work as we need to do wbinvd on all other CPUs after SNP_DECOMMISSION has been issued.
+> 
+> When the last CPU executes sev_emergency_disable() and issues SNP_DECOMMISSION, by that time all other CPUs have entered the NMI halt loop and then they won't be able to do a wbinvd and hence SNP_SHUTDOWN will eventually fail.
+> 
+> One way this can work is if all other CPUs can still execute sev_emergency_disable() and in case of last == false, do a spin busy till the last cpu kicks them out of the spin loop and then they do a wbinvd after exiting the spin busy, but then cpu_emergency_disable_virtualization() is/has to be called before atomic_dec(&waiting_for_crash_ipi) in crash_nmi_callback(), so this spin busy in other CPUs will force the last CPU to wait forever (or till it times out waiting for all other CPUs to execute the NMI callback) which makes all of this looks quite fragile.
 
->>>  e_free_context:
->>> @@ -2884,9 +2890,126 @@ static int snp_decommission_context(struct kvm *kvm)
->>>  	snp_free_firmware_page(sev->snp_context);
->>>  	sev->snp_context = NULL;
->>>  
->>> +	if (snp_asid_to_gctx_pages_map)
->>> +		snp_asid_to_gctx_pages_map[sev_get_asid(kvm)] = NULL;
->>> +
->>>  	return 0;
->>>  }
->>>  
->>> +static void __snp_decommission_all(void)
->>> +{
->>> +	struct sev_data_snp_addr data = {};
->>> +	int ret, asid;
->>> +
->>> +	if (!snp_asid_to_gctx_pages_map)
->>> +		return;
->>> +
->>> +	for (asid = 1; asid < min_sev_asid; asid++) {
->>> +		if (snp_asid_to_gctx_pages_map[asid]) {
->>> +			data.address = __sme_pa(snp_asid_to_gctx_pages_map[asid]);
->> NULL pointer deref if this races with snp_decommission_context() from task
->> context.
+Hi Ashish,
 
-Actually looking at this again, this is why we really need all CPUs synchronizing in NMI context before one CPU in NMI context takes control and issues SNP_DECOMMISSION on all SNP VMs.
+Your patch (and Paolo's suggested rework) came up in the PUCK call this
+morning and I mentioned this point. I was asked to raise some of the
+points here so we can continue the discussion on-list:
 
-If there are sev_vm_destroy() -> snp_decommision_context() executing,Â  when they start handling NMI they would have either already issued SNP_DECOMMISSION for this VM and/or reclaimed the SNP guest context page (transitioned to FW state after SNP_DECOMMISSION). In both cases when we issue SNP_DECOMMISSION here in __snp_decommission_all(), the command will fail with INVALID_GUEST/INVALID_ADDRESS error, so we can simply ignore this error and assume that the VM has already been decommissioned and continue with decommissioning the other VMs.
+Have we confirmed that WBINVD actually has to happen after the
+SNP_DECOMISSION call? Or do we just need to ensure that the WBINVD was
+issued after the last VMEXIT, and that the guest will never VMENTER
+again after the WBINVD?
 
-I actually tested some of these scenarios and they work as above.
+Because if WBINVD can be done prior to SNP_DECOMISSION, then Paolo was
+suggesting we could just have:
 
->>> +			ret = sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, &data, NULL);
->>> +			if (!ret) {
->> And what happens if SEV_CMD_SNP_DECOMMISSION fails?
+  kvm_cpu_svm_disable() {
+    ...
+    WBINVD
+  }
 
-As mentioned above, we can ignore the failure here as the VM may have already been decommissioned.
+  cpu_emergency_disable_virtualization() {
+    kvm_cpu_svm_disable()
+  }
 
-In the case where SNP_DECOMMISSION fails without the VM being already decommissioned, crashkernel boot will fail.
+  smp_stop_nmi_callback() {
+    if (raw_smp_processor_id() == atomic_read(&stopping_cpu)) {
+      return NMI_HANDLED;
+    }
+    cpu_emergency_disable_virtualization()
+    return NMI_HANDLED
+  }
 
-Thanks, Ashish
 
+The panic'ing CPU can then:
+
+  1) WBINVD itself (e.g. via cpu_emergency_disable_virtualization())
+  2) issue SNP_DECOMMISSION for all ASIDs
+
+That would avoid much of the additional synchronization handling since it
+fits more cleanly into existing panic flow. But it's contingent on
+whether WBINVD can happen before SNP_DECOMMISION or not so need to
+confirm that.
+
+Sean and Paolo also raised some other points (feel free to add if I
+missed anything):
+
+  - Since there's a lot of high-level design aspects that need to be
+    accounted for, it would be good to have the patch have some sort of
+    pseudocode/graph/etc so it's easier to reason about different
+    approaches. It would also be good to include this in the commit
+    message (generally it's encouraged to describe "why" rather than "how",
+    but this is an exceptional case where both are useful to reader).
+
+  - Sean inquired about making the target kdump kernel more agnostic to
+    whether or not SNP_SHUTDOWN was done properly, since that might
+    allow for capturing state even for edge cases where we can't go
+    through the normal cleanup path. I mentioned we'd tried this to some
+    degree but hit issues with the IOMMU, and when working around that
+    there was another issue but I don't quite recall the specifics.
+    Can you post a quick recap of what the issues are with that approach
+    so we can determine whether or not this is still an option?
+
+-Mike
+
+> 
+> Thanks, Ashish
+> 
 
