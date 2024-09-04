@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-25844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E3C696B93E
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 12:52:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0633196B941
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 12:52:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7086F1C24FC9
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 10:52:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D23B1F26CF8
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 10:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D091CE6E1;
-	Wed,  4 Sep 2024 10:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51921D0976;
+	Wed,  4 Sep 2024 10:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fZ0sTCwl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HHF2H9yX"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBEA1D048F
-	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 10:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F350C1D04B5
+	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 10:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725447030; cv=none; b=DwRElp9tRcEsJ2g4hHps35mVL3g4RFQ238NCA91IyXDdTy2M0r25uKiGzvJPoO3WWH5iQMG6gbNhaUzJ0Dv8yo4PIsPv4KgESlfRo5YtAWTFM/9QDG0ORsKoO3C7AIa4wSXJKG92Uy8pl/3RKtuxcR3z5IDomunGWYd/b7eV1S4=
+	t=1725447033; cv=none; b=LlbTzlqwqAqK1+znVVAUIon1FZ7zv63N6EgMJg2Ff2WuZQfc7m1spYkCsslMvVSq6F3Tf5OG/IkvyCQKqXQxSb2e+Ue+6ewMZfi4YgJhAikxghByy5iE729G4jULYrGO5KgA3RdJU84vifhdgFOK7ee+R7a6BiG2hnsE0LGBEGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725447030; c=relaxed/simple;
-	bh=OdXf2H2QDLSAtlOxK+CnZ9ratRbha5XGfAp3jGdKS2Y=;
+	s=arc-20240116; t=1725447033; c=relaxed/simple;
+	bh=LOlwO9hPMr2XN89BLGxjZ+LzXopK9uHBbqNh8lmkT24=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c8ROJ7Ukqpd3+aJQ3n/B+6jMtk3ZluB2tHFZOb5X91eS4NUou6ehAaaYOOfacMo4Lk1wGTtGMZgoxob2wap3WZh8MVwU/xg+RhY5GcdnTdd1KquSieaOzi8OJqPWmJaqTxY96aXkI08tVWS3epW7PHGZO8QMo3CKo5nNxmUF6YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fZ0sTCwl; arc=none smtp.client-ip=95.215.58.188
+	 MIME-Version; b=lR+hvHLygfhDJ97KtffccmvyMM5wHfgOVx2bik5TXYkVo4pXEfdH6/FbCrQc0U+oOkW2VROPkv4E3BYyx5oc4UuLeiL11oXF4h92RxOJLyI1VW/rJIWcmK7ev6yvfgVLlEVt27nQTmYnwYrk/iHS7QJakmvOHGulGeunVghFIh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HHF2H9yX; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725447026;
+	t=1725447029;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P8NNLQYH8P4X4ClL5Bx8RReyaTo01W2Due3h6Q3oXYc=;
-	b=fZ0sTCwlLwmNS4Qx14Caj3m7+Wf9GvHpK45FyYLnYSoeN3sTNUc9ZNhvJFFXKjE2qIit3w
-	xrRRlddFhToMEzSHA9L71dLm3+ol7hxzwVSZI5woh4aBt6SMFmmXNpDbpi/I3M9lEtpG9g
-	qWnZMd/+09bOVCE2Sd/kwb0IjKBB0FY=
+	bh=1Myu9U8IEbrxLCMMi6SGb7S+yIVucaaKwRIVAbRfcI4=;
+	b=HHF2H9yXkjxJiYAPY3icEMi+j2QRE1ZCsM+RJp4sNwAXeNrVZM2TGzSxwZ0eOKf2tcQ5/d
+	zRSsTShl3LGbta5Efi5TVD3aVX7fEV3W1Xz91D8WaM+UnLqEqQ+0eVVTLG93W3QyOHFggR
+	VkeMJay9znbhrKvHgqJQFKS5p/aE14I=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -57,9 +57,9 @@ Cc: pbonzini@redhat.com,
 	atishp@rivosinc.com,
 	cade.richard@berkeley.edu,
 	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH v2 1/4] riscv: Drop mstrict-align
-Date: Wed,  4 Sep 2024 12:50:22 +0200
-Message-ID: <20240904105020.1179006-7-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 2/4] Makefile: Prepare for clang EFI builds
+Date: Wed,  4 Sep 2024 12:50:23 +0200
+Message-ID: <20240904105020.1179006-8-andrew.jones@linux.dev>
 In-Reply-To: <20240904105020.1179006-6-andrew.jones@linux.dev>
 References: <20240904105020.1179006-6-andrew.jones@linux.dev>
 Precedence: bulk
@@ -71,29 +71,30 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The spec says unaligned accesses are supported, so this isn't required
-and clang doesn't support it. A platform might have slow unaligned
-accesses, but kvm-unit-tests isn't about speed anyway.
+clang complains about GNU extensions such as variable sized types not
+being at the end of structs unless -Wno-gnu is used. We may
+eventually want -Wno-gnu, but for now let's just handle the warnings
+as they come. Add -Wno-gnu-variable-sized-type-not-at-end to avoid
+the warning issued for the initrd_dev_path struct.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- riscv/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/riscv/Makefile b/riscv/Makefile
-index 179a373dbacf..2ee7c5bb5ad8 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -76,7 +76,7 @@ LDFLAGS += -melf32lriscv
+diff --git a/Makefile b/Makefile
+index 3d51cb726120..7471f7285b78 100644
+--- a/Makefile
++++ b/Makefile
+@@ -50,6 +50,8 @@ EFI_CFLAGS += -fshort-wchar
+ # EFI applications use PIC as they are loaded to dynamic addresses, not a fixed
+ # starting address
+ EFI_CFLAGS += -fPIC
++# Avoid error with the initrd_dev_path struct
++EFI_CFLAGS += -Wno-gnu-variable-sized-type-not-at-end
+ # Create shared library
+ EFI_LDFLAGS := -Bsymbolic -shared -nostdlib
  endif
- CFLAGS += -DCONFIG_RELOC
- CFLAGS += -mcmodel=medany
--CFLAGS += -mstrict-align
-+#CFLAGS += -mstrict-align
- CFLAGS += -std=gnu99
- CFLAGS += -ffreestanding
- CFLAGS += -O2
 -- 
 2.46.0
 
