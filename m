@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-25819-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25821-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC6796AF0B
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 05:18:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D33BD96AF10
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 05:18:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B55C1C236EF
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 03:18:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02B781F25D56
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 03:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3879912DD88;
-	Wed,  4 Sep 2024 03:14:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F14D58203;
+	Wed,  4 Sep 2024 03:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TgQZqPzt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cStDTVrg"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647BB83A09;
-	Wed,  4 Sep 2024 03:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EB457C8D;
+	Wed,  4 Sep 2024 03:14:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725419680; cv=none; b=EotKz9ils1J3zDQwdfQufNbGxwAY45qwBFRihlr6jIQ62KEEVQPnHYCxRPRloHugq1/rjF+/ymQBtQVH2e41ZWiZi1Ms5wfLFVwhiqMtdD6tuQtDNCCcM5XebBg42sNi+sq4RvQReoVIBhqvRX52OSkVX2kb+PqTwXh0pkdilYI=
+	t=1725419682; cv=none; b=bev6kL0ozTxbNMtJqwx1cAURWF3HDQHZ05Ns6zIKo76JsYIF/idv+aACO+/vKlQ307oMsULGxBEHVBs12kz4cOxay2jcijSXPzQfsKJsYeDfCZpN4pUpjNLa8fTbTGGwNlJGMBcoXp56zjAJfiV6hDEZxSv36iC1Asb1x5ZEasQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725419680; c=relaxed/simple;
-	bh=2SyccfbB6s6km++2Ia3ZkwXk8k1gu6IyfFGyB63uYas=;
+	s=arc-20240116; t=1725419682; c=relaxed/simple;
+	bh=VWxvMb0bIs/oli9SNRdkD05D1RIi3Y54Xn91m4sVxhU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Gz7qnv04y9cVo/j7aY5Fidm5NU4U6Rq8gkNpPANwKaGPxSLH7UIElDN0nKTCU5w+RalyW2QHTxAVKShJNrWLm7YJNIeXrOFeGB2AByrJkUzhSu1HQ+i+UaL9awQMuQxQm9bl9T5EPuCUURDqaiqbEeUt9ufJUdXRljvMuTZZ8N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TgQZqPzt; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=lNw/nfwmVAFY2E4ljcnrvWy7JlxYXjhQUmd1zKR9ZGet59y+5aLWG2Z9J2ocdscKvbOd9R+TCbjRD8JNh8VJ5RrTLYMcm2QlIpnwpI9yQcH/SEhW6darYGuaB9mN0aHcLrL1NERGAllEFyFdiWWUY6BguZuEx/feSYAufpwsqe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cStDTVrg; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725419678; x=1756955678;
+  t=1725419680; x=1756955680;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2SyccfbB6s6km++2Ia3ZkwXk8k1gu6IyfFGyB63uYas=;
-  b=TgQZqPzt9JWuAcCy6RAX5pzJDERxX7eahJwALFFx3PUwkrnZvbByE0rl
-   sL98IX63aiep8XmrbuDIIJCzm8b2sO9bLyz+BxsfrOIEy0p50NINMI4V9
-   JBVCQA4qJ3R2q6P8qTtYw+bUL6tqP1bXz1VmebPxDEqhKTg/HURpxonV4
-   LvYbex4W1cn4SddOGR+LlV2CCZtOOODhu9AdRadApXiz//pOPSXJx1kB/
-   E8RDMlCutKeKVzq8DVjx88E7RIYT/LdtMdMOKsNQSUcO+fEA7qHB3i26E
-   4ZAP+pFQYqykUg1De+ANJdF2PUDeN7QR3/vln0RMrnpxLpAvqiC2aCuBp
-   Q==;
-X-CSE-ConnectionGUID: g1Mxmek/Q4iBswtW+QHkvA==
-X-CSE-MsgGUID: DHZpvTmWRoaP9+/z5Y42wg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23564687"
+  bh=VWxvMb0bIs/oli9SNRdkD05D1RIi3Y54Xn91m4sVxhU=;
+  b=cStDTVrgstKLw0oyqCa+Nx2o4D7KPB5lv9JK+BLQ7ZS/zXkQq35EWpXR
+   kguBelMscw7UKP9Udh2FTEEg8/JijQHdPTFZjmZ3budguMjZLcn8OsDii
+   8ARwFYp/PiqyPHbEvVxqxmvjujPC/3E4KD63WPysZFZ/FDQ1o27MmsHPl
+   vXu6HdScrUvBx2pq7E16kEKKqN3bNEhIkUlj17AWlG/jDR2Hm09J+jtfS
+   E/RV+VE7BYSQgyxXyvMAkpC/xj9D632M5AjVvw5JAkxCsDdqNFJeXSuIU
+   71uLQHhMMzMWLlKC88NpO7LBqWkD4VL9OKdUAgBOrsjWdghBYpxbubVeT
+   g==;
+X-CSE-ConnectionGUID: k7h4/RLpRNePFXe4QO75Xw==
+X-CSE-MsgGUID: acrjs5I2SgOqB4ftwzqYBQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23564695"
 X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
-   d="scan'208";a="23564687"
+   d="scan'208";a="23564695"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
   by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:08:08 -0700
-X-CSE-ConnectionGUID: 2ACuqrUzQteHeoXQFgRBQg==
-X-CSE-MsgGUID: N7sIXiqQQoSX0c6zwYroEw==
+X-CSE-ConnectionGUID: 1imYM/m4SJ+EJS8QtSloVg==
+X-CSE-MsgGUID: jzbUD0f1Sl2JAyt0v2ppPA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
-   d="scan'208";a="65106309"
+   d="scan'208";a="65106320"
 Received: from dgramcko-desk.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.221.153])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:08:07 -0700
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:08:08 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -69,9 +69,9 @@ Cc: kai.huang@intel.com,
 	nik.borisov@suse.com,
 	rick.p.edgecombe@intel.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 12/21] KVM: TDX: Set per-VM shadow_mmio_value to 0
-Date: Tue,  3 Sep 2024 20:07:42 -0700
-Message-Id: <20240904030751.117579-13-rick.p.edgecombe@intel.com>
+Subject: [PATCH 13/21] KVM: TDX: Handle TLB tracking for TDX
+Date: Tue,  3 Sep 2024 20:07:43 -0700
+Message-Id: <20240904030751.117579-14-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
 References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
@@ -85,21 +85,39 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Set per-VM shadow_mmio_value to 0 for TDX.
+Handle TLB tracking for TDX by introducing function tdx_track() for private
+memory TLB tracking and implementing flush_tlb* hooks to flush TLBs for
+shared memory.
 
-With enable_mmio_caching on, KVM installs MMIO SPTEs for TDs. To correctly
-configure MMIO SPTEs, TDX requires the per-VM shadow_mmio_value to be set
-to 0. This is necessary to override the default value of the suppress VE
-bit in the SPTE, which is 1, and to ensure value 0 in RWX bits.
+Introduce function tdx_track() to do TLB tracking on private memory, which
+basically does two things: calling TDH.MEM.TRACK to increase TD epoch and
+kicking off all vCPUs. The private EPT will then be flushed when each vCPU
+re-enters the TD. This function is unused temporarily in this patch and
+will be called on a page-by-page basis on removal of private guest page in
+a later patch.
 
-For MMIO SPTE, the spte value changes as follows:
-1. initial value (suppress VE bit is set)
-2. Guest issues MMIO and triggers EPT violation
-3. KVM updates SPTE value to MMIO value (suppress VE bit is cleared)
-4. Guest MMIO resumes.  It triggers VE exception in guest TD
-5. Guest VE handler issues TDG.VP.VMCALL<MMIO>
-6. KVM handles MMIO
-7. Guest VE handler resumes its execution after MMIO instruction
+In earlier revisions, tdx_track() relied on an atomic counter to coordinate
+the synchronization between the actions of kicking off vCPUs, incrementing
+the TD epoch, and the vCPUs waiting for the incremented TD epoch after
+being kicked off.
+
+However, the core MMU only actually needs to call tdx_track() while
+aleady under a write mmu_lock. So this sychnonization can be made to be
+unneeded. vCPUs are kicked off only after the successful execution of
+TDH.MEM.TRACK, eliminating the need for vCPUs to wait for TDH.MEM.TRACK
+completion after being kicked off. tdx_track() is therefore able to send
+requests KVM_REQ_OUTSIDE_GUEST_MODE rather than KVM_REQ_TLB_FLUSH.
+
+Hooks for flush_remote_tlb and flush_remote_tlbs_range are not necessary
+for TDX, as tdx_track() will handle TLB tracking of private memory on
+page-by-page basis when private guest pages are removed. There is no need
+to invoke tdx_track() again in kvm_flush_remote_tlbs() even after changes
+to the mirrored page table.
+
+For hooks flush_tlb_current and flush_tlb_all, which are invoked during
+kvm_mmu_load() and vcpu load for normal VMs, let VMM to flush all EPTs in
+the two hooks for simplicity, since TDX does not depend on the two
+hooks to notify TDX module to flush private EPT in those cases.
 
 Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
@@ -108,58 +126,186 @@ Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
 TDX MMU part 2 v1:
  - Split from the big patch "KVM: TDX: TDP MMU TDX support".
- - Remove warning for shadow_mmio_value
+ - Modification of synchronization mechanism in tdx_track().
+ - Dropped hooks flush_remote_tlb and flush_remote_tlbs_range.
+ - Let VMM to flush all EPTs in hooks flush_tlb_all and flush_tlb_current.
+ - Dropped KVM_BUG_ON() in vt_flush_tlb_gva(). (Rick)
 ---
- arch/x86/kvm/mmu/spte.c |  2 --
- arch/x86/kvm/vmx/tdx.c  | 15 ++++++++++++++-
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ arch/x86/kvm/vmx/main.c    | 52 ++++++++++++++++++++++++++++++++---
+ arch/x86/kvm/vmx/tdx.c     | 55 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h |  2 ++
+ 3 files changed, 105 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 46a26be0245b..4ab6d2a87032 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -94,8 +94,6 @@ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
- 	u64 spte = generation_mmio_spte_mask(gen);
- 	u64 gpa = gfn << PAGE_SHIFT;
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 2cc29d0fc279..1c86849680a3 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -101,6 +101,50 @@ static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	vmx_vcpu_reset(vcpu, init_event);
+ }
  
--	WARN_ON_ONCE(!vcpu->kvm->arch.shadow_mmio_value);
--
- 	access &= shadow_mmio_access_mask;
- 	spte |= vcpu->kvm->arch.shadow_mmio_value | access;
- 	spte |= gpa | shadow_nonpresent_or_rsvd_mask;
++static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * TDX calls tdx_track() in tdx_sept_remove_private_spte() to ensure
++	 * private EPT will be flushed on the next TD enter.
++	 * No need to call tdx_track() here again even when this callback is as
++	 * a result of zapping private EPT.
++	 * Just invoke invept() directly here to work for both shared EPT and
++	 * private EPT.
++	 */
++	if (is_td_vcpu(vcpu)) {
++		ept_sync_global();
++		return;
++	}
++
++	vmx_flush_tlb_all(vcpu);
++}
++
++static void vt_flush_tlb_current(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu)) {
++		tdx_flush_tlb_current(vcpu);
++		return;
++	}
++
++	vmx_flush_tlb_current(vcpu);
++}
++
++static void vt_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
++{
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_flush_tlb_gva(vcpu, addr);
++}
++
++static void vt_flush_tlb_guest(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_flush_tlb_guest(vcpu);
++}
++
+ static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 			int pgd_level)
+ {
+@@ -190,10 +234,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.set_rflags = vmx_set_rflags,
+ 	.get_if_flag = vmx_get_if_flag,
+ 
+-	.flush_tlb_all = vmx_flush_tlb_all,
+-	.flush_tlb_current = vmx_flush_tlb_current,
+-	.flush_tlb_gva = vmx_flush_tlb_gva,
+-	.flush_tlb_guest = vmx_flush_tlb_guest,
++	.flush_tlb_all = vt_flush_tlb_all,
++	.flush_tlb_current = vt_flush_tlb_current,
++	.flush_tlb_gva = vt_flush_tlb_gva,
++	.flush_tlb_guest = vt_flush_tlb_guest,
+ 
+ 	.vcpu_pre_run = vmx_vcpu_pre_run,
+ 	.vcpu_run = vmx_vcpu_run,
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 0c08062ef99f..9da71782660f 100644
+index 9da71782660f..6feb3ab96926 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -6,7 +6,7 @@
+@@ -6,6 +6,7 @@
  #include "mmu.h"
  #include "tdx.h"
  #include "tdx_ops.h"
--
-+#include "mmu/spte.h"
++#include "vmx.h"
+ #include "mmu/spte.h"
  
  #undef pr_fmt
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-@@ -344,6 +344,19 @@ int tdx_vm_init(struct kvm *kvm)
- {
- 	kvm->arch.has_private_mem = true;
+@@ -446,6 +447,51 @@ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
+ 	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa);
+ }
  
-+	/*
-+	 * Because guest TD is protected, VMM can't parse the instruction in TD.
-+	 * Instead, guest uses MMIO hypercall.  For unmodified device driver,
-+	 * #VE needs to be injected for MMIO and #VE handler in TD converts MMIO
-+	 * instruction into MMIO hypercall.
-+	 *
-+	 * SPTE value for MMIO needs to be setup so that #VE is injected into
-+	 * TD instead of triggering EPT MISCONFIG.
-+	 * - RWX=0 so that EPT violation is triggered.
-+	 * - suppress #VE bit is cleared to inject #VE.
-+	 */
-+	kvm_mmu_set_mmio_spte_value(kvm, 0);
++/*
++ * Ensure shared and private EPTs to be flushed on all vCPUs.
++ * tdh_mem_track() is the only caller that increases TD epoch. An increase in
++ * the TD epoch (e.g., to value "N + 1") is successful only if no vCPUs are
++ * running in guest mode with the value "N - 1".
++ *
++ * A successful execution of tdh_mem_track() ensures that vCPUs can only run in
++ * guest mode with TD epoch value "N" if no TD exit occurs after the TD epoch
++ * being increased to "N + 1".
++ *
++ * Kicking off all vCPUs after that further results in no vCPUs can run in guest
++ * mode with TD epoch value "N", which unblocks the next tdh_mem_track() (e.g.
++ * to increase TD epoch to "N + 2").
++ *
++ * TDX module will flush EPT on the next TD enter and make vCPUs to run in
++ * guest mode with TD epoch value "N + 1".
++ *
++ * kvm_make_all_cpus_request() guarantees all vCPUs are out of guest mode by
++ * waiting empty IPI handler ack_kick().
++ *
++ * No action is required to the vCPUs being kicked off since the kicking off
++ * occurs certainly after TD epoch increment and before the next
++ * tdh_mem_track().
++ */
++static void __always_unused tdx_track(struct kvm *kvm)
++{
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
++	u64 err;
 +
- 	/*
- 	 * This function initializes only KVM software construct.  It doesn't
- 	 * initialize TDX stuff, e.g. TDCS, TDR, TDCX, HKID etc.
++	/* If TD isn't finalized, it's before any vcpu running. */
++	if (unlikely(!is_td_finalized(kvm_tdx)))
++		return;
++
++	lockdep_assert_held_write(&kvm->mmu_lock);
++
++	do {
++		err = tdh_mem_track(kvm_tdx);
++	} while (unlikely((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY));
++
++	if (KVM_BUG_ON(err, kvm))
++		pr_tdx_error(TDH_MEM_TRACK, err);
++
++	kvm_make_all_cpus_request(kvm, KVM_REQ_OUTSIDE_GUEST_MODE);
++}
++
+ static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+ {
+ 	const struct tdx_sys_info_td_conf *td_conf = &tdx_sysinfo->td_conf;
+@@ -947,6 +993,15 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+ 	return ret;
+ }
+ 
++void tdx_flush_tlb_current(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * flush_tlb_current() is used only the first time for the vcpu to run.
++	 * As it isn't performance critical, keep this function simple.
++	 */
++	ept_sync_global();
++}
++
+ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+ {
+ 	struct kvm_tdx_cmd tdx_cmd;
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index dcf2b36efbb9..28fda93f0b27 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -131,6 +131,7 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+ 
+ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+ 
++void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
+ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
+ #else
+ static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
+@@ -145,6 +146,7 @@ static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
+ 
+ static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+ 
++static inline void tdx_flush_tlb_current(struct kvm_vcpu *vcpu) {}
+ static inline void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level) {}
+ #endif
+ 
 -- 
 2.34.1
 
