@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-25833-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25832-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A89E96B228
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 08:52:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15D4696B157
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 08:16:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF2481C21425
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 06:52:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87965B260F8
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 06:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09964145B24;
-	Wed,  4 Sep 2024 06:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC22712C49C;
+	Wed,  4 Sep 2024 06:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fO1mzXZG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOs91JMn"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E35513AD03
-	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 06:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745BB3D6B
+	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 06:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725432735; cv=none; b=kcZvCLmQDZSGhgAL16kYQwGpHwBXzkSQQfbg+q1hL62pz1iDdE8qGjv+5Nhge0z5AFUd0HGQ1zVkJRqsQlBAtsJn9H3r2E41wDCHe2KtqX0h1xEnVHBf1STIIu6/Nf6w28sWGhVoafBCIfN8BFP/0akVY8bspuCF/LfbFqVfWuw=
+	t=1725430564; cv=none; b=LnkXLKmOgSdGs/8eNlWBfnl4WPJqtWOAhMdPcuXSPDo+fkBee7JkQsmKBK3LQMPYtQqqLWl1h5QdR6BNCmZre2cCXOlTR/eqw3JFZVzQktE/vSeAua7BaHWo9LHKOQ/DA/ZAOm+433r+W2MtNY4whA0lY/FcRs7Pb1yXp6YAIng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725432735; c=relaxed/simple;
-	bh=IDiZgIow9HfJnlN7tmIwbxlf8Hr93+SVIRR4CnaFmeU=;
+	s=arc-20240116; t=1725430564; c=relaxed/simple;
+	bh=bwl7J8Ei0oLXUFycI7mAAA8XLCISgfFwAHSrsJFGlrA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ghetAOaVA1Ttfsjqj4EIJeUXvTD2HlRD3rwD+J13O5IbwIvKFKiJKjHaTf/IoO7km84yowoBYTxdhzgYF97Jg0UNBgu21SaMMeXAMeK8ZbmK7y/cRVI++l26LQJmw10nAWd4Lbf7q+7u7PSgtep4qDac2SuDsymMgmgZkV5kEHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fO1mzXZG; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=LzvINNEK6C7W8MEOqW7yIspscwh6WYYQT5RgPxYmRQyLGZexU2VhyrSAIVLazL5HKxFd1i4afNi6P5tK0ARr3wwPCzhvPHHGx49h6f67V9cqI6f44xKSH8GLB5nIBioHivYgi6gfzZo7G1FojEGh/NB/8VzqoqpuPWr17w4CF9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JOs91JMn; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725432732;
+	s=mimecast20190719; t=1725430561;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VABDIikbxbAbTSQHLomHWS+MkknfvcB6H0xPs5zD4TI=;
-	b=fO1mzXZG4CowBhhNYqV59URI69yJd2B9/vBq+Ie0/OnCShNZ5kJuKMde4rDWhbFxcSUPUF
-	IiArMP7lnXWavcuMPDb/xBXkSMCcNIRODFdkjCY/zh1YgFEpYJJN6YMNbvEIMTiFeGWuJh
-	JkKzvYcSuGPv5+1qnFFAASwKCbS2kqI=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=pFi+GvA472wwOZH0lUKoPWTzWmpUD/+iLOVkN6gRHFI=;
+	b=JOs91JMnIfq1lzhmIDwCTX3wZqXPNmqFbSR/sBBa7vAv3wXzDMcdwGeCrmCxlNFm3oukDg
+	xwPRFCPFNJ9SVS64UNjLUbnk0HQISE2vbZiYTuTEc1d3pst836v8vc4n0AuUw11lYWkZAR
+	3lI90ncZKlQKv0i0AHGz5qxHFEhESHc=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-649-18yzLtzIO0u3beSU8CpL6w-1; Wed, 04 Sep 2024 02:12:12 -0400
-X-MC-Unique: 18yzLtzIO0u3beSU8CpL6w-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a8683751595so532536366b.2
-        for <kvm@vger.kernel.org>; Tue, 03 Sep 2024 23:12:11 -0700 (PDT)
+ us-mta-251-dNg8sJYaMLCVPEJwkMUZ8g-1; Wed, 04 Sep 2024 02:12:29 -0400
+X-MC-Unique: dNg8sJYaMLCVPEJwkMUZ8g-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a7a83fad218so556376066b.3
+        for <kvm@vger.kernel.org>; Tue, 03 Sep 2024 23:12:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725430331; x=1726035131;
+        d=1e100.net; s=20230601; t=1725430348; x=1726035148;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VABDIikbxbAbTSQHLomHWS+MkknfvcB6H0xPs5zD4TI=;
-        b=prHzpN9q7bfPa2r9wYyDibtz9diAp+q3IxdEPJGMBeAwpgJ9TSTZh6z0bBerUfCbV5
-         17skdxzz4r7hfIZ8rTIZAGL81cY/261Z4WE1s9K0NrdTewklL3yeIl407pTM+kh6XJ6U
-         m31G6FIULzWbrBcVWTQqcW8gyDG4MrSt55myqT6cCU4PcD6ogVkplBjRs43F5UPdInDd
-         T30Ov29W0QTlwm8GwV1oTgaDv28f/o9xej+tOicRlkivrCa3OCNjhI3FNmkCcgtsXqz9
-         gyVEH15mG+wAwiNsIMaCOiNUjec5fjyXMSYCtseitg+BsVHUgh7b83Rl72JAG80ybGNt
-         Bptw==
-X-Forwarded-Encrypted: i=1; AJvYcCXdq8WXES/QryaxSP85ZyqXJ/016PaYb2ARYjoNwYVCH+e/4YSjMHu4VNke94fh/nHrLRY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywrm/sFYNAfcyqdB+y1sFoZELUlFx92of0+DVKhXqyxELqGpgKy
-	OeLTdo44RchWdT8DyJtSpQr4Xki9cB68y2Tj3EfSmh1uLXeNLpSNrWxcn/ysBX1w6QJVW73DAj6
-	MMWdvpt4FmKPz2/8OpU3xUln6MvDdbAra4VwyN8Y7vaas4ctPeQ==
-X-Received: by 2002:a17:907:7295:b0:a86:9d3d:edef with SMTP id a640c23a62f3a-a897f77fa48mr1566624866b.12.1725430330830;
-        Tue, 03 Sep 2024 23:12:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG45AYewg6tNE9To3cLQhgrRQm9CNbEwFJ8DttrdeygyFtBgrMme2ZadeOub7a84GejgI9cug==
-X-Received: by 2002:a17:907:7295:b0:a86:9d3d:edef with SMTP id a640c23a62f3a-a897f77fa48mr1566623066b.12.1725430330337;
-        Tue, 03 Sep 2024 23:12:10 -0700 (PDT)
+        bh=pFi+GvA472wwOZH0lUKoPWTzWmpUD/+iLOVkN6gRHFI=;
+        b=QSMCEUrRJlTNI/QdvE4UlfGScD5ccYLYtxZmSDjXvC8sW0fGDsdmsp6SctwJZk8TTH
+         Ey2VcR97MI8IC7G4JrrB6yDi0xVSX6aHZiLMfZa/D5wcu6QOlyDrkYEMaEBmKJDXN3c3
+         srFURKRwkviZGNjlRuuKP8uEFsmaNtio9noqRN/+WvBTTkqS0ej3AqM8prSRQ+zy6a/b
+         qMzVX4DhtqFpQNRq7bM/tZVbsk9qDxa4V/YNDlRZnYbloB3/za9brhgfyPLZBOoww96Q
+         OGE8LkEEwJT3ijG6tqoaDmJnKvf7hDJp8goSWR83i2E4M0x5HGPhtd3gKDnBa6Jf63XR
+         5HEg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSy4N2SPl3QKIyH05++azO+kE1i8TayqPT37PDwYxTxOF/4YM9WmpNGCQfzqJTCutKXbI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyyo6FXJOSOlsRjhOopbnG4Z+zdLSkXL9vSfmQnwSbSOymMunzL
+	RCVFg7xEzm4hExmzjqKswOMInDHp6p9nujiQZS8S0e4awGkxW+BIgFZRdvS6u82IKXsYUnuTRcw
+	a6DxRVOrpf0+hDdNQNTLbSAZfuiXbU5YsFf+0tXBPleMdu4759w==
+X-Received: by 2002:a17:907:968a:b0:a86:7b01:7dcc with SMTP id a640c23a62f3a-a89b94c72ddmr951639066b.18.1725430348604;
+        Tue, 03 Sep 2024 23:12:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDGkN9s2Jmw7XcWlEqSmMDSJiOFB+htHItlggYvkQ9RraTtZHA1IDxBlv8WOsHPBd0lfuW2g==
+X-Received: by 2002:a17:907:968a:b0:a86:7b01:7dcc with SMTP id a640c23a62f3a-a89b94c72ddmr951636566b.18.1725430348097;
+        Tue, 03 Sep 2024 23:12:28 -0700 (PDT)
 Received: from [192.168.0.6] (ip-109-43-176-181.web.vodafone.de. [109.43.176.181])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989215cb5sm762841866b.191.2024.09.03.23.12.08
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8988feb767sm773020966b.16.2024.09.03.23.12.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Sep 2024 23:12:09 -0700 (PDT)
-Message-ID: <425f68ae-5d63-412d-a677-82d91b2d9935@redhat.com>
-Date: Wed, 4 Sep 2024 08:12:08 +0200
+        Tue, 03 Sep 2024 23:12:27 -0700 (PDT)
+Message-ID: <7ef4ee12-ce0b-41e6-904a-ff43ee571be1@redhat.com>
+Date: Wed, 4 Sep 2024 08:12:25 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 3/3] riscv: gitlab-ci: Add clang build
- tests
+Subject: Re: [kvm-unit-tests PATCH 1/3] riscv: Drop mstrict-align
 To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
  kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
  linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
@@ -92,7 +91,7 @@ Cc: pbonzini@redhat.com, lvivier@redhat.com, frankja@linux.ibm.com,
  imbrenda@linux.ibm.com, nrb@linux.ibm.com, atishp@rivosinc.com,
  cade.richard@berkeley.edu, jamestiotio@gmail.com
 References: <20240903163046.869262-5-andrew.jones@linux.dev>
- <20240903163046.869262-8-andrew.jones@linux.dev>
+ <20240903163046.869262-6-andrew.jones@linux.dev>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -137,20 +136,34 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240903163046.869262-8-andrew.jones@linux.dev>
+In-Reply-To: <20240903163046.869262-6-andrew.jones@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 03/09/2024 18.30, Andrew Jones wrote:
-> Test building 32 and 64-bit with clang. Throw a test of in- and out-
-> of-tree building in too by swapping which is done to which (32-bit
-> vs. 64-bit) with respect to the gcc build tests.
+> The spec says unaligned accesses are supported, so this isn't required
+> and clang doesn't support it. A platform might have slow unaligned
+> accesses, but kvm-unit-tests isn't about speed anyway.
 > 
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 > ---
->   .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
->   1 file changed, 28 insertions(+)
+>   riscv/Makefile | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/riscv/Makefile b/riscv/Makefile
+> index 179a373dbacf..2ee7c5bb5ad8 100644
+> --- a/riscv/Makefile
+> +++ b/riscv/Makefile
+> @@ -76,7 +76,7 @@ LDFLAGS += -melf32lriscv
+>   endif
+>   CFLAGS += -DCONFIG_RELOC
+>   CFLAGS += -mcmodel=medany
+> -CFLAGS += -mstrict-align
+> +#CFLAGS += -mstrict-align
+>   CFLAGS += -std=gnu99
+>   CFLAGS += -ffreestanding
+>   CFLAGS += -O2
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
