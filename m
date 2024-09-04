@@ -1,237 +1,200 @@
-Return-Path: <kvm+bounces-25885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 264C096BF7B
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 16:02:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D143B96C032
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 16:23:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49F2D1C245A8
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 14:02:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 021311C250F9
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 14:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6A01DA611;
-	Wed,  4 Sep 2024 14:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NV1JyW/Z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CCC71E00BB;
+	Wed,  4 Sep 2024 14:20:46 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC601DA602;
-	Wed,  4 Sep 2024 14:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725458526; cv=fail; b=cBqjGeRV3qltU8fXpUUxGcHw8HuqivsprZaLPER18842RIl9nlefXXM4KFo2uICNhT1kO2xBLEcKKozRazOgKbq6kDdZ5CuONLCmJjQwpQ69uo9uxNXtgntlJfjkbx0xF8P/kScSxXm6qQqtzMKGXtNhh0CmTpgcTBrMiIpY7cw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725458526; c=relaxed/simple;
-	bh=JS23WxxsloS+Wrr18FpL6u4e+312XAnYDHhZCrgaa30=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DEB1D4170;
+	Wed,  4 Sep 2024 14:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725459645; cv=none; b=CDDg74boSo9STR95b2yaL5elDzkjCxTc63OKYtbjgkM1FLgtoq3Go9oCa8DjHf9wa9m1jnDf1ucXCh4vQarG3eLeUCH3bakauwSsfOVbWDwfbCcLDhxFPRP748KIdw66wkJracaANG15eVI/tKpHjbaOeYlGHFh5RCpnccWrIoo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725459645; c=relaxed/simple;
+	bh=3NFixX3Kl1y5WBzsUh6ZkbNWiMteGWvyfBElaxW/K1Q=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rYxtCNm/hGCDMhOcHdD9gNVxBGhObxhYwqgL4K4VsvpvxK6X+z6IIETI+DOHHqxcQWPOUO3OQaYEKbajW1uc8G5FlILepF3EXJZab2DCJAlOEp1IvXQD/JRseOq1KV0y7uZBTMATWhi0frZPYODK1rme8RYaWvID02Ccv4q0xdM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NV1JyW/Z; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725458526; x=1756994526;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=JS23WxxsloS+Wrr18FpL6u4e+312XAnYDHhZCrgaa30=;
-  b=NV1JyW/Zq65uqSPXIYBNXX74lMJbrRmvszzA0cdCJQbC6NrOv8XJslkS
-   72RUhEpgthz7icXmk2mYm93LZ1/ydm4Ronyud5O2pQ+FrOQySNC3SDRWE
-   8EppJadyt8HxtqbVonleQ5t9fdQeVgQjsR0khCe2772izr1+4hWret/zu
-   jlkpd/I2CFOJk/px+hygVqlOOWDqmTs5MzWYy5ybvWG8Xm8nSlsU0S8fw
-   rRWK2TNmZZsiI+YlHMp1vhqLrnAiNrDcqqdo1wwdA82NxJ7+6d6Jn2FUz
-   ig8xb5Udo53X16yp48Ht4B09LMl1aBvxK8JiuPSNh859fxgkUvoHBuY5P
-   g==;
-X-CSE-ConnectionGUID: f1rvI9leQfWhiya/CJ1tjg==
-X-CSE-MsgGUID: ujqomCrMTEaimRPGBMRkwQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="24262353"
-X-IronPort-AV: E=Sophos;i="6.10,202,1719903600"; 
-   d="scan'208";a="24262353"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2024 07:02:05 -0700
-X-CSE-ConnectionGUID: WN/HibaJTIScIaNC8XE1Gw==
-X-CSE-MsgGUID: YPpdZvp/TWCCYPczgUuSjw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,202,1719903600"; 
-   d="scan'208";a="69442420"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Sep 2024 07:02:04 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 4 Sep 2024 07:02:03 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 4 Sep 2024 07:02:03 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 4 Sep 2024 07:02:03 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+	 Content-Type:MIME-Version; b=Hnz0mWuBFVkecVvbldDSrtEloQGFf6Ucdr4K4JnBlkPsphMb34b6mTSO5T3ncl8rlMkJRKjfGVDvD5A7hfrF4qvqzipsjxAxjz8q7o/tWQZQbCERlXJ1/5ZaJuUNTckh8KNIJcNrBwEcCUONc+NbgMB7mhM9kj3vwdRIWmZbvBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WzPfQ4FJsz20nLZ;
+	Wed,  4 Sep 2024 22:15:42 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id CDD681400D7;
+	Wed,  4 Sep 2024 22:20:39 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 4 Sep 2024 07:02:02 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PUnKgry1cBECdILQ9UbyMiKtP4LQQH1ceaAMp6X0dgFdIPoV7kHscHGBIJr+ZJC1KHhXoQPok/hI43QhkBFSgKJC05Cc7QMRuNiIedma94KoPGDfFI9sxZzMheqX9xZJun0J3GHrbkWMJPw9O0BrhYA0vUBQvywmzsPpqYWHcGs2ByiqwkHLI+RTEN452OjTxY13XHMDPlaL4Lw203EwL6BkRhhE1MNEIoShXuJPxyVDDSjDPI92bB/i+LJXsyRim+rSPdLrQbpLfsS6d8UM+48Q5tw7cO5jCEcSbvZhyd0VDpyN2ciQM/UYoTTkhLkNLD+lFzXNMW6iXpFfOyE0NQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JS23WxxsloS+Wrr18FpL6u4e+312XAnYDHhZCrgaa30=;
- b=iV+qIYLoJ6ekBFzVEEuiFvNB8buHELjJciSdaTaszvDeNEw/PePvAXvogyZh9Z09hYfD9IwB4PlebMgpdpKh4ZD7u4LIEFFRm3fUrp1g47FoxiOvHmKs8XAbf2c124IBmoPCuGp59xrmLyp/xr236guMZsgEO1r91DfFCnXEDCPk7kFC0Z0KgevCIPuMY+wBVPddtSKn+A/uBJfn+fzwwW+FrDLw8Fb1kR4fyPZ1pcsr2bUAYRUbcF6Jc6A0wZaRnJlweRHnIr9P4CYwBxL91KJqnoB5BRUNErrS4FGo6Jd2ytsJKURxoY/7s7xLHSEwgvT3Ib6oIqbKSqOQGJSg2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by IA0PR11MB8398.namprd11.prod.outlook.com (2603:10b6:208:487::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.24; Wed, 4 Sep
- 2024 14:01:51 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.7918.024; Wed, 4 Sep 2024
- 14:01:47 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "Zhao, Yan Y" <yan.y.zhao@intel.com>
-CC: "seanjc@google.com" <seanjc@google.com>, "Huang, Kai"
-	<kai.huang@intel.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "isaku.yamahata@gmail.com"
-	<isaku.yamahata@gmail.com>, "dmatlack@google.com" <dmatlack@google.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "nik.borisov@suse.com"
-	<nik.borisov@suse.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-Subject: Re: [PATCH 19/21] KVM: TDX: Add an ioctl to create initial guest
- memory
-Thread-Topic: [PATCH 19/21] KVM: TDX: Add an ioctl to create initial guest
- memory
-Thread-Index: AQHa/ne7pTzhAEMIUUeBkR4uOlaw8bJHD/cAgACZDgA=
-Date: Wed, 4 Sep 2024 14:01:47 +0000
-Message-ID: <925ef12f51fe22cd9154196a68137b6d106f9227.camel@intel.com>
-References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
-	 <20240904030751.117579-20-rick.p.edgecombe@intel.com>
-	 <Ztfn5gh5888PmEIe@yzhao56-desk.sh.intel.com>
-In-Reply-To: <Ztfn5gh5888PmEIe@yzhao56-desk.sh.intel.com>
-Accept-Language: en-US
+ 15.2.1544.11; Wed, 4 Sep 2024 22:20:38 +0800
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
+ Wed, 4 Sep 2024 15:20:37 +0100
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>, "acpica-devel@lists.linux.dev"
+	<acpica-devel@lists.linux.dev>, "Guohanjun (Hanjun Guo)"
+	<guohanjun@huawei.com>, "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Len Brown <lenb@kernel.org>,
+	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Lorenzo Pieralisi
+	<lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Robert
+ Moore" <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, "Sudeep
+ Holla" <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>
+CC: Alex Williamson <alex.williamson@redhat.com>, Eric Auger
+	<eric.auger@redhat.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>,
+	"Nicolin Chen" <nicolinc@nvidia.com>, "patches@lists.linux.dev"
+	<patches@lists.linux.dev>, Mostafa Saleh <smostafa@google.com>
+Subject: RE: [PATCH v2 2/8] iommu/arm-smmu-v3: Use S2FWB when available
+Thread-Topic: [PATCH v2 2/8] iommu/arm-smmu-v3: Use S2FWB when available
+Thread-Index: AQHa+JkNXX8oIDp/tkauz0b2cgKn4bJHsELw
+Date: Wed, 4 Sep 2024 14:20:36 +0000
+Message-ID: <85aa5e8eb6f243fd9df754fdc96471b8@huawei.com>
+References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ <2-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+In-Reply-To: <2-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|IA0PR11MB8398:EE_
-x-ms-office365-filtering-correlation-id: 40be6ddd-350d-4248-17b1-08dcccea1dfa
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?R25laHZGV1c1LzZWY3NPVlc1Q1pRQVgzcEw3MnR5djlyMHEvQ3Rudyt6cmRI?=
- =?utf-8?B?TnYrUVpVZkwrZlV1ZzVqVlMyYW9QV0VXU0QwL3czMG9XckllOCtBcm5iYzlU?=
- =?utf-8?B?MS8xd0NLMFhTRGdSclVJTzd2aEJuck0reGIwSGhLNUUrbDdTTU9yRmVsVkNV?=
- =?utf-8?B?Z1FWVlBxQklaNmFsODVmTFBnQTcyWDkwQjUwZm9hbUoyNDZRZnMvZ2dVYXNm?=
- =?utf-8?B?ekVETHgrbzF1Ym82QW9oRTNQcEtrT0M5bThtcitjOFIvZ0RjUGk3Zk5XM3Ew?=
- =?utf-8?B?TXg0SDVGTzlvSHpBMTNhTEswT2hMbWpGYStXR0swRGJPUFRqdVQ5eU9GM205?=
- =?utf-8?B?TXRBcDVrcFVjeWl5RDhURW01ZEZHQlJKQ3RXaVUrM05EM21PeFZ0dFNVU09C?=
- =?utf-8?B?MWNNYW9vK3h0cE9rYkM3d1lFNVhTWWtpSUtaSFhHZjY4U2laUm9HV0crUWRQ?=
- =?utf-8?B?OHpkZkNxY2E0ZnF2bnNqdFovN0EvQ0lhZnV4Rmo5enJ4Z0EvMEc4QnNoTG1m?=
- =?utf-8?B?OTM5SFc3TW00bXdoMVNJZmZKMjVMV1JlZFFvSE1FaU5PWGxJSG52Q3FHbVJZ?=
- =?utf-8?B?eW9WUkNhaG45S3pGSjdVamxOVm9vUkczQ1k3Qytad2ZKN2hyRGNtYWxOYVFC?=
- =?utf-8?B?RkpnMThhMk9lMGV2SWRTcGJvcnBNSC8zZU00dmVOcDRLR3RoQ0QxVmM3d3Bo?=
- =?utf-8?B?R1I4bVFDdzlBb1pXdmV1WXdKKzVRRXZ1L3pRTDArUmhQNTZ0QklmR3QyQU5S?=
- =?utf-8?B?YTJsY3IrbGFGSTBteHQvWXJtSkJCUnVPQ25BZFBJbTFPcEhJVENlZWZYZ2k4?=
- =?utf-8?B?bUdSVGhTamFzcmhPMGpqMU9sZHZURFFRQ0R0TjZqSmIxV1BQQ1pWKzRwQlVT?=
- =?utf-8?B?NlRhTzVVWmpBOXBrOWE2SnBIdTZyQm9WclUxL1dQeXR5T2VYY2pqNmhEckgw?=
- =?utf-8?B?Tm9DMFBNK1VXU29JcXB5N3JvTHdMZllQaHJXd3lLMnFBNmVwMkVsVGdqV21o?=
- =?utf-8?B?am1ucWFMTFBsQ0FLeGh3MkkvNi9mOHFDb1V3T0Q2RG1pRENRS3dUZnZ4T3RV?=
- =?utf-8?B?T3A1NXBKQ2dpZnFSNkpOS3pnZStDM2VYVjlQWGNwMVRuMU9WVWpGZ2VGRUU1?=
- =?utf-8?B?R2dHVzJuVmRRMGlWMi9RTlAwdGl4SG5xZ2llVHJMQkVzWmpqSmpJY3Nod3N4?=
- =?utf-8?B?eDZjQmp0a2ZFQWh0Y044c0dXNm9MSHQ4aVY4SnRiRTdYbjBxc1NtbWhNeURU?=
- =?utf-8?B?aXBUcDU3NnBMM3Ewa2ZEWSsxRVRlN2RuNlRoa09lRi9YRFY3eGhpdnNDM0xY?=
- =?utf-8?B?RDRCeFRVdDVoTk95S3F3YUxlOWVsNm0ycGt6RTBBdm1naldFdTN0Y2FCekg3?=
- =?utf-8?B?WEliaVBlRXBCRHdFUFN1VkpPSWQ3NkpVWlN6RTk3b215WWVZQ3FJSXJFbHJZ?=
- =?utf-8?B?bFI4UzVlT3RrS3F6Y1V6QXpPVHV4dGFWZ1YyQ0VYUFlwYTYxb1BxdTZLWnJG?=
- =?utf-8?B?VVF6QjVYREZUZ2l0bzhxUnlQa2dYNGF0Q3FaaVdVVlJacXczblpDTWlaVFFU?=
- =?utf-8?B?cWVTeFE4R0FjNzBXcDk4dDVWZ0dsdlJxMFQxWG0wYitNUGM2M21odWV2WFdm?=
- =?utf-8?B?TFR4TC8vdEk3dSs4cVZ5SDA2OXBQTHBUVzVuTXowS0hXQjJoZUxDUzJmellv?=
- =?utf-8?B?MUlzYzhBeTZXem9kUHVOQWN3QmQ3WXpuVWxBUUk4QWN2MEN1eUFKelZNdUJR?=
- =?utf-8?B?OTNweGsxR1VKbnpKOVpKU2xkYklaVEVKc1RhUThySEZiSEJFMWMzQ3k1Q2Fw?=
- =?utf-8?B?R0NGWVNCN0toUTZHZWthS2xmTHFJMTBUZ29TZmdkN1lWbVZvV1JmWlllaWdR?=
- =?utf-8?B?cjk2TGU1d2o5a3F1d3pjL3BNNEUxOWs2b3BERnZ5U1puZnc9PQ==?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UmhlaXIvSGFybExvZFhxbmIwRFZJQkQ2UjlsblBCdGh6TjF4eUY0QXJmWEJx?=
- =?utf-8?B?dm1RQUpZalFYaFUwWVNqckNRUW54akxmUHB2TFN5VFNvQVF2ZWNjc0ZjVkZO?=
- =?utf-8?B?TVJDdUV2RXlJbTM1Y25mMHBEYTVFRlRFb3paSEhXbVZQdVNOcEJzWTFjT2hB?=
- =?utf-8?B?S3pUUEdpRWZjTnJrYm5xMUVZWXBrcEszbTY0Vzc3SWNWSlUycFgwNW0xYzJQ?=
- =?utf-8?B?YldnTFJUZytNLzlaRG1QVXlXTFladTJuTDRUR01IakRJTDhkM1BybW83cnc4?=
- =?utf-8?B?cFFmS2R4VVdQMVNOcXRFUkRsZUVMVXExSEc2NzJjaHhTNDI4Y3lFdzdUM3FK?=
- =?utf-8?B?QzFnakRVbG4rc1pPeWZzSmdkY3ZFcHZDS0x4Y3dkN3BLWmpXUzM4RS9wVE5L?=
- =?utf-8?B?a0RtSVM3NnZ3ZmNxdERYNFNYQnV2bzhHTksybEJCNDJoeFBtL1cxampYTUM5?=
- =?utf-8?B?ak16SlJIeWhDc1g0VTA1TmZLUVdjaTc2UndjMWNMczd5a0dHOFQvMERYU24z?=
- =?utf-8?B?S3dLQjUwa1kraVN2Yk43cXkvanZNRUp1Zm1pRGZobFhWN3FDSHYyWjdlTFNN?=
- =?utf-8?B?M0tTbjlDQkxDbTlFdmRIL1hNd1lidXlianFMWGFBUVptS1J5YWo2OU1YQkZu?=
- =?utf-8?B?Z0UxWVFEQkQ5djg2UFZkWUZUeE9ONWhvT1kvMHpCY2F3bHJEUm9INVo3UTlO?=
- =?utf-8?B?ZFEydmZzRkJqYTFheGJtaXZQNWVCcjRkVmlhNzBZNDI0dHNCUldsU1JhalhK?=
- =?utf-8?B?RjladjVXcXJrSkx2QmNkYTRDV2RBT0FqZ293VUJlb3JNMXR3NmtIc1VyNzRE?=
- =?utf-8?B?WlRyYVljbDNZUm9WLzFZTlUzNkkwcDdSbzZSMWFicGxKcnFPNXBWUEwwU1E1?=
- =?utf-8?B?YTJjVS9vaTBFSkl5ZlFtQjlqcHVyZjJveFVVK0lBdDVaSGdTL2ZOMm1ZOGlO?=
- =?utf-8?B?Ujk3eXZ2a3prSFhUZXRiZXpDTkNsdEFxd3hYaUxSMVpFQlpYR0Y4MGJCdk1P?=
- =?utf-8?B?UER3OEdpVHAyYU40b2pzdWQ4WVFsSEt1elFZcnRnSUdQR1RtWS9UUGhSRlpW?=
- =?utf-8?B?M1BoaUlnbnJEakpJS1I2TkhZRldYSWhseVBYaU9ZUndySG1oN3kyWUJocVVK?=
- =?utf-8?B?U1ZRdTJNaURNVjM0QVF0bkh6Q3BpYVZ0d2tCVWI0RmJxdGdDRHdPZ3Zuaktm?=
- =?utf-8?B?ZVpkK2MyQ3lpNklQREs1SXo5Y3FZTld1SUZjakExd2pRV2FTK0lCMnZRbDI5?=
- =?utf-8?B?aTVsZEJWTlBvbHZKYjh5NWg2TFZOTEV1T28wUkpHaGlxZVpJU1dsQWQrMys4?=
- =?utf-8?B?ak5BcGxoWmtLTm5yVG1NZ2VmeG1rTDFIaFlHVGJsRG1jSmVJemtxV3k0QlUv?=
- =?utf-8?B?SXBnRDhsVTB6U3pJUm9JMFNaNGV1cnR1bnlZSUtRZWE1eElnV3B2aExadGph?=
- =?utf-8?B?VmlxZnNHU1ZwOUJSc1o4ZXl1YjR0RXRxV3ZjWUlJQURUNGx3cUpPczF1WGpH?=
- =?utf-8?B?b1NxR0hCMldxU3RXTTR6dlNTRzM0MkVDV3llcGt2RXcrczlQcXBNMmxmRnp2?=
- =?utf-8?B?RXhUdWRNb3RaanZEM3drOHVQS3psTVZGd1pyZSthd3Q5Ykl4bVBuTXlnU2dJ?=
- =?utf-8?B?MXFNZkFOUVhJc1hzWmpZeUJpcnFXWHpXM1Ntb1JLODNnNm04N3p1M0ZONDRa?=
- =?utf-8?B?YlkzY0J4VDJwN2dTcjlaUDFhSWpCQTk5Qkwxb1ovcVRJbjZKcmFVOGNZQlR2?=
- =?utf-8?B?T2g4TE9uZnpFNyswRjVCKzJKQVhjUlJVWEFBa1AxYlJPMlJpR2tqNFNMeWdn?=
- =?utf-8?B?K0lEYXNzMnFKNmE5VUZkS1pJTUwzNGVTdSszTWN4TGx5R0UyTmRwTWI2WS9o?=
- =?utf-8?B?Vzd0aXpzdWtnZURBYWsrSkg0eVE5NkRtcEtQVTZXRGl0TktsY0t6bFE0V0V3?=
- =?utf-8?B?cGlYa1ZIRS9uUkFMVWxaWUQ2V042K1VOUWYzazJoYm5rbG1BQ1FMUkdlcHNM?=
- =?utf-8?B?QmRIcXlIYS9LZEFUL0xSVUd5eHFZcXhQT3Q3VUpTbmp0T2pqRFB6dmphd3ho?=
- =?utf-8?B?R290TzkxSFY3YWcvZml1dXFqMGhjbkFpRHFoYSsxa1JmcFp5QlVkYmJGQStE?=
- =?utf-8?B?Y2pFTXoxSFNxeTEzMVhYL3VEU3phc1JvSURheXdSZm9iRUNUUi9jTmpUdlRR?=
- =?utf-8?Q?er0qwlY+3y5fYUsB6+YjI/M=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1A742CD15916EC49AA73B3356080A448@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40be6ddd-350d-4248-17b1-08dcccea1dfa
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Sep 2024 14:01:47.6481
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: M07U126hd4iH0Oyn6cUdJt+rSinnYXf8g4Bn1UH64vGnAS3E02nBWzVN+q99jwwPH3RaP8bSvMzmsU30VkmX9eBPt/l01riw288yxsxGp1w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8398
-X-OriginatorOrg: intel.com
 
-T24gV2VkLCAyMDI0LTA5LTA0IGF0IDEyOjUzICswODAwLCBZYW4gWmhhbyB3cm90ZToKPiA+ICvC
-oMKgwqDCoMKgwqDCoGlmICgha3ZtX21lbV9pc19wcml2YXRlKGt2bSwgZ2ZuKSkgewo+ID4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldCA9IC1FRkFVTFQ7Cj4gPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgZ290byBvdXRfcHV0X3BhZ2U7Cj4gPiArwqDCoMKgwqDCoMKg
-wqB9Cj4gPiArCj4gPiArwqDCoMKgwqDCoMKgwqByZXQgPSBrdm1fdGRwX21hcF9wYWdlKHZjcHUs
-IGdwYSwgZXJyb3JfY29kZSwgJmxldmVsKTsKPiA+ICvCoMKgwqDCoMKgwqDCoGlmIChyZXQgPCAw
-KQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0X3B1dF9wYWdlOwo+
-ID4gKwo+ID4gK8KgwqDCoMKgwqDCoMKgcmVhZF9sb2NrKCZrdm0tPm1tdV9sb2NrKTsKPiBBbHRo
-b3VnaCBtaXJyb3JlZCByb290IGNhbid0IGJlIHphcHBlZCB3aXRoIHNoYXJlZCBsb2NrIGN1cnJl
-bnRseSwgaXMgaXQKPiBiZXR0ZXIgdG8gaG9sZCB3cml0ZV9sb2NrKCkgaGVyZT8KPiAKPiBJdCBz
-aG91bGQgYnJpbmcgbm8gZXh0cmEgb3ZlcmhlYWQgaW4gYSBub3JtYWwgY29uZGl0aW9uIHdoZW4g
-dGhlCj4gdGR4X2dtZW1fcG9zdF9wb3B1bGF0ZSgpIGlzIGNhbGxlZC4KCkkgdGhpbmsgd2Ugc2hv
-dWxkIGhvbGQgdGhlIHdlYWtlc3QgbG9jayB3ZSBjYW4uIE90aGVyd2lzZSBzb21lZGF5IHNvbWVv
-bmUgY291bGQKcnVuIGludG8gaXQgYW5kIHRoaW5rIHRoZSB3cml0ZV9sb2NrKCkgaXMgcmVxdWly
-ZWQuIEl0IHdpbGwgYWRkIGNvbmZ1c2lvbi4KCldoYXQgd2FzIHRoZSBiZW5lZml0IG9mIGEgd3Jp
-dGUgbG9jaz8gSnVzdCBpbiBjYXNlIHdlIGdvdCBpdCB3cm9uZz8K
+
+
+> -----Original Message-----
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Tuesday, August 27, 2024 4:52 PM
+> To: acpica-devel@lists.linux.dev; Guohanjun (Hanjun Guo)
+> <guohanjun@huawei.com>; iommu@lists.linux.dev; Joerg Roedel
+> <joro@8bytes.org>; Kevin Tian <kevin.tian@intel.com>;
+> kvm@vger.kernel.org; Len Brown <lenb@kernel.org>; linux-
+> acpi@vger.kernel.org; linux-arm-kernel@lists.infradead.org; Lorenzo Piera=
+lisi
+> <lpieralisi@kernel.org>; Rafael J. Wysocki <rafael@kernel.org>; Robert
+> Moore <robert.moore@intel.com>; Robin Murphy
+> <robin.murphy@arm.com>; Sudeep Holla <sudeep.holla@arm.com>; Will
+> Deacon <will@kernel.org>
+> Cc: Alex Williamson <alex.williamson@redhat.com>; Eric Auger
+> <eric.auger@redhat.com>; Jean-Philippe Brucker <jean-
+> philippe@linaro.org>; Moritz Fischer <mdf@kernel.org>; Michael Shavit
+> <mshavit@google.com>; Nicolin Chen <nicolinc@nvidia.com>;
+> patches@lists.linux.dev; Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>; Mostafa Saleh
+> <smostafa@google.com>
+> Subject: [PATCH v2 2/8] iommu/arm-smmu-v3: Use S2FWB when available
+>=20
+> Force Write Back (FWB) changes how the S2 IOPTE's MemAttr field
+> works. When S2FWB is supported and enabled the IOPTE will force cachable
+> access to IOMMU_CACHE memory when nesting with a S1 and deny cachable
+> access otherwise.
+>=20
+> When using a single stage of translation, a simple S2 domain, it doesn't
+> change anything as it is just a different encoding for the exsting mappin=
+g
+> of the IOMMU protection flags to cachability attributes.
+>=20
+> However, when used with a nested S1, FWB has the effect of preventing the
+> guest from choosing a MemAttr in it's S1 that would cause ordinary DMA to
+> bypass the cache. Consistent with KVM we wish to deny the guest the
+> ability to become incoherent with cached memory the hypervisor believes i=
+s
+> cachable so we don't have to flush it.
+>=20
+> Turn on S2FWB whenever the SMMU supports it and use it for all S2
+> mappings.
+>=20
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+
+(...)
+
+> @@ -932,7 +948,8 @@ arm_64_lpae_alloc_pgtable_s1(struct io_pgtable_cfg
+> *cfg, void *cookie)
+>  	if (cfg->quirks & ~(IO_PGTABLE_QUIRK_ARM_NS |
+>  			    IO_PGTABLE_QUIRK_ARM_TTBR1 |
+>  			    IO_PGTABLE_QUIRK_ARM_OUTER_WBWA |
+> -			    IO_PGTABLE_QUIRK_ARM_HD))
+> +			    IO_PGTABLE_QUIRK_ARM_HD |
+> +			    IO_PGTABLE_QUIRK_ARM_S2FWB))
+>  		return NULL;
+
+This should be added to arm_64_lpae_alloc_pgtable_s2(), not here.
+
+With the above fixed, I was able to assign a n/w VF dev to a Guest on a
+test hardware that supports S2FWB.
+
+However host kernel has this WARN message:
+[ 1546.165105] WARNING: CPU: 5 PID: 7047 at drivers/iommu/arm/arm-smmu-v3/a=
+rm-smmu-v3.c:1086 arm_smmu_entry_qword_diff+0x124/0x138
+....
+[ 1546.330312]  arm_smmu_entry_qword_diff+0x124/0x138
+[ 1546.335090]  arm_smmu_write_entry+0x38/0x22c
+[ 1546.339346]  arm_smmu_install_ste_for_dev+0x158/0x1ac
+[ 1546.344383]  arm_smmu_attach_dev+0x138/0x240
+[ 1546.348639]  __iommu_device_set_domain+0x7c/0x11c
+[ 1546.353330]  __iommu_group_set_domain_internal+0x60/0x134
+[ 1546.358714]  iommu_group_replace_domain+0x3c/0x68
+[ 1546.363404]  iommufd_device_do_replace+0x334/0x398
+[ 1546.368181]  iommufd_device_change_pt+0x26c/0x650
+[ 1546.372871]  iommufd_device_replace+0x18/0x24
+[ 1546.377214]  vfio_iommufd_physical_attach_ioas+0x28/0x68
+[ 1546.382514]  vfio_df_ioctl_attach_pt+0x98/0x170
+
+
+And when I tried to use the assigned n/w dev, it seems to do a reset
+continuously.
+
+root@localhost:/# ping 150.0.124.42
+PING 150.0.124.42 (150.0.124.42): 56 data bytes
+64 bytes from 150.0.124.42: seq=3D0 ttl=3D64 time=3D47.648 ms
+[ 1395.958630] hns3 0000:c2:00.0 eth1: NETDEV WATCHDOG: CPU: 1: transmit qu=
+eue 10 timed out 5260 ms
+[ 1395.960187] hns3 0000:c2:00.0 eth1: DQL info last_cnt: 42, queued: 42, a=
+dj_limit: 0, completed: 0
+[ 1395.961758] hns3 0000:c2:00.0 eth1: queue state: 0x6, delta msecs: 5260
+[ 1395.962925] hns3 0000:c2:00.0 eth1: tx_timeout count: 1, queue id: 10, S=
+W_NTU: 0x1, SW_NTC: 0x0, napi state: 16
+[ 1395.964677] hns3 0000:c2:00.0 eth1: tx_pkts: 0, tx_bytes: 0, sw_err_cnt:=
+ 0, tx_pending: 0
+[ 1395.966114] hns3 0000:c2:00.0 eth1: seg_pkt_cnt: 0, tx_more: 0, restart_=
+queue: 0, tx_busy: 0
+[ 1395.967598] hns3 0000:c2:00.0 eth1: tx_push: 1, tx_mem_doorbell: 0
+[ 1395.968687] hns3 0000:c2:00.0 eth1: BD_NUM: 0x7f HW_HEAD: 0x0, HW_TAIL: =
+0x0, BD_ERR: 0x0, INT: 0x1
+[ 1395.970291] hns3 0000:c2:00.0 eth1: RING_EN: 0x1, TC: 0x0, FBD_NUM: 0x0 =
+FBD_OFT: 0x0, EBD_NUM: 0x400, EBD_OFT: 0x0
+[ 1395.972134] hns3 0000:c2:00.0: received reset request from VF enet
+
+All this works fine on a hardware without S2FWB though.
+
+Also on this test hardware, it works fine with legacy VFIO assignment.
+
+Not debugged further. Please let me know if you have any hunch.
+
+Thanks,
+Shameer
+
+
+
 
