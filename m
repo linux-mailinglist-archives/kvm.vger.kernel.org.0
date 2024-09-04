@@ -1,74 +1,80 @@
-Return-Path: <kvm+bounces-25872-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25873-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6114096BB5E
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 13:59:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C0096BB65
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 14:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6A7DB2381E
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 11:59:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 193EAB25422
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 11:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D881D460E;
-	Wed,  4 Sep 2024 11:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CA81D460E;
+	Wed,  4 Sep 2024 11:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="axOBdmZ3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WLh0bkU7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DD71D45FA
-	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 11:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928581D45FA
+	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 11:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725451135; cv=none; b=Zpbs0X32zPCvcMmVcIsouUu5iq4+M+d7hm86ZW+AbCvn03Ap7F5CSB1FrMvjW4gHk5ScG3p87dhmpZAj2F2C0qHyoGYx3dHaoHePXkFGeIivTb8QBBgfHGI3oi9NI6soCTSYVAJG6eGGJoZiAUuiKk62WIDrQYZ0HAGHfxlWc5o=
+	t=1725451166; cv=none; b=BRTjZv+fQGFk+MI0J41YuA3Am+FwPOPLbjRKGHQA5pyI4cy1EXY0z0nYuX87wGEvrf81617xiIE3CVoq3Vhznon2U0ZhW1QRsqd7aBtckhS69nbacc0Gw5XVCNxygt8f6k5Y8rvc3OF6UHqlb87CpQcDOyuT/b3ZM2YCbPeqtZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725451135; c=relaxed/simple;
-	bh=oFpYFAwzQWlL+Kvgx4pEoCCAh+xehZKm3+5+PmwqUq4=;
+	s=arc-20240116; t=1725451166; c=relaxed/simple;
+	bh=qic7WnFphvxImhlZq2xJgj/uL6OD1DNHtFw7bFhP0m8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GF218mo/3YbAUE4K3wZb6ncdSjLA8lOoskdqWGVaGq9E5rDNPCYhHhOYIS56n8K06tYf1+txpiaTvMlM3/jv8lHzKiwOQvbBO0R1ayC+UnGcOoqmC1TN9Set7B4bXPzGTd1fOhJesR9mfQxrr2ELVIB5EO8M/yyNhx5QVdqLb7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=axOBdmZ3; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-53346132365so7991114e87.1
-        for <kvm@vger.kernel.org>; Wed, 04 Sep 2024 04:58:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1725451132; x=1726055932; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VS61FUBAsfsMXwD3b/j+B3Cf4Nz46zKMjoAkgpr9Tb4=;
-        b=axOBdmZ3cZ0yA1EZq3ep+WTEIHt3rOocPgvtwU26V30u0VRMwA0REJ5thtQqNlORv1
-         WyrYeUu4DQ2D2S/MV7QltBbGhv0s1lx60JelgBYhVXMU2gP0+3o7To+FjgdOa08d2LTr
-         e3H/uZKklxJaoBhfHZ6WX8t0FBeoX5jXPdoQZCsOGWZS8OYNsdyolQ3NsSOcw2RREPbD
-         haI+53tqnngooa2XJDTflKHd6MAlRV5SkE3hdyPakBqnsFFBNQYu88GjgkOOviG6ct6Y
-         GA3o32imIQJd22ss2l9hf2GSyEHuS9UKFDNTjElhgA2CKKdDK/15m+MCRTnvX+Q7+fxk
-         VMyg==
+	 In-Reply-To:Content-Type; b=nE1LRjnYv7KwkzPregrDj/AZt5hMLS6SVV7NlCkhEUkMTUG/8zAf6V9/gNCu0luhYsNfMl8qoLPqnaoUAwn3/JBAbKo6jWBDcqNU2qebcu6W5a1nDULz2spAZvbIh6Z2mdrf8XjP0jOdYZezJhvtSWAGLZh7ivwCtuFPIbw2LeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WLh0bkU7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725451163;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dBW9QyBTPJ2vPf7oNy3xBpLtcKazFBxSJAYyxXMm5To=;
+	b=WLh0bkU7XsEqQM0Uc2sE+TtND/Q3cqNJT5EuVRRH+PnpPcM7ovVLyWibt70CaHW2OfN0Hx
+	qGah8S+xki6uSIM3/aOW3Mmh+lgfHf89YfH19UFtZgi1iHg2anqbubLXJDGCPBvuuIOlRH
+	dYkvP2A/4hLGRYyrUTW0VEaOVpORPMY=
+Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
+ [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-588-Rewt6gsHMLi0NCLkRIg9_Q-1; Wed, 04 Sep 2024 07:59:22 -0400
+X-MC-Unique: Rewt6gsHMLi0NCLkRIg9_Q-1
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-6db2a306480so11465437b3.3
+        for <kvm@vger.kernel.org>; Wed, 04 Sep 2024 04:59:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725451132; x=1726055932;
-        h=content-transfer-encoding:in-reply-to:content-language:from
+        d=1e100.net; s=20230601; t=1725451162; x=1726055962;
+        h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VS61FUBAsfsMXwD3b/j+B3Cf4Nz46zKMjoAkgpr9Tb4=;
-        b=TXnMUmddijBoDnW7rdNl+/QLCmgr+MK00BaGecv3oG91vd5CaQ1GBCUQ7BLCtTevX6
-         W8KKKoVbMObFRRSdIBUKxkckrefGi9JCZACEeqM6zCqbqjV+03xy2jhiOZyytXMlqE0I
-         fx40/SzjH1+27h71rc/83Ww8EvHIvVy0Apo/L+sKRE53qF2X1AiS4k1MiolwxK4PvxYX
-         0tKPv8QYk3zAXqXcRJHtFK43kt4tO506A9flG3Wt/rD8Qz3Af5L0k583QXKEz1qgbVAH
-         wTYdLKEMAl1jkabahIStFUGU1U7ocx41nj58P9lzrmeAJAkCq6hp00NqcnPqMyJwipH9
-         pXBw==
-X-Forwarded-Encrypted: i=1; AJvYcCU9j2CYlTLtmAyTYzFkZ8wze6sPrvxlhzPTjEpmx1suA98p3/ehV3+zAhGGNV/nlby3gsY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3c5E6JGoOhU/l7b19o8nIU7Rd3HuzG0w+BltghO8Na+h37g86
-	MqnC62z1PItpN/RxNouKpvtdyUIbvbUPoodjSo111ZQctElrGfdxuczBSq90RjY=
-X-Google-Smtp-Source: AGHT+IHs1wIrBm6X/Hd9ZoeAvwI8G6avm2Xjtx4bTuDlmxGONjsMb86+mwA17/VyPvh0C5XM0JrLgA==
-X-Received: by 2002:a05:6512:1589:b0:52e:f2a6:8e1a with SMTP id 2adb3069b0e04-53546b32cacmr13503390e87.29.1725451130774;
-        Wed, 04 Sep 2024 04:58:50 -0700 (PDT)
-Received: from ?IPV6:2a10:bac0:b000:7332:ffbc:ffbc:9dd4:6902? ([2a10:bac0:b000:7332:ffbc:ffbc:9dd4:6902])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89891daeb1sm800902266b.169.2024.09.04.04.58.49
+        bh=dBW9QyBTPJ2vPf7oNy3xBpLtcKazFBxSJAYyxXMm5To=;
+        b=tbSOIgpI2XQA0lSDLPvTxQtuaieJYmLavLf6vZQsPCTX+oSq49zdH5MjmSuPG+O7w/
+         ig54oIMmOHdCm76t0Fr/SqbkyiITXj/22qO+xNfVd70SMh8gHSskexyWmZ1l+XulDaXF
+         bwLMCAhcVhppdyFRxO1Z7L8xSra1ubUfCpqkCONEVXvG2IGOSUIAQJfnrBuR6Isl+uVM
+         oQ+dJtVO9Sq2tV0aYSLf51Ezl0Nx8n8+gg63cPatuw9syF8kN9zY/EeFd4U9+Tk8J8G6
+         wWbZWXHIPXK3XHcx8ZObSbvsEKBd0B3CTaqaXsvkW5CrJB/uMbaECcFBNyGFLT7GqcJD
+         PtXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVyACLqhlDxHCi2YXbfoeQsCkqNkwF7v9GUa+9U1cq8GDQo0vp6K6aUiTNtTRkTCRiIIgY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu+Mab2D7LHGuyEvZrg1LXt4ymep5Xta+kpbm4f/ffSOs5PG+1
+	EDt0oNphLUFzSugBv11UVv4XhdSRo69zdq5K8T7jtbBdodBnREPMLwLsAlxVIBxErQvPebEtFaA
+	rwCfqvkeTjHkSZvsLGlnw6neo1r9xjK5EJLwC4xlLp648NxtY7A==
+X-Received: by 2002:a05:690c:6785:b0:630:f7c9:80d6 with SMTP id 00721157ae682-6d40fe0f6f3mr192366257b3.27.1725451161921;
+        Wed, 04 Sep 2024 04:59:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGq5HvwRqtezxFnSO42dBg91ombB3BJoTOvLU4UJi+3DHaAlCu/R/sHK6aAwUDyIFtI7vIAAA==
+X-Received: by 2002:a05:690c:6785:b0:630:f7c9:80d6 with SMTP id 00721157ae682-6d40fe0f6f3mr192365827b3.27.1725451161569;
+        Wed, 04 Sep 2024 04:59:21 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a806d5b0easm611441485a.100.2024.09.04.04.59.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Sep 2024 04:58:50 -0700 (PDT)
-Message-ID: <caa4407a-b838-4e1b-bb3d-87518f3de66b@suse.com>
-Date: Wed, 4 Sep 2024 14:58:48 +0300
+        Wed, 04 Sep 2024 04:59:21 -0700 (PDT)
+Message-ID: <1a4270a7-212e-4651-a720-913b3dd11296@redhat.com>
+Date: Wed, 4 Sep 2024 13:59:14 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,99 +82,108 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/25] KVM: TDX: Initialize KVM supported capabilities
- when module setup
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
- tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
- linux-kernel@vger.kernel.org
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-11-rick.p.edgecombe@intel.com>
-From: Nikolay Borisov <nik.borisov@suse.com>
-Content-Language: en-US
-In-Reply-To: <20240812224820.34826-11-rick.p.edgecombe@intel.com>
+Subject: Re: [PATCH v2 19/19] qapi/vfio: Rename VfioMigrationState to Qapi*,
+ and drop prefix
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: alex.williamson@redhat.com, andrew@codeconstruct.com.au,
+ andrew@daynix.com, arei.gonglei@huawei.com, berrange@redhat.com,
+ berto@igalia.com, borntraeger@linux.ibm.com, clg@kaod.org, david@redhat.com,
+ den@openvz.org, eblake@redhat.com, eduardo@habkost.net,
+ farman@linux.ibm.com, farosas@suse.de, hreitz@redhat.com,
+ idryomov@gmail.com, iii@linux.ibm.com, jamin_lin@aspeedtech.com,
+ jasowang@redhat.com, joel@jms.id.au, jsnow@redhat.com, kwolf@redhat.com,
+ leetroy@gmail.com, marcandre.lureau@redhat.com, marcel.apfelbaum@gmail.com,
+ michael.roth@amd.com, mst@redhat.com, mtosatti@redhat.com,
+ nsg@linux.ibm.com, pasic@linux.ibm.com, pbonzini@redhat.com,
+ peter.maydell@linaro.org, peterx@redhat.com, philmd@linaro.org,
+ pizhenwei@bytedance.com, pl@dlhnet.de, richard.henderson@linaro.org,
+ stefanha@redhat.com, steven_lee@aspeedtech.com, thuth@redhat.com,
+ vsementsov@yandex-team.ru, wangyanan55@huawei.com,
+ yuri.benditovich@daynix.com, zhao1.liu@intel.com, qemu-block@nongnu.org,
+ qemu-arm@nongnu.org, qemu-s390x@nongnu.org, kvm@vger.kernel.org,
+ avihaih@nvidia.com
+References: <20240904111836.3273842-1-armbru@redhat.com>
+ <20240904111836.3273842-20-armbru@redhat.com>
+Content-Language: en-US, fr
+From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clegoate@redhat.com>
+In-Reply-To: <20240904111836.3273842-20-armbru@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+On 9/4/24 13:18, Markus Armbruster wrote:
+> QAPI's 'prefix' feature can make the connection between enumeration
+> type and its constants less than obvious.  It's best used with
+> restraint.
+> 
+> VfioMigrationState has a 'prefix' that overrides the generated
+> enumeration constants' prefix to QAPI_VFIO_MIGRATION_STATE.
+> 
+> We could simply drop 'prefix', but then the enumeration constants
+> would look as if they came from kernel header linux/vfio.h.
+> 
+> Rename the type to QapiVfioMigrationState instead, so that 'prefix' is
+> not needed.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 
-On 13.08.24 г. 1:48 ч., Rick Edgecombe wrote:
-> From: Xiaoyao Li <xiaoyao.li@intel.com>
-> 
-> While TDX module reports a set of capabilities/features that it
-> supports, what KVM currently supports might be a subset of them.
-> E.g., DEBUG and PERFMON are supported by TDX module but currently not
-> supported by KVM.
-> 
-> Introduce a new struct kvm_tdx_caps to store KVM's capabilities of TDX.
-> supported_attrs and suppported_xfam are validated against fixed0/1
-> values enumerated by TDX module. Configurable CPUID bits derive from TDX
-> module plus applying KVM's capabilities (KVM_GET_SUPPORTED_CPUID),
-> i.e., mask off the bits that are configurable in the view of TDX module
-> but not supported by KVM yet.
-> 
-> KVM_TDX_CPUID_NO_SUBLEAF is the concept from TDX module, switch it to 0
-> and use KVM_CPUID_FLAG_SIGNIFCANT_INDEX, which are the concept of KVM.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Reviewed-by: Cédric Le Goater <clg@redhat.com>
+
+Thanks,
+
+C.
+
+
 > ---
-> uAPI breakout v1:
->   - Change setup_kvm_tdx_caps() to use the exported 'struct tdx_sysinfo'
->     pointer.
->   - Change how to copy 'kvm_tdx_cpuid_config' since 'struct tdx_sysinfo'
->     doesn't have 'kvm_tdx_cpuid_config'.
->   - Updates for uAPI changes
-> ---
->   arch/x86/include/uapi/asm/kvm.h |  2 -
->   arch/x86/kvm/vmx/tdx.c          | 81 +++++++++++++++++++++++++++++++++
->   2 files changed, 81 insertions(+), 2 deletions(-)
+>   qapi/vfio.json      | 9 ++++-----
+>   hw/vfio/migration.c | 2 +-
+>   2 files changed, 5 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 47caf508cca7..c9eb2e2f5559 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -952,8 +952,6 @@ struct kvm_tdx_cmd {
->   	__u64 hw_error;
->   };
+> diff --git a/qapi/vfio.json b/qapi/vfio.json
+> index eccca82068..b53b7caecd 100644
+> --- a/qapi/vfio.json
+> +++ b/qapi/vfio.json
+> @@ -7,7 +7,7 @@
+>   ##
 >   
-> -#define KVM_TDX_CPUID_NO_SUBLEAF	((__u32)-1)
-> -
->   struct kvm_tdx_cpuid_config {
->   	__u32 leaf;
->   	__u32 sub_leaf;
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 90b44ebaf864..d89973e554f6 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -31,6 +31,19 @@ static void __used tdx_guest_keyid_free(int keyid)
->   	ida_free(&tdx_guest_keyid_pool, keyid);
+>   ##
+> -# @VfioMigrationState:
+> +# @QapiVfioMigrationState:
+>   #
+>   # An enumeration of the VFIO device migration states.
+>   #
+> @@ -32,10 +32,9 @@
+>   #
+>   # Since: 9.1
+>   ##
+> -{ 'enum': 'VfioMigrationState',
+> +{ 'enum': 'QapiVfioMigrationState',
+>     'data': [ 'stop', 'running', 'stop-copy', 'resuming', 'running-p2p',
+> -            'pre-copy', 'pre-copy-p2p' ],
+> -  'prefix': 'QAPI_VFIO_MIGRATION_STATE' }
+> +            'pre-copy', 'pre-copy-p2p' ] }
+>   
+>   ##
+>   # @VFIO_MIGRATION:
+> @@ -63,5 +62,5 @@
+>     'data': {
+>         'device-id': 'str',
+>         'qom-path': 'str',
+> -      'device-state': 'VfioMigrationState'
+> +      'device-state': 'QapiVfioMigrationState'
+>     } }
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index 262d42a46e..17199b73ae 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -81,7 +81,7 @@ static const char *mig_state_to_str(enum vfio_device_mig_state state)
+>       }
 >   }
 >   
-> +#define KVM_TDX_CPUID_NO_SUBLEAF	((__u32)-1)
-> +
-> +struct kvm_tdx_caps {
-> +	u64 supported_attrs;
-> +	u64 supported_xfam;
-> +
-> +	u16 num_cpuid_config;
-> +	/* This must the last member. */
-> +	DECLARE_FLEX_ARRAY(struct kvm_tdx_cpuid_config, cpuid_configs);
-> +};
-> +
-> +static struct kvm_tdx_caps *kvm_tdx_caps;
-> +
->   static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+> -static VfioMigrationState
+> +static QapiVfioMigrationState
+>   mig_state_to_qapi_state(enum vfio_device_mig_state state)
 >   {
->   	const struct tdx_sysinfo_td_conf *td_conf = &tdx_sysinfo->td_conf;
-> @@ -131,6 +144,68 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->   	return r;
->   }
->   
-> +#define KVM_SUPPORTED_TD_ATTRS (TDX_TD_ATTR_SEPT_VE_DISABLE)
+>       switch (state) {
 
-Why isn't TDX_TD_ATTR_DEBUG added as well?
-
-<snip>
 
