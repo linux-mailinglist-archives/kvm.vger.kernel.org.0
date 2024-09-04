@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-25867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C35096BA55
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 13:24:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CDA396BA4E
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 13:24:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC029B2143E
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 11:24:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1863D1F22E64
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 11:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB59D1DA109;
-	Wed,  4 Sep 2024 11:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362481DA601;
+	Wed,  4 Sep 2024 11:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZI05ceR+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kic4TgjQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEAF1DA11B
-	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 11:18:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F711D5CF8
+	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 11:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725448740; cv=none; b=k+0oV4/EHhWMrHrCTxS9Zsxg9i78GlfkK4ZKH5CESAMrGOcd3gNm+ONdSpIhZvJ5jh04C4s/JydVlL3wsDeyRBygLsaN5exj2Q3GkViFiQ7wS/IFDrNfyatSHAQwrhmWdgLduHv5bsv6U70VEEGDHy+L5GlEIbkjYNmOtkqGXD4=
+	t=1725448739; cv=none; b=LOqcHlu/s6Zv0yW8DAKe1Ao3rsYnKgl8J7vQ1r448yDS6s6uGyCVBNaLKcB3eynE+/v9gU2go6pDp3g3GSXN+mxZfkPt2rCOSTtC0uAwjuHkFDg/oxfCpMiRY1S4tNaXBYI6WaQgh6AnsMUj9PFRiUlvSzQEjlNMA5rcTr0Bq9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725448740; c=relaxed/simple;
-	bh=OkWjOnxfa9hBNMiLH0LsjGmdle9M/soZOaHh1bdBpms=;
+	s=arc-20240116; t=1725448739; c=relaxed/simple;
+	bh=h0rGckFs9xwhbRraoXi5+zzKz23q6iBgL71GcCWbgs8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sf+Ud8KwqY/8GnkoM/Cm44HJvdiLyY29mvTGH3JAx2xPeV4XtHGkNscgkxR1jeix/RboYdasrnDDvktuavuLI3SPanAWT10aLdu9VR4C9/P1tXPwp4OBUEaEuhf+pF0bw0ats6yz5H5xWszwzK974UZhdapvV20OSNngaOqQLZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZI05ceR+; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=hxjZ9fYi7uQQGTEYDhozT5SignWn7Kz/BkgyEMohE5Q5R6/xOY7JcJBVPkHTpqirXdRsi71KvFj7dtpNyj1WhgpK7tm7wzXeQG9beY2NGu7v0Ewkmvxdz/QFu2Xp/uuvGsWStinCqSmZoLMwOB0tBZATMmPAjzoaj4cDvs3A6vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kic4TgjQ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725448737;
+	s=mimecast20190719; t=1725448736;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=70jMuVZso5R0028zPf4/S/G6TSwBNhjs4yo5beZEVtA=;
-	b=ZI05ceR+wgWD+guNFVMq+v+Rf6MZpibkc44unsboy5LsKAL9MyVxJh8eynfi2+WYJBwzJM
-	aussAnLNwm2X0+T/DQchoeef0kgKsLhgJ5+HTSkfPcRVQ/c3qqurt89BcHNS6gWImRxcJ8
-	Hb8CMBmKCpRf9thjUBzNTekKwia15K4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=gWp+iCFBJ9F2d1YyCUo75gPc+JrIQoSE3ebW3zYSASw=;
+	b=Kic4TgjQ+luEk6dFo+Jxfad0NpnzZITaajiEiE1bR5QmISocdKY6c8qMKrCF4suVLsg7uq
+	CgNXtwYJlXpJ/0bZwgY76pp7/4IjDr/ZPi/sDjGdWmWW5u/PKy/JBk220k16pGTolKwfZX
+	6SXDPD6JowhyNZyXGhlEXjlnlnuA9B4=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-444-EQ1bwIKsP2y4bb1iuwKx4A-1; Wed,
- 04 Sep 2024 07:18:51 -0400
-X-MC-Unique: EQ1bwIKsP2y4bb1iuwKx4A-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-442-RA6P3sr1OiqPVB6mMsX1Cw-1; Wed,
+ 04 Sep 2024 07:18:52 -0400
+X-MC-Unique: RA6P3sr1OiqPVB6mMsX1Cw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7AACE1955D80;
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91BE41956096;
 	Wed,  4 Sep 2024 11:18:47 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.39.192.112])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E9A431956086;
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E9DE030001AB;
 	Wed,  4 Sep 2024 11:18:46 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id D25F121E682D; Wed,  4 Sep 2024 13:18:36 +0200 (CEST)
+	id D6E9421E682E; Wed,  4 Sep 2024 13:18:36 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: alex.williamson@redhat.com,
@@ -109,9 +109,9 @@ Cc: alex.williamson@redhat.com,
 	qemu-s390x@nongnu.org,
 	kvm@vger.kernel.org,
 	avihaih@nvidia.com
-Subject: [PATCH v2 15/19] qapi/crypto: Rename QCryptoRSAPaddingAlgorithm to *Algo, and drop prefix
-Date: Wed,  4 Sep 2024 13:18:32 +0200
-Message-ID: <20240904111836.3273842-16-armbru@redhat.com>
+Subject: [PATCH v2 16/19] qapi/crypto: Rename QCryptoAFAlg to QCryptoAFAlgo
+Date: Wed,  4 Sep 2024 13:18:33 +0200
+Message-ID: <20240904111836.3273842-17-armbru@redhat.com>
 In-Reply-To: <20240904111836.3273842-1-armbru@redhat.com>
 References: <20240904111836.3273842-1-armbru@redhat.com>
 Precedence: bulk
@@ -122,405 +122,226 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-QAPI's 'prefix' feature can make the connection between enumeration
-type and its constants less than obvious.  It's best used with
-restraint.
-
-QCryptoRSAPaddingAlgorithm has a 'prefix' that overrides the generated
-enumeration constants' prefix to QCRYPTO_RSA_PADDING_ALG.
-
-We could simply drop 'prefix', but then the prefix becomes
-QCRYPTO_RSA_PADDING_ALGORITHM, which is rather long.
-
-We could additionally rename the type to QCryptoRSAPaddingAlg, but I
-think the abbreviation "alg" is less than clear.
-
-Rename the type to QCryptoRSAPaddingAlgo instead.  The prefix becomes
-QCRYPTO_RSA_PADDING_ALGO.
+For consistency with other types names *Algo.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Acked-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- qapi/crypto.json                        |  9 ++++-----
- backends/cryptodev-builtin.c            |  6 +++---
- backends/cryptodev-lkcf.c               | 10 +++++-----
- tests/bench/benchmark-crypto-akcipher.c | 12 ++++++------
- tests/unit/test-crypto-akcipher.c       | 10 +++++-----
- crypto/akcipher-gcrypt.c.inc            | 18 +++++++++---------
- crypto/akcipher-nettle.c.inc            | 18 +++++++++---------
- 7 files changed, 41 insertions(+), 42 deletions(-)
+ crypto/afalgpriv.h    | 14 +++++++-------
+ crypto/hmacpriv.h     |  2 +-
+ crypto/afalg.c        |  8 ++++----
+ crypto/cipher-afalg.c | 12 ++++++------
+ crypto/hash-afalg.c   | 14 +++++++-------
+ 5 files changed, 25 insertions(+), 25 deletions(-)
 
-diff --git a/qapi/crypto.json b/qapi/crypto.json
-index 331d49ebb8..867b09d322 100644
---- a/qapi/crypto.json
-+++ b/qapi/crypto.json
-@@ -608,7 +608,7 @@
-   'data': ['public', 'private']}
+diff --git a/crypto/afalgpriv.h b/crypto/afalgpriv.h
+index 5a2393f1b7..3fdcc0f831 100644
+--- a/crypto/afalgpriv.h
++++ b/crypto/afalgpriv.h
+@@ -30,9 +30,9 @@
+ #define ALG_OPTYPE_LEN 4
+ #define ALG_MSGIV_LEN(len) (sizeof(struct af_alg_iv) + (len))
  
- ##
--# @QCryptoRSAPaddingAlgorithm:
-+# @QCryptoRSAPaddingAlgo:
- #
- # The padding algorithm for RSA.
- #
-@@ -618,8 +618,7 @@
- #
- # Since: 7.1
- ##
--{ 'enum': 'QCryptoRSAPaddingAlgorithm',
--  'prefix': 'QCRYPTO_RSA_PADDING_ALG',
-+{ 'enum': 'QCryptoRSAPaddingAlgo',
-   'data': ['raw', 'pkcs1']}
+-typedef struct QCryptoAFAlg QCryptoAFAlg;
++typedef struct QCryptoAFAlgo QCryptoAFAlgo;
  
- ##
-@@ -629,13 +628,13 @@
- #
- # @hash-alg: QCryptoHashAlgo
- #
--# @padding-alg: QCryptoRSAPaddingAlgorithm
-+# @padding-alg: QCryptoRSAPaddingAlgo
- #
- # Since: 7.1
- ##
- { 'struct': 'QCryptoAkCipherOptionsRSA',
-   'data': { 'hash-alg':'QCryptoHashAlgo',
--            'padding-alg': 'QCryptoRSAPaddingAlgorithm'}}
-+            'padding-alg': 'QCryptoRSAPaddingAlgo'}}
+-struct QCryptoAFAlg {
++struct QCryptoAFAlgo {
+     QCryptoCipher base;
  
- ##
- # @QCryptoAkCipherOptions:
-diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
-index d8b64091b6..6f3990481b 100644
---- a/backends/cryptodev-builtin.c
-+++ b/backends/cryptodev-builtin.c
-@@ -65,7 +65,7 @@ static void cryptodev_builtin_init_akcipher(CryptoDevBackend *backend)
-     QCryptoAkCipherOptions opts;
+     int tfmfd;
+@@ -46,22 +46,22 @@ struct QCryptoAFAlg {
+  * @type: the type of crypto operation
+  * @name: the name of crypto operation
+  *
+- * Allocate a QCryptoAFAlg object and bind itself to
++ * Allocate a QCryptoAFAlgo object and bind itself to
+  * a AF_ALG socket.
+  *
+  * Returns:
+- *  a new QCryptoAFAlg object, or NULL in error.
++ *  a new QCryptoAFAlgo object, or NULL in error.
+  */
+-QCryptoAFAlg *
++QCryptoAFAlgo *
+ qcrypto_afalg_comm_alloc(const char *type, const char *name,
+                          Error **errp);
  
-     opts.alg = QCRYPTO_AK_CIPHER_ALGO_RSA;
--    opts.u.rsa.padding_alg = QCRYPTO_RSA_PADDING_ALG_RAW;
-+    opts.u.rsa.padding_alg = QCRYPTO_RSA_PADDING_ALGO_RAW;
-     if (qcrypto_akcipher_supports(&opts)) {
-         backend->conf.crypto_services |=
-                      (1u << QCRYPTODEV_BACKEND_SERVICE_AKCIPHER);
-@@ -200,12 +200,12 @@ static int cryptodev_builtin_set_rsa_options(
-             return -1;
-         }
-         opt->hash_alg = hash_alg;
--        opt->padding_alg = QCRYPTO_RSA_PADDING_ALG_PKCS1;
-+        opt->padding_alg = QCRYPTO_RSA_PADDING_ALGO_PKCS1;
-         return 0;
-     }
+ /**
+  * afalg_comm_free:
+- * @afalg: the QCryptoAFAlg object
++ * @afalg: the QCryptoAFAlgo object
+  *
+  * Free the @afalg.
+  */
+-void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg);
++void qcrypto_afalg_comm_free(QCryptoAFAlgo *afalg);
  
-     if (virtio_padding_algo == VIRTIO_CRYPTO_RSA_RAW_PADDING) {
--        opt->padding_alg = QCRYPTO_RSA_PADDING_ALG_RAW;
-+        opt->padding_alg = QCRYPTO_RSA_PADDING_ALGO_RAW;
-         return 0;
-     }
+ #endif
+diff --git a/crypto/hmacpriv.h b/crypto/hmacpriv.h
+index bd4c498c62..f339596bd9 100644
+--- a/crypto/hmacpriv.h
++++ b/crypto/hmacpriv.h
+@@ -37,7 +37,7 @@ extern QCryptoHmacDriver qcrypto_hmac_lib_driver;
  
-diff --git a/backends/cryptodev-lkcf.c b/backends/cryptodev-lkcf.c
-index 6fb6e03d98..fde32950f6 100644
---- a/backends/cryptodev-lkcf.c
-+++ b/backends/cryptodev-lkcf.c
-@@ -139,14 +139,14 @@ static int cryptodev_lkcf_set_op_desc(QCryptoAkCipherOptions *opts,
-     }
+ #include "afalgpriv.h"
  
-     rsa_opt = &opts->u.rsa;
--    if (rsa_opt->padding_alg == QCRYPTO_RSA_PADDING_ALG_PKCS1) {
-+    if (rsa_opt->padding_alg == QCRYPTO_RSA_PADDING_ALGO_PKCS1) {
-         snprintf(key_desc, desc_len, "enc=%s hash=%s",
--                 QCryptoRSAPaddingAlgorithm_str(rsa_opt->padding_alg),
-+                 QCryptoRSAPaddingAlgo_str(rsa_opt->padding_alg),
-                  QCryptoHashAlgo_str(rsa_opt->hash_alg));
- 
-     } else {
-         snprintf(key_desc, desc_len, "enc=%s",
--                 QCryptoRSAPaddingAlgorithm_str(rsa_opt->padding_alg));
-+                 QCryptoRSAPaddingAlgo_str(rsa_opt->padding_alg));
-     }
-     return 0;
+-QCryptoAFAlg *qcrypto_afalg_hmac_ctx_new(QCryptoHashAlgo alg,
++QCryptoAFAlgo *qcrypto_afalg_hmac_ctx_new(QCryptoHashAlgo alg,
+                                          const uint8_t *key, size_t nkey,
+                                          Error **errp);
+ extern QCryptoHmacDriver qcrypto_hmac_afalg_driver;
+diff --git a/crypto/afalg.c b/crypto/afalg.c
+index 52a491dbb5..246d0679d4 100644
+--- a/crypto/afalg.c
++++ b/crypto/afalg.c
+@@ -66,13 +66,13 @@ qcrypto_afalg_socket_bind(const char *type, const char *name,
+     return sbind;
  }
-@@ -157,7 +157,7 @@ static int cryptodev_lkcf_set_rsa_opt(int virtio_padding_alg,
-                                       Error **errp)
+ 
+-QCryptoAFAlg *
++QCryptoAFAlgo *
+ qcrypto_afalg_comm_alloc(const char *type, const char *name,
+                          Error **errp)
  {
-     if (virtio_padding_alg == VIRTIO_CRYPTO_RSA_PKCS1_PADDING) {
--        opt->padding_alg = QCRYPTO_RSA_PADDING_ALG_PKCS1;
-+        opt->padding_alg = QCRYPTO_RSA_PADDING_ALGO_PKCS1;
+-    QCryptoAFAlg *afalg;
++    QCryptoAFAlgo *afalg;
  
-         switch (virtio_hash_alg) {
-         case VIRTIO_CRYPTO_RSA_MD5:
-@@ -184,7 +184,7 @@ static int cryptodev_lkcf_set_rsa_opt(int virtio_padding_alg,
-     }
+-    afalg = g_new0(QCryptoAFAlg, 1);
++    afalg = g_new0(QCryptoAFAlgo, 1);
+     /* initialize crypto API socket */
+     afalg->opfd = -1;
+     afalg->tfmfd = qcrypto_afalg_socket_bind(type, name, errp);
+@@ -93,7 +93,7 @@ error:
+     return NULL;
+ }
  
-     if (virtio_padding_alg == VIRTIO_CRYPTO_RSA_RAW_PADDING) {
--        opt->padding_alg = QCRYPTO_RSA_PADDING_ALG_RAW;
-+        opt->padding_alg = QCRYPTO_RSA_PADDING_ALGO_RAW;
-         return 0;
-     }
- 
-diff --git a/tests/bench/benchmark-crypto-akcipher.c b/tests/bench/benchmark-crypto-akcipher.c
-index 225e426bde..750c7e89ee 100644
---- a/tests/bench/benchmark-crypto-akcipher.c
-+++ b/tests/bench/benchmark-crypto-akcipher.c
-@@ -20,7 +20,7 @@
- 
- static QCryptoAkCipher *create_rsa_akcipher(const uint8_t *priv_key,
-                                             size_t keylen,
--                                            QCryptoRSAPaddingAlgorithm padding,
-+                                            QCryptoRSAPaddingAlgo padding,
-                                             QCryptoHashAlgo hash)
+-void qcrypto_afalg_comm_free(QCryptoAFAlg *afalg)
++void qcrypto_afalg_comm_free(QCryptoAFAlgo *afalg)
  {
-     QCryptoAkCipherOptions opt;
-@@ -39,7 +39,7 @@ static void test_rsa_speed(const uint8_t *priv_key, size_t keylen,
- #define SHA1_DGST_LEN 20
- #define SIGN_TIMES 10000
- #define VERIFY_TIMES 100000
--#define PADDING QCRYPTO_RSA_PADDING_ALG_PKCS1
-+#define PADDING QCRYPTO_RSA_PADDING_ALGO_PKCS1
- #define HASH QCRYPTO_HASH_ALGO_SHA1
+     if (!afalg) {
+         return;
+diff --git a/crypto/cipher-afalg.c b/crypto/cipher-afalg.c
+index c08eb7a39b..4980d419c4 100644
+--- a/crypto/cipher-afalg.c
++++ b/crypto/cipher-afalg.c
+@@ -65,7 +65,7 @@ qcrypto_afalg_cipher_ctx_new(QCryptoCipherAlgo alg,
+                              const uint8_t *key,
+                              size_t nkey, Error **errp)
+ {
+-    QCryptoAFAlg *afalg;
++    QCryptoAFAlgo *afalg;
+     size_t expect_niv;
+     char *name;
  
-     g_autoptr(QCryptoAkCipher) rsa =
-@@ -53,7 +53,7 @@ static void test_rsa_speed(const uint8_t *priv_key, size_t keylen,
-     signature = g_new0(uint8_t, key_size / BYTE);
+@@ -119,7 +119,7 @@ qcrypto_afalg_cipher_setiv(QCryptoCipher *cipher,
+                            const uint8_t *iv,
+                            size_t niv, Error **errp)
+ {
+-    QCryptoAFAlg *afalg = container_of(cipher, QCryptoAFAlg, base);
++    QCryptoAFAlgo *afalg = container_of(cipher, QCryptoAFAlgo, base);
+     struct af_alg_iv *alg_iv;
+     size_t expect_niv;
  
-     g_test_message("benchmark rsa%zu (%s-%s) sign...", key_size,
--                   QCryptoRSAPaddingAlgorithm_str(PADDING),
-+                   QCryptoRSAPaddingAlgo_str(PADDING),
-                    QCryptoHashAlgo_str(HASH));
-     g_test_timer_start();
-     for (count = 0; count < SIGN_TIMES; ++count) {
-@@ -64,13 +64,13 @@ static void test_rsa_speed(const uint8_t *priv_key, size_t keylen,
-     g_test_timer_elapsed();
-     g_test_message("rsa%zu (%s-%s) sign %zu times in %.2f seconds,"
-                    " %.2f times/sec ",
--                   key_size,  QCryptoRSAPaddingAlgorithm_str(PADDING),
-+                   key_size,  QCryptoRSAPaddingAlgo_str(PADDING),
-                    QCryptoHashAlgo_str(HASH),
-                    count, g_test_timer_last(),
-                    (double)count / g_test_timer_last());
+@@ -143,7 +143,7 @@ qcrypto_afalg_cipher_setiv(QCryptoCipher *cipher,
+ }
  
-     g_test_message("benchmark rsa%zu (%s-%s) verification...", key_size,
--                   QCryptoRSAPaddingAlgorithm_str(PADDING),
-+                   QCryptoRSAPaddingAlgo_str(PADDING),
-                    QCryptoHashAlgo_str(HASH));
-     g_test_timer_start();
-     for (count = 0; count < VERIFY_TIMES; ++count) {
-@@ -81,7 +81,7 @@ static void test_rsa_speed(const uint8_t *priv_key, size_t keylen,
-     g_test_timer_elapsed();
-     g_test_message("rsa%zu (%s-%s) verify %zu times in %.2f seconds,"
-                    " %.2f times/sec ",
--                   key_size, QCryptoRSAPaddingAlgorithm_str(PADDING),
-+                   key_size, QCryptoRSAPaddingAlgo_str(PADDING),
-                    QCryptoHashAlgo_str(HASH),
-                    count, g_test_timer_last(),
-                    (double)count / g_test_timer_last());
-diff --git a/tests/unit/test-crypto-akcipher.c b/tests/unit/test-crypto-akcipher.c
-index 7dd86125c2..53c2211ba8 100644
---- a/tests/unit/test-crypto-akcipher.c
-+++ b/tests/unit/test-crypto-akcipher.c
-@@ -787,7 +787,7 @@ static QCryptoAkCipherTestData akcipher_test_data[] = {
-         .opt = {
-             .alg = QCRYPTO_AK_CIPHER_ALGO_RSA,
-             .u.rsa = {
--                .padding_alg = QCRYPTO_RSA_PADDING_ALG_RAW,
-+                .padding_alg = QCRYPTO_RSA_PADDING_ALGO_RAW,
-             },
-         },
-         .pub_key = rsa1024_public_key,
-@@ -807,7 +807,7 @@ static QCryptoAkCipherTestData akcipher_test_data[] = {
-         .opt = {
-             .alg = QCRYPTO_AK_CIPHER_ALGO_RSA,
-             .u.rsa = {
--                .padding_alg = QCRYPTO_RSA_PADDING_ALG_PKCS1,
-+                .padding_alg = QCRYPTO_RSA_PADDING_ALGO_PKCS1,
-                 .hash_alg = QCRYPTO_HASH_ALGO_SHA1,
-             },
-         },
-@@ -832,7 +832,7 @@ static QCryptoAkCipherTestData akcipher_test_data[] = {
-         .opt = {
-             .alg = QCRYPTO_AK_CIPHER_ALGO_RSA,
-             .u.rsa = {
--                .padding_alg = QCRYPTO_RSA_PADDING_ALG_RAW,
-+                .padding_alg = QCRYPTO_RSA_PADDING_ALGO_RAW,
-             },
-         },
-         .pub_key = rsa2048_public_key,
-@@ -852,7 +852,7 @@ static QCryptoAkCipherTestData akcipher_test_data[] = {
-         .opt = {
-             .alg = QCRYPTO_AK_CIPHER_ALGO_RSA,
-             .u.rsa = {
--                .padding_alg = QCRYPTO_RSA_PADDING_ALG_PKCS1,
-+                .padding_alg = QCRYPTO_RSA_PADDING_ALGO_PKCS1,
-                 .hash_alg = QCRYPTO_HASH_ALGO_SHA1,
-             },
-         },
-@@ -946,7 +946,7 @@ static void test_rsakey(const void *opaque)
-     QCryptoAkCipherOptions opt = {
-         .alg = QCRYPTO_AK_CIPHER_ALGO_RSA,
-         .u.rsa = {
--            .padding_alg = QCRYPTO_RSA_PADDING_ALG_PKCS1,
-+            .padding_alg = QCRYPTO_RSA_PADDING_ALGO_PKCS1,
-             .hash_alg = QCRYPTO_HASH_ALGO_SHA1,
-         }
-     };
-diff --git a/crypto/akcipher-gcrypt.c.inc b/crypto/akcipher-gcrypt.c.inc
-index 8f1c2b8143..5a880f6638 100644
---- a/crypto/akcipher-gcrypt.c.inc
-+++ b/crypto/akcipher-gcrypt.c.inc
-@@ -32,7 +32,7 @@
- typedef struct QCryptoGcryptRSA {
-     QCryptoAkCipher akcipher;
-     gcry_sexp_t key;
--    QCryptoRSAPaddingAlgorithm padding_alg;
-+    QCryptoRSAPaddingAlgo padding_alg;
-     QCryptoHashAlgo hash_alg;
- } QCryptoGcryptRSA;
+ static int
+-qcrypto_afalg_cipher_op(QCryptoAFAlg *afalg,
++qcrypto_afalg_cipher_op(QCryptoAFAlgo *afalg,
+                         const void *in, void *out,
+                         size_t len, bool do_encrypt,
+                         Error **errp)
+@@ -202,7 +202,7 @@ qcrypto_afalg_cipher_encrypt(QCryptoCipher *cipher,
+                              const void *in, void *out,
+                              size_t len, Error **errp)
+ {
+-    QCryptoAFAlg *afalg = container_of(cipher, QCryptoAFAlg, base);
++    QCryptoAFAlgo *afalg = container_of(cipher, QCryptoAFAlgo, base);
  
-@@ -241,7 +241,7 @@ static int qcrypto_gcrypt_rsa_encrypt(QCryptoAkCipher *akcipher,
+     return qcrypto_afalg_cipher_op(afalg, in, out, len, true, errp);
+ }
+@@ -212,14 +212,14 @@ qcrypto_afalg_cipher_decrypt(QCryptoCipher *cipher,
+                              const void *in, void *out,
+                              size_t len, Error **errp)
+ {
+-    QCryptoAFAlg *afalg = container_of(cipher, QCryptoAFAlg, base);
++    QCryptoAFAlgo *afalg = container_of(cipher, QCryptoAFAlgo, base);
  
-     err = gcry_sexp_build(&data_sexp, NULL,
-                           "(data (flags %s) (value %b))",
--                          QCryptoRSAPaddingAlgorithm_str(rsa->padding_alg),
-+                          QCryptoRSAPaddingAlgo_str(rsa->padding_alg),
-                           in_len, in);
-     if (gcry_err_code(err) != 0) {
-         error_setg(errp, "Failed to build plaintext: %s/%s",
-@@ -263,7 +263,7 @@ static int qcrypto_gcrypt_rsa_encrypt(QCryptoAkCipher *akcipher,
-         goto cleanup;
-     }
+     return qcrypto_afalg_cipher_op(afalg, in, out, len, false, errp);
+ }
  
--    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALG_RAW) {
-+    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALGO_RAW) {
-         cipher_mpi = gcry_sexp_nth_mpi(cipher_sexp_item, 1, GCRYMPI_FMT_USG);
-         if (!cipher_mpi) {
-             error_setg(errp, "Invalid ciphertext result");
-@@ -332,7 +332,7 @@ static int qcrypto_gcrypt_rsa_decrypt(QCryptoAkCipher *akcipher,
+ static void qcrypto_afalg_comm_ctx_free(QCryptoCipher *cipher)
+ {
+-    QCryptoAFAlg *afalg = container_of(cipher, QCryptoAFAlg, base);
++    QCryptoAFAlgo *afalg = container_of(cipher, QCryptoAFAlgo, base);
  
-     err = gcry_sexp_build(&cipher_sexp, NULL,
-                           "(enc-val (flags %s) (rsa (a %b) ))",
--                          QCryptoRSAPaddingAlgorithm_str(rsa->padding_alg),
-+                          QCryptoRSAPaddingAlgo_str(rsa->padding_alg),
-                           in_len, in);
-     if (gcry_err_code(err) != 0) {
-         error_setg(errp, "Failed to build ciphertext: %s/%s",
-@@ -348,7 +348,7 @@ static int qcrypto_gcrypt_rsa_decrypt(QCryptoAkCipher *akcipher,
-     }
+     qcrypto_afalg_comm_free(afalg);
+ }
+diff --git a/crypto/hash-afalg.c b/crypto/hash-afalg.c
+index 8fc6bd0edf..28ab899b18 100644
+--- a/crypto/hash-afalg.c
++++ b/crypto/hash-afalg.c
+@@ -64,12 +64,12 @@ qcrypto_afalg_hash_format_name(QCryptoHashAlgo alg,
+     return name;
+ }
  
-     /* S-expression of plaintext: (value plaintext) */
--    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALG_RAW) {
-+    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALGO_RAW) {
-         data_mpi = gcry_sexp_nth_mpi(data_sexp, 1, GCRYMPI_FMT_USG);
-         if (!data_mpi) {
-             error_setg(errp, "Invalid plaintext result");
-@@ -410,7 +410,7 @@ static int qcrypto_gcrypt_rsa_sign(QCryptoAkCipher *akcipher,
-         return ret;
-     }
+-static QCryptoAFAlg *
++static QCryptoAFAlgo *
+ qcrypto_afalg_hash_hmac_ctx_new(QCryptoHashAlgo alg,
+                                 const uint8_t *key, size_t nkey,
+                                 bool is_hmac, Error **errp)
+ {
+-    QCryptoAFAlg *afalg;
++    QCryptoAFAlgo *afalg;
+     char *name;
  
--    if (rsa->padding_alg != QCRYPTO_RSA_PADDING_ALG_PKCS1) {
-+    if (rsa->padding_alg != QCRYPTO_RSA_PADDING_ALGO_PKCS1) {
-         error_setg(errp, "Invalid padding %u", rsa->padding_alg);
-         return ret;
-     }
-@@ -482,7 +482,7 @@ static int qcrypto_gcrypt_rsa_verify(QCryptoAkCipher *akcipher,
-         return ret;
-     }
+     name = qcrypto_afalg_hash_format_name(alg, is_hmac, errp);
+@@ -98,14 +98,14 @@ qcrypto_afalg_hash_hmac_ctx_new(QCryptoHashAlgo alg,
+     return afalg;
+ }
  
--    if (rsa->padding_alg != QCRYPTO_RSA_PADDING_ALG_PKCS1) {
-+    if (rsa->padding_alg != QCRYPTO_RSA_PADDING_ALGO_PKCS1) {
-         error_setg(errp, "Invalid padding %u", rsa->padding_alg);
-         return ret;
-     }
-@@ -570,10 +570,10 @@ bool qcrypto_akcipher_supports(QCryptoAkCipherOptions *opts)
-     switch (opts->alg) {
-     case QCRYPTO_AK_CIPHER_ALGO_RSA:
-         switch (opts->u.rsa.padding_alg) {
--        case QCRYPTO_RSA_PADDING_ALG_RAW:
-+        case QCRYPTO_RSA_PADDING_ALGO_RAW:
-             return true;
+-static QCryptoAFAlg *
++static QCryptoAFAlgo *
+ qcrypto_afalg_hash_ctx_new(QCryptoHashAlgo alg,
+                            Error **errp)
+ {
+     return qcrypto_afalg_hash_hmac_ctx_new(alg, NULL, 0, false, errp);
+ }
  
--        case QCRYPTO_RSA_PADDING_ALG_PKCS1:
-+        case QCRYPTO_RSA_PADDING_ALGO_PKCS1:
-             switch (opts->u.rsa.hash_alg) {
-             case QCRYPTO_HASH_ALGO_MD5:
-             case QCRYPTO_HASH_ALGO_SHA1:
-diff --git a/crypto/akcipher-nettle.c.inc b/crypto/akcipher-nettle.c.inc
-index 21f27f8286..1720f84362 100644
---- a/crypto/akcipher-nettle.c.inc
-+++ b/crypto/akcipher-nettle.c.inc
-@@ -33,7 +33,7 @@ typedef struct QCryptoNettleRSA {
-     QCryptoAkCipher akcipher;
-     struct rsa_public_key pub;
-     struct rsa_private_key priv;
--    QCryptoRSAPaddingAlgorithm padding_alg;
-+    QCryptoRSAPaddingAlgo padding_alg;
-     QCryptoHashAlgo hash_alg;
- } QCryptoNettleRSA;
+-QCryptoAFAlg *
++QCryptoAFAlgo *
+ qcrypto_afalg_hmac_ctx_new(QCryptoHashAlgo alg,
+                            const uint8_t *key, size_t nkey,
+                            Error **errp)
+@@ -114,14 +114,14 @@ qcrypto_afalg_hmac_ctx_new(QCryptoHashAlgo alg,
+ }
  
-@@ -184,11 +184,11 @@ static int qcrypto_nettle_rsa_encrypt(QCryptoAkCipher *akcipher,
+ static int
+-qcrypto_afalg_hash_hmac_bytesv(QCryptoAFAlg *hmac,
++qcrypto_afalg_hash_hmac_bytesv(QCryptoAFAlgo *hmac,
+                                QCryptoHashAlgo alg,
+                                const struct iovec *iov,
+                                size_t niov, uint8_t **result,
+                                size_t *resultlen,
+                                Error **errp)
+ {
+-    QCryptoAFAlg *afalg;
++    QCryptoAFAlgo *afalg;
+     struct iovec outv;
+     int ret = 0;
+     bool is_hmac = (hmac != NULL) ? true : false;
+@@ -197,7 +197,7 @@ qcrypto_afalg_hmac_bytesv(QCryptoHmac *hmac,
  
-     /* Nettle do not support RSA encryption without any padding */
-     switch (rsa->padding_alg) {
--    case QCRYPTO_RSA_PADDING_ALG_RAW:
-+    case QCRYPTO_RSA_PADDING_ALGO_RAW:
-         error_setg(errp, "RSA with raw padding is not supported");
-         break;
+ static void qcrypto_afalg_hmac_ctx_free(QCryptoHmac *hmac)
+ {
+-    QCryptoAFAlg *afalg;
++    QCryptoAFAlgo *afalg;
  
--    case QCRYPTO_RSA_PADDING_ALG_PKCS1:
-+    case QCRYPTO_RSA_PADDING_ALGO_PKCS1:
-         mpz_init(c);
-         if (rsa_encrypt(&rsa->pub, NULL, wrap_nettle_random_func,
-                         data_len, (uint8_t *)data, c) != 1) {
-@@ -223,11 +223,11 @@ static int qcrypto_nettle_rsa_decrypt(QCryptoAkCipher *akcipher,
-     }
- 
-     switch (rsa->padding_alg) {
--    case QCRYPTO_RSA_PADDING_ALG_RAW:
-+    case QCRYPTO_RSA_PADDING_ALGO_RAW:
-         error_setg(errp, "RSA with raw padding is not supported");
-         break;
- 
--    case QCRYPTO_RSA_PADDING_ALG_PKCS1:
-+    case QCRYPTO_RSA_PADDING_ALGO_PKCS1:
-         nettle_mpz_init_set_str_256_u(c, enc_len, enc);
-         if (!rsa_decrypt(&rsa->priv, &data_len, (uint8_t *)data, c)) {
-             error_setg(errp, "Failed to decrypt");
-@@ -257,7 +257,7 @@ static int qcrypto_nettle_rsa_sign(QCryptoAkCipher *akcipher,
-      * The RSA algorithm cannot be used for signature/verification
-      * without padding.
-      */
--    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALG_RAW) {
-+    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALGO_RAW) {
-         error_setg(errp, "Try to make signature without padding");
-         return ret;
-     }
-@@ -324,7 +324,7 @@ static int qcrypto_nettle_rsa_verify(QCryptoAkCipher *akcipher,
-      * The RSA algorithm cannot be used for signature/verification
-      * without padding.
-      */
--    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALG_RAW) {
-+    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALGO_RAW) {
-         error_setg(errp, "Try to verify signature without padding");
-         return ret;
-     }
-@@ -427,7 +427,7 @@ bool qcrypto_akcipher_supports(QCryptoAkCipherOptions *opts)
-     switch (opts->alg) {
-     case QCRYPTO_AK_CIPHER_ALGO_RSA:
-         switch (opts->u.rsa.padding_alg) {
--        case QCRYPTO_RSA_PADDING_ALG_PKCS1:
-+        case QCRYPTO_RSA_PADDING_ALGO_PKCS1:
-             switch (opts->u.rsa.hash_alg) {
-             case QCRYPTO_HASH_ALGO_MD5:
-             case QCRYPTO_HASH_ALGO_SHA1:
-@@ -439,7 +439,7 @@ bool qcrypto_akcipher_supports(QCryptoAkCipherOptions *opts)
-                 return false;
-             }
- 
--        case QCRYPTO_RSA_PADDING_ALG_RAW:
-+        case QCRYPTO_RSA_PADDING_ALGO_RAW:
-         default:
-             return false;
-         }
+     afalg = hmac->opaque;
+     qcrypto_afalg_comm_free(afalg);
 -- 
 2.46.0
 
