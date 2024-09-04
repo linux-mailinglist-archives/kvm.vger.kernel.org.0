@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-25815-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25817-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF28E96AF02
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 05:16:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DCC796AF07
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 05:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FE0B1F2565B
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 03:16:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE6B41F2575A
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 03:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04AF4F20E;
-	Wed,  4 Sep 2024 03:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E5F126C0A;
+	Wed,  4 Sep 2024 03:14:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EA686JL/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TlFkq+FH"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D91874418;
-	Wed,  4 Sep 2024 03:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAC68121B;
+	Wed,  4 Sep 2024 03:14:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725419677; cv=none; b=BncibAK1vwzn991UfAFRb/xB78xG0gYcRdp/lT2HubA4SLZYZmF5mVsSduDBxVJw3IxEfZv3QA0oeYvGMqR7kF693iHoKeE2gmrFd3o/VxE8eZYHG7aeIxkfC282t4V906WKpTOJ8NwKi25KFJQ14CbBNl8t1cMludfG6Ear9Jk=
+	t=1725419679; cv=none; b=gdWYwy81WW2KnARvNM5NyjffPqhrGsrCMdOH9rdfciGOvEYImtCkEDQTmbzo/mblDvcBa4ih2dNxjn8xgLEFv12jVejZCEasxxTmAJfg6ZAuU/s3iYDPOX/VbHA+GGdLLjjzxky0U8p3XEP3zvwiWlFBwwjdxLCmRkddYAvy5vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725419677; c=relaxed/simple;
-	bh=m0aJmLVGUjr94xP1ERSToS276WOj1bIg2E0s9dvuB1U=;
+	s=arc-20240116; t=1725419679; c=relaxed/simple;
+	bh=xW7XPRQeiRKx4GXYs8rvZQUSXXmZ+f+w5kAxqysOs6Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FGUEbswwsly00iMcLTHzzX+MKY6sdKzMwBrfHDwZDSOh/3hbTnvebv3Is3vjujDcEg1PRUkUAdLwc+5JHGTBGAJA8IMsczCWkGiWNYhSfIGE3D3I3VxdN9IBJu/QTp24AeFKkdEqyqPzoahluZqWrpW0YrRl87h9OfSZeJmejLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EA686JL/; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=YOwppWv0Z/H4WnrG9Upf7SjiHwqDILZ6MSkD6dUPjdyoxG/Gtn4gOdjwIHsbf4Py3ZfJjj1N3eiRRWxAa7AmvJGMESjg6geV8sr/SiGTdLWYkKXuxrsawYwRmoQSre+i5qpJEcZvu2yJCVEjc3lfwI2aPxgHPyQXmqApFLGX540=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TlFkq+FH; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725419675; x=1756955675;
+  t=1725419677; x=1756955677;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=m0aJmLVGUjr94xP1ERSToS276WOj1bIg2E0s9dvuB1U=;
-  b=EA686JL/fEoN22Og7t1rGXbPlc6TQXDK9R/w6f65EV/rUZH5OXs9ocCp
-   6Hgw0JQAYUzhLIrxxIG8G2NhBUbmkvTb5JMQVluw3PzYE3x4x6R/Ce7/L
-   P7oM65pXt10nBaR9kxfKOB3o3+7Na5pHcOlKig6OIXZh/mWY3+r7yA05T
-   htDnk8JoUig6J2EYmrZJ6tt/YeKYRpsp6p0SlttnseW6YK8NK1pKPVEjl
-   /8D5zNf6PAlcIWf1bDog4W48CljcgUGvMd98chIH2fwt81w49Q3tiNyKB
-   ypx8nHwIfy0fDzjrWc0VzBk/VACPTr9FsuBa/BoDvjZCqDrQMZJAG3bCq
-   Q==;
-X-CSE-ConnectionGUID: 4WKa0l1bQCqj7gDhLSS+pg==
-X-CSE-MsgGUID: eFGCdBUGQnqr32N5NJFyrg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23564665"
+  bh=xW7XPRQeiRKx4GXYs8rvZQUSXXmZ+f+w5kAxqysOs6Q=;
+  b=TlFkq+FHf7vXNykzvKNxNZA4JE3wsQvMbknwnlYAZ2mX5COYc5g52ovS
+   +ZsMC7tw4hGeYL257RNy3Lr0rmQsIY2ztmvRsS7ySmDkr0SIp6kd2vpIC
+   blqLhW30txzSMBC8r+EuCkC0A8BJj2IM6ZtypvUQUKqI8dNaM/4ghEMen
+   y3xHyccegAYvkh0f/EiPNkrwh6TaG2G4f5Wbn24I1tDhLd4nHQE8E3yPO
+   Llj9ppvANPUpVNEcPZRm6wiC/RH6fOKXX2ejYnj+Suu+NuWtc0Rmd1Y8B
+   Fe4c4BfqwWSO4QFllb3X5o6q36+KOiwM7NHCqfg3RaCPnZjjxaml+ij2h
+   g==;
+X-CSE-ConnectionGUID: qBWwsdF7ROSIZYkvVo8DJA==
+X-CSE-MsgGUID: XC4ipXY7Sf+t7LQ10ig2OQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23564673"
 X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
-   d="scan'208";a="23564665"
+   d="scan'208";a="23564673"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
   by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:08:08 -0700
-X-CSE-ConnectionGUID: 2x/iTZbURAehzn8Ov8nFrg==
-X-CSE-MsgGUID: K/RD8d26TzqXJwI0iKeSMw==
+X-CSE-ConnectionGUID: OjmE+G0MTdSlc73sQO8Pxg==
+X-CSE-MsgGUID: AfRUoVkYSUWoU4oyAwjKxA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
-   d="scan'208";a="65106270"
+   d="scan'208";a="65106279"
 Received: from dgramcko-desk.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.221.153])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:08:02 -0700
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:08:05 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -68,10 +68,11 @@ Cc: kai.huang@intel.com,
 	yan.y.zhao@intel.com,
 	nik.borisov@suse.com,
 	rick.p.edgecombe@intel.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 08/21] KVM: TDX: Set gfn_direct_bits to shared bit
-Date: Tue,  3 Sep 2024 20:07:38 -0700
-Message-Id: <20240904030751.117579-9-rick.p.edgecombe@intel.com>
+	linux-kernel@vger.kernel.org,
+	Yuan Yao <yuan.yao@intel.com>
+Subject: [PATCH 09/21] KVM: TDX: Retry seamcall when TDX_OPERAND_BUSY with operand SEPT
+Date: Tue,  3 Sep 2024 20:07:39 -0700
+Message-Id: <20240904030751.117579-10-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
 References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
@@ -83,43 +84,152 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Yuan Yao <yuan.yao@intel.com>
 
-Make the direct root handle memslot GFNs at an alias with the TDX shared
-bit set.
+TDX module internally uses locks to protect internal resources.  It tries
+to acquire the locks.  If it fails to obtain the lock, it returns
+TDX_OPERAND_BUSY error without spin because its execution time limitation.
 
-For TDX shared memory, the memslot GFNs need to be mapped at an alias with
-the shared bit set. These shared mappings will be be mapped on the KVM
-MMU's "direct" root. The direct root has it's mappings shifted by
-applying "gfn_direct_bits" as a mask. The concept of "GPAW" (guest
-physical address width) determines the location of the shared bit. So set
-gfn_direct_bits based on this, to map shared memory at the proper GPA.
+TDX SEAMCALL API reference describes what resources are used.  It's known
+which TDX SEAMCALL can cause contention with which resources.  VMM can
+avoid contention inside the TDX module by avoiding contentious TDX SEAMCALL
+with, for example, spinlock.  Because OS knows better its process
+scheduling and its scalability, a lock at OS/VMM layer would work better
+than simply retrying TDX SEAMCALLs.
 
+TDH.MEM.* API except for TDH.MEM.TRACK operates on a secure EPT tree and
+the TDX module internally tries to acquire the lock of the secure EPT tree.
+They return TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT in case of failure to
+get the lock.  TDX KVM allows sept callbacks to return error so that TDP
+MMU layer can retry.
+
+Retry TDX TDH.MEM.* API on the error because the error is a rare event
+caused by zero-step attack mitigation.
+
+Signed-off-by: Yuan Yao <yuan.yao@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
 TDX MMU part 2 v1:
- - Move setting of gfn_direct_bits to separate patch (Yan)
----
- arch/x86/kvm/vmx/tdx.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ - Updates from seamcall overhaul (Kai)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 8f43977ef4c6..25c24901061b 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -921,6 +921,11 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- 	kvm_tdx->attributes = td_params->attributes;
- 	kvm_tdx->xfam = td_params->xfam;
+v19:
+ - fix typo TDG.VP.ENTER => TDH.VP.ENTER,
+   TDX_OPRRAN_BUSY => TDX_OPERAND_BUSY
+ - drop the description on TDH.VP.ENTER as this patch doesn't touch
+   TDH.VP.ENTER
+---
+ arch/x86/kvm/vmx/tdx_ops.h | 48 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
+index 0363d8544f42..8ca3e252a6ed 100644
+--- a/arch/x86/kvm/vmx/tdx_ops.h
++++ b/arch/x86/kvm/vmx/tdx_ops.h
+@@ -31,6 +31,40 @@
+ #define pr_tdx_error_3(__fn, __err, __rcx, __rdx, __r8)	\
+ 	pr_tdx_error_N(__fn, __err, "rcx 0x%llx, rdx 0x%llx, r8 0x%llx\n", __rcx, __rdx, __r8)
  
-+	if (td_params->exec_controls & TDX_EXEC_CONTROL_MAX_GPAW)
-+		kvm->arch.gfn_direct_bits = gpa_to_gfn(BIT_ULL(51));
-+	else
-+		kvm->arch.gfn_direct_bits = gpa_to_gfn(BIT_ULL(47));
++/*
++ * TDX module acquires its internal lock for resources.  It doesn't spin to get
++ * locks because of its restrictions of allowed execution time.  Instead, it
++ * returns TDX_OPERAND_BUSY with an operand id.
++ *
++ * Multiple VCPUs can operate on SEPT.  Also with zero-step attack mitigation,
++ * TDH.VP.ENTER may rarely acquire SEPT lock and release it when zero-step
++ * attack is suspected.  It results in TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT
++ * with TDH.MEM.* operation.  Note: TDH.MEM.TRACK is an exception.
++ *
++ * Because TDP MMU uses read lock for scalability, spin lock around SEAMCALL
++ * spoils TDP MMU effort.  Retry several times with the assumption that SEPT
++ * lock contention is rare.  But don't loop forever to avoid lockup.  Let TDP
++ * MMU retry.
++ */
++#define TDX_ERROR_SEPT_BUSY    (TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT)
 +
- out:
- 	/* kfree() accepts NULL. */
- 	kfree(init_vm);
++static inline u64 tdx_seamcall_sept(u64 op, struct tdx_module_args *in)
++{
++#define SEAMCALL_RETRY_MAX     16
++	struct tdx_module_args args_in;
++	int retry = SEAMCALL_RETRY_MAX;
++	u64 ret;
++
++	do {
++		args_in = *in;
++		ret = seamcall_ret(op, in);
++	} while (ret == TDX_ERROR_SEPT_BUSY && retry-- > 0);
++
++	*in = args_in;
++
++	return ret;
++}
++
+ static inline u64 tdh_mng_addcx(struct kvm_tdx *kvm_tdx, hpa_t addr)
+ {
+ 	struct tdx_module_args in = {
+@@ -55,7 +89,7 @@ static inline u64 tdh_mem_page_add(struct kvm_tdx *kvm_tdx, gpa_t gpa,
+ 	u64 ret;
+ 
+ 	clflush_cache_range(__va(hpa), PAGE_SIZE);
+-	ret = seamcall_ret(TDH_MEM_PAGE_ADD, &in);
++	ret = tdx_seamcall_sept(TDH_MEM_PAGE_ADD, &in);
+ 
+ 	*rcx = in.rcx;
+ 	*rdx = in.rdx;
+@@ -76,7 +110,7 @@ static inline u64 tdh_mem_sept_add(struct kvm_tdx *kvm_tdx, gpa_t gpa,
+ 
+ 	clflush_cache_range(__va(page), PAGE_SIZE);
+ 
+-	ret = seamcall_ret(TDH_MEM_SEPT_ADD, &in);
++	ret = tdx_seamcall_sept(TDH_MEM_SEPT_ADD, &in);
+ 
+ 	*rcx = in.rcx;
+ 	*rdx = in.rdx;
+@@ -93,7 +127,7 @@ static inline u64 tdh_mem_sept_remove(struct kvm_tdx *kvm_tdx, gpa_t gpa,
+ 	};
+ 	u64 ret;
+ 
+-	ret = seamcall_ret(TDH_MEM_SEPT_REMOVE, &in);
++	ret = tdx_seamcall_sept(TDH_MEM_SEPT_REMOVE, &in);
+ 
+ 	*rcx = in.rcx;
+ 	*rdx = in.rdx;
+@@ -123,7 +157,7 @@ static inline u64 tdh_mem_page_aug(struct kvm_tdx *kvm_tdx, gpa_t gpa, hpa_t hpa
+ 	u64 ret;
+ 
+ 	clflush_cache_range(__va(hpa), PAGE_SIZE);
+-	ret = seamcall_ret(TDH_MEM_PAGE_AUG, &in);
++	ret = tdx_seamcall_sept(TDH_MEM_PAGE_AUG, &in);
+ 
+ 	*rcx = in.rcx;
+ 	*rdx = in.rdx;
+@@ -140,7 +174,7 @@ static inline u64 tdh_mem_range_block(struct kvm_tdx *kvm_tdx, gpa_t gpa,
+ 	};
+ 	u64 ret;
+ 
+-	ret = seamcall_ret(TDH_MEM_RANGE_BLOCK, &in);
++	ret = tdx_seamcall_sept(TDH_MEM_RANGE_BLOCK, &in);
+ 
+ 	*rcx = in.rcx;
+ 	*rdx = in.rdx;
+@@ -335,7 +369,7 @@ static inline u64 tdh_mem_page_remove(struct kvm_tdx *kvm_tdx, gpa_t gpa,
+ 	};
+ 	u64 ret;
+ 
+-	ret = seamcall_ret(TDH_MEM_PAGE_REMOVE, &in);
++	ret = tdx_seamcall_sept(TDH_MEM_PAGE_REMOVE, &in);
+ 
+ 	*rcx = in.rcx;
+ 	*rdx = in.rdx;
+@@ -361,7 +395,7 @@ static inline u64 tdh_mem_range_unblock(struct kvm_tdx *kvm_tdx, gpa_t gpa,
+ 	};
+ 	u64 ret;
+ 
+-	ret = seamcall_ret(TDH_MEM_RANGE_UNBLOCK, &in);
++	ret = tdx_seamcall_sept(TDH_MEM_RANGE_UNBLOCK, &in);
+ 
+ 	*rcx = in.rcx;
+ 	*rdx = in.rdx;
 -- 
 2.34.1
 
