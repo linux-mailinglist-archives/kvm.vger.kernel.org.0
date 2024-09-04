@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-25824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25827-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B9E96AF18
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 05:19:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B93B96AF1E
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 05:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4CBB1C236EF
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 03:19:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EA631C23E78
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 03:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CEE613D61A;
-	Wed,  4 Sep 2024 03:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946D91448C5;
+	Wed,  4 Sep 2024 03:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ytze5hD2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TeFJRspa"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5C0139CFC;
-	Wed,  4 Sep 2024 03:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D2D13C690;
+	Wed,  4 Sep 2024 03:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725419684; cv=none; b=sN5lkjCKT/EOa4wHmDOzKI3hZspXThPihW+ehDJritr0+hNlih7AHyYoD/4QnCVTpA72MmY4AxqM/7E9XexQNjhT3FbKK86TawAn8LAff+D2sbVfVQuaREbzYceC+ZQ3F+/SMn+LlkIbLXtsjWrzqKeVSCIt0CITYpVGRCnJ500=
+	t=1725419686; cv=none; b=ZnqwI/bwv+Yswny9QP/Pz469EXpiJ70pEi+KrLT6j29HK8ygTIGLr78pHptT2/Z3t7bRe8ow7VYZ9UgcOHtUWKHxZdiXhiowwHh+0y0CFObzZJUHGloxiNTG9+SHO9zVmT0FV31CKbAQjYNv0lphOYIHhZkLhbyKpwU0Cyn4dxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725419684; c=relaxed/simple;
-	bh=P5V/xRC5gwlM8RuyOqE/ALPqpDAH8g0S2cKP5+h2srI=;
+	s=arc-20240116; t=1725419686; c=relaxed/simple;
+	bh=vzF4jMsbdAIEM7uSpTc8OouvMuhn8wUK+hjt+NiEOh8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QT2FwGCieRJfrmC2ePC3eIlzFYa4DIUvOssjS0dGG/ju+re2sMX9E8VSIxQix2CYeHWE8thPC5Pu9qgasujOCXvzBrBzBiN071g6dJNvP0fLrb39yREIQ2GZPDMPk8paffSk26yio9pyLDuojw6T2hThBURFZadbYZw3hbmZpyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ytze5hD2; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=nAmlW3/ZVe1GXGX6TNMfNaYydAMdc6j+2r1NIwVnmvnr0lL0oUBTPb9iObgkay4gB+KtNax9HXN/mFaoXJA/4pOh/aWzySqgE8d0wFW8XDz16iu+1zshZE4ZciSJjVCaJSipfTB0bBHjp7BDzcHUdGPrR6DvwGOFGm7qU0V9090=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TeFJRspa; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725419682; x=1756955682;
+  t=1725419684; x=1756955684;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=P5V/xRC5gwlM8RuyOqE/ALPqpDAH8g0S2cKP5+h2srI=;
-  b=Ytze5hD2eClOpgW4s2+SxPRmprQ4Wi+FKilipRhOfcJWh1/3MxXF/aJu
-   aX1/PzqUw+aepiWoxK4xOH4xu/ZxhuTvSgFZc/0ex20eZm96pO486homU
-   7Bd9i4ieY8SqHt1S1JTpANM05Q9eOt7VVyYVewH7wVRWpwWii55RYMNPF
-   Hw6zRcAOPWmRb3tj5HtROjCCebsKBgGu2VWwgwg2tsdWBp2TWJ1CzhPfT
-   phCwphNVBA+VMN92Dx1tLPRKPiUqoHV8DTApPJ7wFAe/7WYZ6j5BwnfS/
-   1B9nap8vx/wnhIYw67rPc+x4NOA/dzd86RTbH/osfNnyzLjclqH2L/cki
-   Q==;
-X-CSE-ConnectionGUID: T3g6alZdQ/mbP7igriSTGA==
-X-CSE-MsgGUID: JlcLZrAeTzK9uHHYuH7YDw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23564705"
+  bh=vzF4jMsbdAIEM7uSpTc8OouvMuhn8wUK+hjt+NiEOh8=;
+  b=TeFJRspau6/wIQ2ANrsDRsAwjldhQsBeu+MWh2iR9ZjAQcjo7SUo4WW0
+   mFekPkK3BxcS1zwbSauXMRqcwItypJIanhg6LXwk35NkSkLq9XaTW3ihj
+   Tqqe+MpOXS4UZ3rOkXYmViow265zoNvPzGm1vZ5ZxZj8bGdoD6zSnWIdJ
+   J5sNp8sntlq0ZDZaXD8PjOi2Hj6VDS0eENHg06bzeESjY9OkKQyOot7bo
+   PyTTvdDygm5j196AXfUTWqsFf83FnWtbF1aat8O2MsDYr08UcrUD6zRJB
+   8tbDujWSzgPgIipxCUDmR1ww/wLQVR+KANemjKu94ZGfRrfm/fNa5liBI
+   A==;
+X-CSE-ConnectionGUID: KnxubGoJTHmLUcYw/erxEQ==
+X-CSE-MsgGUID: 2KcFK8EpQgGjub3maeC+3Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23564710"
 X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
-   d="scan'208";a="23564705"
+   d="scan'208";a="23564710"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
   by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:08:10 -0700
-X-CSE-ConnectionGUID: 37obUln5S3GaxwtSWbZkhw==
-X-CSE-MsgGUID: waJ59fTCT9qWto0vgk/xig==
+X-CSE-ConnectionGUID: 6deKK6LdQDCausr+tjEUfg==
+X-CSE-MsgGUID: vQVCmvHSQWGkmWYvSDlc9g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
-   d="scan'208";a="65106341"
+   d="scan'208";a="65106350"
 Received: from dgramcko-desk.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.221.153])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:08:09 -0700
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:08:10 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -69,9 +69,9 @@ Cc: kai.huang@intel.com,
 	nik.borisov@suse.com,
 	rick.p.edgecombe@intel.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 15/21] KVM: TDX: Implement hook to get max mapping level of private pages
-Date: Tue,  3 Sep 2024 20:07:45 -0700
-Message-Id: <20240904030751.117579-16-rick.p.edgecombe@intel.com>
+Subject: [PATCH 16/21] KVM: TDX: Premap initial guest memory
+Date: Tue,  3 Sep 2024 20:07:46 -0700
+Message-Id: <20240904030751.117579-17-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
 References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
@@ -85,10 +85,28 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Implement hook private_max_mapping_level for TDX to let TDP MMU core get
-max mapping level of private pages.
+Update TDX's hook of set_external_spte() to record pre-mapping cnt instead
+of doing nothing and returning when TD is not finalized.
 
-The value is hard coded to 4K for no huge page support for now.
+TDX uses ioctl KVM_TDX_INIT_MEM_REGION to initialize its initial guest
+memory. This ioctl calls kvm_gmem_populate() to get guest pages and in
+tdx_gmem_post_populate(), it will
+(1) Map page table pages into KVM mirror page table and private EPT.
+(2) Map guest pages into KVM mirror page table. In the propagation hook,
+    just record pre-mapping cnt without mapping the guest page into private
+    EPT.
+(3) Map guest pages into private EPT and decrease pre-mapping cnt.
+
+Do not map guest pages into private EPT directly in step (2), because TDX
+requires TDH.MEM.PAGE.ADD() to add a guest page before TD is finalized,
+which copies page content from a source page from user to target guest page
+to be added. However, source page is not available via common interface
+kvm_tdp_map_page() in step (2).
+
+Therefore, just pre-map the guest page into KVM mirror page table and
+record the pre-mapping cnt in TDX's propagation hook. The pre-mapping cnt
+would be decreased in ioctl KVM_TDX_INIT_MEM_REGION when the guest page is
+mapped into private EPT.
 
 Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
@@ -96,82 +114,106 @@ Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
 TDX MMU part 2 v1:
- - Split from the big patch "KVM: TDX: TDP MMU TDX support".
- - Fix missing tdx_gmem_private_max_mapping_level() implementation for
-   !CONFIG_INTEL_TDX_HOST
+ - Update the code comment and patch log according to latest gmem update.
+   https://lore.kernel.org/kvm/CABgObfa=a3cKcKJHQRrCs-3Ty8ppSRou=dhi6Q+KdZnom0Zegw@mail.gmail.com/
+ - Rename tdx_mem_page_add() to tdx_mem_page_record_premap_cnt() to avoid
+   confusion.
+ - Change the patch title to "KVM: TDX: Premap initial guest memory".
+ - Rename KVM_MEMORY_MAPPING => KVM_MAP_MEMORY (Sean)
+ - Drop issueing TDH.MEM.PAGE.ADD() on KVM_MAP_MEMORY(), defer it to
+   KVM_TDX_INIT_MEM_REGION. (Sean)
+ - Added nr_premapped to track the number of premapped pages
+ - Drop tdx_post_mmu_map_page().
 
 v19:
- - Use gmem_max_level callback, delete tdp_max_page_level.
+ - Switched to use KVM_MEMORY_MAPPING
+ - Dropped measurement extension
+ - updated commit message. private_page_add() => set_private_spte()
 ---
- arch/x86/kvm/vmx/main.c    | 10 ++++++++++
- arch/x86/kvm/vmx/tdx.c     |  5 +++++
- arch/x86/kvm/vmx/x86_ops.h |  2 ++
- 3 files changed, 17 insertions(+)
+ arch/x86/kvm/vmx/tdx.c | 40 +++++++++++++++++++++++++++++++++-------
+ arch/x86/kvm/vmx/tdx.h |  2 +-
+ 2 files changed, 34 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index bf6fd5cca1d6..5d43b44e2467 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -184,6 +184,14 @@ static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- 	return tdx_vcpu_ioctl(vcpu, argp);
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 59b627b45475..435112562954 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -488,6 +488,34 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
+ 	return 0;
  }
  
-+static int vt_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
++/*
++ * KVM_TDX_INIT_MEM_REGION calls kvm_gmem_populate() to get guest pages and
++ * tdx_gmem_post_populate() to premap page table pages into private EPT.
++ * Mapping guest pages into private EPT before TD is finalized should use a
++ * seamcall TDH.MEM.PAGE.ADD(), which copies page content from a source page
++ * from user to target guest pages to be added. This source page is not
++ * available via common interface kvm_tdp_map_page(). So, currently,
++ * kvm_tdp_map_page() only premaps guest pages into KVM mirrored root.
++ * A counter nr_premapped is increased here to record status. The counter will
++ * be decreased after TDH.MEM.PAGE.ADD() is called after the kvm_tdp_map_page()
++ * in tdx_gmem_post_populate().
++ */
++static int tdx_mem_page_record_premap_cnt(struct kvm *kvm, gfn_t gfn,
++					  enum pg_level level, kvm_pfn_t pfn)
 +{
-+	if (is_td(kvm))
-+		return tdx_gmem_private_max_mapping_level(kvm, pfn);
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
 +
++	/* Returning error here to let TDP MMU bail out early. */
++	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm)) {
++		tdx_unpin(kvm, pfn);
++		return -EINVAL;
++	}
++
++	/* nr_premapped will be decreased when tdh_mem_page_add() is called. */
++	atomic64_inc(&kvm_tdx->nr_premapped);
 +	return 0;
 +}
 +
- #define VMX_REQUIRED_APICV_INHIBITS				\
- 	(BIT(APICV_INHIBIT_REASON_DISABLED) |			\
- 	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
-@@ -337,6 +345,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+ 			      enum pg_level level, kvm_pfn_t pfn)
+ {
+@@ -510,11 +538,7 @@ int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	if (likely(is_td_finalized(kvm_tdx)))
+ 		return tdx_mem_page_aug(kvm, gfn, level, pfn);
  
- 	.mem_enc_ioctl = vt_mem_enc_ioctl,
- 	.vcpu_mem_enc_ioctl = vt_vcpu_mem_enc_ioctl,
-+
-+	.private_max_mapping_level = vt_gmem_private_max_mapping_level
- };
- 
- struct kvm_x86_init_ops vt_init_ops __initdata = {
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index b8cd5a629a80..59b627b45475 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1582,6 +1582,11 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- 	return ret;
+-	/*
+-	 * TODO: KVM_MAP_MEMORY support to populate before finalize comes
+-	 * here for the initial memory.
+-	 */
+-	return 0;
++	return tdx_mem_page_record_premap_cnt(kvm, gfn, level, pfn);
  }
  
-+int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
-+{
-+	return PG_LEVEL_4K;
-+}
-+
- #define KVM_SUPPORTED_TD_ATTRS (TDX_TD_ATTR_SEPT_VE_DISABLE)
+ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+@@ -546,10 +570,12 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	if (unlikely(!is_td_finalized(kvm_tdx) &&
+ 		     err == (TDX_EPT_WALK_FAILED | TDX_OPERAND_ID_RCX))) {
+ 		/*
+-		 * This page was mapped with KVM_MAP_MEMORY, but
+-		 * KVM_TDX_INIT_MEM_REGION is not issued yet.
++		 * Page is mapped by KVM_TDX_INIT_MEM_REGION, but hasn't called
++		 * tdh_mem_page_add().
+ 		 */
+ 		if (!is_last_spte(entry, level) || !(entry & VMX_EPT_RWX_MASK)) {
++			WARN_ON_ONCE(!atomic64_read(&kvm_tdx->nr_premapped));
++			atomic64_dec(&kvm_tdx->nr_premapped);
+ 			tdx_unpin(kvm, pfn);
+ 			return 0;
+ 		}
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 66540c57ed61..25a4aaede2ba 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -26,7 +26,7 @@ struct kvm_tdx {
  
- static int __init setup_kvm_tdx_caps(void)
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index d1db807b793a..66829413797d 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -142,6 +142,7 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	u64 tsc_offset;
  
- void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
- void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
-+int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
- #else
- static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
- static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
-@@ -185,6 +186,7 @@ static inline int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+-	/* For KVM_MAP_MEMORY and KVM_TDX_INIT_MEM_REGION. */
++	/* For KVM_TDX_INIT_MEM_REGION. */
+ 	atomic64_t nr_premapped;
  
- static inline void tdx_flush_tlb_current(struct kvm_vcpu *vcpu) {}
- static inline void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level) {}
-+static inline int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn) { return 0; }
- #endif
- 
- #endif /* __KVM_X86_VMX_X86_OPS_H */
+ 	struct kvm_cpuid2 *cpuid;
 -- 
 2.34.1
 
