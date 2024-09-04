@@ -1,299 +1,236 @@
-Return-Path: <kvm+bounces-25911-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25912-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0665696C8C9
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 22:43:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C558C96C94E
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 23:11:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2EA228723B
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 20:43:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAD351C255E1
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 21:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890F11E7672;
-	Wed,  4 Sep 2024 20:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DA7156225;
+	Wed,  4 Sep 2024 21:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sh0WpAOh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CEksFbgQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC2F1741C0
-	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 20:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6308913D516;
+	Wed,  4 Sep 2024 21:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725482554; cv=none; b=jXfjzSowLzp7NI8kf5+hwJT46WtKq24qal1LvL3aYHBMRKPvaWRvU96r6bFVxbbfmQ3T9JroBXuaN54/m7NKnyajYvVMZiN+8zUnnaV4Gan9D4b+N+nHEuOYdWRqa0VdBFYdDnqdzSURGlOTD9K93bv1Y25ZyfgHMQRXe9Fu74M=
+	t=1725484113; cv=none; b=VB0IkpWGpZ7XwBsxmKZL32cCzuukZ/TtjaJL8SafcbEFH/MYT7rqctb2XqNNIEgE7f53BeqbG1biTCdVkke2z11NNCMbSFfwKw/yj3J9VGy0Je9/zjxvT7BeAubdOgJvNcxrb6a0knlhTCkrc7rsiBRaVw8ncRotTdIWiU13uzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725482554; c=relaxed/simple;
-	bh=+AZhzeE+TZ65vAr8u0N0Wleqi4qKXSh9vbq6Xw4afuc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XaJGK0Bdm3fpNc9VRzw18FqyWGrPO/fK0WA4v8Z5cN/6cXYQlGR8aLywz3h/DpfZ1YNTdDG/tY4qzdLw9Ko93GhmuZCJTeILxHR0XCBAUtotV0b+PoagvOETok85znRBdYWxZHe5PQ4+SZwdG6WrMJEzLzzwBVa/fv4Qa2C2wwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sh0WpAOh; arc=none smtp.client-ip=209.85.166.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-82a1c57f4a1so1055043339f.3
-        for <kvm@vger.kernel.org>; Wed, 04 Sep 2024 13:42:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725482552; x=1726087352; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZQ6pbNS+V/v0w7+0Yvg7TstZGOzD6SJqSq8ykXuoLos=;
-        b=Sh0WpAOha8xnP9NU6iyBNhOtk5t/wtlAjtzhLx0yRAI6//jEMQGnNSAEXyzTvLRgcD
-         lxWW7Rrk86Qgjwfz2i/4SHk3Ng+5/9LiImU6gQxFKaRN27cT6GkWItrnt61b1tFK/tcs
-         N0GuIIaX1j63PKbOIDlI8eKTsaeusYIJQwF1sUvwhtRWAFKng1UK3BjdCXwJqhpuNsEr
-         LcOKN/R2jH5+vi8JAY2JTvOqy1fLN94mhapPsbf0GqS0i/hnIWjS2tlNxvNqSGlT8crb
-         4oXj0dkgYtPVrnywPClp1jUT0Zo77X6uy0t/4z+SdlMpHXsRrIdP3NTy9iif+xO0v5ct
-         NRJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725482552; x=1726087352;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZQ6pbNS+V/v0w7+0Yvg7TstZGOzD6SJqSq8ykXuoLos=;
-        b=TbxSmU1BOo0QKOmMsVIyAYjYBcpeYNrcCPawmt4fNWc+VXMTRK8U1GTokiALwZxyUY
-         XH9w9+qciDJL8QU7YfT3RcmkiSVxypspcQX1UbnKHs4zI2G/MFsyDiGgGc5Q6o4Mb8hA
-         sZVY26Y1RUiSFXdYsQpXWuEFNe43tEHn6qZ0jisq/M/EqtM3LYkGULATeIV7oBJYPNFn
-         2cfenG8ABnCmmUCgQefel5tWjb71aTL3J0LjgAvO/mtc04AUx2+Ew0FeF7m8yhPy+pqh
-         4/ci1mjFa8sH4aLiBGo29p0r1yrt8L9Fg4auGbxKjbNb2jvgSamvZ4a3Sbunup0r+axx
-         HjXg==
-X-Gm-Message-State: AOJu0YwD/NAByKyQtyULnOMzyQAjQDjEjP9Dpmr5748IZKEocK8vbE+n
-	G8ms25KtJa9zE+RLz6/e/v9h55b+S8q3/9W+9/Hhh+tjmFm+VgReoGTn1jNJ4yY8KCvXVamWAKI
-	96aRP8ALZZUiuTLnE5Y0RbD17MJMyLqIploxycd+eZk9E+taK1CNAWyAH2MIk8i3uWTGTZOFkQ1
-	FnLT0BYaGWBXSXwl9hQ+I3GWjtabQzamkyKrh+ZT/XiCy+DSqiFqCr/l8=
-X-Google-Smtp-Source: AGHT+IH9EBCT8+ykT+OpvYVmgAL1GejG/P9BrG7iuA2P0w+bQDK+bVWQxO99M8Ql2oemuKA/7xEPoMWRBeRAyi1Jng==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:40a3:b0:4b9:ad96:2adc with
- SMTP id 8926c6da1cb9f-4d017e9afc4mr1111520173.4.1725482551325; Wed, 04 Sep
- 2024 13:42:31 -0700 (PDT)
-Date: Wed,  4 Sep 2024 20:41:33 +0000
-In-Reply-To: <20240904204133.1442132-1-coltonlewis@google.com>
+	s=arc-20240116; t=1725484113; c=relaxed/simple;
+	bh=j39n7HMXYSdWvCK+sacpXRMJepgp+GKhtUwav+NXleA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JFTdWnAaPXx7fqC54+SLVRY3JM+zAp0fVSky7YBnXBJZ7NGuCxySiB/ww+F+sF5YtTKtzqGWnKZP8V6/Gfg3+87nT+lFmKN+bJ41MjbrtwKnMHwYenN2CltLfqEjdTNPowGeVKVXERezs3VjJ+FURsUdm2CuJqqwG/r6Ky4eUj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CEksFbgQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6463EC4CEC2;
+	Wed,  4 Sep 2024 21:08:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725484112;
+	bh=j39n7HMXYSdWvCK+sacpXRMJepgp+GKhtUwav+NXleA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CEksFbgQZObZLDnqWJkwWCj0+wXpAN4FFzwndFABiKSNtYHdHb6BNlmVVhf3cZg40
+	 MsCEUJStaXtasB2CJVScv2P1KR4w78YEpqcIqiyNb2H174B9z+8LDQFOGAIG7Q6Rh0
+	 xfVxK300sSeAYRgj4y5Q7Wrc31YB2Fn6kT6hlROZjCEu/kWbMJk/GolQVXgbfDJSj3
+	 za+pzJJWvsZZP9Q45feH4udETnBsEGNgFA9yTnXnlmW3bfq05gXz21UByX7HfnMqiB
+	 3wUHJpYNpeApqLJ/unnnZruAI59JA44c7mqBWRGzn+/lFbpfLCv1OAvqJFd6bdvp9G
+	 V+7NCiEc2MyQg==
+Date: Wed, 4 Sep 2024 14:08:30 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Chao Gao <chao.gao@intel.com>,
+	Zeng Guang <guang.zeng@intel.com>
+Subject: Re: [PATCH 1/6] KVM: nVMX: Get to-be-acknowledge IRQ for nested
+ VM-Exit at injection site
+Message-ID: <20240904210830.GA1229985@thelio-3990X>
+References: <20240720000138.3027780-1-seanjc@google.com>
+ <20240720000138.3027780-2-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240904204133.1442132-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <20240904204133.1442132-6-coltonlewis@google.com>
-Subject: [PATCH 5/5] perf: Correct perf sampling with guest VMs
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Kan Liang <kan.liang@linux.intel.com>, Will Deacon <will@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H . Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, 
-	Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240720000138.3027780-2-seanjc@google.com>
 
-Previously any PMU overflow interrupt that fired while a VCPU was
-loaded was recorded as a guest event whether it truly was or not. This
-resulted in nonsense perf recordings that did not honor
-perf_event_attr.exclude_guest and recorded guest IPs where it should
-have recorded host IPs.
+Hi Sean,
 
-Reorganize that plumbing to record perf events correctly even when
-VCPUs are loaded.
+On Fri, Jul 19, 2024 at 05:01:33PM -0700, Sean Christopherson wrote:
+> Move the logic to get the to-be-acknowledge IRQ for a nested VM-Exit from
+> nested_vmx_vmexit() to vmx_check_nested_events(), which is subtly the one
+> and only path where KVM invokes nested_vmx_vmexit() with
+> EXIT_REASON_EXTERNAL_INTERRUPT.  A future fix will perform a last-minute
+> check on L2's nested posted interrupt notification vector, just before
+> injecting a nested VM-Exit.  To handle that scenario correctly, KVM needs
+> to get the interrupt _before_ injecting VM-Exit, as simply querying the
+> highest priority interrupt, via kvm_cpu_has_interrupt(), would result in
+> TOCTOU bug, as a new, higher priority interrupt could arrive between
+> kvm_cpu_has_interrupt() and kvm_cpu_get_interrupt().
+> 
+> Opportunistically convert the WARN_ON() to a WARN_ON_ONCE().  If KVM has
+> a bug that results in a false positive from kvm_cpu_has_interrupt(),
+> spamming dmesg won't help the situation.
+> 
+> Note, nested_vmx_reflect_vmexit() can never reflect external interrupts as
+> they are always "wanted" by L0.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 2392a7ef254d..b3e17635f7e3 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -4284,11 +4284,26 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	if (kvm_cpu_has_interrupt(vcpu) && !vmx_interrupt_blocked(vcpu)) {
+> +		u32 exit_intr_info;
+> +
+>  		if (block_nested_events)
+>  			return -EBUSY;
+>  		if (!nested_exit_on_intr(vcpu))
+>  			goto no_vmexit;
+> -		nested_vmx_vmexit(vcpu, EXIT_REASON_EXTERNAL_INTERRUPT, 0, 0);
+> +
+> +		if (nested_exit_intr_ack_set(vcpu)) {
+> +			int irq;
+> +
+> +			irq = kvm_cpu_get_interrupt(vcpu);
+> +			WARN_ON_ONCE(irq < 0);
+> +
+> +			exit_intr_info = INTR_INFO_VALID_MASK | INTR_TYPE_EXT_INTR | irq;
+> +		} else {
+> +			exit_intr_info = 0;
+> +		}
+> +
+> +		nested_vmx_vmexit(vcpu, EXIT_REASON_EXTERNAL_INTERRUPT,
+> +				  exit_intr_info, 0);
+>  		return 0;
+>  	}
+>  
+> @@ -4969,14 +4984,6 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+>  	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>  
+>  	if (likely(!vmx->fail)) {
+> -		if ((u16)vm_exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT &&
+> -		    nested_exit_intr_ack_set(vcpu)) {
+> -			int irq = kvm_cpu_get_interrupt(vcpu);
+> -			WARN_ON(irq < 0);
+> -			vmcs12->vm_exit_intr_info = irq |
+> -				INTR_INFO_VALID_MASK | INTR_TYPE_EXT_INTR;
+> -		}
+> -
+>  		if (vm_exit_reason != -1)
+>  			trace_kvm_nested_vmexit_inject(vmcs12->vm_exit_reason,
+>  						       vmcs12->exit_qualification,
+> -- 
+> 2.45.2.1089.g2a221341d9-goog
+> 
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- arch/arm64/include/asm/perf_event.h |  4 ----
- arch/arm64/kernel/perf_callchain.c  | 28 ----------------------------
- arch/x86/events/core.c              | 16 ++++------------
- include/linux/perf_event.h          | 21 +++++++++++++++++++--
- kernel/events/core.c                | 21 +++++++++++++++++----
- 5 files changed, 40 insertions(+), 50 deletions(-)
+I bisected (log below) an issue with starting a nested guest that
+appears on two of my newer Intel test machines (but not a somewhat old
+laptop) when this change as commit 6f373f4d941b ("KVM: nVMX: Get
+to-be-acknowledge IRQ for nested VM-Exit at injection site") in -next is
+present in the host kernel.
 
-diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-index 31a5584ed423..ee45b4e77347 100644
---- a/arch/arm64/include/asm/perf_event.h
-+++ b/arch/arm64/include/asm/perf_event.h
-@@ -10,10 +10,6 @@
- #include <asm/ptrace.h>
- 
- #ifdef CONFIG_PERF_EVENTS
--struct pt_regs;
--extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
--extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
--#define perf_arch_misc_flags(regs)	perf_misc_flags(regs)
- #define perf_arch_bpf_user_pt_regs(regs) &regs->user_regs
- #endif
- 
-diff --git a/arch/arm64/kernel/perf_callchain.c b/arch/arm64/kernel/perf_callchain.c
-index 01a9d08fc009..9b7f26b128b5 100644
---- a/arch/arm64/kernel/perf_callchain.c
-+++ b/arch/arm64/kernel/perf_callchain.c
-@@ -38,31 +38,3 @@ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
- 
- 	arch_stack_walk(callchain_trace, entry, current, regs);
- }
--
--unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
--{
--	if (perf_guest_state())
--		return perf_guest_get_ip();
--
--	return instruction_pointer(regs);
--}
--
--unsigned long perf_arch_misc_flags(struct pt_regs *regs)
--{
--	unsigned int guest_state = perf_guest_state();
--	int misc = 0;
--
--	if (guest_state) {
--		if (guest_state & PERF_GUEST_USER)
--			misc |= PERF_RECORD_MISC_GUEST_USER;
--		else
--			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
--	} else {
--		if (user_mode(regs))
--			misc |= PERF_RECORD_MISC_USER;
--		else
--			misc |= PERF_RECORD_MISC_KERNEL;
--	}
--
--	return misc;
--}
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index 87457e5d7f65..2049b70c5af7 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -2942,9 +2942,6 @@ static unsigned long code_segment_base(struct pt_regs *regs)
- 
- unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
- {
--	if (perf_guest_state())
--		return perf_guest_get_ip();
--
- 	return regs->ip + code_segment_base(regs);
- }
- 
-@@ -2971,17 +2968,12 @@ unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
- 
- unsigned long perf_arch_misc_flags(struct pt_regs *regs)
- {
--	unsigned int guest_state = perf_guest_state();
- 	unsigned long misc = common_misc_flags();
- 
--	if (guest_state) {
--		misc |= perf_arch_guest_misc_flags(regs);
--	} else {
--		if (user_mode(regs))
--			misc |= PERF_RECORD_MISC_USER;
--		else
--			misc |= PERF_RECORD_MISC_KERNEL;
--	}
-+	if (user_mode(regs))
-+		misc |= PERF_RECORD_MISC_USER;
-+	else
-+		misc |= PERF_RECORD_MISC_KERNEL;
- 
- 	return misc;
- }
-diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-index d061e327ad54..968f3edd95e4 100644
---- a/include/linux/perf_event.h
-+++ b/include/linux/perf_event.h
-@@ -1633,8 +1633,9 @@ extern void perf_tp_event(u16 event_type, u64 count, void *record,
- 			  struct task_struct *task);
- extern void perf_bp_event(struct perf_event *event, void *data);
- 
--extern unsigned long perf_misc_flags(struct pt_regs *regs);
--extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-+extern unsigned long perf_misc_flags(struct perf_event *event, struct pt_regs *regs);
-+extern unsigned long perf_instruction_pointer(struct perf_event *event,
-+					      struct pt_regs *regs);
- 
- #ifndef perf_arch_misc_flags
- # define perf_arch_misc_flags(regs) \
-@@ -1645,6 +1646,22 @@ extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
- # define perf_arch_bpf_user_pt_regs(regs) regs
- #endif
- 
-+#ifndef perf_arch_guest_misc_flags
-+static inline unsigned long perf_arch_guest_misc_flags(struct pt_regs *regs)
-+{
-+	unsigned long guest_state = perf_guest_state();
-+
-+	if (guest_state & PERF_GUEST_USER)
-+		return PERF_RECORD_MISC_GUEST_USER;
-+
-+	if (guest_state & PERF_GUEST_ACTIVE)
-+		return PERF_RECORD_MISC_GUEST_KERNEL;
-+
-+	return 0;
-+}
-+# define perf_arch_guest_misc_flags(regs)	perf_arch_guest_misc_flags(regs)
-+#endif
-+
- static inline bool has_branch_stack(struct perf_event *event)
- {
- 	return event->attr.sample_type & PERF_SAMPLE_BRANCH_STACK;
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 4384f6c49930..e1a66c9c3773 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -6915,13 +6915,26 @@ void perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
- EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
- #endif
- 
--unsigned long perf_misc_flags(unsigned long pt_regs *regs)
-+static bool is_guest_event(struct perf_event *event)
- {
-+	return !event->attr.exclude_guest && perf_guest_state();
-+}
-+
-+unsigned long perf_misc_flags(struct perf_event *event,
-+			      struct pt_regs *regs)
-+{
-+	if (is_guest_event(event))
-+		return perf_arch_guest_misc_flags(regs);
-+
- 	return perf_arch_misc_flags(regs);
- }
- 
--unsigned long perf_instruction_pointer(unsigned long pt_regs *regs)
-+unsigned long perf_instruction_pointer(struct perf_event *event,
-+				       struct pt_regs *regs)
- {
-+	if (is_guest_event(event))
-+		return perf_guest_get_ip();
-+
- 	return perf_arch_instruction_pointer(regs);
- }
- 
-@@ -7737,7 +7750,7 @@ void perf_prepare_sample(struct perf_sample_data *data,
- 	__perf_event_header__init_id(data, event, filtered_sample_type);
- 
- 	if (filtered_sample_type & PERF_SAMPLE_IP) {
--		data->ip = perf_instruction_pointer(regs);
-+		data->ip = perf_instruction_pointer(event, regs);
- 		data->sample_flags |= PERF_SAMPLE_IP;
- 	}
- 
-@@ -7901,7 +7914,7 @@ void perf_prepare_header(struct perf_event_header *header,
- {
- 	header->type = PERF_RECORD_SAMPLE;
- 	header->size = perf_sample_data_size(data, event);
--	header->misc = perf_misc_flags(regs);
-+	header->misc = perf_misc_flags(event, regs);
- 
- 	/*
- 	 * If you're adding more sample types here, you likely need to do
--- 
-2.46.0.469.g59c65b2a67-goog
+I start a virtual machine with a full distribution using QEMU then start
+a nested virtual machine using QEMU with the same kernel and a much
+simpler Buildroot initrd, just to test the ability to run a nested
+guest. After this change, starting a nested guest results in no output
+from the nested guest and eventually the first guest restarts, sometimes
+printing a lockup message that appears to be caused from qemu-system-x86
 
+My command for the first guest on the host (in case it matters):
+
+  $ qemu-system-x86_64 \
+      -display none \
+      -serial mon:stdio \
+      -nic user,model=virtio-net-pci,hostfwd=tcp::8022-:22 \
+      -object rng-random,filename=/dev/urandom,id=rng0 \
+      -device virtio-rng-pci \
+      -chardev socket,id=char0,path=$VM_FOLDER/x86_64/arch/vfsd.sock \
+      -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=host \
+      -object memory-backend-memfd,id=mem,share=on,size=16G \
+      -numa node,memdev=mem \
+      -m 16G \
+      -device virtio-balloon \
+      -smp 8 \
+      -drive if=pflash,format=raw,file=$VM_FOLDER/x86_64/arch/efi.img,readonly=on \
+      -drive if=pflash,format=raw,file=$VM_FOLDER/x86_64/arch/efi_vars.img \
+      -cpu host \
+      -enable-kvm \
+      -M q35 \
+      -drive if=virtio,format=qcow2,file=$VM_FOLDER/x86_64/arch/disk.img
+
+My commands in the first guest to spawn the nested guest:
+
+  $ cd $(mktemp -d)
+
+  $ curl -LSs https://archive.archlinux.org/packages/l/linux/linux-6.10.8.arch1-1-x86_64.pkg.tar.zst | tar --zstd -xf -
+
+  $ curl -LSs https://github.com/ClangBuiltLinux/boot-utils/releases/download/20230707-182910/x86_64-rootfs.cpio.zst | zstd -d >rootfs.cpio
+
+  $ qemu-system-x86_64 \
+      -display none \
+      -nodefaults \
+      -M q35 \
+      -d unimp,guest_errors \
+      -append 'console=ttyS0 earlycon=uart8250,io,0x3f8 loglevel=7' \
+      -kernel usr/lib/modules/6.10.8-arch1-1/vmlinuz \
+      -initrd rootfs.cpio \
+      -cpu host \
+      -enable-kvm \
+      -m 512m \
+      -smp 8 \
+      -serial mon:stdio
+
+If there is any additional information I can provide or patches I can
+test, I am more than happy to do so.
+
+Cheers,
+Nathan
+
+# bad: [6804f0edbe7747774e6ae60f20cec4ee3ad7c187] Add linux-next specific files for 20240903
+# good: [67784a74e258a467225f0e68335df77acd67b7ab] Merge tag 'ata-6.11-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/libata/linux
+git bisect start '6804f0edbe7747774e6ae60f20cec4ee3ad7c187' '67784a74e258a467225f0e68335df77acd67b7ab'
+# good: [6b63f16410fa86f6a2e9f52c9cb52ba94c363f3e] Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+git bisect good 6b63f16410fa86f6a2e9f52c9cb52ba94c363f3e
+# good: [194eaf7dd63eef7cee974daeb4df01a3e6b144fe] Merge branch 'for-next' of git://git.kernel.org/pub/scm/linux/kernel/git/sre/linux-power-supply.git
+git bisect good 194eaf7dd63eef7cee974daeb4df01a3e6b144fe
+# bad: [a8f65643f59dac67451d09ff298fa7f6e7917794] Merge branch 'next' of git://git.kernel.org/pub/scm/linux/kernel/git/westeri/thunderbolt.git
+git bisect bad a8f65643f59dac67451d09ff298fa7f6e7917794
+# good: [f80eff5b9f33c4f8d86ba046f3ee54c4f2224454] Merge branch 'timers/drivers/next' of https://git.linaro.org/people/daniel.lezcano/linux.git
+git bisect good f80eff5b9f33c4f8d86ba046f3ee54c4f2224454
+# bad: [a93e40d038ccd17e6cf691e1b8fec8821998baf2] Merge branch 'for-next' of git://git.kernel.org/pub/scm/linux/kernel/git/dennis/percpu.git
+git bisect bad a93e40d038ccd17e6cf691e1b8fec8821998baf2
+# good: [500b6c92524183f97e3a3c8e6c56f8af69429ba4] Merge branch 'non-rcu/next' of git://git.kernel.org/pub/scm/linux/kernel/git/paulmck/linux-rcu.git
+git bisect good 500b6c92524183f97e3a3c8e6c56f8af69429ba4
+# bad: [642613182efa0927c8bd4d4ef2c6b8350554b6ad] Merge branches 'fixes', 'generic', 'misc', 'mmu', 'pat_vmx_msrs', 'selftests', 'svm' and 'vmx'
+git bisect bad 642613182efa0927c8bd4d4ef2c6b8350554b6ad
+# good: [1876dd69dfe8c29e249070b0e4dc941fc15ac1e4] KVM: x86: Add fastpath handling of HLT VM-Exits
+git bisect good 1876dd69dfe8c29e249070b0e4dc941fc15ac1e4
+# bad: [44518120c4ca569cfb9c6199e94c312458dc1c07] KVM: nVMX: Detect nested posted interrupt NV at nested VM-Exit injection
+git bisect bad 44518120c4ca569cfb9c6199e94c312458dc1c07
+# good: [2ab637df5f68d4e0cfa9becd10f43400aee785b3] KVM: VMX: hyper-v: Prevent impossible NULL pointer dereference in evmcs_load()
+git bisect good 2ab637df5f68d4e0cfa9becd10f43400aee785b3
+# bad: [f729851189d5741e7d1059e250422611028657f8] KVM: x86: Don't move VMX's nested PI notification vector from IRR to ISR
+git bisect bad f729851189d5741e7d1059e250422611028657f8
+# bad: [cb14e454add0efc9bc461c1ad30d9c950c406fab] KVM: nVMX: Suppress external interrupt VM-Exit injection if there's no IRQ
+git bisect bad cb14e454add0efc9bc461c1ad30d9c950c406fab
+# bad: [6f373f4d941bf79f06e9abd4a827288ad1de6399] KVM: nVMX: Get to-be-acknowledge IRQ for nested VM-Exit at injection site
+git bisect bad 6f373f4d941bf79f06e9abd4a827288ad1de6399
+# first bad commit: [6f373f4d941bf79f06e9abd4a827288ad1de6399] KVM: nVMX: Get to-be-acknowledge IRQ for nested VM-Exit at injection site
 
