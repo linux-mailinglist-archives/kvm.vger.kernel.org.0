@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-25853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25851-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAEDA96BA43
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 13:23:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD1D96BA42
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 13:23:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37B1B1F21421
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 11:23:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4192D285602
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 11:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D82B1D5CED;
-	Wed,  4 Sep 2024 11:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E2F1D54DC;
+	Wed,  4 Sep 2024 11:18:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RNXUWryM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="az4tY5ay"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295891D0974
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639911D0966
 	for <kvm@vger.kernel.org>; Wed,  4 Sep 2024 11:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725448736; cv=none; b=RITEYijylmMPAF0wkl58g+TU3rkGRT5dBH4intmOfXv1lBaCm/rOrnnM0o2EZn/+ATxuVwXhR0bUe3J5NfUp76rW3QsuA0k8ux+w6/YgmJ+/vl5hZJr1n8gxi52DZ+Qc+wqZKHTd9Y6nVDr4w2BlN7hofcBOdlJ9xU33BVIe45A=
+	t=1725448735; cv=none; b=Z5C7Fw81mYNgs/Y2bgpRd93PlVx2vXxgkaKctyWTlbASQh7A9dV0dHBmfW74TAUATJSlH6KUtOB/Vab08aisaadumptopHWsZDRVXvkYwkr8Kg777CLBWBGHg3jEmFMa82NV/h6/CMKRt8FS0FJYhA360MuMC7QSfSrsGqZI7EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725448736; c=relaxed/simple;
-	bh=7+GTVr4QMMy1cDqCdN64Bnp+xJ873QbTUin232uIsd8=;
+	s=arc-20240116; t=1725448735; c=relaxed/simple;
+	bh=5DADHnOdVY8Q6Qbi2QPije39VC68w82G4KmJNbc5aRA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=KpRD4wBYzyNeHucFcXkAcl4Cxb0Jkt1tDLpQPVSKw8Gdu4/RpJuJWPLEH3AbPncUp0Aq16L/CfLVqve5nbTCh90x4EHeR+7WnNSODnFWzQcD0YtFr1wCPs3UvCxXWXg/2646PHUIAYDFYyFP9vFfcz9070zNKPZqbeA1XgnqnRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RNXUWryM; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=BdDIoszeMRpOigfo89YiRrwCyrryLUnLCHg1sJXFqB959va65XFXTbQ3XGqCKDMViSRW6sFObFYEnrSbbI69To6ISEH1YeCub3YWleP+/hptOMi3tM+PQzuA7IVBGUO8dCyeujTPsGiiBPb5XvFc1TMqwmPNcD1FOY2f01ZKO6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=az4tY5ay; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725448733;
+	s=mimecast20190719; t=1725448732;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mx0VBf7PIZMmG9UblVDStv63N2fkZrKVnw2Bb2K1RLo=;
-	b=RNXUWryMXlx75uwUxurhGDvYu47ALU4QPQ6cppppVHQ1vA3BI4MbaSjMYtxg/R4RmuQYIM
-	5Znv6kndb7BiOYKbdvg9Gtv37ViW9l06LgRgt8q8icEzRrFa6S670ziqvm0p/bquG34qQX
-	wanHx5d+KiAqLtxXcuMrNx8X2qttce0=
+	bh=XgpYkJsaI9m1H5zaH4zbGBX7PFklNC5stqAFMp25Csk=;
+	b=az4tY5ayDrYTcgd21UGOH4pAHSjRNd400MXKgSdFhOWnzoI7ajyme+j5Tf0o/4w0eh87QR
+	z8blj4i/h8ylVy4eMestUnQZBXMioNTwEJzoO0GxXxh4wSTPsLULvqkJNGx/+UQncoHrHH
+	HE4ZeouFCmkFALM1qQAWPytAec9HFNM=
 Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-330-f_RRaaRgPMeBbeFZ_Pxv9g-1; Wed,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-526-63Bd3otfNrOJFq-UnnzLfw-1; Wed,
  04 Sep 2024 07:18:49 -0400
-X-MC-Unique: f_RRaaRgPMeBbeFZ_Pxv9g-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+X-MC-Unique: 63Bd3otfNrOJFq-UnnzLfw-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DF53D1955DA6;
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 42F9D1955D57;
 	Wed,  4 Sep 2024 11:18:45 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.39.192.112])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C8C501956086;
-	Wed,  4 Sep 2024 11:18:43 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 27DC419560AE;
+	Wed,  4 Sep 2024 11:18:44 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id AF9F021E68BD; Wed,  4 Sep 2024 13:18:36 +0200 (CEST)
+	id B4BE621E681F; Wed,  4 Sep 2024 13:18:36 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: alex.williamson@redhat.com,
@@ -109,9 +109,9 @@ Cc: alex.williamson@redhat.com,
 	qemu-s390x@nongnu.org,
 	kvm@vger.kernel.org,
 	avihaih@nvidia.com
-Subject: [PATCH v2 08/19] qapi/ui: Drop temporary 'prefix'
-Date: Wed,  4 Sep 2024 13:18:25 +0200
-Message-ID: <20240904111836.3273842-9-armbru@redhat.com>
+Subject: [PATCH v2 09/19] qapi/machine: Rename CpuS390* to S390Cpu*, and drop 'prefix'
+Date: Wed,  4 Sep 2024 13:18:26 +0200
+Message-ID: <20240904111836.3273842-10-armbru@redhat.com>
 In-Reply-To: <20240904111836.3273842-1-armbru@redhat.com>
 References: <20240904111836.3273842-1-armbru@redhat.com>
 Precedence: bulk
@@ -120,243 +120,254 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Recent commit "qapi: Smarter camel_to_upper() to reduce need for
-'prefix'" added a temporary 'prefix' to delay changing the generated
-code.
+QAPI's 'prefix' feature can make the connection between enumeration
+type and its constants less than obvious.  It's best used with
+restraint.
 
-Revert it.  This improves DisplayGLMode's generated enumeration
-constant prefix from DISPLAYGL_MODE to DISPLAY_GL_MODE.
+CpuS390Entitlement has a 'prefix' to change the generated enumeration
+constants' prefix from CPU_S390_ENTITLEMENT to S390_CPU_ENTITLEMENT.
+Rename the type to S390CpuEntitlement, so that 'prefix' is not needed.
+
+Likewise change CpuS390Polarization to S390CpuPolarization, and
+CpuS390State to S390CpuState.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- qapi/ui.json      |  1 -
- system/vl.c       |  2 +-
- ui/dbus.c         |  8 ++++----
- ui/egl-context.c  |  2 +-
- ui/egl-headless.c |  2 +-
- ui/egl-helpers.c  | 12 ++++++------
- ui/gtk.c          |  4 ++--
- ui/sdl2-gl.c      |  8 ++++----
- ui/sdl2.c         |  2 +-
- ui/spice-core.c   |  2 +-
- 10 files changed, 21 insertions(+), 22 deletions(-)
+ qapi/machine-common.json            |  5 ++---
+ qapi/machine-target.json            | 11 +++++------
+ qapi/machine.json                   |  9 ++++-----
+ qapi/pragma.json                    |  6 +++---
+ include/hw/qdev-properties-system.h |  2 +-
+ include/hw/s390x/cpu-topology.h     |  2 +-
+ target/s390x/cpu.h                  |  2 +-
+ hw/core/qdev-properties-system.c    |  6 +++---
+ hw/s390x/cpu-topology.c             |  6 +++---
+ 9 files changed, 23 insertions(+), 26 deletions(-)
 
-diff --git a/qapi/ui.json b/qapi/ui.json
-index f61a2b6b65..460a26b981 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1397,7 +1397,6 @@
- # Since: 3.0
+diff --git a/qapi/machine-common.json b/qapi/machine-common.json
+index fa6bd71d12..b64e4895cf 100644
+--- a/qapi/machine-common.json
++++ b/qapi/machine-common.json
+@@ -9,13 +9,12 @@
  ##
- { 'enum'    : 'DisplayGLMode',
--  'prefix'  : 'DISPLAYGL_MODE', # TODO drop
-   'data'    : [ 'off', 'on', 'core', 'es' ] }
  
  ##
-diff --git a/system/vl.c b/system/vl.c
-index 01b8b8e77a..fe547ca47c 100644
---- a/system/vl.c
-+++ b/system/vl.c
-@@ -1971,7 +1971,7 @@ static void qemu_create_early_backends(void)
+-# @CpuS390Entitlement:
++# @S390CpuEntitlement:
+ #
+ # An enumeration of CPU entitlements that can be assumed by a virtual
+ # S390 CPU
+ #
+ # Since: 8.2
+ ##
+-{ 'enum': 'CpuS390Entitlement',
+-  'prefix': 'S390_CPU_ENTITLEMENT',
++{ 'enum': 'S390CpuEntitlement',
+   'data': [ 'auto', 'low', 'medium', 'high' ] }
+diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+index 1a394c08f5..541f93eeb7 100644
+--- a/qapi/machine-target.json
++++ b/qapi/machine-target.json
+@@ -405,15 +405,14 @@
+                    'TARGET_RISCV' ] } }
  
-     qemu_console_early_init();
- 
--    if (dpy.has_gl && dpy.gl != DISPLAYGL_MODE_OFF && display_opengl == 0) {
-+    if (dpy.has_gl && dpy.gl != DISPLAY_GL_MODE_OFF && display_opengl == 0) {
- #if defined(CONFIG_OPENGL)
-         error_report("OpenGL is not supported by display backend '%s'",
-                      DisplayType_str(dpy.type));
-diff --git a/ui/dbus.c b/ui/dbus.c
-index e08b5de064..7ecd39e784 100644
---- a/ui/dbus.c
-+++ b/ui/dbus.c
-@@ -176,7 +176,7 @@ dbus_display_add_console(DBusDisplay *dd, int idx, Error **errp)
-     assert(con);
- 
-     if (qemu_console_is_graphic(con) &&
--        dd->gl_mode != DISPLAYGL_MODE_OFF) {
-+        dd->gl_mode != DISPLAY_GL_MODE_OFF) {
-         qemu_console_set_display_gl_ctx(con, &dd->glctx);
-     }
- 
-@@ -466,9 +466,9 @@ static const TypeInfo dbus_vc_type_info = {
- static void
- early_dbus_init(DisplayOptions *opts)
- {
--    DisplayGLMode mode = opts->has_gl ? opts->gl : DISPLAYGL_MODE_OFF;
-+    DisplayGLMode mode = opts->has_gl ? opts->gl : DISPLAY_GL_MODE_OFF;
- 
--    if (mode != DISPLAYGL_MODE_OFF) {
-+    if (mode != DISPLAY_GL_MODE_OFF) {
- #ifdef CONFIG_OPENGL
-         egl_init(opts->u.dbus.rendernode, mode, &error_fatal);
- #else
-@@ -482,7 +482,7 @@ early_dbus_init(DisplayOptions *opts)
- static void
- dbus_init(DisplayState *ds, DisplayOptions *opts)
- {
--    DisplayGLMode mode = opts->has_gl ? opts->gl : DISPLAYGL_MODE_OFF;
-+    DisplayGLMode mode = opts->has_gl ? opts->gl : DISPLAY_GL_MODE_OFF;
- 
-     if (opts->u.dbus.addr && opts->u.dbus.p2p) {
-         error_report("dbus: can't accept both addr=X and p2p=yes options");
-diff --git a/ui/egl-context.c b/ui/egl-context.c
-index 9e0df466f3..aed3e3ba1f 100644
---- a/ui/egl-context.c
-+++ b/ui/egl-context.c
-@@ -17,7 +17,7 @@ QEMUGLContext qemu_egl_create_context(DisplayGLCtx *dgc,
-        EGL_CONTEXT_MINOR_VERSION_KHR, params->minor_ver,
-        EGL_NONE
-    };
--   bool gles = (qemu_egl_mode == DISPLAYGL_MODE_ES);
-+   bool gles = (qemu_egl_mode == DISPLAY_GL_MODE_ES);
- 
-    ctx = eglCreateContext(qemu_egl_display, qemu_egl_config,
-                           eglGetCurrentContext(),
-diff --git a/ui/egl-headless.c b/ui/egl-headless.c
-index 6187249c73..1f6b845500 100644
---- a/ui/egl-headless.c
-+++ b/ui/egl-headless.c
-@@ -207,7 +207,7 @@ static const DisplayGLCtxOps eglctx_ops = {
- 
- static void early_egl_headless_init(DisplayOptions *opts)
- {
--    DisplayGLMode mode = DISPLAYGL_MODE_ON;
-+    DisplayGLMode mode = DISPLAY_GL_MODE_ON;
- 
-     if (opts->has_gl) {
-         mode = opts->gl;
-diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
-index 99b2ebbe23..81a57fa975 100644
---- a/ui/egl-helpers.c
-+++ b/ui/egl-helpers.c
-@@ -503,7 +503,7 @@ static int qemu_egl_init_dpy(EGLNativeDisplayType dpy,
-     EGLint major, minor;
-     EGLBoolean b;
-     EGLint n;
--    bool gles = (mode == DISPLAYGL_MODE_ES);
-+    bool gles = (mode == DISPLAY_GL_MODE_ES);
- 
-     qemu_egl_display = qemu_egl_get_display(dpy, platform);
-     if (qemu_egl_display == EGL_NO_DISPLAY) {
-@@ -533,7 +533,7 @@ static int qemu_egl_init_dpy(EGLNativeDisplayType dpy,
-         return -1;
-     }
- 
--    qemu_egl_mode = gles ? DISPLAYGL_MODE_ES : DISPLAYGL_MODE_CORE;
-+    qemu_egl_mode = gles ? DISPLAY_GL_MODE_ES : DISPLAY_GL_MODE_CORE;
-     return 0;
+ ##
+-# @CpuS390Polarization:
++# @S390CpuPolarization:
+ #
+ # An enumeration of CPU polarization that can be assumed by a virtual
+ # S390 CPU
+ #
+ # Since: 8.2
+ ##
+-{ 'enum': 'CpuS390Polarization',
+-  'prefix': 'S390_CPU_POLARIZATION',
++{ 'enum': 'S390CpuPolarization',
+   'data': [ 'horizontal', 'vertical' ],
+   'if': 'TARGET_S390X'
+ }
+@@ -450,7 +449,7 @@
+       '*socket-id': 'uint16',
+       '*book-id': 'uint16',
+       '*drawer-id': 'uint16',
+-      '*entitlement': 'CpuS390Entitlement',
++      '*entitlement': 'S390CpuEntitlement',
+       '*dedicated': 'bool'
+   },
+   'features': [ 'unstable' ],
+@@ -488,7 +487,7 @@
+ #          "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
+ ##
+ { 'event': 'CPU_POLARIZATION_CHANGE',
+-  'data': { 'polarization': 'CpuS390Polarization' },
++  'data': { 'polarization': 'S390CpuPolarization' },
+   'features': [ 'unstable' ],
+   'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
+ }
+@@ -503,7 +502,7 @@
+ # Since: 8.2
+ ##
+ { 'struct': 'CpuPolarizationInfo',
+-  'data': { 'polarization': 'CpuS390Polarization' },
++  'data': { 'polarization': 'S390CpuPolarization' },
+   'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
  }
  
-@@ -564,8 +564,8 @@ int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy, DisplayGLMode mode)
- int qemu_egl_init_dpy_win32(EGLNativeDisplayType dpy, DisplayGLMode mode)
+diff --git a/qapi/machine.json b/qapi/machine.json
+index d4317435e7..63a5eb0070 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -41,15 +41,14 @@
+              'x86_64', 'xtensa', 'xtensaeb' ] }
+ 
+ ##
+-# @CpuS390State:
++# @S390CpuState:
+ #
+ # An enumeration of cpu states that can be assumed by a virtual S390
+ # CPU
+ #
+ # Since: 2.12
+ ##
+-{ 'enum': 'CpuS390State',
+-  'prefix': 'S390_CPU_STATE',
++{ 'enum': 'S390CpuState',
+   'data': [ 'uninitialized', 'stopped', 'check-stop', 'operating', 'load' ] }
+ 
+ ##
+@@ -66,9 +65,9 @@
+ # Since: 2.12
+ ##
+ { 'struct': 'CpuInfoS390',
+-  'data': { 'cpu-state': 'CpuS390State',
++  'data': { 'cpu-state': 'S390CpuState',
+             '*dedicated': 'bool',
+-            '*entitlement': 'CpuS390Entitlement' } }
++            '*entitlement': 'S390CpuEntitlement' } }
+ 
+ ##
+ # @CpuInfoFast:
+diff --git a/qapi/pragma.json b/qapi/pragma.json
+index 59fbe74b8c..fad3a31628 100644
+--- a/qapi/pragma.json
++++ b/qapi/pragma.json
+@@ -47,9 +47,6 @@
+         'BlockdevSnapshotWrapper',
+         'BlockdevVmdkAdapterType',
+         'ChardevBackendKind',
+-        'CpuS390Entitlement',
+-        'CpuS390Polarization',
+-        'CpuS390State',
+         'CxlCorErrorType',
+         'DisplayProtocol',
+         'DriveBackupWrapper',
+@@ -74,6 +71,9 @@
+         'QKeyCode',
+         'RbdAuthMode',
+         'RbdImageEncryptionFormat',
++        'S390CpuEntitlement',
++        'S390CpuPolarization',
++        'S390CpuState',
+         'String',
+         'StringWrapper',
+         'SysEmuTarget',
+diff --git a/include/hw/qdev-properties-system.h b/include/hw/qdev-properties-system.h
+index 438f65389f..cdcc63056e 100644
+--- a/include/hw/qdev-properties-system.h
++++ b/include/hw/qdev-properties-system.h
+@@ -88,7 +88,7 @@ extern const PropertyInfo qdev_prop_iothread_vq_mapping_list;
+ 
+ #define DEFINE_PROP_CPUS390ENTITLEMENT(_n, _s, _f, _d) \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_cpus390entitlement, \
+-                       CpuS390Entitlement)
++                       S390CpuEntitlement)
+ 
+ #define DEFINE_PROP_IOTHREAD_VQ_MAPPING_LIST(_name, _state, _field) \
+     DEFINE_PROP(_name, _state, _field, qdev_prop_iothread_vq_mapping_list, \
+diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+index c064f427e9..a11b1baa77 100644
+--- a/include/hw/s390x/cpu-topology.h
++++ b/include/hw/s390x/cpu-topology.h
+@@ -37,7 +37,7 @@ typedef struct S390TopologyEntry {
+ 
+ typedef struct S390Topology {
+     uint8_t *cores_per_socket;
+-    CpuS390Polarization polarization;
++    S390CpuPolarization polarization;
+ } S390Topology;
+ 
+ typedef QTAILQ_HEAD(, S390TopologyEntry) S390TopologyList;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index d6b75ad0e0..6cbd77dfdf 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -133,7 +133,7 @@ typedef struct CPUArchState {
+     int32_t book_id;
+     int32_t drawer_id;
+     bool dedicated;
+-    CpuS390Entitlement entitlement; /* Used only for vertical polarization */
++    S390CpuEntitlement entitlement; /* Used only for vertical polarization */
+     uint64_t cpuid;
+ #endif
+ 
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index f13350b4fb..f2db20417a 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -1188,12 +1188,12 @@ const PropertyInfo qdev_prop_uuid = {
+ 
+ /* --- s390 cpu entitlement policy --- */
+ 
+-QEMU_BUILD_BUG_ON(sizeof(CpuS390Entitlement) != sizeof(int));
++QEMU_BUILD_BUG_ON(sizeof(S390CpuEntitlement) != sizeof(int));
+ 
+ const PropertyInfo qdev_prop_cpus390entitlement = {
+-    .name  = "CpuS390Entitlement",
++    .name  = "S390CpuEntitlement",
+     .description = "low/medium (default)/high",
+-    .enum_table  = &CpuS390Entitlement_lookup,
++    .enum_table  = &S390CpuEntitlement_lookup,
+     .get   = qdev_propinfo_get_enum,
+     .set   = qdev_propinfo_set_enum,
+     .set_default_value = qdev_propinfo_set_default_value_enum,
+diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+index f16bdf65fa..7d4e1f5472 100644
+--- a/hw/s390x/cpu-topology.c
++++ b/hw/s390x/cpu-topology.c
+@@ -105,7 +105,7 @@ static void s390_topology_init(MachineState *ms)
+  */
+ void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
  {
-     /* prefer GL ES, as that's what ANGLE supports */
--    if (mode == DISPLAYGL_MODE_ON) {
--        mode = DISPLAYGL_MODE_ES;
-+    if (mode == DISPLAY_GL_MODE_ON) {
-+        mode = DISPLAY_GL_MODE_ES;
-     }
- 
-     if (qemu_egl_init_dpy(dpy, 0, mode) < 0) {
-@@ -618,7 +618,7 @@ EGLContext qemu_egl_init_ctx(void)
-         EGL_CONTEXT_CLIENT_VERSION, 2,
-         EGL_NONE
-     };
--    bool gles = (qemu_egl_mode == DISPLAYGL_MODE_ES);
-+    bool gles = (qemu_egl_mode == DISPLAY_GL_MODE_ES);
-     EGLContext ectx;
-     EGLBoolean b;
- 
-@@ -642,7 +642,7 @@ bool egl_init(const char *rendernode, DisplayGLMode mode, Error **errp)
+-    CpuS390Polarization polarization;
++    S390CpuPolarization polarization;
+     CPUS390XState *env = &cpu->env;
+     uint64_t reg = env->regs[r1];
+     int fc = reg & S390_TOPO_FC_MASK;
+@@ -357,7 +357,7 @@ static void s390_change_topology(uint16_t core_id,
+                                  bool has_book_id, uint16_t book_id,
+                                  bool has_drawer_id, uint16_t drawer_id,
+                                  bool has_entitlement,
+-                                 CpuS390Entitlement entitlement,
++                                 S390CpuEntitlement entitlement,
+                                  bool has_dedicated, bool dedicated,
+                                  Error **errp)
  {
-     ERRP_GUARD();
- 
--    if (mode == DISPLAYGL_MODE_OFF) {
-+    if (mode == DISPLAY_GL_MODE_OFF) {
-         error_setg(errp, "egl: turning off GL doesn't make sense");
-         return false;
-     }
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 8e14c2ac81..bf9d3dd679 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -2514,7 +2514,7 @@ static void early_gtk_display_init(DisplayOptions *opts)
-     }
- 
-     assert(opts->type == DISPLAY_TYPE_GTK);
--    if (opts->has_gl && opts->gl != DISPLAYGL_MODE_OFF) {
-+    if (opts->has_gl && opts->gl != DISPLAY_GL_MODE_OFF) {
- #if defined(CONFIG_OPENGL)
- #if defined(GDK_WINDOWING_WAYLAND)
-         if (GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default())) {
-@@ -2530,7 +2530,7 @@ static void early_gtk_display_init(DisplayOptions *opts)
- #endif
-         {
- #ifdef CONFIG_X11
--            DisplayGLMode mode = opts->has_gl ? opts->gl : DISPLAYGL_MODE_ON;
-+            DisplayGLMode mode = opts->has_gl ? opts->gl : DISPLAY_GL_MODE_ON;
-             gtk_egl_init(mode);
- #endif
-         }
-diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
-index 91b7ee2419..e01d9ab0c7 100644
---- a/ui/sdl2-gl.c
-+++ b/ui/sdl2-gl.c
-@@ -147,11 +147,11 @@ QEMUGLContext sdl2_gl_create_context(DisplayGLCtx *dgc,
-     SDL_GL_MakeCurrent(scon->real_window, scon->winctx);
- 
-     SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
--    if (scon->opts->gl == DISPLAYGL_MODE_ON ||
--        scon->opts->gl == DISPLAYGL_MODE_CORE) {
-+    if (scon->opts->gl == DISPLAY_GL_MODE_ON ||
-+        scon->opts->gl == DISPLAY_GL_MODE_CORE) {
-         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                             SDL_GL_CONTEXT_PROFILE_CORE);
--    } else if (scon->opts->gl == DISPLAYGL_MODE_ES) {
-+    } else if (scon->opts->gl == DISPLAY_GL_MODE_ES) {
-         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                             SDL_GL_CONTEXT_PROFILE_ES);
-     }
-@@ -163,7 +163,7 @@ QEMUGLContext sdl2_gl_create_context(DisplayGLCtx *dgc,
-     /* If SDL fail to create a GL context and we use the "on" flag,
-      * then try to fallback to GLES.
-      */
--    if (!ctx && scon->opts->gl == DISPLAYGL_MODE_ON) {
-+    if (!ctx && scon->opts->gl == DISPLAY_GL_MODE_ON) {
-         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                             SDL_GL_CONTEXT_PROFILE_ES);
-         ctx = SDL_GL_CreateContext(scon->real_window);
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 98ed974371..251ce97796 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -107,7 +107,7 @@ void sdl2_window_create(struct sdl2_console *scon)
-     if (scon->opengl) {
-         const char *driver = "opengl";
- 
--        if (scon->opts->gl == DISPLAYGL_MODE_ES) {
-+        if (scon->opts->gl == DISPLAY_GL_MODE_ES) {
-             driver = "opengles2";
-         }
- 
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index 15be640286..bd9dbe03f1 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -840,7 +840,7 @@ static void qemu_spice_init(void)
-                          "incompatible with -spice port/tls-port");
-             exit(1);
-         }
--        egl_init(qemu_opt_get(opts, "rendernode"), DISPLAYGL_MODE_ON, &error_fatal);
-+        egl_init(qemu_opt_get(opts, "rendernode"), DISPLAY_GL_MODE_ON, &error_fatal);
-         spice_opengl = 1;
-     }
- #endif
+@@ -446,7 +446,7 @@ void qmp_set_cpu_topology(uint16_t core,
+                           bool has_socket, uint16_t socket,
+                           bool has_book, uint16_t book,
+                           bool has_drawer, uint16_t drawer,
+-                          bool has_entitlement, CpuS390Entitlement entitlement,
++                          bool has_entitlement, S390CpuEntitlement entitlement,
+                           bool has_dedicated, bool dedicated,
+                           Error **errp)
+ {
 -- 
 2.46.0
 
