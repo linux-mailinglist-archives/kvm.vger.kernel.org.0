@@ -1,256 +1,565 @@
-Return-Path: <kvm+bounces-25807-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25808-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2104596AE95
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 04:30:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF0296AEF3
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 05:15:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8378AB23E2C
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 02:30:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A3551C23245
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2024 03:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7FD3B78D;
-	Wed,  4 Sep 2024 02:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094DA50276;
+	Wed,  4 Sep 2024 03:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="as4+1UFn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DT4Ki+II"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFCD18054;
-	Wed,  4 Sep 2024 02:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725417019; cv=fail; b=Abq3femT43dF338N7oyfwp7r8asuKv4Bh7hVExVjDyadgokm66Mt+T7ajOxwm36A9LcYBiWyjpXHgJEUPTH1L3rc5vwnXiCjdsknfrhx2ktXIRoqUXDjaIxAVfvnIqg2XxZ0l2jTzNNro9GlLqh2KTsUL120RfBfBGnjhwW+Kio=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725417019; c=relaxed/simple;
-	bh=YpVg1txxjTwJDMqVQ2Rh1F/pSYjt4aBg2N2tsvbhIek=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=CPhBEpDDqWlYep1DJ/gIqsAdqL6ayNP/zokvoura2OCzxD5zbNAFretONJrb2c6eI7MUs9XCw8iE7YzLQgUI/v2EOMG0fzg7uq42TiSiWmCJcRjETCrOIdfMJJ9rsmuvIaHVayybBEH2RsjAta8K23YN1m+RX8u16sqLIXx7a04=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=as4+1UFn; arc=fail smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5813B4776E;
+	Wed,  4 Sep 2024 03:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725419672; cv=none; b=ZLUC7/GFuaE9Ak3aUVnTtrbrHSuJLUKy7XDAJQUoYN28JgZ38arYKkF+xFOotdNCJEVEDlWGt0HQGPnEKLDEMstoMug301cFqEFqsWfFKu4lXf4Dg0JCiDsVcQtq9Xk7Sfn+pFlCB4m3DIalhY4RPOXoWv/TqASwzM/rDOjese4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725419672; c=relaxed/simple;
+	bh=IBcZTEmaFEM5XqtP6UZtRzuXCni/YAvBzMLp3a5Z55Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=DgfgKl4NJtdO2HXzcadja9qjdnvF0BD1G+BQv1I1tRUbbOGrz9NoyOuYo9fEq3NLXqOw5DEjrGdhW4Dfy/ZghEERMS+mobyCWWie8AoaiJWQeJjJcpFVLCE1BegH/jTouux17a2pAGmf7aD29YuPjQ1/uKc+JgtHIt25/O6vwKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DT4Ki+II; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725417018; x=1756953018;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=YpVg1txxjTwJDMqVQ2Rh1F/pSYjt4aBg2N2tsvbhIek=;
-  b=as4+1UFnVuARdMN46eaPLuNJekEc0XaglzRjv91JMOZe/8MDcc+z9hcf
-   Upm/I5ZrDS2wYB2zC4GjM61MAsMlCL0cJ1m+/pBRWlo3xjJCsI+8esouI
-   TsH+eIphRwAIKVK17MLQYS4jWOkAzWqw/vz5CpEaKneE3/kDjxrlmuxwe
-   coqgn5aVM9y6TDUigF9SDqbMox8FSDBRcw/T5UkZ77grWxTthkEMAduNu
-   M3jxqXU52zyCn/uIy1+ZuNe7b6rt4AMu1v1u6SXIwN9XZIyIpmMrNrPy5
-   B0JJT2a3n+CktcJZS0IdrZKDbjZnnRyBXY4QDtyYhUF8NHsrmWM8Ipwh8
-   w==;
-X-CSE-ConnectionGUID: n3xSD7jQQbyV0l1nPfRHeQ==
-X-CSE-MsgGUID: E3njQPdIR4+tO1CJGnGOAw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="41546238"
+  t=1725419669; x=1756955669;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IBcZTEmaFEM5XqtP6UZtRzuXCni/YAvBzMLp3a5Z55Y=;
+  b=DT4Ki+IINQtwK/2Ykgtg/PnHo4ynUZyWEE3r8ca5nsmv3KBho6GCaqlr
+   SrygN9EEpAwv4M2tBPaHw4RVGECRTtK4vU9Z9s4qwHO3taDRJ1zoulLp3
+   u9R8e002Bc7AO2+f7y2fSqVA3C8Sw0L84BghZN9DX7cgoKt+biulTYP5k
+   +DhXBK/9ix0SvMAjdDs+/YDyXjGdIPn4NGqlJ8SoIB+R7q8aiT1JjSR35
+   ZYqb5uhs5QneYeOyHu1dmATI04EhC69Bgz2IsNI8klRoMhK9CK72YnxEI
+   7MRPSjPfW3MA3vjjexiQzXK9IiE3h3i0MUGMsY3LIxVw6JllMVD0nl3Uz
+   Q==;
+X-CSE-ConnectionGUID: wqaKO730QJmXF/UgEd4dFA==
+X-CSE-MsgGUID: 0wyFmddxSfWLPAih9RCn5w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23564618"
 X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
-   d="scan'208";a="41546238"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 19:30:08 -0700
-X-CSE-ConnectionGUID: hLortL+pS9KcDLpuNkh3xA==
-X-CSE-MsgGUID: 9Cs7VgpvRt6kN4PQFGBaOA==
+   d="scan'208";a="23564618"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:07:58 -0700
+X-CSE-ConnectionGUID: aNxLL5J8RxuAHq3mR2qFIA==
+X-CSE-MsgGUID: gRDLCSrJTeGJUTQLDF8nQQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
-   d="scan'208";a="95915612"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Sep 2024 19:30:00 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 3 Sep 2024 19:29:59 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 3 Sep 2024 19:29:58 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 3 Sep 2024 19:29:58 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.47) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 3 Sep 2024 19:29:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SQGwELB8Wd7UsGNIwCUtBFIky/ADax4tLUMrsu4gN8SLptBnSD0+n9+TZfd7iGJthOB0+txaawsXCDLU90J5yaCjlM7h4BJ/hlRavUfCUzkTH2Eq+kD3wF0gGr57o7Yq21vQcnXJuxi5+SyheC9FmiKeEDVasygGJoR3vWECxZ7fd8OTPwxYJ1fIWb6KW5yxW7N0FcVeIAJHqX+7oLks7Uznp439r1h5NWUXoCTjZo1wH+yabBiScErigBhFW5L4D9fUDkIGHH2RvMaRa6YAB/8kky/x31Un2TmJb+xcDcBLBGEgLuv8sZse49QXaJK3h9fq7BCNtHLB2zdjtlvYfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AWJ5flnMlqInGvLRmUvK/sOuGOjZwjkExD2xtvvwM04=;
- b=vWResgT1lWOeeqL55eeWzmInYBXh7+lDacuSwBWzokLNVkNIAT3KIm0fdnvdfCV0ZBU1JQdu2wPOHwOS5IvoEdDlwSAHSbZOzJy/ZPmVGZNO97nbQtOFOJWDvKutP1LhQY2Uufro+Oj9ahjMljF0DpOP8bTHf8Z8WOrRDmND1q9bCzuvyKq2nnRYusG/X2myPa5OWJO9luw0Q1GQG8Gw7nAKPWZZ73SE7B4oUXx4kEjECtr0+vxcURvQZ4IyapZZnsGf4piUVAi6+eDGNAVwVBeOw4FBteHuinOwm7k7SxInAWcsTJK14z5IwnnsEdw006zNAQYGJIgmCALw09LChw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- DM6PR11MB4738.namprd11.prod.outlook.com (2603:10b6:5:2a3::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.27; Wed, 4 Sep 2024 02:29:55 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%2]) with mapi id 15.20.7918.024; Wed, 4 Sep 2024
- 02:29:55 +0000
-Date: Wed, 4 Sep 2024 10:28:02 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-CC: Sean Christopherson <seanjc@google.com>, Gerd Hoffmann
-	<kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	<kvm@vger.kernel.org>, <rcu@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	Kevin Tian <kevin.tian@intel.com>, Yiwei Zhang <zzyiwei@google.com>, "Lai
- Jiangshan" <jiangshanlai@gmail.com>, "Paul E. McKenney" <paulmck@kernel.org>,
-	Josh Triplett <josh@joshtriplett.org>
-Subject: Re: [PATCH 5/5] KVM: VMX: Always honor guest PAT on CPUs that
- support self-snoop
-Message-ID: <ZtfFss2OAGHcNrrV@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20240309010929.1403984-1-seanjc@google.com>
- <20240309010929.1403984-6-seanjc@google.com>
- <877cbyuzdn.fsf@redhat.com>
- <vuwlkftomgsnzsywjyxw6rcnycg3bve3o53svvxg3vd6xpok7o@k4ktmx5tqtmz>
- <871q26unq8.fsf@redhat.com>
- <ZtUYZE6t3COCwvg0@yzhao56-desk.sh.intel.com>
- <87jzfutmfc.fsf@redhat.com>
- <Ztcrs2U8RrI3PCzM@google.com>
- <87frqgu2t0.fsf@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <87frqgu2t0.fsf@redhat.com>
-X-ClientProxiedBy: SG2PR02CA0135.apcprd02.prod.outlook.com
- (2603:1096:4:188::23) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+   d="scan'208";a="65106198"
+Received: from dgramcko-desk.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.221.153])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 20:07:57 -0700
+From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com,
+	kvm@vger.kernel.org
+Cc: kai.huang@intel.com,
+	dmatlack@google.com,
+	isaku.yamahata@gmail.com,
+	yan.y.zhao@intel.com,
+	nik.borisov@suse.com,
+	rick.p.edgecombe@intel.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/21] TDX MMU Part 2
+Date: Tue,  3 Sep 2024 20:07:30 -0700
+Message-Id: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DM6PR11MB4738:EE_
-X-MS-Office365-Filtering-Correlation-Id: daa413a0-cddf-436c-6b03-08dccc8976da
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?wkVChttRmWt7sIwAeECRV1rPUxvhRrCmL2Eu8/T2ZRz0jUNx1/18tUEUl65x?=
- =?us-ascii?Q?yv0K+F1LQnXkwXShDSmVKPCQVAiH9qc8rpgG8iHVJDfiI8HdYbqvhYX3poey?=
- =?us-ascii?Q?sfDJFNfcUoHpFl+p7aq0mSV7Di/Y7aRfWJ3+how4FQ+ecNQW8qhcuQKUkaqR?=
- =?us-ascii?Q?e0Nxw6/g2IwGpyOily55ePg7zm0AaqQWoJ13MC+syrTtEPTsZKUW7Q5d0oZ5?=
- =?us-ascii?Q?zC2pIfE5Ege/sD0vvt8NnJv2vtZRczWBs6Yf2JOCI8vxJxRY3TVRS8bxX5PJ?=
- =?us-ascii?Q?d0oMat9HCdCyaH0UDNxAbmYoQ/d2F2quehew85pKRV3amYE0oQJUYSw6lAJx?=
- =?us-ascii?Q?HxiVLZBYXje8JogITzMm+FwI+qY8w2n9Vu8RuN47ucK+Mqo4QzcVupio9IlR?=
- =?us-ascii?Q?l4PFRiHH1hI9h8LaYkKgA2KKWNIfna78CfdhQZKWIJsnpWMtk8WQStu6lwHl?=
- =?us-ascii?Q?GefcWptB7GmWKaeAFKdfnmXFQEkZkSpDmxdR5CQ175mY552eGhV90p6ZhIr4?=
- =?us-ascii?Q?2Vtx0PiZS5KNjpEWOyJz237EJi96NEL+bSGnC2pdNY6aE4vjcEc294tYWp8j?=
- =?us-ascii?Q?LM0fh3hYbnFvsvgQQM/GMFGkm3moFsfJ4ojJc0MM+7gcG0M5MoPrxpqo526c?=
- =?us-ascii?Q?VBBzAzfwDkq/NAWOg/q8S+2kXbePP6YwcSKAJ+wsRxV39MaOAiAs4lZwybtK?=
- =?us-ascii?Q?KmvPT0EtLi4vlKinl1046VwL/nIbzpIudtokDoiybsA6SGMjcpI7lMUNMrSx?=
- =?us-ascii?Q?5xO5VCvuBjX1oRbJ++HXmvOH9qJWaHu9/iou+/r19tnBAPliI1Km0SOuCTdD?=
- =?us-ascii?Q?fmwWU3q/7cLas3yoO52v+O3iNsTbWd8uVDIhN2caI9P9ynECMcpWwQLji/ZX?=
- =?us-ascii?Q?pYki0Zoj5ngaD+sPaBzgD+A28q4YsiPfFmuYZ8yB/3RwLGZbChkdM/BScMgi?=
- =?us-ascii?Q?296CTeBMuPTa+73UEMnIHEyZsVuVF/F6zIMZJR8X16hu3/l+ZDfj6RgllDdo?=
- =?us-ascii?Q?aB1PWf/C6Taf8gfYW7dqOeY8ksanuPHf2SLzc8fDmmxBYbk2t+DNO/HqXHxt?=
- =?us-ascii?Q?ZOg3ABDS0rpRLlSRXxzCdDvjiWC91Ss6qswIayzud3AOcxmpc0LyTWwTfOtE?=
- =?us-ascii?Q?P9X+Pg6575KfYdSjYhQvLjNoJWOxRvcDfJFB8Mtq+vHHyVCm2k4uc1dvq9MF?=
- =?us-ascii?Q?sV8RYaQOxgZn73psmSggsYQdtyhATxY8KPq5avZ7rKnokSiGVs3XcRCm2z63?=
- =?us-ascii?Q?g3k97S0E582Oiks8MNfXaQi8ACGQXIspHwejJHDTJuiUmoI8qipuf88mcruo?=
- =?us-ascii?Q?GZXEijqHTqRMRsGH0ZGKdnyE3RasnIIsED7kMzO4ZYlDzg=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KWDigKY+PCW4h9255QhuKp103cu/DmwEK8e2fngMmgb2zBRMIAfoegZBtH6T?=
- =?us-ascii?Q?IEpXobdkmEKSRrhGxhAs0MWlumNoffYCtu7TKnAjjZ8T0IAtszl1w4RO2XfP?=
- =?us-ascii?Q?CnjLjdowkl1ZJyprO0cx+UfS/pFVoK5wAVBMXac6D/s5yCXc/m87yzI5J2c6?=
- =?us-ascii?Q?A/QTPROPW9g/5HOT75Ud5n1MRkvXFxRmAQMigQbJKuAMxObCPaSlMt+JwA+H?=
- =?us-ascii?Q?NkkdBPbLISAhPK+uTP/YYHPsJVGladcUTtRpZzx2qp6M5CxKKXSYdjEkY0Wb?=
- =?us-ascii?Q?bgmgJMUo92XP2dLGEZd7+G1W92icYUi/JdvkktH8i16SmSqmv+CC50lj70tV?=
- =?us-ascii?Q?+Frcqj5OGaOQkwhtxL4JPxfDs76IShC5o+ofwOqsFTTli2rIx8cy8ZEXnMB9?=
- =?us-ascii?Q?cXl1kbYRaNDjigzP+svH82DDpckEvunsC9SRdVtXHqVHTNUSiB2pzAqsaPdu?=
- =?us-ascii?Q?0B3khuHyac2Y64qDYEHw9Yv45q2RFweKMZhlylvTj+TUQjqkk9OliVYGi+Jp?=
- =?us-ascii?Q?98I2G+oA0Ub7EuweI4idDrcPIYC7OzyZF8QiUVlVVpzkIjgISFLuEgVy71+9?=
- =?us-ascii?Q?53kSnesNledm8SodLpwW5YyvBoC3+1ybclKL9hekYXCi+OKURepjoKOPLawE?=
- =?us-ascii?Q?54hfM86uih7ELjwe8fFC3Rq+N8z2Plb4EERwxIZnQUDhX+VurFR6MgylWZDA?=
- =?us-ascii?Q?XsH/AIGrQSYPkpkQoheOBNLRd+TGYSlPCdiiVlMfDEqbOMBY8XqOAv87vEIa?=
- =?us-ascii?Q?ig7Db+jN5IwEj46DKtM5AItawmo1s7JuTPvApQ+oqUUlHT/5wffMZwbAdD8l?=
- =?us-ascii?Q?1TTlwbFSKWDRPi0I3L2k4ZMG2koFFS9tytrr6AK3WaYkSkZN3fmFsCeU0qYR?=
- =?us-ascii?Q?4T04ZFPAUyDDqXlaNc4OTqMnDb5N8er4nBdJxqVKXKb+fsG3UrqcgoLS7urZ?=
- =?us-ascii?Q?EPOm6woByHUYnDS6Dvq6vZcJBdEUBN1b0dXYNpMBS80lQSIGWWeeFhEWFopR?=
- =?us-ascii?Q?N9Oe1LuH3o8hJUZh3LO/FxjGgo1dXWbHhepvOFX12onmm2wIB0jcljdJcP2v?=
- =?us-ascii?Q?JNG77SnmC1ptQLmW/8PxJiCJvDSG8xUCoHYaE21UfSHpuNhF1y3nXRZ1qHtz?=
- =?us-ascii?Q?ynKCueXkwPnLynXeVW8qAeYZhocFLDjwnJH5okkk8f+aWe2xMl4veW2Qb9Hs?=
- =?us-ascii?Q?Iu+/7fn/WQ2vxlUMJbN9G9SjzlwBgYIFaac7vhRhYb3/FVYZOi+OX1/GGaYI?=
- =?us-ascii?Q?dlngTOmAuj0k0dNrqN8e+78Jq7hH2LHeqA0u5WlHaCiC9K/OOQv8UC5jAA7G?=
- =?us-ascii?Q?/r38uE/HNmhfVyrdet5miGR0qPEdMfswuCInOZ1eM/fOCfJdZ/dedGtS5IIc?=
- =?us-ascii?Q?J5OQteyxFiyp7dBZbZvDEFE+fk5rtaI6w3+AMuyDwp56UZLOi4B3gIIN7hM5?=
- =?us-ascii?Q?C2MZVykfAJ5a0jgmC1NNNmhgK4+sCef6k22OZuwElPHv7LQOx8PbXl1R0tCu?=
- =?us-ascii?Q?BKQuJKwIJkBo4/MVrWl2xXF3gZj5cunmul7rI5XVTzj4Zy6SbF9dMEqriLpx?=
- =?us-ascii?Q?wG9p4t+zas/0/tjMWo6T8Js4hnKxyPOlwtttq/Lb?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: daa413a0-cddf-436c-6b03-08dccc8976da
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2024 02:29:55.7584
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7Lft7N1iKXBnsVLsscXvqL3UxvA40bV+Jx5aTOg+QHIfuy+R6KUtIWPDXjHI7NBz3VXoXk2wyXrpweCPiWoIVA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4738
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 03, 2024 at 06:20:27PM +0200, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > On Mon, Sep 02, 2024, Vitaly Kuznetsov wrote:
-> >> FWIW, I use QEMU-9.0 from the same C10S (qemu-kvm-9.0.0-7.el10.x86_64)
-> >> but I don't think it matters in this case. My CPU is "Intel(R) Xeon(R)
-> >> Silver 4410Y".
-> >
-> > Has this been reproduced on any other hardware besides SPR?  I.e. did we stumble
-> > on another hardware issue?
-> 
-> Very possible, as according to Yan Zhao this doesn't reproduce on at
-> least "Coffee Lake-S". Let me try to grab some random hardware around
-> and I'll be back with my observations.
+Hi,
 
-Update some new findings from my side:
+This series picks up where “TDX MMU prep series part 1”[0] left off in 
+implementing the parts of TDX support that deal with shared and private 
+memory. Part 1 focused on changes to the generic x86 parts of the KVM MMU 
+code that will be needed by TDX. This series focuses on the parts of the 
+TDX support that will live in the Intel side of KVM. These parts include 
+actually manipulating the S-EPT (private memory), and other special 
+handling around the Shared EPT. 
 
-BAR 0 of bochs VGA (fb_map) is used for frame buffer, covering phys range
-from 0xfd000000 to 0xfe000000.
+There is a larger team working on TDX KVM base enabling. The patches were  
+originally authored by Sean Christopherson and Isaku Yamahata, but 
+otherwise it especially represents the work of Yan Y Zhao, Isaku and 
+myself. 
 
-On "Sapphire Rapids XCC":
+I think the series is in ok shape at this point, but not quite ready to 
+move upstream. However, when it seems to be in generally good shape, we 
+might think about whether TDX MMU part 1 is ready for promotion.
 
-1. If KVM forces this fb_map range to be WC+IPAT, installer/gdm can launch
-   correctly. 
-   i.e.
-   if (gfn >= 0xfd000 && gfn < 0xfe000) {
-   	return (MTRR_TYPE_WRCOMB << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-   }
-   return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
+Base of this series
+===================
+The changes required for TDX support are too large to effectively move 
+upstream as one series. As a result, it has been broken into a bunch of 
+smaller series to be applied sequentially. Based on PUCK discussion we are 
+going to be pipelining the review of these series, such that series are 
+posted before their pre-reqs land in a maintainer branch. While the first 
+breakout series (MMU prep) was able to be applied to kvm-coco-queue 
+directly, this one is based some pre-req series that have not landed 
+upstream. The order of pre-reqs is:
 
-2. If KVM forces this fb_map range to be UC+IPAT, installer failes to show / gdm
-   restarts endlessly. (though on Coffee Lake-S, installer/gdm can launch
-   correctly in this case).
+1. Commit 909f9d422f59 in kvm-coco-queue
+   This commit includes "TDX MMU Prep" series, but not "TDX vCPU/VM 
+   creation". The following pre-reqs depend on Sean’s VMX initialization 
+   changes[1], which is currently in kvm/queue.
+2. Kai’s host metadata series v3 [2]
+3. KVM/TDX Module init series [3]
+4. Binbin's "Check hypercall's exit to userspace generically" [4]
+5. vCPU/VM creation series [5]
 
-3. On starting GDM, ttm_kmap_iter_linear_io_init() in guest is called to set
-   this fb_map range as WC, with
-   iosys_map_set_vaddr_iomem(&iter_io->dmap, ioremap_wc(mem->bus.offset, mem->size));
+This is quite a few pre-reqs at this point. 1-4 are fairly mature so 
+hopefully those will fall off soon.
 
-   However, during bochs_pci_probe()-->bochs_load()-->bochs_hw_init(), pfns for
-   this fb_map has been reserved as uc- by ioremap().
-   Then, the ioremap_wc() during starting GDM will only map guest PAT with UC-.
+Per offline discussion with Dave Hansen, the current plan is for the 
+seamcall export patch to be expanded into a series that implements and 
+exports each seamcall needed by KVM in arch/x86 code. Both this series and 
+(5) rely on the export of the raw seamcall procedure. So future revisions 
+of those two series will include patches to add the needed seamcall 
+implementations into arch/x86 code. The current thought is to send them 
+through the KVM tree with their respective breakout series, and with ack's 
+from x86 maintainers.
 
-   So, with KVM setting WB (no IPAT) to this fb_map range, the effective
-   memory type is UC- and installer/gdm restarts endlessly.
+Private/shared memory in TDX background 
+======================================= 
+Confidential computing solutions have concepts of private and shared 
+memory. Often the guest accesses either private or shared memory via a bit 
+in the guest PTE. Solutions like SEV treat this bit more like a permission 
+bit, where solutions like TDX and ARM CCA treat it more like a GPA bit. In 
+the latter case, the host maps private memory in one half of the address 
+space and shared in another. For TDX these two halves are mapped by 
+different EPT roots. The private half (also called Secure EPT in Intel 
+documentation) gets managed by the privileged TDX Module. The shared half 
+is managed by the untrusted part of the VMM (KVM).
 
-4. If KVM sets WB (no IPAT) to this fb_map range, and changes guest bochs driver
-   to call ioremap_wc() instead in bochs_hw_init(), gdm can launch correctly.
-   (didn't verify the installer's case as I can't update the driver in that case).
+In addition to the separate roots for private and shared, there are 
+limitations on what operations can be done on the private side. Like SNP, 
+TDX wants to protect against protected memory being reset or otherwise 
+scrambled by the host. In order to prevent this, the guest has to take 
+specific action to “accept” memory after changes are made by the VMM to 
+the private EPT. This prevents the VMM from performing many of the usual 
+memory management operations that involve zapping and refaulting memory. 
+The private memory also is always RWX and cannot have VMM specified cache 
+attribute attributes applied.
 
-   The reason is that the ioremap_wc() called during starting GDM will no longer
-   meet conflict and can map guest PAT as WC.
+TDX memory implementation
+=========================
+The following describes how TDX memory management is implemented in KVM.
 
+Creating shared EPT 
+-------------------- 
+Shared EPT handling is relatively simple compared to private memory. It is 
+managed from within KVM. The main differences between shared EPT and EPT 
+in a normal VM are that the root is set with a TDVMCS field (via 
+SEAMCALL), and that a GFN from a memslot perspective needs to be mapped at 
+an offset in the EPT. For the former, this series plumbs in the 
+load_mmu_pgd() operation to the correct field for the shared EPT. For the 
+latter, previous patches have laid the groundwork for roots managed by EPT 
+(called direct roots), to be mapped at an offset based on the VM scoped 
+gfn_direct_bits field. So this series sets gfn_direct_bits to the proper 
+value.
 
-WIP to find out why effective UC in fb_map range will make gdm to restart
-endlessly.
+Creating private EPT 
+------------------------- 
+In previous patches, the concept of “mirrored roots” were introduced. Such 
+roots maintain a KVM side “mirror” of the “external” EPT by keeping an 
+unmapped EPT tree within the KVM MMU code. When changing these mirror 
+EPTs, the KVM MMU code calls out via x86_ops to update the external EPT. 
+This series adds implementations for these “external” ops for TDX to 
+create and manage “private” memory via TDX module APIs.
+
+Managing S-EPT with the TDX Module 
+------------------------------------------------- 
+The TDX module allows the TD’s private memory to be managed via SEAMCALLs. 
+This management consists of operating on two internal elements:
+
+1. The private EPT, which the TDX module calls the S-EPT. It maps the 
+   actual mapped, private half of the GPA space using an EPT tree.
+
+2. The HKID, which represents private encryption keys used for encrypting 
+   TD memory. The CPU doesn’t guarantee cache coherency between these
+   encryption keys, so memory that is encrypted with one of these keys
+   needs to be reclaimed for use on the host in special ways.
+
+This series will primarily focus on the SEAMCALLs for managing the private 
+EPT. Consideration of the HKID is needed for when the TD is torn down.
+
+Populating TDX Private memory 
+----------------------------- 
+TDX allows the EPT mapping the TD’s private memory to be modified in 
+limited ways. There are SEAMCALLs for building and tearing down the EPT 
+tree, as well as mapping pages into the private EPT.
+
+As for building and tearing down the EPT page tables, it is relatively 
+simple. There are SEAMCALLs for installing and removing them. However, the 
+current implementation only supports adding private EPT page tables, and 
+leaves them installed for the lifetime of the TD. For teardown, the 
+details are discussed in a later section.
+
+As for populating and zapping private SPTE, there are SEAMCALLs for this 
+as well. The zapping case will be described in detail later. As for the 
+populating case, there are two categories: before TD is finalized and 
+after TD is finalized. Both of these scenarios go through the TDP MMU map 
+path. The changes done previously to introduce “mirror” and “external” 
+page tables handle directing SPTE installation operations through the 
+set_external_spte() op.
+
+In the “after” case, the TDX set_external_spte() handler simply calls a 
+SEAMCALL (TDX.MEM.PAGE.AUG).
+
+For the before case, it is a bit more complicated as it requires both 
+setting the private SPTE *and* copying in the initial contents of the page 
+at the same time. For TDX this is done via the KVM_TDX_INIT_MEM_REGION 
+ioctl, which is effectively the kvm_gmem_populate() operation.
+
+For SNP, the private memory can be pre-populated first, and faulted in 
+later like normal. But for TDX these need to both happen both at the same 
+time and the setting of the private SPTE needs to happen in a different 
+way than the “after” case described above. It needs to use the 
+TDH.MEM.SEPT.ADD SEAMCALL which does both the copying in of the data and 
+setting the SPTE.
+
+Without extensive modification to the fault path, it’s not possible 
+utilize this callback from the set_external_spte() handler because it the 
+source page for the data to be copied in is not known deep down in this 
+callchain. So instead the post-populate callback does a three step 
+process.
+
+1. Pre-fault the memory into the mirror EPT, but have the 
+   set_external_spte() not make any SEAMCALLs.
+
+2. Check that the page is still faulted into the mirror EPT under read
+   mmu_lock that is held over this and the following step.
+
+3. Call TDH.MEM.SEPT.ADD with the HPA of the page to copy data from, and 
+   the private page installed in the mirror EPT to use for the private 
+   mapping.
+
+The scheme involves some assumptions about the operations that might 
+operate on the mirrored EPT before the VM is finalized. It assumes that no 
+other memory will be faulted into the mirror EPT, that is not also added 
+via TDH.MEM.SEPT.ADD). If this is violated the KVM MMU may not see private 
+memory faulted in there later and so not make the proper external spte 
+callbacks. There is also a problem for SNP, and there was discussion for 
+enforcing this in a more general way. In this series a counter is used, to 
+enforce that the number of pre-faulted pages is the same as the number of 
+pages added via KVM_TDX_INIT_MEM_REGION. It is probably worth discussing 
+if this serves any additional error handling benefits.
+
+TDX TLB flushing 
+----------------
+For TDX, TLB flushing needs to happen in different ways depending on 
+whether private and/or shared EPT needs to be flushed. Shared EPT can be 
+flushed like normal EPT with INVEPT. To avoid reading TD's EPTP out from 
+TDX module, this series flushes shared EPT with type 2 INVEPT. Private TLB 
+entries can be flushed this way too (via type 2). However, since the TDX 
+module needs to enforce some guarantees around which private memory is 
+mapped in the TD, it requires these operations to be done in special ways 
+for private memory.
+
+For flushing private memory, three methods will be used. First it can be 
+flushed directly via a SEAMCALL TDH.VP.FLUSH. This flush is of the INVEPT 
+type 1 variety (i.e. mappings associated with the TD). 
+
+The second method is part of a sequence of SEAMCALLs for removing a guest 
+page. The sequence looks like:
+
+1. TDH.MEM.RANGE.BLOCK - Remove RWX bits from entry (similar to KVM’s zap). 
+
+2. TDH.MEM.TRACK - Increment the TD TLB epoch, which is a per-TD counter 
+
+3. Kick off all vCPUs - In order to force them to have to re-enter.
+
+4. TDH.MEM.PAGE.REMOVE - Actually remove the page and make it available for
+   other use.
+
+5. TDH.VP.ENTER - On re-entering TDX module will see the epoch is
+   incremented and flush the TLB.
+
+The third method, is that during TDX module init, the TDH.SYS.LP.INIT is 
+used to online a CPU for TDX usage. It invokes a INVEPT type 2 to flush 
+all mappings in the TLB.
+
+TDX TLB flushing in KVM 
+----------------------- 
+During runtime, for normal (TDP MMU, non-nested) guests, KVM will do a TLB 
+flushes in 4 scenarios:
+
+(1) kvm_mmu_load()
+
+    After EPT is loaded, call kvm_x86_flush_tlb_current() to invalidate
+    TLBs for current vCPU loaded EPT on current pCPU.
+
+(2) Loading vCPU to a new pCPU
+
+    Send request KVM_REQ_TLB_FLUSH to current vCPU, the request handler 
+    will call kvm_x86_flush_tlb_all() to flush all EPTs assocated with the 
+    new pCPU.
+
+(3) When EPT mapping has changed (after removing or permission reduction) 
+    (e.g. in kvm_flush_remote_tlbs())
+
+    Send request KVM_REQ_TLB_FLUSH to all vCPUs by kicking all them off, 
+    the request handler on each vCPU will call kvm_x86_flush_tlb_all() to 
+    invalidate TLBs for all EPTs associated with the pCPU. 
+
+(4) When EPT changes only affects current vCPU, e.g. virtual apic mode 
+    changed.
+
+    Send request KVM_REQ_TLB_FLUSH_CURRENT, the request handler will call 
+    kvm_x86_flush_tlb_current() to invalidate TLBs for current vCPU loaded 
+    EPT on current pCPU.
+
+Only the first 3 are relevant to TDX. They are implemented as follows. 
+
+(1) kvm_mmu_load() 
+
+    Only the shared EPT root is loaded in this path. The TDX module does 
+    not require any assurances about the operation, so the 
+    flush_tlb_current()->ept_sync_global() can be called as normal. 
+
+(2) vCPU load 
+
+    When a vCPU migrates to a new logical processor, it has to be flushed 
+    on the old pCPU. This is different than normal VMs, where the INVEPT 
+    is executed on the new pCPU. The TDX behavior comes from a requirement 
+    that a vCPU can only be associated with one pCPU at at time. This 
+    flush happens via the TDH.VP.FLUSH SEAMCALL. It happens in the 
+    vcpu_load op callback on the old CPU via IPI.
+
+(3) Removing a private SPTE 
+
+    This is the more complicated flow. It is done in a simple way for now 
+    and is especially inefficient during VM teardown. The plan is to get a 
+    basic functional version working and optimize some of these flows 
+    later.
+
+    When a private page mapping is removed, the core MMU code calls the 
+    newly remove_external_spte() op, and flushes the TLB on all vCPUs. But 
+    TDX can’t rely on doing that for private memory, so it has it’s own 
+    process for making sure the private page is removed. This flow 
+    (TDH.MEM.RANGE.BLOCK, TDH.MEM.TRACK, TDH.MEM.PAGE.REMOVE) is done 
+    withing the remove_external_spte() implementation as described in the 
+    “TDX TLB flushing” section above.
+
+    After that, back in the core MMU code, KVM will call 
+    kvm_flush_remote_tlbs*() resulting in an INVEPT. Despite that, when 
+    the vCPUs re-enter (TDH.VP.ENTER) the TD, the TDX module will do 
+    another INVEPT for its own reassurance.
+
+Private memory teardown 
+----------------------- 
+Tearing down private memory involves reclaiming three types of resources 
+from the TDX module: 
+
+ 1. TD’s HKID 
+
+    To reclaim the TD’s HKID, no mappings may be mapped with it. 
+
+ 2. Private guest pages (mapped with HKID) 
+ 3. Private page tables that map private pages (mapped with HKID) 
+
+    From the TDX module’s perspective, to reclaim guest private pages they 
+    need to be prevented from be accessed via the HKID (unmapped and TLB 
+    flushed), their HKID associated cachelines need to be flushed, and 
+    they need to be marked as no longer use by the TD in the TDX modules 
+    internal tracking (PAMT) 
+
+During runtime private PTEs can be zapped as part of memslot deletion or 
+when memory coverts from shared to private, but private page tables and 
+HKIDs are not torn down until the TD is being destructed. The means the 
+operation to zap private guest mapped pages needs to do the required cache 
+writeback under the assumption that other vCPU’s may be active, but the
+PTs do not.
+
+TD teardown resource reclamation
+--------------------------------
+The code that does the TD teardown is organized such that when an HKID is 
+reclaimed:
+1. vCPUs will no longer enter the TD
+2. The TLB is flushed on all CPUs
+3. The HKID associated cachelines have been flushed.
+
+So at that point most of the steps needed to reclaim TD private pages and 
+page tables have already been done and the reclaim operation only needs to 
+update the TDX module’s tracking of page ownership. For simplicity each 
+operation only supports one scenario: before or after HKID reclaim. Since 
+zapping and reclaiming private pages has to function during runtime for 
+memslot deletion and converting from shared to private, the TD teardown is 
+arranged so this happens before HKID reclaim. Since private page tables 
+are never torn down during TD runtime, they can happen in a simpler and 
+more efficient way after HKID reclaim. The private page reclaim is 
+initiated from the kvm fd release. The callchain looks like this:
+
+do_exit 
+  |->exit_mm --> tdx_mmu_release_hkid() was called here previously in v19 
+  |->exit_files
+      |->1.release vcpu fd
+      |->2.kvm_gmem_release
+      |     |->kvm_gmem_invalidate_begin --> unmap all leaf entries, causing 
+      |                                      zapping of private guest pages
+      |->3.release kvmfd
+            |->kvm_destroy_vm
+                |->kvm_arch_destroy_vm
+                    |->kvm_unload_vcpu_mmus
+                    |  kvm_x86_call(vm_destroy)(kvm) -->tdx_mmu_release_hkid()
+                    |  kvm_destroy_vcpus(kvm)
+                    |   |->kvm_arch_vcpu_destroy
+                    |   |->kvm_x86_call(vcpu_free)(vcpu)
+                    |   |  kvm_mmu_destroy(vcpu) -->unref mirror root
+                    |  kvm_mmu_uninit_vm(kvm) --> mirror root ref is 1 here, 
+                    |                             zap private page tables
+                    | static_call_cond(kvm_x86_vm_free)(kvm);
+
+Notable changes since v19
+=========================
+As usual there are a smattering of small changes across the patches. A few 
+more structural changes are highlighted below.
+
+Removal of TDX flush_remote_tlbs() and flush_remote_tlbs_range() hooks
+----------------------------------------------------------------------
+Since only the remove_external_spte() callback needs to flush remote TLBs 
+for private memory, it is ok to let these have the default behavior of 
+flushing with a plain INVEPT. This change also resulted in all callers 
+doing the TDH.MEM.TRACK flow being inside an MMU write lock, leading to 
+the next removal.
+
+Removal of tdh_mem_track counter
+--------------------------------
+One change of note to this area since the v19 series is how 
+synchronization works between the incrementing of the TD epoch, and the 
+kicking of all the vCPUs. Previously a counter was used to synchronize 
+these. The raw counter instead of more common synchronization primitives 
+made it a bit hard to follow, and a new lock was considered. After the 
+separation of private and shared flushing, it was realized all the callers 
+of tdx_track() held an MMU write lock. So this revision relies on that for 
+this synchronization.
+
+Change of pre-populate flow
+---------------------------
+Previously the part of the pre-populate flow required userspace to 
+pre-fault the private pages into the mirror EPT explicitly with a call to 
+KVM_PRE_FAULT_MEMORY before KVM_TDX_INIT_MEM_REGION. After discussion [6], 
+it was changed to the current design.
+
+Moving of tdx_mmu_release_hkid()
+--------------------------------
+Yan pointed out [7] some oddities related to private memory being 
+reclaimed from an MMU notified callback. This was weird on the face of it, 
+and it turned out Sean had already NAKed the approach. In fixing this, 
+HKID reclaim was moved to after calls that could zapping/reclaim private 
+pages. The fix however meant that the zap/reclaim of the private pages is 
+slower. Previously, Kai had suggested [8] to start with something simpler 
+and optimize it later (which is aligned with what we are trying to do in 
+general for TDX support). So several insights were all leading us in this 
+direction. After the move about ~80 lines of architecturally thorny logic 
+that branched off of whether the HKID was assigned was able to be dropped.
+
+Split "KVM: TDX: TDP MMU TDX support"
+-------------------------------------
+This patch was a big monolith that did a bunch of changes at once. It was
+split apart for easier reviewing.
+
+Repos
+=====
+The series is extracted from this KVM tree:
+https://github.com/intel/tdx/tree/tdx_kvm_dev-2024-09-03
+
+The KVM tree has some workaround patches removed to resemble more closely 
+what will eventually make it upstream. It requires:
+
+    EDK2: 9389b9a208 ("MdePkg/Tdx.h: Fix the order of NumVcpus and MaxVcpus") 
+
+    TDX Module: 1.5.06.00.744
+
+A matching QEMU is here:
+https://github.com/intel-staging/qemu-tdx/tree/tdx-qemu-wip-2024-08-27
+ 
+Testing 
+======= 
+As mentioned earlier, this series is not ready for upstream. All the same, 
+it has been tested as part of the development branch for the TDX base
+series. The testing consisted of TDX kvm-unit-tests and booting a Linux
+TD, and TDX enhanced KVM selftests.
+
+There is a recently discovered bug in the TDX MMU part 1 patches. We will 
+be posting a fix soon. This fix would allow allow for a small amount of 
+code to be removed from this series, but otherwise wouldn't interfere.
+
+[0] https://lore.kernel.org/kvm/20240718211230.1492011-1-rick.p.edgecombe@intel.com/ 
+[1] https://lore.kernel.org/kvm/20240608000639.3295768-1-seanjc@google.com/#t  
+[2] https://lore.kernel.org/kvm/cover.1721186590.git.kai.huang@intel.com/  
+[3] https://github.com/intel/tdx/commits/kvm-tdxinit/  
+[4] https://lore.kernel.org/kvm/20240826022255.361406-1-binbin.wu@linux.intel.com/
+[5] https://lore.kernel.org/kvm/20240812224820.34826-1-rick.p.edgecombe@intel.com/  
+[6] https://lore.kernel.org/kvm/73c62e76d83fe4e5990b640582da933ff3862cb1.camel@intel.com/ 
+[7] https://lore.kernel.org/kvm/ZnUncmMSJ3Vbn1Fx@yzhao56-desk.sh.intel.com/ 
+[8] https://lore.kernel.org/lkml/65a1a35e0a3b9a6f0a123e50ec9ddb755f70da52.camel@intel.com/ 
+
+Isaku Yamahata (14):
+  KVM: x86/tdp_mmu: Add a helper function to walk down the TDP MMU
+  KVM: TDX: Add accessors VMX VMCS helpers
+  KVM: TDX: Set gfn_direct_bits to shared bit
+  KVM: TDX: Require TDP MMU and mmio caching for TDX
+  KVM: x86/mmu: Add setter for shadow_mmio_value
+  KVM: TDX: Set per-VM shadow_mmio_value to 0
+  KVM: TDX: Handle TLB tracking for TDX
+  KVM: TDX: Implement hooks to propagate changes of TDP MMU mirror page
+    table
+  KVM: TDX: Implement hook to get max mapping level of private pages
+  KVM: TDX: Premap initial guest memory
+  KVM: TDX: MTRR: implement get_mt_mask() for TDX
+  KVM: TDX: Add an ioctl to create initial guest memory
+  KVM: TDX: Finalize VM initialization
+  KVM: TDX: Handle vCPU dissociation
+
+Rick Edgecombe (3):
+  KVM: x86/mmu: Implement memslot deletion for TDX
+  KVM: VMX: Teach EPT violation helper about private mem
+  KVM: x86/mmu: Export kvm_tdp_map_page()
+
+Sean Christopherson (2):
+  KVM: VMX: Split out guts of EPT violation to common/exposed function
+  KVM: TDX: Add load_mmu_pgd method for TDX
+
+Yan Zhao (1):
+  KVM: x86/mmu: Do not enable page track for TD guest
+
+Yuan Yao (1):
+  KVM: TDX: Retry seamcall when TDX_OPERAND_BUSY with operand SEPT
+
+ arch/x86/include/asm/vmx.h      |   1 +
+ arch/x86/include/uapi/asm/kvm.h |  10 +
+ arch/x86/kvm/mmu.h              |   4 +
+ arch/x86/kvm/mmu/mmu.c          |   7 +-
+ arch/x86/kvm/mmu/page_track.c   |   3 +
+ arch/x86/kvm/mmu/spte.c         |   8 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      |  37 +-
+ arch/x86/kvm/vmx/common.h       |  47 +++
+ arch/x86/kvm/vmx/main.c         | 122 +++++-
+ arch/x86/kvm/vmx/tdx.c          | 674 +++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/tdx.h          |  91 ++++-
+ arch/x86/kvm/vmx/tdx_arch.h     |  23 ++
+ arch/x86/kvm/vmx/tdx_ops.h      |  54 ++-
+ arch/x86/kvm/vmx/vmx.c          |  25 +-
+ arch/x86/kvm/vmx/x86_ops.h      |  51 +++
+ virt/kvm/kvm_main.c             |   1 +
+ 16 files changed, 1097 insertions(+), 61 deletions(-)
+ create mode 100644 arch/x86/kvm/vmx/common.h
+
+-- 
+2.34.1
+
 
