@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-25929-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25930-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FBCD96D33D
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 11:30:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3901296D35A
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 11:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434E21C2584F
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 09:30:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC2C028933F
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 09:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EA5198E6D;
-	Thu,  5 Sep 2024 09:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51069198E90;
+	Thu,  5 Sep 2024 09:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iny2K5Cm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e5795zeE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31A4197A9E;
-	Thu,  5 Sep 2024 09:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6163197A77;
+	Thu,  5 Sep 2024 09:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725528487; cv=none; b=SKSp71WiGqgCN5p54FjUTRw1qDoe4MirF+1GtA98BRJ7jv1Wcvqc7yGBzUBjJjkje/vUV+V6KNCQzT82qyT82jcetL9Tg2NEDqwQ52ZRlWVoWCNJXCHt8YyFZ0PfCRDI33yilH3nETdLWvR6TqDRGjgm+1sCQDF0g0tH534up/Q=
+	t=1725528699; cv=none; b=Uo5ybCFm5aKa9nbC/Y+811l7Tj+Dr3y+eWeYzqPKrdo8/vlZD60AVpD3r4rYKcQAXXop5bWK5xrLs0hgxzCMimzNmCDnzfyIvDPMIK+rGIFIDN7tir2sLEVSZtgh+07w68TQYG5jRF2L6fnnL29OmHH+BfjdV1T6adXmpDPc5RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725528487; c=relaxed/simple;
-	bh=WC+VXLzSBwluv2vPpjWrFh6Amvrc4jdoGupj0JdnJTo=;
+	s=arc-20240116; t=1725528699; c=relaxed/simple;
+	bh=086CJU3xj3vqkfEQ8ZJx6ssAsn3JtiLdqrG90LXtwfo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rCWt/P7klphEyWe7xZQhr8IlCE+N1z7DBiwVIernl4c2V5HM/bzWLwcEp4yuEw/MNFWVeisr70M8cQuou4WE2uM715D1tJZnJCyH7X2i195pSJZQtkl7hNRK5XBIzmkCxZ+0aGdetN0LOSnGe24O4SJn4kbjahQiwoQSNJQhiGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iny2K5Cm; arc=none smtp.client-ip=198.175.65.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=qis5e5l0g7v+ewGWQiyh/WsuIFIJDyKL1I3oZHxSlIGOq1XJTN+2a2U8eH1hdsTjYoMWzqrc9kmwBv1gzkHls3ntdYSwOpAB8wEuAa3ILIkVDx+vg/dhJSECY7ywSm8JlbyEHUl/qJl6EazrUxQWf3WbGWcijLuajf9ZbUjVNc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e5795zeE; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725528486; x=1757064486;
+  t=1725528698; x=1757064698;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=WC+VXLzSBwluv2vPpjWrFh6Amvrc4jdoGupj0JdnJTo=;
-  b=iny2K5CmnGrHHCdsTTIJElB/jCuT1VtjSIpQQjYdimv0DCiXHUqE6s9A
-   3iZI9sN1jgcuDPTJXeTeZiNy6Gl2o8UymbesgnHygrcaCB2JMWDOi+RaM
-   xaMFv4voybLBcbglYKWRMjznfI8kM0hqq4JJIN/w1OKOG9e/3A5TbWqbz
-   wgJbuoLKamnQNN79GwhAaDSdB28cd/CUMn9Wc5COtJ62V3fGcMTS9jjKZ
-   YYk58NpDKX7y6blYdrBMKXGST8YcSPQKebpXf4ykL9DVUDAk4z+E4qYjJ
-   mHtb+g+Y0HBnFFZu85htO5DXzGCl1PJDdkbqAWztUM/5BjBTusQTEqVI0
+   mime-version:in-reply-to;
+  bh=086CJU3xj3vqkfEQ8ZJx6ssAsn3JtiLdqrG90LXtwfo=;
+  b=e5795zeEOUckBAMm8cMM20QwbMVBgGztMf6M6FCsWBuKqHICD+JaKl2c
+   qby0np2u7IIhfLgm508WUH3JEm0K9puuHk6WpdvVPSRQ5EpxPp8m/q4N5
+   TbjlaDlkyJMYUavLxBr5E8a6feZXG9yBbWYqv1f03b8wZF8L/H5ZOiaYN
+   +AESDwNzSKqGmOkIuLBXLzIJc307AZQvaQ6Q9pLek+MBPHZGtEa/jhst6
+   OcgdDJWUyLsfw0TDEb406mgiQQuC8ADJ/mXMo/5RBlcfAlI/V8j6qOOLK
+   p4VMSsWcFEwG1FcUPodeNrAuiwnrlVaxQkCqRn7zymkL9CcA4bccBuPxH
    g==;
-X-CSE-ConnectionGUID: Z/f4YeeXT02/OacsghMd0A==
-X-CSE-MsgGUID: 77dr74DVRRm4rviRGtKVXQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="27986166"
+X-CSE-ConnectionGUID: 1PKB7GXPRVmOzQv5iIGmBg==
+X-CSE-MsgGUID: WuI+pNrvSnKVVTD561UXMQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="24394656"
 X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
-   d="scan'208";a="27986166"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 02:28:05 -0700
-X-CSE-ConnectionGUID: AOegvW/lSgC4gU3ZGC1TlQ==
-X-CSE-MsgGUID: c0Bg2dRhSWKoHRtJJjX1DQ==
+   d="scan'208";a="24394656"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 02:31:37 -0700
+X-CSE-ConnectionGUID: NbcObBuxSlm459nDSKj5Mg==
+X-CSE-MsgGUID: cRxlMwArSUWmAvtcHovaYQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
-   d="scan'208";a="70167636"
+   d="scan'208";a="69976282"
 Received: from fdefranc-mobl3.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.103])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 02:28:00 -0700
-Date: Thu, 5 Sep 2024 12:27:54 +0300
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 02:31:33 -0700
+Date: Thu, 5 Sep 2024 12:31:26 +0300
 From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
+To: Chenyi Qiang <chenyi.qiang@intel.com>
 Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
 	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
 	isaku.yamahata@gmail.com, xiaoyao.li@intel.com,
@@ -68,117 +68,106 @@ Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
 	Isaku Yamahata <isaku.yamahata@intel.com>
 Subject: Re: [PATCH 14/25] KVM: TDX: initialize VM with TDX specific
  parameters
-Message-ID: <Ztl5muQNXr7eGLWU@tlindgre-MOBL1>
+Message-ID: <Ztl6bg2vfah35Zlj@tlindgre-MOBL1>
 References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
  <20240812224820.34826-15-rick.p.edgecombe@intel.com>
- <ZtAU7FIV2Xkw+L3O@yzhao56-desk.sh.intel.com>
- <ZtWUATuc5wim02rN@tlindgre-MOBL1>
- <ZtlWzUO+VGzt7Z89@yzhao56-desk.sh.intel.com>
+ <43a12ed3-90a7-4d44-aef9-e1ca61008bab@intel.com>
+ <ZtaiNi09UQ1o-tPP@tlindgre-MOBL1>
+ <dd48cb68-1051-48ec-ae29-874c2a77f30f@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZtlWzUO+VGzt7Z89@yzhao56-desk.sh.intel.com>
+In-Reply-To: <dd48cb68-1051-48ec-ae29-874c2a77f30f@intel.com>
 
-On Thu, Sep 05, 2024 at 02:59:25PM +0800, Yan Zhao wrote:
-> On Mon, Sep 02, 2024 at 01:31:29PM +0300, Tony Lindgren wrote:
-> > On Thu, Aug 29, 2024 at 02:27:56PM +0800, Yan Zhao wrote:
-> > > On Mon, Aug 12, 2024 at 03:48:09PM -0700, Rick Edgecombe wrote:
-> > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > > 
-> > > ...
-> > > > +static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
-> > > > +{
-> > ...
+On Tue, Sep 03, 2024 at 04:04:47PM +0800, Chenyi Qiang wrote:
+> 
+> 
+> On 9/3/2024 1:44 PM, Tony Lindgren wrote:
+> > On Tue, Sep 03, 2024 at 10:58:11AM +0800, Chenyi Qiang wrote:
+> >> On 8/13/2024 6:48 AM, Rick Edgecombe wrote:
+> >>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >>> @@ -543,10 +664,23 @@ static int __tdx_td_init(struct kvm *kvm)
+> >>>  		}
+> >>>  	}
+> >>>  
+> >>> -	/*
+> >>> -	 * Note, TDH_MNG_INIT cannot be invoked here.  TDH_MNG_INIT requires a dedicated
+> >>> -	 * ioctl() to define the configure CPUID values for the TD.
+> >>> -	 */
+> >>> +	err = tdh_mng_init(kvm_tdx, __pa(td_params), &rcx);
+> >>> +	if ((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_INVALID) {
+> >>> +		/*
+> >>> +		 * Because a user gives operands, don't warn.
+> >>> +		 * Return a hint to the user because it's sometimes hard for the
+> >>> +		 * user to figure out which operand is invalid.  SEAMCALL status
+> >>> +		 * code includes which operand caused invalid operand error.
+> >>> +		 */
+> >>> +		*seamcall_err = err;
+> >>
+> >> I'm wondering if we could return or output more hint (i.e. the value of
+> >> rcx) in the case of invalid operand. For example, if seamcall returns
+> >> with INVALID_OPERAND_CPUID_CONFIG, rcx will contain the CPUID
+> >> leaf/sub-leaf info.
 > > 
-> > > > +	kvm_tdx->tsc_offset = td_tdcs_exec_read64(kvm_tdx, TD_TDCS_EXEC_TSC_OFFSET);
-> > > > +	kvm_tdx->attributes = td_params->attributes;
-> > > > +	kvm_tdx->xfam = td_params->xfam;
-> > > > +
-> > > > +	if (td_params->exec_controls & TDX_EXEC_CONTROL_MAX_GPAW)
-> > > > +		kvm->arch.gfn_direct_bits = gpa_to_gfn(BIT_ULL(51));
-> > > > +	else
-> > > > +		kvm->arch.gfn_direct_bits = gpa_to_gfn(BIT_ULL(47));
-> > > > +
-> > > Could we introduce a initialized field in struct kvm_tdx and set it true
-> > > here? e.g
-> > > +       kvm_tdx->initialized = true;
-> > > 
-> > > Then reject vCPU creation in tdx_vcpu_create() before KVM_TDX_INIT_VM is
-> > > executed successfully? e.g.
-> > > 
-> > > @@ -584,6 +589,9 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
-> > >         struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> > >         struct vcpu_tdx *tdx = to_tdx(vcpu);
-> > > 
-> > > +       if (!kvm_tdx->initialized)
-> > > +               return -EIO;
-> > > +
-> > >         /* TDX only supports x2APIC, which requires an in-kernel local APIC. */
-> > >         if (!vcpu->arch.apic)
-> > >                 return -EINVAL;
-> > > 
-> > > Allowing vCPU creation only after TD is initialized can prevent unexpected
-> > > userspace access to uninitialized TD primitives.
+> > Printing a decriptive error here would be nice when things go wrong.
+> > Probably no need to return that information.
 > > 
-> > Makes sense to check for initialized TD before allowing other calls. Maybe
-> > the check is needed in other places too in additoin to the tdx_vcpu_create().
-> Do you mean in places checking is_hkid_assigned()?
+> > Sounds like you have a patch already in mind though :) Care to post a
+> > patch against the current kvm-coco branch? If not, I can do it after all
+> > the obvious comment changes are out of the way.
+> 
+> According to the comment above, this patch wants to return the hint to
+> user as the user gives operands. I'm still uncertain if we should follow
+> this to return value in some way or special-case the
+> INVALID_OPERAND_CPUID_CONFIG like:
+> 
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index c00c73b2ad4c..dd6e3149ff5a 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -2476,8 +2476,14 @@ static int __tdx_td_init(struct kvm *kvm, struct
+> td_params *td_params,
+>                  * Return a hint to the user because it's sometimes hard
+> for the
+>                  * user to figure out which operand is invalid.
+> SEAMCALL status
+>                  * code includes which operand caused invalid operand error.
+> +                *
+> +                * TDX_OPERAND_INVALID_CPUID_CONFIG contains more info
+> +                * in rcx (i.e. leaf/sub-leaf), warn it to help figure
+> +                * out the invalid CPUID config.
+>                  */
+>                 *seamcall_err = err;
+> +               if (err == (TDX_OPERAND_INVALID |
+> TDX_OPERAND_ID_CPUID_CONFIG))
+> +                       pr_tdx_error_1(TDH_MNG_INIT, err, rcx);
+>                 ret = -EINVAL;
+>                 goto teardown;
+>         } else if (WARN_ON_ONCE(err)) {
+> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
+> index f9dbb3a065cc..311c3f03d398 100644
+> --- a/arch/x86/kvm/vmx/tdx_errno.h
+> +++ b/arch/x86/kvm/vmx/tdx_errno.h
+> @@ -30,6 +30,7 @@
+>   * detail information
+>   */
+>  #define TDX_OPERAND_ID_RCX                     0x01
+> +#define TDX_OPERAND_ID_CPUID_CONFIG            0x45
+>  #define TDX_OPERAND_ID_TDR                     0x80
+>  #define TDX_OPERAND_ID_SEPT                    0x92
+>  #define TDX_OPERAND_ID_TD_EPOCH                        0xa9
+> 
 
-Sounds like the state needs to be checked in multiple places to handle
-out-of-order ioctls to that's not enough.
-
-> > How about just a function to check for one or more of the already existing
-> > initialized struct kvm_tdx values?
-> Instead of checking multiple individual fields in kvm_tdx or vcpu_tdx, could we
-> introduce a single state field in the two strutures and utilize a state machine
-> for check (as Chao Gao pointed out at [1]) ?
-
-OK
-
-> e.g.
-> Now TD can have 5 states: (1)created, (2)initialized, (3)finalized,
->                           (4)destroyed, (5)freed.
-> Each vCPU has 3 states: (1) created, (2) initialized, (3)freed
-> 
-> All the states are updated by a user operation (e.g. KVM_TDX_INIT_VM,
-> KVM_TDX_FINALIZE_VM, KVM_TDX_INIT_VCPU) or a x86 op (e.g. vm_init, vm_destroy,
-> vm_free, vcpu_create, vcpu_free).
-> 
-> 
->      TD                                   vCPU
-> (1) created(set in op vm_init)
-> (2) initialized
-> (indicate tdr_pa != 0 && HKID assigned)
-> 
->                                           (1) created (set in op vcpu_create)
-> 
->                                           (2) initialized
-> 
->                                     (can call INIT_MEM_REGION, GET_CPUID here)
-> 
-> 
-> (3) finalized
-> 
->                                  (tdx_vcpu_run(), tdx_handle_exit() can be here)
-> 
-> 
-> (4) destroyed (indicate HKID released)
-> 
->                                          (3) freed
-> 
-> (5) freed
-
-So an enum for the TD state, and also for the vCPU state?
+OK yes that should take care of the issue, I doubt that this can be
+automatically be handled by the caller even a better error code
+was returned.
 
 Regards,
 
 Tony
- 
-> [1] https://lore.kernel.org/kvm/ZfvI8t7SlfIsxbmT@chao-email/#t
 
