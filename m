@@ -1,122 +1,132 @@
-Return-Path: <kvm+bounces-25957-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25958-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7963396DB95
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 16:19:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ADF096DCD4
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 16:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23FB61F27645
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 14:19:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DB671C22B54
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 14:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68911CABF;
-	Thu,  5 Sep 2024 14:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE2B19EEC5;
+	Thu,  5 Sep 2024 14:57:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G8XEziJ6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MdMAbHlu"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB9227715
-	for <kvm@vger.kernel.org>; Thu,  5 Sep 2024 14:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970C019A2B7;
+	Thu,  5 Sep 2024 14:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725545877; cv=none; b=NsfG6xoT6q6jgJCrv1wmhbgugTkifPxUAx9dNgns32ho41phlHveTurgsnKGTxO1BZsDo294swpuw6LtHqTtipdyCtZHE51VXP5SxXh7faXwjhnfNem6dQsDPEhluXXqyDZfeArFyKRMlAwh+fHSHIHGv2HGCXO0pt40NJVW/z4=
+	t=1725548238; cv=none; b=B5GbsCXxVsemFnAbE1zTPKFq/IwCO3r88m0U61ovMd0K6QIFZG5aAOFy3g8UCgrFaivYFtYkATQiEO/Myw/Sk/PXWjb4vHe4TDJCsZZGpdddsLyt8j66i/fCB82NuPhgKGwZFZ0r6YCQGkPH34nSp5Gd2mK2jK2jSv0aXR1+hJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725545877; c=relaxed/simple;
-	bh=K+l9mMxcfSbXEO7japsfxlObUe3Pdx0hdSfrik3j3ag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fkRjNQsJpdAhFfXFt2iXMKOpsHnjm0QahE1673y5o8Ypk5oVUNy28oWILNDiJHq8LeNC8VuNkrOS7rK66TV0vnbyzsVL5u6vzpeLe4mNXSgAsf0h8dhJ3f7sNF6gSynRFfRWSsxWP5ALX/0wP3irstIKOjpN5SVP5TgXBifaWuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G8XEziJ6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725545874;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aI4n4X4EeQia228ZkrTYWhYjJj0SeU3OGZPxnQ2jneY=;
-	b=G8XEziJ6hSS9Nd4vC7qEI3Er7SFiiER/t1ypTYfGCcMx6QQFyvjxdY6X3MRVyrpLIbz/ju
-	eVYlcOYmDVkZiFVn/ikjHZ1G02bl99fBmuSLHGv0dQQmZGHj+NfIqJSN563jInu/nRrNaL
-	310KCxTZOflO24UrgXF8fg4aTaEQRps=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-258-ae0AT1hMM2OsKvJhcI_BTg-1; Thu,
- 05 Sep 2024 10:17:50 -0400
-X-MC-Unique: ae0AT1hMM2OsKvJhcI_BTg-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 72CDF195E93C;
-	Thu,  5 Sep 2024 14:17:46 +0000 (UTC)
-Received: from localhost (unknown [10.2.16.181])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B292D195608A;
-	Thu,  5 Sep 2024 14:17:45 +0000 (UTC)
-Date: Thu, 5 Sep 2024 10:17:44 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc: virtualization@lists.linux.dev, mst@redhat.com,
-	Miklos Szeredi <mszeredi@redhat.com>,
-	Vivek Goyal <vgoyal@redhat.com>, kvm@vger.kernel.org,
-	Jingbo Xu <jefflexu@linux.alibaba.com>, pgootzen@nvidia.com,
-	smalin@nvidia.com, larora@nvidia.com, ialroy@nvidia.com,
-	oren@nvidia.com, izach@nvidia.com
-Subject: Re: [PATCH v1 1/2] virtio_fs: introduce virtio_fs_put_locked helper
-Message-ID: <20240905141744.GB1922502@fedora>
-References: <20240825130716.9506-1-mgurtovoy@nvidia.com>
+	s=arc-20240116; t=1725548238; c=relaxed/simple;
+	bh=KAHi3umxUR4oy96Bn7I3kG7qlY5Uqzhzj0ufsrwwPRA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q0NY5Xg+rFtUH8VT/iMWZ44vWbe3I7Yn4ECjL4oD1ZHaFmzVTkHEUqfKekYUcSze6FJ3Q9lVMbMIRQ/swj5l9bSWXPsQBfQ4tTJMywCLrmnl/ccm8dYAY2bPB1snyWihhNYQqAl65OI6vBEHJNHUGblffO30XHHvvejmIrh8L4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MdMAbHlu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C0A3C4CECB;
+	Thu,  5 Sep 2024 14:57:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725548238;
+	bh=KAHi3umxUR4oy96Bn7I3kG7qlY5Uqzhzj0ufsrwwPRA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MdMAbHlumLZf52D59lasIUksNWhnyWNNT3REL5qMUhs4Nn30USb1tTXrki98khANW
+	 suzL5zOptzsWiEul+DcEFVNwPZREgLSBNoGhYjpWtdb08YEQc2444oQ/BYA3wCG4Uj
+	 AftAJzNUu0vli8PVoPp81kBHkDsIMF0bVUZHQkGiu3iTmJAG+ssxjcK40Q4EMRW6rq
+	 oUcaVSoCN8Rc7KxG/iokcR8OaIXYyEo+erAbYrJlYgMy1M4mfywMsR9/RzjqecbsLu
+	 m63CyWq7NBmkeiux+/abXF5HX6OLeqHFXachfWMqzf+qg2UllC8JRfjT6zDek3/Ara
+	 yA5PtnwBX58Dg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1smDv8-009zQN-DJ;
+	Thu, 05 Sep 2024 15:57:15 +0100
+Date: Thu, 05 Sep 2024 15:57:13 +0100
+Message-ID: <86ikvaup12.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v2 12/16] KVM: arm64: Implement AT S1PIE support
+In-Reply-To: <20240905135820.GA4142389@e124191.cambridge.arm.com>
+References: <20240903153834.1909472-1-maz@kernel.org>
+	<20240903153834.1909472-13-maz@kernel.org>
+	<20240905135820.GA4142389@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="PmPZWAVlJaaoA0L+"
-Content-Disposition: inline
-In-Reply-To: <20240825130716.9506-1-mgurtovoy@nvidia.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+Hi Joey,
 
---PmPZWAVlJaaoA0L+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for having a look.
 
-On Sun, Aug 25, 2024 at 04:07:15PM +0300, Max Gurtovoy wrote:
-> Introduce a new helper function virtio_fs_put_locked to encapsulate the
-> common pattern of releasing a virtio_fs reference while holding a lock.
-> The existing virtio_fs_put helper will be used to release a virtio_fs
-> reference while not holding a lock.
->=20
-> Also add an assertion in case the lock is not taken when it should.
->=20
-> Reviewed-by: Idan Zach <izach@nvidia.com>
-> Reviewed-by: Shai Malin <smalin@nvidia.com>
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->  fs/fuse/virtio_fs.c | 17 +++++++++++------
->  1 file changed, 11 insertions(+), 6 deletions(-)
+On Thu, 05 Sep 2024 14:58:20 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> Hello Marc!
+> 
+> >  static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
+> >  				   struct s1_walk_info *wi,
+> >  				   struct s1_walk_result *wr,
+> >  				   struct s1_perms *s1p)
+> >  {
+> > -	compute_s1_direct_permissions(vcpu, wi, wr, s1p);
+> > +	if (!s1pie_enabled(vcpu, wi->regime))
+> > +		compute_s1_direct_permissions(vcpu, wi, wr, s1p);
+> > +	else
+> > +		compute_s1_indirect_permissions(vcpu, wi, wr, s1p);
+> > +
+> >  	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
+> 
+> Is this (and the previous patch to split this up) right?
+> 
+> Looking at this from the ARM ARM (ARM DDI 0487K.a):
+> 
+> 	R JHSVW If Indirect permissions are used, then hierarchical
+> 	permissions are disabled and TCR_ELx.HPDn are RES 1.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Odd. I was convinced that it was when S1POE is enabled that HPs were
+disabled. But you are absolutely right, and it is once more proven
+that I can't read. Oh well.
 
---PmPZWAVlJaaoA0L+
-Content-Type: application/pgp-signature; name="signature.asc"
+Not to worry, I've since found other issues with this series. I have
+forgotten the patch dealing with the fast path on another branch, and
+since decided that TCR2_EL2 needed extra care to cope with individual
+features being disabled.
 
------BEGIN PGP SIGNATURE-----
+The rework is still useful, as I'm looking at POE as well, but I need
+to hoist the HP stuff up a notch.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmbZvYgACgkQnKSrs4Gr
-c8gFJQf/dfAOvhA3E79RBsBGd6CmuOQagcK6ixD60cMHKFI/C2WM8VhBWyW9fVIm
-FhQcYJRgxOPy9IkDGED3jbi+i9UFbKulo81tT/7kwEgHbTXxB9xMUJF/kKk24ls4
-QbG+jkoeYnV98Dr/sJsHDXTntRVmYmSYdB/VRV5zmD9cmxBis3ixNIfjFA7Si9pi
-Lmy8YdUuwSPK9BKRpzOGqJkQB/BEmMtcsiV/SxWpzppZIt97Cxcqn182ecETJMk1
-KbmEwKGeyYHOqaU3bQQk337vwK/fzc+xi78T0ZzEaeEWwsXm+uvvtVb9ZpyWm4Y8
-Qql3XQNfedb9NEh5boqMn8CuXy+nFw==
-=UAVw
------END PGP SIGNATURE-----
+I'll repost things once I've sorted these things up.
 
---PmPZWAVlJaaoA0L+--
+Thanks again,
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
