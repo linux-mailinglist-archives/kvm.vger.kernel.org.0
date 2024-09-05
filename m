@@ -1,242 +1,218 @@
-Return-Path: <kvm+bounces-25920-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25921-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A801E96CD85
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 05:58:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BF8196CE28
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 06:36:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E316281D35
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 03:58:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C9E928A668
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 04:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4117C14B07E;
-	Thu,  5 Sep 2024 03:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002431547E2;
+	Thu,  5 Sep 2024 04:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Z0pz2LCj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E121448C7;
-	Thu,  5 Sep 2024 03:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725508693; cv=none; b=IcRAQR4XuMhmxcOkG8oea5//NRA04Qe2o5QejS4Vp0J6O8jeTMHaQG6B7XLWuCY7+N48GuEj3/zI9gaGY3FLCre0lxVA+kJqMwIumTkDFlPGq1oE9DOGUF2MU3moaXyvny8BFD6zFu41GEwwI1jCnyDoHx1Yy/ElxyPmE019X1M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725508693; c=relaxed/simple;
-	bh=luQb3xUecoD0vUC9Su5msUMd9lpUG6JGBOQr8+FWYfE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=TSZ4kRAPTlZkLQmCph8FFDecyKcPu37jMOe8tg4LcW/MRjW3xIQb0h0EX5iaj3WxsZOYoB/UsOJl6PVNQ5VyqYIibpzcDhfEvndOgzaOUvArTLzSzqC9WZt3KnaIuHo6HtUA5kmQ/bvlF25dF+MxymXZ+5aqOP/W+QYJbNknHqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8DxSupQLNlmLvsqAA--.17723S3;
-	Thu, 05 Sep 2024 11:58:08 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front2 (Coremail) with SMTP id qciowMBxjcVMLNlme34GAA--.18366S3;
-	Thu, 05 Sep 2024 11:58:04 +0800 (CST)
-Subject: Re: [PATCH v3] Loongarch: KVM: Add KVM hypercalls documentation for
- LoongArch
-To: Dandan Zhang <zhangdandan@uniontech.com>, pbonzini@redhat.com,
- corbet@lwn.net, zhaotianrui@loongson.cn, chenhuacai@kernel.org,
- zenghui.yu@linux.dev
-Cc: kernel@xen0n.name, kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- guanwentao@uniontech.com, wangyuli@uniontech.com, baimingcong@uniontech.com,
- Xianglai Li <lixianglai@loongson.cn>, Mingcong Bai <jeffbai@aosc.io>
-References: <4769C036576F8816+20240828045950.3484113-1-zhangdandan@uniontech.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <da7ce1b6-87a9-05ec-3a4d-0bdf5204c1b7@loongson.cn>
-Date: Thu, 5 Sep 2024 11:58:04 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2089.outbound.protection.outlook.com [40.107.93.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8061914F125;
+	Thu,  5 Sep 2024 04:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725510961; cv=fail; b=PCfcDVSc/0BuzlRz78ckDSTdc9CPYQfHQKxxKSzb22A4lXWaU3NrLum5aMKTstnMb+7akK528pdsjnGoJuOAVb4m9UM3cZ52rbQCSWk12JmaQ5jTBdeQqSpWrFXtNX434X9zeo9OcVkn+JyxiJEGTD9D53KuJsdGji0JAbTq884=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725510961; c=relaxed/simple;
+	bh=T+U4dsbWKvc+BAGRouW6y6mJfJBMBICiKIdc0x99CW0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=gqRVoNdJv+9cekjBu/Szw1T2MaKcnCyZU6kkGs1EnkZDSlr6JWbgvaGdt8qsqzQt+kdK36sK7vI/noVSP+FrFUDSY2nHXKQOYmWcG/5U1xxti4yJiD7VAuv7lBbXjLD81cQFjHzdTwqdlGl2yWEuVKWqCm5Kvq9YSBS56+UXVTI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Z0pz2LCj; arc=fail smtp.client-ip=40.107.93.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IF5NrinqanEmnYLEFZTmqJXRLLSLd0XINQtw6lX4GREdpHyhMWS9XOqXd+nrNjerw+Nn5olsAzbUONPanIun0nHmBj5+b4W5t/llbAdYkx/kC2is2AbU6qQDf0BXFlp39EqSDk1gO4rvidnHsBtK9NqN5GUs2PcnN9bETSpfwtWBrTJEyyO+BYefLO2TzyxDFIu8tMRFfqSnBVZGzx0n4x0pnb4SRhgHZoS16ZC06Mo4dU82gA9BPdl07SQ26bgh90/vlNvF3V+wua8m3lHTlSeHF5bmPwk0ctqY+l6Nj8+C1XcjVSg53XkeoPjGFZ+6xr2+PWzzovg1cWzHkzhlYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kJ8aVFkgf3ouk9O8bQBgR7FbYJ3NRkUNE/ngGThzVWM=;
+ b=dNbcDZ8H97t9fqFBcHKOEXqWSaM4Lgrv+0BehD/0Es0s9pOjFJ24x5LhXmW+ZD9PVYQezpvXgr9SWKVF0fQtq+EzHnd6+9Wz+PBiz7qGOH89gc94UFuI+1kfS6cDC9oAQL3HoqYKar9rPcN5RqySEp5iJTMuNWCZhU6d3vmQPQRyi1PzMJJ17E7xmQUEQSpCXcIrPjyxaUJE9vNtYStlvWr0p1N0phgcmG7TGKw1K/uaJyic//AC1F5/F1lcf/wrTqCrSXlAUZVwD1aDmr38Q6fz0P8ch/L5X6rQGkP6AiF7bjjXdafbBLGG4whQQTuTzkDJKIAZAUGNgkdBbwB7lg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kJ8aVFkgf3ouk9O8bQBgR7FbYJ3NRkUNE/ngGThzVWM=;
+ b=Z0pz2LCjy17/8kmVWaEjEd98y6sg0um9xsITBgPLBqsBm45k56zmNB9GzqQmolu9Qu2FzNPxUbcIhlHbWnU09jWpI2T5KCUfosPV7Flo2WDQg6PW7tLcGHxQx0mIIozPpjQUVkqfHmRUovVsgZQM588DKd9FBzLYkl8rzEnkIFg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN0PR12MB6317.namprd12.prod.outlook.com (2603:10b6:208:3c2::12)
+ by MN0PR12MB5713.namprd12.prod.outlook.com (2603:10b6:208:370::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.25; Thu, 5 Sep
+ 2024 04:35:56 +0000
+Received: from MN0PR12MB6317.namprd12.prod.outlook.com
+ ([fe80::6946:6aa5:d057:ff4]) by MN0PR12MB6317.namprd12.prod.outlook.com
+ ([fe80::6946:6aa5:d057:ff4%6]) with mapi id 15.20.7918.024; Thu, 5 Sep 2024
+ 04:35:56 +0000
+Message-ID: <f0d9e9af-1017-953d-3243-facb2ee687b8@amd.com>
+Date: Thu, 5 Sep 2024 10:05:46 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH v11 08/20] virt: sev-guest: Consolidate SNP guest
+ messaging parameters to a struct
+To: Borislav Petkov <bp@alien8.de>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+ kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+ dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+ pbonzini@redhat.com
+References: <20240731150811.156771-1-nikunj@amd.com>
+ <20240731150811.156771-9-nikunj@amd.com>
+ <20240904143158.GCZthvXgYmvl0VNZVz@fat_crate.local>
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <20240904143158.GCZthvXgYmvl0VNZVz@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA0PR01CA0022.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:b8::7) To MN0PR12MB6317.namprd12.prod.outlook.com
+ (2603:10b6:208:3c2::12)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <4769C036576F8816+20240828045950.3484113-1-zhangdandan@uniontech.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qciowMBxjcVMLNlme34GAA--.18366S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3AF18ArW7Ar4UtF4DKr47WrX_yoW7uw15pF
-	95G34xKrs7Jry7Aw17tw15WryUAr97tF47C3WxJry0yr1DZr1fJr4Utr90ya18G348AFW0
-	qF18tr1j9F1UJ3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
-	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-	1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxG
-	rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jr9NsUUU
-	UU=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6317:EE_|MN0PR12MB5713:EE_
+X-MS-Office365-Filtering-Correlation-Id: e018a44c-04a4-4834-6e9e-08dccd643b7e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UUU5SEViZVpOUm5HcnFWa1JoRDFnZXhZME1vWVNGUmJSK3Q0UHdlYys0QVJO?=
+ =?utf-8?B?RThsdkdIbEQ1YXlGVUlXUkswSDhKU0J1bXk5KzlGS3ptSGF5UEkyTXN5RUN0?=
+ =?utf-8?B?dXZBRTUvOU9kZXpOZVNqR0JUZUV5Q1JwZDZZZk44d3hTMFlkbnRqcDdVbVA1?=
+ =?utf-8?B?M0orYmtFaHc4aWorU1dtSFY2QW5yN004K0cwM29wUkEwUzhkM0xpVkJGWkFZ?=
+ =?utf-8?B?SmNaRFMzSndkOTYrdFF5YURzbHRTY1FVWG9nUUZmMkhKTWZEbTh0ODBQQ2ZL?=
+ =?utf-8?B?Nmd2dnRuZS9HZ3lNTldBbnFPZTc3aHEzVHZxODBhUEpCZGJzWGkvSmVXdnlX?=
+ =?utf-8?B?c2laeXlFZ0VsVTI0ZUpyeW56bG13MStkeUZpd2dhT2ZEUktuaHVyVUM2ZUtK?=
+ =?utf-8?B?bGZ2RzVpdzZGN1p3ZFhJT05kLzhFM1BaeWhrZUZqUkhnaEc2VUhSM3NORzln?=
+ =?utf-8?B?NFR3aVhqTnhWSTdRdnpEOTdNWFlpUUZZVXZrWDhocTJkNTJ5a1hkM3hMcXRo?=
+ =?utf-8?B?YmowbWNWSzdnNG5TMzEyR2dlR3VHK3RIZTdJNWJkbmtzSnp4L2xId0JFUG0v?=
+ =?utf-8?B?czBBWGxtbkgvKzBEZi84ZTZqQ0tGdHFTR1JTeEdaYkpPMXIweWNrbnBmRito?=
+ =?utf-8?B?TmQzVEJoaGVHcjMrL2l4UzlyRzhQaVBhSFBxQSszT2w0RDNBL2hvM0o3RTUz?=
+ =?utf-8?B?MEZtVHRoNG9HOEgySjVSRU4vc2xlMFU0L3JFaERTN2xZUTV3QnpiU0wyY3lm?=
+ =?utf-8?B?SUM3bGFYMEthNXVYeDlMTW1QVS9Rc0hCWDNSaHF0V29McTFpSi9jQ3BydXl3?=
+ =?utf-8?B?dHBDbElhS2dIZkNvdVlDYjgxdkxXRTlLQUIxdGlISlAzYmpYL3M0Vy9EMTF5?=
+ =?utf-8?B?TW9wNkxjdGFvbVVtRmI5Y0pzcURjaEZOeHZ1cGdYSDQxejRaTEFPQk5WcWV5?=
+ =?utf-8?B?ZFpBTkZmVmlaOU1OaWRPRnJ6cEUyV21iN0tvTTBIakpoSjl2VEtQUUFWeDdl?=
+ =?utf-8?B?K2lXTUlFbzNjeWpURlMrMVFIbUIvQXhxQ0ZRb2JHZDV3U1liWk5MMkdYNHpS?=
+ =?utf-8?B?aERYb1ZqQm1YQm5acDArNm5zRTA1SGJsaXFPeGlQendEMGdIODQ4aDJKM05V?=
+ =?utf-8?B?ZTZscWhqS2NmTGF2Unp2T2hrRnpzS244cUFibkVQZ3FVcmdwTjVEbUNYc2lM?=
+ =?utf-8?B?amVBSHo5ak5Cbmw2MFBKOWlqMnRHUG5WaUpYYWFDYnRxS0wvMFR4Z0dpNnBl?=
+ =?utf-8?B?YXluL2dWREFaWWpjRWV1cmFnS2JjaHk0N3ArbkROSXNCOXp5b2JqVmVubEZj?=
+ =?utf-8?B?QTRuZS9Ya2o1OHlrYk1lRzgvRjFjaUdsSXIyZUpqMUNVWVdFVnhGMHdyMFVI?=
+ =?utf-8?B?TTZOa0U3ZDR1Nkx4OERoUEJCWkhvR1RpWlI1STUvcW9LSUFYQmZmOUwwYnpB?=
+ =?utf-8?B?VFp1blA0NEx6bkpuWVNlY3Q2d28zbnBYSVVxRGQ0NkZDZmV2SGNoTnIzK1lB?=
+ =?utf-8?B?ZFQ5UzhkL0grL2tPVkl2c2MyNEt0dWQxZ0dhWkVSanBSY1dnLzRRZFZ5cHI4?=
+ =?utf-8?B?ckxGNm55K1hsOVYxRkk0WTVoNkt5QmdKL3VUcGx1aUtZSTZtaHFnbDdGWGFP?=
+ =?utf-8?B?K1RRSERqSjliZUY5ZkIrVTdibUhNdEx6WWFxNGxqMFQ4NTB4VXdud1ZZU3ow?=
+ =?utf-8?B?NWJKalZTRHBibDB1Y1prUlMxL3hsbzZqSW5KTXRuMm8vZU9hV2t5NmRlY1Ex?=
+ =?utf-8?B?OHNOTDVjTloxS0xhY3lZMHd3bElmZUJPdERNSGM2OUQrWUVXSDVkTUdiVVRU?=
+ =?utf-8?B?eExYdVdpSzltcXNJQmZ6Zz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6317.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VVBVQWJCLzliUmsrWjJlems1a0Y5RlVnQ3U3eERLcmFNckdFbDFaenB1NFNw?=
+ =?utf-8?B?Y2ZCTVlOVTZEYTBmVzBUamJlRFJ1dC83USsrWnlydXNiUlRweFdWdjFRSm1v?=
+ =?utf-8?B?TWhEem10RVpiWGJ2UktxMmpLbmVJSlpsaU85b2tpR1g1UjdvQ29PQjJrU0Vi?=
+ =?utf-8?B?ZldIdjhXbGppcUQ0NWRIVlVyZktkZHpDcUhNK1k3eHRWS29lZ0NVTlZwMHhh?=
+ =?utf-8?B?bENhNWhrVDY5Q0VHN29RK3d5M2U1NzFQZjE5eDJGUlprYWwrUzNwcmRTRlJH?=
+ =?utf-8?B?R2FJTnFLM3pjSzM5aUgwYWwrU3ZlMXp3ejYyMjlRTGxRZDV3ckYwMmd5Q09Q?=
+ =?utf-8?B?NVhmckVudXpoSGlMV0pmS2FDRWI0cXNjRE5jdThleUYxNFJva2twL2poVStw?=
+ =?utf-8?B?T1R2dFI5NmU3dXhCWVJpbnZ0bFp4UmxGNGlrWnVCU2N0bUlhQk9QZEUrNHlC?=
+ =?utf-8?B?M20vcVpyM09OQTQ1UzlWMXNjclRWTFpoWkxSYWxkd3c3YXNmQnhwc0xWQjUy?=
+ =?utf-8?B?WG9SVGxOejN2eGQ4b3pGSlR4WFExYmVRRkpiNTdnZXdjWHYxL3VBNnUxaXU2?=
+ =?utf-8?B?S1ExMDh5NWJoUVA1V2V4ZlVPbnczcDZzbVNlKzArRmNYOEt0VHVxZUg4VnF2?=
+ =?utf-8?B?ODd0azFMTldOWmw4ZHFpclM1aVNEU1BJYnNXbVdvYjRWdllkclgzVDRnWXYz?=
+ =?utf-8?B?N29YUGV2TDhWN0RPTXhTdTUwZlF3eGw3dmdSQzJMTGZLY2piQlZzRzg2Z1VQ?=
+ =?utf-8?B?UHl0Y1dHM3ZhNDhPU2tNZitsQnVoeDJoUUxWODlxcXZkS3dhWnhSRm8wV1A5?=
+ =?utf-8?B?b05LU1lubldsTE1tSjNsbnRXbEZMTlRUaEN6Q3FwL3FWRHAyQ1hUeFVoRGZl?=
+ =?utf-8?B?UnA3SDVmZ1RvTi8xb0tYQTFvd3ovbzJNVm9id2cyN04rN2FETkJ1cCt5SkN6?=
+ =?utf-8?B?dk1TK21YNVBUZllxNzlLQ0dtN21ZcWppNDAxd0V6cFIrK1R3ek1ibDlCNmdn?=
+ =?utf-8?B?cU5nUEZaN3B5N05WelU3bGs0MVJXdEFpb2phMW44L2ordEp0dDdFMW1Rb2kw?=
+ =?utf-8?B?NjUwMnlYR2RnSUN5SGRPUDlza2VrekpNSGdmRU5xSTFtMnVIMmp3cHNvWmlq?=
+ =?utf-8?B?dzlaK1QyVlgrQm4yZm5ncGRjSTdvamR4ZzNZZ0JHT3hkclY3YkljYlM3QW1B?=
+ =?utf-8?B?bXE4M2xZcHYxNFhtY0h0cDA4TXlYOWdZbnc4cjRFRVp4Vkk5ckZNSzVNMmZT?=
+ =?utf-8?B?ZFRUUVY4S1FpeHNxV1VVZUZZOXdvcjN0dG95c3Z0eU85RGo3eVNMdTBBMVhr?=
+ =?utf-8?B?WHJCU2Fmc01oMXZGSTd3UXZPSXJzdWp6NjhLWCsrNHdYdVpJQTB6T2lUSk4r?=
+ =?utf-8?B?bU5uU3BLUnVQWHZURXFsb3B3RXY5ZXZRclZKazRGcDJmM2hHUnRyaUg4UVdn?=
+ =?utf-8?B?Zjg5ZWNuVXNRekhKZzVZWEtLY1IrNFNVZmNYVzJqMHVBQUhNckI4eXdyWHlT?=
+ =?utf-8?B?WmRLSWxkYTd1RktkNUtlSXI0eFRFNDZ1WkhjeWl5OUtnQ3dYcFgzMzY4WXVI?=
+ =?utf-8?B?VkNwa296elluSUR4UWZocEJqelg3UWRCQzBFRXF1Z1QwQkRMK0dpejVHZFFa?=
+ =?utf-8?B?VnF0ZFZoN3grVVNCMzM4OGs5NG1KS285Q1c0SXZYcGNRSE95czg2UGVMWXBB?=
+ =?utf-8?B?elgwOFludUp3VmhlaHJJTE9aZ2oybmxmemRkdTVvdlFGWSt3TTlhUms5bC9N?=
+ =?utf-8?B?SHZLUitRRDVrMU9YTkNrNVFhUHFEL0lGczBQWFc3VnBlczVkYTVVUUh0eHNa?=
+ =?utf-8?B?L25NNi9obFFVRjFqZkpLQUdtNkQ3QjRTS2ZsdmI3UHhKQjRMUVRhUzdKb2FE?=
+ =?utf-8?B?OGR5dUlnUGlyWTFlT2ZubHE2T1NGUDRyZzI5RTBkK1BZekRJbHptb1YwdEQ5?=
+ =?utf-8?B?SW1nZmZuTHorQ0tqc3ZWOXRBUnA4Wm8vZGEva0xzWlRWR1NqYmVRYnNMNWI5?=
+ =?utf-8?B?aFM4Z2k1SWljWGNrTU8rV1QrSnROeFlLd0MydEhoeW5kYVJMNHpDQ3ZjZXpW?=
+ =?utf-8?B?RFpkaTRRNDFiYnBzbEhuc1hQMjViZ3FxNzZQM1ZDNzNzMVc1OWVyOXRJS0E3?=
+ =?utf-8?Q?KFH7A2UbK6Mzaxpn09mp6Ye5B?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e018a44c-04a4-4834-6e9e-08dccd643b7e
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6317.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2024 04:35:56.1345
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: d2LEM0NeOI98SgdncJKmFxlgWt+v3xXr6gTpP87BiWSFkJTv+SXLCqem2TiqGZhLDXqwmrFi3y+EwNWu7co+oA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5713
 
 
-On 2024/8/28 下午12:59, Dandan Zhang wrote:
-> From: Bibo Mao <maobibo@loongson.cn>
-> 
-> Add documentation topic for using pv_virt when running as a guest
-> on KVM hypervisor.
-> 
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
-> Co-developed-by: Mingcong Bai <jeffbai@aosc.io>
-> Signed-off-by: Mingcong Bai <jeffbai@aosc.io>
-> Link: https://lore.kernel.org/all/5c338084b1bcccc1d57dce9ddb1e7081@aosc.io/
-> Signed-off-by: Dandan Zhang <zhangdandan@uniontech.com>
-> ---
->   Documentation/virt/kvm/index.rst              |  1 +
->   .../virt/kvm/loongarch/hypercalls.rst         | 89 +++++++++++++++++++
->   Documentation/virt/kvm/loongarch/index.rst    | 10 +++
->   MAINTAINERS                                   |  1 +
->   4 files changed, 101 insertions(+)
->   create mode 100644 Documentation/virt/kvm/loongarch/hypercalls.rst
->   create mode 100644 Documentation/virt/kvm/loongarch/index.rst
-> 
-> diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
-> index ad13ec55ddfe..9ca5a45c2140 100644
-> --- a/Documentation/virt/kvm/index.rst
-> +++ b/Documentation/virt/kvm/index.rst
-> @@ -14,6 +14,7 @@ KVM
->      s390/index
->      ppc-pv
->      x86/index
-> +   loongarch/index
->   
->      locking
->      vcpu-requests
-> diff --git a/Documentation/virt/kvm/loongarch/hypercalls.rst b/Documentation/virt/kvm/loongarch/hypercalls.rst
-> new file mode 100644
-> index 000000000000..dd96ded5d17d
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/loongarch/hypercalls.rst
-> @@ -0,0 +1,89 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +===================================
-> +The LoongArch paravirtual interface
-> +===================================
-> +
-> +KVM hypercalls use the HVCL instruction with code 0x100 and the hypercall
-> +number is put in a0. Up to five arguments may be placed in registers a1 - a5.
-> +The return value is placed in v0 (an alias of a0).
-> +
-> +Source code for this interface can be found in arch/loongarch/kvm*.
-> +
-> +Querying for existence
-> +======================
-> +
-> +To determine if the host is running on KVM, we can utilize the cpucfg()
-> +function at index CPUCFG_KVM_BASE (0x40000000).
-> +
-> +The CPUCFG_KVM_BASE range, spanning from 0x40000000 to 0x400000FF, The
-> +CPUCFG_KVM_BASE range between 0x40000000 - 0x400000FF is marked as reserved.
-> +Consequently, all current and future processors will not implement any
-> +feature within this range.
-> +
-> +On a KVM-virtualized Linux system, a read operation on cpucfg() at index
-> +CPUCFG_KVM_BASE (0x40000000) returns the magic string 'KVM\0'.
-> +
-> +Once you have determined that your host is running on a paravirtualization-
-> +capable KVM, you may now use hypercalls as described below.
-> +
-> +KVM hypercall ABI
-> +=================
-> +
-> +The KVM hypercall ABI is simple, with one scratch register a0 (v0) and at most
-> +five generic registers (a1 - a5) used as input parameters. The FP (Floating-
-> +point) and vector registers are not utilized as input registers and must
-> +remain unmodified during a hypercall.
-> +
-> +Hypercall functions can be inlined as it only uses one scratch register.
-> +
-> +The parameters are as follows:
-> +
-> +	========	================	================
-> +	Register	IN			OUT
-> +	========	================	================
-> +	a0		function number		Return	code
-> +	a1		1st	parameter	-
-> +	a2		2nd	parameter	-
-> +	a3		3rd	parameter	-
-> +	a4		4th	parameter	-
-> +	a5		5th	parameter	-
-> +	========	================	================
-> +
-> +The return codes may be one of the following:
-> +
-> +	====		=========================
-> +	Code		Meaning
-> +	====		=========================
-> +	0		Success
-> +	-1		Hypercall not implemented
-> +	-2		Bad Hypercall parameter
-> +	====		=========================
-> +
-> +KVM Hypercalls Documentation
-> +============================
-> +
-> +The template for each hypercall is as follows:
-> +
-> +1. Hypercall name
-> +2. Purpose
-> +
-> +1. KVM_HCALL_FUNC_IPI
-> +------------------------
-> +
-> +:Purpose: Send IPIs to multiple vCPUs.
-> +
-> +- a0: KVM_HCALL_FUNC_IPI
-> +- a1: Lower part of the bitmap for destination physical CPUIDs
-> +- a2: Higher part of the bitmap for destination physical CPUIDs
-> +- a3: The lowest physical CPUID in the bitmap
-> +
-> +The hypercall lets a guest send multiple IPIs (Inter-Process Interrupts) with
-> +at most 128 destinations per hypercall. The destinations are represented in a
-> +bitmap contained in the first two input registers (a1 and a2).
-> +
-> +Bit 0 of a1 corresponds to the physical CPUID in the third input register (a3)
-> +and bit 1 corresponds to the physical CPUID in a3+1, and so on.
-> +
-> +PV IPI on LoongArch includes both PV IPI multicast sending and PV IPI receiving,
-> +and SWI is used for PV IPI inject since there is no VM-exits accessing SWI registers.
-> diff --git a/Documentation/virt/kvm/loongarch/index.rst b/Documentation/virt/kvm/loongarch/index.rst
-> new file mode 100644
-> index 000000000000..83387b4c5345
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/loongarch/index.rst
-> @@ -0,0 +1,10 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +=========================
-> +KVM for LoongArch systems
-> +=========================
-> +
-> +.. toctree::
-> +   :maxdepth: 2
-> +
-> +   hypercalls.rst
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 878dcd23b331..c267ad7cc2c5 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -12294,6 +12294,7 @@ L:	kvm@vger.kernel.org
->   L:	loongarch@lists.linux.dev
->   S:	Maintained
->   T:	git git://git.kernel.org/pub/scm/virt/kvm/kvm.git
-> +F:	Documentation/virt/kvm/loongarch/
->   F:	arch/loongarch/include/asm/kvm*
->   F:	arch/loongarch/include/uapi/asm/kvm*
->   F:	arch/loongarch/kvm/
-> 
-Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
+On 9/4/2024 8:01 PM, Borislav Petkov wrote:
+> On Wed, Jul 31, 2024 at 08:37:59PM +0530, Nikunj A Dadhania wrote:
+>> +static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code,
+>> +				struct snp_guest_request_ioctl *rio, u8 type,
+>> +				void *req_buf, size_t req_sz, void *resp_buf,
+>> +				u32 resp_sz)
+>> +{
+>> +	struct snp_guest_req req = {
+>> +		.msg_version	= rio->msg_version,
+>> +		.msg_type	= type,
+>> +		.vmpck_id	= vmpck_id,
+>> +		.req_buf	= req_buf,
+>> +		.req_sz		= req_sz,
+>> +		.resp_buf	= resp_buf,
+>> +		.resp_sz	= resp_sz,
+>> +		.exit_code	= exit_code,
+>> +	};
+>> +
+>> +	return snp_send_guest_request(snp_dev, &req, rio);
+>> +}
+> 
+> Right, except you don't need that silly routine copying stuff around either
+> but simply do the right thing at each call site from the get-go.
+> 
+> using the following coding pattern:
+> 
+> 	struct snp_guest_req req = { };
+> 
+> 	/* assign all members required for the respective call: */
+> 	req.<member> = ...;
+> 	...
+> 
+> 	err = snp_send_guest_request(snp_dev, &req, rio);
+> 	if (err)
+> 		...
+
+Sure, will update all the call sites.
+
+Regards
+Nikunj
 
