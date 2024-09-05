@@ -1,75 +1,40 @@
-Return-Path: <kvm+bounces-25932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B116A96D3FA
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 11:48:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 726F296D609
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 12:29:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62D962886DC
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 09:48:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D0B41F212FA
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 10:29:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE041993B0;
-	Thu,  5 Sep 2024 09:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R2mWxN5f"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE23519D06D;
+	Thu,  5 Sep 2024 10:25:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB87A1991D6;
-	Thu,  5 Sep 2024 09:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39AAD1990A1;
+	Thu,  5 Sep 2024 10:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725529610; cv=none; b=RBffo0l8pVyLfyvkWoJGyJ7VbnH0i60rwq1B0UU/tsbJ1XHmnR6I4bTruMVGp0GIJ/ERdr3bI8rdRkR7hw/NVOoXZPlf4qf4QAxjxR1L2DE2PnmSZ5gLOMxtt3vdxl9ulpmaMu+qe0eqorYo5xiVl9yuVkQeGeYicZftx7PraLI=
+	t=1725531925; cv=none; b=oDe33Xm22FZdlWocwT35sAdUNuyCEDjz6HezkceRN1Ih/U9VlbBM7wyeGmoBjtmaW9oFt+ur8RK6Bv96nHT4I4bbV9u/bMblHKMDUr98GYC3ffj+9Glf5AV7UXXrP9hyxEX1qS341NheiFIHEAPq5DkL78S9UQ3IcY4IA5JiMTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725529610; c=relaxed/simple;
-	bh=ooTxRmy9CNhI0QBGKGov1IP8Ny/IFn2b7BpJAt+pUGY=;
+	s=arc-20240116; t=1725531925; c=relaxed/simple;
+	bh=fm7S5KGbuLe9W5HkTosNITMnTz+xAKNDodVv8VFktOY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dEM0Hp0PY7etwJDHiW6mrMp7ueJv4R5fHcNyRK3mlfEpa592qa7Wd7oww4n0pVWCo0MGDRQNCwWaKTQdALZbAWJF+Y3BTTePehAPc7+Z9oRyy+hDLXCfScMQB+OhHsdqvaEOYp7ti6elwvfyvr4U+lb8wnTw34FhiSL2eQroZBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R2mWxN5f; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3780c8d689aso313753f8f.0;
-        Thu, 05 Sep 2024 02:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725529607; x=1726134407; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a3A+0OEpset36zqQ8dSnuPMDIA8aciodye1/vukDHAs=;
-        b=R2mWxN5fjYaJm2yNUzLJXoHE924sOE1VUSro0LKCnvz2Ik+75SdTlPFDxzRNFjvME0
-         C3UZu2s88Bnr/gVo9mkH5l1DHarPD4NXMIIuo59SAiVTw+JqRRFnbP5Jn9LZBGkHiVw5
-         4dQ0mFHEf1+0U9P1adjDD5Gwfx15q3seAWKvbZ67P2etyT/xs/6J1gCC3yN6hmZp4/P6
-         BQklv1cUXsVgcqrPm93Z+5Qc7FqbxwHgG+FFtgA7BqlhiY5TZ1DW8q8W1pc12tN4GmlZ
-         5osWYmaCHx6xKiyQxN6/KOQ1RtmbnX/nKvezhlZ3sqQajSNxPxYcu+aJHpvW8YBwpaSG
-         C10g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725529607; x=1726134407;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a3A+0OEpset36zqQ8dSnuPMDIA8aciodye1/vukDHAs=;
-        b=U3Ix0QOyEAwi0c13MD2bVok++PsFIHcHnoWKKyHLp0khYhw3dtw/+rvDUFnnV5/XEb
-         WaslydGFtk5l6MAU3NsHOF4aB+VcA1sLEB1NqePwA0iVPz8Q+N3NPHAHNM32KJgWavQi
-         OvFpiIe7O3j4l+f0JIp6j96GdXBdHaJ36ehGcDyiEpB0eyewuUhmjGPUWQuKRq1pjEZN
-         eOVrSM/YEHWzsk9qoIDhTNQNJD+0ZS3ZD5L6/ekUuBtbHgikqR44SurpOYcjtZ2beEow
-         we8pzIrfwsI6xUvMV7vYrLCzWjJ2SojILTspL6hl65qTp0wc7b0MDy64k+wVvBUpTOxQ
-         G5Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7a/tO0oOyg56ndYbkbH/F76WR9zWMIEwD/vun3dYazbTORYRalRbqjzyzpiAD3DToJYzXCxqLfFsXii4=@vger.kernel.org, AJvYcCVsstE8OTxLCN1eqbh73sZmGaRJFRvzGXHmzv0bzHd8MKQbX2b3fLlSH3t3VXDP0HBePL8O03NjnlmD/Q==@vger.kernel.org, AJvYcCXYo67GQdOQSSmnCjdD/0BGT0j84y13CnkCvg32FxDa0cvLyt7ybJrfvfqhuc/JPk8Ci9/ZaI8J7clwZkNo2e1JmQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRDPTcuHR8C1qZMh9egyYtS+EpAaN7npKdbR8kouPWyS/W0vSf
-	Xv/G3QiWrHlEWEdOWgR+MFKCkKdLsWOffq0yO8W97G8f6MKqY8uZ
-X-Google-Smtp-Source: AGHT+IGwAx2QSUfLDZ+tfaLzM6jDxYn1gijqzhfBCWl8wJV2u0GTNpP6gbYbb2bM1aZJ2WyRNkSboA==
-X-Received: by 2002:a05:6000:1f8d:b0:374:c29f:8ddc with SMTP id ffacd0b85a97d-376dea47192mr5800262f8f.40.1725529606275;
-        Thu, 05 Sep 2024 02:46:46 -0700 (PDT)
-Received: from gmail.com (1F2EF525.nat.pool.telekom.hu. [31.46.245.37])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374c1de81b2sm13382624f8f.30.2024.09.05.02.46.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 02:46:45 -0700 (PDT)
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date: Thu, 5 Sep 2024 11:46:42 +0200
-From: Ingo Molnar <mingo@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SJ4TaQd+IfBj5raX5XUnqzUkgj/PKJzU7NsYsJ7puB9iwagWtBbk+3HA//ETxjYZFmH42XfjNOOBSlm9k7WFsOnixMZKWrhSYKPuwaRYku5vf0dqO1y/zn11Wxgv2qe1m88pwGufvhkJFOTe6/fcplfIWitvU5hBYgZDWBF81ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06AA5FEC;
+	Thu,  5 Sep 2024 03:25:49 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BBA503F73F;
+	Thu,  5 Sep 2024 03:25:16 -0700 (PDT)
+Date: Thu, 5 Sep 2024 11:25:10 +0100
+From: Mark Rutland <mark.rutland@arm.com>
 To: Colton Lewis <coltonlewis@google.com>
 Cc: kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
 	Sean Christopherson <seanjc@google.com>,
@@ -77,7 +42,6 @@ Cc: kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
 	Ingo Molnar <mingo@redhat.com>,
 	Arnaldo Carvalho de Melo <acme@kernel.org>,
 	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
 	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
 	Adrian Hunter <adrian.hunter@intel.com>,
@@ -99,11 +63,10 @@ Cc: kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
 	"H . Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH 2/5] perf: Hoist perf_instruction_pointer() and
- perf_misc_flags()
-Message-ID: <Ztl-AjEEbIbX4lnm@gmail.com>
+Subject: Re: [PATCH 1/5] arm: perf: Drop unused functions
+Message-ID: <ZtmHBuggqUr3ncw6@J2N7QTR9R3>
 References: <20240904204133.1442132-1-coltonlewis@google.com>
- <20240904204133.1442132-3-coltonlewis@google.com>
+ <20240904204133.1442132-2-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -112,30 +75,75 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240904204133.1442132-3-coltonlewis@google.com>
+In-Reply-To: <20240904204133.1442132-2-coltonlewis@google.com>
 
+On Wed, Sep 04, 2024 at 08:41:29PM +0000, Colton Lewis wrote:
+> perf_instruction_pointer() and perf_misc_flags() aren't used anywhere
+> in this particular perf implementation. Drop them.
 
-* Colton Lewis <coltonlewis@google.com> wrote:
+I think it'd be better to say that arch/arm's implementation of these is
+equivalent to the generic versions in include/linux/perf_event.h, and so
+arch/arm doesn't need to provide its own versions. It doesn't matter if
+arch/arm uses them itself since they're being provided for the core perf
+code.
 
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -6915,6 +6915,16 @@ void perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
->  EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
->  #endif
+With words to that effect:
+
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
+
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arch/arm/include/asm/perf_event.h |  7 -------
+>  arch/arm/kernel/perf_callchain.c  | 17 -----------------
+>  2 files changed, 24 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/perf_event.h b/arch/arm/include/asm/perf_event.h
+> index bdbc1e590891..c08f16f2e243 100644
+> --- a/arch/arm/include/asm/perf_event.h
+> +++ b/arch/arm/include/asm/perf_event.h
+> @@ -8,13 +8,6 @@
+>  #ifndef __ARM_PERF_EVENT_H__
+>  #define __ARM_PERF_EVENT_H__
 >  
-> +unsigned long perf_misc_flags(unsigned long pt_regs *regs)
-> +{
-> +	return perf_arch_misc_flags(regs);
-> +}
-> +
-> +unsigned long perf_instruction_pointer(unsigned long pt_regs *regs)
-> +{
-> +	return perf_arch_instruction_pointer(regs);
-> +}
-
-What's an 'unsigned long pt_regs' ??
-
-Thanks,
-
-	Ingo
+> -#ifdef CONFIG_PERF_EVENTS
+> -struct pt_regs;
+> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
+> -#define perf_misc_flags(regs)	perf_misc_flags(regs)
+> -#endif
+> -
+>  #define perf_arch_fetch_caller_regs(regs, __ip) { \
+>  	(regs)->ARM_pc = (__ip); \
+>  	frame_pointer((regs)) = (unsigned long) __builtin_frame_address(0); \
+> diff --git a/arch/arm/kernel/perf_callchain.c b/arch/arm/kernel/perf_callchain.c
+> index 1d230ac9d0eb..a2601b1ef318 100644
+> --- a/arch/arm/kernel/perf_callchain.c
+> +++ b/arch/arm/kernel/perf_callchain.c
+> @@ -96,20 +96,3 @@ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *re
+>  	arm_get_current_stackframe(regs, &fr);
+>  	walk_stackframe(&fr, callchain_trace, entry);
+>  }
+> -
+> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
+> -{
+> -	return instruction_pointer(regs);
+> -}
+> -
+> -unsigned long perf_misc_flags(struct pt_regs *regs)
+> -{
+> -	int misc = 0;
+> -
+> -	if (user_mode(regs))
+> -		misc |= PERF_RECORD_MISC_USER;
+> -	else
+> -		misc |= PERF_RECORD_MISC_KERNEL;
+> -
+> -	return misc;
+> -}
+> -- 
+> 2.46.0.469.g59c65b2a67-goog
+> 
 
