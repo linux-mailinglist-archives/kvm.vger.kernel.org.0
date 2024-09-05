@@ -1,119 +1,182 @@
-Return-Path: <kvm+bounces-25962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25963-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 210EA96DF68
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 18:20:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BED5096E0E2
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 19:11:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0E18284006
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 16:20:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 772662898DA
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2024 17:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D89E1A01B9;
-	Thu,  5 Sep 2024 16:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6AAB1A3022;
+	Thu,  5 Sep 2024 17:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EW38wY36"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Td++fBf9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB31F1A01B6
-	for <kvm@vger.kernel.org>; Thu,  5 Sep 2024 16:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD9D19DFB8;
+	Thu,  5 Sep 2024 17:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725553237; cv=none; b=ERgqTXuv3O9G6dBf+yq+wy2txi69gNlDKmdXaVGVy5vYdmMEV2R0Eo6cjGp+AKkUNVitmltOtqqj+9YbozJ8p9pB7gRvJMm1c5uzP2zJxd4yONkf8UIt1Rn7AN76AzfCBpd6yQokO4zxf4ZAp9CRFV5xjLmAA/rpfnKucdVBJ64=
+	t=1725556299; cv=none; b=E4/eY2OL129i3KxTv36k5/EHAOCzC3n/Ca29BP2ljo+gNnlAFcPdBbXcYRe5qcsopWnXbeONhL9iEAQwo8DFRn+mEUK+KqKWEuDpuCnUWiiYS8XINjZDAc1NcS4JNpdY4lGfLQYnOqwtj+1CX+7qLDc7zi3KWnTJhwSFsjm1mf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725553237; c=relaxed/simple;
-	bh=n04gPQHvDkHClWZLlSJYgzA0AjqGslLWpNik4Jq1KMM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B5T2/0ae0my4MirENdEbCu9TXgGs2X8bLQWEt/05rRpDA19V550BDvGqli0rMCRikhkJ2mMhuQrcy1Z2iTqbJb2U06s87mG6/aXoyboOw7zWT4Eehpnn/G1l8scLYtUyesH4gz676bBIkoZFy989fg+EE2reug/YeARmnZB+fxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EW38wY36; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725553234;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9TyHzQXM3uFT+3nz9MywkA1E5XwrT2IxpHMEhawq1JI=;
-	b=EW38wY36wJ1UYHk3FdyRmaoSgE9fgd6Wd1DEASnRxe9dfbp1Xcj0Y5qgzbUiPZwdt/L43H
-	QyZU6BC9TUVjBIzEdaKiQT/dF/tGupQXVwq+TOlnHph+LW9H7VKZUhRt5sLfarJFnoZDvp
-	uMWnw6Vw1Fy97xy89NjDxhRBO2HvAcw=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-15-W8ivkgECOSuplGP9zlYeWA-1; Thu,
- 05 Sep 2024 12:20:32 -0400
-X-MC-Unique: W8ivkgECOSuplGP9zlYeWA-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A5F77181E042;
-	Thu,  5 Sep 2024 16:20:00 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E6A131956056;
-	Thu,  5 Sep 2024 16:19:57 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	kvm@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	x86@kernel.org,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Suleiman Souhlal <ssouhlal@freebsd.org>,
-	Vineeth Pillai <vineeth@bitbyteword.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Frederic Weisbecker <fweisbec@gmail.com>
-Subject: Re: [RFC][PATCH] KVM: Remove HIGH_RES_TIMERS dependency
-Date: Thu,  5 Sep 2024 12:19:27 -0400
-Message-ID: <20240905161926.186090-2-pbonzini@redhat.com>
-In-Reply-To: <20240821095127.45d17b19@gandalf.local.home>
-References: 
+	s=arc-20240116; t=1725556299; c=relaxed/simple;
+	bh=UgUKwC+htmQ64BydR+9gR8Mz2CbId2/rj3nOjpSfpeU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H8Ym/6fV69Ahj2TIEudMvxOBQ5SWaFzsIldfItGMqStFyrT2+x1lPganEo3TzD+D5e8YO1ul6PTZyevJpjitn5SFqX7ij8/PGtjsmykMgS5sEMn8tW8BqsvXymbzB8R+D/HSgllfrgMlizw1wy05RLoGq5NHwSG53CD1ELaWiCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Td++fBf9; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.205] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 485H9en23712765
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 5 Sep 2024 10:09:41 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 485H9en23712765
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024081601; t=1725556182;
+	bh=UP5S89Q8T/Q5EsxqhRyQ8f9BJnQqaRl+80CV7+1PjiY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Td++fBf985x/z0uESDRnIoaMDjnC8j2FiRd+xXLy9mgYmLI6IS7D9wTqmPYaqaHlR
+	 CA6x65DAFqM/8/iAXlI4b1xOn6nIRFQscrXw96TKLvIsbBXCTRSPGpxTKTZ4Z3HwFo
+	 +fd0hZCtR2Bj4UZwYnuaIcC3UhRgfQkTTpdq7rPVs+lJME38yR3Bi5WwhJ57q/XwJG
+	 KT+7olRlKhg72DbQtiWMwkZgRt196aqOoA4Czaj3FCPe0lpNVOeXIop54h2KOWBeS+
+	 D/gSJtiyZUhaHa/S6CaWMU6BFRndwWJZ2ZqVnqkDiT9LnpSbPHJk5WEnRwRELNIYpr
+	 82B5itYZvyvuA==
+Message-ID: <feefa9d1-f266-414f-bb7b-b770ef0d8ec6@zytor.com>
+Date: Thu, 5 Sep 2024 10:09:39 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/25] KVM: VMX: Set intercept for FRED MSRs
+To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
+Cc: Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        shuah@kernel.org, vkuznets@redhat.com, peterz@infradead.org,
+        ravi.v.shankar@intel.com
+References: <20240207172646.3981-1-xin3.li@intel.com>
+ <20240207172646.3981-8-xin3.li@intel.com> <ZiJzFsoHR41Sd8lE@chao-email>
+ <ZmoT0jaX_3Ww3Uzu@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
+ 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
+ Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
+ bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
+ raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
+ VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
+ wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
+ 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
+ NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
+ AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
+ tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
+ v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
+ sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
+ QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
+ wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
+ oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
+ vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
+ MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
+ g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
+ cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
+ jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
+ Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
+ m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
+ bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
+ JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
+ /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
+ OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
+ dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
+ 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
+ Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
+ PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
+ gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
+ l75w1xInsg==
+In-Reply-To: <ZmoT0jaX_3Ww3Uzu@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> Commit 92b5265d38f6a ("KVM: Depend on HIGH_RES_TIMERS") added a dependency
-> to high resolution timers with the comment:
+On 6/12/2024 2:32 PM, Sean Christopherson wrote:
+> On Fri, Apr 19, 2024, Chao Gao wrote:
+>> On Wed, Feb 07, 2024 at 09:26:27AM -0800, Xin Li wrote:
+>>> Add FRED MSRs to the valid passthrough MSR list and set FRED MSRs intercept
+>>> based on FRED enumeration.
 > 
->     KVM lapic timer and tsc deadline timer based on hrtimer,
->     setting a leftmost node to rb tree and then do hrtimer reprogram.
->     If hrtimer not configured as high resolution, hrtimer_enqueue_reprogram
->     do nothing and then make kvm lapic timer and tsc deadline timer fail.
+> This needs a *much* more verbose explanation.  It's pretty darn obvious _what_
+> KVM is doing, but it's not at all clear _why_ KVM is passing through FRED MSRs.
+> E.g. why is FRED_SSP0 not included in the set of passthrough MSRs?
 > 
-> That was back in 2012, where hrtimer_start_range_ns() would do the
-> reprogramming with hrtimer_enqueue_reprogram(). But as that was a nop with
-> high resolution timers disabled, this did not work. But a lot has changed
-> in the last 12 years.
+>>> static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>> {
+>>> 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>>> +	bool fred_enumerated;
+>>>
+>>> 	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_FRED);
+>>> +	fred_enumerated = guest_can_use(vcpu, X86_FEATURE_FRED);
+>>>
+>>> -	if (guest_can_use(vcpu, X86_FEATURE_FRED)) {
+>>> +	if (fred_enumerated) {
+>>> 		vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_FRED);
+>>> 		secondary_vm_exit_controls_setbit(vmx,
+>>> 						  SECONDARY_VM_EXIT_SAVE_IA32_FRED |
+>>> @@ -7788,6 +7793,16 @@ static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>> 						    SECONDARY_VM_EXIT_SAVE_IA32_FRED |
+>>> 						    SECONDARY_VM_EXIT_LOAD_IA32_FRED);
+>>> 	}
+>>> +
+>>> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP0, MSR_TYPE_RW, !fred_enumerated);
+>>> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP1, MSR_TYPE_RW, !fred_enumerated);
+>>> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP2, MSR_TYPE_RW, !fred_enumerated);
+>>> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP3, MSR_TYPE_RW, !fred_enumerated);
+>>> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_STKLVLS, MSR_TYPE_RW, !fred_enumerated);
+>>> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP1, MSR_TYPE_RW, !fred_enumerated);
+>>> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP2, MSR_TYPE_RW, !fred_enumerated);
+>>> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP3, MSR_TYPE_RW, !fred_enumerated);
+>>> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_CONFIG, MSR_TYPE_RW, !fred_enumerated);
+>>
+>> Use a for-loop here? e.g.,
+>> 	for (i = MSR_IA32_FRED_RSP0; i <= MSR_IA32_FRED_CONFIG; i++)
 > 
-> For example, commit 49a2a07514a3a ("hrtimer: Kick lowres dynticks targets on
-> timer enqueue") modifies __hrtimer_start_range_ns() to work with low res
-> timers. There's been lots of other changes that make low res work.
-> 
-> I added this change to my main server that runs all my VMs (my mail
-> server, my web server, my ssh server) and disabled HIGH_RES_TIMERS and the
-> system has been running just fine for over a month.
-> 
-> ChromeOS has tested this before as well, and it hasn't seen any issues with
-> running KVM with high res timers disabled.
-> 
-> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+> Hmm, I'd prefer to keep the open coded version.  It's not pretty, but I don't
+> expect this to have much, if any, maintenance cost.  And using a loop makes it
+> harder to both understand _exactly_ what's happening, and to search for relevant
+> code.  E.g. it's quite difficult to see that FRED_SSP0 is still intercepted (see
+> my comment regarding the changelog).
 
-Queued, thanks.
 
-Paolo
+I owe you an explanation; I have been thinking about figuring out a way
+to include FRED SSP0 in the FRED KVM patch set...
+
+MSR_IA32_FRED_SSP0 is an alias of the CET MSR_IA32_PL0_SSP and likely to
+be used in the same way as FRED RSP0, i.e., host FRED SSP0 _should_ be
+restored in arch_exit_to_user_mode_prepare().  However as of today Linux
+has no plan to utilize kernel shadow stack thus no one cares host FRED
+SSP0 (no?).  But lets say anyway it is host's responsibility to manage
+host FRED SSP0, then KVM only needs to take care of guest FRED SSP0
+(just like how KVM should handle guest FRED RSP0) even before the
+supervisor shadow stack feature is advertised to guest.
+
+Another question is should KVM handle userspace request to set/get FRED
+SSP0?  IMO, it should be part of CET state management.
+
+Your suggestion?
+
+Thanks!
+     Xin
+
+
 
 
 
