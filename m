@@ -1,156 +1,137 @@
-Return-Path: <kvm+bounces-26016-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26017-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9828E96F892
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 17:46:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEACD96F8A5
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 17:50:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 553DC286D4A
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 15:46:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04EE6B2220F
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 15:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E500C1D31AD;
-	Fri,  6 Sep 2024 15:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DDA1D31A1;
+	Fri,  6 Sep 2024 15:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ErVKXUnO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YSf2Eyql"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BDF51CEAB1
-	for <kvm@vger.kernel.org>; Fri,  6 Sep 2024 15:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17594374F1
+	for <kvm@vger.kernel.org>; Fri,  6 Sep 2024 15:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725637550; cv=none; b=e+mWx8Mk5TOGM72wJwrF++9k/xDITzgbMzeTUtbwt61vJxeHEsuM1L6rsJ4mtbZHzVzprLmoE5nqUidJLMJkBxsQqeRCLF6HM6WkQELFP26ByR2/7DvkTrFXy3Wh5jAt/KbWYsRiU5jqy4C3QC7G9kUOGffFUo0gDKi9waW65es=
+	t=1725637818; cv=none; b=UXg7OCyNiNBZ+UOPOVQWbKsjcb3cu0eTn6EmekuQeRuxEMR8Zr0eGnvE9Y2MRuRwLI8bmM0FUVMnDXbzI6z0SavMkORArZn2YB9iQ7UPTZl+coBD+fBWUdtEzJXCPa3pJYL1Bpr9zIoYorl8VCnAmB1T3wZvGEMX/6qawUmtQOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725637550; c=relaxed/simple;
-	bh=1T66QnOQ5YMrzOcnt3O9CCNYqMRn16hQAV4F1GAiWxM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jb1svES98FN44O7ewBVY3x8dVwv2CVW5BfK7Wuz8Xjbe+XNDPukCUY2+QtW6JxjDBQbUTURKvf8VkG+aQExJe6SQ/zSy1g/G0luH4JvFc1T1R4qRAAxJTlr1ZiXPyiYy9frcmGI1P3CxY9/m/ggG9SKvwvdEmfDYlFbOJ+uHIGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ErVKXUnO; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1725637818; c=relaxed/simple;
+	bh=voVoKIR4SB0Lj8UyHwZfICbRddc6TUvPDi1bMScCwcA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m7e78KTWpqGIlbGd/8CgB4GtMzBI0UGbaNlqpsRJi2AAXencXFsD1dEn5Eyk6vCwwOlBSWZev4n+FbEF02bx7nC8aqYWVIaMugqGIBMYZDmjUhRqyiU7hcrWnwXoqJtDeUmgRfDEp6XDbY735t5cbVLHG6vtQVjhymygpJztgYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YSf2Eyql; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725637547;
+	s=mimecast20190719; t=1725637816;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=kuEoHVN4VS1AvlIIhN1QY1SKE4hlBdJDGHFexsIgI2Y=;
-	b=ErVKXUnOGslTJL8yQyRR+OFLSJe0NmxazqIiQEuBTW9e7JfAx8VxAcV3ioe1SQ1SXXPAj6
-	FgH2CuD2wm9UrSSSeYM7iGvmTolD9/wnvetjrwWGBrtm/1YnxcYwdPLuWvPtvw9yttxnHn
-	Ahb81/C9UofLwG3ItEY/443C8MEytCo=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-669-xEMjjv4DNcetnWHKOb5DKg-1; Fri,
- 06 Sep 2024 11:45:43 -0400
-X-MC-Unique: xEMjjv4DNcetnWHKOb5DKg-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BF35519344FA;
-	Fri,  6 Sep 2024 15:45:42 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D18D71955D48;
-	Fri,  6 Sep 2024 15:45:18 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.11-rc7
-Date: Fri,  6 Sep 2024 11:45:17 -0400
-Message-ID: <20240906154517.191976-1-pbonzini@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HqozqY4UtKMVO8LR3fBYcUPklBK0aAGz51hg8+BEiWg=;
+	b=YSf2EyqldM98zqEEvx4CPWDXxsbN5aIYMAB8EBhssCbl5DxMY2CGXr2+GAAaZlR/yJNqDv
+	S0NdsqHzzykOicge7OKjNZ4rMg2DEImH5e1VqF7Q3IGoXe9cM9Py0USgqUR3Is66hyIDgM
+	6+TMR8I3MeVHFiyatK2fN7kJq6NZLCQ=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-118-3aaR_snUP-KIgc8Ayt7Eog-1; Fri, 06 Sep 2024 11:50:15 -0400
+X-MC-Unique: 3aaR_snUP-KIgc8Ayt7Eog-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-82a4d07d89fso67289639f.3
+        for <kvm@vger.kernel.org>; Fri, 06 Sep 2024 08:50:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725637814; x=1726242614;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HqozqY4UtKMVO8LR3fBYcUPklBK0aAGz51hg8+BEiWg=;
+        b=jTTs92PBmT1b3bRjTM3wC3kO9vBsD3oo2Ciqk/tarWVjw3h3wJTaAMIBG0W33DQ9iI
+         LB3qkDDL7mD8m6krh23QtuAVNojQgjy4xBfjTLYtteB0/ie1LF/cHsMt0ecivj56cCc+
+         8EXxxtCLSk2DH0MWSFmhA3fqQaUZP0qZRQsQ5NIQsXeeBAWnV/DDxrY5l1Tp3JuP9Z/c
+         6BSIR6f9sG614EZTNT3bvnM1EAIttyuWEP0RW0fvzqUFux42rdekYSn3yaXcDZydgWGG
+         YlZ09GXa+EBQ2KwuxoHUS1IvtKpo3dc9BeKUk4oHZ0vLa+I+0SoEHfIhfI9qcmxKk/nS
+         9HTw==
+X-Forwarded-Encrypted: i=1; AJvYcCXX/9fATJTaffJXFFqLSDmvvJCX0TJSJqGrIKM0ytphB1C1/dVYMxEC6FnYB2hUe8t9qBg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxFZXqWZLObXbPU9a3MtqfxxFIUt/Nr96YFhK12wnkA2UDQpSk
+	C5naRgzk4Q8bWtRspcRXtjeZgJuFUXos/rK+piV8u4DrO70pGdk7wpr5eNT6SZ8V6NZHDATVHWO
+	QqCrkmh9W7vJuDnnR14cl0K5Cwl3pdqUTDxt503HeJPHgNVCBK0Xmdnb1Dg==
+X-Received: by 2002:a6b:7f41:0:b0:81f:9219:4494 with SMTP id ca18e2360f4ac-82a96214b56mr186426539f.2.1725637814303;
+        Fri, 06 Sep 2024 08:50:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH8lrPeDwOb14eoPvBTw2MlvKtC6vAvEyktdfWjIP3XFtrP9mF3v0jA3yTc+vCL1uI2iejA4g==
+X-Received: by 2002:a6b:7f41:0:b0:81f:9219:4494 with SMTP id ca18e2360f4ac-82a96214b56mr186425239f.2.1725637813935;
+        Fri, 06 Sep 2024 08:50:13 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d06a1c5cdesm1025256173.81.2024.09.06.08.50.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 08:50:13 -0700 (PDT)
+Date: Fri, 6 Sep 2024 09:50:11 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Hongbo Li <lihongbo22@huawei.com>
+Cc: <kwankhede@nvidia.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH -next] vfio/mdev: Constify struct kobj_type
+Message-ID: <20240906095011.380c695b.alex.williamson@redhat.com>
+In-Reply-To: <20240904011837.2010444-1-lihongbo22@huawei.com>
+References: <20240904011837.2010444-1-lihongbo22@huawei.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Linus,
+On Wed, 4 Sep 2024 09:18:37 +0800
+Hongbo Li <lihongbo22@huawei.com> wrote:
 
-The following changes since commit 47ac09b91befbb6a235ab620c32af719f8208399:
+> This 'struct kobj_type' is not modified. It is only used in
+> kobject_init_and_add() which takes a 'const struct kobj_type *ktype'
+> parameter.
+> 
+> Constifying this structure and moving it to a read-only section,
+> and this can increase over all security.
+> 
+> ```
+> [Before]
+>    text   data    bss    dec    hex    filename
+>    2372    600      0   2972    b9c    drivers/vfio/mdev/mdev_sysfs.o
+> 
+> [After]
+>    text   data    bss    dec    hex    filename
+>    2436    568      0   3004    bbc    drivers/vfio/mdev/mdev_sysfs.o
+> ```
+> 
+> Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
+> ---
+>  drivers/vfio/mdev/mdev_sysfs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
+> index 9d2738e10c0b..e44bb44c581e 100644
+> --- a/drivers/vfio/mdev/mdev_sysfs.c
+> +++ b/drivers/vfio/mdev/mdev_sysfs.c
+> @@ -160,7 +160,7 @@ static void mdev_type_release(struct kobject *kobj)
+>  	put_device(type->parent->dev);
+>  }
+>  
+> -static struct kobj_type mdev_type_ktype = {
+> +static const struct kobj_type mdev_type_ktype = {
+>  	.sysfs_ops	= &mdev_type_sysfs_ops,
+>  	.release	= mdev_type_release,
+>  	.default_groups	= mdev_type_groups,
 
-  Linux 6.11-rc4 (2024-08-18 13:17:27 -0700)
+Applied to vfio next branch for v6.12.  Thanks!
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 59cbd4eea48fdbc68fc17a29ad71188fea74b28b:
-
-  KVM: Remove HIGH_RES_TIMERS dependency (2024-09-05 12:04:54 -0400)
-
-Many small fixes that accumulated while I was on vacation...
-
-----------------------------------------------------------------
-x86:
-
-- Fixup missed comments from the REMOVED_SPTE=>FROZEN_SPTE rename.
-
-- Ensure a root is successfully loaded when pre-faulting SPTEs.
-
-- Grab kvm->srcu when handling KVM_SET_VCPU_EVENTS to guard against accessing
-  memslots if toggling SMM happens to force a VM-Exit.
-
-- Emulate MSR_{FS,GS}_BASE on SVM even though interception is always disabled,
-  so that KVM does the right thing if KVM's emulator encounters {RD,WR}MSR.
-
-- Explicitly clear BUS_LOCK_DETECT from KVM's caps on AMD, as KVM doesn't yet
-  virtualize BUS_LOCK_DETECT on AMD.
-
-- Cleanup the help message for CONFIG_KVM_AMD_SEV, and call out that KVM now
-  supports SEV-SNP too.
-
-- Specialize return value of KVM_CHECK_EXTENSION(KVM_CAP_READONLY_MEM),
-  based on VM type
-
-- Remove unnecessary dependency on CONFIG_HIGH_RES_TIMERS
-
-- Note an RCU quiescent state on guest exit.  This avoids a call to rcu_core()
-  if there was a grace period request while guest was running.
-
-----------------------------------------------------------------
-Leonardo Bras (1):
-      kvm: Note an RCU quiescent state on guest exit
-
-Maxim Levitsky (1):
-      KVM: SVM: fix emulation of msr reads/writes of MSR_FS_BASE and MSR_GS_BASE
-
-Paolo Bonzini (1):
-      Merge tag 'kvm-x86-fixes-6.11-rcN' of https://github.com/kvm-x86/linux into kvm-master
-
-Ravi Bangoria (1):
-      KVM: SVM: Don't advertise Bus Lock Detect to guest if SVM support is missing
-
-Sean Christopherson (2):
-      KVM: x86/mmu: Check that root is valid/loaded when pre-faulting SPTEs
-      KVM: x86: Acquire kvm->srcu when handling KVM_SET_VCPU_EVENTS
-
-Steven Rostedt (1):
-      KVM: Remove HIGH_RES_TIMERS dependency
-
-Tom Dohrmann (1):
-      KVM: x86: Only advertise KVM_CAP_READONLY_MEM when supported by VM
-
-Vitaly Kuznetsov (1):
-      KVM: SEV: Update KVM_AMD_SEV Kconfig entry and mention SEV-SNP
-
-Yan Zhao (1):
-      KVM: x86/mmu: Fixup comments missed by the REMOVED_SPTE=>FROZEN_SPTE rename
-
- arch/x86/kvm/Kconfig             |  7 ++++---
- arch/x86/kvm/mmu/mmu.c           |  4 +++-
- arch/x86/kvm/mmu/spte.c          |  6 +++---
- arch/x86/kvm/mmu/spte.h          |  2 +-
- arch/x86/kvm/mmu/tdp_mmu.c       |  8 ++++----
- arch/x86/kvm/svm/svm.c           | 15 +++++++++++++++
- arch/x86/kvm/x86.c               |  5 ++++-
- include/linux/context_tracking.h |  6 ++++--
- include/linux/kvm_host.h         | 10 +++++++++-
- 9 files changed, 47 insertions(+), 16 deletions(-)
+Alex
 
 
