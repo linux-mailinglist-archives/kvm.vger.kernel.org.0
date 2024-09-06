@@ -1,155 +1,225 @@
-Return-Path: <kvm+bounces-25995-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25996-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7161C96EB76
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 09:04:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D330296EC51
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 09:44:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D9AC1C2147C
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 07:04:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AEC8B240C7
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 07:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6FA91474CE;
-	Fri,  6 Sep 2024 07:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BB4gMC1A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE15715884A;
+	Fri,  6 Sep 2024 07:42:53 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5581411DE;
-	Fri,  6 Sep 2024 07:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5936715697A;
+	Fri,  6 Sep 2024 07:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725606259; cv=none; b=mVkOS7LyAwY5v0cFKQcCMj2CIU62F++KqW069pijqAsbd/hMQJyH8/G+mQnFOHoKObj1/DwEAw4SxM1D56mnmduRsIeKbLmuAen3IfxLmO2YgTd4NWOzWE5K07dNBraTOOLyFGNdzTW1PwVcgY5GqwgAqMrGl6FhnBuMehUjtEg=
+	t=1725608573; cv=none; b=FaukBjdjnl/l3BydvJjldQ3RxyzQafca+Quml+hUukVFb167aEfXlx+E2J7erkdBc0SFNMlFvsk4d/UxaDCERYLRromu9TPBeeCl+qLKNryIhF9qlf9PHX8OLn6rz7sCbzPxzOayTGpCH5p0eTyZF7ViJGS4l37nv+xoJoUHnjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725606259; c=relaxed/simple;
-	bh=0FA+XIN/Rv2y18b2DDGxt4kw89Tft0Xw5fB1+X9Mdpo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DxFZtJnsSmrf2TZQFDlBsidbdwK33xBR+1Nz3r9yujwe+IywbZD4/Wf4UsMshkTOqzHY8/xpbsz3tZmQ6Ht8UtXLaGzJ0VG5pQNi/id8jhYsd1jHAytYy5s9sTl/fgUmszkibNSaFqq8krTlueqN62sUOSIibulrspEuKQkaDLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BB4gMC1A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A36E3C4CEC4;
-	Fri,  6 Sep 2024 07:04:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725606258;
-	bh=0FA+XIN/Rv2y18b2DDGxt4kw89Tft0Xw5fB1+X9Mdpo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BB4gMC1AsUJMOW1tGS8d+pLxnnBm9CBB3Zs2Ztp0sfUz4/p0TASytsnYZsPIHO2hl
-	 Wo5t205nTTsv2lLLFV3qUosjvxB0sk1Gp5WOG8CMxqzymNpMA2Zb2wc19fmzVUwHPB
-	 WoATO2kjHHxzYTJn2MTZBLEKk2MUPOFjSLmDjTKzVjX7MwzVTt0WlVUAXK1tD9NEtj
-	 UrR64EaUcaXvlnp3NTFj/maz1SKnvx/E/Xis+2sQ3k40v2xny3nI59x9OSFq0+wFsV
-	 bVf0r4WYqZyY/w8H92fpISOT0JAzFoFLQPmn3VvE0QLq7FDMCaKsyls1gQoKRgGrhf
-	 6rLdra+9YD3pQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1smT0y-00ACR1-6K;
-	Fri, 06 Sep 2024 08:04:16 +0100
-Date: Fri, 06 Sep 2024 08:04:15 +0100
-Message-ID: <86h6atuuts.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2 12/16] KVM: arm64: Implement AT S1PIE support
-In-Reply-To: <20240905153734.GA4157679@e124191.cambridge.arm.com>
-References: <20240903153834.1909472-1-maz@kernel.org>
-	<20240903153834.1909472-13-maz@kernel.org>
-	<20240905135820.GA4142389@e124191.cambridge.arm.com>
-	<86ikvaup12.wl-maz@kernel.org>
-	<20240905153734.GA4157679@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1725608573; c=relaxed/simple;
+	bh=T6XLUoAFcXSxruwAYQmBy6F0E6rBy/538u2+YcV2SNc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sQq/imfsODMB3nSjkkEfUiX4xMtWYxidAbZ41+LaCaS8E7dxHpKHlJNCdDZM1uKBvT0jFyqg0e3Fm4NTZmucXgFwAMB0WLTVAOB8W1H8bTRj4FnZ166qjy7+Cxz19wos2se6rpJLo66X9o9HtItzS5hVyE7eu6aCx366KYz17XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4X0Sqj3ntrz1j8Dx;
+	Fri,  6 Sep 2024 15:42:25 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 19E2B1402CD;
+	Fri,  6 Sep 2024 15:42:48 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 6 Sep 2024 15:42:47 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
+	Alexander Duyck <alexanderduyck@fb.com>, Chuck Lever
+	<chuck.lever@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, =?UTF-8?q?Eugenio=20P=C3=A9rez?=
+	<eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
+ Dumazet <edumazet@google.com>, David Howells <dhowells@redhat.com>, Marc
+ Dionne <marc.dionne@auristor.com>, Jeff Layton <jlayton@kernel.org>, Neil
+ Brown <neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Trond Myklebust
+	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Shuah Khan
+	<shuah@kernel.org>, <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-mm@kvack.org>, <linux-afs@lists.infradead.org>,
+	<linux-nfs@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+Subject: [PATCH net-next v18 04/14] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
+Date: Fri, 6 Sep 2024 15:36:36 +0800
+Message-ID: <20240906073646.2930809-5-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20240906073646.2930809-1-linyunsheng@huawei.com>
+References: <20240906073646.2930809-1-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Thu, 05 Sep 2024 16:37:34 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> On Thu, Sep 05, 2024 at 03:57:13PM +0100, Marc Zyngier wrote:
-> > Hi Joey,
-> > 
-> > Thanks for having a look.
-> > 
-> > On Thu, 05 Sep 2024 14:58:20 +0100,
-> > Joey Gouly <joey.gouly@arm.com> wrote:
-> > > 
-> > > Hello Marc!
-> > > 
-> > > >  static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
-> > > >  				   struct s1_walk_info *wi,
-> > > >  				   struct s1_walk_result *wr,
-> > > >  				   struct s1_perms *s1p)
-> > > >  {
-> > > > -	compute_s1_direct_permissions(vcpu, wi, wr, s1p);
-> > > > +	if (!s1pie_enabled(vcpu, wi->regime))
-> > > > +		compute_s1_direct_permissions(vcpu, wi, wr, s1p);
-> > > > +	else
-> > > > +		compute_s1_indirect_permissions(vcpu, wi, wr, s1p);
-> > > > +
-> > > >  	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
-> > > 
-> > > Is this (and the previous patch to split this up) right?
-> > > 
-> > > Looking at this from the ARM ARM (ARM DDI 0487K.a):
-> > > 
-> > > 	R JHSVW If Indirect permissions are used, then hierarchical
-> > > 	permissions are disabled and TCR_ELx.HPDn are RES 1.
-> > 
-> > Odd. I was convinced that it was when S1POE is enabled that HPs were
-> > disabled. But you are absolutely right, and it is once more proven
-> > that I can't read. Oh well.
-> 
-> For POE there is:
-> 
-> 	RBVXDG Hierarchical Permissions are disabled and the
-> 	TCR_ELx.{HPD0, HPD1} bits are RES1 for stage 1 of a
-> 	translation regime using VMSAv8-64 if one or more of POE and
-> 	E0POE (for EL1&0, EL2&0) is enabled for that translation
-> 	regime.
+Use appropriate frag_page API instead of caller accessing
+'page_frag_cache' directly.
 
-Right, this is the one I had at the back of my head.
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+Acked-by: Chuck Lever <chuck.lever@oracle.com>
+---
+ drivers/vhost/net.c                                   |  2 +-
+ include/linux/page_frag_cache.h                       | 10 ++++++++++
+ net/core/skbuff.c                                     |  6 +++---
+ net/rxrpc/conn_object.c                               |  4 +---
+ net/rxrpc/local_object.c                              |  4 +---
+ net/sunrpc/svcsock.c                                  |  6 ++----
+ tools/testing/selftests/mm/page_frag/page_frag_test.c |  2 +-
+ 7 files changed, 19 insertions(+), 15 deletions(-)
 
-At the end of the day, it really looks like hierarchical permissions
-are as dead as the proverbial dodo, and their sole purpose left is to
-antagonise implementations. Hopefully someone realises that and
-eventually allows implementations to build TCR_ELx.HPD* as RES1.
-
-> > Not to worry, I've since found other issues with this series. I have
-> > forgotten the patch dealing with the fast path on another branch, and
-> > since decided that TCR2_EL2 needed extra care to cope with individual
-> > features being disabled.
-> > 
-> > The rework is still useful, as I'm looking at POE as well, but I need
-> > to hoist the HP stuff up a notch.
-> > 
-> > I'll repost things once I've sorted these things up.
-> 
-> I think the rest of this patch looked fine though.
-
-Cool, thanks for having given it a look!
-
-	M.
-
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index f16279351db5..9ad37c012189 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
+ 			vqs[VHOST_NET_VQ_RX]);
+ 
+ 	f->private_data = n;
+-	n->pf_cache.va = NULL;
++	page_frag_cache_init(&n->pf_cache);
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
+index 67ac8626ed9b..0a52f7a179c8 100644
+--- a/include/linux/page_frag_cache.h
++++ b/include/linux/page_frag_cache.h
+@@ -7,6 +7,16 @@
+ #include <linux/mm_types_task.h>
+ #include <linux/types.h>
+ 
++static inline void page_frag_cache_init(struct page_frag_cache *nc)
++{
++	nc->va = NULL;
++}
++
++static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
++{
++	return !!nc->pfmemalloc;
++}
++
+ void page_frag_cache_drain(struct page_frag_cache *nc);
+ void __page_frag_cache_drain(struct page *page, unsigned int count);
+ void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index a52638363ea5..a5f8e4e0c649 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -752,14 +752,14 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
+ 	if (in_hardirq() || irqs_disabled()) {
+ 		nc = this_cpu_ptr(&netdev_alloc_cache);
+ 		data = page_frag_alloc(nc, len, gfp_mask);
+-		pfmemalloc = nc->pfmemalloc;
++		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
+ 	} else {
+ 		local_bh_disable();
+ 		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
+ 
+ 		nc = this_cpu_ptr(&napi_alloc_cache.page);
+ 		data = page_frag_alloc(nc, len, gfp_mask);
+-		pfmemalloc = nc->pfmemalloc;
++		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
+ 
+ 		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+ 		local_bh_enable();
+@@ -849,7 +849,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
+ 		len = SKB_HEAD_ALIGN(len);
+ 
+ 		data = page_frag_alloc(&nc->page, len, gfp_mask);
+-		pfmemalloc = nc->page.pfmemalloc;
++		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
+ 	}
+ 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+ 
+diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
+index 1539d315afe7..694c4df7a1a3 100644
+--- a/net/rxrpc/conn_object.c
++++ b/net/rxrpc/conn_object.c
+@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
+ 	 */
+ 	rxrpc_purge_queue(&conn->rx_queue);
+ 
+-	if (conn->tx_data_alloc.va)
+-		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
+-					conn->tx_data_alloc.pagecnt_bias);
++	page_frag_cache_drain(&conn->tx_data_alloc);
+ 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
+ }
+ 
+diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
+index 504453c688d7..a8cffe47cf01 100644
+--- a/net/rxrpc/local_object.c
++++ b/net/rxrpc/local_object.c
+@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
+ #endif
+ 	rxrpc_purge_queue(&local->rx_queue);
+ 	rxrpc_purge_client_connections(local);
+-	if (local->tx_alloc.va)
+-		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
+-					local->tx_alloc.pagecnt_bias);
++	page_frag_cache_drain(&local->tx_alloc);
+ }
+ 
+ /*
+diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+index 6b3f01beb294..dcfd84cf0694 100644
+--- a/net/sunrpc/svcsock.c
++++ b/net/sunrpc/svcsock.c
+@@ -1609,7 +1609,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
+ static void svc_sock_free(struct svc_xprt *xprt)
+ {
+ 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
+-	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
+ 	struct socket *sock = svsk->sk_sock;
+ 
+ 	trace_svcsock_free(svsk, sock);
+@@ -1619,8 +1618,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
+ 		sockfd_put(sock);
+ 	else
+ 		sock_release(sock);
+-	if (pfc->va)
+-		__page_frag_cache_drain(virt_to_head_page(pfc->va),
+-					pfc->pagecnt_bias);
++
++	page_frag_cache_drain(&svsk->sk_frag_cache);
+ 	kfree(svsk);
+ }
+diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+index 5395a36e4030..a4bd543d6950 100644
+--- a/tools/testing/selftests/mm/page_frag/page_frag_test.c
++++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+@@ -117,7 +117,7 @@ static int __init page_frag_test_init(void)
+ 	u64 duration;
+ 	int ret;
+ 
+-	test_nc.va = NULL;
++	page_frag_cache_init(&test_nc);
+ 	atomic_set(&nthreads, 2);
+ 	init_completion(&wait);
+ 
 -- 
-Without deviation from the norm, progress is not possible.
+2.33.0
+
 
