@@ -1,127 +1,176 @@
-Return-Path: <kvm+bounces-25997-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25998-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F1B96ED9A
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 10:18:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3D4096EDBC
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 10:24:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ED9D1C23C10
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 08:18:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B04DB28765B
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 08:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE1A515821D;
-	Fri,  6 Sep 2024 08:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E32015821E;
+	Fri,  6 Sep 2024 08:23:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NAMcbQZ0"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="NLVDOujL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FD3157476;
-	Fri,  6 Sep 2024 08:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186B775809;
+	Fri,  6 Sep 2024 08:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725610680; cv=none; b=IlEI7sqCJyDyvDjGQmrHpDs8ad8Q2AEkuEADo1LX9T0ujU9RBC94qmzZt2/rVZfyRNNQZg5LnSbRAB/GkX//4rmzDpTnVeBf8tNqXuHHgWTehnV6lXJ+vZSG4Ez2kwzfHvElQcjRtbPTAg4Kp7A6hm0PcbjfZs5+hw3u5eZRv+A=
+	t=1725611029; cv=none; b=ktmZJ2NYnbUJ0uG5+PN/KizCMRR+0IwrlFV2p3CxiSsfH5LXb8NR45VciaewbXmQCgTskJx8cW29C0yfTyXtk0OfNWutbdHKpf9lVoYfHUzgTfo/VNTcikEKJ/id4tx0/kftqyMdez94OekzMv+/TYbGdq4bBk2zEPjvHWWfyOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725610680; c=relaxed/simple;
-	bh=QBOG/88G3YRcY9zMff+guhNTY4exVsPsjtw718pEeHA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mgPWQRjy6mpwnKqdeYPYPoNKMokBwiufJKlkQachBAHGocq/hRfDdiAXLJej/nD1GQobtfpslbhmwxVt9Vup5t9l+3UwxvJVet+ELZB55y59+DlWGAb42t/uEj1Mkh/UTQ0JQsf3Vww/Rmt6J3DcyZ1BTs27Yg91rrTlmL7z4ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NAMcbQZ0; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725610679; x=1757146679;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QBOG/88G3YRcY9zMff+guhNTY4exVsPsjtw718pEeHA=;
-  b=NAMcbQZ0260tZH2Y3M128miw4/sr5Cb3vOuOwdJW3+8coutfiZtxZI1v
-   qXzNRjF7e7sUpMgwwmow4sp+KdPqwvmxn7th/kHoCmQwauZEE8BADovRt
-   Iegkhku++54FFreuErm352bOU/ANiLJ8aZBA7XcXoq+b4pvx8NvICwbF1
-   QEwpfK6eysqIWWkmdWCas3h5oG5VWBqkQ4Ue8Pi96AD6FguyGDvnpxZNg
-   URceiH+DnzUvb7lYSd9rYYO8f6tW3HdCl6QNAODIOrwIt0zytVbMRZdTR
-   6bnbiWWAiyJuBsmEpAQszTPuluviUnNGZZ2BTSsG5ByKL/5796FrfKOoc
-   Q==;
-X-CSE-ConnectionGUID: SegKC2RYQ9q1k9KZDSTupQ==
-X-CSE-MsgGUID: dm9IQkg6Sc2xUDwfeZqYww==
-X-IronPort-AV: E=McAfee;i="6700,10204,11186"; a="41843318"
-X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
-   d="scan'208";a="41843318"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2024 01:17:58 -0700
-X-CSE-ConnectionGUID: 8+bx6dJfS1aiPuSPNOyLIw==
-X-CSE-MsgGUID: KLkjRvucRxiT6qU7fMgjQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
-   d="scan'208";a="70308868"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmviesa005.fm.intel.com with ESMTP; 06 Sep 2024 01:17:56 -0700
-Date: Fri, 6 Sep 2024 16:17:55 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH v2 05/22] KVM: x86: Retry to-be-emulated insn in "slow"
- unprotect path iff sp is zapped
-Message-ID: <20240906081755.okkq3hlrm6wibfxy@yy-desk-7060>
-References: <20240831001538.336683-1-seanjc@google.com>
- <20240831001538.336683-6-seanjc@google.com>
+	s=arc-20240116; t=1725611029; c=relaxed/simple;
+	bh=6KHu/M76euvmYB8uGMZQgD8G7vqWrP8kibHBRSdKCx0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eFA+V8T11FHqkq4/hi2MLdrpL7MXUHcV+dcDTQfxQYuEkOcR0HAHJW0it9irWFWsDYe3IXH1SEUupe0qiqbpgg8fJGUmWSKBvI6crm9Fl095gy0Emef4wphgthdWsy4tcXQXp/nDVFEgiAFfuUp+GAHFuIS8rPcRqYr8yf8mBrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=NLVDOujL; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1725611002;
+	bh=AThVTapdK8W6lR9Hzn1lU3iQE9P312HGd4jzTLay1S0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=NLVDOujLFvZ6f/Cl65Roy7iLt/T1aXKv7Kle8HPjdTkcJDdgjJX3IUKPjyhW3rPJ/
+	 +A+LnCYrgRexWeutiiHxVajkVgA7tKIOGiW1ZME7DCaMNqnkSyYVlHcWzCPmTG8gAN
+	 vi3te/+J5Qm4EkbqDY5y/2KnjfJ+qbpS79bRjOAU=
+X-QQ-mid: bizesmtp82t1725610983td3gjq13
+X-QQ-Originating-IP: XS9dbmsREdHh9f9GsRKePQng3kgynBIBrvK4o5AKij8=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 06 Sep 2024 16:22:59 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 12750230750534342850
+From: WangYuli <wangyuli@uniontech.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	sashal@kernel.org,
+	alexghiti@rivosinc.com,
+	palmer@rivosinc.com,
+	wangyuli@uniontech.com
+Cc: paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	anup@brainfault.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	rdunlap@infradead.org,
+	dvlachos@ics.forth.gr,
+	bhe@redhat.com,
+	samuel.holland@sifive.com,
+	guoren@kernel.org,
+	linux@armlinux.org.uk,
+	linux-arm-kernel@lists.infradead.org,
+	willy@infradead.org,
+	akpm@linux-foundation.org,
+	fengwei.yin@intel.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	conor.dooley@microchip.com,
+	glider@google.com,
+	elver@google.com,
+	dvyukov@google.com,
+	kasan-dev@googlegroups.com,
+	ardb@kernel.org,
+	linux-efi@vger.kernel.org,
+	atishp@atishpatra.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	qiaozhe@iscas.ac.cn,
+	ryan.roberts@arm.com,
+	ryabinin.a.a@gmail.com,
+	andreyknvl@gmail.com,
+	vincenzo.frascino@arm.com,
+	namcao@linutronix.de
+Subject: [PATCH 6.6 1/4] riscv: Use WRITE_ONCE() when setting page table entries
+Date: Fri,  6 Sep 2024 16:22:36 +0800
+Message-ID: <9606AC2974BEDC1A+20240906082254.435410-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240831001538.336683-6-seanjc@google.com>
-User-Agent: NeoMutt/20171215
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Fri, Aug 30, 2024 at 05:15:20PM -0700, Sean Christopherson wrote:
-> Resume the guest and thus skip emulation of a non-PTE-writing instruction
-> if and only if unprotecting the gfn actually zapped at least one shadow
-> page.  If the gfn is write-protected for some reason other than shadow
-> paging, attempting to unprotect the gfn will effectively fail, and thus
-> retrying the instruction is all but guaranteed to be pointless.  This bug
-> has existed for a long time, but was effectively fudged around by the
-> retry RIP+address anti-loop detection.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/x86.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 966fb301d44b..c4cb6c6d605b 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8961,14 +8961,14 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
->  	if (ctxt->eip == last_retry_eip && last_retry_addr == cr2_or_gpa)
->  		return false;
->
-> +	if (!vcpu->arch.mmu->root_role.direct)
-> +		gpa = kvm_mmu_gva_to_gpa_write(vcpu, cr2_or_gpa, NULL);
-> +
-> +	if (!kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa)))
-> +		return false;
-> +
+From: Alexandre Ghiti <alexghiti@rivosinc.com>
 
-Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+[ Upstream commit c30fa83b49897e708a52e122dd10616a52a4c82b ]
 
->  	vcpu->arch.last_retry_eip = ctxt->eip;
->  	vcpu->arch.last_retry_addr = cr2_or_gpa;
-> -
-> -	if (!vcpu->arch.mmu->root_role.direct)
-> -		gpa = kvm_mmu_gva_to_gpa_write(vcpu, cr2_or_gpa, NULL);
-> -
-> -	kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
-> -
->  	return true;
->  }
->
-> --
-> 2.46.0.469.g59c65b2a67-goog
->
+To avoid any compiler "weirdness" when accessing page table entries which
+are concurrently modified by the HW, let's use WRITE_ONCE() macro
+(commit 20a004e7b017 ("arm64: mm: Use READ_ONCE/WRITE_ONCE when accessing
+page tables") gives a great explanation with more details).
+
+Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
+Link: https://lore.kernel.org/r/20231213203001.179237-2-alexghiti@rivosinc.com
+Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ arch/riscv/include/asm/pgtable-64.h | 6 +++---
+ arch/riscv/include/asm/pgtable.h    | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/arch/riscv/include/asm/pgtable-64.h b/arch/riscv/include/asm/pgtable-64.h
+index 7a5097202e15..a65a352dcfbf 100644
+--- a/arch/riscv/include/asm/pgtable-64.h
++++ b/arch/riscv/include/asm/pgtable-64.h
+@@ -198,7 +198,7 @@ static inline int pud_user(pud_t pud)
+ 
+ static inline void set_pud(pud_t *pudp, pud_t pud)
+ {
+-	*pudp = pud;
++	WRITE_ONCE(*pudp, pud);
+ }
+ 
+ static inline void pud_clear(pud_t *pudp)
+@@ -274,7 +274,7 @@ static inline unsigned long _pmd_pfn(pmd_t pmd)
+ static inline void set_p4d(p4d_t *p4dp, p4d_t p4d)
+ {
+ 	if (pgtable_l4_enabled)
+-		*p4dp = p4d;
++		WRITE_ONCE(*p4dp, p4d);
+ 	else
+ 		set_pud((pud_t *)p4dp, (pud_t){ p4d_val(p4d) });
+ }
+@@ -347,7 +347,7 @@ static inline pud_t *pud_offset(p4d_t *p4d, unsigned long address)
+ static inline void set_pgd(pgd_t *pgdp, pgd_t pgd)
+ {
+ 	if (pgtable_l5_enabled)
+-		*pgdp = pgd;
++		WRITE_ONCE(*pgdp, pgd);
+ 	else
+ 		set_p4d((p4d_t *)pgdp, (p4d_t){ pgd_val(pgd) });
+ }
+diff --git a/arch/riscv/include/asm/pgtable.h b/arch/riscv/include/asm/pgtable.h
+index 719c3041ae1c..f8e72df4113a 100644
+--- a/arch/riscv/include/asm/pgtable.h
++++ b/arch/riscv/include/asm/pgtable.h
+@@ -248,7 +248,7 @@ static inline int pmd_leaf(pmd_t pmd)
+ 
+ static inline void set_pmd(pmd_t *pmdp, pmd_t pmd)
+ {
+-	*pmdp = pmd;
++	WRITE_ONCE(*pmdp, pmd);
+ }
+ 
+ static inline void pmd_clear(pmd_t *pmdp)
+@@ -515,7 +515,7 @@ static inline int pte_same(pte_t pte_a, pte_t pte_b)
+  */
+ static inline void set_pte(pte_t *ptep, pte_t pteval)
+ {
+-	*ptep = pteval;
++	WRITE_ONCE(*ptep, pteval);
+ }
+ 
+ void flush_icache_pte(pte_t pte);
+-- 
+2.43.4
+
 
