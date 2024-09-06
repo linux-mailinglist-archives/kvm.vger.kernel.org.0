@@ -1,225 +1,127 @@
-Return-Path: <kvm+bounces-25996-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25997-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D330296EC51
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 09:44:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76F1B96ED9A
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 10:18:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AEC8B240C7
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 07:44:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ED9D1C23C10
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 08:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE15715884A;
-	Fri,  6 Sep 2024 07:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE1A515821D;
+	Fri,  6 Sep 2024 08:18:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NAMcbQZ0"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5936715697A;
-	Fri,  6 Sep 2024 07:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FD3157476;
+	Fri,  6 Sep 2024 08:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725608573; cv=none; b=FaukBjdjnl/l3BydvJjldQ3RxyzQafca+Quml+hUukVFb167aEfXlx+E2J7erkdBc0SFNMlFvsk4d/UxaDCERYLRromu9TPBeeCl+qLKNryIhF9qlf9PHX8OLn6rz7sCbzPxzOayTGpCH5p0eTyZF7ViJGS4l37nv+xoJoUHnjk=
+	t=1725610680; cv=none; b=IlEI7sqCJyDyvDjGQmrHpDs8ad8Q2AEkuEADo1LX9T0ujU9RBC94qmzZt2/rVZfyRNNQZg5LnSbRAB/GkX//4rmzDpTnVeBf8tNqXuHHgWTehnV6lXJ+vZSG4Ez2kwzfHvElQcjRtbPTAg4Kp7A6hm0PcbjfZs5+hw3u5eZRv+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725608573; c=relaxed/simple;
-	bh=T6XLUoAFcXSxruwAYQmBy6F0E6rBy/538u2+YcV2SNc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sQq/imfsODMB3nSjkkEfUiX4xMtWYxidAbZ41+LaCaS8E7dxHpKHlJNCdDZM1uKBvT0jFyqg0e3Fm4NTZmucXgFwAMB0WLTVAOB8W1H8bTRj4FnZ166qjy7+Cxz19wos2se6rpJLo66X9o9HtItzS5hVyE7eu6aCx366KYz17XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4X0Sqj3ntrz1j8Dx;
-	Fri,  6 Sep 2024 15:42:25 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 19E2B1402CD;
-	Fri,  6 Sep 2024 15:42:48 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 6 Sep 2024 15:42:47 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	Alexander Duyck <alexanderduyck@fb.com>, Chuck Lever
-	<chuck.lever@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, =?UTF-8?q?Eugenio=20P=C3=A9rez?=
-	<eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
- Dumazet <edumazet@google.com>, David Howells <dhowells@redhat.com>, Marc
- Dionne <marc.dionne@auristor.com>, Jeff Layton <jlayton@kernel.org>, Neil
- Brown <neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Trond Myklebust
-	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Shuah Khan
-	<shuah@kernel.org>, <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-Subject: [PATCH net-next v18 04/14] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
-Date: Fri, 6 Sep 2024 15:36:36 +0800
-Message-ID: <20240906073646.2930809-5-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240906073646.2930809-1-linyunsheng@huawei.com>
-References: <20240906073646.2930809-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1725610680; c=relaxed/simple;
+	bh=QBOG/88G3YRcY9zMff+guhNTY4exVsPsjtw718pEeHA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mgPWQRjy6mpwnKqdeYPYPoNKMokBwiufJKlkQachBAHGocq/hRfDdiAXLJej/nD1GQobtfpslbhmwxVt9Vup5t9l+3UwxvJVet+ELZB55y59+DlWGAb42t/uEj1Mkh/UTQ0JQsf3Vww/Rmt6J3DcyZ1BTs27Yg91rrTlmL7z4ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NAMcbQZ0; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725610679; x=1757146679;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QBOG/88G3YRcY9zMff+guhNTY4exVsPsjtw718pEeHA=;
+  b=NAMcbQZ0260tZH2Y3M128miw4/sr5Cb3vOuOwdJW3+8coutfiZtxZI1v
+   qXzNRjF7e7sUpMgwwmow4sp+KdPqwvmxn7th/kHoCmQwauZEE8BADovRt
+   Iegkhku++54FFreuErm352bOU/ANiLJ8aZBA7XcXoq+b4pvx8NvICwbF1
+   QEwpfK6eysqIWWkmdWCas3h5oG5VWBqkQ4Ue8Pi96AD6FguyGDvnpxZNg
+   URceiH+DnzUvb7lYSd9rYYO8f6tW3HdCl6QNAODIOrwIt0zytVbMRZdTR
+   6bnbiWWAiyJuBsmEpAQszTPuluviUnNGZZ2BTSsG5ByKL/5796FrfKOoc
+   Q==;
+X-CSE-ConnectionGUID: SegKC2RYQ9q1k9KZDSTupQ==
+X-CSE-MsgGUID: dm9IQkg6Sc2xUDwfeZqYww==
+X-IronPort-AV: E=McAfee;i="6700,10204,11186"; a="41843318"
+X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
+   d="scan'208";a="41843318"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2024 01:17:58 -0700
+X-CSE-ConnectionGUID: 8+bx6dJfS1aiPuSPNOyLIw==
+X-CSE-MsgGUID: KLkjRvucRxiT6qU7fMgjQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
+   d="scan'208";a="70308868"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmviesa005.fm.intel.com with ESMTP; 06 Sep 2024 01:17:56 -0700
+Date: Fri, 6 Sep 2024 16:17:55 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>
+Subject: Re: [PATCH v2 05/22] KVM: x86: Retry to-be-emulated insn in "slow"
+ unprotect path iff sp is zapped
+Message-ID: <20240906081755.okkq3hlrm6wibfxy@yy-desk-7060>
+References: <20240831001538.336683-1-seanjc@google.com>
+ <20240831001538.336683-6-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240831001538.336683-6-seanjc@google.com>
+User-Agent: NeoMutt/20171215
 
-Use appropriate frag_page API instead of caller accessing
-'page_frag_cache' directly.
+On Fri, Aug 30, 2024 at 05:15:20PM -0700, Sean Christopherson wrote:
+> Resume the guest and thus skip emulation of a non-PTE-writing instruction
+> if and only if unprotecting the gfn actually zapped at least one shadow
+> page.  If the gfn is write-protected for some reason other than shadow
+> paging, attempting to unprotect the gfn will effectively fail, and thus
+> retrying the instruction is all but guaranteed to be pointless.  This bug
+> has existed for a long time, but was effectively fudged around by the
+> retry RIP+address anti-loop detection.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 966fb301d44b..c4cb6c6d605b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8961,14 +8961,14 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
+>  	if (ctxt->eip == last_retry_eip && last_retry_addr == cr2_or_gpa)
+>  		return false;
+>
+> +	if (!vcpu->arch.mmu->root_role.direct)
+> +		gpa = kvm_mmu_gva_to_gpa_write(vcpu, cr2_or_gpa, NULL);
+> +
+> +	if (!kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa)))
+> +		return false;
+> +
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
-Acked-by: Chuck Lever <chuck.lever@oracle.com>
----
- drivers/vhost/net.c                                   |  2 +-
- include/linux/page_frag_cache.h                       | 10 ++++++++++
- net/core/skbuff.c                                     |  6 +++---
- net/rxrpc/conn_object.c                               |  4 +---
- net/rxrpc/local_object.c                              |  4 +---
- net/sunrpc/svcsock.c                                  |  6 ++----
- tools/testing/selftests/mm/page_frag/page_frag_test.c |  2 +-
- 7 files changed, 19 insertions(+), 15 deletions(-)
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index f16279351db5..9ad37c012189 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->pf_cache.va = NULL;
-+	page_frag_cache_init(&n->pf_cache);
- 
- 	return 0;
- }
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index 67ac8626ed9b..0a52f7a179c8 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -7,6 +7,16 @@
- #include <linux/mm_types_task.h>
- #include <linux/types.h>
- 
-+static inline void page_frag_cache_init(struct page_frag_cache *nc)
-+{
-+	nc->va = NULL;
-+}
-+
-+static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
-+{
-+	return !!nc->pfmemalloc;
-+}
-+
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index a52638363ea5..a5f8e4e0c649 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -752,14 +752,14 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
- 	if (in_hardirq() || irqs_disabled()) {
- 		nc = this_cpu_ptr(&netdev_alloc_cache);
- 		data = page_frag_alloc(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 	} else {
- 		local_bh_disable();
- 		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 
- 		nc = this_cpu_ptr(&napi_alloc_cache.page);
- 		data = page_frag_alloc(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 
- 		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 		local_bh_enable();
-@@ -849,7 +849,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		len = SKB_HEAD_ALIGN(len);
- 
- 		data = page_frag_alloc(&nc->page, len, gfp_mask);
--		pfmemalloc = nc->page.pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	}
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe7..694c4df7a1a3 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
- 	 */
- 	rxrpc_purge_queue(&conn->rx_queue);
- 
--	if (conn->tx_data_alloc.va)
--		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
--					conn->tx_data_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&conn->tx_data_alloc);
- 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
- }
- 
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..a8cffe47cf01 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
- #endif
- 	rxrpc_purge_queue(&local->rx_queue);
- 	rxrpc_purge_client_connections(local);
--	if (local->tx_alloc.va)
--		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
--					local->tx_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&local->tx_alloc);
- }
- 
- /*
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 6b3f01beb294..dcfd84cf0694 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1609,7 +1609,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1619,8 +1618,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
--	if (pfc->va)
--		__page_frag_cache_drain(virt_to_head_page(pfc->va),
--					pfc->pagecnt_bias);
-+
-+	page_frag_cache_drain(&svsk->sk_frag_cache);
- 	kfree(svsk);
- }
-diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-index 5395a36e4030..a4bd543d6950 100644
---- a/tools/testing/selftests/mm/page_frag/page_frag_test.c
-+++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-@@ -117,7 +117,7 @@ static int __init page_frag_test_init(void)
- 	u64 duration;
- 	int ret;
- 
--	test_nc.va = NULL;
-+	page_frag_cache_init(&test_nc);
- 	atomic_set(&nthreads, 2);
- 	init_completion(&wait);
- 
--- 
-2.33.0
-
+>  	vcpu->arch.last_retry_eip = ctxt->eip;
+>  	vcpu->arch.last_retry_addr = cr2_or_gpa;
+> -
+> -	if (!vcpu->arch.mmu->root_role.direct)
+> -		gpa = kvm_mmu_gva_to_gpa_write(vcpu, cr2_or_gpa, NULL);
+> -
+> -	kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
+> -
+>  	return true;
+>  }
+>
+> --
+> 2.46.0.469.g59c65b2a67-goog
+>
 
