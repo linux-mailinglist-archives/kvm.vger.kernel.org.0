@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-25986-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-25987-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FCB596E8B3
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 06:36:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D794096E8B5
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 06:36:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC5DFB22774
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 04:36:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3752DB2392A
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 04:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F68D1428F3;
-	Fri,  6 Sep 2024 04:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895DD148FF6;
+	Fri,  6 Sep 2024 04:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lnUKM2Le"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OwcH8E/j"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D6813D600
-	for <kvm@vger.kernel.org>; Fri,  6 Sep 2024 04:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5126013DB9F
+	for <kvm@vger.kernel.org>; Fri,  6 Sep 2024 04:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725597270; cv=none; b=MjrvR1vT4+ptVTwuyVa1psdwDa8jjopRqZ20qBCBn3xDRVC9ATl22U0Mdbdf3BxSqQPWkZ5K8YUCsjqfNJ3/Shv/FifvmWzbBD27VQHBGvnsvKvLq+dBe2auTyJGZ6gedIXt8J5H6xbeBIngy6yQJqpQI0F6MJHsJY5460tWEKw=
+	t=1725597271; cv=none; b=NWjBZEYDt0z78idf5iB1V0iwVhdtJlPjNuD0EhBfurt09iPIQhx4eIPyJBWsOgZR1YXRm5X1wxxei++ag+J9O8iFtUpmHUb33w0siMCKbiH9v2BIv23j6IDHA5zqqbvDaLiDH1MeCom3YOXia27fWLh6L4c4zCyEbqOhxImFHa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725597270; c=relaxed/simple;
-	bh=16BMCLeOVpdv0K/WH9ozgUVcrDZ/XLhLK3PWi4tm9l0=;
+	s=arc-20240116; t=1725597271; c=relaxed/simple;
+	bh=KOuZWdc9JPRpBXVKGqAv89lMSGg+kGyVbTW1GAwZ1wU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YXDmgKNT+wfSud0DPJTHjxT5Yx6NfFGCC9OjCoPLlfTdcRULKajnNo8bbwbKf/a/fndY6mD5erTwWCju173IwpFs3WOt0YkKJI2/GoEkpLxJJ2Hj4ABs/T0up1SN3iiH2O6C3cIlllXIi4d+2gEnG8qgWewgaHAzX7R8Jvo9k5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lnUKM2Le; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=T/H7uE8EBcQ9Wn9zuHw+FvcdmTurFQaYbX/WQDdOh1owK1a+p6VirjqtZJcdyJwfxPJxc5PwGpgQZPDHpjLhKPWR+7A1+wCCXYpKh538lmw4+8mETvczN9QpS7FxRJpYz1ihSIBcprU8wpw7t7qxwpmhYBVqXRM86WR6++MmF8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OwcH8E/j; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6d6b2b9a534so62743627b3.2
-        for <kvm@vger.kernel.org>; Thu, 05 Sep 2024 21:34:28 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7d4fc1a2bb7so2223059a12.1
+        for <kvm@vger.kernel.org>; Thu, 05 Sep 2024 21:34:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725597268; x=1726202068; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1725597269; x=1726202069; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=uzxku0+LxyHsHOYX6rcGXjDtKiKbrlhkjaeoxb7nWcQ=;
-        b=lnUKM2Le9gtS7mKy1NFJU7llV3HsuTaVEo9Ge9k3I/lAvyaMJbqIWUgf2aG4SVjgq6
-         0O86BuIKEnFPCusK0FD58aRa7/VfxwxWMcvN8OsH/Actv38uJyx7lU8T4P0ECfY7YQDO
-         wNerNKjpeSS7qpKqOxYb9RQulZ2u+2sFi0y13ie7ROOPWqHRvtcd87LWiu07MFmRFMmP
-         ImXJozsi4HExJiYXYeK7R0Jw7x85In8LnXT3IvQgYN8+1cHeAoIod64VuAM10JeoHMFQ
-         o2QdhwDLvnyw+VZdSBqhHbrXMvJ2VoiGkve1Nr8DL3N9YvkSC4k20YxqjvHBiOBRNdnz
-         qOfw==
+        bh=YYgMGUi3oxiD0kO1ugWhSXeqKUt6BlZh0E2W4sJdCss=;
+        b=OwcH8E/jVBgRIUhB739yDghDvswotReeUXNvXUbZ009xWuvcWj8LsFNC09WINLr7xK
+         qWI9zyB8lQ7nz5x1jjHecDtqWoNbcSmOPTv2Mh6QvomyvrWiZsRMJyPOTH0me0bfRYVj
+         WkYeJg1q3R7KdwthmQxeUyVyY6rCiHgPCySjdI4AyqtO8v0Y5MdEJHoC95sCUNJmo/OC
+         YWuruJAZsTp8nZdTfVKgN+OQmSMZsTwus4Wq+LAC1rTfUdKNEBEECIGcuf+iqQUZ8qKF
+         FtrYYjWXoUzTQHnNmIJ/LWeS+jpHd+HnYv933F7NK+Y7+lidx7v4yKREWadSIRKRlMyp
+         a8uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725597268; x=1726202068;
+        d=1e100.net; s=20230601; t=1725597269; x=1726202069;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uzxku0+LxyHsHOYX6rcGXjDtKiKbrlhkjaeoxb7nWcQ=;
-        b=n+cEPrivZy9oEG9EEvVHjhnMIfFSaqQmaVuXhRP44gs5pYOvuqdM+AxgcWyzj5R6rj
-         7v54yOJeC2ah+eqspzOJcVq25PdvxQOwup+iNk0Os6xOZA6pdvI0uzUixpTquSjHq0gG
-         a2Pwmrxk+waPgelRClJ3wVJuGX3BPpIfAHQKZu9kN//bNf9/XdE9uyriKGrwHz0Qb8zX
-         Va8T/hmx4EEbRh2nB5/tOb2Ub3mBxUdjuLomq0sKF45QW1XhxaDFL7cpI0HHFnpTosyv
-         W/pIg691XY8Ed5yzhACVL5PUtVeteFWmaKqtchCEHAywekN0mUAtn7y6GBXfgDCczCcr
-         il/A==
-X-Gm-Message-State: AOJu0YypDSJt8XKOKdeikilDu8JU39mk6OJErxMLJVKWTb4E7sdR3aeF
-	p6nfZj0J5Ctk8TRirjWV4FvYx5vovNYlmJ+YODiqBTEf/flrmC6fbM4CieAjIm1KoqkeAwdz95M
-	jYg==
-X-Google-Smtp-Source: AGHT+IHnO4jNQ69g0TR8pRoeAENrswe//rGX8Vs4B2T2hgTvjDXJ14AKHraOC49CTLTBDc+mdxX6LOuY5UY=
+        bh=YYgMGUi3oxiD0kO1ugWhSXeqKUt6BlZh0E2W4sJdCss=;
+        b=K9Sn2wCO9j4ym1QgpXipMAZAN18yLIt/fyiwy1FjRTrc1xgpHqEKC706aS5ZuL91Op
+         ENIuzxjXD5faT9mO3+pwZ/eRPoLTSBxpvVhgHRFTCr6sq6mldvSp5CoTT+4jvgJHuz+U
+         iQFHSWISoTAbYfxdUZdDj4dd/nYh05TXh2v0ND9X4WpHLe+NqtyYNo+CuxV2rYXCM47B
+         WSK2eC2SRbA9JRc/Il5Vqc1bMTfhZo2ux9ndn5HRGisAStn+HXRf+4ivdb6wrRB8Y2Tb
+         IEog+8uZH+IbCtkUxPzrjL3mOPagSSrabY+3tfvoCu14WeAtqt6ni2tUIwKD/ErW6S9X
+         0hyw==
+X-Gm-Message-State: AOJu0YxqnpEupHyohJVdUJVrbsW8oApUO2mWC94mLA0DjHNyFwODLWmB
+	uYBwkc7p3LIh9WoVVenkDltH3ZZsegB2nKFN0f3Lbx6k1q0B8H8/SG3ybDdoMsHwNTAnGo81PR/
+	M/Q==
+X-Google-Smtp-Source: AGHT+IGIG/2AqeejW/EiNPsvj7vZAMKQLNqM6dC/eSPaVhlrS/jIejMZxR/29yan4Y6HwPe+cS1JZoSR8O8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:e9c4:0:b0:6d9:c367:54a5 with SMTP id
- 00721157ae682-6db45036a46mr9767b3.4.1725597266843; Thu, 05 Sep 2024 21:34:26
- -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:ea09:b0:205:560d:947d with SMTP id
+ d9443c01a7336-206f0603526mr1127025ad.7.1725597269489; Thu, 05 Sep 2024
+ 21:34:29 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  5 Sep 2024 21:34:11 -0700
+Date: Thu,  5 Sep 2024 21:34:12 -0700
 In-Reply-To: <20240906043413.1049633-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240906043413.1049633-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <20240906043413.1049633-6-seanjc@google.com>
-Subject: [PATCH v2 5/7] KVM: x86: Fold kvm_get_apic_interrupt() into kvm_cpu_get_interrupt()
+Message-ID: <20240906043413.1049633-7-seanjc@google.com>
+Subject: [PATCH v2 6/7] KVM: nVMX: Explicitly invalidate posted_intr_nv if PI
+ is disabled at VM-Enter
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -84,72 +85,74 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Zeng Guang <guang.zeng@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Fold kvm_get_apic_interrupt() into kvm_cpu_get_interrupt() now that nVMX
-essentially open codes kvm_get_apic_interrupt() in order to correctly
-emulate nested posted interrupts.
+Explicitly invalidate posted_intr_nv when emulating nested VM-Enter and
+posted interrupts are disabled to make it clear that posted_intr_nv is
+valid if and only if nested posted interrupts are enabled, and as a cheap
+way to harden against KVM bugs.
 
-Opportunistically stop exporting kvm_cpu_get_interrupt(), as the
-aforementioned nVMX flow was the only user in vendor code.
+KVM initializes posted_intr_nv to -1 at vCPU creation and resets it to -1
+when unloading vmcs12 and/or leaving nested mode, i.e. this is not a bug
+fix (or at least, it's not intended to be a bug fix).
+
+Note, tracking nested.posted_intr_nv as a u16 subtly adds a measure of
+safety, as it prevents unintentionally matching KVM's informal "no IRQ"
+vector of -1, stored as a signed int.  Because a u16 can be always be
+represented as a signed int, the effective "invalid" value of
+posted_intr_nv, 65535, will be preserved as-is when comparing against an
+int, i.e. will be zero-extended, not sign-extended, and thus won't get a
+false positive if KVM is buggy and compares posted_intr_nv against -1.
+
+Opportunistically add a comment in vmx_deliver_nested_posted_interrupt()
+to call out that it must check vmx->nested.posted_intr_nv, not the vector
+in vmcs12, which is presumably the _entire_ reason nested.posted_intr_nv
+exists.  E.g. vmcs12 is a KVM-controlled snapshot, so there are no TOCTOU
+races to worry about, the only potential badness is if the vCPU leaves
+nested and frees vmcs12 between the sender checking is_guest_mode() and
+dereferencing the vmcs12 pointer.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/irq.c   |  7 +++++--
- arch/x86/kvm/lapic.c | 10 ----------
- arch/x86/kvm/lapic.h |  1 -
- 3 files changed, 5 insertions(+), 13 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 6 ++++--
+ arch/x86/kvm/vmx/vmx.c    | 7 +++++++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-index 810da99ff7ed..63f66c51975a 100644
---- a/arch/x86/kvm/irq.c
-+++ b/arch/x86/kvm/irq.c
-@@ -142,9 +142,12 @@ int kvm_cpu_get_interrupt(struct kvm_vcpu *v)
- 	if (vector != -1)
- 		return vector;			/* PIC */
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 238c26155c2a..7e8a646e2851 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2317,10 +2317,12 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
  
--	return kvm_get_apic_interrupt(v);	/* APIC */
-+	vector = kvm_apic_has_interrupt(v);	/* APIC */
-+	if (vector != -1)
-+		kvm_apic_ack_interrupt(v, vector);
-+
-+	return vector;
- }
--EXPORT_SYMBOL_GPL(kvm_cpu_get_interrupt);
+ 	/* Posted interrupts setting is only taken from vmcs12.  */
+ 	vmx->nested.pi_pending = false;
+-	if (nested_cpu_has_posted_intr(vmcs12))
++	if (nested_cpu_has_posted_intr(vmcs12)) {
+ 		vmx->nested.posted_intr_nv = vmcs12->posted_intr_nv;
+-	else
++	} else {
++		vmx->nested.posted_intr_nv = -1;
+ 		exec_control &= ~PIN_BASED_POSTED_INTR;
++	}
+ 	pin_controls_set(vmx, exec_control);
  
- void kvm_inject_pending_timer_irqs(struct kvm_vcpu *vcpu)
+ 	/*
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f18c2d8c7476..63d656032384 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4219,6 +4219,13 @@ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
  {
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index ff63ef8163a9..5c820e3f06a8 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2961,16 +2961,6 @@ void kvm_apic_ack_interrupt(struct kvm_vcpu *vcpu, int vector)
- }
- EXPORT_SYMBOL_GPL(kvm_apic_ack_interrupt);
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
  
--int kvm_get_apic_interrupt(struct kvm_vcpu *vcpu)
--{
--	int vector = kvm_apic_has_interrupt(vcpu);
--
--	if (vector != -1)
--		kvm_apic_ack_interrupt(vcpu, vector);
--
--	return vector;
--}
--
- static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
- 		struct kvm_lapic_state *s, bool set)
- {
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index db80a2965b9c..8310ff74be29 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -90,7 +90,6 @@ void kvm_free_lapic(struct kvm_vcpu *vcpu);
- int kvm_apic_has_interrupt(struct kvm_vcpu *vcpu);
- void kvm_apic_ack_interrupt(struct kvm_vcpu *vcpu, int vector);
- int kvm_apic_accept_pic_intr(struct kvm_vcpu *vcpu);
--int kvm_get_apic_interrupt(struct kvm_vcpu *vcpu);
- int kvm_apic_accept_events(struct kvm_vcpu *vcpu);
- void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event);
- u64 kvm_lapic_get_cr8(struct kvm_vcpu *vcpu);
++	/*
++	 * DO NOT query the vCPU's vmcs12, as vmcs12 is dynamically allocated
++	 * and freed, and must not be accessed outside of vcpu->mutex.  The
++	 * vCPU's cached PI NV is valid if and only if posted interrupts
++	 * enabled in its vmcs12, i.e. checking the vector also checks that
++	 * L1 has enabled posted interrupts for L2.
++	 */
+ 	if (is_guest_mode(vcpu) &&
+ 	    vector == vmx->nested.posted_intr_nv) {
+ 		/*
 -- 
 2.46.0.469.g59c65b2a67-goog
 
