@@ -1,344 +1,192 @@
-Return-Path: <kvm+bounces-26013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C20E996F5FA
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 15:55:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 469DD96F65A
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 16:11:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76FBC283D06
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 13:55:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4D481F25124
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 14:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049921CFEAD;
-	Fri,  6 Sep 2024 13:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3161D0147;
+	Fri,  6 Sep 2024 14:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="01wTvqsv"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070661CF2B3;
-	Fri,  6 Sep 2024 13:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725630911; cv=none; b=mvXdJqsZPDLioxkKJWJ7U2oTH5tj7hCQQdYJrKVK8uwfZDSuUAquDr/2VsoyrSUFE/5TWnfmqql4OtGQ+RmH4kEsF4K0lq0rvDVxw6umGrhlF+8sS5Xd8i4ZLf4qDUWZ8bVh6clgePE/Em822Nem0WTO373tSrmHEc+t+7WG27A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725630911; c=relaxed/simple;
-	bh=oqZ+WpHd3rE4CnKLStyBnVW9tRRPxGCdLI5yqLavC8M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mgy467JRuWfDVe2AgID7enPKZ3Ywg0lQoxBauXQlanCRsFnirzTd7zmAQ21/DAbgY9+AeuNWtGcvnkaJyDPzBEc+wRuNpg++ZhdzpiyJ6D6FTy7NqHpj3V2mNHGRdLGsbFnDgLgKlyi2XqVAkJwxwZJ+UFUi9Dnz57BsCfLv0i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E0FDFEC;
-	Fri,  6 Sep 2024 06:55:34 -0700 (PDT)
-Received: from [10.1.36.22] (e122027.cambridge.arm.com [10.1.36.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B883D3F844;
-	Fri,  6 Sep 2024 06:55:03 -0700 (PDT)
-Message-ID: <8a675a19-52c1-43c7-b560-fbadce0c5145@arm.com>
-Date: Fri, 6 Sep 2024 14:55:01 +0100
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2051.outbound.protection.outlook.com [40.107.94.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEEC1CF7A8
+	for <kvm@vger.kernel.org>; Fri,  6 Sep 2024 14:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725631857; cv=fail; b=jAjPKy2uMf0JXesg9gqBAHYQzum7G6ED4zujjP2N6TTFlYVdsLzleVHlnlyX35xO73rNcnPGBv9nCC92NAc4sTuOG6M0t0iVKp5YOYcCKVsssX47FSzgBIzwteyc7WB9nZfN/7TbDIWKTnXEt6nR/W/m8P/eKMbdWwvidmOuNPs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725631857; c=relaxed/simple;
+	bh=XG8y9go/bGvQgZ9MvcsP1QF4MxhvIExuITOO082x3Oo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=mIFk4KgpcHrQuWKzmGUpaGwVULJZVmGhVU9JlSms3GlOfSOFje5phByskwU37yQghOKgEbK/lB3QSV45qF6FxXbU1m2S556tyySEJcpm4lj8pbYW5VY8oH426b4XnmCgUqVDxwK4cxX0vECwuW/VfJq99keP4YnWg3DYYr5pQAY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=01wTvqsv; arc=fail smtp.client-ip=40.107.94.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XGYOYhOkZCsI80x2Xq0XnfQBepbCNsssidaxDt5Bk26bj4qpJND0VbRuSQmH2Xnd1UbysZUy3QVvsbcy02baFlorleiSnDIV9cRwngEdubaCU1okGfycGZHp/urW2zjVcKvvf3wv/WA4bIOKOf1suLEjDdgLchBMCZgbpJL4li1pJ/Jes7ZkGiqUcOy0jX80RxBUhaLY3lyA2xnCE1h1/q2joH120ZNtbkat5OL4kWmizhp+lfmd0FD6yrkMxQSrCvFxAT1GQDmjrGdva2GlPZETiYe5UJr9GfeHnuPF5X9GlqalvaR6UA0arQvMYXmEnLMykWepZzMA1Ek17E6VjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ybqvfjho77rYw7a8QyaQprkeThL87LADc029VHgYHzQ=;
+ b=fcXvD31Qa84gtQkghGoUHAT8BzHyvyJ7XoqPo9emJ2k2rjbYvZad7vWnsod6cgmGZdSCqAy0OFR0tdLDZbOub75vNyScJdQzlfltV07falSKYH91NutcRNM0Bd1imZTbFceymNDXz4qJ62QhYugLNnQeSpS0Lq85Q9DAplJ01tTp4uGnZjfiLQFVDHrEV7CXrtRAX2NJqLZFb7jky0wjS8tvNzqbbxZ5Xjk5PYrpBr5obZ1P5eteuAsDqcURPu3P6lMxt9nLHGSSIO9Bg+m5g28sImGd6Ek7J/wS8bUpZMsxEO2em6dQgsR1pDmTEPuPDZ6n7seDleCbTkgvQ5fmjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ybqvfjho77rYw7a8QyaQprkeThL87LADc029VHgYHzQ=;
+ b=01wTvqsvaAbQ3/Ft47K3eY+bU8ZhfmtzdGxEtJu1e0sfgcb5O2wKend0qIb2kBWCgr2/ypv3wdl/vTYtRIUiiASGEQEJfO01hadlKZFYHynr5wbHX06INA6GTflKv/eicJ5D2PwVXiXmqzw7i/IZ0JavK4H/bmeyvJcaLv0zG1I=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
+ by DM4PR12MB6231.namprd12.prod.outlook.com (2603:10b6:8:a6::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.17; Fri, 6 Sep
+ 2024 14:10:53 +0000
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::b0ef:2936:fec1:3a87]) by MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::b0ef:2936:fec1:3a87%6]) with mapi id 15.20.7918.024; Fri, 6 Sep 2024
+ 14:10:53 +0000
+Message-ID: <e584828d-b3c4-c9d6-da9b-0c102041d9bb@amd.com>
+Date: Fri, 6 Sep 2024 09:10:50 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Reply-To: babu.moger@amd.com
+Subject: Re: [PATCH v2 0/4] i386/cpu: Add support for perfmon-v2, RAS bits and
+ EPYC-Turin CPU model
+Content-Language: en-US
+To: Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <cover.1723068946.git.babu.moger@amd.com>
+From: "Moger, Babu" <bmoger@amd.com>
+In-Reply-To: <cover.1723068946.git.babu.moger@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR13CA0145.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c6::30) To MW3PR12MB4553.namprd12.prod.outlook.com
+ (2603:10b6:303:2c::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 07/19] arm64: rsi: Add support for checking whether an
- MMIO is protected
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>
-References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-8-steven.price@arm.com>
- <fe3da777-c6de-451d-8a8a-19fdda8e82e5@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <fe3da777-c6de-451d-8a8a-19fdda8e82e5@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW3PR12MB4553:EE_|DM4PR12MB6231:EE_
+X-MS-Office365-Filtering-Correlation-Id: e385352b-75d8-42f7-ffd3-08dcce7db7d0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bThtRk9YbmU1SW1zTEhiQlhoZVNWVTd0Q1NlVFdXMkMxWUZmNEdPOUtIcnBv?=
+ =?utf-8?B?eHpnNk96OW5OU3BrL1B6aDJ6L1o4NGl6aHR1a0diUTM0RDdTL0VsOGV1OHBQ?=
+ =?utf-8?B?SCtPRU56RitHV3RzR3FYcUplZldEdXJHcGYxZ2FkcGNCdzk3ZjFZWFJQYkRB?=
+ =?utf-8?B?MG1xU0NpZXZmbHBpaEI3dUpkakgyb3F4aUk5UnUxMGJrQzJGTlZCMXpzWit5?=
+ =?utf-8?B?dlJoYXFtLy80d095blFvTXFHVXAwU2xqbjJDNnZFUXdyMGZUcktseFduckkz?=
+ =?utf-8?B?Vyt6ZEJKVmxaT01rcndhZk43MWJGcWZIcGs3dmFmMDlZaFJGTEVPcGRpTURv?=
+ =?utf-8?B?VUlsQ1VuWlZ6OUFCU3l5TDJiMHdIK2FWSGJQalZmZE81OWRjTjlsK0tzQUVC?=
+ =?utf-8?B?TlF4Q1U5RmRkdTRoNmtTQW9QS21Dc29nbFU3ek5MTzcxb2ptMCt0NmpkME14?=
+ =?utf-8?B?RGhDT0VwTTI4dnVXcFVkV1dyUXpZaU5ZaTloZnJqcm81cXE5UDAwUExhNTlC?=
+ =?utf-8?B?VlhxVXlxRDZhZ29vR1Y4TzcwQ2FkbHNmY25LNE1sVUVPK1RncWxKOU5PS3J2?=
+ =?utf-8?B?eHBlVjBRckw1dWNxMFlreDFlSWx2c0lpSXFzYXBrdS9iS3hhcjcwZ3RmOGJx?=
+ =?utf-8?B?ZmpUMWwxa0dCaStYbmxCY0hUeGtBUVBqUUpJdUVGdTdtMlpJbzJsTUZDY09B?=
+ =?utf-8?B?ZHRTbjJITCtldG5ITzljaVROQzl4cnBsdGxlOVNCWFlyalEzYjZBclZwODZs?=
+ =?utf-8?B?eXNHTFRLazlRckIrSUQ5eWN4UFZNZ1pmdDFlZ05vdUlBTjNKdVB3aVM5OWpE?=
+ =?utf-8?B?NzZZQnZpNllTMEtCaSs1cVQyYzZjOEJXa3ZWRm5UOUMvYjVPbmlnVWhiSTNj?=
+ =?utf-8?B?UjZKRWwwTFp5V0RVUTVacXdzdUIrNlQrRVBkbHF5SWhaUlVsUWlIY0V1WE5r?=
+ =?utf-8?B?SlFMSVRETmw0aGgwSjNUanUxN0o3Ri9zdHQ0eWVaWVF6azdqNkxOSEE3L0J2?=
+ =?utf-8?B?K2JRL0o5UXBRVEREWUtOUkJNOE5qdDY4L0YwTS94OFVuKzFmTnh5cEVQYkNF?=
+ =?utf-8?B?Ym0zckZOZ3hCZlhFcnM3akxzWk4ycmpoMFYrMzJ2dVJoRWMrQ1dybC9wM2g2?=
+ =?utf-8?B?cnd4emtmREF1ajlPUU9OTktaMVVtMHhTLzhDdklXNktkczIvNHBMU3g5RWFy?=
+ =?utf-8?B?ZWN4SWV1Y0d5d2NjYmxaMVRVcURXTGJYZGx2QklzVFVTSS9hdTR3TGVmY0J0?=
+ =?utf-8?B?M0drSTBCVlQxSWVWY3JrV2l1VjVWcXp0c0RPTkhjK2FkbUxwZHJ1RVZZSWtz?=
+ =?utf-8?B?OVN6T21vVjdGbG5KNWpQaFlLaS9IQkRIbTZvNFd1SzZ3cXRIeC9oTVpQRWww?=
+ =?utf-8?B?RVFIekIrY2VnR0U2NnVDTVRnVE1oejRzcmFSWHlaU1h4a0NWa2xpTHhZSjJG?=
+ =?utf-8?B?SlR1K3F0UUlBSUkxRXFWalViU0FiQS9DNjFqNm83UTk5ZFNwWFFEVTRNSExx?=
+ =?utf-8?B?Q0FpTU5jOWV4dXU2NTkwYTdvN3V6VDNiNk1Mc0c3UGdTVmEwemNGZUk4Ny9p?=
+ =?utf-8?B?MHJkaUhlcmVvRytOdmQvTDVValZWRTlZdUs5T052ODVKRWhzR09EL3JEV1E3?=
+ =?utf-8?B?cXByM0I5aStjMjhTNU8vQzkxK0MyZkQ1WW1qUk1WbDdRdGNyc3dueThwSERw?=
+ =?utf-8?B?RjdFT0RndktFZ1FQMjhvaTRwQVpmYUV1RXFibGFnZ0pZdUJja3NUbEEzUENr?=
+ =?utf-8?B?N3lhNXhGUDVZWUN2WG9CK2QyQXJBOXV1bjIreGtiZVhsWHlsbW9jQzhKWExo?=
+ =?utf-8?B?UURjZ1l1eSttS1hGbkFPQT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VS8xbUFCNDRpeG9YNkxEOTk1UDNFcE9yZFJrbjBTMEhldlNpVmZiek9oa0s5?=
+ =?utf-8?B?c2tQdUpYQnBQM0c2c1hjOHlDNTZ0OXMxTk5tTDNuVjRWem9mbXUrc3V5aWRz?=
+ =?utf-8?B?czVHbThVVi9PRUpVZW1zQ1YydEJHclRicEgzNzNxM1B3ZHBrbzNqaFY3SVNT?=
+ =?utf-8?B?WDl2c2Z3eDhGeCtHbmxGdVhQeHA0Y1M1Z21ZQzc4VWdiT1BJWXB3VDNvdlAv?=
+ =?utf-8?B?bkUvWmltYnFVbkwrdlFQM0V4VE9rd3RyMHNWL2RLM1NndG1zZUlIaWhFNjR0?=
+ =?utf-8?B?Zi9IbC9COGhvMTJ4UnJiWjlqaE5nMHB1cklwSnFoUDhMeU55Y0RzVnhPN3gz?=
+ =?utf-8?B?azQyTXdxaGtCbDVsMzR0TDVsTHEvVVYweXpDaitndXBzQzdTYmVtN25PQzBu?=
+ =?utf-8?B?VVhybW5hOHIweGUxM0lEaDlqaEtXTDRUK3d5ZHlSMHhZVDFlYzYxdDZrZkhm?=
+ =?utf-8?B?WTYydnBoZVZ2cFdHWnU4MElmVHRQY3RDNHBUMUFOcXM0VUJTOXgzNU5Ka0ly?=
+ =?utf-8?B?bENPUVQxUlZxZWNaZnU1Uko3UXFEYkV3NlVuRkVGMTNqWjFDZ3hmUWNHRUZQ?=
+ =?utf-8?B?R2VjbTFhUDF3UTNUeHZXL0c5cUc2ajAzRVY3dkt1NS9XSGtGczZvbnBvbkV0?=
+ =?utf-8?B?MWdKUWt0NWhjTE5mWGh6blozQnpZazM0K2ozVkhqTy9hUTIvaGpJenZYVkxU?=
+ =?utf-8?B?ZThwN1JMM0h4KzBLRTNiRzdmdEtTZ09DSktpUDFkbGJxQ1Avc0RVOXZ4Z2Vz?=
+ =?utf-8?B?bXRTcWYwcGxIUTVvcnpFS1V2UW5qdkVWWlJkLzNmKzdMNHplbzJPMFdxZDcw?=
+ =?utf-8?B?WUp3MzRhN0trVDhQZnVYZ2hxWVFUOUVmM3FBQW05dTlqdXZhSnFvNkFCbXRl?=
+ =?utf-8?B?ckdlLzQ2TnZDamJQYmhMMURTSWh1VmtDemhqYU9nMFZHUjVhVHMwVWFVR2hM?=
+ =?utf-8?B?emo5UE1majBZcjVvMzZZVEdVaDdhdEZvSGFWeTFheTlSY2dhRXN4andNcDZ6?=
+ =?utf-8?B?UTI4eEpxMFkrV0hzY2FWTTFzN1BIdVhEWjBXSXI3d0ROMS9NTlZWZ1l2QmZJ?=
+ =?utf-8?B?QTVKUXp4cGVwNjFMUktBcHY4TmNMbWhQd3FSNFFZUFY3bEt5L1dhQ0pMQTlO?=
+ =?utf-8?B?TmNQT2hFWjh4dGhGVmdZWkU4MHNWaGJhd1F4L2xXN0dySlU3bi9GVmh0RVZD?=
+ =?utf-8?B?MlFlNmc5MExxVjFZVHVuWjdDblVlem80SW1DaGZMN3Q5OHUzTUZGQzhjRlNP?=
+ =?utf-8?B?TW01ZG1tM01wVjdaVUVQVXN6d3J2WFRNbU0wanI2SENFaHcrdjRsall0TzhV?=
+ =?utf-8?B?NUxFSmEwT1JnbWRyNk9nRElYK1BrV2dYb1RPS1ZLS291NjN0djJzTUpwMm14?=
+ =?utf-8?B?N05CTkN1cTZ6Tm9TbGV5bFYydkc3Q2Y1ZEczMUxrSzhrSVlNSktRVkhBMVpo?=
+ =?utf-8?B?ZUl4WS9pT0htV2NGSHRHenhCR2ZUM05Eb0RUcUR2R2pERUtKbEZBT0JzNXJv?=
+ =?utf-8?B?YVJSODlBazdnKzJ5VndPaStXeFdhMXdBNk9IaUh4aVlSLzhVdzRRRmJWV29l?=
+ =?utf-8?B?R2VGVDYxTzJnZUYrS1NldVVpTVN4dXRCWDVDd0ZmTDY2dCt6OXh0T3JNWU5E?=
+ =?utf-8?B?Z3d5eTh3Z1JMVjlkZ1ovamE0K0dTVDdzVzFOQTFERWhQTE1vUmVuL1BXSEs0?=
+ =?utf-8?B?VGMvVy9IU0hyeFdVMGx4eXFtdWtacEVwcHRMZ3RuZ2p6bkRwcFFOTEhDZ0Jm?=
+ =?utf-8?B?ZHN2azdCMEZ1aytrUGZlL1JkT2FqL0xvS1lvRmsvQmxZYjlkc1JJS2RjTVBk?=
+ =?utf-8?B?K3Vic2l4dDFyZGlBTXhtUFQ5QkhFckcydVd6NWR5aHNvc0RROFZZblBRSktV?=
+ =?utf-8?B?RS9uZFVnR0lxaXlKTEVxbkJoQ0Q3bGZieUlnTzN5U2k2bmQ4L2N4MHo3NUlq?=
+ =?utf-8?B?ZU0rTHJpZHhUT1ZnTXA1UzcyQWRqZFUzVVNWRzQ0TnR2ajJoRThNR2dYVXdm?=
+ =?utf-8?B?V3JqNlVPQkU2dDZHMlNoTFJ4bXR5SGRaQlFMOTVlRC9KR0tIN1VkTm5aK0tk?=
+ =?utf-8?B?TUwvb3VLVFZSZnQ5NWpPM3kxaXdOUkUxd2szWSt3SDhtTTc5djY2MExuMi9P?=
+ =?utf-8?Q?3ZZ5IHKRB6MvHs2LUr8NBCEgI?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e385352b-75d8-42f7-ffd3-08dcce7db7d0
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2024 14:10:53.2442
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oGVwsChAMUgRh1ifp9EmkDBgRkPXqaE8Y1E14GfmUchSEAoTp0iyB9YJxVzxYlAV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6231
 
-On 06/09/2024 05:32, Gavin Shan wrote:
-> Hi Steven,
-> 
-> On 8/19/24 11:19 PM, Steven Price wrote:
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> On Arm CCA, with RMM-v1.0, all MMIO regions are shared. However, in
->> the future, an Arm CCA-v1.0 compliant guest may be run in a lesser
->> privileged partition in the Realm World (with Arm CCA-v1.1 Planes
->> feature). In this case, some of the MMIO regions may be emulated
->> by a higher privileged component in the Realm world, i.e, protected.
->>
->> Thus the guest must decide today, whether a given MMIO region is shared
->> vs Protected and create the stage1 mapping accordingly. On Arm CCA, this
->> detection is based on the "IPA State" (RIPAS == RIPAS_IO). Provide a
->> helper to run this check on a given range of MMIO.
->>
->> Also, provide a arm64 helper which may be hooked in by other solutions.
->>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> New patch for v5
->> ---
->>   arch/arm64/include/asm/io.h       |  8 ++++++++
->>   arch/arm64/include/asm/rsi.h      |  3 +++
->>   arch/arm64/include/asm/rsi_cmds.h | 21 +++++++++++++++++++++
->>   arch/arm64/kernel/rsi.c           | 26 ++++++++++++++++++++++++++
->>   4 files changed, 58 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
->> index 1ada23a6ec19..a6c551c5e44e 100644
->> --- a/arch/arm64/include/asm/io.h
->> +++ b/arch/arm64/include/asm/io.h
->> @@ -17,6 +17,7 @@
->>   #include <asm/early_ioremap.h>
->>   #include <asm/alternative.h>
->>   #include <asm/cpufeature.h>
->> +#include <asm/rsi.h>
->>     /*
->>    * Generic IO read/write.  These perform native-endian accesses.
->> @@ -318,4 +319,11 @@ extern bool
->> arch_memremap_can_ram_remap(resource_size_t offset, size_t size,
->>                       unsigned long flags);
->>   #define arch_memremap_can_ram_remap arch_memremap_can_ram_remap
->>   +static inline bool arm64_is_iomem_private(phys_addr_t phys_addr,
->> size_t size)
->> +{
->> +    if (unlikely(is_realm_world()))
->> +        return arm64_rsi_is_protected_mmio(phys_addr, size);
->> +    return false;
->> +}
->> +
->>   #endif    /* __ASM_IO_H */
->> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
->> index 2bc013badbc3..e31231b50b6a 100644
->> --- a/arch/arm64/include/asm/rsi.h
->> +++ b/arch/arm64/include/asm/rsi.h
->> @@ -13,6 +13,9 @@ DECLARE_STATIC_KEY_FALSE(rsi_present);
->>     void __init arm64_rsi_init(void);
->>   void __init arm64_rsi_setup_memory(void);
->> +
->> +bool arm64_rsi_is_protected_mmio(phys_addr_t base, size_t size);
->> +
->>   static inline bool is_realm_world(void)
->>   {
->>       return static_branch_unlikely(&rsi_present);
->> diff --git a/arch/arm64/include/asm/rsi_cmds.h
->> b/arch/arm64/include/asm/rsi_cmds.h
->> index 968b03f4e703..c2363f36d167 100644
->> --- a/arch/arm64/include/asm/rsi_cmds.h
->> +++ b/arch/arm64/include/asm/rsi_cmds.h
->> @@ -45,6 +45,27 @@ static inline unsigned long
->> rsi_get_realm_config(struct realm_config *cfg)
->>       return res.a0;
->>   }
->>   +static inline unsigned long rsi_ipa_state_get(phys_addr_t start,
->> +                          phys_addr_t end,
->> +                          enum ripas *state,
->> +                          phys_addr_t *top)
->> +{
->> +    struct arm_smccc_res res;
->> +
->> +    arm_smccc_smc(SMC_RSI_IPA_STATE_GET,
->> +              start, end, 0, 0, 0, 0, 0,
->> +              &res);
->> +
->> +    if (res.a0 == RSI_SUCCESS) {
->> +        if (top)
->> +            *top = res.a1;
->> +        if (state)
->> +            *state = res.a2;
->> +    }
->> +
->> +    return res.a0;
->> +}
->> +
->>   static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
->>                                phys_addr_t end,
->>                                enum ripas state,
->> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
->> index e968a5c9929e..381a5b9a5333 100644
->> --- a/arch/arm64/kernel/rsi.c
->> +++ b/arch/arm64/kernel/rsi.c
->> @@ -67,6 +67,32 @@ void __init arm64_rsi_setup_memory(void)
->>       }
->>   }
->>   +bool arm64_rsi_is_protected_mmio(phys_addr_t base, size_t size)
->> +{
->> +    enum ripas ripas;
->> +    phys_addr_t end, top;
->> +
->> +    /* Overflow ? */
->> +    if (WARN_ON(base + size < base))
->> +        return false;
->> +
->> +    end = ALIGN(base + size, RSI_GRANULE_SIZE);
->> +    base = ALIGN_DOWN(base, RSI_GRANULE_SIZE);
->> +
->> +    while (base < end) {
->> +        if (WARN_ON(rsi_ipa_state_get(base, end, &ripas, &top)))
->> +            break;
->> +        if (WARN_ON(top <= base))
->> +            break;
->> +        if (ripas != RSI_RIPAS_IO)
->> +            break;
->> +        base = top;
->> +    }
->> +
->> +    return (size && base >= end);
->> +}
-> 
-> I don't understand why @size needs to be checked here. Its initial value
-> taken from the input parameter should be larger than zero and its value
-> is never updated in the loop. So I'm understanding @size is always larger
-> than zero, and the condition would be something like below if I'm correct.
+Working v3 to add few more bits. Will post it sometime next week.
 
-Yes you are correct. I'm not entirely sure why it was written that way.
-The only change dropping 'size' as you suggest is that a zero-sized
-region is considered protected. But I'd consider it a bug if this is
-called with size=0. I'll drop 'size' here.
+On 8/7/2024 5:15 PM, Babu Moger wrote:
+> 
+> This series adds the support for following features in qemu.
+> 1. RAS feature bits (SUCCOR, McaOverflowRecov)
+> 2. perfmon-v2
+> 3. Update EPYC-Genoa to support perfmon-v2 and RAS bits
+> 4. Add support for EPYC-Turin
+> 
+> ---
+> v2: Fixed couple of typos.
+>      Added Reviewed-by tag from Zhao.
+>      Rebased on top of 6d00c6f98256 ("Merge tag 'for-upstream' of https://repo.or.cz/qemu/kevin into staging")
+>    
+> v1: https://lore.kernel.org/qemu-devel/cover.1718218999.git.babu.moger@amd.com/
 
->        return (base >= end);     /* RSI_RIPAS_IO returned for all
-> granules */
-> 
-> Another issue is @top is always zero with the latest tf-rmm. More details
-> are provided below.
-
-That suggests that you are not actually using the 'latest' tf-rmm ;)
-(for some definition of 'latest' which might not be obvious!)
-
-From the cover letter:
-
-> As mentioned above the new RMM specification means that corresponding
-> changes need to be made in the RMM, at this time these changes are still
-> in review (see 'topics/rmm-1.0-rel0-rc1'). So you'll need to fetch the
-> changes[3] from the gerrit instance until they are pushed to the main
-> branch.
->
-> [3] https://review.trustedfirmware.org/c/TF-RMM/tf-rmm/+/30485
-
-Sorry, I should probably have made this much more prominent in the cover
-letter.
-
-Running something like...
-
- git fetch https://git.trustedfirmware.org/TF-RMM/tf-rmm.git \
-	refs/changes/85/30485/11
-
-... should get you the latest. Hopefully these changes will get merged
-to the main branch soon.
-
-Steve
-
->> +EXPORT_SYMBOL(arm64_rsi_is_protected_mmio);
->> +
->>   void __init arm64_rsi_init(void)
->>   {
->>       /*
-> 
-> The unexpected calltrace is continuously observed with host/v4, guest/v5
-> and
-> latest upstream tf-rmm on 'WARN_ON(top <= base)' because @top is never
-> updated
-> by the latest tf-rmm. The following call path indicates how
-> SMC_RSI_IPA_STATE_GET
-> is handled by tf-rmm. I don't see RSI_RIPAS_IO is defined there and @top is
-> updated.
-> 
-> [    0.000000] ------------[ cut here ]------------
-> [    0.000000] WARNING: CPU: 0 PID: 0 at arch/arm64/kernel/rsi.c:103
-> arm64_rsi_is_protected_mmio+0xf0/0x110
-> [    0.000000] Modules linked in:
-> [    0.000000] CPU: 0 UID: 0 PID: 0 Comm: swapper Not tainted
-> 6.11.0-rc1-gavin-g3527d001084e #1
-> [    0.000000] Hardware name: linux,dummy-virt (DT)
-> [    0.000000] pstate: 200000c5 (nzCv daIF -PAN -UAO -TCO -DIT -SSBS
-> BTYPE=--)
-> [    0.000000] pc : arm64_rsi_is_protected_mmio+0xf0/0x110
-> [    0.000000] lr : arm64_rsi_is_protected_mmio+0x80/0x110
-> [    0.000000] sp : ffffcd7097053bf0
-> [    0.000000] x29: ffffcd7097053c30 x28: 0000000000000000 x27:
-> 0000000000000000
-> [    0.000000] x26: 00000000000003d0 x25: 00000000ffffff8e x24:
-> ffffcd7096831bd0
-> [    0.000000] x23: ffffcd7097053c08 x22: 00000000c4000198 x21:
-> 0000000000001000
-> [    0.000000] x20: 0000000001001000 x19: 0000000001000000 x18:
-> 0000000000000002
-> [    0.000000] x17: 0000000000000000 x16: 0000000000000010 x15:
-> 0001000080000000
-> [    0.000000] x14: 0068000000000703 x13: ffffffffff5fe000 x12:
-> ffffcd7097053ba4
-> [    0.000000] x11: 00000000000003d0 x10: ffffcd7097053bc4 x9 :
-> 0000000000000444
-> [    0.000000] x8 : ffffffffff5fe000 x7 : 0000000000000000 x6 :
-> 0000000000000000
-> [    0.000000] x5 : 0000000000000000 x4 : 0000000000000000 x3 :
-> 0000000000000000
-> [    0.000000] x2 : 0000000000000000 x1 : 0000000000000000 x0 :
-> 0000000000000000
-> [    0.000000] Call trace:
-> [    0.000000]  arm64_rsi_is_protected_mmio+0xf0/0x110
-> [    0.000000]  set_fixmap_io+0x8c/0xd0
-> [    0.000000]  of_setup_earlycon+0xa0/0x294
-> [    0.000000]  early_init_dt_scan_chosen_stdout+0x104/0x1dc
-> [    0.000000]  acpi_boot_table_init+0x1a4/0x2d8
-> [    0.000000]  setup_arch+0x240/0x610
-> [    0.000000]  start_kernel+0x6c/0x708
-> [    0.000000]  __primary_switched+0x80/0x88
-> 
-> ===> tf-rmm: git@github.com:TF-RMM/tf-rmm.git
-> 
-> handle_realm_rsi
->   handle_rsi_ipa_state_get
->     realm_ipa_get_ripas
-> 
-> ===> tf-rmm/lib/s2tt/include/ripas.h
-> 
-> enum ripas {
->         RIPAS_EMPTY = RMI_EMPTY,        /* Unused IPA for Realm */
->         RIPAS_RAM = RMI_RAM,            /* IPA used for Code/Data by
-> Realm */
->         RIPAS_DESTROYED = RMI_DESTROYED /* IPA is inaccessible to the
-> Realm */
-> };
-> 
-> ===> tf-rmm/runtime/rsi/memory.c
-> 
-> void handle_rsi_ipa_state_get(struct rec *rec,
->                               struct rsi_result *res)
-> {
->         unsigned long ipa = rec->regs[1];
->         enum s2_walk_status ws;
->         enum ripas ripas_val = RIPAS_EMPTY;
-> 
->         res->action = UPDATE_REC_RETURN_TO_REALM;
-> 
->         if (!GRANULE_ALIGNED(ipa) || !addr_in_rec_par(rec, ipa)) {
->                 res->smc_res.x[0] = RSI_ERROR_INPUT;
->                 return;
->         }
-> 
->         ws = realm_ipa_get_ripas(rec, ipa, &ripas_val);
->         if (ws == WALK_SUCCESS) {
->                 res->smc_res.x[0] = RSI_SUCCESS;
->                 res->smc_res.x[1] = (unsigned long)ripas_val;
->         } else {
->                 res->smc_res.x[0] = RSI_ERROR_INPUT;
->         }
-> }
-> 
-> Thanks,
-> Gavin
-> 
-
+-- 
+- Babu Moger
 
