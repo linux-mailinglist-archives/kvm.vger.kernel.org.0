@@ -1,192 +1,312 @@
-Return-Path: <kvm+bounces-26014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 469DD96F65A
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 16:11:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9445696F87A
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 17:41:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4D481F25124
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 14:11:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48FF4281F5A
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 15:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3161D0147;
-	Fri,  6 Sep 2024 14:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4279B1D2F7D;
+	Fri,  6 Sep 2024 15:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="01wTvqsv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FQXtnkX3"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2051.outbound.protection.outlook.com [40.107.94.51])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AEEC1CF7A8
-	for <kvm@vger.kernel.org>; Fri,  6 Sep 2024 14:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725631857; cv=fail; b=jAjPKy2uMf0JXesg9gqBAHYQzum7G6ED4zujjP2N6TTFlYVdsLzleVHlnlyX35xO73rNcnPGBv9nCC92NAc4sTuOG6M0t0iVKp5YOYcCKVsssX47FSzgBIzwteyc7WB9nZfN/7TbDIWKTnXEt6nR/W/m8P/eKMbdWwvidmOuNPs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725631857; c=relaxed/simple;
-	bh=XG8y9go/bGvQgZ9MvcsP1QF4MxhvIExuITOO082x3Oo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mIFk4KgpcHrQuWKzmGUpaGwVULJZVmGhVU9JlSms3GlOfSOFje5phByskwU37yQghOKgEbK/lB3QSV45qF6FxXbU1m2S556tyySEJcpm4lj8pbYW5VY8oH426b4XnmCgUqVDxwK4cxX0vECwuW/VfJq99keP4YnWg3DYYr5pQAY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=01wTvqsv; arc=fail smtp.client-ip=40.107.94.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XGYOYhOkZCsI80x2Xq0XnfQBepbCNsssidaxDt5Bk26bj4qpJND0VbRuSQmH2Xnd1UbysZUy3QVvsbcy02baFlorleiSnDIV9cRwngEdubaCU1okGfycGZHp/urW2zjVcKvvf3wv/WA4bIOKOf1suLEjDdgLchBMCZgbpJL4li1pJ/Jes7ZkGiqUcOy0jX80RxBUhaLY3lyA2xnCE1h1/q2joH120ZNtbkat5OL4kWmizhp+lfmd0FD6yrkMxQSrCvFxAT1GQDmjrGdva2GlPZETiYe5UJr9GfeHnuPF5X9GlqalvaR6UA0arQvMYXmEnLMykWepZzMA1Ek17E6VjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ybqvfjho77rYw7a8QyaQprkeThL87LADc029VHgYHzQ=;
- b=fcXvD31Qa84gtQkghGoUHAT8BzHyvyJ7XoqPo9emJ2k2rjbYvZad7vWnsod6cgmGZdSCqAy0OFR0tdLDZbOub75vNyScJdQzlfltV07falSKYH91NutcRNM0Bd1imZTbFceymNDXz4qJ62QhYugLNnQeSpS0Lq85Q9DAplJ01tTp4uGnZjfiLQFVDHrEV7CXrtRAX2NJqLZFb7jky0wjS8tvNzqbbxZ5Xjk5PYrpBr5obZ1P5eteuAsDqcURPu3P6lMxt9nLHGSSIO9Bg+m5g28sImGd6Ek7J/wS8bUpZMsxEO2em6dQgsR1pDmTEPuPDZ6n7seDleCbTkgvQ5fmjA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ybqvfjho77rYw7a8QyaQprkeThL87LADc029VHgYHzQ=;
- b=01wTvqsvaAbQ3/Ft47K3eY+bU8ZhfmtzdGxEtJu1e0sfgcb5O2wKend0qIb2kBWCgr2/ypv3wdl/vTYtRIUiiASGEQEJfO01hadlKZFYHynr5wbHX06INA6GTflKv/eicJ5D2PwVXiXmqzw7i/IZ0JavK4H/bmeyvJcaLv0zG1I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
- by DM4PR12MB6231.namprd12.prod.outlook.com (2603:10b6:8:a6::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.17; Fri, 6 Sep
- 2024 14:10:53 +0000
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::b0ef:2936:fec1:3a87]) by MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::b0ef:2936:fec1:3a87%6]) with mapi id 15.20.7918.024; Fri, 6 Sep 2024
- 14:10:53 +0000
-Message-ID: <e584828d-b3c4-c9d6-da9b-0c102041d9bb@amd.com>
-Date: Fri, 6 Sep 2024 09:10:50 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Reply-To: babu.moger@amd.com
-Subject: Re: [PATCH v2 0/4] i386/cpu: Add support for perfmon-v2, RAS bits and
- EPYC-Turin CPU model
-Content-Language: en-US
-To: Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <cover.1723068946.git.babu.moger@amd.com>
-From: "Moger, Babu" <bmoger@amd.com>
-In-Reply-To: <cover.1723068946.git.babu.moger@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0145.namprd13.prod.outlook.com
- (2603:10b6:a03:2c6::30) To MW3PR12MB4553.namprd12.prod.outlook.com
- (2603:10b6:303:2c::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF12381C2;
+	Fri,  6 Sep 2024 15:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725637257; cv=none; b=pXlYFqfERjedYYm7x0YIrj/rUELSnBaTpD8OkqDiyhJKYVYg0zgxbKQI5h3nyOykDm7xLf71qF8KqXM7qCjTOEsNCAIT7oG8sBh4AXBthW9PB+kphRcGB5vYvLahdJtNG5Y928b2/ke+oevzsUW5T57me5GFOSBvtKQaqA76zfw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725637257; c=relaxed/simple;
+	bh=1Fu7uwV9RsPMnzLbXRB2dUkd/WKQaciTY4PTS+mZbkM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B6K8d3AOcHMF8YHea7BsEM2owP9cb88KZNAtBN+GlBH133et2O72pQVoQduoPMhiPl3tkG9kBkG2Puw69pz65DB/fFfBXgqniiJfX7lXCaRtl0oyyKU5u4eps35T1M+VVnJP73vwHBBzRKLShdea7amkdlAKmE7mHsx62rM2oMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FQXtnkX3; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725637254; x=1757173254;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=1Fu7uwV9RsPMnzLbXRB2dUkd/WKQaciTY4PTS+mZbkM=;
+  b=FQXtnkX3MBuhzLYpzQy/xmn88JMyhMZyciHXT0+q8h6iSNBAmEkvod9U
+   /d/B1Ff+G/mvsUZKlJ4k/6VqdFkg1+SuraPCIL8Ql6T8tCsiHiktXbFAu
+   QV6i6dIcOhyyzwCo+pS1GW1mQCJ00+88LLrtBobINhzzL+tB7nJiTIueb
+   dh58wYx1yF5EcATcwZ8YO/Nt4OVIPthO9Gml0sphRGY7So9i98BT2sSsx
+   T697Csn3EcNG0N8BOACilIn7h9jUQdSQI5ykbGVsho+4qyhjRe1F5xo0B
+   R5ZHB1bsc7h7TsiKFnRZgguywPDTHrQLkSnPTH/l1D5Exd6PGwss8rjyv
+   Q==;
+X-CSE-ConnectionGUID: l85X4wiwSwarmv2a4igdNw==
+X-CSE-MsgGUID: aTNV7DRjSJOTjDfMTCNwFw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11187"; a="24349146"
+X-IronPort-AV: E=Sophos;i="6.10,208,1719903600"; 
+   d="scan'208";a="24349146"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2024 08:40:54 -0700
+X-CSE-ConnectionGUID: kvCqxR8hRsWOkJvVNFLYCg==
+X-CSE-MsgGUID: Ric9UC2/SOmekh8PD4LpJw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,208,1719903600"; 
+   d="scan'208";a="65960192"
+Received: from linux.intel.com ([10.54.29.200])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2024 08:40:55 -0700
+Received: from [10.212.119.23] (kliang2-mobl1.ccr.corp.intel.com [10.212.119.23])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by linux.intel.com (Postfix) with ESMTPS id 821F520B5782;
+	Fri,  6 Sep 2024 08:40:52 -0700 (PDT)
+Message-ID: <a585d90b-91f4-49de-bcba-5c2b45d339bc@linux.intel.com>
+Date: Fri, 6 Sep 2024 11:40:51 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW3PR12MB4553:EE_|DM4PR12MB6231:EE_
-X-MS-Office365-Filtering-Correlation-Id: e385352b-75d8-42f7-ffd3-08dcce7db7d0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bThtRk9YbmU1SW1zTEhiQlhoZVNWVTd0Q1NlVFdXMkMxWUZmNEdPOUtIcnBv?=
- =?utf-8?B?eHpnNk96OW5OU3BrL1B6aDJ6L1o4NGl6aHR1a0diUTM0RDdTL0VsOGV1OHBQ?=
- =?utf-8?B?SCtPRU56RitHV3RzR3FYcUplZldEdXJHcGYxZ2FkcGNCdzk3ZjFZWFJQYkRB?=
- =?utf-8?B?MG1xU0NpZXZmbHBpaEI3dUpkakgyb3F4aUk5UnUxMGJrQzJGTlZCMXpzWit5?=
- =?utf-8?B?dlJoYXFtLy80d095blFvTXFHVXAwU2xqbjJDNnZFUXdyMGZUcktseFduckkz?=
- =?utf-8?B?Vyt6ZEJKVmxaT01rcndhZk43MWJGcWZIcGs3dmFmMDlZaFJGTEVPcGRpTURv?=
- =?utf-8?B?VUlsQ1VuWlZ6OUFCU3l5TDJiMHdIK2FWSGJQalZmZE81OWRjTjlsK0tzQUVC?=
- =?utf-8?B?TlF4Q1U5RmRkdTRoNmtTQW9QS21Dc29nbFU3ek5MTzcxb2ptMCt0NmpkME14?=
- =?utf-8?B?RGhDT0VwTTI4dnVXcFVkV1dyUXpZaU5ZaTloZnJqcm81cXE5UDAwUExhNTlC?=
- =?utf-8?B?VlhxVXlxRDZhZ29vR1Y4TzcwQ2FkbHNmY25LNE1sVUVPK1RncWxKOU5PS3J2?=
- =?utf-8?B?eHBlVjBRckw1dWNxMFlreDFlSWx2c0lpSXFzYXBrdS9iS3hhcjcwZ3RmOGJx?=
- =?utf-8?B?ZmpUMWwxa0dCaStYbmxCY0hUeGtBUVBqUUpJdUVGdTdtMlpJbzJsTUZDY09B?=
- =?utf-8?B?ZHRTbjJITCtldG5ITzljaVROQzl4cnBsdGxlOVNCWFlyalEzYjZBclZwODZs?=
- =?utf-8?B?eXNHTFRLazlRckIrSUQ5eWN4UFZNZ1pmdDFlZ05vdUlBTjNKdVB3aVM5OWpE?=
- =?utf-8?B?NzZZQnZpNllTMEtCaSs1cVQyYzZjOEJXa3ZWRm5UOUMvYjVPbmlnVWhiSTNj?=
- =?utf-8?B?UjZKRWwwTFp5V0RVUTVacXdzdUIrNlQrRVBkbHF5SWhaUlVsUWlIY0V1WE5r?=
- =?utf-8?B?SlFMSVRETmw0aGgwSjNUanUxN0o3Ri9zdHQ0eWVaWVF6azdqNkxOSEE3L0J2?=
- =?utf-8?B?K2JRL0o5UXBRVEREWUtOUkJNOE5qdDY4L0YwTS94OFVuKzFmTnh5cEVQYkNF?=
- =?utf-8?B?Ym0zckZOZ3hCZlhFcnM3akxzWk4ycmpoMFYrMzJ2dVJoRWMrQ1dybC9wM2g2?=
- =?utf-8?B?cnd4emtmREF1ajlPUU9OTktaMVVtMHhTLzhDdklXNktkczIvNHBMU3g5RWFy?=
- =?utf-8?B?ZWN4SWV1Y0d5d2NjYmxaMVRVcURXTGJYZGx2QklzVFVTSS9hdTR3TGVmY0J0?=
- =?utf-8?B?M0drSTBCVlQxSWVWY3JrV2l1VjVWcXp0c0RPTkhjK2FkbUxwZHJ1RVZZSWtz?=
- =?utf-8?B?OVN6T21vVjdGbG5KNWpQaFlLaS9IQkRIbTZvNFd1SzZ3cXRIeC9oTVpQRWww?=
- =?utf-8?B?RVFIekIrY2VnR0U2NnVDTVRnVE1oejRzcmFSWHlaU1h4a0NWa2xpTHhZSjJG?=
- =?utf-8?B?SlR1K3F0UUlBSUkxRXFWalViU0FiQS9DNjFqNm83UTk5ZFNwWFFEVTRNSExx?=
- =?utf-8?B?Q0FpTU5jOWV4dXU2NTkwYTdvN3V6VDNiNk1Mc0c3UGdTVmEwemNGZUk4Ny9p?=
- =?utf-8?B?MHJkaUhlcmVvRytOdmQvTDVValZWRTlZdUs5T052ODVKRWhzR09EL3JEV1E3?=
- =?utf-8?B?cXByM0I5aStjMjhTNU8vQzkxK0MyZkQ1WW1qUk1WbDdRdGNyc3dueThwSERw?=
- =?utf-8?B?RjdFT0RndktFZ1FQMjhvaTRwQVpmYUV1RXFibGFnZ0pZdUJja3NUbEEzUENr?=
- =?utf-8?B?N3lhNXhGUDVZWUN2WG9CK2QyQXJBOXV1bjIreGtiZVhsWHlsbW9jQzhKWExo?=
- =?utf-8?B?UURjZ1l1eSttS1hGbkFPQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VS8xbUFCNDRpeG9YNkxEOTk1UDNFcE9yZFJrbjBTMEhldlNpVmZiek9oa0s5?=
- =?utf-8?B?c2tQdUpYQnBQM0c2c1hjOHlDNTZ0OXMxTk5tTDNuVjRWem9mbXUrc3V5aWRz?=
- =?utf-8?B?czVHbThVVi9PRUpVZW1zQ1YydEJHclRicEgzNzNxM1B3ZHBrbzNqaFY3SVNT?=
- =?utf-8?B?WDl2c2Z3eDhGeCtHbmxGdVhQeHA0Y1M1Z21ZQzc4VWdiT1BJWXB3VDNvdlAv?=
- =?utf-8?B?bkUvWmltYnFVbkwrdlFQM0V4VE9rd3RyMHNWL2RLM1NndG1zZUlIaWhFNjR0?=
- =?utf-8?B?Zi9IbC9COGhvMTJ4UnJiWjlqaE5nMHB1cklwSnFoUDhMeU55Y0RzVnhPN3gz?=
- =?utf-8?B?azQyTXdxaGtCbDVsMzR0TDVsTHEvVVYweXpDaitndXBzQzdTYmVtN25PQzBu?=
- =?utf-8?B?VVhybW5hOHIweGUxM0lEaDlqaEtXTDRUK3d5ZHlSMHhZVDFlYzYxdDZrZkhm?=
- =?utf-8?B?WTYydnBoZVZ2cFdHWnU4MElmVHRQY3RDNHBUMUFOcXM0VUJTOXgzNU5Ka0ly?=
- =?utf-8?B?bENPUVQxUlZxZWNaZnU1Uko3UXFEYkV3NlVuRkVGMTNqWjFDZ3hmUWNHRUZQ?=
- =?utf-8?B?R2VjbTFhUDF3UTNUeHZXL0c5cUc2ajAzRVY3dkt1NS9XSGtGczZvbnBvbkV0?=
- =?utf-8?B?MWdKUWt0NWhjTE5mWGh6blozQnpZazM0K2ozVkhqTy9hUTIvaGpJenZYVkxU?=
- =?utf-8?B?ZThwN1JMM0h4KzBLRTNiRzdmdEtTZ09DSktpUDFkbGJxQ1Avc0RVOXZ4Z2Vz?=
- =?utf-8?B?bXRTcWYwcGxIUTVvcnpFS1V2UW5qdkVWWlJkLzNmKzdMNHplbzJPMFdxZDcw?=
- =?utf-8?B?WUp3MzRhN0trVDhQZnVYZ2hxWVFUOUVmM3FBQW05dTlqdXZhSnFvNkFCbXRl?=
- =?utf-8?B?ckdlLzQ2TnZDamJQYmhMMURTSWh1VmtDemhqYU9nMFZHUjVhVHMwVWFVR2hM?=
- =?utf-8?B?emo5UE1majBZcjVvMzZZVEdVaDdhdEZvSGFWeTFheTlSY2dhRXN4andNcDZ6?=
- =?utf-8?B?UTI4eEpxMFkrV0hzY2FWTTFzN1BIdVhEWjBXSXI3d0ROMS9NTlZWZ1l2QmZJ?=
- =?utf-8?B?QTVKUXp4cGVwNjFMUktBcHY4TmNMbWhQd3FSNFFZUFY3bEt5L1dhQ0pMQTlO?=
- =?utf-8?B?TmNQT2hFWjh4dGhGVmdZWkU4MHNWaGJhd1F4L2xXN0dySlU3bi9GVmh0RVZD?=
- =?utf-8?B?MlFlNmc5MExxVjFZVHVuWjdDblVlem80SW1DaGZMN3Q5OHUzTUZGQzhjRlNP?=
- =?utf-8?B?TW01ZG1tM01wVjdaVUVQVXN6d3J2WFRNbU0wanI2SENFaHcrdjRsall0TzhV?=
- =?utf-8?B?NUxFSmEwT1JnbWRyNk9nRElYK1BrV2dYb1RPS1ZLS291NjN0djJzTUpwMm14?=
- =?utf-8?B?N05CTkN1cTZ6Tm9TbGV5bFYydkc3Q2Y1ZEczMUxrSzhrSVlNSktRVkhBMVpo?=
- =?utf-8?B?ZUl4WS9pT0htV2NGSHRHenhCR2ZUM05Eb0RUcUR2R2pERUtKbEZBT0JzNXJv?=
- =?utf-8?B?YVJSODlBazdnKzJ5VndPaStXeFdhMXdBNk9IaUh4aVlSLzhVdzRRRmJWV29l?=
- =?utf-8?B?R2VGVDYxTzJnZUYrS1NldVVpTVN4dXRCWDVDd0ZmTDY2dCt6OXh0T3JNWU5E?=
- =?utf-8?B?Z3d5eTh3Z1JMVjlkZ1ovamE0K0dTVDdzVzFOQTFERWhQTE1vUmVuL1BXSEs0?=
- =?utf-8?B?VGMvVy9IU0hyeFdVMGx4eXFtdWtacEVwcHRMZ3RuZ2p6bkRwcFFOTEhDZ0Jm?=
- =?utf-8?B?ZHN2azdCMEZ1aytrUGZlL1JkT2FqL0xvS1lvRmsvQmxZYjlkc1JJS2RjTVBk?=
- =?utf-8?B?K3Vic2l4dDFyZGlBTXhtUFQ5QkhFckcydVd6NWR5aHNvc0RROFZZblBRSktV?=
- =?utf-8?B?RS9uZFVnR0lxaXlKTEVxbkJoQ0Q3bGZieUlnTzN5U2k2bmQ4L2N4MHo3NUlq?=
- =?utf-8?B?ZU0rTHJpZHhUT1ZnTXA1UzcyQWRqZFUzVVNWRzQ0TnR2ajJoRThNR2dYVXdm?=
- =?utf-8?B?V3JqNlVPQkU2dDZHMlNoTFJ4bXR5SGRaQlFMOTVlRC9KR0tIN1VkTm5aK0tk?=
- =?utf-8?B?TUwvb3VLVFZSZnQ5NWpPM3kxaXdOUkUxd2szWSt3SDhtTTc5djY2MExuMi9P?=
- =?utf-8?Q?3ZZ5IHKRB6MvHs2LUr8NBCEgI?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e385352b-75d8-42f7-ffd3-08dcce7db7d0
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2024 14:10:53.2442
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oGVwsChAMUgRh1ifp9EmkDBgRkPXqaE8Y1E14GfmUchSEAoTp0iyB9YJxVzxYlAV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6231
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 06/58] perf: Support get/put passthrough PMU
+ interfaces
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>,
+ Mingwei Zhang <mizhang@google.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
+ Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>,
+ Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>
+Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+ gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
+ Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+ Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+ Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-7-mizhang@google.com>
+ <f7b2c537-840d-4043-944e-59926f0fa3bb@linux.intel.com>
+Content-Language: en-US
+From: "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <f7b2c537-840d-4043-944e-59926f0fa3bb@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Working v3 to add few more bits. Will post it sometime next week.
 
-On 8/7/2024 5:15 PM, Babu Moger wrote:
+
+On 2024-09-06 6:59 a.m., Mi, Dapeng wrote:
 > 
-> This series adds the support for following features in qemu.
-> 1. RAS feature bits (SUCCOR, McaOverflowRecov)
-> 2. perfmon-v2
-> 3. Update EPYC-Genoa to support perfmon-v2 and RAS bits
-> 4. Add support for EPYC-Turin
+> On 8/1/2024 12:58 PM, Mingwei Zhang wrote:
+>> From: Kan Liang <kan.liang@linux.intel.com>
+>>
+>> Currently, the guest and host share the PMU resources when a guest is
+>> running. KVM has to create an extra virtual event to simulate the
+>> guest's event, which brings several issues, e.g., high overhead, not
+>> accuracy and etc.
+>>
+>> A new passthrough PMU method is proposed to address the issue. It requires
+>> that the PMU resources can be fully occupied by the guest while it's
+>> running. Two new interfaces are implemented to fulfill the requirement.
+>> The hypervisor should invoke the interface while creating a guest which
+>> wants the passthrough PMU capability.
+>>
+>> The PMU resources should only be temporarily occupied as a whole when a
+>> guest is running. When the guest is out, the PMU resources are still
+>> shared among different users.
+>>
+>> The exclude_guest event modifier is used to guarantee the exclusive
+>> occupation of the PMU resources. When creating a guest, the hypervisor
+>> should check whether there are !exclude_guest events in the system.
+>> If yes, the creation should fail. Because some PMU resources have been
+>> occupied by other users.
+>> If no, the PMU resources can be safely accessed by the guest directly.
+>> Perf guarantees that no new !exclude_guest events are created when a
+>> guest is running.
+>>
+>> Only the passthrough PMU is affected, but not for other PMU e.g., uncore
+>> and SW PMU. The behavior of those PMUs are not changed. The guest
+>> enter/exit interfaces should only impact the supported PMUs.
+>> Add a new PERF_PMU_CAP_PASSTHROUGH_VPMU flag to indicate the PMUs that
+>> support the feature.
+>>
+>> Add nr_include_guest_events to track the !exclude_guest events of PMU
+>> with PERF_PMU_CAP_PASSTHROUGH_VPMU.
+>>
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+>> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+>> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+>> ---
+>>  include/linux/perf_event.h | 10 ++++++
+>>  kernel/events/core.c       | 66 ++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 76 insertions(+)
+>>
+>> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+>> index a5304ae8c654..45d1ea82aa21 100644
+>> --- a/include/linux/perf_event.h
+>> +++ b/include/linux/perf_event.h
+>> @@ -291,6 +291,7 @@ struct perf_event_pmu_context;
+>>  #define PERF_PMU_CAP_NO_EXCLUDE			0x0040
+>>  #define PERF_PMU_CAP_AUX_OUTPUT			0x0080
+>>  #define PERF_PMU_CAP_EXTENDED_HW_TYPE		0x0100
+>> +#define PERF_PMU_CAP_PASSTHROUGH_VPMU		0x0200
+>>  
+>>  struct perf_output_handle;
+>>  
+>> @@ -1728,6 +1729,8 @@ extern void perf_event_task_tick(void);
+>>  extern int perf_event_account_interrupt(struct perf_event *event);
+>>  extern int perf_event_period(struct perf_event *event, u64 value);
+>>  extern u64 perf_event_pause(struct perf_event *event, bool reset);
+>> +int perf_get_mediated_pmu(void);
+>> +void perf_put_mediated_pmu(void);
+>>  #else /* !CONFIG_PERF_EVENTS: */
+>>  static inline void *
+>>  perf_aux_output_begin(struct perf_output_handle *handle,
+>> @@ -1814,6 +1817,13 @@ static inline u64 perf_event_pause(struct perf_event *event, bool reset)
+>>  {
+>>  	return 0;
+>>  }
+>> +
+>> +static inline int perf_get_mediated_pmu(void)
+>> +{
+>> +	return 0;
+>> +}
+>> +
+>> +static inline void perf_put_mediated_pmu(void)			{ }
+>>  #endif
+>>  
+>>  #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+>> diff --git a/kernel/events/core.c b/kernel/events/core.c
+>> index 8f908f077935..45868d276cde 100644
+>> --- a/kernel/events/core.c
+>> +++ b/kernel/events/core.c
+>> @@ -402,6 +402,20 @@ static atomic_t nr_bpf_events __read_mostly;
+>>  static atomic_t nr_cgroup_events __read_mostly;
+>>  static atomic_t nr_text_poke_events __read_mostly;
+>>  static atomic_t nr_build_id_events __read_mostly;
+>> +static atomic_t nr_include_guest_events __read_mostly;
+>> +
+>> +static atomic_t nr_mediated_pmu_vms;
+>> +static DEFINE_MUTEX(perf_mediated_pmu_mutex);
+>> +
+>> +/* !exclude_guest event of PMU with PERF_PMU_CAP_PASSTHROUGH_VPMU */
+>> +static inline bool is_include_guest_event(struct perf_event *event)
+>> +{
+>> +	if ((event->pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU) &&
+>> +	    !event->attr.exclude_guest)
+>> +		return true;
+>> +
+>> +	return false;
+>> +}
+>>  
+>>  static LIST_HEAD(pmus);
+>>  static DEFINE_MUTEX(pmus_lock);
+>> @@ -5212,6 +5226,9 @@ static void _free_event(struct perf_event *event)
+>>  
+>>  	unaccount_event(event);
+>>  
+>> +	if (is_include_guest_event(event))
+>> +		atomic_dec(&nr_include_guest_events);
+>> +
+>>  	security_perf_event_free(event);
+>>  
+>>  	if (event->rb) {
+>> @@ -5769,6 +5786,36 @@ u64 perf_event_pause(struct perf_event *event, bool reset)
+>>  }
+>>  EXPORT_SYMBOL_GPL(perf_event_pause);
+>>  
+>> +/*
+>> + * Currently invoked at VM creation to
+>> + * - Check whether there are existing !exclude_guest events of PMU with
+>> + *   PERF_PMU_CAP_PASSTHROUGH_VPMU
+>> + * - Set nr_mediated_pmu_vms to prevent !exclude_guest event creation on
+>> + *   PMUs with PERF_PMU_CAP_PASSTHROUGH_VPMU
+>> + *
+>> + * No impact for the PMU without PERF_PMU_CAP_PASSTHROUGH_VPMU. The perf
+>> + * still owns all the PMU resources.
+>> + */
+>> +int perf_get_mediated_pmu(void)
+>> +{
+>> +	guard(mutex)(&perf_mediated_pmu_mutex);
+>> +	if (atomic_inc_not_zero(&nr_mediated_pmu_vms))
+>> +		return 0;
+>> +
+>> +	if (atomic_read(&nr_include_guest_events))
+>> +		return -EBUSY;
+>> +
+>> +	atomic_inc(&nr_mediated_pmu_vms);
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(perf_get_mediated_pmu);
+>> +
+>> +void perf_put_mediated_pmu(void)
+>> +{
+>> +	atomic_dec(&nr_mediated_pmu_vms);
+>> +}
+>> +EXPORT_SYMBOL_GPL(perf_put_mediated_pmu);
+>> +
+>>  /*
+>>   * Holding the top-level event's child_mutex means that any
+>>   * descendant process that has inherited this event will block
+>> @@ -11907,6 +11954,17 @@ static void account_event(struct perf_event *event)
+>>  	account_pmu_sb_event(event);
+>>  }
+>>  
+>> +static int perf_account_include_guest_event(void)
+>> +{
+>> +	guard(mutex)(&perf_mediated_pmu_mutex);
+>> +
+>> +	if (atomic_read(&nr_mediated_pmu_vms))
+>> +		return -EACCES;
 > 
-> ---
-> v2: Fixed couple of typos.
->      Added Reviewed-by tag from Zhao.
->      Rebased on top of 6d00c6f98256 ("Merge tag 'for-upstream' of https://repo.or.cz/qemu/kevin into staging")
->    
-> v1: https://lore.kernel.org/qemu-devel/cover.1718218999.git.babu.moger@amd.com/
+> Kan, Namhyung posted a patchset
+> https://lore.kernel.org/all/20240904064131.2377873-1-namhyung@kernel.org/
+> which would remove to set exclude_guest flag from perf tools by default.
+> This may impact current mediated vPMU solution, but fortunately the
+> patchset provides a fallback mechanism to add exclude_guest flag if kernel
+> returns "EOPNOTSUPP".
+> 
+> So we'd better return "EOPNOTSUPP" instead of "EACCES" here. BTW, returning
+> "EOPNOTSUPP" here looks more reasonable than "EACCES".
 
--- 
-- Babu Moger
+It seems the existing Apple M1 PMU has ready returned "EOPNOTSUPP" for
+the !exclude_guest. Yes, we should use the same error code.
+
+Thanks,
+Kan
+> 
+> 
+>> +
+>> +	atomic_inc(&nr_include_guest_events);
+>> +	return 0;
+>> +}
+>> +
+>>  /*
+>>   * Allocate and initialize an event structure
+>>   */
+>> @@ -12114,11 +12172,19 @@ perf_event_alloc(struct perf_event_attr *attr, int cpu,
+>>  	if (err)
+>>  		goto err_callchain_buffer;
+>>  
+>> +	if (is_include_guest_event(event)) {
+>> +		err = perf_account_include_guest_event();
+>> +		if (err)
+>> +			goto err_security_alloc;
+>> +	}
+>> +
+>>  	/* symmetric to unaccount_event() in _free_event() */
+>>  	account_event(event);
+>>  
+>>  	return event;
+>>  
+>> +err_security_alloc:
+>> +	security_perf_event_free(event);
+>>  err_callchain_buffer:
+>>  	if (!event->parent) {
+>>  		if (event->attr.sample_type & PERF_SAMPLE_CALLCHAIN)
+> 
 
