@@ -1,66 +1,67 @@
-Return-Path: <kvm+bounces-26025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A3096FBAA
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 20:59:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4982096FBC8
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 21:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 509CC1F2B747
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 18:59:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FF481F21174
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2024 19:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169F91D1732;
-	Fri,  6 Sep 2024 18:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1721D048B;
+	Fri,  6 Sep 2024 19:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="G+cuLWDu"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bYYA+Qnn"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2068.outbound.protection.outlook.com [40.107.244.68])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2068.outbound.protection.outlook.com [40.107.237.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E5E13D2B8;
-	Fri,  6 Sep 2024 18:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739533FB8B;
+	Fri,  6 Sep 2024 19:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725649123; cv=fail; b=gfh464C65tXZcAOj8uYg9WzwDXUI4/xBFrKbdkWJp24YF1+oWXdVKkoFs3nnKGduqQKHFQD1oFBJlZIxQCtxWpwFXHpWODZ36gLEiJ3JY+oX4Y1kv+aLuJbwolmWUt2cJiKYLuoYUNtz+Lq0Z79jPgcqMOhoxV1mGqgiWPcba5E=
+	t=1725649551; cv=fail; b=iVGGtJq4sm4R+gtVx8M6CQCe19/PqtPDmEznBYl3tQjAYYYVj7UKCsjm/IWmK2GSN0p3OixDlTwB4judz4NoQYeGWwnz3z3PdiHz+Es0pEfZhzyWQ17e9p1/nkUgq+Ivdt60HdOvspF0by5RIgct4RMtLyanDKduV4EMJ0endQ4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725649123; c=relaxed/simple;
-	bh=SdZAnNIwYPbGj7rMtiS7IZayNQc9tCD0XAqetdzoQPs=;
+	s=arc-20240116; t=1725649551; c=relaxed/simple;
+	bh=mrUJ/1DyDdQSQKUrSjUFydLe5PczRlB8X7AVsLdEErY=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=dLhD5KOpHR+ChGJoNlmpB9aFaUibD/agP7oOvQ1xOc9ML62ONstfXWwGWjeq2Np42DC8t7U2ok8m8hHgx+ZdZydCBcHi5ks96BfoIq7nVrlPOchYVIZ+gsc99tjHtxaHiQuEaTP20rwJednx3VVEJ+Ut4IUg5seY+Lgr/EXkR6M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G+cuLWDu; arc=fail smtp.client-ip=40.107.244.68
+	 Content-Type:MIME-Version; b=h/9s5pUSgCeYs45j0R6Lh6V53DCixo74fNKTfwuPtKjLzUX0opSzY5MEC9IDZdUdl3ow2l5jpOzLJer0LQR9CTlJf8RpCfi+GhiYcu5svOHn8+paVePDsrt2DNJWsRpZ01n4g0CI7V0KME5LXMVE8GZZ7IRNop/c5c4QbA4JPoU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bYYA+Qnn; arc=fail smtp.client-ip=40.107.237.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UxISUllzlr6LTUpcOWU6cHGNz+Ftg4VchDHc4v1Dni08pE8LHA3ERMi4B4BMqkrS8wX8p3uBeF+9Z8I8a/XQtDCZBsuQym11kaWr0uaMMZwT0lWljaABdtG/MrJuVLvrRXVVaTx2/wGnUiBn+u8k0mcdCJozJG7u74xaJifKrQIIvCQ1oDaaJGYrzKXcuMtB5+yhpHIddmgLsaYKat9LYoPyJ7OBSLtZs0PSCqPjMTyKV7IlCfSq/HCTMc18FUBqVZYpbaMWdzBaNg78aSsXR9gxT+N0ui6Y7f61L3ih1fvyZtxzoTB/y8Zp49GONTFXpwWiJzynqQXc8a9crAU0Lw==
+ b=s3zfRm/SNcwOr2xObQZa4LcnVFg4eQYh1i5nSbRRURCyJjcwZxg9gmFgplcIGpbhAXZLTsKxx8hN/G0SCF6WJhnXjzPqfjSAaXXsfsXVKhdj9YWHe4M7+HQIYNKFeOzU9NnwUXUWCzuWuBjSQ6+Ry3x5bb7JA+LqvBB2oz3D7frKvvZDM55f8emhgdbA+8EqssoTXPwEcuTziFck6cRtSLZOawL7ExWvgKvo80quB5DWpnvbWs/ZvzAkiwoX87NpLRw+DGoP9Ia6gHSx6SLh7ehVOetmR5xSUdOBvtjCz3Yz0CnNU50Z8YtMqmSToz3hbQ2fYbtsnSFwv4+tudgLTg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=plWktybNHgWPOQxiFBrYkaX9MYfFJUa8ZJDpOyBX7ns=;
- b=n/gJ1bCt5AvGRejJi4rcLwfvcGUtFiEvCTRtwUSLVTGGbF7+Puq0yHydK43W7WwD4kuXT5f/pvF+iLPhABS7EHaioPX/dR8e8b7OFphMRHTy3W5t8XNvJyJ4PR03qi4wL9xTOcnN/+kPCSb6D4IOw5dOMw/DX9gBI2xHId9ZPh0MuSBdqmnBOZKPgogY5U5tDpOmIaLRM78oiDbh1bXt+mXvBoP6IciNhdnxecWzoY7LZKzl9WmbHvLV4L1boRRpElE8jySwN11sAmsQP3J3+rfvbdg7OqMSVN9VNLCX1kv47TgM7TKsU8mOkFhZD1BVwRlIbrvahjAf5wFugcSE3Q==
+ bh=yxlZ2m/1gapfuSCs7d5k5UIg8IZe8oAPW3wTL+n4R70=;
+ b=nFVDXn7gKeto+sa6cXT0X7Zu/WJEoFdLzddZevwA9WLfwcAjfjL3kfY/6vIhBcCO5xpRDxuMATzbDZccZk+zitXhebzb+QgpyvWioTYUp4QBQx2xDOnHMVU7HmqWaIRWtbVMWhG1I2hPEzP+N+3dxbZU5WbrcfYiBt35xyoFwKppFMXNU9zLMAsqsmz7tlvsuBQiTGGvKFpev+nH83LZeucQjFl7m09+daGRN6GnVKH0IQEv9hiVhOR14z171RgebLTghQXZ8k1hAOc6fCHUFCNcMSAhmL4yMPSmGIm9bBJ8315f58BZHQrAQ32owRXwa+l6z5l7JYSyyVIASp6NSw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=plWktybNHgWPOQxiFBrYkaX9MYfFJUa8ZJDpOyBX7ns=;
- b=G+cuLWDuJUaHRb5XFrGhHCablkIzXep5m94eBKVdK/JTzoxQHIUKhKQ5DPvSNawxqy5rzmZparf5m0rdC6wkuvWGB2aIv2jam2IAAuKYCvKiqFMgSTi9xbkia4JEMTD2mGI6nPun1iBhlpnynYM7p0gup3xn+zi5Yks+zMP+VBGSvSS6bWUU6jdBADCaIian8ifOxXexUDc/PHGxw6/4jIbu8OZfluG8puZtcmcmkg3dBbRgLnwT7LO0jOyFLC4MjvqT1iqyVQt5NhzlahQqaAzpCHB3QPaTR5+CWYC0P5UnPKnkTc2qipoOY24hZDWsjmsNgyX47KOtiK9Suv866Q==
+ bh=yxlZ2m/1gapfuSCs7d5k5UIg8IZe8oAPW3wTL+n4R70=;
+ b=bYYA+QnnBrr57ATp5DCoNUMTHnvYn7mFF0QSW3ilZApIfNPrlJCVt/8m5Qg6ninvYh88sOFsRK2PWCGcVn6QUnXdoeAPFykHHdzZQY7IuRhx2gm0e8QFa1W/FSsnHMj31eKR/kwHVoEc9K5ObQTVohRAhZOEKXiGu4Hvb+BclXt4WDNeX9Qlc6RvyDeORvoiehju2+j7/K6C72FfThXN0kBYyRXk6nkAIQMNehGb0ZwBGcvSqUURb1S8gNIzd/goA6jCb8w0i6KAh52Ed4A1eKXgDRJsEOiPBFvZb/93yhRJyHWJN97kYG7lV2NcqOVOxM/sldQGeg3NZDq4+IOk8A==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from CY8PR12MB8194.namprd12.prod.outlook.com (2603:10b6:930:76::5)
- by SJ2PR12MB8061.namprd12.prod.outlook.com (2603:10b6:a03:4cb::13) with
+ by DS7PR12MB8249.namprd12.prod.outlook.com (2603:10b6:8:ea::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.17; Fri, 6 Sep
- 2024 18:58:35 +0000
+ 2024 19:05:44 +0000
 Received: from CY8PR12MB8194.namprd12.prod.outlook.com
  ([fe80::82b9:9338:947f:fc9]) by CY8PR12MB8194.namprd12.prod.outlook.com
  ([fe80::82b9:9338:947f:fc9%6]) with mapi id 15.20.7918.024; Fri, 6 Sep 2024
- 18:58:35 +0000
-Message-ID: <c3b0424d-8f04-4d16-a56d-e22784d2ed4d@nvidia.com>
-Date: Fri, 6 Sep 2024 13:58:31 -0500
+ 19:05:44 +0000
+Message-ID: <4162910b-4d30-4697-adb1-72f524b67152@nvidia.com>
+Date: Fri, 6 Sep 2024 14:05:40 -0500
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 05/19] arm64: Detect if in a realm and set RIPAS RAM
+Subject: Re: [PATCH v4 09/43] arm64: RME: ioctls to create and configure
+ realms
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -73,17 +74,16 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Alper Gun <alpergun@google.com>,
- Vikram Sethi <vsethi@nvidia.com>
-References: <20240819131924.372366-1-steven.price@arm.com>
- <20240819131924.372366-6-steven.price@arm.com>
+ Gavin Shan <gshan@redhat.com>, Alper Gun <alpergun@google.com>
+References: <20240821153844.60084-1-steven.price@arm.com>
+ <20240821153844.60084-10-steven.price@arm.com>
 Content-Language: en-US
 From: Shanker Donthineni <sdonthineni@nvidia.com>
-In-Reply-To: <20240819131924.372366-6-steven.price@arm.com>
+In-Reply-To: <20240821153844.60084-10-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL0PR02CA0005.namprd02.prod.outlook.com
- (2603:10b6:207:3c::18) To CY8PR12MB8194.namprd12.prod.outlook.com
+X-ClientProxiedBy: BL1P223CA0020.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c4::25) To CY8PR12MB8194.namprd12.prod.outlook.com
  (2603:10b6:930:76::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -92,351 +92,641 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR12MB8194:EE_|SJ2PR12MB8061:EE_
-X-MS-Office365-Filtering-Correlation-Id: 10facb15-81c4-4a98-c419-08dccea5e8ec
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8194:EE_|DS7PR12MB8249:EE_
+X-MS-Office365-Filtering-Correlation-Id: 296f8875-83d1-4ed2-ab73-08dccea6e8aa
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V3V3MituNXRYUmZLR3dER0MvKzdYdTVCbGJzcFpmQy8xODRiV0tGU2QyaGRG?=
- =?utf-8?B?SWgyNHhSbTIrU3VHZ2JXaWNQL2srdUhkOVErTlc4WnV2MnZ5QTIwNnlLZ1ow?=
- =?utf-8?B?MDcvMnczTzlROHA2Ty9NQnhzT2lEemlIS0diOWdhcEFvbEs0RjFFWWFYWUZE?=
- =?utf-8?B?ek9tbWNmWHRwWVY2c2RrV1pQdmRkZlpXVUd0cUMydW5jRnBHNTUwSi85Tlpy?=
- =?utf-8?B?Y01FUlp4ZGJlamxrOTI4QWVpMmRVV0NkZUFwZEJyK1BUTkdPRDJIL1lGRUgv?=
- =?utf-8?B?RDBBbVhSTUF5dktpY25HVzFqL2g3d0JiRExZSjJEb0UzclZKdU51ZlR6YWJ6?=
- =?utf-8?B?TndyWW14UHFoYTBmRFJ4YTVWVkhFTXYxZ2M2SGZYNVNXRWYrUkx0UllPYkU2?=
- =?utf-8?B?aCtLYUpCZjNRTnVYTkxJQ0Jlb1ppckZlbk1ieUI3WHR4Rk4ybDZPTDhwQUVj?=
- =?utf-8?B?ZDMzcllyczBDR01GYTR3M3EvRnhZWC80WHRLYVZwayt0cnp3T0N6TVRLMVBm?=
- =?utf-8?B?S2dCQVFhejErSENYMiszc1pEdldKaVFKUXZWWTZtMnZVWjdyc3JLVjhaTThR?=
- =?utf-8?B?ZzFWR2V3UVJ5dUtuVkN4cHBCbUJoUUdrc042MEhVUHg0c3p1cnBKSlFmV3Vk?=
- =?utf-8?B?TUZ3elBZazhjNXBJTU1aVTNsQUVIdS9rTGYzeVVzZm92d1phQzlaWml6V09k?=
- =?utf-8?B?K1R2WHYrT2N4aXE5bjMvK0x6YVBnREF2RWl1NUoxZktnR1VTdE9lMmRlRFpN?=
- =?utf-8?B?Umw3VisvMFRwZzNWWk5KV01NTTJQZ2hmbExNakpWS0ZvWXhIYUVSbHVQb0U1?=
- =?utf-8?B?aGJsbmhGczd3eTVJZEpBcFBEYWd4T3RzOVUvbTBFSVQ3d2hLQnQ5aFVKWXRu?=
- =?utf-8?B?ZnZSNkIwYkxNUFJ0NjdrMEhyZTJCVUJxL3FRSTF6S0lPK2tFZW5jWXNZa054?=
- =?utf-8?B?TTdiWHM1eFlNV0paVGFkQU9ZVnBTRVNJZUMwZGJTelV0ZnI2KzJnWU0rN1hC?=
- =?utf-8?B?VDB3M1NaazN3Z0FWSzJBMCtFREF0cnloSkJqZm9OanhCekVNTzdmNXpSbGRj?=
- =?utf-8?B?Tk9aYzBaTkdFMFNCQnlXKy9zUURVTUE1R3hwWVRiUHJ1Qm14M3l0VitJcmxl?=
- =?utf-8?B?emtRVk56U2NYWmsxby9JNWpJRjcrd2doZ0VvdnJXZjhwLzl5dm94aWZmRHps?=
- =?utf-8?B?YXFMRHVYeVVzWmFBdDN5b3pIWDJpYWRoNTVaTC94a00wbkYxTlM4MW9ZNGhP?=
- =?utf-8?B?TUZRdE9FNlcrdXBVb0g0VksxL212ZUd3am1RUDhQdndsbEhXcFZlbjJoZGtJ?=
- =?utf-8?B?M3gyYW5MVGRta2Mwd29Vd01KRjhnVlhINmVNMEZkaHYzanlha1l3Sm5DcGsr?=
- =?utf-8?B?SFBHeTBZWFViNGZDeXRza3FXOFFzNzhvK25pRm5QYnV2d0o2cmNMVVA5dkJS?=
- =?utf-8?B?SVFLOHNpQ0JvL1ZpTlZoZHJ2SzBBQklTc3czTkRGU2NWc1hJTjlFc0k4dytN?=
- =?utf-8?B?bVFtZ1VVNXc3MjNza0FPV0toVG16dDUyM1ZCcVJiWE9NR1NhaDJlSUJYUzVI?=
- =?utf-8?B?QVcyc0NuZnkyWlFnbTY5Sm9DeXBDUzh2UXFudnU1am5BeHh1ZnNlVDdxQlA2?=
- =?utf-8?B?NmtMZVVCcEw5TnArRGpuTDhQYVhqZFcrKzl3c0VjdE80anM4NXcrci9sdW44?=
- =?utf-8?B?Z3NsaVZHKzVDdzRya3JUb1MwWVl3R0N0am0xSHBDTEdiZkNNaldiU3lEako2?=
- =?utf-8?B?SkFQaDQrY3V2REgrdGtIcHlha0VNRWlkdlk4c1ZtQi9icVQ4YWNmOEdFV0xT?=
- =?utf-8?B?MUU2QWhhRXg2TTd3VnNoQT09?=
+	=?utf-8?B?ZkhqWmg5czJPOSt6U3BZUElYRzFtZTNIcktZYkg4L1Q4RnROS0VWZCtEN3ND?=
+ =?utf-8?B?K3VmYkxubFhuWlNTVVpPajlpSDFuWGRhZ2Q5Y285Qk43czVEWTBoaFZ1Vlg2?=
+ =?utf-8?B?dmJUbVVId3Fxd1ZtUXZwN09vY1R5UldrZXp0NDE3L3huR1U1eHcyNVBONzFO?=
+ =?utf-8?B?dFZFWk9rY1ZWT1VDRWRtaG0wQ3EzdG1WajJBRUpEa2xTUXFkVG9FVld3UEVl?=
+ =?utf-8?B?Y1RiS0E5Q0xPMCtaTzUycG1Gc00zaXY3TDhuRTVzWnJqSGFYU0J1WDBwK2Nk?=
+ =?utf-8?B?QXp4MTdkZWdEUGtxM29sRDE5VDY3YU1iRGtma0d0bVQzL05TeTE5SkVCVXp1?=
+ =?utf-8?B?c3AvZUk3akVNckdxbk9qOHlpZ2hibG9zZktmOGhlSVc1RC9pelhPbE01aWNr?=
+ =?utf-8?B?K3VhOHUvUkR3WHNzZW90bUpBcXJvZ3I3WGh6eEZXdG1iVk9uYWZLUWJCWml3?=
+ =?utf-8?B?RXIvcFBUaGErbkRCZjNXa0ttOTNFTFU5RVJOS1J2VGVMMkRwZFh5c1RwclFr?=
+ =?utf-8?B?WlhiRFdlRkVSbVFOWlRMdGx0dnplWHNmZ253RnNIVGRtWStBekVPL2NpU0ly?=
+ =?utf-8?B?WmZwbmRNVEdSQkVOVThOMWpwSWMybDlRc2w4NTJLcVFyOTlqb2tiWk8rY1BN?=
+ =?utf-8?B?SXFGY2VpVFR1MUM3K0UremlHRU5MeStLNFM0N0paZG5QZUF5NG5la2pIakc1?=
+ =?utf-8?B?bFZZem9OV2dFNU1TcGlOWGVlVm5WbUlQV0h6K3c5eXAyN3k0NDF4UzREYXk4?=
+ =?utf-8?B?WXBMTjYwRW0rK3g3L2JqdzI5Mk42KzVRRzBjek5JbVNCbXlxNkMrUkJaWEIz?=
+ =?utf-8?B?WDVhSlFhOGo5Rzd3MmNXekNSRVRPUTZZdmpZT0x2WHBzOFlOVFVoN2Z1dVZI?=
+ =?utf-8?B?U0Z1cEU5OUgxa05KaS9EZ0Y1Q0U5ei9LR0QxaFcxK0F0cU1iWWhVSUp0VHFT?=
+ =?utf-8?B?L2VsR01IbG14MXlMOVFYc0UvcngzUGI4bTRqc0hNZDVtaDhqQWpILytBMzh6?=
+ =?utf-8?B?czdqekVzRm92ZlhZSHkxcmxSbUtkY2htQ3lEV2VoZFNka3J1TVJaYUM1NTJ5?=
+ =?utf-8?B?SnJEckpqK2x3VVFldUVieVQ4djhzT01jOFp4UlhlWUtmMVl5YWR4cy9XMzIv?=
+ =?utf-8?B?ZjNoaGM3bURRczFNYko2V2FuUlA5ZCs4K2FzdDBlZ3M0eW9lRkxhWFZqWndT?=
+ =?utf-8?B?SDdrVlRxK29mcVlYdHZaSEpzV01rNlF3akdqRTIrWVF1WkJUSU9PNExpaGll?=
+ =?utf-8?B?UzUvaG9ER3RXRVdoK1g1L0tjRnZlQVdaRGFXUDNYQkRQV2J2NFZzNWxBSFRv?=
+ =?utf-8?B?Uk01NmlnQXpNeC80UnQwTDdWYnhiR213c2VWeWpRQTE3bEwzeHZpbnh6TjYx?=
+ =?utf-8?B?SkVZUi94RG1yZ3BNMDJ6SVpqS2xWeW1jWm5pY0J4bk1FT09XeUVkUTRldkM3?=
+ =?utf-8?B?WUloMmlmR2tVd1RhTmRvc0JmNlpUOG9seWVVSjVxbHBmNDlXckJPbnNtMGdW?=
+ =?utf-8?B?Y21OeXhvcnNocEF5cWt5UUFqa1kySnErdlZaN3c4QytSTlAxQ0ZhMFVsTGk5?=
+ =?utf-8?B?WXMyVjJlcDRHZys5T080T2doejNaR3RvOW5PLzA3ZlBGTXJiQzJuQktoTFRC?=
+ =?utf-8?B?NkFVcXA3UDU0VndIKzNFc3I5VDE3UkZMbUdzbnQwWk9lRmVSTFZ6WTRLWjli?=
+ =?utf-8?B?cllzYVdqR0R2bVhHR05rSWRobEJSL1RXbmU2SlVXbUI2bWU0WFE1NzdTa1Rw?=
+ =?utf-8?B?YnZXM3dqZWI2c2REd3B3YW9XcnR3M1JkSlR4SjJzLzQ5dExOWlRTRUUvU3dT?=
+ =?utf-8?B?RllQWnBpc0c0dllNL2xrdz09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UzBqZ2FKNWNSbEY3Q3JORHJsYnVIZXg0OVJXUVhyQm5kVlhLUXJvckwrdFQ4?=
- =?utf-8?B?WG15V3R0TGk0N1g2Rk81WkN0L1N1SENHRFZpSDNuU0d3bTBESmVldERMRkJz?=
- =?utf-8?B?eHV4ZTV3bXBKN3ZFVWV4Y0lGVDRDc3VnVEw3dWliWVV0UEVrblpkbEhLaXZq?=
- =?utf-8?B?SnIyTmkvUW1aVmtLK1hUeE9MSm5mSkYwZjFGYUlSY1ExSSs4dlQvekFDcDZw?=
- =?utf-8?B?S08rWnJSRS85NDhQT2dZbWNFYk8xNTRKTlUxWUlQSmhiRkRHaFE0Z0pNcjVn?=
- =?utf-8?B?cHhZVjJyaWIzVHpwd0lKMXA4b0pTL3Q3NHY1czVyNzRCcWFhTGM2Z0JtNEd0?=
- =?utf-8?B?ekRWQW1xeUppMGdHdHM3TU1LWitIeFA3cSthdExIY29HK1pwV05NYXhoVVFT?=
- =?utf-8?B?S29MSmdzZW1TRGZaTUZuaUFURU14ZkVKNWd4MTJZVys3Z3Vqbm5wK08wOXRi?=
- =?utf-8?B?RE5sY1o2Mk9hTkZvSnY0VDRzd0dQaG1VTkpWbTlHYW1FZFZ3aEgxR2VVT0Fp?=
- =?utf-8?B?NkdkNnh0VXhnRXdqQUhRbUcxSzBjZWtwYjZIRkdKQmxyeGY3dDgxQU5BdExj?=
- =?utf-8?B?b2ppR3FnY0lvdWdFbktEVXd1VGQ2MTM4dm5KOGRSVG95clNWYkw3WVI5dlls?=
- =?utf-8?B?L1lWZGF0V3Uvd2UyeERiN012T0U0T2xJNEhqU2FXaStTS21qYjlTS0ZJYWph?=
- =?utf-8?B?eGJxNTI2RHp4bjZ4bzluVGJmMzZuVnpSUUo4TngyQk1ueWZNT0hEQldSdnJi?=
- =?utf-8?B?RVFaMThHMmV6aFFhWWdtaEtxYUdzRjQwZFZHbnBJY0ZhS0pYVEwxdXMraG9V?=
- =?utf-8?B?RmoyaElNUGhoVGpwdW8rUXJzZkxQenZCZFRiaVI0bC9pVXdzeVZna2xUNkJt?=
- =?utf-8?B?ZGhNelF2bzQyQkJMMU5DR2hSWWhsbHUwUGVnN1U2aTFvZlVXaWFxMVNjZjVZ?=
- =?utf-8?B?K2U0Sy9OVURUZkZGalZ6YzdiYVpWUFo2cGJwektoRGxiY0FRM3ZneHJrKy9T?=
- =?utf-8?B?OXVrZE5sZFJzVUNNelVJOXhCTnBoUHQ5NzFRY2l1ZFBBQ2pMK2twMlNFY3ow?=
- =?utf-8?B?VzY2QytEaFJZNktHZy9jRWoweHhjb0FuTTNqbytQNVlCTlhMYVdvTm9wU1RM?=
- =?utf-8?B?bU9DZzB5M2I3UlVaeDBYdHlZZFg3b2x1TUVINVZXUW5aMEFIZmlDM2dSd255?=
- =?utf-8?B?TGQzZHkxU1h2K1BIanFTUjEyTGVqWjhCeXJWUStkMkxiVkQrWW54b2NvWCts?=
- =?utf-8?B?Nks5T3FUN2h3TldlUVM0ekVaTWliQlRLMHgwZkJQNmlCWkludWdXdXhPQ3B2?=
- =?utf-8?B?NWJrV2c3T3I4dUd3ZFY3bFdSOEVia0oxL0tRUVArSmZXT20vSGtjbkdEN3ND?=
- =?utf-8?B?NVRmY0tCTjArWnNEaWtEOHhqR2FENWtmS3UxUVNkUzNOS3pPam41SEZPTEZj?=
- =?utf-8?B?QlprQ0srd0d3TlJEcFlzYy9zeVhtdHhOMTMrUkIzc2hXd3RRUzNITGZMUHN2?=
- =?utf-8?B?RnI3UWpQNHlGb2prZGFyeVh5RnVWR1FwbHV6T3RxMm5sSTF0blF6WVl5ckIv?=
- =?utf-8?B?ZmtBU1JmcHNleHhXQ05VYzdjYXNpVkR3cHdLVForam5jak0wNjMrOCtZOGRH?=
- =?utf-8?B?clRLMkNiRnQ1bGJ2MVV0c2tROGRaV2Q4bVpTdC8xZWtOcFNZZFA4Y3hxV3BC?=
- =?utf-8?B?dXpXUWVjZm4vazhKSFVYWHVNMG9JaWZvTmRBODJzV21QZ1pVak05WEVGZ3px?=
- =?utf-8?B?dmJDUUFmaE5GOWxQZWdjdHpoSDRpejlPUWxIYWhJNC9ENlRWTk83SlRnNVdn?=
- =?utf-8?B?cjgyYVZzL2gvZklMeFZ4WS9ZTkRyTlhvSmVQK3BYRUdqbk5xaFJEdy9yUUF2?=
- =?utf-8?B?S2Y2U0plelN6OGxCMnU0RDh3TnhYcW51NE9nZzM3L1lVTTZueW1ibXphZXFy?=
- =?utf-8?B?eDc0b2UxcTN3Q0FWa2dGRFZSaEtuMUFWZTEyOEVDaUFTaWtGdXJCVWc3ZWg1?=
- =?utf-8?B?dmR5bysvUTBPVjFzNW4yY1BGOW96aHlRd2VjWm1sOElMbXZ5SFRjcDBhbFA5?=
- =?utf-8?B?a3dmWlhjWndQTmppT01xYzZPeEZHN3dpWW5UbDJUdU94TVlVWGZlUE8rWTJZ?=
- =?utf-8?Q?mWvmkpZGhckwquHSLjZZ37aBX?=
+	=?utf-8?B?emd5MlU2L1NJZldFUVVwYUhEa2NoTTRTMklzM1BSSWZzbHlESzdyVWlibmx2?=
+ =?utf-8?B?d29nSmZqSGFFM0xnZmp5VFdWbS9jMzE3elRLYkMwMExoMWpwVy9SZXF5ci9W?=
+ =?utf-8?B?R243VTVwYUMzMEhOUjJtL3p1enB3Vjg0SXFmb3lkRzlPdXFOWWpuSVI2MDYw?=
+ =?utf-8?B?ZG9lamQvaEhaUEVaVS9IZXNFaFNrZzk3OGk4Q2E1SnErR1JJVnZQV3kyckNF?=
+ =?utf-8?B?VXcyZVVTdHl3VDVkUDhZaTIrQUwvZW43MjJNZ3JneTVTL1RDUmNOcHhtSzZW?=
+ =?utf-8?B?dFRxOFVnY2owU1hSOFFseEQya0diZnVoNlVDcmRMSDFaUFZBL1BTcWd0c0Jz?=
+ =?utf-8?B?WjBsLy9CNzd5a1k2OE1OeCtDK1RDTnpPS1hJM3F5eG5QVE96ZThHblNoeW1o?=
+ =?utf-8?B?dGYvVklzd1NxL2NVMnJkakllWmJzZS9PL09EVFhlMThFQmNEcFk4VSt2MFha?=
+ =?utf-8?B?dXJWaFBHeFU1K3hmUElRK0JwWkZ6U1luVk15SzViOC9ZUlFGTzJBRnQ5Rm9B?=
+ =?utf-8?B?QUFEdHRHdVdpN0oxOVd3Y1N3ZGNNOUN3VlJxdFlQTmVSM3ZVZ3dlc3JEelRq?=
+ =?utf-8?B?Yit1cTE3UmkzRDJFeEVWM2MxdGE0Uk1RS1BnbVhXRTAxTTJlcWJsWXd3ajhs?=
+ =?utf-8?B?aks0emdac01sdmx6WjZxbFk0OEprVVRYTGhUdDkrTWgyVzB0NFM1NzN1OXdn?=
+ =?utf-8?B?SCtmcnBNK3l2RVNaK2hkUDUxK20wV0hOdGszTHdVeW92azhPcHdxZzZheWNl?=
+ =?utf-8?B?a1YxUGhvcjhkY1NiakF3TmxFOWxoWk5LVGcwU3FLK2JwTmZ2TTNIbkJzNmNM?=
+ =?utf-8?B?TnMvb3dBUGF5SUlhZnlvZFJKVlVlVHpIa1FTNldHNTREK1NsZThpV1BzbXJa?=
+ =?utf-8?B?S1J4aWlzUjZ5L0V4cWE2OFh0QnFOa0N2MzJmc2dENExheXM3SEkyTzVsZmI1?=
+ =?utf-8?B?ZVdtM2VJNUY2L2crcjN6Z091Ykw2eXV4cklzN3RINno4eWVwYVlYSmVHMDJu?=
+ =?utf-8?B?RmtYM3AvNTNNZTJWMk1uYzVERDQwOURRMnB2QXpDcHhSZzZQSGxaS1RJVUJa?=
+ =?utf-8?B?TmhZS3dhQ0xJcHl0ckUzYnpacnFrb1p4UDdUSHVOeWg0RlRiMlZ4aTZ1Y1JC?=
+ =?utf-8?B?Tmd6anZUVEc0Mk9TQlY4cDFiR1pXTzZCcHg2QWJHRUZZN2dJVkRHNFp5dDlk?=
+ =?utf-8?B?emxoNFg1d2YvVFJ0WlhGTUk4WE42K1lSUGhQM3o0WE5uOG1USURIOHdjSEVH?=
+ =?utf-8?B?N2poSkJVMTZEQVBHM2dMbW9lVWFWa00vQWNSYnliNE1sWDB6SEsxaDJGbnph?=
+ =?utf-8?B?RHhYY0lXeVA2MmtKU1Zlc2hNTnZBZ3hLR040ZlJkZ2tPQTJXOWJGTlhMWGxq?=
+ =?utf-8?B?SC8xbDc4UGt6ZVBUdHlFakVvMGQrcVA2cERKdVBzS2NMdVlDNWI1U2Y3ck81?=
+ =?utf-8?B?ZWdGNTNKVm9WQVQrOWtZSWVvTURlYVQ3MVJuZmtkbVA4aGZ0cTFJRExMdzN5?=
+ =?utf-8?B?QnliZEs5TXlYNWdTRTRPQmpXRld1MVRiRmZMTVBYelRPVmJJNG91NGZRV01r?=
+ =?utf-8?B?SnBTTERoaHE0Zk5TRzlCc1BVQWJ1ck4yK09HUXFqRnZKWFFLMDQ1VG5meUJP?=
+ =?utf-8?B?b0ZQNkhyV1hLRlRVZ3ZSWmExMkRueWlJVjZhL2lSTVlWUkxLa0lHWDhKMTBE?=
+ =?utf-8?B?ak8xeWVpaS9teGEzZHFsQ2VYNVpxSUNUY2duc1JSZjhWQnhDNEVWY3NTcHNQ?=
+ =?utf-8?B?ZHRQeHR1WUh4QWE5c2hUSGJXSWRBVkNFUExYNjNUakpYSnVlS2xjNmdXK0xY?=
+ =?utf-8?B?eFRvZThGZlVjdFJVUWlJeWZjOXNmcHN2UjArL2tyUzl6dEh4a01FNWlaaDl4?=
+ =?utf-8?B?dklqZXJBN3R0M21meTZzOUs0RHBUajNWYnUvdHh1cXhGcUtBV252dG5hUXdn?=
+ =?utf-8?B?Q0xXdUp0c25qU1VuUkZqUmFLdDVkbURPZWJPMVpsQ29PeW5DYzBQVXI0R3hN?=
+ =?utf-8?B?SUtlUHFZVWV5cnplWWlYNWpSNWMzWVNpTjcrSys0OTJJalJ6MFVFWmppcHg1?=
+ =?utf-8?B?anF0bXBXcENBSmlsT0JKcmxGYUFGcXZMM2xjRStuMU8vMVNwWDdmcDhvRkg4?=
+ =?utf-8?Q?xV2wM1kUqL1sdRv/1KBwTYSeV?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 10facb15-81c4-4a98-c419-08dccea5e8ec
+X-MS-Exchange-CrossTenant-Network-Message-Id: 296f8875-83d1-4ed2-ab73-08dccea6e8aa
 X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8194.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2024 18:58:35.4316
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2024 19:05:44.4040
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YqdVJjCDGBjROKuXJ7aXvWdznrEfeslHSdpmbZy0pfZaaunfi8BHSFI9aPD/75kqsAIscumEX9PSPqXCQojP0g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8061
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0VoiylAk7HOq/62/iKm+ADRq2iNfexaLxl8gV3Yec2sMKtXcxoF5LMQbDCOV4BBQ9GBojoFU/QV74x6VXRJwCg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8249
 
-Hi Steven,
 
-On 8/19/24 08:19, Steven Price wrote:
+
+On 8/21/24 10:38, Steven Price wrote:
 > External email: Use caution opening links or attachments
 > 
 > 
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Add the KVM_CAP_ARM_RME_CREATE_RD ioctl to create a realm. This involves
+> delegating pages to the RMM to hold the Realm Descriptor (RD) and for
+> the base level of the Realm Translation Tables (RTT). A VMID also need
+> to be picked, since the RMM has a separate VMID address space a
+> dedicated allocator is added for this purpose.
 > 
-> Detect that the VM is a realm guest by the presence of the RSI
-> interface.
+> KVM_CAP_ARM_RME_CONFIG_REALM is provided to allow configuring the realm
+> before it is created. Configuration options can be classified as:
 > 
-> If in a realm then all memory needs to be marked as RIPAS RAM initially,
-> the loader may or may not have done this for us. To be sure iterate over
-> all RAM and mark it as such. Any failure is fatal as that implies the
-> RAM regions passed to Linux are incorrect - which would mean failing
-> later when attempting to access non-existent RAM.
+>   1. Parameters specific to the Realm stage2 (e.g. IPA Size, vmid, stage2
+>      entry level, entry level RTTs, number of RTTs in start level, LPA2)
+>      Most of these are not measured by RMM and comes from KVM book
+>      keeping.
 > 
+>   2. Parameters controlling "Arm Architecture features for the VM". (e.g.
+>      SVE VL, PMU counters, number of HW BRPs/WPs), configured by the VMM
+>      using the "user ID register write" mechanism. These will be
+>      supported in the later patches.
+> 
+>   3. Parameters are not part of the core Arm architecture but defined
+>      by the RMM spec (e.g. Hash algorithm for measurement,
+>      Personalisation value). These are programmed via
+>      KVM_CAP_ARM_RME_CONFIG_REALM.
+> 
+> For the IPA size there is the possibility that the RMM supports a
+> different size to the IPA size supported by KVM for normal guests. At
+> the moment the 'normal limit' is exposed by KVM_CAP_ARM_VM_IPA_SIZE and
+> the IPA size is configured by the bottom bits of vm_type in
+> KVM_CREATE_VM. This means that it isn't easy for the VMM to discover
+> what IPA sizes are supported for Realm guests. Since the IPA is part of
+> the measurement of the realm guest the current expectation is that the
+> VMM will be required to pick the IPA size demanded by attestation and
+> therefore simply failing if this isn't available is fine. An option
+> would be to expose a new capability ioctl to obtain the RMM's maximum
+> IPA size if this is needed in the future.
+> 
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Co-developed-by: Steven Price <steven.price@arm.com>
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
-> Changes since v4:
->   * Minor tidy ups.
-> Changes since v3:
->   * Provide safe/unsafe versions for converting memory to protected,
->     using the safer version only for the early boot.
->   * Use the new psci_early_test_conduit() function to avoid calling an
->     SMC if EL3 is not present (or not configured to handle an SMC).
 > Changes since v2:
->   * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
->     static_key_false".
->   * Rename set_memory_range() to rsi_set_memory_range().
->   * Downgrade some BUG()s to WARN()s and handle the condition by
->     propagating up the stack. Comment the remaining case that ends in a
->     BUG() to explain why.
->   * Rely on the return from rsi_request_version() rather than checking
->     the version the RMM claims to support.
->   * Rename the generic sounding arm64_setup_memory() to
->     arm64_rsi_setup_memory() and move the call site to setup_arch().
+>   * Improved commit description.
+>   * Improved return failures for rmi_check_version().
+>   * Clear contents of PGD after it has been undelegated in case the RMM
+>     left stale data.
+>   * Minor changes to reflect changes in previous patches.
 > ---
->   arch/arm64/include/asm/rsi.h | 65 ++++++++++++++++++++++++++++++
->   arch/arm64/kernel/Makefile   |  3 +-
->   arch/arm64/kernel/rsi.c      | 78 ++++++++++++++++++++++++++++++++++++
->   arch/arm64/kernel/setup.c    |  8 ++++
->   4 files changed, 153 insertions(+), 1 deletion(-)
->   create mode 100644 arch/arm64/include/asm/rsi.h
->   create mode 100644 arch/arm64/kernel/rsi.c
+>   arch/arm64/include/asm/kvm_emulate.h |   5 +
+>   arch/arm64/include/asm/kvm_rme.h     |  19 ++
+>   arch/arm64/kvm/arm.c                 |  18 ++
+>   arch/arm64/kvm/mmu.c                 |  20 +-
+>   arch/arm64/kvm/rme.c                 | 283 +++++++++++++++++++++++++++
+>   5 files changed, 341 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
-> new file mode 100644
-> index 000000000000..2bc013badbc3
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rsi.h
-> @@ -0,0 +1,65 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2024 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_RSI_H_
-> +#define __ASM_RSI_H_
-> +
-> +#include <linux/jump_label.h>
-> +#include <asm/rsi_cmds.h>
-> +
-> +DECLARE_STATIC_KEY_FALSE(rsi_present);
-> +
-> +void __init arm64_rsi_init(void);
-> +void __init arm64_rsi_setup_memory(void);
-> +static inline bool is_realm_world(void)
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index c7bfb6788c96..5edcfb1b6c68 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -705,6 +705,11 @@ static inline enum realm_state kvm_realm_state(struct kvm *kvm)
+>          return READ_ONCE(kvm->arch.realm.state);
+>   }
+> 
+> +static inline bool kvm_realm_is_created(struct kvm *kvm)
 > +{
-> +       return static_branch_unlikely(&rsi_present);
+> +       return kvm_is_realm(kvm) && kvm_realm_state(kvm) != REALM_STATE_NONE;
 > +}
 > +
-> +static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t end,
-> +                                      enum ripas state, unsigned long flags)
-> +{
-> +       unsigned long ret;
-> +       phys_addr_t top;
+>   static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>   {
+>          return false;
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> index 69af5c3a1e44..209cd99f03dd 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -6,6 +6,8 @@
+>   #ifndef __ASM_KVM_RME_H
+>   #define __ASM_KVM_RME_H
+> 
+> +#include <uapi/linux/kvm.h>
 > +
-> +       while (start != end) {
-> +               ret = rsi_set_addr_range_state(start, end, state, flags, &top);
-> +               if (WARN_ON(ret || top < start || top > end))
+>   /**
+>    * enum realm_state - State of a Realm
+>    */
+> @@ -46,11 +48,28 @@ enum realm_state {
+>    * struct realm - Additional per VM data for a Realm
+>    *
+>    * @state: The lifetime state machine for the realm
+> + * @rd: Kernel mapping of the Realm Descriptor (RD)
+> + * @params: Parameters for the RMI_REALM_CREATE command
+> + * @num_aux: The number of auxiliary pages required by the RMM
+> + * @vmid: VMID to be used by the RMM for the realm
+> + * @ia_bits: Number of valid Input Address bits in the IPA
+>    */
+>   struct realm {
+>          enum realm_state state;
+> +
+> +       void *rd;
+> +       struct realm_params *params;
+> +
+> +       unsigned long num_aux;
+> +       unsigned int vmid;
+> +       unsigned int ia_bits;
+>   };
+> 
+>   void kvm_init_rme(void);
+> +u32 kvm_realm_ipa_limit(void);
+> +
+> +int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+> +int kvm_init_realm_vm(struct kvm *kvm);
+> +void kvm_destroy_realm(struct kvm *kvm);
+> 
+>   #endif
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 71ffcc766eeb..15c7c2cabbf7 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -152,6 +152,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>                  }
+>                  mutex_unlock(&kvm->slots_lock);
+>                  break;
+> +       case KVM_CAP_ARM_RME:
+> +               if (!kvm_is_realm(kvm))
 > +                       return -EINVAL;
-> +               start = top;
+> +               mutex_lock(&kvm->lock);
+> +               r = kvm_realm_enable_cap(kvm, cap);
+> +               mutex_unlock(&kvm->lock);
+> +               break;
+>          default:
+>                  break;
+>          }
+> @@ -213,6 +220,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> 
+>          bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
+> 
+> +       /* Initialise the realm bits after the generic bits are enabled */
+> +       if (kvm_is_realm(kvm)) {
+> +               ret = kvm_init_realm_vm(kvm);
+> +               if (ret)
+> +                       goto err_free_cpumask;
+> +       }
+> +
+>          return 0;
+> 
+>   err_free_cpumask:
+> @@ -271,6 +285,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>          kvm_unshare_hyp(kvm, kvm + 1);
+> 
+>          kvm_arm_teardown_hypercalls(kvm);
+> +       kvm_destroy_realm(kvm);
+>   }
+> 
+>   static bool kvm_has_full_ptr_auth(void)
+> @@ -418,6 +433,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>          case KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES:
+>                  r = BIT(0);
+>                  break;
+> +       case KVM_CAP_ARM_RME:
+> +               r = static_key_enabled(&kvm_rme_is_available);
+> +               break;
+>          default:
+>                  r = 0;
+>          }
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 6981b1bc0946..2257a3b4fb06 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -862,11 +862,16 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>          .icache_inval_pou       = invalidate_icache_guest_page,
+>   };
+> 
+> -static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+> +static int kvm_init_ipa_range(struct kvm *kvm,
+> +                             struct kvm_s2_mmu *mmu, unsigned long type)
+>   {
+>          u32 kvm_ipa_limit = get_kvm_ipa_limit();
+>          u64 mmfr0, mmfr1;
+>          u32 phys_shift;
+> +       u32 ipa_limit = kvm_ipa_limit;
+> +
+> +       if (kvm_is_realm(kvm))
+> +               ipa_limit = kvm_realm_ipa_limit();
+> 
+>          if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+>                  return -EINVAL;
+> @@ -875,12 +880,12 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+>          if (is_protected_kvm_enabled()) {
+>                  phys_shift = kvm_ipa_limit;
+>          } else if (phys_shift) {
+> -               if (phys_shift > kvm_ipa_limit ||
+> +               if (phys_shift > ipa_limit ||
+>                      phys_shift < ARM64_MIN_PARANGE_BITS)
+>                          return -EINVAL;
+>          } else {
+>                  phys_shift = KVM_PHYS_SHIFT;
+> -               if (phys_shift > kvm_ipa_limit) {
+> +               if (phys_shift > ipa_limit) {
+>                          pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
+>                                       current->comm);
+>                          return -EINVAL;
+> @@ -932,7 +937,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>                  return -EINVAL;
+>          }
+> 
+> -       err = kvm_init_ipa_range(mmu, type);
+> +       err = kvm_init_ipa_range(kvm, mmu, type);
+>          if (err)
+>                  return err;
+> 
+> @@ -1055,6 +1060,13 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>          struct kvm_pgtable *pgt = NULL;
+> 
+>          write_lock(&kvm->mmu_lock);
+> +       if (kvm_is_realm(kvm) &&
+> +           (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
+> +            kvm_realm_state(kvm) != REALM_STATE_NONE)) {
+> +               /* Tearing down RTTs will be added in a later patch */
+> +               write_unlock(&kvm->mmu_lock);
+> +               return;
+> +       }
+>          pgt = mmu->pgt;
+>          if (pgt) {
+>                  mmu->pgd_phys = 0;
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index 418685fbf6ed..4d21ec5f2910 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -5,9 +5,20 @@
+> 
+>   #include <linux/kvm_host.h>
+> 
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_mmu.h>
+>   #include <asm/rmi_cmds.h>
+>   #include <asm/virt.h>
+> 
+> +#include <asm/kvm_pgtable.h>
+> +
+> +static unsigned long rmm_feat_reg0;
+> +
+> +static bool rme_supports(unsigned long feature)
+> +{
+> +       return !!u64_get_bits(rmm_feat_reg0, feature);
+> +}
+> +
+>   static int rmi_check_version(void)
+>   {
+>          struct arm_smccc_res res;
+> @@ -36,6 +47,272 @@ static int rmi_check_version(void)
+>          return 0;
+>   }
+> 
+> +u32 kvm_realm_ipa_limit(void)
+> +{
+> +       return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
+> +}
+> +
+> +static int get_start_level(struct realm *realm)
+> +{
+> +       return 4 - stage2_pgtable_levels(realm->ia_bits);
+> +}
+> +
+> +static int realm_create_rd(struct kvm *kvm)
+> +{
+> +       struct realm *realm = &kvm->arch.realm;
+> +       struct realm_params *params = realm->params;
+> +       void *rd = NULL;
+> +       phys_addr_t rd_phys, params_phys;
+> +       struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> +       int i, r;
+> +
+> +       if (WARN_ON(realm->rd) || WARN_ON(!realm->params))
+> +               return -EEXIST;
+> +
+> +       rd = (void *)__get_free_page(GFP_KERNEL);
+> +       if (!rd)
+> +               return -ENOMEM;
+> +
+> +       rd_phys = virt_to_phys(rd);
+> +       if (rmi_granule_delegate(rd_phys)) {
+> +               r = -ENXIO;
+> +               goto free_rd;
+> +       }
+> +
+> +       for (i = 0; i < pgt->pgd_pages; i++) {
+> +               phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
+> +
+> +               if (rmi_granule_delegate(pgd_phys)) {
+> +                       r = -ENXIO;
+> +                       goto out_undelegate_tables;
+> +               }
+> +       }
+> +
+> +       realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+> +
+> +       params->s2sz = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+> +       params->rtt_level_start = get_start_level(realm);
+> +       params->rtt_num_start = pgt->pgd_pages;
+> +       params->rtt_base = kvm->arch.mmu.pgd_phys;
+> +       params->vmid = realm->vmid;
+> +
+> +       params_phys = virt_to_phys(params);
+> +
+> +       if (rmi_realm_create(rd_phys, params_phys)) {
+> +               r = -ENXIO;
+> +               goto out_undelegate_tables;
+> +       }
+> +
+> +       realm->rd = rd;
+> +
+> +       if (WARN_ON(rmi_rec_aux_count(rd_phys, &realm->num_aux))) {
+> +               WARN_ON(rmi_realm_destroy(rd_phys));
+> +               goto out_undelegate_tables;
+> +       }
+> +
+> +       return 0;
+> +
+> +out_undelegate_tables:
+> +       while (--i >= 0) {
+> +               phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
+> +
+> +               WARN_ON(rmi_granule_undelegate(pgd_phys));
+> +       }
+> +       WARN_ON(rmi_granule_undelegate(rd_phys));
+> +free_rd:
+> +       free_page((unsigned long)rd);
+> +       return r;
+> +}
+> +
+> +/* Protects access to rme_vmid_bitmap */
+> +static DEFINE_SPINLOCK(rme_vmid_lock);
+> +static unsigned long *rme_vmid_bitmap;
+> +
+> +static int rme_vmid_init(void)
+> +{
+> +       unsigned int vmid_count = 1 << kvm_get_vmid_bits();
+> +
+> +       rme_vmid_bitmap = bitmap_zalloc(vmid_count, GFP_KERNEL);
+> +       if (!rme_vmid_bitmap) {
+> +               kvm_err("%s: Couldn't allocate rme vmid bitmap\n", __func__);
+> +               return -ENOMEM;
 > +       }
 > +
 > +       return 0;
 > +}
 > +
-> +/*
-> + * Convert the specified range to RAM. Do not use this if you rely on the
-> + * contents of a page that may already be in RAM state.
-> + */
-> +static inline int rsi_set_memory_range_protected(phys_addr_t start,
-> +                                                phys_addr_t end)
+> +static int rme_vmid_reserve(void)
 > +{
-> +       return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
-> +                                   RSI_CHANGE_DESTROYED);
+> +       int ret;
+> +       unsigned int vmid_count = 1 << kvm_get_vmid_bits();
+> +
+> +       spin_lock(&rme_vmid_lock);
+> +       ret = bitmap_find_free_region(rme_vmid_bitmap, vmid_count, 0);
+> +       spin_unlock(&rme_vmid_lock);
+> +
+> +       return ret;
 > +}
 > +
-> +/*
-> + * Convert the specified range to RAM. Do not convert any pages that may have
-> + * been DESTROYED, without our permission.
-> + */
-> +static inline int rsi_set_memory_range_protected_safe(phys_addr_t start,
-> +                                                     phys_addr_t end)
+> +static void rme_vmid_release(unsigned int vmid)
 > +{
-> +       return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
-> +                                   RSI_NO_CHANGE_DESTROYED);
+> +       spin_lock(&rme_vmid_lock);
+> +       bitmap_release_region(rme_vmid_bitmap, vmid, 0);
+> +       spin_unlock(&rme_vmid_lock);
 > +}
 > +
-> +static inline int rsi_set_memory_range_shared(phys_addr_t start,
-> +                                             phys_addr_t end)
+> +static int kvm_create_realm(struct kvm *kvm)
 > +{
-> +       return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY,
-> +                                   RSI_NO_CHANGE_DESTROYED);
-> +}
-> +#endif /* __ASM_RSI_H_ */
-> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> index 2b112f3b7510..71c29a2a2f19 100644
-> --- a/arch/arm64/kernel/Makefile
-> +++ b/arch/arm64/kernel/Makefile
-> @@ -33,7 +33,8 @@ obj-y                 := debug-monitors.o entry.o irq.o fpsimd.o              \
->                             return_address.o cpuinfo.o cpu_errata.o              \
->                             cpufeature.o alternative.o cacheinfo.o               \
->                             smp.o smp_spin_table.o topology.o smccc-call.o       \
-> -                          syscall.o proton-pack.o idle.o patching.o pi/
-> +                          syscall.o proton-pack.o idle.o patching.o pi/        \
-> +                          rsi.o
-> 
->   obj-$(CONFIG_COMPAT)                   += sys32.o signal32.o                   \
->                                             sys_compat.o
-> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-> new file mode 100644
-> index 000000000000..128a9a05a96b
-> --- /dev/null
-> +++ b/arch/arm64/kernel/rsi.c
-> @@ -0,0 +1,78 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
+> +       struct realm *realm = &kvm->arch.realm;
+> +       int ret;
 > +
-> +#include <linux/jump_label.h>
-> +#include <linux/memblock.h>
-> +#include <linux/psci.h>
-> +#include <asm/rsi.h>
+> +       if (!kvm_is_realm(kvm))
+> +               return -EINVAL;
+> +       if (kvm_realm_is_created(kvm))
+> +               return -EEXIST;
 > +
-> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
-> +EXPORT_SYMBOL(rsi_present);
+> +       ret = rme_vmid_reserve();
+> +       if (ret < 0)
+> +               return ret;
+> +       realm->vmid = ret;
 > +
-> +static bool rsi_version_matches(void)
-> +{
-> +       unsigned long ver_lower, ver_higher;
-> +       unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
-> +                                               &ver_lower,
-> +                                               &ver_higher);
-> +
-> +       if (ret == SMCCC_RET_NOT_SUPPORTED)
-> +               return false;
-> +
-> +       if (ret != RSI_SUCCESS) {
-> +               pr_err("RME: RMM doesn't support RSI version %lu.%lu. Supported range: %lu.%lu-%lu.%lu\n",
-> +                      RSI_ABI_VERSION_MAJOR, RSI_ABI_VERSION_MINOR,
-> +                      RSI_ABI_VERSION_GET_MAJOR(ver_lower),
-> +                      RSI_ABI_VERSION_GET_MINOR(ver_lower),
-> +                      RSI_ABI_VERSION_GET_MAJOR(ver_higher),
-> +                      RSI_ABI_VERSION_GET_MINOR(ver_higher));
-> +               return false;
+> +       ret = realm_create_rd(kvm);
+> +       if (ret) {
+> +               rme_vmid_release(realm->vmid);
+> +               return ret;
 > +       }
 > +
-> +       pr_info("RME: Using RSI version %lu.%lu\n",
-> +               RSI_ABI_VERSION_GET_MAJOR(ver_lower),
-> +               RSI_ABI_VERSION_GET_MINOR(ver_lower));
+> +       WRITE_ONCE(realm->state, REALM_STATE_NEW);
 > +
-> +       return true;
+> +       /* The realm is up, free the parameters.  */
+> +       free_page((unsigned long)realm->params);
+> +       realm->params = NULL;
+Is there a specific reason for freeing the params? The pointer is
+referenced in rtt_get_phys() without a NULL check, which leads to
+a kernel crash.
+
+static phys_addr_t rtt_get_phys(struct realm *realm, struct rtt_entry *rtt)
+{
+         bool lpa2 = realm->params->flags & RMI_REALM_PARAM_FLAG_LPA2;
+
+> +
+> +       return 0;
 > +}
 > +
-> +void __init arm64_rsi_setup_memory(void)
+> +static int config_realm_hash_algo(struct realm *realm,
+> +                                 struct kvm_cap_arm_rme_config_item *cfg)
 > +{
-> +       u64 i;
-> +       phys_addr_t start, end;
-> +
-> +       if (!is_realm_world())
-> +               return;
-> +
-> +       /*
-> +        * Iterate over the available memory ranges and convert the state to
-> +        * protected memory. We should take extra care to ensure that we DO NOT
-> +        * permit any "DESTROYED" pages to be converted to "RAM".
-> +        *
-> +        * BUG_ON is used because if the attempt to switch the memory to
-> +        * protected has failed here, then future accesses to the memory are
-> +        * simply going to be reflected as a SEA (Synchronous External Abort)
-> +        * which we can't handle.  Bailing out early prevents the guest limping
-> +        * on and dying later.
-> +        */
-> +       for_each_mem_range(i, &start, &end) {
-> +               BUG_ON(rsi_set_memory_range_protected_safe(start, end));
+> +       switch (cfg->hash_algo) {
+> +       case KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA256:
+> +               if (!rme_supports(RMI_FEATURE_REGISTER_0_HASH_SHA_256))
+> +                       return -EINVAL;
+> +               break;
+> +       case KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA512:
+> +               if (!rme_supports(RMI_FEATURE_REGISTER_0_HASH_SHA_512))
+> +                       return -EINVAL;
+> +               break;
+> +       default:
+> +               return -EINVAL;
 > +       }
+> +       realm->params->hash_algo = cfg->hash_algo;
+> +       return 0;
 > +}
 > +
-> +void __init arm64_rsi_init(void)
+> +static int kvm_rme_config_realm(struct kvm *kvm, struct kvm_enable_cap *cap)
 > +{
-> +       /*
-> +        * If PSCI isn't using SMC, RMM isn't present. Don't try to execute an
-> +        * SMC as it could be UNDEFINED.
-> +        */
-> +       if (!psci_early_test_conduit(SMCCC_CONDUIT_SMC))
-> +               return;
-For ACPI-based kernel boot flow, control never reaches this point because the above
-function does not check the PSCI conduit method when the kernel is booted via UEFI.
-
-As a result, the boot process fails when using ACPI. It works fine with DTB based
-boot.
-
-> +       if (!rsi_version_matches())
-> +               return;
+> +       struct kvm_cap_arm_rme_config_item cfg;
+> +       struct realm *realm = &kvm->arch.realm;
+> +       int r = 0;
 > +
-> +       static_branch_enable(&rsi_present);
+> +       if (kvm_realm_is_created(kvm))
+> +               return -EBUSY;
+> +
+> +       if (copy_from_user(&cfg, (void __user *)cap->args[1], sizeof(cfg)))
+> +               return -EFAULT;
+> +
+> +       switch (cfg.cfg) {
+> +       case KVM_CAP_ARM_RME_CFG_RPV:
+> +               memcpy(&realm->params->rpv, &cfg.rpv, sizeof(cfg.rpv));
+> +               break;
+> +       case KVM_CAP_ARM_RME_CFG_HASH_ALGO:
+> +               r = config_realm_hash_algo(realm, &cfg);
+> +               break;
+> +       default:
+> +               r = -EINVAL;
+> +       }
+> +
+> +       return r;
 > +}
 > +
-> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> index a096e2451044..143f87615af0 100644
-> --- a/arch/arm64/kernel/setup.c
-> +++ b/arch/arm64/kernel/setup.c
-> @@ -43,6 +43,7 @@
->   #include <asm/cpu_ops.h>
->   #include <asm/kasan.h>
->   #include <asm/numa.h>
-> +#include <asm/rsi.h>
->   #include <asm/scs.h>
->   #include <asm/sections.h>
->   #include <asm/setup.h>
-> @@ -293,6 +294,11 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
->           * cpufeature code and early parameters.
->           */
->          jump_label_init();
-> +       /*
-> +        * Init RSI before early param so that "earlycon" console uses the
-> +        * shared alias when in a realm
-> +        */
-> +       arm64_rsi_init();
->          parse_early_param();
-> 
->          dynamic_scs_init();
-> @@ -328,6 +334,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
-> 
->          arm64_memblock_init();
-> 
-> +       arm64_rsi_setup_memory();
+> +int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+> +{
+> +       int r = 0;
 > +
->          paging_init();
+> +       if (!kvm_is_realm(kvm))
+> +               return -EINVAL;
+> +
+> +       switch (cap->args[0]) {
+> +       case KVM_CAP_ARM_RME_CONFIG_REALM:
+> +               r = kvm_rme_config_realm(kvm, cap);
+> +               break;
+> +       case KVM_CAP_ARM_RME_CREATE_RD:
+> +               r = kvm_create_realm(kvm);
+> +               break;
+> +       default:
+> +               r = -EINVAL;
+> +               break;
+> +       }
+> +
+> +       return r;
+> +}
+> +
+> +void kvm_destroy_realm(struct kvm *kvm)
+> +{
+> +       struct realm *realm = &kvm->arch.realm;
+> +       struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> +       int i;
+> +
+> +       if (realm->params) {
+> +               free_page((unsigned long)realm->params);
+> +               realm->params = NULL;
+> +       }
+> +
+> +       if (!kvm_realm_is_created(kvm))
+> +               return;
+> +
+> +       WRITE_ONCE(realm->state, REALM_STATE_DYING);
+> +
+> +       if (realm->rd) {
+> +               phys_addr_t rd_phys = virt_to_phys(realm->rd);
+> +
+> +               if (WARN_ON(rmi_realm_destroy(rd_phys)))
+> +                       return;
+> +               if (WARN_ON(rmi_granule_undelegate(rd_phys)))
+> +                       return;
+> +               free_page((unsigned long)realm->rd);
+> +               realm->rd = NULL;
+> +       }
+> +
+> +       rme_vmid_release(realm->vmid);
+> +
+> +       for (i = 0; i < pgt->pgd_pages; i++) {
+> +               phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
+> +
+> +               if (WARN_ON(rmi_granule_undelegate(pgd_phys)))
+> +                       return;
+> +
+> +               clear_page(phys_to_virt(pgd_phys));
+> +       }
+> +
+> +       WRITE_ONCE(realm->state, REALM_STATE_DEAD);
+> +
+> +       /* Now that the Realm is destroyed, free the entry level RTTs */
+> +       kvm_free_stage2_pgd(&kvm->arch.mmu);
+> +}
+> +
+> +int kvm_init_realm_vm(struct kvm *kvm)
+> +{
+> +       struct realm_params *params;
+> +
+> +       params = (struct realm_params *)get_zeroed_page(GFP_KERNEL);
+> +       if (!params)
+> +               return -ENOMEM;
+> +
+> +       kvm->arch.realm.params = params;
+> +       return 0;
+> +}
+> +
+>   void kvm_init_rme(void)
+>   {
+>          if (PAGE_SIZE != SZ_4K)
+> @@ -46,5 +323,11 @@ void kvm_init_rme(void)
+>                  /* Continue without realm support */
+>                  return;
 > 
->          acpi_table_upgrade();
+> +       if (WARN_ON(rmi_features(0, &rmm_feat_reg0)))
+> +               return;
+> +
+> +       if (rme_vmid_init())
+> +               return;
+> +
+>          /* Future patch will enable static branch kvm_rme_is_available */
+>   }
 > --
 > 2.34.1
 > 
