@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-26051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7236C96FEC4
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 467BB96FEC3
 	for <lists+kvm@lfdr.de>; Sat,  7 Sep 2024 02:55:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F0E01C22066
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F16A51F23BF9
 	for <lists+kvm@lfdr.de>; Sat,  7 Sep 2024 00:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2609CD512;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E96D29E;
 	Sat,  7 Sep 2024 00:54:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PvhmUoM8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h8gnfmtD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260DDA927
-	for <kvm@vger.kernel.org>; Sat,  7 Sep 2024 00:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944D5A92D
+	for <kvm@vger.kernel.org>; Sat,  7 Sep 2024 00:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725670489; cv=none; b=ioT2EuW4C2VKpC60CgNEB9I2aTodjhTPtFB+04/F+wtn+hTEr/Orc8n6NFkzH3YVWdL33vYMkglMsoD1C1/l1sCtNbJZSHXuR9q+diIaAiphe2lKJDzFd2uLiAHZ588+dGaKfweQVGSna6DXlO+68BmxCL/2VHofOzVEpzLe0h8=
+	t=1725670489; cv=none; b=U85e2qxM/MTffIzOpXAzeyZ6ylY3i3+ocjwInNKrEWuig2Q71bRaQMCWljVOowtbZFScTMjaHCcQdUZIUtPH4ivw2/W2ROkpp9+0uHLCficgsibWUAfoBqx4JlKSUY09oO9RMlV8gomvCu2PaayLabh7xaKAzpzIwwwr7ihs3EQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725670489; c=relaxed/simple;
-	bh=7VD03Qntmthy9Q7Vyr/9df/LJOaQhqhvOBK94YTE8to=;
+	bh=OsdQ1yj4JSnzx5SG0hg8J9bx/31o5WGXXyh6SF5GT04=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FCA/cJJF9/9mBSCxXl0T02DqQ8rS8YaVZo4MNq3PYycNbEbSBstsIP3MiHvhyRX8oXzZyeilkVFrXJS6b7PUqVmcRmFGPHBIBDy3iB6qAptgIJF/Nk+IcbHBXuvzJxxmBK5Ms6x+pBhv8scqiJUqwz23e3n8vg5D1PVu7bKpfHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PvhmUoM8; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=DYMsUy3+g0wTl09HSjLF1KxnykbwrGrWqxZYPdeUtloUq6WO6qNW1WHB+umLnlIMDyU54FR0wSYtWT93oqcfxN2mtYPmnf/zruNLiKsmNMweG4aGF59Ga+7ndS5tfm7sBcl6/gwrN/fZ9dK35rHGUMn9HbnbPkIAGetB3lHqURM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h8gnfmtD; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725670485;
+	s=mimecast20190719; t=1725670486;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EEzbdXP/pX9sHfOe1VBFNARTLHFaigbuH1Y/01sWsrM=;
-	b=PvhmUoM8J60zjo6zl8P0tZHZjIJmHFzlpNQByoNudkBL4fE6LYk7oxhmUY9dFadl+f8opB
-	kc7rA5p0RJdy7locxFMp9/wAxXJHHFpk6GRvd8g/2Nuyu9vQXs5pMAC2IdwEBYnqGOvXWt
-	lUrFL15Rj4CjRJK7QoLA5XpK5Nc/wB0=
+	bh=+P8w1LwrK/piZdxoBKsUBjaw9FgpEeIXszfCDXcGJMc=;
+	b=h8gnfmtDu4lZDFOuAoloBO1fJ4s64cFPBme5YgxwOW+YW7G8N/fu5Ewp75wjSjP2Ezvgdy
+	1F5JOEfkpN8rdgoyV3Y6y931Ef2hf9XI/PHWv8AsflI9qMrLUW4Os8zl0O37L57edwDJf5
+	b8HoLmPdXxWOTUvyK3Q+XNbrREwiLQk=
 Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-55-vfWr-JEsMiaaVXSGvFnezQ-1; Fri,
- 06 Sep 2024 20:54:44 -0400
-X-MC-Unique: vfWr-JEsMiaaVXSGvFnezQ-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-74--C7svMowN8GHpe3hfh1Ixw-1; Fri,
+ 06 Sep 2024 20:54:45 -0400
+X-MC-Unique: -C7svMowN8GHpe3hfh1Ixw-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 460FD19560B0
-	for <kvm@vger.kernel.org>; Sat,  7 Sep 2024 00:54:43 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4F9921956096
+	for <kvm@vger.kernel.org>; Sat,  7 Sep 2024 00:54:44 +0000 (UTC)
 Received: from starship.lan (unknown [10.22.65.51])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4565619560AF;
-	Sat,  7 Sep 2024 00:54:42 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5267219560AA;
+	Sat,  7 Sep 2024 00:54:43 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [kvm-unit-tests PATCH 1/5] x86: add _safe and _fep_safe variants to segment base load instructions
-Date: Fri,  6 Sep 2024 20:54:36 -0400
-Message-Id: <20240907005440.500075-2-mlevitsk@redhat.com>
+Subject: [kvm-unit-tests PATCH 2/5] x86: add a few functions for gdt manipulation
+Date: Fri,  6 Sep 2024 20:54:37 -0400
+Message-Id: <20240907005440.500075-3-mlevitsk@redhat.com>
 In-Reply-To: <20240907005440.500075-1-mlevitsk@redhat.com>
 References: <20240907005440.500075-1-mlevitsk@redhat.com>
 Precedence: bulk
@@ -74,114 +74,116 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-_safe and _fep_safe functions will be used to validate various ways of
-setting the segment bases and GDT/LDT bases.
+Add a few functions that will be used to manipulate various
+segment bases that are loaded via GDT.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- lib/x86/desc.h      |  4 ++--
- lib/x86/processor.h | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+), 2 deletions(-)
+ lib/x86/desc.c | 39 ++++++++++++++++++++++++++++++++-------
+ lib/x86/desc.h |  5 +++++
+ 2 files changed, 37 insertions(+), 7 deletions(-)
 
+diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+index d054899c6..52e33f201 100644
+--- a/lib/x86/desc.c
++++ b/lib/x86/desc.c
+@@ -338,7 +338,7 @@ bool exception_rflags_rf(void)
+ 
+ static char intr_alt_stack[4096];
+ 
+-void set_gdt_entry(int sel, unsigned long base,  u32 limit, u8 type, u8 flags)
++void set_gdt_entry_base(int sel, unsigned long base)
+ {
+ 	gdt_entry_t *entry = &gdt[sel >> 3];
+ 
+@@ -347,10 +347,6 @@ void set_gdt_entry(int sel, unsigned long base,  u32 limit, u8 type, u8 flags)
+ 	entry->base2 = (base >> 16) & 0xFF;
+ 	entry->base3 = (base >> 24) & 0xFF;
+ 
+-	/* Setup the descriptor limits, type and flags */
+-	entry->limit1 = (limit & 0xFFFF);
+-	entry->type_limit_flags = ((limit & 0xF0000) >> 8) | ((flags & 0xF0) << 8) | type;
+-
+ #ifdef __x86_64__
+ 	if (!entry->s) {
+ 		struct system_desc64 *entry16 = (struct system_desc64 *)entry;
+@@ -360,6 +356,25 @@ void set_gdt_entry(int sel, unsigned long base,  u32 limit, u8 type, u8 flags)
+ #endif
+ }
+ 
++void set_gdt_entry(int sel, unsigned long base,  u32 limit, u8 type, u8 flags)
++{
++	gdt_entry_t *entry = &gdt[sel >> 3];
++
++	/* Setup the descriptor limits, type and flags */
++	entry->limit1 = (limit & 0xFFFF);
++	entry->type_limit_flags = ((limit & 0xF0000) >> 8) | ((flags & 0xF0) << 8) | type;
++	set_gdt_entry_base(sel, base);
++}
++
++void clear_tss_busy(int sel)
++{
++	gdt_entry_t *entry = &gdt[sel >> 3];
++
++	entry->type_limit_flags &= ~0xFF;
++	entry->type_limit_flags |= 0x89;
++}
++
++
+ void load_gdt_tss(size_t tss_offset)
+ {
+ 	lgdt(&gdt_descr);
+@@ -483,14 +498,24 @@ void __set_exception_jmpbuf(jmp_buf *addr)
+ 	exception_jmpbuf = addr;
+ }
+ 
+-gdt_entry_t *get_tss_descr(void)
++gdt_entry_t *get_gdt_entry(u16 sel)
+ {
+ 	struct descriptor_table_ptr gdt_ptr;
+ 	gdt_entry_t *gdt;
+ 
+ 	sgdt(&gdt_ptr);
+ 	gdt = (gdt_entry_t *)gdt_ptr.base;
+-	return &gdt[str() / 8];
++	return &gdt[sel / 8];
++}
++
++gdt_entry_t *get_tss_descr(void)
++{
++	return get_gdt_entry(str());
++}
++
++gdt_entry_t *get_ldt_descr(void)
++{
++	return get_gdt_entry(sldt());
+ }
+ 
+ unsigned long get_gdt_entry_base(gdt_entry_t *entry)
 diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-index 92c45a48f..5349ea572 100644
+index 5349ea572..a50c8f61b 100644
 --- a/lib/x86/desc.h
 +++ b/lib/x86/desc.h
-@@ -286,8 +286,8 @@ extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
- #define asm_safe(insn, inputs...)					\
- 	__asm_safe("", insn, inputs)
- 
--#define asm_fep_safe(insn, output, inputs...)				\
--	__asm_safe_out1(KVM_FEP, insn, output, inputs)
-+#define asm_fep_safe(insn, inputs...)				\
-+	__asm_safe_out1(KVM_FEP, insn,, inputs)
- 
- #define __asm_safe_out1(fep, insn, output, inputs...)			\
- ({									\
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index da1ed6628..9248a06b2 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -468,6 +468,11 @@ static inline int rdmsr_safe(u32 index, uint64_t *val)
- 	return rdreg64_safe("rdmsr", index, val);
+@@ -246,6 +246,8 @@ void set_idt_entry(int vec, void *addr, int dpl);
+ void set_idt_sel(int vec, u16 sel);
+ void set_idt_dpl(int vec, u16 dpl);
+ void set_gdt_entry(int sel, unsigned long base, u32 limit, u8 access, u8 gran);
++void set_gdt_entry_base(int sel, unsigned long base);
++void clear_tss_busy(int sel);
+ void load_gdt_tss(size_t tss_offset);
+ void set_intr_alt_stack(int e, void *fn);
+ void print_current_tss_info(void);
+@@ -268,7 +270,10 @@ static inline void *get_idt_addr(idt_entry_t *entry)
+ 	return (void *)addr;
  }
  
-+static inline int rdmsr_fep_safe(u32 index, uint64_t *val)
-+{
-+	return __rdreg64_safe(KVM_FEP, "rdmsr", index, val);
-+}
++extern gdt_entry_t *get_gdt_entry(u16 sel);
+ extern gdt_entry_t *get_tss_descr(void);
++gdt_entry_t *get_ldt_descr(void);
 +
- static inline int wrmsr_safe(u32 index, u64 val)
- {
- 	return wrreg64_safe("wrmsr", index, val);
-@@ -597,6 +602,16 @@ static inline void lgdt(const struct descriptor_table_ptr *ptr)
- 	asm volatile ("lgdt %0" : : "m"(*ptr));
- }
+ extern unsigned long get_gdt_entry_base(gdt_entry_t *entry);
+ extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
  
-+static inline int lgdt_safe(const struct descriptor_table_ptr *ptr)
-+{
-+	return asm_safe("lgdt %0", "m"(*ptr));
-+}
-+
-+static inline int lgdt_fep_safe(const struct descriptor_table_ptr *ptr)
-+{
-+	return asm_fep_safe("lgdt %0", "m"(*ptr));
-+}
-+
- static inline void sgdt(struct descriptor_table_ptr *ptr)
- {
- 	asm volatile ("sgdt %0" : "=m"(*ptr));
-@@ -607,6 +622,16 @@ static inline void lidt(const struct descriptor_table_ptr *ptr)
- 	asm volatile ("lidt %0" : : "m"(*ptr));
- }
- 
-+static inline int lidt_safe(const struct descriptor_table_ptr *ptr)
-+{
-+	return asm_safe("lidt %0", "m"(*ptr));
-+}
-+
-+static inline int lidt_fep_safe(const struct descriptor_table_ptr *ptr)
-+{
-+	return asm_fep_safe("lidt %0", "m"(*ptr));
-+}
-+
- static inline void sidt(struct descriptor_table_ptr *ptr)
- {
- 	asm volatile ("sidt %0" : "=m"(*ptr));
-@@ -617,6 +642,16 @@ static inline void lldt(u16 val)
- 	asm volatile ("lldt %0" : : "rm"(val));
- }
- 
-+static inline int lldt_safe(u16 val)
-+{
-+	return asm_safe("lldt %0", "rm"(val));
-+}
-+
-+static inline int lldt_fep_safe(u16 val)
-+{
-+	return asm_safe("lldt %0", "rm"(val));
-+}
-+
- static inline u16 sldt(void)
- {
- 	u16 val;
-@@ -629,6 +664,16 @@ static inline void ltr(u16 val)
- 	asm volatile ("ltr %0" : : "rm"(val));
- }
- 
-+static inline int ltr_safe(u16 val)
-+{
-+	return asm_safe("ltr %0", "rm"(val));
-+}
-+
-+static inline int ltr_fep_safe(u16 val)
-+{
-+	return asm_safe("ltr %0", "rm"(val));
-+}
-+
- static inline u16 str(void)
- {
- 	u16 val;
 -- 
 2.26.3
 
