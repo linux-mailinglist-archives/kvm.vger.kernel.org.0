@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-26072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26073-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16B049704E1
-	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 04:41:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 373C79704E5
+	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 04:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE1F22822A3
-	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 02:41:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E359B282618
+	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 02:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7EF724B2F;
-	Sun,  8 Sep 2024 02:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F872A8D7;
+	Sun,  8 Sep 2024 02:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VjscTXMo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4Ybu1ag"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC20D272;
-	Sun,  8 Sep 2024 02:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E0228FC;
+	Sun,  8 Sep 2024 02:47:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725763260; cv=none; b=SshKbZBODCnWjQyHmxUTJPZ16CcD2w7DZYplY4omKgfuOLv5eHqJULb9P4HpWdold++Em9iGK3p7Bqi1oqbYQ0zYcyow4UAA8PeMmNJfp7w2Pn/tml5bDNOremTLhj6hUaK+/2uK0bbFAYKKPRJXNSvM2ocWLsV72g4p81wIIn0=
+	t=1725763645; cv=none; b=t4r/q0vSjsXLrnOv+pMo6V34pEHd9r0YnUizKY9neyGYii1dnFn3GOlyPHjiNdqUlzeZLWbq6OZjz7uPdtrjUri1Yv8RJhI3nY+R78vXlH1Gj+yDYbsWcWUnTfuZRq9N2LQsWSvMYiBPI3YRiwY+n4/WuNdBQXY22S++Vw/o/iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725763260; c=relaxed/simple;
-	bh=5yBf3P0dSFge8zUoOWsK+QCozjauF+zs2WTj4pouJaw=;
+	s=arc-20240116; t=1725763645; c=relaxed/simple;
+	bh=ver2NE+e9eI6LoOeCL+BOGorY43Bf8AghqCQbR0/sdE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c6V33rNajft1CCvvq6W33AUQv8eaq8tBF4PpC/6RgmzUENFScR18Fh2GKBwy2OTwqj6kuvGP2bASpIsO/MRJg/vJV9jU0o54VR6nzeVUWKswZUBIWJa5jckCDCGZtUzirv5YtLtt0HhaUt9VXOlav+GTTrLKJffMsRhL5dfUB68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VjscTXMo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7947EC4AF09;
-	Sun,  8 Sep 2024 02:40:59 +0000 (UTC)
+	 To:Cc:Content-Type; b=X9Mc5Yqx3bp9/+Xtk+lDptM/qD2PjjvxErZWgVTAGJhua0nu/5oyvGJYhtEjaYTtHdt9rbJy97umDT/yntTS39twyJF+Fva2Hfv0UoqSbe6i1qPa7v2quzjk5tv8H76BEjsu0mKCKLzsstUbeWT3WkYZqvQjFr8H0y6WA+3Y3Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4Ybu1ag; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70365C4CEC8;
+	Sun,  8 Sep 2024 02:47:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725763259;
-	bh=5yBf3P0dSFge8zUoOWsK+QCozjauF+zs2WTj4pouJaw=;
+	s=k20201202; t=1725763645;
+	bh=ver2NE+e9eI6LoOeCL+BOGorY43Bf8AghqCQbR0/sdE=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=VjscTXMoucJlbj8kNtnN57wDZdI7OyMn4haFStIVDoQuJn0Dz6fhPQTvg5q6HyGXZ
-	 m0Au1syXz8e7aqa9FBTNe0rye1+M3moC+FvX/auA1KjeDcRqUW45/zcEHltOjafcDe
-	 x02p0Sajx3UmOPoLgB2TbL2jm+DAPUyXYG529yisn9qe90DsX8cbrOhi4s9eVcy9DD
-	 uJeayRFlljaWspnZypvQRXBROD41B3H6Jmpz/Yw0di5L4qDK7mu63yCb8xHFQpYaU9
-	 tGaf1UPKqL4Nk41l9wmO1HgkimSKV7E8NWeNclVXJMDcnIciydAIT/8gICggKVKuEr
-	 j1OyRx1BPXS5A==
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f75c56f16aso11186691fa.0;
-        Sat, 07 Sep 2024 19:40:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVPLljAFDALhl562NGF/MFqcWOzcyD1iYnsoolkI/GTUGAWPuw2rIovUS3iqDdz5LHlxdg=@vger.kernel.org, AJvYcCVPzZe4kA1p1K7/ykQ9fa6u45o8QPTh062fSbS7Xbqyflk1mNagkI8xLEJ8WW07L3TznpqgSk50AZVAmWxD@vger.kernel.org, AJvYcCW+HrcIqnvH3QvyeIbIkFhN8/F6zTHH+QoJWF6dmf6K2XjJcbWgduH4O1/DmGhayxklmgz1kQzdMoctDA==@vger.kernel.org, AJvYcCW3FHHvF8SoEUkt5GOu4/A/qjy9tOC1tNYv30hMwlNIliBX9RvcMTAQ7I5uSEJuMNrid9dpQ7oEytE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy206pWXhtGMk4dyqrK/I154jjNsdJdzawCZEukzX9QVNJhEs0j
-	tG1nJQHPcIakRWrwfYWUw8d2pczFHBsT7Js42/AMa+NTlweTKnREH+NFdOsKh710fl2bSkPf8BK
-	tKV+Urw9WVbTJRLRWtJsVSjPmdvU=
-X-Google-Smtp-Source: AGHT+IFBhtpwKNxTp7iZ3GwOsA0OLDoMib+tZBANDrIJ3CV1VN598IEmU3BI2NkBNy3Pv+Hc1qkFk5vMO0dpsoVQoVg=
-X-Received: by 2002:a2e:5109:0:b0:2f6:6d6d:63cd with SMTP id
- 38308e7fff4ca-2f751f11e9amr38216391fa.26.1725763257790; Sat, 07 Sep 2024
- 19:40:57 -0700 (PDT)
+	b=n4Ybu1agCSOtR50BSus8iCt5pgA46FjR5PIOlwkJiHv6vxq00UlVygcp+V3C6wlq8
+	 ggf4hYWSd+zO2skuAiJ48Orjv0XwaGqZDuFHGZbeJUwIBUjf9aD40Oj+AmdnCjl+Ru
+	 G7KXNb8QBJq7K5rEnTQ1ntwJovY5JBwWk33pMLGj0UzAK7csQ1wx4Vd26GyMpJ3fmv
+	 c1TaAHWq3jOrV8y1Pxslc3ZudBZGJ2MFyBPALG2gYbSitFrfy5RRQpnzOo2gA01eyZ
+	 ZVbqhzeWI7YofdhSO0CxsW0vSgs6G8eF+bOpTdKhhmEQMmC6vroSokcZb+NyGWtOxq
+	 /4T/Ur/BuTuuw==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c26b5f1ea6so3927207a12.0;
+        Sat, 07 Sep 2024 19:47:25 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU9NiOmD8LTTkJt+jQ2RXmMgIwnw8dT+Z0ctCcbmc2xsTvd4SJbvVLzvnVf5bx9ugq0i8dxkVlQF/tajg==@vger.kernel.org, AJvYcCUdgGbXolY7oNwYUeA/IoRuUfvnpL6vK/DThACG9XPWphKXhB5SZvq8qlKy1LCp+5avPjs=@vger.kernel.org, AJvYcCWn886DBpnKeSPm+6hpr8bGOqVkiF1FRN+jQSFyoj+XTmah8oLFw9NMZH9aqpo/VRP5wieiW8hkLFqRIiXr@vger.kernel.org, AJvYcCXv+vVmUx4vPEZACRPswTstHkGnDcInjIRuTF6xaczGd6s+R4gGjnaw+y1RkYKwVibalzZN5Hkf/6I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeYB7QiRGQb0ZuNjkEWC5t4RB8/P8eJxlOY3QcDevpGAq/4cVk
+	HjO5qlKcON9mWMgw7mxZMyqt57tlmYJhpnfzWm81JPrxhWXA8CfciqJYuxRTGfvMODvoYLWCzUQ
+	X3aLXohI1ajgxj7PkiiU7LNFL3t0=
+X-Google-Smtp-Source: AGHT+IEwyc9T81QqXwiwQXiluNuC2/jX/VJDZJOpvJhv+lUAMex8mDzLjDzkw6HhavOfhcSICl+nah3h8ZRmzyL45PI=
+X-Received: by 2002:a05:6402:35c9:b0:5a1:24fc:9a47 with SMTP id
+ 4fb4d7f45d1cf-5c3dc7baee7mr5537083a12.27.1725763643967; Sat, 07 Sep 2024
+ 19:47:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240907-iocsr-v1-0-0c99b3334444@flygoat.com> <20240907-iocsr-v1-2-0c99b3334444@flygoat.com>
-In-Reply-To: <20240907-iocsr-v1-2-0c99b3334444@flygoat.com>
+References: <20240907-iocsr-v1-0-0c99b3334444@flygoat.com> <20240907-iocsr-v1-3-0c99b3334444@flygoat.com>
+In-Reply-To: <20240907-iocsr-v1-3-0c99b3334444@flygoat.com>
 From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 8 Sep 2024 10:40:51 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4B19+pybM_PeSNEnSmWaLLi6W15t2scbKhEOGLyCtEWw@mail.gmail.com>
-Message-ID: <CAAhV-H4B19+pybM_PeSNEnSmWaLLi6W15t2scbKhEOGLyCtEWw@mail.gmail.com>
-Subject: Re: [PATCH 2/5] LoongArch: Probe more CPU features from CPUCFG
+Date: Sun, 8 Sep 2024 10:47:18 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5xejfimHedCpLfh2CRheHJmAXpvcmWpLacyrg5m4EPJA@mail.gmail.com>
+Message-ID: <CAAhV-H5xejfimHedCpLfh2CRheHJmAXpvcmWpLacyrg5m4EPJA@mail.gmail.com>
+Subject: Re: [PATCH 3/5] LoongArch: cpu-probe: Move IOCSR probing out of cpu_probe_common
 To: Jiaxun Yang <jiaxun.yang@flygoat.com>
 Cc: WANG Xuerui <kernel@xen0n.name>, "Rafael J. Wysocki" <rafael@kernel.org>, 
 	Viresh Kumar <viresh.kumar@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, 
@@ -78,147 +78,130 @@ Hi, Jiaxun,
 On Sat, Sep 7, 2024 at 6:17=E2=80=AFPM Jiaxun Yang <jiaxun.yang@flygoat.com=
 > wrote:
 >
-> Probe ISA level, TLB, IOCSR information from CPUCFG to
-> improve kernel resilience to different core implementations.
+> IOCSR register definition appears to be a platform specific
+> spec instead of architecture spec, even for Loongson CPUs
+> there is no guarantee that IOCSR will always present.
+>
+> Thus it's dangerous to perform IOCSR probing without checking
+> CPU type and instruction availability.
+I don't think this is necessary. Loongson's Chip engineers confirm
+that IOCSR is always present in Loongson processors. If other
+LoongArch (not Loongson) processors have no IOCSR, they should
+implement their own cpu_probe_abc() instead of cpu_probe_loongson().
+
+Huacai
+
 >
 > Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 > ---
->  arch/loongarch/include/asm/cpu.h  |  2 +-
->  arch/loongarch/kernel/cpu-probe.c | 47 ++++++++++++++++++++++++++-------=
+>  arch/loongarch/kernel/cpu-probe.c | 63 ++++++++++++++++++++++++---------=
 ------
->  2 files changed, 32 insertions(+), 17 deletions(-)
+>  1 file changed, 39 insertions(+), 24 deletions(-)
 >
-> diff --git a/arch/loongarch/include/asm/cpu.h b/arch/loongarch/include/as=
-m/cpu.h
-> index 7c44f4ede3a2..31a2de821236 100644
-> --- a/arch/loongarch/include/asm/cpu.h
-> +++ b/arch/loongarch/include/asm/cpu.h
-> @@ -86,7 +86,7 @@ enum cpu_type_enum {
->  #define CPU_FEATURE_LBT_ARM            11      /* CPU has ARM Binary Tra=
-nslation */
->  #define CPU_FEATURE_LBT_MIPS           12      /* CPU has MIPS Binary Tr=
-anslation */
->  #define CPU_FEATURE_TLB                        13      /* CPU has TLB */
-> -#define CPU_FEATURE_CSR                        14      /* CPU has CSR */
-> +#define CPU_FEATURE_IOCSR              14      /* CPU has IOCSR */
->  #define CPU_FEATURE_WATCH              15      /* CPU has watchpoint reg=
-isters */
->  #define CPU_FEATURE_VINT               16      /* CPU has vectored inter=
-rupts */
->  #define CPU_FEATURE_CSRIPI             17      /* CPU has CSR-IPI */
 > diff --git a/arch/loongarch/kernel/cpu-probe.c b/arch/loongarch/kernel/cp=
 u-probe.c
-> index 4446616d497c..6a82ceb6e321 100644
+> index 6a82ceb6e321..968b5a35a0d2 100644
 > --- a/arch/loongarch/kernel/cpu-probe.c
 > +++ b/arch/loongarch/kernel/cpu-probe.c
-> @@ -91,12 +91,23 @@ static void cpu_probe_common(struct cpuinfo_loongarch=
- *c)
->         unsigned int config;
->         unsigned long asid_mask;
+> @@ -173,22 +173,6 @@ static void cpu_probe_common(struct cpuinfo_loongarc=
+h *c)
+>         if (config & CPUCFG6_PMP)
+>                 c->options |=3D LOONGARCH_CPU_PMP;
 >
-> -       c->options =3D LOONGARCH_CPU_CPUCFG | LOONGARCH_CPU_IOCSR |
-> -                    LOONGARCH_CPU_TLB | LOONGARCH_CPU_VINT | LOONGARCH_C=
-PU_WATCH;
-> +       c->options =3D LOONGARCH_CPU_CPUCFG | LOONGARCH_CPU_VINT |
-> +                    LOONGARCH_CPU_WATCH;
+> -       config =3D iocsr_read32(LOONGARCH_IOCSR_FEATURES);
+> -       if (config & IOCSRF_CSRIPI)
+> -               c->options |=3D LOONGARCH_CPU_CSRIPI;
+> -       if (config & IOCSRF_EXTIOI)
+> -               c->options |=3D LOONGARCH_CPU_EXTIOI;
+> -       if (config & IOCSRF_FREQSCALE)
+> -               c->options |=3D LOONGARCH_CPU_SCALEFREQ;
+> -       if (config & IOCSRF_FLATMODE)
+> -               c->options |=3D LOONGARCH_CPU_FLATMODE;
+> -       if (config & IOCSRF_EIODECODE)
+> -               c->options |=3D LOONGARCH_CPU_EIODECODE;
+> -       if (config & IOCSRF_AVEC)
+> -               c->options |=3D LOONGARCH_CPU_AVECINT;
+> -       if (config & IOCSRF_VM)
+> -               c->options |=3D LOONGARCH_CPU_HYPERVISOR;
+> -
+>         config =3D csr_read32(LOONGARCH_CSR_ASID);
+>         config =3D (config & CSR_ASID_BIT) >> CSR_ASID_BIT_SHIFT;
+>         asid_mask =3D GENMASK(config - 1, 0);
+> @@ -231,16 +215,8 @@ static char cpu_full_name[MAX_NAME_LEN] =3D "       =
+ -        ";
 >
->         elf_hwcap =3D HWCAP_LOONGARCH_CPUCFG;
->
->         config =3D read_cpucfg(LOONGARCH_CPUCFG1);
-> +
-> +       if (config & CPUCFG1_ISGR64)
-> +               set_isa(c, LOONGARCH_CPU_ISA_LA64);
-> +       else if (config & CPUCFG1_ISGR32)
-> +               set_isa(c, LOONGARCH_CPU_ISA_LA32S);
-> +       else
-> +               set_isa(c, LOONGARCH_CPU_ISA_LA32R);
-Switch-case is better than if-else here.
-
-> +       if (config & CPUCFG1_PAGING)
-> +               c->options |=3D LOONGARCH_CPU_TLB;
-> +       if (config & CPUCFG1_IOCSR)
-> +               c->options |=3D LOONGARCH_CPU_IOCSR;
->         if (config & CPUCFG1_UAL) {
->                 c->options |=3D LOONGARCH_CPU_UAL;
->                 elf_hwcap |=3D HWCAP_LOONGARCH_UAL;
-> @@ -222,6 +233,7 @@ static inline void cpu_probe_loongson(struct cpuinfo_=
-loongarch *c, unsigned int
+>  static inline void cpu_probe_loongson(struct cpuinfo_loongarch *c, unsig=
+ned int cpu)
 >  {
->         uint64_t *vendor =3D (void *)(&cpu_full_name[VENDOR_OFFSET]);
->         uint64_t *cpuname =3D (void *)(&cpu_full_name[CPUNAME_OFFSET]);
-> +       const char *core_name =3D "Unknown";
+> -       uint64_t *vendor =3D (void *)(&cpu_full_name[VENDOR_OFFSET]);
+> -       uint64_t *cpuname =3D (void *)(&cpu_full_name[CPUNAME_OFFSET]);
+>         const char *core_name =3D "Unknown";
 >
->         if (!__cpu_full_name[cpu])
->                 __cpu_full_name[cpu] =3D cpu_full_name;
-> @@ -232,40 +244,43 @@ static inline void cpu_probe_loongson(struct cpuinf=
-o_loongarch *c, unsigned int
+> -       if (!__cpu_full_name[cpu])
+> -               __cpu_full_name[cpu] =3D cpu_full_name;
+> -
+> -       *vendor =3D iocsr_read64(LOONGARCH_IOCSR_VENDOR);
+> -       *cpuname =3D iocsr_read64(LOONGARCH_IOCSR_CPUNAME);
+> -
 >         switch (c->processor_id & PRID_SERIES_MASK) {
 >         case PRID_SERIES_LA132:
 >                 c->cputype =3D CPU_LOONGSON32;
-> -               set_isa(c, LOONGARCH_CPU_ISA_LA32S);
->                 __cpu_family[cpu] =3D "Loongson-32bit";
-> -               pr_info("32-bit Loongson Processor probed (LA132 Core)\n"=
-);
-> +               core_name =3D "LA132";
->                 break;
->         case PRID_SERIES_LA264:
->                 c->cputype =3D CPU_LOONGSON64;
-> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->                 __cpu_family[cpu] =3D "Loongson-64bit";
-> -               pr_info("64-bit Loongson Processor probed (LA264 Core)\n"=
-);
-> +               core_name =3D "LA264";
->                 break;
->         case PRID_SERIES_LA364:
->                 c->cputype =3D CPU_LOONGSON64;
-> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->                 __cpu_family[cpu] =3D "Loongson-64bit";
-> -               pr_info("64-bit Loongson Processor probed (LA364 Core)\n"=
-);
-> +               core_name =3D "LA364";
->                 break;
->         case PRID_SERIES_LA464:
->                 c->cputype =3D CPU_LOONGSON64;
-> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->                 __cpu_family[cpu] =3D "Loongson-64bit";
-> -               pr_info("64-bit Loongson Processor probed (LA464 Core)\n"=
-);
-> +               core_name =3D "LA464";
->                 break;
->         case PRID_SERIES_LA664:
->                 c->cputype =3D CPU_LOONGSON64;
-> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->                 __cpu_family[cpu] =3D "Loongson-64bit";
-> -               pr_info("64-bit Loongson Processor probed (LA664 Core)\n"=
-);
-> +               core_name =3D "LA664";
->                 break;
->         default: /* Default to 64 bit */
-> -               c->cputype =3D CPU_LOONGSON64;
-> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
-> -               __cpu_family[cpu] =3D "Loongson-64bit";
-> -               pr_info("64-bit Loongson Processor probed (Unknown Core)\=
-n");
-> +               if (c->isa_level & LOONGARCH_CPU_ISA_LA64) {
-> +                       c->cputype =3D CPU_LOONGSON64;
-> +                       __cpu_family[cpu] =3D "Loongson-64bit";
-> +               } else if (c->isa_level & LOONGARCH_CPU_ISA_LA32S) {
-> +                       c->cputype =3D CPU_LOONGSON32;
-> +                       __cpu_family[cpu] =3D "Loongson-32bit";
-Change the name to "Loongson-32bit Standard".
-
-Huacai
-> +               } else if (c->isa_level & LOONGARCH_CPU_ISA_LA32R) {
-> +                       c->cputype =3D CPU_LOONGSON32;
-> +                       __cpu_family[cpu] =3D "Loongson-32bit Reduced";
-> +               }
->         }
-> +
-> +       pr_info("%s Processor probed (%s Core)\n", __cpu_family[cpu], cor=
+> @@ -283,6 +259,36 @@ static inline void cpu_probe_loongson(struct cpuinfo=
+_loongarch *c, unsigned int
+>         pr_info("%s Processor probed (%s Core)\n", __cpu_family[cpu], cor=
 e_name);
 >  }
 >
+> +static inline void iocsr_probe_loongson(struct cpuinfo_loongarch *c, uns=
+igned int cpu)
+> +{
+> +       uint64_t *vendor =3D (void *)(&cpu_full_name[VENDOR_OFFSET]);
+> +       uint64_t *cpuname =3D (void *)(&cpu_full_name[CPUNAME_OFFSET]);
+> +       unsigned int config;
+> +
+> +       *vendor =3D iocsr_read64(LOONGARCH_IOCSR_VENDOR);
+> +       *cpuname =3D iocsr_read64(LOONGARCH_IOCSR_CPUNAME);
+> +
+> +       if (!__cpu_full_name[cpu])
+> +               __cpu_full_name[cpu] =3D cpu_full_name;
+> +
+> +       config =3D iocsr_read32(LOONGARCH_IOCSR_FEATURES);
+> +       if (config & IOCSRF_CSRIPI)
+> +               c->options |=3D LOONGARCH_CPU_CSRIPI;
+> +       if (config & IOCSRF_EXTIOI)
+> +               c->options |=3D LOONGARCH_CPU_EXTIOI;
+> +       if (config & IOCSRF_FREQSCALE)
+> +               c->options |=3D LOONGARCH_CPU_SCALEFREQ;
+> +       if (config & IOCSRF_FLATMODE)
+> +               c->options |=3D LOONGARCH_CPU_FLATMODE;
+> +       if (config & IOCSRF_EIODECODE)
+> +               c->options |=3D LOONGARCH_CPU_EIODECODE;
+> +       if (config & IOCSRF_AVEC)
+> +               c->options |=3D LOONGARCH_CPU_AVECINT;
+> +       if (config & IOCSRF_VM)
+> +               c->options |=3D LOONGARCH_CPU_HYPERVISOR;
+> +
+> +}
+> +
 >  #ifdef CONFIG_64BIT
+>  /* For use by uaccess.h */
+>  u64 __ua_limit;
+> @@ -331,6 +337,15 @@ void cpu_probe(void)
+>                 break;
+>         }
+>
+> +       if (c->options & LOONGARCH_CPU_IOCSR) {
+> +               switch (c->cputype) {
+> +               case CPU_LOONGSON32:
+> +               case CPU_LOONGSON64:
+> +                       iocsr_probe_loongson(c, cpu);
+> +                       break;
+> +               }
+> +       }
+> +
+>         BUG_ON(!__cpu_family[cpu]);
+>         BUG_ON(c->cputype =3D=3D CPU_UNKNOWN);
+>
 >
 > --
 > 2.46.0
