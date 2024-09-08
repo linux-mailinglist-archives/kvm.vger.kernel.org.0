@@ -1,164 +1,100 @@
-Return-Path: <kvm+bounces-26074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4BBF97065C
-	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 12:01:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2658970701
+	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 13:43:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 703AE2820F4
-	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 10:01:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE2101C212C6
+	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 11:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D7E14C588;
-	Sun,  8 Sep 2024 10:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE101586D0;
+	Sun,  8 Sep 2024 11:43:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="PbBrs4Be";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SSDL4jPd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C9s0byn1"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh2-smtp.messagingengine.com (fhigh2-smtp.messagingengine.com [103.168.172.153])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A541366;
-	Sun,  8 Sep 2024 10:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227951494C2
+	for <kvm@vger.kernel.org>; Sun,  8 Sep 2024 11:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725789672; cv=none; b=ZVdn2fBdfIhOXDcnv7Tv8W9y0EbjRLW/yYkwPrzBhOajKPYmI7cFIATuMKu4tG9M+QRvTg1zSsaKqk/Q8HMlV53ZFPsdYWPqHeaildKWsPq0fM7EHxgxQuvChTmm0p4mBwKkV1W8Q3xsxAcgKQJh5oDClC6m8qqHkP24YRn+Wng=
+	t=1725795779; cv=none; b=REc0JK6+efs7tTLl3zU+PdK3FdiKYnK9qPr1zTk9PjrC1NoSpzJ1Z1dQJA1ECAZgIE+yyB56qY0ZJsiXY7lyazIeaCySkdXSijNwecia7W54mYlBoqC9yUM9qNtX0iq8n3H0qO1wZf/OdrWZ8DpOuf9ehuaS9/a/hF28TcqoB+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725789672; c=relaxed/simple;
-	bh=bHer9k9FqetYzp1LXRd154U8yglaVwUhfSbpANomuu4=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=CkmhO83fsK0xCiEQTSsNOJuLTWF5f/YFpUQmK0OGoohJj2hzKFzzVwRd7dCwlQw00AKGOmQ11LqUm4dkpGrgfd1PbnHgAC+8GbVFR/r9xA3LYKfg72ReScdLBC6yaEUV5fBJNGbw2LHlaxKaRinJrfaRPe5CM7A+QjAjnkHqMSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com; spf=pass smtp.mailfrom=flygoat.com; dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b=PbBrs4Be; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SSDL4jPd; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flygoat.com
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 679A51140060;
-	Sun,  8 Sep 2024 06:01:09 -0400 (EDT)
-Received: from phl-imap-12 ([10.202.2.86])
-  by phl-compute-09.internal (MEProxy); Sun, 08 Sep 2024 06:01:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1725789669;
-	 x=1725876069; bh=bHer9k9FqetYzp1LXRd154U8yglaVwUhfSbpANomuu4=; b=
-	PbBrs4BebfNgbn+MHf+d2+EDi1PR2Lwtki95yZy32RqKvTzfuTsQUZrypWdFRDIS
-	tmZEZXq8ThlIjapPJ6XYYWCYi91jBCsde4nepISD19hdo/Rzq3FTz2Eu4R5Pr/4u
-	j7UfkTfjummDeLmvw440W7KCHasEZ3qswvtMsI4Y/+XqhIBsR5Tx2L43C4qEL6oH
-	x+GLQvtQNN5fV35aMSI9rK8qfRuJnklTomCVabPndk5h/cDfOnRNUnX012/fp5hy
-	vf7uakaGbe07GDam1HnX/MmaXFK8aRov2VDc1lRStKj3h6yN/umHkNtiAJp2rJQj
-	ab+MRnRese+0qFnFxxwOrg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1725789669; x=
-	1725876069; bh=bHer9k9FqetYzp1LXRd154U8yglaVwUhfSbpANomuu4=; b=S
-	SDL4jPdRUbwPgv89PaU1gF6x/0SVrHab0dgHixWieP2qoPpyVsZORI/Djdfm5Bqh
-	7ACz2Py9samQeG2I/B0t0nOHFZojDXLyhlGh3WVjxjw3QuIwmAh757FIsrL4uF18
-	bOfXCjJ35JBtdAU6T2zhcfnEq+YcZaspGgwJjgYxCntU8QA3YmIU0L1rXjf2nqKD
-	68T12HsOTfQcQ6gHoXQd8VMeHtD95Y/2Zw948dalm5oK/Z8YbH6PCffiQFZDuBlU
-	IxbK75JK/fx9X7Z6LKlBp7VewZEHTbfvagBS9rCpKgqoUWg4SwIHtoXSYw1s49V4
-	3kEQ43wwBK10PHCOVPweg==
-X-ME-Sender: <xms:5HXdZpwlDS1mhMA8aJz8KbtxNhasqKCZ0G97rShSAESZgkxFeC11AA>
-    <xme:5HXdZpRHKTo3kr9AGcpesKSwhZ2qoFNoWUsv2WIfY6gDfPmND3dvBJrhRCZKC637q
-    P1Yc4NsZchuHFlUxV8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudeihedgvddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdej
-    necuhfhrohhmpedflfhirgiguhhnucgjrghnghdfuceojhhirgiguhhnrdihrghnghesfh
-    hlhihgohgrthdrtghomheqnecuggftrfgrthhtvghrnhepjeehfeduvddtgffgvdffkeet
-    hefhlefgvdevvdekuefffeekheehgeevhfevteejnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihgohgr
-    thdrtghomhdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtph
-    htthhopehtshgsohhgvghnugesrghlphhhrgdrfhhrrghnkhgvnhdruggvpdhrtghpthht
-    oheptghhvghnhhhurggtrghisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrrghfrg
-    gvlheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvhhirhgvshhhrdhkuhhmrghrsehl
-    ihhnrghrohdrohhrghdprhgtphhtthhopehtghhlgieslhhinhhuthhrohhnihigrdguvg
-    dprhgtphhtthhopehlohhonhhgrghrtghhsehlihhsthhsrdhlihhnuhigrdguvghvpdhr
-    tghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
-    hnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehl
-    ihhnuhigqdhmihhpshesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:5HXdZjXKsiVg0w6__LUADfJytMeo5A4WoNQvia67yR5kq9W8Jmoi0A>
-    <xmx:5HXdZrgii1I_h-w-gR8wS3hexx2c9NS-vXSzX9kWSFdDgFOkwBGozQ>
-    <xmx:5HXdZrDcUvQhwymXVqk5VPhjCz17hA7wRmgyDKLspEsJUf4QY_OiRA>
-    <xmx:5HXdZkKztAxFwWu28RgDAE4gSSV_LYzj3kFiwO7qG8pSOTuVzODCvw>
-    <xmx:5XXdZv766T5NvtEyKkiP7RLpIB-HYvrQDJZ-KN3MvjO9rf6m-9PJ-lIF>
-Feedback-ID: ifd894703:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 97D501C20066; Sun,  8 Sep 2024 06:01:08 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1725795779; c=relaxed/simple;
+	bh=t2sLnkInQWUKNBGiID4AD2togWX10HSlRhLqej6PRdM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SIVp3sgS4LRjcij9S45srxRa4V2tmnGSCQiH27W9UseNvTNcxcozPnpPka9MBDx0YMGq0ljbG73oZ28miy7m4BxK1AXWbNidmV3tD9/i1MglCIUWRDVqVDGEqOos0w8nd5SrNVP01mFxTDkMQLyOcxa92V1DLjubs+YYCbXI738=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C9s0byn1; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725795778; x=1757331778;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=t2sLnkInQWUKNBGiID4AD2togWX10HSlRhLqej6PRdM=;
+  b=C9s0byn1djIEwfqNw1qLfTSV/t2SRRqwdiZnnetpO1KYVOWEKUPKT5AK
+   ch3VGtLEBMZ5pQLRgPxwaEQUhtVgV00QipEYwTTMm5ylDTtUrweqv1YZZ
+   rVHeMn0T9s7HY4CrdOT0gdWEA8EJU7eY3A32Z+R++If+S/zxJ1cQQTKAy
+   WVb4X39g3Vv9rH9fWNnEJn3Xgk9bU9BHSgh4uhi6xNF2s8xdnJXMpc7cz
+   2Ju2o8e3uBbaFW690ihdM+JY6hDup/4TOpw0gkNoF3uodISI/uqCh2Evj
+   YUTZAf+XPsC0kYTcVZSm+wgdFW77xRSi7wgxgKoPgeut/J3Vxoo+4lci7
+   A==;
+X-CSE-ConnectionGUID: h3ZpCCnMSS2oPjWX5Db5Bg==
+X-CSE-MsgGUID: ekpcD0VtQf2kJ3PCWEqBCQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11188"; a="27418265"
+X-IronPort-AV: E=Sophos;i="6.10,212,1719903600"; 
+   d="scan'208";a="27418265"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2024 04:42:58 -0700
+X-CSE-ConnectionGUID: z+zkYa8NTmeLIAV4cQu1IA==
+X-CSE-MsgGUID: Wn6TD4u6R7SeBhRWM+nDRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,212,1719903600"; 
+   d="scan'208";a="89668161"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmviesa002.fm.intel.com with ESMTP; 08 Sep 2024 04:42:57 -0700
+From: Yi Liu <yi.l.liu@intel.com>
+To: joro@8bytes.org,
+	jgg@nvidia.com,
+	kevin.tian@intel.com
+Cc: nicolinc@nvidia.com,
+	kvm@vger.kernel.org,
+	yi.l.liu@intel.com,
+	iommu@lists.linux.dev,
+	baolu.lu@linux.intel.com
+Subject: [PATCH 0/2] iommufd: Misc cleanups per iommufd iopf merging
+Date: Sun,  8 Sep 2024 04:42:54 -0700
+Message-Id: <20240908114256.979518-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sun, 08 Sep 2024 11:00:48 +0100
-From: "Jiaxun Yang" <jiaxun.yang@flygoat.com>
-To: "Huacai Chen" <chenhuacai@kernel.org>
-Cc: "Xuerui Wang" <kernel@xen0n.name>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- "Viresh Kumar" <viresh.kumar@linaro.org>,
- "Thomas Gleixner" <tglx@linutronix.de>,
- "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- kvm@vger.kernel.org
-Message-Id: <5d32c242-2854-4687-876a-312bf24e6aeb@app.fastmail.com>
-In-Reply-To: 
- <CAAhV-H5xejfimHedCpLfh2CRheHJmAXpvcmWpLacyrg5m4EPJA@mail.gmail.com>
-References: <20240907-iocsr-v1-0-0c99b3334444@flygoat.com>
- <20240907-iocsr-v1-3-0c99b3334444@flygoat.com>
- <CAAhV-H5xejfimHedCpLfh2CRheHJmAXpvcmWpLacyrg5m4EPJA@mail.gmail.com>
-Subject: Re: [PATCH 3/5] LoongArch: cpu-probe: Move IOCSR probing out of
- cpu_probe_common
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
+Hi,
 
+Two misc patches per the iommufd iopf merging. Please feel free comment.
 
-=E5=9C=A82024=E5=B9=B49=E6=9C=888=E6=97=A5=E4=B9=9D=E6=9C=88 =E4=B8=8A=E5=
-=8D=883:47=EF=BC=8CHuacai Chen=E5=86=99=E9=81=93=EF=BC=9A
-> Hi, Jiaxun,
->
-> On Sat, Sep 7, 2024 at 6:17=E2=80=AFPM Jiaxun Yang <jiaxun.yang@flygoa=
-t.com> wrote:
->>
->> IOCSR register definition appears to be a platform specific
->> spec instead of architecture spec, even for Loongson CPUs
->> there is no guarantee that IOCSR will always present.
->>
->> Thus it's dangerous to perform IOCSR probing without checking
->> CPU type and instruction availability.
-> I don't think this is necessary. Loongson's Chip engineers confirm
-> that IOCSR is always present in Loongson processors. If other
-> LoongArch (not Loongson) processors have no IOCSR, they should
-> implement their own cpu_probe_abc() instead of cpu_probe_loongson().
+Regards,
+	Yi Liu
 
-Hi Huacai,
+Yi Liu (2):
+  iommufd: Avoid duplicated __iommu_group_set_core_domain() call
+  iommu: Set iommu_attach_handle->domain in core
 
-IOCSR_FEATURE probing process is now in cpu_probe_common, which is shared
-among all PRIDs, that's why it needs to be moved out.
+ drivers/iommu/iommu.c                   | 1 +
+ drivers/iommu/iommufd/fault.c           | 1 -
+ drivers/iommu/iommufd/iommufd_private.h | 4 +++-
+ 3 files changed, 4 insertions(+), 2 deletions(-)
 
-It also prepares for different IOCSR definitions, as you said before IOC=
-SR
-definitions are not guaranteed to be compatible, so if an incompatible
-implementation arise, you can just introduce a new CPU_TYPE for it and
-create a new iocsr_probe function.
+-- 
+2.34.1
 
-Thanks
-- Jiaxun
-
->
-> Huacai
->
->>
->> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-
-
---=20
-- Jiaxun
 
