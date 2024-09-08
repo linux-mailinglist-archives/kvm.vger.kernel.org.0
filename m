@@ -1,209 +1,164 @@
-Return-Path: <kvm+bounces-26073-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26074-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 373C79704E5
-	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 04:47:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4BBF97065C
+	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 12:01:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E359B282618
-	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 02:47:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 703AE2820F4
+	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 10:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F872A8D7;
-	Sun,  8 Sep 2024 02:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D7E14C588;
+	Sun,  8 Sep 2024 10:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4Ybu1ag"
+	dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="PbBrs4Be";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SSDL4jPd"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh2-smtp.messagingengine.com (fhigh2-smtp.messagingengine.com [103.168.172.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E0228FC;
-	Sun,  8 Sep 2024 02:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A541366;
+	Sun,  8 Sep 2024 10:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725763645; cv=none; b=t4r/q0vSjsXLrnOv+pMo6V34pEHd9r0YnUizKY9neyGYii1dnFn3GOlyPHjiNdqUlzeZLWbq6OZjz7uPdtrjUri1Yv8RJhI3nY+R78vXlH1Gj+yDYbsWcWUnTfuZRq9N2LQsWSvMYiBPI3YRiwY+n4/WuNdBQXY22S++Vw/o/iA=
+	t=1725789672; cv=none; b=ZVdn2fBdfIhOXDcnv7Tv8W9y0EbjRLW/yYkwPrzBhOajKPYmI7cFIATuMKu4tG9M+QRvTg1zSsaKqk/Q8HMlV53ZFPsdYWPqHeaildKWsPq0fM7EHxgxQuvChTmm0p4mBwKkV1W8Q3xsxAcgKQJh5oDClC6m8qqHkP24YRn+Wng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725763645; c=relaxed/simple;
-	bh=ver2NE+e9eI6LoOeCL+BOGorY43Bf8AghqCQbR0/sdE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X9Mc5Yqx3bp9/+Xtk+lDptM/qD2PjjvxErZWgVTAGJhua0nu/5oyvGJYhtEjaYTtHdt9rbJy97umDT/yntTS39twyJF+Fva2Hfv0UoqSbe6i1qPa7v2quzjk5tv8H76BEjsu0mKCKLzsstUbeWT3WkYZqvQjFr8H0y6WA+3Y3Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4Ybu1ag; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70365C4CEC8;
-	Sun,  8 Sep 2024 02:47:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725763645;
-	bh=ver2NE+e9eI6LoOeCL+BOGorY43Bf8AghqCQbR0/sdE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=n4Ybu1agCSOtR50BSus8iCt5pgA46FjR5PIOlwkJiHv6vxq00UlVygcp+V3C6wlq8
-	 ggf4hYWSd+zO2skuAiJ48Orjv0XwaGqZDuFHGZbeJUwIBUjf9aD40Oj+AmdnCjl+Ru
-	 G7KXNb8QBJq7K5rEnTQ1ntwJovY5JBwWk33pMLGj0UzAK7csQ1wx4Vd26GyMpJ3fmv
-	 c1TaAHWq3jOrV8y1Pxslc3ZudBZGJ2MFyBPALG2gYbSitFrfy5RRQpnzOo2gA01eyZ
-	 ZVbqhzeWI7YofdhSO0CxsW0vSgs6G8eF+bOpTdKhhmEQMmC6vroSokcZb+NyGWtOxq
-	 /4T/Ur/BuTuuw==
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c26b5f1ea6so3927207a12.0;
-        Sat, 07 Sep 2024 19:47:25 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU9NiOmD8LTTkJt+jQ2RXmMgIwnw8dT+Z0ctCcbmc2xsTvd4SJbvVLzvnVf5bx9ugq0i8dxkVlQF/tajg==@vger.kernel.org, AJvYcCUdgGbXolY7oNwYUeA/IoRuUfvnpL6vK/DThACG9XPWphKXhB5SZvq8qlKy1LCp+5avPjs=@vger.kernel.org, AJvYcCWn886DBpnKeSPm+6hpr8bGOqVkiF1FRN+jQSFyoj+XTmah8oLFw9NMZH9aqpo/VRP5wieiW8hkLFqRIiXr@vger.kernel.org, AJvYcCXv+vVmUx4vPEZACRPswTstHkGnDcInjIRuTF6xaczGd6s+R4gGjnaw+y1RkYKwVibalzZN5Hkf/6I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeYB7QiRGQb0ZuNjkEWC5t4RB8/P8eJxlOY3QcDevpGAq/4cVk
-	HjO5qlKcON9mWMgw7mxZMyqt57tlmYJhpnfzWm81JPrxhWXA8CfciqJYuxRTGfvMODvoYLWCzUQ
-	X3aLXohI1ajgxj7PkiiU7LNFL3t0=
-X-Google-Smtp-Source: AGHT+IEwyc9T81QqXwiwQXiluNuC2/jX/VJDZJOpvJhv+lUAMex8mDzLjDzkw6HhavOfhcSICl+nah3h8ZRmzyL45PI=
-X-Received: by 2002:a05:6402:35c9:b0:5a1:24fc:9a47 with SMTP id
- 4fb4d7f45d1cf-5c3dc7baee7mr5537083a12.27.1725763643967; Sat, 07 Sep 2024
- 19:47:23 -0700 (PDT)
+	s=arc-20240116; t=1725789672; c=relaxed/simple;
+	bh=bHer9k9FqetYzp1LXRd154U8yglaVwUhfSbpANomuu4=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=CkmhO83fsK0xCiEQTSsNOJuLTWF5f/YFpUQmK0OGoohJj2hzKFzzVwRd7dCwlQw00AKGOmQ11LqUm4dkpGrgfd1PbnHgAC+8GbVFR/r9xA3LYKfg72ReScdLBC6yaEUV5fBJNGbw2LHlaxKaRinJrfaRPe5CM7A+QjAjnkHqMSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com; spf=pass smtp.mailfrom=flygoat.com; dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b=PbBrs4Be; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SSDL4jPd; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flygoat.com
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 679A51140060;
+	Sun,  8 Sep 2024 06:01:09 -0400 (EDT)
+Received: from phl-imap-12 ([10.202.2.86])
+  by phl-compute-09.internal (MEProxy); Sun, 08 Sep 2024 06:01:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1725789669;
+	 x=1725876069; bh=bHer9k9FqetYzp1LXRd154U8yglaVwUhfSbpANomuu4=; b=
+	PbBrs4BebfNgbn+MHf+d2+EDi1PR2Lwtki95yZy32RqKvTzfuTsQUZrypWdFRDIS
+	tmZEZXq8ThlIjapPJ6XYYWCYi91jBCsde4nepISD19hdo/Rzq3FTz2Eu4R5Pr/4u
+	j7UfkTfjummDeLmvw440W7KCHasEZ3qswvtMsI4Y/+XqhIBsR5Tx2L43C4qEL6oH
+	x+GLQvtQNN5fV35aMSI9rK8qfRuJnklTomCVabPndk5h/cDfOnRNUnX012/fp5hy
+	vf7uakaGbe07GDam1HnX/MmaXFK8aRov2VDc1lRStKj3h6yN/umHkNtiAJp2rJQj
+	ab+MRnRese+0qFnFxxwOrg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1725789669; x=
+	1725876069; bh=bHer9k9FqetYzp1LXRd154U8yglaVwUhfSbpANomuu4=; b=S
+	SDL4jPdRUbwPgv89PaU1gF6x/0SVrHab0dgHixWieP2qoPpyVsZORI/Djdfm5Bqh
+	7ACz2Py9samQeG2I/B0t0nOHFZojDXLyhlGh3WVjxjw3QuIwmAh757FIsrL4uF18
+	bOfXCjJ35JBtdAU6T2zhcfnEq+YcZaspGgwJjgYxCntU8QA3YmIU0L1rXjf2nqKD
+	68T12HsOTfQcQ6gHoXQd8VMeHtD95Y/2Zw948dalm5oK/Z8YbH6PCffiQFZDuBlU
+	IxbK75JK/fx9X7Z6LKlBp7VewZEHTbfvagBS9rCpKgqoUWg4SwIHtoXSYw1s49V4
+	3kEQ43wwBK10PHCOVPweg==
+X-ME-Sender: <xms:5HXdZpwlDS1mhMA8aJz8KbtxNhasqKCZ0G97rShSAESZgkxFeC11AA>
+    <xme:5HXdZpRHKTo3kr9AGcpesKSwhZ2qoFNoWUsv2WIfY6gDfPmND3dvBJrhRCZKC637q
+    P1Yc4NsZchuHFlUxV8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudeihedgvddvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdej
+    necuhfhrohhmpedflfhirgiguhhnucgjrghnghdfuceojhhirgiguhhnrdihrghnghesfh
+    hlhihgohgrthdrtghomheqnecuggftrfgrthhtvghrnhepjeehfeduvddtgffgvdffkeet
+    hefhlefgvdevvdekuefffeekheehgeevhfevteejnecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihgohgr
+    thdrtghomhdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtph
+    htthhopehtshgsohhgvghnugesrghlphhhrgdrfhhrrghnkhgvnhdruggvpdhrtghpthht
+    oheptghhvghnhhhurggtrghisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrrghfrg
+    gvlheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvhhirhgvshhhrdhkuhhmrghrsehl
+    ihhnrghrohdrohhrghdprhgtphhtthhopehtghhlgieslhhinhhuthhrohhnihigrdguvg
+    dprhgtphhtthhopehlohhonhhgrghrtghhsehlihhsthhsrdhlihhnuhigrdguvghvpdhr
+    tghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
+    hnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehl
+    ihhnuhigqdhmihhpshesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:5HXdZjXKsiVg0w6__LUADfJytMeo5A4WoNQvia67yR5kq9W8Jmoi0A>
+    <xmx:5HXdZrgii1I_h-w-gR8wS3hexx2c9NS-vXSzX9kWSFdDgFOkwBGozQ>
+    <xmx:5HXdZrDcUvQhwymXVqk5VPhjCz17hA7wRmgyDKLspEsJUf4QY_OiRA>
+    <xmx:5HXdZkKztAxFwWu28RgDAE4gSSV_LYzj3kFiwO7qG8pSOTuVzODCvw>
+    <xmx:5XXdZv766T5NvtEyKkiP7RLpIB-HYvrQDJZ-KN3MvjO9rf6m-9PJ-lIF>
+Feedback-ID: ifd894703:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 97D501C20066; Sun,  8 Sep 2024 06:01:08 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240907-iocsr-v1-0-0c99b3334444@flygoat.com> <20240907-iocsr-v1-3-0c99b3334444@flygoat.com>
-In-Reply-To: <20240907-iocsr-v1-3-0c99b3334444@flygoat.com>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 8 Sep 2024 10:47:18 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5xejfimHedCpLfh2CRheHJmAXpvcmWpLacyrg5m4EPJA@mail.gmail.com>
-Message-ID: <CAAhV-H5xejfimHedCpLfh2CRheHJmAXpvcmWpLacyrg5m4EPJA@mail.gmail.com>
-Subject: Re: [PATCH 3/5] LoongArch: cpu-probe: Move IOCSR probing out of cpu_probe_common
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Cc: WANG Xuerui <kernel@xen0n.name>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, 
-	linux-mips@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Date: Sun, 08 Sep 2024 11:00:48 +0100
+From: "Jiaxun Yang" <jiaxun.yang@flygoat.com>
+To: "Huacai Chen" <chenhuacai@kernel.org>
+Cc: "Xuerui Wang" <kernel@xen0n.name>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ "Viresh Kumar" <viresh.kumar@linaro.org>,
+ "Thomas Gleixner" <tglx@linutronix.de>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+ "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+ kvm@vger.kernel.org
+Message-Id: <5d32c242-2854-4687-876a-312bf24e6aeb@app.fastmail.com>
+In-Reply-To: 
+ <CAAhV-H5xejfimHedCpLfh2CRheHJmAXpvcmWpLacyrg5m4EPJA@mail.gmail.com>
+References: <20240907-iocsr-v1-0-0c99b3334444@flygoat.com>
+ <20240907-iocsr-v1-3-0c99b3334444@flygoat.com>
+ <CAAhV-H5xejfimHedCpLfh2CRheHJmAXpvcmWpLacyrg5m4EPJA@mail.gmail.com>
+Subject: Re: [PATCH 3/5] LoongArch: cpu-probe: Move IOCSR probing out of
+ cpu_probe_common
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi, Jiaxun,
 
-On Sat, Sep 7, 2024 at 6:17=E2=80=AFPM Jiaxun Yang <jiaxun.yang@flygoat.com=
-> wrote:
->
-> IOCSR register definition appears to be a platform specific
-> spec instead of architecture spec, even for Loongson CPUs
-> there is no guarantee that IOCSR will always present.
->
-> Thus it's dangerous to perform IOCSR probing without checking
-> CPU type and instruction availability.
-I don't think this is necessary. Loongson's Chip engineers confirm
-that IOCSR is always present in Loongson processors. If other
-LoongArch (not Loongson) processors have no IOCSR, they should
-implement their own cpu_probe_abc() instead of cpu_probe_loongson().
 
-Huacai
+=E5=9C=A82024=E5=B9=B49=E6=9C=888=E6=97=A5=E4=B9=9D=E6=9C=88 =E4=B8=8A=E5=
+=8D=883:47=EF=BC=8CHuacai Chen=E5=86=99=E9=81=93=EF=BC=9A
+> Hi, Jiaxun,
+>
+> On Sat, Sep 7, 2024 at 6:17=E2=80=AFPM Jiaxun Yang <jiaxun.yang@flygoa=
+t.com> wrote:
+>>
+>> IOCSR register definition appears to be a platform specific
+>> spec instead of architecture spec, even for Loongson CPUs
+>> there is no guarantee that IOCSR will always present.
+>>
+>> Thus it's dangerous to perform IOCSR probing without checking
+>> CPU type and instruction availability.
+> I don't think this is necessary. Loongson's Chip engineers confirm
+> that IOCSR is always present in Loongson processors. If other
+> LoongArch (not Loongson) processors have no IOCSR, they should
+> implement their own cpu_probe_abc() instead of cpu_probe_loongson().
+
+Hi Huacai,
+
+IOCSR_FEATURE probing process is now in cpu_probe_common, which is shared
+among all PRIDs, that's why it needs to be moved out.
+
+It also prepares for different IOCSR definitions, as you said before IOC=
+SR
+definitions are not guaranteed to be compatible, so if an incompatible
+implementation arise, you can just introduce a new CPU_TYPE for it and
+create a new iocsr_probe function.
+
+Thanks
+- Jiaxun
 
 >
-> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> ---
->  arch/loongarch/kernel/cpu-probe.c | 63 ++++++++++++++++++++++++---------=
-------
->  1 file changed, 39 insertions(+), 24 deletions(-)
+> Huacai
 >
-> diff --git a/arch/loongarch/kernel/cpu-probe.c b/arch/loongarch/kernel/cp=
-u-probe.c
-> index 6a82ceb6e321..968b5a35a0d2 100644
-> --- a/arch/loongarch/kernel/cpu-probe.c
-> +++ b/arch/loongarch/kernel/cpu-probe.c
-> @@ -173,22 +173,6 @@ static void cpu_probe_common(struct cpuinfo_loongarc=
-h *c)
->         if (config & CPUCFG6_PMP)
->                 c->options |=3D LOONGARCH_CPU_PMP;
->
-> -       config =3D iocsr_read32(LOONGARCH_IOCSR_FEATURES);
-> -       if (config & IOCSRF_CSRIPI)
-> -               c->options |=3D LOONGARCH_CPU_CSRIPI;
-> -       if (config & IOCSRF_EXTIOI)
-> -               c->options |=3D LOONGARCH_CPU_EXTIOI;
-> -       if (config & IOCSRF_FREQSCALE)
-> -               c->options |=3D LOONGARCH_CPU_SCALEFREQ;
-> -       if (config & IOCSRF_FLATMODE)
-> -               c->options |=3D LOONGARCH_CPU_FLATMODE;
-> -       if (config & IOCSRF_EIODECODE)
-> -               c->options |=3D LOONGARCH_CPU_EIODECODE;
-> -       if (config & IOCSRF_AVEC)
-> -               c->options |=3D LOONGARCH_CPU_AVECINT;
-> -       if (config & IOCSRF_VM)
-> -               c->options |=3D LOONGARCH_CPU_HYPERVISOR;
-> -
->         config =3D csr_read32(LOONGARCH_CSR_ASID);
->         config =3D (config & CSR_ASID_BIT) >> CSR_ASID_BIT_SHIFT;
->         asid_mask =3D GENMASK(config - 1, 0);
-> @@ -231,16 +215,8 @@ static char cpu_full_name[MAX_NAME_LEN] =3D "       =
- -        ";
->
->  static inline void cpu_probe_loongson(struct cpuinfo_loongarch *c, unsig=
-ned int cpu)
->  {
-> -       uint64_t *vendor =3D (void *)(&cpu_full_name[VENDOR_OFFSET]);
-> -       uint64_t *cpuname =3D (void *)(&cpu_full_name[CPUNAME_OFFSET]);
->         const char *core_name =3D "Unknown";
->
-> -       if (!__cpu_full_name[cpu])
-> -               __cpu_full_name[cpu] =3D cpu_full_name;
-> -
-> -       *vendor =3D iocsr_read64(LOONGARCH_IOCSR_VENDOR);
-> -       *cpuname =3D iocsr_read64(LOONGARCH_IOCSR_CPUNAME);
-> -
->         switch (c->processor_id & PRID_SERIES_MASK) {
->         case PRID_SERIES_LA132:
->                 c->cputype =3D CPU_LOONGSON32;
-> @@ -283,6 +259,36 @@ static inline void cpu_probe_loongson(struct cpuinfo=
-_loongarch *c, unsigned int
->         pr_info("%s Processor probed (%s Core)\n", __cpu_family[cpu], cor=
-e_name);
->  }
->
-> +static inline void iocsr_probe_loongson(struct cpuinfo_loongarch *c, uns=
-igned int cpu)
-> +{
-> +       uint64_t *vendor =3D (void *)(&cpu_full_name[VENDOR_OFFSET]);
-> +       uint64_t *cpuname =3D (void *)(&cpu_full_name[CPUNAME_OFFSET]);
-> +       unsigned int config;
-> +
-> +       *vendor =3D iocsr_read64(LOONGARCH_IOCSR_VENDOR);
-> +       *cpuname =3D iocsr_read64(LOONGARCH_IOCSR_CPUNAME);
-> +
-> +       if (!__cpu_full_name[cpu])
-> +               __cpu_full_name[cpu] =3D cpu_full_name;
-> +
-> +       config =3D iocsr_read32(LOONGARCH_IOCSR_FEATURES);
-> +       if (config & IOCSRF_CSRIPI)
-> +               c->options |=3D LOONGARCH_CPU_CSRIPI;
-> +       if (config & IOCSRF_EXTIOI)
-> +               c->options |=3D LOONGARCH_CPU_EXTIOI;
-> +       if (config & IOCSRF_FREQSCALE)
-> +               c->options |=3D LOONGARCH_CPU_SCALEFREQ;
-> +       if (config & IOCSRF_FLATMODE)
-> +               c->options |=3D LOONGARCH_CPU_FLATMODE;
-> +       if (config & IOCSRF_EIODECODE)
-> +               c->options |=3D LOONGARCH_CPU_EIODECODE;
-> +       if (config & IOCSRF_AVEC)
-> +               c->options |=3D LOONGARCH_CPU_AVECINT;
-> +       if (config & IOCSRF_VM)
-> +               c->options |=3D LOONGARCH_CPU_HYPERVISOR;
-> +
-> +}
-> +
->  #ifdef CONFIG_64BIT
->  /* For use by uaccess.h */
->  u64 __ua_limit;
-> @@ -331,6 +337,15 @@ void cpu_probe(void)
->                 break;
->         }
->
-> +       if (c->options & LOONGARCH_CPU_IOCSR) {
-> +               switch (c->cputype) {
-> +               case CPU_LOONGSON32:
-> +               case CPU_LOONGSON64:
-> +                       iocsr_probe_loongson(c, cpu);
-> +                       break;
-> +               }
-> +       }
-> +
->         BUG_ON(!__cpu_family[cpu]);
->         BUG_ON(c->cputype =3D=3D CPU_UNKNOWN);
->
->
-> --
-> 2.46.0
->
+>>
+>> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+
+
+--=20
+- Jiaxun
 
