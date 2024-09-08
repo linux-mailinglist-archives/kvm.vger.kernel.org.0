@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-26084-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26085-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 350E1970788
-	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 14:44:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3004597078D
+	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 14:44:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF8271F2109F
-	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 12:44:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B36811F2156D
+	for <lists+kvm@lfdr.de>; Sun,  8 Sep 2024 12:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0003A165EF0;
-	Sun,  8 Sep 2024 12:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8E0166312;
+	Sun,  8 Sep 2024 12:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iEQSXrZr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hj0a8+Uj"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA656158207
-	for <kvm@vger.kernel.org>; Sun,  8 Sep 2024 12:43:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B418158207
+	for <kvm@vger.kernel.org>; Sun,  8 Sep 2024 12:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725799441; cv=none; b=IcY/eEpYaVUY3z98vcDMv9lxOE8cdW7K0627J+X5MoK9nsPEf5sGikrdhsKylRWktemX49WTstqvOkQuY7hydi+mRMyLqN//o3b7k8ytffnkJirsX6Q3orArzybblN2wRXfh66lrjUps3DSJMf+DAbTGE2JjS3EpJVpULWfHM3w=
+	t=1725799446; cv=none; b=bIpJJABrvfq1A4QB55fJbbT8s7dl36CmjoQBRZUyrfTh3sU9zUR9FK4A3vTbskUQrf3IFE5FJtCh5tKCjKt+a19xZ38/F/UqRLka5KrvVOADDxmnzZlYx2BXu/tnj0Iue1BS8gRFM9f+az/dZ1wbi6j0+b1A7+0bej6sb6ub8eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725799441; c=relaxed/simple;
-	bh=BrZawMnp3PVtM7q2OTGYiNtV3fjACaeKSFuVHbGDiaQ=;
+	s=arc-20240116; t=1725799446; c=relaxed/simple;
+	bh=hMYhnFWxXSsAfwWdeOKrX4i9zZGtjRAXTsthyts1mB0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dfYw9PZWYtgKExIQGXr+xeGdnDetKV7Ho4rHEcpPpNWfnOi3ndciyVkqfOiPDCG8IUM/MQtaEPEuze+1axSnsa10OXJqEkJeQDivSSaFZj6Y+DFmBHyLZa33tegQrlv08NEXV1ys4JLN9hoB6x616lnWpGmS8vUJTGdkvYb+kvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iEQSXrZr; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=t12zFDT1bjTYKqa5IWEm7aQnKAYHVrgyvvclJ2k0MluksBQGKdDOoT/8SKw+QuDNdGsuwUy6uBesq+M2Tp3qCSEJjjBdrml02HLOtMV/gL31z5fuD2u8Kfba8/Tw8d8vHKp3WOwBcggedF1k+zZ/o+bvf4rBV/sndVw+bGsZbgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hj0a8+Uj; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725799440; x=1757335440;
+  t=1725799445; x=1757335445;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BrZawMnp3PVtM7q2OTGYiNtV3fjACaeKSFuVHbGDiaQ=;
-  b=iEQSXrZr4Z02ti94myYHfcoIW8NpX/4jGAFrvDqvk6aHBhox8dqnZEbe
-   DL3cYkGAmRzFfvYg9oji0yzyWxo8r2tMKI+iIcsEHFxwD9XthqfIVEMi+
-   cw18ImkZ5TrvMpNnCiWm4AwzIXg/javrI6KA8zCmkRIpx5GUk3hbBkJza
-   zkfyI52ILkG5Km0LWIzf/9dHGOtLDpZh6jrQWR5bro9kRpcHFflB2EGs8
-   qc2COD/gVXp8hzDJKLpWYTM+Fj4AiQCeNYhEhU41LdEoKLGLAw2QZgw68
-   fccflKHgqCEuxddQZRDKS8s2AB2mct0KOz/l0beAyQq63GPLUtPftlZQh
-   A==;
-X-CSE-ConnectionGUID: 2fMwo6l8TZ6VYK65j80m6Q==
-X-CSE-MsgGUID: j8wBrIQ8Rui91nlImbsWPw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11189"; a="28238237"
+  bh=hMYhnFWxXSsAfwWdeOKrX4i9zZGtjRAXTsthyts1mB0=;
+  b=Hj0a8+UjeB9Q73cX3ZTxpJg6zIJv6tWA+/Jc6n5ftCUVCf+7A4el0+ie
+   1jFSOFHF1XZVzO+9Ov3gFT7a41xLksoqPgzlsTqxb91t4ZQn+v4O/eTmT
+   1PakCEfdZfBMmgTloKZHTFnOyg6ZrVDaCGUvH/Bo3+aV1U8e4QkyFmnxS
+   lBRnI6/wlodkzUMTw8hZSfB1VIngECKZUO4N1ibKUQ+8DAAdKG9OcLR/O
+   7AhaR3SNoKgESYlbxKAcOuMDX+Y3Jp3nlUmVN7DjPuRddgDQKt/h8okmN
+   Crd7gDwgOlUUHPLFtqoT8mhhYD4RoyoV/KqwRhUjBiinzXQHdKODjnoXC
+   g==;
+X-CSE-ConnectionGUID: veBPPWY6SXKTXwlk8POKbA==
+X-CSE-MsgGUID: yGknIKSBT7SU3t3Hkn2ekw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11189"; a="28238278"
 X-IronPort-AV: E=Sophos;i="6.10,212,1719903600"; 
-   d="scan'208";a="28238237"
+   d="scan'208";a="28238278"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2024 05:44:00 -0700
-X-CSE-ConnectionGUID: WDHpijXHQzaJkHt2SmF1yQ==
-X-CSE-MsgGUID: e9ixptPWRbKmrxsLHzpRhA==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2024 05:44:05 -0700
+X-CSE-ConnectionGUID: EjDF+9ZNR2CHqN/InLQCtw==
+X-CSE-MsgGUID: RyU6ZH3iQmq7EhvumKf80A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,212,1719903600"; 
-   d="scan'208";a="97196648"
+   d="scan'208";a="97196680"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa001.fm.intel.com with ESMTP; 08 Sep 2024 05:43:54 -0700
+  by fmviesa001.fm.intel.com with ESMTP; 08 Sep 2024 05:43:59 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Igor Mammedov <imammedo@redhat.com>,
@@ -84,9 +84,9 @@ Cc: qemu-devel@nongnu.org,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v2 6/7] i386/cpu: Update cache topology with machine's configuration
-Date: Sun,  8 Sep 2024 20:59:19 +0800
-Message-Id: <20240908125920.1160236-7-zhao1.liu@intel.com>
+Subject: [PATCH v2 7/7] i386/pc: Support cache topology in -machine for PC machine
+Date: Sun,  8 Sep 2024 20:59:20 +0800
+Message-Id: <20240908125920.1160236-8-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240908125920.1160236-1-zhao1.liu@intel.com>
 References: <20240908125920.1160236-1-zhao1.liu@intel.com>
@@ -98,78 +98,86 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-User will configure smp cache topology via -machine smp-cache.
+Allow user to configure l1d, l1i, l2 and l3 cache topologies for PC
+machine.
 
-For this case, update the x86 CPUs' cache topology with user's
-configuration in MachineState.
+Additionally, add the document of "-machine smp-cache" in
+qemu-options.hx.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 Tested-by: Yongwei Ma <yongwei.ma@intel.com>
 ---
-Changes since RFC v2:
- * Used smp_cache array to override cache topology.
- * Wrapped the updating into a function.
----
- target/i386/cpu.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+Changes since Patch v1:
+ * Merged document into this patch. (Markus)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index e9f755000356..6d9f7dc0872a 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -7597,6 +7597,38 @@ static void x86_cpu_hyperv_realize(X86CPU *cpu)
-     cpu->hyperv_limits[2] = 0;
- }
+Changes since RFC v2:
+ * Used cache_supported array.
+---
+ hw/i386/pc.c    |  4 ++++
+ qemu-options.hx | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index ba0ff511836c..d562fd25aad2 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1788,6 +1788,10 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     mc->nvdimm_supported = true;
+     mc->smp_props.dies_supported = true;
+     mc->smp_props.modules_supported = true;
++    mc->smp_props.cache_supported[CACHE_LEVEL_AND_TYPE_L1D] = true;
++    mc->smp_props.cache_supported[CACHE_LEVEL_AND_TYPE_L1I] = true;
++    mc->smp_props.cache_supported[CACHE_LEVEL_AND_TYPE_L2] = true;
++    mc->smp_props.cache_supported[CACHE_LEVEL_AND_TYPE_L3] = true;
+     mc->default_ram_id = "pc.ram";
+     pcmc->default_smbios_ep_type = SMBIOS_ENTRY_POINT_TYPE_AUTO;
  
-+#ifndef CONFIG_USER_ONLY
-+static void x86_cpu_update_smp_cache_topo(MachineState *ms, X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    CpuTopologyLevel level;
-+
-+    level = machine_get_cache_topo_level(ms, CACHE_LEVEL_AND_TYPE_L1D);
-+    if (level != CPU_TOPOLOGY_LEVEL_DEFAULT) {
-+        env->cache_info_cpuid4.l1d_cache->share_level = level;
-+        env->cache_info_amd.l1d_cache->share_level = level;
-+    }
-+
-+    level = machine_get_cache_topo_level(ms, CACHE_LEVEL_AND_TYPE_L1I);
-+    if (level != CPU_TOPOLOGY_LEVEL_DEFAULT) {
-+        env->cache_info_cpuid4.l1i_cache->share_level = level;
-+        env->cache_info_amd.l1i_cache->share_level = level;
-+    }
-+
-+    level = machine_get_cache_topo_level(ms, CACHE_LEVEL_AND_TYPE_L2);
-+    if (level != CPU_TOPOLOGY_LEVEL_DEFAULT) {
-+        env->cache_info_cpuid4.l2_cache->share_level = level;
-+        env->cache_info_amd.l2_cache->share_level = level;
-+    }
-+
-+    level = machine_get_cache_topo_level(ms, CACHE_LEVEL_AND_TYPE_L3);
-+    if (level != CPU_TOPOLOGY_LEVEL_DEFAULT) {
-+        env->cache_info_cpuid4.l3_cache->share_level = level;
-+        env->cache_info_amd.l3_cache->share_level = level;
-+    }
-+}
-+#endif
-+
- static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
- {
-     CPUState *cs = CPU(dev);
-@@ -7821,6 +7853,13 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+diff --git a/qemu-options.hx b/qemu-options.hx
+index d94e2cbbaeb1..3936ff3e77f9 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -39,7 +39,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+     "                memory-encryption=@var{} memory encryption object to use (default=none)\n"
+     "                hmat=on|off controls ACPI HMAT support (default=off)\n"
+     "                memory-backend='backend-id' specifies explicitly provided backend for main RAM (default=none)\n"
+-    "                cxl-fmw.0.targets.0=firsttarget,cxl-fmw.0.targets.1=secondtarget,cxl-fmw.0.size=size[,cxl-fmw.0.interleave-granularity=granularity]\n",
++    "                cxl-fmw.0.targets.0=firsttarget,cxl-fmw.0.targets.1=secondtarget,cxl-fmw.0.size=size[,cxl-fmw.0.interleave-granularity=granularity]\n"
++    "                smp-cache.0.cache=cachename,smp-cache.0.topology=topologylevel\n",
+     QEMU_ARCH_ALL)
+ SRST
+ ``-machine [type=]name[,prop=value[,...]]``
+@@ -159,6 +160,31 @@ SRST
+         ::
  
- #ifndef CONFIG_USER_ONLY
-     MachineState *ms = MACHINE(qdev_get_machine());
+             -machine cxl-fmw.0.targets.0=cxl.0,cxl-fmw.0.targets.1=cxl.1,cxl-fmw.0.size=128G,cxl-fmw.0.interleave-granularity=512
 +
-+    /*
-+     * TODO: Add a SMPCompatProps.has_caches flag to avoid useless Updates
-+     * if user didn't set smp_cache.
-+     */
-+    x86_cpu_update_smp_cache_topo(ms, cpu);
++    ``smp-cache.0.cache=cachename,smp-cache.0.topology=topologylevel``
++        Define cache properties (now only the cache topology level) for SMP
++        system.
 +
-     qemu_register_reset(x86_cpu_machine_reset_cb, cpu);
++        ``cache=cachename`` specifies the cache that the properties will be
++        applied on. This field is the combination of cache level and cache
++        type. Currently it supports ``l1d`` (L1 data cache), ``l1i`` (L1
++        instruction cache), ``l2`` (L2 unified cache) and ``l3`` (L3 unified
++        cache).
++
++        ``topology=topologylevel`` sets the cache topology level. It accepts
++        CPU topology levels including ``thread``, ``core``, ``module``,
++        ``cluster``, ``die``, ``socket``, ``book``, ``drawer`` and a special
++        value ``default``. If ``default`` is set, then the cache topology will
++        follow the architecture's default cache topology model. If other CPU
++        topology level is set, the cache will be shared at corresponding CPU
++        topology level. For example, ``topology=core`` makes the cache shared
++        in a core.
++
++        Example:
++
++        ::
++
++            -machine smp-cache.0.cache=l1d,smp-cache.0.topology=core,smp-cache.1.cache=l1i,smp-cache.1.topology=core
+ ERST
  
-     if (cpu->env.features[FEAT_1_EDX] & CPUID_APIC || ms->smp.cpus > 1) {
+ DEF("M", HAS_ARG, QEMU_OPTION_M,
 -- 
 2.34.1
 
