@@ -1,168 +1,142 @@
-Return-Path: <kvm+bounces-26140-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26141-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00CCE971EBE
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 18:07:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC50C971F36
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 18:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64B41B22107
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 16:07:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A780284AC5
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 16:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91124139D1B;
-	Mon,  9 Sep 2024 16:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B2214B06C;
+	Mon,  9 Sep 2024 16:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XxrsWFrP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ke50+5vv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683B31BC40
-	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 16:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0CB14B964;
+	Mon,  9 Sep 2024 16:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725898057; cv=none; b=OHIDQhxbcNDQSQcSXWGQRhHqkKqQUjQM5kzVhdzx9V5g3g7qCNs/mH2T1jPVqzfZP1SjKdTL3QzsxxKEFwi6+HAH8XbHfP9AzpjrqX39tfuxLkC0E88ZWVOgrSNr7vMESHM/ncvYbyA11p03w4Sytp2wjLrSlDUV/nlfaFcIiAw=
+	t=1725899331; cv=none; b=Di9fvRsaiwCn7x5G/jXG1cFeVfFxV5stuqdG1/ndLjC4IPLA/Up0vmdgpMs69pRliguBDbAluAc7txMoXinN5/KmtCt/KhG753aamqhPA8d620WKlJP5kw5nEM8u8lgz0P17V/ztl8y1kuAKoCafntKr/ZMGszAdZKngP4rF/Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725898057; c=relaxed/simple;
-	bh=f6yvKNsFjmjzWxrkN5lhYMejTXn6xE6/txpSzmpV8dU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ISjOSrC7wm0r29zGUZweb+0AEp3mK6V733BJPnSwsn9rguc3mjuWBJg5D8c1NNs6NY7aedg1IrDUu/081oOt81OzJCn8iOBNEPye9rvzSlrxCUCCCovXyezeyieoPAoXD7e9WfW6YenTjVeONr+qkFd/E5ex8L/Ziuk70k7+nAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XxrsWFrP; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2d876431c4aso4750228a91.0
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 09:07:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725898056; x=1726502856; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IOkcFs26faVAy+v5vuvM4jOtiHbzcdzkj3w0oqgWGOA=;
-        b=XxrsWFrPqWMbZ/JaQBAYM0+gAK3AgT0DyiZu+bTmV8ZUU9OXpdaPuhjbewQzj61Zat
-         14qoNaM2mYJXSivJP3ZzFYBsgfrpjobQay64D48cyt2aZgxQVRqb8Z/vMq/glXbIR5+i
-         ZJ/PjU+K/OTev86yyt17IKUBjG0ygEbL2jiov/Mn4551P1wHjDvjjGvO/LSGDmfcHQaM
-         wnngzP+vZCKs0VwTZYjvnn+ynO4EwpeMyR3LMKu4DM+yZ0070BmJUhsAu/f7Gi6E/lDA
-         +FZaaT7JrJcI6vcDfis667RyEkXCillPptCreGonz2fB4T3YEk7q+Y+WDFpDMMDGfXBK
-         NxNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725898056; x=1726502856;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IOkcFs26faVAy+v5vuvM4jOtiHbzcdzkj3w0oqgWGOA=;
-        b=hVDp54fhvQ4Hh4iWglUuHk+ADnK5yfFMfXfpuM1OaisfkDOjN0Iw9X7IcflBtcshfv
-         yj1w/wN1jdYeYl+sIRhVrYzajGno7eLEZgGtr1uZilyJy/Sgbdtb4KOSV7RMQseY3sQy
-         +Rasiwye0PUy6Zd6UL9VOjZvnY1AhRGIynJrN9gGwOzpQy5laohaNU8vz1NFv+/A+sqI
-         8hAi21oGbHzIGM+0eDfHpK3RnZKLmqjw6FWvXrJnLl+IYjXbdAhGI/Ui5etkp+vZT0Z5
-         59AXyJOj0hMzfrJVulYBcUK9HIGvvA3xEUqzFK/V0Barun/aXiehJZXlbP2nBJ5l0KnY
-         WPVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWiNi6JeFGbm+ZN1xsbyJXkl6urqISl7+HfqZqxGh4eyu2gmXlkzQrzwBerYmlgL6SOtLw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDBOqtb9Au+IiNG5VGfYTBBILDiG1GakySMvJ+RoQMG2RwCt3x
-	wW/3BwaI4svfDzv0JDMIOu0NDjIch2HwaB1IBS29nSJedejIQFx6C0zZjMv+2cIjOhvYvv7mVmi
-	HnQ==
-X-Google-Smtp-Source: AGHT+IGdS5AEspkaZ5HysEAAR8XN5A9j9iYho87mTahmA+y1bRLz6oeeqrWw8yM7G4QQcl3nJY5hkgKGlW8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1481:b0:2d8:bd72:c5e5 with SMTP id
- 98e67ed59e1d1-2dad4b82644mr27082a91.0.1725898055523; Mon, 09 Sep 2024
- 09:07:35 -0700 (PDT)
-Date: Mon, 9 Sep 2024 09:07:33 -0700
-In-Reply-To: <20240904030751.117579-5-rick.p.edgecombe@intel.com>
+	s=arc-20240116; t=1725899331; c=relaxed/simple;
+	bh=1XuRPIq83tCtJrBYSVOi/pW6Bd+pY01UHZdp1oKSDnA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LilQe9/GP/Y4Qlo1Fbqimc1Y3tkSVB3ybQGXVb5VbxlqMgmMir+AX99BPV9T0oZ/rDSe5fBWb7oQusqEzQCACgHI7T5Sc6n6SY0SWwPbTRr1dJnvUqSCBHE9grCmsVGvYk8x9z30emulg34/38f9MXwDbVZTXe9Uv+VafIu+Vf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ke50+5vv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CC38C4CECE;
+	Mon,  9 Sep 2024 16:28:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725899331;
+	bh=1XuRPIq83tCtJrBYSVOi/pW6Bd+pY01UHZdp1oKSDnA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ke50+5vvyBYGwfCbkMGu4lOUnHyZ8fTY1FgcdBDHi7TcKd59GTP9Slvmhd0g8dbH4
+	 8ViJtZKrVmqVs0DaRD6kkCv29m6rY9NygnKCyoJH8IvIWCIAUuRhjU7856ty+RYpKm
+	 QPgt57HeDgKbjEen0VS5X4/IJ+vVZ9snbLFPKO2OekHbaSvJT29+pdzvfXJcIjRixF
+	 8sE3gz0pIQSFVq5x3ngVWHtGziwwU9OUCTy9EiDs+h/fKt+VTlVMjVovhg1Bo6qeq9
+	 f0D7NwMavnBZBzeDo4OY2R26tYLA5FBVnh8lSePWV99Ejl5tDfHnKg1VEi3Rkiq5RC
+	 F4Fa4T3TCuMxQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1snhFw-00BAZc-Q1;
+	Mon, 09 Sep 2024 17:28:49 +0100
+Date: Mon, 09 Sep 2024 17:28:48 +0100
+Message-ID: <864j6o94fz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	Sebastian Ott <sebott@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	"Suzuki\
+ K Poulose" <suzuki.poulose@arm.com>,
+	yuzenghui <yuzenghui@huawei.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Shaoqin Huang
+	<shahuang@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	"Wangzhou (B)"
+	<wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v5 07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID register
+In-Reply-To: <0db19a081d9e41f08b0043baeef16f16@huawei.com>
+References: <20240619174036.483943-1-oliver.upton@linux.dev>
+	<20240619174036.483943-8-oliver.upton@linux.dev>
+	<0db19a081d9e41f08b0043baeef16f16@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240904030751.117579-1-rick.p.edgecombe@intel.com> <20240904030751.117579-5-rick.p.edgecombe@intel.com>
-Message-ID: <Zt8dRVdkT2rU31jq@google.com>
-Subject: Re: [PATCH 04/21] KVM: VMX: Split out guts of EPT violation to
- common/exposed function
-From: Sean Christopherson <seanjc@google.com>
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com, 
-	dmatlack@google.com, isaku.yamahata@gmail.com, yan.y.zhao@intel.com, 
-	nik.borisov@suse.com, linux-kernel@vger.kernel.org, 
-	Binbin Wu <binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, sebott@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, shahuang@redhat.com, eric.auger@redhat.com, wangzhou1@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Sep 03, 2024, Rick Edgecombe wrote:
-> +static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
-> +					     unsigned long exit_qualification)
-> +{
-> +	u64 error_code;
-> +
-> +	/* Is it a read fault? */
-> +	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
-> +		     ? PFERR_USER_MASK : 0;
-> +	/* Is it a write fault? */
-> +	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
-> +		      ? PFERR_WRITE_MASK : 0;
-> +	/* Is it a fetch fault? */
-> +	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
-> +		      ? PFERR_FETCH_MASK : 0;
-> +	/* ept page table entry is present? */
-> +	error_code |= (exit_qualification & EPT_VIOLATION_RWX_MASK)
-> +		      ? PFERR_PRESENT_MASK : 0;
-> +
-> +	if (error_code & EPT_VIOLATION_GVA_IS_VALID)
-> +		error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) ?
-> +			      PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
-> +
-> +	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-> +}
-> +
-> +#endif /* __KVM_X86_VMX_COMMON_H */
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 5e7b5732f35d..ade7666febe9 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -53,6 +53,7 @@
->  #include <trace/events/ipi.h>
->  
->  #include "capabilities.h"
-> +#include "common.h"
->  #include "cpuid.h"
->  #include "hyperv.h"
->  #include "kvm_onhyperv.h"
-> @@ -5771,11 +5772,8 @@ static int handle_task_switch(struct kvm_vcpu *vcpu)
->  
->  static int handle_ept_violation(struct kvm_vcpu *vcpu)
->  {
-> -	unsigned long exit_qualification;
-> +	unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
->  	gpa_t gpa;
-> -	u64 error_code;
-> -
-> -	exit_qualification = vmx_get_exit_qual(vcpu);
->  
->  	/*
->  	 * EPT violation happened while executing iret from NMI,
-> @@ -5791,23 +5789,6 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
->  	gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
->  	trace_kvm_page_fault(vcpu, gpa, exit_qualification);
->  
-> -	/* Is it a read fault? */
-> -	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
-> -		     ? PFERR_USER_MASK : 0;
-> -	/* Is it a write fault? */
-> -	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
-> -		      ? PFERR_WRITE_MASK : 0;
-> -	/* Is it a fetch fault? */
-> -	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
-> -		      ? PFERR_FETCH_MASK : 0;
-> -	/* ept page table entry is present? */
-> -	error_code |= (exit_qualification & EPT_VIOLATION_RWX_MASK)
-> -		      ? PFERR_PRESENT_MASK : 0;
-> -
-> -	if (error_code & EPT_VIOLATION_GVA_IS_VALID)
-> -		error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) ?
-> -			      PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
-> -
+Hi Shameer,
 
-Paolo, are you planning on queueing these for 6.12, or for a later kernel?  I ask
-because this will conflict with a bug fix[*] that I am planning on taking through
-kvm-x86/mmu.  If you anticipate merging these in 6.12, then it'd probably be best
-for you to grab that one patch directly, as I don't think it has semantic conflicts
-with anything else in that series.
+On Mon, 09 Sep 2024 16:19:54 +0100,
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+> 
+> Hi Oliver/Sebastian,
+> 
+> > -----Original Message-----
+> > From: Oliver Upton <oliver.upton@linux.dev>
+> > Sent: Wednesday, June 19, 2024 6:41 PM
+> > To: kvmarm@lists.linux.dev
+> > Cc: Marc Zyngier <maz@kernel.org>; James Morse
+> > <james.morse@arm.com>; Suzuki K Poulose <suzuki.poulose@arm.com>;
+> > yuzenghui <yuzenghui@huawei.com>; kvm@vger.kernel.org; Sebastian Ott
+> > <sebott@redhat.com>; Shaoqin Huang <shahuang@redhat.com>; Eric Auger
+> > <eric.auger@redhat.com>; Oliver Upton <oliver.upton@linux.dev>
+> > Subject: [PATCH v5 07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID
+> > register
+> 
+> [...] 
+>  
+> > @@ -2487,7 +2490,10 @@ static const struct sys_reg_desc sys_reg_descs[] =
+> > {
+> >  	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
+> >  	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
+> >  	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown,
+> > CSSELR_EL1 },
+> > -	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
+> > +	ID_WRITABLE(CTR_EL0, CTR_EL0_DIC_MASK |
+> > +			     CTR_EL0_IDC_MASK |
+> > +			     CTR_EL0_DminLine_MASK |
+> > +			     CTR_EL0_IminLine_MASK),
+> 
+> (Sorry if this was discussed earlier, but I couldn't locate it anywhere.)
+> 
+> Is there a reason why we can't make the L1Ip writable as well here?
+> We do have hardware that reports VIPT and PIPT for L11p.
+> 
+> The comment here states,
+> https://elixir.bootlin.com/linux/v6.11-rc7/source/arch/arm64/kernel/cpufeature.c#L489
+> 
+> " If we have differing I-cache policies, report it as the weakest - VIPT."
+> 
+> Does this also mean it is safe to downgrade the PIPT to VIPT for Guest as well?
 
-[*] https://lore.kernel.org/all/20240831001538.336683-2-seanjc@google.com
+It should be safe, as a PIPT CMO always does at least the same as
+VIPT, and potentially more if there is aliasing.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
