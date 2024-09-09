@@ -1,136 +1,219 @@
-Return-Path: <kvm+bounces-26150-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26151-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ADB3972265
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 21:12:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B806972317
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 22:02:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAE501F2495A
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 19:12:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01A2F28545B
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 20:02:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96121189F47;
-	Mon,  9 Sep 2024 19:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5FF189F39;
+	Mon,  9 Sep 2024 20:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KM+lRaaR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eNG4/Jbq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7DE189B84
-	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 19:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D869773440
+	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 20:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725909116; cv=none; b=jFktj+A7z3oviMcHj9eliCtAVZW9NFkwvHKmMStvse3nhLp6MQySgtLQaPb9rj2jT/xqFj23yfpbJjy2vGuo+3CE8a9/Gk0Cm5+inN24hA0sGO0sSk1aKNvLXZ0vG3+L7BRaufxVjMvieL50PG4gRo8Omxndkwa1DB8s8pYjpFc=
+	t=1725912147; cv=none; b=mNF1RKmR0E5nYZACmH7MV9TQhibfnzLbtdRwyEVF8Em4VJ+F0V6pfEh1cHuyuCam87ujlF4DHVaXVQcKB+9+sGREhutyak5UJUNrJMH8DxXJkpbOkRvhsudiqb5xKKAysDiGy+NyCxsD1hXol7ABXEHGa9aa7y2MOKJtgSWmWRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725909116; c=relaxed/simple;
-	bh=A6d4YMiwN1Ngb6IzbjbrTIXlacqKp7Jq6KjY6cUl9Z8=;
+	s=arc-20240116; t=1725912147; c=relaxed/simple;
+	bh=1ODmmtnmvSE5XRGtj8DOvZPJXzuhlWwoNiUgJyWhAbo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VYn8T9XJe3DODAPn3SfoZsXNzTFYFd/VAaeQ/2lvZZg93RCRvKarXcVTf+JZylZjhsveM+Gaapp9sQ0OonLBS5IAMen44LVKIzl5Y6+CL275v4eSC6gmnUttVshBtb3vEsuM97nuvSxobN3yJjomUaRyh8lqmLpjuimIpsYvqYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KM+lRaaR; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=TMlq0pfRIEXEOurqPMrdsu0UKu3g1IZx6/aN/XCih0a2ytyRJFoWNj7WGxAqOg2CYfyyUQPFAAbvQnT3Ce0qXkCTpqQkbqVjGYEW1SCyHZz8xCJKRFUTWUq8qmN4KCPIJHma/AWCcArgMDrW7QPwIabbNQlaUOgsJ1z7Mycq8Mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eNG4/Jbq; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6d3aa5a6715so129309187b3.2
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 12:11:55 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7178f096d62so5277629b3a.2
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 13:02:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725909114; x=1726513914; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IDOUAU5NoY/5ttFNtEIaS5qbTX/scaI3qhxTGLdCCYs=;
-        b=KM+lRaaR4ZFa0+TjgPoB9bOdG7EhwngNHPgygL7lnsG79uyLQS8voLe7zNjnZBvHri
-         EJn6R/aCcNn8PB6IFIfMzfr7d2HCsrH+ddNRy9PhFgQJqWVU6aNxiPvM6G6jNAcbOipv
-         mqn1eF0miXmT5cUZckzzwC2PKNEFlUvn7700Xthiru/ZYIJmRh7H5ZALrqJr/crWOHcu
-         nXCpTzvIuD8R/EOoPJsLGoLXcHh5LjNEBCvPuto4Eult28rvOKn/SpbuyeEha5mZqse/
-         DUS4o4yUeaJgj3RQ/RU5M8PcEpT7+XLEcUZBD1GdyxKboImAsSvy61v436neZal4dBXT
-         fKdQ==
+        d=google.com; s=20230601; t=1725912145; x=1726516945; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rr+lD+q3Ps7g7hEL9ueNYiUSI8mUGp2LqUsSmeSLAjw=;
+        b=eNG4/JbqhSgDgN0Laaho070Fb8E5X4hHpJeqIiQ24DCt9maA1HdAKjky1VcZ2upk9V
+         8gykxCeW/CFouF+CE0s73XfswwiBafWQ38YeI3L+IN+RMk73wDWCVg1k2DZ9p/WvYEsB
+         /kIQD0VraZo9Z063ugZv/YwsquLKUFHMNIFsCsVwpb74icOfzfuqrJOHUE/S0YXvYxqu
+         pbn5Jhu2dHvARgVpsDjDAunWtdw7To6C7jfG4AEOUVseoLfEUZEEA/3or1+qtqnl/cCH
+         tuKBt2XNWl0ZypIvZgEXtwIKq9Z/Glk7emRQycrWgFSbh/TTvL2Tl9RpjuIKLHbyFlos
+         uyJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725909114; x=1726513914;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IDOUAU5NoY/5ttFNtEIaS5qbTX/scaI3qhxTGLdCCYs=;
-        b=MlE6FCxH2bxLswQ3Us47BVJz1NNkv5/zdspRteJILkc/RhHUL1rTdVANO+hYes1wiZ
-         56e9Tv5NiAYOI62nUfcYZGSTXiPQp3brj8QVyq3VuhoC0nViWhM/kdeW4jCwNWwHmiyu
-         mrHEex0AYARaW+0p4cKPL0kYG4dNTffAFn7JAtQMG3VmJwosIKd1dEFmxrWCWmxL2TSO
-         c/Q6EPnl/fEIjf4YZUT6vndpwTRoKV68fqYrA54Rf0bZgrZvX51XUN8Z5D+/D6m5YotM
-         FnnOdKec6PkGWJE3jWd/b/7qdncEEGK7faXmTVPu0G56TnGV2QlYldO4p2xc7nMf34Hb
-         g/XQ==
-X-Gm-Message-State: AOJu0YzFddAD3FF2zzcgOXqpHMpLeR9TcXFbZIF5Y5xbwr75XlsLDjpC
-	DEBxoWh9v+QycAPAFLQDALHuFIn2BNDHIR7ZoAiC9dlhltCn5NlJyijeVThJZp9SL4n1wuHyWJa
-	Cqg==
-X-Google-Smtp-Source: AGHT+IHKozrySUUnjFM9Wne1J6W1t09r2ku4UPIzfqFg+dsqZQj0VDFOASjMwcQRafyt8IUivgBITF2eZAg=
+        d=1e100.net; s=20230601; t=1725912145; x=1726516945;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rr+lD+q3Ps7g7hEL9ueNYiUSI8mUGp2LqUsSmeSLAjw=;
+        b=coCGDu/uVxJQQUHcJLeJ22ugK4RM2yjR5L4qKcZVWvp4ySfrfAda8PUTGDfhytUmzB
+         tRgE2mN+CTQ1fx05Eyf7PCKm6t1yWmLjp3NETTGBI4f1CZWKvDQu17eHf5UjA5IDmj+l
+         /sc4spsAfYPSZwuUsFUp38uLiu4X1SLmAn+mxvLVVDRVxSkNXa/AIrNzPOlR0BwC8LN8
+         017oVw+qeFgry3scpb1ZzqGgXknTDX+lpan2QILNLh+fpTfrX3hBJcLQ/jXMTBqHzchR
+         8G12+KwQngi4MHgO+WgtZKlQCq9JTW3NUcxW2CdxgeENvdkejcN0S3p1GDlbRsPps2PG
+         6hIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQIJeSCEUdGzNnKW/YY85Ij37dbPi9Lc1qZJ1cM4vKOtI4XTKvMX2qctO1oTRTpRkIr9I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWe2pR8PTORn+/pgfvUh8A4ZT4q+qyz0a3KcEqai6iGiQQqF7n
+	pzh/y1RYICpsyx/Pl1olTH/CkQteKWu9Ysjdvbgpff20nonmo9Nr4l8EW0c9BR0KW/lfPtwcsV0
+	t+g==
+X-Google-Smtp-Source: AGHT+IG1s1GuYsk1z43Z4CzStskFM+tIz4IfpgT/98Yn34azkMBxGxNrVMhcaLocwmoIBYFDNo8i5Y6ja+0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6a04:b0:6c1:298e:5a7 with SMTP id
- 00721157ae682-6db4516f4a1mr4349037b3.5.1725909114342; Mon, 09 Sep 2024
- 12:11:54 -0700 (PDT)
-Date: Mon, 9 Sep 2024 12:11:52 -0700
-In-Reply-To: <DA40912C-CACC-4273-95B8-60AC67DFE317@nutanix.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2f8d:b0:717:9643:2043 with SMTP id
+ d2e1a72fcca58-718d5f2eb5fmr29044b3a.4.1725912144952; Mon, 09 Sep 2024
+ 13:02:24 -0700 (PDT)
+Date: Mon, 9 Sep 2024 13:02:23 -0700
+In-Reply-To: <CADrL8HWACwbzraG=MbDoORJ8ramDxb-h9yb0p4nx9-wq4o3c6A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <DA40912C-CACC-4273-95B8-60AC67DFE317@nutanix.com>
-Message-ID: <Zt9IeD_15ZsFElIa@google.com>
-Subject: Re: KVM: x86: __wait_lapic_expire silently using TPAUSE C0.2
+References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-20-seanjc@google.com>
+ <CADrL8HWACwbzraG=MbDoORJ8ramDxb-h9yb0p4nx9-wq4o3c6A@mail.gmail.com>
+Message-ID: <Zt9UT74XkezVpTuK@google.com>
+Subject: Re: [PATCH 19/22] KVM: x86/mmu: Add infrastructure to allow walking
+ rmaps outside of mmu_lock
 From: Sean Christopherson <seanjc@google.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: "kvm @ vger . kernel . org" <kvm@vger.kernel.org>, 
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>, Fenghua Yu <fenghua.yu@intel.com>, 
-	"kyung.min.park@intel.com" <kyung.min.park@intel.com>, Tony Luck <tony.luck@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 06, 2024, Jon Kohler wrote:
-> delay_halt_fn uses __tpause() with TPAUSE_C02_STATE, which is the power
-> optimized version of tpause, which according to documentation [3] is
-> a slower wakeup latency and higher power savings, with an added benefit
-> of being more SMT yield friendly.
-> 
-> For datacenter, latency sensitive workloads, this is problematic as
-> the call to kvm_wait_lapic_expire happens directly prior to reentry
-> through vmx_vcpu_enter_exit, which is the exact wrong place for slow
-> wakeup latency.
+On Mon, Sep 09, 2024, James Houghton wrote:
+> On Fri, Aug 9, 2024 at 12:44=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > +/*
+> > + * rmaps and PTE lists are mostly protected by mmu_lock (the shadow MM=
+U always
+> > + * operates with mmu_lock held for write), but rmaps can be walked wit=
+hout
+> > + * holding mmu_lock so long as the caller can tolerate SPTEs in the rm=
+ap chain
+> > + * being zapped/dropped _while the rmap is locked_.
+> > + *
+> > + * Other than the KVM_RMAP_LOCKED flag, modifications to rmap entries =
+must be
+> > + * done while holding mmu_lock for write.  This allows a task walking =
+rmaps
+> > + * without holding mmu_lock to concurrently walk the same entries as a=
+ task
+> > + * that is holding mmu_lock but _not_ the rmap lock.  Neither task wil=
+l modify
+> > + * the rmaps, thus the walks are stable.
+> > + *
+> > + * As alluded to above, SPTEs in rmaps are _not_ protected by KVM_RMAP=
+_LOCKED,
+> > + * only the rmap chains themselves are protected.  E.g. holding an rma=
+p's lock
+> > + * ensures all "struct pte_list_desc" fields are stable.
+>=20
+> This last sentence makes me think we need to be careful about memory orde=
+ring.
+>=20
+> > + */
+> > +#define KVM_RMAP_LOCKED        BIT(1)
+> > +
+> > +static unsigned long kvm_rmap_lock(struct kvm_rmap_head *rmap_head)
+> > +{
+> > +       unsigned long old_val, new_val;
+> > +
+> > +       old_val =3D READ_ONCE(rmap_head->val);
+> > +       if (!old_val)
+> > +               return 0;
+> > +
+> > +       do {
+> > +               /*
+> > +                * If the rmap is locked, wait for it to be unlocked be=
+fore
+> > +                * trying acquire the lock, e.g. to bounce the cache li=
+ne.
+> > +                */
+> > +               while (old_val & KVM_RMAP_LOCKED) {
+> > +                       old_val =3D READ_ONCE(rmap_head->val);
+> > +                       cpu_relax();
+> > +               }
+> > +
+> > +               /*
+> > +                * Recheck for an empty rmap, it may have been purged b=
+y the
+> > +                * task that held the lock.
+> > +                */
+> > +               if (!old_val)
+> > +                       return 0;
+> > +
+> > +               new_val =3D old_val | KVM_RMAP_LOCKED;
+> > +       } while (!try_cmpxchg(&rmap_head->val, &old_val, new_val));
+>=20
+> I think we (technically) need an smp_rmb() here. I think cmpxchg
+> implicitly has that on x86 (and this code is x86-only), but should we
+> nonetheless document that we need smp_rmb() (if it indeed required)?
+> Perhaps we could/should condition the smp_rmb() on `if (old_val)`.
 
-...
+Hmm, no, not smp_rmb().  If anything, the appropriate barrier here would be
+smp_mb__after_spinlock(), but I'm pretty sure even that is misleading, and =
+arguably
+even wrong.
 
-> So, with all of that said, there are a few things that could be done,
-> and I'm definitely open to ideas:
-> 1. Update delay_halt_tpause to use TPAUSE_C01_STATE unilaterally, which
-> anecdotally seems inline with the spirit of how AMD implemented
-> MWAITX, which uses the same delay_halt loop, and calls mwaitx with
-> MWAITX_DISABLE_CSTATES. 
-> 2. Provide system level configurability to delay.c to optionally use
-> C01 as a config knob, maybe a compile leve setting? That way distros
-> aiming at low energy deployments could use that, but otherwise
-> default is low latency instead?
-> 3. Provide some different delay API that KVM could call, indicating it
-> wants low wakeup latency delays, if hardware supports it?
-> 4. Pull this code into kvm code directly (boooooo?) and manage it
-> directly instead of using delay.c (boooooo?)
-> 5. Something else?
+For the !old_val case, there is a address/data dependency that can't be bro=
+ken by
+the CPU without violating the x86 memory model (all future actions with rel=
+evant
+memory loads depend on rmap_head->val being non-zero).  And AIUI, in the Li=
+nux
+kernel memory model, READ_ONCE() is responsible for ensuring that the addre=
+ss
+dependency can't be morphed into a control dependency by the compiler and
+subsequently reordered by the CPU.
 
-The option that would likely give the best of both worlds would be to prioritize
-lower wakeup latency for "small" delays.  That could be done in __delay() and/or
-in KVM.  E.g. delay_halt_tpause() quite clearly assumes a relatively long delay,
-which is a flawed assumption in this case.
+I.e. even if this were arm64, ignoring the LOCK CMPXCHG path for the moment=
+, I
+don't _think_ an smp_{r,w}mb() pair would be needed, as arm64's definition =
+of
+__READ_ONCE() promotes the operation to an acquire.
 
-	/*
-	 * Hard code the deeper (C0.2) sleep state because exit latency is
-	 * small compared to the "microseconds" that usleep() will delay.
-	 */
-	__tpause(TPAUSE_C02_STATE, edx, eax);
+Back to the LOCK CMPXCHG path, KVM_RMAP_LOCKED implements a rudimentary spi=
+nlock,
+hence my smp_mb__after_spinlock() suggestion.  Though _because_ it's a spin=
+lock,
+the rmaps are fully protected by the critical section.  And for the SPTEs, =
+there
+is no required ordering.  The reader (aging thread) can observe a !PRESENT =
+or a
+PRESENT SPTE, and must be prepared for either.  I.e. there is no requiremen=
+t that
+the reader observe a PRESENT SPTE if there is a valid rmap.
 
-The reason I say "and/or KVM" is that even without TPAUSE in the picture, it might
-make sense for KVM to avoid __delay() for anything but long delays.  Both because
-the overhead of e.g. delay_tsc() could be higher than the delay itself, but also
-because the intent of KVM's delay is somewhat unique.
+So, unless I'm missing something, I would prefer to not add a smp_mb__after=
+_spinlock(),
+even though it's a nop on x86 (unless KCSAN_WEAK_MEMORY=3Dy), because it su=
+ggests
+an ordering requirement that doesn't exist.
 
-By definition, KVM _knows_ there is an IRQ that is being deliver to the vCPU, i.e.
-entering the guest and running the vCPU asap is a priority.  The _only_ reason KVM
-is waiting is to not violate the architecture.  Reducing power consumption and
-even letting an SMT sibling run are arguably non-goals, i.e. it might be best for
-KVM to avoid even regular ol' PAUSE in this specific scenario, unless the wait
-time is so high that delaying VM-Enter more than the absolute bare minimum
-becomes a worthwhile tradeoff.
+> kvm_rmap_lock_readonly() should have an smb_rmb(), but it seems like
+> adding it here will do the right thing for the read-only lock side.
+>=20
+> > +
+> > +       /* Return the old value, i.e. _without_ the LOCKED bit set. */
+> > +       return old_val;
+> > +}
+> > +
+> > +static void kvm_rmap_unlock(struct kvm_rmap_head *rmap_head,
+> > +                           unsigned long new_val)
+> > +{
+> > +       WARN_ON_ONCE(new_val & KVM_RMAP_LOCKED);
+>=20
+> Same goes with having an smp_wmb() here. Is it necessary? If so,
+> should it at least be documented?
+>=20
+> And this is *not* necessary for kvm_rmap_unlock_readonly(), IIUC.
+>=20
+> > +       WRITE_ONCE(rmap_head->val, new_val);
+> > +}
 
