@@ -1,166 +1,136 @@
-Return-Path: <kvm+bounces-26149-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D75B1972262
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 21:12:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ADB3972265
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 21:12:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19EF3284267
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 19:12:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAE501F2495A
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 19:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221AB189BA3;
-	Mon,  9 Sep 2024 19:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96121189F47;
+	Mon,  9 Sep 2024 19:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PuFL4cjz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KM+lRaaR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6ACE17588
-	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 19:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7DE189B84
+	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 19:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725909115; cv=none; b=tTMpJhn51vJMK2QEnls35dgFalgSSPP9vb2nQ9YN1I5hgzEWI7kK8Zv6jZLNIJAC0qHYkBr4G4wOqLbU6r+Kv795CiYI1oi+vfs5SleBxjD+IRkyE0ae+WJtHJlCrYzVSLxEgzgmWNwC4xQQGCqWMgRpCqE1vhjHak0DtRHvq1E=
+	t=1725909116; cv=none; b=jFktj+A7z3oviMcHj9eliCtAVZW9NFkwvHKmMStvse3nhLp6MQySgtLQaPb9rj2jT/xqFj23yfpbJjy2vGuo+3CE8a9/Gk0Cm5+inN24hA0sGO0sSk1aKNvLXZ0vG3+L7BRaufxVjMvieL50PG4gRo8Omxndkwa1DB8s8pYjpFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725909115; c=relaxed/simple;
-	bh=zndEXXrBf3suPdcgFqdqvO3P8HQrrM5vFvZhoVMzWxg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cJH4U5ZPOFyC03TXzWScQf60E4R2CwAqWOjB48B/46e+XW95Qfw4+Q5syFEL37WYIoX7mZrG3U1gqJIfdL5Cglms6+r+UdqcWmVtX1gwCdc9EOD41NJDdsREpx4F7KtgYCV657xuvK5hjJlql8tisJXnQUCt7ZxJKxjKtP40HJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PuFL4cjz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725909112;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5sPSJH7sx8TT8vephZ961tLUcAIsPRNREdt62HfflFk=;
-	b=PuFL4cjz4b03t7SrncGQFPHr0ZEOCsYJCYMcjJdzmYd/K59fEVDGWrijNe1oAf6KOZmA7r
-	YYfChPMEDpQMJFwErncnUqHqtNEXsRi903eemCUgmqdjZoXtybPXkgrmWQnyWRcxKaduZc
-	M98JWgpB+F4cmb2uKbLb53YQqDw75pc=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-465-Fzr-uYNTPQidRnxeWs9jpQ-1; Mon, 09 Sep 2024 15:11:51 -0400
-X-MC-Unique: Fzr-uYNTPQidRnxeWs9jpQ-1
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-5e1cd853298so1492201eaf.1
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 12:11:50 -0700 (PDT)
+	s=arc-20240116; t=1725909116; c=relaxed/simple;
+	bh=A6d4YMiwN1Ngb6IzbjbrTIXlacqKp7Jq6KjY6cUl9Z8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VYn8T9XJe3DODAPn3SfoZsXNzTFYFd/VAaeQ/2lvZZg93RCRvKarXcVTf+JZylZjhsveM+Gaapp9sQ0OonLBS5IAMen44LVKIzl5Y6+CL275v4eSC6gmnUttVshBtb3vEsuM97nuvSxobN3yJjomUaRyh8lqmLpjuimIpsYvqYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KM+lRaaR; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6d3aa5a6715so129309187b3.2
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 12:11:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725909114; x=1726513914; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IDOUAU5NoY/5ttFNtEIaS5qbTX/scaI3qhxTGLdCCYs=;
+        b=KM+lRaaR4ZFa0+TjgPoB9bOdG7EhwngNHPgygL7lnsG79uyLQS8voLe7zNjnZBvHri
+         EJn6R/aCcNn8PB6IFIfMzfr7d2HCsrH+ddNRy9PhFgQJqWVU6aNxiPvM6G6jNAcbOipv
+         mqn1eF0miXmT5cUZckzzwC2PKNEFlUvn7700Xthiru/ZYIJmRh7H5ZALrqJr/crWOHcu
+         nXCpTzvIuD8R/EOoPJsLGoLXcHh5LjNEBCvPuto4Eult28rvOKn/SpbuyeEha5mZqse/
+         DUS4o4yUeaJgj3RQ/RU5M8PcEpT7+XLEcUZBD1GdyxKboImAsSvy61v436neZal4dBXT
+         fKdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725909110; x=1726513910;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5sPSJH7sx8TT8vephZ961tLUcAIsPRNREdt62HfflFk=;
-        b=uEbX3LMii5T5UkaekLflR7m79fo3VLhwzo25iHDmgn2ctq6W3K8dooRjaVm7otfFcA
-         +8/gmvQunq+CuiuqMb0L2gIM8v3ma4rgulf5cLb6Dlsp8t49jAqNIHg0VNS2W70F5FrP
-         CHWum4Ku1SgFWDpPvlqweR5ZHzgrVB7qwpjFOVSujB5P7C9TOqMaBWgGXufU+qp+bYlc
-         VeWLKigdVyMxHejWwRJOLC7jBLauqD10cZRAhitl8/lDZ1T3LFbtxohkznQoMJCtvw+U
-         DbWKI/0nv9dx13rjBKCHFNlZrt1lHZrWmBc1sm32j4iRgL8RknLf0uwuDQf+USkMu+Ld
-         nywA==
-X-Gm-Message-State: AOJu0YyUrwahPH7htQ4mWUYcQZVpIqx5ilQnGyYgIqEQVneCiWaOkuu1
-	8idEo/06owFtE8zrItiznvJ9Vp7/lTW1maQizVEixLyQR24cyvI10f1Oxmm7lvvC+40swCUSbtY
-	OqDG6cSher4afOfQs9l7w6e54DAAhiSAWOoctzFyFotxP9Qt90w==
-X-Received: by 2002:a05:6358:7691:b0:1b8:42cd:19b3 with SMTP id e5c5f4694b2df-1b84d2ff61amr220903455d.28.1725909110171;
-        Mon, 09 Sep 2024 12:11:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEDyIe1YMoL6snR+uNukfxdBjZXJuocOTsnMVfwPCJowbkJePwRp71cfWJBS7eNe3EepSdnUQ==
-X-Received: by 2002:a05:6358:7691:b0:1b8:42cd:19b3 with SMTP id e5c5f4694b2df-1b84d2ff61amr220899855d.28.1725909109624;
-        Mon, 09 Sep 2024 12:11:49 -0700 (PDT)
-Received: from starship ([2607:fea8:fc01:760d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a9a7991f7fsm242462385a.62.2024.09.09.12.11.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2024 12:11:49 -0700 (PDT)
-Message-ID: <61e7e64c615aba6297006dbf32e48986d33c12ab.camel@redhat.com>
-Subject: Re: [PATCH v3 2/2] VMX: reset the segment cache after segment
- initialization in vmx_vcpu_reset
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>, Thomas
- Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
- x86@kernel.org
-Date: Mon, 09 Sep 2024 15:11:48 -0400
-In-Reply-To: <ZrY1adEnEW2N-ijd@google.com>
-References: <20240725175232.337266-1-mlevitsk@redhat.com>
-	 <20240725175232.337266-3-mlevitsk@redhat.com> <ZrF55uIvX2rcHtSW@chao-email>
-	 <ZrY1adEnEW2N-ijd@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1725909114; x=1726513914;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IDOUAU5NoY/5ttFNtEIaS5qbTX/scaI3qhxTGLdCCYs=;
+        b=MlE6FCxH2bxLswQ3Us47BVJz1NNkv5/zdspRteJILkc/RhHUL1rTdVANO+hYes1wiZ
+         56e9Tv5NiAYOI62nUfcYZGSTXiPQp3brj8QVyq3VuhoC0nViWhM/kdeW4jCwNWwHmiyu
+         mrHEex0AYARaW+0p4cKPL0kYG4dNTffAFn7JAtQMG3VmJwosIKd1dEFmxrWCWmxL2TSO
+         c/Q6EPnl/fEIjf4YZUT6vndpwTRoKV68fqYrA54Rf0bZgrZvX51XUN8Z5D+/D6m5YotM
+         FnnOdKec6PkGWJE3jWd/b/7qdncEEGK7faXmTVPu0G56TnGV2QlYldO4p2xc7nMf34Hb
+         g/XQ==
+X-Gm-Message-State: AOJu0YzFddAD3FF2zzcgOXqpHMpLeR9TcXFbZIF5Y5xbwr75XlsLDjpC
+	DEBxoWh9v+QycAPAFLQDALHuFIn2BNDHIR7ZoAiC9dlhltCn5NlJyijeVThJZp9SL4n1wuHyWJa
+	Cqg==
+X-Google-Smtp-Source: AGHT+IHKozrySUUnjFM9Wne1J6W1t09r2ku4UPIzfqFg+dsqZQj0VDFOASjMwcQRafyt8IUivgBITF2eZAg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:6a04:b0:6c1:298e:5a7 with SMTP id
+ 00721157ae682-6db4516f4a1mr4349037b3.5.1725909114342; Mon, 09 Sep 2024
+ 12:11:54 -0700 (PDT)
+Date: Mon, 9 Sep 2024 12:11:52 -0700
+In-Reply-To: <DA40912C-CACC-4273-95B8-60AC67DFE317@nutanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <DA40912C-CACC-4273-95B8-60AC67DFE317@nutanix.com>
+Message-ID: <Zt9IeD_15ZsFElIa@google.com>
+Subject: Re: KVM: x86: __wait_lapic_expire silently using TPAUSE C0.2
+From: Sean Christopherson <seanjc@google.com>
+To: Jon Kohler <jon@nutanix.com>
+Cc: "kvm @ vger . kernel . org" <kvm@vger.kernel.org>, 
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>, Fenghua Yu <fenghua.yu@intel.com>, 
+	"kyung.min.park@intel.com" <kyung.min.park@intel.com>, Tony Luck <tony.luck@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 2024-08-09 at 08:27 -0700, Sean Christopherson wrote:
-> On Tue, Aug 06, 2024, Chao Gao wrote:
-> > On Thu, Jul 25, 2024 at 01:52:32PM -0400, Maxim Levitsky wrote:
-> > > Fix this by moving the vmx_segment_cache_clear() call to be after the
-> > > segments are initialized.
-> > > 
-> > > Note that this still doesn't fix the issue of kvm_arch_vcpu_in_kernel
-> > > getting stale data during the segment setup, and that issue will
-> > > be addressed later.
-> > > 
-> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > 
-> > Do you need a Fixes tag and/or Cc: stable?
+On Fri, Sep 06, 2024, Jon Kohler wrote:
+> delay_halt_fn uses __tpause() with TPAUSE_C02_STATE, which is the power
+> optimized version of tpause, which according to documentation [3] is
+> a slower wakeup latency and higher power savings, with an added benefit
+> of being more SMT yield friendly.
 > 
-> Heh, it's an old one
-> 
->   Fixes: 2fb92db1ec08 ("KVM: VMX: Cache vmcs segment fields")
-> 
-> > > ---
-> > > arch/x86/kvm/vmx/vmx.c | 6 +++---
-> > > 1 file changed, 3 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index fa9f307d9b18..d43bb755e15c 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -4870,9 +4870,6 @@ void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> > > 	vmx->hv_deadline_tsc = -1;
-> > > 	kvm_set_cr8(vcpu, 0);
-> > > 
-> > > -	vmx_segment_cache_clear(vmx);
-> > > -	kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
-> > > -
-> > > 	seg_setup(VCPU_SREG_CS);
-> > > 	vmcs_write16(GUEST_CS_SELECTOR, 0xf000);
-> > > 	vmcs_writel(GUEST_CS_BASE, 0xffff0000ul);
-> > > @@ -4899,6 +4896,9 @@ void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> > > 	vmcs_writel(GUEST_IDTR_BASE, 0);
-> > > 	vmcs_write32(GUEST_IDTR_LIMIT, 0xffff);
-> > > 
-> > > +	vmx_segment_cache_clear(vmx);
-> > > +	kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
-> > 
-> > vmx_segment_cache_clear() is called in a few other sites. I think at least the
-> > call in __vmx_set_segment() should be fixed, because QEMU may read SS.AR right
-> > after a write to it. if the write was preempted after the cache was cleared but
-> > before the new value being written into VMCS, QEMU would find that SS.AR held a
-> > stale value.
-> 
-> Ya, I thought the plan was to go for a more complete fix[*]?  This change isn't
-> wrong, but it's obviously incomplete, and will be unnecessary if the preemption
-> issue is resolved.
+> For datacenter, latency sensitive workloads, this is problematic as
+> the call to kvm_wait_lapic_expire happens directly prior to reentry
+> through vmx_vcpu_enter_exit, which is the exact wrong place for slow
+> wakeup latency.
 
-Hi,
+...
 
-I was thinking to keep it simple, since the issue is mostly theoretical after this fix,
-but I'll give this another try.
+> So, with all of that said, there are a few things that could be done,
+> and I'm definitely open to ideas:
+> 1. Update delay_halt_tpause to use TPAUSE_C01_STATE unilaterally, which
+> anecdotally seems inline with the spirit of how AMD implemented
+> MWAITX, which uses the same delay_halt loop, and calls mwaitx with
+> MWAITX_DISABLE_CSTATES. 
+> 2. Provide system level configurability to delay.c to optionally use
+> C01 as a config knob, maybe a compile leve setting? That way distros
+> aiming at low energy deployments could use that, but otherwise
+> default is low latency instead?
+> 3. Provide some different delay API that KVM could call, indicating it
+> wants low wakeup latency delays, if hardware supports it?
+> 4. Pull this code into kvm code directly (boooooo?) and manage it
+> directly instead of using delay.c (boooooo?)
+> 5. Something else?
 
-Best regards,
-	Maxim Levitsky
+The option that would likely give the best of both worlds would be to prioritize
+lower wakeup latency for "small" delays.  That could be done in __delay() and/or
+in KVM.  E.g. delay_halt_tpause() quite clearly assumes a relatively long delay,
+which is a flawed assumption in this case.
 
-> 
-> [*] https://lore.kernel.org/all/f183d215c903d4d1e85bf89e9d8b57dd6ce5c175.camel@redhat.com
-> 
+	/*
+	 * Hard code the deeper (C0.2) sleep state because exit latency is
+	 * small compared to the "microseconds" that usleep() will delay.
+	 */
+	__tpause(TPAUSE_C02_STATE, edx, eax);
 
+The reason I say "and/or KVM" is that even without TPAUSE in the picture, it might
+make sense for KVM to avoid __delay() for anything but long delays.  Both because
+the overhead of e.g. delay_tsc() could be higher than the delay itself, but also
+because the intent of KVM's delay is somewhat unique.
 
+By definition, KVM _knows_ there is an IRQ that is being deliver to the vCPU, i.e.
+entering the guest and running the vCPU asap is a priority.  The _only_ reason KVM
+is waiting is to not violate the architecture.  Reducing power consumption and
+even letting an SMT sibling run are arguably non-goals, i.e. it might be best for
+KVM to avoid even regular ol' PAUSE in this specific scenario, unless the wait
+time is so high that delaying VM-Enter more than the absolute bare minimum
+becomes a worthwhile tradeoff.
 
