@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-26120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8940971B76
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 15:46:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F91D971BBF
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 15:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10CB11C2100D
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 13:46:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C60431F242E5
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 13:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777F71BA877;
-	Mon,  9 Sep 2024 13:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA4D1BC066;
+	Mon,  9 Sep 2024 13:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GYwWJrZU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cQAogBSY"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C6B1BA292
-	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 13:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09B21BB69F
+	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 13:51:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725889509; cv=none; b=uShBGSuI7zwSUR7dDc0jYzGu6orP8lnlWzpwF6egGHGHtsovK3sTfeBa46Qrq3GNbJ8SQFnTyngqE5LSkk8u+mw/6ardoZ02+WCoSGWRCGjZRzGVMcj+xTqYR4edE/RrZ8uT2GZSh+11WG2fSBqMakM7MnD/Nj9TUz/cvQshupg=
+	t=1725889912; cv=none; b=BSFwA5/lKHghb5R8HdIWDukWkBPuEMvwDoRbrFYB0yODNcHdHfVxO+yfiVNVatzp7guuD0T3NaT5ssxTtQgcwj/pS9mWuTwkPmrerhTIwLgqHasxoH17KC9P23Y2DhG/QfB1tZzAirj8yyMXXn13ntn+BvVdShaqSDgEUVCe4Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725889509; c=relaxed/simple;
-	bh=+9F3uKNMboa1SgybT1etH6wDb2f1GTpwoZhVE0ms3UM=;
+	s=arc-20240116; t=1725889912; c=relaxed/simple;
+	bh=0qbnXvkzmhga39KKgbR31l0OB8fM8okXecKZNPmMmY0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YSodk2/uyXdzxZ5h2iDz3BwRDQDD2SGVy9f6lmg4+BP8GIOXTgKmyMIZz+pzOqCKWrz5dCLXQnBvwd8Wgr1VjxmFSpuVAbvQB1XcVO8il3XMmQxMZbSvg96B2nfCs72jZnIIhoWpe+cZk9ktr1Ax5uke2o1qgY8aLNDFFvAfnCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GYwWJrZU; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=NpwhfZnlPHSCC2Bkl53pjWhADjpHazx1v0RTRyY+ySARrXo55swjsS4dmVrMAZNTv9Y1l2y364MdvhpNuHbVIR4jc/pOvTp6o9gAs1F4CT6VLPhYbri3IwvkTGmB2srS9zfRPTQjoyP6uSZ8TWQXbsN0GEG23I+ATsjdRYDLLko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cQAogBSY; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725889506;
+	s=mimecast20190719; t=1725889908;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Ylw46X/xkXMlviR3Hl2ecKDrkpKoQWtNAOjrdUUapm4=;
-	b=GYwWJrZUk1Eu7Fa0An7N0TWE3/URazKrTLIfNfBsR9n+7KSPkZihvHfJcsOtCa+2ZjwdEc
-	n4kRUMocAtoAW7Td1YJZM+fkUU3h0O+Is1LrXaEtL6EqqBWXuX4u639+ILprM0dNqhF5YQ
-	L34eUuV2owjCUEN3EfRH0jiLvnuzmCI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Y0tZEvsZterp2aqnAF3GcnqbGD9ikKZZm7hI4RTRcxk=;
+	b=cQAogBSYew5E0XI/m5BkEKFuGhx4ZLHaOHg82TUTc3ZvDwRgZ+niWtRCExImqugm7CSCeO
+	NcGGrvWK+mIkBkuHtuPo5U7djI9HytVjkdfNna+wdTn0oJsKR8UPye63S+VGI5wC5mxKYx
+	61RjTKdxnw3YeuJyvTaCeGu7D+KZKvk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-325-nMBSb0t9OM2EMR1TMEtsTA-1; Mon, 09 Sep 2024 09:45:03 -0400
-X-MC-Unique: nMBSb0t9OM2EMR1TMEtsTA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42bbe70c1c2so34738835e9.1
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 06:45:03 -0700 (PDT)
+ us-mta-235-BJZgLszWPaesD5N8E0CbRw-1; Mon, 09 Sep 2024 09:51:43 -0400
+X-MC-Unique: BJZgLszWPaesD5N8E0CbRw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-378929f1a4eso969125f8f.1
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 06:51:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725889502; x=1726494302;
+        d=1e100.net; s=20230601; t=1725889902; x=1726494702;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ylw46X/xkXMlviR3Hl2ecKDrkpKoQWtNAOjrdUUapm4=;
-        b=HhCYHyKTz+GMTnjNpU/9i7yT9Hz4rG0Gw9xqqYiRQBTUhZtHGtcNpvgbuC1x5cBnv1
-         pONBOKHg6UijGcryZwJp9MIlZLmvAi4Tzlf2ke94NUgP68qpb7laCV4x2IVafDspr9SD
-         r3G2SYPDGmik8hY6De8JKF74Fqrn07offsWYX/7Rnr1kG3QUcPkcqbX0vF7zvOcyUZSV
-         XZvIYAeKDK9tv/Rb/zqBGtP3YLtlIIGgme1pnr43SG/aLpMFX9iN5c6ygs0wO+Pv8zdG
-         Qxu3aax38jj6MID+2FETXxAZWvA6NPRJp0kUdkI0NyPsd2SVX2q6w6tNjTBw/XSYBm1B
-         kyhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqFcTh+FQuCjS+ORmXuAJI6OoBF2D+bQ6ZxIZhDdKzvYzYOLxpk+gZSQMe9x6SqQBtUB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4NAKC2EXUQQRqJS7RmviGE3MRksLgJSR0Mqd7qi6wRMW3ZBds
-	8nF32XjolxNuWCQ036Q98uCfplNUoVgyivxDhBR7ce7RQPXUFLJnOiZnJ+JPAqEyuejwWJghf8l
-	saHFY1syucbm0jlgNWZKRPZ7zYrHSJp4oQ+9U3COzgNzHAo8sOw==
-X-Received: by 2002:a05:600c:4f16:b0:42c:a72a:e8f4 with SMTP id 5b1f17b1804b1-42cad760ee2mr62757805e9.14.1725889502084;
-        Mon, 09 Sep 2024 06:45:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFF/95U9vbW29MTrTQs2Nva4ge2R5MZvBC10txmNSECUK5cgpTJ7gCxCL3V/RbNxVpoohqTOA==
-X-Received: by 2002:a05:600c:4f16:b0:42c:a72a:e8f4 with SMTP id 5b1f17b1804b1-42cad760ee2mr62757525e9.14.1725889501607;
-        Mon, 09 Sep 2024 06:45:01 -0700 (PDT)
+        bh=Y0tZEvsZterp2aqnAF3GcnqbGD9ikKZZm7hI4RTRcxk=;
+        b=j5V+o+N55Eli6UWQTfrRwIFKTynaAU5N5gL5W0B6gtmASl6BgnvAtn4FiwuzGN6h+D
+         cFvyNe1fBuM6rlnIWE5yvkpMK1J4U3urMknvJbE0Nj0oacB0Hd/S63xhgRp0jur6BfR/
+         dcp6m2pmvjmgiAY6M7JnsLDP5qk5dJj6O0uzUmkAJiAl1AjBmAz/1ExKEKkacuEbbGki
+         qKDlY93auixLdD7MFxHeFkh7cak4Gi+5PgkGhi+45qovl7kOYB93DrwahUk19wsV7xzI
+         BBnH6mt2C2YN4iBboDzaDf81J34hbSd230FiV1+k/bU56UpzAXYapSeggSbu5ktVLFJI
+         DF0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXP1V7EeAyS40yf1DNkMHj44n/+ceq8ZPm4fGRwhrH2GEKRI5GW02mMC52aPoh3jWYzzPo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySp/L9QB4bR96KwUzfq0FDoqp0lFcWeGjCPGn5wRFBnnpo8Mtb
+	4fNdkqtBlAD/Jd76XXl3nj1z9gfd+O6vx9Sg5xNihl/6kVbxdefMWMLBxq3fPA7saY5Z8FgyTP6
+	VX/t/psVUHGfr2XK/T3VuSv3kuPSCnwP5NfcPl5TaMUfPFWKCWg==
+X-Received: by 2002:adf:e84a:0:b0:374:c92e:f69f with SMTP id ffacd0b85a97d-378895caf24mr7229060f8f.16.1725889901773;
+        Mon, 09 Sep 2024 06:51:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDfIgsMO6NLNmoe2gXmS+oP/AsxfqL24bcUlxSPiMg6y6PqpLe7sOx2QTJodRnKO68Qy7p9g==
+X-Received: by 2002:adf:e84a:0:b0:374:c92e:f69f with SMTP id ffacd0b85a97d-378895caf24mr7229033f8f.16.1725889900970;
+        Mon, 09 Sep 2024 06:51:40 -0700 (PDT)
 Received: from [192.168.10.81] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-378956767c4sm6079302f8f.63.2024.09.09.06.45.00
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-378956650fdsm6120284f8f.25.2024.09.09.06.51.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Sep 2024 06:45:01 -0700 (PDT)
-Message-ID: <d4e07759-c9fc-49db-8b99-0b5798644fcc@redhat.com>
-Date: Mon, 9 Sep 2024 15:44:59 +0200
+        Mon, 09 Sep 2024 06:51:40 -0700 (PDT)
+Message-ID: <d8dc1d89-4f23-41c8-bddf-ebbc41f579d5@redhat.com>
+Date: Mon, 9 Sep 2024 15:51:39 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,13 +83,14 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/21] KVM: x86/mmu: Implement memslot deletion for TDX
+Subject: Re: [PATCH 02/21] KVM: x86/tdp_mmu: Add a helper function to walk
+ down the TDP MMU
 To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
  kvm@vger.kernel.org
 Cc: kai.huang@intel.com, dmatlack@google.com, isaku.yamahata@gmail.com,
  yan.y.zhao@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org
 References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
- <20240904030751.117579-2-rick.p.edgecombe@intel.com>
+ <20240904030751.117579-3-rick.p.edgecombe@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -127,78 +128,145 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240904030751.117579-2-rick.p.edgecombe@intel.com>
+In-Reply-To: <20240904030751.117579-3-rick.p.edgecombe@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 9/4/24 05:07, Rick Edgecombe wrote:
-> Force TDX VMs to use the KVM_X86_QUIRK_SLOT_ZAP_ALL behavior.
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> TDs cannot use the fast zapping operation to implement memslot deletion for
-> a couple reasons:
-> 1. KVM cannot fully zap and re-build TDX private PTEs without coordinating
->     with the guest. This is due to the TDs needing to "accept" memory. So
->     an operation to delete a memslot needs to limit the private zapping to
->     the range of the memslot.
-> 2. For reason (1), kvm_mmu_zap_all_fast() is limited to direct (shared)
->     roots. This means it will not zap the mirror (private) PTEs. If a
->     memslot is deleted with private memory mapped, the private memory would
->     remain mapped in the TD. Then if later the gmem fd was whole punched,
->     the pages could be freed on the host while still mapped in the TD. This
->     is because that operation would no longer have the memslot to map the
->     pgoff to the gfn.
+> Export a function to walk down the TDP without modifying it and simply
+> check if a PGA is mapped.
 > 
-> To handle the first case, userspace could simply set the
-> KVM_X86_QUIRK_SLOT_ZAP_ALL quirk for TDs. This would prevent the issue in
-> (1), but it is not sufficient to resolve (2) because the problems there
-> extend beyond the userspace's TD, to affecting the rest of the host. So the
-> zap-leafs-only behavior is required for both
+> Future changes will support pre-populating TDX private memory. In order to
+> implement this KVM will need to check if a given GFN is already
+> pre-populated in the mirrored EPT. [1]
 > 
-> A couple options were considered, including forcing
-> KVM_X86_QUIRK_SLOT_ZAP_ALL to always be on for TDs, however due to the
-> currently limited quirks interface (no way to query quirks, or force them
-> to be disabled), this would require developing additional interfaces. So
-> instead just do the simple thing and make TDs always do the zap-leafs
-> behavior like when KVM_X86_QUIRK_SLOT_ZAP_ALL is disabled.
+> There is already a TDP MMU walker, kvm_tdp_mmu_get_walk() for use within
+> the KVM MMU that almost does what is required. However, to make sense of
+> the results, MMU internal PTE helpers are needed. Refactor the code to
+> provide a helper that can be used outside of the KVM MMU code.
 > 
-> While at it, have the new behavior apply to all non-KVM_X86_DEFAULT_VM VMs,
-> as the previous behavior was not ideal (see [0]). It is assumed until
-> proven otherwise that the other VM types will not be exposed to the bug[1]
-> that derailed that effort.
+> Refactoring the KVM page fault handler to support this lookup usage was
+> also considered, but it was an awkward fit.
 > 
-> Memslot deletion needs to zap both the private and shared mappings of a
-> GFN, so update the attr_filter field in kvm_mmu_zap_memslot_leafs() to
-> include both.
+> kvm_tdp_mmu_gpa_is_mapped() is based on a diff by Paolo Bonzini.
 > 
-> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Link: https://lore.kernel.org/kvm/ZfBkle1eZFfjPI8l@google.com/ [1]
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Link: https://lore.kernel.org/kvm/20190205205443.1059-1-sean.j.christopherson@intel.com/ [0]
-> Link: https://patchwork.kernel.org/project/kvm/patch/20190205210137.1377-11-sean.j.christopherson@intel.com [1]
 > ---
 > TDX MMU part 2 v1:
->   - Clarify TDX limits on zapping private memory (Sean)
+>   - Change exported function to just return of GPA is mapped because "You
+>     are executing with the filemap_invalidate_lock() taken, and therefore
+>     cannot race with kvm_gmem_punch_hole()" (Paolo)
+>     https://lore.kernel.org/kvm/CABgObfbpNN842noAe77WYvgi5MzK2SAA_FYw-=fGa+PcT_Z22w@mail.gmail.com/
+>   - Take root hpa instead of enum (Paolo)
 > 
-> Memslot quirk series:
+> TDX MMU Prep v2:
+>   - Rename function with "mirror" and use root enum
+> 
+> TDX MMU Prep:
 >   - New patch
 > ---
->   arch/x86/kvm/mmu/mmu.c | 1 +
->   1 file changed, 1 insertion(+)
+>   arch/x86/kvm/mmu.h         |  3 +++
+>   arch/x86/kvm/mmu/mmu.c     |  3 +--
+>   arch/x86/kvm/mmu/tdp_mmu.c | 37 ++++++++++++++++++++++++++++++++-----
+>   3 files changed, 36 insertions(+), 7 deletions(-)
 > 
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index 8f289222b353..5faa416ac874 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -254,6 +254,9 @@ extern bool tdp_mmu_enabled;
+>   #define tdp_mmu_enabled false
+>   #endif
+>   
+> +bool kvm_tdp_mmu_gpa_is_mapped(struct kvm_vcpu *vcpu, u64 gpa);
+> +int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code, u8 *level);
+> +
+>   static inline bool kvm_memslots_have_rmaps(struct kvm *kvm)
+>   {
+>   	return !tdp_mmu_enabled || kvm_shadow_root_allocated(kvm);
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index a8d91cf11761..7e66d7c426c1 100644
+> index 7e66d7c426c1..01808cdf8627 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -7104,6 +7104,7 @@ static void kvm_mmu_zap_memslot_leafs(struct kvm *kvm, struct kvm_memory_slot *s
->   		.start = slot->base_gfn,
->   		.end = slot->base_gfn + slot->npages,
->   		.may_block = true,
-> +		.attr_filter = KVM_FILTER_PRIVATE | KVM_FILTER_SHARED,
->   	};
->   	bool flush = false;
+> @@ -4713,8 +4713,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>   	return direct_page_fault(vcpu, fault);
+>   }
 >   
+> -static int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
+> -			    u8 *level)
+> +int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code, u8 *level)
+>   {
+>   	int r;
+>   
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 37b3769a5d32..019b43723d90 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1911,16 +1911,13 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+>    *
+>    * Must be called between kvm_tdp_mmu_walk_lockless_{begin,end}.
+>    */
+> -int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
+> -			 int *root_level)
+> +static int __kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
+> +				  struct kvm_mmu_page *root)
+>   {
+> -	struct kvm_mmu_page *root = root_to_sp(vcpu->arch.mmu->root.hpa);
+>   	struct tdp_iter iter;
+>   	gfn_t gfn = addr >> PAGE_SHIFT;
+>   	int leaf = -1;
+>   
+> -	*root_level = vcpu->arch.mmu->root_role.level;
+> -
+>   	tdp_mmu_for_each_pte(iter, vcpu->kvm, root, gfn, gfn + 1) {
+>   		leaf = iter.level;
+>   		sptes[leaf] = iter.old_spte;
+> @@ -1929,6 +1926,36 @@ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
+>   	return leaf;
+>   }
+>   
+> +int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
+> +			 int *root_level)
+> +{
+> +	struct kvm_mmu_page *root = root_to_sp(vcpu->arch.mmu->root.hpa);
+> +	*root_level = vcpu->arch.mmu->root_role.level;
+> +
+> +	return __kvm_tdp_mmu_get_walk(vcpu, addr, sptes, root);
+> +}
+> +
+> +bool kvm_tdp_mmu_gpa_is_mapped(struct kvm_vcpu *vcpu, u64 gpa)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	bool is_direct = kvm_is_addr_direct(kvm, gpa);
+> +	hpa_t root = is_direct ? vcpu->arch.mmu->root.hpa :
+> +				 vcpu->arch.mmu->mirror_root_hpa;
+> +	u64 sptes[PT64_ROOT_MAX_LEVEL + 1], spte;
+> +	int leaf;
+> +
+> +	lockdep_assert_held(&kvm->mmu_lock);
+> +	rcu_read_lock();
+> +	leaf = __kvm_tdp_mmu_get_walk(vcpu, gpa, sptes, root_to_sp(root));
+> +	rcu_read_unlock();
+> +	if (leaf < 0)
+> +		return false;
+> +
+> +	spte = sptes[leaf];
+> +	return is_shadow_present_pte(spte) && is_last_spte(spte, leaf);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_tdp_mmu_gpa_is_mapped);
+> +
+>   /*
+>    * Returns the last level spte pointer of the shadow page walk for the given
+>    * gpa, and sets *spte to the spte value. This spte may be non-preset. If no
 
-Stale commit message, I guess.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+I will take another look at the locking after I see some callers.
 
 Paolo
 
