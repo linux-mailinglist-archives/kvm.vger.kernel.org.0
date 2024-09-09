@@ -1,153 +1,284 @@
-Return-Path: <kvm+bounces-26129-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26130-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C9C971D6D
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 17:03:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2437971DDB
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 17:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301681C2349A
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 15:03:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DE531F24117
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 15:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CF018EB1;
-	Mon,  9 Sep 2024 15:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804D11531E0;
+	Mon,  9 Sep 2024 15:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQbbyUpF"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QQdw73md"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2071.outbound.protection.outlook.com [40.107.237.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EA83FC2
-	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 15:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725894197; cv=none; b=sFVD83XIqx/KICIkVu0Zcsrv4CRvIl78OlfoVunlcKclJLOnJz/hN7cPrm/OxhkpGLzj/acYXX64fShBxZET4LUqslKnTZ+NAro7j3zsbttIJzZjLLta1uyg5p6uBBp7W2OqD0MgDdeszjNkWk499OjDQ4AweeOCvJXb406WFdc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725894197; c=relaxed/simple;
-	bh=L0M1mffjiRIPOCuH2OrIjQfgVOyprWyp9psV4eYNvAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fZWsMKDJlLz+eVRaDhHLrhXb97xwj2tEXTpoMjRLt60+9vJjYs53JF+QbxNFDEJkJ8JxyYsKhnTrft1QHL9umrEWqw3cHUIIcVcb5cMtxgZvlc4LvRPnfOeu0D4cyWnG4Z2gudakBuhUROpm7aQvdbl1wgWCm4JskMqxtUI7icU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LQbbyUpF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725894194;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6l+xHNqXTthDlFZ3K9cVgVJ/sPPZ9HvpzFqB6gZQUko=;
-	b=LQbbyUpFJd+q7CoGR6j3DlhyRxOTue2ivwpPKveSWJJjFe5lFqArSjzUnPKoeiE0soqWe3
-	TeuOUx/Oar7EUiQF8AVQFbSBs0Iq1LdoLHjhX9zE8RjncEPBzB/9JxyVhti6UowBGC50sk
-	KtxYlQuEPtzOte27JE1/AUuSLff1pzQ=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-497-8F_3ZG15OEy_vrY6dSoEtQ-1; Mon, 09 Sep 2024 11:03:13 -0400
-X-MC-Unique: 8F_3ZG15OEy_vrY6dSoEtQ-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6c353a05885so47254396d6.2
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 08:03:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725894193; x=1726498993;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6l+xHNqXTthDlFZ3K9cVgVJ/sPPZ9HvpzFqB6gZQUko=;
-        b=mrCB6p4oG17xAwgyiij7zGFPE9QZkf8AGZi/ZMNnt4eodcdOA6/5m9agOxzZ8TLpnc
-         ptkI5VMqeoXpVzjvBryhOItv46l3T88FdkiaWpqq5FKiL0QtHQywC61buvVqRjmbAF1P
-         Dc7CVP1ay5gM7MUgBMQE4Lrc4g5PZ5LbpOAI1O6Chponkizt7lEiNVK7stKnL0DYZ/Hb
-         WYTIFCgfKbieStgpcDb5q5aQXa3/ngrh7B+Qzvefw1z9/+IHqsPZLQt6Q3du7AP4sKU6
-         /bDF9nDCJ49ofDigC9of+GLEpUUCKmsdI3MzT5CQHzHQUPUeU366KrXq0oNC0qniSdxh
-         wqFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVCP7iw53SefUVvCxd/KRRo3jbiTg8QhLGiLIJSrjnOes8FB/YPqekPwr5+zigeE3gl2L0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywhjgy3JwrxymmHDeb9lAdSRq8RzD9iqRfihiOhAyqogIwSCH0b
-	FiuxZGoV3dBnmhyokv9uFzCATaLKaZKwXBL3m67WOMsbaJUXZtqgUs47l65QfsPDHoocig/4+bO
-	N+AzSmZAcTiM9/JMn+HYrXOEtylJ06/w/CqgrQgvrZn19v6d3CA==
-X-Received: by 2002:a05:6214:5b84:b0:6c3:5789:62f8 with SMTP id 6a1803df08f44-6c5323fe2b4mr100989326d6.19.1725894193161;
-        Mon, 09 Sep 2024 08:03:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHXyNgnw3o/IQrxRWaaUJgRseDSr7DTlug9i0O8HD+tnUNFFXmzQMuc9otVGIFfDiIY6ds48Q==
-X-Received: by 2002:a05:6214:5b84:b0:6c3:5789:62f8 with SMTP id 6a1803df08f44-6c5323fe2b4mr100988886d6.19.1725894192696;
-        Mon, 09 Sep 2024 08:03:12 -0700 (PDT)
-Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c53432dfb8sm21272326d6.24.2024.09.09.08.03.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2024 08:03:12 -0700 (PDT)
-Date: Mon, 9 Sep 2024 11:03:09 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Ankit Agrawal <ankita@nvidia.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	Gavin Shan <gshan@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	"x86@kernel.org" <x86@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alistair Popple <apopple@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Jason Gunthorpe <jgg@nvidia.com>, Borislav Petkov <bp@alien8.de>,
-	Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
-	David Hildenbrand <david@redhat.com>,
-	Yan Zhao <yan.y.zhao@intel.com>, Will Deacon <will@kernel.org>,
-	Kefeng Wang <wangkefeng.wang@huawei.com>,
-	Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v2 00/19] mm: Support huge pfnmaps
-Message-ID: <Zt8OLSI3e3K8tFpU@x1n>
-References: <20240826204353.2228736-1-peterx@redhat.com>
- <SA1PR12MB7199DE6F9F63EEAD93F66249B0992@SA1PR12MB7199.namprd12.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E204F606;
+	Mon,  9 Sep 2024 15:15:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725894954; cv=fail; b=GWKsL45wx6uzgPzMWUHAIvpGL35IzTrtjb9SpLjY746zU1bDXe5p+xge6bLPCTHErlrjmiAcLoWqZoIquLtjY5wANKRHqFjKeMm+Xluk9jLh7MQTNaxR25AkSLw9cP5WS71BZMt0SgTWv0C22YWqxzXbRwH7sCssaGjqfzoPy8I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725894954; c=relaxed/simple;
+	bh=h5ZYlSYmDUz6TMdy1E8y0GzRrwFziUn4bJ0aXHSI5HM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=rqfGvuikhwlKwCjmpHQnbYBMaDJOxPCb78N0kjSoGV39JPc6eUf8ZTEOO0IaQsq35ORpD4bgNbMdrt0qjZnmyFVK/Ei1QAyCkn4vfslN83si6YBj4w97BNX+XibyJ1cZY+7pqjmt6u4zwsCp2NuSOFuogCGi7qS3xmqFJmRWNUk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QQdw73md; arc=fail smtp.client-ip=40.107.237.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=h7wDli+K7S/dZK3wHN0aI9hR7R/5njLaG3XPyD1OeJ/9PZD0GZ6viqsB9zuSZ619Gr5DeMPF9Dt50jscm1R+UPD4zqHcyihvkvmNW4E+/TABWdvsIfLfXir+XvTQoPtRtclzc5/dVolgWSrI2w2uho6PBtCZfTwRsVqT/vnRGG1N4bSVpFIMXPRWN4Y27763i/43pfCe0PqgUNCtJJwnKw1gAK4AuKWkNDqBiZeGP1mvgPeT05PzsAKjnE1k6jInJ4zUHIBm+H9ek5sA+KK0HteVlX3EnUaM0m9BKwjzA41OfnbQh4EwslR0FGMRenvFHsy+2qpPjeNgc85cUQobiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2Kk3JOV8Kvyc6/McT5XVhUiho6krY+2mt/nFUUgoO68=;
+ b=ZnOD1p+KG6eoWW5YiS1J5PHI9i0c/6YDIncPsbCaT/TG5SigBCMrcLqrr/VA/3r0PHIV5MFsrQGZcrsOMJaRMJ+OdImeE2qHgY0YZ1C1V1Rm73A6Knc7ks7lPtsF8RVWSY1ddcKNmBJHrjxya1EgS2WHpEg1qXsImEjnHMN0/xXeoBRzV+lD2GoDeli2AFOlbH11iVFmIWGf8W+MZc4I/yRcjSUZiqFfdh2FGmUl5DSfvfBgJ2JGmDW6voNx2jfi0PgKpqS1HGF7SYo9kE3yxv/o775DFkl59wbmiK796PQmQKP/0Nj4J0q+Lz8+zPwDUUhzMHc9+HrSD4vbXzjosg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2Kk3JOV8Kvyc6/McT5XVhUiho6krY+2mt/nFUUgoO68=;
+ b=QQdw73mdhcQslFAn+ZkV0xNEMhqYaMMGavadjhFYD4oWUBXB1q0kFCXcs5Xem0V7aVaUwyycUL0H4rJX2+uOVpClpGnxsCAY/Sqi33SD5WKsmNYN08aNULaK+yl6ZZ2iBDNsw4CInQB4COYZYK7gmXLH2idPp9ewYcsavGUChhkUBqd7H7k6LV+1l6Q7SDr2c1wlUCfsl50Z78n03xeZ7el3uyEcrAiJ9/g0P/9INJWkkJ1kzwl56JG3vP+34Ed/I5kX0LV2yTfdj9nytZNyfyGFmDIHmooQVAd8R+1MbZWhAxhmf3dgL4L6+XcYzHmbwELBUA0ZYOcym+Hfs3GX+w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8194.namprd12.prod.outlook.com (2603:10b6:930:76::5)
+ by DM6PR12MB4355.namprd12.prod.outlook.com (2603:10b6:5:2a3::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Mon, 9 Sep
+ 2024 15:15:43 +0000
+Received: from CY8PR12MB8194.namprd12.prod.outlook.com
+ ([fe80::82b9:9338:947f:fc9]) by CY8PR12MB8194.namprd12.prod.outlook.com
+ ([fe80::82b9:9338:947f:fc9%6]) with mapi id 15.20.7939.022; Mon, 9 Sep 2024
+ 15:15:43 +0000
+Message-ID: <5bbb2577-59e8-423e-9e59-cc584d9e09fa@nvidia.com>
+Date: Mon, 9 Sep 2024 10:15:39 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 05/19] arm64: Detect if in a realm and set RIPAS RAM
+To: Steven Price <steven.price@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Alper Gun <alpergun@google.com>
+References: <20240819131924.372366-1-steven.price@arm.com>
+ <20240819131924.372366-6-steven.price@arm.com>
+ <ff5a11d6-8208-4987-af03-f67b10cc5904@arm.com>
+ <d55a24d2-bad9-40c7-8a2e-4a7bebe9c682@arm.com>
+Content-Language: en-US
+From: Shanker Donthineni <sdonthineni@nvidia.com>
+In-Reply-To: <d55a24d2-bad9-40c7-8a2e-4a7bebe9c682@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BL1PR13CA0342.namprd13.prod.outlook.com
+ (2603:10b6:208:2c6::17) To CY8PR12MB8194.namprd12.prod.outlook.com
+ (2603:10b6:930:76::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <SA1PR12MB7199DE6F9F63EEAD93F66249B0992@SA1PR12MB7199.namprd12.prod.outlook.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8194:EE_|DM6PR12MB4355:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0019fb82-20a0-41e6-9e2e-08dcd0e245d1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WTJuY3RnWUVZMFV2ams0cnBJUE9IL2hxa0NOV2J4RTg2aFR2cTJPZEx1aWxT?=
+ =?utf-8?B?d2Z3R0FxTG82N3liemR1RkJBV2x5R0ZSU05BOUF5eCtIU0hVQkhNMzdnSWRP?=
+ =?utf-8?B?Z1VtTHFpVjJPWkhpNVk4MjYzOUdlS0lqV0twNWdvRkduMmR2SGhVbk9VQ1Fm?=
+ =?utf-8?B?cUZCTWs2akhKdVRYSUQwU1ZlemNwdGluaTJRNHNJSVc0djJCdU1kWG5XMmZu?=
+ =?utf-8?B?VXhIUWxiZnRpdGlrWHB6VkY0NHVyU3pLOXBISFlEcWNFNXZqMk1HU0FTakRa?=
+ =?utf-8?B?WHhVWXgyMTI4TFFpQ3gyanI5N3J4YWdWcmJuRW42azhyYUxzZHowbko4STlW?=
+ =?utf-8?B?dmRlMW90dVk3dHVZb0NwSEYwTU5EWTRHSnZ0WFdFTVd6Q1d0aVJXYW0vU0l1?=
+ =?utf-8?B?RSszdnhtbUY1MGtwcVpoT2VaMHpTWUdobGJiUFhqaFVZVlV0REdnMjVtZERk?=
+ =?utf-8?B?NVNFVTJvZGJrUmtkc3FFcFJobmw0Z2RLMzlLMWl0K1lkSElXekgrSFVKTHFE?=
+ =?utf-8?B?cFJNam9XRWpvemx6Zmdjd2JKK1VBOUt1R25obklRdXZMOXhVZVM3RnlrMnZV?=
+ =?utf-8?B?QU1weVlnWkxvbzJjcngzZElhNkFjdExLT3Zwc2d1MlR3T2tZekFDRDdPa1ho?=
+ =?utf-8?B?OC9WYTZmSGpHWFFlcnV4VnozczV0VGdoWXozOUhZZGhsdGFsVTMyUmo5MXBh?=
+ =?utf-8?B?S0pBbjQwVGxJYnRqbFprOVpOVmhGenh6SlhCQldWODdaTzNuV0Vwa3pNVmNS?=
+ =?utf-8?B?UmNSa3QzS0FkNTFUd2lhL1dXaERTSEZ4N0NkN3dnNTMvdFZOZ2ZvZ0N2Mm1W?=
+ =?utf-8?B?cm5sakdXTjUvSko5UytsZWowWGJEcHVNMzgzQUxvTFVHS29oeUVjTjNRMXdC?=
+ =?utf-8?B?NmhsWHpYVU5ud3VyY3RYd2NXZW96eW4wTEtJNmVycHVGdDFtb1gyV2xxUFNy?=
+ =?utf-8?B?dndGbitKYUhnbWs5YW1jaHB2bmZ4NlRJNWtqUXplS1pwT3kzTVAra0NkMlJ6?=
+ =?utf-8?B?N0srU3dGblpDaEtDcE1BNzMzNGM2SFdkK3NXSTZMa0dyTHo4VXFPMCtDNjVC?=
+ =?utf-8?B?Q09mRStjWmx4YWxMcXYvNmhVQlRWOGg0U0oyL1NBaDV3aVorM3VzRnUwZE81?=
+ =?utf-8?B?REIrbklJbnlQRFhaNjM5MkFoNzhWMGZjSko1eFB5K0Q4cy9TbnErU05HMzdF?=
+ =?utf-8?B?YXE4M2xXS3VXVmN3enNHcmlWZktzWjlmc2trYjdMMkxDcEpwaVl4YkhPRE9M?=
+ =?utf-8?B?WTI1OTErTlNpbkZkVHU5bC9LVjYxejdqRGVrMUIveDh2TFBrL1pCR3hUaElM?=
+ =?utf-8?B?TkEveVNHN3U5MTZab3ZubjdWd0t2MEJEQ3VzbG1Yb3h5Ty9SVC9XQTd4LzVW?=
+ =?utf-8?B?SktQWjhzVXZId09od0YxWk5yQktqTG5wdGF5Q1RWTE4rcFJDMEdodCswdWdU?=
+ =?utf-8?B?UjVnQWJTVXR4M01FSDE2WW0xcHIwQk1LTGFVRm9mMk1xdmVRbFprL3dzdVhm?=
+ =?utf-8?B?WVdLL3JuMWdvUS92bEZnaVhiYXFGRGFTdEsxSEtoekJ1R1dhckI1TWtzdWYx?=
+ =?utf-8?B?dmZzL0J4RWp1Y2c3NFBpQjJkVTF4ejdRMm9qUHhrSUtZZDQwS2Q2cXYzbm4w?=
+ =?utf-8?B?NkkvSE1rRHdNZFpoUy9ISlJWVnk0aFN1MHJ0cHJFTjJBcFp0ZjUyM0YwUXV3?=
+ =?utf-8?B?bks4T3lsaVBuYVZ1MkZnVm11VlF1WDR3QTZDbThyZDNRdGMvMHFlSUlsemVF?=
+ =?utf-8?B?UzlvRlgxakZQVWtKSTBOMEhoUkpSZkRFNkJET2FTVmY3bDhJTVEwSlpQYmZR?=
+ =?utf-8?B?QXFJak5aWGp1akNHOXBCUT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eWsrUTNpeVp3ZWkra1dHN1B2TjNPcHFBdjFZMmI4TkE1aTI1a2J4ZEtmaU92?=
+ =?utf-8?B?UU9zMGVFSng5ZW1YckZQT1ZFcHdRQUozZHF4amdmbng4d2t1TzZ3ZDNkREQr?=
+ =?utf-8?B?VHZKZWY2WG9KVExPMWhiOGVEMUE4SWl6Z3pqWFhab1RZMWQxMDQ3MFNvQ1dl?=
+ =?utf-8?B?SXAxNnVLa2N0MzJyVUdFQ3NINDJlNFBEUENIYWZvdm5TTXl6MnFHc2lNajRJ?=
+ =?utf-8?B?Rk5MOS95bTRCdUdTYmlYK2R3S0xNYmovb2M3blc3MzJWVXAvc1Z0YmQ1ek5U?=
+ =?utf-8?B?b213VW5RdTJaZE4raGlMSTVJR2tNaWFnbFk2eVZMNkIxNm5uRTNHR0xZM1Z4?=
+ =?utf-8?B?SnRzMjllMzlScWlFK0Z3aDliTWVVeUtaWVcwZlhybVBScjVaK0xDWXpoQUJD?=
+ =?utf-8?B?b3EwYjhTYXNycTBiRzJjKzFUUGlrSUo5K1A0QStvcERLblFhSGF0eGFYQkpU?=
+ =?utf-8?B?L1NVRGN3TVRxajdaN3Jwa3pPdTBjL3c3N1ZrU21wTVp3d3dzQVVCcWI2NXlQ?=
+ =?utf-8?B?bmxSay9DVVc5SFJ0aGdhcTBjVmU0c2RvU2loLzR2OSszSFF1dVVUYUQ1UWpn?=
+ =?utf-8?B?WU1HZTlmbVY2TnYyVEpBeWx6UndHOXFKRnhVSFk3RXlyckE3V2NxSmUxSDFL?=
+ =?utf-8?B?eHREWVU1U01GbTVMVVV0Z21FSzBpWU15ZGJOa3ppSFBFaDljWldZeFkrcFRP?=
+ =?utf-8?B?SC84VUxwT2hJc1BNL2NOTWQ3d3ZvSUtnQ1krQjUyR0lKUzhNZzhZVU5lcHV6?=
+ =?utf-8?B?YUg3S2Y4SGtqRjFyeUVzSzV0TmlQS0c0RkhHTDg1YU1pZUFGZndhd0FxTlVG?=
+ =?utf-8?B?Q0l5VWcxNCt1QkR2amlOWGtENm40Ylc0OWZtTzVMODhMWDJsZktmV0IxK3dM?=
+ =?utf-8?B?NGdzbGJyZHhpdHdaR1FINjBIWlhSTUlqdUJtTlozbHZvM05zelJyVk1YcjZj?=
+ =?utf-8?B?RDlxZmN4dXdvY09TN2dnOXBjMjJtYUxIVU1qV1l6RHVSTmtBOUNydDBzMVBU?=
+ =?utf-8?B?NlNUUWJKN0ZCUlF2QWh2RGxvcXJKZ1pONjlRbVdIZ3RFWHRnY1pvbHVvQmN5?=
+ =?utf-8?B?cmw5MXlvK1ZoOVJ3RE9tbUt6dVBzcWFSN3dMZW9jTEV5aTd1dWxmbFNsYSta?=
+ =?utf-8?B?TkpsdHpUZjRRdEFZWjhkN1dDdDFrOHNnSGZXV1dTeURFWFhncWVpRU9FY21i?=
+ =?utf-8?B?RjJQaW1OWVBpMk9mSGUzeHNYUHlSRkgzNDBpakkxQVRRTkJtMGpCL3cxRlgz?=
+ =?utf-8?B?V2xseTlpODVRZlNON0RYUXN1b1VsMU93OEQyaGdCWExUOU9xR0dBZW9ZVTBz?=
+ =?utf-8?B?czRpQ1R0TlFOaDNPdXZvZEZGWk03dHYzZitKSnk1ZmJ2c2txTnVJMGtqZ2lZ?=
+ =?utf-8?B?L0FLcG9tci8zajFLVnc5aVZRUG4yMHlNaTkxMk9SaCtYUkFteENuYllJaGZ2?=
+ =?utf-8?B?VFpqeEhGRlZwZ0pSbG00d29mVFhqMnVCYXFvMkZBeDdzaHcwQjRkZWptZUl0?=
+ =?utf-8?B?OFNnMXlKcU00Z2I1WjNCMG9VaG9nOU5JNUJGZFc4NGw1SnpXTk11WmYwZk9n?=
+ =?utf-8?B?Uit2eWI2Y2xuZlVDTTk2bnBmWTBqb3FTcGFTOStVZmdUR2svUkJxT2EveWIx?=
+ =?utf-8?B?djREa3NROWZoNnBwak1XZWtzZ2RoS2o4Z0JCN1J1R0FqRGhRb1ZwdDRQRnhv?=
+ =?utf-8?B?c1huZmpzVzNCc3pacG1YbDgyWU1ubkhIYWg3K3Y0YjVaS0ZxZHdTM1dhLzR5?=
+ =?utf-8?B?dnpmVWkrWjRncVpRb0JvaXlRWkxiZUpsU1NGaU8rQkc0dk9hZVNhWkQ5Tkw5?=
+ =?utf-8?B?WTVJSmxJem9Nc2pXa1UvSU55WE8rb0VaZ3ptNENPTXFrWTdpZGhrUHlwcGhx?=
+ =?utf-8?B?OGtTRVRtMUhUd0JTUGF4QmY3MWdpK2M0WWtmbnl6TEhqMXNSM2tXeXVNYVR6?=
+ =?utf-8?B?Skp1Z2hqek5qOHlhSkhEZmtDVXlvaUlpL21MNU9NTWVmbm83Y3NQTVlCNmZm?=
+ =?utf-8?B?WWxvOTZKS1hndkU3SExMTThYcXZhQTE0MmxnSTBpWjh4ZlVLWGJJd0lWSFNr?=
+ =?utf-8?B?UmJrTU45R2R2QlZNN1NnR3RXNlhXNUNLWUtNb2plQUNzcVpsVEJqT0ZmSjJ4?=
+ =?utf-8?Q?5viLJEe3t7xyrjyKc3NCp49zO?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0019fb82-20a0-41e6-9e2e-08dcd0e245d1
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2024 15:15:43.4382
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1LQKn/4GpB5uT1+ePTESbxaYTIT7GJ4XYd8l5I9Qlh07DtETwoMj4lZBaKk3nZShUPEA6WPBGqBY+bg0BprPVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4355
 
-On Mon, Sep 09, 2024 at 04:03:55AM +0000, Ankit Agrawal wrote:
-> > More architectures / More page sizes
-> > ------------------------------------
-> > 
-> > Currently only x86_64 (2M+1G) and arm64 (2M) are supported.  There seems to
-> > have plan to support arm64 1G later on top of this series [2].
-> > 
-> > Any arch will need to first support THP / THP_1G, then provide a special
-> > bit in pmds/puds to support huge pfnmaps.
+Hi Steven,
+
+On 8/19/24 09:10, Steven Price wrote:
+> External email: Use caution opening links or attachments
 > 
-> Just to confirm, would this also not support 512M for 64K pages on aarch64
-> with special PMD? Or am I missing something?
-
-I don't think it's properly tested yet, but logically it should be
-supported indeed, as here what matters is "pmd/pud", not the explicit size
-that it uses.
-
 > 
-> > remap_pfn_range() support
-> > -------------------------
-> > 
-> > Currently, remap_pfn_range() still only maps PTEs.  With the new option,
-> > remap_pfn_range() can logically start to inject either PMDs or PUDs when
-> > the alignment requirements match on the VAs.
-> >
-> > When the support is there, it should be able to silently benefit all
-> > drivers that is using remap_pfn_range() in its mmap() handler on better TLB
-> > hit rate and overall faster MMIO accesses similar to processor on hugepages.
-> 
-> Does Peter or other folks know of an ongoing effort/patches to extend
-> remap_pfn_range() to use this?
+> On 19/08/2024 15:04, Suzuki K Poulose wrote:
+>> Hi Steven
+>>
+>> On 19/08/2024 14:19, Steven Price wrote:
+>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>
+>>> Detect that the VM is a realm guest by the presence of the RSI
+>>> interface.
+>>>
+>>> If in a realm then all memory needs to be marked as RIPAS RAM initially,
+>>> the loader may or may not have done this for us. To be sure iterate over
+>>> all RAM and mark it as such. Any failure is fatal as that implies the
+>>> RAM regions passed to Linux are incorrect - which would mean failing
+>>> later when attempting to access non-existent RAM.
+>>>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Co-developed-by: Steven Price <steven.price@arm.com>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> ---
+>>> Changes since v4:
+>>>    * Minor tidy ups.
+>>> Changes since v3:
+>>>    * Provide safe/unsafe versions for converting memory to protected,
+>>>      using the safer version only for the early boot.
+>>>    * Use the new psci_early_test_conduit() function to avoid calling an
+>>>      SMC if EL3 is not present (or not configured to handle an SMC).
+>>> Changes since v2:
+>>>    * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
+>>>      static_key_false".
+>>>    * Rename set_memory_range() to rsi_set_memory_range().
+>>>    * Downgrade some BUG()s to WARN()s and handle the condition by
+>>>      propagating up the stack. Comment the remaining case that ends in a
+>>>      BUG() to explain why.
+>>>    * Rely on the return from rsi_request_version() rather than checking
+>>>      the version the RMM claims to support.
+>>>    * Rename the generic sounding arm64_setup_memory() to
+>>>      arm64_rsi_setup_memory() and move the call site to setup_arch().
+>>> ---
+>>>    arch/arm64/include/asm/rsi.h | 65 ++++++++++++++++++++++++++++++
+>>>    arch/arm64/kernel/Makefile   |  3 +-
+>>>    arch/arm64/kernel/rsi.c      | 78 ++++++++++++++++++++++++++++++++++++
+>>>    arch/arm64/kernel/setup.c    |  8 ++++
+>>>    4 files changed, 153 insertions(+), 1 deletion(-)
+>>>    create mode 100644 arch/arm64/include/asm/rsi.h
+>>>    create mode 100644 arch/arm64/kernel/rsi.c
+>>>
+>>> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
+>>> new file mode 100644
+>>> index 000000000000..2bc013badbc3
+>>> --- /dev/null
+>>> +++ b/arch/arm64/include/asm/rsi.h
+>>> @@ -0,0 +1,65 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>>> +/*
+>>> + * Copyright (C) 2024 ARM Ltd.
+>>> + */
+>>> +
+>>> +#ifndef __ASM_RSI_H_
+>>> +#define __ASM_RSI_H_
+>>> +
+>>> +#include <linux/jump_label.h>
+>>> +#include <asm/rsi_cmds.h>
 
-Not away of any from my side.
+The error number macros are used in this file, but the header file
+'<linux/errno.h>' is not included.
 
-Thanks,
 
--- 
-Peter Xu
+>>> +
+>>> +DECLARE_STATIC_KEY_FALSE(rsi_present);
+>>> +
+>>> +void __init arm64_rsi_init(void);
+>>> +void __init arm64_rsi_setup_memory(void);
+>>> +static inline bool is_realm_world(void)
+>>> +{
+>>> +    return static_branch_unlikely(&rsi_present);
+>>> +}
+>>> +
+>>> +static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t
+>>> end,
+>>> +                       enum ripas state, unsigned long flags)
+>>> +{
+>>> +    unsigned long ret;
+>>> +    phys_addr_t top;
+>>> +
+>>> +    while (start != end) {
+>>> +        ret = rsi_set_addr_range_state(start, end, state, flags, &top);
+>>> +        if (WARN_ON(ret || top < start || top > end))
+>>> +            return -EINVAL;
+>>> +        start = top;
+>>> +    }
+>>> +
+>>> +    return 0;
 
+-Shanker
 
