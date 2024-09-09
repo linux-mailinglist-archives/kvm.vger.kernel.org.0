@@ -1,249 +1,335 @@
-Return-Path: <kvm+bounces-26104-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26105-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33FEC9713E3
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 11:35:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 278D89713E5
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 11:36:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABCF91F2759A
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 09:35:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4881284F85
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 09:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A861B6556;
-	Mon,  9 Sep 2024 09:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71441B7901;
+	Mon,  9 Sep 2024 09:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZwEY+RFb"
+	dkim=pass (2048-bit key) header.d=clever-cloud.com header.i=@clever-cloud.com header.b="W9O/JWrX"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2076.outbound.protection.outlook.com [40.107.236.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D071B6543;
-	Mon,  9 Sep 2024 09:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725874390; cv=fail; b=gF8UONaL0dhGkRb2xIKTKu3MGo5wAh8C0jA/J74e+iDrdCjt75xCrzJiERgF3bEgXDzLaJnyp79CBf6Zzug5AWMRbwoQPZ6QHKMg/C27V8quJXY+5f9mn/Y1fD4ootyGDSrMym/1jbRZLNVZyEvOdCd4+jvoZmUavMRhIE51IV0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725874390; c=relaxed/simple;
-	bh=vKjrSnI+AWTIqOug4pjZuHzm1B/fhycm9nPBH9nPo0k=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=b5Fu6K4fiTCdI8EDamuETg6MteFl5oQeTaob0nQD7eUu871ee6jCsoIGH4UWf9JN7VnqqfraROhaXRG3bcGDW/a6czSv7EnVrDET8VB6qR6AVCk9H1JamllOi1PlmhHPpDuaEqY4Cb08ijiY4jsY2oUCnf/7+AuQsphxGcIi9NM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZwEY+RFb; arc=fail smtp.client-ip=40.107.236.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=r937HFXvvtUACR1Kf7Apzu6L2fd1bb5GXfx5qSIfltaHQO9a9hUOHlxqU2Rly9wL5ZYlHDvYZa4UsuKJuIUJGOyEA5MAq0bwhRswOoc1bpw8/1idR3SnMRAfTHKF202+c/ZGduNazIrqsU+5nakrSZigCp8iLnsarCwSQqxksRgmNOZTQ4zlV7xQtUJZUGr8SIuXrkzoNiVyIGo1zjZRZqyHInKGIqhi8wgRuKXc1uXJrdoBW/nRJQrmrs4NVdHyMMBkS6hI7NY/qo/xABhIkStR9N65um2Rjwo3nVmP7thML/D9KOmigBhvbJeOubvAstFlmnswiGp06MawUjy/Lw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fmCMmTQdtRITrzQgK6/1e5EI04qzV/kOb9yGpNAA5lE=;
- b=EHBmUVVMApgkmoA4I31csZRb23CiKGrngaHeh0+Dmx9diTXDIpaOlU1bLg0a6P2b+hgTivzmpXQua5VzT7Jo8qn0f68QvzGcBDGd9vyw69aXsnyxkV/oeepePaxiP0qsKNminHLaRjPSbBpTXkRhMXX7VxngL3m7gtEj7cWU4rvds3t+3+UvlJL+GrEU2mgoEqYFnRwDCXaIhTmtMFu+zlUBPz2HbRUp4OYLvGv1MZPN/92x2oGWvvubkixdIq0nBRrlXxzGXd6JXKmrL73OdCo7oOUS6vEy7KIWJCA97hT7nfIt4ZSY8d0t8u2aBTsk8iHKAWWI3zwGa+lr4duQQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fmCMmTQdtRITrzQgK6/1e5EI04qzV/kOb9yGpNAA5lE=;
- b=ZwEY+RFbMS6o9z4c2wRKcaojdNZlys5ZIG3FTPC5neQjMdGVrndLchoaWtYvprMLbWVJXPxtYD2imAwXe9v7wJZZOFBCr0bjMQNHZds6LH+sC1tWaeLddq0IiTSyJbkkLvk1fAbCaIQe6eUCiyHrhfqMPogH/ZLGwm3gC7MwSqDrV5cPJtrSQmeIL1NTozQ9y/rTVNHFoIgfLp47WRTDnpdOFE/JO5X83cQ6pCaAOnieWi9oQduTBHlcYG6IQp3xuG1hSUYLAUtRbgWjuObagY1mzLjKqG5ChZSyqCIfKpi7ZkieFiRHQe0u8FIf9f3n1ydAkhaFvSmDADmNpr6STA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY8PR12MB8297.namprd12.prod.outlook.com (2603:10b6:930:79::18)
- by PH7PR12MB7428.namprd12.prod.outlook.com (2603:10b6:510:203::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.28; Mon, 9 Sep
- 2024 09:33:05 +0000
-Received: from CY8PR12MB8297.namprd12.prod.outlook.com
- ([fe80::b313:73f4:6e6b:74a4]) by CY8PR12MB8297.namprd12.prod.outlook.com
- ([fe80::b313:73f4:6e6b:74a4%5]) with mapi id 15.20.7918.024; Mon, 9 Sep 2024
- 09:33:05 +0000
-Message-ID: <c59afb55-78b1-48b3-bafa-646b8499bf1c@nvidia.com>
-Date: Mon, 9 Sep 2024 11:32:58 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH mlx5-vhost v2 01/10] net/mlx5: Support throttled commands
- from async API
-To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Eugenio Perez Martin <eperezma@redhat.com>,
- virtualization@lists.linux-foundation.org
-Cc: Si-Wei Liu <si-wei.liu@oracle.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
- Parav Pandit <parav@nvidia.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Leon Romanovsky <leonro@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-References: <20240816090159.1967650-1-dtatulea@nvidia.com>
- <20240816090159.1967650-2-dtatulea@nvidia.com>
-Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <20240816090159.1967650-2-dtatulea@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR0P278CA0017.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:16::27) To CY8PR12MB8297.namprd12.prod.outlook.com
- (2603:10b6:930:79::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324B81B78F8
+	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 09:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725874400; cv=none; b=A5TzXyoc+Lvh87fi46L53qd8BFHwVwWEO8Z0dvpkrJTgXuF3RA7Sc4ILJSGe480EPTvs3j2n1W1ODVzQ6gw4bq2/I7yIWzKfktl7kgxA+jtR+gPqGlD4LYY6mDFY9zlqr9symHtgiR9l/NGdpH5md0kwB/pEk1MkHkDubnbX5AM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725874400; c=relaxed/simple;
+	bh=U502pxvteMv6NC/yAOfZ73UBXzTGYZhT9/eop8Qdx9k=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=p3jbNGDvcAVwiRhz/e8dOy1r2OD8NZ5RzvAW2EbBgr/jvgMFvOm4a10zugPYnNlqowzmlsU4rS6SE5r7JffWMbfvv5gWBsyqTZhrAVMemqNfaiqGcsb0AqlnT6YEP+4JPQ2glfIHebVyq4oIV4cVPrexIWiKXVyPCczXzYw59V8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=clever-cloud.com; spf=pass smtp.mailfrom=clever-cloud.com; dkim=pass (2048-bit key) header.d=clever-cloud.com header.i=@clever-cloud.com header.b=W9O/JWrX; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=clever-cloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=clever-cloud.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2d5f5d8cc01so2773291a91.0
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 02:33:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=clever-cloud.com; s=google; t=1725874397; x=1726479197; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aKuFNr1L5Ufqfrn7VlHdPR0IRVu8hXrKTZWESEd4/CE=;
+        b=W9O/JWrXNWiabLyAEqk/huiL4g/a7VRChCYlGfRV/8Am6bqRLlRXFf2K5LALHVEGYT
+         Hl9eHiuGszp3WmbrGtI2TUQGhVfWdAp9NZ6erS7Zm7xVpEiDBEWUrY+wjxjx+A9HfZBq
+         yUnw0bOEKYCt8MwwCQa6OE6Tr7v3Sp8kc7q7VqELwiEykWR2C7gF7yhAPwcYzAhoJ0Qo
+         CdLmWP/YxTou7zlP9I8wC4lpofoy7dYZLSwhKSVNJ/li5ECrH4jOMv2qk/21WHubM94X
+         wRXjLSFeN6gPBdICl9lJSW5xscM7k7HZme99eSBD4PqwoP7qML6FOXTTBMtiaFMCAeJf
+         4iGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725874397; x=1726479197;
+        h=content-disposition:mime-version:message-id:subject:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aKuFNr1L5Ufqfrn7VlHdPR0IRVu8hXrKTZWESEd4/CE=;
+        b=g9ZM5+LPW843GYdjold7mIVXwWOwCAvKBCyuHYQaQIxX21p1AE0Wez9Fqp8cGu7eV8
+         HtAnd98rltvSw5rKzEnH863rCMsZByK25OjX8KTRIn0V/jxmSVzgV7rUt5AaW3X9du93
+         WRZ/4wQ8SBKQaAkip+w/M9FFfqmTbrZJUMEmpVwAwff3uhQVzsQcDeyCzIwReS3dj27G
+         ZkZcxorE2tNSfc76vjQoCgkCLiwHY8P2Nf0mP29/fLmSFD91CUTPEE9JPSVvXf2ugUGa
+         nPtBWOOxRMFaEN1BbZn3FUhmj/L33pFBiuSKpweoa1nHKsRoVmrkry07OEAwrFwRelvI
+         sGBA==
+X-Gm-Message-State: AOJu0YzP7AY9L46Cm4qcEOoRJK0wtpRv/E3Iz7sPvvximB0u14KfyHQ8
+	16QUqJS261L3PmE9EHQphtay8jW4fa/rWeGe/uHp63Mo9vF0Byp8U3xZBP9jScAvNsx/rnUz2ts
+	E
+X-Google-Smtp-Source: AGHT+IFXhN2gxDIApWKzpuvlb5d+EvWoab888PBpI2Oe6HngCgifGRqeIK5ve3wmaxZqNiDPqCR7xw==
+X-Received: by 2002:a17:90a:8c89:b0:2c9:36bf:ba6f with SMTP id 98e67ed59e1d1-2dad4f0e52fmr15585293a91.3.1725874396579;
+        Mon, 09 Sep 2024 02:33:16 -0700 (PDT)
+Received: from exherswag ([2a01:e34:ec5f:fb40:444:4ec2:4805:836f])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dadc110527sm6184099a91.36.2024.09.09.02.33.14
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 02:33:15 -0700 (PDT)
+Date: Mon, 9 Sep 2024 11:33:10 +0200
+From: Arnaud Lefebvre <arnaud.lefebvre@clever-cloud.com>
+To: kvm@vger.kernel.org
+Subject: Nested guest VM freeze with lots of spurious pages fault
+Message-ID: <464ypq4jfxiwczufrfvbjrk4sornuzszosadhoupvju6c4p7fb@wthqsezyygds>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR12MB8297:EE_|PH7PR12MB7428:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f16af8f-7084-4700-8a75-08dcd0b26815
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SHk2MHArMkFTSTRsdmxxNUVack1jVFh5aG4zb00yL0t1a1lCc2w0QWdRamtv?=
- =?utf-8?B?WkxnZVA1T0IzWEF1L0Z2NGNSZFdhZndmTitqc1orSXZHK3ZtbEhUMUZ0eUhH?=
- =?utf-8?B?R1VMRmdNMFZoNWFPbTZCQlUwZ0NYTU16VXc4ZkNOZDNiWHdKVTNzZUN3SXRi?=
- =?utf-8?B?ekROMVZPNEdXUFFUbmVGaHpjUzN5ZmJtSVpJcmhoVU9SWUlJM1NCZWlTM3Nk?=
- =?utf-8?B?VkdBYjIyWkFZTm9KYmdqMjNENHhLTTZVOENubFE1dE9EVUVmOERXZmpzYkxW?=
- =?utf-8?B?VU9wSE5FNnZzaUxWSGQzMk9HYnZBR1ZPSGV5UjVQYm1HZmtJaXZoVFBadUhB?=
- =?utf-8?B?UFdaL0ZHRmdCUWMrbm1jclZqakVVWVVsNTFhMXlOOVV0ZnAwWXVOUkNjT1Zp?=
- =?utf-8?B?WlNYRDlYMUVoeHAvZFNxKzRHdmY1VFFNbFRMekY4KzF2NldTQnp0SWVTSmNR?=
- =?utf-8?B?ZVBGOUZVY2VKMk9hSW8ybTRsZ1JwNC83TXpobEFiVmNlVDF2MmF0N29va3Nq?=
- =?utf-8?B?RUxEc2ZEVlRCRlZtVDFkWjBCVE5kdWh2c3FYTmRGVi9xM1FyQ0txM0J3SWtj?=
- =?utf-8?B?ekRmRGpmUUxGazRhUkxsRDUrTDdVQkRIdld0cGlmUk04TU9OL2Z3VitRWHpR?=
- =?utf-8?B?TnQxdUcyVVMvbEZvZ1QwdFpaa2R2OHZJWG9IS2xVbUV3MHlYTzkzZjVUV01C?=
- =?utf-8?B?Y1U3WXJubU82VHRKQk0rNUNZa0duL1o3YnpJbzRIR2IvWGdVYlZSbXZGSGhB?=
- =?utf-8?B?azdzYW5mcDd6WmFaRisyODVtYmRJVHRubDFTT2JUL2FhZWpURi82Q1ZXQVlB?=
- =?utf-8?B?SW5FQi9vOEZNdmw2ZUlUY3kyKzVmYXJFbW82VTJoQUdRZjQ0M0hsOWkybnJI?=
- =?utf-8?B?RjZhUldWL2ZOck1nVFhSK3pKNnV3OVo0S3FHLzNvN3FTeGRvc1kzaFB6Tm5t?=
- =?utf-8?B?UGw5V0ZocTQ2MGNXdDdaMXdhYzBrOUhVVnRReWduaG9nUiszVjFKc0V0Z3ZZ?=
- =?utf-8?B?YzRxcnJZZ0h6alJmVWNFVmwwN3BYTVZjeGdsTmxWTTJINTltWVlTOUJ1TWVS?=
- =?utf-8?B?TnNFdTlvWjgzRVhNY3BSWTRVd2xFVVRLVkFMaFpiR0tHay9UU29IbnRRcG45?=
- =?utf-8?B?OUxPRUhUM1NjU09UZDk0NGpldDJmLzRLN04zWjZUVGNjYjJNa1JmSmNmMkk0?=
- =?utf-8?B?QU9nVVNXS1p4MThRVWFXUWhoY0NlL2E4RUdYWW02RTExZWRPQ2hjYXN6OHpa?=
- =?utf-8?B?VkhNK0Y1UUlNaEE4ODRPemVRejE1KzdIK2dRUXZoeWtyemVycWplU0JKT1pz?=
- =?utf-8?B?a0lxZGFxczFjME5uYWRiQjJRYURKZzVDQUh6eXB1V0NNemtRMTVOOUx0Q21H?=
- =?utf-8?B?QUhmS2RSMUJzdGhGVysveFIySktTaDFwWlJmUFRoMXZlNWsrMlZvc3hPV1lM?=
- =?utf-8?B?eEVsV0lCUXZXcGJkdElWYUJ1UjJGZ2tuUmtDTE5SQ05zaXJzYVRxeEx1RXdW?=
- =?utf-8?B?dVN6N3ZhZ1BOZnF2R2dCNFNtczZCNUgvWnpCakJlcUZCU0x4b0p3UklOaE9s?=
- =?utf-8?B?d0o1RzBZK2gwL3Z5RHp2RzB4TWdBUWJoUTZGejdibFlJOXR5c1RydlY4VGM0?=
- =?utf-8?B?OFQrb25HOCt2YVdodk42T0tQamgwZmlONjRRL0pXTFZPK0J4Z0NLZEF4TUxL?=
- =?utf-8?B?bUtzNjM0ZTNZVklVWDltTW1QQUt3MGUzTmd6RUxJRGJTeFlNNGYxcklRNStp?=
- =?utf-8?B?c2VJUGxjWTFsUXpZUUZsUGZUcERXZGZVK0d5d0hsNzBpRTAwS0VtY1h2blQ1?=
- =?utf-8?B?ZDBnNUpNQ2NOWENDaG1rQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8297.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bW5OdU9KUzlKdDFFUGhhSDh1eTFsbE4ybWhPRUFvREVxcVo2b1lJUFBZeFY4?=
- =?utf-8?B?WEdiQnNIN05IVkNoUVkyaEg0Szg3VndYSExTL1dKS1VtWEE3RXlPNlovQXZZ?=
- =?utf-8?B?UVpUbmRaRkZ0bm93eENvSFE2TG1HNGU1eUxXWk0wNTBkcU0vTGdUOHUrNEh4?=
- =?utf-8?B?Z1BYei9aRGlScXZrSndSU1BtS3JpME1KdWlrOUZESSs1YVR5RlJHQk5XTzA1?=
- =?utf-8?B?Qk5tNUpWcmdYNmdPcTNyWmdXT0FXMlBnaURtdUtXSU50ZWxYTVBLeENyMEUz?=
- =?utf-8?B?bDNSMk5mVkRxeWJja0ttVEViYUxCRDIzZ3d0V2hJcmQ2S3Q3ZUJ5VVhDZU5t?=
- =?utf-8?B?RW9wbGxQOEs4ZGxES1gvWDQ5WlhPVVZoQ3FUeWUwS1dQdC9pemZhaTJhVUsx?=
- =?utf-8?B?VlZyUEtYQ2RBM0FwN3ovNVlsaURCcGJuVG1IVTRrUWMxaEk1RXRhcWxoMmpv?=
- =?utf-8?B?RmxGM3JkQ0szN1g4Y1doNEt0ajRoZHIycXp1UGRYYXh0YnBEOVBMdU9ZRWpq?=
- =?utf-8?B?R0JrREo3UzgwSzhYUUxGdksvQ3hZbHF5Z2JxdVNXbGRBci9CT0lQelh3WWR6?=
- =?utf-8?B?eTg4VTBkeGRaczNVa2FvUFVxTENKOURFckh0YUk1N0J6d2FJMVVGNlkySDFE?=
- =?utf-8?B?OGljVkVmSHdJbTcraGNycUdUcEhnY3Fudy9lbU50OTBDeitOdG01aG8wN3VT?=
- =?utf-8?B?RW5ncHlHOTVBdW9WMjMzdXZGL0Zob1ZjZHlFRHJ4QjNGN3I4Ni9Kc1NGemFY?=
- =?utf-8?B?cVVQSWNHQkxyMnpVMkRuNmxlSVFEMUNmaCttblcwd2RZUk5QN1hNcDNRM2h1?=
- =?utf-8?B?TUJFVkJnRnBkR2NkSjFhMStrd040Wk0xaWpFTlBULzdrbjBic2FqRUpjQy9U?=
- =?utf-8?B?anZqWDdkbXFEanhRVFllU00rUE13dnpuMms0d3lVVTN4eml1N2M2V0d2OE5s?=
- =?utf-8?B?VTgyakE1TWVyM00wYlgrUjkxRGRZZEtUbW9SRFNCUlNOM3pDbjE4S3F0MTRD?=
- =?utf-8?B?UXFoVWtsOVF5N2tJbHRObXUwKzA3cWozTEhTMU9xWUtGTUw0REh4dlNKTWZ4?=
- =?utf-8?B?c2lyY2hSYkI0OEIxMWdqa2dUTkUyaDBsaTNjVVVkZlAzbWcrQzZjZ0FIejd2?=
- =?utf-8?B?UUJKQjVsUy9vZktjS0M1bzFaVGVkSVgwSEw0bStoQ05BMVM0MDArNGhqek0z?=
- =?utf-8?B?c3oxL0tvb01YemFzY09ON25xdGRhbHJZQnRRQmJtb20zUFNFcU0walJ3QmJm?=
- =?utf-8?B?TlZlZHJUSGlialphbXhmQWk2b21uRUlJenR5ejgzMEZYVWJxOGREZGVLWE9R?=
- =?utf-8?B?aGR5T1pOUFdmejhWM3RrUllqRzd6OXNUU1ljUkxwNVl6cG1QV0craDlUaUxh?=
- =?utf-8?B?bHdhM2ZmMFloSmJUYTNNQzBwclcyK0Zub3ZEWERTU0xPMFRVb3lzRVpVN3dP?=
- =?utf-8?B?eHF5R2tzV2ZaeGhFSHQrc0ROaG00K09mdTkwQkpUYjdWZWttNStmM09KS1RB?=
- =?utf-8?B?VVJJL3RrRHRWUGRXd21sSjBNOUJ5VU8zNEtubmF5ZE1DZkhndFh6Vzh3d2pZ?=
- =?utf-8?B?S3JPdkRncHo3bk92a0ZaYi9zUy8yVVRnL3U1ZGxMWm84VWJNbENUNld4Q3lz?=
- =?utf-8?B?SjJ5blVOQzNSSWs4OFplMlhYNVg1M2lLSExUWEVxdGZFZE9acVpBNE50VmVO?=
- =?utf-8?B?Y1hkTHBIaTdVZFRkd3NtYjJmWiszaVBDNHFZVHNaek5vY2pDcWU2N2ZDODlJ?=
- =?utf-8?B?Yk5yL0pibVB6QkhlWllrQmpLY0l0SCtTVDhCenphMFU0dWlPWW9OeDVLeWg4?=
- =?utf-8?B?eUVxekpLY0cvL2lVUmxITW9iNmN1UWJ4YnZzaVFmekVnZnJibnpNZHF5aXox?=
- =?utf-8?B?UDlzU3c5dXlhZzdLaVZ5ODloNUo4eSsvMTNwR0hraFBWUUYxaDNIZTMvb2Zv?=
- =?utf-8?B?L0lGSE1ZVDNBU2RuWFM3WnFSa3ZicDNyMEtrS21pVVdzZzBodjdkY1BacEVE?=
- =?utf-8?B?VEh0bHFrVGw0amsrR3Y2SzF3S08zM290YjRUbjhFdWdwN3NETHJnaFVXUmFO?=
- =?utf-8?B?aVNId1REcjNqdU1iaTI5SUw1NWpRd0hiWGZuaTNQcklNY0pSWVVaZWlEanhy?=
- =?utf-8?Q?0+OD0lSsW8i4knFVK2bf4J1jk?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f16af8f-7084-4700-8a75-08dcd0b26815
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8297.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2024 09:33:05.1130
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HnVDAvL2Hfp0lTPUjtUmavW7/NO74OqCaA+bLx2L1wZn58RNNSF+TVh8R8skMUMeWEQCPE7Yjm7/0fH9QGAa5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7428
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+
+Hello,
+
+I'm currently having trouble in a nested virtualized environment with L2
+guests randomly "freezing" for a couple of minutes before behaving fine
+again.
+
+What we've seen is that, from time to time during certain workloads, the
+guest L2 would freeze: it can be a complete freeze or partial with only
+some frozen CPU. L0 and L1 hypervisors are fine during those
+events and continue to operate normally.
+
+Our setup is currently with VMWare ESXi as the L0 hypervisor, KVM as the
+L1 hypervisor and the final L2 guest. We use qemu on the L1 hypervisor
+to boot our L2 VM. Our L2 VM are basic systems for load balancers or
+databases, web applications, ... . We are using Intel CPUs.
+
+The VMWare L0 hypervisor is running v7.0.3 (which is the latest version
+to my knowledge).
+
+For the L1 KVM hypervisor, we've seen the issue at least with the LTS
+branch (6.6.48) and the stable branch (6.10.7). We've had similar issues
+on another setup more than one year ago but we didn't have time to
+research it extensively, so take it with a grain of salt. But we would
+have been on either 6.1 LTS or 5.15 LTS on our L1 back then.
+
+For the L2 guest, we had the issues on both 6.8.x and current stable
+6.10.7.
+
+We've noticed the guest would often freeze during memory operations and
+print kernel messages like this one:
+
+watchdog: BUG: soft lockup - CPU#3 stuck for 23s! [haproxy:323752]
+Modules linked in:
+CPU: 3 PID: 323752 Comm: haproxy Tainted: G             L
+6.8.12-clevercloud-vm-dirty #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+RIP: 0010:strncpy_from_user+0x9a/0x123
+Code: 85 c0 75 be 0f 1f 00 0f ae e8 49 b8 ff fe fe fe fe fe fe fe 48 89
+df 48 ba 80 80 80 80 80 80 80 80 48 83 e7 f8 48 39 c7 74 5f <49> 8b 74
+05 00 49 89 f1 4a 8d 0c 06 49 f7 d1 4c 21 c9 48 21 d1 74
+RSP: 0018:ffffc90006037d90 EFLAGS: 00010202
+RAX: 0000000000000000 RBX: 0000000000000fe0 RCX: 0000000000000000
+RDX: 8080808080808080 RSI: ffffffff81000000 RDI: 0000000000000fe0
+RBP: ffff88810110e020 R08: fefefefefefefeff R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000fe0
+R13: 00005635358a6f90 R14: 0000000000000000 R15: 0000000000000000
+FS:  00007f13dd136280(0000) GS:ffff888333b80000(0000)
+knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000056353597f710 CR3: 000000018d1c6004 CR4: 0000000000170ef0
+Call Trace:
+  <IRQ>
+  ? watchdog_timer_fn+0x1b1/0x21e
+  ? __hrtimer_run_queues+0xd4/0x16d
+  ? hrtimer_interrupt+0x8d/0x15f
+  ? __sysvec_apic_timer_interrupt+0x8c/0xd2
+  ? sysvec_apic_timer_interrupt+0x5f/0x79
+  </IRQ>
+  <TASK>
+  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
+  ? 0xffffffff81000000
+  ? strncpy_from_user+0x9a/0x123
+  getname_flags+0x64/0x1a5
+  vfs_fstatat+0x54/0x89
+  __do_sys_newfstatat+0x43/0x7a
+  do_syscall_64+0x80/0xe2
+  ? clear_bhb_loop+0x45/0xa0
+  ? clear_bhb_loop+0x45/0xa0
+  ? clear_bhb_loop+0x45/0xa0
+  ? clear_bhb_loop+0x45/0xa0
+  ? clear_bhb_loop+0x45/0xa0
+  entry_SYSCALL_64_after_hwframe+0x78/0x80
+RIP: 0033:0x7f13dc8c8ffe
+Code: 0f 1f 40 00 48 8b 15 09 4e 0e 00 f7 d8 64 89 02 b8 ff ff ff ff c3
+66 0f 1f 44 00 00 f3 0f 1e fa 41 89 ca b8 06 01 00 00 0f 05 <3d> 00 f0
+ff ff 77 0b 31 c0 c3 0f 1f 84 00 00 00 00 00 48 8b 15 d1
+RSP: 002b:00007ffdc20faa98 EFLAGS: 00000246 ORIG_RAX: 0000000000000106
+RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f13dc8c8ffe
+RDX: 00007ffdc20faaa0 RSI: 00005635358a6f90 RDI: 00000000ffffff9c
+RBP: 00007f13d33f8640 R08: 0000000000000078 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000007
+R13: 0000000000000000 R14: 00005635358a6f90 R15: 00005635358a6f90
+  </TASK>
+
+We have additional traces but they do not all "originate" from the VFS
+subsystem, it's a bit random, sometimes it also has kcompactd in its
+stacktrace.
+
+So we started tracing what was happening with KVM on the L1 host. We
+noticed that during those events, KVM would get a lot of EPT_VIOLATIONS
+from the guest and treat them as spurious (those logs are not related to
+the same event that produced the kernel messages above):
+
+qemu-5791    [023] d.... 3602162.971191: kvm_entry: vcpu 7, rip
+0xffffffff820fe612
+qemu-5786    [029] d.... 3602162.971193: kvm_exit: vcpu 4 reason
+EPT_VIOLATION rip 0xffffffff820fe612 info1 0x0000000000000184 info2
+0x0000000000000000 intr_info 0x00000000 error_code 0x00000000
+qemu-5786    [029] ..... 3602162.971194: kvm_page_fault: vcpu 4 rip
+0xffffffff820fe612 address 0x00000000020fe612 error_code 0x184
+qemu-5786    [029] ..... 3602162.971194: fast_page_fault: vcpu 4 gva
+20fe612 error_code F sptep 00000000fd98c937 old 0x61000034d4fe877 new
+61000034d4fe877 spurious 1 fixed 0
+qemu-5786    [029] d.... 3602162.971194: kvm_entry: vcpu 4, rip
+0xffffffff820fe612
+qemu-5791    [023] d.... 3602162.971197: kvm_exit: vcpu 7 reason
+EPT_VIOLATION rip 0xffffffff820fe612 info1 0x0000000000000184 info2
+0x0000000000000000 intr_info 0x00000000 error_code 0x00000000
+qemu-5791    [023] ..... 3602162.971197: kvm_page_fault: vcpu 7 rip
+0xffffffff820fe612 address 0x00000000020fe612 error_code 0x184
+qemu-5791    [023] ..... 3602162.971197: fast_page_fault: vcpu 7 gva
+20fe612 error_code F sptep 00000000fd98c937 old 0x61000034d4fe877 new
+61000034d4fe877 spurious 1 fixed 0
+qemu-5791    [023] d.... 3602162.971197: kvm_entry: vcpu 7, rip
+0xffffffff820fe612
+qemu-5786    [029] d.... 3602162.971199: kvm_exit: vcpu 4 reason
+EPT_VIOLATION rip 0xffffffff820fe612 info1 0x0000000000000184 info2
+0x0000000000000000 intr_info 0x00000000 error_code 0x00000000
+qemu-5786    [029] ..... 3602162.971199: kvm_page_fault: vcpu 4 rip
+0xffffffff820fe612 address 0x00000000020fe612 error_code 0x184
+qemu-5786    [029] ..... 3602162.971200: fast_page_fault: vcpu 4 gva
+20fe612 error_code F sptep 00000000fd98c937 old 0x61000034d4fe877 new
+61000034d4fe877 spurious 1 fixed 0
+qemu-5786    [029] d.... 3602162.971200: kvm_entry: vcpu 4, rip
+0xffffffff820fe612
+qemu-5791    [023] d.... 3602162.971203: kvm_exit: vcpu 7 reason
+EPT_VIOLATION rip 0xffffffff820fe612 info1 0x0000000000000184 info2
+0x0000000000000000 intr_info 0x00000000 error_code 0x00000000
+qemu-5791    [023] ..... 3602162.971203: kvm_page_fault: vcpu 7 rip
+0xffffffff820fe612 address 0x00000000020fe612 error_code 0x184
+qemu-5791    [023] ..... 3602162.971203: fast_page_fault: vcpu 7 gva
+20fe612 error_code F sptep 00000000fd98c937 old 0x61000034d4fe877 new
+61000034d4fe877 spurious 1 fixed 0
+qemu-5791    [023] d.... 3602162.971204: kvm_entry: vcpu 7, rip
+0xffffffff820fe612
+qemu-5786    [029] d.... 3602162.971205: kvm_exit: vcpu 4 reason
+EPT_VIOLATION rip 0xffffffff820fe612 info1 0x0000000000000184 info2
+0x0000000000000000 intr_info 0x00000000 error_code 0x00000000
+qemu-5786    [029] ..... 3602162.971205: kvm_page_fault: vcpu 4 rip
+0xffffffff820fe612 address 0x00000000020fe612 error_code 0x184
+qemu-5786    [029] ..... 3602162.971206: fast_page_fault: vcpu 4 gva
+20fe612 error_code F sptep 00000000fd98c937 old 0x61000034d4fe877 new
+61000034d4fe877 spurious 1 fixed 0
+qemu-5786    [029] d.... 3602162.971206: kvm_entry: vcpu 4, rip
+0xffffffff820fe612
+qemu-5791    [023] d.... 3602162.971209: kvm_exit: vcpu 7 reason
+EPT_VIOLATION rip 0xffffffff820fe612 info1 0x0000000000000184 info2
+0x0000000000000000 intr_info 0x00000000 error_code 0x00000000
+qemu-5791    [023] ..... 3602162.971209: kvm_page_fault: vcpu 7 rip
+0xffffffff820fe612 address 0x00000000020fe612 error_code 0x184
+qemu-5791    [023] ..... 3602162.971209: fast_page_fault: vcpu 7 gva
+20fe612 error_code F sptep 00000000fd98c937 old 0x61000034d4fe877 new
+61000034d4fe877 spurious 1 fixed 0
+qemu-5791    [023] d.... 3602162.971210: kvm_entry: vcpu 7, rip
+0xffffffff820fe612
+qemu-5786    [029] d.... 3602162.971211: kvm_exit: vcpu 4 reason
+EPT_VIOLATION rip 0xffffffff820fe612 info1 0x0000000000000184 info2
+0x0000000000000000 intr_info 0x00000000 error_code 0x00000000
+qemu-5786    [029] ..... 3602162.971211: kvm_page_fault: vcpu 4 rip
+0xffffffff820fe612 address 0x00000000020fe612 error_code 0x184
+qemu-5786    [029] ..... 3602162.971211: fast_page_fault: vcpu 4 gva
+20fe612 error_code F sptep 00000000fd98c937 old 0x61000034d4fe877 new
+61000034d4fe877 spurious 1 fixed 0
+qemu-5786    [029] d.... 3602162.971211: kvm_entry: vcpu 4, rip
+0xffffffff820fe612
 
 
+That particular event, we traced during ~200 seconds and we got a total
+of 6275430 traces matching 'spurious 1' with the following repartition:
 
-On 16.08.24 11:01, Dragos Tatulea wrote:
-> Currently, commands that qualify as throttled can't be used via the
-> async API. That's due to the fact that the throttle semaphore can sleep
-> but the async API can't.
-> 
-> This patch allows throttling in the async API by using the tentative
-> variant of the semaphore and upon failure (semaphore at 0) returns EBUSY
-> to signal to the caller that they need to wait for the completion of
-> previously issued commands.
-> 
-> Furthermore, make sure that the semaphore is released in the callback.
-> 
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Cc: Leon Romanovsky <leonro@nvidia.com>
-> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Same reminder as in v1: Tariq is the maintainer for mlx5 so his review
-also counts as Acked-by.
+$ grep spurious ./traces | awk '{for (i=5; i<=NF; i++) printf "%s ", $i;
+print ""}' | sort | uniq -c | sort -h
+<snip>
+5      fast_page_fault: vcpu 7 gva 1386001 error_code F sptep
+00000000e955370b old 0x61000012eb86877 new 61000012eb86877
+spurious 1 fixed 0
+6      fast_page_fault: vcpu 0 gva 1384d26 error_code F sptep
+000000004d5f1b76 old 0x61000012eb84877 new 61000012eb84877
+spurious 1 fixed 0
+20     fast_page_fault: vcpu 5 gva 1384d26 error_code F sptep
+000000004d5f1b76 old 0x61000012eb84877 new 61000012eb84877 spurious
+1 fixed 0
+711132 fast_page_fault: vcpu 7 gva 20fe612 error_code F sptep
+00000000fd98c937 old 0x61000034d4fe877 new 61000034d4fe877 spurious 1
+fixed 0
+720948 fast_page_fault: vcpu 3 gva 20fe612 error_code F sptep
+00000000fd98c937 old 0x61000034d4fe877 new 61000034d4fe877 spurious 1
+fixed 0
+739082 fast_page_fault: vcpu 1 gva 20fe612 error_code F sptep
+00000000fd98c937 old 0x61000034d4fe877 new 61000034d4fe877 spurious 1
+fixed 0
+764741 fast_page_fault: vcpu 2 gva 20fe612 error_code F sptep
+00000000fd98c937 old 0x61000034d4fe877 new 61000034d4fe877 spurious 1
+fixed 0
+781260 fast_page_fault: vcpu 0 gva 20fe612 error_code F sptep
+00000000fd98c937 old 0x61000034d4fe877 new 61000034d4fe877 spurious 1
+fixed 0
+830163 fast_page_fault: vcpu 6 gva 20fe612 error_code F sptep
+00000000fd98c937 old 0x61000034d4fe877 new 61000034d4fe877 spurious 1
+fixed 0
+839176 fast_page_fault: vcpu 4 gva 20fe612 error_code F sptep
+00000000fd98c937 old 0x61000034d4fe877 new 61000034d4fe877 spurious 1
+fixed 0
+888879 fast_page_fault: vcpu 5 gva 20fe612 error_code F sptep
+00000000fd98c937 old 0x61000034d4fe877 new 61000034d4fe877 spurious 1
+fixed 0
 
-Thanks,
-Dragos
+Also, we recorded the various /sys/kernel/debug/kvm/pf_* counters. At
+the start of the event, pf_spurious was at 9020471475 and at the end, it
+was at 9189105724, so a difference of 168634249. It seems like a lot and
+really different than what we have collected in ftrace. Could it be
+because our tracing was CPU bound and some events were lost? (we used
+cat /sys/kernel/debug/tracing/tracing_pipe because we had issues with
+trace-cmd but cat is usually maxed out at 100% CPU)
 
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 21 ++++++++++++++-----
->  1 file changed, 16 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-> index 20768ef2e9d2..f69c977c1569 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-> @@ -1882,10 +1882,12 @@ static int cmd_exec(struct mlx5_core_dev *dev, void *in, int in_size, void *out,
->  
->  	throttle_op = mlx5_cmd_is_throttle_opcode(opcode);
->  	if (throttle_op) {
-> -		/* atomic context may not sleep */
-> -		if (callback)
-> -			return -EINVAL;
-> -		down(&dev->cmd.vars.throttle_sem);
-> +		if (callback) {
-> +			if (down_trylock(&dev->cmd.vars.throttle_sem))
-> +				return -EBUSY;
-> +		} else {
-> +			down(&dev->cmd.vars.throttle_sem);
-> +		}
->  	}
->  
->  	pages_queue = is_manage_pages(in);
-> @@ -2091,10 +2093,19 @@ static void mlx5_cmd_exec_cb_handler(int status, void *_work)
->  {
->  	struct mlx5_async_work *work = _work;
->  	struct mlx5_async_ctx *ctx;
-> +	struct mlx5_core_dev *dev;
-> +	u16 opcode;
->  
->  	ctx = work->ctx;
-> -	status = cmd_status_err(ctx->dev, status, work->opcode, work->op_mod, work->out);
-> +	dev = ctx->dev;
-> +	opcode = work->opcode;
-> +	status = cmd_status_err(dev, status, work->opcode, work->op_mod, work->out);
->  	work->user_callback(status, work);
-> +	/* Can't access "work" from this point on. It could have been freed in
-> +	 * the callback.
-> +	 */
-> +	if (mlx5_cmd_is_throttle_opcode(opcode))
-> +		up(&dev->cmd.vars.throttle_sem);
->  	if (atomic_dec_and_test(&ctx->num_inflight))
->  		complete(&ctx->inflight_done);
->  }
+All pf_* counters difference between start and end of the freeze:
+/sys/kernel/debug/kvm/pf_emulate: diff=0
+/sys/kernel/debug/kvm/pf_fast: diff=168634218
+/sys/kernel/debug/kvm/pf_fixed: diff=1181
+/sys/kernel/debug/kvm/pf_guest: diff=0
+/sys/kernel/debug/kvm/pf_mmio_spte_created: diff=0
+/sys/kernel/debug/kvm/pf_spurious: diff=168634249
+/sys/kernel/debug/kvm/pf_taken: diff=168635430
 
+So the guest isn't really frozen because its CPU seems to try
+running the same CPU instructions. The RIP of the guest displayed in the
+traces doesn't change a lot, though I've seen it change from time to
+time but it seemed to still be "stuck" on the same memory address.
+
+After a certain amount of time (could be a few seconds to like 40
+minutes), the guest "unfreeze" and continues operations normally.
+
+Note: We are running the same setups on other nested environments (L0
+KVM -> L1 KVM -> L2 guest, L0 XEN -> L1 KVM -> L2 guest) or even in
+baremetal and never had such issue. We only encountered this with VMWare
+as the L0.
+
+The only way we could reproduce~ish the issue is by using stress-ng with
+various memory stressors. Current one is "stress-ng --fault 4
+--sysbadaddr 2 --memcpy 2" which produces a freeze every few
+days. We did not come up with a better reproducer yet.
+
+Would you be able to point us a direction to further investigate the
+issue? We suspect an issue between VMWare memory management and our L1
+kernels but our knowledge of KVM is lacking, even more in nested
+virtualization.
+
+We are able to reproduce the issue in a test environment and compile our
+own kernels.
+
+Thanks a lot for your help and time!
 
