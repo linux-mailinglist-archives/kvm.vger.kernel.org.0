@@ -1,268 +1,265 @@
-Return-Path: <kvm+bounces-26161-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26162-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DC719724E6
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 00:03:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AC79724FD
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 00:11:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE9BEB22EA7
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 22:02:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CBCFB23453
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 22:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE3A18C935;
-	Mon,  9 Sep 2024 22:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E5718C92C;
+	Mon,  9 Sep 2024 22:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I5uEwTjG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e2o5TrJX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2446D18A95C
-	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 22:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E85D18C924
+	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 22:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725919367; cv=none; b=NhOTcoqLmEcnbBzoTrOfaoD4lRKkCVwD0Fhq3TLXr/VQgoPKpXjr/3WOYvNOPcmQ2uXtFQ5Z1hyixFg1IIS+G6D3tp57DjKcL4EZwqr6OWuQ+sl2uy53XaD8GDH3mXip3FHjIscwdir7G2q/D43o+mbHNC7f4CwaS432aW+GpLo=
+	t=1725919867; cv=none; b=ASypEd8txOCWU7EaGDg7DWqxawLOHmtlFWeo88ekNS7i4O/34Es3zI/v7a8l47G9q/3r3uzZAToh5EewbSkVGzg/aV0B3uJoykyPQlV3mctspCRxoLrnGuvB7Qf78XWCi7E7LehzdsekZnwNRUtAdpFf7n4dKkuTynrP/jKiW4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725919367; c=relaxed/simple;
-	bh=DUFY+DZfO7+AqwuFLy5LudZkwjfnVz4AclZWLG53KJU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hk1WQ4Z32slVaM20BZHpPk3vTq1Awpb2PhZkI+lh21ENqFpI41HYvQwJ6YKYOFYEYyukOup04TML08eXYg5paZgVp3qA2cv7VhhZ4GRI7328t5N1qwJFiqgDCh/EUb+vX7Cse9FqM+QdWoI8oYowamNPwXoR4ALxf42bRiabxyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I5uEwTjG; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1725919867; c=relaxed/simple;
+	bh=Ym4S4z4hZUnUMnFN/gZ0bWxo/cR/CmX26LwWeCa4kJM=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=G310biM1xS5yVWHEJWkJuaYmP52JxUqOhP0DwlLP0yTTzWNCfeyRZrs+xHCId5Vs1LchAqrg0UyCgSXAfws4LFRiuJrm20IOw6VhK89fnuNek45UvrYavOpIv2nSsFghHzzHOOgoqrW8ifkP1wKv3yKCopzi/LzKLlweKQRwwPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e2o5TrJX; arc=none smtp.client-ip=209.85.166.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7d1fe1dd173so4988530a12.0
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 15:02:46 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-82cf30e0092so272770139f.3
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 15:11:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725919365; x=1726524165; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eDN/fD1fWlVYUsfWFNeY11plKSbG6eNq65vUSIIaXZo=;
-        b=I5uEwTjG4JUhXMY02AlABDcsXKPqn0Eu+mKJNBT/QqHgJY6aOX20q5K/if7igaRUtV
-         RZpTif3kEL6LCjYB3OQduF4DKewuejab+5AwRKhb7tByrE7dToce1mK9jZq5LSt4IUaZ
-         3aVCEo3SRpz7xG/66ymnNFT0NZOHVurQgt27NatEVK1xWfWqeY1kgLeuQndZxdutEBUR
-         0NW7HeEFHlDRlBapjd/tqqY2NY/fQl26dl4QeoF0S7ptUWglLl9TKtV6uZ23gxSay6rr
-         xX9sifGgTyeCUlamYzaWY8FXl8xhMNaHghuduKj3PvptB3B5yHK56chGJT5rf56OPV6r
-         NFdg==
+        d=google.com; s=20230601; t=1725919864; x=1726524664; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mwiDGbxq8H2WD4p4wklx1FUjJYJSGOrjotVinFQ/oRw=;
+        b=e2o5TrJXFXfBcuMD+t+elWncMrLOoX2iFRq4AUKJzqB3k6YAndb+DI8/ctx1D/fzqs
+         zpZXiGRUPCCxBkS0ld2EdR/+STuab5wBxAcu5/D0TVGCAihXHhZfcWPFzosi4vAozrUs
+         bR4UPzpnBjQCS8LKoVosj1Ea4JTfOeDWXKbQdjDkPUNOe5OC0wHGzgatFwXjw6GjfB9q
+         kMM5cRugJFnBhv4QYDJsZqzu8I72fGvM7c2hU28FLuh50uNy77v2Kn/BFQezPcfKrb1G
+         kW5POJ52reEz3WJ4/w411m9FD3vGjNuYMiyJbQ6D2paDo0PzU4/l+1QqJrj64A2znYTI
+         Tbdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725919365; x=1726524165;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eDN/fD1fWlVYUsfWFNeY11plKSbG6eNq65vUSIIaXZo=;
-        b=jB4ACdk4/rIiY/J4OcVrJW1m73lE2wlZPxuH7qeUqYnhlCDZ2V610XNkqrcHj01GkJ
-         6nAKGL4Cg/Yzyyy+egX0mEA9lJKWiCqJ2UHkXF3UfCpntXYoZpHN20dken/pIdfEXaeo
-         geJksS35JeHuFbbjKdyrXXs/eYlpvQvNISXTv78+lrQxaw7fLUp8t+OWLG3NaBjQdzo5
-         MS53OcbUf3zm137RUmUu7aK++MuxuFhxzDb4bmj+rKL4CAGxxb+ypKGwV0oWsheTO0nx
-         tUxrD6l0OVxp8QKKzgvDYobO9iN0i8811wLqFyZAofZFkADHSzdtW2rh8dcG+zdQkenu
-         eVPA==
-X-Forwarded-Encrypted: i=1; AJvYcCVkZWQWpMQUK02/WWrvt6F8FMkSCQBMGQfQIDgFVHywH8blbc8UAuVWuWScwN7N247d80s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrLB6mw3rnmYoUp4voWnEsSkSxYEKsRreV5BU2laZPaCd8gnvV
-	RiYX9TdcrYnD2RKVe3n06wOX2CcJ2por2RlZH5j5VB7t2CyJZygt119HdhCCZ2Y2itN0FiG4pN0
-	o4g==
-X-Google-Smtp-Source: AGHT+IGGtNJ9J2pBPzXxJKnIWU60VR/rN6PzOzfLZuYkuT2leAPAotkJrTHJr1E+W8UKZjnsjesbS347OZw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:9517:0:b0:718:da6:277e with SMTP id
- 41be03b00d2f7-7d79f5b5f0fmr37096a12.2.1725919365275; Mon, 09 Sep 2024
- 15:02:45 -0700 (PDT)
-Date: Mon, 9 Sep 2024 15:02:43 -0700
-In-Reply-To: <CADrL8HW-mOAyF0Gcw7UbkvEvEfcHDxEir0AiStkqYzD5x8ZGpg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1725919864; x=1726524664;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mwiDGbxq8H2WD4p4wklx1FUjJYJSGOrjotVinFQ/oRw=;
+        b=QibXP7+1dzN9Wr9inOXdsB+Zqe6dn/K36Q2RObSP2zw/CiwYOWE0bavpEaVobo3FX3
+         EKKY7yG2vWmlIxHgHxTPtnUxxPlrlbCd3CuiYp7ewYiyim6ZvDxRY5te9J4dbH7uf29R
+         hgfTpbDf1qQyP7yv5ndbELotyHIHAYWRUiSgbYT+Wbx9Fq5q+KoauSRfENdEk2wB1cpZ
+         b6o8AkiPzSi08yWpu5fwX1F4jycdb2UZd5Xj5d/pvMTdnJUS7lQC2i47HzDhMLXvBv5G
+         Uc+gccKRXu+ZOTBTVYZY/OVV3tdXC7umY/I6pnR/d2lxB2rCD471XclRBRuGHk1p6But
+         ORRA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBIhxLQd3Kd9fPEYxWjYaDnKvNXxo9b+2F281RUoJP9FcKmylMrCNXWyWG6lJD3hfogi8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcvBnTVBcCS24O/F6bxVyPY78OaqYvMIMGy24RxAsIzxYyzAqn
+	cZ6dZKPbd9zdpgifHTzpzm82dFWNzZ3wjmjWPATR+xyUPwaurpxZSSL53T2padHB/aZnjS9igi6
+	Hv5kJ6eZPqOHxF1Ymx3QWgg==
+X-Google-Smtp-Source: AGHT+IFbOAZC8OkGbMlqnvGhe3VdEHbkA3wy16Kyk/Po0dvS9tvD9w+NBX/fV1WUh9kizCTu6HK4wQe3yBUVcQQyFQ==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fa18])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6602:342a:b0:82c:e924:d7d1 with
+ SMTP id ca18e2360f4ac-82ce924de3amr2500639f.0.1725919864441; Mon, 09 Sep 2024
+ 15:11:04 -0700 (PDT)
+Date: Mon, 09 Sep 2024 22:11:03 +0000
+In-Reply-To: <20240801045907.4010984-13-mizhang@google.com> (message from
+ Mingwei Zhang on Thu,  1 Aug 2024 04:58:21 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-20-seanjc@google.com>
- <CADrL8HWACwbzraG=MbDoORJ8ramDxb-h9yb0p4nx9-wq4o3c6A@mail.gmail.com>
- <Zt9UT74XkezVpTuK@google.com> <CADrL8HW-mOAyF0Gcw7UbkvEvEfcHDxEir0AiStkqYzD5x8ZGpg@mail.gmail.com>
-Message-ID: <Zt9wg6h_bPp8BKtd@google.com>
-Subject: Re: [PATCH 19/22] KVM: x86/mmu: Add infrastructure to allow walking
- rmaps outside of mmu_lock
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <gsnt7cbkeavc.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [RFC PATCH v3 12/58] perf: core/x86: Register a new vector for
+ KVM GUEST PMI
+From: Colton Lewis <coltonlewis@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, xiong.y.zhang@intel.com, 
+	dapeng1.mi@linux.intel.com, kan.liang@intel.com, zhenyuw@linux.intel.com, 
+	manali.shukla@amd.com, sandipan.das@amd.com, jmattson@google.com, 
+	eranian@google.com, irogers@google.com, namhyung@kernel.org, 
+	mizhang@google.com, gce-passthrou-pmu-dev@google.com, samantha.alt@intel.com, 
+	zhiyuan.lv@intel.com, yanfei.xu@intel.com, like.xu.linux@gmail.com, 
+	peterz@infradead.org, rananta@google.com, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Mon, Sep 09, 2024, James Houghton wrote:
-> On Mon, Sep 9, 2024 at 1:02=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Mon, Sep 09, 2024, James Houghton wrote:
-> > > On Fri, Aug 9, 2024 at 12:44=E2=80=AFPM Sean Christopherson <seanjc@g=
-oogle.com> wrote:
-> > > > + */
-> > > > +#define KVM_RMAP_LOCKED        BIT(1)
-> > > > +
-> > > > +static unsigned long kvm_rmap_lock(struct kvm_rmap_head *rmap_head=
-)
-> > > > +{
-> > > > +       unsigned long old_val, new_val;
-> > > > +
-> > > > +       old_val =3D READ_ONCE(rmap_head->val);
-> > > > +       if (!old_val)
-> > > > +               return 0;
-> > > > +
-> > > > +       do {
-> > > > +               /*
-> > > > +                * If the rmap is locked, wait for it to be unlocke=
-d before
-> > > > +                * trying acquire the lock, e.g. to bounce the cach=
-e line.
-> > > > +                */
-> > > > +               while (old_val & KVM_RMAP_LOCKED) {
-> > > > +                       old_val =3D READ_ONCE(rmap_head->val);
-> > > > +                       cpu_relax();
-> > > > +               }
-> > > > +
-> > > > +               /*
-> > > > +                * Recheck for an empty rmap, it may have been purg=
-ed by the
-> > > > +                * task that held the lock.
-> > > > +                */
-> > > > +               if (!old_val)
-> > > > +                       return 0;
-> > > > +
-> > > > +               new_val =3D old_val | KVM_RMAP_LOCKED;
-> > > > +       } while (!try_cmpxchg(&rmap_head->val, &old_val, new_val));
-> > >
-> > > I think we (technically) need an smp_rmb() here. I think cmpxchg
-> > > implicitly has that on x86 (and this code is x86-only), but should we
-> > > nonetheless document that we need smp_rmb() (if it indeed required)?
-> > > Perhaps we could/should condition the smp_rmb() on `if (old_val)`.
-> >
-> > Hmm, no, not smp_rmb().  If anything, the appropriate barrier here woul=
-d be
-> > smp_mb__after_spinlock(), but I'm pretty sure even that is misleading, =
-and arguably
-> > even wrong.
->=20
-> I don't think smp_mb__after_spinlock() is right either. This seems to
-> be used following the acquisition of a spinlock to promote the memory
-> ordering from an acquire barrier (that is implicit with the lock
-> acquisition, e.g. [1]) to a full barrier. IIUC, we have no need for a
-> stronger-than-usual barrier. But I guess I'm not really sure.
->=20
-> In this case, I'm complaining that we don't have the usual memory
-> ordering restrictions that come with a spinlock.
+Hello,
 
-What makes you think that?
+Mingwei Zhang <mizhang@google.com> writes:
 
-> > For the !old_val case, there is a address/data dependency that can't be=
- broken by
-> > the CPU without violating the x86 memory model (all future actions with=
- relevant
-> > memory loads depend on rmap_head->val being non-zero).  And AIUI, in th=
-e Linux
-> > kernel memory model, READ_ONCE() is responsible for ensuring that the a=
-ddress
-> > dependency can't be morphed into a control dependency by the compiler a=
-nd
-> > subsequently reordered by the CPU.
-> >
-> > I.e. even if this were arm64, ignoring the LOCK CMPXCHG path for the mo=
-ment, I
-> > don't _think_ an smp_{r,w}mb() pair would be needed, as arm64's definit=
-ion of
-> > __READ_ONCE() promotes the operation to an acquire.
-> >
-> > Back to the LOCK CMPXCHG path, KVM_RMAP_LOCKED implements a rudimentary=
- spinlock,
-> > hence my smp_mb__after_spinlock() suggestion.  Though _because_ it's a =
-spinlock,
-> > the rmaps are fully protected by the critical section.
->=20
-> I feel like a spinlock must include the appropriate barriers for it to
-> correctly function as a spinlock, so I'm not sure I fully understand
-> what you mean here.
+> From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
 
-On TSO architectures, the atomic _is_ the barrier.  E.g. atomic_try_cmpxchg=
-_acquire()
-eventually resolves to atomic_try_cmpxchg() on x86.  And jumping back to th=
-e
-"we don't have the usual memory ordering restrictions that come with a spin=
-lock",
-x86's virt_spin_lock() uses atomic_try_cmpxchg().  So while using the acqui=
-re
-variant here is obviously not wrong, it also feels somewhat weird.  Though =
-some
-of that is undoubtedly due to explicit "acquire" semantics being rather rar=
-e in
-x86.
+> Create a new vector in the host IDT for kvm guest PMI handling within
+> mediated passthrough vPMU. In addition, guest PMI handler registration
+> is added into x86_set_kvm_irq_handler().
 
-> > And for the SPTEs, there is no required ordering.  The reader (aging
-> > thread) can observe a !PRESENT or a PRESENT SPTE, and must be prepared =
-for
-> > either.  I.e. there is no requirement that the reader observe a PRESENT
-> > SPTE if there is a valid rmap.
->=20
-> This makes sense.
->=20
-> > So, unless I'm missing something, I would prefer to not add a smp_mb__a=
-fter_spinlock(),
-> > even though it's a nop on x86 (unless KCSAN_WEAK_MEMORY=3Dy), because i=
-t suggests
-> > an ordering requirement that doesn't exist.
->=20
-> So we have: the general kvm_rmap_lock() and the read-only
-> kvm_rmap_lock_readonly(), as introduced by the next patch[2]. I'll use
-> those names (sorry if it's confusing).
->=20
-> For kvm_rmap_lock(), we are always holding mmu_lock for writing. So
-> any changes we make to the rmap will be properly published to other
-> threads that subsequently grab kvm_rmap_lock() because we had to
-> properly release and then re-acquire mmu_lock, which comes with the
-> barriers I'm saying we need.
->=20
-> For kvm_rmap_lock_readonly(), we don't hold mmu_lock, so there is no
-> smp_rmb() or equivalent. Without an smp_rmb() somewhere, I claim that
-> it is possible that there may observe external changes to the
-> pte_list_desc while we are in this critical section (for a
-> sufficiently weak architecture). The changes that the kvm_rmap_lock()
-> (mmu_lock) side made were half-published with an smp_wmb() (really
-> [3]), but the read side didn't use a load-acquire or smp_rmb(), so it
-> hasn't held up its end of the deal.
->=20
-> I don't think READ_ONCE() has the guarantees we need to be a
-> sufficient replacement for smp_rmb() or a load-acquire that a real
-> lock would use, although I agree with you that, on arm64, it
-> apparently *is* a sufficient replacement.
->=20
-> Now this isn't a problem if the kvm_rmap_lock_readonly() side can
-> tolerate changes to pte_list_desc while in the critical section. I
-> don't think this is true (given for_each_rmap_spte_lockless),
-> therefore an smp_rmb() or equivalent is (technically) needed.
->=20
-> Am I confused?
+> This is the preparation work to support mediated passthrough vPMU to
+> handle kvm guest PMIs without interference from PMI handler of the host
+> PMU.
 
-Yes, I think so.  kvm_rmap_lock_readonly() creates a critical section that =
-prevents
-any pte_list_desc changes.  rmap_head->val, and every pte_list_desc that is=
- pointed
-at by rmap_head->val in the KVM_RMAP_MULTI case, is protected and cannot ch=
-ange.
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>   arch/x86/include/asm/hardirq.h                |  1 +
+>   arch/x86/include/asm/idtentry.h               |  1 +
+>   arch/x86/include/asm/irq_vectors.h            |  5 ++++-
+>   arch/x86/kernel/idt.c                         |  1 +
+>   arch/x86/kernel/irq.c                         | 21 +++++++++++++++++++
+>   .../beauty/arch/x86/include/asm/irq_vectors.h |  5 ++++-
+>   6 files changed, 32 insertions(+), 2 deletions(-)
 
-The SPTE _value_ that is pointed at by rmap_head->val or pte_list_desc.spte=
-s[]
-can change, but the pointers themselves cannot.  And with aging, the code i=
-s
-completely tolerant of an instable SPTE _value_ because test-only doesn't c=
-are
-about false negatives/positives, and test-and-clear is itself an atomic acc=
-ess
-i.e. won't corrupt a SPTE (and is also tolerant of false positives/negative=
-s).
+> diff --git a/arch/x86/include/asm/hardirq.h  
+> b/arch/x86/include/asm/hardirq.h
+> index c67fa6ad098a..42a396763c8d 100644
+> --- a/arch/x86/include/asm/hardirq.h
+> +++ b/arch/x86/include/asm/hardirq.h
+> @@ -19,6 +19,7 @@ typedef struct {
+>   	unsigned int kvm_posted_intr_ipis;
+>   	unsigned int kvm_posted_intr_wakeup_ipis;
+>   	unsigned int kvm_posted_intr_nested_ipis;
+> +	unsigned int kvm_guest_pmis;
+>   #endif
+>   	unsigned int x86_platform_ipis;	/* arch dependent */
+>   	unsigned int apic_perf_irqs;
+> diff --git a/arch/x86/include/asm/idtentry.h  
+> b/arch/x86/include/asm/idtentry.h
+> index d4f24499b256..7b1e3e542b1d 100644
+> --- a/arch/x86/include/asm/idtentry.h
+> +++ b/arch/x86/include/asm/idtentry.h
+> @@ -745,6 +745,7 @@ DECLARE_IDTENTRY_SYSVEC(IRQ_WORK_VECTOR,		 
+> sysvec_irq_work);
+>   DECLARE_IDTENTRY_SYSVEC(POSTED_INTR_VECTOR,		sysvec_kvm_posted_intr_ipi);
+>   DECLARE_IDTENTRY_SYSVEC(POSTED_INTR_WAKEUP_VECTOR,	 
+> sysvec_kvm_posted_intr_wakeup_ipi);
+>   DECLARE_IDTENTRY_SYSVEC(POSTED_INTR_NESTED_VECTOR,	 
+> sysvec_kvm_posted_intr_nested_ipi);
+> +DECLARE_IDTENTRY_SYSVEC(KVM_GUEST_PMI_VECTOR,	         
+> sysvec_kvm_guest_pmi_handler);
+>   #else
+>   # define fred_sysvec_kvm_posted_intr_ipi		NULL
+>   # define fred_sysvec_kvm_posted_intr_wakeup_ipi		NULL
+> diff --git a/arch/x86/include/asm/irq_vectors.h  
+> b/arch/x86/include/asm/irq_vectors.h
+> index 13aea8fc3d45..ada270e6f5cb 100644
+> --- a/arch/x86/include/asm/irq_vectors.h
+> +++ b/arch/x86/include/asm/irq_vectors.h
+> @@ -77,7 +77,10 @@
+>    */
+>   #define IRQ_WORK_VECTOR			0xf6
 
->=20
-> (Though all of this works just fine as written on x86.)
->=20
-> [1]: https://elixir.bootlin.com/linux/v6.11-rc7/source/kernel/locking/rwb=
-ase_rt.c#L62
-> [2]: https://lore.kernel.org/kvm/20240809194335.1726916-21-seanjc@google.=
-com/
-> [3]: https://elixir.bootlin.com/linux/v6.11-rc7/source/kernel/locking/rwb=
-ase_rt.c#L190
+> -/* 0xf5 - unused, was UV_BAU_MESSAGE */
+> +#if IS_ENABLED(CONFIG_KVM)
+> +#define KVM_GUEST_PMI_VECTOR		0xf5
+> +#endif
+> +
+>   #define DEFERRED_ERROR_VECTOR		0xf4
+
+>   /* Vector on which hypervisor callbacks will be delivered */
+> diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+> index f445bec516a0..0bec4c7e2308 100644
+> --- a/arch/x86/kernel/idt.c
+> +++ b/arch/x86/kernel/idt.c
+> @@ -157,6 +157,7 @@ static const __initconst struct idt_data apic_idts[]  
+> = {
+>   	INTG(POSTED_INTR_VECTOR,		asm_sysvec_kvm_posted_intr_ipi),
+>   	INTG(POSTED_INTR_WAKEUP_VECTOR,		asm_sysvec_kvm_posted_intr_wakeup_ipi),
+>   	INTG(POSTED_INTR_NESTED_VECTOR,		asm_sysvec_kvm_posted_intr_nested_ipi),
+> +	INTG(KVM_GUEST_PMI_VECTOR,		asm_sysvec_kvm_guest_pmi_handler),
+
+
+There is a subtle inconsistency in that this code is guarded on
+CONFIG_HAVE_KVM when the #define KVM_GUEST_PMI_VECTOR is guarded on
+CONFIG_KVM. Beats me why there are two different flags that are so
+similar, but it is possible they have different values leading to
+compilation errors.
+
+I happened to hit this compilation error because make defconfig will
+define CONFIG_HAVE_KVM but not CONFIG_KVM. CONFIG_KVM is the more strict
+of the two because it depends on CONFIG_HAVE_KVM.
+
+This code should also be guarded on CONFIG_KVM.
+
+>   # endif
+>   # ifdef CONFIG_IRQ_WORK
+>   	INTG(IRQ_WORK_VECTOR,			asm_sysvec_irq_work),
+> diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
+> index 18cd418fe106..b29714e23fc4 100644
+> --- a/arch/x86/kernel/irq.c
+> +++ b/arch/x86/kernel/irq.c
+> @@ -183,6 +183,12 @@ int arch_show_interrupts(struct seq_file *p, int  
+> prec)
+>   		seq_printf(p, "%10u ",
+>   			   irq_stats(j)->kvm_posted_intr_wakeup_ipis);
+>   	seq_puts(p, "  Posted-interrupt wakeup event\n");
+> +
+> +	seq_printf(p, "%*s: ", prec, "VPMU");
+> +	for_each_online_cpu(j)
+> +		seq_printf(p, "%10u ",
+> +			   irq_stats(j)->kvm_guest_pmis);
+> +	seq_puts(p, " KVM GUEST PMI\n");
+>   #endif
+>   #ifdef CONFIG_X86_POSTED_MSI
+>   	seq_printf(p, "%*s: ", prec, "PMN");
+> @@ -311,6 +317,7 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_x86_platform_ipi)
+>   #if IS_ENABLED(CONFIG_KVM)
+>   static void dummy_handler(void) {}
+>   static void (*kvm_posted_intr_wakeup_handler)(void) = dummy_handler;
+> +static void (*kvm_guest_pmi_handler)(void) = dummy_handler;
+
+>   void x86_set_kvm_irq_handler(u8 vector, void (*handler)(void))
+>   {
+> @@ -321,6 +328,10 @@ void x86_set_kvm_irq_handler(u8 vector, void  
+> (*handler)(void))
+>   	    (handler == dummy_handler ||
+>   	     kvm_posted_intr_wakeup_handler == dummy_handler))
+>   		kvm_posted_intr_wakeup_handler = handler;
+> +	else if (vector == KVM_GUEST_PMI_VECTOR &&
+> +		 (handler == dummy_handler ||
+> +		  kvm_guest_pmi_handler == dummy_handler))
+> +		kvm_guest_pmi_handler = handler;
+>   	else
+>   		WARN_ON_ONCE(1);
+
+> @@ -356,6 +367,16 @@  
+> DEFINE_IDTENTRY_SYSVEC_SIMPLE(sysvec_kvm_posted_intr_nested_ipi)
+>   	apic_eoi();
+>   	inc_irq_stat(kvm_posted_intr_nested_ipis);
+>   }
+> +
+> +/*
+> + * Handler for KVM_GUEST_PMI_VECTOR.
+> + */
+> +DEFINE_IDTENTRY_SYSVEC(sysvec_kvm_guest_pmi_handler)
+> +{
+> +	apic_eoi();
+> +	inc_irq_stat(kvm_guest_pmis);
+> +	kvm_guest_pmi_handler();
+> +}
+>   #endif
+
+>   #ifdef CONFIG_X86_POSTED_MSI
+> diff --git a/tools/perf/trace/beauty/arch/x86/include/asm/irq_vectors.h  
+> b/tools/perf/trace/beauty/arch/x86/include/asm/irq_vectors.h
+> index 13aea8fc3d45..670dcee46631 100644
+> --- a/tools/perf/trace/beauty/arch/x86/include/asm/irq_vectors.h
+> +++ b/tools/perf/trace/beauty/arch/x86/include/asm/irq_vectors.h
+> @@ -77,7 +77,10 @@
+>    */
+>   #define IRQ_WORK_VECTOR			0xf6
+
+> -/* 0xf5 - unused, was UV_BAU_MESSAGE */
+> +#if IS_ENABLED(CONFIG_KVM)
+> +#define KVM_GUEST_PMI_VECTOR           0xf5
+> +#endif
+> +
+>   #define DEFERRED_ERROR_VECTOR		0xf4
+
+>   /* Vector on which hypervisor callbacks will be delivered */
 
