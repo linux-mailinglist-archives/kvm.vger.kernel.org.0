@@ -1,544 +1,333 @@
-Return-Path: <kvm+bounces-26137-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26138-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25F8E971E4F
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 17:41:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44AD1971E74
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 17:49:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1D85285231
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 15:41:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA1E11F22B1E
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 15:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365034D8B1;
-	Mon,  9 Sep 2024 15:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D4977110;
+	Mon,  9 Sep 2024 15:49:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nl4xEppp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ahdkASbm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD583B791
-	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 15:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE18C4D8DA
+	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 15:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725896482; cv=none; b=TEIDgFzd2lAVI9v+6a8RDc/gWAPFK5HWtSUV/IGpqtngmJ8ptnQcfErpOZTVIV2o4x8pFMza7UOLeQ81el9VCDLwfkhnBpymAw3ipv4IR3ahnBgpkBNKf//grOry0g7stH6SJTECjjxvlK/TSLUTF94fsd6/zzqUsJZnfjr7kTs=
+	t=1725896986; cv=none; b=ty+1wHDotyvw/erCVXBXoVTn1/FJKWX0jwZ7LvJCqb5DHoosWrMp2tTQiDhxYBzPeYgAN1RW9LjUElmoRRsPiotEMh8+EV6aTsHuq210hfXqzCFE5KGpScZoIWag/V51Mu7i8O2lF3prPOFy+CLWfXKp9dMXQZb/0u7gcnkl1cM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725896482; c=relaxed/simple;
-	bh=zZxnXquR9DYCPBjgjvpa9fPaOPw1UKc4QBW+bwvYbBI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kbn7TCelAz4NgjrBV2uA3O3u6U80rjsJowunUiEM0pkh8fQ9OSOYGYGkPFNWgFIGyUlFMBVCJ3ANOwMHmAo3G5RUoZjKDZ3AxVJt+ve/S6oVMi0xW3Dtext2IN3gwDd/QfcE5hQJPyezBTetxjrZ2sCg7diN33wj6LdZo9yWWVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nl4xEppp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725896478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=JI9jdrA1pwrzYoUJkQ/dbUC0Ow4MhaVrQtDY9JRYPWw=;
-	b=Nl4xEpppzoFt1b+vDHW+CYZWhQY27S6H2/Cym2cJ4weyMAoMMRHotBkO25QtWZ525Mv9LM
-	TaHu+kDVTzZsU7DjTGGGQ7yPnLnJMujQOE+rZcVmK+I4ndmZpUc1oa+U7RMQy8LdiorY44
-	tLGk8IKUY/3/Sxi1CWgum7ODPEJw2Xw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-UgysphTHMim5foRLmt1mvg-1; Mon, 09 Sep 2024 11:41:17 -0400
-X-MC-Unique: UgysphTHMim5foRLmt1mvg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cbadcbb6eso4653865e9.2
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 08:41:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725896476; x=1726501276;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+	s=arc-20240116; t=1725896986; c=relaxed/simple;
+	bh=sLE8/LlAfbnGrOzaBSQACzUkdA3fCwIsnzI32ChO6mQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fJbhvkYjnAS0hdsRseAQEtshlfSEsNRCjR/IBuQh91ACmNAgl6U6VGKNqnRlxbE7jurd9TrZemms1klBTt9VR3xfY+t7X6b+UJcQfRTep/Ov0pmF3VjAnOumpje207/oTwMzGBJ6lXGtV2im5Ag467jVP/JZyn6anAozoVG82Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ahdkASbm; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e1d10fde51cso10312276276.1
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 08:49:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725896983; x=1726501783; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=JI9jdrA1pwrzYoUJkQ/dbUC0Ow4MhaVrQtDY9JRYPWw=;
-        b=qBlHJdbJiX3ylFEgNlCnSV19pF+p1Ix2L6/OcOqmUBqS4MSFHwk89bmCyy64WNBlGS
-         skpn9PIimqwNWGiXRn+7/a+uCg30cLtswB+gloYGEhtGgnrmfEjhnVtF7IddtCEMdV1A
-         mW7kOF0tv85kQ4AI9cmb2TSdTdcrSGVyLYdPg24t4vCRLbJ2rDN3BKmwZ2ui1Y9Vr0Q1
-         C4RdPpG3Qgcm31g/UMyC64wcH9wOQIPR1ITdWJrwJEvu2W7pm7O3f4PZy5gNPyaiRdWf
-         qXW1XjyoqrMNFXF0wcu88uEp1AyfhANWrM6xbnUuXAJIVTkTOxHvlmdwu3s2RxWowWQ+
-         6C4g==
-X-Forwarded-Encrypted: i=1; AJvYcCW8p4vP8rR7zSDxFtSzTUEtfOAhChiwNqlM+ZjofVf3Y/w5mDooWBLBuTBIZCF/GU+mC9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf7CzCipDXWCeAiAaXkzK3PeoWSagetOU/A5A/K/yvJ/zc1F4I
-	KR/diRmWXUtClPzuseSNdzTgd/2TLPLz2ziSiHsVJapmdpR05nw5P/SFbj7VwQniHdGosBKMtXu
-	OZQIJf2GQPYPl7ZonRO5hl7U5fmVAoSsuCh9ob57LmLQijM4UaA==
-X-Received: by 2002:a05:600c:4506:b0:428:1ce0:4dfd with SMTP id 5b1f17b1804b1-42c9f9e1980mr82477815e9.34.1725896476023;
-        Mon, 09 Sep 2024 08:41:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEy7JGszyHmEw/v6aX4uxNl6gtNV3DASeqmjvLnSg7Hp/mo+kMdRp5XkP1tARqKcwFPHVWIlg==
-X-Received: by 2002:a05:600c:4506:b0:428:1ce0:4dfd with SMTP id 5b1f17b1804b1-42c9f9e1980mr82477495e9.34.1725896475348;
-        Mon, 09 Sep 2024 08:41:15 -0700 (PDT)
-Received: from [192.168.10.81] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42caeb815e8sm81045245e9.31.2024.09.09.08.41.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Sep 2024 08:41:14 -0700 (PDT)
-Message-ID: <4449bc94-7c5e-4095-8e91-7cd0544bb831@redhat.com>
-Date: Mon, 9 Sep 2024 17:41:13 +0200
+        bh=LNwoFKLm/N/Hcz6rIQxwMOO5QV8YU6AFj1EsPbHngTk=;
+        b=ahdkASbmjT4LU8S23rQQ9bMqK6j1/yhDSgk10A7s3kFFuNdmSqgMDfhVNnx2JuZgPK
+         B+0Ao95dbqV0W3HyJWSsEM9ppfTyrpwSOcG/MPa3ksvXqgwyTLbiP9WVwtWmjIyq+l5N
+         Mty3dxUnQcNDMri4DHM5er1pMj9kjPsWpnq7xoReYUdryrTYpr5xXVVDCi0bfwS7WsxB
+         /1gZbmc06CDY3Fn1iXsuJroYRRgLm6E16pZXzAMopLJ1w3NLk92Wz9bBniD43is1y2jJ
+         xAUQe064B/hWNUua7ZnWRIAiWOSCBonYh/NLFTVeIImdMp01I4hTLbGswBchX8EstY0m
+         WoRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725896983; x=1726501783;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LNwoFKLm/N/Hcz6rIQxwMOO5QV8YU6AFj1EsPbHngTk=;
+        b=oVr0S3BWjPaNVH6RCXbAzGuolSdCI8T1ovcfgtYw+NVrDMUuylxncRaaHPyuecOvkL
+         e1e2/5NNJyIKgtjsq7HEgkQ9a81rAY1NskUEWnbxekihuemyhmecRRExv8AHc4Lz35e/
+         KXhNEzcfahi0YcQi9LXU3Gnb2EvDQ9c2oKAx2Ul/W3QGZNpuEfE0dRE+LnXGS8LuVQKi
+         xjjJb+uPpOLxTWdG0tgoLXput8bfQkEucKelXe24wt0iWzh5TE8HIIsv8t3vNaplestG
+         a1ktGo5VLumcweSWO3vqZisGeeNpqOahgQIiZfe0Q9r+RgnfbyNoWaSCPpM/aD3mZTAj
+         NiDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmexfIuqVRs7ZhusiqpiZPJzQ/9Ng4NC0mBLp8+H/BkDzWShcyfMOpuMmrbfP/rbOHA/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPmw0cZ8AZf3QlHcxQChTCaqgJPTdFe7mkWKSqDvzGaWKwbxQR
+	B84lIo9FD84VzjqnvGHbpcOqRjOyw1LM44/EEEFlEjw9PEqtLecbgYOhEWC+DJs2OTzW4gaxHpC
+	1jA==
+X-Google-Smtp-Source: AGHT+IEYtk8RynB49lyU1BQzsbnYAWn1zVMeMkLeBfvik8eAFfX7nhTd9PF8qmZ+/sTYwdMzlVfyVDhf8dw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:aa2e:0:b0:dfb:1c1c:abf9 with SMTP id
+ 3f1490d57ef6-e1d34863413mr145259276.2.1725896983267; Mon, 09 Sep 2024
+ 08:49:43 -0700 (PDT)
+Date: Mon, 9 Sep 2024 08:49:41 -0700
+In-Reply-To: <CADrL8HVaZk7m73FftxXYEXvAqjKa8vc4QG_1FAMXTYSfOE7jhQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 21/21] KVM: TDX: Handle vCPU dissociation
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- kvm@vger.kernel.org
-Cc: kai.huang@intel.com, dmatlack@google.com, isaku.yamahata@gmail.com,
- yan.y.zhao@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org
-References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
- <20240904030751.117579-22-rick.p.edgecombe@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240904030751.117579-22-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-10-seanjc@google.com>
+ <CADrL8HXcD--jn1iLeCJycCd3Btv4_rBPxz6NMnTREXfeh0vRZA@mail.gmail.com>
+ <Ztuj7KapTJyBVCVR@google.com> <CADrL8HVaZk7m73FftxXYEXvAqjKa8vc4QG_1FAMXTYSfOE7jhQ@mail.gmail.com>
+Message-ID: <Zt8ZFYL1l8ni4wgQ@google.com>
+Subject: Re: [PATCH 09/22] KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/4/24 05:07, Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> Handle vCPUs dissociations by invoking SEAMCALL TDH.VP.FLUSH which flushes
-> the address translation caches and cached TD VMCS of a TD vCPU in its
-> associated pCPU.
-> 
-> In TDX, a vCPUs can only be associated with one pCPU at a time, which is
-> done by invoking SEAMCALL TDH.VP.ENTER. For a successful association, the
-> vCPU must be dissociated from its previous associated pCPU.
-> 
-> To facilitate vCPU dissociation, introduce a per-pCPU list
-> associated_tdvcpus. Add a vCPU into this list when it's loaded into a new
-> pCPU (i.e. when a vCPU is loaded for the first time or migrated to a new
-> pCPU).
-> 
-> vCPU dissociations can happen under below conditions:
-> - On the op hardware_disable is called.
->    This op is called when virtualization is disabled on a given pCPU, e.g.
->    when hot-unplug a pCPU or machine shutdown/suspend.
->    In this case, dissociate all vCPUs from the pCPU by iterating its
->    per-pCPU list associated_tdvcpus.
-> 
-> - On vCPU migration to a new pCPU.
->    Before adding a vCPU into associated_tdvcpus list of the new pCPU,
->    dissociation from its old pCPU is required, which is performed by issuing
->    an IPI and executing SEAMCALL TDH.VP.FLUSH on the old pCPU.
->    On a successful dissociation, the vCPU will be removed from the
->    associated_tdvcpus list of its previously associated pCPU.
-> 
-> - On tdx_mmu_release_hkid() is called.
->    TDX mandates that all vCPUs must be disassociated prior to the release of
->    an hkid. Therefore, dissociation of all vCPUs is a must before executing
->    the SEAMCALL TDH.MNG.VPFLUSHDONE and subsequently freeing the hkid.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+On Fri, Sep 06, 2024, James Houghton wrote:
+> On Fri, Sep 6, 2024 at 5:53=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >  #ifdef __x86_64__
+> > -                       asm volatile(".byte 0xc6,0x40,0x0,0x0" :: "a" (=
+gpa) : "memory"); /* MOV RAX, [RAX] */
+> > +                       asm volatile(".byte 0x48,0x89,0x00" :: "a"(gpa)=
+ : "memory"); /* mov %rax, (%rax) */
+>=20
+> FWIW I much prefer the trailing comment you have ended up with vs. the
+> one you had before. (To me, the older one _seems_ like it's Intel
+> syntax, in which case the comment says it's a load..? The comment you
+> have now is, to me, obviously indicating a store. Though... perhaps
+> "movq"?)
 
-I think this didn't apply correctly to kvm-coco-queue, but I'll wait for 
-further instructions on next postings.
+TL;DR: "movq" is arguably a worse mnemonic than simply "mov" because MOV *a=
+nd*
+        MOVQ are absurdly overloaded mnemonics, and because x86-64 is wonky=
+.
 
-Paolo
+Heh, "movq" is technically a different instruction (MMX/SSE instruction).  =
+For
+ambiguous mnemonics, the assembler infers the exact instructions from the o=
+perands.
+When a register is the source or destination, appending the size to a vanil=
+la MOV
+is 100% optional, as the width of the register communicates the desired siz=
+e
+without any ambiguity.
 
-> ---
-> TDX MMU part 2 v1:
->   - Changed title to "KVM: TDX: Handle vCPU dissociation" .
->   - Updated commit log.
->   - Removed calling tdx_disassociate_vp_on_cpu() in tdx_vcpu_free() since
->     no new TD enter would be called for vCPU association after
->     tdx_mmu_release_hkid(), which is now called in vt_vm_destroy(), i.e.
->     after releasing vcpu fd and kvm_unload_vcpu_mmus(), and before
->     tdx_vcpu_free().
->   - TODO: include Isaku's fix
->     https://eclists.intel.com/sympa/arc/kvm-qemu-review/2024-07/msg00359.html
->   - Update for the wrapper functions for SEAMCALLs. (Sean)
->   - Removed unnecessary pr_err() in tdx_flush_vp_on_cpu().
->   - Use KVM_BUG_ON() in tdx_flush_vp_on_cpu() for consistency.
->   - Capitalize the first word of tile. (Binbin)
->   - Minor fixed in changelog. (Binbin, Reinette(internal))
->   - Fix some comments. (Binbin, Reinette(internal))
->   - Rename arg_ to _arg (Binbin)
->   - Updates from seamcall overhaul (Kai)
->   - Remove lockdep_assert_preemption_disabled() in tdx_hardware_setup()
->     since now hardware_enable() is not called via SMP func call anymore,
->     but (per-cpu) CPU hotplug thread
->   - Use KVM_BUG_ON() for SEAMCALLs in tdx_mmu_release_hkid() (Kai)
->   - Update based on upstream commit "KVM: x86: Fold kvm_arch_sched_in()
->     into kvm_arch_vcpu_load()"
->   - Eliminate TDX_FLUSHVP_NOT_DONE error check because vCPUs were all freed.
->     So the error won't happen. (Sean)
-> ---
->   arch/x86/kvm/vmx/main.c    |  22 +++++-
->   arch/x86/kvm/vmx/tdx.c     | 151 +++++++++++++++++++++++++++++++++++--
->   arch/x86/kvm/vmx/tdx.h     |   2 +
->   arch/x86/kvm/vmx/x86_ops.h |   4 +
->   4 files changed, 169 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 8f5dbab9099f..8171c1412c3b 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -10,6 +10,14 @@
->   #include "tdx.h"
->   #include "tdx_arch.h"
->   
-> +static void vt_hardware_disable(void)
-> +{
-> +	/* Note, TDX *and* VMX need to be disabled if TDX is enabled. */
-> +	if (enable_tdx)
-> +		tdx_hardware_disable();
-> +	vmx_hardware_disable();
-> +}
-> +
->   static __init int vt_hardware_setup(void)
->   {
->   	int ret;
-> @@ -113,6 +121,16 @@ static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->   	vmx_vcpu_reset(vcpu, init_event);
->   }
->   
-> +static void vt_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	if (is_td_vcpu(vcpu)) {
-> +		tdx_vcpu_load(vcpu, cpu);
-> +		return;
-> +	}
-> +
-> +	vmx_vcpu_load(vcpu, cpu);
-> +}
-> +
->   static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
->   {
->   	/*
-> @@ -217,7 +235,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.hardware_unsetup = vmx_hardware_unsetup,
->   
->   	.hardware_enable = vmx_hardware_enable,
-> -	.hardware_disable = vmx_hardware_disable,
-> +	.hardware_disable = vt_hardware_disable,
->   	.emergency_disable = vmx_emergency_disable,
->   
->   	.has_emulated_msr = vmx_has_emulated_msr,
-> @@ -234,7 +252,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.vcpu_reset = vt_vcpu_reset,
->   
->   	.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
-> -	.vcpu_load = vmx_vcpu_load,
-> +	.vcpu_load = vt_vcpu_load,
->   	.vcpu_put = vmx_vcpu_put,
->   
->   	.update_exception_bitmap = vmx_update_exception_bitmap,
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 3083a66bb895..554154d3dd58 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -57,6 +57,14 @@ static DEFINE_MUTEX(tdx_lock);
->   /* Maximum number of retries to attempt for SEAMCALLs. */
->   #define TDX_SEAMCALL_RETRIES	10000
->   
-> +/*
-> + * A per-CPU list of TD vCPUs associated with a given CPU.  Used when a CPU
-> + * is brought down to invoke TDH_VP_FLUSH on the appropriate TD vCPUS.
-> + * Protected by interrupt mask.  This list is manipulated in process context
-> + * of vCPU and IPI callback.  See tdx_flush_vp_on_cpu().
-> + */
-> +static DEFINE_PER_CPU(struct list_head, associated_tdvcpus);
-> +
->   static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
->   {
->   	return pa | ((hpa_t)hkid << boot_cpu_data.x86_phys_bits);
-> @@ -88,6 +96,22 @@ static inline bool is_td_finalized(struct kvm_tdx *kvm_tdx)
->   	return kvm_tdx->finalized;
->   }
->   
-> +static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
-> +{
-> +	lockdep_assert_irqs_disabled();
-> +
-> +	list_del(&to_tdx(vcpu)->cpu_list);
-> +
-> +	/*
-> +	 * Ensure tdx->cpu_list is updated before setting vcpu->cpu to -1,
-> +	 * otherwise, a different CPU can see vcpu->cpu = -1 and add the vCPU
-> +	 * to its list before it's deleted from this CPU's list.
-> +	 */
-> +	smp_wmb();
-> +
-> +	vcpu->cpu = -1;
-> +}
-> +
->   static void tdx_clear_page(unsigned long page_pa)
->   {
->   	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
-> @@ -168,6 +192,83 @@ static void tdx_reclaim_control_page(unsigned long ctrl_page_pa)
->   	free_page((unsigned long)__va(ctrl_page_pa));
->   }
->   
-> +struct tdx_flush_vp_arg {
-> +	struct kvm_vcpu *vcpu;
-> +	u64 err;
-> +};
-> +
-> +static void tdx_flush_vp(void *_arg)
-> +{
-> +	struct tdx_flush_vp_arg *arg = _arg;
-> +	struct kvm_vcpu *vcpu = arg->vcpu;
-> +	u64 err;
-> +
-> +	arg->err = 0;
-> +	lockdep_assert_irqs_disabled();
-> +
-> +	/* Task migration can race with CPU offlining. */
-> +	if (unlikely(vcpu->cpu != raw_smp_processor_id()))
-> +		return;
-> +
-> +	/*
-> +	 * No need to do TDH_VP_FLUSH if the vCPU hasn't been initialized.  The
-> +	 * list tracking still needs to be updated so that it's correct if/when
-> +	 * the vCPU does get initialized.
-> +	 */
-> +	if (is_td_vcpu_created(to_tdx(vcpu))) {
-> +		/*
-> +		 * No need to retry.  TDX Resources needed for TDH.VP.FLUSH are:
-> +		 * TDVPR as exclusive, TDR as shared, and TDCS as shared.  This
-> +		 * vp flush function is called when destructing vCPU/TD or vCPU
-> +		 * migration.  No other thread uses TDVPR in those cases.
-> +		 */
-> +		err = tdh_vp_flush(to_tdx(vcpu));
-> +		if (unlikely(err && err != TDX_VCPU_NOT_ASSOCIATED)) {
-> +			/*
-> +			 * This function is called in IPI context. Do not use
-> +			 * printk to avoid console semaphore.
-> +			 * The caller prints out the error message, instead.
-> +			 */
-> +			if (err)
-> +				arg->err = err;
-> +		}
-> +	}
-> +
-> +	tdx_disassociate_vp(vcpu);
-> +}
-> +
-> +static void tdx_flush_vp_on_cpu(struct kvm_vcpu *vcpu)
-> +{
-> +	struct tdx_flush_vp_arg arg = {
-> +		.vcpu = vcpu,
-> +	};
-> +	int cpu = vcpu->cpu;
-> +
-> +	if (unlikely(cpu == -1))
-> +		return;
-> +
-> +	smp_call_function_single(cpu, tdx_flush_vp, &arg, 1);
-> +	if (KVM_BUG_ON(arg.err, vcpu->kvm))
-> +		pr_tdx_error(TDH_VP_FLUSH, arg.err);
-> +}
-> +
-> +void tdx_hardware_disable(void)
-> +{
-> +	int cpu = raw_smp_processor_id();
-> +	struct list_head *tdvcpus = &per_cpu(associated_tdvcpus, cpu);
-> +	struct tdx_flush_vp_arg arg;
-> +	struct vcpu_tdx *tdx, *tmp;
-> +	unsigned long flags;
-> +
-> +	local_irq_save(flags);
-> +	/* Safe variant needed as tdx_disassociate_vp() deletes the entry. */
-> +	list_for_each_entry_safe(tdx, tmp, tdvcpus, cpu_list) {
-> +		arg.vcpu = &tdx->vcpu;
-> +		tdx_flush_vp(&arg);
-> +	}
-> +	local_irq_restore(flags);
-> +}
-> +
->   static void smp_func_do_phymem_cache_wb(void *unused)
->   {
->   	u64 err = 0;
-> @@ -204,22 +305,21 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
->   	bool packages_allocated, targets_allocated;
->   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
->   	cpumask_var_t packages, targets;
-> -	u64 err;
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long j;
->   	int i;
-> +	u64 err;
->   
->   	if (!is_hkid_assigned(kvm_tdx))
->   		return;
->   
-> -	/* KeyID has been allocated but guest is not yet configured */
-> -	if (!is_td_created(kvm_tdx)) {
-> -		tdx_hkid_free(kvm_tdx);
-> -		return;
-> -	}
-> -
->   	packages_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
->   	targets_allocated = zalloc_cpumask_var(&targets, GFP_KERNEL);
->   	cpus_read_lock();
->   
-> +	kvm_for_each_vcpu(j, vcpu, kvm)
-> +		tdx_flush_vp_on_cpu(vcpu);
-> +
->   	/*
->   	 * TDH.PHYMEM.CACHE.WB tries to acquire the TDX module global lock
->   	 * and can fail with TDX_OPERAND_BUSY when it fails to get the lock.
-> @@ -233,6 +333,16 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
->   	 * After the above flushing vps, there should be no more vCPU
->   	 * associations, as all vCPU fds have been released at this stage.
->   	 */
-> +	err = tdh_mng_vpflushdone(kvm_tdx);
-> +	if (err == TDX_FLUSHVP_NOT_DONE)
-> +		goto out;
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error(TDH_MNG_VPFLUSHDONE, err);
-> +		pr_err("tdh_mng_vpflushdone() failed. HKID %d is leaked.\n",
-> +		       kvm_tdx->hkid);
-> +		goto out;
-> +	}
-> +
->   	for_each_online_cpu(i) {
->   		if (packages_allocated &&
->   		    cpumask_test_and_set_cpu(topology_physical_package_id(i),
-> @@ -258,6 +368,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
->   		tdx_hkid_free(kvm_tdx);
->   	}
->   
-> +out:
->   	mutex_unlock(&tdx_lock);
->   	cpus_read_unlock();
->   	free_cpumask_var(targets);
-> @@ -409,6 +520,26 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->   	return 0;
->   }
->   
-> +void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> +
-> +	if (vcpu->cpu == cpu)
-> +		return;
-> +
-> +	tdx_flush_vp_on_cpu(vcpu);
-> +
-> +	local_irq_disable();
-> +	/*
-> +	 * Pairs with the smp_wmb() in tdx_disassociate_vp() to ensure
-> +	 * vcpu->cpu is read before tdx->cpu_list.
-> +	 */
-> +	smp_rmb();
-> +
-> +	list_add(&tdx->cpu_list, &per_cpu(associated_tdvcpus, cpu));
-> +	local_irq_enable();
-> +}
-> +
->   void tdx_vcpu_free(struct kvm_vcpu *vcpu)
->   {
->   	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> @@ -1977,7 +2108,7 @@ static int __init __do_tdx_bringup(void)
->   static int __init __tdx_bringup(void)
->   {
->   	const struct tdx_sys_info_td_conf *td_conf;
-> -	int r;
-> +	int r, i;
->   
->   	if (!tdp_mmu_enabled || !enable_mmio_caching)
->   		return -EOPNOTSUPP;
-> @@ -1987,6 +2118,10 @@ static int __init __tdx_bringup(void)
->   		return -EOPNOTSUPP;
->   	}
->   
-> +	/* tdx_hardware_disable() uses associated_tdvcpus. */
-> +	for_each_possible_cpu(i)
-> +		INIT_LIST_HEAD(&per_cpu(associated_tdvcpus, i));
-> +
->   	/*
->   	 * Enabling TDX requires enabling hardware virtualization first,
->   	 * as making SEAMCALLs requires CPU being in post-VMXON state.
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 25a4aaede2ba..4b6fc25feeb6 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -39,6 +39,8 @@ struct vcpu_tdx {
->   	unsigned long *tdcx_pa;
->   	bool td_vcpu_created;
->   
-> +	struct list_head cpu_list;
-> +
->   	bool initialized;
->   
->   	/*
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index d8a00ab4651c..f4aa0ec16980 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -119,6 +119,7 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
->   void vmx_setup_mce(struct kvm_vcpu *vcpu);
->   
->   #ifdef CONFIG_INTEL_TDX_HOST
-> +void tdx_hardware_disable(void);
->   int tdx_vm_init(struct kvm *kvm);
->   void tdx_mmu_release_hkid(struct kvm *kvm);
->   void tdx_vm_free(struct kvm *kvm);
-> @@ -128,6 +129,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
->   int tdx_vcpu_create(struct kvm_vcpu *vcpu);
->   void tdx_vcpu_free(struct kvm_vcpu *vcpu);
->   void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
-> +void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
->   u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
->   
->   int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
-> @@ -145,6 +147,7 @@ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
->   void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
->   int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
->   #else
-> +static inline void tdx_hardware_disable(void) {}
->   static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
->   static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
->   static inline void tdx_vm_free(struct kvm *kvm) {}
-> @@ -154,6 +157,7 @@ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOP
->   static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
->   static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
->   static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
-> +static inline void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
->   static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
->   
->   static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+When there is no register operand, e.g. storing an immediate to memory, the=
+ size
+becomes necessary, sort of.  The assembler will still happily accept an inf=
+erred
+size, but the size is simply the default operand size for the current mode.
 
+E.g.
+
+  mov $0xffff, (%0)
+
+will generate a 4-byte MOV
+
+  c7 00 ff ff 00 00
+
+so if you actually wanted a 2-byte MOV, the mnemonic needs to be:
+
+  movw $0xffff, (%0)
+
+There is still value in specifying an explicit operand size in assembly, as=
+ it
+disambiguates the size of human readers, and also generates an error if the
+operands mismatch.
+
+E.g.
+
+  movw $0xffff, %%eax
+
+will fail with
+
+  incorrect register `%eax' used with `w' suffix
+
+The really fun one is if ou want to load a 64-bit gpr with an immediate.  A=
+ll
+else being equal, the assembler will generally optimize for code size, and =
+so
+if the desired value can be generated by sign-extension, the compiler will =
+opt
+for opcode 0xc7 or 0xb8
+
+E.g.
+
+  mov $0xffffffffffffffff, %%rax
+
+generates
+
+  48 c7 c0 ff ff ff ff
+
+whereas, somewhat counter-intuitively, this
+
+  mov $0xffffffff, %%rax
+
+generates the more gnarly
+
+  48 b8 ff ff ff ff 00 00 00 00
+
+
+But wait, there's more!  If the developer were a wee bit smarter, they coul=
+d/should
+actually write
+
+  mov $0xffffffff, %%eax
+
+to generate
+
+  b8 ff ff ff ff
+
+because in x86-64, writing the lower 32 bits of a 64-bit register architect=
+urally
+clears the upper 32 bits.  I mention this because you'll actually see the c=
+ompiler
+take advantage of this behavior.
+
+E.g. if you were to load RAX through an inline asm constraint
+
+  asm volatile(".byte 0xcc" :: "a"(0xffffffff) : "memory");
+
+the generated code will indeed be:
+
+  b8 ff ff ff ff          mov    $0xffffffff,%eax
+
+or if you explicitly load a register with '0'
+
+  31 c0                   xor    %eax,%eax
+
+Lastly, because "%0" in 64-bit mode refers to RAX, not EAX, this:
+
+  asm volatile("mov $0xffffffff, %0" :: "a"(gpa) : "memory");
+
+generates
+
+  48 b8 ff ff ff ff 00 00 00 00
+
+i.e. is equivalent to "mov .., %%rax".
+
+Jumping back to "movq", it's perfectly fine in this case, but also fully
+redundant.  And so I would prefer to document it simply as "mov", because "=
+movq"
+would be more appropriate to document something like this:
+
+  asm volatile("movq %0, %%xmm0" :: "a"(gpa) : "memory");
+
+  66 48 0f 6e c0          movq   %rax,%xmm0
+
+LOL, which brings up more quirks/warts with x86-64.  Many instructions in x=
+86,
+especially SIMD instructions, have mandatory "prefixes" in order to squeeze=
+ more
+instructions out of the available opcodes.  E.g. the operand size prefix, 0=
+x66,
+is reserved for MMX instructions, which allows the architecture to usurp th=
+e
+reserved combination for XMM instructions.   Table 9-3. Effect of Prefixes =
+on MMX
+Instructions says this
+
+  Operand Size (66H)Reserved and may result in unpredictable behavior.
+
+and specifically says "unpredictable behavior" instead of #UD, because pref=
+ixing
+most MMX instructions with 0x66 "promotes" the instruction to operate on XM=
+M
+registers.
+
+And then there's the REX prefix, which is actually four prefixes built into=
+ one.
+The "base" prefix ix 0x40, with the lower 4 bits encoding the four "real" p=
+refixes.
+From Table 2-4. REX Prefix Fields [BITS: 0100WRXB]
+
+  Field Name      Bit Position    Definition
+  -               7:4             0100
+  W               3               0 =3D Operand size determined by CS.D, 1 =
+=3D 64 Bit Operand Size
+  R               2               Extension of the ModR/M reg field
+  X               1               Extension of the SIB index field
+  B               0               Extension of the ModR/M r/m field, SIB ba=
+se field, or Opcode reg field
+
+e.g. 0x48 is REX.W, 0x49 is REX.W+REX.B, etc.
+
+The first quirky thing with REX, and REX.W (0x48) + the legacy operand size
+prefix (0x66) in particular, is that the legacy prefix is ignored in most c=
+ases
+if REX.W=3D1.
+
+  For non-byte operations: if a 66H prefix is used with prefix (REX.W =3D 1=
+), 66H is ignored.
+
+But because 0x66 is a mandatory prefix for MOVQ, it's not ignored (at least=
+, I
+don't _think_ it's ignored; objdump and gdb both seem to happy decoding MOV=
+Q
+without the prefix).
+
+Anyways, the second quirky thing with REX is that, because REX usurps singl=
+e-byte
+opcodes for DEC and INC
+
+  In 64-bit mode, DEC r16 and DEC r32 are not encodable (because opcodes 48=
+H through
+  4FH are REX prefixes).
+=20
+  In 64-bit mode, INC r16 and INC r32 are not encodable (because opcodes 40=
+H through
+  47H are REX prefixes).
+
+i.e. uses opcodes that are actual instructions outside of 64-bit mode, the =
+REX
+prefix _must_ be the last byte before the non-prefix opcode, otherwise it's
+ignored (presumably this avoids extra complexity in the instruction decoder=
+).
+
+  Only one REX prefix is allowed per instruction. If used, the REX prefix b=
+yte
+  must immediately precede the opcode byte or the escape opcode byte (0FH).=
+ When
+  a REX prefix is used in conjunction with an instruction containing a mand=
+atory
+  prefix, the mandatory prefix must come before the REX so the REX prefix c=
+an be
+  immediately preceding the opcode or the escape byte. For example, CVTDQ2P=
+D with
+  a REX prefix should have REX placed between F3 and 0F E6. Other placement=
+s are
+  ignored. The instruction-size limit of 15 bytes still applies to instruct=
+ions
+  with a REX prefix.
+
+So even though the "opcode" for MOVQ is "66 0F 6E" , when encoding with REX=
+.W to
+address RAX instead of EAX, the full encoding needs to be "66 48 0F DE", ot=
+herwise
+REX.W will be ignored, e.g. objdump will interpret it as this, even though =
+the
+CPU will decode REX.W as part of the MOVD.
+
+  4024d1:       48                      rex.W
+  4024d2:       66 0f 6e c0             movd   %eax,%xmm0
+
+And because _that's_ just not confusing enough, there are actually _six_ di=
+stinct
+opcodes for MOVQ (I think; might be more): two which are REX.W promotions o=
+f MOVD
+(6E and 7E, ignoring mandatory prefixes and the escape opcode 0F), and four=
+ that
+are straight quadword moves that can't target registers, i.e. can be encode=
+d even
+in 32-bit mode (6F, 7E, 7F, and D6).
+
+So yeah, MOVQ in particular is a disaster, especially in 64-bit mode, so I'=
+d much
+prefer to just say "mov %rax, (%rax)" and leave it to the reader to underst=
+and
+that it's a 64-bit store.
 
