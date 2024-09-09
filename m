@@ -1,217 +1,166 @@
-Return-Path: <kvm+bounces-26148-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26149-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7001972240
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 21:01:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D75B1972262
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 21:12:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96A5C2857E8
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 19:01:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19EF3284267
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 19:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14A1189B95;
-	Mon,  9 Sep 2024 19:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221AB189BA3;
+	Mon,  9 Sep 2024 19:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJR1LrNI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PuFL4cjz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DE11F942
-	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 19:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6ACE17588
+	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 19:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725908455; cv=none; b=FYK54y5Gw7kttU4KUtA2AYkk2/f5+HkHpJE/whqcmc/B6MEfN3zq82Tvrr05QxKJFNZKA4Yl7oVXPfnJebXg5UGDBfLDJQ7ai24sPfKzAdWDsFZURjyHOFyl4FTKSgeqM2aUn12k0r2cGtIOJKIHPykNXMeN/gstI0xrDdVxR5M=
+	t=1725909115; cv=none; b=tTMpJhn51vJMK2QEnls35dgFalgSSPP9vb2nQ9YN1I5hgzEWI7kK8Zv6jZLNIJAC0qHYkBr4G4wOqLbU6r+Kv795CiYI1oi+vfs5SleBxjD+IRkyE0ae+WJtHJlCrYzVSLxEgzgmWNwC4xQQGCqWMgRpCqE1vhjHak0DtRHvq1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725908455; c=relaxed/simple;
-	bh=j/numQIZWtWkd6EtYn4iL3OE7HPVQg+q+JXn6cioXTU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N7Vf4qfpy2WZGRzpdanAhguvKGcl5mkUZ7wKplX1b5+sMfvB0RErIGXdKeCytzx41RV2n71Yev+QKbeIiFUmut90SRKVnTC9tf/MK0AvE1d04mL/gg0WOUsmsW0XY9joJfZLJ7TnLwZ900+dj5Acq69ypLFWhT6HSacmMiCqn/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJR1LrNI; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6cdae28014dso35205917b3.1
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 12:00:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725908451; x=1726513251; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A72L+GUjbQDFBk2MUwlGfe11O4m077FKuGtcJSgBRQQ=;
-        b=IJR1LrNIAIBVgtkHXuaVN9HDOrRcbydlX8cTKaXZT3ANXZq7yNHc6cT5MLlgpAhvPb
-         Fz85SRrLcKkFgaYqiQ91IchbIXyKl3RAoC6ZaEcHM0mZruQyVJERy4sRnso3eYyqytw2
-         adkYF7UvExT0CJy5aWrqutJrI0nzerA0E469hHEQyYSepEJmSzoQ2gSI8od4qxARo1bt
-         X9eZni/S18UBIwrcTYpzWZq6PBHw5WSQGZvdvP/AJdTOIeIRPaNO1onbTW+M5jFRPf6m
-         PcZp2ICn1HkBhZpGOr/eX84ACeev34ldi2NIrWxnFdwR11GLLgamwrCOk0pTsWGZxHZL
-         /yDg==
+	s=arc-20240116; t=1725909115; c=relaxed/simple;
+	bh=zndEXXrBf3suPdcgFqdqvO3P8HQrrM5vFvZhoVMzWxg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cJH4U5ZPOFyC03TXzWScQf60E4R2CwAqWOjB48B/46e+XW95Qfw4+Q5syFEL37WYIoX7mZrG3U1gqJIfdL5Cglms6+r+UdqcWmVtX1gwCdc9EOD41NJDdsREpx4F7KtgYCV657xuvK5hjJlql8tisJXnQUCt7ZxJKxjKtP40HJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PuFL4cjz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725909112;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5sPSJH7sx8TT8vephZ961tLUcAIsPRNREdt62HfflFk=;
+	b=PuFL4cjz4b03t7SrncGQFPHr0ZEOCsYJCYMcjJdzmYd/K59fEVDGWrijNe1oAf6KOZmA7r
+	YYfChPMEDpQMJFwErncnUqHqtNEXsRi903eemCUgmqdjZoXtybPXkgrmWQnyWRcxKaduZc
+	M98JWgpB+F4cmb2uKbLb53YQqDw75pc=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-465-Fzr-uYNTPQidRnxeWs9jpQ-1; Mon, 09 Sep 2024 15:11:51 -0400
+X-MC-Unique: Fzr-uYNTPQidRnxeWs9jpQ-1
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-5e1cd853298so1492201eaf.1
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 12:11:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725908451; x=1726513251;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A72L+GUjbQDFBk2MUwlGfe11O4m077FKuGtcJSgBRQQ=;
-        b=J8Z8R+5PfzCD7ufkYCzijQ7F/zDgWhBuZhjYCJNF7aUix2HyvAWIQu1pSvhcykK41T
-         urLR8lIp8u7KpKgzXXyvoef5XNE3epYSuOxwSJTmt4CDWSI5xWoMaxGvrQnrscMKBQTq
-         feA6rXAmhG/GwW9mZMCoqOGO8P7fUjNtpwr7lWBrmI/goMj20t4Ee6kKhlka1DevGlgm
-         KmEWnpZN94X3ATAb6Ch0TG/nHQ46C7ysyczmHUVH8LF0vjtVlMPBOwb5KY1OjGVxpQmY
-         cVo51ODrdhhsN4kEjOlJjEd7MvvjZglrqA/5LkOPtMewPXgH2jW0t6RXoi8ra+rtjBwv
-         ws5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWBeWH6/kk9VdMsi18vFsq+lRL2FB2vDlJ6TC2dnHB6pMPEZ8W2bCL3DN296nc46rwHUjo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXVqFBhTWwQVK8cmYuze/CCF8v3UtwRI/J/GEQcJCFNIePf1HL
-	wgHgQhLN2NX9hOhk+UyXudbotMknxAAB+6Kw7Z/t/FbeYUdjhM1RkNKSgn8UV8Agf94dC4wUTcf
-	agrLghXFPGrNCjGWtl/x41xMXhtYQWqOYNWnS
-X-Google-Smtp-Source: AGHT+IFR6zulDZKlUD4bAN1hPEwMA1FY+4vRNJHse0GHukSpBMl4XHH4SgwprP02hwRSXpE0fsxpg+6qvu7h46yJxCs=
-X-Received: by 2002:a05:690c:4b0e:b0:6d4:72b7:177e with SMTP id
- 00721157ae682-6db95312363mr6193027b3.5.1725908451204; Mon, 09 Sep 2024
- 12:00:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725909110; x=1726513910;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5sPSJH7sx8TT8vephZ961tLUcAIsPRNREdt62HfflFk=;
+        b=uEbX3LMii5T5UkaekLflR7m79fo3VLhwzo25iHDmgn2ctq6W3K8dooRjaVm7otfFcA
+         +8/gmvQunq+CuiuqMb0L2gIM8v3ma4rgulf5cLb6Dlsp8t49jAqNIHg0VNS2W70F5FrP
+         CHWum4Ku1SgFWDpPvlqweR5ZHzgrVB7qwpjFOVSujB5P7C9TOqMaBWgGXufU+qp+bYlc
+         VeWLKigdVyMxHejWwRJOLC7jBLauqD10cZRAhitl8/lDZ1T3LFbtxohkznQoMJCtvw+U
+         DbWKI/0nv9dx13rjBKCHFNlZrt1lHZrWmBc1sm32j4iRgL8RknLf0uwuDQf+USkMu+Ld
+         nywA==
+X-Gm-Message-State: AOJu0YyUrwahPH7htQ4mWUYcQZVpIqx5ilQnGyYgIqEQVneCiWaOkuu1
+	8idEo/06owFtE8zrItiznvJ9Vp7/lTW1maQizVEixLyQR24cyvI10f1Oxmm7lvvC+40swCUSbtY
+	OqDG6cSher4afOfQs9l7w6e54DAAhiSAWOoctzFyFotxP9Qt90w==
+X-Received: by 2002:a05:6358:7691:b0:1b8:42cd:19b3 with SMTP id e5c5f4694b2df-1b84d2ff61amr220903455d.28.1725909110171;
+        Mon, 09 Sep 2024 12:11:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDyIe1YMoL6snR+uNukfxdBjZXJuocOTsnMVfwPCJowbkJePwRp71cfWJBS7eNe3EepSdnUQ==
+X-Received: by 2002:a05:6358:7691:b0:1b8:42cd:19b3 with SMTP id e5c5f4694b2df-1b84d2ff61amr220899855d.28.1725909109624;
+        Mon, 09 Sep 2024 12:11:49 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:760d:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a9a7991f7fsm242462385a.62.2024.09.09.12.11.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 12:11:49 -0700 (PDT)
+Message-ID: <61e7e64c615aba6297006dbf32e48986d33c12ab.camel@redhat.com>
+Subject: Re: [PATCH v3 2/2] VMX: reset the segment cache after segment
+ initialization in vmx_vcpu_reset
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>, Thomas
+ Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
+ Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+ x86@kernel.org
+Date: Mon, 09 Sep 2024 15:11:48 -0400
+In-Reply-To: <ZrY1adEnEW2N-ijd@google.com>
+References: <20240725175232.337266-1-mlevitsk@redhat.com>
+	 <20240725175232.337266-3-mlevitsk@redhat.com> <ZrF55uIvX2rcHtSW@chao-email>
+	 <ZrY1adEnEW2N-ijd@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-20-seanjc@google.com>
-In-Reply-To: <20240809194335.1726916-20-seanjc@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Mon, 9 Sep 2024 12:00:14 -0700
-Message-ID: <CADrL8HWACwbzraG=MbDoORJ8ramDxb-h9yb0p4nx9-wq4o3c6A@mail.gmail.com>
-Subject: Re: [PATCH 19/22] KVM: x86/mmu: Add infrastructure to allow walking
- rmaps outside of mmu_lock
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 9, 2024 at 12:44=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Steal another bit from rmap entries (which are word aligned pointers, i.e=
-.
-> have 2 free bits on 32-bit KVM, and 3 free bits on 64-bit KVM), and use
-> the bit to implement a *very* rudimentary per-rmap spinlock.  The only
-> anticipated usage of the lock outside of mmu_lock is for aging gfns, and
-> collisions between aging and other MMU rmap operations are quite rare,
-> e.g. unless userspace is being silly and aging a tiny range over and over
-> in a tight loop, time between contention when aging an actively running V=
-M
-> is O(seconds).  In short, a more sophisticated locking scheme shouldn't b=
-e
-> necessary.
->
-> Note, the lock only protects the rmap structure itself, SPTEs that are
-> pointed at by a locked rmap can still be modified and zapped by another
-> task (KVM drops/zaps SPTEs before deleting the rmap entries)
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 80 +++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 71 insertions(+), 9 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 8ca7f51c2da3..a683b5fc4026 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -909,11 +909,73 @@ static struct kvm_memory_slot *gfn_to_memslot_dirty=
-_bitmap(struct kvm_vcpu *vcpu
->   * About rmap_head encoding:
->   *
->   * If the bit zero of rmap_head->val is clear, then it points to the onl=
-y spte
-> - * in this rmap chain. Otherwise, (rmap_head->val & ~1) points to a stru=
-ct
-> + * in this rmap chain. Otherwise, (rmap_head->val & ~3) points to a stru=
-ct
->   * pte_list_desc containing more mappings.
->   */
->  #define KVM_RMAP_MANY  BIT(0)
->
-> +/*
-> + * rmaps and PTE lists are mostly protected by mmu_lock (the shadow MMU =
-always
-> + * operates with mmu_lock held for write), but rmaps can be walked witho=
-ut
-> + * holding mmu_lock so long as the caller can tolerate SPTEs in the rmap=
- chain
-> + * being zapped/dropped _while the rmap is locked_.
-> + *
-> + * Other than the KVM_RMAP_LOCKED flag, modifications to rmap entries mu=
-st be
-> + * done while holding mmu_lock for write.  This allows a task walking rm=
-aps
-> + * without holding mmu_lock to concurrently walk the same entries as a t=
-ask
-> + * that is holding mmu_lock but _not_ the rmap lock.  Neither task will =
-modify
-> + * the rmaps, thus the walks are stable.
-> + *
-> + * As alluded to above, SPTEs in rmaps are _not_ protected by KVM_RMAP_L=
-OCKED,
-> + * only the rmap chains themselves are protected.  E.g. holding an rmap'=
-s lock
-> + * ensures all "struct pte_list_desc" fields are stable.
+On Fri, 2024-08-09 at 08:27 -0700, Sean Christopherson wrote:
+> On Tue, Aug 06, 2024, Chao Gao wrote:
+> > On Thu, Jul 25, 2024 at 01:52:32PM -0400, Maxim Levitsky wrote:
+> > > Fix this by moving the vmx_segment_cache_clear() call to be after the
+> > > segments are initialized.
+> > > 
+> > > Note that this still doesn't fix the issue of kvm_arch_vcpu_in_kernel
+> > > getting stale data during the segment setup, and that issue will
+> > > be addressed later.
+> > > 
+> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > 
+> > Do you need a Fixes tag and/or Cc: stable?
+> 
+> Heh, it's an old one
+> 
+>   Fixes: 2fb92db1ec08 ("KVM: VMX: Cache vmcs segment fields")
+> 
+> > > ---
+> > > arch/x86/kvm/vmx/vmx.c | 6 +++---
+> > > 1 file changed, 3 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > index fa9f307d9b18..d43bb755e15c 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -4870,9 +4870,6 @@ void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> > > 	vmx->hv_deadline_tsc = -1;
+> > > 	kvm_set_cr8(vcpu, 0);
+> > > 
+> > > -	vmx_segment_cache_clear(vmx);
+> > > -	kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
+> > > -
+> > > 	seg_setup(VCPU_SREG_CS);
+> > > 	vmcs_write16(GUEST_CS_SELECTOR, 0xf000);
+> > > 	vmcs_writel(GUEST_CS_BASE, 0xffff0000ul);
+> > > @@ -4899,6 +4896,9 @@ void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> > > 	vmcs_writel(GUEST_IDTR_BASE, 0);
+> > > 	vmcs_write32(GUEST_IDTR_LIMIT, 0xffff);
+> > > 
+> > > +	vmx_segment_cache_clear(vmx);
+> > > +	kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
+> > 
+> > vmx_segment_cache_clear() is called in a few other sites. I think at least the
+> > call in __vmx_set_segment() should be fixed, because QEMU may read SS.AR right
+> > after a write to it. if the write was preempted after the cache was cleared but
+> > before the new value being written into VMCS, QEMU would find that SS.AR held a
+> > stale value.
+> 
+> Ya, I thought the plan was to go for a more complete fix[*]?  This change isn't
+> wrong, but it's obviously incomplete, and will be unnecessary if the preemption
+> issue is resolved.
 
-This last sentence makes me think we need to be careful about memory orderi=
-ng.
+Hi,
 
-> + */
-> +#define KVM_RMAP_LOCKED        BIT(1)
-> +
-> +static unsigned long kvm_rmap_lock(struct kvm_rmap_head *rmap_head)
-> +{
-> +       unsigned long old_val, new_val;
-> +
-> +       old_val =3D READ_ONCE(rmap_head->val);
-> +       if (!old_val)
-> +               return 0;
-> +
-> +       do {
-> +               /*
-> +                * If the rmap is locked, wait for it to be unlocked befo=
-re
-> +                * trying acquire the lock, e.g. to bounce the cache line=
-.
-> +                */
-> +               while (old_val & KVM_RMAP_LOCKED) {
-> +                       old_val =3D READ_ONCE(rmap_head->val);
-> +                       cpu_relax();
-> +               }
-> +
-> +               /*
-> +                * Recheck for an empty rmap, it may have been purged by =
-the
-> +                * task that held the lock.
-> +                */
-> +               if (!old_val)
-> +                       return 0;
-> +
-> +               new_val =3D old_val | KVM_RMAP_LOCKED;
-> +       } while (!try_cmpxchg(&rmap_head->val, &old_val, new_val));
+I was thinking to keep it simple, since the issue is mostly theoretical after this fix,
+but I'll give this another try.
 
-I think we (technically) need an smp_rmb() here. I think cmpxchg
-implicitly has that on x86 (and this code is x86-only), but should we
-nonetheless document that we need smp_rmb() (if it indeed required)?
-Perhaps we could/should condition the smp_rmb() on `if (old_val)`.
+Best regards,
+	Maxim Levitsky
 
-kvm_rmap_lock_readonly() should have an smb_rmb(), but it seems like
-adding it here will do the right thing for the read-only lock side.
+> 
+> [*] https://lore.kernel.org/all/f183d215c903d4d1e85bf89e9d8b57dd6ce5c175.camel@redhat.com
+> 
 
-> +
-> +       /* Return the old value, i.e. _without_ the LOCKED bit set. */
-> +       return old_val;
-> +}
-> +
-> +static void kvm_rmap_unlock(struct kvm_rmap_head *rmap_head,
-> +                           unsigned long new_val)
-> +{
-> +       WARN_ON_ONCE(new_val & KVM_RMAP_LOCKED);
 
-Same goes with having an smp_wmb() here. Is it necessary? If so,
-should it at least be documented?
-
-And this is *not* necessary for kvm_rmap_unlock_readonly(), IIUC.
-
-> +       WRITE_ONCE(rmap_head->val, new_val);
-> +}
 
