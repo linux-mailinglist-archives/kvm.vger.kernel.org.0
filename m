@@ -1,141 +1,270 @@
-Return-Path: <kvm+bounces-26163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27C8972511
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 00:12:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DBB797252F
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 00:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00A0C1C21982
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 22:12:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB273B235E3
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 22:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1AE18DF67;
-	Mon,  9 Sep 2024 22:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B3418CBFA;
+	Mon,  9 Sep 2024 22:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EK8pale8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gZor9CGG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC84918CC04
-	for <kvm@vger.kernel.org>; Mon,  9 Sep 2024 22:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E31C18030;
+	Mon,  9 Sep 2024 22:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725919903; cv=none; b=UfejAKqGMWx2H39l4XdB/4BqshpEwBr1ltWymX9+9YuK/4W+Om4csl9a9vILnaiHCDdDo41c95Srh35+6N8enGkyxpOijzk3eOG6xRtBDzMvu6ZdgVhkqBcjSbXMFoGSTJ+Sku3JGkx1cVpjeWyRHhnWNsSgayP3Ko+R8pwweoA=
+	t=1725920243; cv=none; b=V6NS5Nnz63getE6Mkoc6FZq0nZgBYR5YyB1u2j/zxYKT4gwStUIydti4xHyBPnhZr0Ab0BgLDt/uxLy3MTlsKZ1T4dCFjZ2/3BO6xrqChoBj65Jo7BFa1vSvNKVx1fdnew2gLVB+7OjpWtV2hUxu4gMWMhHMRCuF8InUuZRQy8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725919903; c=relaxed/simple;
-	bh=+uIaSjx7tpFHnGMRaarBn8DWXOxfz418oPiwr2T98Xo=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=Uag6byR4Zpntz5HoTibQGUMhvoT74IixDYXtJz6HZRHi2hFOqUZ6O+70sDlL4VKkeylzILlo4YZ0qL0NEqwlc6UxIcdFBeobsA+nmKuTNhFA7d1OE8Cnz978vslMZyaMcV6WXDhvgZka9rf9gxuCwUvuvbpJ/Yc6VoNfuwg1c7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EK8pale8; arc=none smtp.client-ip=209.85.166.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-82cda24c462so455848539f.0
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2024 15:11:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725919900; x=1726524700; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=c2pACaTK9nt0Rc3BheIIfZV1ckivGrvcSLjBPbKaYU4=;
-        b=EK8pale8K29N4Fq1If5YBI/g2bRom/MctNtTqlpnZ2aC9TmPWilw9PJ6BL/xYS+k57
-         APyN19Ur6PAKu8qtFkAiuxK5eqUdDlRXry3IqZxhzjCyTeAb+Dsr7aLQKWG62gwbLibc
-         v5GbmPsNz9VAREAnOHlxPFBeXqX4wb6AiOEYC/u8W2aaz4m2VIrWfb6/0hHj0OGy6RG+
-         SBhhTWv2FXWxM15NibHCdcSgLjRfT4OI0ZGY66IXTvj8Pw8DyXjBHq85RsZyqie+g5OI
-         8r2iQyTXZbYT5RiKQjdWnw/a6GzXVhVjauc0+H6qhW3AwDVKrMunfGCLxeOg/ibT0gkV
-         Xsjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725919900; x=1726524700;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c2pACaTK9nt0Rc3BheIIfZV1ckivGrvcSLjBPbKaYU4=;
-        b=Behx0C04oTZoe0uZ50qTCpuZoN0Z4NHz2YKDOaRym1TFbkOOn1DU8qfCKqcKhml0Je
-         zbfqWUS4JjQ78nuTn/7L5DSUySRPx1b2sZZQFtBbWM2JS20W6o3BkFl8qKHmCDZArWcm
-         9XCnls4kD0qpH02f/Kdp/n6r8laMLCsrJ3Arhri3bZNhEMl5+44Auq0xqx4oG6tzCPdT
-         /gZ/FmcxALawD6lw4OHguPm4z6z+Q1Tx3sL0AZCZACxNsqqUg2G/8KzRzN72zFFKXW/d
-         9d1NBycXVjsWnzNWmR0OyGii/W6kEbsy5j2GYhpdXVC+1FiBFbWjqP4L5b8v6ClPf09w
-         gtXA==
-X-Forwarded-Encrypted: i=1; AJvYcCViAslY1bR/QC6KPwGF1TVHaxVvrVyqWYpq3ILlrosA9Opg/p4KupAy824O4j/EK71mOk0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpJMSQIAm/+5LixM6j2N2FS6fAgl6R80wv+PbXtcXv4t9q4UDh
-	ev2RAzg6XJtySdln1Urn3szmfQeTof09BBHiLYu54XgnAx8hzD0RWhPr9n3C8qX0QUHvH36ccOc
-	3hUu0ZNuqeIA3bOxw0uYOrw==
-X-Google-Smtp-Source: AGHT+IHumdyf8RGWX3ScsIDrd53c+f7QJveB+hxSaPOpbEO5ESD9I/7HvQQf8wQXYzJAZ6+8WW7qN/Hn1QRzMOohHg==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fa18])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:8707:b0:4ca:7128:6c70 with
- SMTP id 8926c6da1cb9f-4d08506dd17mr722531173.6.1725919900003; Mon, 09 Sep
- 2024 15:11:40 -0700 (PDT)
-Date: Mon, 09 Sep 2024 22:11:39 +0000
-In-Reply-To: <20240801045907.4010984-16-mizhang@google.com> (message from
- Mingwei Zhang on Thu,  1 Aug 2024 04:58:24 +0000)
+	s=arc-20240116; t=1725920243; c=relaxed/simple;
+	bh=7xNmkX1MrzhkG29N4fJyIOYP9GKZjbL/6Nc9BXH8PbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y4AbaBkoDHnhePC0zpNjaHCfCEPasVWkFmNl3eq0mvyHF97IG2bRJkZiYj8vCJiepuGnwSPpseNqXnihOAOtryMQTBC2tJpqaxhaY+zCX7wY8JUUDBLEveUFtKLkYH3AVoji9H4Mh2khQIcDB6OTrbLwQM8jZNFH++pi3HYjPN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gZor9CGG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D53EC4CEC5;
+	Mon,  9 Sep 2024 22:17:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725920242;
+	bh=7xNmkX1MrzhkG29N4fJyIOYP9GKZjbL/6Nc9BXH8PbQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gZor9CGGAl7jRy3t39usihS6sEn3qjidalH2YNkNAWzWfazPphNqsJy/qj67ZtFPu
+	 DZck1N8vaCuB7sV08I14IkEJYJRJS72au+4NWpiODv+ToHyhjZBFOqG4rvi3vVoQcU
+	 WUAibgtFttLhKTJemWrRCuUvJd7CGk3o3OixWqAYolnhE+d3KpJT1cTay7ERamEiB4
+	 AlLMq7xcjUrc8/xBJQgOA7daNoolJQL6UrMFZ1asfwp45BPYuSpTUh0mWvirUuLYy1
+	 T515rK3MWkYCu7jJbvTgBfuSwRXIXDs7pscwwtmqoFDGtzsI6Ea+62bTcwdPKvGd4J
+	 rRtmaIH+3Mr+w==
+Date: Mon, 9 Sep 2024 15:17:20 -0700
+From: Namhyung Kim <namhyung@kernel.org>
+To: "Liang, Kan" <kan.liang@linux.intel.com>
+Cc: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Xiong Zhang <xiong.y.zhang@intel.com>,
+	Kan Liang <kan.liang@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Manali Shukla <manali.shukla@amd.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Jim Mattson <jmattson@google.com>,
+	Stephane Eranian <eranian@google.com>,
+	Ian Rogers <irogers@google.com>, gce-passthrou-pmu-dev@google.com,
+	Samantha Alt <samantha.alt@intel.com>,
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+	Like Xu <like.xu.linux@gmail.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [RFC PATCH v3 06/58] perf: Support get/put passthrough PMU
+ interfaces
+Message-ID: <Zt9z8J4wD2VXe2sE@google.com>
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-7-mizhang@google.com>
+ <f7b2c537-840d-4043-944e-59926f0fa3bb@linux.intel.com>
+ <a585d90b-91f4-49de-bcba-5c2b45d339bc@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsnt5xr4eauc.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [RFC PATCH v3 15/58] perf/x86: Support switch_interrupt interface
-From: Colton Lewis <coltonlewis@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, xiong.y.zhang@intel.com, 
-	dapeng1.mi@linux.intel.com, kan.liang@intel.com, zhenyuw@linux.intel.com, 
-	manali.shukla@amd.com, sandipan.das@amd.com, jmattson@google.com, 
-	eranian@google.com, irogers@google.com, namhyung@kernel.org, 
-	mizhang@google.com, gce-passthrou-pmu-dev@google.com, samantha.alt@intel.com, 
-	zhiyuan.lv@intel.com, yanfei.xu@intel.com, like.xu.linux@gmail.com, 
-	peterz@infradead.org, rananta@google.com, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a585d90b-91f4-49de-bcba-5c2b45d339bc@linux.intel.com>
 
-Mingwei Zhang <mizhang@google.com> writes:
+Hello,
 
-> From: Kan Liang <kan.liang@linux.intel.com>
+On Fri, Sep 06, 2024 at 11:40:51AM -0400, Liang, Kan wrote:
+> 
+> 
+> On 2024-09-06 6:59 a.m., Mi, Dapeng wrote:
+> > 
+> > On 8/1/2024 12:58 PM, Mingwei Zhang wrote:
+> >> From: Kan Liang <kan.liang@linux.intel.com>
+> >>
+> >> Currently, the guest and host share the PMU resources when a guest is
+> >> running. KVM has to create an extra virtual event to simulate the
+> >> guest's event, which brings several issues, e.g., high overhead, not
+> >> accuracy and etc.
+> >>
+> >> A new passthrough PMU method is proposed to address the issue. It requires
+> >> that the PMU resources can be fully occupied by the guest while it's
+> >> running. Two new interfaces are implemented to fulfill the requirement.
+> >> The hypervisor should invoke the interface while creating a guest which
+> >> wants the passthrough PMU capability.
+> >>
+> >> The PMU resources should only be temporarily occupied as a whole when a
+> >> guest is running. When the guest is out, the PMU resources are still
+> >> shared among different users.
+> >>
+> >> The exclude_guest event modifier is used to guarantee the exclusive
+> >> occupation of the PMU resources. When creating a guest, the hypervisor
+> >> should check whether there are !exclude_guest events in the system.
+> >> If yes, the creation should fail. Because some PMU resources have been
+> >> occupied by other users.
+> >> If no, the PMU resources can be safely accessed by the guest directly.
+> >> Perf guarantees that no new !exclude_guest events are created when a
+> >> guest is running.
+> >>
+> >> Only the passthrough PMU is affected, but not for other PMU e.g., uncore
+> >> and SW PMU. The behavior of those PMUs are not changed. The guest
+> >> enter/exit interfaces should only impact the supported PMUs.
+> >> Add a new PERF_PMU_CAP_PASSTHROUGH_VPMU flag to indicate the PMUs that
+> >> support the feature.
+> >>
+> >> Add nr_include_guest_events to track the !exclude_guest events of PMU
+> >> with PERF_PMU_CAP_PASSTHROUGH_VPMU.
+> >>
+> >> Suggested-by: Sean Christopherson <seanjc@google.com>
+> >> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+> >> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> >> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> >> ---
+> >>  include/linux/perf_event.h | 10 ++++++
+> >>  kernel/events/core.c       | 66 ++++++++++++++++++++++++++++++++++++++
+> >>  2 files changed, 76 insertions(+)
+> >>
+> >> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+> >> index a5304ae8c654..45d1ea82aa21 100644
+> >> --- a/include/linux/perf_event.h
+> >> +++ b/include/linux/perf_event.h
+> >> @@ -291,6 +291,7 @@ struct perf_event_pmu_context;
+> >>  #define PERF_PMU_CAP_NO_EXCLUDE			0x0040
+> >>  #define PERF_PMU_CAP_AUX_OUTPUT			0x0080
+> >>  #define PERF_PMU_CAP_EXTENDED_HW_TYPE		0x0100
+> >> +#define PERF_PMU_CAP_PASSTHROUGH_VPMU		0x0200
+> >>  
+> >>  struct perf_output_handle;
+> >>  
+> >> @@ -1728,6 +1729,8 @@ extern void perf_event_task_tick(void);
+> >>  extern int perf_event_account_interrupt(struct perf_event *event);
+> >>  extern int perf_event_period(struct perf_event *event, u64 value);
+> >>  extern u64 perf_event_pause(struct perf_event *event, bool reset);
+> >> +int perf_get_mediated_pmu(void);
+> >> +void perf_put_mediated_pmu(void);
+> >>  #else /* !CONFIG_PERF_EVENTS: */
+> >>  static inline void *
+> >>  perf_aux_output_begin(struct perf_output_handle *handle,
+> >> @@ -1814,6 +1817,13 @@ static inline u64 perf_event_pause(struct perf_event *event, bool reset)
+> >>  {
+> >>  	return 0;
+> >>  }
+> >> +
+> >> +static inline int perf_get_mediated_pmu(void)
+> >> +{
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static inline void perf_put_mediated_pmu(void)			{ }
+> >>  #endif
+> >>  
+> >>  #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+> >> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> >> index 8f908f077935..45868d276cde 100644
+> >> --- a/kernel/events/core.c
+> >> +++ b/kernel/events/core.c
+> >> @@ -402,6 +402,20 @@ static atomic_t nr_bpf_events __read_mostly;
+> >>  static atomic_t nr_cgroup_events __read_mostly;
+> >>  static atomic_t nr_text_poke_events __read_mostly;
+> >>  static atomic_t nr_build_id_events __read_mostly;
+> >> +static atomic_t nr_include_guest_events __read_mostly;
+> >> +
+> >> +static atomic_t nr_mediated_pmu_vms;
+> >> +static DEFINE_MUTEX(perf_mediated_pmu_mutex);
+> >> +
+> >> +/* !exclude_guest event of PMU with PERF_PMU_CAP_PASSTHROUGH_VPMU */
+> >> +static inline bool is_include_guest_event(struct perf_event *event)
+> >> +{
+> >> +	if ((event->pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU) &&
+> >> +	    !event->attr.exclude_guest)
+> >> +		return true;
+> >> +
+> >> +	return false;
+> >> +}
+> >>  
+> >>  static LIST_HEAD(pmus);
+> >>  static DEFINE_MUTEX(pmus_lock);
+> >> @@ -5212,6 +5226,9 @@ static void _free_event(struct perf_event *event)
+> >>  
+> >>  	unaccount_event(event);
+> >>  
+> >> +	if (is_include_guest_event(event))
+> >> +		atomic_dec(&nr_include_guest_events);
+> >> +
+> >>  	security_perf_event_free(event);
+> >>  
+> >>  	if (event->rb) {
+> >> @@ -5769,6 +5786,36 @@ u64 perf_event_pause(struct perf_event *event, bool reset)
+> >>  }
+> >>  EXPORT_SYMBOL_GPL(perf_event_pause);
+> >>  
+> >> +/*
+> >> + * Currently invoked at VM creation to
+> >> + * - Check whether there are existing !exclude_guest events of PMU with
+> >> + *   PERF_PMU_CAP_PASSTHROUGH_VPMU
+> >> + * - Set nr_mediated_pmu_vms to prevent !exclude_guest event creation on
+> >> + *   PMUs with PERF_PMU_CAP_PASSTHROUGH_VPMU
+> >> + *
+> >> + * No impact for the PMU without PERF_PMU_CAP_PASSTHROUGH_VPMU. The perf
+> >> + * still owns all the PMU resources.
+> >> + */
+> >> +int perf_get_mediated_pmu(void)
+> >> +{
+> >> +	guard(mutex)(&perf_mediated_pmu_mutex);
+> >> +	if (atomic_inc_not_zero(&nr_mediated_pmu_vms))
+> >> +		return 0;
+> >> +
+> >> +	if (atomic_read(&nr_include_guest_events))
+> >> +		return -EBUSY;
+> >> +
+> >> +	atomic_inc(&nr_mediated_pmu_vms);
+> >> +	return 0;
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(perf_get_mediated_pmu);
+> >> +
+> >> +void perf_put_mediated_pmu(void)
+> >> +{
+> >> +	atomic_dec(&nr_mediated_pmu_vms);
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(perf_put_mediated_pmu);
+> >> +
+> >>  /*
+> >>   * Holding the top-level event's child_mutex means that any
+> >>   * descendant process that has inherited this event will block
+> >> @@ -11907,6 +11954,17 @@ static void account_event(struct perf_event *event)
+> >>  	account_pmu_sb_event(event);
+> >>  }
+> >>  
+> >> +static int perf_account_include_guest_event(void)
+> >> +{
+> >> +	guard(mutex)(&perf_mediated_pmu_mutex);
+> >> +
+> >> +	if (atomic_read(&nr_mediated_pmu_vms))
+> >> +		return -EACCES;
+> > 
+> > Kan, Namhyung posted a patchset
+> > https://lore.kernel.org/all/20240904064131.2377873-1-namhyung@kernel.org/
+> > which would remove to set exclude_guest flag from perf tools by default.
+> > This may impact current mediated vPMU solution, but fortunately the
+> > patchset provides a fallback mechanism to add exclude_guest flag if kernel
+> > returns "EOPNOTSUPP".
+> > 
+> > So we'd better return "EOPNOTSUPP" instead of "EACCES" here. BTW, returning
+> > "EOPNOTSUPP" here looks more reasonable than "EACCES".
+> 
+> It seems the existing Apple M1 PMU has ready returned "EOPNOTSUPP" for
+> the !exclude_guest. Yes, we should use the same error code.
 
-> Implement switch_interrupt interface for x86 PMU, switch PMI to dedicated
-> KVM_GUEST_PMI_VECTOR at perf guest enter, and switch PMI back to
-> NMI at perf guest exit.
+Yep, it'd be much easier to handle if it returns the same error code.
 
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
-> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
-> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->   arch/x86/events/core.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
+Thanks,
+Namhyung
 
-> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> index 5bf78cd619bf..b17ef8b6c1a6 100644
-> --- a/arch/x86/events/core.c
-> +++ b/arch/x86/events/core.c
-> @@ -2673,6 +2673,15 @@ static bool x86_pmu_filter(struct pmu *pmu, int  
-> cpu)
->   	return ret;
->   }
-
-> +static void x86_pmu_switch_interrupt(bool enter, u32 guest_lvtpc)
-> +{
-> +	if (enter)
-> +		apic_write(APIC_LVTPC, APIC_DM_FIXED | KVM_GUEST_PMI_VECTOR |
-> +			   (guest_lvtpc & APIC_LVT_MASKED));
-> +	else
-> +		apic_write(APIC_LVTPC, APIC_DM_NMI);
-> +}
-> +
-
-Similar issue I point out in an earlier patch. #define
-KVM_GUEST_PMI_VECTOR is guarded by CONFIG_KVM but this code is not,
-which can result in compile errors.
-
->   static struct pmu pmu = {
->   	.pmu_enable		= x86_pmu_enable,
->   	.pmu_disable		= x86_pmu_disable,
-> @@ -2702,6 +2711,8 @@ static struct pmu pmu = {
->   	.aux_output_match	= x86_pmu_aux_output_match,
-
->   	.filter			= x86_pmu_filter,
-> +
-> +	.switch_interrupt	= x86_pmu_switch_interrupt,
->   };
-
->   void arch_perf_update_userpage(struct perf_event *event,
 
