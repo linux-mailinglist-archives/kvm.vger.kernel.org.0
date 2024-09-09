@@ -1,230 +1,299 @@
-Return-Path: <kvm+bounces-26169-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26170-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 462829725C1
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 01:30:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 471FB9725C3
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 01:34:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B46DEB23660
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 23:30:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85152B23665
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2024 23:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88ED718DF74;
-	Mon,  9 Sep 2024 23:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D0E18E020;
+	Mon,  9 Sep 2024 23:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YzyoCJaW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EIWXrXCV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2043.outbound.protection.outlook.com [40.107.237.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5078180A6A;
-	Mon,  9 Sep 2024 23:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF377130495;
+	Mon,  9 Sep 2024 23:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725924643; cv=fail; b=gkPBCPT0gRKumPEBfQonEUqbiI+0+paH/OaImwC8lSin85vTnX274H6vi9Mp8/6Vtt/AvTCLPW5q5DkLVlvQBNMwr/jjUqZ4wQ6DV7OAB38BurB4S5mXSOcNdZBIfk60VfFh4M9I+ZXan5tIUeBqYTsBh4LQibALEheZhFQen3M=
+	t=1725924865; cv=fail; b=K+zje3xxB1FCglv+x0yRMfRZ+/9qgZUU4zvA+PQPJtn0SDaFiWFnxfbcMZ1nq1SMkx57K1QjaPI2tMBjqSYmzSxDy06pXhMoS/IUGg9hx0JsICX89tevk3npKzxOZz7wkFEwZNXVLs7zi0ZkbCB4SCCqFPcpLSWv0O3AcdNWBOA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725924643; c=relaxed/simple;
-	bh=8mh0QBThIUsH6hab179XrH4GB5ZxL7rely5FS13INEw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=b87kIQ2YPtwDbaOLMq+j3yMM+3ugNH49AmDmioWFqPicplcUZXfvxmyUTtJWANSRsbS4FAxWvAPdoCpjBh2Ate9PFULjBUJaI2FvbctvPHvxivLP3jAnncRBdNXzA5t+6evKM7UETyUbX+D31pVDL/nPk26kyRjL+Kk8t4Vv2Po=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YzyoCJaW; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725924642; x=1757460642;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=8mh0QBThIUsH6hab179XrH4GB5ZxL7rely5FS13INEw=;
-  b=YzyoCJaW8/0WlBv0J58wuKorXjokIRUZSQAUAm1mu6ccdaru8UtKoPy+
-   JORhqCbcPXq9WTORpIwAHiMDvUXQeknn27jqv0gfrQYhd6+yKT9UrQDTs
-   3hhsoV/nF09uF8GRkKZs3JTvvKy7sELikJ9hTl3oNxNf5MlvAEcwBm8xE
-   /hhtno2ojsM3AYO1a3463JguhgHTBrtLunAk8EspzapF50cFxRz9jo9j7
-   V63WXAe1oc0KtPZ3TiiuuUtBY488BRJxBKnkS6aloJtpk9JEK8jqY3TZs
-   O3oOYkuVAp7fUZ4ibdIp0MiMy+b9yiRLwbUJZe4blQKA+J6Nix2R6fYO1
-   g==;
-X-CSE-ConnectionGUID: 2pHOygKuQaWs/As2dXPM7A==
-X-CSE-MsgGUID: HDMyXdtqRuC4E0W8Ec8MSQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="24524522"
-X-IronPort-AV: E=Sophos;i="6.10,215,1719903600"; 
-   d="scan'208";a="24524522"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2024 16:30:41 -0700
-X-CSE-ConnectionGUID: DObiUS6gRtSoFFZbaGpYRQ==
-X-CSE-MsgGUID: 6txFb/HWQ+CQR/chf8EdqQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,215,1719903600"; 
-   d="scan'208";a="71223518"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Sep 2024 16:30:41 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 9 Sep 2024 16:30:40 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 9 Sep 2024 16:30:40 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 9 Sep 2024 16:30:40 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.48) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 9 Sep 2024 16:30:39 -0700
+	s=arc-20240116; t=1725924865; c=relaxed/simple;
+	bh=9LHbQcJlkEQtAZLr04POOHw4T7/Gj8aQt20/q1yVGKw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FTyz67CzKrA0FzkP5PEo5iKSl6yQzcb3yoyfpS+zuaOWkH1BjVz1uuBNU7VA3jRS4X2tk9n+k+Pyv+ae/9PQQlgxwmKYu2t5tVWd0mHzVlyc1oETTMzzmhhlkkYot52HJaYASRR1PQ46EOahGxhQMVKTsSZT/tFB8XL9vvfS9ww=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EIWXrXCV; arc=fail smtp.client-ip=40.107.237.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OY+HDwysFGZyg7XohurISuP9f7k+0r72+G6vef/Vjrf4aR7QPocf34o8ZCIKw4+rOS36XYl36uGmOR/pH6V4R26cxgRmOT7Nm9hpbBQgFxUaIFXAQz5WqHbRndt7+saVKFwRoUzxjXvsm/GMVzffmlL3c6ZLHzGXqK1wZuAyrkP3ctcaFapZECu8MPjiKSKlNIMsHzSwqGGQrg/Ljv3ZfQZpU5+o6Xp6pKl8hzqZRr3UzywGCiyGecRzPGl6TidHP2aX+T+osQAlzZU1rtQnOQ8uyJbeCE+lg8NO8nyUrFOY6bGPQ3Mfbf5TlsleOzPdQo95FuR6/Xuizc1/fhrK8w==
+ b=GhtSe76ifTYwPK8L4RppQ/vr8gWALomQVLYPa20RT0LoRd6H6QqqyMcdi1VRQNSBHI+AlCcjQuHsFuWRK22xVo5WS2XCbYEkBXVugzscBX1ninVbk6wr1mxhrF5EIbWvhyV5NTbhHNx18s/ir1xp+GQ5Q7iFYk1icDbLIWQmHQhYHhcGYNS7QRJCUPRgh+e6IdEa6+NmnhS5X54+4HMJNpMDYRklq5V+BfGEYdIngKWHowdfUtEGcRPIXdAxj06EPSf4Pfe20hUAQjDBDvBs7PF+XekC+wGwZHSeCMYpiVF90nADBYzxMVofEuAakngm3ZXBrs84IatTOJrHn2uD3g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8mh0QBThIUsH6hab179XrH4GB5ZxL7rely5FS13INEw=;
- b=W+qlEjU1q2wYEdYlMIJvqG94orHue1T8+8Gy/sB6iaXifC0HktjZmJkqYMON3EfbxdYCx4WDCHM9sDilkbUM8/8Ykv70WQBXt+iY8NvEi3CwyAh7aNP161qfjQdTiej3J5I2uKG2IcgJ4iQ0n5ysRtlBkok2SbNjXNNajxE1xX89QKF/DgBSnhTmdm2Of6VJSiyUpliy9hYQchZ3GqhxK1p4Z3BJpIqBudHkJyCFueCDLRIMv2m5hRe7IJONJUwrAFEoHihQPG4NFpxAcXFYADTC9MaAYRET0M5Rzt5fS1lc/7ajf3mO1Yyp49afMKdjELUMqKIhptejWtR6GGF6ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by SN7PR11MB6725.namprd11.prod.outlook.com (2603:10b6:806:267::18) with
+ bh=3IvNxHOyaPNa7dODJ0V0986Ug1mueN+mziud9Fesnug=;
+ b=Q755r7Z/QVWptIqZ9noqOXq/NIRYtdHYfd8Jjd6HeoabeUVi2Y7T++i3CJGK2EpnYR459gAFbA5GRaxMpMO/EXnnitRF+Jf4bbTHHOZsBMy7Nf10agJi6YlIiaWDYXiQKHecuK3vMqmam4bkTMI+1fkuzS8WT0o4MYknu/VgqVnXUWh63Vo6ghnR5KdGJ/U6KZIGt1RZp+0eOD/7Bz9Vlwpu/DweTpCZpPoxBysbTMlcdir80kW5m5tWzKelA34d98vkxDIA3EGVYSRRWo5uv52nxuNJhkIsqxN8i44sItt1CtoHg3a3cMaMyk1KzZjCERDYHrz9FB22s6Fd5b9YMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3IvNxHOyaPNa7dODJ0V0986Ug1mueN+mziud9Fesnug=;
+ b=EIWXrXCVV5O3ua84/9vFlqXE4JFTtreBl4Bw33nq8PNzNRfByjVqf8bSlImZySLgDyCI/o8aDOeRF/JHPj6Z1U6Z186tF4jc6ty3aWJpAdAMro/XYfTrCJt/8aZ/LA095lXz3136l53seWcxCM98ZHSa4NVxok3ae8Z9vB8ZfU0=
+Received: from CH0PR03CA0367.namprd03.prod.outlook.com (2603:10b6:610:119::24)
+ by CH2PR12MB4136.namprd12.prod.outlook.com (2603:10b6:610:a4::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Mon, 9 Sep
- 2024 23:30:37 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.7939.017; Mon, 9 Sep 2024
- 23:30:37 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "seanjc@google.com" <seanjc@google.com>
-CC: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "nik.borisov@suse.com"
-	<nik.borisov@suse.com>, "dmatlack@google.com" <dmatlack@google.com>, "Huang,
- Kai" <kai.huang@intel.com>, "isaku.yamahata@gmail.com"
-	<isaku.yamahata@gmail.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 21/21] KVM: TDX: Handle vCPU dissociation
-Thread-Topic: [PATCH 21/21] KVM: TDX: Handle vCPU dissociation
-Thread-Index: AQHa/ne7SX1xh76jUUONLpUuqlnIa7JPoHaAgACDJQA=
-Date: Mon, 9 Sep 2024 23:30:37 +0000
-Message-ID: <18661b9ae2e35c53ac0f9e7c24f509fae887cfec.camel@intel.com>
-References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
-	 <20240904030751.117579-22-rick.p.edgecombe@intel.com>
-	 <4449bc94-7c5e-4095-8e91-7cd0544bb831@redhat.com>
-In-Reply-To: <4449bc94-7c5e-4095-8e91-7cd0544bb831@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|SN7PR11MB6725:EE_
-x-ms-office365-filtering-correlation-id: 6b024f92-034b-43b6-4267-08dcd12768dc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?UElveXVid2hydTFxRVNGazgxVlZxMnB1aVVoNTI4WXp0MEIvQ1FPcGNHWkZL?=
- =?utf-8?B?b1FVWE4vRExZVkNoL25RY1pMaXpWdXdwd2dUQ2NvdDBNMFA0cXc0Z0VFZkhJ?=
- =?utf-8?B?eGprMTg4aHFMeE83aGhWS2xCR0ZZQlE5Nk5jZldNVTUzMDJEYkdhWWFFS1BK?=
- =?utf-8?B?UzI1bzFqbmM0azN4Z1hCMy9yUmdWMnhOMzF5cUZnTzQwc25YNDQ4enlUU2Rz?=
- =?utf-8?B?bGw2MFJ2MU1ZWXN1ZFJxVGNPZkRzOVFlckp1b25BdFV6NHFyMTNJemU0Snpw?=
- =?utf-8?B?S1IvSlpHUmNQTVNseENlWlNrV2k3MkM4SjRMclg5R0dVMTJwTFhvSHBMUE0y?=
- =?utf-8?B?amdUZ3ZING9HWWF4bnphSTJ6aWJubDFob2czVjBGR3M0K0Y1RXR5TW5xTVlz?=
- =?utf-8?B?eEhTNzRWL2FUcFVrVWtiYytsaHhUZ0hRMDRxMW96RW1YR2N3V3FabWVTdHU5?=
- =?utf-8?B?dnRxS1JwTWVGcDZvZmdkZlJaT1hLWmVxd2xPMHdVMERpditieEE1b3pZUGta?=
- =?utf-8?B?VWJlM3Jnb0l6Q3h6WjlYM3NROE5kOUZteEhQNWdOT0c0LytoMW4va2lCSmY1?=
- =?utf-8?B?V2c3ZEw5N1lpb3RpMmdGR1RaYmM4c3pFNHBKUTd6RkhnRmtSQVJCaENIbTZF?=
- =?utf-8?B?a3lGb0M1QzlZeWhtZ3dpT0svTFNMaVZFWEVKK01scHBVMEJmZVhiemo2THBp?=
- =?utf-8?B?K0FtUHdxTURqWDE1cnJWUWI2eHdMVEEyRGtsZ1Q0S3pzanpSalQ0OUxuekRw?=
- =?utf-8?B?Y21CSzBITnVYSXkxSjAyUGh5SEZxOTR3YUFZMjFFZXNvTzdiM2t5SDZ5Sk9x?=
- =?utf-8?B?dDFiZk1mUzJKdFZ6eXN4OHJrbjlaMjdYMzFwazFDNUFjeUhBaFczMEFTSGNV?=
- =?utf-8?B?ckF3STQxR0NSOHNWSzVEdXYyMmJtbVpha2pMcWdpbVhPd3dDUk1YdmNmUUhG?=
- =?utf-8?B?aHRoNktqN01XUzcvbXJKZ3NnYmIvRzN2a25wbEpZSFJabFc2cUNQNWh4WW5R?=
- =?utf-8?B?MG45S3EzNklGRGpSUjJ5UkFmb1Y2V3VxUi9OZW80MStkeEt0MkJOTWtVTDMx?=
- =?utf-8?B?MEJLSGdsRDZ0d1NUREx5Q25XZktZRzFHZFkwTGN3VEV6bkw1dkxsam5YSWNi?=
- =?utf-8?B?NFFjMy9zdzFYdUJ3L0NRWXpnN0hrYjJFcnhVYllXQ0lhRXMyeUJjZWJlVUdx?=
- =?utf-8?B?dndlckhsTld1d2lOZ2ZtVExsNTAwc3R4UmZWMTVzT0tjbjNhK09kbk5vTVBs?=
- =?utf-8?B?bUF2S3Z5NWIyNmVxMHhRWlhiTFJyY2hxYnRaTng0TU1oNFhIL2xxVHY0TUtk?=
- =?utf-8?B?VzJXRVNxZmxOMGpyYkhEcVo4ODY5WS9Kbm9OejVmTXBhcXBSTlhDY0U4ZVQz?=
- =?utf-8?B?NGx4MHVFZDZsTGhNMXJTV0RSbDZHbkViSVVxYml0cGlXYjBzVzE5UVpQZkhm?=
- =?utf-8?B?Nm9kZ2o1aSsyR0gxblNLWDE2NVYxckdIa1RER3pLdWQ0cDJqa3VPc0hJdUZX?=
- =?utf-8?B?eDBjZFVlMktOeWtYRld2R3FPTHJWYnNsK01uNWlweXZ1Y1VlUWVzN1h2bHh1?=
- =?utf-8?B?aGFZb0E5M05QdHNwSi80aU1namtoMlNPSG1GNEZGckM1OE13K3BleDBqRkVM?=
- =?utf-8?B?SUlTZloxMWtBNDRLQndsM0cyUkFldkpMRFNpV0lNOWV3UmF6SUF5OUExTWVj?=
- =?utf-8?B?RDB0anB1dlkvM0tZTXU4L20wZDV2NXVqK2thZjVEY2dVZHMrMUxEOEIyMjRu?=
- =?utf-8?B?VWFOU2lXaDJnSTl5QWtNWU00Uzc3UGgyd09Ud3V2WFc2ZU9yWWtDdUdBMVJG?=
- =?utf-8?B?RjJyUFFpMlZNQnBGSlZoamJ0N2dnSXRKWnNDZms4UGpLcEZOdU14UmcwV01J?=
- =?utf-8?B?NUx2M0xremowbEtPbEkwditFTnM4VWFiYkdLOXU0SkliVVE9PQ==?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WFYyZXZMU25tL2sycmZnam5XdDQ5eno4MUo4MkZYZ2RLZ05GdzYrWWJyQ3dy?=
- =?utf-8?B?NWoycUdTcXBhWU1OZXNMQVJIOEF2cXFMcjFZdGxRWUNHdW8xSDhwRjZOZGV1?=
- =?utf-8?B?TEJFT09ONks5akswZHdWNnhoR3NYSXZnM0RmODZDMnhSTlRLTjVwVE1JVmZB?=
- =?utf-8?B?QlNITzFIVFFld3hDOVVZM2g3ODlmRG1GRGhvQW1uSEVDSkRGNS9waXRpWDIv?=
- =?utf-8?B?RE1vbXNsZ2NWTGhXTUlCR1FPcHYyb2YxOXg1NXQxTE1FWWRxY2kvWkE4MmxL?=
- =?utf-8?B?Q0pOZzNJTFBsM1JCNFRadnE2NmovR3dvRzdKcUdKeGJ1OEpQeml5MERiSnFW?=
- =?utf-8?B?SHdod3FZVjQvTDBXRHY0MG5RZXVmaXd5SG1UREVPVjU3WXZOUG5ZUGpGd3Fw?=
- =?utf-8?B?T3J5VUs5eC94aWxnZWVzOEhtWjNjOHRTeENwUVNqREEzL2FHN1JSQ1diNHdh?=
- =?utf-8?B?bHJNRHZRclFRemh0VU1SSU44Tk9tREwwUG9HNkFvWDNwOFdWdEJhTlpjSVF0?=
- =?utf-8?B?WW94WlRMamFhc20wcHRPaG50THUvQWxtdHMyWHd2VUhEOG9FQ2tTOTBzcWRm?=
- =?utf-8?B?M2tVb0F5ODJvRlM3Nlhob29QMHVtQkZrTEVnVlVkN0Jmd0lxUnV3TFJNdEN6?=
- =?utf-8?B?OWxHendxSjAzNGNLNVdCV1YyU0daS3VzQUNBUXE0cG13cGdrS0hPR3R0bUdQ?=
- =?utf-8?B?VDhqaGtIRGgxRktRY2FMQ3h1NFBpL2wxSmdFRlRYOU9ZeG01b1hLYjhmZXBJ?=
- =?utf-8?B?Nk05Y3UrbDk2eTBxM1piUWJiVHdGSUZpZ1dLOWdoOFNlWGZlTEhpY1Z1OHBK?=
- =?utf-8?B?eDdmc01aL0hUUjF5VmJoOFJLaWZoVnlNb0lLczlMeXdzdTEzZkZTTmdFbUhF?=
- =?utf-8?B?VUdOTCs5T2p5WHljd0hVRmNMKzF6SEJFWXR3N0RxMjIvSDJYOG5jZFl2VlFq?=
- =?utf-8?B?eGdLd1hZaCtwQUpsd3F0aFB2ZytwbjMzNW1ic1NSVEhZcHFEZlRhditONjRn?=
- =?utf-8?B?WHMxMGwxLytYK3RMVkVDaG5neU02NStTUDlWSWRvckEvWUFQM0JGaXcwcHI0?=
- =?utf-8?B?dHVUSnhHTzlzaWJMMzBEWFdBSFVuRHpmdzBwVzZhc1lGUzd1ZVJWOVlodUtp?=
- =?utf-8?B?MTYyUHZybnRkYzFvWElnYlJkcHM0andLblRzcFhtRTB4NTVvd0haTDl1dkNt?=
- =?utf-8?B?MHlacHpaRkM2a3lMaXQxY0g0b2xpOGFPNURvMytvQk9jOXhPelZSZlR1VGtU?=
- =?utf-8?B?WEp5cWltUEp3bEo0MmlIcVc4eElwWjNiTGVZNXVYSXBzYVVyZDhUZXpSWlFE?=
- =?utf-8?B?ZXI2c09XNnZCUGRFVU1kWUlHdnBkWm1aUWpyYjhrMzdoTzFNNDhwdTBKMkpn?=
- =?utf-8?B?RVhHcWNoSDAwa3E1d1JtamE2UzhrMnF0eERWK3F1bi9sak5SVDZId1dlRW5P?=
- =?utf-8?B?REpSOU50dGlNSkdpZitBdW12WWpsRmVKZFprVTA2aVRUNDBkbHBFZU9VbUJY?=
- =?utf-8?B?ZjV6dCtKbGo3TUJNL2x4TXRuLyt6bFdTL0xIamQ2TTlpVGxwcklsaGJyUTN4?=
- =?utf-8?B?SFk5RDFuNHBuc3M2MEtOWEVPZ3piQkJKV09mbkMxZ3pqV3JOQTA2b2NBMTRR?=
- =?utf-8?B?OXJ2b2w5QVRGTmNOWG1FUEMxT3lxOE5acEZUZCtrc3pUWFFhN25mQ3J5aS9h?=
- =?utf-8?B?V3MzWFVaaWlkSEJXQWFXMFRjL3dRa3R3Y0FTMlBJdTZyZS9yY0FxNnpGQ2x2?=
- =?utf-8?B?Q0o4OFFFQnlyUFZoTHgvcW9FUWV2SGhtZjAzK0JYRzFiUW42WW5QMDdGSld3?=
- =?utf-8?B?R05UOUo3dEt6RzFUTDA1K3ZPc1M2c0xGck1YbXZ1a0J0VGpKNmdLMG5zQ3RH?=
- =?utf-8?B?V200cEZPanMxTmgrNWEydmtRZnNhMXRzL1UwVFFtZ1dsZCtBMHVnNlJLSVBt?=
- =?utf-8?B?UjhDRXovOUdCTHZscXdJdlBGcXdQaFU3MmY2Y29rUHAwVXBwQUk1c2ZVaXB4?=
- =?utf-8?B?NVAvamVFWU9ETGNocG5ESG10N1RHYmNQZDViVEpWUWlLZlVLa28wK0Vka01o?=
- =?utf-8?B?Y1d1Z090aWI2d2FONDdKVzE2YTVZYmlQQU9IQkZYa3liMEdlUG5SMnQrT3Iz?=
- =?utf-8?B?Q2EzRzlHVWtrS1RZN3dVSllaS3FMQXFxS2xYMUV4dFc5b1J6clJoMEZxMXhF?=
- =?utf-8?B?c0E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <053B84FE102CCD45A541C27EDB33D66F@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ 2024 23:34:18 +0000
+Received: from CH2PEPF00000144.namprd02.prod.outlook.com
+ (2603:10b6:610:119:cafe::71) by CH0PR03CA0367.outlook.office365.com
+ (2603:10b6:610:119::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24 via Frontend
+ Transport; Mon, 9 Sep 2024 23:34:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CH2PEPF00000144.mail.protection.outlook.com (10.167.244.101) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7918.13 via Frontend Transport; Mon, 9 Sep 2024 23:34:16 +0000
+Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Sep
+ 2024 18:34:15 -0500
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <ashish.kalra@amd.com>
+CC: <bp@alien8.de>, <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
+	<kexec@lists.infradead.org>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<michael.roth@amd.com>, <mingo@redhat.com>, <pbonzini@redhat.com>,
+	<peterz@infradead.org>, <seanjc@google.com>, <tglx@linutronix.de>,
+	<thomas.lendacky@amd.com>, <x86@kernel.org>
+Subject: Re: [PATCH v2] x86/sev: Fix host kdump support for SNP
+Date: Mon, 9 Sep 2024 23:33:32 +0000
+Message-ID: <20240909233332.4779-1-Ashish.Kalra@amd.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240906202757.5258-1-Ashish.Kalra@amd.com>
+References: <20240906202757.5258-1-Ashish.Kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b024f92-034b-43b6-4267-08dcd12768dc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Sep 2024 23:30:37.2886
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
+ (10.181.40.144)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000144:EE_|CH2PR12MB4136:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4905275f-5a5f-48b8-ad74-08dcd127eb47
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|36860700013|82310400026|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?9V6HrtXt2u0oWhDfNpJEWzxxHwp/LQB7YKVqro3o55cCFECI0YPmcdgKyQfH?=
+ =?us-ascii?Q?2yHrKe8F6fngH/I+6bq20jpZTAWpu/mlywp+quuPbGwTiWIgSyWXb29JQBdd?=
+ =?us-ascii?Q?8gzpUTqj/1ve+kNpc3aKrToN+VHhPQF3kctADfanX89OUG3KXg7l96cUc2Wr?=
+ =?us-ascii?Q?eChrZtriuxhKkp/TeIW0uxg5/DwahFtbA6hjQbpggRsMXPpU1jkvLzj+pOGM?=
+ =?us-ascii?Q?RBKSa/lIHXMv4nTFlBnrBu1Xnx6R6CPCdyXkFPsxM5kYKBl7Sw3rQTJObrwq?=
+ =?us-ascii?Q?v7TgaW4+72OYiCHOfhkiVEvnkHmC3pHy35ufP4X2klBSaPORYjxSptQo8nth?=
+ =?us-ascii?Q?edQ4Osl1R9w/o7Jn4YjSIF53GbqCgeEdABdAxaaFTKcSeLYxMRh9nhD/acYv?=
+ =?us-ascii?Q?uxzKfjWxhwYczXB2GWtp2I79R1LmBv4Rp0CoqfH6QTNSBmu1hSfy9oM4vLPN?=
+ =?us-ascii?Q?+kXhZhCV2qqRRYnX/HhY/x1J10JBs39al3RjKaijjVC03RmXxrnRl5COr0sl?=
+ =?us-ascii?Q?6CVzKZJCRTRZYhGS2Y3d2YtnHpIcAKRBN3GsRlpbGQXurX8qvLej/B6gevGy?=
+ =?us-ascii?Q?akYHfg34QsKbTS2Fr2a1eO6gVLyVWNkOzuFgpYPBuQBgIn7SWTi+TaZhjURU?=
+ =?us-ascii?Q?J3+9Bs7sHjQpPMH3F4L+Ytjz2aml/oDxrPf7n1F+0qM3ZnMvMx8lEwD4rqUP?=
+ =?us-ascii?Q?MEq0TTemMn3oj+j84TMv/FqWX6odoqkAqoigGDmn+mEAVGHteK60fPkih2xH?=
+ =?us-ascii?Q?tVzPaYToo79vzOjP3z0j01zdnh8xzuH1WMbN48J7cZki/vdNEhzd7KuXAuPi?=
+ =?us-ascii?Q?A4xexInQRmPu6yz9ouHjzFvEkcLsuWmCsKgPDI0dDctcftI6BhYuz1uxMGsJ?=
+ =?us-ascii?Q?QBF+2JiGQfRoZxn7hvc6rvFMs0+IFfVf5dChcJzCkSbOlcOgnfBpjbL27oe5?=
+ =?us-ascii?Q?Rmh3G/VXhMpYX+WtwTes80wsJvHB3tPm3peoZi+IMZRdtn3uhKlnJTDUOz1V?=
+ =?us-ascii?Q?D4CakxjTCo9YNSkMjqJVYW12IYEkmMc3AVblw1jkC11dGCanxE0q8j32+yW4?=
+ =?us-ascii?Q?4Bvdxha+LZ/KPyYqFrTGt+R8M5ulW50iHjqzEsLOtCbAsfFxr4JuIPr9E++c?=
+ =?us-ascii?Q?I5pR06FcosOlY3jsIJ+yEsmhOacocDav9Mpru5IAZT8ifJcZyJ4+FcOwFTM3?=
+ =?us-ascii?Q?8lH4ixEQfmoUuG82TTPNN8eZUDXAdq6OiEA4z92eJSTW5iFjaJMy9pWhdase?=
+ =?us-ascii?Q?KhuLyxI5xHHb3PFQijeywhrm337dUSofpjjmHYZysH609sH0XGt8MMuPnSra?=
+ =?us-ascii?Q?vmGqR9LdG940UD63eMGYce2ZRFBlK/T+JkoOZuaM0V2NENXih4OXtqnlPgyo?=
+ =?us-ascii?Q?p7bQ6qUfvf900yc0gs9PJtNztlg2x0CjMbGkLikVe1R+xuDGGvFq6CaCPlu9?=
+ =?us-ascii?Q?7Qx0krkiTJdE8ESHF4sAmTRJ9CUWT1Wy?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2024 23:34:16.0103
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZV098/RxVY405uJIdHyd9zTZldaEIoH8hjzN98ITeezTW2S8+l67WtkVbwwEbpPMsb0w6m6x8t6ektnHiHkamEOpPNDnjCIawJXspbqBAgY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6725
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4905275f-5a5f-48b8-ad74-08dcd127eb47
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000144.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4136
 
-T24gTW9uLCAyMDI0LTA5LTA5IGF0IDE3OjQxICswMjAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
-PiA+IFNpZ25lZC1vZmYtYnk6IElzYWt1IFlhbWFoYXRhIDxpc2FrdS55YW1haGF0YUBpbnRlbC5j
-b20+DQo+ID4gQ28tZGV2ZWxvcGVkLWJ5OiBZYW4gWmhhbyA8eWFuLnkuemhhb0BpbnRlbC5jb20+
-DQo+ID4gU2lnbmVkLW9mZi1ieTogWWFuIFpoYW8gPHlhbi55LnpoYW9AaW50ZWwuY29tPg0KPiA+
-IFNpZ25lZC1vZmYtYnk6IFJpY2sgRWRnZWNvbWJlIDxyaWNrLnAuZWRnZWNvbWJlQGludGVsLmNv
-bT4NCj4gDQo+IEkgdGhpbmsgdGhpcyBkaWRuJ3QgYXBwbHkgY29ycmVjdGx5IHRvIGt2bS1jb2Nv
-LXF1ZXVlLCBidXQgSSdsbCB3YWl0IGZvciANCj4gZnVydGhlciBpbnN0cnVjdGlvbnMgb24gbmV4
-dCBwb3N0aW5ncy4NCg0KVGhlcmUgd2FzIHNvbWUgZmVlZGJhY2sgaW50ZWdyYXRlZCBpbnRvIHRo
-ZSBwcmVjZWRpbmcgVk0vdkNQVSBjcmVhdGlvbiBwYXRjaGVzDQpiZWZvcmUgdGhpcyB3YXMgZ2Vu
-ZXJhdGVkLiBTbyB0aGF0IG1pZ2h0IGhhdmUgYmVlbiBpdC4NCg0KVGhhbmtzIGZvciB0aGUgcmV2
-aWV3Lg0K
+Hello Sean,
+
+On 9/4/2024 5:23 PM, Sean Christopherson wrote:
+>> On Wed, Sep 04, 2024, Ashish Kalra wrote:
+>>> On 9/4/2024 2:54 PM, Michael Roth wrote:
+>>>>   - Sean inquired about making the target kdump kernel more agnostic to
+>>>>     whether or not SNP_SHUTDOWN was done properly, since that might
+>>>>     allow for capturing state even for edge cases where we can't go
+>>>>     through the normal cleanup path. I mentioned we'd tried this to some
+>>>>     degree but hit issues with the IOMMU, and when working around that
+>>>>     there was another issue but I don't quite recall the specifics.
+>>>>     Can you post a quick recap of what the issues are with that approach
+>>>>     so we can determine whether or not this is still an option?
+>>>
+>>> Yes, i believe without SNP_SHUTDOWN, early_enable_iommus() configure the
+>>> IOMMUs into an IRQ remapping configuration causing the crash in
+>>> io_apic.c::check_timer().
+>>>
+>>> It looks like in this case, we enable IRQ remapping configuration *earlier*
+>>> than when it needs to be enabled and which causes the panic as indicated:
+>>>
+>>> EMERGENCY [    1.376701] Kernel panic - not syncing: timer doesn't work
+>>> through Interrupt-remapped IO-APIC
+>>
+>> I assume the problem is that IOMMU setup fails in the kdump kernel, not that it
+>> does the setup earlier.  That's that part I want to understand.
+
+>Here is a deeper understanding of this issue:
+
+>It looks like this is happening: when we do SNP_SHUTDOWN without IOMMU_SNP_SHUTDOWN during panic, kdump boot runs with iommu snp 
+>enforcement still enabled and IOMMU completion wait buffers (cwb) still locked and exclusivity still setup on those, and then in 
+>kdump boot, we allocate new iommu completion wait buffers and try to use them, but we get a iommu command completion wait time-out,
+>due to the locked in (prev) completion wait buffers, the newly allocated completion wait buffers are not getting used for iommu 
+>command execution and completion indication :
+
+>[    1.711588] AMD-Vi: early_amd_iommu_init: irq remaping enabled
+>[    1.718972] AMD-Vi: in early_enable_iommus
+>[    1.723543] AMD-Vi: Translation is already enabled - trying to copy translation structures
+>[    1.733333] AMD-Vi: Copied DEV table from previous kernel.
+>[    1.739566] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.11.0-rc6-next-20240903-snp-host-f2a41ff576cc+ #78
+>[    1.750920] Hardware name: AMD Corporation ETHANOL_X/ETHANOL_X, BIOS RXM100AB 10/17/2022
+>[    1.759950] Call Trace:
+>[    1.762677]  <TASK>
+>[    1.765018]  dump_stack_lvl+0x70/0x90
+>[    1.769109]  dump_stack+0x14/0x20
+>[    1.772809]  iommu_completion_wait.part.0.isra.0+0x38/0x140
+>[    1.779035]  amd_iommu_flush_all_caches+0xa3/0x240
+>[    1.784383]  ? memcpy_toio+0x25/0xc0
+>[    1.788372]  early_enable_iommus+0x151/0x880
+>[    1.793140]  state_next+0xe67/0x22b0
+>[    1.797130]  ? __raw_callee_save___native_queued_spin_unlock+0x19/0x30
+>[    1.804421]  amd_iommu_enable+0x24/0x60
+>[    1.808702]  irq_remapping_enable+0x1f/0x50
+>[    1.813371]  enable_IR_x2apic+0x155/0x260
+>[    1.817848]  x86_64_probe_apic+0x13/0x70
+>[    1.822226]  apic_intr_mode_init+0x39/0xf0
+>[    1.826799]  x86_late_time_init+0x28/0x40
+>[    1.831266]  start_kernel+0x6ad/0xb50
+>[    1.835436]  x86_64_start_reservations+0x1c/0x30
+>[    1.840591]  x86_64_start_kernel+0xbf/0x110
+>[    1.845256]  ? setup_ghcb+0x12/0x130
+>[    1.849247]  common_startup_64+0x13e/0x141
+>[    1.853821]  </TASK>
+>[    2.077901] AMD-Vi: Completion-Wait loop timed out
+>...
+
+>And because of this the iommu command, in this case which is for enabling irq remapping does not succeed and that eventually causes 
+>timer to fail without irq remapping support enabled.
+
+>Once IOMMU SNP support is enabled, to enforce RMP enforcement the IOMMU completion wait buffers are setup as read-only and 
+>exclusivity set on these and additionally the IOMMU registers used to mark the exclusivity on the store addresses associated with 
+>these CWB is also locked. This enforcement of SNP in the IOMMU is only disabled with the IOMMU_SNP_SHUTDOWN parameter with 
+>SNP_SHUTDOWN_EX command.
+
+>From the AMD IOMMU specifications:
+
+>2.12.2.2 SEV-SNP COMPLETION_WAIT Store Restrictions On systems that are SNP-enabled, the store address associated with any host 
+>COMPLETION_WAIT command (s=1) is restricted. The Store Address must fall within the address range specified by the Completion Store 
+>Base and Completion Store Limit registers. When the system is SNP-enabled, the memory within this range will be marked in the RMP 
+>using a special immutable state by the PSP. This memory region will be readable by the CPU but not writable.
+
+>2.12.2.3 SEV-SNP Exclusion Range Restrictions The exclusion range feature is not supported on systems that are SNP-enabled. 
+>Additionally, the Exclusion Base and Exclusion Range Limit registers are re-purposed to act as the Completion Store Base and Limit 
+>registers.
+
+>Therefore, we need to disable IOMMU SNP enforcement with SNP_SHUTDOWN_EX command before the kdump kernel starts booting as we can't 
+>setup IOMMU CWB again in kdump as SEV-SNP exclusion base and range limit registers are locked as IOMMU SNP support is still enabled.
+
+>I tried to use the previous kernel's CWB (cmd_sem) as below: 
+
+>static int __init alloc_cwwb_sem(struct amd_iommu *iommu)
+>{
+>        if (!is_kdump_kernel())
+>                iommu->cmd_sem = iommu_alloc_4k_pages(iommu, GFP_KERNEL, 1);
+>        else {
+>                if (check_feature(FEATURE_SNP)) {
+>                        u64 cwwb_sem_paddr;
+>
+>                        cwwb_sem_paddr = readq(iommu->mmio_base + MMIO_EXCL_BASE_OFFSET);
+>                        iommu->cmd_sem = iommu_phys_to_virt(cwwb_sem_paddr);
+>        		return iommu->cmd_sem ? 0 : -ENOMEM;
+>                }
+>        }
+>
+>        return iommu->cmd_sem ? 0 : -ENOMEM;
+>}
+
+>I tried this, but this fails as i believe the kdump kernel will not have these previous kernel's allocated IOMMU CWB in the kernel 
+>direct map : 
+
+>[    1.708959] AMD-Vi: in alloc_cwwb_sem kdump kernel
+>[    1.714327] AMD-Vi: in alloc_cwwb_sem SNP feature enabled, cmd_sem_paddr 0x100805000, cmd_sem_vaddr 0xffff9f5340805000
+>[    1.726309] AMD-Vi: in alloc_cwwb_sem kdump kernel
+>[    1.731676] AMD-Vi: in alloc_cwwb_sem SNP feature enabled, cmd_sem_paddr 0x1050051000, cmd_sem_vaddr 0xffff9f6290051000
+>[    1.743742] AMD-Vi: in alloc_cwwb_sem kdump kernel
+>[    1.749109] AMD-Vi: in alloc_cwwb_sem SNP feature enabled, cmd_sem_paddr 0x1050052000, cmd_sem_vaddr 0xffff9f6290052000
+>[    1.761177] AMD-Vi: in alloc_cwwb_sem kdump kernel
+>[    1.766542] AMD-Vi: in alloc_cwwb_sem SNP feature enabled, cmd_sem_paddr 0x100808000, cmd_sem_vaddr 0xffff9f5340808000
+>[    1.778509] AMD-Vi: in alloc_cwwb_sem kdump kernel
+>[    1.783877] AMD-Vi: in alloc_cwwb_sem SNP feature enabled, cmd_sem_paddr 0x1050053000, cmd_sem_vaddr 0xffff9f6290053000
+>[    1.795942] AMD-Vi: in alloc_cwwb_sem kdump kernel
+>[    1.801300] AMD-Vi: in alloc_cwwb_sem SNP feature enabled, cmd_sem_paddr 0x100809000, cmd_sem_vaddr 0xffff9f5340809000
+>[    1.813268] AMD-Vi: in alloc_cwwb_sem kdump kernel
+>[    1.818636] AMD-Vi: in alloc_cwwb_sem SNP feature enabled, cmd_sem_paddr 0x1050054000, cmd_sem_vaddr 0xffff9f6290054000
+>[    1.830701] AMD-Vi: in alloc_cwwb_sem kdump kernel
+>[    1.836069] AMD-Vi: in alloc_cwwb_sem SNP feature enabled, cmd_sem_paddr 0x10080a000, cmd_sem_vaddr 0xffff9f534080a000
+>[    1.848039] AMD-Vi: early_amd_iommu_init: irq remaping enabled
+>[    1.855431] AMD-Vi: in early_enable_iommus
+>[    1.860032] AMD-Vi: Translation is already enabled - trying to copy translation structures
+>[    1.869812] AMD-Vi: Copied DEV table from previous kernel.
+>[    1.875958] AMD-Vi: in build_completion_wait, paddr = 0x100805000
+>[    1.882766] BUG: unable to handle page fault for address: ffff9f5340805000
+>[    1.890441] #PF: supervisor read access in kernel mode
+>[    1.896177] #PF: error_code(0x0000) - not-present page
+
+>....
+
+>I think that memremap(..,..,MEMREMAP_WB) will also fail for the same reason as memremap(.., MEMREMAP_WB) for the RAM region will 
+>again use the kernel directmap.
+
+To follow up on this:
+
+I am able to use memremap() to map the previous kernel's allocated CWB buffers and try to reuse the same CWB buffers in the
+kdump kernel, obviously, memremap() does not return a direct pointer to kernel directmap as the previous kernel's CWB buffers 
+will be in a RAM address which is not directly mapped into kdump kernel's directmap.
+ 
+And these memremap() mappings seem to be correct, because if i do a memset(0) on these, i get a RMP #PF violation due
+to these buffers being setup as RO in the RMP table, so that means that memremap() seems to have done the mapping correctly.
+
+I am getting inconsistent IOMMU command completion wait timeout's with these reused CWB buffers (which are used as
+semaphores to indicate IOMMU command completions) and i am still debugging those issues.
+
+Thanks,
+Ashish
 
