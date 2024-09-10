@@ -1,182 +1,229 @@
-Return-Path: <kvm+bounces-26198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 935AE97292F
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 08:00:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5382D972935
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 08:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FDC51F25D80
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 06:00:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7A031F26218
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 06:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D749176AAD;
-	Tue, 10 Sep 2024 06:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BDEC175D2F;
+	Tue, 10 Sep 2024 06:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G78PQbOR"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YwOyIlfT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2074.outbound.protection.outlook.com [40.107.223.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08AFB1CD1F;
-	Tue, 10 Sep 2024 06:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725948010; cv=none; b=cgqUiqAMKGMpci3Qo1DW60b1gHx4dKNnmGnQNYptBdLeAq1YIfJ3AapkjOY55pB2wr+7m7ay8Zjtf3kWQh7q7SoV7fFzuWFVv+AO2aA5N5ekzHbL8LW1YF2eHpoxkTJgRWUIwH95GSUcJz3yg8m/aoh/WcF4cHlIVt4vWlEHr7Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725948010; c=relaxed/simple;
-	bh=YKlFgKmNBL+UvTbDp6vo7VzFbHN0vj4I0Lmh1OIQjck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ss0VyhTAj6d4UX58Nh7bjBV+5Uaxf4bNmSdKsaTFhZqLVWof3SROF6xYOBXuAZwrCiDftDlCgTmaMFc+21ULsREzus3bMWvpdPKbLP1MQKNa6GQyzLgAiBLn886a/TMnF4O1m0F0mJjaphXm+qCwMR/vaqr6+sn8B4uVcBLhYPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G78PQbOR; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725948009; x=1757484009;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=YKlFgKmNBL+UvTbDp6vo7VzFbHN0vj4I0Lmh1OIQjck=;
-  b=G78PQbORDUnXdqNj8nbJ/yWasNjBizLa2DTQAEnSLut1ooOsGDHCd/Ij
-   5BSGhbEM8tdck2SciqeOkBvfpVtD8elKA3DOMxKimbuwq+cYLqoFcH6VE
-   MQQKOaMjcW2kCEwqqnKEJik5G6eYiGiK6PAF55b2z8mS1oXVjo8VuO97R
-   8XjmGKvKNvN6AyQpbzj4Fc64APIF9T8UxNcYxGfsqo/DGuY5WRy87JblO
-   jRcfMncBHpC2AVoQj7K0menMUUdHX7/Jl7WWbSxo9t8TgvMBY6Kxb+W9r
-   4IYLP8PQFQBieXjgVcF/3tRv3tH0pstFeniS7rJzIRz+OW7YX9DCIF2QK
-   g==;
-X-CSE-ConnectionGUID: Gx3ScJpIQG2vZeABnWn+Uw==
-X-CSE-MsgGUID: NoJc+xReS1+Btu8DqZOnng==
-X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="24553392"
-X-IronPort-AV: E=Sophos;i="6.10,216,1719903600"; 
-   d="asc'?scan'208";a="24553392"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2024 23:00:08 -0700
-X-CSE-ConnectionGUID: cVZNg4DfS0CKoDo3SzGu4w==
-X-CSE-MsgGUID: P+pOe+qSRKqfhQlgP2iybA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,216,1719903600"; 
-   d="asc'?scan'208";a="66967552"
-Received: from debian-skl.sh.intel.com (HELO debian-skl) ([10.239.160.45])
-  by fmviesa008.fm.intel.com with ESMTP; 09 Sep 2024 23:00:03 -0700
-Date: Tue, 10 Sep 2024 14:02:28 +0800
-From: Zhenyu Wang <zhenyuw@linux.intel.com>
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>, kvm@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Ingo Molnar <mingo@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	H Peter Anvin <hpa@zytor.com>, Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Kan Liang <kan.liang@linux.intel.com>, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH 0/3] KVM: x86: Fix Intel PT Host/Guest mode when host
- tracing also
-Message-ID: <Zt/g9Cpix06Ccg4z@debian-scheme>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20240906130026.10705-1-adrian.hunter@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D9213AD09;
+	Tue, 10 Sep 2024 06:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725948240; cv=fail; b=oN87h1Mjx0ia8hDqpC03fgO3XG8lfvfzurL1y/vaSWXX7UG6jbmOBNvws2ScugeqN1rWCPW4u86mKnuPkkLVL/abRbeSHakDDSHpIIs81jjpfLfTTFMRPgBsnPlOoj+6hfmiflNA1zrSHg/zZJyeydHRI29IfMam4P/qUdE+oM8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725948240; c=relaxed/simple;
+	bh=6tC2uBIAAOP/gckKDLmvJh4Po3Nv4AbVmmFCkDBjzjA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DKjdhC5m4JL2IF5sJrn3nN56o9IodqagDZOb1fuSuc7HxuyRBMeLxH+tTom17Tr6fcJKIjCQQ+fOFeV/OyiElrA2I65niYnUa8Z0dZP2LftbBMHrG2k9vY4560Pvp5pI632Q/n0v3aLS7A+Wrbypg8Lb2Gw2Amo69C23R9RJ+I4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YwOyIlfT; arc=fail smtp.client-ip=40.107.223.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xJgsxi08urGMmSBhkyqLL+TuZCXSnVzwtvzIeRZM/+bGUufeayFmRCxcUm2EpyFkXmd9QeHVdjlEwr5k0nAGo/d4HLhglE9RehfeCeD0uzA0i5zQ3ttDOBQHZvolbYw47iGunVYCvaRpd8p0zBpYhfYGud8R7NkRmJbRuZtRO7XUlfJjDAQE612t+KIrpydI3Dlps8kbin8N7+yXRN/4czTS5coOSaWr1Ec+dCZT4tqj1RGKEMENoNcnTopJn6F25qXwkmDVfnvHPEdoATat6hfgyns7vZmrtr67iUx4l+LO7lPKzEOP5p70kNcf9dhpr1yHeHe3SxhpdVjjfvBbPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8t2t/u3V4VNuulSELjP+bju54IM8pzOdafWVoIy2DmM=;
+ b=AWukiFzF1b6A3EVckSljYv1C9TRrEjyycAptBWwRRSax2JD8mnPFc+Sh5vccrKp/Sv2WezNS6c5oc2Sb2YpC59Tiyz+DD1HIj8cw76Dyw6tVXHDWIyyu91HvO0z9MA4oxw9h3BgtZ7GoN4F/uH/+sjTLJjg1HIP/D3DCoRQboF11bX5jSLgDxQI6DH+CeaAeeJY2OHL4oG796u9S3apvDCpidbCISz4agHvYwL5298V8qoKOqGX0U+nGfU15QrlcaWxWlcNtlHlvdzyNLp6dMxVS0nYvfcxYflaTcDujECJDPstk/1aVSq1Nsz49Nu5ITONp6fQ6O49lJ2a1VwSSew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8t2t/u3V4VNuulSELjP+bju54IM8pzOdafWVoIy2DmM=;
+ b=YwOyIlfTyXYPWUtsYZVaZiDpz5y43Ho3qSaR72QzbOY/z9D7AMBHplxmlGQbIMSSK/r2BYmJLvfI03kTO0/LwkpSX55pUOyjS/EMNKIz7cswY7X10sx7F3nbBW64WfsQW2z5NRWBHxJSy09J8GCh3zjqgf9foZBD41xAV1gHyd0=
+Received: from SJ0PR13CA0127.namprd13.prod.outlook.com (2603:10b6:a03:2c6::12)
+ by CY8PR12MB7756.namprd12.prod.outlook.com (2603:10b6:930:85::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.28; Tue, 10 Sep
+ 2024 06:03:55 +0000
+Received: from CO1PEPF000075F1.namprd03.prod.outlook.com
+ (2603:10b6:a03:2c6:cafe::2f) by SJ0PR13CA0127.outlook.office365.com
+ (2603:10b6:a03:2c6::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24 via Frontend
+ Transport; Tue, 10 Sep 2024 06:03:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CO1PEPF000075F1.mail.protection.outlook.com (10.167.249.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7918.13 via Frontend Transport; Tue, 10 Sep 2024 06:03:55 +0000
+Received: from ruby-9130host.amd.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 10 Sep
+ 2024 01:03:53 -0500
+From: Melody Wang <huibo.wang@amd.com>
+To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>
+CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>, Ashish Kalra
+	<ashish.kalra@amd.com>, Michael Roth <michael.roth@amd.com>, Melody Wang
+	<huibo.wang@amd.com>
+Subject: [PATCH v2 0/6] Add SEV-SNP restricted injection hypervisor support
+Date: Tue, 10 Sep 2024 06:03:30 +0000
+Message-ID: <cover.1725945912.git.huibo.wang@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="l5QniXQFWRwHsHV7"
-Content-Disposition: inline
-In-Reply-To: <20240906130026.10705-1-adrian.hunter@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
+ (10.181.40.144)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000075F1:EE_|CY8PR12MB7756:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8e4685b8-ac45-489e-3647-08dcd15e5a7e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?M9P7B2NvMfJrsAi3hsJYWJh8b+5FuROXK2ebbBWwfXCHakCWHsXRl6rnWGLW?=
+ =?us-ascii?Q?UuS33/ZnJsttKYneX/CP6xhlGn+mT2W3TGTgIBVEktNoD1RJPHdyl0KvZAyU?=
+ =?us-ascii?Q?N3jgjzSOjAlZWPxfXM7QVnAnd+HFSUsnaIZaDp6d/RlTpjYKItRHqq6C0fhm?=
+ =?us-ascii?Q?UpzSzxn1Zs1O8hR/MSjSO1UHR9WukEKiq1wOc4hes1y/VLzLiDHOcQk7gg5K?=
+ =?us-ascii?Q?pARMGfjSBpNzlhoZ39K0KQbKDyaytk3JVpVD4R4OE1SxmEMilSsIYrzlWrDx?=
+ =?us-ascii?Q?S4XYWoYx3l/dyB4kq6phM8xesY25Dlm04VFr+fuAQdyY6jVxEx7Sqm8b46qN?=
+ =?us-ascii?Q?/unAhDeRIkX3A9/WHD07xV2dQy+bTX9DynSujYuqzMW9GpppTyWWh4wLdgAA?=
+ =?us-ascii?Q?RKuon3ixjF4EQdnbZc88rNygRuk1oLLkCaRUNxJNAeud53aat2XE6uFXaJaf?=
+ =?us-ascii?Q?wHuNE4NHLMMpgnU/H54pw8CDDP0qQtN6N8n8+pr4Qz/vvC6STp//4BumgXRA?=
+ =?us-ascii?Q?1eqiE8LKPgEVDveN8seaJVVIstaEKHPQYBN5QELhS+9JmwO8s3eeMJtAaOon?=
+ =?us-ascii?Q?C8b+HgHjSET84+dQbUvFW3S1oVGsf5QSx/91AYYljVwHYTvfyt88weXFWONC?=
+ =?us-ascii?Q?HnjYTKfu+wHJ/1OLE36hRAzC+HINLcVt0Vu1cksafbAaz/XESteJsrQKfn2a?=
+ =?us-ascii?Q?YwR9O/rBjl+/gOJSReq3UA1DDN2KhbVPtqfl0Wq3snbrBTODec0+8CB8X+7o?=
+ =?us-ascii?Q?6vLDMS7mn39Or4ZidzafajBxBB01Tm+YyvDg2hb6RlLwCXLVPiMKhlsWLSr3?=
+ =?us-ascii?Q?8pU01FdkOojFt78F3IkbqXeXicdYQAfkD+b3BWqnDGW7n1ABkmmjwn3ZxDuv?=
+ =?us-ascii?Q?K4vsfZhmWzc8lazyUflgmFPmBnxBNxffE0ra6RSvP3KRt0//MndtN4UPok0a?=
+ =?us-ascii?Q?u+r2cPTsTJUQ6kGiBPLBirZn/zBj2OlMOpEDH//jc4z+2jWefgsqOBLZkbgo?=
+ =?us-ascii?Q?dsnvhhPvEcd6+0rC+tmWheQ+Lgy42Oj7k35to0OEE0TqovjDwyNf3hICU3QN?=
+ =?us-ascii?Q?cRgFEPGPiy1N6X06/RPY/Aos4T+w09P2xeHnnvsCDlcBx6M1OVpjR+cizdxQ?=
+ =?us-ascii?Q?cB0TzU0wcnMufXn1E8YtJv7NsFpvLs9x/y28UW2yV8Ex8+K98i5dRqJOgtnn?=
+ =?us-ascii?Q?3/TG0L2IK8EzYvSVsOBsVFuvOeQAwRhsk8RadBRZmJ+FLLzONY3G9YKvXDmx?=
+ =?us-ascii?Q?RaYzOxqtlWFldXJoGytcWuSsbPlxptodfysZLaxk7qrdRjNF6XRPltWylL7F?=
+ =?us-ascii?Q?gDNIo9SR+Myf8D1FP56I30ypSyElKtAiU7P388H80LrbKLNaVCHSs80H48eE?=
+ =?us-ascii?Q?0puUDjUwqOYKXiLlhFPvMZi+ak+ol60KGUp0wQpr7Ap/a8VY++7cSxfDBhTc?=
+ =?us-ascii?Q?GLoVFpF015uRK5n++j0t40AIxx4VFtYxRgpKpkDffKBSU8SKECqMMA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2024 06:03:55.3244
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e4685b8-ac45-489e-3647-08dcd15e5a7e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000075F1.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7756
 
+Hi all,
 
---l5QniXQFWRwHsHV7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is a v2 of the restricted injection hypervisor support patches.
+ 
+The previous version was submitted here:
+https://lore.kernel.org/r/cover.1722989996.git.huibo.wang@amd.com.
 
+Since the previous submission, one issue reported by the kernel test robot was
+fixed.
 
-Add Mingwei.
+All comments and review feedback are appreciated.
 
-On 2024.09.06 16:00:23 +0300, Adrian Hunter wrote:
-> Hi
->=20
-> There is a long-standing problem whereby running Intel PT on host and gue=
-st
-> in Host/Guest mode, causes VM-Entry failure.
->=20
-> The motivation for this patch set is to provide a fix for stable kernels
-> prior to the advent of the "Mediated Passthrough vPMU" patch set:
->=20
-> 	https://lore.kernel.org/kvm/20240801045907.4010984-1-mizhang@google.com/
->=20
-> which would render a large part of the fix unnecessary but likely not be
-> suitable for backport to stable due to its size and complexity.
->=20
-> Ideally, this patch set would be applied before "Mediated Passthrough vPM=
-U"
->=20
-> Note that the fix does not conflict with "Mediated Passthrough vPMU", it
-> is just that "Mediated Passthrough vPMU" will make the code to stop and
-> restart Intel PT unnecessary.
->
+Thanks. 
 
-With mediated passthrough vPMU, we could enable PT pmu's PERF_PMU_CAP_PASST=
-HROUGH_VPMU
-capability like core pmu, then perf guest helper could handle any host PT e=
-vents
-during VM entry/exit as well like core perf events. The benefit is general =
-perf interface
-to handle like others. But it would be sure to depend on passthrough vPMU b=
-e enabled,
-not as this to fix in case w/o that.
+Changelog:
+v1
 
-I have local patches to work against passthrough vPMU, but like passthrough=
- vPMU
-to be settled down first. With Adrian's change, it could be also possible t=
-o decouple
-the dependency, so may support in both cases with or w/o passthrough vPMU e=
-nabled.=20
+Operating systems may not handle unexpected interrupt or exception sequences.
+A malicious hypervisor can inject random interrupt or exception sequences,
+putting guest drivers or guest OS kernels into an unexpected state, which could
+lead to security issues.
 
->=20
-> Adrian Hunter (3):
->       KVM: x86: Fix Intel PT IA32_RTIT_CTL MSR validation
->       KVM: x86: Fix Intel PT Host/Guest mode when host tracing also
->       KVM: selftests: Add guest Intel PT test
->=20
->  arch/x86/events/intel/pt.c                         | 131 ++++++-
->  arch/x86/events/intel/pt.h                         |  10 +
->  arch/x86/include/asm/intel_pt.h                    |   4 +
->  arch/x86/kvm/vmx/vmx.c                             |  26 +-
->  arch/x86/kvm/vmx/vmx.h                             |   1 -
->  tools/testing/selftests/kvm/Makefile               |   1 +
->  .../selftests/kvm/include/x86_64/processor.h       |   1 +
->  tools/testing/selftests/kvm/x86_64/intel_pt.c      | 381 +++++++++++++++=
-++++++
->  8 files changed, 532 insertions(+), 23 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/intel_pt.c
->=20
-> base-commit: d45aab436cf06544abeeffc607110f559a3af3b4
->=20
->=20
-> Regards
-> Adrian
->=20
+To address this concern, SEV-SNP restricts the injection of interrupts and
+exceptions to those only allowed by the guest. Restricted Injection disables
+all hypervisor-based interrupt queuing and event injection for all vectors,
+allowing only a single vector, #HV (28), which is reserved for SNP guest use
+but is never generated by hardware. #HV is only permitted to be injected into
+VMSAs that execute with Restricted Injection.
 
---l5QniXQFWRwHsHV7
-Content-Type: application/pgp-signature; name="signature.asc"
+Guests operating with Restricted Injection are expected to communicate with the
+hypervisor about events via a software-managed para-virtualization interface.
+This interface can utilize #HV injection as a doorbell to inform the guest that
+new events have occurred. This patch set implements Restricted Injection on the
+KVM side directly into VMPL0.
 
------BEGIN PGP SIGNATURE-----
+Overview:
 
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCZt/g7wAKCRCxBBozTXgY
-J4FmAJ4l1Cil0SD6XxGOygTov/Nm/zTkBQCcDgsjqp1rTxgyohF44JMESE88C7o=
-=/KK1
------END PGP SIGNATURE-----
+The GHCB 2.0 specification[1] defines #HV doorbell page and the #HV doorbell
+page NAE event allows for an SEV-SNP guest to register a doorbell page for use
+with the hypervisor injection exception (#HV). When Restricted Injection is
+active, only #HV exceptions can be injected into the guest, and the hypervisor
+follows the GHCB #HV doorbell communication to inject the exception or
+interrupt. Restricted Injection can be enabled by setting the bit in
+vmsa_features.
 
---l5QniXQFWRwHsHV7--
+The patchset is rebased on the kvm/next (commit 15e1c3d65975524c5c792fcd59f7d89f00402261).
+
+Testing:
+
+The patchset has been tested with the sev-snp guest, ovmf and qemu supporting
+restricted injection.
+
+Four test sets:
+1.ls -lr /
+2.apt update
+3.fio
+4.perf
+
+Thanks
+Melody
+
+Melody Wang (6):
+  x86/sev: Define the #HV doorbell page structure
+  KVM: SVM: Add support for the SEV-SNP #HV doorbell page NAE event
+  KVM: SVM: Inject #HV when restricted injection is active
+  KVM: SVM: Inject NMIs when restricted injection is active
+  KVM: SVM: Inject MCEs when restricted injection is active
+  KVM: SVM: Enable restricted injection for an SEV-SNP guest
+
+ arch/x86/include/asm/cpufeatures.h |   1 +
+ arch/x86/include/asm/kvm-x86-ops.h |   1 +
+ arch/x86/include/asm/kvm_host.h    |   1 +
+ arch/x86/include/asm/sev-common.h  |   1 +
+ arch/x86/include/asm/svm.h         |  41 +++++
+ arch/x86/include/uapi/asm/kvm.h    |   1 +
+ arch/x86/include/uapi/asm/svm.h    |   5 +
+ arch/x86/kvm/svm/sev.c             | 277 ++++++++++++++++++++++++++++-
+ arch/x86/kvm/svm/svm.c             |  44 ++++-
+ arch/x86/kvm/svm/svm.h             |  26 ++-
+ arch/x86/kvm/vmx/main.c            |   1 +
+ arch/x86/kvm/vmx/vmx.c             |   5 +
+ arch/x86/kvm/vmx/x86_ops.h         |   1 +
+ arch/x86/kvm/x86.c                 |   8 +
+ 14 files changed, 408 insertions(+), 5 deletions(-)
+
+-- 
+2.34.1
+
+[1] https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/56421.pdf
 
