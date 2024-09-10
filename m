@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-26311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BADA1973D52
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 18:34:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB03C973D58
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 18:35:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEBA21C247A9
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 16:34:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5ACD41F26DE2
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 16:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CACA11A4F2A;
-	Tue, 10 Sep 2024 16:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 170B11A76C7;
+	Tue, 10 Sep 2024 16:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="vxctVS38"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="L/x6q0sZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CBB1A3BD3;
-	Tue, 10 Sep 2024 16:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0261A76BD;
+	Tue, 10 Sep 2024 16:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725985896; cv=none; b=PpcNJAqWUOKaNz3L06XRUewK8OWOd8OkuYBjhLKlCTKR0E/8QDTCW+CAgQFrRov1fdPVcb8GpW/J6L0Oa1OqllPu+wrRMAyLccR3971BouPRvzvGEWTR4r2sHM63yYnTxVzHVAdrYyWHcs79QyC9ICWqkl1OiaBGhILxrH968aU=
+	t=1725985903; cv=none; b=Qayr0fnFqp96GQpS+5cPjigCqScg/90HA5kp8EU6+KbDUj6nJehJdXci00nGuKgS8n9WY/JZ3zo5yl4S0/XXkskbzQQuFdZnZS5qhUmSamE2s8+UoHltQfk/Gs5SPJiWQxm9iQ6YEMKgyNvpyN8r7DRtOKXiHdIDl1mJr9vR43I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725985896; c=relaxed/simple;
-	bh=KuKlPSFBk+6o2cA7opO9wLlxrDIRu2/Eon9+LUTmQ8c=;
+	s=arc-20240116; t=1725985903; c=relaxed/simple;
+	bh=WiMd1fQnJ68uRJs7o1MvaQ3hErm2TB0gEsTi8l3L3mo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cd92UtdUtLTGa1T/h1OhBvVEgjTvxMavABZe1Cnh4oTEc2xKz4KP+eS8v31t3V+WjVpD+jM2296LyCO1zdC54xOQONmZDr3/7LZLz/eYQ/T5IepWUbWsEnX2mZSvRHvEi/pGsgmFOjFHkgg/I5I4mGNQdWObJM2yLMhD1hs9jLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=vxctVS38; arc=none smtp.client-ip=207.171.190.10
+	 MIME-Version:Content-Type; b=WLEErpPk9dZ7zXYJeVdRi2b6kBwRoXGippwrFY7JmNz3EYwfQtOci+W8aR/3BGOSj8U9ycICrmgBSuNVeqFNhsQJweB4LGHWUUn53ho5nFO3Fj9GEMzW13O8WsBHoy4GMl5fev6zWMGEF4FVTegY2L2Hk4ukJqRmCYVYe7NE9gE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=L/x6q0sZ; arc=none smtp.client-ip=52.95.49.90
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1725985895; x=1757521895;
+  s=amazon201209; t=1725985902; x=1757521902;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=umyhObMpA1DDGyKFrbGuBdzuz/jHr6ecIUxm4GlHskc=;
-  b=vxctVS38/4rbtRl6GfW+W4P4w53xJpkOSXpta4LeJFkol9TZQWBd64fK
-   sc0n4Xy0wD+CotskhTLU8vE4Kop3cvVgnWy83NIN4zCv/O0KPNYVgLrzC
-   ebQfH+iE/XLDsnkO9PDhsl4m3wjKRYxNOHM6AP2840yVI7m1eQgWYP/9T
-   Q=;
+  bh=nrEWCAm2NUlH3H3kjrWi9+hHd8dgkyixf/clN7dg47w=;
+  b=L/x6q0sZWZg6KJQiavFHq6sKC9wGFqBhmSWtOa6NRVqbl3vNml9+WA4X
+   lM8idV5vgYXiojVMNEIoJiKgtO6dUQyOjHJboF6XFgyVVYDcHbBhc7/OR
+   Dg9kK2+Yyiqpabg1xYmY4eyZy2ubj+lQN9cDkf6FtghbTma7Ses9+qLDd
+   4=;
 X-IronPort-AV: E=Sophos;i="6.10,217,1719878400"; 
-   d="scan'208";a="367280463"
+   d="scan'208";a="432478644"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 16:31:33 +0000
-Received: from EX19MTAUEC001.ant.amazon.com [10.0.44.209:40383]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.48.28:2525] with esmtp (Farcaster)
- id f846bd55-b4c7-479e-9859-a7c32f90264a; Tue, 10 Sep 2024 16:31:31 +0000 (UTC)
-X-Farcaster-Flow-ID: f846bd55-b4c7-479e-9859-a7c32f90264a
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 16:31:39 +0000
+Received: from EX19MTAUEB001.ant.amazon.com [10.0.44.209:27167]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.42.209:2525] with esmtp (Farcaster)
+ id f943c050-93c0-47aa-b307-1815f2e5f7c0; Tue, 10 Sep 2024 16:31:37 +0000 (UTC)
+X-Farcaster-Flow-ID: f943c050-93c0-47aa-b307-1815f2e5f7c0
 Received: from EX19D008UEA004.ant.amazon.com (10.252.134.191) by
- EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
+ EX19MTAUEB001.ant.amazon.com (10.252.135.108) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 10 Sep 2024 16:31:25 +0000
+ Tue, 10 Sep 2024 16:31:32 +0000
 Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
  EX19D008UEA004.ant.amazon.com (10.252.134.191) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 10 Sep 2024 16:31:25 +0000
+ Tue, 10 Sep 2024 16:31:31 +0000
 Received: from ua2d7e1a6107c5b.home (172.19.88.180) by mail-relay.amazon.com
  (10.250.64.254) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34 via Frontend
- Transport; Tue, 10 Sep 2024 16:31:21 +0000
+ Transport; Tue, 10 Sep 2024 16:31:27 +0000
 From: Patrick Roy <roypat@amazon.co.uk>
 To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
 	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
@@ -73,9 +73,9 @@ To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
 CC: Patrick Roy <roypat@amazon.co.uk>, <graf@amazon.com>,
 	<jgowans@amazon.com>, <derekmn@amazon.com>, <kalyazin@amazon.com>,
 	<xmarcalx@amazon.com>
-Subject: [RFC PATCH v2 07/10] kvm: pfncache: invalidate when memory attributes change
-Date: Tue, 10 Sep 2024 17:30:33 +0100
-Message-ID: <20240910163038.1298452-8-roypat@amazon.co.uk>
+Subject: [RFC PATCH v2 08/10] kvm: pfncache: Support caching gmem pfns
+Date: Tue, 10 Sep 2024 17:30:34 +0100
+Message-ID: <20240910163038.1298452-9-roypat@amazon.co.uk>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240910163038.1298452-1-roypat@amazon.co.uk>
 References: <20240910163038.1298452-1-roypat@amazon.co.uk>
@@ -88,155 +88,198 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 
-Invalidate gfn_to_pfn_caches when the memory attributes of the gfn it
-contains change.
+Inside the `hva_to_pfn_retry` loop, for gpa based gpcs, check whether
+the gpa has KVM_MEMORY_ATTRIBUTE_PRIVATE set, and if so, use
+`kvm_gmem_get_pfn` with `KVM_GMEM_GET_PFN_SHARED` to resolve the pfn.
+Ignore uhva based gpcs for now, as they are only used with Xen, and we
+don't have guest_memfd there (yet). Gmem pfns that are cached by a gpc
+have their sharing refcount elevated until the gpc gets invalidated (or
+rather: until it gets refreshed after invalidation) or deactivated.
 
-Since gfn_to_pfn_caches are not hooked up to KVM's MMU notifiers, but
-rather have to be invalidated right _before_ KVM's MMU notifiers are
-triggers, adopt the approach used by
-kvm_mmu_notifier_invalidate_range_start for invalidating gpcs inside
-kvm_vm_set_mem_attributes.
+Since during the refresh loop the memory attributes could change between
+private shared, store a uhva anyway, even if it will not be used in the
+translation in the end.
 
 Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
 ---
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      |  5 +++++
- virt/kvm/kvm_mm.h        | 10 +++++++++
- virt/kvm/pfncache.c      | 45 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 61 insertions(+)
+ include/linux/kvm_types.h |  1 +
+ virt/kvm/pfncache.c       | 63 ++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 56 insertions(+), 8 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index cd28eb34aaeb1..7d36164a2cee5 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -840,6 +840,7 @@ struct kvm {
- #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
- 	/* Protected by slots_locks (for writes) and RCU (for reads) */
- 	struct xarray mem_attr_array;
-+	bool attribute_change_in_progress;
- #endif
- 	char stats_id[KVM_STATS_NAME_SIZE];
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index 827ecc0b7e10a..8903b8f46cf6c 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -70,6 +70,7 @@ struct gfn_to_pfn_cache {
+ 	kvm_pfn_t pfn;
+ 	bool active;
+ 	bool valid;
++	bool private;
  };
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 13347fb03d4a9..183f7ce57a428 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2533,6 +2533,7 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
  
- 	mutex_lock(&kvm->slots_lock);
- 
-+
- 	/* Nothing to do if the entire range as the desired attributes. */
- 	if (kvm_range_has_memory_attributes(kvm, start, end, attributes))
- 		goto out_unlock;
-@@ -2547,6 +2548,9 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
- 			goto out_unlock;
- 	}
- 
-+	kvm->attribute_change_in_progress = true;
-+	gfn_to_pfn_cache_invalidate_gfns_start(kvm, start, end);
-+
- 	kvm_handle_gfn_range(kvm, &pre_set_range);
- 
- 	for (i = start; i < end; i++) {
-@@ -2558,6 +2562,7 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
- 	kvm_handle_gfn_range(kvm, &post_set_range);
- 
- out_unlock:
-+	kvm->attribute_change_in_progress = false;
- 	mutex_unlock(&kvm->slots_lock);
- 
- 	return r;
-diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
-index 715f19669d01f..5a53d888e4b18 100644
---- a/virt/kvm/kvm_mm.h
-+++ b/virt/kvm/kvm_mm.h
-@@ -27,12 +27,22 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
- void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
- 				       unsigned long start,
- 				       unsigned long end);
-+
-+void gfn_to_pfn_cache_invalidate_gfns_start(struct kvm *kvm,
-+					    gfn_t start,
-+					    gfn_t end);
- #else
- static inline void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
- 						     unsigned long start,
- 						     unsigned long end)
- {
- }
-+
-+static inline void gfn_to_pfn_cache_invalidate_gfns_start(struct kvm *kvm,
-+							  gfn_t start,
-+							  gfn_t end)
-+{
-+}
- #endif /* HAVE_KVM_PFNCACHE */
- 
- #ifdef CONFIG_KVM_PRIVATE_MEM
+ #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
 diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index f0039efb9e1e3..6de934a8a153f 100644
+index 6de934a8a153f..a4f935e80f545 100644
 --- a/virt/kvm/pfncache.c
 +++ b/virt/kvm/pfncache.c
-@@ -57,6 +57,43 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
- 	spin_unlock(&kvm->gpc_lock);
+@@ -16,6 +16,7 @@
+ #include <linux/highmem.h>
+ #include <linux/module.h>
+ #include <linux/errno.h>
++#include <linux/pagemap.h>
+ 
+ #include "kvm_mm.h"
+ 
+@@ -145,13 +146,20 @@ static void *gpc_map(kvm_pfn_t pfn)
+ #endif
  }
  
-+/*
-+ * Identical to `gfn_to_pfn_cache_invalidate_start`, except based on gfns
-+ * instead of uhvas.
-+ */
-+void gfn_to_pfn_cache_invalidate_gfns_start(struct kvm *kvm, gfn_t start, gfn_t end)
-+{
-+	struct gfn_to_pfn_cache *gpc;
-+
-+	spin_lock(&kvm->gpc_lock);
-+	list_for_each_entry(gpc, &kvm->gpc_list, list) {
-+		read_lock_irq(&gpc->lock);
-+
-+		/*
-+		 * uhva based gpcs must not be used with gmem enabled memslots
-+		 */
-+		if (kvm_is_error_gpa(gpc->gpa)) {
-+			read_unlock_irq(&gpc->lock);
-+			continue;
-+		}
-+
-+		if (gpc->valid && !is_error_noslot_pfn(gpc->pfn) &&
-+		    gpa_to_gfn(gpc->gpa) >= start && gpa_to_gfn(gpc->gpa) < end) {
-+			read_unlock_irq(&gpc->lock);
-+
-+			write_lock_irq(&gpc->lock);
-+			if (gpc->valid && !is_error_noslot_pfn(gpc->pfn) &&
-+			    gpa_to_gfn(gpc->gpa) >= start && gpa_to_gfn(gpc->gpa) < end)
-+				gpc->valid = false;
-+			write_unlock_irq(&gpc->lock);
-+			continue;
-+		}
-+
-+		read_unlock_irq(&gpc->lock);
-+	}
-+	spin_unlock(&kvm->gpc_lock);
-+}
-+
- static bool kvm_gpc_is_valid_len(gpa_t gpa, unsigned long uhva,
- 				 unsigned long len)
+-static void gpc_unmap(kvm_pfn_t pfn, void *khva)
++static void gpc_unmap(kvm_pfn_t pfn, void *khva, bool private)
  {
-@@ -141,6 +178,14 @@ static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long mmu_s
- 	if (kvm->mn_active_invalidate_count)
- 		return true;
+ 	/* Unmap the old pfn/page if it was mapped before. */
+ 	if (is_error_noslot_pfn(pfn) || !khva)
+ 		return;
  
-+	/*
-+	 * Similarly to the above, attribute_change_in_progress is set
-+	 * before gfn_to_pfn_cache_invalidate_start is called in
-+	 * kvm_vm_set_mem_attributes, and isn't cleared until after
-+	 * mmu_invalidate_seq is updated.
-+	 */
-+	if (kvm->attribute_change_in_progress)
-+		return true;
+ 	if (pfn_valid(pfn)) {
++		if (private) {
++			struct folio *folio = pfn_folio(pfn);
++
++			folio_lock(folio);
++			kvm_gmem_put_shared_pfn(pfn);
++			folio_unlock(folio);
++		}
+ 		kunmap(pfn_to_page(pfn));
+ 		return;
+ 	}
+@@ -203,6 +211,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+ 	void *old_khva = (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
+ 	kvm_pfn_t new_pfn = KVM_PFN_ERR_FAULT;
+ 	void *new_khva = NULL;
++	bool private = gpc->private;
+ 	unsigned long mmu_seq;
+ 
+ 	lockdep_assert_held(&gpc->refresh_lock);
+@@ -235,17 +244,43 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+ 			 * the existing mapping and didn't create a new one.
+ 			 */
+ 			if (new_khva != old_khva)
+-				gpc_unmap(new_pfn, new_khva);
++				gpc_unmap(new_pfn, new_khva, private);
+ 
+ 			kvm_release_pfn_clean(new_pfn);
+ 
+ 			cond_resched();
+ 		}
+ 
+-		/* We always request a writeable mapping */
+-		new_pfn = hva_to_pfn(gpc->uhva, false, false, NULL, true, NULL);
+-		if (is_error_noslot_pfn(new_pfn))
+-			goto out_error;
++		/*
++		 * If we do not have a GPA, we cannot immediately determine
++		 * whether the area of guest memory gpc->uhva pointed to
++		 * is currently set to shared. So assume that uhva-based gpcs
++		 * never have their underlying guest memory switched to
++		 * private (which we can do as uhva-based gpcs are only used
++		 * with Xen, and guest_memfd is not supported there).
++		 */
++		if (gpc->gpa != INVALID_GPA) {
++			/*
++			 * mmu_notifier events can be due to shared/private conversions,
++			 * thus recheck this every iteration.
++			 */
++			private = kvm_mem_is_private(gpc->kvm, gpa_to_gfn(gpc->gpa));
++		} else {
++			private = false;
++		}
++
++		if (private) {
++			int r = kvm_gmem_get_pfn(gpc->kvm, gpc->memslot, gpa_to_gfn(gpc->gpa),
++						 &new_pfn, NULL, KVM_GMEM_GET_PFN_SHARED);
++			if (r)
++				goto out_error;
++		} else {
++			/* We always request a writeable mapping */
++			new_pfn = hva_to_pfn(gpc->uhva, false, false, NULL,
++					     true, NULL);
++			if (is_error_noslot_pfn(new_pfn))
++				goto out_error;
++		}
+ 
+ 		/*
+ 		 * Obtain a new kernel mapping if KVM itself will access the
+@@ -274,6 +309,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+ 	gpc->valid = true;
+ 	gpc->pfn = new_pfn;
+ 	gpc->khva = new_khva + offset_in_page(gpc->uhva);
++	gpc->private = private;
+ 
  	/*
- 	 * Ensure mn_active_invalidate_count is read before
- 	 * mmu_invalidate_seq.  This pairs with the smp_wmb() in
+ 	 * Put the reference to the _new_ pfn.  The pfn is now tracked by the
+@@ -298,6 +334,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 	kvm_pfn_t old_pfn;
+ 	bool hva_change = false;
+ 	void *old_khva;
++	bool old_private;
+ 	int ret;
+ 
+ 	/* Either gpa or uhva must be valid, but not both */
+@@ -316,6 +353,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 	old_pfn = gpc->pfn;
+ 	old_khva = (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
+ 	old_uhva = PAGE_ALIGN_DOWN(gpc->uhva);
++	old_private = gpc->private;
+ 
+ 	if (kvm_is_error_gpa(gpa)) {
+ 		page_offset = offset_in_page(uhva);
+@@ -338,6 +376,11 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 			gpc->gpa = gpa;
+ 			gpc->generation = slots->generation;
+ 			gpc->memslot = __gfn_to_memslot(slots, gfn);
++			/*
++			 * compute the uhva even for private memory, in case an
++			 * invalidation event flips memory from private to
++			 * shared while in hva_to_pfn_retry
++			 */
+ 			gpc->uhva = gfn_to_hva_memslot(gpc->memslot, gfn);
+ 
+ 			if (kvm_is_error_hva(gpc->uhva)) {
+@@ -395,7 +438,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 	write_unlock_irq(&gpc->lock);
+ 
+ 	if (unmap_old)
+-		gpc_unmap(old_pfn, old_khva);
++		gpc_unmap(old_pfn, old_khva, old_private);
+ 
+ 	return ret;
+ }
+@@ -486,6 +529,7 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
+ 	struct kvm *kvm = gpc->kvm;
+ 	kvm_pfn_t old_pfn;
+ 	void *old_khva;
++	bool old_private;
+ 
+ 	guard(mutex)(&gpc->refresh_lock);
+ 
+@@ -508,6 +552,9 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
+ 		old_khva = gpc->khva - offset_in_page(gpc->khva);
+ 		gpc->khva = NULL;
+ 
++		old_private = gpc->private;
++		gpc->private = false;
++
+ 		old_pfn = gpc->pfn;
+ 		gpc->pfn = KVM_PFN_ERR_FAULT;
+ 		write_unlock_irq(&gpc->lock);
+@@ -516,6 +563,6 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
+ 		list_del(&gpc->list);
+ 		spin_unlock(&kvm->gpc_lock);
+ 
+-		gpc_unmap(old_pfn, old_khva);
++		gpc_unmap(old_pfn, old_khva, old_private);
+ 	}
+ }
 -- 
 2.46.0
 
