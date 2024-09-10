@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-26203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E2797293E
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 08:06:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 100F897293F
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 08:06:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27E97B24060
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 06:05:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E89F1B23920
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 06:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9958D16F27F;
-	Tue, 10 Sep 2024 06:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8530117965E;
+	Tue, 10 Sep 2024 06:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3RowBa7L"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="duaWbJN0"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2076.outbound.protection.outlook.com [40.107.223.76])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2047.outbound.protection.outlook.com [40.107.243.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E790166F00;
-	Tue, 10 Sep 2024 06:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED56D175D5A;
+	Tue, 10 Sep 2024 06:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725948344; cv=fail; b=lNNg+3BdXPaxGYRwOagsDjY9+Xru2Q6rgsMdwJyAGmzrLLBNWOllnwKn3w8P6oIsnvtVvqUGNbX8GcB08sztWzwdPsIj27esSNU3YYe9NG8qLYWAYJSRDHldRtC5XUmEKaJ4YBtnSOEjh1XJiKIzmCI8QjUp1jdU9eE+6y3KqYg=
+	t=1725948347; cv=fail; b=i7kZKo6O4w77ggPw5UeEmAduR9d/uOSS+JOvbmeJYMeuzVym0TuKntWAMBRIKUHxCUwv7DjAkkggZio9XJczIbJQwIz8tAJ4muvvkPfJFGylI+3rmeWkDtLdwlxs3Z4zaIiCIoTel1R1jFeGjcNugPkpgA8RUuLbNusI1dzWTZc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725948344; c=relaxed/simple;
-	bh=1RvH64giLzsAFCBJEwnxMeF9iIP+bM0o2di3sz1EdXQ=;
+	s=arc-20240116; t=1725948347; c=relaxed/simple;
+	bh=2nraB2Z3/crlRxkcbr/hMqKCOwwWC042q2JUz7F0PT8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ltKZtmIBTK6MUm/qtijqJUNMtrk08nYYGK597Daq7p6MGQ//aT7yigK0xPUkeO0BNau1Ld3zd3Z/VZcJwubhxswXcc2GK5RFeJKUWMahlyXyZxZsg5+qvzkvCfItxZgZrKgWnLJ2WFQSFunHahopItkQUo3nyA73OoSjecJ0RcA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3RowBa7L; arc=fail smtp.client-ip=40.107.223.76
+	 MIME-Version:Content-Type; b=DJn0jJnhfP0Y8rEveT/JlXSBGRYcwLJOvDu1AnGXEMIEZftylZ5A6L+luItwcmrqjI/ojORtSR+HfEsyIoEOaVlbrqPxy1fpfTChOLWNMbpOd42JxIClXPviv0d4KsMvQxeFwpZGbKCGL0ePLPVVHgUn7e8bUXA8cAg5tIyr5hw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=duaWbJN0; arc=fail smtp.client-ip=40.107.243.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qLWCIXYehhnsJAl36EI+5YY61vEb8sBelCaoqKAeZSccVfQ0Zt7CN3dgRA+aFZlGIXliBYwEbmszZIQzw7UxWjjxyJL7YC0jfzwK4Ct8jneSYuNZZF8QdHdaUyKpVjTLr13N/L0BF5Q+xpd4e+vC9jMYw5hijkkfqBPh/+kQ9qTdQMKi/f0Zr6fXDczNPyvdfAnmagfI+3kQDINFzM02wZWFYY740aQ+V+y7vYhEqgF6snLkB2EUpYqIoadtbGto5ltqC+Gic0JzvOp9g2es3ibeYmj/sy9TANs3fs2AyMWXegE3Vipez+DrK+eB/grAtQ/n5Z3TuX8S2tNEvd98lA==
+ b=Qd6oGM+SGEs3BTx3c51mUTb8np6VVIEj4q7RfwmdYVdngao6/HLyJB2bTTRG1oHLLrEMVrmQGwakrOpr2Y0ss+26u1+U7MHASotJ9KJEJOKGaUlgGV3eqTjV8OeFzR4PwXOZ1Xky3+CPKNFwj8pcYtE8uNS72Gh9078gR/S8qypCSnaeF5jZZA3JvsLbH4xiNeYsY22Fueh4rbdD92g9HkanTDLAls0GXEVF56FPVFHEhseUfH9Vi1DfNkMVOcy1viviLkVfJojp3LL11VuXv8y/xWXHKq18wbAwtbMnr2ya8KNy/1hpM7zjjNl1R6PgKZifipixytXS1I4z518b3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mXskL7azb5JqpARC1VesGy6K3lPsq/FoQJe8AVkcByI=;
- b=B/DX8DIX3V2jc5mSXiXeD6jPONCSrnOO4MeErn8QyF2x84Z1fwMdM54155fw2IGshlbGdBHpbAR/tPV6ehqFSVQw8RdfDWUgHdnK2TfX9uTTQhiH1PBtHI9clLV5IMMDYcO97v9X04/DS6t+BS7ZjSFw+8jqH8CDLtbQKMtTMFG7/G0GwcY8LSxfIdz7RHq44dC8PK4fely+1mgxLAmv8t29v0P56OF0ziCizOVC4abb86Kuz4C20wqJh+R2RRLIpsKa7GexajrFow0huo5y5cNwxMx3MILhGWSqpyx9d/FcgczbbHqSDiB0YujvNWlO/BIixaN9tNtkBVVMsc0bcw==
+ bh=x4m2uRvXtfBuum/oRe5e5uAr00h6qkG0CTEBwXFmvAE=;
+ b=GON7zNqTd8U9516frNJYgYrl8hnMy7YYe6NbK9UxZ7UAIoi3OZrqldeGoGklveG7LK1Yw7cIFPuEelvydRaOUxqlQrNddlcmZ7OKTgoIvU6YNA7uNGjuqbjCCYJRP9XPCPIpZcUH1v6mowcDouS/UmPHaAI6cNe09oKHh4J5Yo+2Co+KORGFUDAYbI5aJzCpZ3qcWMaLLX2jRjudyZJTk1iFy5HhVcc4qeZBv1mEvAuno0GEStVgn3jhc9XbND/u0hOYEKrWz1m6ZkcHlcFsSb9xXgFsBREt/tiT4e/dpgN82RDGTM9sW3QnAJufD4IYcNbLuyqpoUpg8vuDfNEBlg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mXskL7azb5JqpARC1VesGy6K3lPsq/FoQJe8AVkcByI=;
- b=3RowBa7LM0Pbe9x9KFb2geAqppis2TZnrQbCM8vUZEBXw2LOgLyFnBs413KMhCA1I8kvZ+hvNsJOxzzHEmLf6u2/6RUmfXTdKWOQlqFrrfgMfgPSzYtRxrVtzBOcNYHgHs6HP9mILpOYLrmYKcN9HK1l8yj1n+ixh8n75S5TqK0=
-Received: from MW3PR06CA0023.namprd06.prod.outlook.com (2603:10b6:303:2a::28)
- by CH3PR12MB8459.namprd12.prod.outlook.com (2603:10b6:610:139::14) with
+ bh=x4m2uRvXtfBuum/oRe5e5uAr00h6qkG0CTEBwXFmvAE=;
+ b=duaWbJN059BqnEbzLuq2G6H7w0EyI2nLNCoXo23cLASJLsN300hrF5vk7hEoMAveeBLHLAGifnkM/LsxPXJskpviFG233GgFktfpIkuo9c54kEXri8sVeTV49AIzxkqxqahmU071O9pTIHy+OBIjfR/wbVIWnMtQAKFVzcOD6aQ=
+Received: from BYAPR08CA0020.namprd08.prod.outlook.com (2603:10b6:a03:100::33)
+ by PH7PR12MB7259.namprd12.prod.outlook.com (2603:10b6:510:207::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.28; Tue, 10 Sep
- 2024 06:05:24 +0000
-Received: from CO1PEPF000075ED.namprd03.prod.outlook.com
- (2603:10b6:303:2a:cafe::e) by MW3PR06CA0023.outlook.office365.com
- (2603:10b6:303:2a::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.25 via Frontend
- Transport; Tue, 10 Sep 2024 06:05:23 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.17; Tue, 10 Sep
+ 2024 06:05:41 +0000
+Received: from CO1PEPF000075F4.namprd03.prod.outlook.com
+ (2603:10b6:a03:100:cafe::2e) by BYAPR08CA0020.outlook.office365.com
+ (2603:10b6:a03:100::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24 via Frontend
+ Transport; Tue, 10 Sep 2024 06:05:41 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,22 +63,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
 Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CO1PEPF000075ED.mail.protection.outlook.com (10.167.249.36) with Microsoft
+ CO1PEPF000075F4.mail.protection.outlook.com (10.167.249.43) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Tue, 10 Sep 2024 06:05:23 +0000
+ 15.20.7918.13 via Frontend Transport; Tue, 10 Sep 2024 06:05:41 +0000
 Received: from ruby-9130host.amd.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 10 Sep
- 2024 01:05:21 -0500
+ 2024 01:05:39 -0500
 From: Melody Wang <huibo.wang@amd.com>
 To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>
 CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
 	<pbonzini@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>, Ashish Kalra
 	<ashish.kalra@amd.com>, Michael Roth <michael.roth@amd.com>, Melody Wang
 	<huibo.wang@amd.com>
-Subject: [PATCH v2 4/6] KVM: SVM: Inject NMIs when restricted injection is active
-Date: Tue, 10 Sep 2024 06:03:34 +0000
-Message-ID: <e27a542257fa03810eb2851ebcc3850e815513c1.1725945912.git.huibo.wang@amd.com>
+Subject: [PATCH v2 5/6] KVM: SVM: Inject MCEs when restricted injection is active
+Date: Tue, 10 Sep 2024 06:03:35 +0000
+Message-ID: <fcddd32c625acef93ac1fd74b472d26d36626ecb.1725945912.git.huibo.wang@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1725945912.git.huibo.wang@amd.com>
 References: <cover.1725945912.git.huibo.wang@amd.com>
@@ -94,161 +94,276 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
  (10.181.40.144)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075ED:EE_|CH3PR12MB8459:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9280c4e8-defd-48cd-2b0e-08dcd15e8f08
+X-MS-TrafficTypeDiagnostic: CO1PEPF000075F4:EE_|PH7PR12MB7259:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd731b2b-6f35-439c-5c22-08dcd15e997b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?GQ4SXD0aqoGcYckGdtczib2+hXBFBTScYbEOQGQ7zUj55tfiBUk0antegaGi?=
- =?us-ascii?Q?iBG7k05v4xdp00MYRgKW2zdbRSkTLDMJBZU530kC7gciXZvMUtDafO1/vYUH?=
- =?us-ascii?Q?u7oUhwkFtb8eHJhgtSy00DLsrVYufhdypY8yF9UG8DskJjMGHeBdWXpwfPtg?=
- =?us-ascii?Q?d7JLMHek2NG7kchGeYlKUhXa9SUth+JgRuFKPXOsS2nf964N6XOkWCxyBoLN?=
- =?us-ascii?Q?2FP9I0UOJVJeWj7viDZn1kc2gumF0qHG759m7C0aNC4HLBTo5hOhyZeaAq+Q?=
- =?us-ascii?Q?uevJ0Rxo1/3UoMEHtwuDAftnkNRTvh+fP1eytTRfse1CXkXzk/WkoRtqvry1?=
- =?us-ascii?Q?+5ECvBwm/nxMe3uEfIkaH1mlkzyhff/w43jPEIQQOJoQkJXUBHp6A8UfXYZU?=
- =?us-ascii?Q?zDbGtNsu2pTdHfx8u0ZfY1Hil8rph8TKehO9xQDhtSkvKKGUGSAoZoniF3IQ?=
- =?us-ascii?Q?iF4g+dTQ2EMG3p8lMNOgUYx3r+p1qD2y6ZOpIDDWgC8Se84gZvforBDAdTM7?=
- =?us-ascii?Q?SmUDpWPM/R44IhKEt+dLIICtfcKDfDg3sqQkki7LvL0GL9krtLjEiPkv7vHD?=
- =?us-ascii?Q?ZRbxyWdZiNkNRseL3OnJdLJ2cGk1mn1keThI0Wn7giCRQZr5q6SDeLPutOeg?=
- =?us-ascii?Q?/2mxXSwXK9Rt3l3g+nVoIq6Z6yOBudjdicI89a0iiZ10h8AlCfna8Z9d5N1a?=
- =?us-ascii?Q?FNt8BPwdo39TMUm2GuG6rQpfqvgJaD5F2l5k38tIsIL6SweMjsXXxL9AZIzO?=
- =?us-ascii?Q?qJSbmTBxgGOyo6x8rfj1gYEoUp9v/weI9S7tvZ/EKXmwIxMNzYzevD/7+Le5?=
- =?us-ascii?Q?ZPxnPZhhvccLf4UCdoXySmYNntaV3RaLv8yARJ/HVGKb7v/gX2rJ0Wwta6bs?=
- =?us-ascii?Q?QMPpJLc7J+KMfY5Y4cEcaLTZGhtwpOJ+wdEWLrtLQBqFuTgp3SSJhkP6NilO?=
- =?us-ascii?Q?Rds5hgzZjOFPRJkjVPcUSz+cRnihkFjFsGSEHqug90WMmWMQtNUpRevBrmpY?=
- =?us-ascii?Q?MWx6YTZYa3M+xLx69EYIq+9CWRuLzpBlulB759druNs0RJxmszHtQIVH1EdW?=
- =?us-ascii?Q?txbK2erAHG30sqLwzIyOOZIOr++9WXpPEjMTO2LfwX0NwzV2i6WMtRlVKNqC?=
- =?us-ascii?Q?IETJZRlOvEXa7SuRJ0ItEcnwLvKhdALmU18LptI+0EOVDJmmx3Q+HNOitk9I?=
- =?us-ascii?Q?RWIleR4ATiCRp7PMi93PT+00FGo+k89AfV49rkF36G1PD37NtOLWkXTe8hpj?=
- =?us-ascii?Q?i8kupvSYF9NXYCXohYwLWuCiV8WzWZECudDrsYrwaYFEPrl1cKWanCsR7CPJ?=
- =?us-ascii?Q?Q7tvXiDUZ7uprdFnc6d+yR9q5vPiejSp6hLVAFt8ej3snBlLV6ESCqqPuzRr?=
- =?us-ascii?Q?s4J9a7v9ebwXncNKKYv5oWXie085LVGta3mT+dh/A7Rc5S7GdXNHFiFGaAfi?=
- =?us-ascii?Q?k95citNq7JlgmDTha+IYnz5dRB92EcoI?=
+	=?us-ascii?Q?1HL9QZ1HMc15uaj3sGyHhOja3gGT8lgVusY8xy6GJ6SZ9bWh1bb/O8lju8FU?=
+ =?us-ascii?Q?/jLSaHGzTIovx0JTH5KCmYsDiM4eHq7EndMR+KHvrp5iFhnitrdWO7ZKpt4z?=
+ =?us-ascii?Q?hX47rxYyCEKQNZmGUksmnZZ1nRdtyd4DoYL/Z8eBP+zsqjTo7SmGP2EC+a7a?=
+ =?us-ascii?Q?WyGVYuo275AdVM7LuKPYi/7Bb3oc7fFdp5Aym/sXqex+FqhFp6t9o0bH6q95?=
+ =?us-ascii?Q?4yDl80wTVDnIXswQaNtJqnL7yDzsZanH3w69ZCNngR2SeAg9KZbcd4ZKtrnV?=
+ =?us-ascii?Q?IfNpWCS0psLrXTqhjH8m+etvw5siGOBSnl2/TkP1ur8H1W1Mchb9XrxJQkYE?=
+ =?us-ascii?Q?D4vxyv2g31ZmPYJFSqnmW+b/cBv1ajZPMoRo3iB1ybJsC/vFT/hvGGuoMj8E?=
+ =?us-ascii?Q?7H25ufHQpwWnU7J2LrNybUymAHtJrRnQ9t/eTpWKdwrUCDEHXjBKOfHbJz06?=
+ =?us-ascii?Q?Vm02kRHODLKBCiNzpztekSVlkc3nsGUjr4u63wYyFenHtWbrNWtxzzYLpSAA?=
+ =?us-ascii?Q?eZI1J+krXJ/qPzrxmIZwuh317dc9cISfQJc/epUxXU/ZmpfVJ3pb9xCFZToV?=
+ =?us-ascii?Q?rmbap4dzhKMxbDao9NT8Pm+ijF8ZBrEyHW8SZ6zDit+csrLCaFTnUhJdEtui?=
+ =?us-ascii?Q?5CCgx42Rk+Kv56NAM35JjXxgqFe8rGee/hE/rkBYdcKAWaweuwwMbHLAQoEI?=
+ =?us-ascii?Q?R8ztOOrGvmmSDDcdSlCLhVJehZvvE229e43mAiK2TU4JptmlO+cSxdc/gyWd?=
+ =?us-ascii?Q?BoHJ9PQClYRW7MCVik9PCx/ywwwTttF5a2lOnYlCHEO0K9+wrv7Hef7vjnhu?=
+ =?us-ascii?Q?vgSYoqd7TNgoY7sL7lzNTR1GgHO0988DB8S+7gFOo9Hn57+PiAKxPVtPrwAr?=
+ =?us-ascii?Q?84MeKpysL9vQKd1uz0Wgih5kCax6+57t5R5HBsBJIJ92JUIJNncqIDfnomjO?=
+ =?us-ascii?Q?w2kF46v3IW8LaHO2+f68UqiX8q1Ydakf3oG/c+65vVM4X2BrCjHoym8nPvtE?=
+ =?us-ascii?Q?xp8DSRu9pNaIsrnCAC95a496Fds64Eszk6TLkj5yHd1EpR5Pl8Hyfudy3Zem?=
+ =?us-ascii?Q?0GVys1hSsep2EYAp2q7IVz89e2Hah88APvKs6aGsQSY0ZBQ2sdr3ue+bTU7B?=
+ =?us-ascii?Q?dlGQRZQthtvegzY0BfrGQnGv91TOqa5ZHXFKkbj6n7EVMFRDq/GASUmuMw0F?=
+ =?us-ascii?Q?V3LzGIzYrlrlmzk00G7+0nPNjDnauu3GygVhN6Gz40sBwrtNxzrLBFwHH4x7?=
+ =?us-ascii?Q?wDn3vTwo+U+s5DhNekCnYcuGO8YCIjwb2XrdN3FoSxQNTtPDpDFABKfthNxg?=
+ =?us-ascii?Q?0/saCe1Z67jaY07DUOXXT40N2NSK+YoqhX4lrs+SQFFmRKbTvY7zsgo0XwvN?=
+ =?us-ascii?Q?xFvMeNRVWQJrAdHHO+37dtcP5nTQheEe+VIrFG7+KVrT2FXlWrQlVc46ITjx?=
+ =?us-ascii?Q?sUdA/ArSxSXxcVYYzoxPRVO4+VaIvaKS?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2024 06:05:23.4701
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2024 06:05:41.0334
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9280c4e8-defd-48cd-2b0e-08dcd15e8f08
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd731b2b-6f35-439c-5c22-08dcd15e997b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075ED.namprd03.prod.outlook.com
+	CO1PEPF000075F4.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8459
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7259
 
 When restricted injection is active, only #HV exceptions can be injected into
 the SEV-SNP guest.
 
 Detect that restricted injection feature is active for the guest, and then
-follow the #HV doorbell communication from the GHCB specification to inject
-NMIs.
+follow the #HV doorbell communication from the GHCB specification to inject the
+MCEs.
 
 Co-developed-by: Thomas Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Thomas Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Melody Wang <huibo.wang@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 19 ++++++++++++++++---
- arch/x86/kvm/svm/svm.c |  8 ++++++++
- arch/x86/kvm/svm/svm.h |  1 +
- 3 files changed, 25 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  1 +
+ arch/x86/kvm/svm/sev.c             | 16 ++++++++++++++--
+ arch/x86/kvm/svm/svm.c             | 17 +++++++++++++++++
+ arch/x86/kvm/svm/svm.h             |  2 ++
+ arch/x86/kvm/vmx/main.c            |  1 +
+ arch/x86/kvm/vmx/vmx.c             |  5 +++++
+ arch/x86/kvm/vmx/x86_ops.h         |  1 +
+ arch/x86/kvm/x86.c                 |  8 ++++++++
+ 9 files changed, 50 insertions(+), 2 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 68ad4f923664..9e5764a8e031 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -76,6 +76,7 @@ KVM_X86_OP(inject_exception)
+ KVM_X86_OP(cancel_injection)
+ KVM_X86_OP(interrupt_allowed)
+ KVM_X86_OP(nmi_allowed)
++KVM_X86_OP_OPTIONAL(mce_allowed)
+ KVM_X86_OP(get_nmi_mask)
+ KVM_X86_OP(set_nmi_mask)
+ KVM_X86_OP(enable_nmi_window)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 94e7b5a4fafe..cb1608a69144 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1715,6 +1715,7 @@ struct kvm_x86_ops {
+ 	void (*cancel_injection)(struct kvm_vcpu *vcpu);
+ 	int (*interrupt_allowed)(struct kvm_vcpu *vcpu, bool for_injection);
+ 	int (*nmi_allowed)(struct kvm_vcpu *vcpu, bool for_injection);
++	int (*mce_allowed)(struct kvm_vcpu *vcpu);
+ 	bool (*get_nmi_mask)(struct kvm_vcpu *vcpu);
+ 	void (*set_nmi_mask)(struct kvm_vcpu *vcpu, bool masked);
+ 	/* Whether or not a virtual NMI is pending in hardware. */
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f7623fa64307..9102f7e39c52 100644
+index 9102f7e39c52..0b898b16026b 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -5070,7 +5070,10 @@ static bool __sev_snp_inject(enum inject_type type, struct kvm_vcpu *vcpu)
- 	if (!hvdb)
+@@ -5072,6 +5072,8 @@ static bool __sev_snp_inject(enum inject_type type, struct kvm_vcpu *vcpu)
+ 
+ 	if (type == INJECT_NMI)
+ 		hvdb->events.nmi = 1;
++	else if (type == INJECT_MCE)
++		hvdb->events.mce = 1;
+ 	else
+ 		hvdb->events.vector = vcpu->arch.interrupt.nr;
+ 
+@@ -5089,6 +5091,11 @@ bool sev_snp_queue_exception(struct kvm_vcpu *vcpu)
+ 	if (!sev_snp_is_rinj_active(vcpu))
  		return false;
  
--	hvdb->events.vector = vcpu->arch.interrupt.nr;
-+	if (type == INJECT_NMI)
-+		hvdb->events.nmi = 1;
-+	else
-+		hvdb->events.vector = vcpu->arch.interrupt.nr;
++	if (vcpu->arch.exception.vector == MC_VECTOR) {
++		if (__sev_snp_inject(INJECT_MCE, vcpu))
++			return true;
++	}
++
+ 	/*
+ 	 * Restricted injection is enabled, only #HV is supported.
+ 	 * If the vector is not HV_VECTOR, do not inject the exception,
+@@ -5153,7 +5160,7 @@ void sev_snp_cancel_injection(struct kvm_vcpu *vcpu)
  
- 	prepare_hv_injection(svm, hvdb);
- 
-@@ -5148,10 +5151,17 @@ void sev_snp_cancel_injection(struct kvm_vcpu *vcpu)
- 	/* Copy info back into event_inj field (replaces #HV) */
- 	svm->vmcb->control.event_inj = SVM_EVTINJ_VALID;
- 
-+	/*
-+	 * KVM only injects a single event each time (prepare_hv_injection),
-+	 * so when events.nmi is true, the vector will be zero
-+	 */
+ 	/*
+ 	 * KVM only injects a single event each time (prepare_hv_injection),
+-	 * so when events.nmi is true, the vector will be zero
++	 * so when events.nmi is true, the mce and vector will be zero
+ 	 */
  	if (hvdb->events.vector)
  		svm->vmcb->control.event_inj |= hvdb->events.vector |
- 						SVM_EVTINJ_TYPE_INTR;
+@@ -5162,6 +5169,9 @@ void sev_snp_cancel_injection(struct kvm_vcpu *vcpu)
+ 	if (hvdb->events.nmi)
+ 		svm->vmcb->control.event_inj |= SVM_EVTINJ_TYPE_NMI;
  
-+	if (hvdb->events.nmi)
-+		svm->vmcb->control.event_inj |= SVM_EVTINJ_TYPE_NMI;
++	if (hvdb->events.mce)
++		svm->vmcb->control.event_inj |= MC_VECTOR | SVM_EVTINJ_TYPE_EXEPT;
 +
  	hvdb->events.pending_events = 0;
  
  out:
-@@ -5169,8 +5179,11 @@ bool sev_snp_blocked(enum inject_type type, struct kvm_vcpu *vcpu)
+@@ -5179,9 +5189,11 @@ bool sev_snp_blocked(enum inject_type type, struct kvm_vcpu *vcpu)
  	if (!hvdb)
  		return true;
  
--	/* Indicate interrupts blocked based on guest acknowledgment */
--	blocked = !!hvdb->events.vector;
-+	/* Indicate NMIs and interrupts blocked based on guest acknowledgment */
-+	if (type == INJECT_NMI)
-+		blocked = hvdb->events.nmi;
-+	else
-+		blocked = !!hvdb->events.vector;
- 
- 	unmap_hvdb(vcpu, &hvdb_map);
+-	/* Indicate NMIs and interrupts blocked based on guest acknowledgment */
++	/* Indicate NMIs, MCEs and interrupts blocked based on guest acknowledgment */
+ 	if (type == INJECT_NMI)
+ 		blocked = hvdb->events.nmi;
++	else if (type == INJECT_MCE)
++		blocked = hvdb->events.mce;
+ 	else
+ 		blocked = !!hvdb->events.vector;
  
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index a48388d99c97..d9c572344f0c 100644
+index d9c572344f0c..1c13c5da6eea 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -3602,6 +3602,9 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
-+	if (sev_snp_inject(INJECT_NMI, vcpu))
-+		goto status;
-+
- 	svm->vmcb->control.event_inj = SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_NMI;
- 
- 	if (svm->nmi_l1_to_l2)
-@@ -3616,6 +3619,8 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
- 		svm->nmi_masked = true;
- 		svm_set_iret_intercept(svm);
- 	}
-+
-+status:
- 	++vcpu->stat.nmi_injections;
+@@ -3867,6 +3867,22 @@ static int svm_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ 	return 1;
  }
  
-@@ -3786,6 +3791,9 @@ bool svm_nmi_blocked(struct kvm_vcpu *vcpu)
- 	if (!gif_set(svm))
- 		return true;
- 
++bool svm_mce_blocked(struct kvm_vcpu *vcpu)
++{
 +	if (sev_snp_is_rinj_active(vcpu))
-+		return sev_snp_blocked(INJECT_NMI, vcpu);
++		return sev_snp_blocked(INJECT_MCE, vcpu);
 +
- 	if (is_guest_mode(vcpu) && nested_exit_on_nmi(svm))
- 		return false;
- 
++	return false;
++}
++
++static int svm_mce_allowed(struct kvm_vcpu *vcpu)
++{
++	if (svm_mce_blocked(vcpu))
++		return 0;
++
++	return 1;
++}
++
+ static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -5066,6 +5082,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.cancel_injection = svm_cancel_injection,
+ 	.interrupt_allowed = svm_interrupt_allowed,
+ 	.nmi_allowed = svm_nmi_allowed,
++	.mce_allowed = svm_mce_allowed,
+ 	.get_nmi_mask = svm_get_nmi_mask,
+ 	.set_nmi_mask = svm_set_nmi_mask,
+ 	.enable_nmi_window = svm_enable_nmi_window,
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 95c0a7070bd1..f60ff6229ff4 100644
+index f60ff6229ff4..0cf32954589f 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -43,6 +43,7 @@ extern int lbrv;
- 
+@@ -44,6 +44,7 @@ extern int lbrv;
  enum inject_type {
  	INJECT_IRQ,
-+	INJECT_NMI,
+ 	INJECT_NMI,
++	INJECT_MCE,
  };
  
  /*
+@@ -602,6 +603,7 @@ void svm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
+ void disable_nmi_singlestep(struct vcpu_svm *svm);
+ bool svm_smi_blocked(struct kvm_vcpu *vcpu);
+ bool svm_nmi_blocked(struct kvm_vcpu *vcpu);
++bool svm_mce_blocked(struct kvm_vcpu *vcpu);
+ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu);
+ void svm_set_gif(struct vcpu_svm *svm, bool value);
+ int svm_invoke_exit_handler(struct kvm_vcpu *vcpu, u64 exit_code);
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 0bf35ebe8a1b..c3a49a3b7f21 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -84,6 +84,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.cancel_injection = vmx_cancel_injection,
+ 	.interrupt_allowed = vmx_interrupt_allowed,
+ 	.nmi_allowed = vmx_nmi_allowed,
++	.mce_allowed = vmx_mce_allowed,
+ 	.get_nmi_mask = vmx_get_nmi_mask,
+ 	.set_nmi_mask = vmx_set_nmi_mask,
+ 	.enable_nmi_window = vmx_enable_nmi_window,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f18c2d8c7476..b3dce5d95329 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5093,6 +5093,11 @@ int vmx_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ 	return !vmx_interrupt_blocked(vcpu);
+ }
+ 
++int vmx_mce_allowed(struct kvm_vcpu *vcpu)
++{
++	return 1;
++}
++
+ int vmx_set_tss_addr(struct kvm *kvm, unsigned int addr)
+ {
+ 	void __user *ret;
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index ce3221cd1d01..b2b1a3bb4eb3 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -92,6 +92,7 @@ void vmx_inject_exception(struct kvm_vcpu *vcpu);
+ void vmx_cancel_injection(struct kvm_vcpu *vcpu);
+ int vmx_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection);
+ int vmx_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection);
++int vmx_mce_allowed(struct kvm_vcpu *vcpu);
+ bool vmx_get_nmi_mask(struct kvm_vcpu *vcpu);
+ void vmx_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked);
+ void vmx_enable_nmi_window(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 70219e406987..2007598af873 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10485,6 +10485,12 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
+ 			}
+ 		}
+ 
++		if (vcpu->arch.exception.vector == MC_VECTOR) {
++			r = static_call(kvm_x86_mce_allowed)(vcpu);
++			if (!r)
++				goto out_except;
++		}
++
+ 		kvm_inject_exception(vcpu);
+ 
+ 		vcpu->arch.exception.pending = false;
+@@ -10493,6 +10499,8 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
+ 		can_inject = false;
+ 	}
+ 
++out_except:
++
+ 	/* Don't inject interrupts if the user asked to avoid doing so */
+ 	if (vcpu->guest_debug & KVM_GUESTDBG_BLOCKIRQ)
+ 		return 0;
 -- 
 2.34.1
 
