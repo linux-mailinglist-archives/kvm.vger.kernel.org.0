@@ -1,41 +1,42 @@
-Return-Path: <kvm+bounces-26261-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26262-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B310973782
+	by mail.lfdr.de (Postfix) with ESMTPS id AA807973783
 	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 14:36:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BC53B2736A
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:36:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03A4EB273AF
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99BB5191F82;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99CCC191F88;
 	Tue, 10 Sep 2024 12:36:27 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28E818E76F
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 12:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CEC9191484
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 12:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725971787; cv=none; b=Bz+/tXyLZEpjhJMgCy3DhcQ3ClQ9Qzntkucb4kvWYDho3Q1W1qxMF25D/InJFdLiin7/rPr4Wl55Pbs/2RgPKM3YOboiVEBkTUVuYjHqWkkvdnaoLarJguj/6f55ERfBKMKqRhRs5VBkpNQLxzFMtPELGrsaE+GqmwDijNeZtlM=
+	t=1725971787; cv=none; b=ktXQfQt6eywsKunToX0CHZRppb7o6Re8dwMiKgI/7CxgYBbCMpFqo5RLlBS6fhfMb3GVWalRQLZ4MGIum/wTrRs21bHT3y+KvQq14Vte1H5d7nE9jNDuMd/lWZmsapmvzb5ZxuLeqBUozZG/H0MizRKM0ywrHumyuLexV11haLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725971787; c=relaxed/simple;
-	bh=gt47L2/1sVzeqKcmzd/Rk+RpmgTdVGiIBt3nBws+vjk=;
+	bh=ttSHtWmp4HDtZ4+pmTms3oqUsWRPHhUMuo+pTn9hbN8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MpI0SS9nBF36WZp6dqSga22hyRcQ1TjMNnZLv7gLXWf1FrJ2N4iVkeT/bn8jRAUrg4q1sAmy5zRRylkPZP52hOhvthl+/qf1iwpTi9ZynA2y6vgOjUvGE1o4JM2zF9fIIzZu6c36ReS2fGrVyiewhxArqAThNVbDt0lsJW+z1cw=
+	 MIME-Version; b=kNVousQOpcXUFaiknFFZZygXF9/hhcSykrHVSey9ytKsjt1I4vEndxI85KjXQ7mLlgs6GTwfexWig0AIR36BdT4O7YcMHw1ixZi/VpfkFMsV/8evPBNENq62jP0ZmWPaUA2lqQpWXqjerLOy2N+elrXHgAgJ3TDKVISciWKUtDE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.2.5.185])
-	by gateway (Coremail) with SMTP id _____8CxC+pFPeBmabkDAA--.8774S3;
+	by gateway (Coremail) with SMTP id _____8DxlehGPeBmb7kDAA--.7651S3;
 	Tue, 10 Sep 2024 20:36:22 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-	by front2 (Coremail) with SMTP id qciowMBx+cVCPeBmXGoDAA--.15753S3;
-	Tue, 10 Sep 2024 20:36:20 +0800 (CST)
+	by front2 (Coremail) with SMTP id qciowMBx+cVCPeBmXGoDAA--.15753S4;
+	Tue, 10 Sep 2024 20:36:21 +0800 (CST)
 From: Xianglai Li <lixianglai@loongson.cn>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Paolo Bonzini <pbonzini@redhat.com>,
 	Song Gao <gaosong@loongson.cn>,
 	Jiaxun Yang <jiaxun.yang@flygoat.com>,
 	Huacai Chen <chenhuacai@kernel.org>,
@@ -43,9 +44,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Cornelia Huck <cohuck@redhat.com>,
 	kvm@vger.kernel.org,
 	Bibo Mao <maobibo@loongson.cn>
-Subject: [RFC PATCH V2 1/5] include: Add macro definitions needed for interrupt controller kvm emulation
-Date: Tue, 10 Sep 2024 20:18:28 +0800
-Message-Id: <2182eb694629ee3f2859e441b8076d62d3606ee2.1725969898.git.lixianglai@loongson.cn>
+Subject: [RFC PATCH V2 2/5] hw/loongarch: Add KVM IPI device support
+Date: Tue, 10 Sep 2024 20:18:29 +0800
+Message-Id: <b8a6f1958ba09f634bec9ee294815ac047dd1371.1725969898.git.lixianglai@loongson.cn>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <cover.1725969898.git.lixianglai@loongson.cn>
 References: <cover.1725969898.git.lixianglai@loongson.cn>
@@ -56,14 +57,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qciowMBx+cVCPeBmXGoDAA--.15753S3
+X-CM-TRANSID:qciowMBx+cVCPeBmXGoDAA--.15753S4
 X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
 	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
 	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Add macro definitions needed for interrupt controller kvm emulation.
+Added ipi interrupt controller for kvm emulation.
+The main process is to send the command word for
+creating an ipi device to the kernel.
+When the VM is saved, the ioctl obtains the ipi
+interrupt controller data in the kernel and saves it.
+When the VM is recovered, the saved data is sent to the kernel.
 
+Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
 ---
 Cc: Paolo Bonzini <pbonzini@redhat.com>
@@ -76,290 +83,308 @@ Cc: kvm@vger.kernel.org
 Cc: Bibo Mao <maobibo@loongson.cn>
 Cc: Xianglai Li <lixianglai@loongson.cn>
 
- include/hw/intc/loongarch_extioi.h    | 38 ++++++++++++++++--
- include/hw/intc/loongarch_ipi.h       | 15 +++++++
- include/hw/intc/loongarch_pch_pic.h   | 58 +++++++++++++++++++++++++--
- include/hw/intc/loongson_ipi.h        |  1 -
- include/hw/intc/loongson_ipi_common.h |  2 +
- include/hw/loongarch/virt.h           | 15 +++++++
- linux-headers/asm-loongarch/kvm.h     | 18 +++++++++
- linux-headers/linux/kvm.h             |  6 +++
- 8 files changed, 146 insertions(+), 7 deletions(-)
+ hw/intc/Kconfig               |   3 +
+ hw/intc/loongarch_ipi_kvm.c   | 128 ++++++++++++++++++++++++++++++++++
+ hw/intc/loongson_ipi_common.c |  28 ++++++++
+ hw/intc/meson.build           |   1 +
+ hw/loongarch/Kconfig          |   1 +
+ hw/loongarch/virt.c           |  40 +++++++----
+ target/loongarch/kvm/kvm.c    |   1 +
+ 7 files changed, 189 insertions(+), 13 deletions(-)
+ create mode 100644 hw/intc/loongarch_ipi_kvm.c
 
-diff --git a/include/hw/intc/loongarch_extioi.h b/include/hw/intc/loongarch_extioi.h
-index 626a37dfa1..97f6aa4d60 100644
---- a/include/hw/intc/loongarch_extioi.h
-+++ b/include/hw/intc/loongarch_extioi.h
-@@ -15,7 +15,7 @@
- #define EXTIOI_IRQS                (256)
- #define EXTIOI_IRQS_BITMAP_SIZE    (256 / 8)
- /* irq from EXTIOI is routed to no more than 4 cpus */
--#define EXTIOI_CPUS                (4)
-+#define EXTIOI_CPUS                (256)
- /* map to ipnum per 32 irqs */
- #define EXTIOI_IRQS_IPMAP_SIZE     (256 / 32)
- #define EXTIOI_IRQS_COREMAP_SIZE   256
-@@ -36,7 +36,7 @@
- #define EXTIOI_ISR_START             (0x700 - APIC_OFFSET)
- #define EXTIOI_ISR_END               (0x720 - APIC_OFFSET)
- #define EXTIOI_COREISR_START         (0x800 - APIC_OFFSET)
--#define EXTIOI_COREISR_END           (0xB20 - APIC_OFFSET)
-+#define EXTIOI_COREISR_END           (0x820 - APIC_OFFSET)
- #define EXTIOI_COREMAP_START         (0xC00 - APIC_OFFSET)
- #define EXTIOI_COREMAP_END           (0xD00 - APIC_OFFSET)
- #define EXTIOI_SIZE                  0x800
-@@ -64,7 +64,8 @@ typedef struct ExtIOICore {
-     qemu_irq parent_irq[LS3A_INTC_IP];
- } ExtIOICore;
+diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
+index dd405bdb5d..5201505f23 100644
+--- a/hw/intc/Kconfig
++++ b/hw/intc/Kconfig
+@@ -98,6 +98,9 @@ config LOONGARCH_IPI
+     bool
+     select LOONGSON_IPI_COMMON
  
--#define TYPE_LOONGARCH_EXTIOI "loongarch.extioi"
-+#define TYPE_LOONGARCH_EXTIOI        "loongarch-extioi"
-+#define TYPE_KVM_LOONGARCH_EXTIOI    "loongarch-kvm-extioi"
- OBJECT_DECLARE_SIMPLE_TYPE(LoongArchExtIOI, LOONGARCH_EXTIOI)
- struct LoongArchExtIOI {
-     SysBusDevice parent_obj;
-@@ -86,4 +87,35 @@ struct LoongArchExtIOI {
-     MemoryRegion extioi_system_mem;
-     MemoryRegion virt_extend;
- };
++config LOONGARCH_IPI_KVM
++    bool
 +
-+struct KVMLoongArchExtIOI {
-+    SysBusDevice parent_obj;
-+    uint32_t num_cpu;
-+    uint32_t features;
-+    uint32_t status;
+ config LOONGARCH_PCH_PIC
+     bool
+     select UNIMP
+diff --git a/hw/intc/loongarch_ipi_kvm.c b/hw/intc/loongarch_ipi_kvm.c
+new file mode 100644
+index 0000000000..74ed83d89f
+--- /dev/null
++++ b/hw/intc/loongarch_ipi_kvm.c
+@@ -0,0 +1,128 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * LoongArch IPI interrupt support
++ *
++ * Copyright (C) 2024 Loongson Technology Corporation Limited
++ */
 +
-+    /* hardware state */
-+    uint32_t nodetype[EXTIOI_IRQS_NODETYPE_COUNT / 2];
-+    uint32_t bounce[EXTIOI_IRQS_GROUP_COUNT];
-+    uint32_t isr[EXTIOI_IRQS / 32];
-+    uint32_t coreisr[EXTIOI_CPUS][EXTIOI_IRQS_GROUP_COUNT];
-+    uint32_t enable[EXTIOI_IRQS / 32];
-+    uint32_t ipmap[EXTIOI_IRQS_IPMAP_SIZE / 4];
-+    uint32_t coremap[EXTIOI_IRQS / 4];
-+    uint8_t  sw_coremap[EXTIOI_IRQS];
++#include "qemu/osdep.h"
++#include "hw/boards.h"
++#include "sysemu/kvm.h"
++#include "qapi/error.h"
++#include "hw/intc/loongarch_ipi.h"
++#include "target/loongarch/cpu.h"
++
++static AddressSpace *get_iocsr_as(CPUState *cpu)
++{
++    return LOONGARCH_CPU(cpu)->env.address_space_iocsr;
++}
++
++static void kvm_ipi_access_regs(int fd, uint64_t addr,
++                                uint32_t *val, bool is_write)
++{
++    kvm_device_access(fd, KVM_DEV_LOONGARCH_IPI_GRP_REGS,
++                          addr, val, is_write, &error_abort);
++}
++static void kvm_loongarch_ipi_save_load_regs(void *opaque, bool is_write)
++{
++    LoongsonIPICommonState *ipi = (LoongsonIPICommonState *)opaque;
++    KVMLoongarchIPIState *s = KVM_LOONGARCH_IPI(opaque);
++    IPICore *cpu;
++    uint64_t attr;
++    int cpu_id = 0;
++    int fd = s->dev_fd;
++
++    for (cpu_id = 0; cpu_id < ipi->num_cpu; cpu_id++) {
++        cpu = &ipi->cpu[cpu_id];
++        attr = (cpu_id << 16) | CORE_STATUS_OFF;
++        kvm_ipi_access_regs(fd, attr, &cpu->status, is_write);
++
++        attr = (cpu_id << 16) | CORE_EN_OFF;
++        kvm_ipi_access_regs(fd, attr, &cpu->en, is_write);
++
++        attr = (cpu_id << 16) | CORE_SET_OFF;
++        kvm_ipi_access_regs(fd, attr, &cpu->set, is_write);
++
++        attr = (cpu_id << 16) | CORE_CLEAR_OFF;
++        kvm_ipi_access_regs(fd, attr, &cpu->clear, is_write);
++
++        attr = (cpu_id << 16) | CORE_BUF_20;
++        kvm_ipi_access_regs(fd, attr, &cpu->buf[0], is_write);
++
++        attr = (cpu_id << 16) | CORE_BUF_28;
++        kvm_ipi_access_regs(fd, attr, &cpu->buf[2], is_write);
++
++        attr = (cpu_id << 16) | CORE_BUF_30;
++        kvm_ipi_access_regs(fd, attr, &cpu->buf[4], is_write);
++
++        attr = (cpu_id << 16) | CORE_BUF_38;
++        kvm_ipi_access_regs(fd, attr, &cpu->buf[6], is_write);
++    }
++}
++
++static void kvm_loongarch_ipi_pre_save(LoongsonIPICommonState *opaque)
++{
++    kvm_loongarch_ipi_save_load_regs(opaque, false);
++}
++
++static void kvm_loongarch_ipi_post_load(LoongsonIPICommonState *opaque,
++                                        int version_id)
++{
++    kvm_loongarch_ipi_save_load_regs(opaque, true);
++}
++
++static void kvm_loongarch_ipi_realize(DeviceState *dev, Error **errp)
++{
++    KVMLoongarchIPIState *s = KVM_LOONGARCH_IPI(dev);
++    KVMLoongArchIPIClass *klic = KVM_LOONGARCH_IPI_GET_CLASS(dev);
++    struct kvm_create_device cd = {0};
++    Error *local_err = NULL;
++    int ret;
++
++    klic->parent_realize(dev, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    cd.type = KVM_DEV_TYPE_LOONGARCH_IPI;
++    ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
++    if (ret < 0) {
++        error_setg_errno(errp, errno, "Creating the KVM device failed");
++        return;
++    }
++    s->dev_fd = cd.fd;
++}
++
++static void kvm_loongarch_ipi_unrealize(DeviceState *dev)
++{
++    KVMLoongArchIPIClass *klic = KVM_LOONGARCH_IPI_GET_CLASS(dev);
++    klic->parent_unrealize(dev);
++}
++
++static void kvm_loongarch_ipi_class_init(ObjectClass *klass, void *data)
++{
++    LoongsonIPICommonClass *licc = LOONGSON_IPI_COMMON_CLASS(klass);
++    KVMLoongArchIPIClass *klic = KVM_LOONGARCH_IPI_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    device_class_set_parent_realize(dc, kvm_loongarch_ipi_realize,
++                                    &klic->parent_realize);
++    device_class_set_parent_unrealize(dc, kvm_loongarch_ipi_unrealize,
++                                    &klic->parent_unrealize);
++
++    licc->get_iocsr_as = get_iocsr_as;
++    licc->cpu_by_arch_id = cpu_by_arch_id;
++    licc->pre_save =  kvm_loongarch_ipi_pre_save;
++    licc->post_load = kvm_loongarch_ipi_post_load;
++}
++
++static const TypeInfo kvm_loongarch_ipi_types[] = {
++    {
++        .name               = TYPE_KVM_LOONGARCH_IPI,
++        .parent             = TYPE_LOONGSON_IPI_COMMON,
++        .class_init         = kvm_loongarch_ipi_class_init,
++    }
 +};
-+typedef struct KVMLoongArchExtIOI KVMLoongArchExtIOI;
-+DECLARE_INSTANCE_CHECKER(KVMLoongArchExtIOI, KVM_LOONGARCH_EXTIOI,
-+                         TYPE_KVM_LOONGARCH_EXTIOI)
 +
-+struct KVMLoongArchExtIOIClass {
-+    SysBusDeviceClass parent_class;
-+    DeviceRealize parent_realize;
-+
-+    bool is_created;
-+    int dev_fd;
-+};
-+typedef struct KVMLoongArchExtIOIClass KVMLoongArchExtIOIClass;
-+DECLARE_CLASS_CHECKERS(KVMLoongArchExtIOIClass, KVM_LOONGARCH_EXTIOI,
-+                       TYPE_KVM_LOONGARCH_EXTIOI)
- #endif /* LOONGARCH_EXTIOI_H */
-diff --git a/include/hw/intc/loongarch_ipi.h b/include/hw/intc/loongarch_ipi.h
-index 276b3040a3..64ebbdcba6 100644
---- a/include/hw/intc/loongarch_ipi.h
-+++ b/include/hw/intc/loongarch_ipi.h
-@@ -22,4 +22,19 @@ struct LoongarchIPIClass {
-     LoongsonIPICommonClass parent_class;
- };
++DEFINE_TYPES(kvm_loongarch_ipi_types)
+diff --git a/hw/intc/loongson_ipi_common.c b/hw/intc/loongson_ipi_common.c
+index a6ce0181f6..8b0683bd40 100644
+--- a/hw/intc/loongson_ipi_common.c
++++ b/hw/intc/loongson_ipi_common.c
+@@ -289,10 +289,38 @@ static void loongson_ipi_common_unrealize(DeviceState *dev)
+     g_free(s->cpu);
+ }
  
-+#define TYPE_KVM_LOONGARCH_IPI  "kvm_loongarch_ipi"
++static int loongson_ipi_pre_save(void *opaque)
++{
++    IPICore *ipicore = (IPICore *)opaque;
++    LoongsonIPICommonState *s = ipicore->ipi;
++    LoongsonIPICommonClass *licc = LOONGSON_IPI_COMMON_GET_CLASS(s);
 +
-+OBJECT_DECLARE_TYPE(KVMLoongarchIPIState,
-+                    KVMLoongArchIPIClass, KVM_LOONGARCH_IPI)
++    if (licc->pre_save) {
++        licc->pre_save(s);
++    }
 +
-+struct KVMLoongarchIPIState {
-+    LoongsonIPICommonState parent_obj;
-+    int dev_fd;
-+};
++    return 0;
++}
 +
-+struct KVMLoongArchIPIClass {
-+   LoongsonIPICommonClass parent_class;
-+   DeviceRealize parent_realize;
-+    DeviceUnrealize parent_unrealize;
-+};
- #endif
-diff --git a/include/hw/intc/loongarch_pch_pic.h b/include/hw/intc/loongarch_pch_pic.h
-index d5437e88f2..bbde9e6de9 100644
---- a/include/hw/intc/loongarch_pch_pic.h
-+++ b/include/hw/intc/loongarch_pch_pic.h
-@@ -5,9 +5,13 @@
-  * Copyright (c) 2021 Loongson Technology Corporation Limited
-  */
++static int loongson_ipi_post_load(void *opaque, int version_id)
++{
++    IPICore *ipicore = (IPICore *)opaque;
++    LoongsonIPICommonState *s = ipicore->ipi;
++    LoongsonIPICommonClass *licc = LOONGSON_IPI_COMMON_GET_CLASS(s);
++
++    if (licc->post_load) {
++        licc->post_load(s, version_id);
++    }
++
++    return 0;
++}
++
+ static const VMStateDescription vmstate_ipi_core = {
+     .name = "ipi-single",
+     .version_id = 2,
+     .minimum_version_id = 2,
++    .pre_save  = loongson_ipi_pre_save,
++    .post_load = loongson_ipi_post_load,
+     .fields = (const VMStateField[]) {
+         VMSTATE_UINT32(status, IPICore),
+         VMSTATE_UINT32(en, IPICore),
+diff --git a/hw/intc/meson.build b/hw/intc/meson.build
+index f4d81eb8e4..f55eb1b80b 100644
+--- a/hw/intc/meson.build
++++ b/hw/intc/meson.build
+@@ -72,6 +72,7 @@ specific_ss.add(when: 'CONFIG_M68K_IRQC', if_true: files('m68k_irqc.c'))
+ specific_ss.add(when: 'CONFIG_LOONGSON_IPI_COMMON', if_true: files('loongson_ipi_common.c'))
+ specific_ss.add(when: 'CONFIG_LOONGSON_IPI', if_true: files('loongson_ipi.c'))
+ specific_ss.add(when: 'CONFIG_LOONGARCH_IPI', if_true: files('loongarch_ipi.c'))
++specific_ss.add(when: 'CONFIG_LOONGARCH_IPI_KVM', if_true: files('loongarch_ipi_kvm.c'))
+ specific_ss.add(when: 'CONFIG_LOONGARCH_PCH_PIC', if_true: files('loongarch_pch_pic.c'))
+ specific_ss.add(when: 'CONFIG_LOONGARCH_PCH_MSI', if_true: files('loongarch_pch_msi.c'))
+ specific_ss.add(when: 'CONFIG_LOONGARCH_EXTIOI', if_true: files('loongarch_extioi.c'))
+diff --git a/hw/loongarch/Kconfig b/hw/loongarch/Kconfig
+index 0de713a439..f8fcac3e7b 100644
+--- a/hw/loongarch/Kconfig
++++ b/hw/loongarch/Kconfig
+@@ -16,6 +16,7 @@ config LOONGARCH_VIRT
+     select LOONGARCH_PCH_PIC
+     select LOONGARCH_PCH_MSI
+     select LOONGARCH_EXTIOI
++    select LOONGARCH_IPI_KVM if KVM
+     select LS7A_RTC
+     select SMBIOS
+     select ACPI_PCI
+diff --git a/hw/loongarch/virt.c b/hw/loongarch/virt.c
+index 29040422aa..3b28e8e671 100644
+--- a/hw/loongarch/virt.c
++++ b/hw/loongarch/virt.c
+@@ -48,6 +48,7 @@
+ #include "hw/block/flash.h"
+ #include "hw/virtio/virtio-iommu.h"
+ #include "qemu/error-report.h"
++#include "sysemu/kvm.h"
  
-+#ifndef LOONGARCH_PCH_PIC_H
-+#define LOONGARCH_PCH_PIC_H
-+
- #include "hw/sysbus.h"
+ static bool virt_is_veiointc_enabled(LoongArchVirtMachineState *lvms)
+ {
+@@ -788,15 +789,32 @@ static void virt_irq_init(LoongArchVirtMachineState *lvms)
+      */
  
--#define TYPE_LOONGARCH_PCH_PIC "loongarch_pch_pic"
-+#define TYPE_LOONGARCH_PCH_PIC          "loongarch_pch_pic"
-+#define TYPE_KVM_LOONGARCH_PCH_PIC      "loongarch_kvm_pch_pic"
- #define PCH_PIC_NAME(name) TYPE_LOONGARCH_PCH_PIC#name
- OBJECT_DECLARE_SIMPLE_TYPE(LoongArchPCHPIC, LOONGARCH_PCH_PIC)
- 
-@@ -28,15 +32,26 @@ OBJECT_DECLARE_SIMPLE_TYPE(LoongArchPCHPIC, LOONGARCH_PCH_PIC)
- #define PCH_PIC_AUTO_CTRL0_HI           0xc4
- #define PCH_PIC_AUTO_CTRL1_LO           0xe0
- #define PCH_PIC_AUTO_CTRL1_HI           0xe4
--#define PCH_PIC_ROUTE_ENTRY_OFFSET      0x100
-+#define PCH_PIC_ROUTE_ENTRY_START       0x100
- #define PCH_PIC_ROUTE_ENTRY_END         0x13f
--#define PCH_PIC_HTMSI_VEC_OFFSET        0x200
-+#define PCH_PIC_HTMSI_VEC_START         0x200
- #define PCH_PIC_HTMSI_VEC_END           0x23f
- #define PCH_PIC_INT_STATUS_LO           0x3a0
- #define PCH_PIC_INT_STATUS_HI           0x3a4
- #define PCH_PIC_INT_POL_LO              0x3e0
- #define PCH_PIC_INT_POL_HI              0x3e4
- 
-+#define PCH_PIC_INT_ID_START            PCH_PIC_INT_ID_LO
-+#define PCH_PIC_MASK_START              PCH_PIC_INT_MASK_LO
-+#define PCH_PIC_HTMSI_EN_START          PCH_PIC_HTMSI_EN_LO
-+#define PCH_PIC_EDGE_START              PCH_PIC_INT_EDGE_LO
-+#define PCH_PIC_CLEAR_START             PCH_PIC_INT_CLEAR_LO
-+#define PCH_PIC_AUTO_CTRL0_START        PCH_PIC_AUTO_CTRL0_LO
-+#define PCH_PIC_AUTO_CTRL1_START        PCH_PIC_AUTO_CTRL1_LO
-+#define PCH_PIC_INT_IRR_START           0x380
-+#define PCH_PIC_INT_ISR_START           PCH_PIC_INT_STATUS_LO
-+#define PCH_PIC_POLARITY_START          PCH_PIC_INT_POL_LO
-+
- #define STATUS_LO_START                 0
- #define STATUS_HI_START                 0x4
- #define POL_LO_START                    0x40
-@@ -67,3 +82,40 @@ struct LoongArchPCHPIC {
-     MemoryRegion iomem8;
-     unsigned int irq_num;
- };
-+
-+struct KVMLoongArchPCHPIC {
-+    SysBusDevice parent_obj;
-+    uint64_t int_mask; /*0x020 interrupt mask register*/
-+    uint64_t htmsi_en; /*0x040 1=msi*/
-+    uint64_t intedge; /*0x060 edge=1 level  =0*/
-+    uint64_t intclr; /*0x080 for clean edge int,set 1 clean,set 0 is noused*/
-+    uint64_t auto_crtl0; /*0x0c0*/
-+    uint64_t auto_crtl1; /*0x0e0*/
-+    uint64_t last_intirr;    /* edge detection */
-+    uint64_t intirr; /* 0x380 interrupt request register */
-+    uint64_t intisr; /* 0x3a0 interrupt service register */
-+    /*
-+     * 0x3e0 interrupt level polarity selection
-+     * register 0 for high level trigger
-+     */
-+    uint64_t int_polarity;
-+
-+    uint8_t route_entry[64]; /*0x100 - 0x138*/
-+    uint8_t htmsi_vector[64]; /*0x200 - 0x238*/
-+};
-+typedef struct KVMLoongArchPCHPIC KVMLoongArchPCHPIC;
-+DECLARE_INSTANCE_CHECKER(KVMLoongArchPCHPIC, KVM_LOONGARCH_PCH_PIC,
-+                         TYPE_KVM_LOONGARCH_PCH_PIC)
-+
-+struct KVMLoongArchPCHPICClass {
-+    SysBusDeviceClass parent_class;
-+    DeviceRealize parent_realize;
-+
-+    bool is_created;
-+    int dev_fd;
-+};
-+typedef struct KVMLoongArchPCHPICClass KVMLoongArchPCHPICClass;
-+DECLARE_CLASS_CHECKERS(KVMLoongArchPCHPICClass, KVM_LOONGARCH_PCH_PIC,
-+                       TYPE_KVM_LOONGARCH_PCH_PIC)
-+
-+#endif /* LOONGARCH_PCH_PIC_H */
-diff --git a/include/hw/intc/loongson_ipi.h b/include/hw/intc/loongson_ipi.h
-index 4e517cc8dc..57e0d94e2b 100644
---- a/include/hw/intc/loongson_ipi.h
-+++ b/include/hw/intc/loongson_ipi.h
-@@ -27,5 +27,4 @@ struct LoongsonIPIState {
- 
-     MemoryRegion *ipi_mmio_mem;
- };
+     /* Create IPI device */
+-    ipi = qdev_new(TYPE_LOONGARCH_IPI);
+-    qdev_prop_set_uint32(ipi, "num-cpu", ms->smp.cpus);
+-    sysbus_realize_and_unref(SYS_BUS_DEVICE(ipi), &error_fatal);
 -
- #endif
-diff --git a/include/hw/intc/loongson_ipi_common.h b/include/hw/intc/loongson_ipi_common.h
-index df9d9c5168..adba8ffd49 100644
---- a/include/hw/intc/loongson_ipi_common.h
-+++ b/include/hw/intc/loongson_ipi_common.h
-@@ -45,6 +45,8 @@ struct LoongsonIPICommonClass {
-     DeviceUnrealize parent_unrealize;
-     AddressSpace *(*get_iocsr_as)(CPUState *cpu);
-     CPUState *(*cpu_by_arch_id)(int64_t id);
-+    void (*pre_save)(LoongsonIPICommonState *s);
-+    void (*post_load)(LoongsonIPICommonState *s, int version_id);
- };
+-    /* IPI iocsr memory region */
+-    memory_region_add_subregion(&lvms->system_iocsr, SMP_IPI_MAILBOX,
+-                   sysbus_mmio_get_region(SYS_BUS_DEVICE(ipi), 0));
+-    memory_region_add_subregion(&lvms->system_iocsr, MAIL_SEND_ADDR,
+-                   sysbus_mmio_get_region(SYS_BUS_DEVICE(ipi), 1));
++    if (kvm_enabled() && kvm_irqchip_in_kernel()) {
++        ipi = qdev_new(TYPE_KVM_LOONGARCH_IPI);
++        qdev_prop_set_int32(ipi, "num-cpu", ms->smp.cpus);
++        sysbus_realize_and_unref(SYS_BUS_DEVICE(ipi), &error_fatal);
++    } else {
++        ipi = qdev_new(TYPE_LOONGARCH_IPI);
++        qdev_prop_set_uint32(ipi, "num-cpu", ms->smp.cpus);
++        sysbus_realize_and_unref(SYS_BUS_DEVICE(ipi), &error_fatal);
++
++        /* IPI iocsr memory region */
++        memory_region_add_subregion(&lvms->system_iocsr, SMP_IPI_MAILBOX,
++                       sysbus_mmio_get_region(SYS_BUS_DEVICE(ipi), 0));
++        memory_region_add_subregion(&lvms->system_iocsr, MAIL_SEND_ADDR,
++                       sysbus_mmio_get_region(SYS_BUS_DEVICE(ipi), 1));
++
++        for (cpu = 0; cpu < ms->smp.cpus; cpu++) {
++            cpu_state = qemu_get_cpu(cpu);
++            cpudev = DEVICE(cpu_state);
++            lacpu = LOONGARCH_CPU(cpu_state);
++            env = &(lacpu->env);
++
++            /* connect ipi irq to cpu irq */
++            qdev_connect_gpio_out(ipi, cpu, qdev_get_gpio_in(cpudev, IRQ_IPI));
++            env->ipistate = ipi;
++        }
++    }
  
- MemTxResult loongson_ipi_core_readl(void *opaque, hwaddr addr, uint64_t *data,
-diff --git a/include/hw/loongarch/virt.h b/include/hw/loongarch/virt.h
-index c373e48f27..c1769fc20c 100644
---- a/include/hw/loongarch/virt.h
-+++ b/include/hw/loongarch/virt.h
-@@ -36,6 +36,21 @@
+     /* Add cpu interrupt-controller */
+     fdt_add_cpuic_node(lvms, &cpuintc_phandle);
+@@ -807,10 +825,6 @@ static void virt_irq_init(LoongArchVirtMachineState *lvms)
+         lacpu = LOONGARCH_CPU(cpu_state);
+         env = &(lacpu->env);
+         env->address_space_iocsr = &lvms->as_iocsr;
+-
+-        /* connect ipi irq to cpu irq */
+-        qdev_connect_gpio_out(ipi, cpu, qdev_get_gpio_in(cpudev, IRQ_IPI));
+-        env->ipistate = ipi;
+     }
  
- #define FDT_BASE                0x100000
+     /* Create EXTIOI device */
+diff --git a/target/loongarch/kvm/kvm.c b/target/loongarch/kvm/kvm.c
+index e1be6a6959..c07dcfd85f 100644
+--- a/target/loongarch/kvm/kvm.c
++++ b/target/loongarch/kvm/kvm.c
+@@ -719,6 +719,7 @@ int kvm_arch_get_default_type(MachineState *ms)
  
-+/* KVM_IRQ_LINE irq field index values */
-+#define KVM_LOONGARCH_IRQ_TYPE_SHIFT            24
-+#define KVM_LOONGARCH_IRQ_TYPE_MASK             0xff
-+#define KVM_LOONGARCH_IRQ_VCPU_SHIFT            16
-+#define KVM_LOONGARCH_IRQ_VCPU_MASK             0xff
-+#define KVM_LOONGARCH_IRQ_NUM_SHIFT             0
-+#define KVM_LOONGARCH_IRQ_NUM_MASK              0xffff
-+
-+/* irq_type field */
-+#define KVM_LOONGARCH_IRQ_TYPE_CPU_IP           0
-+#define KVM_LOONGARCH_IRQ_TYPE_CPU_IO           1
-+#define KVM_LOONGARCH_IRQ_TYPE_HT               2
-+#define KVM_LOONGARCH_IRQ_TYPE_MSI              3
-+#define KVM_LOONGARCH_IRQ_TYPE_IOAPIC           4
-+
- struct LoongArchVirtMachineState {
-     /*< private >*/
-     MachineState parent_obj;
-diff --git a/linux-headers/asm-loongarch/kvm.h b/linux-headers/asm-loongarch/kvm.h
-index f9abef3823..e102d500a3 100644
---- a/linux-headers/asm-loongarch/kvm.h
-+++ b/linux-headers/asm-loongarch/kvm.h
-@@ -108,4 +108,22 @@ struct kvm_iocsr_entry {
- #define KVM_IRQCHIP_NUM_PINS	64
- #define KVM_MAX_CORES		256
- 
-+#define KVM_DEV_LOONGARCH_IPI_GRP_REGS		        0x40000001
-+
-+#define KVM_DEV_LOONGARCH_EXTIOI_GRP_REGS	        0x40000002
-+
-+#define KVM_DEV_LOONGARCH_EXTIOI_GRP_SW_STATUS	        0x40000003
-+#define KVM_DEV_LOONGARCH_EXTIOI_SW_STATUS_NUM_CPU   	0x0
-+#define KVM_DEV_LOONGARCH_EXTIOI_SW_STATUS_FEATURE   	0x1
-+#define KVM_DEV_LOONGARCH_EXTIOI_SW_STATUS_STATE   	0x2
-+
-+#define KVM_DEV_LOONGARCH_EXTIOI_GRP_CTRL	        0x40000004
-+#define KVM_DEV_LOONGARCH_EXTIOI_CTRL_INIT_NUM_CPU   	0x0
-+#define KVM_DEV_LOONGARCH_EXTIOI_CTRL_INIT_FEATURE 	0x1
-+#define KVM_DEV_LOONGARCH_EXTIOI_CTRL_LOAD_FINISHED   	0x3
-+
-+#define KVM_DEV_LOONGARCH_PCH_PIC_GRP_REGS	        0x40000005
-+#define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL	        0x40000006
-+#define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT	        0
-+
- #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index c93876ca0b..cd2aed735c 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -1138,6 +1138,12 @@ enum kvm_device_type {
- #define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
- 	KVM_DEV_TYPE_RISCV_AIA,
- #define KVM_DEV_TYPE_RISCV_AIA		KVM_DEV_TYPE_RISCV_AIA
-+	KVM_DEV_TYPE_LOONGARCH_PCH_PIC,
-+#define KVM_DEV_TYPE_LOONGARCH_PCH_PIC  KVM_DEV_TYPE_LOONGARCH_PCH_PIC
-+	KVM_DEV_TYPE_LOONGARCH_IPI,
-+#define KVM_DEV_TYPE_LOONGARCH_IPI      KVM_DEV_TYPE_LOONGARCH_IPI
-+	KVM_DEV_TYPE_LOONGARCH_EXTIOI,
-+#define KVM_DEV_TYPE_LOONGARCH_EXTIOI   KVM_DEV_TYPE_LOONGARCH_EXTIOI
- 	KVM_DEV_TYPE_MAX,
- };
- 
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
++    s->kernel_irqchip_allowed = false;
+     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
+     return 0;
+ }
 -- 
 2.39.1
 
