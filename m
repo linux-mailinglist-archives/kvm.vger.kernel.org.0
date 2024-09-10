@@ -1,188 +1,180 @@
-Return-Path: <kvm+bounces-26240-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26259-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF35973682
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 13:55:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B047C9736F4
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 14:16:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C5332876D3
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 11:55:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCB6B1C21847
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058A418FC72;
-	Tue, 10 Sep 2024 11:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A913318FDDC;
+	Tue, 10 Sep 2024 12:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZfaKzm8m"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwmy469Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D9718C003;
-	Tue, 10 Sep 2024 11:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5588F18A6AA
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 12:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725969306; cv=none; b=qwwdeK4pQ4fq64l2Ryr9h686w3clpXs9RoC6F+a1XEPMGxKIr1Nha5DPV1N0YqRZfRiafKn1hqo8M/gy0m/ZTBG3aPbu0YEw/YOIgHFckhKZrTvBTqOqAz5VNmrAgxDLOOU4+/a8buyldWwgquCFY/IYAJKyyTrseYowQzQ3Vx4=
+	t=1725970579; cv=none; b=XZMYJi15Yt6tG1aOohQwA6sO4JC//bXpuwCoT/jL3la95ImSnjKw4hhxU57+H6L0QhdBmXY7yTksiFn4DF1qJpLNhTAMEiXwrWs2ez0ASEgYJ2xLaekkvbubMlIQn+QZ9Ff41l+UfynrgmZtxFGtktoZbxqsh1zIQYGU/lMBTe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725969306; c=relaxed/simple;
-	bh=eah5Sen1l0Aw0ayjvsVeKGFBQX7863WPYIJIOytk2U4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BzDHkRul1KHLVDERhRRI5J66b8hywh1txTJHJTHKQiX5lIwTTjv9Aegk37QgHb5txmqnC8LbmI6VT1Kk9/RwkEjE+tdu0L+h+7CIOCMJBdo64uykcOwhnxm1g+pYhE44/WVTkAquVgXuArGhMothpjFWMOoqosSOcqU3PlALwEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZfaKzm8m; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725969304; x=1757505304;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=eah5Sen1l0Aw0ayjvsVeKGFBQX7863WPYIJIOytk2U4=;
-  b=ZfaKzm8mWeWxMKl2Xvp2C/LjSoiX82RG5NEJzuuz1y/bokZIkX2Uh4JI
-   ECZmlsmlXv0C0PiQRcGxRwEcPR4EKXbfjbJvdX+LNDUUwM8P47ry55Vci
-   I4B3jTEIECHjbP3PjRJMDTD+ChSWJ5JheKHmmtgavyb3Qo5IP2aD7Gt49
-   8jd8wVSn3WqClTFbxxyuNSlfoxlN+r7jopE0j2jJoaF5MoMxVO9ckjywi
-   aUZU9+WmK8AEe4/zbJ3byd8uJSw7FF/I+Duc3QMUdJgLhOGUg1gi1Pvsg
-   AqXHh4NGSuUvSnSSRHmd9Haoj5RD4+ZSKl583QMAISVWHOOTfBHyl+Qf4
-   Q==;
-X-CSE-ConnectionGUID: umelgkIqTLGV2UKQfXJ8PQ==
-X-CSE-MsgGUID: 3/1ZZbgOTBqYU+3yjkHwEA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="24525206"
-X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
-   d="scan'208";a="24525206"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 04:55:04 -0700
-X-CSE-ConnectionGUID: a5ta+mteSUGBdy9s1uL/9w==
-X-CSE-MsgGUID: +Me8vOSjRhqQMxh0Ue2FBw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
-   d="scan'208";a="71990261"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.115.59])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 04:55:00 -0700
-Message-ID: <88eb6d03-2fb4-49cf-944a-6ec64bf83ac8@intel.com>
-Date: Tue, 10 Sep 2024 14:54:54 +0300
+	s=arc-20240116; t=1725970579; c=relaxed/simple;
+	bh=UEfWeuvm0Ydu8ziZV3f9vRnj+VSGpjuHDKnB6BVHGBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ak8xd0l+Uwvi2RITU1Bj1B/xP/F44oC5OW05jEcKPiGdwbQ60BlCjEvBn9JF9qcxj8NfckEpx6iwTg29fwYfrEVMFpFnK+WPyBEug3E/m+KRPJh7er5GdhPVYtxm715fJ/HCEc8sdtoFu1CeIBcmJfTwYc+fRTLMgJkMUQWD4EI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwmy469Z; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725970577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TqNTsGxo7KShGTs/iiAEuAgoPybBC8iCW7tKXvfqSTE=;
+	b=fwmy469Znubw9uqU/lVnt0prsnNShV5HAWs78pWERWYtfEEVxuafgoAgLZ1Y4rusQD5901
+	fYBJEya6EmzqjsZtBP5CZCZXJ3EWrp6ERrNbNYvMqavXYYr/+CfehbC88NNUN+Hkidpent
+	m7XB5ldAw4ekdpC/N1lyK2+2WXarPNo=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-egKrHm18Nv2zb0M-RLFluA-1; Tue, 10 Sep 2024 08:16:16 -0400
+X-MC-Unique: egKrHm18Nv2zb0M-RLFluA-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-458373c736fso15607621cf.0
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 05:16:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725970575; x=1726575375;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TqNTsGxo7KShGTs/iiAEuAgoPybBC8iCW7tKXvfqSTE=;
+        b=ihNOBQtdBoqGskD4rLyjQ4hQhacrdmkKNoIxmQBxwNBauENhfY/sa1OKJlCgrnywVz
+         CWFIGAWgyb6g8I7DBBqYfurfjNyPWV9/gBYYwcq46FjHKaV+dkrrUquh5NlFOK69Ko1c
+         17GQqHRxlH34EQ8foNQtN9R7VqqIq2ZAAxnEzefCyZ1OE0kLLgWpVs+x49i2VLN9yoeO
+         j4NCN/vz3adsAQwafUDE96Z2X6rR5hHG+ztbZKUF+GXuAI3epq9uV24YOZvdApqIIBDX
+         qiHPLFq/KPM4VB/Befm4eGg5ilg0I+oT4aAMIyPyGZgbGySIUzmfKCpSR5CuXVun15EX
+         dc5g==
+X-Forwarded-Encrypted: i=1; AJvYcCWLRNok8A4ldhJiNC/379hn7atbz3lH8vEPyvQ6tkdTEZZ/d6NcsHOUPYwyBjIC4IMTyMM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAtaPWP+By0hbsl5pY+zByigybF+TnEq/T9JgmBo02aaIZA2+g
+	E/Jnb6PUzUI7EeISdcnaAlqj0hnmZKuxrMXlta8IgCLM1Oma/ZcJYQoQ7FlAswWm327OF4Txpxh
+	DlQlLDXKeDsucWur5QTmIU9GHpUQ0iR/+izY7Evf4LvW8cpzxBw==
+X-Received: by 2002:ac8:5f47:0:b0:458:1578:56a6 with SMTP id d75a77b69052e-4581f480530mr147993521cf.24.1725970575407;
+        Tue, 10 Sep 2024 05:16:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFFv3wgyd3Hg6lqpOUUjpJkTGHHsYgJs2xr7aDITSvRwlUJdHVQc4gd4/fSmPETPVJLM55vBA==
+X-Received: by 2002:ac8:5f47:0:b0:458:1578:56a6 with SMTP id d75a77b69052e-4581f480530mr147993141cf.24.1725970574851;
+        Tue, 10 Sep 2024 05:16:14 -0700 (PDT)
+Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45822eb001bsm29057461cf.54.2024.09.10.05.16.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 05:16:14 -0700 (PDT)
+Date: Tue, 10 Sep 2024 08:16:10 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, Gavin Shan <gshan@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, x86@kernel.org,
+	Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Alistair Popple <apopple@nvidia.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Sean Christopherson <seanjc@google.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Jason Gunthorpe <jgg@nvidia.com>, Borislav Petkov <bp@alien8.de>,
+	Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
+	David Hildenbrand <david@redhat.com>, Will Deacon <will@kernel.org>,
+	Kefeng Wang <wangkefeng.wang@huawei.com>,
+	Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v2 07/19] mm/fork: Accept huge pfnmap entries
+Message-ID: <ZuA4ivNcz0NwOAh5@x1n>
+References: <20240826204353.2228736-1-peterx@redhat.com>
+ <20240826204353.2228736-8-peterx@redhat.com>
+ <ZtVwLntpS0eJubFq@yzhao56-desk.sh.intel.com>
+ <Ztd-WkEoFJGZ34xj@x1n>
+ <20240909152546.4ef47308e560ce120156bc35@linux-foundation.org>
+ <Zt96CoGoMsq7icy7@x1n>
+ <20240909161539.aa685e3eb44cdc786b8c05d2@linux-foundation.org>
+ <Zt-N8MB93XSqFZO_@x1n>
+ <Zt+0UTTEkkRQQza0@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 20/21] KVM: TDX: Finalize VM initialization
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- kvm@vger.kernel.org
-Cc: kai.huang@intel.com, dmatlack@google.com, isaku.yamahata@gmail.com,
- yan.y.zhao@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org
-References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
- <20240904030751.117579-21-rick.p.edgecombe@intel.com>
- <acf52e41-e78c-479d-9736-419a86002982@redhat.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <acf52e41-e78c-479d-9736-419a86002982@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Zt+0UTTEkkRQQza0@yzhao56-desk.sh.intel.com>
 
-On 10/09/24 13:25, Paolo Bonzini wrote:
-> On 9/4/24 05:07, Rick Edgecombe wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> Add a new VM-scoped KVM_MEMORY_ENCRYPT_OP IOCTL subcommand,
->> KVM_TDX_FINALIZE_VM, to perform TD Measurement Finalization.
->>
->> Documentation for the API is added in another patch:
->> "Documentation/virt/kvm: Document on Trust Domain Extensions(TDX)"
->>
->> For the purpose of attestation, a measurement must be made of the TDX VM
->> initial state. This is referred to as TD Measurement Finalization, and
->> uses SEAMCALL TDH.MR.FINALIZE, after which:
->> 1. The VMM adding TD private pages with arbitrary content is no longer
->>     allowed
->> 2. The TDX VM is runnable
->>
->> Co-developed-by: Adrian Hunter <adrian.hunter@intel.com>
->> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
->> ---
->> TDX MMU part 2 v1:
->>   - Added premapped check.
->>   - Update for the wrapper functions for SEAMCALLs. (Sean)
->>   - Add check if nr_premapped is zero.  If not, return error.
->>   - Use KVM_BUG_ON() in tdx_td_finalizer() for consistency.
->>   - Change tdx_td_finalizemr() to take struct kvm_tdx_cmd *cmd and return error
->>     (Adrian)
->>   - Handle TDX_OPERAND_BUSY case (Adrian)
->>   - Updates from seamcall overhaul (Kai)
->>   - Rename error->hw_error
->>
->> v18:
->>   - Remove the change of tools/arch/x86/include/uapi/asm/kvm.h.
->>
->> v15:
->>   - removed unconditional tdx_track() by tdx_flush_tlb_current() that
->>     does tdx_track().
->> ---
->>   arch/x86/include/uapi/asm/kvm.h |  1 +
->>   arch/x86/kvm/vmx/tdx.c          | 28 ++++++++++++++++++++++++++++
->>   2 files changed, 29 insertions(+)
->>
->> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
->> index 789d1d821b4f..0b4827e39458 100644
->> --- a/arch/x86/include/uapi/asm/kvm.h
->> +++ b/arch/x86/include/uapi/asm/kvm.h
->> @@ -932,6 +932,7 @@ enum kvm_tdx_cmd_id {
->>       KVM_TDX_INIT_VM,
->>       KVM_TDX_INIT_VCPU,
->>       KVM_TDX_INIT_MEM_REGION,
->> +    KVM_TDX_FINALIZE_VM,
->>       KVM_TDX_GET_CPUID,
->>         KVM_TDX_CMD_NR_MAX,
->> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->> index 796d1a495a66..3083a66bb895 100644
->> --- a/arch/x86/kvm/vmx/tdx.c
->> +++ b/arch/x86/kvm/vmx/tdx.c
->> @@ -1257,6 +1257,31 @@ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu)
->>       ept_sync_global();
->>   }
->>   +static int tdx_td_finalizemr(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
->> +{
->> +    struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
->> +
->> +    if (!is_hkid_assigned(kvm_tdx) || is_td_finalized(kvm_tdx))
->> +        return -EINVAL;
->> +    /*
->> +     * Pages are pending for KVM_TDX_INIT_MEM_REGION to issue
->> +     * TDH.MEM.PAGE.ADD().
->> +     */
->> +    if (atomic64_read(&kvm_tdx->nr_premapped))
->> +        return -EINVAL;
-> 
-> I suggest moving all of patch 16, plus the
-> 
-> +    WARN_ON_ONCE(!atomic64_read(&kvm_tdx->nr_premapped));
-> +    atomic64_dec(&kvm_tdx->nr_premapped);
-> 
-> lines of patch 19, into this patch.
-> 
->> +    cmd->hw_error = tdh_mr_finalize(kvm_tdx);
->> +    if ((cmd->hw_error & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY)
->> +        return -EAGAIN;
->> +    if (KVM_BUG_ON(cmd->hw_error, kvm)) {
->> +        pr_tdx_error(TDH_MR_FINALIZE, cmd->hw_error);
->> +        return -EIO;
->> +    }
->> +
->> +    kvm_tdx->finalized = true;
->> +    return 0;
-> 
-> This should also set pre_fault_allowed to true.
+On Tue, Sep 10, 2024 at 10:52:01AM +0800, Yan Zhao wrote:
+> Hi Peter,
 
-Ideally, need to ensure it is not possible for another CPU
-to see kvm_tdx->finalized==false and pre_fault_allowed==true
+Hi, Yan,
 
-Perhaps also, to document the dependency, return an error if
-pre_fault_allowed is true in tdx_mem_page_record_premap_cnt().
+> 
+> Not sure if I missed anything.
+> 
+> It looks that before this patch, pmd/pud are alawys write protected without
+> checking "is_cow_mapping(vma->vm_flags) && pud_write(pud)". pud_wrprotect()
+> clears dirty bit by moving the dirty value to the software bit.
+> 
+> And I have a question that why previously pmd/pud are always write protected.
+
+IIUC this is a separate question - the move of dirty bit in pud_wrprotect()
+is to avoid wrongly creating shadow stack mappings.  In our discussion I
+think that's an extra complexity and can be put aside; the dirty bit will
+get recovered in pud_clear_saveddirty() later, so it's not the same as
+pud_mkclean().
+
+AFAIU pmd/pud paths don't consider is_cow_mapping() because normally we
+will not duplicate pgtables in fork() for most of shared file mappings
+(!CoW).  Please refer to vma_needs_copy(), and the comment before returning
+false at last.  I think it's not strictly is_cow_mapping(), as we're
+checking anon_vma there, however it's mostly it, just to also cover
+MAP_PRIVATE on file mappings too when there's no CoW happened (as if CoW
+happened then anon_vma will appear already).
+
+There're some outliers, e.g. userfault protected, or pfnmaps/mixedmaps.
+Userfault & mixedmap are not involved in this series at all, so let's
+discuss pfnmaps.
+
+It means, fork() can still copy pgtable for pfnmap vmas, and it's relevant
+to this series, because before this series pfnmap only exists in pte level,
+hence IMO the is_cow_mapping() must exist for pte level as you described,
+because it needs to properly take care of those.  Note that in the pte
+processing it also checks pte_write() to make sure it's a COWed page, not a
+RO page cache / pfnmap / ..., for example.
+
+Meanwhile, since pfnmap won't appear in pmd/pud, I think it's fair that
+pmd/pud assumes when seeing a huge mapping it must be MAP_PRIVATE otherwise
+the whole copy_page_range() could be already skipped.  IOW I think they
+only need to process COWed pages here, and those pages require write bit
+removed in both parent and child when fork().
+
+After this series, pfnmaps can appear in the form of pmd/pud, then the
+previous assumption will stop holding true, as we'll still copy pfnmaps
+during fork() always. My guessing of the reason is because most of the
+drivers map pfnmap vmas only during mmap(), it means there can normally
+have no fault() handler at all for those pfns.
+
+In this case, we'll need to also identify whether the page is COWed, using
+the newly added "is_cow_mapping() && pxx_write()" in this series (added
+to pud path, while for pmd path I used a WARN_ON_ONCE instead).
+
+If we don't do that, it means e.g. for a VM_SHARED pfnmap vma, after fork()
+we'll wrongly observe write protected entries.  Here the change will make
+sure VM_SHARED can properly persist the write bits on pmds/puds.
+
+Hope that explains.
+
+Thanks,
+
+-- 
+Peter Xu
 
 
