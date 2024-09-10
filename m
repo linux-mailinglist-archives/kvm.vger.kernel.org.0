@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-26325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26326-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C11A974033
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 19:39:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35EF49740AA
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 19:40:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 810CB1C20DF2
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 17:39:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B4471C2590C
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 17:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE771ABECA;
-	Tue, 10 Sep 2024 17:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2F91AE038;
+	Tue, 10 Sep 2024 17:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QzkZ8D6p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VVyk15YC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065821ABEB3
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 17:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BA41A38CE
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 17:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725989483; cv=none; b=dCFo83H1J0hG8qMdXD96q+8Y73jc0vUgOwiuFoVKJluSDd9iPGe7+l3kPY5PJUX3JIu9rovja3FFiu76K1WsTIHpti+67EtxWmDJq1W/n8FnI6eR4ASKxI2Mc9CrvIDG0ZQhEUg++tAQn2A8ZICTXAS3ZcMBPHGLokztodQBdHk=
+	t=1725989601; cv=none; b=FaUBidCia38xIDehkCQUy3sQP+Wr9FaacVdByIzhKEeNQLGsFB/kCgOZJGj8BT7s/BoKs8aPUTZcC5lXtiBS1NZGm9rsfp7VZ6R4PjFjgC1NhWI2B+vMDIc/RwsFRtphXZ1sk2gz2ZRwglVLFprHJSdhjTH6CvdGmMZllpOxeIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725989483; c=relaxed/simple;
-	bh=zLg14Q65wu05Yz0CdocNRo3LsUGTtqQTpYBpH3ca0cw=;
+	s=arc-20240116; t=1725989601; c=relaxed/simple;
+	bh=us5qbw1rIakwrbuY34rPo5XV/bUOWD6ruRrPJUaoCTU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MSGjEVwF64nKmzReGNUWmggOfvT3Gz44s4ARGR8EDQL89aPYI4F0EHcpvkm1rj/gNag58YtKk4ajZmIiLUYrb34EkR8Lwoo7ZTgttfCaIy3jMAt8QrSBbuJ14LUAjDaIjmBWzkAhRJLBk9czkX/meUxdlAIwyZG4X7MGFau2rpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QzkZ8D6p; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=CHUU7mYCXn0pWu3S4h5iX7y7MKGYV82wBGakB/tDySB2mpnT0T8toKpLOuM67cUjW5N4jgbAdEkh0on3I1zInJwaaHqIQWGFX4nXpEHUj/XCV+m0Gafo9tUFcpYSW2sIxCx0XM1slliqbgOL8NBn0ySh6Xr1cp3BoPoD1TIsp2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VVyk15YC; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725989480;
+	s=mimecast20190719; t=1725989597;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=xLcvqp5chP2dPZGzNdVbZn2ZJp4vCGE1ONukxZlZVHE=;
-	b=QzkZ8D6pVF4bvMvypgy57k8m0oMaDSoxQ/oUXCL3gAgiXgkShpQ8vNNsz9oapaL8ToC50I
-	yo9nAxp9QioPgui1Eppo6dqHjJWv80BPP23CJJI/DLD0Nq4RXOGIyWxPh9bRpigz/CDhdI
-	YQ84ImDbkhsyhlwbQOCfv8P/C68d1s8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=HnmkLlU+5fvR+S4Bm7cPH3+t+REDtoUy8WqBEqzX/5U=;
+	b=VVyk15YCDF0OhLP7EzqRoQwjEFdn7xOk/Cuabh2Vn+g+jp7c7CN+bOAv2quhKWDoc2o2Ty
+	Cgy0aW9iB0XYurQjdy6M7HjKf5AYu8HiUhdRiEX6Wfz/XsDfOFYTHbOJDTimvaKu0VJyr3
+	X07vtRDWR9SjEDxebt+bBdCn8jwiuGY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-468-My7c0JopM3y9KoN1T5HEPw-1; Tue, 10 Sep 2024 13:31:19 -0400
-X-MC-Unique: My7c0JopM3y9KoN1T5HEPw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42cc4345561so4975885e9.1
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:31:19 -0700 (PDT)
+ us-mta-77-lStQFP24NBOjfspLjpehtA-1; Tue, 10 Sep 2024 13:33:16 -0400
+X-MC-Unique: lStQFP24NBOjfspLjpehtA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-374cbbaf315so25629f8f.0
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:33:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725989478; x=1726594278;
+        d=1e100.net; s=20230601; t=1725989595; x=1726594395;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xLcvqp5chP2dPZGzNdVbZn2ZJp4vCGE1ONukxZlZVHE=;
-        b=g5jkl1tfm0hqam9AYzV0leM7wLjOAxbCft66xCCaKJyEy6DCT16bHErwgA0vRulv3O
-         8ThEAal4BgpuPNXp3cRDHnlJYVOFGduAuOy97gqYaNy08cWEolrceXcc2Y+Viaq+FfyC
-         uISRGZHGmPNW2eCh/kVIEKzYmFNxgPjugbmLrOT60pGAHpXcZORaKscRMzydluSuNfM4
-         UwUDi1cBVNAJJd0mmWQMOiJP1xKEDrMyJGIa6D95gpFEpgjsLAh6p1C8/fis9I2aENnr
-         G3AJdxD4a5OP602UxTIXgplHXWaOSiDPZ/XXpLJQSqPQxMdXQ2Mmce6wPuKKQ0dNaLaL
-         nYiA==
-X-Forwarded-Encrypted: i=1; AJvYcCU44majDAf+FofyvOwXf1s8N7VIwwGQ+2Ew4GDw1uf2hwA5E5Ay+Vm6ghoGr4S/20qsUQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxLMRbj/xrAuS5LGlQMZ5E0GqJwHuRqrQtIHWBEGu4l0A5kmjy
-	K8q6i0bS8DXLN+68gQlEo3FCnAPFv8nd1Z9CsBFsKBCq16PC9bjvsydUYCVC/u2/jClWJU6OQG/
-	wfOgQg3ziW1+j4a/D6ScUYu/nqsxHc/autkeIq25HNbVM/Jm//g==
-X-Received: by 2002:a05:600c:1c16:b0:42b:afe3:e9f4 with SMTP id 5b1f17b1804b1-42cad746525mr90187365e9.3.1725989478429;
-        Tue, 10 Sep 2024 10:31:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGFM6s6VhdPe9bBCCI8bOowhCo7zDIQhAJP38VRyGZKXGtWax0aiQPX7UTyQyQY8XSUWwg0yg==
-X-Received: by 2002:a05:600c:1c16:b0:42b:afe3:e9f4 with SMTP id 5b1f17b1804b1-42cad746525mr90186995e9.3.1725989477901;
-        Tue, 10 Sep 2024 10:31:17 -0700 (PDT)
+        bh=HnmkLlU+5fvR+S4Bm7cPH3+t+REDtoUy8WqBEqzX/5U=;
+        b=LcTeNn8Mpai20GNTepMWBWJ08/Lzg1kbJeLNs5Q+Xw81E/HhpAYznsx33+clJI1pM2
+         BjIA/hFpw79uXZfkVttXFVhx3XzGF2w8Humc20IdeJ47Q1JqmMdLVkJ/8+tjeu2xnn7s
+         j5+9/8ffXLKw4LcKwaJnFkVq5ovsEtNN8N9VymDBxBq6vjJFpUV9fNcLO5EI/7VidFx9
+         zUdn+Mrg6T74EQCKI7OA+BvDYxhL+oWQcSFy48RkY4QzIbBhtB+MlfFFERwvfcSuB+qD
+         A0N3XF6gUsa7H6BqGfW1E0FX7nDVVEz90LwjESShniNxpqWkg8S+uqML7wXsQjVrRvIr
+         E4Gg==
+X-Forwarded-Encrypted: i=1; AJvYcCXNX4Kui/1OAWgTzhkN6AlwBYLBU2gPlgrBzZEYNG695LzVbcvVZiTkTTdB7/AytNXdADs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUm+UV5VgGlp1nwhdqq7wzPw0gfM6Bi6gKhNpqT+c3ddYIBVNv
+	XVMvCiYCnFVRcmgX+qfYpZpLrXSMnSXS5lKRZvkN+BRBT2X02mKr0C+Q6axy9gOE1MwNswy+6Fj
+	pqhcKbXOkNu9Z0Xvpu5x9jyazFRVEyWGAAI0LCMttN0PehxAeoA==
+X-Received: by 2002:a05:6000:8a:b0:374:badf:3017 with SMTP id ffacd0b85a97d-378a8a84a0fmr2051071f8f.33.1725989595061;
+        Tue, 10 Sep 2024 10:33:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH//BrUy5noFJlQWtRqYXISxgtqzNUygz8Ow85NRuWHaaKDxyu95lioGkW6mT4JSyPVvgMCNA==
+X-Received: by 2002:a05:6000:8a:b0:374:badf:3017 with SMTP id ffacd0b85a97d-378a8a84a0fmr2051060f8f.33.1725989594580;
+        Tue, 10 Sep 2024 10:33:14 -0700 (PDT)
 Received: from [192.168.10.81] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37895649bafsm9642275f8f.7.2024.09.10.10.31.17
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-378956654e8sm9489147f8f.41.2024.09.10.10.33.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 10:31:17 -0700 (PDT)
-Message-ID: <7ba0756f-3a7f-4aed-b0d1-d47c1d4cbd5b@redhat.com>
-Date: Tue, 10 Sep 2024 19:31:16 +0200
+        Tue, 10 Sep 2024 10:33:13 -0700 (PDT)
+Message-ID: <1b694939-0738-4165-8dd6-5da2770bb3f9@redhat.com>
+Date: Tue, 10 Sep 2024 19:33:13 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,15 +83,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 22/25] KVM: TDX: Use guest physical address to configure
- EPT level and GPAW
+Subject: Re: [PATCH 23/25] KVM: x86/mmu: Taking guest pa into consideration
+ when calculate tdp level
 To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
  kvm@vger.kernel.org
 Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
  tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
  linux-kernel@vger.kernel.org
 References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-23-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-24-rick.p.edgecombe@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -129,26 +129,27 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240812224820.34826-23-rick.p.edgecombe@intel.com>
+In-Reply-To: <20240812224820.34826-24-rick.p.edgecombe@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 8/13/24 00:48, Rick Edgecombe wrote:
-> @@ -576,6 +575,9 @@ static int setup_tdparams_cpuids(struct kvm_cpuid2 *cpuid,
->   		value->ebx = entry->ebx;
->   		value->ecx = entry->ecx;
->   		value->edx = entry->edx;
+> +	int maxpa = 0;
 > +
-> +		if (c->leaf == 0x80000008)
-> +			value->eax &= 0xff00ffff;
->   	}
->   
->   	return 0;
+> +	if (vcpu->kvm->arch.vm_type == KVM_X86_TDX_VM)
+> +		maxpa = cpuid_query_maxguestphyaddr(vcpu);
 
-Ah, this answers my question in 21/25.  It definitely needs a comment 
-though!  Also to explain what will future support in the TDX module look 
-like (a new feature bit I guess).
+I think the "if" should be in cpuid_query_maxguestphyaddr(), or 
+alternatively the test below should become an "else".  The current 
+combination is not the clearest.
 
-Paolo
+Otherwise,
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+> +	if (!maxpa)
+> +		maxpa = cpuid_maxphyaddr(vcpu);
+> +
+
 
 
