@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-26404-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26405-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B129F9746AC
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 01:49:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F36A9746B0
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 01:49:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55E89286496
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 23:49:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14673280F2D
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 23:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7045C1BB688;
-	Tue, 10 Sep 2024 23:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204811BD028;
+	Tue, 10 Sep 2024 23:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E5CmHT76"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OBRva3P7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53101BC06D
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 23:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA401BC9E3
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 23:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726011895; cv=none; b=KjaekAd+LgNn2RUyt1vi0lcCwRzuytF4NbfM2NlMJTHoN/naP9WG9EiWPc/Lj1pOI6DYIeE47Oj/72hhKXiBfBbAGa8PWk9lusgdAL184Ftz+Va4LByRxEBu87xpLodjYTIeaMe32AYqUuzHlgZoC9yMWkEhfBZdBeBFWjShRDE=
+	t=1726011898; cv=none; b=rVEh1KwJYmGwrzYXbeGj9YrtCqWqA2ptFY5Rf+9/8iT+UevQGEl3AT2hmmujWwV8ITYnDbVtRG+YyVL7vTHzlmuQXGm+AXTOcaAZCz9phGxawPLKOzzwgagmhz2GiZvkJCPCR8E+9z4RVnbdV4N2J9M6QNlVa5vAnJ7Xisd+OSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726011895; c=relaxed/simple;
-	bh=jfrlv9Zwe9WtcJZnfnb3Is0i40E/8Bmzj5N4J0pkDAw=;
+	s=arc-20240116; t=1726011898; c=relaxed/simple;
+	bh=XocZIyZvhmk8Gbypm0WGqGmS1qv9uLlsMNuSkwppb/k=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jEY9CO9x3Y0MrbJVMgcVuQNHR2uscXh8jGFO03Kv42PmJgoB0uN667oVXIXxVuGjsNKzFafT6iONRrzkpSQA5Ldca0nc6CWSmgN0Seis0NnDSBMCQKEvrXLoWD7lHV76EWGl28g3eq5uxAg7TCcYea4s8xt3B299NPHSP8qqPdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E5CmHT76; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=E/MtGKU+a2vMVMwUkzAJuHd8LMXSnm7aCRqMrP3r1gga+IhhjKgDMHOBFz6LNZYj7oCIB1EJ6ft8/aqVwEQDTWysXKuyig1v0O4adyWHpL/SMxjrFK/g/ANQAs7fgKO7T8c1ZXRal9bQY02p1YfL9Qdoi8zR9FUqS/I+tNbCLdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OBRva3P7; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e1a6d328eacso2912252276.3
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 16:44:53 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-20556f1cfebso88210335ad.1
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 16:44:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726011893; x=1726616693; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1726011894; x=1726616694; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gEfEne/GQ2Ka6MCKI1Fo0Z3xc55YqHsI9PC21Ep9Z3Y=;
-        b=E5CmHT76fBBu+F/q4KGEOE2wmRqPW9mRbNmFKKDxFFMnOuHGleA0eX+0cIpVG7rkb/
-         sk0eYvo1Xi0n/Fmh8qku3Dd1Y3XMH6uMeWW9NQEXqh9xxWdUyhORl8QZ9LpxnsWYNBra
-         COcmIprNQpNoT4GwSNk5UNASnbv7hUgnECVppTlfiPOUEYA4XFRUR/e21fdK344630Li
-         P04PRj8tE+jF3XilgPp1gFEkDOeblVi5Z7D8q3EGvjTUZqwKXMPPHKGkjvjtKg71aOgP
-         KZCr3XwYWr/c6TqtkNgAy8PEFIMJ37/z1L+DwO+RVYFhZvqMFPBtsjrieu9JuL57dkwu
-         3qLg==
+        bh=fsO00i1fJ+fyO29aW7nLdVziXXefzp2jZQcWLLFpi3o=;
+        b=OBRva3P7NNE0Sp9kNqOQz67kJmjpqSrrvt11azE7Uec4PZ6Y+Vv8CdBR1b0N45mt6w
+         dLMKnuT38xFkcLNes0EKUrnq3IO7ZukjbmnHQ76l9NRHR1405yvdJCilQIRKx8BsQdCR
+         n8MdZGEVoA9DfreQBUMj2nHV0zcD+VOF+fQ9ylUeq8ra7cw5JMTjekqwKu2D/qZQC6oL
+         /DSA7ED3+ojDsf/cBJ+gyXgQFr0wagfcugL3zXTrX5CfSmN9ogDSVcTfXr5dO6uyXRbR
+         0tPG78N6SXBFYgyYHQKuZDvnDI92w1tyGoFd3i2Momp8h9HwWEkHa1h8tyo1qjJsJtPt
+         q/Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726011893; x=1726616693;
+        d=1e100.net; s=20230601; t=1726011894; x=1726616694;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gEfEne/GQ2Ka6MCKI1Fo0Z3xc55YqHsI9PC21Ep9Z3Y=;
-        b=TdWdMBZ/RHGlJ8DGG3uqzOHTG9R8XbPkv9XDL73p9qL+a7L0hFxQkBgwNcHvI7bEfk
-         toASnady6j4vBpETtPVObd7cu6efiixyi2wC2aPpimNA3UWH00+3HmWk0ixCJE+rkRun
-         V1TWILHS/QwjYwGWhV4WrYvnY2slluIihykygJl1EDN6UrrpJl9Sl0cVDXyKkT3nV1k7
-         t9+ZiRUN6JifJ0fLCNomSYbjv5T88lB9asHJmbjpKSXcDJnl4iHeiQbmOwDdaaFXJOCY
-         HnrikJh2ddak2eDFjpLW4nvevAm8h2lHza5OC2Ht8TCagvMI4qvlu74d9tQw+0Ozz5rQ
-         720A==
-X-Forwarded-Encrypted: i=1; AJvYcCXoq7KiRH7r6TW23e/21zJHJEzozKaZii1xqlqT+OqF9pUO7lmSKaiHXLGiL2wXaqjH1QA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUdCTrmD42mMk09n6vL7IHQUBoJ3eZml13+8c3fttQN03LfDVb
-	Wkf46HtpU97eJkgxftyzKmTBRLyODnGdClMVItvC34/HEezwte7hNhpb0zzqL9EY4JK8aOZtcrA
-	6UWFPbaS6dwu8AGq15PVYYg==
-X-Google-Smtp-Source: AGHT+IF6ODlxEXjF8aJZSBZZ4I/iqFxheCqSbnSqwhL4p+xdg87aJqDyTNVQn4Ts0x37EKQBXrqF/+I4z5+HsrSwWw==
+        bh=fsO00i1fJ+fyO29aW7nLdVziXXefzp2jZQcWLLFpi3o=;
+        b=e3MVklEjpJkgHXgxxBzFe2br4fKgpYRFo6Lnj54DddkxS3Nx87uBW29OoXJUyJUpMc
+         xPqS793yhVmdZkcrQ79j0oR4ryNNs9eP0whiQPbaooa+uSiEaFEz8pwy2XaAMQ8t/AVF
+         KIwuQjlYczomQLfZUc+sVyCJKwPekn3ODJf3h2q7rrn7WiWgAAgJl9ru+Po5Pna28nB7
+         OLjgJsL7heyxbbkXs8af5sYEiUb+CGjQIXLjF1llU5nvup5ejtWE8G09rYH5LqmzciNW
+         uIsBeCLOrNfVab4zEEb14mLMoWazz/Go35Z2CAr3rbyyFeD0128QpbPL6hYOz3hh+FnR
+         YQOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUgWZbdL5T8ROsBuXqsF6KfdrumP5NjLhuQ+0oND6JHS8PBMfxwgF9EgOkvGGn+rq08Ckw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxC7hgcl3hV2ICdloG5InXikf4cPgfpFELjtNpMGdNFZN6keQhj
+	2bouO2W+W/ljLBPPyUc3bb9t47JLus/0lBhvaflGTjERg8+dqj3tTnboYWeHpZMjMixyJbdMTIt
+	Qx+RwggIeOBv83G/S/be0Ag==
+X-Google-Smtp-Source: AGHT+IGkG5bdlVVJvvD6Ym5sklISkCRvUY93a1/yDRHhOSbI1kqRvzrl9TXy8aPAOijAjgn0S5+iR/vuXr5UMgKZiQ==
 X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a25:698a:0:b0:e16:50d2:3d39 with SMTP
- id 3f1490d57ef6-e1d8c5610cbmr1470276.9.1726011892629; Tue, 10 Sep 2024
- 16:44:52 -0700 (PDT)
-Date: Tue, 10 Sep 2024 23:43:43 +0000
+ (user=ackerleytng job=sendgmr) by 2002:a17:902:c407:b0:205:5284:e52c with
+ SMTP id d9443c01a7336-2074c7995e4mr761845ad.9.1726011894266; Tue, 10 Sep 2024
+ 16:44:54 -0700 (PDT)
+Date: Tue, 10 Sep 2024 23:43:44 +0000
 In-Reply-To: <cover.1726009989.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1726009989.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.46.0.598.g6f2099f65c-goog
-Message-ID: <315ae41e7a53edab139c0323fa96892f2b647450.1726009989.git.ackerleytng@google.com>
-Subject: [RFC PATCH 12/39] mm: hugetlb: Move and expose hugetlb_zero_partial_page()
+Message-ID: <d1940d466fc69472c8b6dda95df2e0522b2d8744.1726009989.git.ackerleytng@google.com>
+Subject: [RFC PATCH 13/39] KVM: guest_memfd: Make guest mem use guest mem
+ inodes instead of anonymous inodes
 From: Ackerley Tng <ackerleytng@google.com>
 To: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk, 
 	jgg@nvidia.com, peterx@redhat.com, david@redhat.com, rientjes@google.com, 
@@ -94,119 +95,207 @@ Cc: erdemaktas@google.com, vannapurve@google.com, ackerleytng@google.com,
 	linux-fsdevel@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 
-This will used by guest_memfd in a later patch.
+Using guest mem inodes allows us to store metadata for the backing
+memory on the inode. Metadata will be added in a later patch to
+support HugeTLB pages.
+
+Metadata about backing memory should not be stored on the file, since
+the file represents a guest_memfd's binding with a struct kvm, and
+metadata about backing memory is not unique to a specific binding and
+struct kvm.
 
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- fs/hugetlbfs/inode.c    | 33 +++++----------------------------
- include/linux/hugetlb.h |  3 +++
- mm/hugetlb.c            | 21 +++++++++++++++++++++
- 3 files changed, 29 insertions(+), 28 deletions(-)
+ include/uapi/linux/magic.h |   1 +
+ virt/kvm/guest_memfd.c     | 119 ++++++++++++++++++++++++++++++-------
+ 2 files changed, 100 insertions(+), 20 deletions(-)
 
-diff --git a/fs/hugetlbfs/inode.c b/fs/hugetlbfs/inode.c
-index 300a6ef300c1..f76001418672 100644
---- a/fs/hugetlbfs/inode.c
-+++ b/fs/hugetlbfs/inode.c
-@@ -720,29 +720,6 @@ static void hugetlb_vmtruncate(struct inode *inode, loff_t offset)
- 	remove_inode_hugepages(inode, offset, LLONG_MAX);
- }
+diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
+index bb575f3ab45e..169dba2a6920 100644
+--- a/include/uapi/linux/magic.h
++++ b/include/uapi/linux/magic.h
+@@ -103,5 +103,6 @@
+ #define DEVMEM_MAGIC		0x454d444d	/* "DMEM" */
+ #define SECRETMEM_MAGIC		0x5345434d	/* "SECM" */
+ #define PID_FS_MAGIC		0x50494446	/* "PIDF" */
++#define GUEST_MEMORY_MAGIC	0x474d454d	/* "GMEM" */
  
--static void hugetlbfs_zero_partial_page(struct hstate *h,
--					struct address_space *mapping,
--					loff_t start,
--					loff_t end)
--{
--	pgoff_t idx = start >> huge_page_shift(h);
--	struct folio *folio;
--
--	folio = filemap_lock_hugetlb_folio(h, mapping, idx);
--	if (IS_ERR(folio))
--		return;
--
--	start = start & ~huge_page_mask(h);
--	end = end & ~huge_page_mask(h);
--	if (!end)
--		end = huge_page_size(h);
--
--	folio_zero_segment(folio, (size_t)start, (size_t)end);
--
--	folio_unlock(folio);
--	folio_put(folio);
--}
--
- static long hugetlbfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- {
- 	struct hugetlbfs_inode_info *info = HUGETLBFS_I(inode);
-@@ -768,9 +745,10 @@ static long hugetlbfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 	i_mmap_lock_write(mapping);
+ #endif /* __LINUX_MAGIC_H__ */
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 8f079a61a56d..5d7fd1f708a6 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -1,12 +1,17 @@
+ // SPDX-License-Identifier: GPL-2.0
++#include <linux/fs.h>
++#include <linux/mount.h>
+ #include <linux/backing-dev.h>
+ #include <linux/falloc.h>
+ #include <linux/kvm_host.h>
++#include <linux/pseudo_fs.h>
+ #include <linux/pagemap.h>
+ #include <linux/anon_inodes.h>
  
- 	/* If range starts before first full page, zero partial page. */
--	if (offset < hole_start)
--		hugetlbfs_zero_partial_page(h, mapping,
--				offset, min(offset + len, hole_start));
-+	if (offset < hole_start) {
-+		hugetlb_zero_partial_page(h, mapping, offset,
-+					  min(offset + len, hole_start));
-+	}
+ #include "kvm_mm.h"
  
- 	/* Unmap users of full pages in the hole. */
- 	if (hole_end > hole_start) {
-@@ -782,8 +760,7 @@ static long hugetlbfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 
- 	/* If range extends beyond last full page, zero partial page. */
- 	if ((offset + len) > hole_end && (offset + len) > hole_start)
--		hugetlbfs_zero_partial_page(h, mapping,
--				hole_end, offset + len);
-+		hugetlb_zero_partial_page(h, mapping, hole_end, offset + len);
- 
- 	i_mmap_unlock_write(mapping);
- 
-diff --git a/include/linux/hugetlb.h b/include/linux/hugetlb.h
-index 4d47bf94c211..752062044b0b 100644
---- a/include/linux/hugetlb.h
-+++ b/include/linux/hugetlb.h
-@@ -124,6 +124,9 @@ long hugepage_subpool_put_pages(struct hugepage_subpool *spool, long delta);
- 
- int hugetlb_acct_memory(struct hstate *h, long delta);
- 
-+void hugetlb_zero_partial_page(struct hstate *h, struct address_space *mapping,
-+			       loff_t start, loff_t end);
++static struct vfsmount *kvm_gmem_mnt;
 +
- void hugetlb_dup_vma_private(struct vm_area_struct *vma);
- void clear_vma_resv_huge_pages(struct vm_area_struct *vma);
- int move_hugetlb_page_tables(struct vm_area_struct *vma,
-diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-index 5a37b03e1361..372d8294fb2f 100644
---- a/mm/hugetlb.c
-+++ b/mm/hugetlb.c
-@@ -1989,6 +1989,27 @@ void free_huge_folio(struct folio *folio)
- 	}
+ struct kvm_gmem {
+ 	struct kvm *kvm;
+ 	struct xarray bindings;
+@@ -302,6 +307,38 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
+ 	return get_file_active(&slot->gmem.file);
  }
  
-+void hugetlb_zero_partial_page(struct hstate *h, struct address_space *mapping,
-+			       loff_t start, loff_t end)
++static const struct super_operations kvm_gmem_super_operations = {
++	.statfs		= simple_statfs,
++};
++
++static int kvm_gmem_init_fs_context(struct fs_context *fc)
 +{
-+	pgoff_t idx = start >> huge_page_shift(h);
-+	struct folio *folio;
++	struct pseudo_fs_context *ctx;
 +
-+	folio = filemap_lock_hugetlb_folio(h, mapping, idx);
-+	if (IS_ERR(folio))
-+		return;
++	if (!init_pseudo(fc, GUEST_MEMORY_MAGIC))
++		return -ENOMEM;
 +
-+	start = start & ~huge_page_mask(h);
-+	end = end & ~huge_page_mask(h);
-+	if (!end)
-+		end = huge_page_size(h);
++	ctx = fc->fs_private;
++	ctx->ops = &kvm_gmem_super_operations;
 +
-+	folio_zero_segment(folio, (size_t)start, (size_t)end);
-+
-+	folio_unlock(folio);
-+	folio_put(folio);
++	return 0;
 +}
 +
- /*
-  * Must be called with the hugetlb lock held
-  */
++static struct file_system_type kvm_gmem_fs = {
++	.name		 = "kvm_guest_memory",
++	.init_fs_context = kvm_gmem_init_fs_context,
++	.kill_sb	 = kill_anon_super,
++};
++
++static void kvm_gmem_init_mount(void)
++{
++	kvm_gmem_mnt = kern_mount(&kvm_gmem_fs);
++	BUG_ON(IS_ERR(kvm_gmem_mnt));
++
++	/* For giggles. Userspace can never map this anyways. */
++	kvm_gmem_mnt->mnt_flags |= MNT_NOEXEC;
++}
++
+ static struct file_operations kvm_gmem_fops = {
+ 	.open		= generic_file_open,
+ 	.release	= kvm_gmem_release,
+@@ -311,6 +348,8 @@ static struct file_operations kvm_gmem_fops = {
+ void kvm_gmem_init(struct module *module)
+ {
+ 	kvm_gmem_fops.owner = module;
++
++	kvm_gmem_init_mount();
+ }
+ 
+ static int kvm_gmem_migrate_folio(struct address_space *mapping,
+@@ -392,11 +431,67 @@ static const struct inode_operations kvm_gmem_iops = {
+ 	.setattr	= kvm_gmem_setattr,
+ };
+ 
++static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
++						      loff_t size, u64 flags)
++{
++	const struct qstr qname = QSTR_INIT(name, strlen(name));
++	struct inode *inode;
++	int err;
++
++	inode = alloc_anon_inode(kvm_gmem_mnt->mnt_sb);
++	if (IS_ERR(inode))
++		return inode;
++
++	err = security_inode_init_security_anon(inode, &qname, NULL);
++	if (err) {
++		iput(inode);
++		return ERR_PTR(err);
++	}
++
++	inode->i_private = (void *)(unsigned long)flags;
++	inode->i_op = &kvm_gmem_iops;
++	inode->i_mapping->a_ops = &kvm_gmem_aops;
++	inode->i_mode |= S_IFREG;
++	inode->i_size = size;
++	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
++	mapping_set_inaccessible(inode->i_mapping);
++	/* Unmovable mappings are supposed to be marked unevictable as well. */
++	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
++
++	return inode;
++}
++
++static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
++						  u64 flags)
++{
++	static const char *name = "[kvm-gmem]";
++	struct inode *inode;
++	struct file *file;
++
++	if (kvm_gmem_fops.owner && !try_module_get(kvm_gmem_fops.owner))
++		return ERR_PTR(-ENOENT);
++
++	inode = kvm_gmem_inode_make_secure_inode(name, size, flags);
++	if (IS_ERR(inode))
++		return ERR_CAST(inode);
++
++	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR,
++				 &kvm_gmem_fops);
++	if (IS_ERR(file)) {
++		iput(inode);
++		return file;
++	}
++
++	file->f_mapping = inode->i_mapping;
++	file->f_flags |= O_LARGEFILE;
++	file->private_data = priv;
++
++	return file;
++}
++
+ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ {
+-	const char *anon_name = "[kvm-gmem]";
+ 	struct kvm_gmem *gmem;
+-	struct inode *inode;
+ 	struct file *file;
+ 	int fd, err;
+ 
+@@ -410,32 +505,16 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ 		goto err_fd;
+ 	}
+ 
+-	file = anon_inode_create_getfile(anon_name, &kvm_gmem_fops, gmem,
+-					 O_RDWR, NULL);
++	file = kvm_gmem_inode_create_getfile(gmem, size, flags);
+ 	if (IS_ERR(file)) {
+ 		err = PTR_ERR(file);
+ 		goto err_gmem;
+ 	}
+ 
+-	file->f_flags |= O_LARGEFILE;
+-
+-	inode = file->f_inode;
+-	WARN_ON(file->f_mapping != inode->i_mapping);
+-
+-	inode->i_private = (void *)(unsigned long)flags;
+-	inode->i_op = &kvm_gmem_iops;
+-	inode->i_mapping->a_ops = &kvm_gmem_aops;
+-	inode->i_mode |= S_IFREG;
+-	inode->i_size = size;
+-	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+-	mapping_set_inaccessible(inode->i_mapping);
+-	/* Unmovable mappings are supposed to be marked unevictable as well. */
+-	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+-
+ 	kvm_get_kvm(kvm);
+ 	gmem->kvm = kvm;
+ 	xa_init(&gmem->bindings);
+-	list_add(&gmem->entry, &inode->i_mapping->i_private_list);
++	list_add(&gmem->entry, &file_inode(file)->i_mapping->i_private_list);
+ 
+ 	fd_install(fd, file);
+ 	return fd;
 -- 
 2.46.0.598.g6f2099f65c-goog
 
