@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-26230-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26231-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B73209735D1
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 13:00:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EDFE973571
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:49:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73BBEB297F8
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 10:46:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEA54285CFB
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 10:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC711922EB;
-	Tue, 10 Sep 2024 10:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB95184521;
+	Tue, 10 Sep 2024 10:48:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bwqtp6Tx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ET3uqHoX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A63184521
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1437C2AF15
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725965114; cv=none; b=BCqSQTmDsey/aCn6SjyvI6kbJi3EPYZ3s7Ysrg78BniZELPOcgItUCWh3tmkah0pPrPaijlySs3h6Z1Eup1hUoKa7Go3Sq+3EJjSyaoDVzYEpLRrtcTgDK3weBOl2Mh4+WX9z7itPa5Gqt9xZfhDnd0Yqe/G4lTHn5JfpJo8sy0=
+	t=1725965331; cv=none; b=ZRiUBSGXrSRDGQJUjbygLwcWHLQdieVqkcDWUvTQsEcZcYC25kcxUMXW+sJNtynwZPLKCUhIw6Aw/iTrUlVpIiXdxTAUl3sw/1kw+qp2KhVELj7BR5izonI4PHPSSATBRoBG1fspQ4dSxekXlSwDFosOYRzozw8ANsPfWweASRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725965114; c=relaxed/simple;
-	bh=jYlCh8yNeYIkjiBpQOKOkIMz2OZvTJRJ/aETlxPhMrA=;
+	s=arc-20240116; t=1725965331; c=relaxed/simple;
+	bh=Yry6yn1otmrO433bv7L6l95zS3P3tvOdRr0ia+1ysdg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nARY/uqrnNoYHmDR6qAxEktNJgOzHmtkmvZFuomZOsofIEMqchGzKo1bJXjmu2gy6zN+UVwyNJzrY+MR5YljULqRTSAwU/16urTQSpHXoBY/IOMJS7+xGNJ7OH3cFrVg2vJBdM5ySEPWMv16jTt0WtYFq8Ckt435KWtszF6jW18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bwqtp6Tx; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=hiimkknzYEZKIH5J8Oq8aUomCMXnUg7VPax8gZ9FSkX9bIsRyb83FYfl4duKFG2GPBj8pllaiLCqWp5t2GFuOJvL7JtNxToY+T1R6IfZAKjJwheUNO3hIIKSb0PZYIJV28N5XqpFr5HGsw6q44NDbn8UFfFZ3q/fv6b9yfR9oSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ET3uqHoX; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725965111;
+	s=mimecast20190719; t=1725965328;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jyPpBrEHkd08T4IqqfOrRciboN+U1FHHDgcUpFHe6pE=;
-	b=bwqtp6Tx6WC0DlOaPINpDo5PDPysKZsCYveHHnfz2r1vIehfegoOVYFA9feJ5hrpa2bREF
-	ACLu0MSSz5K2yi5S6RzEgY99C/HFayALLpoW0GaFBer6Qo1Em9jvkgqvPSfejFefM3nBQC
-	kZU7SZ+YNVa2116prW8Xac3n59IOrQQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=B2ieYUxbbHHGGo0E6WELXjXJIeasVfrRq3zIDQk/VQo=;
+	b=ET3uqHoXTLwLPJ9PyXO0cGna/BEM+QETZovKCI96QFjho1aaukjfhzXGT9EiQ6AYveB3EE
+	eX1Gf0EnzyAxYwSW9AxtwjOXuF8rckU+MczmpA0EvDaVtfVAGEi3FypNGApHDn6ZhDBk+0
+	JigWp4Czrd4CpcEaORkKJxhh9T/62Pw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-292-2dVrchrmNHKcUK5-Fhosjw-1; Tue, 10 Sep 2024 06:45:10 -0400
-X-MC-Unique: 2dVrchrmNHKcUK5-Fhosjw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cb33e6299so16693655e9.2
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 03:45:10 -0700 (PDT)
+ us-mta-453-3djCLiiDO8e9lsDtBE-8KA-1; Tue, 10 Sep 2024 06:48:47 -0400
+X-MC-Unique: 3djCLiiDO8e9lsDtBE-8KA-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cae209243so22145175e9.1
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 03:48:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725965109; x=1726569909;
+        d=1e100.net; s=20230601; t=1725965326; x=1726570126;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jyPpBrEHkd08T4IqqfOrRciboN+U1FHHDgcUpFHe6pE=;
-        b=nH8mx/nmiMW/DRZdjsodR00dMdhzbhnKoUlwSHt0psouyxBq29Tjpc4Ve9ilqXS74H
-         Mwq7ZhzxVqVmO7fqcGfdxGIy4Q3EVcT+MplN9WDWzmBkRl1sGCeBfiE5dUEfFFJGqp/u
-         291NomBMd8fytPqj3bsc2jWt2eHZqIK9110/98ovhFZAGpKwDWX9sd/pDPcNjw5liaNB
-         i2CZLRcxooQlTGk4G78zzIDNyp0eAganVMUzrM4P2cTFZsVHSGE2MAWJtWm0cfJTXgyO
-         FYF1d44fpPErO90us0lcixObBkKoQ4DjVxhYBB9ia6X4nD9DRhrIH8/JWQP3XaiW54AO
-         b+xA==
-X-Forwarded-Encrypted: i=1; AJvYcCXDKr5shGGZFyGSc/2xB8JMb4sH9jpUknz/QJ7PE90KbsqFAH05tEKL+Whlr9rJ8nX1igQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb3rfiZS1Hbv6xt3oLbXhZvT+I6JUaHsTXUTeAydM23KOC/rni
-	+83zDCarsUV0Rdnzx023/9Ct8VfXKYPCfzb9IbA8dF0yuKpirMgymQt/G2GLJROlR08j04OM12j
-	53iRFpykPWfrdD2/aFbqXLfY71+qlWKkHNDPXxRCnwftR0YtDcA==
-X-Received: by 2002:a05:600c:3b9a:b0:42c:af06:718 with SMTP id 5b1f17b1804b1-42caf060aa3mr68287645e9.28.1725965109335;
-        Tue, 10 Sep 2024 03:45:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHfmE2OcdsT+5uBbdXW+uePHJTdUw7zg7QfpVhNTyVckW+6q4fb0qb3B5MMthaJdYsgSv77Gg==
-X-Received: by 2002:a05:600c:3b9a:b0:42c:af06:718 with SMTP id 5b1f17b1804b1-42caf060aa3mr68287355e9.28.1725965108879;
-        Tue, 10 Sep 2024 03:45:08 -0700 (PDT)
+        bh=B2ieYUxbbHHGGo0E6WELXjXJIeasVfrRq3zIDQk/VQo=;
+        b=gbzRBj5dTmND5AfQPF5EYxI7BWckUtRQhrl+m3fGvHte5anW1316N92cts9/JPPlc6
+         JEJbcLjzdzT/9hXhU8iARwbyIi29Hg8rMyEzcpuVRjqPAhFb6oWiLuNJqSZPGUbRvVIQ
+         nQOLSM7LDeJK49i8UM5hbffXEOMp2aGDKdKvJUTRt1SRiR3/YhEjjNTQQoSWFmPZ0EZW
+         0j6OS0hIUSpme9ElqTiSDuhRnRk6lW5i37T6mWTw7OW2Glu0aWdBEmSuKDFIOqvOQxap
+         lZwK8/1xjAhjbtUS0cvxh9FlaodxZpK+8Pv9PnV16Jxs+yX4j3Sk2r+h2XHKGrmBAsC2
+         UoBg==
+X-Forwarded-Encrypted: i=1; AJvYcCW7psT4/ZR2IgZPnaEqVnr6Elck85aDQ39UcMobUpMHVQKgpA0HUWfrGvtF7S51VklKjcs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOmoxoxwjLB0vvbVMcPed7QzZ0PtVtryH/01yA6ol3y7ynA8cB
+	PX1liUtymfQ31wE6gOkBIBO33HgN0Ps88VSokDDkoeUnWWXjcyWBBzcOeII+9dxW3qQtqo/MUUK
+	N66aKOqYm8WKRbHtzmsEsF1B6PnxcZCTcAWfcXYgLOlhjClJKEJ27Ag1/LVc5
+X-Received: by 2002:a05:600c:3555:b0:429:a05:32fb with SMTP id 5b1f17b1804b1-42cae70f2c4mr86924885e9.10.1725965326434;
+        Tue, 10 Sep 2024 03:48:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE20Ebh6b/agKccFilSQknl7HrcvujOdpkCfv2DU9dT0Q2NhUpep/t2EMMM9InGNCQWzUuMFQ==
+X-Received: by 2002:a05:600c:3555:b0:429:a05:32fb with SMTP id 5b1f17b1804b1-42cae70f2c4mr86924605e9.10.1725965325922;
+        Tue, 10 Sep 2024 03:48:45 -0700 (PDT)
 Received: from [192.168.10.81] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3789564a18asm8495403f8f.15.2024.09.10.03.45.07
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42cb2f86488sm88949275e9.15.2024.09.10.03.48.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 03:45:08 -0700 (PDT)
-Message-ID: <7fab7177-078e-4921-a07e-87c81303a71d@redhat.com>
-Date: Tue, 10 Sep 2024 12:45:07 +0200
+        Tue, 10 Sep 2024 03:48:45 -0700 (PDT)
+Message-ID: <92b86a71-3bbb-40a7-ae45-ab32215cce90@redhat.com>
+Date: Tue, 10 Sep 2024 12:48:44 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,13 +83,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 21/21] KVM: TDX: Handle vCPU dissociation
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- kvm@vger.kernel.org
-Cc: kai.huang@intel.com, dmatlack@google.com, isaku.yamahata@gmail.com,
- yan.y.zhao@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 06/21] KVM: TDX: Add accessors VMX VMCS helpers
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "seanjc@google.com" <seanjc@google.com>
+Cc: "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+ "nik.borisov@suse.com" <nik.borisov@suse.com>,
+ "dmatlack@google.com" <dmatlack@google.com>, "Huang, Kai"
+ <kai.huang@intel.com>, "isaku.yamahata@gmail.com"
+ <isaku.yamahata@gmail.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
- <20240904030751.117579-22-rick.p.edgecombe@intel.com>
+ <20240904030751.117579-7-rick.p.edgecombe@intel.com>
+ <bd423b07-3cb4-434f-b245-381cd0ba4e58@redhat.com>
+ <38b2a97bd60e55505bd77e92a9257d5504c22b8b.camel@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -127,27 +134,42 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240904030751.117579-22-rick.p.edgecombe@intel.com>
+In-Reply-To: <38b2a97bd60e55505bd77e92a9257d5504c22b8b.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/4/24 05:07, Rick Edgecombe wrote:
-> +/*
-> + * A per-CPU list of TD vCPUs associated with a given CPU.  Used when a CPU
-> + * is brought down to invoke TDH_VP_FLUSH on the appropriate TD vCPUS.
+On 9/9/24 23:29, Edgecombe, Rick P wrote:
+>> Maybe a bit large when inlined?  Maybe
+>>
+>>          if (unlikely(err))
+>>                  tdh_vp_wr_failed(tdx, field, bit, err);
+>>
+>> and add tdh_vp_wr_failed to tdx.c.
+> There is a tiny bit of difference between the messages:
+> pr_err("TDH_VP_WR["#uclass".0x%x] = 0x%llx failed: 0x%llx\n", ...
+> pr_err("TDH_VP_WR["#uclass".0x%x] |= 0x%llx failed: 0x%llx\n", ...
+> pr_err("TDH_VP_WR["#uclass".0x%x] &= ~0x%llx failed: 0x%llx\n", ...
+> 
+> We can parameterize that part of the message, but it gets a bit tortured. Or
+> just lose that bit of detail. We can take a look. Thanks.
 
-... or when a vCPU is migrated.
+Yes, you can:
 
-> + * Protected by interrupt mask.  This list is manipulated in process context
-> + * of vCPU and IPI callback.  See tdx_flush_vp_on_cpu().
-> + */
-> +static DEFINE_PER_CPU(struct list_head, associated_tdvcpus);
+1) have three different functions for the failure
 
-It may be a bit more modern, or cleaner, to use a local_lock here 
-instead of just relying on local_irq_disable/enable.
+2) leave out the value part
 
-Another more organizational question is whether to put this in the 
-VM/vCPU series but I might be missing something obvious.
+3) pass the mask as well to tdh_vp_wr_failed() and use it to deduce the 
+=/|=/&= part, like
+
+	if (!~mask)
+		op = "=";
+	else if (!value)
+		op = "&= ~", value = mask;
+	else if (value == mask)
+		op = "|=";
+	else
+		op = "??, value = ";
 
 Paolo
 
