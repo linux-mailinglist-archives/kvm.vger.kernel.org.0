@@ -1,150 +1,251 @@
-Return-Path: <kvm+bounces-26349-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26350-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C62F97449E
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 23:12:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2510497457A
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 00:16:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DC0EB253F8
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 21:12:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83556B2430A
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 22:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB331AB531;
-	Tue, 10 Sep 2024 21:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85C21AB53E;
+	Tue, 10 Sep 2024 22:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QRG7aq1i"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vXkRinR7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90581AB508
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 21:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBF017622D
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 22:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726002715; cv=none; b=QSX3DL3JLtRgz2XkX8Unvg7V4c/+fxGGIjTtCqbTHbArnWWIHvnRkw30vBmJKllz9EU4s5KJp2LO2OoNlKQkPvwkOjAJrvcdgEjjkA/S6bnuyZEbKViOC82LD2j8ldgaToYRiFPnsQHkMEt+KrOeGdnKPCmlDCwVfLSWodZfxKU=
+	t=1726006573; cv=none; b=Jpp4wKIx2hgYFEh9ytGwxqHOoiMgcK/XLMRYsPqvINBepb1UWfNFpsZ0rcBgbf+A2f6VOb6O+RGrjJAcYcI+oZXGycfx+5gpOCngO6vC745sBn/8OLGGSQPu2Zpysgvmq/mwMj8tNw6QR9DBKdT0+CPNkqITaqhmcaWgMiXyd2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726002715; c=relaxed/simple;
-	bh=vQ19Neos0DyR2KeY0ecAmyspXyYZOWY65Booqku3A+U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tLxSNbzmh69wT8d6W18OM91qdTEONRQoDSkNHjjDK+GQ6GdXM+XC0vk3sT8lWcThuL/kgU0nEjgSJ3JYHz3KYp0uuwSm1sTz+pDBqX2im48li0G8XZIHMYGwNAzEmXZUbnIFmHv/PO7f+9hl4kPrM1DZE7cbuXext6oDA2BoHZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QRG7aq1i; arc=none smtp.client-ip=209.85.221.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-50108a42fa9so1532401e0c.3
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 14:11:53 -0700 (PDT)
+	s=arc-20240116; t=1726006573; c=relaxed/simple;
+	bh=P8NkKuyeBZj4+kkwnfXX2dn6JWq/ANG/uqh2PJhUPws=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=qD6e8FIVJZZEIJ8jlADZdDga6DmwhtkbIao+PUXtN31xkBbUAB6TDDO1UdyCP4FdoCAJCrQjk+DO85VMiuoLmNjf6Sk/9JaaoVlMgkiB6lmrgJcFPJa1Z+YVZruzwhG8DiWtlcM1GZEwXcl8s1yZWjkVB+GFBFwixpJT7lOVlmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vXkRinR7; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-71798661a52so233951b3a.0
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 15:16:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726002712; x=1726607512; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9mL456C9bf2/NmawuOM2i75QU0ioWJIK8fenw90OA60=;
-        b=QRG7aq1i6d891jb5kRmAOpiq6j6e0jEU+k+GF8Xio9Jdj2w4JUahuOOKXoqYM2rqUk
-         paSTgEuDbKHXvg+0zucLYk3e5lQXyyBrETl2pE/XzggNAody0L7XoypUvWtG+Sqc3tLy
-         KtdNtPWdDbgKM70V51npsIUbFdNo3EFDBfHIyd93Dv+vzOn/HeZt50p9q/qVjnTBWPel
-         WXMU/e5geV9REQBtfpy17FkksY8C5nD3IT09kKM0iklIhUJSvL5m4v1caaQRmZ25mESa
-         ufJVJ3v0YVU66JwY9DABoV62V2hY4+SXB5P9gBQK9s1QwhZntfxKkpSHPxgaIrjEBAon
-         xgJg==
+        d=linaro.org; s=google; t=1726006571; x=1726611371; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YSyqJppZZS4UpzgxKNiY6ieJzLYfceDr8xhPE0xjFbI=;
+        b=vXkRinR7FVyi2JqVa0xerKK5sSz5vgSG86IicS7YmbHodVGtzXC+eA2csu/u1BSPqg
+         Os5wHzucOh7L7i9mFQeEPqTzQZxHbFtS8gsLqaQ/zexauyOkHggy3S4s1Sb/qH+vJf0i
+         XYTmMrIyZJlf4SskZ9Q2sSOIABwMwstX7/h8/bMak1v3/nXl0WSOSvsePq0S68JcvaJL
+         /ewEfs07NwMd6BJ0sXkdT6S+7BtkSFICf60DJwCO9dXSwEXJG0I07+bAjmkvFNnMJ9D+
+         tlkzhjYwO4v1UkiGy9uWX4FpFh6zlHLR+xEsOPOc6FJ8DJ7uL1P64KRBPuDKnhlHA/cR
+         yMkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726002712; x=1726607512;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9mL456C9bf2/NmawuOM2i75QU0ioWJIK8fenw90OA60=;
-        b=AMB+q/kTqMIR8fnepapJmnSRmJ9cEh9r1SU2dNyFfCewAL8r+U4Ya7SzgUmEwq+lTG
-         gofvJJUA6BQCIuqNpNnfucL3tf5JXll3TUwF0V0GadzXPGQiElUnxo9qUYM7D26b0sm9
-         snZpgmdXIyUL+BkmqObbpAcrUvs3uyilsvd1I2SAy0v2YM6Zg3u9U8Bo7s/SaLAm2Oxw
-         teOHt/BFu3r0KwbKSPhTS99CzBHDf97X/qfWw/bVZ9JsecIUpI3ju+bNr4ydXrzn0Xgh
-         /vJEikpCheK0oFY0MNEK8N+96/Jjw7WNGK1JhtsgRUQPNhARbNGws1VPF+KGmKOAS9Fv
-         RaHw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjoeULEMMH0IstviBQd9LeBPf+9AobPrIS9rm4YpX/CXSisPiha14JVq7YrOiuTQe/V3U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyiAel3ZvM7qFwyoUOqughch3lgWOuggqRtHWA0ecewjShWlXs
-	st5iykOac02+xV0AoWaUZnwrnifI0jKOOJ/BJPt0I8Dkeb7ZIAC6xT/61z5korHMdVPhkMw/Eg3
-	7i7w5uAZazXVhGVhZKX3ffyLdahp96Ro2xaeK
-X-Google-Smtp-Source: AGHT+IGNmBkL+R7xBhZDsZOCgpmdSTcN3mnBPXPvha5B1FEl7C+EEP8dxL5+KIrRnUpFi2Hpj2/2XWpfjHaq+rdxtm4=
-X-Received: by 2002:a05:6122:2808:b0:501:2960:7595 with SMTP id
- 71dfb90a1353d-502143a9979mr12814010e0c.11.1726002712536; Tue, 10 Sep 2024
- 14:11:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726006571; x=1726611371;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YSyqJppZZS4UpzgxKNiY6ieJzLYfceDr8xhPE0xjFbI=;
+        b=B0fyFgmehH/IKx2wukMAjceym2YMal0W9bOP6/L6raEu2hpLCL4nQlsl79ZHdWFwZ0
+         UPwGd8+C5M5FUdkb6hE+g/lMBy6G9QcU0ecTnYeQKtlndEI+wr/K6vPhmwxnpXj5Jx5U
+         A+R58y6IAXEh8q1HebH9TVYAZhXMns1/iz0Mjzh6ftR+Oo3Yje1Atct3qXKeT4EypLx/
+         hD+FMIzBRKWUSkMPtkI5sRsD5dCSkVBTW8ac6PnT2dP6m+4dr3oiFU//h2ZRRUgkD5Bn
+         3AtJnwpPuc4NeRtt7SnXbiJ6+0pDvqXOUQuCCYG279g0MUXgv1p/aJwo/ZMi+k5WVr1c
+         eV+A==
+X-Forwarded-Encrypted: i=1; AJvYcCUsSMOgT4UpiN+bRWjVwvsGeuK16ozILK9nK0yLrEwuVLMVwl296ZGLbJFaeAGwK7e1aXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvjKKzbXcSQM0Em98xytli1O7Yx6YWUaUyEsS5Q8iOu4fk/3yE
+	R30e8LfKkzSKyaFT5BpP85XJ3XIGe0sYgtj9e1tNpvSbJFYrNKJO4xJS0gxl6MA=
+X-Google-Smtp-Source: AGHT+IFq8D12w3lrLR9iZPp9dBLWaCbloOusYWBwljwNqw7WFauubajh8SDyD921iLBgiiedqovYTQ==
+X-Received: by 2002:a05:6a00:9484:b0:712:7512:add9 with SMTP id d2e1a72fcca58-71907f2dc50mr6196737b3a.13.1726006570484;
+        Tue, 10 Sep 2024 15:16:10 -0700 (PDT)
+Received: from linaro.vn.shawcable.net ([2604:3d08:9384:1d00::9633])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71909003d0esm1884055b3a.93.2024.09.10.15.16.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 15:16:10 -0700 (PDT)
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Zhao Liu <zhao1.liu@intel.com>,
+	"Richard W.M. Jones" <rjones@redhat.com>,
+	Joel Stanley <joel@jms.id.au>,
+	Kevin Wolf <kwolf@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-arm@nongnu.org,
+	Corey Minyard <minyard@acm.org>,
+	Eric Farman <farman@linux.ibm.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Keith Busch <kbusch@kernel.org>,
+	WANG Xuerui <git@xen0n.name>,
+	Hyman Huang <yong.huang@smartx.com>,
+	Stefan Berger <stefanb@linux.vnet.ibm.com>,
+	Michael Rolnik <mrolnik@gmail.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	qemu-riscv@nongnu.org,
+	Ani Sinha <anisinha@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Jesper Devantier <foss@defmacro.it>,
+	Laurent Vivier <laurent@vivier.eu>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Igor Mammedov <imammedo@redhat.com>,
+	kvm@vger.kernel.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Fam Zheng <fam@euphon.net>,
+	qemu-s390x@nongnu.org,
+	Hanna Reitz <hreitz@redhat.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	qemu-block@nongnu.org,
+	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+	qemu-ppc@nongnu.org,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Harsh Prateek Bora <harshpb@linux.ibm.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Fabiano Rosas <farosas@suse.de>,
+	Helge Deller <deller@gmx.de>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Peter Xu <peterx@redhat.com>,
+	Bin Meng <bmeng.cn@gmail.com>,
+	Weiwei Li <liwei1518@gmail.com>,
+	Klaus Jensen <its@irrelevant.dk>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Jason Wang <jasowang@redhat.com>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: [PATCH 00/39] Use g_assert_not_reached instead of (g_)assert(0,false)
+Date: Tue, 10 Sep 2024 15:15:27 -0700
+Message-Id: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
+X-Mailer: git-send-email 2.39.2
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-20-seanjc@google.com>
- <CADrL8HWACwbzraG=MbDoORJ8ramDxb-h9yb0p4nx9-wq4o3c6A@mail.gmail.com>
- <Zt9UT74XkezVpTuK@google.com> <CADrL8HW-mOAyF0Gcw7UbkvEvEfcHDxEir0AiStkqYzD5x8ZGpg@mail.gmail.com>
- <Zt9wg6h_bPp8BKtd@google.com> <CADrL8HWbNjv-w-ZJOxkLK78S5RePd2QXDuXV-=4iFVV29uHKyg@mail.gmail.com>
- <Zt-kHjtTVrONMU1V@google.com>
-In-Reply-To: <Zt-kHjtTVrONMU1V@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Tue, 10 Sep 2024 14:11:15 -0700
-Message-ID: <CADrL8HV1Erpg-D4LzuRHUk7dg6mvex8oQz5pBzwO7A3OjB8Uvw@mail.gmail.com>
-Subject: Re: [PATCH 19/22] KVM: x86/mmu: Add infrastructure to allow walking
- rmaps outside of mmu_lock
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 9, 2024 at 6:42=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Mon, Sep 09, 2024, James Houghton wrote:
-> > I take back what I said about this working on x86. I think it's
-> > possible for there to be a race.
-> >
-> > Say...
-> >
-> > 1. T1 modifies pte_list_desc then unlocks kvm_rmap_unlock().
-> > 2. T2 then locks kvm_rmap_lock_readonly().
-> >
-> > The modifications that T1 has made are not guaranteed to be visible to
-> > T2 unless T1 has an smp_wmb() (or equivalent) after the modfication
-> > and T2 has an smp_rmb() before reading the data.
-> >
-> > Now the way you had it, T2, because it uses try_cmpxchg() with full
-> > ordering, will effectively do a smp_rmb(). But T1 only does an
-> > smp_wmb() *after dropping the mmu_lock*, so there is a race. While T1
-> > still holds the mmu_lock but after releasing the kvm_rmap_lock(), T2
-> > may enter its critical section and then *later* observe the changes
-> > that T1 made.
-> >
-> > Now this is impossible on x86 (IIUC) if, in the compiled list of
-> > instructions, T1's writes occur in the same order that we have written
-> > them in C. I'm not sure if WRITE_ONCE guarantees that this reordering
-> > at compile time is forbidden.
-> >
-> > So what I'm saying is:
-> >
-> > 1. kvm_rmap_unlock() must have an smp_wmb().
->
-> No, because beating a dead horse, this is not generic code, this is x86.
+This series cleans up all usages of assert/g_assert who are supposed to stop
+execution of QEMU. We replace those by g_assert_not_reached().
+It was suggested recently when cleaning codebase to build QEMU with gcc
+and tsan: https://lore.kernel.org/qemu-devel/54bb02a6-1b12-460a-97f6-3f478ef766c6@linaro.org/.
 
-What prevents the compiler from reordering (non-atomic, non-volatile)
-stores that happen before WRITE_ONCE() in kvm_rmap_unlock() to after
-the WRITE_ONCE()?
+In more, cleanup useless break after g_assert_not_reached();
 
-IMV, such a reordering is currently permitted[1] (i.e., a barrier() is
-missing), and should the compiler choose to do this, the lock will not
-function correctly.
+And finally, ensure with scripts/checkpatch.pl that we don't reintroduce
+(g_)assert(false) in the future.
 
-> If kvm_rmap_head.val were an int, i.e. could be unionized with an atomic_=
-t, then
-> I wouldn't be opposed to doing this in the locking code to document thing=
-s:
->
->  s/READ_ONCE/atomic_read_acquire
->  s/WRITE_ONCE/atomic_set_release
->  s/try_cmpxchg/atomic_cmpxchg_acquire
+Pierrick Bouvier (39):
+  docs/spin: replace assert(0) with g_assert_not_reached()
+  hw/acpi: replace assert(0) with g_assert_not_reached()
+  hw/arm: replace assert(0) with g_assert_not_reached()
+  hw/char: replace assert(0) with g_assert_not_reached()
+  hw/core: replace assert(0) with g_assert_not_reached()
+  hw/net: replace assert(0) with g_assert_not_reached()
+  hw/watchdog: replace assert(0) with g_assert_not_reached()
+  migration: replace assert(0) with g_assert_not_reached()
+  qobject: replace assert(0) with g_assert_not_reached()
+  system: replace assert(0) with g_assert_not_reached()
+  target/ppc: replace assert(0) with g_assert_not_reached()
+  tests/qtest: replace assert(0) with g_assert_not_reached()
+  tests/unit: replace assert(0) with g_assert_not_reached()
+  include/hw/s390x: replace assert(false) with g_assert_not_reached()
+  block: replace assert(false) with g_assert_not_reached()
+  hw/hyperv: replace assert(false) with g_assert_not_reached()
+  hw/net: replace assert(false) with g_assert_not_reached()
+  hw/nvme: replace assert(false) with g_assert_not_reached()
+  hw/pci: replace assert(false) with g_assert_not_reached()
+  hw/ppc: replace assert(false) with g_assert_not_reached()
+  migration: replace assert(false) with g_assert_not_reached()
+  target/i386/kvm: replace assert(false) with g_assert_not_reached()
+  tests/qtest: replace assert(false) with g_assert_not_reached()
+  accel/tcg: remove break after g_assert_not_reached()
+  block: remove break after g_assert_not_reached()
+  hw/acpi: remove break after g_assert_not_reached()
+  hw/gpio: remove break after g_assert_not_reached()
+  hw/misc: remove break after g_assert_not_reached()
+  hw/net: remove break after g_assert_not_reached()
+  hw/pci-host: remove break after g_assert_not_reached()
+  hw/scsi: remove break after g_assert_not_reached()
+  hw/tpm: remove break after g_assert_not_reached()
+  target/arm: remove break after g_assert_not_reached()
+  target/riscv: remove break after g_assert_not_reached()
+  tests/qtest: remove break after g_assert_not_reached()
+  ui: remove break after g_assert_not_reached()
+  fpu: remove break after g_assert_not_reached()
+  tcg/loongarch64: remove break after g_assert_not_reached()
+  scripts/checkpatch.pl: emit error when using assert(false)
 
-I think we can use atomic_long_t.
+ docs/spin/aio_notify_accept.promela     |  6 +++---
+ docs/spin/aio_notify_bug.promela        |  6 +++---
+ include/hw/s390x/cpu-topology.h         |  2 +-
+ accel/tcg/plugin-gen.c                  |  1 -
+ block/qcow2.c                           |  2 +-
+ block/ssh.c                             |  1 -
+ hw/acpi/aml-build.c                     |  3 +--
+ hw/arm/highbank.c                       |  2 +-
+ hw/char/avr_usart.c                     |  2 +-
+ hw/core/numa.c                          |  2 +-
+ hw/gpio/nrf51_gpio.c                    |  1 -
+ hw/hyperv/hyperv_testdev.c              |  6 +++---
+ hw/hyperv/vmbus.c                       | 12 ++++++------
+ hw/misc/imx6_ccm.c                      |  1 -
+ hw/misc/mac_via.c                       |  2 --
+ hw/net/e1000e_core.c                    |  2 +-
+ hw/net/i82596.c                         |  2 +-
+ hw/net/igb_core.c                       |  2 +-
+ hw/net/net_rx_pkt.c                     |  3 +--
+ hw/nvme/ctrl.c                          |  8 ++++----
+ hw/pci-host/gt64120.c                   |  2 --
+ hw/pci/pci-stub.c                       |  4 ++--
+ hw/ppc/spapr_events.c                   |  2 +-
+ hw/scsi/virtio-scsi.c                   |  1 -
+ hw/tpm/tpm_spapr.c                      |  1 -
+ hw/watchdog/watchdog.c                  |  2 +-
+ migration/dirtyrate.c                   |  2 +-
+ migration/migration-hmp-cmds.c          |  2 +-
+ migration/postcopy-ram.c                | 14 +++++++-------
+ migration/ram.c                         |  6 +++---
+ qobject/qlit.c                          |  2 +-
+ qobject/qnum.c                          |  8 ++++----
+ system/rtc.c                            |  2 +-
+ target/arm/hyp_gdbstub.c                |  1 -
+ target/i386/kvm/kvm.c                   |  4 ++--
+ target/ppc/dfp_helper.c                 |  8 ++++----
+ target/ppc/mmu_helper.c                 |  2 +-
+ target/riscv/monitor.c                  |  1 -
+ tests/qtest/ipmi-bt-test.c              |  2 +-
+ tests/qtest/ipmi-kcs-test.c             |  4 ++--
+ tests/qtest/migration-helpers.c         |  1 -
+ tests/qtest/numa-test.c                 | 10 +++++-----
+ tests/qtest/rtl8139-test.c              |  2 +-
+ tests/unit/test-xs-node.c               |  4 ++--
+ ui/qemu-pixman.c                        |  1 -
+ fpu/softfloat-parts.c.inc               |  2 --
+ target/riscv/insn_trans/trans_rvv.c.inc |  2 --
+ tcg/loongarch64/tcg-target.c.inc        |  1 -
+ scripts/checkpatch.pl                   |  3 +++
+ 49 files changed, 72 insertions(+), 90 deletions(-)
 
-It would be really great if we did a substitution like this. That
-would address my above concern about barrier() (atomic_set_release,
-for example, implies a barrier() that we otherwise need to include).
+-- 
+2.39.2
 
-[1]: https://www.kernel.org/doc/Documentation/memory-barriers.txt
-(GUARANTEES + COMPILER BARRIER)
 
