@@ -1,302 +1,188 @@
-Return-Path: <kvm+bounces-26258-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26240-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A08829736C9
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 14:05:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF35973682
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 13:55:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C506D1C25BB1
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:05:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C5332876D3
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 11:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF8319A28B;
-	Tue, 10 Sep 2024 12:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058A418FC72;
+	Tue, 10 Sep 2024 11:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZfaKzm8m"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0760199FBE;
-	Tue, 10 Sep 2024 12:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D9718C003;
+	Tue, 10 Sep 2024 11:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725969767; cv=none; b=QxCRudpC9R0u6+3HWBtqExXkL6pdp8xwqSIWBf77vuqGKFypy6HfkpfDb8gGIhGURAMaG97qHT9Fijs4JSoFeI9b56YTTBtL/pAm+Q4RukQsiqZLFcvhXaHNcmgI5TrhDMwMuWdzXr62NO50VLHnKmjZmFjnsZbhBcQ+ijq/b9A=
+	t=1725969306; cv=none; b=qwwdeK4pQ4fq64l2Ryr9h686w3clpXs9RoC6F+a1XEPMGxKIr1Nha5DPV1N0YqRZfRiafKn1hqo8M/gy0m/ZTBG3aPbu0YEw/YOIgHFckhKZrTvBTqOqAz5VNmrAgxDLOOU4+/a8buyldWwgquCFY/IYAJKyyTrseYowQzQ3Vx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725969767; c=relaxed/simple;
-	bh=0sGCuxGAGG2RC7q/gsCHk89YH++xo72bXbcBO10obUY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W//S4EDvfZje9I82wpz+MuFVgN+ZfWRs4XqVBE7jJZSED2geCiPjWBcC8ddJ8RTxsmkNijc0tbvVnEAl2Dtg9QDbr5/1unfan3b+LxmgLsvu64ceYqjtMpalQXtg5iqbbmpO7IfpKJVslyyqddxodwKfub2VxUch4HqSJeqBnVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.185])
-	by gateway (Coremail) with SMTP id _____8CxyuldNeBms68DAA--.8591S3;
-	Tue, 10 Sep 2024 20:02:37 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-	by front2 (Coremail) with SMTP id qciowMDx_OVVNeBmE2MDAA--.16225S7;
-	Tue, 10 Sep 2024 20:02:35 +0800 (CST)
-From: Xianglai Li <lixianglai@loongson.cn>
-To: linux-kernel@vger.kernel.org
-Cc: Bibo Mao <maobibo@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Xianglai li <lixianglai@loongson.cn>
-Subject: [PATCH V3 11/11] LoongArch: KVM: Add irqfd support
-Date: Tue, 10 Sep 2024 19:45:01 +0800
-Message-Id: <20240910114501.4062476-6-lixianglai@loongson.cn>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20240910114501.4062476-1-lixianglai@loongson.cn>
-References: <20240910114501.4062476-1-lixianglai@loongson.cn>
+	s=arc-20240116; t=1725969306; c=relaxed/simple;
+	bh=eah5Sen1l0Aw0ayjvsVeKGFBQX7863WPYIJIOytk2U4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BzDHkRul1KHLVDERhRRI5J66b8hywh1txTJHJTHKQiX5lIwTTjv9Aegk37QgHb5txmqnC8LbmI6VT1Kk9/RwkEjE+tdu0L+h+7CIOCMJBdo64uykcOwhnxm1g+pYhE44/WVTkAquVgXuArGhMothpjFWMOoqosSOcqU3PlALwEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZfaKzm8m; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725969304; x=1757505304;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=eah5Sen1l0Aw0ayjvsVeKGFBQX7863WPYIJIOytk2U4=;
+  b=ZfaKzm8mWeWxMKl2Xvp2C/LjSoiX82RG5NEJzuuz1y/bokZIkX2Uh4JI
+   ECZmlsmlXv0C0PiQRcGxRwEcPR4EKXbfjbJvdX+LNDUUwM8P47ry55Vci
+   I4B3jTEIECHjbP3PjRJMDTD+ChSWJ5JheKHmmtgavyb3Qo5IP2aD7Gt49
+   8jd8wVSn3WqClTFbxxyuNSlfoxlN+r7jopE0j2jJoaF5MoMxVO9ckjywi
+   aUZU9+WmK8AEe4/zbJ3byd8uJSw7FF/I+Duc3QMUdJgLhOGUg1gi1Pvsg
+   AqXHh4NGSuUvSnSSRHmd9Haoj5RD4+ZSKl583QMAISVWHOOTfBHyl+Qf4
+   Q==;
+X-CSE-ConnectionGUID: umelgkIqTLGV2UKQfXJ8PQ==
+X-CSE-MsgGUID: 3/1ZZbgOTBqYU+3yjkHwEA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="24525206"
+X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
+   d="scan'208";a="24525206"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 04:55:04 -0700
+X-CSE-ConnectionGUID: a5ta+mteSUGBdy9s1uL/9w==
+X-CSE-MsgGUID: +Me8vOSjRhqQMxh0Ue2FBw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
+   d="scan'208";a="71990261"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.115.59])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 04:55:00 -0700
+Message-ID: <88eb6d03-2fb4-49cf-944a-6ec64bf83ac8@intel.com>
+Date: Tue, 10 Sep 2024 14:54:54 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 20/21] KVM: TDX: Finalize VM initialization
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+ kvm@vger.kernel.org
+Cc: kai.huang@intel.com, dmatlack@google.com, isaku.yamahata@gmail.com,
+ yan.y.zhao@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org
+References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
+ <20240904030751.117579-21-rick.p.edgecombe@intel.com>
+ <acf52e41-e78c-479d-9736-419a86002982@redhat.com>
+Content-Language: en-US
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <acf52e41-e78c-479d-9736-419a86002982@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qciowMDx_OVVNeBmE2MDAA--.16225S7
-X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Enable the KVM_IRQ_ROUTING KVM_IRQCHIP KVM_MSI configuration item,
-increase the KVM_CAP_IRQCHIP capability, and implement the query
-interface of the kernel irqchip.
+On 10/09/24 13:25, Paolo Bonzini wrote:
+> On 9/4/24 05:07, Rick Edgecombe wrote:
+>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>
+>> Add a new VM-scoped KVM_MEMORY_ENCRYPT_OP IOCTL subcommand,
+>> KVM_TDX_FINALIZE_VM, to perform TD Measurement Finalization.
+>>
+>> Documentation for the API is added in another patch:
+>> "Documentation/virt/kvm: Document on Trust Domain Extensions(TDX)"
+>>
+>> For the purpose of attestation, a measurement must be made of the TDX VM
+>> initial state. This is referred to as TD Measurement Finalization, and
+>> uses SEAMCALL TDH.MR.FINALIZE, after which:
+>> 1. The VMM adding TD private pages with arbitrary content is no longer
+>>     allowed
+>> 2. The TDX VM is runnable
+>>
+>> Co-developed-by: Adrian Hunter <adrian.hunter@intel.com>
+>> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+>> ---
+>> TDX MMU part 2 v1:
+>>   - Added premapped check.
+>>   - Update for the wrapper functions for SEAMCALLs. (Sean)
+>>   - Add check if nr_premapped is zero.  If not, return error.
+>>   - Use KVM_BUG_ON() in tdx_td_finalizer() for consistency.
+>>   - Change tdx_td_finalizemr() to take struct kvm_tdx_cmd *cmd and return error
+>>     (Adrian)
+>>   - Handle TDX_OPERAND_BUSY case (Adrian)
+>>   - Updates from seamcall overhaul (Kai)
+>>   - Rename error->hw_error
+>>
+>> v18:
+>>   - Remove the change of tools/arch/x86/include/uapi/asm/kvm.h.
+>>
+>> v15:
+>>   - removed unconditional tdx_track() by tdx_flush_tlb_current() that
+>>     does tdx_track().
+>> ---
+>>   arch/x86/include/uapi/asm/kvm.h |  1 +
+>>   arch/x86/kvm/vmx/tdx.c          | 28 ++++++++++++++++++++++++++++
+>>   2 files changed, 29 insertions(+)
+>>
+>> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+>> index 789d1d821b4f..0b4827e39458 100644
+>> --- a/arch/x86/include/uapi/asm/kvm.h
+>> +++ b/arch/x86/include/uapi/asm/kvm.h
+>> @@ -932,6 +932,7 @@ enum kvm_tdx_cmd_id {
+>>       KVM_TDX_INIT_VM,
+>>       KVM_TDX_INIT_VCPU,
+>>       KVM_TDX_INIT_MEM_REGION,
+>> +    KVM_TDX_FINALIZE_VM,
+>>       KVM_TDX_GET_CPUID,
+>>         KVM_TDX_CMD_NR_MAX,
+>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>> index 796d1a495a66..3083a66bb895 100644
+>> --- a/arch/x86/kvm/vmx/tdx.c
+>> +++ b/arch/x86/kvm/vmx/tdx.c
+>> @@ -1257,6 +1257,31 @@ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu)
+>>       ept_sync_global();
+>>   }
+>>   +static int tdx_td_finalizemr(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+>> +{
+>> +    struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+>> +
+>> +    if (!is_hkid_assigned(kvm_tdx) || is_td_finalized(kvm_tdx))
+>> +        return -EINVAL;
+>> +    /*
+>> +     * Pages are pending for KVM_TDX_INIT_MEM_REGION to issue
+>> +     * TDH.MEM.PAGE.ADD().
+>> +     */
+>> +    if (atomic64_read(&kvm_tdx->nr_premapped))
+>> +        return -EINVAL;
+> 
+> I suggest moving all of patch 16, plus the
+> 
+> +    WARN_ON_ONCE(!atomic64_read(&kvm_tdx->nr_premapped));
+> +    atomic64_dec(&kvm_tdx->nr_premapped);
+> 
+> lines of patch 19, into this patch.
+> 
+>> +    cmd->hw_error = tdh_mr_finalize(kvm_tdx);
+>> +    if ((cmd->hw_error & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY)
+>> +        return -EAGAIN;
+>> +    if (KVM_BUG_ON(cmd->hw_error, kvm)) {
+>> +        pr_tdx_error(TDH_MR_FINALIZE, cmd->hw_error);
+>> +        return -EIO;
+>> +    }
+>> +
+>> +    kvm_tdx->finalized = true;
+>> +    return 0;
+> 
+> This should also set pre_fault_allowed to true.
 
-Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
----
-Cc: Bibo Mao <maobibo@loongson.cn> 
-Cc: Huacai Chen <chenhuacai@kernel.org> 
-Cc: kvm@vger.kernel.org 
-Cc: loongarch@lists.linux.dev 
-Cc: Paolo Bonzini <pbonzini@redhat.com> 
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn> 
-Cc: WANG Xuerui <kernel@xen0n.name> 
-Cc: Xianglai li <lixianglai@loongson.cn> 
+Ideally, need to ensure it is not possible for another CPU
+to see kvm_tdx->finalized==false and pre_fault_allowed==true
 
- arch/loongarch/kvm/Kconfig        |  3 ++
- arch/loongarch/kvm/Makefile       |  1 +
- arch/loongarch/kvm/intc/pch_pic.c | 27 ++++++++++
- arch/loongarch/kvm/irqfd.c        | 87 +++++++++++++++++++++++++++++++
- arch/loongarch/kvm/vm.c           | 19 ++++++-
- 5 files changed, 136 insertions(+), 1 deletion(-)
- create mode 100644 arch/loongarch/kvm/irqfd.c
-
-diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
-index 248744b4d086..2947f93efb34 100644
---- a/arch/loongarch/kvm/Kconfig
-+++ b/arch/loongarch/kvm/Kconfig
-@@ -30,6 +30,9 @@ config KVM
- 	select HAVE_KVM_READONLY_MEM
- 	select KVM_XFER_TO_GUEST_WORK
- 	select SCHED_INFO
-+	select HAVE_KVM_IRQ_ROUTING
-+	select HAVE_KVM_IRQCHIP
-+	select HAVE_KVM_MSI
- 	help
- 	  Support hosting virtualized guest machines using
- 	  hardware virtualization extensions. You will need
-diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
-index 97b2adf08206..3a01292f71cc 100644
---- a/arch/loongarch/kvm/Makefile
-+++ b/arch/loongarch/kvm/Makefile
-@@ -21,5 +21,6 @@ kvm-y += vm.o
- kvm-y += intc/ipi.o
- kvm-y += intc/eiointc.o
- kvm-y += intc/pch_pic.o
-+kvm-y += irqfd.o
- 
- CFLAGS_exit.o	+= $(call cc-option,-Wno-override-init,)
-diff --git a/arch/loongarch/kvm/intc/pch_pic.c b/arch/loongarch/kvm/intc/pch_pic.c
-index 94e964a617e0..41469a426cca 100644
---- a/arch/loongarch/kvm/intc/pch_pic.c
-+++ b/arch/loongarch/kvm/intc/pch_pic.c
-@@ -447,6 +447,28 @@ static int kvm_pch_pic_set_attr(struct kvm_device *dev,
- 	return ret;
- }
- 
-+static int kvm_setup_default_irq_routing(struct kvm *kvm)
-+{
-+	struct kvm_irq_routing_entry *entries;
-+
-+	u32 nr = KVM_IRQCHIP_NUM_PINS;
-+	int i, ret;
-+
-+	entries = kcalloc(nr, sizeof(*entries), GFP_KERNEL);
-+	if (!entries)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < nr; i++) {
-+		entries[i].gsi = i;
-+		entries[i].type = KVM_IRQ_ROUTING_IRQCHIP;
-+		entries[i].u.irqchip.irqchip = 0;
-+		entries[i].u.irqchip.pin = i;
-+	}
-+	ret = kvm_set_irq_routing(kvm, entries, nr, 0);
-+	kfree(entries);
-+	return 0;
-+}
-+
- static void kvm_pch_pic_destroy(struct kvm_device *dev)
- {
- 	struct kvm *kvm;
-@@ -463,6 +485,7 @@ static void kvm_pch_pic_destroy(struct kvm_device *dev)
- 
- static int kvm_pch_pic_create(struct kvm_device *dev, u32 type)
- {
-+	int ret;
- 	struct loongarch_pch_pic *s;
- 	struct kvm *kvm = dev->kvm;
- 
-@@ -470,6 +493,10 @@ static int kvm_pch_pic_create(struct kvm_device *dev, u32 type)
- 	if (kvm->arch.pch_pic)
- 		return -EINVAL;
- 
-+	ret = kvm_setup_default_irq_routing(kvm);
-+	if (ret)
-+		return -ENOMEM;
-+
- 	s = kzalloc(sizeof(struct loongarch_pch_pic), GFP_KERNEL);
- 	if (!s)
- 		return -ENOMEM;
-diff --git a/arch/loongarch/kvm/irqfd.c b/arch/loongarch/kvm/irqfd.c
-new file mode 100644
-index 000000000000..bf67f329ebc9
---- /dev/null
-+++ b/arch/loongarch/kvm/irqfd.c
-@@ -0,0 +1,87 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2024 Loongson Technology Corporation Limited
-+ */
-+
-+#include <linux/kvm_host.h>
-+#include <trace/events/kvm.h>
-+#include <asm/kvm_pch_pic.h>
-+
-+static int kvm_set_ioapic_irq(struct kvm_kernel_irq_routing_entry *e,
-+					struct kvm *kvm, int irq_source_id,
-+					int level, bool line_status)
-+{
-+	/* ioapic pin (0 ~ 64) <---> gsi(0 ~ 64) */
-+	pch_pic_set_irq(kvm->arch.pch_pic, e->irqchip.pin, level);
-+
-+	return 0;
-+}
-+
-+/*
-+ * kvm_set_routing_entry: populate a kvm routing entry
-+ * from a user routing entry
-+ *
-+ * @kvm: the VM this entry is applied to
-+ * @e: kvm kernel routing entry handle
-+ * @ue: user api routing entry handle
-+ * return 0 on success, -EINVAL on errors.
-+ */
-+int kvm_set_routing_entry(struct kvm *kvm,
-+			struct kvm_kernel_irq_routing_entry *e,
-+			const struct kvm_irq_routing_entry *ue)
-+{
-+	int r = -EINVAL;
-+
-+	switch (ue->type) {
-+	case KVM_IRQ_ROUTING_IRQCHIP:
-+		e->set = kvm_set_ioapic_irq;
-+
-+		e->irqchip.irqchip = ue->u.irqchip.irqchip;
-+		e->irqchip.pin = ue->u.irqchip.pin;
-+
-+		if (e->irqchip.pin >= KVM_IRQCHIP_NUM_PINS)
-+			goto out;
-+		break;
-+	case KVM_IRQ_ROUTING_MSI:
-+		e->set = kvm_set_msi;
-+		e->msi.address_lo = ue->u.msi.address_lo;
-+		e->msi.address_hi = ue->u.msi.address_hi;
-+		e->msi.data = ue->u.msi.data;
-+		break;
-+	default:
-+		goto out;
-+	}
-+	r = 0;
-+out:
-+	return r;
-+}
-+
-+int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
-+		struct kvm *kvm, int irq_source_id,
-+		int level, bool line_status)
-+{
-+	if (e->type == KVM_IRQ_ROUTING_MSI) {
-+		pch_msi_set_irq(kvm, e->msi.data, 1);
-+		return 0;
-+	}
-+
-+	return -EWOULDBLOCK;
-+}
-+
-+/**
-+ * kvm_set_msi: inject the MSI corresponding to the
-+ * MSI routing entry
-+ *
-+ * This is the entry point for irqfd MSI injection
-+ * and userspace MSI injection.
-+ */
-+int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
-+		struct kvm *kvm, int irq_source_id,
-+		int level, bool line_status)
-+{
-+	if (!level)
-+		return -1;
-+
-+	pch_msi_set_irq(kvm, e->msi.data, level);
-+	return 0;
-+}
-diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
-index 5a60474bb933..2cb3288f4e85 100644
---- a/arch/loongarch/kvm/vm.c
-+++ b/arch/loongarch/kvm/vm.c
-@@ -71,6 +71,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	int r;
- 
- 	switch (ext) {
-+	case KVM_CAP_IRQCHIP:
- 	case KVM_CAP_ONE_REG:
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_READONLY_MEM:
-@@ -103,7 +104,18 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 
- int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- {
--	return -ENOIOCTLCMD;
-+	int r;
-+
-+	switch (ioctl) {
-+	case KVM_CREATE_IRQCHIP: {
-+		r = 1;
-+		break;
-+	}
-+	default:
-+		r = -ENOIOCTLCMD;
-+	}
-+
-+	return r;
- }
- 
- int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *data,
-@@ -137,3 +149,8 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *data,
- 
- 	return ret;
- }
-+
-+bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
-+{
-+	return (bool)((!!kvm->arch.eiointc) && (!!kvm->arch.pch_pic));
-+}
--- 
-2.39.1
+Perhaps also, to document the dependency, return an error if
+pre_fault_allowed is true in tdx_mem_page_record_premap_cnt().
 
 
