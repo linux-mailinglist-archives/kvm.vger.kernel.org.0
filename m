@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-26387-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26388-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6C19745C0
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 00:20:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 772439745C3
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 00:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0CA01C25929
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 22:20:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C236289188
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 22:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD98A1AED41;
-	Tue, 10 Sep 2024 22:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6541AED47;
+	Tue, 10 Sep 2024 22:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zIIn/gEM"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="izifK3UJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9855A1B150D
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 22:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC6F1B3F36
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 22:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726006691; cv=none; b=sxWTiwDzyA9pclVV/ti8itcMiTzaLAYBTotBm4O0rzBOX0dkjlJuNjRq9gqgCLRKE6v4rFE7lcma4baYEa7i3pMD4JeLrRCi8SUmYSlccHESf56C5dvOquNj0GcQCOI/nbl2WsmDOYO3nwEZUQM9TGytiDw34MkrngGVzuntRdc=
+	t=1726006693; cv=none; b=I5slG0j/lLa2CWiNp5ahhFbN9NAP5Svxy+ElN5/7UfNRAsNTV/u0ooKWX83TjfeCXKQ510jtaxzbKm/016nBhsa1aApGyJkvoQBlouEv4MoWKdlX0cbdFrTM5QA8CZMedG9ln/VkCtErnVIYnGgjt6qedDDytIirUVZ3nplPErg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726006691; c=relaxed/simple;
-	bh=U/hJ8AHDBxN4vbSkcUYneem7sLGkz/PxyrW5VkLEjPY=;
+	s=arc-20240116; t=1726006693; c=relaxed/simple;
+	bh=7tnyEKGF6I0kdsqEPySzPknXjOBFuB9tDuzYsVVK+fE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NzofjCRJuTAUOE+YzFDCuCElYVtXpwYMy1NWuzrCiEaQ3BcnrvxRW0LbJYsyzTy7zm5U8qp+gxcJvpKtrU8BC1Gkna8bkypzvNE12G32S4uy8Cg8g75RsLheh60jV+6/lp2V8BnLhmfNR/1Gr8/9Y2BfJWwwl+ILazHIuHcpeSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zIIn/gEM; arc=none smtp.client-ip=209.85.210.170
+	 MIME-Version; b=qckC77qZiYplzLyy5oT717bJlxyYLr1zMZIqdW3YldEJNA3kzn6wlr1QinPiix1pXNO04UZLddEjPDrp5UyxUwbwBai6FVdZLLiCl7vT9aWBIfRqYl1Fk1tcgNDWLCmXo6ZigWGrN38IT74KJuXhK7ZFxQ+KSF0d9JfPtr4lIQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=izifK3UJ; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-718e6299191so2047548b3a.2
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 15:18:09 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-718f28f77f4so1195246b3a.1
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 15:18:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726006689; x=1726611489; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726006691; x=1726611491; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w3yhi+ZDTWCfsZmUwBuf/pfnGgC91a9e/gCoVrv3y5U=;
-        b=zIIn/gEMSPl+NTeadxYcwIKFvNKGgbrFiBrs8TVpHIk3bpz65nHUiaOBEllR+md/9A
-         NPUO9Uhe838GIIEMdE/aeA85nFW87z77r62w+2oKRT/FKXY4RKOeBTKHcTaKue1rRlEc
-         VRGS9ufTpVjOTo9J4btzd4iMMe/PI7waUNVH3wMAys4N7vxTVMImJ4fKC4L0LQsN3ONW
-         UKt6qHDuTfsmARyonZVOyvVks8fL+7k13ASYw535p49n90zO8ieI35qWtpfgDWZxl4XA
-         yoIXyCfsOSRCGyKs4HXaRgcmZ18+lqCFNBHpNaOlSmmYE5EyT7/shNxJlDt7kuFTWe5N
-         +WSw==
+        bh=nwKevNIRKkN+EDjbfQlFt24U9FBu+BfVdKedtfXUqZs=;
+        b=izifK3UJ5hCKlDQzWmLdFp0VawhL7+ra0Zpk6a0i4JBtqkRLOrA3pjPOjkxwwFj9OK
+         PS5fbjm7YRQ9K6vCk66yox2DclqdE+AZVAtUtukYXQkgmmkgCEHtskyZGWK/IKui9CIt
+         uwh/9PnodDeF7+xQSo0tOl35nHOw0fZ3U/j1DW/DAZqlxU6Z0IpLXm8b2GcnhqyeyULS
+         kjEFEYHBo/3Gumhg0Z1POp7fQ2OSsk7JiIaRA5iPoy6LRclCxGdngMJ9/6/sOWudNIxu
+         ADNCG3oHRc0utFpIQUe2pY7sNDSg9N0njHX6ZD9RZEwnqceif9BkSBb6p/HL3zQ83+UD
+         OvMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726006689; x=1726611489;
+        d=1e100.net; s=20230601; t=1726006691; x=1726611491;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w3yhi+ZDTWCfsZmUwBuf/pfnGgC91a9e/gCoVrv3y5U=;
-        b=LCf7gkxoy3EljOmvsfY6NOUj2DfKhlj3D1dw7IFMjlKi9T4k800UcNB/CMNMVv32F0
-         dUGnxXULLu3XR9omf1tSOjoaS0o9CcZz6h8tkrSSn31qQUT39YdgjAVCm7BNZSCwdBgN
-         1kCOxCzexBoQ3lLtcCgvBruICyK38oXDL+JjEreJ9jJOTaKMRb4L7x+Dh9Gx4WlahmyM
-         bL4CMniyUDtgeAj2AK8oJJmtKQGG5R1G11PKmTkaDIHuFsiWx89oIaVGSGQHvrF4YsOC
-         q9/lEDrp+yMt15XxMb5ErPuYXmk4nIQucbLrvHZvQZCFSaSNVK161ol8TDcBoz2QViWk
-         fdqg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8pnPeHLPFGqtnfxJzEq7PW52zN95NaIYJSlF9mMpGGJFKstQTVlWum+ID6QRDpvJGmi8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2g6GyM5X9NWtPodnB6OGYt7G54j0tS3OV83nlHFY9vWYnb/BC
-	SWHMHNYR81BJSHVnMcUQYg2lvwYgozeNSBei7KKRql27xkT4DzmY9LCfCVlPbu8=
-X-Google-Smtp-Source: AGHT+IFWVQXCFJBuiwg4sJ6d5t1Y5jRczP6OzJP2N7AUafUaS1UpRZkOWeoH/e+NIJwWwR2fc3KdxA==
-X-Received: by 2002:a05:6a00:218e:b0:717:9768:a4e7 with SMTP id d2e1a72fcca58-718d5ded0acmr15828847b3a.2.1726006688573;
-        Tue, 10 Sep 2024 15:18:08 -0700 (PDT)
+        bh=nwKevNIRKkN+EDjbfQlFt24U9FBu+BfVdKedtfXUqZs=;
+        b=PDk5vZmVmssho1F6ftkcWDOmQgsRmY7q1T6ixJOfrFc0Rl6WhfwuowVZCUoFms2Vtu
+         888y3dgB0BrUIlZHVs3Ob4AAHIRQ3JsHECyFSuyRL4XKY3MnVfsHQ9QLZBFSt8pNIUOo
+         reV/NcyQr4k0wkyH/XyME4WCcrJmpBXUSpUjZdqx32gNIqqbdUlDq6xL9AOLqcOx6jps
+         VkNgq9HmPTZCa8x62pUFTF7JQ+hGl5JdIVhHIE9oEM9xcuy4jbUPYsy7MALxyzRDK2/h
+         2N9vnbI7pBJMjxLAT5GHrIW3U0MkorO5T9axNN5FSI2LxRjL6kLk67fq0EJ/hcnC1Etz
+         J0Jw==
+X-Forwarded-Encrypted: i=1; AJvYcCXwH4G8yY3eU7n1BuW+pqyo/H684QvU9DHnptnf/xTvxgAFGaWAIC7QhUnepRBSJ3hpFQ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8lNICT5ZmaCbO3gM92in1DyQP9UtzEiBad9XABJ1dxwLwwhxj
+	8C0Ca9z49Fq5NIMuHht0CiQqP1pek8r1SiwtoRI1X1s6nHlaEr8xMCz0PzxPG+A=
+X-Google-Smtp-Source: AGHT+IH1SlHsJsphQAKUCS+TONfXaMdTKjfpItrNVqpZABGJSlkB8aGqx2pcbEZTF3hMcOrMflu/7g==
+X-Received: by 2002:a05:6a00:2ea5:b0:714:25ee:df58 with SMTP id d2e1a72fcca58-71916e9b6ebmr1238405b3a.18.1726006690994;
+        Tue, 10 Sep 2024 15:18:10 -0700 (PDT)
 Received: from linaro.vn.shawcable.net ([2604:3d08:9384:1d00::9633])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71909003d0esm1884055b3a.93.2024.09.10.15.18.06
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71909003d0esm1884055b3a.93.2024.09.10.15.18.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 15:18:08 -0700 (PDT)
+        Tue, 10 Sep 2024 15:18:10 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Zhao Liu <zhao1.liu@intel.com>,
@@ -132,9 +132,9 @@ Cc: Zhao Liu <zhao1.liu@intel.com>,
 	Jean-Christophe Dubois <jcd@tribudubois.net>,
 	Jason Wang <jasowang@redhat.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH 37/39] fpu: remove break after g_assert_not_reached()
-Date: Tue, 10 Sep 2024 15:16:04 -0700
-Message-Id: <20240910221606.1817478-38-pierrick.bouvier@linaro.org>
+Subject: [PATCH 38/39] tcg/loongarch64: remove break after g_assert_not_reached()
+Date: Tue, 10 Sep 2024 15:16:05 -0700
+Message-Id: <20240910221606.1817478-39-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
 References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
@@ -148,29 +148,21 @@ Content-Transfer-Encoding: 8bit
 
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- fpu/softfloat-parts.c.inc | 2 --
- 1 file changed, 2 deletions(-)
+ tcg/loongarch64/tcg-target.c.inc | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/fpu/softfloat-parts.c.inc b/fpu/softfloat-parts.c.inc
-index a44649f4f4a..cc6e06b9761 100644
---- a/fpu/softfloat-parts.c.inc
-+++ b/fpu/softfloat-parts.c.inc
-@@ -1373,7 +1373,6 @@ static FloatPartsN *partsN(minmax)(FloatPartsN *a, FloatPartsN *b,
-             break;
-         default:
-             g_assert_not_reached();
--            break;
-         }
-         switch (b->cls) {
-         case float_class_normal:
-@@ -1386,7 +1385,6 @@ static FloatPartsN *partsN(minmax)(FloatPartsN *a, FloatPartsN *b,
-             break;
-         default:
-             g_assert_not_reached();
--            break;
-         }
+diff --git a/tcg/loongarch64/tcg-target.c.inc b/tcg/loongarch64/tcg-target.c.inc
+index 5b7ed5c176b..973601aec36 100644
+--- a/tcg/loongarch64/tcg-target.c.inc
++++ b/tcg/loongarch64/tcg-target.c.inc
+@@ -650,7 +650,6 @@ static int tcg_out_setcond_int(TCGContext *s, TCGCond cond, TCGReg ret,
+ 
+     default:
+         g_assert_not_reached();
+-        break;
      }
  
+     return ret | flags;
 -- 
 2.39.2
 
