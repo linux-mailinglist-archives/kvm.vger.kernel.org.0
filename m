@@ -1,272 +1,180 @@
-Return-Path: <kvm+bounces-26232-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26233-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42DD0973573
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:49:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34DF49735AE
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:56:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 676421C25140
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 10:49:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACA461F255F1
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 10:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575AC188A28;
-	Tue, 10 Sep 2024 10:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C0C189BBA;
+	Tue, 10 Sep 2024 10:56:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JoH/IowN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cD16+RVy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA81A143880
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0437E5674D
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725965374; cv=none; b=q3XO2gnVwBrog/aq04rqrB0pGFyrF7htUK18dsTM3UhKZc3xLL2jhAM049FqCtmvhU8D0EG54adi4t6GvygEX34KYaCXbv1FdGSq4uOABi3WjMBT5a/tA82i329ZIYeddQAFcBHk4CUiv6s+jWnGEYfVD+3akBy50VKfd2Ms6XI=
+	t=1725965762; cv=none; b=jBZQCFHE8Src6SLzRBuJ3TGEK2MH1c3emdiLvVC0EwZtDK3L0Vmr/8lkdiG/mL4l2DE6rxipmQbBSfhu6/vZBzV4B3qoCEgvECKwa3Z9DIs0wMbZQLnSM7fSP4H3xCKukuXaG7Uq1yGcvIMVPXgip4s75WOtHklNwB2Vn5eR/AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725965374; c=relaxed/simple;
-	bh=h2I4l+F4I3vf8PFeFEB+/ZN6u70oYt1viZx4df4lcOw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZDj8q1Ms2IR3DafZE9BgZqbYKq/yxchLR9f+9tXkSOltqKSIBCsitmsJgy8pe6xSXNvEt3662juiAT5S7B7iyTpC1cpXfrb/CnD/ZYv1UcpFnGwprF8VEHUtY3Hj7UH+DB7NuGOpeoGL+DaKb3NnXl+n0g5z3hprr+6rjjEYy1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JoH/IowN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725965371;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=LOmcBxv9dCrK96rLts0gHO5lvQM5BwbFhTJhXF46Ga0=;
-	b=JoH/IowNKVa6cDur2wSFN9SLc1C+PAfDU189YgD2ETDikv+LYdgKnB6LdGBVlnkwjPWzgo
-	CH9FCSp8YeiMZOWkaTztsLf9gRX0xqxp6dCEU7VbECsEuKBShi10Nu1mV+uQzM2XxIh31Z
-	TyhxCh8yeVz/koQObgdo5w6UT1WpPZk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-83-Oc4FUPvXPDK_HDxJLi-H3A-1; Tue, 10 Sep 2024 06:49:28 -0400
-X-MC-Unique: Oc4FUPvXPDK_HDxJLi-H3A-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42caf073db8so26277065e9.3
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 03:49:28 -0700 (PDT)
+	s=arc-20240116; t=1725965762; c=relaxed/simple;
+	bh=E0rU2Bx/jS99DDu2M3sefvBWt8JU8LAOi0vcShQGr6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QoYkpOxm1LHCLaySLumnTmLBmHbaJG8lRKDoa/r8TruMyKm5RbRr1BWj/qUsHdGL4mFuAonhdDvzZU3baPkBrZRXGBwMuxCnQUcqTbV06alsgJqAJBObwuB6NF0BJrLS+SzlHZSSrq4dZElYGP4Y2d3Tv+uHT9d9EoyuOgOYJMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cD16+RVy; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c2460e885dso11596a12.0
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 03:56:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725965759; x=1726570559; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vHmk114QIZCjlFSKd2nx+MtW7wZ0G3Zn0tQIsPkVXhc=;
+        b=cD16+RVy8eM9jzRWyDKago4J3Vok7SDzOz/X9qurVGKw8twoB/6rG3ms34NoVyqr6q
+         znpfcu/k3LJ3AyxmM0lIricHTYiXyd337F6eA1Hq81gaTBWC2j7ZhqhSpuu053307toG
+         VxTzGlg1Jz5Vg+AdcLvjNvrJxCu2uawlazXas6aSkSjMUHUZPooaNzzYdf36nCFcTOeV
+         Ra+Qlh5VeD+GCIMak4NEM8hyEPtitzWU11I7n4q7ZlF/DQ6zYcn53QSk77+LNiUFCmdW
+         A8gVyqpNGaed+OEHlUahmKFvl2Z4YElWGW36ytFGjTEPJvYUGjNhNCEdRLwNofISZl0J
+         p7gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725965367; x=1726570167;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LOmcBxv9dCrK96rLts0gHO5lvQM5BwbFhTJhXF46Ga0=;
-        b=e+BgMQt/S3S6aF5GM/w+3WGek2fbZrYbnWetzGslK/gKPS8nFtuOjNR8/D9AnVVpGk
-         +5YwEqUa6PT3JpGDnwEkGIoCm7JNeA9IUT2UrfIzAA+QvNtanyw/P22qjrXt9SgkE5C1
-         6yfKl3/dYqE3Daf9uDOsEP9JZ247kx4gbqiIz6+aRJxY7BlnjU3LvYtWakegAXFTBjmN
-         bLrtTl5ns5NVhh9idMw8HyGMkYhtYR9KQ5Q+L3zoklLLxb8RRiOoe5Qt4l241KFfHvtw
-         WTPfkkatgp/DU6HDwA+gT0TqttVp9zosa/7nVO5vYDzWvnaz0Sc8QoPpeQ3JNy2NzimW
-         wyOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXCDdM6o1xAwyt5HFXMJ30JcwqH/SsuVf8PbQ8bSHoDNb9BNuf0kYaK3A9pY7keK7EpGUY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYXYlW+kAqJZOE0Xb0aCMsvajnGs7obG/hO6wadDpyYkOJhnA3
-	Fej7+Iq9UoQ/T9wk54ZXsgvCioTPs9eiZraQ5UvGnmL6kp4m/lu2g/VbBGn533vTX9Rvm/P124i
-	6QU+sR4dOwKvrsfK6BxtRUi/QguxMZ5i5S7QYR4l6pfsYIX2Qtg==
-X-Received: by 2002:a05:600c:3ca7:b0:428:f0c2:ef4a with SMTP id 5b1f17b1804b1-42c9f97caa0mr112636285e9.13.1725965367241;
-        Tue, 10 Sep 2024 03:49:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH3TF6YkVmUetJXRdL2vleI3SxkX6kg071NsA6CgMW58eqsqFgskcQSrZBYjV9Ty+GkWXBGUA==
-X-Received: by 2002:a05:600c:3ca7:b0:428:f0c2:ef4a with SMTP id 5b1f17b1804b1-42c9f97caa0mr112636015e9.13.1725965366668;
-        Tue, 10 Sep 2024 03:49:26 -0700 (PDT)
-Received: from [192.168.10.81] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42caeb32678sm107181275e9.16.2024.09.10.03.49.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 03:49:25 -0700 (PDT)
-Message-ID: <09df9848-b425-4f8b-8fb5-dcd6929478de@redhat.com>
-Date: Tue, 10 Sep 2024 12:49:24 +0200
+        d=1e100.net; s=20230601; t=1725965759; x=1726570559;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vHmk114QIZCjlFSKd2nx+MtW7wZ0G3Zn0tQIsPkVXhc=;
+        b=uyz2FhTJk52qgN/RLCRCRyZWrSo1XkGc1cwXPObHWpIgAs86oFZFNe2KoqazlbOzTg
+         PksDIDUdvlk12uV/pMQvtxt6KVst2eqahlH3lIogpkkQ5GR+VTKHVcB5L15yEfSEI1vC
+         l+AnyZmUGOxJOrpgY5gyLOQBu8DfwMt0A8JO10r1XgSGutxtZXP19fZCZzT6c8Jy8xrk
+         si0zp54NXn0xZu79xUwg2Ig9Z0cpGckuaop7G+NKRY+2jP3pHJs+PBs5PWUlGe/5bGBU
+         ICkkyLqhyXF4RerGUvtOFlqgTwjlXvenNpJwzMIOShGDl5wC++SiGLrQra7tWFR7L+Pz
+         wOgg==
+X-Forwarded-Encrypted: i=1; AJvYcCWDyuAr3v9gPCy/loLcPnSOQm4Xwu9CRwJNTqS6/zl7IiInYGGqmlTA6XLWgKL5DbpcQ+8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIe/lcKfNCOw8wuazkZEUF16px+Kda+6NR4bs/YltamWY3Honm
+	bj4pXxYjQIcHA2G3Tg3MN6zaEWPJ4BgenF0NgT/rdfciQXUeImcxBHSvkhZWgw==
+X-Google-Smtp-Source: AGHT+IH5Z6CO+MKfDYUG1iOU31Fa2e8Ac+77rN2VKHvSd6OZvtfGFA8hOAHmo3xhEkofbaoqsCkAhQ==
+X-Received: by 2002:a05:6402:34d5:b0:58b:15e4:d786 with SMTP id 4fb4d7f45d1cf-5c4040d9d24mr152948a12.5.1725965758834;
+        Tue, 10 Sep 2024 03:55:58 -0700 (PDT)
+Received: from google.com (205.215.190.35.bc.googleusercontent.com. [35.190.215.205])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb8afc9sm108460105e9.44.2024.09.10.03.55.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 03:55:58 -0700 (PDT)
+Date: Tue, 10 Sep 2024 10:55:51 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>,
+	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Moritz Fischer <mdf@kernel.org>,
+	Michael Shavit <mshavit@google.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v2 2/8] iommu/arm-smmu-v3: Use S2FWB when available
+Message-ID: <ZuAlt9SsijRxuGLk@google.com>
+References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ <2-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ <ZtHhdj6RAKACBCUG@google.com>
+ <20240830164019.GU3773488@nvidia.com>
+ <ZtWFkR0eSRM4ogJL@google.com>
+ <20240903000546.GD3773488@nvidia.com>
+ <ZtbBTX96OWdONhaQ@google.com>
+ <20240903233340.GH3773488@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 16/21] KVM: TDX: Premap initial guest memory
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- kvm@vger.kernel.org
-Cc: kai.huang@intel.com, dmatlack@google.com, isaku.yamahata@gmail.com,
- yan.y.zhao@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org
-References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
- <20240904030751.117579-17-rick.p.edgecombe@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240904030751.117579-17-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240903233340.GH3773488@nvidia.com>
 
-On 9/4/24 05:07, Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Tue, Sep 03, 2024 at 08:33:40PM -0300, Jason Gunthorpe wrote:
+> On Tue, Sep 03, 2024 at 07:57:01AM +0000, Mostafa Saleh wrote:
 > 
-> Update TDX's hook of set_external_spte() to record pre-mapping cnt instead
-> of doing nothing and returning when TD is not finalized.
+> > Basically, I believe we shouldn’t set FWB blindly just because it’s supported,
+> > I don’t see how it’s useful for stage-2 only domains.
 > 
-> TDX uses ioctl KVM_TDX_INIT_MEM_REGION to initialize its initial guest
-> memory. This ioctl calls kvm_gmem_populate() to get guest pages and in
-> tdx_gmem_post_populate(), it will
-> (1) Map page table pages into KVM mirror page table and private EPT.
-> (2) Map guest pages into KVM mirror page table. In the propagation hook,
->      just record pre-mapping cnt without mapping the guest page into private
->      EPT.
-> (3) Map guest pages into private EPT and decrease pre-mapping cnt.
-> 
-> Do not map guest pages into private EPT directly in step (2), because TDX
-> requires TDH.MEM.PAGE.ADD() to add a guest page before TD is finalized,
-> which copies page content from a source page from user to target guest page
-> to be added. However, source page is not available via common interface
-> kvm_tdp_map_page() in step (2).
-> 
-> Therefore, just pre-map the guest page into KVM mirror page table and
-> record the pre-mapping cnt in TDX's propagation hook. The pre-mapping cnt
-> would be decreased in ioctl KVM_TDX_INIT_MEM_REGION when the guest page is
-> mapped into private EPT.
+> And the only problem we can see is some niche scenario where incoming
+> memory attributes that are already requesting cachable combine to a
+> different kind of cachable?
 
-Stale commit message; squashing all of it into patch 20 is an easy cop 
-out...
+No, it’s not about the niche scenario, as I mentioned I don’t think
+we should enable FWB because it just exists. One can argue the opposite,
+if S2FWB is no different why enable it?
 
-Paolo
+AFAIU, FWB would be useful in cases where the hypervisor(or VMM) knows
+better than the VM, for example some devices MMIO space are emulated so
+they are normal memory and it’s more efficient to use memory attributes.
 
-> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
-> TDX MMU part 2 v1:
->   - Update the code comment and patch log according to latest gmem update.
->     https://lore.kernel.org/kvm/CABgObfa=a3cKcKJHQRrCs-3Ty8ppSRou=dhi6Q+KdZnom0Zegw@mail.gmail.com/
->   - Rename tdx_mem_page_add() to tdx_mem_page_record_premap_cnt() to avoid
->     confusion.
->   - Change the patch title to "KVM: TDX: Premap initial guest memory".
->   - Rename KVM_MEMORY_MAPPING => KVM_MAP_MEMORY (Sean)
->   - Drop issueing TDH.MEM.PAGE.ADD() on KVM_MAP_MEMORY(), defer it to
->     KVM_TDX_INIT_MEM_REGION. (Sean)
->   - Added nr_premapped to track the number of premapped pages
->   - Drop tdx_post_mmu_map_page().
+Taking into consideration all the hassle that can happen if non-coherent
+devices use the wrong attribute, I’d suggest either set FWB only for
+coherent devices (I know it’s not easy to define, but maybe be should?)
+or we have a new CAP where the caller is aware of that. But I don’t think
+the driver should decide that on behalf of the caller.
+
 > 
-> v19:
->   - Switched to use KVM_MEMORY_MAPPING
->   - Dropped measurement extension
->   - updated commit message. private_page_add() => set_private_spte()
-> ---
->   arch/x86/kvm/vmx/tdx.c | 40 +++++++++++++++++++++++++++++++++-------
->   arch/x86/kvm/vmx/tdx.h |  2 +-
->   2 files changed, 34 insertions(+), 8 deletions(-)
+> > And I believe making assumptions about VFIO (which actually is not correctly
+> > enforced at the moment) is fragile.
 > 
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 59b627b45475..435112562954 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -488,6 +488,34 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
->   	return 0;
->   }
->   
-> +/*
-> + * KVM_TDX_INIT_MEM_REGION calls kvm_gmem_populate() to get guest pages and
-> + * tdx_gmem_post_populate() to premap page table pages into private EPT.
-> + * Mapping guest pages into private EPT before TD is finalized should use a
-> + * seamcall TDH.MEM.PAGE.ADD(), which copies page content from a source page
-> + * from user to target guest pages to be added. This source page is not
-> + * available via common interface kvm_tdp_map_page(). So, currently,
-> + * kvm_tdp_map_page() only premaps guest pages into KVM mirrored root.
-> + * A counter nr_premapped is increased here to record status. The counter will
-> + * be decreased after TDH.MEM.PAGE.ADD() is called after the kvm_tdp_map_page()
-> + * in tdx_gmem_post_populate().
-> + */
-> +static int tdx_mem_page_record_premap_cnt(struct kvm *kvm, gfn_t gfn,
-> +					  enum pg_level level, kvm_pfn_t pfn)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +
-> +	/* Returning error here to let TDP MMU bail out early. */
-> +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm)) {
-> +		tdx_unpin(kvm, pfn);
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* nr_premapped will be decreased when tdh_mem_page_add() is called. */
-> +	atomic64_inc(&kvm_tdx->nr_premapped);
-> +	return 0;
-> +}
-> +
->   int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
->   			      enum pg_level level, kvm_pfn_t pfn)
->   {
-> @@ -510,11 +538,7 @@ int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
->   	if (likely(is_td_finalized(kvm_tdx)))
->   		return tdx_mem_page_aug(kvm, gfn, level, pfn);
->   
-> -	/*
-> -	 * TODO: KVM_MAP_MEMORY support to populate before finalize comes
-> -	 * here for the initial memory.
-> -	 */
-> -	return 0;
-> +	return tdx_mem_page_record_premap_cnt(kvm, gfn, level, pfn);
->   }
->   
->   static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
-> @@ -546,10 +570,12 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
->   	if (unlikely(!is_td_finalized(kvm_tdx) &&
->   		     err == (TDX_EPT_WALK_FAILED | TDX_OPERAND_ID_RCX))) {
->   		/*
-> -		 * This page was mapped with KVM_MAP_MEMORY, but
-> -		 * KVM_TDX_INIT_MEM_REGION is not issued yet.
-> +		 * Page is mapped by KVM_TDX_INIT_MEM_REGION, but hasn't called
-> +		 * tdh_mem_page_add().
->   		 */
->   		if (!is_last_spte(entry, level) || !(entry & VMX_EPT_RWX_MASK)) {
-> +			WARN_ON_ONCE(!atomic64_read(&kvm_tdx->nr_premapped));
-> +			atomic64_dec(&kvm_tdx->nr_premapped);
->   			tdx_unpin(kvm, pfn);
->   			return 0;
->   		}
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 66540c57ed61..25a4aaede2ba 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -26,7 +26,7 @@ struct kvm_tdx {
->   
->   	u64 tsc_offset;
->   
-> -	/* For KVM_MAP_MEMORY and KVM_TDX_INIT_MEM_REGION. */
-> +	/* For KVM_TDX_INIT_MEM_REGION. */
->   	atomic64_t nr_premapped;
->   
->   	struct kvm_cpuid2 *cpuid;
+> VFIO requiring cachable is definately not fragile, and it also sets
+> the IOMMU_CACHE flag to indicate this. Revising VFIO to allow
+> non-cachable would be a signficant change and would also change what
+> IOMMU_CACHE flag it sets.
+> 
 
+I meant the driver shouldn't assume the caller behaviour, if it's VFIO
+or something new.
+
+> > and we should only set FWB for coherent
+> > devices in nested setup only where the VMM(or hypervisor) knows better than
+> > the VM.
+> 
+> I don't want to touch the 'only coherent devices' question. Last time
+> I tried to do that I got told every option was wrong.
+> 
+> I would be fine to only enable for nesting parent domains. It is
+> mandatory here and we definitely don't support non-cachable nesting
+> today.  Can we agree on that?
+> 
+Why is it mandatory?
+
+I think a supporting point for this, is that KVM does the same for
+the CPU, where it enables FWB for VMs if supported. I have this on
+my list to study if that can be improved. But may be if we are out
+of options that would be a start.
+
+> Keep in mind SMMU S2FWB is really new and probably very little HW
+> supports it right now. So we are not breaking anything existing
+> here. IMHO it is better to always enable the stricter features going
+> forward, and then evaluate an in-kernel opt-out if someone comes with
+> a concrete use case.
+> 
+
+I agree, it’s unlikely that this breaks existing hardware, but I’d
+be concerned if FWB is enabled unconditionally it breaks devices in
+the future and we end up restricting it more.
+
+Thanks,
+Mostafa
+> Jason
 
