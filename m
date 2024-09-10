@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-26222-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26223-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FEB3973136
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:09:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21ADB97321C
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:18:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 344E81C255AD
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 10:09:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A57DF1F22DBE
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 10:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C21519EEBB;
-	Tue, 10 Sep 2024 10:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BDFE197A76;
+	Tue, 10 Sep 2024 10:13:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N0of05pz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EIiAOEZh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9672819ADB6
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4173196C86
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725962685; cv=none; b=TXDcsTfz5u9mb35b4Us36/81gKp9wQx7CdRC97CkkonXfYrCRi8VaczlpgOZJNbjAPWCGKRAbYZlQ1tGddjGHOd08o9RWrYLl+Shz42mncxTsav4INKVsD1/4f2w+arwDp7s4elBlPOH1KhAu+RJ5x3SF9/PWs0z9yiFzZLRHbw=
+	t=1725963236; cv=none; b=pviRqmUZzGEvjBjqmICQXlBWLjdoRECVr9hn1LPbcuWH9/Ox7NdGQxiuAYurCYXUVorAHYGgkOTeIs+eNAJVQXtjNc2A9Mivh9U4y8JRbKOs2yToE3OvXySLiDK/lqXaTqTyQ/beVh39WJwSNEqwgld+6s+WUKb+M3HgT88/UO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725962685; c=relaxed/simple;
-	bh=c1q+2ZRMkIemQg5aKWOwHHskC4R3MMARGodpVyx0GPs=;
+	s=arc-20240116; t=1725963236; c=relaxed/simple;
+	bh=DfmBoqhY5ZJUvGoqCesXpmishaSxskD00ID1HShSmto=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iXZJqrlsG0sue83zOPqzFnTFvmokfvOK2beD+FndFOL8XFOy0ZzWlknkTYPGUoGQ1OQ0TBljvMztQ4TbPT0B93zAVE6D0T91GQqi/57EO4sLVYEBFXZEKSAjTaIYMiF5E3xYj2iPA1vidMZ7Kqwvs1jw1nwLq3LDPI8crw35leo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N0of05pz; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=DB2QuxzUPmi8yWG4vwSIGcHrABg6YUpGfDpooEpmGnax2m7N210KyL/UwSNsOyT3l5ayU/UgtZe0M75zrS7tGc8AhjJw/9rkRPh7JpeSaWyXB01s2ONABx9Cqqe2MuIldJhUeItQFMr3ipiIlw1vOCYj/+VupdoQv0kz2GHGaX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EIiAOEZh; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725962682;
+	s=mimecast20190719; t=1725963233;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=kabCxL/6w6s9bJiFniqx3kSTgIzeS/1Z08vJuRnvWiA=;
-	b=N0of05pzYcMOQeaMkCcZH0Q+k8oGVbAX1Mhn8Q3MwJ68tCeoLxPVwhkqFZekDyO53MREmJ
-	1cx9EP4J8C/HtI4XFVX0z6vEuPzWcPOYyvXG5WdfT9OUZwbTq7Ej7D6Zp2POJd/IIf9kop
-	bJqm3ZxuDQLjhif2HyF5Bv+/4RvssFY=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6AP6r25f65ztGYBeuRMH9nyvJDb+6rpvy3qvP6qysss=;
+	b=EIiAOEZhNPvWUerMuciHNURAt6o4BzjmF6snX8sNHc3IpSHjvjBRwOJE4Gj32aTO68ON1f
+	/Mpjdz8odVejZqwsut0OAFy4uICfz+RNaE8evfPpqaHFCB1K1fpwG6bt4iM07+XG5PdLFI
+	jbEU8aZk8i+LyKYpo3LplHpVp9H9Xdo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-520-W3FYrmF5MT-2hxnhXOPJPg-1; Tue, 10 Sep 2024 06:04:41 -0400
-X-MC-Unique: W3FYrmF5MT-2hxnhXOPJPg-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5365b1f0c2bso3173454e87.3
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 03:04:41 -0700 (PDT)
+ us-mta-473-pATC294JOeKfx-IrLfZYtQ-1; Tue, 10 Sep 2024 06:13:52 -0400
+X-MC-Unique: pATC294JOeKfx-IrLfZYtQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-374bacd5cccso2930359f8f.1
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 03:13:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725962679; x=1726567479;
+        d=1e100.net; s=20230601; t=1725963231; x=1726568031;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=kabCxL/6w6s9bJiFniqx3kSTgIzeS/1Z08vJuRnvWiA=;
-        b=J6e1RGgW3pJ9lCgy5hJQCzYTC0sSI9jZqom+kTvQzUcEQUCCbdaHNRKzxltHGhaeCl
-         QaQjF6hlfa4tLmFY+gddevdYSX1OV884ybNQg9T7TDaPP3aFkJjsiU/rExiSfw+Jg3m6
-         ygPbr63BllsNcXZRePylUlkNh/Q6f9ja2VeIl2Zq1QP/2mXp9hsMme4OnFIvNVcKktnJ
-         5foEyMtD5q/8WDb9aCRFT2HKxjUYMXUsqniGXcahjue091pPwYHyd4UcCVNECQPsVZay
-         sjSPuFShtQ4rCmvo0hHFDqWK+SdWvLs8TBBvMp1ZGMVCE2bADxOyr9Cw4ya92nsNahCW
-         d/qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVuSoDTI6BXdZdn/AVnhSp5cn8dr9QjbojQYtOTWXTxWM7Ik6/x+aX5R26UFNC45ejJOLs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeWjJKLZscdRIljor7wWa5LvHaJniC7d93K/5wKZwCZ9CTXSsm
-	Jg7XXWsW0AxhknSgWvQfJ3Q1lvSSccoE6XZrMmr/W36zZpF6obAt/gqQUstH7CAxvW+tZJotjlN
-	X6H+5KJqoO/21SbmLNDcNI+VdYV65nJT/BnYq5GQ7yM9yEzINfQHVueTgMIBy
-X-Received: by 2002:a05:6512:39ce:b0:536:54df:bff2 with SMTP id 2adb3069b0e04-53658812f84mr9622740e87.54.1725962678923;
-        Tue, 10 Sep 2024 03:04:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF+PoFLbcRKIJkJNVfdmgaoelN5gExicdgOdCqJVTkL4CGjPFfbnWqFRTQk4Pv12lYKO58SlA==
-X-Received: by 2002:a05:6512:39ce:b0:536:54df:bff2 with SMTP id 2adb3069b0e04-53658812f84mr9622706e87.54.1725962678246;
-        Tue, 10 Sep 2024 03:04:38 -0700 (PDT)
+        bh=6AP6r25f65ztGYBeuRMH9nyvJDb+6rpvy3qvP6qysss=;
+        b=a9IVdhA8Voc7+ogy39EC07TZSyg/us4OOpqxYr7pjzDB5loZOL19MhS4tZsMXFGdPq
+         29IRlUW5dJAiw2Gn2KUc7IUJoURREw3ESOaVfiTia4/gWM+MPytPewKarD72B3QrUxY3
+         7jU48FonG35CWGTdEKmiqim8t10GYM+patnKoXgtwP3qfna+Btqq7o29//glhFpDl7Fa
+         yeR97xsRiK72DyAVp8rH+5bHb+2Sq18UdpgiqxY7/dWk2coMpJWe/xMYv2jBND9rs3b/
+         8CUHoWilMm85b6KZ1jb8CmxlY8QclK4JP/prdBgIswjf8QyKl1LbeFP43yeckhnvFvio
+         babQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWVzdMDPDgat4W+IZ5Do9gOOxlDemhhnqI425WHfuTchTo2negEZf/zZ/QKkFXwppsgQ+0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLz8xS3xr/8NqpuwXl0sf3kukMhV1noarQItL4F7SToDSZJLQi
+	qfpMWHKstGBhEmXQyqrPRqHY927MKa6uWQuHgXCQptzrHiLUT3YXLJ2dohYhW4+LzJDNXXJ6E7x
+	IsXM4+Dwy7nSjfzfvaxqdS92sQk+vbF6qxfBYAPzKFyN9W9VSMw==
+X-Received: by 2002:a05:6000:d8c:b0:371:8cc3:3995 with SMTP id ffacd0b85a97d-378896035a0mr8983515f8f.34.1725963231120;
+        Tue, 10 Sep 2024 03:13:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHy5P0EwcX0ItxKYDRTeq52pENXWKZzMDGIn+kiNA9wiZmAaVMqy9YBbSaqe53p8fp2gaS+DQ==
+X-Received: by 2002:a05:6000:d8c:b0:371:8cc3:3995 with SMTP id ffacd0b85a97d-378896035a0mr8983496f8f.34.1725963230533;
+        Tue, 10 Sep 2024 03:13:50 -0700 (PDT)
 Received: from [192.168.10.81] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42cb73ab096sm68228645e9.22.2024.09.10.03.04.37
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-378956d37a1sm8431319f8f.77.2024.09.10.03.13.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 03:04:37 -0700 (PDT)
-Message-ID: <b791a3f6-a5ab-4f7e-bb2a-d277b26ec2c4@redhat.com>
-Date: Tue, 10 Sep 2024 12:04:36 +0200
+        Tue, 10 Sep 2024 03:13:49 -0700 (PDT)
+Message-ID: <0feae675-3ccb-4d0e-b2cd-4477f9288058@redhat.com>
+Date: Tue, 10 Sep 2024 12:13:49 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,13 +83,22 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 17/21] KVM: TDX: MTRR: implement get_mt_mask() for TDX
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- kvm@vger.kernel.org
-Cc: kai.huang@intel.com, dmatlack@google.com, isaku.yamahata@gmail.com,
- yan.y.zhao@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 19/21] KVM: TDX: Add an ioctl to create initial guest
+ memory
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Cc: "seanjc@google.com" <seanjc@google.com>, "Huang, Kai"
+ <kai.huang@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+ "dmatlack@google.com" <dmatlack@google.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "nik.borisov@suse.com" <nik.borisov@suse.com>
 References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
- <20240904030751.117579-18-rick.p.edgecombe@intel.com>
+ <20240904030751.117579-20-rick.p.edgecombe@intel.com>
+ <Ztfn5gh5888PmEIe@yzhao56-desk.sh.intel.com>
+ <925ef12f51fe22cd9154196a68137b6d106f9227.camel@intel.com>
+ <9983d4229ad0f6c75605da8846253d1ffca84ae8.camel@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -127,98 +136,41 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240904030751.117579-18-rick.p.edgecombe@intel.com>
+In-Reply-To: <9983d4229ad0f6c75605da8846253d1ffca84ae8.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/4/24 05:07, Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On 9/6/24 18:30, Edgecombe, Rick P wrote:
+> /*
+>   * The case to care about here is a PTE getting zapped concurrently and
+>   * this function erroneously thinking a page is mapped in the mirror EPT.
+>   * The private mem zapping paths are already covered by other locks held
+>   * here, but grab an mmu read_lock to not trigger the assert in
+>   * kvm_tdp_mmu_gpa_is_mapped().
+>   */
 > 
-> Although TDX supports only WB for private GPA, it's desirable to support
-> MTRR for shared GPA.  Always honor guest PAT for shared EPT as what's done
-> for normal VMs.
-> 
-> Suggested-by: Kai Huang <kai.huang@intel.com>
-> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
-> TDX MMU part 2 v1:
->   - Align with latest vmx code in kvm/queue.
->   - Updated patch log.
->   - Dropped KVM_BUG_ON() in vt_get_mt_mask(). (Rick)
+> Yan, do you think it is sufficient?
 
-The only difference at this point is
+If you're actually requiring that the other locks are sufficient, then 
+there can be no ENOENT.
 
-         if (!static_cpu_has(X86_FEATURE_SELFSNOOP) &&
-             !kvm_arch_has_noncoherent_dma(vcpu->kvm))
-                 return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | 
-VMX_EPT_IPAT_BIT;
+Maybe:
 
-
-which should never be true.  I think this patch can simply be dropped.
+	/*
+	 * The private mem cannot be zapped after kvm_tdp_map_page()
+	 * because all paths are covered by slots_lock and the
+	 * filemap invalidate lock.  Check that they are indeed enough.
+	 */
+	if (IS_ENABLED(CONFIG_KVM_PROVE_MMU)) {
+		scoped_guard(read_lock, &kvm->mmu_lock) {
+			if (KVM_BUG_ON(kvm,
+				!kvm_tdp_mmu_gpa_is_mapped(vcpu, gpa)) {
+				ret = -EIO;
+				goto out;
+			}
+		}
+	}
 
 Paolo
-
-> +static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return tdx_get_mt_mask(vcpu, gfn, is_mmio);
-> +
-> +	return vmx_get_mt_mask(vcpu, gfn, is_mmio);
-> +}
-> +
->   static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->   {
->   	if (!is_td(kvm))
-> @@ -292,7 +300,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   
->   	.set_tss_addr = vmx_set_tss_addr,
->   	.set_identity_map_addr = vmx_set_identity_map_addr,
-> -	.get_mt_mask = vmx_get_mt_mask,
-> +	.get_mt_mask = vt_get_mt_mask,
->   
->   	.get_exit_info = vmx_get_exit_info,
->   
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 435112562954..50ce24905062 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -374,6 +374,14 @@ int tdx_vm_init(struct kvm *kvm)
->   	return 0;
->   }
->   
-> +u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-> +{
-> +	if (is_mmio)
-> +		return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
-> +
-> +	return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
-> +}
-> +
->   int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index 66829413797d..d8a00ab4651c 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -128,6 +128,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
->   int tdx_vcpu_create(struct kvm_vcpu *vcpu);
->   void tdx_vcpu_free(struct kvm_vcpu *vcpu);
->   void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
-> +u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
->   
->   int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
->   
-> @@ -153,6 +154,7 @@ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOP
->   static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
->   static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
->   static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
-> +static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
->   
->   static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
->   
 
 
