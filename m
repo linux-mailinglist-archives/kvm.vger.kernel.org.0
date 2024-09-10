@@ -1,149 +1,150 @@
-Return-Path: <kvm+bounces-26348-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26349-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 427FB974436
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 22:42:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C62F97449E
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 23:12:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFF421F25BC2
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 20:42:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DC0EB253F8
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 21:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39711AB530;
-	Tue, 10 Sep 2024 20:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB331AB531;
+	Tue, 10 Sep 2024 21:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T3Q5nrco"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QRG7aq1i"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761491A7AF6
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 20:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90581AB508
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 21:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726000925; cv=none; b=ZGZt34y/cLyXXM9Msoy7J32ECGsCFSyhRDsZDZoGXRSZW2C/R83KPYr9Uv7Fu9uIDJmeWzWOOq1kOxeahV5KxDqEduegzZR4rAEpO9rm8GygD3tKg0k7Cq1nCmq3T508Y0FTN5UPYYoYQEsilwwq2+8HBAkpxAWSbvpJn2trvJA=
+	t=1726002715; cv=none; b=QSX3DL3JLtRgz2XkX8Unvg7V4c/+fxGGIjTtCqbTHbArnWWIHvnRkw30vBmJKllz9EU4s5KJp2LO2OoNlKQkPvwkOjAJrvcdgEjjkA/S6bnuyZEbKViOC82LD2j8ldgaToYRiFPnsQHkMEt+KrOeGdnKPCmlDCwVfLSWodZfxKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726000925; c=relaxed/simple;
-	bh=/B6ktjls9e8sahrf4f9YjYTnkS2AyJU2YCdJDde3Pcw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J1s+HRp7cPeABvwk5HR0zapgNDSXwokjpl00iFCSfpu+Va/tHZponV1B4m4z73k9zxARYtglJ8vN8bjObneVs4bZ8GqEDjtj0QEutHNALesutqR52cWe3hiQdwca3lwpfwKurFobYJmrgbXEcJcrIvp03h9gyFQQzZKk7Q+icIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T3Q5nrco; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726000921;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DXWc8YwViA5zWo54WjIEfGW+8+5CIqabuJJ/r7VO3GE=;
-	b=T3Q5nrcooMM1ZL+n0wtIUqQLFNVhcGZrKQhR4gXScw7d58K8w9dkGwM/Z6d9lU42aKfVWv
-	FtVlLjGINfA35YGdAlVCffvjVDR5jJpij2a+wx4p4p7X/W31kgtt/bI31FMg/KwA/glFy9
-	UPtHiiXfO+KGTapMH8vfCeWhgEugMes=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-mMY63KMVMy-bbJ4EYw6A3g-1; Tue, 10 Sep 2024 16:42:00 -0400
-X-MC-Unique: mMY63KMVMy-bbJ4EYw6A3g-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4582a549257so28767451cf.2
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 13:42:00 -0700 (PDT)
+	s=arc-20240116; t=1726002715; c=relaxed/simple;
+	bh=vQ19Neos0DyR2KeY0ecAmyspXyYZOWY65Booqku3A+U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tLxSNbzmh69wT8d6W18OM91qdTEONRQoDSkNHjjDK+GQ6GdXM+XC0vk3sT8lWcThuL/kgU0nEjgSJ3JYHz3KYp0uuwSm1sTz+pDBqX2im48li0G8XZIHMYGwNAzEmXZUbnIFmHv/PO7f+9hl4kPrM1DZE7cbuXext6oDA2BoHZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QRG7aq1i; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-50108a42fa9so1532401e0c.3
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 14:11:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726002712; x=1726607512; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9mL456C9bf2/NmawuOM2i75QU0ioWJIK8fenw90OA60=;
+        b=QRG7aq1i6d891jb5kRmAOpiq6j6e0jEU+k+GF8Xio9Jdj2w4JUahuOOKXoqYM2rqUk
+         paSTgEuDbKHXvg+0zucLYk3e5lQXyyBrETl2pE/XzggNAody0L7XoypUvWtG+Sqc3tLy
+         KtdNtPWdDbgKM70V51npsIUbFdNo3EFDBfHIyd93Dv+vzOn/HeZt50p9q/qVjnTBWPel
+         WXMU/e5geV9REQBtfpy17FkksY8C5nD3IT09kKM0iklIhUJSvL5m4v1caaQRmZ25mESa
+         ufJVJ3v0YVU66JwY9DABoV62V2hY4+SXB5P9gBQK9s1QwhZntfxKkpSHPxgaIrjEBAon
+         xgJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726000919; x=1726605719;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DXWc8YwViA5zWo54WjIEfGW+8+5CIqabuJJ/r7VO3GE=;
-        b=MHvvrLE1DcCW0hMbFJKcYoMVkc4CCpFkzpeej04lZH8DoKSI4CLZyk9Y7BU5NFlyKa
-         JlVEsBC52Dc4czjfcE5xuGpjeAkZC+F6LGaWUQ+G5SJxjcu29Q65CcnbvvjAWPBkewq4
-         8VBuORlnE6orP6Bew4BINAIpBoI9RzjMf9TfspEKTt4o5TObpiQWePO0EPC8WtMoT8Wp
-         pgB3dLUEfTfvYn/+RtqJIZEqFFs0+pW182GJneFrxEFaU/SUTY0ituIvAN1HoKNftCm6
-         AKRcT/0OqOToma8OCzmD6msszRqCHcdTt5bkTcLJXRRIZsqT6yLFj9LXZ/J2CXcMH+RN
-         hLyA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+eFAGX/AAqsMZyW9fapZhWxY8uDoympp2ng0PWPL4EKoPPdlFOadErTCp2pW9dz64f5g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygnhZwSoAexgwa+jMgMVMU1y/cPbbdQVvOWQIyAe7B1n7QcfEd
-	xQi3525bTXlK8dq6K4Ia6/F4igqElyOQULcnN8441dDZp7nJFHFPi5GSrEj4oXzzFwnOTD16ajZ
-	0fKB7GubTCw5ObTH0tqCgY3mQTQwYcVCgvHQMqDeWpVQWrv3wSg==
-X-Received: by 2002:a05:622a:18a2:b0:458:2c40:e08b with SMTP id d75a77b69052e-4584e90021bmr10728021cf.30.1726000919653;
-        Tue, 10 Sep 2024 13:41:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6g4A4JvYd5H/gkbWbjJoXbDr6NCaKNFVqZ4P3NxyUw79k0kFE23eV1CPcOhxAh3JabLXj7g==
-X-Received: by 2002:a05:622a:18a2:b0:458:2c40:e08b with SMTP id d75a77b69052e-4584e90021bmr10727791cf.30.1726000919292;
-        Tue, 10 Sep 2024 13:41:59 -0700 (PDT)
-Received: from starship ([2607:fea8:fc01:760d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4583636e38esm17482701cf.33.2024.09.10.13.41.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 13:41:58 -0700 (PDT)
-Message-ID: <b9cf0083783b32fd92edb4805a20a843a09af6fc.camel@redhat.com>
-Subject: Re: [PATCH v2 44/49] KVM: x86: Update guest cpu_caps at runtime for
- dynamic CPUID-based features
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
- <vkuznets@redhat.com>,  kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Hou Wenlong <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>,
- Oliver Upton <oliver.upton@linux.dev>, Binbin Wu
- <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>,
- Robert Hoo <robert.hoo.linux@gmail.com>
-Date: Tue, 10 Sep 2024 16:41:57 -0400
-In-Reply-To: <ZoyDTJ3nb_MQ38nW@google.com>
-References: <20240517173926.965351-1-seanjc@google.com>
-	 <20240517173926.965351-45-seanjc@google.com>
-	 <2d554577722d30605ecd0f920f4777129fff3951.camel@redhat.com>
-	 <ZoyDTJ3nb_MQ38nW@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1726002712; x=1726607512;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9mL456C9bf2/NmawuOM2i75QU0ioWJIK8fenw90OA60=;
+        b=AMB+q/kTqMIR8fnepapJmnSRmJ9cEh9r1SU2dNyFfCewAL8r+U4Ya7SzgUmEwq+lTG
+         gofvJJUA6BQCIuqNpNnfucL3tf5JXll3TUwF0V0GadzXPGQiElUnxo9qUYM7D26b0sm9
+         snZpgmdXIyUL+BkmqObbpAcrUvs3uyilsvd1I2SAy0v2YM6Zg3u9U8Bo7s/SaLAm2Oxw
+         teOHt/BFu3r0KwbKSPhTS99CzBHDf97X/qfWw/bVZ9JsecIUpI3ju+bNr4ydXrzn0Xgh
+         /vJEikpCheK0oFY0MNEK8N+96/Jjw7WNGK1JhtsgRUQPNhARbNGws1VPF+KGmKOAS9Fv
+         RaHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjoeULEMMH0IstviBQd9LeBPf+9AobPrIS9rm4YpX/CXSisPiha14JVq7YrOiuTQe/V3U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyiAel3ZvM7qFwyoUOqughch3lgWOuggqRtHWA0ecewjShWlXs
+	st5iykOac02+xV0AoWaUZnwrnifI0jKOOJ/BJPt0I8Dkeb7ZIAC6xT/61z5korHMdVPhkMw/Eg3
+	7i7w5uAZazXVhGVhZKX3ffyLdahp96Ro2xaeK
+X-Google-Smtp-Source: AGHT+IGNmBkL+R7xBhZDsZOCgpmdSTcN3mnBPXPvha5B1FEl7C+EEP8dxL5+KIrRnUpFi2Hpj2/2XWpfjHaq+rdxtm4=
+X-Received: by 2002:a05:6122:2808:b0:501:2960:7595 with SMTP id
+ 71dfb90a1353d-502143a9979mr12814010e0c.11.1726002712536; Tue, 10 Sep 2024
+ 14:11:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-20-seanjc@google.com>
+ <CADrL8HWACwbzraG=MbDoORJ8ramDxb-h9yb0p4nx9-wq4o3c6A@mail.gmail.com>
+ <Zt9UT74XkezVpTuK@google.com> <CADrL8HW-mOAyF0Gcw7UbkvEvEfcHDxEir0AiStkqYzD5x8ZGpg@mail.gmail.com>
+ <Zt9wg6h_bPp8BKtd@google.com> <CADrL8HWbNjv-w-ZJOxkLK78S5RePd2QXDuXV-=4iFVV29uHKyg@mail.gmail.com>
+ <Zt-kHjtTVrONMU1V@google.com>
+In-Reply-To: <Zt-kHjtTVrONMU1V@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Tue, 10 Sep 2024 14:11:15 -0700
+Message-ID: <CADrL8HV1Erpg-D4LzuRHUk7dg6mvex8oQz5pBzwO7A3OjB8Uvw@mail.gmail.com>
+Subject: Re: [PATCH 19/22] KVM: x86/mmu: Add infrastructure to allow walking
+ rmaps outside of mmu_lock
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2024-07-08 at 17:24 -0700, Sean Christopherson wrote:
-> On Thu, Jul 04, 2024, Maxim Levitsky wrote:
-> > On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
-> > > -		cpuid_entry_change(best, X86_FEATURE_OSPKE,
-> > > -				   kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE));
-> > > +		kvm_update_feature_runtime(vcpu, best, X86_FEATURE_OSPKE,
-> > > +					   kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE));
-> > > +
-> > >  
-> > >  	best = kvm_find_cpuid_entry_index(vcpu, 0xD, 0);
-> > >  	if (best)
-> > 
-> > I am not 100% sure that we need to do this.
-> > 
-> > Runtime cpuid changes are a hack that Intel did back then, due to various
-> > reasons, These changes don't really change the feature set that CPU supports,
-> > but merly as you like to say 'massage' the output of the CPUID instruction to
-> > make the unmodified OS happy usually.
-> > 
-> > Thus it feels to me that CPU caps should not include the dynamic features,
-> > and neither KVM should use the value of these as a source for truth, but
-> > rather the underlying source of the truth (e.g CR4).
-> > 
-> > But if you insist, I don't really have a very strong reason to object this.
-> 
-> FWIW, I think I agree that CR4 should be the source of truth, but it's largely a
-> moot point because KVM doesn't actually check OSXSAVE or OSPKE, as KVM never
-> emulates the relevant instructions.  So for those, it's indeed not strictly
-> necessary.
-> 
-> Unfortunately, KVM has established ABI for checking X86_FEATURE_MWAIT when
-> "emulating" MONITOR and MWAIT, i.e. KVM can't use vcpu->arch.ia32_misc_enable_msr
-> as the source of truth.
+On Mon, Sep 9, 2024 at 6:42=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Mon, Sep 09, 2024, James Houghton wrote:
+> > I take back what I said about this working on x86. I think it's
+> > possible for there to be a race.
+> >
+> > Say...
+> >
+> > 1. T1 modifies pte_list_desc then unlocks kvm_rmap_unlock().
+> > 2. T2 then locks kvm_rmap_lock_readonly().
+> >
+> > The modifications that T1 has made are not guaranteed to be visible to
+> > T2 unless T1 has an smp_wmb() (or equivalent) after the modfication
+> > and T2 has an smp_rmb() before reading the data.
+> >
+> > Now the way you had it, T2, because it uses try_cmpxchg() with full
+> > ordering, will effectively do a smp_rmb(). But T1 only does an
+> > smp_wmb() *after dropping the mmu_lock*, so there is a race. While T1
+> > still holds the mmu_lock but after releasing the kvm_rmap_lock(), T2
+> > may enter its critical section and then *later* observe the changes
+> > that T1 made.
+> >
+> > Now this is impossible on x86 (IIUC) if, in the compiled list of
+> > instructions, T1's writes occur in the same order that we have written
+> > them in C. I'm not sure if WRITE_ONCE guarantees that this reordering
+> > at compile time is forbidden.
+> >
+> > So what I'm saying is:
+> >
+> > 1. kvm_rmap_unlock() must have an smp_wmb().
+>
+> No, because beating a dead horse, this is not generic code, this is x86.
 
-Can you elaborate on this? Can you give me an example of the ABI?
+What prevents the compiler from reordering (non-atomic, non-volatile)
+stores that happen before WRITE_ONCE() in kvm_rmap_unlock() to after
+the WRITE_ONCE()?
 
+IMV, such a reordering is currently permitted[1] (i.e., a barrier() is
+missing), and should the compiler choose to do this, the lock will not
+function correctly.
 
->   So for MWAIT, KVM does need to update CPU caps (or carry
-> even more awful MWAIT code), at which point extending the behavior to the CR4
-> features (and to X86_FEATURE_APIC) is practically free.
-> 
+> If kvm_rmap_head.val were an int, i.e. could be unionized with an atomic_=
+t, then
+> I wouldn't be opposed to doing this in the locking code to document thing=
+s:
+>
+>  s/READ_ONCE/atomic_read_acquire
+>  s/WRITE_ONCE/atomic_set_release
+>  s/try_cmpxchg/atomic_cmpxchg_acquire
 
+I think we can use atomic_long_t.
 
-Best regards,
-	Maxim Levitsky
+It would be really great if we did a substitution like this. That
+would address my above concern about barrier() (atomic_set_release,
+for example, implies a barrier() that we otherwise need to include).
 
+[1]: https://www.kernel.org/doc/Documentation/memory-barriers.txt
+(GUARANTEES + COMPILER BARRIER)
 
