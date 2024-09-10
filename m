@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-26244-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26243-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7C4B973695
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 13:59:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9986D973692
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 13:59:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01BE51C24975
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 11:59:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE0F31C24901
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 11:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA17191F8C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF41191484;
 	Tue, 10 Sep 2024 11:58:59 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B7C189BA4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E027418F2DB;
 	Tue, 10 Sep 2024 11:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725969539; cv=none; b=VQ2vhNMrQ7O266SJb/klt9hw0asLSAVFYYZ4D0AsSAS5YWQZhbNU7ZsiOP12FaQyXDn2CMeafHnd5dhT9GNrAf2otFNxIguc55t86wymQp2f0RyVXD7dydiNmitrJ/+URWzmxJlMjHTHSU01NjD9bL2cW01KcFdv2IxgF/Z+ttA=
+	t=1725969538; cv=none; b=THOi4SQttTrgCid8HdpKFzQLD76oVmlAqxgV+VtGX52BY2eiMmR/0N40FKS6nVWz4mAV2bY3Qi4w2rCCTXrQ8WMnFiXSWWbLujOnKvdkiWgRiMLX2mNzvSxHIwrrxOEi9HEq14u6tLVZSoLraFTnGNbF0fBwCbUSI1RgjdDJiR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725969539; c=relaxed/simple;
-	bh=7Z6oj8tec7G+l6Fi7f4VQ2bYnwgurw5JBRAmZfQoYHI=;
+	s=arc-20240116; t=1725969538; c=relaxed/simple;
+	bh=IzC3rJDWrewmtTIzpdimqj0J9cj9ZcnQVurp8oj12H8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RFkovARrgFm5WOW5fuYu3bbGtyHF/33SVFo36Jsrl7C7HK1whfnwER5sUTzoigm4bI2gxehYhdVXlhiojW/a2rgvo9JUBgPImZc68usQYetdxUICnSZu/5YM2/jd1Z1wiNMPvrYhD+anXgrhBNZnBf2J00DPSCQRhWk+KVWWQCs=
+	 MIME-Version; b=JwtjLfMaM1NUl3awtSC8oUOvZtgo7ZRHqlp1y3TR8DUGk0pXaDjxdRW20O5MNLyjLjX5nFVUqdFArjQCk/6T3lfHTIL1luvzz16GAfUoV4p1pA6Zb3OEowV/zc8kaI7xGR3zyuI9HEC0nciIMn6wL7jSp08i/APcYyIbVNIiIck=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.2.5.185])
-	by gateway (Coremail) with SMTP id _____8Axrup3NOBm5K0DAA--.9197S3;
-	Tue, 10 Sep 2024 19:58:47 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Dx2ul8NOBm660DAA--.8604S3;
+	Tue, 10 Sep 2024 19:58:52 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-	by front2 (Coremail) with SMTP id qciowMCxSsZwNOBm+GEDAA--.16096S3;
-	Tue, 10 Sep 2024 19:58:46 +0800 (CST)
+	by front2 (Coremail) with SMTP id qciowMCxSsZwNOBm+GEDAA--.16096S4;
+	Tue, 10 Sep 2024 19:58:48 +0800 (CST)
 From: Xianglai Li <lixianglai@loongson.cn>
 To: linux-kernel@vger.kernel.org
 Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
@@ -43,12 +43,13 @@ Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	WANG Xuerui <kernel@xen0n.name>,
 	Xianglai li <lixianglai@loongson.cn>
-Subject: [PATCH V3 01/11] LoongArch: KVM: Add iocsr and mmio bus simulation in kernel
-Date: Tue, 10 Sep 2024 19:40:55 +0800
-Message-Id: <20240910114105.4062286-2-lixianglai@loongson.cn>
+Subject: [PATCH V3 02/11] LoongArch: KVM: Add IPI device support
+Date: Tue, 10 Sep 2024 19:40:56 +0800
+Message-Id: <20240910114105.4062286-3-lixianglai@loongson.cn>
 X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20240910114105.4062286-1-lixianglai@loongson.cn>
+In-Reply-To: <20240910114105.4062286-2-lixianglai@loongson.cn>
 References: <20240910114105.4062286-1-lixianglai@loongson.cn>
+ <20240910114105.4062286-2-lixianglai@loongson.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,16 +57,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qciowMCxSsZwNOBm+GEDAA--.16096S3
+X-CM-TRANSID:qciowMCxSsZwNOBm+GEDAA--.16096S4
 X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
 	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
 	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Add iocsr and mmio memory read and write simulation to the kernel.
-When the VM accesses the device address space through iocsr
-instructions or mmio, it does not need to return to the qemu
-user mode but directly completes the access in the kernel mode.
+Added device model for IPI interrupt controller,
+implemented basic create destroy interface,
+and registered device model to kvm device table.
 
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
@@ -79,208 +79,297 @@ Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
 Cc: WANG Xuerui <kernel@xen0n.name> 
 Cc: Xianglai li <lixianglai@loongson.cn> 
 
- arch/loongarch/kvm/exit.c  | 86 +++++++++++++++++++++++++++-----------
- include/linux/kvm_host.h   |  1 +
- include/trace/events/kvm.h | 35 ++++++++++++++++
- 3 files changed, 97 insertions(+), 25 deletions(-)
+ arch/loongarch/include/asm/kvm_host.h |   4 +
+ arch/loongarch/include/asm/kvm_ipi.h  |  36 +++++++
+ arch/loongarch/kvm/Makefile           |   1 +
+ arch/loongarch/kvm/intc/ipi.c         | 138 ++++++++++++++++++++++++++
+ arch/loongarch/kvm/main.c             |   6 +-
+ arch/loongarch/kvm/vcpu.c             |   3 +
+ include/uapi/linux/kvm.h              |   4 +
+ 7 files changed, 190 insertions(+), 2 deletions(-)
+ create mode 100644 arch/loongarch/include/asm/kvm_ipi.h
+ create mode 100644 arch/loongarch/kvm/intc/ipi.c
 
-diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-index ea73f9dc2cc6..6b15117106f9 100644
---- a/arch/loongarch/kvm/exit.c
-+++ b/arch/loongarch/kvm/exit.c
-@@ -151,7 +151,7 @@ static int kvm_handle_csr(struct kvm_vcpu *vcpu, larch_inst inst)
- int kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu *vcpu)
- {
- 	int ret;
--	unsigned long val;
-+	unsigned long *val;
- 	u32 addr, rd, rj, opcode;
+diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+index 5f0677e03817..2b65007503dc 100644
+--- a/arch/loongarch/include/asm/kvm_host.h
++++ b/arch/loongarch/include/asm/kvm_host.h
+@@ -19,6 +19,7 @@
+ #include <asm/inst.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/loongarch.h>
++#include <asm/kvm_ipi.h>
  
- 	/*
-@@ -164,6 +164,7 @@ int kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu *vcpu)
- 	ret = EMULATE_DO_IOCSR;
- 	run->iocsr_io.phys_addr = addr;
- 	run->iocsr_io.is_write = 0;
-+	val = &vcpu->arch.gprs[rd];
+ /* Loongarch KVM register ids */
+ #define KVM_GET_IOC_CSR_IDX(id)		((id & KVM_CSR_IDX_MASK) >> LOONGARCH_REG_SHIFT)
+@@ -110,6 +111,7 @@ struct kvm_arch {
  
- 	/* LoongArch is Little endian */
- 	switch (opcode) {
-@@ -196,18 +197,30 @@ int kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu *vcpu)
- 		run->iocsr_io.is_write = 1;
- 		break;
- 	default:
--		ret = EMULATE_FAIL;
--		break;
-+		return EMULATE_FAIL;
- 	}
- 
--	if (ret == EMULATE_DO_IOCSR) {
--		if (run->iocsr_io.is_write) {
--			val = vcpu->arch.gprs[rd];
--			memcpy(run->iocsr_io.data, &val, run->iocsr_io.len);
--		}
--		vcpu->arch.io_gpr = rd;
-+	if (run->iocsr_io.is_write) {
-+		if (!kvm_io_bus_write(vcpu,
-+				KVM_IOCSR_BUS, addr, run->iocsr_io.len, val))
-+			ret = EMULATE_DONE;
-+		else
-+			/* Save data and let user space to write it */
-+			memcpy(run->iocsr_io.data, val, run->iocsr_io.len);
-+		trace_kvm_iocsr(KVM_TRACE_IOCSR_WRITE,
-+				run->iocsr_io.len,
-+				addr, val);
-+	} else {
-+		if (!kvm_io_bus_read(vcpu,
-+				KVM_IOCSR_BUS, addr, run->iocsr_io.len, val))
-+			ret = EMULATE_DONE;
-+		else
-+			/* Save register id for iocsr read completion */
-+			vcpu->arch.io_gpr = rd;
-+		trace_kvm_iocsr(KVM_TRACE_IOCSR_READ,
-+				run->iocsr_io.len,
-+				addr, NULL);
- 	}
--
- 	return ret;
- }
- 
-@@ -441,19 +454,32 @@ int kvm_emu_mmio_read(struct kvm_vcpu *vcpu, larch_inst inst)
- 	}
- 
- 	if (ret == EMULATE_DO_MMIO) {
-+		trace_kvm_mmio(KVM_TRACE_MMIO_READ, run->mmio.len,
-+				run->mmio.phys_addr, NULL);
-+		/*
-+		 * if mmio device such as pch pic is emulated in KVM,
-+		 * it need not return to user space to handle the mmio
-+		 * exception.
-+		 */
-+		ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, vcpu->arch.badv,
-+				run->mmio.len, &vcpu->arch.gprs[rd]);
-+		if (!ret) {
-+			update_pc(&vcpu->arch);
-+			vcpu->mmio_needed = 0;
-+			return EMULATE_DONE;
-+		}
-+
- 		/* Set for kvm_complete_mmio_read() use */
- 		vcpu->arch.io_gpr = rd;
- 		run->mmio.is_write = 0;
- 		vcpu->mmio_is_write = 0;
--		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, run->mmio.len,
--				run->mmio.phys_addr, NULL);
--	} else {
--		kvm_err("Read not supported Inst=0x%08x @%lx BadVaddr:%#lx\n",
--			inst.word, vcpu->arch.pc, vcpu->arch.badv);
--		kvm_arch_vcpu_dump_regs(vcpu);
--		vcpu->mmio_needed = 0;
-+		return EMULATE_DO_MMIO;
- 	}
- 
-+	kvm_err("Read not supported Inst=0x%08x @%lx BadVaddr:%#lx\n",
-+			inst.word, vcpu->arch.pc, vcpu->arch.badv);
-+	kvm_arch_vcpu_dump_regs(vcpu);
-+	vcpu->mmio_needed = 0;
- 	return ret;
- }
- 
-@@ -594,19 +620,29 @@ int kvm_emu_mmio_write(struct kvm_vcpu *vcpu, larch_inst inst)
- 	}
- 
- 	if (ret == EMULATE_DO_MMIO) {
-+		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, run->mmio.len,
-+				run->mmio.phys_addr, data);
-+		/*
-+		 * if mmio device such as pch pic is emulated in KVM,
-+		 * it need not return to user space to handle the mmio
-+		 * exception.
-+		 */
-+		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, vcpu->arch.badv,
-+				run->mmio.len, data);
-+		if (!ret)
-+			return EMULATE_DONE;
-+
- 		run->mmio.is_write = 1;
- 		vcpu->mmio_needed = 1;
- 		vcpu->mmio_is_write = 1;
--		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, run->mmio.len,
--				run->mmio.phys_addr, data);
--	} else {
--		vcpu->arch.pc = curr_pc;
--		kvm_err("Write not supported Inst=0x%08x @%lx BadVaddr:%#lx\n",
--			inst.word, vcpu->arch.pc, vcpu->arch.badv);
--		kvm_arch_vcpu_dump_regs(vcpu);
--		/* Rollback PC if emulation was unsuccessful */
-+		return EMULATE_DO_MMIO;
- 	}
- 
-+	vcpu->arch.pc = curr_pc;
-+	kvm_err("Write not supported Inst=0x%08x @%lx BadVaddr:%#lx\n",
-+			inst.word, vcpu->arch.pc, vcpu->arch.badv);
-+	kvm_arch_vcpu_dump_regs(vcpu);
-+	/* Rollback PC if emulation was unsuccessful */
- 	return ret;
- }
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 0d5125a3e31a..1149cc6a9dde 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -219,6 +219,7 @@ enum kvm_bus {
- 	KVM_PIO_BUS,
- 	KVM_VIRTIO_CCW_NOTIFY_BUS,
- 	KVM_FAST_MMIO_BUS,
-+	KVM_IOCSR_BUS,
- 	KVM_NR_BUSES
+ 	s64 time_offset;
+ 	struct kvm_context __percpu *vmcs;
++	struct loongarch_ipi *ipi;
  };
  
-diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-index 74e40d5d4af4..2391cb257636 100644
---- a/include/trace/events/kvm.h
-+++ b/include/trace/events/kvm.h
-@@ -236,6 +236,41 @@ TRACE_EVENT(kvm_mmio,
- 		  __entry->len, __entry->gpa, __entry->val)
- );
+ #define CSR_MAX_NUMS		0x800
+@@ -203,6 +205,8 @@ struct kvm_vcpu_arch {
+ 	int last_sched_cpu;
+ 	/* mp state */
+ 	struct kvm_mp_state mp_state;
++	/* ipi state */
++	struct ipi_state ipi_state;
+ 	/* cpucfg */
+ 	u32 cpucfg[KVM_MAX_CPUCFG_REGS];
  
-+#define KVM_TRACE_IOCSR_READ_UNSATISFIED 0
-+#define KVM_TRACE_IOCSR_READ 1
-+#define KVM_TRACE_IOCSR_WRITE 2
+diff --git a/arch/loongarch/include/asm/kvm_ipi.h b/arch/loongarch/include/asm/kvm_ipi.h
+new file mode 100644
+index 000000000000..3dacdf1781b8
+--- /dev/null
++++ b/arch/loongarch/include/asm/kvm_ipi.h
+@@ -0,0 +1,36 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2024 Loongson Technology Corporation Limited
++ */
 +
-+#define kvm_trace_symbol_iocsr \
-+	({ KVM_TRACE_IOCSR_READ_UNSATISFIED, "unsatisfied-read" }, \
-+	{ KVM_TRACE_IOCSR_READ, "read" }, \
-+	{ KVM_TRACE_IOCSR_WRITE, "write" })
++#ifndef __ASM_KVM_IPI_H
++#define __ASM_KVM_IPI_H
 +
-+TRACE_EVENT(kvm_iocsr,
-+	TP_PROTO(int type, int len, u64 gpa, void *val),
-+	TP_ARGS(type, len, gpa, val),
++#include <kvm/iodev.h>
 +
-+	TP_STRUCT__entry(
-+		__field(u32,	type)
-+		__field(u32,	len)
-+		__field(u64,	gpa)
-+		__field(u64,	val)
-+	),
++#define LARCH_INT_IPI			12
 +
-+	TP_fast_assign(
-+		__entry->type		= type;
-+		__entry->len		= len;
-+		__entry->gpa		= gpa;
-+		__entry->val		= 0;
-+		if (val)
-+			memcpy(&__entry->val, val,
-+			       min_t(u32, sizeof(__entry->val), len));
-+	),
++struct loongarch_ipi {
++	spinlock_t lock;
++	struct kvm *kvm;
++	struct kvm_io_device device;
++	struct kvm_io_device mail_dev;
++};
 +
-+	TP_printk("iocsr %s len %u gpa 0x%llx val 0x%llx",
-+		  __print_symbolic(__entry->type, kvm_trace_symbol_iocsr),
-+		  __entry->len, __entry->gpa, __entry->val)
-+);
++struct ipi_state {
++	spinlock_t lock;
++	uint32_t status;
++	uint32_t en;
++	uint32_t set;
++	uint32_t clear;
++	uint64_t buf[4];
++};
 +
- #define kvm_fpu_load_symbol	\
- 	{0, "unload"},		\
- 	{1, "load"}
++#define SMP_MAILBOX			0x1000
++#define KVM_IOCSR_IPI_ADDR_SIZE		0x48
++
++#define MAIL_SEND_ADDR			(SMP_MAILBOX + IOCSR_MAIL_SEND)
++#define KVM_IOCSR_MAIL_ADDR_SIZE	0x118
++
++int kvm_loongarch_register_ipi_device(void);
++#endif
+diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
+index b2f4cbe01ae8..36c3009fe89c 100644
+--- a/arch/loongarch/kvm/Makefile
++++ b/arch/loongarch/kvm/Makefile
+@@ -18,5 +18,6 @@ kvm-y += timer.o
+ kvm-y += tlb.o
+ kvm-y += vcpu.o
+ kvm-y += vm.o
++kvm-y += intc/ipi.o
+ 
+ CFLAGS_exit.o	+= $(call cc-option,-Wno-override-init,)
+diff --git a/arch/loongarch/kvm/intc/ipi.c b/arch/loongarch/kvm/intc/ipi.c
+new file mode 100644
+index 000000000000..5a19712185d5
+--- /dev/null
++++ b/arch/loongarch/kvm/intc/ipi.c
+@@ -0,0 +1,138 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2024 Loongson Technology Corporation Limited
++ */
++
++#include <linux/kvm_host.h>
++#include <asm/kvm_ipi.h>
++#include <asm/kvm_vcpu.h>
++
++static int kvm_ipi_write(struct kvm_vcpu *vcpu,
++			struct kvm_io_device *dev,
++			gpa_t addr, int len, const void *val)
++{
++	return 0;
++}
++
++static int kvm_ipi_read(struct kvm_vcpu *vcpu,
++			struct kvm_io_device *dev,
++			gpa_t addr, int len, void *val)
++{
++	return 0;
++}
++
++static int kvm_loongarch_mail_write(struct kvm_vcpu *vcpu,
++			struct kvm_io_device *dev,
++			gpa_t addr, int len, const void *val)
++{
++	return 0;
++}
++
++static const struct kvm_io_device_ops kvm_ipi_ops = {
++	.read	= kvm_ipi_read,
++	.write	= kvm_ipi_write,
++};
++
++static const struct kvm_io_device_ops kvm_loongarch_mail_ops = {
++	.write	= kvm_loongarch_mail_write,
++};
++
++static int kvm_ipi_get_attr(struct kvm_device *dev,
++			struct kvm_device_attr *attr)
++{
++	return 0;
++}
++
++static int kvm_ipi_set_attr(struct kvm_device *dev,
++			struct kvm_device_attr *attr)
++{
++	return 0;
++}
++
++static void kvm_ipi_destroy(struct kvm_device *dev)
++{
++	struct kvm *kvm;
++	struct loongarch_ipi *ipi;
++
++	if (!dev || !dev->kvm || !dev->kvm->arch.ipi)
++		return;
++	kvm = dev->kvm;
++	ipi = kvm->arch.ipi;
++	kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &ipi->device);
++	kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &ipi->mail_dev);
++	kfree(ipi);
++}
++
++static int kvm_ipi_create(struct kvm_device *dev, u32 type)
++{
++	struct kvm *kvm;
++	struct loongarch_ipi *s;
++	unsigned long addr;
++	struct kvm_io_device *device;
++	int ret;
++
++	kvm_debug("begin create loongarch ipi in kvm ...\n");
++	if (!dev) {
++		kvm_err("%s: kvm_device ptr is invalid!\n", __func__);
++		return -EINVAL;
++	}
++
++	kvm = dev->kvm;
++	if (kvm->arch.ipi) {
++		kvm_err("%s: loongarch ipi has been created!\n", __func__);
++		return -EINVAL;
++	}
++
++	s = kzalloc(sizeof(struct loongarch_ipi), GFP_KERNEL);
++	if (!s)
++		return -ENOMEM;
++	spin_lock_init(&s->lock);
++	s->kvm = kvm;
++
++	/*
++	 * Initialize IOCSR device
++	 */
++	device = &s->device;
++	kvm_iodevice_init(device, &kvm_ipi_ops);
++	addr = SMP_MAILBOX;
++	mutex_lock(&kvm->slots_lock);
++	ret = kvm_io_bus_register_dev(kvm, KVM_IOCSR_BUS, addr,
++			KVM_IOCSR_IPI_ADDR_SIZE, device);
++	mutex_unlock(&kvm->slots_lock);
++	if (ret < 0) {
++		kvm_err("%s: initialize IOCSR dev failed, ret = %d\n", __func__, ret);
++		goto err;
++	}
++
++	device = &s->mail_dev;
++	kvm_iodevice_init(device, &kvm_loongarch_mail_ops);
++	addr = MAIL_SEND_ADDR;
++	mutex_lock(&kvm->slots_lock);
++	ret = kvm_io_bus_register_dev(kvm, KVM_IOCSR_BUS, addr,
++			KVM_IOCSR_MAIL_ADDR_SIZE, device);
++	mutex_unlock(&kvm->slots_lock);
++	if (ret < 0) {
++		kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &s->device);
++		kvm_err("%s: initialize mail box dev failed, ret = %d\n", __func__, ret);
++		goto err;
++	}
++	kvm->arch.ipi = s;
++	return 0;
++err:
++	kfree(s);
++	return -EFAULT;
++}
++
++static struct kvm_device_ops kvm_ipi_dev_ops = {
++	.name = "kvm-loongarch-ipi",
++	.create = kvm_ipi_create,
++	.destroy = kvm_ipi_destroy,
++	.set_attr = kvm_ipi_set_attr,
++	.get_attr = kvm_ipi_get_attr,
++};
++
++int kvm_loongarch_register_ipi_device(void)
++{
++	return kvm_register_device_ops(&kvm_ipi_dev_ops,
++					KVM_DEV_TYPE_LOONGARCH_IPI);
++}
+diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+index 844736b99d38..a1cec0b1fd7f 100644
+--- a/arch/loongarch/kvm/main.c
++++ b/arch/loongarch/kvm/main.c
+@@ -313,7 +313,7 @@ void kvm_arch_hardware_disable(void)
+ 
+ static int kvm_loongarch_env_init(void)
+ {
+-	int cpu, order;
++	int cpu, order, ret;
+ 	void *addr;
+ 	struct kvm_context *context;
+ 
+@@ -368,7 +368,9 @@ static int kvm_loongarch_env_init(void)
+ 
+ 	kvm_init_gcsr_flag();
+ 
+-	return 0;
++	/* Register loongarch ipi interrupt controller interface. */
++	ret = kvm_loongarch_register_ipi_device();
++	return ret;
+ }
+ 
+ static void kvm_loongarch_env_exit(void)
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index 6905283f535b..ad8e69344a56 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -1162,6 +1162,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	/* Init */
+ 	vcpu->arch.last_sched_cpu = -1;
+ 
++	/* Init ipi_state lock */
++	spin_lock_init(&vcpu->arch.ipi_state.lock);
++
+ 	/*
+ 	 * Initialize guest register state to valid architectural reset state.
+ 	 */
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 637efc055145..9fff439c30ea 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1158,7 +1158,11 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
+ 	KVM_DEV_TYPE_RISCV_AIA,
+ #define KVM_DEV_TYPE_RISCV_AIA		KVM_DEV_TYPE_RISCV_AIA
++	KVM_DEV_TYPE_LOONGARCH_IPI,
++#define KVM_DEV_TYPE_LOONGARCH_IPI	KVM_DEV_TYPE_LOONGARCH_IPI
++
+ 	KVM_DEV_TYPE_MAX,
++
+ };
+ 
+ struct kvm_vfio_spapr_tce {
 -- 
 2.39.1
 
