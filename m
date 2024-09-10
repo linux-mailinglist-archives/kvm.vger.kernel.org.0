@@ -1,213 +1,120 @@
-Return-Path: <kvm+bounces-26234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B50B49735F6
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 13:12:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77130973601
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 13:15:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79C49285A6F
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 11:12:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FD07B24CB4
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 11:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1925618CBFC;
-	Tue, 10 Sep 2024 11:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F269418DF97;
+	Tue, 10 Sep 2024 11:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3aP+G57w"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hZZJaLgg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A82A18A94C
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 11:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA1618A6B9;
+	Tue, 10 Sep 2024 11:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725966749; cv=none; b=lLss4Oh6BlmoMAi0176q/VYycBlKX657aWoD0DDkSX0PWhtbbHCGkRaBb/5gcR12ONpR6PZCAKJzLctq5J6HPD66jagWHntaqLEV0SKyPnTsOvN/4MivG4rf8qnXQhZDww8tpQbzbZWbvn23TBh/W89k2vc9+w5sd+RySUloT18=
+	t=1725966915; cv=none; b=fwNPoTEVzF2IZCq+iDk0r+Hzatw+ab1q7CSyVBQOinWcX+0SCbHcz0AVtfWB5nH9MVPqIa9QddHaRKCkUqi0gKP5sKEh7oaELAMlHr925voZVIp/5hv/UkVlYVQoJg3qxTNjO18+iQU18r5+JLHUpooNBXYmnSFN7GyWgxaFmDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725966749; c=relaxed/simple;
-	bh=UYj7aweKY056oMs7GM5XXWBsu2TkMRaSALM5bW7LDJc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m6rYbneS9FjOrVYPy1a7o2cfpARYZiT+r1DcjDVEJDk5ywA53FRrDzydk+decI5YZy3TNe/A5reht772onJ4+1mVN6YC3gsPJN/KYx0iI6wmAGoli5Gu1oeQo4LA+nDnzbPq3fGsZBRrNXds/RcsxFZV/fz99XZO/Sgbd2i2IOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3aP+G57w; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5c2460e885dso11987a12.0
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 04:12:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725966746; x=1726571546; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UYy4DmMGHFHCTGKn7bORTP8d4lFk3R5EHaNq4YeXwzM=;
-        b=3aP+G57wDR8GIYBh6ISTS9mQpKM2xJGooKSvcW/1zJs3uUy2Nl4GzcjkZOJSXOdvo2
-         tbOzMS79+lzVHhUo8f6eTAczUAMjoL8eINQp9CNKdFuPrulh7E3WtH03W/p+Umf4A/yp
-         hFyrf3OTO7GDiUkB4oV5gfziClpwMJRbZJWgaAFhv33e/l4speBx7uRLBsQ0WgyG1JDs
-         BDr9Lv/D/WcToKBSHOoSA7k3YLfz+PuB+OhOpdDWq+MTipUmeCkLOL2LeRVT9mfDC+Pr
-         hOvJUVNq5373zEu9AHOVYwzOxvn3XDi3mdKCh4i+LatgbtwC21VeXdqBgXyCzGFgl03f
-         KPIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725966746; x=1726571546;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UYy4DmMGHFHCTGKn7bORTP8d4lFk3R5EHaNq4YeXwzM=;
-        b=hseXiUjdWI4UR8lauP5OtXIPNrHEYwBDpBjb8XmvDsRcVXoQi92J1Njtl/7TcLC2VT
-         D1dq/Zol3csgkguCRhPQp3LyChUs/xDrIKOtNe2EjayG0QoggXkIgLylW/X6OM3acsPM
-         /e+TqxiD05wxpSgelHCL499c25RkmmMy0gvpuXZN76+nZh1BSe1lsl5vGYb+4tsopL7j
-         ptK6Qhg06lvppw3cgj0Q2Mgem4nyLg3i0CvbiLNoiTv5xX+oopf8jYkO1LaqK6Z41FFG
-         5kSULEskd3D6Miy7O4PcaVUMiy/4KGMy2y0NyYs8EzntT8xVyTgPeFGB8O2qxa/+cemI
-         /9aA==
-X-Forwarded-Encrypted: i=1; AJvYcCUvhJKDTiYWUmnKWs8MBxdK3mhi+dOGBAf7ql9tribFbTUO9u6CrjBVvd6vZpLuA7IXX+A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yza1aAfelOHRamKeGkehAda0ipV/U1MJ0zOARbfBmLINcRdFafS
-	v5KDUMx98Exk5tN25/TA/dy2vgTppRiMgyBXkDM6pK1rW5lFSXd8v4kfBPYV+g==
-X-Google-Smtp-Source: AGHT+IFie5nPTW6D5tNlRl7qFWvNiI/ySCh0zgRrb+aBAPhZhb7eVrcOK1eXSiw1bugwbN+BJ9aSog==
-X-Received: by 2002:a05:6402:1ec4:b0:59f:9f59:9b07 with SMTP id 4fb4d7f45d1cf-5c4029ef54amr158266a12.4.1725966745263;
-        Tue, 10 Sep 2024 04:12:25 -0700 (PDT)
-Received: from google.com (205.215.190.35.bc.googleusercontent.com. [35.190.215.205])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb8120asm107512605e9.37.2024.09.10.04.12.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 04:12:24 -0700 (PDT)
-Date: Tue, 10 Sep 2024 11:12:20 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>,
-	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
-	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Robert Moore <robert.moore@intel.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Moritz Fischer <mdf@kernel.org>,
-	Michael Shavit <mshavit@google.com>,
-	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH v2 8/8] iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED
-Message-ID: <ZuAplEO7wyFahr6Z@google.com>
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <8-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <ZtHuoDWbe54H1nhZ@google.com>
- <20240830170426.GV3773488@nvidia.com>
- <ZtWMGQAdR6sjBmer@google.com>
- <20240903003022.GF3773488@nvidia.com>
- <ZtbQMDxKZUZCGfrR@google.com>
- <20240903235532.GJ3773488@nvidia.com>
- <Ztrigx4LmpbFiMba@google.com>
- <20240906133444.GE1358970@nvidia.com>
+	s=arc-20240116; t=1725966915; c=relaxed/simple;
+	bh=nqs0o+h1KdF/H50Mxp8SLZWpWhEws0D0OPKmKXw+CrY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sul5GKyxkqASMuGMezsaYPzKcln/EU98FohKBSKPLW2nuiUGYIf1fCz/UFEmQv2D0LHG/XQCz4kbVZGtG8lb2UFZvF+a1OVkHpBvhc1ffT4+I0ddd5kgRxGqW20UmyGD+26OPzzSIxihzTFV7fpVLOAlZcIGvcx4/PPWybU7+bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hZZJaLgg; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725966913; x=1757502913;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nqs0o+h1KdF/H50Mxp8SLZWpWhEws0D0OPKmKXw+CrY=;
+  b=hZZJaLggRIkey8/qkMN2jaknnAr4KtORlW1bC2IEhb9vAxod1gpKr+3W
+   kFF491rn17mlVE7dlmjePnB+1EmLNfdzOnjqVkjwdVRvbvpC9nqTgfPXa
+   Usa6w3BbZfJybdSSS8uI3idp8aWt17WJI+DCe/T5XhR4geXcuLc4C798B
+   r2uQXO/hRD6yDC+VBhnXVhPKGvU3AMlVOin7kNZ+IjggrTaVgmCQB50wO
+   N4roSMj4JM4vueZILiPLwOPwW/tsQyN7NranLN4pyI58ETXaYFyF8SbYZ
+   pcQClzEpJAKlUGKx6hGR+ybz2aTtlkAJN67Ch/3Cdu3NEsQ8yiCqwXV0U
+   g==;
+X-CSE-ConnectionGUID: BoXuQNMVQayiwFqGwlc9BQ==
+X-CSE-MsgGUID: 5EQ+hHzbQkOvNxcuCmOJUw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="24865214"
+X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
+   d="scan'208";a="24865214"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 04:15:12 -0700
+X-CSE-ConnectionGUID: wabqkZBHQD2FN1rjUaAFng==
+X-CSE-MsgGUID: yqA1uC7GQbaA1FW0igEiCQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
+   d="scan'208";a="67284049"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.115.59])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 04:15:08 -0700
+Message-ID: <e58349f3-fa36-4635-9b2b-9ff8f2d88038@intel.com>
+Date: Tue, 10 Sep 2024 14:15:02 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 20/21] KVM: TDX: Finalize VM initialization
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+ kvm@vger.kernel.org
+Cc: kai.huang@intel.com, dmatlack@google.com, isaku.yamahata@gmail.com,
+ yan.y.zhao@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org
+References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
+ <20240904030751.117579-21-rick.p.edgecombe@intel.com>
+ <58a801d7-72e2-4a6d-8d0b-6d7f37adaf88@intel.com>
+ <5b2fa2b3-ca77-4d6e-a474-75c196b8fefc@redhat.com>
+Content-Language: en-US
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <5b2fa2b3-ca77-4d6e-a474-75c196b8fefc@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240906133444.GE1358970@nvidia.com>
 
-On Fri, Sep 06, 2024 at 10:34:44AM -0300, Jason Gunthorpe wrote:
-> On Fri, Sep 06, 2024 at 11:07:47AM +0000, Mostafa Saleh wrote:
+On 10/09/24 13:33, Paolo Bonzini wrote:
+> On 9/4/24 17:37, Adrian Hunter wrote:
+>> Isaku was going to lock the mmu.  Seems like the change got lost.
+>> To protect against racing with KVM_PRE_FAULT_MEMORY,
+>> KVM_TDX_INIT_MEM_REGION, tdx_sept_set_private_spte() etc
+>> e.g. Rename tdx_td_finalizemr to __tdx_td_finalizemr and add:
+>>
+>> static int tdx_td_finalizemr(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+>> {
+>>     int ret;
+>>
+>>     write_lock(&kvm->mmu_lock);
+>>     ret = __tdx_td_finalizemr(kvm, cmd);
+>>     write_unlock(&kvm->mmu_lock);
+>>
+>>     return ret;
+>> }
 > 
-> > However, I believe the UAPI can be more clear and solid in terms of
-> > what is supported (maybe a typical struct with the CD, and some
-> > extra configs?) I will give it a think.
-> 
-> I don't think breaking up the STE into fields in another struct is
-> going to be a big improvement, it adds more code and corner cases to
-> break up and reassemble it.
-> 
-> #define STRTAB_STE_0_NESTING_ALLOWED                                         \
-> 	cpu_to_le64(STRTAB_STE_0_V | STRTAB_STE_0_CFG | STRTAB_STE_0_S1FMT | \
-> 		    STRTAB_STE_0_S1CTXPTR_MASK | STRTAB_STE_0_S1CDMAX)
-> #define STRTAB_STE_1_NESTING_ALLOWED                            \
-> 	cpu_to_le64(STRTAB_STE_1_S1DSS | STRTAB_STE_1_S1CIR |   \
-> 		    STRTAB_STE_1_S1COR | STRTAB_STE_1_S1CSH |   \
-> 		    STRTAB_STE_1_S1STALLD | STRTAB_STE_1_EATS)
-> 
-> It is 11 fields that would need to be recoded, that's alot.. Even if
-> you say the 3 cache ones are not needed it is still alot.
+> kvm->slots_lock is better.  In tdx_vcpu_init_mem_region() you can take it before the is_td_finalized() so that there is a lock that is clearly protecting kvm_tdx->finalized between the two.  (I also suggest switching to guard() in tdx_vcpu_init_mem_region()).
 
-I was thinking of providing a higher level semantics
-(no need for caching, valid...), something like:
-
-struct smmu_user_table {
-	u64 cd_table;
-	u32 smmu_cd_cfg;  /* linear or 2lvl,.... */
-	u32 smmu_trans_cfg; /* Translate, bypass, abort */
-	u32 dev_feat; /*ATS, STALL, …*/
-};
-
-I feel that is a bit more clear for user space? Instead of
-partially setting the STE, and it should be easier to extend than
-masking the STE.
-
-I’am not opposed to the vSTE, I just feel it's loosely defined,
-that's why I was asking for the docs.
+Doesn't KVM_PRE_FAULT_MEMORY also need to be protected?
 
 > 
-> > > Reporting a static kernel capability through GET_INFO output is
-> > > easier/saner than providing some kind of policy flags in the GET_INFO
-> > > input to specify how the sanitization should work.
-> > 
-> > I don’t think it’s “policy”, it’s just giving userspace the minimum
-> > knowledge it needs to create the vSMMU, but again no really strong
-> > opinion about that.
-> 
-> There is no single "minimum knowledge" though, it depends on what the
-> VMM is able to support. IMHO once you go over to the "VMM has to
-> ignore bits it doesn't understand" you may as well just show
-> everything. Then the kernel side can't be wrong.
-> 
-> If the kernel side can be wrong, then you are back to handshaking
-> policy because the kernel can't assume that all existing VMMs wil not
-> rely on the kernel to do the masking.
->
+> Also, I think that in patch 16 (whether merged or not) nr_premapped should not be incremented, once kvm_tdx->finalized has been set?
 
-I agree it’s tricky, again no strong opinion on that, although I doubt
-that a VMM would care about all the SMMU features.
+tdx_sept_set_private_spte() checks is_td_finalized() to decide
+whether to call tdx_mem_page_aug() or tdx_mem_page_record_premap_cnt()
+Refer patch 14 "KVM: TDX: Implement hooks to propagate changes
+of TDP MMU mirror page table" for the addition of
+tdx_sept_set_private_spte()
 
-> > > > But this is a UAPI. How can userspace implement that if it has no
-> > > > documentation, and how can it be maintained if there is no clear
-> > > > interface with userspace with what is expected/returned...
-> > > 
-> > > I'm not sure what you are looking for here? I don't think an entire
-> > > tutorial on how to build a paravirtualized vSMMU is appropriate to
-> > > put in comments?
-> > 
-> > Sorry, I don’t think I was clear, I meant actual documentation for
-> > the UAPI, as in RST files for example. If I want to support that
-> > in kvmtool how can I implement it? 
-> 
-> Well, you need thousands of lines of code in kvtool to build a vIOMMU :)
-> 
-> Nicolin is looking at writing something, lets see.
-> 
-> I think for here we should focus on the comments being succinct but
-> sufficient to understand what the uAPI does itself.
-> 
-Actually I think the opposite, I think UAPI docs is more important
-here, especially for the vSTE, that's how we can compare the code to
-what is expected from user-space.
 
-> > > I would *really* like everyone to sit down and figure out how to
-> > > manage virtual device lifecycle in a single language!
-> > 
-> > Yes, just like the guest_memfd work. There has been also
-> > some work to unify some of the guest HVC bits:
-> > https://lore.kernel.org/all/20240830130150.8568-1-will@kernel.org/
-> 
-> I think Dan Williams is being ringleader for the PCI side effort on CC
-
-Thanks, I will try to spend some time on the secure VFIO work.
-
-Thanks,
-Mostafa
-
-> 
-> Jason
 
