@@ -1,131 +1,265 @@
-Return-Path: <kvm+bounces-26206-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26207-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E76E0972A60
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 09:17:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBF29972A95
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 09:24:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 975701F258BD
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 07:17:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F9B8283459
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 07:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC3A17C222;
-	Tue, 10 Sep 2024 07:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B8617D35C;
+	Tue, 10 Sep 2024 07:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wTtnwDxO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qb9r4ZkU";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Qo5B/Dfv";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7tt0SXRd"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1DCBA45
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 07:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A429F17C228;
+	Tue, 10 Sep 2024 07:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725952623; cv=none; b=PI7hgQV0ukZe11em8xGnUBGeS230rpdnlJJ5JtNZbIjRIdm/cXv5pDx71w1GbjLu8uIT+vD6KwWn4vtcaMQsEZpAjintAd4+ndQ8FDEWRnsRYi+39JZxoUy1I6viD7A78VpuZsVdjtn4PDdpbRZyOTwdnFfe8+wO2YtfIR4ANOE=
+	t=1725953066; cv=none; b=B5pt3GrN28qM0pPvQpePJdmfy+TCyacc00pRYTAknmEUFHfZwN7iEKGSxr6hmaI6prf9PsgAGBrL5IP4+DJBEuLGxVQoVVLjG9W/L9W4p24R6JfFLWcbQNXT48lokjR8zDYgkdP/WKxx5M6aIFKHCLpJ2b+pjJ61vnCRFNqwK5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725952623; c=relaxed/simple;
-	bh=2Cw9mNBhZURvNnlO42Hu3NILmNZJ3TmRQ7D/nqNfoWQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eZ9IvN0ZV5nKaNLAvSeuE9TTnZtF/UNloFk8jZPdVYNVKtq60sH1cqj2p6G+tHvQclBKhRz2h0ehmpMkIdvr6aJ4IACF4eoCD7ZF/Z+4kD+JFJaCkLYeoRLThqpmR/0hv6kPjPPzmQwqjav4+r+8en04VlpU07xnslejVcd1wls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4X2w3W4bxgzyR17;
-	Tue, 10 Sep 2024 15:16:07 +0800 (CST)
-Received: from kwepemd200010.china.huawei.com (unknown [7.221.188.124])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1F3F51400D1;
-	Tue, 10 Sep 2024 15:16:52 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- kwepemd200010.china.huawei.com (7.221.188.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 10 Sep 2024 15:16:51 +0800
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Tue, 10 Sep 2024 08:16:49 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, Sebastian Ott
-	<sebott@redhat.com>, James Morse <james.morse@arm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, yuzenghui <yuzenghui@huawei.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Shaoqin Huang
-	<shahuang@redhat.com>, Eric Auger <eric.auger@redhat.com>, "Wangzhou (B)"
-	<wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v5 07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID
- register
-Thread-Topic: [PATCH v5 07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID
- register
-Thread-Index: AQHawm/0TP9B4WSU3kSdeZvzR1wQjLJQDNGggAAIPQCAAAfwgIAAEmkA///8m4CAAOuFwA==
-Date: Tue, 10 Sep 2024 07:16:49 +0000
-Message-ID: <6abe14d969da42638d648db205d39fe7@huawei.com>
-References: <20240619174036.483943-1-oliver.upton@linux.dev>
- <20240619174036.483943-8-oliver.upton@linux.dev>
- <0db19a081d9e41f08b0043baeef16f16@huawei.com> <864j6o94fz.wl-maz@kernel.org>
- <Zt8o6fStuQXANSrX@linux.dev> <8e361ab82d6c4adcb15890cd3cab48ee@huawei.com>
- <Zt81ga44ztdX_KET@linux.dev>
-In-Reply-To: <Zt81ga44ztdX_KET@linux.dev>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1725953066; c=relaxed/simple;
+	bh=qO+ZxvCBk1IwwsGwEwBC/rUo+yTquTnujH6P70v3GJ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mLCWw8sGSCUhFWE/2p8+g6MjBHkjYZE/P2Zz4pIqDtEjxfKjufUgcBCZgFc5jemu/iPoq/XN20yHwNDH/QEHbC0K/b5WWk65cxYaB9zGyjvBCo3zoZjuONQC6w4aP0TVB8rOl73ujs6GCHBVbmvzycPYmv4Ifd1o3pdN8s8wEEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wTtnwDxO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qb9r4ZkU; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Qo5B/Dfv; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7tt0SXRd; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id CBD701F804;
+	Tue, 10 Sep 2024 07:24:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1725953063; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=zNgLU6oyaubrQ/4d6rM6K1MKOLGhk6AKfbSQ7+uFIdk=;
+	b=wTtnwDxOQhLio/IuUrWZxqFH+3K6hcXYJA6IlB6ytP4/gRQi5n4i8tpUlE8igiQ/SZy1mr
+	D0AJsyVVsyFgSITDOkzihHG9pGI2ULPGKL/jKYP033+UL6thvgBMTmRHYHH43xJZodAK8z
+	kziMuD26vrocvFOE7IPxmUjIP/GJtBg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1725953063;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=zNgLU6oyaubrQ/4d6rM6K1MKOLGhk6AKfbSQ7+uFIdk=;
+	b=qb9r4ZkUAscAbNexhcQlZvBFMYvXGk3PAMuRkabCyby6sTQxZw77GFMHqE0JPkuvZmAzQZ
+	sejiGpGSyBORAxBA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="Qo5B/Dfv";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=7tt0SXRd
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1725953062; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=zNgLU6oyaubrQ/4d6rM6K1MKOLGhk6AKfbSQ7+uFIdk=;
+	b=Qo5B/DfvGyaB5+DXXCuNV6eGt/OGakNT76K6XjOra7td4qBfLXkpW11jeB9BE4mnk8se0m
+	xjnU4KRdM9mNxzIUryWWjrmA1Lodfa6IGNaYayIrTObtcUbuqUhGYin0MsTDmVrF4RDG1V
+	EEauavZMt/Ou+UhwZMLV9O9n4pKygis=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1725953062;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=zNgLU6oyaubrQ/4d6rM6K1MKOLGhk6AKfbSQ7+uFIdk=;
+	b=7tt0SXRdLPSV1ZDBd2xY3cK2LcH/bNWxh10C/JNKzN1pSFJ3Al5ow/BfSnp40jhREuj80f
+	wMyxsRiRoBxGlnCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7264F13A3A;
+	Tue, 10 Sep 2024 07:24:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Vt6TGib032ZKJQAAD6G6ig
+	(envelope-from <tzimmermann@suse.de>); Tue, 10 Sep 2024 07:24:22 +0000
+Message-ID: <75c8c1f0-d774-4bc1-ba71-bce15db921c7@suse.de>
+Date: Tue, 10 Sep 2024 09:24:22 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] drm/bochs: use devm_ioremap_wc() to map framebuffer
+To: Yan Zhao <yan.y.zhao@intel.com>, kraxel@redhat.com,
+ maarten.lankhorst@linux.intel.com, mripard@kernel.org, airlied@gmail.com,
+ daniel@ffwll.ch, virtualization@lists.linux.dev,
+ dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Kevin Tian <kevin.tian@intel.com>
+References: <20240909131643.28915-1-yan.y.zhao@intel.com>
+Content-Language: en-US
+From: Thomas Zimmermann <tzimmermann@suse.de>
+Autocrypt: addr=tzimmermann@suse.de; keydata=
+ xsBNBFs50uABCADEHPidWt974CaxBVbrIBwqcq/WURinJ3+2WlIrKWspiP83vfZKaXhFYsdg
+ XH47fDVbPPj+d6tQrw5lPQCyqjwrCPYnq3WlIBnGPJ4/jreTL6V+qfKRDlGLWFjZcsrPJGE0
+ BeB5BbqP5erN1qylK9i3gPoQjXGhpBpQYwRrEyQyjuvk+Ev0K1Jc5tVDeJAuau3TGNgah4Yc
+ hdHm3bkPjz9EErV85RwvImQ1dptvx6s7xzwXTgGAsaYZsL8WCwDaTuqFa1d1jjlaxg6+tZsB
+ 9GluwvIhSezPgnEmimZDkGnZRRSFiGP8yjqTjjWuf0bSj5rUnTGiyLyRZRNGcXmu6hjlABEB
+ AAHNJ1Rob21hcyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPsLAjgQTAQgAOAIb
+ AwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftODH
+ AAoJEGgNwR1TC3ojx1wH/0hKGWugiqDgLNXLRD/4TfHBEKmxIrmfu9Z5t7vwUKfwhFL6hqvo
+ lXPJJKQpQ2z8+X2vZm/slsLn7J1yjrOsoJhKABDi+3QWWSGkaGwRJAdPVVyJMfJRNNNIKwVb
+ U6B1BkX2XDKDGffF4TxlOpSQzdtNI/9gleOoUA8+jy8knnDYzjBNOZqLG2FuTdicBXblz0Mf
+ vg41gd9kCwYXDnD91rJU8tzylXv03E75NCaTxTM+FBXPmsAVYQ4GYhhgFt8S2UWMoaaABLDe
+ 7l5FdnLdDEcbmd8uLU2CaG4W2cLrUaI4jz2XbkcPQkqTQ3EB67hYkjiEE6Zy3ggOitiQGcqp
+ j//OwE0EWznS4AEIAMYmP4M/V+T5RY5at/g7rUdNsLhWv1APYrh9RQefODYHrNRHUE9eosYb
+ T6XMryR9hT8XlGOYRwKWwiQBoWSDiTMo/Xi29jUnn4BXfI2px2DTXwc22LKtLAgTRjP+qbU6
+ 3Y0xnQN29UGDbYgyyK51DW3H0If2a3JNsheAAK+Xc9baj0LGIc8T9uiEWHBnCH+RdhgATnWW
+ GKdDegUR5BkDfDg5O/FISymJBHx2Dyoklv5g4BzkgqTqwmaYzsl8UxZKvbaxq0zbehDda8lv
+ hFXodNFMAgTLJlLuDYOGLK2AwbrS3Sp0AEbkpdJBb44qVlGm5bApZouHeJ/+n+7r12+lqdsA
+ EQEAAcLAdgQYAQgAIAIbDBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftOH6AAoJEGgNwR1T
+ C3ojVSkIALpAPkIJPQoURPb1VWjh34l0HlglmYHvZszJWTXYwavHR8+k6Baa6H7ufXNQtThR
+ yIxJrQLW6rV5lm7TjhffEhxVCn37+cg0zZ3j7zIsSS0rx/aMwi6VhFJA5hfn3T0TtrijKP4A
+ SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
+ Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
+ 4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
+In-Reply-To: <20240909131643.28915-1-yan.y.zhao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: CBD701F804
+X-Spam-Score: -4.51
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[intel.com,redhat.com,linux.intel.com,kernel.org,gmail.com,ffwll.ch,lists.linux.dev,lists.freedesktop.org,vger.kernel.org];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,suse.de:dkim,suse.de:mid,suse.de:email]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogT2xpdmVyIFVwdG9uIDxv
-bGl2ZXIudXB0b25AbGludXguZGV2Pg0KPiBTZW50OiBNb25kYXksIFNlcHRlbWJlciA5LCAyMDI0
-IDY6NTEgUE0NCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29s
-b3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gQ2M6IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5v
-cmc+OyBrdm1hcm1AbGlzdHMubGludXguZGV2OyBTZWJhc3RpYW4gT3R0DQo+IDxzZWJvdHRAcmVk
-aGF0LmNvbT47IEphbWVzIE1vcnNlIDxqYW1lcy5tb3JzZUBhcm0uY29tPjsgU3V6dWtpIEsNCj4g
-UG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT47IHl1emVuZ2h1aSA8eXV6ZW5naHVpQGh1
-YXdlaS5jb20+Ow0KPiBrdm1Admdlci5rZXJuZWwub3JnOyBTaGFvcWluIEh1YW5nIDxzaGFodWFu
-Z0ByZWRoYXQuY29tPjsgRXJpYyBBdWdlcg0KPiA8ZXJpYy5hdWdlckByZWRoYXQuY29tPjsgV2Fu
-Z3pob3UgKEIpIDx3YW5nemhvdTFAaGlzaWxpY29uLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRD
-SCB2NSAwNy8xMF0gS1ZNOiBhcm02NDogVHJlYXQgQ1RSX0VMMCBhcyBhIFZNIGZlYXR1cmUgSUQN
-Cj4gcmVnaXN0ZXINCj4gDQo+IE9uIE1vbiwgU2VwIDA5LCAyMDI0IGF0IDA1OjE2OjU1UE0gKzAw
-MDAsIFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gd3JvdGU6DQo+ID4gPiA+IEl0IHNob3Vs
-ZCBiZSBzYWZlLCBhcyBhIFBJUFQgQ01PIGFsd2F5cyBkb2VzIGF0IGxlYXN0IHRoZSBzYW1lIGFz
-DQo+ID4gPiA+IFZJUFQsIGFuZCBwb3RlbnRpYWxseSBtb3JlIGlmIHRoZXJlIGlzIGFsaWFzaW5n
-Lg0KPiA+ID4NCj4gPiA+ICsxLCB0aGVyZSB3YXMgbm8gcGFydGljdWxhciByZWFzb24gd2h5IHRo
-aXMgd2Fzbid0IGhhbmRsZWQgYmVmb3JlLg0KPiA+ID4NCj4gPiA+IFdlIHNob3VsZCBiZSBjYXJl
-ZnVsIHRvIG9ubHkgYWxsb3cgdXNlcnNwYWNlIHRvIHNlbGVjdCBWSVBUIG9yIFBJUFQNCj4gKHdo
-ZXJlDQo+ID4gPiBwZXJtaXNzaWJsZSksIGFuZCBub3QgbmVjZXNzYXJpbHkgYW55IHZhbHVlIGxv
-d2VyIHRoYW4gd2hhdCdzIHJlcG9ydGVkIGJ5DQo+ID4gPiBoYXJkd2FyZS4NCj4gPg0KPiA+IFZJ
-UFQgMGIxMA0KPiA+IFBJUFQgMGIxMQ0KPiA+DQo+ID4gT2suIEp1c3QgdG8gY2xhcmlmeSB0aGF0
-ICIgbm90IG5lY2Vzc2FyaWx5IGFueSB2YWx1ZSBsb3dlciB0aGFuIHdoYXQncw0KPiByZXBvcnRl
-ZCBieQ0KPiA+IGhhcmR3YXJlIiBtZWFucyB1c2Vyc3BhY2UgY2FuIHNldCBQSVBUIGlmIGhhcmR3
-YXJlIHN1cHBvcnRzIFZJUFQ/DQo+IA0KPiBCeSB0aGF0IEkgbWVhbnQgd2UgZGlzYWxsb3cgdXNl
-cnNwYWNlIGZyb20gc2VsZWN0aW5nIEFJVklWVCAoMGIwMSkgYW5kDQo+IFZQSVBUICgwYjAwKS4g
-VGhlIGZvcm1lciBpcyByZXNlcnZlZCBpbiBBUk12OCwgYW5kIEkgZG9uJ3QgdGhpbmsgYW55b25l
-DQo+IGhhcyBldmVyIGJ1aWx0IHRoZSBsYXR0ZXIuDQo+IA0KPiA+IEJhc2VkIG9uIHRoaXMsDQo+
-ID4gIiBJZiB3ZSBoYXZlIGRpZmZlcmluZyBJLWNhY2hlIHBvbGljaWVzLCByZXBvcnQgaXQgYXMg
-dGhlIHdlYWtlc3QgLSBWSVBULiIgLCBJDQo+IHdhcyB0aGlua2luZw0KPiA+IHRoZSBvdGhlciB3
-YXkgYXJvdW5kKHNlZSAic2FmZSB0byBkb3duZ3JhZGUgUElQVCB0byBWSVBUIikuIEJ1dCBNYXJj
-IGFsc28NCj4gPiBzZWVtcyB0byBzdWdnZXN0IFBJUFQgQ01PIGVuZHMgdXAgZG9pbmcgYXRsZWFz
-dCBzYW1lIGFzIFZJUFQgYW5kIG1vcmUsDQo+IHNvIGl0IGxvb2tzIGxpa2UNCj4gPiB0aGUgb3Ro
-ZXIgd2F5LiBJZiB0aGF0J3MgdGhlIGNhc2UsIHdoYXQgZG9lcyB0aGF0ICJyZXBvcnQgaXQgYXMg
-dGhlIHdlYWtlc3QiDQo+IG1lYW5zIGZvciBob3N0Pw0KPiANCj4gUElQVCBpcyB0aGUgbm9uLWFs
-aWFzaW5nIGZsYXZvciBvZiBJJC4gVXNpbmcgYSBWSVBUIHNvZnR3YXJlIG1vZGVsIG9uDQo+IFBJ
-UFQgd2lsbCBsZWFkIHRvIG92ZXJpbnZhbGlkYXRpbmcsIGJ1dCBzdGlsbCBjb3JyZWN0LiBDYW5u
-b3QgZG8gaXQgdGhlDQo+IG90aGVyIHdheSBhcm91bmQuDQoNCk9rLiBUaGFua3MgYm90aC4gSSB3
-aWxsIHNlbmQgb3V0IGEgcGF0Y2ggc29vbi4NCg0KQW5kIG5vdyB0byB0aGUgZWxlcGhhbnQgaW4g
-dGhlIHJvb20sIGhhbmRsaW5nIE1JRFIgZGlmZmVyZW5jZXMgYW5kIGFzc29jaWF0ZWQgZXJyYXRh
-DQptYW5hZ2VtZW50IPCfmIoNCg0KTWFyYywgeW91IG1lbnRpb25lZCBhYm91dCBhICBwcm90b3R5
-cGUgc29sdXRpb24geW91IGhhdmUgYSB3aGlsZSBiYWNrWzBdLA0KaGFzIHRoYXQgYmVlbiBzaGFy
-ZWQgcHVibGljPw0KDQpBbHNvIG5vdCBzdXJlIEFSTSBoYXMgYW55IHBsYW5zIHRvIG1ha2UgdGhp
-cyBhIHNwZWNpZmljYXRpb24gc29vbi4NCg0KSSB3YXMgdGhpbmtpbmcgb2YgaGFuZGxpbmcgdGhp
-cyBpbiB1c2Vyc3BhY2UgZm9yIG5vdyBieSBpZ25vcmluZyB0aGUgTUlEUiB3cml0ZQ0KZXJyb3Ig
-b24gTWlncmF0aW9uIGFuZCBrZWVwaW5nIHRoZSBob3N0IE1JRFIgdmFsdWUgZm9yIGRlc3RpbmF0
-aW9uIFZNLiBUaGlzIGlzDQpmb3IgdXNlIGNhc2VzIHdoZXJlIHdlIGtub3cgdGhhdCB0aGUgaG9z
-dHMgZG9lc24ndCBoYXZlIGFueSBNSURSIGJhc2VkIGVycmF0YSBvcg0KZXJyYXRhIGRpZmZlcmVu
-Y2UgZG9lc24ndCBtYXR0ZXIgYW5kIGFzc3VtaW5nIHRoZSB1c2VyIGtub3dzIHdoYXQgdGhleSBh
-cmUgZG9pbmcuDQoNClBsZWFzZSBsZXQgbWUga25vdywgaWYgdGhlcmUgYXJlIGFueSBvdGhlciBz
-dWdnZXN0aW9ucyBvciB3b3JrIGluIHByb2dyZXNzIG9uIHRoaXMgb25lLg0KDQpUaGFua3MsDQpT
-aGFtZWVyDQpbMF0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtYXJtLWtlcm5lbC84Njdj
-dDhtbmVsLndsLW1hekBrZXJuZWwub3JnLw0KDQo=
+Hi
+
+Am 09.09.24 um 15:16 schrieb Yan Zhao:
+> Opt for devm_ioremap_wc() over devm_ioremap() when mapping the framebuffer.
+>
+> Using devm_ioremap() results in the VA being mapped with PAT=UC-, which
+> considerably slows down drm_fb_memcpy(). In contrast, devm_ioremap_wc()
+> maps the VA with PAT set to WC, leading to better performance on platforms
+> where access to UC memory is much slower than WC memory.
+>
+> Here's the performance data measured in a guest on the physical machine
+> "Sapphire Rapids XCC".
+> With host KVM honors guest PAT memory types, the effective memory type
+> for this framebuffer range is
+> - WC when devm_ioremap_wc() is used
+> - UC- when devm_ioremap() is used.
+>
+> The data presented is an average from 10 execution runs.
+>
+> Cycles: Avg cycles of executed bochs_primary_plane_helper_atomic_update()
+>          from VM boot to GDM show up
+> Cnt:    Avg cnt of executed bochs_primary_plane_helper_atomic_update()
+>          from VM boot to GDM show up
+> T:      Avg time of each bochs_primary_plane_helper_atomic_update().
+>
+>   -------------------------------------------------
+> |            | devm_ioremap() | devm_ioremap_wc() |
+> |------------|----------------|-------------------|
+> |  Cycles    |    211.545M    |   0.157M          |
+> |------------|----------------|-------------------|
+> |  Cnt       |     142        |   1917            |
+> |------------|----------------|-------------------|
+> |  T         |    0.1748s     |   0.0004s         |
+>   -------------------------------------------------
+
+Very nice. Thank you so much.
+
+> Note:
+> Following the rebase to [3], the previously reported GDM failure on the
+> VGA device [1] can no longer be reproduced, thanks to the memory management
+> improvements made in [2]. Despite this, I have proceeded to submit this
+> patch because of the noticeable performance improvements it provides.
+>
+> Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Closes: https://lore.kernel.org/all/87jzfutmfc.fsf@redhat.com/#t
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Thomas Zimmermann <tzimmermann@suse.de>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Link: https://lore.kernel.org/all/87jzfutmfc.fsf@redhat.com/#t [1]
+> Link: https://patchwork.freedesktop.org/series/138086 [2]
+> Link: https://gitlab.freedesktop.org/drm/misc/kernel/-/tree/drm-misc-next [3]
+
+Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
+Texted-by: Thomas Zimmermann <tzimmermann@suse.de>
+
+If no other reviews come in, I'll merge the patch by the end of the week.
+
+Best regards
+Thomas
+
+> ---
+> v2:
+> - Rebased to the latest drm-misc-next branch. [2]
+> - Updated patch log to match the base code.
+>
+> v1: https://lore.kernel.org/all/20240909051529.26776-1-yan.y.zhao@intel.com
+> ---
+>   drivers/gpu/drm/tiny/bochs.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/gpu/drm/tiny/bochs.c b/drivers/gpu/drm/tiny/bochs.c
+> index 69c5f65e9853..9055b1dd66df 100644
+> --- a/drivers/gpu/drm/tiny/bochs.c
+> +++ b/drivers/gpu/drm/tiny/bochs.c
+> @@ -268,7 +268,7 @@ static int bochs_hw_init(struct bochs_device *bochs)
+>   	if (!devm_request_mem_region(&pdev->dev, addr, size, "bochs-drm"))
+>   		DRM_WARN("Cannot request framebuffer, boot fb still active?\n");
+>   
+> -	bochs->fb_map = devm_ioremap(&pdev->dev, addr, size);
+> +	bochs->fb_map = devm_ioremap_wc(&pdev->dev, addr, size);
+>   	if (bochs->fb_map == NULL) {
+>   		DRM_ERROR("Cannot map framebuffer\n");
+>   		return -ENOMEM;
+
+-- 
+--
+Thomas Zimmermann
+Graphics Driver Developer
+SUSE Software Solutions Germany GmbH
+Frankenstrasse 146, 90461 Nuernberg, Germany
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+HRB 36809 (AG Nuernberg)
+
 
