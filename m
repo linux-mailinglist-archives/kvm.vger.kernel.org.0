@@ -1,90 +1,90 @@
-Return-Path: <kvm+bounces-26390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8259745EB
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 00:25:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A94AD9745ED
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 00:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 293571F27185
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 22:25:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD64E1C214FC
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 22:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1421ABECD;
-	Tue, 10 Sep 2024 22:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D426B1ABECE;
+	Tue, 10 Sep 2024 22:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IsJPlDel";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+WN70kXv";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IsJPlDel";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+WN70kXv"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Uw2TIwur";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="thBj5R5t";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OfGUfAHm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GFI0CEfj"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD77817BB3D
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 22:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7443117BB3D
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 22:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726007117; cv=none; b=AosMSv8W+fx69KBmB9j5PbIzC1yNv2XzHz3xiM93z6tl2eerrvBZ/vCPMdzZwBajMiMWzWPRcu1aMVIrpBIncKbAyzPAJuL8DDp9iexwSFrrNB4XJjxfpD4+DmuiGQVaynnwDxHWhx0KgbPrLVn+2Uc2uRoahILB20ytNmlZgII=
+	t=1726007169; cv=none; b=S6r4yQeV3zB2FX5kJwxWLCDpScz8VFm3/1sQxc4LQVnax4dAHOjQ8B71vVYex5Z5XAFvrOlftSeVeuQ82yQzr40i//Trt9VvFYlLnt8azPPy1KkuyMKrlmfdG0koM33KQ2j1HqRD9SsWzsP60s1oDR31ZtWlnz1iohOtqfAXfZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726007117; c=relaxed/simple;
-	bh=964TAfua5Dy0nuXre0wI7J9Jd2aoCVngcNHjIHTW2V8=;
+	s=arc-20240116; t=1726007169; c=relaxed/simple;
+	bh=KHEH2dumcGJ+iWLRTO+Pudo/yr85yi/H4tL3yocRdFE=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hC6oQ/ljP3RTBc12eJFN87Gj6jAki09e+XIckDYul9Yu2U8XwOnn7SUlcB/Dvs8Tq8rIl7mDDdTutYyTVA0M/yhWcWubxrVurKU6NdKxHSZfOhj3Yk/rPklthBzVWFSrdIe0CVviSVWYPO9jD0kj4a2Q4w5vXCPgFTIpoKuJ8cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IsJPlDel; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+WN70kXv; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IsJPlDel; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+WN70kXv; arc=none smtp.client-ip=195.135.223.130
+	 MIME-Version:Content-Type; b=YqqynVPzn1dKI6I5Z9yuBndlotThdS7v2DrzN9sf+7a72DlVd466v1v9TG3vPJGoP9bSm0Ux6/tXiBuYnhMdzjt9IC5v+ah70yLPeJsWFE/905PYH7+auY6O7H3glJKu3bd92IuTeWZ5kp8oOk2vh4GHlvG8Ex69fXTpBbLS+FI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Uw2TIwur; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=thBj5R5t; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OfGUfAHm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GFI0CEfj; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id BC4B521A5D;
-	Tue, 10 Sep 2024 22:25:13 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 8AFE821A7B;
+	Tue, 10 Sep 2024 22:26:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1726007113; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1726007165; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/ngJZupkt611k1HwvHZHIrGAiSEDttJWiwH4VezFYDA=;
-	b=IsJPlDelGX+nr5/FOwAUoKaLDkVeGRuJsjO5Ttp4G9CVC8eAQ6FHB2Xq8OP01tyhxwVDav
-	iE717wPn8F3aN4GfLXvPenoYL+iwTd4Ois6/1tyh0KpZFNFqpY71qwVM0Zvs9MwNUskY4G
-	cCHTofFJ4qY03+SV7OnoAaZ4rE6z6sc=
+	bh=xyKU/vmnk31FcTe/MsOvbzJI78hDjVUhHHGOtjP8OL4=;
+	b=Uw2TIwurMWwrXhFc8ZEDLaHSFKjWsOWdy5g4ZfwyzXlyZJIX0QbJ2JjXnutnFeFqkkDheX
+	LboU7fwlbdqoxeBXZWm9i6uy71vhiFM+caKc1ypvV/uLEakczT10a0Fvpgo1V8NEDn6MWJ
+	oPtxW+eqcgWIELFiduuueQ7Rqp79LNU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1726007113;
+	s=susede2_ed25519; t=1726007165;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/ngJZupkt611k1HwvHZHIrGAiSEDttJWiwH4VezFYDA=;
-	b=+WN70kXvXhiKPcyECLNcD1EOXXM2KPPgNHW0tek0hOiIIoHIYJJEOGAY5gHwpFw6254f9c
-	UPV9Pe4BS9VBkVBQ==
+	bh=xyKU/vmnk31FcTe/MsOvbzJI78hDjVUhHHGOtjP8OL4=;
+	b=thBj5R5tCaylH/cQy9u92YD6gqaoN8WJKCM0oO2+EyrNIkTqb2W6TCv1pm2194xDQ5846w
+	1AzHpA3lY2Y59uBg==
 Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=IsJPlDel;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=+WN70kXv
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=OfGUfAHm;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=GFI0CEfj
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1726007113; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1726007164; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/ngJZupkt611k1HwvHZHIrGAiSEDttJWiwH4VezFYDA=;
-	b=IsJPlDelGX+nr5/FOwAUoKaLDkVeGRuJsjO5Ttp4G9CVC8eAQ6FHB2Xq8OP01tyhxwVDav
-	iE717wPn8F3aN4GfLXvPenoYL+iwTd4Ois6/1tyh0KpZFNFqpY71qwVM0Zvs9MwNUskY4G
-	cCHTofFJ4qY03+SV7OnoAaZ4rE6z6sc=
+	bh=xyKU/vmnk31FcTe/MsOvbzJI78hDjVUhHHGOtjP8OL4=;
+	b=OfGUfAHm/MLJluU8DNo+wJZ3HR15vrr4c1nygO9wkcAxfKNV/yzIfg3U25Gbn1M9WMwJp3
+	pr3OzD1ncXh41vRKYO7Z/8DQsDb5e1CkS4loYWgEKvpt9CUU0XULBnd2g3hsyhP8ya3MwI
+	P3in5dibnETCM0FR1FujLFLD4dTWsDY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1726007113;
+	s=susede2_ed25519; t=1726007164;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/ngJZupkt611k1HwvHZHIrGAiSEDttJWiwH4VezFYDA=;
-	b=+WN70kXvXhiKPcyECLNcD1EOXXM2KPPgNHW0tek0hOiIIoHIYJJEOGAY5gHwpFw6254f9c
-	UPV9Pe4BS9VBkVBQ==
+	bh=xyKU/vmnk31FcTe/MsOvbzJI78hDjVUhHHGOtjP8OL4=;
+	b=GFI0CEfjgoLr2GcKjjlN24Y5lwQdxzsjekbGhLNFdLG7ZrNABA8Xf2mDv72hG5LnRfmijp
+	FOzcuqyVVH4o5gAw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DD737132CB;
-	Tue, 10 Sep 2024 22:25:12 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id AD6FC132CB;
+	Tue, 10 Sep 2024 22:26:03 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 9MvrNUjH4GbMOQAAD6G6ig
-	(envelope-from <farosas@suse.de>); Tue, 10 Sep 2024 22:25:12 +0000
+	id 7OZUKnvH4GYbOgAAD6G6ig
+	(envelope-from <farosas@suse.de>); Tue, 10 Sep 2024 22:26:03 +0000
 From: Fabiano Rosas <farosas@suse.de>
 To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
 Cc: Zhao Liu <zhao1.liu@intel.com>, "Richard W.M. Jones"
@@ -124,13 +124,13 @@ Cc: Zhao Liu <zhao1.liu@intel.com>, "Richard W.M. Jones"
  <bmeng.cn@gmail.com>, Weiwei Li <liwei1518@gmail.com>, Klaus Jensen
  <its@irrelevant.dk>, Jean-Christophe Dubois <jcd@tribudubois.net>, Jason
  Wang <jasowang@redhat.com>, Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: Re: [PATCH 08/39] migration: replace assert(0) with
+Subject: Re: [PATCH 21/39] migration: replace assert(false) with
  g_assert_not_reached()
-In-Reply-To: <20240910221606.1817478-9-pierrick.bouvier@linaro.org>
+In-Reply-To: <20240910221606.1817478-22-pierrick.bouvier@linaro.org>
 References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
- <20240910221606.1817478-9-pierrick.bouvier@linaro.org>
-Date: Tue, 10 Sep 2024 19:25:10 -0300
-Message-ID: <87plpbqh89.fsf@suse.de>
+ <20240910221606.1817478-22-pierrick.bouvier@linaro.org>
+Date: Tue, 10 Sep 2024 19:26:01 -0300
+Message-ID: <87mskfqh6u.fsf@suse.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -138,10 +138,10 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Rspamd-Queue-Id: BC4B521A5D
+X-Rspamd-Queue-Id: 8AFE821A7B
 X-Spam-Level: 
-X-Spamd-Result: default: False [-5.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
+X-Spamd-Result: default: False [-5.00 / 50.00];
+	BAYES_HAM(-2.99)[99.94%];
 	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
 	SUSPICIOUS_RECIPS(1.50)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
@@ -150,136 +150,53 @@ X-Spamd-Result: default: False [-5.01 / 50.00];
 	MIME_GOOD(-0.10)[text/plain];
 	MX_GOOD(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
 	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
 	FREEMAIL_CC(0.00)[intel.com,redhat.com,jms.id.au,nongnu.org,acm.org,linux.ibm.com,kernel.org,xen0n.name,smartx.com,linux.vnet.ibm.com,gmail.com,wdc.com,ericsson.com,dabbelt.com,defmacro.it,vivier.eu,linaro.org,vger.kernel.org,euphon.net,habkost.net,oracle.com,gmx.de,ventanamicro.com,daynix.com,gibson.dropbear.id.au,aurel32.net,linux.alibaba.com,huawei.com,irrelevant.dk,tribudubois.net];
+	RCVD_TLS_ALL(0.00)[];
 	DKIM_TRACE(0.00)[suse.de:+];
-	TO_DN_SOME(0.00)[];
 	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[64];
 	RCVD_COUNT_TWO(0.00)[2];
 	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[64];
-	TAGGED_RCPT(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
 	MISSING_XM_UA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,linaro.org:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,linaro.org:email,suse.de:email,suse.de:dkim,suse.de:mid]
 X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
 X-Rspamd-Action: no action
-X-Spam-Score: -5.01
+X-Spam-Score: -5.00
 X-Spam-Flag: NO
 
 Pierrick Bouvier <pierrick.bouvier@linaro.org> writes:
 
 > Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 > ---
->  migration/migration-hmp-cmds.c |  2 +-
->  migration/postcopy-ram.c       | 14 +++++++-------
->  migration/ram.c                |  6 +++---
->  3 files changed, 11 insertions(+), 11 deletions(-)
+>  migration/dirtyrate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/migration/migration-hmp-cmds.c b/migration/migration-hmp-cmds.c
-> index 7d608d26e19..e6e96aa6288 100644
-> --- a/migration/migration-hmp-cmds.c
-> +++ b/migration/migration-hmp-cmds.c
-> @@ -636,7 +636,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
->          visit_type_bool(v, param, &p->direct_io, &err);
->          break;
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 1d9db812990..a28c07327e8 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -228,7 +228,7 @@ static int time_unit_to_power(TimeUnit time_unit)
+>      case TIME_UNIT_MILLISECOND:
+>          return -3;
 >      default:
-> -        assert(0);
-> +        g_assert_not_reached();
+> -        assert(false); /* unreachable */
+> +        g_assert_not_reached(); /* unreachable */
+>          return 0;
 >      }
->  
->      if (err) {
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 1c374b7ea1e..f431bbc0d4f 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -1411,40 +1411,40 @@ int postcopy_ram_incoming_init(MigrationIncomingState *mis)
->  
->  int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->      return -1;
 >  }
->  
->  int postcopy_ram_prepare_discard(MigrationIncomingState *mis)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->      return -1;
->  }
->  
->  int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
->                                   uint64_t client_addr, uint64_t rb_offset)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->      return -1;
->  }
->  
->  int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->      return -1;
->  }
->  
->  int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
->                          RAMBlock *rb)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->      return -1;
->  }
->  
->  int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
->                          RAMBlock *rb)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->      return -1;
->  }
->  
-> @@ -1452,7 +1452,7 @@ int postcopy_wake_shared(struct PostCopyFD *pcfd,
->                           uint64_t client_addr,
->                           RAMBlock *rb)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->      return -1;
->  }
->  #endif
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 67ca3d5d51a..0aa5d347439 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1765,19 +1765,19 @@ bool ram_write_tracking_available(void)
->  
->  bool ram_write_tracking_compatible(void)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->      return false;
->  }
->  
->  int ram_write_tracking_start(void)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->      return -1;
->  }
->  
->  void ram_write_tracking_stop(void)
->  {
-> -    assert(0);
-> +    g_assert_not_reached();
->  }
->  #endif /* defined(__linux__) */
+
+You could drop the comment that's now redundant.
 
 Reviewed-by: Fabiano Rosas <farosas@suse.de>
 
