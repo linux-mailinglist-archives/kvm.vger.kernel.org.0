@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-26321-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26322-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EBF3973EF7
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 19:18:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17B72973F94
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 19:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57D06285564
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 17:18:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4CB3289906
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 17:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE471AC450;
-	Tue, 10 Sep 2024 17:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310141BC084;
+	Tue, 10 Sep 2024 17:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q3U9sRwX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hN3cyH4g"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79101A76BC
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 17:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63261BBBD7
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 17:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725988527; cv=none; b=lA6ORpXpFh3hl4zHz1KyyW/zek0tt5igBFBsU2tyS1FRBeiXT6l1SI1NCGOFPS2Q3HaoUE5AgNHSxGT4L8KZHP0HQXDXrtSe5ZYiWtAjvBuS7s756zQGAMgJQCfk73tWblrSsIUvcXXPFHX9+ZAk+69C88dzZe30Ek6EYT/GSlc=
+	t=1725988997; cv=none; b=gm1i7caKA5gHMLswmnDuMsbsGfI1X6SLMixMwtWfWY6RIPEBgFg9i1UpBo+SrRYXJth9UCxWExP2C69xzg7ZtTR9r9a3g9R7+oVVxEilYFd/wMTvy7Y2/GCD4rnS1iWAMEtl9HvhVhlSUZqs3UCbe5AhvRax/zAZA/JmjEGAI5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725988527; c=relaxed/simple;
-	bh=XFPw4yEHmK4Uj+n0pqWuMAmjYZ3OQyW2kdeqzb+wy1w=;
+	s=arc-20240116; t=1725988997; c=relaxed/simple;
+	bh=3HzZMOePfkS9jV2mIucUMg0FLClBHJMcLOws/BZLNeI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QvNxoMYoXRX+h0IG0rHqvRUtvHZD3sKkcGLlzKTSKhe21v/N7oExKzEno6hZhHqCoN6C2NuPdIsCGTB0OBrVkKh26Z2DKIw+53MVuVncRjee42iCbegSHHpXJ8ZhTK0MQ/AVlxP9GgzpBl+7XIPb3Fk/556y0F3gCIcZUb8itFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q3U9sRwX; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=aM85uraW4koqOKdwbukJNaGBjt386bM9hBglKpqSg4MEcYeTxFftbVjOuS49E6m02huU1jIuWxOC2lDCVs8yjmdS8A2yFkzJPaFLDUQCC8TfOte4NlN6b53vL8RxKplOYzNj0rKpqpMJ4qWbymkspOPx54lkW1R8ouyleay3rrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hN3cyH4g; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725988518;
+	s=mimecast20190719; t=1725988994;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=USNHgAWTu7Xz/dUY/5bkNTj1kC3g7jbwqT+OELqU7Dc=;
-	b=Q3U9sRwXtAbVwYx70FN1laE0l/CPACKuwLqXaU09z8FjgJITkxUG7TswaHa8hXjBRclnMs
-	ba9l1AhVy4higs6DH5G1RcKOyMg+e1nuAoyyKc2pbDFrwNsSxjL2/+IxGalOglA/Mb/5hG
-	h7iQ6fQRLM488+pOAcfygppjlfkjyRQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=uU1YVV5KEmnJArooZzou/r1gFQKreRbLBjRHOx64SpU=;
+	b=hN3cyH4gXzjeLZGMSX4BPJRB8WY+8RLTuWRacJIlVdG3jWoH/JqxjlCSEk/JsuiDGQuR/M
+	ffheGrZCnWMN/62oLXZjYyiLmtJ3ABd2JnCfQ3liBlvV6zoKXk3ibauB5d6Xnm+1REbu41
+	xTPqcdEwUuUUULxkac26C3WckiujbHY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-EcjF0RsQOHmLEnegqZ-Hag-1; Tue, 10 Sep 2024 13:15:17 -0400
-X-MC-Unique: EcjF0RsQOHmLEnegqZ-Hag-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cb99afa97so17680095e9.2
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:15:16 -0700 (PDT)
+ us-mta-450-79mi-WPrP9S2CmibdM2spg-1; Tue, 10 Sep 2024 13:23:13 -0400
+X-MC-Unique: 79mi-WPrP9S2CmibdM2spg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-374c960ee7aso4252003f8f.3
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 10:23:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725988516; x=1726593316;
+        d=1e100.net; s=20230601; t=1725988992; x=1726593792;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=USNHgAWTu7Xz/dUY/5bkNTj1kC3g7jbwqT+OELqU7Dc=;
-        b=RCEDdQi2+r5neQNsgTj0WDR6an90JKMUHVSKEWZdUzn8JEwVE0hVfFntq4XHpPdvW2
-         v15bYq4/F9c/oarLbtNhxRqP8alnz6bftwAJvFEkbEJvSdv3R+d/zPOpLTFpG45mk+Ju
-         guiBIatIy6gqT9sus7ErETH1dTDQKaejTD/kN3L6qX7vNX2r+4Ost2uS7vnf1KO+AnCK
-         8yHrbhBV9v0Ro+fU93HYoARi1dFdaDoeseOOElexlrWOcCQSILcyX2RqyuSB1gJJV74R
-         xxBH9oDERpCQ8kigKXXRB2CO4OMBUdC2fFcKfY0dFi/slaU+XOh2dVJ2v8AQ92fR3PjL
-         Z2bA==
-X-Forwarded-Encrypted: i=1; AJvYcCWjrH0qz7d3cDQ07D9BOewVbY5XTxQvGiyXkqsijG+jaMyP/RyElU73QFn3WAkzXHIECnU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxFdqx2Xah2IeGIiYNcXDSaJdeOMKeqy8AEdvMDgoEmiSk1n7Z
-	AfCWwYooS6dfauB98gI61eThkQxons6Bxjr+LwRqjOb0E3vHlXC5+issmHIPzduiYqmJEEwxlOI
-	skDQf7tmXKDRqdxfGzVlUlcvWM++gulbgnm9WJM+amtKqYOe4SA==
-X-Received: by 2002:a05:600c:358a:b0:42c:ba1f:5482 with SMTP id 5b1f17b1804b1-42cba1f598fmr45156655e9.35.1725988515940;
-        Tue, 10 Sep 2024 10:15:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IECXXwCUHaWoTl/1CJaefS9Qy2T+MFosNsOAumT3kcXW2Zq1atmXfCBm7JIbbwUJ75y4Z2WHw==
-X-Received: by 2002:a05:600c:358a:b0:42c:ba1f:5482 with SMTP id 5b1f17b1804b1-42cba1f598fmr45156495e9.35.1725988515441;
-        Tue, 10 Sep 2024 10:15:15 -0700 (PDT)
+        bh=uU1YVV5KEmnJArooZzou/r1gFQKreRbLBjRHOx64SpU=;
+        b=HBl2FeCtM/HTREDsZcZoNsFG3Q6axlXA9MakcUNiHoLznZKQazGl7GF8/qmstZJYH/
+         5wizxays0MeG8qq0ss1NRh9uZCKoTFZLf+1f3IjyDi/wVZS2FqrNNsvo2Iw0fMeVRu8Q
+         kLxiCG7X7TaDmGZavDncgCBltqeJOINnUHk/adaomPlVIYV7j9cVC8BOzuachoELKSmA
+         dNYkHtw9rsKCevIa02l0aa62TFAqXi342uFWMfMmekeIzVdjUGfYH8i6Z/+AN1i4tPva
+         jc8W6tOfItAIp0ZlbSTzkeTJ80He9WMOsK60D3gtY9L5DcyEMY2byuB9oqyGjtvTa4ZM
+         q0mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2++A7MEXRsfP4fQRAiy7zTfpxfHPGt7P8YQeXLboj0H/vvPDIDHr5GID6sgo2GFs9mE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6qg3dSbjjnVhfkWQMbxDEjaqFtLaB/ZuH66jYrcMpCWpGLt83
+	MbMCkSIvxJScLVlZcpaSY+x7Bg5jPBgsWfsPSByGBjHWRh1+IeYxySdDC5YFxnhf3YjTsdygZM6
+	SYyAjjKcVCjg4/djOiDzwWIsEslq2a1bFOij1dkPdy6BzOLuSGQ==
+X-Received: by 2002:a5d:64ce:0:b0:374:c71c:3dc0 with SMTP id ffacd0b85a97d-37892466d5bmr10563236f8f.52.1725988992466;
+        Tue, 10 Sep 2024 10:23:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGQtLVK5qHXlirReZkAVIKHaz8mqp7ppA9dX+hwrkXKZ9TWwHgJqvWCAKwbH3vJJABbUFSJfQ==
+X-Received: by 2002:a5d:64ce:0:b0:374:c71c:3dc0 with SMTP id ffacd0b85a97d-37892466d5bmr10563201f8f.52.1725988991948;
+        Tue, 10 Sep 2024 10:23:11 -0700 (PDT)
 Received: from [192.168.10.81] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42caeb81ac0sm120131165e9.34.2024.09.10.10.15.13
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-378956de00fsm9438259f8f.99.2024.09.10.10.23.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 10:15:13 -0700 (PDT)
-Message-ID: <b3a46758-b0ac-4136-934b-ec38fc845eeb@redhat.com>
-Date: Tue, 10 Sep 2024 19:15:12 +0200
+        Tue, 10 Sep 2024 10:23:11 -0700 (PDT)
+Message-ID: <d566cce2-2c78-4547-a2c0-75087e06f790@redhat.com>
+Date: Tue, 10 Sep 2024 19:23:10 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,17 +83,14 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/25] KVM: TDX: Initialize KVM supported capabilities
- when module setup
-To: Tony Lindgren <tony.lindgren@linux.intel.com>,
- Nikolay Borisov <nik.borisov@suse.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- kvm@vger.kernel.org, kai.huang@intel.com, isaku.yamahata@gmail.com,
- xiaoyao.li@intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 15/25] KVM: TDX: Make pmu_intel.c ignore guest TD case
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+ kvm@vger.kernel.org
+Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
+ linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>
 References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-11-rick.p.edgecombe@intel.com>
- <b8ed694f-3ab1-453c-b14b-25113defbdb6@suse.com>
- <Zs_-YqQ-9MUAEubx@tlindgre-MOBL1>
+ <20240812224820.34826-16-rick.p.edgecombe@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -131,23 +128,33 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <Zs_-YqQ-9MUAEubx@tlindgre-MOBL1>
+In-Reply-To: <20240812224820.34826-16-rick.p.edgecombe@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 8/29/24 06:51, Tony Lindgren wrote:
->> nit: Since there are other similarly named functions that come later how
->> about rename this to init_kvm_tdx_caps, so that it's clear that the
->> functions that are executed ones are prefixed with "init_" and those that
->> will be executed on every TDV boot up can be named prefixed with "setup_"
-> We can call setup_kvm_tdx_caps() from from tdx_get_kvm_supported_cpuid(),
-> and drop the struct kvm_tdx_caps. So then the setup_kvm_tdx_caps() should
-> be OK.
+On 8/13/24 00:48, Rick Edgecombe wrote:
+> From: Isaku Yamahata<isaku.yamahata@intel.com>
+> 
+> Because TDX KVM doesn't support PMU yet (it's future work of TDX KVM
+> support as another patch series) and pmu_intel.c touches vmx specific
+> structure in vcpu initialization, as workaround add dummy structure to
+> struct vcpu_tdx and pmu_intel.c can ignore TDX case.
+> 
+> Signed-off-by: Isaku Yamahata<isaku.yamahata@intel.com>
+> Signed-off-by: Rick Edgecombe<rick.p.edgecombe@intel.com>
 
-I don't understand this suggestion since tdx_get_capabilities() also 
-needs kvm_tdx_caps.  I think the code is okay as it is with just the 
-rename that Nik suggested (there are already some setup_*() functions in 
-KVM but for example setup_vmcs_config() is called from hardware_setup()).
+Would be nicer not to have this dummy member at all if possible.
+
+Could vcpu_to_lbr_desc() return NULL, and then lbr_desc can be checked 
+in intel_pmu_init() and intel_pmu_refresh()?  Then the checks for 
+is_td_vcpu(vcpu), both inside WARN_ON_ONCE() and outside, can also be 
+changed to check NULL-ness of vcpu_to_lbr_desc().
+
+Also please add a WARN_ON_ONCE(is_td_vcpu(vcpu)), or 
+WARN_ON_ONCE(!lbr_desc) given the above suggestion, to return early from 
+vmx_passthrough_lbr_msrs().
+
+Thanks,
 
 Paolo
 
