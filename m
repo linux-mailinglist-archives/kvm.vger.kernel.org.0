@@ -1,268 +1,226 @@
-Return-Path: <kvm+bounces-26344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54884974409
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 22:23:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BACE997441C
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 22:37:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78CC41C2562B
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 20:23:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D4B7287273
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 20:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FAE1A76CB;
-	Tue, 10 Sep 2024 20:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA411A707B;
+	Tue, 10 Sep 2024 20:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GWraNwnX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hkPyvjGx"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2076.outbound.protection.outlook.com [40.107.237.76])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47844183CC7;
-	Tue, 10 Sep 2024 20:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725999780; cv=fail; b=YAyHG09pPMJOB97gCFuqwil2lZuod7mZ/rqyIwG73ng54FUAj5gYheMEB6IhDgFpwKaGMhvZ4oWKk53Xyu0N3dLuCVh35lpElPLrsTmi+GfR5cDdqs7ZWojolTJsGhNKBmoDa9YJWS03KxRhIgB4NfcyGpD1bQcNKIrDLigaOdg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725999780; c=relaxed/simple;
-	bh=xU7338DwD/4Ob6ZER+igshGGd9kURqnVP8oS//EABoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=kUtQfxKz45DfPM5Ir09oZUh0iLTDmRi3rZIdwXu2Y9Evo7wlfWlJV5yEhj8Pz7I2vXlmdnfWvdMQhIj2T4VLTUwP+dKPiMOiCASDk+lRtywd7eBUaGBJx01q7PoceMVQpIvG0wjNpnYD3JDnBbi/Ff9AVISLB9Y57FrKXHAbvZw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GWraNwnX; arc=fail smtp.client-ip=40.107.237.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UEmRPlq894S/YxBD3ttCa9jkAPXv/xpuKP5jZsSbk+twoHiZE9s6FNCWEZmLLi/xYO+047w4vMhbh/B8u0Tvrw9MInaZPjUqJfXGa3fEzuwnXdaw2SasN2kDdm5LEEsoA+oD5+XRMApPKArIgzi1B7EJC3T1o3tT77xquMKbCBMdrWDP4VbU6j17qhNZqNlKXsbiPZ7+r8tCX2ZQ+/3OSGwQ2N8spYQxu70OIiS/qxOVt9n0pBiDBOtTmt5FRHM+484JpCjmJTUWgqOKTcQBNkVR9pef862g9pnhgjuOyD1cXDJ43nGbgPv68bXayLDMsgGnyX0dMy97tp8tGTL1fw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LyF0pod8cnW45bByn/VnwjvMW3y4ps7ii/vE9W3lfiw=;
- b=BgZoSaYua9cvdwrjVUuhWH6LQHpYh/D22Wlc0dH8cqvW73gOD3l69zoToxcGq+NTRMZ6iUEljcXBWAT2WgTF9qHcfa2UECenmKjHLXobyxnDi/fQYNjD/i/SY3WPKWKoViSckrabse2Fufr4/rFhyBmG8YlflUOz3z7j9cTQVk2WuWnOdr+hjcy5fiQaj8DBJZLlk5FltuEe9por4omwfkBKErrB5WuxU55n3IpV6o11S1CYr+nQ5AaeRqSKQVo6IRaxInIsznVWpDhUYTWG1y970WBJq7eplI0DLmeoE7b1MnT9qg//AKIRCj0EZx9ER7Bs+NfK51xZjECBDtdGZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LyF0pod8cnW45bByn/VnwjvMW3y4ps7ii/vE9W3lfiw=;
- b=GWraNwnXwKS97ybK5d2OuFKtsVwSLrbmdn4CgUUBfC0V4bAJbKQ9YMmiigHOxBKhoS2BdMo8N9SQ+r5zHy8YNwUPdaTvBfsm8t4D7fJNXRAqme2bvIcL//X4Qi52eITXNAJNkef12d/VEZo/GqF3PqpaayAqo9GvwxzQ2B5jUhnvMLsm8D+qJ427KlEL30mGNahpWlRh39AEpog3iqTtS8YYnI+NCQb76LCl5Qi9Yj2o5BJc/JROnijNOuinZZ2wRYOrw/ztz6KP22ZR44ES8jrIhemG/3m+LV/1noA+k3l6AlR/6jBaeOxQfTX438IA4TDPho4jKfeABe0hsJaHww==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
- by MW6PR12MB8836.namprd12.prod.outlook.com (2603:10b6:303:241::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27; Tue, 10 Sep
- 2024 20:22:53 +0000
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8%5]) with mapi id 15.20.7939.022; Tue, 10 Sep 2024
- 20:22:52 +0000
-Date: Tue, 10 Sep 2024 17:22:51 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>,
-	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
-	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Robert Moore <robert.moore@intel.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Moritz Fischer <mdf@kernel.org>,
-	Michael Shavit <mshavit@google.com>,
-	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH v2 2/8] iommu/arm-smmu-v3: Use S2FWB when available
-Message-ID: <20240910202251.GJ58321@nvidia.com>
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <2-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <ZtHhdj6RAKACBCUG@google.com>
- <20240830164019.GU3773488@nvidia.com>
- <ZtWFkR0eSRM4ogJL@google.com>
- <20240903000546.GD3773488@nvidia.com>
- <ZtbBTX96OWdONhaQ@google.com>
- <20240903233340.GH3773488@nvidia.com>
- <ZuAlt9SsijRxuGLk@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZuAlt9SsijRxuGLk@google.com>
-X-ClientProxiedBy: MN0P220CA0012.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:208:52e::35) To CH3PR12MB7763.namprd12.prod.outlook.com
- (2603:10b6:610:145::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94FB1741E8
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 20:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726000629; cv=none; b=oTyIPo2Lf3c/MBh7Xgs09PfJiZWJbaHdQtcLfPOcjbdBiiYU/TG31ZHnoMtisWpYOedg7E9R/6fdLdKdzcYNYqmotD+d9JjDwH6B73xL3u1w3sm70BKRfpJPYjbv9T5cYA4zlHwV0yzHEHnkL7KDRvTjqGFNhUXu7lX4y9zm5dY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726000629; c=relaxed/simple;
+	bh=aVHEeNzFOm4LF+kU6BEHYMwFBnWzH9T9ec3sbI1wGzw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PSwJKF7cl9FTsWE60feI8Hyc56T1t+VRJKt2MVYfwfcxhg5vkpg7Vo/dBcCUtBuwhoniGAdPxx3/qjed1jpNX9p6KvSSSUvy3BL9f96RO5CXw3k9zN2hWx+OK/LeNszmQbsiGB64UqhcP0HwexXPHMnNhp/SLjeB9ZXMhMQxEiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hkPyvjGx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726000626;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q9/XnTNN38MUq9u6fZgBkjo42UTNP+Y6Vu/qqdocpo0=;
+	b=hkPyvjGx64MhPSjW8psMkR63MetIs4Uhq3nfCL6W6DHh3ko5jIWm1bzWbch9lh1+DaEXFf
+	af3Id0cLO3Xe4AnGO9+cMuSIcwugrVVwVXjjlhi36EpSN7ywr/snQsn+Q/oKPvOtlJUMoI
+	xz7N1joBxkvc2VXFznOugmy8NWeMxjk=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-159-MvaKb5PuPiuH0uaKHLyHGA-1; Tue, 10 Sep 2024 16:37:05 -0400
+X-MC-Unique: MvaKb5PuPiuH0uaKHLyHGA-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6c35b3a220aso4772876d6.0
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 13:37:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726000625; x=1726605425;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q9/XnTNN38MUq9u6fZgBkjo42UTNP+Y6Vu/qqdocpo0=;
+        b=EmKTEE4KuKClKu/rsdwiEO067+siccutHxWv3+Oc5tpqmZQc5Tsom0cefwyzN/Y/yk
+         c8kiO9CjXX6OyNEqHTF40k5bpwVOYOYJcf4d4fc533nfAOabk6bqiFN8/hdmHNhLr30y
+         HHTChq6my2JKXZvrkIjXGQAEFpwjHEaxYf1rPbbKDsYxR2HKkqs0d2ZyI7c+bFiyRiMr
+         OtFYt9eDAKbktn+Q4RraGHyDsvfUTuNBMHzLpc2BveUu7tVebx4vP/yuEFkH6QTaUD0M
+         ykJMiT2HyyDXYs8cs6jQu3XxSZZjRcZgktSDX5sSt5VXHd7LgDq5xTXC2KyDZAePKRod
+         V6Fg==
+X-Forwarded-Encrypted: i=1; AJvYcCXK2cW7GXqJJl6MYHtXpWXFyar0xTG8cvmrJ4MQL8f3o+g6fvbgILk1hNdCfWelxHrd3Xw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEwnSTDQjtjRAsmwBGE0RSK23NQpLCjqm766HIwSBun3lMx551
+	qV4NZHPwu+CNHNzgpI4hljVwW6fU8zKsv2MufM2ESpAGVaGT5Z2A2XIyFi1skEYmSVjcteu4lDf
+	wdbK2nFHYwwla2ciMUiMXs0/whdpxtE3ux8EkQlr5cmzRJidhtw==
+X-Received: by 2002:ad4:5dc6:0:b0:6c4:d2f9:644e with SMTP id 6a1803df08f44-6c554d43f77mr72921616d6.12.1726000624836;
+        Tue, 10 Sep 2024 13:37:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGrqSLKSPDJj3hMABilp0LfLhiMlrqFtNDvhizWXrMFBxm/Irv+MVixW3x//LDXGfBMevPJ6Q==
+X-Received: by 2002:ad4:5dc6:0:b0:6c4:d2f9:644e with SMTP id 6a1803df08f44-6c554d43f77mr72920956d6.12.1726000624143;
+        Tue, 10 Sep 2024 13:37:04 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:760d:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c5343397f7sm33307116d6.49.2024.09.10.13.37.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 13:37:03 -0700 (PDT)
+Message-ID: <44e7f9cba483bda99f8ddc0a2ad41d69687e1dbe.camel@redhat.com>
+Subject: Re: [PATCH v2 22/49] KVM: x86: Add a macro to precisely handle
+ aliased 0x1.EDX CPUID features
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
+ <vkuznets@redhat.com>,  kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Hou Wenlong <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Binbin Wu
+ <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>,
+ Robert Hoo <robert.hoo.linux@gmail.com>
+Date: Tue, 10 Sep 2024 16:37:02 -0400
+In-Reply-To: <ZrFLlxvUs86nqDqG@google.com>
+References: <20240517173926.965351-1-seanjc@google.com>
+	 <20240517173926.965351-23-seanjc@google.com>
+	 <43ef06aca700528d956c8f51101715df86f32a91.camel@redhat.com>
+	 <ZoxVa55MIbAz-WnM@google.com>
+	 <3da2be9507058a15578b5f736bc179dc3b5e970f.camel@redhat.com>
+	 <ZqKb_JJlUED5JUHP@google.com>
+	 <8f35b524cda53aff29a9389c79742fc14f77ec68.camel@redhat.com>
+	 <ZrFLlxvUs86nqDqG@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|MW6PR12MB8836:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0a7a2554-9e58-405a-5131-08dcd1d658bb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V29ZUWVWMllWbWduZElEYzFiRTdzeENLUTlQN1JxZWlkcU1LT3RBbERZLys0?=
- =?utf-8?B?QTFNL29pMXQ4clB0Q3BvTHJ5S0NYbG45UGJSNW52K2FDYS9mVE5raENFblNI?=
- =?utf-8?B?Mzk4bUVQTjRrUHo1R3E1SGFKVGlaaG5Rc1p6Ly9PSjFlMkpxbmZ3blRpK1k5?=
- =?utf-8?B?Z2JWT2Z3TDlVQ1RXRm5Oc1VPV3ZVbGFBc1VyQll3bWRlbmJoYlhDZm5ZblVS?=
- =?utf-8?B?SmxmQ1hHMm5PVWQ1bzQvaTFnQkZCZ3o0TVptanB2MHdMYzczZFA3Rk84MG9K?=
- =?utf-8?B?bTRvS3ZQcXdRZ25rSkNIcmYzOWViUGZpK3cvZ1Juc1pzZUQrT3BaZzJtUmJi?=
- =?utf-8?B?Um5nMmxvNUlaWStYV3cxMVdxNHVXOFE3RTZkOEV0SVUwOWZTWFJYRERyY2ZL?=
- =?utf-8?B?L25vTkI0NVplNVluN1FRVVNicDJ4eGw3SkxKM24xZkZidnhVN2krK0ozYUs4?=
- =?utf-8?B?d3dUb3YvSW5qYTBZelhVVC9aUXdkaDR6YVU4aEFDODJNQUtHeTdVVHI3RW5V?=
- =?utf-8?B?SmtUVVJWZXpiRWxxNFcyTmNWYkJEQUNqQnhSNGJOeHVGcHRHZVRRRGNIK3RW?=
- =?utf-8?B?SEtqeElEcHMyK210emg0cE5ISkJpN0VTZVZuU092SE03aHVtZ3hwNUk0Yzc2?=
- =?utf-8?B?V3ZUWlYyVGg3MkJLSGlrb2p2UjRlYXFzaWhEa1o1L3lqSFowVEhjcklxNVli?=
- =?utf-8?B?YlFsemM5WTFKWnJjeEZsekZNSnBSdDBBMlZNWmZub3BUelQ1dHUwM0FjTms4?=
- =?utf-8?B?OWpJQ1JSVVpqRnNoeXhHbTlhWWxqNUVJeXo2RVdURUxXUGZuWGpnZ3RmOW9D?=
- =?utf-8?B?UmlZZEN6OTE3MFRPZ3pLNDFDWHdPTXZtc1I0VnFseWlnMlh0ZjJWaUJTdnJw?=
- =?utf-8?B?RGJPd0xNZ3poUnhnM3hwbGJoZE03RVBJWlA1Z3VQTFJzMDdEQ0RBSTF0MUs1?=
- =?utf-8?B?WWphUHNpN2VDMGYyYWZYbloycThsaVp6S09MeU13c2U5MXVqcG9BbitxZTlP?=
- =?utf-8?B?eGxjNnlWSGZ2QmZUZEFmNlltSUU2Nlp5clNRaHdPT3VNeGttVkc5MGlmeEk5?=
- =?utf-8?B?Q0ZXaE1qSmRpSk5qSWlQRlNrTys4dTFNWklWMlN0Rk5QeDhYdWNuU3BqTk9u?=
- =?utf-8?B?cGkvYkVUME5PK0hxYkRRYXBQVGhGSkNpelkzUmhyMnVCTW5YQ3JuSTQ0cHBu?=
- =?utf-8?B?SU52bFZ4YVlKMzcvRGdQVGozMUREbE9jbGJ2NVlhVzlCbGUvQjBzTUszelpk?=
- =?utf-8?B?SHFsSkI1VFZqQm45SWJ1V0J6L3E1aVQzNTBDSER3ZHFGZTZiR2M3NVFEZzlW?=
- =?utf-8?B?UlRQS1ZCY2gzQXloOWFacjhOeXVBV202cXNkRmxkRlo1QjZMWFZ6VVF5OVQ5?=
- =?utf-8?B?dnkxV0RndHZYRjN0NEFZWGhFRTlWT1VoSEZlZDJzaFVDNmRTczkvdGt0eGhM?=
- =?utf-8?B?bEdJOEl4OENwazZUcXVuS3B6a3AvaXF6YUZjWk1FendpaEsxQm4vdHY1SUtO?=
- =?utf-8?B?YW0rOXFIQnhzbmJURFJjSlUwR2Fic1Z1d0ZNRVdEZ3ZxVkYvajBaRFlQZDNs?=
- =?utf-8?B?K0dnM1lTa3NRdnptNW90VUFrNFZ4Wkk1ODNSdzdTTXR1bkt3YXFzYnRFTEZS?=
- =?utf-8?B?NXhXZ1RKRFRKanA2TWJ0aTJBUmlxWDl1cVhNajdLM1NTSER4U0xLR3hoT1U2?=
- =?utf-8?B?MGdLcUxhcFREeGQzUFBITDVaUUhNZXRDR21yWnZuRjFabDhkUUkrUHRnamZO?=
- =?utf-8?B?cDljMjlNUXRQdXFtOVZ4bGtMSmlBTEpxODRnREQ0d3hPdWFZcUZTRE4yY2Ny?=
- =?utf-8?B?MkkreGd2WUN6clFnOVpodz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bFJhbE0xWDFxWnJ5NFYyWWYzQU5zUlo5cDdKKzJKQmhTa3huUHd1aFNObC9J?=
- =?utf-8?B?UmxuNFFud2p0L0lkS3U3YWJnK2xTV0htM2U5cjZWUTc0UjBQMjJzd05kYVRJ?=
- =?utf-8?B?bDI4dzc4VFB4ME8yT09LQktVT1hEbWtVeUxLczdxSWxERTQxaExUaEJicllU?=
- =?utf-8?B?VldJcmYycERIV3hjLzBIc3lqOU1jMmo4dUlOM1JDVm4yY2RFa29RTW1ta1Nz?=
- =?utf-8?B?QWNpYUtmTHNudVhWYzR4R2ZPNmp0VmcxcUhMelUwYk9OdnIvdzRBbGFjZnpL?=
- =?utf-8?B?U004ZW9XWjZwVGFtUDMzQXRpVUpYSzMwR2F4aGVJek55TElzTGZmY0EvQ2hp?=
- =?utf-8?B?THJucmxnWUFyK2xEOFplR0JVQ3A2UWpUdDlySkl3dFNtbVVqN3QwenY0Ynky?=
- =?utf-8?B?bkdGTzlmcndmZDBCeGkycXd2YlpDaWpBdzhSZU5Ca2swRExLSEhXTytJSHZL?=
- =?utf-8?B?SDViWU1oZHU4Y2VKY0tzaWRjNnVmdWVqSXN5Y1p1bnZVTS9RSnFtbEtHNXVk?=
- =?utf-8?B?WDhhcS9yUlVncHRHek0vNXFVSnpkaUpta216MFlyMEJIZWhwSS82emdZSjht?=
- =?utf-8?B?S3ZoMEs5dnJ5VU96Y0lHcXJJbkVkMHJqelZXdnREWHoyRlhXV2dTMHhRa0JF?=
- =?utf-8?B?d0hPMlRGY2NKMzNsVWhCM0w2QWRHamV0QUZ6Mk1Ibmp6cnE0NzlJd014eno5?=
- =?utf-8?B?TEJublNXeGxNbG1CSGpncldrRU5TcEZGckZFcVN2cFErcG1GK0M5YWI3dGZX?=
- =?utf-8?B?WnJjTXZwUXgwM2dUZmFMM0RML0U3UUtkZGRycEcrYWpHMlAvYzVkOUs3NkF5?=
- =?utf-8?B?azFqMXFZWmN4dHpLSzBzeDNCazc5YWgrWGdFVEZJNWxielpLZnBJUmFNaTR4?=
- =?utf-8?B?WU9lWGxVQ3JuNEl2VzYwa3R0dWQyTFZCbm10S1dBZEpRdWwrMVlXQXhCa1R4?=
- =?utf-8?B?cFY1V1ZHbjR1MXNqN09RaU5BWFAxVmZPYTRabVNiNC82eHlOVFZtM2hRWWxo?=
- =?utf-8?B?bGh5dC9rbkdBNnRmRURWWmZzN3dSd1dRN1YweUduSnA1U0lac0hmVWJhajR3?=
- =?utf-8?B?bGRzeGhJZGdPeEZtanFWRkViYlJnWnR0aEdoVi9TRXMxSkcySDVJVkFDVi9q?=
- =?utf-8?B?Qlo5Ulo5UlFYd1kydjk3aUt1NzYzRndCODZTaDAxZCtpUVNUUUtVYlFvZ25J?=
- =?utf-8?B?NXIyT3RFNG81TDBVUmxtdGJhU2YyckNzMzlUQjZRQTFPeU9uWnVJbzdDTDZw?=
- =?utf-8?B?NVVwRGQ5ZlpwcXpSWWFPd2M3Rlp6QkN1SUVmNGF4NWJzVFl6MzNIYUpWbk1S?=
- =?utf-8?B?RlAzcEZJWElWNGZ0NnhmbDdQNzlDTko2blpmRmFyZXcwMDNlWW95aW9wSCti?=
- =?utf-8?B?WnQ0VWxVMkNJOThadDZ5MnpzK0IyNUJqanZDZmVFUHd3WEhVb2xrM1MxY0hT?=
- =?utf-8?B?SHVYTEZjcnVyYit6a0lTdDdYRUY1YWRacDJFK2JBN2RtNzdVbE1TUEYzbDRJ?=
- =?utf-8?B?Y0p5RWU2WG5ETXNKVGZRbmt3Wk4yQ1pKbUZUREoraERST2k2aTlGb1RnTkY1?=
- =?utf-8?B?YVlRWVZWWXhZWllBRTRIRnJYYkc0K0JIaGNFMm1ta0xvWHEyOUtUM2U0MFZo?=
- =?utf-8?B?dU5DVHA3RUVKSU5BczZmZHlRQWFrRC82c2lIQlpRNmc4T05FUDVJVEUyYXN4?=
- =?utf-8?B?MU1Xa2JtOEpGaEo3NHduM1FyeHBrbW5ESHpDSW5GYUIrbUdiNTdNVzBQNStt?=
- =?utf-8?B?QU9oNjc4aU11dHQwRjdidDNDSXc0Uzc4OERKeDdqK2NvQmxhTUNnaTVranhS?=
- =?utf-8?B?Vk0xK2hheG9PeERGY3FkNXk4WHFzaTZBZzlqMkdPaVVQejBQL3FBTE92Tm94?=
- =?utf-8?B?UVVjSmcwRWpQLzNXZlArMURvSkFMVEpVK093WG9tZ3ZIa2xtUTlGSTNiMDNj?=
- =?utf-8?B?NTVtK0tSMVhTMy84NUZFdWlOUGhyMmxPelRpbi90UGExUERhNVJkSENsYWpn?=
- =?utf-8?B?cTl0V1V1V2tNVjcxQWVYOTJ6V2dSYlZCNWUrSURqQmhhbmZFanRUWVg3WnBp?=
- =?utf-8?B?QURUSWdDMXJzekJCTitmNWdxT2haaUFNTlJNTmIrcGpEMnJKT1dUcm5yZXE4?=
- =?utf-8?Q?QM29IZ3iRacxzkkoRoUyLNWD3?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a7a2554-9e58-405a-5131-08dcd1d658bb
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2024 20:22:52.3340
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Kd8W7HXdocj84KjviZjCcvCDk+O6Wa9p//QzzEUEINqNqmlEea+ZMzWhIxzAa/kU
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8836
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 10, 2024 at 10:55:51AM +0000, Mostafa Saleh wrote:
-> On Tue, Sep 03, 2024 at 08:33:40PM -0300, Jason Gunthorpe wrote:
-> > On Tue, Sep 03, 2024 at 07:57:01AM +0000, Mostafa Saleh wrote:
+On Mon, 2024-08-05 at 15:00 -0700, Sean Christopherson wrote:
+> On Mon, Aug 05, 2024, mlevitsk@redhat.com wrote:
+> > У чт, 2024-07-25 у 11:39 -0700, Sean Christopherson пише:
+> > > > On Wed, Jul 24, 2024, Maxim Levitsky wrote:
+> > > > > > On Mon, 2024-07-08 at 14:08 -0700, Sean Christopherson wrote:
+> > > > > > > > On Thu, Jul 04, 2024, Maxim Levitsky wrote:
+> > > > > > > > > > What if we defined the aliased features instead.
+> > > > > > > > > > Something like this:
+> > > > > > > > > > 
+> > > > > > > > > > #define __X86_FEATURE_8000_0001_ALIAS(feature) \
+> > > > > > > > > >         (feature + (CPUID_8000_0001_EDX - CPUID_1_EDX) * 32)
+> > > > > > > > > > 
+> > > > > > > > > > #define KVM_X86_FEATURE_FPU_ALIAS       __X86_FEATURE_8000_0001_ALIAS(KVM_X86_FEATURE_FPU)
+> > > > > > > > > > #define KVM_X86_FEATURE_VME_ALIAS       __X86_FEATURE_8000_0001_ALIAS(KVM_X86_FEATURE_VME)
+> > > > > > > > > > 
+> > > > > > > > > > And then just use for example the 'F(FPU_ALIAS)' in the CPUID_8000_0001_EDX
+> > > > > > > > 
+> > > > > > > > At first glance, I really liked this idea, but after working through the
+> > > > > > > > ramifications, I think I prefer "converting" the flag when passing it to
+> > > > > > > > kvm_cpu_cap_init().  In-place conversion makes it all but impossible for KVM to
+> > > > > > > > check the alias, e.g. via guest_cpu_cap_has(), especially since the AF() macro
+> > > > > > > > doesn't set the bits in kvm_known_cpu_caps (if/when a non-hacky validation of
+> > > > > > > > usage becomes reality).
+> > > > > > 
+> > > > > > Could you elaborate on this as well?
+> > > > > > 
+> > > > > > My suggestion was that we can just treat aliases as completely independent
+> > > > > > and dummy features, say KVM_X86_FEATURE_FPU_ALIAS, and pass them as is to the
+> > > > > > guest, which means that if an alias is present in host cpuid, it appears in
+> > > > > > kvm caps, and thus qemu can then set it in guest cpuid.
+> > > > > > 
+> > > > > > I don't think that we need any special treatment for them if you look at it
+> > > > > > this way.  If you don't agree, can you give me an example?
+> > > > 
+> > > > KVM doesn't honor the aliases beyond telling userspace they can be set (see below
+> > > > for all the aliased features that KVM _should_ be checking).  The APM clearly
+> > > > states that the features are the same as their CPUID.0x1 counterparts, but Intel
+> > > > CPUs don't support the aliases.  So, as you also note below, I think we could
+> > > > unequivocally say that enumerating the aliases but not the "real" features is a
+> > > > bogus CPUID model, but we can't say the opposite, i.e. the real features can
+> > > > exists without the aliases.
+> > > > 
+> > > > And that means that KVM must never query the aliases, e.g. should never do
+> > > > guest_cpu_cap_has(KVM_X86_FEATURE_FPU_ALIAS), because the result is essentially
+> > > > meaningless.  It's a small thing, but if KVM_X86_FEATURE_FPU_ALIAS simply doesn't
+> > > > exist, i.e. we do in-place conversion, then it's impossible to feed the aliases
+> > > > into things like guest_cpu_cap_has().
 > > 
-> > > Basically, I believe we shouldn’t set FWB blindly just because it’s supported,
-> > > I don’t see how it’s useful for stage-2 only domains.
+> > This only makes my case stronger - treating the aliases as just features will
+> > allow us to avoid adding more logic to code which is already too complex IMHO.
 > > 
-> > And the only problem we can see is some niche scenario where incoming
-> > memory attributes that are already requesting cachable combine to a
-> > different kind of cachable?
+> > If your concern is that features could be queried by guest_cpu_cap_has()
+> > that is easy to fix, we can (and should) put them into a separate file and
+> > #include them only in cpuid.c.
+> > 
+> > We can even #undef the __X86_FEATURE_8000_0001_ALIAS macro after the kvm_set_cpu_caps,
+> > then if I understand the macro pre-processor correctly, any use of feature alias
+> > macros will not fully evaluate and cause a compile error.
 > 
-> No, it’s not about the niche scenario, as I mentioned I don’t think
-> we should enable FWB because it just exists. One can argue the opposite,
-> if S2FWB is no different why enable it?
-
-Well, I'd argue that it provides more certainty for the kernel that
-the DMA API behavior is matched by HW behavior. But I don't feel strongly.
-
-I adjusted the patch to only enable it for nesting parents.
-
-> AFAIU, FWB would be useful in cases where the hypervisor(or VMM) knows
-> better than the VM, for example some devices MMIO space are emulated so
-> they are normal memory and it’s more efficient to use memory attributes.
-
-Not quite, the purpose of FWB is to allow the hypervisor to avoid
-costly cache flushing. It is specifically to protect the hypervisor
-against a VM causing the caches to go incoherent.
-
-Caches that are unexpectedly incoherent are a security problem for the
-hypervisor.
-
-> > > and we should only set FWB for coherent
-> > > devices in nested setup only where the VMM(or hypervisor) knows better than
-> > > the VM.
-> > 
-> > I don't want to touch the 'only coherent devices' question. Last time
-> > I tried to do that I got told every option was wrong.
-> > 
-> > I would be fine to only enable for nesting parent domains. It is
-> > mandatory here and we definitely don't support non-cachable nesting
-> > today.  Can we agree on that?
+> I don't see how that's less code.  Either way, KVM needs a macro to handle aliases,
+> e.g. either we end up with ALIAS_F() or __X86_FEATURE_8000_0001_ALIAS().  For the
+> macros themselves, IMO they carry the same amount of complexity.
 > 
-> Why is it mandatory?
+> If we go with ALIASED_F() (or ALIASED_8000_0001_F()), then that macro is all that
+> is needed, and it's bulletproof.  E.g. there is no KVM_X86_FEATURE_FPU_ALIAS that
+> can be queried, and thus no need to be ensure it's defined in cpuid.c and #undef'd
+> after its use.
+> 
+> Hmm, I supposed we could harden the aliased feature usage in the same way as the
+> ALIASED_F(), e.g.
+> 
+>   #define __X86_FEATURE_8000_0001_ALIAS(feature)				\
+>   ({										\
+> 	BUILD_BUG_ON(__feature_leaf(X86_FEATURE_##name) != CPUID_1_EDX);	\
+> 	BUILD_BUG_ON(kvm_cpu_cap_init_in_progress != CPUID_8000_0001_EDX);	\
+> 	(feature + (CPUID_8000_0001_EDX - CPUID_1_EDX) * 32);			\
+>   })
+> 
+> If something tries to use an X86_FEATURE_*_ALIAS outside if kvm_cpu_cap_init(),
+> it would need to define and set kvm_cpu_cap_init_in_progress, i.e. would really
+> have to try to mess up.
+> 
+> Effectively the only differences are that KVM would have ~10 or so more lines of
+> code to define the X86_FEATURE_*_ALIAS macros, and that the usage would look like:
+> 
+> 	VIRTUALIZED_F(FPU_ALIAS)
+> 
+> versus
+> 
+> 	ALIASED_F(FPU)
 
-Because iommufd/vfio doesn't have cache flushing.
- 
-> I think a supporting point for this, is that KVM does the same for
-> the CPU, where it enables FWB for VMs if supported. I have this on
-> my list to study if that can be improved. But may be if we are out
-> of options that would be a start.
 
-When KVM turns on S2FWB it stops doing cache flushing. As I understand
-it S2FWB is significantly a performance optimization.
+This is exactly my point. I want to avoid profiliation of the _F macros, because
+later, we will need to figure out what each of them (e.g ALIASED_F) does.
 
-On the VFIO side we don't have cache flushing at all. So enforcing
-cache consistency is mandatory for security.
+A whole leaf alias, is once in x86 arch life misfeature, and it is very likely that
+Intel/AMD won't add more such aliases.
 
-For native VFIO we set IOMMU_CACHE and expect that the contract with
-the IOMMU is that no cache flushing is required.
+Why VIRTUALIZED_F though, it wasn't in the patch series? Normal F() should be enough
+IMHO.
 
-For nested we set S2FWB/CANWBS to prevent the VM from disabling VFIO's
-IOMMU_CACHE and again the contract with the HW is that no cache
-flushing is required.
 
-Thus VFIO is security correct even though it doesn't cache flush.
+> 
+> At that point, I'm ok with defining each alias, though I honestly still don't
+> understand the motivation for defining single-use macros.
+> 
 
-None of this has anything to do with device coherence capability. It
-is why I keep saying incoherent devices must be blocked from VFIO
-because it cannot operate them securely/correctly.
+The idea is that nobody will need to look at these macros (e.g__X86_FEATURE_8000_0001_ALIAS() and its usages), 
+because it's clear what they do, they just define few extra CPUID features 
+that nobody really cares about.
 
-Fixing that is a whole other topic, Yi has a series for it on x86 at
-least..
+ALIASED_F() on the other hand is yet another _F macro() and we will need,
+once again and again to figure out why it is there, what it does, etc.
 
-Jason
+Best regards,
+	Maxim Levitsky
+
+
+
 
