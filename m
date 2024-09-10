@@ -1,218 +1,180 @@
-Return-Path: <kvm+bounces-26264-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26266-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F38E7973787
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 14:36:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A7A39737E9
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 14:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23F331C2525A
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:36:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F9D5B25B5C
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 12:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286D51922EB;
-	Tue, 10 Sep 2024 12:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F84192D7A;
+	Tue, 10 Sep 2024 12:49:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUEi1fxA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C309E1917F6
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 12:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65561192B8F
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 12:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725971788; cv=none; b=iyOJUKs5b8MFNCJHx6Ibp5DrSUOpmU4C60dsduDwEihmPauWyR9IvkqIc0wBvs6O/WGiCEtG/XvTV5fh9jrzJYLOTkxCZFPSRyFDPT61cRvo/DD9fBd2n9rl72kOETqNLkn0qknGdJEni6hWzoysMbLGxfnWFFiu6xOdrnNLG+o=
+	t=1725972580; cv=none; b=r5n6voY9Er6Uk9IMa6hWhweyldQL7DIE6n4wVGqkBy8DMw75V3HGKYhUUbegigYDwXheOceUuASDtajG2ODNigA2ke+LQLU6Xjgf9gvzS6UIVZPr51HFrKIOkxOy0FBYbJBszcwCbBgUnp2HnMbVNnmRKLRUkWus6hhomZiizZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725971788; c=relaxed/simple;
-	bh=jEHWujaR/6Id0Mda1zToipvSoWwHbCg0aMS0Lf5OJqs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PQFoZbD577d1WXvwStRfDg42PTZSjVdbmGMoeraSNU53TAAbldh38j9QpGror9AbclUJnZY55AvgSaECYiZdbzA7QKBZnH+DuokN4QON0eUJz9auaon4wA83pfuL4eh0pfLRIIJ8H2NPGT1OKaV5vYPvGJ73a6LxDfNeU1p9wxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.185])
-	by gateway (Coremail) with SMTP id _____8AxrupJPeBmf7kDAA--.9334S3;
-	Tue, 10 Sep 2024 20:36:25 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-	by front2 (Coremail) with SMTP id qciowMBx+cVCPeBmXGoDAA--.15753S7;
-	Tue, 10 Sep 2024 20:36:24 +0800 (CST)
-From: Xianglai Li <lixianglai@loongson.cn>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Song Gao <gaosong@loongson.cn>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	kvm@vger.kernel.org,
-	Bibo Mao <maobibo@loongson.cn>
-Subject: [RFC PATCH V2 5/5] hw/loongarch: Add KVM pch msi device support
-Date: Tue, 10 Sep 2024 20:18:32 +0800
-Message-Id: <8c81313bd4a5c53db5c889f19c9415994a9e007d.1725969898.git.lixianglai@loongson.cn>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <cover.1725969898.git.lixianglai@loongson.cn>
-References: <cover.1725969898.git.lixianglai@loongson.cn>
+	s=arc-20240116; t=1725972580; c=relaxed/simple;
+	bh=mgfcX2uQtqJW+4vxPdt0csDUudu1Fc2mT+vh+uOSnds=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=RDy/Iu0CW5sA7UTm4DsDS6vfQ4tgbI2w6NFI2SjNffoPOtTcXBKige2iduVJAbRnzWVzNukh09AaVVrWnOr4C+aZCjy5397D3/nT3hbaPoM7fXfe+KBS0/1P0DYELL3+79cIICd01W9mC3+2ZKawjJ0httd0zjAJuDQXOzj14to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZUEi1fxA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725972577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6nd62AWkPIK5gIXPiUm1JLX0Wy6uPdrxO6zecHjvld0=;
+	b=ZUEi1fxAStn1fwPuDmBH6pWhIqphxwJZbSMylVl025zK5/UxkVAksNzElR/Ef7NX44ld3Q
+	JHYJN9hVaYIhwId5TJZXS9CH68yvmyvgzLO9UTS2Loqlzm65v13nmcenVmdUOOjtLaSFEm
+	neaCZYg/rvDpxtYVIHHW/zIHK7m5RPE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-4_DPzqkzNPWj2HrJCVxOOw-1; Tue, 10 Sep 2024 08:49:36 -0400
+X-MC-Unique: 4_DPzqkzNPWj2HrJCVxOOw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-374c79bf194so517441f8f.0
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 05:49:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725972575; x=1726577375;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6nd62AWkPIK5gIXPiUm1JLX0Wy6uPdrxO6zecHjvld0=;
+        b=c6iVjE0oojsDDhtCWt4kejA8fIyIx0DJdHXBxw88U0jBwMAo0ItohANOQeM9zA6C2b
+         laM+FmiNtpIWG2eJ6/oYtzMAiKBKgltw5cJeP5xsBqVyBSrP88psVLMv1cV8g5gGQKtl
+         YiBt51Yo9S6buG1w6bE+rCtk4IiedoH6j0kRegXOaDghkAwDSLR5dA/QUSgGDUvcsnBc
+         7oaiRY3ARCdW3RooM3S4Gq3J5kNHGKm5PhzKp05ED6HTjYu02IliVX2jnLYPGTZBeHni
+         mmLjoqQPJztd/IjYL/UPzILvyCMOQcWetX/4hL7TdaeLEfUUGpU13O2IOmXj+Llfko31
+         HuBg==
+X-Forwarded-Encrypted: i=1; AJvYcCWsoRXilcJ5KdP2ptRNNmoM4Gj68KgzMS7cNMNl9b5FtGvC3ADM46knWIvFLd8cuBJ050M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0M0GsjzBdBsp+xyRFgXJ1iAvqUbUy1styeSp9hWd7HzUfFh+m
+	GBADYby1tJPD4nR/MEYfQFDQlBFKEBOL8hjBtBp/pQJDKppWHW8ofgDXSqXmn7GUempq19onO9S
+	yRERVagAiJo16U1s+LnSdhm0M/xe/BoNJN0zfr38Xzq8FzqmVGQ==
+X-Received: by 2002:adf:f744:0:b0:366:eade:bfbb with SMTP id ffacd0b85a97d-37889682e0fmr9248508f8f.46.1725972575095;
+        Tue, 10 Sep 2024 05:49:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFn1VOKKhA4WLT+ujhN0UWmvu2oY3V+R+ECDiuNE+P04fsSNUprDeK4EvgDC0oQ+l+wSJkUiA==
+X-Received: by 2002:adf:f744:0:b0:366:eade:bfbb with SMTP id ffacd0b85a97d-37889682e0fmr9248486f8f.46.1725972574606;
+        Tue, 10 Sep 2024 05:49:34 -0700 (PDT)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb8afc9sm112219705e9.44.2024.09.10.05.49.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 05:49:34 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org, Yan Zhao
+ <yan.y.zhao@intel.com>, Kevin Tian <kevin.tian@intel.com>,
+ kraxel@redhat.com, maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+ tzimmermann@suse.de, airlied@gmail.com, daniel@ffwll.ch,
+ virtualization@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] drm/bochs: use devm_ioremap_wc() to map framebuffer
+In-Reply-To: <20240909131643.28915-1-yan.y.zhao@intel.com>
+References: <20240909131643.28915-1-yan.y.zhao@intel.com>
+Date: Tue, 10 Sep 2024 14:49:33 +0200
+Message-ID: <87a5gf4qsi.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qciowMBx+cVCPeBmXGoDAA--.15753S7
-X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
+Content-Type: text/plain
 
-Added pch_msi interrupt controller handling
-during kernel emulation of irq chip.
+Yan Zhao <yan.y.zhao@intel.com> writes:
 
-Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
----
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Song Gao <gaosong@loongson.cn>
-Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Cc: Huacai Chen <chenhuacai@kernel.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: Bibo Mao <maobibo@loongson.cn>
-Cc: Xianglai Li <lixianglai@loongson.cn>
+> Opt for devm_ioremap_wc() over devm_ioremap() when mapping the framebuffer.
+>
+> Using devm_ioremap() results in the VA being mapped with PAT=UC-, which
+> considerably slows down drm_fb_memcpy(). In contrast, devm_ioremap_wc()
+> maps the VA with PAT set to WC, leading to better performance on platforms
+> where access to UC memory is much slower than WC memory.
+>
+> Here's the performance data measured in a guest on the physical machine
+> "Sapphire Rapids XCC".
+> With host KVM honors guest PAT memory types, the effective memory type
+> for this framebuffer range is
+> - WC when devm_ioremap_wc() is used
+> - UC- when devm_ioremap() is used.
+>
+> The data presented is an average from 10 execution runs.
+>
+> Cycles: Avg cycles of executed bochs_primary_plane_helper_atomic_update()
+>         from VM boot to GDM show up
+> Cnt:    Avg cnt of executed bochs_primary_plane_helper_atomic_update()
+>         from VM boot to GDM show up
+> T:      Avg time of each bochs_primary_plane_helper_atomic_update().
+>
+>  -------------------------------------------------
+> |            | devm_ioremap() | devm_ioremap_wc() |
+> |------------|----------------|-------------------|
+> |  Cycles    |    211.545M    |   0.157M          |
+> |------------|----------------|-------------------|
+> |  Cnt       |     142        |   1917            |
+> |------------|----------------|-------------------|
+> |  T         |    0.1748s     |   0.0004s         |
+>  -------------------------------------------------
+>
+> Note:
+> Following the rebase to [3], the previously reported GDM failure on the
+> VGA device [1] can no longer be reproduced, thanks to the memory management
+> improvements made in [2]. Despite this, I have proceeded to submit this
+> patch because of the noticeable performance improvements it provides.
+>
+> Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
- hw/intc/loongarch_pch_msi.c | 42 +++++++++++++++++++++++++++----------
- hw/loongarch/virt.c         | 26 +++++++++++++----------
- target/loongarch/kvm/kvm.c  |  1 -
- 3 files changed, 46 insertions(+), 23 deletions(-)
+FWIW, this patch (alone) resolves the observed issue, thanks!
 
-diff --git a/hw/intc/loongarch_pch_msi.c b/hw/intc/loongarch_pch_msi.c
-index ecf3ed0267..bab6f852f8 100644
---- a/hw/intc/loongarch_pch_msi.c
-+++ b/hw/intc/loongarch_pch_msi.c
-@@ -2,7 +2,7 @@
- /*
-  * QEMU Loongson 7A1000 msi interrupt controller.
-  *
-- * Copyright (C) 2021 Loongson Technology Corporation Limited
-+ * Copyright (C) 2024 Loongson Technology Corporation Limited
-  */
- 
- #include "qemu/osdep.h"
-@@ -14,6 +14,8 @@
- #include "hw/misc/unimp.h"
- #include "migration/vmstate.h"
- #include "trace.h"
-+#include "sysemu/kvm.h"
-+#include "hw/loongarch/virt.h"
- 
- static uint64_t loongarch_msi_mem_read(void *opaque, hwaddr addr, unsigned size)
- {
-@@ -26,14 +28,24 @@ static void loongarch_msi_mem_write(void *opaque, hwaddr addr,
-     LoongArchPCHMSI *s = (LoongArchPCHMSI *)opaque;
-     int irq_num;
- 
--    /*
--     * vector number is irq number from upper extioi intc
--     * need subtract irq base to get msi vector offset
--     */
--    irq_num = (val & 0xff) - s->irq_base;
--    trace_loongarch_msi_set_irq(irq_num);
--    assert(irq_num < s->irq_num);
--    qemu_set_irq(s->pch_msi_irq[irq_num], 1);
-+    MSIMessage msg = {
-+        .address = addr,
-+        .data = val,
-+    };
-+
-+    if (kvm_enabled() && kvm_irqchip_in_kernel()) {
-+        kvm_irqchip_send_msi(kvm_state, msg);
-+    } else {
-+        /*
-+         * vector number is irq number from upper extioi intc
-+         * need subtract irq base to get msi vector offset
-+         */
-+        irq_num = (val & 0xff) - s->irq_base;
-+        trace_loongarch_msi_set_irq(irq_num);
-+        assert(irq_num < s->irq_num);
-+
-+        qemu_set_irq(s->pch_msi_irq[irq_num], 1);
-+    }
- }
- 
- static const MemoryRegionOps loongarch_pch_msi_ops = {
-@@ -45,8 +57,16 @@ static const MemoryRegionOps loongarch_pch_msi_ops = {
- static void pch_msi_irq_handler(void *opaque, int irq, int level)
- {
-     LoongArchPCHMSI *s = LOONGARCH_PCH_MSI(opaque);
--
--    qemu_set_irq(s->pch_msi_irq[irq], level);
-+    MSIMessage msg = {
-+        .address = 0,
-+        .data = irq,
-+    };
-+
-+    if (kvm_enabled() && kvm_irqchip_in_kernel()) {
-+        kvm_irqchip_send_msi(kvm_state, msg);
-+    } else {
-+        qemu_set_irq(s->pch_msi_irq[irq], level);
-+    }
- }
- 
- static void loongarch_pch_msi_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/loongarch/virt.c b/hw/loongarch/virt.c
-index db0c08899b..b42cf7e5af 100644
---- a/hw/loongarch/virt.c
-+++ b/hw/loongarch/virt.c
-@@ -887,24 +887,28 @@ static void virt_irq_init(LoongArchVirtMachineState *lvms)
-         for (i = 0; i < num; i++) {
-             qdev_connect_gpio_out(DEVICE(d), i, qdev_get_gpio_in(extioi, i));
-         }
-+    }
- 
--        /* Add PCH PIC node */
--        fdt_add_pch_pic_node(lvms, &eiointc_phandle, &pch_pic_phandle);
-+    /* Add PCH PIC node */
-+    fdt_add_pch_pic_node(lvms, &eiointc_phandle, &pch_pic_phandle);
- 
--        pch_msi = qdev_new(TYPE_LOONGARCH_PCH_MSI);
--        start   =  num;
--        num = EXTIOI_IRQS - start;
--        qdev_prop_set_uint32(pch_msi, "msi_irq_base", start);
--        qdev_prop_set_uint32(pch_msi, "msi_irq_num", num);
--        d = SYS_BUS_DEVICE(pch_msi);
--        sysbus_realize_and_unref(d, &error_fatal);
--        sysbus_mmio_map(d, 0, VIRT_PCH_MSI_ADDR_LOW);
-+    pch_msi = qdev_new(TYPE_LOONGARCH_PCH_MSI);
-+    num = VIRT_PCH_PIC_IRQ_NUM;
-+    start   =  num;
-+    num = EXTIOI_IRQS - start;
-+    qdev_prop_set_uint32(pch_msi, "msi_irq_base", start);
-+    qdev_prop_set_uint32(pch_msi, "msi_irq_num", num);
-+    d = SYS_BUS_DEVICE(pch_msi);
-+    sysbus_realize_and_unref(d, &error_fatal);
-+
-+    if (!(kvm_enabled() && kvm_irqchip_in_kernel())) {
-+        /* Connect pch_msi irqs to extioi */
-         for (i = 0; i < num; i++) {
--            /* Connect pch_msi irqs to extioi */
-             qdev_connect_gpio_out(DEVICE(d), i,
-                                   qdev_get_gpio_in(extioi, i + start));
-         }
-     }
-+    sysbus_mmio_map(d, 0, VIRT_PCH_MSI_ADDR_LOW);
- 
-     /* Add PCH MSI node */
-     fdt_add_pch_msi_node(lvms, &eiointc_phandle, &pch_msi_phandle);
-diff --git a/target/loongarch/kvm/kvm.c b/target/loongarch/kvm/kvm.c
-index c07dcfd85f..e1be6a6959 100644
---- a/target/loongarch/kvm/kvm.c
-+++ b/target/loongarch/kvm/kvm.c
-@@ -719,7 +719,6 @@ int kvm_arch_get_default_type(MachineState *ms)
- 
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
--    s->kernel_irqchip_allowed = false;
-     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
-     return 0;
- }
+Tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+I, however, share Paolo's concern around existing VMs which KVM's change
+is effectively breaking.
+
+> Closes: https://lore.kernel.org/all/87jzfutmfc.fsf@redhat.com/#t
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Thomas Zimmermann <tzimmermann@suse.de>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Link: https://lore.kernel.org/all/87jzfutmfc.fsf@redhat.com/#t [1]
+> Link: https://patchwork.freedesktop.org/series/138086 [2]
+> Link: https://gitlab.freedesktop.org/drm/misc/kernel/-/tree/drm-misc-next [3]
+> ---
+> v2:
+> - Rebased to the latest drm-misc-next branch. [2]
+> - Updated patch log to match the base code.
+>
+> v1: https://lore.kernel.org/all/20240909051529.26776-1-yan.y.zhao@intel.com
+> ---
+>  drivers/gpu/drm/tiny/bochs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/gpu/drm/tiny/bochs.c b/drivers/gpu/drm/tiny/bochs.c
+> index 69c5f65e9853..9055b1dd66df 100644
+> --- a/drivers/gpu/drm/tiny/bochs.c
+> +++ b/drivers/gpu/drm/tiny/bochs.c
+> @@ -268,7 +268,7 @@ static int bochs_hw_init(struct bochs_device *bochs)
+>  	if (!devm_request_mem_region(&pdev->dev, addr, size, "bochs-drm"))
+>  		DRM_WARN("Cannot request framebuffer, boot fb still active?\n");
+>  
+> -	bochs->fb_map = devm_ioremap(&pdev->dev, addr, size);
+> +	bochs->fb_map = devm_ioremap_wc(&pdev->dev, addr, size);
+>  	if (bochs->fb_map == NULL) {
+>  		DRM_ERROR("Cannot map framebuffer\n");
+>  		return -ENOMEM;
+
 -- 
-2.39.1
+Vitaly
 
 
