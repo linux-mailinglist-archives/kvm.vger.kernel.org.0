@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-26410-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26411-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FEAE9746BF
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 01:51:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A4C49746C2
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 01:51:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE14DB25761
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 23:51:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE1952884E4
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 23:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445341BE860;
-	Tue, 10 Sep 2024 23:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2F61BF327;
+	Tue, 10 Sep 2024 23:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TVvaCXSW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qBJJpB7n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8121BDAB5
-	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 23:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C441AE843
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 23:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726011905; cv=none; b=CrvngJlS5ZYSTNWieETRaX1/njMWth8WBIoAMd46QqxIQLBvCHbfzpEXilyH0BidlQy6+4xIlQ7Qg3bmSHoplKsRnvD/TzsNX2ifSrgzhUMfNGaypnR/E3aZlJsh57xnfl/bD2LsYZ03K3SDOEEVRpP/mCUJuP8Nk07wNAlTrFg=
+	t=1726011907; cv=none; b=fsReSqjrv+azm7kaYFZ7+ctYIUSUFiZRE+DQRmtSMaPId7Ka7XzPOgnTnmewNymDAdrIWMlh0bvX/EGZyatBWX9zs8aqUgxSGJZ+GFto/H2sfr4t/iln92+UhDQrHCHOEktQv7qmsnCkhzIFntQXEHzyjmnPGCOYOsaZxyw99l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726011905; c=relaxed/simple;
-	bh=eWDkcOSZuZ5Pq1xHHeSym7RfOxqvVkcI++gI8lj3qk0=;
+	s=arc-20240116; t=1726011907; c=relaxed/simple;
+	bh=TzSJJrRlAi780A8pE55jdRFKRZBu64XpcxDuBoryqQs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FBcYwxBbq1nEOR9opkB5nn48yTqLaQoV6FjCMtvnAgtMheSxoweaClLcRE4zg7ls3MilTV/83FOo/hLGlrC747GCU4tq0Gu7FZci0jhuscXdFHnDaErFQZgUkvoguP94YluiS6fc1toaWw4lgjvr2P+gkTym1PJ3SQZuRH20FTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TVvaCXSW; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=GyFILsKzqktjwklnHHZdWrZW4SWnUwPbK4iZci5gegLbHGfhkAHyTLznnwDvd9AeXTUpg1iYZgQw7DY/aj1ARJq2u5CFFQL4lW9aJy/qTme2wBx5DCt+Z7ZGROgB0YBzJA1VTFNXItbmNBFnSShpvYqPE8UfnkKELFmlF9FmVOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qBJJpB7n; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2d8a1e91afaso6338756a91.1
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 16:45:03 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7d4fb78fe49so5332070a12.2
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 16:45:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726011903; x=1726616703; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1726011905; x=1726616705; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRCNcbi6F+8e/+W6bDlSdC9DBYtBZ6HMw9eZxHX0xEQ=;
-        b=TVvaCXSWAqvlTaSewTvfrylxAXS694NKkoQgWuUEX9xWZ7pCRo5mICqtp+EP9A1kWz
-         Hp7LWM7nZYnj8ssyx7Z7G9UxWikVIwx3PpwhQaGw4UGmyGJztEVnjdtfwY087vPZ5Otx
-         c0Cb4X0yPLRloaMtTK5QpI+W1/IKlErv+nmZ9XYaEI9sfe42msRHzJPGhMSQLlzHXnHG
-         qKpwR5regWKj4lSR/9uXVxzAhprDQQh6bxXJMu6Mm5LWUqc7hNOzO0uMNmDWS17lsFFt
-         x7L401zG4E6n6ZFxD4grdqOuHZGDTPEMlcjne6YrnyAA7WMt6rplWEM/iZk5SKhATgdG
-         KhqQ==
+        bh=JNe/WmHLeg6VKg7h5W2f+s+eqgKPFc2fIX3V6u3knDI=;
+        b=qBJJpB7n5mTvijCfEdMh2HbVXo1BCYMHQbNlSNfKFWq+K8pGQyhWQQOOodkJRxLTOO
+         Xnka5U1glb+Eor5CES1U6pvCgkC/peoM8mwIlda6IgnIQfVqj2o0+IK7xfJLdANdknbJ
+         cgu2V8psQ2uxiCFU0eXwrQd9q2TEGsp4FZWVcptQ2mNjCGGIqOMO7Hdo+bMIeG7ThEgj
+         wV9IBLz/g3MfUjng7fkk5KLk4GTrP5iHIBWj9mvJrrG95LuJ8FBcWwp49e6ssLwFpaov
+         dzdw/tb+WulrtLW5jpv/eH8BH22m18vkj024F05piYoUiPkVcwCuqLIW2kWMpmQ5U9UI
+         OmyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726011903; x=1726616703;
+        d=1e100.net; s=20230601; t=1726011905; x=1726616705;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRCNcbi6F+8e/+W6bDlSdC9DBYtBZ6HMw9eZxHX0xEQ=;
-        b=iHnu53P5AqJ3u0Zj49x6ArfyyVbqKkdzDOyEEHsNPFeEVHk2sXBaHJak1D7aXyN+8m
-         HfPmfDJ2Esy5votpobEij0RYvhvlx4wa4epMHTGIkFdQXPs82XMovkpAg5lCY3q9rKAC
-         6jFOXvuKJfGRVwgsOvY24pFvioNxI0xKcQPnxZcg+ft6QiL7yu+rF/crSqw4QlPw74Sd
-         INy7wEFAKtddONTxRqVCJJYSXyiE5tDtFOw0dU4WGweJBAzJzFnl4JzB0IgNBWC68lc6
-         63kA2AsMUn8quNxLMrD4KqOrqC5HRrj1IOVWwz2YGNcTb8FEp4kuLkLZs3PGKPveuhyy
-         5J0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUhD2bN1h5BPFxR6rFbs22naF8aTFGIDrQPlccIp3kTwnU9xpSeDIHZ1SZR7NCogqn+qD4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxYxomd6yAZdzGpeRjbC1Khee1SCZl3rMJ/FVmnz+TUAxAhcRo
-	/WkM/4gzEhliRV7vGoU8ojC1HLKz9i6DTXrMAMM6jIomI41vjaWAfE5PuggtPBbl4Zi+pSV3JaY
-	K7JeZ1vpZG8jFF48k+42UsA==
-X-Google-Smtp-Source: AGHT+IHtETmvMtzECuoQj0TF7p/fCvI8MzpUYVVeKR6wp9ZmcH42X+aBOrBQUronIKH1gIl+RV35B4SpP9LwziE8Sg==
+        bh=JNe/WmHLeg6VKg7h5W2f+s+eqgKPFc2fIX3V6u3knDI=;
+        b=ntwY0LtQYtu6dFt/2m74M6HQj8ETntcNBtTWpw/1wijpPhm7xDaqe0vRNoAkdC8ziZ
+         mG8c1cp3akS9p9bQNFj0kfaCbaoX/g9D+BIJnuodv8KMUq+H26iDlE1W1H6+4OEi3ulr
+         t2PkpxaxdS0GM52m7AIE3gXaESOf9rFYserVrOHMrS24P3Bt8CvwHtv5dpGlpgePZC10
+         RdFkhD1KgWJkoRv9BftRF+DKibDcdW5cpFdm9QS32De94oQvTSKVlrlCcuh1ZDpOFVWr
+         OnhDUvqUVQarKbbWangRCrHc50UmZOfuLpqGY0x3SV8R4DmEPuovZDqDuNLnMJLQMrRP
+         /YdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeto73O8hs+Gz73XpqOc5UGQbMMfMYJ5piWXrWSyRa3sT7fYwKeqB2IxueN7PRpV0BcV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxh24QyB3rhQeVmtBjUkbZCWtewzWnWDrCAfxObFaGLR7puUe9+
+	dRKGDBPyDPaus07x/cehKqV4T6HtX0GYScwY0wCrW+gOKx7cdHeBMrWhWHiUD2UVi+rn9Zf/8SV
+	ucVw2AgiBe801V0ko63hMYw==
+X-Google-Smtp-Source: AGHT+IEf/I6TXDj4AnDTGwL9SBffiRIBIsWvgKs+GwMaxvWB3wQdGWq/Gxc5GyUB8zA1nCQX52oCQ5i2eL9ajayvXg==
 X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a17:90a:b38d:b0:2d8:a37d:b762 with
- SMTP id 98e67ed59e1d1-2dad517ea05mr68668a91.4.1726011902955; Tue, 10 Sep 2024
- 16:45:02 -0700 (PDT)
-Date: Tue, 10 Sep 2024 23:43:49 +0000
+ (user=ackerleytng job=sendgmr) by 2002:a63:2506:0:b0:7c9:58ed:7139 with SMTP
+ id 41be03b00d2f7-7db084ae38emr8766a12.2.1726011904575; Tue, 10 Sep 2024
+ 16:45:04 -0700 (PDT)
+Date: Tue, 10 Sep 2024 23:43:50 +0000
 In-Reply-To: <cover.1726009989.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1726009989.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.46.0.598.g6f2099f65c-goog
-Message-ID: <327dadf390b5e397074e5bcc9f85468b1467f9a6.1726009989.git.ackerleytng@google.com>
-Subject: [RFC PATCH 18/39] KVM: selftests: Support various types of backing
- sources for private memory
+Message-ID: <41d7d714cfa7cec3e7089a184918da39e93008ee.1726009989.git.ackerleytng@google.com>
+Subject: [RFC PATCH 19/39] KVM: selftests: Update test for various private
+ memory backing source types
 From: Ackerley Tng <ackerleytng@google.com>
 To: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk, 
 	jgg@nvidia.com, peterx@redhat.com, david@redhat.com, rientjes@google.com, 
@@ -95,157 +95,99 @@ Cc: erdemaktas@google.com, vannapurve@google.com, ackerleytng@google.com,
 	linux-fsdevel@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 
-Adds support for various type of backing sources for private
-memory (in the sense of confidential computing), similar to the
-backing sources available for shared memory.
+Update private_mem_conversions_test for various private memory backing
+source types.
 
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-
 ---
- .../testing/selftests/kvm/include/test_util.h | 16 ++++
- tools/testing/selftests/kvm/lib/test_util.c   | 74 +++++++++++++++++++
- 2 files changed, 90 insertions(+)
+ .../kvm/x86_64/private_mem_conversions_test.c | 28 ++++++++++++++-----
+ 1 file changed, 21 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index 3e473058849f..011e757d4e2c 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -142,6 +142,16 @@ struct vm_mem_backing_src_alias {
- 	uint32_t flag;
- };
- 
-+enum vm_private_mem_backing_src_type {
-+	VM_PRIVATE_MEM_SRC_GUEST_MEM,  /* Use default page size */
-+	VM_PRIVATE_MEM_SRC_HUGETLB,    /* Use kernel default page size for hugetlb pages */
-+	VM_PRIVATE_MEM_SRC_HUGETLB_2MB,
-+	VM_PRIVATE_MEM_SRC_HUGETLB_1GB,
-+	NUM_PRIVATE_MEM_SRC_TYPES,
-+};
-+
-+#define DEFAULT_VM_PRIVATE_MEM_SRC VM_PRIVATE_MEM_SRC_GUEST_MEM
-+
- #define MIN_RUN_DELAY_NS	200000UL
- 
- bool thp_configured(void);
-@@ -152,6 +162,12 @@ size_t get_backing_src_pagesz(uint32_t i);
- bool is_backing_src_hugetlb(uint32_t i);
- void backing_src_help(const char *flag);
- enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
-+
-+void private_mem_backing_src_help(const char *flag);
-+enum vm_private_mem_backing_src_type parse_private_mem_backing_src_type(const char *type_name);
-+const struct vm_mem_backing_src_alias *vm_private_mem_backing_src_alias(uint32_t i);
-+size_t get_private_mem_backing_src_pagesz(uint32_t i);
-+
- long get_run_delay(void);
- 
- /*
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-index 8ed0b74ae837..d0a9b5ee0c01 100644
---- a/tools/testing/selftests/kvm/lib/test_util.c
-+++ b/tools/testing/selftests/kvm/lib/test_util.c
-@@ -15,6 +15,7 @@
- #include <sys/syscall.h>
- #include <linux/mman.h>
- #include "linux/kernel.h"
-+#include <linux/kvm.h>
- 
- #include "test_util.h"
- 
-@@ -288,6 +289,34 @@ const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i)
- 	return &aliases[i];
- }
- 
-+const struct vm_mem_backing_src_alias *vm_private_mem_backing_src_alias(uint32_t i)
-+{
-+	static const struct vm_mem_backing_src_alias aliases[] = {
-+		[VM_PRIVATE_MEM_SRC_GUEST_MEM] = {
-+			.name = "private_mem_guest_mem",
-+			.flag = 0,
-+		},
-+		[VM_PRIVATE_MEM_SRC_HUGETLB] = {
-+			.name = "private_mem_hugetlb",
-+			.flag = KVM_GUEST_MEMFD_HUGETLB,
-+		},
-+		[VM_PRIVATE_MEM_SRC_HUGETLB_2MB] = {
-+			.name = "private_mem_hugetlb_2mb",
-+			.flag = KVM_GUEST_MEMFD_HUGETLB | KVM_GUEST_MEMFD_HUGE_2MB,
-+		},
-+		[VM_PRIVATE_MEM_SRC_HUGETLB_1GB] = {
-+			.name = "private_mem_hugetlb_1gb",
-+			.flag = KVM_GUEST_MEMFD_HUGETLB | KVM_GUEST_MEMFD_HUGE_1GB,
-+		},
-+	};
-+	_Static_assert(ARRAY_SIZE(aliases) == NUM_PRIVATE_MEM_SRC_TYPES,
-+		       "Missing new backing private mem src types?");
-+
-+	TEST_ASSERT(i < NUM_PRIVATE_MEM_SRC_TYPES, "Private mem backing src type ID %d too big", i);
-+
-+	return &aliases[i];
-+}
-+
- #define MAP_HUGE_PAGE_SIZE(x) (1ULL << ((x >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK))
- 
- size_t get_backing_src_pagesz(uint32_t i)
-@@ -308,6 +337,20 @@ size_t get_backing_src_pagesz(uint32_t i)
+diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c b/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
+index 82a8d88b5338..71f480c19f92 100644
+--- a/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
++++ b/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
+@@ -366,14 +366,20 @@ static void *__test_mem_conversions(void *__vcpu)
  	}
  }
  
-+size_t get_private_mem_backing_src_pagesz(uint32_t i)
-+{
-+	uint32_t flag = vm_private_mem_backing_src_alias(i)->flag;
-+
-+	switch (i) {
-+	case VM_PRIVATE_MEM_SRC_GUEST_MEM:
-+		return getpagesize();
-+	case VM_PRIVATE_MEM_SRC_HUGETLB:
-+		return get_def_hugetlb_pagesz();
-+	default:
-+		return MAP_HUGE_PAGE_SIZE(flag);
-+	}
-+}
-+
- bool is_backing_src_hugetlb(uint32_t i)
+-static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t nr_vcpus,
+-				 uint32_t nr_memslots)
++static void
++test_mem_conversions(enum vm_mem_backing_src_type src_type,
++		     enum vm_private_mem_backing_src_type private_mem_src_type,
++		     uint32_t nr_vcpus,
++		     uint32_t nr_memslots)
  {
- 	return !!(vm_mem_backing_src_alias(i)->flag & MAP_HUGETLB);
-@@ -344,6 +387,37 @@ enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name)
- 	return -1;
- }
+ 	/*
+ 	 * Allocate enough memory so that each vCPU's chunk of memory can be
+ 	 * naturally aligned with respect to the size of the backing store.
+ 	 */
+-	const size_t alignment = max_t(size_t, SZ_2M, get_backing_src_pagesz(src_type));
++	const size_t alignment = max_t(size_t, SZ_2M,
++				       max_t(size_t,
++					     get_private_mem_backing_src_pagesz(private_mem_src_type),
++					     get_backing_src_pagesz(src_type)));
+ 	const size_t per_cpu_size = align_up(PER_CPU_DATA_SIZE, alignment);
+ 	const size_t memfd_size = per_cpu_size * nr_vcpus;
+ 	const size_t slot_size = memfd_size / nr_memslots;
+@@ -394,7 +400,9 @@ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t
  
-+static void print_available_private_mem_backing_src_types(const char *prefix)
-+{
-+	int i;
-+
-+	printf("%sAvailable private mem backing src types:\n", prefix);
-+
-+	for (i = 0; i < NUM_PRIVATE_MEM_SRC_TYPES; i++)
-+		printf("%s    %s\n", prefix, vm_private_mem_backing_src_alias(i)->name);
-+}
-+
-+void private_mem_backing_src_help(const char *flag)
-+{
-+	printf(" %s: specify the type of memory that should be used to\n"
-+	       "     back guest private memory. (default: %s)\n",
-+	       flag, vm_private_mem_backing_src_alias(DEFAULT_VM_PRIVATE_MEM_SRC)->name);
-+	print_available_private_mem_backing_src_types("     ");
-+}
-+
-+enum vm_private_mem_backing_src_type parse_private_mem_backing_src_type(const char *type_name)
-+{
-+	int i;
-+
-+	for (i = 0; i < NUM_PRIVATE_MEM_SRC_TYPES; i++)
-+		if (!strcmp(type_name, vm_private_mem_backing_src_alias(i)->name))
-+			return i;
-+
-+	print_available_private_mem_backing_src_types("");
-+	TEST_FAIL("Unknown private mem backing src type: %s", type_name);
-+	return -1;
-+}
-+
- long get_run_delay(void)
+ 	vm_enable_cap(vm, KVM_CAP_EXIT_HYPERCALL, (1 << KVM_HC_MAP_GPA_RANGE));
+ 
+-	memfd = vm_create_guest_memfd(vm, memfd_size, 0);
++	memfd = vm_create_guest_memfd(
++		vm, memfd_size,
++		vm_private_mem_backing_src_alias(private_mem_src_type)->flag);
+ 
+ 	for (i = 0; i < nr_memslots; i++)
+ 		vm_mem_add(vm, src_type, BASE_DATA_GPA + slot_size * i,
+@@ -440,10 +448,12 @@ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t
+ static void usage(const char *cmd)
  {
- 	char path[64];
+ 	puts("");
+-	printf("usage: %s [-h] [-m nr_memslots] [-s mem_type] [-n nr_vcpus]\n", cmd);
++	printf("usage: %s [-h] [-m nr_memslots] [-s mem_type] [-p private_mem_type] [-n nr_vcpus]\n", cmd);
+ 	puts("");
+ 	backing_src_help("-s");
+ 	puts("");
++	private_mem_backing_src_help("-p");
++	puts("");
+ 	puts(" -n: specify the number of vcpus (default: 1)");
+ 	puts("");
+ 	puts(" -m: specify the number of memslots (default: 1)");
+@@ -453,17 +463,21 @@ static void usage(const char *cmd)
+ int main(int argc, char *argv[])
+ {
+ 	enum vm_mem_backing_src_type src_type = DEFAULT_VM_MEM_SRC;
++	enum vm_private_mem_backing_src_type private_mem_src_type = DEFAULT_VM_PRIVATE_MEM_SRC;
+ 	uint32_t nr_memslots = 1;
+ 	uint32_t nr_vcpus = 1;
+ 	int opt;
+ 
+ 	TEST_REQUIRE(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM));
+ 
+-	while ((opt = getopt(argc, argv, "hm:s:n:")) != -1) {
++	while ((opt = getopt(argc, argv, "hm:s:p:n:")) != -1) {
+ 		switch (opt) {
+ 		case 's':
+ 			src_type = parse_backing_src_type(optarg);
+ 			break;
++		case 'p':
++			private_mem_src_type = parse_private_mem_backing_src_type(optarg);
++			break;
+ 		case 'n':
+ 			nr_vcpus = atoi_positive("nr_vcpus", optarg);
+ 			break;
+@@ -477,7 +491,7 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
+-	test_mem_conversions(src_type, nr_vcpus, nr_memslots);
++	test_mem_conversions(src_type, private_mem_src_type, nr_vcpus, nr_memslots);
+ 
+ 	return 0;
+ }
 -- 
 2.46.0.598.g6f2099f65c-goog
 
