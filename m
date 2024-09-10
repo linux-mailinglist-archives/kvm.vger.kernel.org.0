@@ -1,143 +1,173 @@
-Return-Path: <kvm+bounces-26269-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26270-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C2A973912
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 15:49:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CB92973931
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 15:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AD8A1F26193
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 13:49:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 712CA1C24BC8
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2024 13:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5323D194080;
-	Tue, 10 Sep 2024 13:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91A2193073;
+	Tue, 10 Sep 2024 13:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jdo4DX90"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VlpqTSOG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA54192B9C;
-	Tue, 10 Sep 2024 13:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE23192D7B
+	for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 13:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725976160; cv=none; b=ZDUu/IzlE3mv4GQQsXFyM9NRZ/l5B+IAevfZ2Q3Qhy7v5wMcfj7wdbH2q0yPMwvV2aCKzyPfUxcu1x1f/fle80oa1MFzMNSdA21VqUBnXMupMmD11A4vjQtBo2a9yLXQgIKS1NtIVri/Au40rGo44sGbKIOgYOffEN+sqlqaxKM=
+	t=1725976679; cv=none; b=Bl+6s4ucxoePGd2sUJCFx+LTR993jTVeo2OnKnXnpYrukznf+cL5Y0VbS8EXqt9Bv3D29WbxBxhhVioLOGDbnHQp2Uz31HammV1XTfwY2m6KeFFbQl61SYySbjBGxxowiVGLtmwGnfkKhzOqnjQCJHTh2cgtTRJSkzGu4gvJV9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725976160; c=relaxed/simple;
-	bh=fw/M42pCfVAc0YLnpR3ek5zD+pVyEqrE+OE+mrVQuH8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=nFL7zHqblMnpJYUV1LkqvWm9+ynj4G9qMgFLbMXgcve97p9gPcocZfnCcq5EHGIso9u8XqZyox4HcBfAV0nsPVqVmRirjOvkX8eBWpbeltm+vL2qy1qVu47nKn0T71yoJW3647QgfbTan8IuNQUGt66VoGWSfiXs4fVwZAA9hLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jdo4DX90; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1497C4CEC3;
-	Tue, 10 Sep 2024 13:49:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725976160;
-	bh=fw/M42pCfVAc0YLnpR3ek5zD+pVyEqrE+OE+mrVQuH8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=Jdo4DX90Z0vmjWge0UXVXxfYTAw/WA45saY7+tOkt4/8STo5zOGzY87KoSq9pXSxt
-	 aoZ2fCClY6mrDIVY4qo9SHr7Sl/0m7U84GQhFESVVE83w1/zsZ//TRVchkVpXDUN/r
-	 wztUAut2OJrUOVynOqtlvG6G8z1gOoM0CnWcDykkx2yUdsfdFUBQHuA8wRaRz210P2
-	 TZGHI6pK2ul1FPqZYs+GUMlvDUKYXKABU+hsVY4mSgkrL2WjGetB1E0cOHlgtjHS6V
-	 A7NKSruUupyn2GWzgvSXMVgfHzkOxrl/WpErkGYIlVrGZRocTSMAOBSjqwgg2QxbcE
-	 68XmiPQgcRE/Q==
-Date: Tue, 10 Sep 2024 08:49:18 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: zdravko delineshev <delineshev@outlook.com>
-Cc: "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-Subject: Re: nointxmask device
-Message-ID: <20240910134918.GA579571@bhelgaas>
+	s=arc-20240116; t=1725976679; c=relaxed/simple;
+	bh=C3OuvsYXzxsi8PsJHLti8+yTLlIB/Wx/T1gR0I+782Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kjsyVmcDH58EceN+4NkyqDx1XEXEbnSrWXuVh1Y84ThRYEgxjkFl95f9F9ImBgK5U5fxEt9Jm0lX5CJ3Lim0+0uB6fZCujUiOUxao9VxIpQ3y8eGzkbWMsHTZHGLOS+v+sCLahH/PTinUWPGaUBQprmIWm1uWJK7SsB/vYfysJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VlpqTSOG; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6db7a8c6910so69293577b3.0
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 06:57:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725976676; x=1726581476; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hrgYqxg+OsjDVol4glnNVZPQAh7+/pJe50NmZF8ETrk=;
+        b=VlpqTSOGkDmRWca/xoYmQsC0eVo+cgYVz8zxqEHiSBDKcZOv77OGI1xCRGcD3S6IGi
+         PZ3WqnQKcQmzbvOZyU9YpXK+GHn5Jx6icQl7ZnOCf3/jawJr7Nyl6dTQCbx6zoXMsWl3
+         SNOBJZpKNtUaHYv4zN4SWYP5W0rwUmp4bnRg2m5zlV/hiX/STQCyD2zah/nXvEhZuLHi
+         RM5uTKt/r/kjm1+EocY90t2+PfzVjvnt7cPBaTMoDlzPyB/MucWUR1V8S0DXtx3o5t3s
+         3wlMMW25/saIhtKtCLwLrXztgpUcO5BW3M/lxLZ0LAdvQREkRxQqXArr7VkQ+jtpT7qW
+         LeYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725976676; x=1726581476;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hrgYqxg+OsjDVol4glnNVZPQAh7+/pJe50NmZF8ETrk=;
+        b=nqz4gfMhWWH5+YzRrvHyRqv4aYTq39AClq3LU84IqYTYXglhCQaZ4u+wBy6POgxTAF
+         0CMyQeXIjrx9SHk9oDYQEo6TY46UGMcTK1PLns+9Xk/+uCYd05qJjxwnnYaQrFgLWwWV
+         a5q0qB54AF8LowHDp9gvc9P42jD9H3kGbjxZWQ9Z+WSh0kcOTa89xiZzeqIdkLqwHZMM
+         YaEhC1vZZtAioWlwJZDbd0QpaxYopA0TXyQMJe372fHQr4cvjpS0yWsc1y8Fvcsai5kU
+         uMwz7qCR8Ov0P4G1DAOGIARF+qRa11B2/Nrj/zpC7jCfZfbGZIZfFhRbSaURZWTmC4HO
+         nrmA==
+X-Forwarded-Encrypted: i=1; AJvYcCVymkbmvyWsXhX3NZgrbBlRVzQABcC6vyxsJewFXcUOAkt8/1WA3Ze/S2GNvpwLPwhPZcw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVWu8+/guzOsVlXlk5oYuHLeTBWxrGLedBK/6Q2DLvwernw59I
+	/pVQAwAz7IOW1+IRY1SgBRtAJ6sVaxd7igKYgqa7N4sbYejPZXcUyXvbYpPbmpLZH8+voomRN94
+	r3A==
+X-Google-Smtp-Source: AGHT+IHYFtzUz/PGpro4LUc7/eZdeUX8GATKxph3lRCbnZwJE9AuGBVRCQAmAzgDSxlh877uyOBvJG8xY08=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:c7c7:0:b0:e1a:a29d:33f6 with SMTP id
+ 3f1490d57ef6-e1d3487ce6dmr143080276.3.1725976676434; Tue, 10 Sep 2024
+ 06:57:56 -0700 (PDT)
+Date: Tue, 10 Sep 2024 06:57:54 -0700
+In-Reply-To: <1bbe3a78-8746-4db9-a96c-9dc5f1190f16@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <VI1PR10MB8207C507DB5420AB4C7281E0DB9A2@VI1PR10MB8207.EURPRD10.PROD.OUTLOOK.COM>
+Mime-Version: 1.0
+References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
+ <20240904030751.117579-10-rick.p.edgecombe@intel.com> <6449047b-2783-46e1-b2a9-2043d192824c@redhat.com>
+ <b012360b4d14c0389bcb77fc8e9e5d739c6cc93d.camel@intel.com>
+ <Zt9kmVe1nkjVjoEg@google.com> <1bbe3a78-8746-4db9-a96c-9dc5f1190f16@redhat.com>
+Message-ID: <ZuBQYvY6Ib4ZYBgx@google.com>
+Subject: Re: [PATCH 09/21] KVM: TDX: Retry seamcall when TDX_OPERAND_BUSY with
+ operand SEPT
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	Yan Y Zhao <yan.y.zhao@intel.com>, Yuan Yao <yuan.yao@intel.com>, 
+	"nik.borisov@suse.com" <nik.borisov@suse.com>, "dmatlack@google.com" <dmatlack@google.com>, 
+	Kai Huang <kai.huang@intel.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-[+cc Alex, kvm]
+On Tue, Sep 10, 2024, Paolo Bonzini wrote:
+> On 9/9/24 23:11, Sean Christopherson wrote:
+> > In general, I am_very_  opposed to blindly retrying an SEPT SEAMCALL, ever.  For
+> > its operations, I'm pretty sure the only sane approach is for KVM to ensure there
+> > will be no contention.  And if the TDX module's single-step protection spuriously
+> > kicks in, KVM exits to userspace.  If the TDX module can't/doesn't/won't communicate
+> > that it's mitigating single-step, e.g. so that KVM can forward the information
+> > to userspace, then that's a TDX module problem to solve.
+> 
+> In principle I agree but we also need to be pragmatic.  Exiting to userspace
+> may not be practical in all flows, for example.
+> 
+> First of all, we can add a spinlock around affected seamcalls.
 
-On Tue, Sep 10, 2024 at 01:13:41PM +0000, zdravko delineshev wrote:
+No, because that defeates the purpose of having mmu_lock be a rwlock.
+
+> This way we know that "busy" errors must come from the guest and have set
+> HOST_PRIORITY.
+ 
+We should be able to achieve that without a VM-wide spinlock.  My thought (from
+v11?) was to effectively use the FROZEN_SPTE bit as a per-SPTE spinlock, i.e. keep
+it set until the SEAMCALL completes.
+
+> It is still kinda bad that guests can force the VMM to loop, but the VMM can
+> always say enough is enough.  In other words, let's assume that a limit of
+> 16 is probably appropriate but we can also increase the limit and crash the
+> VM if things become ridiculous.
 > 
-> Hello,
+> Something like this:
 > 
-> i found a note in the vfio-pci parameters to email devices fixed by the nointxmask parameter.
+> 	static u32 max = 16;
+> 	int retry = 0;
+> 	spin_lock(&kvm->arch.seamcall_lock);
+> 	for (;;) {
+> 		args_in = *in;
+> 		ret = seamcall_ret(op, in);
+> 		if (++retry == 1) {
+> 			/* protected by the same seamcall_lock */
+> 			kvm->stat.retried_seamcalls++;
+> 		} else if (retry == READ_ONCE(max)) {
+> 			pr_warn("Exceeded %d retries for S-EPT operation\n", max);
+> 			if (KVM_BUG_ON(kvm, retry == 1024)) {
+> 				pr_err("Crashing due to lock contention in the TDX module\n");
+> 				break;
+> 			}
+> 			cmpxchg(&max, retry, retry * 2);
+> 		}
+> 	}
+> 	spin_unlock(&kvm->arch.seamcall_lock);
 > 
-> Here is the one i have and i am trying to pass trough. it is currently working fine, with nointxmask=1 .
-> 
-> 
-> 81:00.0 Audio device: Creative Labs EMU20k2 [Sound Blaster X-Fi Titanium Series] (rev 03)
->         Subsystem: Creative Labs EMU20k2 [Sound Blaster X-Fi Titanium Series]
->         Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr+ Stepping- SERR+ FastB2B- DisINTx-
->         Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
->         Latency: 0, Cache Line Size: 32 bytes
->         Interrupt: pin A routed to IRQ 409
->         NUMA node: 1
->         IOMMU group: 23
->         Region 0: Memory at d3200000 (64-bit, non-prefetchable) [size=64K]
->         Region 2: Memory at d3000000 (64-bit, non-prefetchable) [size=2M]
->         Region 4: Memory at d2000000 (64-bit, non-prefetchable) [size=16M]
->         Capabilities: [40] Power Management version 3
->                 Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-,D3cold-)
->                 Status: D0 NoSoftRst- PME-Enable- DSel=0 DScale=0 PME-
->         Capabilities: [48] MSI: Enable- Count=1/1 Maskable- 64bit+
->                 Address: 0000000000000000  Data: 0000
->         Capabilities: [58] Express (v2) Endpoint, MSI 00
->                 DevCap: MaxPayload 128 bytes, PhantFunc 0, Latency L0s <64ns, L1 <1us
->                         ExtTag- AttnBtn- AttnInd- PwrInd- RBE+ FLReset- SlotPowerLimit 0W
->                 DevCtl: CorrErr- NonFatalErr- FatalErr+ UnsupReq-
->                         RlxdOrd+ ExtTag- PhantFunc- AuxPwr+ NoSnoop+
->                         MaxPayload 128 bytes, MaxReadReq 512 bytes
->                 DevSta: CorrErr- NonFatalErr- FatalErr- UnsupReq- AuxPwr- TransPend-
->                 LnkCap: Port #0, Speed 2.5GT/s, Width x1, ASPM L0s L1, Exit Latency L0s <64ns, L1 <1us
->                         ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp-
->                 LnkCtl: ASPM Disabled; RCB 64 bytes, Disabled- CommClk-
->                         ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
->                 LnkSta: Speed 2.5GT/s, Width x1
->                         TrErr- Train- SlotClk- DLActive- BWMgmt- ABWMgmt-
->                 DevCap2: Completion Timeout: Range ABCD, TimeoutDis- NROPrPrP- LTR-
->                          10BitTagComp- 10BitTagReq- OBFF Not Supported, ExtFmt- EETLPPrefix-
->                          EmergencyPowerReduction Not Supported, EmergencyPowerReductionInit-
->                          FRS- TPHComp- ExtTPHComp-
->                          AtomicOpsCap: 32bit- 64bit- 128bitCAS-
->                 DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis- LTR- 10BitTagReq- OBFF Disabled,
->                          AtomicOpsCtl: ReqEn-
->                 LnkCtl2: Target Link Speed: 2.5GT/s, EnterCompliance- SpeedDis-
->                          Transmit Margin: Normal Operating Range, EnterModifiedCompliance- ComplianceSOS-
->                          Compliance Preset/De-emphasis: -6dB de-emphasis, 0dB preshoot
->                 LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete- EqualizationPhase1-
->                          EqualizationPhase2- EqualizationPhase3- LinkEqualizationRequest-
->                          Retimer- 2Retimers- CrosslinkRes: unsupported
->         Capabilities: [100 v1] Device Serial Number ff-ff-ff-ff-ff-ff-ff-ff
->         Capabilities: [300 v1] Advanced Error Reporting
->                 UESta:  DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
->                 UEMsk:  DLP- SDES+ TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq+ ACSViol-
->                 UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+ ECRC- UnsupReq- ACSViol-
->                 CESta:  RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
->                 CEMsk:  RxErr- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
->                 AERCap: First Error Pointer: 00, ECRCGenCap+ ECRCGenEn- ECRCChkCap+ ECRCChkEn-
->                         MultHdrRecCap- MultHdrRecEn- TLPPfxPres- HdrLogCap-
->                 HeaderLog: 00000000 00000000 00000000 00000000
->         Kernel driver in use: vfio-pci
->         Kernel modules: snd_ctxfi
-> 00: 02 11 0b 00 46 01 10 00 03 00 03 04 08 00 00 00
-> 10: 04 00 20 d3 00 00 00 00 04 00 00 d3 00 00 00 00
-> 20: 04 00 00 d2 00 00 00 00 00 00 00 00 02 11 44 00
-> 30: 00 00 00 00 40 00 00 00 00 00 00 00 0b 01 00 00
-> 40: 01 48 03 00 00 00 00 00 05 58 80 00 00 00 00 00
-> 50: 00 00 00 00 00 00 00 00 10 00 02 00 00 80 00 00
-> 60: 14 2c 20 00 11 0c 00 00 00 00 11 00 00 00 00 00
-> 70: 00 00 00 00 00 00 00 00 00 00 00 00 0f 00 00 00
-> 80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 90: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> This way we can do some testing and figure out a useful limit.
+
+2 :-)
+
+One try that guarantees no other host task is accessing the S-EPT entry, and a
+second try after blasting IPI to kick vCPUs to ensure no guest-side task has
+locked the S-EPT entry.
+
+My concern with an arbitrary retry loop is that we'll essentially propagate the
+TDX module issues to the broader kernel.  Each of those SEAMCALLs is slooow, so
+retrying even ~20 times could exceed the system's tolerances for scheduling, RCU,
+etc...
+
+> For zero step detection, my reading is that it's TDH.VP.ENTER that fails;
+> not any of the MEM seamcalls.  For that one to be resolved, it should be
+> enough to do take and release the mmu_lock back to back, which ensures that
+> all pending critical sections have completed (that is,
+> "write_lock(&kvm->mmu_lock); write_unlock(&kvm->mmu_lock);").  And then
+> loop.  Adding a vCPU stat for that one is a good idea, too.
+
+As above and in my discussion with Rick, I would prefer to kick vCPUs to force
+forward progress, especially for the zero-step case.  If KVM gets to the point
+where it has retried TDH.VP.ENTER on the same fault so many times that zero-step
+kicks in, then it's time to kick and wait, not keep retrying blindly.
+
+There is still risk of a hang, e.g. if a CPU fails to respond to the IPI, but
+that's a possibility that always exists.  Kicking vCPUs allows KVM to know with
+100% certainty that a SEAMCALL should succeed.
+
+Hrm, the wrinkle is that if we want to guarantee success, the vCPU kick would
+need to happen when the SPTE is frozen, to ensure some other host task doesn't
+"steal" the lock.
 
