@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-26472-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26473-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2195974C47
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 10:15:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF653974C73
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 10:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 771E6B23283
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 08:15:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4083286AF8
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 08:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7BA213D8AC;
-	Wed, 11 Sep 2024 08:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B1C17995E;
+	Wed, 11 Sep 2024 08:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QH20hfCv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mOgc2X16"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B4213D510
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 08:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D35714AD0A
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 08:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726042525; cv=none; b=jNZtxBKsh64jc2sF7aDfxq5eJ2Knn3HrT5v45AYb9KSyfiIJPOpzUlyARzu+tdtVgP7Q/bbatSoInKOxt3zRI7WBjrnOUOy3mwO6PZpnIfYQob5ikMh+ODtenSgj3dam/LDBShtl6mv2YZ8P2I67JkOe28gbNnF8qQqEdK+pJpI=
+	t=1726042772; cv=none; b=VQ7fbFjHNGpOC51oms03sXxbYmbfk+eOerHj57uq13kCuS0GpJdWZNK0QOkU7fQg6kj9GYxvylGy+ctpvO9kX/l5pTb47BSUBZrVez6hviAchHXJZn51XIwr8CtwaXYTCkC//pedW7j4KqP12DNecB49UAbj/1vkgaOpW3P20DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726042525; c=relaxed/simple;
-	bh=eVUKOIYAw5aoyTC7VA+7kbvlur+eIyJI8kzLj6ED0Og=;
+	s=arc-20240116; t=1726042772; c=relaxed/simple;
+	bh=LxHdd6oWMKDSmV87qVDd0Ih45iGUGvPc3C0MfoJr+W4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G1vMYY9fmuc5sVhoIWcHJ7oH+QvC9MYoO2BbS7OU7Vr2bsTrnRpcm1eUvZmYWVrMER079jBk/P8htqpILwJlAoz3rAdHHL9cPSsdUxivcs7mSPCxRwLPGHitkY4utK6gHAo08r9YZ8nVe0qPpq6z+YdRn1VcfrmQPueEzeUYkCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QH20hfCv; arc=none smtp.client-ip=91.218.175.186
+	 Content-Type:Content-Disposition:In-Reply-To; b=iNrnvmdhmStmrGfMBs2spLq8obGnjXTYk/xMsEPIwaa4oe3tEvLqYw0/IZs57taXEEvnZFqbR3DeTem2bbDXDu1M4PsBqZY2kxinTIyVnPSXHGznVMEEdHz+VrIBarRiu6dyaIY2y5lyMQTgmPlrSv0TnX2zR1VLA5sht1TSYLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mOgc2X16; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 11 Sep 2024 10:15:14 +0200
+Date: Wed, 11 Sep 2024 10:19:19 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726042520;
+	t=1726042767;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=V987fBm6F9emK0J95GoYEdiv+Gd6fbUioktZ1lszOmg=;
-	b=QH20hfCvh9Cvy1MeUujlEhHWUY3A3d/I1Y15631aaDCYouDnUvYEgYv1OOPLoU+JNzJQaz
-	FcUHxiszgnbUqFJoRPq5D1Dlgfyo7jviih14D+7UJeIBS0ez7V96uKkLujVBgHmY5K4Imh
-	SYjV42ODWjbbywoFaXc1JSYBM7/02a0=
+	bh=Xawjdg9z4iOS4w17C67FyLrAjZ6VCLSaCQ0vlpCF4cQ=;
+	b=mOgc2X16DMniSSg5raKMj4rMI4P5mn/hmJoO4dhq78qFcth9aXmLURlGx3a9wvb/xx3GZV
+	xZ4p1ifKJZnphmltqmAInC3jPjDJ1plx7dRNLiTvGa4ZBWwKQn+ruszwkrQKp5BFNWhLFa
+	imaAtwoItwF0hl/nnckK9zeluUh+I/0=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Nicholas Piggin <npiggin@gmail.com>
@@ -49,11 +49,11 @@ Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
 	pbonzini@redhat.com, thuth@redhat.com, lvivier@redhat.com, frankja@linux.ibm.com, 
 	imbrenda@linux.ibm.com, nrb@linux.ibm.com, atishp@rivosinc.com, 
 	cade.richard@berkeley.edu, jamestiotio@gmail.com
-Subject: Re: [kvm-unit-tests PATCH 1/2] configure: Introduce add-config
-Message-ID: <20240911-d6ec4d38091c5f852f825d17@orel>
-References: <20240903143946.834864-4-andrew.jones@linux.dev>
- <20240903143946.834864-5-andrew.jones@linux.dev>
- <D431AYECDJV3.1AVQCTIRV2J4G@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v2 1/4] riscv: Drop mstrict-align
+Message-ID: <20240911-b5b62a907e90fabe4c701930@orel>
+References: <20240904105020.1179006-6-andrew.jones@linux.dev>
+ <20240904105020.1179006-7-andrew.jones@linux.dev>
+ <D430NH4TXH15.KR19KPMT2APE@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,35 +62,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <D431AYECDJV3.1AVQCTIRV2J4G@gmail.com>
+In-Reply-To: <D430NH4TXH15.KR19KPMT2APE@gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 11, 2024 at 10:39:03AM GMT, Nicholas Piggin wrote:
-> On Wed Sep 4, 2024 at 12:39 AM AEST, Andrew Jones wrote:
-> > Allow users to add additional CONFIG_* and override defaults
-> > by concatenating a given file with #define's and #undef's to
-> > lib/config.h
+On Wed, Sep 11, 2024 at 10:08:23AM GMT, Nicholas Piggin wrote:
+> On Wed Sep 4, 2024 at 8:50 PM AEST, Andrew Jones wrote:
+> > The spec says unaligned accesses are supported, so this isn't required
+> > and clang doesn't support it. A platform might have slow unaligned
+> > accesses, but kvm-unit-tests isn't about speed anyway.
+> >
+> > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> > ---
+> >  riscv/Makefile | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/riscv/Makefile b/riscv/Makefile
+> > index 179a373dbacf..2ee7c5bb5ad8 100644
+> > --- a/riscv/Makefile
+> > +++ b/riscv/Makefile
+> > @@ -76,7 +76,7 @@ LDFLAGS += -melf32lriscv
+> >  endif
+> >  CFLAGS += -DCONFIG_RELOC
+> >  CFLAGS += -mcmodel=medany
+> > -CFLAGS += -mstrict-align
+> > +#CFLAGS += -mstrict-align
 > 
-> That's a horrible config format lol, but probbaly the simplest way to
-> get something working. What if you included the user config first, then
-> make the generated config test ifndef before defining the default?
-
-User config first and then #ifndef would indeed be better.
-
+> Just remove the line?
 > 
-> Is it better to have a config file than to just add more --options to
-> configure? If we had thousands of options maybe, but so far we are
-> getting by with configure options.
+> Or put a comment there instead to explain.
 
-I have some unposted patches where I introduce two more configs, which
-is what inspired me to stop adding configure command line options.
-
-> I think I prefer that for now
-> unless we wholesale moved everything to a .config style.
-
-Moving to .config would be good, and importing and applying Kconfiglib
-doesn't look too daunting either. We can put this --add-config idea on
-hold until we've had a chance to experiment.
+I'll add a comment.
 
 Thanks,
 drew
