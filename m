@@ -1,113 +1,155 @@
-Return-Path: <kvm+bounces-26550-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26551-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70877975755
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 17:39:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 590FC97575B
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 17:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A41D1C23073
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:39:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5D4F1F24469
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103DE1AD3E3;
-	Wed, 11 Sep 2024 15:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3011AC458;
+	Wed, 11 Sep 2024 15:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q2kRUeGq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3/TJgaXR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329F51AC452;
-	Wed, 11 Sep 2024 15:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5389219F108
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 15:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726069128; cv=none; b=JGYXwBasphCisX/2KWsmrgQAJr3IZyP7A/B2MN0xqXUnUu7h1RZw9b2rSK2trjCJJkqn7oTbkLzklWPpLbiyw7eaFAQ0hxpY4cK6D/lUOkHra7HidvPysjDr+mZUB/JpAo+ikcEg2oEIpRTFp14unM/qkR/KZQP707dhfwwndMc=
+	t=1726069298; cv=none; b=JmN1Ai8+oZrbUeirWPE70GiehZhXORIQxvoXrDqcaiViEyYBbtRaIAlvYxzE9H0uOHF+rk3lJygC8u1nb4dOl7ra2NUjzI9UY3KCP+kC5HQdhNarmkuqtCT9pA6xsgTVBquZiTTy3S94oI4opCRVaZkgoUdkTGaKg5ug5aRh2FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726069128; c=relaxed/simple;
-	bh=QXNbUMRnp7GSpzgS2NMBHKjIaE+3Iot+Pwen86lwgm0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l++aRnyVh3taB4fapFNcgKSpQckewNrF0BEsn4gb8IGnTSeEus6ecImi/TczaJXZLu6O5enrTnIT8MNBfGcC86RfOuCQYP4TiA0xB6QtUp4ug7X/RLcMu7qWypkHLy95OlYzGCf5fHsWQeG3j1o0TSLlAZ2yv+E+OFE1RXdzK9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q2kRUeGq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7413C4CEC7;
-	Wed, 11 Sep 2024 15:38:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726069127;
-	bh=QXNbUMRnp7GSpzgS2NMBHKjIaE+3Iot+Pwen86lwgm0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q2kRUeGqilM3z+qHYizbvhdFYxTz61KWW2q9694IOZOkj9LQhGIP5w0VgQI8WISU/
-	 Q95oYFiblD2zkHFGtiwuY6hl+ghy+VgQkeGkXr8sF0it1oM6itF3/qdtlzuAWz/EUu
-	 ggHjXMwZtssNrcE/xTvAc6/zBV6LqpnLKGKNTHpjzOBD5x4Yc6E+Z2oYNmGdV2vsew
-	 ABovSiAJs0/c0co1y0sj1wJooFZpMz/t8mJDdEMGEPCN9TfBMW8WQV6o69RJBkinIy
-	 ta7yjGqMJABR3NdpucKri+WAjHgzrykeTVn5CaQyZ/DYSNe6FzL4vcUcRnRvKUOKyB
-	 4kClu4N4nUvuA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1soPQb-00CALu-Q9;
-	Wed, 11 Sep 2024 16:38:45 +0100
-Date: Wed, 11 Sep 2024 16:38:45 +0100
-Message-ID: <86o74u6vzu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 18/24] KVM: arm64: Split S1 permission evaluation into direct and hierarchical parts
-In-Reply-To: <20240911141513.GA1080224@e124191.cambridge.arm.com>
-References: <20240911135151.401193-1-maz@kernel.org>
-	<20240911135151.401193-19-maz@kernel.org>
-	<20240911141513.GA1080224@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1726069298; c=relaxed/simple;
+	bh=W+tiD1V/X/8R+/g/FQpft47xq5xPlYobfuaHr6OTIXE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Bgd8D9OjsGbDhUV627dnUoVCYObuFGeWRDDsuyC2WPtmkoRmjXwglrCj+bm/eX3HxgXLslA4oV/Iw0frLTtD/4SL/IQCYoseW2dgMeScrDSWvjVW6wCBH0EVrhgZL2n01RK5d7X1GZZYNTjy81+fsWh6svnr6ytHQzlrI+LUHo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3/TJgaXR; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-717dfdd7c72so8121218b3a.0
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 08:41:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726069296; x=1726674096; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MrHdXt7JrpjjUmNFGMd/v0CPNQfs3OQgNDJ0sdafxQA=;
+        b=3/TJgaXRapFAmpEpFNVFO4wLa+FeGLmvmDIaMjuurQdzq0KX1p8gnpQum1hpW/jiav
+         muLVO+2qpm6g8Se9iSvxCn6MRwCQ/GXllQIGNS0PNMkvYzPiIQXdYECIFv+tkKfU5FDM
+         cnK6QZTPmWuZ0LBiMjBZJU9A0tv+f1uxmL98e/UfC+URyamZj8pk4pUdrI9qE8dk+4Jz
+         Qt2aNpKZLDKVuKpXBkECjT6/7TkVNIQeL1FQVZNb/WZYm2xBRdyBrFds9GIzPRmKE0Bj
+         HGGj7ybYIma0PyaUibwduRTtA8XY98PGuiGALnm9CZ0K3o97xUhCXhPY6eE5FbiSqJ5W
+         A40g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726069296; x=1726674096;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MrHdXt7JrpjjUmNFGMd/v0CPNQfs3OQgNDJ0sdafxQA=;
+        b=tdNCcBEWtK7zzVOrdke1YSI6XdyXJHxuhPeX0gh/TUqv1XO007mtib508Hb2Q8P1iB
+         ABhtR8TBZEK9XsqG2biYPMeKZaUDcEXPg0D/OSwX6/fHwggg9WGgYomRsA3r5NQs9U6M
+         NVnXQqrkfCR+XQ47Puw+2rwCNbU/9ARiBeMyCr2dGptDneR5spmxReulgbdKDXvzA54F
+         7YStBohqraSYwH2myZtwzm9XvClA/rl7ZISwnfI+8b3bqurp44assjjZkKCymF6httgZ
+         eEHR4p5Ad0XBfTuEPmXHMgfMf8izrYH9XzeNQtPBUJqSniDY7FVi4rEQbyp2basLA+ci
+         1bAg==
+X-Forwarded-Encrypted: i=1; AJvYcCV6lkm1j3P3ha9NAXJTyQq3G2kUCfyLIhXgv0Q4nuLN/7pcR+m+C373Q3Q4dyG6DSMnpU8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD/ZieDqgLw4o0jMyaVsCw2+CCTi0oC8BqHavmdj+8DKd09p4L
+	+QvbP0xvEMcpkCkmHPm9sn0Br+iHouisSb2y0fwWg3KRCizP4vj3TM+uTE5P7loMaeUd+5DhjvN
+	NIA==
+X-Google-Smtp-Source: AGHT+IEHOhSB3DGvNEb+fdf89QVvK15AW99bpbRa1rQ/AYagpH+uE8Q8G9twq+/is6tH9A9baDGBHZMmwxU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:aa7:90c7:0:b0:718:d528:7423 with SMTP id
+ d2e1a72fcca58-718d5e09cccmr43282b3a.2.1726069296465; Wed, 11 Sep 2024
+ 08:41:36 -0700 (PDT)
+Date: Wed, 11 Sep 2024 08:41:34 -0700
+In-Reply-To: <b9cf0083783b32fd92edb4805a20a843a09af6fc.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-45-seanjc@google.com>
+ <2d554577722d30605ecd0f920f4777129fff3951.camel@redhat.com>
+ <ZoyDTJ3nb_MQ38nW@google.com> <b9cf0083783b32fd92edb4805a20a843a09af6fc.camel@redhat.com>
+Message-ID: <ZuG6LqLA6tGw9Edi@google.com>
+Subject: Re: [PATCH v2 44/49] KVM: x86: Update guest cpu_caps at runtime for
+ dynamic CPUID-based features
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
+	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
+	Robert Hoo <robert.hoo.linux@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 11 Sep 2024 15:15:13 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Tue, Sep 10, 2024, Maxim Levitsky wrote:
+> On Mon, 2024-07-08 at 17:24 -0700, Sean Christopherson wrote:
+> > On Thu, Jul 04, 2024, Maxim Levitsky wrote:
+> > > On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
+> > > > -		cpuid_entry_change(best, X86_FEATURE_OSPKE,
+> > > > -				   kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE));
+> > > > +		kvm_update_feature_runtime(vcpu, best, X86_FEATURE_OSPKE,
+> > > > +					   kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE));
+> > > > +
+> > > >  
+> > > >  	best = kvm_find_cpuid_entry_index(vcpu, 0xD, 0);
+> > > >  	if (best)
+> > > 
+> > > I am not 100% sure that we need to do this.
+> > > 
+> > > Runtime cpuid changes are a hack that Intel did back then, due to various
+> > > reasons, These changes don't really change the feature set that CPU supports,
+> > > but merly as you like to say 'massage' the output of the CPUID instruction to
+> > > make the unmodified OS happy usually.
+> > > 
+> > > Thus it feels to me that CPU caps should not include the dynamic features,
+> > > and neither KVM should use the value of these as a source for truth, but
+> > > rather the underlying source of the truth (e.g CR4).
+> > > 
+> > > But if you insist, I don't really have a very strong reason to object this.
+> > 
+> > FWIW, I think I agree that CR4 should be the source of truth, but it's largely a
+> > moot point because KVM doesn't actually check OSXSAVE or OSPKE, as KVM never
+> > emulates the relevant instructions.  So for those, it's indeed not strictly
+> > necessary.
+> > 
+> > Unfortunately, KVM has established ABI for checking X86_FEATURE_MWAIT when
+> > "emulating" MONITOR and MWAIT, i.e. KVM can't use vcpu->arch.ia32_misc_enable_msr
+> > as the source of truth.
 > 
-> On Wed, Sep 11, 2024 at 02:51:45PM +0100, Marc Zyngier wrote:
+> Can you elaborate on this? Can you give me an example of the ABI?
 
-[...]
+Writes to MSR_IA32_MISC_ENABLE are guarded with a quirk:
 
-> > +static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
-> > +						struct s1_walk_info *wi,
-> > +						struct s1_walk_result *wr,
-> > +						struct s1_perms *s1p)
-> > +{
-> 
-> How about:
-> 
-> 	if (wi->hpd)
-> 		return;
+		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
+		    ((old_val ^ data)  & MSR_IA32_MISC_ENABLE_MWAIT)) {
+			if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+				return 1;
+			vcpu->arch.ia32_misc_enable_msr = data;
+			kvm_update_cpuid_runtime(vcpu);
+		} else {
+			vcpu->arch.ia32_misc_enable_msr = data;
+		}
 
-I was hoping not to add anything like this, because all the table bits
-are 0 (we simply don't collect them), and thus don't have any effect.
+as is enforcement of #UD on MONITOR/MWAIT.
 
-Or did you spot any edge case where that would result in in a
-different set of permissions?
+  static int kvm_emulate_monitor_mwait(struct kvm_vcpu *vcpu, const char *insn)
+  {
+	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS) &&
+	    !guest_cpuid_has(vcpu, X86_FEATURE_MWAIT))
+		return kvm_handle_invalid_op(vcpu);
 
-Thanks,
+	pr_warn_once("%s instruction emulated as NOP!\n", insn);
+	return kvm_emulate_as_nop(vcpu);
+  }
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+If KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT is enabled but KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS
+is _disabled_, then KVM's ABI is to honor X86_FEATURE_MWAIT regardless of what
+is in vcpu->arch.ia32_misc_enable_msr (because userspace owns X86_FEATURE_MWAIT
+in that scenario).
 
