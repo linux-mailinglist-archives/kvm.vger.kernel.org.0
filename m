@@ -1,310 +1,272 @@
-Return-Path: <kvm+bounces-26591-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26592-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 536B9975CE7
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 00:08:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B210975CF0
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 00:13:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77D8E1C225AF
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 22:08:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F3151C223D4
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 22:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08AC8158DB1;
-	Wed, 11 Sep 2024 22:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 692A11A303D;
+	Wed, 11 Sep 2024 22:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fEeQ1U7G"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hqoEZqwO"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E94273FC
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 22:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4EE1273FC
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 22:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726092479; cv=none; b=kxMO3s3NNlMo/qltyyNC3qcMWzaeHZQt+zzDj5hLhCiAg8fHFzzjh/BjUIl7gHhQZXbYKJbVPC4VxTeeKVKw1/cbbFX0lu02KBdp9iD4aesyT6+vdw7aklWn4wg/fKaHyU9J21Eiz8B2p/KXqvzuDguA187MaXJ1wiprTVquN9U=
+	t=1726092774; cv=none; b=Jl/fBRb11l4xcGKPt6+ABOoB5caMDqRY17mmXoM5zRLRkoeOqvXYR8oW7JXG4qadKeMMLndef+vRMyp3JMjZqWRZIFVOBCkfvsaFZXr1AAIRXlRMaqSOprg9CzwseAEonlEOJ1fX13HRG7SbU5hrbs7PTjSi8N0gS5JwMCh7jSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726092479; c=relaxed/simple;
-	bh=WQ5xUdoURdT7+vK5J20UZjKk+FmJEb9HDmLlurDQLig=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hY4QjyowCPqduRhscz8OTqVBFDD+YLdsgnww9/C7HURdudFNS+wcQ39qPYvCbm0388svMSDBlubK3SMsLAPCrdXAV8NUrpm+q6c2kiDp+jnF7VjAdd80n8SNkxrXjXzzNJ+DjnychWDLT44U2izGqJFSbQz4GH2etENXE/GA+zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fEeQ1U7G; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1726092774; c=relaxed/simple;
+	bh=NYXgSuA+0WFfcSQnsHH6qp6vrNapxzh7jzPSICAhUQA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r2yVkxfXu62Yx+jRtrZ8DL4GTZ6Q/8+O9bjRcCLL1K8gJuorJ8GEc59B0+qv+S4wyQ/sC8M0Us8wdnNTElJUKT37yYb/y1XOmouwASyLSiWe3Edik2OrefpjobXM25KsBRcdaMO5+XW3PuFgeZtuomGKKvHn6EJfh9mh8S1yxlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hqoEZqwO; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726092476;
+	s=mimecast20190719; t=1726092771;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=qPv18UJlJ1AtcMakcGZBSmFd7ZNQdnu0Fu6/erRRIEI=;
-	b=fEeQ1U7G/ikqVk4rPfAV/ruOGA+4ElgeaWZ1kcPHDbjtfTqOEVs/JQhB9baRSFJhcVTczS
-	7bgWChOU/u2j+YnbzSVAt6b7hIBXk/op7b55qP3aKNUevb5wtqYjdFxECV5KAuHJySV6mx
-	9eQsxp5p32V7HiUzbUqmA+Cx8N4/B9g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=w1pCeESPNBVhMgdnisZiLl5MZQpZJwy5Dpq1bGy51vA=;
+	b=hqoEZqwOh/vTUmsERMOwmjWchNKxZ0hC7Wd8+Cz0hALpm/7fU9xt/59xIqAslehl5Lmqlm
+	l59hDv2WzuMmb8GEjeaY4pvLSwMwrD+TCuxlK7vgmTk39RFA8pVzIGD+YgDrK7q7Kv17Fe
+	S/hFiEoXR2GF6+lAQFZHLrcGD6aZK0g=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-GrgkS-IOM3iGlwJQKWzpxA-1; Wed, 11 Sep 2024 18:07:55 -0400
-X-MC-Unique: GrgkS-IOM3iGlwJQKWzpxA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42cb89fbb8cso1368285e9.0
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 15:07:55 -0700 (PDT)
+ us-mta-652-RoDyukiKO6a8TVHhgq1aew-1; Wed, 11 Sep 2024 18:12:50 -0400
+X-MC-Unique: RoDyukiKO6a8TVHhgq1aew-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-82be60b9809so6145839f.3
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 15:12:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726092474; x=1726697274;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qPv18UJlJ1AtcMakcGZBSmFd7ZNQdnu0Fu6/erRRIEI=;
-        b=XMFsLQmxqnecpKvvpTfDEEyAieNT9OY5ks8awPKIu54uyd6qjJinRlgNi0AhdQBW0y
-         Vd8f+t3NyMSDyPMhwByhkCdPl7BmTsnYtRhQ6CkMoYjKd7K26+8BtrUzoocMeg20A+u+
-         lomd1ZUDl6o8JK4JlL7uEotRiwY7MrZ1r1+i68kPw+UqMxnyFxVbKuQN8fTnXGj/4brW
-         EIOGmyOJo3vZF7iJQulPuvMcyOgJcIIb9D26kZLHuG+vNlu9M5jjov7d09DRBMfQAyGk
-         OV9eXqANR4xUcJLv35EI0dFbCU4eeDXt1vm0mkuhT9Mskoy2Cr74zwm9PdvX4SlM7BQ4
-         YRxQ==
-X-Gm-Message-State: AOJu0YzK8nXbkZH/LVo5/vowaq5EzdodJoqNGUHxBLfmC+fZgbm10TWN
-	6znktiaqnonq9zfOVgEUgmWg1KO1Kss/F7cu3Jh2FLC6hc/k3xpR3nD6vL7K9J/cQ7I22bNiHgw
-	QFm+UNtfD4axu2RuDNm+RoIt7GPlOJggCl9etSFiAgnWphbd0vw==
-X-Received: by 2002:adf:9b92:0:b0:371:87af:c88a with SMTP id ffacd0b85a97d-378c2d4d7e5mr369985f8f.45.1726092473853;
-        Wed, 11 Sep 2024 15:07:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEaYRRHD1jY22/i7oTAzVTJ734TcisQhWrmAF4DsRLiAb3ee+Ki3SXogOD8Ci/m6qeMHIP46A==
-X-Received: by 2002:adf:9b92:0:b0:371:87af:c88a with SMTP id ffacd0b85a97d-378c2d4d7e5mr369955f8f.45.1726092472849;
-        Wed, 11 Sep 2024 15:07:52 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c700:7e00:c672:608:5b3e:df8c? (p200300cbc7007e00c67206085b3edf8c.dip0.t-ipconnect.de. [2003:cb:c700:7e00:c672:608:5b3e:df8c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb4444asm152958595e9.22.2024.09.11.15.07.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Sep 2024 15:07:52 -0700 (PDT)
-Message-ID: <cf587c8b-3894-4589-bfea-be5db70e81f3@redhat.com>
-Date: Thu, 12 Sep 2024 00:07:51 +0200
+        d=1e100.net; s=20230601; t=1726092770; x=1726697570;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w1pCeESPNBVhMgdnisZiLl5MZQpZJwy5Dpq1bGy51vA=;
+        b=vGw6Reexh28jbfXsA71PhTMPHxgXA8uDHSNNth4MMp9OM5JwqTXF6BbIVrgnvqKLJ1
+         ieWLwNPpUdrmLN6gSL3UNp9/R10NgqFA7tysnh2kGAKkdzDcUOVDq7noPia2USI9YBBs
+         pAgJ4SLBnUXLbjPdbiI37r9KcRh72vHymLBH6p/YWJHNq8ayHjQasS1w9pcT6144J9Po
+         hp7K29B0haAR3bvWUt2fCdp800AaZiJPxFTBTF5JgF6f1Y7dn3UO5ZlCHhAui/tVCWkU
+         9l3WfZNmk6LBWLAnNpSfrb9/uoMAgQ/ehBfSfGc8ow+TlrGA3H9Ou3jL+eeW47GASEIW
+         sO2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXOKwM8FJHxaBGrK8N7HVgeyqTPI8eX4JNLOsMnQjyrUPDYlSxhIFuMHCzqLDeD8od0iSc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxW3glwE6BitN7Bib+DAk/hp3rBcMfPRRCnLL+YyYmnlblY7Np5
+	ENDaARTwpQ409aMkyQomisUiUe4gjgy4ifWLowkk35k32ZqFquxgEwG4kM5tQVtGKA1xDFXLlcs
+	k/fepOavudXF7RNgH0/CJWLDfi+Ek0q0cMpECeKDmksd5rZiLvg==
+X-Received: by 2002:a5e:8b4a:0:b0:82a:a4f0:963b with SMTP id ca18e2360f4ac-82d1f98ef7amr33380339f.4.1726092769818;
+        Wed, 11 Sep 2024 15:12:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHL62LzYYJxiLBBcLdGSSWST2aHzY8lEq9OoEMEiSMhL0W7j0UVnM9d4Z/oSt5KgckbdhFkog==
+X-Received: by 2002:a5e:8b4a:0:b0:82a:a4f0:963b with SMTP id ca18e2360f4ac-82d1f98ef7amr33379739f.4.1726092769392;
+        Wed, 11 Sep 2024 15:12:49 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-82aa736e212sm284495239f.26.2024.09.11.15.12.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 15:12:48 -0700 (PDT)
+Date: Wed, 11 Sep 2024 16:12:48 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: zdravko delineshev <delineshev@outlook.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, "linux-pci@vger.kernel.org"
+ <linux-pci@vger.kernel.org>, kvm@vger.kernel.org
+Subject: Re: nointxmask device
+Message-ID: <20240911161248.1f05d7da.alex.williamson@redhat.com>
+In-Reply-To: <20240910134918.GA579571@bhelgaas>
+References: <VI1PR10MB8207C507DB5420AB4C7281E0DB9A2@VI1PR10MB8207.EURPRD10.PROD.OUTLOOK.COM>
+	<20240910134918.GA579571@bhelgaas>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC RESEND 0/6] hugetlbfs largepage RAS project
-To: William Roche <william.roche@oracle.com>, pbonzini@redhat.com,
- peterx@redhat.com, philmd@linaro.org, marcandre.lureau@redhat.com,
- berrange@redhat.com, thuth@redhat.com, richard.henderson@linaro.org,
- peter.maydell@linaro.org, mtosatti@redhat.com, qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, qemu-arm@nongnu.org, joao.m.martins@oracle.com
-References: <20240910090747.2741475-1-william.roche@oracle.com>
- <20240910100216.2744078-1-william.roche@oracle.com>
- <ec3337f7-3906-4a1b-b153-e3d5b16685b6@redhat.com>
- <9f9a975e-3a04-4923-b8a5-f1edbed945e6@oracle.com>
-Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <9f9a975e-3a04-4923-b8a5-f1edbed945e6@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi again,
+On Tue, 10 Sep 2024 08:49:18 -0500
+Bjorn Helgaas <helgaas@kernel.org> wrote:
 
->>> This is a Qemu RFC to introduce the possibility to deal with hardware
->>> memory errors impacting hugetlbfs memory backed VMs. When using
->>> hugetlbfs large pages, any large page location being impacted by an
->>> HW memory error results in poisoning the entire page, suddenly making
->>> a large chunk of the VM memory unusable.
->>>
->>> The implemented proposal is simply a memory mapping change when an HW
->>> error
->>> is reported to Qemu, to transform a hugetlbfs large page into a set of
->>> standard sized pages. The failed large page is unmapped and a set of
->>> standard sized pages are mapped in place.
->>> This mechanism is triggered when a SIGBUS/MCE_MCEERR_Ax signal is
->>> received
->>> by qemu and the reported location corresponds to a large page.
+> [+cc Alex, kvm]
+>=20
+> On Tue, Sep 10, 2024 at 01:13:41PM +0000, zdravko delineshev wrote:
+> >=20
+> > Hello,
+> >=20
+> > i found a note in the vfio-pci parameters to email devices fixed by the=
+ nointxmask parameter.
+> >=20
+> > Here is the one i have and i am trying to pass trough. it is currently =
+working fine, with nointxmask=3D1 .
 
-One clarifying question: you simply replace the hugetlb page by multiple 
-small pages using mmap(MAP_FIXED). So you
+What are the symptoms without using nointxmask=3D1?  Please provide any
+dmesg snippets in the host related to using this device.
 
-(a) are not able to recover any memory of the original page (as of now)
-(b) no longer have a hugetlb page and, therefore, possibly a performance
-     degradation, relevant in low-latency applications that really care
-     about the usage of hugetlb pages.
-(c) run into the described inconsistency issues
+> > 81:00.0 Audio device: Creative Labs EMU20k2 [Sound Blaster X-Fi Titaniu=
+m Series] (rev 03)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Subsystem: Creative Labs EMU20k2 [Sound Bla=
+ster X-Fi Titanium Series]
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Control: I/O- Mem+ BusMaster+ SpecCycle- Me=
+mWINV- VGASnoop- ParErr+ Stepping- SERR+ FastB2B- DisINTx-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Status: Cap+ 66MHz- UDF- FastB2B- ParErr- D=
+EVSEL=3Dfast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Latency: 0, Cache Line Size: 32 bytes
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Interrupt: pin A routed to IRQ 409
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 NUMA node: 1
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 IOMMU group: 23
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Region 0: Memory at d3200000 (64-bit, non-p=
+refetchable) [size=3D64K]
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Region 2: Memory at d3000000 (64-bit, non-p=
+refetchable) [size=3D2M]
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Region 4: Memory at d2000000 (64-bit, non-p=
+refetchable) [size=3D16M]
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Capabilities: [40] Power Management version=
+ 3
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Flags: PMEClk- =
+DSI- D1- D2- AuxCurrent=3D0mA PME(D0-,D1-,D2-,D3hot-,D3cold-)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Status: D0 NoSo=
+ftRst- PME-Enable- DSel=3D0 DScale=3D0 PME-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Capabilities: [48] MSI: Enable- Count=3D1/1=
+ Maskable- 64bit+
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Address: 000000=
+0000000000 =C2=A0Data: 0000
 
-Why is what you propose beneficial over just fallocate(PUNCH_HOLE) the 
-full page and get a fresh, non-poisoned page instead?
+The device supports MSI, but the snd-ctxfs driver we have in the Linux
+kernel has no support for it, therefore reporting zero for the INTx pin
+is not an option.
 
-Sure, you have to reserve some pages if that ever happens, but what is 
-the big selling point over PUNCH_HOLE + realloc? (sorry if I missed it 
-and it was spelled out)
+Are you able to verify a kernel patch?
 
->>>
->>> This gives the possibility to:
->>> - Take advantage of newer hypervisor kernel providing a way to retrieve
->>> still valid data on the impacted hugetlbfs poisoned large page.
+Adding it to the existing broken INTx quirk should simply be:
 
-Reading that again, that shouldn't have to be hypervisor-specific. 
-Really, if someone were to extract data from a poisoned hugetlb folio, 
-it shouldn't be hypervisor-specific. The kernel should be able to know 
-which regions are accessible and could allow ways for reading these, one 
-way or the other.
-
-It could just be a fairly hugetlb-special feature that would replace the 
-poisoned page by a fresh hugetlb page where as much page content as 
-possible has been recoverd from the old one.
-
->>> If the backend file is MAP_SHARED, we can copy the valid data into the
-> 
-> 
-> Thank you David for this first reaction on this proposal.
-> 
-> 
->> How are you dealing with other consumers of the shared memory,
->> such as vhost-user processes,
-> 
-> 
-> In the current proposal, I don't deal with this aspect.
-> In fact, any other process sharing the changed memory will
-> continue to map the poisoned large page. So any access to
-> this page will generate a SIGBUS to this other process.
-> 
-> In this situation vhost-user processes should continue to receive
-> SIGBUS signals (and probably continue to die because of that).
-
-That's ... suboptimal. :)
-
-Assume you have a 1 GiB page. The guest OS can happily allocate buffers 
-in there so they can end up in vhost-user and crash that process. 
-Without any warning.
-
-> 
-> So I do see a real problem if 2 qemu processes are sharing the
-> same hugetlbfs segment -- in this case, error recovery should not
-> occur on this piece of the memory. Maybe dealing with this situation
-> with "ivshmem" options is doable (marking the shared segment
-> "not eligible" to hugetlbfs recovery, just like not "share=on"
-> hugetlbfs entries are not eligible)
-> -- I need to think about this specific case.
-> 
-> Please let me know if there is a better way to deal with this
-> shared memory aspect and have a better system reaction.
-
-Not creating the inconsistency in the first place :)
-
->> vm migration whereby RAM is migrated using file content,
-> 
-> 
-> Migration doesn't currently work with memory poisoning.
-> You can give a look at the already integrated following commit:
-> 
-> 06152b89db64 migration: prevent migration when VM has poisoned memory
-> 
-> This proposal doesn't change anything on this side.
-
-That commit is fairly fresh and likely missed the option to *not* 
-migrate RAM by reading it, but instead by migrating it through a shared 
-file. For example, VM life-upgrade (CPR) wants to use that (or is 
-already using that), to avoid RAM migration completely.
-
-> 
->> vfio that might have these pages pinned?
-> 
-> AFAIK even pinned memory can be impacted by memory error and poisoned
-> by the kernel. Now as I said in the cover letter, I'd like to know if
-> we should take extra care for IO memory, vfio configured memory buffers...
-
-Assume your GPU has a hugetlb folio pinned via vfio. As soon as you make 
-the guest RAM point at anything else as VFIO is aware of, we end up in 
-the same problem we had when we learned about having to disable balloon 
-inflation (MADVISE_DONTNEED) as soon as VFIO pinned pages.
-
-We'd have to inform VFIO that the mapping is now different. Otherwise 
-it's really better to crash the VM than having your GPU read/write 
-different data than your CPU reads/writes,
-
-> 
-> 
->> In general, you cannot simply replace pages by private copies
->> when somebody else might be relying on these pages to go to
->> actual guest RAM.
-> 
-> This is correct, but the current proposal is dealing with a specific
-> shared memory type: poisoned large pages. So any other process mapping
-> this type of page can't access it without generating a SIGBUS.
-
-Right, and that's the issue. Because, for example, how should the VM be 
-aware that this memory is now special and must not be used for some 
-purposes without leading to problems elsewhere?
-
-> 
-> 
->> It sounds very hacky and incomplete at first.
-> 
-> As you can see, RAS features need to be completed.
-> And if this proposal is incomplete, what other changes should be
-> done to complete it ?
-> 
-> I do hope we can discuss this RFC to adapt what is incorrect, or
-> find a better way to address this situation.
-
-One long-term goal people are working on is to allow remapping the 
-hugetlb folios in smaller granularity, such that only a single affected 
-PTE can be marked as poisoned. (used to be called high-granularity-mapping)
-
-However, at the same time, the focus hseems to shift towards using 
-guest_memfd instead of hugetlb, once it supports 1 GiB pages and shared 
-memory. It will likely be easier to support mapping 1 GiB pages using 
-PTEs that way, and there are ongoing discussions how that can be 
-achieved more easily.
-
-There are also discussions [1] about not poisoning the mappings at all 
-and handling it differently. But I haven't yet digested how exactly that 
-could look like in reality.
+diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+index a2ce4e08edf5..c7596e9aabb0 100644
+--- a/drivers/pci/quirks.c
++++ b/drivers/pci/quirks.c
+@@ -3608,6 +3608,8 @@ DECLARE_PCI_FIXUP_FINAL(0x1814, 0x0601, /* Ralink RT2=
+800 802.11n PCI */
+ 			quirk_broken_intx_masking);
+ DECLARE_PCI_FIXUP_FINAL(0x1b7c, 0x0004, /* Ceton InfiniTV4 */
+ 			quirk_broken_intx_masking);
++DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_CREATIVE, PCI_DEVICE_ID_CREATIVE_20K=
+2,
++			quirk_broken_intx_masking);
+=20
+ /*
+  * Realtek RTL8169 PCI Gigabit Ethernet Controller (rev 10)
 
 
-[1] https://lkml.kernel.org/r/20240828234958.GE3773488@nvidia.com
+Thanks,
+Alex
 
--- 
-Cheers,
-
-David / dhildenb
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Capabilities: [58] Express (v2) Endpoint, M=
+SI 00
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 DevCap: MaxPayl=
+oad 128 bytes, PhantFunc 0, Latency L0s <64ns, L1 <1us
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 ExtTag- AttnBtn- AttnInd- PwrInd- RBE+ FLReset- SlotPowerLimi=
+t 0W
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 DevCtl: CorrErr=
+- NonFatalErr- FatalErr+ UnsupReq-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 RlxdOrd+ ExtTag- PhantFunc- AuxPwr+ NoSnoop+
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 MaxPayload 128 bytes, MaxReadReq 512 bytes
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 DevSta: CorrErr=
+- NonFatalErr- FatalErr- UnsupReq- AuxPwr- TransPend-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 LnkCap: Port #0=
+, Speed 2.5GT/s, Width x1, ASPM L0s L1, Exit Latency L0s <64ns, L1 <1us
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 ClockPM- Surprise- LLActRep- BwNot- ASPMOptComp-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 LnkCtl: ASPM Di=
+sabled; RCB 64 bytes, Disabled- CommClk-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 LnkSta: Speed 2=
+.5GT/s, Width x1
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 TrErr- Train- SlotClk- DLActive- BWMgmt- ABWMgmt-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 DevCap2: Comple=
+tion Timeout: Range ABCD, TimeoutDis- NROPrPrP- LTR-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A010BitTagComp- 10BitTagReq- OBFF Not Supported, ExtFmt- =
+EETLPPrefix-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0EmergencyPowerReduction Not Supported, EmergencyPowerRe=
+ductionInit-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0FRS- TPHComp- ExtTPHComp-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0AtomicOpsCap: 32bit- 64bit- 128bitCAS-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 DevCtl2: Comple=
+tion Timeout: 50us to 50ms, TimeoutDis- LTR- 10BitTagReq- OBFF Disabled,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0AtomicOpsCtl: ReqEn-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 LnkCtl2: Target=
+ Link Speed: 2.5GT/s, EnterCompliance- SpeedDis-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0Transmit Margin: Normal Operating Range, EnterModifiedC=
+ompliance- ComplianceSOS-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0Compliance Preset/De-emphasis: -6dB de-emphasis, 0dB pr=
+eshoot
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 LnkSta2: Curren=
+t De-emphasis Level: -6dB, EqualizationComplete- EqualizationPhase1-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0EqualizationPhase2- EqualizationPhase3- LinkEqualizatio=
+nRequest-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0Retimer- 2Retimers- CrosslinkRes: unsupported
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Capabilities: [100 v1] Device Serial Number=
+ ff-ff-ff-ff-ff-ff-ff-ff
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Capabilities: [300 v1] Advanced Error Repor=
+ting
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 UESta: =C2=A0DL=
+P- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- Unsup=
+Req- ACSViol-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 UEMsk: =C2=A0DL=
+P- SDES+ TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- Unsup=
+Req+ ACSViol-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 UESvrt: DLP+ SD=
+ES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+ ECRC- UnsupReq- =
+ACSViol-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CESta: =C2=A0Rx=
+Err- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CEMsk: =C2=A0Rx=
+Err- BadTLP- BadDLLP- Rollover- Timeout- AdvNonFatalErr+
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 AERCap: First E=
+rror Pointer: 00, ECRCGenCap+ ECRCGenEn- ECRCChkCap+ ECRCChkEn-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 MultHdrRecCap- MultHdrRecEn- TLPPfxPres- HdrLogCap-
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 HeaderLog: 0000=
+0000 00000000 00000000 00000000
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Kernel driver in use: vfio-pci
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 Kernel modules: snd_ctxfi
+> > 00: 02 11 0b 00 46 01 10 00 03 00 03 04 08 00 00 00
+> > 10: 04 00 20 d3 00 00 00 00 04 00 00 d3 00 00 00 00
+> > 20: 04 00 00 d2 00 00 00 00 00 00 00 00 02 11 44 00
+> > 30: 00 00 00 00 40 00 00 00 00 00 00 00 0b 01 00 00
+> > 40: 01 48 03 00 00 00 00 00 05 58 80 00 00 00 00 00
+> > 50: 00 00 00 00 00 00 00 00 10 00 02 00 00 80 00 00
+> > 60: 14 2c 20 00 11 0c 00 00 00 00 11 00 00 00 00 00
+> > 70: 00 00 00 00 00 00 00 00 00 00 00 00 0f 00 00 00
+> > 80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > 90: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 =20
+>=20
 
 
