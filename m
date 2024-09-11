@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-26519-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26517-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8149754AF
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:54:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0626A9754AD
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:54:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B59D7B2AF5D
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 396541C254DE
 	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 13:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADD11A76C3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE081A76C7;
 	Wed, 11 Sep 2024 13:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jO40AB9F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJdH6lDr"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72D31A3A84;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC7B1A38F1;
 	Wed, 11 Sep 2024 13:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062720; cv=none; b=GGkCF3jxO9IhE+dcbBNI0pZYoxwHQAqm+JfjEuT5s/bLCpFWZH3lkVz3dXeuIV8WPoXYKK153jYntvDjFM1FcFwOMy0oUFCT3yoyUYlyqMocTP7HhQ9r2aEr7GQtOabRRHtmxmt3N+jeYPRV5gkt+tWLwA3ZeVzNs1yQIJvkv2g=
+	t=1726062719; cv=none; b=KBQNjKdn5r2y7YLow+M3QSq/5qaEZGmPjzyddCBjzr0t9aPTFK8jLyExNXEqY712jDggQ7A+ywjEyNmNyGyWq3yfXr4Qal6BIUEuS6ZzISuqT8cACaY2sxjT7nMF/9zcWmsTS0jW+gDaq+kzd4yGl5LsizVwNxFmle+4lOGE78M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726062720; c=relaxed/simple;
-	bh=Z0ym++tumuJ3A+5B8wBqj36SWhkYJ/0i8uaCjWKMtIc=;
+	s=arc-20240116; t=1726062719; c=relaxed/simple;
+	bh=EkNOxajA1sXIEet1JDQdUnqLS3wZ1Qi/EB3YjEcrH9g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kMaO+T0w+HmzXLWg7Dn22lLf73n8AGlAgr7qnj421Uy68nUl2/b3m4dOHBJ7Lvxellx2+Urji3VlDj0QWa8hZBogjlBmvDqYV96UhrQ4rag0W0Z7yanxAMIjJzPKq1t+390hA3uCZDLa/RyyLILcobZY/5NR1nq9mmp6tfo9Olw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jO40AB9F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BE58C4CEC0;
+	 MIME-Version; b=TI/i2HTAAM1XCErAdGSotIMP+Q931Us+giCF9LtaY1M5wKmDCVyMwknBmvk4IVXfHoGFsQWUkiyxFHbVh1LQQh6Fe6U1ZStsLDmXb5anycMuMfiShihCioiUrfz+p3tFn6NXR/9nznehQmWT/IdoUGeOwuN2Na3C0WpVUVFZe6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JJdH6lDr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EB28C4CECE;
 	Wed, 11 Sep 2024 13:51:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1726062719;
-	bh=Z0ym++tumuJ3A+5B8wBqj36SWhkYJ/0i8uaCjWKMtIc=;
+	bh=EkNOxajA1sXIEet1JDQdUnqLS3wZ1Qi/EB3YjEcrH9g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jO40AB9FZ2p58Khg2kr6h2XrWOs+RSrWQdlS5UiRzV/KWs5grow9wgtCEIQJWZecQ
-	 nDyQU+Qt3KjL/ESasB7JHTGy5DwlYI8C4ASbhAvjOmIzvnwthRkhOFBYNIlv9M4qe6
-	 c49KFz13oPfHX3XUksXPwA/DIMW+eSRSC4dlo/64Gd9KXPV/MlfTmUNQqnohCv9gzC
-	 KMsRZ99CmvmThxr1Xl59vc5nefZPlm8lEFwf8Pm3VBy86WWuOdQj2EUGZkCpEBkAhC
-	 Vtf2MyL/cRqAN1NJ+gGiJcwoWtXi4T0Ezq9G2f8koNRbqisTGx4op3C4/GqvjniKqV
-	 DIsQ8rYoljUXQ==
+	b=JJdH6lDr9OKubB4xQ/F9Y+oq7SYRm1CUFeR7Fm5qHGP35S5muTiN9h2Yv+5fCd4jL
+	 6/DjHEC4P26TpR1oBWJpPIp/goOHjAf9WTkPwNTjqQvIEiWt5LSdF7SM78hCED2CxZ
+	 bYuuY0x7+xwmTUjpAf2zvOQTPLydcB+SClYcjVY9gAZNnc7dcE2uxjeKAIShY857iv
+	 KFkGud2+aqLF8beW/cRz6waklO3Q9Xx1lUvnxznGTUSUSaAc+CNvM0VW+kTp+9y6vl
+	 rYxEFancpPUCpckRVo7th7UGQP+DAQzyCSy6ZRd2eqOgaLNwkpLQFXdGB8NuRYxuw6
+	 trSYl0wWdJgpg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1soNlF-00C7tL-Fb;
+	id 1soNlF-00C7tL-Mc;
 	Wed, 11 Sep 2024 14:51:57 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -58,9 +58,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 06/24] KVM: arm64: nv: Save/Restore vEL2 sysregs
-Date: Wed, 11 Sep 2024 14:51:33 +0100
-Message-Id: <20240911135151.401193-7-maz@kernel.org>
+Subject: [PATCH v3 07/24] KVM: arm64: Correctly access TCR2_EL1, PIR_EL1, PIRE0_EL1 with VHE
+Date: Wed, 11 Sep 2024 14:51:34 +0100
+Message-Id: <20240911135151.401193-8-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240911135151.401193-1-maz@kernel.org>
 References: <20240911135151.401193-1-maz@kernel.org>
@@ -76,232 +76,58 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Whenever we need to restore the guest's system registers to the CPU, we
-now need to take care of the EL2 system registers as well. Most of them
-are accessed via traps only, but some have an immediate effect and also
-a guest running in VHE mode would expect them to be accessible via their
-EL1 encoding, which we do not trap.
+For code that accesses any of the guest registers for emulation
+purposes, it is crucial to know where the most up-to-date data is.
 
-For vEL2 we write the virtual EL2 registers with an identical format directly
-into their EL1 counterpart, and translate the few registers that have a
-different format for the same effect on the execution when running a
-non-VHE guest guest hypervisor.
+While this is pretty clear for nVHE (memory is the sole repository),
+things are a lot muddier for VHE, as depending on the SYSREGS_ON_CPU
+flag, registers can either be loaded on the HW or be in memory.
 
-Based on an initial patch from Andre Przywara, rewritten many times
-since.
+Even worse with NV, where the loaded state is by definition partial.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+For these reasons, KVM offers the vcpu_read_sys_reg() and
+vcpu_write_sys_reg() primitives that always do the right thing.
+However, these primitive must know what register to access, and
+this is the role of the __vcpu_read_sys_reg_from_cpu() and
+__vcpu_write_sys_reg_to_cpu() helpers.
+
+As it turns out, TCR2_EL1, PIR_EL1, PIRE0_EL1 and not described
+in the latter helpers, meaning that the AT code cannot use them
+to emulate S1PIE.
+
+Add the three registers to the (long) list.
+
+Fixes: 86f9de9db178 ("KVM: arm64: Save/restore PIE registers")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
- arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 137 ++++++++++++++++++++-
- 3 files changed, 139 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 4c0fdabaf8aec..dfbc0159bf0b3 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -128,9 +128,10 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
- }
- 
--static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-+static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
-+					      u64 mpidr)
- {
--	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
-+	write_sysreg(mpidr,				vmpidr_el2);
- 
- 	if (has_vhe() ||
- 	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-index 29305022bc048..dba101565de36 100644
---- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-@@ -28,7 +28,7 @@ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
- 
- void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_restore_el1_state(ctxt);
-+	__sysreg_restore_el1_state(ctxt, ctxt_sys_reg(ctxt, MPIDR_EL1));
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_user_state(ctxt);
- 	__sysreg_restore_el2_return_state(ctxt);
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index e12bd7d6d2dce..e0df14ead2657 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -15,6 +15,108 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_nested.h>
- 
-+static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
-+{
-+	/* These registers are common with EL1 */
-+	__vcpu_sys_reg(vcpu, PAR_EL1)	= read_sysreg(par_el1);
-+	__vcpu_sys_reg(vcpu, TPIDR_EL1)	= read_sysreg(tpidr_el1);
-+
-+	__vcpu_sys_reg(vcpu, ESR_EL2)	= read_sysreg_el1(SYS_ESR);
-+	__vcpu_sys_reg(vcpu, AFSR0_EL2)	= read_sysreg_el1(SYS_AFSR0);
-+	__vcpu_sys_reg(vcpu, AFSR1_EL2)	= read_sysreg_el1(SYS_AFSR1);
-+	__vcpu_sys_reg(vcpu, FAR_EL2)	= read_sysreg_el1(SYS_FAR);
-+	__vcpu_sys_reg(vcpu, MAIR_EL2)	= read_sysreg_el1(SYS_MAIR);
-+	__vcpu_sys_reg(vcpu, VBAR_EL2)	= read_sysreg_el1(SYS_VBAR);
-+	__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2) = read_sysreg_el1(SYS_CONTEXTIDR);
-+	__vcpu_sys_reg(vcpu, AMAIR_EL2)	= read_sysreg_el1(SYS_AMAIR);
-+
-+	/*
-+	 * In VHE mode those registers are compatible between EL1 and EL2,
-+	 * and the guest uses the _EL1 versions on the CPU naturally.
-+	 * So we save them into their _EL2 versions here.
-+	 * For nVHE mode we trap accesses to those registers, so our
-+	 * _EL2 copy in sys_regs[] is always up-to-date and we don't need
-+	 * to save anything here.
-+	 */
-+	if (vcpu_el2_e2h_is_set(vcpu)) {
-+		u64 val;
-+
-+		/*
-+		 * We don't save CPTR_EL2, as accesses to CPACR_EL1
-+		 * are always trapped, ensuring that the in-memory
-+		 * copy is always up-to-date. A small blessing...
-+		 */
-+		__vcpu_sys_reg(vcpu, SCTLR_EL2)	= read_sysreg_el1(SYS_SCTLR);
-+		__vcpu_sys_reg(vcpu, TTBR0_EL2)	= read_sysreg_el1(SYS_TTBR0);
-+		__vcpu_sys_reg(vcpu, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
-+		__vcpu_sys_reg(vcpu, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
-+
-+		/*
-+		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
-+		 * the interesting CNTHCTL_EL2 bits live. So preserve these
-+		 * bits when reading back the guest-visible value.
-+		 */
-+		val = read_sysreg_el1(SYS_CNTKCTL);
-+		val &= CNTKCTL_VALID_BITS;
-+		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) &= ~CNTKCTL_VALID_BITS;
-+		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) |= val;
-+	}
-+
-+	__vcpu_sys_reg(vcpu, SP_EL2)	= read_sysreg(sp_el1);
-+	__vcpu_sys_reg(vcpu, ELR_EL2)	= read_sysreg_el1(SYS_ELR);
-+	__vcpu_sys_reg(vcpu, SPSR_EL2)	= read_sysreg_el1(SYS_SPSR);
-+}
-+
-+static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
-+
-+	/* These registers are common with EL1 */
-+	write_sysreg(__vcpu_sys_reg(vcpu, PAR_EL1),	par_el1);
-+	write_sysreg(__vcpu_sys_reg(vcpu, TPIDR_EL1),	tpidr_el1);
-+
-+	write_sysreg(read_cpuid_id(),				vpidr_el2);
-+	write_sysreg(__vcpu_sys_reg(vcpu, MPIDR_EL1),		vmpidr_el2);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, MAIR_EL2),	SYS_MAIR);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, VBAR_EL2),	SYS_VBAR);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2),	SYS_CONTEXTIDR);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, AMAIR_EL2),	SYS_AMAIR);
-+
-+	if (vcpu_el2_e2h_is_set(vcpu)) {
-+		/*
-+		 * In VHE mode those registers are compatible between
-+		 * EL1 and EL2.
-+		 */
-+		write_sysreg_el1(__vcpu_sys_reg(vcpu, SCTLR_EL2),   SYS_SCTLR);
-+		write_sysreg_el1(__vcpu_sys_reg(vcpu, CPTR_EL2),    SYS_CPACR);
-+		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR0_EL2),   SYS_TTBR0);
-+		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR1_EL2),   SYS_TTBR1);
-+		write_sysreg_el1(__vcpu_sys_reg(vcpu, TCR_EL2),	    SYS_TCR);
-+		write_sysreg_el1(__vcpu_sys_reg(vcpu, CNTHCTL_EL2), SYS_CNTKCTL);
-+	} else {
-+		/*
-+		 * CNTHCTL_EL2 only affects EL1 when running nVHE, so
-+		 * no need to restore it.
-+		 */
-+		val = translate_sctlr_el2_to_sctlr_el1(__vcpu_sys_reg(vcpu, SCTLR_EL2));
-+		write_sysreg_el1(val, SYS_SCTLR);
-+		val = translate_cptr_el2_to_cpacr_el1(__vcpu_sys_reg(vcpu, CPTR_EL2));
-+		write_sysreg_el1(val, SYS_CPACR);
-+		val = translate_ttbr0_el2_to_ttbr0_el1(__vcpu_sys_reg(vcpu, TTBR0_EL2));
-+		write_sysreg_el1(val, SYS_TTBR0);
-+		val = translate_tcr_el2_to_tcr_el1(__vcpu_sys_reg(vcpu, TCR_EL2));
-+		write_sysreg_el1(val, SYS_TCR);
-+	}
-+
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, ESR_EL2),		SYS_ESR);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, AFSR0_EL2),	SYS_AFSR0);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, AFSR1_EL2),	SYS_AFSR1);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, FAR_EL2),		SYS_FAR);
-+	write_sysreg(__vcpu_sys_reg(vcpu, SP_EL2),		sp_el1);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, ELR_EL2),		SYS_ELR);
-+	write_sysreg_el1(__vcpu_sys_reg(vcpu, SPSR_EL2),	SYS_SPSR);
-+}
-+
- /*
-  * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and
-  * pstate, which are handled as part of the el2 return state) on every
-@@ -66,6 +168,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
-+	u64 mpidr;
- 
- 	host_ctxt = host_data_ptr(host_ctxt);
- 	__sysreg_save_user_state(host_ctxt);
-@@ -89,7 +192,29 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
- 	 */
- 	__sysreg32_restore_state(vcpu);
- 	__sysreg_restore_user_state(guest_ctxt);
--	__sysreg_restore_el1_state(guest_ctxt);
-+
-+	if (unlikely(__is_hyp_ctxt(guest_ctxt))) {
-+		__sysreg_restore_vel2_state(vcpu);
-+	} else {
-+		if (vcpu_has_nv(vcpu)) {
-+			/*
-+			 * Only set VPIDR_EL2 for nested VMs, as this is the
-+			 * only time it changes. We'll restore the MIDR_EL1
-+			 * view on put.
-+			 */
-+			write_sysreg(ctxt_sys_reg(guest_ctxt, VPIDR_EL2), vpidr_el2);
-+
-+			/*
-+			 * As we're restoring a nested guest, set the value
-+			 * provided by the guest hypervisor.
-+			 */
-+			mpidr = ctxt_sys_reg(guest_ctxt, VMPIDR_EL2);
-+		} else {
-+			mpidr = ctxt_sys_reg(guest_ctxt, MPIDR_EL1);
-+		}
-+
-+		__sysreg_restore_el1_state(guest_ctxt, mpidr);
-+	}
- 
- 	vcpu_set_flag(vcpu, SYSREGS_ON_CPU);
- }
-@@ -112,12 +237,20 @@ void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
- 
- 	host_ctxt = host_data_ptr(host_ctxt);
- 
--	__sysreg_save_el1_state(guest_ctxt);
-+	if (unlikely(__is_hyp_ctxt(guest_ctxt)))
-+		__sysreg_save_vel2_state(vcpu);
-+	else
-+		__sysreg_save_el1_state(guest_ctxt);
-+
- 	__sysreg_save_user_state(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
- 
- 	/* Restore host user state */
- 	__sysreg_restore_user_state(host_ctxt);
- 
-+	/* If leaving a nesting guest, restore MPIDR_EL1 default view */
-+	if (vcpu_has_nv(vcpu))
-+		write_sysreg(read_cpuid_id(),	vpidr_el2);
-+
- 	vcpu_clear_flag(vcpu, SYSREGS_ON_CPU);
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a33f5996ca9f1..5265a1a929514 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1012,6 +1012,9 @@ static inline bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+ 	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
+ 	case TTBR1_EL1:		*val = read_sysreg_s(SYS_TTBR1_EL12);	break;
+ 	case TCR_EL1:		*val = read_sysreg_s(SYS_TCR_EL12);	break;
++	case TCR2_EL1:		*val = read_sysreg_s(SYS_TCR2_EL12);	break;
++	case PIR_EL1:		*val = read_sysreg_s(SYS_PIR_EL12);	break;
++	case PIRE0_EL1:		*val = read_sysreg_s(SYS_PIRE0_EL12);	break;
+ 	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
+ 	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
+ 	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
+@@ -1058,6 +1061,9 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+ 	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
+ 	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	break;
+ 	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	break;
++	case TCR2_EL1:		write_sysreg_s(val, SYS_TCR2_EL12);	break;
++	case PIR_EL1:		write_sysreg_s(val, SYS_PIR_EL12);	break;
++	case PIRE0_EL1:		write_sysreg_s(val, SYS_PIRE0_EL12);	break;
+ 	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
+ 	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
+ 	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
 -- 
 2.39.2
 
