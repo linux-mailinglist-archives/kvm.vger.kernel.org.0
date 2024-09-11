@@ -1,187 +1,151 @@
-Return-Path: <kvm+bounces-26548-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26549-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40BFA975739
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 17:34:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CEAD975748
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 17:38:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A8871C21C91
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:34:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B78BD1F228F5
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0506F1AC8A2;
-	Wed, 11 Sep 2024 15:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B561ABEC8;
+	Wed, 11 Sep 2024 15:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CZKrXpkz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fkqiYNgm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51E41AC458
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 15:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9D81AB52A
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 15:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726068853; cv=none; b=SDSO2y91YOSBOi2TdteD+bkb3aWLk0gyxcTiwgDQd6oGjE4+88Usq2UZweVStLWW6CpES7hygDuVX0lGeOHnlZq/n6+qEPn7NE+p5I6XSTZdop9xBX9FGwu7T5Pu6s9ygqdecQDVvnUSwKFd7EUxfQpbyugm2qa2SX9RlL8pEEs=
+	t=1726069076; cv=none; b=G6i2VUZtTNFknRaOB/nFGVJP0Gl07yoQYmaMziv0e4tJHSYtKDpZccVKwlsfoWA5vfoR5kQP58ReIDy5snTNuS4jPDuVI9zjNimYwqED5DfUYXRaWiwoxx7SL2g0Wbo2NXjKbKWOpQR3+nqnMTKVvADBsb5tcl8D5VMbzAGBC9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726068853; c=relaxed/simple;
-	bh=eA+709nEJaGWuuqo4euF6T+QcJULW+fZtN6qnIYUmcY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A8clQmNK1U3SoAKlaXvgpsmGBB7VDS0e0RNZcZ8YVhLWX2wWL6AFu8SZYg9vPS4bvWxNCDYAA2xxLgJD5CKcG70ih3jRHqX81PBvZhxl5B/cs8/lU0M8d7/55T2y1XiGpYYzuaIsdjkPrjxPRWtzz+JzjP22qUYhkS+fbw+Xfg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CZKrXpkz; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-718d91eef2eso760007b3a.1
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 08:34:11 -0700 (PDT)
+	s=arc-20240116; t=1726069076; c=relaxed/simple;
+	bh=/9mGBPcz6bEEuta300HLDU/i5hbGKt+GMHZF6+0ToCI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=V0e5PPMJqvGIfbybCWrwjTUVJzsh3w0rIutN5bbKdiosTQzAiCPcYsx+2wIagtpUJDHc5I3Ux1lQ4OgEc/Xl1IX4F0F8IpXOpkccFdTJBGUl70BnYBqtE/7yNg0le73OGLcVSC/btgSRJqdiGvpgMwUcW10HJ/u0mZ6gKVX99XE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fkqiYNgm; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-778702b9f8fso848662a12.1
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 08:37:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726068851; x=1726673651; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eA+709nEJaGWuuqo4euF6T+QcJULW+fZtN6qnIYUmcY=;
-        b=CZKrXpkzdJo74UImz5txF+UZ55gPeiDAV/0AVIkPhjk7emynUSZXFVSLjZdohLe7Wd
-         uStNealuAvBMDYqgl1aO0bP2XcfoyUukZFK00s1M4qaqPAvGUqUTDk2i6MoGO+0qmuzK
-         +7Me1NUjYZqhSVYVAgspU6DzXY8flpbEfu2X2L6pr1ornug7Dk9GoUoMd1Yc57Vupvty
-         pFJMn9dh4NvbclVZHAWgonYE01i7lZ4VcEk0oPw35zJrkgrbjJrQjdKEYFSJzQB83mS0
-         BNbp6O+RK9ah20HFQ1Eyk9guaAX7pEwlbpfO5ATf72O0M0Y4eehKEb051NKERMnM+x9y
-         qEQA==
+        d=google.com; s=20230601; t=1726069074; x=1726673874; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KOyOIRL3lgO9opRsCrN+ghOFkRsLNHeHkE/P6t+PUfs=;
+        b=fkqiYNgmwZVx1oEG6cEKzjiVE+hLjKOhnABOiozMGZwk64t7n2mEgiTGCbK7iGKgY6
+         Nc/yrCDgqmQYai1KWKiXcYetDzBxYNVGPhHhDTa4dMwCvOk/1z/peMvEMRW3PjcL6PoL
+         LJA9eparptv2eUMshwOtqEfmAesZ8amBCfCUqk/vaQCk+lH3puHZuRJhjT452ZuF6Ndw
+         O1Yl5aaHS19fH5v8VTtwWj8LMS2Zd1ipciusn7N6vB36bMv68/vfKZAkYjTnSmKIKszI
+         IA55lDAHLttQLPK7FylF5p8nCfaBtlyIZF8TDVM7yP9qmQjftL1itsz4Z33x93CBg7ZF
+         9lXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726068851; x=1726673651;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eA+709nEJaGWuuqo4euF6T+QcJULW+fZtN6qnIYUmcY=;
-        b=WkVuTc6u7PmTsZtv0FgruN4iK72E1eUNJYHnPCuSFW8fOyN9b4H5VO2uZayioZRJv2
-         jVWzSdzoAYYyCMrpjspH9ibioDk9a1FWUfsrEZmx0PMnLSBje1H6LYcZHQpIK0GVGVBe
-         BDgvqi6X6MUSGUyFMi5fR7e3n1XgktNKB8LE1QWJRh8Tyo9p17o5KtF6P8qa6QHEVYk6
-         XwEVaHh49dLuNPDAb5Nhrq8n5r0Fkh56RxuJq4TB8eGnPgkmRzfOQhONQyVgUTWNTQTV
-         4SHp+2UwggJNPnaMugUDtkxc2G1z7HgQf1IJrwlNm/Aoc+zIXXgf4Hgy6uzRwxTmQnaW
-         GubA==
-X-Forwarded-Encrypted: i=1; AJvYcCXC37Wd1SdPoA5x0rSBOD1HLtLuOv3cO/ISVf993PC32qMhVZpJ/bcOdS7WQAoUJ4CWuK0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0brHCFwUS7bYpTsKumv4zPVmFEF6rHn0WCyrfqC554Tl4vs7P
-	bN4YtmipI5wBwW8eqptSEHO9jrOjl81h9SVKQJpbyZBqJ21F8Qa/1oG6MOBjbSE=
-X-Google-Smtp-Source: AGHT+IFppOMwSoql1QLOJ+22ancIMUpNoJdbhH59Q3aBWEWte2FEb8Yn5UIVH+O8hp1Oz/TnqhIL4A==
-X-Received: by 2002:a05:6a00:2f9b:b0:718:d4e4:a10a with SMTP id d2e1a72fcca58-71907ea941emr10052359b3a.4.1726068850740;
-        Wed, 11 Sep 2024 08:34:10 -0700 (PDT)
-Received: from ?IPV6:2604:3d08:9384:1d00::9633? ([2604:3d08:9384:1d00::9633])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71909003d0esm3222002b3a.93.2024.09.11.08.34.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Sep 2024 08:34:10 -0700 (PDT)
-Message-ID: <b58a2188-3652-4a7a-af10-c7f32b2c6f62@linaro.org>
-Date: Wed, 11 Sep 2024 08:34:06 -0700
+        d=1e100.net; s=20230601; t=1726069074; x=1726673874;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KOyOIRL3lgO9opRsCrN+ghOFkRsLNHeHkE/P6t+PUfs=;
+        b=SZyjiMSpGevEkf9cRL2t60x19g4yKpTA71OKRjv2XNWzOwpsR1VgEcNaIk2qAXaVTv
+         XsLPYDc7kzUqEW6XIc4rl07X7AsqxzBLKulLEf5SqQZLIBsQKHgny2b2HtBzmTufLGGC
+         OMxE+2wWVTKJImAbYPl0G2g8xluN/RmSNtWI2H5KEzG62pMzdDEcopfLUaIZEfMhI6Y3
+         U/DV8exmx1rpeLVomdhQeOTTOxATvdwhcLmLuJgSk9CfTcmVFhk4OTTvuPh+K1k7Bj2x
+         j1mYi8IpAGovvwSTqsv3+MPgcWtcI7SmeMDrNn1MWwZNsxjT4tspfQZJgLyrMwjc8WdJ
+         kg5A==
+X-Forwarded-Encrypted: i=1; AJvYcCXLFpuE/vhAqhfbUvSalODWTElLIBAt20ftCvcgNH3DMg+7eITeCZvOHdADewolK62QRzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGAZ3Or9HhT8YNDggnOYFnMC3LXWx1uyul/adpyBfHNDfOKNTL
+	GSkREFrjgfiUVGHf2vpbLv/wnKyHJbd+LIkMMhsZvTbXav30Jopqw/qojim3cokZaSWbv+kTceX
+	O1Q==
+X-Google-Smtp-Source: AGHT+IEhfSIYMnsJNwhqfisaN5qoyB38Lao3g7nOTEDCmftPeFTt71jA12MSRIMm6JGo9mZ+1idIw20uA3s=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:f85:b0:7a1:6a6b:4a5b with SMTP id
+ 41be03b00d2f7-7db0850b96bmr18853a12.2.1726069073748; Wed, 11 Sep 2024
+ 08:37:53 -0700 (PDT)
+Date: Wed, 11 Sep 2024 08:37:52 -0700
+In-Reply-To: <44e7f9cba483bda99f8ddc0a2ad41d69687e1dbe.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/39] Use g_assert_not_reached instead of
- (g_)assert(0,false)
-Content-Language: en-US
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-devel@nongnu.org
-Cc: Zhao Liu <zhao1.liu@intel.com>, "Richard W.M. Jones" <rjones@redhat.com>,
- Joel Stanley <joel@jms.id.au>, Kevin Wolf <kwolf@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- Corey Minyard <minyard@acm.org>, Eric Farman <farman@linux.ibm.com>,
- Thomas Huth <thuth@redhat.com>, Keith Busch <kbusch@kernel.org>,
- WANG Xuerui <git@xen0n.name>, Hyman Huang <yong.huang@smartx.com>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>,
- Michael Rolnik <mrolnik@gmail.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, qemu-riscv@nongnu.org,
- Ani Sinha <anisinha@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Jesper Devantier <foss@defmacro.it>, Laurent Vivier <laurent@vivier.eu>,
- Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov
- <imammedo@redhat.com>, kvm@vger.kernel.org,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, Fam Zheng
- <fam@euphon.net>, qemu-s390x@nongnu.org, Hanna Reitz <hreitz@redhat.com>,
- Nicholas Piggin <npiggin@gmail.com>, Eduardo Habkost <eduardo@habkost.net>,
- Laurent Vivier <lvivier@redhat.com>, Rob Herring <robh@kernel.org>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-block@nongnu.org,
- "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>, qemu-ppc@nongnu.org,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>,
- Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Fabiano Rosas <farosas@suse.de>,
- Helge Deller <deller@gmx.de>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>,
- Marcelo Tosatti <mtosatti@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
- Yanan Wang <wangyanan55@huawei.com>, Peter Xu <peterx@redhat.com>,
- Bin Meng <bmeng.cn@gmail.com>, Weiwei Li <liwei1518@gmail.com>,
- Klaus Jensen <its@irrelevant.dk>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Jason Wang <jasowang@redhat.com>
-References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
- <cd6c5970-9a1c-4d58-b8af-483909c3c0ca@linaro.org>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <cd6c5970-9a1c-4d58-b8af-483909c3c0ca@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Mime-Version: 1.0
+References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-23-seanjc@google.com>
+ <43ef06aca700528d956c8f51101715df86f32a91.camel@redhat.com>
+ <ZoxVa55MIbAz-WnM@google.com> <3da2be9507058a15578b5f736bc179dc3b5e970f.camel@redhat.com>
+ <ZqKb_JJlUED5JUHP@google.com> <8f35b524cda53aff29a9389c79742fc14f77ec68.camel@redhat.com>
+ <ZrFLlxvUs86nqDqG@google.com> <44e7f9cba483bda99f8ddc0a2ad41d69687e1dbe.camel@redhat.com>
+Message-ID: <ZuG5ULBjfQ3hv_Jb@google.com>
+Subject: Re: [PATCH v2 22/49] KVM: x86: Add a macro to precisely handle
+ aliased 0x1.EDX CPUID features
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
+	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
+	Robert Hoo <robert.hoo.linux@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 
-T24gOS8xMS8yNCAwMTozOSwgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgd3JvdGU6DQo+IE9u
-IDExLzkvMjQgMDA6MTUsIFBpZXJyaWNrIEJvdXZpZXIgd3JvdGU6DQo+IA0KPj4gUGllcnJp
-Y2sgQm91dmllciAoMzkpOg0KPj4gICAgIGRvY3Mvc3BpbjogcmVwbGFjZSBhc3NlcnQoMCkg
-d2l0aCBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgaHcvYWNwaTogcmVwbGFjZSBh
-c3NlcnQoMCkgd2l0aCBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgaHcvYXJtOiBy
-ZXBsYWNlIGFzc2VydCgwKSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBo
-dy9jaGFyOiByZXBsYWNlIGFzc2VydCgwKSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkN
-Cj4+ICAgICBody9jb3JlOiByZXBsYWNlIGFzc2VydCgwKSB3aXRoIGdfYXNzZXJ0X25vdF9y
-ZWFjaGVkKCkNCj4+ICAgICBody9uZXQ6IHJlcGxhY2UgYXNzZXJ0KDApIHdpdGggZ19hc3Nl
-cnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGh3L3dhdGNoZG9nOiByZXBsYWNlIGFzc2VydCgw
-KSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBtaWdyYXRpb246IHJlcGxh
-Y2UgYXNzZXJ0KDApIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIHFvYmpl
-Y3Q6IHJlcGxhY2UgYXNzZXJ0KDApIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4g
-ICAgIHN5c3RlbTogcmVwbGFjZSBhc3NlcnQoMCkgd2l0aCBnX2Fzc2VydF9ub3RfcmVhY2hl
-ZCgpDQo+PiAgICAgdGFyZ2V0L3BwYzogcmVwbGFjZSBhc3NlcnQoMCkgd2l0aCBnX2Fzc2Vy
-dF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgdGVzdHMvcXRlc3Q6IHJlcGxhY2UgYXNzZXJ0KDAp
-IHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIHRlc3RzL3VuaXQ6IHJlcGxh
-Y2UgYXNzZXJ0KDApIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGluY2x1
-ZGUvaHcvczM5MHg6IHJlcGxhY2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNzZXJ0X25vdF9y
-ZWFjaGVkKCkNCj4+ICAgICBibG9jazogcmVwbGFjZSBhc3NlcnQoZmFsc2UpIHdpdGggZ19h
-c3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGh3L2h5cGVydjogcmVwbGFjZSBhc3NlcnQo
-ZmFsc2UpIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGh3L25ldDogcmVw
-bGFjZSBhc3NlcnQoZmFsc2UpIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAg
-IGh3L252bWU6IHJlcGxhY2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFj
-aGVkKCkNCj4+ICAgICBody9wY2k6IHJlcGxhY2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNz
-ZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBody9wcGM6IHJlcGxhY2UgYXNzZXJ0KGZhbHNl
-KSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBtaWdyYXRpb246IHJlcGxh
-Y2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICB0
-YXJnZXQvaTM4Ni9rdm06IHJlcGxhY2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNzZXJ0X25v
-dF9yZWFjaGVkKCkNCj4+ICAgICB0ZXN0cy9xdGVzdDogcmVwbGFjZSBhc3NlcnQoZmFsc2Up
-IHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGFjY2VsL3RjZzogcmVtb3Zl
-IGJyZWFrIGFmdGVyIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBibG9jazogcmVt
-b3ZlIGJyZWFrIGFmdGVyIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBody9hY3Bp
-OiByZW1vdmUgYnJlYWsgYWZ0ZXIgZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGh3
-L2dwaW86IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAg
-ICAgaHcvbWlzYzogcmVtb3ZlIGJyZWFrIGFmdGVyIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkN
-Cj4+ICAgICBody9uZXQ6IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hl
-ZCgpDQo+PiAgICAgaHcvcGNpLWhvc3Q6IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9u
-b3RfcmVhY2hlZCgpDQo+PiAgICAgaHcvc2NzaTogcmVtb3ZlIGJyZWFrIGFmdGVyIGdfYXNz
-ZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBody90cG06IHJlbW92ZSBicmVhayBhZnRlciBn
-X2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgdGFyZ2V0L2FybTogcmVtb3ZlIGJyZWFr
-IGFmdGVyIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICB0YXJnZXQvcmlzY3Y6IHJl
-bW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgdGVzdHMv
-cXRlc3Q6IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAg
-ICAgdWk6IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAg
-ICAgZnB1OiByZW1vdmUgYnJlYWsgYWZ0ZXIgZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4g
-ICAgIHRjZy9sb29uZ2FyY2g2NDogcmVtb3ZlIGJyZWFrIGFmdGVyIGdfYXNzZXJ0X25vdF9y
-ZWFjaGVkKCkNCj4+ICAgICBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6IGVtaXQgZXJyb3Igd2hl
-biB1c2luZyBhc3NlcnQoZmFsc2UpDQo+IA0KPiBJJ20gcXVldWluZyByZXZpZXdlZCBwYXRj
-aGVzIDQsNSw3LDEwLDI3LDI4LDMwLDM2IHNvIHlvdSBkb24ndA0KPiBoYXZlIHRvIGNhcnJ5
-IHRoZW0gaW4gdjIuDQo+IA0KPiBSZWdhcmRzLA0KPiANCj4gUGhpbC4NCg0KSnVzdCBmb3Ig
-dGhlIHNha2Ugb2Ygc2ltcGxpY2l0eSwgYW5kIHRvIG5vdCBtaXNzIGFueXRoaW5nIChvbiBt
-eSBzaWRlKSwgDQpJJ2xsIGtlZXAgdGhvc2UgaW4gdjIuIFdoZW4gcmViYXNpbmcsIG9uY2Ug
-bWVyZ2VkIG9uIG1hc3RlciwgdGhleSB3aWxsIA0KYmUgc2tpcHBlZCBhdXRvbWF0aWNhbGx5
-Lg0KDQpUaGFua3MsDQpQaWVycmljaw0K
+On Tue, Sep 10, 2024, Maxim Levitsky wrote:
+> On Mon, 2024-08-05 at 15:00 -0700, Sean Christopherson wrote:
+> > If we go with ALIASED_F() (or ALIASED_8000_0001_F()), then that macro is all that
+> > is needed, and it's bulletproof.  E.g. there is no KVM_X86_FEATURE_FPU_ALIAS that
+> > can be queried, and thus no need to be ensure it's defined in cpuid.c and #undef'd
+> > after its use.
+> > 
+> > Hmm, I supposed we could harden the aliased feature usage in the same way as the
+> > ALIASED_F(), e.g.
+> > 
+> >   #define __X86_FEATURE_8000_0001_ALIAS(feature)				\
+> >   ({										\
+> > 	BUILD_BUG_ON(__feature_leaf(X86_FEATURE_##name) != CPUID_1_EDX);	\
+> > 	BUILD_BUG_ON(kvm_cpu_cap_init_in_progress != CPUID_8000_0001_EDX);	\
+> > 	(feature + (CPUID_8000_0001_EDX - CPUID_1_EDX) * 32);			\
+> >   })
+> > 
+> > If something tries to use an X86_FEATURE_*_ALIAS outside if kvm_cpu_cap_init(),
+> > it would need to define and set kvm_cpu_cap_init_in_progress, i.e. would really
+> > have to try to mess up.
+> > 
+> > Effectively the only differences are that KVM would have ~10 or so more lines of
+> > code to define the X86_FEATURE_*_ALIAS macros, and that the usage would look like:
+> > 
+> > 	VIRTUALIZED_F(FPU_ALIAS)
+> > 
+> > versus
+> > 
+> > 	ALIASED_F(FPU)
+> 
+> 
+> This is exactly my point. I want to avoid profiliation of the _F macros, because
+> later, we will need to figure out what each of them (e.g ALIASED_F) does.
+> 
+> A whole leaf alias, is once in x86 arch life misfeature, and it is very likely that
+> Intel/AMD won't add more such aliases.
+> 
+> Why VIRTUALIZED_F though, it wasn't in the patch series? Normal F() should be enough
+> IMHO.
+
+I'm a-ok with F(), I simply thought there was a desire for more verbosity across
+the board.
+
+> > At that point, I'm ok with defining each alias, though I honestly still don't
+> > understand the motivation for defining single-use macros.
+> > 
+> 
+> The idea is that nobody will need to look at these macros
+> (e.g__X86_FEATURE_8000_0001_ALIAS() and its usages), because it's clear what
+> they do, they just define few extra CPUID features that nobody really cares
+> about.
+> 
+> ALIASED_F() on the other hand is yet another _F macro() and we will need,
+> once again and again to figure out why it is there, what it does, etc.
+
+That seems easily solved by naming the macro ALIASED_8000_0001_F().  I don't see
+how that's any less clear than __X86_FEATURE_8000_0001_ALIAS(), and as above,
+there are several advantages to defining the alias in the context of the leaf
+builder.
 
