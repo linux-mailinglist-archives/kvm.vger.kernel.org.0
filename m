@@ -1,117 +1,55 @@
-Return-Path: <kvm+bounces-26553-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26554-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D169097577E
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 17:48:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 361DC97579E
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 17:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00D091C22F51
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:48:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 638DA1C26216
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721881AC8A8;
-	Wed, 11 Sep 2024 15:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WF8IQ11d"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86091A304E;
+	Wed, 11 Sep 2024 15:51:37 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4151AB6DA
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 15:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6A31A2C05
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 15:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726069708; cv=none; b=Uw4Ict2cd9j1XvtPhzhG69ppYMPKykJEOvxCKN7fMDQug8/1D5Qb0jOIhyLAbjeBh0BfL3zRjQF/GNP5LeYlF/1NrY6VJcU/7JBPMkBIcLDvtzrvtPt7+wQ9JRF94FHzZjuTX6pGnql0cmM/HHozVFJH3WarULmprNVcq0frYts=
+	t=1726069897; cv=none; b=JUJWHMeMbQZ6EH5qweyv5YMuvoyJVxNLYoZefHJQQpz65bkJAb3uFvfZqeMC3vA8zhTc/NZEuHZ5XLdTDeYm6cKKJfY2dz/ilrpF1P5BZsVFss3BIq3jmt68IFZwjenAa0lR3FXtDkkNua39V8rFnHy85bF6oCZW5j5c8F/tzp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726069708; c=relaxed/simple;
-	bh=FDcn3NduRBzJ1p1GnYweZ1g7LcQAP4wJdN/8+ZG8KQo=;
+	s=arc-20240116; t=1726069897; c=relaxed/simple;
+	bh=DJcG4Jwz42u8yWiFSfRgZEJvIBcA6akcJZnWRTWkVcw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g6d7B6yptxgJSzia7q0py96uB6e6IQYzzOgQdrngngdrLpq2EWynaV0FJB8pJyKhmWtTmsPLjwWIFydbr3NQRGobU/7NDLFb81LR8lTeb3bKUMQTcg5oloTyaJX+pPRY4u59KR49WtrcanXZ2iOqhZOzJ1VYXHgwj+OYerIhPIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WF8IQ11d; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726069705;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FDcn3NduRBzJ1p1GnYweZ1g7LcQAP4wJdN/8+ZG8KQo=;
-	b=WF8IQ11dXGu6bdFJq/kpJzi7JR4Vb+ImTee/QIMVD4MxKPMBi5k0aGWkiwJI9W7/9hpfXY
-	OSWiiOc/JUTSJSPZYoyHGUDAc9XEg0RldfSbb1tvN3Xx3xMA9CbzML2hpkAhT8uLj8Bx1Y
-	8r6WbYt5dQ523YtWWEQA3gu00+qHAuY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-463-mW7O2tfiMtGR-XEoQRGdqQ-1; Wed,
- 11 Sep 2024 11:48:24 -0400
-X-MC-Unique: mW7O2tfiMtGR-XEoQRGdqQ-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7094419344C2;
-	Wed, 11 Sep 2024 15:48:12 +0000 (UTC)
-Received: from redhat.com (unknown [10.39.193.224])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 59475195605A;
-	Wed, 11 Sep 2024 15:47:48 +0000 (UTC)
-Date: Wed, 11 Sep 2024 17:47:40 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Cc: qemu-devel@nongnu.org, Zhao Liu <zhao1.liu@intel.com>,
-	"Richard W.M. Jones" <rjones@redhat.com>,
-	Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-arm@nongnu.org, Corey Minyard <minyard@acm.org>,
-	Eric Farman <farman@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-	Keith Busch <kbusch@kernel.org>, WANG Xuerui <git@xen0n.name>,
-	Hyman Huang <yong.huang@smartx.com>,
-	Stefan Berger <stefanb@linux.vnet.ibm.com>,
-	Michael Rolnik <mrolnik@gmail.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>, qemu-riscv@nongnu.org,
-	Ani Sinha <anisinha@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Jesper Devantier <foss@defmacro.it>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Fam Zheng <fam@euphon.net>, qemu-s390x@nongnu.org,
-	Hanna Reitz <hreitz@redhat.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Laurent Vivier <lvivier@redhat.com>, Rob Herring <robh@kernel.org>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	qemu-block@nongnu.org,
-	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-	qemu-ppc@nongnu.org,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>, Helge Deller <deller@gmx.de>,
-	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	Yanan Wang <wangyanan55@huawei.com>, Peter Xu <peterx@redhat.com>,
-	Bin Meng <bmeng.cn@gmail.com>, Weiwei Li <liwei1518@gmail.com>,
-	Klaus Jensen <its@irrelevant.dk>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH 15/39] block: replace assert(false) with
- g_assert_not_reached()
-Message-ID: <ZuG7nHfvuis-IAcf@redhat.com>
-References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
- <20240910221606.1817478-16-pierrick.bouvier@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mcZJsWVyihAjzolUfyGjox/j2z89GBLqxchMomb8X4gRmDj2FJC+SkrkPWl8djsYfqv6L4YpiSizjQ42e3CVZikGiqtpqEfTBcGF/J/EEdgE82r5yY2LhbY/v9LnqK0pj9hUbc7GFDlJKMI+wubALim7oxscnyQGRUUfrrvZwzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 686B01063;
+	Wed, 11 Sep 2024 08:52:04 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F7FF3F66E;
+	Wed, 11 Sep 2024 08:51:33 -0700 (PDT)
+Date: Wed, 11 Sep 2024 16:51:28 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 18/24] KVM: arm64: Split S1 permission evaluation into
+ direct and hierarchical parts
+Message-ID: <20240911155128.GA1087252@e124191.cambridge.arm.com>
+References: <20240911135151.401193-1-maz@kernel.org>
+ <20240911135151.401193-19-maz@kernel.org>
+ <20240911141513.GA1080224@e124191.cambridge.arm.com>
+ <86o74u6vzu.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -120,12 +58,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240910221606.1817478-16-pierrick.bouvier@linaro.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <86o74u6vzu.wl-maz@kernel.org>
 
-Am 11.09.2024 um 00:15 hat Pierrick Bouvier geschrieben:
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+On Wed, Sep 11, 2024 at 04:38:45PM +0100, Marc Zyngier wrote:
+> On Wed, 11 Sep 2024 15:15:13 +0100,
+> Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > On Wed, Sep 11, 2024 at 02:51:45PM +0100, Marc Zyngier wrote:
+> 
+> [...]
+> 
+> > > +static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
+> > > +						struct s1_walk_info *wi,
+> > > +						struct s1_walk_result *wr,
+> > > +						struct s1_perms *s1p)
+> > > +{
+> > 
+> > How about:
+> > 
+> > 	if (wi->hpd)
+> > 		return;
+> 
+> I was hoping not to add anything like this, because all the table bits
+> are 0 (we simply don't collect them), and thus don't have any effect.
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+I just thought it was more obvious that they wouldn't apply in this case, don't
+feel super strongly about it.
 
+> 
+> Or did you spot any edge case where that would result in in a
+> different set of permissions?
+> 
+> Thanks,
+> 
+> 	M.
+> 
+
+Thanks,
+Joey
 
