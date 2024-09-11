@@ -1,149 +1,137 @@
-Return-Path: <kvm+bounces-26558-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26559-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 056AB9757F7
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 18:09:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C68C9757FD
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 18:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87FF01F22F00
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 16:09:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF90DB24CF9
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 16:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E901AC42A;
-	Wed, 11 Sep 2024 16:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD321AE049;
+	Wed, 11 Sep 2024 16:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJ53Rfrr"
 X-Original-To: kvm@vger.kernel.org
-Received: from zero.eik.bme.hu (zero.eik.bme.hu [152.66.115.2])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D8719CC05
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 16:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.66.115.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBA81AD3E3;
+	Wed, 11 Sep 2024 16:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726070947; cv=none; b=tiv2IbB709n8qiWbXUyevgq2Wu8axdPccFesPV1Vv4i4Dd7wVUAsPuPNhxadN43ufsgG0rt/ZURkAIKecz9rh/ocM2Xrycjx4D91Ss1ijk2x5xTRtwYT4zKBj5XJLnEfjW1gAgAy1EpeHuwkcVXMrr4/JQ9Rok78fgfmYIoIqcI=
+	t=1726071007; cv=none; b=IwBX1ivVkRpS0Ju5ftdpdOKHCGaZrH9VQqGJe5u42ncFSDayLylA1M7pf1MXmrg6J4XJo7Q49CGbsONq0I7cIiPaRIP8F8uBn6Rhm0R6C58JqZTXt5KQ1IvSswjvq0ZVPjh4SaFcZsZGwaH+1Qi10ODibVbpn5x1TQI1wTrV1kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726070947; c=relaxed/simple;
-	bh=nm1CeJyYBieD1E1/5qigB/OZZZR0KzilE+yVlrGdDgM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=JHvtMNZpH5cJaXfQhYEvYDgrS2HGXgThG3uIjUP38mo+hTIkY5e2ZGJeckUN137QJSkjALNAhObfPMiV5IgrxVd/eVCgTZ3RqX78KvzklxnWWqw0tMspYua47wS2PIDnT3rOPOybZ5J9GcZ+0zoRwKdw1AVjBtYZ2CkVK1ulZF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu; spf=pass smtp.mailfrom=eik.bme.hu; arc=none smtp.client-ip=152.66.115.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eik.bme.hu
-Received: from zero.eik.bme.hu (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id AAE1D4E6010;
-	Wed, 11 Sep 2024 18:09:01 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at eik.bme.hu
-Received: from zero.eik.bme.hu ([127.0.0.1])
- by zero.eik.bme.hu (zero.eik.bme.hu [127.0.0.1]) (amavisd-new, port 10028)
- with ESMTP id aoKD5nEAFJwI; Wed, 11 Sep 2024 18:08:59 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
-	id B61AD4E6004; Wed, 11 Sep 2024 18:08:59 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id B2618746F60;
-	Wed, 11 Sep 2024 18:08:59 +0200 (CEST)
-Date: Wed, 11 Sep 2024 18:08:59 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-cc: qemu-devel@nongnu.org, Zhao Liu <zhao1.liu@intel.com>, 
-    "Richard W.M. Jones" <rjones@redhat.com>, Joel Stanley <joel@jms.id.au>, 
-    Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-    qemu-arm@nongnu.org, Corey Minyard <minyard@acm.org>, 
-    Eric Farman <farman@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, 
-    Keith Busch <kbusch@kernel.org>, WANG Xuerui <git@xen0n.name>, 
-    Hyman Huang <yong.huang@smartx.com>, 
-    Stefan Berger <stefanb@linux.vnet.ibm.com>, 
-    Michael Rolnik <mrolnik@gmail.com>, 
-    Alistair Francis <alistair.francis@wdc.com>, 
-    =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>, 
-    Markus Armbruster <armbru@redhat.com>, 
-    Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, 
-    Palmer Dabbelt <palmer@dabbelt.com>, qemu-riscv@nongnu.org, 
-    Ani Sinha <anisinha@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, 
-    Jesper Devantier <foss@defmacro.it>, Laurent Vivier <laurent@vivier.eu>, 
-    Peter Maydell <peter.maydell@linaro.org>, 
-    Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org, 
-    =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, 
-    Richard Henderson <richard.henderson@linaro.org>, 
-    Fam Zheng <fam@euphon.net>, qemu-s390x@nongnu.org, 
-    Hanna Reitz <hreitz@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, 
-    Eduardo Habkost <eduardo@habkost.net>, Laurent Vivier <lvivier@redhat.com>, 
-    Rob Herring <robh@kernel.org>, 
-    Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-block@nongnu.org, 
-    "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>, qemu-ppc@nongnu.org, 
-    Daniel Henrique Barboza <danielhb413@gmail.com>, 
-    Christian Borntraeger <borntraeger@linux.ibm.com>, 
-    Harsh Prateek Bora <harshpb@linux.ibm.com>, 
-    =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>, 
-    Nina Schoetterl-Glausch <nsg@linux.ibm.com>, 
-    "Michael S. Tsirkin" <mst@redhat.com>, Fabiano Rosas <farosas@suse.de>, 
-    Helge Deller <deller@gmx.de>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, 
-    Daniel Henrique Barboza <dbarboza@ventanamicro.com>, 
-    Akihiko Odaki <akihiko.odaki@daynix.com>, 
-    Marcelo Tosatti <mtosatti@redhat.com>, 
-    David Gibson <david@gibson.dropbear.id.au>, 
-    Aurelien Jarno <aurelien@aurel32.net>, 
-    Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, 
-    Yanan Wang <wangyanan55@huawei.com>, Peter Xu <peterx@redhat.com>, 
-    Bin Meng <bmeng.cn@gmail.com>, Weiwei Li <liwei1518@gmail.com>, 
-    Klaus Jensen <its@irrelevant.dk>, 
-    Jean-Christophe Dubois <jcd@tribudubois.net>, 
-    Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH 20/39] hw/ppc: replace assert(false) with
- g_assert_not_reached()
-In-Reply-To: <45c6a39b-9c16-4580-ad6b-99973b5e6b0f@linaro.org>
-Message-ID: <cb4298a0-eb1f-be02-18d5-b9ce87a4c550@eik.bme.hu>
-References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org> <20240910221606.1817478-21-pierrick.bouvier@linaro.org> <232858c7-6270-f763-adfc-b6c8259bf021@eik.bme.hu> <45c6a39b-9c16-4580-ad6b-99973b5e6b0f@linaro.org>
+	s=arc-20240116; t=1726071007; c=relaxed/simple;
+	bh=n3zgqizMvbrvZLnqLGYPpKZnWKf0e2LcRkhxNBqsjvc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qdL2Dfo7P8besfxsWPFHwckcz8vvt3XkHvSOT4FuOZEmVuiwOi2LxpUZKzh+UB351PxDVE2ovpI0ZpyaJ0SDgFxx3cxZHNxO1S+OWRVDA2wG+0eHLBse/kwe9V5TqhMP860TTs75PgaTFTR91+mYlUYFj11iX/QASgc8UAOybI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJ53Rfrr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 869E0C4CED2;
+	Wed, 11 Sep 2024 16:10:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726071006;
+	bh=n3zgqizMvbrvZLnqLGYPpKZnWKf0e2LcRkhxNBqsjvc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cJ53RfrrQgECSOr1FX3ZKvn4orPRiAmMck+nUrMh666hvi2GEN22z91zwZ4Z+sneY
+	 +uj0JblZ7PK7Odd8ykfsNE/l+y8mmTPpgQOCP3cFbBJx1c4vmm8CtyfwGfaCZLTVt0
+	 oXb+zW8VucH1CKRAfPVHuPCht2De8GCYynT1C504U8ZeC3UoQwKeHv1itkCGfUNwDq
+	 BhqpyCkLaqveKVJLLF1Vp2Vkg1QxUO900uYtWxOGyWHm/h8ZQDsV4i4hWqECDE0ecX
+	 3/f0xELPkXhc3RObMQtPKkWbiYdvEqVKUjrQB/Vpxo5GtaqATCtfzI01PzWwfhxjLt
+	 eDIEOJaDIne3g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1soPuu-00CAxN-I5;
+	Wed, 11 Sep 2024 17:10:04 +0100
+Date: Wed, 11 Sep 2024 17:10:04 +0100
+Message-ID: <86mske6ujn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 18/24] KVM: arm64: Split S1 permission evaluation into direct and hierarchical parts
+In-Reply-To: <20240911155128.GA1087252@e124191.cambridge.arm.com>
+References: <20240911135151.401193-1-maz@kernel.org>
+	<20240911135151.401193-19-maz@kernel.org>
+	<20240911141513.GA1080224@e124191.cambridge.arm.com>
+	<86o74u6vzu.wl-maz@kernel.org>
+	<20240911155128.GA1087252@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 11 Sep 2024, Pierrick Bouvier wrote:
-> On 9/11/24 07:10, BALATON Zoltan wrote:
->> 
->> 
->> On Tue, 10 Sep 2024, Pierrick Bouvier wrote:
->> 
->>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
->>> ---
->>> hw/ppc/spapr_events.c | 2 +-
->>> 1 file changed, 1 insertion(+), 1 deletion(-)
->>> 
->>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
->>> index cb0eeee5874..38ac1cb7866 100644
->>> --- a/hw/ppc/spapr_events.c
->>> +++ b/hw/ppc/spapr_events.c
->>> @@ -645,7 +645,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, 
->>> uint8_t hp_action,
->>>          /* we shouldn't be signaling hotplug events for resources
->>>           * that don't support them
->>>           */
->>> -        g_assert(false);
->>> +        g_assert_not_reached();
->>>          return;
->>>      }
->> 
->> If break does not make sense after g_assert_not_reached() and removed then
->> return is the same here.
->> 
->> It may make the series shorter and easier to check that none of these are
->> missed if this is done in the same patch where the assert is changed
->> instead of separate patches. It's unlikely that the assert change and
->> removal of the following break or return would need to be reverted
->> separately so it's a simple enough change to put in one patch in my
->> opinion but I don't mink if it's kept separate either.
->> 
->> Regards,
->> BALATON Zoltan
->
-> Mostly done this way because it's easy for creating many commits.
+On Wed, 11 Sep 2024 16:51:28 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> On Wed, Sep 11, 2024 at 04:38:45PM +0100, Marc Zyngier wrote:
+> > On Wed, 11 Sep 2024 15:15:13 +0100,
+> > Joey Gouly <joey.gouly@arm.com> wrote:
+> > > 
+> > > On Wed, Sep 11, 2024 at 02:51:45PM +0100, Marc Zyngier wrote:
+> > 
+> > [...]
+> > 
+> > > > +static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
+> > > > +						struct s1_walk_info *wi,
+> > > > +						struct s1_walk_result *wr,
+> > > > +						struct s1_perms *s1p)
+> > > > +{
+> > > 
+> > > How about:
+> > > 
+> > > 	if (wi->hpd)
+> > > 		return;
+> > 
+> > I was hoping not to add anything like this, because all the table bits
+> > are 0 (we simply don't collect them), and thus don't have any effect.
+> 
+> I just thought it was more obvious that they wouldn't apply in this case, don't
+> feel super strongly about it.
 
-As I said I don't mind either way. Now that part of this series is queued 
-it's easier to add another patch to remove the return.
+If you want it to be obvious, how about this instead?
 
-Regards,
-BALATON Zoltan
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 8a5e1c4682619..fb9de5fc2cc26 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -985,7 +985,8 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
+ 	else
+ 		compute_s1_indirect_permissions(vcpu, wi, wr, s1p);
+ 
+-	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
++	if (!wi->hpd)
++		compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
+ 
+ 	if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
+ 		bool pan;
+
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
