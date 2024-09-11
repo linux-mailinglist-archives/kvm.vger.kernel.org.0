@@ -1,177 +1,208 @@
-Return-Path: <kvm+bounces-26538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26539-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1784C975592
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 16:35:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B9549755AC
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 16:38:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6B7F28837A
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 14:35:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A03431F2536E
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 14:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C20919FA86;
-	Wed, 11 Sep 2024 14:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2D71A3021;
+	Wed, 11 Sep 2024 14:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XmcuRJcN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2WADTme2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FAF1E480
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 14:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291AC19F47E
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 14:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726065304; cv=none; b=U/Lp5UnpvNfh5BRJPzhYDJJ9fd8AePUKv44WEY2WOAkxEdlySdqOxagg7r8RG75O9E3PyfuuDsI1bc0O+QZpz4v7lK7XzyagM4slJ7fxUNvZ3D5tm4sreKqHTZGptHHDH7cP3sr3XbZKGE6L+dnPJ3mpwv6gkArL0znGDNDoB+M=
+	t=1726065390; cv=none; b=PyOoYu8CHyHovRN5VtBrXw4LTtTmAxm0EVi5iuzdTVu0W+xkKNkrsG6JAYB6rgnh4R6BxrpzAcXKl8+vEUoTfpYiOIv3cqSQ+uyQ0xa96pLz4K8BIzRRAeqnemJ08EGXNpQSHvB8mYwv8DAmR4P/HLlv9QObzrGumE9JlqJokyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726065304; c=relaxed/simple;
-	bh=v9fVORhT6WEBOV50bgrsA/Vtx4HPmTUbPL0CYJSZVgA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gBvMalp1NDAP13sw/AJQ1kShcL9+3AGhSkOlkTHg1LnCAYQ34ivWrjl+xcFvx9KlEsLp3KRnHjrWcu3c7rtyJxG7O701Rffgi1nftTyjgQPWnwhOQHvVrvbBRdWYr1TPFVP2aZS0wq0OgqitjzRlSS805I0CVIYw014p16/l9r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XmcuRJcN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726065301;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PF/0q5orqycLDyFBmSuytp8djSJ4rgjRkbyNMLkxAWQ=;
-	b=XmcuRJcNHJfvuCE37YDFhNG59x4hRuyPGIP4MdQ8zvDM5jX89IL/Uo/4utjp/4pvDyuUTK
-	im2EUDC9MiWmwHBkZY+etI6ZyqaQm1eKvuq6JV7z6/Fi+xmyumNzQbxyPtKgTB10FModpM
-	h9QxOXGLXvKIETE0JxLdl0nj+TA71V8=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-398-9GLUVgEZO8GEErI7VzwXpw-1; Wed, 11 Sep 2024 10:35:00 -0400
-X-MC-Unique: 9GLUVgEZO8GEErI7VzwXpw-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4581b5172a6so100330571cf.3
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 07:35:00 -0700 (PDT)
+	s=arc-20240116; t=1726065390; c=relaxed/simple;
+	bh=jmgy6ePhB7bLDBpTd81J0tiVbuti6trYQHnkM+1M0mE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=JXdCrOPO62+dmp3uElLKb8pZkeqNd2OrqmDKM+XX5qcbuvSTk3VIXx4fAYApGFXz79sUpNXaGXjlVCahozYmiTCVH1GQ7C8/9fljV4+k1fuWDiwCDCNxDmavQ7pOIc9SfGeKyIZBx6qmFbEY2wTKo5P9JTZvD09vLgMe9E7PeJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2WADTme2; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7cf58491fe9so6552781a12.0
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 07:36:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726065388; x=1726670188; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6rTR8YGAn/aAtZT0hzqf25aT4TpKY7n5RE/q8NR1IC4=;
+        b=2WADTme2a7B10jjNHTQZmMCG4anY4k7jNsFCvlqgqnnH8s6/qpsevn6GBkTkNAqfCf
+         ped2DJPu492yZStQMuvGhrmaEkInKckFKDO8DU80tHinIJ1DpIkN84F1L/1NgdZNb8Jj
+         8MZi7xqxjEYoFw/FbVVCFG1i8zVWo3KSNwEQ7Mw6yGcjhdMN+1gNibheX2WvV4F5ajeA
+         BZmzWpLXl1V0hVZ5F1Cw+57+0NCEQNdxUB2ACfqSZyxY1k0m5Oh0bWcPB2GChWHI4g7L
+         0+2oTD+bv/sj+e54ws0jQX9oBNE8ZvPH6KWfolzRvsFxSF1pxWBAJElkOarCG59hk2OH
+         ymNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726065300; x=1726670100;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PF/0q5orqycLDyFBmSuytp8djSJ4rgjRkbyNMLkxAWQ=;
-        b=Rekg80ovjkMiFCwETRnzyBlAIcrEbZBOHJilZFJA3Z5xLaew9uWMxDTbtjl+yGbY9g
-         hdXQAVs9Cc8rIlzXyexHqbqalwMZkmjq7BzNA+vxlIBHbIH7BvCY3whYOhdmq9h5F8zh
-         s9kPjD7HCJZF87YxiKWgbgpuR6pEJ6eXCY0J8hkYf2vKnCiNf6UBYxRcDqi1dOiMTcJD
-         n/KveLoiTTCoHFOe9j+/bbDG84NSyx51qjYQVfB44w5QIZRUcDIjH458MseASy2N/Cc0
-         UcbJ5pXSM2C1Qp0BmhpZpX+SEdiVY5S3ZYrin/fM0TP4R4YSy0A6mOzqmV5Eh2aGk8DE
-         Soeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWjZoga5sm/hEH8pGPwrXym2CroDnWPtVu+Ne2z43UCtE2bouzcLYYa6b3QwqvlxkiNCCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyi1XP8oSxsws27qOoomCeQe/RZptmY41vQH+l5798n1efHVeQX
-	3eFb/kxsRDRel/a4BEIY6bJRVtv/MEd2DUqeDz56pOl6CUJs3f5jgQqqtw8N7Rrp7XhcZoK/DvI
-	Jb3fqmh0jbCsckBV+1Z3MxWsU0xo9V5DscSgLW9j/Gko1c4ZSnA==
-X-Received: by 2002:a05:622a:651:b0:458:4323:d7b3 with SMTP id d75a77b69052e-4584323d91emr68257411cf.34.1726065300145;
-        Wed, 11 Sep 2024 07:35:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFngkfkq1nQs7Kv0mNC7ulS6e7nNeL51I8RbbZOuMP/jFQHPk0ALPxgHZnZfq+Gumf6CJkjkA==
-X-Received: by 2002:a05:622a:651:b0:458:4323:d7b3 with SMTP id d75a77b69052e-4584323d91emr68257071cf.34.1726065299714;
-        Wed, 11 Sep 2024 07:34:59 -0700 (PDT)
-Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45822e61a77sm41722191cf.20.2024.09.11.07.34.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 07:34:58 -0700 (PDT)
-Date: Wed, 11 Sep 2024 10:34:54 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, Gavin Shan <gshan@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, x86@kernel.org,
-	Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alistair Popple <apopple@nvidia.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Sean Christopherson <seanjc@google.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Jason Gunthorpe <jgg@nvidia.com>, Borislav Petkov <bp@alien8.de>,
-	Zi Yan <ziy@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
-	David Hildenbrand <david@redhat.com>, Will Deacon <will@kernel.org>,
-	Kefeng Wang <wangkefeng.wang@huawei.com>,
-	Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v2 07/19] mm/fork: Accept huge pfnmap entries
-Message-ID: <ZuGqjiYZA33lUS5z@x1n>
-References: <20240826204353.2228736-8-peterx@redhat.com>
- <ZtVwLntpS0eJubFq@yzhao56-desk.sh.intel.com>
- <Ztd-WkEoFJGZ34xj@x1n>
- <20240909152546.4ef47308e560ce120156bc35@linux-foundation.org>
- <Zt96CoGoMsq7icy7@x1n>
- <20240909161539.aa685e3eb44cdc786b8c05d2@linux-foundation.org>
- <Zt-N8MB93XSqFZO_@x1n>
- <Zt+0UTTEkkRQQza0@yzhao56-desk.sh.intel.com>
- <ZuA4ivNcz0NwOAh5@x1n>
- <ZuD9l6D6XuAUb4tP@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1726065388; x=1726670188;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6rTR8YGAn/aAtZT0hzqf25aT4TpKY7n5RE/q8NR1IC4=;
+        b=WJRAsl9R/aJXAylAs3ABTNquflfDRRQ6/yzJdB6Kl9a2CW0+BwuWBPEGh4norTnQmg
+         kMNCl4PLf7Mh7gvuAbVxdkhnueuO5dWi7tPqLKOkIGOYV007gSK1eNeCtTKZfu29frcV
+         wnflgq4+hEqeXAHOqbhysoaglqD7BzNNNpv3kDYgJ4PUl1NyEIYhgwgxEKYNv4MZuHeF
+         f2D6SqTFG1Y2yMh/QuLQwXjn3RJGGGlu8MfK7HLJWsF8AW3i8rBHMgJfaWe191Q/5hAt
+         HceCpjiLrc7/FnHnSWQ4Tey21Gn5Po3UEymmwToYxuN9r7VBwiXJbz0IdZz5/ktZsJ4R
+         uWVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVobwOIbIQFOXMDU4bGuIIZF2V5nFz7HTagggLDGX50wqMsKaSVR6gx8xEhv75bdDS5XFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcuUrEme1fblhdlOm9DayaFlvipUohtJ2x6ER97hyRhL2SCSuM
+	YATk1p4P1S9GFFQ5e048+HTojkru3YMmpL4xxwldJEykDt4cYXM/esLYtgbrVBVVNkH1PPVVLme
+	dgg==
+X-Google-Smtp-Source: AGHT+IGHWdcYX1NkcVg1OQeMu4hjtViqzfIsCNlewZ9TUR7AJ+hEpfLh5HL5P11rsM9OQjoLPY9X/txlPPE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:c405:b0:207:50e2:f54 with SMTP id
+ d9443c01a7336-20750e20f6emr3336845ad.1.1726065388259; Wed, 11 Sep 2024
+ 07:36:28 -0700 (PDT)
+Date: Wed, 11 Sep 2024 07:36:26 -0700
+In-Reply-To: <07b0b475-9f45-4476-a63d-291f940f9b4d@amazon.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZuD9l6D6XuAUb4tP@yzhao56-desk.sh.intel.com>
+Mime-Version: 1.0
+References: <20240509075423.156858-1-weijiang.yang@intel.com> <07b0b475-9f45-4476-a63d-291f940f9b4d@amazon.de>
+Message-ID: <ZuGpJtEPv1NtdYwM@google.com>
+Subject: Re: [RFC PATCH 1/2] KVM: x86: Introduce KVM_{G,S}ET_ONE_REG uAPIs support
+From: Sean Christopherson <seanjc@google.com>
+To: Nikolas Wipper <nikwip@amazon.de>
+Cc: Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com, mlevitsk@redhat.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Sep 11, 2024 at 10:16:55AM +0800, Yan Zhao wrote:
-> On Tue, Sep 10, 2024 at 08:16:10AM -0400, Peter Xu wrote:
-> > On Tue, Sep 10, 2024 at 10:52:01AM +0800, Yan Zhao wrote:
-> > > Hi Peter,
+On Wed, Sep 11, 2024, Nikolas Wipper wrote:
+> On Thu May  9, 2024 at 09:54 AM UTC+0200, Yang Weijiang wrote:
+> > Enable KVM_{G,S}ET_ONE_REG uAPIs so that userspace can access HW MSR or
+> > KVM synthetic MSR throught it.
 > > 
-> > Hi, Yan,
+> > In CET KVM series [*], KVM "steals" an MSR from PV MSR space and access
+> > it via KVM_{G,S}ET_MSRs uAPIs, but the approach pollutes PV MSR space
+> > and hides the difference of synthetic MSRs and normal HW defined MSRs.
 > > 
-> > > 
-> > > Not sure if I missed anything.
-> > > 
-> > > It looks that before this patch, pmd/pud are alawys write protected without
-> > > checking "is_cow_mapping(vma->vm_flags) && pud_write(pud)". pud_wrprotect()
-> > > clears dirty bit by moving the dirty value to the software bit.
-> > > 
-> > > And I have a question that why previously pmd/pud are always write protected.
+> > Now carve out a separate room in KVM-customized MSR address space for
+> > synthetic MSRs. The synthetic MSRs are not exposed to userspace via
+> > KVM_GET_MSR_INDEX_LIST, instead userspace complies with KVM's setup and
+> > composes the uAPI params. KVM synthetic MSR indices start from 0 and
+> > increase linearly. Userspace caller should tag MSR type correctly in
+> > order to access intended HW or synthetic MSR.
 > > 
-> > IIUC this is a separate question - the move of dirty bit in pud_wrprotect()
-> > is to avoid wrongly creating shadow stack mappings.  In our discussion I
-> > think that's an extra complexity and can be put aside; the dirty bit will
-> > get recovered in pud_clear_saveddirty() later, so it's not the same as
-> > pud_mkclean().
-> But pud_clear_saveddirty() will only set dirty bit when write bit is 1.
+> > [*]:
+> > https://lore.kernel.org/all/20240219074733.122080-18-weijiang.yang@intel.com/
+> > 
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> 
+> Having this API, and specifically having a definite kvm_one_reg structure 
+> for x86 registers, would be interesting for register pinning/intercepts.
+> With one_reg for x86 the API could be platform agnostic and possible even
+> replace MSR filters for x86.
 
-Yes, it's because x86 wants to avoid unexpected write=0 && dirty=1 entries,
-because it can wrongly reflect a shadow stack mapping.  Here we cannot
-recover the dirty bit if set only if write bit is 1 first.
+I don't follow.  MSR filters let userspace intercept accesses for a variety of
+reasons, these APIs simply provide a way to read/write a register value that is
+stored in KVM.  I don't see how this could replace MSR filters.  
+
+> I do have a couple of questions about these patches.
+> 
+> > ---
+> >  arch/x86/include/uapi/asm/kvm.h | 10 ++++++
+> >  arch/x86/kvm/x86.c              | 62 +++++++++++++++++++++++++++++++++
+> >  2 files changed, 72 insertions(+)
+> > 
+> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> > index ef11aa4cab42..ca2a47a85fa1 100644
+> > --- a/arch/x86/include/uapi/asm/kvm.h
+> > +++ b/arch/x86/include/uapi/asm/kvm.h
+> > @@ -410,6 +410,16 @@ struct kvm_xcrs {
+> >  	__u64 padding[16];
+> >  };
+> >  
+> > +#define KVM_X86_REG_MSR			(1 << 2)
+> > +#define KVM_X86_REG_SYNTHETIC_MSR	(1 << 3)
+> 
+> Why is this a bitfield? As opposed to just counting up?
+
+Hmm, good question.  This came from my initial sketch, and it would seem that I
+something specific in mind since starting at (1 << 2) is oddly specific, but for
+the life of me I can't remember what the plan was.  Best guest is that I was
+leaving space for '0' and '1' to be regs and sregs?  But that still doesn't
+explain/justify using a bitfield.
+
+[*] https://lore.kernel.org/all/ZjLE7giCsEI4Sftp@google.com
 
 > 
-> > 
-> > AFAIU pmd/pud paths don't consider is_cow_mapping() because normally we
-> > will not duplicate pgtables in fork() for most of shared file mappings
-> > (!CoW).  Please refer to vma_needs_copy(), and the comment before returning
-> > false at last.  I think it's not strictly is_cow_mapping(), as we're
-> > checking anon_vma there, however it's mostly it, just to also cover
-> > MAP_PRIVATE on file mappings too when there's no CoW happened (as if CoW
-> > happened then anon_vma will appear already).
-> > 
-> > There're some outliers, e.g. userfault protected, or pfnmaps/mixedmaps.
-> > Userfault & mixedmap are not involved in this series at all, so let's
-> > discuss pfnmaps.
-> > 
-> > It means, fork() can still copy pgtable for pfnmap vmas, and it's relevant
-> > to this series, because before this series pfnmap only exists in pte level,
-> > hence IMO the is_cow_mapping() must exist for pte level as you described,
-> > because it needs to properly take care of those.  Note that in the pte
-> > processing it also checks pte_write() to make sure it's a COWed page, not a
-> > RO page cache / pfnmap / ..., for example.
-> > 
-> > Meanwhile, since pfnmap won't appear in pmd/pud, I think it's fair that
-> > pmd/pud assumes when seeing a huge mapping it must be MAP_PRIVATE otherwise
-> > the whole copy_page_range() could be already skipped.  IOW I think they
-> > only need to process COWed pages here, and those pages require write bit
-> > removed in both parent and child when fork().
-> Is it also based on that there's no MAP_SHARED huge DEVMAP pages up to now?
+> #define KVM_X86_REG_MSR			2
+> #define KVM_X86_REG_SYNTHETIC_MSR	3
+> 
+> > +
+> > +struct kvm_x86_reg_id {
+> > +	__u32 index;
+> > +	__u8 type;
+> > +	__u8 rsvd;
+> > +	__u16 rsvd16;
+> > +};
+> 
+> This struct is opposite to what other architectures do, where they have
+> an architecture ID in the upper 32 bits, and the lower 32 bits actually
+> identify the register. This would probably make sense for x86 too, to
+> avoid conflicts with other IDs (I think MIPS core registers can have IDs
+> with the lower 32 bits all zero) so that the IDs are actually unique,
+> right?
 
-Correct.
+It's not the opposite, it's just missing fields for the arch and the size.  Ugh,
+the size is unaligned.  That's annoying.  Something like this?
 
-Thanks,
+struct kvm_x86_reg_id {
+	__u32 index;
+	__u8  type;
+	__u8  rsvd;
+	__u8  rsvd4:4;
+	__u8  size:4;
+	__u8  x86;
+}
 
--- 
-Peter Xu
+Though looking at this with fresh eyes, I don't think the above structure should
+be exposed to userspace.  Userspace will only ever want to encode a register; the
+exact register may not be hardcoded, but I would expect the type to always be
+known ahead of time, if not outright hardcoded.  The struct is really only useful
+for the kernel, e.g. to easily switch on the type, extract the index, etc.
 
+As annoying as it can be for a human to decipher the final value, the arm64/riscv
+approach of providing builders is probably the way to go, though I think x86 can
+be much simpler (less stuff to encode).
+
+Oh!  Another thing I think we should do is make KVM_{G,S}ET_ONE_REG 64-bit only
+so that we don't have to deal with 32-bit vs. 64-bit GPRs.  32-bit userspace
+would need to manually encode the register id, but I have no problem making life
+difficult for such setups.  Or KVM could reject the ioctl for .compat_ioctl(),
+but that seems unnecessary.
+
+E.g. since IIUC switch() and if() statements are off-limits in uapi headers...
+
+#define KVM_X86_REG_TYPE_MSR	2ull
+
+#define KVM_x86_REG_TYPE_SIZE(type) 						\
+{(										\
+	__u64 type_size = type;							\
+										\
+	type_size |= type == KVM_X86_REG_TYPE_MSR ? KVM_REG_SIZE_U64 :		\
+		     type == KVM_X86_REG_TYPE_SYNTHETIC_MSR ? KVM_REG_SIZE_U64 :\
+		     0;								\
+	type_size;								\
+})
+
+#define KVM_X86_REG_ENCODE(type, index)				\
+	(KVM_REG_X86 | KVM_X86_REG_TYPE_SIZE(type) | index)
+
+#define KVM_X86_REG_MSR(index) KVM_X86_REG_ENCODE(KVM_X86_REG_TYPE_MSR, index)
 
