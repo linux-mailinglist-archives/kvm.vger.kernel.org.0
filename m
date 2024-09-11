@@ -1,45 +1,47 @@
-Return-Path: <kvm+bounces-26482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32180974E46
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 11:15:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 722AF974E49
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 11:15:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 656C61C2697D
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 09:15:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39E16282AB3
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 09:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D7C183090;
-	Wed, 11 Sep 2024 09:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E920183CD2;
+	Wed, 11 Sep 2024 09:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oKszq2B1"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ukkq+j7D"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8608E13A884
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 09:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C0515FA92
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 09:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726046058; cv=none; b=M/qWjY0G28RAgv4Ac81ovPtdH4vlYxiXtJGeme0g2rNgEahOByf1WulM4hO1TS3DRD9I42WGfwtmIgd8w0spC3L1C4MK7YwccM+HRH89VLN9RxT4JSzMcg1k2ax66EzegKE+SqMXO0bDrCxH4UNne5EgCTrQWM3GUnEmojv7MlQ=
+	t=1726046062; cv=none; b=Z1iIy9PZ4uoor9oRtjeIfF3TmhUhn9tbh0f4h/97+Dxh/IJ8QkPWn222r4UO5s3KZ3g9DVBLLHB7qNBiSJd8cOQYh4YVXdxtvqs1Yhzk3p1zrTzfxzdeIwR5dfJsFIyQfW+wL7mZ7QOPAXObrXnXAw5PMYJYjL+cob/9+4PaOc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726046058; c=relaxed/simple;
-	bh=h5ySaVfM8I8xxT2S6UUVoBpC3hcCM3GhiFxSe7b4r/Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DjbdCsvvkCc4Cahif0idqWpHs3pB5c5BZKxs3l6ozQKu07F0Z7fV4V0iqMBh2i5bBtEhbGRDcVq6OJbB5Zc70KBNhLu2Gx3kiuUOFTxwq2SBoBNm8VFywhh88L/sZhzsOCoBt4o04YzBE3m8I1RZsyLd5rvFVV1JSJ/RQNhh+F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oKszq2B1; arc=none smtp.client-ip=95.215.58.188
+	s=arc-20240116; t=1726046062; c=relaxed/simple;
+	bh=fxWazOowneATN/NMms7JegZApQ3fmiARD6aivGAAY18=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ayNAxqvQZpLXHOuz6KI2AShOeYAlORT2oD+SiFQG8sjS25f/aKOKxgFk6M5tondX2FTMzGeDTIEfFV4kj287/9e5mdPeKx5z8mB4ECCa88zQ1OjlS0k/LLPbBbmSe7xiUD52W57rVqtQtE3cCGQLd3sM063OyJ/4rUUH24o0cRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ukkq+j7D; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726046053;
+	t=1726046058;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=fyMdMsKCQOu5UpiuFGR47iMoCTLzsA/eJycU3Mv3Vbs=;
-	b=oKszq2B1bo4frYhI+HQHEPnCnV3/e3p6ugg//2xh2MI4JsYftikgOuS1vQ+4oMt2JMkY9i
-	VZQsA3cFF+ltiew9QSW8n05L1CiXrG5Wc4PEjk90wixvGnHNjYBMMwZmuVDiCTEREz0xec
-	8qdsrA6rXSby9QN0vXw59rOVHlVWzcU=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PG2DAax+JlcWtQamyINUSDmt+za3swHNY4VA8lUVONc=;
+	b=ukkq+j7DSgzu99+s4/Sj7crBGzDfShHZKTFs2u72WegAsbbYuORO7jgNfgze3vogvP3D6k
+	3vpzTR+AZ1TXwx5pqiziUb+WHgS55/sAqA3h9+fYA90AAidxkqm/fOe0VJ64UegmgY/FWJ
+	+I4h4bD34o4s0knIOFV/gn/cq7bPnfs=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -55,9 +57,11 @@ Cc: pbonzini@redhat.com,
 	atishp@rivosinc.com,
 	cade.richard@berkeley.edu,
 	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH v3 0/5] Support cross compiling with clang
-Date: Wed, 11 Sep 2024 11:14:07 +0200
-Message-ID: <20240911091406.134240-7-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v3 1/5] riscv: Drop mstrict-align
+Date: Wed, 11 Sep 2024 11:14:08 +0200
+Message-ID: <20240911091406.134240-8-andrew.jones@linux.dev>
+In-Reply-To: <20240911091406.134240-7-andrew.jones@linux.dev>
+References: <20240911091406.134240-7-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,38 +71,31 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Modify configure to allow --cc=clang and a cross-prefix to be specified
-together (as well as --cflags). This allows compiling with clang, but
-using cross binutils for everything else, including the linker. So far
-tested on riscv 32- and 64-bit and aarch64 (with some hacks to the code
-to get it to compile - which is why there's no gitlab-ci patch for aarch64
-in this series). I suspect it should work for other architectures too.
+The spec says unaligned accesses are supported, so this isn't required
+and clang doesn't support it. A platform might have slow unaligned
+accesses, but kvm-unit-tests isn't about speed anyway.
 
-v3:
- - Add README patch for cross-compiling, clang, and cross-clang [Nick]
- - Add comment to the commenting-out of mstrict-align [Nick]
- - Add the reason to ignore warnings vs. fix code to commit message of
-   patch2
- - Picked up Nick's tags
-v2:
- - fix building with clang and --config-efi by suppressing a warning
- - added riscv clang efi build to CI
- - picked up Thomas's tags
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
+ riscv/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Andrew Jones (5):
-  riscv: Drop mstrict-align
-  Makefile: Prepare for clang EFI builds
-  configure: Support cross compiling with clang
-  riscv: gitlab-ci: Add clang build tests
-  README: Add cross and clang recipes
-
- .gitlab-ci.yml | 43 +++++++++++++++++++++++++++++++++++++++++++
- Makefile       |  2 ++
- README.md      | 22 ++++++++++++++++++++++
- configure      | 11 ++++++++---
- riscv/Makefile |  4 +++-
- 5 files changed, 78 insertions(+), 4 deletions(-)
-
+diff --git a/riscv/Makefile b/riscv/Makefile
+index 179a373dbacf..22fd273acac3 100644
+--- a/riscv/Makefile
++++ b/riscv/Makefile
+@@ -76,7 +76,9 @@ LDFLAGS += -melf32lriscv
+ endif
+ CFLAGS += -DCONFIG_RELOC
+ CFLAGS += -mcmodel=medany
+-CFLAGS += -mstrict-align
++# Unaligned accesses are allowed, but may be emulated by M-mode.
++# Enable -mstrict-align if that's troublesome (only supported by gcc).
++#CFLAGS += -mstrict-align
+ CFLAGS += -std=gnu99
+ CFLAGS += -ffreestanding
+ CFLAGS += -O2
 -- 
 2.46.0
 
