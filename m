@@ -1,106 +1,139 @@
-Return-Path: <kvm+bounces-26456-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 090349749FE
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 07:58:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DCB0974A24
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 08:12:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4AD21F25850
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 05:58:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F4CD283F83
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 06:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7DD4F881;
-	Wed, 11 Sep 2024 05:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C7E762D0;
+	Wed, 11 Sep 2024 06:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="if820MxU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F9NnJSHK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9692B558B7;
-	Wed, 11 Sep 2024 05:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745F138DE5
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 06:12:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726034305; cv=none; b=Ak2dg9isZK7Tz+amqOR3xAxwCqGaxta+W5ADY3zF0MLaf/2H/BqMLN1S/Z8WsKsX1mzurfiTNrrsYXWh1KePcSG4w/s6MkitIQkY4JUidxQgpdposCJWB6ntBKMNVL+BnoQrDsb7Vr87b/9Z2b8alkefKlj7TrIUno09qwOtWnw=
+	t=1726035124; cv=none; b=cXkLFXlUnOfYjUfFEVhGI5llLPiYXeZyBle424JYgVgQD1pj9RR4wtcPHQvf4w66sNGSJsTw260jYr5l8xZ3u0iuqKGpmkeZmnx6nwfnPlQXPMEE/NQKsmJ4+8Zg4ZoJ0L53JPLbJn1IvPNoTZRBWDU+Vmj0Cv13d8oI/lJVGWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726034305; c=relaxed/simple;
-	bh=IsXKRKlRRuoUhynSJbyMXcCxSD7PLob00R0+URxVCkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nYqUK1SKSMwzBVJGrjnzD5J+02xjb01km7z1AaBv+ThIRIxnqk8VNRdICe34RUubVWZwOGUkdss/RzoUbFZVT9DPHAqoCoEM5WT2biCkJmrr0VNYD091hv8wkzOXB+AgwoVli8HdC5N2ZCObgYdPHDXc6V0VVhcmxDCo/3GkSBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=if820MxU; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726034304; x=1757570304;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=IsXKRKlRRuoUhynSJbyMXcCxSD7PLob00R0+URxVCkE=;
-  b=if820MxUjGFB40henhOjXKcPwtPKMcdD6LF4+Ztm/+4pOiLCo0ohjYxn
-   5PsgT/GfhKHA6UdU+14NsI4XiRFprY8U2gZB3oarOCHbDpAVlYLJ31xOv
-   Fn2++5gIIjgDo6kvl0EGImQWie1yOgAubuXYQnRHqNzWuPvWMu4mIaEsg
-   ZhFYtjzenORZBw2phm9UdNYz20ptVwqbN5C6VrIJhG/ZahZTZke3+IozY
-   2gEpIIuT1kKbbgqb5+SkR83P+zCye54gnlJwPcr6HQWWitOV5bFPylUqq
-   exYrXau44jIijEpijj+60K0hyIdXznr0zS+U6a5hJiz5XN7KD1ZsFdL8x
-   g==;
-X-CSE-ConnectionGUID: Z/DBDX+QSNuvxyGzttG6Sw==
-X-CSE-MsgGUID: Ane3ksJbSvyepfIIdGWabA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11191"; a="24752594"
-X-IronPort-AV: E=Sophos;i="6.10,219,1719903600"; 
-   d="scan'208";a="24752594"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 22:58:23 -0700
-X-CSE-ConnectionGUID: ueKq3hlCTgq+TdyP0xyCSg==
-X-CSE-MsgGUID: shOFvoKuRkOPI++3EIgGJA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,219,1719903600"; 
-   d="scan'208";a="104729422"
-Received: from bergbenj-mobl1.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.117])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 22:58:19 -0700
-Date: Wed, 11 Sep 2024 08:58:14 +0300
-From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Binbin Wu <binbin.wu@linux.intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
-	kvm@vger.kernel.org, kai.huang@intel.com, isaku.yamahata@gmail.com,
-	xiaoyao.li@intel.com, linux-kernel@vger.kernel.org,
-	Sean Christopherson <sean.j.christopherson@intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 03/25] KVM: TDX: Add TDX "architectural" error codes
-Message-ID: <ZuExdkguCRNcX14o@tlindgre-MOBL1>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-4-rick.p.edgecombe@intel.com>
- <45cecaa1-d118-4465-98ae-8f63eb166c84@linux.intel.com>
- <ZtAGCSslkH3XhM7a@tlindgre-MOBL1>
- <ZtFeO3hq6dpnXvmf@tlindgre-MOBL1>
- <80a3a5a1-59cb-4ca9-8107-b7552fa35b6b@redhat.com>
+	s=arc-20240116; t=1726035124; c=relaxed/simple;
+	bh=rJlEf4IObiOvjDlODsgi/ze2ZGvpXn/XlSqSJF64zQw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VKgg2j9ThuhDvCKmDNHbsHmjPITxSVoiwltmJa3mJb86ZNCKZecSZvdHcdxjgm6XVW1LaAJwxJFGHvecPYK8sGCRovA5/UWR9c2nMnwpUspIprWrYpFOpaFbqHuuOUvwpA/81ESi374CB2TQOgE2279+At7pYuOoBGPW0TUg0qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F9NnJSHK; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a8d2b4a5bf1so220392466b.2
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 23:12:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1726035121; x=1726639921; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+34vrWrHaGMzGum0dUZAL9TUKidQHtpHEuGMkrYa2DA=;
+        b=F9NnJSHK+nB9s/ho0Zasy+ya7BxuOPT7M88I8RXr0YeKCcwtLA4xzKEfcLxKINe9GL
+         4JI5Lqp9ehVXkBho73n3x4mA6ViTN3VpGkBZV6SoM/YTDNiDns6Jltu0XXeDR8wsz8CY
+         K/1o7keR7hXFLQ0j6VhWEsR1e5Py3fzJitTXB5CDTtHGKfljEdrXav9hg5NrlUT1X4ZA
+         GzKZyTryJJa9T+33BVVtTEpdc89eWIAOAetwzYeaCclIJmAQTSZkXDWSem5RcaRMbz2o
+         kSLztk90l60htF0eDXbneFRSPD3+yTStq0C6U/JCEOG40cz+xjuw3Vj2hQOLfgHsxzam
+         DRjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726035121; x=1726639921;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+34vrWrHaGMzGum0dUZAL9TUKidQHtpHEuGMkrYa2DA=;
+        b=UJzOb+4eQ7veaiMrmjMzsAtfoFtKK4XrUVN1IH9twZv7hDXZb1HSXSPwQJCislo78t
+         D0qNap9Mm8CEAcW3AworZ3VN5nxeEPvUKpHf/vE7eusnhpeU4rW+5nPUWLjDL5/pCiCr
+         v8IsbOG69HYCpuHpQqvTVYxQ2j/pD/38v2ODW2ospCrjKjOMVYLXeREvJmTqyiSEup2p
+         gNz//yL/RFDahZCBiHN27XHGj2f/g6jK5+53HLdolFHPTi5XMjhEMwDy+Eo/E8rWbw4O
+         Mqtm7NsGMe4Gbai/C05y87b7X6uPYoMtkmrZ4tf8p1uT1DRtD3D7aDbkCV4TUD7it5GK
+         6pWw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqqnitYfIEKGwX0AufksAS0igaHvwDVz5RKbYSby4KOm9yIxsfJvbDa69x2B4buaSujPM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6qifazxpIgc6lziDMvzu2fGEmBlcc31E6XoR6ERQbH+z/qSCN
+	JFEIqbyxpyhiyvBin2wwNTOMmcXlZg3VXcqrebZ9cvYJhorAmJvHYAEXbnsyWHs=
+X-Google-Smtp-Source: AGHT+IH4ooGDdGMRExue4kMMs1ung0TKQVFYie4NWRoJANGnBSzGpgLK0lpNkpt9jkOB2KoDESp7sg==
+X-Received: by 2002:a17:907:efcb:b0:a8a:85af:7ae8 with SMTP id a640c23a62f3a-a9004798aa7mr202327666b.11.1726035120608;
+        Tue, 10 Sep 2024 23:12:00 -0700 (PDT)
+Received: from [192.168.69.100] ([176.187.196.107])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25a25897sm571142466b.87.2024.09.10.23.11.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Sep 2024 23:12:00 -0700 (PDT)
+Message-ID: <cca80b37-2640-4269-af72-aebccfa47245@linaro.org>
+Date: Wed, 11 Sep 2024 08:11:51 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/39] hw/char: replace assert(0) with
+ g_assert_not_reached()
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Zhao Liu <zhao1.liu@intel.com>, "Richard W.M. Jones" <rjones@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+ Corey Minyard <minyard@acm.org>, Eric Farman <farman@linux.ibm.com>,
+ Thomas Huth <thuth@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ WANG Xuerui <git@xen0n.name>, Hyman Huang <yong.huang@smartx.com>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ Michael Rolnik <mrolnik@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, qemu-riscv@nongnu.org,
+ Ani Sinha <anisinha@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Jesper Devantier <foss@defmacro.it>, Laurent Vivier <laurent@vivier.eu>,
+ Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov
+ <imammedo@redhat.com>, kvm@vger.kernel.org,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, Fam Zheng
+ <fam@euphon.net>, qemu-s390x@nongnu.org, Hanna Reitz <hreitz@redhat.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Eduardo Habkost <eduardo@habkost.net>,
+ Laurent Vivier <lvivier@redhat.com>, Rob Herring <robh@kernel.org>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-block@nongnu.org,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>, qemu-ppc@nongnu.org,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>,
+ Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Fabiano Rosas <farosas@suse.de>,
+ Helge Deller <deller@gmx.de>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ Yanan Wang <wangyanan55@huawei.com>, Peter Xu <peterx@redhat.com>,
+ Bin Meng <bmeng.cn@gmail.com>, Weiwei Li <liwei1518@gmail.com>,
+ Klaus Jensen <its@irrelevant.dk>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Jason Wang <jasowang@redhat.com>
+References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
+ <20240910221606.1817478-5-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20240910221606.1817478-5-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <80a3a5a1-59cb-4ca9-8107-b7552fa35b6b@redhat.com>
 
-On Tue, Sep 10, 2024 at 06:22:52PM +0200, Paolo Bonzini wrote:
-> On 8/30/24 07:52, Tony Lindgren wrote:
-> > > > +#define TDVMCALL_STATUS_SUCCESS 0x0000000000000000ULL
-> > > > -#define TDVMCALL_STATUS_RETRY††††††††††††††††† 1
-> > > > +#define TDVMCALL_STATUS_RETRY 0x0000000000000001ULL
-> > > > +#define TDVMCALL_STATUS_INVALID_OPERAND 0x8000000000000000ULL
-> > > Makes sense as they are the hardware status codes.
-> > I'll do a patch against the CoCo queue for the TDVMCALL_STATUS prefix FYI.
-> 
-> Just squash it in the next version of this series.
+On 11/9/24 00:15, Pierrick Bouvier wrote:
+> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+> ---
+>   hw/char/avr_usart.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sure no problem.
+Reviewed-by: Philippe Mathieu-Daud√© <philmd@linaro.org>
 
-Regards,
-
-Tony
 
