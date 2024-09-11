@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-26509-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26510-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C163F975454
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:46:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AF1897545B
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:46:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47CDCB29D1D
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 13:46:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D8D71F269F0
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 13:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412941AB50B;
-	Wed, 11 Sep 2024 13:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F6E19E980;
+	Wed, 11 Sep 2024 13:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eVGGHDEP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PwgnRavr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E436F1A704B
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 13:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C7E1A704B
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 13:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062026; cv=none; b=SIYZMG8rHBS3PLLeXid7bubFLcbqjQYlgvhVxoZFQBospKQUcT7ttM+6O/0JoyjR6g1pGgksMqCNk0SqxZwP3ZBHGEc51kdnh+6t2gJCxZRomNk6zCz4V9wE0/YBts1G0SMdR/Hj+4IdOMG/cczohz06Bfhd6YIfYhUCwDiflUs=
+	t=1726062055; cv=none; b=sKFYWXLTmoaVQ2zzoHaLvWreJ/LGCPeymOT4YaKfjgemvbEO9SqXEdmnKDkGq2gzFr3eMpu3lG/ZHGlQ3MgLxhdkwXtMF62giPP3z4TL4CHkHRnCjCLHeSemvv2ZoMFZVVyAGnLXd+0KLF7mV0+bFSLE/XyNxoS7OF37X/fDmCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726062026; c=relaxed/simple;
-	bh=IflGPQtbT29hOYsmEmelqfK3S0m6oxtsvz7g0LGIE+o=;
+	s=arc-20240116; t=1726062055; c=relaxed/simple;
+	bh=yvPIK3dJ8RsWPzerUzVgZiq/JOY6U2/kNH5HEGIlabg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oGJqp12Ti/5gcz3k9ksAa92Ma8J5mbk025O3/0S3K/DIolR+ygeTpmf7Nc/xVnnYLP8bPTHziePNuaWi+8G1n6JPe7tRE5S5uYgjZsfUru51JBptnQnJEBrCRXlUicxfR+LLhh4nkr3mPaEWvflIK6hafewOCr7xPSbiosjAM2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eVGGHDEP; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=tHyutuMOeF+zwiVcszIAlNvs/q0RrGXNZZhom7vTDdQPMyjfIiXuSf/Yrr3mczolP6/6oo4Jql2HTR2l7gs12X1i1BXNbrJikJS1+7xaKdghLfPoXY0W+xFfCYh0EjiqvjNQ95Q3E+TucnpD+OUEtcHCk7T0znsmBKj/fQqsSQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PwgnRavr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726062024;
+	s=mimecast20190719; t=1726062053;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ylLQ46RRK0r8akuM+MAjQ7YJk+TYPgJnv3CN/nu5zsE=;
-	b=eVGGHDEPc5a8DkwGfmKE7+AG+yoLH+efvWH90X1hZTX1q8iK9/B1vXbQganP9CG+Q9LJOb
-	NUyQpUtlNwat7BIBhqDgLySnRst5OwdEMUTGNTd+mIWa0OnEqn5rmi9OrkPvrImimqtvLK
-	Kx3rsz6leWevoGfrenwep+Y/Z4KkCd8=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=A4cGYuzEcsU+H11W5DX5/hXv+/XV9V+6iflAKbWezCQ=;
+	b=PwgnRavrCSkBydV8h7ly1eFoCBI8fAJOXIzwXKyfLlUFPS+ztiv/hoMjmMye1/ZYu29UuF
+	xyY3eNxMoyAPDhltXDP8KJ56UNguaFu4TYk8TEb161NP19+Fd1ZKGLD+wIO3i2K/OxNPdR
+	TvLsEGA8lKpOXqdEdieB44E39LSFSaE=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-pwiYDgJ7Py6DaexC48KdWg-1; Wed, 11 Sep 2024 09:40:22 -0400
-X-MC-Unique: pwiYDgJ7Py6DaexC48KdWg-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7a99ec76780so514228885a.0
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 06:40:21 -0700 (PDT)
+ us-mta-640-WYKnV5kBN6yNOQclWCp1xw-1; Wed, 11 Sep 2024 09:40:52 -0400
+X-MC-Unique: WYKnV5kBN6yNOQclWCp1xw-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4582790fc3cso70234061cf.0
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 06:40:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726062021; x=1726666821;
+        d=1e100.net; s=20230601; t=1726062052; x=1726666852;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ylLQ46RRK0r8akuM+MAjQ7YJk+TYPgJnv3CN/nu5zsE=;
-        b=HRUaLGKDMytZzsqQdbe4uAf3I0u1t/MsBKA+0J39OyEBSmHOIdNpRUMhD2MxuRwuAq
-         1x4DTP6113LjfCZP4bGSazAPRya/PxDN0qgbSzYlPQjgPT+dLJH+uvvGiCiwieftf8ZT
-         vzE8s5Ahd+z2gnJV50QkkYnuzQXWU0NuaI4maC3YI6aMpzgKYeSDTc2na1uJ+4zih5OS
-         64ZyxCjRygsoMjSBRKgfbo3N7RIfCeq0rwLc91F5AHc4oIQWrOwyM8CWjLzZEXtqIbBJ
-         oDOg/BwbZghRgF21GEVp74ALCK31pwfz2B2Bt0poSe/ZFuDqfoYkv2TlCv3vgxHS1qnD
-         V4ig==
-X-Forwarded-Encrypted: i=1; AJvYcCU/FjiUERC9Jzwg8zyBSmDH25Ri3GMUa+/gByOlPNuMf3qdBoD73mU0e3i66pHLizJRVA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoyQm1P6wB4ILbNr/Ny/+ctCg2FfjcCTOxuNZyT+KN01QKiinS
-	W0YxuDMo3/uQpv905dagq4hrX1HWmX8qAaW+4t2tPnK4D4b5HUAV01r45pKo8Pihi+twWnW/tsI
-	+E41PqdcxQWx1uJRGmWc1f9V9MQbwmnYyIMDUzcipHeke0zFPcA==
-X-Received: by 2002:a05:620a:2454:b0:7a9:a6a7:dc2e with SMTP id af79cd13be357-7a9d3a7a33emr403696485a.26.1726062021425;
-        Wed, 11 Sep 2024 06:40:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFe+qt8pwlXDK0mfZ+LtyxQgEnpZe0Z6LEhOSLBDwBTuJnhTlFofajkphGOvjHQEd/U2LJQ2A==
-X-Received: by 2002:a05:620a:2454:b0:7a9:a6a7:dc2e with SMTP id af79cd13be357-7a9d3a7a33emr403689185a.26.1726062020970;
-        Wed, 11 Sep 2024 06:40:20 -0700 (PDT)
+        bh=A4cGYuzEcsU+H11W5DX5/hXv+/XV9V+6iflAKbWezCQ=;
+        b=HlTR3OWqniwxXbj+/THc10cqW0r0XlvUMJV3Cote1JF0M67oobSbZFmFXPLsHwQef/
+         3Rk4UpsxUJUF8KdsNopFLxwedHlpL1+O75bYVz4RDtEIi0gIQt0oJ6hCp91u6JVBlJCm
+         5MPQg3TRPq1Zk+vpGzy/1tc+5GkV77yEsPERAv4FuIxcAP53hbh78A2zO6JDQzD3KxLj
+         pzCxaEYMn7Xo4o1C7BVvNjcLUGCmzcqdDlnhYeM5vFQFlpM6EckOJefr/L8syraYidax
+         hVARnb5iIA+B3sWuysDiY+b0oo9uyRY3umjlPcd0r5tt0NSWgYex41IX9gMWhGTrC1Br
+         2A9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUbAL8t2BiRB9XC081ioXlQf1QgkrAcOW7Q6gJb25aA+4xJM6k6xE6IMfKpwYqdsEmQZ6Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRdjBzwlSe+MXqkA7d5JpUacUZ2mE1GYalCPVAsNBCr7dVpbSR
+	ylgwEb/JnXd2hmurBPq3l79f9sopBIwquitnByouIbm76dm3g05+5WjDFKuLMYkRUeo9SBysFJ2
+	gL5JIhKjpnvae1z9FZg5NxWP86c7TgeZVhVol6465kEyDkf8Smg==
+X-Received: by 2002:ac8:57c4:0:b0:458:59e3:2b52 with SMTP id d75a77b69052e-45859e332abmr16950081cf.55.1726062051415;
+        Wed, 11 Sep 2024 06:40:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH9OJUDpC/dDLPTaAj7vE1LX91DjdMwKKxOTbejPT9DFiRR1lsGsySzd/YLuGZUG3kBLFK7Vw==
+X-Received: by 2002:ac8:57c4:0:b0:458:59e3:2b52 with SMTP id d75a77b69052e-45859e332abmr16948861cf.55.1726062049492;
+        Wed, 11 Sep 2024 06:40:49 -0700 (PDT)
 Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a9a7a1a8d5sm421889085a.116.2024.09.11.06.40.17
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45822e60974sm41358491cf.8.2024.09.11.06.40.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 06:40:20 -0700 (PDT)
-Date: Wed, 11 Sep 2024 09:40:16 -0400
+        Wed, 11 Sep 2024 06:40:48 -0700 (PDT)
+Date: Wed, 11 Sep 2024 09:40:45 -0400
 From: Peter Xu <peterx@redhat.com>
 To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 Cc: qemu-devel@nongnu.org, Zhao Liu <zhao1.liu@intel.com>,
@@ -123,11 +123,11 @@ Cc: qemu-devel@nongnu.org, Zhao Liu <zhao1.liu@intel.com>,
 	Weiwei Li <liwei1518@gmail.com>, Klaus Jensen <its@irrelevant.dk>,
 	Jean-Christophe Dubois <jcd@tribudubois.net>,
 	Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH 08/39] migration: replace assert(0) with
+Subject: Re: [PATCH 21/39] migration: replace assert(false) with
  g_assert_not_reached()
-Message-ID: <ZuGdwMYENxER2r6-@x1n>
+Message-ID: <ZuGd3bcawih4bN9Z@x1n>
 References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
- <20240910221606.1817478-9-pierrick.bouvier@linaro.org>
+ <20240910221606.1817478-22-pierrick.bouvier@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -136,9 +136,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240910221606.1817478-9-pierrick.bouvier@linaro.org>
+In-Reply-To: <20240910221606.1817478-22-pierrick.bouvier@linaro.org>
 
-On Tue, Sep 10, 2024 at 03:15:35PM -0700, Pierrick Bouvier wrote:
+On Tue, Sep 10, 2024 at 03:15:48PM -0700, Pierrick Bouvier wrote:
 > Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
