@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-26443-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26444-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22CBD974771
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 02:39:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF3EF974799
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 02:55:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F6831F2693F
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 00:39:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66DFB2874BA
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 00:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2CFDF42;
-	Wed, 11 Sep 2024 00:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F32217BD9;
+	Wed, 11 Sep 2024 00:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PmA5f2pQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpKWZgsE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB8FDF5C;
-	Wed, 11 Sep 2024 00:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C13AD5A
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 00:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726015154; cv=none; b=Naodgph9jCZHv0vhQIvtmIJozGiXaoMm6oFYMEqssQuqmKYFZc2RxzYPqPKu87ibKk5es7OjrsEQC3m8lZZhe7C84UXwFVkQii1hBg1J21HzlbBifsagP07duHYuIgVjPdwwy8X03HaOlmrJarm6xFknjaYDh5aQr8cUfDvafBo=
+	t=1726016144; cv=none; b=E3haNI+XIC70RA2Zd76hCXNtHCmnhTIQMT6h2KRrmppyvPiCeDjRJ2F7ge7wXVccYy3kQEnwY0X0znLOBBUySTK1e+6TBbOY85ZJumrVgJqZn1yIO3HQGzZRnqKrOMFaWE4TAo9fSRlFkB+AZvtXt1BHhRUwpJ9ee5d95YsIXCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726015154; c=relaxed/simple;
-	bh=ZnBdl2cA4ztUKelTqdaewmKZZClVReaKhYlkQ6TOZVM=;
+	s=arc-20240116; t=1726016144; c=relaxed/simple;
+	bh=xkHnAUkzLmC5486vaTFdbksVFRf4EDutLsyQdr80otc=;
 	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=sVyHZJW92xij/5MpevDchPQrZiVU5Fp7x0DLZLy3e2RemLrbBjYVIXE73e4I/ySv1EFUY6CLOvM0yrpjtqhrsdTcaSymyabVdyIU1tXK0eOsAZEoRWNhiM+oy4mLieiFb82yN6oXUJT6h/STkevz4Z+pqotFQr3w6o1eADOSZj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PmA5f2pQ; arc=none smtp.client-ip=209.85.210.171
+	 References:In-Reply-To; b=grvw1h3io6qSabMSyC6XTscYezJ03VCKfsvzL5kcJEU1Mx6uT2vC2K7XNc+qQ5b3KtWCESAxEf41SnxgC3XdVKXvv4G034gpglhiU2i9xKiHpurdfJalTrcevx0J4XQRdJMj5fuZ2Wwg4ec5J1MG5BE0P4EhCaT5ITA2/sTpUjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpKWZgsE; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-717929b671eso1229605b3a.0;
-        Tue, 10 Sep 2024 17:39:13 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-206aee40676so51185115ad.0
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2024 17:55:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726015152; x=1726619952; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1726016141; x=1726620941; darn=vger.kernel.org;
         h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aU2W8CjkecEHnTcSi2eLdxjM7yES0Dfnh45fYE5GR5I=;
-        b=PmA5f2pQ08v5INxNTeErgGxqUwVCoHlNvVY1h4AqpbbBOh38Tdq2ygJ8RTRR8oSRk8
-         GM2wSNQdNwUXh3h+7jFlBphQW+AZDjGE3e01DAxhNgqQ9jBOdeWAF2zL9SopGDrchbAR
-         G8TBSomdS8Byyx+ptC/TZAyvv04HBfL2chPsDX89VdHgr9DV55b7rUC0EGWkpUrNdaH0
-         FlNN7DKo9OTcHusgJNeRTM2lsQNB+6NV+vH4AevePfHeb1b/Wg1u8X50vpnvf/+xNs+Z
-         DQKOLZpCgRAo9ce9BiD+4Eq8gkEjpI+5oM7vcAkN+zD15poTuuU7YE7+hNXbPoEnnKwk
-         wDHw==
+        bh=itC2WqutZECbXY6ZLrN2/kGwGHxwBlnGdFqeRrwJWbo=;
+        b=kpKWZgsEz8u+n2iFiovPwsGAG5kyRUe9AM7kpBwR/UZROpkutkd9hsMQakiyDaV0hN
+         tSTlm4iAiZ7lecZomfJ7H6mbr8P/Jsq0SyDk1Z+It+TSAU51Rn3+N8AsbgvA4jtrOyE4
+         rK8oyBSbcH0zEbU48IR6Fo4I1Mh9U7Za6p7TnmLChEYka89PvMqZd5iSP0XfCf1pB7tC
+         S2ssJKibmLJX+G0XEgCpXBOq633PMDvX7/644DupNC0h91du2OW5UVqIG0ejU50W/+v9
+         s7QMAc1qvvf9gf/1Ch0POTQKNCPSfhvJGLO1egyuFhd+BDgt9l9JIcvD39DCbKC9UdP6
+         GLpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726015152; x=1726619952;
+        d=1e100.net; s=20230601; t=1726016141; x=1726620941;
         h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=aU2W8CjkecEHnTcSi2eLdxjM7yES0Dfnh45fYE5GR5I=;
-        b=I9C9Caq3+mJB3TCilDF0RvxRHihIIDhDEX9NwA/wK1CB/IO1X/KQIoU4iezSHlW2nD
-         6iawNhOIaYGAGlzTJMoQfRLdC7OS01SwHcWJsBF1ZfkE1fBbNpTVI3asjTviwF9kUj8Z
-         7dtKUvWP/8eDiikzGEVrTi3cW5a1p8mDiZVMNfnnpEGQ6O7thxFYJCAjFlUBmnPrvsSX
-         4avmcI1/ukuiQogEPTj2Iq1vHit6Uum37taGVklm/cnWWG7FEX/P3HOXJnGDT/WxYtth
-         q4XA6bidkjAbe8vJIdfw1mSy5LJpMb3GX9L6xT/FkWSDAYpiXGWAkHLCB83iziEVUD+M
-         EUcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVtSK60CwtUOL8Eh5HwFJzxCUE1CLGqhNbDXeoDkzQQR3MQTwIVYH/znhzeO2aS+ybdB6YatL0UUxFyzA==@vger.kernel.org, AJvYcCWAku6LLH8Q/syalRhc3vEosTjZmzYfA0Yzx+hkxWB7kYz9JV9zJMrJAcooLnX7cEhQfSA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjkNMsxeuXx4eNhdiycjzEbs+rHUkDYzsuD6E5tTytmS1IWrqx
-	YhfPy7xITp17XgRnLQ7xqoc7XHK0Jt1FWjpXhUoc/AMyFUAe7I5m
-X-Google-Smtp-Source: AGHT+IHRKKq+mrn5RGMG8qqoe7SoGI6xTYPwCUO1y//ca3K0M+pW44jdvdBPQb4Ae3YMIwaUEIB4lw==
-X-Received: by 2002:a05:6a00:21cd:b0:714:1bce:913a with SMTP id d2e1a72fcca58-7191712345fmr1713499b3a.21.1726015152432;
-        Tue, 10 Sep 2024 17:39:12 -0700 (PDT)
+        bh=itC2WqutZECbXY6ZLrN2/kGwGHxwBlnGdFqeRrwJWbo=;
+        b=M8I08Jg6w6YjDXphNJfwCHawXNr9eknBemZ/W1p8qqt0gnpdroafJAZ4dZbQI3K5eu
+         R2cCpyMzqRyoCPjJOpZke/61sbksM0wgLuwhQa1j6X/sRgjDI6eswsLaUoHYTIeQ6gMM
+         C+DfZdYIVxCCBaXqB3057Hf6qXnevGzXwCVNswhI1FKRj6SfWmCwYkz8Qh4QiXgzmhqe
+         r8NtkzbnxyZVeSTH9+4EMGoHC+uVP/IYuALwK8+TKJFBeU2ZlM7epr7RkeQxy6HKUUca
+         stlB8lK3fVN/6XHifI835d6tROmz2FZRbPKtN9uLhldYcHlj80WRz37+XRKuDQlm2YxA
+         aXXg==
+X-Forwarded-Encrypted: i=1; AJvYcCUTX/oP0PMzl/v1WlZLzuTzIIkyoniwOguNXL0gmx0ooCDtxwLZNPYSPbPgpxiHMD/rzEM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwShT9DFDx6L4cAjJRP6VhbrZhRP37ZxT3lod9TY2J9zUo68YIo
+	Ud0rcqkTyc37pR6ksgbFwLLbdMuF5I5MvtCXITC34SeQE+2jVeVY
+X-Google-Smtp-Source: AGHT+IEm97cCFXdaI03zMLbj/Gxe4ThtsIkW15HwzaeJnZxbas50Ww+SgIR4e2MihlsHN/sSiMGa3w==
+X-Received: by 2002:a17:902:e846:b0:206:c8dc:e334 with SMTP id d9443c01a7336-2074c69b72emr35544575ad.39.1726016141297;
+        Tue, 10 Sep 2024 17:55:41 -0700 (PDT)
 Received: from localhost ([1.146.47.52])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-719090b038bsm1909998b3a.152.2024.09.10.17.39.05
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710eeaf1csm53934775ad.176.2024.09.10.17.55.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 17:39:12 -0700 (PDT)
+        Tue, 10 Sep 2024 17:55:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,93 +75,98 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Wed, 11 Sep 2024 10:39:03 +1000
-Message-Id: <D431AYECDJV3.1AVQCTIRV2J4G@gmail.com>
-Cc: <pbonzini@redhat.com>, <thuth@redhat.com>, <lvivier@redhat.com>,
- <frankja@linux.ibm.com>, <imbrenda@linux.ibm.com>, <nrb@linux.ibm.com>,
- <atishp@rivosinc.com>, <cade.richard@berkeley.edu>, <jamestiotio@gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 1/2] configure: Introduce add-config
+Date: Wed, 11 Sep 2024 10:55:34 +1000
+Message-Id: <D431NLP0XYPF.F69YFSU98T2G@gmail.com>
+Cc: <pbonzini@redhat.com>, <thuth@redhat.com>, <atishp@rivosinc.com>,
+ <cade.richard@berkeley.edu>, <jamestiotio@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] lib/stack: Restrengthen base_address
 From: "Nicholas Piggin" <npiggin@gmail.com>
 To: "Andrew Jones" <andrew.jones@linux.dev>, <kvm@vger.kernel.org>,
- <kvm-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
- <linuxppc-dev@lists.ozlabs.org>, <linux-s390@vger.kernel.org>
+ <kvm-riscv@lists.infradead.org>
 X-Mailer: aerc 0.18.2
-References: <20240903143946.834864-4-andrew.jones@linux.dev>
- <20240903143946.834864-5-andrew.jones@linux.dev>
-In-Reply-To: <20240903143946.834864-5-andrew.jones@linux.dev>
+References: <20240904145107.2447876-2-andrew.jones@linux.dev>
+In-Reply-To: <20240904145107.2447876-2-andrew.jones@linux.dev>
 
-On Wed Sep 4, 2024 at 12:39 AM AEST, Andrew Jones wrote:
-> Allow users to add additional CONFIG_* and override defaults
-> by concatenating a given file with #define's and #undef's to
-> lib/config.h
+On Thu Sep 5, 2024 at 12:51 AM AEST, Andrew Jones wrote:
+> commit a1f2b0e1efd5 ("treewide: lib/stack: Make base_address arch
+> specific") made base_address() a weak function in order to allow
+> architectures to override it. Linking for EFI doesn't seem to figure
+> out the right one to use though [anymore?]. It must have worked at
+> one point because the commit calls outs EFI as the motivation.
+> Anyway, just drop the weakness in favor of another HAVE_ define.
 
-That's a horrible config format lol, but probbaly the simplest way to
-get something working. What if you included the user config first, then
-make the generated config test ifndef before defining the default?
+I prefer HAVE_ style than weak so fine by me.
 
-Is it better to have a config file than to just add more --options to
-configure? If we had thousands of options maybe, but so far we are
-getting by with configure options. I think I prefer that for now
-unless we wholesale moved everything to a .config style.
+How is the linker not resolving it properly? Some calls still
+point to weak symbol despite non-weak symbol also existing?
 
-Thanks,
-Nick
 
 >
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 > ---
->  configure | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+>  lib/riscv/asm/stack.h |  1 +
+>  lib/riscv/stack.c     |  2 +-
+>  lib/stack.c           | 10 ++++++----
+>  lib/stack.h           |  2 +-
+>  4 files changed, 9 insertions(+), 6 deletions(-)
 >
-> diff --git a/configure b/configure
-> index 27ae9cc89657..7a1317d0650d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -64,6 +64,8 @@ usage() {
->  	                           no environ is provided by the user (enabled =
-by default)
->  	    --erratatxt=3DFILE       specify a file to use instead of errata.tx=
-t. Use
->  	                           '--erratatxt=3D' to ensure no file is used.
-> +	    --add-config=3DFILE      specify a file containing configs (CONFIG_=
-*) to add on to the
-> +	                           generated lib/config.h. Use #undef to overri=
-de default configs.
->  	    --host-key-document=3DHOST_KEY_DOCUMENT
->  	                           Specify the machine-specific host-key docume=
-nt for creating
->  	                           a PVM image with 'genprotimg' (s390x only)
-> @@ -153,6 +155,10 @@ while [[ "$1" =3D -* ]]; do
->  	    erratatxt=3D
->  	    [ "$arg" ] && erratatxt=3D$(eval realpath "$arg")
->  	    ;;
-> +	--add-config)
-> +	    add_config=3D
-> +	    [ "$arg" ] && add_config=3D$(eval realpath "$arg")
-> +	    ;;
->  	--host-key-document)
->  	    host_key_document=3D"$arg"
->  	    ;;
-> @@ -213,6 +219,10 @@ if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
->      echo "erratatxt: $erratatxt does not exist or is not a regular file"
->      exit 1
->  fi
-> +if [ "$add_config" ] && [ ! -f "$add_config" ]; then
-> +    echo "add-config: $add_config does not exist or is not a regular fil=
-e"
-> +    exit 1
-> +fi
+> diff --git a/lib/riscv/asm/stack.h b/lib/riscv/asm/stack.h
+> index f003ca37c913..708fa4215007 100644
+> --- a/lib/riscv/asm/stack.h
+> +++ b/lib/riscv/asm/stack.h
+> @@ -8,5 +8,6 @@
 > =20
->  arch_name=3D$arch
->  [ "$arch" =3D "aarch64" ] && arch=3D"arm64"
-> @@ -502,4 +512,8 @@ cat <<EOF >> lib/config.h
+>  #define HAVE_ARCH_BACKTRACE_FRAME
+>  #define HAVE_ARCH_BACKTRACE
+> +#define HAVE_ARCH_BASE_ADDRESS
 > =20
->  EOF
->  fi
-> +if [ "$add_config" ]; then
-> +    echo "/* Additional configs from $add_config */" >> lib/config.h
-> +    cat "$add_config" >> lib/config.h
-> +fi
->  echo "#endif" >> lib/config.h
+>  #endif
+> diff --git a/lib/riscv/stack.c b/lib/riscv/stack.c
+> index 2cd7f012738b..a143c22a570a 100644
+> --- a/lib/riscv/stack.c
+> +++ b/lib/riscv/stack.c
+> @@ -5,7 +5,7 @@
+>  #ifdef CONFIG_RELOC
+>  extern char ImageBase, _text, _etext;
+> =20
+> -bool arch_base_address(const void *rebased_addr, unsigned long *addr)
+> +bool base_address(const void *rebased_addr, unsigned long *addr)
+>  {
+>  	unsigned long ra =3D (unsigned long)rebased_addr;
+>  	unsigned long base =3D (unsigned long)&ImageBase;
+> diff --git a/lib/stack.c b/lib/stack.c
+> index 086fec544a81..e1c981085176 100644
+> --- a/lib/stack.c
+> +++ b/lib/stack.c
+> @@ -12,9 +12,10 @@
+>  #define MAX_DEPTH 20
+> =20
+>  #ifdef CONFIG_RELOC
+> +#ifndef HAVE_ARCH_BASE_ADDRESS
+>  extern char _text, _etext;
+> =20
+> -bool __attribute__((weak)) arch_base_address(const void *rebased_addr, u=
+nsigned long *addr)
+> +bool base_address(const void *rebased_addr, unsigned long *addr)
+>  {
+>  	unsigned long ra =3D (unsigned long)rebased_addr;
+>  	unsigned long start =3D (unsigned long)&_text;
+> @@ -26,8 +27,9 @@ bool __attribute__((weak)) arch_base_address(const void=
+ *rebased_addr, unsigned
+>  	*addr =3D ra - start;
+>  	return true;
+>  }
+> +#endif
+>  #else
+> -bool __attribute__((weak)) arch_base_address(const void *rebased_addr, u=
+nsigned long *addr)
+> +bool base_address(const void *rebased_addr, unsigned long *addr)
+>  {
+>  	*addr =3D (unsigned long)rebased_addr;
+>  	return true;
 
+Shouldn't HAVE_ARCH_BASE_ADDRESS also cover this?
+
+Thanks,
+Nick
 
