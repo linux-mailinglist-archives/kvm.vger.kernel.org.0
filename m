@@ -1,271 +1,209 @@
-Return-Path: <kvm+bounces-26587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 815B8975BFE
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 22:46:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 381BC975C76
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 23:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC2E9B23B4B
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 20:46:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59CD41C22162
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 21:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE8A1BF7E5;
-	Wed, 11 Sep 2024 20:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01F7176AA9;
+	Wed, 11 Sep 2024 21:32:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A4CcR5Y9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nUmWm1bv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E930E1BE87A
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 20:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669D51547FB
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 21:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726087371; cv=none; b=F9bAFe1QTDdq5vSKQEDL4qlYu7Lola0XFCIWUHnuW3bBJTy1/iAPeBBApT7tLBF6z682zQSYb5O3CN1s5z4wi37KudvAWETzyYZEYILckAM5WZtRk9MomF/XInez6FpYQDxcjhFlkFmvFJWeq6DRwcWLI6Dz5+jOEVC7NH5MBxQ=
+	t=1726090337; cv=none; b=R757kliPzAUW/RfkSwsKEDcCCqkUk0HGPK/ioaUp84uIi56x9IZMOr9Z6XxunnpcSfcygxsfbsLSat3ipQD9ZOtka9oozmf79jWrJ6P8JD56EaE+Kogyt2LfPelcLguqLC3FnrVUMBSBDgyfN52ujHzacoMtdmDSllsH8djR70A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726087371; c=relaxed/simple;
-	bh=nzjwfSdD3cO6aEdd4P/TaF27B9tCLmQVt0LgI5quIXs=;
+	s=arc-20240116; t=1726090337; c=relaxed/simple;
+	bh=plORcOTuVEPJ+MsdfJHV1BfJY7x844i6ennLD+BS/Tw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gPJDi6SIFP0MtdX7zFQ3mA5dBq+VNpxSK5ERjPJ8CBTuGeDKWkt6blirPwNYubyhey36mnsV5JpNlzrIFt8c6kJgu21wqlqKgnpA2Nq4Ftg548EQeUsnedUPmqc1yjiDiTg2HhUkBqWrdCu7Xd7qugV6Jhdy9w+MviOMmHCg1aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A4CcR5Y9; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=NbiPFsHdURqvEfjOG7isvnhxUMpYAedQC1+fRYSUOyd0kIr7PNwW3Ntq0gkQuIZAE94LCoQfzmYwn4XHImu94fp7ecy06/v538XSO8EYK2p6yOfPeIzCaJLV2bl5tLZH/ll1Y9mHTEde6PUJdYGB4/syUuO4r4i0J0bCdLWFJLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nUmWm1bv; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7d904fe9731so362002a12.3
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 13:42:47 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6d7124939beso10645077b3.2
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 14:32:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726087367; x=1726692167; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=9gVKeS9zxIWQJ6wZPVMMrqlZKwDoa69fsuapAtj2LII=;
-        b=A4CcR5Y9iaOVqaxVdTtTj3/mCmAdEfoENfhxLR5WKQpbImKQzbR0ZY7KsaQxcommsZ
-         oF6hdx6kdRJh3VfhPBAt++bi2Ib1Y3SSeKWwRhd/fX+toIs5OUnj45GdDqekOQ2u2DbI
-         LCxJqXGVuv2BzWbixyq3PNRDu73bnCNJGAQ2sUHpa43ZIAoh9dfNwjp3fvP7GfwRcp15
-         tPPjJMmTHQXXNpI3Di0cWYncSmmofnxo530Szjqh96aj+xtM2DGwt2twpt8WhbzcR+FL
-         AS1DxoA+WobdhDiS7eOoR0TDm55aFB+r7m4195GQmosb2wHWqusaEE7DQjt3wTa6jb0g
-         de8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726087367; x=1726692167;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1726090334; x=1726695134; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9gVKeS9zxIWQJ6wZPVMMrqlZKwDoa69fsuapAtj2LII=;
-        b=SjVZm9sz/bFL47No7ZKiib22WNZRCqG9vgwZll5j5TvnL0qNTBWVuHnGe1R6ly+ro2
-         GiV0K+kZTSSyma+nNvh7tKGupfgO/GflkLvHd00aV1hXTpNy9/Q6vY8mBqv//zCSruCj
-         qPV+sNSOvHiyt4hainR9uZPeuxLe3JhS/NPPr9YXpMwLRzR8OVB6Wqc9rb8smVpcjs/e
-         cjR4+UF6etB+NziEosAoL+8nUUJyHhyIa9upjl94ZYOMMWhxcrqgGEQ1ocNhkkKEy47D
-         zWP78+GUZmvYfUOZKFdlF0IUopJX1reUFmltCdOIIx6oQzVRSrmUSn86utlLFUHdOEH7
-         ycjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWoQMdd0YAQoBk9spNrxeGUrG931v6IQh8LrGXnLKGP8ur0gEkLKUIwD93N9TYnC0Vq9Lw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9jolZRTPCvR8eHak5uEGzTOHGoS7Kw5JLWorZWJmaQFO5IZ/V
-	dF/3f0ZQUu7bThF0/N7k8BuvWLZKsLLcUgjtv6bpw8Ro95s6TcSsda7ldfJWA7+zO+WjaFiNUc9
-	kfA==
-X-Google-Smtp-Source: AGHT+IGelrPvd4nOI5BY8vHHV3fhWRQXV6KTNrZs/VYSkLr9yCzToyzIxt0KpWTMZ3YrjpacOP321gVr5gM=
+        bh=G0tls9TSeYZiERk0YKTQyn2qIGVoqsjolT5VS8LI/f0=;
+        b=nUmWm1bvwptiIt8nbBwLh4zPA9MX3ncI4rCNfpuP67JOqWNsDuzl3keMeSOJYdKP9J
+         wSHjZIy3l1MHMIhBsYIoiSaiY/LhzRt4btQTIHX2rJ3Rv+ak7kxxMdS1SwQA0CI6M9h+
+         o9/5sEGKVRxgj8ipPB6sXhEFML82KG43wr8MkWm1XbxqEmhGscOaMWmOAB3/OCNaDj4x
+         +j4BhCjckJs+A5fL9NhIFtQTNKk/5AhhGEU0xOwTpN5/muiKB79g3i8sbWUmhzBqlrSO
+         YP6+heRusn8Be/WTrGQmvNBXrBYvbIMHVQDyE+nR4UdpCSvBZLN+7B3EF+ErTsgxl6SL
+         Dt7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726090334; x=1726695134;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=G0tls9TSeYZiERk0YKTQyn2qIGVoqsjolT5VS8LI/f0=;
+        b=iXbZ1J/hBW6Mq742WlEWHbZsxyqR0VCRMfh/dperroleQQaXUklWzcXMhlnjLgYNNk
+         rfa8LHxVlIMWjmS/58p7AetKuopVPjpYnFSxm1IsiV7NPJ/RhKxs+T/HbIXaCqwYqQxi
+         ujCY7vgUJs8NsqKTbQ8xld2ldfhDIzxMuzJrclFw63tVVp/FQDGMYDiokvIQrwVsLqvi
+         Qy5P00qr9OEcPapDdinQu5SdGTq3ggVYwsdPP/qy0G4H6MYYaDNz1dzMV0ppwVE/DAgu
+         ZBnKc3ZRX+fPRCaSrURiCZ8wEFQSaucyX9Dmqsd2MryF9eDx74laPJCT+xUBnfHRyD5Z
+         37hA==
+X-Gm-Message-State: AOJu0YzoP5TVKtNxYx4Vpt+e3VNJiM6EQSK1coGY673vnCinFraJMV0y
+	5kdp9kVf0xcJetsDMYhynBOUdL5U3A/8UibfUOugYtZAakyuZ5b5Rz73Mjyb3+HFXbuL2EY/jFl
+	YKQ==
+X-Google-Smtp-Source: AGHT+IEy+FRcMZPJBM3QoM9Z+sg7QH9U7zKXbfsEXEPeme3vnncS+gSnDv69FtYTijg/Y2YEp+Ue2yOV1RA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:721a:0:b0:7cd:6621:8cd5 with SMTP id
- 41be03b00d2f7-7db2057eeb1mr17290a12.3.1726087367261; Wed, 11 Sep 2024
- 13:42:47 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 11 Sep 2024 13:41:58 -0700
-In-Reply-To: <20240911204158.2034295-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:529:b0:e1d:96a7:c9b1 with SMTP id
+ 3f1490d57ef6-e1d9dc2cfd7mr1264276.6.1726090334323; Wed, 11 Sep 2024 14:32:14
+ -0700 (PDT)
+Date: Wed, 11 Sep 2024 14:32:12 -0700
+In-Reply-To: <2E1344D0-E955-4E15-9766-73E3DAA73634@nutanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240911204158.2034295-1-seanjc@google.com>
-X-Mailer: git-send-email 2.46.0.598.g6f2099f65c-goog
-Message-ID: <20240911204158.2034295-14-seanjc@google.com>
-Subject: [PATCH v2 13/13] KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
+References: <DA40912C-CACC-4273-95B8-60AC67DFE317@nutanix.com>
+ <Zt9IeD_15ZsFElIa@google.com> <2E1344D0-E955-4E15-9766-73E3DAA73634@nutanix.com>
+Message-ID: <ZuIMXFVcjVUbf9j9@google.com>
+Subject: Re: KVM: x86: __wait_lapic_expire silently using TPAUSE C0.2
 From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>, James Houghton <jthoughton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Jon Kohler <jon@nutanix.com>
+Cc: "kvm @ vger . kernel . org" <kvm@vger.kernel.org>, 
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>, Fenghua Yu <fenghua.yu@intel.com>, 
+	"kyung.min.park@intel.com" <kyung.min.park@intel.com>, Tony Luck <tony.luck@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add two phases to mmu_stress_test to verify that KVM correctly handles
-guest memory that was writable, and then made read-only in the primary MMU,
-and then made writable again.
+On Tue, Sep 10, 2024, Jon Kohler wrote:
+> How about something like this for the regular ol=E2=80=99 PAUSE route?
+>=20
+> Note: the ndelay side would likely be a bit more annoying to handle to in=
+ternalize
+> to KVM, but perhaps we could just have delay library return the amount of=
+ cycles,
+> and then do the loop I=E2=80=99ve got as a separate, KVM only func?
+>=20
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1627,16 +1627,39 @@ static bool lapic_timer_int_injected(struct kvm_v=
+cpu *vcpu)
+>  static inline void __wait_lapic_expire(struct kvm_vcpu *vcpu, u64 guest_=
+cycles)
+>  {
+>         u64 timer_advance_ns =3D vcpu->arch.apic->lapic_timer.timer_advan=
+ce_ns;
+> +       u64 start, end, delay_by =3D 0;
+> =20
+>         /*
+>          * If the guest TSC is running at a different ratio than the host=
+, then
+> -        * convert the delay to nanoseconds to achieve an accurate delay.=
+  Note
+> -        * that __delay() uses delay_tsc whenever the hardware has TSC, t=
+hus
+> -        * always for VMX enabled hardware.
+> +        * convert the delay to nanoseconds to achieve an accurate delay.
+> +        *
+> +        * Note: open code delay function as KVM's use case is a bit spec=
+ial, as
+> +        * we know we need to reenter the guest at a specific time; howev=
+er, the
+> +        * delay library may introduce architectural delays that we do no=
+t want,
+> +        * such as using TPAUSE. Our mission is to simply get into the gu=
+est as
+> +        * soon as possible without violating architectural constraints.
+> +        * RFC: Keep ndelay for help converting to nsec? or pull that in =
+too?
+>          */
+>         if (vcpu->arch.tsc_scaling_ratio =3D=3D kvm_caps.default_tsc_scal=
+ing_ratio) {
+> -               __delay(min(guest_cycles,
+> -                       nsec_to_cycles(vcpu, timer_advance_ns)));
+> +               delay_by =3D min(guest_cycles,=20
+> +                                          nsec_to_cycles(vcpu, timer_adv=
+ance_ns));
+> +
+> +               if (delay_by =3D=3D 0) {
+> +                       return;
+> +               } else {
+> +                       start =3D rdtsc();
+> +
+> +                       for (;;) {
+> +                               cpu_relax();
+> +                               end =3D rdtsc();
+> +
+> +                               if (delay_by <=3D end - start)
+> +                                       break;
+> +
+> +                               delay_by -=3D end - start;
+> +                               start =3D end;
+> +                       }
 
-Add bonus coverage for x86 and arm64 to verify that all of guest memory was
-marked read-only.  Making forward progress (without making memory writable)
-requires arch specific code to skip over the faulting instruction, but the
-test can at least verify each vCPU's starting page was made read-only for
-other architectures.
+I don't want to replicate __delay() in KVM.  If the delay is short, KVM sho=
+uld
+busy wait and intentionally NOT do PAUSE, i.e. not yield to the SMT sibling=
+(s).
+Because unlike most uses of PAUSE, this CPU isn't waiting on any resource e=
+xcept
+time itself.  E.g. there's no need to give a different CPU cycles so that t=
+he
+other CPU can finish a critical section.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/mmu_stress_test.c | 104 +++++++++++++++++-
- 1 file changed, 101 insertions(+), 3 deletions(-)
+And again, entering the guest so that the vCPU can service the IRQ is a pri=
+ority,
+e.g. see all of the ChromeOS work around paravirt scheduling to boost the p=
+riority
+of vCPUs that have pending IRQs.  Not to mention the physical CPU is runnin=
+g with
+IRQs disabled, i.e. if a _host_ IRQ becomes pending, then entering the gues=
+t is a
+priority in order to recognize that IRQ as well.
 
-diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testing/selftests/kvm/mmu_stress_test.c
-index 50c3a17418c4..c07c15d7cc9a 100644
---- a/tools/testing/selftests/kvm/mmu_stress_test.c
-+++ b/tools/testing/selftests/kvm/mmu_stress_test.c
-@@ -16,6 +16,8 @@
- #include "guest_modes.h"
- #include "processor.h"
- 
-+static bool mprotect_ro_done;
-+
- static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
- {
- 	uint64_t gpa;
-@@ -31,6 +33,42 @@ static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t stride)
- 		*((volatile uint64_t *)gpa);
- 	GUEST_SYNC(2);
- 
-+	/*
-+	 * Write to the region while mprotect(PROT_READ) is underway.  Keep
-+	 * looping until the memory is guaranteed to be read-only, otherwise
-+	 * vCPUs may complete their writes and advance to the next stage
-+	 * prematurely.
-+	 *
-+	 * For architectures that support skipping the faulting instruction,
-+	 * generate the store via inline assembly to ensure the exact length
-+	 * of the instruction is known and stable (vcpu_arch_put_guest() on
-+	 * fixed-length architectures should work, but the cost of paranoia
-+	 * is low in this case).  For x86, hand-code the exact opcode so that
-+	 * there is no room for variability in the generated instruction.
-+	 */
-+	do {
-+		for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
-+#ifdef __x86_64__
-+			asm volatile(".byte 0x48,0x89,0x00" :: "a"(gpa) : "memory"); /* mov %rax, (%rax) */
-+#elif defined(__aarch64__)
-+			asm volatile("str %0, [%0]" :: "r" (gpa) : "memory");
-+#else
-+			vcpu_arch_put_guest(*((volatile uint64_t *)gpa), gpa);
-+#endif
-+	} while (!READ_ONCE(mprotect_ro_done));
-+
-+	/*
-+	 * Only architectures that write the entire range can explicitly sync,
-+	 * as other architectures will be stuck on the write fault.
-+	 */
-+#if defined(__x86_64__) || defined(__aarch64__)
-+	GUEST_SYNC(3);
-+#endif
-+
-+	for (gpa = start_gpa; gpa < end_gpa; gpa += stride)
-+		vcpu_arch_put_guest(*((volatile uint64_t *)gpa), gpa);
-+	GUEST_SYNC(4);
-+
- 	GUEST_ASSERT(0);
- }
- 
-@@ -78,6 +116,7 @@ static void *vcpu_worker(void *data)
- 	struct vcpu_info *info = data;
- 	struct kvm_vcpu *vcpu = info->vcpu;
- 	struct kvm_vm *vm = vcpu->vm;
-+	int r;
- 
- 	vcpu_args_set(vcpu, 3, info->start_gpa, info->end_gpa, vm->page_size);
- 
-@@ -100,6 +139,57 @@ static void *vcpu_worker(void *data)
- 
- 	/* Stage 2, read all of guest memory, which is now read-only. */
- 	run_vcpu(vcpu, 2);
-+
-+	/*
-+	 * Stage 3, write guest memory and verify KVM returns -EFAULT for once
-+	 * the mprotect(PROT_READ) lands.  Only architectures that support
-+	 * validating *all* of guest memory sync for this stage, as vCPUs will
-+	 * be stuck on the faulting instruction for other architectures.  Go to
-+	 * stage 3 without a rendezvous
-+	 */
-+	do {
-+		r = _vcpu_run(vcpu);
-+	} while (!r);
-+	TEST_ASSERT(r == -1 && errno == EFAULT,
-+		    "Expected EFAULT on write to RO memory, got r = %d, errno = %d", r, errno);
-+
-+#if defined(__x86_64__) || defined(__aarch64__)
-+	/*
-+	 * Verify *all* writes from the guest hit EFAULT due to the VMA now
-+	 * being read-only.  x86 and arm64 only at this time as skipping the
-+	 * instruction that hits the EFAULT requires advancing the program
-+	 * counter, which is arch specific and relies on inline assembly.
-+	 */
-+#ifdef __x86_64__
-+	vcpu->run->kvm_valid_regs = KVM_SYNC_X86_REGS;
-+#endif
-+	for (;;) {
-+		r = _vcpu_run(vcpu);
-+		if (!r)
-+			break;
-+		TEST_ASSERT_EQ(errno, EFAULT);
-+#if defined(__x86_64__)
-+		WRITE_ONCE(vcpu->run->kvm_dirty_regs, KVM_SYNC_X86_REGS);
-+		vcpu->run->s.regs.regs.rip += 3;
-+#elif defined(__aarch64__)
-+		vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc),
-+			     vcpu_get_reg(vcpu, ARM64_CORE_REG(regs.pc)) + 4);
-+#endif
-+
-+	}
-+	assert_sync_stage(vcpu, 3);
-+#endif /* __x86_64__ || __aarch64__ */
-+	rendezvous_with_boss();
-+
-+	/*
-+	 * Stage 4.  Run to completion, waiting for mprotect(PROT_WRITE) to
-+	 * make the memory writable again.
-+	 */
-+	do {
-+		r = _vcpu_run(vcpu);
-+	} while (r && errno == EFAULT);
-+	TEST_ASSERT_EQ(r, 0);
-+	assert_sync_stage(vcpu, 4);
- 	rendezvous_with_boss();
- 
- 	return NULL;
-@@ -182,7 +272,7 @@ int main(int argc, char *argv[])
- 	const uint64_t start_gpa = SZ_4G;
- 	const int first_slot = 1;
- 
--	struct timespec time_start, time_run1, time_reset, time_run2, time_ro;
-+	struct timespec time_start, time_run1, time_reset, time_run2, time_ro, time_rw;
- 	uint64_t max_gpa, gpa, slot_size, max_mem, i;
- 	int max_slots, slot, opt, fd;
- 	bool hugepages = false;
-@@ -287,19 +377,27 @@ int main(int argc, char *argv[])
- 	rendezvous_with_vcpus(&time_run2, "run 2");
- 
- 	mprotect(mem, slot_size, PROT_READ);
-+	usleep(10);
-+	mprotect_ro_done = true;
-+	sync_global_to_guest(vm, mprotect_ro_done);
-+
- 	rendezvous_with_vcpus(&time_ro, "mprotect RO");
-+	mprotect(mem, slot_size, PROT_READ | PROT_WRITE);
-+	rendezvous_with_vcpus(&time_rw, "mprotect RW");
- 
-+	time_rw    = timespec_sub(time_rw,     time_ro);
- 	time_ro    = timespec_sub(time_ro,     time_run2);
- 	time_run2  = timespec_sub(time_run2,   time_reset);
- 	time_reset = timespec_sub(time_reset,  time_run1);
- 	time_run1  = timespec_sub(time_run1,   time_start);
- 
- 	pr_info("run1 = %ld.%.9lds, reset = %ld.%.9lds, run2 = %ld.%.9lds, "
--		"ro = %ld.%.9lds\n",
-+		"ro = %ld.%.9lds, rw = %ld.%.9lds\n",
- 		time_run1.tv_sec, time_run1.tv_nsec,
- 		time_reset.tv_sec, time_reset.tv_nsec,
- 		time_run2.tv_sec, time_run2.tv_nsec,
--		time_ro.tv_sec, time_ro.tv_nsec);
-+		time_ro.tv_sec, time_ro.tv_nsec,
-+		time_rw.tv_sec, time_rw.tv_nsec);
- 
- 	/*
- 	 * Delete even numbered slots (arbitrary) and unmap the first half of
--- 
-2.46.0.598.g6f2099f65c-goog
+> +               }
+>         } else {
+>                 u64 delay_ns =3D guest_cycles * 1000000ULL;
+>                 do_div(delay_ns, vcpu->arch.virtual_tsc_khz);
 
+Whatever we do, we should do the same thing irrespective of whether or not =
+TSC
+scaling is in use.  I don't think we have an existing helper to unscale a g=
+uest
+TSC, but it shouldn't be hard to add (do math).
+
+E.g. something like:
+
+	delay_cycles =3D kvm_unscale_tsc(guest_cycles,
+				       vcpu->arch.tsc_scaling_ratio);
+	delay_cyles =3D min(guest_cycles, nsec_to_cycles(vcpu, timer_advance_ns));
+
+	if (delay_cycles > N) {
+		__delay(delay_cycles);
+		return;
+	}
+
+	for (start =3D rdtsc(); rdtsc() - start < delay_cycles); )
+		;
+
+And then I also think we (handwavy "we") should do some profiling to ensure=
+ KVM
+isn't regularly waiting for more than N cycles, where N is probably somethi=
+ng
+like 200.  Because if KVM is regularly waiting for 200+ cycles, then we lik=
+ely
+need to re-tune the timer_advance_ns logic to be more conservative, i.e. er=
+r more
+on the side of the timer arriving slightly late so as not to waste CPU cycl=
+es.
 
