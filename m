@@ -1,161 +1,187 @@
-Return-Path: <kvm+bounces-26547-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26548-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A9F975733
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 17:34:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40BFA975739
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 17:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F29A1F23E1D
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:34:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A8871C21C91
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4C0186E57;
-	Wed, 11 Sep 2024 15:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0506F1AC8A2;
+	Wed, 11 Sep 2024 15:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iQjY4j4j"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CZKrXpkz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101B87E583
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 15:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51E41AC458
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 15:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726068837; cv=none; b=Q7TPiVCJi7kDJo8IHF5NMnOinQE9zQJVrALufBwoF6IzNmUEoF9f8uBa7Yz/z49nlY+L53KBxrixLthDEsVdsAJny9dOW7ta+4+qbEkpn28VQV7ONkiAWd0YRbWKnSCqI+6KvwRA7aU4mGp5kqieU89DnvGn1HYDTv58hslm01s=
+	t=1726068853; cv=none; b=SDSO2y91YOSBOi2TdteD+bkb3aWLk0gyxcTiwgDQd6oGjE4+88Usq2UZweVStLWW6CpES7hygDuVX0lGeOHnlZq/n6+qEPn7NE+p5I6XSTZdop9xBX9FGwu7T5Pu6s9ygqdecQDVvnUSwKFd7EUxfQpbyugm2qa2SX9RlL8pEEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726068837; c=relaxed/simple;
-	bh=ayl5RujrcIoIbZiylngRNpI68XJsjFCab88H7hrJBBY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=g7fSBOrNib6dR68LqViJYUj5H3OyVMcjoEw4/GDt5Th+TfmFSSfhHrZdkurUxrGyVEL0BC1Rbjuaed8itovn7k72iv8Ze71QK232T+vtTnxRtY9d/B75cYJJgtRBKYAZQe0w4lnh+IkdwqDIHJl1ryvNPsmUOqKH71Gx8on7ZF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iQjY4j4j; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2d8e59fcd4bso2477324a91.1
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 08:33:55 -0700 (PDT)
+	s=arc-20240116; t=1726068853; c=relaxed/simple;
+	bh=eA+709nEJaGWuuqo4euF6T+QcJULW+fZtN6qnIYUmcY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A8clQmNK1U3SoAKlaXvgpsmGBB7VDS0e0RNZcZ8YVhLWX2wWL6AFu8SZYg9vPS4bvWxNCDYAA2xxLgJD5CKcG70ih3jRHqX81PBvZhxl5B/cs8/lU0M8d7/55T2y1XiGpYYzuaIsdjkPrjxPRWtzz+JzjP22qUYhkS+fbw+Xfg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CZKrXpkz; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-718d91eef2eso760007b3a.1
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 08:34:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726068835; x=1726673635; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=n9PjfZ/H+0hBJSkcWiHIbXsU+9SAnJ63aVgh3FD7FYE=;
-        b=iQjY4j4jMyoOLMPmtn08rcp/s496Iv7oU5cie4QKYH8RB8aR7r38vq/aGVO30uaedR
-         5NJ9qNEVZEEeS2KI5j7JCdteJ514vcv8KByEp8ji60WtCa47qrn8RmV9luBFrc+DGS2M
-         ctlMDXt4G+VbJE6qeRS5kNnkYWc1nENZq/61mtIkPcdKBxw7RgdTPeugevZlRs/VnOfW
-         +dFcKum7zl6+lq2bCsbVJHM+yt0xe308otlCDCrt9Dx0+JcBRoZD06WKKggxxIxdAMHg
-         /IVRz6TbkDJ1lBuSQvAykfLNj84XVroMmrhfeF/V80BxdUWqrIvL4R5WTyJfwSuGci6F
-         UoYA==
+        d=linaro.org; s=google; t=1726068851; x=1726673651; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eA+709nEJaGWuuqo4euF6T+QcJULW+fZtN6qnIYUmcY=;
+        b=CZKrXpkzdJo74UImz5txF+UZ55gPeiDAV/0AVIkPhjk7emynUSZXFVSLjZdohLe7Wd
+         uStNealuAvBMDYqgl1aO0bP2XcfoyUukZFK00s1M4qaqPAvGUqUTDk2i6MoGO+0qmuzK
+         +7Me1NUjYZqhSVYVAgspU6DzXY8flpbEfu2X2L6pr1ornug7Dk9GoUoMd1Yc57Vupvty
+         pFJMn9dh4NvbclVZHAWgonYE01i7lZ4VcEk0oPw35zJrkgrbjJrQjdKEYFSJzQB83mS0
+         BNbp6O+RK9ah20HFQ1Eyk9guaAX7pEwlbpfO5ATf72O0M0Y4eehKEb051NKERMnM+x9y
+         qEQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726068835; x=1726673635;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=n9PjfZ/H+0hBJSkcWiHIbXsU+9SAnJ63aVgh3FD7FYE=;
-        b=B1XBHOZiU8Le1zcrBgKuXg8Yv2ARMD0YTvzq68/CL5mr590yeDyP2Ai9j9DnXGbL6B
-         F8So/8HqgMU63S5FvsjAmVK0pkduUaE1Agytxc3E61Tq6CfJD7Xy4vhPdq36k9v2n7m6
-         igdAOsvEbxm5ZKtrHG0Osy5lH2192A7rhK1sQ70JjI+2e4Is+C7nGN4V5lYKKTucvXuV
-         Oma89d1R5Ghrn56Gwyh7GWox+DA+6C/HLENIdFl2A38v+CDX9GkqDMbF7YYZ+CKjzesB
-         6LVmQxYJ0emo5HfjO6IFcbcfxw3M/QmLmIkiJ6qnsQMlkvK4UbiNhCl+ZQTyBiqEHbYM
-         c8uw==
-X-Forwarded-Encrypted: i=1; AJvYcCUR/h7KZTMMGekYp7A/dWdCRakdk/ak4malqVK/Ra+iSOmtb8BwZsi3CcVY1RJwVmL6O6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQ7tNfMIunh7PjUAngbqlxPrhVP+lOmOinBqM5PFlGaEkh22W8
-	xagZowYTsa1TVFqiVhyz8mG0JstN3rs76yipeZy85IQikUTF7+LbLq3dzt5b2JV7zVEQSjGXayw
-	aRw==
-X-Google-Smtp-Source: AGHT+IFpZ9ndY7Ts97EEPr2ASMuCzC5PgXkvhoZjCrqJDmQXEhIoN17GXMOiW9kwAQyxWgil0J2fQ/kYSDY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1e50:b0:2d2:453:1501 with SMTP id
- 98e67ed59e1d1-2db82e64986mr19872a91.2.1726068835051; Wed, 11 Sep 2024
- 08:33:55 -0700 (PDT)
-Date: Wed, 11 Sep 2024 08:33:53 -0700
-In-Reply-To: <CADrL8HV1Erpg-D4LzuRHUk7dg6mvex8oQz5pBzwO7A3OjB8Uvw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1726068851; x=1726673651;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eA+709nEJaGWuuqo4euF6T+QcJULW+fZtN6qnIYUmcY=;
+        b=WkVuTc6u7PmTsZtv0FgruN4iK72E1eUNJYHnPCuSFW8fOyN9b4H5VO2uZayioZRJv2
+         jVWzSdzoAYYyCMrpjspH9ibioDk9a1FWUfsrEZmx0PMnLSBje1H6LYcZHQpIK0GVGVBe
+         BDgvqi6X6MUSGUyFMi5fR7e3n1XgktNKB8LE1QWJRh8Tyo9p17o5KtF6P8qa6QHEVYk6
+         XwEVaHh49dLuNPDAb5Nhrq8n5r0Fkh56RxuJq4TB8eGnPgkmRzfOQhONQyVgUTWNTQTV
+         4SHp+2UwggJNPnaMugUDtkxc2G1z7HgQf1IJrwlNm/Aoc+zIXXgf4Hgy6uzRwxTmQnaW
+         GubA==
+X-Forwarded-Encrypted: i=1; AJvYcCXC37Wd1SdPoA5x0rSBOD1HLtLuOv3cO/ISVf993PC32qMhVZpJ/bcOdS7WQAoUJ4CWuK0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0brHCFwUS7bYpTsKumv4zPVmFEF6rHn0WCyrfqC554Tl4vs7P
+	bN4YtmipI5wBwW8eqptSEHO9jrOjl81h9SVKQJpbyZBqJ21F8Qa/1oG6MOBjbSE=
+X-Google-Smtp-Source: AGHT+IFppOMwSoql1QLOJ+22ancIMUpNoJdbhH59Q3aBWEWte2FEb8Yn5UIVH+O8hp1Oz/TnqhIL4A==
+X-Received: by 2002:a05:6a00:2f9b:b0:718:d4e4:a10a with SMTP id d2e1a72fcca58-71907ea941emr10052359b3a.4.1726068850740;
+        Wed, 11 Sep 2024 08:34:10 -0700 (PDT)
+Received: from ?IPV6:2604:3d08:9384:1d00::9633? ([2604:3d08:9384:1d00::9633])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71909003d0esm3222002b3a.93.2024.09.11.08.34.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Sep 2024 08:34:10 -0700 (PDT)
+Message-ID: <b58a2188-3652-4a7a-af10-c7f32b2c6f62@linaro.org>
+Date: Wed, 11 Sep 2024 08:34:06 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-20-seanjc@google.com>
- <CADrL8HWACwbzraG=MbDoORJ8ramDxb-h9yb0p4nx9-wq4o3c6A@mail.gmail.com>
- <Zt9UT74XkezVpTuK@google.com> <CADrL8HW-mOAyF0Gcw7UbkvEvEfcHDxEir0AiStkqYzD5x8ZGpg@mail.gmail.com>
- <Zt9wg6h_bPp8BKtd@google.com> <CADrL8HWbNjv-w-ZJOxkLK78S5RePd2QXDuXV-=4iFVV29uHKyg@mail.gmail.com>
- <Zt-kHjtTVrONMU1V@google.com> <CADrL8HV1Erpg-D4LzuRHUk7dg6mvex8oQz5pBzwO7A3OjB8Uvw@mail.gmail.com>
-Message-ID: <ZuG4YYzozOddPRCm@google.com>
-Subject: Re: [PATCH 19/22] KVM: x86/mmu: Add infrastructure to allow walking
- rmaps outside of mmu_lock
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/39] Use g_assert_not_reached instead of
+ (g_)assert(0,false)
+Content-Language: en-US
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Zhao Liu <zhao1.liu@intel.com>, "Richard W.M. Jones" <rjones@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+ Corey Minyard <minyard@acm.org>, Eric Farman <farman@linux.ibm.com>,
+ Thomas Huth <thuth@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ WANG Xuerui <git@xen0n.name>, Hyman Huang <yong.huang@smartx.com>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ Michael Rolnik <mrolnik@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, qemu-riscv@nongnu.org,
+ Ani Sinha <anisinha@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Jesper Devantier <foss@defmacro.it>, Laurent Vivier <laurent@vivier.eu>,
+ Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov
+ <imammedo@redhat.com>, kvm@vger.kernel.org,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, Fam Zheng
+ <fam@euphon.net>, qemu-s390x@nongnu.org, Hanna Reitz <hreitz@redhat.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Eduardo Habkost <eduardo@habkost.net>,
+ Laurent Vivier <lvivier@redhat.com>, Rob Herring <robh@kernel.org>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-block@nongnu.org,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>, qemu-ppc@nongnu.org,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>,
+ Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Fabiano Rosas <farosas@suse.de>,
+ Helge Deller <deller@gmx.de>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ Yanan Wang <wangyanan55@huawei.com>, Peter Xu <peterx@redhat.com>,
+ Bin Meng <bmeng.cn@gmail.com>, Weiwei Li <liwei1518@gmail.com>,
+ Klaus Jensen <its@irrelevant.dk>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Jason Wang <jasowang@redhat.com>
+References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
+ <cd6c5970-9a1c-4d58-b8af-483909c3c0ca@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <cd6c5970-9a1c-4d58-b8af-483909c3c0ca@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-On Tue, Sep 10, 2024, James Houghton wrote:
-> On Mon, Sep 9, 2024 at 6:42=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Mon, Sep 09, 2024, James Houghton wrote:
-> > > I take back what I said about this working on x86. I think it's
-> > > possible for there to be a race.
-> > >
-> > > Say...
-> > >
-> > > 1. T1 modifies pte_list_desc then unlocks kvm_rmap_unlock().
-> > > 2. T2 then locks kvm_rmap_lock_readonly().
-> > >
-> > > The modifications that T1 has made are not guaranteed to be visible t=
-o
-> > > T2 unless T1 has an smp_wmb() (or equivalent) after the modfication
-> > > and T2 has an smp_rmb() before reading the data.
-> > >
-> > > Now the way you had it, T2, because it uses try_cmpxchg() with full
-> > > ordering, will effectively do a smp_rmb(). But T1 only does an
-> > > smp_wmb() *after dropping the mmu_lock*, so there is a race. While T1
-> > > still holds the mmu_lock but after releasing the kvm_rmap_lock(), T2
-> > > may enter its critical section and then *later* observe the changes
-> > > that T1 made.
-> > >
-> > > Now this is impossible on x86 (IIUC) if, in the compiled list of
-> > > instructions, T1's writes occur in the same order that we have writte=
-n
-> > > them in C. I'm not sure if WRITE_ONCE guarantees that this reordering
-> > > at compile time is forbidden.
-> > >
-> > > So what I'm saying is:
-> > >
-> > > 1. kvm_rmap_unlock() must have an smp_wmb().
-> >
-> > No, because beating a dead horse, this is not generic code, this is x86=
-.
->=20
-> What prevents the compiler from reordering (non-atomic, non-volatile)
-> stores that happen before WRITE_ONCE() in kvm_rmap_unlock() to after
-> the WRITE_ONCE()?
-
-Oof, right, nothing.  Which is why __smp_store_release() has an explicit
-barrier() before its WRITE_ONCE().
-
-> IMV, such a reordering is currently permitted[1] (i.e., a barrier() is
-> missing), and should the compiler choose to do this, the lock will not
-> function correctly.
->=20
-> > If kvm_rmap_head.val were an int, i.e. could be unionized with an atomi=
-c_t, then
-> > I wouldn't be opposed to doing this in the locking code to document thi=
-ngs:
-> >
-> >  s/READ_ONCE/atomic_read_acquire
-> >  s/WRITE_ONCE/atomic_set_release
-> >  s/try_cmpxchg/atomic_cmpxchg_acquire
->=20
-> I think we can use atomic_long_t.
-
-Duh.  That's a /facepalm moment.
-
-> It would be really great if we did a substitution like this. That
-> would address my above concern about barrier() (atomic_set_release,
-> for example, implies a barrier() that we otherwise need to include).
-
-Ya, agreed, not just for warm fuzzies, but because it's necessary to preven=
-t
-the compiler from being clever.
+T24gOS8xMS8yNCAwMTozOSwgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgd3JvdGU6DQo+IE9u
+IDExLzkvMjQgMDA6MTUsIFBpZXJyaWNrIEJvdXZpZXIgd3JvdGU6DQo+IA0KPj4gUGllcnJp
+Y2sgQm91dmllciAoMzkpOg0KPj4gICAgIGRvY3Mvc3BpbjogcmVwbGFjZSBhc3NlcnQoMCkg
+d2l0aCBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgaHcvYWNwaTogcmVwbGFjZSBh
+c3NlcnQoMCkgd2l0aCBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgaHcvYXJtOiBy
+ZXBsYWNlIGFzc2VydCgwKSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBo
+dy9jaGFyOiByZXBsYWNlIGFzc2VydCgwKSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkN
+Cj4+ICAgICBody9jb3JlOiByZXBsYWNlIGFzc2VydCgwKSB3aXRoIGdfYXNzZXJ0X25vdF9y
+ZWFjaGVkKCkNCj4+ICAgICBody9uZXQ6IHJlcGxhY2UgYXNzZXJ0KDApIHdpdGggZ19hc3Nl
+cnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGh3L3dhdGNoZG9nOiByZXBsYWNlIGFzc2VydCgw
+KSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBtaWdyYXRpb246IHJlcGxh
+Y2UgYXNzZXJ0KDApIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIHFvYmpl
+Y3Q6IHJlcGxhY2UgYXNzZXJ0KDApIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4g
+ICAgIHN5c3RlbTogcmVwbGFjZSBhc3NlcnQoMCkgd2l0aCBnX2Fzc2VydF9ub3RfcmVhY2hl
+ZCgpDQo+PiAgICAgdGFyZ2V0L3BwYzogcmVwbGFjZSBhc3NlcnQoMCkgd2l0aCBnX2Fzc2Vy
+dF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgdGVzdHMvcXRlc3Q6IHJlcGxhY2UgYXNzZXJ0KDAp
+IHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIHRlc3RzL3VuaXQ6IHJlcGxh
+Y2UgYXNzZXJ0KDApIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGluY2x1
+ZGUvaHcvczM5MHg6IHJlcGxhY2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNzZXJ0X25vdF9y
+ZWFjaGVkKCkNCj4+ICAgICBibG9jazogcmVwbGFjZSBhc3NlcnQoZmFsc2UpIHdpdGggZ19h
+c3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGh3L2h5cGVydjogcmVwbGFjZSBhc3NlcnQo
+ZmFsc2UpIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGh3L25ldDogcmVw
+bGFjZSBhc3NlcnQoZmFsc2UpIHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAg
+IGh3L252bWU6IHJlcGxhY2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFj
+aGVkKCkNCj4+ICAgICBody9wY2k6IHJlcGxhY2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNz
+ZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBody9wcGM6IHJlcGxhY2UgYXNzZXJ0KGZhbHNl
+KSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBtaWdyYXRpb246IHJlcGxh
+Y2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICB0
+YXJnZXQvaTM4Ni9rdm06IHJlcGxhY2UgYXNzZXJ0KGZhbHNlKSB3aXRoIGdfYXNzZXJ0X25v
+dF9yZWFjaGVkKCkNCj4+ICAgICB0ZXN0cy9xdGVzdDogcmVwbGFjZSBhc3NlcnQoZmFsc2Up
+IHdpdGggZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGFjY2VsL3RjZzogcmVtb3Zl
+IGJyZWFrIGFmdGVyIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBibG9jazogcmVt
+b3ZlIGJyZWFrIGFmdGVyIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBody9hY3Bp
+OiByZW1vdmUgYnJlYWsgYWZ0ZXIgZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4gICAgIGh3
+L2dwaW86IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAg
+ICAgaHcvbWlzYzogcmVtb3ZlIGJyZWFrIGFmdGVyIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkN
+Cj4+ICAgICBody9uZXQ6IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hl
+ZCgpDQo+PiAgICAgaHcvcGNpLWhvc3Q6IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9u
+b3RfcmVhY2hlZCgpDQo+PiAgICAgaHcvc2NzaTogcmVtb3ZlIGJyZWFrIGFmdGVyIGdfYXNz
+ZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICBody90cG06IHJlbW92ZSBicmVhayBhZnRlciBn
+X2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgdGFyZ2V0L2FybTogcmVtb3ZlIGJyZWFr
+IGFmdGVyIGdfYXNzZXJ0X25vdF9yZWFjaGVkKCkNCj4+ICAgICB0YXJnZXQvcmlzY3Y6IHJl
+bW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAgICAgdGVzdHMv
+cXRlc3Q6IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAg
+ICAgdWk6IHJlbW92ZSBicmVhayBhZnRlciBnX2Fzc2VydF9ub3RfcmVhY2hlZCgpDQo+PiAg
+ICAgZnB1OiByZW1vdmUgYnJlYWsgYWZ0ZXIgZ19hc3NlcnRfbm90X3JlYWNoZWQoKQ0KPj4g
+ICAgIHRjZy9sb29uZ2FyY2g2NDogcmVtb3ZlIGJyZWFrIGFmdGVyIGdfYXNzZXJ0X25vdF9y
+ZWFjaGVkKCkNCj4+ICAgICBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6IGVtaXQgZXJyb3Igd2hl
+biB1c2luZyBhc3NlcnQoZmFsc2UpDQo+IA0KPiBJJ20gcXVldWluZyByZXZpZXdlZCBwYXRj
+aGVzIDQsNSw3LDEwLDI3LDI4LDMwLDM2IHNvIHlvdSBkb24ndA0KPiBoYXZlIHRvIGNhcnJ5
+IHRoZW0gaW4gdjIuDQo+IA0KPiBSZWdhcmRzLA0KPiANCj4gUGhpbC4NCg0KSnVzdCBmb3Ig
+dGhlIHNha2Ugb2Ygc2ltcGxpY2l0eSwgYW5kIHRvIG5vdCBtaXNzIGFueXRoaW5nIChvbiBt
+eSBzaWRlKSwgDQpJJ2xsIGtlZXAgdGhvc2UgaW4gdjIuIFdoZW4gcmViYXNpbmcsIG9uY2Ug
+bWVyZ2VkIG9uIG1hc3RlciwgdGhleSB3aWxsIA0KYmUgc2tpcHBlZCBhdXRvbWF0aWNhbGx5
+Lg0KDQpUaGFua3MsDQpQaWVycmljaw0K
 
