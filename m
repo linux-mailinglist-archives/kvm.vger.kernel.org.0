@@ -1,149 +1,169 @@
-Return-Path: <kvm+bounces-26510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AF1897545B
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:46:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF209754A7
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 15:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D8D71F269F0
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 13:46:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 947081F2786D
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 13:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F6E19E980;
-	Wed, 11 Sep 2024 13:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F7F1A3A83;
+	Wed, 11 Sep 2024 13:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PwgnRavr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PVIAQbyv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C7E1A704B
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 13:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9871A2642;
+	Wed, 11 Sep 2024 13:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062055; cv=none; b=sKFYWXLTmoaVQ2zzoHaLvWreJ/LGCPeymOT4YaKfjgemvbEO9SqXEdmnKDkGq2gzFr3eMpu3lG/ZHGlQ3MgLxhdkwXtMF62giPP3z4TL4CHkHRnCjCLHeSemvv2ZoMFZVVyAGnLXd+0KLF7mV0+bFSLE/XyNxoS7OF37X/fDmCw=
+	t=1726062718; cv=none; b=WsLq1bv40Q//r5pIRc6qXJ6JSqslBF1/pHPb+ATBgRVczR3Cru9akEn06prNkqdA02/mLUnLjYuwwjAjQGkHKfDVidDxfVJvXXQy5SrsBpdFa50NDwOO23wAeZMwZdQvj/lvjuCGjefmYtygXmkRm2Xeebm0KSw9Lp4fANR6pgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726062055; c=relaxed/simple;
-	bh=yvPIK3dJ8RsWPzerUzVgZiq/JOY6U2/kNH5HEGIlabg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tHyutuMOeF+zwiVcszIAlNvs/q0RrGXNZZhom7vTDdQPMyjfIiXuSf/Yrr3mczolP6/6oo4Jql2HTR2l7gs12X1i1BXNbrJikJS1+7xaKdghLfPoXY0W+xFfCYh0EjiqvjNQ95Q3E+TucnpD+OUEtcHCk7T0znsmBKj/fQqsSQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PwgnRavr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726062053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A4cGYuzEcsU+H11W5DX5/hXv+/XV9V+6iflAKbWezCQ=;
-	b=PwgnRavrCSkBydV8h7ly1eFoCBI8fAJOXIzwXKyfLlUFPS+ztiv/hoMjmMye1/ZYu29UuF
-	xyY3eNxMoyAPDhltXDP8KJ56UNguaFu4TYk8TEb161NP19+Fd1ZKGLD+wIO3i2K/OxNPdR
-	TvLsEGA8lKpOXqdEdieB44E39LSFSaE=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-WYKnV5kBN6yNOQclWCp1xw-1; Wed, 11 Sep 2024 09:40:52 -0400
-X-MC-Unique: WYKnV5kBN6yNOQclWCp1xw-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4582790fc3cso70234061cf.0
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 06:40:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726062052; x=1726666852;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A4cGYuzEcsU+H11W5DX5/hXv+/XV9V+6iflAKbWezCQ=;
-        b=HlTR3OWqniwxXbj+/THc10cqW0r0XlvUMJV3Cote1JF0M67oobSbZFmFXPLsHwQef/
-         3Rk4UpsxUJUF8KdsNopFLxwedHlpL1+O75bYVz4RDtEIi0gIQt0oJ6hCp91u6JVBlJCm
-         5MPQg3TRPq1Zk+vpGzy/1tc+5GkV77yEsPERAv4FuIxcAP53hbh78A2zO6JDQzD3KxLj
-         pzCxaEYMn7Xo4o1C7BVvNjcLUGCmzcqdDlnhYeM5vFQFlpM6EckOJefr/L8syraYidax
-         hVARnb5iIA+B3sWuysDiY+b0oo9uyRY3umjlPcd0r5tt0NSWgYex41IX9gMWhGTrC1Br
-         2A9g==
-X-Forwarded-Encrypted: i=1; AJvYcCUbAL8t2BiRB9XC081ioXlQf1QgkrAcOW7Q6gJb25aA+4xJM6k6xE6IMfKpwYqdsEmQZ6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRdjBzwlSe+MXqkA7d5JpUacUZ2mE1GYalCPVAsNBCr7dVpbSR
-	ylgwEb/JnXd2hmurBPq3l79f9sopBIwquitnByouIbm76dm3g05+5WjDFKuLMYkRUeo9SBysFJ2
-	gL5JIhKjpnvae1z9FZg5NxWP86c7TgeZVhVol6465kEyDkf8Smg==
-X-Received: by 2002:ac8:57c4:0:b0:458:59e3:2b52 with SMTP id d75a77b69052e-45859e332abmr16950081cf.55.1726062051415;
-        Wed, 11 Sep 2024 06:40:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH9OJUDpC/dDLPTaAj7vE1LX91DjdMwKKxOTbejPT9DFiRR1lsGsySzd/YLuGZUG3kBLFK7Vw==
-X-Received: by 2002:ac8:57c4:0:b0:458:59e3:2b52 with SMTP id d75a77b69052e-45859e332abmr16948861cf.55.1726062049492;
-        Wed, 11 Sep 2024 06:40:49 -0700 (PDT)
-Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45822e60974sm41358491cf.8.2024.09.11.06.40.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 06:40:48 -0700 (PDT)
-Date: Wed, 11 Sep 2024 09:40:45 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Cc: qemu-devel@nongnu.org, Zhao Liu <zhao1.liu@intel.com>,
-	"Richard W.M. Jones" <rjones@redhat.com>,
-	Joel Stanley <joel@jms.id.au>, Kevin Wolf <kwolf@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
-	Corey Minyard <minyard@acm.org>, Eric Farman <farman@linux.ibm.com>,
-	Thomas Huth <thuth@redhat.com>, Keith Busch <kbusch@kernel.org>,
-	WANG Xuerui <git@xen0n.name>, Hyman Huang <yong.huang@smartx.com>,
-	Stefan Berger <stefanb@linux.vnet.ibm.com>,
-	Michael Rolnik <mrolnik@gmail.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>, qemu-riscv@nongnu.org,
-	Ani Sinha <anisinha@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Jesper Devantier <foss@defmacro.it>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Fam Zheng <fam@euphon.net>, qemu-s390x@nongnu.org,
-	Hanna Reitz <hreitz@redhat.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Laurent Vivier <lvivier@redhat.com>, Rob Herring <robh@kernel.org>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	qemu-block@nongnu.org,
-	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-	qemu-ppc@nongnu.org,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>, Helge Deller <deller@gmx.de>,
-	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	Yanan Wang <wangyanan55@huawei.com>, Bin Meng <bmeng.cn@gmail.com>,
-	Weiwei Li <liwei1518@gmail.com>, Klaus Jensen <its@irrelevant.dk>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH 21/39] migration: replace assert(false) with
- g_assert_not_reached()
-Message-ID: <ZuGd3bcawih4bN9Z@x1n>
-References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
- <20240910221606.1817478-22-pierrick.bouvier@linaro.org>
+	s=arc-20240116; t=1726062718; c=relaxed/simple;
+	bh=wO+H1x7RpunI39z5g6QQtUvPj7qwwksh4Ah0uJkrFLE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Rw/PENJTKz9rz6KWNTY1XM5h00osLZb9b1dGQCcsTRTU0+GNtALYe4R2t6g2sYMkTyXf4gAdglVn0UVwC5CftpN1shEBZFQJusRA6XJyF8ah2NUgqbHlfl4Ld9WNWvxiUshXtlkHlSt0lh6Lw4Nk0UeHsXFrq3sX9ZUuc/bwSg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PVIAQbyv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8411BC4CEC0;
+	Wed, 11 Sep 2024 13:51:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726062718;
+	bh=wO+H1x7RpunI39z5g6QQtUvPj7qwwksh4Ah0uJkrFLE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PVIAQbyvTmBKzZc8GMOcpEMjA1U8Ip58tOgkLvur+UCu0ygdjB74YvSN6CACy1jQf
+	 pbKiOr/duVQ7wmo+jNBqrANTjLbcI2lIHZNO8Pn+xYxY+wcg8BOn81FZj/EaizREXr
+	 Oi/iQziLKJLbLJOkSXhvGdbzwaI2p3twd9Ta0dwRYX9T1dmo3Nn5uaosuXwTjxROjh
+	 bVe3xG62EDcdYoLmY2p1QlS1hWH3V09Sn0xZwo1YsNYF7sEnTo0oHdWPviJyc31Gr2
+	 SymSnLlR7woYJ1zprgqdpF0Tr6YawTCaT1acpEuI7jeD55QteQouLsZq0/IfoYzdxr
+	 KXx/gj8OFPJcg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1soNlE-00C7tL-6c;
+	Wed, 11 Sep 2024 14:51:56 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v3 00/24] KVM: arm64: Add EL2 support to FEAT_S1PIE
+Date: Wed, 11 Sep 2024 14:51:27 +0100
+Message-Id: <20240911135151.401193-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240910221606.1817478-22-pierrick.bouvier@linaro.org>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Sep 10, 2024 at 03:15:48PM -0700, Pierrick Bouvier wrote:
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+This series serves a few purposes:
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+- Complete the S1PIE support to include EL2
+- Sneak in the EL2 system register world switch
+
+As mentioned in few of the patches, this implementation relies on a
+very recent fix to the architecture (D22677 in [0]).
+
+* From v2 [2]:
+
+  - Correctly reprogram the context for AT in the fast path when S1PIE
+    is in use
+
+  - Generalised sysreg RES0/RES1 masking, and added TCR2_EL2 RES0/RES1
+    bit handling
+
+  - Fix TCR2_EL1, PIR_EL1, PIRE0_EL1 access with VHE
+
+  - Add a bunch of missing registers to get_el2_to_el1_mapping()
+
+  - Correctly map {TCR2,PIR,PIRE0}_EL2 to their EL1 equivalent on NV
+
+  - Disable hierarchical permissions when S1PIE is enabled
+
+  - Make EL2 world switch directly act on the vcpu rather than an
+    arbitrary context
+
+  - Remove SKL{0,1} from the TCR2_EL2 description
+
+* From the initial posting [1]:
+
+- Rebased on top of the AT support branch, which is currently sitting
+  in kvmarm/next
+
+- Add handling for S1 indirect permission in AT, which I'm sure will
+  give Alexandru another king-sized headache
+
+- Picked Mark Brown's series [3] dealing with TCRX and S1PIE
+  visibility, and slapped an extra fix on top for good measure
+
+- Picked up RBs from Joey, with thanks.
+
+[0] https://developer.arm.com/documentation/102105/ka-04/
+[1] https://lore.kernel.org/r/20240813144738.2048302-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20240903153834.1909472-1-maz@kernel.org
+[3] https://lore.kernel.org/r/20240822-kvm-arm64-hide-pie-regs-v2-0-376624fa829c@kernel.org
+
+Marc Zyngier (21):
+  arm64: Drop SKL0/SKL1 from TCR2_EL2
+  arm64: Remove VNCR definition for PIRE0_EL2
+  arm64: Add encoding for PIRE0_EL2
+  KVM: arm64: nv: Add missing EL2->EL1 mappings in
+    get_el2_to_el1_mapping()
+  KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+  KVM: arm64: nv: Save/Restore vEL2 sysregs
+  KVM: arm64: Correctly access TCR2_EL1, PIR_EL1, PIRE0_EL1 with VHE
+  KVM: arm64: Extend masking facility to arbitrary registers
+  arm64: Define ID_AA64MMFR1_EL1.HAFDBS advertising FEAT_HAFT
+  KVM: arm64: Add TCR2_EL2 to the sysreg arrays
+  KVM: arm64: Sanitise TCR2_EL2
+  KVM: arm64: Add save/restore for TCR2_EL2
+  KVM: arm64: Add PIR{,E0}_EL2 to the sysreg arrays
+  KVM: arm64: Add save/restore for PIR{,E0}_EL2
+  KVM: arm64: Handle PIR{,E0}_EL2 traps
+  KVM: arm64: Sanitise ID_AA64MMFR3_EL1
+  KVM: arm64: Add AT fast-path support for S1PIE
+  KVM: arm64: Split S1 permission evaluation into direct and
+    hierarchical parts
+  KVM: arm64: Disable hierarchical permissions when S1PIE is enabled
+  KVM: arm64: Implement AT S1PIE support
+  KVM: arm64: Rely on visibility to let PIR*_ELx/TCR2_ELx UNDEF
+
+Mark Brown (3):
+  KVM: arm64: Define helper for EL2 registers with custom visibility
+  KVM: arm64: Hide TCR2_EL1 from userspace when disabled for guests
+  KVM: arm64: Hide S1PIE registers from userspace when disabled for
+    guests
+
+ arch/arm64/include/asm/kvm_host.h          |  34 ++-
+ arch/arm64/include/asm/vncr_mapping.h      |   1 -
+ arch/arm64/kvm/at.c                        | 322 +++++++++++++++++----
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
+ arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 155 +++++++++-
+ arch/arm64/kvm/nested.c                    |  34 ++-
+ arch/arm64/kvm/sys_regs.c                  | 129 ++++++++-
+ arch/arm64/tools/sysreg                    |   8 +-
+ include/kvm/arm_arch_timer.h               |   3 +
+ 10 files changed, 597 insertions(+), 96 deletions(-)
 
 -- 
-Peter Xu
+2.39.2
 
 
