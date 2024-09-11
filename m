@@ -1,138 +1,308 @@
-Return-Path: <kvm+bounces-26537-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C798297551A
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 16:17:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB44975513
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 16:15:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 027351C22C4A
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 14:17:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 348141F24663
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 14:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1A419F107;
-	Wed, 11 Sep 2024 14:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EABE619C553;
+	Wed, 11 Sep 2024 14:15:22 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from zero.eik.bme.hu (zero.eik.bme.hu [152.66.115.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942A919DFAC
-	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 14:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.66.115.2
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652D17DA79
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 14:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726064226; cv=none; b=U525Mb/6dHhU5ptvOsXwtO3y3J322IdlruTXeZG+sLppdVDlC6+SK5SOEgKCx6HnO2sXGUecXKyvFAK/RftaKqRVpvNw3xg3V6rxw1vLNrfkfyR774wUy2UKda6NePvH35Nkdn329ykedTrUtM2yVp7aK7j4XhV67O8l+bkhReA=
+	t=1726064122; cv=none; b=hba34l54BhsCHshsxFCDpPmTjP2ZvssLtYN4Ll99P147zh1S5ulKjLvzh3M3uOY2fRbX880ztf53net4dEoWE2YjC9RQancY0dN7gbcZLDpPse9CjT6uSKOBsX+wBz2lnhwNoHNbIMXVnnSxuAll4zmCg3POz6+y/vr314ELASI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726064226; c=relaxed/simple;
-	bh=SOUw5Y4YQMLsjOAljdqcjjuymWDc8Xu/C98I0ot+Gx8=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=KluzvG+hIA4+NP+E4lbZzg7fdCHCnvEy+DpgJUQCLhvyF0Zf9ReOqq2kEss4jLVGqMKaXk1Y6khprdD5sidEz5ouanACXyXGhcdlay3uKDc7DtkfRSk58ciM/iiDNNl1WSlStg1B9P+ftFX+K9VlZIN4E+cSUztkz0XZRMvD4ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu; spf=pass smtp.mailfrom=eik.bme.hu; arc=none smtp.client-ip=152.66.115.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eik.bme.hu
-Received: from zero.eik.bme.hu (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id 667EE4E6004;
-	Wed, 11 Sep 2024 16:10:09 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at eik.bme.hu
-Received: from zero.eik.bme.hu ([127.0.0.1])
- by zero.eik.bme.hu (zero.eik.bme.hu [127.0.0.1]) (amavisd-new, port 10028)
- with ESMTP id YLElQEdkb6ps; Wed, 11 Sep 2024 16:10:07 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
-	id 7534F4E600E; Wed, 11 Sep 2024 16:10:07 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id 7180A746F60;
-	Wed, 11 Sep 2024 16:10:07 +0200 (CEST)
-Date: Wed, 11 Sep 2024 16:10:07 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-cc: qemu-devel@nongnu.org, Zhao Liu <zhao1.liu@intel.com>, 
-    "Richard W.M. Jones" <rjones@redhat.com>, Joel Stanley <joel@jms.id.au>, 
-    Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-    qemu-arm@nongnu.org, Corey Minyard <minyard@acm.org>, 
-    Eric Farman <farman@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, 
-    Keith Busch <kbusch@kernel.org>, WANG Xuerui <git@xen0n.name>, 
-    Hyman Huang <yong.huang@smartx.com>, 
-    Stefan Berger <stefanb@linux.vnet.ibm.com>, 
-    Michael Rolnik <mrolnik@gmail.com>, 
-    Alistair Francis <alistair.francis@wdc.com>, 
-    =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>, 
-    Markus Armbruster <armbru@redhat.com>, 
-    Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, 
-    Palmer Dabbelt <palmer@dabbelt.com>, qemu-riscv@nongnu.org, 
-    Ani Sinha <anisinha@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, 
-    Jesper Devantier <foss@defmacro.it>, Laurent Vivier <laurent@vivier.eu>, 
-    Peter Maydell <peter.maydell@linaro.org>, 
-    Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org, 
-    =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, 
-    Richard Henderson <richard.henderson@linaro.org>, 
-    Fam Zheng <fam@euphon.net>, qemu-s390x@nongnu.org, 
-    Hanna Reitz <hreitz@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, 
-    Eduardo Habkost <eduardo@habkost.net>, Laurent Vivier <lvivier@redhat.com>, 
-    Rob Herring <robh@kernel.org>, 
-    Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-block@nongnu.org, 
-    "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>, qemu-ppc@nongnu.org, 
-    Daniel Henrique Barboza <danielhb413@gmail.com>, 
-    Christian Borntraeger <borntraeger@linux.ibm.com>, 
-    Harsh Prateek Bora <harshpb@linux.ibm.com>, 
-    =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>, 
-    Nina Schoetterl-Glausch <nsg@linux.ibm.com>, 
-    "Michael S. Tsirkin" <mst@redhat.com>, Fabiano Rosas <farosas@suse.de>, 
-    Helge Deller <deller@gmx.de>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, 
-    Daniel Henrique Barboza <dbarboza@ventanamicro.com>, 
-    Akihiko Odaki <akihiko.odaki@daynix.com>, 
-    Marcelo Tosatti <mtosatti@redhat.com>, 
-    David Gibson <david@gibson.dropbear.id.au>, 
-    Aurelien Jarno <aurelien@aurel32.net>, 
-    Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, 
-    Yanan Wang <wangyanan55@huawei.com>, Peter Xu <peterx@redhat.com>, 
-    Bin Meng <bmeng.cn@gmail.com>, Weiwei Li <liwei1518@gmail.com>, 
-    Klaus Jensen <its@irrelevant.dk>, 
-    Jean-Christophe Dubois <jcd@tribudubois.net>, 
-    Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH 20/39] hw/ppc: replace assert(false) with
- g_assert_not_reached()
-In-Reply-To: <20240910221606.1817478-21-pierrick.bouvier@linaro.org>
-Message-ID: <232858c7-6270-f763-adfc-b6c8259bf021@eik.bme.hu>
-References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org> <20240910221606.1817478-21-pierrick.bouvier@linaro.org>
+	s=arc-20240116; t=1726064122; c=relaxed/simple;
+	bh=C/fI7kaD7EtAk3Iav89lmxsAr0NqFH6Ak9vhkIs7pSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WMmlfpqO0pMoDFm3hKTlKIDvFEe6JRK4bwb8QhdsnNPfIaL4LufpxtawJpfX4J55gOZEHgHDX9BbSma9lPny80x9SBajuep4Jlrkp/2uwgZf6x62fKBe6q8Welv3izo1UY434HZ8+18PCYW2u5NRezkHQ90jMRMdOcf2Fw5KjsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 701331007;
+	Wed, 11 Sep 2024 07:15:49 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8BC303F73B;
+	Wed, 11 Sep 2024 07:15:18 -0700 (PDT)
+Date: Wed, 11 Sep 2024 15:15:13 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 18/24] KVM: arm64: Split S1 permission evaluation into
+ direct and hierarchical parts
+Message-ID: <20240911141513.GA1080224@e124191.cambridge.arm.com>
+References: <20240911135151.401193-1-maz@kernel.org>
+ <20240911135151.401193-19-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911135151.401193-19-maz@kernel.org>
 
-
-
-On Tue, 10 Sep 2024, Pierrick Bouvier wrote:
-
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+On Wed, Sep 11, 2024 at 02:51:45PM +0100, Marc Zyngier wrote:
+> The AArch64.S1DirectBasePermissions() pseudocode deals with both
+> direct and hierarchical S1 permission evaluation. While this is
+> probably convenient in the pseudocode, we would like a bit more
+> flexibility to slot things like indirect permissions.
+> 
+> To that effect, split the two permission check parts out of
+> handle_at_slow() and into their own functions. The permissions
+> are passed around in a new s1_perms type that contains the
+> individual permissions across the flow.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
-> hw/ppc/spapr_events.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index cb0eeee5874..38ac1cb7866 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -645,7 +645,7 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
->         /* we shouldn't be signaling hotplug events for resources
->          * that don't support them
->          */
-> -        g_assert(false);
-> +        g_assert_not_reached();
->         return;
->     }
+>  arch/arm64/kvm/at.c | 164 ++++++++++++++++++++++++++------------------
+>  1 file changed, 99 insertions(+), 65 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 73b2ee662f371..d6ee3a5c30bc2 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -47,6 +47,10 @@ struct s1_walk_result {
+>  	bool	failed;
+>  };
+>  
+> +struct s1_perms {
+> +	bool	ur, uw, ux, pr, pw, px;
+> +};
+> +
+>  static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
+>  {
+>  	wr->fst		= fst;
+> @@ -764,111 +768,141 @@ static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+>  	return sctlr & SCTLR_EL1_EPAN;
+>  }
+>  
+> -static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +static void compute_s1_direct_permissions(struct kvm_vcpu *vcpu,
+> +					  struct s1_walk_info *wi,
+> +					  struct s1_walk_result *wr,
+> +					  struct s1_perms *s1p)
+>  {
+> -	bool perm_fail, ur, uw, ux, pr, pw, px;
+> -	struct s1_walk_result wr = {};
+> -	struct s1_walk_info wi = {};
+> -	int ret, idx;
+> -
+> -	ret = setup_s1_walk(vcpu, op, &wi, &wr, vaddr);
+> -	if (ret)
+> -		goto compute_par;
+> -
+> -	if (wr.level == S1_MMU_DISABLED)
+> -		goto compute_par;
+> -
+> -	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> -
+> -	ret = walk_s1(vcpu, &wi, &wr, vaddr);
+> -
+> -	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> -
+> -	if (ret)
+> -		goto compute_par;
+> -
+> -	/* FIXME: revisit when adding indirect permission support */
+> -	/* AArch64.S1DirectBasePermissions() */
+> -	if (wi.regime != TR_EL2) {
+> -		switch (FIELD_GET(PTE_USER | PTE_RDONLY, wr.desc)) {
+> +	/* Non-hierarchical part of AArch64.S1DirectBasePermissions() */
+> +	if (wi->regime != TR_EL2) {
+> +		switch (FIELD_GET(PTE_USER | PTE_RDONLY, wr->desc)) {
+>  		case 0b00:
+> -			pr = pw = true;
+> -			ur = uw = false;
+> +			s1p->pr = s1p->pw = true;
+> +			s1p->ur = s1p->uw = false;
+>  			break;
+>  		case 0b01:
+> -			pr = pw = ur = uw = true;
+> +			s1p->pr = s1p->pw = s1p->ur = s1p->uw = true;
+>  			break;
+>  		case 0b10:
+> -			pr = true;
+> -			pw = ur = uw = false;
+> +			s1p->pr = true;
+> +			s1p->pw = s1p->ur = s1p->uw = false;
+>  			break;
+>  		case 0b11:
+> -			pr = ur = true;
+> -			pw = uw = false;
+> +			s1p->pr = s1p->ur = true;
+> +			s1p->pw = s1p->uw = false;
+>  			break;
+>  		}
+>  
+> -		switch (wr.APTable) {
+> +		/* We don't use px for anything yet, but hey... */
+> +		s1p->px = !((wr->desc & PTE_PXN) || s1p->uw);
+> +		s1p->ux = !(wr->desc & PTE_UXN);
+> +	} else {
+> +		s1p->ur = s1p->uw = s1p->ux = false;
+> +
+> +		if (!(wr->desc & PTE_RDONLY)) {
+> +			s1p->pr = s1p->pw = true;
+> +		} else {
+> +			s1p->pr = true;
+> +			s1p->pw = false;
+> +		}
+> +
+> +		/* XN maps to UXN */
+> +		s1p->px = !(wr->desc & PTE_UXN);
+> +	}
+> +}
+> +
+> +static void compute_s1_hierarchical_permissions(struct kvm_vcpu *vcpu,
+> +						struct s1_walk_info *wi,
+> +						struct s1_walk_result *wr,
+> +						struct s1_perms *s1p)
+> +{
 
-If break does not make sense after g_assert_not_reached() and removed then 
-return is the same here.
+How about:
 
-It may make the series shorter and easier to check that none of these are 
-missed if this is done in the same patch where the assert is changed 
-instead of separate patches. It's unlikely that the assert change and 
-removal of the following break or return would need to be reverted 
-separately so it's a simple enough change to put in one patch in my 
-opinion but I don't mink if it's kept separate either.
+	if (wi->hpd)
+		return;
 
-Regards,
-BALATON Zoltan
+> +	/* Hierarchical part of AArch64.S1DirectBasePermissions() */
+> +	if (wi->regime != TR_EL2) {
+> +		switch (wr->APTable) {
+>  		case 0b00:
+>  			break;
+>  		case 0b01:
+> -			ur = uw = false;
+> +			s1p->ur = s1p->uw = false;
+>  			break;
+>  		case 0b10:
+> -			pw = uw = false;
+> +			s1p->pw = s1p->uw = false;
+>  			break;
+>  		case 0b11:
+> -			pw = ur = uw = false;
+> +			s1p->pw = s1p->ur = s1p->uw = false;
+>  			break;
+>  		}
+>  
+> -		/* We don't use px for anything yet, but hey... */
+> -		px = !((wr.desc & PTE_PXN) || wr.PXNTable || uw);
+> -		ux = !((wr.desc & PTE_UXN) || wr.UXNTable);
+> -
+> -		if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
+> -			bool pan;
+> -
+> -			pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
+> -			pan &= ur || uw || (pan3_enabled(vcpu, wi.regime) && ux);
+> -			pw &= !pan;
+> -			pr &= !pan;
+> -		}
+> +		s1p->px &= !wr->PXNTable;
+> +		s1p->ux &= !wr->UXNTable;
+>  	} else {
+> -		ur = uw = ux = false;
+> +		if (wr->APTable & BIT(1))
+> +			s1p->pw = false;
+>  
+> -		if (!(wr.desc & PTE_RDONLY)) {
+> -			pr = pw = true;
+> -		} else {
+> -			pr = true;
+> -			pw = false;
+> -		}
+> +		/* XN maps to UXN */
+> +		s1p->px &= !wr->UXNTable;
+> +	}
+> +}
+>  
+> -		if (wr.APTable & BIT(1))
+> -			pw = false;
+> +static void compute_s1_permissions(struct kvm_vcpu *vcpu, u32 op,
+> +				   struct s1_walk_info *wi,
+> +				   struct s1_walk_result *wr,
+> +				   struct s1_perms *s1p)
+> +{
+> +	compute_s1_direct_permissions(vcpu, wi, wr, s1p);
+> +	compute_s1_hierarchical_permissions(vcpu, wi, wr, s1p);
+>  
+> -		/* XN maps to UXN */
+> -		px = !((wr.desc & PTE_UXN) || wr.UXNTable);
+> +	if (op == OP_AT_S1E1RP || op == OP_AT_S1E1WP) {
+> +		bool pan;
+> +
+> +		pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
+> +		pan &= s1p->ur || s1p->uw || (pan3_enabled(vcpu, wi->regime) && s1p->ux);
+> +		s1p->pw &= !pan;
+> +		s1p->pr &= !pan;
+>  	}
+> +}
+> +
+> +static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +{
+> +	struct s1_walk_result wr = {};
+> +	struct s1_walk_info wi = {};
+> +	struct s1_perms s1p = {};
+> +	bool perm_fail = false;
+> +	int ret, idx;
+> +
+> +	ret = setup_s1_walk(vcpu, op, &wi, &wr, vaddr);
+> +	if (ret)
+> +		goto compute_par;
+> +
+> +	if (wr.level == S1_MMU_DISABLED)
+> +		goto compute_par;
+> +
+> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> +
+> +	ret = walk_s1(vcpu, &wi, &wr, vaddr);
+> +
+> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +
+> +	if (ret)
+> +		goto compute_par;
+>  
+> -	perm_fail = false;
+> +	compute_s1_permissions(vcpu, op, &wi, &wr, &s1p);
+>  
+>  	switch (op) {
+>  	case OP_AT_S1E1RP:
+>  	case OP_AT_S1E1R:
+>  	case OP_AT_S1E2R:
+> -		perm_fail = !pr;
+> +		perm_fail = !s1p.pr;
+>  		break;
+>  	case OP_AT_S1E1WP:
+>  	case OP_AT_S1E1W:
+>  	case OP_AT_S1E2W:
+> -		perm_fail = !pw;
+> +		perm_fail = !s1p.pw;
+>  		break;
+>  	case OP_AT_S1E0R:
+> -		perm_fail = !ur;
+> +		perm_fail = !s1p.ur;
+>  		break;
+>  	case OP_AT_S1E0W:
+> -		perm_fail = !uw;
+> +		perm_fail = !s1p.uw;
+>  		break;
+>  	case OP_AT_S1E1A:
+>  	case OP_AT_S1E2A:
+> -- 
+> 2.39.2
+> 
 
