@@ -1,109 +1,138 @@
-Return-Path: <kvm+bounces-26498-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26499-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584D297507E
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 13:11:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E18D97509E
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 13:17:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BE3D1C22AF8
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 11:11:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7AFB1F2179C
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2024 11:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29CD186617;
-	Wed, 11 Sep 2024 11:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C433C187349;
+	Wed, 11 Sep 2024 11:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tbd2WXUW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dIVYljLb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 479C148CDD;
-	Wed, 11 Sep 2024 11:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A1918733C
+	for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 11:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726053071; cv=none; b=ESpoKIzpbTWbQEIJNGLw0F1Jpb4kchiQE6P4mNmoSW+3iJsApKw8U1B/+nvAZnVo+ZZa86J7TdznxcnNnpZ6kyj1LIk4x0ke3IVNq34svjg9herOVohn6TRNlCCuFf4TPeQw5ZhxftxQzWb27WNYbx0cRpLpVW6lzAp4JpjhJFA=
+	t=1726053386; cv=none; b=VnHvU06ZdBDwTjdMDAV08aJhAQ1VBv7R5QhusOsmlMzchjtxWahcfGXbNITiy/+hla35yv/fGxy1ai6f1qXb5ffIWT1AfCvtOVe9EaH+FXrj3xObDAdD+l9rKTLUXBIBzNuWveQ+0CKFRwQ817HruOyoFa4wUEgrX39Z6mxyAa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726053071; c=relaxed/simple;
-	bh=TJKUhgN6N7ctiISRF1YLUsjTx+p+elgwMQtDSzGiZqA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G697zVdktwAOlow/AqZ9bNHzPG2BDqyWxBokAmfqvKaMmkGEXM8+x9EoYpcM7YiPzUbM3hwi4+kuX7qCh2r5PTWAqmxHX7H5WMr6e+EWsYSQThyZxOpCoUxUOYnsOAahvIZ2wu2ocwQNN6vmjiOSbch0C952fIysLKQd99pOCXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tbd2WXUW; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726053070; x=1757589070;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TJKUhgN6N7ctiISRF1YLUsjTx+p+elgwMQtDSzGiZqA=;
-  b=Tbd2WXUWNb+caqP1QIu48/vIQo70dnUGOh6qovFxREaiiEy4Ze7Oo00l
-   xjLG9/JamsKPEnGggcSiMq7xcDgFyK+/guV9ZIqa+HyUcG/t92MSVKa7c
-   m7AgVlDDo008YU+n2Avd5Xr6jgwgyR8GEbY1KluIkoGW35zXdWvG6TemB
-   +ZQf1Q2y7A1n/E15X6enspaWLoG1vZzdV0+vqG0LTZKc2kAoo/D23IZSr
-   WleXpRu34Oeo6/q3xRX8drVgM/Cf9Y2m2naM3n7DTv/UDZjttzab4ifqW
-   iEPcHnEK/1XT6LPyAxbSqPc6lNgtl4W86EzB21ods33X0hDgYwUXutjrg
-   A==;
-X-CSE-ConnectionGUID: uCa2n2tIRIWb63rAC9q3jQ==
-X-CSE-MsgGUID: rB+G4yBjRLO7FBbFe5e1xg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11191"; a="35413477"
-X-IronPort-AV: E=Sophos;i="6.10,219,1719903600"; 
-   d="scan'208";a="35413477"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2024 04:11:09 -0700
-X-CSE-ConnectionGUID: EyLeILBhT8GqQ9iza4CQjw==
-X-CSE-MsgGUID: Ofww2NsUTBqempbtf7Le5w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,219,1719903600"; 
-   d="scan'208";a="72324954"
-Received: from bergbenj-mobl1.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.117])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2024 04:11:05 -0700
-Date: Wed, 11 Sep 2024 14:11:01 +0300
-From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Xu Yilun <yilun.xu@linux.intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
-	kvm@vger.kernel.org, kai.huang@intel.com, isaku.yamahata@gmail.com,
-	xiaoyao.li@intel.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 21/25] KVM: x86: Introduce KVM_TDX_GET_CPUID
-Message-ID: <ZuF6xa9RAR5dEf3f@tlindgre-MOBL1>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-22-rick.p.edgecombe@intel.com>
- <ZsLRyk5F9SRgafIO@yilunxu-OptiPlex-7050>
- <Zta4if4oEHiAIkz7@tlindgre-MOBL1>
- <a59e021f-fe90-41d1-aa8d-6ce0a0abcfcc@redhat.com>
+	s=arc-20240116; t=1726053386; c=relaxed/simple;
+	bh=wTtci8eoVgZsRM2qXAmiFpLpC6jRu1ELaLXAPR2rZro=;
+	h=Date:Message-Id:Mime-Version:Subject:From:To:Cc:Content-Type; b=hRlsovQ8YNt/56LbKrdkjp+UMo8hKXfCu8yb/gYafOpPC2rpnTNULDqb/8ed2YLcvLIJ9BtUTFufmC/drKQGdvLUpjV5pZ04o1B2uzULFwqJ1pLksoX4f1tjozNwRXJHdpP4b5ZHTCQSqo91Q0cK8jJTWirl+jJwZxvetA0l6so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dIVYljLb; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-69a0536b23aso185690167b3.3
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 04:16:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726053383; x=1726658183; darn=vger.kernel.org;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rZeN3m7JwHd+aiSOQFFXykrHDvl9NFzT+dwyqVmXC5I=;
+        b=dIVYljLbDhJUYptPLiTqDqcC/sP1fKbYMXxWG82HHUpG8NBIgkjdLEGJXVUS0cJgjU
+         uj9GkUVOnSltYD1t2Pcgds+7L+l3IygfA5LNriyEsA6ubvdJUFkXSWj2xp2fv+AE3eIi
+         OL9UE8UxGfoSxLu8i6BCfjHiEsi3NeyfShVKcQbwMnVoHzk3VE3K4Il7nH4C2J+EZKZv
+         cGgZZWSK9px18piAf0U5hlbYL+cKbqZ8/+PktEU6ilSC2aX0SFfQ4fCScXye40xOEJxx
+         1ahZ0gV/3FnkMl6mHsuSiPFiZH8V+c5Reispc5GTek3oKh9MDSF6zokP8bS+TGCZpoLd
+         vI4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726053383; x=1726658183;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rZeN3m7JwHd+aiSOQFFXykrHDvl9NFzT+dwyqVmXC5I=;
+        b=d64fbjX9S/o1lXEOje6MugA9KfkySngZKNZYteNzkG14tcjpRJTdtUfbmq1Zce7Ewu
+         mTRsKgtZ6XxNH8NxqdCoBovtjB0PNwCj1lNayolIxVUBflNuELsLkE2/qiCvof21uzM7
+         gCBz46YTvDJfVxw2q3I7o5bf2sL5HBFUNhrPt543e0VfjuE8x3x72uiglHoyP213FtLj
+         8lOs6+dLpHdP/ncbz1aGiorgNJ5VGq1CDG8HeQVjQcXs3CQZI0hUI7f0V6zg2HY+d313
+         WLQnCteijBlE+MktSEJWcaqgsSsctAbvaJU02kT87ZYPKAACwt9wIGdK+jmKrYsomJA5
+         oKBA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBkKiuQkvLj8YjXsMd/mAEiwsu6cwxQv41ZMDzhF3Vlvv8FDjxCVPpKtpeguaKJjuM6nY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxjs+wZSvJzGyp9+7S7TbpIq/y3wRatTC321rNkzmzlaTYZNMV2
+	fZhripGLeIC3oNCG+HiKwCwW//8T1BJAj0JVT84dPBJgkEDx8D091lte0cpRdNp8FcWPnxoFoIj
+	bzdlAvnmZUQ==
+X-Google-Smtp-Source: AGHT+IFLsShVm8R7NpJci0/1+sfejlskACPnpCLygmEyKH0O7KOx81HYO532YTKxSmiWzym78Cq5wyJCyqBjWg==
+X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:23ef:6338:5fb3:dbb0])
+ (user=suleiman job=sendgmr) by 2002:a25:df4c:0:b0:e0b:f93:fe8c with SMTP id
+ 3f1490d57ef6-e1d346b2ca3mr52914276.0.1726053383366; Wed, 11 Sep 2024 04:16:23
+ -0700 (PDT)
+Date: Wed, 11 Sep 2024 20:15:22 +0900
+Message-Id: <20240911111522.1110074-1-suleiman@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a59e021f-fe90-41d1-aa8d-6ce0a0abcfcc@redhat.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.598.g6f2099f65c-goog
+Subject: [PATCH v2] sched: Don't try to catch up excess steal time.
+From: Suleiman Souhlal <suleiman@google.com>
+To: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>
+Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Valentin Schneider <vschneid@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, joelaf@google.com, 
+	vineethrp@google.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	ssouhlal@freebsd.org, Srikar Dronamraju <srikar@linux.ibm.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Sean Christopherson <seanjc@google.com>, 
+	Suleiman Souhlal <suleiman@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 10, 2024 at 07:29:13PM +0200, Paolo Bonzini wrote:
-> On 9/3/24 09:19, Tony Lindgren wrote:
-> > > > +			gpa_t gpa_bits = gfn_to_gpa(kvm_gfn_direct_bits(vcpu->kvm));
-> > > > +			unsigned int g_maxpa = __ffs(gpa_bits) + 1;
-> > > > +
-> > > > +			output_e->eax &= ~0x00ff0000;
-> > > > +			output_e->eax |= g_maxpa << 16;
-> > > Is it possible this workaround escapes the KVM supported bits check?
-> > 
-> > Yes it might need a mask for (g_maxpa << 16) & 0x00ff0000 to avoid setting
-> > the wrong bits, will check.
-> 
-> The mask is okay, __ffs(gpa_bits) + 1 will be between 1 and 64.
+When steal time exceeds the measured delta when updating clock_task, we
+currently try to catch up the excess in future updates.
+However, this results in inaccurate run times for the future things using
+clock_task, as they end up getting additional steal time that did not
+actually happen.
 
-OK
+For example, suppose a task in a VM runs for 10ms and had 15ms of steal
+time reported while it ran. clock_task rightly doesn't advance. Then, a
+different taks runs on the same rq for 10ms without any time stolen in
+the host.
+Because of the current catch up mechanism, clock_sched inaccurately ends
+up advancing by only 5ms instead of 10ms even though there wasn't any
+actual time stolen. The second task is getting charged for less time
+than it ran, even though it didn't deserve it.
+This can result in tasks getting more run time than they should actually
+get.
 
-> The question is whether the TDX module will accept nonzero bits 16..23 of
-> CPUID[0x80000008].EAX.
+So, we instead don't make future updates pay back past excess stolen time.
 
-Just for reference, that's the 0x80000008 quirk as you noticed in 22/25.
+Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+---
+v2:
+- Slightly changed to simply moving one line up instead of adding
+  new variable.
 
-Regards,
+v1: https://lore.kernel.org/lkml/20240806111157.1336532-1-suleiman@google.com
+---
+ kernel/sched/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Tony
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index f3951e4a55e5..6c34de8b3fbb 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -730,11 +730,11 @@ static void update_rq_clock_task(struct rq *rq, s64 delta)
+ 	if (static_key_false((&paravirt_steal_rq_enabled))) {
+ 		steal = paravirt_steal_clock(cpu_of(rq));
+ 		steal -= rq->prev_steal_time_rq;
++		rq->prev_steal_time_rq += steal;
+ 
+ 		if (unlikely(steal > delta))
+ 			steal = delta;
+ 
+-		rq->prev_steal_time_rq += steal;
+ 		delta -= steal;
+ 	}
+ #endif
+-- 
+2.46.0.598.g6f2099f65c-goog
+
 
