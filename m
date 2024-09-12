@@ -1,113 +1,160 @@
-Return-Path: <kvm+bounces-26708-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26709-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C3CB976A1C
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 15:12:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 050EF976A4D
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 15:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46AC61C232DB
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 13:12:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C06AF28527D
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 13:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04401AB6F1;
-	Thu, 12 Sep 2024 13:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558611AD245;
+	Thu, 12 Sep 2024 13:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="CKxcCSwR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X4xfHfDS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22E21A42B3
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 13:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5163185B60;
+	Thu, 12 Sep 2024 13:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726146725; cv=none; b=H4h5qes816XRP97P6umIWVlTqhjD49bPpWn2gZImKMf0fzRS1S+DMz3qLRzElyDf++hprxDA3esoq70L0PYjB8gH26CvsiTcTYFbbtpC69VgaQ9WNOtoYfT49LeVpRjxyq+LKoM6wr2mklL4L8DV4TBqleb7vDBslNcGwwNTrrQ=
+	t=1726147055; cv=none; b=La7yNFJcZ8bw81WM1qDt6EH1uCzT9l3rdW/TOcWR+EE5qSz/pt17N/VEBq6oQQ1Wscs6yQ1kl9oBvEucZVfh6m93+cOSGi5ngVyYO3IUaYMcIFQUlzTewOqOehCttQRv7IEQGy/Bc6hhMf8sQZ38sywWrRmW8t3sC/yxBQsfO8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726146725; c=relaxed/simple;
-	bh=RaydOSJFL3Q9Fw7f0XuBKFvCOwlO2D1b/uIs9scmK6s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pQGUuV6Y5ce1D+bUQqFNxiB0rWjkPIbDTh7h7aEyqQXtph9nYIHfQxuCAb3G1FROxA1VxBVS5BNvO7Nnf6gr1m1jDki1ZRIVtZ8+EOhy0l4jVSlO1ahFCarUryFPuOe9PgKNcfi2QwXo30sV35Qq4GZjaVBKSwXo68HLTqwxaRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=CKxcCSwR; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7a99e8ad977so62492485a.3
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 06:12:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1726146721; x=1726751521; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VBD1supAppfnGRodOiWLEHyXSpQurWFz61I765SalUk=;
-        b=CKxcCSwRlcQuIVHcElXMPyQ2gIgVj1QyFGTHHrqdZoIDWjvjlEuUaCEFecmFI5xqLi
-         ZXze9mK1O0RsHTpXK2sKunz0ziAKPEJoCiD0nw+FjO05EAm+w0IrlDOUBQQNnIj88EcI
-         ejLLCP03LYePKuOR0X4dYZ8NmlDF9hg00iBDJHqUP8MCMN0bENu5Rh//ott/e7iQI1GU
-         fZPy5d7r7ZstUEhS6V+CKWWCs3DobzW5L0ovZs+pMzXft4h3ZYl8B84hFPEvzfUH8z95
-         tUfonciUhStqheDdIT1jIpzCIX5G8CubuwTOXaTLMlffuZ8g93N2P30vw3Ess1siIwba
-         3gVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726146721; x=1726751521;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VBD1supAppfnGRodOiWLEHyXSpQurWFz61I765SalUk=;
-        b=w+bH8qnMDXMSvLFKWzjqmTdOBBieC2p9y8ABSkW+yOoXUD0vHB0JSOxp/FYurtD3zu
-         SvnbGYMnkHLVKM/b8Govj50vjCrM46m3siU8vGdSAKEOEZrfnuTuLzFqgAchlja2UFJK
-         1HSGYG8MlLSViw/qYJzBdnn7zzdI7hoeRClO3DZYkbgD18C81RN3erQcaEtVrEWG0fYz
-         zKCpDoh+yEg1rpLThatQejPB1XFusrZjXba++Vr6TXwbfUf3Zfcjgb6eqq6uzMYq9aiP
-         1n2TcNJHjKZwxcqdFMrB8+o/MqxpbMemqOUzk/3fWN7BUgaCEZukmM4OGJfxxQLanGbs
-         zoPA==
-X-Forwarded-Encrypted: i=1; AJvYcCW+SPJkpe0NJwQKHB0IugJcdB51pOmpCjBZRPDXtONnYwFOxVokYjv0VDi4HYG6/FYE08o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMrFA8U5BV6bF11KqdeuaRLzYZ0XW4BOmfj2YkZexsoXw36CEq
-	tf0JyIYi31CR4l0b/VCpbTIqRfeThwD6pPpl2ukSO9FnqmITC/ve5tbx1dnELFc=
-X-Google-Smtp-Source: AGHT+IG9WyRXWSNrKA444XIFeHToPFPIZbf+sv4Odz1gHEboQOTlEfHF2PRWRKXrNZsoGdWZluUUWQ==
-X-Received: by 2002:a05:620a:2a01:b0:79f:1cf:551e with SMTP id af79cd13be357-7a9e5ee5707mr318668085a.5.1726146720738;
-        Thu, 12 Sep 2024 06:12:00 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a9a7a283adsm533918285a.129.2024.09.12.06.12.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 06:12:00 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sojc7-00CzIH-H0;
-	Thu, 12 Sep 2024 10:11:59 -0300
-Date: Thu, 12 Sep 2024 10:11:59 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Kunwu Chan <chentao@kylinos.cn>, Ankit Agrawal <ankita@nvidia.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] vfio/pci: clean up a type in
- vfio_pci_ioctl_pci_hot_reset_groups()
-Message-ID: <20240912131159.GC1304783@ziepe.ca>
-References: <262ada03-d848-4369-9c37-81edeeed2da2@stanley.mountain>
+	s=arc-20240116; t=1726147055; c=relaxed/simple;
+	bh=tTnRmX+6RHq0ncXVXSOVD+Hvk28tzNe+cSrBE1j1oiE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Jm/ZlFNRf5329aGZjIOO6GGQhgUedn2WIDR0SxNFL8P83ac3gBpvmipnTjtHohwDznTfvSEG++0wJk3m2lYF9nh7gOhe+1uUOuctW14cvrOokLV75AzLgM5OA1JiievK33M56ZoEGds4ruSogiHQJEz0WmT49wd6Dc7MC6ghDc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X4xfHfDS; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726147053; x=1757683053;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tTnRmX+6RHq0ncXVXSOVD+Hvk28tzNe+cSrBE1j1oiE=;
+  b=X4xfHfDSiOA9SKzpe5PwWeD+MKK+zvgN31ld/o6rIUGXGuJFq93X1Hye
+   gnH1FDA2OWcq1Q57O9Tu2Z+H85T92th8wE8RzWcE8GifxnPftE4L0j20R
+   HhUqIxLxIGeOmkLXEqdtIrh20eVf3y+FSEvyJNGTYefUINGgTcM0hGoFZ
+   zEnpki2TGPp9E2ecjzSxx3Qje/zCDXAl5r8Qv24Tfl5vjnTQf5pCvjM6Q
+   mvhLTkJLTo7IPkhatjCMfatwsaDrpMf40M13uT6FTvhaXpMUPwilsj4Nn
+   DkguEBO6BHGMzPa7prg2iNbaPl0xbPGiIF2oSTJB69fFYl093ptwfhRuH
+   g==;
+X-CSE-ConnectionGUID: UM1rIib6T6KbxBrhe8k+Kw==
+X-CSE-MsgGUID: MEX1/3EnTRixeDeogW8x2Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11192"; a="13493302"
+X-IronPort-AV: E=Sophos;i="6.10,223,1719903600"; 
+   d="scan'208";a="13493302"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 06:17:31 -0700
+X-CSE-ConnectionGUID: 493sDDapRD+SfvZ18Fh2JQ==
+X-CSE-MsgGUID: XdQ+CjVyRTOZhEpXBfC5ng==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,223,1719903600"; 
+   d="scan'208";a="72692532"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orviesa004.jf.intel.com with ESMTP; 12 Sep 2024 06:17:31 -0700
+From: Yi Liu <yi.l.liu@intel.com>
+To: joro@8bytes.org,
+	jgg@nvidia.com,
+	kevin.tian@intel.com,
+	baolu.lu@linux.intel.com
+Cc: alex.williamson@redhat.com,
+	eric.auger@redhat.com,
+	nicolinc@nvidia.com,
+	kvm@vger.kernel.org,
+	chao.p.peng@linux.intel.com,
+	yi.l.liu@intel.com,
+	iommu@lists.linux.dev,
+	zhenzhong.duan@intel.com,
+	linux-kselftest@vger.kernel.org,
+	vasant.hegde@amd.com
+Subject: [PATCH v3 0/4] vfio-pci support pasid attach/detach
+Date: Thu, 12 Sep 2024 06:17:25 -0700
+Message-Id: <20240912131729.14951-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <262ada03-d848-4369-9c37-81edeeed2da2@stanley.mountain>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 12, 2024 at 11:49:10AM +0300, Dan Carpenter wrote:
-> The "array_count" value comes from the copy_from_user() in
-> vfio_pci_ioctl_pci_hot_reset().  If the user passes a value larger than
-> INT_MAX then we'll pass a negative value to kcalloc() which triggers an
-> allocation failure and a stack trace.
-> 
-> It's better to make the type unsigned so that if (array_count > count)
-> returns -EINVAL instead.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  drivers/vfio/pci/vfio_pci_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+This adds the pasid attach/detach uAPIs for userspace to attach/detach
+a PASID of a device to/from a given ioas/hwpt. Only vfio-pci driver is
+enabled in this series. After this series, PASID-capable devices bound
+with vfio-pci can report PASID capability to userspace and VM to enable
+PASID usages like Shared Virtual Addressing (SVA).
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Based on the discussion about reporting the vPASID to VM [1], it's agreed
+that we will let the userspace VMM to synthesize the vPASID capability.
+The VMM needs to figure out a hole to put the vPASID cap. This includes
+the hidden bits handling for some devices. While, it's up to the userspace,
+it's not the focus of this series.
 
-Jason
+This series first adds the helpers for pasid attach in vfio core and then
+adds the device cdev ioctls for pasid attach/detach. In the end of this
+series, the IOMMU_GET_HW_INFO ioctl is extended to report the PCI PASID
+capability to the userspace. Userspace should check this before using any
+PASID related uAPIs provided by VFIO, which is the agreement in [2]. This
+series depends on the iommufd pasid attach/detach series [3].
+
+The completed code can be found at [4], tested with a hacky Qemu branch [5].
+
+[1] https://lore.kernel.org/kvm/BN9PR11MB5276318969A212AD0649C7BE8CBE2@BN9PR11MB5276.namprd11.prod.outlook.com/
+[2] https://lore.kernel.org/kvm/4f2daf50-a5ad-4599-ab59-bcfc008688d8@intel.com/
+[3] https://lore.kernel.org/linux-iommu/20240912131255.13305-1-yi.l.liu@intel.com/
+[4] https://github.com/yiliu1765/iommufd/tree/iommufd_pasid
+[5] https://github.com/yiliu1765/qemu/tree/wip/zhenzhong/iommufd_nesting_rfcv2-test-pasid
+
+Change log:
+
+v3:
+ - Misc enhancement on patch 01 of v2 (Alex, Jason)
+ - Add Jason's r-b to patch 03 of v2
+ - Drop the logic that report PASID via VFIO_DEVICE_FEATURE ioctl
+ - Extend IOMMU_GET_HW_INFO to report PASID support (Kevin, Jason, Alex)
+
+v2: https://lore.kernel.org/kvm/20240412082121.33382-1-yi.l.liu@intel.com/
+ - Use IDA to track if PASID is attached or not in VFIO. (Jason)
+ - Fix the issue of calling pasid_at[de]tach_ioas callback unconditionally (Alex)
+ - Fix the wrong data copy in vfio_df_ioctl_pasid_detach_pt() (Zhenzhong)
+ - Minor tweaks in comments (Kevin)
+
+v1: https://lore.kernel.org/kvm/20231127063909.129153-1-yi.l.liu@intel.com/
+ - Report PASID capability via VFIO_DEVICE_FEATURE (Alex)
+
+rfc: https://lore.kernel.org/linux-iommu/20230926093121.18676-1-yi.l.liu@intel.com/
+
+Regards,
+	Yi Liu
+
+Yi Liu (4):
+  ida: Add ida_find_first_range()
+  vfio-iommufd: Support pasid [at|de]tach for physical VFIO devices
+  vfio: Add VFIO_DEVICE_PASID_[AT|DE]TACH_IOMMUFD_PT
+  iommufd: Extend IOMMU_GET_HW_INFO to report PASID capability
+
+ drivers/iommu/iommufd/device.c | 27 +++++++++++++-
+ drivers/pci/ats.c              | 32 ++++++++++++++++
+ drivers/vfio/device_cdev.c     | 51 ++++++++++++++++++++++++++
+ drivers/vfio/iommufd.c         | 50 +++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci.c    |  2 +
+ drivers/vfio/vfio.h            |  4 ++
+ drivers/vfio/vfio_main.c       |  8 ++++
+ include/linux/idr.h            | 11 ++++++
+ include/linux/pci-ats.h        |  3 ++
+ include/linux/vfio.h           | 11 ++++++
+ include/uapi/linux/iommufd.h   | 14 ++++++-
+ include/uapi/linux/vfio.h      | 55 ++++++++++++++++++++++++++++
+ lib/idr.c                      | 67 ++++++++++++++++++++++++++++++++++
+ 13 files changed, 333 insertions(+), 2 deletions(-)
+
+-- 
+2.34.1
+
 
