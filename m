@@ -1,217 +1,177 @@
-Return-Path: <kvm+bounces-26717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26723-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68822976B73
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 16:04:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46201976C19
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 16:29:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B9B6286B88
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 14:04:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0044F284CFD
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 14:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77BB51B29D8;
-	Thu, 12 Sep 2024 14:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11AE31B12E8;
+	Thu, 12 Sep 2024 14:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="NSojrDuz";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="NEbkbqiR"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NGriG+uP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5EC1B29C2;
-	Thu, 12 Sep 2024 14:03:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726149814; cv=fail; b=Dvx4L63i3DGP43er39C+nK6FA50P9I8p52GX/XIdPBu+CiPOxTPrp2AX2j81cI2Fzinx7JSlRZ7w72BsHL/aE6yTMSaHNde1Hj6K10UMwedjmeEmcgTgxyG3wXwPpNiB0qY4IU3ZogjAvPv6pAPxsNOpVmqjj+JH6s+a0K4sKhU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726149814; c=relaxed/simple;
-	bh=d7Y/Lzb5oQBKoiXbEnDz7nYNgYs1lPX5apJgp69PMOE=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Qh6OVtYxNlQQ5dts5TfHH08uAYtUA/+9HfdBN39YIs57VbF1GR8AgzEY/8/GhXc+sPgVaxooiorN+H78LbZ1x4S4yhGQqVPfSTO+MJ27noj49wFZ035rK5AltVX4XPtRw0bM4lxEVkdF0vlYWKw9wgYcSqkno0fWr82XSE30Go4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=NSojrDuz; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=NEbkbqiR; arc=fail smtp.client-ip=148.163.155.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nutanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
-Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
-	by mx0b-002c1b01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48C9Z2Sv021581;
-	Thu, 12 Sep 2024 07:03:24 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=proofpoint20171006; bh=swQkonSsoqKDQ
-	tA/mEcezUOYIJF9aoZJFmBuNo/bvtU=; b=NSojrDuzq8vugOA7rpPj7Spz55zUR
-	T8zjy9OsN8UOdmOYcloKY5GU0DiyMrc8IyWztC6nh5LJRx5bhc/Flb3oeVR/J3UW
-	rGPzj6x1E/s6bUUwsn6oOkQK4MHZNA7+sHV6O6m3R1KJUwF2+AgZnrmwKy9qSqYd
-	6DpDJyXSIwNiYQZwdqcn6EcI92BnlgAuEi083AERam9CxV4uYUluaOKeG3z/H0Y+
-	EmVQpP7TSIh+IcJ2xzsIGvnrBh5viWCAGeKGiKEQIepyq1WNsQZ5pBGSAGCZNadb
-	m1MG3JSbRAlhogQryj/1dNaIwtA5nqkAnVh9VXREBI2GAbDtscpgHk86g==
-Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazlp17011027.outbound.protection.outlook.com [40.93.13.27])
-	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 41gmxhvfs7-1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9AD1A4E7C;
+	Thu, 12 Sep 2024 14:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726151381; cv=none; b=r7aO+K3N0uqptZGb06E6+m+0fdpH7CAHzX3Asatgw/A19Q64Xwjupicbpc4Z4Q1bGE+cc2ISNj3xs79mp1PLySN3ocOJzHqjWZfU/gNPz7vh60jqAeVoWa1mRARHoy9eQ8IN2Ug59Fh2oMpts7ankMDFDMX9M7aA3UDj2sr/Ad4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726151381; c=relaxed/simple;
+	bh=WqWblWK9j9pBmIDPL8+cidY79AOM7Ury3RJgfIB58HY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
+	 References:In-Reply-To; b=N1FFszQ8WmvDaRQkgDC3eYG3Z/2EDVEdVNv3u2nzMfKPSBhZJa/sIeim3c5l/Imnw57E9XwQZymwO9VeGT1aD7GK8IjzaHaSbogKdYKuEYkd9LBbX7rI2AdPUEjprK35QDL+gCqUrO8xj8kp9ilCgCmiXdLINObBfYJOOf+aRKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NGriG+uP; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48CBXhiN020293;
+	Thu, 12 Sep 2024 14:29:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	mime-version:content-transfer-encoding:content-type:date
+	:message-id:from:cc:to:subject:references:in-reply-to; s=pp1;
+	 bh=V8JhCKvZz3EJEDtODbSJXFM409kvD1wRr+l0IYPGJis=; b=NGriG+uPuMt/
+	EdX6uyBPOqL+0tSDe3n/KaYeZtChhDyC7PXPDHuVPrvg4Ac9Es7mHzTJGCgT38Yl
+	m3WDipIUgK/a7+1hOPYy9xy9vDntE4DpJsnqV9yTOejTn+OnjPaney6d4rIyDbZs
+	ztCi1Ny/1nVyn3mRdsBRnrJ4rAfeQwyl4WUtDNd3gUVDkkxv7xS8MlMS7++X9utn
+	rW3BzXHyLy/4szJXEZz4ydt4YGhfChgc0wkAQ18dkJzBOEwUCnx1rrfcc1376a5I
+	cAjIpHwl2U3aVebIWiWOZv+nYJD2PpVfP1nH0wUReDP+Ujg2fVuir8pA9gwiTqsn
+	p8ynGZSKPQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gebam7jf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Sep 2024 07:03:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cz62c3UtopWh09l0eByECJPwKFxwQIuCq+odI4wyL0pL+ZcU+5BJB4S3KQv3eSwAuvMUt80IxtCAWMIhy7RHVhIqsCSeNCo6G42tbbtaEc7xUCvck0EfVFRcvsBTRO/uvgg+4EcLEQi3F4IvuzMBAFFfsMYXXKZ8YytxLpIqhKdD8rwYyCVlibh1JeZpTQQGSTCE9tyhLmDm22gkyMrCUzjpErYANv66wrkc6u/Hsk1d8LW0CvTsFQwUEKwC0aiovxthzxrjA5d8YCgm2ES1r538HxpHDJ14Gzibv7+rq7GtInN+0Rah4XSyBgy7Hgp9nsSheI5Quopw4vhLdyN3Ow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=swQkonSsoqKDQtA/mEcezUOYIJF9aoZJFmBuNo/bvtU=;
- b=J1GBs5a1WY/H0KIJOiabdsjxqWMTErUD2fpBd7qFu118c/TCN5xEwPStRTaMMvwn5/rJaV6FmH0nLktxd7g5VSj1/0Atfy/4bhZzLStXyDFHzpugcsz7NDxLHPa4Ld9+WGoR0/LrQUvkXJSB+hMuMDVPzOFuEona6AqilCPWnCFUnmNAMTpqt/wiwC4/36JqrK9EsxKEnzEyPtD1FEnM8HUgjE2SNoeJEhAmHQ6/LYvIzvA8m08uQwSIRxpZPNaaNN2LKxYNYbB0K6zbeG51dYjn6mHKpdwAXVhr/COPf4bB7W5jGZFAckClAxnuk8KA1sapyBiFBHCB2bGp3Re57A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=swQkonSsoqKDQtA/mEcezUOYIJF9aoZJFmBuNo/bvtU=;
- b=NEbkbqiRJ9t5krf5SRNpyVZkQ/zOc+lYrW8/kWSGDfJxACBlBoeiD6g2XyS3tf4zQn4Wi9pPhgvID6FJSqw6ROgrwiHEmj0dIDKs6shrQgWtxNQBq6OgtotQPN6BuZYC49L92HGPUMp/EyyFLYGWEskRufIwOtqYnKtTWyONeFO40zy2cb8uyK1YVLa18qyydvk///Wz1dL22lTOO+/m7z4dlNSqhy8BQBZghGPoR7PTq18wWJcfRcGn1vgOlASFhvo9ov9tUGNa/0VbarQSLaTSJmla3DdzfK0swp/v8AI2tj1cCrVZBWXv6YwZKNA5mZgMuPPusPGQUCX/svwxMQ==
-Received: from LV8PR02MB10287.namprd02.prod.outlook.com
- (2603:10b6:408:1fa::10) by MWHPR02MB10571.namprd02.prod.outlook.com
- (2603:10b6:303:287::5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.17; Thu, 12 Sep
- 2024 14:03:21 +0000
-Received: from LV8PR02MB10287.namprd02.prod.outlook.com
- ([fe80::b769:6234:fd94:5054]) by LV8PR02MB10287.namprd02.prod.outlook.com
- ([fe80::b769:6234:fd94:5054%5]) with mapi id 15.20.7918.020; Thu, 12 Sep 2024
- 14:03:21 +0000
-From: Jon Kohler <jon@nutanix.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Tony Krowiak <akrowiak@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Jon Kohler <jon@nutanix.com>, Christoph Hellwig <hch@lst.de>,
-        Jason Gunthorpe <jgg@nvidia.com>, Rohit Shenoy <rshenoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: [PATCH] vfio-mdev: reinstate VFIO_MDEV Kconfig
-Date: Thu, 12 Sep 2024 07:19:55 -0700
-Message-ID: <20240912141956.237734-1-jon@nutanix.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0203.namprd13.prod.outlook.com
- (2603:10b6:a03:2c3::28) To LV8PR02MB10287.namprd02.prod.outlook.com
- (2603:10b6:408:1fa::10)
+	Thu, 12 Sep 2024 14:29:35 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48CETZvr017287;
+	Thu, 12 Sep 2024 14:29:35 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gebam7j7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Sep 2024 14:29:35 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48CCaxVq013471;
+	Thu, 12 Sep 2024 14:29:34 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 41h3cmg8qu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Sep 2024 14:29:34 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48CETUlY52232584
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Sep 2024 14:29:30 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8720F20043;
+	Thu, 12 Sep 2024 14:29:30 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5569020040;
+	Thu, 12 Sep 2024 14:29:30 +0000 (GMT)
+Received: from darkmoore (unknown [9.179.25.216])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 12 Sep 2024 14:29:30 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR02MB10287:EE_|MWHPR02MB10571:EE_
-X-MS-Office365-Filtering-Correlation-Id: 140aadf0-f3f7-4fdc-d05a-08dcd333a908
-x-proofpoint-crosstenant: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|52116014|1800799024|7416014|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?MpB2YdyOCY54WSAt/OnwBjrOS8P0uS9TJzzZJDXvMcm3496rgL+QtEWywot4?=
- =?us-ascii?Q?oADoJnGRzwTAEKuTCChbP/Ky23Jalc5bLT7kXEw2TLeeqZCDiuadvErSC8OT?=
- =?us-ascii?Q?i/P4dsWIhcZkIN/FXlpShB4CnZNkzieIMhuFSiqs3DuEJAw7ZXL13y6ubxYE?=
- =?us-ascii?Q?M80NuzzLA2blPrUWIaBRdqlmJ20jBBChT0RWz0xeiGQy/pwmH+maQm6Z7epu?=
- =?us-ascii?Q?+MSMvxf+sPUTaMBGa5aT/OY+LiU1+YaUFP+vZBp69sPC939ypMrOPbDLWyqO?=
- =?us-ascii?Q?6HU97D5z9c0x2aL346eU5rh79GFkGUukM/DOwozADj/i3tTHPzxvN0OlS2Sr?=
- =?us-ascii?Q?5aC75ofnik5IrnQ4tFKSR49DSh4fMhiHkeMshEPjCN+8bOktgL8BhmBICzfL?=
- =?us-ascii?Q?DmyOPb/AELBWe45l+zjio/iGhHvTPBSuRG/KEyY88e78RapgjOXuiImYXXgc?=
- =?us-ascii?Q?BomavlUaCa0mWDV2+SkO7K1ckgz/yBKDxeAd+rOhiZrGgtm/DI3E4yZH4lw4?=
- =?us-ascii?Q?nAxTaL+Q6ooe5piIikT3KJBQuqjzjbOfuzKcxrDyi/Ej3wDfCwRr2YwQqJN1?=
- =?us-ascii?Q?x9GFbohUVoIhzILcpFm451vqKpOfJh2jjt7mwtx+MvIR0XE+TecfrSss15lK?=
- =?us-ascii?Q?vNblrvO4JVeUZassC0eWqGanJL96bXVAkNmBNI0cvLPlMp2b4V+OoU984DJ8?=
- =?us-ascii?Q?DqTPbD3U6pZKszrJXR7czz9XsQzB/OxL8tDws5AUHWBoHZOqRoyCW150sJtV?=
- =?us-ascii?Q?TPClgeNZwl40LCheuDgxLAhlGtBI1uRlZ5OFV/WqzzGmtlHhJa0gB83xFlpb?=
- =?us-ascii?Q?382Bpl+aKhWOhYSWXD/kdWAXnUNar+1p5oN+k9R2RXRqdiNBCdexNXjrp31v?=
- =?us-ascii?Q?V1PFVT8CpA3QPxJWzxZ2iZU29dg22mqAblnMjX796yws3jv8ZAlUc8neC5Us?=
- =?us-ascii?Q?700uZ5Ymqk7xWb2noVeZdek2fbh0OfgL64Y90AQLLMJQk+E63pWVnHxTqlJR?=
- =?us-ascii?Q?OlVi3VT5QSMZfJqnSu+pj5s5NVTlh5x/57vVhqfXlDQrL2kyJs+FrU6kGqiy?=
- =?us-ascii?Q?m46S1MHQqU7xlfFN6gUavkCI11J/JqIWyIQOst4h9AB2KwFD34OOSHekisHF?=
- =?us-ascii?Q?YGO0yXIo13VyPNPTCUvYVObYtJ9pPOMpvE/1SExCZeuXnU2sP+36YmTVvLM9?=
- =?us-ascii?Q?nOPYsDexKO+bYFMOpz8aGObDhJgGX8hNEhQ63TujyR8/SEXWWaedwJ6yVd67?=
- =?us-ascii?Q?wEh/qquhPzzwKjG2tEKIVBN+Q2VUFcwLaBPIAbNK81qZYVUM6rohPsqhdCzi?=
- =?us-ascii?Q?4vcSSgW/wo1AfacTvK7ldO8Wt+1Nj6+RC79wgPzH/q+HxJbmhXKBpAuBdcOH?=
- =?us-ascii?Q?0GWfAJjgofg2iT8TtdRXp6Zsls6TuRDbrj2Rbx4sXeZycqp4fg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR02MB10287.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(1800799024)(7416014)(366016)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?MLvgT4n4/PAo3Dw4fq6uUBVRhPNtXVze6cQhUjxmorlAH5yyS6vCFtiGHTi2?=
- =?us-ascii?Q?EdpYILA0ZuMW8YTS+MLk/ay5LSKfiY1R6B5R+TZWgPgY+ePTTrjEanrgABW5?=
- =?us-ascii?Q?HCmsgFMgMkXt3Rv3GWDhyQbkwT2kYHiFcVSsIcMEt4g6TzSlWQoqCiihW4Y0?=
- =?us-ascii?Q?XUseZQWcalWs5iImjOg+dBTn8pYp3bYeBxG1Ui2pjJyDEqwTvgzx6C5Xde1W?=
- =?us-ascii?Q?F/7HnIrf3J/1NcnA/7PrifAK9aCJ3S93Ojrx3zvBWES6DxnewYrl1LIiM9pL?=
- =?us-ascii?Q?Q6nIz7McoJgbSwgCsq0HwVLBGNLxzI51rBu/R1GpEHaSfTZ/KQQpwsiIq1Hu?=
- =?us-ascii?Q?hMZWhQJnhZPVAxyff/Y+E8w9WutQumW9UGuuVgYPKSxCEG+YuGnGQa6qrWkm?=
- =?us-ascii?Q?Qvwqiv5ADk7v/DPz3FmOEy0yMHWlCAaM7FxevZOmaDL7jSrkYvzQoA6+5y0k?=
- =?us-ascii?Q?PnVwnEmZ09Skh5XJ4Ld9JilUQFlpgcX+HLgcj7ah5gsd/8Rt7F7wwfmrmuim?=
- =?us-ascii?Q?DIlNbUWB3lDgKmA6+72u+T82UB7d6B7jaKbfiXR53O9d57PQ3MwsxkH3PYMW?=
- =?us-ascii?Q?ThzDOQgmBn2jXgE72sGp2sy+yev0SjTa8KV+bP4ARDKCrRQx60PPDyEv+4LR?=
- =?us-ascii?Q?vvv8cGgbJgGjy5Ba9GsCNQvICTLmFSKDIeCZ5wcpaMPZC0C2UpxKQz2sFFwU?=
- =?us-ascii?Q?TqpIhS3Hzl0JEVmK/MzDmrLyrjlIg5hsTWR++G/php1p9fr9X30HCvrgl9Pa?=
- =?us-ascii?Q?wqqnyoKcI77NDc/H1EWZXyhK4fKhpwStnsPJWUFlLyGbBehw5fF6B+zDbNIx?=
- =?us-ascii?Q?zT9uSZrG3uZuj36oLpdxC1ztMY4bF7Ju40zcvI8Ys+ezHUy55XVhbSp47eaD?=
- =?us-ascii?Q?1kLPa4P01cI2YAEzReFpCwGGG6R6v7NS3koGpvXQXp7Fc/efpDsbL/MX2a/+?=
- =?us-ascii?Q?5mU1HbMI2xrqRCgCreRfymB2DdkbeGkSx+u7f+HFfkXTYffqlibdMHVlXgRm?=
- =?us-ascii?Q?Gb5fimrLB4DzCEtB+c2D9kXxeaKCdqiw8LOUKY9dueebCdIqlE/0EYDdBuRV?=
- =?us-ascii?Q?9+a5fs02PakxjH1daZL/xYLNoVSR5fQp7/5eYT+UgelyCPlMtPI6XLfNg87b?=
- =?us-ascii?Q?HmgHefm97qNUkmUMNKk4Mtsva6r5tiKnRkyFqMKscuEMIYYcLjDTguJXBCPf?=
- =?us-ascii?Q?xxjQgWxM2Ne9EIHkycWP1cCOjxEP2PebdasBgJ9AOgKWgSTlc5Gstbt8dXnn?=
- =?us-ascii?Q?IeWIctaVt0dQ10zCssTHK6jRaHS93e4rcfGlp+n/D/NCsiSvJ01kK93iQJUQ?=
- =?us-ascii?Q?3GLNs0tqicP/JSpEtJ3I1daYkb0SKbaP11MpyXUhC0iA2O5108JHrQDkaF53?=
- =?us-ascii?Q?bl5BY3xvwxmK1qSJGlxZC0zIHGZ8wzedAdkjhU/ZWQv+n4XTTC52Pca+0r2o?=
- =?us-ascii?Q?ghni0LC5LiNGOxz1crp1EPwZga09SmZ2TqDurn0zNwTkYm/Yw/rB/8zq5Jab?=
- =?us-ascii?Q?eEAIUu1+IbnzIxsl8FRx/ZpaPGwqW5R0XTrJ9JuxOb2Wi4fPROSplyieCD88?=
- =?us-ascii?Q?ILVDteFnu8HAWLPu3n0CMxfkrMdiLwaIbwVNVpXKiNTQSS88Uki+MsmSTSdL?=
- =?us-ascii?Q?rQ=3D=3D?=
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 140aadf0-f3f7-4fdc-d05a-08dcd333a908
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR02MB10287.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2024 14:03:21.6422
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jnpYzcXbnNdKISfCEEGwEGHs5QOoX4QtgQETidVMRcbxMKOm7YdTEMyHxJ11D5NmiSzBDpA7V5cWzKM5e2zNHYJ2UAHeQ2QgG+pWnV1yd70=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB10571
-X-Authority-Analysis: v=2.4 cv=SfSldeRu c=1 sm=1 tr=0 ts=66e2f4ac cx=c_pps a=U0KzkmEawxegXmCr7eTojA==:117 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=EaEq8P2WXUwA:10 a=0034W8JfsZAA:10 a=0kUYKlekyDsA:10 a=64Cc0HZtAAAA:8 a=20KFwNOVAAAA:8
- a=Ikd4Dj_1AAAA:8 a=VnNF1IyMAAAA:8 a=p4TyGKwq3amCRySJVqkA:9 a=14NRyaPF5x3gF6G45PvQ:22
-X-Proofpoint-ORIG-GUID: H-nTBx--hPOqTDHRAnj-jDgWlJopxbnp
-X-Proofpoint-GUID: H-nTBx--hPOqTDHRAnj-jDgWlJopxbnp
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 12 Sep 2024 16:29:25 +0200
+Message-Id: <D44DL9UL4Q2T.3JHP2BM3APY6A@linux.ibm.com>
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>,
+        "Paolo Bonzini" <pbonzini@redhat.com>, "Shuah Khan" <shuah@kernel.org>,
+        "Christian Borntraeger"
+ <borntraeger@linux.ibm.com>,
+        "Janosch Frank" <frankja@linux.ibm.com>,
+        "David Hildenbrand" <david@redhat.com>,
+        "Nina Schoetterl-Glausch"
+ <nsg@linux.ibm.com>
+To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH v2 2/3] selftests: kvm: s390: Add uc_skey VM test case
+X-Mailer: aerc 0.18.2
+References: <20240902115002.199331-1-schlameuss@linux.ibm.com>
+ <20240902115002.199331-3-schlameuss@linux.ibm.com>
+ <20240912101523.5ee9ca54@p-imbrenda>
+In-Reply-To: <20240912101523.5ee9ca54@p-imbrenda>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 5V3cu_pd0_FiapShwabz62x6YUSCC06o
+X-Proofpoint-GUID: axDXDaVUYWZMAW1fgR1Ls2ke40B6Udrq
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-12_03,2024-09-12_01,2024-09-02_01
-X-Proofpoint-Spam-Reason: safe
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 bulkscore=0 spamscore=0 phishscore=0 lowpriorityscore=0
+ mlxscore=0 mlxlogscore=627 impostorscore=0 clxscore=1015 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
+ definitions=main-2409120102
 
-Reinstate Kconfig setup for CONFIG_VFIO_MDEV to help support out of
-tree drivers that use VFIO_MDEV library (e.g. Nvidia GPU drivers).
+On Thu Sep 12, 2024 at 10:15 AM CEST, Claudio Imbrenda wrote:
+> On Mon,  2 Sep 2024 13:50:01 +0200
+> Christoph Schlameuss <schlameuss@linux.ibm.com> wrote:
+>
+> > Add a test case manipulating s390 storage keys from within the ucontrol
+> > VM.
+> >=20
+> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> > ---
+> >  .../selftests/kvm/s390x/ucontrol_test.c       | 89 ++++++++++++++++++-
+> >  1 file changed, 88 insertions(+), 1 deletion(-)
 
-Fixes: 8bf8c5ee1f38 ("vfio-mdev: turn VFIO_MDEV into a selectable symbol")
-Signed-off-by: Jon Kohler <jon@nutanix.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Rohit Shenoy <rshenoy@nvidia.com>
-Cc: Tarun Gupta <targupta@nvidia.com>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>
----
- drivers/vfio/mdev/Kconfig | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+[...]
 
-diff --git a/drivers/vfio/mdev/Kconfig b/drivers/vfio/mdev/Kconfig
-index e5fb84e07965..b5e1eb634e62 100644
---- a/drivers/vfio/mdev/Kconfig
-+++ b/drivers/vfio/mdev/Kconfig
-@@ -1,4 +1,10 @@
- # SPDX-License-Identifier: GPL-2.0-only
- 
- config VFIO_MDEV
--	tristate
-+	tristate "Mediated device driver framework"
-+	default n
-+	help
-+	  Provides a framework to virtualize devices.
-+	  See Documentation/driver-api/vfio-mediated-device.rst for more details.
-+
-+	  If you don't know what do here, say N.
-\ No newline at end of file
--- 
-2.43.0
+> > +TEST_F(uc_kvm, uc_skey)
+> > +{
+> > +	u64 test_vaddr =3D VM_MEM_SIZE - (SZ_1M / 2);
+> > +	struct kvm_sync_regs *sync_regs =3D &self->run->s.regs;
+> > +	struct kvm_run *run =3D self->run;
+> > +	u8 skeyvalue =3D 0x34;
+> > +
+> > +	/* copy test_skey_asm to code_hva / code_gpa */
+> > +	TH_LOG("copy code %p to vm mapped memory %p / %p",
+> > +	       &test_skey_asm, (void *)self->code_hva, (void *)self->code_gpa=
+);
+> > +	memcpy((void *)self->code_hva, &test_skey_asm, PAGE_SIZE);
+> > +
+> > +	/* set register content for test_skey_asm to access not mapped memory=
+ */
+> > +	sync_regs->gprs[1] =3D skeyvalue;
+> > +	sync_regs->gprs[5] =3D self->base_gpa;
+> > +	sync_regs->gprs[6] =3D test_vaddr;
+> > +	run->kvm_dirty_regs |=3D KVM_SYNC_GPRS;
+> > +
+> > +	/* DAT disabled + 64 bit mode */
+> > +	run->psw_mask =3D 0x0000000180000000ULL;
+> > +	run->psw_addr =3D self->code_gpa;
+> > +
+> > +	ASSERT_EQ(0, uc_run_once(self));
+> > +	ASSERT_EQ(false, uc_handle_exit(self));
+>
+> this should be true, since KSS will be triggered
+>
+
+Good find.
+Yes, as this is the assertion does actually fail here.
+Will fix that in the next version.
+
+> > +	ASSERT_EQ(1, sync_regs->gprs[0]);
+> > +
+> > +	/* ISKE */
+> > +	ASSERT_EQ(0, uc_run_once(self));
+> > +	ASSERT_EQ(false, uc_handle_exit(self));
+> > +	ASSERT_EQ(2, sync_regs->gprs[0]);
+> > +	/* assert initial skey (ACC =3D 0, R & C =3D 1) */
+> > +	ASSERT_EQ(0x06, sync_regs->gprs[1]);
+> > +	uc_assert_diag44(self);
+
+[...]
 
 
