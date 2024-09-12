@@ -1,126 +1,133 @@
-Return-Path: <kvm+bounces-26758-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26759-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E269772B9
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 22:31:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DAF39772E5
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 22:49:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6ECC1F24E04
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 20:31:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71F441C23F76
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 20:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0671C0DF4;
-	Thu, 12 Sep 2024 20:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9A31C174A;
+	Thu, 12 Sep 2024 20:49:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IuUxudrt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GqzAI6WT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353E918BC19
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 20:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7E31BFE02
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 20:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726173063; cv=none; b=mpgx1QEO1WmyMriZASQP0ADUUHfqyjuupBCAiqndLyobKpSneI84AQ9ez2QYqQYgzrWUskAZI7HHpAR6pTRWED5rBp0DoTqzTkDfz4U8ugIERfBjj54jRRdMUX5g1bpU70AEN/s8jRQsPz0tRJRtbytUIfaDs9p+2jRWdUzUvxM=
+	t=1726174140; cv=none; b=JAzp+tkwtfYB2IH8q/JgjYP4QrtP6LN77fw5BJJ6uHlJcFm/vlsHjmiPX5TDd9CfVmT4yqmQv+d17HTWkfygb94DZXa9P1XXN+u9zaFthmbQmng8eWjbNVOtmJoqUtY8wGwo3jNhEualHzcdmhEAuwLM2msJyTtfsUPeDN7LFMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726173063; c=relaxed/simple;
-	bh=u3+xTKiDZ6CgDyqF+o7xgUFgxz+T2D6SLtwRNZRyVS8=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=gV7v83lO56FIlGwY3bIVJ93IH9e1txpVyisUscwkW7PV1CBy22cS85q8s8C8r8wQuPAfxKoKgIVAsxsvJxoBqSXfRzX7N6mOrAymSqXCCtoX4drWj/AGLCATZ/1H7iuNgmg5dinYksxVZUR3/79I0W6N9fa2P/CxeNGbHc6/Aco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IuUxudrt; arc=none smtp.client-ip=209.85.166.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-82cf28c74efso214836239f.1
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 13:31:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726173061; x=1726777861; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yLPhhW7Y6mbWdZPPRUIkvARITfuZTEZkDii7oKKU+Ek=;
-        b=IuUxudrtlEScnPVJtdJIZL653Kzmq2KrkAJZPlos0BCzQ/d8bWSAWJkoHNmSMMvpzX
-         baaUwY3pLIG5Q8FPiRzMLdlaTS1hNSet+8xvdak+omyblP51OedpMqboDXfBWT0v/rVB
-         8tE537sMMR+gUfLWoUy5+xEH3z5fAzERmA5v7Bnw//1jsFw9/0TOahkCJLsXQUMYBNCF
-         Z7SN5Rf/20K6pfJRiIHgQgYVJWfu587IeXQtEjx6LZFw64K0kp+5b+DQsRaFTes86bRV
-         JGLk+EEFNQwUgbXyYligdHmcQnfPazUUNlbGOws4Mz15dOUCrjTI4NOM0+BbnvSbHhZB
-         lcPQ==
+	s=arc-20240116; t=1726174140; c=relaxed/simple;
+	bh=yIP6S9iCrMiW5fAQkDzldFnKUGGLDTbn0cgLJErdI/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KApunTq/1OnCLeRd3xq1l6V2pW2Gp7zANVtmkN8h1RQsEQE3wGlV8jFvEF374ewVVvNBgniK5zGVYgSPVpAXQt5DUudAxmuIc3JaOk7LL/4O9HE+Be1GAHgo93J2XG0PdgZncMmyHIBXjb0t+ikaFOqZr/RG6GrX9C9W+V6PY2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GqzAI6WT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726174137;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vDpmMjelNalx2jwG4t1xNYLZluds06xeruDv/xAuYKQ=;
+	b=GqzAI6WT9OUelHs+BnwoUiyfBmTvEEOJcjxQqrjXcqIIXUlLJmeYGAnk0a2KB4AnezkyXQ
+	1mEGm+ILmwM3lAWSobikCzpOIKHxA7jsZk1BuJc8TgRjRE16jzLChXgYjKwfx8S2exsRSP
+	EXifLEN3g/AqAhH8tuFX/AZPs5c9knI=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-688-RK83EwkEMeu6oOztm0gt-w-1; Thu, 12 Sep 2024 16:48:56 -0400
+X-MC-Unique: RK83EwkEMeu6oOztm0gt-w-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-82cdab14847so31629639f.0
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 13:48:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726173061; x=1726777861;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yLPhhW7Y6mbWdZPPRUIkvARITfuZTEZkDii7oKKU+Ek=;
-        b=VzJ1TchsB0LRPmytThfc6el/Z0JfxkqX83bJ0F4uTEdb/KSxtA7ABeTod7rLpusMmD
-         86X+8/ExKvEWDzfMv8cM3vL5mDXj6dmqZIlsGJm2pdR4aedl5KGftwPY1ZBXwfeCOHu1
-         7lSlmaHC1f2vOz9WEHkOubUo+YY0p7vO6KqeQqNmtR2nVCMuOQFdNcgS3AbKWkN9ZviS
-         jHAXpKHHvnIOPp0+Dp06pYQZWWVkbHfQ2L63XA8T0Hjydc8wKRehxvrHTFOWWrs+24+C
-         S/sc9LEtlo85t6Opp5pstb3LNoguOFy/TpeIKhh4zId6DBNE1wHlPVVsaWrUQLyVcE/P
-         HSRQ==
-X-Gm-Message-State: AOJu0YxgdSQ2tF1L3/TafYLJVSJLEPnhZ0DTlyEOHtit0NjELg2yZRx9
-	qna+080LDc7jfOorWwiEAlJ13j+e8GegZB3a6jSpkvYlK42nj0HQeC8VN2fXLuY8FY81KYVJ+xw
-	TXBx5wfsw9H7ghVCn2hJIoA==
-X-Google-Smtp-Source: AGHT+IEvNBP56SW+DzYGXpGSQjGH7l5m6WCB475tagf/GqT0PVTompxQRWYnVlmUdK8417EDaVC+g6P+CB3gV00+3Q==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fa18])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:1412:b0:4c0:8165:c391 with
- SMTP id 8926c6da1cb9f-4d36136b75dmr162015173.4.1726173061371; Thu, 12 Sep
- 2024 13:31:01 -0700 (PDT)
-Date: Thu, 12 Sep 2024 20:31:00 +0000
-In-Reply-To: <ZuIgE2-GElzSGztH@google.com> (message from Sean Christopherson
- on Wed, 11 Sep 2024 15:56:19 -0700)
+        d=1e100.net; s=20230601; t=1726174136; x=1726778936;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vDpmMjelNalx2jwG4t1xNYLZluds06xeruDv/xAuYKQ=;
+        b=KnicLMUSvMwc0r6YGv34MjNZ9QQLB9pRjKi5aGXtIua8+x061YR0DIfL0c3AMGHR6t
+         2MVzvCCp/BSJ9j55j07y8z40CfYiO5R+qi2T171T+hV8v9+NTllrZ/e3SIlq08CaTKD0
+         u+KT3ix0NN2VjVOaaJWdUNJU7jv543ELzV1/W8ZxmqnVdVy1GGfkANyX/Wpnr36bADdj
+         1Umat8pA/T9yxCeOvMptCU0izRd81DS2eaH49gpOl+qyUM5XuMlv/Um0h2/kOSbRo4H4
+         91bftcL/9fl7zMpjxmILvf17yrvGpsce9BQ8zgf4OI5V5oZOQtSRvEltwvc/VBX4QdBt
+         V96g==
+X-Forwarded-Encrypted: i=1; AJvYcCWr0nNOFtkW7cqWOnYq3RxDgzRO9gbI9jMbBa9YiRYSCpOKXjcU5Y00yrAiNkV7BSyq2E8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxL/8VUL5k/ke9iX01NfeoV4f4BJCPdwUVR6OLKEDEjMD0sDZHt
+	iybMu0JkbvMse7k3FJkVetFcpijclzsutanTSKogO/V19+oWXqtD3Frb8bIxZSRd00m7ytN7RR5
+	WNI8ll5TcQNOAlgpcciBDKZonrZKuFarTkL13YiKo2yxhIHZNZg==
+X-Received: by 2002:a05:6e02:17c9:b0:3a0:4bd3:6cd with SMTP id e9e14a558f8ab-3a0847cde94mr11229545ab.0.1726174135794;
+        Thu, 12 Sep 2024 13:48:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF27lLlFUrUcBat8oysYWhOtTVjDxFqpMhIx9lYi5bD/C/pP0LIVOh0yQJnIQl2kFEKYKcbRw==
+X-Received: by 2002:a05:6e02:17c9:b0:3a0:4bd3:6cd with SMTP id e9e14a558f8ab-3a0847cde94mr11229455ab.0.1726174135458;
+        Thu, 12 Sep 2024 13:48:55 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d35f949133sm778323173.164.2024.09.12.13.48.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 13:48:55 -0700 (PDT)
+Date: Thu, 12 Sep 2024 14:48:53 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, Yi
+ Liu <yi.l.liu@intel.com>, Christian Brauner <brauner@kernel.org>, Kunwu
+ Chan <chentao@kylinos.cn>, Ankit Agrawal <ankita@nvidia.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] vfio/pci: clean up a type in
+ vfio_pci_ioctl_pci_hot_reset_groups()
+Message-ID: <20240912144853.42ceb733.alex.williamson@redhat.com>
+In-Reply-To: <262ada03-d848-4369-9c37-81edeeed2da2@stanley.mountain>
+References: <262ada03-d848-4369-9c37-81edeeed2da2@stanley.mountain>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsntldzwd37f.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v2 5/5] perf: Correct perf sampling with guest VMs
-From: Colton Lewis <coltonlewis@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, oliver.upton@linux.dev, peterz@infradead.org, 
-	mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com, 
-	alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, 
-	adrian.hunter@intel.com, kan.liang@linux.intel.com, will@kernel.org, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, mpe@ellerman.id.au, 
-	npiggin@gmail.com, christophe.leroy@csgroup.eu, naveen@kernel.org, 
-	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com, 
-	borntraeger@linux.ibm.com, svens@linux.ibm.com, tglx@linutronix.de, 
-	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
-	linux-s390@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Sean Christopherson <seanjc@google.com> writes:
+On Thu, 12 Sep 2024 11:49:10 +0300
+Dan Carpenter <dan.carpenter@linaro.org> wrote:
 
-> On Wed, Sep 11, 2024, Colton Lewis wrote:
->> Previously any PMU overflow interrupt that fired while a VCPU was
->> loaded was recorded as a guest event whether it truly was or not. This
->> resulted in nonsense perf recordings that did not honor
->> perf_event_attr.exclude_guest and recorded guest IPs where it should
->> have recorded host IPs.
+> The "array_count" value comes from the copy_from_user() in
+> vfio_pci_ioctl_pci_hot_reset().  If the user passes a value larger than
+> INT_MAX then we'll pass a negative value to kcalloc() which triggers an
+> allocation failure and a stack trace.
+> 
+> It's better to make the type unsigned so that if (array_count > count)
+> returns -EINVAL instead.
+> 
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 077d4a2629c8..1ab58da9f38a 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1324,7 +1324,7 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+>  
+>  static int
+>  vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
+> -				    int array_count, bool slot,
+> +				    u32 array_count, bool slot,
+>  				    struct vfio_pci_hot_reset __user *arg)
+>  {
+>  	int32_t *group_fds;
 
->> Rework the sampling logic to only record guest samples for events with
->> exclude_guest clear. This way any host-only events with exclude_guest
->> set will never see unexpected guest samples. The behaviour of events
->> with exclude_guest clear is unchanged.
+Applied to vfio next branch for v6.12.  Thanks!
 
-> Nit, "with exclude_guest clear" is easy to misread as simply "with  
-> exclude_guest"
-> (I did so at least three times).  Maybe
+Alex
 
->    The behavior of exclude_guest=0 events is unchanged.
-
-> or
-
->    The behavior of events without exclude_guest is unchanged.
-
-> I think it's also worth explicitly calling out that events that are  
-> configured
-> to sample both host and guest may still be prone to misattributing a PMI  
-> that
-> arrived in the host as a guest event, depending on the KVM arch and/or  
-> vendor
-> behavior.
-
-Done
 
