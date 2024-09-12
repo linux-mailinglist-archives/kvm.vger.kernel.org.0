@@ -1,193 +1,323 @@
-Return-Path: <kvm+bounces-26666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26667-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A30E9763E1
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 10:04:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7965897642B
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 10:16:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EC6C1C20E86
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 08:04:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABC401C233CC
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 08:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37EC19047A;
-	Thu, 12 Sep 2024 08:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D6E190489;
+	Thu, 12 Sep 2024 08:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Xtfg0Jvo"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WKxlfTZF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB2318F2DD
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 08:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AB117BA1;
+	Thu, 12 Sep 2024 08:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726128260; cv=none; b=Eu/Vue87hVA+23lsWKP20BgSGQb9Kx2s2oZoB4TP6Ez9UnZCIifgYHEaB8Xl65SVrrPJkDk1Q3H7sRDSs4S7j+vGLIX2wbEKq7uDG0XMu92oKudhaxunxQ6R0iohhBPLfe6Ao5QkkTWSqDF6DuZHbOzF4t+xHXv10H7lMnshF2w=
+	t=1726128997; cv=none; b=dwgkgifPzsmDsCQAMtDBoNGsiJgWYKzYxUv0wFD6Q8zVn8vaK5UD1loKg2rHj8abB2tfEHRQP6Ze6LrJ8kvAsK/rt2PVamd+aHBMFdq+EjyrsKAXQqI8j8Jk95F4xcBRB/6QtXijcmTfYUwDA/iABFJnloIoVJY4UxHlBA0sy4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726128260; c=relaxed/simple;
-	bh=DZz6BPm5Y8g79lftloZDX6D22Au7imvIxsJZijxch6c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kIkedp7ydxc1zLhUn3J5ZJt5q4GTlc/F2axBG2w67Cv3AoC6xvCANuXKvmba2XjRoLkzKhfNiBsTBw9RWmdUsHjdhW/g0lDp3NGqzK86chcXomdQwy2cW0SrFh0UIhI+e7O6B45IPmIhfZwocp62yeidPI7jmIQ5mjyJEorE6r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Xtfg0Jvo; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5c275491c61so798093a12.0
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 01:04:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1726128255; x=1726733055; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TBJ2+XdUW/qafjoJnmA9ma/Xf9l2jCrkQ02M3zdM7sU=;
-        b=Xtfg0Jvodg73B8YY4wiev9zXoagpyjbY1kwhdbm63cneygzsVzDYWvjdhTexvr0uwf
-         F+5yAjQbqAZFacJOr/VbxT5UH+JxmGNXXcKlaWCqmrDLhbiNq23wHaPJV874QShs64rr
-         svQ9lqpNoE5kcb5+DiO32wRywtfocoaYDE/XgvLxSy8OSN3r3JyJqaH3HZHdZBEzCrAI
-         sRHesEBfccUtfXq0oZCdeU8o+uPIeUablN9vQLIxdG53ZgMOnu3ndmAjmcLM5TtQntEF
-         r6+AIX6bSDfqNkrlG0K5xxZV8IlRoEnvqFG9Cf+Gp/59frinoG106b8Vrm8JfddJ5oPh
-         HLzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726128255; x=1726733055;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TBJ2+XdUW/qafjoJnmA9ma/Xf9l2jCrkQ02M3zdM7sU=;
-        b=D80PI0qMJUgaCx83tGIZNIk1DBl6MYxQU8si+7LEt1w4mIQnHey0YLo+WEPFms/W1+
-         8iyb41nppd4Iy8HHd+1ijyn0cmWLAvgDU7bDg7hkVtlIwyzuJSuvefwIxaYbnxDSWhXU
-         9veMmyP/aLYIuqWNykbYXCN6ZlgSVJt6uGnSfOZKHrKB+96QMAUdi6zag69m0EiyBa0Y
-         0ZtevbhmhfY8SxkSLVfp/gpSX8jENV6ZQsbaIwMi9PF4X6M4l1aAC7pb2hDaVtJVjUmL
-         1UbFtHI5QLaijRplenaStltJOYcq9/rP5mg1DjkDqqprW83qQ30DwO0B94wYe9uQcmrX
-         +VGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOZUBKSLftjGo0GKaBfIgvfeKp0GpiV3ffT7fC9jEFWUzyv40ZayPy9f5ejzXGrku5Wo4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYWx7aAS9eH6f6FCkXyGujuNwf0Hf/ExJtBBnpZSB3rbsR91B6
-	oENTSHvWwlGJcc21455A/6pKNSgZ+keiThHe6HWZ0TCuuBmiMhQnRBnYkHETEJQ=
-X-Google-Smtp-Source: AGHT+IF/rJztx9gqu2mmKHo36afM3kDLZPJkVPeDslFK1r3K2IZksYBImDJOHrN8xF8lPscvyhwlwg==
-X-Received: by 2002:a05:6402:1e8f:b0:5c3:c548:bb25 with SMTP id 4fb4d7f45d1cf-5c413e4d2eamr2008032a12.23.1726128254287;
-        Thu, 12 Sep 2024 01:04:14 -0700 (PDT)
-Received: from ?IPV6:2a10:bac0:b000:75b8:97eb:f4c4:420c:463b? ([2a10:bac0:b000:75b8:97eb:f4c4:420c:463b])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd468casm6214095a12.33.2024.09.12.01.04.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Sep 2024 01:04:13 -0700 (PDT)
-Message-ID: <2a2dd102-2ad9-4bbd-a5f7-5994de3870ae@suse.com>
-Date: Thu, 12 Sep 2024 11:04:12 +0300
+	s=arc-20240116; t=1726128997; c=relaxed/simple;
+	bh=SBfSrAHKe9JwBnDq6qTmF1f5rdYhudlhMtTHjKAhbEY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PMEooerur8j/knirqAauGtpUvm1eae6Z2rip2s+NH49fmlE3Pq6Cw2YKIbnwZV8I06Zu7XNwrn3ksWo4k+3yrCEXm8T0eoKke+VfGNN+0Ux9S08trxm9OZ4kfUneZ93dRzii2Ml2vzNHGyH5WWOwEchpf1tPLOXoq8GiCk1e2E0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WKxlfTZF; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48BKIjsn021192;
+	Thu, 12 Sep 2024 08:16:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	uTeVi2xWw5uitBigQiGA3v/ZlRN8rtJ0JUynUhhPpgw=; b=WKxlfTZFmaH4Ef7q
+	V2DQv7mDmSlTiSkT+p1GvcQcFUuzq15fCH7hh6E0Ew7e5C8DfNY9ClowFxO3x4Uq
+	e/ifTQbo7yf4Omcxzw0h723pD8Y534pT/7hsVNSfHs75FKDacV1wvlAhZBeIaBJJ
+	Ikaw8qT3kbnFCouDCE4A4jVPnorhd2nPdJPQxkNnuntNDjqvRyfXJrVzBU3kzejX
+	1gVNGoHtFsY6NVh5mOTMM4LGUekw/P4hVW/sh23OBIOieCZ40db09ov1XlNFUeip
+	2mDHD1Tb7ziBnPo7FGFUJn71izi47PA2b5QQ1I3f9rPNrG4Gjrh6hGqG9CfK1yt6
+	Tr1peA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gefyt2wq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Sep 2024 08:16:30 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48C8GTck019667;
+	Thu, 12 Sep 2024 08:16:29 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gefyt2wn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Sep 2024 08:16:29 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48C6xmD4032088;
+	Thu, 12 Sep 2024 08:16:29 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41h2nmxj7f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Sep 2024 08:16:29 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48C8GPvh54985044
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Sep 2024 08:16:25 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0DA8520040;
+	Thu, 12 Sep 2024 08:16:25 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5546B2004B;
+	Thu, 12 Sep 2024 08:16:24 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.8.247])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 12 Sep 2024 08:16:24 +0000 (GMT)
+Date: Thu, 12 Sep 2024 10:14:34 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah
+ Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand
+ <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Subject: Re: [PATCH v2 1/3] selftests: kvm: s390: Add uc_map_unmap VM test
+ case
+Message-ID: <20240912101434.14aafd7a@p-imbrenda>
+In-Reply-To: <20240902115002.199331-2-schlameuss@linux.ibm.com>
+References: <20240902115002.199331-1-schlameuss@linux.ibm.com>
+	<20240902115002.199331-2-schlameuss@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/25] KVM: TDX: Initialize KVM supported capabilities
- when module setup
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Nikolay Borisov
- <nik.borisov@suse.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>,
- seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
- tony.lindgren@linux.intel.com, linux-kernel@vger.kernel.org
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-11-rick.p.edgecombe@intel.com>
- <caa4407a-b838-4e1b-bb3d-87518f3de66b@suse.com>
- <aa764aad-1736-459f-896e-4f43bfe8b18d@intel.com>
-From: Nikolay Borisov <nik.borisov@suse.com>
-Content-Language: en-US
-In-Reply-To: <aa764aad-1736-459f-896e-4f43bfe8b18d@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: i9p_7-D9dCo3AIvNqlbeUPyrPyN1DfWt
+X-Proofpoint-ORIG-GUID: 7G3b-K7AfpI6phlifM1-We5Db_NZYDaj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-11_02,2024-09-09_02,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=866 priorityscore=1501
+ adultscore=0 clxscore=1015 spamscore=0 bulkscore=0 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409120055
 
+On Mon,  2 Sep 2024 13:50:00 +0200
+Christoph Schlameuss <schlameuss@linux.ibm.com> wrote:
 
-
-On 5.09.24 г. 16:36 ч., Xiaoyao Li wrote:
-> On 9/4/2024 7:58 PM, Nikolay Borisov wrote:
->>
->>
->> On 13.08.24 г. 1:48 ч., Rick Edgecombe wrote:
->>> From: Xiaoyao Li <xiaoyao.li@intel.com>
->>>
->>> While TDX module reports a set of capabilities/features that it
->>> supports, what KVM currently supports might be a subset of them.
->>> E.g., DEBUG and PERFMON are supported by TDX module but currently not
->>> supported by KVM.
->>>
->>> Introduce a new struct kvm_tdx_caps to store KVM's capabilities of TDX.
->>> supported_attrs and suppported_xfam are validated against fixed0/1
->>> values enumerated by TDX module. Configurable CPUID bits derive from TDX
->>> module plus applying KVM's capabilities (KVM_GET_SUPPORTED_CPUID),
->>> i.e., mask off the bits that are configurable in the view of TDX module
->>> but not supported by KVM yet.
->>>
->>> KVM_TDX_CPUID_NO_SUBLEAF is the concept from TDX module, switch it to 0
->>> and use KVM_CPUID_FLAG_SIGNIFCANT_INDEX, which are the concept of KVM.
->>>
->>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
->>> ---
->>> uAPI breakout v1:
->>>   - Change setup_kvm_tdx_caps() to use the exported 'struct tdx_sysinfo'
->>>     pointer.
->>>   - Change how to copy 'kvm_tdx_cpuid_config' since 'struct tdx_sysinfo'
->>>     doesn't have 'kvm_tdx_cpuid_config'.
->>>   - Updates for uAPI changes
->>> ---
->>>   arch/x86/include/uapi/asm/kvm.h |  2 -
->>>   arch/x86/kvm/vmx/tdx.c          | 81 +++++++++++++++++++++++++++++++++
->>>   2 files changed, 81 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/arch/x86/include/uapi/asm/kvm.h 
->>> b/arch/x86/include/uapi/asm/kvm.h
->>> index 47caf508cca7..c9eb2e2f5559 100644
->>> --- a/arch/x86/include/uapi/asm/kvm.h
->>> +++ b/arch/x86/include/uapi/asm/kvm.h
->>> @@ -952,8 +952,6 @@ struct kvm_tdx_cmd {
->>>       __u64 hw_error;
->>>   };
->>> -#define KVM_TDX_CPUID_NO_SUBLEAF    ((__u32)-1)
->>> -
->>>   struct kvm_tdx_cpuid_config {
->>>       __u32 leaf;
->>>       __u32 sub_leaf;
->>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->>> index 90b44ebaf864..d89973e554f6 100644
->>> --- a/arch/x86/kvm/vmx/tdx.c
->>> +++ b/arch/x86/kvm/vmx/tdx.c
->>> @@ -31,6 +31,19 @@ static void __used tdx_guest_keyid_free(int keyid)
->>>       ida_free(&tdx_guest_keyid_pool, keyid);
->>>   }
->>> +#define KVM_TDX_CPUID_NO_SUBLEAF    ((__u32)-1)
->>> +
->>> +struct kvm_tdx_caps {
->>> +    u64 supported_attrs;
->>> +    u64 supported_xfam;
->>> +
->>> +    u16 num_cpuid_config;
->>> +    /* This must the last member. */
->>> +    DECLARE_FLEX_ARRAY(struct kvm_tdx_cpuid_config, cpuid_configs);
->>> +};
->>> +
->>> +static struct kvm_tdx_caps *kvm_tdx_caps;
->>> +
->>>   static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
->>>   {
->>>       const struct tdx_sysinfo_td_conf *td_conf = &tdx_sysinfo->td_conf;
->>> @@ -131,6 +144,68 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user 
->>> *argp)
->>>       return r;
->>>   }
->>> +#define KVM_SUPPORTED_TD_ATTRS (TDX_TD_ATTR_SEPT_VE_DISABLE)
->>
->> Why isn't TDX_TD_ATTR_DEBUG added as well?
+> Add a test case verifying basic running and interaction of ucontrol VMs.
+> Fill the segment and page tables for allocated memory and map memory on
+> first access.
 > 
-> Because so far KVM doesn't support all the features of a DEBUG TD for 
-> userspace. e.g., KVM doesn't provide interface for userspace to 
-> read/write private memory of DEBUG TD.
+> * uc_map_unmap
+>   Store and load data to mapped and unmapped memory and use pic segment
+>   translation handling to map memory on access.
+> 
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> ---
+>  .../selftests/kvm/s390x/ucontrol_test.c       | 121 +++++++++++++++++-
+>  1 file changed, 120 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> index 030c59010fe1..04a0d55af617 100644
+> --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> @@ -16,7 +16,11 @@
+>  #include <linux/capability.h>
+>  #include <linux/sizes.h>
+>  
+> +#define PGM_SEGMENT_TRANSLATION 0x10
+> +
+>  #define VM_MEM_SIZE (4 * SZ_1M)
+> +#define VM_MEM_EXT_SIZE (2 * SZ_1M)
+> +#define VM_MEM_MAX_M ((VM_MEM_SIZE + VM_MEM_EXT_SIZE) / SZ_1M)
+>  
+>  /* so directly declare capget to check caps without libcap */
+>  int capget(cap_user_header_t header, cap_user_data_t data);
+> @@ -58,6 +62,23 @@ asm("test_gprs_asm:\n"
+>  	"	j	0b\n"
+>  );
+>  
+> +/* Test program manipulating memory */
+> +extern char test_mem_asm[];
+> +asm("test_mem_asm:\n"
+> +	"xgr	%r0, %r0\n"
+> +
+> +	"0:\n"
+> +	"	ahi	%r0,1\n"
+> +	"	st	%r1,0(%r5,%r6)\n"
+> +
+> +	"	xgr	%r1,%r1\n"
+> +	"	l	%r1,0(%r5,%r6)\n"
+> +	"	ahi	%r0,1\n"
+> +	"	diag	0,0,0x44\n"
+> +
+> +	"	j	0b\n"
+> +);
+> +
+>  FIXTURE(uc_kvm)
+>  {
+>  	struct kvm_s390_sie_block *sie_block;
+> @@ -67,6 +88,7 @@ FIXTURE(uc_kvm)
+>  	uintptr_t base_hva;
+>  	uintptr_t code_hva;
+>  	int kvm_run_size;
+> +	vm_paddr_t pgd;
+>  	void *vm_mem;
+>  	int vcpu_fd;
+>  	int kvm_fd;
+> @@ -116,7 +138,7 @@ FIXTURE_SETUP(uc_kvm)
+>  	self->base_gpa = 0;
+>  	self->code_gpa = self->base_gpa + (3 * SZ_1M);
+>  
+> -	self->vm_mem = aligned_alloc(SZ_1M, VM_MEM_SIZE);
+> +	self->vm_mem = aligned_alloc(SZ_1M, VM_MEM_MAX_M * SZ_1M);
+>  	ASSERT_NE(NULL, self->vm_mem) TH_LOG("malloc failed %u", errno);
+>  	self->base_hva = (uintptr_t)self->vm_mem;
+>  	self->code_hva = self->base_hva - self->base_gpa + self->code_gpa;
+> @@ -222,6 +244,36 @@ TEST(uc_cap_hpage)
+>  	close(kvm_fd);
+>  }
+>  
+> +/* calculate host virtual addr from guest physical addr */
+> +static void *gpa2hva(FIXTURE_DATA(uc_kvm) * self, u64 gpa)
+> +{
+> +	return (void *)(self->base_hva - self->base_gpa + gpa);
+> +}
+> +
+> +static void uc_handle_exit_ucontrol(FIXTURE_DATA(uc_kvm) * self)
+> +{
+> +	struct kvm_run *run = self->run;
+> +
+> +	TEST_ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
+> +	switch (run->s390_ucontrol.pgm_code) {
+> +	case PGM_SEGMENT_TRANSLATION:
+> +		pr_info("ucontrol pic segment translation 0x%llx\n",
+> +			run->s390_ucontrol.trans_exc_code);
+> +		/* map / make additional memory available */
+> +		struct kvm_s390_ucas_mapping map2 = {
+> +			.user_addr = (u64)gpa2hva(self, run->s390_ucontrol.trans_exc_code),
+> +			.vcpu_addr = run->s390_ucontrol.trans_exc_code,
+> +			.length = VM_MEM_EXT_SIZE,
+> +		};
 
-But this means that you can't really run a TDX with SEPT_VE_DISABLE 
-disabled for debugging purposes, so perhaps it might be necessary to 
-rethink the condition allowing SEPT_VE_DISABLE to be disabled. Without 
-the debug flag and SEPT_VE_DISABLE disabled the code refuses to start 
-the VM, what if one wants to debug some SEPT issue by having an oops 
-generated inside the vm ?
+you could use the wrapper here too (see below)
 
-> 
->> <snip>
-> 
-> 
+> +		pr_info("ucas map %p %p 0x%llx\n",
+> +			(void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
+> +		TEST_ASSERT_EQ(0, ioctl(self->vcpu_fd, KVM_S390_UCAS_MAP, &map2));
+> +		break;
+
+so this will always return true
+
+> +	default:
+> +		TEST_FAIL("UNEXPECTED PGM CODE %d", run->s390_ucontrol.pgm_code);
+> +	}
+> +}
+> +
+>  /* verify SIEIC exit
+>   * * reset stop requests
+>   * * fail on codes not expected in the test cases
+> @@ -256,6 +308,12 @@ static bool uc_handle_exit(FIXTURE_DATA(uc_kvm) * self)
+>  	struct kvm_run *run = self->run;
+>  
+>  	switch (run->exit_reason) {
+> +	case KVM_EXIT_S390_UCONTROL:
+> +		/** check program interruption code
+> +		 * handle page fault --> ucas map
+> +		 */
+> +		uc_handle_exit_ucontrol(self);
+> +		break;
+>  	case KVM_EXIT_S390_SIEIC:
+>  		return uc_handle_sieic(self);
+>  	default:
+> @@ -287,6 +345,67 @@ static void uc_assert_diag44(FIXTURE_DATA(uc_kvm) * self)
+>  	TEST_ASSERT_EQ(0x440000, sie_block->ipb);
+>  }
+>  
+> +TEST_F(uc_kvm, uc_map_unmap)
+> +{
+> +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
+> +	struct kvm_run *run = self->run;
+> +	int rc;
+> +
+> +	/* copy test_mem_asm to code_hva / code_gpa */
+> +	TH_LOG("copy code %p to vm mapped memory %p / %p",
+> +	       &test_mem_asm, (void *)self->code_hva, (void *)self->code_gpa);
+> +	memcpy((void *)self->code_hva, &test_mem_asm, PAGE_SIZE);
+> +
+> +	/* DAT disabled + 64 bit mode */
+> +	run->psw_mask = 0x0000000180000000ULL;
+> +	run->psw_addr = self->code_gpa;
+> +
+> +	/* set register content for test_mem_asm to access not mapped memory*/
+> +	sync_regs->gprs[1] = 0x55;
+> +	sync_regs->gprs[5] = self->base_gpa;
+> +	sync_regs->gprs[6] = VM_MEM_SIZE;
+> +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
+> +
+> +	/* run and expect to fail with ucontrol pic segment translation */
+> +	ASSERT_EQ(0, uc_run_once(self));
+> +	ASSERT_EQ(1, sync_regs->gprs[0]);
+> +	ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
+> +
+> +	ASSERT_EQ(PGM_SEGMENT_TRANSLATION, run->s390_ucontrol.pgm_code);
+> +	ASSERT_EQ(self->base_gpa + VM_MEM_SIZE, run->s390_ucontrol.trans_exc_code);
+> +	/* map / make additional memory available */
+> +	struct kvm_s390_ucas_mapping map2 = {
+> +		.user_addr = (u64)gpa2hva(self, self->base_gpa + VM_MEM_SIZE),
+> +		.vcpu_addr = self->base_gpa + VM_MEM_SIZE,
+> +		.length = VM_MEM_EXT_SIZE,
+> +	};
+> +	TH_LOG("ucas map %p %p 0x%llx",
+> +	       (void *)map2.user_addr, (void *)map2.vcpu_addr,
+> map2.length);
+> +	rc = ioctl(self->vcpu_fd, KVM_S390_UCAS_MAP, &map2);
+
+maybe you can put the map/unmap IOCTLs in a wrapper, so that this
+becomes more readable? 
+
+rc = uc_map_ext(self->base_gpa + VM_MEM_SIZE, self->base_gpa +VM_MEM_SIZE);
+
+> +	ASSERT_EQ(0, rc)
+> +		TH_LOG("ucas map result %d not expected, %s", rc, strerror(errno));
+> +	ASSERT_EQ(0, uc_run_once(self));
+> +	ASSERT_EQ(false, uc_handle_exit(self));
+> +	uc_assert_diag44(self);
+> +
+> +	/* assert registers and memory are in expected state */
+> +	ASSERT_EQ(2, sync_regs->gprs[0]);
+> +	ASSERT_EQ(0x55, sync_regs->gprs[1]);
+> +	ASSERT_EQ(0x55, *(u32 *)gpa2hva(self, self->base_gpa + VM_MEM_SIZE));
+> +
+> +	/* unmap and run loop again */
+> +	TH_LOG("ucas unmap %p %p 0x%llx",
+> +	       (void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
+> +	rc = ioctl(self->vcpu_fd, KVM_S390_UCAS_UNMAP, &map2);
+> +	ASSERT_EQ(0, rc)
+> +		TH_LOG("ucas unmap result %d not expected, %s", rc, strerror(errno));
+> +	ASSERT_EQ(0, uc_run_once(self));
+> +	ASSERT_EQ(3, sync_regs->gprs[0]);
+> +	ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
+> +	ASSERT_EQ(PGM_SEGMENT_TRANSLATION, run->s390_ucontrol.pgm_code);
+> +	ASSERT_EQ(true, uc_handle_exit(self));
+> +}
+> +
+>  TEST_F(uc_kvm, uc_gprs)
+>  {
+>  	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
+
 
