@@ -1,177 +1,184 @@
-Return-Path: <kvm+bounces-26723-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26724-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46201976C19
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 16:29:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3A99976C44
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 16:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0044F284CFD
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 14:29:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8068B23552
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 14:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11AE31B12E8;
-	Thu, 12 Sep 2024 14:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C291B373A;
+	Thu, 12 Sep 2024 14:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NGriG+uP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2uGVAGt8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9AD1A4E7C;
-	Thu, 12 Sep 2024 14:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1DB1AD279
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 14:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726151381; cv=none; b=r7aO+K3N0uqptZGb06E6+m+0fdpH7CAHzX3Asatgw/A19Q64Xwjupicbpc4Z4Q1bGE+cc2ISNj3xs79mp1PLySN3ocOJzHqjWZfU/gNPz7vh60jqAeVoWa1mRARHoy9eQ8IN2Ug59Fh2oMpts7ankMDFDMX9M7aA3UDj2sr/Ad4=
+	t=1726151799; cv=none; b=SyKRkGyBdDYNFA2PAGkrrGFpYnam2HIkUQGuP2xnBWZLz3y0o+ZA5M27AkqLbsQy1ypz9O64x6oD/1NatsPxE56T3JX1gmC/VM5QwFg+xZLy9+H0UdDR30aTdBeR4IoNU0/Jh+Wnjd+GHG8ePc47o+FfxcMaoDd+8Qm6nvuJsCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726151381; c=relaxed/simple;
-	bh=WqWblWK9j9pBmIDPL8+cidY79AOM7Ury3RJgfIB58HY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=N1FFszQ8WmvDaRQkgDC3eYG3Z/2EDVEdVNv3u2nzMfKPSBhZJa/sIeim3c5l/Imnw57E9XwQZymwO9VeGT1aD7GK8IjzaHaSbogKdYKuEYkd9LBbX7rI2AdPUEjprK35QDL+gCqUrO8xj8kp9ilCgCmiXdLINObBfYJOOf+aRKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NGriG+uP; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48CBXhiN020293;
-	Thu, 12 Sep 2024 14:29:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	mime-version:content-transfer-encoding:content-type:date
-	:message-id:from:cc:to:subject:references:in-reply-to; s=pp1;
-	 bh=V8JhCKvZz3EJEDtODbSJXFM409kvD1wRr+l0IYPGJis=; b=NGriG+uPuMt/
-	EdX6uyBPOqL+0tSDe3n/KaYeZtChhDyC7PXPDHuVPrvg4Ac9Es7mHzTJGCgT38Yl
-	m3WDipIUgK/a7+1hOPYy9xy9vDntE4DpJsnqV9yTOejTn+OnjPaney6d4rIyDbZs
-	ztCi1Ny/1nVyn3mRdsBRnrJ4rAfeQwyl4WUtDNd3gUVDkkxv7xS8MlMS7++X9utn
-	rW3BzXHyLy/4szJXEZz4ydt4YGhfChgc0wkAQ18dkJzBOEwUCnx1rrfcc1376a5I
-	cAjIpHwl2U3aVebIWiWOZv+nYJD2PpVfP1nH0wUReDP+Ujg2fVuir8pA9gwiTqsn
-	p8ynGZSKPQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gebam7jf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Sep 2024 14:29:35 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48CETZvr017287;
-	Thu, 12 Sep 2024 14:29:35 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gebam7j7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Sep 2024 14:29:35 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48CCaxVq013471;
-	Thu, 12 Sep 2024 14:29:34 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 41h3cmg8qu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Sep 2024 14:29:34 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48CETUlY52232584
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Sep 2024 14:29:30 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8720F20043;
-	Thu, 12 Sep 2024 14:29:30 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5569020040;
-	Thu, 12 Sep 2024 14:29:30 +0000 (GMT)
-Received: from darkmoore (unknown [9.179.25.216])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Sep 2024 14:29:30 +0000 (GMT)
+	s=arc-20240116; t=1726151799; c=relaxed/simple;
+	bh=ZoHEMiLHNAklQqy8n7zR1GpdffFQA3RiPrxrJvYrbkU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=d6rdYujebXRPt2HSyKRW9wcxs9tS5XXwNZsd2suGeercX/7Ys+eUJ10V85JWFePKrC5RGOLOO4FCOlaE34Fs7SDOZ0crAEKJ252DnWHQwOT5lIzwkFQUgp10bx3GFgK83jLXwYfVEkB/4KQIJGSUANJQ+pD3XLNYXt80PUkXACo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2uGVAGt8; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-207464a9b59so13749435ad.3
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:36:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726151797; x=1726756597; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IuWyNxzcGe6GM7Msd7pGsCR+v4gYGRud4L+CnasmxO4=;
+        b=2uGVAGt8+7M/VfnAFduB6YZz0LUpTjFVyhdTgsV+Tw7RDOVWvH50ZxIzlkoo3fVz2d
+         kT/ltGae1nflUaD6D5rDW135zg1DxCtGoFJ7cyrmIE0JcRYo4r5Qd1C28kG/Mtaa9HX8
+         2Cizs82jE4mhZQkCosmsHigLA/mOUrLxzQM9Tavw2Ce+jkktV/+hMeZGUY5C2W3KAfyQ
+         T9c6uoaWDAQ77NPQKD9HbTByKWjSHnuOM/ziy4nOiJ+zuuaLUMv6d/qE5UxKQQzRHBlN
+         cyDuPf8UEm4Edf2GqfN5xFcz0oSZWBtgyk3QtNS3/Bry7O9uQFxF8xBybPdcHdEVDnse
+         i9Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726151797; x=1726756597;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IuWyNxzcGe6GM7Msd7pGsCR+v4gYGRud4L+CnasmxO4=;
+        b=euLjIwAtyi3AzxJbc3mRuJkC7w2xxyvUGDIE37c6cOyVefAPzsda4tY6/LQgOSBHtu
+         feH1QrivI166NoF8ue5H02Wni5leFUJh7mJQ5k8bANe+Q3dbVCUIsAbWxYh1GndOQZ3H
+         U37C/nb8/VUHpLNkbJShip9KANBja7jrqGqvFxxYpCjccRfKpG9IRTR/e4ZYYSGbHY72
+         Fla4bg9PEztFuQw6DfsYLhMaqoYT86tgREBE/ljy14LDkiUcIuKnQUtqJ3ncoAyby1Rr
+         6Z3cBPYffQkvmjPwD9JaxpQURZMh0N3yyPKunZueodvtPfdgMDjuJI0CU6qIZgS8gLYi
+         7/Jw==
+X-Forwarded-Encrypted: i=1; AJvYcCXjoBRnCjUmDzgLWDHdT/i6e+dTQNbPkQrc0qwmZAP6iF57+NUiggh27YkpeXfAbQIFUZs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwBbPjjM5LH96EpZLT6Vw6/e9UykFFOUU1m/2YIoFU8t0GzBxN
+	Uo9qrKsJbHcju0JpyGTEvEgb61Zh/Y+24Ff0O1312TUoLuvoOV5X6TqjOXcxocyI5h2yFdZ8azk
+	0/A==
+X-Google-Smtp-Source: AGHT+IFuWC8JsJR3HsGyaRESNbHfLvQfpWc/wR0gpPN/S8O3DJQxAYIEFm0Vm/kFYnlxP670Kr6C2sD3R10=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:fa47:b0:205:71fb:2b27 with SMTP id
+ d9443c01a7336-2076e3793dbmr630405ad.4.1726151796967; Thu, 12 Sep 2024
+ 07:36:36 -0700 (PDT)
+Date: Thu, 12 Sep 2024 07:36:35 -0700
+In-Reply-To: <CADrL8HW+hUNKPbaL7xYb0FEesB2t-AwAw07iOCDj8KHp0RwVpQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240911204158.2034295-1-seanjc@google.com> <20240911204158.2034295-14-seanjc@google.com>
+ <CADrL8HW+hUNKPbaL7xYb0FEesB2t-AwAw07iOCDj8KHp0RwVpQ@mail.gmail.com>
+Message-ID: <ZuL8c7SCV0I16cma@google.com>
+Subject: Re: [PATCH v2 13/13] KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 12 Sep 2024 16:29:25 +0200
-Message-Id: <D44DL9UL4Q2T.3JHP2BM3APY6A@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>,
-        "Paolo Bonzini" <pbonzini@redhat.com>, "Shuah Khan" <shuah@kernel.org>,
-        "Christian Borntraeger"
- <borntraeger@linux.ibm.com>,
-        "Janosch Frank" <frankja@linux.ibm.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        "Nina Schoetterl-Glausch"
- <nsg@linux.ibm.com>
-To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>
-Subject: Re: [PATCH v2 2/3] selftests: kvm: s390: Add uc_skey VM test case
-X-Mailer: aerc 0.18.2
-References: <20240902115002.199331-1-schlameuss@linux.ibm.com>
- <20240902115002.199331-3-schlameuss@linux.ibm.com>
- <20240912101523.5ee9ca54@p-imbrenda>
-In-Reply-To: <20240912101523.5ee9ca54@p-imbrenda>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5V3cu_pd0_FiapShwabz62x6YUSCC06o
-X-Proofpoint-GUID: axDXDaVUYWZMAW1fgR1Ls2ke40B6Udrq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-12_03,2024-09-12_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 spamscore=0 phishscore=0 lowpriorityscore=0
- mlxscore=0 mlxlogscore=627 impostorscore=0 clxscore=1015 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2409120102
 
-On Thu Sep 12, 2024 at 10:15 AM CEST, Claudio Imbrenda wrote:
-> On Mon,  2 Sep 2024 13:50:01 +0200
-> Christoph Schlameuss <schlameuss@linux.ibm.com> wrote:
->
-> > Add a test case manipulating s390 storage keys from within the ucontrol
-> > VM.
-> >=20
-> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> > ---
-> >  .../selftests/kvm/s390x/ucontrol_test.c       | 89 ++++++++++++++++++-
-> >  1 file changed, 88 insertions(+), 1 deletion(-)
+On Wed, Sep 11, 2024, James Houghton wrote:
+> On Wed, Sep 11, 2024 at 1:42=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > @@ -31,6 +33,42 @@ static void guest_code(uint64_t start_gpa, uint64_t =
+end_gpa, uint64_t stride)
+> >                 *((volatile uint64_t *)gpa);
+> >         GUEST_SYNC(2);
+> >
+> > +       /*
+> > +        * Write to the region while mprotect(PROT_READ) is underway.  =
+Keep
+> > +        * looping until the memory is guaranteed to be read-only, othe=
+rwise
+> > +        * vCPUs may complete their writes and advance to the next stag=
+e
+> > +        * prematurely.
+> > +        *
+> > +        * For architectures that support skipping the faulting instruc=
+tion,
+> > +        * generate the store via inline assembly to ensure the exact l=
+ength
+> > +        * of the instruction is known and stable (vcpu_arch_put_guest(=
+) on
+> > +        * fixed-length architectures should work, but the cost of para=
+noia
+> > +        * is low in this case).  For x86, hand-code the exact opcode s=
+o that
+> > +        * there is no room for variability in the generated instructio=
+n.
+> > +        */
+> > +       do {
+> > +               for (gpa =3D start_gpa; gpa < end_gpa; gpa +=3D stride)
+> > +#ifdef __x86_64__
+> > +                       asm volatile(".byte 0x48,0x89,0x00" :: "a"(gpa)=
+ : "memory"); /* mov %rax, (%rax) */
+>=20
+> I'm curious what you think about using labels (in asm, but perhaps
+> also in C) and *setting* the PC instead of incrementing the PC.=20
 
-[...]
+I have nothing against asm labels, but generally speaking I don't like usin=
+g
+_global_ labels to skip instructions.  E.g. __KVM_ASM_SAFE() uses labels to=
+ compute
+the instruction size, but those labels are local and never directly used ou=
+tside
+of the macro.
 
-> > +TEST_F(uc_kvm, uc_skey)
-> > +{
-> > +	u64 test_vaddr =3D VM_MEM_SIZE - (SZ_1M / 2);
-> > +	struct kvm_sync_regs *sync_regs =3D &self->run->s.regs;
-> > +	struct kvm_run *run =3D self->run;
-> > +	u8 skeyvalue =3D 0x34;
-> > +
-> > +	/* copy test_skey_asm to code_hva / code_gpa */
-> > +	TH_LOG("copy code %p to vm mapped memory %p / %p",
-> > +	       &test_skey_asm, (void *)self->code_hva, (void *)self->code_gpa=
-);
-> > +	memcpy((void *)self->code_hva, &test_skey_asm, PAGE_SIZE);
-> > +
-> > +	/* set register content for test_skey_asm to access not mapped memory=
- */
-> > +	sync_regs->gprs[1] =3D skeyvalue;
-> > +	sync_regs->gprs[5] =3D self->base_gpa;
-> > +	sync_regs->gprs[6] =3D test_vaddr;
-> > +	run->kvm_dirty_regs |=3D KVM_SYNC_GPRS;
-> > +
-> > +	/* DAT disabled + 64 bit mode */
-> > +	run->psw_mask =3D 0x0000000180000000ULL;
-> > +	run->psw_addr =3D self->code_gpa;
-> > +
-> > +	ASSERT_EQ(0, uc_run_once(self));
-> > +	ASSERT_EQ(false, uc_handle_exit(self));
->
-> this should be true, since KSS will be triggered
->
+The biggest problem with global labels is that they don't scale.  E.g. if w=
+e
+extend this test in the future with another testcase that needs to skip a g=
+pa,
+then we'll end up with skip_page1 and skip_page2, and the code starts to be=
+come
+even harder to follow.
 
-Good find.
-Yes, as this is the assertion does actually fail here.
-Will fix that in the next version.
+Don't get me wrong, skipping a fixed instruction size is awful too, but in =
+my
+experience they are less painful to maintain over the long haul.
 
-> > +	ASSERT_EQ(1, sync_regs->gprs[0]);
-> > +
-> > +	/* ISKE */
-> > +	ASSERT_EQ(0, uc_run_once(self));
-> > +	ASSERT_EQ(false, uc_handle_exit(self));
-> > +	ASSERT_EQ(2, sync_regs->gprs[0]);
-> > +	/* assert initial skey (ACC =3D 0, R & C =3D 1) */
-> > +	ASSERT_EQ(0x06, sync_regs->gprs[1]);
-> > +	uc_assert_diag44(self);
+> Diff attached (tested on x86).
 
-[...]
+Nit, in the future, just copy+pase the diff for small things like this (and=
+ even
+for large diffs in many cases) so that readers don't need to open an attach=
+ment
+(depending on their mail client), and so that it's easier to comment on the
+proposed changed.
 
+`git am --scissors` (a.k.a. `git am -c`) can be used to essentially extract=
+ and
+apply such a diff from the mail.
+
+> It might even be safe/okay to always use vcpu_arch_put_guest(), just set =
+the
+> PC to a label immediately following it.
+
+That would not be safe/feasible.  Labels in C code are scoped to the functi=
+on.
+And AFAIK, labels for use with goto are also not visible symbols, they are
+statements.  The "standard" way to expose a label from a function is to use=
+ inline
+asm, at which point there are zero guarantees that nothing necessary is gen=
+erated
+between vcpu_arch_put_guest() and the next asm() block.
+
+E.g. ignoring the inline asm for the moment, the compiler could generate mu=
+ltiple
+paths for a loop, e.g. an unrolled version for a small number of iterations=
+, and
+an actual loop for a larger number of iterations.  Trying to define a label=
+ as a
+singular symbol for that is nonsensical.
 
