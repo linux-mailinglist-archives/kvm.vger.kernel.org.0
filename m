@@ -1,157 +1,154 @@
-Return-Path: <kvm+bounces-26753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA92B9770D4
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 20:29:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F6D9770DD
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 20:41:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3EDA285E41
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 18:29:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A8B0285A1E
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 18:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4001BFDEC;
-	Thu, 12 Sep 2024 18:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14541BFDE7;
+	Thu, 12 Sep 2024 18:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6GSm8TP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wrgtlElg"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305F81B12FA
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 18:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6573D1BE857
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 18:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726165785; cv=none; b=PjYjRozFc192CaEr1OHL5yVq+wplymX4BEYBLxv+tPkeAOGYoyojMH7WsvSqPkM8fPC7csjwgJyA9rABKXZO4B7xtPHez0JC5/6pzO30eQb7qCUAbs3pmMSSqRNgqPSXKkC1pXMFWQEXBOxec7XbKS9R+8cRoD7BE7LorPrCBX8=
+	t=1726166492; cv=none; b=g8fTGcbn/zcsQ0Du+1iUPIvbkOCgew3727Ax+lZEhAVGjIWFYzR5+OZuiPmunDM+lECb54u7ok3HZ/cLiwXU7alOtJJc8vf/kjIV6uJhFBlOVTxRBPOa1iHHhktiArXID7wHA7Op0ras98f+nsGjvR8oOF6wZXZ0wVcLIUr8fPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726165785; c=relaxed/simple;
-	bh=gqzQaTlpGo+QX2EPoFVnO0rEY31FWTVAiW8vn/iHvw4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rXEMyD71MVRmnc3kKRxZg+rxp7mPET3qW50Fh18fjgc+KSjG/iaopoNAj/wqa/LTZ1W5KFmJHd9hajGrnvHXgdpO5pKiXfnpJu55GYwOsqfuyeQEdacbLgZ5cQxXQNojvg2e6Si1+XNCC5Adb4OBLvVTOWckZQp+XIW5bd41kBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W6GSm8TP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726165783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lDIH4mBgl9RAQst2WRBMWUVmbQay80eGVTkA1/RxoHw=;
-	b=W6GSm8TPFQ4mblieTQ/xg/Ff4CBw7pjPw+8vCfLDoTBm5/eiJB+v4J9b4L1bp4bFR478sJ
-	7TnWQGoOt+pa7u7QMsI3x/fHF21Q4pmmwsPZpz6ecPciNPqDOHrYiaKZooF5tnp/b8NTwz
-	neKreHCDb+KOFBFmxbaNwGaHdebpbQI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-494-4lfJC74vNiW9FPlv-PLmyA-1; Thu, 12 Sep 2024 14:29:41 -0400
-X-MC-Unique: 4lfJC74vNiW9FPlv-PLmyA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-374b69e65e8so604504f8f.0
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 11:29:41 -0700 (PDT)
+	s=arc-20240116; t=1726166492; c=relaxed/simple;
+	bh=BFs81fz+/fKkGQ/9h98oeaKtvMGTr0K0X4JKPhX7S/E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=BMPWUQpQL6htD9LPTH7RGrFtZ4nRMZmE6bfEy336yTPV0JDtTMP7Pl3Kf5gYph1o7iy2sDVVoHn5aV/UMk/wP1VrAIJ9PrhKZyFoA2z656SBLTMIsxiNFc8Tmlx0G9sxX6NlhbT0PxpZjuA3t9LfG6RA8yFexvwKC/26S2WPYlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wrgtlElg; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6d7124938d1so32906937b3.0
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 11:41:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726166490; x=1726771290; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cKXybCzsjXolS9UcuOQMALQBHp9XXAXKDPNYebFpzCA=;
+        b=wrgtlElgukdb1l6nMH9R0btagEd+J2MEUAqpEeD9488/+B6v7lTWn/VYJDzCu5MVDc
+         yitO8rsGp8hNaSOhW5jqGsIlHFuRNaknIFrif+mcKHoKaTsroDbG3tERufQNsjlQqkow
+         2/9n4dwUCz7muITWHor00EXVxsVcI1vwIbrFKR0lM49u6Qw1CGF2gim/HcR3xhRnDmD6
+         ZO6kl93K9SHqAYkSDVrajg1gtXaCB3EjJHkuaxPCu3tNbfmcaMneqT5mb23gKay3rNCg
+         zqnM1zQJZpwH3O/5mSSMIcXNPRMtYDzzQdDMcFNrUTls6D4q37r+n9BpMdDuFmV6UYP+
+         ZjuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726165781; x=1726770581;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lDIH4mBgl9RAQst2WRBMWUVmbQay80eGVTkA1/RxoHw=;
-        b=nBxIbPtR5C1o+wf0L8g5REPsH3rhGeZTS4Ltu4AmWJeyNpRCx2XsRqJyfMD8/qW+62
-         EOQXFBbAUQm5w7I7X9X03dgPJnZ7aMhqNkZccu/sZg5X/OfRLP2FYH0KMfxz12h+eugh
-         0OAcz80KTfiwjmCOl/wSYiGgO83YpjDKrCA+QVEtLDj8ZaUdeIR32/3r9x/EQAt1JJ+g
-         ENeaQ7kDJ3ukVrp0X0V34R9WRDzZYfuznL+Rr53VJstOw4FWq+aOhgbd5fbDHcmUj9lE
-         63dKHTpY5NN+uyfKNcloP7lamQgcsliKizzNQ1tE1A5MlNU4KaWUN/ZomjNTgs7Bpoxq
-         +8LA==
-X-Forwarded-Encrypted: i=1; AJvYcCVQyAkz1X6BLn6XY45PefHLlGlcqeS7ozCRxBo0+a8TDuhFbzoO+y+I5h412B1ct74bUhM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypmpRRpBH8WjJB/8K3vOfJTXN3BnyNrQP4E8rJtLI7w/Rh775h
-	Z0RkFJjkt94s/bSC6arSgY6q6BTgWZlkDCwvsRudGbndXrLffdJALKGuKsQq6InjsLm5U36red5
-	3VlTsCtx77rI1FCXevJ+31Zja8qicX8M/xvLIgz8aBFrT++tkWrQT92XOZLNF+d6RB3ZrouNL5q
-	gSwlZ0QfSlM/8FzMOcSBiQSxYJ
-X-Received: by 2002:adf:fc0a:0:b0:371:8c61:577c with SMTP id ffacd0b85a97d-378c2d121c0mr2267734f8f.26.1726165780676;
-        Thu, 12 Sep 2024 11:29:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQtfXLWHi72srHCUSdiyqWsp1/7c4sM6L9CY7al7GP3wF3pMbjYvkXS86BtezLsnLxSofUqszJG/BpEF6KTZ0=
-X-Received: by 2002:adf:fc0a:0:b0:371:8c61:577c with SMTP id
- ffacd0b85a97d-378c2d121c0mr2267720f8f.26.1726165780132; Thu, 12 Sep 2024
- 11:29:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726166490; x=1726771290;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cKXybCzsjXolS9UcuOQMALQBHp9XXAXKDPNYebFpzCA=;
+        b=IdVxT50/mkOkPSgLlp2zeXcjUIqFROBh0EuCQrgJcz08B4sPWTCOf5A51fh6xq9QPx
+         TUdHhx2lesbwtoA/4q7HCYh9IW+/Iudcro1OJh3YpCnCSJkUkPosu6P1TREPwvUb/4uV
+         /wW+F+ahSSC8Pw4uJbG9kiESLr8gsNZ3i/uvYXSXhYvAZuuSM37TyksZ8bqs3E1Lpa9P
+         kFcZfyhgi0FJUa2beTZ/IsgrzWgE7Wcq6u7Yx0JFcD0AuJKOvzFSxSv/MLfCTS0jrYcZ
+         BaJP/2qGaIxa5BiyMBWbvCqPtZRtUNwZMqdfGBGdwIaSUNC60YHKn07eJ/W4j8v6gdHn
+         ut3w==
+X-Forwarded-Encrypted: i=1; AJvYcCXj8j9j98NfLD2bLgFnXbtLwpnHjPMe3qL+lE3uVsKNHPqC1KphuKkcTTydW1+TCOPkr+g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZW0ECNpPSrjh5HdxbWwl8PGTO9+P0e6eRXH3mcNzyCKy3btkA
+	ODcWfGZJGqRRXYjQAUXRJ7aXlwrXqqlR+6vOy2pPUa09vdveGQitgn2OnGSJmN6WHU3KqDw/ebn
+	4ew==
+X-Google-Smtp-Source: AGHT+IEe7W/SCYY7Jtcilvig7Nir8LqKuHfAsfIwTwdcmtqiZ1O+o5Y9CHfzQtoHDU2kyU1NO7hvKxN3Bn8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:5b88:0:b0:6db:c6d8:678 with SMTP id
+ 00721157ae682-6dbc6d807f6mr534257b3.0.1726166490365; Thu, 12 Sep 2024
+ 11:41:30 -0700 (PDT)
+Date: Thu, 12 Sep 2024 11:41:28 -0700
+In-Reply-To: <CABgObfZV3-xRSALfS6syL3pzdMoep82OjWT4m7=4fLRaiWp=XQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
  <20240812224820.34826-26-rick.p.edgecombe@intel.com> <05cf3e20-6508-48c3-9e4c-9f2a2a719012@redhat.com>
  <cd236026-0bc9-424c-8d49-6bdc9daf5743@intel.com> <CABgObfbyd-a_bD-3fKmF3jVgrTiCDa3SHmrmugRji8BB-vs5GA@mail.gmail.com>
  <df05e4fe-a50b-49a8-9ea0-2077cb061c44@intel.com> <CABgObfZ5ssWK=Beu7t+7RqyZGMiY2zbmAKPy_Sk0URDZ9zbhJA@mail.gmail.com>
- <ZuMZ2u937xQzeA-v@google.com>
-In-Reply-To: <ZuMZ2u937xQzeA-v@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 12 Sep 2024 20:29:27 +0200
-Message-ID: <CABgObfZV3-xRSALfS6syL3pzdMoep82OjWT4m7=4fLRaiWp=XQ@mail.gmail.com>
+ <ZuMZ2u937xQzeA-v@google.com> <CABgObfZV3-xRSALfS6syL3pzdMoep82OjWT4m7=4fLRaiWp=XQ@mail.gmail.com>
+Message-ID: <ZuM12EFbOXmpHHVQ@google.com>
 Subject: Re: [PATCH 25/25] KVM: x86: Add CPUID bits missing from KVM_GET_SUPPORTED_CPUID
-To: Sean Christopherson <seanjc@google.com>
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
 	kvm@vger.kernel.org, kai.huang@intel.com, isaku.yamahata@gmail.com, 
 	tony.lindgren@linux.intel.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 12, 2024 at 6:42=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Thu, Sep 12, 2024, Paolo Bonzini wrote:
-> > On Thu, Sep 12, 2024 at 4:45=E2=80=AFPM Xiaoyao Li <xiaoyao.li@intel.co=
-m> wrote:
-> > > > KVM is not going to have any checks, it's only going to pass the
-> > > > CPUID to the TDX module and return an error if the check fails
-> > > > in the TDX module.
-> > >
-> > > If so, new feature can be enabled for TDs out of KVM's control.
-> > >
-> > > Is it acceptable?
+On Thu, Sep 12, 2024, Paolo Bonzini wrote:
+> On Thu, Sep 12, 2024 at 6:42=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
 > >
-> > It's the same as for non-TDX VMs, I think it's acceptable.
->
-> No?  IIUC, it's not the same.
->
-> E.g. KVM doesn't yet support CET, and while userspace can enumerate CET s=
-upport
-> to VMs all it wants, guests will never be able to set CR4.CET and thus ca=
-n't
-> actually enable CET.
->
-> IIUC, the proposal here is to allow userspace to configure the features t=
-hat are
-> exposed _and enabled_ for a TDX VM without any enforcement from KVM.
+> > On Thu, Sep 12, 2024, Paolo Bonzini wrote:
+> > > On Thu, Sep 12, 2024 at 4:45=E2=80=AFPM Xiaoyao Li <xiaoyao.li@intel.=
+com> wrote:
+> > > > > KVM is not going to have any checks, it's only going to pass the
+> > > > > CPUID to the TDX module and return an error if the check fails
+> > > > > in the TDX module.
+> > > >
+> > > > If so, new feature can be enabled for TDs out of KVM's control.
+> > > >
+> > > > Is it acceptable?
+> > >
+> > > It's the same as for non-TDX VMs, I think it's acceptable.
+> >
+> > No?  IIUC, it's not the same.
+> >
+> > E.g. KVM doesn't yet support CET, and while userspace can enumerate CET=
+ support
+> > to VMs all it wants, guests will never be able to set CR4.CET and thus =
+can't
+> > actually enable CET.
+> >
+> > IIUC, the proposal here is to allow userspace to configure the features=
+ that are
+> > exposed _and enabled_ for a TDX VM without any enforcement from KVM.
+>=20
+> Yeah, that's correct, on the other hand a lot of features are just
+> new instructions and no new registers.  Those pass under the radar
+> and in fact you can even use them if the CPUID bit is 0 (of course).
+> Others are just data, and again you can pass any crap you'd like.
 
-Yeah, that's correct, on the other hand a lot of features are just
-new instructions and no new registers.  Those pass under the radar
-and in fact you can even use them if the CPUID bit is 0 (of course).
-Others are just data, and again you can pass any crap you'd like.
+Right, I don't care about those precisely because there's nothing KVM can o=
+r
+_needs_ to do for features that don't have interception controls.
 
-And for SNP we had the case where we are forced to leave features
-enabled if their state is in the VMSA, because we cannot block
-writes to XCR0 and XSS that we'd like to be invalid.
+> And for SNP we had the case where we are forced to leave features
+> enabled if their state is in the VMSA, because we cannot block
+> writes to XCR0 and XSS that we'd like to be invalid.
 
-> CET might be a bad example because it looks like it's controlled by TDCS.=
-XFAM, but
-> presumably there are other CPUID-based features that would actively enabl=
-e some
-> feature for a TDX VM.
+Oh, I'm well aware :-)
 
-XFAM is controlled by userspace though, not KVM, so we've got no
-control on that either.
+> > CET might be a bad example because it looks like it's controlled by TDC=
+S.XFAM, but
+> > presumably there are other CPUID-based features that would actively ena=
+ble some
+> > feature for a TDX VM.
+>=20
+> XFAM is controlled by userspace though, not KVM, so we've got no
+> control on that either.
 
-> For HYPERVISOR and TSC_DEADLINE_TIMER, I would much prefer to fix those K=
-VM warts,
-> and have already posted patches[1][2] to do exactly that.
->
-> With those out of the way, are there any other CPUID-based features that =
-KVM
-> supports, but doesn't advertise?  Ignore MWAIT, it's a special case and i=
-sn't
-> allowed in TDX VMs anyways.
+I assume it's plain text though?  I.e. whatever ioctl() sets TDCS.XFAM can =
+be
+rejected by KVM if it attempts to enable unsupported features?
 
-I don't think so.
-
-Paolo
-
+I don't expect that we'll want KVM to gatekeep many, if any features, but I=
+ do
+think we should require explicit enabling in KVM whenever possible, even if=
+ the
+enabling is boring and largely ceremonial.
 
