@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-26634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A8B9762FD
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 09:41:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56D59762FF
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 09:41:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DD73B23C53
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 07:41:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5154A1F24272
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 07:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A851990C4;
-	Thu, 12 Sep 2024 07:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3842D18FDDB;
+	Thu, 12 Sep 2024 07:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qRDUt6hr"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="joA2yG6N"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D9118FDDB
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BB9191477
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726126816; cv=none; b=pcpy7nWQEPtdr2RucahrbiCCud/5JJWj8t++61JkIRZYASOf/DfjL735CwEMKeZPrB4c/Rw4fCxr2mNp6UdrTH0iSQuVjL2qNi7bHxlZB4Kj1jS6s3FwAvA+AGThDBO8sdN9u+iwWxgvF2xQXA7L4pxu51ijCVranf8tRPoXNhY=
+	t=1726126819; cv=none; b=koptAfxDw/ViWUc5s5uyWaCymfY1a9b1hV0VJ2+iAAGTlgKWu9K8rVLApbBvQmg/mwGekmo1qinSDTQ46TwGTNqwJhOh0/5Ov2/5dGzB9/wtb8offU+l8benJTccMTLYxgxwHWH5a9XcMt8uD6VzzHlgvQlQHYc7BbzU9hEtsDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726126816; c=relaxed/simple;
-	bh=eEnFhXW8TKgilQt2LSiJkpcgLzb7JOAcTjQeFy0AF6I=;
+	s=arc-20240116; t=1726126819; c=relaxed/simple;
+	bh=QwIT7hjUUVpIm7wW7pa8dcd4MWifd9MGeiuQY06Qv8U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QPCu8CFeYbVRCsOcADZD4BbQ6GfCn9bdmhCuEfh9C+AJEVapGW4+EBY44YuWTYiK1/NUo/P0/gkACgqcUcgri6Ahi0bl7u5+V7HGa+G4nT7RAFPVf/avTnuf2tPreow9jqLznyP6n4OXboNqX1BwQ5TdDtjsz0EyUpn1CGmTE9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qRDUt6hr; arc=none smtp.client-ip=209.85.210.182
+	 MIME-Version; b=q9GweynryZFKiZG3O+/JvOILTBzKrNekbMwiXbYotT95Q5GCg34SaEI6fN1/zyGGVYX69IPArqs1NNEsqWFCQsOssQYB+UeFoceZhacXaHhMAot8XYUV9uqDeOM7LZiDChjbLodKLOyuIp66TBvXmaWge7Nrye3JTgjd7V7ppoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=joA2yG6N; arc=none smtp.client-ip=209.85.167.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-717911ef035so416312b3a.3
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:40:15 -0700 (PDT)
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3e04801bb65so366235b6e.0
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:40:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726126815; x=1726731615; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726126817; x=1726731617; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TcrlVQ2BBzTTTXSH1b4iRRRxuNhgYzpbZvccV8dHuB8=;
-        b=qRDUt6hrbjmONQqQLDuBshCPjfS/SMY8B/XzDzz6Kizv8HHsR1HNrPa9oA+ugfbrLO
-         UusY0Um4evhldk42wGrbClxVNpdtEOIT5YrMwIq1KYfvLEzZs4cv0Yn5jfLS+ihC2v/0
-         Ei9Aiz67sZAyzxEzejHLQkWOFd+SKjwZWCNZuQYQrU/OxmRC73tKWaegxk+zblTL4M+Q
-         xlHMfOFI0WXabNJLApaN/l/TAYZqRcbfTCOJgmP4fpgnUgwAvTWpihVR9uw9aM7u520U
-         D2qxLOvd1W6yTLMrWOa1HzrFe5whQIjoc2eDUPNSoK17A0NFicaa8JxgSv14orj2Yt28
-         KhDw==
+        bh=THAU92UrM0dCOcON0qgAWJPM/1rIMc3WLepZV6d4U4w=;
+        b=joA2yG6N6WdXNzCsJxHu8p54ZlO9YIdfLoYh7z27mHHHPhMO2xdX67VEInz4bqmYB2
+         41UJatSme1F/bs9WZl5u3L0/j8T7b0J9WT5osdPoYjVCQsOepxbrmLnZSKhLSrfXoZA9
+         B6IaHDXUqnYqh6J7NsJpyEPjUEJtY6+ANk2hRg1XzRXIpUcDU16V2p7LZD6ogvdlE3DP
+         ePGtlE2r3WYpkBpM8S3aEAp/YxQREw5wSpH9goP5RPCM6MsO3UPIvGzeZZmCNloH51dG
+         M+CuVmqsLAoJy1wfTHVvZY7TLrDzfk/GxkPttfRZwBAmQwpdAu2kHuWmlszBCDNcKKsV
+         LsZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726126815; x=1726731615;
+        d=1e100.net; s=20230601; t=1726126817; x=1726731617;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TcrlVQ2BBzTTTXSH1b4iRRRxuNhgYzpbZvccV8dHuB8=;
-        b=KC288Pgrvzy6faOCiVHB2c9ZFUGlWh7qg8Rdbm8l8KNZHEERfa9dKNk18OlenAfGjt
-         Q9zXEHRqNiDsMFBVvnN/9HBi1YBESBJkETjtfiQ5ouMfhwS8IIHA0Os+ytgNxTFJ3ntI
-         k2WokTsAKp5KQdecyiV7ub9Ek1D04FcQk4/T6IC27TyLZzHzytVrptSi7/CyEglZWXSm
-         DaMa4aWUHTg1tPgCQLZTCEJc0xZBPL0fvMDzmifzyYvxImiYV31/wvtPtSxkJACtE9Dj
-         kwk5XPVYTnqNXvFc8RfIrvrsfDvq1ic5zKnCoXUqX4yeS+xgOtmj0VzgPOm+THOvhMbf
-         rsVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWlvsiB5qK6/f3jNydYx9ZvARaW4qIefUQVZm8aFersgExHnQXlFB2YzVy4Kpdc9IButIM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh4wSv6mT/mGfREefiasMyH1zSv/Z3tRJnUKKzI2QjeuvMrkv8
-	rXSDgwntFsw7xjRiSwDRg3nASCDUZ5dwT/Uhu7zY1sxyyD53CLci5QeZsBXe5mw=
-X-Google-Smtp-Source: AGHT+IFAZ1Pk4eCCVsZPvVoIoG/IsRq4YVcZJLHNGvieq8Ne31Y/ZKtRMM5/ZNOtWgduAu3UbqRH6w==
-X-Received: by 2002:a05:6a00:4f90:b0:714:1849:2503 with SMTP id d2e1a72fcca58-71926055cfamr3299082b3a.6.1726126814532;
-        Thu, 12 Sep 2024 00:40:14 -0700 (PDT)
+        bh=THAU92UrM0dCOcON0qgAWJPM/1rIMc3WLepZV6d4U4w=;
+        b=dTuKLIx8Qdqc5avjttwWp73SsccS5cDOnl9v5WlXEfnJUWcyornj7nH1A+Ptp1ajX6
+         nWbc17I8CaPWKqSkz/lO9Afv4OhkW9FjNuXnwX228VjyU72tHVSqLlQkwRVMuLiC9jh1
+         XbDEHkwmvepnD0Rcd4jIQWREaEHsU1vwWvoSrDVnUdIEnBTASzpYXkkUzsB0fcGge2au
+         JC0qEdLvE9PpacxPqFqwzIUJ7XwBhW1VBGpNBn6WIl83nfTvrX/ubrxRisSqvyeDSRIe
+         gFydzY4QBcMlpsWb9Gedhdm2soFCykxvVy41mkuxqxGpfeZGUmmYoh5aEks/G2vAZCVe
+         b1zg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFKdW/HDD7zM86jW73a6VBcFfBLKUx02Y++F7VZsEMbF0gSc9Rjn56eoXF31FUs72ag1w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzc/D/7xDOpkj2GmkqbbxFYiBcDBXntbJHsB/NkDOQwnmVa4Yed
+	atayleBkgY9yz6D2fLm6/HqM290o9qMAGNNd3+NVFV0aiSiw0kx/aeBauyEZKt8=
+X-Google-Smtp-Source: AGHT+IE18OQNSYCTciWDcZ2tARjoD9KTkXd4QIX1a/2fI71lIh2I9Gute7KgIxVtwws+/7Dh8z96lg==
+X-Received: by 2002:a05:6808:23d5:b0:3e0:45ea:7fbe with SMTP id 5614622812f47-3e071a97f6emr1220176b6e.13.1726126817031;
+        Thu, 12 Sep 2024 00:40:17 -0700 (PDT)
 Received: from linaro.vn.shawcable.net ([2604:3d08:9384:1d00::9633])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fb9ad87sm983458a12.6.2024.09.12.00.40.10
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fb9ad87sm983458a12.6.2024.09.12.00.40.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 00:40:14 -0700 (PDT)
+        Thu, 12 Sep 2024 00:40:16 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Jason Wang <jasowang@redhat.com>,
@@ -133,9 +133,9 @@ Cc: Jason Wang <jasowang@redhat.com>,
 	Weiwei Li <liwei1518@gmail.com>,
 	Markus Armbruster <armbru@redhat.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 18/48] hw/nvme: replace assert(false) with g_assert_not_reached()
-Date: Thu, 12 Sep 2024 00:38:51 -0700
-Message-Id: <20240912073921.453203-19-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 19/48] hw/pci: replace assert(false) with g_assert_not_reached()
+Date: Thu, 12 Sep 2024 00:38:52 -0700
+Message-Id: <20240912073921.453203-20-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
 References: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
@@ -154,49 +154,29 @@ assertion mechanisms.
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- hw/nvme/ctrl.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/pci/pci-stub.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/nvme/ctrl.c b/hw/nvme/ctrl.c
-index 9f277b81d83..fc3b27c031e 100644
---- a/hw/nvme/ctrl.c
-+++ b/hw/nvme/ctrl.c
-@@ -1816,7 +1816,7 @@ static uint16_t nvme_check_zone_state_for_write(NvmeZone *zone)
-         trace_pci_nvme_err_zone_is_read_only(zslba);
-         return NVME_ZONE_READ_ONLY;
-     default:
--        assert(false);
-+        g_assert_not_reached();
-     }
+diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+index f0508682d2b..c6950e21bd4 100644
+--- a/hw/pci/pci-stub.c
++++ b/hw/pci/pci-stub.c
+@@ -46,13 +46,13 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
+ /* kvm-all wants this */
+ MSIMessage pci_get_msi_message(PCIDevice *dev, int vector)
+ {
+-    g_assert(false);
++    g_assert_not_reached();
+     return (MSIMessage){};
+ }
  
-     return NVME_INTERNAL_DEV_ERROR;
-@@ -1870,7 +1870,7 @@ static uint16_t nvme_check_zone_state_for_read(NvmeZone *zone)
-         trace_pci_nvme_err_zone_is_offline(zone->d.zslba);
-         return NVME_ZONE_OFFLINE;
-     default:
--        assert(false);
-+        g_assert_not_reached();
-     }
+ uint16_t pci_requester_id(PCIDevice *dev)
+ {
+-    g_assert(false);
++    g_assert_not_reached();
+     return 0;
+ }
  
-     return NVME_INTERNAL_DEV_ERROR;
-@@ -4654,7 +4654,7 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
-     case NVME_CMD_IO_MGMT_SEND:
-         return nvme_io_mgmt_send(n, req);
-     default:
--        assert(false);
-+        g_assert_not_reached();
-     }
- 
-     return NVME_INVALID_OPCODE | NVME_DNR;
-@@ -7205,7 +7205,7 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeRequest *req)
-     case NVME_ADM_CMD_DIRECTIVE_RECV:
-         return nvme_directive_receive(n, req);
-     default:
--        assert(false);
-+        g_assert_not_reached();
-     }
- 
-     return NVME_INVALID_OPCODE | NVME_DNR;
 -- 
 2.39.2
 
