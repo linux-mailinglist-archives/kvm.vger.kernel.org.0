@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-26630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26631-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30E2C9762F5
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 09:41:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE5F9762F6
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 09:41:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A57611F24274
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 07:41:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B20AD1C225DE
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 07:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8571190462;
-	Thu, 12 Sep 2024 07:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47BE119047A;
+	Thu, 12 Sep 2024 07:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PCBencC1"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FxGeW4LE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B571925BC
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A16B192B8D
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726126805; cv=none; b=Oy9S5omBBsV/8EvHT6Z4IW49GyfcfsQMmGTS6exTlw8b760I+qqtz/2DBtEGqU2kG5tPIYyle7IAl0dq02H94AszjH7AxeU5ni0bAsuiXVwfYRm3TPrcBG3QAXXSoxzE0uLaQMk8x1MBbqonj/MvZ1kikzvYRqdeXuPPnSwKMNE=
+	t=1726126807; cv=none; b=NGNw8BHhjh4/M9r/M8VOWrPrqBbWGoReilpgwZd/Dm7VCeR6v6yvv7qiv8qr2469I9VTuMRBe8fXOQSUo9fH9CKwQc2OgvLvDN9sQt9pJlcGP8dG+virXJ6yCpDtiYWfXFdEr8k7FiLdqC5e7/gAI1x3pIK0vyMwjonGz9GxuGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726126805; c=relaxed/simple;
-	bh=Tsn24Q2zqOITbsqWB26jmhxj+NilzFUR/Z5Y25b5X5o=;
+	s=arc-20240116; t=1726126807; c=relaxed/simple;
+	bh=yNmoBMylyOucZGz0kA77fXTBlKvOobO732WuHrRADpc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZfE+lcqwb9UACyo6M5bEjK4yb4bu2UNwZG7RT9+CFzOgIg84tozjnFdSfgV3/vJPWWxBrO2eEk0Bp3Gn6BiXIs7VYELKDGBu6Ay96RAbTz7C+Xtc342wqe1UrzAaf0EVAz5s8IL0ucTu3blZE/P+sP9BMu/G/Vr272p6BClsCh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PCBencC1; arc=none smtp.client-ip=209.85.210.182
+	 MIME-Version; b=WirB2uJdeTw55mTAj/km4FvBFvnVz2dX7jtfxQ3Hu3f5ZDyaBiRI+0hmQ0KJFiYxmW0yMEjazivKKM0xBbxbZeSSkIfDiZgS7UYuYMft/Kwzxg8DC+MI9QLw82Rv9z2lf11NtskLQFc5Ti+g3C2YkQ7XlowUwf88XrSpS/aGvbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FxGeW4LE; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-718f4fd89e5so549283b3a.0
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:40:03 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7db238d07b3so384810a12.2
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:40:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726126803; x=1726731603; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726126805; x=1726731605; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cfrMTIgk5Q+XEJO7A3FTmtoXD8cfHvhd3vsooDA9mV4=;
-        b=PCBencC1I+Iys/e01Vp3XG9yQk3dn+QxHFRXgtcWfM9aR3jqyKd6kP6G4DDikQpSJl
-         q7tbJsRx/3on5M8DRZz5Ivq/wvasclRzhVVtrAHnGYhLsxkTebYR2YK5qH4dT9VPNjYa
-         Dk6yQ6z4PjpiWy61EsTkNlfR5L4WUnCTHEe6vIoVUeNxMXPeF05T0j7O7rSwGexH6JVj
-         9yqpsZouxmbXDPoSXvFjBoew40mwBjnsbX7q+aLjW4qS5wJ429yNluaueDcuOxjeN/1H
-         rBJKL+XLmFU32LAzUe+gI2iEBt3BQXqyEODsUlXakYfJ/gZNZLBnLmDwhvI2MVpx+z4T
-         VxDA==
+        bh=5zF+jA5qLmLbmnQj5+SFXwtuz0TNrysgMomjB+iiCqE=;
+        b=FxGeW4LEfYC29DC/05jVjWUJBG751UT449YrO/gAVV1DjhTkGQcFqClPBuEV8JUcNX
+         xe3Uyof80UAGuQsV0iEUjI5kuteM5kyP//lgK3wQq/46LejHuBKtZh6GGNDURPLpy0qO
+         Wv0X7j4APXlEqJujxCCTifkR6gWSJ+OMF/X6PfYtctjZxyhJIVp7LGUamuWGpeK5f74V
+         zAh+4DG51tTbQLMPN9tW7g75xDDmEX4fcG+zs/IBoiAiCe/i2/zxQvvQ0fSq+TOO6cCE
+         LUU0OGfn07nXhKjGx8HqazYuRBA80F4u2iLkgVby5D7/DgrRR13emI6biZ/E84hiGRPu
+         t0XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726126803; x=1726731603;
+        d=1e100.net; s=20230601; t=1726126805; x=1726731605;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cfrMTIgk5Q+XEJO7A3FTmtoXD8cfHvhd3vsooDA9mV4=;
-        b=wjcv6Hw47CwgygnWQD9+8vTyiLFscKGaQPNzeacuLy+eHavfoI+3WOCN0boIHb7lbj
-         7IUtA/9nuazM2UHyXB8ekDsKD4t9+cdj//qiyFgiH31Z/7+MHCRcrhjhLrpocHjPH77i
-         hnZ1UV+L5qT6V4A/1Dm0kv+/a6CmncMZz7mU+Vyb0F1oRH3RFQJ7dG6U9rhe7l2XNcYe
-         HRneh/U6Tvm3I6zN5FHiNxb0QXpZV3YesX/69w/gY6g6CHA38pEHAjjIXQCe6hd73reT
-         ip/8QMhFhEQeVrjXKTSj+4xyMIvrwP9lfSOXfFfWXHOC9gNblkTYTdFon0AVcGRbMM0V
-         MAZg==
-X-Forwarded-Encrypted: i=1; AJvYcCXUKecJK4biT96zDFiGJkE3kajj5cN8MpzKEGzMB+jdwsnT15zGS/u5DouTIFnhwc/I+Hw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfmRIhJMisrLqDSmCZvufsryeSG22LR88s+Gy52+E7ESa/3kPa
-	qNSp+xbG2GrVyPH2zOk+zQe8VJ4nOAdNQ8QYfoSnaqlOgljN8nrAqDSnedGaSoM=
-X-Google-Smtp-Source: AGHT+IHWOaE7dY6tBiE9Ghckw7hSP0fZD+0ZwcWT4soLCd5pY4NREymaum+9biUNdbtqFJkCdDcI4A==
-X-Received: by 2002:a05:6a20:8420:b0:1cf:d745:d641 with SMTP id adf61e73a8af0-1cfd745d677mr1281589637.18.1726126802834;
-        Thu, 12 Sep 2024 00:40:02 -0700 (PDT)
+        bh=5zF+jA5qLmLbmnQj5+SFXwtuz0TNrysgMomjB+iiCqE=;
+        b=iMNC2q4jDT+lEtIbv/W80ArKUrNXI1V1m24xFvVZ4Pgw8aqWU/k4LlJPLa9raCyeqy
+         S2jX5JNOy6FO2TqAx7fourC2dZMkeRz4LggxHWm3OxLiXMaqfx/j+v5OkPsmRjAJNyJ+
+         8GL8XS/w5DslLc2qTpat9R9Me4p/jxikMb4IyZXfJz/uZGAicWD6KYKUwxQ59/Kgqye+
+         dX/yVvHfanJ9BhV4UhBZpqFReF6ok8ioZMM2VbqP2OezfFGI0GbCJKxUKxmhB+eGBVK/
+         BNhXm3MOxdPgYgPobhijzgAjsEqe7ifqPZDR/LoPTnSF5f7yo1Rz9hYmGv+BAdvc/Rge
+         jKmA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCUsUl9hMLX2D7uA8fuZZ/8Qz/fB+aZMDZUg7MPvgTqSPygPIki1CoBmpgj8Yisb0mWUQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaUoDNO4KJMPoMA/rANn9xPUKmHLeppwg4KJjIuI5UyduqhV8f
+	TH0zFyHj4UOhk+03zU1E5T9ViSqRuXnLrp96tbUZJxm8J+6ieg6eV7BnsF4bOFk=
+X-Google-Smtp-Source: AGHT+IHDXrX+NbUP9NtxGqG8dJEo0gfcy7xOv/m7ynMdOyBHgNq9WtYD8rjvMD0vL3Bh2gbeHd5Gyw==
+X-Received: by 2002:a05:6a20:1056:b0:1cf:9a86:73e4 with SMTP id adf61e73a8af0-1cf9a86a035mr1164601637.14.1726126805353;
+        Thu, 12 Sep 2024 00:40:05 -0700 (PDT)
 Received: from linaro.vn.shawcable.net ([2604:3d08:9384:1d00::9633])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fb9ad87sm983458a12.6.2024.09.12.00.40.00
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fb9ad87sm983458a12.6.2024.09.12.00.40.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 00:40:02 -0700 (PDT)
+        Thu, 12 Sep 2024 00:40:04 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Jason Wang <jasowang@redhat.com>,
@@ -133,9 +133,9 @@ Cc: Jason Wang <jasowang@redhat.com>,
 	Weiwei Li <liwei1518@gmail.com>,
 	Markus Armbruster <armbru@redhat.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 14/48] include/hw/s390x: replace assert(false) with g_assert_not_reached()
-Date: Thu, 12 Sep 2024 00:38:47 -0700
-Message-Id: <20240912073921.453203-15-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 15/48] block: replace assert(false) with g_assert_not_reached()
+Date: Thu, 12 Sep 2024 00:38:48 -0700
+Message-Id: <20240912073921.453203-16-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
 References: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
@@ -152,25 +152,25 @@ g_assert_not_reached() rather than an ad hoc mix of different
 assertion mechanisms.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- include/hw/s390x/cpu-topology.h | 2 +-
+ block/qcow2.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
-index a11b1baa77b..9283c948e3a 100644
---- a/include/hw/s390x/cpu-topology.h
-+++ b/include/hw/s390x/cpu-topology.h
-@@ -57,7 +57,7 @@ static inline void s390_topology_setup_cpu(MachineState *ms,
- static inline void s390_topology_reset(void)
- {
-     /* Unreachable, CPU topology not implemented for TCG */
--    assert(false);
-+    g_assert_not_reached();
- }
- #endif
+diff --git a/block/qcow2.c b/block/qcow2.c
+index dd359d241b7..803ca73a2ff 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -5299,7 +5299,7 @@ qcow2_get_specific_info(BlockDriverState *bs, Error **errp)
+     } else {
+         /* if this assertion fails, this probably means a new version was
+          * added without having it covered here */
+-        assert(false);
++        g_assert_not_reached();
+     }
  
+     if (encrypt_info) {
 -- 
 2.39.2
 
