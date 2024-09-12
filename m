@@ -1,168 +1,126 @@
-Return-Path: <kvm+bounces-26757-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 574C9977291
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 22:06:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15E269772B9
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 22:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 895BC1C21ACE
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 20:06:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6ECC1F24E04
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 20:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE771C175F;
-	Thu, 12 Sep 2024 20:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0671C0DF4;
+	Thu, 12 Sep 2024 20:31:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YmQIWbI9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IuUxudrt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A0018BBBA
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 20:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353E918BC19
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 20:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726171548; cv=none; b=Wl96gBxjhKgAMEgIWbFJY1Jd3xmtJNaeIbvaJqtCCgNPl38UMXLZBVvYg9xrceAmDxxWQEyILBBy4mc6ESDU6moCWvRbv8n1jjyRecVmW07lGg4uaXcZtpniPmuO2xY0fkQMvosr9zQqMRa4QBW45t6EASuO50cfKUoaXBf6NFs=
+	t=1726173063; cv=none; b=mpgx1QEO1WmyMriZASQP0ADUUHfqyjuupBCAiqndLyobKpSneI84AQ9ez2QYqQYgzrWUskAZI7HHpAR6pTRWED5rBp0DoTqzTkDfz4U8ugIERfBjj54jRRdMUX5g1bpU70AEN/s8jRQsPz0tRJRtbytUIfaDs9p+2jRWdUzUvxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726171548; c=relaxed/simple;
-	bh=zgVFGLKcvsfnGJiJdgrGdKWJuix6jbiZzKyiHN3clf0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=D9eAbWypHB4p2gFrTjygERJK551sFKclw6QZemUTw54DT7arudN3C9X5sWdw+SbTnX2h2Rq6dVyxBwW/7rG97Hk4oILuSSRHddCiRg4MmbgwHWZZcuABe6IyLccfGwVrAmLNrYg8jcK5qmxF7qTK8UDGqI6zUHsAzsKh6I5yIeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YmQIWbI9; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1726173063; c=relaxed/simple;
+	bh=u3+xTKiDZ6CgDyqF+o7xgUFgxz+T2D6SLtwRNZRyVS8=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=gV7v83lO56FIlGwY3bIVJ93IH9e1txpVyisUscwkW7PV1CBy22cS85q8s8C8r8wQuPAfxKoKgIVAsxsvJxoBqSXfRzX7N6mOrAymSqXCCtoX4drWj/AGLCATZ/1H7iuNgmg5dinYksxVZUR3/79I0W6N9fa2P/CxeNGbHc6/Aco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IuUxudrt; arc=none smtp.client-ip=209.85.166.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2d89b31e942so1583804a91.1
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 13:05:46 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-82cf28c74efso214836239f.1
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 13:31:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726171546; x=1726776346; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fnnjrlSetIbQ77vTIX4XItRIWsi2rxf02mpUNlAPpck=;
-        b=YmQIWbI97wgABO+GqgWJ7XMiY9/CGbBe/9xIwKUz27Ea6y3uyU5WGZlx+R+S1FotXo
-         Aei2SflW7WkconSAOn+f9KjSR/8l8Pl4Ix8LWEoIp7TeR04rIVB8LY7QjGw9LP5pd6am
-         WJFyI5oYK/VBYjMezQOnrrzjVmTiifU3dYXP+3rdRGqHiUd5aD1wXAIg+K3FDawnf4+i
-         SACvAFPY40QrscIryoTNhFEVzWLKL/eMJabpv3q4lf90OMCDnYmHrEC8jAVYsrzY52w5
-         jFwkf23lV710yKESQQ8syXYNPPqRnv2QObGatwqqxls1xnsztm+Fw7LwEviIXdGd0gJO
-         6r/w==
+        d=google.com; s=20230601; t=1726173061; x=1726777861; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yLPhhW7Y6mbWdZPPRUIkvARITfuZTEZkDii7oKKU+Ek=;
+        b=IuUxudrtlEScnPVJtdJIZL653Kzmq2KrkAJZPlos0BCzQ/d8bWSAWJkoHNmSMMvpzX
+         baaUwY3pLIG5Q8FPiRzMLdlaTS1hNSet+8xvdak+omyblP51OedpMqboDXfBWT0v/rVB
+         8tE537sMMR+gUfLWoUy5+xEH3z5fAzERmA5v7Bnw//1jsFw9/0TOahkCJLsXQUMYBNCF
+         Z7SN5Rf/20K6pfJRiIHgQgYVJWfu587IeXQtEjx6LZFw64K0kp+5b+DQsRaFTes86bRV
+         JGLk+EEFNQwUgbXyYligdHmcQnfPazUUNlbGOws4Mz15dOUCrjTI4NOM0+BbnvSbHhZB
+         lcPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726171546; x=1726776346;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fnnjrlSetIbQ77vTIX4XItRIWsi2rxf02mpUNlAPpck=;
-        b=EqiiQbTHYir74+Mg5EmwVrZBzg0haJd3ZU5jYVwLMmHKDgaIwhty03PzzoNdMTUiCM
-         BwR0aqZorH9e1O2A3xQdPFC3kT1CaK5R2DVffjF2d1WqWuh9O8G7vQ7MmzqX3PV7XYdQ
-         hxWtNVZbqamK+AwEJDtYGwFi3TQ4lx/+YSdZaWVJhwqKtAET9mgePGPZMwSTvc0gMMWF
-         bkfXuKUQzKy7XCV/NMAViFOIwT9YV9ez7mosV84mhWu/5WmRGiB6+cd2Srf9g1gyua0X
-         BJdTgQNQfuhd2VZUcd8oH/cMDKeSttvaaY8V0rWX7gn8sy6A+pslnuqhqrKD2+zmA+gr
-         AOzA==
-X-Forwarded-Encrypted: i=1; AJvYcCUixZpPE3LEMrmySQN+9ChXp0rAGqGfNyCRDyerv0Z581eIQL8SnGdT0KRcZY8PZgg5d0k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNJXVbL4pDbHRXeiszrAATBJGrt9eGvuV4aEYKBlr0NuID48YU
-	ftrU+ldmlQUp0CKgklCF+O33ZMoTwWzfKzagBiYX0QN5NC6bZHpqXmrP7jzLrdi32PZrFbSW4m7
-	6mw==
-X-Google-Smtp-Source: AGHT+IGMbV565ZUceOdGGm+YNdFHzG/XNLZao6v/FtV6YMEzbuF+laauyv9Oc3FC1PC6/WerO4BWUeVoybg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:d791:b0:2d8:7c76:45d7 with SMTP id
- 98e67ed59e1d1-2dba0061767mr25737a91.4.1726171545428; Thu, 12 Sep 2024
- 13:05:45 -0700 (PDT)
-Date: Thu, 12 Sep 2024 13:05:43 -0700
-In-Reply-To: <feefa9d1-f266-414f-bb7b-b770ef0d8ec6@zytor.com>
+        d=1e100.net; s=20230601; t=1726173061; x=1726777861;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yLPhhW7Y6mbWdZPPRUIkvARITfuZTEZkDii7oKKU+Ek=;
+        b=VzJ1TchsB0LRPmytThfc6el/Z0JfxkqX83bJ0F4uTEdb/KSxtA7ABeTod7rLpusMmD
+         86X+8/ExKvEWDzfMv8cM3vL5mDXj6dmqZIlsGJm2pdR4aedl5KGftwPY1ZBXwfeCOHu1
+         7lSlmaHC1f2vOz9WEHkOubUo+YY0p7vO6KqeQqNmtR2nVCMuOQFdNcgS3AbKWkN9ZviS
+         jHAXpKHHvnIOPp0+Dp06pYQZWWVkbHfQ2L63XA8T0Hjydc8wKRehxvrHTFOWWrs+24+C
+         S/sc9LEtlo85t6Opp5pstb3LNoguOFy/TpeIKhh4zId6DBNE1wHlPVVsaWrUQLyVcE/P
+         HSRQ==
+X-Gm-Message-State: AOJu0YxgdSQ2tF1L3/TafYLJVSJLEPnhZ0DTlyEOHtit0NjELg2yZRx9
+	qna+080LDc7jfOorWwiEAlJ13j+e8GegZB3a6jSpkvYlK42nj0HQeC8VN2fXLuY8FY81KYVJ+xw
+	TXBx5wfsw9H7ghVCn2hJIoA==
+X-Google-Smtp-Source: AGHT+IEvNBP56SW+DzYGXpGSQjGH7l5m6WCB475tagf/GqT0PVTompxQRWYnVlmUdK8417EDaVC+g6P+CB3gV00+3Q==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:11b:3898:ac11:fa18])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6638:1412:b0:4c0:8165:c391 with
+ SMTP id 8926c6da1cb9f-4d36136b75dmr162015173.4.1726173061371; Thu, 12 Sep
+ 2024 13:31:01 -0700 (PDT)
+Date: Thu, 12 Sep 2024 20:31:00 +0000
+In-Reply-To: <ZuIgE2-GElzSGztH@google.com> (message from Sean Christopherson
+ on Wed, 11 Sep 2024 15:56:19 -0700)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-8-xin3.li@intel.com>
- <ZiJzFsoHR41Sd8lE@chao-email> <ZmoT0jaX_3Ww3Uzu@google.com> <feefa9d1-f266-414f-bb7b-b770ef0d8ec6@zytor.com>
-Message-ID: <ZuNJlzXntREQVb3n@google.com>
-Subject: Re: [PATCH v2 07/25] KVM: VMX: Set intercept for FRED MSRs
-From: Sean Christopherson <seanjc@google.com>
-To: Xin Li <xin@zytor.com>
-Cc: Chao Gao <chao.gao@intel.com>, Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, shuah@kernel.org, 
-	vkuznets@redhat.com, peterz@infradead.org, ravi.v.shankar@intel.com
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <gsntldzwd37f.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 5/5] perf: Correct perf sampling with guest VMs
+From: Colton Lewis <coltonlewis@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, oliver.upton@linux.dev, peterz@infradead.org, 
+	mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com, 
+	alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, 
+	adrian.hunter@intel.com, kan.liang@linux.intel.com, will@kernel.org, 
+	linux@armlinux.org.uk, catalin.marinas@arm.com, mpe@ellerman.id.au, 
+	npiggin@gmail.com, christophe.leroy@csgroup.eu, naveen@kernel.org, 
+	hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com, 
+	borntraeger@linux.ibm.com, svens@linux.ibm.com, tglx@linutronix.de, 
+	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
+	linux-s390@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Thu, Sep 05, 2024, Xin Li wrote:
-> On 6/12/2024 2:32 PM, Sean Christopherson wrote:
-> > On Fri, Apr 19, 2024, Chao Gao wrote:
-> > > On Wed, Feb 07, 2024 at 09:26:27AM -0800, Xin Li wrote:
-> > > > Add FRED MSRs to the valid passthrough MSR list and set FRED MSRs intercept
-> > > > based on FRED enumeration.
-> > 
-> > This needs a *much* more verbose explanation.  It's pretty darn obvious _what_
-> > KVM is doing, but it's not at all clear _why_ KVM is passing through FRED MSRs.
-> > E.g. why is FRED_SSP0 not included in the set of passthrough MSRs?
-> > 
-> > > > static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > > > {
-> > > > 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > > > +	bool fred_enumerated;
-> > > > 
-> > > > 	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_FRED);
-> > > > +	fred_enumerated = guest_can_use(vcpu, X86_FEATURE_FRED);
-> > > > 
-> > > > -	if (guest_can_use(vcpu, X86_FEATURE_FRED)) {
-> > > > +	if (fred_enumerated) {
-> > > > 		vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_FRED);
-> > > > 		secondary_vm_exit_controls_setbit(vmx,
-> > > > 						  SECONDARY_VM_EXIT_SAVE_IA32_FRED |
-> > > > @@ -7788,6 +7793,16 @@ static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > > > 						    SECONDARY_VM_EXIT_SAVE_IA32_FRED |
-> > > > 						    SECONDARY_VM_EXIT_LOAD_IA32_FRED);
-> > > > 	}
-> > > > +
-> > > > +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP0, MSR_TYPE_RW, !fred_enumerated);
-> > > > +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP1, MSR_TYPE_RW, !fred_enumerated);
-> > > > +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP2, MSR_TYPE_RW, !fred_enumerated);
-> > > > +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP3, MSR_TYPE_RW, !fred_enumerated);
-> > > > +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_STKLVLS, MSR_TYPE_RW, !fred_enumerated);
-> > > > +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP1, MSR_TYPE_RW, !fred_enumerated);
-> > > > +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP2, MSR_TYPE_RW, !fred_enumerated);
-> > > > +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP3, MSR_TYPE_RW, !fred_enumerated);
-> > > > +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_CONFIG, MSR_TYPE_RW, !fred_enumerated);
-> > > 
-> > > Use a for-loop here? e.g.,
-> > > 	for (i = MSR_IA32_FRED_RSP0; i <= MSR_IA32_FRED_CONFIG; i++)
-> > 
-> > Hmm, I'd prefer to keep the open coded version.  It's not pretty, but I don't
-> > expect this to have much, if any, maintenance cost.  And using a loop makes it
-> > harder to both understand _exactly_ what's happening, and to search for relevant
-> > code.  E.g. it's quite difficult to see that FRED_SSP0 is still intercepted (see
-> > my comment regarding the changelog).
-> 
-> 
-> I owe you an explanation; I have been thinking about figuring out a way
-> to include FRED SSP0 in the FRED KVM patch set...
-> 
-> MSR_IA32_FRED_SSP0 is an alias of the CET MSR_IA32_PL0_SSP and likely to
-> be used in the same way as FRED RSP0, i.e., host FRED SSP0 _should_ be
-> restored in arch_exit_to_user_mode_prepare().  However as of today Linux
-> has no plan to utilize kernel shadow stack thus no one cares host FRED
-> SSP0 (no?).  But lets say anyway it is host's responsibility to manage
-> host FRED SSP0, then KVM only needs to take care of guest FRED SSP0
-> (just like how KVM should handle guest FRED RSP0) even before the
-> supervisor shadow stack feature is advertised to guest.
+Sean Christopherson <seanjc@google.com> writes:
 
-Heh, I'm not sure what your question is, or if there even is a question.  KVM
-needs to context switch FRED SSP0 if FRED is exposed to the guest, but presumably
-that will be done through XSAVE state?  If that's the long term plan, I would
-prefer to focus on merging CET virtualization first, and then land FRED virtualization
-on top so that KVM doesn't have to carry intermediate code to deal with the aliased
-MSR.
+> On Wed, Sep 11, 2024, Colton Lewis wrote:
+>> Previously any PMU overflow interrupt that fired while a VCPU was
+>> loaded was recorded as a guest event whether it truly was or not. This
+>> resulted in nonsense perf recordings that did not honor
+>> perf_event_attr.exclude_guest and recorded guest IPs where it should
+>> have recorded host IPs.
 
-Ugh, but what happens if a CPU (or the host kernel) supports FRED but not CET SS?
-Or is that effectively an illegal combination?
+>> Rework the sampling logic to only record guest samples for events with
+>> exclude_guest clear. This way any host-only events with exclude_guest
+>> set will never see unexpected guest samples. The behaviour of events
+>> with exclude_guest clear is unchanged.
 
-> Another question is should KVM handle userspace request to set/get FRED
-> SSP0?  IMO, it should be part of CET state management.
+> Nit, "with exclude_guest clear" is easy to misread as simply "with  
+> exclude_guest"
+> (I did so at least three times).  Maybe
 
-Yes, KVM needs to allow userspace to get/set FRED SSP0.  In general, KVM needs to
-allow reads/writes to MSRs even if they can be saved/restored through some other
-means.  In most cases, including this one, it's a moot point, because KVM needs
-to have the necessary code anyways, e.g. if KVM encounters a RDMSR/WRMSR while
-emulating.
+>    The behavior of exclude_guest=0 events is unchanged.
+
+> or
+
+>    The behavior of events without exclude_guest is unchanged.
+
+> I think it's also worth explicitly calling out that events that are  
+> configured
+> to sample both host and guest may still be prone to misattributing a PMI  
+> that
+> arrived in the host as a guest event, depending on the KVM arch and/or  
+> vendor
+> behavior.
+
+Done
 
