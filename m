@@ -1,191 +1,183 @@
-Return-Path: <kvm+bounces-26664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D059763CE
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 10:01:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5598C9763D2
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 10:02:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A5A21C20E86
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 08:01:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F8411C20AE1
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 08:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B83B1925A0;
-	Thu, 12 Sep 2024 08:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CA618DF9B;
+	Thu, 12 Sep 2024 08:02:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NN/9nE8I"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53567126C18;
-	Thu, 12 Sep 2024 08:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EEA126C18
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 08:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726128062; cv=none; b=IvJowywxN4PYgR5SFUgHLQUvWNSaUQb3End+Vz1YIO/p2eXijXc5A3dHX0SRP7kwyQsY+gk73TkU7dgKSBi7cHdio5WBEGHWgmClYABoaW0hQgX4/3hJuI8dvSLGu6B1RDBqh1YmNw27A6VMI0odgOlVMzuH3+5Le9GcqB6wukc=
+	t=1726128166; cv=none; b=kosiUNk32Q+wWf+0EcSYQkaEE+MfLQi1UGSn3Kq3ZENCQxh3mXlB+HhNxiecCqedmP5eNcOCM3cqULA7vRpYW2/5h2uiR6sTX92gBR8BWtPJgpDDmnlDpx0rY7ps1OPQ+rlq9qeWRCXFZq2GS5l7XoAFjVFM6BXFBEuxKjfY1zY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726128062; c=relaxed/simple;
-	bh=aVlSPsUZBfRf+FqfFhEzZSGZfo19zpqp7vNBm72MltQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LX3SfBsQXJNV3l8pxXHXq64BBZC+pl5T+fmxTMfdaCgtmXfUJjFChjEpDH2+szp6P0ZxMX/MdpfIFiEwZO7lR7QoIND4QuyymSB8YW4zwnm7Ls+vnMrbrr940ZV3HrHU60+Etb01Bp1e4k/iWFzczsXQ4JbJnn6xR4YkcycJ10Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from zq-Legion-Y7000.. (unknown [180.111.103.6])
-	by APP-01 (Coremail) with SMTP id qwCowAAHDx+pn+Jm9F_9Ag--.56033S2;
-	Thu, 12 Sep 2024 16:00:41 +0800 (CST)
-From: zhouquan@iscas.ac.cn
-To: anup@brainfault.org,
-	ajones@ventanamicro.com,
-	atishp@atishpatra.org,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	mark.rutland@arm.com,
-	alexander.shishkin@linux.intel.com,
-	jolsa@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
-	Quan Zhou <zhouquan@iscas.ac.cn>
-Subject: [PATCH v3 2/2] riscv: KVM: add basic support for host vs guest profiling
-Date: Thu, 12 Sep 2024 16:00:38 +0800
-Message-Id: <86e8f4eeb30dfc8700089cd88616e6cfb5a142ff.1726126795.git.zhouquan@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1726126795.git.zhouquan@iscas.ac.cn>
-References: <cover.1726126795.git.zhouquan@iscas.ac.cn>
+	s=arc-20240116; t=1726128166; c=relaxed/simple;
+	bh=Oi3FJRkPNYKycmUZm9towbpHpMZOAL+lTSh6x8lAauE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fjik87hISyqQPdgqoTD2jC5PVGSL3CIDaPhvCPmYqlyeqaOB+jGCfOIkKoiaIUfFC2fxlz2e1NOl3VmH1kpzy2Ia+g2dmnYd6o5BRZrk0cHFn1446RXCR81tqwIE/pDgdR7hVCn0fwEgSj4RrZyDq6dtUZjhQ7I1KVuYbTQQHsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NN/9nE8I; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726128163;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZJCCBAsy1yjL6s99J+14imn5GBc215lIAHWntNhCiQ4=;
+	b=NN/9nE8IYophqsUeaKc67tZP7tH7K5OGQpsBVOOwSK3SDRwjfgHEmWg0F8rvK/RKZEdjed
+	H+vQAB/lNwOM/J8wfEul16oy534P1Ug9OFU7EXj6iYanqpF61GyzUapsiJYgqJh9CBT+vm
+	o07XH/s8zGs5+MQn/eXGrlhm/BiemA8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-647-ecBWDYq8PTmDZe5c088npQ-1; Thu, 12 Sep 2024 04:02:41 -0400
+X-MC-Unique: ecBWDYq8PTmDZe5c088npQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42ac185e26cso4834195e9.3
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 01:02:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726128160; x=1726732960;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZJCCBAsy1yjL6s99J+14imn5GBc215lIAHWntNhCiQ4=;
+        b=CcrlPAddnM0uNPR0pCiV0zKu2vLP+SH4ahURB7yjRHMe6GKb3Km94VUunQtHIzNKa9
+         s7q0CMbLi2ZZzL76MUnhVA4/zCnXRxu25T3yCfAZC02clb5+IPf7NCcVdx+oSoWlKS1+
+         wgwWKE+FTXd2hN8ccb4EuMipB778clemnmoChi9tc3Gf+Rfn9SJY335E0l0wyiJWgITE
+         kmYhnwujXHyiskzQFH74Zq1XpeAmh5HLQAV4BNzlYevL7sHbfb9kT3XJ7p6jPJKsf4nQ
+         6DLg43Z4AuKEO49OPBX5gIOl156aHVb0KHQ0uKfFGcKDylVhy+CsT2iAOGQPaASeTeR0
+         euIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUyqZGacAi5XbrNd7JH7mrGhzNsMplDmiQ+kCoiItongIaDHlRWnd9Dzbf6qTuWuLVlXMU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzA5mPPZj1w6B1Y5F1sF4BDoKgbaHg06WyrTyWIthjKS7ICKB1
+	C6ThRCKdQpI2SF9yrndC5qvhY9M7J9SBVBLa4yKKjWL1i7HP20WA+E47VfEOJUUvKfazp+j25sG
+	7E1c3+6gqTuYO4D7lGjzm7QmAUJTFAN46iycFC3UwBQZUnYIWrQ==
+X-Received: by 2002:a05:600c:511d:b0:42c:b62c:9f36 with SMTP id 5b1f17b1804b1-42cdb5389e4mr14181145e9.5.1726128159719;
+        Thu, 12 Sep 2024 01:02:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEON90/FK9z91xoz/hl8qQv4UdLOeyoldJa5DD3joRha0AcFsGOMu+tz57qR5UM1pH1Hmui2w==
+X-Received: by 2002:a05:600c:511d:b0:42c:b62c:9f36 with SMTP id 5b1f17b1804b1-42cdb5389e4mr14180635e9.5.1726128159137;
+        Thu, 12 Sep 2024 01:02:39 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb32678sm163754975e9.16.2024.09.12.01.02.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Sep 2024 01:02:38 -0700 (PDT)
+Message-ID: <fdd3f261-c2a5-49a7-b8ef-3e99287a0921@redhat.com>
+Date: Thu, 12 Sep 2024 10:02:30 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 43/48] hw/ppc: remove return after
+ g_assert_not_reached()
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, Laurent Vivier <lvivier@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Klaus Jensen <its@irrelevant.dk>, WANG Xuerui <git@xen0n.name>,
+ Halil Pasic <pasic@linux.ibm.com>, Rob Herring <robh@kernel.org>,
+ Michael Rolnik <mrolnik@gmail.com>, Zhao Liu <zhao1.liu@intel.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Fabiano Rosas <farosas@suse.de>, Corey Minyard <minyard@acm.org>,
+ Keith Busch <kbusch@kernel.org>, Thomas Huth <thuth@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>, Kevin Wolf <kwolf@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jesper Devantier <foss@defmacro.it>,
+ Hyman Huang <yong.huang@smartx.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, qemu-s390x@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, qemu-riscv@nongnu.org,
+ "Richard W.M. Jones" <rjones@redhat.com>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, kvm@vger.kernel.org,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ Hanna Reitz <hreitz@redhat.com>, Ani Sinha <anisinha@redhat.com>,
+ qemu-ppc@nongnu.org, =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?=
+ <marcandre.lureau@redhat.com>, Alistair Francis <alistair.francis@wdc.com>,
+ Bin Meng <bmeng.cn@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Helge Deller <deller@gmx.de>, Peter Xu <peterx@redhat.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ Yanan Wang <wangyanan55@huawei.com>, qemu-arm@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Eric Farman <farman@linux.ibm.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, qemu-block@nongnu.org,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>, Joel Stanley <joel@jms.id.au>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ David Gibson <david@gibson.dropbear.id.au>, Fam Zheng <fam@euphon.net>,
+ Weiwei Li <liwei1518@gmail.com>, Markus Armbruster <armbru@redhat.com>
+References: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
+ <20240912073921.453203-44-pierrick.bouvier@linaro.org>
+Content-Language: en-US, fr
+From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clegoate@redhat.com>
+In-Reply-To: <20240912073921.453203-44-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAAHDx+pn+Jm9F_9Ag--.56033S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJFW7KrWUtFWxAryrGF15Arb_yoW5ZF1xpF
-	Z8ur9Y9r4rKryxC34ayr1v9r45WFsYg343Xry7CFy5Wr45try8Jr4vg34DAry5JFW8Xa4S
-	kFy8KFyruwn8Aw7anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
-	8cxan2IY04v7M4kE6xkIj40Ew7xC0wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwI
-	xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
-	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUXqXdUUUUU=
-X-CM-SenderInfo: 52kr31xxdqqxpvfd2hldfou0/1tbiCQ8SBmbifb+DkgAAsF
 
-From: Quan Zhou <zhouquan@iscas.ac.cn>
+On 9/12/24 09:39, Pierrick Bouvier wrote:
+> This patch is part of a series that moves towards a consistent use of
+> g_assert_not_reached() rather than an ad hoc mix of different
+> assertion mechanisms.
+> 
+> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 
-For the information collected on the host side, we need to
-identify which data originates from the guest and record
-these events separately, this can be achieved by having
-KVM register perf callbacks.
 
-Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
----
- arch/riscv/include/asm/kvm_host.h | 10 ++++++++++
- arch/riscv/kvm/Kconfig            |  1 +
- arch/riscv/kvm/main.c             | 12 ++++++++++--
- arch/riscv/kvm/vcpu.c             |  7 +++++++
- 4 files changed, 28 insertions(+), 2 deletions(-)
+Reviewed-by: Cédric Le Goater <clg@redhat.com>
 
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 2e2254fd2a2a..35eab6e0f4ae 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -286,6 +286,16 @@ struct kvm_vcpu_arch {
- 	} sta;
- };
- 
-+/*
-+ * Returns true if a Performance Monitoring Interrupt (PMI), a.k.a. perf event,
-+ * arrived in guest context.  For riscv, any event that arrives while a vCPU is
-+ * loaded is considered to be "in guest".
-+ */
-+static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
-+{
-+	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
-+}
-+
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- 
- #define KVM_RISCV_GSTAGE_TLB_MIN_ORDER		12
-diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index 26d1727f0550..0c3cbb0915ff 100644
---- a/arch/riscv/kvm/Kconfig
-+++ b/arch/riscv/kvm/Kconfig
-@@ -32,6 +32,7 @@ config KVM
- 	select KVM_XFER_TO_GUEST_WORK
- 	select KVM_GENERIC_MMU_NOTIFIER
- 	select SCHED_INFO
-+	select GUEST_PERF_EVENTS if PERF_EVENTS
- 	help
- 	  Support hosting virtualized guest machines.
- 
-diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-index bab2ec34cd87..734b48d8f6dd 100644
---- a/arch/riscv/kvm/main.c
-+++ b/arch/riscv/kvm/main.c
-@@ -51,6 +51,12 @@ void kvm_arch_hardware_disable(void)
- 	csr_write(CSR_HIDELEG, 0);
- }
- 
-+static void kvm_riscv_teardown(void)
-+{
-+	kvm_riscv_aia_exit();
-+	kvm_unregister_perf_callbacks();
-+}
-+
- static int __init riscv_kvm_init(void)
- {
- 	int rc;
-@@ -105,9 +111,11 @@ static int __init riscv_kvm_init(void)
- 		kvm_info("AIA available with %d guest external interrupts\n",
- 			 kvm_riscv_aia_nr_hgei);
- 
-+	kvm_register_perf_callbacks(NULL);
-+
- 	rc = kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE);
- 	if (rc) {
--		kvm_riscv_aia_exit();
-+		kvm_riscv_teardown();
- 		return rc;
- 	}
- 
-@@ -117,7 +125,7 @@ module_init(riscv_kvm_init);
- 
- static void __exit riscv_kvm_exit(void)
- {
--	kvm_riscv_aia_exit();
-+	kvm_riscv_teardown();
- 
- 	kvm_exit();
- }
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 8d7d381737ee..e8ffb3456898 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -226,6 +226,13 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
- 	return (vcpu->arch.guest_context.sstatus & SR_SPP) ? true : false;
- }
- 
-+#ifdef CONFIG_GUEST_PERF_EVENTS
-+unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.guest_context.sepc;
-+}
-+#endif
-+
- vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- {
- 	return VM_FAULT_SIGBUS;
--- 
-2.34.1
+Thanks,
+
+C.
+
+
+> ---
+>   hw/ppc/ppc.c          | 1 -
+>   hw/ppc/spapr_events.c | 1 -
+>   2 files changed, 2 deletions(-)
+> 
+> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> index e6fa5580c01..fde46194122 100644
+> --- a/hw/ppc/ppc.c
+> +++ b/hw/ppc/ppc.c
+> @@ -267,7 +267,6 @@ static void power9_set_irq(void *opaque, int pin, int level)
+>           break;
+>       default:
+>           g_assert_not_reached();
+> -        return;
+>       }
+>   }
+>   
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 38ac1cb7866..4dbf8e2e2ef 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -646,7 +646,6 @@ static void spapr_hotplug_req_event(uint8_t hp_id, uint8_t hp_action,
+>            * that don't support them
+>            */
+>           g_assert_not_reached();
+> -        return;
+>       }
+>   
+>       if (hp_id == RTAS_LOG_V6_HP_ID_DRC_COUNT) {
 
 
