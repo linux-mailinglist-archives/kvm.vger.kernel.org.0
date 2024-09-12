@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-26655-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26656-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4EF97631C
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 09:43:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F2297631D
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 09:43:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C18341F24365
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 07:43:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C19B82816EB
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 07:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043DB19F438;
-	Thu, 12 Sep 2024 07:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82EE319006A;
+	Thu, 12 Sep 2024 07:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fIvIiFu/"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wdCk0uyB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE1919F42D
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6153819F43E
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726126871; cv=none; b=HtITvvC0gvoFgCyjEvQlIKb+mrVytMfYzlqfKFvNqjz0pARdvMQrWE6Gi2PoeIqMrOSyAQ/7Dxy+hDgtGl5ikGVp0y5uwicU/6tndHDDOuEikPEt2Ix2CSlZm9gqPBK7MV7tQFaBiQPNh/lYpHtTbwhMCIubQSD4ygRx5DQ+sHI=
+	t=1726126873; cv=none; b=sCZxp3oLwzgNhlu2jXz1AOjXU8LsqaVPLtlA9cpZhD3JJNb2cZXv0S7oaIDAOU3bvqcoLvqX+XSrNViViC6C1FkDmeDww1StPWJEtzX2FcYH2M1v9lpGw3r1LR4zrx8cewzRC0ySjzG1a3K0cICSWESLQZItpzwgL+WYuKwSGRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726126871; c=relaxed/simple;
-	bh=E1Pu0CO5CUPU0r7PLYod3ULL8E40Kpi0/doRJL/zAuU=;
+	s=arc-20240116; t=1726126873; c=relaxed/simple;
+	bh=oa5AL/HwdyX7y2/urQTvAYAUXGLIjF8e/GVGt6+JtKI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rC1j5BJ/ATsMIBVlRjKb4NUG+VtJwodfq1KR9Nb2PPUNB65tL0uMiudzff3qjmQjm6gB1uQ3Ux0SQQoMuV2xfOwJWLsIVfpqWPa2t1amySubrtLzk87nB0DhpU/7jnLlnQImeHHQovmn4nfmiSzWBrpTThih2xQGHz4TfuGvYxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fIvIiFu/; arc=none smtp.client-ip=209.85.216.46
+	 MIME-Version; b=nd0ZkPq5Ed0O1qAZbGV28kN6Sid5wEI27flPRdO0UObqX4cXKZ5cXX78FxutO0ahPv/lliZxmCma/57dilNLjilK5WrEhKBZ4Vv+B5CRayphQwrxnt6lBtqf6e/T3CxTh6gIvgRsZHp4jFpsI9G23mOyrl7FLJVFzgCTeYdJKEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wdCk0uyB; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2d8818337a5so1298245a91.1
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:41:09 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-717849c0dcaso595274b3a.3
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:41:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726126869; x=1726731669; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726126872; x=1726731672; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QSalypF+pMQKKa4uNxhVuqSrJY5QTLcHY0WTppEbuVc=;
-        b=fIvIiFu/zSbfJ1iN6cXiUZEZTvCj5r2rySDJfOEwBjCToTUH6Wli7DjU2bWwj7AdG6
-         0aVb2J5tFyVPbVjTQs5E2gFdKqt31XS96GiLLDFxgWW6I7S70G3LYB9/shcb7bJKTDd/
-         9sh9G54Yi+LYrzjYGA9hgkCw67en3txYIWHz4ulaY6igZncoj4xQfNZ0psHpWL7gJmvV
-         Qpu+xbLQ4IW3f9QFkeWkhHrtJScmbX+O4FUNFzSQiweX6Uu2xyAnVk6DBxtSUKEiy7p/
-         4jOR41xgFS6ji10wEBjJkhxmuxNnPQQOE2ZPlCik8a7W30xwXPlMUFza3qagCJ7QDP3u
-         DPKQ==
+        bh=0Q1mMHu0qY1Mg7YdLUybGWIueKQg5CpgXLD+/9rtI1o=;
+        b=wdCk0uyBWix1AI/QrarPqQEsTUKsuCfEXQeEphJCQi4ip8XRkbzx85Si6iT4OXyzzb
+         tytOa+gZUm6zwW2rAhYWgmyji1Ujo/bKCULg4EZ0fS/ewPq3xMlVfDZHlm4CjhPdWz3F
+         o6mqApkkB/oMy/4d102JmTmHpA/QaxH1Rao9lkUrn1coApIdyiBIWHWXFZe25GkS2MT6
+         tKg2U++4LjA1Ak8web5rTh7A8oH8ASwLXlNDxb0ufz64wCGIutjt3B42ge+qOdHJE+uK
+         qf6LsfzaCHOsRvAReM2Ipe0z7O3ImU9Euu3d1Sncklt8hIJFOFCWEia12hcUR88BzHSA
+         aRDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726126869; x=1726731669;
+        d=1e100.net; s=20230601; t=1726126872; x=1726731672;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QSalypF+pMQKKa4uNxhVuqSrJY5QTLcHY0WTppEbuVc=;
-        b=AVnXt2kB1+5MpJ3Mmi9htpIfCTeHScOUagS7qy7lNXxyxjMLISzDbKD3RuHcwu3hWo
-         uw5lChD56KWI+Y515QNuNgZklgr4p/bzGps9ctmdUCnd0FPouKeZ8blS6Y1jcBUlaXHA
-         kqJyJ1iAlLG/gfazmsnjrMCAd1djvY0fqUA8Byo4jY1AdPAFHmHcT83FPFDuEike9Zu6
-         VttGO1cxrXT44vMjQUSBUoy9qBNGiHIYVYqj2+taaSTRin1lCRlZNS6dfPr37XvvwJl+
-         mlIhLyc1GuMJjlHBRVuje0v4dfV7xeUVadkoDj2+r0I0nhphtTPNBEeKV+ll64p8ZJ5P
-         mryw==
-X-Forwarded-Encrypted: i=1; AJvYcCULSrkb8Rz/1IuWKP/ZAkzzTh1CB19MRpDjAXftcU517/hOK+3tzUYQd4StxwmronN33Oo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzamZ1jSexTbDpTKvxePB7tBUL4N5lfOgtmivx+94hMTyN+CELT
-	+G49pzA/NTtowdnF8CTQBDevvOA6VZLou+McWhO7xiort48bEX9tZ8aV3RWB4ik=
-X-Google-Smtp-Source: AGHT+IF1YUkgbI8Z5QYhP8g1gpLzhK5aYcn1/M3ZoEOkopdJCnHdCRszwAZ6uD2z8SDokzvFEDBk7g==
-X-Received: by 2002:a17:90a:8a14:b0:2d8:a943:87d1 with SMTP id 98e67ed59e1d1-2db67211d37mr14855931a91.13.1726126869060;
-        Thu, 12 Sep 2024 00:41:09 -0700 (PDT)
+        bh=0Q1mMHu0qY1Mg7YdLUybGWIueKQg5CpgXLD+/9rtI1o=;
+        b=N0wz0xIIMtcJ/I1kWy6Z+6CkWPl97/ODR/GOov4IvMOm2FYyyTJ/eMfBDtX2OEniCq
+         ZliVkz4Woq3bAa7BNvtAruHLLEc28HacxIumj4jAIxCe3ePqjtAGQ6ifVDaAar1Se0M0
+         /UhI4fCDUHHs3Frxl1e2mVK4ESxohB9sVqjrcMm41iF1Tks02FAi63dRgLaSqpNmv1eT
+         Clycwu8sHdls4kkqB7s6fS2NV+8VDkRD2O9JbeSJYjDW+gbf/L704fdRotrADKA1luMr
+         UT6cQZn58xYW4CDVhB/rh/3h7xOHpQYv+z4RfUCzQuCTd47nrYxPU4TnGSR8owL3goJk
+         VqWA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0Flo00OOE2KnjDSmX+M+WI8xxH1lvvg+7Bdqt13R8502P4qb5LWe/15hKnb77jQBe16Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZyIjmR41DC/gQRQG4xucSCN8s0mndKD4fSnQtQW/HARWil316
+	6/eM0dsUb+EmCRsOYYJDPJY8Wxw43oTc5brUQDwVk9hTCYVXJ4QEjGAG5qL0Tg0=
+X-Google-Smtp-Source: AGHT+IE7t7Xs2KH5JUIaVOe68OuWPwNTouEEYSj6TZqCiSQvTjYgxD2YaXeBSDQ2jSGG5jMqgQ5hKg==
+X-Received: by 2002:a05:6a00:1906:b0:718:532f:5a3 with SMTP id d2e1a72fcca58-7192607ec83mr3028275b3a.7.1726126871623;
+        Thu, 12 Sep 2024 00:41:11 -0700 (PDT)
 Received: from linaro.vn.shawcable.net ([2604:3d08:9384:1d00::9633])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fb9ad87sm983458a12.6.2024.09.12.00.41.06
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fb9ad87sm983458a12.6.2024.09.12.00.41.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 00:41:08 -0700 (PDT)
+        Thu, 12 Sep 2024 00:41:11 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Jason Wang <jasowang@redhat.com>,
@@ -133,9 +133,9 @@ Cc: Jason Wang <jasowang@redhat.com>,
 	Weiwei Li <liwei1518@gmail.com>,
 	Markus Armbruster <armbru@redhat.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 39/48] include/qemu: remove return after g_assert_not_reached()
-Date: Thu, 12 Sep 2024 00:39:12 -0700
-Message-Id: <20240912073921.453203-40-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 40/48] hw/hyperv: remove return after g_assert_not_reached()
+Date: Thu, 12 Sep 2024 00:39:13 -0700
+Message-Id: <20240912073921.453203-41-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
 References: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
@@ -153,21 +153,50 @@ assertion mechanisms.
 
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- include/qemu/pmem.h | 1 -
- 1 file changed, 1 deletion(-)
+ hw/hyperv/hyperv_testdev.c | 1 -
+ hw/hyperv/vmbus.c          | 3 ---
+ 2 files changed, 4 deletions(-)
 
-diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
-index d2d7ad085cc..e12a67ba2c0 100644
---- a/include/qemu/pmem.h
-+++ b/include/qemu/pmem.h
-@@ -22,7 +22,6 @@ pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
-     /* If 'pmem' option is 'on', we should always have libpmem support,
-        or qemu will report a error and exit, never come here. */
+diff --git a/hw/hyperv/hyperv_testdev.c b/hw/hyperv/hyperv_testdev.c
+index ef50e490c4e..a630ca70476 100644
+--- a/hw/hyperv/hyperv_testdev.c
++++ b/hw/hyperv/hyperv_testdev.c
+@@ -89,7 +89,6 @@ static TestSintRoute *sint_route_find(HypervTestDev *dev,
+         }
+     }
      g_assert_not_reached();
 -    return NULL;
  }
  
- static inline void
+ static void sint_route_destroy(HypervTestDev *dev,
+diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
+index df47aae72b8..be7d3172c4f 100644
+--- a/hw/hyperv/vmbus.c
++++ b/hw/hyperv/vmbus.c
+@@ -1890,7 +1890,6 @@ static bool complete_create_gpadl(VMBus *vmbus)
+     }
+ 
+     g_assert_not_reached();
+-    return false;
+ }
+ 
+ static void handle_gpadl_teardown(VMBus *vmbus,
+@@ -1947,7 +1946,6 @@ static bool complete_teardown_gpadl(VMBus *vmbus)
+     }
+ 
+     g_assert_not_reached();
+-    return false;
+ }
+ 
+ static void handle_open_channel(VMBus *vmbus, vmbus_message_open_channel *msg,
+@@ -2021,7 +2019,6 @@ static bool complete_open_channel(VMBus *vmbus)
+     }
+ 
+     g_assert_not_reached();
+-    return false;
+ }
+ 
+ static void vdev_reset_on_close(VMBusDevice *vdev)
 -- 
 2.39.2
 
