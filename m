@@ -1,235 +1,200 @@
-Return-Path: <kvm+bounces-26603-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26604-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0810C975DED
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 02:20:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CEA5975DF9
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 02:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE20528592B
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 00:20:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 715C31C22725
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 00:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CE463D5;
-	Thu, 12 Sep 2024 00:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED16A46BF;
+	Thu, 12 Sep 2024 00:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YuLrVO0d"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vrfMQaF6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3247A4C85
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEA163CB
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726100403; cv=none; b=f7/4cQBR39EOrVa6lYkcjQ05xgSSkIXGgpSKfLp5zKqvC3AhKeIVwGMIvmRBTk6zLm+aiptbRhwSc5hxLLYaitlFjbR7VGRr4zvqpnbLQVEcdO1O/r8o+8qJiI7Tb7QlScHvoC61xOpRwJdsOyQLydcTda0Pm9CVdKyq6hv1YeU=
+	t=1726100912; cv=none; b=QgJDYjHma+Y9+mz6W7l/dmWMZw6SE/qkFT/N35nCOJ5WMIzZwBjQg3yk9ksTIEUiWga3j6/aGtIw8xlfVym1TNF3ytLG409oMuqx3bdL8drz1OJGzA/Gw2ysVnFyya4xd6j/1LNII2Q+Im3CSfx51KHqlc/xhFfyU4ffwbNn9xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726100403; c=relaxed/simple;
-	bh=7ZHE6rnn9Pm63u68EhYfwOZZSNVSjSnrzypykdDVVhg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QQzYDPOYYQMabWhD7wFE1v4j73vYMztEfpaeqV04TRlim/ENvsT0+M0IHL0R2rRR0jcN79tAbTiqMSDOFcwmSNzXakjZpffj68EENcKxRgmtHtmtIAfD3Sb4Yzu7x1WVhYHjV4GG4dk9iZY0EMLU/CSlGMf6/U72GthRAkMgt7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YuLrVO0d; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6d4f1d9951fso3540097b3.1
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 17:20:02 -0700 (PDT)
+	s=arc-20240116; t=1726100912; c=relaxed/simple;
+	bh=J2JpUYErlL4g4HomSmRzvF37GGprKRc+5g9//gbviXY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kc5U3gYB7LB2WNalm5EgDg14dPL+ka4sKXxoDCNDgpxTUCpL+aOaCHWTBF5EtCf2e/CMkQTViD+ggzXwSiUTmxhYnN1wAPbZwpdg6HkVRamQEGnH6lG5Z0q/I/gW6Z6xN5MGGynSTIvLkBOXYCcKuAtaeAIxEjZCHJG60esDrGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vrfMQaF6; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7d50e865b7aso391366a12.0
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 17:28:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726100401; x=1726705201; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6gfaXOaocGV5N/sXdVJlpTgJOtMKxsPAOrOzp4Kg5Zo=;
-        b=YuLrVO0dH2khkHl6aJ1TD1RsyaER2PgGB9TQe0qCLCa/osrq53Gk0ZZ0KwUIii955y
-         rAnM4mv8eCEPESyCGx8n/o+BdqAKt9DspdZ3GuVOd/6Grlk9w7Yt9KnTFgYrK8LKYYpv
-         NuAU3E+hR7O2KIsHckaAWqEEc5sW8u2huu2/2VQNtOgq93QhpG6rEO5XHajrryUAmEx9
-         5x6RUCwHX4DTS4OlvJxp9asMzx7KZZxqtPS4LN8LcvXT6GI3R+lLcSjtwKB41jjKnUnk
-         vKtc0souqsm5CQCGmbyMx2od6nsbl9VUUrumVfmyDX2wod7bo8M1TqQDowoNF2/ZT4Ri
-         nMag==
+        d=linaro.org; s=google; t=1726100910; x=1726705710; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c9o7/Cb/II9t2dUk/lFV7V5FBEJVmX+kPV3LL4olG50=;
+        b=vrfMQaF67e4bAWbnHyNrnxKsUAEat24vIed00FFpI2Rhn2vKxa0j7/ybvFBMPPvx+P
+         U+ssgscMjvymzsVmpfXOe8rux9sjyKe3PCDRr44ULO2V6KLWTmAkeHpY8PwvHTYutS5N
+         3w7uMzoMH4cE+LV88l3q6gyNk9R5+fyhUg8pjvKEy7X7DCKyVKJy3KvSSlqNAO53LVn7
+         ayuYCm4Hkr0gFsMw3XIOjDHD5mTXQiTaK87TjLxXTj52X6uyZPB+XCp6ptMqdsMgUCSw
+         oIKt+x5zzj+51UrjkKCm/rM01R+ICpijXl7fCUJTvT5WF5hqKHUDCiLgO8N7jAhpZWUN
+         XgAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726100401; x=1726705201;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6gfaXOaocGV5N/sXdVJlpTgJOtMKxsPAOrOzp4Kg5Zo=;
-        b=b/7ATfuR+wioY9p144Xr2X+hWwP5j+3E+QLalW+jwwz0/O/jIvk7SnCwvjkpjjc7Ep
-         1juPSO6KWRHEjtdzf0B+2EtVuhLIaEGVYJAIwFMxf5awZRmyM3IRU5cnpbc/Z0tMLNem
-         0vv2djEl5j4ziic2SHd2zInl7TXMs1GQXGsBGV57OUPcogDFQbNsrlU5Hd2wz6zcRLNR
-         EoiX0m2nl0nSn5HRQvjFJNGHtYsajCp9FlUf+GkkDsRpwCFTcmsdQIbK3wowWZUbpRfG
-         1o8vNAtjSmY/sRJkNMIDdImKnHdmj5f/8InGhD/N9IMFer+uB+GXgJqgEmNz1wqxxyQa
-         /ISw==
-X-Forwarded-Encrypted: i=1; AJvYcCWrC1sIdU2/IZLVb+3Klx1rRs8fxW6NMFgCt+su2RZyQSKay0gCcGU6odcv09ObEdCU8Z4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVceAGa+h3k3qJ4J1HlF3zroLLmLekOn4heXhRcdL3KrVbrJHm
-	RQjVvAqKpa/y0WXF4h8812573TgGXInurD/V8sMrvYUISj+hb6wB6Ej3y/e5E8SZ/vuwcivAKTp
-	0UNzzOs+QCdDFSSGwy+xIzWhv5tSYTXoD8GBe
-X-Google-Smtp-Source: AGHT+IFCSQW9OkhxWu5GixWfZA3Akz697w6Am0RhcKLgULCV/kD0mPJsOAT48WevjQEwyJGw4vOMbwN8aQtB8tw8odU=
-X-Received: by 2002:a05:690c:ec8:b0:6db:b1d5:5116 with SMTP id
- 00721157ae682-6dbb6add2fdmr14504987b3.9.1726100400935; Wed, 11 Sep 2024
- 17:20:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726100910; x=1726705710;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c9o7/Cb/II9t2dUk/lFV7V5FBEJVmX+kPV3LL4olG50=;
+        b=rX+FN0AlfZrhodc5N3SNXhfjjj3ZoPBLzH9t23J8Mhn+nfMyijfHQ5Vj6wIdTSdZsC
+         kFcyc1lk2AqddaMxkTHT5n9z+Ew1J0xdCT+5fW9kWvPpssUtKjV7IBGomQE6rLQlTGIX
+         964nboNXzsKMJCjtPdMsZzrJj5J6PNT3qr0QaMQTtlUana/VOPetwN0T+Bzse1grFc7R
+         djm8OlByWSftWOcfJ6rwSwuadSge6QatFfZRCNrf6MPZ3gCXZ1PUO7nrzoybQlRSCj8M
+         UlvHMC2QRcQB6ZaVxIawnam5X4cE2P3YYvE3BtawPkjQkHIpQZOYmTNlCOlxYIBr3ux1
+         aTMA==
+X-Forwarded-Encrypted: i=1; AJvYcCWgFbKcKxoCRTjOFqDFMZCwQ4wTn0c0E+q9xe1lcjPBk7dPYsr1GJl7xVjFvjO7MRQ+zo0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpMyGmrQy9Se/PKvYqsESMZvH/SGgFYCwxGBrtuCFD1UAc7EEo
+	mKNXrxcwnprlNeex9+ozWAZewIlFx7g15MYPTNtJRSppd8GvruwOLyuPdflQ8nk=
+X-Google-Smtp-Source: AGHT+IG/+agFR+owCifK6LN7nBFHTLHqk0umycTEk4Q5c9uh7VrVH7bVyDXkjOez5N5fvomBj8Vk0w==
+X-Received: by 2002:a05:6a21:4581:b0:1cf:4458:8b27 with SMTP id adf61e73a8af0-1cf764afde6mr1438134637.46.1726100909723;
+        Wed, 11 Sep 2024 17:28:29 -0700 (PDT)
+Received: from ?IPV6:2604:3d08:9384:1d00::9633? ([2604:3d08:9384:1d00::9633])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-719090c37efsm3523445b3a.187.2024.09.11.17.28.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Sep 2024 17:28:29 -0700 (PDT)
+Message-ID: <7328179f-dbc8-46da-8b87-1077a706acc7@linaro.org>
+Date: Wed, 11 Sep 2024 17:28:26 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240911204158.2034295-1-seanjc@google.com> <20240911204158.2034295-14-seanjc@google.com>
-In-Reply-To: <20240911204158.2034295-14-seanjc@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Wed, 11 Sep 2024 17:19:24 -0700
-Message-ID: <CADrL8HW+hUNKPbaL7xYb0FEesB2t-AwAw07iOCDj8KHp0RwVpQ@mail.gmail.com>
-Subject: Re: [PATCH v2 13/13] KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: multipart/mixed; boundary="0000000000003f3d950621e1110c"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/39] docs/spin: replace assert(0) with
+ g_assert_not_reached()
+Content-Language: en-US
+To: Thomas Huth <thuth@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>,
+ "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
+ Zhao Liu <zhao1.liu@intel.com>, Joel Stanley <joel@jms.id.au>,
+ Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-arm@nongnu.org, Corey Minyard <minyard@acm.org>,
+ Eric Farman <farman@linux.ibm.com>, Keith Busch <kbusch@kernel.org>,
+ WANG Xuerui <git@xen0n.name>, Hyman Huang <yong.huang@smartx.com>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ Michael Rolnik <mrolnik@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, qemu-riscv@nongnu.org,
+ Ani Sinha <anisinha@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Jesper Devantier <foss@defmacro.it>, Laurent Vivier <laurent@vivier.eu>,
+ Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov
+ <imammedo@redhat.com>, kvm@vger.kernel.org,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, Fam Zheng
+ <fam@euphon.net>, qemu-s390x@nongnu.org, Hanna Reitz <hreitz@redhat.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Eduardo Habkost <eduardo@habkost.net>,
+ Laurent Vivier <lvivier@redhat.com>, Rob Herring <robh@kernel.org>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-block@nongnu.org,
+ qemu-ppc@nongnu.org, Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Fabiano Rosas <farosas@suse.de>,
+ Helge Deller <deller@gmx.de>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ Yanan Wang <wangyanan55@huawei.com>, Peter Xu <peterx@redhat.com>,
+ Bin Meng <bmeng.cn@gmail.com>, Weiwei Li <liwei1518@gmail.com>,
+ Klaus Jensen <its@irrelevant.dk>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Jason Wang <jasowang@redhat.com>
+References: <20240910221606.1817478-1-pierrick.bouvier@linaro.org>
+ <20240910221606.1817478-2-pierrick.bouvier@linaro.org>
+ <zkyoryho5alnyirnl7ulvh5y6tkty6koccgeygmve42uml7glu@37rkdodtlx4f>
+ <bwo43ms2wi6vbeqhlc7qjwmw5jyt2btxvpph3lqn7tfol4srjf@77yusngzs6wh>
+ <10d6d67a-32f6-40fc-aba9-c62a74d9d98d@maciej.szmigiero.name>
+ <20240911125126.GS1450@redhat.com>
+ <c62bed1a-a13d-49eb-aec2-54bfe78dd1e5@redhat.com>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <c62bed1a-a13d-49eb-aec2-54bfe78dd1e5@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---0000000000003f3d950621e1110c
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 9/11/24 09:13, Thomas Huth wrote:
+> On 11/09/2024 14.51, Richard W.M. Jones wrote:
+>> On Wed, Sep 11, 2024 at 02:46:18PM +0200, Maciej S. Szmigiero wrote:
+>>> On 11.09.2024 14:37, Eric Blake wrote:
+>>>> On Wed, Sep 11, 2024 at 07:33:59AM GMT, Eric Blake wrote:
+>>>>> On Tue, Sep 10, 2024 at 03:15:28PM GMT, Pierrick Bouvier wrote:
+>>>>>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>>>>>> ---
+>>>>>
+>>>>> A general suggestion for the entire series: please use a commit
+>>>>> message that explains why this is a good idea.  Even something as
+>>>>> boiler-plate as "refer to commit XXX for rationale" that can be
+>>>>> copy-pasted into all the other commits is better than nothing,
+>>>>> although a self-contained message is best.  Maybe:
+>>>>>
+>>>>> This patch is part of a series that moves towards a consistent use of
+>>>>> g_assert_not_reached() rather than an ad hoc mix of different
+>>>>> assertion mechanisms.
+>>>>
+>>>> Or summarize your cover letter:
+>>>>
+>>>> Use of assert(false) can trip spurious control flow warnings from some
+>>>> versions of gcc:
+>>>> https://lore.kernel.org/qemu-devel/54bb02a6-1b12-460a-97f6-3f478ef766c6@linaro.org/
+>>>> Solve that by unifying the code base on g_assert_not_reached()
+>>>> instead.
+>>>>
+>>>
+>>> If using g_assert_not_reached() instead of assert(false) silences
+>>> the warning about missing return value in such impossible to reach
+>>> locations should we also be deleting the now-unnecessary "return"
+>>> statements after g_assert_not_reached()?
+>>
+>> Although it's unlikely to be used on any compiler that can also
+>> compile qemu, there is a third implementation of g_assert_not_reached
+>> that does nothing, see:
+>>
+>> https://gitlab.gnome.org/GNOME/glib/-/blob/927683ebd94eb66c0d7868b77863f57ce9c5bc76/glib/gtestutils.h#L269
+> 
+> That's only in the #ifdef G_DISABLE_ASSERT case ... and we forbid that in
+> QEMU, see osdep.h:
+> 
+> #ifdef G_DISABLE_ASSERT
+> #error building with G_DISABLE_ASSERT is not supported
+> #endif
+> 
+> So in QEMU, g_assert_not_reached() should always abort.
+> 
+>    Thomas
+> 
 
-On Wed, Sep 11, 2024 at 1:42=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Add two phases to mmu_stress_test to verify that KVM correctly handles
-> guest memory that was writable, and then made read-only in the primary MM=
-U,
-> and then made writable again.
->
-> Add bonus coverage for x86 and arm64 to verify that all of guest memory w=
-as
-> marked read-only.  Making forward progress (without making memory writabl=
-e)
-> requires arch specific code to skip over the faulting instruction, but th=
-e
-> test can at least verify each vCPU's starting page was made read-only for
-> other architectures.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  tools/testing/selftests/kvm/mmu_stress_test.c | 104 +++++++++++++++++-
->  1 file changed, 101 insertions(+), 3 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/mmu_stress_test.c b/tools/testin=
-g/selftests/kvm/mmu_stress_test.c
-> index 50c3a17418c4..c07c15d7cc9a 100644
-> --- a/tools/testing/selftests/kvm/mmu_stress_test.c
-> +++ b/tools/testing/selftests/kvm/mmu_stress_test.c
-> @@ -16,6 +16,8 @@
->  #include "guest_modes.h"
->  #include "processor.h"
->
-> +static bool mprotect_ro_done;
-> +
->  static void guest_code(uint64_t start_gpa, uint64_t end_gpa, uint64_t st=
-ride)
->  {
->         uint64_t gpa;
-> @@ -31,6 +33,42 @@ static void guest_code(uint64_t start_gpa, uint64_t en=
-d_gpa, uint64_t stride)
->                 *((volatile uint64_t *)gpa);
->         GUEST_SYNC(2);
->
-> +       /*
-> +        * Write to the region while mprotect(PROT_READ) is underway.  Ke=
-ep
-> +        * looping until the memory is guaranteed to be read-only, otherw=
-ise
-> +        * vCPUs may complete their writes and advance to the next stage
-> +        * prematurely.
-> +        *
-> +        * For architectures that support skipping the faulting instructi=
-on,
-> +        * generate the store via inline assembly to ensure the exact len=
-gth
-> +        * of the instruction is known and stable (vcpu_arch_put_guest() =
-on
-> +        * fixed-length architectures should work, but the cost of parano=
-ia
-> +        * is low in this case).  For x86, hand-code the exact opcode so =
-that
-> +        * there is no room for variability in the generated instruction.
-> +        */
-> +       do {
-> +               for (gpa =3D start_gpa; gpa < end_gpa; gpa +=3D stride)
-> +#ifdef __x86_64__
-> +                       asm volatile(".byte 0x48,0x89,0x00" :: "a"(gpa) :=
- "memory"); /* mov %rax, (%rax) */
+Yes indeed.
 
-I'm curious what you think about using labels (in asm, but perhaps
-also in C) and *setting* the PC instead of incrementing the PC. Diff
-attached (tested on x86). It might even be safe/okay to always use
-vcpu_arch_put_guest(), just set the PC to a label immediately
-following it.
+For further information:
 
-I don't feel strongly, so feel free to ignore.
+g_assert_not_reached() expand to g_assertion_message_expr(), [1]
+which is a function marked noreturn [2][3], so indeed, it always abort.
 
-
-
-> +#elif defined(__aarch64__)
-> +                       asm volatile("str %0, [%0]" :: "r" (gpa) : "memor=
-y");
-> +#else
-> +                       vcpu_arch_put_guest(*((volatile uint64_t *)gpa), =
-gpa);
-> +#endif
-> +       } while (!READ_ONCE(mprotect_ro_done));
-> +
-> +       /*
-> +        * Only architectures that write the entire range can explicitly =
-sync,
-> +        * as other architectures will be stuck on the write fault.
-> +        */
-> +#if defined(__x86_64__) || defined(__aarch64__)
-> +       GUEST_SYNC(3);
-> +#endif
-
---0000000000003f3d950621e1110c
-Content-Type: application/x-patch; name="labels.diff"
-Content-Disposition: attachment; filename="labels.diff"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m0yjcx7b0>
-X-Attachment-Id: f_m0yjcx7b0
-
-ZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9tbXVfc3RyZXNzX3Rlc3Qu
-YyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9tbXVfc3RyZXNzX3Rlc3QuYwppbmRleCBj
-MDdjMTVkN2NjOWEuLmE3Y2NlZDVjM2U2NyAxMDA2NDQKLS0tIGEvdG9vbHMvdGVzdGluZy9zZWxm
-dGVzdHMva3ZtL21tdV9zdHJlc3NfdGVzdC5jCisrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3Rz
-L2t2bS9tbXVfc3RyZXNzX3Rlc3QuYwpAQCAtMTYsOCArMTYsMTMgQEAKICNpbmNsdWRlICJndWVz
-dF9tb2Rlcy5oIgogI2luY2x1ZGUgInByb2Nlc3Nvci5oIgogCisjaWYgZGVmaW5lZChfX3g4Nl82
-NF9fKSB8fCBkZWZpbmVkKF9fYWFyY2g2NF9fKQorZXh0ZXJuIHZvaWQgKnNraXBfcGFnZTsKKyNl
-bmRpZgorCiBzdGF0aWMgYm9vbCBtcHJvdGVjdF9yb19kb25lOwogCisKIHN0YXRpYyB2b2lkIGd1
-ZXN0X2NvZGUodWludDY0X3Qgc3RhcnRfZ3BhLCB1aW50NjRfdCBlbmRfZ3BhLCB1aW50NjRfdCBz
-dHJpZGUpCiB7CiAJdWludDY0X3QgZ3BhOwpAQCAtNDAsMTggKzQ1LDIxIEBAIHN0YXRpYyB2b2lk
-IGd1ZXN0X2NvZGUodWludDY0X3Qgc3RhcnRfZ3BhLCB1aW50NjRfdCBlbmRfZ3BhLCB1aW50NjRf
-dCBzdHJpZGUpCiAJICogcHJlbWF0dXJlbHkuCiAJICoKIAkgKiBGb3IgYXJjaGl0ZWN0dXJlcyB0
-aGF0IHN1cHBvcnQgc2tpcHBpbmcgdGhlIGZhdWx0aW5nIGluc3RydWN0aW9uLAotCSAqIGdlbmVy
-YXRlIHRoZSBzdG9yZSB2aWEgaW5saW5lIGFzc2VtYmx5IHRvIGVuc3VyZSB0aGUgZXhhY3QgbGVu
-Z3RoCi0JICogb2YgdGhlIGluc3RydWN0aW9uIGlzIGtub3duIGFuZCBzdGFibGUgKHZjcHVfYXJj
-aF9wdXRfZ3Vlc3QoKSBvbgotCSAqIGZpeGVkLWxlbmd0aCBhcmNoaXRlY3R1cmVzIHNob3VsZCB3
-b3JrLCBidXQgdGhlIGNvc3Qgb2YgcGFyYW5vaWEKLQkgKiBpcyBsb3cgaW4gdGhpcyBjYXNlKS4g
-IEZvciB4ODYsIGhhbmQtY29kZSB0aGUgZXhhY3Qgb3Bjb2RlIHNvIHRoYXQKLQkgKiB0aGVyZSBp
-cyBubyByb29tIGZvciB2YXJpYWJpbGl0eSBpbiB0aGUgZ2VuZXJhdGVkIGluc3RydWN0aW9uLgor
-CSAqIGdlbmVyYXRlIHRoZSBzdG9yZSB2aWEgaW5saW5lIGFzc2VtYmx5IHRvIGVuc3VyZSB3ZSBj
-YW4gY29ycmVjdGx5CisJICogYWRqdXN0IHRoZSBQQyB1cG9uIGZhdWx0aW5nLgogCSAqLwogCWRv
-IHsKIAkJZm9yIChncGEgPSBzdGFydF9ncGE7IGdwYSA8IGVuZF9ncGE7IGdwYSArPSBzdHJpZGUp
-CiAjaWZkZWYgX194ODZfNjRfXwotCQkJYXNtIHZvbGF0aWxlKCIuYnl0ZSAweDQ4LDB4ODksMHgw
-MCIgOjogImEiKGdwYSkgOiAibWVtb3J5Iik7IC8qIG1vdiAlcmF4LCAoJXJheCkgKi8KKwkJCWFz
-bSB2b2xhdGlsZSgiLmdsb2JhbCBza2lwX3BhZ2U7IgorCQkJCSAgICAgIm1vdiAlMCwgKCUwKTsi
-CisJCQkJICAgICAic2tpcF9wYWdlOjsiCisJCQkJICAgICA6OiAiciIgKGdwYSkgOiAibWVtb3J5
-Iik7CiAjZWxpZiBkZWZpbmVkKF9fYWFyY2g2NF9fKQotCQkJYXNtIHZvbGF0aWxlKCJzdHIgJTAs
-IFslMF0iIDo6ICJyIiAoZ3BhKSA6ICJtZW1vcnkiKTsKKwkJCWFzbSB2b2xhdGlsZSgiLmdsb2Jh
-bCBza2lwX3BhZ2U7IgorCQkJCSAgICAgInN0ciAlMCwgWyUwXTsiCisJCQkJICAgICAic2tpcF9w
-YWdlOjsiCisJCQkJICAgICA6OiAiciIgKGdwYSkgOiAibWVtb3J5Iik7CiAjZWxzZQogCQkJdmNw
-dV9hcmNoX3B1dF9ndWVzdCgqKCh2b2xhdGlsZSB1aW50NjRfdCAqKWdwYSksIGdwYSk7CiAjZW5k
-aWYKQEAgLTE3MCwxMCArMTc4LDEwIEBAIHN0YXRpYyB2b2lkICp2Y3B1X3dvcmtlcih2b2lkICpk
-YXRhKQogCQlURVNUX0FTU0VSVF9FUShlcnJubywgRUZBVUxUKTsKICNpZiBkZWZpbmVkKF9feDg2
-XzY0X18pCiAJCVdSSVRFX09OQ0UodmNwdS0+cnVuLT5rdm1fZGlydHlfcmVncywgS1ZNX1NZTkNf
-WDg2X1JFR1MpOwotCQl2Y3B1LT5ydW4tPnMucmVncy5yZWdzLnJpcCArPSAzOworCQl2Y3B1LT5y
-dW4tPnMucmVncy5yZWdzLnJpcCA9ICh2bV92YWRkcl90KSZza2lwX3BhZ2U7CiAjZWxpZiBkZWZp
-bmVkKF9fYWFyY2g2NF9fKQogCQl2Y3B1X3NldF9yZWcodmNwdSwgQVJNNjRfQ09SRV9SRUcocmVn
-cy5wYyksCi0JCQkgICAgIHZjcHVfZ2V0X3JlZyh2Y3B1LCBBUk02NF9DT1JFX1JFRyhyZWdzLnBj
-KSkgKyA0KTsKKwkJCSAgICAgKHZtX3ZhZGRyX3QpJnNraXBfcGFnZSk7CiAjZW5kaWYKIAogCX0K
---0000000000003f3d950621e1110c--
+[1] 
+https://gitlab.gnome.org/GNOME/glib/-/blob/927683ebd94eb66c0d7868b77863f57ce9c5bc76/glib/gtestutils.h#L274
+[2] 
+https://gitlab.gnome.org/GNOME/glib/-/blob/927683ebd94eb66c0d7868b77863f57ce9c5bc76/glib/gtestutils.h#L592
+[3] https://docs.gtk.org/glib/macros.html#compiler
 
