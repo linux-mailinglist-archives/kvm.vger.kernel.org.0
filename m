@@ -1,103 +1,116 @@
-Return-Path: <kvm+bounces-26714-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26716-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D23B0976B26
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 15:49:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB97C976B60
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 15:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BC802828D7
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 13:49:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A04811F24432
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 13:59:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E871AD256;
-	Thu, 12 Sep 2024 13:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25D0A1B12DE;
+	Thu, 12 Sep 2024 13:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZSQTMkzs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P2nC27CN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3281A01CC
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 13:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037A61AAE0A
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 13:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726148984; cv=none; b=t3FdglmkL/hHMIYgorCJFD88b06c18TTnrgXM/Y3MhDcG/BLY9LgXFyHjLTeXWBzOQcgFsPc7jJN7NOfNnFmsiPhPB0GvK4mblne3OVsGx9Rz+7qh4y2+ucoXKl2ImwVhDIc9rcgNT3f4RdYMpwVp2wG4dbHgwx9pnEEUaTKV7c=
+	t=1726149531; cv=none; b=oXoPenERJemWy43xBRuaihGPkh5sVdOxxcwMCtSwLERbunSWNsflGfZHMLb5mqaR+EfM1IouyxpWl4FNoTmqfoXKG69Aj3Ra/ih4kJkCwWergi/vG2oWvfb3/Gsz+bWkq/vEczwtzPBCr0dU83qdLWzC58je/own7XPWwwj+qfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726148984; c=relaxed/simple;
-	bh=TK63ZITwXiK1tpwBleYE7XvV84aecTotysnL7Q6Y+UI=;
+	s=arc-20240116; t=1726149531; c=relaxed/simple;
+	bh=SeITqANqh8uS/MwUSMMbpOgql+rfNsYyyshPxmsnKYw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ho7ijDtjXvR9VvrEVLsW/DLDn7HbcD/PHYLt7gDjnFzXG3QbsLlhem4cZkW65W+mxcrFcdB25NKwKZSg1y6RXcdl/pp2Bxw3kzoDEgdUEXJ00hHbX3sNHFgPUAUWR5uMk9uGeTSwz1NE5y7Hwyz3Ya1mNCSSAYVWm+wDyB+kVCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZSQTMkzs; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=bR3uptakTSOzYArnSfpW8tce00lKP6ww5WaOcuKnRwDK1KNUJ7+OFup5hisSVqOq5iBhK2JIC8zc2YsN20ArWKyYgAIdSSSMKMaLc6dIg4x6AN/Rsscd6NyQXHBBMsLTuYXgnnSI0tnng2BLQz8B8aAXNXLmXizUv/pb42lq2E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P2nC27CN; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6d4426ad833so24826757b3.2
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 06:49:43 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1ff24acb60dso9801365ad.0
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 06:58:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726148982; x=1726753782; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1726149529; x=1726754329; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XqdrXm4ZcBhMxArHEVqbh0H8bhyUvIJvDn8m8Oi5KOY=;
-        b=ZSQTMkzsggCnz2qFqYYMTitCnmimFkrgh7IALeNoHySb+qFm8MajpuoJfjvVintMvd
-         4aP0JepGxGkysCYFjF0Ly2vbHk6zfYK6M0QsGYzT0wF1VP7FE4uA/V8Ama4Z50WVDEQD
-         fsc/o03ZR0imD3MIV8HkreYe9/AZNrbDVPY+aPg/8cpNNJVAYT5+fIQnKp5FGcOr01nH
-         Hb5bq88ca8BDNwIWvtXYwyZRMj3/K1YSTx5fa/mSY0hcajgfgKQ/RyVdVqHYoVwOugyd
-         RcqiqE8jaR3gxgmRwzdYJFYXiSernO3LG8PKQ3KDGCOFfKMZj+epi8dXQtlJqKTKAIm4
-         CiDw==
+        bh=ZK6HVHZn98Hj1qj5vJmB4zUj1ZfRB7+fu+YXBUGUC+g=;
+        b=P2nC27CNjjo+D8hhpSfjI6jvkPYcSuTLvUzo0qwN2s8vz8jWrW5NJOKcCxyqKs1NQ4
+         B0w3CdF/qRO3+QmeM8L1sA3DC8Y+EUXQrdeFpp7tV1H4M+xGFKXSh0upLlLufRARZ0bP
+         E3R54e4xCJDblKmZb5rEqJnyP7vo7skWIUjZE7fq7OaZlXcQoHRWH0MHrra+tK00DF60
+         clBNCmkrPoOPuxCg10YfuqXbZadHm0Ig7ptvyhh71sdj7Jwo/U0khRf+RtlSrlPx/vUo
+         2FswaNixXC8hEP2e0D6+bcV+c2rvjRKxbYTgP5ntO4LLkTM8DCu0QaE80MgO21GTnl64
+         GJDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726148982; x=1726753782;
+        d=1e100.net; s=20230601; t=1726149529; x=1726754329;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XqdrXm4ZcBhMxArHEVqbh0H8bhyUvIJvDn8m8Oi5KOY=;
-        b=l8BIDhkWBFchoSuG1+PKNUl9SSGkgtK/xp1j0LWIXUtpFSC2DiP2UQROTBAmvukt3p
-         k8yXBpP1/mIVDriN+2wE3dv/It8bgRDkVDofh+s4A9+5pMxQr0kE4OdQujpVGle/gs7K
-         prJHr3/k5xlKQPQdu8Q5RMuuK1YGlxejDvc428dfNBH3tMtu6oHSlCus2upWKhrW5Qaq
-         VsqjaSFVXXZh2aedup7VzaxegL0PY0vRogTOI9fW83ypZiO0A53TCaJiwWjB+n6E9O51
-         S/88mtQ/oIjlfQ9PcfQ3P4XMpVXzxl4KKhO3Sy42rpYBaU+KhKygwYfAEFWQmwxa0gCR
-         Miqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXBavOWLJTeA1XCLMBbjbZmv9QmvsrsBz4bBaUnZsP6MJqOjZ3xgUFsMnTor6kzQi/n83U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymVKg69mdIxWgw/YHHUWFMjE3Ltr/Pqd4fsJnsa0a0WWXojG1t
-	KPE0Dgm3SdmmZTFW3RxbvgxlWjFX7wJw9E7SgRE36wt0hyxRUQ2Kzkh+DLuvTuMOuMq1XVAheB3
-	05Q==
-X-Google-Smtp-Source: AGHT+IERWDyZH0lw1THIMdF1ZNEMNfNEpIHjvdgU0tin44x4h90whZRVuXvE3+8fuo4JVbUfWmxTfJ+4tEs=
+        bh=ZK6HVHZn98Hj1qj5vJmB4zUj1ZfRB7+fu+YXBUGUC+g=;
+        b=b3arpjCuacJ9Ymic6yU4bkhwxqyKAbtJpEWZAybL2a4z0ptpeYay24+hLCwu64Gb2T
+         d2IJuzx4Fyj+IRkku1ZETki8kQBBfwLM2BQIoVCKTJXspbdbSSkLNxggltCGwHYmtXVm
+         x91d4edvpBVdEyeQSVDj4ISzNTpTV9UcQk68VnRj1p1Lk0GzMMA8g5bBjy7ZquCHuXSM
+         rzLgZPW14LgbA1Zg3a6mfsNPMn2zFABDR+6xFzvTvkpAbo0IekQfPipAHiCsnFu8Lah4
+         FrADtE6G7ypXg8nfGRKAJB1pA2H8qcJiPPbt0KZcne6f/Hs/70uvBh/Na0usCIVWspFV
+         yucA==
+X-Forwarded-Encrypted: i=1; AJvYcCXVmvbj87ylfEQdESjJ5XJ9qWb3yN0DX7605QFXQW32rRBi48IMFGvBngGY3i6fpMPmsnM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsuQNYg77bmUWZehy5F16fhVEaqGoVmd1jRbSg/PpuRbgg0LSF
+	wPchXhNhwtv1e2tFrR7HQHzTZWcMj7SRGep/D0c71yohitTtM1r1Rdir3R1u7EqK2OfS0zxw5Jl
+	V8w==
+X-Google-Smtp-Source: AGHT+IFqTdTG4b3Mr7BP/09ZXc+oW/zlXp3T5xgWOLFDE7WfwPK4BdJD+RmItP4d7duZp2TQ8vP7BLIJ0nw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:50c:b0:e1d:a616:602 with SMTP id
- 3f1490d57ef6-e1da6160834mr2247276.7.1726148982380; Thu, 12 Sep 2024 06:49:42
- -0700 (PDT)
-Date: Thu, 12 Sep 2024 06:49:40 -0700
-In-Reply-To: <20240912-a3894135370bf3fe551ed018@orel>
+ (user=seanjc job=sendgmr) by 2002:a17:903:64e:b0:205:58ee:1567 with SMTP id
+ d9443c01a7336-2074c3ae046mr208235ad.0.1726149529086; Thu, 12 Sep 2024
+ 06:58:49 -0700 (PDT)
+Date: Thu, 12 Sep 2024 06:58:47 -0700
+In-Reply-To: <8761e1b8-4c65-4837-b152-98be86cf220d@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240911204158.2034295-1-seanjc@google.com> <20240911204158.2034295-3-seanjc@google.com>
- <20240912-a3894135370bf3fe551ed018@orel>
-Message-ID: <ZuLxIjMT4QzrUaad@google.com>
-Subject: Re: [PATCH v2 02/13] KVM: selftests: Return a value from
- vcpu_get_reg() instead of using an out-param
+References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
+ <20240904030751.117579-6-rick.p.edgecombe@intel.com> <8761e1b8-4c65-4837-b152-98be86cf220d@intel.com>
+Message-ID: <ZuLzl6reeDH_1fFh@google.com>
+Subject: Re: [PATCH 05/21] KVM: VMX: Teach EPT violation helper about private mem
 From: Sean Christopherson <seanjc@google.com>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Anup Patel <anup@brainfault.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	James Houghton <jthoughton@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	dmatlack@google.com, isaku.yamahata@gmail.com, yan.y.zhao@intel.com, 
+	nik.borisov@suse.com, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Sep 12, 2024, Andrew Jones wrote:
-> On Wed, Sep 11, 2024 at 01:41:47PM GMT, Sean Christopherson wrote:
-> > Return a uint64_t from vcpu_get_reg() instead of having the caller provide
-> > a pointer to storage, as none of the KVM_GET_ONE_REG usage in KVM selftests
+On Thu, Sep 12, 2024, Kai Huang wrote:
+> > +static inline bool kvm_is_private_gpa(struct kvm *kvm, gpa_t gpa)
+> > +{
+> > +	/* For TDX the direct mask is the shared mask. */
+> > +	return !kvm_is_addr_direct(kvm, gpa);
+> > +}
 > 
-> "none of the vcpu_get_reg() usage"
+> Does this get used in any other places?  If no I think we can open code this
+> in the __vmx_handle_ept_violation().
 > 
-> (There is KVM_GET_ONE_REG usage accessing larger registers, but those are
->  done through __vcpu_get_reg(). See get-reg-list.c)
+> The reason is I think the name kvm_is_private_gpa() is too generic and this
+> is in the header file.
 
-Doh, right, which was also part of my reasoning for making the conversion (tests
-can use __vcpu_get_reg() if they need to get a larger register).
++1, kvm_is_private_gpa() is much too generic.  I knew what the code was *supposed*
+to do, but had to look at the implementation to verify that's actually what it did.
+
+> E.g., one can come up with another kvm_is_private_gpa() checking the memory
+> attributes to tell whether a GPA is private.
+> 
+> Or we rename it to something like
+> 
+> 	__vmx_is_faulting_gpa_private()
+> ?
+> 
+> Which clearly says it is checking the *faulting* GPA.
+
+I don't think that necessarily solves the problem either, because the reader has
+to know that the KVM looks at the shared bit.
+
+If open coding is undesirable, maybe a very literal name, e.g. vmx_is_shared_bit_set()?
 
