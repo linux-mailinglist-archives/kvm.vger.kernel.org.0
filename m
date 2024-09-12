@@ -1,267 +1,478 @@
-Return-Path: <kvm+bounces-26606-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26607-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CEC5975E6D
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 03:20:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EF62975FA8
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 05:26:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6766285288
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 01:20:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E8F41F238A7
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 03:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A473C1CD2B;
-	Thu, 12 Sep 2024 01:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h3QhemFF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB5B13A40F;
+	Thu, 12 Sep 2024 03:26:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B061AACA;
-	Thu, 12 Sep 2024 01:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726104013; cv=fail; b=XdbVxOKjLWGWLmeZkJAvJd7IHKgD9YiLTf9AdbqZEOd8Z9J/h+I2eqWEpMtKI8EHwq8BoAgWyxzhL8y6QcfII8L5oAqbqQV4luRNbTqa66skZbak+ZsNyxcWohPfqD4bgfS/wsw6Um/Epp+sU/SgiKEVNOHvIXbgu9+rHED76m0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726104013; c=relaxed/simple;
-	bh=LlPFLpZ7OvjWzzpX4DyylzNAd6Rr1YLG8+rkeoBZTnQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=d9aH9oLkSCigIXnaUtoaFnKdL7GxJyO9r5jwdsXLHj40K208Xy7j4g5w6Gx3WbiwtSQGtOpu2r81cqf1mLcE1Bd073+HhOZ1L7Fw57mKtR+Qw4ZRypFJ8KfnOGdtuTEmfr9IOu6NOlSocNBiFhWBvVZVMEG7meLERsYGS/gDGhQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h3QhemFF; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726104012; x=1757640012;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=LlPFLpZ7OvjWzzpX4DyylzNAd6Rr1YLG8+rkeoBZTnQ=;
-  b=h3QhemFFbMY3Q0X9h4iUG1YayKYF/7SlrYtpAiCS7bDW02qPERUMaohS
-   j9pyZZ+59Qx2T16S1P1ZMoXLg3GrQggi9OlEzLNLkGsQ8uDJn0SgVuITX
-   CWN7T/c8bdPiGEoperPQhRnLUt9OeN3XCeVpjaqWRRFUN7ykux4N+JlAL
-   +U7AXaKe+O/3hK71R7h9FSAtRg/oFB/lUesey4IPfaOqIaeCZOHxBOW0J
-   ZV9WEsh+vvRKau/O5p+5xzt0EoCBlmsAGsGVQdNOQ5cnvMvef2o/m9s4k
-   EMcT7lE6g3lygxB3efLcoLkElF4wJlC5R9g9dXycLhmRMToT2XTth2JJT
-   Q==;
-X-CSE-ConnectionGUID: 6nFi5cTlSgGd7o5xU6ay2A==
-X-CSE-MsgGUID: +nUF9E4PSd69pZD8lrXN9A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11192"; a="13481628"
-X-IronPort-AV: E=Sophos;i="6.10,221,1719903600"; 
-   d="scan'208";a="13481628"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2024 18:20:11 -0700
-X-CSE-ConnectionGUID: m43QpreXRl68xt1SjHhLaA==
-X-CSE-MsgGUID: GxcOfggxQ9evvd5PjZnz1g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,221,1719903600"; 
-   d="scan'208";a="72345151"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Sep 2024 18:20:11 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 11 Sep 2024 18:20:11 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 11 Sep 2024 18:20:10 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 11 Sep 2024 18:20:10 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 11 Sep 2024 18:20:10 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=c4O20m9kk3X4pw54nOHq/6VX4JAathTCkV19Cd4RUNHuiawN3Y37NVy8a6FsjeCObenw0YJEy0Gz8+8lrE5BpI7ApQnse9O0+KVcytvzhXkx0F0t/0Kkv9h1kB4eOTuZ7d3cEpgG+/dzLMpuUdW9iIg+rMiwDbpawoXyj5v+Wh7mTpvLxRUv0SEl39nFx09WUMhkVFz84cIyVmTl4/lpNJ2xWFsJA9OOalux2cDNWBWypWdjBcBKfPXIlCbOGGUvqCDH+q5p5ttP6vbHygtMKPv7FP0TjXBKKBEK3bF7brlzsK/cIO5cMmusFvoz2RJ23Us2oGg+vZpu1dzQ1b+CpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5BczAsLz/jh+6Gj5aMFNO+i3r+j+zMGDJauVGt/VU3s=;
- b=vBvNGnTDEe1etnVHsiAxoG/d4ngpb7FrG4wGxoQTZhQSFPmVEnlwzfuMS/g3lFhugs676UXV8YeYa3xGeUC/lwyVdOZtoOywdDXVx0yl9tiQw1MAbMCPWQgSrh6es/U0+geBprIpc4kEfknQIRnwWxI7fbMKFoQkMXCY6OlSrmgNGBTXT9Sb+DAZ4VD3DKPgLEWoE/yCGktC2ymcnPbohINt0RkH8ioWZTTu7D2VZonaKWTQC6EjTiAstKsxtfy31GMiGvzTaX0tVize/EX8FKy94qZXisJRBNlQ/eGf2XmWq3Tk1OTlPKS56tWHM2+6lbDIdYf0AuAi62UqW8tp1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by DM4PR11MB6310.namprd11.prod.outlook.com (2603:10b6:8:a7::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.23; Thu, 12 Sep
- 2024 01:20:06 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b%4]) with mapi id 15.20.7939.022; Thu, 12 Sep 2024
- 01:20:05 +0000
-Message-ID: <7ff58b42-ce51-45ff-90da-231db5e0c79e@intel.com>
-Date: Thu, 12 Sep 2024 13:19:59 +1200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/21] KVM: VMX: Teach EPT violation helper about private
- mem
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, <seanjc@google.com>,
-	<pbonzini@redhat.com>, <kvm@vger.kernel.org>
-CC: <dmatlack@google.com>, <isaku.yamahata@gmail.com>, <yan.y.zhao@intel.com>,
-	<nik.borisov@suse.com>, <linux-kernel@vger.kernel.org>
-References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
- <20240904030751.117579-6-rick.p.edgecombe@intel.com>
-Content-Language: en-US
-From: "Huang, Kai" <kai.huang@intel.com>
-In-Reply-To: <20240904030751.117579-6-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR05CA0165.namprd05.prod.outlook.com
- (2603:10b6:a03:339::20) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B39524D7
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 03:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726111575; cv=none; b=X0s0+QCqZcAYtaGEl0daaKwwM1MQ7Rw/eSQV4hENFbh28qtn+xus7oYhofQqMxtTP3mkzQmRQnGzzFb+V2r1oitGGmjbeI85Q3/4CNXzcxOBOEDJ5jd/4eJnSRvrudlxUO/IfUiIOz+Eg/Ez9GzmxtKLuA+s9Z6rBjiyxU4OBgQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726111575; c=relaxed/simple;
+	bh=fKVuG+uiI2l4gBm+OxuG8N39xSOHy++rw0ouRvy1Jyw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=VInlMDiMCR6T9iJz+9CN1etJnnWvAWj/XXMuK925Y6KQJJHLtXt2oIUElncESE+lDqRc6J7OMJbZFzNivk9jDx63pWj2Y0ciF205MXUdZ3OHT5b4aqi3zxzwWi/CqZcECfqr+TWQcDZPbwqoR5G5etlko4ISh9iUWl7dfdn1Tvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8CxC+pKX+JmhWwFAA--.12720S3;
+	Thu, 12 Sep 2024 11:26:02 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front2 (Coremail) with SMTP id qciowMAxa8ZFX+JmJkgFAA--.24414S3;
+	Thu, 12 Sep 2024 11:25:59 +0800 (CST)
+Subject: Re: [RFC PATCH V2 3/5] hw/loongarch: Add KVM extioi device support
+To: Xianglai Li <lixianglai@loongson.cn>, qemu-devel@nongnu.org
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
+ Paolo Bonzini <pbonzini@redhat.com>, Song Gao <gaosong@loongson.cn>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ kvm@vger.kernel.org
+References: <cover.1725969898.git.lixianglai@loongson.cn>
+ <f359346bb865fcc4d52552c8c0fc27123c858aad.1725969898.git.lixianglai@loongson.cn>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <9abdad1a-4a23-00b6-f3ef-51ba4ea6bebb@loongson.cn>
+Date: Thu, 12 Sep 2024 11:25:56 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|DM4PR11MB6310:EE_
-X-MS-Office365-Filtering-Correlation-Id: 58e1bc56-0572-494f-5a0c-08dcd2c90883
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?QWRnbk81RFlwaDJRejJpU2Qwd1JOeUprc05BZzhBUElHZ2ttMmNSVzFTa09h?=
- =?utf-8?B?TGczWUgrUnVvTjJTazNGeGJBV01zTEZqYXNPbnBwL0FBUUgzM2V0SFhWUXVY?=
- =?utf-8?B?RzYzZ29OQU12aXdYRGFvcmZ4VE9IZnh4eFByYm9CcGZIWjdsUmhHYU1aM1FD?=
- =?utf-8?B?YmhtN0xGMUNaM2VGdEw4SFdDQkppSm5BNFNuQmM0dG9KTGRwU2ExS3NuL1lJ?=
- =?utf-8?B?MFlubTZkaDNwaUpkWElzb2VKUis1TTY0Q3VmWkZoc3lIMzh2S2I1Ulc5dEg2?=
- =?utf-8?B?QkpPTEt5aWxzVG85SnUwNnNWM0cxcVcwQWJYRjZLWTVIc0pnTDBBcmExb2sv?=
- =?utf-8?B?dnErRkEzQldwaE0wMmlJY0pqRUlHVElBeW5KUVJFRmNUREhDSmFsaGNmbDMr?=
- =?utf-8?B?dkg2M000bXcwY1FpVHdjd1E5eEExL25YQ0VGQWhwclRHYzhuMVF5eko2d1lt?=
- =?utf-8?B?T0I4WVNKclRjMDBVUEZUMDliRUtvemg3WGs2VHV6V2RqMnFGQzNnMjdjcnJ0?=
- =?utf-8?B?eHZsTzBmT2xXSGNibHBlbzY0ZjExSFhjVnRBTDdxNVJBeTI3a3pHRFk2Vitl?=
- =?utf-8?B?M0kvUWNNeThncGJmSmNyZFhqeFd2bk9mQ0hwb29aT0s4bmdHN3lJK3pNdVFk?=
- =?utf-8?B?NnA5RVE2TGRYVjUya1doWktTODU0MENNUjRkdWU4MHVSTjhKRTdYV25pZXFa?=
- =?utf-8?B?a3lHOUlHTWhNc1c0L3AzaDV1eWgyck1IaXl0L1BLNUVqRkE0SjhyYmdyQXFL?=
- =?utf-8?B?QnJmSDhFNVJPd210MndjMUpqQ3FZWjJxMWRHclA0VS9xUkR2TlNFcGR1QVJ0?=
- =?utf-8?B?cURkczBzWmNObWRHUlNwdE5nSGFZc0F5ZFhNdjViMVJKdkZyZGpEc1cxNkFC?=
- =?utf-8?B?UTBBWGFDUWF3dThmWWFNaGNkOGtXdnhCRFVBb1dNb0FDalV4L1dLeGxlaVNz?=
- =?utf-8?B?UEhHOTB5N0x6R3dZb3VRL3BEMzFnMnpmLzBJMCsxcG1SZ3N6VmNnT0pWWUZI?=
- =?utf-8?B?TjY5NFd4a2JjV21LZEVnd0tiUG9HRFRJRHlsZWxiZG5CTWdXYnJhY1dZc0xD?=
- =?utf-8?B?NThWdC91QktteG5YS1AybHFPbWYzZk1GM1hldFdwZDVMbnNPY2FEME9yTVhr?=
- =?utf-8?B?bGhqZEplVW5Eb1RGSUkwa0xWcmVzSm9DMzJmQlJRTllSQVEvNGJ1dlQydWxG?=
- =?utf-8?B?TG9DSWJpUGlCMWFoOVc3RDlPNzVrdlFhQUttMHJ6SXBrSy8xZkhyZWRyM1ht?=
- =?utf-8?B?MCtUSHNlUjlBcTkySnE5Wm9QNWJLTlJYQlg5am00cTJHSGhYT1U5UEtweUgz?=
- =?utf-8?B?WGJ5bXlwR200bzV4WjRQNnJBR2hLcUdFUzBWNmRxakhFRjdyRTJPbFYxY3ZB?=
- =?utf-8?B?MEN1L3MwZHp1WFdkbG9GRkM0djBLZ0ZTcUtZczAzUDlXL2c0TjRHTWpHSEM4?=
- =?utf-8?B?K3M3Q016RE52UW0yZHpHZi9udTZBejhtb0hTVSttSyt1ZzVHRG9Nam1VUm1Z?=
- =?utf-8?B?a1VOTEVzS0xrWDlHREJiZVE2TzFuYWhKeDd3dUhzZ294YlNBQ010Sk9OQ1hF?=
- =?utf-8?B?VWdUYzBLc3orMytoZzBrV2h4OXhSOGVqaFJBRlQrMFJDRGtaL1dxdlkyb1RR?=
- =?utf-8?B?UmlMT3B2RFJXRDRDM0JPZlpyS2pwZUhQZ283SWh6blNEeDFGL1BVZUJLR2pG?=
- =?utf-8?B?L2NOMHVtV2VScnVUcmxIUUt5UlF2dkFHLzBTNXhSUmtya1QwUFdRTENiSHhS?=
- =?utf-8?B?V0lSczhOa21aWXhScEk3V0dvSTNneU1acjZ3WkZRN0xUclFzTlQ5U3FvOGsx?=
- =?utf-8?B?ZUJ0S2JBVEV2MTRuWDZ4Zz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SGVDekxLeG44OGxlTWkwNWpyeVR4bTM5MlZmei9keHROYjl6YkxuV3JBNTBa?=
- =?utf-8?B?YTcwa2pZMFFwR2lxNVZGbnVXMmdsZ2lpTmJ0RTlGNWFBVTB6SlE1eHVDREpX?=
- =?utf-8?B?cHg5NWUwdHVzY09QMktudXZCZzJnd0dNT0RuUXNFaE04eXFibHNCemZha242?=
- =?utf-8?B?ZzFZcTJBcVBBeEs0aytjc1FwTTU2ajZOcVFLOGJFYTBaa2ZQRFhkRlcvRFpp?=
- =?utf-8?B?aGwybURjQXVrQk4vSWkwdHlUTmxGTUpLRStuNzJUNzhUMGpibXZTVVVqRUZk?=
- =?utf-8?B?MjVwQVdxUlRzYjhMbFB5UVdPK3orVnNEOVpwMXFLcjNNZ2l2YVhOVHdjWnNJ?=
- =?utf-8?B?UE5CdjFtMjdQemFndzhEdEdndkROVnEwMG85WTkyVzZhd25YMEpiUmlvTlZ1?=
- =?utf-8?B?QVRLNDdFUWhzYzNnRTRtQmxtUExEV1ZMSmIvQkgrVDgvQ3YzejdNZTBRaE9p?=
- =?utf-8?B?MWtkckdnL29oNFUwUHQ3dmpzRGVsaldPaTNrbEVQSjVSUmVheGZRWDhwQlVa?=
- =?utf-8?B?Z2hXSy9qOTRTYWtaNUFlaUNtTFlZT1IzdzJEVUtpQ01pMjM5YnpOZGhNOGxL?=
- =?utf-8?B?UkxSZHJYYVIzKzdkSDgwRDg0MWdCb2hLNmR3bzBSYzdwT0pTZkpsbFpSeHlR?=
- =?utf-8?B?Zk92NmdNVnorUmxpVCszOXNyZk5zOWpyVE92dFNhdFVnRmw5Sk10TW5NYmY2?=
- =?utf-8?B?bUJtN2NoVG5KM3VMUmgvWXNrWlI1OFcrVW5UVmVaaHRCcEYxVXRvZ2xGYm04?=
- =?utf-8?B?bW9TWTJsTmFHVm1OUXo0d1czTVgwaUg3STBpc3A1Rk9NVWhaSlJTbnlWalo2?=
- =?utf-8?B?S1U0dHJCeU1OTU5lK2Q1OW9LcUU2UEh1WEcvcEZXTXFkdmlheEcza29LMExB?=
- =?utf-8?B?cGZRTjU3UlhpNHEzbzczQWhEa09qQXF3Y3lIb3JFaUQ4em9WdEliQVNFSWdV?=
- =?utf-8?B?YVk5eFI1V3UydUlMYkxwcHQ0TzRqUE9tWWtRZE9nMnNCVXM0aXFKTGtQK2Rs?=
- =?utf-8?B?UjVPcEpRVXY1WUVHSFV0WjF0RGNFTHJGUHFRVWtLcXBvdWcrTGNDdCtma3Fp?=
- =?utf-8?B?bkxTamZXdDBvanVQNUFhTUF3a05MU0EwSTBoc3FwbnphbTd2ejdIaWR1NkRO?=
- =?utf-8?B?RmZ2Y2w4TzZIWENvNGJXMGd2ZkVrTkNMWEZDc3JEazBzaW1Vb2o5a3R2cXV4?=
- =?utf-8?B?UWdvVEVRem9jdEdLREdyUk55eFpRQmpwRFNiTzlGNVJaMU12VXQyT0IyNk1Z?=
- =?utf-8?B?bE1YU1BrNDF2L3UyTmRmamgxaHRsNkRjMWgvN05LNjJIQnZvb2RaRGhLSE91?=
- =?utf-8?B?OTFyQmYrbjVlNCs4bFdEYTZHVVJBVlVBN2dvNXpoUXZPRDhlVzRXTjV4U0Vz?=
- =?utf-8?B?amI0anhxK0ZVRUFBLzdnSTNQUmxiU2FaTXRIUEdoOFhBanl0WGFkbVRkcCtQ?=
- =?utf-8?B?VHpobE5PRjFVdEhMVWNWNlFWQkVLK0tpYmtybEVtdElHMjdCWHh0V3pUQXdQ?=
- =?utf-8?B?NVBSblRrZkJ0bktGZjJjRkVuWU9rcitkT1ZWaGl5eXQvdXBOZTNmVWVFZG03?=
- =?utf-8?B?c1VzTE1HUWM0K2duUnVxVUVZRThtdG0wMjU1M09OYU1PblVGRFIxWHVMK3FW?=
- =?utf-8?B?ZytJUFFpSDFsY3lZTVdGV1poM1ZuWFNRVVlaVnJjRTlUWGdKWjBPQUlJR0ha?=
- =?utf-8?B?ZjBsdGVxQWN1R2RYUDFwdXZwRFB1b3hvVlhqckd0Mk81c0tUQWU3WDNSWHVj?=
- =?utf-8?B?R2FhdndWb2pabW14Rmh2WVE3cERHY3NkMG1aUU1ISW9TckQyNDE5ZjRSdmRV?=
- =?utf-8?B?Wm02eUZXRDRjTU8rcGNiczBsR0txMHBodzVuZjVYSmNsUk5weWg2bFR3SGZ4?=
- =?utf-8?B?cnl4VUtoM2hicm5QNXpLUFVHWGU4SFlML1JSL3gwMWhQV2p1N21UZWZlRHJP?=
- =?utf-8?B?ajVTYXkvZE5paEVaZGhDSXVwSlVlZkRZa1lMNkZaSFZ4VFlEQ3pxek96V1JI?=
- =?utf-8?B?N3diN0lpZkxYMU00bXA1cFRZeWk1eHZsRlFTV0phUHpMcnJQcmUremJGNnNY?=
- =?utf-8?B?ZjB5dkZqQTlSYWc1aEVVOWNGTWJTV1dwbmVmbmFCdHo2bGE5Zm0vR3FzaEdF?=
- =?utf-8?Q?e5H70W/hr8R1XEg+FdTK/oECH?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 58e1bc56-0572-494f-5a0c-08dcd2c90883
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2024 01:20:05.4324
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rx6OJDJImRtYZfWejm950MrGMz4odbY18ZVE6GBv907yCJyUX2k1Jnj/PAuqiq7WuhhFJkhEh+pdycj2yi4a7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6310
-X-OriginatorOrg: intel.com
+In-Reply-To: <f359346bb865fcc4d52552c8c0fc27123c858aad.1725969898.git.lixianglai@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qciowMAxa8ZFX+JmJkgFAA--.24414S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj9fXoW3Cw18ArW3Kr18AF15ZrWUGFX_yoW8GFWxuo
+	WUJFsFvr4rJr97ZrZ5JwsrtF43tr409FW5AFW7Zw43uF47tFW5Ja1DK3WFkryxWFs8KryD
+	GasIgFs7Ja42yw1rl-sFpf9Il3svdjkaLaAFLSUrUUUU8b8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUO17kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8JVW8Jr1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
+	6r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
+	1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxG
+	rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUXVWUAwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8HKZJUUUU
+	U==
 
 
 
-On 4/09/2024 3:07 pm, Rick Edgecombe wrote:
-> Teach EPT violation helper to check shared mask of a GPA to find out
-> whether the GPA is for private memory.
+On 2024/9/10 下午8:18, Xianglai Li wrote:
+> Added extioi interrupt controller for kvm emulation.
+> The main process is to send the command word for
+> creating an extioi device to the kernel.
+> When the VM is saved, the ioctl obtains the related
+> data of the extioi interrupt controller in the kernel
+> and saves it. When the VM is recovered, the saved data
+> is sent to the kernel.
 > 
-> When EPT violation is triggered after TD accessing a private GPA, KVM will
-> exit to user space if the corresponding GFN's attribute is not private.
-> User space will then update GFN's attribute during its memory conversion
-> process. After that, TD will re-access the private GPA and trigger EPT
-> violation again. Only with GFN's attribute matches to private, KVM will
-> fault in private page, map it in mirrored TDP root, and propagate changes
-> to private EPT to resolve the EPT violation.
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
+> ---
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Song Gao <gaosong@loongson.cn>
+> Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> Cc: Huacai Chen <chenhuacai@kernel.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Cc: Bibo Mao <maobibo@loongson.cn>
+> Cc: Xianglai Li <lixianglai@loongson.cn>
 > 
-> Relying on GFN's attribute tracking xarray to determine if a GFN is
-> private, as for KVM_X86_SW_PROTECTED_VM, may lead to endless EPT
-> violations.
+>   hw/intc/Kconfig                |   3 +
+>   hw/intc/loongarch_extioi_kvm.c | 250 +++++++++++++++++++++++++++++++++
+>   hw/intc/meson.build            |   1 +
+>   hw/loongarch/Kconfig           |   1 +
+>   hw/loongarch/virt.c            |  51 ++++---
+>   5 files changed, 285 insertions(+), 21 deletions(-)
+>   create mode 100644 hw/intc/loongarch_extioi_kvm.c
+> 
+> diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
+> index 5201505f23..df9352d41d 100644
+> --- a/hw/intc/Kconfig
+> +++ b/hw/intc/Kconfig
+> @@ -112,3 +112,6 @@ config LOONGARCH_PCH_MSI
+>   
+>   config LOONGARCH_EXTIOI
+>       bool
+> +
+> +config LOONGARCH_EXTIOI_KVM
+> +    bool
+> diff --git a/hw/intc/loongarch_extioi_kvm.c b/hw/intc/loongarch_extioi_kvm.c
+> new file mode 100644
+> index 0000000000..139a00ac2a
+> --- /dev/null
+> +++ b/hw/intc/loongarch_extioi_kvm.c
+> @@ -0,0 +1,250 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * LoongArch kvm extioi interrupt support
+> + *
+> + * Copyright (C) 2024 Loongson Technology Corporation Limited
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/qdev-properties.h"
+> +#include "qemu/typedefs.h"
+> +#include "hw/intc/loongarch_extioi.h"
+> +#include "hw/sysbus.h"
+> +#include "linux/kvm.h"
+> +#include "migration/vmstate.h"
+> +#include "qapi/error.h"
+> +#include "sysemu/kvm.h"
+> +
+> +static void kvm_extioi_access_regs(int fd, uint64_t addr,
+> +                                       void *val, bool is_write)
+> +{
+> +        kvm_device_access(fd, KVM_DEV_LOONGARCH_EXTIOI_GRP_REGS,
+> +                          addr, val, is_write, &error_abort);
+> +}
+> +
+> +static void kvm_extioi_access_sw_status(int fd, uint64_t addr,
+> +                                       void *val, bool is_write)
+> +{
+> +        kvm_device_access(fd, KVM_DEV_LOONGARCH_EXTIOI_GRP_SW_STATUS,
+> +                          addr, val, is_write, &error_abort);
+> +}
+> +
+> +static void kvm_extioi_save_load_sw_status(void *opaque, bool is_write)
+> +{
+> +    KVMLoongArchExtIOI *s = (KVMLoongArchExtIOI *)opaque;
+> +    KVMLoongArchExtIOIClass *class = KVM_LOONGARCH_EXTIOI_GET_CLASS(s);
+> +    int fd = class->dev_fd;
+> +    int addr;
+> +
+> +    addr = KVM_DEV_LOONGARCH_EXTIOI_SW_STATUS_NUM_CPU;
+> +    kvm_extioi_access_sw_status(fd, addr, (void *)&s->num_cpu, is_write);
+> +
+> +    addr = KVM_DEV_LOONGARCH_EXTIOI_SW_STATUS_FEATURE;
+> +    kvm_extioi_access_sw_status(fd, addr, (void *)&s->features, is_write);
+> +
+> +    addr = KVM_DEV_LOONGARCH_EXTIOI_SW_STATUS_STATE;
+> +    kvm_extioi_access_sw_status(fd, addr, (void *)&s->status, is_write);
+> +}
+> +
+> +static void kvm_extioi_save_load_regs(void *opaque, bool is_write)
+> +{
+> +    KVMLoongArchExtIOI *s = (KVMLoongArchExtIOI *)opaque;
+> +    KVMLoongArchExtIOIClass *class = KVM_LOONGARCH_EXTIOI_GET_CLASS(s);
+> +    int fd = class->dev_fd;
+> +    int addr, offset, cpuid;
+> +
+> +    for (addr = EXTIOI_NODETYPE_START; addr < EXTIOI_NODETYPE_END; addr += 4) {
+> +        offset = (addr - EXTIOI_NODETYPE_START) / 4;
+> +        kvm_extioi_access_regs(fd, addr,
+> +                               (void *)&s->nodetype[offset], is_write);
+> +    }
+> +
+> +    for (addr = EXTIOI_IPMAP_START; addr < EXTIOI_IPMAP_END; addr += 4) {
+> +        offset = (addr - EXTIOI_IPMAP_START) / 4;
+> +        kvm_extioi_access_regs(fd, addr, (void *)&s->ipmap[offset], is_write);
+> +    }
+> +
+> +    for (addr = EXTIOI_ENABLE_START; addr < EXTIOI_ENABLE_END; addr += 4) {
+> +        offset = (addr - EXTIOI_ENABLE_START) / 4;
+> +        kvm_extioi_access_regs(fd, addr,
+> +                               (void *)&s->enable[offset], is_write);
+> +    }
+> +
+> +    for (addr = EXTIOI_BOUNCE_START; addr < EXTIOI_BOUNCE_END; addr += 4) {
+> +        offset = (addr - EXTIOI_BOUNCE_START) / 4;
+> +        kvm_extioi_access_regs(fd, addr,
+> +                               (void *)&s->bounce[offset], is_write);
+> +    }
+> +
+> +    for (addr = EXTIOI_ISR_START; addr < EXTIOI_ISR_END; addr += 4) {
+> +        offset = (addr - EXTIOI_ISR_START) / 4;
+> +        kvm_extioi_access_regs(fd, addr,
+> +                               (void *)&s->isr[offset], is_write);
+> +    }
+> +
+> +    for (addr = EXTIOI_COREMAP_START; addr < EXTIOI_COREMAP_END; addr += 4) {
+> +        offset = (addr - EXTIOI_COREMAP_START) / 4;
+> +        kvm_extioi_access_regs(fd, addr,
+> +                               (void *)&s->coremap[offset], is_write);
+> +    }
+> +
+> +    for (cpuid = 0; cpuid < s->num_cpu; cpuid++) {
+> +        for (addr = EXTIOI_COREISR_START;
+> +             addr < EXTIOI_COREISR_END; addr += 4) {
+> +            offset = (addr - EXTIOI_COREISR_START) / 4;
+> +            addr = (cpuid << 16) | addr;
+> +            kvm_extioi_access_regs(fd, addr,
+> +                              (void *)&s->coreisr[cpuid][offset], is_write);
+> +        }
+> +    }
+> +}
+> +
+> +static int kvm_loongarch_extioi_pre_save(void *opaque)
+> +{
+> +    kvm_extioi_save_load_regs(opaque, false);
+> +    kvm_extioi_save_load_sw_status(opaque, false);
+> +    return 0;
+> +}
+> +
+> +static int kvm_loongarch_extioi_post_load(void *opaque, int version_id)
+> +{
+> +    KVMLoongArchExtIOI *s = (KVMLoongArchExtIOI *)opaque;
+> +    KVMLoongArchExtIOIClass *class = KVM_LOONGARCH_EXTIOI_GET_CLASS(s);
+> +    int fd = class->dev_fd;
+> +
+> +    kvm_extioi_save_load_regs(opaque, true);
+> +    kvm_extioi_save_load_sw_status(opaque, true);
+> +
+> +    kvm_device_access(fd, KVM_DEV_LOONGARCH_EXTIOI_GRP_CTRL,
+> +                      KVM_DEV_LOONGARCH_EXTIOI_CTRL_LOAD_FINISHED,
+> +                      NULL, true, &error_abort);
+> +    return 0;
+> +}
+> +
+> +static void kvm_loongarch_extioi_realize(DeviceState *dev, Error **errp)
+> +{
+> +    KVMLoongArchExtIOIClass *extioi_class = KVM_LOONGARCH_EXTIOI_GET_CLASS(dev);
+> +    KVMLoongArchExtIOI *s = KVM_LOONGARCH_EXTIOI(dev);
+> +    struct kvm_create_device cd = {0};
+> +    Error *err = NULL;
+> +    int ret, i;
+> +
+> +    extioi_class->parent_realize(dev, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    if (s->num_cpu == 0) {
+> +        error_setg(errp, "num-cpu must be at least 1");
+> +        return;
+> +    }
+> +
+> +
+> +    if (extioi_class->is_created) {
+> +        error_setg(errp, "extioi had be created");
+> +        return;
+> +    }
+> +
+> +    if (s->features & BIT(EXTIOI_HAS_VIRT_EXTENSION)) {
+> +        s->features |= EXTIOI_VIRT_HAS_FEATURES;
+> +    }
+> +
+> +    cd.type = KVM_DEV_TYPE_LOONGARCH_EXTIOI;
+> +    ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, errno,
+> +                         "Creating the KVM extioi device failed");
+> +        return;
+> +    }
+> +    extioi_class->is_created = true;
+> +    extioi_class->dev_fd = cd.fd;
+> +
+> +    ret = kvm_device_access(cd.fd, KVM_DEV_LOONGARCH_EXTIOI_GRP_CTRL,
+> +                            KVM_DEV_LOONGARCH_EXTIOI_CTRL_INIT_NUM_CPU,
+> +                            &s->num_cpu, true, NULL);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, errno,
+> +                         "KVM EXTIOI: failed to set the num-cpu of EXTIOI");
+> +        exit(1);
+> +    }
+> +
+> +    ret = kvm_device_access(cd.fd, KVM_DEV_LOONGARCH_EXTIOI_GRP_CTRL,
+> +                            KVM_DEV_LOONGARCH_EXTIOI_CTRL_INIT_FEATURE,
+> +                            &s->features, true, NULL);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, errno,
+> +                         "KVM EXTIOI: failed to set the feature of EXTIOI");
+> +        exit(1);
+> +    }
+> +
+> +    fprintf(stdout, "Create LoongArch extioi irqchip in KVM done!\n");
+> +
+> +    kvm_async_interrupts_allowed = true;
+> +    kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
+> +    if (kvm_has_gsi_routing()) {
+> +        for (i = 0; i < 64; ++i) {
+> +            kvm_irqchip_add_irq_route(kvm_state, i, 0, i);
+> +        }
+> +        kvm_gsi_routing_allowed = true;
+> +    }
+Does memory region need be created to extioi with irqchip_in_kernel mode?
 
-Sorry for not finishing in the previous reply:
+> +}
+> +
+> +static const VMStateDescription vmstate_kvm_extioi_core = {
+> +    .name = "kvm-extioi-single",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .pre_save = kvm_loongarch_extioi_pre_save,
+> +    .post_load = kvm_loongarch_extioi_post_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32_ARRAY(nodetype, KVMLoongArchExtIOI,
+> +                             EXTIOI_IRQS_NODETYPE_COUNT / 2),
+> +        VMSTATE_UINT32_ARRAY(bounce, KVMLoongArchExtIOI,
+> +                             EXTIOI_IRQS_GROUP_COUNT),
+> +        VMSTATE_UINT32_ARRAY(isr, KVMLoongArchExtIOI, EXTIOI_IRQS / 32),
+> +        VMSTATE_UINT32_2DARRAY(coreisr, KVMLoongArchExtIOI, EXTIOI_CPUS,
+> +                               EXTIOI_IRQS_GROUP_COUNT),
+> +        VMSTATE_UINT32_ARRAY(enable, KVMLoongArchExtIOI, EXTIOI_IRQS / 32),
+> +        VMSTATE_UINT32_ARRAY(ipmap, KVMLoongArchExtIOI,
+> +                             EXTIOI_IRQS_IPMAP_SIZE / 4),
+> +        VMSTATE_UINT32_ARRAY(coremap, KVMLoongArchExtIOI, EXTIOI_IRQS / 4),
+> +        VMSTATE_UINT8_ARRAY(sw_coremap, KVMLoongArchExtIOI, EXTIOI_IRQS),
+> +        VMSTATE_UINT32(features, KVMLoongArchExtIOI),
+> +        VMSTATE_UINT32(status, KVMLoongArchExtIOI),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+It is duplicated with structure vmstate_loongarch_extioi in file
+hw/intc/loongarch_extioi.c
 
-IMHO in the very beginning of fault handler, we should just use hardware 
-as the source to determine whether a *faulting* GPA is private or not. 
-It doesn't quite matter whether KVM maintains memory attributes and how 
-does it handle based on it -- it just must handle this properly.
+> +
+> +static Property extioi_properties[] = {
+> +    DEFINE_PROP_UINT32("num-cpu", KVMLoongArchExtIOI, num_cpu, 1),
+> +    DEFINE_PROP_BIT("has-virtualization-extension", KVMLoongArchExtIOI,
+> +                    features, EXTIOI_HAS_VIRT_EXTENSION, 0),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+Ditto, it is duplicated.
 
-E.g., even using memory attributes (to determine private) won't lead to 
-endless EPT violations, it is wrong to use it to determine, because at 
-the beginning of fault handler, we must know the *hardware* behaviour.
+> +
+> +static void kvm_loongarch_extioi_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +    KVMLoongArchExtIOIClass *extioi_class = KVM_LOONGARCH_EXTIOI_CLASS(oc);
+> +
+> +    extioi_class->parent_realize = dc->realize;
+> +    dc->realize = kvm_loongarch_extioi_realize;
+> +    extioi_class->is_created = false;
+> +    device_class_set_props(dc, extioi_properties);
+> +    dc->vmsd = &vmstate_kvm_extioi_core;
+Do we need reset interface for irqchip_in_kernel mode?
 
-So I think the changelog should be something like this (the title could 
-be enhanced too perhaps):
+Regards
+Bibo Mao
 
-When TDX guests access memory causes EPT violation, TDX determines 
-whether the faulting GPA is private or shared by checking whether the 
-faulting GPA contains the shared bit (either bit 47 or bit 51 depending 
-on the configuration of the guest).
-
-KVM maintains an Xarray to record whether a GPA is private or not, e.g., 
-for KVM_X86_SW_PROTECTED_VM guests.  TDX needs to honor this too.  The 
-memory attributes (private or shared) for a given GPA that KVM records 
-may not match the type of the faulting GPA.  E.g., the TDX guest can 
-explicitly convert memory type from private to shared or the opposite. 
-In this case KVM will exit to userspace to handle (e.g., change to the 
-new memory attributes, issue the memory conversion and go back to 
-guest).  After KVM determines the faulting type is legal and can 
-proceed, it sets up the actual mapping, using TDX-specific ops for 
-private one.
-
-The common KVM fault handler uses the PFERR_PRIVATE_ACCESS bit of the 
-error code to tell whether a faulting GPA is private.  Check the 
-faulting GPA for TDX and convert it to the PFERR_PRIVATE_ACCESS so the 
-common code can handle.
-
-The specific operations to setup private mapping when the faulting GPA 
-is private will follow in future patches.
-
+> +}
+> +
+> +static const TypeInfo kvm_loongarch_extioi_info = {
+> +    .name = TYPE_KVM_LOONGARCH_EXTIOI,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(KVMLoongArchExtIOI),
+> +    .class_size = sizeof(KVMLoongArchExtIOIClass),
+> +    .class_init = kvm_loongarch_extioi_class_init,
+> +};
+> +
+> +static void kvm_loongarch_extioi_register_types(void)
+> +{
+> +    type_register_static(&kvm_loongarch_extioi_info);
+> +}
+> +
+> +type_init(kvm_loongarch_extioi_register_types)
+> diff --git a/hw/intc/meson.build b/hw/intc/meson.build
+> index f55eb1b80b..85174d1af1 100644
+> --- a/hw/intc/meson.build
+> +++ b/hw/intc/meson.build
+> @@ -76,3 +76,4 @@ specific_ss.add(when: 'CONFIG_LOONGARCH_IPI_KVM', if_true: files('loongarch_ipi_
+>   specific_ss.add(when: 'CONFIG_LOONGARCH_PCH_PIC', if_true: files('loongarch_pch_pic.c'))
+>   specific_ss.add(when: 'CONFIG_LOONGARCH_PCH_MSI', if_true: files('loongarch_pch_msi.c'))
+>   specific_ss.add(when: 'CONFIG_LOONGARCH_EXTIOI', if_true: files('loongarch_extioi.c'))
+> +specific_ss.add(when: 'CONFIG_LOONGARCH_EXTIOI_KVM', if_true: files('loongarch_extioi_kvm.c'))
+> diff --git a/hw/loongarch/Kconfig b/hw/loongarch/Kconfig
+> index f8fcac3e7b..99a523171f 100644
+> --- a/hw/loongarch/Kconfig
+> +++ b/hw/loongarch/Kconfig
+> @@ -17,6 +17,7 @@ config LOONGARCH_VIRT
+>       select LOONGARCH_PCH_MSI
+>       select LOONGARCH_EXTIOI
+>       select LOONGARCH_IPI_KVM if KVM
+> +    select LOONGARCH_EXTIOI_KVM if KVM
+>       select LS7A_RTC
+>       select SMBIOS
+>       select ACPI_PCI
+> diff --git a/hw/loongarch/virt.c b/hw/loongarch/virt.c
+> index 3b28e8e671..8ca7c09016 100644
+> --- a/hw/loongarch/virt.c
+> +++ b/hw/loongarch/virt.c
+> @@ -828,28 +828,37 @@ static void virt_irq_init(LoongArchVirtMachineState *lvms)
+>       }
+>   
+>       /* Create EXTIOI device */
+> -    extioi = qdev_new(TYPE_LOONGARCH_EXTIOI);
+> -    qdev_prop_set_uint32(extioi, "num-cpu", ms->smp.cpus);
+> -    if (virt_is_veiointc_enabled(lvms)) {
+> -        qdev_prop_set_bit(extioi, "has-virtualization-extension", true);
+> -    }
+> -    sysbus_realize_and_unref(SYS_BUS_DEVICE(extioi), &error_fatal);
+> -    memory_region_add_subregion(&lvms->system_iocsr, APIC_BASE,
+> -                    sysbus_mmio_get_region(SYS_BUS_DEVICE(extioi), 0));
+> -    if (virt_is_veiointc_enabled(lvms)) {
+> -        memory_region_add_subregion(&lvms->system_iocsr, EXTIOI_VIRT_BASE,
+> -                    sysbus_mmio_get_region(SYS_BUS_DEVICE(extioi), 1));
+> -    }
+> +    if (kvm_enabled() && kvm_irqchip_in_kernel()) {
+> +        extioi = qdev_new(TYPE_KVM_LOONGARCH_EXTIOI);
+> +        qdev_prop_set_uint32(extioi, "num-cpu", ms->smp.cpus);
+> +        if (virt_is_veiointc_enabled(lvms)) {
+> +            qdev_prop_set_bit(extioi, "has-virtualization-extension", true);
+> +        }
+> +        sysbus_realize_and_unref(SYS_BUS_DEVICE(extioi), &error_fatal);
+> +    } else {
+> +        extioi = qdev_new(TYPE_LOONGARCH_EXTIOI);
+> +        qdev_prop_set_uint32(extioi, "num-cpu", ms->smp.cpus);
+> +        if (virt_is_veiointc_enabled(lvms)) {
+> +            qdev_prop_set_bit(extioi, "has-virtualization-extension", true);
+> +        }
+> +        sysbus_realize_and_unref(SYS_BUS_DEVICE(extioi), &error_fatal);
+> +        memory_region_add_subregion(&lvms->system_iocsr, APIC_BASE,
+> +                       sysbus_mmio_get_region(SYS_BUS_DEVICE(extioi), 0));
+> +        if (virt_is_veiointc_enabled(lvms)) {
+> +            memory_region_add_subregion(&lvms->system_iocsr, EXTIOI_VIRT_BASE,
+> +                        sysbus_mmio_get_region(SYS_BUS_DEVICE(extioi), 1));
+> +        }
+>   
+> -    /*
+> -     * connect ext irq to the cpu irq
+> -     * cpu_pin[9:2] <= intc_pin[7:0]
+> -     */
+> -    for (cpu = 0; cpu < ms->smp.cpus; cpu++) {
+> -        cpudev = DEVICE(qemu_get_cpu(cpu));
+> -        for (pin = 0; pin < LS3A_INTC_IP; pin++) {
+> -            qdev_connect_gpio_out(extioi, (cpu * 8 + pin),
+> -                                  qdev_get_gpio_in(cpudev, pin + 2));
+> +        /*
+> +         * connect ext irq to the cpu irq
+> +         * cpu_pin[9:2] <= intc_pin[7:0]
+> +         */
+> +        for (cpu = 0; cpu < ms->smp.cpus; cpu++) {
+> +            cpudev = DEVICE(qemu_get_cpu(cpu));
+> +            for (pin = 0; pin < LS3A_INTC_IP; pin++) {
+> +                qdev_connect_gpio_out(extioi, (cpu * 8 + pin),
+> +                                      qdev_get_gpio_in(cpudev, pin + 2));
+> +            }
+>           }
+>       }
+>   
+> 
 
 
