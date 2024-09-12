@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-26745-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26746-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC96976E76
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 18:12:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7516976E77
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 18:12:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF4B51C23960
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 16:12:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3148C1F2472B
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 16:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B6F14C5AF;
-	Thu, 12 Sep 2024 16:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075A213DBBE;
+	Thu, 12 Sep 2024 16:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xE32lnYH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qH2ZRfku"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BD1148300
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 16:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A9714F12D
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 16:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726157534; cv=none; b=j5GmgGKdFJdGyzh8ZANqJn0asV+CpADCWHuCjLFkX0O8fG3Tk4y2hqJ5rdA+vjjBb/8fVAnu8/az7CwCp+p5y5vVS5rppHLS7Ihu0bE+AERzYKmW6kTqFbiJW+H/l/Sn333my54JYcvPRY6HmalBtpq8sGg4b8+wJUxx414FwSg=
+	t=1726157537; cv=none; b=NWgwEHpUCyUKo+UBAZtb1934zMbE2iZO258CkRjV+FgiZk6uKVuHdoFE+BbyFR8eNNAH/scf30DQATZJrZNqCUA34E5jsVNLy4hJSoeUC9hYbCDQ9G6L9hT27PpaD3AUIIjhhHmafg6tr7mk3pLr+dm3ExTq0Bk7Hry29Q9jqkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726157534; c=relaxed/simple;
-	bh=7ePZGISZjz4seQJioMzifLb68u9zgTlI1DyF+ig+7UY=;
+	s=arc-20240116; t=1726157537; c=relaxed/simple;
+	bh=rx8KXXnabdEWKAYTTAH01K2wRN2Cx2fddQlG8cTW25Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AxiUAMkrjPkJ6SjvyfWpoZM8VajQFLv4+LIAd0ULQ0bQaxf2o5PRSrt8wLc80Ini8VG1dP1UcQdTwLn2xOjve0UtSiPH15VY8BRJxjtO4cnlBmyVXOd6DXaWKNKcd62I+1u3MgQFPEzRnUdw8YCicx/QNWstnP+SdjipQLUGFjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xE32lnYH; arc=none smtp.client-ip=209.85.215.178
+	 MIME-Version; b=TTxHypB/9zjLCdODcUV8scX5hf6pOx8uTBMPRHI6hpNldldCr+U3/02k5fXRwai48DVGJsqISZqoulv7wLAzfqD/77YaPE+a684Z4v8DRXTZToj/4r+VA0BZZ7mfi4lHrT8ODLAVZ3kjFbaAEl7z2CF7l6Axwsxr+kzDm5Ws97s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qH2ZRfku; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7db299608e7so475336a12.1
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 09:12:12 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2da55ea8163so849979a91.1
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 09:12:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726157532; x=1726762332; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726157535; x=1726762335; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I2RDX2fjFJQRiytlapcKfuKzsswRML3AeBvlkH5UKQw=;
-        b=xE32lnYH6r7HTQ9dl6EpjeaO6RT9S8QzrcbKjdvS7s+OeJAmKQiIReXsUm+P/e/Og2
-         5MT027i2ubayceKnwdKiywD1FYl99dhCLJGlOIsAgXAzJXsLccOL90Sfg+gnYY7NOxg7
-         BjjbsS/gZnpSqj74sFSd1DsmGgidTYcDRzACjYCMEYbtyjmCoXV4dIxzyiiatEQKNgWW
-         7x1kyC2LbKJKgVR4ZaP9GX5iph+xvKTc39xm4sCfokianNMSxFXEHeC/0Q5GyO4KqgIE
-         ljXn5E1z6i6Ytvmg1Aa4EksMiYcpRXQIejVRGjjphBU5lIjc+RmKjZgwBHEtKuglwffX
-         g+xw==
+        bh=HWN+Oy9HOzHEP1zqC69VZ8fDvc5xR6kboU5Mz4xPMnU=;
+        b=qH2ZRfkunv+sbpfEekljae3ciUpZ01T0xY37z/a1jDVgKrUZTWQBJ9Erc5xUXO7flk
+         c7snGSMabqtyG07N4NsXfBQ/iMV3EkyOaP8aHRX4TfX2pYzlr3TTIam8xgl6caIJQ6mC
+         McTqzZcAUoNryKdzAShwBI5Wp3i0PCnjX9GI0BFSw/x4SXDom/r+bKK+USxpGY5HPn33
+         PSxEuePYvRqMcizPc30TzRTJWSXzCIEkVb615GUZMuInWC84hpFo96E+e22z7QzlmFgr
+         wGhms5ZowSjgNzuGn7YDd01KQcGVHvAsdmzRsBJJgghQuJXbFBYrcUGyViPpZTrJGUZT
+         aaXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726157532; x=1726762332;
+        d=1e100.net; s=20230601; t=1726157535; x=1726762335;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I2RDX2fjFJQRiytlapcKfuKzsswRML3AeBvlkH5UKQw=;
-        b=TdiIGgysq53Fk0ZGmH0JJafKTnGEUu60pYCTI9H4TIRHW8zwHg6x9Q9zuU98eyycgl
-         82BbNohCgm9kF1QtndqZfv0cmR86C7d4FNLwYI6Z0Mql+pLGxDdmA7dymJ77OQD4/SgR
-         BySNAJB6GbuM/EPL0I0Mot6K2c1HHiIroYx5JhWVK22hVLWGk+NqXnWfjlXoAbw7rhdf
-         FjddkFXTjfAwalP2uQPK0tTTW29hbRmwtGMDt58PAV5WLSG9GZSIo91N4su5Woebis9Q
-         UbXTaN95+cYh0l5XPKIowignSH69AnvbBq9biB4XiQosLPlkuz5bIfcUsDQUd2KYIGP+
-         rZig==
-X-Forwarded-Encrypted: i=1; AJvYcCVJZTUsm6MWb02qu6Ec1o+EuJJMFfs0DhR4VfC8/xBaQLsvHYrMsY6k4d1cOrkAZW8qQ4k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOJ4EyHcY/dwrzEumkEgJp+qTt5sOql+xYK2JWjCvfGKu6OkSX
-	BRyhmhgLU0ubMOqyuAS6FXmbEMSfHl8ZKrcVFSPqTjYAfMge9gLs2NHEPMQNsgM=
-X-Google-Smtp-Source: AGHT+IGK4aCZmCNuEDtLotPImMG0hqQX92keeNScArTDh0uI/me/xdlfLavv9yxHnNep1l1nzhsFEw==
-X-Received: by 2002:a17:903:2285:b0:205:2a59:a28c with SMTP id d9443c01a7336-2076e3155demr54911595ad.1.1726157532316;
-        Thu, 12 Sep 2024 09:12:12 -0700 (PDT)
+        bh=HWN+Oy9HOzHEP1zqC69VZ8fDvc5xR6kboU5Mz4xPMnU=;
+        b=HY1492+9AOReQ8+97sPVBP7L97oliK+JoLNqI8C/VeEIr087j4nLMikpjeX+qZoVwp
+         b97D5Sayye7lF5Tj5sab0byxHYTc5uBnwlMYE64Y7syfVgV+nMy+RyDjtKA0G/L8NH79
+         aVKWvTtMPRkVwcQZTtQRBuDteiSXLhCaxX4pVjjQkMqX47mZfLsisyYbVR4+PXO6YSw+
+         dU8lCDpg1V71zBtyz21N86eKKCAzrsYUPgF7NtxXd1kEBfSA1sXntRH/6wzFBw9ICkxZ
+         8/zS75c87sUgA9sct4pPWT0YLYi1KjMsN5rZeB/ETXCVwjm/heWMFs8QY4/kvI8aAPSA
+         TLnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWARQjtl/Q+xaNUGsh1bkw1zBQ1H9zTr2oerKa9xl+Yr34nWOVfz0dyQQig60VsLBjojaU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiAdyeEo8MxXEL+3Mh/DC/0eqelm9U79u0d3aRmXVYu9hAOsbc
+	o7SmWr8IcOSAd7Pe+i2b8dy9CD7Nh/ZiNilDlBCw4fwxfOLy3fFm2JX4NTiUJqM=
+X-Google-Smtp-Source: AGHT+IEudqjJEaJGfdkYpDawDooI9CPu9lOGv3V8EFCc9McG20NJHsadE1XKePiqdhT+Fnpsv3OOxg==
+X-Received: by 2002:a17:90b:4c41:b0:2c9:3370:56e3 with SMTP id 98e67ed59e1d1-2dba008304amr3540812a91.34.1726157534900;
+        Thu, 12 Sep 2024 09:12:14 -0700 (PDT)
 Received: from linaro.vn.shawcable.net ([2604:3d08:9384:1d00::9633])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2db0419aab4sm10868139a91.15.2024.09.12.09.12.10
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2db0419aab4sm10868139a91.15.2024.09.12.09.12.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 09:12:11 -0700 (PDT)
+        Thu, 12 Sep 2024 09:12:14 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -133,9 +133,9 @@ Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Corey Minyard <minyard@acm.org>,
 	Alistair Francis <alistair.francis@wdc.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 47/48] tests/qtest: remove return after g_assert_not_reached()
-Date: Thu, 12 Sep 2024 09:11:49 -0700
-Message-Id: <20240912161150.483515-4-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 48/48] scripts/checkpatch.pl: emit error when using assert(false)
+Date: Thu, 12 Sep 2024 09:11:50 -0700
+Message-Id: <20240912161150.483515-5-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240912161150.483515-1-pierrick.bouvier@linaro.org>
 References: <20240912161150.483515-1-pierrick.bouvier@linaro.org>
@@ -151,21 +151,26 @@ This patch is part of a series that moves towards a consistent use of
 g_assert_not_reached() rather than an ad hoc mix of different
 assertion mechanisms.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- tests/qtest/acpi-utils.c | 1 -
- 1 file changed, 1 deletion(-)
+ scripts/checkpatch.pl | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tests/qtest/acpi-utils.c b/tests/qtest/acpi-utils.c
-index 673fc975862..9dc24fbe5a0 100644
---- a/tests/qtest/acpi-utils.c
-+++ b/tests/qtest/acpi-utils.c
-@@ -156,5 +156,4 @@ uint64_t acpi_find_rsdp_address_uefi(QTestState *qts, uint64_t start,
-         g_usleep(TEST_DELAY);
-     }
-     g_assert_not_reached();
--    return 0;
- }
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 65b6f46f905..fa9c12230eb 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -3102,6 +3102,9 @@ sub process {
+ 		if ($line =~ /\b(g_)?assert\(0\)/) {
+ 			ERROR("use g_assert_not_reached() instead of assert(0)\n" . $herecurr);
+ 		}
++		if ($line =~ /\b(g_)?assert\(false\)/) {
++			ERROR("use g_assert_not_reached() instead of assert(false)\n" . $herecurr);
++		}
+ 		if ($line =~ /\bstrerrorname_np\(/) {
+ 			ERROR("use strerror() instead of strerrorname_np()\n" . $herecurr);
+ 		}
 -- 
 2.39.2
 
