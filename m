@@ -1,166 +1,196 @@
-Return-Path: <kvm+bounces-26669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26670-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C095976472
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 10:28:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65BBB9764B8
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 10:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3ED6B213F0
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 08:27:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E72731F24A35
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 08:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2AD1917CD;
-	Thu, 12 Sep 2024 08:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8932C190057;
+	Thu, 12 Sep 2024 08:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="vte8cmle";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kxzadh44"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KgOusAie"
 X-Original-To: kvm@vger.kernel.org
-Received: from flow5-smtp.messagingengine.com (flow5-smtp.messagingengine.com [103.168.172.140])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9457189525
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 08:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0935D2BB0D;
+	Thu, 12 Sep 2024 08:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726129671; cv=none; b=dO6LWkWrok3lyYuNBrGVrZQTNaNLp7Rs9ySfXukabdJmrK5BNGuNBsNZFoSsqbShbY+MLoUR5Vv7/ydtAtZXHhNBiT+bswY1WDahsr3vNh9pN1/GpkF83HsyjQZHqPCx4vP4LBW6LVNNiLDb7T7TJHY80bAQjCNNxSPrUKgq6nI=
+	t=1726130231; cv=none; b=kXhlm9Q4RZYeFYgOy36zg+1KQEoDomAbZWVp9u4GwUMWt3rqMBc5wp+h6ycPQsxjoht1OGB3TxoZrkmkdy0OdrvfE1o0XurvmU2g4WEAv8tJgQ6VlEJxsqe5VMGkYn9hEZ7JOFlwifBSjLKhsWw7mmti1uV7Ak3L5aNHy2Xb5Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726129671; c=relaxed/simple;
-	bh=bM5p8eUML9nixzKOaQi1qyvHqPHtoPeKrZ+9hGgfwZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D37PYxS26QaDCK/V+ZAd0o01dx2VfBjbDh6CZGiuHzGzZQLGHvKSsblorRoaG/4LYfP/eOVPU41FQwD3Wb4Jid1l/ETUMBoA3plKRTQ+iC//BPGzCMFyKLRwgDRjtKxXNDIUMoMjoWR/m7I2kF6lEePpRPvu8mRmux5TreTDXfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk; spf=pass smtp.mailfrom=irrelevant.dk; dkim=pass (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b=vte8cmle; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kxzadh44; arc=none smtp.client-ip=103.168.172.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=irrelevant.dk
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailflow.phl.internal (Postfix) with ESMTP id 38F432001AC;
-	Thu, 12 Sep 2024 04:27:46 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Thu, 12 Sep 2024 04:27:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1726129666; x=
-	1726136866; bh=Xsf9ae63fQV1tLsIn2cFPWGsIOLkkinD3TZg82l4IaU=; b=v
-	te8cmle/zMi5ovvDxUYfo6aV1sThzymxGhlvDMlHhXH2Vxvr3nw3rtMWIBw6Y+vX
-	d+XdcM2M7+RoH4/vgSYx2Fm8rK7Tmf0Rh6n6+VNlth2u8W3IfeHRiA6NHPcZgsxo
-	juDO2XLKZ2ybbz0aUtrmJLJvVqvNLyc/+JyfsACZxDrlfICTStJietYJK9PM7z8z
-	/PasONfwU9eceGwH0d7oJqLNoZNn5AD6d+4PQ8hO096QeWfAIznxnJoYu4QqNqTn
-	EF+5EqbT8dhfBRt2RZjeHIeEHBURT/WFpo9Q3VkZcqno9WpyXk0u4EZNdjvSNcJX
-	QnzTVTKwrB21x098t6Y0A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1726129666; x=1726136866; bh=Xsf9ae63fQV1tLsIn2cFPWGsIOLk
-	kinD3TZg82l4IaU=; b=kxzadh44Ag7Sg+wWD5sgxEE7VKM0hAH0n1vkUXwBO/R3
-	R0rxP2xCTXkC2hMGlUgofpHu++z8KJR3KvUpSWEplHU94xQojvQbE2kuiUQwPi5F
-	GmfKh91skz4cYaNk06regQ767449fD5YbmCGZBb+3hSEdxQj4QcKkNDCszG9+PXB
-	u7kF6wUMcyUdx00566GnM2JO+jDpL2purxWNlzH/dJ5iJ/YL8DHUAHygEk2ikVxI
-	jmRe4T1YX4NdAElwxv/ym+Yusv5JR4S927yLsLI0sRDxDfK9PzvDdsr5+XXSXiew
-	MXzGZlju/sihZ3wm87eyfcHxVM5SA88HYu0tNw3tmw==
-X-ME-Sender: <xms:_KXiZgG6H0I3zOZWTojHw1H_OHbn3t0236rww4TTf-_9s5rlQPG12g>
-    <xme:_KXiZpU0gUc5Hmb8lfylhX8rHXEg0I_CeOymtK2BHlJBJchionaewikUqERn_Y2o0
-    p_laacxOzQMcvfLWlA>
-X-ME-Received: <xmr:_KXiZqKZ_S2s_Bkb5lS2zhDUXrPkhVko1wiO9bFScvyOlaUNaF88Vjr4-5RIOA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudejfedgtdegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
-    ucfhrhhomhepmfhlrghushculfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrd
-    gukheqnecuggftrfgrthhtvghrnhepveejtdejteevfefhffehiedvffdvudelvdeigfek
-    feevledtieetffehgeeggfdunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukhdpnhgspghrtghpthht
-    ohepieehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehpihgvrhhrihgtkhdrsg
-    houhhvihgvrheslhhinhgrrhhordhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghl
-    sehnohhnghhnuhdrohhrghdprhgtphhtthhopehjrghsohifrghnghesrhgvughhrghtrd
-    gtohhmpdhrtghpthhtoheprghlvgigrdgsvghnnhgvvgeslhhinhgrrhhordhorhhgpdhr
-    tghpthhtoheplhhvihhvihgvrhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepmhhtoh
-    hsrghtthhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehnphhighhgihhnsehgmhgr
-    ihhlrdgtohhmpdhrtghpthhtohepghhithesgigvnhdtnhdrnhgrmhgvpdhrtghpthhtoh
-    epphgrshhitgeslhhinhhugidrihgsmhdrtghomh
-X-ME-Proxy: <xmx:_KXiZiFiPc8R1rYhcfi8lBa8w9onIaCYENkAzORPkX-mhtnnk_N1pw>
-    <xmx:_KXiZmUy_LNrz3YrYxScEUQ6j3JBmCaRwtXADraQScbRsIUPPHwoRA>
-    <xmx:_KXiZlPPqsP_QOKnb8J5PKDziMCewAWhVZP-Ve9DEhjBd72f8_joag>
-    <xmx:_KXiZt1pIFNJBbrQ_ZsiOUqX1-5wuIrUc86SpQRRmm5eP_O7bgvt5A>
-    <xmx:AqbiZve8YRRpE8YPHhV39Vayh3sF8c3gzhOWNAmYPtBtsl3f9tK91htv>
-Feedback-ID: idc91472f:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 12 Sep 2024 04:27:39 -0400 (EDT)
-Date: Thu, 12 Sep 2024 10:27:38 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Nicholas Piggin <npiggin@gmail.com>, WANG Xuerui <git@xen0n.name>,
-	Halil Pasic <pasic@linux.ibm.com>, Rob Herring <robh@kernel.org>,
-	Michael Rolnik <mrolnik@gmail.com>, Zhao Liu <zhao1.liu@intel.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Fabiano Rosas <farosas@suse.de>, Corey Minyard <minyard@acm.org>,
-	Keith Busch <kbusch@kernel.org>, Thomas Huth <thuth@redhat.com>,
-	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-	Harsh Prateek Bora <harshpb@linux.ibm.com>,
-	Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jesper Devantier <foss@defmacro.it>,	Hyman Huang <yong.huang@smartx.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>, qemu-s390x@nongnu.org,
-	Laurent Vivier <laurent@vivier.eu>, qemu-riscv@nongnu.org,
-	"Richard W.M. Jones" <rjones@redhat.com>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, kvm@vger.kernel.org,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-	Hanna Reitz <hreitz@redhat.com>, Ani Sinha <anisinha@redhat.com>,
-	qemu-ppc@nongnu.org,
-	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Bin Meng <bmeng.cn@gmail.com>,	"Michael S. Tsirkin" <mst@redhat.com>,
- Helge Deller <deller@gmx.de>,	Peter Xu <peterx@redhat.com>,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-	Yanan Wang <wangyanan55@huawei.com>, qemu-arm@nongnu.org,
-	Igor Mammedov <imammedo@redhat.com>,
-	Jean-Christophe Dubois <jcd@tribudubois.net>,
-	Eric Farman <farman@linux.ibm.com>,
-	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
-	qemu-block@nongnu.org, Stefan Berger <stefanb@linux.vnet.ibm.com>,
-	Joel Stanley <joel@jms.id.au>,	Eduardo Habkost <eduardo@habkost.net>,
-	David Gibson <david@gibson.dropbear.id.au>,	Fam Zheng <fam@euphon.net>,
- Weiwei Li <liwei1518@gmail.com>,	Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v2 18/48] hw/nvme: replace assert(false) with
- g_assert_not_reached()
-Message-ID: <ZuKl-vucvRaV1hU3@AALNPWKJENSEN.aal.scsc.local>
-References: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
- <20240912073921.453203-19-pierrick.bouvier@linaro.org>
+	s=arc-20240116; t=1726130231; c=relaxed/simple;
+	bh=dMdyNS6X8lwdVAWYWS30gDfkheVbLMNtD0caHiArAco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UjlVF7KBxfiDtqS0fygpiMG7lPpAyOq9+0JO6+WPCoBRIgk48AmoAIaogq3OEp+xYbpXSR8BCg5IsXpkBxqj9mkHuDnjj21hmRcsqMhgpeKD5BTDTOEnmBe744O9VFfc9Sgo1shEr/siU5LRDPEkRolD7lsbkEshLIC715H3Zn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KgOusAie; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726130229; x=1757666229;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=dMdyNS6X8lwdVAWYWS30gDfkheVbLMNtD0caHiArAco=;
+  b=KgOusAie7zBgMoN+RSghIxLzZkSLi2w/1WaRqVj800Tzl6oXujOCwTfc
+   i9suPEa49B0iXQXVz/E/2NNFhMzPpEo+4vJnW9TzWzkG8nxgMLZmKqVUa
+   dcNZ6Y6a3/f4ZIXDrvvguPTN4HRsNNKsgIj1wQpeM2kbMKwffJ8pxtL1+
+   hO1N0Z0sSDhmW2N23gFEuecBwqZKxKfivw7FaMqRG492nQsAFnLDHfcmK
+   M329IN41GFu21FIQKrDdSJOdbk2Qf3sEsULa0jZG8OKcofQt/4mSvwA82
+   LU8wInXKHnhYtNCF5Q/LT3CD0P6T+fgSveqEM2ZJ4tyitNh69Es8+Dkl1
+   A==;
+X-CSE-ConnectionGUID: XLZEQXmHTHq8xWFYMu3Rew==
+X-CSE-MsgGUID: fEzPCFC4QnSsADJeaL2Gjw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11192"; a="25071246"
+X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
+   d="scan'208";a="25071246"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 01:37:09 -0700
+X-CSE-ConnectionGUID: 0EJR5hMvSfGGFMfaT/AeGw==
+X-CSE-MsgGUID: /LVL6xsBRDma29LaJBHEfA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
+   d="scan'208";a="68143861"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.224.38]) ([10.124.224.38])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 01:37:06 -0700
+Message-ID: <45963b9e-eec8-40b1-9e86-226504c463b8@intel.com>
+Date: Thu, 12 Sep 2024 16:37:03 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240912073921.453203-19-pierrick.bouvier@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 10/25] KVM: TDX: Initialize KVM supported capabilities
+ when module setup
+To: Nikolay Borisov <nik.borisov@suse.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org
+Cc: kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, linux-kernel@vger.kernel.org
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-11-rick.p.edgecombe@intel.com>
+ <caa4407a-b838-4e1b-bb3d-87518f3de66b@suse.com>
+ <aa764aad-1736-459f-896e-4f43bfe8b18d@intel.com>
+ <2a2dd102-2ad9-4bbd-a5f7-5994de3870ae@suse.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <2a2dd102-2ad9-4bbd-a5f7-5994de3870ae@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sep 12 00:38, Pierrick Bouvier wrote:
-> This patch is part of a series that moves towards a consistent use of
-> g_assert_not_reached() rather than an ad hoc mix of different
-> assertion mechanisms.
+On 9/12/2024 4:04 PM, Nikolay Borisov wrote:
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> ---
->  hw/nvme/ctrl.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
+> On 5.09.24 г. 16:36 ч., Xiaoyao Li wrote:
+>> On 9/4/2024 7:58 PM, Nikolay Borisov wrote:
+>>>
+>>>
+>>> On 13.08.24 г. 1:48 ч., Rick Edgecombe wrote:
+>>>> From: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>>
+>>>> While TDX module reports a set of capabilities/features that it
+>>>> supports, what KVM currently supports might be a subset of them.
+>>>> E.g., DEBUG and PERFMON are supported by TDX module but currently not
+>>>> supported by KVM.
+>>>>
+>>>> Introduce a new struct kvm_tdx_caps to store KVM's capabilities of TDX.
+>>>> supported_attrs and suppported_xfam are validated against fixed0/1
+>>>> values enumerated by TDX module. Configurable CPUID bits derive from 
+>>>> TDX
+>>>> module plus applying KVM's capabilities (KVM_GET_SUPPORTED_CPUID),
+>>>> i.e., mask off the bits that are configurable in the view of TDX module
+>>>> but not supported by KVM yet.
+>>>>
+>>>> KVM_TDX_CPUID_NO_SUBLEAF is the concept from TDX module, switch it to 0
+>>>> and use KVM_CPUID_FLAG_SIGNIFCANT_INDEX, which are the concept of KVM.
+>>>>
+>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+>>>> ---
+>>>> uAPI breakout v1:
+>>>>   - Change setup_kvm_tdx_caps() to use the exported 'struct 
+>>>> tdx_sysinfo'
+>>>>     pointer.
+>>>>   - Change how to copy 'kvm_tdx_cpuid_config' since 'struct 
+>>>> tdx_sysinfo'
+>>>>     doesn't have 'kvm_tdx_cpuid_config'.
+>>>>   - Updates for uAPI changes
+>>>> ---
+>>>>   arch/x86/include/uapi/asm/kvm.h |  2 -
+>>>>   arch/x86/kvm/vmx/tdx.c          | 81 
+>>>> +++++++++++++++++++++++++++++++++
+>>>>   2 files changed, 81 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/arch/x86/include/uapi/asm/kvm.h 
+>>>> b/arch/x86/include/uapi/asm/kvm.h
+>>>> index 47caf508cca7..c9eb2e2f5559 100644
+>>>> --- a/arch/x86/include/uapi/asm/kvm.h
+>>>> +++ b/arch/x86/include/uapi/asm/kvm.h
+>>>> @@ -952,8 +952,6 @@ struct kvm_tdx_cmd {
+>>>>       __u64 hw_error;
+>>>>   };
+>>>> -#define KVM_TDX_CPUID_NO_SUBLEAF    ((__u32)-1)
+>>>> -
+>>>>   struct kvm_tdx_cpuid_config {
+>>>>       __u32 leaf;
+>>>>       __u32 sub_leaf;
+>>>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>>>> index 90b44ebaf864..d89973e554f6 100644
+>>>> --- a/arch/x86/kvm/vmx/tdx.c
+>>>> +++ b/arch/x86/kvm/vmx/tdx.c
+>>>> @@ -31,6 +31,19 @@ static void __used tdx_guest_keyid_free(int keyid)
+>>>>       ida_free(&tdx_guest_keyid_pool, keyid);
+>>>>   }
+>>>> +#define KVM_TDX_CPUID_NO_SUBLEAF    ((__u32)-1)
+>>>> +
+>>>> +struct kvm_tdx_caps {
+>>>> +    u64 supported_attrs;
+>>>> +    u64 supported_xfam;
+>>>> +
+>>>> +    u16 num_cpuid_config;
+>>>> +    /* This must the last member. */
+>>>> +    DECLARE_FLEX_ARRAY(struct kvm_tdx_cpuid_config, cpuid_configs);
+>>>> +};
+>>>> +
+>>>> +static struct kvm_tdx_caps *kvm_tdx_caps;
+>>>> +
+>>>>   static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+>>>>   {
+>>>>       const struct tdx_sysinfo_td_conf *td_conf = 
+>>>> &tdx_sysinfo->td_conf;
+>>>> @@ -131,6 +144,68 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user 
+>>>> *argp)
+>>>>       return r;
+>>>>   }
+>>>> +#define KVM_SUPPORTED_TD_ATTRS (TDX_TD_ATTR_SEPT_VE_DISABLE)
+>>>
+>>> Why isn't TDX_TD_ATTR_DEBUG added as well?
+>>
+>> Because so far KVM doesn't support all the features of a DEBUG TD for 
+>> userspace. e.g., KVM doesn't provide interface for userspace to 
+>> read/write private memory of DEBUG TD.
+> 
+> But this means that you can't really run a TDX with SEPT_VE_DISABLE 
+> disabled for debugging purposes, so perhaps it might be necessary to 
+> rethink the condition allowing SEPT_VE_DISABLE to be disabled. Without 
+> the debug flag and SEPT_VE_DISABLE disabled the code refuses to start 
+> the VM, what if one wants to debug some SEPT issue by having an oops 
+> generated inside the vm ?
 
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
+sept_ve_disable is allowed to be disable, i.e., set to 0.
+
+I think there must be some misunderstanding.
+
+>>
+>>> <snip>
+>>
+>>
+
 
