@@ -1,256 +1,514 @@
-Return-Path: <kvm+bounces-26755-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26756-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA3BA9770DF
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 20:42:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A038977278
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 21:53:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3918D1F2370A
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 18:42:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E5D61C211A4
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 19:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FA11BF81C;
-	Thu, 12 Sep 2024 18:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906CF1BFDE5;
+	Thu, 12 Sep 2024 19:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FnomKo0w"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="mowKfLEx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2098.outbound.protection.outlook.com [40.92.89.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C09149C50;
-	Thu, 12 Sep 2024 18:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C41713D530;
+	Thu, 12 Sep 2024 19:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.89.98
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726166569; cv=fail; b=V7hc1SyE7kN7aas3EOuuv+9bAlFTGXfoH5j012/MQyZq1bAhB6RdgrbiawI8mvpb5BoyOgRzWwd8FLP6J3vRLT/lViK8oHcEDZkp3s0GtsGnrvUEPGGRJyX44E+aPk9xjoW8qDVpl5Yq3Zczmsa8FeXVCq/lhzKNekZJPflNTts=
+	t=1726170777; cv=fail; b=kH5Mwn793xXZDxblVNW2vzKNIsMWmIpBA2pRvMg9vLfFw4LLHkiTqE23gN4MOJdV1pBzhb9+V5CYPX2TjOehAR/Y553fucA+tnexI7A43hXevPkCzZ+MrHRLZAbdemmGhCKXA/U2ImZpfQkOMjjqYCpweYeyF1peTFbLIpZ179g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726166569; c=relaxed/simple;
-	bh=jDcVpZKhTSHPGAgDalCp4/3X1B28iB5nYXAN7b/juTM=;
+	s=arc-20240116; t=1726170777; c=relaxed/simple;
+	bh=88MtX9Bmv4jJqc5W7DTVDtLBDOt99UyTjpg7nq14CRc=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=G4Afa7WWsOKo9znSmAn+OfoJ8Ri4+A39Um+G1XQzpXstzKjP8Fl+AzXMEOU7HQH9uEiwwG5AanWEKFft7a27vnrK7kmSreiKPrgNQT+Ddx4EzIkS0zB7Twll+Nt2KbnAtqGDGcyel8kbW5Z4GNGkM77D3evh28qA00DGdQ9dILo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FnomKo0w; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726166567; x=1757702567;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=jDcVpZKhTSHPGAgDalCp4/3X1B28iB5nYXAN7b/juTM=;
-  b=FnomKo0wFxKi1r/hLnkhSb9K7cQL+nII8LaNeSEiEA/Qvo1/JEMU+YPW
-   FZZ+dU6IzT+kQiJuDbhMoBM6mBAtmPVs06I712FTa7tGHcXjY5QPme7wR
-   QUjh8aXOVBH+idYsbecAcvsXDTcNO/0EjNiIicwqKwo26bha+dHPf+XR6
-   nTshSrpQWv7hjaXJlFVJlxXIhslXsFoAgxTZXh9b+9hOWv2TPYUMlTrbG
-   d0/ANJA5w/ti8ht+hFqUs94GCKTXXOL/xVxIDVt8E2XQGyluM+XzTFSfw
-   A4hguhHRvcouU89V0JzX/Q4PBwfxEhC2I97nYi/GKYuuD21a74tGNzt5s
-   g==;
-X-CSE-ConnectionGUID: BkixEqCnTUeYkKYHxZKazQ==
-X-CSE-MsgGUID: kBdgUfkXQ5y5HYyDDWNZ1g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11193"; a="42557662"
-X-IronPort-AV: E=Sophos;i="6.10,223,1719903600"; 
-   d="scan'208";a="42557662"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 11:42:46 -0700
-X-CSE-ConnectionGUID: YY+wnAZWRvmIJX1aS1Bi+g==
-X-CSE-MsgGUID: JRYFx2fyRmO15E6jAn13MA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,223,1719903600"; 
-   d="scan'208";a="68058018"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Sep 2024 11:42:46 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 12 Sep 2024 11:42:45 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 12 Sep 2024 11:42:44 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 12 Sep 2024 11:42:44 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.47) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 12 Sep 2024 11:42:44 -0700
+	 Content-Type:MIME-Version; b=W+899iVWcwuSFKOAxl5u2A7mcfzPPdl+HXkgpkjsrmEDGSv38hrl9Gaj5hEiVV0EAM7Q1GA6JB6MjFMDg7w71vbRBj0McBI9mU9/4tvL0ISwWIH5+FcpJK5Vk4sKENnHnKy99RIh0pqrcqC/H226289TKjK8mN10w2bYuXIqz2M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=mowKfLEx; arc=fail smtp.client-ip=40.92.89.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wy/JpIdLsUrTNEOaK3+VVI4yLYYjDLKFWOM76zmtmFFkEK1UNOmHHKEICTEkzRDXdzCgWMppMauegZz0TmnEeas4ndYQLESBxMf7TJw3TN866y1xKUwp7GXzeuUNnmOZ3MDDR9Lyhi8IoPJWkNnvKX3nKV7QtHcNfdsgaNGTDJlxs/f92OtVemO+Kj8SaH3ASFvnKua6j1czVPF+B+ORLr1+b2rFuH0hPHhy3Qu2vuQHKOzFY78c891i1F7HY0ed7S8tSYsNJHhNhKzAvPxwERrBp1hoMtO0FUTxljHKvSv3eStgwHQhue9ZQSTMEiqyaX9N9RMIQDEclcYBfLMfrw==
+ b=pHUuNQglnc/yoEe2gsGEgywn2rdoifLZF7rYsarNW9CoIvEcmzNK+Dojzc72EbxtiQexSlENRoSlCO73GXTkOD4R8fgXbuSx7RmION81M/e011jfhsk6WtvT/GWK6mpXvGObnLQfkYmgQjewIZgbN1TTmZoziLwlTjiAmDskg/H095zyw7w2RPIeKz2W1Tsf4NUUxMJWlSUBsxBe7LjNNv1dgcLru2GTOQ49hWM6FVJjoe3sHXyEg2z5jXAVm2OBunhrQrtidTBANUtgJIwCsDhUeG+PNNQ6S9DO97rcgY2D+5Y7DUvgiofaMnJleZx8Y3+RpsJ9JvY6FYLj0QduqQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jDcVpZKhTSHPGAgDalCp4/3X1B28iB5nYXAN7b/juTM=;
- b=O+URemrBmSjNeolnMY3J1rGrh8zI2M74Gl03zCjIxHFM8Aq1UOh3kPTIJv+ZdG/5Ki8EN6L6q7Ytb8MV+vBoF5aupHIzi6oVYAuOTPzbCliyXLuKL6ju3QqcNE9SGAmch5b+UReQQkX7gWctGjxllooFTJxOobuhMIAz7asXiZEI/HQvxwfnIjV0EAqB39CiuK2EjbyyyDstRE/rSeqekHX0LVi/eS3xpuX3YzVDRbjJF+Co+pTAS6yzd+e99363s3GKL1TmodYB/pctX4I/ghtzUoyHI6UH3gTZIGIhbZCEyBK9cNsCHdAtzlvzP5uS4+GprQqOEQwHZcG26a9F4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by CY5PR11MB6212.namprd11.prod.outlook.com (2603:10b6:930:24::14) with
+ bh=88MtX9Bmv4jJqc5W7DTVDtLBDOt99UyTjpg7nq14CRc=;
+ b=oRHvoknJVuGBtVCdxn5FkPGRf8yhEcc1j//0dgRbNQOLkyMpcT3aXepjy8rkG2+b9/2QF+mq2e9W9z2NFrOSfatZXAT9RD8b8IaMH4uJDl17PTh0otD3gFdqHy+jXHGAbb8yBUuuisZhaPykOIg3u1BXeJQNBgz8xj82tnwZp1t3l5GZ2hT/HvPBrZ8TO01zBsB3VWokmti7YYTlpMPLQtQIqTDjFTXmpS4MLAPloaQzeaQJBvFZE4yTg8OUHfRV4LmcqVqwMy+CyW6pn4FCRRpDmszb7e+z168WQWEyYPEmlLiVKB1j1P2ENauLMXAm4GbAS4bbW3ciZQPFMibtkg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=88MtX9Bmv4jJqc5W7DTVDtLBDOt99UyTjpg7nq14CRc=;
+ b=mowKfLExCYRqoesy/7rTTv0yGrBqvLfkV4giOr9nEw14RqMIiumA/aPm7zC1UuNgH93zARe7wNZYSabilpgg9HdXrDCTRlYl6k6V6JzXA9CAfZGO1EHWBhOKdvukL30xMuXZF8P7HgggyMFSQ6IUJ5dyIBpymZFHsY8E6d7Z3taDTaqRM37QDEnZCn8f3HvB6Y7LvOnjcx1qcm61/PCXqa+Wxhx3BgeCnQJwmQWmvGhsT31ZPBpaZHLcONL2I2r4h8UDs7D1xMmWRU9q4xQCNQcLZaPzM4CawGRJW5PRBjrGGIj2nJ0wBqKZAkXkP1V2TwQiz5HNTcZolUT4mRacIQ==
+Received: from VI1PR10MB8207.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:800:1d9::21)
+ by AS8PR10MB7375.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:615::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.17; Thu, 12 Sep
- 2024 18:42:42 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.7939.017; Thu, 12 Sep 2024
- 18:42:42 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
-	<seanjc@google.com>
-CC: "Li, Xiaoyao" <xiaoyao.li@intel.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "tony.lindgren@linux.intel.com"
-	<tony.lindgren@linux.intel.com>, "Huang, Kai" <kai.huang@intel.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 25/25] KVM: x86: Add CPUID bits missing from
- KVM_GET_SUPPORTED_CPUID
-Thread-Topic: [PATCH 25/25] KVM: x86: Add CPUID bits missing from
- KVM_GET_SUPPORTED_CPUID
-Thread-Index: AQHa7QnThnZIMHm/AkW0hgwbYo+0yrJRemKAgAJ7zwCAAGp1gIAACiSAgAAAtYCAAB/QAIAAHgOAgAADsoA=
-Date: Thu, 12 Sep 2024 18:42:42 +0000
-Message-ID: <8e1afc752580e877c8cfea4715a9babf639e88a7.camel@intel.com>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
-	 <20240812224820.34826-26-rick.p.edgecombe@intel.com>
-	 <05cf3e20-6508-48c3-9e4c-9f2a2a719012@redhat.com>
-	 <cd236026-0bc9-424c-8d49-6bdc9daf5743@intel.com>
-	 <CABgObfbyd-a_bD-3fKmF3jVgrTiCDa3SHmrmugRji8BB-vs5GA@mail.gmail.com>
-	 <df05e4fe-a50b-49a8-9ea0-2077cb061c44@intel.com>
-	 <CABgObfZ5ssWK=Beu7t+7RqyZGMiY2zbmAKPy_Sk0URDZ9zbhJA@mail.gmail.com>
-	 <ZuMZ2u937xQzeA-v@google.com>
-	 <CABgObfZV3-xRSALfS6syL3pzdMoep82OjWT4m7=4fLRaiWp=XQ@mail.gmail.com>
-In-Reply-To: <CABgObfZV3-xRSALfS6syL3pzdMoep82OjWT4m7=4fLRaiWp=XQ@mail.gmail.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.24; Thu, 12 Sep
+ 2024 19:52:52 +0000
+Received: from VI1PR10MB8207.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::9061:3480:b7e4:9bf1]) by VI1PR10MB8207.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::9061:3480:b7e4:9bf1%6]) with mapi id 15.20.7939.017; Thu, 12 Sep 2024
+ 19:52:51 +0000
+From: zdravko delineshev <delineshev@outlook.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: Bjorn Helgaas <helgaas@kernel.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: nointxmask device
+Thread-Topic: nointxmask device
+Thread-Index: AQHbA3xRb4NScq4cFUSTGvZPrcImc7JQ/0vrgAAKMgCAAh8CAIABZwMR
+Date: Thu, 12 Sep 2024 19:52:51 +0000
+Message-ID:
+ <VI1PR10MB8207104B3B0C86648DE30452DB642@VI1PR10MB8207.EURPRD10.PROD.OUTLOOK.COM>
+References:
+ <VI1PR10MB8207C507DB5420AB4C7281E0DB9A2@VI1PR10MB8207.EURPRD10.PROD.OUTLOOK.COM>
+	<20240910134918.GA579571@bhelgaas>
+ <20240911161248.1f05d7da.alex.williamson@redhat.com>
+In-Reply-To: <20240911161248.1f05d7da.alex.williamson@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
+msip_labels:
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tmn: [YIFVFj036jVlCPOyoi3PszWRqlWq1r/V]
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CY5PR11MB6212:EE_
-x-ms-office365-filtering-correlation-id: f0cf1605-ec83-4095-36e8-08dcd35aaf4a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?VERKbDNGRHdXZmlmN1dNZE9NT05iVHpLUFdRekpXUDBMRzM0SDJTR2h1ako5?=
- =?utf-8?B?N3A0d0liMi80ejV0c251Z0pqTzdZRkF1NDcyZUxnWGZsOG9XbVFaZ1UzUlBu?=
- =?utf-8?B?T2t5S21hQWpaL2QyL05BaS82TVFIbVhZdTZrQlJtY1lMdmJWaWI2YlFBWmJS?=
- =?utf-8?B?c0d2aitrVFY1Z3lBc3p2b2Q1OXdoNEFIOWU3YmIrRyt2bE9IdFJ2MS8rcC85?=
- =?utf-8?B?R05BL2lKakl6YTdpU0lGWnhaT1lUbEl1cXlDUUt2SjB1M1Vmd1ZIaE1jZjYx?=
- =?utf-8?B?RTlFUWdTazBWbGErbG95YlJXS1BYU1hUTDArcTZZYWpHcExQeitIemxCWGVG?=
- =?utf-8?B?cnFJWHV0QnFuTVZiNHpUTWNNaXp0U3J1WW1VODJkME1RR0w5ZHBvU1lvU1Y1?=
- =?utf-8?B?c09LME1MdXlGRTIwWmhNcWNJMG9UbFpwbFBaWTFtRnkxVkRRTnZXSEpJazJl?=
- =?utf-8?B?REo4aU1nQTBQelNHR2RyQ1N1Rmh3U3BINEYwTWNScjVlSWgrdlU0ZDdrUVh4?=
- =?utf-8?B?ZE9lZ3FDRHI2ejR4L1lvUlREaXBwYVJQaGxZYkZlNXVheHAzczYwT0VTZUxE?=
- =?utf-8?B?U1kxRXhuTjFubEF3NjJtc0pUTm0vUGlONS9NRGF2ZTJTS0pVQXoycWxXK2hP?=
- =?utf-8?B?M0JGaVRZR0gwQ3Z3V3ZFTW03VENZTHdiK29QZ2NYR3F1Y01takYxZGM4Y29l?=
- =?utf-8?B?WmZJenJGQmxRdmp3RUh5UjJaYUdKL3ZWeEd0QnNJdGZsVmRZa09wQ2xEZSth?=
- =?utf-8?B?L2tPUTJYL2FHSGdnZzNNUU1JM0N0WkcvS3loZE5iUFJidVhtQStyMTdVbjEr?=
- =?utf-8?B?UlNYZjFtbnB6VnEwQ3owM3g1QUh3dzZQbDI3UEVnWlY1MzcxVGw4cjBiQ2lz?=
- =?utf-8?B?N3BCR2hYM20xYzYwTUM4bU90eUh4RkZ2d2RmL0pmT2NtbkRMYlk1Z1FjTjN4?=
- =?utf-8?B?Y2x3ZXBkTnNLTk0zVGNHTFhObXlLRjJnMGVRRUh2REYyUTdmR1VYRzl2dXJN?=
- =?utf-8?B?NjFuZStVYS9GRzRhNTVQVmZlWDR2SkNlWnQ1bSs2cElzb2UwQ1hDKzVqL2ky?=
- =?utf-8?B?WXB4V3ZFWG44ZnRkbHRVR3kvaGwwcHZmSitkcHA0cGZPaTEyamJ1cjFRcnls?=
- =?utf-8?B?aFB1bEg3dm5IeVI3Y3RLV0NVcTNyYXVqNGd5U25POTNjUTNFSnZYR0hNMkJv?=
- =?utf-8?B?L2RHd3gyRFRzVHhEK1dTa1dJelZZMWNmUWZrZ094YmpnK01OTVl5aEZpRllz?=
- =?utf-8?B?NzFlcHBEMndXdy9kK2t3bHFCSmhsNTZia1VrajhwRlhrcXRjTDhDUXlEZCtX?=
- =?utf-8?B?SVRZVWZqMjR4RktLOXVYUFRDSlBlb3JZV0xDL2J2cUhwaTNGV3lRZHMxVTFO?=
- =?utf-8?B?ZEVpMS9SYmlON2V4OGhUWnRTQlAzTU00UnZ3L3JlZTRrcTZtd2JvNTJlRHVE?=
- =?utf-8?B?dUZaK2hIZkhNNllTZjIreERMUGFMR0ZaaHpBYnI1SS9DWlJhQUw4ZGFYdmZL?=
- =?utf-8?B?RWZJOFVETWlNUG4rWDJZWjQ4WlAvV3FlcnFzZFpUQTA1M0kzRGNqVE1xVHda?=
- =?utf-8?B?ZHNhQjJhRjZZSEZwQ0MwSUFvNzBISXloZ1dZUW5JckhIUHB0SWZMbFNiSlNw?=
- =?utf-8?B?SFpiQWFnaW1UdEJTMVRFVlYzQThod1JEcHFkMmRka0ZZOVRzQTNVOVUyUk0y?=
- =?utf-8?B?QW5wUy83bHY0WWgxSnlsSG1JT0dFYnlZM3lyZUF5bmhlVm9jY1YzTGkrYURO?=
- =?utf-8?B?YzZwTEYvTVlhdURJdTJKVVBwNkRPZTlod3c4SUhVZklERWhjdnl0RCt1aDBs?=
- =?utf-8?B?cS9GVkVpR1F1UzZZaUQrL0FPTUhRZmNsN1Rzc2hvWG0xUlMrTURheWZKWVBr?=
- =?utf-8?B?MVN2NkJBQUVlUVFaSTlSc211Y0h3V3hiRUhKWXZyVlFoOHc9PQ==?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-traffictypediagnostic: VI1PR10MB8207:EE_|AS8PR10MB7375:EE_
+x-ms-office365-filtering-correlation-id: 15a57fb4-d07b-46b7-b701-08dcd3647c88
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|8060799006|15080799006|19110799003|461199028|7092599003|15030799003|3412199025|440099028|102099032;
+x-microsoft-antispam-message-info:
+ lGgaPSn8mcJG8xb1Lwc0PJqEj7sqAXEnscISsB4B9JSWwa9PLQoqp9KHJgDA0NVfEAMtVih96CU1IkMKgiFGKAI3Q1XVkcENoozt5k71jrYnG2DSjbT9gy9SC1Vfo7aMmEkdl204vUPDSGooW5htHAvWCnsJ+ZjntH51W93EqRNLnlwhnM/HbHBAxKeIjRd7IEw+0c5AAwnBMACeu1ljWJ8xMFVYgXCS4PfTi14RitS+TlaG8yn/kGnBEt6ee7xYdodfDJ47i1rdCUhJUbGIunkFysT8hpP36w41yfpIwzXqbZqxTYlW2XjYLZbKD5KxbusFrcWAIbafzNvp95i2DKOejkotvzq9MTcb6ogrnrBjXSB0IhCWx/N3kywrUrSvd6r3S3Ej8js6givAiHVufRK57pIO/It7HbmGTXAEbfxhg/shCsgdTSIVgtmoVqarGXQ07jyVipp5gsbDxMbjemRVYx6MMi8nM7Z36RqEgXEKNDUVAdr6s567GU0C8tZv2NcXreCUrQMZ+DXIxfnujvDGa1QCZ1oHJx34XbO5DZjKW7SfQXpXNilXmjzH4aivpIoMaiIAkRZvcPFDIrrHBuqty2IM5HnX8i+1Y1EZAH678hV1vcIoIlTy+oQ6rzvHVxX2dST4ZesBqef7p4RqHUmjqwf2HeltjZTTHH6QpkpMg+fHiOdAEwZ4FYVd+4cOkqM3xD/7V/2rHJC7JWpaiImbNaeBjQZJCqKCvXTurxyz1A8xng7UomALUDGG5Dlm
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?S0c4RWl5Y2pIRXp6Q3g1MCthSSt0aTA1Q2ZYcmNNZjNsL0VHalcwZGJ2M0xK?=
- =?utf-8?B?S3VUVVlxcUlFUjVDUjZkQWZHSE9zbkk2L2JKWjhRY2lRc2RyZWdQb3ZPSHR1?=
- =?utf-8?B?czR6RjAzZ1JJLytxREp3d2RyQXBMVlpDb1hsYWJCWk8vMXZHY0NjWDUwV0V4?=
- =?utf-8?B?Z0pGZzh2dnVRU21RdHJ5L3ZHVVNGZ2JrcnliSTFBbmZCTDZiK2ppVEJQdG9D?=
- =?utf-8?B?U3p4b1luM3k1aWdBUmlJSzZya3V0ZWp1eENXSDlZaDcrZmpjTU5CTFRoWnZH?=
- =?utf-8?B?RGo1TW1pRXVUUEg4akFQdytWRzdvY09yQlRnQVpydm04UFlwZ1FqMDc0WnJ0?=
- =?utf-8?B?RHNyVFMyR0ovSzM4ZWx5MEpqU0Y4SDMwaFZiclFMQnltWHpna3BpcXNxTXM5?=
- =?utf-8?B?QUtQNUNiRkxpcmdCYnhrWW5YMXlGcnV5Q0hxRXdMZTVDUkRMdzVJZ1BsNlNK?=
- =?utf-8?B?dmNUK0JwbUhmZnJsYnpvQWg2bmVNaldMNFhHeWYwLytnaVZqdVFBRVZZbEZx?=
- =?utf-8?B?WXJBYjd4a3pFSERSK0NoMjhnQ1k2ejFDNFRyQ0FBSVJXL1IybWRXMDc5OFVm?=
- =?utf-8?B?ZkFCSjZIZWFLZ1dnSXlmR2JPWXhWYkt6dTd6TG1YZFF0LytBZzNGeVVNMnp5?=
- =?utf-8?B?NFk3cVlOcWNYZmh6dkFEOURjL0xta1hUbitoVHZnb2VXTmpDRGJPZVpjYXJq?=
- =?utf-8?B?Y3ZZWXdYNG50clJETnE4R0lPUDhTd1M1WnRsRlNjRjdqRE9uc0crNjlhSkN1?=
- =?utf-8?B?ZlVxZlBsS29UMnVCUU5oZUlQZGhITmdVS0dRaSt4UXVoMzdrMFV6MUNqd25B?=
- =?utf-8?B?T2Rock5mSTVTTW1xei82bWg3amJia3FMTFBzaURjRHVsa3loRzZGUW53N0p5?=
- =?utf-8?B?VVpwMlprT0F5NVJwdmN3UVVpbHJwa2xEZUNpZHFVZlpwdHlxeWhweGVjdHhP?=
- =?utf-8?B?Z2lqem9EeTAreW5WYjY1eHpxdXdnQTlPWWlvTzdFWGlVM3ZaZ2Q1UDRENWNB?=
- =?utf-8?B?cUM4SGFwRzFrVnFZQXVtOHpTcjg0ZW84bkxlRlVFQkRvQU5URlk3V2U4U01W?=
- =?utf-8?B?Ujlhd3lLdC9KN2hac2JPME9tRFFGdmRXMUlWTndSTkVTcGRxdlA4Y0pNbUZW?=
- =?utf-8?B?Z2lhNmliYmFFd2J2K0RsTXlxanhmTGIrcjltQTNEaWg4Q1Rtanc0aFEyUWUr?=
- =?utf-8?B?ek8xdnRhc3cwMHQ3U1NpWGxuditWSVc0T1hUd2pPU2JYZHFsZXVVa3R1ajQr?=
- =?utf-8?B?MlVkY3ZqbVVVR3JvMjJyNjQ0ZzZuOWJ3cHJvY3ZaNjBITkFERktZY2hhaXdh?=
- =?utf-8?B?TERVZDc0eVdZRlRyQ0JTaERWOWM0VU5aelI3enhoWVRGSFkyTGhveGVpQmVL?=
- =?utf-8?B?bVhTeTdnSVFiQ1EwYkk2ZWRITnVYTmwwaC9rOW1DOHZxb29Bc3B0K3dUd3Fn?=
- =?utf-8?B?aVlVekhtb0NOTCtGQUtFOEh2ZHNLNmQ2TGhQVmo5d25pYTNHNS8xYnJ5QkNV?=
- =?utf-8?B?ZFZQaTUwaE9zVW9pRkR5YkJhREdIcVA4OXZmSEJJR0wvOXhnMU9EVzA4eDI1?=
- =?utf-8?B?Q1d3UGhjbVBHVDRadWV1bFdabVErYjF4TnRDaEhVUktLVU9meW93eVkzbWpN?=
- =?utf-8?B?ekZvcFlnS3FiY1pVVFd6R2o5c1JGOXFSRGdPaDhSdEpHWkhpNEJwbE8zdmgy?=
- =?utf-8?B?TWc1cjV5TW9oL0I2V1c0Y0g1ZVhJR3NZdXF6bkpPZXJ1U1RiUlJwOU55TUhG?=
- =?utf-8?B?bGVHQjJ1cVRlbzZWRFErcVhEbFNkVTBCcmtWMnpmVFE3ZnI1Y0w3MldiS1ZQ?=
- =?utf-8?B?Z1F5UlUyOVYxVTkxNWt1dXNXUFJFb1JQMzFmQWJVRncwKy9UM2NxTkJIcVdz?=
- =?utf-8?B?eUltTEFtQjhZRHRjc0c2K2hmVkNEWFEzUTdCUVVFQmV3M3V6WDZ0NGdwTG5Y?=
- =?utf-8?B?bkZYVnl0NHpKMGRMTEhoQWZuMnpvdlZQMENIb3Y3QXZSU2VJZlNoYk5ibk1j?=
- =?utf-8?B?akZ0NU9OWSttZ1IycTRnNzhzc3Z3MXpIcEkxSThYVHpIQXpyYTBMOStTdnpS?=
- =?utf-8?B?b3lnU3V0M2MwYkd2c3B1YlRIMFZuVjkzdDJ3VUxkYThpRms1MVM2U3F2ZVJo?=
- =?utf-8?B?NzVkWlVZQTJhQmdqRkpXSHJhMlF3NS8xOTgvQVhidDFJblo3WUJ2MlR3SUNw?=
- =?utf-8?B?c0E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7314B8EA1FB0B64B81E803871D682E0E@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?+vQJQd1O/DdCadAAYo81yxlDZV8sOKenGSDqTeObrJvp1hPcyp1NE298tt?=
+ =?iso-8859-1?Q?jluh8ozKWtXrQSpz5otWAU3XgHM/Lp+/UPOoxwPHDatKP4tR5HtpN/kKtJ?=
+ =?iso-8859-1?Q?a5ikH/2wT4ZCFqE0qbyDzQvZiZ501betD9sTUre9AbKDil/06Yk4rwcqs1?=
+ =?iso-8859-1?Q?t0DWQ5DYdRv6Vg2tzCjzwABGk7Ra+sTuymO6CNpv3yd8KyfW7sfUrXzPRI?=
+ =?iso-8859-1?Q?RhQaUnPzuy3HMWQzLucdur6DWHcbNWyPrFGtUJD1HW9W+zvsSkAnZkBx18?=
+ =?iso-8859-1?Q?0uy2VyUQX9lyIsDUdAe1mcjFIP21VvKth46ijmSJ8cqgh+vXQP2FhtHq2m?=
+ =?iso-8859-1?Q?Ag2jlfV81tq8YVIw2I1niezujNh+BtNffZx5TTpx35RdBCzC+olyRZGuQm?=
+ =?iso-8859-1?Q?caq0++MgOf0gnayNZaRcgdPITY643H00igk0VTRZoxxNMFOaBGXq7ALwqE?=
+ =?iso-8859-1?Q?vx+Yu8Gy6zxm7SX5PQ1FVrN37sDzN4F6PK9jDRHBtwM4Mn3YCzX66EzKPT?=
+ =?iso-8859-1?Q?SKhyEl9LegBeFlAXxqZRnyRFpwFUippOymy8xNFf0NHmOOR6p1O+cPo1aN?=
+ =?iso-8859-1?Q?Il4RFXQsPynz86fAA49groE3TtNuOdcUAXziewml89a4Ia/w3C0t9CePDb?=
+ =?iso-8859-1?Q?jQmBZ0lMcN/4/lXInEuAH4Pxund7sWt7vW22myP/TCRMsbjhftm43H1gi0?=
+ =?iso-8859-1?Q?JExhEb0x8VyfDzQBjhjkAE5BZrWoFrQdDdBAiSRLvI4kkLQplOE7Th2X8Q?=
+ =?iso-8859-1?Q?zhZj4OK6f1CgjdaJje1+Qeypxs+CDvwyizzr18rT3Xoi8hp4sPxX0YveOu?=
+ =?iso-8859-1?Q?Lj1+0dByDH6cMgIi+4dI/GEwB97o3QfW9/MxmwoHHLNYt96s7YARVrci+c?=
+ =?iso-8859-1?Q?kDO7973K4yi5sKnnXPxvvEJuLahSGnqpsReQQpicngEhVTse9SJqB1yw+e?=
+ =?iso-8859-1?Q?4KAlk00BrWtc+6YZGQBLdHr1RYz4ItccjTEs1lod/OTNsBDP9+7cgb4mrg?=
+ =?iso-8859-1?Q?spa9kgcpgaVyI37H7cDRHcJg6dE6vct4tCJ409K3YfQkDzJJrWKmD+8w3j?=
+ =?iso-8859-1?Q?fkgg78pEu6ByOn/7fyiuIC7ZjHOBlPeu3xJAnpoIqS949hHqGSGJfvM1TF?=
+ =?iso-8859-1?Q?MASzxBVQyQqNg5IXUhhDd7J/uK2WAgOvYBKOgteTsF2Gf3oIHslZSyqRzt?=
+ =?iso-8859-1?Q?hukd6XBnDXO3AHWPW+a2JcUIpEr3iKfsUL7WNZn6wB/ZQGGuQycPDuPDp1?=
+ =?iso-8859-1?Q?O3eDn5dGKNNiVhxkm2Wg=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0cf1605-ec83-4095-36e8-08dcd35aaf4a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Sep 2024 18:42:42.0558
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR10MB8207.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15a57fb4-d07b-46b7-b701-08dcd3647c88
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Sep 2024 19:52:51.9274
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ldz7w1AMjldp4hx022ytqEtN8l/a3LK9AjDKLq+iJGFxjM/VoiT1cX3xnOWhOo6dC9ZTu+C/s4AcDjkKdH/5OF/TIvkJOcvD08j8sVcwugc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6212
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR10MB7375
 
-T24gVGh1LCAyMDI0LTA5LTEyIGF0IDIwOjI5ICswMjAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
-PiA+IElJVUMsIHRoZSBwcm9wb3NhbCBoZXJlIGlzIHRvIGFsbG93IHVzZXJzcGFjZSB0byBjb25m
-aWd1cmUgdGhlIGZlYXR1cmVzIHRoYXQNCj4gPiBhcmUNCj4gPiBleHBvc2VkIF9hbmQgZW5hYmxl
-ZF8gZm9yIGEgVERYIFZNIHdpdGhvdXQgYW55IGVuZm9yY2VtZW50IGZyb20gS1ZNLg0KPiANCj4g
-WWVhaCwgdGhhdCdzIGNvcnJlY3QsIG9uIHRoZSBvdGhlciBoYW5kIGEgbG90IG9mIGZlYXR1cmVz
-IGFyZSBqdXN0DQo+IG5ldyBpbnN0cnVjdGlvbnMgYW5kIG5vIG5ldyByZWdpc3RlcnMuwqAgVGhv
-c2UgcGFzcyB1bmRlciB0aGUgcmFkYXINCj4gYW5kIGluIGZhY3QgeW91IGNhbiBldmVuIHVzZSB0
-aGVtIGlmIHRoZSBDUFVJRCBiaXQgaXMgMCAob2YgY291cnNlKS4NCj4gT3RoZXJzIGFyZSBqdXN0
-IGRhdGEsIGFuZCBhZ2FpbiB5b3UgY2FuIHBhc3MgYW55IGNyYXAgeW91J2QgbGlrZS4NCj4gDQo+
-IEFuZCBmb3IgU05QIHdlIGhhZCB0aGUgY2FzZSB3aGVyZSB3ZSBhcmUgZm9yY2VkIHRvIGxlYXZl
-IGZlYXR1cmVzDQo+IGVuYWJsZWQgaWYgdGhlaXIgc3RhdGUgaXMgaW4gdGhlIFZNU0EsIGJlY2F1
-c2Ugd2UgY2Fubm90IGJsb2NrDQo+IHdyaXRlcyB0byBYQ1IwIGFuZCBYU1MgdGhhdCB3ZSdkIGxp
-a2UgdG8gYmUgaW52YWxpZC4NCj4gDQo+ID4gQ0VUIG1pZ2h0IGJlIGEgYmFkIGV4YW1wbGUgYmVj
-YXVzZSBpdCBsb29rcyBsaWtlIGl0J3MgY29udHJvbGxlZCBieQ0KPiA+IFREQ1MuWEZBTSwgYnV0
-DQo+ID4gcHJlc3VtYWJseSB0aGVyZSBhcmUgb3RoZXIgQ1BVSUQtYmFzZWQgZmVhdHVyZXMgdGhh
-dCB3b3VsZCBhY3RpdmVseSBlbmFibGUNCj4gPiBzb21lDQo+ID4gZmVhdHVyZSBmb3IgYSBURFgg
-Vk0uDQo+IA0KPiBYRkFNIGlzIGNvbnRyb2xsZWQgYnkgdXNlcnNwYWNlIHRob3VnaCwgbm90IEtW
-TSwgc28gd2UndmUgZ290IG5vDQo+IGNvbnRyb2wgb24gdGhhdCBlaXRoZXIuDQoNClRoZXJlIGFy
-ZSBzb21lIEFUVFJJQlVURVMgKHRoZSBub24teHNhdmUgZmVhdHVyZXMgbGlrZSBQS1MgZ2V0IGJ1
-Y2tldGVkIGluDQp0aGVyZSksIHdoaWNoIGNhbiBhZmZlY3QgdGhlIGhvc3QuIFNvIHdlIGhhdmUg
-dG8gZmlsdGVyIHRoaXMgY29uZmlnIGluIEtWTS4gSSdkDQpqdXN0IGFzc3VtZSBub3QgdHJ1c3Qg
-ZnV0dXJlIFhGQU0gYml0cyBiZWNhdXNlIGl0J3MgZWFzeSB0byBpbXBsZW1lbnQuDQoNCg0KPiAN
-Cj4gPiBGb3IgSFlQRVJWSVNPUiBhbmQgVFNDX0RFQURMSU5FX1RJTUVSLCBJIHdvdWxkIG11Y2gg
-cHJlZmVyIHRvIGZpeCB0aG9zZSBLVk0NCj4gPiB3YXJ0cywNCj4gPiBhbmQgaGF2ZSBhbHJlYWR5
-IHBvc3RlZCBwYXRjaGVzWzFdWzJdIHRvIGRvIGV4YWN0bHkgdGhhdC4NCj4gPiANCj4gPiBXaXRo
-IHRob3NlIG91dCBvZiB0aGUgd2F5LCBhcmUgdGhlcmUgYW55IG90aGVyIENQVUlELWJhc2VkIGZl
-YXR1cmVzIHRoYXQgS1ZNDQo+ID4gc3VwcG9ydHMsIGJ1dCBkb2Vzbid0IGFkdmVydGlzZT/CoCBJ
-Z25vcmUgTVdBSVQsIGl0J3MgYSBzcGVjaWFsIGNhc2UgYW5kDQo+ID4gaXNuJ3QNCj4gPiBhbGxv
-d2VkIGluIFREWCBWTXMgYW55d2F5cy4NCj4gDQo+IEkgZG9uJ3QgdGhpbmsgc28uDQoNCg0K
+Hello,=0A=
+=0A=
+Here is the dmesg output BEFORE enabling the flag:=0A=
+=0A=
+2024-09-01T01:32:02.885775+03:00 proxmox kernel: [ =A0843.996111] irq 409: =
+nobody cared (try booting with the "irqpoll" option)=0A=
+2024-09-01T01:32:02.885792+03:00 proxmox kernel: [ =A0843.996682] CPU: 46 P=
+ID: 7672 Comm: kvm Tainted: P =A0 =A0 =A0 =A0 =A0 O =A0 =A0 =A0 6.8.12-1-pv=
+e #1=0A=
+2024-09-01T01:32:02.885793+03:00 proxmox kernel: [ =A0843.997142] Hardware =
+name: Supermicro Super Server/X11DPX-T, BIOS 4.2 12/15/2023=0A=
+2024-09-01T01:32:02.885794+03:00 proxmox kernel: [ =A0843.997566] Call Trac=
+e:=0A=
+2024-09-01T01:32:02.885795+03:00 proxmox kernel: [ =A0843.997973] =A0<TASK>=
+=0A=
+2024-09-01T01:32:02.885796+03:00 proxmox kernel: [ =A0843.998370] =A0dump_s=
+tack_lvl+0x76/0xa0=0A=
+2024-09-01T01:32:02.885797+03:00 proxmox kernel: [ =A0843.998766] =A0dump_s=
+tack+0x10/0x20=0A=
+2024-09-01T01:32:02.885798+03:00 proxmox kernel: [ =A0843.999153] =A0__repo=
+rt_bad_irq+0x30/0xd0=0A=
+2024-09-01T01:32:02.885799+03:00 proxmox kernel: [ =A0843.999539] =A0note_i=
+nterrupt+0x2e1/0x320=0A=
+2024-09-01T01:32:02.885800+03:00 proxmox kernel: [ =A0843.999917] =A0handle=
+_irq_event+0x79/0x80=0A=
+2024-09-01T01:32:02.885802+03:00 proxmox kernel: [ =A0844.000296] =A0handle=
+_fasteoi_irq+0x7d/0x200=0A=
+2024-09-01T01:32:02.885803+03:00 proxmox kernel: [ =A0844.000677] =A0__comm=
+on_interrupt+0x3e/0xb0=0A=
+2024-09-01T01:32:02.885804+03:00 proxmox kernel: [ =A0844.001057] =A0common=
+_interrupt+0x44/0xb0=0A=
+2024-09-01T01:32:02.885815+03:00 proxmox kernel: [ =A0844.001435] =A0asm_co=
+mmon_interrupt+0x27/0x40=0A=
+2024-09-01T01:32:02.885816+03:00 proxmox kernel: [ =A0844.001812] RIP: 0033=
+:0x5c4d6fb518be=0A=
+2024-09-01T01:32:02.885817+03:00 proxmox kernel: [ =A0844.002209] Code: ff =
+48 69 04 24 00 ca 9a 3b 48 03 44 24 08 eb d4 e8 c7 f2 d9 ff 0f 1f 80 00 00 =
+00 00 53 0f 1f 80 00 00 00 00 8b 1d 72 a3 2a 01 <e8> 3d ff ff ff 83 e3 fe 8=
+b 15=0A=
+64 a3 2a 01 39 da 75 e8 5b 31 d2 c3=0A=
+2024-09-01T01:32:02.885819+03:00 proxmox kernel: [ =A0844.002618] RSP: 002b=
+:00007ffdea5752f0 EFLAGS: 00000246=0A=
+2024-09-01T01:32:02.885820+03:00 proxmox kernel: [ =A0844.003027] RAX: 0000=
+000000000000 RBX: 0000000000000002 RCX: 0000000000000000=0A=
+2024-09-01T01:32:02.885821+03:00 proxmox kernel: [ =A0844.003436] RDX: 0000=
+000000000000 RSI: 0000000000000000 RDI: 0000000000000001=0A=
+2024-09-01T01:32:02.885822+03:00 proxmox kernel: [ =A0844.003844] RBP: 0000=
+5c4d72c4fe70 R08: 0000000000000000 R09: 0000000000000000=0A=
+2024-09-01T01:32:02.885823+03:00 proxmox kernel: [ =A0844.004247] R10: 0000=
+000000000000 R11: 0000000000000000 R12: 00005c4d70e13860=0A=
+2024-09-01T01:32:02.885824+03:00 proxmox kernel: [ =A0844.004649] R13: 0000=
+5c4d70dfc7f8 R14: 00005c4d70e137c8 R15: 00007ffdea575360=0A=
+2024-09-01T01:32:02.885825+03:00 proxmox kernel: [ =A0844.005054] =A0</TASK=
+>=0A=
+2024-09-01T01:32:02.885826+03:00 proxmox kernel: [ =A0844.005455] handlers:=
+=0A=
+2024-09-01T01:32:02.885827+03:00 proxmox kernel: [ =A0844.005851] [<0000000=
+0eac396f2>] vfio_intx_handler [vfio_pci_core]=0A=
+2024-09-01T01:32:02.885828+03:00 proxmox kernel: [ =A0844.006265] Disabling=
+ IRQ #409=0A=
+2024-09-01T01:32:03.377945+03:00 proxmox kernel: [ =A0844.484106] irq 16: n=
+obody cared (try booting with the "irqpoll" option)=0A=
+2024-09-01T01:32:03.377963+03:00 proxmox kernel: [ =A0844.484635] CPU: 8 PI=
+D: 0 Comm: swapper/8 Tainted: P =A0 =A0 =A0 =A0 =A0 O =A0 =A0 =A0 6.8.12-1-=
+pve #1=0A=
+2024-09-01T01:32:03.377964+03:00 proxmox kernel: [ =A0844.485087] Hardware =
+name: Supermicro Super Server/X11DPX-T, BIOS 4.2 12/15/2023=0A=
+2024-09-01T01:32:03.377965+03:00 proxmox kernel: [ =A0844.485494] Call Trac=
+e:=0A=
+2024-09-01T01:32:03.377966+03:00 proxmox kernel: [ =A0844.485901] =A0<IRQ>=
+=0A=
+2024-09-01T01:32:03.377967+03:00 proxmox kernel: [ =A0844.486299] =A0dump_s=
+tack_lvl+0x76/0xa0=0A=
+2024-09-01T01:32:03.377968+03:00 proxmox kernel: [ =A0844.486707] =A0dump_s=
+tack+0x10/0x20=0A=
+2024-09-01T01:32:03.377969+03:00 proxmox kernel: [ =A0844.487104] =A0__repo=
+rt_bad_irq+0x30/0xd0=0A=
+2024-09-01T01:32:03.377971+03:00 proxmox kernel: [ =A0844.487507] =A0note_i=
+nterrupt+0x2e1/0x320=0A=
+2024-09-01T01:32:03.377972+03:00 proxmox kernel: [ =A0844.487908] =A0handle=
+_irq_event+0x79/0x80=0A=
+2024-09-01T01:32:03.377973+03:00 proxmox kernel: [ =A0844.488308] =A0handle=
+_fasteoi_irq+0x7d/0x200=0A=
+2024-09-01T01:32:03.377974+03:00 proxmox kernel: [ =A0844.488706] =A0__comm=
+on_interrupt+0x3e/0xb0=0A=
+2024-09-01T01:32:03.377975+03:00 proxmox kernel: [ =A0844.489112] =A0common=
+_interrupt+0x9f/0xb0=0A=
+2024-09-01T01:32:03.377986+03:00 proxmox kernel: [ =A0844.489511] =A0</IRQ>=
+=0A=
+2024-09-01T01:32:03.377987+03:00 proxmox kernel: [ =A0844.489900] =A0<TASK>=
+=0A=
+2024-09-01T01:32:03.377988+03:00 proxmox kernel: [ =A0844.490287] =A0asm_co=
+mmon_interrupt+0x27/0x40=0A=
+2024-09-01T01:32:03.377989+03:00 proxmox kernel: [ =A0844.490681] RIP: 0010=
+:pv_native_safe_halt+0xb/0x10=0A=
+2024-09-01T01:32:03.377990+03:00 proxmox kernel: [ =A0844.491075] Code: 22 =
+d7 31 ff c3 cc cc cc cc 66 0f 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 =
+90 90 90 90 90 66 90 0f 00 2d 29 58 37 00 fb f4 <c3> cc cc cc cc 90 90 90 9=
+0 90 90 90 90 90 90 90 90 90 90 90 90 83=0A=
+2024-09-01T01:32:03.377991+03:00 proxmox kernel: [ =A0844.491497] RSP: 0018=
+:ffffb4c54029fea0 EFLAGS: 00000246=0A=
+2024-09-01T01:32:03.377992+03:00 proxmox kernel: [ =A0844.491923] RAX: 0000=
+000000000000 RBX: 0000000000000008 RCX: 0000000000000000=0A=
+2024-09-01T01:32:03.377993+03:00 proxmox kernel: [ =A0844.492354] RDX: 0000=
+000000000000 RSI: 0000000000000000 RDI: 0000000000000000=0A=
+2024-09-01T01:32:03.377994+03:00 proxmox kernel: [ =A0844.492781] RBP: ffff=
+b4c54029fea8 R08: 0000000000000000 R09: 0000000000000000=0A=
+2024-09-01T01:32:03.377995+03:00 proxmox kernel: [ =A0844.493207] R10: 0000=
+000000000000 R11: 0000000000000000 R12: ffff9bd807f68000=0A=
+2024-09-01T01:32:03.377996+03:00 proxmox kernel: [ =A0844.493634] R13: 0000=
+000000000000 R14: 0000000000000000 R15: ffff9bd807f68000=0A=
+2024-09-01T01:32:03.377997+03:00 proxmox kernel: [ =A0844.494064] =A0? defa=
+ult_idle+0x9/0x30=0A=
+2024-09-01T01:32:03.377998+03:00 proxmox kernel: [ =A0844.494496] =A0arch_c=
+pu_idle+0x9/0x10=0A=
+2024-09-01T01:32:03.377999+03:00 proxmox kernel: [ =A0844.494930] =A0defaul=
+t_idle_call+0x2c/0xf0=0A=
+2024-09-01T01:32:03.377999+03:00 proxmox kernel: [ =A0844.495361] =A0do_idl=
+e+0x216/0x260=0A=
+2024-09-01T01:32:03.378000+03:00 proxmox kernel: [ =A0844.495793] =A0cpu_st=
+artup_entry+0x2a/0x30=0A=
+2024-09-01T01:32:03.378001+03:00 proxmox kernel: [ =A0844.496225] =A0start_=
+secondary+0x119/0x140=0A=
+2024-09-01T01:32:03.378002+03:00 proxmox kernel: [ =A0844.496655] =A0second=
+ary_startup_64_no_verify+0x184/0x18b=0A=
+2024-09-01T01:32:03.378004+03:00 proxmox kernel: [ =A0844.497090] =A0</TASK=
+>=0A=
+2024-09-01T01:32:03.378005+03:00 proxmox kernel: [ =A0844.497519] handlers:=
+=0A=
+2024-09-01T01:32:03.378006+03:00 proxmox kernel: [ =A0844.497944] [<0000000=
+067e8c516>] i801_isr [i2c_i801]=0A=
+2024-09-01T01:32:03.378007+03:00 proxmox kernel: [ =A0844.498383] Disabling=
+ IRQ #16=0A=
+=0A=
+=0A=
+=0A=
+This is a message AFTER enabling the flag, but device continued to operate.=
+ it has appeared only ONCE, and since this timestamp there are no other iss=
+ues observed:=0A=
+=0A=
+2024-09-06T16:02:31.196668+03:00 proxmox kernel: [ =A0754.479693] Hardware =
+name: Supermicro Super Server/X11DPX-T, BIOS 4.2 12/15/2023=0A=
+2024-09-06T16:02:31.196669+03:00 proxmox kernel: [ =A0754.480098] Call Trac=
+e:=0A=
+2024-09-06T16:02:31.196671+03:00 proxmox kernel: [ =A0754.480488] =A0<IRQ>=
+=0A=
+2024-09-06T16:02:31.196672+03:00 proxmox kernel: [ =A0754.480878] =A0dump_s=
+tack_lvl+0x76/0xa0=0A=
+2024-09-06T16:02:31.196673+03:00 proxmox kernel: [ =A0754.481274] =A0dump_s=
+tack+0x10/0x20=0A=
+2024-09-06T16:02:31.196674+03:00 proxmox kernel: [ =A0754.481661] =A0__repo=
+rt_bad_irq+0x30/0xd0=0A=
+2024-09-06T16:02:31.196675+03:00 proxmox kernel: [ =A0754.482043] =A0note_i=
+nterrupt+0x2e1/0x320=0A=
+2024-09-06T16:02:31.196677+03:00 proxmox kernel: [ =A0754.482423] =A0handle=
+_irq_event+0x79/0x80=0A=
+2024-09-06T16:02:31.196685+03:00 proxmox kernel: [ =A0754.482802] =A0handle=
+_fasteoi_irq+0x7d/0x200=0A=
+2024-09-06T16:02:31.196686+03:00 proxmox kernel: [ =A0754.483179] =A0__comm=
+on_interrupt+0x3e/0xb0=0A=
+2024-09-06T16:02:31.196688+03:00 proxmox kernel: [ =A0754.483556] =A0common=
+_interrupt+0x9f/0xb0=0A=
+2024-09-06T16:02:31.196689+03:00 proxmox kernel: [ =A0754.483931] =A0</IRQ>=
+=0A=
+2024-09-06T16:02:31.196690+03:00 proxmox kernel: [ =A0754.484297] =A0<TASK>=
+=0A=
+2024-09-06T16:02:31.196691+03:00 proxmox kernel: [ =A0754.484663] =A0asm_co=
+mmon_interrupt+0x27/0x40=0A=
+2024-09-06T16:02:31.196692+03:00 proxmox kernel: [ =A0754.485032] RIP: 0010=
+:pv_native_safe_halt+0xb/0x10=0A=
+2024-09-06T16:02:31.196693+03:00 proxmox kernel: [ =A0754.485403] Code: 22 =
+d7 31 ff c3 cc cc cc cc 66 0f 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 =
+90 90 90 90 90 66 90 0f 00 2d 29 58 37 00 fb f4 <c3> cc cc cc cc 90 90 90 9=
+0 90 90 90 90 90 90 90 90 90 90 90 90 83=0A=
+2024-09-06T16:02:31.196702+03:00 proxmox kernel: [ =A0754.485806] RSP: 0018=
+:ffffb501c029fea0 EFLAGS: 00000246=0A=
+2024-09-06T16:02:31.196703+03:00 proxmox kernel: [ =A0754.486210] RAX: 0000=
+000000000000 RBX: 0000000000000008 RCX: 0000000000000000=0A=
+2024-09-06T16:02:31.196704+03:00 proxmox kernel: [ =A0754.486617] RDX: 0000=
+000000000000 RSI: 0000000000000000 RDI: 0000000000000000=0A=
+2024-09-06T16:02:31.196705+03:00 proxmox kernel: [ =A0754.487022] RBP: ffff=
+b501c029fea8 R08: 0000000000000000 R09: 0000000000000000=0A=
+2024-09-06T16:02:31.196706+03:00 proxmox kernel: [ =A0754.487427] R10: 0000=
+000000000000 R11: 0000000000000000 R12: ffffa0a207fa0000=0A=
+2024-09-06T16:02:31.196707+03:00 proxmox kernel: [ =A0754.487833] R13: 0000=
+000000000000 R14: 0000000000000000 R15: ffffa0a207fa0000=0A=
+2024-09-06T16:02:31.196708+03:00 proxmox kernel: [ =A0754.488241] =A0? defa=
+ult_idle+0x9/0x30=0A=
+2024-09-06T16:02:31.196709+03:00 proxmox kernel: [ =A0754.488645] =A0arch_c=
+pu_idle+0x9/0x10=0A=
+2024-09-06T16:02:31.196710+03:00 proxmox kernel: [ =A0754.489047] =A0defaul=
+t_idle_call+0x2c/0xf0=0A=
+2024-09-06T16:02:31.196711+03:00 proxmox kernel: [ =A0754.489449] =A0do_idl=
+e+0x216/0x260=0A=
+2024-09-06T16:02:31.196712+03:00 proxmox kernel: [ =A0754.489852] =A0cpu_st=
+artup_entry+0x2a/0x30=0A=
+2024-09-06T16:02:31.196712+03:00 proxmox kernel: [ =A0754.490252] =A0start_=
+secondary+0x119/0x140=0A=
+2024-09-06T16:02:31.196713+03:00 proxmox kernel: [ =A0754.490653] =A0second=
+ary_startup_64_no_verify+0x184/0x18b=0A=
+2024-09-06T16:02:31.196714+03:00 proxmox kernel: [ =A0754.491059] =A0</TASK=
+>=0A=
+2024-09-06T16:02:31.196715+03:00 proxmox kernel: [ =A0754.491453] handlers:=
+=0A=
+2024-09-06T16:02:31.196716+03:00 proxmox kernel: [ =A0754.491846] [<0000000=
+09e36e508>] i801_isr [i2c_i801]=0A=
+2024-09-06T16:02:31.196717+03:00 proxmox kernel: [ =A0754.492249] Disabling=
+ IRQ #16=0A=
+=0A=
+=0A=
+________________________________________=0A=
+From:=A0Alex Williamson <alex.williamson@redhat.com>=0A=
+Sent:=A0Thursday, September 12, 2024 1:12 AM=0A=
+To:=A0zdravko delineshev <delineshev@outlook.com>=0A=
+Cc:=A0Bjorn Helgaas <helgaas@kernel.org>; linux-pci@vger.kernel.org <linux-=
+pci@vger.kernel.org>; kvm@vger.kernel.org <kvm@vger.kernel.org>=0A=
+Subject:=A0Re: nointxmask device=0A=
+=A0=0A=
+On Tue, 10 Sep 2024 08:49:18 -0500=0A=
+Bjorn Helgaas <helgaas@kernel.org> wrote:=0A=
+=0A=
+> [+cc Alex, kvm]=0A=
+>=0A=
+> On Tue, Sep 10, 2024 at 01:13:41PM +0000, zdravko delineshev wrote:=0A=
+> >=0A=
+> > Hello,=0A=
+> >=0A=
+> > i found a note in the vfio-pci parameters to email devices fixed by the=
+ nointxmask parameter.=0A=
+> >=0A=
+> > Here is the one i have and i am trying to pass trough. it is currently =
+working fine, with nointxmask=3D1 .=0A=
+=0A=
+What are the symptoms without using nointxmask=3D1?=A0 Please provide any=
+=0A=
+dmesg snippets in the host related to using this device.=0A=
+=0A=
+> > 81:00.0 Audio device: Creative Labs EMU20k2 [Sound Blaster X-Fi Titaniu=
+m Series] (rev 03)=0A=
+> > =A0 =A0 =A0 =A0 Subsystem: Creative Labs EMU20k2 [Sound Blaster X-Fi Ti=
+tanium Series]=0A=
+> > =A0 =A0 =A0 =A0 Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASn=
+oop- ParErr+ Stepping- SERR+ FastB2B- DisINTx-=0A=
+> > =A0 =A0 =A0 =A0 Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast=
+ >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-=0A=
+> > =A0 =A0 =A0 =A0 Latency: 0, Cache Line Size: 32 bytes=0A=
+> > =A0 =A0 =A0 =A0 Interrupt: pin A routed to IRQ 409=0A=
+> > =A0 =A0 =A0 =A0 NUMA node: 1=0A=
+> > =A0 =A0 =A0 =A0 IOMMU group: 23=0A=
+> > =A0 =A0 =A0 =A0 Region 0: Memory at d3200000 (64-bit, non-prefetchable)=
+ [size=3D64K]=0A=
+> > =A0 =A0 =A0 =A0 Region 2: Memory at d3000000 (64-bit, non-prefetchable)=
+ [size=3D2M]=0A=
+> > =A0 =A0 =A0 =A0 Region 4: Memory at d2000000 (64-bit, non-prefetchable)=
+ [size=3D16M]=0A=
+> > =A0 =A0 =A0 =A0 Capabilities: [40] Power Management version 3=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Flags: PMEClk- DSI- D1- D2- AuxCurrent=
+=3D0mA PME(D0-,D1-,D2-,D3hot-,D3cold-)=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Status: D0 NoSoftRst- PME-Enable- DSel=
+=3D0 DScale=3D0 PME-=0A=
+> > =A0 =A0 =A0 =A0 Capabilities: [48] MSI: Enable- Count=3D1/1 Maskable- 6=
+4bit+=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Address: 0000000000000000 =A0Data: 0000=
+=0A=
+=0A=
+The device supports MSI, but the snd-ctxfs driver we have in the Linux=0A=
+kernel has no support for it, therefore reporting zero for the INTx pin=0A=
+is not an option.=0A=
+=0A=
+Are you able to verify a kernel patch?=0A=
+=0A=
+Adding it to the existing broken INTx quirk should simply be:=0A=
+=0A=
+diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c=0A=
+index a2ce4e08edf5..c7596e9aabb0 100644=0A=
+--- a/drivers/pci/quirks.c=0A=
++++ b/drivers/pci/quirks.c=0A=
+@@ -3608,6 +3608,8 @@ DECLARE_PCI_FIXUP_FINAL(0x1814, 0x0601, /* Ralink RT2=
+800 802.11n PCI */=0A=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qu=
+irk_broken_intx_masking);=0A=
+=A0DECLARE_PCI_FIXUP_FINAL(0x1b7c, 0x0004, /* Ceton InfiniTV4 */=0A=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qu=
+irk_broken_intx_masking);=0A=
++DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_CREATIVE, PCI_DEVICE_ID_CREATIVE_20K=
+2,=0A=
++=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 quirk_b=
+roken_intx_masking);=0A=
+=A0=0A=
+=A0/*=0A=
+=A0 * Realtek RTL8169 PCI Gigabit Ethernet Controller (rev 10)=0A=
+=0A=
+=0A=
+Thanks,=0A=
+Alex=0A=
+=0A=
+> > =A0 =A0 =A0 =A0 Capabilities: [58] Express (v2) Endpoint, MSI 00=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 DevCap: MaxPayload 128 bytes, PhantFunc=
+ 0, Latency L0s <64ns, L1 <1us=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ExtTag- AttnBtn- AttnIn=
+d- PwrInd- RBE+ FLReset- SlotPowerLimit 0W=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 DevCtl: CorrErr- NonFatalErr- FatalErr+=
+ UnsupReq-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 RlxdOrd+ ExtTag- PhantF=
+unc- AuxPwr+ NoSnoop+=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 MaxPayload 128 bytes, M=
+axReadReq 512 bytes=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 DevSta: CorrErr- NonFatalErr- FatalErr-=
+ UnsupReq- AuxPwr- TransPend-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 LnkCap: Port #0, Speed 2.5GT/s, Width x=
+1, ASPM L0s L1, Exit Latency L0s <64ns, L1 <1us=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ClockPM- Surprise- LLAc=
+tRep- BwNot- ASPMOptComp-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 LnkCtl: ASPM Disabled; RCB 64 bytes, Di=
+sabled- CommClk-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ExtSynch- ClockPM- AutW=
+idDis- BWInt- AutBWInt-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 LnkSta: Speed 2.5GT/s, Width x1=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 TrErr- Train- SlotClk- =
+DLActive- BWMgmt- ABWMgmt-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 DevCap2: Completion Timeout: Range ABCD=
+, TimeoutDis- NROPrPrP- LTR-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A010BitTagComp- 10BitT=
+agReq- OBFF Not Supported, ExtFmt- EETLPPrefix-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0EmergencyPowerReduct=
+ion Not Supported, EmergencyPowerReductionInit-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0FRS- TPHComp- ExtTPH=
+Comp-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0AtomicOpsCap: 32bit-=
+ 64bit- 128bitCAS-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 DevCtl2: Completion Timeout: 50us to 50=
+ms, TimeoutDis- LTR- 10BitTagReq- OBFF Disabled,=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0AtomicOpsCtl: ReqEn-=
+=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 LnkCtl2: Target Link Speed: 2.5GT/s, En=
+terCompliance- SpeedDis-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Transmit Margin: Nor=
+mal Operating Range, EnterModifiedCompliance- ComplianceSOS-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Compliance Preset/De=
+-emphasis: -6dB de-emphasis, 0dB preshoot=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 LnkSta2: Current De-emphasis Level: -6d=
+B, EqualizationComplete- EqualizationPhase1-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0EqualizationPhase2- =
+EqualizationPhase3- LinkEqualizationRequest-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Retimer- 2Retimers- =
+CrosslinkRes: unsupported=0A=
+> > =A0 =A0 =A0 =A0 Capabilities: [100 v1] Device Serial Number ff-ff-ff-ff=
+-ff-ff-ff-ff=0A=
+> > =A0 =A0 =A0 =A0 Capabilities: [300 v1] Advanced Error Reporting=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 UESta: =A0DLP- SDES- TLP- FCP- CmpltTO-=
+ CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 UEMsk: =A0DLP- SDES+ TLP- FCP- CmpltTO-=
+ CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq+ ACSViol-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- C=
+mpltAbrt- UnxCmplt- RxOF+ MalfTLP+ ECRC- UnsupReq- ACSViol-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CESta: =A0RxErr- BadTLP- BadDLLP- Rollo=
+ver- Timeout- AdvNonFatalErr+=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CEMsk: =A0RxErr- BadTLP- BadDLLP- Rollo=
+ver- Timeout- AdvNonFatalErr+=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 AERCap: First Error Pointer: 00, ECRCGe=
+nCap+ ECRCGenEn- ECRCChkCap+ ECRCChkEn-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 MultHdrRecCap- MultHdrR=
+ecEn- TLPPfxPres- HdrLogCap-=0A=
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 HeaderLog: 00000000 00000000 00000000 0=
+0000000=0A=
+> > =A0 =A0 =A0 =A0 Kernel driver in use: vfio-pci=0A=
+> > =A0 =A0 =A0 =A0 Kernel modules: snd_ctxfi=0A=
+> > 00: 02 11 0b 00 46 01 10 00 03 00 03 04 08 00 00 00=0A=
+> > 10: 04 00 20 d3 00 00 00 00 04 00 00 d3 00 00 00 00=0A=
+> > 20: 04 00 00 d2 00 00 00 00 00 00 00 00 02 11 44 00=0A=
+> > 30: 00 00 00 00 40 00 00 00 00 00 00 00 0b 01 00 00=0A=
+> > 40: 01 48 03 00 00 00 00 00 05 58 80 00 00 00 00 00=0A=
+> > 50: 00 00 00 00 00 00 00 00 10 00 02 00 00 80 00 00=0A=
+> > 60: 14 2c 20 00 11 0c 00 00 00 00 11 00 00 00 00 00=0A=
+> > 70: 00 00 00 00 00 00 00 00 00 00 00 00 0f 00 00 00=0A=
+> > 80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=0A=
+> > 90: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=0A=
+> > a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=0A=
+> > b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=0A=
+> > c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=0A=
+> > d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=0A=
+> > e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=0A=
+> > f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=A0=0A=
+>=0A=
 
