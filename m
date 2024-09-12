@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-26628-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26629-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 024729762EF
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 09:41:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99AAF9762F3
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 09:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3049DB23063
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 07:41:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9A23B220B9
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 07:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DFC419258E;
-	Thu, 12 Sep 2024 07:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C17190063;
+	Thu, 12 Sep 2024 07:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j7sV1Fqh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pm2CMFAb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D9C18FDDE
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4380E190047
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726126801; cv=none; b=TNX5i4rusQzmgRggPAJJWgMwI/RfdP3nU4sgcbrclKTsPS7wuYkngdbVZ4CAMJdhNW+tiKZk56Nkqu+4u2NgiabvokjOcLUm/u9w4YQRzm5AhKkuwrGsemWLutiOXPf1OMLOHFwq/2TMFOayNANBS9nGPpl2e2jupCqeIvz7zMY=
+	t=1726126802; cv=none; b=H0wwyd55WMdLvC13EKR4j66LFy2ggwsB9FZlI59mlq1Hd+KHKNiDykiehspmQYxyeE0D4WLvWzq1hMpzc6cXf9zPd0mrk+a3TYwsAjKRa3Y6v/5KH14unUY/P/V6mgtO/+1GixMM3NnfG5RwlVYZesqj3kDJ+ImSetM+KmtoDfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726126801; c=relaxed/simple;
-	bh=PhZK5jB8AGwL3Dlv0BhUdpfkS+HADWChfqJRb4K3skE=;
+	s=arc-20240116; t=1726126802; c=relaxed/simple;
+	bh=rGwr1vUCHvqHW+ILBB/ASnMP3I3a3rFp9bAatKHlp2c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tVm24yXcL5WwCmAfEAPQdFgpp4RwfNpP+jTh8VXm032feB8o9lsxikTfPYLkKetswadA4p201cpP09V9AzAFIO9zm6yujhb8YlUkNw0Nktr+I+x8QCgZE4BsJHR3K1lwJnTHLAG/ke+jzHK8EiCaGJZFE1zXOuTLuQopetM7D6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=j7sV1Fqh; arc=none smtp.client-ip=209.85.210.51
+	 MIME-Version; b=rRxVLlBIrd080utu6dO3EhPfzh2LMUgOXD4hmXkzpDlLK1Mb494tpYzURJrbItusC9Xy99wrZc5Yq4eHkh7x/C7an6gbxfG4VmNOgnnVH8GUrWPGmCDpwSIh8pBkUqUvcvPjm4nrURE2Pa/s1sSaOma2zht1JERIFUjWptyvsRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Pm2CMFAb; arc=none smtp.client-ip=209.85.210.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-710da656c0bso235536a34.0
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:39:58 -0700 (PDT)
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-70930972e19so185995a34.3
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:40:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726126798; x=1726731598; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726126800; x=1726731600; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/E70KJJTPx2V75BYTTVlugDcxiGJ3PzFoLEiBX1aDhc=;
-        b=j7sV1FqhTE4Nqy8h0xrxGU9XgX36n42LWilGltEUisefnL/LzDL7uCpr/imzv4O2fU
-         fG4bgwND/HV/yYW0GpmkCGMB2vGxURVVrlik53cgatEPqOq6Ho5+SSUTLHb8jng7M3uw
-         DClzoevD6eyhk4ybCd1mHPGQHmkV1te3MKVdDKx5AvP9MeH/sMazGCnCvehQVec4curt
-         r+BYKcC0/CIYETm/mpmd8+bcUODDSSemrIz/TTnv3utHkeq+ZT0I0pIU6s0OBcbIUgW5
-         Ko+7vAd+0hAvqKSupb6RNq6nPVhmmKGfHGhDsOARxvSv8r+9kRqQ7wRs0ZywpxyQhJn9
-         4WLw==
+        bh=F+rVp3/BLJYyjxO33P6GwzzAqjbQ85NDH2br5JtXUaQ=;
+        b=Pm2CMFAbgs9nRVC4e1o/NmmcButdVZgIoB/V2Zyvn57HrTvmgEVs9M6pDavNCJ0qjH
+         BCSKdn0n0b4ZHlLM2ZQ2Q6XAvuKlhZpARBmh15yO0fea31OjlliOj6h6CsQLpzmM+Tn0
+         RxnqE47ESAdPRcvVd5/hy3cD2jrknuH44A437+7CVQ3GmuSHQ0hA52ADP5sFEgoSSoCl
+         9OpoWLlHpXEx/uCtlej9RtQIXED5AXSQyRC6oEnoxbcn9HTD0hKRis9Y+G90taTiZmZK
+         P0bBgXhvytWaG3O6yM3W7/DyhxyRSS5Q2cox9HbTnjUHQJhP0asaV7Ex0YUjPkoueG8a
+         lJ0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726126798; x=1726731598;
+        d=1e100.net; s=20230601; t=1726126800; x=1726731600;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/E70KJJTPx2V75BYTTVlugDcxiGJ3PzFoLEiBX1aDhc=;
-        b=V7fGEsZRiKIs8PSaReMrw6ln8Hv93MnMs8jVyeEseFgPah8OwsqcX+qPVqMM7J/Z9R
-         ghc7eu/B/ecr5hrlO1RIeMLxDjTIoZVw3JVs2eTW3nyv1H8rvnXE71OyDZMwkgAj38IZ
-         mtb9xW6JEwN4un0Y8EHrazLxpptUqbt9LeYOwA13qYCIeVfxhq8hmLaaOe393ux1QWjr
-         HA41CBTWQBCteSFUCLaA/VM8MnFKGjb1tEp6xJANxq5xG4OOIUZ9VMexdxENjyr7uwBB
-         Jv4DdQR1/dC7AY9X6kZCCg1RixV/TbXnhYAcZuc/zs3OZtqGqU+uZoRlnk5eIVPufALU
-         9akw==
-X-Forwarded-Encrypted: i=1; AJvYcCXc0MswY6LoMP5phdFV6gGkouAks1GiEPi2EupTxUt5ij3/JIQ8f9bI6+Sye5ssYR/35Z8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwH0SminX3quqDyljvdZostGRAwFGjhWQlJbWDbLG9EVTF/YvM/
-	ptu9f0lJI/tvMJTKewuutsTXnbzNPG9u5xGj4MmQK3GWLJ3Q0HVL6P97xtiA1hA=
-X-Google-Smtp-Source: AGHT+IG5ne8GTfzcAIBppwGJ8l4Yooy0KY6YC3wG/455mCNEr6eNEp84R9bb0cy5D5sMvEwevLyaeg==
-X-Received: by 2002:a05:6830:d02:b0:710:bffc:a28e with SMTP id 46e09a7af769-7110949a084mr1707232a34.19.1726126797795;
-        Thu, 12 Sep 2024 00:39:57 -0700 (PDT)
+        bh=F+rVp3/BLJYyjxO33P6GwzzAqjbQ85NDH2br5JtXUaQ=;
+        b=N+dUzA461DhwGsM5IqtmRSn+gJJZIgnCluUL7FVITtZv/jpFWs+Dmnf6NTuUX5m67S
+         jT9B1Hm97+XoKZ/kTIYjx6s3b4+fpy+0M2YjYhqz8nVF37RarYwSjjs1obgBQDhF5GJH
+         3Mp6P9fHEywO50AuRg+vP+H1lboR+vI6krsrKBner3mZ8s/puSiXGI9U+i0QW/P7RW8K
+         vQe3Yxp955XiszrTPXFJJRM9+e5yYqoT1Cpy7AcnO0uCbWM7gjCkyVUOw8iUk0pK0MPz
+         6fFk/eITqZjv6fnfLQsiMAXLEsglpW0tg59cqPsTCu4bvt6x1fnky1yOeXMi+2vUWCrj
+         Xx5w==
+X-Forwarded-Encrypted: i=1; AJvYcCXSN+3JfC2j++YdJTUxRre3hxmXSTgqNXuanQZ3HDuLWJLA4WXpQLP7Roz3d1dDtHt/PqE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkXAaittE7YFOOeKrPNaW2MKMNp0UKeyrDbWlw5T1s7cdB8CBk
+	VXo16H9ylg6dL2sXlb/8YvrzriQY9KU0/B0tLRFFFz9ojUWDgM+dNDPhMq2BXgs=
+X-Google-Smtp-Source: AGHT+IG6+n9GSh9VOQuGu9AiTjxnE8dPu+UEy8HMFEQWjdljbFKlQEVbTyzIuHmcncyWJBtD1Vjx6g==
+X-Received: by 2002:a05:6830:4994:b0:710:b19a:cea3 with SMTP id 46e09a7af769-711094727c0mr2302235a34.13.1726126800291;
+        Thu, 12 Sep 2024 00:40:00 -0700 (PDT)
 Received: from linaro.vn.shawcable.net ([2604:3d08:9384:1d00::9633])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fb9ad87sm983458a12.6.2024.09.12.00.39.55
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fb9ad87sm983458a12.6.2024.09.12.00.39.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 00:39:57 -0700 (PDT)
+        Thu, 12 Sep 2024 00:39:59 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Jason Wang <jasowang@redhat.com>,
@@ -133,9 +133,9 @@ Cc: Jason Wang <jasowang@redhat.com>,
 	Weiwei Li <liwei1518@gmail.com>,
 	Markus Armbruster <armbru@redhat.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 12/48] tests/qtest: replace assert(0) with g_assert_not_reached()
-Date: Thu, 12 Sep 2024 00:38:45 -0700
-Message-Id: <20240912073921.453203-13-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 13/48] tests/unit: replace assert(0) with g_assert_not_reached()
+Date: Thu, 12 Sep 2024 00:38:46 -0700
+Message-Id: <20240912073921.453203-14-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
 References: <20240912073921.453203-1-pierrick.bouvier@linaro.org>
@@ -152,62 +152,33 @@ g_assert_not_reached() rather than an ad hoc mix of different
 assertion mechanisms.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- tests/qtest/ipmi-bt-test.c  | 2 +-
- tests/qtest/ipmi-kcs-test.c | 4 ++--
- tests/qtest/rtl8139-test.c  | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ tests/unit/test-xs-node.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qtest/ipmi-bt-test.c b/tests/qtest/ipmi-bt-test.c
-index 383239bcd48..13f7c841f59 100644
---- a/tests/qtest/ipmi-bt-test.c
-+++ b/tests/qtest/ipmi-bt-test.c
-@@ -251,7 +251,7 @@ static void emu_msg_handler(void)
-         msg[msg_len++] = 0xa0;
-         write_emu_msg(msg, msg_len);
-     } else {
+diff --git a/tests/unit/test-xs-node.c b/tests/unit/test-xs-node.c
+index ac94e7ed6c2..2f447a73fb8 100644
+--- a/tests/unit/test-xs-node.c
++++ b/tests/unit/test-xs-node.c
+@@ -212,7 +212,7 @@ static void compare_tx(gpointer key, gpointer val, gpointer opaque)
+         printf("Comparison failure in TX %u after serdes:\n", tx_id);
+         dump_ref("Original", t1->root, 0);
+         dump_ref("Deserialised", t2->root, 0);
 -        g_assert(0);
 +        g_assert_not_reached();
      }
+     g_assert(t1->nr_nodes == t2->nr_nodes);
  }
- 
-diff --git a/tests/qtest/ipmi-kcs-test.c b/tests/qtest/ipmi-kcs-test.c
-index afc24dd3e46..3186c6ad64b 100644
---- a/tests/qtest/ipmi-kcs-test.c
-+++ b/tests/qtest/ipmi-kcs-test.c
-@@ -145,7 +145,7 @@ static void kcs_cmd(uint8_t *cmd, unsigned int cmd_len,
-         break;
- 
-     default:
--        g_assert(0);
-+        g_assert_not_reached();
-     }
-     *rsp_len = j;
- }
-@@ -184,7 +184,7 @@ static void kcs_abort(uint8_t *cmd, unsigned int cmd_len,
-         break;
- 
-     default:
+@@ -257,7 +257,7 @@ static void check_serdes(XenstoreImplState *s)
+         printf("Comparison failure in main tree after serdes:\n");
+         dump_ref("Original", s->root, 0);
+         dump_ref("Deserialised", s2->root, 0);
 -        g_assert(0);
 +        g_assert_not_reached();
      }
  
-     /* Start the abort here */
-diff --git a/tests/qtest/rtl8139-test.c b/tests/qtest/rtl8139-test.c
-index eedf90f65af..55f671f2f59 100644
---- a/tests/qtest/rtl8139-test.c
-+++ b/tests/qtest/rtl8139-test.c
-@@ -65,7 +65,7 @@ PORT(IntrMask, w, 0x3c)
- PORT(IntrStatus, w, 0x3E)
- PORT(TimerInt, l, 0x54)
- 
--#define fatal(...) do { g_test_message(__VA_ARGS__); g_assert(0); } while (0)
-+#define fatal(...) do { g_test_message(__VA_ARGS__); g_assert_not_reached(); } while (0)
- 
- static void test_timer(void)
- {
+     nr_transactions1 = g_hash_table_size(s->transactions);
 -- 
 2.39.2
 
