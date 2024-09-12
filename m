@@ -1,168 +1,123 @@
-Return-Path: <kvm+bounces-26727-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26728-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAC63976C88
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 16:47:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F2E3976C8D
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 16:48:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A197E1F24A8C
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 14:47:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69452B24884
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 14:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDC51BBBFE;
-	Thu, 12 Sep 2024 14:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C731BAEF0;
+	Thu, 12 Sep 2024 14:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PH7ncove"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LWW9yDkB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0153A1DB;
-	Thu, 12 Sep 2024 14:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC3A14293
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 14:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726152355; cv=none; b=jAJgG1efFgl6veCVJEnFKwcfaj34XIyTbI8d9Sh4y2ruDoqo1VoXQcmCR+Szz0KH9LH8W4MgleERqEwMMtI5bu4IqIx/MF/buvdgQkkDEJNeGd7ObW4Rj/C1nrImAg38rhnsrv+fjhBY6SvF6gmxy2zMZjQbV9eXkxIu8f3lylg=
+	t=1726152419; cv=none; b=TngfY5TkzRrrxXyNhFmwvOGpHdUh4NjdmA1pV++kberlxmnCppuBbh2AtiSiF02Yb+OKWB2vKAUG+OmGK/udbJO1Nqmeto6U/IW3blvJx5LJCTjOUEBzCFviXcmF0NkR98CzTxVRSiq5GlqszaJOp6Pf2QGV/o4TTe62qVteas8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726152355; c=relaxed/simple;
-	bh=FWIWJhbC+YhtqzC3zdmfLYeQqacvFMaqlLEVi/oubFs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BmihlAn2eIex++2e1FYL1ULFCbKlvIxCBf7f9xs9BQgx3hJYtP8dTezKkP03xbQVHecgSF4PHLGS02dFZsu9h/NpbTTUVkjae/lnh4Hsf3r82Lqb7SmyFaBhhrjKiWi2nLe6ZczemKEY220bRM5kdeA+RML6GTiCqF4OqG2HLQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PH7ncove; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726152354; x=1757688354;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=FWIWJhbC+YhtqzC3zdmfLYeQqacvFMaqlLEVi/oubFs=;
-  b=PH7ncove/wSPYj9wzQ9sPjlKZzTSURvGAjlW8cYH5nOCPX7b6z20JVL0
-   y1rVohUGqxXHaCvoDmacfG8PBAUyXc+zOCTuY69vaXjEKBe9P/G4Xt5V3
-   cz92/wmYUB02G2i4HvQmKgxSZszVSqFajQSzmzCjOeDU0JjMVYEXLRCle
-   f01EL63fG9vjz/XA7nKDQ6rCZI4R87fOiRe01MW/bOhbjaARTA1SpnfKb
-   3gVSjtq2kdskE0AJrmj1N7WYPdcxuX3Z/GXPx1822MPo6lIVQDKGKsYrG
-   K+suqDhxqqeH3j1YA0u0KTtSZvTWvXo0eyGUhJr/k8sN+4xK/Z3/wcfiL
-   w==;
-X-CSE-ConnectionGUID: dUaKcokyQX+ia3Q0wsg87g==
-X-CSE-MsgGUID: 4rD5kHxRSX6pgn4+dvlTmg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11193"; a="24833082"
-X-IronPort-AV: E=Sophos;i="6.10,223,1719903600"; 
-   d="scan'208";a="24833082"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 07:45:46 -0700
-X-CSE-ConnectionGUID: bTWZPzvvQpG2UlgNaeWI2g==
-X-CSE-MsgGUID: UxRluXfsQkKvmn1DZekJ7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,223,1719903600"; 
-   d="scan'208";a="67985421"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.224.38]) ([10.124.224.38])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 07:45:42 -0700
-Message-ID: <df05e4fe-a50b-49a8-9ea0-2077cb061c44@intel.com>
-Date: Thu, 12 Sep 2024 22:45:39 +0800
+	s=arc-20240116; t=1726152419; c=relaxed/simple;
+	bh=tpdgi4juBb051AiOwZ5loJ0Avk2Y9YVyXPUQ57w6zTk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Soj1NN/QbLz9fu/c2BiKNcDBtmnsa4mr8lAx26LWorgcwFlVhUgsj19ttLXbCUvOulSa7/edYiSF01Au2rezfFU84Mbm1kkzQe2BjQmat8Nx+A06ZTMGIkJeptTj+qpw5dZcrqk3FYMvsf9QIu1bmyzw4PJmEY8vKbQ1a7pNihE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LWW9yDkB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726152417;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tpdgi4juBb051AiOwZ5loJ0Avk2Y9YVyXPUQ57w6zTk=;
+	b=LWW9yDkBBnvJQc0+nXBykRoboaZyYWVBqj0g4nqgE0pxJ2PWFxAnt/DpuOC3oMOHfVa7ot
+	weObX6hXjKzqPsqleHTqkFN3fECOSTk8MPI+K3hIG+W7mhVNgNnYR3wCU0WSErjoukKn5W
+	TKWuDMRaZSb8xx6J7fc22kQ70FSiP5U=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-201-XHV2DcpNOCaxQlEVFhfofw-1; Thu, 12 Sep 2024 10:46:53 -0400
+X-MC-Unique: XHV2DcpNOCaxQlEVFhfofw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3730b54347cso504063f8f.1
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:46:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726152412; x=1726757212;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tpdgi4juBb051AiOwZ5loJ0Avk2Y9YVyXPUQ57w6zTk=;
+        b=DH5nL6WoYwEp1O9Ds/zKXjoag7CvMudJat1YCUnu/yrcd7AvCt3ymDQexeRzzU0YKe
+         beJEGEfl5zPBGC8aujCNyCjWMyNsNV0x1UTyptOmC+DcfNOl5ZgVRc7nQWI4a/D1QSHp
+         +sTUynArz9DoUC6BkFxsE7FU2UqXktdswrqxfQ4574U//aDEXRtBYj6KuMMpA05SLN3v
+         KlnYxiMs8X4ScAyMfPPyInOTaQTDtTEI7a3/8D6ZbChjZFXmlgJuZgmwuSaxUK9+M/M+
+         5rDObGOUpq9IJhCuD6oz+xhVDDMa3nca/eO0cdQ90KlRetqH327UgTZ0UFOLGF4LenEO
+         E35A==
+X-Forwarded-Encrypted: i=1; AJvYcCWnZmq4RrHUqeAJl+k0kyhmmL8MQqaIUCRmkRuoGXvQi4qAdOdD9FKblSkvYt0RJPk1OMM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1LWkSUzReqBJprnvEOTaFx7npqKiSYIHAFuNf1JKRl/lsrJNu
+	H47Z744i+djGKdtmYDVAs1nP2st8g0ugQeyVrSpH4sCMBp3GtRaKxbmLRurnktqG0WYR3vqC+0F
+	h1858Xx/16D23jmF8QNnurjkofegHvb5lsG/tApFWNU++90/HpmT4DhMNN+OGgbQ8CzD6eNYY74
+	XpPTchqGaAqMLUHui8yOP40Ztq
+X-Received: by 2002:a05:6000:128b:b0:374:c911:7756 with SMTP id ffacd0b85a97d-378c2d5a0b9mr1767653f8f.38.1726152412431;
+        Thu, 12 Sep 2024 07:46:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGXOt7eWeKrY/oke1uOUY9JGn1eMWvkplmC6z0F6bdmjBjP9Jctk6jvW8//ZU8X0ryKSQz/AKC9pD2uLCl6aP8=
+X-Received: by 2002:a05:6000:128b:b0:374:c911:7756 with SMTP id
+ ffacd0b85a97d-378c2d5a0b9mr1767637f8f.38.1726152411958; Thu, 12 Sep 2024
+ 07:46:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 25/25] KVM: x86: Add CPUID bits missing from
- KVM_GET_SUPPORTED_CPUID
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
- kvm@vger.kernel.org, kai.huang@intel.com, isaku.yamahata@gmail.com,
- tony.lindgren@linux.intel.com, linux-kernel@vger.kernel.org
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-26-rick.p.edgecombe@intel.com>
- <05cf3e20-6508-48c3-9e4c-9f2a2a719012@redhat.com>
- <cd236026-0bc9-424c-8d49-6bdc9daf5743@intel.com>
- <CABgObfbyd-a_bD-3fKmF3jVgrTiCDa3SHmrmugRji8BB-vs5GA@mail.gmail.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <CABgObfbyd-a_bD-3fKmF3jVgrTiCDa3SHmrmugRji8BB-vs5GA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240904030751.117579-1-rick.p.edgecombe@intel.com>
+ <20240904030751.117579-6-rick.p.edgecombe@intel.com> <8761e1b8-4c65-4837-b152-98be86cf220d@intel.com>
+ <ZuLzl6reeDH_1fFh@google.com> <d5c49c918a86d37995ed6388c1e77cd41fc51c19.camel@intel.com>
+In-Reply-To: <d5c49c918a86d37995ed6388c1e77cd41fc51c19.camel@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 12 Sep 2024 16:46:39 +0200
+Message-ID: <CABgObfZsqf7BbXo0CzyDOAG=x_GucHt-kANQHLa=on9RhE_ngg@mail.gmail.com>
+Subject: Re: [PATCH 05/21] KVM: VMX: Teach EPT violation helper about private mem
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "seanjc@google.com" <seanjc@google.com>, "Huang, Kai" <kai.huang@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "nik.borisov@suse.com" <nik.borisov@suse.com>, 
+	"dmatlack@google.com" <dmatlack@google.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/12/2024 10:09 PM, Paolo Bonzini wrote:
-> On Thu, Sep 12, 2024 at 9:48 AM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->> On 9/11/2024 1:52 AM, Paolo Bonzini wrote:
->>> On 8/13/24 00:48, Rick Edgecombe wrote:
->>>> For KVM_TDX_CAPABILITIES, there was also the problem of bits that are
->>>> actually supported by KVM, but missing from get_supported_cpuid() for one
->>>> reason or another. These include X86_FEATURE_MWAIT, X86_FEATURE_HT and
->>>> X86_FEATURE_TSC_DEADLINE_TIMER. This is currently worked around in
->>>> QEMU by
->>>> adjusting which features are expected.
->>
->> I'm not sure what issue/problem can be worked around in QEMU.
->> QEMU doesn't expect these bit are reported by KVM as supported for TDX.
->> QEMU just accepts the result reported by KVM.
-> 
-> QEMU already adds some extra bits, for example:
-> 
->          ret |= CPUID_EXT_HYPERVISOR;
->          if (kvm_irqchip_in_kernel() &&
->                  kvm_check_extension(s, KVM_CAP_TSC_DEADLINE_TIMER)) {
->              ret |= CPUID_EXT_TSC_DEADLINE_TIMER;
->          }
-> 
->> The problem is, TDX module and the hardware allow these bits be
->> configured for TD guest, but KVM doesn't allow. It leads to users cannot
->> create a TD with these bits on.
-> 
-> KVM is not going to have any checks, it's only going to pass the
-> CPUID to the TDX module and return an error if the check fails
-> in the TDX module.
+On Thu, Sep 12, 2024 at 4:43=E2=80=AFPM Edgecombe, Rick P
+<rick.p.edgecombe@intel.com> wrote:
+>
+> On Thu, 2024-09-12 at 06:58 -0700, Sean Christopherson wrote:
+> > > Which clearly says it is checking the *faulting* GPA.
+> >
+> > I don't think that necessarily solves the problem either, because the r=
+eader
+> > has
+> > to know that the KVM looks at the shared bit.
+> >
+> > If open coding is undesirable
+>
+> Yea, I think it's used in enough places that a helper is worth it.
+>
+> > , maybe a very literal name, e.g. vmx_is_shared_bit_set()?
+>
+> Sure, thanks.
 
-If so, new feature can be enabled for TDs out of KVM's control.
+I didn't see a problem with kvm_is_private_gpa(), but I do prefer
+something that has vmx_ or vt_ in the name after seeing it. My
+preference would go to something like vt_is_tdx_private_gpa(), but I'm
+not going to force one name or another.
 
-Is it acceptable?
-
-> KVM can have a TDX-specific version of KVM_GET_SUPPORTED_CPUID, so
-> that we can keep a variant of the "get supported bits and pass them
-> to KVM_SET_CPUID2" logic, but that's it.
-> 
->>> This is the kind of API that we need to present for TDX, even if the
->>> details on how to get the supported CPUID are different.  Not because
->>> it's a great API, but rather because it's a known API.
->>
->> However there are differences for TDX. For legacy VMs, the result of
->> KVM_GET_SUPPORTED_CPUID isn't used to filter the input of KVM_SET_CPUID2.
->> But for TDX, it needs to filter the input of KVM_TDX_VM_INIT.CPUID[]
->> because TDX module only allows the bits that are reported as
->> configurable to be set to 1.
-> 
-> Yes, that's userspace's responsibility.
-> 
->> With current designed API, QEMU can only know which bits are
->> configurable before KVM_TDX_VM_INIT, i.e., which bits can be set to 1 or
->> 0 freely.
-> 
-> The API needs userspace to have full knowledge of the
-> requirements of the TDX module, if it wants to change the
-> defaults provided by KVM.
-> 
-> This is the same as for non-TDX VMs (including SNP).  The only
-> difference is that TDX and SNP fails, while non-confidential VMs
-> get slightly garbage CPUID.
-> 
->> For other bits not reported as configurable, QEMU can know the exact
->> value of them via KVM_TDX_GET_CPUID, after KVM_TDX_VM_INIT and before
->> TD's running. With it, QEMU can validate the return value is matched
->> with what QEMU wants to set that determined by users input. If not
->> matched, QEMU can provide some warnings like what for legacy VMs:
->>
->>     - TDX doesn't support requested feature: CPUID.01H.ECX.tsc-deadline
->> [bit 24]
->>     - TDX forcibly sets features: CPUID.01H:ECX.hypervisor [bit 31]
->>
->> If there are ioctls to report the fixed0 bits and fixed1 bits for TDX,
->> QEMU can validate the user's configuration earlier.
-> 
-> Yes, that's fine.
-> 
-> Paolo
-> 
+Paolo
 
 
