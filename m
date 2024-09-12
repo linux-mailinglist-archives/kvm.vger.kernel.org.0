@@ -1,295 +1,196 @@
-Return-Path: <kvm+bounces-26614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3FC59761FE
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 08:58:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 946AC9762BC
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 09:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E86C01C231C7
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 06:58:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE3FFB21191
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2024 07:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF65E18C906;
-	Thu, 12 Sep 2024 06:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B3E18C921;
+	Thu, 12 Sep 2024 07:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1K+xSA0"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mDstQUWS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD25B18BB89
-	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 06:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FFA18858F
+	for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 07:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726124251; cv=none; b=P3E9biACyMRexZTN3g4FI5eJnGlmavcZPp+W43yBWkGje7s9ZMQz/AyNdw0XmwveUYo+fDCq6NUOVhCqWMVjDVLQYJ9v7u8hB2jKh5407Q9tWEQepStXdlkiu9w+bkKirXguF5KMiMs7q5ijPPtxJagPp31lHN1NSXHmsfGkDrw=
+	t=1726126376; cv=none; b=rKCTK01zxUIJ1FqRrGW3LtYa5qQgqRYN9cnKJqFs8FUldAujqxKLJn7/mXK6A5SCv9aTBxAEQ8sc3cILev/6pY8ZG/z7HutWR+TUIe9407Y+dYYQ3j+QgPNBu8rpUJNz+upMn6pabIql93rBuP+2TuRjpN6jAMtEoEhNm77PPxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726124251; c=relaxed/simple;
-	bh=c41U737DvIbyS3rQw7wuHXZTvfLKDNamYnqZSCT+gW0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WnSl7sz6gR1+X0e7Xg2H76W3O44wIvFhKjD6hv0HtfNUc2+oAUixVEs/BFGL1rTWhQASsNoBP0FStxbpONE6Pz7ZOw8003MxN0/a0B5zU2S1uu7u5jWr2fSiqMn17jiB3cffa/GXYH6Yzx2GC6nB31eN3xylRJR1cNMRMYI13qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D1K+xSA0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726124246;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DPuZRy5RtmH3L7P/pdVOYsdMJ2O6tjAAwnmHh6w1Hw8=;
-	b=D1K+xSA0rRTjdtF9nViuBzZ1zn9aRMFpMsDRIb+0SC9NzEjnfPUjjpJSCMJrAYSzQmwkB1
-	Eo/+f2DjmXQ5ZFHvQXI3soVeo3fCN1F7/zLDddyS3cUPfB1f6D7uM3BlbVjsR5Lx3WLeY9
-	9lcVe/VlgehwA852B7xo3UCblj6zD7o=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-390-0oyMvtF-NlG2WtfBd4fAuQ-1; Thu, 12 Sep 2024 02:57:25 -0400
-X-MC-Unique: 0oyMvtF-NlG2WtfBd4fAuQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cbadcbb6eso4091345e9.2
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2024 23:57:25 -0700 (PDT)
+	s=arc-20240116; t=1726126376; c=relaxed/simple;
+	bh=FzBKh+AU40CN9oHzR3BSVFgBams1zQxhZ8kcZSCD9k0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ILVUseFPbnDoYftcNqNw91ktTSs9X1zAsdDwD6qzkqCOA2Se1i9guDTzR2wuBMqAL75p86gp6TISg9Y2WuU2YKtMoj5EyJpBquCAblSQ2cD+8Bv5QkqUKBMfLy7rQhXvcBweESz+s6Xgxc3FmJtnquZ+p6U1dlmrn6MNVy6jrvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mDstQUWS; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5356ab89665so701404e87.1
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 00:32:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1726126373; x=1726731173; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mORgeThFItSKRVvwL2eU52STgrT61e2xyY47HCtu0j0=;
+        b=mDstQUWSJRX8uSlNgce//qZYi6Hwex4k0yIuHiYiZruBEiYmJwgBWHlQThm+qf4Th0
+         xJEclNObmybulIGEAi58NDZDBzsazgnmIBjXNwpPZgfp4/d/uHFUnXX+X5No7rmDHYVM
+         bM4/twqLZRveYGWhK4eDq15mmJ6kDJxG29p4UNyTKj8qnA0fXGd62A2iElMXWdsVSanY
+         Z2vcLikEg/Hn0f8WsJ8cfF7LZJQkVKhW6vsF6Evkzu8K9p56Hi0vYe4KDh24KtUH+rHD
+         HnDiYDTYO0SDaxF6yFCls5CDbtbuo7s2sKLMl9A51CNvXNYHXMehPONPdOa2NE/0b0eY
+         vyiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726124244; x=1726729044;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DPuZRy5RtmH3L7P/pdVOYsdMJ2O6tjAAwnmHh6w1Hw8=;
-        b=EAUiU/KB2QInRUhHaDtksiScU/ry6ybE05RLWIvsGLR/spY8n1EFT237oTO/dVy+UC
-         3pyTJ0TRfz/IawLq7+aSzgxCZH+aShPg0mdHKD3ajQKqveJkzuu3aYY78lmvh08vYnKo
-         sOxR6BP7upy5SGgSlAUYQy35dOytBcvn8oHcHPahMPXI+RXLRGZlkEY9Kv7FPl4gtpJ1
-         8yWizEvq9C34ENv/7UEj0vBlTIlJaLYkSCQtNZlRzI0tLHB8/DzgeIQ5GLs3mww/uLPX
-         nwfB+LGAcDA12JTGoVUt44iAMYNakpYsN9wpJFiJGQfMg9j+wOAazZZIoWqwUCi2iZej
-         yuKw==
-X-Forwarded-Encrypted: i=1; AJvYcCWBLvmnW5GDArOoNp3LNbd1Iezapojxhbyi66tEL5ngnzQcDm4giED+q9mA0Yl6/m7noIA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywamg4wq4U6vIVE3uSJKJE+LkksX4xS0GHzPae3jkRrCZWVlUnu
-	0taOj+QFv0zga7Kg9DISZTnhoJoVL3D7YBpiolg4d9Fm6pD920+C13pysFNmebwIBeTZVQ3DSND
-	YWPweTO/ySOLnWobo9gJYXpBHwUB8vBW43jVHX71favSI7I+6IA==
-X-Received: by 2002:a05:600c:45cf:b0:42c:a802:540a with SMTP id 5b1f17b1804b1-42cdb511f33mr14269665e9.7.1726124244021;
-        Wed, 11 Sep 2024 23:57:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGXqL1cN5bc6oEjTaDawFfKLkvgvogi3g7n3oqVfDLLfZUD5MCgnoC0hHuYgrIgCx12yMiOQA==
-X-Received: by 2002:a05:600c:45cf:b0:42c:a802:540a with SMTP id 5b1f17b1804b1-42cdb511f33mr14269415e9.7.1726124243343;
-        Wed, 11 Sep 2024 23:57:23 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:55d:cf1c:50e8:cd2d:1a0a:6371])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42cdf25282bsm8989165e9.33.2024.09.11.23.57.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 23:57:22 -0700 (PDT)
-Date: Thu, 12 Sep 2024 02:57:19 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Max Gurtovoy <mgurtovoy@nvidia.com>, stefanha@redhat.com,
-	virtualization@lists.linux.dev, axboe@kernel.dk,
-	kvm@vger.kernel.org, linux-block@vger.kernel.org, oren@nvidia.com
-Subject: Re: [PATCH v2] virtio_blk: implement init_hctx MQ operation
-Message-ID: <20240912025124-mutt-send-email-mst@kernel.org>
-References: <20240807224129.34237-1-mgurtovoy@nvidia.com>
- <CGME20240912064617eucas1p1c3191629f76e04111d4b39b15fea350a@eucas1p1.samsung.com>
- <fb28ea61-4e94-498e-9caa-c8b7786d437a@samsung.com>
+        d=1e100.net; s=20230601; t=1726126373; x=1726731173;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mORgeThFItSKRVvwL2eU52STgrT61e2xyY47HCtu0j0=;
+        b=bvBU/sQ29eR3mg7S0RJUPI3Q2Rim9igV64HaFAGaPiq/PvMcpIsobAAzKGjKewoIYA
+         rmR/KkNVsvsahLpZa0eRIySaPTL93SnhWG9hFy8BbgSoGjMngwcvTCdm6Bp0yXA84MRC
+         IDLlFcsU2+1cPJhZW9ndd5tIK0TQT1/MvpFBoAZIP9vT71JZbTkyK4zrNhu9ODw45OQL
+         SKrNU0voFgmTin42Tm7QuxmKkNmbMJYVHKtrmFSzkHS2tLBYsy/xljK/HMLOLLwIeoqB
+         HoxTi5TCncdiVvlg3FDdwuqxsoSTMi5m8mo7YBbNVxhL3l9+CfE1PxqCOUhpIuJcMa/H
+         MGng==
+X-Forwarded-Encrypted: i=1; AJvYcCX/Rq+huYgRRwCYKWEvuENJVedJkzD0XqY16UJEaKjbMzB3tlPo4RXs1g5fVaArYMy/htI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSAjLy9s0CSjj6ifoRqREjflXDR0J8LjDfpP3ycdeDdqBI8Zfi
+	kUFvzJeqd+wD/cIWKas4nG3BlVMEq3UgyAtjXMpofryoO+VrV1fbbPZP6inptQdiIRhevN3Umes
+	wBMykwAXXLg3PJRMFCPaXHwu7fQpEQmpSigbp7T9Qq7RUVONBGCnCrY6Kf2WS9Q==
+X-Google-Smtp-Source: AGHT+IE2qH+DDo5DbegofrZD/Jk3qp04GIJFuzg8g/g2YGLkO7heSfzNnSID+VNatE+0Yyh1SXo2NwGwNJsgxGu/4kI=
+X-Received: by 2002:a05:6512:ac9:b0:535:d4e9:28bb with SMTP id
+ 2adb3069b0e04-53678feb448mr861902e87.46.1726126371795; Thu, 12 Sep 2024
+ 00:32:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fb28ea61-4e94-498e-9caa-c8b7786d437a@samsung.com>
+References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
+ <Zs5Fom+JFZimFpeS@Asurada-Nvidia> <CABQgh9HChfeD-H-ghntqBxA3xHrySShy+3xJCNzHB74FuncFNw@mail.gmail.com>
+ <ee50c648-3fb5-4cb4-bc59-2283489be10e@linux.intel.com>
+In-Reply-To: <ee50c648-3fb5-4cb4-bc59-2283489be10e@linux.intel.com>
+From: Zhangfei Gao <zhangfei.gao@linaro.org>
+Date: Thu, 12 Sep 2024 15:32:40 +0800
+Message-ID: <CABQgh9H2+uTgsQxgLSuua7h0kxSwfYZE1=GM1TA4H30jNsM9OQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
+To: Baolu Lu <baolu.lu@linux.intel.com>
+Cc: Nicolin Chen <nicolinc@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, acpica-devel@lists.linux.dev, 
+	Hanjun Guo <guohanjun@huawei.com>, iommu@lists.linux.dev, 
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
+	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
+	Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Moritz Fischer <mdf@kernel.org>, 
+	Michael Shavit <mshavit@google.com>, patches@lists.linux.dev, 
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Sep 12, 2024 at 08:46:15AM +0200, Marek Szyprowski wrote:
-> Dear All,
-> 
-> On 08.08.2024 00:41, Max Gurtovoy wrote:
-> > Set the driver data of the hardware context (hctx) to point directly to
-> > the virtio block queue. This cleanup improves code readability and
-> > reduces the number of dereferences in the fast path.
+On Thu, 12 Sept 2024 at 12:29, Baolu Lu <baolu.lu@linux.intel.com> wrote:
+>
+> On 9/12/24 11:42 AM, Zhangfei Gao wrote:
+> > On Wed, 28 Aug 2024 at 05:32, Nicolin Chen<nicolinc@nvidia.com>  wrote:
+> >> On Tue, Aug 27, 2024 at 12:51:30PM -0300, Jason Gunthorpe wrote:
+> >>> This brings support for the IOMMFD ioctls:
+> >>>
+> >>>   - IOMMU_GET_HW_INFO
+> >>>   - IOMMU_HWPT_ALLOC_NEST_PARENT
+> >>>   - IOMMU_DOMAIN_NESTED
+> >>>   - ops->enforce_cache_coherency()
+> >>>
+> >>> This is quite straightforward as the nested STE can just be built in the
+> >>> special NESTED domain op and fed through the generic update machinery.
+> >>>
+> >>> The design allows the user provided STE fragment to control several
+> >>> aspects of the translation, including putting the STE into a "virtual
+> >>> bypass" or a aborting state. This duplicates functionality available by
+> >>> other means, but it allows trivially preserving the VMID in the STE as we
+> >>> eventually move towards the VIOMMU owning the VMID.
+> >>>
+> >>> Nesting support requires the system to either support S2FWB or the
+> >>> stronger CANWBS ACPI flag. This is to ensure the VM cannot bypass the
+> >>> cache and view incoherent data, currently VFIO lacks any cache flushing
+> >>> that would make this safe.
+> >>>
+> >>> Yan has a series to add some of the needed infrastructure for VFIO cache
+> >>> flushing here:
+> >>>
+> >>>   https://lore.kernel.org/linux-iommu/20240507061802.20184-1-yan.y.zhao@intel.com/
+> >>>
+> >>> Which may someday allow relaxing this further.
+> >>>
+> >>> Remove VFIO_TYPE1_NESTING_IOMMU since it was never used and superseded by
+> >>> this.
+> >>>
+> >>> This is the first series in what will be several to complete nesting
+> >>> support. At least:
+> >>>   - IOMMU_RESV_SW_MSI related fixups
+> >>>      https://lore.kernel.org/linux-iommu/cover.1722644866.git.nicolinc@nvidia.com/
+> >>>   - VIOMMU object support to allow ATS and CD invalidations
+> >>>      https://lore.kernel.org/linux-iommu/cover.1723061377.git.nicolinc@nvidia.com/
+> >>>   - vCMDQ hypervisor support for direct invalidation queue assignment
+> >>>      https://lore.kernel.org/linux-iommu/cover.1712978212.git.nicolinc@nvidia.com/
+> >>>   - KVM pinned VMID using VIOMMU for vBTM
+> >>>      https://lore.kernel.org/linux-iommu/20240208151837.35068-1-shameerali.kolothum.thodi@huawei.com/
+> >>>   - Cross instance S2 sharing
+> >>>   - Virtual Machine Structure using VIOMMU (for vMPAM?)
+> >>>   - Fault forwarding support through IOMMUFD's fault fd for vSVA
+> >>>
+> >>> The VIOMMU series is essential to allow the invalidations to be processed
+> >>> for the CD as well.
+> >>>
+> >>> It is enough to allow qemu work to progress.
+> >>>
+> >>> This is on github:https://github.com/jgunthorpe/linux/commits/smmuv3_nesting
+> >>>
+> >>> v2:
+> >> As mentioned above, the VIOMMU series would be required to test
+> >> the entire nesting feature, which now has a v2 rebasing on this
+> >> series. I tested it with a paring QEMU branch. Please refer to:
+> >> https://lore.kernel.org/linux-iommu/cover.1724776335.git.nicolinc@nvidia.com/
+> >> Also, there is another new VIRQ series on top of the VIOMMU one
+> >> and this nesting series. And I tested it too. Please refer to:
+> >> https://lore.kernel.org/linux-iommu/cover.1724777091.git.nicolinc@nvidia.com/
+> >>
+> >> With that,
+> >>
+> >> Tested-by: Nicolin Chen<nicolinc@nvidia.com>
+> >>
+> > Have you tested the user page fault?
 > >
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > ---
-> >   drivers/block/virtio_blk.c | 42 ++++++++++++++++++++------------------
-> >   1 file changed, 22 insertions(+), 20 deletions(-)
-> 
-> This patch landed in recent linux-next as commit 8d04556131c1 
-> ("virtio_blk: implement init_hctx MQ operation"). In my tests I found 
-> that it introduces a regression in system suspend/resume operation. From 
-> time to time system crashes during suspend/resume cycle. Reverting this 
-> patch on top of next-20240911 fixes this problem.
-> 
-> I've even managed to catch a kernel panic log of this problem on QEMU's 
-> ARM64 'virt' machine:
-> 
-> root@target:~# time rtcwake -s10 -mmem
-> rtcwake: wakeup from "mem" using /dev/rtc0 at Thu Sep 12 07:11:52 2024
-> Unable to handle kernel NULL pointer dereference at virtual address 
-> 0000000000000090
-> Mem abort info:
->    ESR = 0x0000000096000046
->    EC = 0x25: DABT (current EL), IL = 32 bits
->    SET = 0, FnV = 0
->    EA = 0, S1PTW = 0
->    FSC = 0x06: level 2 translation fault
-> Data abort info:
->    ISV = 0, ISS = 0x00000046, ISS2 = 0x00000000
->    CM = 0, WnR = 1, TnD = 0, TagAccess = 0
->    GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-> user pgtable: 4k pages, 48-bit VAs, pgdp=0000000046bbb000
-> ...
-> Internal error: Oops: 0000000096000046 [#1] PREEMPT SMP
-> Modules linked in: bluetooth ecdh_generic ecc rfkill ipv6
-> CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0H Not tainted 6.11.0-rc6+ #9024
-> Hardware name: linux,dummy-virt (DT)
-> Workqueue: kblockd blk_mq_requeue_work
-> pstate: 800000c5 (Nzcv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> pc : virtqueue_add_split+0x458/0x63c
-> lr : virtqueue_add_split+0x1d0/0x63c
-> ...
-> Call trace:
->   virtqueue_add_split+0x458/0x63c
->   virtqueue_add_sgs+0xc4/0xec
->   virtblk_add_req+0x8c/0xf4
->   virtio_queue_rq+0x6c/0x1bc
->   blk_mq_dispatch_rq_list+0x21c/0x714
->   __blk_mq_sched_dispatch_requests+0xb4/0x58c
->   blk_mq_sched_dispatch_requests+0x30/0x6c
->   blk_mq_run_hw_queue+0x14c/0x40c
->   blk_mq_run_hw_queues+0x64/0x124
->   blk_mq_requeue_work+0x188/0x1bc
->   process_one_work+0x20c/0x608
->   worker_thread+0x238/0x370
->   kthread+0x124/0x128
->   ret_from_fork+0x10/0x20
-> Code: f9404282 79401c21 b9004a81 f94047e1 (f8206841)
-> ---[ end trace 0000000000000000 ]---
-> note: kworker/0:0H[9] exited with irqs disabled
-> note: kworker/0:0H[9] exited with preempt_count 1
-> 
+> > I got an issue, when a user page fault happens,
+> >   group->attach_handle = iommu_attach_handle_get(pasid)
+> > return NULL.
+> >
+> > A bit confused here, only find IOMMU_NO_PASID is used when attaching
+> >
+> >   __fault_domain_replace_dev
+> > ret = iommu_replace_group_handle(idev->igroup->group, hwpt->domain,
+> > &handle->handle);
+> > curr = xa_store(&group->pasid_array, IOMMU_NO_PASID, handle, GFP_KERNEL);
+> >
+> > not find where the code attach user pasid with the attach_handle.
+>
+> Have you set iommu_ops::user_pasid_table for SMMUv3 driver?
 
-OK I'll drop from next for now, pls try to debug
-and repost.
+Thanks Baolu, Nico
 
+Yes, after arm_smmu_ops = {
++       .user_pasid_table       = 1,
 
-> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > index 2351f411fa46..35a7a586f6f5 100644
-> > --- a/drivers/block/virtio_blk.c
-> > +++ b/drivers/block/virtio_blk.c
-> > @@ -129,14 +129,6 @@ static inline blk_status_t virtblk_result(u8 status)
-> >   	}
-> >   }
-> >   
-> > -static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
-> > -{
-> > -	struct virtio_blk *vblk = hctx->queue->queuedata;
-> > -	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
-> > -
-> > -	return vq;
-> > -}
-> > -
-> >   static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
-> >   {
-> >   	struct scatterlist out_hdr, in_hdr, *sgs[3];
-> > @@ -377,8 +369,7 @@ static void virtblk_done(struct virtqueue *vq)
-> >   
-> >   static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
-> >   {
-> > -	struct virtio_blk *vblk = hctx->queue->queuedata;
-> > -	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
-> > +	struct virtio_blk_vq *vq = hctx->driver_data;
-> >   	bool kick;
-> >   
-> >   	spin_lock_irq(&vq->lock);
-> > @@ -428,10 +419,10 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
-> >   			   const struct blk_mq_queue_data *bd)
-> >   {
-> >   	struct virtio_blk *vblk = hctx->queue->queuedata;
-> > +	struct virtio_blk_vq *vq = hctx->driver_data;
-> >   	struct request *req = bd->rq;
-> >   	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-> >   	unsigned long flags;
-> > -	int qid = hctx->queue_num;
-> >   	bool notify = false;
-> >   	blk_status_t status;
-> >   	int err;
-> > @@ -440,26 +431,26 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
-> >   	if (unlikely(status))
-> >   		return status;
-> >   
-> > -	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
-> > -	err = virtblk_add_req(vblk->vqs[qid].vq, vbr);
-> > +	spin_lock_irqsave(&vq->lock, flags);
-> > +	err = virtblk_add_req(vq->vq, vbr);
-> >   	if (err) {
-> > -		virtqueue_kick(vblk->vqs[qid].vq);
-> > +		virtqueue_kick(vq->vq);
-> >   		/* Don't stop the queue if -ENOMEM: we may have failed to
-> >   		 * bounce the buffer due to global resource outage.
-> >   		 */
-> >   		if (err == -ENOSPC)
-> >   			blk_mq_stop_hw_queue(hctx);
-> > -		spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
-> > +		spin_unlock_irqrestore(&vq->lock, flags);
-> >   		virtblk_unmap_data(req, vbr);
-> >   		return virtblk_fail_to_queue(req, err);
-> >   	}
-> >   
-> > -	if (bd->last && virtqueue_kick_prepare(vblk->vqs[qid].vq))
-> > +	if (bd->last && virtqueue_kick_prepare(vq->vq))
-> >   		notify = true;
-> > -	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
-> > +	spin_unlock_irqrestore(&vq->lock, flags);
-> >   
-> >   	if (notify)
-> > -		virtqueue_notify(vblk->vqs[qid].vq);
-> > +		virtqueue_notify(vq->vq);
-> >   	return BLK_STS_OK;
-> >   }
-> >   
-> > @@ -504,7 +495,7 @@ static void virtio_queue_rqs(struct request **rqlist)
-> >   	struct request *requeue_list = NULL;
-> >   
-> >   	rq_list_for_each_safe(rqlist, req, next) {
-> > -		struct virtio_blk_vq *vq = get_virtio_blk_vq(req->mq_hctx);
-> > +		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
-> >   		bool kick;
-> >   
-> >   		if (!virtblk_prep_rq_batch(req)) {
-> > @@ -1164,6 +1155,16 @@ static const struct attribute_group *virtblk_attr_groups[] = {
-> >   	NULL,
-> >   };
-> >   
-> > +static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
-> > +		unsigned int hctx_idx)
-> > +{
-> > +	struct virtio_blk *vblk = data;
-> > +	struct virtio_blk_vq *vq = &vblk->vqs[hctx_idx];
-> > +
-> > +	hctx->driver_data = vq;
-> > +	return 0;
-> > +}
-> > +
-> >   static void virtblk_map_queues(struct blk_mq_tag_set *set)
-> >   {
-> >   	struct virtio_blk *vblk = set->driver_data;
-> > @@ -1205,7 +1206,7 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
-> >   static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
-> >   {
-> >   	struct virtio_blk *vblk = hctx->queue->queuedata;
-> > -	struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
-> > +	struct virtio_blk_vq *vq = hctx->driver_data;
-> >   	struct virtblk_req *vbr;
-> >   	unsigned long flags;
-> >   	unsigned int len;
-> > @@ -1236,6 +1237,7 @@ static const struct blk_mq_ops virtio_mq_ops = {
-> >   	.queue_rqs	= virtio_queue_rqs,
-> >   	.commit_rqs	= virtio_commit_rqs,
-> >   	.complete	= virtblk_request_done,
-> > +	.init_hctx	= virtblk_init_hctx,
-> >   	.map_queues	= virtblk_map_queues,
-> >   	.poll		= virtblk_poll,
-> >   };
-> 
-> Best regards
-> -- 
-> Marek Szyprowski, PhD
-> Samsung R&D Institute Poland
+find_fault_handler can go inside attach_handle =
+iommu_attach_handle_get(IOMMU_NO_PASID);
+qemu handler also gets called.
 
+But hardware reports errors and needs reset, still in check.
+[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 0
+
+Thanks
 
