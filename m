@@ -1,266 +1,162 @@
-Return-Path: <kvm+bounces-26775-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26776-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9879E9775E7
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 02:08:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85E5F977628
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 02:39:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CE96286659
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 00:08:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B41ECB23B57
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 00:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD777E6;
-	Fri, 13 Sep 2024 00:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C722733C8;
+	Fri, 13 Sep 2024 00:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wirdfzHQ"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="MTxTj6DO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE3D391
-	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 00:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60109443D
+	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 00:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726186081; cv=none; b=O3Elm72wPfQrQht7GlyLPxrncsP2nDHnphEaqLj4wwYOseAp4FvAtec+QTDQUwodRH9Hn0VeFjmKV08uxTeMlg0+60OqEsn8mok5vzYUkgh2acp7jsC2lNykjamn9vgWHE5dILo/nF+1IC9ntGrby7Z3h9p7JVC9x2mL//IzVO0=
+	t=1726187956; cv=none; b=hmKi4kQRIaCFMAPNvSIYQhQfgndMp3JzWDtnrRMMgKqhXOGDYdKemdVx8WfgB/EI0GJXw/SDMqHkHwKQtOoQy5BrCJQuMAaYd5RGO+M8TmYDD5cYhg1GBCUBMa6gIr5hcrp8JgXpHQvAaDq2Cq7KmGNxyZ3iPoyAKEmIUWmofGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726186081; c=relaxed/simple;
-	bh=HnqZ+WQxTmhdX5AHMSykpvAerEB7h3ospCerp328K5g=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UVUgVIsRzrMUoN82F5IxZ1xMThNSp1+X4ZlB2t0aVLsFv+cRKN4ao3mqkd5L4cOPMbPEc8ABhGrLmeSKMgSZVEWs+pwmm9GOTXxbySzOTberfI/vZRY8gNrHJNseCL6H+dq2zcz8lMD8+VnLqIvQ3rcB8AKythpHcGkQ6gCiSzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wirdfzHQ; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1ff24acb60dso14249395ad.0
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 17:07:59 -0700 (PDT)
+	s=arc-20240116; t=1726187956; c=relaxed/simple;
+	bh=08L0zeY49h3WNCoKEWf1RrEqzKHTnip0RZZYSfxScew=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rhqIzvg9M7w8TjynvHMkp2ZHL+JmvOasqtadhiXOmSyj3R1Nk90TAdEO/b5043H9B1qgyQJSV6D1tWG7QXjMLvLH2g1qDUkn61qzZFRpvkbuY54KfSoPyUCmwpn9WmFZLuGG+vweQEsPB7krO80VN5u8z01QnNXGis81Ilr9r6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=MTxTj6DO; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-82cda617e1aso92506339f.2
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 17:39:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726186079; x=1726790879; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FV0xpAyRsnkvg2I8ID+gF0AA+BuNB8xDqvOjKUOupJw=;
-        b=wirdfzHQJ4+vCavXp/jlw5OWk84YzRIb/+Qc2QWdSalyvnB01+wNjM0UPmosotwsjS
-         oucz4EbfWo9Qvpedz4zYAG63EY3BEs8aLiknUF8Z8RNsxbjx6Iie9Nt3NiOolsjlHBpj
-         JT6k2uAlYGXPfKbAFBvZBc0XWOCvFOq05VBu0m25YpIVjNvaj25v4cvWgpOp15EZBV9W
-         vX3R533MgdCoUNxpuXR1EcMlGZWr/LOClGvp1Ba+dubyeyawj294MthRkxoryONTpyRA
-         GXAk7yXkwIPwRmncX9+EQ6tqqt/H4DC4T1blkDkyWcmGLKhcXnHzUEBsUOL2Y/3sGayR
-         DQXA==
+        d=sifive.com; s=google; t=1726187953; x=1726792753; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Yq7jQvcHt7PS48CeNeYkOSKd0KSPF8mXYZUm141Cz7c=;
+        b=MTxTj6DOs0S4xQL6gqj1scwZ3c82fzDvm0liDY2v9YDNNa47hO9/w9BoaC/ofCECwZ
+         HHYyEQ1EyeNMxdnJbWGqKwl5EJytqxTiWfOExX6UWKX/5YeaSqSNQDX9bgPz/Yrnp7Xu
+         BCqvMkADciK+2MSXuTwHIAaYcvyJMnfOctSPWGURQTwbEqU75+En2S9+lFyQ8FrA9ZYp
+         c29yFDc+4u3VrKjp6hMc1S96IkAdr323NtRKXTbZaVAYYtwWJq8ISxIQsKC7Or0205sx
+         7U6naFkzh7lAmVNvggi7swBWYcj4mpqoq/v9tbahrp+hgSrBNHa0Ow/hUoWaT/CvE9A5
+         NfSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726186079; x=1726790879;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FV0xpAyRsnkvg2I8ID+gF0AA+BuNB8xDqvOjKUOupJw=;
-        b=Q1gwTHB6ta13/F5LOtw+jCoNlxVXwjwDjGGXeVzEuQ09FMTPXGyKtyLaoLa3FuZXMp
-         c6OY7Tz2sWu4wht7zNLaO0mXoNZAr2yXzgUNHbKRpkbqdVHEUsdfkU+wZpZUPtsg13sW
-         Wh/wG3ALwEL8OoUYyIJ1q3nXTGJ+21dYFMwu5SPYiaHEBDAk+Ivoi9UjRekufVSMsFUa
-         gFeAX1K2RuRWIf8syhLPn5YcfcuS2ascDoMdMYF6oP7sVfNOpBAWOPiaWvOfCk5jiMo2
-         /MG/mP6WO9jPEXfAQythvoFY/bt4KZNqAVkxf9fRCisS6zpA3G+lYYPVk3uPsEfTu7hp
-         gHCA==
-X-Gm-Message-State: AOJu0Yy62cBIsD+Om3trdYw9b0bFg0Zo4Od1e+MrFVFn+Kgl0spqnS0w
-	NteLOXu5OqUFqD2nxD+QZrxche+IhHiC6PHIZi6UUnrEV+VLe+ml7I/Y97yXAaaaq8B4Frb/qR0
-	L/Q==
-X-Google-Smtp-Source: AGHT+IGPquyAWmRgRvPVm5oG0pkzuk76JVdxT2qdK+EbZAQCvazZOU7w0yp0FIdj678BpZ2KG/ZeC2SNH68=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:c386:b0:205:4fe5:8136 with SMTP id
- d9443c01a7336-2074c6d7bd9mr297185ad.3.1726186078899; Thu, 12 Sep 2024
- 17:07:58 -0700 (PDT)
-Date: Thu, 12 Sep 2024 17:07:57 -0700
-In-Reply-To: <6eecc450d0326c9bedfbb34096a0279410923c8d.1726182754.git.isaku.yamahata@intel.com>
+        d=1e100.net; s=20230601; t=1726187953; x=1726792753;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yq7jQvcHt7PS48CeNeYkOSKd0KSPF8mXYZUm141Cz7c=;
+        b=AF9FVghRY+PFzmY60OWPv8G/t9XYrBrbUWrwgZZYUeVely6nioygnKyZ7WaOG9JJzL
+         vhWr6oGa+WohfRUc4qBDy4Z0R6ZXSi90MDYCXs+tBeGOhuwpC9GHkGtV3WV5MwiHL7gM
+         PZ0WRIgN2v7zVQTrR+4N+o2mtlzNOCahGOAqzIMrhJpjTVYE2ybUw5l+tJoEaTV9APwe
+         FCQteqaKsmPJkSBnX8Yto2H5z4vsyGUTUhSId2IAvqcgfPF9xHYdJmWWSnPUuABFpVHm
+         eSwTEUsyUh8Xn8Z9y6cuUno4PnaVQQizYTWaSm0g5Ng68KGS1AIJCbKYDYeLQG+tyfjn
+         s82A==
+X-Forwarded-Encrypted: i=1; AJvYcCUzRGX8JAeGLNYlHlNvjQtp29BTCoHfcGODL1kpsQR2JwxBOSQ1DYK+ubMEPZ7WJUOC7FQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw97vfhD84/QT0stBKbtq1QtJ5cuJiDq5/phaT1a7MAFnMZF09y
+	RBSvNL+sYjgUgZMyn5/mAzTdDYn7ZVFVUPWvLZbEMnvLeWdgz3gwJHgH4Ura50E=
+X-Google-Smtp-Source: AGHT+IFvrXsansubjNKmfH96tpet9MMQHobUfK5ZcIImam7/5J5d7xDWJDRwrnj478owALsMz4iHEg==
+X-Received: by 2002:a05:6602:2c88:b0:82d:461:703e with SMTP id ca18e2360f4ac-82d1f8c3477mr641631739f.3.1726187953271;
+        Thu, 12 Sep 2024 17:39:13 -0700 (PDT)
+Received: from [100.64.0.1] ([147.124.94.167])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-82aa76aac56sm343052539f.44.2024.09.12.17.39.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Sep 2024 17:39:12 -0700 (PDT)
+Message-ID: <380f4da9-50e9-4632-bdc8-b1723eb19ca5@sifive.com>
+Date: Thu, 12 Sep 2024 19:39:10 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <6eecc450d0326c9bedfbb34096a0279410923c8d.1726182754.git.isaku.yamahata@intel.com>
-Message-ID: <ZuOCXarfAwPjYj19@google.com>
-Subject: Re: [PATCH] KVM: x86/tdp_mmu: Trigger the callback only when an
- interesting change
-From: Sean Christopherson <seanjc@google.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: kvm@vger.kernel.org, sagis@google.com, chao.gao@intel.com, 
-	pbonzini@redhat.com, rick.p.edgecombe@intel.com, yan.y.zhao@intel.com, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] RISC-V: KVM: Redirect instruction access fault trap to
+ guest
+To: Quan Zhou <zhouquan@iscas.ac.cn>, anup@brainfault.org,
+ ajones@ventanamicro.com, atishp@atishpatra.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+References: <83c2234d582b7e823ce9ac9b73a6bbcf63971a29.1724911120.git.zhouquan@iscas.ac.cn>
+ <b5128162-278a-4284-8271-b2b91dc446e1@iscas.ac.cn>
+Content-Language: en-US
+From: Samuel Holland <samuel.holland@sifive.com>
+In-Reply-To: <b5128162-278a-4284-8271-b2b91dc446e1@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 12, 2024, Isaku Yamahata wrote:
-> KVM MMU behavior
-> ================
-> The leaf SPTE state machine is coded in make_spte().  Consider AD bits and
-> the present bits for simplicity.  The two functionalities and AD bits
-> support are related in this context.  unsync (manipulate D bit and W bit,
-> and handle write protect fault) and access tracking (manipulate A bit and
-> present bit, and hand handle page fault).  (We don't consider dirty page
-> tracking for now as it's future work of TDX KVM.)
+On 2024-09-12 4:03 AM, Quan Zhou wrote:
 > 
-> * If AD bit is enabled:
-> D bit state change for dirty page tracking
-> On the first EPT violation without prefetch,
-> - D bits are set.
-> - Make SPTE writable as TDX supports only RXW (or if write fault).
->   (TDX KVM doesn't support write protection at this state. It's future work.)
+> On 2024/8/29 14:20, zhouquan@iscas.ac.cn wrote:
+>> From: Quan Zhou <zhouquan@iscas.ac.cn>
+>>
+>> The M-mode redirects an unhandled instruction access
+>> fault trap back to S-mode when not delegating it to
+>> VS-mode(hedeleg). However, KVM running in HS-mode
+>> terminates the VS-mode software when back from M-mode.
+>>
+>> The KVM should redirect the trap back to VS-mode, and
+>> let VS-mode trap handler decide the next step.
+>>
+>> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
+>> ---
+>>   arch/riscv/kvm/vcpu_exit.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+>> index fa98e5c024b2..696b62850d0b 100644
+>> --- a/arch/riscv/kvm/vcpu_exit.c
+>> +++ b/arch/riscv/kvm/vcpu_exit.c
+>> @@ -182,6 +182,7 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct
+>> kvm_run *run,
+>>       ret = -EFAULT;
+>>       run->exit_reason = KVM_EXIT_UNKNOWN;
+>>       switch (trap->scause) {
+>> +    case EXC_INST_ACCESS:
 > 
-> On the second EPT violation.
-> - clear D bits if write fault.
+> A gentle ping, the instruction access fault should be redirected to
+> VS-mode for handling, is my understanding correct?
 
-Heh, I was literally just writing changelogs for patches to address this (I told
-Sagi I would do it "this week"; that was four weeks ago).
+Yes, this looks correct. However, I believe it would be equivalent (and more
+efficient) to add EXC_INST_ACCESS to KVM_HEDELEG_DEFAULT in asm/kvm_host.h.
 
-This is a bug in make_spte().  Replacing a W=1,D=1 SPTE with a W=1,D=0 SPTE is
-nonsensical.  And I'm pretty sure it's an outright but for the TDP MMU (see below).
+I don't understand why some exceptions are delegated with hedeleg and others are
+caught and redirected here with no further processing. Maybe someone thought
+that it wasn't valid to set a bit in hedeleg if the corresponding bit was
+cleared in medeleg? But this doesn't make sense, as S-mode cannot know which
+bits are set in medeleg (maybe none are!).
 
-Right now, the fixes for make_spte() are sitting toward the end of the massive
-kvm_follow_pfn() rework (80+ patches and counting), but despite the size, I am
-fairly confident that series can land in 6.13 (lots and lots of small patches).
+So the hypervisor must either:
+ 1) assume M-mode firmware checks hedeleg and redirects exceptions to VS-mode
+    regardless of medeleg, in which case all four of these exceptions can be
+    moved to KVM_HEDELEG_DEFAULT and removed from this switch statement, or
 
----
-Author:     Sean Christopherson <seanjc@google.com>
-AuthorDate: Thu Sep 12 16:23:21 2024 -0700
-Commit:     Sean Christopherson <seanjc@google.com>
-CommitDate: Thu Sep 12 16:35:06 2024 -0700
+ 2) assume M-mode might not check hedeleg and redirect exceptions to VS-mode,
+    and since no bits are guaranteed to be set in medeleg, any bit set in
+    hedeleg must _also_ be handled in the switch case here.
 
-    KVM: x86/mmu: Flush TLBs if resolving a TDP MMU fault clears W or D bits
-    
-    Do a remote TLB flush if installing a leaf SPTE overwrites an existing
-    leaf SPTE (with the same target pfn) and clears the Writable bit or the
-    Dirty bit.  KVM isn't _supposed_ to clear Writable or Dirty bits in such
-    a scenario, but make_spte() has a flaw where it will fail to set the Dirty
-    if the existing SPTE is writable.
-    
-    E.g. if two vCPUs race to handle faults, the KVM will install a W=1,D=1
-    SPTE for the first vCPU, and then overwrite it with a W=1,D=0 SPTE for the
-    second vCPU.  If the first vCPU (or another vCPU) accesses memory using
-    the W=1,D=1 SPTE, i.e. creates a writable, dirty TLB entry, and that is
-    the only SPTE that is dirty at the time of the next relevant clearing of
-    the dirty logs, then clear_dirty_gfn_range() will not modify any SPTEs
-    because it sees the D=0 SPTE, and thus will complete the clearing of the
-    dirty logs without performing a TLB flush.
-    
-    Opportunistically harden the TDP MMU against clearing the Writable bit as
-    well, both to prevent similar bugs for write-protection, but also so that
-    the logic can eventually be deduplicated into spte.c (mmu_spte_update() in
-    the shadow MMU has similar logic).
-    
-    Fix the bug in the TDP MMU's page fault handler even though make_spte() is
-    clearly doing odd things, e.g. it marks the page dirty in its slot but
-    doesn't set the Dirty bit.  Precisely because replacing a leaf SPTE with
-    another leaf SPTE is so rare, the cost of hardening KVM against such bugs
-    is negligible.  The make_spte() will be addressed in a future commit.
-    
-    Fixes: bb18842e2111 ("kvm: x86/mmu: Add TDP MMU PF handler")
-    Cc: David Matlack <dmatlack@google.com>
-    Cc: stable@vger.kernel.org
-    Signed-off-by: Sean Christopherson <seanjc@google.com>
+Anup, Atish, thoughts?
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 3b996c1fdaab..7c6d1c610f0e 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1038,7 +1038,9 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
-        else if (tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
-                return RET_PF_RETRY;
-        else if (is_shadow_present_pte(iter->old_spte) &&
--                !is_last_spte(iter->old_spte, iter->level))
-+                (!is_last_spte(iter->old_spte, iter->level) ||
-+                 (is_mmu_writable_spte(old_spte) && !is_writable_pte(new_spte)) ||
-+                 (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte))))
-                kvm_flush_remote_tlbs_gfn(vcpu->kvm, iter->gfn, iter->level);
- 
-        /*
----
+Regards,
+Samuel
 
->  arch/x86/kvm/mmu/spte.h    |  6 ++++++
->  arch/x86/kvm/mmu/tdp_mmu.c | 28 +++++++++++++++++++++++++---
->  2 files changed, 31 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> index a72f0e3bde17..1726f8ec5a50 100644
-> --- a/arch/x86/kvm/mmu/spte.h
-> +++ b/arch/x86/kvm/mmu/spte.h
-> @@ -214,6 +214,12 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
->   */
->  #define FROZEN_SPTE	(SHADOW_NONPRESENT_VALUE | 0x5a0ULL)
->  
-> +#define EXTERNAL_SPTE_IGNORE_CHANGE_MASK		\
-> +	(shadow_acc_track_mask |			\
-> +	 (SHADOW_ACC_TRACK_SAVED_BITS_MASK <<		\
-> +	  SHADOW_ACC_TRACK_SAVED_BITS_SHIFT) |		\
-
-Just make TDX require A/D bits, there's no reason to care about access tracking.
-
-> +	 shadow_dirty_mask | shadow_accessed_mask)
-> +
->  /* Removed SPTEs must not be misconstrued as shadow present PTEs. */
->  static_assert(!(FROZEN_SPTE & SPTE_MMU_PRESENT_MASK));
->  
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 019b43723d90..cfb82ede8982 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -503,8 +503,6 @@ static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sp
->  	kvm_pfn_t new_pfn = spte_to_pfn(new_spte);
->  	int ret = 0;
->  
-> -	KVM_BUG_ON(was_present, kvm);
-> -
->  	lockdep_assert_held(&kvm->mmu_lock);
->  	/*
->  	 * We need to lock out other updates to the SPTE until the external
-> @@ -519,10 +517,34 @@ static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sp
->  	 * external page table, or leaf.
->  	 */
->  	if (is_leaf) {
-> -		ret = static_call(kvm_x86_set_external_spte)(kvm, gfn, level, new_pfn);
-> +		/*
-> +		 * SPTE is state machine with software available bits used.
-> +		 * Check if the change is interesting to the backend.
-> +		 */
-> +		if (!was_present)
-> +			ret = static_call(kvm_x86_set_external_spte)(kvm, gfn, level, new_pfn);
-> +		else {
-> +			/*
-> +			 * The external PTEs don't need updates for some bits,
-> +			 * but if others are changed, bug the VM.
-> +			 */
-> +			if (KVM_BUG_ON(~EXTERNAL_SPTE_IGNORE_CHANGE_MASK &
-
-There's no reason to bug the VM.  WARN, yes (maybe), but not bug the VM.  And I
-think this should be short-circuited somewhere further up the chain, i.e. not
-just for TDX.
-
-One idea would be to WARN and skip setting the SPTE in tdp_mmu_map_handle_target_level().
-I.e. WARN and ignore 1=>0 transitions for Writable and Dirty bits, and then drop
-the TLB flush (assuming the above patch lands).
-
-> +				       (old_spte ^ new_spte), kvm)) {
-
-Curly braces are unnecessary.
-
-> +				ret = -EIO;
-> +			}
-> +		}
-> +
-> +		/*
-> +		 * The backend shouldn't return an error except EAGAIN.
-> +		 * It's hard to debug without those info.
-> +		 */
-> +		if (ret && ret != EAGAIN)
-> +			pr_debug("gfn 0x%llx old_spte 0x%llx new_spte 0x%llx level %d\n",
-> +				 gfn, old_spte, new_spte, level);
-
-Please no.  Not in upstream.  Yeah, for development it's fine, but sprinkling
-printks all over the MMU eventually just results in stale printks, e.g. see all
-of the pgprintk crud that got ripped out a while back.
-
->  	} else {
->  		void *external_spt = get_external_spt(gfn, new_spte, level);
->  
-> +		KVM_BUG_ON(was_present, kvm);
->  		KVM_BUG_ON(!external_spt, kvm);
->  		ret = static_call(kvm_x86_link_external_spt)(kvm, gfn, level, external_spt);
->  	}
+>>       case EXC_INST_ILLEGAL:
+>>       case EXC_LOAD_MISALIGNED:
+>>       case EXC_STORE_MISALIGNED:
+>>
+>> base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
 > 
-> base-commit: d2c7662a6ea1c325a9ae878b3f1a265264bcd18b
-> -- 
-> 2.45.2
 > 
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
+
 
