@@ -1,100 +1,98 @@
-Return-Path: <kvm+bounces-26867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26868-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A658978A01
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 22:33:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA521978A04
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 22:33:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2ED79B22A8A
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 20:33:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5B781C21774
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 20:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3CB15B56E;
-	Fri, 13 Sep 2024 20:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AAD61714C8;
+	Fri, 13 Sep 2024 20:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="6LOAV/P6";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="L90Gysna"
+	dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="f3p75sk2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WJmLZp/3"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh2-smtp.messagingengine.com (fhigh2-smtp.messagingengine.com [103.168.172.153])
+Received: from fout6-smtp.messagingengine.com (fout6-smtp.messagingengine.com [103.168.172.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDAF14B081;
-	Fri, 13 Sep 2024 20:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553F616BE1C;
+	Fri, 13 Sep 2024 20:33:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726259573; cv=none; b=rFht6mEsk+3GaCUkGBp9VJ10V9dGM8xnEge2N3rMNbwAFQECpNcDIWBxvIk1WtJAw7CtHNv2T2rFBFWaiu6iYqpDNy9nJ78eTLIV2NmdxPtZrvgtU2mfUN0G5uScqQv+M9InfJncGPRPKt/QLO5ZtXx4aBKlr04Ya29TLhy8Q/c=
+	t=1726259582; cv=none; b=nf/RfJtnabWbCt55ofnIvEII0k16GlnJzINaBrEW+VQXpETBACQUC12YBL/OZMGIpAHPb4WoM3vJElT0NKdKYsl+G376DbyJl0Z0hLa1JUIiA2zPCrHMV67WmohOx8y/CtXBB7KIsdqI3o6An1/7NeUVIti0LMTdMP4XqbFqoDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726259573; c=relaxed/simple;
-	bh=BEF7g2cENeo1Ug39B1X0mUSSZJeSp7BignOPYrjGS70=;
+	s=arc-20240116; t=1726259582; c=relaxed/simple;
+	bh=QR4DGLMUsuXkjf1A1LS7CFLwhFvqzfkt5ophtTS3Iko=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hgBUQLMmps0PdUhZE6B283/YrUcsSMi9/sCIJVssbnVDIjM+ZLI+SQP3ORoTTL1hP7vHKCnuhq6eoJXT7bhQhr2nJcq6h+9aumM4qiu/TaYrE+Zmwtp8JWthniUA2KNwO3RXsPp6MMt89IMWBoM3w0ntUWvLhkwk2+IGcTUjIpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com; spf=pass smtp.mailfrom=flygoat.com; dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b=6LOAV/P6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=L90Gysna; arc=none smtp.client-ip=103.168.172.153
+	 In-Reply-To:To:Cc; b=TWWIqO8sEI3WSNzI6fs5/Siq/LJu0tsCQIZePl+5AikmgHS4tVxlS/5DZKRf942eajq2QeR9aFM6iIwUIWEW0FzF4qPX6fS/qXT1Gq/ZoKxBPlqdvazRdJ+IWXFFQrX3WBoxMIl9S6pwuzho0fwEjaTkrsoib22C92srq+Kjuvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com; spf=pass smtp.mailfrom=flygoat.com; dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b=f3p75sk2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WJmLZp/3; arc=none smtp.client-ip=103.168.172.149
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flygoat.com
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id EEEFB114032E;
-	Fri, 13 Sep 2024 16:32:50 -0400 (EDT)
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id 8364413803C6;
+	Fri, 13 Sep 2024 16:32:59 -0400 (EDT)
 Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-08.internal (MEProxy); Fri, 13 Sep 2024 16:32:50 -0400
+  by phl-compute-05.internal (MEProxy); Fri, 13 Sep 2024 16:32:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1726259570;
-	 x=1726345970; bh=zh/rs3p8kX/iDZzj5IerT0F0oUa7knq0x6BJZiiveZ4=; b=
-	6LOAV/P6lhiCHZh286oNaY2XoEQJ/YZiJLYcCowu26Ey0DyFz1HQeAEZ6cMmD2k2
-	UAnJ+alTXsnCXFauyh+EqaDTSPCS4K1aphtCydBVjllgy13jj0ZeHYnqORWa+/s4
-	lsIYL/MZEg3oy1nR+vGkJWceWcPJPyu+Za74GVLuGDBaXkWORUOp5SAqDGUdw96M
-	PYXZowgK38N0tYYqFz3BXoEyCD1DBbm1u6DQY6qDxlV2WQezFTgGvOWxD42bMya4
-	NKw+FOVBCDXHGCr+RGvNah7fS90xxvkl/vMEdR6FJGKVpIO/0Af9F+zLy0Bw/ZIa
-	u2WNOjw+QGbwQ/IwGtstXw==
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1726259579;
+	 x=1726345979; bh=5yZhMf1etdNhnGTjDvT1Dwa0rJtLOxEPY0uZSbNmmL4=; b=
+	f3p75sk2Kb/jxmV8o9K/xLUM6lPpIhcsK9Y8cj25Q0k1SgZC4FuJMQK3YDSFRjr5
+	w4uBnUO2NToGZJhdsUg66oXRY6gWwCcrubdTkDGYqsiCes0hWVsMIyCQAmS3sGSm
+	l8oIY1iZknDCG0LSorek5zO1syqSOcxUbXYGRLd/Q3VfcDpNY3ijytgcIeveWFUo
+	Be9cEbIPtYh87rIg/dLMKvM3uzFU8n7zLLwBFYajcsDN0TKPJGY6umBIdOgaNJLE
+	D0Bkuf0kmid3Qxp8CJ3I0fs4G7BSqyzVixVVxjl5J4w+k1A7mB12TZfazbGismwy
+	Qiit4qbHLpFJmOj0Sih/Ag==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1726259570; x=
-	1726345970; bh=zh/rs3p8kX/iDZzj5IerT0F0oUa7knq0x6BJZiiveZ4=; b=L
-	90GysnaOv+SIGMQHITqTkMWZqAcT/zXM88xjDM1wQbppTlnCeGM8EEBTJd9qiE94
-	/df/Ac30oa3LMNKVTO+cYgMXNhjgYajGZo35jMEwGKB6Zi+/7x5Os5XCtjSKsz4B
-	dI0r7qJGPv6JPHhEErk+n/b2BBn7+w7aQAgpCPTRsCwNDtqBqhI+gSkAD+YPBGeK
-	JQQWEI+MPlllVroVGBJLd5kvaRYdPoJtrq8g4mIkN2j/4HrCOxmGpxMsoXSGOf5H
-	7VkPjgYx0aPd1cmPQ6Wr2IQlgRPs+66RI9h8OxCwUgvwzDDNjEwcrx0pzM5xNz3m
-	ocSG/Gon/kR47uysGY6Xw==
-X-ME-Sender: <xms:cqHkZlgRkMgrNosp0S4p0Q4pH-fB8hDVYBItjfBlABuxOKUpLSCQKQ>
-    <xme:cqHkZqCOAmpASuElZ4F7Eq1mUDq3uECXU_8qZk-b7U5LNocfZpXrQ9JstUiuKOYT8
-    yRTIfEwKfitwVhxiV4>
-X-ME-Received: <xmr:cqHkZlHSGqLn43fcDlzwUC4q97GXwuhBMWotbSRUbFFfy2p2NN2x5piYTCJepo_aGOQ>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1726259579; x=
+	1726345979; bh=5yZhMf1etdNhnGTjDvT1Dwa0rJtLOxEPY0uZSbNmmL4=; b=W
+	JmLZp/3CrIGOwNNk0q1OB+GIDYJhuZeqUG6aXBu+YA1sl7g2LbIk0OCAdnmAp9oR
+	fdO0amiLCqyw/bFSBakPmREfpwE3tmEbtGFJWLhRBaWbaHsLZpfyifWYrbhmC1LH
+	LmNGn7vTsXYdpbFdLt+4tFpOAW/vVnWunSJ17Fj944+A+m5sbXNkji+XYF5bewMD
+	Mc/fPIUe360q8E9m4TvScXKzYVU/vZmK/goBZgOiX7Bb24YuNrqbRecZBOCP1L+c
+	7elrfgcn5pv/mgtCOt+0aNYCt0RKxp3HCwKD3z1ZbyaBS3IjN28kOy+m4dkzjG6V
+	wTn4+WnZ5Opcrp2IneE4g==
+X-ME-Sender: <xms:e6HkZjdBl2jZywSZL8R3DBrkrHfG2l3IeWFtw-DnkUfmb0nwTZlkUA>
+    <xme:e6HkZpNKqIX3higvLoIO7gZJhzP5vXLAoVRC3oYxGe1cPMWEhMcvDqOtdlZTA_48h
+    fGCysZPlJJmdfEZoco>
+X-ME-Received: <xmr:e6HkZsgqjExnIqqPPSRlQGwnyEfaAKDlfqW1o0poybtaWDZxJ3k9zm2WVlKp9fmMv6M>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudejkedgvdefucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
     rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
     htshculddquddttddmnecujfgurhephfffufggtgfgkfhfjgfvvefosehtjeertdertdej
     necuhfhrohhmpeflihgrgihunhcujggrnhhguceojhhirgiguhhnrdihrghnghesfhhlhi
-    hgohgrthdrtghomheqnecuggftrfgrthhtvghrnhepgfeufeeuvefffedufeeuffffgeei
-    veevuefhjeejgffhhfegtedvtdetjeegffeknecuffhomhgrihhnpehrvghlohgtrghtvg
-    gpkhgvrhhnvghlrdhssgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgr
-    ihhlfhhrohhmpehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhmpdhnsggprh
-    gtphhtthhopeduvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheptghhvghnhhhu
-    rggtrghisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrh
-    hnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqmhhiphhssehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtohepvhhirhgvshhhrdhkuhhmrghrsehlihhnrghrohdroh
-    hrghdprhgtphhtthhopehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhmpdhr
-    tghpthhtoheplhhinhhugidqphhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepkhgvrhhnvghlseigvghntdhnrdhnrghmvgdprhgtphhtthhopehrrghfrggvlhes
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrh
-    drkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:cqHkZqS-74PTWA7Pd9dQsV_VMs43y7n7oKH86xnIj3kAjyHkidGfRA>
-    <xmx:cqHkZixIz8VfL019FZ65unRchxfUL9VmP8oKOVfdYl1pAvFq9ztEbA>
-    <xmx:cqHkZg7fj6WD9fzK36KnyY3B-SOTnZVakT-3DuZ_hN2f3zQoAOBT4A>
-    <xmx:cqHkZnweLvjY8wI72qvcVddPDh-09KSSWdLEwSTEELUQP1r2QpS8cA>
-    <xmx:cqHkZtq1zlaTwihTcuCSjc6QYUKERFoJPGiDF2rhGW2Uv-F2Aq4Xi-Gz>
+    hgohgrthdrtghomheqnecuggftrfgrthhtvghrnhepvdekiefhfeevkeeuveetfeelffek
+    gedugefhtdduudeghfeuveegffegudekjeelnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihgohgrthdr
+    tghomhdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhpohhuthdprhgtphhtth
+    hopegthhgvnhhhuhgrtggriheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhvmhes
+    vhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhmihhpshesvh
+    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehvihhrvghshhdrkhhumhgrrhes
+    lhhinhgrrhhordhorhhgpdhrtghpthhtohepjhhirgiguhhnrdihrghnghesfhhlhihgoh
+    grthdrtghomhdprhgtphhtthhopehlihhnuhigqdhpmhesvhhgvghrrdhkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehkvghrnhgvlhesgigvnhdtnhdrnhgrmhgvpdhrtghpthhtoh
+    eprhgrfhgrvghlsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghr
+    nhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:e6HkZk9TYas-PwBmnKO3G0-3SKNklcXSlK4L7912NJpg5PTl3XBAkw>
+    <xmx:e6HkZvs2YfQc2AK0xzYtLXPZg4Z_wIKU8J8PhrQCq5ZuZ5c_BuikXQ>
+    <xmx:e6HkZjGHFD8rp8YnTt-CT9ms2aHNOiMsqd8Vgdh4B_qcNUuUC63yQg>
+    <xmx:e6HkZmMn_d6ak3YVPQcNrKuRTlaRZJ9kICWM3o2GNv0xOC_-mUaAsA>
+    <xmx:e6HkZoHGHTg3m17tffBXN6C7SWn_yi9_lHmXXsYJaqhmIL6RW6opc_oG>
 Feedback-ID: ifd894703:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 13 Sep 2024 16:32:44 -0400 (EDT)
+ 13 Sep 2024 16:32:51 -0400 (EDT)
 From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Date: Fri, 13 Sep 2024 21:32:06 +0100
-Subject: [PATCH v3 3/4] LoongArch: Extract IOCSR definitions to standalone
- header
+Date: Fri, 13 Sep 2024 21:32:07 +0100
+Subject: [PATCH v3 4/4] MIPS: Loongson64: Use shared IOCSR header
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -103,7 +101,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240913-iocsr-v3-3-81a57f60350d@flygoat.com>
+Message-Id: <20240913-iocsr-v3-4-81a57f60350d@flygoat.com>
 References: <20240913-iocsr-v3-0-81a57f60350d@flygoat.com>
 In-Reply-To: <20240913-iocsr-v3-0-81a57f60350d@flygoat.com>
 To: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
@@ -115,516 +113,332 @@ Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
  linux-pm@vger.kernel.org, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
  Jiaxun Yang <jiaxun.yang@flygoat.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=18003;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10190;
  i=jiaxun.yang@flygoat.com; h=from:subject:message-id;
- bh=BEF7g2cENeo1Ug39B1X0mUSSZJeSp7BignOPYrjGS70=;
- b=owGbwMvMwCXmXMhTe71c8zDjabUkhrQnC6P9Lu5tWN8nH3dA5u/p1/+/lxzcyPXlz27DE4XrI
- g+GBHke7ihlYRDjYpAVU2QJEVDq29B4ccH1B1l/YOawMoEMYeDiFICJTDrEyLBmwx/76W371Tki
- f+gc+5EbqbdxSkba2ZpNf2w2/jq9g9GD4b9/1sOfnqohV0+lbBX+Nll/Fgfb1Nd3RW95T74tuTm
- +XY8VAA==
+ bh=QR4DGLMUsuXkjf1A1LS7CFLwhFvqzfkt5ophtTS3Iko=;
+ b=owGbwMvMwCXmXMhTe71c8zDjabUkhrQnC6P/O6s9UKzm2WQ3e9rm57PWl2XYsyQr71i1dgGjq
+ YLnk1DbjlIWBjEuBlkxRZYQAaW+DY0XF1x/kPUHZg4rE8gQBi5OAZjIuhSGv4IevN9rN4uL1TRG
+ hM35omJ576dNmvFklwdhSwJ+aF683c7IMLfgyeKzVybP01m26VHfXVGHbEbGZXaf/mxfvcZAvs3
+ YhwEA
 X-Developer-Key: i=jiaxun.yang@flygoat.com; a=openpgp;
  fpr=980379BEFEBFBF477EA04EF9C111949073FC0F67
 
-As IOCSR is not a part of architecture specification, it is not
-really appropriate to define those stuff in loongarch.h.
+MIPS and LoongArch Loongson CPUs are sharing definition of
+IOCSR registers, so it makes sense to use the same header
+as well.
 
-Extract those definitions to include/linux/loongson/iocsr.h, so
-that they can be shared with MIPS based Loongson systems as well.
+Align function names in loongson_regs.h with it's loongarch
+equivalent and fix up macro names everywhere.
 
 Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- MAINTAINERS                             |   1 +
- arch/loongarch/include/asm/loongarch.h  |  90 --------------------------
- arch/loongarch/kernel/cpu-probe.c       |   7 +-
- arch/loongarch/kernel/relocate_kernel.S |   5 +-
- arch/loongarch/kernel/smp.c             |  23 +++----
- drivers/cpufreq/loongson3_cpufreq.c     |  11 ++--
- drivers/irqchip/irq-loongarch-avec.c    |   5 +-
- drivers/irqchip/irq-loongson-eiointc.c  |   5 +-
- include/linux/loongson/iocsr.h          | 110 ++++++++++++++++++++++++++++++++
- 9 files changed, 142 insertions(+), 115 deletions(-)
+ .../include/asm/mach-loongson64/loongson_regs.h    | 58 ++++++----------------
+ arch/mips/kvm/vz.c                                 |  2 +-
+ arch/mips/loongson64/smp.c                         | 44 ++++++++--------
+ drivers/platform/mips/cpu_hwmon.c                  |  7 ++-
+ include/linux/loongson/iocsr.h                     |  5 +-
+ 5 files changed, 46 insertions(+), 70 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0a3d9e17295a..f0f4c427e9a3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13305,6 +13305,7 @@ F:	Documentation/translations/zh_CN/arch/loongarch/
- F:	arch/loongarch/
- F:	drivers/*/*loongarch*
- F:	drivers/cpufreq/loongson3_cpufreq.c
-+F:	include/linux/loongson
+diff --git a/arch/mips/include/asm/mach-loongson64/loongson_regs.h b/arch/mips/include/asm/mach-loongson64/loongson_regs.h
+index fec767507604..d8af16796dbe 100644
+--- a/arch/mips/include/asm/mach-loongson64/loongson_regs.h
++++ b/arch/mips/include/asm/mach-loongson64/loongson_regs.h
+@@ -5,12 +5,13 @@
+ #ifndef _LOONGSON_REGS_H_
+ #define _LOONGSON_REGS_H_
  
- LOONGSON GPIO DRIVER
- M:	Yinbo Zhu <zhuyinbo@loongson.cn>
-diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
-index 23af28f00c3c..4ac228230720 100644
---- a/arch/loongarch/include/asm/loongarch.h
-+++ b/arch/loongarch/include/asm/loongarch.h
-@@ -1048,84 +1048,6 @@
+-#include <linux/types.h>
+ #include <linux/bits.h>
++#include <linux/types.h>
  
- #define ESTATF_IP		0x00003fff
+ #include <asm/mipsregs.h>
+ #include <asm/cpu.h>
  
--#define LOONGARCH_IOCSR_FEATURES	0x8
--#define  IOCSRF_TEMP			BIT_ULL(0)
--#define  IOCSRF_NODECNT			BIT_ULL(1)
--#define  IOCSRF_MSI			BIT_ULL(2)
--#define  IOCSRF_EXTIOI			BIT_ULL(3)
--#define  IOCSRF_CSRIPI			BIT_ULL(4)
--#define  IOCSRF_FREQCSR			BIT_ULL(5)
--#define  IOCSRF_FREQSCALE		BIT_ULL(6)
--#define  IOCSRF_DVFSV1			BIT_ULL(7)
--#define  IOCSRF_EIODECODE		BIT_ULL(9)
--#define  IOCSRF_FLATMODE		BIT_ULL(10)
--#define  IOCSRF_VM			BIT_ULL(11)
--#define  IOCSRF_AVEC			BIT_ULL(15)
--
--#define LOONGARCH_IOCSR_VENDOR		0x10
--
--#define LOONGARCH_IOCSR_CPUNAME		0x20
--
--#define LOONGARCH_IOCSR_NODECNT		0x408
--
--#define LOONGARCH_IOCSR_MISC_FUNC	0x420
--#define  IOCSR_MISC_FUNC_SOFT_INT	BIT_ULL(10)
--#define  IOCSR_MISC_FUNC_TIMER_RESET	BIT_ULL(21)
--#define  IOCSR_MISC_FUNC_EXT_IOI_EN	BIT_ULL(48)
--#define  IOCSR_MISC_FUNC_AVEC_EN	BIT_ULL(51)
--
--#define LOONGARCH_IOCSR_CPUTEMP		0x428
--
--#define LOONGARCH_IOCSR_SMCMBX		0x51c
--
--/* PerCore CSR, only accessible by local cores */
--#define LOONGARCH_IOCSR_IPI_STATUS	0x1000
--#define LOONGARCH_IOCSR_IPI_EN		0x1004
--#define LOONGARCH_IOCSR_IPI_SET		0x1008
--#define LOONGARCH_IOCSR_IPI_CLEAR	0x100c
--#define LOONGARCH_IOCSR_MBUF0		0x1020
--#define LOONGARCH_IOCSR_MBUF1		0x1028
--#define LOONGARCH_IOCSR_MBUF2		0x1030
--#define LOONGARCH_IOCSR_MBUF3		0x1038
--
--#define LOONGARCH_IOCSR_IPI_SEND	0x1040
--#define  IOCSR_IPI_SEND_IP_SHIFT	0
--#define  IOCSR_IPI_SEND_CPU_SHIFT	16
--#define  IOCSR_IPI_SEND_BLOCKING	BIT(31)
--
--#define LOONGARCH_IOCSR_MBUF_SEND	0x1048
--#define  IOCSR_MBUF_SEND_BLOCKING	BIT_ULL(31)
--#define  IOCSR_MBUF_SEND_BOX_SHIFT	2
--#define  IOCSR_MBUF_SEND_BOX_LO(box)	(box << 1)
--#define  IOCSR_MBUF_SEND_BOX_HI(box)	((box << 1) + 1)
--#define  IOCSR_MBUF_SEND_CPU_SHIFT	16
--#define  IOCSR_MBUF_SEND_BUF_SHIFT	32
--#define  IOCSR_MBUF_SEND_H32_MASK	0xFFFFFFFF00000000ULL
--
--#define LOONGARCH_IOCSR_ANY_SEND	0x1158
--#define  IOCSR_ANY_SEND_BLOCKING	BIT_ULL(31)
--#define  IOCSR_ANY_SEND_CPU_SHIFT	16
--#define  IOCSR_ANY_SEND_MASK_SHIFT	27
--#define  IOCSR_ANY_SEND_BUF_SHIFT	32
--#define  IOCSR_ANY_SEND_H32_MASK	0xFFFFFFFF00000000ULL
--
--/* Register offset and bit definition for CSR access */
--#define LOONGARCH_IOCSR_TIMER_CFG       0x1060
--#define LOONGARCH_IOCSR_TIMER_TICK      0x1070
--#define  IOCSR_TIMER_CFG_RESERVED       (_ULCAST_(1) << 63)
--#define  IOCSR_TIMER_CFG_PERIODIC       (_ULCAST_(1) << 62)
--#define  IOCSR_TIMER_CFG_EN             (_ULCAST_(1) << 61)
--#define  IOCSR_TIMER_MASK		0x0ffffffffffffULL
--#define  IOCSR_TIMER_INITVAL_RST        (_ULCAST_(0xffff) << 48)
--
--#define LOONGARCH_IOCSR_EXTIOI_NODEMAP_BASE	0x14a0
--#define LOONGARCH_IOCSR_EXTIOI_IPMAP_BASE	0x14c0
--#define LOONGARCH_IOCSR_EXTIOI_EN_BASE		0x1600
--#define LOONGARCH_IOCSR_EXTIOI_BOUNCE_BASE	0x1680
--#define LOONGARCH_IOCSR_EXTIOI_ISR_BASE		0x1800
--#define LOONGARCH_IOCSR_EXTIOI_ROUTE_BASE	0x1c00
--#define IOCSR_EXTIOI_VECTOR_NUM			256
--
- #ifndef __ASSEMBLY__
++#ifndef __ASSEMBLY__
+ static inline bool cpu_has_cfg(void)
+ {
+ 	return ((read_c0_prid() & PRID_IMP_MASK) == PRID_IMP_LOONGSON_64G);
+@@ -33,6 +34,7 @@ static inline u32 read_cpucfg(u32 reg)
+ 		);
+ 	return __res;
+ }
++#endif
  
- static __always_inline u64 drdtime(void)
-@@ -1145,18 +1067,6 @@ static inline unsigned int get_csr_cpuid(void)
- 	return csr_read32(LOONGARCH_CSR_CPUID);
+ /* Bit Domains for CFG registers */
+ #define LOONGSON_CFG0	0x0
+@@ -131,6 +133,7 @@ static inline u32 read_cpucfg(u32 reg)
+ #define LOONGSON_CFG7_GCCAEQRP	BIT(0)
+ #define LOONGSON_CFG7_UCAWINP	BIT(1)
+ 
++#ifndef __ASSEMBLY__
+ static inline bool cpu_has_csr(void)
+ {
+ 	if (cpu_has_cfg())
+@@ -139,7 +142,10 @@ static inline bool cpu_has_csr(void)
+ 	return false;
  }
  
--static inline void csr_any_send(unsigned int addr, unsigned int data,
--				unsigned int data_mask, unsigned int cpu)
--{
--	uint64_t val = 0;
--
--	val = IOCSR_ANY_SEND_BLOCKING | addr;
--	val |= (cpu << IOCSR_ANY_SEND_CPU_SHIFT);
--	val |= (data_mask << IOCSR_ANY_SEND_MASK_SHIFT);
--	val |= ((uint64_t)data << IOCSR_ANY_SEND_BUF_SHIFT);
--	iocsr_write64(val, LOONGARCH_IOCSR_ANY_SEND);
--}
--
- static inline unsigned int read_csr_excode(void)
+-static inline u32 csr_readl(u32 reg)
++#define cpu_has_iocsr()	cpu_has_csr()
++
++/* For MIPS/Loongson IOCSR and Core CSR are accessed same way */
++static inline u32 csr_read32(u32 reg)
  {
- 	return (csr_read32(LOONGARCH_CSR_ESTAT) & CSR_ESTAT_EXC) >> CSR_ESTAT_EXC_SHIFT;
-diff --git a/arch/loongarch/kernel/cpu-probe.c b/arch/loongarch/kernel/cpu-probe.c
-index 8a868a10df9c..07b68f93ccdc 100644
---- a/arch/loongarch/kernel/cpu-probe.c
-+++ b/arch/loongarch/kernel/cpu-probe.c
-@@ -6,6 +6,7 @@
-  */
+ 	u32 __res;
+ 
+@@ -158,7 +164,7 @@ static inline u32 csr_readl(u32 reg)
+ 	return __res;
+ }
+ 
+-static inline u64 csr_readq(u32 reg)
++static inline u64 csr_read64(u32 reg)
+ {
+ 	u64 __res;
+ 
+@@ -177,7 +183,7 @@ static inline u64 csr_readq(u32 reg)
+ 	return __res;
+ }
+ 
+-static inline void csr_writel(u32 val, u32 reg)
++static inline void csr_write32(u32 val, u32 reg)
+ {
+ 	/* WRCSR reg, val */
+ 	__asm__ __volatile__(
+@@ -193,7 +199,7 @@ static inline void csr_writel(u32 val, u32 reg)
+ 		);
+ }
+ 
+-static inline void csr_writeq(u64 val, u32 reg)
++static inline void csr_write64(u64 val, u32 reg)
+ {
+ 	/* DWRCSR reg, val */
+ 	__asm__ __volatile__(
+@@ -209,43 +215,10 @@ static inline void csr_writeq(u64 val, u32 reg)
+ 		);
+ }
+ 
+-/* Public CSR Register can also be accessed with regular addresses */
+-#define CSR_PUBLIC_MMIO_BASE 0x1fe00000
+-
+-#define MMIO_CSR(x)		(void *)TO_UNCAC(CSR_PUBLIC_MMIO_BASE + x)
+-
+-#define LOONGSON_CSR_FEATURES	0x8
+-#define LOONGSON_CSRF_TEMP	BIT(0)
+-#define LOONGSON_CSRF_NODECNT	BIT(1)
+-#define LOONGSON_CSRF_MSI	BIT(2)
+-#define LOONGSON_CSRF_EXTIOI	BIT(3)
+-#define LOONGSON_CSRF_IPI	BIT(4)
+-#define LOONGSON_CSRF_FREQ	BIT(5)
+-
+-#define LOONGSON_CSR_VENDOR	0x10 /* Vendor name string, should be "Loongson" */
+-#define LOONGSON_CSR_CPUNAME	0x20 /* Processor name string */
+-#define LOONGSON_CSR_NODECNT	0x408
+-#define LOONGSON_CSR_CPUTEMP	0x428
+-
+-/* PerCore CSR, only accessible by local cores */
+-#define LOONGSON_CSR_IPI_STATUS	0x1000
+-#define LOONGSON_CSR_IPI_EN	0x1004
+-#define LOONGSON_CSR_IPI_SET	0x1008
+-#define LOONGSON_CSR_IPI_CLEAR	0x100c
+-#define LOONGSON_CSR_IPI_SEND	0x1040
+-#define CSR_IPI_SEND_IP_SHIFT	0
+-#define CSR_IPI_SEND_CPU_SHIFT	16
+-#define CSR_IPI_SEND_BLOCK	BIT(31)
+-
+-#define LOONGSON_CSR_MAIL_BUF0		0x1020
+-#define LOONGSON_CSR_MAIL_SEND		0x1048
+-#define CSR_MAIL_SEND_BLOCK		BIT_ULL(31)
+-#define CSR_MAIL_SEND_BOX_LOW(box)	(box << 1)
+-#define CSR_MAIL_SEND_BOX_HIGH(box)	((box << 1) + 1)
+-#define CSR_MAIL_SEND_BOX_SHIFT		2
+-#define CSR_MAIL_SEND_CPU_SHIFT		16
+-#define CSR_MAIL_SEND_BUF_SHIFT		32
+-#define CSR_MAIL_SEND_H32_MASK		0xFFFFFFFF00000000ULL
++#define iocsr_read32(reg)	csr_read32(reg)
++#define iocsr_read64(reg)	csr_read64(reg)
++#define iocsr_write32(val, reg)	csr_write32(val, reg)
++#define iocsr_write64(val, reg)	csr_write64(val, reg)
+ 
+ static inline u64 drdtime(void)
+ {
+@@ -264,5 +237,6 @@ static inline u64 drdtime(void)
+ 		);
+ 	return val;
+ }
++#endif
+ 
+ #endif
+diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+index 99d5a71e4300..4964c1922b23 100644
+--- a/arch/mips/kvm/vz.c
++++ b/arch/mips/kvm/vz.c
+@@ -2977,7 +2977,7 @@ static int kvm_vz_hardware_enable(void)
+ #ifdef CONFIG_CPU_LOONGSON64
+ 	/* Control guest CCA attribute */
+ 	if (cpu_has_csr())
+-		csr_writel(csr_readl(0xffffffec) | 0x1, 0xffffffec);
++		csr_write32(csr_read32(0xffffffec) | 0x1, 0xffffffec);
+ #endif
+ 
+ 	return 0;
+diff --git a/arch/mips/loongson64/smp.c b/arch/mips/loongson64/smp.c
+index 147acd972a07..0cf03377edf0 100644
+--- a/arch/mips/loongson64/smp.c
++++ b/arch/mips/loongson64/smp.c
+@@ -7,6 +7,7 @@
+ #include <irq.h>
  #include <linux/init.h>
- #include <linux/kernel.h>
+ #include <linux/cpu.h>
 +#include <linux/loongson/iocsr.h>
- #include <linux/ptrace.h>
- #include <linux/smp.h>
- #include <linux/stddef.h>
-@@ -267,13 +268,13 @@ static inline void cpu_probe_loongson(struct cpuinfo_loongarch *c, unsigned int
- 	if (!(c->options & LOONGARCH_CPU_IOCSR))
- 		return;
+ #include <linux/sched.h>
+ #include <linux/sched/hotplug.h>
+ #include <linux/sched/task_stack.h>
+@@ -19,7 +20,6 @@
+ #include <asm/tlbflush.h>
+ #include <asm/cacheflush.h>
+ #include <loongson.h>
+-#include <loongson_regs.h>
+ #include <workarounds.h>
  
--	*vendor = iocsr_read64(LOONGARCH_IOCSR_VENDOR);
--	*cpuname = iocsr_read64(LOONGARCH_IOCSR_CPUNAME);
-+	*vendor = iocsr_read64(LOONGSON_IOCSR_VENDOR);
-+	*cpuname = iocsr_read64(LOONGSON_IOCSR_CPUNAME);
+ #include "smp.h"
+@@ -45,19 +45,19 @@ static void csr_mail_send(uint64_t data, int cpu, int mailbox)
+ {
+ 	uint64_t val;
  
- 	if (!__cpu_full_name[cpu])
- 		__cpu_full_name[cpu] = cpu_full_name;
- 
--	config = iocsr_read32(LOONGARCH_IOCSR_FEATURES);
-+	config = iocsr_read32(LOONGSON_IOCSR_FEATURES);
- 	if (config & IOCSRF_CSRIPI)
- 		c->options |= LOONGARCH_CPU_CSRIPI;
- 	if (config & IOCSRF_EXTIOI)
-diff --git a/arch/loongarch/kernel/relocate_kernel.S b/arch/loongarch/kernel/relocate_kernel.S
-index 84e6de2fd973..ce40ba6b5975 100644
---- a/arch/loongarch/kernel/relocate_kernel.S
-+++ b/arch/loongarch/kernel/relocate_kernel.S
-@@ -5,6 +5,7 @@
-  * Copyright (C) 2022 Loongson Technology Corporation Limited
-  */
- 
-+#include <linux/loongson/iocsr.h>
- #include <linux/kexec.h>
- 
- #include <asm/asm.h>
-@@ -88,14 +89,14 @@ SYM_CODE_END(relocate_new_kernel)
- #ifdef CONFIG_SMP
- /*
-  * Other CPUs should wait until code is relocated and
-- * then start at the entry point from LOONGARCH_IOCSR_MBUF0.
-+ * then start at the entry point from LOONGSON_IOCSR_MBUF0.
-  */
- SYM_CODE_START(kexec_smp_wait)
- 	UNWIND_HINT_UNDEFINED
- 1:	li.w		t0, 0x100			/* wait for init loop */
- 2:	addi.w		t0, t0, -1			/* limit mailbox access */
- 	bnez		t0, 2b
--	li.w		t1, LOONGARCH_IOCSR_MBUF0
-+	li.w		t1, LOONGSON_IOCSR_MBUF0
- 	iocsrrd.w	s0, t1				/* check PC as an indicator */
- 	beqz		s0, 1b
- 	iocsrrd.d	s0, t1				/* get PC via mailbox */
-diff --git a/arch/loongarch/kernel/smp.c b/arch/loongarch/kernel/smp.c
-index 4adbbef3450a..120865985376 100644
---- a/arch/loongarch/kernel/smp.c
-+++ b/arch/loongarch/kernel/smp.c
-@@ -14,6 +14,7 @@
- #include <linux/init.h>
- #include <linux/interrupt.h>
- #include <linux/irq_work.h>
-+#include <linux/loongson/iocsr.h>
- #include <linux/profile.h>
- #include <linux/seq_file.h>
- #include <linux/smp.h>
-@@ -164,14 +165,14 @@ static void csr_mail_send(uint64_t data, int cpu, int mailbox)
- 	val |= (IOCSR_MBUF_SEND_BOX_HI(mailbox) << IOCSR_MBUF_SEND_BOX_SHIFT);
- 	val |= (cpu << IOCSR_MBUF_SEND_CPU_SHIFT);
- 	val |= (data & IOCSR_MBUF_SEND_H32_MASK);
--	iocsr_write64(val, LOONGARCH_IOCSR_MBUF_SEND);
+-	/* send high 32 bits */
+-	val = CSR_MAIL_SEND_BLOCK;
+-	val |= (CSR_MAIL_SEND_BOX_HIGH(mailbox) << CSR_MAIL_SEND_BOX_SHIFT);
+-	val |= (cpu << CSR_MAIL_SEND_CPU_SHIFT);
+-	val |= (data & CSR_MAIL_SEND_H32_MASK);
+-	csr_writeq(val, LOONGSON_CSR_MAIL_SEND);
+-
+-	/* send low 32 bits */
+-	val = CSR_MAIL_SEND_BLOCK;
+-	val |= (CSR_MAIL_SEND_BOX_LOW(mailbox) << CSR_MAIL_SEND_BOX_SHIFT);
+-	val |= (cpu << CSR_MAIL_SEND_CPU_SHIFT);
+-	val |= (data << CSR_MAIL_SEND_BUF_SHIFT);
+-	csr_writeq(val, LOONGSON_CSR_MAIL_SEND);
++	/* Send high 32 bits */
++	val = IOCSR_MBUF_SEND_BLOCKING;
++	val |= (IOCSR_MBUF_SEND_BOX_HI(mailbox) << IOCSR_MBUF_SEND_BOX_SHIFT);
++	val |= (cpu << IOCSR_MBUF_SEND_CPU_SHIFT);
++	val |= (data & IOCSR_MBUF_SEND_H32_MASK);
 +	iocsr_write64(val, LOONGSON_IOCSR_MBUF_SEND);
- 
- 	/* Send low 32 bits */
- 	val = IOCSR_MBUF_SEND_BLOCKING;
- 	val |= (IOCSR_MBUF_SEND_BOX_LO(mailbox) << IOCSR_MBUF_SEND_BOX_SHIFT);
- 	val |= (cpu << IOCSR_MBUF_SEND_CPU_SHIFT);
- 	val |= (data << IOCSR_MBUF_SEND_BUF_SHIFT);
--	iocsr_write64(val, LOONGARCH_IOCSR_MBUF_SEND);
++
++	/* Send low 32 bits */
++	val = IOCSR_MBUF_SEND_BLOCKING;
++	val |= (IOCSR_MBUF_SEND_BOX_LO(mailbox) << IOCSR_MBUF_SEND_BOX_SHIFT);
++	val |= (cpu << IOCSR_MBUF_SEND_CPU_SHIFT);
++	val |= (data << IOCSR_MBUF_SEND_BUF_SHIFT);
 +	iocsr_write64(val, LOONGSON_IOCSR_MBUF_SEND);
  };
  
- static u32 ipi_read_clear(int cpu)
-@@ -179,9 +180,9 @@ static u32 ipi_read_clear(int cpu)
+ static u32 csr_ipi_read_clear(int cpu)
+@@ -65,9 +65,9 @@ static u32 csr_ipi_read_clear(int cpu)
  	u32 action;
  
  	/* Load the ipi register to figure out what we're supposed to do */
--	action = iocsr_read32(LOONGARCH_IOCSR_IPI_STATUS);
+-	action = csr_readl(LOONGSON_CSR_IPI_STATUS);
 +	action = iocsr_read32(LOONGSON_IOCSR_IPI_STATUS);
  	/* Clear the ipi register to clear the interrupt */
--	iocsr_write32(action, LOONGARCH_IOCSR_IPI_CLEAR);
+-	csr_writel(action, LOONGSON_CSR_IPI_CLEAR);
 +	iocsr_write32(action, LOONGSON_IOCSR_IPI_CLEAR);
- 	wbflush();
  
  	return action;
-@@ -193,7 +194,7 @@ static void ipi_write_action(int cpu, u32 action)
+ }
+@@ -77,22 +77,22 @@ static void csr_ipi_write_action(int cpu, u32 action)
+ 	unsigned int irq = 0;
  
- 	val = IOCSR_IPI_SEND_BLOCKING | action;
- 	val |= (cpu << IOCSR_IPI_SEND_CPU_SHIFT);
--	iocsr_write32(val, LOONGARCH_IOCSR_IPI_SEND);
-+	iocsr_write32(val, LOONGSON_IOCSR_IPI_SEND);
+ 	while ((irq = ffs(action))) {
+-		uint32_t val = CSR_IPI_SEND_BLOCK;
++		uint32_t val = IOCSR_IPI_SEND_BLOCKING;
+ 		val |= (irq - 1);
+-		val |= (cpu << CSR_IPI_SEND_CPU_SHIFT);
+-		csr_writel(val, LOONGSON_CSR_IPI_SEND);
++		val |= (cpu << IOCSR_IPI_SEND_CPU_SHIFT);
++		iocsr_write32(val, LOONGSON_IOCSR_IPI_SEND);
+ 		action &= ~BIT(irq - 1);
+ 	}
  }
  
- static void loongson_send_ipi_single(int cpu, unsigned int action)
-@@ -322,7 +323,7 @@ void __init loongson_smp_setup(void)
- 	cpu_data[0].package = cpu_logical_map(0) / loongson_sysconf.cores_per_package;
- 
- 	pv_ipi_init();
--	iocsr_write32(0xffffffff, LOONGARCH_IOCSR_IPI_EN);
-+	iocsr_write32(0xffffffff, LOONGSON_IOCSR_IPI_EN);
- 	pr_info("Detected %i available CPU(s)\n", loongson_sysconf.nr_cpus);
- }
- 
-@@ -370,7 +371,7 @@ void loongson_init_secondary(void)
- 
- 	change_csr_ecfg(ECFG0_IM, imask);
- 
--	iocsr_write32(0xffffffff, LOONGARCH_IOCSR_IPI_EN);
-+	iocsr_write32(0xffffffff, LOONGSON_IOCSR_IPI_EN);
- 
- #ifdef CONFIG_NUMA
- 	numa_add_cpu(cpu);
-@@ -385,7 +386,7 @@ void loongson_init_secondary(void)
- void loongson_smp_finish(void)
+ static void csr_ipi_write_enable(int cpu)
  {
- 	local_irq_enable();
--	iocsr_write64(0, LOONGARCH_IOCSR_MBUF0);
+-	csr_writel(0xffffffff, LOONGSON_CSR_IPI_EN);
++	iocsr_write32(0xffffffff, LOONGSON_IOCSR_IPI_EN);
+ }
+ 
+ static void csr_ipi_clear_buf(int cpu)
+ {
+-	csr_writeq(0, LOONGSON_CSR_MAIL_BUF0);
 +	iocsr_write64(0, LOONGSON_IOCSR_MBUF0);
- 	pr_info("CPU#%d finished\n", smp_processor_id());
  }
  
-@@ -435,12 +436,12 @@ void __noreturn arch_cpu_idle_dead(void)
- 	__smp_mb();
- 	do {
- 		__asm__ __volatile__("idle 0\n\t");
--		addr = iocsr_read64(LOONGARCH_IOCSR_MBUF0);
-+		addr = iocsr_read64(LOONGSON_IOCSR_MBUF0);
- 	} while (addr == 0);
+ static void csr_ipi_write_buf(int cpu, struct task_struct *idle)
+@@ -169,7 +169,7 @@ static void legacy_ipi_write_buf(int cpu, struct task_struct *idle)
  
- 	local_irq_disable();
- 	init_fn = (void *)TO_CACHE(addr);
--	iocsr_write32(0xffffffff, LOONGARCH_IOCSR_IPI_CLEAR);
-+	iocsr_write32(0xffffffff, LOONGSON_IOCSR_IPI_CLEAR);
- 
- 	init_fn();
- 	BUG();
-@@ -460,7 +461,7 @@ static int loongson_ipi_suspend(void)
- 
- static void loongson_ipi_resume(void)
+ static void csr_ipi_probe(void)
  {
--	iocsr_write32(0xffffffff, LOONGARCH_IOCSR_IPI_EN);
-+	iocsr_write32(0xffffffff, LOONGSON_IOCSR_IPI_EN);
- }
- 
- static struct syscore_ops loongson_ipi_syscore_ops = {
-diff --git a/drivers/cpufreq/loongson3_cpufreq.c b/drivers/cpufreq/loongson3_cpufreq.c
-index 6b5e6798d9a2..11d5f1ba3040 100644
---- a/drivers/cpufreq/loongson3_cpufreq.c
-+++ b/drivers/cpufreq/loongson3_cpufreq.c
-@@ -10,6 +10,7 @@
- #include <linux/cpufreq.h>
- #include <linux/delay.h>
+-	if (cpu_has_csr() && csr_readl(LOONGSON_CSR_FEATURES) & LOONGSON_CSRF_IPI) {
++	if (cpu_has_iocsr() && iocsr_read32(LOONGSON_IOCSR_FEATURES) & IOCSRF_CSRIPI) {
+ 		ipi_read_clear = csr_ipi_read_clear;
+ 		ipi_write_action = csr_ipi_write_action;
+ 		ipi_write_enable = csr_ipi_write_enable;
+diff --git a/drivers/platform/mips/cpu_hwmon.c b/drivers/platform/mips/cpu_hwmon.c
+index 2ac2f31090f9..9b0b39a39d13 100644
+--- a/drivers/platform/mips/cpu_hwmon.c
++++ b/drivers/platform/mips/cpu_hwmon.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ #include <linux/err.h>
++#include <linux/loongson/iocsr.h>
  #include <linux/module.h>
-+#include <linux/loongson/iocsr.h>
- #include <linux/platform_device.h>
- #include <linux/units.h>
+ #include <linux/reboot.h>
+ #include <linux/jiffies.h>
+@@ -9,7 +10,6 @@
+ #include <loongson.h>
+ #include <boot_param.h>
+ #include <loongson_hwmon.h>
+-#include <loongson_regs.h>
  
-@@ -182,7 +183,7 @@ static inline int do_service_request(u32 id, u32 info, u32 cmd, u32 val, u32 ext
+ static int csr_temp_enable;
  
- 	mutex_lock(&cpufreq_mutex[package]);
+@@ -24,7 +24,7 @@ int loongson3_cpu_temp(int cpu)
+ 	u32 reg, prid_rev;
  
--	last.value = iocsr_read32(LOONGARCH_IOCSR_SMCMBX);
-+	last.value = iocsr_read32(LOONGSON_IOCSR_SMCMBX);
- 	if (!last.complete) {
- 		mutex_unlock(&cpufreq_mutex[package]);
- 		return -EPERM;
-@@ -195,12 +196,12 @@ static inline int do_service_request(u32 id, u32 info, u32 cmd, u32 val, u32 ext
- 	msg.extra	= extra;
- 	msg.complete	= 0;
+ 	if (csr_temp_enable) {
+-		reg = (csr_readl(LOONGSON_CSR_CPUTEMP) & 0xff);
++		reg = (iocsr_read32(LOONGSON_IOCSR_CPUTEMP) & 0xff);
+ 		goto out;
+ 	}
  
--	iocsr_write32(msg.value, LOONGARCH_IOCSR_SMCMBX);
--	iocsr_write32(iocsr_read32(LOONGARCH_IOCSR_MISC_FUNC) | IOCSR_MISC_FUNC_SOFT_INT,
--		      LOONGARCH_IOCSR_MISC_FUNC);
-+	iocsr_write32(msg.value, LOONGSON_IOCSR_SMCMBX);
-+	iocsr_write32(iocsr_read32(LOONGSON_IOCSR_MISC_FUNC) | IOCSR_MISC_FUNC_SOFT_INT,
-+		      LOONGSON_IOCSR_MISC_FUNC);
+@@ -136,8 +136,7 @@ static int __init loongson_hwmon_init(void)
+ 	pr_info("Loongson Hwmon Enter...\n");
  
- 	for (retries = 0; retries < 10000; retries++) {
--		msg.value = iocsr_read32(LOONGARCH_IOCSR_SMCMBX);
-+		msg.value = iocsr_read32(LOONGSON_IOCSR_SMCMBX);
- 		if (msg.complete)
- 			break;
+ 	if (cpu_has_csr())
+-		csr_temp_enable = csr_readl(LOONGSON_CSR_FEATURES) &
+-				  LOONGSON_CSRF_TEMP;
++		csr_temp_enable = iocsr_read32(LOONGSON_IOCSR_FEATURES) & IOCSRF_TEMP;
  
-diff --git a/drivers/irqchip/irq-loongarch-avec.c b/drivers/irqchip/irq-loongarch-avec.c
-index 0f6e465dd309..2452c6cc0aa1 100644
---- a/drivers/irqchip/irq-loongarch-avec.c
-+++ b/drivers/irqchip/irq-loongarch-avec.c
-@@ -10,6 +10,7 @@
- #include <linux/irqchip.h>
- #include <linux/irqchip/chained_irq.h>
- #include <linux/irqdomain.h>
-+#include <linux/loongson/iocsr.h>
- #include <linux/kernel.h>
- #include <linux/msi.h>
- #include <linux/radix-tree.h>
-@@ -378,9 +379,9 @@ static int __init avecintc_init(struct irq_domain *parent)
- 				  "irqchip/loongarch/avecintc:starting",
- 				  avecintc_cpu_online, avecintc_cpu_offline);
- #endif
--	value = iocsr_read64(LOONGARCH_IOCSR_MISC_FUNC);
-+	value = iocsr_read64(LOONGSON_IOCSR_MISC_FUNC);
- 	value |= IOCSR_MISC_FUNC_AVEC_EN;
--	iocsr_write64(value, LOONGARCH_IOCSR_MISC_FUNC);
-+	iocsr_write64(value, LOONGSON_IOCSR_MISC_FUNC);
- 
- 	return ret;
- 
-diff --git a/drivers/irqchip/irq-loongson-eiointc.c b/drivers/irqchip/irq-loongson-eiointc.c
-index e24db71a8783..6e81bf27914f 100644
---- a/drivers/irqchip/irq-loongson-eiointc.c
-+++ b/drivers/irqchip/irq-loongson-eiointc.c
-@@ -13,6 +13,7 @@
- #include <linux/irqchip.h>
- #include <linux/irqdomain.h>
- #include <linux/irqchip/chained_irq.h>
-+#include <linux/loongson/iocsr.h>
- #include <linux/kernel.h>
- #include <linux/syscore_ops.h>
- #include <asm/numa.h>
-@@ -52,9 +53,9 @@ static void eiointc_enable(void)
- {
- 	uint64_t misc;
- 
--	misc = iocsr_read64(LOONGARCH_IOCSR_MISC_FUNC);
-+	misc = iocsr_read64(LOONGSON_IOCSR_MISC_FUNC);
- 	misc |= IOCSR_MISC_FUNC_EXT_IOI_EN;
--	iocsr_write64(misc, LOONGARCH_IOCSR_MISC_FUNC);
-+	iocsr_write64(misc, LOONGSON_IOCSR_MISC_FUNC);
- }
- 
- static int cpu_to_eio_node(int cpu)
+ 	if (!csr_temp_enable && !loongson_chiptemp[0])
+ 		return -ENODEV;
 diff --git a/include/linux/loongson/iocsr.h b/include/linux/loongson/iocsr.h
-new file mode 100644
-index 000000000000..6654a904bcbe
---- /dev/null
+index 6654a904bcbe..15e70e6e132e 100644
+--- a/include/linux/loongson/iocsr.h
 +++ b/include/linux/loongson/iocsr.h
-@@ -0,0 +1,110 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2020-2022 Loongson Technology Corporation Limited
-+ * Copyright (C) 2024, Jiaxun Yang <jiaxun.yang@flygoat.com>
-+ */
-+
-+#ifndef _LOONGSON_IOCSR_H
-+#define _LOONGSON_IOCSR_H
-+
-+#include <linux/bits.h>
-+#include <linux/types.h>
-+
-+#ifdef CONFIG_LOONGARCH
-+#include <asm/loongarch.h>
+@@ -10,9 +10,12 @@
+ #include <linux/bits.h>
+ #include <linux/types.h>
+ 
+-#ifdef CONFIG_LOONGARCH
++#if defined(CONFIG_LOONGARCH)
+ #include <asm/loongarch.h>
+ #endif
++#if defined(CONFIG_MIPS) && defined(CONFIG_MACH_LOONGSON64)
++#include <loongson_regs.h>
 +#endif
-+
-+#define LOONGSON_IOCSR_FEATURES	0x8
-+#define  IOCSRF_TEMP			BIT_ULL(0)
-+#define  IOCSRF_NODECNT			BIT_ULL(1)
-+#define  IOCSRF_MSI			BIT_ULL(2)
-+#define  IOCSRF_EXTIOI			BIT_ULL(3)
-+#define  IOCSRF_CSRIPI			BIT_ULL(4)
-+#define  IOCSRF_FREQCSR			BIT_ULL(5)
-+#define  IOCSRF_FREQSCALE		BIT_ULL(6)
-+#define  IOCSRF_DVFSV1			BIT_ULL(7)
-+#define  IOCSRF_EIODECODE		BIT_ULL(9)
-+#define  IOCSRF_FLATMODE		BIT_ULL(10)
-+#define  IOCSRF_VM			BIT_ULL(11)
-+#define  IOCSRF_AVEC			BIT_ULL(15)
-+
-+#define LOONGSON_IOCSR_VENDOR		0x10
-+
-+#define LOONGSON_IOCSR_CPUNAME		0x20
-+
-+#define LOONGSON_IOCSR_NODECNT		0x408
-+
-+#define LOONGSON_IOCSR_MISC_FUNC	0x420
-+#define  IOCSR_MISC_FUNC_SOFT_INT	BIT_ULL(10)
-+#define  IOCSR_MISC_FUNC_TIMER_RESET	BIT_ULL(21)
-+#define  IOCSR_MISC_FUNC_EXT_IOI_EN	BIT_ULL(48)
-+#define  IOCSR_MISC_FUNC_AVEC_EN	BIT_ULL(51)
-+
-+#define LOONGSON_IOCSR_CPUTEMP		0x428
-+
-+#define LOONGSON_IOCSR_SMCMBX		0x51c
-+
-+/* PerCore CSR, only accessible by local cores */
-+#define LOONGSON_IOCSR_IPI_STATUS	0x1000
-+#define LOONGSON_IOCSR_IPI_EN		0x1004
-+#define LOONGSON_IOCSR_IPI_SET		0x1008
-+#define LOONGSON_IOCSR_IPI_CLEAR	0x100c
-+#define LOONGSON_IOCSR_MBUF0		0x1020
-+#define LOONGSON_IOCSR_MBUF1		0x1028
-+#define LOONGSON_IOCSR_MBUF2		0x1030
-+#define LOONGSON_IOCSR_MBUF3		0x1038
-+
-+#define LOONGSON_IOCSR_IPI_SEND	0x1040
-+#define  IOCSR_IPI_SEND_IP_SHIFT	0
-+#define  IOCSR_IPI_SEND_CPU_SHIFT	16
-+#define  IOCSR_IPI_SEND_BLOCKING	BIT(31)
-+
-+#define LOONGSON_IOCSR_MBUF_SEND	0x1048
-+#define  IOCSR_MBUF_SEND_BLOCKING	BIT_ULL(31)
-+#define  IOCSR_MBUF_SEND_BOX_SHIFT	2
-+#define  IOCSR_MBUF_SEND_BOX_LO(box)	(box << 1)
-+#define  IOCSR_MBUF_SEND_BOX_HI(box)	((box << 1) + 1)
-+#define  IOCSR_MBUF_SEND_CPU_SHIFT	16
-+#define  IOCSR_MBUF_SEND_BUF_SHIFT	32
-+#define  IOCSR_MBUF_SEND_H32_MASK	0xFFFFFFFF00000000ULL
-+
-+#define LOONGSON_IOCSR_ANY_SEND	0x1158
-+#define  IOCSR_ANY_SEND_BLOCKING	BIT_ULL(31)
-+#define  IOCSR_ANY_SEND_CPU_SHIFT	16
-+#define  IOCSR_ANY_SEND_MASK_SHIFT	27
-+#define  IOCSR_ANY_SEND_BUF_SHIFT	32
-+#define  IOCSR_ANY_SEND_H32_MASK	0xFFFFFFFF00000000ULL
-+
-+/* Register offset and bit definition for CSR access */
-+#define LOONGSON_IOCSR_TIMER_CFG       0x1060
-+#define LOONGSON_IOCSR_TIMER_TICK      0x1070
-+#define  IOCSR_TIMER_CFG_RESERVED       (_ULCAST_(1) << 63)
-+#define  IOCSR_TIMER_CFG_PERIODIC       (_ULCAST_(1) << 62)
-+#define  IOCSR_TIMER_CFG_EN             (_ULCAST_(1) << 61)
-+#define  IOCSR_TIMER_MASK		0x0ffffffffffffULL
-+#define  IOCSR_TIMER_INITVAL_RST        (_ULCAST_(0xffff) << 48)
-+
-+#define LOONGSON_IOCSR_EXTIOI_NODEMAP_BASE	0x14a0
-+#define LOONGSON_IOCSR_EXTIOI_IPMAP_BASE	0x14c0
-+#define LOONGSON_IOCSR_EXTIOI_EN_BASE		0x1600
-+#define LOONGSON_IOCSR_EXTIOI_BOUNCE_BASE	0x1680
-+#define LOONGSON_IOCSR_EXTIOI_ISR_BASE		0x1800
-+#define LOONGSON_IOCSR_EXTIOI_ROUTE_BASE	0x1c00
-+#define IOCSR_EXTIOI_VECTOR_NUM			256
-+
-+#ifndef __ASSEMBLY__
-+static inline void csr_any_send(unsigned int addr, unsigned int data,
-+				unsigned int data_mask, unsigned int cpu)
-+{
-+	uint64_t val = 0;
-+
-+	val = IOCSR_ANY_SEND_BLOCKING | addr;
-+	val |= (cpu << IOCSR_ANY_SEND_CPU_SHIFT);
-+	val |= (data_mask << IOCSR_ANY_SEND_MASK_SHIFT);
-+	val |= ((uint64_t)data << IOCSR_ANY_SEND_BUF_SHIFT);
-+	iocsr_write64(val, LOONGSON_IOCSR_ANY_SEND);
-+}
-+#endif
-+
-+#endif
-+
+ 
+ #define LOONGSON_IOCSR_FEATURES	0x8
+ #define  IOCSRF_TEMP			BIT_ULL(0)
 
 -- 
 2.46.0
