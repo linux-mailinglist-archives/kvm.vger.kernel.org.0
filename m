@@ -1,330 +1,525 @@
-Return-Path: <kvm+bounces-26791-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26792-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEFC5977BF3
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 11:11:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9DA977C17
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 11:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FA2E285DFA
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 09:11:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18E401F28C49
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 09:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5061D6DBC;
-	Fri, 13 Sep 2024 09:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="ExTFxaOM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LSzpmTvK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDC51D6DA7;
+	Fri, 13 Sep 2024 09:20:27 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from fout7-smtp.messagingengine.com (fout7-smtp.messagingengine.com [103.168.172.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AAB31D58B2;
-	Fri, 13 Sep 2024 09:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4C0175D45
+	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 09:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726218653; cv=none; b=EmmIWVCqhnkDC9b0wqpTOdqrQEAqOpnyFkpkBHq2gc+eWpi5DAx8+Sqq4l1oM6ct2Z9EUPiqmIqUoIgusU6GsLK4XfxX37VN7q8oD48JUlBSBmC3efb57ue3GIjP8zS4t899sWh6uFNgiMuwd9L7NX7q1JTAYQ6Mh+cexUuBnJ0=
+	t=1726219226; cv=none; b=E81pYSKGGK5bEiKckCfqzaodjBx0Aq4WWjzu/mOUqJNkgbaTQLAYqmDK0uusnf6QsDSbFSNQVKDFN+nHqnz+fL9eAGWrpXL5SLD5e0ibDzdZ06mbBTq9NVu0vcu3I4Skh2I0pef80DtkSl798a/B+5zEF6AQslPCfxjMq9CNb98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726218653; c=relaxed/simple;
-	bh=tt9AADMrwVNUsXHIqAOKdNpwu64ra0IXp/MHU7EzxmQ=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=uszbwTn4VLRQ0jbzcZpdq8RH5hCsQ4bUAmCIethr5JBJHKIX28ou+iPgIRmVpt8dOnav1X1d9woc/oTo+hwainIqlHUU5ZFvpBYcUN/PexUarLfH7ASyFSZZ7G8yPDLq08aCzipAA6Gow6vEQLhlxzbUIO50/cwLfyNNzykPKu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com; spf=pass smtp.mailfrom=flygoat.com; dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b=ExTFxaOM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LSzpmTvK; arc=none smtp.client-ip=103.168.172.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flygoat.com
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfout.phl.internal (Postfix) with ESMTP id 281CE13802B2;
-	Fri, 13 Sep 2024 05:10:49 -0400 (EDT)
-Received: from phl-imap-12 ([10.202.2.86])
-  by phl-compute-09.internal (MEProxy); Fri, 13 Sep 2024 05:10:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1726218649;
-	 x=1726305049; bh=FJ45Qglvg7DmjFxDy6maK3tnXPu/iEdwJfotzp3qoVY=; b=
-	ExTFxaOM1q2QaFIn5lMTUZRkL3s3wsqh2uACtKgm2++6I8Cxbuarlx73WuTfodr+
-	1BG52BjtQ2O/RbOeHY6Z5nQkez1OTWLHrw9Y0HdlwCG7Fcqffcm9ZE/Z42MUw6e7
-	aJ1k6eLQeyWnQzqilmgQFjTxoRlR/as6/lCk3zH39XuljGSLdvDfM87v/n7ohRLK
-	q9k4demWaxJOiy9mMFAW3aqlDjJC/OC9NwEmy69O96Fht5SMVvyfM6Anra7fPhYb
-	fBJFHPwan1xmQbtth9l/LYFNR8i5qnFS4B7K6V6gTiiYoVJJlkLRbdknR0LpiI5q
-	S4tQHPtdDuDOfectuh04SA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1726218649; x=
-	1726305049; bh=FJ45Qglvg7DmjFxDy6maK3tnXPu/iEdwJfotzp3qoVY=; b=L
-	SzpmTvKYIF5kHP5K92PZi0/P6uMjICaF3iGyvPH8pPsB2p2rAbeVJ0MrxBwZHLWS
-	vwU1MB6JZCIELNgabHhzhAOZLt5M8i5ie5bkMDSppFPjNrsHxluzZpQjbRVyZglX
-	9t3GYgDXiLuwU2NHU2+J1w04V03e+pH6SSyCyOiIGXsUftHsl25QN5WC+apWqqof
-	+Ui9WOf9Z0UAeJr5w2RDbrq4SukapfQnvpceTr9VSvxfOCfBYwB+K0CevPj5lNSF
-	awYmOZ2IF6sy/CGw1Hl0eBY9hcNrrbMeeukbxHtbFir99XQZP4q3UIZIlO9vOkN3
-	5EaIK3QW/8Cd+MaNk/3kg==
-X-ME-Sender: <xms:mAHkZs58ehgy0N4vhx2YdYQMhZOLsKB1XYqdEW7-rkcwoVtJwOG_hg>
-    <xme:mAHkZt5TJnLA5yoStQU0eMuqwJdk-iY43LttYqwyDED4quoAtVd543NrTsfcTqpS1
-    7TknnLWC_HhaaBTSXQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudejjedgudduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdej
-    necuhfhrohhmpedflfhirgiguhhnucgjrghnghdfuceojhhirgiguhhnrdihrghnghesfh
-    hlhihgohgrthdrtghomheqnecuggftrfgrthhtvghrnhepjeehfeduvddtgffgvdffkeet
-    hefhlefgvdevvdekuefffeekheehgeevhfevteejnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihgohgr
-    thdrtghomhdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtph
-    htthhopehtshgsohhgvghnugesrghlphhhrgdrfhhrrghnkhgvnhdruggvpdhrtghpthht
-    oheptghhvghnhhhurggtrghisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrrghfrg
-    gvlheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvhhirhgvshhhrdhkuhhmrghrsehl
-    ihhnrghrohdrohhrghdprhgtphhtthhopehtghhlgieslhhinhhuthhrohhnihigrdguvg
-    dprhgtphhtthhopehlohhonhhgrghrtghhsehlihhsthhsrdhlihhnuhigrdguvghvpdhr
-    tghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
-    hnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehl
-    ihhnuhigqdhmihhpshesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:mAHkZreBs9WeD2wS-4sgdFp08F2qC_tlncrS_kXiaFyZY3gZpEEJCg>
-    <xmx:mAHkZhIRkM_6p6WglSJG38Xq1-yLnpz_YUilrHgTLr6Sz1l1pStRPg>
-    <xmx:mAHkZgI1iWTI-sWtiM2oEdAejdsQo6QLXm5oIs-jr1b0h2qRheqEQQ>
-    <xmx:mAHkZiz6yS6epgx0Hz0fHV15BuOnWeYnZMReLDTfgw37ODVKNf3k6Q>
-    <xmx:mQHkZtALj-7B8j9db26vWy2uo4xeplo4CRbDzNqmchNcB2Br6nCwg1Yy>
-Feedback-ID: ifd894703:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 2A1761C20065; Fri, 13 Sep 2024 05:10:48 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1726219226; c=relaxed/simple;
+	bh=zmWPNb0zLRwifSl8fo+Pmp2E+9Xg4kr/XkokhEtNbS8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=XffH76uxyjIfBpzFPXqlcfO61u5tF3AeTbByd5cqcLCR2W6du4NcqGhZv6nDmqcOWtVicUKxXupyfP+bqlWlDEJwW+e8a9zxTqb9BSYbPM46YlOZpkUpK5uJ6XwxCO2vI33sFjKF0xu9ra07PC9d3pv1k9HLuSwk1LPxdMqn5Uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Bxb+vOA+RmqcgGAA--.15977S3;
+	Fri, 13 Sep 2024 17:20:14 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMCxLeTLA+RmG60FAA--.32697S3;
+	Fri, 13 Sep 2024 17:20:12 +0800 (CST)
+Subject: Re: [RFC PATCH V2 4/5] hw/loongarch: Add KVM pch pic device support
+To: Xianglai Li <lixianglai@loongson.cn>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Song Gao <gaosong@loongson.cn>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ kvm@vger.kernel.org
+References: <cover.1725969898.git.lixianglai@loongson.cn>
+ <86f29d4f56b12f826e8a5817cdb1efbfb6007a08.1725969898.git.lixianglai@loongson.cn>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <267f54d5-8660-b3b3-7cc3-bb851a5bfbae@loongson.cn>
+Date: Fri, 13 Sep 2024 17:20:11 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 13 Sep 2024 10:10:09 +0100
-From: "Jiaxun Yang" <jiaxun.yang@flygoat.com>
-To: "Huacai Chen" <chenhuacai@kernel.org>
-Cc: "Xuerui Wang" <kernel@xen0n.name>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- "Viresh Kumar" <viresh.kumar@linaro.org>,
- "Thomas Gleixner" <tglx@linutronix.de>,
- "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- kvm@vger.kernel.org
-Message-Id: <84c6e819-e2b8-40b6-8de4-9f550e652acc@app.fastmail.com>
-In-Reply-To: 
- <CAAhV-H74OCxnRQjHXtu-CuVaEb5bsMQ4vR4wCOvztZdV-HWEVg@mail.gmail.com>
-References: <20240912-iocsr-v2-0-e88f75b37da4@flygoat.com>
- <20240912-iocsr-v2-1-e88f75b37da4@flygoat.com>
- <CAAhV-H74OCxnRQjHXtu-CuVaEb5bsMQ4vR4wCOvztZdV-HWEVg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] LoongArch: Probe more CPU features from CPUCFG
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <86f29d4f56b12f826e8a5817cdb1efbfb6007a08.1725969898.git.lixianglai@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMCxLeTLA+RmG60FAA--.32697S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj9fXoW3try3uF4xtF4xtF47WF47KFX_yoW8WFW5to
+	WftF1SvF4xGr1fArWFkrn8tFW7CrWIkFZ8Aa9Fva15CF4Utry5KF9xKw1FyrW7Jws5Krn3
+	Aa4SgFs0yasFyrs7l-sFpf9Il3svdjkaLaAFLSUrUUUU8b8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUO07kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Gr1j6F4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	JF0_Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
+	xGrwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAK
+	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrV
+	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
+	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
+	AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcpBTUU
+	UUU
 
 
 
-=E5=9C=A82024=E5=B9=B49=E6=9C=8813=E6=97=A5=E4=B9=9D=E6=9C=88 =E4=B8=8A=E5=
-=8D=889:46=EF=BC=8CHuacai Chen=E5=86=99=E9=81=93=EF=BC=9A
-> Hi, Jiaxun,
->
-> On Fri, Sep 13, 2024 at 4:56=E2=80=AFAM Jiaxun Yang <jiaxun.yang@flygo=
-at.com> wrote:
->>
->> Probe ISA level, TLB, IOCSR information from CPUCFG to
->> improve kernel resilience to different core implementations.
->>
->> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
->> ---
->>  arch/loongarch/include/asm/cpu.h       |  4 +++
->>  arch/loongarch/include/asm/loongarch.h |  3 +-
->>  arch/loongarch/kernel/cpu-probe.c      | 54 ++++++++++++++++++++++++=
-----------
->>  3 files changed, 44 insertions(+), 17 deletions(-)
->>
->> diff --git a/arch/loongarch/include/asm/cpu.h b/arch/loongarch/includ=
-e/asm/cpu.h
->> index 843f9c4ec980..251a15439cff 100644
->> --- a/arch/loongarch/include/asm/cpu.h
->> +++ b/arch/loongarch/include/asm/cpu.h
->> @@ -100,6 +100,8 @@ enum cpu_type_enum {
->>  #define CPU_FEATURE_HYPERVISOR         25      /* CPU has hypervisor=
- (running in VM) */
->>  #define CPU_FEATURE_PTW                        26      /* CPU has ha=
-rdware page table walker */
->>  #define CPU_FEATURE_AVECINT            27      /* CPU has avec inter=
-rupt */
->> +#define CPU_FEATURE_IOCSR              28      /* CPU has IOCSR */
->> +#define CPU_FEATURE_LSPW               29      /* CPU has LSPW */
-> I don't see LSPW being used, so just remove it now?
+On 2024/9/10 下午8:18, Xianglai Li wrote:
+> Added pch_pic interrupt controller for kvm emulation.
+> The main process is to send the command word for
+> creating an pch_pic device to the kernel,
+> Delivers the pch pic interrupt controller configuration
+> register base address to the kernel.
+> When the VM is saved, the ioctl obtains the pch_pic
+> interrupt controller data in the kernel and saves it.
+> When the VM is recovered, the saved data is sent to the kernel.
+> 
+> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
+> ---
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Song Gao <gaosong@loongson.cn>
+> Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> Cc: Huacai Chen <chenhuacai@kernel.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Cc: Bibo Mao <maobibo@loongson.cn>
+> Cc: Xianglai Li <lixianglai@loongson.cn>
+> 
+>   hw/intc/Kconfig                 |   3 +
+>   hw/intc/loongarch_pch_pic.c     |  40 ++++---
+>   hw/intc/loongarch_pch_pic_kvm.c | 180 ++++++++++++++++++++++++++++++++
+>   hw/intc/meson.build             |   1 +
+>   hw/loongarch/Kconfig            |   1 +
+>   hw/loongarch/virt.c             |  67 ++++++------
+>   6 files changed, 249 insertions(+), 43 deletions(-)
+>   create mode 100644 hw/intc/loongarch_pch_pic_kvm.c
+> 
+> diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
+> index df9352d41d..1169926eec 100644
+> --- a/hw/intc/Kconfig
+> +++ b/hw/intc/Kconfig
+> @@ -105,6 +105,9 @@ config LOONGARCH_PCH_PIC
+>       bool
+>       select UNIMP
+>   
+> +config LOONGARCH_PCH_PIC_KVM
+> +    bool
+> +
+>   config LOONGARCH_PCH_MSI
+>       select MSI_NONBROKEN
+>       bool
+> diff --git a/hw/intc/loongarch_pch_pic.c b/hw/intc/loongarch_pch_pic.c
+> index 2d5e65abff..13934be7d9 100644
+> --- a/hw/intc/loongarch_pch_pic.c
+> +++ b/hw/intc/loongarch_pch_pic.c
+> @@ -16,18 +16,27 @@
+>   #include "migration/vmstate.h"
+>   #include "trace.h"
+>   #include "qapi/error.h"
+> +#include "sysemu/kvm.h"
+>   
+>   static void pch_pic_update_irq(LoongArchPCHPIC *s, uint64_t mask, int level)
+>   {
+>       uint64_t val;
+>       int irq;
+> +    int kvm_irq;
+>   
+>       if (level) {
+>           val = mask & s->intirr & ~s->int_mask;
+>           if (val) {
+>               irq = ctz64(val);
+>               s->intisr |= MAKE_64BIT_MASK(irq, 1);
+> -            qemu_set_irq(s->parent_irq[s->htmsi_vector[irq]], 1);
+> +            if (kvm_enabled() && kvm_irqchip_in_kernel()) {
+> +                kvm_irq = (
+> +                KVM_LOONGARCH_IRQ_TYPE_IOAPIC << KVM_LOONGARCH_IRQ_TYPE_SHIFT)
+> +                | (0 <<  KVM_LOONGARCH_IRQ_VCPU_SHIFT) | s->htmsi_vector[irq];
+> +                kvm_set_irq(kvm_state, kvm_irq, !!level);
+> +            } else {
+> +                qemu_set_irq(s->parent_irq[s->htmsi_vector[irq]], 1);
+> +            }
+ From my point, modification is unnecessay, since there is separate irq 
+handler if irqchip_in_kernel in file hw/intc/loongarch_pch_pic_kvm.c
 
-I=E2=80=99m going to submit a page table walker for CPU without SPW late=
-r on :-)
+Also I do not know why there is so such modification with file 
+hw/intc/loongarch_pch_pic.c, it is irrelative and not used if 
+irqchip_in_kernel is set.
 
-I=E2=80=99m fine with adding that later.
+Regards
+Bibo Mao
 
-Thanks
-- Jiaxun
+>           }
+>       } else {
+>           /*
+> @@ -38,7 +47,14 @@ static void pch_pic_update_irq(LoongArchPCHPIC *s, uint64_t mask, int level)
+>           if (val) {
+>               irq = ctz64(val);
+>               s->intisr &= ~MAKE_64BIT_MASK(irq, 1);
+> -            qemu_set_irq(s->parent_irq[s->htmsi_vector[irq]], 0);
+> +            if (kvm_enabled() && kvm_irqchip_in_kernel()) {
+> +                kvm_irq = (
+> +                KVM_LOONGARCH_IRQ_TYPE_IOAPIC << KVM_LOONGARCH_IRQ_TYPE_SHIFT)
+> +                | (0 <<  KVM_LOONGARCH_IRQ_VCPU_SHIFT) | s->htmsi_vector[irq];
+> +                kvm_set_irq(kvm_state, kvm_irq, !!level);
+> +            } else {
+> +                qemu_set_irq(s->parent_irq[s->htmsi_vector[irq]], 0);
+> +            }
+>           }
+>       }
+>   }
+> @@ -265,18 +281,18 @@ static uint64_t loongarch_pch_pic_readb(void *opaque, hwaddr addr,
+>   {
+>       LoongArchPCHPIC *s = LOONGARCH_PCH_PIC(opaque);
+>       uint64_t val = 0;
+> -    uint32_t offset = (addr & 0xfff) + PCH_PIC_ROUTE_ENTRY_OFFSET;
+> +    uint32_t offset = (addr & 0xfff) + PCH_PIC_ROUTE_ENTRY_START;
+>       int64_t offset_tmp;
+>   
+>       switch (offset) {
+> -    case PCH_PIC_HTMSI_VEC_OFFSET ... PCH_PIC_HTMSI_VEC_END:
+> -        offset_tmp = offset - PCH_PIC_HTMSI_VEC_OFFSET;
+> +    case PCH_PIC_HTMSI_VEC_START ... PCH_PIC_HTMSI_VEC_END:
+> +        offset_tmp = offset - PCH_PIC_HTMSI_VEC_START;
+>           if (offset_tmp >= 0 && offset_tmp < 64) {
+>               val = s->htmsi_vector[offset_tmp];
+>           }
+>           break;
+> -    case PCH_PIC_ROUTE_ENTRY_OFFSET ... PCH_PIC_ROUTE_ENTRY_END:
+> -        offset_tmp = offset - PCH_PIC_ROUTE_ENTRY_OFFSET;
+> +    case PCH_PIC_ROUTE_ENTRY_START ... PCH_PIC_ROUTE_ENTRY_END:
+> +        offset_tmp = offset - PCH_PIC_ROUTE_ENTRY_START;
+>           if (offset_tmp >= 0 && offset_tmp < 64) {
+>               val = s->route_entry[offset_tmp];
+>           }
+> @@ -294,19 +310,19 @@ static void loongarch_pch_pic_writeb(void *opaque, hwaddr addr,
+>   {
+>       LoongArchPCHPIC *s = LOONGARCH_PCH_PIC(opaque);
+>       int32_t offset_tmp;
+> -    uint32_t offset = (addr & 0xfff) + PCH_PIC_ROUTE_ENTRY_OFFSET;
+> +    uint32_t offset = (addr & 0xfff) + PCH_PIC_ROUTE_ENTRY_START;
+>   
+>       trace_loongarch_pch_pic_writeb(size, addr, data);
+>   
+>       switch (offset) {
+> -    case PCH_PIC_HTMSI_VEC_OFFSET ... PCH_PIC_HTMSI_VEC_END:
+> -        offset_tmp = offset - PCH_PIC_HTMSI_VEC_OFFSET;
+> +    case PCH_PIC_HTMSI_VEC_START ... PCH_PIC_HTMSI_VEC_END:
+> +        offset_tmp = offset - PCH_PIC_HTMSI_VEC_START;
+>           if (offset_tmp >= 0 && offset_tmp < 64) {
+>               s->htmsi_vector[offset_tmp] = (uint8_t)(data & 0xff);
+>           }
+>           break;
+> -    case PCH_PIC_ROUTE_ENTRY_OFFSET ... PCH_PIC_ROUTE_ENTRY_END:
+> -        offset_tmp = offset - PCH_PIC_ROUTE_ENTRY_OFFSET;
+> +    case PCH_PIC_ROUTE_ENTRY_START ... PCH_PIC_ROUTE_ENTRY_END:
+> +        offset_tmp = offset - PCH_PIC_ROUTE_ENTRY_START;
+>           if (offset_tmp >= 0 && offset_tmp < 64) {
+>               s->route_entry[offset_tmp] = (uint8_t)(data & 0xff);
+>           }
+> diff --git a/hw/intc/loongarch_pch_pic_kvm.c b/hw/intc/loongarch_pch_pic_kvm.c
+> new file mode 100644
+> index 0000000000..9b6a2f6784
+> --- /dev/null
+> +++ b/hw/intc/loongarch_pch_pic_kvm.c
+> @@ -0,0 +1,180 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * LoongArch kvm pch pic interrupt support
+> + *
+> + * Copyright (C) 2024 Loongson Technology Corporation Limited
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/qdev-properties.h"
+> +#include "qemu/typedefs.h"
+> +#include "hw/intc/loongarch_pch_pic.h"
+> +#include "hw/sysbus.h"
+> +#include "linux/kvm.h"
+> +#include "migration/vmstate.h"
+> +#include "qapi/error.h"
+> +#include "sysemu/kvm.h"
+> +#include "hw/loongarch/virt.h"
+> +#include "hw/pci-host/ls7a.h"
+> +#include "qemu/error-report.h"
+> +
+> +static void kvm_pch_pic_access_regs(int fd, uint64_t addr,
+> +                                       void *val, bool is_write)
+> +{
+> +        kvm_device_access(fd, KVM_DEV_LOONGARCH_PCH_PIC_GRP_REGS,
+> +                          addr, val, is_write, &error_abort);
+> +}
+> +
+> +static void kvm_loongarch_pch_pic_save_load(void *opaque, bool is_write)
+> +{
+> +    KVMLoongArchPCHPIC *s = (KVMLoongArchPCHPIC *)opaque;
+> +    KVMLoongArchPCHPICClass *class = KVM_LOONGARCH_PCH_PIC_GET_CLASS(s);
+> +    int fd = class->dev_fd;
+> +    int addr, offset;
+> +
+> +    kvm_pch_pic_access_regs(fd, PCH_PIC_MASK_START,
+> +                            (void *)&s->int_mask, is_write);
+> +    kvm_pch_pic_access_regs(fd, PCH_PIC_HTMSI_EN_START,
+> +                            (void *)&s->htmsi_en, is_write);
+> +    kvm_pch_pic_access_regs(fd, PCH_PIC_EDGE_START,
+> +                            (void *)&s->intedge, is_write);
+> +    kvm_pch_pic_access_regs(fd, PCH_PIC_AUTO_CTRL0_START,
+> +                            (void *)&s->auto_crtl0, is_write);
+> +    kvm_pch_pic_access_regs(fd, PCH_PIC_AUTO_CTRL1_START,
+> +                            (void *)&s->auto_crtl1, is_write);
+> +
+> +    for (addr = PCH_PIC_ROUTE_ENTRY_START;
+> +         addr < PCH_PIC_ROUTE_ENTRY_END; addr++) {
+> +        offset = addr - PCH_PIC_ROUTE_ENTRY_START;
+> +        kvm_pch_pic_access_regs(fd, addr,
+> +                                (void *)&s->route_entry[offset], is_write);
+> +    }
+> +
+> +    for (addr = PCH_PIC_HTMSI_VEC_START; addr < PCH_PIC_HTMSI_VEC_END; addr++) {
+> +        offset = addr - PCH_PIC_HTMSI_VEC_START;
+> +        kvm_pch_pic_access_regs(fd, addr,
+> +                                (void *)&s->htmsi_vector[offset], is_write);
+> +    }
+> +
+> +    kvm_pch_pic_access_regs(fd, PCH_PIC_INT_IRR_START,
+> +                            (void *)&s->intirr, is_write);
+> +    kvm_pch_pic_access_regs(fd, PCH_PIC_INT_ISR_START,
+> +                            (void *)&s->intisr, is_write);
+> +    kvm_pch_pic_access_regs(fd, PCH_PIC_POLARITY_START,
+> +                            (void *)&s->int_polarity, is_write);
+> +}
+> +
+> +static int kvm_loongarch_pch_pic_pre_save(void *opaque)
+> +{
+> +    kvm_loongarch_pch_pic_save_load(opaque, false);
+> +    return 0;
+> +}
+> +
+> +static int kvm_loongarch_pch_pic_post_load(void *opaque, int version_id)
+> +{
+> +    kvm_loongarch_pch_pic_save_load(opaque, true);
+> +    return 0;
+> +}
+> +
+> +static void kvm_pch_pic_handler(void *opaque, int irq, int level)
+> +{
+> +    int kvm_irq;
+> +
+> +    if (kvm_enabled()) {
+> +        kvm_irq = \
+> +            (KVM_LOONGARCH_IRQ_TYPE_IOAPIC << KVM_LOONGARCH_IRQ_TYPE_SHIFT)
+> +            | (0 <<  KVM_LOONGARCH_IRQ_VCPU_SHIFT) | irq;
+> +        kvm_set_irq(kvm_state, kvm_irq, !!level);
+> +    }
+> +}
+> +
+> +static void kvm_loongarch_pch_pic_realize(DeviceState *dev, Error **errp)
+> +{
+> +    KVMLoongArchPCHPICClass *pch_pic_class =
+> +            KVM_LOONGARCH_PCH_PIC_GET_CLASS(dev);
+> +    struct kvm_create_device cd = {0};
+> +    uint64_t pch_pic_base = VIRT_PCH_REG_BASE;
+> +    Error *err = NULL;
+> +    int ret;
+> +
+> +    pch_pic_class->parent_realize(dev, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    if (!pch_pic_class->is_created) {
+> +        cd.type = KVM_DEV_TYPE_LOONGARCH_PCH_PIC;
+> +        ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
+> +        if (ret < 0) {
+> +            error_setg_errno(errp, errno,
+> +                             "Creating the KVM pch pic device failed");
+> +            return;
+> +        }
+> +        pch_pic_class->is_created = true;
+> +        pch_pic_class->dev_fd = cd.fd;
+> +        fprintf(stdout, "Create LoongArch pch pic irqchip in KVM done!\n");
+> +
+> +        ret = kvm_device_access(cd.fd, KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL,
+> +                                KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT,
+> +                                &pch_pic_base, true, NULL);
+> +        if (ret < 0) {
+> +            error_report(
+> +                "KVM PCH_PIC: failed to set the base address of PCH PIC");
+> +            exit(1);
+> +        }
+> +
+> +        qdev_init_gpio_in(dev, kvm_pch_pic_handler, VIRT_PCH_PIC_IRQ_NUM);
+> +    }
+> +}
+> +
+> +static const VMStateDescription vmstate_kvm_loongarch_pch_pic = {
+> +    .name = TYPE_LOONGARCH_PCH_PIC,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .pre_save = kvm_loongarch_pch_pic_pre_save,
+> +    .post_load = kvm_loongarch_pch_pic_post_load,
+> +    .fields = (const VMStateField[]) {
+> +        VMSTATE_UINT64(int_mask, KVMLoongArchPCHPIC),
+> +        VMSTATE_UINT64(htmsi_en, KVMLoongArchPCHPIC),
+> +        VMSTATE_UINT64(intedge, KVMLoongArchPCHPIC),
+> +        VMSTATE_UINT64(intclr, KVMLoongArchPCHPIC),
+> +        VMSTATE_UINT64(auto_crtl0, KVMLoongArchPCHPIC),
+> +        VMSTATE_UINT64(auto_crtl1, KVMLoongArchPCHPIC),
+> +        VMSTATE_UINT8_ARRAY(route_entry, KVMLoongArchPCHPIC, 64),
+> +        VMSTATE_UINT8_ARRAY(htmsi_vector, KVMLoongArchPCHPIC, 64),
+> +        VMSTATE_UINT64(last_intirr, KVMLoongArchPCHPIC),
+> +        VMSTATE_UINT64(intirr, KVMLoongArchPCHPIC),
+> +        VMSTATE_UINT64(intisr, KVMLoongArchPCHPIC),
+> +        VMSTATE_UINT64(int_polarity, KVMLoongArchPCHPIC),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +
+> +static void kvm_loongarch_pch_pic_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +    KVMLoongArchPCHPICClass *pch_pic_class = KVM_LOONGARCH_PCH_PIC_CLASS(oc);
+> +
+> +    pch_pic_class->parent_realize = dc->realize;
+> +    dc->realize = kvm_loongarch_pch_pic_realize;
+> +    pch_pic_class->is_created = false;
+> +    dc->vmsd = &vmstate_kvm_loongarch_pch_pic;
+> +
+> +}
+> +
+> +static const TypeInfo kvm_loongarch_pch_pic_info = {
+> +    .name = TYPE_KVM_LOONGARCH_PCH_PIC,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(KVMLoongArchPCHPIC),
+> +    .class_size = sizeof(KVMLoongArchPCHPICClass),
+> +    .class_init = kvm_loongarch_pch_pic_class_init,
+> +};
+> +
+> +static void kvm_loongarch_pch_pic_register_types(void)
+> +{
+> +    type_register_static(&kvm_loongarch_pch_pic_info);
+> +}
+> +
+> +type_init(kvm_loongarch_pch_pic_register_types)
+> diff --git a/hw/intc/meson.build b/hw/intc/meson.build
+> index 85174d1af1..c20c0a2c05 100644
+> --- a/hw/intc/meson.build
+> +++ b/hw/intc/meson.build
+> @@ -77,3 +77,4 @@ specific_ss.add(when: 'CONFIG_LOONGARCH_PCH_PIC', if_true: files('loongarch_pch_
+>   specific_ss.add(when: 'CONFIG_LOONGARCH_PCH_MSI', if_true: files('loongarch_pch_msi.c'))
+>   specific_ss.add(when: 'CONFIG_LOONGARCH_EXTIOI', if_true: files('loongarch_extioi.c'))
+>   specific_ss.add(when: 'CONFIG_LOONGARCH_EXTIOI_KVM', if_true: files('loongarch_extioi_kvm.c'))
+> +specific_ss.add(when: 'CONFIG_LOONGARCH_PCH_PIC_KVM', if_true: files('loongarch_pch_pic_kvm.c'))
+> diff --git a/hw/loongarch/Kconfig b/hw/loongarch/Kconfig
+> index 99a523171f..f909f799ad 100644
+> --- a/hw/loongarch/Kconfig
+> +++ b/hw/loongarch/Kconfig
+> @@ -17,6 +17,7 @@ config LOONGARCH_VIRT
+>       select LOONGARCH_PCH_MSI
+>       select LOONGARCH_EXTIOI
+>       select LOONGARCH_IPI_KVM if KVM
+> +    select LOONGARCH_PCH_PIC_KVM if KVM
+>       select LOONGARCH_EXTIOI_KVM if KVM
+>       select LS7A_RTC
+>       select SMBIOS
+> diff --git a/hw/loongarch/virt.c b/hw/loongarch/virt.c
+> index 8ca7c09016..db0c08899b 100644
+> --- a/hw/loongarch/virt.c
+> +++ b/hw/loongarch/virt.c
+> @@ -865,40 +865,45 @@ static void virt_irq_init(LoongArchVirtMachineState *lvms)
+>       /* Add Extend I/O Interrupt Controller node */
+>       fdt_add_eiointc_node(lvms, &cpuintc_phandle, &eiointc_phandle);
+>   
+> -    pch_pic = qdev_new(TYPE_LOONGARCH_PCH_PIC);
+> -    num = VIRT_PCH_PIC_IRQ_NUM;
+> -    qdev_prop_set_uint32(pch_pic, "pch_pic_irq_num", num);
+> -    d = SYS_BUS_DEVICE(pch_pic);
+> -    sysbus_realize_and_unref(d, &error_fatal);
+> -    memory_region_add_subregion(get_system_memory(), VIRT_IOAPIC_REG_BASE,
+> -                            sysbus_mmio_get_region(d, 0));
+> -    memory_region_add_subregion(get_system_memory(),
+> -                            VIRT_IOAPIC_REG_BASE + PCH_PIC_ROUTE_ENTRY_OFFSET,
+> +    if (kvm_enabled() && kvm_irqchip_in_kernel()) {
+> +        pch_pic = qdev_new(TYPE_KVM_LOONGARCH_PCH_PIC);
+> +        sysbus_realize_and_unref(SYS_BUS_DEVICE(pch_pic), &error_fatal);
+> +    } else {
+> +        pch_pic = qdev_new(TYPE_LOONGARCH_PCH_PIC);
+> +        num = VIRT_PCH_PIC_IRQ_NUM;
+> +        qdev_prop_set_uint32(pch_pic, "pch_pic_irq_num", num);
+> +        d = SYS_BUS_DEVICE(pch_pic);
+> +        sysbus_realize_and_unref(d, &error_fatal);
+> +        memory_region_add_subregion(get_system_memory(), VIRT_IOAPIC_REG_BASE,
+> +                                sysbus_mmio_get_region(d, 0));
+> +        memory_region_add_subregion(get_system_memory(),
+> +                            VIRT_IOAPIC_REG_BASE + PCH_PIC_ROUTE_ENTRY_START,
+>                               sysbus_mmio_get_region(d, 1));
+> -    memory_region_add_subregion(get_system_memory(),
+> -                            VIRT_IOAPIC_REG_BASE + PCH_PIC_INT_STATUS_LO,
+> -                            sysbus_mmio_get_region(d, 2));
+> -
+> -    /* Connect pch_pic irqs to extioi */
+> -    for (i = 0; i < num; i++) {
+> -        qdev_connect_gpio_out(DEVICE(d), i, qdev_get_gpio_in(extioi, i));
+> -    }
+> +        memory_region_add_subregion(get_system_memory(),
+> +                                VIRT_IOAPIC_REG_BASE + PCH_PIC_INT_STATUS_LO,
+> +                                sysbus_mmio_get_region(d, 2));
+>   
+> -    /* Add PCH PIC node */
+> -    fdt_add_pch_pic_node(lvms, &eiointc_phandle, &pch_pic_phandle);
+> +        /* Connect pch_pic irqs to extioi */
+> +        for (i = 0; i < num; i++) {
+> +            qdev_connect_gpio_out(DEVICE(d), i, qdev_get_gpio_in(extioi, i));
+> +        }
+>   
+> -    pch_msi = qdev_new(TYPE_LOONGARCH_PCH_MSI);
+> -    start   =  num;
+> -    num = EXTIOI_IRQS - start;
+> -    qdev_prop_set_uint32(pch_msi, "msi_irq_base", start);
+> -    qdev_prop_set_uint32(pch_msi, "msi_irq_num", num);
+> -    d = SYS_BUS_DEVICE(pch_msi);
+> -    sysbus_realize_and_unref(d, &error_fatal);
+> -    sysbus_mmio_map(d, 0, VIRT_PCH_MSI_ADDR_LOW);
+> -    for (i = 0; i < num; i++) {
+> -        /* Connect pch_msi irqs to extioi */
+> -        qdev_connect_gpio_out(DEVICE(d), i,
+> -                              qdev_get_gpio_in(extioi, i + start));
+> +        /* Add PCH PIC node */
+> +        fdt_add_pch_pic_node(lvms, &eiointc_phandle, &pch_pic_phandle);
+> +
+> +        pch_msi = qdev_new(TYPE_LOONGARCH_PCH_MSI);
+> +        start   =  num;
+> +        num = EXTIOI_IRQS - start;
+> +        qdev_prop_set_uint32(pch_msi, "msi_irq_base", start);
+> +        qdev_prop_set_uint32(pch_msi, "msi_irq_num", num);
+> +        d = SYS_BUS_DEVICE(pch_msi);
+> +        sysbus_realize_and_unref(d, &error_fatal);
+> +        sysbus_mmio_map(d, 0, VIRT_PCH_MSI_ADDR_LOW);
+> +        for (i = 0; i < num; i++) {
+> +            /* Connect pch_msi irqs to extioi */
+> +            qdev_connect_gpio_out(DEVICE(d), i,
+> +                                  qdev_get_gpio_in(extioi, i + start));
+> +        }
+>       }
+>   
+>       /* Add PCH MSI node */
+> 
 
->
->>
->>  #define LOONGARCH_CPU_CPUCFG           BIT_ULL(CPU_FEATURE_CPUCFG)
->>  #define LOONGARCH_CPU_LAM              BIT_ULL(CPU_FEATURE_LAM)
->> @@ -129,5 +131,7 @@ enum cpu_type_enum {
->>  #define LOONGARCH_CPU_HYPERVISOR       BIT_ULL(CPU_FEATURE_HYPERVISO=
-R)
->>  #define LOONGARCH_CPU_PTW              BIT_ULL(CPU_FEATURE_PTW)
->>  #define LOONGARCH_CPU_AVECINT          BIT_ULL(CPU_FEATURE_AVECINT)
->> +#define LOONGARCH_CPU_IOCSR            BIT_ULL(CPU_FEATURE_IOCSR)
->> +#define LOONGARCH_CPU_LSPW             BIT_ULL(CPU_FEATURE_LSPW)
->>
->>  #endif /* _ASM_CPU_H */
->> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/=
-include/asm/loongarch.h
->> index 631d249b3ef2..23af28f00c3c 100644
->> --- a/arch/loongarch/include/asm/loongarch.h
->> +++ b/arch/loongarch/include/asm/loongarch.h
->> @@ -60,8 +60,7 @@
->>  #define  CPUCFG0_PRID                  GENMASK(31, 0)
->>
->>  #define LOONGARCH_CPUCFG1              0x1
->> -#define  CPUCFG1_ISGR32                        BIT(0)
->> -#define  CPUCFG1_ISGR64                        BIT(1)
->> +#define  CPUCFG1_ISA                   GENMASK(1, 0)
->>  #define  CPUCFG1_PAGING                        BIT(2)
->>  #define  CPUCFG1_IOCSR                 BIT(3)
->>  #define  CPUCFG1_PABITS                        GENMASK(11, 4)
->> diff --git a/arch/loongarch/kernel/cpu-probe.c b/arch/loongarch/kerne=
-l/cpu-probe.c
->> index 14f0449f5452..5dc8ca3c4387 100644
->> --- a/arch/loongarch/kernel/cpu-probe.c
->> +++ b/arch/loongarch/kernel/cpu-probe.c
->> @@ -92,11 +92,29 @@ static void cpu_probe_common(struct cpuinfo_loong=
-arch *c)
->>         unsigned long asid_mask;
->>
->>         c->options =3D LOONGARCH_CPU_CPUCFG | LOONGARCH_CPU_CSR |
->> -                    LOONGARCH_CPU_TLB | LOONGARCH_CPU_VINT | LOONGAR=
-CH_CPU_WATCH;
->> +                    LOONGARCH_CPU_VINT | LOONGARCH_CPU_WATCH;
->>
->>         elf_hwcap =3D HWCAP_LOONGARCH_CPUCFG;
->>
->>         config =3D read_cpucfg(LOONGARCH_CPUCFG1);
->> +
->> +       switch (config & CPUCFG1_ISA) {
->> +       case 0:
->> +               set_isa(c, LOONGARCH_CPU_ISA_LA32R);
->> +               break;
->> +       case 1:
->> +               set_isa(c, LOONGARCH_CPU_ISA_LA32S);
->> +               break;
->> +       case 2:
->> +               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->> +               break;
->> +       default:
->> +               pr_warn("Warning: unknown ISA level\n");
->> +       }
->> +       if (config & CPUCFG1_PAGING)
->> +               c->options |=3D LOONGARCH_CPU_TLB;
->> +       if (config & CPUCFG1_IOCSR)
->> +               c->options |=3D LOONGARCH_CPU_IOCSR;
->>         if (config & CPUCFG1_UAL) {
->>                 c->options |=3D LOONGARCH_CPU_UAL;
->>                 elf_hwcap |=3D HWCAP_LOONGARCH_UAL;
->> @@ -157,6 +175,8 @@ static void cpu_probe_common(struct cpuinfo_loong=
-arch *c)
->>                 elf_hwcap |=3D HWCAP_LOONGARCH_LBT_MIPS;
->>         }
->>  #endif
->> +       if (config & CPUCFG2_LSPW)
->> +               c->options |=3D LOONGARCH_CPU_LSPW;
->>
->>         config =3D read_cpucfg(LOONGARCH_CPUCFG6);
->>         if (config & CPUCFG6_PMP)
->> @@ -222,6 +242,7 @@ static inline void cpu_probe_loongson(struct cpui=
-nfo_loongarch *c, unsigned int
->>  {
->>         uint64_t *vendor =3D (void *)(&cpu_full_name[VENDOR_OFFSET]);
->>         uint64_t *cpuname =3D (void *)(&cpu_full_name[CPUNAME_OFFSET]=
-);
->> +       const char *core_name =3D "Unknown";
->>
->>         if (!__cpu_full_name[cpu])
->>                 __cpu_full_name[cpu] =3D cpu_full_name;
->> @@ -232,40 +253,43 @@ static inline void cpu_probe_loongson(struct cp=
-uinfo_loongarch *c, unsigned int
->>         switch (c->processor_id & PRID_SERIES_MASK) {
->>         case PRID_SERIES_LA132:
->>                 c->cputype =3D CPU_LOONGSON32;
->> -               set_isa(c, LOONGARCH_CPU_ISA_LA32S);
->>                 __cpu_family[cpu] =3D "Loongson-32bit";
->> -               pr_info("32-bit Loongson Processor probed (LA132 Core=
-)\n");
->> +               core_name =3D "LA132";
->>                 break;
->>         case PRID_SERIES_LA264:
->>                 c->cputype =3D CPU_LOONGSON64;
->> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->>                 __cpu_family[cpu] =3D "Loongson-64bit";
->> -               pr_info("64-bit Loongson Processor probed (LA264 Core=
-)\n");
->> +               core_name =3D "LA264";
->>                 break;
->>         case PRID_SERIES_LA364:
->>                 c->cputype =3D CPU_LOONGSON64;
->> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->>                 __cpu_family[cpu] =3D "Loongson-64bit";
->> -               pr_info("64-bit Loongson Processor probed (LA364 Core=
-)\n");
->> +               core_name =3D "LA364";
->>                 break;
->>         case PRID_SERIES_LA464:
->>                 c->cputype =3D CPU_LOONGSON64;
->> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->>                 __cpu_family[cpu] =3D "Loongson-64bit";
->> -               pr_info("64-bit Loongson Processor probed (LA464 Core=
-)\n");
->> +               core_name =3D "LA464";
->>                 break;
->>         case PRID_SERIES_LA664:
->>                 c->cputype =3D CPU_LOONGSON64;
->> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->>                 __cpu_family[cpu] =3D "Loongson-64bit";
->> -               pr_info("64-bit Loongson Processor probed (LA664 Core=
-)\n");
->> +               core_name =3D "LA664";
->>                 break;
->>         default: /* Default to 64 bit */
->> -               c->cputype =3D CPU_LOONGSON64;
->> -               set_isa(c, LOONGARCH_CPU_ISA_LA64);
->> -               __cpu_family[cpu] =3D "Loongson-64bit";
->> -               pr_info("64-bit Loongson Processor probed (Unknown Co=
-re)\n");
->> +               if (c->isa_level & LOONGARCH_CPU_ISA_LA64) {
->> +                       c->cputype =3D CPU_LOONGSON64;
->> +                       __cpu_family[cpu] =3D "Loongson-64bit";
->> +               } else if (c->isa_level & LOONGARCH_CPU_ISA_LA32S) {
->> +                       c->cputype =3D CPU_LOONGSON32;
->> +                       __cpu_family[cpu] =3D "Loongson-32bit";
->> +               } else if (c->isa_level & LOONGARCH_CPU_ISA_LA32R) {
->> +                       c->cputype =3D CPU_LOONGSON32;
->> +                       __cpu_family[cpu] =3D "Loongson-32bit Reduced=
-";
->> +               }
-> I prefer to move this part before the switch-case of PRID (and it is
-> better to convert to a switch-case too), then the switch-case of PRID
-> can be only used for probing core-name.
->
-> Huacai
->
->>         }
->> +
->> +       pr_info("%s Processor probed (%s Core)\n", __cpu_family[cpu],=
- core_name);
->>  }
->>
->>  #ifdef CONFIG_64BIT
->>
->> --
->> 2.46.0
->>
-
---=20
-- Jiaxun
 
