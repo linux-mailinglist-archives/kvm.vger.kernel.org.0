@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-26847-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26848-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47E919786D8
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 19:33:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D56E9786DA
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 19:33:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5DCCB23311
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 17:33:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C82CBB2180B
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 17:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD30712C549;
-	Fri, 13 Sep 2024 17:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E29412FB0A;
+	Fri, 13 Sep 2024 17:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g4m3+MVz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EWXdHCXk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824D3126C11
-	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 17:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2057212BEBB
+	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 17:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726248776; cv=none; b=di0/gUpkqPTUkXkjTOaayleHPns9alAy93A4z/KZIP56Eo63JMo1kK2qTjSSCPJP2Q2Cs/FqrUzjp6fCbx0zgGteaTmtLJxEDkDDDD5BHTsR20cH9gz785HZpj+o9zN64XyA2wn9mzi4McZJbncQ8r+SyzwIJXkC1/p+p9+pFzk=
+	t=1726248778; cv=none; b=JDamR99RR9iUeMFyiH+2vxkft2CPC6o2/kQEQ1fXNUXKOjF74/b0BWOn4O/5L2T2jbjQZrP2HIQUWZ2Y+mKku9K+mr6nxW6IBGXujaBERUGLRqNZE+MqhToSbusa21O1YNaUV0VqbBqJ+RUHll10QzwvNC9QIS3Hl4Hb8Mk0vwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726248776; c=relaxed/simple;
-	bh=xjay2CBwiCBq12bGlndFnnErz6A9u1ntnHfvd8gjIxA=;
+	s=arc-20240116; t=1726248778; c=relaxed/simple;
+	bh=INXEGqBpdqXknfmZSD/sh52qeMFtGxNFla/jPofoHTg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AfBbA6k6uSgUstj427eSf6r0Q7v2F0J5j9GRyIsxT0XbZP8rRaG1FWkZCTe71XTxABMNpOQSNw+7U4rPelgsgm5xwfeTRUx3kVAoJwRqSm5GIjB9McDHAwuUjuXop43EP4MC0I7lBDNwq/uhWSveoja6/EYRPoSJRlcQO8nfl0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g4m3+MVz; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=DvgIHlHzDC+RhoehBcGOlnO/NKH15teQ5zsoIPWsPCkQrIgIgEpxpgN5/q0CJHrXK1TLYn/qXStv2n75JG3XJabECvfoTLVZV9chQTDNfaIFZF9UBtJtvOqlMuIOc5z28GSKslurPKI1fTpxTWy231jjZ0uRT4XbmkPDhPKg4zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EWXdHCXk; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6d9e31e66eeso31792527b3.1
-        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 10:32:55 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e1a8eedf001so1743060276.0
+        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 10:32:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726248774; x=1726853574; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1726248776; x=1726853576; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l3WawTJXscEZHW+HHwjyEYFYW96KcqSVaobUybf0kTc=;
-        b=g4m3+MVzeTgN/iLC2AEsSuQ7xIHfGV30ls7b7F2heHALW/zioDMSvHm7WWkK4FLiZW
-         0WbSBPLYESKeMmONW6jrjs0oKXKxXx38jbHJYL0ZFQe13uUP0U8GUIqaCzTH2y0fgPDu
-         b93ubuiX280MHKu5YuOaz3FXCMo+qWPJ6PyK5Jj2rWVXmR78sHs0y8x1T/F2GQEO3a0a
-         J6YYRLe3cIzgmOvnVQXXH0Ir9AzXdjLLK9w06EstozKw2uNijUMh/2QO4ImFgI5Jp+tx
-         9RLoyGJS4sBmJ9StXxEtjicn2u29vvuxPeP8fSa87mbcNg/y87P+nP2idKws+lYC4yFj
-         3Hzw==
+        bh=g8wmRU1VBjftYUbE8QWox2vZgYnjmK1j3kpaMosk3/s=;
+        b=EWXdHCXkW5znDv/JsjN+fX1/Z4mNgAAtnYKHXtG89ipLjOi7hBfN2uXR/mzFm2eDXQ
+         pWgrgC6xggoKHw0qWlODXUbdCQWR4AtjWhu2HueD0x0CR6J2aHEF2Iq8A39wI86EzZYu
+         rnMXdgNt5bDlEajhf8ZT4Ef5LkcITZPM39eYnwFarhMfvXJddPpwMek7GsRBlRIslO/t
+         H16+fYdUmb2W3k+VZmKArqlOUxIF72aZvid8+HufUBZlOpULgd6Znb7a/TMHY6BzZQKF
+         Besp3n6+VdZozN9jR4rQJ0IYpeRV/blP5lhDUhMnPtiVHlNyoiQOYiJQMQdN4sUF27Av
+         nKdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726248774; x=1726853574;
+        d=1e100.net; s=20230601; t=1726248776; x=1726853576;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l3WawTJXscEZHW+HHwjyEYFYW96KcqSVaobUybf0kTc=;
-        b=IM8tFxoaS2AenikPmHdUhXyobm6Dj4mT57m4sltc0rGEIHMR8l6jtaCnOESex4BHG2
-         yua5SvLke50OqtviCHDtr36nbfuznYw68sdYHC3X4IXu+saKjR5hCL/IYpwois8ocE1C
-         +cLqjYa7gI8r7dHpFv3PPnY7QyMngKBEySLXw9NnOhoRZW7U03Xy9x6yabPLYQNHOcYt
-         ne8VRNiTiMqxSnAvHj1qgrZ/9NGMD5IQjpcOo0q1mbZBsUceNIJRIKQ6+5dzm6fYHhiJ
-         EVY8coNO/rAkx156IMD2I+laYF8U+/v9cpTa8SA2wTSGFc61ptbGvueYlXEqQtdyfl7O
-         f3hA==
-X-Forwarded-Encrypted: i=1; AJvYcCW3yn/nizEge5tmfNt2VSOPeNI6GuhSRKddrk5GbGe7Pc465Ynz3ENHM1o8AeehgScRV1I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxow7WDlbrnwg0qFTszT5YfDxsiZVK3nxeCTCSXP6wI/SL4X1sN
-	r7fhBf77bthNbyl3xSKVI0HCPiIt9VvwkZZIB8xAKeHPY5Rj1XuRW11yHu3MU6nDkxnQ2MUEqNL
-	v/jqqUYqQkQ==
-X-Google-Smtp-Source: AGHT+IH1DurPlTxXWjA3nswyL98NGzJfftHUY2cOTogCVmKjqUSTXxMzYDUdelJDMpXHUhHOWBbACI4EY1DVmA==
+        bh=g8wmRU1VBjftYUbE8QWox2vZgYnjmK1j3kpaMosk3/s=;
+        b=aL9SYHcckcKBXl/P8MyEHIGo/WyENsjLGUfWzczn/NHc7Ez7u56NAbw1JoD2ltkZjR
+         aJBObj/aw5Pqr6q+piSJKA8C86YkZn7lATHWueaXrms3t6VxiIBuNyrcG5Xf6VeTpKWg
+         AKMU4RjIbbTnJpB5Aq4FdkW+5T9cppG3U8Dj81HD2iku5MH0pVHuMDI5nHu8D2HGM8g5
+         W+qc/klcDmKQtvNDcOmtJJZUtL+d1o2kCYl0bl5VzTBk8JOdBQo5UTwtWrOcBUJD7YeN
+         iy0aEUwYdUG8/xAVzF+9j9ASfD/FuxbVUCwRNeCMNFQIrwxj4F+nzgB0TBN/0m/tukNE
+         tCAg==
+X-Forwarded-Encrypted: i=1; AJvYcCWtgFPUnsHaAckOl9xat4PjIX6FWJl+j8qEy9YBKXJhFBOZDolmAcisbk9MydpUwc+uyKM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0y6N2Am+nUFNlMakgVZOvtPdA0Awhdu4+9pCvwCxGC5q6OJI2
+	SQ3FzIJ04cxFgF1AzMu27Ipv072Cfc/QNzo8dpndePNrelfCf5GoAJDeGH8OeH4ZFF8BwBy5uwV
+	bJdAZwnWwBg==
+X-Google-Smtp-Source: AGHT+IGSFsTgCDbNetbXcYx95b1Niemc1TyU+mUuvVsCWCrCX6LdU1NXur64D5AtqnSZJbSSZ+54bB9edgoiUg==
 X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:f3:525d:ac13:60e1])
- (user=jmattson job=sendgmr) by 2002:a81:b049:0:b0:68d:cbd6:e28 with SMTP id
- 00721157ae682-6dbcc579af6mr673767b3.6.1726248774214; Fri, 13 Sep 2024
- 10:32:54 -0700 (PDT)
-Date: Fri, 13 Sep 2024 10:32:28 -0700
+ (user=jmattson job=sendgmr) by 2002:a25:b2a4:0:b0:e11:5807:1072 with SMTP id
+ 3f1490d57ef6-e1db00f2edemr4504276.8.1726248776127; Fri, 13 Sep 2024 10:32:56
+ -0700 (PDT)
+Date: Fri, 13 Sep 2024 10:32:29 -0700
 In-Reply-To: <20240913173242.3271406-1-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240913173242.3271406-1-jmattson@google.com>
 X-Mailer: git-send-email 2.46.0.662.g92d0881bb0-goog
-Message-ID: <20240913173242.3271406-3-jmattson@google.com>
-Subject: [PATCH v4 2/3] KVM: x86: Advertise AMD_IBPB_RET to userspace
+Message-ID: <20240913173242.3271406-4-jmattson@google.com>
+Subject: [PATCH v4 3/3] KVM: x86: AMD's IBPB is not equivalent to Intel's IBPB
 From: Jim Mattson <jmattson@google.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
 	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
@@ -84,31 +84,72 @@ To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
 	Jim Mattson <jmattson@google.com>, Sandipan Das <sandipan.das@amd.com>, 
 	Kai Huang <kai.huang@intel.com>, x86@kernel.org, linux-kernel@vger.kernel.org, 
 	kvm@vger.kernel.org
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Venkatesh Srinivas <venkateshs@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 
-This is an inherent feature of IA32_PRED_CMD[0], so it is trivially
-virtualizable (as long as IA32_PRED_CMD[0] is virtualized).
+From Intel's documention [1], "CPUID.(EAX=07H,ECX=0):EDX[26]
+enumerates support for indirect branch restricted speculation (IBRS)
+and the indirect branch predictor barrier (IBPB)." Further, from [2],
+"Software that executed before the IBPB command cannot control the
+predicted targets of indirect branches (4) executed after the command
+on the same logical processor," where footnote 4 reads, "Note that
+indirect branches include near call indirect, near jump indirect and
+near return instructions. Because it includes near returns, it follows
+that **RSB entries created before an IBPB command cannot control the
+predicted targets of returns executed after the command on the same
+logical processor.**" [emphasis mine]
 
-Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
+On the other hand, AMD's IBPB "may not prevent return branch
+predictions from being specified by pre-IBPB branch targets" [3].
+
+However, some AMD processors have an "enhanced IBPB" [terminology
+mine] which does clear the return address predictor. This feature is
+enumerated by CPUID.80000008:EDX.IBPB_RET[bit 30] [4].
+
+Adjust the cross-vendor features enumerated by KVM_GET_SUPPORTED_CPUID
+accordingly.
+
+[1] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/cpuid-enumeration-and-architectural-msrs.html
+[2] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/speculative-execution-side-channel-mitigations.html#Footnotes
+[3] https://www.amd.com/en/resources/product-security/bulletin/amd-sb-1040.html
+[4] https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24594.pdf
+
+Fixes: 0c54914d0c52 ("KVM: x86: use Intel speculation bugs and features as derived in generic x86 code")
+Suggested-by: Venkatesh Srinivas <venkateshs@chromium.org>
 Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/kvm/cpuid.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/cpuid.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 2617be544480..ec7b2ca3b4d3 100644
+index ec7b2ca3b4d3..600d79ea22be 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -751,7 +751,7 @@ void kvm_set_cpu_caps(void)
- 		F(CLZERO) | F(XSAVEERPTR) |
- 		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
- 		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) |
--		F(AMD_PSFD)
-+		F(AMD_PSFD) | F(AMD_IBPB_RET)
- 	);
+@@ -690,7 +690,9 @@ void kvm_set_cpu_caps(void)
+ 	kvm_cpu_cap_set(X86_FEATURE_TSC_ADJUST);
+ 	kvm_cpu_cap_set(X86_FEATURE_ARCH_CAPABILITIES);
  
- 	/*
+-	if (boot_cpu_has(X86_FEATURE_IBPB) && boot_cpu_has(X86_FEATURE_IBRS))
++	if (boot_cpu_has(X86_FEATURE_AMD_IBPB_RET) &&
++	    boot_cpu_has(X86_FEATURE_AMD_IBPB) &&
++	    boot_cpu_has(X86_FEATURE_AMD_IBRS))
+ 		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
+ 	if (boot_cpu_has(X86_FEATURE_STIBP))
+ 		kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
+@@ -759,8 +761,12 @@ void kvm_set_cpu_caps(void)
+ 	 * arch/x86/kernel/cpu/bugs.c is kind enough to
+ 	 * record that in cpufeatures so use them.
+ 	 */
+-	if (boot_cpu_has(X86_FEATURE_IBPB))
++	if (boot_cpu_has(X86_FEATURE_IBPB)) {
+ 		kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB);
++		if (boot_cpu_has(X86_FEATURE_SPEC_CTRL) &&
++		    !boot_cpu_has_bug(X86_BUG_EIBRS_PBRSB))
++			kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
++	}
+ 	if (boot_cpu_has(X86_FEATURE_IBRS))
+ 		kvm_cpu_cap_set(X86_FEATURE_AMD_IBRS);
+ 	if (boot_cpu_has(X86_FEATURE_STIBP))
 -- 
 2.46.0.662.g92d0881bb0-goog
 
