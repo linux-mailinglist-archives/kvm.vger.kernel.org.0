@@ -1,157 +1,139 @@
-Return-Path: <kvm+bounces-26854-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 563A89787CF
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 20:27:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C71978803
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 20:39:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 906D01C21D31
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 18:27:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ADD91C20BD9
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 18:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 746F9136671;
-	Fri, 13 Sep 2024 18:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2C4132121;
+	Fri, 13 Sep 2024 18:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="uK0xHbEn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iluuAxg+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD64C8C11;
-	Fri, 13 Sep 2024 18:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC29126F0A
+	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 18:39:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726252050; cv=none; b=PyAM7ygDyNmH6xBe1Qot3OMIWPllZud37udy0nA+Om1LjMrKAPbQfxFmXRlyBrXbLDEgVC3B/W28ydUJbaWBPkZvdwHIsQDraJD1uKzN9GDiEG2w9VkVWZqORZ/BtzhQrOnqvDRS5rf1FPFPItENf8WPpTBf15U7AQicG2sKQxQ=
+	t=1726252762; cv=none; b=qoHovrrGkl/FzMQoglplMycL8yqZRza36PGVSzuGw9A1iSBmpl/NCJqlpV2XOZO5h3jClfa/SCoDT03vNI67Bwz2CelWJ1P3CQWMOYpQ0nFxXl7DkPK1pkhYc+ivJ2KsPNX6ZA57ziIwJZ73EE9Zkr32gCf6kz18W1HyVG+y1+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726252050; c=relaxed/simple;
-	bh=T/FAGmskof49WPg60zyMYqxdzTPYLl+utpDpDsGWIgI=;
-	h=Subject:MIME-Version:Content-Type:Date:Message-ID:From:To:CC:
-	 References:In-Reply-To; b=XnvrYJAMPc/AtQYr4QPSpbH9BRlK3L+r0lz9VebhDqayDF473vMCT23gnwqglARKgIvf9uxeEvhHm1b0kaX1Bfzs/jRG7LKfe7KnHc7IWgcDKWvyySjWpW1DOd/Emu+ZWlR0mbSM4CJ+09xBAqBTAgv45dJ04u/Z9aezkQyXBRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=uK0xHbEn; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
+	s=arc-20240116; t=1726252762; c=relaxed/simple;
+	bh=0mjinyG1vQ9VPNowu/aF5fd8Gaqb239gzFrjSTjxTd4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XWmq4efYrvv1VFEs2aH2szGfsYIXIZak1HnYXNv9Ig4Aprg7nKex53O3YJnqgNnT241EXE/iqzOVA668fqd5ZhA06wyP2R6Uecw9hbLvjhX6Pj/B8p5seIfpxFjkEqmSx/Y8SHCNy/rZJHD1bbvAkoZC7bfOxQtus4eycUcWtMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iluuAxg+; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a045f08fd6so29785ab.0
+        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 11:39:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1726252049; x=1757788049;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   from:to:cc:references:in-reply-to:subject;
-  bh=wLLXE9tAXmUWkp0mNTmCfQvKPHj+bdubDsMn8oPnwBc=;
-  b=uK0xHbEnzY8FgxjONqDUcW47zA2JDsb/aUMi+un9nh5LtYk91J/tVm1W
-   RyWuBl/P7WuQOS0lF13r7QK1L8tSMM/SRanwgtbcctoSVH4leW8WOMyD5
-   aXYpwY/+ZXiV3fBFuiDrHys3ilhdn/89hxe1CK1TAgDianeSGIjElTjbE
-   o=;
-X-IronPort-AV: E=Sophos;i="6.10,226,1719878400"; 
-   d="scan'208";a="453843029"
-Subject: Re: [PATCH 16/18] KVM: x86: Take mem attributes into account when faulting
- memory
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2024 18:27:18 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.10.100:19490]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.41.21:2525] with esmtp (Farcaster)
- id 4d96842b-9f62-44f5-97a0-d8ad265e11a9; Fri, 13 Sep 2024 18:27:04 +0000 (UTC)
-X-Farcaster-Flow-ID: 4d96842b-9f62-44f5-97a0-d8ad265e11a9
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 13 Sep 2024 18:27:04 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Fri, 13 Sep 2024
- 18:26:58 +0000
+        d=google.com; s=20230601; t=1726252760; x=1726857560; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ud/mHHSQausWCzpDvdCBlAPv0KqUcssPpprLfydgrHM=;
+        b=iluuAxg+ka1+Y3GeozIGqQjmcbqFSOMpMxovWiTykqZgJBXRcbi1kkstf6VN/m+Mug
+         t8zVJDTUt7gcGiVZJ2KlG4u0MC+WNusMS+Rb4mtq3SXnQHlAJEekngph91vVL4ZpaJ/J
+         yWHRrMbHyPerzK3ocbtVTunr9ROKDyeBmD9rQS+M3Bj5YVuEPTygVqL6rW+csTLLx9QB
+         eMYwLCjQaXq/zq9Gl05aUgfH8kuNVzxofPqa9qxyK2CCCygsf4uggyJCMy+iE+l2waV8
+         MKkO9EG1E9i19shxV06/dJ+4HoFXcKWQEPDfVwJXxeBo6oz0VcQ2DEsBzrGB5VjBErQZ
+         MhZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726252760; x=1726857560;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ud/mHHSQausWCzpDvdCBlAPv0KqUcssPpprLfydgrHM=;
+        b=ObhllEw6zRU9QkpLqxttd3IbcpKf89loWhcgqLkBKSEdLGasoFuh+lp5lJxsnD5HtQ
+         NLP3zKQCc3SaZCsxvpgBdnewj9jNsO9M8VgZMRWHdE935nFwl4a6NgzVo9XuNNl+KWHf
+         vpysQcCGk6DEsDzm2AB30PPzRgGjABfGB7usy9Ux7oCAoEX/mAKL+u9n2dj7KDtText4
+         nuGeOmBoGvJ26YcW0GyJL9084YbDvhUlxsTn6YzFSacix3CxIqeqynwl2F6uXKahBSVZ
+         Rxgqx4n4jFA4ab9ad4U1GHqcj2BUrTwTOWrQuUUmWuUT38aAO0uI2OnFLLzq1aV1kuhO
+         ZnSw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJkZNbVdWg1BSz2moCcUaTA6LipR4tfvwWi8K1HWNuZ8gtOGIeeL6nIcbHAfRxYYbWync=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaaNJh9y7h3grjtNYOGf0IBzxDZjgFnbDRl0g4dV6UOC6ljam0
+	3j7OUPDKl14uQvK+3afbQELqYbAsawxrKrM6wM1CvKlk+59rOolfNR3j2G8bHR+2l6Ei6y1e7IT
+	qHo/sx+BO3vBhCC0yO15mdVWUZVexwSOa9Ywn
+X-Google-Smtp-Source: AGHT+IFIB+0iYlnluWMyxDDG65+XyKrHZg/GyrbyaUN2OxJI1M8y35fV8elsIsbPrdyS6cnglGKL5tq6VIqj4bPlvlY=
+X-Received: by 2002:a05:6e02:1886:b0:375:edce:baf1 with SMTP id
+ e9e14a558f8ab-3a0856cf368mr10155715ab.13.1726252759723; Fri, 13 Sep 2024
+ 11:39:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+References: <20240912141156.231429-1-jon@nutanix.com> <20240912151410.bazw4tdc7dugtl6c@desk>
+ <070B4F7E-5103-4C1B-B901-01CE7191EB9A@nutanix.com> <20240912162440.be23sgv5v5ojtf3q@desk>
+ <ZuPNmOLJPJsPlufA@intel.com>
+In-Reply-To: <ZuPNmOLJPJsPlufA@intel.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 13 Sep 2024 11:39:07 -0700
+Message-ID: <CALMp9eRDtcYKsxqW=z6m=OqF+kB6=GiL-XaWrVrhVQ_2uQz_nA@mail.gmail.com>
+Subject: Re: [PATCH] x86/bhi: avoid hardware mitigation for 'spectre_bhi=vmexit'
+To: Chao Gao <chao.gao@intel.com>
+Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Jon Kohler <jon@nutanix.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, LKML <linux-kernel@vger.kernel.org>, 
+	"kvm @ vger . kernel . org" <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 13 Sep 2024 18:26:54 +0000
-Message-ID: <D45D9NN03CSH.3B25KJ1XKV6XE@amazon.com>
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<pbonzini@redhat.com>, <vkuznets@redhat.com>, <linux-doc@vger.kernel.org>,
-	<linux-hyperv@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <graf@amazon.de>,
-	<dwmw2@infradead.org>, <pdurrant@amazon.com>, <mlevitsk@redhat.com>,
-	<jgowans@amazon.com>, <corbet@lwn.net>, <decui@microsoft.com>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <amoorthy@google.com>
-X-Mailer: aerc 0.18.2-0-ge037c095a049-dirty
-References: <20240609154945.55332-1-nsaenz@amazon.com>
- <20240609154945.55332-17-nsaenz@amazon.com>
- <D3MJJCTNY7OM.WOB5W8AVBH9G@amazon.com> <ZsduQ7tg0oQFDY8h@google.com>
-In-Reply-To: <ZsduQ7tg0oQFDY8h@google.com>
-X-ClientProxiedBy: EX19D040UWB003.ant.amazon.com (10.13.138.8) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Content-Transfer-Encoding: quoted-printable
 
-On Thu Aug 22, 2024 at 4:58 PM UTC, Sean Christopherson wrote:
-> On Thu, Aug 22, 2024, Nicolas Saenz Julienne wrote:
-> > On Sun Jun 9, 2024 at 3:49 PM UTC, Nicolas Saenz Julienne wrote:
-> > > Take into account access restrictions memory attributes when faulting
-> > > guest memory. Prohibited memory accesses will cause an user-space fau=
-lt
-> > > exit.
-> > >
-> > > Additionally, bypass a warning in the !tdp case. Access restrictions =
-in
-> > > guest page tables might not necessarily match the host pte's when mem=
-ory
-> > > attributes are in use.
-> > >
-> > > Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
-> >
-> > I now realize that only taking into account memory attributes during
-> > faults isn't good enough for VSM. We should check the attributes anytim=
-e
-> > KVM takes GPAs as input for any action initiated by the guest. If the
-> > memory attributes are incompatible with such action, it should be
-> > stopped. Failure to do so opens side channels that unprivileged VTLs ca=
-n
-> > abuse to infer information about privileged VTL. Some examples I came u=
-p
-> > with:
-> > - Guest page walks: VTL0 could install malicious directory entries that
-> >   point to GPAs only visible to VTL1. KVM will happily continue the
-> >   walk. Among other things, this could be use to infer VTL1's GVA->GPA
-> >   mappings.
-> > - PV interfaces like the Hyper-V TSC page or VP assist page, could be
-> >   used to modify portions of VTL1 memory.
-> > - Hyper-V hypercalls that take GPAs as input/output can be abused in a
-> >   myriad of ways. Including ones that exit into user-space.
-> >
-> > We would be protected against all these if we implemented the memory
-> > access restrictions through the memory slots API. As is, it has the
-> > drawback of having to quiesce the whole VM for any non-trivial slot
-> > modification (i.e. VSM's memory protections). But if we found a way to
-> > speed up the slot updates we could rely on that, and avoid having to
-> > teach kvm_read/write_guest() and friends to deal with memattrs. Note
-> > that we would still need to use memory attributes to request for faults
-> > to exit onto user-space on those select GPAs. Any opinions or
-> > suggestions?
-> >
-> > Note that, for now, I'll stick with the memory attributes approach to
-> > see what the full solution looks like.
+On Thu, Sep 12, 2024 at 10:29=E2=80=AFPM Chao Gao <chao.gao@intel.com> wrot=
+e:
 >
-> FWIW, I suspect we'll be better off honoring memory attributes.  It's not=
- just
-> the KVM side that has issues with memslot updates, my understanding is us=
-erspace
-> has also built up "slow" code with respect to memslot updates, in part be=
-cause
-> it's such a slow path in KVM.
+> On Thu, Sep 12, 2024 at 09:24:40AM -0700, Pawan Gupta wrote:
+> >On Thu, Sep 12, 2024 at 03:44:38PM +0000, Jon Kohler wrote:
+> >> > It is only worth implementing the long sequence in VMEXIT_ONLY mode =
+if it is
+> >> > significantly better than toggling the MSR.
+> >>
+> >> Thanks for the pointer! I hadn=E2=80=99t seen that second sequence. I=
+=E2=80=99ll do measurements on
+> >> three cases and come back with data from an SPR system.
+> >> 1. as-is (wrmsr on entry and exit)
+> >> 2. Short sequence (as a baseline)
+> >> 3. Long sequence
+> >
+> >I wonder if virtual SPEC_CTRL feature introduced in below series can
+> >provide speedup, as it can replace the MSR toggling with faster VMCS
+> >operations:
+>
+> "virtual SPEC_CTRL" won't provide speedup. the wrmsr on entry/exit is sti=
+ll
+> need if guest's (effective) value and host's value are different.
 
-Sean, since I see you're looking at the series. I don't think it's worth
-spending too much time with the memory attributes patches. Since
-figuring out the sidechannels mentioned above, I found even more
-shortcomings in this implementation. I'm reworking the whole thing in a
-separate series [1], taking into account sidechannels, MMIO, non-TDP
-MMUs, etc. and introducing selftests and an in-depth design document.
+I believe that is the case here. The guest's effective value is 1025.
+If the guest knew about BHI_DIS_S, it would actually set it to 1025,
+but older guests set it to 1.
 
-[1] https://github.com/vianpl/linux branch 'vsm/memory-protections' (wip)
+The IA32_SPEC_CTRL mask and shadow fields should be perfect for this.
 
-Thanks,
-Nicolas
+> "virtual SPEC_CTRL" just prevents guests from toggling some bits. It does=
+n't
+> switch the MSR between guest value and host value on entry/exit. so, KVM =
+has
+> to do the switching with wrmsr/rdmsr instructions. A new feature, "load
+> IA32_SPEC_CTRL" VMX control (refer to Chapter 15 in ISE spec[*]), can hel=
+p but
+> it isn't supported on SPR.
+>
+> [*]: https://cdrdv2.intel.com/v1/dl/getContent/671368
+>
+> >
+> >  https://lore.kernel.org/kvm/20240410143446.797262-1-chao.gao@intel.com=
+/
+> >
+> >Adding Chao for their opinion.
+>
 
