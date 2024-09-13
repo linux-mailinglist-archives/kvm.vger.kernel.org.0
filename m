@@ -1,173 +1,125 @@
-Return-Path: <kvm+bounces-26849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26850-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0473E9786DD
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 19:34:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E486E97870A
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 19:42:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C1B61F25A76
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 17:34:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8ED191F217C8
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 17:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B34084D29;
-	Fri, 13 Sep 2024 17:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6108984039;
+	Fri, 13 Sep 2024 17:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E1iGZQw6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lo51zDP3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4311EEE4;
-	Fri, 13 Sep 2024 17:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341EA1C14
+	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 17:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726248819; cv=none; b=Fqa/8PBMFH7YZ/lAei+r1w6ilJBCXbPAyKC4CLnzXVQCwBO2SSmwp8GfpyCh3/A/FQDX2s4ZVlce8wIY5qRvcdTNJ6SuydDk8Df0nMx0iCRFB4HOdPqJsgYlSPPlK0xdMM+GRQZys+aQh4NkRNJyqzXibmCKYeUlZYGyfVNvSNY=
+	t=1726249347; cv=none; b=WpoJY648XgJi7wNvDEfNYKT+ZVgaqOpX1kEP7WNhxNbYYDHNaBmK62a4cy72430xYZz8m7Z34PV45OrRmGSPAeY2C6QznV6W/DH2P9YhH8w0LrSFNuE/nW6s6bv5s8qLvJHLxAoxJBkLzhuv1UHLUNyVVIoHaCz2L1Mu74h4bcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726248819; c=relaxed/simple;
-	bh=9c+3Sprtb3LUjHMbj19tnQkWfJ6bZ8unBcJ3UA4Owvw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NSrbJmzGgwfTtyMKbyn+0yyprl03N21HuvaUcxOCp7mSIo8SANNEYEZBnqMN2el64vC5syTyZgkcYVf5C+aNH8UM+c+y3oZZyuRf6e4njVoVOa7/6jfwUWN3PWZGNUj9XP1oHy7MTJRMJTEJizxbU8enoE08uxUm+eaFMXyX1hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E1iGZQw6; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726248817; x=1757784817;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=9c+3Sprtb3LUjHMbj19tnQkWfJ6bZ8unBcJ3UA4Owvw=;
-  b=E1iGZQw6DzYhChsL6G1XnCK3OABmUFasf0GoUyIGUoyp1onieKHan5+0
-   cIJsljmsdqJ7A9kLo/fRy4sWy6iadsV40Bi5dphfLcY7e62WTvFZiM3YO
-   6r7neZTHfe0GV2rx7XAM3U+Pg4qlBjKSe3Xi7ZlUUPxrsNUwJ6PjUIl42
-   mTcH0PeU1X7r1/1qOI0tiFGb2c7O7AAmpCR6mAtFwJgtDjA+frzB7WNqL
-   MkAhwUATdjikjC/Yb05wrFQUNVSjdXlNO+9LprNCZndjK3Ua2MsdTTuni
-   pNtD7i7Xslc1B2NUdY/Rq+tMupHW+gacLGU2BWC94deVQ6Pk62VXAmfrT
-   A==;
-X-CSE-ConnectionGUID: d9F8O0JDQdG8zZdV1BAX7w==
-X-CSE-MsgGUID: hUjnuYaERdO9cCZrG2RGXw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11194"; a="25309584"
-X-IronPort-AV: E=Sophos;i="6.10,226,1719903600"; 
-   d="scan'208";a="25309584"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2024 10:33:36 -0700
-X-CSE-ConnectionGUID: y29oZL4IT32DU+Oys4CVUg==
-X-CSE-MsgGUID: Gj1dYRYSRe68ECZ3RkJW5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,226,1719903600"; 
-   d="scan'208";a="67987717"
-Received: from tbrumzie-mobl2.amr.corp.intel.com (HELO desk) ([10.125.147.158])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2024 10:33:35 -0700
-Date: Fri, 13 Sep 2024 10:33:23 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@alien8.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	"kvm @ vger . kernel . org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] x86/bhi: avoid hardware mitigation for
- 'spectre_bhi=vmexit'
-Message-ID: <20240913173323.6guq4p2h4z7ulgr3@desk>
-References: <20240912141156.231429-1-jon@nutanix.com>
- <20240912151410.bazw4tdc7dugtl6c@desk>
- <070B4F7E-5103-4C1B-B901-01CE7191EB9A@nutanix.com>
- <20240912162440.be23sgv5v5ojtf3q@desk>
- <ZuPNmOLJPJsPlufA@intel.com>
- <3244950F-0422-49AD-812D-DE536DAF5D7E@nutanix.com>
+	s=arc-20240116; t=1726249347; c=relaxed/simple;
+	bh=173AQeyMDaJ45QZOQirS7+SDcWgIwJyD7RHQE/oNyVc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rztzdu/zmmtgu8nTLqnfSO477Qt6N82HVXMgYt34Kmi6UxH2LCjZvX/U6EK66dslRNIptN34yvgZ/wg1Fxz+0HZxrbLASAEI1cWHgALUnK9FQdjMz9WtQI/GksFIiBF2io+3VGRvYB6m1cMeGg6S+bTDl8iGZ9iEvJfZXBHl+hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lo51zDP3; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a045f08fd6so14795ab.0
+        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 10:42:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726249345; x=1726854145; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8W5LH9MX3hMkElj2Z0bxV+YjhV0sKkJFY50QdMlkH6A=;
+        b=Lo51zDP3IUE12e+3hFs0NO/gHeNnl7/YLpzALvCUZAUOqJKXXK4bfwtVWVp7uP3vtD
+         FJa0qOaIeRsdEa/qUA/QMbER1sHx/VmwODFjfa99De2b+CVosLnWoLqEjdK1BSojmnr8
+         7XNzqdhv7sbQEd6d9VxXZgoYJsmrwHRJ8uUhVMobbf2Zw4K6e0Ojtrax/+RLra6n6Osl
+         qLvk4cu0OJ+v5reI5smhmPT2Pgzjkf34iV/a4PBdbYfp0pp27p2NhSZ/tC/fIaae2YXe
+         yBHu1mHXZhX8+Ofq+6UfvyyJin0aeTwsIUh1rUZEYcNGgV1tIdO9Z6er3mT779BgUKa8
+         vN2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726249345; x=1726854145;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8W5LH9MX3hMkElj2Z0bxV+YjhV0sKkJFY50QdMlkH6A=;
+        b=jhaPBFgtRwQYm5w+oLFpFwWO7Vyb0Okka6dP55qOweDW32AATw1P9AFAaRIeO7ofv0
+         ruvzX8ETmEli3o9wQFVRMjqBU6u9B1pcGA3a24gIiOQNrqN+WDQysdIWADW2r+DLzKeG
+         6MCb8BfIQc8rWs2UR5xB8xprFbH6/6+rDROZRyfCF6pj5U5GKYAgdRSMIqaBptbxNN2L
+         ePs+jbq5zyg+qc8KIPMkNd10DN+3NicVqjmN/+hNBoacRYDQt0gnfQfU8LvC9mZbGnl4
+         EcpQ9avulleEKUNEUpz/NdLzoiiGA1rbDxK4SmgwqBgeCwrPBWWkO7rEEeX3mVINl4lF
+         rDXw==
+X-Forwarded-Encrypted: i=1; AJvYcCV5UHrIGh4v0H/ypIY2Hmz88zvQkwxMDILSAqOjvHeP/rD3XeTzaPjz6RUWUheEYYjuzrs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxI+CWgwkn4JIexPaGjYN2IZ0+7rPLbaGGYsenBOn+EU8XazZCU
+	SGECNod1oYVcS2pA3ZiCwQcOxmbfvmmKYgoI4NBemiKPhD/+jlHNJBR0pUkQR3uZKiZw0nHkkKn
+	v9U6I5lHZ4zQgi4V7BABs9cYBW25sjQOqwiHh
+X-Google-Smtp-Source: AGHT+IEAfzEpcAH80+98bRbDt00y7w7gSufYRSYoHgdXgSwFe329MnxAcBG0lIP7pS5hRLNyP4mhgzWnfrVP3m8JQig=
+X-Received: by 2002:a05:6e02:1aab:b0:3a0:439b:f610 with SMTP id
+ e9e14a558f8ab-3a0856cfd7fmr10007445ab.15.1726249345097; Fri, 13 Sep 2024
+ 10:42:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3244950F-0422-49AD-812D-DE536DAF5D7E@nutanix.com>
+References: <20240731150811.156771-1-nikunj@amd.com> <20240731150811.156771-21-nikunj@amd.com>
+In-Reply-To: <20240731150811.156771-21-nikunj@amd.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 13 Sep 2024 10:42:13 -0700
+Message-ID: <CALMp9eRZtg126iSZ4zzH_SjEz2V+-FRJfkw7=fLxSoVL1NTp_g@mail.gmail.com>
+Subject: Re: [PATCH v11 20/20] x86/cpu/amd: Do not print FW_BUG for Secure TSC
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de, 
+	x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de, 
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com, 
+	pbonzini@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 13, 2024 at 03:51:01PM +0000, Jon Kohler wrote:
-> 
-> 
-> > On Sep 13, 2024, at 1:28 AM, Chao Gao <chao.gao@intel.com> wrote:
-> > 
-> > !-------------------------------------------------------------------|
-> >  CAUTION: External Email
-> > 
-> > |-------------------------------------------------------------------!
-> > 
-> > On Thu, Sep 12, 2024 at 09:24:40AM -0700, Pawan Gupta wrote:
-> >> On Thu, Sep 12, 2024 at 03:44:38PM +0000, Jon Kohler wrote:
-> >>>> It is only worth implementing the long sequence in VMEXIT_ONLY mode if it is
-> >>>> significantly better than toggling the MSR.
-> >>> 
-> >>> Thanks for the pointer! I hadn’t seen that second sequence. I’ll do measurements on
-> >>> three cases and come back with data from an SPR system.
-> >>> 1. as-is (wrmsr on entry and exit)
-> >>> 2. Short sequence (as a baseline)
-> >>> 3. Long sequence
-> >> 
-> 
-> Pawan,
-> 
-> Thanks for the pointer to the long sequence. I've tested it along with 
-> Listing 3 (TSX Abort sequence) using KUT tscdeadline_immed test. TSX 
-> abort sequence performs better unless BHI mitigation is off or 
-> host/guest spec_ctrl values match, avoiding WRMSR toggling. Having the
-> values match the DIS_S value is easier said than done across a fleet
-> that is already using eIBRS heavily.
-> 
-> Test System:
-> - Intel Xeon Gold 6442Y, microcode 0x2b0005c0
-> - Linux 6.6.34 + patches, qemu 8.2
-> - KVM Unit Tests @ latest (17f6f2fd) with tscdeadline_immed + edits:
-> - Toggle spec ctrl before test in main()
-> - Use cpu type SapphireRapids-v2
-> 
-> Test string:
-> TESTNAME=vmexit_tscdeadline_immed TIMEOUT=90s MACHINE= ACCEL= taskset -c 26 ./x86/run x86/vmexit.flat \
-> -smp 1 -cpu SapphireRapids-v2,+x2apic,+tsc-deadline -append tscdeadline_immed |grep tscdeadline
-> 
-> Test Results:
-> 1. spectre_bhi=on, host spec_ctrl=1025, guest spec_ctrl=1: tscdeadline_immed 3878 (WRMSR toggling)
-> 2. spectre_bhi=on, host spec_ctrl=1025, guest spec_ctrl=1025: tscdeadline_immed 3153 (no WRMSR toggling)
-> 3. spectre_bhi=vmexit, BHB long sequence, host/guest spec_ctrl=1: tscdeadline_immed 3629 (still better than test 1, penalty only on exit)
-> 4. spectre_bhi=vmexit, TSX abort sequence, host/guest spec_ctrl=1: tscdeadline_immed 3294 (best general purpose performance)
+On Wed, Jul 31, 2024 at 8:16=E2=80=AFAM Nikunj A Dadhania <nikunj@amd.com> =
+wrote:
+>
+> When Secure TSC is enabled and TscInvariant (bit 8) in CPUID_8000_0007_ed=
+x
+> is set, the kernel complains with the below firmware bug:
+>
+> [Firmware Bug]: TSC doesn't count with P0 frequency!
+>
+> Secure TSC does not need to run at P0 frequency; the TSC frequency is set
+> by the VMM as part of the SNP_LAUNCH_START command. Skip this check when
+> Secure TSC is enabled
+>
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Tested-by: Peter Gonda <pgonda@google.com>
+> ---
+>  arch/x86/kernel/cpu/amd.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+> index be5889bded49..87b55d2183a0 100644
+> --- a/arch/x86/kernel/cpu/amd.c
+> +++ b/arch/x86/kernel/cpu/amd.c
+> @@ -370,7 +370,8 @@ static void bsp_determine_snp(struct cpuinfo_x86 *c)
+>
+>  static void bsp_init_amd(struct cpuinfo_x86 *c)
+>  {
+> -       if (cpu_has(c, X86_FEATURE_CONSTANT_TSC)) {
+> +       if (cpu_has(c, X86_FEATURE_CONSTANT_TSC) &&
+> +           !cc_platform_has(CC_ATTR_GUEST_SECURE_TSC)) {
 
-This looks promising.
-
-> 5. spectre_bhi=vmexit, TSX abort sequence, host spec_ctrl=1, guest spec_ctrl=1025: tscdeadline_immed 4011 (needs optimization)
-
-Once QEMU adds support for exposing BHI_CTRL, this is a very likely
-scenario. To optimize this, host needs to have BHI_DIS_S set. We also need
-to account for the case where some guests set BHI_DIS_S and others dont.
-
-> In short, there is a significant speedup to be had here.
-> 
-> As for test 5, honest that is somewhat invalid because it would be
-> dependent on the VMM user space showing BHI_CTRL.
-
-Right.
-
-> QEMU as an example does not do that, so even with latest qemu and latest
-> kernel, guests will still use BHB loop even on SPR++ today, and they
-> could use the TSX loop with this proposed change if the VMM exposes RTM
-> feature.
-
-I did not know that QEMU does not expose CPUID.BHI_CTRL. Chao, could you
-please help getting this feature exposed in QEMU?
-
-> I'm happy to post a V2 patch with my TSX changes, or take any other
-> suggestions here.
-
-With CPUID.BHI_CTRL exposed to guests, this:
-
-> 2. spectre_bhi=on, host spec_ctrl=1025, guest spec_ctrl=1025: tscdeadline_immed 3153 (no WRMSR toggling)
-
-will be the most common case, which is also the best performing. Isn't it
-better to aim for this?
+Could we extend this to never complain in a virtual machine? i.e.
+...
+-       if (cpu_has(c, X86_FEATURE_CONSTANT_TSC)) {
++       if (cpu_has(c, X86_FEATURE_CONSTANT_TSC) &&
++           !cpu_has(c, X86_FEATURE_HYPERVISOR)) {
+...
 
