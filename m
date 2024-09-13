@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-26801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26802-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC8B0977E92
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 13:38:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E8B9977E95
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 13:38:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD78728360D
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 11:38:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 371E02847B8
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 11:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD0B1D88CE;
-	Fri, 13 Sep 2024 11:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF761D86E9;
+	Fri, 13 Sep 2024 11:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bUUmJE8n"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="j4lHiMo6"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2044.outbound.protection.outlook.com [40.107.236.44])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2063.outbound.protection.outlook.com [40.107.223.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5D11D86DC;
-	Fri, 13 Sep 2024 11:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C3A1D86D8;
+	Fri, 13 Sep 2024 11:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726227497; cv=fail; b=MEuNtTZHLCqIFxLushft0eVnTeIhilfpyVRTacSKbyL1kcH0QUT7vDk0V6ZVbsWbMLWkBAcJgDgPwSghGE8EumqNsH0eAUerSC1GTdCD+MVPAgMRoZMaIcxol4js+eYpclCRwEwHiBUP7DbrYbA8YYv/9BdMpBWIc/Q0erGEa7c=
+	t=1726227517; cv=fail; b=WNZ4NfYuhVinP4SCemJI7GqR+I0mK13zOMwvuckKpArmZHKg+BvSDROMYLJ+foo5Ym/6U5tk+yE3587HipHE7Aj1vBJgBV65wb95oj/awInj1GvZogttSED7T1GyWDkSd5c67awYfPm3lrv0AsTsOhGkSttcmjglabrIy/GOU/0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726227497; c=relaxed/simple;
-	bh=q8u3We2VLkPF/lz36iDTTedNi5w4bbEGcgaDaql0+y0=;
+	s=arc-20240116; t=1726227517; c=relaxed/simple;
+	bh=/g80h7m1trobD5qpOSBjyHmZTGda5QBtre431gxqujE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=td38eR9QlpVfLNUy0j/kQ0x3Yz3QQAenZtMTeAlKYxnoAms95kwaq+aq3VOVCmcoas6cuXVvI3RPsWxOSNEFZ47HF2buDcjeqoJwJTWCHOtnzqDj2CvJDQIL+PBy/jUESuFze2FjUZ/sKh/018GgwEalZxnw0OLMh6JGm5P+QBk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bUUmJE8n; arc=fail smtp.client-ip=40.107.236.44
+	 MIME-Version:Content-Type; b=MdzEBNR2s/G4WJCz3ATs4eS8Y+8UsybJ/itgAwd/BZVeNtZv3QS62BaL7jThQrcWgzVBylnQZ01bVeTzJ3ZtlP8hJ8giITSkh/NYC6e1LDFVqx/v82AdHdDFxJcCgL+rK37L+ppynmb97mm0FURDudCpdsA3bX1EaftyuP+O/zY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=j4lHiMo6; arc=fail smtp.client-ip=40.107.223.63
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xvo+vwwgwBJIeIU/SyZTVIr8zDttXCR9aekpfrp0hdPCbvkAtUP5bJb0Wfg7RBU1T2J4VfdM494lU5rBSFSez/CYuN/zMoH/L/j6MWDCaL5mjTsCO8elwCLhxpWAAvCMAWM5wGtv5lshSLJw3huQobL1+d49NG92LTQimm65Usm8T/VvB1ALb0uN6+wRR8CenXLwk8zHtSM9o50me2/4v/I3qsLumJUKlsvztMfyRrdEF24B0WQpbPrRcUCLFk98v9K7y+ORXI5OGwXTvwsFug9ZbQknCbI9FRRmrZoaLoqbz0iQH3zgvuN4UtVjchAAYIEv2B4j7khbvwWf0Loi+g==
+ b=dI4sQtCMmb29l1FQqP0llQh+FGbJIiaxxLTIRvqoNEhwqnXSSm1K83wbIxTl856S1v3iVfzrA7IQRLRNiV8JlxHC+BSXw9mRSW5uUCxob/6A3ds/Le21c8fgMWCIb+hrNTcUly+++zLKCo6y4wYRtuafNoh1R8rpUYMHa4OmjRJjCgEXaqbYxuPFIh3KtDdaI1zkUXfJh0AxUZ3MmeoCuJwNKNYTi9f4E3NWwvgR5aXUea3YwQA07osFC7ZQGP6cWpF4uQH9uAAO6BbnDLi8EjdrsRj7/FBy79i2Q1g9vqteQDOuOK9z4XLjU8+zK1pnBhZ/TFmVenCcCO9wBO0FUA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dI4RnNYDa8AEATzqojqiA/fNQIL6jNQN7KLJKpDRQs0=;
- b=dcCUkFi6/ht5fVdDcelojGZiLnboKklgJD/ytWN5/OGQSot1lGYj8gYjpQn5zEcPPKY5Oi5dMJ2Yg52L9Mo0lvts4qcVx3+opMHOM2S51ck0/KOJyTcoiWJk5uRKCXExOZBUppFNp1TOxwcnpc2TpqSTCqtRPAUPqQgDIk6VNretIsgLTSRsH75mDCqpclxyhI/HOOomxI7LX5UiBgKJY/JWrro3fYTAaREK4P0QjHVTe+muYkfVzNnGcBq0iQOPZcLhnMDwwfAlmcwZ03BuPknHBoLtO4Cwyuw4t1F6db2TUF3oXNc/OhiNWFnvIfhz8KWSABn3WMrCJyOWrN7W5g==
+ bh=p45UyZLAMepyQCNoiAwbVCYaoRz41qRisYaMzUm/ERc=;
+ b=OFKPvdmEDZ+eHk4Cvw89Yr4FB9KJ2zXDFP1nvwtuXNwwKuSrFKoA1EvvgNMjozVhivKyoWi62pFVZuEy1kt/twlgRYpsCWkzZ1JupXQsMCU7dsjki1cgb7IZqCNIKwdzjsiDoUQ/mqZdWQTou3jTkVUMS/IZFSb6BHN7nk+/C2MXp/YELCvKc8Azv6RNIlHOsGS0VNJiWp6s/CenfdxEnOOeeJV/VhMapkPO9ajvMGKvtiNuMOAr7h/w0eM/ljSpdqiXBfM14rkBsBiirdJmu0wKhWXLAZ3KCakoCsZ/77gXoBkQOTLha2SX3xtercNbasx6PSQqMsAJQXDsfzlj4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dI4RnNYDa8AEATzqojqiA/fNQIL6jNQN7KLJKpDRQs0=;
- b=bUUmJE8nuQttUrIyEqb4XNwFlp+7W7rExhPGnBc6M7lNxof0SlGiMNChkHRWB033zFhtPp4StyrXgxbHQ61WxdJnWHr51GyksputWV6nn/BPdUEDu9AsUqKC3Qn3j3sN34wVOQLuysrh8rMIuUWQJKvmnmMyFyrunmf5hJ4sELM=
-Received: from CH0PR04CA0056.namprd04.prod.outlook.com (2603:10b6:610:77::31)
- by SJ2PR12MB8160.namprd12.prod.outlook.com (2603:10b6:a03:4af::8) with
+ bh=p45UyZLAMepyQCNoiAwbVCYaoRz41qRisYaMzUm/ERc=;
+ b=j4lHiMo6VN0Gaoxt6YjqoGacXDAH1oabuSZjJh4H7XJ5IcPWMg/sK+27PA+Irg+8xbF2AHIv48LQJzFJqDZq9V8NHZ5BDDr+LoVRysofGdsqOMHVP9wgX+8WsWw7M1uJzOmMMo2uovu/KnDnGse8GnRRTLA+yKztdwnZCYmceTQ=
+Received: from CH2PR12CA0022.namprd12.prod.outlook.com (2603:10b6:610:57::32)
+ by SJ0PR12MB5612.namprd12.prod.outlook.com (2603:10b6:a03:427::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.25; Fri, 13 Sep
- 2024 11:38:12 +0000
-Received: from DS3PEPF000099E2.namprd04.prod.outlook.com
- (2603:10b6:610:77:cafe::c3) by CH0PR04CA0056.outlook.office365.com
- (2603:10b6:610:77::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.26 via Frontend
- Transport; Fri, 13 Sep 2024 11:38:11 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.18; Fri, 13 Sep
+ 2024 11:38:31 +0000
+Received: from DS3PEPF000099DF.namprd04.prod.outlook.com
+ (2603:10b6:610:57:cafe::46) by CH2PR12CA0022.outlook.office365.com
+ (2603:10b6:610:57::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.25 via Frontend
+ Transport; Fri, 13 Sep 2024 11:38:30 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS3PEPF000099E2.mail.protection.outlook.com (10.167.17.201) with Microsoft
+ DS3PEPF000099DF.mail.protection.outlook.com (10.167.17.202) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Fri, 13 Sep 2024 11:38:11 +0000
+ 15.20.7918.13 via Frontend Transport; Fri, 13 Sep 2024 11:38:30 +0000
 Received: from BLR-L-NUPADHYA.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 13 Sep
- 2024 06:38:06 -0500
+ 2024 06:38:24 -0500
 From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 To: <linux-kernel@vger.kernel.org>
 CC: <tglx@linutronix.de>, <mingo@redhat.com>, <dave.hansen@linux.intel.com>,
@@ -78,9 +78,9 @@ CC: <tglx@linutronix.de>, <mingo@redhat.com>, <dave.hansen@linux.intel.com>,
 	<David.Kaplan@amd.com>, <x86@kernel.org>, <hpa@zytor.com>,
 	<peterz@infradead.org>, <seanjc@google.com>, <pbonzini@redhat.com>,
 	<kvm@vger.kernel.org>
-Subject: [RFC 03/14] x86/apic: Populate .read()/.write() callbacks of Secure AVIC driver
-Date: Fri, 13 Sep 2024 17:06:54 +0530
-Message-ID: <20240913113705.419146-4-Neeraj.Upadhyay@amd.com>
+Subject: [RFC 04/14] x86/apic: Initialize APIC backing page for Secure AVIC
+Date: Fri, 13 Sep 2024 17:06:55 +0530
+Message-ID: <20240913113705.419146-5-Neeraj.Upadhyay@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
 References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
@@ -96,223 +96,271 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099E2:EE_|SJ2PR12MB8160:EE_
-X-MS-Office365-Filtering-Correlation-Id: e3272934-8d9f-4c34-6975-08dcd3e88c18
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DF:EE_|SJ0PR12MB5612:EE_
+X-MS-Office365-Filtering-Correlation-Id: 440f955e-b486-41b0-f0ea-08dcd3e8976c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|7416014|1800799024;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?juJCZDOAHjyYhUSjDbqphNFJSRl5aBAsQUK2aVyxJ9r007SI7CnjdRV71SpW?=
- =?us-ascii?Q?/5na2YOn2ElxganPBOi8bgOBzXY07imHVUjUsr5YKdms5BY86ESWvZwh0Rqk?=
- =?us-ascii?Q?YtGwF5rNDxj7KbzzotlvtGiHrd+0JZ6KXXuTflZMwRG0W/bT7TCmEq9W+mXH?=
- =?us-ascii?Q?rEB/pbPDpo4WBoBXQ3FgkXGdBBi2lfvR+/Tv0n8W+Yqu+MSQxhiGoQDGnY0+?=
- =?us-ascii?Q?Q7oI2Qo0NGJ260p84OQLYf+vQ5SYONTdPQ9aTdaTzNbb4ul0cpdlHTCB5e1i?=
- =?us-ascii?Q?jSm2zlQmz90qgDEA9NyZmHtnXeMGb04Bo7SgLq10L+BNn69vf40VxFsgB/8d?=
- =?us-ascii?Q?+hliMcuX8WKxuXxFex261G30b1pZa+g+5FyYRzduiur5BpJr0wk0GFPOZ8nJ?=
- =?us-ascii?Q?cwl6SwD0ZH7H1dKOuOkZW5eLSVuiFbpi+a007KJHcsu73gmd4nlpEkLt/K29?=
- =?us-ascii?Q?euS6Wz6Uthm5EsDUAfu/3ToP4/tIPY5b3dn4YGWoZjqbAq120hzehRdQBnlR?=
- =?us-ascii?Q?A3H05RgKt61pXlfN7g+J01UcmA+6gTxy26FOaXX/mq9E6nhmGkxymkqQ9FDI?=
- =?us-ascii?Q?DXjZvqZodaXQRg3yRs+8vgWI8/cfftdQWi6x9O9U3d/Z6LNed58v80KurdQn?=
- =?us-ascii?Q?xqievI6aQWTHKJ+BGXDE/ST65t1f+k+oOhuzeE8U/tY2r0igvHJVnzOSi7sg?=
- =?us-ascii?Q?hDrfXcGmzU6C9BVIg5+Qkufsxl1azijEnK+HJMJHCcMWn91SgLtfsZd6TAmO?=
- =?us-ascii?Q?J9RzPgbt0XdDaEsEGAptCvraCYyviIEtalApHLheyfQ7PGcCeF0QEriDVCXx?=
- =?us-ascii?Q?flN0/+uGyk4pK3nLmqmpFHjcaVdlIMKxHw21HdVHq63yaRPYXs02HOaLc7wn?=
- =?us-ascii?Q?bs4wtYwA1vByrNeZwJOe7P4dQvul0JwRCYu5EIzlljHuhQoI0NT+rshSv3i1?=
- =?us-ascii?Q?jvi1wJQoJIXIDn+WCVclD9IiaA/gJP9WRE71gtsp/ZYH24YXsn850iUSHNel?=
- =?us-ascii?Q?QLdXfcP5wflc/FoUa2jgrBP1jyjlvVEFYpZV1LngNKA2u4C4WFdYdo/GFSau?=
- =?us-ascii?Q?nMJNiO39ADgqgxfNxtLsTwgtV3aXQlXGNY0gHnpCCAD9eJjKp2ki+R4OT9x2?=
- =?us-ascii?Q?sGJKMKodcWynl5bKomw1XKuhnsGwrAJo+KdNkdKmcW5+IZCG1YTmNiCNxZST?=
- =?us-ascii?Q?Yvfd8okrdEr2VhUupO1hGoiFTlxkKzs6t8fuALai+dRHh04YS16b/nJckZfy?=
- =?us-ascii?Q?ceU+UxaXA3gT3o9CiI4JR5e49yw9b2UrK/k0OoKqohVcdbhbQsfcENGVAu5i?=
- =?us-ascii?Q?pEXMI6bKdqMn0hwB+v62xpc/5EufoAJqLiaM5Y/jAT5pEjSgXAGSTbVrcfLK?=
- =?us-ascii?Q?Yv3215nyd/nAcwY9NTaejkCfILw/7jQTLN5t0WHiHvhk0/cA6pHtSFlAWusY?=
- =?us-ascii?Q?dkD+vHa3Wzk69MV4lcgROIfEjkh2eGhv?=
+	=?us-ascii?Q?WJadrVW48/os7KavrPYcLShiyHdxXrpEi0in1ZTyTAkW3jcVh9+9TIkAPKEE?=
+ =?us-ascii?Q?l/PG6LFsn719ax3IgB4jkfsIt+lSqxsclfB9ughhIIeatkPxWL0YO5JBMALo?=
+ =?us-ascii?Q?vCcrHo+HZHPOZHV5FVgVtF2VsCkM97LFXXZfNwmVeNizV3vdgwYG8YDcwVOS?=
+ =?us-ascii?Q?79lRmzG6pz1lGqv+oJEZR8h1H7/1hieWobJ5mF+7C0Wd6qkuzXtvxXNiC3TG?=
+ =?us-ascii?Q?19LfxshJDcg8uTrwDh2gD3RiRSY1rxieYW86b6GpyUoNMzeJlXaDQcFLhL+P?=
+ =?us-ascii?Q?/3sJ2nlBwg+IWoB812KzhXD8NCaNXHVR4uYqVyUBY11lx24DBx/0DUHTfM7Z?=
+ =?us-ascii?Q?JNeo50jDlaMKaUHo+AZ+1loKCwdwNaSnGd2DNgsxBFzMSGt2aSk/nnREwBZh?=
+ =?us-ascii?Q?prUuFYUR63zVx1tG+HSp0PcwPsuW86QKDuacCes9vY0gvUnCKgHzJTvEtXWo?=
+ =?us-ascii?Q?oYJQIcBYTKMKuYLyYFrOFOZOulyXNXz7x2AeQMeh7rjsIYaze0al60Q93C3b?=
+ =?us-ascii?Q?q3xH8/C4h0dEBFbTdpGZHcdBtlLRet0JPUbo+Ya6FFXQQVC9PoJlZYVxRf+z?=
+ =?us-ascii?Q?y0gABCUdbTa5WjQajcCW7vgPvVGMMSqcip1u+cOEAnOtDHqCV9qF2ix0KY0Q?=
+ =?us-ascii?Q?FdweRPBB/cJ0zbMEw0wwJC0XdYoXblfd/nzJ/K+AVTf/CHrennUOeQQRuOco?=
+ =?us-ascii?Q?Yz1i3h/oOHLuWNCOgtsivKi40bRrnEZ/tqvxamfjmQBgxxSbdCY+n+MwbGMN?=
+ =?us-ascii?Q?8w7/lSeoSaVJUn3Div1HjkJyL1NYxceaEGAf0y8bDnZsYcMMqzXgVgeyDxpF?=
+ =?us-ascii?Q?I5mMrqbQAK4Bl93ypuBAtxJDUU7w7nrSESvuuJtvhNYIq7B6QU59wMhFWbXV?=
+ =?us-ascii?Q?y/xYna8uqyfFSNCLTuFqdxc1BN1TRte5EJqL5CTXHPMJOZihvY8Fc/iO8n7R?=
+ =?us-ascii?Q?ewabctoAa6QUodGbAYREEDBD5XRBUKOHepy+b5NNAw29YOqI952jWnKUy/iT?=
+ =?us-ascii?Q?ZAxSUBhBnjP6HlhRsFsLf3yA+q8sZxDuvGN/OoRE3hrsSYEDHypn1yq5VUpQ?=
+ =?us-ascii?Q?vgc+k5PqLTv3Vg77VCELJmq6pQUhF1LjxZL2cFI4hlj+2md5+o1b4SRlKyIz?=
+ =?us-ascii?Q?Xg5XpS12y6Y++daDcZFt5Br3OKp7B4crl0yavxNBEbAA7QZOSv0d4OSYJgbl?=
+ =?us-ascii?Q?wNq4XzomJpJ/ndvtfVYZS1RDkw4MCnoSmncciyVCN1QKrkf+TVffKJLLVuoU?=
+ =?us-ascii?Q?6H3ZHl6Yer+Y8SSUtGa30scqeUM24HJyPiJQnS/0K7j1Vpf6O41xtoLseLkI?=
+ =?us-ascii?Q?gZYTfKtvuVANM+TGuzfMDj6JFlO9pgyhEv8vXHuAWRmn50dkN585B2A8AUMt?=
+ =?us-ascii?Q?UHZj7wY3VEQ6w8e7AeXg9zRprctNAZfSkQatiSOdgPLpBOnW1ZeonnTzIc3m?=
+ =?us-ascii?Q?fKaqGmaS8XHrfJS7JGb0fvEmna+szsUh?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(7416014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2024 11:38:11.4957
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2024 11:38:30.4577
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3272934-8d9f-4c34-6975-08dcd3e88c18
+X-MS-Exchange-CrossTenant-Network-Message-Id: 440f955e-b486-41b0-f0ea-08dcd3e8976c
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099E2.namprd04.prod.outlook.com
+	DS3PEPF000099DF.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8160
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5612
 
-The x2APIC registers are mapped at an offset within the guest APIC
-backing page which is same as their x2APIC MMIO offset. Secure AVIC
-adds new registers such as ALLOWED_IRRs (which are at 4-byte offset
-within the IRR register offset range) and NMI_REQ to the APIC register
-space. In addition, the APIC_ID register is writable and configured by
-guest.
+From: Kishon Vijay Abraham I <kvijayab@amd.com>
 
-Add read() and write() APIC callback functions to read and write x2APIC
-registers directly from the guest APIC backing page.
+Secure AVIC lets guest manage the APIC backing page (unlike emulated
+x2APIC or x2AVIC where the hypervisor manages the APIC backing page).
 
-The default .read()/.write() callbacks of x2APIC drivers perform
-a rdmsr/wrmsr of the x2APIC registers. When Secure AVIC is enabled,
-these would result in #VC exception (for non-accelerated register
-accesses). The #VC exception handler reads/write the x2APIC register
-in the guest APIC backing page. Since this would increase the latency
-of accessing x2APIC registers, the read() and write() callbacks of
-Secure AVIC driver directly reads/writes to the guest APIC backing page.
+However the introduced Secure AVIC Linux design still maintains the
+APIC backing page in the hypervisor to shadow the APIC backing page
+maintained by guest (It should be noted only subset of the registers
+are shadowed for specific usecases and registers like APIC_IRR,
+APIC_ISR are not shadowed).
 
-Co-developed-by: Kishon Vijay Abraham I <kvijayab@amd.com>
+Add sev_ghcb_msr_read() to invoke "SVM_EXIT_MSR" VMGEXIT to read
+MSRs from hypervisor. Initialize the Secure AVIC's APIC backing
+page by copying the initial state of shadow APIC backing page in
+the hypervisor to the guest APIC backing page. Specifically copy
+APIC_LVR, APIC_LDR, and APIC_LVT MSRs from the shadow APIC backing
+page.
+
 Signed-off-by: Kishon Vijay Abraham I <kvijayab@amd.com>
+Co-developed-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 ---
- arch/x86/include/asm/apicdef.h      |   2 +
- arch/x86/kernel/apic/x2apic_savic.c | 107 +++++++++++++++++++++++++++-
- 2 files changed, 107 insertions(+), 2 deletions(-)
+ arch/x86/coco/sev/core.c            | 41 ++++++++++++++++-----
+ arch/x86/include/asm/sev.h          |  2 ++
+ arch/x86/kernel/apic/x2apic_savic.c | 55 +++++++++++++++++++++++++++++
+ 3 files changed, 90 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/include/asm/apicdef.h b/arch/x86/include/asm/apicdef.h
-index 094106b6a538..be39a543fbe5 100644
---- a/arch/x86/include/asm/apicdef.h
-+++ b/arch/x86/include/asm/apicdef.h
-@@ -135,6 +135,8 @@
- #define		APIC_TDR_DIV_128	0xA
- #define	APIC_EFEAT	0x400
- #define	APIC_ECTRL	0x410
-+#define APIC_SEOI	0x420
-+#define APIC_IER	0x480
- #define APIC_EILVTn(n)	(0x500 + 0x10 * n)
- #define		APIC_EILVT_NR_AMD_K8	1	/* # of extended interrupts */
- #define		APIC_EILVT_NR_AMD_10H	4
+diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+index 93470538af5e..0e140f92cfef 100644
+--- a/arch/x86/coco/sev/core.c
++++ b/arch/x86/coco/sev/core.c
+@@ -1331,18 +1331,15 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
+ 	return 0;
+ }
+ 
+-static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
++static enum es_result __vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt, bool write)
+ {
+ 	struct pt_regs *regs = ctxt->regs;
++	u64 exit_info_1 = write ? 1 : 0;
+ 	enum es_result ret;
+-	u64 exit_info_1;
+-
+-	/* Is it a WRMSR? */
+-	exit_info_1 = (ctxt->insn.opcode.bytes[1] == 0x30) ? 1 : 0;
+ 
+ 	if (regs->cx == MSR_SVSM_CAA) {
+ 		/* Writes to the SVSM CAA msr are ignored */
+-		if (exit_info_1)
++		if (write)
+ 			return ES_OK;
+ 
+ 		regs->ax = lower_32_bits(this_cpu_read(svsm_caa_pa));
+@@ -1352,14 +1349,14 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ 	}
+ 
+ 	ghcb_set_rcx(ghcb, regs->cx);
+-	if (exit_info_1) {
++	if (write) {
+ 		ghcb_set_rax(ghcb, regs->ax);
+ 		ghcb_set_rdx(ghcb, regs->dx);
+ 	}
+ 
+ 	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_MSR, exit_info_1, 0);
+ 
+-	if ((ret == ES_OK) && (!exit_info_1)) {
++	if (ret == ES_OK && !write) {
+ 		regs->ax = ghcb->save.rax;
+ 		regs->dx = ghcb->save.rdx;
+ 	}
+@@ -1367,6 +1364,34 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ 	return ret;
+ }
+ 
++static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
++{
++	return __vc_handle_msr(ghcb, ctxt, ctxt->insn.opcode.bytes[1] == 0x30);
++}
++
++enum es_result sev_ghcb_msr_read(u64 msr, u64 *value)
++{
++	struct pt_regs regs = { .cx = msr };
++	struct es_em_ctxt ctxt = { .regs = &regs };
++	struct ghcb_state state;
++	unsigned long flags;
++	enum es_result ret;
++	struct ghcb *ghcb;
++
++	local_irq_save(flags);
++	ghcb = __sev_get_ghcb(&state);
++	vc_ghcb_invalidate(ghcb);
++
++	ret = __vc_handle_msr(ghcb, &ctxt, false);
++	if (ret == ES_OK)
++		*value = regs.ax | regs.dx << 32;
++
++	__sev_put_ghcb(&state);
++	local_irq_restore(flags);
++
++	return ret;
++}
++
+ enum es_result sev_notify_savic_gpa(u64 gpa)
+ {
+ 	struct ghcb_state state;
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index e84fc7fcc32a..5e6385bfb85a 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -400,6 +400,7 @@ u64 sev_get_status(void);
+ void sev_show_status(void);
+ void snp_update_svsm_ca(void);
+ enum es_result sev_notify_savic_gpa(u64 gpa);
++enum es_result sev_ghcb_msr_read(u64 msr, u64 *value);
+ 
+ #else	/* !CONFIG_AMD_MEM_ENCRYPT */
+ 
+@@ -437,6 +438,7 @@ static inline u64 sev_get_status(void) { return 0; }
+ static inline void sev_show_status(void) { }
+ static inline void snp_update_svsm_ca(void) { }
+ static inline enum es_result sev_notify_savic_gpa(u64 gpa) { return ES_UNSUPPORTED; }
++static inline enum es_result sev_ghcb_msr_read(u64 msr, u64 *value) { return ES_UNSUPPORTED; }
+ 
+ #endif	/* CONFIG_AMD_MEM_ENCRYPT */
+ 
 diff --git a/arch/x86/kernel/apic/x2apic_savic.c b/arch/x86/kernel/apic/x2apic_savic.c
-index d903c35b8b64..6a471bbc3dba 100644
+index 6a471bbc3dba..99151be4e173 100644
 --- a/arch/x86/kernel/apic/x2apic_savic.c
 +++ b/arch/x86/kernel/apic/x2apic_savic.c
-@@ -10,6 +10,7 @@
- #include <linux/cpumask.h>
+@@ -11,6 +11,7 @@
  #include <linux/cc_platform.h>
  #include <linux/percpu-defs.h>
-+#include <linux/align.h>
+ #include <linux/align.h>
++#include <linux/sizes.h>
  
  #include <asm/apic.h>
  #include <asm/sev.h>
-@@ -24,6 +25,108 @@ static int x2apic_savic_acpi_madt_oem_check(char *oem_id, char *oem_table_id)
+@@ -20,6 +21,19 @@
+ static DEFINE_PER_CPU(void *, apic_backing_page);
+ static DEFINE_PER_CPU(bool, savic_setup_done);
+ 
++enum lapic_lvt_entry {
++	LVT_TIMER,
++	LVT_THERMAL_MONITOR,
++	LVT_PERFORMANCE_COUNTER,
++	LVT_LINT0,
++	LVT_LINT1,
++	LVT_ERROR,
++
++	APIC_MAX_NR_LVT_ENTRIES,
++};
++
++#define APIC_LVTx(x) (APIC_LVTT + 0x10 * (x))
++
+ static int x2apic_savic_acpi_madt_oem_check(char *oem_id, char *oem_table_id)
+ {
  	return x2apic_enabled() && cc_platform_has(CC_ATTR_SNP_SECURE_AVIC);
+@@ -35,6 +49,22 @@ static inline void set_reg(char *page, int reg_off, u32 val)
+ 	WRITE_ONCE(*((u32 *)(page + reg_off)), val);
  }
  
-+static inline u32 get_reg(char *page, int reg_off)
++static u32 read_msr_from_hv(u32 reg)
 +{
-+	return READ_ONCE(*((u32 *)(page + reg_off)));
-+}
++	u64 data, msr;
++	int ret;
 +
-+static inline void set_reg(char *page, int reg_off, u32 val)
-+{
-+	WRITE_ONCE(*((u32 *)(page + reg_off)), val);
-+}
-+
-+#define SAVIC_ALLOWED_IRR_OFFSET	0x204
-+
-+static u32 x2apic_savic_read(u32 reg)
-+{
-+	void *backing_page = this_cpu_read(apic_backing_page);
-+
-+	switch (reg) {
-+	case APIC_LVTT:
-+	case APIC_TMICT:
-+	case APIC_TMCCT:
-+	case APIC_TDCR:
-+	case APIC_ID:
-+	case APIC_LVR:
-+	case APIC_TASKPRI:
-+	case APIC_ARBPRI:
-+	case APIC_PROCPRI:
-+	case APIC_LDR:
-+	case APIC_SPIV:
-+	case APIC_ESR:
-+	case APIC_ICR:
-+	case APIC_LVTTHMR:
-+	case APIC_LVTPC:
-+	case APIC_LVT0:
-+	case APIC_LVT1:
-+	case APIC_LVTERR:
-+	case APIC_EFEAT:
-+	case APIC_ECTRL:
-+	case APIC_SEOI:
-+	case APIC_IER:
-+	case APIC_EILVTn(0) ... APIC_EILVTn(3):
-+		return get_reg(backing_page, reg);
-+	case APIC_ISR ... APIC_ISR + 0x70:
-+	case APIC_TMR ... APIC_TMR + 0x70:
-+		WARN_ONCE(!IS_ALIGNED(reg, 16), "Reg offset %#x not aligned at 16 bytes", reg);
-+		return get_reg(backing_page, reg);
-+	/* IRR and ALLOWED_IRR offset range */
-+	case APIC_IRR ... APIC_IRR + 0x74:
-+		/*
-+		 * Either aligned at 16 bytes for valid IRR reg offset or a
-+		 * valid Secure AVIC ALLOWED_IRR offset.
-+		 */
-+		WARN_ONCE(!(IS_ALIGNED(reg, 16) || IS_ALIGNED(reg - SAVIC_ALLOWED_IRR_OFFSET, 16)),
-+			  "Misaligned IRR/ALLOWED_IRR reg offset %#x", reg);
-+		return get_reg(backing_page, reg);
-+	default:
-+		pr_err("Permission denied: read of Secure AVIC reg offset %#x\n", reg);
-+		return 0;
++	msr = APIC_BASE_MSR + (reg >> 4);
++	ret = sev_ghcb_msr_read(msr, &data);
++	if (ret != ES_OK) {
++		pr_err("Secure AVIC msr (%#llx) read returned error (%d)\n", msr, ret);
++		/* MSR read failures are treated as fatal errors */
++		snp_abort();
 +	}
++
++	return lower_32_bits(data);
 +}
 +
-+#define SAVIC_NMI_REQ_OFFSET		0x278
-+
-+static void x2apic_savic_write(u32 reg, u32 data)
-+{
-+	void *backing_page = this_cpu_read(apic_backing_page);
-+
-+	switch (reg) {
-+	case APIC_LVTT:
-+	case APIC_LVT0:
-+	case APIC_LVT1:
-+	case APIC_TMICT:
-+	case APIC_TDCR:
-+	case APIC_SELF_IPI:
-+	/* APIC_ID is writable and configured by guest for Secure AVIC */
-+	case APIC_ID:
-+	case APIC_TASKPRI:
-+	case APIC_EOI:
-+	case APIC_SPIV:
-+	case SAVIC_NMI_REQ_OFFSET:
-+	case APIC_ESR:
-+	case APIC_ICR:
-+	case APIC_LVTTHMR:
-+	case APIC_LVTPC:
-+	case APIC_LVTERR:
-+	case APIC_ECTRL:
-+	case APIC_SEOI:
-+	case APIC_IER:
-+	case APIC_EILVTn(0) ... APIC_EILVTn(3):
-+		set_reg(backing_page, reg, data);
-+		break;
-+	/* ALLOWED_IRR offsets are writable */
-+	case SAVIC_ALLOWED_IRR_OFFSET ... SAVIC_ALLOWED_IRR_OFFSET + 0x70:
-+		if (IS_ALIGNED(reg - SAVIC_ALLOWED_IRR_OFFSET, 16)) {
-+			set_reg(backing_page, reg, data);
-+			break;
-+		}
-+		fallthrough;
-+	default:
-+		pr_err("Permission denied: write to Secure AVIC reg offset %#x\n", reg);
-+	}
-+}
-+
- static void x2apic_savic_send_IPI(int cpu, int vector)
- {
- 	u32 dest = per_cpu(x86_cpu_to_apicid, cpu);
-@@ -140,8 +243,8 @@ static struct apic apic_x2apic_savic __ro_after_init = {
- 	.send_IPI_self			= x2apic_send_IPI_self,
- 	.nmi_to_offline_cpu		= true,
+ #define SAVIC_ALLOWED_IRR_OFFSET	0x204
  
--	.read				= native_apic_msr_read,
--	.write				= native_apic_msr_write,
-+	.read				= x2apic_savic_read,
-+	.write				= x2apic_savic_write,
- 	.eoi				= native_apic_msr_eoi,
- 	.icr_read			= native_x2apic_icr_read,
- 	.icr_write			= native_x2apic_icr_write,
+ static u32 x2apic_savic_read(u32 reg)
+@@ -168,6 +198,30 @@ static void x2apic_savic_send_IPI_mask_allbutself(const struct cpumask *mask, in
+ 	__send_IPI_mask(mask, vector, APIC_DEST_ALLBUT);
+ }
+ 
++static void init_backing_page(void *backing_page)
++{
++	u32 val;
++	int i;
++
++	val = read_msr_from_hv(APIC_LVR);
++	set_reg(backing_page, APIC_LVR, val);
++
++	/*
++	 * Hypervisor is used for all timer related functions,
++	 * so don't copy those values.
++	 */
++	for (i = LVT_THERMAL_MONITOR; i < APIC_MAX_NR_LVT_ENTRIES; i++) {
++		val = read_msr_from_hv(APIC_LVTx(i));
++		set_reg(backing_page, APIC_LVTx(i), val);
++	}
++
++	val = read_msr_from_hv(APIC_LVT0);
++	set_reg(backing_page, APIC_LVT0, val);
++
++	val = read_msr_from_hv(APIC_LDR);
++	set_reg(backing_page, APIC_LDR, val);
++}
++
+ static void x2apic_savic_setup(void)
+ {
+ 	void *backing_page;
+@@ -178,6 +232,7 @@ static void x2apic_savic_setup(void)
+ 		return;
+ 
+ 	backing_page = this_cpu_read(apic_backing_page);
++	init_backing_page(backing_page);
+ 	gpa = __pa(backing_page);
+ 	ret = sev_notify_savic_gpa(gpa);
+ 	if (ret != ES_OK)
 -- 
 2.34.1
 
