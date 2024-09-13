@@ -1,135 +1,159 @@
-Return-Path: <kvm+bounces-26788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26789-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1523977B94
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 10:48:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 814DD977BAE
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 10:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 171AC1C25840
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 08:48:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01821B260BE
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 08:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA8E1D6DAA;
-	Fri, 13 Sep 2024 08:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F161D6C61;
+	Fri, 13 Sep 2024 08:57:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pzYBXrOP"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="I9ZkFCeF"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5471BB6B3;
-	Fri, 13 Sep 2024 08:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF311714CD;
+	Fri, 13 Sep 2024 08:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726217318; cv=none; b=Sxg4KNqvnj3OIM/cye8TdkSH6/lmPBDAufGk2F5MWAazSx0KvmsW6To0/uLEMY3UTf8kbQ7Btm2w/QX//PrjLhGlrQxl4eSFyLkK2BdzvbcBdQ/G3mkBPxTiME1CUh3+y82y8XNHh4iruCUkc6CvJ6nX0LUslnX2QUnNjRanHt0=
+	t=1726217838; cv=none; b=eAcWNsabXHpmInYoEivz+BPQPvmAjkyJ1FA5kANU6MMYOpt4vWQBRI6SZ0GVJpNd01ldMg1jxSQl8eD7PEdgWaAQChj91asDolNpCzuQnAVCKqQGIDT+aW0myWUn7WuYTrBRpdAUvcprakxcd9y8ia6yY+n4bEa/YKw30AZr4/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726217318; c=relaxed/simple;
-	bh=RyDvqS2FL5Hm0TH9N1rF42ZS5UKm2nTFiqjSkozNOUM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ghenyOfS2ibzhbINZwLqXhiDOlocfigV2AQnI9HB6iOUW0eAi2MmUQVnMiEjfMefyaMxpSakhWqlEzpBggVIitgJ5c8a8WyopFDi6px0shb6kp5DjGNLAQB7Pu6ozTkVsbWHUGR7lBikqaYDfxp2Eeo9tpgA+Cp1i6bxXTzUsMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pzYBXrOP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66713C4CECF;
-	Fri, 13 Sep 2024 08:48:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726217317;
-	bh=RyDvqS2FL5Hm0TH9N1rF42ZS5UKm2nTFiqjSkozNOUM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=pzYBXrOPE3tm8OeMXF/owUcFqavpGKMiVHzPx2KzNDY+yxJuSRCGq8xE1NHyyPGqE
-	 gMXCYzEQriv+HbGivtJts+NXBWHFNkDJRkBS6B8qrm2oPXWWsNclnuoSjheshE/dhf
-	 1vS+Kp/xhTNQNSHp8OaPMyRuwggIW8Dyung/rwcwZmopctdcQMKWuvqb0mpiWnj352
-	 DG8XyztitSjIRH6FT8ZegJb49mpqEC05As+naogkq+Mo2kFKOuCPmd7FcxzN16Z78e
-	 p18lupWLV3dHofKysowO/WUAJ4Sl/tcLFT7tSV6hrtfDaTtKzugqHRIdlM2LA9OZh5
-	 wRP7x5ZNbadqA==
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c27067b81aso660660a12.0;
-        Fri, 13 Sep 2024 01:48:37 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUESpstasWtchvP13DOzq7QXYiXVWpDhDS+A0nQhIJOZT4YdQfYMNOa6B4XPGwpApSbo5WIwewOAX/HGw==@vger.kernel.org, AJvYcCVdf/qk/QlgrStileWfawO57t4iOnw7tcAawVhSK23ncDzQO8ccNLpRFZfAAJ/6n29rhfs=@vger.kernel.org, AJvYcCVuohjuy1n5Rx3JXtnitkX23gpFkDWJ56TjkyRPQ3ldOFalyvsUK/uxCOu49umNVO/UdKBjalSTr8Y=@vger.kernel.org, AJvYcCXdQBKGwIpUuWtzgYoe/KwIwlVcSBKHN5rFHgKQaSWIQImlA1cGGLq22uWr8BE4lsgZ0A/e26VTKtTIHffY@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywg3ha48WoCW3KPgF+jNt2RYL3SlnbYW9+EOY1in3xauin0LbZX
-	sjTjMRWshVGyZCLMYrR1DSNUgb5Hw/20AQT5XX3jIXOUayy8/27aiNKKL2gl0qxDFPNq0jV4mX2
-	3US69wecpdoOb5t3D8nSNBx/f8WU=
-X-Google-Smtp-Source: AGHT+IGxaU84H2rJpTKm+AdI3/GYF1ZX56p+WMUPH/a1hpMzs1gVjtnJn7uMkTUBM9lkKw3rEE/fFLQKHJ4EoG1Gffw=
-X-Received: by 2002:a05:6402:234f:b0:5c4:136c:ee53 with SMTP id
- 4fb4d7f45d1cf-5c41d5bc591mr2038704a12.0.1726217315937; Fri, 13 Sep 2024
- 01:48:35 -0700 (PDT)
+	s=arc-20240116; t=1726217838; c=relaxed/simple;
+	bh=zcFdpQbzJKsIubxtpyJsT/HdE90nXvhgnbaRRvOMwCg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l6FXditRy8xuZ/GkPbnhAiD3h0PqzeXgwoKWLUNTR2QGpr6d6x4UK9UuBxWcYiOErHMDRCMe7M4qwzgpkcbjD+wu9pgS/2dprJZNU+SP+1hazpZhIvyLB3gQKP2ogp4mP2DvhyPQkGJKTmurW4VH44zGPv7n/9NcDt2qIwzzzFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=I9ZkFCeF; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48D89FSw018461;
+	Fri, 13 Sep 2024 08:57:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=axo/DjJIaLKhBTChwIp2zOOGBs
+	niBf0FSboJpyh9Tss=; b=I9ZkFCeFu5e/63xEokS6kRZtQGsipliEKzhxjWxpn9
+	fjaaevBv55wi3cwha7g1L396vFJ74RrK6mK9Ljh0Nvb2/CJ4B0OVOdHw6JJ13dND
+	9BZKofhH4WFXgIru4jU8+nDRbIFU59uFEzYbG4cF8C7FfBVe70vO7Otq2OECaGoF
+	kJJEp1pxB6jGD5CBJHxCFh7Z6HAtcRx7wzOa9q5ey88h8kjEjM9zaRZTOvOBEa6w
+	4YJbT4jwiqKixrSAydq5aCe/0WV7ck++vUzxIjOnY9aBAOTKthJZrTHYCyCouKmY
+	aNRRwSTcysAcQovIsQ9LKEIF7kWrKTJLPyrPySTCAumg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gc8qs2ry-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 08:57:14 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48D8vDSR001286;
+	Fri, 13 Sep 2024 08:57:13 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gc8qs2ru-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 08:57:13 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48D6lCZv027389;
+	Fri, 13 Sep 2024 08:57:13 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 41h3v3mss2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 08:57:13 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48D8v9JM57999722
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Sep 2024 08:57:09 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 879F02004B;
+	Fri, 13 Sep 2024 08:57:09 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B29B20040;
+	Fri, 13 Sep 2024 08:57:09 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 13 Sep 2024 08:57:09 +0000 (GMT)
+From: Nico Boehr <nrb@linux.ibm.com>
+To: frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1] configure: process arguments not starting with dash
+Date: Fri, 13 Sep 2024 10:56:44 +0200
+Message-ID: <20240913085709.122017-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240912-iocsr-v2-0-e88f75b37da4@flygoat.com> <20240912-iocsr-v2-2-e88f75b37da4@flygoat.com>
- <4f631f4a-eeb8-4b57-8424-4f5e970f0b69@app.fastmail.com>
-In-Reply-To: <4f631f4a-eeb8-4b57-8424-4f5e970f0b69@app.fastmail.com>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Fri, 13 Sep 2024 16:48:23 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5JQSg3PTWBJ862-xjX87q5+fx72Dq0Wk+bsJxiC88wEQ@mail.gmail.com>
-Message-ID: <CAAhV-H5JQSg3PTWBJ862-xjX87q5+fx72Dq0Wk+bsJxiC88wEQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] LoongArch: cpu-probe: Move IOCSR probing out of cpu_probe_common
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Cc: Xuerui Wang <kernel@xen0n.name>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, 
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1zGdLyAl2thhIfuxtTpNuXgrBErww-Qk
+X-Proofpoint-ORIG-GUID: yEmJrmuTNImfRBLQbETJmZSmrKMnr0Oz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-13_04,2024-09-13_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ mlxscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 adultscore=0 clxscore=1011 mlxlogscore=999 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409130058
 
-Hi, Jiaxun,
+We have arguments in the configure script which take an additional
+parameter, like --host-key-document. The syntax is as follows:
 
-On Fri, Sep 13, 2024 at 4:59=E2=80=AFAM Jiaxun Yang <jiaxun.yang@flygoat.co=
-m> wrote:
->
->
->
-> =E5=9C=A82024=E5=B9=B49=E6=9C=8812=E6=97=A5=E4=B9=9D=E6=9C=88 =E4=B8=8B=
-=E5=8D=889:55=EF=BC=8CJiaxun Yang=E5=86=99=E9=81=93=EF=BC=9A
-> [...]
-> > +
-> > +     if (c->options & LOONGARCH_CPU_IOCSR)
-> > +             return;
-> Oops, typo here, there should be a not :-(
->
-> Huacai, if the series is ok for you please fix this when applying
-> the patch. I only tested against NEMU so didn't catch this :-(
-Since the first patch can also be improved, you can improve this one
-by yourself. And from my point of view the two patches can be combined
-to one.
+  --host-key-document=PARAMETER
 
-Huacai
+We always expect an equals sign (=) after the argument name and the
+parameter.
 
->
-> Thanks
-> - Jiaxun
->
-> > +
-> > +     *vendor =3D iocsr_read64(LOONGARCH_IOCSR_VENDOR);
-> > +     *cpuname =3D iocsr_read64(LOONGARCH_IOCSR_CPUNAME);
-> > +
-> > +     if (!__cpu_full_name[cpu])
-> > +             __cpu_full_name[cpu] =3D cpu_full_name;
-> > +
-> > +     config =3D iocsr_read32(LOONGARCH_IOCSR_FEATURES);
-> > +     if (config & IOCSRF_CSRIPI)
-> > +             c->options |=3D LOONGARCH_CPU_CSRIPI;
-> > +     if (config & IOCSRF_EXTIOI)
-> > +             c->options |=3D LOONGARCH_CPU_EXTIOI;
-> > +     if (config & IOCSRF_FREQSCALE)
-> > +             c->options |=3D LOONGARCH_CPU_SCALEFREQ;
-> > +     if (config & IOCSRF_FLATMODE)
-> > +             c->options |=3D LOONGARCH_CPU_FLATMODE;
-> > +     if (config & IOCSRF_EIODECODE)
-> > +             c->options |=3D LOONGARCH_CPU_EIODECODE;
-> > +     if (config & IOCSRF_AVEC)
-> > +             c->options |=3D LOONGARCH_CPU_AVECINT;
-> > +     if (config & IOCSRF_VM)
-> > +             c->options |=3D LOONGARCH_CPU_HYPERVISOR;
-> >  }
-> >
-> >  #ifdef CONFIG_64BIT
-> >
-> > --
-> > 2.46.0
->
-> --
-> - Jiaxun
+If the user omits '=' between the argument name and parameter, both
+words will be interpreted as parameter-less arguments.
+
+This on its own is not a problem, since the parameter would normally not
+be a valid argument name and should hence lead to an error message.
+However, this doesn't work currently.
+
+The configure script stops parsing arguments when an argument starting
+with something other than a dash is encountered. This means that
+specifying arguments such as:
+
+  --host-key-document /tmp/test --gen-se-header=/usr/bin/gen-se-header
+
+Will actually lead to --gen-se-header being ignored. Note the space
+instead of equals sign after --host-hey-document.
+
+In addition, --host-key-document only verifies its parameter when it is
+not empty so we will just continue as if no arguments were specified in
+the case above.
+
+This can be highly confusing, hence consume _all_ specified arguments,
+even if they don't start with a dash. This will lead to an error in the
+case above.
+
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ configure | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 27ae9cc89657..85a2358ca20b 100755
+--- a/configure
++++ b/configure
+@@ -102,8 +102,11 @@ EOF
+     exit 1
+ }
+ 
+-while [[ "$1" = -* ]]; do
++optno=1
++argc=$#
++while [[ $optno -le $argc ]]; do
+     opt="$1"; shift
++    optno=$(( $optno + 1 ))
+     arg=
+     if [[ "$opt" = *=* ]]; then
+ 	arg="${opt#*=}"
+-- 
+2.46.0
+
 
