@@ -1,175 +1,166 @@
-Return-Path: <kvm+bounces-26876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26877-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 480E5978B63
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 00:27:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBAE6978BAC
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 01:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFCBA28620A
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 22:27:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4712F1F23A17
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 23:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0134917BED3;
-	Fri, 13 Sep 2024 22:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BBD185939;
+	Fri, 13 Sep 2024 23:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="L7ZhIj6h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HREQxMe2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0E44A21;
-	Fri, 13 Sep 2024 22:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692441714C3
+	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 23:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726266426; cv=none; b=iKBe4bh7bY9PJKQ4Za8uTRtJGNwFVaAPSN/LuaHvyA1/Zv15QH1HM3yQRODcwOvHV36ckBvMFZfZS3bD8mKamkYmIldWawYhn3SwkOJINh5LNRI5+q8yLkjOZ09DocZVxPTRnBJqy+R5+bLVwkCuWcz77fwnJ0sKOUhwC/oDRVQ=
+	t=1726268711; cv=none; b=Or9zwc1aZSV2w3jAh/Q+Qr5CDQlHGmgfpM7ajphtT7jtw+w4niNO2nk/WtDwZM6EsQMiSKr8EW+HJgcKaLJw2wy3XMzA7O/1nYONXbU6zb1UaMePovFVYZEkYFKhX/qiDr6YnFVpRU9WL7KexxGeYzAW9nx0peClX+vmiEv1Eo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726266426; c=relaxed/simple;
-	bh=caw209yMSYQ3Xp0hcZs/qplFVrOnDNCKGMMZmcpVGXY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rQNIMkuxlpeds5mDAN37SCCxN+IToWqcRIQT8LZJX86QHHoiKi5yOWBEP5x2e0Iv/93Up01RA7meg38FeUNkRSMqctYW6xlOQurDRSkn2i+J/3dseNshNH6yAps0ZYW4KHgcWNVOIpoPhEGIYXWvP9ahy8J29kYdpan1TLmqtOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=L7ZhIj6h; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48DAFUlh004967;
-	Fri, 13 Sep 2024 22:26:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=Uk9R8EworvfXJgI1loKuB2zS
-	uA6mO6IdvNS7+IBXEtQ=; b=L7ZhIj6ho9aJldsQXLc9u5ttXOCfJlpuKJjAzmRw
-	I5gkLv982ScsetX66eNRkcauRY/QSi3CxDwu+Plx+Y5fe8n4xoZtAP+Gxe0Wyjfa
-	1XWmqG8u7Oqhv5kbwvEBcuxwJpQ/LRBKLe4YNCmZCWQRlNATpeTvLlsF06wl/QYL
-	CHIu8TZ7R0JhghLBzlDCcvxsHMw7XQ6sSuUWE4As0dIf9XQnO9x0yl6Hn5kl0hFl
-	2ogTO9pigZ+47MOcn9GDPuP3kwal0wRQuf5AJL5F0W/fQNFnxy6hMaa1yCN85SEc
-	3v135b/aILqEd84l6HNnq6H/+JUdS7SMJtycG0f4KPKiTw==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41kvma5p3m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Sep 2024 22:26:33 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48DMQVHO017065
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Sep 2024 22:26:31 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 13 Sep 2024 15:26:30 -0700
-Date: Fri, 13 Sep 2024 15:26:30 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: Ackerley Tng <ackerleytng@google.com>
-CC: <tabba@google.com>, <roypat@amazon.co.uk>, <jgg@nvidia.com>,
-        <peterx@redhat.com>, <david@redhat.com>, <rientjes@google.com>,
-        <fvdl@google.com>, <jthoughton@google.com>, <seanjc@google.com>,
-        <pbonzini@redhat.com>, <zhiquan1.li@intel.com>, <fan.du@intel.com>,
-        <jun.miao@intel.com>, <isaku.yamahata@intel.com>,
-        <muchun.song@linux.dev>, <mike.kravetz@oracle.com>,
-        <erdemaktas@google.com>, <vannapurve@google.com>, <qperret@google.com>,
-        <jhubbard@nvidia.com>, <willy@infradead.org>, <shuah@kernel.org>,
-        <brauner@kernel.org>, <bfoster@redhat.com>,
-        <kent.overstreet@linux.dev>, <pvorel@suse.cz>, <rppt@kernel.org>,
-        <richard.weiyang@gmail.com>, <anup@brainfault.org>,
-        <haibo1.xu@intel.com>, <ajones@ventanamicro.com>,
-        <vkuznets@redhat.com>, <maciej.wieczor-retman@intel.com>,
-        <pgonda@google.com>, <oliver.upton@linux.dev>,
-        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-fsdevel@kvack.org>
-Subject: Re: [RFC PATCH 15/39] KVM: guest_memfd: hugetlb: allocate and
- truncate from hugetlb
-Message-ID: <20240913151802822-0700.eberman@hu-eberman-lv.qualcomm.com>
-References: <cover.1726009989.git.ackerleytng@google.com>
- <768488c67540aa18c200d7ee16e75a3a087022d4.1726009989.git.ackerleytng@google.com>
+	s=arc-20240116; t=1726268711; c=relaxed/simple;
+	bh=A4KpB9cU5hA2OJrw24+7NbE/kxvP7sQ4WJUyXP+ET/I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NtOlx+VVVKOEghHYNHpQx81fY6X9/jswcvpVek/+tWtrnh7XEt0wn6Jdpoh0OnTmIAQx3dNZcxGK/JFp1afRkvL+NYzCUUoHPHcECAAfF108drtu2Ct90ijuovR77LOXxApVKTnQgc9QiV0ni0djOrUKsrW4Cz1iHH/gH+rdcpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HREQxMe2; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a045f08fd6so85485ab.0
+        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 16:05:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726268708; x=1726873508; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t/LLgDbhHhmWqLgtuLx+Is8IFl8BXUmoR6QEBZPHG94=;
+        b=HREQxMe2YOvL7dGOrCkuWizKLHRdEVXJ5jyN9hTBxlYJdfG1SbD17lJBC3HYaCLNEi
+         RPrC2Hp97HV0Udz6LN1NAcbX7ahZZ1t4wqtnbrrEomZotUiNrNWi94Wcr89ijl8Zp8TX
+         /CNKv7bQXlX+OIIf6Tu7FjYROQRypk/iUH73J7H69HanfpaibYE5wrBHUbMEPCJM7mkM
+         QWosV7QUEYFg0yCKBQHDv0i2tIx9RzW2hEhXNIfM8JrCAg0eXGnewi7eDDm4AXoyU3VF
+         4hfIfVOMo3YsRKJFWctaidCW4KgiXQALHB+M0YQOxtd0vhKowvbu0vIURwEaX4fyxZCk
+         f9eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726268708; x=1726873508;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t/LLgDbhHhmWqLgtuLx+Is8IFl8BXUmoR6QEBZPHG94=;
+        b=fZiDiHPSuPH4oZzid42suP8ueyBJk7WUoV3fi+WQdaixg790GGaDwgYxaAZz4tOrLD
+         HESAEYd7e/m+L1t1fl3XWtyHCrqcUJLC/XvreNB/khzJ0jrQLPYOzv1tWT/tfpnCBIpn
+         kx3LoaWKsGCA9SsJKQ9wwCVFqOW0ZSvPEEwxjoPfpx80qK4h8GYg/Gk7G8AYbzCAU8Ay
+         GUbk/Y2dXWXmI3QkbrpyHMUV8UnjKsbM4Hj1gry6LkbsiAcMHzqLF2iOW84vXRkhT0CS
+         PX2lTLaXNm9nuu/IlCrsoejR7NgrgSL3lN8WUH/VP6hMLRMa4o2HjHnBeAopXJPPX9xQ
+         h/BA==
+X-Forwarded-Encrypted: i=1; AJvYcCVg4T2UVphu7JWo2gwSNIw75HB1B6Fb/9AbMhtlIM7Yo5/ZUiWojkpIuJiLn/z71BIqufw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHTjE9RVI3efVjIJDYpZgp5tVVGnwimBDhR7hXLvsMY1hWfrLO
+	AM69e73IW1AS9oSjXmtBmzQN9h6dGo6TiItlXBRQS5xcpyTrRAg6HrThto58rXdX7mTmX5+dRfR
+	MSMee76KmUGqX0O3cg5zXJLJwt0vd49TFpgrW
+X-Google-Smtp-Source: AGHT+IEIleSuC9f4gGuWQyJzHvX9+AYom/k5UJhlK6XKH0GPjZ6+sUYNxj5lfl0DNvWlKL7g+sgn2iA8tR8lTWVs9go=
+X-Received: by 2002:a05:6e02:214b:b0:3a0:44d1:dca4 with SMTP id
+ e9e14a558f8ab-3a084702e91mr11603665ab.6.1726268708090; Fri, 13 Sep 2024
+ 16:05:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <768488c67540aa18c200d7ee16e75a3a087022d4.1726009989.git.ackerleytng@google.com>
-X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: suaMa3NZIFw7PT50Hox3kCz63QqfnhRF
-X-Proofpoint-GUID: suaMa3NZIFw7PT50Hox3kCz63QqfnhRF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- phishscore=0 mlxlogscore=999 bulkscore=0 priorityscore=1501 adultscore=0
- mlxscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2409130159
+References: <20240912141156.231429-1-jon@nutanix.com> <20240912151410.bazw4tdc7dugtl6c@desk>
+ <070B4F7E-5103-4C1B-B901-01CE7191EB9A@nutanix.com> <20240912162440.be23sgv5v5ojtf3q@desk>
+ <ZuPNmOLJPJsPlufA@intel.com> <CALMp9eRDtcYKsxqW=z6m=OqF+kB6=GiL-XaWrVrhVQ_2uQz_nA@mail.gmail.com>
+In-Reply-To: <CALMp9eRDtcYKsxqW=z6m=OqF+kB6=GiL-XaWrVrhVQ_2uQz_nA@mail.gmail.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 13 Sep 2024 16:04:56 -0700
+Message-ID: <CALMp9eTQUznmXKAGYpes=A0b1BMbyKaCa+QAYTwwftMN3kufLA@mail.gmail.com>
+Subject: Re: [PATCH] x86/bhi: avoid hardware mitigation for 'spectre_bhi=vmexit'
+To: Chao Gao <chao.gao@intel.com>
+Cc: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Jon Kohler <jon@nutanix.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, LKML <linux-kernel@vger.kernel.org>, 
+	"kvm @ vger . kernel . org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 10, 2024 at 11:43:46PM +0000, Ackerley Tng wrote:
-> If HugeTLB is requested at guest_memfd creation time, HugeTLB pages
-> will be used to back guest_memfd.
-> 
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> ---
->  virt/kvm/guest_memfd.c | 252 ++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 239 insertions(+), 13 deletions(-)
-> 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 31e1115273e1..2e6f12e2bac8 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -8,6 +8,8 @@
->  #include <linux/pseudo_fs.h>
->  #include <linux/pagemap.h>
->  #include <linux/anon_inodes.h>
-> +#include <linux/memcontrol.h>
-> +#include <linux/mempolicy.h>
->  
->  #include "kvm_mm.h"
->  
-> @@ -29,6 +31,13 @@ static struct kvm_gmem_hugetlb *kvm_gmem_hgmem(struct inode *inode)
->  	return inode->i_mapping->i_private_data;
->  }
->  
-> +static bool is_kvm_gmem_hugetlb(struct inode *inode)
-> +{
-> +	u64 flags = (u64)inode->i_private;
-> +
-> +	return flags & KVM_GUEST_MEMFD_HUGETLB;
-> +}
-> +
->  /**
->   * folio_file_pfn - like folio_file_page, but return a pfn.
->   * @folio: The folio which contains this index.
-> @@ -58,6 +67,9 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
->  	return 0;
->  }
->  
-> +/**
-> + * Use the uptodate flag to indicate that the folio is prepared for KVM's usage.
-> + */
->  static inline void kvm_gmem_mark_prepared(struct folio *folio)
->  {
->  	folio_mark_uptodate(folio);
-> @@ -72,13 +84,18 @@ static inline void kvm_gmem_mark_prepared(struct folio *folio)
->  static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
->  				  gfn_t gfn, struct folio *folio)
->  {
-> -	unsigned long nr_pages, i;
->  	pgoff_t index;
->  	int r;
->  
-> -	nr_pages = folio_nr_pages(folio);
-> -	for (i = 0; i < nr_pages; i++)
-> -		clear_highpage(folio_page(folio, i));
-> +	if (folio_test_hugetlb(folio)) {
-> +		folio_zero_user(folio, folio->index << PAGE_SHIFT);
+On Fri, Sep 13, 2024 at 11:39=E2=80=AFAM Jim Mattson <jmattson@google.com> =
+wrote:
+>
+> On Thu, Sep 12, 2024 at 10:29=E2=80=AFPM Chao Gao <chao.gao@intel.com> wr=
+ote:
+> >
+> > On Thu, Sep 12, 2024 at 09:24:40AM -0700, Pawan Gupta wrote:
+> > >On Thu, Sep 12, 2024 at 03:44:38PM +0000, Jon Kohler wrote:
+> > >> > It is only worth implementing the long sequence in VMEXIT_ONLY mod=
+e if it is
+> > >> > significantly better than toggling the MSR.
+> > >>
+> > >> Thanks for the pointer! I hadn=E2=80=99t seen that second sequence. =
+I=E2=80=99ll do measurements on
+> > >> three cases and come back with data from an SPR system.
+> > >> 1. as-is (wrmsr on entry and exit)
+> > >> 2. Short sequence (as a baseline)
+> > >> 3. Long sequence
+> > >
+> > >I wonder if virtual SPEC_CTRL feature introduced in below series can
+> > >provide speedup, as it can replace the MSR toggling with faster VMCS
+> > >operations:
+> >
+> > "virtual SPEC_CTRL" won't provide speedup. the wrmsr on entry/exit is s=
+till
+> > need if guest's (effective) value and host's value are different.
+>
+> I believe that is the case here. The guest's effective value is 1025.
+> If the guest knew about BHI_DIS_S, it would actually set it to 1025,
+> but older guests set it to 1.
+>
+> The IA32_SPEC_CTRL mask and shadow fields should be perfect for this.
 
-Is (folio->index << PAGE_SHIFT) the right address hint to provide?
-I don't think we can say the folio will be mapped at this address since
-this value is an offset into the file.  In most cases, I believe it
-won't be mapped anywhere since we just allocated it.
+In fact, this is the guidance given in
+https://www.intel.com/content/www/us/en/developer/articles/technical/softwa=
+re-security-guidance/technical-documentation/branch-history-injection.html:
 
-Thanks,
-Elliot
+The VMM should use the =E2=80=9Cvirtualize IA32_SPEC_CTRL=E2=80=9D VM-execu=
+tion
+control to cause BHI_DIS_S to be set (see the VMM Support for
+BHB-clearing Software Sequences section) whenever:
+o The VMM is running on a processor for which the short software
+sequence may not be effective:
+  - Specifically, it does not enumerate BHI_NO, but does enumerate
+BHI_DIS_S, and is not an Atom-only processor.
 
+In other words, the VMM should set bit 10 in the IA32_SPEC_CTRL mask
+on SPR. As long as the *effective* guest IA32_SPEC_CTRL value matches
+the host value, there is no need to write the MSR on VM-{entry,exit}.
+
+There is no need to disable BHI_DIS_S on the host and use the TSX
+abort sequence in its place.
+
+Besides, with the TSX abort approach, what are you going to do about
+guests that *do* set BHI_DIS_S? If that bit is clear on the host,
+they'll suffer the overhead of writing the MSR on VM-{entry,exit}.
+
+> > "virtual SPEC_CTRL" just prevents guests from toggling some bits. It do=
+esn't
+> > switch the MSR between guest value and host value on entry/exit. so, KV=
+M has
+> > to do the switching with wrmsr/rdmsr instructions. A new feature, "load
+> > IA32_SPEC_CTRL" VMX control (refer to Chapter 15 in ISE spec[*]), can h=
+elp but
+> > it isn't supported on SPR.
+> >
+> > [*]: https://cdrdv2.intel.com/v1/dl/getContent/671368
+> >
+> > >
+> > >  https://lore.kernel.org/kvm/20240410143446.797262-1-chao.gao@intel.c=
+om/
+> > >
+> > >Adding Chao for their opinion.
+> >
 
