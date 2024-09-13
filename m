@@ -1,254 +1,198 @@
-Return-Path: <kvm+bounces-26781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26782-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4959777E2
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 06:27:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DE8B9777FA
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 06:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97873284C6F
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 04:27:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D14492864B6
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 04:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3866D1D414D;
-	Fri, 13 Sep 2024 04:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7C11C6893;
+	Fri, 13 Sep 2024 04:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ipG14bHv"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="qno/KKHG"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2045.outbound.protection.outlook.com [40.107.92.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32001C461C;
-	Fri, 13 Sep 2024 04:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726201628; cv=fail; b=haH3JFZkkjbn9Yp6AEQMCCWcq183XwyTDKe7OGqp3YLEAANCh0FOUu8yvPgwREu+bIV5LsrWy1VXjLxxoluZh4Q/Q8FN/MkmuLXaVXiwBf10mJOuaJn2udItlTtXAvx0YL0nr9/M+4Ai11aao+tCs59pTtu+rvs/NOjFwiRqdJE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726201628; c=relaxed/simple;
-	bh=pJFhok5GOEml9U4cBy8LiMW+QiF1Usy6YYL4stXoHjE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=c0QJ1xc3PUMFK3+BcRCk2YRgQoYSClAMT4tNMz2YMPgp2Aztbo+N21FWenqDWZsw62FFQWWw4+WKKpML6jSnocYyte4BZdcfE4YFb24A2c6lDVCAhYmoxVziGhePFVrYviuNieON5N6UgJ8ysBTKnW9tePiv1CoOXrGl+f3Q71k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ipG14bHv; arc=fail smtp.client-ip=40.107.92.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Iizw+EgKco5pijP2Hn4osvvJCHriJ660F60uKp5dCOt6bLj21qANB6OxOpNqZ562OGXmmr8i3xxVmH7izDdnKrObRSCq+SmMBDn0IPf0UfpVmExsP8QAn78QuVmlCPLbZYv4/OYqCH1V+cYznxpQrXbWarF5mDUOCw3VbkXu70G4TpB+EvLWayLebij2Uom7mWgoZWHMRZKyUiObNeiIcucon7r3o8JPUhanwU1zOOn39LoTOiVnh4+jhQUlQT64AoKirPYO5NsyR5jS7EfAdlqbXbuGBLGXJto7x9zXUfzEsSRIzq3J6UazJ1Zf1Ec3J+g25EONqVKB0vb6KwdRaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0uXBemPPfVkfH15v/DxLzTOB2Er1JuL18lzcKqsx8/U=;
- b=tW/Goci+1xbJKwNAx9HC3mNtjAe98Z9v7yhE24uq78DULmjPg12FIyiRDd5zRiRE3X4kxJScxvl4OjgxHN9e2Mv8y6FGfz4Np3e6ZH8qz3esKuVy425jiEdvUaKUpemg0eEgs4/xUls1cINWUd+NB8GTxQmfYZB/eGYAZP1gorN7mkINyjTq2a2yaWvlL1Qv2dNUEm7083BFOt3JRUHO8PYY6tmf8/FFPaZyWsJkMtpZy5QnQbW9y2Dly/57C5iS2yH6c5diLOyEvUUgZI1d9V6O0ZMhpnjhbmbGhWt26tFRbx039nJmwHU8PUZI9FNfHGjvq4oYXwQPzu+Pc5ZFLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0uXBemPPfVkfH15v/DxLzTOB2Er1JuL18lzcKqsx8/U=;
- b=ipG14bHvLX5CsZ9ORu6KjhVMS+D2GQ/E2cxt49axmqYlU1/x+nTQcu99doV45KCsBLzBe7Dt95lWv3jeXQX2zsoTT8UJAG+H83ycbDoLB2hw1IIQDCldpXcRSVFsiz2dISi/utj6LPXZGfID0g3boFHpdwiLzLNfboFPo87+cpQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- SJ0PR12MB6943.namprd12.prod.outlook.com (2603:10b6:a03:44b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Fri, 13 Sep
- 2024 04:27:03 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec%5]) with mapi id 15.20.7962.018; Fri, 13 Sep 2024
- 04:27:03 +0000
-Message-ID: <a826082f-d80e-4aa3-982e-df7c723e2d2b@amd.com>
-Date: Fri, 13 Sep 2024 09:56:52 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [PATCH v11 09/20] virt: sev-guest: Reduce the scope of SNP
- command mutex
-To: Tom Lendacky <thomas.lendacky@amd.com>, linux-kernel@vger.kernel.org,
- bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
-Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
- pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
-References: <20240731150811.156771-1-nikunj@amd.com>
- <20240731150811.156771-10-nikunj@amd.com>
- <30a5505f-8c9c-6f13-6f90-8d5b6826acb5@amd.com>
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <30a5505f-8c9c-6f13-6f90-8d5b6826acb5@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0240.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:eb::17) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1281514CE
+	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 04:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726201962; cv=none; b=iT+UiPOlcO+1lJREGrgrMiyZrEzsaiMUEVicPdXJyopnIhjEGwVNl485QbCh3CXCHfyUdseb9MKQw3S0+OE3MX5cJ9h7k5B8FnHfhJ1uaXnLN9fzosR2gCN6INP8AA5ahehBE2mdRiM4LasSOVN6w9wCFnh+amRSzoGQ6F+nBXo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726201962; c=relaxed/simple;
+	bh=7/sXqifHGzfl2SRL3Mw1Pln76S7FBnwdNmeHZ7WAGME=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AoEfuLUZzqlP4nUpv67Y5u6edO7l0noX9Zkgm50+VkzrbqCiow7mPM94Teh6wr6eIL8OIV0kCMcEU8tq+FzN1yEgeq2uUZCQ92jNYmVaqTOTgs14Zh4rkEUE2EW18brG6+oU5FaiFD2k9KQn11Ml09qGKBHYxJ3N4eeEDwNhjQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=qno/KKHG; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-82a626d73efso65097839f.1
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2024 21:32:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1726201959; x=1726806759; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w54pp7KLxKfAIPY5581fcuCi0omX1JlS2WnZJ/hN1G4=;
+        b=qno/KKHG/cdhGE7KRcU9DH/rSJnZ0qJLaruKCVrItKzYUKphrwoLWN5WTgdHrlPFSi
+         be6qCoLmZ7PCWuOLf8YRBMAwJetYqaTTSmG3Ab7AQ7PoTNEX2u2osPY38nhM0xW2eQ4F
+         k/cpAF8qjTvNXdQCD/FxZnoageNlYQ3+1azbPh2NB3CZVxhj+Jw36FZ0H7AYGpuw7W0a
+         /tlI5rk+QWdGrxYZCbmIz2dYJbEybjPs5F9btB6Nbv2p7ddOYCMVgzO1qNukWkFytYAu
+         bjRPz8jJnb6qxQnR+aAnB1Tve6zsHo1PcRVlFdATPsgd6B0SWJs514aGrKc1GxOyhBH2
+         A6RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726201959; x=1726806759;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w54pp7KLxKfAIPY5581fcuCi0omX1JlS2WnZJ/hN1G4=;
+        b=p6vVWOQvtMSrB9O7EJwyggxiRt+SW5hf6+kwk2dFGLxFGYItFCUwwC6HbG2WM/94Mn
+         C2j1D2p70vkT5xLgBNEAbsI1psbHWciC+y616Vmsmm60Dff2G3c54aWPG0Uk8lmfwwxm
+         sYxXQqYiSxwXZvNplJXqvjNrc1YMe+yN2TA04+cab35VMwCAtjVrjINihkeRd8W1Wn56
+         wU8VOdfwY3AsDmaDdQNiuNVRF+FnO6ddPNjkZNWzF/r6ukPXdnQgWC4CO6S8/Wuw+zIx
+         gdQWKxdf7vg7zvj4B5R/nB1Bl/cuFXPibTfSqkPFj8hy0XUb1KhJ5mPUedK+e00I2rjc
+         pNrA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEtHs0H+u+awaOGSesPDu8w2yDQL6zkuJ5+uxzMKsqcROw9wVH/ewUs64+9lao46GjvSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYmuoJtY6cPW/KPrMJPgJ2CT2pWKw8SF+9pU4KXTDMDnhcIuZZ
+	32knW3NxycUnij0uBaYna5H67zdx0VxPMZCLzxgE1VZ7lltFbiOEJptRCVsRY2Gn0S5opsoFTkT
+	RuSn10S1e0X5wa+toVDo8h15rk8IfuCrBRrkVaA==
+X-Google-Smtp-Source: AGHT+IE+2QF6HwF17VErmVADwVFkI6DzAjV6r3QI8XJIUdFcDK2edj5QNTbv9dEzH2k7P2s7H77k2KRWduAraPSF2Sg=
+X-Received: by 2002:a05:6e02:154f:b0:3a0:4250:165f with SMTP id
+ e9e14a558f8ab-3a0847d0c17mr55015385ab.0.1726201959580; Thu, 12 Sep 2024
+ 21:32:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|SJ0PR12MB6943:EE_
-X-MS-Office365-Filtering-Correlation-Id: cdfe7eea-a2eb-436b-d776-08dcd3ac5123
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bjBnT1NxRnBCNDdPQk8rMXY0elM3K09oU1RsdDIzSVlIQmQ4TW1qNjlveStO?=
- =?utf-8?B?ZzFFdHE3OWVKejc4d1BuVmxrQm1tVlN4Z09Da1l3bTRia0swa0p2SFQ1cEll?=
- =?utf-8?B?OVI4eEs2blFuS0pMbjBsMWNIODJNMG9Ed1N3K1FjSExBZTdHOUNSbW5lckMv?=
- =?utf-8?B?WnhFK0RIWjdjTWY2REVCcUhobmF3VjhzSkxwMnNZV3ArNEJsdlhKM1hDTlpu?=
- =?utf-8?B?NGdUNGZoczU3Uk1OUjhXNTdLNWFIVDlFOWs2Q2VUUXU5QUpHYU8wb01EUDR2?=
- =?utf-8?B?SzNveWUyb3BMcjlpYktSVFNHZ01pNFRDeThVaUdxNVdqMHVLY0lZZEc5K0NT?=
- =?utf-8?B?TEtIbkk2Nno1aUwwT291ZDlGRXExVU9zeVhmdEZnNldFMWdHQWkyOWoyUVkv?=
- =?utf-8?B?c3pDZ1R4NFR5a08rYTN4RXg4c1paT29YRUw3ZCt4MW56UFp1NzVUQVJsNG0r?=
- =?utf-8?B?d2ZuamI3QTlQK1lkdUo2TnNxY29GbW15eiszVC9aZG5peDhVUnIzbHF5R3NL?=
- =?utf-8?B?SU02UzZqRngvNW9mNEVyUnJxWTQ2Sng4WWFVVS9ydXc1a0NLaWpFWk1VNUpp?=
- =?utf-8?B?OFYyOExxRk5hVFZoeWVYMHJ2UlBhWWRrM1FzWklpTU9qSGJpcGJNM2I3aTlM?=
- =?utf-8?B?ZFFIZHVWNVY3S2dlOXNzcyt6QU1wTkIxMjhWYlVONVVINU5CK3NZczY1OEpp?=
- =?utf-8?B?ZWtKeVNiNHhDdDdieFB0RWdiOGZBVGMrbU1XYzEvUm5TZzRKRU5DdjRtemZv?=
- =?utf-8?B?b0E1MjYxUy9hbnp4U01BYUNLYzZkd2pFNEdVcEdwR2hGbkx2UjVDckxuU1FW?=
- =?utf-8?B?WkNZMG1ITXI1S2ZQN0ZFZ01ubStGdk1Ca2V5VFZ1Mm50TWN6U0VoY2h3Snp2?=
- =?utf-8?B?YW1SaTF3aVh0OGNPWlJzNTRMRDNuTHhjWGk4aWRpRWxCRGpHZlV3bFExakQ0?=
- =?utf-8?B?QWFqNkJLd3d2UU5YbXNzQ2IrWVNEd2NoRGpQWTNnaGxIc21jZlNENE5Xc3I1?=
- =?utf-8?B?dDc2WmRsZHpOaURROFk4NnczWTc1c1VkU083K0FUVThiNWhzTVQ5QWd6d2lw?=
- =?utf-8?B?OURTUzU2N2VOQnoxVkhGVDRaaExZU3N1T3p2YmdYSlRYdlBndzRpVlZmYWFI?=
- =?utf-8?B?UFBmczBpMTArRVo2K1dWa1pOTzkrVmo3ZlJCR3dIUDVEaS80YkdsOFl0VDNl?=
- =?utf-8?B?N0ZGNGdWS2dSU3BpeHhSOGdrbkREWG9jZmQ4UkZybnRUWkljei9ONVAzQlQ5?=
- =?utf-8?B?VkF2U2pOM2IwaG5iTkNLeTIweGl1bTRUQWJIWnB3LzZwaXNGTUJaL0VDc2Y0?=
- =?utf-8?B?bHR0YnBWV2RGbll4L0VxNmJGWExTVTFWamR0WUlod3U5SGQwWlVjM2l1b1cx?=
- =?utf-8?B?bk1oYmNTMWNwZzBncEZ4dDZINmltMU4xeXJraFFETjVqT3gwRmVJVkQ1bDM5?=
- =?utf-8?B?QmJnNXZ6bmt3RUl4cXE3WGorNnJSeWJ6eTZUbG9rTE5WaVNydjVVV28xbmZj?=
- =?utf-8?B?S0Mzc3VweExEQzJ5S2U1RjczK1VpTTRSYzFrektWa01EdmNMaXJnTnllYTFw?=
- =?utf-8?B?eDBmTHZqUGJieHdpZURaQi9TQjl5bzJyY2w1cTJlQWVZUVdQQlZGV3dVTXVj?=
- =?utf-8?B?dVdwcGFSZlc4L1c2OGt2NTRKTkovTkVab3YwL2NJVkNWbkZNS3crNUxhWi9y?=
- =?utf-8?B?RXdWZGIwMGYvNXMzc1RtTm1yamZUeXNvUmZIcWVndGhCY2ZxTW1xSEpiUTJ4?=
- =?utf-8?B?THBYVnJZRzQyVDJCWmhqbzNSYnhXdXp6VTFxckdiYjh0UWN1d0QvbHFTTW1C?=
- =?utf-8?B?aitZdTB5QmpxOHJGZ3k4UT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?T0J5VUhFL1NjbmpPcENLQ2dDd1d1SmJmL1gvM016U3pRRUV5WE5CZ3dqMGdn?=
- =?utf-8?B?eGRBU3dVeWpROWFaOVY2UU5Hck8yQWFNTWlCVHFrV252MFNMUHhyNjRmdm9j?=
- =?utf-8?B?dTU0Wk5lZEk5RkNHeERkNnlUU242cGFaWjZEWEhvZndGRzNoNDF1WlJRcU40?=
- =?utf-8?B?cFA2aDNxN21XekEzYWdtK1JveTZ6SHhZL2Y1RHE5aXRXRk9IM1E3SkJEWFN2?=
- =?utf-8?B?eVF2VWFaSTJoZDFOcnRwaHVnanc1Y1V4RmJZcXdXMU8zZDZQcnNVUGEvRnAy?=
- =?utf-8?B?dVhSczFpekp4SFBkdWszVVNvL0pLUVQ0S0MwMGRjUktBNWRDYTFFQ1EyOHhV?=
- =?utf-8?B?NnV4WnhRNk5sdTY1WGdzZkJhNnhybDc3anR3cHBGRytadlFOSXNRZC9aa1VK?=
- =?utf-8?B?enRpdldBR2tOQ1k5V3VGNnFYY1FKNGNzSC9HRmVpOGhsVnF0VGZtKzlJSW5Z?=
- =?utf-8?B?M0FuTzZuU240Um90U21VK2VwUWpiUG9pb0liY05YdjdNbDdvbzdRRXlVZllY?=
- =?utf-8?B?a1NRNHVuL3RBRXZkRjlUUktYTTBXeVNlV2xUd1ZQaFA1YXo3SFg2Rk0rSFBo?=
- =?utf-8?B?NDIrMUpDSlc4TTVXeVNJazhFY0VwSU5uSVloa3JYMVUxU3FmRHljTVoyY0Z5?=
- =?utf-8?B?dUcvaTlWUit1UzRhTXRiNEdSeTB3ODNERnQ4THp1REVQVHBLMHZaSnVXd3c3?=
- =?utf-8?B?ZmpGbStLZ2RNU2lXR1YwWkhQY0drK0xkSU9lNXVvazVUT0JOVHBielFoTUZ3?=
- =?utf-8?B?MW9GMElNNEZ6NXNGeGFoUE94M0FNM3llaGVuZlFSSkhnV2RNRlpma0VoLy83?=
- =?utf-8?B?Sld5MEo5ZzExdXBzZXVoR2VyUjdSK1NEbE1MZnVsc1hsNVN1c29lbDRoNUxO?=
- =?utf-8?B?NHVzMFdyRndCSDFZMjk1UG9LVmd1Mk9ORUY0NWtDTjN4djNxa29UNS8weGlI?=
- =?utf-8?B?ZmZHekh5R3gwZWFwMVcvbXU2K2N6TkdTdiswUkJiVlVrSnd2N3FqNTZ4dERL?=
- =?utf-8?B?dW5xbWNyNHRTeldYNFlkNFpiMUk0aXZWVE5PZ2ZaNHBVZmJ2NTJCc2xxazdN?=
- =?utf-8?B?L3k3eVV5M0Nid2QxdjJDK0Z1d25WeFJLcXJGRE52Nk9raWlOSzkxMkwrYkJj?=
- =?utf-8?B?Q3REZWwwdTRpQ2JEb2pmSGV5djQ4OFZQUW1mWExYZVlLSWQ4SWFBOEU5MWd2?=
- =?utf-8?B?dWswd0JmM2J3cHR3Q1cyREd6M0U4VC9MNmVRN3gvdy84cUlkTEY4dHFRQm9J?=
- =?utf-8?B?UmRtY1MrbW1mbWIvcjNhSGVRZVNvTGJ0blE1ZUtPM2pqMStBOGtWYTZteVA5?=
- =?utf-8?B?ZkRZenZVT1JYenZCa2tWZU9rQmgyTTQvTFV2WTR1Y21WbVRPSWJqZm8wcUh0?=
- =?utf-8?B?aGptbzY2ZFh5bExDbTkvd2xrNGR6NjZSQnpwZDNsQlgyTFlnQUN5SFlYakVh?=
- =?utf-8?B?dzRsVk1FN0NPaG8yVGFnaHdrMkJtSml6T0JuT0pScmhPMDJZNFV6bWwyNEtR?=
- =?utf-8?B?Tm1XRjhyMXNsWUZpa2FjS3hmbXJYUnN2RzFPbEVpajVmS1VsVmRaTWRQbjY5?=
- =?utf-8?B?dU96ZnRPd2FNK0VOTmc2OFFvTDcyWElFYytuVTZQcGVwZndYYnhJY010USt5?=
- =?utf-8?B?eDVtVWhmSldiTmR5K2ZCelp6emJVbzduU1J2ZVJRVnJGekFZM0JpSFJwK2Rv?=
- =?utf-8?B?dVU0bFZFMW41a1IyckhYNVArS0paemh3THo0dGVFTnZPOHJqSVMvaVVrZmtD?=
- =?utf-8?B?RjRZclQyM2dhTG0zdmpFaGVuWDVxZjhtcjRyMExoVFd1bTd0dVJBRS9HN2U5?=
- =?utf-8?B?UmhzRFFyaE53V1M3N1Q4ZVpteE9aeHRkSEdaWTdmYXFNdkJPbkhCeXY1MVB2?=
- =?utf-8?B?SmZKRWVDR250QWdCaElhaTRHMGh4VXFBS2pTVzZkRm1HRUkvd0VXaEhCY21m?=
- =?utf-8?B?R2hmOExmRjFNa0ZpWlp1YjViQk1DTGRNajJsdk9Wb0E5YldZYURSWjFEalJP?=
- =?utf-8?B?bDVSMTZQV0FvVDFOUzkrSWhGcm1kT2x0ZzNkZ1R3VmQ2MVJXNDB6V0RTNTAz?=
- =?utf-8?B?NE52bHdjWnB1QUxyU0lrQjBGWjBkbDVheU9NUXN2NUYxNUtHajBQMElpMllv?=
- =?utf-8?Q?BBcJm94OEvao1458Vqp0CBSwE?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cdfe7eea-a2eb-436b-d776-08dcd3ac5123
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2024 04:27:03.2382
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D/NnK5bWT/XIWlFWABbFLXcega0Ft9flyO9dNpIv3Q8HwVIB8a5JDK95gZl5hDNYSTaL62UWX9fxYZLAOe8mNg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6943
+References: <83c2234d582b7e823ce9ac9b73a6bbcf63971a29.1724911120.git.zhouquan@iscas.ac.cn>
+ <b5128162-278a-4284-8271-b2b91dc446e1@iscas.ac.cn> <380f4da9-50e9-4632-bdc8-b1723eb19ca5@sifive.com>
+In-Reply-To: <380f4da9-50e9-4632-bdc8-b1723eb19ca5@sifive.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 13 Sep 2024 10:02:28 +0530
+Message-ID: <CAAhSdy1zSTWuTW1KohUDXr9UXUx-QL1A30AUkTGoL7W2L7JWLQ@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: KVM: Redirect instruction access fault trap to guest
+To: Samuel Holland <samuel.holland@sifive.com>
+Cc: Quan Zhou <zhouquan@iscas.ac.cn>, ajones@ventanamicro.com, atishp@atishpatra.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Tom,
+On Fri, Sep 13, 2024 at 6:09=E2=80=AFAM Samuel Holland
+<samuel.holland@sifive.com> wrote:
+>
+> On 2024-09-12 4:03 AM, Quan Zhou wrote:
+> >
+> > On 2024/8/29 14:20, zhouquan@iscas.ac.cn wrote:
+> >> From: Quan Zhou <zhouquan@iscas.ac.cn>
+> >>
+> >> The M-mode redirects an unhandled instruction access
+> >> fault trap back to S-mode when not delegating it to
+> >> VS-mode(hedeleg). However, KVM running in HS-mode
+> >> terminates the VS-mode software when back from M-mode.
+> >>
+> >> The KVM should redirect the trap back to VS-mode, and
+> >> let VS-mode trap handler decide the next step.
+> >>
+> >> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
+> >> ---
+> >>   arch/riscv/kvm/vcpu_exit.c | 1 +
+> >>   1 file changed, 1 insertion(+)
+> >>
+> >> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> >> index fa98e5c024b2..696b62850d0b 100644
+> >> --- a/arch/riscv/kvm/vcpu_exit.c
+> >> +++ b/arch/riscv/kvm/vcpu_exit.c
+> >> @@ -182,6 +182,7 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, str=
+uct
+> >> kvm_run *run,
+> >>       ret =3D -EFAULT;
+> >>       run->exit_reason =3D KVM_EXIT_UNKNOWN;
+> >>       switch (trap->scause) {
+> >> +    case EXC_INST_ACCESS:
+> >
+> > A gentle ping, the instruction access fault should be redirected to
+> > VS-mode for handling, is my understanding correct?
+>
+> Yes, this looks correct. However, I believe it would be equivalent (and m=
+ore
+> efficient) to add EXC_INST_ACCESS to KVM_HEDELEG_DEFAULT in asm/kvm_host.=
+h.
+>
+> I don't understand why some exceptions are delegated with hedeleg and oth=
+ers are
+> caught and redirected here with no further processing. Maybe someone thou=
+ght
+> that it wasn't valid to set a bit in hedeleg if the corresponding bit was
+> cleared in medeleg? But this doesn't make sense, as S-mode cannot know wh=
+ich
+> bits are set in medeleg (maybe none are!).
+>
+> So the hypervisor must either:
+>  1) assume M-mode firmware checks hedeleg and redirects exceptions to VS-=
+mode
+>     regardless of medeleg, in which case all four of these exceptions can=
+ be
+>     moved to KVM_HEDELEG_DEFAULT and removed from this switch statement, =
+or
+>
+>  2) assume M-mode might not check hedeleg and redirect exceptions to VS-m=
+ode,
+>     and since no bits are guaranteed to be set in medeleg, any bit set in
+>     hedeleg must _also_ be handled in the switch case here.
+>
+> Anup, Atish, thoughts?
 
-On 9/13/2024 3:24 AM, Tom Lendacky wrote:
-> On 7/31/24 10:08, Nikunj A Dadhania wrote:
->> @@ -590,12 +586,9 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
->>  	if (!input.msg_version)
->>  		return -EINVAL;
->>  
->> -	mutex_lock(&snp_cmd_mutex);
->> -
->>  	/* Check if the VMPCK is not empty */
->>  	if (is_vmpck_empty(snp_dev)) {
-> 
-> Are we ok with this being outside of the lock now?
+Any exception delegated to VS-mode via hedeleg means it is directly deliver=
+ed
+to VS-mode without any intervention of HS-mode. This aligns with the RISC-V
+priv specification and there is no alternate semantics assumed by KVM RISC-=
+V.
 
-We can move the check inside the lock, and get_* will try to prepare
-the message and after grabbing the lock if the the VMPCK is empty we
-would fail. Something like below:
+At the moment, for KVM RISC-V we are converging towards the following
+approach:
 
-diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
-index 8a2d0d751685..537f59358090 100644
---- a/drivers/virt/coco/sev-guest/sev-guest.c
-+++ b/drivers/virt/coco/sev-guest/sev-guest.c
-@@ -347,6 +347,12 @@ static int snp_send_guest_request(struct snp_guest_dev *snp_dev, struct snp_gues
- 
- 	guard(mutex)(&snp_cmd_mutex);
- 
-+	/* Check if the VMPCK is not empty */
-+	if (is_vmpck_empty(snp_dev)) {
-+		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
-+		return -ENOTTY;
-+        }
-+
- 	/* Get message sequence and verify that its a non-zero */
- 	seqno = snp_get_msg_seqno(snp_dev);
- 	if (!seqno)
-@@ -594,12 +600,6 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
- 	if (!input.msg_version)
- 		return -EINVAL;
- 
--	/* Check if the VMPCK is not empty */
--	if (is_vmpck_empty(snp_dev)) {
--		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
--		return -ENOTTY;
--	}
--
- 	switch (ioctl) {
- 	case SNP_GET_REPORT:
- 		ret = get_report(snp_dev, &input);
-@@ -869,12 +869,6 @@ static int sev_report_new(struct tsm_report *report, void *data)
- 	if (!buf)
- 		return -ENOMEM;
- 
--	/* Check if the VMPCK is not empty */
--	if (is_vmpck_empty(snp_dev)) {
--		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
--		return -ENOTTY;
--	}
--
- 	cert_table = buf + report_size;
- 	struct snp_ext_report_req ext_req = {
- 		.data = { .vmpl = desc->privlevel },
+1) Only delegate "supervisor expected" traps to VS-mode via hedeleg
+which supervisor software is generally expected to directly handle such
+as breakpoint, user syscall, inst page fault, load page fault, and store
+page fault.
 
+2) Other "supervisor unexpected" traps are redirected to VS-mode via
+software in HS-mode because these are not typically expected by supervisor
+software and KVM RISC-V should at least gather some stats for such traps.
+Previously, we were redirecting such unexpect traps to KVM user space
+where the KVM user space tool will simply dump the VCPU state and kill
+the Guest/VM.
 
-> I believe is_vmpck_empty() can get a false and then be waiting on the
-> mutex while snp_disable_vmpck() is called. Suddenly the code thinks the
-> VMPCK is valid when it isn't anymore. Not sure if that matters, as the
-> guest request will fail anyway?
+The inst misaligned trap was historically always set in hedeleg but we
+should update it based on the above approach.
 
-The above code will fail early.
+>
+> Regards,
+> Samuel
+>
+> >
+> >>       case EXC_INST_ILLEGAL:
+> >>       case EXC_LOAD_MISALIGNED:
+> >>       case EXC_STORE_MISALIGNED:
+> >>
+> >> base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
+> >
+> >
+> > _______________________________________________
+> > linux-riscv mailing list
+> > linux-riscv@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/linux-riscv
+>
 
-> 
-> Thanks,
-> Tom
-> 
-
-Regards
-Nikunj
-
+Regards,
+Anup
 
