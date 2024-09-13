@@ -1,370 +1,229 @@
-Return-Path: <kvm+bounces-26873-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26874-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274A7978AC4
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 23:44:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76A31978B3A
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 00:09:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C8B51C22808
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 21:44:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A96401C21C90
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2024 22:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3D317CA1F;
-	Fri, 13 Sep 2024 21:43:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E531714AA;
+	Fri, 13 Sep 2024 22:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aJuR4R2x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c3FbuHBr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5176616F85E
-	for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 21:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726263818; cv=none; b=qjIVEcSBfEa/MvdpyZnr6N14VnqbPQNWZn7beSueJ9C8QC9y5fiBBFouw+7uMWSVN4jJlLMaRIGhukDPzO9LJNsnosomnJZBAj1R0Db5MCnB10Y/xeCBmI0cqkg5vo46aFuhTy3XtO2YgF991CjbG294vdYTn2wZqE6yRoGXLvA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726263818; c=relaxed/simple;
-	bh=091/pNCRdGXGxztyYIPeIZciZOeD1K3TPYeC5iTdipY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Tpb1qqsi7tTkRpugDkfVVwI0hMWYFl8t+08EjTJKeJLmgKGWJYMo28aoW/2JvOsU/pR9B9I6ytXbhVEZs+1zxtS6X2XZJL28XvieYnSQKJ6GqKntN7EIKrJZDxzRYSB3dBHUzl84/MVnsoKs4JCpDthR7KAx8/4UfawNHfCYNAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aJuR4R2x; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e1d46cee0b0so4557421276.2
-        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 14:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726263815; x=1726868615; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rAUYJhCtl2npTL0Ze9xPEuUa5GQYdR3/oyvz0EeWkWA=;
-        b=aJuR4R2xGap97q/ojfIWjW9d79B1nVTqY5pvfv4j/BZfvReCuuw3/OjhykXdC/8nrZ
-         vuquw/smOuZlmFM34uMbA4xDL1mQcsZm4aJmdD3mko/r2758t98GKtRVo/2LxKBoko5G
-         b8WihQWAt9jeZoVv+R6uEj6eocgsW7MMqIVZyjTeyfrIkbU53jOj8lv9oW4tnh6bxY1d
-         EXlQRv+6SOyS5QqZXbgSsHcSAUF4xqzc5HaBscd/goAcd1Plp6TS0BdoIGbuRSfyxhqN
-         kS0ak64Gp+Q4KAv+2r02TnEBhAAbA4DeELnrRozg3ah5juItW9JtBbAV19a09xJReuSk
-         YM+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726263815; x=1726868615;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rAUYJhCtl2npTL0Ze9xPEuUa5GQYdR3/oyvz0EeWkWA=;
-        b=tKFA0g04PJnCr5fhUaOF6nQwiCQkN3FnCrQFUhzbP3Lr9A+u0oLCLybgBbcG3uiTIT
-         uVbBqVMNKvVKvewGpOElTI/el2YCfgCbteHr4CoZswBfV288vJq/Ozk6SA71GClzdaJ1
-         4YwJlcZ0ZyHn/yj3en5q4ngNBaNJB0dRx5fkyBRhnpqLayvGML2B0c84ompLwVsfQIu6
-         vvW1eObXUvXn8A9mtnp7fFZl9GrOYbKWjwgataNGNW7DWy9OeEOjIBCz2rhOZ0Im5Mdg
-         QNJry60buwLKfkCE+MG2nZlP+FyqJxcYPda/LGcltkldJQ6VKUvQQqQ+s4dp1nMcyelT
-         u+Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2HGo49jqPnLnATTiunT9vimWkVoIisAsNKfxLsMTrr/nWEuV5kDwsoQIDOrXPkQrrEjU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7e/KV2S6dj6sCzL1CaIw9KAm9Q11vz+9+8s/uNTjY482YskTL
-	oo4pOShpWY8iCtrqiTui2Ab36+uUpHJGiey01S0Kt2ScM5iaJFyCNVqhAIQkyACvwqLXSavRaJd
-	4q8cx2w==
-X-Google-Smtp-Source: AGHT+IGnKFpaMNNVc7WWMIWqQzwsj3RQhz1JMObdkTK6x2eMJDipdhA6PX0yZBLM65ZhFmOcjP+ONsH8riiy
-X-Received: from vipin.c.googlers.com ([35.247.89.60]) (user=vipinsh
- job=sendgmr) by 2002:a25:e812:0:b0:e16:51f9:59da with SMTP id
- 3f1490d57ef6-e1d9dc1b42emr20182276.6.1726263815170; Fri, 13 Sep 2024 14:43:35
- -0700 (PDT)
-Date: Fri, 13 Sep 2024 14:43:16 -0700
-In-Reply-To: <20240913214316.1945951-1-vipinsh@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED035146580;
+	Fri, 13 Sep 2024 22:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726265354; cv=fail; b=BjdttNS1OPc9RpGq/dhyGKBEx2OiFUiBEB/pBmwVbVcA24f7MNh6+tj/spvymuXD9keQBsqruCdOhgyGzL7dK0D30fXsFItjmnQOF3sEGVRzudaDkBNXA3CqaA4gY7eGTfjRNFf2ebwudT4eUQOsf9jB14NHOrJBTyCAWF+bIdY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726265354; c=relaxed/simple;
+	bh=bAP2VpX2fpurLPXkmuOAZss5aa3KYcy1NJpZaiW03TQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=uoRjVQGI1ZdWDBHWfJC0j49cQG90//2Ft8OOOQyN0e5bsFn/sMEXNCnP7imLxkzFQdANTMS0hnFWRZugr3I6SPoKIf4J12mPpW+LKkASLs3Ma+UGSZVQ6Pby4t6RKm474pwMZ6s/+y3eY933kbLlQXxv/JNY6545J3ztQLM7Au0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c3FbuHBr; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726265353; x=1757801353;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=bAP2VpX2fpurLPXkmuOAZss5aa3KYcy1NJpZaiW03TQ=;
+  b=c3FbuHBr6dgHUA3X7zK+e/NNa29zq/yRRwIhKdFmaBK6XVzn5Dpk87LT
+   D7qVEFU8FAM3mh7y3ddTX2tNZJh+LUHJUflcl/y2/aJ5vd2eHIUqHO1ka
+   hfyAIAysXkxEvHI+KqncY2MVmC1gXHAiEij6CHeVDi3eyofxZ+6vjzr3j
+   Ht6Wc7fDaUh3fEHKWIds8MC57gbAuW0phY5IQPOu5eAZyfLSom4hMMdFS
+   /LyFJaYB4X/gHrIXLpcISDLzy8p9IP98HaRCMFYLSkXrhBOLgKm8jd49x
+   K4878WrtlZrEIpEsE+qFe1ciNCfhjZ0nUNvsTr+4Qe8mA0frI23l8nRNQ
+   w==;
+X-CSE-ConnectionGUID: XZ7iF6UkRz+6sjHY+rDo/A==
+X-CSE-MsgGUID: 3fL1KMsSTgyMN4No933HvQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11194"; a="35756115"
+X-IronPort-AV: E=Sophos;i="6.10,227,1719903600"; 
+   d="scan'208";a="35756115"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2024 15:09:12 -0700
+X-CSE-ConnectionGUID: lyLk2Q4HTcGedkbVZcmW2g==
+X-CSE-MsgGUID: ZMCQbjCfRve9h9fdlAtwRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,227,1719903600"; 
+   d="scan'208";a="68074968"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Sep 2024 15:09:12 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 13 Sep 2024 15:09:10 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 13 Sep 2024 15:09:10 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 13 Sep 2024 15:09:09 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Odr1ZAnYHTpelgDB9Q7j72dXZDJZUYm+7InxCAqrxjcQBd2exvAjzZOeQ7xenJ+oU9nTZiGIHlqDKJOi+tguUYXrSzMMVnievw0IFr/zJq3dncgpxkiUbMzgF4omLdMhndgdyc7sWkhYJqrM0eJya34OOyPauHwEwVUSWm73ZqOhSQ1UA2PJTd7pSTvCcNixhQJGWOGsye0aaWHVgZ3xDtbxYyF0uHwO4qUgOoEM8j7AfmIPkINsKLAbhKxvpigxWPnKGfXkE5OhZ9oy0ltIrOcI3BIF8WnJb7NgUAK7vkrqcowy/XcelKySV1cIXXNb00MoejbL6thl+m2Pvd6tqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rsCftbEw7sldZR+QRKQkUlnCdHB08t13J9TvVoo7HFI=;
+ b=NNqmiJdu2yjObJlH24R4UHPDQBpAvaHh5B3LuJNmfjjbRYpJK9qBr/y+NX+SPNjO7qIOtwWP4r9Z5CqoZlcxre+kBtSDuNT788+SDLz9CSvSmcvgJeUTkI4obBBmMJQR/S05ZLzRcgb9g5Tn4xdIQNo8rqjQ7r+nBoIIovdMIVUmfJYnEs+HioxawD4zn3O0EBmKJdmKY3gYOVjhIJi571Dhtdr3EHiAu5XlwftBWGx5sD6/g/O/jlY8f6/kI0MDHcH6+SqB8JE67Iavh1n7fe3tXLV707tKC53owIEst9OrcNOI91wXmFLdMD9KACnspMIHzkFo/FpcPajnBrJCkg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by MW6PR11MB8438.namprd11.prod.outlook.com (2603:10b6:303:241::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.18; Fri, 13 Sep
+ 2024 22:09:02 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%7]) with mapi id 15.20.7939.022; Fri, 13 Sep 2024
+ 22:09:02 +0000
+Date: Fri, 13 Sep 2024 15:08:59 -0700
+From: Dan Williams <dan.j.williams@intel.com>
+To: Zhi Wang <zhiwang@kernel.org>, Alexey Kardashevskiy <aik@amd.com>
+CC: <kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
+	<linux-coco@lists.linux.dev>, <linux-pci@vger.kernel.org>, "Suravee
+ Suthikulpanit" <suravee.suthikulpanit@amd.com>, Alex Williamson
+	<alex.williamson@redhat.com>, Dan Williams <dan.j.williams@intel.com>,
+	<pratikrajesh.sampat@amd.com>, <michael.day@amd.com>, <david.kaplan@amd.com>,
+	<dhaval.giani@amd.com>, Santosh Shukla <santosh.shukla@amd.com>, Tom Lendacky
+	<thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, "Alexander
+ Graf" <agraf@suse.de>, Nikunj A Dadhania <nikunj@amd.com>, Vasant Hegde
+	<vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>
+Subject: Re: [RFC PATCH 11/21] KVM: SEV: Add TIO VMGEXIT and bind TDI
+Message-ID: <66e4b7fabf8df_ae21294c7@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+References: <20240823132137.336874-1-aik@amd.com>
+ <20240823132137.336874-12-aik@amd.com>
+ <20240913165011.000028f4.zhiwang@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240913165011.000028f4.zhiwang@kernel.org>
+X-ClientProxiedBy: SJ0PR13CA0191.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c3::16) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240913214316.1945951-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.46.0.662.g92d0881bb0-goog
-Message-ID: <20240913214316.1945951-3-vipinsh@google.com>
-Subject: [PATCH 2/2] KVM: x86/mmu: Use MMU shrinker to shrink KVM MMU memory caches
-From: Vipin Sharma <vipinsh@google.com>
-To: seanjc@google.com, pbonzini@redhat.com
-Cc: dmatlack@google.com, zhi.wang.linux@gmail.com, weijiang.yang@intel.com, 
-	mizhang@google.com, liangchen.linux@gmail.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|MW6PR11MB8438:EE_
+X-MS-Office365-Filtering-Correlation-Id: 646a688c-a0ac-4584-4b92-08dcd440ac7a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Yf51nM0dyT8k37TEHUSPvrGYBcMl9hDDyCDdeQAmHMiNRuaZX3NKdmp7ShDS?=
+ =?us-ascii?Q?Egjmn0F98o5AMlLVKBsI1soNkJVfNh+DpWqcYxQbsV2vpJEKcCfiKlNc2BSi?=
+ =?us-ascii?Q?CqGsVLFD6vMBTGd/7aV13JAfmQ9Cc45KXg7/Hqi+ffpMG7daHP1wLxblRlau?=
+ =?us-ascii?Q?JUB8J56u8RaIvqXQn2grSISftQmr+RQiHNs8vZhhLUKmwu7QbW/M2c2lHaPk?=
+ =?us-ascii?Q?LjpwYrdRbu54UfH8jnAU0nbetxnqfWa7sTEsLAQVqdWG5RAovL/brx4aJPeX?=
+ =?us-ascii?Q?xSs6bOKH5vlPFCilxwBldo3bLIm3Fovo4eUCI8kRxStoH2AXrzN2HSbGdUCm?=
+ =?us-ascii?Q?nMYop4S4Fv7jBCgQ2HVQHnJOdVMhoxRsL1FJjzkvD2jhBfQ62GyqFuqueEKN?=
+ =?us-ascii?Q?ojwKl61ySB2gvEj0YaxLbsMA3Qp1Gv8I+IApx9lUwpMheNDhd34DWeTlA/7/?=
+ =?us-ascii?Q?OnZpOrGYRaW0qOqpCUq/2gmKkGmmtMkqqhFzIN2mA+Z1bwYNf47f7rQ6tsky?=
+ =?us-ascii?Q?aLAukObBOACojI4b5xJB44+u/WLv+p1Fcp9rLNcOIg/peaZS9+fQ89AAAVDH?=
+ =?us-ascii?Q?6mja+NhxwUgCRoGKVDXfFNUJc0CMIayzjohpo5f5WrtABp6qvT+0k2HwpuOe?=
+ =?us-ascii?Q?xbv5p7X/+aDMLKRHtolV3ag5fBcYxn+8VB1veRne8+8N71Pe0E3XKTkAU5N6?=
+ =?us-ascii?Q?Ne8gYKKe6byj+A4IRI9PKi43NsqLmJidnVtuh4e7cmoScRbY+0pfI3AAnDHR?=
+ =?us-ascii?Q?yoRQuMsDiOlYurpzJ9kHy7K+nbGZjoliAOIi1mo7ATB4FagMlQCOjN3d+kAN?=
+ =?us-ascii?Q?BsIDKDtDR3B1I1U93s+zcNk10kOgZfc5AJOTZAOyVvRoRKz0tapEEqDoAUsj?=
+ =?us-ascii?Q?cx8V3MrdKFfBbD6KLRAwhU9DJ7PPiTJyLgUOfLCbcNl8CoAUQIRPBSQ7Jj91?=
+ =?us-ascii?Q?3GdOFUUwagkD3RkoES/QJk406By3R1ewgQKHlIJ7FU21ArFr3eIHqdRG+on9?=
+ =?us-ascii?Q?MfaXNM9LN9T26o+hcOxf3vsbKeqjBBmBDlmGij8dIHZWh3RiHMtwm8j1LOgg?=
+ =?us-ascii?Q?h0h/Rqhe83/Fu/Q8j4EP+pIKJc05tacDziBOlc3qBOCgcNzPQP731EZEPYl2?=
+ =?us-ascii?Q?ohBLhBZ9O7NmC04mbJIspX+MxpUIX/Cl74rHOraGCtk2+B5bs87zP/CtPvFH?=
+ =?us-ascii?Q?n61UZyXZJ+J94rgKZCWDepNUlVUqqP/XIxr/taumCZhZbPppKvvuba5uYb+i?=
+ =?us-ascii?Q?XdIYksNqVMkmk0mxjt3KmKSUD1z70/Tg5kH7pAWmIWAKZbORwW0D0CcblGBj?=
+ =?us-ascii?Q?gCidRbu5TrazsgMRQJ/XTZGJUrPPQ4VZCRkhUc+TSrnQjA=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UOEFy3wptIKDT9f8x1MNm9SlhnHKBHWXsBqN180N4vzBUZUJeYlHzoOJ/kRT?=
+ =?us-ascii?Q?dyGqqdD+pPntHRW6kQeT76LPtuiMmogFHLZHf4fjQ+RQJwOi1tFVzeEXbVmc?=
+ =?us-ascii?Q?WXHZduBWJyHToM3bh1PCGDYLjD+diRLrUYCD0EVHSnjkFHBbgkCJCIXvzdAL?=
+ =?us-ascii?Q?GnJgZAn0WgoO34h3FLLUjWwkPBoIUFjEx+iKh8ntqsosmf5AfU77km6C0yf8?=
+ =?us-ascii?Q?gPqUECZdM7DcmAD9Z5MvyHtcTJfF/VaelDCw0WHjhaJ2dhMs+ZtJRZOFZA6c?=
+ =?us-ascii?Q?Klf/SDHzCuHCgob7vTO+yp17VEU1+nhH8us9kA//GVyAHvKNMrSmeb86Jn5c?=
+ =?us-ascii?Q?Ml5v3q3A6eRYMRlrN0PFkuvVeaK+z7jKmG+2ucx0/XkiBdFXALWqVkElnPFV?=
+ =?us-ascii?Q?wBNRCvK6d7nFp4Wv+x9DADfLMfcMQq/I3KT1M9Y6EN0b44LQ2BHvOPapgrtB?=
+ =?us-ascii?Q?iNUF20Nm6zBcAD789Ft/qrmuSD2X9wUoFsf8zBxOsXCLzhRUbnxPtgQw2rlM?=
+ =?us-ascii?Q?fiyFQPn3m1+9WUCPl92Wdaf1gKwYQAFSVeGmTWennS27HELBLGBOpJxpLPKb?=
+ =?us-ascii?Q?iR5SKnIj22fFqOL4v3jlmYgjm7uuRbNdriK+vj5+n9dxq8RANvpMCPvgcvkP?=
+ =?us-ascii?Q?nb3kOQfMSp8nsghXLFAiVzvXyYxixzuMzmP9A94/kPo7ziU/d3hCgltiSLXq?=
+ =?us-ascii?Q?Wh7klJKYtol4brTj9jKS8FGfVQW6gudhk/kAOc0Ox9v709u6WLOY5uXAco+W?=
+ =?us-ascii?Q?q8KFCSc/m+rQ6eC9cay7+zBDp5UCF8IQ7haljQrwMIT/CMatN7UcPcp8IEYB?=
+ =?us-ascii?Q?qfW+dxyGSwcAYmjuRMXRj2VZGSWiqcUFp/DOvOBSsmtmvW2lRerWbG4G2B4I?=
+ =?us-ascii?Q?JcO0HqfP/l1keeRgUxvME2+YhpBKRPLk6jb+CWdpSN7gifoMpB1BUA+7/UCG?=
+ =?us-ascii?Q?yUOBOBwZJ+ZJr5TgWY37FR0p52lOKJQSufLQgNri4p4JjMvPN1beRAIXG4KG?=
+ =?us-ascii?Q?nocOVykLazfzAnGM1Mq1utLW+dUKDMT34hr2jHIrfabPOwzjL8Qw/j/YW3QM?=
+ =?us-ascii?Q?ZiOBKUIGK6H2BjH0o/YLEN8JCsV4U78b727AB7DsQrbRFB25DIpOqpzrTlEj?=
+ =?us-ascii?Q?ZKe2ou4itRhPxoNEoCcrAkgnFtO8UXeWcBNWj+rVXSG55tBcXEPOkt4At7dN?=
+ =?us-ascii?Q?Dpxcb/uKXWYa9c/RaFDGpFYQHWvWknmv9CF8Vf3oSd2ply4zhx0gf4pimdkT?=
+ =?us-ascii?Q?KH4N6nwfh466g7YNxcqRpW2tPKbWdzU/UnKpxfwaRHtteoDZRmXh/T0dQNHy?=
+ =?us-ascii?Q?yeTmIkuJDv4ZWaKd6k2W2VDgKsdGCM9ywKKFNmOhR55zYt6jVKj8lN62aMpK?=
+ =?us-ascii?Q?Dg9d3F8hJsdjQqw3YnDXR2cUxJZbAro1dUrhHEvChcRRg/ckzYGGTmYoiv7K?=
+ =?us-ascii?Q?H2ezJjBC6jiQOHBuNYv14w3Ep5nfjemnD4ytdfy0AUQkDd+rMnEEt1puwlnf?=
+ =?us-ascii?Q?u3tIuyNZsGTyrBqXBywd7/qwguqI7kHFWObzFsOSUMg4HlUOMwgRcXDzgrIP?=
+ =?us-ascii?Q?pwKtk9OT13YAWdInR9qGtD7pGdepNgk6dAapfPLt?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 646a688c-a0ac-4584-4b92-08dcd440ac7a
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2024 22:09:01.9386
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rz7Y6ptqxRMijub9WCYcbOBbZ0B4Yb9lPEvOkvx1U/V24cx6xJHNOFWYsWF7b+FU0Nrd2LrVULCoYnVsMHqbXpOFXQJuInnnHNbfOfn13nY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8438
+X-OriginatorOrg: intel.com
 
-Use MMU shrinker to iterate through all the vCPUs of all the VMs and
-free pages allocated in MMU memory caches. Protect cache allocation in
-page fault and MMU load path from MMU shrinker by using a per vCPU
-mutex. In MMU shrinker, move the iterated VM to the end of the VMs list
-so that the pain of emptying cache spread among other VMs too.
+Zhi Wang wrote:
+> On Fri, 23 Aug 2024 23:21:25 +1000
+> Alexey Kardashevskiy <aik@amd.com> wrote:
+> 
+> > The SEV TIO spec defines a new TIO_GUEST_MESSAGE message to
+> > provide a secure communication channel between a SNP VM and
+> > the PSP.
+> > 
+> > The defined messages provide way to read TDI info and do secure
+> > MMIO/DMA setup.
+> > 
+> > On top of this, GHCB defines an extension to return certificates/
+> > measurements/report and TDI run status to the VM.
+> > 
+> > The TIO_GUEST_MESSAGE handler also checks if a specific TDI bound
+> > to the VM and exits the KVM to allow the userspace to bind it.
+> > 
+> 
+> Out of curiosity, do we have to handle the TDI bind/unbind in the kernel
+> space? It seems we are get the relationship between modules more
+> complicated. What is the design concern that letting QEMU to handle the
+> TDI bind/unbind message, because QEMU can talk to VFIO/KVM and also TSM.
 
-The specific caches to empty are mmu_shadow_page_cache and
-mmu_shadowed_info_cache as these caches store whole pages. Emptying them
-will give more impact to shrinker compared to other caches like
-mmu_pte_list_desc_cache{} and mmu_page_header_cache{}
+Hmm, the flow I have in mind is:
 
-Holding per vCPU mutex lock ensures that a vCPU doesn't get surprised
-by finding its cache emptied after filling them up for page table
-allocations during page fault handling and MMU load operation. Per vCPU
-mutex also makes sure there is only race between MMU shrinker and all
-other vCPUs. This should result in very less contention.
+Guest GHCx(BIND) => KVM => TSM GHCx handler => VFIO state update + TSM low-level BIND
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Suggested-by: David Matlack <dmatlack@google.com>
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
----
- arch/x86/include/asm/kvm_host.h |  6 +++
- arch/x86/kvm/mmu/mmu.c          | 69 +++++++++++++++++++++++++++------
- arch/x86/kvm/mmu/paging_tmpl.h  | 14 ++++---
- include/linux/kvm_host.h        |  1 +
- virt/kvm/kvm_main.c             |  8 +++-
- 5 files changed, 81 insertions(+), 17 deletions(-)
+vs this: (if I undertand your question correctly?)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index cbfe31bac6cf..63eaf03111eb 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -811,6 +811,12 @@ struct kvm_vcpu_arch {
- 	 */
- 	struct kvm_mmu *walk_mmu;
- 
-+	/*
-+	 * Protect cache from getting emptied in MMU shrinker while vCPU might
-+	 * use cache for fault handling or loading MMU.  As this is a per vCPU
-+	 * lock, only contention might happen when MMU shrinker runs.
-+	 */
-+	struct mutex mmu_memory_cache_lock;
- 	struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
- 	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
- 	struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 213e46b55dda..8e2935347615 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4524,29 +4524,33 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (r != RET_PF_INVALID)
- 		return r;
- 
-+	mutex_lock(&vcpu->arch.mmu_memory_cache_lock);
- 	r = mmu_topup_memory_caches(vcpu, false);
- 	if (r)
--		return r;
-+		goto out_mmu_memory_cache_unlock;
- 
- 	r = kvm_faultin_pfn(vcpu, fault, ACC_ALL);
- 	if (r != RET_PF_CONTINUE)
--		return r;
-+		goto out_mmu_memory_cache_unlock;
- 
- 	r = RET_PF_RETRY;
- 	write_lock(&vcpu->kvm->mmu_lock);
- 
- 	if (is_page_fault_stale(vcpu, fault))
--		goto out_unlock;
-+		goto out_mmu_unlock;
- 
- 	r = make_mmu_pages_available(vcpu);
- 	if (r)
--		goto out_unlock;
-+		goto out_mmu_unlock;
- 
- 	r = direct_map(vcpu, fault);
- 
--out_unlock:
-+out_mmu_unlock:
- 	write_unlock(&vcpu->kvm->mmu_lock);
- 	kvm_release_pfn_clean(fault->pfn);
-+out_mmu_memory_cache_unlock:
-+	mutex_unlock(&vcpu->arch.mmu_memory_cache_lock);
-+
- 	return r;
- }
- 
-@@ -4617,25 +4621,28 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
- 	if (r != RET_PF_INVALID)
- 		return r;
- 
-+	mutex_lock(&vcpu->arch.mmu_memory_cache_lock);
- 	r = mmu_topup_memory_caches(vcpu, false);
- 	if (r)
--		return r;
-+		goto out_mmu_memory_cache_unlock;
- 
- 	r = kvm_faultin_pfn(vcpu, fault, ACC_ALL);
- 	if (r != RET_PF_CONTINUE)
--		return r;
-+		goto out_mmu_memory_cache_unlock;
- 
- 	r = RET_PF_RETRY;
- 	read_lock(&vcpu->kvm->mmu_lock);
- 
- 	if (is_page_fault_stale(vcpu, fault))
--		goto out_unlock;
-+		goto out_mmu_unlock;
- 
- 	r = kvm_tdp_mmu_map(vcpu, fault);
- 
--out_unlock:
-+out_mmu_unlock:
- 	read_unlock(&vcpu->kvm->mmu_lock);
- 	kvm_release_pfn_clean(fault->pfn);
-+out_mmu_memory_cache_unlock:
-+	mutex_unlock(&vcpu->arch.mmu_memory_cache_lock);
- 	return r;
- }
- #endif
-@@ -5691,6 +5698,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- {
- 	int r;
- 
-+	mutex_lock(&vcpu->arch.mmu_memory_cache_lock);
- 	r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->root_role.direct);
- 	if (r)
- 		goto out;
-@@ -5717,6 +5725,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- 	 */
- 	kvm_x86_call(flush_tlb_current)(vcpu);
- out:
-+	mutex_unlock(&vcpu->arch.mmu_memory_cache_lock);
- 	return r;
- }
- 
-@@ -6303,6 +6312,7 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- 	if (!vcpu->arch.mmu_shadow_page_cache.init_value)
- 		vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
- 
-+	mutex_init(&vcpu->arch.mmu_memory_cache_lock);
- 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
- 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
- 
-@@ -6997,13 +7007,50 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
- static unsigned long mmu_shrink_scan(struct shrinker *shrink,
- 				     struct shrink_control *sc)
- {
--	return SHRINK_STOP;
-+	struct kvm *kvm, *next_kvm, *first_kvm = NULL;
-+	unsigned long i, freed = 0;
-+	struct kvm_vcpu *vcpu;
-+
-+	mutex_lock(&kvm_lock);
-+	list_for_each_entry_safe(kvm, next_kvm, &vm_list, vm_list) {
-+		if (!first_kvm)
-+			first_kvm = kvm;
-+		else if (first_kvm == kvm)
-+			break;
-+
-+		list_move_tail(&kvm->vm_list, &vm_list);
-+
-+		kvm_for_each_vcpu(i, vcpu, kvm) {
-+			if (!mutex_trylock(&vcpu->arch.mmu_memory_cache_lock))
-+				continue;
-+			freed += kvm_mmu_empty_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
-+			freed += kvm_mmu_empty_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
-+			mutex_unlock(&vcpu->arch.mmu_memory_cache_lock);
-+			if (freed >= sc->nr_to_scan)
-+				goto out;
-+		}
-+	}
-+out:
-+	mutex_unlock(&kvm_lock);
-+	return freed;
- }
- 
- static unsigned long mmu_shrink_count(struct shrinker *shrink,
- 				      struct shrink_control *sc)
- {
--	return SHRINK_EMPTY;
-+	unsigned long i, count = 0;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm *kvm;
-+
-+	mutex_lock(&kvm_lock);
-+	list_for_each_entry(kvm, &vm_list, vm_list) {
-+		kvm_for_each_vcpu(i, vcpu, kvm) {
-+			count += READ_ONCE(vcpu->arch.mmu_shadow_page_cache.nobjs);
-+			count += READ_ONCE(vcpu->arch.mmu_shadowed_info_cache.nobjs);
-+		}
-+	}
-+	mutex_unlock(&kvm_lock);
-+	return !count ? SHRINK_EMPTY : count;
- }
- 
- static struct shrinker *mmu_shrinker;
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 405bd7ceee2a..084a5c532078 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -809,13 +809,14 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 		return RET_PF_EMULATE;
- 	}
- 
-+	mutex_lock(&vcpu->arch.mmu_memory_cache_lock);
- 	r = mmu_topup_memory_caches(vcpu, true);
- 	if (r)
--		return r;
-+		goto out_mmu_memory_cache_unlock;
- 
- 	r = kvm_faultin_pfn(vcpu, fault, walker.pte_access);
- 	if (r != RET_PF_CONTINUE)
--		return r;
-+		goto out_mmu_memory_cache_unlock;
- 
- 	/*
- 	 * Do not change pte_access if the pfn is a mmio page, otherwise
-@@ -840,16 +841,19 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	write_lock(&vcpu->kvm->mmu_lock);
- 
- 	if (is_page_fault_stale(vcpu, fault))
--		goto out_unlock;
-+		goto out_mmu_unlock;
- 
- 	r = make_mmu_pages_available(vcpu);
- 	if (r)
--		goto out_unlock;
-+		goto out_mmu_unlock;
- 	r = FNAME(fetch)(vcpu, fault, &walker);
- 
--out_unlock:
-+out_mmu_unlock:
- 	write_unlock(&vcpu->kvm->mmu_lock);
- 	kvm_release_pfn_clean(fault->pfn);
-+out_mmu_memory_cache_unlock:
-+	mutex_unlock(&vcpu->arch.mmu_memory_cache_lock);
-+
- 	return r;
- }
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index b23c6d48392f..288e503f14a0 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1446,6 +1446,7 @@ void kvm_flush_remote_tlbs_memslot(struct kvm *kvm,
- int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
- int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min);
- int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc);
-+int kvm_mmu_empty_memory_cache(struct kvm_mmu_memory_cache *mc);
- void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
- void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
- #endif
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cb2b78e92910..5d89ca218791 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -451,15 +451,21 @@ int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc)
- 	return mc->nobjs;
- }
- 
--void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
-+int kvm_mmu_empty_memory_cache(struct kvm_mmu_memory_cache *mc)
- {
-+	int freed = mc->nobjs;
- 	while (mc->nobjs) {
- 		if (mc->kmem_cache)
- 			kmem_cache_free(mc->kmem_cache, mc->objects[--mc->nobjs]);
- 		else
- 			free_page((unsigned long)mc->objects[--mc->nobjs]);
- 	}
-+	return freed;
-+}
- 
-+void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
-+{
-+	kvm_mmu_empty_memory_cache(mc);
- 	kvfree(mc->objects);
- 
- 	mc->objects = NULL;
--- 
-2.46.0.662.g92d0881bb0-goog
+Guest GHCx(BIND) => KVM => TSM GHCx handler => QEMU => VFIO => TSM low-level BIND
 
+Why exit to QEMU only to turn around and call back into the kernel? VFIO
+should already have the context from establishing the vPCI device as
+"bind-capable" at setup time.
+
+Maybe I misunderstood your complication concern?
 
