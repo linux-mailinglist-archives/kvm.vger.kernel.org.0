@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-26885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D7EC978C60
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 03:15:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A7D978C62
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 03:15:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BFE3B248D4
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 01:15:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00B251C22FC0
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 01:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72DB40BF5;
-	Sat, 14 Sep 2024 01:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEAD7344C;
+	Sat, 14 Sep 2024 01:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pFc5eU9l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lHNB1SQS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A064D1D551
-	for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 01:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB0A42AA2
+	for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 01:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726276443; cv=none; b=XGdgCA08ODe8F66ZznA9hSxXzOdbJ1s07vFMCvZWrLWDP5dYEO1H5POnGTiue+8Ii3AkCFUnULob4qyxOcJzed7zYagwJ79fnjy6VcJuaR65H3KrEHYtMEAu4VSAM5G4z0sR7xp7xXNiPhcGa8L6P9NHP0hemlZ1KqANAraol8M=
+	t=1726276446; cv=none; b=l45wuZBT+A+12SR6IeetvpDB9jNJhgwpeL1AMWPh9WF0Dl1kQTIH8b/qj0wSj268YauPQZqyyClTx9UbRaq6prDTu/E/WvsOENUrp7ggBXYdmaFKb7cPFcvIf8gGjtWVFsAo42fJFwI3ocQp2qqCwthBoSVZ1OHdwI2p+XZFT5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726276443; c=relaxed/simple;
-	bh=xppevfAptevbPbqwJcKDzvBsXUxo8t6URwOvrGr+ZLY=;
+	s=arc-20240116; t=1726276446; c=relaxed/simple;
+	bh=8hGFnDmx97YvmntVh7A6887mN5n1bo6yLTTUAOGk2Z0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oqdw2Kw06PvnOhwJhRxr9EavMMJG/f3WPKFpiziF+NkTZHEIR+CetCMCgSoKlKqIylcU4WSBeIEfdj7siATbZAmmFNS34fELc5m98yWwVcIp/dVaKQ8MRQVN6TClbOQZdL051fIU5TTqzMiu/zs9CBIFDtuLGm2oqJHUeQabLYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pFc5eU9l; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=NOLGE+gWk+DtFT6sP06AXE0vUL4SHgGYJTtBNCuf0vzTS19tuIEz2YXFYKORsZ6HILIzZfiqsdKyOhxo80DhYX3/a5mqSYX2GkG+M2v9yJu9W7RT5y+s0TzBSVQjVsLSqPmNKjAcZr0/sKMYlAS5kEtOmDhXNeYZ13Nu0cARDu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lHNB1SQS; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7db493ff1b2so381749a12.1
-        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 18:14:01 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6db961c2291so61943077b3.1
+        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 18:14:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726276441; x=1726881241; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1726276443; x=1726881243; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=xvgZPW09Nbm9lucb1cC9o89RtyC6+MnMH79yvO/ZkH8=;
-        b=pFc5eU9lBvIYFpZSLZ1hBjEe+ImhfjmLdZVLD29ptgJ2aYkNU73B2EBjmDVu2a+E0O
-         NyrN6ib9Ya1q0S+GV3+bWpn224zRaYwF5XYJBL0KMRXylyHg0Jl2v+iHE/P/bQ3wbPJI
-         dP+brSXwAyKHgPSlXTgyiL9Bb0hUMMvMuYOXTFDr+/HHTMUH78JaRUtwHFzUcgLwyZBr
-         HdaopKC1spqinjdM08gvgshZRh++7kBQhy+bq5d2XBaeUq5T3FRJ7m1OFwILeyxW9if7
-         GAdovqaPbP5c8R6uNw16uM2sRM4uWk082DQxijRoMZThi4CBqwPag8xGaMVBgxbN7cTD
-         ew7A==
+        bh=/wusTrY/RaRpW8ZSA2W7PXFPM2ScRlEcVob6BeeQf34=;
+        b=lHNB1SQSKi16zGJR5BT2upfl57z+qabwnPGnzSFfwhQI0nrPF9DFW0zq77gheiU/4T
+         wu0KpttkVuidniVrRh5jbW2YQE4lyX/tlMRqIQIGSz+PDLFwQ/8JZrQ+u8rbUcmBtv82
+         Fdg/yTCMDvbdiFAVyH67C+ku+6mggTS7oLczIcExton3DsfJLIWIlcnKNNa374x3uj/3
+         CcyRn9rC+V5Yp00YCg0JlsLGE/blNdNnuZ26vwnB+kFYU3DpBJtWNqBeI8da1j2zoxie
+         kYGeIQS2DeRjn1eSTDIGGdxgdQMEb3JnjHaRoOY/1ijHFs+mz4wnzcgkG4eYBjmxL9Zn
+         LGGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726276441; x=1726881241;
+        d=1e100.net; s=20230601; t=1726276443; x=1726881243;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xvgZPW09Nbm9lucb1cC9o89RtyC6+MnMH79yvO/ZkH8=;
-        b=X8rPXVB6EMaQiaNsTXuNpaz0+E1Xek/s8VAPj7fhJr6migBX1Ibi5CTPcRvmILpTQe
-         mSFbCmCKyHYfF2X5rxAmi+Kb9QpOWmlsxpOXQCbFwgkHKT1EW4UvZLJypl7Mxul33xTp
-         P+Jxuz9MidLeshO/vGFQsyvqzvltWUlZhws04zplawAMyOywQdRsnSOefr4hZaQg/zP+
-         ij2PhVnDe2+hrMv/rE/17yudDbZnocVhJ7SwC7A4x7QFi66Qz4MY1NujC9DOn1+Rzkgs
-         PrxfMc5KLOnGZR/YZiuHKV6aDJisDHzYzb5ZjABB3k0ASBA91oR1mRIcbN/lKBax4P0M
-         IUxg==
-X-Gm-Message-State: AOJu0YwNkkgXqHQn3c3hOB3+dWzxZAtwNx/LTUJcoDhZuvn1xP75piau
-	v8P8SYsDCwUaBKADmDNUnozIMJB6J3ZJ8nA3EKelkHWx4JEmhWqmnUluBr6q1RMsy8rPRWFvBpr
-	kqw==
-X-Google-Smtp-Source: AGHT+IGqhtyTzHA8ggkpcGPQZe82d4lJz0N00TofL2u4pqglGjOyN6tA6m9TlHbYiXhEZF/xylViCACsCvI=
+        bh=/wusTrY/RaRpW8ZSA2W7PXFPM2ScRlEcVob6BeeQf34=;
+        b=mK4QdUoagzZjtdTskESQygQRvmUzugRWXaOccJCtzNWnu1igVi+bCrGn0pBtFa166k
+         vTGjf5r7fvu5E4r70pF/Nn6iIeVjlDgwc9vR1Z1SfCtiQtvvdZHomCv9CE3QKNknxFpb
+         B5U+haNR4cXL7DBT72WIXSyUe0vSBvOAgZa8GQVauc9DfQc2y98a7kbgotVWX397/Tcq
+         wfKimmrWCCYkj/9bJbSVE5yrH6m/hzbPvTrt+8l8I5Ng59cybp0AVghPo0uYiJYICaAb
+         MUv2BjwE5kXMRucGN6x4sH3FmK2FNYQv86nRcBpde51NFJg2V/nL3ocw9O4C9WTU1ssC
+         1TOA==
+X-Gm-Message-State: AOJu0Yz+YrNnSE4zLrDQlZ882nJ5vzgIdhqT1UkLlKkSXCGrBlbdQguD
+	Pp33WXnmNOLjKjxnng8vQ13jOpXY/Mc7jranciZSc7pBwtwyIhw8UoBVxdOHMQDlpNRcDxOTUFM
+	5Gw==
+X-Google-Smtp-Source: AGHT+IGqMoVw7IyDOoeQsf0VKAfkCs3rgUl0XVcRxqiZgLjIaoMEzdFDDd3f9P30bTFCqJfct6AgL/JcPJU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:5c54:0:b0:7d8:449f:148d with SMTP id
- 41be03b00d2f7-7db2f7a88f5mr8187a12.8.1726276440680; Fri, 13 Sep 2024 18:14:00
+ (user=seanjc job=sendgmr) by 2002:a25:6890:0:b0:e16:55e7:5138 with SMTP id
+ 3f1490d57ef6-e1d9daabfb5mr12120276.0.1726276442805; Fri, 13 Sep 2024 18:14:02
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 13 Sep 2024 18:13:46 -0700
+Date: Fri, 13 Sep 2024 18:13:47 -0700
 In-Reply-To: <20240914011348.2558415-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,26 +75,15 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240914011348.2558415-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.662.g92d0881bb0-goog
-Message-ID: <20240914011348.2558415-6-seanjc@google.com>
-Subject: [GIT PULL] KVM: Selftests changes for 6.12
+Message-ID: <20240914011348.2558415-7-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: SVM changes for 6.12
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-As mentioned in the cover letter, the tools/testing/selftests/kvm/.gitignore
-change will conflict with the s390 pull request.  Easiest solution should be to
-just take my changes (they're a strict superset).
-
-The other notable selftests related change isn't part of this pull request.  I
-posted a mini-series to use the canonical $(ARCH) paths for KVM selftests
-directories[*], e.g. arm64 instead of aarch64.  My plan is to send a v2 after
-all the arch pull requests are merged and try to squeeze it into the back half
-of the merge window (I kinda forgot about LPC and KVM Forum, but I'm crossing
-my fingers here will be minimal conflicts).
-
-[*] https://lore.kernel.org/all/20240826190116.145945-1-seanjc@google.com
+I got nothing clever or interesting to say for this one.
 
 The following changes since commit 47ac09b91befbb6a235ab620c32af719f8208399:
 
@@ -102,53 +91,39 @@ The following changes since commit 47ac09b91befbb6a235ab620c32af719f8208399:
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.12
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-svm-6.12
 
-for you to fetch changes up to c32e028057f144f15c06e2f09dfec49b14311910:
+for you to fetch changes up to 4440337af4d415c8abf8b9b0e10c79b7518e6e3c:
 
-  KVM: selftests: Verify single-stepping a fastpath VM-Exit exits to userspace (2024-09-09 20:12:12 -0700)
-
-----------------------------------------------------------------
-KVM selftests changes for 6.12:
-
- - Fix a goof that caused some Hyper-V tests to be skipped when run on bare
-   metal, i.e. NOT in a VM.
-
- - Add a regression test for KVM's handling of SHUTDOWN for an SEV-ES guest.
-
- - Explicitly include one-off assets in .gitignore.  Past Sean was completely
-   wrong about not being able to detect missing .gitignore entries.
-
- - Verify userspace single-stepping works when KVM happens to handle a VM-Exit
-   in its fastpath.
-
- - Misc cleanups
+  KVM: SVM: let alternatives handle the cases when RSB filling is required (2024-09-10 10:27:53 -0700)
 
 ----------------------------------------------------------------
-Peter Gonda (1):
-      KVM: selftests: Add SEV-ES shutdown test
+KVM SVM changes for 6.12:
 
-Sean Christopherson (4):
-      KVM: selftests: Remove unused kvm_memcmp_hva_gva()
-      KVM: selftests: Always unlink memory regions when deleting (VM free)
-      KVM: selftests: Explicitly include committed one-off assets in .gitignore
-      KVM: selftests: Verify single-stepping a fastpath VM-Exit exits to userspace
+ - Don't stuff the RSB after VM-Exit when RETPOLINE=y and AutoIBRS is enabled,
+   i.e. when the CPU has already flushed the RSB.
 
-Vitaly Kuznetsov (2):
-      KVM: selftests: Move Hyper-V specific functions out of processor.c
-      KVM: selftests: Re-enable hyperv_evmcs/hyperv_svm_test on bare metal
+ - Trace the per-CPU host save area as a VMCB pointer to improve readability
+   and cleanup the retrieval of the SEV-ES host save area.
 
- tools/testing/selftests/kvm/.gitignore             |  4 +
- tools/testing/selftests/kvm/include/kvm_util.h     |  2 -
- .../testing/selftests/kvm/include/x86_64/hyperv.h  | 18 +++++
- .../selftests/kvm/include/x86_64/processor.h       |  7 +-
- tools/testing/selftests/kvm/lib/kvm_util.c         | 85 ++--------------------
- tools/testing/selftests/kvm/lib/x86_64/hyperv.c    | 67 +++++++++++++++++
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 61 ----------------
- tools/testing/selftests/kvm/x86_64/debug_regs.c    | 11 ++-
- tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c  |  2 +-
- .../testing/selftests/kvm/x86_64/hyperv_svm_test.c |  2 +-
- .../testing/selftests/kvm/x86_64/sev_smoke_test.c  | 32 ++++++++
- .../testing/selftests/kvm/x86_64/xen_vmcall_test.c |  1 +
- 12 files changed, 141 insertions(+), 151 deletions(-)
+ - Remove unnecessary accounting of temporary nested VMCB related allocations.
+
+----------------------------------------------------------------
+Amit Shah (1):
+      KVM: SVM: let alternatives handle the cases when RSB filling is required
+
+Sean Christopherson (3):
+      KVM: SVM: Add a helper to convert a SME-aware PA back to a struct page
+      KVM: SVM: Add host SEV-ES save area structure into VMCB via a union
+      KVM: SVM: Track the per-CPU host save area as a VMCB pointer
+
+Yongqiang Liu (1):
+      KVM: SVM: Remove unnecessary GFP_KERNEL_ACCOUNT in svm_set_nested_state()
+
+ arch/x86/include/asm/svm.h | 20 +++++++++++++++-----
+ arch/x86/kvm/svm/nested.c  |  4 ++--
+ arch/x86/kvm/svm/svm.c     | 24 ++++++++++++------------
+ arch/x86/kvm/svm/svm.h     | 18 ++++++++++++++++--
+ arch/x86/kvm/svm/vmenter.S |  8 ++------
+ 5 files changed, 47 insertions(+), 27 deletions(-)
 
