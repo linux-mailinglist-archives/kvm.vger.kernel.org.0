@@ -1,130 +1,137 @@
-Return-Path: <kvm+bounces-26916-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C935F978EF7
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 09:47:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0172978E94
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 09:01:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83DE4285EE9
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 07:47:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F0B81F23E4F
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 07:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C81713B7A3;
-	Sat, 14 Sep 2024 07:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA0F1CDA2B;
+	Sat, 14 Sep 2024 07:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="DLUHpjti"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I6kwCkdM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC7E10E9
-	for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 07:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4233E61FFC;
+	Sat, 14 Sep 2024 07:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726300047; cv=none; b=jqF77bdTPCq8bhu43rBfcx0BE3PB6hsSOghijaaFg9aXtmE6nxhtS8Fz0A3lbTr8zdN1/XrVJewuX6KjWiOqCZ7xmm6HHUcSLuNQcRCAl0Y+PhPFhuBBLBs3v+MJCsSVwoN30kz/yz/N6VWLR4U2tTgBTvv/3k6KIVO5zPlCeKg=
+	t=1726297273; cv=none; b=EOLTm+Jc2VArN/euCP9jUk2ZR3A5imv71rBjvNFAHOaA0biZv34Fd1mUoWo1opCImJZLr6qGZdQLMAJsSJYQ44KHOc5bRJ9e2kQb8RkYUWA9iR+zL6D58S+Z8Tk4b0BGt9Rl63eZFRJOSulsjCMF8bgO+zcbh61aPhbt5gfZbnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726300047; c=relaxed/simple;
-	bh=HN4KlbogxIn9kipt/+5DY3MCRNpduAin5rQLumuXjLg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ur5GkbOk/dn3M2g4wsM1AgYIpk0RBVl6ejD9dcA3EEtzjZMaZ2j0pOAVoUwopAESEaVFJ2/eWEpzhkgtS+KujN0q32ZnCY44ztijUSDog4XsZRpZxM5vZB8Xp+yLbRWyBA3oBx4i43QjBB3uexch6AGo4n0cxJ6fAv6k9staacE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=DLUHpjti; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3a08489f757so8885395ab.0
-        for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 00:47:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1726300044; x=1726904844; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xCXWx1AARdSEy+aE8rrZQ09YhMgt7Bc9EsokRlJmT98=;
-        b=DLUHpjtidCzRgSpewVYnMwLpdEpUYHNPKUC4gK9xyQgIdqavXEimHw8Y0kP+etqAh6
-         WhJkTOtlEi8gSSCq1TVuWCE1YDjvK9I2z5yhy9wl0z5nmKg6fcYNx6kCwkhOboUMoVAN
-         bniIL7WMg+zfrKzQ0owQfDyYvcUm2sT+ZqCdKATkrwimmlgJfWYnpnvjUfLZ33AsQ6qq
-         Wk0gMd/r8L4Dpn2rKPeuRPFfpBDKDQ57+vRhRp0eSVj4qXQUSIoHWqJeETzYBAo0P/fE
-         /7h1H7Bw/Sd0O/V8dn0wwYVutn/aPE0lwUua403lR/jL/D4NJ0FY3tjIbf7AXUpe7YqO
-         digQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726300044; x=1726904844;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xCXWx1AARdSEy+aE8rrZQ09YhMgt7Bc9EsokRlJmT98=;
-        b=L5yQPuegbAmqIe0ycJc+3i9+3OzFKvI+krYmCjdGfUVu0GoEKHS25otBfyGBVh8q9q
-         y7M3Ck3w4tB8xTnuaZhv+Bf+m4Kd6gOy9GZ+Wax6MIaczwUOynIpBMxh6Ua5jW7xtbBS
-         i/JT5xrb56YnMkz7J4fNBTk8M+LbXx9smK4XaFJ7fk6Kd39x+Xq7oHf0cQmSjbvsBs0l
-         X5Xx5uKxU/Q8XVFgvWTdxpdXvV8vXZHqldL6comdkgHvIP+qsqoN6XHDhYYLTCzlSjMi
-         8WGj43Ccf95ur7tk5PXlom+2+0vGUXZfr31Y3TXtzHUzVCmfAWG/Ex+yW+D/HGWPPL3m
-         vTFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkwBHQWwJDX6MgNG1g1EGfFA5zVAMM4XQzJzBnDMcN+8Y7EBdNkndmqvp4WGV5kN71CvU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzU0pmZNlz4wQcIkmZytkp8IdRfbIHrgJ6LcXJ1qlS28QJsyunQ
-	mCD1L9Pk2h3tMjjDPxTCG6K370eh521WFOOTGlL2cpiiuGhk+RIU51BJdnDjiHKZ5CjSkUrLmFV
-	9yy+qyXeoKtvmskrMepQN5SBeEhWIQ7g8eNO51Q==
-X-Google-Smtp-Source: AGHT+IE1+YolBGHlPsnYebHEoJOTB+fxO3iuwnRSWzmivhke4/IK2SM0tqoudxlnPJ1GndHJ+aH11X+h3T8BBsrdWoQ=
-X-Received: by 2002:a05:6e02:2147:b0:398:a9b3:d6b1 with SMTP id
- e9e14a558f8ab-3a08464e152mr82842365ab.12.1726300044565; Sat, 14 Sep 2024
- 00:47:24 -0700 (PDT)
+	s=arc-20240116; t=1726297273; c=relaxed/simple;
+	bh=cqIWvOOX+XrN3/tY6RHoaMPUp//S60KN/bWEkvG3V+A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NTCDRRhEaPML5Tlrc8rcyPmK4r0M+UPPlkQv/zd9N+IaKENIRmOKVL1LW9AE9Dojz3iBYfUaWR2pH/2paQVr7h/xwxDfb2p9A0mxzgSRzqOkIGzkVGeT2V0HcwC/xLDeX5bHzD+trz5F/O1CebzsHa0XmW7DNX7Wm8hlrJUwsWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I6kwCkdM; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726297271; x=1757833271;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cqIWvOOX+XrN3/tY6RHoaMPUp//S60KN/bWEkvG3V+A=;
+  b=I6kwCkdMPZWaRg3bVxNk3IBT9u8GbMGyqW9q9/5OsTVOY2R2SUb1JycL
+   QctkurubiQSCNY7vvclwff2ddoNslRvbU7P93Ba5+CzWhCR4YnvC+VSHV
+   VNjGfuIk0kkIcf3Cek5xeQeJw+pionn5du69CwXP7ia02xlLSZEU8nsUC
+   1P6Jy+nQrc8jrg6clUtBPLlmPX7qKhi6lwh5bviF8rh21nHnU1ZotwimZ
+   iedy7jsjh2BKmYRGW7PCraA0ybWLVGy9bKuIVerTAwD35vl7Ny94y0M4e
+   44dhnBpKBo/MbybRxitafAcOBhLCMgDrVK2kB8rCc7pkwnS2usvJRiioX
+   A==;
+X-CSE-ConnectionGUID: TV9p/K/mTJGCq5WssTbUcw==
+X-CSE-MsgGUID: JGKdyDPcQqCcLb2Z0vbYHQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11194"; a="35778729"
+X-IronPort-AV: E=Sophos;i="6.10,228,1719903600"; 
+   d="scan'208";a="35778729"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2024 00:01:11 -0700
+X-CSE-ConnectionGUID: xcO3UL5RSuyB3PldMGxZgw==
+X-CSE-MsgGUID: g3/73qBDSmy7IV22QEOEoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,228,1719903600"; 
+   d="scan'208";a="67950635"
+Received: from emr.sh.intel.com ([10.112.229.56])
+  by fmviesa006.fm.intel.com with ESMTP; 14 Sep 2024 00:00:55 -0700
+From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jim Mattson <jmattson@google.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Xiong Zhang <xiong.y.zhang@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Like Xu <like.xu.linux@gmail.com>,
+	Jinrong Liang <cloudliang@tencent.com>,
+	Yongwei Ma <yongwei.ma@intel.com>,
+	Dapeng Mi <dapeng1.mi@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
+Subject: [kvm-unit-tests patch v6 00/18] pmu test bugs fix and improvements
+Date: Sat, 14 Sep 2024 10:17:10 +0000
+Message-Id: <20240914101728.33148-1-dapeng1.mi@linux.intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Sat, 14 Sep 2024 13:17:13 +0530
-Message-ID: <CAAhSdy0fHNoSx9KAG9nL=sc9=L+zeComyJjctD7kYOhuMNxLdg@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.12
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@rivosinc.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@atishpatra.org>, 
-	Atish Patra <atishp@rivosinc.com>, KVM General <kvm@vger.kernel.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo,
+Changes:
+v5 -> v6:
+  * limit maximum fixed counters number to 
+    MIN(pmu.nr_fixed_counters, ARRAY_SIZE(fixed_events)) to avoid
+    out-of-bound access for fixed_events[]. If supported fixed counters
+    number is larger than array size of fixed_events[], print message to
+    remind to update test case. (Jim)
+  * limit instructions & branches events precise validation for only
+    Intel processors. (Sandipan Das)
 
-We have only 4 KVM RISC-V fixes for 6.12. There
-are quite a few in-flight patches waiting for more
-reviews and these will be included in 6.13.
+KUT/pmu test passes on Intel Sapphire Rapids platform.
 
-Please pull.
+History:
+  v5: https://lore.kernel.org/all/20240703095712.64202-1-dapeng1.mi@linux.intel.com/
+  v4: https://lore.kernel.org/all/20240419035233.3837621-1-dapeng1.mi@linux.intel.com/
+  v3: https://lore.kernel.org/lkml/20240103031409.2504051-1-dapeng1.mi@linux.intel.com/ 
+  v2: https://lore.kernel.org/lkml/20231031092921.2885109-1-dapeng1.mi@linux.intel.com/
+  v1: https://lore.kernel.org/lkml/20231024075748.1675382-1-dapeng1.mi@linux.intel.com/
 
-Regards,
-Anup
+Dapeng Mi (17):
+  x86: pmu: Remove blank line and redundant space
+  x86: pmu: Refine fixed_events[] names
+  x86: pmu: Fix the issue that pmu_counter_t.config crosses cache line
+  x86: pmu: Enlarge cnt[] length to 48 in check_counters_many()
+  x86: pmu: Print measured event count if test fails
+  x86: pmu: Fix potential out of bound access for fixed events
+  x86: pmu: Fix cycles event validation failure
+  x86: pmu: Use macro to replace hard-coded branches event index
+  x86: pmu: Use macro to replace hard-coded ref-cycles event index
+  x86: pmu: Use macro to replace hard-coded instructions event index
+  x86: pmu: Enable and disable PMCs in loop() asm blob
+  x86: pmu: Improve instruction and branches events verification
+  x86: pmu: Improve LLC misses event verification
+  x86: pmu: Adjust lower boundary of llc-misses event to 0 for legacy
+    CPUs
+  x86: pmu: Add IBPB indirect jump asm blob
+  x86: pmu: Adjust lower boundary of branch-misses event
+  x86: pmu: Optimize emulated instruction validation
 
-The following changes since commit 47ac09b91befbb6a235ab620c32af719f8208399:
+Xiong Zhang (1):
+  x86: pmu: Remove duplicate code in pmu_init()
 
-  Linux 6.11-rc4 (2024-08-18 13:17:27 -0700)
+ lib/x86/pmu.c |   5 -
+ x86/pmu.c     | 427 ++++++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 346 insertions(+), 86 deletions(-)
 
-are available in the Git repository at:
 
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.12-1
+base-commit: 17f6f2fd17935eb5e564f621c71244b4a3ddeafb
+-- 
+2.40.1
 
-for you to fetch changes up to 5aa09297a3dcc798d038bd7436f8c90f664045a6:
-
-  RISC-V: KVM: Fix to allow hpmcounter31 from the guest (2024-08-19
-08:58:21 +0530)
-
-----------------------------------------------------------------
-KVM/riscv changes for 6.12
-
-- Fix sbiret init before forwarding to userspace
-- Don't zero-out PMU snapshot area before freeing data
-- Allow legacy PMU access from guest
-- Fix to allow hpmcounter31 from the guest
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      RISC-V: KVM: Fix sbiret init before forwarding to userspace
-
-Anup Patel (1):
-      RISC-V: KVM: Don't zero-out PMU snapshot area before freeing data
-
-Atish Patra (2):
-      RISC-V: KVM: Allow legacy PMU access from guest
-      RISC-V: KVM: Fix to allow hpmcounter31 from the guest
-
- arch/riscv/include/asm/kvm_vcpu_pmu.h | 21 +++++++++++++++++----
- arch/riscv/kvm/vcpu_pmu.c             | 14 ++------------
- arch/riscv/kvm/vcpu_sbi.c             |  4 ++--
- 3 files changed, 21 insertions(+), 18 deletions(-)
 
