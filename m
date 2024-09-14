@@ -1,160 +1,159 @@
-Return-Path: <kvm+bounces-26922-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26923-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0AEE9790FF
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 15:34:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A16979102
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 15:35:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FBD1281587
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 13:34:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45FEB1C2192A
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 13:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A431CF7B0;
-	Sat, 14 Sep 2024 13:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA181CF7D7;
+	Sat, 14 Sep 2024 13:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wra250YA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V9t/S0Yf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E348414659B
-	for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 13:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBF81482F3
+	for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 13:34:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726320857; cv=none; b=mxmSjqVBOcd9MhLEqlJ6REKxmoLHDMY+pKB+Nw5Vx2hWV2gHPo8uYQFvoap403CT3Izwf8Oc00KmC2JPMvBObz1bxVkh/yi/PptydKqPoidLqrGe6rvVD7ymD3F4wMtzFKBm2DNCJzz5DGtr+XOcVvb8vFShTOU3WRiRco1xxII=
+	t=1726320891; cv=none; b=t0A30oXRA+IJ9zDeoTYcMAioxawxGMxVZzcH9uvWBbZbpkkfRIQZBdDfKQwsSJSHlRQ+mFqKDZV5Fclo2aqUODousDz+AMcaFpp1plhB18sIFlELsP7A2huItOgipU+q+jyaKVqqbbwvzOx5UFsOmuXIiXxkkxwMHAhf844E0b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726320857; c=relaxed/simple;
-	bh=Bo9HHMH/7VGecfGqlAkHXUQ0PAaQ8egvSPQACg+ewKc=;
+	s=arc-20240116; t=1726320891; c=relaxed/simple;
+	bh=dHM/9nGeV0kB5TjHKKHKGDZ6zh5A8DGqa4bFzJrKT/U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j7O8jT39W3kx0ncjIDmzE8J2Sp5Ey8CGe987/JhiQajvj1vLh+OY9HomZB92Mm0SvOqoHGi98W+Qlc07Q9ZU4VXG/it+DhZvP44lNHuYM/4ClV2X0x9UYODQHWbOluk9/8glGAwx5qytgDgbvzHxGQaWigfqEDO1lr854Di1RZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wra250YA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726320853;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=INwlJ0XvfL4HQTe5EqAskgvpw/m/mm4hcWt9RMaUHIY=;
-	b=Wra250YAieYEKcF1HP5+BlUTQXyl723ntPkE70XbHZBZ2bl/VE1NR1fzuZeW/zhFT5oC9p
-	kqCJ8qkUYViWTShlLMKdsjvvp16Eyy3t4Ch/PmsPDb5GuQQMNwvYkrdThlZKe7T5bXElS2
-	O7fMe+4VUxKGNR8L/296510ee5xd3Sg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-695-_kKNQVM6Nd6JFNY28PIfag-1; Sat, 14 Sep 2024 09:34:12 -0400
-X-MC-Unique: _kKNQVM6Nd6JFNY28PIfag-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3780c8d689bso1441862f8f.2
-        for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 06:34:11 -0700 (PDT)
+	 To:Cc:Content-Type; b=NWNNBLzE0m9F1RJgtU2xr+y86OwTV9LyOGt2GTJM056sNfm5BD1macDYG809+gNxvznjYj9q4iiHo736CrzU1pD52wbeZXy1KDiEoTiINyFQduXElE/V1QGF9bLr5PmNVNDAMBFEw9y6fC+3rYf3CvkqbncRmiS9aU8J+oaZdsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V9t/S0Yf; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-42cae4ead5bso11835e9.1
+        for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 06:34:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726320888; x=1726925688; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dHM/9nGeV0kB5TjHKKHKGDZ6zh5A8DGqa4bFzJrKT/U=;
+        b=V9t/S0YfvqGt18n1LGGsMgqgKHI5SlP4OdMcEzXgOFMe1ICK4kLgk5lR4+VqXze3Oi
+         Ns6rU3WQmZhEmBqKYMlNQorw8BrBwesnjBWTJGU1denCkuYgF+0s2pZVNtv0WjC87LIw
+         MANdkrNi1ADdjYZdd3BM75uuinL1jfbae4jx6E0UalYwNfII0A0FGKlWutl1QX8O2OVR
+         p5+hq3m6KnFQtxWXulZnr8vZ2uRKiYsyFeh1ICHj9oStUOwSJB7ehbPMccrNt7VZpImT
+         cCX7bYX/VITDInLxtfA+D8y58Tl1yn56z7+KfM7SeqrN0aDRUgrgkIjuIzbA45rwnxha
+         I/Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726320851; x=1726925651;
+        d=1e100.net; s=20230601; t=1726320888; x=1726925688;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=INwlJ0XvfL4HQTe5EqAskgvpw/m/mm4hcWt9RMaUHIY=;
-        b=Vb8WJ0Fc/5u34hRDVEQtk6005p7kYeS5DlnAtmxHL08D2uYXY9rqbyyfKnIERyhx5E
-         x3NjGX5/pHyATIzYGzsyDJJmNHFnqYbrOjBZemnBO+x0YgYHy7uziKIwDO2SRndEprqt
-         Eoaace5/FhE3ZNo+c0oLdkTY+qX75R0QHJ7N/ZQy08kbRKlucJ1YgJ1j8+eD3q+fMfw6
-         VON6cd2Nh7eP37qtF83ihUGwF0Fz+YxI2UMy2bXm8yMgCGNsf7uM4xXYjh/q1znxGWML
-         92mcQbi5XcFopp1GF7B7mdfXCxaPZd6wpc/p4M1UE73woAGLWJVVaemH0GxPoZocW7qs
-         N+8A==
-X-Forwarded-Encrypted: i=1; AJvYcCX7BtjgXmC65KOxvqL44Jqv1PzjDJFZpX1iekZiZY1ydWUw+hyoHgWabW/xbdBHFy768jc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNb4lH9Xs4SyzUKlcz+dlJEnfKTqPTOR+5wS06JquC/kHUxLl8
-	HynevLtV7NUA07YgyvIsB6qj+D1wzq+B4NeD3evApTnjptwTm4mf47dkCBPfPEJNnVCI4QQml9z
-	aOG/Z1Wz0yva4WsdL/qnjb4JAR3g0Cp2V17kZ12qja4zCdlrFWGkWmRgiI1s8zljyZDWnLjt2Vg
-	L4Br125K97QXxce3p36sLtjsRp
-X-Received: by 2002:a5d:50c5:0:b0:374:b35e:ea6c with SMTP id ffacd0b85a97d-378c2d515cemr5395081f8f.40.1726320850953;
-        Sat, 14 Sep 2024 06:34:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFb6HtPkwGnd8GM7d/KRiyJlB1NATkocV9vkbyr817E3RiHieIGR5imtJW33zVee0ZnqWkWEGQp1XYS+1SQiKY=
-X-Received: by 2002:a5d:50c5:0:b0:374:b35e:ea6c with SMTP id
- ffacd0b85a97d-378c2d515cemr5395071f8f.40.1726320850544; Sat, 14 Sep 2024
- 06:34:10 -0700 (PDT)
+        bh=dHM/9nGeV0kB5TjHKKHKGDZ6zh5A8DGqa4bFzJrKT/U=;
+        b=oruVmbnJLs18f9LincRz7RHCiTpe1ESmVnyHn6G9b7v3zhuOfciuMrmg5um6XvErRB
+         yBVc0XP4Yr84Lw5VCj7tbcEv79QnxFuanrzvBVdBhsCQcAG5n1NFOZgO9PFgclK3eiU4
+         QKqOYVHCstV22OegS6EoLuAFd0yLf86ojM1dRQ9dUW3r0MyvYr9P/oF7bfYpnhnfRfya
+         jzqfxRd9JcI4ZDhFgW90X4K3afq690kiyizAq+SujsYLdY2vHgGM2tZKM8lvVVA5xNGb
+         CyQ4YJqTNruzJE+lbu3mXhyGkgWm6ujLWDXGy8lhhhM7EdME8y6V92MpR401d+qHUBk1
+         RuVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX1JxDT7rO1hMpRQSUk32Sr6mJVVzRKmE1rqGq5bVQXwVzomjmbdDKFoPvwNPTxEbZF3FY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs8hwiL4ajBJwZm12ZK7/QcAH71FtKWOB0ftf/g6AjMDK0Pg+n
+	0CE/kyJAgNJUdsQbZ0TS1X4CsAkdQSh4kvXfwi62l7eLwA6x5C9tjIgiHJyhXBt3UUGMkwNb+Qa
+	xZ240U21FYLfrFHmdNmyIKy940isH0Pse2HS3
+X-Google-Smtp-Source: AGHT+IEU9079HmdtThcsiN8JY3iJ1eHKyBPsG+CZSLZMAH2usfwIpF0g9bdh4YwDboVE3ql8z1EaPMYZFS9J2snJ4E8=
+X-Received: by 2002:a05:600c:1da5:b0:42b:a8fc:3937 with SMTP id
+ 5b1f17b1804b1-42cdcd1ec3amr514975e9.4.1726320887370; Sat, 14 Sep 2024
+ 06:34:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240913085812.1030686-1-chenhuacai@loongson.cn>
-In-Reply-To: <20240913085812.1030686-1-chenhuacai@loongson.cn>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 14 Sep 2024 15:33:59 +0200
-Message-ID: <CABgObfaNgSX=3RJjksLq+g9qq6r6HO=YgAXRE4UQdPPL0XKifw@mail.gmail.com>
-Subject: Re: [GIT PULL] LoongArch KVM changes for v6.12
-To: Huacai Chen <chenhuacai@loongson.cn>
-Cc: Huacai Chen <chenhuacai@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>, 
-	Jiaxun Yang <jiaxun.yang@flygoat.com>
+References: <cover.1726009989.git.ackerleytng@google.com> <MN0PR11MB61813367958D393369C0AD8399662@MN0PR11MB6181.namprd11.prod.outlook.com>
+In-Reply-To: <MN0PR11MB61813367958D393369C0AD8399662@MN0PR11MB6181.namprd11.prod.outlook.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Sat, 14 Sep 2024 06:34:36 -0700
+Message-ID: <CAGtprH-GczOb64XrLpdW4ObRG7Gsv8tHWNhiW7=2dE=OAF7-Rw@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/39] 1G page support for guest_memfd
+To: "Du, Fan" <fan.du@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, "tabba@google.com" <tabba@google.com>, 
+	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
+	"jgg@nvidia.com" <jgg@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
+	"david@redhat.com" <david@redhat.com>, "rientjes@google.com" <rientjes@google.com>, 
+	"fvdl@google.com" <fvdl@google.com>, "jthoughton@google.com" <jthoughton@google.com>, 
+	"seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"Li, Zhiquan1" <zhiquan1.li@intel.com>, "Miao, Jun" <jun.miao@intel.com>, 
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
+	"mike.kravetz@oracle.com" <mike.kravetz@oracle.com>, "Aktas, Erdem" <erdemaktas@google.com>, 
+	"qperret@google.com" <qperret@google.com>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>, 
+	"willy@infradead.org" <willy@infradead.org>, "shuah@kernel.org" <shuah@kernel.org>, 
+	"brauner@kernel.org" <brauner@kernel.org>, "bfoster@redhat.com" <bfoster@redhat.com>, 
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "pvorel@suse.cz" <pvorel@suse.cz>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, 
+	"anup@brainfault.org" <anup@brainfault.org>, "Xu, Haibo1" <haibo1.xu@intel.com>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
+	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, "pgonda@google.com" <pgonda@google.com>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
+	"linux-fsdevel@kvack.org" <linux-fsdevel@kvack.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 13, 2024 at 11:07=E2=80=AFAM Huacai Chen <chenhuacai@loongson.c=
-n> wrote:
+On Fri, Sep 13, 2024 at 6:08=E2=80=AFPM Du, Fan <fan.du@intel.com> wrote:
 >
-> The following changes since commit da3ea35007d0af457a0afc87e84fddaebc4e0b=
-63:
+> ...
+> >
+> > Hello,
+> >
+> > This patchset is our exploration of how to support 1G pages in guest_me=
+mfd,
+> > and
+> > how the pages will be used in Confidential VMs.
+> >
+> > The patchset covers:
+> >
+> > + How to get 1G pages
+> > + Allowing mmap() of guest_memfd to userspace so that both private and
+> > shared
 >
->   Linux 6.11-rc7 (2024-09-08 14:50:28 -0700)
+> Hi Ackerley
 >
-> are available in the Git repository at:
+> Thanks for posting new version :)
 >
->   git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson=
-.git tags/loongarch-kvm-6.12
->
-> for you to fetch changes up to 3abb708ec0be25da16a1ee9f1ab5cbc93f3256f3:
->
->   LoongArch: KVM: Implement function kvm_para_has_feature() (2024-09-12 2=
-2:56:14 +0800)
+> W.r.t above description and below patch snippet from Patch 26-29,
+> Does this new design aim to backup shared and private GPA with a single
+> Hugetlb spool which equal VM instance total memory?
 
-Pulled, thanks.
+Yes.
+>
+> By my understanding, before this new changes, shared memfd and gmem fd
+> has dedicate hugetlb pool, that's two copy/reservation of hugetlb spool.
 
-Paolo
+Selftests attached to this series use single gmem fd to back guest memory.
 
-> ----------------------------------------------------------------
-> LoongArch KVM changes for v6.12
 >
-> 1. Revert qspinlock to test-and-set simple lock on VM.
-> 2. Add Loongson Binary Translation extension support.
-> 3. Add PMU support for guest.
-> 4. Enable paravirt feature control from VMM.
-> 5. Implement function kvm_para_has_feature().
->
-> ----------------------------------------------------------------
-> Bibo Mao (6):
->       LoongArch: Revert qspinlock to test-and-set simple lock on VM
->       LoongArch: KVM: Add VM feature detection function
->       LoongArch: KVM: Add Binary Translation extension support
->       LoongArch: KVM: Add vm migration support for LBT registers
->       LoongArch: KVM: Enable paravirt feature control from VMM
->       LoongArch: KVM: Implement function kvm_para_has_feature()
->
-> Song Gao (1):
->       LoongArch: KVM: Add PMU support for guest
->
->  arch/loongarch/include/asm/Kbuild          |   1 -
->  arch/loongarch/include/asm/kvm_csr.h       |   6 +
->  arch/loongarch/include/asm/kvm_host.h      |  37 +++-
->  arch/loongarch/include/asm/kvm_para.h      |  12 +
->  arch/loongarch/include/asm/kvm_vcpu.h      |  11 +
->  arch/loongarch/include/asm/loongarch.h     |  11 +-
->  arch/loongarch/include/asm/paravirt.h      |   7 +
->  arch/loongarch/include/asm/qspinlock.h     |  41 ++++
->  arch/loongarch/include/uapi/asm/Kbuild     |   2 -
->  arch/loongarch/include/uapi/asm/kvm.h      |  20 ++
->  arch/loongarch/include/uapi/asm/kvm_para.h |  21 ++
->  arch/loongarch/kernel/paravirt.c           |  47 ++--
->  arch/loongarch/kernel/setup.c              |   2 +
->  arch/loongarch/kernel/smp.c                |   4 +-
->  arch/loongarch/kvm/exit.c                  |  46 ++--
->  arch/loongarch/kvm/vcpu.c                  | 340 +++++++++++++++++++++++=
-+++++-
->  arch/loongarch/kvm/vm.c                    |  69 +++++-
->  17 files changed, 616 insertions(+), 61 deletions(-)
->  create mode 100644 arch/loongarch/include/asm/qspinlock.h
->  create mode 100644 arch/loongarch/include/uapi/asm/kvm_para.h
+> Does Qemu require new changes as well? I'd like to have a test of this se=
+ries
+> if you can share Qemu branch?
 >
 
+We are going to discuss this RFC series and related issues at LPC.
+Once the next steps are finalized, the plan will be to send out an
+improved version. You can use/modify the selftests that are part of
+this series to test this feature with software protected VMs for now.
+
+Qemu will require changes for this feature on top of already floated
+gmem integration series [1] that adds software protected VM support to
+Qemu. If you are interested in testing this feature with TDX VMs then
+it needs multiple series to set up the right test environment
+(including [2]). We haven't considered posting Qemu patches and it
+will be a while before we can get to it.
+
+[1] https://patchew.org/QEMU/20230914035117.3285885-1-xiaoyao.li@intel.com/
+[2] https://patchwork.kernel.org/project/kvm/cover/20231115071519.2864957-1=
+-xiaoyao.li@intel.com/
 
