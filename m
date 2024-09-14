@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-26912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9699C978EBA
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 09:06:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 839D6978EBD
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 09:06:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 398DA28C5FA
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 07:06:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B945AB27C73
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 07:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CEC1D130B;
-	Sat, 14 Sep 2024 07:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F411D1737;
+	Sat, 14 Sep 2024 07:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mE05eoHG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XK7UerGB"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345301D12EF;
-	Sat, 14 Sep 2024 07:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682361D12EA;
+	Sat, 14 Sep 2024 07:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726297320; cv=none; b=e/rC7ebpFWH8JK8cSeRskeMfoL+rKcdTgTJozS3LNwe9SXlj8Pehjwu7sUm7oTUeVDES7HVhArphl/6sVQqEyIUPbQWozwykHXybuoyl5dMHe/akheYSPoXnUxqXvVs6XbloVFbfS78DCQukcbioSnWAgynNjIChii+c9tWS2gM=
+	t=1726297323; cv=none; b=uUUNO/mIEbD4FVbIlgqZkaWyqSNZ9jiHkwbMn+lKNciX7vn8URXvcsMGusprsECuArTF02RTDEIRAdJaUu+5HFHYYF3jWHf1HU9QEZkgXMGMKdluo3auuT2NDr/zrWMAci32qcKXiMaJGsSmXzCrJXxi+9iQ3D2ol8lBgFV/XTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726297320; c=relaxed/simple;
-	bh=RPa+ulwIzhMZ5m/sqo9YLmXKAMy+I/zbCrWW8L0dxrQ=;
+	s=arc-20240116; t=1726297323; c=relaxed/simple;
+	bh=M4FmLtoUVjDaLJG+tUmv0c1pIfIWLYH5Bz71t6kstTk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jkY21ReU8bX/nmx4gUIiX9D3O/HQl/Eu0Gcuic+3++E3KCC69P59RyaszRjGD+E/DBqNHVxU8b/Cb0nGHTiO/KrDb2hAEjDkl6SHj+axyZg9wcbMcS5/+OqDIkJXesX3K9aEX+MpbY3eaZFrlWvBqYclk9zePNNNzcWpabt9DsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mE05eoHG; arc=none smtp.client-ip=198.175.65.11
+	 MIME-Version; b=P97t05FJPfDA7sX3WBrcMmmv15EGnExirYin21siezJgvFIeYRu+uiAjKP6Y8BC5zYCQgD9Vr1hmdBTguHnRWLaeI85eEYBVIvyyVOAzf8kYwAghA0Q5lZD2NXep0kwEyWLHXGV+OzzcE5sOX9nBD6ZoZkTBWnNlCPmoB+OOUuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XK7UerGB; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726297319; x=1757833319;
+  t=1726297322; x=1757833322;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RPa+ulwIzhMZ5m/sqo9YLmXKAMy+I/zbCrWW8L0dxrQ=;
-  b=mE05eoHGS0WGqZHUb21T1Sycd/92C1XKUSEa8C/bAqcemTJdiDrzxi3w
-   ke9b7w3YAA78rvfpudTUvot4pLE9hwOQLMkr91sOmCjgk6hRZ0FMeFK1I
-   nUJTd2hdiraDiX2YzuzHlDZ7njZ6/h2ac/7t7gXMHYcN6tq6Cqh+k2U0Y
-   Y9aU9rzB+eNJATRqHKNQpJ3whBbdMeNApikzs6aup2r6Qgyy97d5zVEiQ
-   kEX5ucBfFrWuK/VIsnb/GSSqLK1djVTEzyImnRYMNWWfeYUqErTcxgxar
-   nufj0vZB0d4RlKS6o+FnvioDGng0gpqGu5BVh633VQhsjxRda3l1BS1SE
+  bh=M4FmLtoUVjDaLJG+tUmv0c1pIfIWLYH5Bz71t6kstTk=;
+  b=XK7UerGBQWPJJq6U5+UUErH8aVe4yFiDko5YXGF5ZfnagahZMYyvJ2ZW
+   GRVZEqZ8T4rPcSBdCU7/G4QeybRLSkebk+kJIAQTvnnEqqXyhdydj2bh8
+   l7qbmq/cp549v2xSnUd1rtihVIbQEf8xKf8q0I0lqV/eC/7T1mc7lBp++
+   GBdjTZ721qAZ39nnbzkZnbwt2Y+AmqgEavBNrM9HT+U5/rhYWyQLN5FEw
+   CMyrO6mZzq8lbvXddCKWptbwNDQOT9IfNVIvluJfzrP1K/WZb5FOUro97
+   9utEJotSsm4wDZv+koYi6FebmCfyeVywcHDCKxuXBtBNC+OrV+Jav4uly
    w==;
-X-CSE-ConnectionGUID: zlmavc13Q/6/MKTaELOtfQ==
-X-CSE-MsgGUID: +6ioKSAIRseWeS7jSHOxaQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11194"; a="35778890"
+X-CSE-ConnectionGUID: uNThJpO9Rk2ecFFYHAsemQ==
+X-CSE-MsgGUID: LG8Msil4Tp2QgYOHPZNtwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11194"; a="35778899"
 X-IronPort-AV: E=Sophos;i="6.10,228,1719903600"; 
-   d="scan'208";a="35778890"
+   d="scan'208";a="35778899"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2024 00:01:59 -0700
-X-CSE-ConnectionGUID: xX9dpccoQfuljbLCf59VfA==
-X-CSE-MsgGUID: EvYNJMgrQauRR3P1fSDofw==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2024 00:02:02 -0700
+X-CSE-ConnectionGUID: TuQxA9nDRt+TpaV1XfE+6g==
+X-CSE-MsgGUID: FqI4piiFRryiZ6XGpGAoYA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,228,1719903600"; 
-   d="scan'208";a="67951014"
+   d="scan'208";a="67951026"
 Received: from emr.sh.intel.com ([10.112.229.56])
-  by fmviesa006.fm.intel.com with ESMTP; 14 Sep 2024 00:01:56 -0700
+  by fmviesa006.fm.intel.com with ESMTP; 14 Sep 2024 00:01:59 -0700
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>
@@ -72,9 +72,9 @@ Cc: kvm@vger.kernel.org,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [kvm-unit-tests patch v6 17/18] x86: pmu: Adjust lower boundary of branch-misses event
-Date: Sat, 14 Sep 2024 10:17:27 +0000
-Message-Id: <20240914101728.33148-18-dapeng1.mi@linux.intel.com>
+Subject: [kvm-unit-tests patch v6 18/18] x86: pmu: Optimize emulated instruction validation
+Date: Sat, 14 Sep 2024 10:17:28 +0000
+Message-Id: <20240914101728.33148-19-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240914101728.33148-1-dapeng1.mi@linux.intel.com>
 References: <20240914101728.33148-1-dapeng1.mi@linux.intel.com>
@@ -86,107 +86,177 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since the IBPB command is added to force to trigger a branch miss at
-least, the lower boundary of branch misses event is increased to 1 by
-default. For these CPUs without IBPB support, adjust dynamically the
-lower boundary to 0 to avoid false positive.
+For support CPUs supporting PERF_GLOBAL_CTRL MSR, the validation for
+emulated instruction can be improved to check against precise counts for
+instructions and branches events instead of a rough range.
+
+Move enabling and disabling PERF_GLOBAL_CTRL MSR into kvm_fep_asm blob,
+thus instructions and branches events can be verified against precise
+counts.
 
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- x86/pmu.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ x86/pmu.c | 108 ++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 65 insertions(+), 43 deletions(-)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 279d418d..c7848fd1 100644
+index c7848fd1..3a5659b2 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -90,12 +90,12 @@ struct pmu_event {
- 	{"llc references", 0x4f2e, 1, 2*N},
- 	{"llc misses", 0x412e, 1, 1*N},
- 	{"branches", 0x00c4, 1*N, 1.1*N},
--	{"branch misses", 0x00c5, 0, 0.1*N},
-+	{"branch misses", 0x00c5, 1, 0.1*N},
- }, amd_gp_events[] = {
- 	{"core cycles", 0x0076, 1*N, 50*N},
- 	{"instructions", 0x00c0, 10*N, 10.2*N},
- 	{"branches", 0x00c2, 1*N, 1.1*N},
--	{"branch misses", 0x00c3, 0, 0.1*N},
-+	{"branch misses", 0x00c3, 1, 0.1*N},
- }, fixed_events[] = {
- 	{"fixed 0", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
- 	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
-@@ -111,6 +111,7 @@ enum {
- 	INTEL_REF_CYCLES_IDX	= 2,
- 	INTEL_LLC_MISSES_IDX	= 4,
- 	INTEL_BRANCHES_IDX	= 5,
-+	INTEL_BRANCH_MISS_IDX	= 6,
- };
+@@ -14,11 +14,6 @@
  
- /*
-@@ -120,6 +121,7 @@ enum {
- enum {
- 	AMD_INSTRUCTIONS_IDX    = 1,
- 	AMD_BRANCHES_IDX	= 2,
-+	AMD_BRANCH_MISS_IDX	= 3,
- };
+ #define N 1000000
  
- char *buf;
-@@ -184,7 +186,8 @@ static inline void loop(u64 cntrs)
- }
+-// These values match the number of instructions and branches in the
+-// assembly block in check_emulated_instr().
+-#define EXPECTED_INSTR 17
+-#define EXPECTED_BRNCH 5
+-
+ #define IBPB_JMP_INSTRNS      9
+ #define IBPB_JMP_BRANCHES     2
  
- static void adjust_events_range(struct pmu_event *gp_events,
--				int instruction_idx, int branch_idx)
-+				int instruction_idx, int branch_idx,
-+				int branch_miss_idx)
- {
- 	/*
- 	 * If HW supports GLOBAL_CTRL MSR, enabling and disabling PMCs are
-@@ -205,6 +208,17 @@ static void adjust_events_range(struct pmu_event *gp_events,
- 		gp_events[branch_idx].min = LOOP_BRANCHES;
- 		gp_events[branch_idx].max = LOOP_BRANCHES;
- 	}
+@@ -71,6 +66,40 @@ do {								\
+ 		     : "edi");					\
+ } while (0)
+ 
++/* the number of instructions and branches of the kvm_fep_asm() blob */
++#define KVM_FEP_INSTR	22
++#define KVM_FEP_BRNCH	5
 +
-+	/*
-+	 * For CPUs without IBPB support, no way to force to trigger a
-+	 * branch miss and the measured branch misses is possible to be
-+	 * 0. Thus overwrite the lower boundary of branch misses event
-+	 * to 0 to avoid false positive.
-+	 */
-+	if (!has_ibpb()) {
-+		/* branch misses event */
-+		gp_events[branch_miss_idx].min = 0;
-+	}
- }
++/*
++ * KVM_FEP is a magic prefix that forces emulation so
++ * 'KVM_FEP "jne label\n"' just counts as a single instruction.
++ */
++#define kvm_fep_asm(_wrmsr)			\
++do {						\
++	asm volatile(				\
++		_wrmsr "\n\t"			\
++		"mov %%ecx, %%edi;\n\t"		\
++		"mov $0x0, %%eax;\n\t"		\
++		"cmp $0x0, %%eax;\n\t"		\
++		KVM_FEP "jne 1f\n\t"		\
++		KVM_FEP "jne 1f\n\t"		\
++		KVM_FEP "jne 1f\n\t"		\
++		KVM_FEP "jne 1f\n\t"		\
++		KVM_FEP "jne 1f\n\t"		\
++		"mov $0xa, %%eax; cpuid;\n\t"	\
++		"mov $0xa, %%eax; cpuid;\n\t"	\
++		"mov $0xa, %%eax; cpuid;\n\t"	\
++		"mov $0xa, %%eax; cpuid;\n\t"	\
++		"mov $0xa, %%eax; cpuid;\n\t"	\
++		"1: mov %%edi, %%ecx; \n\t"	\
++		"xor %%eax, %%eax; \n\t"	\
++		"xor %%edx, %%edx;\n\t"		\
++		_wrmsr "\n\t"			\
++		:				\
++		: "a"(eax), "d"(edx), "c"(ecx)	\
++		: "ebx", "edi");		\
++} while (0)
++
+ typedef struct {
+ 	uint32_t ctr;
+ 	uint32_t idx;
+@@ -672,6 +701,7 @@ static void check_running_counter_wrmsr(void)
  
- volatile uint64_t irq_received;
-@@ -918,6 +932,7 @@ int main(int ac, char **av)
+ static void check_emulated_instr(void)
  {
- 	int instruction_idx;
- 	int branch_idx;
-+	int branch_miss_idx;
++	u32 eax, edx, ecx;
+ 	uint64_t status, instr_start, brnch_start;
+ 	uint64_t gp_counter_width = (1ull << pmu.gp_counter_width) - 1;
+ 	unsigned int branch_idx = pmu.is_intel ?
+@@ -679,6 +709,7 @@ static void check_emulated_instr(void)
+ 	unsigned int instruction_idx = pmu.is_intel ?
+ 				       INTEL_INSTRUCTIONS_IDX :
+ 				       AMD_INSTRUCTIONS_IDX;
++
+ 	pmu_counter_t brnch_cnt = {
+ 		.ctr = MSR_GP_COUNTERx(0),
+ 		/* branch instructions */
+@@ -694,55 +725,46 @@ static void check_emulated_instr(void)
+ 	if (this_cpu_has_perf_global_status())
+ 		pmu_clear_global_status();
  
- 	setup_vm();
- 	handle_irq(PMI_VECTOR, cnt_overflow);
-@@ -934,6 +949,7 @@ int main(int ac, char **av)
- 		gp_events_size = sizeof(intel_gp_events)/sizeof(intel_gp_events[0]);
- 		instruction_idx = INTEL_INSTRUCTIONS_IDX;
- 		branch_idx = INTEL_BRANCHES_IDX;
-+		branch_miss_idx = INTEL_BRANCH_MISS_IDX;
+-	start_event(&brnch_cnt);
+-	start_event(&instr_cnt);
++	__start_event(&brnch_cnt, 0);
++	__start_event(&instr_cnt, 0);
  
- 		/*
- 		 * For legacy Intel CPUS without clflush/clflushopt support,
-@@ -950,9 +966,10 @@ int main(int ac, char **av)
- 		gp_events = (struct pmu_event *)amd_gp_events;
- 		instruction_idx = AMD_INSTRUCTIONS_IDX;
- 		branch_idx = AMD_BRANCHES_IDX;
-+		branch_miss_idx = AMD_BRANCH_MISS_IDX;
- 		report_prefix_push("AMD");
+-	brnch_start = -EXPECTED_BRNCH;
+-	instr_start = -EXPECTED_INSTR;
++	brnch_start = -KVM_FEP_BRNCH;
++	instr_start = -KVM_FEP_INSTR;
+ 	wrmsr(MSR_GP_COUNTERx(0), brnch_start & gp_counter_width);
+ 	wrmsr(MSR_GP_COUNTERx(1), instr_start & gp_counter_width);
+-	// KVM_FEP is a magic prefix that forces emulation so
+-	// 'KVM_FEP "jne label\n"' just counts as a single instruction.
+-	asm volatile(
+-		"mov $0x0, %%eax\n"
+-		"cmp $0x0, %%eax\n"
+-		KVM_FEP "jne label\n"
+-		KVM_FEP "jne label\n"
+-		KVM_FEP "jne label\n"
+-		KVM_FEP "jne label\n"
+-		KVM_FEP "jne label\n"
+-		"mov $0xa, %%eax\n"
+-		"cpuid\n"
+-		"mov $0xa, %%eax\n"
+-		"cpuid\n"
+-		"mov $0xa, %%eax\n"
+-		"cpuid\n"
+-		"mov $0xa, %%eax\n"
+-		"cpuid\n"
+-		"mov $0xa, %%eax\n"
+-		"cpuid\n"
+-		"label:\n"
+-		:
+-		:
+-		: "eax", "ebx", "ecx", "edx");
+ 
+-	if (this_cpu_has_perf_global_ctrl())
+-		wrmsr(pmu.msr_global_ctl, 0);
++	if (this_cpu_has_perf_global_ctrl()) {
++		eax = BIT(0) | BIT(1);
++		ecx = pmu.msr_global_ctl;
++		edx = 0;
++		kvm_fep_asm("wrmsr");
++	} else {
++		eax = ecx = edx = 0;
++		kvm_fep_asm("nop");
++	}
+ 
+-	stop_event(&brnch_cnt);
+-	stop_event(&instr_cnt);
++	__stop_event(&brnch_cnt);
++	__stop_event(&instr_cnt);
+ 
+ 	// Check that the end count - start count is at least the expected
+ 	// number of instructions and branches.
+-	report(instr_cnt.count - instr_start >= EXPECTED_INSTR,
+-	       "instruction count");
+-	report(brnch_cnt.count - brnch_start >= EXPECTED_BRNCH,
+-	       "branch count");
++	if (this_cpu_has_perf_global_ctrl()) {
++		report(instr_cnt.count - instr_start == KVM_FEP_INSTR,
++		       "instruction count");
++		report(brnch_cnt.count - brnch_start == KVM_FEP_BRNCH,
++		       "branch count");
++	} else {
++		report(instr_cnt.count - instr_start >= KVM_FEP_INSTR,
++		       "instruction count");
++		report(brnch_cnt.count - brnch_start >= KVM_FEP_BRNCH,
++		       "branch count");
++	}
++
+ 	if (this_cpu_has_perf_global_status()) {
+ 		// Additionally check that those counters overflowed properly.
+ 		status = rdmsr(pmu.msr_global_status);
+-		report(status & 1, "branch counter overflow");
+-		report(status & 2, "instruction counter overflow");
++		report(status & BIT_ULL(0), "branch counter overflow");
++		report(status & BIT_ULL(1), "instruction counter overflow");
  	}
--	adjust_events_range(gp_events, instruction_idx, branch_idx);
-+	adjust_events_range(gp_events, instruction_idx, branch_idx, branch_miss_idx);
  
- 	printf("PMU version:         %d\n", pmu.version);
- 	printf("GP counters:         %d\n", pmu.nr_gp_counters);
+ 	report_prefix_pop();
 -- 
 2.40.1
 
