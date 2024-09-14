@@ -1,275 +1,575 @@
-Return-Path: <kvm+bounces-26889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1898978CD4
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 04:47:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45552978D28
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 05:42:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64A16286D9F
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 02:47:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03AFE288552
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 03:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B408514A8B;
-	Sat, 14 Sep 2024 02:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ibhPAm5k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9190018039;
+	Sat, 14 Sep 2024 03:42:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E5DD528;
-	Sat, 14 Sep 2024 02:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726282063; cv=fail; b=SmW//S74cDuVK0vVD9JrrzVXy3zdzgmoOiR/X33G5iYm0bCYrzV99Trble/YMbDNYqjQz7/FkR8CnjAfZeDKRv4qRhof0OboLmm+/HjTxCmaA9MwC+PKmFv1M2ujZPdXg1Xd/se/KhMORF24F94KTH+JwTTlR8B8RJKzrBJ7vJM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726282063; c=relaxed/simple;
-	bh=EBfFYu34rXvKAqIC5KuTTl7Eu9VUKvv09db12qPpYZQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lyv87oUJ823WnLb4qsfHvuc0Qzi6v8aAraOuuRCqJZpf0as/FVvftOKNVJOzalXhdWweagnNwlGrGTosWNWkR5EvAusa+x+Ktt4C3ONX1oAJHKI5FXhZ4QkcOEvuDH3w0xNuIsh3vVIcK0CRgng25PGrpaRBuswCB0fQL5RDcvM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ibhPAm5k; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726282063; x=1757818063;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=EBfFYu34rXvKAqIC5KuTTl7Eu9VUKvv09db12qPpYZQ=;
-  b=ibhPAm5ke2IbpOUS4/krGPGT4Vqgsbsvkc/LgAKaqrRG/0EN8ODyTA1+
-   Hf+v22wXlYB4KnpvRKNzq1MX3H9bTOw4Pfo2DNjk2Dxzo3IFNNmLyhy6e
-   4ntUD703M6ZnBVXo2JY8pdZ4HqtrVUggncVRw9abMWJyu2EBl10HgvmTa
-   KWazGAvHZpxb98qLCPSI5pqiE3Kd6Kt/066b7kCL2PBlw49g3KcMnTACk
-   v3nHwCyLFKEHYiChd8mwOVOZ22X50IUSsfYuOtNEvEsHNDsRcbshpmCuX
-   +egrdH3hsFUSvw1acAbPnrcxJMjr+yTDIIYpZFsjWfATNZ0nBilgr4E6t
-   A==;
-X-CSE-ConnectionGUID: pWvNNf9/SYyytgoA40td/g==
-X-CSE-MsgGUID: krrYZTAXRmm0S/iuPkfaWw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11194"; a="29091252"
-X-IronPort-AV: E=Sophos;i="6.10,227,1719903600"; 
-   d="scan'208";a="29091252"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2024 19:47:40 -0700
-X-CSE-ConnectionGUID: XqzBxkPwS0yljGClzs7OQA==
-X-CSE-MsgGUID: 4tGjl74fT3uxSMPpeOVpug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,227,1719903600"; 
-   d="scan'208";a="68225279"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Sep 2024 19:47:40 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 13 Sep 2024 19:47:39 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 13 Sep 2024 19:47:39 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 13 Sep 2024 19:47:39 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 13 Sep 2024 19:47:38 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=S9T8oYGy0f32dshXgZ+dVwRj0EtobnuktpE7MofzsrE74zUoTs2MM4hswxljf8IrUzRkU5ejatDPRoGgzvm+QDZvI9l6HnzT+6ZNiDK6Qt85ZCDz7qqJGk4ghYdIVO0PVHCgDmeO8hcOgC4+mh+bxJqfItJHM7cWy4lFNVT7KDbjB5eDedfpkpGZ15gST7IERp9qENmU+Wqmeni7qkZxS5WVCWaS7MtKuEc/Yb567dYTs05IYZfwTNRpIh1BK5EzqH5TXY0FcmlqsGCP8otKobVbAidqhtbVK+VpCwEMoc06TdX787IzRrhLU5ZHkRird9FzxCNC9m+CIi2zJnBqig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EBfFYu34rXvKAqIC5KuTTl7Eu9VUKvv09db12qPpYZQ=;
- b=UuLNkqtBdAOA8ozt3TsbqDNZI8sE8oeT6wi20oTD9gTd3Idjr6XlX6i/LIzfN7Y+QMRt7sYgiH+YDPsIfyzyDfFRd+fWcwquID+3qpW9XuaEWd1vP7omf183WjT1cfsEAnyyke5gvR3Pu8OgPwPoCXjzFLlJt3llkvFTbm6JrvzQz993vGFI9Xp66BZaI9l8jPBL7V6exo8SPoqBrkal2VYgr0KBLdnSyJdibQr4MNjhTwggPEcvJEpASYeAqcOiOuwTQsc7SwC/d82dMD3TmFqjS2mZNqpcSWnbH1wJ2wpyIS/wWzZ4jiNR/pqiO0r0pD9A4dVUuLa2pyi6umfAqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by IA0PR11MB8303.namprd11.prod.outlook.com (2603:10b6:208:487::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.18; Sat, 14 Sep
- 2024 02:47:28 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1%5]) with mapi id 15.20.7962.021; Sat, 14 Sep 2024
- 02:47:27 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Williams, Dan J" <dan.j.williams@intel.com>, Zhi Wang
-	<zhiwang@kernel.org>, Alexey Kardashevskiy <aik@amd.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, "linux-coco@lists.linux.dev"
-	<linux-coco@lists.linux.dev>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, Suravee Suthikulpanit
-	<suravee.suthikulpanit@amd.com>, Alex Williamson
-	<alex.williamson@redhat.com>, "Williams, Dan J" <dan.j.williams@intel.com>,
-	"pratikrajesh.sampat@amd.com" <pratikrajesh.sampat@amd.com>,
-	"michael.day@amd.com" <michael.day@amd.com>, "david.kaplan@amd.com"
-	<david.kaplan@amd.com>, "dhaval.giani@amd.com" <dhaval.giani@amd.com>,
-	Santosh Shukla <santosh.shukla@amd.com>, Tom Lendacky
-	<thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, "Alexander
- Graf" <agraf@suse.de>, Nikunj A Dadhania <nikunj@amd.com>, Vasant Hegde
-	<vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>
-Subject: RE: [RFC PATCH 11/21] KVM: SEV: Add TIO VMGEXIT and bind TDI
-Thread-Topic: [RFC PATCH 11/21] KVM: SEV: Add TIO VMGEXIT and bind TDI
-Thread-Index: AQHa9WDNQ67YRCpYD0iE+VoTl/u3uLJV3PKAgACLXYCAAENmsA==
-Date: Sat, 14 Sep 2024 02:47:27 +0000
-Message-ID: <BN9PR11MB527607712924E6574159C4908C662@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240823132137.336874-1-aik@amd.com>
- <20240823132137.336874-12-aik@amd.com>
- <20240913165011.000028f4.zhiwang@kernel.org>
- <66e4b7fabf8df_ae21294c7@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-In-Reply-To: <66e4b7fabf8df_ae21294c7@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|IA0PR11MB8303:EE_
-x-ms-office365-filtering-correlation-id: 134ec7d1-989f-4f55-af83-08dcd4679235
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?GLDChXPcwMUPO7xwycL3hQl0rlLqnDy0XvsI6yHnHETnloO5zkaY+g9rAiA2?=
- =?us-ascii?Q?qUQjZ59qItKQOL1q4PvI5GYcQ/AI6S9IqX2QppTwFpqe7SYLicX9jmHA2qlr?=
- =?us-ascii?Q?quayS2AxsblDfXSOGvjWoRvnsBHnqyLd+UwccnfvsbT8L2AXtnr8/tG5x1LT?=
- =?us-ascii?Q?KnwViwbfs4nwJFTAbfrzr+2yUucHEiuiosVi8+aCvHONRz++mBacYkt/b45X?=
- =?us-ascii?Q?wDXy6wgoMQB7dwrR6IfjBU/qJDwjnrWQvPPkU+FtcXPUNx3rQs367V743rYA?=
- =?us-ascii?Q?Vjx3oOepIk4cshx8dNp+rhh+gukz6g7ywxwGML9UcsUKBYqoA0m1Y8Sr5fcL?=
- =?us-ascii?Q?NyqH+XE7pIIpv0Cksq1xrDuMs+voidmKFxMsrnbyVyGoSFUkHR3Uheur+cPK?=
- =?us-ascii?Q?TlbixoHtLKPmuX9yZg1oG92ZZK45h4XrgHY4+w+jpDCEPMPR3DzxnC5Ex4HO?=
- =?us-ascii?Q?+6MRk021YuFhYE/jnE9gP1Cglaev4FcmVvuYp3WGu5AEdf2j4vGcWxfqJmtn?=
- =?us-ascii?Q?gSAaUq9uJVfOMPepb1LPYgLfYvLe6kIBMdJ8tBKK8iX8voT+TKMFtmv/QjO0?=
- =?us-ascii?Q?YIbAectBefnQEVOYDdkBkU7K5Lboa8zzsWvBaexD2jpewzrBX5n9yHbCG+YP?=
- =?us-ascii?Q?pUTE1oT67rFNFdVlfWf+Z8/BtjSRFFgOHS2uSk6/TSVpp9IS2LMztGYtAK/8?=
- =?us-ascii?Q?i5w9Sk6z1C9I8510syNERvmMM9q0Uv9y1sHOvOcApoZHnYPTnO1VbUva2WuM?=
- =?us-ascii?Q?T87YBRhV44pNsd583OY2rIv5yZ9Ow3xYXBq//hIizIonROQ3/rxzaI0fhVt8?=
- =?us-ascii?Q?M/QaA+qhTIq0g0ZmlErvwrEaD5B382Ax14JqlsfnXZ0Kc5cC2z9qdkB1VWzN?=
- =?us-ascii?Q?qHIUoqEU2z2OPwfV4VWtbcJA0CzF/n6GomIlE0a8nAgwQAhL05zifGDu2SCD?=
- =?us-ascii?Q?dNQITrk4Oym+4/Msk6l2SlSivKhqWpsL/CNcwqP1j3OWeojAk5s1o9mVpCPf?=
- =?us-ascii?Q?f2AYFMdruOBxq2ZWwS7xWMnaSES9JDZsuGMy2vrDvQc+YhULoxe8k3kBxMQk?=
- =?us-ascii?Q?2MwcEbq/2FZhPZljjc2fuGYPUgKZ3u8Xybo2yso7/DCf+5QD/KkngAc/5rwQ?=
- =?us-ascii?Q?Ky7sMa/B8AguDM39TEmixG0mimrBkB+6F0LqFM4xDSpx2KIkxTyyygzfy8YQ?=
- =?us-ascii?Q?XSNiq/SmsYPGgZEP9FKuQAVDYpzRrJLrbB1ziAoDE9r4WkEitBWHb1RvpUxY?=
- =?us-ascii?Q?M8rBIZsC50VnW5AfIqQiGfFWM/mkTpOtmKuFAwd5LUm3gdRr0Q2zUkyPMfhY?=
- =?us-ascii?Q?zcaHinlMOPf8JHW3O8ki0O0YWwvdAb7bgHBJhIBu/fsoKMbuFinx8PNRj6Iy?=
- =?us-ascii?Q?Mfjw2iT8zKdWJb+gbCasgSq24Fnaey2W0NRrGPrO7fD4+LCDMg=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?w5UkG/ouDpQieYVL+fH9+7getaxQeIZO0tQws5F39jVRbK0awZAW5Bv3H2Z7?=
- =?us-ascii?Q?4wRSq6I+DCxAj2Fs7YtZFvVBMflJJCH7NgftBbfCd9/MiJb7tPoggR6P3KvI?=
- =?us-ascii?Q?e5fbGmf4o7Y37PueVIbANbnR9hzyv9vibTWIVnT1b/XmloUTIaK8fM74tCJX?=
- =?us-ascii?Q?1LH4znWICK1Pt+uaVrdri4IkgMB2jIBcjqyh3Dq9FymFu8ZW1agfq8s4QS/r?=
- =?us-ascii?Q?nlnfaJAnOEf7mldj34QADDGnwaPmeKMPQ3fQ+s9rHDh1KtfmlJi1gihGTD4N?=
- =?us-ascii?Q?uUosWiOK2hFAat9Bk/ggcEASCw4mEOWVsuRIE6S48EW2w8sqtv9Faaml/o8N?=
- =?us-ascii?Q?Sx6qAcijwr6VqpJZcz4CsYMv+hTWhJ0yqjJgFXVbE/izOE+51WDCLKIH3uJO?=
- =?us-ascii?Q?HBhrMdOdTZIkDEnjE3gPaIukbEyIUvj0sA6Q74ai5XA/Tqekq+DLe5NyaObt?=
- =?us-ascii?Q?rMYzeBu4aJJD9+lffHkW2BcJWOGVtSE9y9JmtPFvYpOJ9NE43heY8IarTZrJ?=
- =?us-ascii?Q?9c4BR781PPw8mv0o+IdmShuHoglh2OyDaKCD03mAbwY4RjtYRlotRi/n7gVl?=
- =?us-ascii?Q?pr5fNDtPTeSf2yesKOyW3IXcE2rRlkzffqnsxfL986pGVCobUKpqrbgGG8FP?=
- =?us-ascii?Q?v+RWxzYSupWmfbynsWDh+QHsrFI5VeJZnqzHNgTZzdm0cy6H4wLD/txsMFK2?=
- =?us-ascii?Q?7t4LI4W+pZEmpWSCb32B3NPRFMi3qJ4VO30vxUv+C+ot4owcylq7+AmVl79W?=
- =?us-ascii?Q?OunmZQTr+7iDTqwbMbFgmSwfhchP4s9ksaeNDoNM18DqKG/VHHL/dWcXQMaI?=
- =?us-ascii?Q?AzZh4b+OdsFum4A8y26FqcOpuUA0BWgBvX/odWBPZYs730lIxzKAbf8oVnkW?=
- =?us-ascii?Q?zA4n3vMbroGbwVkrLO2WTNX3cgWJcFuKZbPTcIBemXEkRkWIZeXW7k2ONlqK?=
- =?us-ascii?Q?yuBRVazBVsSrUloqgH9pFjhO8thGsMzOut/21/nVRm9xd0dgao9p885EpmIB?=
- =?us-ascii?Q?JsQyqYDs8vz17Z6l3ZAPwRpVZVD2UXJBl+hpzfOVdN32kaPFiuPybmlRhjMJ?=
- =?us-ascii?Q?d/Wa4bDxD9WyNaqPIpwaOVDhq/BBG0v0dZ7iXFq/6F7F37QwKkbOH6iTaQWH?=
- =?us-ascii?Q?Pi+TJaegeV6oAIqzEqvHnwBwk3JJ+Dr/ednxwIwfZ2bJBIXGBHfVS2M04ZRT?=
- =?us-ascii?Q?J5/Du1ID5KLopvxgBGQKa4cSeOJCTbVHCZUJtzgZ1P29JgGvjOycaqJ9G+/H?=
- =?us-ascii?Q?iEoITvfjtlD07CtsrBwcf2DaNS9xyuFSpMZgi5CKDHqRN3Od7G0U/dQVSf0X?=
- =?us-ascii?Q?fFk5sGeztlHR6M4Fgp9fg6sGoR2TBc0A7JY77w5ZOq/pg2Mj4ENH8Jdis6p9?=
- =?us-ascii?Q?olUrWdWJxEPDQHEG+cJQFqGS8CGgqxEmcxpRnitbQsGRcCT07ukc2bHF8Opi?=
- =?us-ascii?Q?VdXg50gf1CGtJ7Dp3X8wqABE6BIF9TfTd+MDRpUMuFxMsD4pRJUoa2cUwk4u?=
- =?us-ascii?Q?4SyZ86UVqz0a0D4WAOsCSTrRmUluTb2oVR+M1TemAo11Os3c4dSTEfdHQhXd?=
- =?us-ascii?Q?eHEjty+z9VdEFtLeQqjXuX1VWX0GOSCG+TGecUcr?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B5E1863F;
+	Sat, 14 Sep 2024 03:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726285370; cv=none; b=eGYCBbFsq/jAx5mUgaegfeXaSG2gy7pXzIcOxkTzP/P2EIBe8GJTH7934nDzbAGW0AtrhuutN11jh4tszGBjqJQRk/LWMAvSLWPkhx8b8/PBSOoOXw92F4SOQvLr1vCYdjNAKFTf9B1dk+VR4d8dI12nGvJLX/9jFRNRu7F5C+8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726285370; c=relaxed/simple;
+	bh=lBiaqH9un8KG0gpPx0kvI5NAKncEnABf+jVDZpdfrfE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=RMm821d8HarsOokmYrk66Ul2dgXlvjxxfUYXHEg/Mf0YDJm0cIelEomVLDoi4zJ/92CuXiJPaNp11BZxBTZMvphqC1r7kXxHSB1VDcLgSS7RLszKtcgwbzGPPUQWwuadmR633TfKFJEAP3J4aqG1HTCyd40CB1GQ8Exs2SmbtO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8AxKOk0BuVmZq4HAA--.16726S3;
+	Sat, 14 Sep 2024 11:42:44 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMDxcNYyBuVm9XwGAA--.35887S3;
+	Sat, 14 Sep 2024 11:42:42 +0800 (CST)
+Subject: Re: [PATCH V3 09/11] LoongArch: KVM: Add PCHPIC read and write
+ functions
+To: Xianglai Li <lixianglai@loongson.cn>, linux-kernel@vger.kernel.org
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+ WANG Xuerui <kernel@xen0n.name>
+References: <20240910114501.4062476-1-lixianglai@loongson.cn>
+ <20240910114501.4062476-4-lixianglai@loongson.cn>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <6013af5d-5d35-3ecf-5bd0-2c557ace3fe8@loongson.cn>
+Date: Sat, 14 Sep 2024 11:42:41 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 134ec7d1-989f-4f55-af83-08dcd4679235
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Sep 2024 02:47:27.9075
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 88/Cpdv+C68vAPY21vLlYsrgig2Eti66AbKTWGtx5AjsoMv0RER7lese3xniGV8z7eOUc044RDsgIZUfPS+h4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8303
-X-OriginatorOrg: intel.com
+In-Reply-To: <20240910114501.4062476-4-lixianglai@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMDxcNYyBuVm9XwGAA--.35887S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj9fXoW3Cw15ZF13uw4rtF4xAF4DWrX_yoW8XF43Co
+	WfJF1F93W8Kw1rCrWjkr9rJF4jyrs2k3yUZa9Yv398AF4xX3s8KF17K34Utr13X395Kr1f
+	C3yIqr4kXa92ywnrl-sFpf9Il3svdjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYx7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv
+	67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GF
+	ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
+	4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jY
+	SoJUUUUU=
 
-> From: Dan Williams <dan.j.williams@intel.com>
-> Sent: Saturday, September 14, 2024 6:09 AM
->=20
-> Zhi Wang wrote:
-> > On Fri, 23 Aug 2024 23:21:25 +1000
-> > Alexey Kardashevskiy <aik@amd.com> wrote:
-> >
-> > > The SEV TIO spec defines a new TIO_GUEST_MESSAGE message to
-> > > provide a secure communication channel between a SNP VM and
-> > > the PSP.
-> > >
-> > > The defined messages provide way to read TDI info and do secure
-> > > MMIO/DMA setup.
-> > >
-> > > On top of this, GHCB defines an extension to return certificates/
-> > > measurements/report and TDI run status to the VM.
-> > >
-> > > The TIO_GUEST_MESSAGE handler also checks if a specific TDI bound
-> > > to the VM and exits the KVM to allow the userspace to bind it.
-> > >
-> >
-> > Out of curiosity, do we have to handle the TDI bind/unbind in the kerne=
-l
-> > space? It seems we are get the relationship between modules more
-> > complicated. What is the design concern that letting QEMU to handle the
-> > TDI bind/unbind message, because QEMU can talk to VFIO/KVM and also
-> TSM.
->=20
-> Hmm, the flow I have in mind is:
->=20
-> Guest GHCx(BIND) =3D> KVM =3D> TSM GHCx handler =3D> VFIO state update + =
-TSM
-> low-level BIND
->=20
-> vs this: (if I undertand your question correctly?)
->=20
-> Guest GHCx(BIND) =3D> KVM =3D> TSM GHCx handler =3D> QEMU =3D> VFIO =3D> =
-TSM
-> low-level BIND
 
-Reading this patch appears that it's implemented this way except QEMU
-calls a KVM_DEV uAPI instead of going through VFIO (as Yilun suggested).
 
->=20
-> Why exit to QEMU only to turn around and call back into the kernel? VFIO
-> should already have the context from establishing the vPCI device as
-> "bind-capable" at setup time.
->=20
+On 2024/9/10 下午7:44, Xianglai Li wrote:
+> Implementation of IPI interrupt controller address
+> space read and write function simulation.
+> 
+> Implement interrupt injection interface under loongarch.
+> 
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
+> ---
+> Cc: Bibo Mao <maobibo@loongson.cn>
+> Cc: Huacai Chen <chenhuacai@kernel.org>
+> Cc: kvm@vger.kernel.org
+> Cc: loongarch@lists.linux.dev
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
+> Cc: WANG Xuerui <kernel@xen0n.name>
+> Cc: Xianglai li <lixianglai@loongson.cn>
+> 
+>   arch/loongarch/include/asm/kvm_host.h    |  18 ++
+>   arch/loongarch/include/asm/kvm_pch_pic.h |  31 +++
+>   arch/loongarch/include/uapi/asm/kvm.h    |   1 +
+>   arch/loongarch/kvm/intc/pch_pic.c        | 290 ++++++++++++++++++++++-
+>   arch/loongarch/kvm/vm.c                  |  34 +++
+>   5 files changed, 372 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+> index a4feb1b9c816..1259636d7ead 100644
+> --- a/arch/loongarch/include/asm/kvm_host.h
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -34,6 +34,22 @@
+>   #define KVM_REQ_TLB_FLUSH_GPA		KVM_ARCH_REQ(0)
+>   #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(1)
+>   
+> +/* KVM_IRQ_LINE irq field index values */
+> +#define KVM_LOONGARCH_IRQ_TYPE_SHIFT	24
+> +#define KVM_LOONGARCH_IRQ_TYPE_MASK	0xff
+> +#define KVM_LOONGARCH_IRQ_VCPU_SHIFT	16
+> +#define KVM_LOONGARCH_IRQ_VCPU_MASK	0xff
+> +#define KVM_LOONGARCH_IRQ_NUM_SHIFT	0
+> +#define KVM_LOONGARCH_IRQ_NUM_MASK	0xffff
+> +
+> +/* irq_type field */
+> +#define KVM_LOONGARCH_IRQ_TYPE_CPU_IP	0
+> +#define KVM_LOONGARCH_IRQ_TYPE_CPU_IO	1
+> +#define KVM_LOONGARCH_IRQ_TYPE_HT	2
+> +#define KVM_LOONGARCH_IRQ_TYPE_MSI	3
+> +#define KVM_LOONGARCH_IRQ_TYPE_IOAPIC	4
+> +#define KVM_LOONGARCH_IRQ_TYPE_ROUTE	5
+> +
+>   #define KVM_GUESTDBG_SW_BP_MASK		\
+>   	(KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP)
+>   #define KVM_GUESTDBG_VALID_MASK		\
+> @@ -50,6 +66,8 @@ struct kvm_vm_stat {
+>   	u64 ipi_write_exits;
+>   	u64 eiointc_read_exits;
+>   	u64 eiointc_write_exits;
+> +	u64 pch_pic_read_exits;
+> +	u64 pch_pic_write_exits;
+>   };
+>   
+>   struct kvm_vcpu_stat {
+> diff --git a/arch/loongarch/include/asm/kvm_pch_pic.h b/arch/loongarch/include/asm/kvm_pch_pic.h
+> index c320f66c2004..7a6625fdeab9 100644
+> --- a/arch/loongarch/include/asm/kvm_pch_pic.h
+> +++ b/arch/loongarch/include/asm/kvm_pch_pic.h
+> @@ -8,6 +8,35 @@
+>   
+>   #include <kvm/iodev.h>
+>   
+> +#define PCH_PIC_SIZE			0x3e8
+> +
+> +#define PCH_PIC_INT_ID_START		0x0
+> +#define PCH_PIC_INT_ID_END		0x7
+> +#define PCH_PIC_MASK_START		0x20
+> +#define PCH_PIC_MASK_END		0x27
+> +#define PCH_PIC_HTMSI_EN_START		0x40
+> +#define PCH_PIC_HTMSI_EN_END		0x47
+> +#define PCH_PIC_EDGE_START		0x60
+> +#define PCH_PIC_EDGE_END		0x67
+> +#define PCH_PIC_CLEAR_START		0x80
+> +#define PCH_PIC_CLEAR_END		0x87
+> +#define PCH_PIC_AUTO_CTRL0_START	0xc0
+> +#define PCH_PIC_AUTO_CTRL0_END		0xc7
+> +#define PCH_PIC_AUTO_CTRL1_START	0xe0
+> +#define PCH_PIC_AUTO_CTRL1_END		0xe7
+> +#define PCH_PIC_ROUTE_ENTRY_START	0x100
+> +#define PCH_PIC_ROUTE_ENTRY_END		0x13f
+> +#define PCH_PIC_HTMSI_VEC_START		0x200
+> +#define PCH_PIC_HTMSI_VEC_END		0x23f
+> +#define PCH_PIC_INT_IRR_START		0x380
+> +#define PCH_PIC_INT_IRR_END		0x38f
+> +#define PCH_PIC_INT_ISR_START		0x3a0
+> +#define PCH_PIC_INT_ISR_END		0x3af
+> +#define PCH_PIC_POLARITY_START		0x3e0
+> +#define PCH_PIC_POLARITY_END		0x3e7
+> +#define PCH_PIC_INT_ID_VAL		0x7000000UL
+> +#define PCH_PIC_INT_ID_VER		0x1UL
+> +
+>   struct loongarch_pch_pic {
+>   	spinlock_t lock;
+>   	struct kvm *kvm;
+> @@ -26,5 +55,7 @@ struct loongarch_pch_pic {
+>   	uint64_t pch_pic_base;
+>   };
+>   
+> +void pch_pic_set_irq(struct loongarch_pch_pic *s, int irq, int level);
+> +void pch_msi_set_irq(struct kvm *kvm, int irq, int level);
+>   int kvm_loongarch_register_pch_pic_device(void);
+>   #endif /* LOONGARCH_PCH_PIC_H */
+> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
+> index d019f88b6286..acf8db9e3dfb 100644
+> --- a/arch/loongarch/include/uapi/asm/kvm.h
+> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+> @@ -16,6 +16,7 @@
+>   
+>   #define KVM_COALESCED_MMIO_PAGE_OFFSET	1
+>   #define KVM_DIRTY_LOG_PAGE_OFFSET	64
+> +#define __KVM_HAVE_IRQ_LINE
+>   
+>   #define KVM_GUESTDBG_USE_SW_BP		0x00010000
+>   
+> diff --git a/arch/loongarch/kvm/intc/pch_pic.c b/arch/loongarch/kvm/intc/pch_pic.c
+> index 1888be1c9a8e..25a10bc3fff0 100644
+> --- a/arch/loongarch/kvm/intc/pch_pic.c
+> +++ b/arch/loongarch/kvm/intc/pch_pic.c
+> @@ -8,18 +8,304 @@
+>   #include <asm/kvm_vcpu.h>
+>   #include <linux/count_zeros.h>
+>   
+> +/* update the isr according to irq level and route irq to eiointc */
+> +static void pch_pic_update_irq(struct loongarch_pch_pic *s, int irq, int level)
+> +{
+> +	u64 mask = BIT(irq);
+> +
+> +	/*
+> +	 * set isr and route irq to eiointc and
+> +	 * the route table is in htmsi_vector[]
+> +	 */
+> +	if (level) {
+> +		if (mask & s->irr & ~s->mask) {
+> +			s->isr |= mask;
+> +			irq = s->htmsi_vector[irq];
+> +			eiointc_set_irq(s->kvm->arch.eiointc, irq, level);
+> +		}
+> +	} else {
+> +		if (mask & s->isr & ~s->irr) {
+> +			s->isr &= ~mask;
+> +			irq = s->htmsi_vector[irq];
+> +			eiointc_set_irq(s->kvm->arch.eiointc, irq, level);
+> +		}
+> +	}
+> +}
+> +
+> +/* msi irq handler */
+> +void pch_msi_set_irq(struct kvm *kvm, int irq, int level)
+> +{
+> +	eiointc_set_irq(kvm->arch.eiointc, irq, level);
+> +}
+> +
+> +/* called when a irq is triggered in pch pic */
+> +void pch_pic_set_irq(struct loongarch_pch_pic *s, int irq, int level)
+> +{
+> +	u64 mask = BIT(irq);
+> +
+> +	spin_lock(&s->lock);
+> +	if (level)
+> +		/* set irr */
+> +		s->irr |= mask;
+> +	else {
+> +		/* 0 level signal in edge triggered irq does not mean to clear irq
+> +		 * The irr register variable is cleared when the cpu writes to the
+> +		 * PCH_PIC_CLEAR_START address area
+> +		 */
+> +		if (s->edge & mask) {
+> +			spin_unlock(&s->lock);
+> +			return;
+> +		}
+> +		s->irr &= ~mask;
+> +	}
+> +	pch_pic_update_irq(s, irq, level);
+> +	spin_unlock(&s->lock);
+> +}
+> +
+> +/* update batch irqs, the irq_mask is a bitmap of irqs */
+> +static void pch_pic_update_batch_irqs(struct loongarch_pch_pic *s, u64 irq_mask, int level)
+> +{
+> +	int irq, bits;
+> +
+> +	/* find each irq by irqs bitmap and update each irq */
+> +	bits = sizeof(irq_mask) * 8;
+> +	irq = find_first_bit((void *)&irq_mask, bits);
+> +	while (irq < bits) {
+> +		pch_pic_update_irq(s, irq, level);
+> +		bitmap_clear((void *)&irq_mask, irq, 1);
+> +		irq = find_first_bit((void *)&irq_mask, bits);
+> +	}
+> +}
+> +
+> +/*
+> + * pch pic register is 64-bit, but it is accessed by 32-bit,
+> + * so we use high to get whether low or high 32 bits we want
+> + * to read.
+> + */
+> +static u32 pch_pic_read_reg(u64 *s, int high)
+> +{
+> +	u64 val = *s;
+> +
+> +	/* read the high 32 bits when the high is 1 */
+> +	return high ? (u32)(val >> 32) : (u32)val;
+> +}
+> +
+> +/*
+> + * pch pic register is 64-bit, but it is accessed by 32-bit,
+> + * so we use high to get whether low or high 32 bits we want
+> + * to write.
+> + */
+> +static u32 pch_pic_write_reg(u64 *s, int high, u32 v)
+> +{
+> +	u64 val = *s, data = v;
+> +
+> +	if (high) {
+> +		/*
+> +		 * Clear val high 32 bits
+> +		 * write the high 32 bits when the high is 1
+> +		 */
+> +		*s = (val << 32 >> 32) | (data << 32);
+> +		val >>= 32;
+> +	} else
+> +		/*
+> +		 * Clear val low 32 bits
+> +		 * write the low 32 bits when the high is 0
+> +		 */
+> +		*s = (val >> 32 << 32) | v;
+> +
+> +	return (u32)val;
+> +}
+> +
+> +static int loongarch_pch_pic_write(struct loongarch_pch_pic *s, gpa_t addr,
+> +					int len, const void *val)
+> +{
+> +	u32 old, data, offset, index;
+> +	u64 irq;
+> +	int ret;
+> +
+> +	ret = 0;
+> +	data = *(u32 *)val;
+> +	offset = addr - s->pch_pic_base;
+> +
+> +	spin_lock(&s->lock);
+> +	switch (offset) {
+> +	case PCH_PIC_MASK_START ... PCH_PIC_MASK_END:
+> +		offset -= PCH_PIC_MASK_START;
+> +		/* get whether high or low 32 bits we want to write */
+> +		index = offset >> 2;
+> +		old = pch_pic_write_reg(&s->mask, index, data);
+> +
+> +		/* enable irq when mask value change to 0 */
+> +		irq = (old & ~data) << (32 * index);
+> +		pch_pic_update_batch_irqs(s, irq, 1);
+> +
+> +		/* disable irq when mask value change to 1 */
+> +		irq = (~old & data) << (32 * index);
+> +		pch_pic_update_batch_irqs(s, irq, 0);
+> +		break;
+> +	case PCH_PIC_HTMSI_EN_START ... PCH_PIC_HTMSI_EN_END:
+> +		offset -= PCH_PIC_HTMSI_EN_START;
+> +		index = offset >> 2;
+> +		pch_pic_write_reg(&s->htmsi_en, index, data);
+> +		break;
+> +	case PCH_PIC_EDGE_START ... PCH_PIC_EDGE_END:
+> +		offset -= PCH_PIC_EDGE_START;
+> +		index = offset >> 2;
+> +		/* 1: edge triggered, 0: level triggered */
+> +		pch_pic_write_reg(&s->edge, index, data);
+> +		break;
+> +	case PCH_PIC_CLEAR_START ... PCH_PIC_CLEAR_END:
+> +		offset -= PCH_PIC_CLEAR_START;
+> +		index = offset >> 2;
+> +		/* write 1 to clear edge irq */
+> +		old = pch_pic_read_reg(&s->irr, index);
+> +		/*
+> +		 * get the irq bitmap which is edge triggered and
+> +		 * already set and to be cleared
+> +		 */
+> +		irq = old & pch_pic_read_reg(&s->edge, index) & data;
+> +		/* write irr to the new state where irqs have been cleared */
+> +		pch_pic_write_reg(&s->irr, index, old & ~irq);
+> +		/* update cleared irqs */
+> +		pch_pic_update_batch_irqs(s, irq, 0);
+> +		break;
+> +	case PCH_PIC_AUTO_CTRL0_START ... PCH_PIC_AUTO_CTRL0_END:
+> +		offset -= PCH_PIC_AUTO_CTRL0_START;
+> +		index = offset >> 2;
+> +		/* we only use default mode: fixed interrupt distribution mode */
+> +		pch_pic_write_reg(&s->auto_ctrl0, index, 0);
+> +		break;
+> +	case PCH_PIC_AUTO_CTRL1_START ... PCH_PIC_AUTO_CTRL1_END:
+> +		offset -= PCH_PIC_AUTO_CTRL1_START;
+> +		index = offset >> 2;
+> +		/* we only use default mode: fixed interrupt distribution mode */
+> +		pch_pic_write_reg(&s->auto_ctrl1, index, 0);
+> +		break;
+> +	case PCH_PIC_ROUTE_ENTRY_START ... PCH_PIC_ROUTE_ENTRY_END:
+> +		offset -= PCH_PIC_ROUTE_ENTRY_START;
+> +		/* only route to int0: eiointc */
+> +		s->route_entry[offset] = 1;
+> +		break;
+> +	case PCH_PIC_HTMSI_VEC_START ... PCH_PIC_HTMSI_VEC_END:
+> +		/* route table to eiointc */
+> +		offset -= PCH_PIC_HTMSI_VEC_START;
+> +		s->htmsi_vector[offset] = (u8)data;
+> +		break;
+> +	case PCH_PIC_POLARITY_START ... PCH_PIC_POLARITY_END:
+> +		offset -= PCH_PIC_POLARITY_START;
+> +		index = offset >> 2;
+> +
+> +		/* we only use defalut value 0: high level triggered */
+> +		pch_pic_write_reg(&s->polarity, index, 0);
+> +		break;
+> +	default:
+> +		ret = -EINVAL;
+> +		break;
+> +	}
+> +	spin_unlock(&s->lock);
+> +	return ret;
+> +}
+> +
+>   static int kvm_pch_pic_write(struct kvm_vcpu *vcpu,
+>   			struct kvm_io_device *dev,
+>   			gpa_t addr, int len, const void *val)
+>   {
+> -	return 0;
+> +	int ret;
+> +	struct loongarch_pch_pic *s = vcpu->kvm->arch.pch_pic;
+> +
+> +	if (!s) {
+> +		kvm_err("%s: pch pic irqchip not valid!\n", __func__);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* statistics of pch pic writing */
+> +	vcpu->kvm->stat.pch_pic_write_exits++;
+> +	ret = loongarch_pch_pic_write(s, addr, len, val);
+> +	return ret;
+> +}
+> +
+> +static int loongarch_pch_pic_read(struct loongarch_pch_pic *s, gpa_t addr, int len, void *val)
+> +{
+> +	int offset, index, ret = 0;
+> +	u32 data = 0;
+> +	u64 int_id = 0;
+> +
+> +	offset = addr - s->pch_pic_base;
+> +
+> +	spin_lock(&s->lock);
+> +	switch (offset) {
+> +	case PCH_PIC_INT_ID_START ... PCH_PIC_INT_ID_END:
+> +		/* int id version */
+> +		int_id |= (u64)PCH_PIC_INT_ID_VER << 32;
+> +		/* irq number */
+> +		int_id |= (u64)31 << (32 + 16);
+> +		/* int id value */
+> +		int_id |= PCH_PIC_INT_ID_VAL;
+> +		*(u64 *)val = int_id;
+> +		break;
+> +	case PCH_PIC_MASK_START ... PCH_PIC_MASK_END:
+> +		offset -= PCH_PIC_MASK_START;
+> +		index = offset >> 2;
+> +		/* read mask reg */
+> +		data = pch_pic_read_reg(&s->mask, index);
+> +		*(u32 *)val = data;
+> +		break;
+> +	case PCH_PIC_HTMSI_EN_START ... PCH_PIC_HTMSI_EN_END:
+> +		offset -= PCH_PIC_HTMSI_EN_START;
+> +		index = offset >> 2;
+> +		/* read htmsi enable reg */
+> +		data = pch_pic_read_reg(&s->htmsi_en, index);
+> +		*(u32 *)val = data;
+> +		break;
+> +	case PCH_PIC_EDGE_START ... PCH_PIC_EDGE_END:
+> +		offset -= PCH_PIC_EDGE_START;
+> +		index = offset >> 2;
+> +		/* read edge enable reg */
+> +		data = pch_pic_read_reg(&s->edge, index);
+> +		*(u32 *)val = data;
+> +		break;
+> +	case PCH_PIC_AUTO_CTRL0_START ... PCH_PIC_AUTO_CTRL0_END:
+> +	case PCH_PIC_AUTO_CTRL1_START ... PCH_PIC_AUTO_CTRL1_END:
+> +		/* we only use default mode: fixed interrupt distribution mode */
+> +		*(u32 *)val = 0;
+> +		break;
+> +	case PCH_PIC_ROUTE_ENTRY_START ... PCH_PIC_ROUTE_ENTRY_END:
+> +		/* only route to int0: eiointc */
+> +		*(u8 *)val = 1;
+> +		break;
+> +	case PCH_PIC_HTMSI_VEC_START ... PCH_PIC_HTMSI_VEC_END:
+> +		offset -= PCH_PIC_HTMSI_VEC_START;
+> +		/* read htmsi vector */
+> +		data = s->htmsi_vector[offset];
+> +		*(u8 *)val = data;
+> +		break;
+> +	case PCH_PIC_POLARITY_START ... PCH_PIC_POLARITY_END:
+> +		/* we only use defalut value 0: high level triggered */
+> +		*(u32 *)val = 0;
+> +		break;
+> +	default:
+> +		ret = -EINVAL;
+> +	}
+> +	spin_unlock(&s->lock);
+> +	return ret;
+>   }
+>   
+>   static int kvm_pch_pic_read(struct kvm_vcpu *vcpu,
+>   			struct kvm_io_device *dev,
+>   			gpa_t addr, int len, void *val)
+>   {
+> -	return 0;
+> +	int ret;
+> +	struct loongarch_pch_pic *s = vcpu->kvm->arch.pch_pic;
+> +
+> +	if (!s) {
+> +		kvm_err("%s: pch pic irqchip not valid!\n", __func__);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* statistics of pch pic reading */
+> +	vcpu->kvm->stat.pch_pic_read_exits++;
+> +	ret = loongarch_pch_pic_read(s, addr, len, val);
+> +	return ret;
+>   }
+>   
+>   static const struct kvm_io_device_ops kvm_pch_pic_ops = {
+> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
+> index 6b2e4f66ad26..5a60474bb933 100644
+> --- a/arch/loongarch/kvm/vm.c
+> +++ b/arch/loongarch/kvm/vm.c
+> @@ -5,6 +5,8 @@
+>   
+>   #include <linux/kvm_host.h>
+>   #include <asm/kvm_mmu.h>
+> +#include <asm/kvm_eiointc.h>
+> +#include <asm/kvm_pch_pic.h>
+>   
+>   const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>   	KVM_GENERIC_VM_STATS(),
+> @@ -103,3 +105,35 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>   {
+>   	return -ENOIOCTLCMD;
+>   }
+> +
+> +int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *data,
+> +			  bool line_status)
+> +{
+> +	bool level;
+> +	struct loongarch_pch_pic *s;
+> +	int type, vcpu, irq, vcpus, val, ret = 0;
+> +
+Had better check whether irqchip_in_kernel is enabled for ioctl 
+interface from userspace, such as:
+         if (!kvm_arch_irqchip_in_kernel(kvm))
+                 return -ENXIO;
 
-The general practice in VFIO is to design things around userspace driver
-control over the device w/o assuming the existence of KVM. When VMM
-comes to the picture the interaction with KVM is minimized unless
-for functional or perf reasons.
+> +	level = data->level;
+> +	val = data->irq;
+> +	s = kvm->arch.pch_pic;
+> +	vcpus = atomic_read(&kvm->online_vcpus);
+> +
+> +	type = (val >> KVM_LOONGARCH_IRQ_TYPE_SHIFT) & KVM_LOONGARCH_IRQ_TYPE_MASK;
+> +	vcpu = (val >> KVM_LOONGARCH_IRQ_VCPU_SHIFT) & KVM_LOONGARCH_IRQ_VCPU_MASK;
+> +	irq = (val >> KVM_LOONGARCH_IRQ_NUM_SHIFT) & KVM_LOONGARCH_IRQ_NUM_MASK;
+> +
+> +	switch (type) {
+> +	case KVM_LOONGARCH_IRQ_TYPE_IOAPIC:
+> +		if (irq < KVM_IRQCHIP_NUM_PINS)
+> +			pch_pic_set_irq(s, irq, level);
+> +		else if (irq < 256)
+> +			pch_msi_set_irq(kvm, irq, level);
+Can we use interface kvm_set_irq() to inject msi or irqline interrupt here?
 
-e.g. KVM needs to know whether an assigned device allows non-coherent
-DMA for proper cache control, or mdev/new vIOMMU object needs
-a reference to struct kvm, etc.=20
+Regards
+Bibo Mao
 
-sometimes frequent trap-emulates is too costly then KVM/VFIO may
-enable in-kernel acceleration to skip Qemu via eventfd, but in=20
-this case the slow-path via Qemu has been firstly implemented.
-
-Ideally BIND/UNBIND is not a frequent operation, so falling back to
-Qemu in a longer path is not a real problem. If no specific
-functionality or security reason for doing it in-kernel, I'm inclined
-to agree with Zhi here (though not about complexity).
-
+> +		else
+> +			ret = -EINVAL;
+> +		break;
+> +	default:
+> +		ret = -EINVAL;
+> +	}
+> +
+> +	return ret;
+> +}
+> 
 
 
