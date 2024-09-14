@@ -1,575 +1,252 @@
-Return-Path: <kvm+bounces-26890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45552978D28
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 05:42:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34252978D3F
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 06:12:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03AFE288552
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 03:42:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5888B1C228C7
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 04:12:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9190018039;
-	Sat, 14 Sep 2024 03:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8D618EA2;
+	Sat, 14 Sep 2024 04:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BkTjRtZz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B5E1863F;
-	Sat, 14 Sep 2024 03:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726285370; cv=none; b=eGYCBbFsq/jAx5mUgaegfeXaSG2gy7pXzIcOxkTzP/P2EIBe8GJTH7934nDzbAGW0AtrhuutN11jh4tszGBjqJQRk/LWMAvSLWPkhx8b8/PBSOoOXw92F4SOQvLr1vCYdjNAKFTf9B1dk+VR4d8dI12nGvJLX/9jFRNRu7F5C+8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726285370; c=relaxed/simple;
-	bh=lBiaqH9un8KG0gpPx0kvI5NAKncEnABf+jVDZpdfrfE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=RMm821d8HarsOokmYrk66Ul2dgXlvjxxfUYXHEg/Mf0YDJm0cIelEomVLDoi4zJ/92CuXiJPaNp11BZxBTZMvphqC1r7kXxHSB1VDcLgSS7RLszKtcgwbzGPPUQWwuadmR633TfKFJEAP3J4aqG1HTCyd40CB1GQ8Exs2SmbtO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8AxKOk0BuVmZq4HAA--.16726S3;
-	Sat, 14 Sep 2024 11:42:44 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMDxcNYyBuVm9XwGAA--.35887S3;
-	Sat, 14 Sep 2024 11:42:42 +0800 (CST)
-Subject: Re: [PATCH V3 09/11] LoongArch: KVM: Add PCHPIC read and write
- functions
-To: Xianglai Li <lixianglai@loongson.cn>, linux-kernel@vger.kernel.org
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
- WANG Xuerui <kernel@xen0n.name>
-References: <20240910114501.4062476-1-lixianglai@loongson.cn>
- <20240910114501.4062476-4-lixianglai@loongson.cn>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <6013af5d-5d35-3ecf-5bd0-2c557ace3fe8@loongson.cn>
-Date: Sat, 14 Sep 2024 11:42:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0018C1F;
+	Sat, 14 Sep 2024 04:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726287167; cv=fail; b=HiSu7gLjoVj1gL5UstESGYUzoT2FiaZIvvvJerx4/JfSBfjeVTLZTlx6ZeOu98HrecJuc2ZlIC+1l/UoRGfQIXKn/oxozwzxaSPfZXTWEKO1LjDsS3aUducDaFriUDXqSPNILF4HrNpfrMH4Ko2L0TUczh6iVTdVNbIAxlH2tOA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726287167; c=relaxed/simple;
+	bh=qutrNPxLFUf4mIt+VXSsxeDieRkGI7WWX4IAbMEkisA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UUHYMHCmnjqw1NExVHshtig1T920nqyjr1Jh1TB4lg1rK96OH9p0i0aAk9Z5Ywl+OjZ7eynQiLn4UyxIEhdaW0mFHC98XxAanR0fCjpdupAhkMwfRFTnhtQE0CNO/eFO5MLNmOqI3ihW77m/ehy7S1M5uYPN4vqEyTZMDQvg/6w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BkTjRtZz; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726287166; x=1757823166;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=qutrNPxLFUf4mIt+VXSsxeDieRkGI7WWX4IAbMEkisA=;
+  b=BkTjRtZz2jzkmcdG6ABbYwVQoWqI2ko9DiK0ZGAbB7Nxs6t+kGZMYZeO
+   yBCdyJe4xDz1cDAiYYnIAINcB8gSBX3QRz4MCXnNClgNIdP9wCEPF/pNy
+   isGM5vv+jMsdfpechQINm97Wq/gMl0pt8ZzAEItoJAkJ73AUZXGAPU70v
+   DohEA2sld7HMG6Gyin+eyt6C3Kc2YcbZssdev6zQsaanPHOUZcJy8qxen
+   0cYfwrbwcE01CECzM2ORyrRnmCkxLxvp+gV0H7O//kdJIN4D5tetN7WQI
+   ergP3w0pi0Jv5juQHXSsLoSOXk0CFI8Mh4rLX/MzhWjl4mjI2ObNQw9/E
+   Q==;
+X-CSE-ConnectionGUID: MtdNkzTgRhGeQGl1JIIq9A==
+X-CSE-MsgGUID: iLDRQe/+TSWbPTpAuO5wGA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11194"; a="42674946"
+X-IronPort-AV: E=Sophos;i="6.10,228,1719903600"; 
+   d="scan'208";a="42674946"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2024 21:12:45 -0700
+X-CSE-ConnectionGUID: wRogih7JS0OqFeBPIYp7og==
+X-CSE-MsgGUID: u2GLgWR8TYSs+J2/OjJZAw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,228,1719903600"; 
+   d="scan'208";a="68625739"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Sep 2024 21:12:45 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 13 Sep 2024 21:12:44 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 13 Sep 2024 21:12:44 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.41) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 13 Sep 2024 21:12:44 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Osr9qTr2UAXc8jTgb+8IStmw/6cg4yQrgc7sQ/lfpp2rjVPNYcenKxLY3BNVLAbBG+w5ydoUkTcmO0RXGISsSUH+o2ZMkEJltyXwcxZicoHfU8d5hCMQHvjSmEa8zcaNfnn6W78NfH7o9dH1qxTwAkk3qBO3RJ66e7+on0XSAOpbbcSKf7Qnhd0lt7c2dvQYvu7r2ASxXkPtUa8ktrLQJLSU75vF6vTCtKs6W3gG3T7IbJHBHV5lnLw7dC2YiDIclACd8JX3b77boQ94M8Ksug6DcT2awW3F6KJXEJKi3ZeihGYUs02s+AV2JuCQ7VSZjv/CVYMp//WodGoTd5ArQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BhN+PR4FRpuoS0QiudrymJtwv6aNMjzwsU+M2DKq83U=;
+ b=aWzXfoYZwKPz/4xRJgIXYblPl466b6XvY4EKW3oqs7QWmyfc4Oa6/mwoPCEjj8Q0u1pnCXMclmpNA91LVSn6unHzGeaHt42fPcvI0MsTIi1bujDXc6+6cJKijmA6qbFnEXPJMC6Bv5tXRIGdzklX3kCNM8TudmKujU3STKpwV6GQHOGotCFI60VUM4rdlwx3+uBPA3808ZzH58sT4yhwCgpCvJVQujGohgphv/VT3HWL8IjvuTJ+OE3ch3dHNoRvEQK/MNYdVVq/3FboRupgNbSoEG+Z0Twqp2NHjqxHreXHrR+/sGAq56oTA/s3rczgRQzYg+qbnwKiGcLmiKC6UA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by SN7PR11MB6828.namprd11.prod.outlook.com (2603:10b6:806:2a3::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.18; Sat, 14 Sep
+ 2024 04:12:42 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a%4]) with mapi id 15.20.7962.018; Sat, 14 Sep 2024
+ 04:12:42 +0000
+Message-ID: <ebc8812c-c16d-4465-a730-c1e49e211cc5@intel.com>
+Date: Sat, 14 Sep 2024 12:16:57 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/4] ida: Add ida_find_first_range()
+To: Matthew Wilcox <willy@infradead.org>
+CC: <joro@8bytes.org>, <jgg@nvidia.com>, <kevin.tian@intel.com>,
+	<baolu.lu@linux.intel.com>, <alex.williamson@redhat.com>,
+	<eric.auger@redhat.com>, <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
+	<chao.p.peng@linux.intel.com>, <iommu@lists.linux.dev>,
+	<zhenzhong.duan@intel.com>, <linux-kselftest@vger.kernel.org>,
+	<vasant.hegde@amd.com>
+References: <20240912131729.14951-1-yi.l.liu@intel.com>
+ <20240912131729.14951-2-yi.l.liu@intel.com>
+ <ZuMEsybAnOi_uSfY@casper.infradead.org>
+ <a24aad52-3da6-49d3-9df9-f418fad36434@intel.com>
+ <ZuRVu088KuMbtqsm@casper.infradead.org>
+Content-Language: en-US
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <ZuRVu088KuMbtqsm@casper.infradead.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR02CA0009.apcprd02.prod.outlook.com
+ (2603:1096:3:17::21) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240910114501.4062476-4-lixianglai@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMDxcNYyBuVm9XwGAA--.35887S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj9fXoW3Cw15ZF13uw4rtF4xAF4DWrX_yoW8XF43Co
-	WfJF1F93W8Kw1rCrWjkr9rJF4jyrs2k3yUZa9Yv398AF4xX3s8KF17K34Utr13X395Kr1f
-	C3yIqr4kXa92ywnrl-sFpf9Il3svdjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8wcxFpf
-	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-	UjIYCTnIWjp_UUUYx7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
-	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv
-	67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
-	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
-	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GF
-	ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
-	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
-	4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jY
-	SoJUUUUU=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SN7PR11MB6828:EE_
+X-MS-Office365-Filtering-Correlation-Id: ac55e80a-ad0b-4936-7288-08dcd4737a49
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?REw3ZG0zV29WN1BXeW1ZaEFRM0VOVHhBaHpKc2dJQi9XRGRzUHc3b3VGYkhR?=
+ =?utf-8?B?V1NteTJYQlVsaXFoT2E0NmVGV3VnOE9yVVM0cyt1bFhqNzdEcE5na012WlEr?=
+ =?utf-8?B?M25qL2ZTSTVaTnhsZHhUTlQ1N1JXemZkVnFOaHdCMUpaM3VGbHpKeXBLTGxF?=
+ =?utf-8?B?ckRRYkZWN1FkbHlaV3oxelUrZjdodkloVUVEMXJFOTRTUTRlR1NaVitvd1BQ?=
+ =?utf-8?B?TG1SbVRwNE1iRklpU0E1dnp0TVlONkEzejByK25ITmd1N28wb3IrUXBmL0Nm?=
+ =?utf-8?B?V2JNYlY5NW4wWlAvTDVUWEp1TStPTVZsMlFQMXZTdmI2N0RnY3dEdktwUUFr?=
+ =?utf-8?B?anJWbU1iaXFBWUJPZXo2OTJIWU8rZGQvSjN6ZHhQTU93SVVzWHlOS2wxMTZk?=
+ =?utf-8?B?NzdiQklObUwyWW9vWXJrWjhVTjJ6WTVTMGk2ZWNuWUtGV0dnMGFFaXNIcGlm?=
+ =?utf-8?B?MzQxSlRCNUp2UW1rU1FUcnVWeVZRVGJRN1gzZVBNWU41S2NMd0FsRmVac3lT?=
+ =?utf-8?B?S2JzMm1VUk1JRkE2ZjFVcEJIZHZZOEhyWFY4cXpqUVE2MGV6N3JrSHI1YSs2?=
+ =?utf-8?B?Wk51aXlFRHMxWlBLcW80MnpkQ1p2cWlvMjlwVGhHRmNhSW0vOFN4TGRhbGxa?=
+ =?utf-8?B?YUR1KzQ2TFI4Q3R0ZDJmemh1NnVQNVNidXF1bk9FMEZaZWxhVTE1dDhzZ05u?=
+ =?utf-8?B?NTQ0cjNsK0Fzc1dibEsvbzVobncwaW1zY1g0dGJGZU9QRUIyY09EcjRMVlZs?=
+ =?utf-8?B?dS82aFB2am5vQkFNcWEvWWVxWFJ4V2l4L1llSXNjZmJBRy9ydndqcXBPNU5D?=
+ =?utf-8?B?cWh6S1RpWHRlb05vaFZ6bEY2QVB3R0tsM3dVNmZxdE9iakNncDlsOGxVTGFo?=
+ =?utf-8?B?clhUejA2dXhFWVVBT3drRjludTVtN0VKSmUxTFpSajh3aW5RQ1Rtc0cxNmpD?=
+ =?utf-8?B?RXlxbExyVUZweDJPc1JPOXh2a1BoRWFlNUJKQVVGaVhFcjAxckl6UTVWQWVL?=
+ =?utf-8?B?R0hjeGh4MFh0bEFhT3V3WTUwc1NoTWI5S2UrM0R0RVdnaS90dUo4U3o4WHV5?=
+ =?utf-8?B?NEFWcXpzTHk1TWFoMkVBMStDSjhiWkhQWndBeXdKUk4yVWxSeFlLMmlta1Y5?=
+ =?utf-8?B?R1FraEdveUZVNU1jTHVYYXRrR2w2TXlYR3daYm1La3FMOGVQc2tFYytldTBT?=
+ =?utf-8?B?RnlOM0pyT1NUYnp5Znd6YXovTVJGdWRpTGhIZ25UVWxVazJOdVlDRENtamhx?=
+ =?utf-8?B?ZUhiTU1SMjROSXhTVFZWUzdGMnRJSUJQT3FXZWVBOFZTb2d2WjJRZVI5dDZD?=
+ =?utf-8?B?VEs4RWpCMzRZY2F1U1JOQ2JvdFMxdDloUTBYSWh0Tm1xcnpGaHYzemdicCtZ?=
+ =?utf-8?B?amlqejJNRjB4WWpkMC9BQnNoVlNnbHJUbU1tY0lveHJUUUJiSDNLZ2VDbHJo?=
+ =?utf-8?B?UmhHN3BOS2JFVDByakU2eGpoTlhvTzlZOCtTWlJ4RlBGNS9VSWp6TXFMZHdw?=
+ =?utf-8?B?VDNEa0pzenZkNmRNbVMvUGhtWE1xWFNETUtuS3VPN1AzQmhKWmJ4aktMdUg5?=
+ =?utf-8?B?bmx0c2lXTXRRcVZNeDBrb1hKeStYOW5RMTlKWW9Hdmx4VzFVU1RDQUptZFBl?=
+ =?utf-8?B?MkF1Q1V4ZVJ2RFd1NDdzN3hCbFdidnNEU0RkSXFoV2szSzRzYnZIVWl5OHdT?=
+ =?utf-8?B?WE9WQnpBUDNyZUloUUI4RjhPbWN2YnBQY2Q2LzZoRUlsb3p0d0FkV2NXazJp?=
+ =?utf-8?B?QTkyc3ZnVWxsRmNJSjRaUTBQLzJnV0ZDM0liOHZDQmRobHZuV0hNUjZ6UzhH?=
+ =?utf-8?B?L3RsQUZiWTRMK0JCbUZwQT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aTh3N09TTXNIbTdaZFdxaTR6OUhKRlNmOWRHUFZFYWkxZ25BSnBGRTVJOGkx?=
+ =?utf-8?B?T2tFaEVNdjNMb1JmZENialpaN2lFcVdBeEdndnRRR204alZFaWJ3emhDaWF1?=
+ =?utf-8?B?U29IbFQ0bVFHMlFQZW1OQTVuYnVqZEZvZmttcUtsckRGMnFLc1AwaXMvbDdN?=
+ =?utf-8?B?bEZlZHhOZUFWbVdxUU5pcjJBM3RGeFgrWTVkRHo2Y09MK1JCVHVUYXRNVnJ1?=
+ =?utf-8?B?bXAxSlloQ29qVFRVWktDWEhLMGRabzNLOU9LTTJHR1hiRmdObGJuS0ZPNjRn?=
+ =?utf-8?B?RG9uVlJscjlKS1hLTFo0ajN0VFVOcVRkU1VWYTNlMjBuM0pRbGdmczZlZE5r?=
+ =?utf-8?B?aG1GWVZtZnBIOG5VRjdac01FY0t6WXk2UmlHUmV5Yi9pN21aQ2hHcy9WdHBz?=
+ =?utf-8?B?azljbytZZDgwVWwxUHRKRVl3R01ZbkhBZ2o3bEFNMHM5aVEwdStvR0lXV3Vn?=
+ =?utf-8?B?MDQ0dllFeU8zdnB0SzJONkYvZkk1cVEvVVo2TXhTdEZlbW0wS3Zvb0QwYjdE?=
+ =?utf-8?B?cmY3MXFLYlVvaUtUSHBnN0tYYW9Dc0YydkxnWk1EbVNpMmVSeWFwNjBMOGs4?=
+ =?utf-8?B?V2dLMjBCTitSa0FBMnZZTmZ1RWZPWDdTd1VsSFpDRjJCY3FxOFZlaXl3ZmZy?=
+ =?utf-8?B?djR2RzRYODhRR0VLbzVhNU1PbGxnU29JYWdvVFRZQnFFMlQwMGpzZ0xUZGZP?=
+ =?utf-8?B?MkxRNDVxZnJBQ0lKK1NuWTNNT0pPb2ZMZlRiczQzaUJJOXlyMVRQRlpaNG9N?=
+ =?utf-8?B?M3I4bzlMV3FmYVBSZG5TSUdqM2ZocmVKUE1MZkthdzBTOVdWSFBhTXZWWkRL?=
+ =?utf-8?B?L1Q1eERHbkRqLzduTE51UXJMeGlhOHlrMjR5OXBWRDNJSEhod1FRc04zajJ6?=
+ =?utf-8?B?bjlsdzAybngvWlBaK3BpeHZzOGxGN2c3bERSeExMVHNnYkcxYlhRNjg1N29C?=
+ =?utf-8?B?NWpuK1ZBRHlzTUFKdU9JYlRFMVQ0T2I1UXV0Ti9PTHh1TlNpVjE1b3RNTDN2?=
+ =?utf-8?B?bmlEdnFjYk0veS9BQ1JndjY1QWtUTHNhbnp0TE5nQk1xbTkrMEJoL216a1RW?=
+ =?utf-8?B?WnNjZlNtemxrUmk3YzlmVUcxekcyL3NySkI3L3BSYTFETVNCd3ZVWHdGMXlC?=
+ =?utf-8?B?N0xOREFId1dHNGVZSnQ1di9RV0FPNzZqNUIzdERrMU02NHZGWHMwSThFd1RB?=
+ =?utf-8?B?Mkh4cWcySjRkSEozdlU3RVhNMEFMY1VaTTc4QktpMHU5a3lIZ1pYd3B0YUov?=
+ =?utf-8?B?dTQzM0JUMHpFcTdQSG9JdWZwcGlCbVltRkJyWGt3THBFaXhEeUF5MU1VcG5o?=
+ =?utf-8?B?ZGI4UlA5U0ZocUhleSs0aXoxbFAxL2NBdG05eXdwT0g1cGlkNklQand6dUJK?=
+ =?utf-8?B?RS9PQkh6bDZNSW1BL0FMM08zYmhia29Oa3lta0VTOWFmelpTZW1CTFBFLzdz?=
+ =?utf-8?B?TnFJd09kSmwwODNpSzZ1K3c4Qnk2eUJOTXIva081REw1WVprREs1K2pCS1pq?=
+ =?utf-8?B?SUxPSmZ3azlGZXl2ZE9GSUQweVYrMFgyMmlnb0VTK0FBUUNFcnVPbElISFNl?=
+ =?utf-8?B?RVRDMHhlREs4c2tmaDRoV0VUZ1VrNGtKMVFTVDJTRXBUNVhES3lTYkMrWTJG?=
+ =?utf-8?B?T0RDS0NYRGNUdU5MeWIySS9Ebk9oMW0wVDRvTzBzcThHVmgvTzdZRU14d0dJ?=
+ =?utf-8?B?OC9meU5LL3N5Rko0SFVpb2VFMXBRbjNvYzBBSUZPYWQ0NmplTitsMEdzSW5k?=
+ =?utf-8?B?b2JyRC9nS1RJVmVhMnVvTmx4UFMvTWZIcVMxUVFPV0tZY2FmMXQyc24vRWRx?=
+ =?utf-8?B?REtsUVRYTkNEeWNRV2F6YnN4M0JsNWlyaGpBTUlGZW54KzNnSlo5aHYxZGFw?=
+ =?utf-8?B?cFM0VUo5UTAwQUcwcmovWTZtQVAySVhNR2FENjR3bWVyQUlURXYwYSsvUzZj?=
+ =?utf-8?B?akc1TnpYdmc3NVFZQUxNSFZ4cnBjeTluMWF0Y1A4S2oxOEZzL3dXU1VGdFFS?=
+ =?utf-8?B?SlFZUjJkcDFJbWxiM1Z1WTRORHNLQ0NJbkFOS1dkY2d1TFExSHRJa2NtMWQz?=
+ =?utf-8?B?K2RFNHNsYUViZ3JybTJlU1pRd3JxekdQZGo4Uk9GTjdqNyt4S3NqQkpVZ0hZ?=
+ =?utf-8?Q?UoDqDKlEvPVWP1F1UXQXKEr1d?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ac55e80a-ad0b-4936-7288-08dcd4737a49
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2024 04:12:42.0773
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5YlXjTrW+IA7ky+Haddp0ZHT6S5Lc9m8GJTR4RF7MrQnPps6c2VIpNrPxTHou4gfRTGjKMcczBtqULWF24gAuA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6828
+X-OriginatorOrg: intel.com
 
-
-
-On 2024/9/10 下午7:44, Xianglai Li wrote:
-> Implementation of IPI interrupt controller address
-> space read and write function simulation.
+On 2024/9/13 23:09, Matthew Wilcox wrote:
+> On Fri, Sep 13, 2024 at 07:45:55PM +0800, Yi Liu wrote:
+>>> No test cases for the test suite?  ;-(
+>>
+>> let me add something like the below. :)
 > 
-> Implement interrupt injection interface under loongarch.
+> That looks pretty comprehensive, thanks!
 > 
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
-> ---
-> Cc: Bibo Mao <maobibo@loongson.cn>
-> Cc: Huacai Chen <chenhuacai@kernel.org>
-> Cc: kvm@vger.kernel.org
-> Cc: loongarch@lists.linux.dev
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
-> Cc: WANG Xuerui <kernel@xen0n.name>
-> Cc: Xianglai li <lixianglai@loongson.cn>
-> 
->   arch/loongarch/include/asm/kvm_host.h    |  18 ++
->   arch/loongarch/include/asm/kvm_pch_pic.h |  31 +++
->   arch/loongarch/include/uapi/asm/kvm.h    |   1 +
->   arch/loongarch/kvm/intc/pch_pic.c        | 290 ++++++++++++++++++++++-
->   arch/loongarch/kvm/vm.c                  |  34 +++
->   5 files changed, 372 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-> index a4feb1b9c816..1259636d7ead 100644
-> --- a/arch/loongarch/include/asm/kvm_host.h
-> +++ b/arch/loongarch/include/asm/kvm_host.h
-> @@ -34,6 +34,22 @@
->   #define KVM_REQ_TLB_FLUSH_GPA		KVM_ARCH_REQ(0)
->   #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(1)
->   
-> +/* KVM_IRQ_LINE irq field index values */
-> +#define KVM_LOONGARCH_IRQ_TYPE_SHIFT	24
-> +#define KVM_LOONGARCH_IRQ_TYPE_MASK	0xff
-> +#define KVM_LOONGARCH_IRQ_VCPU_SHIFT	16
-> +#define KVM_LOONGARCH_IRQ_VCPU_MASK	0xff
-> +#define KVM_LOONGARCH_IRQ_NUM_SHIFT	0
-> +#define KVM_LOONGARCH_IRQ_NUM_MASK	0xffff
-> +
-> +/* irq_type field */
-> +#define KVM_LOONGARCH_IRQ_TYPE_CPU_IP	0
-> +#define KVM_LOONGARCH_IRQ_TYPE_CPU_IO	1
-> +#define KVM_LOONGARCH_IRQ_TYPE_HT	2
-> +#define KVM_LOONGARCH_IRQ_TYPE_MSI	3
-> +#define KVM_LOONGARCH_IRQ_TYPE_IOAPIC	4
-> +#define KVM_LOONGARCH_IRQ_TYPE_ROUTE	5
-> +
->   #define KVM_GUESTDBG_SW_BP_MASK		\
->   	(KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP)
->   #define KVM_GUESTDBG_VALID_MASK		\
-> @@ -50,6 +66,8 @@ struct kvm_vm_stat {
->   	u64 ipi_write_exits;
->   	u64 eiointc_read_exits;
->   	u64 eiointc_write_exits;
-> +	u64 pch_pic_read_exits;
-> +	u64 pch_pic_write_exits;
->   };
->   
->   struct kvm_vcpu_stat {
-> diff --git a/arch/loongarch/include/asm/kvm_pch_pic.h b/arch/loongarch/include/asm/kvm_pch_pic.h
-> index c320f66c2004..7a6625fdeab9 100644
-> --- a/arch/loongarch/include/asm/kvm_pch_pic.h
-> +++ b/arch/loongarch/include/asm/kvm_pch_pic.h
-> @@ -8,6 +8,35 @@
->   
->   #include <kvm/iodev.h>
->   
-> +#define PCH_PIC_SIZE			0x3e8
-> +
-> +#define PCH_PIC_INT_ID_START		0x0
-> +#define PCH_PIC_INT_ID_END		0x7
-> +#define PCH_PIC_MASK_START		0x20
-> +#define PCH_PIC_MASK_END		0x27
-> +#define PCH_PIC_HTMSI_EN_START		0x40
-> +#define PCH_PIC_HTMSI_EN_END		0x47
-> +#define PCH_PIC_EDGE_START		0x60
-> +#define PCH_PIC_EDGE_END		0x67
-> +#define PCH_PIC_CLEAR_START		0x80
-> +#define PCH_PIC_CLEAR_END		0x87
-> +#define PCH_PIC_AUTO_CTRL0_START	0xc0
-> +#define PCH_PIC_AUTO_CTRL0_END		0xc7
-> +#define PCH_PIC_AUTO_CTRL1_START	0xe0
-> +#define PCH_PIC_AUTO_CTRL1_END		0xe7
-> +#define PCH_PIC_ROUTE_ENTRY_START	0x100
-> +#define PCH_PIC_ROUTE_ENTRY_END		0x13f
-> +#define PCH_PIC_HTMSI_VEC_START		0x200
-> +#define PCH_PIC_HTMSI_VEC_END		0x23f
-> +#define PCH_PIC_INT_IRR_START		0x380
-> +#define PCH_PIC_INT_IRR_END		0x38f
-> +#define PCH_PIC_INT_ISR_START		0x3a0
-> +#define PCH_PIC_INT_ISR_END		0x3af
-> +#define PCH_PIC_POLARITY_START		0x3e0
-> +#define PCH_PIC_POLARITY_END		0x3e7
-> +#define PCH_PIC_INT_ID_VAL		0x7000000UL
-> +#define PCH_PIC_INT_ID_VER		0x1UL
-> +
->   struct loongarch_pch_pic {
->   	spinlock_t lock;
->   	struct kvm *kvm;
-> @@ -26,5 +55,7 @@ struct loongarch_pch_pic {
->   	uint64_t pch_pic_base;
->   };
->   
-> +void pch_pic_set_irq(struct loongarch_pch_pic *s, int irq, int level);
-> +void pch_msi_set_irq(struct kvm *kvm, int irq, int level);
->   int kvm_loongarch_register_pch_pic_device(void);
->   #endif /* LOONGARCH_PCH_PIC_H */
-> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
-> index d019f88b6286..acf8db9e3dfb 100644
-> --- a/arch/loongarch/include/uapi/asm/kvm.h
-> +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> @@ -16,6 +16,7 @@
->   
->   #define KVM_COALESCED_MMIO_PAGE_OFFSET	1
->   #define KVM_DIRTY_LOG_PAGE_OFFSET	64
-> +#define __KVM_HAVE_IRQ_LINE
->   
->   #define KVM_GUESTDBG_USE_SW_BP		0x00010000
->   
-> diff --git a/arch/loongarch/kvm/intc/pch_pic.c b/arch/loongarch/kvm/intc/pch_pic.c
-> index 1888be1c9a8e..25a10bc3fff0 100644
-> --- a/arch/loongarch/kvm/intc/pch_pic.c
-> +++ b/arch/loongarch/kvm/intc/pch_pic.c
-> @@ -8,18 +8,304 @@
->   #include <asm/kvm_vcpu.h>
->   #include <linux/count_zeros.h>
->   
-> +/* update the isr according to irq level and route irq to eiointc */
-> +static void pch_pic_update_irq(struct loongarch_pch_pic *s, int irq, int level)
-> +{
-> +	u64 mask = BIT(irq);
-> +
-> +	/*
-> +	 * set isr and route irq to eiointc and
-> +	 * the route table is in htmsi_vector[]
-> +	 */
-> +	if (level) {
-> +		if (mask & s->irr & ~s->mask) {
-> +			s->isr |= mask;
-> +			irq = s->htmsi_vector[irq];
-> +			eiointc_set_irq(s->kvm->arch.eiointc, irq, level);
-> +		}
-> +	} else {
-> +		if (mask & s->isr & ~s->irr) {
-> +			s->isr &= ~mask;
-> +			irq = s->htmsi_vector[irq];
-> +			eiointc_set_irq(s->kvm->arch.eiointc, irq, level);
-> +		}
-> +	}
-> +}
-> +
-> +/* msi irq handler */
-> +void pch_msi_set_irq(struct kvm *kvm, int irq, int level)
-> +{
-> +	eiointc_set_irq(kvm->arch.eiointc, irq, level);
-> +}
-> +
-> +/* called when a irq is triggered in pch pic */
-> +void pch_pic_set_irq(struct loongarch_pch_pic *s, int irq, int level)
-> +{
-> +	u64 mask = BIT(irq);
-> +
-> +	spin_lock(&s->lock);
-> +	if (level)
-> +		/* set irr */
-> +		s->irr |= mask;
-> +	else {
-> +		/* 0 level signal in edge triggered irq does not mean to clear irq
-> +		 * The irr register variable is cleared when the cpu writes to the
-> +		 * PCH_PIC_CLEAR_START address area
-> +		 */
-> +		if (s->edge & mask) {
-> +			spin_unlock(&s->lock);
-> +			return;
-> +		}
-> +		s->irr &= ~mask;
-> +	}
-> +	pch_pic_update_irq(s, irq, level);
-> +	spin_unlock(&s->lock);
-> +}
-> +
-> +/* update batch irqs, the irq_mask is a bitmap of irqs */
-> +static void pch_pic_update_batch_irqs(struct loongarch_pch_pic *s, u64 irq_mask, int level)
-> +{
-> +	int irq, bits;
-> +
-> +	/* find each irq by irqs bitmap and update each irq */
-> +	bits = sizeof(irq_mask) * 8;
-> +	irq = find_first_bit((void *)&irq_mask, bits);
-> +	while (irq < bits) {
-> +		pch_pic_update_irq(s, irq, level);
-> +		bitmap_clear((void *)&irq_mask, irq, 1);
-> +		irq = find_first_bit((void *)&irq_mask, bits);
-> +	}
-> +}
-> +
-> +/*
-> + * pch pic register is 64-bit, but it is accessed by 32-bit,
-> + * so we use high to get whether low or high 32 bits we want
-> + * to read.
-> + */
-> +static u32 pch_pic_read_reg(u64 *s, int high)
-> +{
-> +	u64 val = *s;
-> +
-> +	/* read the high 32 bits when the high is 1 */
-> +	return high ? (u32)(val >> 32) : (u32)val;
-> +}
-> +
-> +/*
-> + * pch pic register is 64-bit, but it is accessed by 32-bit,
-> + * so we use high to get whether low or high 32 bits we want
-> + * to write.
-> + */
-> +static u32 pch_pic_write_reg(u64 *s, int high, u32 v)
-> +{
-> +	u64 val = *s, data = v;
-> +
-> +	if (high) {
-> +		/*
-> +		 * Clear val high 32 bits
-> +		 * write the high 32 bits when the high is 1
-> +		 */
-> +		*s = (val << 32 >> 32) | (data << 32);
-> +		val >>= 32;
-> +	} else
-> +		/*
-> +		 * Clear val low 32 bits
-> +		 * write the low 32 bits when the high is 0
-> +		 */
-> +		*s = (val >> 32 << 32) | v;
-> +
-> +	return (u32)val;
-> +}
-> +
-> +static int loongarch_pch_pic_write(struct loongarch_pch_pic *s, gpa_t addr,
-> +					int len, const void *val)
-> +{
-> +	u32 old, data, offset, index;
-> +	u64 irq;
-> +	int ret;
-> +
-> +	ret = 0;
-> +	data = *(u32 *)val;
-> +	offset = addr - s->pch_pic_base;
-> +
-> +	spin_lock(&s->lock);
-> +	switch (offset) {
-> +	case PCH_PIC_MASK_START ... PCH_PIC_MASK_END:
-> +		offset -= PCH_PIC_MASK_START;
-> +		/* get whether high or low 32 bits we want to write */
-> +		index = offset >> 2;
-> +		old = pch_pic_write_reg(&s->mask, index, data);
-> +
-> +		/* enable irq when mask value change to 0 */
-> +		irq = (old & ~data) << (32 * index);
-> +		pch_pic_update_batch_irqs(s, irq, 1);
-> +
-> +		/* disable irq when mask value change to 1 */
-> +		irq = (~old & data) << (32 * index);
-> +		pch_pic_update_batch_irqs(s, irq, 0);
-> +		break;
-> +	case PCH_PIC_HTMSI_EN_START ... PCH_PIC_HTMSI_EN_END:
-> +		offset -= PCH_PIC_HTMSI_EN_START;
-> +		index = offset >> 2;
-> +		pch_pic_write_reg(&s->htmsi_en, index, data);
-> +		break;
-> +	case PCH_PIC_EDGE_START ... PCH_PIC_EDGE_END:
-> +		offset -= PCH_PIC_EDGE_START;
-> +		index = offset >> 2;
-> +		/* 1: edge triggered, 0: level triggered */
-> +		pch_pic_write_reg(&s->edge, index, data);
-> +		break;
-> +	case PCH_PIC_CLEAR_START ... PCH_PIC_CLEAR_END:
-> +		offset -= PCH_PIC_CLEAR_START;
-> +		index = offset >> 2;
-> +		/* write 1 to clear edge irq */
-> +		old = pch_pic_read_reg(&s->irr, index);
-> +		/*
-> +		 * get the irq bitmap which is edge triggered and
-> +		 * already set and to be cleared
-> +		 */
-> +		irq = old & pch_pic_read_reg(&s->edge, index) & data;
-> +		/* write irr to the new state where irqs have been cleared */
-> +		pch_pic_write_reg(&s->irr, index, old & ~irq);
-> +		/* update cleared irqs */
-> +		pch_pic_update_batch_irqs(s, irq, 0);
-> +		break;
-> +	case PCH_PIC_AUTO_CTRL0_START ... PCH_PIC_AUTO_CTRL0_END:
-> +		offset -= PCH_PIC_AUTO_CTRL0_START;
-> +		index = offset >> 2;
-> +		/* we only use default mode: fixed interrupt distribution mode */
-> +		pch_pic_write_reg(&s->auto_ctrl0, index, 0);
-> +		break;
-> +	case PCH_PIC_AUTO_CTRL1_START ... PCH_PIC_AUTO_CTRL1_END:
-> +		offset -= PCH_PIC_AUTO_CTRL1_START;
-> +		index = offset >> 2;
-> +		/* we only use default mode: fixed interrupt distribution mode */
-> +		pch_pic_write_reg(&s->auto_ctrl1, index, 0);
-> +		break;
-> +	case PCH_PIC_ROUTE_ENTRY_START ... PCH_PIC_ROUTE_ENTRY_END:
-> +		offset -= PCH_PIC_ROUTE_ENTRY_START;
-> +		/* only route to int0: eiointc */
-> +		s->route_entry[offset] = 1;
-> +		break;
-> +	case PCH_PIC_HTMSI_VEC_START ... PCH_PIC_HTMSI_VEC_END:
-> +		/* route table to eiointc */
-> +		offset -= PCH_PIC_HTMSI_VEC_START;
-> +		s->htmsi_vector[offset] = (u8)data;
-> +		break;
-> +	case PCH_PIC_POLARITY_START ... PCH_PIC_POLARITY_END:
-> +		offset -= PCH_PIC_POLARITY_START;
-> +		index = offset >> 2;
-> +
-> +		/* we only use defalut value 0: high level triggered */
-> +		pch_pic_write_reg(&s->polarity, index, 0);
-> +		break;
-> +	default:
-> +		ret = -EINVAL;
-> +		break;
-> +	}
-> +	spin_unlock(&s->lock);
-> +	return ret;
-> +}
-> +
->   static int kvm_pch_pic_write(struct kvm_vcpu *vcpu,
->   			struct kvm_io_device *dev,
->   			gpa_t addr, int len, const void *val)
->   {
-> -	return 0;
-> +	int ret;
-> +	struct loongarch_pch_pic *s = vcpu->kvm->arch.pch_pic;
-> +
-> +	if (!s) {
-> +		kvm_err("%s: pch pic irqchip not valid!\n", __func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* statistics of pch pic writing */
-> +	vcpu->kvm->stat.pch_pic_write_exits++;
-> +	ret = loongarch_pch_pic_write(s, addr, len, val);
-> +	return ret;
-> +}
-> +
-> +static int loongarch_pch_pic_read(struct loongarch_pch_pic *s, gpa_t addr, int len, void *val)
-> +{
-> +	int offset, index, ret = 0;
-> +	u32 data = 0;
-> +	u64 int_id = 0;
-> +
-> +	offset = addr - s->pch_pic_base;
-> +
-> +	spin_lock(&s->lock);
-> +	switch (offset) {
-> +	case PCH_PIC_INT_ID_START ... PCH_PIC_INT_ID_END:
-> +		/* int id version */
-> +		int_id |= (u64)PCH_PIC_INT_ID_VER << 32;
-> +		/* irq number */
-> +		int_id |= (u64)31 << (32 + 16);
-> +		/* int id value */
-> +		int_id |= PCH_PIC_INT_ID_VAL;
-> +		*(u64 *)val = int_id;
-> +		break;
-> +	case PCH_PIC_MASK_START ... PCH_PIC_MASK_END:
-> +		offset -= PCH_PIC_MASK_START;
-> +		index = offset >> 2;
-> +		/* read mask reg */
-> +		data = pch_pic_read_reg(&s->mask, index);
-> +		*(u32 *)val = data;
-> +		break;
-> +	case PCH_PIC_HTMSI_EN_START ... PCH_PIC_HTMSI_EN_END:
-> +		offset -= PCH_PIC_HTMSI_EN_START;
-> +		index = offset >> 2;
-> +		/* read htmsi enable reg */
-> +		data = pch_pic_read_reg(&s->htmsi_en, index);
-> +		*(u32 *)val = data;
-> +		break;
-> +	case PCH_PIC_EDGE_START ... PCH_PIC_EDGE_END:
-> +		offset -= PCH_PIC_EDGE_START;
-> +		index = offset >> 2;
-> +		/* read edge enable reg */
-> +		data = pch_pic_read_reg(&s->edge, index);
-> +		*(u32 *)val = data;
-> +		break;
-> +	case PCH_PIC_AUTO_CTRL0_START ... PCH_PIC_AUTO_CTRL0_END:
-> +	case PCH_PIC_AUTO_CTRL1_START ... PCH_PIC_AUTO_CTRL1_END:
-> +		/* we only use default mode: fixed interrupt distribution mode */
-> +		*(u32 *)val = 0;
-> +		break;
-> +	case PCH_PIC_ROUTE_ENTRY_START ... PCH_PIC_ROUTE_ENTRY_END:
-> +		/* only route to int0: eiointc */
-> +		*(u8 *)val = 1;
-> +		break;
-> +	case PCH_PIC_HTMSI_VEC_START ... PCH_PIC_HTMSI_VEC_END:
-> +		offset -= PCH_PIC_HTMSI_VEC_START;
-> +		/* read htmsi vector */
-> +		data = s->htmsi_vector[offset];
-> +		*(u8 *)val = data;
-> +		break;
-> +	case PCH_PIC_POLARITY_START ... PCH_PIC_POLARITY_END:
-> +		/* we only use defalut value 0: high level triggered */
-> +		*(u32 *)val = 0;
-> +		break;
-> +	default:
-> +		ret = -EINVAL;
-> +	}
-> +	spin_unlock(&s->lock);
-> +	return ret;
->   }
->   
->   static int kvm_pch_pic_read(struct kvm_vcpu *vcpu,
->   			struct kvm_io_device *dev,
->   			gpa_t addr, int len, void *val)
->   {
-> -	return 0;
-> +	int ret;
-> +	struct loongarch_pch_pic *s = vcpu->kvm->arch.pch_pic;
-> +
-> +	if (!s) {
-> +		kvm_err("%s: pch pic irqchip not valid!\n", __func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* statistics of pch pic reading */
-> +	vcpu->kvm->stat.pch_pic_read_exits++;
-> +	ret = loongarch_pch_pic_read(s, addr, len, val);
-> +	return ret;
->   }
->   
->   static const struct kvm_io_device_ops kvm_pch_pic_ops = {
-> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
-> index 6b2e4f66ad26..5a60474bb933 100644
-> --- a/arch/loongarch/kvm/vm.c
-> +++ b/arch/loongarch/kvm/vm.c
-> @@ -5,6 +5,8 @@
->   
->   #include <linux/kvm_host.h>
->   #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_eiointc.h>
-> +#include <asm/kvm_pch_pic.h>
->   
->   const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
->   	KVM_GENERIC_VM_STATS(),
-> @@ -103,3 +105,35 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->   {
->   	return -ENOIOCTLCMD;
->   }
-> +
-> +int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *data,
-> +			  bool line_status)
-> +{
-> +	bool level;
-> +	struct loongarch_pch_pic *s;
-> +	int type, vcpu, irq, vcpus, val, ret = 0;
-> +
-Had better check whether irqchip_in_kernel is enabled for ioctl 
-interface from userspace, such as:
-         if (!kvm_arch_irqchip_in_kernel(kvm))
-                 return -ENXIO;
+> Acked-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-> +	level = data->level;
-> +	val = data->irq;
-> +	s = kvm->arch.pch_pic;
-> +	vcpus = atomic_read(&kvm->online_vcpus);
-> +
-> +	type = (val >> KVM_LOONGARCH_IRQ_TYPE_SHIFT) & KVM_LOONGARCH_IRQ_TYPE_MASK;
-> +	vcpu = (val >> KVM_LOONGARCH_IRQ_VCPU_SHIFT) & KVM_LOONGARCH_IRQ_VCPU_MASK;
-> +	irq = (val >> KVM_LOONGARCH_IRQ_NUM_SHIFT) & KVM_LOONGARCH_IRQ_NUM_MASK;
-> +
-> +	switch (type) {
-> +	case KVM_LOONGARCH_IRQ_TYPE_IOAPIC:
-> +		if (irq < KVM_IRQCHIP_NUM_PINS)
-> +			pch_pic_set_irq(s, irq, level);
-> +		else if (irq < 256)
-> +			pch_msi_set_irq(kvm, irq, level);
-Can we use interface kvm_set_irq() to inject msi or irqline interrupt here?
+thanks, and FYI. I found a bug when running the unit test. will fix it
+in the next version. it's really helpful suggestion.
 
-Regards
-Bibo Mao
+diff --git a/lib/idr.c b/lib/idr.c
+index 6644d3d1af02..f16eb3d172bc 100644
+--- a/lib/idr.c
++++ b/lib/idr.c
+@@ -494,6 +494,7 @@ int ida_find_first_range(struct ida *ida, unsigned int 
+min, unsigned int max)
+  	unsigned int offset = min % IDA_BITMAP_BITS;
+  	unsigned long *addr, size, bit;
+  	unsigned long flags;
++	unsigned long tmp = 0;
+  	void *entry;
+  	int ret;
 
-> +		else
-> +			ret = -EINVAL;
-> +		break;
-> +	default:
-> +		ret = -EINVAL;
-> +	}
-> +
-> +	return ret;
-> +}
-> 
+@@ -518,8 +519,7 @@ int ida_find_first_range(struct ida *ida, unsigned int 
+min, unsigned int max)
+  	}
 
+  	if (xa_is_value(entry)) {
+-		unsigned long tmp = xa_to_value(entry);
+-
++		tmp = xa_to_value(entry);
+  		addr = &tmp;
+  		size = BITS_PER_XA_VALUE;
+  	} else {
+
+-- 
+Regards,
+Yi Liu
 
