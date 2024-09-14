@@ -1,609 +1,612 @@
-Return-Path: <kvm+bounces-26917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2223978F4A
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 10:57:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BBFA978F7E
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 11:29:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C63C7B2461D
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 08:57:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8863D1F234B2
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 09:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E2D19E7FC;
-	Sat, 14 Sep 2024 08:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC1276046;
+	Sat, 14 Sep 2024 09:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B0bffDzD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90A310E9;
-	Sat, 14 Sep 2024 08:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726304210; cv=none; b=pH8V8Vd3ykJLXA5aEZa3KweJQH8JOXJ6EYjn1KXMVZ2D7j85w/Z7KmPgvgUjHDgWon83J4/7ws2UVuTm6+BHo0sytFGvuCOvjL/VPdkPzTaK/aBufsvf9Q4att3Tqteqh1RUEe2Rd8u7aZSI1I0EbjvOfdIkg02VAaYZQ515JqI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726304210; c=relaxed/simple;
-	bh=g3Fk1Psf82pq5xnjzHbT39MQdtOMJLff6D6Cc6nuZDc=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=OKpUz/RdrPOttIuU7CCB/cVJA54vekogzZNkxkURTxqaKE32vBB1ksIa5a3+GVC8+ClA9ec0jEykxu19K4XI0KhG38bZLr0epJOLCuwcreIgH1cODNBpsp2pbjXWjGFyVXtkWhYJ3Y3UVMwH2j9TsVr3oybfXinG97p9pBOgdfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Bx++nKT+Vms9oHAA--.18060S3;
-	Sat, 14 Sep 2024 16:56:42 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMCxrtfJT+VmMbUGAA--.37972S3;
-	Sat, 14 Sep 2024 16:56:41 +0800 (CST)
-Subject: Re: [PATCH v3 3/4] LoongArch: Extract IOCSR definitions to standalone
- header
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen
- <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Viresh Kumar <viresh.kumar@linaro.org>, Thomas Gleixner
- <tglx@linutronix.de>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-mips@vger.kernel.org, kvm@vger.kernel.org
-References: <20240913-iocsr-v3-0-81a57f60350d@flygoat.com>
- <20240913-iocsr-v3-3-81a57f60350d@flygoat.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <147e72c9-8177-9c03-8baf-df7362143cd6@loongson.cn>
-Date: Sat, 14 Sep 2024 16:56:40 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8671474B9;
+	Sat, 14 Sep 2024 09:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726306182; cv=fail; b=ChbOAcccRpFwfoE3cGPAP2etTSS4lNBrw5naTwCnhNklnMKQth/FzAcLribOC2hZCIJOrWsvWWJzM7fxefl8LdlcVKpqCWRp6iH6j7wXJCxhtWBd6Ns+FBR1nVvNZCPPEkSpHJl3hun5SoH49aMGk8lj/nmeKLnAoxPIW560sOs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726306182; c=relaxed/simple;
+	bh=qkujYtWq/I7XLeAn12ZQH40oKgtKagA646IU7MnkB1c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=kbeBiVzn9kNKTOjZK4OkL53pJ2Y8VCQ5QQx14c90jomtGWJHLTxU1pjZby0oVFVrBd+BQDCUtWEfuP+4LruFU5oxpqAwu9MiY9C5OhYn4PbBmQiObRzKvgVrRddEbTpQ739oerlJrmFdF0YL85nWXSWsy4jrE2TYzQWL92KcR/Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B0bffDzD; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726306180; x=1757842180;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=qkujYtWq/I7XLeAn12ZQH40oKgtKagA646IU7MnkB1c=;
+  b=B0bffDzDAAkLnR6c5FDA8tNvVkRh5C0nsAdLOKrij4y7HDkjB1CcX12E
+   glvZdFp6KB+js6RIKMkmO4PMTYQg/nYtB1x9SbbRvMk3yuzH3wTHdg+pS
+   OgLMzWTPpkW63cDgYGUUOf06HFlxpcWhlkk1Wvq3WAjf8AoPsZXaB0pYO
+   i17OfTxEfROZqHgXZGpHfl32Ocuq5Am4ya+E1N9rpT7/xicfI0t3oIzGf
+   1wZpfw2iXUr1U6gegdhzkaE71YGavGTMuSOmPJXNFAIgkxENK8+ZWmcSR
+   nBTxgnCxbRkFfrc+4W14NPv80896P0uedLNdbAt36NPBi4zJB89kTsNUA
+   w==;
+X-CSE-ConnectionGUID: 0arES7/8TxaJ1H2qBR/xxg==
+X-CSE-MsgGUID: 4xq8TWLXS4GTHyH5kXlmig==
+X-IronPort-AV: E=McAfee;i="6700,10204,11194"; a="50624270"
+X-IronPort-AV: E=Sophos;i="6.10,228,1719903600"; 
+   d="scan'208";a="50624270"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2024 02:29:39 -0700
+X-CSE-ConnectionGUID: gfXHfEJ7ThmHFJ1lOI0icg==
+X-CSE-MsgGUID: UWZPATcnSFqjSpbrs9OlMg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,228,1719903600"; 
+   d="scan'208";a="91627865"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Sep 2024 02:29:39 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sat, 14 Sep 2024 02:29:38 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sat, 14 Sep 2024 02:29:38 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Sat, 14 Sep 2024 02:29:38 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.170)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sat, 14 Sep 2024 02:29:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=j9IOvoPrf+DO/JRunpGBzlG40ZelD/vizGB8C/2Ntk92+D2IBaF7jtwjhlfv5w7NpK3KYuGmcL3AZClFrphCfunKyv4L6Z29GxysEmlXyfJy/lGFa7B9pBRMuu7JGd9o0uJEcpWD5+kmGSRCN57Z+tutu18i15O8esgd/2z1cteTcWoy5ctmVQR1PTngiodVkiN/O6vg4rz1Lpied2Lq2kYsyhnL9Ub15DLzEncfIQVBjQWSP3T2SOsUuR1jX21/WGeHEmvoAsGGjsH/K0FO+FOu5uuuqM9XpzQJG+0MwOoESxFvQVhxG1WgadpTMzCwsJMnY7DbXC8qchxlZPFMdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7WwFl0+Vf6jnHlhaR4kXF/bFiIvKlXbtL5RSWcHAcic=;
+ b=PyBjN2IoJhVZc9xTJavbdW3+Q0L8mGPqfPJ/OdM6AM8BlHwYCqf6QpKp0ZJtU2SOh5YPwpqnFnYh611DtbKqL0KXCI5lrvVaJFzREdquMVbM+e5Zjsb5A2lTOdVWXhx5e7EIP/EPw5z7j78zQeQSzGyL7ay3d54vduWIi5G2ExkK3fWEspMoaOqL2ygxSAufJUDzwDvYVSa52SBY+lNj9T8Z7HUvbne6G2iQvndX8Q1ztLj/xF4AFju8Gy6xkGmyW+KvavkXQjph9mJ1rxKvcXgpmtPaYB+F0YXTi1bbhqS9umTd/6zSUT+RJSjQLQfiw6l3ng3wHm/HM5Kbu666tw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ CH3PR11MB8185.namprd11.prod.outlook.com (2603:10b6:610:159::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.21; Sat, 14 Sep
+ 2024 09:29:33 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.7962.021; Sat, 14 Sep 2024
+ 09:29:33 +0000
+Date: Sat, 14 Sep 2024 17:27:32 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, Yuan Yao <yuan.yao@intel.com>, Kai Huang
+	<kai.huang@intel.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "dmatlack@google.com"
+	<dmatlack@google.com>, "nik.borisov@suse.com" <nik.borisov@suse.com>
+Subject: Re: [PATCH 09/21] KVM: TDX: Retry seamcall when TDX_OPERAND_BUSY
+ with operand SEPT
+Message-ID: <ZuVXBDCWS615bsVa@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <b012360b4d14c0389bcb77fc8e9e5d739c6cc93d.camel@intel.com>
+ <Zt9kmVe1nkjVjoEg@google.com>
+ <1bbe3a78-8746-4db9-a96c-9dc5f1190f16@redhat.com>
+ <ZuBQYvY6Ib4ZYBgx@google.com>
+ <CABgObfayLGyWKERXkU+0gjeUg=Sp3r7GEQU=+13sUMpo36weWg@mail.gmail.com>
+ <ZuBsTlbrlD6NHyv1@google.com>
+ <655170f6a09ad892200cd033efe5498a26504fec.camel@intel.com>
+ <ZuCE_KtmXNi0qePb@google.com>
+ <ZuP5eNXFCljzRgWo@yzhao56-desk.sh.intel.com>
+ <ZuR09EqzU1WbQYGd@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZuR09EqzU1WbQYGd@google.com>
+X-ClientProxiedBy: SI2PR01CA0010.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:191::12) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240913-iocsr-v3-3-81a57f60350d@flygoat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMCxrtfJT+VmMbUGAA--.37972S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj9fXoWfXw4UZFy5ZFyUuFWkCFykZwc_yoW8ZF1kCo
-	W0qayftr48Aw47Zw1Yq3yqvFWUJrykArs8AanxAa97JrW7JF1DKFW5ta42vry3tayYvrZr
-	Ca9FgFWkJa9avas8l-sFpf9Il3svdjkaLaAFLSUrUUUU0b8apTn2vfkv8UJUUUU8wcxFpf
-	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-	UjIYCTnIWjp_UUUOn7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
-	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-	JF0_Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
-	xGrwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAK
-	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrV
-	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267
-	AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_
-	Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3
-	UUUUU==
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CH3PR11MB8185:EE_
+X-MS-Office365-Filtering-Correlation-Id: ed124c0b-83a0-47fb-e12e-08dcd49fbdbc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?QIlAMoCKST9GgqCcGOLwCOjrZtboYQgX5ofNXw/oRW3J8IG26/dv7ACy+c0r?=
+ =?us-ascii?Q?yzoX+QEMzGzWtNi4ahWqPKqKeewY9Lt1+ZAgz5wxIhOaWHLX8y0f/L4Y6QTn?=
+ =?us-ascii?Q?YSFeEsQEqzQqDcEMF4aeok9AwlH0cBV8hk3pVFCqD4GNcIGu9WzIW2uCsh/B?=
+ =?us-ascii?Q?e+Q2V57m/onngCFJRlmTuwVtDYzlfJM04RKbsr2hynW/eeaU8naXKyzMJ6Wu?=
+ =?us-ascii?Q?/ffMKHqIwgOdiSvS/hIIRZjcRptU4sB7d/0CYCFiK6Td6bo9K0IS4aLkuM1U?=
+ =?us-ascii?Q?pBcfVwyegSrjs5dOviOJbFvnpgIsCg7JddiuwSFyJjVyqb/itZosFNQ94NdI?=
+ =?us-ascii?Q?tkg+dpsDDE30jpSh9a43XrtRxgGR3bN/klta5nVTd/ZoYTuLYFjrGJoT1UWU?=
+ =?us-ascii?Q?C5u2ZLcjXjC/cHPNbArcYAkFEZMdunCiP2DcOw1jc9wEA+vQycH1mNtOHDYV?=
+ =?us-ascii?Q?MtjO7YPA5CIUSMbUdHF1zXPjuZM6scxc+jLdJL/v78E6UbBTVeHX+0qGu3b4?=
+ =?us-ascii?Q?8XePFqqZTUV7LtgPa0lFXTQ/d3lye30IO8Cgb8wNOtzLfZat2V+AAXvSjsGF?=
+ =?us-ascii?Q?OzHAj3FnEscd/gft1V5m40n0ml6jlXFY9OvLYSAyhDsTzonIbLxhBin+twkV?=
+ =?us-ascii?Q?F+sfsarJQZ7gAfH8DaGB9XdhZ84uj4Q6c2O0X1AdzbbMOC0kJa/kMdeRcDy1?=
+ =?us-ascii?Q?gGbJODbraeezLYUIY7Vo4rvPMabqjdm1mNdpXKbDr6PE22OmPgDamZGdS88V?=
+ =?us-ascii?Q?3rtlUq7YRntOXtBID/ll9QJ71jZdhVznk5MGFrDD14ESZnkiEttHAgl9Jkju?=
+ =?us-ascii?Q?66CofkgojvK4wYOw2vMgQTBF2IAE8T+eCbN/86G/lrYu+6QceXTHrsZQ3/p4?=
+ =?us-ascii?Q?YuVQx+aw9280K9t/Qm0D/eqT+zqhkm06voUehJepyIh4dBKvNxMWed+IEbJP?=
+ =?us-ascii?Q?/SVsy2jdm4j5cDRRyfz9sCzXrKRV9de+jCOJ+cl2CXQB7Eu5uDXhoVk7VXzL?=
+ =?us-ascii?Q?qPlYA18P1v01TJWn994KTbSN2jkd1oqc59Fh+ysLHZbGyEXGRS/FJSPISiWk?=
+ =?us-ascii?Q?zI/mFco/Y1LOlcRfh6T/9qhlfHnW8UdcuSBGzicQ0bqzT3XKHXvn0klNT9wz?=
+ =?us-ascii?Q?thuh0SL0OlxYpMRz7Au2orQYxelvLHCVWueCCRqtEneEGwcwypJhrKV+q0eO?=
+ =?us-ascii?Q?rPm9I2J73BlBdHMHmLjQq4WEuueWfFnRQzEuN/hVqztjPmlXrMkmGrvpgcYs?=
+ =?us-ascii?Q?DkG/52g595s7EGz0J1vSfOQ/t8kUI/3mgLrBLErh7mzTVJRkUzPh36csna8I?=
+ =?us-ascii?Q?TYMtP9/+sB/PuKcKnrNtYByt5VcT5IdHjBH3n/XwOVIQj1+yEBixFC7yu1HU?=
+ =?us-ascii?Q?GwGJrJo=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Hvxba1L9aCNN67Z37npRYz1am+viLMqvQ0qrPITXcboV+3x7SZkSGuRcCSeR?=
+ =?us-ascii?Q?Pdo6/hvc2Nz3fRk2WfMaVyiPBQNZASZy81x9SYkih20RKqF2D6P5EXTJC7yT?=
+ =?us-ascii?Q?fmq9GHHCGpi/Y+ubCcIRjczp9LEbBdfq49gi9a51biV0iPwOEH6hdJXkTEJH?=
+ =?us-ascii?Q?lq3rIenNZY35LNa2d2SGEDsPNr19gqipVREFbJUX94AP+abrCstXKzU0esIQ?=
+ =?us-ascii?Q?4rKVuOccvbaAepwr4jbzBZ3EuLzVynnBp2wObu3d8pmpJy+1wjju75zRqIz0?=
+ =?us-ascii?Q?RO49cOkoi9nTQfgKMaOHfUdxFIxvSAwVeyjvbIP1b7u4Y8IA5BkSkW+l9fpC?=
+ =?us-ascii?Q?+9EawESZtPZrcx4d6ALxN33qT3R+xHRQKjDc0maFb0czMncln8fhd8B/8Asb?=
+ =?us-ascii?Q?MbptKwpuKkupjUYCuQzfXUgU038g/vZU+9SBIj+ps9ugI6Bg3RL2m2+O3SsL?=
+ =?us-ascii?Q?kCGFHc83uup3ANf2yAc7REjaGEsDmq+7s8HU7O9G3YKu9tf016PphpjN8Dm9?=
+ =?us-ascii?Q?xbRdKDu04vvqpDu0/hCFjYKvs4BoAiUdkJV5b9z1c/p5rZ/CU8yx/9EOBWaR?=
+ =?us-ascii?Q?ngDYZKhiY8Eka2Gbl0ihUc5CKuB/BG16hWaHwvghIY2lxnnCeUIU7Cqw61v5?=
+ =?us-ascii?Q?08zFlWiCbKkpv9ASJjLLriMXBk1MgRWWd9ILUk1Kgy6b1alYS8yK1I+x7H5A?=
+ =?us-ascii?Q?L/1eWo0GSPsPJpnumeMMbi/rAZoE91ITJ8Zw275n1n+uZTIP2vFutyRQXB2d?=
+ =?us-ascii?Q?sgyxaAo5Es6vZmTRUHTZJi1fgBOKW+DCpK2Yd5vNwrfPla+0vZhPqoLFp849?=
+ =?us-ascii?Q?eai7nVXtNk0XjfeXSeTO7sJTHYF3NATrK72aJ+jQcXhvuRJ1EBsUJmuJfj9S?=
+ =?us-ascii?Q?cjqYERQtyLYxT0mE+xm09krKZtUCYAWywimmkGKzPsYsKN+XOcgdb1wvgALy?=
+ =?us-ascii?Q?Lwff3EFrvAQb6xPe1ncupgJHIBNAaQVuC0gjlmGGT469BqnRg1NHw4CnQupb?=
+ =?us-ascii?Q?1NhLvarGbPuJbpKZbonHJCqmmOPpPr9/eetBl2CaKBYIYESWr8ArSTwsmRqW?=
+ =?us-ascii?Q?k6/Zg2Apt5dxFFj2iF0JQ7UjtyZ/rqJPvj/EEUWWjwxlCjEv1ZG8/Nrl1JPl?=
+ =?us-ascii?Q?C8Jzq4k2M/M/EUXz9ABy0lNHqQiCAY8VuP5XINnNf5eleZGVmPsW3w6PMvNM?=
+ =?us-ascii?Q?f9pKQaVpFUA2beLL8Ws4Fwuz5647gHT0QAuRD6iF/rTC0bFtFylPo8ckUmwQ?=
+ =?us-ascii?Q?qLGIwaFQLHhsSIOPwjXtSWWB78XqTrFHGuG2FHF36r2K5dFTLVSLtvhA1b0L?=
+ =?us-ascii?Q?NCINN+C4vIg//JPNLTtyzyOzKJ5k+yCMvk7lRkfdEEEQOmTLlcL+ZFLBPthI?=
+ =?us-ascii?Q?b8vDWM+e72AL5gBjYSe5dQHPlLQNSoEUFA6fMU0v/eRe5jRMaVMMpm+Ar5dT?=
+ =?us-ascii?Q?K2dDJY/63u/iIx6TpuwwuVEvG+DHkv9A3m8JXHht0+PPj2nLS7yVcqAmnwv0?=
+ =?us-ascii?Q?/eIPoYGXU6fjpo3cKi3iWUHYPQoIyeLp5OCiWMa8fLToj5eHDslUwUadr2TF?=
+ =?us-ascii?Q?EvM/6lPX/w4jtxml8xuEmux+rPHHvag3pq2AtUE3?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed124c0b-83a0-47fb-e12e-08dcd49fbdbc
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2024 09:29:32.9310
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 13RjyYpQfVxFVOpVQp/+M12GrY8/tyiVoipEKsyIPGsb+vVX7IxmH2GvxNQENH6PjYA63z7gtidWDiSLu3tKSw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8185
+X-OriginatorOrg: intel.com
 
-Hi jiaxun,
-
-On 2024/9/14 上午4:32, Jiaxun Yang wrote:
-> As IOCSR is not a part of architecture specification, it is not
-> really appropriate to define those stuff in loongarch.h.
-IOCSR address is somewhat strange compared with generic mmio bus,
-neither fdt nor acpi does not support IOCSR address space. I do not know 
-the future about IOCSR, since I do not know the advantage of it compared 
-to MMIO address space, except it can only  be accessed in supervisor mode.
-
-Sharing the same code with multiple architecture is welcome.
+On Fri, Sep 13, 2024 at 10:23:00AM -0700, Sean Christopherson wrote:
+> On Fri, Sep 13, 2024, Yan Zhao wrote:
+> > This is a lock status report of TDX module for current SEAMCALL retry issue
+> > based on code in TDX module public repo https://github.com/intel/tdx-module.git
+> > branch TDX_1.5.05.
+> > 
+> > TL;DR:
+> > - tdh_mem_track() can contend with tdh_vp_enter().
+> > - tdh_vp_enter() contends with tdh_mem*() when 0-stepping is suspected.
 > 
-> Extract those definitions to include/linux/loongson/iocsr.h, so
-> that they can be shared with MIPS based Loongson systems as well.
+> The zero-step logic seems to be the most problematic.  E.g. if KVM is trying to
+> install a page on behalf of two vCPUs, and KVM resumes the guest if it encounters
+> a FROZEN_SPTE when building the non-leaf SPTEs, then one of the vCPUs could
+> trigger the zero-step mitigation if the vCPU that "wins" and gets delayed for
+> whatever reason.
 > 
-> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> Since FROZEN_SPTE is essentially bit-spinlock with a reaaaaaly slow slow-path,
+> what if instead of resuming the guest if a page fault hits FROZEN_SPTE, KVM retries
+> the fault "locally", i.e. _without_ redoing tdh_vp_enter() to see if the vCPU still
+> hits the fault?
+> 
+> For non-TDX, resuming the guest and letting the vCPU retry the instruction is
+> desirable because in many cases, the winning task will install a valid mapping
+> before KVM can re-run the vCPU, i.e. the fault will be fixed before the
+> instruction is re-executed.  In the happy case, that provides optimal performance
+> as KVM doesn't introduce any extra delay/latency.
+> 
+> But for TDX, the math is different as the cost of a re-hitting a fault is much,
+> much higher, especially in light of the zero-step issues.
+> 
+> E.g. if the TDP MMU returns a unique error code for the frozen case, and
+> kvm_mmu_page_fault() is modified to return the raw return code instead of '1',
+> then the TDX EPT violation path can safely retry locally, similar to the do-while
+> loop in kvm_tdp_map_page().
+> 
+> The only part I don't like about this idea is having two "retry" return values,
+> which creates the potential for bugs due to checking one but not the other.
+> 
+> Hmm, that could be avoided by passing a bool pointer as an out-param to communicate
+> to the TDX S-EPT fault handler that the SPTE is frozen.  I think I like that
+> option better even though the out-param is a bit gross, because it makes it more
+> obvious that the "frozen_spte" is a special case that doesn't need attention for
+> most paths.
+Good idea.
+But could we extend it a bit more to allow TDX's EPT violation handler to also
+retry directly when tdh_mem_sept_add()/tdh_mem_page_aug() returns BUSY?
+
+> 
+> > - tdg_mem_page_accept() can contend with other tdh_mem*().
+> > 
+> > Proposal:
+> > - Return -EAGAIN directly in ops link_external_spt/set_external_spte when
+> >   tdh_mem_sept_add()/tdh_mem_page_aug() returns BUSY.
+> What is the result of returning -EAGAIN? E.g. does KVM redo tdh_vp_enter()?
+Sorry, I meant -EBUSY originally.
+
+With the current code in kvm_tdp_map_page(), vCPU should just retry without
+tdh_vp_enter() except when there're signals pending.
+With a real EPT violation, tdh_vp_enter() should be called again.
+
+I realized that this is not good enough.
+So, is it better to return -EAGAIN in ops link_external_spt/set_external_spte
+and have kvm_tdp_mmu_map() return RET_PF_RETRY_FROZEN for -EAGAIN?
+(or maybe some other name for RET_PF_RETRY_FROZEN).
+
+> Also tdh_mem_sept_add() is strictly pre-finalize, correct?  I.e. should never
+> contend with tdg_mem_page_accept() because vCPUs can't yet be run.
+tdh_mem_page_add() is pre-finalize, tdh_mem_sept_add() is not.
+tdh_mem_sept_add() can be called runtime by tdp_mmu_link_sp().
+
+ 
+> Similarly, can tdh_mem_page_aug() actually contend with tdg_mem_page_accept()?
+> The page isn't yet mapped, so why would the guest be allowed to take a lock on
+> the S-EPT entry?
+Before tdg_mem_page_accept() accepts a gpa and set rwx bits in a SPTE, if second
+tdh_mem_page_aug() is called on the same gpa, the second one may contend with
+tdg_mem_page_accept().
+
+But given KVM does not allow the second tdh_mem_page_aug(), looks the contention
+between tdh_mem_page_aug() and tdg_mem_page_accept() will not happen.
+
+> 
+> > - Kick off vCPUs at the beginning of page removal path, i.e. before the
+> >   tdh_mem_range_block().
+> >   Set a flag and disallow tdh_vp_enter() until tdh_mem_page_remove() is done.
+> 
+> This is easy enough to do via a request, e.g. see KVM_REQ_MCLOCK_INPROGRESS.
+Great!
+
+> 
+> >   (one possible optimization:
+> >    since contention from tdh_vp_enter()/tdg_mem_page_accept should be rare,
+> >    do not kick off vCPUs in normal conditions.
+> >    When SEAMCALL BUSY happens, retry for once, kick off vCPUs and do not allow
+> 
+> Which SEAMCALL is this specifically?  tdh_mem_range_block()?
+Yes, they are
+- tdh_mem_range_block() contends with tdh_vp_enter() for secure_ept_lock.
+- tdh_mem_track() contends with tdh_vp_enter() for TD epoch.
+  (current code in MMU part 2 just retry tdh_mem_track() endlessly),
+- tdh_mem_page_remove()/tdh_mem_range_block() contends with
+  tdg_mem_page_accept() for SEPT entry lock.
+  (this one should not happen on a sane guest).
+
+ Resources              SHARED  users              EXCLUSIVE users      
+------------------------------------------------------------------------
+(5) TDCS epoch         tdh_vp_enter                tdh_mem_track
+------------------------------------------------------------------------
+(6) secure_ept_lock    tdh_mem_sept_add            tdh_vp_enter
+                       tdh_mem_page_aug            tdh_mem_sept_remove
+                       tdh_mem_page_remove         tdh_mem_range_block
+                                                   tdh_mem_range_unblock
+------------------------------------------------------------------------
+(7) SEPT entry                                     tdh_mem_sept_add
+                                                   tdh_mem_sept_remove
+                                                   tdh_mem_page_aug
+                                                   tdh_mem_page_remove
+                                                   tdh_mem_range_block
+                                                   tdh_mem_range_unblock
+                                                   tdg_mem_page_accept
+
+
+> 
+> >    TD enter until page removal completes.)
+> 
+> 
+> Idea #1:
 > ---
->   MAINTAINERS                             |   1 +
->   arch/loongarch/include/asm/loongarch.h  |  90 --------------------------
->   arch/loongarch/kernel/cpu-probe.c       |   7 +-
->   arch/loongarch/kernel/relocate_kernel.S |   5 +-
->   arch/loongarch/kernel/smp.c             |  23 +++----
->   drivers/cpufreq/loongson3_cpufreq.c     |  11 ++--
->   drivers/irqchip/irq-loongarch-avec.c    |   5 +-
->   drivers/irqchip/irq-loongson-eiointc.c  |   5 +-
->   include/linux/loongson/iocsr.h          | 110 ++++++++++++++++++++++++++++++++
->   9 files changed, 142 insertions(+), 115 deletions(-)
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b45258285c9c..8113c17bd2f6 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4719,7 +4719,7 @@ static int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
+>                         return -EINTR;
+>                 cond_resched();
+>                 r = kvm_mmu_do_page_fault(vcpu, gpa, error_code, true, NULL, level);
+> -       } while (r == RET_PF_RETRY);
+> +       } while (r == RET_PF_RETRY || r == RET_PF_RETRY_FOZEN);
+>  
+>         if (r < 0)
+>                 return r;
+> @@ -6129,7 +6129,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+>                 vcpu->stat.pf_spurious++;
+>  
+>         if (r != RET_PF_EMULATE)
+> -               return 1;
+> +               return r;
+>  
+>  emulate:
+>         return x86_emulate_instruction(vcpu, cr2_or_gpa, emulation_type, insn,
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index 8d3fb3c8c213..690f03d7daae 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -256,12 +256,15 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+>   * and of course kvm_mmu_do_page_fault().
+>   *
+>   * RET_PF_CONTINUE: So far, so good, keep handling the page fault.
+> + * RET_PF_FIXED: The faulting entry has been fixed.
+>   * RET_PF_RETRY: let CPU fault again on the address.
+> + * RET_PF_RETRY_FROZEN: One or more SPTEs related to the address is frozen.
+> + *                     Let the CPU fault again on the address, or retry the
+> + *                     fault "locally", i.e. without re-entering the guest.
+>   * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
+>   * RET_PF_WRITE_PROTECTED: the gfn is write-protected, either unprotected the
+>   *                         gfn and retry, or emulate the instruction directly.
+>   * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
+> - * RET_PF_FIXED: The faulting entry has been fixed.
+>   * RET_PF_SPURIOUS: The faulting entry was already fixed, e.g. by another vCPU.
+>   *
+>   * Any names added to this enum should be exported to userspace for use in
+> @@ -271,14 +274,18 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+>   * on -errno return values.  Somewhat arbitrarily use '0' for CONTINUE, which
+>   * will allow for efficient machine code when checking for CONTINUE, e.g.
+>   * "TEST %rax, %rax, JNZ", as all "stop!" values are non-zero.
+> + *
+> + * Note #2, RET_PF_FIXED _must_ be '1', so that KVM's -errno/0/1 return code
+> + * scheme, where 1==success, translates '1' to RET_PF_FIXED.
+>   */
+Looks "r > 0" represents success in vcpu_run()?
+So, moving RET_PF_FIXED to 1 is not necessary?
+
+>  enum {
+>         RET_PF_CONTINUE = 0,
+> +       RET_PF_FIXED    = 1,
+>         RET_PF_RETRY,
+> +       RET_PF_RETRY_FROZEN,
+>         RET_PF_EMULATE,
+>         RET_PF_WRITE_PROTECTED,
+>         RET_PF_INVALID,
+> -       RET_PF_FIXED,
+>         RET_PF_SPURIOUS,
+>  };
+>  
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 5a475a6456d4..cbf9e46203f3 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1174,6 +1174,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  
+>  retry:
+>         rcu_read_unlock();
+> +       if (ret == RET_PF_RETRY && is_frozen_spte(iter.old_spte))
+> +               return RET_PF_RETRY_FOZEN;
+>         return ret;
+>  }
+>  
+> ---
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0a3d9e17295a..f0f4c427e9a3 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13305,6 +13305,7 @@ F:	Documentation/translations/zh_CN/arch/loongarch/
->   F:	arch/loongarch/
->   F:	drivers/*/*loongarch*
->   F:	drivers/cpufreq/loongson3_cpufreq.c
-> +F:	include/linux/loongson
->   
->   LOONGSON GPIO DRIVER
->   M:	Yinbo Zhu <zhuyinbo@loongson.cn>
-> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
-> index 23af28f00c3c..4ac228230720 100644
-> --- a/arch/loongarch/include/asm/loongarch.h
-> +++ b/arch/loongarch/include/asm/loongarch.h
-> @@ -1048,84 +1048,6 @@
->   
->   #define ESTATF_IP		0x00003fff
->   
-> -#define LOONGARCH_IOCSR_FEATURES	0x8
-> -#define  IOCSRF_TEMP			BIT_ULL(0)
-> -#define  IOCSRF_NODECNT			BIT_ULL(1)
-> -#define  IOCSRF_MSI			BIT_ULL(2)
-> -#define  IOCSRF_EXTIOI			BIT_ULL(3)
-> -#define  IOCSRF_CSRIPI			BIT_ULL(4)
-> -#define  IOCSRF_FREQCSR			BIT_ULL(5)
-> -#define  IOCSRF_FREQSCALE		BIT_ULL(6)
-> -#define  IOCSRF_DVFSV1			BIT_ULL(7)
-> -#define  IOCSRF_EIODECODE		BIT_ULL(9)
-> -#define  IOCSRF_FLATMODE		BIT_ULL(10)
-> -#define  IOCSRF_VM			BIT_ULL(11)
-> -#define  IOCSRF_AVEC			BIT_ULL(15)
-> -
-> -#define LOONGARCH_IOCSR_VENDOR		0x10
-> -
-> -#define LOONGARCH_IOCSR_CPUNAME		0x20
-> -
-> -#define LOONGARCH_IOCSR_NODECNT		0x408
-> -
-> -#define LOONGARCH_IOCSR_MISC_FUNC	0x420
-> -#define  IOCSR_MISC_FUNC_SOFT_INT	BIT_ULL(10)
-> -#define  IOCSR_MISC_FUNC_TIMER_RESET	BIT_ULL(21)
-> -#define  IOCSR_MISC_FUNC_EXT_IOI_EN	BIT_ULL(48)
-> -#define  IOCSR_MISC_FUNC_AVEC_EN	BIT_ULL(51)
-> -
-> -#define LOONGARCH_IOCSR_CPUTEMP		0x428
-> -
-> -#define LOONGARCH_IOCSR_SMCMBX		0x51c
-> -
-> -/* PerCore CSR, only accessible by local cores */
-> -#define LOONGARCH_IOCSR_IPI_STATUS	0x1000
-> -#define LOONGARCH_IOCSR_IPI_EN		0x1004
-> -#define LOONGARCH_IOCSR_IPI_SET		0x1008
-> -#define LOONGARCH_IOCSR_IPI_CLEAR	0x100c
-> -#define LOONGARCH_IOCSR_MBUF0		0x1020
-> -#define LOONGARCH_IOCSR_MBUF1		0x1028
-> -#define LOONGARCH_IOCSR_MBUF2		0x1030
-> -#define LOONGARCH_IOCSR_MBUF3		0x1038
-> -
-> -#define LOONGARCH_IOCSR_IPI_SEND	0x1040
-> -#define  IOCSR_IPI_SEND_IP_SHIFT	0
-> -#define  IOCSR_IPI_SEND_CPU_SHIFT	16
-> -#define  IOCSR_IPI_SEND_BLOCKING	BIT(31)
-> -
-> -#define LOONGARCH_IOCSR_MBUF_SEND	0x1048
-> -#define  IOCSR_MBUF_SEND_BLOCKING	BIT_ULL(31)
-> -#define  IOCSR_MBUF_SEND_BOX_SHIFT	2
-> -#define  IOCSR_MBUF_SEND_BOX_LO(box)	(box << 1)
-> -#define  IOCSR_MBUF_SEND_BOX_HI(box)	((box << 1) + 1)
-> -#define  IOCSR_MBUF_SEND_CPU_SHIFT	16
-> -#define  IOCSR_MBUF_SEND_BUF_SHIFT	32
-> -#define  IOCSR_MBUF_SEND_H32_MASK	0xFFFFFFFF00000000ULL
-> -
-> -#define LOONGARCH_IOCSR_ANY_SEND	0x1158
-> -#define  IOCSR_ANY_SEND_BLOCKING	BIT_ULL(31)
-> -#define  IOCSR_ANY_SEND_CPU_SHIFT	16
-> -#define  IOCSR_ANY_SEND_MASK_SHIFT	27
-> -#define  IOCSR_ANY_SEND_BUF_SHIFT	32
-> -#define  IOCSR_ANY_SEND_H32_MASK	0xFFFFFFFF00000000ULL
-> -
-> -/* Register offset and bit definition for CSR access */
-> -#define LOONGARCH_IOCSR_TIMER_CFG       0x1060
-> -#define LOONGARCH_IOCSR_TIMER_TICK      0x1070
-> -#define  IOCSR_TIMER_CFG_RESERVED       (_ULCAST_(1) << 63)
-> -#define  IOCSR_TIMER_CFG_PERIODIC       (_ULCAST_(1) << 62)
-> -#define  IOCSR_TIMER_CFG_EN             (_ULCAST_(1) << 61)
-> -#define  IOCSR_TIMER_MASK		0x0ffffffffffffULL
-> -#define  IOCSR_TIMER_INITVAL_RST        (_ULCAST_(0xffff) << 48)
-> -
-> -#define LOONGARCH_IOCSR_EXTIOI_NODEMAP_BASE	0x14a0
-> -#define LOONGARCH_IOCSR_EXTIOI_IPMAP_BASE	0x14c0
-> -#define LOONGARCH_IOCSR_EXTIOI_EN_BASE		0x1600
-> -#define LOONGARCH_IOCSR_EXTIOI_BOUNCE_BASE	0x1680
-> -#define LOONGARCH_IOCSR_EXTIOI_ISR_BASE		0x1800
-> -#define LOONGARCH_IOCSR_EXTIOI_ROUTE_BASE	0x1c00
-> -#define IOCSR_EXTIOI_VECTOR_NUM			256
-> -
->   #ifndef __ASSEMBLY__
->   
->   static __always_inline u64 drdtime(void)
-> @@ -1145,18 +1067,6 @@ static inline unsigned int get_csr_cpuid(void)
->   	return csr_read32(LOONGARCH_CSR_CPUID);
->   }
->   
-> -static inline void csr_any_send(unsigned int addr, unsigned int data,
-> -				unsigned int data_mask, unsigned int cpu)
-> -{
-> -	uint64_t val = 0;
-> -
-> -	val = IOCSR_ANY_SEND_BLOCKING | addr;
-> -	val |= (cpu << IOCSR_ANY_SEND_CPU_SHIFT);
-> -	val |= (data_mask << IOCSR_ANY_SEND_MASK_SHIFT);
-> -	val |= ((uint64_t)data << IOCSR_ANY_SEND_BUF_SHIFT);
-> -	iocsr_write64(val, LOONGARCH_IOCSR_ANY_SEND);
-> -}
-> -
->   static inline unsigned int read_csr_excode(void)
->   {
->   	return (csr_read32(LOONGARCH_CSR_ESTAT) & CSR_ESTAT_EXC) >> CSR_ESTAT_EXC_SHIFT;
-> diff --git a/arch/loongarch/kernel/cpu-probe.c b/arch/loongarch/kernel/cpu-probe.c
-> index 8a868a10df9c..07b68f93ccdc 100644
-> --- a/arch/loongarch/kernel/cpu-probe.c
-> +++ b/arch/loongarch/kernel/cpu-probe.c
-> @@ -6,6 +6,7 @@
->    */
->   #include <linux/init.h>
->   #include <linux/kernel.h>
-> +#include <linux/loongson/iocsr.h>
->   #include <linux/ptrace.h>
->   #include <linux/smp.h>
->   #include <linux/stddef.h>
-> @@ -267,13 +268,13 @@ static inline void cpu_probe_loongson(struct cpuinfo_loongarch *c, unsigned int
->   	if (!(c->options & LOONGARCH_CPU_IOCSR))
->   		return;
->   
-> -	*vendor = iocsr_read64(LOONGARCH_IOCSR_VENDOR);
-> -	*cpuname = iocsr_read64(LOONGARCH_IOCSR_CPUNAME);
-> +	*vendor = iocsr_read64(LOONGSON_IOCSR_VENDOR);
-> +	*cpuname = iocsr_read64(LOONGSON_IOCSR_CPUNAME);
->   
->   	if (!__cpu_full_name[cpu])
->   		__cpu_full_name[cpu] = cpu_full_name;
->   
-> -	config = iocsr_read32(LOONGARCH_IOCSR_FEATURES);
-> +	config = iocsr_read32(LOONGSON_IOCSR_FEATURES);
->   	if (config & IOCSRF_CSRIPI)
->   		c->options |= LOONGARCH_CPU_CSRIPI;
->   	if (config & IOCSRF_EXTIOI)
-> diff --git a/arch/loongarch/kernel/relocate_kernel.S b/arch/loongarch/kernel/relocate_kernel.S
-> index 84e6de2fd973..ce40ba6b5975 100644
-> --- a/arch/loongarch/kernel/relocate_kernel.S
-> +++ b/arch/loongarch/kernel/relocate_kernel.S
-> @@ -5,6 +5,7 @@
->    * Copyright (C) 2022 Loongson Technology Corporation Limited
->    */
->   
-> +#include <linux/loongson/iocsr.h>
->   #include <linux/kexec.h>
->   
->   #include <asm/asm.h>
-> @@ -88,14 +89,14 @@ SYM_CODE_END(relocate_new_kernel)
->   #ifdef CONFIG_SMP
->   /*
->    * Other CPUs should wait until code is relocated and
-> - * then start at the entry point from LOONGARCH_IOCSR_MBUF0.
-> + * then start at the entry point from LOONGSON_IOCSR_MBUF0.
->    */
->   SYM_CODE_START(kexec_smp_wait)
->   	UNWIND_HINT_UNDEFINED
->   1:	li.w		t0, 0x100			/* wait for init loop */
->   2:	addi.w		t0, t0, -1			/* limit mailbox access */
->   	bnez		t0, 2b
-> -	li.w		t1, LOONGARCH_IOCSR_MBUF0
-> +	li.w		t1, LOONGSON_IOCSR_MBUF0
->   	iocsrrd.w	s0, t1				/* check PC as an indicator */
->   	beqz		s0, 1b
->   	iocsrrd.d	s0, t1				/* get PC via mailbox */
-> diff --git a/arch/loongarch/kernel/smp.c b/arch/loongarch/kernel/smp.c
-> index 4adbbef3450a..120865985376 100644
-> --- a/arch/loongarch/kernel/smp.c
-> +++ b/arch/loongarch/kernel/smp.c
-> @@ -14,6 +14,7 @@
->   #include <linux/init.h>
->   #include <linux/interrupt.h>
->   #include <linux/irq_work.h>
-> +#include <linux/loongson/iocsr.h>
->   #include <linux/profile.h>
->   #include <linux/seq_file.h>
->   #include <linux/smp.h>
-> @@ -164,14 +165,14 @@ static void csr_mail_send(uint64_t data, int cpu, int mailbox)
->   	val |= (IOCSR_MBUF_SEND_BOX_HI(mailbox) << IOCSR_MBUF_SEND_BOX_SHIFT);
->   	val |= (cpu << IOCSR_MBUF_SEND_CPU_SHIFT);
->   	val |= (data & IOCSR_MBUF_SEND_H32_MASK);
-> -	iocsr_write64(val, LOONGARCH_IOCSR_MBUF_SEND);
-> +	iocsr_write64(val, LOONGSON_IOCSR_MBUF_SEND);
->   
->   	/* Send low 32 bits */
->   	val = IOCSR_MBUF_SEND_BLOCKING;
->   	val |= (IOCSR_MBUF_SEND_BOX_LO(mailbox) << IOCSR_MBUF_SEND_BOX_SHIFT);
->   	val |= (cpu << IOCSR_MBUF_SEND_CPU_SHIFT);
->   	val |= (data << IOCSR_MBUF_SEND_BUF_SHIFT);
-> -	iocsr_write64(val, LOONGARCH_IOCSR_MBUF_SEND);
-> +	iocsr_write64(val, LOONGSON_IOCSR_MBUF_SEND);
->   };
->   
->   static u32 ipi_read_clear(int cpu)
-> @@ -179,9 +180,9 @@ static u32 ipi_read_clear(int cpu)
->   	u32 action;
->   
->   	/* Load the ipi register to figure out what we're supposed to do */
-> -	action = iocsr_read32(LOONGARCH_IOCSR_IPI_STATUS);
-> +	action = iocsr_read32(LOONGSON_IOCSR_IPI_STATUS);
->   	/* Clear the ipi register to clear the interrupt */
-> -	iocsr_write32(action, LOONGARCH_IOCSR_IPI_CLEAR);
-> +	iocsr_write32(action, LOONGSON_IOCSR_IPI_CLEAR);
->   	wbflush();
->   
->   	return action;
-> @@ -193,7 +194,7 @@ static void ipi_write_action(int cpu, u32 action)
->   
->   	val = IOCSR_IPI_SEND_BLOCKING | action;
->   	val |= (cpu << IOCSR_IPI_SEND_CPU_SHIFT);
-> -	iocsr_write32(val, LOONGARCH_IOCSR_IPI_SEND);
-> +	iocsr_write32(val, LOONGSON_IOCSR_IPI_SEND);
->   }
->   
->   static void loongson_send_ipi_single(int cpu, unsigned int action)
-> @@ -322,7 +323,7 @@ void __init loongson_smp_setup(void)
->   	cpu_data[0].package = cpu_logical_map(0) / loongson_sysconf.cores_per_package;
->   
->   	pv_ipi_init();
-> -	iocsr_write32(0xffffffff, LOONGARCH_IOCSR_IPI_EN);
-> +	iocsr_write32(0xffffffff, LOONGSON_IOCSR_IPI_EN);
->   	pr_info("Detected %i available CPU(s)\n", loongson_sysconf.nr_cpus);
->   }
->   
-> @@ -370,7 +371,7 @@ void loongson_init_secondary(void)
->   
->   	change_csr_ecfg(ECFG0_IM, imask);
->   
-> -	iocsr_write32(0xffffffff, LOONGARCH_IOCSR_IPI_EN);
-> +	iocsr_write32(0xffffffff, LOONGSON_IOCSR_IPI_EN);
->   
->   #ifdef CONFIG_NUMA
->   	numa_add_cpu(cpu);
-> @@ -385,7 +386,7 @@ void loongson_init_secondary(void)
->   void loongson_smp_finish(void)
->   {
->   	local_irq_enable();
-> -	iocsr_write64(0, LOONGARCH_IOCSR_MBUF0);
-> +	iocsr_write64(0, LOONGSON_IOCSR_MBUF0);
->   	pr_info("CPU#%d finished\n", smp_processor_id());
->   }
->   
-> @@ -435,12 +436,12 @@ void __noreturn arch_cpu_idle_dead(void)
->   	__smp_mb();
->   	do {
->   		__asm__ __volatile__("idle 0\n\t");
-> -		addr = iocsr_read64(LOONGARCH_IOCSR_MBUF0);
-> +		addr = iocsr_read64(LOONGSON_IOCSR_MBUF0);
->   	} while (addr == 0);
->   
->   	local_irq_disable();
->   	init_fn = (void *)TO_CACHE(addr);
-> -	iocsr_write32(0xffffffff, LOONGARCH_IOCSR_IPI_CLEAR);
-> +	iocsr_write32(0xffffffff, LOONGSON_IOCSR_IPI_CLEAR);
->   
->   	init_fn();
->   	BUG();
-> @@ -460,7 +461,7 @@ static int loongson_ipi_suspend(void)
->   
->   static void loongson_ipi_resume(void)
->   {
-> -	iocsr_write32(0xffffffff, LOONGARCH_IOCSR_IPI_EN);
-> +	iocsr_write32(0xffffffff, LOONGSON_IOCSR_IPI_EN);
->   }
->   
->   static struct syscore_ops loongson_ipi_syscore_ops = {
-> diff --git a/drivers/cpufreq/loongson3_cpufreq.c b/drivers/cpufreq/loongson3_cpufreq.c
-> index 6b5e6798d9a2..11d5f1ba3040 100644
-> --- a/drivers/cpufreq/loongson3_cpufreq.c
-> +++ b/drivers/cpufreq/loongson3_cpufreq.c
-> @@ -10,6 +10,7 @@
->   #include <linux/cpufreq.h>
->   #include <linux/delay.h>
->   #include <linux/module.h>
-> +#include <linux/loongson/iocsr.h>
->   #include <linux/platform_device.h>
->   #include <linux/units.h>
->   
-> @@ -182,7 +183,7 @@ static inline int do_service_request(u32 id, u32 info, u32 cmd, u32 val, u32 ext
->   
->   	mutex_lock(&cpufreq_mutex[package]);
->   
-> -	last.value = iocsr_read32(LOONGARCH_IOCSR_SMCMBX);
-> +	last.value = iocsr_read32(LOONGSON_IOCSR_SMCMBX);
->   	if (!last.complete) {
->   		mutex_unlock(&cpufreq_mutex[package]);
->   		return -EPERM;
-> @@ -195,12 +196,12 @@ static inline int do_service_request(u32 id, u32 info, u32 cmd, u32 val, u32 ext
->   	msg.extra	= extra;
->   	msg.complete	= 0;
->   
-> -	iocsr_write32(msg.value, LOONGARCH_IOCSR_SMCMBX);
-> -	iocsr_write32(iocsr_read32(LOONGARCH_IOCSR_MISC_FUNC) | IOCSR_MISC_FUNC_SOFT_INT,
-> -		      LOONGARCH_IOCSR_MISC_FUNC);
-> +	iocsr_write32(msg.value, LOONGSON_IOCSR_SMCMBX);
-> +	iocsr_write32(iocsr_read32(LOONGSON_IOCSR_MISC_FUNC) | IOCSR_MISC_FUNC_SOFT_INT,
-> +		      LOONGSON_IOCSR_MISC_FUNC);
->   
->   	for (retries = 0; retries < 10000; retries++) {
-> -		msg.value = iocsr_read32(LOONGARCH_IOCSR_SMCMBX);
-> +		msg.value = iocsr_read32(LOONGSON_IOCSR_SMCMBX);
->   		if (msg.complete)
->   			break;
->   
-> diff --git a/drivers/irqchip/irq-loongarch-avec.c b/drivers/irqchip/irq-loongarch-avec.c
-> index 0f6e465dd309..2452c6cc0aa1 100644
-> --- a/drivers/irqchip/irq-loongarch-avec.c
-> +++ b/drivers/irqchip/irq-loongarch-avec.c
-> @@ -10,6 +10,7 @@
->   #include <linux/irqchip.h>
->   #include <linux/irqchip/chained_irq.h>
->   #include <linux/irqdomain.h>
-> +#include <linux/loongson/iocsr.h>
->   #include <linux/kernel.h>
->   #include <linux/msi.h>
->   #include <linux/radix-tree.h>
-> @@ -378,9 +379,9 @@ static int __init avecintc_init(struct irq_domain *parent)
->   				  "irqchip/loongarch/avecintc:starting",
->   				  avecintc_cpu_online, avecintc_cpu_offline);
->   #endif
-> -	value = iocsr_read64(LOONGARCH_IOCSR_MISC_FUNC);
-> +	value = iocsr_read64(LOONGSON_IOCSR_MISC_FUNC);
->   	value |= IOCSR_MISC_FUNC_AVEC_EN;
-> -	iocsr_write64(value, LOONGARCH_IOCSR_MISC_FUNC);
-> +	iocsr_write64(value, LOONGSON_IOCSR_MISC_FUNC);
->   
->   	return ret;
->   
-> diff --git a/drivers/irqchip/irq-loongson-eiointc.c b/drivers/irqchip/irq-loongson-eiointc.c
-> index e24db71a8783..6e81bf27914f 100644
-> --- a/drivers/irqchip/irq-loongson-eiointc.c
-> +++ b/drivers/irqchip/irq-loongson-eiointc.c
-> @@ -13,6 +13,7 @@
->   #include <linux/irqchip.h>
->   #include <linux/irqdomain.h>
->   #include <linux/irqchip/chained_irq.h>
-> +#include <linux/loongson/iocsr.h>
->   #include <linux/kernel.h>
->   #include <linux/syscore_ops.h>
->   #include <asm/numa.h>
-> @@ -52,9 +53,9 @@ static void eiointc_enable(void)
->   {
->   	uint64_t misc;
->   
-> -	misc = iocsr_read64(LOONGARCH_IOCSR_MISC_FUNC);
-> +	misc = iocsr_read64(LOONGSON_IOCSR_MISC_FUNC);
->   	misc |= IOCSR_MISC_FUNC_EXT_IOI_EN;
-> -	iocsr_write64(misc, LOONGARCH_IOCSR_MISC_FUNC);
-> +	iocsr_write64(misc, LOONGSON_IOCSR_MISC_FUNC);
->   }
->   
->   static int cpu_to_eio_node(int cpu)
-> diff --git a/include/linux/loongson/iocsr.h b/include/linux/loongson/iocsr.h
-> new file mode 100644
-> index 000000000000..6654a904bcbe
-> --- /dev/null
-> +++ b/include/linux/loongson/iocsr.h
-> @@ -0,0 +1,110 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020-2022 Loongson Technology Corporation Limited
-> + * Copyright (C) 2024, Jiaxun Yang <jiaxun.yang@flygoat.com>
-> + */
-> +
-> +#ifndef _LOONGSON_IOCSR_H
-> +#define _LOONGSON_IOCSR_H
-> +
-> +#include <linux/bits.h>
-> +#include <linux/types.h>
-> +
-> +#ifdef CONFIG_LOONGARCH
-> +#include <asm/loongarch.h>
-> +#endif
-> +
-> +#define LOONGSON_IOCSR_FEATURES	0x8
-> +#define  IOCSRF_TEMP			BIT_ULL(0)
-> +#define  IOCSRF_NODECNT			BIT_ULL(1)
-> +#define  IOCSRF_MSI			BIT_ULL(2)
-> +#define  IOCSRF_EXTIOI			BIT_ULL(3)
-> +#define  IOCSRF_CSRIPI			BIT_ULL(4)
-> +#define  IOCSRF_FREQCSR			BIT_ULL(5)
-> +#define  IOCSRF_FREQSCALE		BIT_ULL(6)
-> +#define  IOCSRF_DVFSV1			BIT_ULL(7)
-> +#define  IOCSRF_EIODECODE		BIT_ULL(9)
-> +#define  IOCSRF_FLATMODE		BIT_ULL(10)
-> +#define  IOCSRF_VM			BIT_ULL(11)
-> +#define  IOCSRF_AVEC			BIT_ULL(15)
-Is these definiton the same between Loongson3 mips and LoongArch machine 
-such as IOCSRF_FLATMODE/IOCSRF_AVEC?
-
-> +
-> +#define LOONGSON_IOCSR_VENDOR		0x10
-> +
-> +#define LOONGSON_IOCSR_CPUNAME		0x20
-> +
-> +#define LOONGSON_IOCSR_NODECNT		0x408
-> +
-> +#define LOONGSON_IOCSR_MISC_FUNC	0x420
-> +#define  IOCSR_MISC_FUNC_SOFT_INT	BIT_ULL(10)
-> +#define  IOCSR_MISC_FUNC_TIMER_RESET	BIT_ULL(21)
-> +#define  IOCSR_MISC_FUNC_EXT_IOI_EN	BIT_ULL(48)
-> +#define  IOCSR_MISC_FUNC_AVEC_EN	BIT_ULL(51)
-> +
-> +#define LOONGSON_IOCSR_CPUTEMP		0x428
-> +
-> +#define LOONGSON_IOCSR_SMCMBX		0x51c
-> +
-> +/* PerCore CSR, only accessible by local cores */
-> +#define LOONGSON_IOCSR_IPI_STATUS	0x1000
-> +#define LOONGSON_IOCSR_IPI_EN		0x1004
-> +#define LOONGSON_IOCSR_IPI_SET		0x1008
-> +#define LOONGSON_IOCSR_IPI_CLEAR	0x100c
-> +#define LOONGSON_IOCSR_MBUF0		0x1020
-> +#define LOONGSON_IOCSR_MBUF1		0x1028
-> +#define LOONGSON_IOCSR_MBUF2		0x1030
-> +#define LOONGSON_IOCSR_MBUF3		0x1038
-It seems that it is only used with arch/loongarch/kernel/smp.c,
-and file smp.c is arch specific. No generic driver uses this.
-
-> +
-> +#define LOONGSON_IOCSR_IPI_SEND	0x1040
-> +#define  IOCSR_IPI_SEND_IP_SHIFT	0
-> +#define  IOCSR_IPI_SEND_CPU_SHIFT	16
-> +#define  IOCSR_IPI_SEND_BLOCKING	BIT(31)
-> +
-> +#define LOONGSON_IOCSR_MBUF_SEND	0x1048
-> +#define  IOCSR_MBUF_SEND_BLOCKING	BIT_ULL(31)
-> +#define  IOCSR_MBUF_SEND_BOX_SHIFT	2
-> +#define  IOCSR_MBUF_SEND_BOX_LO(box)	(box << 1)
-> +#define  IOCSR_MBUF_SEND_BOX_HI(box)	((box << 1) + 1)
-> +#define  IOCSR_MBUF_SEND_CPU_SHIFT	16
-> +#define  IOCSR_MBUF_SEND_BUF_SHIFT	32
-> +#define  IOCSR_MBUF_SEND_H32_MASK	0xFFFFFFFF00000000ULL
-> +
-> +#define LOONGSON_IOCSR_ANY_SEND	0x1158
-> +#define  IOCSR_ANY_SEND_BLOCKING	BIT_ULL(31)
-> +#define  IOCSR_ANY_SEND_CPU_SHIFT	16
-> +#define  IOCSR_ANY_SEND_MASK_SHIFT	27
-> +#define  IOCSR_ANY_SEND_BUF_SHIFT	32
-> +#define  IOCSR_ANY_SEND_H32_MASK	0xFFFFFFFF00000000ULL
-> +
-> +/* Register offset and bit definition for CSR access */
-> +#define LOONGSON_IOCSR_TIMER_CFG       0x1060
-> +#define LOONGSON_IOCSR_TIMER_TICK      0x1070
-> +#define  IOCSR_TIMER_CFG_RESERVED       (_ULCAST_(1) << 63)
-> +#define  IOCSR_TIMER_CFG_PERIODIC       (_ULCAST_(1) << 62)
-> +#define  IOCSR_TIMER_CFG_EN             (_ULCAST_(1) << 61)
-> +#define  IOCSR_TIMER_MASK		0x0ffffffffffffULL
-> +#define  IOCSR_TIMER_INITVAL_RST        (_ULCAST_(0xffff) << 48)
-I do not find any use about IOCSR_TIMER macro, which does ip driver use 
-this?
-
-> +
-> +#define LOONGSON_IOCSR_EXTIOI_NODEMAP_BASE	0x14a0
-> +#define LOONGSON_IOCSR_EXTIOI_IPMAP_BASE	0x14c0
-> +#define LOONGSON_IOCSR_EXTIOI_EN_BASE		0x1600
-> +#define LOONGSON_IOCSR_EXTIOI_BOUNCE_BASE	0x1680
-> +#define LOONGSON_IOCSR_EXTIOI_ISR_BASE		0x1800
-> +#define LOONGSON_IOCSR_EXTIOI_ROUTE_BASE	0x1c00
-> +#define IOCSR_EXTIOI_VECTOR_NUM			256
-Is it better to define these macro in common header file or in extioi 
-driver?  It seems that only extioi use it.
-
-Regards
-Bibo Mao
-
-> +
-> +#ifndef __ASSEMBLY__
-> +static inline void csr_any_send(unsigned int addr, unsigned int data,
-> +				unsigned int data_mask, unsigned int cpu)
-> +{
-> +	uint64_t val = 0;
-> +
-> +	val = IOCSR_ANY_SEND_BLOCKING | addr;
-> +	val |= (cpu << IOCSR_ANY_SEND_CPU_SHIFT);
-> +	val |= (data_mask << IOCSR_ANY_SEND_MASK_SHIFT);
-> +	val |= ((uint64_t)data << IOCSR_ANY_SEND_BUF_SHIFT);
-> +	iocsr_write64(val, LOONGSON_IOCSR_ANY_SEND);
-> +}
-> +#endif
-> +
-> +#endif
-> +
 > 
-
+> Idea #2:
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 +-
+>  arch/x86/kvm/mmu/mmu.c          | 12 ++++++------
+>  arch/x86/kvm/mmu/mmu_internal.h | 15 ++++++++++++---
+>  arch/x86/kvm/mmu/tdp_mmu.c      |  1 +
+>  arch/x86/kvm/svm/svm.c          |  2 +-
+>  arch/x86/kvm/vmx/vmx.c          |  4 ++--
+>  6 files changed, 23 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 46e0a466d7fb..200fecd1de88 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2183,7 +2183,7 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+>  
+>  int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
+> -		       void *insn, int insn_len);
+> +		       void *insn, int insn_len, bool *frozen_spte);
+>  void kvm_mmu_print_sptes(struct kvm_vcpu *vcpu, gpa_t gpa, const char *msg);
+>  void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva);
+>  void kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b45258285c9c..207840a316d3 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4283,7 +4283,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  		return;
+>  
+>  	r = kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, work->arch.error_code,
+> -				  true, NULL, NULL);
+> +				  true, NULL, NULL, NULL);
+>  
+>  	/*
+>  	 * Account fixed page faults, otherwise they'll never be counted, but
+> @@ -4627,7 +4627,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+>  		trace_kvm_page_fault(vcpu, fault_address, error_code);
+>  
+>  		r = kvm_mmu_page_fault(vcpu, fault_address, error_code, insn,
+> -				insn_len);
+> +				       insn_len, NULL);
+>  	} else if (flags & KVM_PV_REASON_PAGE_NOT_PRESENT) {
+>  		vcpu->arch.apf.host_apf_flags = 0;
+>  		local_irq_disable();
+> @@ -4718,7 +4718,7 @@ static int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
+>  		if (signal_pending(current))
+>  			return -EINTR;
+>  		cond_resched();
+> -		r = kvm_mmu_do_page_fault(vcpu, gpa, error_code, true, NULL, level);
+> +		r = kvm_mmu_do_page_fault(vcpu, gpa, error_code, true, NULL, level, NULL);
+>  	} while (r == RET_PF_RETRY);
+>  
+>  	if (r < 0)
+> @@ -6073,7 +6073,7 @@ static int kvm_mmu_write_protect_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  }
+>  
+>  int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
+> -		       void *insn, int insn_len)
+> +				void *insn, int insn_len, bool *frozen_spte)
+>  {
+>  	int r, emulation_type = EMULTYPE_PF;
+>  	bool direct = vcpu->arch.mmu->root_role.direct;
+> @@ -6109,7 +6109,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+>  		vcpu->stat.pf_taken++;
+>  
+>  		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa, error_code, false,
+> -					  &emulation_type, NULL);
+> +					  &emulation_type, NULL, frozen_spte);
+>  		if (KVM_BUG_ON(r == RET_PF_INVALID, vcpu->kvm))
+>  			return -EIO;
+>  	}
+> @@ -6129,7 +6129,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+>  		vcpu->stat.pf_spurious++;
+>  
+>  	if (r != RET_PF_EMULATE)
+> -		return 1;
+> +		return r;
+>  
+>  emulate:
+>  	return x86_emulate_instruction(vcpu, cr2_or_gpa, emulation_type, insn,
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index 8d3fb3c8c213..5b1fc77695c1 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -247,6 +247,9 @@ struct kvm_page_fault {
+>  	 * is changing its own translation in the guest page tables.
+>  	 */
+>  	bool write_fault_to_shadow_pgtable;
+> +
+> +	/* Indicates the page fault needs to be retried due to a frozen SPTE. */
+> +	bool frozen_spte;
+>  };
+>  
+>  int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+> @@ -256,12 +259,12 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+>   * and of course kvm_mmu_do_page_fault().
+>   *
+>   * RET_PF_CONTINUE: So far, so good, keep handling the page fault.
+> + * RET_PF_FIXED: The faulting entry has been fixed.
+>   * RET_PF_RETRY: let CPU fault again on the address.
+>   * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
+>   * RET_PF_WRITE_PROTECTED: the gfn is write-protected, either unprotected the
+>   *                         gfn and retry, or emulate the instruction directly.
+>   * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
+> - * RET_PF_FIXED: The faulting entry has been fixed.
+>   * RET_PF_SPURIOUS: The faulting entry was already fixed, e.g. by another vCPU.
+>   *
+>   * Any names added to this enum should be exported to userspace for use in
+> @@ -271,14 +274,17 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+>   * on -errno return values.  Somewhat arbitrarily use '0' for CONTINUE, which
+>   * will allow for efficient machine code when checking for CONTINUE, e.g.
+>   * "TEST %rax, %rax, JNZ", as all "stop!" values are non-zero.
+> + *
+> + * Note #2, RET_PF_FIXED _must_ be '1', so that KVM's -errno/0/1 return code
+> + * scheme, where 1==success, translates '1' to RET_PF_FIXED.
+>   */
+>  enum {
+>  	RET_PF_CONTINUE = 0,
+> +	RET_PF_FIXED    = 1,
+>  	RET_PF_RETRY,
+>  	RET_PF_EMULATE,
+>  	RET_PF_WRITE_PROTECTED,
+>  	RET_PF_INVALID,
+> -	RET_PF_FIXED,
+>  	RET_PF_SPURIOUS,
+>  };
+>  
+> @@ -292,7 +298,8 @@ static inline void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+>  
+>  static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  					u64 err, bool prefetch,
+> -					int *emulation_type, u8 *level)
+> +					int *emulation_type, u8 *level,
+> +					bool *frozen_spte)
+>  {
+>  	struct kvm_page_fault fault = {
+>  		.addr = cr2_or_gpa,
+> @@ -341,6 +348,8 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  		*emulation_type |= EMULTYPE_WRITE_PF_TO_SP;
+>  	if (level)
+>  		*level = fault.goal_level;
+> +	if (frozen_spte)
+> +		*frozen_spte = fault.frozen_spte;
+>  
+>  	return r;
+>  }
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 5a475a6456d4..e7fc5ea4b437 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1174,6 +1174,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  
+>  retry:
+>  	rcu_read_unlock();
+> +	fault->frozen_spte = is_frozen_spte(iter.old_spte);
+>  	return ret;
+>  }
+>  
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 38723b0c435d..269de6a9eb13 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2075,7 +2075,7 @@ static int npf_interception(struct kvm_vcpu *vcpu)
+>  	rc = kvm_mmu_page_fault(vcpu, fault_address, error_code,
+>  				static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
+>  				svm->vmcb->control.insn_bytes : NULL,
+> -				svm->vmcb->control.insn_len);
+> +				svm->vmcb->control.insn_len, NULL);
+>  
+>  	if (rc > 0 && error_code & PFERR_GUEST_RMP_MASK)
+>  		sev_handle_rmp_fault(vcpu, fault_address, error_code);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 368acfebd476..fc2ff5d91a71 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5822,7 +5822,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+>  	if (unlikely(allow_smaller_maxphyaddr && !kvm_vcpu_is_legal_gpa(vcpu, gpa)))
+>  		return kvm_emulate_instruction(vcpu, 0);
+>  
+> -	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> +	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0, NULL);
+>  }
+>  
+>  static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+> @@ -5843,7 +5843,7 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+>  		return kvm_skip_emulated_instruction(vcpu);
+>  	}
+>  
+> -	return kvm_mmu_page_fault(vcpu, gpa, PFERR_RSVD_MASK, NULL, 0);
+> +	return kvm_mmu_page_fault(vcpu, gpa, PFERR_RSVD_MASK, NULL, 0, NULL);
+>  }
+>  
+>  static int handle_nmi_window(struct kvm_vcpu *vcpu)
+> 
+> base-commit: bc87a2b4b5508d247ed2c30cd2829969d168adfe
+> -- 
+> 
 
