@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-26882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73EE3978C5A
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 03:14:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88FED978C5C
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 03:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 366DF282868
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 01:14:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADE5D1C22814
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 01:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72CD1754B;
-	Sat, 14 Sep 2024 01:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6AC18049;
+	Sat, 14 Sep 2024 01:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m6FzPeXU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UnN4JQw8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CEDDDAB
-	for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 01:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B196168B8
+	for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 01:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726276437; cv=none; b=QnTJKCCuF12th1M3q33mQamLRXRZTCN6q04ty0zYwHBn/yHdVd8VD1HHgCLo+1pwGd6mZbrXHmD4zgGqShK8C6NbFmtmWwfE8B4k660A8AxAx1Zt/Y8kw/+ChlqgrccLhQm0ZJvPrI/hIHvBj/EoPB2+jgQ/7CoGMQfuN/ayia8=
+	t=1726276439; cv=none; b=dpe7kWRiz25CWbWISD/37VPQKOdhUNNfAjARUtwhc+zl6U7IeHV1Y7P+LiFTmNGuC4Y/qyjNUs2Pz5iIduZ/IUu3pDI7VtKhzJwbD4c2DLYMJaq0yw2GJy+eubt4tiA9tghtedxaJgOUAZNyxaMUdqNkcg868FQeX7P/OnThKWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726276437; c=relaxed/simple;
-	bh=tbJ2fbywyEYiNK7oO5Ch4oPfiPSjK8RRgUt3VXS92eE=;
+	s=arc-20240116; t=1726276439; c=relaxed/simple;
+	bh=JhQjvHU4nlyd0cPtYHleziW0WDbsr6+EQ8xZwOs1dHc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Flx4z6oNhODoz8xLWm6mn3Pud59x7RV8sZYdxM+vSVSS8JsvhRrHiz9cCUY4UKEDH6OheCioXHHjWHk7DCZXCuXWK9I8SydtINlv+V0Qhze1d2LDQzDVQ2PcmXMNZ6UB/s3PBwWaQ4S9WFC2JKdP3MSV4D6i9fhhMLdbP92cvzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m6FzPeXU; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=c2qd3B5slg28F7lMMjJLwUzfQoLZpHEQE9HEEdRw2TKHi2VjZHFw7OqaIIr6ovJoR+AyhYmzAW81WGb3uwFlVrWBbrUG9AHjdw5WZgan8Advc6DAYNdSDoKTyGfNujjd+mHZawtrkaHigu6DvI5jGgF5U8KK6/RVhEH2THmRbiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UnN4JQw8; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7db1762d70fso1289749a12.2
-        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 18:13:55 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6818fa37eecso3120992a12.1
+        for <kvm@vger.kernel.org>; Fri, 13 Sep 2024 18:13:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726276435; x=1726881235; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1726276437; x=1726881237; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=0eUzHbE7RFQ4bpUGANQPMKixAv9OiFz7ajFe5aARpWI=;
-        b=m6FzPeXUXR7ZyzmstrCp8IucRWwJC/SR9UsZd7NOWL2RqkMgkABOZH3qU3Nwvkf6bU
-         gaVcP0mr3xACZNKwgeQ9UdRPIAVetb6T6/OrC+Cc/SEMIOIXKI1E8mrxtslDEs9Z4fM+
-         4WYRoZ2yB8HIMgUP+mZJD2FZxsFXw3+SYqR6VKSOKzIiR2J223pYdKQTnx7AkGbWxS2Z
-         zEI4Uxwm7lCJMumjzpQVHFFvZymz0pkut0fq1Dd0FPmK9HrZITdwJYi26ul97zO9av9R
-         7paVoSJ6M7MN1fQkFaQK1BTUIgisJVd28f3qKqXgQv8FIb7dfe1UpMuy3STKOBEhs5SX
-         LsBQ==
+        bh=aacdJw8TNmRgJZleOUeRazwv02Hn4nA2W9oH/j73FzM=;
+        b=UnN4JQw8+hTScOdL40L26QDQThpK13Dh9HdBxRsKRXGzWMYnYbAJKNEc3dweOZ9HAk
+         Sqi3URjmo3OzTVEXahhFC62O6U6VQzJ2SK350iJPgasbuD9Uy2s5vjoEp+XH95WscGN5
+         Xw7Fg2jkAYYHPvI33RWSH9CBS6UusKiTFdQlHppXgKfntTT3gc046q6cx9qfcirSQmsl
+         3N/4hZzgaSGBcRttj7sZOIDeysDpkQYg/d8GGJOqOggajvOvii63DOhZMfst9hOZZYJ5
+         gUz6yJRvtQFvfB9xwfV7624TG3gEcH+beRuIHCYvTg33zQ3IEZ1KM0YxFxP+zhF6OVME
+         D7BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726276435; x=1726881235;
+        d=1e100.net; s=20230601; t=1726276437; x=1726881237;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0eUzHbE7RFQ4bpUGANQPMKixAv9OiFz7ajFe5aARpWI=;
-        b=nf0TnzlWzQne+Ko2VN+Xig7OyR3pM9Pu8qfG63u3U+XaWueCkzTZwai6ExXaRyQHWl
-         W0K8TMQV0Lgr3WapoIomyT2y0YoHZqoU6Fs8uAokxvInWtHsgG9tsTw/jSlPAe4G41Gf
-         LpAxU8dEkk4lriSn3fkMMHY4BWsE03UBmqjeRH+Aa19u9D8aIzejX5Bk+zygKawhHWWd
-         scwJuJxCiSi9WQQsN2zidZBm9bp91Q1W3lH58OoTWqYWkzv9qg9dySb3W9yOCm75lSEv
-         S7GHWBzZn+Qkosd+b6snmkOQkYp3vE2qppiPvp6Jwc/+gZtqeuSPCP836gZP0V5BVF+z
-         378g==
-X-Gm-Message-State: AOJu0YxDg00gDJtnQuN9RT2pfLBGa0smM8oYE1jusnoiMMtg4CbKlEKc
-	YDkoy8Vm+lQ5tRMZCENDvhxxEpFjWCcJLjI8SH+m3OYwUChuFOHbuBwi4wCfzzENmI03lxVvvZh
-	F3Q==
-X-Google-Smtp-Source: AGHT+IF+PF6xPdFlEhb4A6LGdbRcTGc+bTCG8xZjyE7asr6+YExfNMxMK+LwtSqL4Xho6J9oxCdenAVMQh4=
+        bh=aacdJw8TNmRgJZleOUeRazwv02Hn4nA2W9oH/j73FzM=;
+        b=Eb9bMLEMsdHk4QowtgE5/UPlGO4PVlv1aDezYjqwyCUCzjP7zL7Yc0e5zMo7YdZMPQ
+         G6pEDI0ffe0tdH8hoAZ2iz47q04/zocN7uV3AXS7Wd944bagM4cdC9OC7UAywZn/ZXEC
+         jUds4fHNC+UR/cgFcLLip2gCq4ika2bIMUi3PlempBRyeJUggsG2845leEWnfAgq3HCr
+         HClOp0JqK2d90DuKUA2dwkGg5ljJG1JQcuQOswTlkY/+CTk0hdWcBjcknRNSUxIRNZAO
+         E7F8ra481Wp3WvWhgL024O2plPzE14nShmAAbOGlJXVlWoiIMVRwTaLbtwa++GSuzNea
+         +7Fw==
+X-Gm-Message-State: AOJu0YytSAekZGYpY0tWX0zBRf5sEfcsMFlGEgw46nNO9NJHOaiqrQiw
+	msyrjLHCBAHaa5tUEWJT0+JN3fdf4j96W8hqWoJRNIV2ZFcWErGgJlo2f2VahsPJOIbEzR5+n68
+	pzw==
+X-Google-Smtp-Source: AGHT+IGlEsXZ2dgj+PLxZlYHIQ0vi4apKgGfQ/Win3919G8dju4lDWtoWfN0fO9U+MC+ECnEqlqFjWVZvbc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:b216:0:b0:7a2:cd4d:2a29 with SMTP id
- 41be03b00d2f7-7db2f98c2a5mr9465a12.10.1726276434643; Fri, 13 Sep 2024
- 18:13:54 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a65:6859:0:b0:7d6:66fb:3da7 with SMTP id
+ 41be03b00d2f7-7db2057ef03mr22911a12.3.1726276436690; Fri, 13 Sep 2024
+ 18:13:56 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 13 Sep 2024 18:13:43 -0700
+Date: Fri, 13 Sep 2024 18:13:44 -0700
 In-Reply-To: <20240914011348.2558415-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,24 +75,17 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240914011348.2558415-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.662.g92d0881bb0-goog
-Message-ID: <20240914011348.2558415-3-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: Misc changes for 6.12
+Message-ID: <20240914011348.2558415-4-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: MMU changes for 6.12
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The highlight is a rework of the userspace MSR access code to automatically
-suppress errors on disallowed accesses to advertised-but-unsupported MSRs.
-Unfortunately, actually removing all of the !host_initiated exemptions in KVM
-is decidely non-trivial, so realizing most the benefits will have to wait
-(though this should make life much easier for CET enabling).
-
-The lowlight is a rework of the x2APIC ICR handling.  KVM jumped through hoops
-to deal with Intel CPUs storing the full 64-bit value at the ICR offset in the
-vAPIC page, and then AMD (x2AVIC) came along and continued to split the value
-to the legacy ICR and ICR2 offsets.  *sigh*
+The bulk of the changes are to clean up the thorny "unprotect and retry" mess
+that grew over time.  The other notable change is to support yielding in the
+shadow MMU when zapping rmaps (simply a historic oversight, AFAICT).
 
 The following changes since commit 47ac09b91befbb6a235ab620c32af719f8208399:
 
@@ -100,98 +93,69 @@ The following changes since commit 47ac09b91befbb6a235ab620c32af719f8208399:
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-misc-6.12
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-mmu-6.12
 
-for you to fetch changes up to 4ca077f26d885cbc97e742a5f3572aac244a0f8a:
+for you to fetch changes up to 9a5bff7f5ec2383e3edac5eda561b52e267ccbb5:
 
-  KVM: x86: Remove some unused declarations (2024-09-09 20:12:43 -0700)
-
-----------------------------------------------------------------
-KVM x86 misc changes for 6.12
-
- - Advertise AVX10.1 to userspace (effectively prep work for the "real" AVX10
-   functionality that is on the horizon).
-
- - Rework common MSR handling code to suppress errors on userspace accesses to
-   unsupported-but-advertised MSRs.  This will allow removing (almost?) all of
-   KVM's exemptions for userspace access to MSRs that shouldn't exist based on
-   the vCPU model (the actual cleanup is non-trivial future work).
-
- - Rework KVM's handling of x2APIC ICR, again, because AMD (x2AVIC) splits the
-   64-bit value into the legacy ICR and ICR2 storage, whereas Intel (APICv)
-   stores the entire 64-bit value a the ICR offset.
-
- - Fix a bug where KVM would fail to exit to userspace if one was triggered by
-   a fastpath exit handler.
-
- - Add fastpath handling of HLT VM-Exit to expedite re-entering the guest when
-   there's already a pending wake event at the time of the exit.
-
- - Finally fix the RSM vs. nested VM-Enter WARN by forcing the vCPU out of
-   guest mode prior to signalling SHUTDOWN (architecturally, the SHUTDOWN is
-   supposed to hit L1, not L2).
+  KVM: x86/mmu: Use KVM_PAGES_PER_HPAGE() instead of an open coded equivalent (2024-09-09 20:22:08 -0700)
 
 ----------------------------------------------------------------
-Li Chen (1):
-      KVM: x86: Use this_cpu_ptr() in kvm_user_return_msr_cpu_online
+KVM x86 MMU changes for 6.12:
 
-Sean Christopherson (26):
-      KVM: SVM: Disallow guest from changing userspace's MSR_AMD64_DE_CFG value
-      KVM: x86: Move MSR_TYPE_{R,W,RW} values from VMX to x86, as enums
-      KVM: x86: Rename KVM_MSR_RET_INVALID to KVM_MSR_RET_UNSUPPORTED
-      KVM: x86: Refactor kvm_x86_ops.get_msr_feature() to avoid kvm_msr_entry
-      KVM: x86: Rename get_msr_feature() APIs to get_feature_msr()
-      KVM: x86: Refactor kvm_get_feature_msr() to avoid struct kvm_msr_entry
-      KVM: x86: Funnel all fancy MSR return value handling into a common helper
-      KVM: x86: Hoist x86.c's global msr_* variables up above kvm_do_msr_access()
-      KVM: x86: Suppress failures on userspace access to advertised, unsupported MSRs
-      KVM: x86: Suppress userspace access failures on unsupported, "emulated" MSRs
-      KVM: x86: Enforce x2APIC's must-be-zero reserved ICR bits
-      KVM: x86: Move x2APIC ICR helper above kvm_apic_write_nodecode()
-      KVM: x86: Re-split x2APIC ICR into ICR+ICR2 for AMD (x2AVIC)
-      KVM: selftests: Open code vcpu_run() equivalent in guest_printf test
-      KVM: selftests: Report unhandled exceptions on x86 as regular guest asserts
-      KVM: selftests: Add x86 helpers to play nice with x2APIC MSR #GPs
-      KVM: selftests: Skip ICR.BUSY test in xapic_state_test if x2APIC is enabled
-      KVM: selftests: Test x2APIC ICR reserved bits
-      KVM: selftests: Verify the guest can read back the x2APIC ICR it wrote
-      KVM: selftests: Play nice with AMD's AVIC errata
-      KVM: x86: Re-enter guest if WRMSR(X2APIC_ICR) fastpath is successful
-      KVM: x86: Dedup fastpath MSR post-handling logic
-      KVM: x86: Exit to userspace if fastpath triggers one on instruction skip
-      KVM: x86: Reorganize code in x86.c to co-locate vCPU blocking/running helpers
-      KVM: x86: Add fastpath handling of HLT VM-Exits
-      KVM: x86: Forcibly leave nested if RSM to L2 hits shutdown
+ - Overhaul the "unprotect and retry" logic to more precisely identify cases
+   where retrying is actually helpful, and to harden all retry paths against
+   putting the guest into an infinite retry loop.
 
-Tao Su (1):
-      KVM: x86: Advertise AVX10.1 CPUID to userspace
+ - Add support for yielding, e.g. to honor NEED_RESCHED, when zapping rmaps in
+   the shadow MMU.
 
-Thorsten Blum (1):
-      KVM: x86: Optimize local variable in start_sw_tscdeadline()
+ - Refactor pieces of the shadow MMU related to aging SPTEs in prepartion for
+   adding MGLRU support in KVM.
 
-Yue Haibing (1):
-      KVM: x86: Remove some unused declarations
+ - Misc cleanups
 
- arch/x86/include/asm/cpuid.h                       |   1 +
- arch/x86/include/asm/kvm-x86-ops.h                 |   2 +-
- arch/x86/include/asm/kvm_host.h                    |   5 +-
- arch/x86/kvm/cpuid.c                               |  30 +-
- arch/x86/kvm/lapic.c                               |  75 +-
- arch/x86/kvm/lapic.h                               |   1 -
- arch/x86/kvm/mmu.h                                 |   2 -
- arch/x86/kvm/mmu/mmu_internal.h                    |   2 -
- arch/x86/kvm/reverse_cpuid.h                       |   8 +
- arch/x86/kvm/smm.c                                 |  24 +-
- arch/x86/kvm/svm/svm.c                             |  44 +-
- arch/x86/kvm/vmx/main.c                            |   4 +-
- arch/x86/kvm/vmx/vmx.c                             |  10 +-
- arch/x86/kvm/vmx/vmx.h                             |   4 -
- arch/x86/kvm/vmx/x86_ops.h                         |   2 +-
- arch/x86/kvm/x86.c                                 | 841 +++++++++++----------
- arch/x86/kvm/x86.h                                 |  28 +-
- tools/testing/selftests/kvm/guest_print_test.c     |  19 +-
- tools/testing/selftests/kvm/include/x86_64/apic.h  |  21 +-
- tools/testing/selftests/kvm/lib/x86_64/processor.c |   8 +-
- .../selftests/kvm/x86_64/xapic_state_test.c        |  54 +-
- 21 files changed, 681 insertions(+), 504 deletions(-)
+----------------------------------------------------------------
+Sean Christopherson (33):
+      KVM: x86/mmu: Clean up function comments for dirty logging APIs
+      KVM: x86/mmu: Decrease indentation in logic to sync new indirect shadow page
+      KVM: x86/mmu: Drop pointless "return" wrapper label in FNAME(fetch)
+      KVM: x86/mmu: Reword a misleading comment about checking gpte_changed()
+      KVM: x86/mmu: Replace PFERR_NESTED_GUEST_PAGE with a more descriptive helper
+      KVM: x86/mmu: Trigger unprotect logic only on write-protection page faults
+      KVM: x86/mmu: Skip emulation on page fault iff 1+ SPs were unprotected
+      KVM: x86: Retry to-be-emulated insn in "slow" unprotect path iff sp is zapped
+      KVM: x86: Get RIP from vCPU state when storing it to last_retry_eip
+      KVM: x86: Store gpa as gpa_t, not unsigned long, when unprotecting for retry
+      KVM: x86/mmu: Apply retry protection to "fast nTDP unprotect" path
+      KVM: x86/mmu: Try "unprotect for retry" iff there are indirect SPs
+      KVM: x86: Move EMULTYPE_ALLOW_RETRY_PF to x86_emulate_instruction()
+      KVM: x86: Fold retry_instruction() into x86_emulate_instruction()
+      KVM: x86/mmu: Don't try to unprotect an INVALID_GPA
+      KVM: x86/mmu: Always walk guest PTEs with WRITE access when unprotecting
+      KVM: x86/mmu: Move event re-injection unprotect+retry into common path
+      KVM: x86: Remove manual pfn lookup when retrying #PF after failed emulation
+      KVM: x86: Check EMULTYPE_WRITE_PF_TO_SP before unprotecting gfn
+      KVM: x86: Apply retry protection to "unprotect on failure" path
+      KVM: x86: Update retry protection fields when forcing retry on emulation failure
+      KVM: x86: Rename reexecute_instruction()=>kvm_unprotect_and_retry_on_failure()
+      KVM: x86/mmu: Subsume kvm_mmu_unprotect_page() into the and_retry() version
+      KVM: x86/mmu: Detect if unprotect will do anything based on invalid_list
+      KVM: x86/mmu: WARN on MMIO cache hit when emulating write-protected gfn
+      KVM: x86/mmu: Move walk_slot_rmaps() up near for_each_slot_rmap_range()
+      KVM: x86/mmu: Plumb a @can_yield parameter into __walk_slot_rmaps()
+      KVM: x86/mmu: Add a helper to walk and zap rmaps for a memslot
+      KVM: x86/mmu: Honor NEED_RESCHED when zapping rmaps and blocking is allowed
+      KVM: x86/mmu: Morph kvm_handle_gfn_range() into an aging specific helper
+      KVM: x86/mmu: Fold mmu_spte_age() into kvm_rmap_age_gfn_range()
+      KVM: x86/mmu: Add KVM_RMAP_MANY to replace open coded '1' and '1ul' literals
+      KVM: x86/mmu: Use KVM_PAGES_PER_HPAGE() instead of an open coded equivalent
+
+ arch/x86/include/asm/kvm_host.h |  14 +-
+ arch/x86/kvm/mmu/mmu.c          | 522 ++++++++++++++++++++++------------------
+ arch/x86/kvm/mmu/mmu_internal.h |   3 +
+ arch/x86/kvm/mmu/mmutrace.h     |   1 +
+ arch/x86/kvm/mmu/paging_tmpl.h  |  63 ++---
+ arch/x86/kvm/mmu/tdp_mmu.c      |   6 +-
+ arch/x86/kvm/x86.c              | 133 +++-------
+ 7 files changed, 368 insertions(+), 374 deletions(-)
 
