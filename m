@@ -1,137 +1,132 @@
-Return-Path: <kvm+bounces-26939-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26940-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAEF4979445
-	for <lists+kvm@lfdr.de>; Sun, 15 Sep 2024 03:36:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FF359794C0
+	for <lists+kvm@lfdr.de>; Sun, 15 Sep 2024 08:33:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55D0FB24A89
-	for <lists+kvm@lfdr.de>; Sun, 15 Sep 2024 01:36:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 075142829E5
+	for <lists+kvm@lfdr.de>; Sun, 15 Sep 2024 06:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85772BA41;
-	Sun, 15 Sep 2024 01:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 135F31DFED;
+	Sun, 15 Sep 2024 06:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="sJoJ/7Jk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cagWJBCt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0FF10E0
-	for <kvm@vger.kernel.org>; Sun, 15 Sep 2024 01:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA50A1B960
+	for <kvm@vger.kernel.org>; Sun, 15 Sep 2024 06:33:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726364162; cv=none; b=Am++hVHd+OvyygILzCTYN9pPkf3fKEmCQjPoyg2GmzJtH31xPdk1YUcxu2IAaGTQiPdILi5Q7Ryb3X5zHqxhCiblpLEigv7dfZjBEj4z747pRrxK8typEqCuAm9xuyFeWCYJPImHxirg4fbOZHuIVqZg5/p4Xv6mohUtQAQFFlE=
+	t=1726381983; cv=none; b=svD5uefNQKkMuAmSb786ChjnImvr9kfDiHd5BUisL8e3Gv8Zy7RuRIghptLY8+BNDhrATIlFs0o3PWylwXe1O/OVikw+eRnE14nnOjGKRb9zRiqfWPOLdLnwHkzV6cJvGsO2EIX6bUMRY/gjjp+gw9eLSAcq2d/Levaeoq///a8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726364162; c=relaxed/simple;
-	bh=6HK5vKJd1Pz6CMRoia/S7R29gEpWsJ/Mfdgnkw8NhNA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=sVUWb3MVDlnqdwdmxEhGAthpIJj/T/UlgLGbIvPQdbYpY344oWiQCn2eNzbkMyGtaQZ8DHDY+v4Op2ec/F3ZThCwpYUs2KULxkIHdHQCQ/fCi+7G/tkTuMK1HM8tSyoixayBfFUCmzRdmLEHH0mJhwuBFJi7cvo7UyHdVdqJu+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=sJoJ/7Jk; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2068acc8b98so29807435ad.3
-        for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 18:36:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1726364161; x=1726968961; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=w8tj/CMN+xcHivHKfSr03LNWcdWKGkoKc1aDHjXGCyk=;
-        b=sJoJ/7JkzPGXOsvkoWQf5DqEcwV9mQ+dlalqgk759o7EZMM8ig2AeAL6c9Zgo89CYI
-         RTK/VvV+GDSEEKS4tf9sa8P8oPki2r+MJyss4I3fRiurc8xILsnAGKLDvxag9MDN6SVp
-         lTaATThqZnIR3QGB+OO+nvhDBL8kI0IsgMF0PzVHd9ShEkKPWOEgqqiatxNDCBOyhy2V
-         lzjqLtdDJtleKaGeby3aOsyfwflnStkDpkXLp7d96yeklijaxfWm0eb+wRQh9iv8kcz6
-         KUQqGbaFIoZT6iX6z6TOkPEbfpkWP4flJ+HUrDJTcPVkzZmvuxXP+hO1lcjw/OVOJrjf
-         4Etw==
+	s=arc-20240116; t=1726381983; c=relaxed/simple;
+	bh=lm+XUmAmVSDgb3EJXa1VZap5D/+Aow7c0ziBALSJypw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I228Semg1Z85+YoeExbBbFLd5gnAnhNZdVEK7VAs10qspOo3WtQUmIZiRgehADGw0Z+6Q8DWX1lNc6q1XFI/Hx2c9ZTOAn6EfYXz7VSZ1qkZQhAKwcgcVo9WgA15dIyxjuHk/YbBLM6OVEJtPxHWn50HIDHsyNGzCaCwq0lycIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cagWJBCt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726381979;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dMKHOf1xuC7TpHTelTfyEy/DYa5PwD5G1Ptu+WtDrxk=;
+	b=cagWJBCtTHnQ46qRChAFRUHx513E90eVF2sLMTnBvCBYsHMfCCxxumHgK53YPDEMVHjYKp
+	utW0WTwdztytdA9A0KxCiBpvll3uBBS2yAizb9CH8jMmsPlt5c/MRB6xLw/r2EZtdrvDr7
+	JLhY3kkQGzZ9p40QXM27gZtV4upTcgc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-326-zcYcT0ioM_aZDRSnXRFiQA-1; Sun, 15 Sep 2024 02:32:58 -0400
+X-MC-Unique: zcYcT0ioM_aZDRSnXRFiQA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-374bb1e931cso2173158f8f.0
+        for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 23:32:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726364161; x=1726968961;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w8tj/CMN+xcHivHKfSr03LNWcdWKGkoKc1aDHjXGCyk=;
-        b=SLNCkHcuc2D4+iJI8qViFxKKGwKthGmXne6+44nvAVi0GmMQjfkWy7Xdki4mxziIl9
-         VnXVVzO1w91l0btCZD7c43lRO5EtpBvZDnF+01+1a+cT+kIeZK0BGlAjUsiPgrC8ZPIz
-         6dI7ppgi+QebcCfmpFrS8ChUTB49hdBW4EJJ2cOO1uknIaRfEKEBBYcocTCWI2yvqf9z
-         7uBC3rja+4DMLR9xaqQhD8JRF+Mv+jKo7aUcDIEXk93queQHzuXzbnOeXnk1kyRFlLGs
-         jOrP1pOOSx1WA+5sz6hJuJaWHY0voxZuP+V42pF0XSM413G9qizPvFQ/71apu/BeVss5
-         uDLA==
-X-Gm-Message-State: AOJu0Yzg60Sx6IPfqb3NkLr6x+ZVsL49jAFeGoIpHcJlGiG9f45FgfwY
-	iZ6PsFrBTaBCxSlUx/wQEUCBIhnk/4rQ6yVQHZsMLpwoN4t3spVyxuYlxUKCFrw=
-X-Google-Smtp-Source: AGHT+IHOrSk7MZi+esiCMTfswJQ9NquBWUjlKkA2lu3eeEtyMYGJhosf6snJ4jwv1UvMxQMrmtnewA==
-X-Received: by 2002:a17:902:e742:b0:206:a3a9:197c with SMTP id d9443c01a7336-2076e43d052mr172274795ad.49.1726364160775;
-        Sat, 14 Sep 2024 18:36:00 -0700 (PDT)
-Received: from localhost ([210.160.217.68])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-20794605721sm14899215ad.111.2024.09.14.18.35.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 14 Sep 2024 18:36:00 -0700 (PDT)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Sun, 15 Sep 2024 10:35:53 +0900
-Subject: [PATCH] vhost/net: Set num_buffers for virtio 1.0
+        d=1e100.net; s=20230601; t=1726381977; x=1726986777;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dMKHOf1xuC7TpHTelTfyEy/DYa5PwD5G1Ptu+WtDrxk=;
+        b=fwhrZEIJW6XOeWsYd1Djr7dHkXZ70bVMh85Jg5ori4hVwF5U2dHBLr0nsCoFZpbLyt
+         bdaMJyiGxZhX22y0gv3QRuFYQd4HDX+JwWkESo07Mz5fkuqvIIv8YeAxF5E1lXkZ6Fe8
+         pSzYvK+MiLkbjNQxgbVgLAMBDahrKODU4nbNta7quhgaVP+SRDcV3uoomJ5djKmvkbYr
+         8RRsxNUj2PgnuPd1eH3BDnhqNy8XlEm5u4LV3zM1eNWwKPT5CM3rZkhN6PU7E5NSMFyM
+         SkUrRrc+ERbJSAtnDz5+xYAkqdUDBYnUkPcJRigNvWn9HoLTt0s15WgYDVt1MocGlq5D
+         oRxQ==
+X-Gm-Message-State: AOJu0YykpEwWHKl3WoN5eyLzGI8mLuKMe7wwazSAU+aIjWmj50URCMTr
+	bWSfqGZCse82xt2Lrzkf4jOL+Gn+841kYTdwx0+s4gVsoe7G9SUa4M7VzDzODGhhL+cVBTu50Xh
+	aAZ65mriFYTVNGgLT0FBHDifVJk23lHbBO7ivKNLeRjsHC7kSbyVfJGxENciMMT0BcbpdtV9dI2
+	OisHncMsS7EPs1JjXgos1gbHe/
+X-Received: by 2002:a5d:5d81:0:b0:374:bb1a:eebb with SMTP id ffacd0b85a97d-378c5e5d6a3mr5139447f8f.25.1726381976839;
+        Sat, 14 Sep 2024 23:32:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFlQQUMooRrySbo5EAnMxgrKZk9K6rI27EWehhL1UM/p80ojVgXzTvwa2jrK0uOjw7akO5/N/u1DZ4KKGetqP4=
+X-Received: by 2002:a5d:5d81:0:b0:374:bb1a:eebb with SMTP id
+ ffacd0b85a97d-378c5e5d6a3mr5139435f8f.25.1726381976355; Sat, 14 Sep 2024
+ 23:32:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240915-v1-v1-1-f10d2cb5e759@daynix.com>
-X-B4-Tracking: v=1; b=H4sIAPg55mYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIxMDSwML3TJDXUuDtGQL47Q0iyQDSyWgwoKi1LTMCrAh0bG1tQAopLCnVAA
- AAA==
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14-dev-fd6e3
+References: <20240914011348.2558415-1-seanjc@google.com> <CABgObfbV0HOAPA-4XjdUR2Q-gduEQhgSdJb1SzDQXd08M_pD+A@mail.gmail.com>
+In-Reply-To: <CABgObfbV0HOAPA-4XjdUR2Q-gduEQhgSdJb1SzDQXd08M_pD+A@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sun, 15 Sep 2024 08:32:44 +0200
+Message-ID: <CABgObfZ1oZHU+9LKc_uiPZs1uwqxczcknspCD=BJCFZd5+-yyw@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: x86 pull requests for 6.12
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The specification says the device MUST set num_buffers to 1 if
-VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+On Sat, Sep 14, 2024 at 4:54=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
+ wrote:
+>
+> On Sat, Sep 14, 2024 at 3:13=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > There's a trivial (and amusing) conflict with KVM s390 in the selftests=
+ pull
+> > request (we both added "config" to the .gitignore, within a few days of=
+ each
+> > other, after the goof being around for a good year or more).
+> >
+> > Note, the pull requests are relative to v6.11-rc4.  I got a late start,=
+ and for
+> > some reason thought kvm/next would magically end up on rc4 or later.
+> >
+> > Note #2, I had a brainfart and put the testcase for verifying KVM's fas=
+tpath
+> > correctly exits to userspace when needed in selftests, whereas the actu=
+al KVM
+> > fix is in misc.  So if you run KVM selftests in the middle of pulling e=
+verything,
+> > expect the debug_regs test to fail.
+>
+> Pulled all, thanks. Due to combination of being recovering from flu +
+> preparing to travel I will probably spend not be able to run tests for
+> a few days, but everything should be okay for the merge window.
 
-Fixes: 41e3e42108bc ("vhost/net: enable virtio 1.0")
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- drivers/vhost/net.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Hmm, I tried running tests in a slightly non-standard way (compiling
+the will-be-6.12 code on a 6.10 kernel and installing the module)
+because that's what I could do for now, and I'm getting system hangs
+in a few tests. The first ones that hung were
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index f16279351db5..d4d97fa9cc8f 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1107,6 +1107,7 @@ static void handle_rx(struct vhost_net *net)
- 	size_t vhost_hlen, sock_hlen;
- 	size_t vhost_len, sock_len;
- 	bool busyloop_intr = false;
-+	bool set_num_buffers;
- 	struct socket *sock;
- 	struct iov_iter fixup;
- 	__virtio16 num_buffers;
-@@ -1129,6 +1130,8 @@ static void handle_rx(struct vhost_net *net)
- 	vq_log = unlikely(vhost_has_feature(vq, VHOST_F_LOG_ALL)) ?
- 		vq->log : NULL;
- 	mergeable = vhost_has_feature(vq, VIRTIO_NET_F_MRG_RXBUF);
-+	set_num_buffers = mergeable ||
-+			  vhost_has_feature(vq, VIRTIO_F_VERSION_1);
- 
- 	do {
- 		sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-@@ -1205,7 +1208,7 @@ static void handle_rx(struct vhost_net *net)
- 		/* TODO: Should check and handle checksum. */
- 
- 		num_buffers = cpu_to_vhost16(vq, headcount);
--		if (likely(mergeable) &&
-+		if (likely(set_num_buffers) &&
- 		    copy_to_iter(&num_buffers, sizeof num_buffers,
- 				 &fixup) != sizeof num_buffers) {
- 			vq_err(vq, "Failed num_buffers write");
+hyperv_ipi
+hyperv_tlb_flush
+xapic_ipi_test
 
----
-base-commit: 46a0057a5853cbdb58211c19e89ba7777dc6fd50
-change-id: 20240908-v1-90fc83ff8b09
+And of course, this is on a machine that doesn't have serial
+console... :( I think for now I'll push the non-x86 stuff to kvm/next
+and then either bisect or figure out how to run tests normally.
 
-Best regards,
--- 
-Akihiko Odaki <akihiko.odaki@daynix.com>
+Paolo
 
 
