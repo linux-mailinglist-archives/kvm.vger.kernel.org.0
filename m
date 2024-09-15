@@ -1,201 +1,179 @@
-Return-Path: <kvm+bounces-26928-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26929-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005E097921D
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 18:40:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBC079793FC
+	for <lists+kvm@lfdr.de>; Sun, 15 Sep 2024 03:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64BE2B21AD5
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2024 16:40:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EAAB1F221D7
+	for <lists+kvm@lfdr.de>; Sun, 15 Sep 2024 01:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D528D1D0DE2;
-	Sat, 14 Sep 2024 16:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0F0946C;
+	Sun, 15 Sep 2024 01:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="irK6unxW"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="MB8JxnIv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D461DFFC
-	for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 16:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205D7186A
+	for <kvm@vger.kernel.org>; Sun, 15 Sep 2024 01:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726331991; cv=none; b=pyDHUuSkoXNrapw0mcL0A3nfv+GBJnO30J5yGmeqDhPFRuAePYzN/NmdcK9cz5p5kXdAl0Rk22AV/wxrcj+5mMFcbF+5N/TlKmyWB7eCXHPKEOqVOzeGhzePEOvV6YEeRxecBAyvvo/kvX4+6RdqlvxBBSvJ+e0GgNpf7lBy+X0=
+	t=1726363090; cv=none; b=qvk+6OKupm652n0JfL55mlv5r5WERcjgMh6N2N6QLNEwx9yFEVTwWAImPnaoSwNR+YhxA9a5Z/S7gSNODGQqfIFZDfx+5Jdk/FcX0ubwtlbAubJhGxEUJ7/0Fq/AuJa2QdUcyP9Oha789FNe2+xVj3KMzNz9D6Ll2d0J05XllJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726331991; c=relaxed/simple;
-	bh=Dvxs9j9TLSUzp3z2Nu/7vUqe2yENvwIXyR/MAq3YdDo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MsNYoVAY6+1/YAlvYYBq+gBqR/+yu6+VoemXQ6gqI8HdLxxw0KRH3uaGzFk6YV+atjIYTGHIYfTZsl1PLOYu4BFtfcSZdQsRGmjpG9ZJFlMlyaBE0b+ktiw5CJou7wt4LRSCcI2ivQtO9QCZWo6Yl88JPQ+WlrpJkm2B1uLHC6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=irK6unxW; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-82d07f32eeaso94027239f.2
-        for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 09:39:48 -0700 (PDT)
+	s=arc-20240116; t=1726363090; c=relaxed/simple;
+	bh=DjLACX6Izp1tDR7jnoxIGZpV6PDSLXserAQrHsvK6tI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To; b=u4CHayVpYNDWt+MAJFTzo1+3/ZTW+F1E/BD2qL/f3glYPzV7nwJEfIBgPLk3otG04F0QppUXOm2DS1smDeNU4vPMy3RXnjRe82yNEZ5YLGihVGIku6iuk1tVAfUWuIK50u30xFrBosWa9NhuwiG0QBQnRVHylGTicPJxnwD1Eiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=MB8JxnIv; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2055a3f80a4so22698235ad.2
+        for <kvm@vger.kernel.org>; Sat, 14 Sep 2024 18:18:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1726331987; x=1726936787; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=F5jKDPdzf6bQMz9p0N2ObXfh/X3qnIwnwioASvA03Fk=;
-        b=irK6unxWWDDZs+1p07uQ9CjvPWKohwM1fWEfZFwARz9eDKi3j+AMDoCImIWZWDEiAT
-         gl8qlMObMYT49miO0Yfo9X/utlb9u8L7ORQLJ3EActgE5Ix60eCUEz162XtS+Z15jZJn
-         AITvwib87TpGBAwzx6eIKs9P0xys+vZZXZeDACCldH8OzPFsH+tcMSjUgLAm43XbhOKu
-         VmcTHII1WKXkkQgtSFEk1hEIEpLoFdoQNS6uZ64NN+E1Fdt/rxkSoSEYLw8FunSg+Rkq
-         cYg8j045hCHMUKaW27D8GAx2AbdFEysZQO54lcMDxlCiSkOE57oGNv+00sNFN3kD5sK7
-         IrHw==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1726363088; x=1726967888; darn=vger.kernel.org;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4RlYLWTGEUWVMmH5uAZ3KmcTjt8vGdeFUKq4t4XgGZI=;
+        b=MB8JxnIvPG1zgxFx0z664yagV4HCyoXFZRMK72RU/Fza2Wib+ymw0auV7RhRVhRr1f
+         tIOYexepibcAayZ+jvfc6LAFXykIPErkafcFMLzHlEXJxlN7iimWhnMz9bH1coe9YUpT
+         cFiqCUizHuU3Wkb1++WVAiaany4W2nxfVv6F+A4zOBdFja2umX0fOXxTQvEo8styrigP
+         XLrgK3UhzV8koz3Gi3C7LH3rvJ+cP+nGM27jgfTNcv30aA1SHWatTx+WkGI30zMVQGD1
+         fkYVrC1te5mnSXVfIHlO+uYJjwYHNWN7jm9w8JXQsCJ7n1t7pH1hu+oRzzjFSa8OQL7e
+         7t7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726331987; x=1726936787;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F5jKDPdzf6bQMz9p0N2ObXfh/X3qnIwnwioASvA03Fk=;
-        b=VW9kadVn/XAWTj3U6qepIDKmrhCR8A9bIEnQnIkEBmvA8LwIimv7/Iq9wgY5QiA93X
-         oEMzCwCF7tT/hpTCgjWsPO0UJbjYr22qGWeDXRMtdDxbG8/uQAgSDfDdu7hX6GLdmKgp
-         p5Sce61w2V1PB972MpIYmFQ+AtDuUOMqc/SA52oDNUYfdnTHv8QgZU6Ciw9EBcvRMSBn
-         k+ypynOI8iB9OF1IyuTYoJcOf4x2wod4BHZv01/UMmustdxcyvdDyseJcpuiiIgpx9OL
-         CHKMX+nIycqPuElMIhTUOIrpX04cnWcq9jIa0JA3vUr0/AB9KpzRNotWzDEHr2MeEG+N
-         IAlg==
-X-Forwarded-Encrypted: i=1; AJvYcCWsKfSBjHXnXWHLeoUY1v3lQVxXv3Y5jtjrSHnIq4DBeuJUtvemNT4yvaJMQ1LlmF0mryo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgMz5hmp7w5JK0KgHcNqhfVo7tjCMKnyv6AprS9okb01InwnzE
-	58n/QwrIEKtqRmLc9cJXA18mrS1ZlCy47CWnXIvSWw2lubTGX9H3DRD7u4X4NPGKGyBFZQGmdVT
-	120U=
-X-Google-Smtp-Source: AGHT+IHcYNd/jqeI1uUq39K0wTEEILl56cZmfFM206eoGpPJ7N6EmrgIJr8Kaa/jRja1JuZV67rn6g==
-X-Received: by 2002:a05:6602:2cd3:b0:82a:a804:2ec1 with SMTP id ca18e2360f4ac-82d378245b8mr721024639f.12.1726331987542;
-        Sat, 14 Sep 2024 09:39:47 -0700 (PDT)
-Received: from [100.64.0.1] ([147.124.94.167])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d37ed33fd1sm470270173.122.2024.09.14.09.39.45
+        d=1e100.net; s=20230601; t=1726363088; x=1726967888;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4RlYLWTGEUWVMmH5uAZ3KmcTjt8vGdeFUKq4t4XgGZI=;
+        b=QrVWx5+jhZAbZIHN8MWQCLiis2WCqtb/8PdoMDnGscJol3z8abwaTpOfQIQHNlGKYQ
+         5unyy9rads0mYf5CaWoTA8jUAAWdTi+VCogfK45tjyTTNdxoEOz3GHBmfPoTDd7g/yVE
+         Ccn6g/CHggAKI055vQHghQXc4N0haGa+Uq/6JGav9NWTHGsBnauvFLBrx4uGa3eoeOq9
+         QWnTrgq6J0kNBJKHe2oLSV4tdKAGAt/GSxw2spFyO/reFn93QRkCHxtFnBPipbowjlRi
+         aDkwO7CvWFfteYARG/vaXGCSYX4isGl9B+IYbPWeZq/XyTE55zWR8i0kvt4NeW5fLbb/
+         1mLw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNu6CSwa+v+R5Loigt3PWZUXs9Uds2ji945I6X+hsjYm7Y2WgFa9B2Jg7UlSSFlqrHmXU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs0Kb7Pm/FSE6N/hHX6eOGhY8/21tzvh/qKgzu0Jvtva9WjAnv
+	04k6bqDzE213Q7TEBP9HxNz9T9PKQd7ygoWhFbVzHLfIIztp8MTiNiXV/KP8JdE=
+X-Google-Smtp-Source: AGHT+IEiuSb5mz6nz0x+3ls5vJS2I1fqTIfJlWtcvvYAYRCP14NP9cyLAAgnz5CXLZHRFQsX1yZDwg==
+X-Received: by 2002:a17:902:e842:b0:205:5f35:80a0 with SMTP id d9443c01a7336-2076e460c8bmr183980385ad.57.1726363088286;
+        Sat, 14 Sep 2024 18:18:08 -0700 (PDT)
+Received: from localhost ([210.160.217.68])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-207946d181fsm14749405ad.133.2024.09.14.18.18.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 14 Sep 2024 09:39:46 -0700 (PDT)
-Message-ID: <d161a6ea-6975-4427-8de8-93d4ee9e80fb@sifive.com>
-Date: Sat, 14 Sep 2024 11:39:45 -0500
+        Sat, 14 Sep 2024 18:18:07 -0700 (PDT)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH RFC v3 0/9] tun: Introduce virtio-net hashing feature
+Date: Sun, 15 Sep 2024 10:17:39 +0900
+Message-Id: <20240915-rss-v3-0-c630015db082@daynix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] RISC-V: KVM: Redirect instruction access fault trap to
- guest
-To: Anup Patel <anup@brainfault.org>
-Cc: Quan Zhou <zhouquan@iscas.ac.cn>, ajones@ventanamicro.com,
- atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org
-References: <83c2234d582b7e823ce9ac9b73a6bbcf63971a29.1724911120.git.zhouquan@iscas.ac.cn>
- <b5128162-278a-4284-8271-b2b91dc446e1@iscas.ac.cn>
- <380f4da9-50e9-4632-bdc8-b1723eb19ca5@sifive.com>
- <CAAhSdy1zSTWuTW1KohUDXr9UXUx-QL1A30AUkTGoL7W2L7JWLQ@mail.gmail.com>
-From: Samuel Holland <samuel.holland@sifive.com>
-Content-Language: en-US
-In-Reply-To: <CAAhSdy1zSTWuTW1KohUDXr9UXUx-QL1A30AUkTGoL7W2L7JWLQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALM15mYC/32MuwrCMBSGX6VkNiEnOU2qkyD4AK7iEJrUHoqNJ
+ FJaSt/d0MnJ7b9+K8shUcjsVK0shYkyxbEYfahY27vxGTj54pmSCiVKzVPOPFhtfXMMnbOWleU
+ 7hY7mnXJnt+uFPUrYU/7EtOzkCfaqQDRI2chagQQBiKgUB+4G6mmIIvqizt4tI82ija+dM6mfL
+ 9SAYBCFMtKg+fvdtu0LzTrgp98AAAA=
+To: Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+X-Mailer: b4 0.14-dev-fd6e3
 
-Hi Anup,
+virtio-net have two usage of hashes: one is RSS and another is hash
+reporting. Conventionally the hash calculation was done by the VMM.
+However, computing the hash after the queue was chosen defeats the
+purpose of RSS.
 
-On 2024-09-12 11:32 PM, Anup Patel wrote:
-> On Fri, Sep 13, 2024 at 6:09 AM Samuel Holland
-> <samuel.holland@sifive.com> wrote:
->>
->> On 2024-09-12 4:03 AM, Quan Zhou wrote:
->>>
->>> On 2024/8/29 14:20, zhouquan@iscas.ac.cn wrote:
->>>> From: Quan Zhou <zhouquan@iscas.ac.cn>
->>>>
->>>> The M-mode redirects an unhandled instruction access
->>>> fault trap back to S-mode when not delegating it to
->>>> VS-mode(hedeleg). However, KVM running in HS-mode
->>>> terminates the VS-mode software when back from M-mode.
->>>>
->>>> The KVM should redirect the trap back to VS-mode, and
->>>> let VS-mode trap handler decide the next step.
->>>>
->>>> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
->>>> ---
->>>>   arch/riscv/kvm/vcpu_exit.c | 1 +
->>>>   1 file changed, 1 insertion(+)
->>>>
->>>> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
->>>> index fa98e5c024b2..696b62850d0b 100644
->>>> --- a/arch/riscv/kvm/vcpu_exit.c
->>>> +++ b/arch/riscv/kvm/vcpu_exit.c
->>>> @@ -182,6 +182,7 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct
->>>> kvm_run *run,
->>>>       ret = -EFAULT;
->>>>       run->exit_reason = KVM_EXIT_UNKNOWN;
->>>>       switch (trap->scause) {
->>>> +    case EXC_INST_ACCESS:
->>>
->>> A gentle ping, the instruction access fault should be redirected to
->>> VS-mode for handling, is my understanding correct?
->>
->> Yes, this looks correct. However, I believe it would be equivalent (and more
->> efficient) to add EXC_INST_ACCESS to KVM_HEDELEG_DEFAULT in asm/kvm_host.h.
->>
->> I don't understand why some exceptions are delegated with hedeleg and others are
->> caught and redirected here with no further processing. Maybe someone thought
->> that it wasn't valid to set a bit in hedeleg if the corresponding bit was
->> cleared in medeleg? But this doesn't make sense, as S-mode cannot know which
->> bits are set in medeleg (maybe none are!).
->>
->> So the hypervisor must either:
->>  1) assume M-mode firmware checks hedeleg and redirects exceptions to VS-mode
->>     regardless of medeleg, in which case all four of these exceptions can be
->>     moved to KVM_HEDELEG_DEFAULT and removed from this switch statement, or
->>
->>  2) assume M-mode might not check hedeleg and redirect exceptions to VS-mode,
->>     and since no bits are guaranteed to be set in medeleg, any bit set in
->>     hedeleg must _also_ be handled in the switch case here.
->>
->> Anup, Atish, thoughts?
-> 
-> Any exception delegated to VS-mode via hedeleg means it is directly delivered
-> to VS-mode without any intervention of HS-mode. This aligns with the RISC-V
-> priv specification and there is no alternate semantics assumed by KVM RISC-V.
-> 
-> At the moment, for KVM RISC-V we are converging towards the following
-> approach:
-> 
-> 1) Only delegate "supervisor expected" traps to VS-mode via hedeleg
-> which supervisor software is generally expected to directly handle such
-> as breakpoint, user syscall, inst page fault, load page fault, and store
-> page fault.
-> 
-> 2) Other "supervisor unexpected" traps are redirected to VS-mode via
-> software in HS-mode because these are not typically expected by supervisor
-> software and KVM RISC-V should at least gather some stats for such traps.
+Another approach is to use eBPF steering program. This approach has
+another downside: it cannot report the calculated hash due to the
+restrictive nature of eBPF.
 
-Can you point me to where we collect stats for these traps? I don't see any code
-in kvm_riscv_vcpu_exit() that does this.
+Introduce the code to compute hashes to the kernel in order to overcome
+thse challenges.
 
-> Previously, we were redirecting such unexpect traps to KVM user space
-> where the KVM user space tool will simply dump the VCPU state and kill
-> the Guest/VM.
+An alternative solution is to extend the eBPF steering program so that it
+will be able to report to the userspace, but it is based on context
+rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+and vhost_net).
 
-Currently we have 5 exception types that go through software in HS-mode but
-never kill the guest: EXC_INST_ILLEGAL, EXC_LOAD_MISALIGNED,
-EXC_STORE_MISALIGNED, EXC_LOAD_ACCESS, and EXC_STORE_ACCESS. Are those
-considered "expected" or "unexpected"?
+QEMU patched to use this new feature is available at:
+https://github.com/daynix/qemu/tree/akihikodaki/rss2
 
-> The inst misaligned trap was historically always set in hedeleg but we
-> should update it based on the above approach.
+The QEMU patches will soon be submitted to the upstream as RFC too.
 
-What are the criteria for determining if a trap is "supervisor expected" or
-"supervisor unexpected"? Certainly any trap that can be triggered by misbehaved
-software in VU-mode should not kill the guest. Similarly, any trap that can be
-triggered by a misbehaved nested VS-mode guest should not kill the outer guest
-either.
+This work will be presented at LPC 2024:
+https://lpc.events/event/18/contributions/1963/
 
-So the only reason I see for not delegating them is to collect stats, but I
-wonder if that is worth the performance cost. I would rather make misaligned
-loads/stores (for example) faster in the guest than have a count of them at the
-hypervisor level.
+V1 -> V2:
+  Changed to introduce a new BPF program type.
 
-Regards,
-Samuel
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+---
+Changes in v3:
+- Reverted back to add ioctl.
+- Split patch "tun: Introduce virtio-net hashing feature" into
+  "tun: Introduce virtio-net hash reporting feature" and
+  "tun: Introduce virtio-net RSS".
+- Changed to reuse hash values computed for automq instead of performing
+  RSS hashing when hash reporting is requested but RSS is not.
+- Extracted relevant data from struct tun_struct to keep it minimal.
+- Added kernel-doc.
+- Changed to allow calling TUNGETVNETHASHCAP before TUNSETIFF.
+- Initialized num_buffers with 1.
+- Added a test case for unclassified packets.
+- Fixed error handling in tests.
+- Changed tests to verify that the queue index will not overflow.
+- Rebased.
+- Link to v2: https://lore.kernel.org/r/20231015141644.260646-1-akihiko.odaki@daynix.com
+
+---
+Akihiko Odaki (9):
+      skbuff: Introduce SKB_EXT_TUN_VNET_HASH
+      virtio_net: Add functions for hashing
+      net: flow_dissector: Export flow_keys_dissector_symmetric
+      tap: Pad virtio header with zero
+      tun: Pad virtio header with zero
+      tun: Introduce virtio-net hash reporting feature
+      tun: Introduce virtio-net RSS
+      selftest: tun: Add tests for virtio-net hashing
+      vhost/net: Support VIRTIO_NET_F_HASH_REPORT
+
+ Documentation/networking/tuntap.rst  |   7 +
+ drivers/net/Kconfig                  |   1 +
+ drivers/net/tap.c                    |   2 +-
+ drivers/net/tun.c                    | 255 ++++++++++++--
+ drivers/vhost/net.c                  |  16 +-
+ include/linux/skbuff.h               |  10 +
+ include/linux/virtio_net.h           | 198 +++++++++++
+ include/net/flow_dissector.h         |   1 +
+ include/uapi/linux/if_tun.h          |  71 ++++
+ net/core/flow_dissector.c            |   3 +-
+ net/core/skbuff.c                    |   3 +
+ tools/testing/selftests/net/Makefile |   2 +-
+ tools/testing/selftests/net/tun.c    | 666 ++++++++++++++++++++++++++++++++++-
+ 13 files changed, 1195 insertions(+), 40 deletions(-)
+---
+base-commit: 46a0057a5853cbdb58211c19e89ba7777dc6fd50
+change-id: 20240403-rss-e737d89efa77
+
+Best regards,
+-- 
+Akihiko Odaki <akihiko.odaki@daynix.com>
 
 
