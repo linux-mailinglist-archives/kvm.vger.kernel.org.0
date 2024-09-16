@@ -1,69 +1,127 @@
-Return-Path: <kvm+bounces-26961-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26962-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAA81979BF3
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 09:20:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCD4979C66
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 10:02:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 290661C228F5
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 07:20:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80DE8B232BE
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 08:02:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C75139578;
-	Mon, 16 Sep 2024 07:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9B013EFF3;
+	Mon, 16 Sep 2024 08:02:01 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C6720B22;
-	Mon, 16 Sep 2024 07:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9D6136357;
+	Mon, 16 Sep 2024 08:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726471237; cv=none; b=gcsEEa9eO8PHw3UJYmptHZvlOwlosNQQcaqdSqpJ8RyKWstwPWaoKNj1LPBl+beEU9dNMk6gdnkCHVitZJkvR/Y2RLFM3WiD83pqWng02KQaysbp7QO3rNgcTH2ioYoTbPIuAuWxYf359Q4SiVs683nZ+mhyw7JFsb7Z9LxjjPo=
+	t=1726473721; cv=none; b=CVzIdlVXw8d2ExT2gQkW0Rgn0QXbEbLetufACW8XgrAIKxR0IoEhweiaDy3RgSKcgkSxF9DhVP7uwk6LCLqAQKT2jKaZpV3FQSYWMrzPB5qBPG+DeOXl44dzRks3Daz8r4hisuV9QsRCGgBamUTvu/6vpkuCJZy/xDEX+pSaIlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726471237; c=relaxed/simple;
-	bh=82vHmi8ozG4X8T4z16a0738yGdikAB7EbfGQTDd99dE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lyiRYxTKFKbW2b2RXo3Z09mu7lEjo6ZUgB0NMLprCspuM+v8mrWU+y1zhWC+OL89jkcjCN2cNzPMsUSXSMVzaP5nUoXJEX/gI5IWNCIYXvOvXoJbdBAepkQGfn32cWU5SXd97A4OulsBCbDfbKZQjtV19EVTQI5qiwo71sAm0F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id EB8E0227AAD; Mon, 16 Sep 2024 09:20:30 +0200 (CEST)
-Date: Mon, 16 Sep 2024 09:20:30 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Jon Kohler <jon@nutanix.com>
-Cc: Christoph Hellwig <hch@lst.de>, Kirti Wankhede <kwankhede@nvidia.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Tony Krowiak <akrowiak@linux.ibm.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Jason Gunthorpe <jgg@nvidia.com>, Rohit Shenoy <rshenoy@nvidia.com>,
-	Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH] vfio-mdev: reinstate VFIO_MDEV Kconfig
-Message-ID: <20240916072030.GC16514@lst.de>
-References: <20240912141956.237734-1-jon@nutanix.com> <20240912140509.GA893@lst.de> <8A26B654-51D0-4007-919C-F1934BD0DFEE@nutanix.com>
+	s=arc-20240116; t=1726473721; c=relaxed/simple;
+	bh=46/KW6t/Ri9qLs83dZwNcfB7QL78F1lTLAYCmSjs+g4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BZsoAN/4Q9akuHMERpLQghLMBprtHLqX4oL+xf0b4EimlIjhOrdyVbOH38VkD+Gr2nKhy+PikL5W34bsRjqePlHZrP/ItEbOKzDm1asCjLbBDOT00Crq+SaU1rsktdCvOVUdnk9g5YEYTSknAUi44siKMX/W5W6CA5a6tbLdvYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4X6cjH0kRmz6L6ww;
+	Mon, 16 Sep 2024 15:58:11 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 827341400CB;
+	Mon, 16 Sep 2024 16:01:55 +0800 (CST)
+Received: from china (10.221.233.88) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 16 Sep
+ 2024 10:01:46 +0200
+From: <gur.stavi@huawei.com>
+To: <gur.stavi@huawei.com>
+CC: <akihiko.odaki@daynix.com>, <andrew@daynix.com>, <corbet@lwn.net>,
+	<davem@davemloft.net>, <edumazet@google.com>, <jasowang@redhat.com>,
+	<kuba@kernel.org>, <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<mst@redhat.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<shuah@kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<willemdebruijn.kernel@gmail.com>, <xuanzhuo@linux.alibaba.com>,
+	<yuri.benditovich@daynix.com>
+Subject: [PATCH RFC v3 2/9] virtio_net: Add functions for hashing
+Date: Mon, 16 Sep 2024 11:01:36 +0300
+Message-ID: <20240916080137.508-1-gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.1
+In-Reply-To: <20240916071253.462-1-gur.stavi@huawei.com>
+References: <20240916071253.462-1-gur.stavi@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8A26B654-51D0-4007-919C-F1934BD0DFEE@nutanix.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-On Thu, Sep 12, 2024 at 03:32:52PM +0000, Jon Kohler wrote:
-> Christoph - thanks for the swift reply, I appreciate it. To clarify slightly,
-> MDEV does have various exported symbols in MDEV, with both regular
-> EXPORT_SYMBOL and _GPL variant; however, there is just no way to 
-> consume them out of tree without this patch, unless there is also
-> incidentally another in-tree module that has select VFIO_MDEV set.
+> +
+> +static inline void virtio_net_toeplitz(struct virtio_net_toeplitz_state *state,
+> +				       const __be32 *input, size_t len)
+> 
+> The function calculates a hash value but its name does not make it
+> clear. Consider adding a 'calc'.
+> 
+> +{
+> +	u32 key;
+> +
+> +	while (len) {
+> +		state->key++;
+> +		key = be32_to_cpu(*state->key);
+> 
+> You perform be32_to_cpu to support both CPU endianities.
+> If you will follow with an unconditional swab32, you could run the
+> following loop on a more natural 0 to 31 always referring to bit 0
+> and avoiding !!(key & bit):
+> 
+> key = swab32(be32_to_cpu(*state->key));
+> for (i = 0; i < 32; i++, key >>= 1) {
+> 	if (be32_to_cpu(*input) & 1)
+> 		state->hash ^= state->key_buffer;
+> 	state->key_buffer = (state->key_buffer << 1) | (key & 1);
+> }
+> 
 
-The point of kernel infrastructure is not to consume it out of tree.
-Get your driver upstream and fully participate instead wasting your
-time on this kind of stuff please.
+Fixing myself, in previous version 'input' was tested against same bit.
+Advantage is less clear now, replacing !! with extra shift.
+However, since little endian CPUs are more common, the combination of
+swab32(be32_to_cpu(x) will actually become a nop.
+Similar tactic may be applied to 'input' by assigning it to local
+variable. This may produce more efficient version but not necessary
+easier to understand.
+
+key = bswap32(be32_to_cpu(*state->key));
+for (u32 bit = BIT(31); bit; bit >>= 1, key >>= 1) {
+	if (be32_to_cpu(*input) & bit)
+		state->hash ^= state->key_buffer;
+	state->key_buffer =
+		(state->key_buffer << 1) | (key & 1);
+}
+
+> 
+> +
+> +		for (u32 bit = BIT(31); bit; bit >>= 1) {
+> +			if (be32_to_cpu(*input) & bit)
+> +				state->hash ^= state->key_buffer;
+> +
+> +			state->key_buffer =
+> +				(state->key_buffer << 1) | !!(key & bit);
+> +		}
+> +
+> +		input++;
+> +		len--;
+> +	}
+> +}
+> +
 
