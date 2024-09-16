@@ -1,222 +1,223 @@
-Return-Path: <kvm+bounces-27000-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27001-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EDAB97A527
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 17:20:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 754C797A562
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 17:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E68F928AD85
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 15:20:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAA0D1F21785
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 15:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4247B15A86A;
-	Mon, 16 Sep 2024 15:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0665815AADB;
+	Mon, 16 Sep 2024 15:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tondjNBN"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kdRYpM8s"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2064.outbound.protection.outlook.com [40.107.237.64])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68A215A864;
-	Mon, 16 Sep 2024 15:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726500036; cv=fail; b=CHoM2lwdKiI0jYIQn9Z3eCtqlmK6L+lunwbpwm6dlIihDis7omI0a0Z19fEQxWkev8r+nXMb6K1oC0SrR34nDfXvuZanhkpQ0AQM5h75U220GfWRiLsD55J4EPJNiOq/PKWzVy6h+VqLIPx1uwiBbngFYSHJodrEloICC2wFHDg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726500036; c=relaxed/simple;
-	bh=Dm28Qy0AEAlrh9aOehZ2mI+tYjIebSDNKMlQQYtfhps=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ooXAwoMd57SmLmhgwSutM4dtQ8SZSHE66aBoCkJI5OO7BLKehtU81984RmxFSqpIAXSKHREjeS1fZJs5hx4GjeaQ4Nml8R4vpWsNe7r67u0W7nKSmLXrMBzcnvOadoqLDL0H7QASGuhdf6NNIW3/76ZAXuCr/DH/NIU9R5CMEJI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tondjNBN; arc=fail smtp.client-ip=40.107.237.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bG6eQJxIBvw0hg39JvZfk5uL96DxKxLmFRoY7bTrUg39u8ORg5qjhNl/vPs3Ct2UjuNdHF6zCoJbAW8vnGAxXwx4yjUOu+Iu2CCg6CZQnU/P3BYLf92Au71eU+W3+Cpm90q/hgrd+m8adhzS1J3V4vT5otHVMPEJ67FjfJgLCEZSq/kCbfs4Xt5KEXDRlVDfUtZpZEkMpUuil6D0/4QnNMRdcsrJ+hd3/TPEfrJ/Xqzwaim7Tlkt33meESUWFG6ZPrXL9SAdCxdW/CNOlvNmJ6k5E6te2+CtQLPT8yDV/cfXzmay/fgDgG55PB0/aom4USnwMPzXlKLHX30HD9ZJHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I4aECBFXDuQaOBC3IGqcm3YuDqt7ufMAk6hyDk3fjCk=;
- b=xj4tT5BaaRBr/Nmk5wN1eqBAY538DRH+4LyAviDRmmzp0+UWlBiCms8GlvYURkYut76sDXEKaAUBcdisvACQEEJiWMd71ynr8Gf+UHNnnMW4XVOGrtcdKDBRcNyCe5OlsciFvpjEvSmrZcZ6/qirCGn3BHZeBJV0VddGqaiiQHs8lp56hcd5ITL1jf9KecdWIWhkjNsy5+DcJeYfkrqXDhU4G8fGShT86n8I/jVXYlLedV42XFmQMaxx8XuLhp0vfAurOSvZ3HKoZZjRnjiY6kbv7Y4Q5QZybERuFuYw8dvmK3HtS/wM0RUOg/p9zoBCT67dDuPnciUwCyMIfMjnpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I4aECBFXDuQaOBC3IGqcm3YuDqt7ufMAk6hyDk3fjCk=;
- b=tondjNBNIvs6cytgU+/eWdwZ+az7jNF+PPxEqwVpbQmQ3RH/fwGZJ+TnQTYmWbYV2dZEdIUTDezbgl12pXMrEZ8MjJziDep5xCW9hLYRKL/SPRsvK0lbCXrMi1MrAalraIfNpzSnV9KjyRx0QJ14vGH2Uev+0Ka1ttWUw9rxgGE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- CY8PR12MB7217.namprd12.prod.outlook.com (2603:10b6:930:5b::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7962.23; Mon, 16 Sep 2024 15:20:31 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec%5]) with mapi id 15.20.7962.022; Mon, 16 Sep 2024
- 15:20:31 +0000
-Message-ID: <9a218564-b011-4222-187d-cba9e9268e93@amd.com>
-Date: Mon, 16 Sep 2024 20:50:20 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [PATCH v11 19/20] x86/kvmclock: Skip kvmclock when Secure TSC is
- available
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de,
- x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
- dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com
-References: <20240731150811.156771-1-nikunj@amd.com>
- <20240731150811.156771-20-nikunj@amd.com> <ZuR2t1QrBpPc1Sz2@google.com>
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <ZuR2t1QrBpPc1Sz2@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0PR01CA0101.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:af::11) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFF4158550;
+	Mon, 16 Sep 2024 15:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726500834; cv=none; b=uhAJY+n/Q5k+Yh35NQgJFc2VDZLLeYkzOgOXY+Xv6D0aQgzNct+v3T7WJHEecTVBNVmTugf/uilmJi/Xhx4bWKJmAZiPMsn4uUjTFLvPDBdIkMOl6rtjV6+L/hpmYOUcxb49Vm9pdL1eKzeNIRH1lTTjWo45oip18CK3/dhh7Fc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726500834; c=relaxed/simple;
+	bh=IY8C+StfjFJHJtqw4O3q5t4JZ6R26AYxgS+dshF64Y8=;
+	h=Subject:MIME-Version:Content-Type:Date:Message-ID:From:To:CC:
+	 References:In-Reply-To; b=np8Ays1Rywe5EWMAWEaCf58M/my84IY9VZZOVJCbrQ/yJw8Vl/wx6xFElNpRS99CGak7FNQ1PxhhQJQNVi/a++i9zy5MYqCFi//6X1pTV+RWYSMmV4pW7d9ED5rjK8Ab4IpascCutIBCXdjz8G9UAHDHAbJg4qe3YIn7X1iUAUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kdRYpM8s; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1726500833; x=1758036833;
+  h=mime-version:content-transfer-encoding:date:message-id:
+   from:to:cc:references:in-reply-to:subject;
+  bh=EEwEknCR7gPqewEKfA7AQyWhoTIg8MMivyoECSmpsEI=;
+  b=kdRYpM8slLpP1+mbE98ePb1MrORmSx6TZzULdNMAqdyuZc8ehl2plGhw
+   MUnQcVhNZvLmkItwz2bz8JnWXc7lj0NccZQk17epiH20PQXgIw3OgFGVq
+   JD8W7Uj5PtT3EYxDSK61E9NsEQ4SEGi1xSEQ9mAaKbKVkkbC1wP+Va8iB
+   w=;
+X-IronPort-AV: E=Sophos;i="6.10,233,1719878400"; 
+   d="scan'208";a="25953235"
+Subject: Re: [PATCH 05/18] KVM: x86: hyper-v: Introduce MP_STATE_HV_INACTIVE_VTL
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 15:33:48 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.10.100:51984]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.1.23:2525] with esmtp (Farcaster)
+ id f0c8e00d-30a9-4cd0-acb9-4acbebf05106; Mon, 16 Sep 2024 15:33:46 +0000 (UTC)
+X-Farcaster-Flow-ID: f0c8e00d-30a9-4cd0-acb9-4acbebf05106
+Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 16 Sep 2024 15:33:45 +0000
+Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
+ (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Mon, 16 Sep 2024
+ 15:33:39 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|CY8PR12MB7217:EE_
-X-MS-Office365-Filtering-Correlation-Id: b3f64a14-b42e-4eb6-4b9e-08dcd6631a05
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MFhmenFPalBpWVZFck4xemVaR0lzdzRkaWpUcHdUNjVDbDZFdEJUY1lGeEpv?=
- =?utf-8?B?RGJ3d0hDb2ZkSHVYR3d6YUxrSTVtSUxJTXcwVFdzMDM4VGt0U0pacGJzeU5k?=
- =?utf-8?B?YTczZmcvZSttZmdBNVp4dDkzT3RRdHllVXZiM0doWW9nK2pQQWNkN3ptWFRq?=
- =?utf-8?B?RHBrUVEzSnFvYUsxeEJPdFJCN3VmbENBWG54cmt0SkxQcHJ6cDliRzRkdCtX?=
- =?utf-8?B?V2hWZUNnaHNWeTdRRWJNakFxVThuNyt0cnpxL3FnN3dxK1dTR3RXZ3FCdVBj?=
- =?utf-8?B?dlpwUnM0b0NjTThDTS9UTGpxSEZzWFJYTkZpWVFkbzY5S0p5RFUrMWw4d2hP?=
- =?utf-8?B?K3J3dXpJbTdpRlNnd2xyN1pVZnFsOFl4RTlPRGc5eTdnM2piNzdMRko0UnhU?=
- =?utf-8?B?SVhYZkxtaU02YXZnV3cvN2Uyd3JUaktZdlZadUJqdlY4OW14NXUvcy9QaDJL?=
- =?utf-8?B?OU1zSHA5R2lVMnZyWVNWWE9kUElrVkd5OG1rQjgxbkFIVFBUYVYvS28rczU1?=
- =?utf-8?B?Zm5HSXUrTEJCWjhobXA4endGREZQWlRkYkFFdHFvVVZhWklBYmk4ZklDUGJB?=
- =?utf-8?B?L1dqNG1kNEZCUTZBVXVyc3BSZ3paQ1ZyMi9oMUZ1dmszSHdwZ3RlMnN5RlFB?=
- =?utf-8?B?bDdrQmJaNmI5RHUzeWxuSExxckhzRlo3aDBZSldYM2JuUHRyS3FHQ3ZDN3VQ?=
- =?utf-8?B?eGtPdFEwbFJUbzNkR1B5NFBHb1lvUjUxQldSemduVHRtNmlXMHZQN0pBU05L?=
- =?utf-8?B?US9oK0Y1MURBcS9welhBaGNTcEh3TVZHYlN2b1JJSmZQTG9sc1hFM0kwRVRN?=
- =?utf-8?B?QU1IaFJEMExHM0hDMlllN3FKendIam5DZlpmYTZtMWxSNDRpMXZna0xYU3RW?=
- =?utf-8?B?dWd3eDN1VWhCSXBSazZjRTFWaC93ZHlpckZwQlBWWENVeFRsWjZTbHl2SkM3?=
- =?utf-8?B?czVqL2p1RWU1V0lTTzdBNGlKeFgxNHNaTFBXdlEzSUlqM0E2ZHJyRXNvZjU0?=
- =?utf-8?B?SXFQQ2NEOFgrSVJFam11UU95THNlTEFXbldTSGF5UFBTZ0c3c2NURlVzNVM3?=
- =?utf-8?B?M2p5YlRpeEtNMUE4amdlV2NvTGJHWXFPQUhNMk93Y3dRbUs4a3pkbGFSWjd4?=
- =?utf-8?B?UldjSTVEMkJDcVE1WGtRTEZ0OVdDUG4weVl0QlZPbXoyZDJqR1VKZmtCWWMw?=
- =?utf-8?B?QjVVMzQ0L210NzA3eDB2cVNXZDlMZU5NU0NhNEVYSHdKcGk1OUtPWFVaKysx?=
- =?utf-8?B?MnpRYjNUano3dkFrWVNabjZ4RUFyNTFLRmZMb0dpS2lDcmJZVFdIY2NYbkxq?=
- =?utf-8?B?b3J0R291R1lwcmlYbDAwb1g1WFZESUdjRXl6RVIyaDJBa3EzSGVWcWloTlYr?=
- =?utf-8?B?MzA5K2QrRHlIaitWbHF2NWxod1RFcjZsVTB5Y1hQUTBQVHNacG0yaWdobUwr?=
- =?utf-8?B?cjF2U2VLVUFDd0FYWmtlbk1iVm5ZRDR0RnJtdU1JR0hQMUQrODF4WS9DUjNq?=
- =?utf-8?B?RmhQMGx2SU5EQ3ZIdmZlaDhxN2ZJYUFJbFFPWDFhZWs2SGszNjNTTmNTeTNh?=
- =?utf-8?B?M01XUVBQeDVteUpiNVF3SUFzdGNKa2VJRUh4YnRsZXVYRUh5RUdmZlBtR1Np?=
- =?utf-8?B?RFdybVk5VThFQlJRY04wWHFSaXFFOWVuYUFRejdRZzJNazMrQXFwSlpEVExs?=
- =?utf-8?B?SU5ZYjN4U1hjL2lhWjlvNnpTQ01NaDdVZ0Fuc0hDTHc1VjF2Y1RuUWpzZlh6?=
- =?utf-8?B?cWtUSnJBOXp6UkJRTXhWcm51T2hKc2dTSEYvandpQk51d3R5Z0I1VlVvNWpP?=
- =?utf-8?B?M1RZOVl0TXlDMlIyY1luQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ekdnQVJxZFV6R05YODNnblJ3RW5jYlFNS1p3Mi9YRUkweXNHODJ1U2FuQnEy?=
- =?utf-8?B?Z2VVb0VwZ0FUQjYyUHErWGQyeFZyZVdpcHdCcDVJM0ZNQ1FOTzBxak1aRjUz?=
- =?utf-8?B?Y0NGYmtDTGQ0NHdiaUoveWg4aDBLQXVyN1BGcjJJQUJVS0FXTWN4MnhaTE1R?=
- =?utf-8?B?RUk5L0hKT1FKdWtrY3NsNnIzYnBqdVFqZmFnNVlpMzYyYzR3VHkxZ1BHdTRE?=
- =?utf-8?B?TkFRS1BRYTJvNGpCZGRhL3BmNytHNXJDVCt5RVpuMXhGS08xQ2ZMaVordGl6?=
- =?utf-8?B?emFoYWpCcmRvUXlQYmZRMks2ZFJOUitrUHJVNUMxSng1Q0R2VjdaM014N3Nn?=
- =?utf-8?B?Z3luYUI1RDRGYUZ6R3hTYWF4Nks3Wnh6NlB3LzdlWUw4WWVFaHF6Nk9CQjll?=
- =?utf-8?B?MkZ0bzBnaUZIaW8yQ3BaZkdMS0Y0REZCNm9oQmtjZXh6bnQzTXVjanRmdVVV?=
- =?utf-8?B?dXhKUmtkWlVXaFN4am1EZVlBK3V4V2ozZ2NlUHNuVlh2THJQZENHRy9RbVdR?=
- =?utf-8?B?UnBaNG1iNjhzaDh5NUVCYW5iMGNNMXdGLzZ4NzUwU2pZNE1IeFJHY0R5Yk8v?=
- =?utf-8?B?VXZXNUxRVGlKT0RmK3VIMytoaEg5VDE4Tkt1OThESnRoSzFTd0JLNEN2S2xZ?=
- =?utf-8?B?SU5TenNPaENJTERzMm8vSmdnYWtiVnRxRU1UcDZVeXFsZnVGZy9HSEFxVzVG?=
- =?utf-8?B?UTdTRy9DRG8zS3REWFB5b0hTbHJPOUlGNGRxS25sek02Q3dYdGhwYXY1UlVs?=
- =?utf-8?B?VFhmS2ZFOC9HcWdQejdtUDlZT3R2dG9TTHBpaVhlV0M2NWVDREYzMVJHTUxx?=
- =?utf-8?B?Tyt6aEhPWDVRNmVqT1ZJMHdWU3p3Z0tIZk9WZVJzUXE4dThpcmI3SEFlMVBE?=
- =?utf-8?B?a2JJSUFQcmRZcDZmSVFRYWlUVFJmRWZ4djBQamZQUkFVb211Q3d2VEMvSU5q?=
- =?utf-8?B?eHFRV0REanlzS3FzemVtRWhTM0RpenhQaEsvS0ZDTlVSRUFQM3plWXcvV0V6?=
- =?utf-8?B?QXNaM3BoT2N0dUFOZWNQU01MSnorNHAwdVJESUR3cW84ZnN5TzBUbVJDSWNq?=
- =?utf-8?B?dGtKT3NDSjlHVUd0WlNRalMvMVJUSGJ2NCt1aEhWbE9PZFZhZWZodU1WVWJk?=
- =?utf-8?B?NjNiNDcyMld4VFF5aHZRY1Y4Q2syLzBLd0E1dDRoQmNLT3VlZGl0SkxyUXU1?=
- =?utf-8?B?UTNaQmhXcVllcHQzUmsyTURUMTVCN3N6RGhxY20xWlB2N2lOb3BraGR2aCtv?=
- =?utf-8?B?SUFoWmJlK25lbkxKV0NiRlFaTXkyTGt4bEFpY2ozcWVVek1CNmFVVkI3UlNE?=
- =?utf-8?B?NlB1QllVZ2xLbHgxREtlSzQ1YVBveVRKNTFBaURPSDJRRkd0ZTNKdzlrdnRn?=
- =?utf-8?B?NWMyL1BSdVFqSjE1L0NMb0o2UGRHNXNLZjh3ajZ3ZTdLYzhxR0c1clhGUEdv?=
- =?utf-8?B?U2dJSWl1YUZ1NUY0aE9aT2RvdlgzQVVveTlMLzhRS0U5T0VVNVdaSzNuemE4?=
- =?utf-8?B?ZkVGM0xYaUdPcnZ6QnVlQUJTL2RWNGdzbGoxTkxnaVZ1ejhvZDRGQzM0Vm43?=
- =?utf-8?B?RXE5L09ZY0gweXhlczJjSFMrak5tdWUxeEJpbERrc1J6eGlkakZGZi9XZ1Mw?=
- =?utf-8?B?RksvbTQ0eGZSN0h1UDVIRnhtaTVKcEdBcVB3VGJwd3RwVHFVRWFyQlNoRDEv?=
- =?utf-8?B?aFpGbTQzRDg3RVQwTU1Vby92dGR4LzZkb2duem9VcVlUV2ZoTHZHczBzRytl?=
- =?utf-8?B?RWw5S1ozbE1hZ2Zsb29RV2N6aEpCME1xQjZONGNUVmJYSG1VL0IwU1QzSFp6?=
- =?utf-8?B?YVVMeWt6eU1iTkcxRkQ1UW1YN016K2VEd1A2QzdhRElOaUxHV0o2UnpLM0hm?=
- =?utf-8?B?TWFmMjBSbHBBdXkrdTlQU0RFOEdSZ2VVU1I1Q1BWTHAwZ3B5Q2FWdUR1ZkZX?=
- =?utf-8?B?dER2eWpjdWFmaVE2cHlWdFJKS0lqcGIyRUZwOXE3Um1ibGI5TTErRTFHLzhJ?=
- =?utf-8?B?MEZIYmtLOVF5cFJNYXVOMnV6UDNYNWpXYjZXcXVYNDFWM2x2eHdsbGNVR1g0?=
- =?utf-8?B?aXRHMU5ZVVQyNktSV1VsakJYbGs0OFovY3NPVWc5RVhrTVptRXRsMXF6bkM3?=
- =?utf-8?Q?C0kaI1xFRrEA3q+cN4kD4lNYJ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3f64a14-b42e-4eb6-4b9e-08dcd6631a05
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2024 15:20:31.0028
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: W1T45oQwg/JJxfewZKVtLBs0raOHMivbJ5pGPKcXM8WXg5wuACXpH1gD3o94flPJAQPLZROUjS02PAzct9PSiQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7217
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 16 Sep 2024 15:33:36 +0000
+Message-ID: <D47TGLMWFTN2.2VCKLFM1K4GM8@amazon.com>
+From: Nicolas Saenz Julienne <nsaenz@amazon.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<pbonzini@redhat.com>, <vkuznets@redhat.com>, <linux-doc@vger.kernel.org>,
+	<linux-hyperv@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <graf@amazon.de>,
+	<dwmw2@infradead.org>, <mlevitsk@redhat.com>, <jgowans@amazon.com>,
+	<corbet@lwn.net>, <decui@microsoft.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<x86@kernel.org>, <amoorthy@google.com>
+X-Mailer: aerc 0.18.2-0-ge037c095a049-dirty
+References: <20240609154945.55332-1-nsaenz@amazon.com>
+ <20240609154945.55332-6-nsaenz@amazon.com> <ZuSL_FCfvVywCPxm@google.com>
+In-Reply-To: <ZuSL_FCfvVywCPxm@google.com>
+X-ClientProxiedBy: EX19D039UWA003.ant.amazon.com (10.13.139.49) To
+ EX19D004EUC001.ant.amazon.com (10.252.51.190)
 
+On Fri Sep 13, 2024 at 7:01 PM UTC, Sean Christopherson wrote:
+> On Sun, Jun 09, 2024, Nicolas Saenz Julienne wrote:
+> > Model inactive VTL vCPUs' behaviour with a new MP state.
+> >
+> > Inactive VTLs are in an artificial halt state. They enter into this
+> > state in response to invoking HvCallVtlCall, HvCallVtlReturn.
+> > User-space, which is VTL aware, can processes the hypercall, and set th=
+e
+> > vCPU in MP_STATE_HV_INACTIVE_VTL. When a vCPU is run in this state it'l=
+l
+> > block until a wakeup event is received. The rules of what constitutes a=
+n
+> > event are analogous to halt's except that VTL's ignore RFLAGS.IF.
+> >
+> > When a wakeup event is registered, KVM will exit to user-space with a
+> > KVM_SYSTEM_EVENT exit, and KVM_SYSTEM_EVENT_WAKEUP event type.
+> > User-space is responsible of deciding whether the event has precedence
+> > over the active VTL and will switch the vCPU to KVM_MP_STATE_RUNNABLE
+> > before resuming execution on it.
+> >
+> > Running a KVM_MP_STATE_HV_INACTIVE_VTL vCPU with pending events will
+> > return immediately to user-space.
+> >
+> > Note that by re-using the readily available halt infrastructure in
+> > KVM_RUN, MP_STATE_HV_INACTIVE_VTL correctly handles (or disables)
+> > virtualisation features like the VMX preemption timer or APICv before
+> > blocking.
+>
+> IIUC, this is a convoluted and roundabout way to let userspace check if a=
+ vCPU
+> has a wake event, correct?  Even by the end of the series, KVM never sets
+> MP_STATE_HV_INACTIVE_VTL, i.e. the only use for this is to combine it as:
+>
+>   KVM_SET_MP_STATE =3D> KVM_RUN =3D> KVM_SET_MP_STATE =3D> KVM_RUN
 
+Correct.
 
-On 9/13/2024 11:00 PM, Sean Christopherson wrote:
-> On Wed, Jul 31, 2024, Nikunj A Dadhania wrote:
->> For AMD SNP guests with SecureTSC enabled, kvm-clock is being picked up
->> momentarily instead of selecting more stable TSC clocksource.
->>
->> [    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
->> [    0.000001] kvm-clock: using sched offset of 1799357702246960 cycles
->> [    0.001493] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
->> [    0.006289] tsc: Detected 1996.249 MHz processor
->> [    0.305123] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x398cadd9d93, max_idle_ns: 881590552906 ns
->> [    1.045759] clocksource: Switched to clocksource kvm-clock
->> [    1.141326] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x398cadd9d93, max_idle_ns: 881590552906 ns
->> [    1.144634] clocksource: Switched to clocksource tsc
->>
->> When Secure TSC is enabled, skip using the kvmclock. The guest kernel will
->> fallback and use Secure TSC based clocksource.
->>
->> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
->> Tested-by: Peter Gonda <pgonda@google.com>
->> ---
->>  arch/x86/kernel/kvmclock.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
->> index 5b2c15214a6b..3d03b4c937b9 100644
->> --- a/arch/x86/kernel/kvmclock.c
->> +++ b/arch/x86/kernel/kvmclock.c
->> @@ -289,7 +289,7 @@ void __init kvmclock_init(void)
->>  {
->>  	u8 flags;
->>  
->> -	if (!kvm_para_available() || !kvmclock)
->> +	if (!kvm_para_available() || !kvmclock || cc_platform_has(CC_ATTR_GUEST_SECURE_TSC))
-> 
-> I would much prefer we solve the kvmclock vs. TSC fight in a generic way.  Unless
-> I've missed something, the fact that the TSC is more trusted in the SNP/TDX world
-> is simply what's forcing the issue, but it's not actually the reason why Linux
-> should prefer the TSC over kvmclock.  The underlying reason is that platforms that
-> support SNP/TDX are guaranteed to have a stable, always running TSC, i.e. that the
-> TSC is a superior timesource purely from a functionality perspective.  That it's
-> more secure is icing on the cake.
+> The upside to this approach is that it requires minimal uAPI and very few=
+ KVM
+> changes, but that's about it AFAICT.  On the other hand, making this so p=
+ainfully
+> specific feels like a missed opportunity, and unnecessarily bleeds VTL de=
+tails
+> into KVM.
+>
+> Bringing halt-polling into the picture (by going down kvm_vcpu_halt()) is=
+ also
+> rather bizarre since quite a bit of time has already elapsed since the vC=
+PU first
+> did HvCallVtlCall/HvCallVtlReturn.  But that doesn't really have anything=
+ to do
+> with MP_STATE_HV_INACTIVE_VTL, e.g. it'd be just as easy to go to kvm_vcp=
+u_block().
+>
+> Why not add an ioctl() to very explicitly block until a wake event is rea=
+dy?
+> Or probably better, a generic "wait" ioctl() that takes the wait type as =
+an
+> argument.
+>
+> Kinda like your idea of supporting .poll() on the vCPU FD[*], except it's=
+ very
+> specifically restricted to a single caller (takes vcpu->mutex).  We could=
+ probably
+> actually implement it via .poll(), but I suspect that would be more confu=
+sing than
+> helpful.
+>
+> E.g. extract the guts of vcpu_block() to a separate helper, and then wire=
+ that
+> up to an ioctl().
+>
+> As for the RFLAGS.IF quirk, maybe handle that via a kvm_run flag?  That w=
+ay,
+> userspace doesn't need to do a round-trip just to set a single bit.  E.g.=
+ I think
+> we should be able to squeeze it into "struct kvm_hyperv_exit".
 
-Are you suggesting that whenever the guest is either SNP or TDX, kvmclock should be
-disabled assuming that timesource is stable and always running?
+It's things like the RFLAG.IF exemption that deterred me from building a
+generic interface. We might find out that the generic blocking logic
+doesn't match the expected VTL semantics and be stuck with a uAPI that
+isn't enough for VSM, nor useful for any other use-case. We can always
+introduce 'flags' I guess.
 
-Regards
-Nikunj
+Note that I'm just being cautious here, AFAICT the generic approach
+works, and I'm fine with going the "wait" ioctl.
+
+> Actually, speaking of kvm_hyperv_exit, is there a reason we can't simply =
+wire up
+> HVCALL_VTL_CALL and/or HVCALL_VTL_RETURN to a dedicated complete_userspac=
+e_io()
+> callback that blocks if some flag is set?  That would make it _much_ clea=
+ner to
+> scope the RFLAGS.IF check to kvm_hyperv_exit, and would require little to=
+ no new
+> uAPI.
+
+So IIUC, the approach is to have complete_userspace_io() block after
+re-entering HVCALL_VTL_RETURN. Then, have it exit back onto user-space
+whenever an event is made available (maybe re-using
+KVM_SYSTEM_EVENT_WAKEUP?). That would work, but will need something
+extra to be compatible with migration/live-update.
+
+> > @@ -3797,6 +3798,10 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu=
+)
+> >         if (!gif_set(svm))
+> >                 return true;
+> >
+> > +       /*
+> > +        * The Hyper-V TLFS states that RFLAGS.IF is ignored when decid=
+ing
+> > +        * whether to block interrupts targeted at inactive VTLs.
+> > +        */
+> >         if (is_guest_mode(vcpu)) {
+> >                 /* As long as interrupts are being delivered...  */
+> >                 if ((svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK)
+> > @@ -3808,7 +3813,7 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
+> >                 if (nested_exit_on_intr(svm))
+> >                         return false;
+> >         } else {
+> > -               if (!svm_get_if_flag(vcpu))
+> > +               if (!svm_get_if_flag(vcpu) && !kvm_hv_vcpu_is_idle_vtl(=
+vcpu))
+>
+> Speaking of RFLAGS.IF, I think it makes sense to add a common x86 helper =
+to handle
+> the RFLAGS.IF vs. idle VTL logic.  Naming will be annoying, but that's ab=
+out it.
+>
+> E.g. kvm_is_irq_blocked_by_rflags_if() or so.
+
+Noted.
+
+Thanks,
+Nicolas
 
