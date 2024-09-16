@@ -1,155 +1,176 @@
-Return-Path: <kvm+bounces-26959-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65084979BD9
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 09:13:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E1D979BF1
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 09:19:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 978F91C2292D
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 07:13:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 689481F22D86
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 07:19:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F1013A3F4;
-	Mon, 16 Sep 2024 07:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EEF12E1CA;
+	Mon, 16 Sep 2024 07:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BB+JCo/z"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01A14174C;
-	Mon, 16 Sep 2024 07:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04D420B22
+	for <kvm@vger.kernel.org>; Mon, 16 Sep 2024 07:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726470803; cv=none; b=JPxA+Z23BV0dbvy1WONG0iUWFBFGtjS8xxmL/pRxon9w7+3TxY6unbDJp04xSMz8tyFSBgtdiYHuEyclFrKa5pg8axFRDv6pHKDgK0nyzoQAfo/Uq+7FXArgOXgTbKFIL9t0jK5O1/kwixjzx+jUtIhIGbfNHA6jvkC5e+MSxxc=
+	t=1726471164; cv=none; b=hmJr2/Mt29a9ja7TdUJ6ndF66LBwxWshGUHPJCYV2nCJ5GqkWvl2r77TutN6Yqb7FcXhArIpsL821X6lyt+1Ro3n3Hw7Y6kNUydIyWiJGYcUFfgn4V1SqARRNmdmQlj3ZqXbmC8o0AOY+uF3z2Nr6AC9iKfbly9WM0SWnU0os0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726470803; c=relaxed/simple;
-	bh=ZaE3JPjtRaAYCYIkE3022YmPKGJtBMPOLnJUVzEdaQc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cQiN59nBaEyyXUKvlD8CwCMiG8jFHrXZd/Q3p9k7Z5t4LxD/zKFwXMOxfbXaZtWL+252URF9KztiZO8oSXwt+nLuTgN6i9mx//6A5NXFPKoG7x0+0WEG1N8GH/GBKFa137P1ARv8kfDQcmYtSnenZSkaBd7jX/K5gyGqQOPzw4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4X6bd32w2Wz6L78S;
-	Mon, 16 Sep 2024 15:09:27 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id C16E0140516;
-	Mon, 16 Sep 2024 15:13:11 +0800 (CST)
-Received: from china (10.221.233.88) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 16 Sep
- 2024 09:13:03 +0200
-From: <gur.stavi@huawei.com>
-To: <akihiko.odaki@daynix.com>
-CC: <andrew@daynix.com>, <corbet@lwn.net>, <davem@davemloft.net>,
-	<edumazet@google.com>, <jasowang@redhat.com>, <kuba@kernel.org>,
-	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<mst@redhat.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<shuah@kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<willemdebruijn.kernel@gmail.com>, <xuanzhuo@linux.alibaba.com>,
-	<yuri.benditovich@daynix.com>
-Subject: [PATCH RFC v3 2/9] virtio_net: Add functions for hashing
-Date: Mon, 16 Sep 2024 10:12:53 +0300
-Message-ID: <20240916071253.462-1-gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240915-rss-v3-2-c630015db082@daynix.com>
-References: <20240915-rss-v3-2-c630015db082@daynix.com>
+	s=arc-20240116; t=1726471164; c=relaxed/simple;
+	bh=AiuT2GVbgf/JaQpd2uk1kpOWwLsSoVCbq2mNltMd4c0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=geDK3PJcFeuXRcg80e4S6PIxXakgdWaOJpzuGWtENkAuuRMWmvUCbfmrqXSyUEwYNGmr8tIMmA2fo6ash/T3EZVJhjhuGYkbcoUFcXHfZI+SJJmarO/TJm9guNmyQS+uvL7j01+7vkkrOZa7jMin6AV5rPhPBY7ZkOi7YCQc6Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BB+JCo/z; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 16 Sep 2024 09:19:00 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726471158;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XFMQE0C78fViBPaDapacxW93vJ112LrqDdN07T5XTgI=;
+	b=BB+JCo/za9ULHNsmkLoqaDC2eGXLCxlcGn0UClkVOAtx2cipN/Wf8RvLqqq6kgIiuU7iL4
+	6RbmNAqs9ZS/WltbfZvEQQ3AnM9JvxMT5AQwzv/7Zo+GeoPFBOFjCHblu3so2GaZE66SSR
+	JOBXxc9gwxKpw3hKNsxX2xPqjCf1F+c=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: James Raphael Tiovalen <jamestiotio@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu
+Subject: Re: [kvm-unit-tests PATCH v4 1/3] riscv: Rewrite hartid_to_cpu in
+ assembly
+Message-ID: <20240916-68681cd03420e20e1628481b@orel>
+References: <20240915183459.52476-1-jamestiotio@gmail.com>
+ <20240915183459.52476-2-jamestiotio@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- frapeml500005.china.huawei.com (7.182.85.13)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240915183459.52476-2-jamestiotio@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-+
-+static inline void virtio_net_toeplitz(struct virtio_net_toeplitz_state *state,
-+				       const __be32 *input, size_t len)
+On Mon, Sep 16, 2024 at 02:34:57AM GMT, James Raphael Tiovalen wrote:
+> From: Andrew Jones <andrew.jones@linux.dev>
+> 
+> Some SBI HSM tests run without a stack being setup so they can't
+> run C code. Those tests still need to know the corresponding cpuid
+> for the hartid on which they are running. Give those tests
+> hartid_to_cpu() by reimplementing it in assembly.
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 
-The function calculates a hash value but its name does not make it
-clear. Consider adding a 'calc'.
+This should also include your sign-off since you're posting it and it's
+for your series. Passing unmodified patches on that you're comfortable
+passing on corresponds to (c) of [1]
 
-+{
-+	u32 key;
-+
-+	while (len) {
-+		state->key++;
-+		key = be32_to_cpu(*state->key);
+[1] https://www.kernel.org/doc/html/v4.17/process/submitting-patches.html#developer-s-certificate-of-origin-1-1
 
-You perform be32_to_cpu to support both CPU endianities.
-If you will follow with an unconditional swab32, you could run the
-following loop on a more natural 0 to 31 always referring to bit 0
-and avoiding !!(key & bit):
+> ---
+>  lib/riscv/asm-offsets.c |  5 +++++
+>  lib/riscv/setup.c       | 10 ----------
+>  riscv/cstart.S          | 23 +++++++++++++++++++++++
+>  3 files changed, 28 insertions(+), 10 deletions(-)
+> 
+> diff --git a/lib/riscv/asm-offsets.c b/lib/riscv/asm-offsets.c
+> index a2a32438..6c511c14 100644
+> --- a/lib/riscv/asm-offsets.c
+> +++ b/lib/riscv/asm-offsets.c
+> @@ -1,6 +1,7 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+>  #include <kbuild.h>
+>  #include <elf.h>
+> +#include <asm/processor.h>
+>  #include <asm/ptrace.h>
+>  #include <asm/smp.h>
+>  
+> @@ -58,5 +59,9 @@ int main(void)
+>  	OFFSET(SECONDARY_FUNC, secondary_data, func);
+>  	DEFINE(SECONDARY_DATA_SIZE, sizeof(struct secondary_data));
+>  
+> +	OFFSET(THREAD_INFO_CPU, thread_info, cpu);
+> +	OFFSET(THREAD_INFO_HARTID, thread_info, hartid);
+> +	DEFINE(THREAD_INFO_SIZE, sizeof(struct thread_info));
+> +
+>  	return 0;
+>  }
+> diff --git a/lib/riscv/setup.c b/lib/riscv/setup.c
+> index 495db041..f347ad63 100644
+> --- a/lib/riscv/setup.c
+> +++ b/lib/riscv/setup.c
+> @@ -43,16 +43,6 @@ uint64_t timebase_frequency;
+>  
+>  static struct mem_region riscv_mem_regions[NR_MEM_REGIONS + 1];
+>  
+> -int hartid_to_cpu(unsigned long hartid)
+> -{
+> -	int cpu;
+> -
+> -	for_each_present_cpu(cpu)
+> -		if (cpus[cpu].hartid == hartid)
+> -			return cpu;
+> -	return -1;
+> -}
+> -
+>  static void cpu_set_fdt(int fdtnode __unused, u64 regval, void *info __unused)
+>  {
+>  	int cpu = nr_cpus++;
+> diff --git a/riscv/cstart.S b/riscv/cstart.S
+> index 8f269997..6784d5e1 100644
+> --- a/riscv/cstart.S
+> +++ b/riscv/cstart.S
+> @@ -109,6 +109,29 @@ halt:
+>  1:	wfi
+>  	j	1b
+>  
+> +/*
+> + * hartid_to_cpu
+> + *   a0 is a hartid on entry
+> + * returns the corresponding cpuid in a0
 
-key = swab32(be32_to_cpu(*state->key));
-for (i = 0; i < 32; i++, key >>= 1) {
-	if (be32_to_cpu(*input) & 1)
-		state->hash ^= state->key_buffer;
-	state->key_buffer = (state->key_buffer << 1) | (key & 1);
-}
+I should have capitalized the 'r' in 'returns' and also written
+"or -1 if no thread-info struct with 'hartid' is found."
 
+> + */
+> +.balign 4
+> +.global hartid_to_cpu
+> +hartid_to_cpu:
+> +	la	t0, cpus
+> +	la	t1, nr_cpus
+> +	lw	t1, 0(t1)
+> +	li	t2, 0
+> +1:	bne	t2, t1, 2f
+> +	li	a0, -1
+> +	ret
+> +2:	REG_L	t3, THREAD_INFO_HARTID(t0)
+> +	bne	a0, t3, 3f
+> +	lw	a0, THREAD_INFO_CPU(t0)
+> +	ret
+> +3:	addi	t0, t0, THREAD_INFO_SIZE
+> +	addi	t2, t2, 1
+> +	j	1b
+> +
+>  .balign 4
+>  .global secondary_entry
+>  secondary_entry:
+> -- 
+> 2.43.0
+>
 
-+
-+		for (u32 bit = BIT(31); bit; bit >>= 1) {
-+			if (be32_to_cpu(*input) & bit)
-+				state->hash ^= state->key_buffer;
-+
-+			state->key_buffer =
-+				(state->key_buffer << 1) | !!(key & bit);
-+		}
-+
-+		input++;
-+		len--;
-+	}
-+}
-+
-+static inline u32 virtio_net_hash_report(u32 types,
-+					 struct flow_dissector_key_basic key)
-+{
-+	switch (key.n_proto) {
-+	case htons(ETH_P_IP):
+I'll fixup the comment and add your sign-off when applying.
 
-Other parts of the code use be_to_cpu and cpu_to_be, Why use legacy
-htons here?
-
-+		if (key.ip_proto == IPPROTO_TCP &&
-+		    (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4))
-+			return VIRTIO_NET_HASH_REPORT_TCPv4;
-+
-+		if (key.ip_proto == IPPROTO_UDP &&
-+		    (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4))
-+			return VIRTIO_NET_HASH_REPORT_UDPv4;
-+
-+		if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv4)
-+			return VIRTIO_NET_HASH_REPORT_IPv4;
-+
-+		return VIRTIO_NET_HASH_REPORT_NONE;
-+
-+	case htons(ETH_P_IPV6):
-+		if (key.ip_proto == IPPROTO_TCP &&
-+		    (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv6))
-+			return VIRTIO_NET_HASH_REPORT_TCPv6;
-+
-+		if (key.ip_proto == IPPROTO_UDP &&
-+		    (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv6))
-+			return VIRTIO_NET_HASH_REPORT_UDPv6;
-+
-+		if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv6)
-+			return VIRTIO_NET_HASH_REPORT_IPv6;
-+
-+		return VIRTIO_NET_HASH_REPORT_NONE;
-+
-+	default:
-+		return VIRTIO_NET_HASH_REPORT_NONE;
-+	}
-+}
- #endif /* _LINUX_VIRTIO_NET_H */
-
--- 
-2.46.0
-
+Thanks,
+drew
 
