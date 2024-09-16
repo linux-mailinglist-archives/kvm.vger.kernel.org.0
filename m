@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-26988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C84F797A054
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 13:34:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AE1A97A057
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 13:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 739AA1F2240B
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 11:34:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3DB8B220FC
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 11:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BB215665D;
-	Mon, 16 Sep 2024 11:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE181509B3;
+	Mon, 16 Sep 2024 11:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="aLsPqo0s"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="caQYpc8V"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21541547C4;
-	Mon, 16 Sep 2024 11:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8E1154429;
+	Mon, 16 Sep 2024 11:34:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726486443; cv=none; b=JeUg548jyIdRl7jDhfPZN498FUpQZVBDfiZzunzuiRGCMXc+DtZfCxjM9Od1HS6qw5K9zJ5KHJDZS0/8UOZtLStMdOHnO6S9nyVEPqBS15PajrwXe8r8wvLvs3AZ4O3vyj63/abLipfuGxI7wAdpVPmt6M2hZq+4qTjXVoQnzRE=
+	t=1726486491; cv=none; b=Er1sY23pbg7CnoSqyHYdTkRB1tigzqlbe3ooDcqI+JB3W8DX7EJqtyoXdpHdq2S0n2oIvZ9a62f3Rsmc37ZOdrVdbWfjqTHyurW6oB6M01ul96NlJQNL+aJMBPe50eWYr5bJMlCzHO1P4txaQ7Zgrqq3gecjbg+nyty0Juz2sXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726486443; c=relaxed/simple;
-	bh=qnq7WvFftCoeWcTSBoWunoZuNfa1NE67PLgl/LAceBM=;
+	s=arc-20240116; t=1726486491; c=relaxed/simple;
+	bh=2Z+qKyzqOqbutmfC3zXpXkioDGSuvF+lOnNL+tKeDWY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ph9ON1e9gzVLQDuByruSOMTFOZlHjpnWJGKvDvth8IBuksb1Zh0Tad1O8dMidDGdC4Z/JMUiQ7yeHHOUhQ+tuzSnuPwv++hjUfMGI+xOvUIGJdciS4vtazaXF6bnYLogSvLXpSVj/4crGFJBBsal8fWMqFeiMbc+QscptboH96M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=aLsPqo0s; arc=none smtp.client-ip=99.78.197.219
+	 MIME-Version:Content-Type; b=Bh5Pb21gb441yL6l+sBjBr0NPzWWMdfghmvg+ZLU/q7phQWPEaej40fYS+fy2RPK1+epjIbjscVFfCa7bHpctDlInh45jrsnP9zhISCIaTPssVZ85MF4X/hK8dYkoQh8IRq7hVgJjcTld0xi4GvhFVAv/PU2cOhS1JuRLAAesxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=caQYpc8V; arc=none smtp.client-ip=52.119.213.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1726486441; x=1758022441;
+  t=1726486490; x=1758022490;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=znWocKnBAQ/hYk1869lWadM7cB9SuIb60CkQR+dfh54=;
-  b=aLsPqo0sk+v5tjA3Tbmhi/px0YeWE46JGcM9HGSTKp7U8a8SCC6kPTyz
-   S7EiXJ185mOs0HlSf5db5vamicp96TdlCGHIUvYaWLoXu6BNlXHO910jV
-   FVkYIIyYJjSVr5WT4n/gh1nNYUan8WlToSp+kWGJk0JIe3X8Nw0+Oaccr
-   A=;
+  bh=d7SA1xd31CQwM5KfV5meLxmO5eWfDrrSDBGteh7IWAY=;
+  b=caQYpc8V/YMvfAic+xKc3k5DqmY7+aRb4xQ/S1/GELaK8wox/PHO3hHY
+   jZ6X3ep9CD0mMR4on5/5av56AuXp91EyQS+RCY024uMnuh03WhLuYqjTo
+   7eKp/bhycYLd3xFBB6oZ+Nb1cr9NOKzAEboFnzt+gPKjT0lZHVMQZCiuJ
+   4=;
 X-IronPort-AV: E=Sophos;i="6.10,233,1719878400"; 
-   d="scan'208";a="126593101"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 11:34:01 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.17.79:20132]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.3.169:2525] with esmtp (Farcaster)
- id 2782e688-9c8a-483f-87c2-fcf35b3201fd; Mon, 16 Sep 2024 11:34:00 +0000 (UTC)
-X-Farcaster-Flow-ID: 2782e688-9c8a-483f-87c2-fcf35b3201fd
+   d="scan'208";a="232155494"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 11:34:49 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:46245]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.43.112:2525] with esmtp (Farcaster)
+ id 86fb6cac-b9f4-49c1-bff6-bddf8af55ee2; Mon, 16 Sep 2024 11:34:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 86fb6cac-b9f4-49c1-bff6-bddf8af55ee2
 Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 16 Sep 2024 11:34:00 +0000
+ Mon, 16 Sep 2024 11:34:43 +0000
 Received: from u5d18b891348c5b.ant.amazon.com (10.146.13.221) by
  EX19D014EUC004.ant.amazon.com (10.252.51.182) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 16 Sep 2024 11:33:49 +0000
+ Mon, 16 Sep 2024 11:34:32 +0000
 From: James Gowans <jgowans@amazon.com>
 To: <linux-kernel@vger.kernel.org>
 CC: Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, "Joerg
@@ -69,9 +69,9 @@ CC: Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, "Joerg
 	<baolu.lu@linux.intel.com>, Alexander Graf <graf@amazon.de>,
 	<anthony.yznaga@oracle.com>, <steven.sistare@oracle.com>,
 	<nh-open-source@amazon.com>, "Saenz Julienne, Nicolas" <nsaenz@amazon.es>
-Subject: [RFC PATCH 08/13] intel-iommu: Add serialise and deserialise boilerplate
-Date: Mon, 16 Sep 2024 13:30:57 +0200
-Message-ID: <20240916113102.710522-9-jgowans@amazon.com>
+Subject: [RFC PATCH 09/13] intel-iommu: Serialise dmar_domain on KHO activaet
+Date: Mon, 16 Sep 2024 13:30:58 +0200
+Message-ID: <20240916113102.710522-10-jgowans@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240916113102.710522-1-jgowans@amazon.com>
 References: <20240916113102.710522-1-jgowans@amazon.com>
@@ -86,173 +86,166 @@ Content-Type: text/plain
 X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
  EX19D014EUC004.ant.amazon.com (10.252.51.182)
 
-Similar to how iommufd got serialise and deserialise hooks, now add this
-to the platform iommu driver, in this case intel-iommu. Once again this
-will be fleshed out in the next commits to actually serialise the struct
-dmar_domain before kexec and restore them after kexec.
----
- drivers/iommu/intel/Makefile    |  1 +
- drivers/iommu/intel/iommu.c     | 18 +++++++++++++++
- drivers/iommu/intel/iommu.h     | 18 +++++++++++++++
- drivers/iommu/intel/serialise.c | 40 +++++++++++++++++++++++++++++++++
- 4 files changed, 77 insertions(+)
- create mode 100644 drivers/iommu/intel/serialise.c
+Add logic to iterate through persistent domains, add the page table
+pages to KHO persistent memory pages. Also serialise some metadata about
+the domains and attached PCI devices.
 
-diff --git a/drivers/iommu/intel/Makefile b/drivers/iommu/intel/Makefile
-index c8beb0281559..ca9f73992620 100644
---- a/drivers/iommu/intel/Makefile
-+++ b/drivers/iommu/intel/Makefile
-@@ -9,3 +9,4 @@ ifdef CONFIG_INTEL_IOMMU
- obj-$(CONFIG_IRQ_REMAP) += irq_remapping.o
- endif
- obj-$(CONFIG_INTEL_IOMMU_PERF_EVENTS) += perfmon.o
-+obj-$(CONFIG_KEXEC_KHO) += serialise.o
+By adding the page table pages to the `mem` attribute on the KHO object
+these pages will be carved out of system memory early in boot by KHO,
+guaranteeing that they will not be used for any other purpose by the new
+kernel. This persists the page tables across kexec.
+---
+ drivers/iommu/intel/iommu.c     |  9 ----
+ drivers/iommu/intel/iommu.h     | 10 ++++
+ drivers/iommu/intel/serialise.c | 92 ++++++++++++++++++++++++++++++++-
+ 3 files changed, 101 insertions(+), 10 deletions(-)
+
 diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index f473a8c008a7..7e77b787148a 100644
+index 7e77b787148a..0a2118a3b7c4 100644
 --- a/drivers/iommu/intel/iommu.c
 +++ b/drivers/iommu/intel/iommu.c
-@@ -65,6 +65,7 @@ static int rwbf_quirk;
- static int force_on = 0;
- static int intel_iommu_tboot_noforce;
- static int no_platform_optin;
-+DEFINE_XARRAY(persistent_domains);
+@@ -46,15 +46,6 @@
  
- #define ROOT_ENTRY_NR (VTD_PAGE_SIZE/sizeof(struct root_entry))
+ #define DEFAULT_DOMAIN_ADDRESS_WIDTH 57
  
-@@ -3393,6 +3394,10 @@ static __init int tboot_force_iommu(void)
- 	return 1;
- }
- 
-+static struct notifier_block serialise_kho_nb = {
-+	.notifier_call = intel_iommu_serialise_kho,
-+};
-+
- int __init intel_iommu_init(void)
- {
- 	int ret = -ENODEV;
-@@ -3432,6 +3437,12 @@ int __init intel_iommu_init(void)
- 	if (!no_iommu)
- 		intel_iommu_debugfs_init();
- 
-+	if (IS_ENABLED(CONFIG_KEXEC_KHO)) {
-+		ret = register_kho_notifier(&serialise_kho_nb);
-+		if (ret)
-+			goto out_free_dmar;
-+	}
-+
- 	if (no_iommu || dmar_disabled) {
- 		/*
- 		 * We exit the function here to ensure IOMMU's remapping and
-@@ -3738,6 +3749,7 @@ intel_iommu_domain_alloc_user(struct device *dev, u32 flags,
- 	struct intel_iommu *iommu = info->iommu;
- 	struct dmar_domain *dmar_domain;
- 	struct iommu_domain *domain;
-+	int rc;
- 
- 	/* Must be NESTING domain */
- 	if (parent) {
-@@ -3778,6 +3790,12 @@ intel_iommu_domain_alloc_user(struct device *dev, u32 flags,
- 		domain->dirty_ops = &intel_dirty_ops;
- 	}
- 
-+	if (persistent_id) {
-+		rc = xa_insert(&persistent_domains, persistent_id, domain, GFP_KERNEL_ACCOUNT);
-+		if (rc)
-+			pr_warn("Unable to track persistent domain %lu\n", persistent_id);
-+	}
-+
- 	return domain;
- }
+-#define __DOMAIN_MAX_PFN(gaw)  ((((uint64_t)1) << ((gaw) - VTD_PAGE_SHIFT)) - 1)
+-#define __DOMAIN_MAX_ADDR(gaw) ((((uint64_t)1) << (gaw)) - 1)
+-
+-/* We limit DOMAIN_MAX_PFN to fit in an unsigned long, and DOMAIN_MAX_ADDR
+-   to match. That way, we can use 'unsigned long' for PFNs with impunity. */
+-#define DOMAIN_MAX_PFN(gaw)	((unsigned long) min_t(uint64_t, \
+-				__DOMAIN_MAX_PFN(gaw), (unsigned long)-1))
+-#define DOMAIN_MAX_ADDR(gaw)	(((uint64_t)__DOMAIN_MAX_PFN(gaw)) << VTD_PAGE_SHIFT)
+-
+ static void __init check_tylersburg_isoch(void);
+ static int rwbf_quirk;
  
 diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
-index cfd006588824..7866342f0909 100644
+index 7866342f0909..cd932a97a9bc 100644
 --- a/drivers/iommu/intel/iommu.h
 +++ b/drivers/iommu/intel/iommu.h
-@@ -11,6 +11,7 @@
- #define _INTEL_IOMMU_H_
+@@ -38,6 +38,16 @@
  
- #include <linux/types.h>
-+#include <linux/kexec.h>
- #include <linux/iova.h>
- #include <linux/io.h>
- #include <linux/idr.h>
-@@ -496,6 +497,7 @@ struct q_inval {
- #define PRQ_DEPTH	((0x1000 << PRQ_ORDER) >> 5)
+ #define IOVA_PFN(addr)		((addr) >> PAGE_SHIFT)
  
- struct dmar_pci_notify_info;
-+extern struct xarray persistent_domains;
- 
- #ifdef CONFIG_IRQ_REMAP
- /* 1MB - maximum possible interrupt remapping table size */
-@@ -1225,6 +1227,22 @@ static inline int iommu_calculate_max_sagaw(struct intel_iommu *iommu)
- #define intel_iommu_sm (0)
- #endif
- 
-+#ifdef CONFIG_KEXEC_KHO
-+int intel_iommu_serialise_kho(struct notifier_block *self, unsigned long cmd,
-+			  void *fdt);
-+int __init intel_iommu_deserialise_kho(void);
-+#else
-+int intel_iommu_serialise_kho(struct notifier_block *self, unsigned long cmd,
-+			  void *fdt)
-+{
-+	return 0;
-+}
-+int __init intel_iommu_deserialise_kho(void)
-+{
-+	return 0;
-+}
-+#endif /* CONFIG_KEXEC_KHO */
++#define __DOMAIN_MAX_PFN(gaw)  ((((uint64_t)1) << ((gaw) - VTD_PAGE_SHIFT)) - 1)
++#define __DOMAIN_MAX_ADDR(gaw) ((((uint64_t)1) << (gaw)) - 1)
 +
- static inline const char *decode_prq_descriptor(char *str, size_t size,
- 		u64 dw0, u64 dw1, u64 dw2, u64 dw3)
- {
++/* We limit DOMAIN_MAX_PFN to fit in an unsigned long, and DOMAIN_MAX_ADDR
++   to match. That way, we can use 'unsigned long' for PFNs with impunity. */
++#define DOMAIN_MAX_PFN(gaw)	((unsigned long) min_t(uint64_t, \
++				__DOMAIN_MAX_PFN(gaw), (unsigned long)-1))
++#define DOMAIN_MAX_ADDR(gaw)	(((uint64_t)__DOMAIN_MAX_PFN(gaw)) << VTD_PAGE_SHIFT)
++
++
+ #define VTD_STRIDE_SHIFT        (9)
+ #define VTD_STRIDE_MASK         (((u64)-1) << VTD_STRIDE_SHIFT)
+ 
 diff --git a/drivers/iommu/intel/serialise.c b/drivers/iommu/intel/serialise.c
-new file mode 100644
-index 000000000000..08a548b33703
---- /dev/null
+index 08a548b33703..bc755e51732b 100644
+--- a/drivers/iommu/intel/serialise.c
 +++ b/drivers/iommu/intel/serialise.c
-@@ -0,0 +1,40 @@
-+// SPDX-License-Identifier: GPL-2.0-only
+@@ -2,9 +2,99 @@
+ 
+ #include "iommu.h"
+ 
++/*
++ * Serialised format:
++ * /intel-iommu
++ *     compatible = str
++ *     domains = {
++ *         persistent-id = {
++ *             mem = [ ... ] // page table pages
++ *             agaw = i32
++ *             pgd = u64
++ *             devices = {
++ *                 id = {
++ *                     u8 bus;
++ *                     u8 devfn
++ *                 },
++ *                 ...
++ *             }
++ *         }
++ *      }
++ */
 +
-+#include "iommu.h"
-+
-+static int serialise_domain(void *fdt, struct iommu_domain *domain)
++/*
++ * Adds all present PFNs on the PTE page to the kho_mem pointer and advances
++ * the pointer.
++ * Stolen from dma_pte_list_pagetables() */
++static void save_pte_pages(struct dmar_domain *domain, int level,
++			   struct dma_pte *pte, struct kho_mem **kho_mem)
 +{
-+	return 0;
-+}
++	struct page *pg;
 +
-+int intel_iommu_serialise_kho(struct notifier_block *self, unsigned long cmd,
-+			  void *fdt)
-+{
-+	static const char compatible[] = "intel-iommu-v0";
-+	struct iommu_domain *domain;
-+	unsigned long xa_idx;
-+	int err = 0;
++	pg = pfn_to_page(dma_pte_addr(pte) >> PAGE_SHIFT);
++	
++	if (level == 1)
++		return;
 +
-+	switch (cmd) {
-+	case KEXEC_KHO_ABORT:
-+		/* Would do serialise rollback here. */
-+		return NOTIFY_DONE;
-+	case KEXEC_KHO_DUMP:
-+		err |= fdt_begin_node(fdt, "intel-iommu");
-+		fdt_property(fdt, "compatible", compatible, sizeof(compatible));
-+		err |= fdt_begin_node(fdt, "domains");
-+		xa_for_each(&persistent_domains, xa_idx, domain) {
-+			err |= serialise_domain(fdt, domain);
++	pte = page_address(pg);
++	do {
++		if (dma_pte_present(pte)) {
++			(*kho_mem)->addr = dma_pte_addr(pte);
++			(*kho_mem)->len = PAGE_SIZE;
++			(*kho_mem)++;
++			if (!dma_pte_superpage(pte))
++				save_pte_pages(domain, level - 1, pte, kho_mem);
 +		}
-+		err |= fdt_end_node(fdt); /* domains */
-+		err |= fdt_end_node(fdt); /* intel-iommu*/
-+		return err? NOTIFY_BAD : NOTIFY_DONE;
-+	default:
-+		return NOTIFY_BAD;
-+	}
++		pte++;
++	} while (!first_pte_in_page(pte));
 +}
++		
+ static int serialise_domain(void *fdt, struct iommu_domain *domain)
+ {
+-	return 0;
++	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
++	/*
++	 * kho_mems_start points to the original allocated array; kho_mems
++	 * is incremented by the callee. Keep both to know how many were added.
++	 */
++	struct kho_mem *kho_mems, *kho_mems_start;
++	struct device_domain_info *info;
++	int err = 0;
++	char name[24];
++	int device_idx = 0;
++	phys_addr_t pgd;
 +
-+int __init intel_iommu_deserialise_kho(void)
-+{
-+	return 0;
-+}
++	/*
++	 * Assume just one page worth of kho_mem objects is enough.
++	 * Better would be to keep track of number of allocated pages in the domain.
++	 * */
++	kho_mems_start = kho_mems = kzalloc(PAGE_SIZE, GFP_KERNEL);
++
++	save_pte_pages(dmar_domain, agaw_to_level(dmar_domain->agaw),
++		       dmar_domain->pgd, &kho_mems);
++
++	snprintf(name, sizeof(name), "%lu", domain->persistent_id);
++	err |= fdt_begin_node(fdt, name);
++	err |= fdt_property(fdt, "mem", kho_mems_start,
++			sizeof(struct kho_mem) * (kho_mems - kho_mems_start));
++	err |= fdt_property(fdt, "persistent_id", &domain->persistent_id,
++			sizeof(domain->persistent_id));
++	pgd = virt_to_phys(dmar_domain->pgd);
++	err |= fdt_property(fdt, "pgd", &pgd, sizeof(pgd));
++	err |= fdt_property(fdt, "agaw", &dmar_domain->agaw,
++			sizeof(dmar_domain->agaw));
++
++	err |= fdt_begin_node(fdt, "devices");
++	list_for_each_entry(info, &dmar_domain->devices, link) {
++		snprintf(name, sizeof(name), "%i", device_idx++);
++		err |= fdt_begin_node(fdt, name);
++		err |= fdt_property(fdt, "bus", &info->bus, sizeof(info->bus));
++		err |= fdt_property(fdt, "devfn", &info->devfn, sizeof(info->devfn));
++		err |= fdt_end_node(fdt); /* device_idx */
++	}
++	err |= fdt_end_node(fdt); /* devices */
++	err |= fdt_end_node(fdt); /* domain->persistent_id */
++
++	return err;
+ }
+ 
+ int intel_iommu_serialise_kho(struct notifier_block *self, unsigned long cmd,
 -- 
 2.34.1
 
