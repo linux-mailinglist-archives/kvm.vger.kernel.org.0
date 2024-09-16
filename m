@@ -1,89 +1,88 @@
-Return-Path: <kvm+bounces-27007-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27008-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8E9197A666
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 19:00:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71A4197A731
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 20:18:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A3B81F22AB0
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 17:00:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9313E1C21D18
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 18:18:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B03316BE0B;
-	Mon, 16 Sep 2024 16:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B3F15956C;
+	Mon, 16 Sep 2024 18:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QoxQZ1hH"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="efXLiX5b";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="efXLiX5b"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2081.outbound.protection.outlook.com [40.107.92.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA7115B964;
-	Mon, 16 Sep 2024 16:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726505928; cv=fail; b=SiQCfcbBO+Kvj70hrIMmYgoB86BkAKkJngouHjwFk4xB8+5f3qcvroNFNHoH4j7YTkiwFT5i2goaId+Q33FM1Mr1jhgVIgXBgMe5P22+MCqY+6wsVofLRDsmx6xmpwi+5YRhjJ1F2Tixhym1qlS9IEhdwRMDXzuGUt6Sq93dX3s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726505928; c=relaxed/simple;
-	bh=Ch/3BXRIDwXuwvGggJHTLNf/PCWdMgQZ54sRU6QlWZk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BxdMGjX9YfDdn9kFycKMRyjFNUM+XSTd8V6E8pndbTHL8VqFxBP1RmELT+W8ZyKM/sXQmTLaVshN00qtJvH9RcTniPQ86/eBBD1xOlol+PUrAsVH79eq84qmN9g16V98o0JOAJf8vLx72o0PiMldS4LwOp8wNPtVOz1d8i6uDTo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QoxQZ1hH; arc=fail smtp.client-ip=40.107.92.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u5jIR95Kx2fG4Svhmo/jZ57vDaiWopGt1NRUJkPLZ1sr5b6OpvCqNr/b8CLLouCg6/Ngb0hKhGRQkiSXWwe0UFzWbpqitC4nHQwxmvvbeByxzrRP+FS4Ot6p4XD6P9+lfvlJefnGeGnquJ78iCNW4o95u3Xlgje7u+YDEjLEq0USwpyelgfggPN9PPY771lbLnTEcKz33L5GFinI1mlp+CkjODf4u6H+n8kmiDEjVa3VRk7ms1ev/BjBgwigcC65HD1lkXHz9gxg+/a8lk9pMMGlwBM/zGO+NkbsJ5PGbzZNVMsv4ZUs05RQNNqx718ilLeD+tX9ptC5z/XtcOlc7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=t3TqfD3ymF6eqT4nlqJNmccBGoGKxBelhDPWPHnJ0q8=;
- b=zVJUD3LRylBHVZOH55tgjhN85vVulCoRXyuavhDntkWsEc8fo6yvE561c0aCcbjMkhXDawJAbeptmeXSzbOdIu+EW9hYrEUynwNWGFreUKqHm6JhUF53uW7xG5WEbR5K60exlvXW+K7aaf7p/+RZjDeftDKgfqUG5dQ94DUtOWBTyqitEGSRNEdodY8iWCS574kNKZsGVFNrIzL2aO54JtEFJalLLRGEKtbsL+BY4ybbAULwoN3PP1w2awqE//ygoEgHZu6t+i4pWIgTU/xHd5h2GCLo0GRKcJoJ4r28e2yWZGBnJ1jV677KZVZnm2RkB2uNuX9/owVQmf1QFXkCPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t3TqfD3ymF6eqT4nlqJNmccBGoGKxBelhDPWPHnJ0q8=;
- b=QoxQZ1hHyr14fQxR3BKCC715xWenv4az8sx9Mrzu2+etVof4p+8WXwI4VqWHS0/l4tvjQGubQJvwBJW5UTJjJH81sABWMYbXEgUIpnzXgNOYr0PqZCveenYyXsmahFspj1rAidfg0cunaKZl31ujzyrUgAKS+bJT2pBgwScFflg=
-Received: from SA0PR11CA0114.namprd11.prod.outlook.com (2603:10b6:806:d1::29)
- by DM4PR12MB5796.namprd12.prod.outlook.com (2603:10b6:8:63::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.24; Mon, 16 Sep
- 2024 16:58:40 +0000
-Received: from SN1PEPF000252A1.namprd05.prod.outlook.com
- (2603:10b6:806:d1:cafe::40) by SA0PR11CA0114.outlook.office365.com
- (2603:10b6:806:d1::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.30 via Frontend
- Transport; Mon, 16 Sep 2024 16:58:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF000252A1.mail.protection.outlook.com (10.167.242.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Mon, 16 Sep 2024 16:58:39 +0000
-Received: from kaveri.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 16 Sep
- 2024 11:58:32 -0500
-From: Shivank Garg <shivankg@amd.com>
-To: <pbonzini@redhat.com>, <corbet@lwn.net>, <akpm@linux-foundation.org>,
-	<willy@infradead.org>
-CC: <acme@redhat.com>, <namhyung@kernel.org>, <mpe@ellerman.id.au>,
-	<isaku.yamahata@intel.com>, <joel@jms.id.au>, <kvm@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <linux-fsdevel@vger.kernel.org>, <shivankg@amd.com>,
-	<shivansh.dhiman@amd.com>, <bharata@amd.com>, <nikunj@amd.com>
-Subject: [PATCH RFC 3/3] KVM: guest_memfd: Enforce NUMA mempolicy if available
-Date: Mon, 16 Sep 2024 16:57:43 +0000
-Message-ID: <20240916165743.201087-4-shivankg@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240916165743.201087-1-shivankg@amd.com>
-References: <20240916165743.201087-1-shivankg@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB151757D;
+	Mon, 16 Sep 2024 18:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726510691; cv=none; b=YSjKt2/t/xIM5/yxcEGnzD3aCyIBaRqeWk70D3vWz6qoH161wbHeBxDO+otVy7ICHLHDLJDDZ/AFvpYLdoIbJgjLIYixLl3iSc5BVGcp8lqiGOY/Q5zF48Jopf3XM1xdFa24W/Q2W5G2JknQcVEuYPcJMoNCLHoqAEq6wsizQPQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726510691; c=relaxed/simple;
+	bh=m229F7lTAsNvK6HcL/O64g5VlZo0y/U95D0dCXRtmtM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LsW4tRo5nJP6Rz2cOXiqxvHqyf0CAJ+RS6q5xoEedAcsVqfsGipaybno0rZ9iZbTbtCsyxoVQJcqRd3SnN+Al52jG9jJM3HHO/DePMRPCzwn/fjkeS36L12mtpfxfkCFjYTev3hNSKoyoziNy+qp6oAEKYk1aL2uSXigwDx6hYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=efXLiX5b; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=efXLiX5b; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6746E21C28;
+	Mon, 16 Sep 2024 18:18:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1726510687; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=DSY+rRM/oRoUBLntwZdVzVpI0q9tw7YCBKmspwhGVp4=;
+	b=efXLiX5bV0bpflHPeVNZjbTmGMpXZzfEjCbINJwJbRz8OLL0kGha7r/H+KgipvzuTbmmV1
+	d5nY/TZBG5QkQAlhoY77jGRKqQRmwTjqjpwIZ+Mzp7jGWtnuEMR+EjupqxAs0mw6I0YOLU
+	4Es+E8OyMJI8o0OyY045Sqs1gww27ls=
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1726510687; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=DSY+rRM/oRoUBLntwZdVzVpI0q9tw7YCBKmspwhGVp4=;
+	b=efXLiX5bV0bpflHPeVNZjbTmGMpXZzfEjCbINJwJbRz8OLL0kGha7r/H+KgipvzuTbmmV1
+	d5nY/TZBG5QkQAlhoY77jGRKqQRmwTjqjpwIZ+Mzp7jGWtnuEMR+EjupqxAs0mw6I0YOLU
+	4Es+E8OyMJI8o0OyY045Sqs1gww27ls=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BFCEC139CE;
+	Mon, 16 Sep 2024 18:18:06 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Nu85LF526GbveAAAD6G6ig
+	(envelope-from <roy.hopkins@suse.com>); Mon, 16 Sep 2024 18:18:06 +0000
+From: Roy Hopkins <roy.hopkins@suse.com>
+To: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	linux-coco@lists.linux.dev
+Cc: Roy Hopkins <roy.hopkins@suse.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Michael Roth <michael.roth@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Joerg Roedel <jroedel@suse.de>,
+	Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [RFC PATCH 0/5] Extend SEV-SNP SVSM support with a kvm_vcpu per VMPL
+Date: Mon, 16 Sep 2024 19:17:52 +0100
+Message-ID: <cover.1726506534.git.roy.hopkins@suse.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,97 +90,211 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A1:EE_|DM4PR12MB5796:EE_
-X-MS-Office365-Filtering-Correlation-Id: f9f75e68-0ee6-488e-5b0f-08dcd670d051
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+bwEEvAnMVEBX6U9xmGh4Fmg6LC4oZNUd5RW1KE4MImQuwJvVVQSmJStxXfb?=
- =?us-ascii?Q?MohnRy3/t1VO8Xcpk3Yaxrqyk3/FIKBISMYPjLVxVotgX73pFAReY+qKp/lR?=
- =?us-ascii?Q?PMbX8+g1t69fhT1ENYvWZXJrFuAJZFial2bSuH1GFWfmvdT6reG3l1r/8C86?=
- =?us-ascii?Q?beh4BpqRERejjZCAzmy76eh6jVf5JJY5OP5serfVMGlWDwskLYzPbb2pijQC?=
- =?us-ascii?Q?zyZjUfvqrZ/n4IUiVVvGLLCEZ3i5MgiwUf85ekM4mm9rSfLW0hBdstWQXTbU?=
- =?us-ascii?Q?Xv0UjIZw98ORE4sn+WWkhZGvgSYZMtvVQMAQIIrUvyfiZZWFub+q4ufUTtcy?=
- =?us-ascii?Q?N32ah2Aq3AUmt4OvhO9yrMvPLZ46IAoMdOECuKgLNlyjGm7xOMfjiA7yu9v8?=
- =?us-ascii?Q?XxDVzPPr1QtTyJQrDbLShEw3opunnNunwkKJPLOO0nsdJD4nPFOKyhnfSS1b?=
- =?us-ascii?Q?GUtHnoah7bteYw5Lf4VEUvo8GY9lXNwSSuEgUywBeR3SJF951SeAspf99ZwZ?=
- =?us-ascii?Q?Xs2xAh0jJg4Z8/B19pRtbFnemq338Swl1J4t/NMYsVOzvVZ0vYdOZG1oXikA?=
- =?us-ascii?Q?3pmAI85+FYwXiL5uqDbtOVsZpOEKNrepGr7n0kjnJMlZ9R/ugm/OGkfKJPr0?=
- =?us-ascii?Q?NzXDP4X5mIe81zSZxha+sAIhcMAuObmx17m/G3ofWcZr3+lKomLOT4XHDvqP?=
- =?us-ascii?Q?vE8SugY3F9CbUQld1T50ascSTyKCNUIjhfs4CTO/IhSRDgaCHqWyC0zozg7I?=
- =?us-ascii?Q?nmpp16cCuhLGJRi8obLqPt1GmR/DJ0J4AeJl2zui2xcAkf1OFdu2u2wZ6pZI?=
- =?us-ascii?Q?2IC/O3yyuAW1LVm91LSn8KQCsSDzVgpdREu/uWXQJ2sbuqMWEBttO/j3TWJX?=
- =?us-ascii?Q?uCtQ4/Yl9Gnqnl+WjQQC4duXcQpuQnftWPHqt7pZ1tfmrdAuRtrBG5r5Q+uQ?=
- =?us-ascii?Q?6yNzfTYLF0xTemHHzf2XvcwyOzi/UvOGKEUyu+WfyVCx5iV+Hbpl/B5zUaYG?=
- =?us-ascii?Q?Dz8sqQgN+25UB3krLmimbG1R8vvDskhXJfNBjx3epTwmG8DpayqXuGccKl0e?=
- =?us-ascii?Q?JDDYAvFxL7YPnD3d5v2+qr+6XL01qmAAqiofjIuByusr/h0fvTIOdhZj9Ekd?=
- =?us-ascii?Q?YEVEF95WlgeVsmruzVR05ZYmpRY+ryuAqaSzWGCCmnNe/ICdWHDK9vLUQXXV?=
- =?us-ascii?Q?/Rn+MHYGtpzWgLgp95OPAiVeS7cQ59UOHNzQ9m3URx+7psav6nX9bBm4k0WI?=
- =?us-ascii?Q?xNVfTXKtl1tadZpvMRkvS9+P778cE4NF4yzuQKdH4MScvoH+zHwlJ7tgA1az?=
- =?us-ascii?Q?2Jl1InxY6VnXjkITcGlcRpxSEC1L6ZtpX+4Gp5e0of2ipbDh6RWwTQyebuSz?=
- =?us-ascii?Q?6wYGPlM4NnhsFaffVjUEDbFYie95EVhCtKmjfpO4U0r8qXWsiMEViJAbZEqb?=
- =?us-ascii?Q?hzJCG1kDYfgUKguGmoa7RR/2DKZEydZb?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2024 16:58:39.8660
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9f75e68-0ee6-488e-5b0f-08dcd670d051
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000252A1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5796
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,imap1.dmz-prg2.suse.org:helo];
+	RCVD_TLS_ALL(0.00)[]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-From: Shivansh Dhiman <shivansh.dhiman@amd.com>
+I've prepared this series as an extension to the RFC patch series: 'SEV-SNP
+support for running an SVSM' posted by Tom Lendacky [1]. This extends the
+support for transitioning a vCPU between VM Privilege Levels (VMPLs) by
+storing the vCPU state for each VMPL in its own `struct kvm_vcpu`. This
+additionally allows for separate APICs for each VMPL.
 
-Enforce memory policy on guest-memfd to provide proper NUMA support.
-Previously, guest-memfd allocations were following local NUMA node id in
-absence of process mempolicy, resulting in random memory allocation.
-Moreover, it cannot use mbind() since memory isn't mapped to userspace.
+In treating each VMPL as a `struct kvm_vcpu` it makes it very simple to 
+perform a VMPL transition. In most cases it is a simple as just switching
+the context from one kvm_vcpu pointer to another. This results in very
+low overhead VMPL switches. This can can also support the case where a VMPL
+switch occurs during guest execution - something that we will need to support
+for Intel TDX and perhaps other isolation technologies.
 
-To support NUMA policies, retrieve the mempolicy struct from
-i_private_data part of memfd's inode. Use filemap_grab_folio_mpol() to
-ensure that allocations follow the specified memory policy.
+Obviously, there is much to consider when splitting a single vCPU into being
+managed by multiple `struct kvm_vcpu`s. First and foremost is the fact that
+much of the state should be shared between all kvm_vcpu's that relate to a
+single vCPU, such as the vCPU ID, requests, mutexes, etc. This series
+introduces a solution where the common fields are accessed via a pointer in
+each kvm_vcpu. Unfortunately this means that any code that refers to these
+fields needs to be updated, resulting in the first patch in the series that
+touches many areas of the code.
 
-Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
-Signed-off-by: Shivank Garg <shivankg@amd.com>
----
- virt/kvm/guest_memfd.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+This is very much proof-of-concept code and, like Tom's series, is introduced
+to trigger discussions around implementing VMPL support and not intended for
+merging at this stage. The code currently has some instabilities during guest
+startup which I need to locate.
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 8f1877be4976..8553d7069ba8 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -130,12 +130,15 @@ static struct folio *__kvm_gmem_get_folio(struct inode *inode, pgoff_t index,
- 					  bool allow_huge)
- {
- 	struct folio *folio = NULL;
-+	struct mempolicy *mpol;
- 
- 	if (gmem_2m_enabled && allow_huge)
- 		folio = kvm_gmem_get_huge_folio(inode, index, PMD_ORDER);
- 
--	if (!folio)
--		folio = filemap_grab_folio(inode->i_mapping, index);
-+	if (!folio) {
-+		mpol = (struct mempolicy *)(inode->i_mapping->i_private_data);
-+		folio = filemap_grab_folio_mpol(inode->i_mapping, index, mpol);
-+	}
- 
- 	pr_debug("%s: allocate folio with PFN %lx order %d\n",
- 		 __func__, folio_pfn(folio), folio_order(folio));
+This series is based off the same tip tree as [1], and the patches from that
+series need to be applied before this series:
+  https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git master
+
+  b0c57a7002b0 ("Merge branch into tip/master: 'x86/cpu'")
+
+[1] Provide SEV-SNP support for running under an SVSM
+https://lore.kernel.org/lkml/cover.1706307364.git.thomas.lendacky@amd.com/
+
+Roy Hopkins (5):
+  kvm: Move kvm_vcpu fields into common structure
+  x86/kvm: Create a child struct kvm_vcpu for each VMPL
+  kvm/sev: Update SEV VMPL handling to use multiple struct kvm_vcpus
+  x86/kvm: Add x86 field to find the default VMPL that IRQs should
+    target
+  x86/kvm: Add target VMPL to IRQs and send to APIC for VMPL
+
+ Documentation/virt/kvm/api.rst                |   2 +-
+ Documentation/virt/kvm/locking.rst            |   6 +-
+ Documentation/virt/kvm/vcpu-requests.rst      |  20 +-
+ arch/arm64/kvm/arch_timer.c                   |   4 +-
+ arch/arm64/kvm/arm.c                          |  34 +-
+ arch/arm64/kvm/debug.c                        |  22 +-
+ arch/arm64/kvm/guest.c                        |   6 +-
+ arch/arm64/kvm/handle_exit.c                  |  12 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |   2 +-
+ arch/arm64/kvm/hypercalls.c                   |   2 +-
+ arch/arm64/kvm/mmio.c                         |  14 +-
+ arch/arm64/kvm/pmu-emul.c                     |   4 +-
+ arch/arm64/kvm/psci.c                         |  14 +-
+ arch/arm64/kvm/vgic/vgic.c                    |   2 +-
+ arch/loongarch/kvm/exit.c                     |  52 +--
+ arch/loongarch/kvm/timer.c                    |   2 +-
+ arch/loongarch/kvm/vcpu.c                     |  22 +-
+ arch/mips/kvm/emulate.c                       |  94 ++--
+ arch/mips/kvm/mips.c                          |  52 +--
+ arch/mips/kvm/vz.c                            |  30 +-
+ arch/powerpc/kvm/book3s.c                     |   4 +-
+ arch/powerpc/kvm/book3s_emulate.c             |   6 +-
+ arch/powerpc/kvm/book3s_hv.c                  |  38 +-
+ arch/powerpc/kvm/book3s_hv_nested.c           |   4 +-
+ arch/powerpc/kvm/book3s_hv_rm_xics.c          |   8 +-
+ arch/powerpc/kvm/book3s_pr.c                  |  38 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/book3s_xics.c                |   8 +-
+ arch/powerpc/kvm/book3s_xive.c                |  12 +-
+ arch/powerpc/kvm/book3s_xive_native.c         |   8 +-
+ arch/powerpc/kvm/booke.c                      |  38 +-
+ arch/powerpc/kvm/booke_emulate.c              |  22 +-
+ arch/powerpc/kvm/e500_emulate.c               |   6 +-
+ arch/powerpc/kvm/emulate.c                    |   6 +-
+ arch/powerpc/kvm/emulate_loadstore.c          |   2 +-
+ arch/powerpc/kvm/powerpc.c                    |  62 +--
+ arch/powerpc/kvm/timing.h                     |  28 +-
+ arch/powerpc/kvm/trace.h                      |   2 +-
+ arch/powerpc/kvm/trace_hv.h                   |   2 +-
+ arch/riscv/kvm/aia_device.c                   |   8 +-
+ arch/riscv/kvm/aia_imsic.c                    |   2 +-
+ arch/riscv/kvm/vcpu.c                         |  24 +-
+ arch/riscv/kvm/vcpu_insn.c                    |  14 +-
+ arch/riscv/kvm/vcpu_sbi.c                     |   2 +-
+ arch/riscv/kvm/vcpu_sbi_hsm.c                 |   2 +-
+ arch/s390/include/asm/kvm_host.h              |   8 +-
+ arch/s390/kvm/diag.c                          |  72 ++--
+ arch/s390/kvm/gaccess.c                       |   4 +-
+ arch/s390/kvm/guestdbg.c                      |  14 +-
+ arch/s390/kvm/intercept.c                     |  30 +-
+ arch/s390/kvm/interrupt.c                     |  82 ++--
+ arch/s390/kvm/kvm-s390.c                      | 160 +++----
+ arch/s390/kvm/kvm-s390.h                      |  12 +-
+ arch/s390/kvm/priv.c                          | 186 ++++----
+ arch/s390/kvm/pv.c                            |   2 +-
+ arch/s390/kvm/sigp.c                          |  62 +--
+ arch/s390/kvm/vsie.c                          |   6 +-
+ arch/x86/include/asm/kvm_host.h               |   8 +
+ arch/x86/kvm/cpuid.c                          |  78 ++--
+ arch/x86/kvm/debugfs.c                        |   2 +-
+ arch/x86/kvm/hyperv.c                         |  20 +-
+ arch/x86/kvm/ioapic.c                         |   3 +
+ arch/x86/kvm/irq_comm.c                       |   1 +
+ arch/x86/kvm/kvm_cache_regs.h                 |   4 +-
+ arch/x86/kvm/lapic.c                          |  10 +-
+ arch/x86/kvm/mmu/mmu.c                        |  28 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                    |   2 +-
+ arch/x86/kvm/pmu.c                            |   2 +-
+ arch/x86/kvm/svm/nested.c                     |   6 +-
+ arch/x86/kvm/svm/sev.c                        | 231 +++++-----
+ arch/x86/kvm/svm/svm.c                        | 122 +++---
+ arch/x86/kvm/svm/svm.h                        |  36 +-
+ arch/x86/kvm/trace.h                          |  12 +-
+ arch/x86/kvm/vmx/nested.c                     |  18 +-
+ arch/x86/kvm/vmx/posted_intr.c                |   2 +-
+ arch/x86/kvm/vmx/sgx.c                        |   4 +-
+ arch/x86/kvm/vmx/vmx.c                        | 128 +++---
+ arch/x86/kvm/x86.c                            | 406 ++++++++++--------
+ arch/x86/kvm/xen.c                            |  24 +-
+ arch/x86/kvm/xen.h                            |   2 +-
+ drivers/s390/crypto/vfio_ap_ops.c             |  10 +-
+ include/linux/kvm_host.h                      | 180 ++++----
+ include/trace/events/kvm.h                    |  48 +++
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   2 +-
+ .../selftests/kvm/aarch64/page_fault_test.c   |   2 +-
+ .../selftests/kvm/aarch64/smccc_filter.c      |   2 +-
+ .../selftests/kvm/demand_paging_test.c        |   2 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |   2 +-
+ tools/testing/selftests/kvm/dirty_log_test.c  |   4 +-
+ .../testing/selftests/kvm/guest_print_test.c  |   4 +-
+ .../selftests/kvm/hardware_disable_test.c     |   2 +-
+ .../selftests/kvm/kvm_page_table_test.c       |   2 +-
+ .../testing/selftests/kvm/lib/aarch64/ucall.c |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  14 +-
+ tools/testing/selftests/kvm/lib/riscv/ucall.c |   2 +-
+ .../kvm/lib/s390x/diag318_test_handler.c      |   2 +-
+ .../selftests/kvm/lib/s390x/processor.c       |   6 +-
+ tools/testing/selftests/kvm/lib/s390x/ucall.c |   2 +-
+ .../testing/selftests/kvm/lib/x86_64/ucall.c  |   2 +-
+ .../kvm/memslot_modification_stress_test.c    |   2 +-
+ .../testing/selftests/kvm/memslot_perf_test.c |   2 +-
+ .../selftests/kvm/pre_fault_memory_test.c     |   2 +-
+ tools/testing/selftests/kvm/s390x/cmma_test.c |  20 +-
+ .../testing/selftests/kvm/s390x/debug_test.c  |  12 +-
+ tools/testing/selftests/kvm/s390x/memop.c     |   2 +-
+ tools/testing/selftests/kvm/s390x/resets.c    |  14 +-
+ .../selftests/kvm/s390x/sync_regs_test.c      |  10 +-
+ tools/testing/selftests/kvm/s390x/tprot.c     |   2 +-
+ .../selftests/kvm/set_memory_region_test.c    |   4 +-
+ tools/testing/selftests/kvm/steal_time.c      |   2 +-
+ .../testing/selftests/kvm/x86_64/cpuid_test.c |   2 +-
+ .../testing/selftests/kvm/x86_64/debug_regs.c |   2 +-
+ .../selftests/kvm/x86_64/fix_hypercall_test.c |   2 +-
+ .../selftests/kvm/x86_64/flds_emulation.h     |   2 +-
+ .../kvm/x86_64/hyperv_extended_hypercalls.c   |   2 +-
+ .../kvm/x86_64/nested_exceptions_test.c       |   4 +-
+ .../kvm/x86_64/private_mem_conversions_test.c |   4 +-
+ .../kvm/x86_64/private_mem_kvm_exits_test.c   |  16 +-
+ .../selftests/kvm/x86_64/set_boot_cpu_id.c    |   2 +-
+ .../selftests/kvm/x86_64/sev_smoke_test.c     |  22 +-
+ .../selftests/kvm/x86_64/sync_regs_test.c     |  16 +-
+ .../kvm/x86_64/triple_fault_event_test.c      |   2 +-
+ .../selftests/kvm/x86_64/tsc_msrs_test.c      |   2 +-
+ .../selftests/kvm/x86_64/userspace_io_test.c  |   2 +-
+ .../kvm/x86_64/userspace_msr_exit_test.c      |   8 +-
+ .../kvm/x86_64/vmx_apic_access_test.c         |   2 +-
+ .../kvm/x86_64/vmx_close_while_nested_test.c  |   2 +-
+ .../vmx_exception_with_invalid_guest_state.c  |   2 +-
+ .../x86_64/vmx_invalid_nested_guest_state.c   |   2 +-
+ .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |   2 +-
+ .../selftests/kvm/x86_64/xen_vmcall_test.c    |   2 +-
+ virt/kvm/async_pf.c                           |  60 +--
+ virt/kvm/dirty_ring.c                         |   6 +-
+ virt/kvm/kvm_main.c                           | 274 +++++++-----
+ 134 files changed, 1746 insertions(+), 1587 deletions(-)
+
 -- 
-2.34.1
+2.43.0
 
 
