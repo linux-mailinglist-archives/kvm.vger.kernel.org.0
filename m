@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-26991-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26992-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A0B997A05B
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 13:35:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE11B97A05C
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 13:36:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A962B21EB4
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 11:35:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3373B1F20631
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 11:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EE4155C98;
-	Mon, 16 Sep 2024 11:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3158715531B;
+	Mon, 16 Sep 2024 11:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rtexy970"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LMPKFVZu"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4BD155336;
-	Mon, 16 Sep 2024 11:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0905D153824;
+	Mon, 16 Sep 2024 11:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726486514; cv=none; b=gUFAqoTT1gsaIQH//qEWTHc23GDvrXCElKlLmK2oknK7yrCx6qgDLXVert7A3lf1DrI203HbyhMXVbgC17PV6nebb4eKbbv4dNltT8wz7dIjAly+LLYKnQtjZnDq1rvljjp9VcpECONo2wA0Yb0HoB28PFQjG6sUojcJlziq5H8=
+	t=1726486551; cv=none; b=phvv5DWLoNBclXCcvpj2cFrQez77BCrupEA+szhfvm2HlotqRv81mRJuQr6klH3Obv9N5Cy4zwoa+aJmum6t51Z4hPLpeMsMCdYMcNPu8iKcOJF97ouEV9aeAmYTw2/WReuROaEKh5fT4CvqtFEoEP866Oies736cyXl042uKNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726486514; c=relaxed/simple;
-	bh=kA7sCJq83w/U5a6+MV6UIyor1R8tN22DopzPIXKiz28=;
+	s=arc-20240116; t=1726486551; c=relaxed/simple;
+	bh=kZap1Ca0wYXL5ZXFV+JmmCCnLEfEqJOXPIU9iFe1SF0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=orCZwiZrEwSWCANFf9j+x+lBKIdlkbyAsHtTtjTecirwqFJolR0Tja3wK4AK5pa1BSa8WH8UURbCoU1bD0lRoweTpIE5Ky3c+YzpxskFCLHTdmxcSs9rJsRmBjoRfjiBU9RzAY7RrZigl90ljxFgQe5g9sk4tZRVDKfCN5DbRiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rtexy970; arc=none smtp.client-ip=207.171.184.29
+	 MIME-Version:Content-Type; b=HED/YzXHBbU8sL30rKRz7gaoqM3hqSk7LrLIGklhxBsNZ9Clw0isUkjHP6AP6qGHuEFPZ7RjIjfouKdXK43Tpgj83fcVT78fxYF0A8iUgRRDI3h4nyQRtO0ri5oTUcBiVlgLVSltRYLnI4UH5dsrKhn3r3T4WV9JWN8HMiwKh+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LMPKFVZu; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1726486513; x=1758022513;
+  t=1726486551; x=1758022551;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ddSVhaYeFUjlU8dhdd/QQglr933C97nK5BrvKFB/qRU=;
-  b=rtexy9702sA+r1nbyRmGYR3uxCTQyS/UY6UFzJebofLGcIbPDglYBTUE
-   9wGqwGKOShrV9CjxP6EjUlhzVmzck1Mq9sSjgRp4gp0ZiR419C9D8p3zi
-   Dl5S9Aywc+lpRZ3P1I9Y9jkyZpvCwVlRNmchCjHrO7FjoCrDenEBeCa6g
+  bh=YhYC82vuYhxRbKNM3lupC9Sz/V22SIFTp2GLNchSdFM=;
+  b=LMPKFVZuLEXbvmJBhHxXvdUIXTSUU4GSqmckX98KlY9h324MztgMQWPc
+   biX7ZnyGnUQmQVo6SMMhEqdH2xZDwc/Coq84gyzlmaTm5B6m3O1oqg0y3
+   ehPcsr4lkmf0Xu3k/wDmmDqK0ZR4b48imGNaZLQWiWqdNWpKwDj9cVziA
    M=;
 X-IronPort-AV: E=Sophos;i="6.10,233,1719878400"; 
-   d="scan'208";a="454426971"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 11:35:06 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:46964]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.35.229:2525] with esmtp (Farcaster)
- id 9197f70c-cad3-4f56-b798-def27e3f2a65; Mon, 16 Sep 2024 11:35:04 +0000 (UTC)
-X-Farcaster-Flow-ID: 9197f70c-cad3-4f56-b798-def27e3f2a65
+   d="scan'208";a="454427141"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 11:35:48 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:29382]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.20.15:2525] with esmtp (Farcaster)
+ id b4c4bc91-312e-476c-b408-dce0c369f62a; Mon, 16 Sep 2024 11:35:47 +0000 (UTC)
+X-Farcaster-Flow-ID: b4c4bc91-312e-476c-b408-dce0c369f62a
 Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 16 Sep 2024 11:35:04 +0000
+ Mon, 16 Sep 2024 11:35:46 +0000
 Received: from u5d18b891348c5b.ant.amazon.com (10.146.13.221) by
  EX19D014EUC004.ant.amazon.com (10.252.51.182) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 16 Sep 2024 11:34:54 +0000
+ Mon, 16 Sep 2024 11:35:36 +0000
 From: James Gowans <jgowans@amazon.com>
 To: <linux-kernel@vger.kernel.org>
 CC: Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, "Joerg
@@ -69,9 +69,9 @@ CC: Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, "Joerg
 	<baolu.lu@linux.intel.com>, Alexander Graf <graf@amazon.de>,
 	<anthony.yznaga@oracle.com>, <steven.sistare@oracle.com>,
 	<nh-open-source@amazon.com>, "Saenz Julienne, Nicolas" <nsaenz@amazon.es>
-Subject: [RFC PATCH 11/13] iommu: Add callback to restore persisted iommu_domain
-Date: Mon, 16 Sep 2024 13:31:00 +0200
-Message-ID: <20240916113102.710522-12-jgowans@amazon.com>
+Subject: [RFC PATCH 12/13] iommufd, guestmemfs: Ensure persistent file used for persistent DMA
+Date: Mon, 16 Sep 2024 13:31:01 +0200
+Message-ID: <20240916113102.710522-13-jgowans@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240916113102.710522-1-jgowans@amazon.com>
 References: <20240916113102.710522-1-jgowans@amazon.com>
@@ -83,95 +83,111 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
+X-ClientProxiedBy: EX19D031UWA004.ant.amazon.com (10.13.139.19) To
  EX19D014EUC004.ant.amazon.com (10.252.51.182)
 
-The previous commits re-hydrated the struct iommu_domain and added them
-to the persisted_domains xarray. Now provide a callback to get the
-domain so that iommufd can restore a link to it.
+When IOASes and hardware page tables are made persistent then DMA will
+continue accessing memory which is mapped for DMA during and after
+kexec. This is only legal if we are sure that the memory being accessed
+by that DMA is also persistent. It would not be legal to map normal
+buddy-list managed anonymous memory for persistent DMA.
 
-Roughly where the restore would happen is called out in a comment, but
-some more head scratching is needed to figure out how to actually do
-this.
+Currently there is one provider of persistent memory: guestmemfs:
+https://lore.kernel.org/all/20240805093245.889357-1-jgowans@amazon.com/
+
+This commit ensures that only guestmemfs memory can be mapped into
+persistent iommufds. This is almost certainly the wrong way and place to
+do it, but something similar to this is needed. Perhaps in page.c?
+As more persistent memory providers become available they can be added
+to the list to check for.
 ---
- drivers/iommu/intel/iommu.c       | 12 ++++++++++++
- drivers/iommu/iommufd/serialise.c |  9 ++++++++-
- include/linux/iommu.h             |  5 +++++
- 3 files changed, 25 insertions(+), 1 deletion(-)
+ drivers/iommu/iommufd/ioas.c | 22 ++++++++++++++++++++++
+ fs/guestmemfs/file.c         |  5 +++++
+ include/linux/guestmemfs.h   |  7 +++++++
+ 3 files changed, 34 insertions(+)
 
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 8e0ed033b03f..000ddfe5b6de 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -4690,6 +4690,17 @@ static int intel_iommu_read_and_clear_dirty(struct iommu_domain *domain,
- 	return 0;
- }
+diff --git a/drivers/iommu/iommufd/ioas.c b/drivers/iommu/iommufd/ioas.c
+index 742248276548..ce76b41d2d72 100644
+--- a/drivers/iommu/iommufd/ioas.c
++++ b/drivers/iommu/iommufd/ioas.c
+@@ -2,9 +2,11 @@
+ /*
+  * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
+  */
++#include <linux/guestmemfs.h>
+ #include <linux/interval_tree.h>
+ #include <linux/iommufd.h>
+ #include <linux/iommu.h>
++#include <linux/mm_types.h>
+ #include <uapi/linux/iommufd.h>
  
-+static struct iommu_domain *intel_domain_restore(struct device *dev,
-+		unsigned long persistent_id)
+ #include "io_pagetable.h"
+@@ -217,6 +219,26 @@ int iommufd_ioas_map(struct iommufd_ucmd *ucmd)
+ 	if (IS_ERR(ioas))
+ 		return PTR_ERR(ioas);
+ 
++	pr_info("iommufd_ioas_map persistent id %lu\n",
++			ucmd->ictx->persistent_id);
++	if (ucmd->ictx->persistent_id) {
++#ifdef CONFIG_GUESTMEMFS_FS
++		struct vm_area_struct *vma;
++		struct mm_struct *mm = current->mm;
++
++		mmap_read_lock(mm);
++		vma = find_vma_intersection(current->mm,
++				 cmd->user_va, cmd->user_va + cmd->length);
++		if (!vma || !is_guestmemfs_file(vma->vm_file)) {
++			mmap_read_unlock(mm);
++			return -EFAULT;
++		}
++		mmap_read_unlock(mm);
++#else
++		return -EFAULT;
++#endif /* CONFIG_GUESTMEMFS_FS */
++	}
++
+ 	if (!(cmd->flags & IOMMU_IOAS_MAP_FIXED_IOVA))
+ 		flags = IOPT_ALLOC_IOVA;
+ 	rc = iopt_map_user_pages(ucmd->ictx, &ioas->iopt, &iova,
+diff --git a/fs/guestmemfs/file.c b/fs/guestmemfs/file.c
+index 8707a9d3ad90..ecacaf200a31 100644
+--- a/fs/guestmemfs/file.c
++++ b/fs/guestmemfs/file.c
+@@ -104,3 +104,8 @@ const struct file_operations guestmemfs_file_fops = {
+ 	.owner = THIS_MODULE,
+ 	.mmap = mmap,
+ };
++
++bool is_guestmemfs_file(struct file const *file)
 +{
-+	struct iommu_domain *domain;
-+
-+	domain = xa_load(&persistent_domains, persistent_id);
-+	if (!domain)
-+		pr_warn("No such persisted domain id %lu\n", persistent_id);
-+	return domain;
++	return file && file->f_op == &guestmemfs_file_fops;
 +}
-+
- static const struct iommu_dirty_ops intel_dirty_ops = {
- 	.set_dirty_tracking = intel_iommu_set_dirty_tracking,
- 	.read_and_clear_dirty = intel_iommu_read_and_clear_dirty,
-@@ -4703,6 +4714,7 @@ const struct iommu_ops intel_iommu_ops = {
- 	.domain_alloc		= intel_iommu_domain_alloc,
- 	.domain_alloc_user	= intel_iommu_domain_alloc_user,
- 	.domain_alloc_sva	= intel_svm_domain_alloc,
-+	.domain_restore 	= intel_domain_restore,
- 	.probe_device		= intel_iommu_probe_device,
- 	.release_device		= intel_iommu_release_device,
- 	.get_resv_regions	= intel_iommu_get_resv_regions,
-diff --git a/drivers/iommu/iommufd/serialise.c b/drivers/iommu/iommufd/serialise.c
-index 9519969bd201..baac7d6150cb 100644
---- a/drivers/iommu/iommufd/serialise.c
-+++ b/drivers/iommu/iommufd/serialise.c
-@@ -139,7 +139,14 @@ static int rehydrate_iommufd(char *iommufd_name)
- 		    area->node.last = *iova_start + *iova_len - 1;
- 		    interval_tree_insert(&area->node, &ioas->iopt.area_itree);
- 	    }
--	    /* TODO: restore link from ioas to hwpt. */
-+	    /*
-+	     * Here we should do something to associate struct iommufd_device with the
-+	     * ictx, then get the iommu_ops via dev_iommu_ops(), and call the new
-+	     * .domain_restore callback to get the struct iommu_domain.
-+	     * Something like:
-+	     * hwpt->domain = ops->domain_restore(dev, persistent_id);
-+	     * Hand wavy - the details allude me at the moment...
-+	     */
- 	}
+diff --git a/include/linux/guestmemfs.h b/include/linux/guestmemfs.h
+index 60e769c8e533..c5cd7b6a5630 100644
+--- a/include/linux/guestmemfs.h
++++ b/include/linux/guestmemfs.h
+@@ -3,14 +3,21 @@
+ #ifndef _LINUX_GUESTMEMFS_H
+ #define _LINUX_GUESTMEMFS_H
  
- 	return fd;
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index a616e8702a1c..0dc97d494fd9 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -529,6 +529,8 @@ static inline int __iommu_copy_struct_from_user_array(
-  * @domain_alloc_paging: Allocate an iommu_domain that can be used for
-  *                       UNMANAGED, DMA, and DMA_FQ domain types.
-  * @domain_alloc_sva: Allocate an iommu_domain for Shared Virtual Addressing.
-+ * @domain_restore: After kexec, give the same persistent_id which was originally
-+ *                  used to allocate the domain, and the domain will be restored.
-  * @probe_device: Add device to iommu driver handling
-  * @release_device: Remove device from iommu driver handling
-  * @probe_finalize: Do final setup work after the device is added to an IOMMU
-@@ -576,6 +578,9 @@ struct iommu_ops {
- 	struct iommu_domain *(*domain_alloc_sva)(struct device *dev,
- 						 struct mm_struct *mm);
- 
-+	struct iommu_domain *(*domain_restore)(struct device *dev,
-+			unsigned long persistent_id);
++#include <linux/fs.h>
 +
- 	struct iommu_device *(*probe_device)(struct device *dev);
- 	void (*release_device)(struct device *dev);
- 	void (*probe_finalize)(struct device *dev);
+ /*
+  * Carves out chunks of memory from memblocks for guestmemfs.
+  * Must be called in early boot before memblocks are freed.
+  */
+ # ifdef CONFIG_GUESTMEMFS_FS
+ void guestmemfs_reserve_mem(void);
++bool is_guestmemfs_file(struct file const *filp);
+ #else
+ void guestmemfs_reserve_mem(void) { }
++inline bool is_guestmemfs_file(struct file const *filp)
++{
++	return 0;
++}
+ #endif
+ 
+ #endif
 -- 
 2.34.1
 
