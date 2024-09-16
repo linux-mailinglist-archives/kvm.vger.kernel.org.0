@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-26987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-26988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A6E097A051
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 13:34:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C84F797A054
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 13:34:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41199283B93
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 11:34:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 739AA1F2240B
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 11:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57473155CBD;
-	Mon, 16 Sep 2024 11:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BB215665D;
+	Mon, 16 Sep 2024 11:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="igbE2LUH"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="aLsPqo0s"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2597461FD8;
-	Mon, 16 Sep 2024 11:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21541547C4;
+	Mon, 16 Sep 2024 11:34:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726486432; cv=none; b=HXT2GrPwa/RRhwqpS4sCUwyS/lFW6cKAGVDTAen2XEEDd7VBBR17XV9tDrdXJ73J8q+O0vBHoM80/pnSGN2EJiSg6kdURsEIgnoIyWL1RA5OuZu7bi/nit00e/73p0WZgGA81ZlL1RFRv3uQ0MXFSRNoe2Fah1H3lQX9CTAOh9Y=
+	t=1726486443; cv=none; b=JeUg548jyIdRl7jDhfPZN498FUpQZVBDfiZzunzuiRGCMXc+DtZfCxjM9Od1HS6qw5K9zJ5KHJDZS0/8UOZtLStMdOHnO6S9nyVEPqBS15PajrwXe8r8wvLvs3AZ4O3vyj63/abLipfuGxI7wAdpVPmt6M2hZq+4qTjXVoQnzRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726486432; c=relaxed/simple;
-	bh=dxOdRSAZOWofWEYK0VVawmecWoCTfCFqvejo79rI17o=;
+	s=arc-20240116; t=1726486443; c=relaxed/simple;
+	bh=qnq7WvFftCoeWcTSBoWunoZuNfa1NE67PLgl/LAceBM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XLJ3DqcTcWUfw5F5a9bUP+vZYOvoWTVz14F9HlPYsLFdZMBjN6yUObOpL/McwkTC0aUHJUtbwQ66ooGarlg3L8hfBnqkS+8Fc5gzShCcXMtbraB2w4X2JeqTC875hdomMw7lMikM0vRi6lqskjzD00zgISNob2F3thd5od1fqYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=igbE2LUH; arc=none smtp.client-ip=99.78.197.219
+	 MIME-Version:Content-Type; b=ph9ON1e9gzVLQDuByruSOMTFOZlHjpnWJGKvDvth8IBuksb1Zh0Tad1O8dMidDGdC4Z/JMUiQ7yeHHOUhQ+tuzSnuPwv++hjUfMGI+xOvUIGJdciS4vtazaXF6bnYLogSvLXpSVj/4crGFJBBsal8fWMqFeiMbc+QscptboH96M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=aLsPqo0s; arc=none smtp.client-ip=99.78.197.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1726486431; x=1758022431;
+  t=1726486441; x=1758022441;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tEGWnhFMypw6xRZtfZafM76snQDV4sMYnYAjAyQltqs=;
-  b=igbE2LUHolPHphzAxJJReYzI81iE55v7eU4Pp1+bKe3+IpCc4JJ17+6a
-   rb5UpvVgb/Nag5JJ+d+7F4ZaVomW4BmNoGFeScRHPW6L8W0/iAeGYJvcb
-   6TNdBiLdHgZ895OzNVD/HciPLPPmUyYGDWtzh5LIOT2av65nzEr1CC8is
-   U=;
+  bh=znWocKnBAQ/hYk1869lWadM7cB9SuIb60CkQR+dfh54=;
+  b=aLsPqo0sk+v5tjA3Tbmhi/px0YeWE46JGcM9HGSTKp7U8a8SCC6kPTyz
+   S7EiXJ185mOs0HlSf5db5vamicp96TdlCGHIUvYaWLoXu6BNlXHO910jV
+   FVkYIIyYJjSVr5WT4n/gh1nNYUan8WlToSp+kWGJk0JIe3X8Nw0+Oaccr
+   A=;
 X-IronPort-AV: E=Sophos;i="6.10,233,1719878400"; 
-   d="scan'208";a="126593048"
+   d="scan'208";a="126593101"
 Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 11:33:50 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.43.254:42594]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.25.198:2525] with esmtp (Farcaster)
- id f532e37d-8857-4c4d-b867-21ef2f8b2bae; Mon, 16 Sep 2024 11:33:49 +0000 (UTC)
-X-Farcaster-Flow-ID: f532e37d-8857-4c4d-b867-21ef2f8b2bae
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 11:34:01 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.17.79:20132]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.3.169:2525] with esmtp (Farcaster)
+ id 2782e688-9c8a-483f-87c2-fcf35b3201fd; Mon, 16 Sep 2024 11:34:00 +0000 (UTC)
+X-Farcaster-Flow-ID: 2782e688-9c8a-483f-87c2-fcf35b3201fd
 Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
+ EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 16 Sep 2024 11:33:49 +0000
+ Mon, 16 Sep 2024 11:34:00 +0000
 Received: from u5d18b891348c5b.ant.amazon.com (10.146.13.221) by
  EX19D014EUC004.ant.amazon.com (10.252.51.182) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 16 Sep 2024 11:33:39 +0000
+ Mon, 16 Sep 2024 11:33:49 +0000
 From: James Gowans <jgowans@amazon.com>
 To: <linux-kernel@vger.kernel.org>
 CC: Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, "Joerg
@@ -69,9 +69,9 @@ CC: Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, "Joerg
 	<baolu.lu@linux.intel.com>, Alexander Graf <graf@amazon.de>,
 	<anthony.yznaga@oracle.com>, <steven.sistare@oracle.com>,
 	<nh-open-source@amazon.com>, "Saenz Julienne, Nicolas" <nsaenz@amazon.es>
-Subject: [RFC PATCH 07/13] iommufd: Re-hydrate a usable iommufd ctx from sysfs
-Date: Mon, 16 Sep 2024 13:30:56 +0200
-Message-ID: <20240916113102.710522-8-jgowans@amazon.com>
+Subject: [RFC PATCH 08/13] intel-iommu: Add serialise and deserialise boilerplate
+Date: Mon, 16 Sep 2024 13:30:57 +0200
+Message-ID: <20240916113102.710522-9-jgowans@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240916113102.710522-1-jgowans@amazon.com>
 References: <20240916113102.710522-1-jgowans@amazon.com>
@@ -86,151 +86,173 @@ Content-Type: text/plain
 X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
  EX19D014EUC004.ant.amazon.com (10.252.51.182)
 
-When the sysfs file is read, create an iommufd file descriptor, create a
-fresh iommufd_ctx, and populate that ictx struct and related structs
-with the data about mapped IOVA ranges from KHO.
-
-This is done in a super yucky way by having the sysfs file's .show()
-callback create a new file and then print out the new file's fd number.
-Done this way because I couldn't figure out how to define a custom
-.open() callback on a sysfs object.
-An alternative would be to have a new iommufd pseudo-filesystem which
-could be mounted somewhere and would have all of the relevant persistent
-data in it.
-
-Opinions/ideas on how best to expose persisted domains to userspace are
-welcome.
+Similar to how iommufd got serialise and deserialise hooks, now add this
+to the platform iommu driver, in this case intel-iommu. Once again this
+will be fleshed out in the next commits to actually serialise the struct
+dmar_domain before kexec and restore them after kexec.
 ---
- drivers/iommu/iommufd/io_pagetable.c    |  2 +-
- drivers/iommu/iommufd/iommufd_private.h |  4 ++
- drivers/iommu/iommufd/main.c            |  4 +-
- drivers/iommu/iommufd/serialise.c       | 54 ++++++++++++++++++++++++-
- 4 files changed, 60 insertions(+), 4 deletions(-)
+ drivers/iommu/intel/Makefile    |  1 +
+ drivers/iommu/intel/iommu.c     | 18 +++++++++++++++
+ drivers/iommu/intel/iommu.h     | 18 +++++++++++++++
+ drivers/iommu/intel/serialise.c | 40 +++++++++++++++++++++++++++++++++
+ 4 files changed, 77 insertions(+)
+ create mode 100644 drivers/iommu/intel/serialise.c
 
-diff --git a/drivers/iommu/iommufd/io_pagetable.c b/drivers/iommu/iommufd/io_pagetable.c
-index 05fd9d3abf1b..b4b75663d7cf 100644
---- a/drivers/iommu/iommufd/io_pagetable.c
-+++ b/drivers/iommu/iommufd/io_pagetable.c
-@@ -222,7 +222,7 @@ static int iopt_insert_area(struct io_pagetable *iopt, struct iopt_area *area,
- 	return 0;
+diff --git a/drivers/iommu/intel/Makefile b/drivers/iommu/intel/Makefile
+index c8beb0281559..ca9f73992620 100644
+--- a/drivers/iommu/intel/Makefile
++++ b/drivers/iommu/intel/Makefile
+@@ -9,3 +9,4 @@ ifdef CONFIG_INTEL_IOMMU
+ obj-$(CONFIG_IRQ_REMAP) += irq_remapping.o
+ endif
+ obj-$(CONFIG_INTEL_IOMMU_PERF_EVENTS) += perfmon.o
++obj-$(CONFIG_KEXEC_KHO) += serialise.o
+diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+index f473a8c008a7..7e77b787148a 100644
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -65,6 +65,7 @@ static int rwbf_quirk;
+ static int force_on = 0;
+ static int intel_iommu_tboot_noforce;
+ static int no_platform_optin;
++DEFINE_XARRAY(persistent_domains);
+ 
+ #define ROOT_ENTRY_NR (VTD_PAGE_SIZE/sizeof(struct root_entry))
+ 
+@@ -3393,6 +3394,10 @@ static __init int tboot_force_iommu(void)
+ 	return 1;
  }
  
--static struct iopt_area *iopt_area_alloc(void)
-+struct iopt_area *iopt_area_alloc(void)
++static struct notifier_block serialise_kho_nb = {
++	.notifier_call = intel_iommu_serialise_kho,
++};
++
+ int __init intel_iommu_init(void)
  {
- 	struct iopt_area *area;
+ 	int ret = -ENODEV;
+@@ -3432,6 +3437,12 @@ int __init intel_iommu_init(void)
+ 	if (!no_iommu)
+ 		intel_iommu_debugfs_init();
  
-diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
-index ad8d180269bd..94612cec2814 100644
---- a/drivers/iommu/iommufd/iommufd_private.h
-+++ b/drivers/iommu/iommufd/iommufd_private.h
-@@ -59,6 +59,10 @@ struct io_pagetable {
- 	unsigned long iova_alignment;
- };
- 
-+extern const struct file_operations iommufd_fops;
-+int iommufd_fops_open(struct inode *inode, struct file *filp);
-+struct iopt_area *iopt_area_alloc(void);
-+
- void iopt_init_table(struct io_pagetable *iopt);
- void iopt_destroy_table(struct io_pagetable *iopt);
- int iopt_get_pages(struct io_pagetable *iopt, unsigned long iova,
-diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
-index 21a7e1ad40d1..f78a4cf23741 100644
---- a/drivers/iommu/iommufd/main.c
-+++ b/drivers/iommu/iommufd/main.c
-@@ -233,7 +233,7 @@ static int iommufd_destroy(struct iommufd_ucmd *ucmd)
- 	return iommufd_object_remove(ucmd->ictx, NULL, cmd->id, 0);
- }
- 
--static int iommufd_fops_open(struct inode *inode, struct file *filp)
-+int iommufd_fops_open(struct inode *inode, struct file *filp)
- {
- 	struct iommufd_ctx *ictx;
- 
-@@ -473,7 +473,7 @@ static long iommufd_fops_ioctl(struct file *filp, unsigned int cmd,
- 	return ret;
- }
- 
--static const struct file_operations iommufd_fops = {
-+const struct file_operations iommufd_fops = {
- 	.owner = THIS_MODULE,
- 	.open = iommufd_fops_open,
- 	.release = iommufd_fops_release,
-diff --git a/drivers/iommu/iommufd/serialise.c b/drivers/iommu/iommufd/serialise.c
-index 7f2e7b1eda13..9519969bd201 100644
---- a/drivers/iommu/iommufd/serialise.c
-+++ b/drivers/iommu/iommufd/serialise.c
-@@ -1,5 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0-only
- 
-+#include <linux/anon_inodes.h>
-+#include <linux/fdtable.h>
- #include <linux/kexec.h>
- #include <linux/libfdt.h>
- #include "iommufd_private.h"
-@@ -97,10 +99,60 @@ int iommufd_serialise_kho(struct notifier_block *self, unsigned long cmd,
- 	}
- }
- 
-+static int rehydrate_iommufd(char *iommufd_name)
-+{
-+	struct file *file;
-+	int fd;
-+	int off;
-+	struct iommufd_ctx *ictx;
-+	struct files_struct *files = current->files;  // Current process's files_struct
-+	const void *fdt = kho_get_fdt();
-+	char kho_path[42];
-+
-+	fd = anon_inode_getfd("iommufd", &iommufd_fops, NULL, O_RDWR);
-+	if (fd < 0)
-+		return fd;
-+	file = files_lookup_fd_raw(files, fd);
-+	iommufd_fops_open(NULL, file);
-+	ictx = file->private_data;
-+
-+	snprintf(kho_path, sizeof(kho_path), "/iommufd/iommufds/%s/ioases", iommufd_name);
-+	fdt_for_each_subnode(off, fdt, fdt_path_offset(fdt, kho_path)) {
-+	    struct iommufd_ioas *ioas;
-+	    int range_off;
-+
-+	    ioas = iommufd_ioas_alloc(ictx);
-+	    iommufd_object_finalize(ictx, &ioas->obj);
-+
-+	    fdt_for_each_subnode(range_off, fdt, off) {
-+		    const unsigned long *iova_start, *iova_len;
-+		    const int *iommu_prot;
-+		    int len;
-+		    struct iopt_area *area = iopt_area_alloc();
-+
-+		    iova_start = fdt_getprop(fdt, range_off, "iova-start", &len);
-+		    iova_len = fdt_getprop(fdt, range_off, "iova-len", &len);
-+		    iommu_prot = fdt_getprop(fdt, range_off, "iommu-prot", &len);
-+
-+		    area->iommu_prot = *iommu_prot;
-+		    area->node.start = *iova_start;
-+		    area->node.last = *iova_start + *iova_len - 1;
-+		    interval_tree_insert(&area->node, &ioas->iopt.area_itree);
-+	    }
-+	    /* TODO: restore link from ioas to hwpt. */
++	if (IS_ENABLED(CONFIG_KEXEC_KHO)) {
++		ret = register_kho_notifier(&serialise_kho_nb);
++		if (ret)
++			goto out_free_dmar;
 +	}
 +
-+	return fd;
-+}
+ 	if (no_iommu || dmar_disabled) {
+ 		/*
+ 		 * We exit the function here to ensure IOMMU's remapping and
+@@ -3738,6 +3749,7 @@ intel_iommu_domain_alloc_user(struct device *dev, u32 flags,
+ 	struct intel_iommu *iommu = info->iommu;
+ 	struct dmar_domain *dmar_domain;
+ 	struct iommu_domain *domain;
++	int rc;
+ 
+ 	/* Must be NESTING domain */
+ 	if (parent) {
+@@ -3778,6 +3790,12 @@ intel_iommu_domain_alloc_user(struct device *dev, u32 flags,
+ 		domain->dirty_ops = &intel_dirty_ops;
+ 	}
+ 
++	if (persistent_id) {
++		rc = xa_insert(&persistent_domains, persistent_id, domain, GFP_KERNEL_ACCOUNT);
++		if (rc)
++			pr_warn("Unable to track persistent domain %lu\n", persistent_id);
++	}
 +
- static ssize_t iommufd_show(struct kobject *kobj, struct kobj_attribute *attr,
- 	char *buf)
- {
--	return 0;
-+	char fd_str[10];
-+	ssize_t len;
-+
-+	len = snprintf(buf, sizeof(fd_str), "%i\n", rehydrate_iommufd("1"));
-+	return len;
+ 	return domain;
  }
  
- static struct kobj_attribute persisted_attr =
+diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
+index cfd006588824..7866342f0909 100644
+--- a/drivers/iommu/intel/iommu.h
++++ b/drivers/iommu/intel/iommu.h
+@@ -11,6 +11,7 @@
+ #define _INTEL_IOMMU_H_
+ 
+ #include <linux/types.h>
++#include <linux/kexec.h>
+ #include <linux/iova.h>
+ #include <linux/io.h>
+ #include <linux/idr.h>
+@@ -496,6 +497,7 @@ struct q_inval {
+ #define PRQ_DEPTH	((0x1000 << PRQ_ORDER) >> 5)
+ 
+ struct dmar_pci_notify_info;
++extern struct xarray persistent_domains;
+ 
+ #ifdef CONFIG_IRQ_REMAP
+ /* 1MB - maximum possible interrupt remapping table size */
+@@ -1225,6 +1227,22 @@ static inline int iommu_calculate_max_sagaw(struct intel_iommu *iommu)
+ #define intel_iommu_sm (0)
+ #endif
+ 
++#ifdef CONFIG_KEXEC_KHO
++int intel_iommu_serialise_kho(struct notifier_block *self, unsigned long cmd,
++			  void *fdt);
++int __init intel_iommu_deserialise_kho(void);
++#else
++int intel_iommu_serialise_kho(struct notifier_block *self, unsigned long cmd,
++			  void *fdt)
++{
++	return 0;
++}
++int __init intel_iommu_deserialise_kho(void)
++{
++	return 0;
++}
++#endif /* CONFIG_KEXEC_KHO */
++
+ static inline const char *decode_prq_descriptor(char *str, size_t size,
+ 		u64 dw0, u64 dw1, u64 dw2, u64 dw3)
+ {
+diff --git a/drivers/iommu/intel/serialise.c b/drivers/iommu/intel/serialise.c
+new file mode 100644
+index 000000000000..08a548b33703
+--- /dev/null
++++ b/drivers/iommu/intel/serialise.c
+@@ -0,0 +1,40 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++#include "iommu.h"
++
++static int serialise_domain(void *fdt, struct iommu_domain *domain)
++{
++	return 0;
++}
++
++int intel_iommu_serialise_kho(struct notifier_block *self, unsigned long cmd,
++			  void *fdt)
++{
++	static const char compatible[] = "intel-iommu-v0";
++	struct iommu_domain *domain;
++	unsigned long xa_idx;
++	int err = 0;
++
++	switch (cmd) {
++	case KEXEC_KHO_ABORT:
++		/* Would do serialise rollback here. */
++		return NOTIFY_DONE;
++	case KEXEC_KHO_DUMP:
++		err |= fdt_begin_node(fdt, "intel-iommu");
++		fdt_property(fdt, "compatible", compatible, sizeof(compatible));
++		err |= fdt_begin_node(fdt, "domains");
++		xa_for_each(&persistent_domains, xa_idx, domain) {
++			err |= serialise_domain(fdt, domain);
++		}
++		err |= fdt_end_node(fdt); /* domains */
++		err |= fdt_end_node(fdt); /* intel-iommu*/
++		return err? NOTIFY_BAD : NOTIFY_DONE;
++	default:
++		return NOTIFY_BAD;
++	}
++}
++
++int __init intel_iommu_deserialise_kho(void)
++{
++	return 0;
++}
 -- 
 2.34.1
 
