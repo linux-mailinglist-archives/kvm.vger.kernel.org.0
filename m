@@ -1,213 +1,136 @@
-Return-Path: <kvm+bounces-27010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7951197A737
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 20:19:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C741B97A74B
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 20:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81F0A1C26899
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 18:19:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71AE41F28777
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2024 18:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE72B16191E;
-	Mon, 16 Sep 2024 18:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC7215B984;
+	Mon, 16 Sep 2024 18:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="rN1w5HsK";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="rN1w5HsK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PhDmi8QY"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AD215C144;
-	Mon, 16 Sep 2024 18:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7549F158545
+	for <kvm@vger.kernel.org>; Mon, 16 Sep 2024 18:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726510696; cv=none; b=SJGVewkw2glxYFG/mi3ha7jEskWaksXLRmHQJPQa2lb8FCtPJdOd3Tr10zv+D/wEtyW1h2vWPZdNV2bCFCjhg+cX1I1GPP/5k8SoaJkYH4EotllJb3Oj9baFYweOZCrb3kKLom7Y1SLNwRN/T3CuMcSWfoL3b3hmqK4aLmKqOpE=
+	t=1726511070; cv=none; b=F2x30VU3BdG2dimrVhuCHfa1FJJUsvml0sdxcc/JpXaWLrWq0Pr1/I2Hex+ZazGHg4O967FSj5564ERw0m9QlSWxRofxIBoaiujiYcUKX0F68TmGMg5Zrz1maE18F50U8VE88Cij7ogYzwirAaErwgIMKxYxI7zMxhUq0SFRXQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726510696; c=relaxed/simple;
-	bh=3Fw+K0hQmf1BM7ZUV56V8ZoBg80KB09mMA/nO1nJv50=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=awVXhUKOdvjnWiDRUsyOQ6LdXt9VvUph9TpMfKDQp9o2KUQL/a0L5Te9dbaVHU9svRW0a0XY4xA4xgBVP5D0rX1sZU46oxg9YOwfir05dYMZfH8zsBnMgnkj7Ho/lkt4bmx2/AAPQya/Em/O0eC7mgM47DKzKbdBzLtWqOwrDlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=rN1w5HsK; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=rN1w5HsK; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E1D6221C29;
-	Mon, 16 Sep 2024 18:18:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1726510690; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cmWFWeD/k+yoNDkLlzMQjwNocrg/PxJwLUSs9viTQhw=;
-	b=rN1w5HsK48Bgtd/u6hO6M/taq110M6zoZAubwmeu0EzlpqMyrMXDfDc4q85DzVxZD9a8v0
-	xKP3HgcyUlPy3ku4OoH2wvAdq793eVOAaD+HTX/rg4jFrU6oTXVijMLgtnbXhRfJpuaji0
-	RXiGt/K5WRGurqytB2T00nc9A9aKNCs=
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1726510690; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cmWFWeD/k+yoNDkLlzMQjwNocrg/PxJwLUSs9viTQhw=;
-	b=rN1w5HsK48Bgtd/u6hO6M/taq110M6zoZAubwmeu0EzlpqMyrMXDfDc4q85DzVxZD9a8v0
-	xKP3HgcyUlPy3ku4OoH2wvAdq793eVOAaD+HTX/rg4jFrU6oTXVijMLgtnbXhRfJpuaji0
-	RXiGt/K5WRGurqytB2T00nc9A9aKNCs=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4E71913A3A;
-	Mon, 16 Sep 2024 18:18:10 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id wPgSEWJ26GbveAAAD6G6ig
-	(envelope-from <roy.hopkins@suse.com>); Mon, 16 Sep 2024 18:18:10 +0000
-From: Roy Hopkins <roy.hopkins@suse.com>
-To: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	linux-coco@lists.linux.dev
-Cc: Roy Hopkins <roy.hopkins@suse.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Michael Roth <michael.roth@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Joerg Roedel <jroedel@suse.de>,
-	Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [RFC PATCH 5/5] x86/kvm: Add target VMPL to IRQs and send to APIC for VMPL
-Date: Mon, 16 Sep 2024 19:17:57 +0100
-Message-ID: <67ffe577fe98f53068d68c053fa209e8d4b4bae9.1726506534.git.roy.hopkins@suse.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1726506534.git.roy.hopkins@suse.com>
-References: <cover.1726506534.git.roy.hopkins@suse.com>
+	s=arc-20240116; t=1726511070; c=relaxed/simple;
+	bh=KyN8GKvHoP6oAAePFJM111cdcf+1s0w20NMicGPpf5o=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nmMuhXwNzVW/D8OWQoSJHD76hug9HNnI6KfJa2t2ZuYLvIsJZVYrivtBjNYW2gH64wj4mV5BSTOcSyKw8343GkC0KdqN74FaNv+oJp7b6fmaePfgEUGjpRaMCZxWffo0uJqE+Gkv6SZyi9+dtt/92e0EFYXHtROKeJ0bgPFqZPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PhDmi8QY; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ddc768e85aso21306807b3.1
+        for <kvm@vger.kernel.org>; Mon, 16 Sep 2024 11:24:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726511067; x=1727115867; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PWVVert/0duLgr8lppMjlBcvaVlhn5CV2P73SctPY5A=;
+        b=PhDmi8QY8HXvWeZDVLCDmpjTTaxYVgf3GoXVan3Qim27iF9p3KG+odLNLZwNB5WOTd
+         EvnBVSKt3lZ7/PSSMsLs8/y7OcXPsfiAyylEQt8KESVWflKzdbcMtVjxvL7GNYQpMRWJ
+         QHCCqzf0NidZ27O8zNMBZZMGNSa44LAFz56kzDWstcWxIc3Lqi10TpIhn4gNQlXvo5qp
+         tgt8410g4gkdZ1HRExxHOWOn4MFZte8qEDzAwPJ+AiaabGVjC4hVwqncbgWCxDqbmA4W
+         VpOsuytOtojxEwfHDGkp4ivWF4B/ym4813pmIp7DTjIY8sxuUMHXEGWgVcXQ4fEJzmJj
+         VYMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726511067; x=1727115867;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PWVVert/0duLgr8lppMjlBcvaVlhn5CV2P73SctPY5A=;
+        b=D62vU+62jXDpSriSpbaUBCIwTytlk7sg6Ne/si4FGozgDQ21Eo+jOH3YVUlxjWJ/j+
+         xuNXdg5ZllGDLHmJLcwFPLaUKThwFm66phI0+xjL4XHi9vIpnKjsQCCeypjdIkUMRKRQ
+         8BBvvWQyR2i6X3otfd5zAJLQ5DMOb4fFdaLdXCU1isu2Wa9J2O7e85qi/PMqnSayMG/f
+         64kU02D/QwRYgjgqLjhquYFQYz848a30EnE26yAKf4Kj3RXj50OWl+iiR3a1RN8Sol4s
+         HPj0ETE/6rMlfZu30eqC6qolRWwA4d/CtGLqNZHRNWxQvsCicZAjsspFdqzbW6uUCO2K
+         66Mw==
+X-Gm-Message-State: AOJu0Yy6touGg3nG3pzOdbmW68AYhKJMqQhBP8dZrrczCILuC3nl5G1W
+	aKnHme6IT2Zx5QP+0ofdlMIRpgAxBPvg+BSeqx9Ipb7DjspwJ3herpTpRmutDmNSb9kv5xNbdTu
+	qNw==
+X-Google-Smtp-Source: AGHT+IGw6+fTdMMlTRPuPFeoq64qFkHtSG8aeQPj9JG0eFHtNo93fBF43eoD6YBxvGRG6q4NAAC5M9oExS0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:c4a:0:b0:e17:c4c5:bcb2 with SMTP id
+ 3f1490d57ef6-e1db00d2b9dmr49146276.7.1726511067380; Mon, 16 Sep 2024 11:24:27
+ -0700 (PDT)
+Date: Mon, 16 Sep 2024 11:24:25 -0700
+In-Reply-To: <CABgObfZ1oZHU+9LKc_uiPZs1uwqxczcknspCD=BJCFZd5+-yyw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:mid,imap1.dmz-prg2.suse.org:helo];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	R_RATELIMIT(0.00)[to_ip_from(RLh8t8sqpgocps1pdp1zxxqsw5)];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Score: -6.80
-X-Spam-Flag: NO
+Mime-Version: 1.0
+References: <20240914011348.2558415-1-seanjc@google.com> <CABgObfbV0HOAPA-4XjdUR2Q-gduEQhgSdJb1SzDQXd08M_pD+A@mail.gmail.com>
+ <CABgObfZ1oZHU+9LKc_uiPZs1uwqxczcknspCD=BJCFZd5+-yyw@mail.gmail.com>
+Message-ID: <Zuh32evWMcs8hTAM@google.com>
+Subject: Re: [GIT PULL] KVM: x86 pull requests for 6.12
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Systems that support VMPLs need to decide which VMPL each
-IRQ is destined for; each VMPL can support its own set of hardware
-devices that generate interrupts.
+On Sun, Sep 15, 2024, Paolo Bonzini wrote:
+> On Sat, Sep 14, 2024 at 4:54=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.co=
+m> wrote:
+> >
+> > On Sat, Sep 14, 2024 at 3:13=E2=80=AFAM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+> > > There's a trivial (and amusing) conflict with KVM s390 in the selftes=
+ts pull
+> > > request (we both added "config" to the .gitignore, within a few days =
+of each
+> > > other, after the goof being around for a good year or more).
+> > >
+> > > Note, the pull requests are relative to v6.11-rc4.  I got a late star=
+t, and for
+> > > some reason thought kvm/next would magically end up on rc4 or later.
+> > >
+> > > Note #2, I had a brainfart and put the testcase for verifying KVM's f=
+astpath
+> > > correctly exits to userspace when needed in selftests, whereas the ac=
+tual KVM
+> > > fix is in misc.  So if you run KVM selftests in the middle of pulling=
+ everything,
+> > > expect the debug_regs test to fail.
+> >
+> > Pulled all, thanks. Due to combination of being recovering from flu +
+> > preparing to travel I will probably spend not be able to run tests for
+> > a few days, but everything should be okay for the merge window.
+>=20
+> Hmm, I tried running tests in a slightly non-standard way (compiling
+> the will-be-6.12 code on a 6.10 kernel and installing the module)
+> because that's what I could do for now, and I'm getting system hangs
+> in a few tests. The first ones that hung were
+>=20
+> hyperv_ipi
+> hyperv_tlb_flush
 
-This commit extends kvm_lapic_irq to include a target_vmpl field the
-sends the IRQ to the APIC instance at the target VMPL.
+This one failing gives me hope that it's some weird combination of 6.10 and=
+ the
+for-6.12 code.  Off the top of my head, I can't think of any relevant chang=
+es.
 
-Signed-off-by: Roy Hopkins <roy.hopkins@suse.com>
----
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/ioapic.c           | 3 +++
- arch/x86/kvm/irq_comm.c         | 1 +
- arch/x86/kvm/lapic.c            | 6 +++++-
- 4 files changed, 10 insertions(+), 1 deletion(-)
+FWIW, I haven't been able to reproduce any failures with kvm/next+kvm-x86/n=
+ext,
+on AMD or Intel.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3dd3a5ff0cec..d0febb67dabf 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1624,6 +1624,7 @@ struct kvm_lapic_irq {
- 	u32 shorthand;
- 	u32 dest_id;
- 	bool msi_redir_hint;
-+	unsigned int target_vmpl;
- };
- 
- static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 995eb5054360..7b835a192561 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -413,6 +413,8 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
- 			irq.shorthand = APIC_DEST_NOSHORT;
- 			irq.dest_id = e->fields.dest_id;
- 			irq.msi_redir_hint = false;
-+			irq.target_vmpl = ioapic->kvm->arch.default_irq_vmpl;
-+
- 			bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
- 			kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
- 						 vcpu_bitmap);
-@@ -458,6 +460,7 @@ static int ioapic_service(struct kvm_ioapic *ioapic, int irq, bool line_status)
- 	irqe.level = 1;
- 	irqe.shorthand = APIC_DEST_NOSHORT;
- 	irqe.msi_redir_hint = false;
-+	irqe.target_vmpl = ioapic->kvm->arch.default_irq_vmpl;
- 
- 	if (irqe.trig_mode == IOAPIC_EDGE_TRIG)
- 		ioapic->irr_delivered |= 1 << irq;
-diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-index 8136695f7b96..6bd4a78dddba 100644
---- a/arch/x86/kvm/irq_comm.c
-+++ b/arch/x86/kvm/irq_comm.c
-@@ -119,6 +119,7 @@ void kvm_set_msi_irq(struct kvm *kvm, struct kvm_kernel_irq_routing_entry *e,
- 	irq->msi_redir_hint = msg.arch_addr_lo.redirect_hint;
- 	irq->level = 1;
- 	irq->shorthand = APIC_DEST_NOSHORT;
-+	irq->target_vmpl = kvm->arch.default_irq_vmpl;
- }
- EXPORT_SYMBOL_GPL(kvm_set_msi_irq);
- 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index e2dd573e4f2d..20b433a78457 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -836,7 +836,9 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
- int kvm_apic_set_irq(struct kvm_vcpu *vcpu, struct kvm_lapic_irq *irq,
- 		     struct dest_map *dest_map)
- {
--	struct kvm_lapic *apic = vcpu->arch.apic;
-+	struct kvm_lapic *apic = vcpu->vcpu_parent->vcpu_vmpl[irq->target_vmpl]->arch.apic;
-+	if (!apic)
-+		return -EINVAL;
- 
- 	return __apic_accept_irq(apic, irq->delivery_mode, irq->vector,
- 			irq->level, irq->trig_mode, dest_map);
-@@ -1528,6 +1530,8 @@ void kvm_apic_send_ipi(struct kvm_lapic *apic, u32 icr_low, u32 icr_high)
- 	irq.trig_mode = icr_low & APIC_INT_LEVELTRIG;
- 	irq.shorthand = icr_low & APIC_SHORT_MASK;
- 	irq.msi_redir_hint = false;
-+	/* IPIs always target the same VMPL as the source */
-+	irq.target_vmpl = apic->vcpu->vmpl;
- 	if (apic_x2apic_mode(apic))
- 		irq.dest_id = icr_high;
- 	else
--- 
-2.43.0
-
+> xapic_ipi_test
+>=20
+> And of course, this is on a machine that doesn't have serial
+> console... :( I think for now I'll push the non-x86 stuff to kvm/next
+> and then either bisect or figure out how to run tests normally.
 
