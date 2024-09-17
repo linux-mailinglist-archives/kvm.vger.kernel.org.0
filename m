@@ -1,313 +1,405 @@
-Return-Path: <kvm+bounces-27022-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27023-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17A9597AA5F
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 04:12:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC1C97AB1D
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 07:40:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFDDA28C9A9
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 02:11:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FD231C26E71
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 05:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6754C66;
-	Tue, 17 Sep 2024 02:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE83A14A4DE;
+	Tue, 17 Sep 2024 05:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J1OYdnTC"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nVCQHbxT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD021C6B2;
-	Tue, 17 Sep 2024 02:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726539114; cv=fail; b=s4dgdTQlggZj7716Kn+Q6Jy/jxLV1q03V8eemdk46LU8OFj6XZHroXCzwy79IkIcQU8+2BvoiQAAQZupO59M3tWJfdKH+HBU0tcAUqB91s/QKXrIR/YI2GJSWq/Wsj78pfyLU9cWzfxOI+R+ggn+KpnFPgQYoqiZ20eqpaOGpro=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726539114; c=relaxed/simple;
-	bh=QncAfoKdg4IcHlkH5WxHt6ZTQF2ov75ArOZrstUyfus=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kUn68y49Lt8jt6QiHfbCiYxo+WdGoNWBiYszmHjobKV5mlBlyP5dK7t0pp64J/7VFSmRjx4/jRKdPzNmCcD2JGgeCDIp+nNgx+v0Pu1OB9T0cnrN7KwSAQmjpEak39E2pwFXwigYV+v6bysCAW9elQ5ctxh3wzj4d9bwiw4SgnY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J1OYdnTC; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726539112; x=1758075112;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=QncAfoKdg4IcHlkH5WxHt6ZTQF2ov75ArOZrstUyfus=;
-  b=J1OYdnTCD5I/22v2ypHPirqgWTvpd0yOn4b39pcIEe6oVq6dUTmeuWUA
-   AN41w3NHvdpE3XmMGyHnRpuBYzLVx/10khAiScnZomJepU6/a6WIc6DRn
-   Jz/1EpT34uCJJsnREiB0mFPdBI4ibfpd9dDwsGRzeumAxwe2nthwrkvqG
-   OdF/2jcu9B1xVGRJrcDsIAQ4KsXkEdREgZ8ggafcFoxeA8JSXmJ/UDkFu
-   aECqOy2xkBQ9XkzE8iboGGL84VqKJUFCYVjIOPEnCWKL3QEtKA+xMYIuj
-   d/JnWvQOw93antm3o/89hxyqdpgSQQS1rJ5bq1I10WLH1Rk+VtO3zi9xI
-   A==;
-X-CSE-ConnectionGUID: HjL1pdbKRkeeKXzSd+gs/Q==
-X-CSE-MsgGUID: SZWiio4cQrSy7WLzgZ6kSQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11197"; a="42896055"
-X-IronPort-AV: E=Sophos;i="6.10,234,1719903600"; 
-   d="scan'208";a="42896055"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 19:11:12 -0700
-X-CSE-ConnectionGUID: 69AI9o5KTOqresqpajQQ7g==
-X-CSE-MsgGUID: pAv6Q9SuSdynr2ozuXeUDQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,234,1719903600"; 
-   d="scan'208";a="73877127"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Sep 2024 19:11:12 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 16 Sep 2024 19:11:11 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 16 Sep 2024 19:11:11 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 16 Sep 2024 19:11:11 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.176)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 16 Sep 2024 19:11:11 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JC4wcW9qKqe1tXy7j5bnAKi0CNPb/jA+XKqF8tJZIpS1+mA3ttlXvjbuVicGFxvJTBTzzTRzWBqlPY55Yx/4O/RuCV1o0hms5KcKbHLNuoUhHoYlBFtxk8y3LZyoG0G6O2bhIDk+PkctPsH4db3QlLQwuGl1jLSvqTCBURCbm2S2N8KhEquAYVf7JKoAKd9U8WTla8+MayuqZfbQ0YnY51k1Ui/yc74VR2iTKm7u1sbyBj85R9scNwSrI0yrwYNJ5aT09gImOEzT2eBA1iOX0ThYDIiHgJNHjkTxoFsDmMgijrfOMmVmRn4WfqoHhsUNYGVOO6AhPkww0mzPo8tASw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=enHtedmWrFdNhd4aTuLnUw+L5vu1rZSyhZtEz/UIqYs=;
- b=lqp5Ij4uOQNJMRgWOVybIbADfOmchxQuwpgN9S9VVJOMTZ6qv1aepu28aPtPgY0Y01FByt78knHVgXSUIbhZwHX3Bwrq+qV4GXDoLC34LubMCMYQaQVqXwpmNzvSs+FGFRORZ/ChZkZuWGR5h27cVTYQljvx28RxwhIciYlWpDvOZpyyG3fQxwUzss9Vz0wwnZmeQIOVSc9qLni2CU+vmTX0ySHwIwVzIOh6h5ChgMjavw8r37YxBmQBuHbgTB1xjnKdhReDwakUg5C2bO3bTRoKqT09GISaB+yUYXRn6T8Sj3PuZYwEnHbDrxNaVPtT5lGSXJQIw8ciRnKcyB5A2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by PH7PR11MB6329.namprd11.prod.outlook.com (2603:10b6:510:1ff::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.23; Tue, 17 Sep
- 2024 02:11:08 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b%4]) with mapi id 15.20.7962.022; Tue, 17 Sep 2024
- 02:11:07 +0000
-Message-ID: <b50bfb56-c2f2-493e-bd87-1c5aaa8bfb59@intel.com>
-Date: Tue, 17 Sep 2024 14:11:01 +1200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/21] KVM: TDX: Retry seamcall when TDX_OPERAND_BUSY with
- operand SEPT
-To: Sean Christopherson <seanjc@google.com>, Yan Zhao <yan.y.zhao@intel.com>
-CC: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, Yuan Yao <yuan.yao@intel.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "dmatlack@google.com"
-	<dmatlack@google.com>, "nik.borisov@suse.com" <nik.borisov@suse.com>
-References: <6449047b-2783-46e1-b2a9-2043d192824c@redhat.com>
- <b012360b4d14c0389bcb77fc8e9e5d739c6cc93d.camel@intel.com>
- <Zt9kmVe1nkjVjoEg@google.com>
- <1bbe3a78-8746-4db9-a96c-9dc5f1190f16@redhat.com>
- <ZuBQYvY6Ib4ZYBgx@google.com>
- <CABgObfayLGyWKERXkU+0gjeUg=Sp3r7GEQU=+13sUMpo36weWg@mail.gmail.com>
- <ZuBsTlbrlD6NHyv1@google.com>
- <655170f6a09ad892200cd033efe5498a26504fec.camel@intel.com>
- <ZuCE_KtmXNi0qePb@google.com> <ZuP5eNXFCljzRgWo@yzhao56-desk.sh.intel.com>
- <ZuR09EqzU1WbQYGd@google.com>
-Content-Language: en-US
-From: "Huang, Kai" <kai.huang@intel.com>
-In-Reply-To: <ZuR09EqzU1WbQYGd@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P222CA0002.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:303:114::7) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB685364BE;
+	Tue, 17 Sep 2024 05:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726551503; cv=none; b=BE/83sctJ3dwzj2S0oaarLOjwk9c7c5I/BBZbQRY4Exk2gPM1QeKdCNeQ6RjiZNKU5UtAeJ7O4H3z7yS6XlGfpgJcveewCDM/Br/K+ZR/MCyDEuuaSgtxI7Kvt5LUOHzn8Q2YdmXa5sgO+Lf9UxdUWbP3zFTPFZ2ft21v6DGvpc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726551503; c=relaxed/simple;
+	bh=92/sm0x9b8bTZYjWstigCGTYf/nD/vd4R8j9jsSv6kE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iGdDJnWampwbpF/jeZpQKBqSlUvjgCF7IZjcw6p5bMRqY4f5kFtCG2mpaeCgUD54hPOvXw/YpOV0tYawHSIdMBgU8x/7Ljk5bKFooxAi1X3Bi8EpyC1XMwrEVPgYoTXg/WZwXPlkYDVY71m/aUjHE8c2uTQ/NKFmGznD3h2GE5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nVCQHbxT; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48GIV0Gh031215;
+	Tue, 17 Sep 2024 05:37:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=m
+	n49dey97attnTx40sSCX8lZEHnYddM5AExwpYsB+xg=; b=nVCQHbxTPJXg6BtHF
+	6hsmoqKbgKVh7zN3DeJRs9NRVi+kmCrK4CteQtEhjtU4fuYEAkCRicKxxmf5CAV0
+	1qf5x2heZ8yuvjtzN7CySK1G3ER+Yqozi7+y+21mL5ocFGpbaWTaJpO66J46cQXn
+	8g8FTGErWamgiOukU/npMn4Wx4fySIt6nJBnAKSQEGd23+7D4Nii9WzwCUCZEL0N
+	eDy7ffJ5CF+Dx8kptffv1+XeeUMyEM1y55EwDgr/NYRjiuhzIaDzgf1UP03fQE5H
+	K09FZppUQ3l6JoPxW0jMBXl/S13oo5xXr6EGIkH+7f0O/CbAuzsU1OQ87e52Ap86
+	OKGew==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n3vnnjj7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Sep 2024 05:37:14 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48H5bDsU004868;
+	Tue, 17 Sep 2024 05:37:13 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n3vnnjj3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Sep 2024 05:37:13 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48H4ge8U001960;
+	Tue, 17 Sep 2024 05:37:12 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41nmtukhj9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Sep 2024 05:37:12 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48H5bBoK25166476
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 17 Sep 2024 05:37:11 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0369858050;
+	Tue, 17 Sep 2024 05:37:11 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5CB2058052;
+	Tue, 17 Sep 2024 05:36:57 +0000 (GMT)
+Received: from [9.43.81.97] (unknown [9.43.81.97])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 17 Sep 2024 05:36:57 +0000 (GMT)
+Message-ID: <64fbdf0b-02b9-43cd-a0ba-89e37f2615f8@linux.ibm.com>
+Date: Tue, 17 Sep 2024 11:06:54 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|PH7PR11MB6329:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5bb14d34-7eea-4a88-acce-08dcd6bdfde6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?T05UNFM5RExuQTZHRTZkU21kOS96akQyZTdUajc2dm1YZ25zb0RGcmplQVJZ?=
- =?utf-8?B?VU8zR0FsTG91QnZXWnVDV1RZYnRQVlN1Z2FEL3BVM21MdnltL25HSmJSQ0xv?=
- =?utf-8?B?RWlhbzUwblQ1ZWdEUU9aZm9Wc0RoTDR0TXpyRlhoaW4zZUJGV3VvOXo1Mlc5?=
- =?utf-8?B?MVJZdzlqMnBQNnVEMkVoOWd6czFVcUVDTVVMNnVjdG04K3l6WkptdVNtejZX?=
- =?utf-8?B?VGJ2Q1NmVEk1VVRUZXUwZzVncURPRTBNQTlmYkVvRjFLaENPS0tKQWJiajNZ?=
- =?utf-8?B?ZVZqbFBlbWFHV0I3V296OUw2SUY5aWlhOS84M0FmcURkMFdwTjlFSGVSS3p0?=
- =?utf-8?B?TEFFOTZLcTRHd3ROSmFKTmc5T2s3anpUTmJFbHBPeHFacGM5RTRLK0MxTCtw?=
- =?utf-8?B?RThDMTVYcm1rbS94cDZYR2VXUlJxQXBJRmdRWWcxajB6NXBhUWpteFB3c1RR?=
- =?utf-8?B?SUpYNWRxcXM3TFRQY1RJWkpJd3FEMnRiQVlrTHNRTmZLZXA3QTlsdjloUVYx?=
- =?utf-8?B?aGE0c3huZGtGaHBPYTJZVU5pQ1gxVHlDbGM2V1Y4TUdVbUhCZ3R0QWs1VDUy?=
- =?utf-8?B?WUpNMGNBeHRLNEN0aVlpMVNoRW9vWTI4TnFnS1BGYnl6VkpuQktmWjlYS2pR?=
- =?utf-8?B?N1d6QU5XczR2MFJuRzBnK05xUitSNnZEcjNaS0xLVTl0RjJUZHFxcFdWaXJm?=
- =?utf-8?B?YzV2TlNCeThmR3hRQVlmRGNpeHZHZHV4b0VqMklBc05jdk9GN1FSZXhld01H?=
- =?utf-8?B?cE5aeFNHSjMrODVuTlBPbU9nMUZOZEhkd28rK09DZTBYR1hrK0FhM0RDTG1T?=
- =?utf-8?B?a0xoaVFyMUw1YXVpejBCRlorVFVONmRJM3p4ZG1xOFhRTDBvbThPaEF1TmVv?=
- =?utf-8?B?YTl2Ty9CdmY5b05UQXJRbVdEVnhLNlRzZlFiS3MyeVpUSEJoZjNUVk1uUXFC?=
- =?utf-8?B?YmpIOTBkaHlQSXRWbFRGS3FoNkFyOVo5em0zdDYxNGZVU3U3Vy9wWWpEek9C?=
- =?utf-8?B?a0N0ekRLYmJLR2FFL29WbEpDdTFDcDcvZ2haNytZb3hwNDVWVE1qdE8rOUxk?=
- =?utf-8?B?Z3JrcWVPdGdvNVM5YXpDYVFBZ2d2UkFaTFhmRkdoc05DaTd2ZE5FU2dyYVZv?=
- =?utf-8?B?cUdBWDIwa05DQ0NwV2tZdlVIcHB4ZnRIcER2SzZaTTZhemhxdWg4dGs0UlBK?=
- =?utf-8?B?dHo3M0J4QnZMMnRoWmt0Mkp0VVJHVEhxczV1SlZuNDB4Y0hvSVk5bnBRazky?=
- =?utf-8?B?SlVSU3NGalliL2xCYm9URXdFaWFyMTNIcCtScldzL1dyKzFST1dScWl1UFFo?=
- =?utf-8?B?RDlwZWRQeERsRklVV0UwQ1ZtK2tlcXlmMVhtWWJ4Q2pkb1dLSFFHMEZDZVBu?=
- =?utf-8?B?aTFQOGVwd1pVSU84ZHRTWEpyZTBLdTNnMkRGN1JESDBmOGtvQjBISlBRNEY5?=
- =?utf-8?B?YkJGTm9WYm03Z1R3TDlmNFRxNjFTMk1mVWF0L2Z0OUN0cmdvcTNORE5jNG9D?=
- =?utf-8?B?bXdITUR3ajI3TWE5d09qWXBzUklXalkrTFNHNGVkU1lOaE01NGZ6N1U1dDUy?=
- =?utf-8?B?OXRlTGIwY1MwNGdrV0RDUGY0TmEvMXEydkUwbU51WGZuZGMvWFhDUkUxM05H?=
- =?utf-8?B?N0VWcUNxV3lPOEkxLzFibmNna2hPWVljQVF6MEhPNk1VL1JOVjdBK05pVllk?=
- =?utf-8?B?Y3l3K04rZHAxM1FGUmp2eUR0cnBtbXNtNjBnSmtZaEVmOElzaTdCK2JPUmw5?=
- =?utf-8?B?bmNNRW44clhRb3RxV2dvaUlLSnBxSFd4WnVicHZpVEFiR2JSbWIwS3BMeXRl?=
- =?utf-8?B?bXdwS3NwQVV5TVR5T2FNQT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?KzhrYlRTYnNaNjVFalNod0ZLNHBJbVhaQnVLUTZPbWZoWENtZTVyczExaENG?=
- =?utf-8?B?VzVMenJUdG9ySlpXQmlRUERFdmxVVHZCOGpTNTMyTlNkaDJuRGdyQ3R6RmM5?=
- =?utf-8?B?QWphL0xEZGRpOEFDZzBnL0ErZlZkU1NJdy9KY0YvN3l4ekJOdlVTVzFjZENr?=
- =?utf-8?B?aDU0aWViVVdKWE9wRTRhb3I2ZkQxQ2FkMWpaaS9mMGYvbXFLeitaUHZqYU9m?=
- =?utf-8?B?Q0ZsRHk1S0dXQkY0YTRsVmw0ekgzNDFNRkQ4Vmd1ekpTWUFhVmpQcytzTDNG?=
- =?utf-8?B?OU54R0oxTmFTNjhDOS8yYTdKbW5vbTFtM2tZSGcrUjh0NEF6dktkMHpVaGlp?=
- =?utf-8?B?ZFpVVm94YmNrdFQ2OFo2V2NjNERjWjRQZUxWTExQcC9hYTRiWmxEWkllVTFl?=
- =?utf-8?B?QTZYOW1oNkYvSlFKaStvY0ZTL0IzeXA2RUc1SzVmblNkNVVoSFVYTXMwd0N0?=
- =?utf-8?B?YVZQVUZZN0V1c082SkhLMXBJNVVtN1NGWmhOVDE4V1JYMVRUS2RJSHV6b2lO?=
- =?utf-8?B?azNXaDI0bmZsSkwwMGNoUWFtREswNGwzOEwyK2hSc1RnVWNJUEIramxsU3Vi?=
- =?utf-8?B?c3JlMmZzblgrUUQrUW43T0pSbFgwVy95dHMyN1Fjbk56WHJ0ZEJidVBnVHFZ?=
- =?utf-8?B?dnNpWDJDcnl2dkRSSm1lRTJsOGVSSWNGcTcxYmo0OStDbE52YTNUSFVYaWg1?=
- =?utf-8?B?YjRZZ25IL05NMGlmM2Q5Y0h3cVBiUkcycnEyd0VXYWxHYlNVYWVoVkUydExy?=
- =?utf-8?B?Zk9BWnNBRFlwQkFka0tpTkFITHNFNFpTUUpWVTBScHhzdU9oZmd0L3NCVE5k?=
- =?utf-8?B?cW1MZUdmcU1nNExxb2hrdVRiS3lmZkVVZDVSbW9OS1loUnlpTWRISVJNR1Qx?=
- =?utf-8?B?WmtXRTFqQWx2bUROQzZtbWYzaUNRQ25kR1k3aEIyZXJCMzZsNlp1ckMvek5w?=
- =?utf-8?B?aU1jZEM0c0tRb2lwUk1obnpMQXFVKzdtcGVaU0tJN09mVkt5T2pUTStZZXlu?=
- =?utf-8?B?VFd1SmdSejM1V0kwZ29iWVF4L01pc1JneW1tT21CcFo3WU9NRm9xT0dhTFZT?=
- =?utf-8?B?WXE2ZU92a29ZYzJ1WXE0VUZ0TUNuMkFHWWFXak9yR0x4aVA4YWwwVk84Q2lo?=
- =?utf-8?B?Y0hNUDAwcWp2cmp3QXZqamdOL1FVMUd1YkR0eDZnRHpjUUNKWEI3RUI1Yktu?=
- =?utf-8?B?bktGYnRQQ1hZbnluVy9FejNHYzV6NVc5L2VZYWcyZlNVMWE2aWt5bHlqR2x3?=
- =?utf-8?B?RWJDUi9kR0thVyt1THVFVXhTNHlGSTlPbmN0NEFuM3VmTzVhOXZjb09CbWQ5?=
- =?utf-8?B?V1Nxa0RrZVRuVGxSUDYza2hRendiZHVXUE5zTk1sQ0lyVStBUEliaVdUazl4?=
- =?utf-8?B?S0JubDhxajVYWkNaZTMzTFRpRkRqbnhEaE9zSkFPTnhFS1NXaEdrUytNeUUv?=
- =?utf-8?B?ZmNjQXBKMGR0enBJR2tiRm5QVW44aUZOaGd5TmFHNUJhbzk3aTFDaDNUWlJ3?=
- =?utf-8?B?NTRaT0VoWkx6cnVjcXAyREliUmQvak9WOWFZb1NFYjBkSWYrUWVXYTF4VFF2?=
- =?utf-8?B?cXFmSFgrU0N2alcvYXA0WmpneDNJcUNnNmZKQTZ3R3ZkUDZrWURhQkJ2bG1r?=
- =?utf-8?B?aWlOS1ROVE5XdnNFNEVuVk1CeEt2THVBV0JJZFRINGZmdHJEWVVKckdheTM5?=
- =?utf-8?B?a1FhNnQrQTRxMXJSdDAvU1I1SUZ6YTJXbFdyNXpHbkVZZDdWRkpHNFByNWM2?=
- =?utf-8?B?NHE4dWdsQURhU05IZW96c0pLZlVBMnE4amlITnVTNVE1YVRoNlc0c2tYZUZL?=
- =?utf-8?B?cTA0aWZvNngzUG00eUlpeVRKdGVhbzg0eTVrdWlPeEdCZjdUYnpScW42cmYy?=
- =?utf-8?B?MENhenJzUUJoSEhRRy9lcTlneXpjNzRZSVJjc1VOeHU1MnhIbWlMVUV4blFI?=
- =?utf-8?B?dDdNWEkyeXlYK0pTazI0UjJLUzNVV2cxM1dyZFE2eEJSTThPNE1XZEhDaC9I?=
- =?utf-8?B?alpGYlo1aFJ0UTRMMHFNZnYydGRqQ0Z4Sm5PbGFqWm5wcGg2a3lCN2RYSWRD?=
- =?utf-8?B?bXkrYXlXdlRaUVlPQWdEb3lZcEl3ZHA4SDQ3YzZLeW9COHFEU3BCYU05Znpp?=
- =?utf-8?Q?d10+bPzFNJ5yspR1IIgDlFTbt?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5bb14d34-7eea-4a88-acce-08dcd6bdfde6
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2024 02:11:07.8146
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vZPI3uWg1tzyPSr5rpe/DwXSffN9zpJF+yHAKgQp2rGPYbKiDvL9d/6juoCZqQT3Q47d4+543trpDYC93Ixr4Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6329
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/5] perf: Hoist perf_instruction_pointer() and
+ perf_misc_flags()
+To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>, Will Deacon <will@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Naveen N Rao <naveen@kernel.org>, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
+References: <20240912205133.4171576-1-coltonlewis@google.com>
+ <20240912205133.4171576-3-coltonlewis@google.com>
+Content-Language: en-US
+From: Madhavan Srinivasan <maddy@linux.ibm.com>
+In-Reply-To: <20240912205133.4171576-3-coltonlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: gCr9z-Ag2yvf1oDEJ19gugT8Q6t_NwFY
+X-Proofpoint-GUID: QTSYotEEB_qIeDnpl69YaMBZY4DirbZx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-17_01,2024-09-16_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ priorityscore=1501 phishscore=0 clxscore=1011 malwarescore=0 bulkscore=0
+ impostorscore=0 spamscore=0 suspectscore=0 mlxscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
+ definitions=main-2409170040
 
 
-
-On 14/09/2024 5:23 am, Sean Christopherson wrote:
-> On Fri, Sep 13, 2024, Yan Zhao wrote:
->> This is a lock status report of TDX module for current SEAMCALL retry issue
->> based on code in TDX module public repo https://github.com/intel/tdx-module.git
->> branch TDX_1.5.05.
->>
->> TL;DR:
->> - tdh_mem_track() can contend with tdh_vp_enter().
->> - tdh_vp_enter() contends with tdh_mem*() when 0-stepping is suspected.
-> 
-> The zero-step logic seems to be the most problematic.  E.g. if KVM is trying to
-> install a page on behalf of two vCPUs, and KVM resumes the guest if it encounters
-> a FROZEN_SPTE when building the non-leaf SPTEs, then one of the vCPUs could
-> trigger the zero-step mitigation if the vCPU that "wins" and gets delayed for
-> whatever reason.
-> 
-> Since FROZEN_SPTE is essentially bit-spinlock with a reaaaaaly slow slow-path,
-> what if instead of resuming the guest if a page fault hits FROZEN_SPTE, KVM retries
-> the fault "locally", i.e. _without_ redoing tdh_vp_enter() to see if the vCPU still
-> hits the fault?
-> 
-> For non-TDX, resuming the guest and letting the vCPU retry the instruction is
-> desirable because in many cases, the winning task will install a valid mapping
-> before KVM can re-run the vCPU, i.e. the fault will be fixed before the
-> instruction is re-executed.  In the happy case, that provides optimal performance
-> as KVM doesn't introduce any extra delay/latency.
-> 
-> But for TDX, the math is different as the cost of a re-hitting a fault is much,
-> much higher, especially in light of the zero-step issues.
-> 
-> E.g. if the TDP MMU returns a unique error code for the frozen case, and
-> kvm_mmu_page_fault() is modified to return the raw return code instead of '1',
-> then the TDX EPT violation path can safely retry locally, similar to the do-while
-> loop in kvm_tdp_map_page().
-> 
-> The only part I don't like about this idea is having two "retry" return values,
-> which creates the potential for bugs due to checking one but not the other.
-> 
-> Hmm, that could be avoided by passing a bool pointer as an out-param to communicate
-> to the TDX S-EPT fault handler that the SPTE is frozen.  I think I like that
-> option better even though the out-param is a bit gross, because it makes it more
-> obvious that the "frozen_spte" is a special case that doesn't need attention for
-> most paths.
-> 
-
-[...]
-
+On 9/13/24 2:21 AM, Colton Lewis wrote:
+> For clarity, rename the arch-specific definitions of these functions
+> to perf_arch_* to denote they are arch-specifc. Define the
+> generic-named functions in one place where they can call the
+> arch-specific ones as needed.
+>
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>   arch/arm64/include/asm/perf_event.h          |  6 +++---
+>   arch/arm64/kernel/perf_callchain.c           |  4 ++--
+>   arch/powerpc/include/asm/perf_event_server.h |  6 +++---
+>   arch/powerpc/perf/core-book3s.c              |  4 ++--
+>   arch/s390/include/asm/perf_event.h           |  6 +++---
+>   arch/s390/kernel/perf_event.c                |  4 ++--
+>   arch/x86/events/core.c                       |  4 ++--
+>   arch/x86/include/asm/perf_event.h            | 10 +++++-----
+>   include/linux/perf_event.h                   |  9 ++++++---
+>   kernel/events/core.c                         | 10 ++++++++++
+>   10 files changed, 38 insertions(+), 25 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
+> index eb7071c9eb34..31a5584ed423 100644
+> --- a/arch/arm64/include/asm/perf_event.h
+> +++ b/arch/arm64/include/asm/perf_event.h
+> @@ -11,9 +11,9 @@
 >   
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 5a475a6456d4..cbf9e46203f3 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1174,6 +1174,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>   #ifdef CONFIG_PERF_EVENTS
+>   struct pt_regs;
+> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
+> -#define perf_misc_flags(regs)	perf_misc_flags(regs)
+> +extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
+> +extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
+> +#define perf_arch_misc_flags(regs)	perf_misc_flags(regs)
+>   #define perf_arch_bpf_user_pt_regs(regs) &regs->user_regs
+>   #endif
 >   
->   retry:
->          rcu_read_unlock();
-> +       if (ret == RET_PF_RETRY && is_frozen_spte(iter.old_spte))
-> +               return RET_PF_RETRY_FOZEN;
+> diff --git a/arch/arm64/kernel/perf_callchain.c b/arch/arm64/kernel/perf_callchain.c
+> index e8ed5673f481..01a9d08fc009 100644
+> --- a/arch/arm64/kernel/perf_callchain.c
+> +++ b/arch/arm64/kernel/perf_callchain.c
+> @@ -39,7 +39,7 @@ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
+>   	arch_stack_walk(callchain_trace, entry, current, regs);
+>   }
+>   
+> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
+> +unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
+>   {
+>   	if (perf_guest_state())
+>   		return perf_guest_get_ip();
+> @@ -47,7 +47,7 @@ unsigned long perf_instruction_pointer(struct pt_regs *regs)
+>   	return instruction_pointer(regs);
+>   }
+>   
+> -unsigned long perf_misc_flags(struct pt_regs *regs)
+> +unsigned long perf_arch_misc_flags(struct pt_regs *regs)
+>   {
+>   	unsigned int guest_state = perf_guest_state();
+>   	int misc = 0;
+> diff --git a/arch/powerpc/include/asm/perf_event_server.h b/arch/powerpc/include/asm/perf_event_server.h
+> index 5995614e9062..41587d3f8446 100644
+> --- a/arch/powerpc/include/asm/perf_event_server.h
+> +++ b/arch/powerpc/include/asm/perf_event_server.h
+> @@ -102,8 +102,8 @@ struct power_pmu {
+>   int __init register_power_pmu(struct power_pmu *pmu);
+>   
+>   struct pt_regs;
+> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
+> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+> +extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
+> +extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
+>   extern unsigned long int read_bhrb(int n);
+>   
+>   /*
+> @@ -111,7 +111,7 @@ extern unsigned long int read_bhrb(int n);
+>    * if we have hardware PMU support.
+>    */
+>   #ifdef CONFIG_PPC_PERF_CTRS
+> -#define perf_misc_flags(regs)	perf_misc_flags(regs)
+> +#define perf_arch_misc_flags(regs)	perf_misc_flags(regs)
+>   #endif
+>   
+Compilation fails with
 
-Ack the whole "retry on frozen" approach, either with RET_PF_RETRY_FOZEN 
-or fault->frozen_spte.
-
-One minor side effect:
-
-For normal VMs, the fault handler can also see a frozen spte, e.g, when 
-kvm_tdp_mmu_map() checks the middle level SPTE:
-
-	/*
-          * If SPTE has been frozen by another thread, just give up and
-          * retry, avoiding unnecessary page table allocation and free.
-          */
-         if (is_frozen_spte(iter.old_spte))
-         	goto retry;
-
-So for normal VM this RET_PF_RETRY_FOZEN will change "go back to guest 
-to retry" to "retry in KVM internally".
-
-As you mentioned above for normal VMs we probably always want to "go 
-back to guest to retry" even for FROZEN SPTE, but I guess this is a 
-minor issue that we can even notice.
-
-Or we can additionally add:
-
-	if (ret == RET_PF_RETRY && is_frozen_spte(iter.old_spte)
-			&& is_mirrored_sptep(iter.sptep))
-		return RET_PF_RETRY_FOZEN;
-
-So it only applies to TDX.
+In file included from /linux/arch/powerpc/include/asm/perf_event.h:14,
+                  from /linux/include/linux/perf_event.h:25,
+                  from /linux/arch/powerpc/perf/core-book3s.c:10:
+/linux/arch/powerpc/include/asm/perf_event_server.h:114:41: error: 
+conflicting types for 'perf_misc_flags'; have 'long unsigned int(struct 
+pt_regs *)'
+   114 | #define perf_arch_misc_flags(regs)      perf_misc_flags(regs)
+|                                         ^~~~~~~~~~~~~~~
+/linux/arch/powerpc/perf/core-book3s.c:2335:15: note: in expansion of 
+macro 'perf_arch_misc_flags'
+  2335 | unsigned long perf_arch_misc_flags(struct pt_regs *regs)
+       |               ^~~~~~~~~~~~~~~~~~~~
+/linux/include/linux/perf_event.h:1630:22: note: previous declaration of 
+'perf_misc_flags' with type 'long unsigned int(struct perf_event *, 
+struct pt_regs *)'
+  1630 | extern unsigned long perf_misc_flags(struct perf_event *event, 
+struct pt_regs *regs);
+       |                      ^~~~~~~~~~~~~~~
 
 
+This fixes the fail
+
+--- a/arch/powerpc/include/asm/perf_event_server.h
++++ b/arch/powerpc/include/asm/perf_event_server.h
+@@ -111,7 +111,7 @@ extern unsigned long int read_bhrb(int n);
+   * if we have hardware PMU support.
+   */
+  #ifdef CONFIG_PPC_PERF_CTRS
+-#define perf_arch_misc_flags(regs) perf_misc_flags(regs)
++#define perf_arch_misc_flags(regs) perf_arch_misc_flags(regs)
+  #endif
+
+  /*
+
+>   /*
+> diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3s.c
+> index 42867469752d..dc01aa604cc1 100644
+> --- a/arch/powerpc/perf/core-book3s.c
+> +++ b/arch/powerpc/perf/core-book3s.c
+> @@ -2332,7 +2332,7 @@ static void record_and_restart(struct perf_event *event, unsigned long val,
+>    * Called from generic code to get the misc flags (i.e. processor mode)
+>    * for an event_id.
+>    */
+> -unsigned long perf_misc_flags(struct pt_regs *regs)
+> +unsigned long perf_arch_misc_flags(struct pt_regs *regs)
+>   {
+>   	u32 flags = perf_get_misc_flags(regs);
+>   
+> @@ -2346,7 +2346,7 @@ unsigned long perf_misc_flags(struct pt_regs *regs)
+>    * Called from generic code to get the instruction pointer
+>    * for an event_id.
+>    */
+> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
+> +unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
+>   {
+>   	unsigned long siar = mfspr(SPRN_SIAR);
+>   
+> diff --git a/arch/s390/include/asm/perf_event.h b/arch/s390/include/asm/perf_event.h
+> index 9917e2717b2b..f2d83289ec7a 100644
+> --- a/arch/s390/include/asm/perf_event.h
+> +++ b/arch/s390/include/asm/perf_event.h
+> @@ -37,9 +37,9 @@ extern ssize_t cpumf_events_sysfs_show(struct device *dev,
+>   
+>   /* Perf callbacks */
+>   struct pt_regs;
+> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
+> -#define perf_misc_flags(regs) perf_misc_flags(regs)
+> +extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
+> +extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
+> +#define perf_arch_misc_flags(regs) perf_misc_flags(regs)
+>   #define perf_arch_bpf_user_pt_regs(regs) &regs->user_regs
+>   
+>   /* Perf pt_regs extension for sample-data-entry indicators */
+> diff --git a/arch/s390/kernel/perf_event.c b/arch/s390/kernel/perf_event.c
+> index 5fff629b1a89..f9000ab49f4a 100644
+> --- a/arch/s390/kernel/perf_event.c
+> +++ b/arch/s390/kernel/perf_event.c
+> @@ -57,7 +57,7 @@ static unsigned long instruction_pointer_guest(struct pt_regs *regs)
+>   	return sie_block(regs)->gpsw.addr;
+>   }
+>   
+> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
+> +unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
+>   {
+>   	return is_in_guest(regs) ? instruction_pointer_guest(regs)
+>   				 : instruction_pointer(regs);
+> @@ -84,7 +84,7 @@ static unsigned long perf_misc_flags_sf(struct pt_regs *regs)
+>   	return flags;
+>   }
+>   
+> -unsigned long perf_misc_flags(struct pt_regs *regs)
+> +unsigned long perf_arch_misc_flags(struct pt_regs *regs)
+>   {
+>   	/* Check if the cpum_sf PMU has created the pt_regs structure.
+>   	 * In this case, perf misc flags can be easily extracted.  Otherwise,
+> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+> index be01823b1bb4..760ad067527c 100644
+> --- a/arch/x86/events/core.c
+> +++ b/arch/x86/events/core.c
+> @@ -2940,7 +2940,7 @@ static unsigned long code_segment_base(struct pt_regs *regs)
+>   	return 0;
+>   }
+>   
+> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
+> +unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
+>   {
+>   	if (perf_guest_state())
+>   		return perf_guest_get_ip();
+> @@ -2948,7 +2948,7 @@ unsigned long perf_instruction_pointer(struct pt_regs *regs)
+>   	return regs->ip + code_segment_base(regs);
+>   }
+>   
+> -unsigned long perf_misc_flags(struct pt_regs *regs)
+> +unsigned long perf_arch_misc_flags(struct pt_regs *regs)
+>   {
+>   	unsigned int guest_state = perf_guest_state();
+>   	int misc = 0;
+> diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+> index 91b73571412f..feb87bf3d2e9 100644
+> --- a/arch/x86/include/asm/perf_event.h
+> +++ b/arch/x86/include/asm/perf_event.h
+> @@ -536,15 +536,15 @@ struct x86_perf_regs {
+>   	u64		*xmm_regs;
+>   };
+>   
+> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
+> -#define perf_misc_flags(regs)	perf_misc_flags(regs)
+> +extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
+> +extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
+> +#define perf_arch_misc_flags(regs)	perf_arch_misc_flags(regs)
+>   
+>   #include <asm/stacktrace.h>
+>   
+>   /*
+> - * We abuse bit 3 from flags to pass exact information, see perf_misc_flags
+> - * and the comment with PERF_EFLAGS_EXACT.
+> + * We abuse bit 3 from flags to pass exact information, see
+> + * perf_arch_misc_flags() and the comment with PERF_EFLAGS_EXACT.
+>    */
+>   #define perf_arch_fetch_caller_regs(regs, __ip)		{	\
+>   	(regs)->ip = (__ip);					\
+> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+> index 1a8942277dda..d061e327ad54 100644
+> --- a/include/linux/perf_event.h
+> +++ b/include/linux/perf_event.h
+> @@ -1633,10 +1633,13 @@ extern void perf_tp_event(u16 event_type, u64 count, void *record,
+>   			  struct task_struct *task);
+>   extern void perf_bp_event(struct perf_event *event, void *data);
+>   
+> -#ifndef perf_misc_flags
+> -# define perf_misc_flags(regs) \
+> +extern unsigned long perf_misc_flags(struct pt_regs *regs);
+> +extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+> +
+> +#ifndef perf_arch_misc_flags
+> +# define perf_arch_misc_flags(regs) \
+>   		(user_mode(regs) ? PERF_RECORD_MISC_USER : PERF_RECORD_MISC_KERNEL)
+> -# define perf_instruction_pointer(regs)	instruction_pointer(regs)
+> +# define perf_arch_instruction_pointer(regs)	instruction_pointer(regs)
+>   #endif
+>   #ifndef perf_arch_bpf_user_pt_regs
+>   # define perf_arch_bpf_user_pt_regs(regs) regs
+> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> index 8a6c6bbcd658..eeabbf791a8c 100644
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -6921,6 +6921,16 @@ void perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+>   EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
+>   #endif
+>   
+> +unsigned long perf_misc_flags(struct pt_regs *regs)
+> +{
+> +	return perf_arch_misc_flags(regs);
+> +}
+> +
+> +unsigned long perf_instruction_pointer(struct pt_regs *regs)
+> +{
+> +	return perf_arch_instruction_pointer(regs);
+> +}
+> +
+>   static void
+>   perf_output_sample_regs(struct perf_output_handle *handle,
+>   			struct pt_regs *regs, u64 mask)
 
