@@ -1,72 +1,53 @@
-Return-Path: <kvm+bounces-27030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CFF197AC79
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 09:57:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD1997AD0E
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 10:50:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B5B6B23054
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 07:57:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2661B283866
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 08:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F373A14B948;
-	Tue, 17 Sep 2024 07:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1889A1581F4;
+	Tue, 17 Sep 2024 08:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DikWAbgT"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="D5KaWB03"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDE420EB
-	for <kvm@vger.kernel.org>; Tue, 17 Sep 2024 07:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BC9146D6B;
+	Tue, 17 Sep 2024 08:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726559847; cv=none; b=GAjQXiM8jJjED7OO610EKGepHX5LrCHXsDgN4lCPq+LpK19ue3OhlZhVmpsMDU70Nwg4VN276ooU35FR+Q0cDV5OSeaB1/uMd5xB/LNBgycGp93dflwx+q6rOwKehhpw0G9q/NhnI1P2g+98/QWzXod7UjqmmFj//ZxMudlmJvI=
+	t=1726563000; cv=none; b=E1hspCc3U8RljJBeSOQ6b0/IUDEJbs9ujAWBp0djvTgNwNdiLWDIJhSNvvDCP0bOCur3uAdMs4JPJJcSEP8IxbO5DtAufMx6HgkzGhfaBWMLuLi3Nbpvrec/bkPpHJZ2RYVl++UD26RFtMO8+DRyWsQO3HbVze1z3S6LHWkcMMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726559847; c=relaxed/simple;
-	bh=wHR9J9yARMAY6m8/9WXANDhPcMRHFQhog6kgcpJjl0M=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=YQhdHF52GGYvKmsx2JaIl/eKsxLC40IZ9aGQdwoLF7JQgIiVUPlsSY4S/+EgTr9J1Hzym1t3jy+BN31vU7HQMdlQiKmFM8jLNUokjjqad5Bm1WOLAnhzqo4J1JQk0qldnvAixxcTr7meyFmF//L/6x2IIvhNH28v2AonhcydkyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DikWAbgT; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a7a843bef98so543051066b.2
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2024 00:57:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726559844; x=1727164644; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wHR9J9yARMAY6m8/9WXANDhPcMRHFQhog6kgcpJjl0M=;
-        b=DikWAbgTm5BDHIyZ1Z/UHD8tMR70uwu8ca/wAewH3fSWQOZlnDE8HPhJGduLm91668
-         GgrPagkUfTRDSkirKuulhz2bRHQyP+XoOuQMV1QdH6cEha1qf7XL1zDdo547H4lwaxWb
-         0s4NkJ6Gj2OSO704+DEQAGCeOPABafFJMIOM7JkTFKOTTgqu1zvU7XUDqISAEiCFgzx9
-         xi1tZKDRl6+CEnbpwp00YfUEkA/9vFZ0tmztrVkD8LaRgUos6GZ/AufdLAKd010OjvMn
-         A+7hAfU1ApTAsWHyXC9/DwwKCjQqLiOq5/vz8Wf1yShI4nlX9yKOvs91KoRxap4rjNCC
-         /3Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726559844; x=1727164644;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wHR9J9yARMAY6m8/9WXANDhPcMRHFQhog6kgcpJjl0M=;
-        b=nxxIV9toJ+XujQNVFMoJI3u/HDYQ6/CRYzaVifkEBO1Alpm81WZV6sZyfbR+ku8hLU
-         QzNA45H+4GdKoF7UhrkfGVudN6QjEy1E/khAJYMaObgMtnCQX4ps3uLlNM2Wt05n3anP
-         C8i0G5hg8bSs8V6SYs0M5OG1BALgnAYrj0LVabZwn8AyJeJALsZfHzZkgF4VVcM1hgm6
-         enXOLWI/hQixMjdMYMjfoLrhlE/DM4TAmfrFBoDP3h+oPUpoLAhGMlTSbXStL0lFCf3R
-         8hJO+lTyKyvi4adpRKY2ki93Ie4kV8U4jx5tWTRG4dR0tJqgWn9wz9Vs7Zp2zZ+BqsI7
-         1qqw==
-X-Gm-Message-State: AOJu0YxjwrLTTkI+GPo3UXmB0+tTvmuoyV6DDFOt32jEJd3TR6Vy87HO
-	7u5cbhmW45JP6q9pfxoBQbMV0YTfh5sDFj812IWyHcOHkEzZ8RMyYErtSFoh
-X-Google-Smtp-Source: AGHT+IHGDiR7BopFBgQ+HHrQjxIEAOpv2FW0osQEOHL+yKcmagiGMYMYa4YKWhcrheMOLnIqrXDm3w==
-X-Received: by 2002:a17:906:c113:b0:a8a:835f:4cb9 with SMTP id a640c23a62f3a-a9048105fd9mr1605887366b.46.1726559843548;
-        Tue, 17 Sep 2024 00:57:23 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:9d09:9800:f5fd:67f7:66fc:d8c9? (dynamic-2a02-3100-9d09-9800-f5fd-67f7-66fc-d8c9.310.pool.telefonica.de. [2a02:3100:9d09:9800:f5fd:67f7:66fc:d8c9])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a90612b3f6fsm412614966b.107.2024.09.17.00.57.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2024 00:57:23 -0700 (PDT)
-Message-ID: <8c55ce81-6b0a-42f5-8e05-5557933ca3b8@gmail.com>
-Date: Tue, 17 Sep 2024 09:57:23 +0200
+	s=arc-20240116; t=1726563000; c=relaxed/simple;
+	bh=LssHL0o8gqHlXpaUgFEYZYDWsFgM2dA16ib5MYaTLvQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jP1xfEEnbYW0Bagp/zhxwzPXQrsCr6O9JNtUcv9dgi8a4iP/Itx/a/E0jOdyS7RJ8pOap6FDpS02YMgDPo/iOll+4riZ5Y70VHM2W6eiO9G9ANde6CimZKU9oGMAmmiTOGRXCGmrNdPIdRHD+BbPabgkF2EZW+H/V8z/P9nnc+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=D5KaWB03; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1726562953;
+	bh=LssHL0o8gqHlXpaUgFEYZYDWsFgM2dA16ib5MYaTLvQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=D5KaWB03cjATfV9q/yXc56NbLefmoAyEBdyO0aGWw9sbrJbqWswDSNORYVYt3ABrV
+	 nHNQtBQrEaF+Q2AKXdNo3h26a8frvlGSr6nIz6ZjjRW2577R5y/Z2g9yPEFGxmapO2
+	 H5kVKHwo6VReQQIum4Gzh4tylIpfMsEl4oiQPu64=
+X-QQ-mid: bizesmtpip2t1726562946tqwms51
+X-QQ-Originating-IP: G+YseKVbbTNQgJwSB8iy9v4u6ESfp3jPo6df9dsT3bo=
+Received: from [IPV6:240e:36c:d18:fa00:4838:7a ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 17 Sep 2024 16:49:04 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 6379166551292348725
+Message-ID: <3E9630B3C9FBF09F+32098b9e-b18a-4252-b8c6-a766f3de84b4@uniontech.com>
+Date: Tue, 17 Sep 2024 16:49:04 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -74,63 +55,98 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6.10] LoongArch: KVM: Remove undefined a6 argument
+ comment for kvm_hypercall()
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, sashal@kernel.org, maobibo@loongson.cn,
+ guanwentao@uniontech.com, zhangdandan@uniontech.com, chenhuacai@loongson.cn,
+ zhaotianrui@loongson.cn, kernel@xen0n.name, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <5B13B2AF7C2779A7+20240916092857.433334-1-wangyuli@uniontech.com>
+ <2024091647-absolve-wharf-f271@gregkh>
+From: WangYuli <wangyuli@uniontech.com>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Can class_compat usage in vfio/mdev be removed?
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Autocrypt: addr=wangyuli@uniontech.com; keydata=
+ xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
+ IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
+ qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
+ 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
+ 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
+ VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
+ DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
+ o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
+In-Reply-To: <2024091647-absolve-wharf-f271@gregkh>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------HDUTo0wGYhCUeLHRnq3cTPTT"
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-After 7e722083fcc3 ("i2c: Remove I2C_COMPAT config symbol and related code")
-vfio/mdev is that last user of class_compat. This compatibility functionality
-is meant to be used temporarily, and it has been in vfio/mdev since 2016.
-Can it be removed? Or is there any userspace tool which hasn't been updated
-to use the bus interface instead?
-If class_compat can be removed in vfio/mdev, then we may be able to remove
-this functionality completely.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------HDUTo0wGYhCUeLHRnq3cTPTT
+Content-Type: multipart/mixed; boundary="------------TPiiqvvKxfu54ZhFQ02qlh8n";
+ protected-headers="v1"
+From: WangYuli <wangyuli@uniontech.com>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, sashal@kernel.org, maobibo@loongson.cn,
+ guanwentao@uniontech.com, zhangdandan@uniontech.com, chenhuacai@loongson.cn,
+ zhaotianrui@loongson.cn, kernel@xen0n.name, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+Message-ID: <32098b9e-b18a-4252-b8c6-a766f3de84b4@uniontech.com>
+Subject: Re: [PATCH v2 6.10] LoongArch: KVM: Remove undefined a6 argument
+ comment for kvm_hypercall()
+References: <5B13B2AF7C2779A7+20240916092857.433334-1-wangyuli@uniontech.com>
+ <2024091647-absolve-wharf-f271@gregkh>
+In-Reply-To: <2024091647-absolve-wharf-f271@gregkh>
 
+--------------TPiiqvvKxfu54ZhFQ02qlh8n
+Content-Type: multipart/mixed; boundary="------------vt0AXiXzEA4MnK0wswNOi5e5"
+
+--------------vt0AXiXzEA4MnK0wswNOi5e5
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+
+DQpPbiAyMDI0LzkvMTYgMTk6MzksIEdyZWcgS0ggd3JvdGU6DQo+IEFnYWluLCB3aHkgaXMg
+dGhpcyBuZWVkZWQ/DQo+DQpIbW0uLi4NCg0KSnVzdCBhIG1pbmkgJ2ZpeCcuDQoNClRoZSBy
+ZWFzb24gb2YgDQonaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzIwMjQwOTE2MjgtZ2ln
+YW50aWMtZmlsdGgtYjdiN0BncmVna2gnIGlzIHNhbWUuDQoNCj4gdGhhbmtzLA0KPg0KPiBn
+cmVnIGstaA0KPg0KVGhhbmtzLA0KLS0gDQpXYW5nWXVsaQ0K
+--------------vt0AXiXzEA4MnK0wswNOi5e5
+Content-Type: application/pgp-keys; name="OpenPGP_0xC5DA1F3046F40BEE.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xC5DA1F3046F40BEE.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSK
+P+nX39DNIVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAx
+FiEEa1GMzYeuKPkgqDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMB
+AAAKCRDF2h8wRvQL7g0UAQCH3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfP
+bwD/SrncJwwPAL4GiLPEC4XssV6FPUAY0rA68eNNI9cJLArOOARmgSyJEgorBgEE
+AZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7VTL0dvPDofBTjFYDAQgHwngE
+GBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIbDAAKCRDF2h8wRvQL
+7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkUo9ERi7qS
+/hbUdUgtitI89efbY0TVetgDsyeQiwU=3D
+=3DBlkq
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------vt0AXiXzEA4MnK0wswNOi5e5--
+
+--------------TPiiqvvKxfu54ZhFQ02qlh8n--
+
+--------------HDUTo0wGYhCUeLHRnq3cTPTT
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZulCgAUDAAAAAAAKCRDF2h8wRvQL7tVy
+AP9MVhEXseSIS+VfhuY0FCwd0fhc6z2XDqNn6WlPwB/JRgEAgKIGARi2cYl/nSW/o/w3RsclJn16
+NEjRYCfUQ98+tgI=
+=7q2+
+-----END PGP SIGNATURE-----
+
+--------------HDUTo0wGYhCUeLHRnq3cTPTT--
 
