@@ -1,170 +1,309 @@
-Return-Path: <kvm+bounces-27043-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27044-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6E5397AFD3
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 13:50:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C388F97B002
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 14:15:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC5881C222D0
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 11:50:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 520261F237F2
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 12:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814A316B75D;
-	Tue, 17 Sep 2024 11:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E89170A3F;
+	Tue, 17 Sep 2024 12:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="smxiBUZz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bQPc5YG0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E03E7641E;
-	Tue, 17 Sep 2024 11:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4671714A3
+	for <kvm@vger.kernel.org>; Tue, 17 Sep 2024 12:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726573823; cv=none; b=IRm4RZzr4PhkvpZTnIxHuF4D1OvM9rQPCgUNtgd9Ow5VVe1EB/qyQDEn710FhgkDjGV7qTwMRG5NCXA+oenYEXHQ5G/82N3fQootoh3INFFxK9Y+sSMZq+tn/me9hef7NSoikNh7XJ4mg9NdQhEAuDd1xvLfbU0o6mNbchS68lo=
+	t=1726575330; cv=none; b=jOY7kAYVpmbuPgrkXCOwCgoEoKUWVDustvaZACaWq+Kn/+k0HIGUU/Z6g7f8fsaXafjUjpxc6Ra5Mdftl7JumKTZO6V53PuDLpApUcruBCvF/LCFFiQYTcn4Q5Z7TPuRJJakR3gkpAlV1R+eO6OkCp84l+KFuuVBQKUirTMPytE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726573823; c=relaxed/simple;
-	bh=JBJWI41Z4+GkrnIleBU8zJMJCDAppILox9Bk/48WrM0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=El8ntvj+lphDu9YL2zs+kBtrEGs4AlPq6kLtDSzUiFrtGTpnqCLh/ybpjkFR5JmczKCYcWy8qwkmG7ol7Vm97vbhkaDLk5mDImQ8RMGv2S06J1TTxtCt3xkVoRZqqK+OReJbmicjMVY3oL6ZwH2V91hQKR7A2CKnFngkc9QJUi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=smxiBUZz; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48H9qNcU031825;
-	Tue, 17 Sep 2024 11:50:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=/
-	5F8jxhZ5e/E5QnfQMfpbyr61Fqgqymp4Pxly0bYi30=; b=smxiBUZzFyE7NixpT
-	C9ZNle8nLvCJyIDBwe60IfqFSfj+edKOXuxSv2GFYBZizMBtSyOJPQjuoeSue1R7
-	+DbI3PRpUGZXgEowTrVOQ/+Hn8LUjSWjIByKx0hLR/Xmlr5uVK8o2+tabveTUihw
-	uqm5j1dvg3+mjQe2mbtB2SM/azmf1vHFs2kZ+06saDRs0X8SqFFMVa6dRcz3Lx7Z
-	XLYapudnfpBB1CUoiA6vuKyBJBC926I+Q5NEMsRvilvmJa8KYI4M7O1qkkFvffMb
-	sqGXk+Are4ZeENNBpHgE0F5NnG3RG48F/fZJXjoqAzYN0BxG/BaowoteHdpW0HsE
-	OvruQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n3uj7w1f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Sep 2024 11:50:16 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48HBoFDO011672;
-	Tue, 17 Sep 2024 11:50:15 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n3uj7w1b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Sep 2024 11:50:15 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48HAQsOS024699;
-	Tue, 17 Sep 2024 11:50:14 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 41nq1mvrb4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Sep 2024 11:50:14 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48HBoASv16187882
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 17 Sep 2024 11:50:10 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8E5D620040;
-	Tue, 17 Sep 2024 11:50:10 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 298C620043;
-	Tue, 17 Sep 2024 11:50:10 +0000 (GMT)
-Received: from [9.179.13.46] (unknown [9.179.13.46])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 17 Sep 2024 11:50:10 +0000 (GMT)
-Message-ID: <5f247db9-5d63-40d4-82e8-4ade9be714ad@linux.ibm.com>
-Date: Tue, 17 Sep 2024 13:50:09 +0200
+	s=arc-20240116; t=1726575330; c=relaxed/simple;
+	bh=aHYn3dmDCJnWNIlJcWJDvc+UKiUxjkFYBntpcXxE8kU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R18xDRGQKMFt0s0sp3DD7KipjlaBinao0L2Pn+es0cECSpCg9QPc6+RTjQOkd67uzcsdCyEcrlNi3c4JQ1dDPMy6etn+0XR4WImAkuKPXcmnXUI6j8DN5+kTguP7ujq4omHBqX79XPuOKFR6visDAPG7tYKGmUqh5DZ9t2c89Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bQPc5YG0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726575324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AsBnjy+X7R8yO5SwSmmu3aaG/Z4/ynLw4YA/Z9vtMbI=;
+	b=bQPc5YG0eZRaSZdE2eeYt3F90mH5lBrwcvsJral2fE5WtIpQfbnzRm3GbJVfN139RlvffX
+	oxlbfFk4UcT+jyl79VgCwvoV/XOXbK68ucJ92zk3wjv5yiuPFNFmsypRaeyPNqp4coIsED
+	ZtEvsGACg0+tx1vK3Bb7AuwjKdT2nUE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-WvoY2QPVPqqwzAsMGuOBQQ-1; Tue, 17 Sep 2024 08:15:23 -0400
+X-MC-Unique: WvoY2QPVPqqwzAsMGuOBQQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42ac185e26cso41100545e9.3
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2024 05:15:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726575322; x=1727180122;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AsBnjy+X7R8yO5SwSmmu3aaG/Z4/ynLw4YA/Z9vtMbI=;
+        b=vVkNsLnTjGvo80p1pMedtFbmnXIWrBvURYzuTayLkrM281h73GBUimDl9ddhQgIQaq
+         pbLOMWkJJk3kV1jPymc2UteC1P0YbnrA/xMY0yCovbMpde1aex1qCOYO6oYxFBpDRu4z
+         Vx/nsV0uAUu8hFax0xk9S5SxHdgD/l6/PzXbTl7fKR6GofQ7Q01SR6uMuQ+KqYItUZR/
+         HfmRAh4XYWhMsd5IyUrxsIhsWaRa+D16vh+9BeML6kxvFTCvHIMWaKfMh3si4s6n+Waa
+         zRqOF0lCjygl5dRXJRpjp5PYwSpMkJiX7AkedQzejKPXgeIL/da6dFvs6sI9L47qvzEJ
+         ND0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW2JkGLuiuUziq3IIunL2tyRwc+Wm7dL1TjMdK4Jg1VgZuuhRi87me9Ym9EVAYnuzCb5Pg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOS/ZfjlXw8Ai3AsCUynH3veMGCnFVLgapFefbntS5y/uvs1h2
+	PR1xHfu/f9uUGhaFAwcrwvkHBkdMaf9ErCh4dgGtHI6Plthfy6v1xFm29EW5MOoeSJixHWvWO9Z
+	2bgyE9PJl2ffNEwiUcvcu+fnvIOg7/3Px7+1mfNjd406AO3faSQ==
+X-Received: by 2002:a05:600c:474d:b0:42b:8a35:1acf with SMTP id 5b1f17b1804b1-42cdb586f4cmr147962365e9.25.1726575321766;
+        Tue, 17 Sep 2024 05:15:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGDaQt/Kk+FBdnrigXqyg0bYmIA0V9x+x+wJSLf76x1CQYsA1tvA83D0CUwSoJQMo2sBz6ibg==
+X-Received: by 2002:a05:600c:474d:b0:42b:8a35:1acf with SMTP id 5b1f17b1804b1-42cdb586f4cmr147961835e9.25.1726575321020;
+        Tue, 17 Sep 2024 05:15:21 -0700 (PDT)
+Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e73e80eesm9339148f8f.30.2024.09.17.05.15.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Sep 2024 05:15:20 -0700 (PDT)
+Date: Tue, 17 Sep 2024 14:15:19 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Shiju Jose
+ <shiju.jose@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Ani Sinha
+ <anisinha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dongjiu Geng
+ <gengdongjiu1@gmail.com>, Eric Blake <eblake@redhat.com>, John Snow
+ <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth
+ <michael.roth@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+Subject: Re: [PATCH v10 00/21] Add ACPI CPER firmware first error injection
+ on ARM emulation
+Message-ID: <20240917141519.57766bb6@imammedo.users.ipa.redhat.com>
+In-Reply-To: <cover.1726293808.git.mchehab+huawei@kernel.org>
+References: <cover.1726293808.git.mchehab+huawei@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/4] selftests: kvm: s390: Add uc_map_unmap VM test
- case
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-References: <20240917064456.210839-1-schlameuss@linux.ibm.com>
- <20240917064456.210839-2-schlameuss@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20240917064456.210839-2-schlameuss@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Q98N09Ow_h1tHRY4FlqdcJ-sGVn_kY0y
-X-Proofpoint-GUID: fd-5KalycGs-2DmqKAKqSAV-41xv2IqR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-17_02,2024-09-16_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=631 adultscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
- clxscore=1015 bulkscore=0 suspectscore=0 mlxscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409170084
 
-On 9/17/24 8:44 AM, Christoph Schlameuss wrote:
-> Add a test case verifying basic running and interaction of ucontrol VMs.
-> Fill the segment and page tables for allocated memory and map memory on
-> first access.
-> 
-> * uc_map_unmap
->    Store and load data to mapped and unmapped memory and use pic segment
->    translation handling to map memory on access.
-> 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->
+On Sat, 14 Sep 2024 08:13:21 +0200
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> This series add support for injecting generic CPER records.  Such records
+> are generated outside QEMU via a provided script.
+> 
+> On this  version,  the patch reworking the way offsets are calculated were
+> split on several other patches, to make one logical change per patch and
+> make review easier.
+> 
+> Despite the number of patches increased from 12 to 21, there is just one
+> real new patch (as the other ones are a split from a big change):
+> 
+>   acpi/generic_event_device: Update GHES migration to cover hest addr
+
+I'm done with this round of review.
+
+Given that the series accumulated a bunch of cleanups,
+I'd suggest to move all cleanups/renamings not related
+to new HEST lookup and new src id mapping to the beginning
+of the series, so once they reviewed they could be split up into
+a separate series that could be merged while we are ironing down
+the new functionality. 
+ 
+
+> ---
+> 
+> v10:
+> - Patch 1 split on several patches to make reviews easier;
+> - Added a migration patch;
+> - CPER QMP command was renamed;
+> - Updated some comments to better reflect exact ACPI version;
+> - Removed a code to reset acks when OSPM fails to read records;
+> - Removed a duplicated config GHES_CPER symbol;
+> - There is  now an arch-independent namespace for GHES source IDs;
+> - Fixed the size of hest_ghes_notify array when creating tables;
+> - acpi-hest.json is now a section of ACPI;
+> - QMP command renamed from @ghes-cper to inject-ghes-error.
+> 
+> v9:
+> - Patches reorganized to make easier for reviewers;
+> - source ID is now guest-OS specific;
+> - Some patches got a revision history since v8;
+> - Several minor cleanups.
+> 
+> v8:
+> - Fix one of the BIOS links that were incorrect;
+> - Changed mem error internal injection to use a common code;
+> - No more hardcoded values for CPER: instead of using just the
+>   payload at the QAPI, it now has the full raw CPER there;
+> - Error injection script now supports changing fields at the
+>   Generic Error Data section of the CPER;
+> - Several minor cleanups.
+> 
+> v7:
+> - Change the way offsets are calculated and used on HEST table.
+>   Now, it is compatible with migrations as all offsets are relative
+>   to the HEST table;
+> - GHES interface is now more generic: the entire CPER is sent via
+>   QMP, instead of just the payload;
+> - Some code cleanups to make the code more robust;
+> - The python script now uses QEMUMonitorProtocol class.
+> 
+> v6:
+> - PNP0C33 device creation moved to aml-build.c;
+> - acpi_ghes record functions now use ACPI notify parameter,
+>   instead of source ID;
+> - the number of source IDs is now automatically calculated;
+> - some code cleanups and function/var renames;
+> - some fixes and cleanups at the error injection script;
+> - ghes cper stub now produces an error if cper JSON is not compiled;
+> - Offset calculation logic for GHES was refactored;
+> - Updated documentation to reflect the GHES allocated size;
+> - Added a x-mpidr object for QOM usage;
+> - Added a patch making usage of x-mpidr field at ARM injection
+>   script;
+> 
+> v5:
+> - CPER guid is now passing as string;
+> - raw-data is now passed with base64 encode;
+> - Removed several GPIO left-overs from arm/virt.c changes;
+> - Lots of cleanups and improvements at the error injection script.
+>   It now better handles QMP dialog and doesn't print debug messages.
+>   Also, code was split on two modules, to make easier to add more
+>   error injection commands.
+> 
+> v4:
+> - CPER generation moved to happen outside QEMU;
+> - One patch adding support for mpidr query was removed.
+> 
+> v3:
+> - patch 1 cleanups with some comment changes and adding another place where
+>   the poweroff GPIO define should be used. No changes on other patches (except
+>   due to conflict resolution).
+> 
+> v2:
+> - added a new patch using a define for GPIO power pin;
+> - patch 2 changed to also use a define for generic error GPIO pin;
+> - a couple cleanups at patch 2 removing uneeded else clauses.
+> 
+> Example of generating a CPER record:
+> 
+> $ scripts/ghes_inject.py -d arm -p 0xdeadbeef
+> GUID: e19e3d16-bc11-11e4-9caa-c2051d5d46b0
+> Generic Error Status Block (20 bytes):
+>       00000000  01 00 00 00 00 00 00 00 00 00 00 00 90 00 00 00   ................
+>       00000010  00 00 00 00                                       ....
+> 
+> Generic Error Data Entry (72 bytes):
+>       00000000  16 3d 9e e1 11 bc e4 11 9c aa c2 05 1d 5d 46 b0   .=...........]F.
+>       00000010  00 00 00 00 00 03 00 00 48 00 00 00 00 00 00 00   ........H.......
+>       00000020  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+>       00000030  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00   ................
+>       00000040  00 00 00 00 00 00 00 00                           ........
+> 
+> Payload (72 bytes):
+>       00000000  05 00 00 00 01 00 00 00 48 00 00 00 00 00 00 00   ........H.......
+>       00000010  00 00 00 80 00 00 00 00 10 05 0f 00 00 00 00 00   ................
+>       00000020  00 00 00 00 00 00 00 00 00 20 14 00 02 01 00 03   ......... ......
+>       00000030  0f 00 91 00 00 00 00 00 ef be ad de 00 00 00 00   ................
+>       00000040  ef be ad de 00 00 00 00                           ........
+> 
+> Error injected.
+> 
+> [    9.358364] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 1
+> [    9.359027] {1}[Hardware Error]: event severity: recoverable
+> [    9.359586] {1}[Hardware Error]:  Error 0, type: recoverable
+> [    9.360124] {1}[Hardware Error]:   section_type: ARM processor error
+> [    9.360561] {1}[Hardware Error]:   MIDR: 0x00000000000f0510
+> [    9.361160] {1}[Hardware Error]:   Multiprocessor Affinity Register (MPIDR): 0x0000000080000000
+> [    9.361643] {1}[Hardware Error]:   running state: 0x0
+> [    9.362142] {1}[Hardware Error]:   Power State Coordination Interface state: 0
+> [    9.362682] {1}[Hardware Error]:   Error info structure 0:
+> [    9.363030] {1}[Hardware Error]:   num errors: 2
+> [    9.363656] {1}[Hardware Error]:    error_type: 0x02: cache error
+> [    9.364163] {1}[Hardware Error]:    error_info: 0x000000000091000f
+> [    9.364834] {1}[Hardware Error]:     transaction type: Data Access
+> [    9.365599] {1}[Hardware Error]:     cache error, operation type: Data write
+> [    9.366441] {1}[Hardware Error]:     cache level: 2
+> [    9.367005] {1}[Hardware Error]:     processor context not corrupted
+> [    9.367753] {1}[Hardware Error]:    physical fault address: 0x00000000deadbeef
+> [    9.374267] Memory failure: 0xdeadb: recovery action for free buddy page: Recovered
+> 
+> Such script currently supports arm processor error CPER, but can easily be
+> extended to other GHES notification types.
+> 
+> 
+> Mauro Carvalho Chehab (21):
+>   acpi/ghes: add a firmware file with HEST address
+>   acpi/generic_event_device: Update GHES migration to cover hest addr
+>   acpi/ghes: get rid of ACPI_HEST_SRC_ID_RESERVED
+>   acpi/ghes: simplify acpi_ghes_record_errors() code
+>   acpi/ghes: better handle source_id and notification
+>   acpi/ghes: Remove a duplicated out of bounds check
+>   acpi/ghes: rework the logic to handle HEST source ID
+>   acpi/ghes: Change the type for source_id
+>   acpi/ghes: Don't hardcode the number of sources on ghes
+>   acpi/ghes: make the GHES record generation more generic
+>   acpi/ghes: don't crash QEMU if ghes GED is not found
+>   acpi/ghes: rename etc/hardware_error file macros
+>   acpi/ghes: better name GHES memory error function
+>   acpi/ghes: add a notifier to notify when error data is ready
+>   acpi/generic_event_device: add an APEI error device
+>   arm/virt: Wire up a GED error device for ACPI / GHES
+>   qapi/acpi-hest: add an interface to do generic CPER error injection
+>   docs: acpi_hest_ghes: fix documentation for CPER size
+>   scripts/ghes_inject: add a script to generate GHES error inject
+>   target/arm: add an experimental mpidr arm cpu property object
+>   scripts/arm_processor_error.py: retrieve mpidr if not filled
+> 
+>  MAINTAINERS                            |  10 +
+>  docs/specs/acpi_hest_ghes.rst          |   6 +-
+>  hw/acpi/Kconfig                        |   5 +
+>  hw/acpi/aml-build.c                    |  10 +
+>  hw/acpi/generic_event_device.c         |  19 +-
+>  hw/acpi/ghes-stub.c                    |   2 +-
+>  hw/acpi/ghes.c                         | 312 +++++++----
+>  hw/acpi/ghes_cper.c                    |  32 ++
+>  hw/acpi/ghes_cper_stub.c               |  19 +
+>  hw/acpi/meson.build                    |   2 +
+>  hw/arm/virt-acpi-build.c               |  12 +-
+>  hw/arm/virt.c                          |  19 +-
+>  include/hw/acpi/acpi_dev_interface.h   |   1 +
+>  include/hw/acpi/aml-build.h            |   2 +
+>  include/hw/acpi/generic_event_device.h |   1 +
+>  include/hw/acpi/ghes.h                 |  37 +-
+>  include/hw/arm/virt.h                  |   2 +
+>  qapi/acpi-hest.json                    |  35 ++
+>  qapi/meson.build                       |   1 +
+>  qapi/qapi-schema.json                  |   1 +
+>  scripts/arm_processor_error.py         | 388 ++++++++++++++
+>  scripts/ghes_inject.py                 |  51 ++
+>  scripts/qmp_helper.py                  | 702 +++++++++++++++++++++++++
+>  target/arm/cpu.c                       |   1 +
+>  target/arm/cpu.h                       |   1 +
+>  target/arm/helper.c                    |  10 +-
+>  target/arm/kvm.c                       |   3 +-
+>  27 files changed, 1552 insertions(+), 132 deletions(-)
+>  create mode 100644 hw/acpi/ghes_cper.c
+>  create mode 100644 hw/acpi/ghes_cper_stub.c
+>  create mode 100644 qapi/acpi-hest.json
+>  create mode 100644 scripts/arm_processor_error.py
+>  create mode 100755 scripts/ghes_inject.py
+>  create mode 100644 scripts/qmp_helper.py
+> 
+
 
