@@ -1,161 +1,136 @@
-Return-Path: <kvm+bounces-27029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2797A97AB9E
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 08:45:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CFF197AC79
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 09:57:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A49E1C24D0D
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 06:45:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B5B6B23054
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 07:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B1013E022;
-	Tue, 17 Sep 2024 06:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F373A14B948;
+	Tue, 17 Sep 2024 07:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gMx448dR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DikWAbgT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADF014D2AC;
-	Tue, 17 Sep 2024 06:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDE420EB
+	for <kvm@vger.kernel.org>; Tue, 17 Sep 2024 07:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726555522; cv=none; b=XGREjEA+YMrsRrhR1jnM85McrQq08LDCe/EexHWowLAMGbLHbs42QdVC9gDOwSIWebBPGzQz0flq8NevqDb6aWy7/YE7vHuYfwHSd88c50Iipaz16dkZGb3dQXEtzAu6xANTO3YVkss2JceDlDTJh2ryS0aIfX8HFo4TlDvr/KM=
+	t=1726559847; cv=none; b=GAjQXiM8jJjED7OO610EKGepHX5LrCHXsDgN4lCPq+LpK19ue3OhlZhVmpsMDU70Nwg4VN276ooU35FR+Q0cDV5OSeaB1/uMd5xB/LNBgycGp93dflwx+q6rOwKehhpw0G9q/NhnI1P2g+98/QWzXod7UjqmmFj//ZxMudlmJvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726555522; c=relaxed/simple;
-	bh=Eab19z/TpNQrwMEK7VrIP5gGxGz9rkp8RvOn9laezVA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p6IzSqnGHPFG6F5h2IqVv8KPGxvwgD0kw2TC449WP7PT1JOeXsarhX6oZSZNo0HvGZOCnkrnNdNH7j2fFD0odEOlm9cHjSS94FzN/rvMFS3UBv23QR6ntAJ+9cvxRhII0p9lVj8j6wurjzEB2AF2M6oJJJtTgjM+xUidbNHR76o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gMx448dR; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48GIUxRe006129;
-	Tue, 17 Sep 2024 06:45:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=eKug9P7/DihZm
-	kaac97VF9PXuPLF7ofWaSK/7mkX3PE=; b=gMx448dRJ4wREQvL51JvUmXWCZiyr
-	14TN1jtfSCjOhWHlMdTy8XyfRZ86oU7TefWz/5V4nTbqappnFWDowduwXqVBqMlL
-	B8QswXFF/vfzgMnkeQ+S/Nc32daD8yWpAkww7PStGKbvMMz22QwduZqteqhM7kqy
-	ZEJfQEeXAmG9h15jids5Q2thagbt2ojLeXAOiF/fGTFT96KOX/O37S/zw6B6XRMi
-	jpKsZB34tQdvGv2EzE85kub2PBD7ZmCXh/0fYppTF93IUq3sABQhbWM14a/FbzWw
-	5PP6n+YF9k0cx6wVaKsFdNlsiLA6DMFjlSb+GXcaIBafXw3R6Fq0JfGRQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n41adsb2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Sep 2024 06:45:14 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48H6jEdk031738;
-	Tue, 17 Sep 2024 06:45:14 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n41adsax-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Sep 2024 06:45:14 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48H5RMTS000637;
-	Tue, 17 Sep 2024 06:45:13 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41nn713pk2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Sep 2024 06:45:13 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48H6j9pY56361382
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 17 Sep 2024 06:45:09 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B9F1C20043;
-	Tue, 17 Sep 2024 06:45:09 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2EDFA20040;
-	Tue, 17 Sep 2024 06:45:09 +0000 (GMT)
-Received: from darkmoore.ibmuc.com (unknown [9.179.17.198])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 17 Sep 2024 06:45:09 +0000 (GMT)
-From: Christoph Schlameuss <schlameuss@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>, schlameuss@linux.ibm.com
-Subject: [PATCH v4 4/4] fixup! selftests: kvm: s390: Add VM run test case
-Date: Tue, 17 Sep 2024 08:44:56 +0200
-Message-ID: <20240917064456.210839-5-schlameuss@linux.ibm.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240917064456.210839-1-schlameuss@linux.ibm.com>
-References: <20240917064456.210839-1-schlameuss@linux.ibm.com>
+	s=arc-20240116; t=1726559847; c=relaxed/simple;
+	bh=wHR9J9yARMAY6m8/9WXANDhPcMRHFQhog6kgcpJjl0M=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=YQhdHF52GGYvKmsx2JaIl/eKsxLC40IZ9aGQdwoLF7JQgIiVUPlsSY4S/+EgTr9J1Hzym1t3jy+BN31vU7HQMdlQiKmFM8jLNUokjjqad5Bm1WOLAnhzqo4J1JQk0qldnvAixxcTr7meyFmF//L/6x2IIvhNH28v2AonhcydkyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DikWAbgT; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a7a843bef98so543051066b.2
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2024 00:57:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726559844; x=1727164644; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wHR9J9yARMAY6m8/9WXANDhPcMRHFQhog6kgcpJjl0M=;
+        b=DikWAbgTm5BDHIyZ1Z/UHD8tMR70uwu8ca/wAewH3fSWQOZlnDE8HPhJGduLm91668
+         GgrPagkUfTRDSkirKuulhz2bRHQyP+XoOuQMV1QdH6cEha1qf7XL1zDdo547H4lwaxWb
+         0s4NkJ6Gj2OSO704+DEQAGCeOPABafFJMIOM7JkTFKOTTgqu1zvU7XUDqISAEiCFgzx9
+         xi1tZKDRl6+CEnbpwp00YfUEkA/9vFZ0tmztrVkD8LaRgUos6GZ/AufdLAKd010OjvMn
+         A+7hAfU1ApTAsWHyXC9/DwwKCjQqLiOq5/vz8Wf1yShI4nlX9yKOvs91KoRxap4rjNCC
+         /3Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726559844; x=1727164644;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wHR9J9yARMAY6m8/9WXANDhPcMRHFQhog6kgcpJjl0M=;
+        b=nxxIV9toJ+XujQNVFMoJI3u/HDYQ6/CRYzaVifkEBO1Alpm81WZV6sZyfbR+ku8hLU
+         QzNA45H+4GdKoF7UhrkfGVudN6QjEy1E/khAJYMaObgMtnCQX4ps3uLlNM2Wt05n3anP
+         C8i0G5hg8bSs8V6SYs0M5OG1BALgnAYrj0LVabZwn8AyJeJALsZfHzZkgF4VVcM1hgm6
+         enXOLWI/hQixMjdMYMjfoLrhlE/DM4TAmfrFBoDP3h+oPUpoLAhGMlTSbXStL0lFCf3R
+         8hJO+lTyKyvi4adpRKY2ki93Ie4kV8U4jx5tWTRG4dR0tJqgWn9wz9Vs7Zp2zZ+BqsI7
+         1qqw==
+X-Gm-Message-State: AOJu0YxjwrLTTkI+GPo3UXmB0+tTvmuoyV6DDFOt32jEJd3TR6Vy87HO
+	7u5cbhmW45JP6q9pfxoBQbMV0YTfh5sDFj812IWyHcOHkEzZ8RMyYErtSFoh
+X-Google-Smtp-Source: AGHT+IHGDiR7BopFBgQ+HHrQjxIEAOpv2FW0osQEOHL+yKcmagiGMYMYa4YKWhcrheMOLnIqrXDm3w==
+X-Received: by 2002:a17:906:c113:b0:a8a:835f:4cb9 with SMTP id a640c23a62f3a-a9048105fd9mr1605887366b.46.1726559843548;
+        Tue, 17 Sep 2024 00:57:23 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:9d09:9800:f5fd:67f7:66fc:d8c9? (dynamic-2a02-3100-9d09-9800-f5fd-67f7-66fc-d8c9.310.pool.telefonica.de. [2a02:3100:9d09:9800:f5fd:67f7:66fc:d8c9])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a90612b3f6fsm412614966b.107.2024.09.17.00.57.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Sep 2024 00:57:23 -0700 (PDT)
+Message-ID: <8c55ce81-6b0a-42f5-8e05-5557933ca3b8@gmail.com>
+Date: Tue, 17 Sep 2024 09:57:23 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Y9v0DmzbHOuB7N3Iz-NCjcHqgHiGy0ME
-X-Proofpoint-ORIG-GUID: 4-JElDKybZarhXAk6t3t6WYBqltWZQxr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-17_02,2024-09-16_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 suspectscore=0 mlxscore=0 mlxlogscore=906 bulkscore=0
- impostorscore=0 phishscore=0 priorityscore=1501 spamscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409170049
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Can class_compat usage in vfio/mdev be removed?
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fix pointer function arguments whitespaces.
-
-Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/ucontrol_test.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-index 1f1c58f5ec2f..83061db79c83 100644
---- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-+++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-@@ -330,7 +330,7 @@ static void uc_handle_exit_ucontrol(FIXTURE_DATA(uc_kvm) *self)
-  * * fail on codes not expected in the test cases
-  * Returns if interception is handled / execution can be continued
-  */
--static bool uc_handle_sieic(FIXTURE_DATA(uc_kvm) * self)
-+static bool uc_handle_sieic(FIXTURE_DATA(uc_kvm) *self)
- {
- 	struct kvm_s390_sie_block *sie_block = self->sie_block;
- 	struct kvm_run *run = self->run;
-@@ -359,7 +359,7 @@ static bool uc_handle_sieic(FIXTURE_DATA(uc_kvm) * self)
- }
- 
- /* verify VM state on exit */
--static bool uc_handle_exit(FIXTURE_DATA(uc_kvm) * self)
-+static bool uc_handle_exit(FIXTURE_DATA(uc_kvm) *self)
- {
- 	struct kvm_run *run = self->run;
- 
-@@ -379,7 +379,7 @@ static bool uc_handle_exit(FIXTURE_DATA(uc_kvm) * self)
- }
- 
- /* run the VM until interrupted */
--static int uc_run_once(FIXTURE_DATA(uc_kvm) * self)
-+static int uc_run_once(FIXTURE_DATA(uc_kvm) *self)
- {
- 	int rc;
- 
-@@ -390,7 +390,7 @@ static int uc_run_once(FIXTURE_DATA(uc_kvm) * self)
- 	return rc;
- }
- 
--static void uc_assert_diag44(FIXTURE_DATA(uc_kvm) * self)
-+static void uc_assert_diag44(FIXTURE_DATA(uc_kvm) *self)
- {
- 	struct kvm_s390_sie_block *sie_block = self->sie_block;
- 
--- 
-2.46.0
+After 7e722083fcc3 ("i2c: Remove I2C_COMPAT config symbol and related code")
+vfio/mdev is that last user of class_compat. This compatibility functionality
+is meant to be used temporarily, and it has been in vfio/mdev since 2016.
+Can it be removed? Or is there any userspace tool which hasn't been updated
+to use the bus interface instead?
+If class_compat can be removed in vfio/mdev, then we may be able to remove
+this functionality completely.
 
 
