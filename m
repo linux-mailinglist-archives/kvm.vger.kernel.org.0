@@ -1,365 +1,187 @@
-Return-Path: <kvm+bounces-27056-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27057-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61D1C97B321
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 18:45:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E59C997B47D
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 22:15:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D546B2235E
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 16:45:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77F621F2577D
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2024 20:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D00E17BEB7;
-	Tue, 17 Sep 2024 16:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C2018BB9C;
+	Tue, 17 Sep 2024 20:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="G9K1MfwW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CfOKPR3T"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2086.outbound.protection.outlook.com [40.107.94.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCDC185953
-	for <kvm@vger.kernel.org>; Tue, 17 Sep 2024 16:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726591534; cv=none; b=cFKX3iZpBQrgqyZwomCeKJPbi4TLe9KxeHyFsNI8dcA7H3uafSKXudCUPtjhIQ3DwFJlyvNY64qRaquA8TIluRteLfLIUYnas0DlwjACtZ81VH95iTb2PIYchqOBNpI7wUyZHDaY8voHBKCLIV9JFkM19VGnpoQIRJEqz/a2fuw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726591534; c=relaxed/simple;
-	bh=qqDFQFtVVcye2IEz2g3CHUsKZtVqb7nn9gHNIon5pT4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cx1s0jRAOB4JYMLPem8EzvNTJIXWWn/JYModbnyeaN2dZ9BtpOVW5zD6Zds48U8e4Tq4fxqc6CQ66+CQDLC5oDnKUwc33UFcxfEiyVb9pl2gVx80dSQw0DjdWUQtEM3ndijGeJjmMdViGXrCMxMc7iqxUdbfg85FWEa+wIpNsDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=G9K1MfwW; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id E24F140AA9
-	for <kvm@vger.kernel.org>; Tue, 17 Sep 2024 16:45:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1726591524;
-	bh=NT1MFgf5d1eFKJ8lvG5GHflLOH9+PDppupkTwcUm1iE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type;
-	b=G9K1MfwW+Nc229snpuYrNKoOm7s6YR3FxRf3tgE+XtUpvI66SXs6YOWyyWG+FRHAN
-	 WSTBiV7eGvobqGnH2AetNxyKJcvMQMnOhMommS9RMg1XahNy0vtaZY3MSg/ITJ1s1D
-	 T1zixIC051fR2i5/COJH5Od4k574Fmi4XYXTV7M0bh9Qj1NXmM2AvErPaUDz/ElXAL
-	 rYtYBSRN7QY3PvvahrIh9VU8lFVPSNL8zkOgvb58kPbi/AY6rcwkT+fcV5PUn39Ztm
-	 NF+HxkXz0t7at4wUtRgYFvICKSDhoTqytxaET0UMGB5ZykcS4rmH5wO5yqpWWuity7
-	 PEVyqvN96iY1A==
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-374b385b146so2973426f8f.0
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2024 09:45:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726591524; x=1727196324;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NT1MFgf5d1eFKJ8lvG5GHflLOH9+PDppupkTwcUm1iE=;
-        b=l9Js2gYeY5/u9RSf20WS76r5jk6gXUYjH1onk7vjEpFQ+Cjxg4UB8NsPi7GR0Y5ec+
-         FP6OGwxITRzd/sR9Y3EveTNHrkpRt9lxAundU9dpbZ9AlLhTrk1nifT3zaVV1VROa6Yt
-         jYqx6hiFHg6nZo7oEKsHt4aUcC5jhbKf9IVVUtXhS6c8O6i/fJtMRGNF1/KlyM1H0McH
-         qDadTCVJb6yk1GX18Z2chSimFJnLj5rlU6oYRNs1pwzPF9VFAe54a/K1A2CkjcfqRFRJ
-         2q0gOFChAX7r4VHqFsydwkOUQF7+1JAl5xns0iUWaoWv5R1BGCQJ4aTIVYvTz8BvBIll
-         o89g==
-X-Forwarded-Encrypted: i=1; AJvYcCWpH+LxWNa43axU2txuOKjxlLbzsple8PECW6F71EHEfrORVCfZjGGH0kMi8NIcctvnqMA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCUhbJX1ouQazRilVyrf9Dq+RCOmJ9GB8Y7hEB9z8PQ1JIceKK
-	3hwAYMBlODY0DRmC08d0j8DSaOQnstqahfITKk0riiDXbrCBvXu2f+OUz8/1NZQyqgBj756809U
-	CLwtBPhk7QfCpuWdpZtanUPI3Iwg4K+NHGR9Wy6WO8u8zQTomvgBu3IUnjnha3ewnKw==
-X-Received: by 2002:a5d:5e0b:0:b0:378:fd4a:b9c7 with SMTP id ffacd0b85a97d-378fd4abdd0mr1676604f8f.58.1726591524371;
-        Tue, 17 Sep 2024 09:45:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFs0Cj+RwanvZfc+Zpgq+IL/nl24ARC+SCQIgbK1A19jHR2OTbPlljOxY0Nabw1aG0vB0qF6g==
-X-Received: by 2002:a5d:5e0b:0:b0:378:fd4a:b9c7 with SMTP id ffacd0b85a97d-378fd4abdd0mr1676576f8f.58.1726591523830;
-        Tue, 17 Sep 2024 09:45:23 -0700 (PDT)
-Received: from [192.168.103.101] (dynamic-046-114-111-082.46.114.pool.telefonica.de. [46.114.111.82])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e73e8340sm9976172f8f.46.2024.09.17.09.45.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2024 09:45:23 -0700 (PDT)
-Message-ID: <8b24728f-8b6e-4c79-91f6-7cbb79494550@canonical.com>
-Date: Tue, 17 Sep 2024 18:45:21 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B26213777E;
+	Tue, 17 Sep 2024 20:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726604134; cv=fail; b=XK7sD3oIO6E5GIU0p2wHk8GgbxQAA7tRSNVmFlWIk+Ha4xgNLyvRkyDjauugzg73ANtF8AXQuDG86i6LO8XOESZkYGfgcoxGqpuogDeQQFRNaJGM0GoXvnJc3EJTrXyYAPgOC5cCEFiP7lZGbsY0wjEiQyCgUfgPUNDFejd+XSQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726604134; c=relaxed/simple;
+	bh=ZzvI/KdCN0hpptFF9PoFLiYdIfFdJ+rS2sb9gO3Fn/Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m30S2juxEieZ9Jvy2dkTXp4DS+wA+XMg3jpJ54xgfSPm2wNKNxBI05gpPHuTAnqCi2qmBAcvjU1uDi57y0/XxH512rtzVqPrV+MEa3pcINu/OujZzzqJ+mHcb0auYAvxx2wGPVHP5mMfeHG3fY5NO7y8Jawdluy5c18FfLZ2kxg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=CfOKPR3T; arc=fail smtp.client-ip=40.107.94.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Iq1kztq+D7CnRbTyd6CeED3KkwGFKny+vP/YY0rtWEgH+h7TPnVDpwQ5SPaJcCGfRFYicOu6sJnMGoLC4Vcel3gEDgN+yodlPSEHzF4m8/ecZIsMNSZ+xk+ruNBJE9j/CwvNDlQXR3xH6gLNyvKImud01CDiJLQp/FFKEPnuGNm4Sv1fKqlhfa2zwTw6ng9bGAVchzcytGcfEMCxbYwcDcki3f8wy9lOuBrG+Nkbh9FMwFaH+7+8RbG4sm1NzPHQcpY3ceiIgwR8RgdsdUmrZybUxJTGBsYqmywjPbTodeIPFxUMMU6G/dK+4/hBaE1P0SCJ6AsBxsivi7rZbt2nEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RJQ3vKgpt68MV83MZwcbBV1ks5AtEuGvL6neQdoETLQ=;
+ b=tBNPLIjB8wJHtku9QQexFsmx1TanJgWVgi8+x0NBJ1z56WHY/6OJqo0Jr45rVieVhDykNSsM8ZdPQWFT5NRD4h5x3vGHqfhU1ZX7veOWQL4xT8PzbvYmjkFpYoQ7kB68ck2E0Nr+XYH8rvvr6t7yIVjsccgEGuEIE7ftgQEIF07BPM9M041zcafUo2+e0mEWAx5vcveh4L/M17GAH+pRNe+aAvpXi+uAPZ9tE8Bd/Yo87wTcd3YqW7am/xocySlAM6mdnl66EDYOsscGVw/rCvcyboGjOh1aokiXiJuD8785QLbkZ2+z6wPllFVQfC9w7Ps0SWCL8Wo++EpGi/ySFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RJQ3vKgpt68MV83MZwcbBV1ks5AtEuGvL6neQdoETLQ=;
+ b=CfOKPR3TSiMUDqzu/WcaWZGV9iB2GFNyBtDWO0jIJUzHjpVKAQoQLV1u2AjJMJJQqtrcDy/AVJ+m//0l4arBRhpFq72dLX3O6UGXSDh1fkkcJBeP67WVMRpPCpEVe15zUbhzKGT8zVugdfAZxzCiMKovP1vWgwm8rGbhmwrx0iA=
+Received: from BYAPR04CA0012.namprd04.prod.outlook.com (2603:10b6:a03:40::25)
+ by CYYPR12MB8749.namprd12.prod.outlook.com (2603:10b6:930:c6::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.16; Tue, 17 Sep
+ 2024 20:15:26 +0000
+Received: from SJ5PEPF00000209.namprd05.prod.outlook.com
+ (2603:10b6:a03:40:cafe::18) by BYAPR04CA0012.outlook.office365.com
+ (2603:10b6:a03:40::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.29 via Frontend
+ Transport; Tue, 17 Sep 2024 20:15:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SJ5PEPF00000209.mail.protection.outlook.com (10.167.244.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7918.13 via Frontend Transport; Tue, 17 Sep 2024 20:15:26 +0000
+Received: from purico-ed09host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 17 Sep
+ 2024 15:15:23 -0500
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<hpa@zytor.com>, <herbert@gondor.apana.org.au>
+CC: <x86@kernel.org>, <john.allen@amd.com>, <davem@davemloft.net>,
+	<thomas.lendacky@amd.com>, <michael.roth@amd.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: [PATCH v2 0/3] Add SEV-SNP CipherTextHiding feature support
+Date: Tue, 17 Sep 2024 20:15:13 +0000
+Message-ID: <cover.1726602374.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] target/riscv: enable floating point unit
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
- Weiwei Li <liwei1518@gmail.com>,
- Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Paul Walmsley
- <paul.walmsley@sifive.com>, Albert Ou <aou@eecs.berkeley.edu>,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240916181633.366449-1-heinrich.schuchardt@canonical.com>
- <20240917-f45624310204491aede04703@orel>
- <15c359a4-b3c1-4cb0-be2e-d5ca5537bc5b@canonical.com>
- <20240917-b13c51d41030029c70aab785@orel>
-Content-Language: en-US
-From: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
-In-Reply-To: <20240917-b13c51d41030029c70aab785@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF00000209:EE_|CYYPR12MB8749:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7446bf52-d969-4e53-338a-08dcd75577e7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|7416014|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xguOO+yYuwnpTmsGBtRA8+BiAUf4HKvueC02iKxXDwzfAe2yDGOT+My1ALkV?=
+ =?us-ascii?Q?R/nzYb9WSPqmBXMzyKlB55d1+SBHlHOVoOXPA6C7yAhfX5aqHBsy1vMrM1ro?=
+ =?us-ascii?Q?l6UpfmToQ9nN2X0bshavUi3ETngAg1XmQqUbuBhpkmQKEirAjPxa39Ojfrpx?=
+ =?us-ascii?Q?Oe7pcSOwg+9wzQYg4/i/cSatOG8k2371kcA3zZxqIlPpUWAQQru4g9cCANh0?=
+ =?us-ascii?Q?3KT+JYm0uBBYZf+3C5i660MEmLS94t8M7dx90t36vjtgD7VMOVZkU+WSLsPY?=
+ =?us-ascii?Q?OZ6sKwcU0esrWXVqH07Cq7bDSKvoe1szsHtv4cWC4tVEnDY/tRtY8E/cZd2F?=
+ =?us-ascii?Q?Fb/YTRaU0qIdWfSQTy0dJVpd+nih4OZAfwUNPMMhWgTe60HQHbVVrSYsSolM?=
+ =?us-ascii?Q?Xe+AiHml/0pct+U6BSOVRjcARv4yvvReCLct9yqD02mM2CjWUHKayhnYbbOe?=
+ =?us-ascii?Q?lfZp+/cfcEPlxjUu9+NpTDFLfOn+i98E61Yk5YU7On14JvHZCgUmZFjNmzag?=
+ =?us-ascii?Q?KYarIKrOw1cZLAZqAFgTA4bL83DqgTVNWxOdz+xLc35zbTFN4fB+81tm3i3x?=
+ =?us-ascii?Q?VgIjcFl4Sj3Q/LN/XEMaWrHxJYTYY8jgI49fsNAJug8rRUS83rk02De05Q4R?=
+ =?us-ascii?Q?SUTrDOSdxCqDpi6wUJoJFxrjFG8A+ImKjKVxt5MNecAfBJBvpNAdBC9CRBTx?=
+ =?us-ascii?Q?x0d5uyzfDo6pCyG/b706tjLAvUqNXUhRvFuhx5oFKuBEzrKFoQq48y6tcpad?=
+ =?us-ascii?Q?iZVIrIOaN4M2oNPTzdd3lQtLt23BUHSarevwV6DfYRYD5is0hI1tzU9ubMgJ?=
+ =?us-ascii?Q?I2SBD4/7UuKd+n8yqYWeBJGxZRIVtXdvWLWsUvpb3ODtmxzSeL42cDS5Thn9?=
+ =?us-ascii?Q?7cmQXftbzslHYba9YhhK7BSD5niYI/Y0ax+XxeKSaUE12H702oZq1QImbbM4?=
+ =?us-ascii?Q?SL3Ejv241ueea5ocQoy0gHsEIIAzYPztl9uH3i/pnyCiKusz2dHYZ/Vz0mej?=
+ =?us-ascii?Q?SOYpbstJ5iYTgRBnLFk4QGXH3yM3jFlo6KwEIpHF1UR5yEQ/jgMaxqi7Z50Z?=
+ =?us-ascii?Q?CEjARcXtNViznQFD57H6qXPsd0EgYP+B0xtvqgkH1BuGtjJEicnRh3lxOG5i?=
+ =?us-ascii?Q?2cP2SXyRL6eJopnmLaQciPXfou6p22VSJSvh4Y4oVHViOMPLeHS6x2MAYZeq?=
+ =?us-ascii?Q?kfUnJ7RYSaJ7p9hkBpENXHxC+dIfONNY8z/7CYb6+Irx3FdL0YxGHtu39BvK?=
+ =?us-ascii?Q?l34xoyoA8RMyeSCVtwtLIGNuaXuJAuv4+1BwXBxz1zGNerB6VHIrJ8rl5ZUG?=
+ =?us-ascii?Q?4l3wk3aXvuExBXeJ2LNxM+lQoYx4IZ59Qs+wOdhBBEd5Sejq9iLT3gqv1bOf?=
+ =?us-ascii?Q?tLP+iukpUFX4x15p4Lf3oCeOJTy2PWEjf6tIksXcs+ypYGu4vFUDxJ8z9Oho?=
+ =?us-ascii?Q?YTewWlOUAk1YsUYyKdC8CzVYGmCP1byp?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2024 20:15:26.1881
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7446bf52-d969-4e53-338a-08dcd75577e7
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF00000209.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8749
 
-On 17.09.24 16:49, Andrew Jones wrote:
-> On Tue, Sep 17, 2024 at 03:28:42PM GMT, Heinrich Schuchardt wrote:
->> On 17.09.24 14:13, Andrew Jones wrote:
->>> On Mon, Sep 16, 2024 at 08:16:33PM GMT, Heinrich Schuchardt wrote:
->>>> OpenSBI enables the floating point in mstatus. For consistency QEMU/KVM
->>>> should do the same.
->>>>
->>>> Without this patch EDK II with TLS enabled crashes when hitting the first
->>>> floating point instruction while running QEMU with --accel kvm and runs
->>>> fine with --accel tcg.
->>>>
->>>> Additionally to this patch EDK II should be changed to make no assumptions
->>>> about the state of the floating point unit.
->>>>
->>>> Signed-off-by: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
->>>> ---
->>>>    target/riscv/cpu.c | 7 +++++++
->>>>    1 file changed, 7 insertions(+)
->>>>
->>>> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
->>>> index 4bda754b01..c32e2721d4 100644
->>>> --- a/target/riscv/cpu.c
->>>> +++ b/target/riscv/cpu.c
->>>> @@ -923,6 +923,13 @@ static void riscv_cpu_reset_hold(Object *obj, ResetType type)
->>>>        if (mcc->parent_phases.hold) {
->>>>            mcc->parent_phases.hold(obj, type);
->>>>        }
->>>> +    if (riscv_has_ext(env, RVF) || riscv_has_ext(env, RVD)) {
->>>> +        env->mstatus = set_field(env->mstatus, MSTATUS_FS, env->misa_mxl);
->>>> +        for (int regnr = 0; regnr < 32; ++regnr) {
->>>> +            env->fpr[regnr] = 0;
->>>> +        }
->>>> +        riscv_csrrw(env, CSR_FCSR, NULL, 0, -1);
->>>> +    }
->>>
->>> If this is only fixing KVM, then I think it belongs in
->>> kvm_riscv_reset_vcpu(). But, I feel like we're working around an issue
->>> with KVM synchronization with this, as well as with the "clear CSR values"
->>> part of commit 8633951530cc ("target/riscv: Clear CSR values at reset and
->>> sync MPSTATE with host"). KVM knows how to reset VCPUs. It does so on
->>> VCPU creation and for any secondaries started with SBI HSM start. KVM's
->>> reset would set sstatus.FS to 1 ("Initial") and zero out all the fp
->>> registers and fcsr. So it seems like we're either synchronizing prior to
->>> KVM resetting the boot VCPU, not synchronizing at all, or KVM isn't doing
->>> the reset of the boot VCPU.
->>>
->>> Thanks,
->>> drew
->>
->> Hello Drew,
->>
->> Thanks for reviewing.
->>
->> Concerning the question whether kvm_riscv_reset_vcpu() would be a better
->> place for the change:
->>
->> Is there any specification prescribing what the state of the FS bits should
->> be when entering M-mode and when entering S-mode?
-> 
-> I didn't see anything in the spec, so I think 0 (or 1 when all fp
-> registers are also reset) is reasonable for an implementation to
-> choose.
-> 
->>
->> Patch 8633951530cc seems not to touch the status register in QEMU's
->> kvm_riscv_reset_vcpu(). So it is not obvious that this patch could have
->> caused the problem.
-> 
-> I don't think 8633951530cc caused this problem. It was solving its own
-> problem in the same way, which is to add some more reset for the VCPU.
-> I think both it and this patch are working around a problem with KVM or
-> with a problem synchronizing with KVM. If that's the case, and we fix
-> KVM or the synchronization with KVM, then I would revert the reset parts
-> of 8633951530cc too.
-> 
->>
->> Looking at the call sequences in Linux gives some ideas where to debug:
->>
->> kvm_arch_vcpu_create calls kvm_riscv_reset_vcpu which calls
->> kvm_riscv_vcpu_fp_reset.
->>
->> riscv_vcpu_set_isa_ext_single and kvm_riscv_vcpu_set_reg_config
->> only call kvm_riscv_vcpu_fp_reset if !vcpu->arch.ran_atleast_once.
->>
->> kvm_riscv_vcpu_fp_reset sets FS bits to "initial"
->> if CONFIG_FPU=y and extension F or D is available.
->>
->> It seems that in KVM only the creation of a vcpu will set the FS bits but
->> rebooting will not.
-> 
-> If KVM never resets the boot VCPU on reboot, then maybe it should or needs
-> QEMU to inform it to do so. I'd rather just one of the two (KVM or QEMU)
-> decide what needs to be reset and to which values, rather than both having
-> their own ideas. For example, with this patch, the boot hart will have its
-> sstatus.FS set to 3, but, iiuc, all secondaries will be brought up
-> with their sstatus.FS set to 1.
-> 
-> Thanks,
-> drew
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Hello Drew,
+Ciphertext hiding prevents host accesses from reading the ciphertext
+of SNP guest private memory. Instead of reading ciphertext, the host
+will see constant default values (0xff).
 
-I added some debug messages.
+Ciphertext hiding separates the ASID space into SNP guest ASIDs and 
+host ASIDs. All SNP active guests must have an ASID less than or
+equal to MAX_SNP_ASID provided to the SNP_INIT_EX command.
+All SEV-legacy guests must be greater than MAX_SNP_ASID.
 
-Without smp: Linux' kvm_riscv_vcpu_fp_reset() is called before QEMU's 
-kvm_riscv_reset_vcpu() and is never called on reboot.
+This patch-set adds a new module parameter to the CCP driver defined
+as psp_max_snp_asid which is a user configurable MAX_SNP_ASID to
+define the system-wide maximum SNP ASID value. If this value is
+not set, then the ASID space is equally divided between SEV-SNP
+and SEV-ES guests.
 
-qemu-system-riscv64 -M virt -accel kvm -nographic -kernel 
-payload_workaround.bin
-[  920.805102] kvm_arch_vcpu_create: Entry
-[  920.805608] kvm_riscv_vcpu_fp_reset: At entry FS=0
-[  920.805961] kvm_riscv_vcpu_fp_reset: At exit FS=8192
-[  920.806289] kvm_arch_vcpu_create: Exit
-[  920.810554] kvm_arch_vcpu_create: Entry
-[  920.810959] kvm_riscv_vcpu_fp_reset: At entry FS=0
-[  920.811334] kvm_riscv_vcpu_fp_reset: At exit FS=8192
-[  920.811696] kvm_arch_vcpu_create: Exit
-[  920.816772] kvm_arch_vcpu_create: Entry
-[  920.817095] kvm_riscv_vcpu_fp_reset: At entry FS=0
-[  920.817411] kvm_riscv_vcpu_fp_reset: At exit FS=8192
-[  920.817975] kvm_arch_vcpu_create: Exit
-[  920.818395] kvm_riscv_vcpu_set_reg_config:
-[  920.818696] kvm_riscv_vcpu_set_reg_config:
-[  920.818975] kvm_riscv_vcpu_set_reg_config:
-QEMU riscv_cpu_reset_hold: Entry
-QEMU kvm_riscv_reset_vcpu: Entry
-QEMU kvm_riscv_reset_vcpu: Exit
-QEMU riscv_cpu_reset_hold: Exit
-QEMU riscv_cpu_reset_hold: Entry
-QEMU kvm_riscv_reset_vcpu: Entry
-QEMU kvm_riscv_reset_vcpu: Exit
-QEMU riscv_cpu_reset_hold: Exit
-[  920.946333] kvm_arch_vcpu_ioctl_run: run->ext_reason 0
-[  920.947031] kvm_arch_vcpu_ioctl_run: run->ext_reason 0
-[  920.947700] kvm_riscv_check_vcpu_requests: Entry
-[  920.948482] kvm_riscv_check_vcpu_requests: Entry
+v2:
+- Fix and add more description to commit logs.
+- Rename sev_cache_snp_platform_status_and_discover_features() to 
+snp_get_platform_data().
+- Add check in snp_get_platform_data to guard against being called
+after SNP_INIT_EX.
+- Fix comments for new structure field definitions being added.
+- Fix naming for new structure being added.
+- Add new vm-type parameter to sev_asid_new().
+- Fix identation.
+- Rename CCP module parameters psp_cth_enabled to cipher_text_hiding and 
+psp_max_snp_asid to max_snp_asid.
+- Rename max_snp_asid to snp_max_snp_asid. 
 
-Test payload
-============
+Ashish Kalra (3):
+  crypto: ccp: New bit-field definitions for SNP_PLATFORM_STATUS command
+  crypto: ccp: Add support for SNP_FEATURE_INFO command
+  x86/sev: Add SEV-SNP CipherTextHiding support
 
-[  920.950012] kvm_arch_vcpu_ioctl_run: run->ext_reason 35
+ arch/x86/kvm/svm/sev.c       | 26 ++++++++--
+ drivers/crypto/ccp/sev-dev.c | 99 ++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.h |  3 ++
+ include/linux/psp-sev.h      | 41 ++++++++++++++-
+ include/uapi/linux/psp-sev.h | 10 +++-
+ 5 files changed, 171 insertions(+), 8 deletions(-)
 
-[  920.950666] kvm_riscv_check_vcpu_requests: Entry
-Rebooting
+-- 
+2.34.1
 
-[  920.951478] kvm_arch_vcpu_ioctl_run: run->ext_reason 35
-[  920.952051] kvm_riscv_check_vcpu_requests: Entry
-QEMU riscv_cpu_reset_hold: Entry
-QEMU kvm_riscv_reset_vcpu: Entry
-QEMU kvm_riscv_reset_vcpu: Exit
-QEMU riscv_cpu_reset_hold: Exit
-[  920.962404] kvm_arch_vcpu_ioctl_run: run->ext_reason 24
-[  920.962969] kvm_arch_vcpu_ioctl_run: run->ext_reason 24
-[  920.963496] kvm_riscv_check_vcpu_requests: Entry
-
-Test payload
-============
-
-
-With -smp 2 this seems to hold true per CPU. So essentially the effect 
-of vm_riscv_vcpu_fp_reset() is always ignored both on the primary and 
-the secondary harts.
-
-$ qemu-system-riscv64 -M virt -accel kvm -smp 2 -nographic -kernel 
-payload_workaround.bin
-[  202.573659] kvm_arch_vcpu_create: Entry
-[  202.574024] kvm_riscv_vcpu_fp_reset: At entry FS=0
-[  202.574328] kvm_riscv_vcpu_fp_reset: At exit FS=8192
-[  202.574626] kvm_arch_vcpu_create: Exit
-[  202.580626] kvm_arch_vcpu_create: Entry
-[  202.581070] kvm_riscv_vcpu_fp_reset: At entry FS=0
-[  202.581599] kvm_riscv_vcpu_fp_reset: At exit FS=8192
-[  202.582040] kvm_arch_vcpu_create: Exit
-[  202.587356] kvm_arch_vcpu_create: Entry
-[  202.587894] kvm_riscv_vcpu_fp_reset: At entry FS=0
-[  202.588376] kvm_riscv_vcpu_fp_reset: At exit FS=8192
-[  202.589188] kvm_arch_vcpu_create: Exit
-[  202.589650] kvm_riscv_vcpu_set_reg_config:
-[  202.590014] kvm_riscv_vcpu_set_reg_config:
-[  202.590340] kvm_riscv_vcpu_set_reg_config:
-[  202.595220] kvm_arch_vcpu_create: Entry
-[  202.595604] kvm_riscv_vcpu_fp_reset: At entry FS=0
-[  202.595939] kvm_riscv_vcpu_fp_reset: At exit FS=8192
-[  202.596278] kvm_arch_vcpu_create: Exit
-QEMU riscv_cpu_reset_hold: Entry
-QEMU kvm_riscv_reset_vcpu: Entry
-QEMU kvm_riscv_reset_vcpu: Exit
-QEMU riscv_cpu_reset_hold: Exit
-[  202.602093] kvm_arch_vcpu_create: Entry
-[  202.602426] kvm_riscv_vcpu_fp_reset: At entry FS=0
-[  202.602777] kvm_riscv_vcpu_fp_reset: At exit FS=8192
-[  202.603110] kvm_arch_vcpu_create: Exit
-[  202.607898] kvm_arch_vcpu_create: Entry
-[  202.608306] kvm_riscv_vcpu_fp_reset: At entry FS=0
-[  202.608989] kvm_riscv_vcpu_fp_reset: At exit FS=8192
-[  202.609416] kvm_arch_vcpu_create: Exit
-[  202.609939] kvm_riscv_vcpu_set_reg_config:
-[  202.610312] kvm_riscv_vcpu_set_reg_config:
-[  202.610666] kvm_riscv_vcpu_set_reg_config:
-QEMU riscv_cpu_reset_hold: Entry
-QEMU kvm_riscv_reset_vcpu: Entry
-QEMU kvm_riscv_reset_vcpu: Exit
-QEMU riscv_cpu_reset_hold: Exit
-QEMU riscv_cpu_reset_hold: Entry
-QEMU kvm_riscv_reset_vcpu: Entry
-QEMU kvm_riscv_reset_vcpu: Exit
-QEMU riscv_cpu_reset_hold: Exit
-QEMU riscv_cpu_reset_hold: Entry
-QEMU kvm_riscv_reset_vcpu: Entry
-QEMU kvm_riscv_reset_vcpu: Exit
-QEMU riscv_cpu_reset_hold: Exit
-[  202.749911] kvm_arch_vcpu_ioctl_run: run->ext_reason 0
-[  202.750370] kvm_arch_vcpu_ioctl_run: run->ext_reason 0
-[  202.750799] kvm_arch_vcpu_ioctl_run: run->ext_reason 0
-[  202.750819] kvm_arch_vcpu_ioctl_run: run->ext_reason 0
-[  202.751574] kvm_riscv_check_vcpu_requests: Entry
-[  202.751617] kvm_riscv_check_vcpu_requests: Entry
-[  202.752737] kvm_riscv_check_vcpu_requests: Entry
-
-Test payload
-============
-
-[  202.753678] kvm_arch_vcpu_ioctl_run: run->ext_reason 35
-fcvt.d.w fa5,a5
-[  202.754145] kvm_riscv_check_vcpu_requests: Entry
-Rebooting
-
-[  202.754655] kvm_arch_vcpu_ioctl_run: run->ext_reason 35
-[  202.755030] kvm_riscv_check_vcpu_requests: Entry
-QEMU riscv_cpu_reset_hold: Entry
-QEMU kvm_riscv_reset_vcpu: Entry
-QEMU kvm_riscv_reset_vcpu: Exit
-QEMU riscv_cpu_reset_hold: Exit
-QEMU riscv_cpu_reset_hold: Entry
-QEMU kvm_riscv_reset_vcpu: Entry
-QEMU kvm_riscv_reset_vcpu: Exit
-QEMU riscv_cpu_reset_hold: Exit
-[  202.770352] kvm_arch_vcpu_ioctl_run: run->ext_reason 24
-[  202.770915] kvm_arch_vcpu_ioctl_run: run->ext_reason 10
-[  202.770951] kvm_arch_vcpu_ioctl_run: run->ext_reason 24
-[  202.771802] kvm_arch_vcpu_ioctl_run: run->ext_reason 10
-[  202.772272] kvm_riscv_check_vcpu_requests: Entry
-[  202.772888] kvm_riscv_check_vcpu_requests: Entry
-
-Test payload
-============
-
-
-When thinking about the migration of virtual machines shouldn't QEMU be 
-in control of the initial state of vcpus instead of KVM?
-
-CCing the RISC-V KVM maintainers.
-
-Best regards
-
-Heinrich
 
