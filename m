@@ -1,135 +1,208 @@
-Return-Path: <kvm+bounces-27064-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27065-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ADAC97B8D6
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 09:56:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BDDF97B978
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 10:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8602B1C210D0
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 07:56:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30E33282C0E
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 08:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F264A173336;
-	Wed, 18 Sep 2024 07:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7D117CA02;
+	Wed, 18 Sep 2024 08:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gPk6lIPO"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="iifoiFoa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCE0158219
-	for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 07:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5353317798F;
+	Wed, 18 Sep 2024 08:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726646181; cv=none; b=UM+R4KAxoOcOfrDItcp8XxDBWT7Yd9NfHdw5JuUJWoRbKrJt7d61lKaDSwLYO7v0vouSVW+Wb4UW60SaU7og8KGMw5MvK2qa9toK6dJXP8umvv3IMNO8QTWh7jWekI6Y9DR9UUsDckJA4hDOVwwPt0dkyYBot5XVvjcQryvyHDA=
+	t=1726648603; cv=none; b=OTg1Z6PZCGdw4Rm+rYupLakLA4UzGQxpkmGNpyT29IoTvhWHmRCIHakqMrOxBicRTOAdcfJ1rCShH02Qt3pjucsKR1GYWEzsVBHqC8QsU72j+wqGJF50xsVUkmFbw1htNVGOVns65x8edSvEfQ52pqIYssg4OVCPPuovvm3ge8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726646181; c=relaxed/simple;
-	bh=E6sYje1FTSCQR6Phn3zxl12MQWQkG0ia5UJs7jeqW10=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=K8q9Cud86i6E2pPtyBU0FWLfr/6NnVxiVu1HvS0ttVIJzfsGVn4bz1oApBSuQPSki2/RC5Y3Q9g/grVapHHl02LpWiD3+jkHMb4YJSpCDhWQbyAGykZwBu4iML1eQw2UrOFjqu7wqq8sudxhmEixsjnc6+nbdtQi9ErrzGCZbYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gPk6lIPO; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ddcb18b13cso52284537b3.1
-        for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 00:56:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726646178; x=1727250978; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GlQ4Yaq6kY+TAD4XQKPrVKTHn9jUpmIJO7M7toxIG6M=;
-        b=gPk6lIPOsqP16q1fdb3o6WNodLbzsTyU1ysSFXMqsaG/P4g2Pf2cvHCo/X2K140idI
-         wssA+PpidHLMZTG/qqroSwuJtLeKpLA+gZGSdEa8xkJKpFB0lfaFA3vzYLkmb0SvmhmA
-         CRaNDFR8DaNavU+EXZQI0r9gVBKBUdSAC/LNI9yKuAUa/sQ8/ddkfLDLqQ2UCMfGTCnG
-         XsuOtTMxW2IG+40XdrGiLCheMBtfp40Y7fVqW4EFJFF5jXdhNGCGawy5tmLTkAS+XnQA
-         eRwsLyFeTrG2ThfQwOOGOsICyhCtFoNFPrQj39CMeFqXzo1VJtMZDbZoccNmN8L3Yt3b
-         EfsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726646178; x=1727250978;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GlQ4Yaq6kY+TAD4XQKPrVKTHn9jUpmIJO7M7toxIG6M=;
-        b=eWP4psU6j2SfhGNaqaVct+z6NMAKizTftNTdLC0DDv9VNDFgd4x5AbKRP4vuTyirN4
-         rAijNl735bLubJL2fcpP59ToB8Ul9j7ErR90byIFQsCBHXqsinN/UD3xCwq60PGdnMcf
-         HWqQQqFibtzGFdLqz/IGCiLEV1SGnDJpYJceo5GsOng3RCxV1BXywQ0VLkVK5iRcTowx
-         HkO4gKxAu1INoF5KX3AsB+LTC5n8dFQ4wM/6zs1yKUB/19ae+bfxzYx0xj8XbjWiUuYk
-         FtucslCmJkm6Do7RVe/1tmKi1aFaeGVTEBEdlbNumIAsbRwpiOB9bBm5ufci6Ld4tAjc
-         WfPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVCcTBfCzI3OrpYW3aup3ZJZ6HYO2tAFxEGAEx0pTqoWYRVs2SLppRL82acK0qQR2Cf9Ko=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3LNxx17enk1ucOnUAJFDgbHzAr3ZA9c8mFwn43hefuoKoxn+P
-	b58YuP0UmcXEN5fPlo+XtBRvMtkr+hDXcPFfHphowtoP4U2jdUib4TqtP80gUb5PZ9C8ubZAQau
-	IhA==
-X-Google-Smtp-Source: AGHT+IG5J5++nWPV0aFihORTlQmC2H/Ah9MYQoDGjE3lVKqRoNKbWt/ZoG4m7Y5ovFCNYdEeJv75pFhcNIA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:e947:0:b0:6ae:d83e:9172 with SMTP id
- 00721157ae682-6dbb6b865b6mr3800587b3.5.1726646178348; Wed, 18 Sep 2024
- 00:56:18 -0700 (PDT)
-Date: Wed, 18 Sep 2024 00:56:16 -0700
-In-Reply-To: <D47TGLMWFTN2.2VCKLFM1K4GM8@amazon.com>
+	s=arc-20240116; t=1726648603; c=relaxed/simple;
+	bh=SPlYo2wbVPtywFZJvGZL5i8i+ocFuBwmMn6s5v97xHY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gbpA+aeVes0xDbMdMQC35PPLtA2zo9scLPQX1HktqNOfHblRwXr8ASRqVfKJt+9PtzdNM0OycdmQJAEVCaF7oZLHLnU6/ZEUoXo72eNe5Ux+IEI8PFGELD9CWvvSRmVdqZItuZQ3kdOVQUFxKGK70WlSrQaRcSyFlGnQG91he2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=iifoiFoa; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.205] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 48I8ZpZx1114904
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 18 Sep 2024 01:35:52 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 48I8ZpZx1114904
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024091601; t=1726648555;
+	bh=x2GclNT1jGzmcwnuPezDBelGlqN1/8ggygWx7Pfpj6A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iifoiFoays4n2azeZw/XhgYRM2pwAMUNJTTSYdaIl+wLZlRFZye+Ff6YDMk8jblpR
+	 FCMuZZEJzGngGPObV982xZ8nFfvP+GkfHvPiLkPDOzwCrXdyKO6Zt2b1FdZaLYA6d0
+	 4yIJlgFYqG7Ew/MdHaW1bDCBYU8PztXl0uwwRFTqbGIF8DKXVBwympsBtbeURKIIut
+	 W9w4bnV1Q50Zs4ZV138U7SjEk4oklNRFCOHuLnBQnUwiRTt3umeYpoRPI6lCJj1czi
+	 3xz6v9eutDFpTTn4Dswsg5z8gRav0GmzEheCza9k6KMYunAb33RLiOFqyz6yip0tAN
+	 lE4zIHGzntXmw==
+Message-ID: <d65e62d2-ca64-4b29-8656-bb8411fe837d@zytor.com>
+Date: Wed, 18 Sep 2024 01:35:51 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240609154945.55332-1-nsaenz@amazon.com> <20240609154945.55332-6-nsaenz@amazon.com>
- <ZuSL_FCfvVywCPxm@google.com> <D47TGLMWFTN2.2VCKLFM1K4GM8@amazon.com>
-Message-ID: <ZuqHoK1E8gyMC6Ew@google.com>
-Subject: Re: [PATCH 05/18] KVM: x86: hyper-v: Introduce MP_STATE_HV_INACTIVE_VTL
-From: Sean Christopherson <seanjc@google.com>
-To: Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	vkuznets@redhat.com, linux-doc@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	graf@amazon.de, dwmw2@infradead.org, mlevitsk@redhat.com, jgowans@amazon.com, 
-	corbet@lwn.net, decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	amoorthy@google.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/25] KVM: VMX: Set intercept for FRED MSRs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Chao Gao <chao.gao@intel.com>, Xin Li <xin3.li@intel.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, shuah@kernel.org, vkuznets@redhat.com,
+        peterz@infradead.org, ravi.v.shankar@intel.com
+References: <20240207172646.3981-1-xin3.li@intel.com>
+ <20240207172646.3981-8-xin3.li@intel.com> <ZiJzFsoHR41Sd8lE@chao-email>
+ <ZmoT0jaX_3Ww3Uzu@google.com>
+ <feefa9d1-f266-414f-bb7b-b770ef0d8ec6@zytor.com>
+ <ZuNJlzXntREQVb3n@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
+ 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
+ Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
+ bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
+ raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
+ VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
+ wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
+ 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
+ NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
+ AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
+ tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
+ v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
+ sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
+ QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
+ wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
+ oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
+ vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
+ MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
+ g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
+ cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
+ jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
+ Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
+ m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
+ bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
+ JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
+ /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
+ OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
+ dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
+ 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
+ Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
+ PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
+ gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
+ l75w1xInsg==
+In-Reply-To: <ZuNJlzXntREQVb3n@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 16, 2024, Nicolas Saenz Julienne wrote:
-> On Fri Sep 13, 2024 at 7:01 PM UTC, Sean Christopherson wrote:
-> > On Sun, Jun 09, 2024, Nicolas Saenz Julienne wrote:
-> > E.g. extract the guts of vcpu_block() to a separate helper, and then wire that
-> > up to an ioctl().
-> >
-> > As for the RFLAGS.IF quirk, maybe handle that via a kvm_run flag?  That way,
-> > userspace doesn't need to do a round-trip just to set a single bit.  E.g. I think
-> > we should be able to squeeze it into "struct kvm_hyperv_exit".
+>> MSR_IA32_FRED_SSP0 is an alias of the CET MSR_IA32_PL0_SSP and likely to
+>> be used in the same way as FRED RSP0, i.e., host FRED SSP0 _should_ be
+>> restored in arch_exit_to_user_mode_prepare().  However as of today Linux
+>> has no plan to utilize kernel shadow stack thus no one cares host FRED
+>> SSP0 (no?).  But lets say anyway it is host's responsibility to manage
+>> host FRED SSP0, then KVM only needs to take care of guest FRED SSP0
+>> (just like how KVM should handle guest FRED RSP0) even before the
+>> supervisor shadow stack feature is advertised to guest.
 > 
-> It's things like the RFLAG.IF exemption that deterred me from building a
-> generic interface. We might find out that the generic blocking logic
-> doesn't match the expected VTL semantics and be stuck with a uAPI that
-> isn't enough for VSM, nor useful for any other use-case.
+> Heh, I'm not sure what your question is, or if there even is a question.  KVM
+> needs to context switch FRED SSP0 if FRED is exposed to the guest, but presumably
+> that will be done through XSAVE state?  If that's the long term plan, I would
+> prefer to focus on merging CET virtualization first, and then land FRED virtualization
+> on top so that KVM doesn't have to carry intermediate code to deal with the aliased
+> MSR.
 
-That's only motivation for ensuring that we are as confident as we can reasonably
-be that the uAPI we merge will work for VSM, e.g. by building out userspace and
-proving that a generic ioctl() provides the necessary functionality.  If there's
-no other immediate use case, then there's no reason to merge a generic ioctl()
-until VSM support is imminent.  And if there is another use case, then the concern
-that a generic ioctl() isn't useful obviously goes away.
+You mean the following patch set, right?
 
-> We can always introduce 'flags' I guess.
->
-> Note that I'm just being cautious here, AFAICT the generic approach
-> works, and I'm fine with going the "wait" ioctl.
+https://lore.kernel.org/kvm/20240531090331.13713-1-weijiang.yang@intel.com/
+
+I think it's probably better to do so.  Otherwise a patch to explicitly
+save/restore FRED SSP0 would be needed before the CET patch set lands
+and then reverted immediately after:
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f828f03d48ab..c790cb7a7d6b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1343,8 +1343,10 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu 
+*vcpu)
+
+         wrmsrl(MSR_KERNEL_GS_BASE, vmx->msr_guest_kernel_gs_base);
+
+-       if (cpu_feature_enabled(X86_FEATURE_FRED) && guest_can_use(vcpu, 
+X86_FEATURE_FRED))
++       if (cpu_feature_enabled(X86_FEATURE_FRED) && guest_can_use(vcpu, 
+X86_FEATURE_FRED)) {
+                 wrmsrns(MSR_IA32_FRED_RSP0, vmx->msr_guest_fred_rsp0);
++               wrmsrns(MSR_IA32_FRED_SSP0, vmx->msr_guest_fred_ssp0);
++       }
+  #else
+         savesegment(fs, fs_sel);
+         savesegment(gs, gs_sel);
+@@ -1393,6 +1395,8 @@ static void vmx_prepare_switch_to_host(struct 
+vcpu_vmx *vmx)
+         if (cpu_feature_enabled(X86_FEATURE_FRED) && 
+guest_can_use(&vmx->vcpu, X86_FEATURE_FRED)) {
+                 vmx->msr_guest_fred_rsp0 = read_msr(MSR_IA32_FRED_RSP0);
+                 fred_sync_rsp0(vmx->msr_guest_fred_rsp0);
++
++               vmx->msr_guest_fred_ssp0 = read_msr(MSR_IA32_FRED_SSP0);
+         }
+  #endif
+         load_fixmap_gdt(raw_smp_processor_id());
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 9012428984de..d1b9352f56c7 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -282,6 +282,7 @@ struct vcpu_vmx {
+         u64                   msr_host_kernel_gs_base;
+         u64                   msr_guest_kernel_gs_base;
+         u64                   msr_guest_fred_rsp0;
++       u64                   msr_guest_fred_ssp0;
+  #endif
+
+         u64                   spec_ctrl;
+
 > 
-> > Actually, speaking of kvm_hyperv_exit, is there a reason we can't simply wire up
-> > HVCALL_VTL_CALL and/or HVCALL_VTL_RETURN to a dedicated complete_userspace_io()
-> > callback that blocks if some flag is set?  That would make it _much_ cleaner to
-> > scope the RFLAGS.IF check to kvm_hyperv_exit, and would require little to no new
-> > uAPI.
-> 
-> So IIUC, the approach is to have complete_userspace_io() block after
-> re-entering HVCALL_VTL_RETURN. Then, have it exit back onto user-space
-> whenever an event is made available (maybe re-using KVM_SYSTEM_EVENT_WAKEUP?).
+> Ugh, but what happens if a CPU (or the host kernel) supports FRED but not CET SS?
+> Or is that effectively an illegal combination?
 
-Mostly out of curiosity, why does control need to return to userspace?
+The FRED Spec says:
 
-> That would work, but will need something extra to be compatible with
-> migration/live-update.
+IA32_FRED_SSP1, IA32_FRED_SSP2, and IA32_FRED_SSP3 (MSR indices 1D1H–
+1D3H). Together with the existing MSR IA32_PL0_SSP (MSR index 6A4H), 
+these are the FRED SSP MSRs.
 
-Gah, right, because KVM's generic ABI is that userspace must complete I/O exits
-before saving/restoring state.  Yeah, having KVM automatically enter a blocking
-state is probably a bad idea.
+The FRED SSP MSRs are supported by any processor that enumerates
+CPUID.(EAX=7,ECX=1):EAX.FRED[bit 17] as 1. If such a processor does not 
+support CET, FRED transitions will not use the MSRs (because shadow 
+stacks are not enabled), but the MSRs would still be accessible using 
+RDMSR and WRMSR.
+
+
+So they are independent, just that FRED SSP MSRs are NOT used if
+supervisor shadow stacks are not enabled (obviously Qemu can be
+configured to not advertise CET but FRED).
+
+When FRED is advertised to a guest, KVM should allow FRED SSP MSRs
+accesses through disabling FRED SSP MSRs interception no matter whether
+supervisor shadow stacks are enabled or not.
+
+Thanks!
+     Xin
+
 
