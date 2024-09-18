@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-27083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27082-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 218A397BE96
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 17:28:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D698F97BE95
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 17:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCDD42839B6
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 15:28:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60B201F21D83
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 15:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E911C8FDE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583301C8FD6;
 	Wed, 18 Sep 2024 15:28:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dfMqR+zz"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="u4r8IaIV"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA1018B470
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC42C79FD
 	for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 15:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726673301; cv=none; b=EC5B1t32MDn/vZYajv8V6xs1jLzixGDP79WqknUAz0z0d6DYvo1/81JMhAJMj3iohPEQaoD5lMJWfPdlOBVJljYT2bOhxeviqsoRQZXavTXsOPOvonSd6BKogCopzPJ8nJkt8e/P/mOyIVMQPxvT+LGDquF4T9vkO8QTEPJve7o=
+	t=1726673301; cv=none; b=soZpPnf8gbjnNdWnD611J0Dj/WjNBj22k+UmhkpKIgbm/RjhVPEN2/LGfR+p6202L81v4rRyyUsW4kaN60cqu0jdZHo6JA9TYde8a0BcOLrgIAJIaO/LRK8ExRO8n37nfSFPo41VHuHJ7J0QKH6oT8ID111UZpRabCMymm3lXtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726673301; c=relaxed/simple;
-	bh=ItAa8fO3kkj4DyZk3TKrr+9iURCiwBGC9y6QfuRBEkw=;
+	bh=kh2YDaGShz5thW3QPhYpY9fgec3JXqODlV0AI1myx1A=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FXC853vqnSBo9WVCND7ySFSKNOuiZK2iDjFlInX/K/aKncA6CG4FLklLn9wcgSZtG4iQCTEpPNkOIeUoKDID3abnwaPnscNsYUynox8hEFQA6xMy7s2DdzZYhMmPnb0Iu4zK2O3YrsqZhWkCW0uhCRSP44b9GcLveh1mJKJd6WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dfMqR+zz; arc=none smtp.client-ip=52.119.213.154
+	 MIME-Version:Content-Type; b=DrLa6jwC7P0Rep1rNcJ9mi/DZVlz0lpD95QHXaxUomp0rxpHmH8mrchzi54wSqVtxJCJB4C1LumlX0BATSwySfDuB0cxxQ2KP1BQR3X8KIHLtg473R+B6EmeYYCl6Nig+urr0Mz3gXlN7hFgunWpCaX+rtnOOpCAwLnSqdOUn5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=u4r8IaIV; arc=none smtp.client-ip=52.119.213.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
@@ -36,41 +36,41 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   t=1726673300; x=1758209300;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=R+cb/dbFY2OXe13tFaBYjWlfNZRYT3F0Ag124qVSVDc=;
-  b=dfMqR+zzTPI4atsx39cdmx53aC/bmMHEqYw6lr90iTsGWm5Z/XQna7Ji
-   2gsoG1V2krbjI5s1o8WIO2gxrILM/fCYsFh8IqdSQw7Bn3/2dt7R6ll3K
-   MVGZGZtaUPHc2GwP/aelT/F+9lkna1g1j0FahRLOin/izmxUsg8Ae6Qhp
-   8=;
+  bh=0Jyj0savNbJCLUK2pqQ1ijmSGedpVV92FizpmekSTfE=;
+  b=u4r8IaIVyRCR8RAxJLQH3hZWu1HIcISEpEjRoFssVqPo2qo3zouN4uhZ
+   OYvMYuoP2fJCyuo+3cjm5hcgePvqi6FTUxNvqDXOm7OVmaacyGItGwTbF
+   GSzEhj0mvzB2ojav0HqJilKD6lMr7sHonKPieUTW+f6fw1UWC3/RsdQPp
+   I=;
 X-IronPort-AV: E=Sophos;i="6.10,239,1719878400"; 
-   d="scan'208";a="232771159"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 15:28:17 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:18849]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.17.12:2525] with esmtp (Farcaster)
- id e7d64bef-93c6-4e89-8986-8a05a3aaf0da; Wed, 18 Sep 2024 15:28:15 +0000 (UTC)
-X-Farcaster-Flow-ID: e7d64bef-93c6-4e89-8986-8a05a3aaf0da
-Received: from EX19D018EUC003.ant.amazon.com (10.252.51.231) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
+   d="scan'208";a="659813185"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 15:28:18 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.10.100:13771]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.46.202:2525] with esmtp (Farcaster)
+ id eb63749e-64ec-4474-a98c-96448a4608db; Wed, 18 Sep 2024 15:28:16 +0000 (UTC)
+X-Farcaster-Flow-ID: eb63749e-64ec-4474-a98c-96448a4608db
+Received: from EX19D018EUC004.ant.amazon.com (10.252.51.172) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 18 Sep 2024 15:28:15 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.145) by
- EX19D018EUC003.ant.amazon.com (10.252.51.231) with Microsoft SMTP Server
+ Wed, 18 Sep 2024 15:28:16 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19D018EUC004.ant.amazon.com (10.252.51.172) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
  Wed, 18 Sep 2024 15:28:15 +0000
 Received: from email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com
- (10.25.36.210) by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Wed, 18 Sep 2024 15:28:14 +0000
+ 15.2.1258.34 via Frontend Transport; Wed, 18 Sep 2024 15:28:15 +0000
 Received: from dev-dsk-lilitj-1a-5039c68b.eu-west-1.amazon.com (dev-dsk-lilitj-1a-5039c68b.eu-west-1.amazon.com [172.19.104.233])
-	by email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com (Postfix) with ESMTPS id 5BA1E40421;
-	Wed, 18 Sep 2024 15:28:13 +0000 (UTC)
+	by email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com (Postfix) with ESMTPS id 487D94043E;
+	Wed, 18 Sep 2024 15:28:14 +0000 (UTC)
 From: Lilit Janpoladyan <lilitj@amazon.com>
 To: <kvm@vger.kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
 	<james.morse@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
 	<nh-open-source@amazon.com>, <lilitj@amazon.com>
-Subject: [PATCH 1/8] arm64: add an interface for stage-2 page tracking
-Date: Wed, 18 Sep 2024 15:28:00 +0000
-Message-ID: <20240918152807.25135-2-lilitj@amazon.com>
+Subject: [PATCH 2/8] KVM: arm64: add page tracking device as a capability
+Date: Wed, 18 Sep 2024 15:28:01 +0000
+Message-ID: <20240918152807.25135-3-lilitj@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240918152807.25135-1-lilitj@amazon.com>
 References: <20240918152807.25135-1-lilitj@amazon.com>
@@ -83,313 +83,119 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Add an interface for tracking stage-2 page accesses. The interface
-can be implemented by a driver for a device that has the capabilities
-e.g. AWS Graviton Page Tracking Agent accelerator. When a device
-implementing page_tracking_device interface is available, KVM will
-use it to accelerate dirty logging. The initial version of the
-interface supports dirty logging only, but the interface can be
-extended to other use cases, such as a WSS calculation.
+Add new capability KVM_CAP_ARM_PAGE_TRACKING_DEVICE to use page tracking
+device for dirty logging. The capability can be used only if platform
+supports such a device i.e. when KVM_CAP_ARM_PAGE_TRACKING_DEVICE
+extension is supported. Until there is dirty ring support, make new
+capability incompatible with the use of dirty ring.
 
-page_tracking_device supports tracking stage-2 translations by VMID
-and by CPU ID. While VMID filter is required, CPU ID is optional.
-CPU ID == -1 denotes any CPU. Similarly, page_tracking_device allows
-getting pages logged for either a particular CPU or for all. KVM
-can use CPU ID of -1 to populate dirty bitmaps and a specific
-CPU ID for per vCPU dirty rings.
+When page tracking device is in use, instead of logging dirty pages on
+faults KVM will collect a list of dirty pages from the device when
+userspace reads dirty bitmap.
 
 Signed-off-by: Lilit Janpoladyan <lilitj@amazon.com>
 ---
- arch/arm64/include/asm/page_tracking.h |  79 +++++++++++++
- arch/arm64/kvm/Kconfig                 |  12 ++
- arch/arm64/kvm/Makefile                |   1 +
- arch/arm64/kvm/page_tracking.c         | 158 +++++++++++++++++++++++++
- 4 files changed, 250 insertions(+)
- create mode 100644 arch/arm64/include/asm/page_tracking.h
- create mode 100644 arch/arm64/kvm/page_tracking.c
+ Documentation/virt/kvm/api.rst    | 17 +++++++++++++++++
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/arm.c              | 17 +++++++++++++++++
+ include/uapi/linux/kvm.h          |  1 +
+ 4 files changed, 37 insertions(+)
 
-diff --git a/arch/arm64/include/asm/page_tracking.h b/arch/arm64/include/asm/page_tracking.h
-new file mode 100644
-index 000000000000..5162fb5b648e
---- /dev/null
-+++ b/arch/arm64/include/asm/page_tracking.h
-@@ -0,0 +1,79 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ARM64_PAGE_TRACKING_DEVICE_H
-+#define _ARM64_PAGE_TRACKING_DEVICE_H
-+
-+#include <linux/types.h>
-+#include <linux/kvm_types.h>
-+
-+/* Page tracking mode */
-+enum pt_mode {
-+	dirty_pages,
-+};
-+
-+/* Configuration of a per-VM page tracker */
-+struct pt_config {
-+	enum pt_mode mode; /* Tracking mode */
-+	u32 vmid;	/* VMID to track */
-+};
-+
-+/* Interface provided by the page tracking device */
-+struct page_tracking_device {
-+
-+	/* Allocates a per-VM tracker, returns tracking context */
-+	void* (*allocate_tracker)(struct pt_config config);
-+
-+	/* Releases a per-VM tracker */
-+	int (*release_tracker)(void *ctx);
-+
-+	/*
-+	 * Enables tracking for the specified @ctx and the specified @cpu,
-+	 * @cpu = -1 enables tracking for all cpus
-+	 *
-+	 * The function may be called for the same @ctx and @cpu multiple
-+	 * times and the implementation has to do reference counting to
-+	 * correctly disable the tracking.
-+	 * @returns 0 on success, negative errno in case of a failure
-+	 */
-+	int (*enable_tracking)(void *ctx, int cpu);
-+
-+	/*
-+	 * Disables tracking for the @ctx
-+	 *
-+	 * Does actually disable the tracking of the @ctx and the @cpu only
-+	 * when the number of disable and enable calls matches, i.e. when the
-+	 * reference counter is at 0. @returns 0 in this case, -EBUSY while
-+	 * reference counter > 0 and negative errno in case of a failure
-+	 */
-+	int (*disable_tracking)(void *ctx, int cpu);
-+
-+	/*
-+	 * Flushes any tracking data available for the @ctx,
-+	 * @returns 0 on success, negative errno in case of a failure
-+	 */
-+	int (*flush)(void *ctx);
-+
-+	/*
-+	 * Reads up to @max dirty pages available for the @ctx
-+	 * In case @cpu id is not -1, reads only pages dirtied by the specified cpu
-+	 * @returns number of read pages and -errno in case of a failure
-+	 */
-+	int (*read_dirty_pages)(void *ctx,
-+				int cpu,
-+				gpa_t *pages,
-+				u32 max);
-+};
-+
-+/* Page tracking device tear-down, bring-up and existence checks */
-+void page_tracking_device_unregister(struct page_tracking_device *pt_dev);
-+int page_tracking_device_register(struct page_tracking_device *pt_dev);
-+int page_tracking_device_registered(void);
-+
-+/* Page tracking device wrappers */
-+void *page_tracking_allocate(struct pt_config config);
-+int page_tracking_release(void *ctx);
-+int page_tracking_enable(void *ctx, int cpu);
-+int page_tracking_disable(void *ctx, int cpu);
-+int page_tracking_flush(void *ctx);
-+int page_tracking_read_dirty_pages(void *ctx, int cpu, gpa_t *pages, u32 max);
-+
-+#endif /*_ARM64_PAGE_TRACKNG_DEVICE_H */
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 8304eb342be9..33844658279b 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -66,4 +66,16 @@ config PROTECTED_NVHE_STACKTRACE
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index b3be87489108..989d5dd886fb 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8950,6 +8950,23 @@ Do not use KVM_X86_SW_PROTECTED_VM for "real" VMs, and especially not in
+ production.  The behavior and effective ABI for software-protected VMs is
+ unstable.
  
- 	  If unsure, or not using protected nVHE (pKVM), say N.
++8.42 KVM_CAP_ARM_PAGE_TRACKING_DEVICE
++_____________________________________
++
++:Capability: KVM_CAP_ARM_PAGE_TRACKING_DEVICE
++:Architecture: arm64
++:Type: vm
++:Parameters: arg[0] whether feature should be enabled or not
++:Returns 0 on success, -errno on failure
++
++This capability enables or disables hardware assistance for dirty page logging.
++
++In case page tracking device is available (i.e. if the host supports the
++KVM_CAP_ARM_PAGE_TRACKING_DEVICE extension), the device can be used to accelerate
++dirty logging. This capability turns the acceleration on and off.
++
++Not compatible with KVM_CAP_DIRTY_LOG_RING/KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
++
+ 9. Known KVM API problems
+ =========================
  
-+config HAVE_KVM_PAGE_TRACKING_DEVICE
-+	bool "Support for hardware accelerated dirty tracking"
-+	default n
-+	help
-+	  Say Y to enable hardware accelerated dirty tracking
-+
-+	  Adds support for hardware accelerated dirty tracking during live
-+	  migration of a virtual machine. Requires a hardware accelerator.
-+
-+	  If there is no required hardware, say N.
-+
-+
- endif # VIRTUALIZATION
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 86a629aaf0a1..4e4f5c63baf2 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -18,6 +18,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
- 	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
- 	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
-+	 page_tracking.o \
- 	 vgic/vgic.o vgic/vgic-init.o \
- 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
- 	 vgic/vgic-v3.o vgic/vgic-v4.o \
-diff --git a/arch/arm64/kvm/page_tracking.c b/arch/arm64/kvm/page_tracking.c
-new file mode 100644
-index 000000000000..a81c917d4faa
---- /dev/null
-+++ b/arch/arm64/kvm/page_tracking.c
-@@ -0,0 +1,158 @@
-+// SPDX-License-Identifier: GPL-2.0
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a33f5996ca9f..5b5e3647fbda 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -326,6 +326,8 @@ struct kvm_arch {
+ #define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
+ 	/* Fine-Grained UNDEF initialised */
+ #define KVM_ARCH_FLAG_FGU_INITIALIZED			8
++	/* Page tracking device enabled */
++#define KVM_ARCH_FLAG_PAGE_TRACKING_DEVICE_ENABLED	9
+ 	unsigned long flags;
+ 
+ 	/* VM-wide vCPU feature set */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9bef7638342e..aea56df8ac04 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -40,6 +40,7 @@
+ #include <asm/kvm_nested.h>
+ #include <asm/kvm_pkvm.h>
+ #include <asm/kvm_ptrauth.h>
 +#include <asm/page_tracking.h>
-+#include <linux/mutex.h>
-+#include <linux/rcupdate.h>
+ #include <asm/sections.h>
+ 
+ #include <kvm/arm_hypercalls.h>
+@@ -149,6 +150,19 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->slots_lock);
+ 		break;
++	case KVM_CAP_ARM_PAGE_TRACKING_DEVICE:
++		if (page_tracking_device_registered() &&
++		    !kvm->dirty_ring_size /* Does not support dirty ring yet */) {
 +
-+#ifndef CONFIG_HAVE_KVM_PAGE_TRACKING_DEVICE
-+
-+int page_tracking_device_register(struct page_tracking_device *dev) { return 0; }
-+void page_tracking_device_unregister(struct page_tracking_device *dev) {}
-+int page_tracking_device_registered(void) { return 0; }
-+void *page_tracking_allocate(struct pt_config config) { return NULL; }
-+int page_tracking_release(void *ctx) { return 0; }
-+int page_tracking_enable(void *ctx, int cpu) { return 0; }
-+int page_tracking_disable(void *ctx, int cpu) { return 0; }
-+int page_tracking_flush(void *ctx) { return 0; }
-+int page_tracking_read_dirty_pages(void *ctx, int cpu, gpa_t *pages, u32 max) { return 0; }
-+
-+#else
-+
-+static DEFINE_MUTEX(page_tracking_device_mutex);
-+static struct page_tracking_device __rcu *pt_dev __read_mostly;
-+
-+int page_tracking_device_register(struct page_tracking_device *dev)
-+{
-+	int rc = 0;
-+
-+	mutex_lock(&page_tracking_device_mutex);
-+
-+	if (rcu_dereference_protected(pt_dev, lockdep_is_held(&page_tracking_device_mutex))) {
-+		rc = -EBUSY;
-+		goto out;
-+	}
-+	rcu_assign_pointer(pt_dev, dev);
-+out:
-+	mutex_unlock(&page_tracking_device_mutex);
-+	return rc;
-+}
-+EXPORT_SYMBOL_GPL(page_tracking_device_register);
-+
-+void page_tracking_device_unregister(struct page_tracking_device *dev)
-+{
-+	mutex_lock(&page_tracking_device_mutex);
-+
-+	if (dev == rcu_dereference_protected(pt_dev,
-+					     lockdep_is_held(&page_tracking_device_mutex))) {
-+		/* Disable page tracking device */
-+		RCU_INIT_POINTER(pt_dev, NULL);
-+		synchronize_rcu();
-+	}
-+	mutex_unlock(&page_tracking_device_mutex);
-+}
-+EXPORT_SYMBOL_GPL(page_tracking_device_unregister);
-+
-+int page_tracking_device_registered(void)
-+{
-+	bool registered;
-+
-+	rcu_read_lock();
-+	registered = (rcu_dereference(pt_dev) != NULL);
-+	rcu_read_unlock();
-+	return registered;
-+}
-+EXPORT_SYMBOL_GPL(page_tracking_device_registered);
-+
-+/* Allocates a per-VM tracker, returns tracking context */
-+void *page_tracking_allocate(struct pt_config config)
-+{
-+	struct page_tracking_device *dev;
-+	void *ctx = NULL;
-+
-+	rcu_read_lock();
-+	dev = rcu_dereference(pt_dev);
-+	if (likely(dev))
-+		ctx = dev->allocate_tracker(config);
-+	rcu_read_unlock();
-+	return ctx;
-+}
-+EXPORT_SYMBOL_GPL(page_tracking_allocate);
-+
-+/* Releases a per-VM tracker */
-+int page_tracking_release(void *ctx)
-+{
-+	int r;
-+	struct page_tracking_device *dev;
-+
-+	rcu_read_lock();
-+	dev = rcu_dereference(pt_dev);
-+	if (likely(dev))
-+		r = dev->release_tracker(ctx);
-+	rcu_read_unlock();
-+	return r;
-+}
-+EXPORT_SYMBOL_GPL(page_tracking_release);
-+
-+/* Enables tracking for the specified @ctx and @cpu (-1 for all cpus) */
-+int page_tracking_enable(void *ctx, int cpu)
-+{
-+	int r;
-+	struct page_tracking_device *dev;
-+
-+	rcu_read_lock();
-+	dev = rcu_dereference(pt_dev);
-+	if (likely(dev))
-+		r = dev->enable_tracking(ctx, cpu);
-+	rcu_read_unlock();
-+	return r;
-+}
-+EXPORT_SYMBOL_GPL(page_tracking_enable);
-+
-+/* Disables tracking for the @ctx and @cpu */
-+int page_tracking_disable(void *ctx, int cpu)
-+{
-+	int r;
-+	struct page_tracking_device *dev;
-+
-+	rcu_read_lock();
-+	dev = rcu_dereference(pt_dev);
-+	if (likely(dev))
-+		r = dev->disable_tracking(ctx, cpu);
-+	rcu_read_unlock();
-+	return r;
-+}
-+EXPORT_SYMBOL_GPL(page_tracking_disable);
-+
-+/* Flushes any available data */
-+int page_tracking_flush(void *ctx)
-+{
-+	int r;
-+	struct page_tracking_device *dev;
-+
-+	rcu_read_lock();
-+	dev = rcu_dereference(pt_dev);
-+	if (likely(dev))
-+		r = dev->flush(ctx);
-+	rcu_read_unlock();
-+	return r;
-+}
-+EXPORT_SYMBOL_GPL(page_tracking_flush);
-+
-+/*
-+ * Reads up to @max dirty pages available for the @ctx and @cpu (-1 for all cpus)
-+ * @returns number of read pages and -errno in case of error
-+ */
-+int page_tracking_read_dirty_pages(void *ctx, int cpu, gpa_t *pages, u32 max)
-+{
-+	int r;
-+	struct page_tracking_device *dev;
-+
-+	rcu_read_lock();
-+	dev = rcu_dereference(pt_dev);
-+	if (likely(dev))
-+		r = dev->read_dirty_pages(ctx, cpu, pages, max);
-+	rcu_read_unlock();
-+	return r;
-+}
-+EXPORT_SYMBOL_GPL(page_tracking_read_dirty_pages);
-+
-+#endif
++			r = 0;
++			if (cap->args[0])
++				set_bit(KVM_ARCH_FLAG_PAGE_TRACKING_DEVICE_ENABLED,
++					&kvm->arch.flags);
++			else
++				clear_bit(KVM_ARCH_FLAG_PAGE_TRACKING_DEVICE_ENABLED,
++					  &kvm->arch.flags);
++		}
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -416,6 +430,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES:
+ 		r = BIT(0);
+ 		break;
++	case KVM_CAP_ARM_PAGE_TRACKING_DEVICE:
++		r = page_tracking_device_registered();
++		break;
+ 	default:
+ 		r = 0;
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 637efc055145..552ebede3f9d 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -933,6 +933,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_PRE_FAULT_MEMORY 236
+ #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
+ #define KVM_CAP_X86_GUEST_MODE 238
++#define KVM_CAP_ARM_PAGE_TRACKING_DEVICE 239
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
 -- 
 2.40.1
 
