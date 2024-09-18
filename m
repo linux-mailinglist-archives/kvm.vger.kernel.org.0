@@ -1,89 +1,89 @@
-Return-Path: <kvm+bounces-27068-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27069-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A546D97BB24
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 12:56:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A6B97BB2C
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 12:58:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D1E11F24D29
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 10:56:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 808D0B21BA0
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 10:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCEB6184114;
-	Wed, 18 Sep 2024 10:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A782A183CDE;
+	Wed, 18 Sep 2024 10:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Tj8olah6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XBM4siWa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEB2381D5;
-	Wed, 18 Sep 2024 10:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C797381D5;
+	Wed, 18 Sep 2024 10:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726656969; cv=none; b=GcWM7l0u8DbLb6NqLalBV6o4HX5qRPHCAEp+l8Sc6j9NKNYfIqnZdYCcnjSx8BQ2UNVmwcpPgj4dsBNQLflxCiCFQpccZ0iNkuCyEwNoWxgVZjy7YMggIBSRyNBFArugyeuAbd0b8dSWE6SXeb2hMqSSp0r8a1UPLKxbMCGlGpY=
+	t=1726657097; cv=none; b=p2eNEPGFFNZj7k2yl0QSMcwVnn4w5tCqwVTtHaAOQNvFSXMvTiS/ZWXewFtouF+VNQS4VKHmSGRrObnwoSQAG0/5EYI3JZrB//pv8iatJVHNhePjwLPp7K8uKw5BuGOQf7CT2skd+10lEPqeVS2Udw+rlRQsgXuCHdyU5jvkJ9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726656969; c=relaxed/simple;
-	bh=Nro01JlJOcF/gmso+wpRiJXuo/a9pEqcUHcxwsns3AM=;
+	s=arc-20240116; t=1726657097; c=relaxed/simple;
+	bh=31Yqfc96Kwmb4Zv3GI1bzHl73m80mXFJXQu6DDhpvys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cKftFLZc5hXMAqg4KT6s3MNELubHA70SWb0fpUE3FHU9FMtIHposRgErBz0tQdeBVnpXjdBzu0wt/jbzwXhyFI/Elu+diCPXLjN2Bbah6EvzGmHLZU6N1SrfNPUn3DmgL7ENy89/EAgRq3jW6s/ai+7JGlGn2lUXO3WwhMqMUtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Tj8olah6; arc=none smtp.client-ip=148.163.158.5
+	 Content-Type:Content-Disposition:In-Reply-To; b=LLFvgZkdrha6P4xUWsSl7T89CB0ErT2h7n0qw2j4yqC58hXEsXO37j3OBW4pOrNOAYbrp8O3+AlfbgRBDRQvgKHrBKJLAme92KKjdlyM4nuP+5Es6rTbbCff/m9E34ZWA8/fWK+qw/QBTVEKo2ZHXdy7WX7NXReUCFMo5IOQHrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XBM4siWa; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48HMxBek031399;
-	Wed, 18 Sep 2024 10:56:04 GMT
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48I9O08D031821;
+	Wed, 18 Sep 2024 10:58:14 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
 	:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pp1; bh=ivHy+iQh2TUSLbk1lfjRppjXKAY
-	RZ3lZ1bgiuF0ozXY=; b=Tj8olah6UTJYOgimorHOffM4YVQD88u8GdMIwBOq/mz
-	LdAqUIffP0RJxiO808SExzdAU/K8+q6uOmuHaHp0GMhGqNnJJkGKtKX8npf/SGug
-	Bwzg1TgjpTw0GRa6THPrMFyCDEH2bSkeqPFnR4tQMRH6Ab+aU/UgQQIR0ipXPBPf
-	9skayiBhpLCkAWqcd5/lbzyJBUMp5+678y0XuIfszVjCUq9dXZ2HfYQ71tPHKCZW
-	d0FEORkxws1dXafQ94SxOA3RDjhckaCGYNxZzAuDk15OgLNg/0TO0WQZalUpB6Mm
-	pVXLeS9r4nenwHLVpQz1irWdT8baOVMPR2voCrj+Waw==
+	:content-type:in-reply-to; s=pp1; bh=UKpjdqTlzkAJNuludSllQjJTRen
+	ZBzB1GmHuh4gwGRA=; b=XBM4siWayRAiE82E5+BdUemTuvaqUA21mxIm9rQNyKg
+	7YY7a5aExicDPi923D5p54b/ZX3a2IAnFkOBoOfxomyYeMVDmyhkf5mOeYtQbUzz
+	rLI9/d7kmJ1bvvRl9DlDfkibhofPwTQUW7vYakz6cNsUaSH81kOUIqdC+hyjrEeH
+	ATr1gw+vVRwjZ4c23pnm78cmb8Tzqwu1sRUtR+5go8TmyCCwVyeeIdOGwnIkNMXN
+	LpgXIpo9YLfE51D3k9EqpjK1WwHl9Ko3GuiHsFYmOx7aNpAMMsUDsKp+/nFPq57r
+	AEKrawPrUyoyK+z0AdCjVB/zrYumb3wLQ0DOSWmDNhg==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n3vnw0ad-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n3ujdcuk-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Sep 2024 10:56:04 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48IAu4lM005785;
-	Wed, 18 Sep 2024 10:56:04 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n3vnw0a8-1
+	Wed, 18 Sep 2024 10:58:14 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48IAwDC5023047;
+	Wed, 18 Sep 2024 10:58:13 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n3ujdcug-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Sep 2024 10:56:04 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48I8oXqO001871;
-	Wed, 18 Sep 2024 10:56:03 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 41nqh3t6xp-1
+	Wed, 18 Sep 2024 10:58:13 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48I98tRE001960;
+	Wed, 18 Sep 2024 10:58:12 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41nmtutt69-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Sep 2024 10:56:03 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48IAtxml40763834
+	Wed, 18 Sep 2024 10:58:12 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48IAw9BY44106204
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Sep 2024 10:55:59 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C1A3620040;
-	Wed, 18 Sep 2024 10:55:59 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A037420043;
-	Wed, 18 Sep 2024 10:55:59 +0000 (GMT)
+	Wed, 18 Sep 2024 10:58:09 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7252020043;
+	Wed, 18 Sep 2024 10:58:09 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 51ED520040;
+	Wed, 18 Sep 2024 10:58:09 +0000 (GMT)
 Received: from osiris (unknown [9.152.212.60])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 18 Sep 2024 10:55:59 +0000 (GMT)
-Date: Wed, 18 Sep 2024 12:55:57 +0200
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 18 Sep 2024 10:58:09 +0000 (GMT)
+Date: Wed, 18 Sep 2024 12:58:07 +0200
 From: Heiko Carstens <hca@linux.ibm.com>
 To: Nico Boehr <nrb@linux.ibm.com>
 Cc: borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
         david@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] KVM: s390: gaccess: check if guest address is in
- memslot
-Message-ID: <20240918105557.6794-B-hca@linux.ibm.com>
+Subject: Re: [PATCH v1 2/2] KVM: s390: Change virtual to physical address
+ access in diag 0x258 handler
+Message-ID: <20240918105807.6794-C-hca@linux.ibm.com>
 References: <20240917151904.74314-1-nrb@linux.ibm.com>
- <20240917151904.74314-2-nrb@linux.ibm.com>
+ <20240917151904.74314-3-nrb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,89 +92,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240917151904.74314-2-nrb@linux.ibm.com>
+In-Reply-To: <20240917151904.74314-3-nrb@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 490CDxhU7fBMnL1CgBJeOebs1dESGUd8
-X-Proofpoint-GUID: 5UaRTxsro-tytv5273cnNEMINoeUhyhl
+X-Proofpoint-ORIG-GUID: 3qXRF2aNPcfRFuRlz04f7Ew8e2rQxMQD
+X-Proofpoint-GUID: pM4tG90lCkmlGvqYWAoNg5NnHvJoPmHF
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-18_09,2024-09-16_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- priorityscore=1501 phishscore=0 clxscore=1015 malwarescore=0 bulkscore=0
- impostorscore=0 spamscore=0 suspectscore=0 mlxscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2409180069
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=627 adultscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
+ clxscore=1015 bulkscore=0 suspectscore=0 mlxscore=0 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409180069
 
-On Tue, Sep 17, 2024 at 05:18:33PM +0200, Nico Boehr wrote:
-> Previously, access_guest_page() did not check whether the given guest
-> address is inside of a memslot. This is not a problem, since
-> kvm_write_guest_page/kvm_read_guest_page return -EFAULT in this case.
-...
-> To be able to distinguish these two cases, return PGM_ADDRESSING in
-> access_guest_page() when the guest address is outside guest memory. In
-> access_guest_real(), populate vcpu->arch.pgm.code such that
-> kvm_s390_inject_prog_cond() can be used in the caller for injecting into
-> the guest (if applicable).
+On Tue, Sep 17, 2024 at 05:18:34PM +0200, Nico Boehr wrote:
+> From: Michael Mueller <mimu@linux.ibm.com>
 > 
-> Since this adds a new return value to access_guest_page(), we need to make
-> sure that other callers are not confused by the new positive return value.
+> The parameters for the diag 0x258 are real addresses, not virtual, but
+> KVM was using them as virtual addresses. This only happened to work, since
+> the Linux kernel as a guest used to have a 1:1 mapping for physical vs
+> virtual addresses.
 > 
-> There are the following users of access_guest_page():
-> - access_guest_with_key() does the checking itself (in
->   guest_range_to_gpas()), so this case should never happen. Even if, the
->   handling is set up properly.
-> - access_guest_real() just passes the return code to its callers, which
->   are:
->     - read_guest_real() - see below
->     - write_guest_real() - see below
+> Fix KVM so that it correctly uses the addresses as real addresses.
 > 
-> There are the following users of read_guest_real():
-> - ar_translation() in gaccess.c which already returns PGM_*
-
-With this patch you actually fix a bug in ar_translation(), where two
-read_guest_real() invocations might have returned -EFAULT instead of
-the correct PGM_ADDRESSING.
-
-Looks like the author assumed read_guest_real() would do the right
-thing. See commit 664b49735370 ("KVM: s390: Add access register mode").
-
-> Fixes: 2293897805c2 ("KVM: s390: add architecture compliant guest access functions")
 > Cc: stable@vger.kernel.org
+> Fixes: 8ae04b8f500b ("KVM: s390: Guest's memory access functions get access registers")
+> Suggested-by: Vasily Gorbik <gor@linux.ibm.com>
+> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+> [ nrb: drop tested-by tags ]
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This shouldn't be part of the commit message.
+
 > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > ---
->  arch/s390/kvm/gaccess.c |  7 +++++++
->  arch/s390/kvm/gaccess.h | 14 ++++++++------
->  2 files changed, 15 insertions(+), 6 deletions(-)
+>  arch/s390/kvm/diag.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index e65f597e3044..004047578729 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -828,6 +828,9 @@ static int access_guest_page(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
->  	const gfn_t gfn = gpa_to_gfn(gpa);
->  	int rc;
->  
-> +	if (!gfn_to_memslot(kvm, gfn))
-> +		return PGM_ADDRESSING;
-> +
->  	if (mode == GACC_STORE)
->  		rc = kvm_write_guest_page(kvm, gfn, data, offset, len);
-
-It would be nice to not add random empty lines to stay consistent with the
-existing coding style.
-
->  	}
-> +
-> +	if (rc > 0)
-> +		vcpu->arch.pgm.code = rc;
-> +
->  	return rc;
->  }
-
-Same here.
-
-But whoever applies this can change this, or not.
-
-In any case:
 Reviewed-by: Heiko Carstens <hca@linux.ibm.com>
 
