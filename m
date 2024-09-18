@@ -1,132 +1,182 @@
-Return-Path: <kvm+bounces-27061-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27062-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9EA697B6AB
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 04:05:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A81397B78A
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 07:52:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8ABDB1F23354
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 02:05:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AF3F2871AE
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 05:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9AF60B8A;
-	Wed, 18 Sep 2024 02:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49F1156225;
+	Wed, 18 Sep 2024 05:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmvMj4Vn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4457C21364
-	for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 02:05:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7CD136327;
+	Wed, 18 Sep 2024 05:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726625145; cv=none; b=emoYsq0+uZZPntwzI9IH8I8urCIMBUCnBr6m7jeKsUzwthQT3PUtSb8U1FJFBaEhHSYCti86omwT5Eshog1q2TAbM0uZZQtL8A51ylMb0K8mMo/6lJB272vbgn50yRB3WLbc9mVnFilERogrgJputbre2uWNgzi1vI5wtIA4Bzw=
+	t=1726638719; cv=none; b=WkOpL7M19c6tnVJvyD/hPYLoYf+e2eTyDQq26EeHchjFER8/YwIDITdu5x33Ezfsuzh+mDnMw738dN1e3x62lFroVRu81Y/vTDtzMHDX6W+/pG/aUZC+y9TV4kSnRCYiADovgErzbbNTprK/k5D9pUzI+glMiATv+eLYzUCAQp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726625145; c=relaxed/simple;
-	bh=ja0bMnkN4tal4/Qm2vECx9zbDlKn9vDet4Fh//EDTdM=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=XlpG1r/dAYHgP8Lhimow/lIaHMK98e1JH5MMErG3jQaouDVR1IcJXlQJmgUlQ3L5jm8OVf5n6ZP4bv2KAwjrYYeiTpRAnpJzxRg8dRteXd6XoZyFnNCcDUmKGwCf1jA1bttVeBHlgGBlVlLPKgh4UhwANFEY+R0e55R31MO8f9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.184])
-	by gateway (Coremail) with SMTP id _____8BxfeptNepmnGUKAA--.24561S3;
-	Wed, 18 Sep 2024 10:05:33 +0800 (CST)
-Received: from [10.20.42.184] (unknown [10.20.42.184])
-	by front1 (Coremail) with SMTP id qMiowMBxHeRpNepmN0EJAA--.53205S3;
-	Wed, 18 Sep 2024 10:05:32 +0800 (CST)
-Subject: Re: [PATCH] LoongArch: KVM: Ensure ret is always initialized in
- kvm_eiointc_{read,write}()
-To: Nathan Chancellor <nathan@kernel.org>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev, llvm@lists.linux.dev,
- patches@lists.linux.dev
-References: <20240916-loongarch-kvm-eiointc-fix-sometimes-uninitialized-v1-1-85142dcb2274@kernel.org>
-From: lixianglai <lixianglai@loongson.cn>
-Message-ID: <9c7e4360-3f77-035f-edb9-61dcfe239a29@loongson.cn>
-Date: Wed, 18 Sep 2024 10:05:10 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1726638719; c=relaxed/simple;
+	bh=k4p5yAWG1/S7eqbUX0zVSAQcPzHPeBPvL5Uur8qzQXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ob6ruO1uFjhSGql55rh/a/83K371O6FMUIAR+Hgy+MATdYYA5rLxzV9QJDoSqciQklRIdqbGgAT+8V3j5vNF2dUdjtz3FrVs0oRZJUEXgRoKbgPNccYNLi+laiEphYqFhG73TLPyxDn8VyfQv8TOJeX2eTC7IA+5p2lC+SAZ4sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmvMj4Vn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CC3C4CEC3;
+	Wed, 18 Sep 2024 05:51:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726638718;
+	bh=k4p5yAWG1/S7eqbUX0zVSAQcPzHPeBPvL5Uur8qzQXg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NmvMj4Vno/SD/Lxb/VrmunICZNou7xy3jI904aeaU+2RWv/oQAeHzrsUZhlAxnK38
+	 m19Py8rK9HSNtGAlkBKUrp/a5Tw7uyWu+tm2REdoni3IJUK7mstBogdzIOvNyOjAit
+	 ktuxvgC08XvjkcFIvy2iSLfzpfXlvZgasnTM18u0nLEzRP0Hd+O/rXbi0y3yhi8GGE
+	 ilhr1D8N3E+N/1LgwTLzW3gydvbcEd8tFK1r22AcTJZrYpjMQvDZUwLwMjV869m1ec
+	 AJnoOd/Lw+PV2i91v52ltZz0oRyFvpoMsqH5EAh3Cy//GmUX5EKhIJc9a40Q0beMUI
+	 6HNAh4UYf6b7Q==
+Date: Wed, 18 Sep 2024 07:48:54 +0200
+From: Mike Rapoport <rppt@kernel.org>
+To: Patrick Roy <roypat@amazon.co.uk>
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, rostedt@goodmis.org,
+	mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, quic_eberman@quicinc.com,
+	dwmw@amazon.com, david@redhat.com, tabba@google.com,
+	linux-mm@kvack.org, dmatlack@google.com, graf@amazon.com,
+	jgowans@amazon.com, derekmn@amazon.com, kalyazin@amazon.com,
+	xmarcalx@amazon.com
+Subject: Re: [RFC PATCH v2 01/10] kvm: gmem: Add option to remove gmem from
+ direct map
+Message-ID: <Zuppxn_uW5JhDBjR@kernel.org>
+References: <20240910163038.1298452-1-roypat@amazon.co.uk>
+ <20240910163038.1298452-2-roypat@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240916-loongarch-kvm-eiointc-fix-sometimes-uninitialized-v1-1-85142dcb2274@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowMBxHeRpNepmN0EJAA--.53205S3
-X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7ZFW7KrykZw4xJFyxurW3urX_yoW8ZrW5pF
-	1UZw4kCrs5Xrykta4Dt3WrWF4jqa95Gr17uFyYqFW2kF4UZF9xZ340yrZIgFyYkws7Jr40
-	qF1F93WYvan0y3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
-	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8j-e5UU
-	UUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240910163038.1298452-2-roypat@amazon.co.uk>
 
-Hi Nathan Chancellor :
-
-Thank you very much for pointing out the problem,
-I will integrate this patch in the next version.
-
-Thanks!
-Xianglai.
-
-> Clang warns (or errors with CONFIG_WERROR=y):
->
->    arch/loongarch/kvm/intc/eiointc.c:512:2: error: variable 'ret' is used uninitialized whenever switch default is taken [-Werror,-Wsometimes-uninitialized]
->      512 |         default:
->          |         ^~~~~~~
->    arch/loongarch/kvm/intc/eiointc.c:716:2: error: variable 'ret' is used uninitialized whenever switch default is taken [-Werror,-Wsometimes-uninitialized]
->      716 |         default:
->          |         ^~~~~~~
->
-> Set ret to -EINVAL in the default case to resolve the warning, as len
-> was not a valid value for the functions to handle.
->
-> Fixes: f810ef038c66 ("LoongArch: KVM: Add EIOINTC read and write functions")
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+On Tue, Sep 10, 2024 at 05:30:27PM +0100, Patrick Roy wrote:
+> Add a flag to the KVM_CREATE_GUEST_MEMFD ioctl that causes gmem pfns
+> to be removed from the host kernel's direct map. Memory is removed
+> immediately after allocation and preparation of gmem folios (after
+> preparation, as the prepare callback might expect the direct map entry
+> to be present). Direct map entries are restored before
+> kvm_arch_gmem_invalidate is called (as ->invalidate_folio is called
+> before ->free_folio), for the same reason.
+> 
+> Use the PG_private flag to indicate that a folio is part of gmem with
+> direct map removal enabled. While in this patch, PG_private does have a
+> meaning of "folio not in direct map", this will no longer be true in
+> follow up patches. Gmem folios might get temporarily reinserted into the
+> direct map, but the PG_private flag needs to remain set, as the folios
+> will have private data that needs to be freed independently of direct
+> map status. This is why kvm_gmem_folio_clear_private does not call
+> folio_clear_private.
+> 
+> kvm_gmem_{set,clear}_folio_private must be called with the folio lock
+> held.
+> 
+> To ensure that failures in kvm_gmem_{clear,set}_private do not cause
+> system instability due to leaving holes in the direct map, try to always
+> restore direct map entries on failure. Pages for which restoration of
+> direct map entries fails are marked as HWPOISON, to prevent the
+> kernel from ever touching them again.
+> 
+> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
 > ---
->   arch/loongarch/kvm/intc/eiointc.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/intc/eiointc.c
-> index 414e4ffd69173dc248ba0042bed3bebdc11700e3..e5d23f0da055c97c0e4ba6705f6b71d89846f42a 100644
-> --- a/arch/loongarch/kvm/intc/eiointc.c
-> +++ b/arch/loongarch/kvm/intc/eiointc.c
-> @@ -512,6 +512,7 @@ static int kvm_eiointc_write(struct kvm_vcpu *vcpu,
->   	default:
->   		WARN_ONCE(1, "%s: Abnormal address access:addr 0x%llx,size %d\n",
->   						__func__, addr, len);
-> +		ret = -EINVAL;
->   	}
->   	loongarch_ext_irq_unlock(eiointc, flags);
->   	return ret;
-> @@ -716,6 +717,7 @@ static int kvm_eiointc_read(struct kvm_vcpu *vcpu,
->   	default:
->   		WARN_ONCE(1, "%s: Abnormal address access:addr 0x%llx,size %d\n",
->   						__func__, addr, len);
-> +		ret = -EINVAL;
->   	}
->   	loongarch_ext_irq_unlock(eiointc, flags);
->   	return ret;
->
-> ---
-> base-commit: 357da696640e1db8fc8829a4dd1bb2d0402169b5
-> change-id: 20240916-loongarch-kvm-eiointc-fix-sometimes-uninitialized-e17b039d2813
->
-> Best regards,
+>  include/uapi/linux/kvm.h |  2 +
+>  virt/kvm/guest_memfd.c   | 96 +++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 91 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 637efc0551453..81b0f4a236b8c 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1564,6 +1564,8 @@ struct kvm_create_guest_memfd {
+>  	__u64 reserved[6];
+>  };
+>  
+> +#define KVM_GMEM_NO_DIRECT_MAP			(1ULL << 0)
+> +
+>  #define KVM_PRE_FAULT_MEMORY	_IOWR(KVMIO, 0xd5, struct kvm_pre_fault_memory)
+>  
+>  struct kvm_pre_fault_memory {
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 1c509c3512614..2ed27992206f3 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -4,6 +4,7 @@
+>  #include <linux/kvm_host.h>
+>  #include <linux/pagemap.h>
+>  #include <linux/anon_inodes.h>
+> +#include <linux/set_memory.h>
+>  
+>  #include "kvm_mm.h"
+>  
+> @@ -49,8 +50,69 @@ static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct fol
+>  	return 0;
+>  }
+>  
+> +static bool kvm_gmem_test_no_direct_map(struct inode *inode)
+> +{
+> +	return ((unsigned long)inode->i_private & KVM_GMEM_NO_DIRECT_MAP) == KVM_GMEM_NO_DIRECT_MAP;
+> +}
+> +
+> +static int kvm_gmem_folio_set_private(struct folio *folio)
+> +{
+> +	unsigned long start, npages, i;
+> +	int r;
+> +
+> +	start = (unsigned long) folio_address(folio);
+> +	npages = folio_nr_pages(folio);
+> +
+> +	for (i = 0; i < npages; ++i) {
+> +		r = set_direct_map_invalid_noflush(folio_page(folio, i));
+> +		if (r)
+> +			goto out_remap;
+> +	}
 
+I feels like we need a new helper that takes care of contiguous pages.
+arm64 already has set_memory_valid(), so it may be something like
+
+	int set_direct_map_valid_noflush(struct page *p, unsigned nr, bool valid);
+
+> +	flush_tlb_kernel_range(start, start + folio_size(folio));
+> +	folio_set_private(folio);
+> +	return 0;
+> +out_remap:
+> +	for (; i > 0; i--) {
+> +		struct page *page = folio_page(folio, i - 1);
+> +
+> +		if (WARN_ON_ONCE(set_direct_map_default_noflush(page))) {
+> +			/*
+> +			 * Random holes in the direct map are bad, let's mark
+> +			 * these pages as corrupted memory so that the kernel
+> +			 * avoids ever touching them again.
+> +			 */
+> +			folio_set_hwpoison(folio);
+> +			r = -EHWPOISON;
+> +		}
+> +	}
+> +	return r;
+> +}
+> +
+
+-- 
+Sincerely yours,
+Mike.
 
