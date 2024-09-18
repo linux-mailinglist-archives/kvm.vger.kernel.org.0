@@ -1,208 +1,209 @@
-Return-Path: <kvm+bounces-27065-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27067-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BDDF97B978
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 10:37:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63CA797BB17
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 12:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30E33282C0E
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 08:37:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 247F2281CBC
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 10:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7D117CA02;
-	Wed, 18 Sep 2024 08:36:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5847C1862B9;
+	Wed, 18 Sep 2024 10:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="iifoiFoa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gb2YmsS5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5353317798F;
-	Wed, 18 Sep 2024 08:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFCB717B401;
+	Wed, 18 Sep 2024 10:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726648603; cv=none; b=OTg1Z6PZCGdw4Rm+rYupLakLA4UzGQxpkmGNpyT29IoTvhWHmRCIHakqMrOxBicRTOAdcfJ1rCShH02Qt3pjucsKR1GYWEzsVBHqC8QsU72j+wqGJF50xsVUkmFbw1htNVGOVns65x8edSvEfQ52pqIYssg4OVCPPuovvm3ge8o=
+	t=1726656489; cv=none; b=CVdtxvbZn3bFHUdU8M6PtJIs94V/ufCsHBB9N4lTv8XbGxFtU5LoyGlPnus6ehU5DP+f7ZeI4raAijzHAG0mvKJhBVegYaZaHSnN7nO12rZFN8S5YRu0n+/hxhYDXL72rA/w3lAVBajzbf2rtaB5898fiySqntl7uO87ULfoC2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726648603; c=relaxed/simple;
-	bh=SPlYo2wbVPtywFZJvGZL5i8i+ocFuBwmMn6s5v97xHY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gbpA+aeVes0xDbMdMQC35PPLtA2zo9scLPQX1HktqNOfHblRwXr8ASRqVfKJt+9PtzdNM0OycdmQJAEVCaF7oZLHLnU6/ZEUoXo72eNe5Ux+IEI8PFGELD9CWvvSRmVdqZItuZQ3kdOVQUFxKGK70WlSrQaRcSyFlGnQG91he2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=iifoiFoa; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.205] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 48I8ZpZx1114904
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 18 Sep 2024 01:35:52 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 48I8ZpZx1114904
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024091601; t=1726648555;
-	bh=x2GclNT1jGzmcwnuPezDBelGlqN1/8ggygWx7Pfpj6A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=iifoiFoays4n2azeZw/XhgYRM2pwAMUNJTTSYdaIl+wLZlRFZye+Ff6YDMk8jblpR
-	 FCMuZZEJzGngGPObV982xZ8nFfvP+GkfHvPiLkPDOzwCrXdyKO6Zt2b1FdZaLYA6d0
-	 4yIJlgFYqG7Ew/MdHaW1bDCBYU8PztXl0uwwRFTqbGIF8DKXVBwympsBtbeURKIIut
-	 W9w4bnV1Q50Zs4ZV138U7SjEk4oklNRFCOHuLnBQnUwiRTt3umeYpoRPI6lCJj1czi
-	 3xz6v9eutDFpTTn4Dswsg5z8gRav0GmzEheCza9k6KMYunAb33RLiOFqyz6yip0tAN
-	 lE4zIHGzntXmw==
-Message-ID: <d65e62d2-ca64-4b29-8656-bb8411fe837d@zytor.com>
-Date: Wed, 18 Sep 2024 01:35:51 -0700
+	s=arc-20240116; t=1726656489; c=relaxed/simple;
+	bh=TiIy7EfGXyCmAuvsoen3rZWUqqgVpPDNqDz5ADa6soM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CZl/m1dR+DREkTF3MipfZndP2sEZ2nnL5b0xjmhWjZJeQrAajPUbU6cDiRiMmkXopt7faNoigArHfP+bUqNBpbpM8Hr5efChukCKwTIX38ArqEUlhw0G+3Dq2rw+Eu+cBhQ0hfP2jER12a7G3IVn9Kw1kVNUAD4MiXA01dzki0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gb2YmsS5; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726656488; x=1758192488;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TiIy7EfGXyCmAuvsoen3rZWUqqgVpPDNqDz5ADa6soM=;
+  b=Gb2YmsS52OqKh/nG8i/gMnJzA51opXYFTR7Zh8mnSrKFocIWDRlQAU+z
+   Hug/X8atK1jyy+I1b6rlzhAHAUbCCNcd9oZy8meQlayCsHb+bY2AWJQ2c
+   TyGL5A8ma/1kFW9A3ewoq/XgFRDXk7LvfuowE1lgt1G+HXvPLLKDwDixv
+   Q6ALX0Np+Br50Ego6A8mTACKZNHSta5wKG2xHw57JH41wsHcyBxM2MDzq
+   qQUmrq7ecu+4G3vW9fwlJsTqIkb0frHQUdgw7pIXLh8PKkJgU+LMKaGyi
+   QoA8ghdLjlq/QrI/WPFmXipupotyEya9+vOlBK+yaCZvpD+XhmGKk71Qr
+   Q==;
+X-CSE-ConnectionGUID: SWaxycP5Sp60FTn38JVV4w==
+X-CSE-MsgGUID: A/1XsqVRSHyJ3/r8XoXSkg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11198"; a="36228035"
+X-IronPort-AV: E=Sophos;i="6.10,238,1719903600"; 
+   d="scan'208";a="36228035"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 03:48:07 -0700
+X-CSE-ConnectionGUID: r1ktb154Qomnw/3/dLbBPw==
+X-CSE-MsgGUID: +YEmRqY1RuCSlWKwZz3t1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,238,1719903600"; 
+   d="scan'208";a="73864529"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa005.fm.intel.com with ESMTP; 18 Sep 2024 03:48:02 -0700
+Date: Wed, 18 Sep 2024 18:45:14 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Zhi Wang <zhiw@nvidia.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+	"Williams, Dan J" <dan.j.williams@intel.com>,
+	Zhi Wang <zhiwang@kernel.org>, Alexey Kardashevskiy <aik@amd.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	"pratikrajesh.sampat@amd.com" <pratikrajesh.sampat@amd.com>,
+	"michael.day@amd.com" <michael.day@amd.com>,
+	"david.kaplan@amd.com" <david.kaplan@amd.com>,
+	"dhaval.giani@amd.com" <dhaval.giani@amd.com>,
+	Santosh Shukla <santosh.shukla@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Michael Roth <michael.roth@amd.com>, Alexander Graf <agraf@suse.de>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>
+Subject: Re: [RFC PATCH 11/21] KVM: SEV: Add TIO VMGEXIT and bind TDI
+Message-ID: <ZuqvOt1WEn/Pa/wQ@yilunxu-OptiPlex-7050>
+References: <20240823132137.336874-1-aik@amd.com>
+ <20240823132137.336874-12-aik@amd.com>
+ <20240913165011.000028f4.zhiwang@kernel.org>
+ <66e4b7fabf8df_ae21294c7@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+ <BN9PR11MB527607712924E6574159C4908C662@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20240914081946.000079ae.zhiw@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/25] KVM: VMX: Set intercept for FRED MSRs
-To: Sean Christopherson <seanjc@google.com>
-Cc: Chao Gao <chao.gao@intel.com>, Xin Li <xin3.li@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, shuah@kernel.org, vkuznets@redhat.com,
-        peterz@infradead.org, ravi.v.shankar@intel.com
-References: <20240207172646.3981-1-xin3.li@intel.com>
- <20240207172646.3981-8-xin3.li@intel.com> <ZiJzFsoHR41Sd8lE@chao-email>
- <ZmoT0jaX_3Ww3Uzu@google.com>
- <feefa9d1-f266-414f-bb7b-b770ef0d8ec6@zytor.com>
- <ZuNJlzXntREQVb3n@google.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <ZuNJlzXntREQVb3n@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240914081946.000079ae.zhiw@nvidia.com>
 
->> MSR_IA32_FRED_SSP0 is an alias of the CET MSR_IA32_PL0_SSP and likely to
->> be used in the same way as FRED RSP0, i.e., host FRED SSP0 _should_ be
->> restored in arch_exit_to_user_mode_prepare().  However as of today Linux
->> has no plan to utilize kernel shadow stack thus no one cares host FRED
->> SSP0 (no?).  But lets say anyway it is host's responsibility to manage
->> host FRED SSP0, then KVM only needs to take care of guest FRED SSP0
->> (just like how KVM should handle guest FRED RSP0) even before the
->> supervisor shadow stack feature is advertised to guest.
+On Sat, Sep 14, 2024 at 08:19:46AM +0300, Zhi Wang wrote:
+> On Sat, 14 Sep 2024 02:47:27 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
 > 
-> Heh, I'm not sure what your question is, or if there even is a question.  KVM
-> needs to context switch FRED SSP0 if FRED is exposed to the guest, but presumably
-> that will be done through XSAVE state?  If that's the long term plan, I would
-> prefer to focus on merging CET virtualization first, and then land FRED virtualization
-> on top so that KVM doesn't have to carry intermediate code to deal with the aliased
-> MSR.
+> > > From: Dan Williams <dan.j.williams@intel.com>
+> > > Sent: Saturday, September 14, 2024 6:09 AM
+> > > 
+> > > Zhi Wang wrote:
+> > > > On Fri, 23 Aug 2024 23:21:25 +1000
+> > > > Alexey Kardashevskiy <aik@amd.com> wrote:
+> > > >
+> > > > > The SEV TIO spec defines a new TIO_GUEST_MESSAGE message to
+> > > > > provide a secure communication channel between a SNP VM and
+> > > > > the PSP.
+> > > > >
+> > > > > The defined messages provide way to read TDI info and do secure
+> > > > > MMIO/DMA setup.
+> > > > >
+> > > > > On top of this, GHCB defines an extension to return
+> > > > > certificates/ measurements/report and TDI run status to the VM.
+> > > > >
+> > > > > The TIO_GUEST_MESSAGE handler also checks if a specific TDI
+> > > > > bound to the VM and exits the KVM to allow the userspace to
+> > > > > bind it.
+> > > > >
+> > > >
+> > > > Out of curiosity, do we have to handle the TDI bind/unbind in the
+> > > > kernel space? It seems we are get the relationship between
+> > > > modules more complicated. What is the design concern that letting
+> > > > QEMU to handle the TDI bind/unbind message, because QEMU can talk
+> > > > to VFIO/KVM and also
+> > > TSM.
+> > > 
+> > > Hmm, the flow I have in mind is:
+> > > 
+> > > Guest GHCx(BIND) => KVM => TSM GHCx handler => VFIO state update +
+> > > TSM low-level BIND
+> > > 
+> > > vs this: (if I undertand your question correctly?)
+> > > 
+> > > Guest GHCx(BIND) => KVM => TSM GHCx handler => QEMU => VFIO => TSM
+> > > low-level BIND
+> > 
+> > Reading this patch appears that it's implemented this way except QEMU
+> > calls a KVM_DEV uAPI instead of going through VFIO (as Yilun
+> > suggested).
+> > 
+> > > 
+> > > Why exit to QEMU only to turn around and call back into the kernel?
+> > > VFIO should already have the context from establishing the vPCI
+> > > device as "bind-capable" at setup time.
 
-You mean the following patch set, right?
+Previously we tried to do host side "bind-capable" setup (TDI context
+creation required by firmware but no LOCK) at setup time. But didn't
+see enough value, only to make the error recovery flow more complex. So
+now I actually didn't see much work to do for "bind-capable", just to
+mark the device as can-be-private. I.e. the context from establishing
+the vPCI device are moved to GHCx BIND phase.
 
-https://lore.kernel.org/kvm/20240531090331.13713-1-weijiang.yang@intel.com/
+> > > 
+> > 
+> > The general practice in VFIO is to design things around userspace
+> > driver control over the device w/o assuming the existence of KVM.
+> > When VMM comes to the picture the interaction with KVM is minimized
+> > unless for functional or perf reasons.
+> > 
+> > e.g. KVM needs to know whether an assigned device allows non-coherent
+> > DMA for proper cache control, or mdev/new vIOMMU object needs
+> > a reference to struct kvm, etc. 
+> > 
+> > sometimes frequent trap-emulates is too costly then KVM/VFIO may
+> > enable in-kernel acceleration to skip Qemu via eventfd, but in 
+> > this case the slow-path via Qemu has been firstly implemented.
+> > 
+> > Ideally BIND/UNBIND is not a frequent operation, so falling back to
+> > Qemu in a longer path is not a real problem. If no specific
+> > functionality or security reason for doing it in-kernel, I'm inclined
+> > to agree with Zhi here (though not about complexity).
 
-I think it's probably better to do so.  Otherwise a patch to explicitly
-save/restore FRED SSP0 would be needed before the CET patch set lands
-and then reverted immediately after:
+I agree GHCx BIND/UNBIND been routed to QEMU, cause there are host side
+cross module managements for BIND/UNBIND. E.g. IOMMUFD page table
+switching, VFIO side settings that builds host side TDI context & LOCK
+TDI.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f828f03d48ab..c790cb7a7d6b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1343,8 +1343,10 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu 
-*vcpu)
+But I do support other GHCx calls between BIND/UNBIND been directly
+route to TSM low-level. E.g. get device interface report, get device
+certification/measurement, TDISP RUN. It is because these communications
+are purely for CoCo-VM, firmware and TDI. Host is totally out of its
+business and worth nothing to pass these requirements to QEMU/VFIO and
+still back into TSM low-level.
 
-         wrmsrl(MSR_KERNEL_GS_BASE, vmx->msr_guest_kernel_gs_base);
+Thanks,
+Yilun
 
--       if (cpu_feature_enabled(X86_FEATURE_FRED) && guest_can_use(vcpu, 
-X86_FEATURE_FRED))
-+       if (cpu_feature_enabled(X86_FEATURE_FRED) && guest_can_use(vcpu, 
-X86_FEATURE_FRED)) {
-                 wrmsrns(MSR_IA32_FRED_RSP0, vmx->msr_guest_fred_rsp0);
-+               wrmsrns(MSR_IA32_FRED_SSP0, vmx->msr_guest_fred_ssp0);
-+       }
-  #else
-         savesegment(fs, fs_sel);
-         savesegment(gs, gs_sel);
-@@ -1393,6 +1395,8 @@ static void vmx_prepare_switch_to_host(struct 
-vcpu_vmx *vmx)
-         if (cpu_feature_enabled(X86_FEATURE_FRED) && 
-guest_can_use(&vmx->vcpu, X86_FEATURE_FRED)) {
-                 vmx->msr_guest_fred_rsp0 = read_msr(MSR_IA32_FRED_RSP0);
-                 fred_sync_rsp0(vmx->msr_guest_fred_rsp0);
-+
-+               vmx->msr_guest_fred_ssp0 = read_msr(MSR_IA32_FRED_SSP0);
-         }
-  #endif
-         load_fixmap_gdt(raw_smp_processor_id());
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 9012428984de..d1b9352f56c7 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -282,6 +282,7 @@ struct vcpu_vmx {
-         u64                   msr_host_kernel_gs_base;
-         u64                   msr_guest_kernel_gs_base;
-         u64                   msr_guest_fred_rsp0;
-+       u64                   msr_guest_fred_ssp0;
-  #endif
-
-         u64                   spec_ctrl;
-
+> > 
+> > 
 > 
-> Ugh, but what happens if a CPU (or the host kernel) supports FRED but not CET SS?
-> Or is that effectively an illegal combination?
-
-The FRED Spec says:
-
-IA32_FRED_SSP1, IA32_FRED_SSP2, and IA32_FRED_SSP3 (MSR indices 1D1H–
-1D3H). Together with the existing MSR IA32_PL0_SSP (MSR index 6A4H), 
-these are the FRED SSP MSRs.
-
-The FRED SSP MSRs are supported by any processor that enumerates
-CPUID.(EAX=7,ECX=1):EAX.FRED[bit 17] as 1. If such a processor does not 
-support CET, FRED transitions will not use the MSRs (because shadow 
-stacks are not enabled), but the MSRs would still be accessible using 
-RDMSR and WRMSR.
-
-
-So they are independent, just that FRED SSP MSRs are NOT used if
-supervisor shadow stacks are not enabled (obviously Qemu can be
-configured to not advertise CET but FRED).
-
-When FRED is advertised to a guest, KVM should allow FRED SSP MSRs
-accesses through disabling FRED SSP MSRs interception no matter whether
-supervisor shadow stacks are enabled or not.
-
-Thanks!
-     Xin
-
+> Exactly what I was thinking. Folks had been spending quite some efforts
+> on keeping VFIO and KVM independent. The existing shortcut calling
+> between two modules is there because there is no other better way to do
+> it.
+> 
+> TSM BIND/UNBIND should not be a performance critical path. Thus falling
+> back to QEMU would be fine. Besides, not sure about others' opinion, I
+> don't think adding tsm_{bind, unbind} in kvm_x86_ops is a good idea.
+> 
+> If we have to stick to the current approach, I think we need more
+> justifications.
+> 
 
