@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-27087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8236D97BE9A
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 17:28:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60AB597BE99
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 17:28:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB344B20F4F
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 15:28:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B296283937
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 15:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CDA1C9879;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A7A1C9877;
 	Wed, 18 Sep 2024 15:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="eQ6up9F0"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="V6N/T07X"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF5F1C984E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852291BAEF4
 	for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 15:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726673305; cv=none; b=RgiJi/sSXj1NYpAahdFS7d0pIoIQF2mw9fZ3hHLEqe+soWwkFITkAccwNoT4exXGJu3+8bm8UlLhj+mos2bIOHhA026ezznrM25vr5VMDLZt1snZlF8e13CQIEO4E/qw9vDAb/8R97qnqz+EEZKBhVoFmv3o0+isi9Nj0kXnv2s=
+	t=1726673305; cv=none; b=U5YEK8xGchT1AAqZyGfLn2WqildbD5dNN43qTUelsy1yCsc6OWaQSG48KhW80p+PKZfyStYInxk2wSlr9iv5T06sXKo+tENhsySJMopN9Gt/8LhueA10B3A9RfIpz2eVLAcObqfF9Z77waVuoVECUe6bu1ACAdZuIl6gpJcNN4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726673305; c=relaxed/simple;
-	bh=TXO4quz4Mn+UlPlrUbatQb4WzsclfIuhR8Ks5+h7PRc=;
+	bh=HvbYUAUuqxfvZVUyVuSjHY5g7ZmMcbW5eX1OPbSI7ak=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uBAZF4xOC+xdgvmNqS9p092IuksJ0J90RUV7xuzfCkrCXQRXliD0+wdLDK1P343d3YshtlO03Cl13BzoKBGjoQ7BEIgg3Iy+3DLuTIcfyS72U0ZXOczPPL+JygFjaZsoiP8hrcgz4DMZacrQ2PFnQSLTImC+L3PAT2ewGYeCK7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=eQ6up9F0; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=NFpeWzdq20M7mkTgHwFwe41A3hliAparvidHB7SBJ2Qrz2qg9mVuCoyKjZ5eLfiP6JmJXsSrBuIijfwKOigCcqOlhupexJVczMbnB/yiM1TuzCrCnPaLOE3bC0tTAk3sxYnE6i7sEWDly1Qc1/tWdxJVqd0cvQLlhXwbEdHoKqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=V6N/T07X; arc=none smtp.client-ip=99.78.197.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1726673304; x=1758209304;
+  t=1726673303; x=1758209303;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=o+1ltl0tHyU5VT0TXuY0ad53zHIQ+Akmv2TZGDLX2Mo=;
-  b=eQ6up9F0R/MqtbXEYkCsmNcT3sSel+JL5np9FsVzlL39tidQpJ79Xa56
-   WifhFeeib63E3RxqLqKVy3hl9mfGLGJ/mKIubWal9kyv5jk4rWofKw6+s
-   9+l+nDHJ+BW63sw2BIH7Q/+vpNUxDrFW1z0Kv40cTqv0dKBaoyqdmLVFY
-   0=;
+  bh=Mrvf5QEc5i3VRcPPRer2E9I3RCr3GLlTIVg8suSOwps=;
+  b=V6N/T07XY/pYp1J6oHHuVvTmKUTrk3BhzbjOBuTdBwxIvPzrPEtJ6I4l
+   80U0W0y9v/7i/1akI90CMHNyRJapqymRAmhc8r3xIicNIhOZcnbi6BNjk
+   psEhfPW/EcKRjKylI/8JjoAX0Hr/Eqa4OX8B5mNohgC8diWYjTjFOc5kH
+   I=;
 X-IronPort-AV: E=Sophos;i="6.10,239,1719878400"; 
-   d="scan'208";a="434305177"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 15:28:21 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.43.254:28715]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.41.159:2525] with esmtp (Farcaster)
- id 3fb400e6-91db-4d62-bc61-38f4ea3463bd; Wed, 18 Sep 2024 15:28:19 +0000 (UTC)
-X-Farcaster-Flow-ID: 3fb400e6-91db-4d62-bc61-38f4ea3463bd
-Received: from EX19D018EUA002.ant.amazon.com (10.252.50.146) by
+   d="scan'208";a="127584803"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 15:28:22 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.43.254:54141]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.8.19:2525] with esmtp (Farcaster)
+ id 4c766550-61e7-4d25-8d36-b3acac605531; Wed, 18 Sep 2024 15:28:20 +0000 (UTC)
+X-Farcaster-Flow-ID: 4c766550-61e7-4d25-8d36-b3acac605531
+Received: from EX19D018EUA003.ant.amazon.com (10.252.50.163) by
  EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 18 Sep 2024 15:28:19 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
- EX19D018EUA002.ant.amazon.com (10.252.50.146) with Microsoft SMTP Server
+ Wed, 18 Sep 2024 15:28:20 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (10.250.64.231) by
+ EX19D018EUA003.ant.amazon.com (10.252.50.163) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 18 Sep 2024 15:28:19 +0000
+ Wed, 18 Sep 2024 15:28:20 +0000
 Received: from email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com
- (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.228) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Wed, 18 Sep 2024 15:28:18 +0000
+ 15.2.1258.34 via Frontend Transport; Wed, 18 Sep 2024 15:28:19 +0000
 Received: from dev-dsk-lilitj-1a-5039c68b.eu-west-1.amazon.com (dev-dsk-lilitj-1a-5039c68b.eu-west-1.amazon.com [172.19.104.233])
-	by email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com (Postfix) with ESMTPS id AB47D4041D;
-	Wed, 18 Sep 2024 15:28:17 +0000 (UTC)
+	by email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com (Postfix) with ESMTPS id 869FC4043E;
+	Wed, 18 Sep 2024 15:28:18 +0000 (UTC)
 From: Lilit Janpoladyan <lilitj@amazon.com>
 To: <kvm@vger.kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
 	<james.morse@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
 	<nh-open-source@amazon.com>, <lilitj@amazon.com>
-Subject: [PATCH 6/8] KVM: arm64: flush dirty logging data
-Date: Wed, 18 Sep 2024 15:28:05 +0000
-Message-ID: <20240918152807.25135-7-lilitj@amazon.com>
+Subject: [PATCH 7/8] KVM: arm64: enable hardware dirty state management for stage-2
+Date: Wed, 18 Sep 2024 15:28:06 +0000
+Message-ID: <20240918152807.25135-8-lilitj@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240918152807.25135-1-lilitj@amazon.com>
 References: <20240918152807.25135-1-lilitj@amazon.com>
@@ -83,50 +83,42 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Make sure we do not miss last dirty pages and flush the data after
-disabling dirty logging. Flush only when dirty logging is actually
-disabled i.e. when page_tracking_disable returns 0.
+Enable hardware management of dirty state for stage-2 (VTCR_EL2.HD)
+translations. Set VTCR_EL2.HD unconditionally. This won't allow hardware
+dirty state management yet as page descriptors are considered as
+candidates for hardware dirty state updates when DBM (51) bit is set
+and by default page descriptors are created with DBM = 0.
 
 Signed-off-by: Lilit Janpoladyan <lilitj@amazon.com>
 ---
- arch/arm64/kvm/arm.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 139d7e929266..5ed049accb3e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1877,17 +1877,21 @@ int kvm_arch_disable_dirty_logging(struct kvm *kvm, const struct kvm_memory_slot
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 9e2bbee77491..d507931ab10c 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -658,7 +658,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
  
- 	r = page_tracking_disable(kvm->arch.page_tracking_ctx, -1);
+ #ifdef CONFIG_ARM64_HW_AFDBM
+ 	/*
+-	 * Enable the Hardware Access Flag management, unconditionally
++	 * Enable the Hardware Access Flag and Dirty State management, unconditionally
+ 	 * on all CPUs. In systems that have asymmetric support for the feature
+ 	 * this allows KVM to leverage hardware support on the subset of cores
+ 	 * that implement the feature.
+@@ -669,8 +669,10 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+ 	 * happen to be running on a design that has unadvertised support for
+ 	 * HAFDBS. Here be dragons.
+ 	 */
+-	if (!cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
++	if (!cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38)) {
+ 		vtcr |= VTCR_EL2_HA;
++		vtcr |= VTCR_EL2_HD;
++	}
+ #endif /* CONFIG_ARM64_HW_AFDBM */
  
--	if (r == -EBUSY) {
--		r = 0;
--	} else {
--		page_tracking_release(kvm->arch.page_tracking_ctx);
--		kvm->arch.page_tracking_ctx = NULL;
-+	if (r == -EBUSY)
-+		return 0;
- 
--		if (kvm->arch.page_tracking_pg) {
--			free_page((unsigned long)kvm->arch.page_tracking_pg);
--			kvm->arch.page_tracking_pg = NULL;
--		}
-+	/* Flush only when dirty tracking is disabled */
-+	if (!r)
-+		r = page_tracking_flush(kvm->arch.page_tracking_ctx);
-+
-+	/* But release resources anyway */
-+	page_tracking_release(kvm->arch.page_tracking_ctx);
-+	kvm->arch.page_tracking_ctx = NULL;
-+	if (kvm->arch.page_tracking_pg) {
-+		free_page((unsigned long)kvm->arch.page_tracking_pg);
-+		kvm->arch.page_tracking_pg = NULL;
- 	}
-+
- 	return r;
- }
- 
+ 	if (kvm_lpa2_is_enabled())
 -- 
 2.40.1
 
