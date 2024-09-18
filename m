@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-27086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27088-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60AB597BE99
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 17:28:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6CF997BE9B
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 17:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B296283937
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 15:28:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8C8B1C21929
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2024 15:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A7A1C9877;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD071C9DC4;
 	Wed, 18 Sep 2024 15:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="V6N/T07X"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="l77kZWU+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852291BAEF4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80B21C9855
 	for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 15:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726673305; cv=none; b=U5YEK8xGchT1AAqZyGfLn2WqildbD5dNN43qTUelsy1yCsc6OWaQSG48KhW80p+PKZfyStYInxk2wSlr9iv5T06sXKo+tENhsySJMopN9Gt/8LhueA10B3A9RfIpz2eVLAcObqfF9Z77waVuoVECUe6bu1ACAdZuIl6gpJcNN4Q=
+	t=1726673305; cv=none; b=ZpXDO+u9xmsS1bvdceOS2OOPM7xMb8Z2Kq/U/KLtSQVMxAZBMCe8BY647JS3QJE56Ncdq3uS04Ydt4/+1Cp28PbWiXT15fN0xtlVcaGT8q8gZoAqdEjqnppSYp1UxN6Rw+5kdl878NI3b/fSzpxUKSXbfm8wlymqPsUqtL9uleM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726673305; c=relaxed/simple;
-	bh=HvbYUAUuqxfvZVUyVuSjHY5g7ZmMcbW5eX1OPbSI7ak=;
+	bh=/fiwKLJNU+6tNWT6VQd7KBpnBT+w41Rr0g3Co8I4NZQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NFpeWzdq20M7mkTgHwFwe41A3hliAparvidHB7SBJ2Qrz2qg9mVuCoyKjZ5eLfiP6JmJXsSrBuIijfwKOigCcqOlhupexJVczMbnB/yiM1TuzCrCnPaLOE3bC0tTAk3sxYnE6i7sEWDly1Qc1/tWdxJVqd0cvQLlhXwbEdHoKqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=V6N/T07X; arc=none smtp.client-ip=99.78.197.219
+	 MIME-Version:Content-Type; b=iFv4GtWkbgxeAFAEPlnh0uqunBP42r1Lc/SjkeHJdkp9HBM9pas2huT5b/4z9N3tB45ZjsTCdSAIecQWtXVOJrzVkr+fRXRYoVNrLpSqlmoS3YO+nJNCli7HSNbNhc1eO+CEs0WTCLCMq1Hz47i1lrhZE9RCrQneNMMphZ0HsiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=l77kZWU+; arc=none smtp.client-ip=52.119.213.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1726673303; x=1758209303;
+  t=1726673304; x=1758209304;
   h=from:to:subject:date:message-id:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=Mrvf5QEc5i3VRcPPRer2E9I3RCr3GLlTIVg8suSOwps=;
-  b=V6N/T07XY/pYp1J6oHHuVvTmKUTrk3BhzbjOBuTdBwxIvPzrPEtJ6I4l
-   80U0W0y9v/7i/1akI90CMHNyRJapqymRAmhc8r3xIicNIhOZcnbi6BNjk
-   psEhfPW/EcKRjKylI/8JjoAX0Hr/Eqa4OX8B5mNohgC8diWYjTjFOc5kH
-   I=;
+  bh=cBuhl0qXKMJntrBkdWcKjcLFuCE565FUUFhI9H/DaWM=;
+  b=l77kZWU+2A9Zp6h1wtzMQco35vJ/sQEM/qF5gJgKY/9kXZvBy0HSqXvv
+   htih3b6x0h4UZYn3NjSV2Fijbg8oRLAEwUBee6TFU99Dmlgv5Ox7cHzB0
+   1apiZqrDKb55cOTuSZ6CNqiSDWsR5kHY99gqrZpqL+sBeRoGplhtLwEnn
+   w=;
 X-IronPort-AV: E=Sophos;i="6.10,239,1719878400"; 
-   d="scan'208";a="127584803"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 15:28:22 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.43.254:54141]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.8.19:2525] with esmtp (Farcaster)
- id 4c766550-61e7-4d25-8d36-b3acac605531; Wed, 18 Sep 2024 15:28:20 +0000 (UTC)
-X-Farcaster-Flow-ID: 4c766550-61e7-4d25-8d36-b3acac605531
-Received: from EX19D018EUA003.ant.amazon.com (10.252.50.163) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+   d="scan'208";a="232771200"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 15:28:23 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.10.100:54299]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.16.194:2525] with esmtp (Farcaster)
+ id 4bd0e212-e6c1-41ad-a1ff-6bfdfe5b07a3; Wed, 18 Sep 2024 15:28:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 4bd0e212-e6c1-41ad-a1ff-6bfdfe5b07a3
+Received: from EX19D018EUA001.ant.amazon.com (10.252.50.145) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
  Wed, 18 Sep 2024 15:28:20 +0000
-Received: from EX19MTAUWB002.ant.amazon.com (10.250.64.231) by
- EX19D018EUA003.ant.amazon.com (10.252.50.163) with Microsoft SMTP Server
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
+ EX19D018EUA001.ant.amazon.com (10.252.50.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
  Wed, 18 Sep 2024 15:28:20 +0000
 Received: from email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com
- (10.25.36.214) by mail-relay.amazon.com (10.250.64.228) with Microsoft SMTP
+ (10.43.8.2) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Wed, 18 Sep 2024 15:28:19 +0000
+ 15.2.1258.34 via Frontend Transport; Wed, 18 Sep 2024 15:28:20 +0000
 Received: from dev-dsk-lilitj-1a-5039c68b.eu-west-1.amazon.com (dev-dsk-lilitj-1a-5039c68b.eu-west-1.amazon.com [172.19.104.233])
-	by email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com (Postfix) with ESMTPS id 869FC4043E;
-	Wed, 18 Sep 2024 15:28:18 +0000 (UTC)
+	by email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com (Postfix) with ESMTPS id 6258C4063D;
+	Wed, 18 Sep 2024 15:28:19 +0000 (UTC)
 From: Lilit Janpoladyan <lilitj@amazon.com>
 To: <kvm@vger.kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
 	<james.morse@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
 	<nh-open-source@amazon.com>, <lilitj@amazon.com>
-Subject: [PATCH 7/8] KVM: arm64: enable hardware dirty state management for stage-2
-Date: Wed, 18 Sep 2024 15:28:06 +0000
-Message-ID: <20240918152807.25135-8-lilitj@amazon.com>
+Subject: [PATCH 8/8] KVM: arm64: make hardware manage dirty state after write faults
+Date: Wed, 18 Sep 2024 15:28:07 +0000
+Message-ID: <20240918152807.25135-9-lilitj@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240918152807.25135-1-lilitj@amazon.com>
 References: <20240918152807.25135-1-lilitj@amazon.com>
@@ -83,42 +83,121 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Enable hardware management of dirty state for stage-2 (VTCR_EL2.HD)
-translations. Set VTCR_EL2.HD unconditionally. This won't allow hardware
-dirty state management yet as page descriptors are considered as
-candidates for hardware dirty state updates when DBM (51) bit is set
-and by default page descriptors are created with DBM = 0.
+In case of hardware dirty logging, fault in pages with their dirty
+state managed by hardware. This will allow further writes to the
+faulted in pages to be logged by the page tracking device. The first
+write will still be logged on write fault. To avoid faults on first
+writes we need to set DBM bit when eagerly splitting huge pages (to be
+added).
+
+Add KVM_PTE_LEAF_ATTR_HI_S2_DBM for the hardware DBM flag and
+KVM_PGTABLE_PROT_HWDBM as a software page protection flag.
+
+Hardware dirty state management changes the way
+KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W is interpreted. Pages whose dirty state
+is managed by the hardware are always writable and
+KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W bit denotes their dirty state.
 
 Signed-off-by: Lilit Janpoladyan <lilitj@amazon.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h |  1 +
+ arch/arm64/kvm/hyp/pgtable.c         | 23 ++++++++++++++++++++---
+ arch/arm64/kvm/mmu.c                 |  8 ++++++++
+ 3 files changed, 29 insertions(+), 3 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 19278dfe7978..d3b81d7e923b 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -210,6 +210,7 @@ enum kvm_pgtable_prot {
+ 
+ 	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+ 	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
++	KVM_PGTABLE_PROT_HWDBM			= BIT(5),
+ 
+ 	KVM_PGTABLE_PROT_SW0			= BIT(55),
+ 	KVM_PGTABLE_PROT_SW1			= BIT(56),
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 9e2bbee77491..d507931ab10c 100644
+index d507931ab10c..c4d654e7189c 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -658,7 +658,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+@@ -46,6 +46,8 @@
  
- #ifdef CONFIG_ARM64_HW_AFDBM
- 	/*
--	 * Enable the Hardware Access Flag management, unconditionally
-+	 * Enable the Hardware Access Flag and Dirty State management, unconditionally
- 	 * on all CPUs. In systems that have asymmetric support for the feature
- 	 * this allows KVM to leverage hardware support on the subset of cores
- 	 * that implement the feature.
-@@ -669,8 +669,10 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
- 	 * happen to be running on a design that has unadvertised support for
- 	 * HAFDBS. Here be dragons.
- 	 */
--	if (!cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-+	if (!cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38)) {
- 		vtcr |= VTCR_EL2_HA;
-+		vtcr |= VTCR_EL2_HD;
-+	}
- #endif /* CONFIG_ARM64_HW_AFDBM */
+ #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
  
- 	if (kvm_lpa2_is_enabled())
++#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
++
+ #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
+ 					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
+ 					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
+@@ -746,7 +748,13 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+ 	if (prot & KVM_PGTABLE_PROT_R)
+ 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+ 
+-	if (prot & KVM_PGTABLE_PROT_W)
++	/*
++	 * If hardware dirty state management is enabled then S2AP_W is interpreted
++	 * as dirty state, don't set S2AP_W in this case
++	 */
++	if (prot & KVM_PGTABLE_PROT_HWDBM)
++		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
++	else if (prot & KVM_PGTABLE_PROT_W)
+ 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+ 
+ 	if (!kvm_lpa2_is_enabled())
+@@ -768,7 +776,10 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte)
+ 
+ 	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R)
+ 		prot |= KVM_PGTABLE_PROT_R;
+-	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
++
++	if (pte & KVM_PTE_LEAF_ATTR_HI_S2_DBM)
++		prot |= KVM_PGTABLE_PROT_HWDBM | KVM_PGTABLE_PROT_W;
++	else if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
+ 		prot |= KVM_PGTABLE_PROT_W;
+ 	if (!(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN))
+ 		prot |= KVM_PGTABLE_PROT_X;
+@@ -1367,7 +1378,13 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+ 	if (prot & KVM_PGTABLE_PROT_R)
+ 		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+ 
+-	if (prot & KVM_PGTABLE_PROT_W)
++	/*
++	 * If hardware dirty state management is enabled then S2AP_W is interpreted
++	 * as dirty state, don't set S2AP_W in this case
++	 */
++	if (prot & KVM_PGTABLE_PROT_HWDBM)
++		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
++	else if (prot & KVM_PGTABLE_PROT_W)
+ 		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+ 
+ 	if (prot & KVM_PGTABLE_PROT_X)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index a509b63bd4dd..a5bcc7f11083 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1418,6 +1418,11 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+ 	return vma->vm_flags & VM_MTE_ALLOWED;
+ }
+ 
++static bool is_hw_logging_enabled(struct kvm *kvm)
++{
++	return kvm->arch.page_tracking_ctx != NULL;
++}
++
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  struct kvm_s2_trans *nested,
+ 			  struct kvm_memory_slot *memslot, unsigned long hva,
+@@ -1658,6 +1663,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (writable)
+ 		prot |= KVM_PGTABLE_PROT_W;
+ 
++	if (is_hw_logging_enabled(kvm))
++		prot |= KVM_PGTABLE_PROT_HWDBM;
++
+ 	if (exec_fault)
+ 		prot |= KVM_PGTABLE_PROT_X;
+ 
 -- 
 2.40.1
 
