@@ -1,247 +1,253 @@
-Return-Path: <kvm+bounces-27120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2DF297C2D9
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 04:33:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90A3C97C36D
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 06:46:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36656B21CC6
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 02:33:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA9741F21F3B
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 04:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB301EF1D;
-	Thu, 19 Sep 2024 02:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EE51B28A;
+	Thu, 19 Sep 2024 04:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SQQt22vj"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F9TUXtm7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990E3BA3D
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 02:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38741BC46
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 04:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726713190; cv=none; b=BJKTX17pEVgKNSsC36yFyu9h/V52W2TqZ/cZBvuRU/nU90kjXzMg8GK+Yn/+AqaQ6xtIag5RXUN6M8C0JsYY63UHhiw9KCHYd2xeBuGFpwuoNP2muBGAl3uovqio7sh8pyyujiuw8/nAWDF7+HXXJjBA6shepI+9lv0/kVxt22k=
+	t=1726721209; cv=none; b=ZhYUx0sJUb7K9XAsDBIWBGv1vhuu5RCmRaINiVwhf4KNuQIvSk8PVbxXtLNz0SctnQwhGQ+GhXgglFxSPOLwLPjafNH4ziO7Zh5g0OYKAhEYTr9ZKv0d59gaPW4tpEctEE1uaXl3yIYegbdKN9fO6m2tQREL03kEAlQYI3/5xw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726713190; c=relaxed/simple;
-	bh=LnVqCTl/DSIuzexp1Q7fc9Ja/psmiLqRekrpQqozjyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gb9L5ok7K8e6dU8UHjZcTd7QiC5v5h/VgAOOMAsmj9eI9ThQMBhCB/LFyJRr8lHgVFpebrwy8X6ywKKCBAb2oDDjyTmbzXdm5OKCiajzXSeIQXUd6FnI27QiZc1hNDJYG3w6jYK4GiTQglfL3tuOpoGJljEh+0XfdMeXNhy1zWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SQQt22vj; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726713189; x=1758249189;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LnVqCTl/DSIuzexp1Q7fc9Ja/psmiLqRekrpQqozjyY=;
-  b=SQQt22vj7gDvowMLI/SX7x6g0Qn8sRyvcKwP7oczZHa/8KxRnHoTjejI
-   i5Z2B6pl2idGXJ7lRnKIIcNKH8IJyn6oPeNbHV7BGZbI2Zfe3RXzJrBR+
-   kmc159gqWpfWPluZNVrJrVc3oUhbX3zgjkplrVePJvvi9EDQXIfPEDnhy
-   Tmzh/LhqDsnH1++C+BjNkWUuSgJ7mxrubBbcD0qyplGEpzOMi2vJ91rd+
-   eR/QX1TNDrVPPiOUZoC/zNy7Dd9BL3iOKCpfkcVAR7++45jCJlpGzMzUe
-   VnxGieDTtXrWgS/GlUwDvjgr+twHYzLBZYOOVuyWXDWL0h5KGy91t9wbk
-   Q==;
-X-CSE-ConnectionGUID: 6YB+C1+HSyq/0UG/KwHsgQ==
-X-CSE-MsgGUID: 6APvbkdPQNqsiUY1sh1+MA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="36226629"
-X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="36226629"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 19:33:09 -0700
-X-CSE-ConnectionGUID: OpZ8ImQ4SV6f7eis63ZUEA==
-X-CSE-MsgGUID: g8GKn9P0RpWj2x1uW2tsFg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="74315463"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Sep 2024 19:33:05 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sr6yd-000CpW-0g;
-	Thu, 19 Sep 2024 02:33:03 +0000
-Date: Thu, 19 Sep 2024 10:32:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lilit Janpoladyan <lilitj@amazon.com>, kvm@vger.kernel.org,
-	maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	nh-open-source@amazon.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH 4/8] KVM: return value from kvm_arch_sync_dirty_log
-Message-ID: <202409191039.OFrXIvns-lkp@intel.com>
-References: <20240918152807.25135-5-lilitj@amazon.com>
+	s=arc-20240116; t=1726721209; c=relaxed/simple;
+	bh=LOW5dlyXFN0fbsV3pZUBsfmJUvK7b3SUazvap5/jqoI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=UV7DBGtJJ7vsxBrtwXeJrTg2UboK1xAL45fECAvOmJ02BKKXxn7z+LpVVuAd7tfN2HuUu9OhFNxkMohWBO29oXbxjDlPNj/8JQ94E8ZFMHoAviQqjYf8inttWuvRhAb3Xhh/fMu2LpPqj8WLg7BXaS4LJb4CWq5AkONcochSfq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F9TUXtm7; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-656d8b346d2so243049a12.2
+        for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 21:46:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1726721207; x=1727326007; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=okWQnCc9i+a9qTeP/CljeFJtPOK3zSl+MYdGWF+XBiU=;
+        b=F9TUXtm74oMThHq3MTmvKrFCjpwPpr3pI1UEG42MMq4MndmXFvuYcS0SXvJt19FT3a
+         FkwgAunM6sc1LC17hQVwI9LKWDIYxjJmCGpJ12v9BvqyOcDgEcrhY9kwoIOwHsK3myux
+         OYJg6wRQpFYaX0gXRnucliLHgGSH+16uGSpnnOdOTwHmRSh9/PXygfQc/GtS+ZmVnEI1
+         53xo23e3BFQL7cr1T9m0YvT3lw179HTec7+hRE3EQb4yEIBQOUl05930QEWnscGzQJMr
+         mP3ZtsdsJhaO7AF5O2PNWqH2afztBtBNAxarnfH2uyH6/+qebWTQdiydBTl6gooaEcAr
+         5oCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726721207; x=1727326007;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=okWQnCc9i+a9qTeP/CljeFJtPOK3zSl+MYdGWF+XBiU=;
+        b=acAikMRjG/PkdzEyWsabcZWPCYBmvmZR07JBSbVyKitRfZe1Tq861W0XVjiSzplrFS
+         KwshU9ZzHzwr2/mUj/wQOvU/H23HOfjr+daUIMRuK/MePFNjaP/k1NuZwiLPpe0lKsyy
+         9cK+6pLWCaHfswGRJKEgh56fVMttj0/RSOdJzVqyx3E61ruTKiEAmdCokly6VTFrhK0U
+         Atbz0YShZYATGKV1iwFMTaUH7IuGqiK09ZkD6W2DTUQH+VRlgF+TznHcXZL6mf4Op6Yz
+         n2AP3x7v0otNmtYczpiGwDUzCJw9bPl7fHN5NwtoUK4tJUkDX+SziSX38fUQlf+leXoY
+         hc6A==
+X-Forwarded-Encrypted: i=1; AJvYcCU7ne/bsvczqBlrvCOGNQZm3aALDWxDvxhEIkSjjOX2N+ZKQkTRhu1N15Rb0dbwn4HOgBE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgKDULgKmrIKb68gqtvTBO5acFVDzlbAdz/3IYmCPireWhnyd8
+	zfqHPHsnXQYVOxuBmQenJyFhjxsV9CK1TCoLgSUJljopwS9cYk02s8tu8Lu5j1E=
+X-Google-Smtp-Source: AGHT+IFTeoz0sc18zegnRwG9uqK1i/tdvMiZIsB+jYHs0tQzrYbWKu22/eeI4GvU6Dyul2n7o0JIuw==
+X-Received: by 2002:a05:6a21:1690:b0:1cf:4348:d5c8 with SMTP id adf61e73a8af0-1d112e8bfaemr31800828637.39.1726721206933;
+        Wed, 18 Sep 2024 21:46:46 -0700 (PDT)
+Received: from linaro.. (216-180-64-156.dyn.novuscom.net. [216.180.64.156])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944bc279csm7478601b3a.188.2024.09.18.21.46.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Sep 2024 21:46:46 -0700 (PDT)
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Hyman Huang <yong.huang@smartx.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	kvm@vger.kernel.org,
+	Bin Meng <bmeng.cn@gmail.com>,
+	Peter Xu <peterx@redhat.com>,
+	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	qemu-s390x@nongnu.org,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+	Hanna Reitz <hreitz@redhat.com>,
+	Klaus Jensen <its@irrelevant.dk>,
+	Corey Minyard <minyard@acm.org>,
+	Laurent Vivier <laurent@vivier.eu>,
+	WANG Xuerui <git@xen0n.name>,
+	Thomas Huth <thuth@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Harsh Prateek Bora <harshpb@linux.ibm.com>,
+	"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Stefan Berger <stefanb@linux.vnet.ibm.com>,
+	Fam Zheng <fam@euphon.net>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Keith Busch <kbusch@kernel.org>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	qemu-riscv@nongnu.org,
+	Igor Mammedov <imammedo@redhat.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	"Richard W.M. Jones" <rjones@redhat.com>,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Markus Armbruster <armbru@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Fabiano Rosas <farosas@suse.de>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	qemu-arm@nongnu.org,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	qemu-ppc@nongnu.org,
+	Zhao Liu <zhao1.liu@intel.com>,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	qemu-block@nongnu.org,
+	Joel Stanley <joel@jms.id.au>,
+	Weiwei Li <liwei1518@gmail.com>,
+	Kevin Wolf <kwolf@redhat.com>,
+	Helge Deller <deller@gmx.de>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Michael Rolnik <mrolnik@gmail.com>,
+	Jesper Devantier <foss@defmacro.it>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: [PATCH v3 00/34] Use g_assert_not_reached instead of (g_)assert(0,false)
+Date: Wed, 18 Sep 2024 21:46:07 -0700
+Message-Id: <20240919044641.386068-1-pierrick.bouvier@linaro.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240918152807.25135-5-lilitj@amazon.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Lilit,
+This series cleans up all usages of assert/g_assert who are supposed to stop
+execution of QEMU. We replace those by g_assert_not_reached().
+It was suggested recently when cleaning codebase to build QEMU with gcc
+and tsan: https://lore.kernel.org/qemu-devel/54bb02a6-1b12-460a-97f6-3f478ef766c6@linaro.org/.
 
-kernel test robot noticed the following build warnings:
+In more, cleanup useless break and return after g_assert_not_reached();
 
-[auto build test WARNING on powerpc/topic/ppc-kvm]
-[also build test WARNING on v6.11]
-[cannot apply to kvmarm/next kvm/queue linus/master kvm/linux-next next-20240918]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+And finally, ensure with scripts/checkpatch.pl that we don't reintroduce
+(g_)assert(false) in the future.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lilit-Janpoladyan/arm64-add-an-interface-for-stage-2-page-tracking/20240918-233004
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git topic/ppc-kvm
-patch link:    https://lore.kernel.org/r/20240918152807.25135-5-lilitj%40amazon.com
-patch subject: [PATCH 4/8] KVM: return value from kvm_arch_sync_dirty_log
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20240919/202409191039.OFrXIvns-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 8663a75fa2f31299ab8d1d90288d9df92aadee88)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240919/202409191039.OFrXIvns-lkp@intel.com/reproduce)
+New commits (removing return) need review.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409191039.OFrXIvns-lkp@intel.com/
+Tested that it build warning free with gcc and clang.
 
-All warnings (new ones prefixed by >>):
+If a maintainer could pull the whole series, this would be much more easier than
+integrating various parts of it in different subsystems. Thanks!
 
-   In file included from arch/s390/kvm/kvm-s390.c:22:
-   In file included from include/linux/kvm_host.h:16:
-   In file included from include/linux/mm.h:2228:
-   include/linux/vmstat.h:500:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     500 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     501 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:507:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     507 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     508 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:519:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     519 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     520 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:528:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     528 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     529 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from arch/s390/kvm/kvm-s390.c:22:
-   In file included from include/linux/kvm_host.h:19:
-   In file included from include/linux/msi.h:24:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:14:
-   In file included from arch/s390/include/asm/io.h:93:
-   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     548 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/big_endian.h:37:59: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) __swab16((__force __u16)(__le16)(x))
-         |                                                           ^
-   include/uapi/linux/swab.h:102:54: note: expanded from macro '__swab16'
-     102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
-         |                                                      ^
-   In file included from arch/s390/kvm/kvm-s390.c:22:
-   In file included from include/linux/kvm_host.h:19:
-   In file included from include/linux/msi.h:24:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:14:
-   In file included from arch/s390/include/asm/io.h:93:
-   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/big_endian.h:35:59: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
-         |                                                           ^
-   include/uapi/linux/swab.h:115:54: note: expanded from macro '__swab32'
-     115 | #define __swab32(x) (__u32)__builtin_bswap32((__u32)(x))
-         |                                                      ^
-   In file included from arch/s390/kvm/kvm-s390.c:22:
-   In file included from include/linux/kvm_host.h:19:
-   In file included from include/linux/msi.h:24:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:14:
-   In file included from arch/s390/include/asm/io.h:93:
-   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     585 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:693:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     693 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:701:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     701 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:709:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     709 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:718:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     718 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:727:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     727 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:736:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     736 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
->> arch/s390/kvm/kvm-s390.c:705:4: warning: non-void function 'kvm_arch_sync_dirty_log' should return a value [-Wreturn-mismatch]
-     705 |                         return;
-         |                         ^
-   18 warnings generated.
+v3
+- drop changes on .promela files
+- some changes were already merged
 
+v2
+- align backslashes for some changes
+- add summary in all commits message
+- remove redundant comment
 
-vim +/kvm_arch_sync_dirty_log +705 arch/s390/kvm/kvm-s390.c
+v1
+https://lore.kernel.org/qemu-devel/20240910221606.1817478-1-pierrick.bouvier@linaro.org/T/#t
 
-5b5865e81387b9 Lilit Janpoladyan     2024-09-18  679  
-522a3b6f0285f5 Lilit Janpoladyan     2024-09-18  680  int kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
-15f36ebd34b5b2 Jason J. Herne        2012-08-02  681  {
-0959e168678d2d Janosch Frank         2018-07-17  682  	int i;
-15f36ebd34b5b2 Jason J. Herne        2012-08-02  683  	gfn_t cur_gfn, last_gfn;
-0959e168678d2d Janosch Frank         2018-07-17  684  	unsigned long gaddr, vmaddr;
-15f36ebd34b5b2 Jason J. Herne        2012-08-02  685  	struct gmap *gmap = kvm->arch.gmap;
-0959e168678d2d Janosch Frank         2018-07-17  686  	DECLARE_BITMAP(bitmap, _PAGE_ENTRIES);
-15f36ebd34b5b2 Jason J. Herne        2012-08-02  687  
-0959e168678d2d Janosch Frank         2018-07-17  688  	/* Loop over all guest segments */
-0959e168678d2d Janosch Frank         2018-07-17  689  	cur_gfn = memslot->base_gfn;
-15f36ebd34b5b2 Jason J. Herne        2012-08-02  690  	last_gfn = memslot->base_gfn + memslot->npages;
-0959e168678d2d Janosch Frank         2018-07-17  691  	for (; cur_gfn <= last_gfn; cur_gfn += _PAGE_ENTRIES) {
-0959e168678d2d Janosch Frank         2018-07-17  692  		gaddr = gfn_to_gpa(cur_gfn);
-0959e168678d2d Janosch Frank         2018-07-17  693  		vmaddr = gfn_to_hva_memslot(memslot, cur_gfn);
-0959e168678d2d Janosch Frank         2018-07-17  694  		if (kvm_is_error_hva(vmaddr))
-0959e168678d2d Janosch Frank         2018-07-17  695  			continue;
-0959e168678d2d Janosch Frank         2018-07-17  696  
-0959e168678d2d Janosch Frank         2018-07-17  697  		bitmap_zero(bitmap, _PAGE_ENTRIES);
-0959e168678d2d Janosch Frank         2018-07-17  698  		gmap_sync_dirty_log_pmd(gmap, bitmap, gaddr, vmaddr);
-0959e168678d2d Janosch Frank         2018-07-17  699  		for (i = 0; i < _PAGE_ENTRIES; i++) {
-0959e168678d2d Janosch Frank         2018-07-17  700  			if (test_bit(i, bitmap))
-0959e168678d2d Janosch Frank         2018-07-17  701  				mark_page_dirty(kvm, cur_gfn + i);
-0959e168678d2d Janosch Frank         2018-07-17  702  		}
-15f36ebd34b5b2 Jason J. Herne        2012-08-02  703  
-1763f8d09d522b Christian Borntraeger 2016-02-03  704  		if (fatal_signal_pending(current))
-1763f8d09d522b Christian Borntraeger 2016-02-03 @705  			return;
-70c88a00fbf659 Christian Borntraeger 2016-02-02  706  		cond_resched();
-15f36ebd34b5b2 Jason J. Herne        2012-08-02  707  	}
-522a3b6f0285f5 Lilit Janpoladyan     2024-09-18  708  	return 0;
-15f36ebd34b5b2 Jason J. Herne        2012-08-02  709  }
-15f36ebd34b5b2 Jason J. Herne        2012-08-02  710  
+Pierrick Bouvier (34):
+  hw/acpi: replace assert(0) with g_assert_not_reached()
+  hw/arm: replace assert(0) with g_assert_not_reached()
+  hw/net: replace assert(0) with g_assert_not_reached()
+  migration: replace assert(0) with g_assert_not_reached()
+  qobject: replace assert(0) with g_assert_not_reached()
+  target/ppc: replace assert(0) with g_assert_not_reached()
+  block: replace assert(false) with g_assert_not_reached()
+  hw/hyperv: replace assert(false) with g_assert_not_reached()
+  hw/net: replace assert(false) with g_assert_not_reached()
+  hw/nvme: replace assert(false) with g_assert_not_reached()
+  hw/pci: replace assert(false) with g_assert_not_reached()
+  hw/ppc: replace assert(false) with g_assert_not_reached()
+  migration: replace assert(false) with g_assert_not_reached()
+  target/i386/kvm: replace assert(false) with g_assert_not_reached()
+  accel/tcg: remove break after g_assert_not_reached()
+  block: remove break after g_assert_not_reached()
+  hw/acpi: remove break after g_assert_not_reached()
+  hw/net: remove break after g_assert_not_reached()
+  hw/scsi: remove break after g_assert_not_reached()
+  hw/tpm: remove break after g_assert_not_reached()
+  target/arm: remove break after g_assert_not_reached()
+  target/riscv: remove break after g_assert_not_reached()
+  fpu: remove break after g_assert_not_reached()
+  tcg/loongarch64: remove break after g_assert_not_reached()
+  include/qemu: remove return after g_assert_not_reached()
+  hw/hyperv: remove return after g_assert_not_reached()
+  hw/net: remove return after g_assert_not_reached()
+  hw/pci: remove return after g_assert_not_reached()
+  hw/ppc: remove return after g_assert_not_reached()
+  migration: remove return after g_assert_not_reached()
+  qobject: remove return after g_assert_not_reached()
+  qom: remove return after g_assert_not_reached()
+  tests/qtest: remove return after g_assert_not_reached()
+  scripts/checkpatch.pl: emit error when using assert(false)
+
+ include/qemu/pmem.h                     |  1 -
+ accel/tcg/plugin-gen.c                  |  1 -
+ block/qcow2.c                           |  2 +-
+ block/ssh.c                             |  1 -
+ hw/acpi/aml-build.c                     |  3 +--
+ hw/arm/highbank.c                       |  2 +-
+ hw/hyperv/hyperv_testdev.c              |  7 +++----
+ hw/hyperv/vmbus.c                       | 15 ++++++---------
+ hw/net/e1000e_core.c                    |  4 +---
+ hw/net/i82596.c                         |  2 +-
+ hw/net/igb_core.c                       |  4 +---
+ hw/net/net_rx_pkt.c                     |  3 +--
+ hw/net/vmxnet3.c                        |  1 -
+ hw/nvme/ctrl.c                          |  8 ++++----
+ hw/pci/pci-stub.c                       |  6 ++----
+ hw/ppc/ppc.c                            |  1 -
+ hw/ppc/spapr_events.c                   |  3 +--
+ hw/scsi/virtio-scsi.c                   |  1 -
+ hw/tpm/tpm_spapr.c                      |  1 -
+ migration/dirtyrate.c                   |  3 +--
+ migration/migration-hmp-cmds.c          |  2 +-
+ migration/postcopy-ram.c                | 21 +++++++--------------
+ migration/ram.c                         |  8 +++-----
+ qobject/qlit.c                          |  2 +-
+ qobject/qnum.c                          | 12 ++++--------
+ qom/object.c                            |  1 -
+ target/arm/hyp_gdbstub.c                |  1 -
+ target/i386/kvm/kvm.c                   |  4 ++--
+ target/ppc/dfp_helper.c                 |  8 ++++----
+ target/ppc/mmu_helper.c                 |  2 +-
+ target/riscv/monitor.c                  |  1 -
+ tests/qtest/acpi-utils.c                |  1 -
+ fpu/softfloat-parts.c.inc               |  2 --
+ target/riscv/insn_trans/trans_rvv.c.inc |  2 --
+ tcg/loongarch64/tcg-target.c.inc        |  1 -
+ scripts/checkpatch.pl                   |  3 +++
+ 36 files changed, 50 insertions(+), 90 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.5
+
 
