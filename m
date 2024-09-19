@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-27162-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27163-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C86D97C3FD
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 07:56:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 020D497C3FF
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 07:56:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E91CC1F224C5
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 05:56:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87FFA1F21ECC
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 05:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC6377110;
-	Thu, 19 Sep 2024 05:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7B212D214;
+	Thu, 19 Sep 2024 05:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dBKR5pCx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EoD3HZYs"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA3374424
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 05:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D8174424
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 05:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726725369; cv=none; b=kUKBe+xrhYpBLok77dhxxJrn9mq2OiY+VVTSmOCr1y/NTNrQUFrbHvErDHzWW3eldVUpcXthgmFRbr6wPHxBufj0WE+/KqTzBlX2cD/eQY3YaTjRoI3bMdFNz9pJMD4ArWP6kZqrnsikXU2zmOHn2i1Ej+/rGzDVFhk41HQw7ks=
+	t=1726725375; cv=none; b=heg61Nf2E44LG0qPs0vSWSjLczjjPJPbhCY024jQhIPvFK73OVclZpMmPdpT0Z3CUfiAuVp4QetxrjdirDCbtAOOb2IIieXE78MYiRGLp8x24CIKNqGCZbpQt/9ZsNpid6PLUpjLQ5dWIojVJfi3g9NWeRi9hvkqEEnGbK6hO5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726725369; c=relaxed/simple;
-	bh=8gzS+6OwF3KgPtXFuFeQ8LrUaVl5pHIgZpajPFYb5x4=;
+	s=arc-20240116; t=1726725375; c=relaxed/simple;
+	bh=NEuBE48juMTcQ/dJZHqJkRWuT1BVDd+3siUk37y9rsM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bBU1hMsxnWWM/W3/FPI3ovNcoXHEREAudcE473ETC7NgkthgYP6oj/3HfJ2rnGeKlKylxL80gHi0PTBN3v8yerKnpA0F08PEY0E4gDoh6M/AxOfL1XlaltysD6XjUtHX839KvJyGQvYdfd4qbn3XxWOIFpFNdA6OY3VBN7/GF4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dBKR5pCx; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=dEZfL83cQldekjQGx21F4/iSIUSlSAEbJFWnWVT8d/wa/+pu2ZtEkY52Pv+OHdcaZOOL7CyYFBguWonVzWmoh41ETT8HX3OuUMe/IfIoPl1gmv1Cg1IayNTpG4iCrabe+fJN0uP/h6FGRJehbXosuB2un2j0jXsCRhom0hjFkhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EoD3HZYs; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726725368; x=1758261368;
+  t=1726725374; x=1758261374;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8gzS+6OwF3KgPtXFuFeQ8LrUaVl5pHIgZpajPFYb5x4=;
-  b=dBKR5pCx73/q14nE9Sj85eck5FGfW32c+aZpy2lHyUtAV/r+mFWp+Pqd
-   CyLszzkXxF+pc3RcRLprNrq5L7RnyyrIXPoo4MPuOt1lbaGH/JfnNFEqp
-   NdVA8GMyB3LLbBPqLsWqsYHodlA/h0seYLU+QKusSs1uywFuerUpBqLKr
-   Y/gDIuLeYjUstCSFz7HT5OCCbEopHqdd8cmf7NNj0/V+IDk6F3+Z8/N+J
-   TInSrd+JeCdlNkglaz1jGwfIL/KHgWlRvMxAqupyaRRLl3U7MgeI85q5b
-   j+jmvOZudTyTBt4zA00nfhz5zgVeqWinjRtorRciwFoTilVBzWW+vrJj5
-   w==;
-X-CSE-ConnectionGUID: 1wRQFCRKRfeyAw+cP9276w==
-X-CSE-MsgGUID: rwp8HsXYRNe2rBEMs4iztw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="25813608"
+  bh=NEuBE48juMTcQ/dJZHqJkRWuT1BVDd+3siUk37y9rsM=;
+  b=EoD3HZYsPUlyJS6ZdixZSECaSEyFeI+wUDRqOBN498a2ZWdJBASDBec+
+   sA0zGCDhr9JJmgHnr7Wpxq0pGUwrfap6i+AOLVfIZhT8zuGYd45w1C3ef
+   ITUXQJyP9U9rSodyRitLoylG7v9B4rGvA9So4k3Z0qTjLpkvw7EOUIigd
+   20DBgvNW5J1kswXEskiwkPNYViayDinj9O5jPEpm6WhibDDo+YfTvT6/P
+   h4RQO15/iq6xY13w5Q9g+CsyKS2wEfRReGvbryiy5dDQxfxQdGjVE0SA0
+   LRt3cuslQ1JhXiGwjlbtC0kEFrXWUDKaHrTVDvOZIljTkuMs6glnqyCmK
+   A==;
+X-CSE-ConnectionGUID: 2z2B/baAQq2XyjkwWomkTw==
+X-CSE-MsgGUID: HePOw8JVT6Cjr9CvNqnG3g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="25813632"
 X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="25813608"
+   d="scan'208";a="25813632"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 22:56:07 -0700
-X-CSE-ConnectionGUID: gUHshS+6Qa+f/5DU/ygquA==
-X-CSE-MsgGUID: cvkL99LVRG6pb7HnWQ57VQ==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 22:56:13 -0700
+X-CSE-ConnectionGUID: uRrDVkRIRWuVWkVS9YAxng==
+X-CSE-MsgGUID: NLGU4weHTJKIgFAW97vQLw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="69418731"
+   d="scan'208";a="69418749"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa006.fm.intel.com with ESMTP; 18 Sep 2024 22:56:01 -0700
+  by fmviesa006.fm.intel.com with ESMTP; 18 Sep 2024 22:56:07 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Igor Mammedov <imammedo@redhat.com>,
@@ -85,9 +85,9 @@ Cc: qemu-devel@nongnu.org,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC v2 06/12] hw/cpu: Constrain CPU topology tree with max_limit
-Date: Thu, 19 Sep 2024 14:11:22 +0800
-Message-Id: <20240919061128.769139-7-zhao1.liu@intel.com>
+Subject: [RFC v2 07/12] hw/core: Re-implement topology helpers to honor max limitations
+Date: Thu, 19 Sep 2024 14:11:23 +0800
+Message-Id: <20240919061128.769139-8-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240919061128.769139-1-zhao1.liu@intel.com>
 References: <20240919061128.769139-1-zhao1.liu@intel.com>
@@ -99,124 +99,150 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Apply max_limit to CPU topology and prevent the number of topology
-devices from exceeding the max limitation configured by user.
+For custom topology case, the valid and reliable topology information
+be obtained from topology max limitations.
 
-Additionally, ensure that CPUs created from the CLI via custom topology
-meet at least the requirements of smp.cpus. This guarantees that custom
-topology will always have CPUs.
+Therefore, re-implement machine_topo_get_cores_per_socket() and
+machine_topo_get_threads_per_socket() to consider the custom topology
+case. And further, use the wrapped helper to set CPUState.nr_threads/
+nr_cores, avoiding topology mismatches in custom topology scenarios.
+
+Additionally, since test-smp-parse needs more stubs to compile with
+cpu-slot.c, keep the old helpers for test-smp-parse' use for now. The
+legacy old helpers will be cleaned up when full compilation support is
+added later on.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/core/machine.c         |  4 ++++
- hw/cpu/cpu-slot.c         | 32 ++++++++++++++++++++++++++++++++
- include/hw/cpu/cpu-slot.h |  1 +
- include/hw/qdev-core.h    |  5 +++++
- 4 files changed, 42 insertions(+)
+ hw/core/machine-smp.c       |  8 +++++---
+ hw/cpu/cpu-slot.c           | 18 ++++++++++++++++++
+ include/hw/boards.h         |  9 +++++++--
+ include/hw/cpu/cpu-slot.h   |  2 ++
+ system/cpus.c               |  2 +-
+ tests/unit/test-smp-parse.c |  4 ++--
+ 6 files changed, 35 insertions(+), 8 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index dedabd75c825..54fca9eb7265 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -1684,6 +1684,10 @@ void machine_run_board_post_init(MachineState *machine, Error **errp)
- {
-     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
- 
-+    if (!machine_validate_topo_tree(machine, errp)) {
-+        return;
-+    }
-+
-     if (machine_class->post_init) {
-         machine_class->post_init(machine);
-     }
-diff --git a/hw/cpu/cpu-slot.c b/hw/cpu/cpu-slot.c
-index 2d16a2729501..f2b9c412926f 100644
---- a/hw/cpu/cpu-slot.c
-+++ b/hw/cpu/cpu-slot.c
-@@ -47,6 +47,7 @@ static void cpu_slot_device_realize(DeviceListener *listener,
- {
-     CPUSlot *slot = container_of(listener, CPUSlot, listener);
-     CPUTopoState *topo;
-+    int max_children;
- 
-     if (!object_dynamic_cast(OBJECT(dev), TYPE_CPU_TOPO)) {
-         return;
-@@ -54,6 +55,13 @@ static void cpu_slot_device_realize(DeviceListener *listener,
- 
-     topo = CPU_TOPO(dev);
-     cpu_slot_add_topo_info(slot, topo);
-+
-+    if (dev->parent_bus) {
-+        max_children = slot->stat.entries[GET_CPU_TOPO_LEVEL(topo)].max_limit;
-+        if (dev->parent_bus->num_children == max_children) {
-+            qbus_mark_full(dev->parent_bus);
-+        }
-+    }
- }
- 
- static void cpu_slot_del_topo_info(CPUSlot *slot, CPUTopoState *topo)
-@@ -79,6 +87,10 @@ static void cpu_slot_device_unrealize(DeviceListener *listener,
- 
-     topo = CPU_TOPO(dev);
-     cpu_slot_del_topo_info(slot, topo);
-+
-+    if (dev->parent_bus) {
-+        qbus_mask_full(dev->parent_bus);
-+    }
- }
- 
- DeviceListener cpu_slot_device_listener = {
-@@ -443,3 +455,23 @@ bool machine_parse_custom_topo_config(MachineState *ms,
- 
+diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
+index d3be4352267d..2965b042fd92 100644
+--- a/hw/core/machine-smp.c
++++ b/hw/core/machine-smp.c
+@@ -376,14 +376,16 @@ bool machine_parse_smp_cache(MachineState *ms,
      return true;
  }
-+
-+bool machine_validate_topo_tree(MachineState *ms, Error **errp)
+ 
+-unsigned int machine_topo_get_cores_per_socket(const MachineState *ms)
++unsigned int machine_topo_get_cores_per_socket_old(const MachineState *ms)
+ {
++    assert(!ms->topo);
+     return ms->smp.cores * ms->smp.modules * ms->smp.clusters * ms->smp.dies;
+ }
+ 
+-unsigned int machine_topo_get_threads_per_socket(const MachineState *ms)
++unsigned int machine_topo_get_threads_per_socket_old(const MachineState *ms)
+ {
+-    return ms->smp.threads * machine_topo_get_cores_per_socket(ms);
++    assert(!ms->topo);
++    return ms->smp.threads * machine_topo_get_cores_per_socket_old(ms);
+ }
+ 
+ CpuTopologyLevel machine_get_cache_topo_level(const MachineState *ms,
+diff --git a/hw/cpu/cpu-slot.c b/hw/cpu/cpu-slot.c
+index f2b9c412926f..8c0d55e835e2 100644
+--- a/hw/cpu/cpu-slot.c
++++ b/hw/cpu/cpu-slot.c
+@@ -204,6 +204,8 @@ static int get_smp_info_by_level(const CpuTopology *smp_info,
+         return smp_info->cores;
+     case CPU_TOPOLOGY_LEVEL_MODULE:
+         return smp_info->modules;
++    case CPU_TOPOLOGY_LEVEL_CLUSTER:
++        return smp_info->clusters;
+     case CPU_TOPOLOGY_LEVEL_DIE:
+         return smp_info->dies;
+     case CPU_TOPOLOGY_LEVEL_SOCKET:
+@@ -356,6 +358,22 @@ int get_max_topo_by_level(const MachineState *ms, CpuTopologyLevel level)
+     return ms->topo->stat.entries[level].max_limit;
+ }
+ 
++unsigned int machine_topo_get_cores_per_socket(const MachineState *ms)
 +{
-+    int cpus;
++    int cores = 1, i;
 +
-+    if (!ms->topo || !ms->topo->custom_topo_enabled) {
-+        return true;
++    for (i = CPU_TOPOLOGY_LEVEL_CORE; i < CPU_TOPOLOGY_LEVEL_SOCKET; i++) {
++        cores *= get_max_topo_by_level(ms, i);
 +    }
-+
-+    cpus = ms->topo->stat.entries[CPU_TOPOLOGY_LEVEL_THREAD].total_instances;
-+    if (cpus < ms->smp.cpus) {
-+        error_setg(errp, "machine requires at least %d online CPUs, "
-+                   "but currently only %d CPUs",
-+                   ms->smp.cpus, cpus);
-+        return false;
-+    }
-+
-+    /* TODO: Add checks for other levels to honor more -smp parameters. */
-+    return true;
++    return cores;
 +}
++
++unsigned int machine_topo_get_threads_per_socket(const MachineState *ms)
++{
++    return get_max_topo_by_level(ms, CPU_TOPOLOGY_LEVEL_THREAD) *
++           machine_topo_get_cores_per_socket(ms);
++}
++
+ bool machine_parse_custom_topo_config(MachineState *ms,
+                                       const SMPConfiguration *config,
+                                       Error **errp)
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 6ef4ea322590..faf7859debdd 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -48,8 +48,13 @@ void machine_parse_smp_config(MachineState *ms,
+ bool machine_parse_smp_cache(MachineState *ms,
+                              const SmpCachePropertiesList *caches,
+                              Error **errp);
+-unsigned int machine_topo_get_cores_per_socket(const MachineState *ms);
+-unsigned int machine_topo_get_threads_per_socket(const MachineState *ms);
++/*
++ * TODO: Drop these old helpers when cpu-slot.c could be compiled for
++ * test-smp-parse. Pls use machine_topo_get_cores_per_socket() and
++ * machine_topo_get_threads_per_socket() instead.
++ */
++unsigned int machine_topo_get_cores_per_socket_old(const MachineState *ms);
++unsigned int machine_topo_get_threads_per_socket_old(const MachineState *ms);
+ CpuTopologyLevel machine_get_cache_topo_level(const MachineState *ms,
+                                               CacheLevelAndType cache);
+ void machine_memory_devices_init(MachineState *ms, hwaddr base, uint64_t size);
 diff --git a/include/hw/cpu/cpu-slot.h b/include/hw/cpu/cpu-slot.h
-index 8d7e35aa1851..f56a0b08dca4 100644
+index f56a0b08dca4..230309b67fe1 100644
 --- a/include/hw/cpu/cpu-slot.h
 +++ b/include/hw/cpu/cpu-slot.h
-@@ -84,5 +84,6 @@ int get_max_topo_by_level(const MachineState *ms, CpuTopologyLevel level);
+@@ -81,6 +81,8 @@ struct CPUSlot {
+ void machine_plug_cpu_slot(MachineState *ms);
+ bool machine_create_topo_tree(MachineState *ms, Error **errp);
+ int get_max_topo_by_level(const MachineState *ms, CpuTopologyLevel level);
++unsigned int machine_topo_get_cores_per_socket(const MachineState *ms);
++unsigned int machine_topo_get_threads_per_socket(const MachineState *ms);
  bool machine_parse_custom_topo_config(MachineState *ms,
                                        const SMPConfiguration *config,
                                        Error **errp);
-+bool machine_validate_topo_tree(MachineState *ms, Error **errp);
+diff --git a/system/cpus.c b/system/cpus.c
+index 1c818ff6828c..53e7cfb8a55f 100644
+--- a/system/cpus.c
++++ b/system/cpus.c
+@@ -667,7 +667,7 @@ void qemu_init_vcpu(CPUState *cpu)
+     MachineState *ms = MACHINE(qdev_get_machine());
  
- #endif /* CPU_SLOT_H */
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index ddcaa329e3ec..3f2117e08774 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -1063,6 +1063,11 @@ static inline void qbus_mark_full(BusState *bus)
-     bus->full = true;
- }
+     cpu->nr_cores = machine_topo_get_cores_per_socket(ms);
+-    cpu->nr_threads =  ms->smp.threads;
++    cpu->nr_threads = get_max_topo_by_level(ms, CPU_TOPOLOGY_LEVEL_THREAD);
+     cpu->stopped = true;
+     cpu->random_seed = qemu_guest_random_seed_thread_part1();
  
-+static inline void qbus_mask_full(BusState *bus)
-+{
-+    bus->full = false;
-+}
-+
- void device_listener_register(DeviceListener *listener);
- void device_listener_unregister(DeviceListener *listener);
+diff --git a/tests/unit/test-smp-parse.c b/tests/unit/test-smp-parse.c
+index f9bccb56abc7..44d2213a7163 100644
+--- a/tests/unit/test-smp-parse.c
++++ b/tests/unit/test-smp-parse.c
+@@ -801,8 +801,8 @@ static void check_parse(MachineState *ms, const SMPConfiguration *config,
+     /* call the generic parser */
+     machine_parse_smp_config(ms, config, &err);
  
+-    ms_threads_per_socket = machine_topo_get_threads_per_socket(ms);
+-    ms_cores_per_socket = machine_topo_get_cores_per_socket(ms);
++    ms_threads_per_socket = machine_topo_get_threads_per_socket_old(ms);
++    ms_cores_per_socket = machine_topo_get_cores_per_socket_old(ms);
+     output_topo_str = cpu_topology_to_string(&ms->smp,
+                                              ms_threads_per_socket,
+                                              ms_cores_per_socket,
 -- 
 2.34.1
 
