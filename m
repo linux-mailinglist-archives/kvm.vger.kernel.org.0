@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-27135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FEE697C382
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 06:48:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 503EE97C384
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 06:48:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 075F11F22CA6
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 04:48:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 752341C2243C
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 04:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF473CF51;
-	Thu, 19 Sep 2024 04:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C925E200AE;
+	Thu, 19 Sep 2024 04:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xg8iB9RN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aPLYOVVH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A187C3B79C
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 04:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934A14206D
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 04:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726721236; cv=none; b=PRHyNtKOSCbKf0aGTsbY69sETeTz7CSfKQMf6ca4JyUskH1erRixrRM048xK1R6UGNkr6bc53ysVnvWZYkN51UXXAc4YQyOnXOAsZulPF1IPlM9ZKrTnJeGUCZmVwshq2uh2nKcSPgd6V6ilezusTihw6/RwFUYA0P60eIDpAs0=
+	t=1726721238; cv=none; b=ruORDNKjgkq8dDY1kPy70j5wOoTTPOnDy/ZnTw/Mbaei76uv0pMnRD50tMyqke8PykviO0ag9dF8ZCdDLLDIWWDu71F128BbnalDL1UvzlU7YiaesB8gakvBHSwxoxpBbxCaNrNPx1ROYKPKOZFPfEIGe7PCxnegYrMS1baqrC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726721236; c=relaxed/simple;
-	bh=L03cMnciaXv+Tu1dHQm4msd/v7u2MEWZ2b+KhDe0RV0=;
+	s=arc-20240116; t=1726721238; c=relaxed/simple;
+	bh=yvpumS8T8+RP59x5A8bfw9cg1+WDbsrkKy7pql26upQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Aw1gBzV/b/UNq8Ae+JXWtKFbg1V+Lvjnv+m3IB14oEMJzVI2Q3Rpvgv7nlyVI9rAS4WE2GNnHAsPRk5YgwSWKDQnN6EsmuJEP1cOhbHUvAcfOjT42ptzPi2d9+JQUUDHz9P3TvdBi9ySG29cQfJbqsyHtPUBLbdBQI+El6hP8Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Xg8iB9RN; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version; b=jDTv+DesVwZjm4GXHs1epzz0/bo2MNo99o70MwdN5QgbBCHZ5EFh68Kclb2UwG2auuhWxwxHrRSp0GJUw9BjD7080wB04DGhP2u6DWi6rli2+eRiXFoYYBAkruYzR4SILyuNXHz6CbqG9q2uHgP3kd4mbe00+FharGkpH5caQIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aPLYOVVH; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-718d8d6af8fso288055b3a.3
-        for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 21:47:14 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7191fb54147so271831b3a.2
+        for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 21:47:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726721234; x=1727326034; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726721236; x=1727326036; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7PZhVYqzq4kADvRMhAIMG6rvS/s/Gp2LRBj3c7uTV/4=;
-        b=Xg8iB9RNTIr8NP6JjBGg1UY1cXl6WTO4zJiQzSQ+8EtJiATcHTvi8fq2LhUVHXGWXe
-         pXXeVo8wHLcTDy7jvUabT+smGNS2RSJMOGID19iZGFZOKq18jzM42JfZkZLdBkbktND0
-         0F/4+a2KV2MHLzTiJaKbs0TEhUFhzpm8nWOA3xN0nFNzSvp5wt7IAWXykiCC+U+gr8Zq
-         sQ9vZHE15vPQiskPRXemZu69pSzn0+kLGSIeLWz5MzJwePsJlHKJGGwGUeHeCzcX7KYh
-         I3JEHm8UM7fBw76zwku6t5/R5yTsPDatTmPwiATbOOePrbuB+Q4mhceLV734CLrxRzFX
-         9MVA==
+        bh=volzZG+VvX1cjCtnHdp2ianv+4MCm6slEtRN/0TB/Mc=;
+        b=aPLYOVVHpxWT5n7kpfPFjEEg/6/+ocSIvLpoXFmg/Lta3wRc6AiDnTXiMZF4fitoo+
+         ls6FLeeT9wDGQdGBaTMKhUfpMwSMgZRzoSW4YPP3f5RIyTq3kylfZ8gWTnH6QNH+6FRn
+         RLUR3uATYP524nP8aEPOExB7fgJKA+Ju6JjtKe9lOO3wq9NWiYI2wTaQdtmsMctvGotJ
+         UfiT88hlaTSzdk7c7rbSFUQEGKQQBXx/ST9RgvSJaXksqN1b5q7uZ/NPnp7Ql6VV60N3
+         D8BucPZ+THQumdEriZiHdpaKKfC3ag8dOuNIYXL0cr1MGEaie0lv9uS1AojEX0fDF7k2
+         SaeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726721234; x=1727326034;
+        d=1e100.net; s=20230601; t=1726721236; x=1727326036;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7PZhVYqzq4kADvRMhAIMG6rvS/s/Gp2LRBj3c7uTV/4=;
-        b=tnrjzyCaygh/p3FqbY7H2xcSVpzrk31A1CaquxHrpbA2qBdRf6dtg0/ecQ3/m8V3+W
-         5wkWK/oP/j8moe4cpsDxF8ctcEXB5mFd2rh8tcKwDIi01Ja1PE7Ulw5XOcZ1jD9Ex2Ca
-         eiLNjnDhq/hv5JozFEIyzL9d3YAecymSswTGxweK9rEI5oKo9/lxgh2ucim6opE8WCEH
-         F9YsIPoSSrX1KzDC5IpcX9BN3Izzlj7nsEU9UUwjNuby6eg7jCAMV3IOfPvCnfil2cuo
-         AzxjP3Boffzn0aTuEYiKgaAcdXLrBqV04JwYyKJPWfXvKMq2j5IFi+p3eq4vojgSqr4J
-         GKiA==
-X-Forwarded-Encrypted: i=1; AJvYcCXdysEYjyw8/pKPY3WRbfK5r73WwGjlaIJzgBWXWdSzkUcuPEphANbn2MQ69zLbRVYCxlk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJ0Tdkubc9LHBDXj6pmVMlmWDZxR4e9Al7XVfxNqE/sej7KDj0
-	TFd4NOwzFdsqWKLvLzpkPhdyMpqGfD8hhVu4c8TbX1EXCQgdXAs2V1pXvDkMzyg=
-X-Google-Smtp-Source: AGHT+IFRqXUQzeifeEouuocTRosW9D+grcvLtI1xOR31wi5/CcwZDxPvsAI1HZex+byGlUmwqu8pKw==
-X-Received: by 2002:a05:6a00:2d91:b0:717:86ea:d010 with SMTP id d2e1a72fcca58-719261edaa2mr33169557b3a.21.1726721233871;
-        Wed, 18 Sep 2024 21:47:13 -0700 (PDT)
+        bh=volzZG+VvX1cjCtnHdp2ianv+4MCm6slEtRN/0TB/Mc=;
+        b=T+voDAEpkIZqIjPm7T2+G6LYxxMPcdMXKh/y2pNl5tlZU7DwAXavLxdkLXf6WHkHFs
+         poggF86j6dGCduAOhcgtBTB32gVaTpzsw/3aRCDUenxmnK+oxcEfBCJJArhA4WsN6+jE
+         kFGBtYd3MnpMOxO4anjcoiSJTtaGensEXQ/qmDOSDIpCeQZyOFdIQ9BLhTTiYW49ejea
+         eP0GHS3OzIM5x6mW7f07UJ6HQq/r2sGczGLb6cBZaD/3+nKNYBJgfIehPN2lx2kMkLgv
+         dAEQnOS2XX4EbGp88AqsyMdbWWSGWOuMX3Js09pF0oWVszqmbeGvkfA8loKLWgvUk7ax
+         k+Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXgy8dB7HHpa9esOZq3+3MpIeD9Zhq0hwd7cOe4E4XoszxC6wLjGdK6Awxq379nmf+YK9k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGbAiAn1nzfEZvQskUdR7Rs7rfIdlPVygFf2e9IYogp+wPjlKR
+	LFNkl13Bv6UkFxwHvaYcHrTz19fGGMgw2nbFdX5x6UtMTnF587qRj73j7LVR2tQ=
+X-Google-Smtp-Source: AGHT+IFkwdx7PRwXSy60OR+EcQ83hvrfwCo2zu+BZr4pCRc3QVrXN1huxPQ5BQ1Ng2g+CQtBhwCssQ==
+X-Received: by 2002:a05:6a00:2352:b0:70d:2e24:af75 with SMTP id d2e1a72fcca58-71926210c2cmr41850428b3a.24.1726721235916;
+        Wed, 18 Sep 2024 21:47:15 -0700 (PDT)
 Received: from linaro.. (216-180-64-156.dyn.novuscom.net. [216.180.64.156])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944bc279csm7478601b3a.188.2024.09.18.21.47.12
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944bc279csm7478601b3a.188.2024.09.18.21.47.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Sep 2024 21:47:13 -0700 (PDT)
+        Wed, 18 Sep 2024 21:47:15 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Palmer Dabbelt <palmer@dabbelt.com>,
@@ -133,9 +133,9 @@ Cc: Palmer Dabbelt <palmer@dabbelt.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
 	Peter Maydell <peter.maydell@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v3 14/34] target/i386/kvm: replace assert(false) with g_assert_not_reached()
-Date: Wed, 18 Sep 2024 21:46:21 -0700
-Message-Id: <20240919044641.386068-15-pierrick.bouvier@linaro.org>
+Subject: [PATCH v3 15/34] accel/tcg: remove break after g_assert_not_reached()
+Date: Wed, 18 Sep 2024 21:46:22 -0700
+Message-Id: <20240919044641.386068-16-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20240919044641.386068-1-pierrick.bouvier@linaro.org>
 References: <20240919044641.386068-1-pierrick.bouvier@linaro.org>
@@ -145,42 +145,30 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 This patch is part of a series that moves towards a consistent use of
 g_assert_not_reached() rather than an ad hoc mix of different
 assertion mechanisms.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- target/i386/kvm/kvm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ accel/tcg/plugin-gen.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index ada581c5d6e..c8056ef83d7 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -5771,7 +5771,7 @@ static int kvm_handle_rdmsr(X86CPU *cpu, struct kvm_run *run)
-         }
+diff --git a/accel/tcg/plugin-gen.c b/accel/tcg/plugin-gen.c
+index ec89a085b43..2ee4c22befd 100644
+--- a/accel/tcg/plugin-gen.c
++++ b/accel/tcg/plugin-gen.c
+@@ -251,7 +251,6 @@ static void inject_mem_cb(struct qemu_plugin_dyn_cb *cb,
+         break;
+     default:
+         g_assert_not_reached();
+-        break;
      }
- 
--    assert(false);
-+    g_assert_not_reached();
  }
  
- static int kvm_handle_wrmsr(X86CPU *cpu, struct kvm_run *run)
-@@ -5790,7 +5790,7 @@ static int kvm_handle_wrmsr(X86CPU *cpu, struct kvm_run *run)
-         }
-     }
- 
--    assert(false);
-+    g_assert_not_reached();
- }
- 
- static bool has_sgx_provisioning;
 -- 
 2.39.5
 
