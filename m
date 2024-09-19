@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-27157-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27158-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13CF497C3F5
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 07:55:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 698C997C3F7
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 07:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FE8C1F22191
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 05:55:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3009E283649
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 05:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1008378C8D;
-	Thu, 19 Sep 2024 05:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF7B73514;
+	Thu, 19 Sep 2024 05:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iY8yUBdV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DDr2X3+4"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A55C17BAF
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 05:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C6D6A039
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 05:55:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726725339; cv=none; b=kO3SqHBoCWaK1tjalJGgIwuzfbba1+s389wy0/l9ctt0ETbR0S18X66CBoveAL0/6abXYLZyGfiWuiTtqfaIM2uBXBKIUenCJrN7c7tKAuVhIe6vMFKukPOeX3hMXQthfFZ01fGAhnNNRn3DidUql3uWxf+cDVlxGlkehFXXDW0=
+	t=1726725356; cv=none; b=Fx7nBp31i+kyXD/HbNo78QzY7XQwLgj59SgNwqzG6iq63UBWi05yT1BXq8Hi4PFNNx6iDX31N5dO2HppKJ4Bis2X/U1ExCfc0D3VqOcKvD2kXrNlF/rhAbAc1FrPtcHlaTtvpubq4sz4rwFTeKiMqbo21U9PqYOOyP/KbWtzeEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726725339; c=relaxed/simple;
-	bh=8vg6cBFZQesBlTuKocwFM3B2ozeoI/WHoRcB8vhHX3k=;
+	s=arc-20240116; t=1726725356; c=relaxed/simple;
+	bh=/cMy+TVZMq4kWR7qIMuMwsU4jrTnlPcE1TIfBgg13Sg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mCMnvWOmI4SCsSm881a6gQBLifbz1iuEs/B0usef8v2nYU6iatPYKLS3STZweIPxh8MsrLNCHU8/ijHY78HH44oLtsfvsg9WPUZK5BrIQpg6OubPqXnYx8NlI6/SgeAIq8IWI3f7XCzoJWyWJrpRnMQAe3OECKwbh4HHu1ab+XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iY8yUBdV; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=rUYKgZBuIjaUlb4wk9VrHv4rVgKdslVgYIQzMBrP88hrjvNeNNC7suNrLEP9Cwn7h79/NOyhhZ5iSTkATpADnDMjbB1lO02tftdROSbv2186zBh9il2lx2DW9s/uYDc3Yk57pE+UNm/p0ekygCZhYJb3pOuymJmNdaiS/2cq530=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DDr2X3+4; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726725337; x=1758261337;
+  t=1726725356; x=1758261356;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8vg6cBFZQesBlTuKocwFM3B2ozeoI/WHoRcB8vhHX3k=;
-  b=iY8yUBdVVtcOQCAy/0a3LGJ9a4c0/UVh0O9EIRcNqElWlBMGshD+oONg
-   XtxJbdNSivGQMp9q3V4pDu5wm8+BNHLeUpnL2Czfx1Gu+Mstunmc6v8Ic
-   mEaKXo0RbXtvNOXxskG4h/sjDlS1BiL4/cyNZTtX7glyX3rvfXzkJ9rdQ
-   +/sRpOWIGncNjDpATrpFw/igKJyp8B+NyUBAu6wCCKPCSww8bHEOQ6GRJ
-   GEN8YpcH6R97KHj7YIYORhleG4cgx8k2JfUz3eLW8eR/CUzz//ug1OQfD
-   s/y6totc171NasUE42ORTIPsdwvyO40auoNWnXGhVWKe8LOWghUh54qUA
-   Q==;
-X-CSE-ConnectionGUID: rFiUZqlIQg+yjs8Pc06wSA==
-X-CSE-MsgGUID: GXsJNhQzSRiEJ6DcXsz8SQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="25813445"
+  bh=/cMy+TVZMq4kWR7qIMuMwsU4jrTnlPcE1TIfBgg13Sg=;
+  b=DDr2X3+4+byZfY8xvhQenvrcadP4Q71ZjfJFrRuK1aTR6opG5mvM0Dxr
+   zmz85K2xxqr4bqYuytRXB7OwBXpWoz3niXPt0DHhAJ1DiQuFlEEWiXFDk
+   Xt1x6nO9fBt9G+STUPCVfwY5ofivv685kJR5BAg8RBl3kNkkjCnkdmbal
+   HOM62Uk5Da1bqHeNJkXaJXymLhskA+OeEKQN/6GpnlYdPBHFt0sNObU7L
+   +cM+IOmJwZe27muQ7eU4V+LHX6lw34kmHMLqBv9Ex00bG2Csd1GxbNd5y
+   cBncFSbPQzMDki89RlxUem4yL9YjeqUkhLuwlMDdt9aE18EvlteT00EXz
+   w==;
+X-CSE-ConnectionGUID: gUEog2ugRNWJw9L/AU3zQA==
+X-CSE-MsgGUID: y2q3NxGTTSyot085tWII2g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="25813480"
 X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="25813445"
+   d="scan'208";a="25813480"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 22:55:37 -0700
-X-CSE-ConnectionGUID: bQQEQDoBRhGmcoS6NdtmMA==
-X-CSE-MsgGUID: oV7dFcGcTuSTNDb8wim0HA==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 22:55:43 -0700
+X-CSE-ConnectionGUID: HLpTBuCBQpubXQuDEb2ZXA==
+X-CSE-MsgGUID: hbxUqHsUT/+8D401YpRrJQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="69418610"
+   d="scan'208";a="69418634"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa006.fm.intel.com with ESMTP; 18 Sep 2024 22:55:31 -0700
+  by fmviesa006.fm.intel.com with ESMTP; 18 Sep 2024 22:55:37 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Igor Mammedov <imammedo@redhat.com>,
@@ -85,9 +85,9 @@ Cc: qemu-devel@nongnu.org,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC v2 01/12] qdev: Allow qdev_device_add() to add specific category device
-Date: Thu, 19 Sep 2024 14:11:17 +0800
-Message-Id: <20240919061128.769139-2-zhao1.liu@intel.com>
+Subject: [RFC v2 02/12] qdev: Introduce new device category to cover basic topology device
+Date: Thu, 19 Sep 2024 14:11:18 +0800
+Message-Id: <20240919061128.769139-3-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240919061128.769139-1-zhao1.liu@intel.com>
 References: <20240919061128.769139-1-zhao1.liu@intel.com>
@@ -99,133 +99,56 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Topology devices need to be created and realized before board
-initialization.
+Topology devices are used to define CPUs and need to be created and
+realized earlier than current qemu_create_cli_devices().
 
-Allow qdev_device_add() to specify category to help create topology
-devices early.
+Use this new catogory to identify such special devices, which allows
+to create them earlier in subsequent change.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/net/virtio-net.c    |  2 +-
- hw/usb/xen-usb.c       |  3 ++-
- include/monitor/qdev.h |  4 ++--
- system/qdev-monitor.c  | 12 ++++++++----
- system/vl.c            |  4 ++--
- 5 files changed, 15 insertions(+), 10 deletions(-)
+ hw/cpu/cpu-topology.c  | 2 +-
+ include/hw/qdev-core.h | 1 +
+ system/qdev-monitor.c  | 1 +
+ 3 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index fb84d142ee29..0d92e09e9076 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -935,7 +935,7 @@ static void failover_add_primary(VirtIONet *n, Error **errp)
-         return;
-     }
+diff --git a/hw/cpu/cpu-topology.c b/hw/cpu/cpu-topology.c
+index 3e8982ff7e6c..ce3da844a7d8 100644
+--- a/hw/cpu/cpu-topology.c
++++ b/hw/cpu/cpu-topology.c
+@@ -164,7 +164,7 @@ static void cpu_topo_class_init(ObjectClass *oc, void *data)
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     CPUTopoClass *tc = CPU_TOPO_CLASS(oc);
  
--    dev = qdev_device_add_from_qdict(n->primary_opts,
-+    dev = qdev_device_add_from_qdict(n->primary_opts, NULL,
-                                      n->primary_opts_from_json,
-                                      &err);
-     if (err) {
-diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
-index 13901625c0c8..e4168b1fec7e 100644
---- a/hw/usb/xen-usb.c
-+++ b/hw/usb/xen-usb.c
-@@ -766,7 +766,8 @@ static void usbback_portid_add(struct usbback_info *usbif, unsigned port,
-     qdict_put_str(qdict, "hostport", portname);
-     opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict,
-                                 &error_abort);
--    usbif->ports[port - 1].dev = USB_DEVICE(qdev_device_add(opts, &local_err));
-+    usbif->ports[port - 1].dev = USB_DEVICE(
-+                                     qdev_device_add(opts, NULL, &local_err));
-     if (!usbif->ports[port - 1].dev) {
-         qobject_unref(qdict);
-         xen_pv_printf(&usbif->xendev, 0,
-diff --git a/include/monitor/qdev.h b/include/monitor/qdev.h
-index 1d57bf657794..f5fd6e6c1ffc 100644
---- a/include/monitor/qdev.h
-+++ b/include/monitor/qdev.h
-@@ -8,8 +8,8 @@ void hmp_info_qdm(Monitor *mon, const QDict *qdict);
- void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp);
+-    set_bit(DEVICE_CATEGORY_CPU, dc->categories);
++    set_bit(DEVICE_CATEGORY_CPU_DEF, dc->categories);
+     dc->realize = cpu_topo_realize;
  
- int qdev_device_help(QemuOpts *opts);
--DeviceState *qdev_device_add(QemuOpts *opts, Error **errp);
--DeviceState *qdev_device_add_from_qdict(const QDict *opts,
-+DeviceState *qdev_device_add(QemuOpts *opts, long *category, Error **errp);
-+DeviceState *qdev_device_add_from_qdict(const QDict *opts, long *category,
-                                         bool from_json, Error **errp);
- 
- /**
+     /*
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 77223b28c788..ddcaa329e3ec 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -86,6 +86,7 @@ typedef enum DeviceCategory {
+     DEVICE_CATEGORY_SOUND,
+     DEVICE_CATEGORY_MISC,
+     DEVICE_CATEGORY_CPU,
++    DEVICE_CATEGORY_CPU_DEF,
+     DEVICE_CATEGORY_WATCHDOG,
+     DEVICE_CATEGORY_MAX
+ } DeviceCategory;
 diff --git a/system/qdev-monitor.c b/system/qdev-monitor.c
-index 457dfd05115e..fe120353fedc 100644
+index fe120353fedc..07863d4e650a 100644
 --- a/system/qdev-monitor.c
 +++ b/system/qdev-monitor.c
-@@ -632,7 +632,7 @@ const char *qdev_set_id(DeviceState *dev, char *id, Error **errp)
-     return prop->name;
- }
- 
--DeviceState *qdev_device_add_from_qdict(const QDict *opts,
-+DeviceState *qdev_device_add_from_qdict(const QDict *opts, long *category,
-                                         bool from_json, Error **errp)
- {
-     ERRP_GUARD();
-@@ -655,6 +655,10 @@ DeviceState *qdev_device_add_from_qdict(const QDict *opts,
-         return NULL;
-     }
- 
-+    if (category && !test_bit(*category, dc->categories)) {
-+        return NULL;
-+    }
-+
-     /* find bus */
-     path = qdict_get_try_str(opts, "bus");
-     if (path != NULL) {
-@@ -767,12 +771,12 @@ err_del_dev:
- }
- 
- /* Takes ownership of @opts on success */
--DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
-+DeviceState *qdev_device_add(QemuOpts *opts, long *category, Error **errp)
- {
-     QDict *qdict = qemu_opts_to_qdict(opts, NULL);
-     DeviceState *ret;
- 
--    ret = qdev_device_add_from_qdict(qdict, false, errp);
-+    ret = qdev_device_add_from_qdict(qdict, category, false, errp);
-     if (ret) {
-         qemu_opts_del(opts);
-     }
-@@ -897,7 +901,7 @@ void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
-         qemu_opts_del(opts);
-         return;
-     }
--    dev = qdev_device_add(opts, errp);
-+    dev = qdev_device_add(opts, NULL, errp);
-     if (!dev) {
-         /*
-          * Drain all pending RCU callbacks. This is done because
-diff --git a/system/vl.c b/system/vl.c
-index 193e7049ccbe..c40364e2f091 100644
---- a/system/vl.c
-+++ b/system/vl.c
-@@ -1212,7 +1212,7 @@ static int device_init_func(void *opaque, QemuOpts *opts, Error **errp)
- {
-     DeviceState *dev;
- 
--    dev = qdev_device_add(opts, errp);
-+    dev = qdev_device_add(opts, NULL, errp);
-     if (!dev && *errp) {
-         error_report_err(*errp);
-         return -1;
-@@ -2665,7 +2665,7 @@ static void qemu_create_cli_devices(void)
-          * from the start, so call qdev_device_add_from_qdict() directly for
-          * now.
-          */
--        dev = qdev_device_add_from_qdict(opt->opts, true, &error_fatal);
-+        dev = qdev_device_add_from_qdict(opt->opts, NULL, true, &error_fatal);
-         object_unref(OBJECT(dev));
-         loc_pop(&opt->loc);
-     }
+@@ -179,6 +179,7 @@ static void qdev_print_devinfos(bool show_no_user)
+         [DEVICE_CATEGORY_SOUND]   = "Sound",
+         [DEVICE_CATEGORY_MISC]    = "Misc",
+         [DEVICE_CATEGORY_CPU]     = "CPU",
++        [DEVICE_CATEGORY_CPU_DEF] = "CPU Definition",
+         [DEVICE_CATEGORY_WATCHDOG]= "Watchdog",
+         [DEVICE_CATEGORY_MAX]     = "Uncategorized",
+     };
 -- 
 2.34.1
 
