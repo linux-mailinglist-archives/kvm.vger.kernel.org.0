@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-27166-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27167-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35CEB97C403
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 07:56:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF91997C404
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 07:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E896D283649
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 05:56:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51F2C1F21EA5
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 05:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953AB12B143;
-	Thu, 19 Sep 2024 05:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76D47581D;
+	Thu, 19 Sep 2024 05:56:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QfyZsd3c"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UG92vlR6"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6C2745F2
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 05:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D1117BAF
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 05:56:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726725393; cv=none; b=JUILEDDO35E8cNjYZFe4MO7Ln4byjS22zuG1Ixsz3sEOHyAT/ttevgagvr6CDukptANW2NzoxvXijxaWjp54whJnVz6fa/uTWHxeDIYTDGyWI4/FWQo2L1oyptSIVmXvSNDiq0Wy5gimFchrLWwlDqfes+k708KeRm2wZgu+hWY=
+	t=1726725403; cv=none; b=rBtjQtG3zBHQ5VDo4f7b1k940t7PsGMt5S9OCLV1KV6aWEIzQQ8phHS2GA6C9L6jM087mzoqGlUgorpGw5WpTkLvAWOKbZKVYLyWrHYO+jFS8h7GF30KUPJ/NVuLmaZDo5X1cntPMHDDDuUtWPlfwhi3H7UdVSZ8GTCUwGWPSPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726725393; c=relaxed/simple;
-	bh=Oni1QkPfkrICnCBlh4UeJn1VwjE0CfJhi05hbONHUs0=;
+	s=arc-20240116; t=1726725403; c=relaxed/simple;
+	bh=85v++8FV1/OeoJfcfM2dF4Z0fvvP/1Y4odYjQpC249A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=A5HtzGZAZWi8/He2pAd8d72TucNZuztjVToXxRJEx5EVSYMCfHG54iqpn+yE2U+gxdEWiB2uT6MV/4s+DV86JCc7W1LjaYa96ysDterHgg8d5AF3jWxtub84zPSoXZKqbzQoBtDVM5b379VbGn7704z3tbbcHqojhdr/Se4l3Zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QfyZsd3c; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=Y30rWU+5GFxWIIdCMgp2ZCv7D00ruNYedmsgs2C/aaU+6boZbwHR5y6wRRsheiPcDDuDXgWQmWOjnP59w8hEzoGup8yNSgBv0YV2p7bBJW/9DvYYUJ5eqJeup5F498Llpl3YLRIu8injlFKeuDoLFu8Vty6CNQOP1zKGfWDgtUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UG92vlR6; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726725392; x=1758261392;
+  t=1726725402; x=1758261402;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Oni1QkPfkrICnCBlh4UeJn1VwjE0CfJhi05hbONHUs0=;
-  b=QfyZsd3c5+sHaZ50pf2+k5BO+q2cBrYxiJGcHkOsb+0jNd1+WY0ZLoRq
-   9a4RgghIB9/w8nqqj3L1f7V0nA5+eoYfoIws5KRcrRvD3dia+mt22ESrN
-   vHXy8n08XpirVb4eOb8BeQSDn13+QQZZ0Z5s7Q/5thnnaYGuF+B8IbVhR
-   cAVC+FrbgI7LSK5wSEnzet+I1GBPRF5pqS6cTnNge/Jzjm7UpSd8XtQuR
-   Y6GNw5NZYyKCBRQw/391PZjAavGxMRFpYiL3pVyc23XUEmyGlLhpGvuM1
-   t49UaVaxkU3vLrgH91Ebga/tn9PiQulyQugfTCK5WKbjDIAkb6m7ALxcJ
+  bh=85v++8FV1/OeoJfcfM2dF4Z0fvvP/1Y4odYjQpC249A=;
+  b=UG92vlR6rRguyl6jFXJGkkmfk4hkgdIF2Zp7u4F2gdDhWVm4x4zHbeRq
+   0w7Mx+U2UcjPprdFmHnoAMVY8toaZnf1uobI9TStcNzUxe6l2Z/hmsaHW
+   IfyVPvOZYv4Qmzq5yD1sx/OyTnl/biwAMmdKS4N/WEQYSoiujE4Gz341R
+   gDtsv6wVh37NAo2u41BTVRIkkY1kgwGeSkqFgEQi5Q5JiWtvPinH3gg5R
+   h3vwTlx0itA9R7+GyWZ9obDaLEFcDXsSFDHUSAirw4RIVNO5BloFg7Rsp
+   QSMK/ZDq2K7sWhCv6m1yH5wbPT3TTc1PJOKyMLuVt8mxKyBiKQXXHGF+8
    Q==;
-X-CSE-ConnectionGUID: OTCQi90iR0Cj6po+Pd3bjA==
-X-CSE-MsgGUID: lMcfgayBRAOGNwKSkdidgw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="25813713"
+X-CSE-ConnectionGUID: YGSqAmaNQi2qYXKtLZMrFg==
+X-CSE-MsgGUID: iVJknf+dSjCiB1fW+tW+GA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="25813761"
 X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="25813713"
+   d="scan'208";a="25813761"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 22:56:32 -0700
-X-CSE-ConnectionGUID: Sel7rERnT/aTpdzbHPcXrg==
-X-CSE-MsgGUID: dLracHQoTbOgKrV0muLpCQ==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 22:56:41 -0700
+X-CSE-ConnectionGUID: UYayTWY+RcSOXbGe/lxomA==
+X-CSE-MsgGUID: oSBDaJfESCymhB7De9E+LA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="69418804"
+   d="scan'208";a="69418828"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa006.fm.intel.com with ESMTP; 18 Sep 2024 22:56:26 -0700
+  by fmviesa006.fm.intel.com with ESMTP; 18 Sep 2024 22:56:32 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Igor Mammedov <imammedo@redhat.com>,
@@ -84,11 +84,10 @@ Cc: qemu-devel@nongnu.org,
 	Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Zhuocheng Ding <zhuocheng.ding@intel.com>
-Subject: [RFC v2 10/12] i386/cpu: Support Intel hybrid CPUID
-Date: Thu, 19 Sep 2024 14:11:26 +0800
-Message-Id: <20240919061128.769139-11-zhao1.liu@intel.com>
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [RFC v2 11/12] i386/machine: Split machine initialization after CPU creation into post_init()
+Date: Thu, 19 Sep 2024 14:11:27 +0800
+Message-Id: <20240919061128.769139-12-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240919061128.769139-1-zhao1.liu@intel.com>
 References: <20240919061128.769139-1-zhao1.liu@intel.com>
@@ -100,170 +99,228 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For hybrid cpu topology, Intel exposes these CPUIDs [1]:
-1. Set CPUID.07H.0H:EDX.Hybrid[bit 15]. With setting as 1, the processor
-   is identified as a hybrid part.
-2. Have CPUID.1AH leaf. Set core type and native model ID in
-   CPUID.1AH:EAX. Because the native model ID is currently useless for
-   the software, no need to emulate.
+Custom topology will allow machine to skip the default CPU creation and
+accept user's CPU creation from CLI.
 
-For hybrid related CPUIDs, especially CPUID.07H.0H:EDX.Hybrid[bit 15],
-there's no need to expose this feature in feature_word_info[] to allow
-user to set directly, because hybrid features depend on the specific
-core type information, and this information needs to be gathered
-together with hybrid cpu topology.
+Therefore, for microvm, pc-i440fx and pc-q35, split machine
+initialization from x86_cpus_init(), and place the remaining part into
+post_init(), which can continue to run after CPU creation from CLI.
 
-[1]: SDM, vol.2, Ch.3, 3.2 Instructions (A-L), CPUID-CPU Identification
+This addresses the CPU dependency for the remaining initialization steps
+after x86_cpus_init().
 
-Co-Developed-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
-Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- target/i386/cpu.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++
- target/i386/cpu.h |  5 ++++
- 2 files changed, 63 insertions(+)
+ hw/i386/microvm.c    |  7 +++++++
+ hw/i386/pc_piix.c    | 40 +++++++++++++++++++++++++---------------
+ hw/i386/pc_q35.c     | 36 ++++++++++++++++++++++--------------
+ include/hw/i386/pc.h |  3 +++
+ 4 files changed, 57 insertions(+), 29 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index fb54c2c100a0..2f0e7f3d5ad7 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -22,6 +22,7 @@
- #include "qemu/cutils.h"
- #include "qemu/qemu-print.h"
- #include "qemu/hw-version.h"
-+#include "core.h"
- #include "cpu.h"
- #include "tcg/helper-tcg.h"
- #include "sysemu/hvf.h"
-@@ -743,6 +744,10 @@ static CPUCacheInfo legacy_l3_cache = {
- #define INTEL_AMX_TMUL_MAX_K           0x10
- #define INTEL_AMX_TMUL_MAX_N           0x40
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index 49a897db50fc..dc9b21a34230 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -463,6 +463,11 @@ static void microvm_machine_state_init(MachineState *machine)
+     microvm_memory_init(mms);
  
-+/* CPUID Leaf 0x1A constants: */
-+#define INTEL_HYBRID_TYPE_ATOM         0x20
-+#define INTEL_HYBRID_TYPE_CORE         0x40
+     x86_cpus_init(x86ms, CPU_VERSION_LATEST);
++}
 +
- void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
-                               uint32_t vendor2, uint32_t vendor3)
- {
-@@ -6580,6 +6585,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-                 *ecx |= CPUID_7_0_ECX_OSPKE;
-             }
-             *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
-+
-+            if (env->parent_core_type != COMMON_CORE &&
-+                (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
-+                *edx |= CPUID_7_0_EDX_HYBRID;
-+            }
-         } else if (count == 1) {
-             *eax = env->features[FEAT_7_1_EAX];
-             *edx = env->features[FEAT_7_1_EDX];
-@@ -6800,6 +6810,31 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         }
-         break;
-     }
-+    case 0x1A:
-+        /* Hybrid Information Enumeration */
-+        *eax = 0;
-+        *ebx = 0;
-+        *ecx = 0;
-+        *edx = 0;
-+        if (env->parent_core_type != COMMON_CORE &&
-+            (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
-+            /*
-+             * CPUID.1AH:EAX.[bits 23-0] indicates "native model ID of the
-+             * core". Since this field currently is useless for software,
-+             * no need to emulate.
-+             */
-+            switch (env->parent_core_type) {
-+            case INTEL_ATOM:
-+                *eax = INTEL_HYBRID_TYPE_ATOM << 24;
-+                break;
-+            case INTEL_CORE:
-+                *eax = INTEL_HYBRID_TYPE_CORE << 24;
-+                break;
-+            default:
-+                g_assert_not_reached();
-+            }
-+        }
-+        break;
-     case 0x1D: {
-         /* AMX TILE, for now hardcoded for Sapphire Rapids*/
-         *eax = 0;
-@@ -7459,6 +7494,14 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-             }
-         }
++static void microvm_machine_state_post_init(MachineState *machine)
++{
++    MicrovmMachineState *mms = MICROVM_MACHINE(machine);
  
-+        /*
-+         * Intel CPU topology with hybrid cores support requires CPUID.1AH.
-+         */
-+        if (env->parent_core_type != COMMON_CORE &&
-+            (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
-+            x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1A);
-+        }
-+
-         /*
-          * Intel CPU topology with multi-dies support requires CPUID[0x1F].
-          * For AMD Rome/Milan, cpuid level is 0x10, and guest OS should detect
-@@ -7650,6 +7693,20 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         return;
-     }
+     microvm_devices_init(mms);
+ }
+@@ -665,6 +670,8 @@ static void microvm_class_init(ObjectClass *oc, void *data)
+     /* Machine class handlers */
+     mc->reset = microvm_machine_reset;
  
-+    /*
-+     * TODO: Introduce parent_pre_realize to make sure topology device
-+     * can realize first.
-+     */
-+    if (dev->parent_bus && dev->parent_bus->parent) {
-+        DeviceState *parent = dev->parent_bus->parent;
-+        X86CPUCore *core =
-+            (X86CPUCore *)object_dynamic_cast(OBJECT(parent),
-+                                              TYPE_X86_CPU_CORE);
-+        if (core) {
-+            env->parent_core_type = X86_CPU_CORE_GET_CLASS(core)->core_type;
-+        }
-+    }
++    mc->post_init = microvm_machine_state_post_init;
 +
+     /* hotplug (for cpu coldplug) */
+     mc->get_hotplug_handler = microvm_get_hotplug_handler;
+     hc->pre_plug = microvm_device_pre_plug_cb;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 2bf6865d405e..c1db2f3129cf 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -105,19 +105,9 @@ static void pc_init1(MachineState *machine, const char *pci_type)
+     PCMachineState *pcms = PC_MACHINE(machine);
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     X86MachineState *x86ms = X86_MACHINE(machine);
+-    MemoryRegion *system_memory = get_system_memory();
+-    MemoryRegion *system_io = get_system_io();
+-    Object *phb = NULL;
+-    ISABus *isa_bus;
+-    Object *piix4_pm = NULL;
+-    qemu_irq smi_irq;
+-    GSIState *gsi_state;
+-    MemoryRegion *ram_memory;
+-    MemoryRegion *pci_memory = NULL;
+-    MemoryRegion *rom_memory = system_memory;
+     ram_addr_t lowmem;
+-    uint64_t hole64_size = 0;
+ 
++    pcms->pci_type = pci_type;
      /*
-      * Process Hyper-V enlightenments.
-      * Note: this currently has to happen before the expansion of CPU features.
-@@ -8048,6 +8105,7 @@ static void x86_cpu_initfn(Object *obj)
-     CPUX86State *env = &cpu->env;
+      * Calculate ram split, for memory below and above 4G.  It's a bit
+      * complicated for backward compatibility reasons ...
+@@ -150,9 +140,9 @@ static void pc_init1(MachineState *machine, const char *pci_type)
+      *    qemu -M pc,max-ram-below-4g=4G -m 3968M  -> 3968M low (=4G-128M)
+      */
+     if (xen_enabled()) {
+-        xen_hvm_init_pc(pcms, &ram_memory);
++        xen_hvm_init_pc(pcms, &pcms->pre_config_ram);
+     } else {
+-        ram_memory = machine->ram;
++        pcms->pre_config_ram = machine->ram;
+         if (!pcms->max_ram_below_4g) {
+             pcms->max_ram_below_4g = 0xe0000000; /* default: 3.5G */
+         }
+@@ -182,6 +172,23 @@ static void pc_init1(MachineState *machine, const char *pci_type)
  
-     x86_cpu_init_default_topo(cpu);
-+    env->parent_core_type = COMMON_CORE;
- 
-     object_property_add(obj, "feature-words", "X86CPUFeatureWordInfo",
-                         x86_cpu_get_feature_words,
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index afe2b5fd3382..38236df547e6 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -21,6 +21,7 @@
- #define I386_CPU_H
- 
- #include "sysemu/tcg.h"
-+#include "core.h"
- #include "cpu-qom.h"
- #include "kvm/hyperv-proto.h"
- #include "exec/cpu-defs.h"
-@@ -920,6 +921,8 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w);
- #define CPUID_7_0_EDX_AVX512_VP2INTERSECT (1U << 8)
- /* SERIALIZE instruction */
- #define CPUID_7_0_EDX_SERIALIZE         (1U << 14)
-+/* Hybrid */
-+#define CPUID_7_0_EDX_HYBRID            (1U << 15)
- /* TSX Suspend Load Address Tracking instruction */
- #define CPUID_7_0_EDX_TSX_LDTRK         (1U << 16)
- /* Architectural LBRs */
-@@ -1996,6 +1999,8 @@ typedef struct CPUArchState {
- 
-     /* Bitmap of available CPU topology levels for this CPU. */
-     DECLARE_BITMAP(avail_cpu_topo, CPU_TOPOLOGY_LEVEL__MAX);
+     pc_machine_init_sgx_epc(pcms);
+     x86_cpus_init(x86ms, pcmc->default_cpu_version);
++}
 +
-+    X86CoreType parent_core_type;
- } CPUX86State;
++static void pc_post_init1(MachineState *machine)
++{
++    PCMachineState *pcms = PC_MACHINE(machine);
++    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
++    X86MachineState *x86ms = X86_MACHINE(machine);
++    MemoryRegion *system_memory = get_system_memory();
++    MemoryRegion *system_io = get_system_io();
++    Object *phb = NULL;
++    ISABus *isa_bus;
++    Object *piix4_pm = NULL;
++    qemu_irq smi_irq;
++    GSIState *gsi_state;
++    MemoryRegion *pci_memory = NULL;
++    MemoryRegion *rom_memory = system_memory;
++    uint64_t hole64_size = 0;
  
- struct kvm_msrs;
+     if (kvm_enabled()) {
+         kvmclock_create(pcmc->kvmclock_create_always);
+@@ -195,7 +202,7 @@ static void pc_init1(MachineState *machine, const char *pci_type)
+         phb = OBJECT(qdev_new(TYPE_I440FX_PCI_HOST_BRIDGE));
+         object_property_add_child(OBJECT(machine), "i440fx", phb);
+         object_property_set_link(phb, PCI_HOST_PROP_RAM_MEM,
+-                                 OBJECT(ram_memory), &error_fatal);
++                                 OBJECT(pcms->pre_config_ram), &error_fatal);
+         object_property_set_link(phb, PCI_HOST_PROP_PCI_MEM,
+                                  OBJECT(pci_memory), &error_fatal);
+         object_property_set_link(phb, PCI_HOST_PROP_SYSTEM_MEM,
+@@ -206,7 +213,7 @@ static void pc_init1(MachineState *machine, const char *pci_type)
+                                  x86ms->below_4g_mem_size, &error_fatal);
+         object_property_set_uint(phb, PCI_HOST_ABOVE_4G_MEM_SIZE,
+                                  x86ms->above_4g_mem_size, &error_fatal);
+-        object_property_set_str(phb, I440FX_HOST_PROP_PCI_TYPE, pci_type,
++        object_property_set_str(phb, I440FX_HOST_PROP_PCI_TYPE, pcms->pci_type,
+                                 &error_fatal);
+         sysbus_realize_and_unref(SYS_BUS_DEVICE(phb), &error_fatal);
+ 
+@@ -413,6 +420,7 @@ static void pc_set_south_bridge(Object *obj, int value, Error **errp)
+ static void pc_init_isa(MachineState *machine)
+ {
+     pc_init1(machine, NULL);
++    pc_post_init1(machine);
+ }
+ #endif
+ 
+@@ -423,6 +431,7 @@ static void pc_xen_hvm_init_pci(MachineState *machine)
+                 TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE : TYPE_I440FX_PCI_DEVICE;
+ 
+     pc_init1(machine, pci_type);
++    pc_post_init1(machine);
+ }
+ 
+ static void pc_xen_hvm_init(MachineState *machine)
+@@ -463,6 +472,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+     m->default_nic = "e1000";
+     m->no_floppy = !module_object_class_by_name(TYPE_ISA_FDC);
+     m->no_parallel = !module_object_class_by_name(TYPE_ISA_PARALLEL);
++    m->post_init = pc_post_init1;
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_VMBUS_BRIDGE);
+ 
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 8319b6d45ee3..9ce3e65d7182 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -129,21 +129,7 @@ static void pc_q35_init(MachineState *machine)
+     PCMachineState *pcms = PC_MACHINE(machine);
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     X86MachineState *x86ms = X86_MACHINE(machine);
+-    Object *phb;
+-    PCIDevice *lpc;
+-    DeviceState *lpc_dev;
+-    MemoryRegion *system_memory = get_system_memory();
+-    MemoryRegion *system_io = get_system_io();
+-    MemoryRegion *pci_memory = g_new(MemoryRegion, 1);
+-    GSIState *gsi_state;
+-    ISABus *isa_bus;
+-    int i;
+     ram_addr_t lowmem;
+-    DriveInfo *hd[MAX_SATA_PORTS];
+-    MachineClass *mc = MACHINE_GET_CLASS(machine);
+-    bool acpi_pcihp;
+-    bool keep_pci_slot_hpc;
+-    uint64_t pci_hole64_size = 0;
+ 
+     assert(pcmc->pci_enabled);
+ 
+@@ -188,6 +174,27 @@ static void pc_q35_init(MachineState *machine)
+ 
+     pc_machine_init_sgx_epc(pcms);
+     x86_cpus_init(x86ms, pcmc->default_cpu_version);
++}
++
++static void pc_q35_post_init(MachineState *machine)
++{
++    PCMachineState *pcms = PC_MACHINE(machine);
++    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
++    X86MachineState *x86ms = X86_MACHINE(machine);
++    Object *phb;
++    PCIDevice *lpc;
++    DeviceState *lpc_dev;
++    MemoryRegion *system_memory = get_system_memory();
++    MemoryRegion *system_io = get_system_io();
++    MemoryRegion *pci_memory = g_new(MemoryRegion, 1);
++    GSIState *gsi_state;
++    ISABus *isa_bus;
++    int i;
++    DriveInfo *hd[MAX_SATA_PORTS];
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
++    bool acpi_pcihp;
++    bool keep_pci_slot_hpc;
++    uint64_t pci_hole64_size = 0;
+ 
+     if (kvm_enabled()) {
+         kvmclock_create(pcmc->kvmclock_create_always);
+@@ -348,6 +355,7 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->no_floppy = 1;
+     m->max_cpus = 4096;
+     m->no_parallel = !module_object_class_by_name(TYPE_ISA_PARALLEL);
++    m->post_init = pc_q35_post_init;
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 14ee06287da3..14534781e8fb 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -58,6 +58,9 @@ typedef struct PCMachineState {
+ 
+     SGXEPCState sgx_epc;
+     CXLState cxl_devices_state;
++
++    MemoryRegion *pre_config_ram;
++    const char *pci_type;
+ } PCMachineState;
+ 
+ #define PC_MACHINE_ACPI_DEVICE_PROP "acpi-device"
 -- 
 2.34.1
 
