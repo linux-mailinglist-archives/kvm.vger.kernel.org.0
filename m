@@ -1,70 +1,72 @@
-Return-Path: <kvm+bounces-27121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27122-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A3C97C36D
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 06:46:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D32C97C36E
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 06:47:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA9741F21F3B
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 04:46:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E82A7283AC2
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 04:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EE51B28A;
-	Thu, 19 Sep 2024 04:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0726D1C683;
+	Thu, 19 Sep 2024 04:46:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F9TUXtm7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ke9j1pCH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38741BC46
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 04:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD5217740
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 04:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726721209; cv=none; b=ZhYUx0sJUb7K9XAsDBIWBGv1vhuu5RCmRaINiVwhf4KNuQIvSk8PVbxXtLNz0SctnQwhGQ+GhXgglFxSPOLwLPjafNH4ziO7Zh5g0OYKAhEYTr9ZKv0d59gaPW4tpEctEE1uaXl3yIYegbdKN9fO6m2tQREL03kEAlQYI3/5xw4=
+	t=1726721211; cv=none; b=kWvJAtNL4ASfA9nvrzo0SY4VOwriL+AJxaM5vBM5DKQmtuYX7EfTM8JRZW40RWWNxV3sd2pwgV4kgOA8V27Pr5HAkAPTFH9CeXLYLDEodtSTC+OTIIPGT6O0DQnJbv0msONIEY0Z+zqVY6ocSkVFMYSols8ouj9jZilvJBsslXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726721209; c=relaxed/simple;
-	bh=LOW5dlyXFN0fbsV3pZUBsfmJUvK7b3SUazvap5/jqoI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=UV7DBGtJJ7vsxBrtwXeJrTg2UboK1xAL45fECAvOmJ02BKKXxn7z+LpVVuAd7tfN2HuUu9OhFNxkMohWBO29oXbxjDlPNj/8JQ94E8ZFMHoAviQqjYf8inttWuvRhAb3Xhh/fMu2LpPqj8WLg7BXaS4LJb4CWq5AkONcochSfq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F9TUXtm7; arc=none smtp.client-ip=209.85.215.179
+	s=arc-20240116; t=1726721211; c=relaxed/simple;
+	bh=IoqNRBXFy/wI6A8Da5gsnsZfUt5toPKUe8IBwqqaRvI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=IEXCktFlnY9Vgdg6WJ/sA0E1jPTQiI/pxKkbjKMCO18sgTX1fCGOZg5E7NLe27seXVtkccogKSErLt640Nz8EYBmthealG9pSQq/ZFr1xB4zRH7THI9yedmK5QHk2nl7/4Jehd/YeuxDI7yiM4c8PyqLYCcTLOhk/Vq3l5h9hDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ke9j1pCH; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-656d8b346d2so243049a12.2
-        for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 21:46:47 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71979bf5e7aso286032b3a.1
+        for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 21:46:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726721207; x=1727326007; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=okWQnCc9i+a9qTeP/CljeFJtPOK3zSl+MYdGWF+XBiU=;
-        b=F9TUXtm74oMThHq3MTmvKrFCjpwPpr3pI1UEG42MMq4MndmXFvuYcS0SXvJt19FT3a
-         FkwgAunM6sc1LC17hQVwI9LKWDIYxjJmCGpJ12v9BvqyOcDgEcrhY9kwoIOwHsK3myux
-         OYJg6wRQpFYaX0gXRnucliLHgGSH+16uGSpnnOdOTwHmRSh9/PXygfQc/GtS+ZmVnEI1
-         53xo23e3BFQL7cr1T9m0YvT3lw179HTec7+hRE3EQb4yEIBQOUl05930QEWnscGzQJMr
-         mP3ZtsdsJhaO7AF5O2PNWqH2afztBtBNAxarnfH2uyH6/+qebWTQdiydBTl6gooaEcAr
-         5oCg==
+        d=linaro.org; s=google; t=1726721209; x=1727326009; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bKE/FaSnwekzuSHN/DiZj4HlusD3QhW4e3YSU1WvaKE=;
+        b=Ke9j1pCHAbOOkWfKFaULH9CT3c8K3sUuL/Fik0s1tEB7HkZdVvupwS8e6JKn2rvlxG
+         hP5prvJHCg8iaONy/iGhxGcXZ6hGuNeyleABGpz5ufc058UMd7Y/m0bqDWssvzR1P3Wb
+         0YuIu60fjELswIuaZMwJhjOdliZGFA/rY3ZJDQhq7bzcg9MqyoyHW1e0CczQhWO2q8Ou
+         3wQjE/QVlCnTMkM51AL8CrzKZ4kPVrhaO/JOLGRPIFpjZgB1b0clyZmu8buCtpNqBzxQ
+         Q3ukv1kyQiVZFbCf+0uS7hQkDUruMvW47Xc9Y+PHN3OmkgJAQOSd05GNzMoEtCaxys/+
+         xyaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726721207; x=1727326007;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=okWQnCc9i+a9qTeP/CljeFJtPOK3zSl+MYdGWF+XBiU=;
-        b=acAikMRjG/PkdzEyWsabcZWPCYBmvmZR07JBSbVyKitRfZe1Tq861W0XVjiSzplrFS
-         KwshU9ZzHzwr2/mUj/wQOvU/H23HOfjr+daUIMRuK/MePFNjaP/k1NuZwiLPpe0lKsyy
-         9cK+6pLWCaHfswGRJKEgh56fVMttj0/RSOdJzVqyx3E61ruTKiEAmdCokly6VTFrhK0U
-         Atbz0YShZYATGKV1iwFMTaUH7IuGqiK09ZkD6W2DTUQH+VRlgF+TznHcXZL6mf4Op6Yz
-         n2AP3x7v0otNmtYczpiGwDUzCJw9bPl7fHN5NwtoUK4tJUkDX+SziSX38fUQlf+leXoY
-         hc6A==
-X-Forwarded-Encrypted: i=1; AJvYcCU7ne/bsvczqBlrvCOGNQZm3aALDWxDvxhEIkSjjOX2N+ZKQkTRhu1N15Rb0dbwn4HOgBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgKDULgKmrIKb68gqtvTBO5acFVDzlbAdz/3IYmCPireWhnyd8
-	zfqHPHsnXQYVOxuBmQenJyFhjxsV9CK1TCoLgSUJljopwS9cYk02s8tu8Lu5j1E=
-X-Google-Smtp-Source: AGHT+IFTeoz0sc18zegnRwG9uqK1i/tdvMiZIsB+jYHs0tQzrYbWKu22/eeI4GvU6Dyul2n7o0JIuw==
-X-Received: by 2002:a05:6a21:1690:b0:1cf:4348:d5c8 with SMTP id adf61e73a8af0-1d112e8bfaemr31800828637.39.1726721206933;
-        Wed, 18 Sep 2024 21:46:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726721209; x=1727326009;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bKE/FaSnwekzuSHN/DiZj4HlusD3QhW4e3YSU1WvaKE=;
+        b=ah5dauXuNb/vQPJ0DOIVsTmHloJj78mHsMeNQtAfDVpD/NhACOcQrKpj5CODMOzPOE
+         J9NS5g4OVv0kEz7HdHe0/UI43+lYqndG4XJwGlRGyweajcoMunO0bq+dN+rLQdcGXQ40
+         3e11bfPxcjIUJxr4Mlv4+2opNy7pcqKIzLHirFK+XE4MNvDReZIwhArq1Zk33lmNsiJO
+         jaav5dZRbAzRvxAudQx961nQYhZ5aAuBawXwOmfisLXL0TAZkP4/b5DMpew/7xG8CaP8
+         gvqS3SJYCs7DVqFyYIqFViWGaKXYgV+0t/58xjHn5vW1teYdV562x8RxqhGDOUtQbxp9
+         OfFw==
+X-Forwarded-Encrypted: i=1; AJvYcCX7DopVSJfmAsP01RvNSgYMhVKKJ6TmEhRt9MrnELsbveM93OTs/ANr2SOUKF6P33ES7fs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyf2q34gjs08rthfu/5sBKPMmoZhAKa6zRyp59Y1arO/YrbVkvf
+	bAtfkhI1dKNs57tfcAWE+J4OQSNFduIAEomSWVHBGsqEKQPUr7tzZ/IW3mwu4o4=
+X-Google-Smtp-Source: AGHT+IFSLpGq1tdAK7kcH0oPXH2ipnr8o9jAFjv4J5HFm8vaiwaqPv2XJ4VGf5F1OUzUb1F//zn0vg==
+X-Received: by 2002:a05:6a00:2389:b0:70e:8e3a:10ee with SMTP id d2e1a72fcca58-719261d9b0dmr36234028b3a.21.1726721208838;
+        Wed, 18 Sep 2024 21:46:48 -0700 (PDT)
 Received: from linaro.. (216-180-64-156.dyn.novuscom.net. [216.180.64.156])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944bc279csm7478601b3a.188.2024.09.18.21.46.45
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944bc279csm7478601b3a.188.2024.09.18.21.46.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Sep 2024 21:46:46 -0700 (PDT)
+        Wed, 18 Sep 2024 21:46:48 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Palmer Dabbelt <palmer@dabbelt.com>,
@@ -131,122 +133,43 @@ Cc: Palmer Dabbelt <palmer@dabbelt.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
 	Peter Maydell <peter.maydell@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v3 00/34] Use g_assert_not_reached instead of (g_)assert(0,false)
-Date: Wed, 18 Sep 2024 21:46:07 -0700
-Message-Id: <20240919044641.386068-1-pierrick.bouvier@linaro.org>
+Subject: [PATCH v3 01/34] hw/acpi: replace assert(0) with g_assert_not_reached()
+Date: Wed, 18 Sep 2024 21:46:08 -0700
+Message-Id: <20240919044641.386068-2-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20240919044641.386068-1-pierrick.bouvier@linaro.org>
+References: <20240919044641.386068-1-pierrick.bouvier@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-This series cleans up all usages of assert/g_assert who are supposed to stop
-execution of QEMU. We replace those by g_assert_not_reached().
-It was suggested recently when cleaning codebase to build QEMU with gcc
-and tsan: https://lore.kernel.org/qemu-devel/54bb02a6-1b12-460a-97f6-3f478ef766c6@linaro.org/.
+This patch is part of a series that moves towards a consistent use of
+g_assert_not_reached() rather than an ad hoc mix of different
+assertion mechanisms.
 
-In more, cleanup useless break and return after g_assert_not_reached();
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+---
+ hw/acpi/aml-build.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-And finally, ensure with scripts/checkpatch.pl that we don't reintroduce
-(g_)assert(false) in the future.
-
-New commits (removing return) need review.
-
-Tested that it build warning free with gcc and clang.
-
-If a maintainer could pull the whole series, this would be much more easier than
-integrating various parts of it in different subsystems. Thanks!
-
-v3
-- drop changes on .promela files
-- some changes were already merged
-
-v2
-- align backslashes for some changes
-- add summary in all commits message
-- remove redundant comment
-
-v1
-https://lore.kernel.org/qemu-devel/20240910221606.1817478-1-pierrick.bouvier@linaro.org/T/#t
-
-Pierrick Bouvier (34):
-  hw/acpi: replace assert(0) with g_assert_not_reached()
-  hw/arm: replace assert(0) with g_assert_not_reached()
-  hw/net: replace assert(0) with g_assert_not_reached()
-  migration: replace assert(0) with g_assert_not_reached()
-  qobject: replace assert(0) with g_assert_not_reached()
-  target/ppc: replace assert(0) with g_assert_not_reached()
-  block: replace assert(false) with g_assert_not_reached()
-  hw/hyperv: replace assert(false) with g_assert_not_reached()
-  hw/net: replace assert(false) with g_assert_not_reached()
-  hw/nvme: replace assert(false) with g_assert_not_reached()
-  hw/pci: replace assert(false) with g_assert_not_reached()
-  hw/ppc: replace assert(false) with g_assert_not_reached()
-  migration: replace assert(false) with g_assert_not_reached()
-  target/i386/kvm: replace assert(false) with g_assert_not_reached()
-  accel/tcg: remove break after g_assert_not_reached()
-  block: remove break after g_assert_not_reached()
-  hw/acpi: remove break after g_assert_not_reached()
-  hw/net: remove break after g_assert_not_reached()
-  hw/scsi: remove break after g_assert_not_reached()
-  hw/tpm: remove break after g_assert_not_reached()
-  target/arm: remove break after g_assert_not_reached()
-  target/riscv: remove break after g_assert_not_reached()
-  fpu: remove break after g_assert_not_reached()
-  tcg/loongarch64: remove break after g_assert_not_reached()
-  include/qemu: remove return after g_assert_not_reached()
-  hw/hyperv: remove return after g_assert_not_reached()
-  hw/net: remove return after g_assert_not_reached()
-  hw/pci: remove return after g_assert_not_reached()
-  hw/ppc: remove return after g_assert_not_reached()
-  migration: remove return after g_assert_not_reached()
-  qobject: remove return after g_assert_not_reached()
-  qom: remove return after g_assert_not_reached()
-  tests/qtest: remove return after g_assert_not_reached()
-  scripts/checkpatch.pl: emit error when using assert(false)
-
- include/qemu/pmem.h                     |  1 -
- accel/tcg/plugin-gen.c                  |  1 -
- block/qcow2.c                           |  2 +-
- block/ssh.c                             |  1 -
- hw/acpi/aml-build.c                     |  3 +--
- hw/arm/highbank.c                       |  2 +-
- hw/hyperv/hyperv_testdev.c              |  7 +++----
- hw/hyperv/vmbus.c                       | 15 ++++++---------
- hw/net/e1000e_core.c                    |  4 +---
- hw/net/i82596.c                         |  2 +-
- hw/net/igb_core.c                       |  4 +---
- hw/net/net_rx_pkt.c                     |  3 +--
- hw/net/vmxnet3.c                        |  1 -
- hw/nvme/ctrl.c                          |  8 ++++----
- hw/pci/pci-stub.c                       |  6 ++----
- hw/ppc/ppc.c                            |  1 -
- hw/ppc/spapr_events.c                   |  3 +--
- hw/scsi/virtio-scsi.c                   |  1 -
- hw/tpm/tpm_spapr.c                      |  1 -
- migration/dirtyrate.c                   |  3 +--
- migration/migration-hmp-cmds.c          |  2 +-
- migration/postcopy-ram.c                | 21 +++++++--------------
- migration/ram.c                         |  8 +++-----
- qobject/qlit.c                          |  2 +-
- qobject/qnum.c                          | 12 ++++--------
- qom/object.c                            |  1 -
- target/arm/hyp_gdbstub.c                |  1 -
- target/i386/kvm/kvm.c                   |  4 ++--
- target/ppc/dfp_helper.c                 |  8 ++++----
- target/ppc/mmu_helper.c                 |  2 +-
- target/riscv/monitor.c                  |  1 -
- tests/qtest/acpi-utils.c                |  1 -
- fpu/softfloat-parts.c.inc               |  2 --
- target/riscv/insn_trans/trans_rvv.c.inc |  2 --
- tcg/loongarch64/tcg-target.c.inc        |  1 -
- scripts/checkpatch.pl                   |  3 +++
- 36 files changed, 50 insertions(+), 90 deletions(-)
-
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 6d4517cfbe3..006c506a375 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -534,7 +534,7 @@ void aml_append(Aml *parent_ctx, Aml *child)
+     case AML_NO_OPCODE:
+         break;
+     default:
+-        assert(0);
++        g_assert_not_reached();
+         break;
+     }
+     build_append_array(parent_ctx->buf, buf);
 -- 
 2.39.5
 
