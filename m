@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-27106-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27107-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5D8797C284
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 03:40:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68ADC97C285
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 03:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05BB81C213FD
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 01:40:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BC301C218A9
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 01:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF291865C;
-	Thu, 19 Sep 2024 01:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0556B18E11;
+	Thu, 19 Sep 2024 01:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SGYN6AiL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JDegS0+7"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0E31E89C
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 01:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8961E1CFB9
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 01:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726710014; cv=none; b=XzkxgIjOXtfZqLIfJZ5HhA899+ccQSiaEc3w/KwOKX7L3ShC+Yvp+htAlO2GAC/rnMIi3rQaZaUf/+X106hfos5Z4dXMa2O6m7domNQzkBN0kWvEgkazGHgLHi0UVjxwLd8rLM6i1uEOx2VPf3BZuoNkm/0dx/02LucTmM2CMEM=
+	t=1726710020; cv=none; b=UcQ8EruAK+1EpOgn5OJhfJQuz2f+ZQRycGfGfXIuE0jjXThq8+mLj5ut1qt651DFTeOBc5OfQ7D04c6cLzFWw8nLwxeMbIcNsnaSbt7e+uIZjvlNEbXOnw4NzC3byEKyGflv60lWisOa259r2lRaP0XPcsu6fdHGflJ0KFsTUJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726710014; c=relaxed/simple;
-	bh=F7jWrurI1XVWfEeDSjk70sFPKqku+j5BACGGdK6zY9w=;
+	s=arc-20240116; t=1726710020; c=relaxed/simple;
+	bh=573w2DHmYSHZ5HLG8xM/Ws3MSekemg/qhlyIWizCQb0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=P+gSieDNZwcTYIVXj6ZzF9h2YdbSzkdW08ce2MvcOUvkV5qx3/R7tmtUrp2V52BlefQkhIKpUfPe1n6JUFNsWPpNPWIBB4abpmvRmtFETRyQxORjtmehqJFknjn2nHvkxSbbM919kDK2KIqpjLfpmhVR3Q/3DwSlHj3JiKvh47k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SGYN6AiL; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=fO6KD1sevXk5Dx5eZqloEgvoSAm1buAH3TpNVyk4VcwkjiOUUKxZsvA3ik1g5EdgO4thhNtS+VXH/HVUE/HVfL7Ou0vm8Q5+HT8jgf3CqzpxQGJAm6mvWxQeAmNFGpXwybyCUUYyeazXeILsAGk55KpWK2kQHaVyK3ulF53YgxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JDegS0+7; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726710013; x=1758246013;
+  t=1726710019; x=1758246019;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=F7jWrurI1XVWfEeDSjk70sFPKqku+j5BACGGdK6zY9w=;
-  b=SGYN6AiLCpPYJk4bOzreSTEiSLVq6N10hNBE7ExH+3bqGPrYz+TpvhmL
-   JPAFllCuLT+RR25/eMHpp66/Pnq8eJClehlU698EFBhrK/aSSs6HMrUx4
-   CW8ztl6qMRlTNerSmgtiEvW1wFjafH9BRduIkkG51X8fCOLxTXj3V3fzP
-   NZIc7jSiFMK4s3GZ/1Aksalp4L6xEVIUaUYr8eRD6bTfmZR5kowCF2q/8
-   VD1+jn17CxOZFGnPMQYLYvEfbwtfMO5XbAyi+vrF/QKYZPMjY/sd7hbxy
-   MT0AlFB3B7NJoSx2IlaUzL9tgcwQI5J5pWQlNeaDhhwnzTl1t4pZAppPb
+  bh=573w2DHmYSHZ5HLG8xM/Ws3MSekemg/qhlyIWizCQb0=;
+  b=JDegS0+7UCsU9NHVN4M8SUUHyj+msUWItm/edgEpeXk/4+MohMt6QT+7
+   dfZ8WdWCR/C5p2Eu1hmdpNvsHIV6iai4ucoDAZuF86C8+YTVh5gg8lLEY
+   0uxZ0uWqm4CbVqwyvjCFjVpI/RHtG/S6UvDLfswprRen2/+FBWHG7xGKv
+   iQv3/x83YigDMZT6j02d1dI/ZrOVgibuP70VG4ukmpzi0MJoTG2X2qu0q
+   eBgPUYvVyjX/NuOKdPbJI68ZKkuur5f2Apcx8dDH6FjT6V3F+2QUeJPEr
+   SgYOY9NE10YIx51FbXQdQ5s242TY9M4pe9WQZSZp0WDOOWonDD7TcIHfU
    g==;
-X-CSE-ConnectionGUID: 4dHoOVmeSLKdn/mghFDN+g==
-X-CSE-MsgGUID: lXAsgejeR1yltEDXkNbgkw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="25797853"
+X-CSE-ConnectionGUID: exJMhU+PSX6Ze/6LdDX9Fw==
+X-CSE-MsgGUID: sZFo4IaZS0O5WfibxJQmBg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="25797867"
 X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="25797853"
+   d="scan'208";a="25797867"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 18:40:12 -0700
-X-CSE-ConnectionGUID: VQKFuNgeQburcx//Eizfqw==
-X-CSE-MsgGUID: 5cDjh2NdT+qSFPCfiK9wyw==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 18:40:18 -0700
+X-CSE-ConnectionGUID: VTAf9j9wSdmPPMQUWsdetg==
+X-CSE-MsgGUID: O69kmvrZS0GmljFMm/GWdA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,240,1719903600"; 
-   d="scan'208";a="70058644"
+   d="scan'208";a="70058690"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by orviesa006.jf.intel.com with ESMTP; 18 Sep 2024 18:40:05 -0700
+  by orviesa006.jf.intel.com with ESMTP; 18 Sep 2024 18:40:12 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Igor Mammedov <imammedo@redhat.com>,
@@ -86,9 +86,9 @@ Cc: qemu-devel@nongnu.org,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC v2 04/15] hw/cpu: Introduce CPU slot to manage CPU topology
-Date: Thu, 19 Sep 2024 09:55:22 +0800
-Message-Id: <20240919015533.766754-5-zhao1.liu@intel.com>
+Subject: [RFC v2 05/15] qdev: Add method in BusClass to customize device index
+Date: Thu, 19 Sep 2024 09:55:23 +0800
+Message-Id: <20240919015533.766754-6-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240919015533.766754-1-zhao1.liu@intel.com>
 References: <20240919015533.766754-1-zhao1.liu@intel.com>
@@ -100,280 +100,141 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When there's a CPU topology tree, original MachineState.smp (CpuTopology
-structure) is not enough to dynamically monitor changes of the tree or
-update topology information in time.
+Currently, when the bus assigns an index to a child device, it relies on
+a monotonically increasing max_index.
 
-To address this, introduce the CPU slot, as the root of CPU topology
-tree, which is used to update and maintain global topological statistics
-by listening any changes of topology device (realize() and unrealize()).
+However, when a device is removed from the bus, its index is not
+reassigned to new devices, leading to "holes" in child indices.
+
+For topology devices, such as CPUs/cores, arches define custom
+sub-topology IDs. Some of these IDs are global (e.g., core-id for core
+devices), while others are local (e.g., thread-id/core-id/module-id for
+x86 CPUs).
+
+Local IDs are indexes under the same parent device and align with
+BusChild's index meaning. Therefore, local IDs in a topology context
+should use BusChild.index.
+
+Considering that topology devices support hot-plug and local IDs often
+have range constraints, add a new method (BusClass.assign_free_index) to
+allow the bus to customize index assignment.
+
+Based on this method, the CPU bus will search for free index "holes"
+created by unplugging and assign these free indices to newly inserted
+devices.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- MAINTAINERS               |   2 +
- hw/cpu/cpu-slot.c         | 140 ++++++++++++++++++++++++++++++++++++++
- hw/cpu/meson.build        |   1 +
- include/hw/cpu/cpu-slot.h |  72 ++++++++++++++++++++
- 4 files changed, 215 insertions(+)
- create mode 100644 hw/cpu/cpu-slot.c
- create mode 100644 include/hw/cpu/cpu-slot.h
+ hw/core/qdev.c                |  8 +++++++-
+ hw/cpu/cpu-topology.c         | 37 +++++++++++++++++++++++++++++++++++
+ include/hw/cpu/cpu-topology.h |  1 +
+ include/hw/qdev-core.h        |  2 ++
+ 4 files changed, 47 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 230267597b5f..8e5b2cd91dca 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1884,6 +1884,7 @@ F: hw/core/machine-smp.c
- F: hw/core/null-machine.c
- F: hw/core/numa.c
- F: hw/cpu/cluster.c
-+F: hw/cpu/cpu-slot.c
- F: hw/cpu/cpu-topology.c
- F: qapi/machine.json
- F: qapi/machine-common.json
-@@ -1891,6 +1892,7 @@ F: qapi/machine-target.json
- F: include/hw/boards.h
- F: include/hw/core/cpu.h
- F: include/hw/cpu/cluster.h
-+F: include/hw/cpu/cpu-slot.h
- F: include/hw/cpu/cpu-topology.h
- F: include/sysemu/numa.h
- F: tests/functional/test_cpu_queries.py
-diff --git a/hw/cpu/cpu-slot.c b/hw/cpu/cpu-slot.c
-new file mode 100644
-index 000000000000..66ef8d9faa97
---- /dev/null
-+++ b/hw/cpu/cpu-slot.c
-@@ -0,0 +1,140 @@
-+/*
-+ * CPU slot abstraction - manage CPU topology
-+ *
-+ * Copyright (C) 2024 Intel Corporation.
-+ *
-+ * Author: Zhao Liu <zhao1.liu@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "hw/boards.h"
-+#include "hw/cpu/cpu-slot.h"
-+#include "hw/cpu/cpu-topology.h"
-+#include "hw/qdev-core.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/sysbus.h"
-+#include "qapi/error.h"
-+
-+static void cpu_slot_add_topo_info(CPUSlot *slot, CPUTopoState *topo)
-+{
-+    CpuTopologyLevel level = GET_CPU_TOPO_LEVEL(topo);
-+    CPUTopoStatEntry *entry;
-+    int instances_num;
-+
-+    entry = &slot->stat.entries[level];
-+    entry->total_instances++;
-+
-+    instances_num = cpu_topo_get_instances_num(topo);
-+    if (instances_num > entry->max_instances) {
-+        entry->max_instances = instances_num;
-+    }
-+
-+    set_bit(level, slot->stat.curr_levels);
-+
-+    return;
-+}
-+
-+static void cpu_slot_device_realize(DeviceListener *listener,
-+                                    DeviceState *dev)
-+{
-+    CPUSlot *slot = container_of(listener, CPUSlot, listener);
-+    CPUTopoState *topo;
-+
-+    if (!object_dynamic_cast(OBJECT(dev), TYPE_CPU_TOPO)) {
-+        return;
-+    }
-+
-+    topo = CPU_TOPO(dev);
-+    cpu_slot_add_topo_info(slot, topo);
-+}
-+
-+static void cpu_slot_del_topo_info(CPUSlot *slot, CPUTopoState *topo)
-+{
-+    CpuTopologyLevel level = GET_CPU_TOPO_LEVEL(topo);
-+    CPUTopoStatEntry *entry;
-+
-+    entry = &slot->stat.entries[level];
-+    entry->total_instances--;
-+
-+    return;
-+}
-+
-+static void cpu_slot_device_unrealize(DeviceListener *listener,
-+                                      DeviceState *dev)
-+{
-+    CPUSlot *slot = container_of(listener, CPUSlot, listener);
-+    CPUTopoState *topo;
-+
-+    if (!object_dynamic_cast(OBJECT(dev), TYPE_CPU_TOPO)) {
-+        return;
-+    }
-+
-+    topo = CPU_TOPO(dev);
-+    cpu_slot_del_topo_info(slot, topo);
-+}
-+
-+DeviceListener cpu_slot_device_listener = {
-+    .realize = cpu_slot_device_realize,
-+    .unrealize = cpu_slot_device_unrealize,
-+};
-+
-+static bool slot_bus_check_topology(CPUBusState *cbus,
-+                                    CPUTopoState *topo,
-+                                    Error **errp)
-+{
-+    CPUSlot *slot = CPU_SLOT(BUS(cbus)->parent);
-+    CpuTopologyLevel level = GET_CPU_TOPO_LEVEL(topo);
-+
-+    if (!test_bit(level, slot->supported_levels)) {
-+        error_setg(errp, "cpu topo: level %s is not supported",
-+                   CpuTopologyLevel_str(level));
-+        return false;
-+    }
-+    return true;
-+}
-+
-+static void cpu_slot_realize(DeviceState *dev, Error **errp)
-+{
-+    CPUSlot *slot = CPU_SLOT(dev);
-+
-+    slot->listener = cpu_slot_device_listener;
-+    device_listener_register(&slot->listener);
-+
-+    qbus_init(&slot->bus, sizeof(CPUBusState),
-+              TYPE_CPU_BUS, dev, "cpu-slot");
-+    slot->bus.check_topology = slot_bus_check_topology;
-+}
-+
-+static void cpu_slot_unrealize(DeviceState *dev)
-+{
-+    CPUSlot *slot = CPU_SLOT(dev);
-+
-+    device_listener_unregister(&slot->listener);
-+}
-+
-+static void cpu_slot_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->realize = cpu_slot_realize;
-+    dc->unrealize = cpu_slot_unrealize;
-+}
-+
-+static const TypeInfo cpu_slot_type_info = {
-+    .name = TYPE_CPU_SLOT,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .class_init = cpu_slot_class_init,
-+    .instance_size = sizeof(CPUSlot),
-+};
-+
-+static void cpu_slot_register_types(void)
-+{
-+    type_register_static(&cpu_slot_type_info);
-+}
-+
-+type_init(cpu_slot_register_types)
-diff --git a/hw/cpu/meson.build b/hw/cpu/meson.build
-index 6c6546646608..358e2b3960fa 100644
---- a/hw/cpu/meson.build
-+++ b/hw/cpu/meson.build
-@@ -1,6 +1,7 @@
- common_ss.add(files('cpu-topology.c'))
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index ff073cbff56d..e3e9f0f303d6 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -78,11 +78,17 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
  
- system_ss.add(files('core.c'))
-+system_ss.add(files('cpu-slot.c'))
- system_ss.add(when: 'CONFIG_CPU_CLUSTER', if_true: files('cluster.c'))
+ static void bus_add_child(BusState *bus, DeviceState *child)
+ {
++    BusClass *bc = BUS_GET_CLASS(bus);
+     char name[32];
+     BusChild *kid = g_malloc0(sizeof(*kid));
  
- system_ss.add(when: 'CONFIG_ARM11MPCORE', if_true: files('arm11mpcore.c'))
-diff --git a/include/hw/cpu/cpu-slot.h b/include/hw/cpu/cpu-slot.h
-new file mode 100644
-index 000000000000..9d02d5de578e
---- /dev/null
-+++ b/include/hw/cpu/cpu-slot.h
-@@ -0,0 +1,72 @@
-+/*
-+ * CPU slot abstraction header
-+ *
-+ * Copyright (C) 2024 Intel Corporation.
-+ *
-+ * Author: Zhao Liu <zhao1.liu@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
++    if (bc->assign_free_index) {
++        kid->index = bc->assign_free_index(bus);
++    } else {
++        kid->index = bus->max_index++;
++    }
 +
-+#ifndef CPU_SLOT_H
-+#define CPU_SLOT_H
+     bus->num_children++;
+-    kid->index = bus->max_index++;
+     kid->child = child;
+     child->bus_node = kid;
+     object_ref(OBJECT(kid->child));
+diff --git a/hw/cpu/cpu-topology.c b/hw/cpu/cpu-topology.c
+index e68c06132e7d..3e8982ff7e6c 100644
+--- a/hw/cpu/cpu-topology.c
++++ b/hw/cpu/cpu-topology.c
+@@ -49,11 +49,40 @@ static bool cpu_bus_check_address(BusState *bus, DeviceState *dev,
+     return cpu_parent_check_topology(bus->parent, dev, errp);
+ }
+ 
++static int cpu_bus_assign_free_index(BusState *bus)
++{
++    BusChild *kid;
++    int index;
 +
-+#include "hw/cpu/cpu-topology.h"
-+#include "hw/qdev-core.h"
-+#include "hw/sysbus.h"
-+#include "qapi/qapi-types-machine-common.h"
-+#include "qom/object.h"
++    if (bus->num_children == bus->max_index) {
++        return bus->max_index++;
++    }
 +
-+/**
-+ * CPUTopoStatEntry:
-+ * @total_instances: Total number of topological instances at the same level
-+ *                   that are currently inserted in CPU slot
-+ * @max_instances: Maximum number of topological instances at the same level
-+ *                 under the parent topological container
-+ */
-+typedef struct CPUTopoStatEntry {
-+    int total_instances;
-+    int max_instances;
-+} CPUTopoStatEntry;
++    assert(bus->num_children < bus->max_index);
++    /* TODO: Introduce the list sorted by index */
++    for (index = 0; index < bus->num_children; index++) {
++        bool existed = false;
 +
-+/**
-+ * CPUTopoStat:
-+ * @entries: Detail count information for valid topology levels under
-+ *           CPU slot
-+ * @curr_levels: Current CPU topology levels inserted in CPU slot
-+ */
-+typedef struct CPUTopoStat {
-+    /* TODO: Exclude invalid and default levels. */
-+    CPUTopoStatEntry entries[CPU_TOPOLOGY_LEVEL__MAX];
-+    DECLARE_BITMAP(curr_levels, CPU_TOPOLOGY_LEVEL__MAX);
-+} CPUTopoStat;
++        QTAILQ_FOREACH(kid, &bus->children, sibling) {
++            if (kid->index == index) {
++                existed = true;
++                break;
++            }
++        }
 +
-+#define TYPE_CPU_SLOT "cpu-slot"
-+OBJECT_DECLARE_SIMPLE_TYPE(CPUSlot, CPU_SLOT)
++        if (!existed) {
++            break;
++        }
++    }
++    return index;
++}
 +
-+/**
-+ * CPUSlot:
-+ * @cores: Queue consisting of all the cores in the topology tree
-+ *     where the cpu-slot is the root. cpu-slot can maintain similar
-+ *     queues for other topology levels to facilitate traversal
-+ *     when necessary.
-+ * @stat: Topological statistics for topology tree.
-+ * @bus: CPU bus to add the children topology device.
-+ * @supported_levels: Supported topology levels for topology tree.
-+ * @listener: Hooks to listen realize() and unrealize() of topology
-+ *            device.
-+ */
-+struct CPUSlot {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
+ static void cpu_bus_class_init(ObjectClass *oc, void *data)
+ {
+     BusClass *bc = BUS_CLASS(oc);
+ 
+     bc->check_address = cpu_bus_check_address;
++    bc->assign_free_index = cpu_bus_assign_free_index;
+ }
+ 
+ static const TypeInfo cpu_bus_type_info = {
+@@ -177,3 +206,11 @@ int cpu_topo_get_instances_num(CPUTopoState *topo)
+ 
+     return bus ? bus->num_children : 1;
+ }
 +
-+    /*< public >*/
-+    CPUBusState bus;
-+    CPUTopoStat stat;
-+    DECLARE_BITMAP(supported_levels, CPU_TOPOLOGY_LEVEL__MAX);
++int cpu_topo_get_index(CPUTopoState *topo)
++{
++    BusChild *node = DEVICE(topo)->bus_node;
 +
-+    DeviceListener listener;
-+};
++    assert(node);
++    return node->index;
++}
+diff --git a/include/hw/cpu/cpu-topology.h b/include/hw/cpu/cpu-topology.h
+index 7a447ad16ee7..80aeff18baa3 100644
+--- a/include/hw/cpu/cpu-topology.h
++++ b/include/hw/cpu/cpu-topology.h
+@@ -64,5 +64,6 @@ struct CPUTopoState {
+ #define GET_CPU_TOPO_LEVEL(topo)    (CPU_TOPO_GET_CLASS(topo)->level)
+ 
+ int cpu_topo_get_instances_num(CPUTopoState *topo);
++int cpu_topo_get_index(CPUTopoState *topo);
+ 
+ #endif /* CPU_TOPO_H */
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 7cbc5fb97298..77223b28c788 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -342,6 +342,8 @@ struct BusClass {
+      */
+     bool (*check_address)(BusState *bus, DeviceState *dev, Error **errp);
+ 
++    int (*assign_free_index)(BusState *bus);
 +
-+#endif /* CPU_SLOT_H */
+     BusRealize realize;
+     BusUnrealize unrealize;
+ 
 -- 
 2.34.1
 
