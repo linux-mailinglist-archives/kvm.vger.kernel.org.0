@@ -1,205 +1,146 @@
-Return-Path: <kvm+bounces-27176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C5BD97C865
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 13:14:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C40597C988
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 14:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A06551C2525B
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 11:14:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F03EB284EA3
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 12:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C8619D8B3;
-	Thu, 19 Sep 2024 11:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE17319E83C;
+	Thu, 19 Sep 2024 12:51:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HLl02lb6"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="xdswiPZ3"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7182219D093;
-	Thu, 19 Sep 2024 11:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F9819DF86
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 12:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726744433; cv=none; b=ds3SQhRmutAr8Muh6w+rNEwP5AL3w58oIfxp47CygllElOJW0NvD6sdDXSKHmblw9qxFhWIsLEubZphRSbpFSs5kcuK194ZVtHJlhrUgXSad4GH+z993/19JO5cx9QXYeyf88518TRaq6V24RWa4iypyXa4eF/dvqaChZPHUW7c=
+	t=1726750308; cv=none; b=cOSW8itvXssQ7qkvB5abU0QZPEGPkqyFWRFYADDjAgQmShyZ1ECizZlGCC2FXM3BPj2A6IIQJlvtws1Tnn7lSKBnmut7S8EpU2FhjsZKOCpmzWejoArTs0l9bVXH75/5j54Z4behV3PBB7ssghQ6AUq6140YjnkfyG5Cz9pG6zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726744433; c=relaxed/simple;
-	bh=nQLrwtEvPD2RIIWNzQpKhc6xQPqQQ1ILaBmagJ3VLpc=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=E5rr0y9rxeHbJXcI7+KoirXCtSQV/j12c7tQ3BUOrIFkyUvRIJ4+ymZ8n/xgcuVfmUk35XJBjAe3A8nnSKJ9VPsGKR8m5KVlXB4sb+7AI1XsYF7UcNWanddn+K20GVS+7niZFN+ubA4IrzojLFzm8HkcB3y6MY2xpT/XA7dnBXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HLl02lb6; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=NeI2rUXnLzjpOtYnknN4FnM+omBAMRqLA336G57YcoI=; b=HLl02lb6kHfUPOArY6JJlLmUfO
-	zFsXAspjCR4SgKGMRtcBFd21Cr1nlzpiDNaa5UsqVuOw52ne10PWmQEsnox7Y1Ee5m0Z7IcXkhrkO
-	NIdHoEhUnB9ZYVQgd76IdS+1hasPLsdsMuK/x2w0btnm7RxmxBJlJi6NFiewHgErUKUB5zb1Xuo3d
-	CjaAoiXkVD40ZN2nXrRVW0GfHzPbl7hT985K9pFD7HbNCkIc5Fih1Qx6uszsG9YNnrRlt624UNt2S
-	ee2UDG83JjdmjfhE70NdgdaZDfDxT/j91auEXzbHqCkYpbTPpE44/v0BLCFog6+aKevMv5CN5Rx/W
-	WyWEtSVg==;
-Received: from [83.68.141.146] (helo=[127.0.0.1])
-	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1srF6G-00000000zDq-0RV5;
-	Thu, 19 Sep 2024 11:13:28 +0000
-Date: Thu, 19 Sep 2024 13:13:25 +0200
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Hussain, Mushahid" <hmushi@amazon.co.uk>
-CC: Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Mingwei Zhang <mizhang@google.com>, Maxim Levitsky <mlevitsk@redhat.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v3_1/5=5D_KVM=3A_pfncache=3A_Add_ne?=
- =?US-ASCII?Q?eds=5Finvalidation_flag_to_gfn=5Fto=5Fpfn=5Fcache?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20240821202814.711673-1-dwmw2@infradead.org>
-References: <20240821202814.711673-1-dwmw2@infradead.org>
-Message-ID: <30CC6DCB-DF32-4FE5-A600-14CE242CBA61@infradead.org>
+	s=arc-20240116; t=1726750308; c=relaxed/simple;
+	bh=SlJmwhGl3SrJKXIOv4Gm2FmJKvlW3Kv5wJXm0Ihsfbs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rv3Fxx8CDx3pdwyotjiygZoKTcJq150zU6tMWg0DLReUgNndJbMGuRXR58ueR0Veni1osD6zN3XwiYAlKxg/AZwkt3IaPPQinLxyBgxr4deBtIpeyMTzmECXOot+8e241Cgg3aSduz/2cZ+YHLwGcf/V6WH3nLryvdNDPchnvLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=xdswiPZ3; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a8ce5db8668so115338566b.1
+        for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 05:51:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1726750305; x=1727355105; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=G2ods2eZT8RMxJfTBuByt96hZQnySzfhNv8GJfRYckM=;
+        b=xdswiPZ3zpI4ykYr/NoPyiNg5Cjuvudh40FXhFvATIpMm6YKJld59brEhi+RXEsXBU
+         9sE4iY9T2hzc9sttavp15D4N52vagV25k3I3/uHzb+Sjt1/yePPSTpqAV5VIBcbxHDfF
+         pP2fOht/6DLjwPkXmKIXu+RhrnjRyMTm4sksHN8BEMcOwLaTljH0BInRIJcgnaoawNhR
+         d4fIHeD2fMx19HOiy1niyZXm2LF81eXuA/MN1TItTniMBmHQF5KP5uRYYOP91HkVw8e/
+         lt8s52rmFKzO9ZFFyityDtvoscTzVMjbDyiNhg9p013aFAcbg/b17cqz9xxKLoOZ+Jfc
+         rugg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726750305; x=1727355105;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=G2ods2eZT8RMxJfTBuByt96hZQnySzfhNv8GJfRYckM=;
+        b=r++IwxxFQzDcGCU4exunMeRcBW4I4QcDIhlpyLCykmCUafynsoco41j9dQosFmVCfw
+         BiXHgCdoqVUKgzrZgMJbsxJSVzMxt3OelDFT31y/kYvcsP4Ozjxxz5F6gki3UN4jZg8v
+         vO0MKAAd3W8Nnhsh8DggGPzJG3wfR3OQGkJyXa1GDXM6SAaAEv5BPzURza6c4hDS6UCQ
+         /ih01m7oQlay9kN0A7PIZITq9gLUbNDxkPajlDKKI4AIIohnMT6qDPIAokXfqtwTVUAL
+         oxq46SEjPEoMzPn179/ZHXIEOh5ZDLorItxEgfCm4GVfcxVFjLemOMgYl6tJZFi0wtzO
+         gq9A==
+X-Forwarded-Encrypted: i=1; AJvYcCWBVvT6TsrfKUPeSGQ8yzN5/GEuVi4IaVkk6ZIZc0/r9/tqTqK6BGMi/sa1/M/AOXJmkpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlQKMy5E4jOqrv1GZJFWJrAQ7zYlnIlA7rYYjO/JyLo2/8w2Q0
+	CQDD4woW2jsgGj6fKEyfxEDFt3m3GTb9QmzpcDYW3v2Zl5dPKl6sj/t8fpIUcc8=
+X-Google-Smtp-Source: AGHT+IGZqgve+KamWKCTyn5ghHOmYZoUojN3YplaJpvEJ6WqeTRtpjQs7A0Ut18Ni9wirgc/SkN/uw==
+X-Received: by 2002:a17:907:36cd:b0:a90:b73f:61d7 with SMTP id a640c23a62f3a-a90b73f63bamr599108766b.42.1726750305479;
+        Thu, 19 Sep 2024 05:51:45 -0700 (PDT)
+Received: from [10.130.6.89] ([83.68.141.146])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90610968b9sm718971366b.5.2024.09.19.05.51.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Sep 2024 05:51:44 -0700 (PDT)
+Message-ID: <18d61c52-be6f-4ef3-b020-d597ba7cdaeb@daynix.com>
+Date: Thu, 19 Sep 2024 14:51:43 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v3 2/9] virtio_net: Add functions for hashing
+To: gur.stavi@huawei.com
+Cc: andrew@daynix.com, corbet@lwn.net, davem@davemloft.net,
+ edumazet@google.com, jasowang@redhat.com, kuba@kernel.org,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ mst@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ virtualization@lists.linux-foundation.org, willemdebruijn.kernel@gmail.com,
+ xuanzhuo@linux.alibaba.com, yuri.benditovich@daynix.com
+References: <20240916071253.462-1-gur.stavi@huawei.com>
+ <20240916080137.508-1-gur.stavi@huawei.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <20240916080137.508-1-gur.stavi@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 21 August 2024 22:28:09 CEST, David Woodhouse <dwmw2@infradead=2Eorg> wr=
-ote:
->From: David Woodhouse <dwmw@amazon=2Eco=2Euk>
->
->This will be used to allow hva_to_pfn_retry() to be more selective about
->its retry loop, which is currently extremely pessimistic=2E
->
->It allows for invalidations to occur even while the PFN is being mapped
->(which happens with the lock dropped), before the GPC is fully valid=2E
->
->No functional change yet, as the existing mmu_notifier_retry_cache()
->function will still return true in all cases where the invalidation
->may have triggered=2E
->
->Signed-off-by: David Woodhouse <dwmw@amazon=2Eco=2Euk>
->---
-> include/linux/kvm_types=2Eh |  1 +
-> virt/kvm/pfncache=2Ec       | 29 ++++++++++++++++++++++++-----
-> 2 files changed, 25 insertions(+), 5 deletions(-)
->
->diff --git a/include/linux/kvm_types=2Eh b/include/linux/kvm_types=2Eh
->index 827ecc0b7e10=2E=2E4d8fbd87c320 100644
->--- a/include/linux/kvm_types=2Eh
->+++ b/include/linux/kvm_types=2Eh
->@@ -69,6 +69,7 @@ struct gfn_to_pfn_cache {
-> 	void *khva;
-> 	kvm_pfn_t pfn;
-> 	bool active;
->+	bool needs_invalidation;
-> 	bool valid;
-> };
->=20
->diff --git a/virt/kvm/pfncache=2Ec b/virt/kvm/pfncache=2Ec
->index f0039efb9e1e=2E=2E7007d32d197a 100644
->--- a/virt/kvm/pfncache=2Ec
->+++ b/virt/kvm/pfncache=2Ec
->@@ -32,7 +32,7 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,=
- unsigned long start,
-> 		read_lock_irq(&gpc->lock);
->=20
-> 		/* Only a single page so no need to care about length */
->-		if (gpc->valid && !is_error_noslot_pfn(gpc->pfn) &&
->+		if (gpc->needs_invalidation && !is_error_noslot_pfn(gpc->pfn) &&
-> 		    gpc->uhva >=3D start && gpc->uhva < end) {
-> 			read_unlock_irq(&gpc->lock);
->=20
->@@ -45,9 +45,11 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm=
-, unsigned long start,
-> 			 */
->=20
-> 			write_lock_irq(&gpc->lock);
->-			if (gpc->valid && !is_error_noslot_pfn(gpc->pfn) &&
->-			    gpc->uhva >=3D start && gpc->uhva < end)
->+			if (gpc->needs_invalidation && !is_error_noslot_pfn(gpc->pfn) &&
->+			    gpc->uhva >=3D start && gpc->uhva < end) {
->+				gpc->needs_invalidation =3D false;
-> 				gpc->valid =3D false;
->+			}
-> 			write_unlock_irq(&gpc->lock);
-> 			continue;
-> 		}
->@@ -93,6 +95,9 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsign=
-ed long len)
-> 	if (!gpc->valid)
-> 		return false;
->=20
->+	/* If it's valid, it needs invalidation! */
->+	WARN_ON_ONCE(!gpc->needs_invalidation);
->+
-> 	return true;
+On 2024/09/16 10:01, gur.stavi@huawei.com wrote:
+>> +
+>> +static inline void virtio_net_toeplitz(struct virtio_net_toeplitz_state *state,
+>> +				       const __be32 *input, size_t len)
+>>
+>> The function calculates a hash value but its name does not make it
+>> clear. Consider adding a 'calc'.
+>>
+>> +{
+>> +	u32 key;
+>> +
+>> +	while (len) {
+>> +		state->key++;
+>> +		key = be32_to_cpu(*state->key);
+>>
+>> You perform be32_to_cpu to support both CPU endianities.
+>> If you will follow with an unconditional swab32, you could run the
+>> following loop on a more natural 0 to 31 always referring to bit 0
+>> and avoiding !!(key & bit):
+>>
+>> key = swab32(be32_to_cpu(*state->key));
+>> for (i = 0; i < 32; i++, key >>= 1) {
+>> 	if (be32_to_cpu(*input) & 1)
+>> 		state->hash ^= state->key_buffer;
+>> 	state->key_buffer = (state->key_buffer << 1) | (key & 1);
+>> }
+>>
+> 
+> Fixing myself, in previous version 'input' was tested against same bit.
+> Advantage is less clear now, replacing !! with extra shift.
+> However, since little endian CPUs are more common, the combination of
+> swab32(be32_to_cpu(x) will actually become a nop.
+> Similar tactic may be applied to 'input' by assigning it to local
+> variable. This may produce more efficient version but not necessary
+> easier to understand.
+> 
+> key = bswap32(be32_to_cpu(*state->key));
+> for (u32 bit = BIT(31); bit; bit >>= 1, key >>= 1) {
+> 	if (be32_to_cpu(*input) & bit)
+> 		state->hash ^= state->key_buffer;
+> 	state->key_buffer =
+> 		(state->key_buffer << 1) | (key & 1);
 > }
->=20
->@@ -175,6 +180,17 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_=
-cache *gpc)
-> 		mmu_seq =3D gpc->kvm->mmu_invalidate_seq;
-> 		smp_rmb();
->=20
->+		/*
->+		 * The translation made by hva_to_pfn() below could be made
->+		 * invalid as soon as it's mapped=2E But the uhva is already
->+		 * known and that's all that gfn_to_pfn_cache_invalidate()
->+		 * looks at=2E So set the 'needs_invalidation' flag to allow
->+		 * the GPC to be marked invalid from the moment the lock is
->+		 * dropped, before the corresponding PFN is even found (and,
->+		 * more to the point, immediately afterwards)=2E
->+		 */
->+		gpc->needs_invalidation =3D true;
->+
-> 		write_unlock_irq(&gpc->lock);
->=20
-> 		/*
->@@ -224,7 +240,8 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_c=
-ache *gpc)
-> 		 * attempting to refresh=2E
-> 		 */
-> 		WARN_ON_ONCE(gpc->valid);
->-	} while (mmu_notifier_retry_cache(gpc->kvm, mmu_seq));
->+	} while (!gpc->needs_invalidation ||
->+		 mmu_notifier_retry_cache(gpc->kvm, mmu_seq));
->=20
-> 	gpc->valid =3D true;
-> 	gpc->pfn =3D new_pfn;
->@@ -339,6 +356,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache =
-*gpc, gpa_t gpa, unsigned l
-> 	 */
-> 	if (ret) {
-> 		gpc->valid =3D false;
->+		gpc->needs_invalidation =3D false;
-> 		gpc->pfn =3D KVM_PFN_ERR_FAULT;
-> 		gpc->khva =3D NULL;
-> 	}
->@@ -383,7 +401,7 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struc=
-t kvm *kvm)
-> 	gpc->pfn =3D KVM_PFN_ERR_FAULT;
-> 	gpc->gpa =3D INVALID_GPA;
-> 	gpc->uhva =3D KVM_HVA_ERR_BAD;
->-	gpc->active =3D gpc->valid =3D false;
->+	gpc->active =3D gpc->valid =3D gpc->needs_invalidation =3D false;
-> }
->=20
-> static int __kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, u=
-nsigned long uhva,
->@@ -453,6 +471,7 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
-> 		write_lock_irq(&gpc->lock);
-> 		gpc->active =3D false;
-> 		gpc->valid =3D false;
->+		gpc->needs_invalidation =3D false;
->=20
-> 		/*
-> 		 * Leave the GPA =3D> uHVA cache intact, it's protected by the
 
-Ping?
+This unfortunately does not work. swab32() works at *byte*-level but we 
+need to reverse the order of *bits*. bitrev32() is what we need, but it 
+cannot eliminate be32_to_cpu().
+
+Regards,
+Akihiko Odaki
 
