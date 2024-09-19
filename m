@@ -1,127 +1,146 @@
-Return-Path: <kvm+bounces-27180-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27181-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48DDF97CB55
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 17:07:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8DC597CBF7
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 18:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91869B2393A
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 15:07:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E3A71F21F0E
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 16:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A62F1A0BC4;
-	Thu, 19 Sep 2024 15:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2841A01B0;
+	Thu, 19 Sep 2024 16:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C6MHDpmP"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Uy4kYy8D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AB81A072A
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 15:07:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA3312E4A
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 16:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726758461; cv=none; b=WJgvx4997iggUIHpJu1rp4/y7nJ620XqEWDe8e3S1Cd9gZJgQRh36w72b3kDwuCCw5t4e+ZKnRO7tJI6kxvsy8vDgEuEU9AFvJuu0g8DdaQTeSKe7O95/0C2JNIa3Wrcgd29JYsG6vyrC8fa5G8cLI3kjYeAvl1B/WE4pvN3Ybg=
+	t=1726761753; cv=none; b=MyntH8jND0KLP14dNFMvpgDh+Qe6fpIOa6JBNBr/ZNZuRTtE5xLUJfBBMmiJkkjpwLAWO9Jgw3JzN/iv5TjzZOKiInHJfp9awnwOWNUTww7a4EIfOoLKvg5awwmhiBiN5hiYiqoPTEdVom8kwta2qF2tW5Z5+p12j8bDVhYMpNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726758461; c=relaxed/simple;
-	bh=zTX2cg50iHlLd3llr0TXiQMRYPkIqgvqhdCjB4ltTqA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WE7Y2ON8VFf07hfprGgPokmTpngojZ5mZZtD4ONvgLE9tN+bBm/YSCZb8f+cqYvgpR+/1iU5fo0GZtvIV2DQl8f2ghlwZx+cE/MHLjlafhgGjLSbg3g5dZyQTcopHbiCKo2AReSt9nn7mr8pAf74BqPyGdSVSuScUPADWXmzkcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C6MHDpmP; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7d4f9e39c55so704394a12.2
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 08:07:14 -0700 (PDT)
+	s=arc-20240116; t=1726761753; c=relaxed/simple;
+	bh=3Rdw/7FPHr7LRKVhUtEAjNZXLsqUxVL5CyGv7Wt/Dy4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q/SgGonInl10aMEBwp55eTpAHeUmjkKJeI08MNbmE43MjGj48u5NejzBWmCav9811qChvWIIIpSGE2546pNMEgzD53axsx6+9KZLWvKkvmmle3PxPS15CFRDqlCXXmv49qDt5Z5Jm11BYBDYWgUgldNKTEG3meupD1Ql0vWQogE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=Uy4kYy8D; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20696938f86so9078865ad.3
+        for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 09:02:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726758433; x=1727363233; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zTX2cg50iHlLd3llr0TXiQMRYPkIqgvqhdCjB4ltTqA=;
-        b=C6MHDpmPWg6ImVSVupcCqwJebcrhRBPQJsjY/gZWCKQM36RTV5wq2o0ubhUWDTX1pN
-         igLLtZWOunn1QWNZgDjNq+EndpWl7opLUk0Z6RuYS5EHtxHlp7ZGwC4DkElflbhgXWeu
-         QuTGD92CT/yA5l0JXvFTk2PTglL2+AOYwn3Wrxu8eSu8hOQX4sIpOixCCaDctjSpRT3G
-         xoFD4Z5Mra9xtAf6z9LPTf70idZ16J/TQJbr9iioKG9R09UQKrTGA2b45WH0K7gbS37d
-         7VcSf6Xb4jeKHdIuGmRbm9NAzfo+cgrrsRJao5hPkiflbdgBc5Huqe8xH9SEbhR1T4yc
-         8Sfg==
+        d=sifive.com; s=google; t=1726761751; x=1727366551; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IY5B5QxXDNVGbG3vnBPyBqvWzO5uiDp/nIYu33vK85A=;
+        b=Uy4kYy8DvylGxgTb8+p2pAPlwrvJFuTxYB/fDG+Skl2LR7fBUDhc2lzJwqWoUEEaX+
+         g11Iv4uhb7dKs/wpqhCbZZPVrIBy3O9nbLOX9CRaCht7k4JMqQp++kEn/9v//9x5hbEB
+         qxtIJR+2mpYz5mTnDS4eoZEg/eV7bI8RhQ1j2f4OI1acsI1yUwzVtiTQaxEzid2Tuw60
+         5JjqBsZMNhRcVcdlipszY/p/zNOgrcGzGI1Ki+bKgAhqUYhwktc9BPlJYosg6K9qGOon
+         4ei1PrnquEEvXEETp99f3DKpSLRfGtxV4LTGwWRncyjI5YGjg3b5nLl2V6yE82dhSYSr
+         nB+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726758433; x=1727363233;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zTX2cg50iHlLd3llr0TXiQMRYPkIqgvqhdCjB4ltTqA=;
-        b=n++kHar80YbLLKqph46aqdwJgFNVGXvcKA9dv3DW/bv3cNzq2c46y6YvLHIQclsTbZ
-         NpCEYMV7XZ9KezBZwMUGlkTHh0Sm2hdHV5ynZkp3y6ZoRfyvhOmHN8W7nps+FVdxlxDW
-         ejhsW63s0Ck569wZ00WGOuNv3bZZ3MhtQOLi+OCkasb316yDacClkY9wI45aVjT6nzVl
-         Y/iOrdG1NkDsIkv02u/DU9kBArV8YFYHqkreN/nZdXAn+ILJp/x0HDyqhGhH9+LtXPEB
-         lbKPGP2PWrjgcQdj4E4dMVbrlJ3AgVJeoCl81/yJp49dILWyRfQO3Wst2stnQO+IZKFc
-         u8Ng==
-X-Forwarded-Encrypted: i=1; AJvYcCX2U5Gme/rUj39bhrgd25pAsEUmKWNK/+bZRrNyXoCerMPOl7t6DmWtzF/wLxH60Y4sQdU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyu4fa8BZw7tqDcprhdmHkAi679Tg0insV55HQpkX3WDz6XION4
-	CXXFwWyTl69+LE0Nk2yVKi1f/9kvndVrCMeiHGO9GTGRJ4A+An0TWH4785WCxf5I7ryZTAhQhj3
-	MlA70EMjlhhkfSSTCBJElx59RHEHmC3TZkVf9V1lMV5+aeWNdVjOpzKw=
-X-Google-Smtp-Source: AGHT+IH5KdWmVYdVGhH1YJwTT9BeiFn9LnB6HS47xkZ4yRuON9VoQ2KHUIf+6fZMyNC/5O3cZX2xrGxHoy1y3uidUWk=
-X-Received: by 2002:a05:6a20:ac43:b0:1cf:476f:2cef with SMTP id
- adf61e73a8af0-1cf7624b4bamr32388167637.49.1726758433158; Thu, 19 Sep 2024
- 08:07:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726761751; x=1727366551;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IY5B5QxXDNVGbG3vnBPyBqvWzO5uiDp/nIYu33vK85A=;
+        b=AX6BGcmx0dKESVmHghpFSU8mMgfqcSX/VXBcK8B9Kg5VW/eYra6b7a4Ffll1swaWN+
+         x5i6G6cOHoYv3K9HgpnVVuirCFOcn0cBj6KdIvNcvSbo0EYyHeHypfYWNOzv2/XgYgZH
+         MlNhj1oEFCmdnwgfBq0uWS3gpezJay1KOuESexJU2IQ7SUSUeVU31wavar+9K4/j7ny1
+         PWBezflLX6bfnWSdkYogWWB4mmgM5P7EqvhTgAQvuISuZYs7zmf7/oEmrCWTHNtMYTGv
+         AHp/r0EGWmCPMT9Yceh2Cg9vzxK82shbsJYBbhuK2ogWM7nvcifW1Io6ElVARuJGp2Qx
+         bz8g==
+X-Forwarded-Encrypted: i=1; AJvYcCVNI2859w5xhP/lJMAEHH5yWIxdP6LdYurmKu2rCD0NtsBhOfUKZ0+nqycap/yez4zySQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1npr8+89ertdG0D04K7hZK7UWdE8K7SkbCzjb91wYukMHFJMv
+	Hi2TDFwipNKf4kU0ksRrTuea8ZnenKUjQNdHF/AJVfOxLj/08mNmmG91vRNinrw=
+X-Google-Smtp-Source: AGHT+IHlrfEPPxfE7BBmxMTJoT8E08EE7/Q0AmzGFUzu6sN8uV/9Rnz5ZDYIemz+SMlLQ8t0Vj4kxg==
+X-Received: by 2002:a17:903:8c8:b0:205:40a6:115a with SMTP id d9443c01a7336-2076e4360f7mr350612825ad.48.1726761751137;
+        Thu, 19 Sep 2024 09:02:31 -0700 (PDT)
+Received: from cyan-mbp.internal.sifive.com (114-32-147-116.hinet-ip.hinet.net. [114.32.147.116])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946d19e5sm81665645ad.140.2024.09.19.09.02.28
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 19 Sep 2024 09:02:30 -0700 (PDT)
+From: Cyan Yang <cyan.yang@sifive.com>
+To: anup@brainfault.org
+Cc: atishp@atishpatra.org,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Cyan Yang <cyan.yang@sifive.com>,
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Subject: [PATCH] RISCV: KVM: use raw_spinlock for critical section in imsic
+Date: Fri, 20 Sep 2024 00:01:26 +0800
+Message-Id: <20240919160126.44487-1-cyan.yang@sifive.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZuK30-Ug790Vbhck@8bytes.org> <FD656EE6-DC11-46E5-B9BE-7A7647316581@8bytes.org>
-In-Reply-To: <FD656EE6-DC11-46E5-B9BE-7A7647316581@8bytes.org>
-From: Dionna Amalie Glaze <dionnaglaze@google.com>
-Date: Thu, 19 Sep 2024 08:06:57 -0700
-Message-ID: <CAAH4kHZoLEjhHv8wD_Oj3qjQs89dB2Q17O5T3sLnAa6gFia4AQ@mail.gmail.com>
-Subject: Re: [svsm-devel] Invitation to COCONUT-SVSM BoF at Linux Plumbers Conference
-To: =?UTF-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>
-Cc: svsm-devel@coconut-svsm.dev, linux-coco@lists.linux.dev, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-The livestreams don't appear to be named with "hackroom". Do you know
-which to watch from this page?
-https://www.youtube.com/@LinuxPlumbersConference/streams?app=3Ddesktop
+For the external interrupt updating procedure in imsic, there was a
+spinlock to protect it already. But since it should not be preempted in
+any cases, we should turn to use raw_spinlock to prevent any preemption
+in case PREEMPT_RT was enabled.
 
-On Thu, Sep 19, 2024 at 7:57=E2=80=AFAM J=C3=B6rg R=C3=B6del <joro@8bytes.o=
-rg> wrote:
->
-> The session is broadcasted via LPC Hackroom #1.
->
-> > Am 12.09.2024 um 11:43 schrieb J=C3=B6rg R=C3=B6del <joro@8bytes.org>:
-> >
-> > Hi,
-> >
-> > The COCONUT-SVSM community wants to invite the Linux, virtualisation, a=
-nd
-> > confidential computing communities to our BoF at the Linux Plumbers
-> > Conference next week in Vienna.
-> >
-> > We hope to gather ideas, discuss problems and get input for the next
-> > year of development. It is scheduled for Thursday, September 19th at 5p=
-m
-> > in Room 1.14. Details are at this link:
-> >
-> > https://lpc.events/event/18/contributions/1980/
-> >
-> > Hope to see you all there!
-> >
-> > Regards,
-> >
-> > J=C3=B6rg
-> >
->
-> --
-> Svsm-devel mailing list
-> Svsm-devel@coconut-svsm.dev
-> https://mail.8bytes.org/cgi-bin/mailman/listinfo/svsm-devel
+Signed-off-by: Cyan Yang <cyan.yang@sifive.com>
+Reviewed-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+---
+ arch/riscv/kvm/aia_imsic.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
+index 0a1e85932..a8085cd82 100644
+--- a/arch/riscv/kvm/aia_imsic.c
++++ b/arch/riscv/kvm/aia_imsic.c
+@@ -55,7 +55,7 @@ struct imsic {
+ 	/* IMSIC SW-file */
+ 	struct imsic_mrif *swfile;
+ 	phys_addr_t swfile_pa;
+-	spinlock_t swfile_extirq_lock;
++	raw_spinlock_t swfile_extirq_lock;
+ };
+ 
+ #define imsic_vs_csr_read(__c)			\
+@@ -622,7 +622,7 @@ static void imsic_swfile_extirq_update(struct kvm_vcpu *vcpu)
+ 	 * interruptions between reading topei and updating pending status.
+ 	 */
+ 
+-	spin_lock_irqsave(&imsic->swfile_extirq_lock, flags);
++	raw_spin_lock_irqsave(&imsic->swfile_extirq_lock, flags);
+ 
+ 	if (imsic_mrif_atomic_read(mrif, &mrif->eidelivery) &&
+ 	    imsic_mrif_topei(mrif, imsic->nr_eix, imsic->nr_msis))
+@@ -630,7 +630,7 @@ static void imsic_swfile_extirq_update(struct kvm_vcpu *vcpu)
+ 	else
+ 		kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_EXT);
+ 
+-	spin_unlock_irqrestore(&imsic->swfile_extirq_lock, flags);
++	raw_spin_unlock_irqrestore(&imsic->swfile_extirq_lock, flags);
+ }
+ 
+ static void imsic_swfile_read(struct kvm_vcpu *vcpu, bool clear,
+@@ -1051,7 +1051,7 @@ int kvm_riscv_vcpu_aia_imsic_init(struct kvm_vcpu *vcpu)
+ 	}
+ 	imsic->swfile = page_to_virt(swfile_page);
+ 	imsic->swfile_pa = page_to_phys(swfile_page);
+-	spin_lock_init(&imsic->swfile_extirq_lock);
++	raw_spin_lock_init(&imsic->swfile_extirq_lock);
+ 
+ 	/* Setup IO device */
+ 	kvm_iodevice_init(&imsic->iodev, &imsic_iodoev_ops);
+-- 
+2.39.5 (Apple Git-154)
 
-
---=20
--Dionna Glaze, PhD, CISSP, CCSP (she/her)
 
