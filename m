@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-27134-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27135-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8C9597C381
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 06:48:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FEE697C382
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 06:48:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA661283BF4
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 04:48:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 075F11F22CA6
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 04:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C482A3BB47;
-	Thu, 19 Sep 2024 04:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF473CF51;
+	Thu, 19 Sep 2024 04:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LIFwYD4j"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xg8iB9RN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F47383A1
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 04:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A187C3B79C
+	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 04:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726721234; cv=none; b=R0qX0WG/q9EjpeMte2PMI+N3WE/GZn6clZ1f6NB1yirz0TovrSLa3t1SN/7LM4yoCcQoDzS/FdMtp9BD/K7wnFRaoShnA5dcI6V1fSI9dWneGzkjBMTJ/FfrITWCDXJCKqjzTcaeoYYrCvz+MT7Kltm2A/2J33jUPlXCFH6o7uk=
+	t=1726721236; cv=none; b=PRHyNtKOSCbKf0aGTsbY69sETeTz7CSfKQMf6ca4JyUskH1erRixrRM048xK1R6UGNkr6bc53ysVnvWZYkN51UXXAc4YQyOnXOAsZulPF1IPlM9ZKrTnJeGUCZmVwshq2uh2nKcSPgd6V6ilezusTihw6/RwFUYA0P60eIDpAs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726721234; c=relaxed/simple;
-	bh=opM1fuP4B6hYIxce6wrCIcsQth4x5c32Od/9tnr8SGk=;
+	s=arc-20240116; t=1726721236; c=relaxed/simple;
+	bh=L03cMnciaXv+Tu1dHQm4msd/v7u2MEWZ2b+KhDe0RV0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=USUFyJem1jRplJlH5YMf2Z+jcmOC39sBfrc2Sr2VSCqtORsq0nWIiEaQRpPd+u9bbPYktztUboqT6uEzijz3LH26XcRASzhCzX0PnGn/fxEzeflZ1upatMg55Bm/sbv4yxYPnYOiiTIexLIp8BahTefjEr8rNFOBIizhXUjmsNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LIFwYD4j; arc=none smtp.client-ip=209.85.215.177
+	 MIME-Version:Content-Type; b=Aw1gBzV/b/UNq8Ae+JXWtKFbg1V+Lvjnv+m3IB14oEMJzVI2Q3Rpvgv7nlyVI9rAS4WE2GNnHAsPRk5YgwSWKDQnN6EsmuJEP1cOhbHUvAcfOjT42ptzPi2d9+JQUUDHz9P3TvdBi9ySG29cQfJbqsyHtPUBLbdBQI+El6hP8Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Xg8iB9RN; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7d916b6a73aso213519a12.1
-        for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 21:47:12 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-718d8d6af8fso288055b3a.3
+        for <kvm@vger.kernel.org>; Wed, 18 Sep 2024 21:47:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726721232; x=1727326032; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726721234; x=1727326034; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BFDTm87nVz3V5/Slt3dbvL2tTaVEGEVOzfLYJ3PuoMQ=;
-        b=LIFwYD4j6B+0CPzcmP6heMI4BPR/l9hW+aixF8hwL71OFO//ILuQ+7kA3S2srTI+oe
-         3WDaGGbUzn1e6eIg9J24pOEDq8rMG2r8ZZT8YamlbagbRytMlRualLFf5vOXBsFNvtqO
-         tPCpRVW0hDz592dWsTBmpDAH2lqMWxjKmanZucX2LOqnvkC5fCZ6UnGCdncNpaCesdjG
-         h4NvNTt0KUh4vna6VXsIFh1N4CUsR0wbJk3XSssB/G5NGNLLVptunDlPWSDhICziDa66
-         /Ks90gVlCGFPnsMuqk92pq1/v3oisb3To3mJAAft7BddmA1BgZ/lpZq4YhNDBPjnxTlU
-         lL6w==
+        bh=7PZhVYqzq4kADvRMhAIMG6rvS/s/Gp2LRBj3c7uTV/4=;
+        b=Xg8iB9RNTIr8NP6JjBGg1UY1cXl6WTO4zJiQzSQ+8EtJiATcHTvi8fq2LhUVHXGWXe
+         pXXeVo8wHLcTDy7jvUabT+smGNS2RSJMOGID19iZGFZOKq18jzM42JfZkZLdBkbktND0
+         0F/4+a2KV2MHLzTiJaKbs0TEhUFhzpm8nWOA3xN0nFNzSvp5wt7IAWXykiCC+U+gr8Zq
+         sQ9vZHE15vPQiskPRXemZu69pSzn0+kLGSIeLWz5MzJwePsJlHKJGGwGUeHeCzcX7KYh
+         I3JEHm8UM7fBw76zwku6t5/R5yTsPDatTmPwiATbOOePrbuB+Q4mhceLV734CLrxRzFX
+         9MVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726721232; x=1727326032;
+        d=1e100.net; s=20230601; t=1726721234; x=1727326034;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BFDTm87nVz3V5/Slt3dbvL2tTaVEGEVOzfLYJ3PuoMQ=;
-        b=VQEAkvld2bpOaRhqe2bRADjVvPVh18vMek72MbGWeyR+RfAkI+k9VDQoT0DfSyRl+G
-         SqGV6apF2/XuXfkRDxE5B5MfoUVft5f1E31rquslMow4kVGxXfmS2bzrSkY23NWIEqHs
-         6n5G1KXY9b6HBlxq+0DpJCQuGrl1BeFg4ZnglWumPTKDPPQ2Nn5H+Ts9tN2xo5tLVxy/
-         sLy0jke4RBOf0fk14qn/vsMHPJdl3ME8ItavLRGbQI+Mrmoo6NpCfrTSG/qTYP//Fe/Y
-         TMl3iUIXj9T9E+BkA3S4QMrpr/OTD1XM6W1GSNvRJbS9i5keNvZz3fjwXSb1balGdpkV
-         rqbA==
-X-Forwarded-Encrypted: i=1; AJvYcCWcGy/8yhqexiWVmmBZI5YeowytAjOBzCK4ZC7SFKsdCkc72SIxJArV6Pib1/XOLZkgwZg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxslJZt2q50Q6c7CIsYGDAz+Rr7AO7O/Gbna3aWTGYGt7Gct/zx
-	jmlldc4EmWMcerAhseePxgae+nFpkz/+7p9zXyYkgcz42nSvUXs22UAwv5+NQR8=
-X-Google-Smtp-Source: AGHT+IEyMy6V2A0OtvCxf4O48p53ASfDnJYGmnLQMeZ/04wkCNDXNGA3OfpgkgUg92nhjq5jeesYvA==
-X-Received: by 2002:a05:6a20:e30b:b0:1cf:3402:6e9d with SMTP id adf61e73a8af0-1cf75d76b46mr35535691637.2.1726721231866;
-        Wed, 18 Sep 2024 21:47:11 -0700 (PDT)
+        bh=7PZhVYqzq4kADvRMhAIMG6rvS/s/Gp2LRBj3c7uTV/4=;
+        b=tnrjzyCaygh/p3FqbY7H2xcSVpzrk31A1CaquxHrpbA2qBdRf6dtg0/ecQ3/m8V3+W
+         5wkWK/oP/j8moe4cpsDxF8ctcEXB5mFd2rh8tcKwDIi01Ja1PE7Ulw5XOcZ1jD9Ex2Ca
+         eiLNjnDhq/hv5JozFEIyzL9d3YAecymSswTGxweK9rEI5oKo9/lxgh2ucim6opE8WCEH
+         F9YsIPoSSrX1KzDC5IpcX9BN3Izzlj7nsEU9UUwjNuby6eg7jCAMV3IOfPvCnfil2cuo
+         AzxjP3Boffzn0aTuEYiKgaAcdXLrBqV04JwYyKJPWfXvKMq2j5IFi+p3eq4vojgSqr4J
+         GKiA==
+X-Forwarded-Encrypted: i=1; AJvYcCXdysEYjyw8/pKPY3WRbfK5r73WwGjlaIJzgBWXWdSzkUcuPEphANbn2MQ69zLbRVYCxlk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJ0Tdkubc9LHBDXj6pmVMlmWDZxR4e9Al7XVfxNqE/sej7KDj0
+	TFd4NOwzFdsqWKLvLzpkPhdyMpqGfD8hhVu4c8TbX1EXCQgdXAs2V1pXvDkMzyg=
+X-Google-Smtp-Source: AGHT+IFRqXUQzeifeEouuocTRosW9D+grcvLtI1xOR31wi5/CcwZDxPvsAI1HZex+byGlUmwqu8pKw==
+X-Received: by 2002:a05:6a00:2d91:b0:717:86ea:d010 with SMTP id d2e1a72fcca58-719261edaa2mr33169557b3a.21.1726721233871;
+        Wed, 18 Sep 2024 21:47:13 -0700 (PDT)
 Received: from linaro.. (216-180-64-156.dyn.novuscom.net. [216.180.64.156])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944bc279csm7478601b3a.188.2024.09.18.21.47.10
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944bc279csm7478601b3a.188.2024.09.18.21.47.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Sep 2024 21:47:11 -0700 (PDT)
+        Wed, 18 Sep 2024 21:47:13 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Palmer Dabbelt <palmer@dabbelt.com>,
@@ -133,9 +133,9 @@ Cc: Palmer Dabbelt <palmer@dabbelt.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
 	Peter Maydell <peter.maydell@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v3 13/34] migration: replace assert(false) with g_assert_not_reached()
-Date: Wed, 18 Sep 2024 21:46:20 -0700
-Message-Id: <20240919044641.386068-14-pierrick.bouvier@linaro.org>
+Subject: [PATCH v3 14/34] target/i386/kvm: replace assert(false) with g_assert_not_reached()
+Date: Wed, 18 Sep 2024 21:46:21 -0700
+Message-Id: <20240919044641.386068-15-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20240919044641.386068-1-pierrick.bouvier@linaro.org>
 References: <20240919044641.386068-1-pierrick.bouvier@linaro.org>
@@ -145,33 +145,42 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 This patch is part of a series that moves towards a consistent use of
 g_assert_not_reached() rather than an ad hoc mix of different
 assertion mechanisms.
 
-Reviewed-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- migration/dirtyrate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/i386/kvm/kvm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 1d9db812990..c03b13b624f 100644
---- a/migration/dirtyrate.c
-+++ b/migration/dirtyrate.c
-@@ -228,7 +228,7 @@ static int time_unit_to_power(TimeUnit time_unit)
-     case TIME_UNIT_MILLISECOND:
-         return -3;
-     default:
--        assert(false); /* unreachable */
-+        g_assert_not_reached();
-         return 0;
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index ada581c5d6e..c8056ef83d7 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -5771,7 +5771,7 @@ static int kvm_handle_rdmsr(X86CPU *cpu, struct kvm_run *run)
+         }
      }
+ 
+-    assert(false);
++    g_assert_not_reached();
  }
+ 
+ static int kvm_handle_wrmsr(X86CPU *cpu, struct kvm_run *run)
+@@ -5790,7 +5790,7 @@ static int kvm_handle_wrmsr(X86CPU *cpu, struct kvm_run *run)
+         }
+     }
+ 
+-    assert(false);
++    g_assert_not_reached();
+ }
+ 
+ static bool has_sgx_provisioning;
 -- 
 2.39.5
 
