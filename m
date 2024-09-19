@@ -1,74 +1,71 @@
-Return-Path: <kvm+bounces-27177-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27178-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C40597C988
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 14:52:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA27697C99C
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 15:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F03EB284EA3
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 12:52:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06645B22B17
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2024 13:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE17319E83C;
-	Thu, 19 Sep 2024 12:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA0D19DFAE;
+	Thu, 19 Sep 2024 13:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="xdswiPZ3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iFioIop1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F9819DF86
-	for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 12:51:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2E741746;
+	Thu, 19 Sep 2024 13:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726750308; cv=none; b=cOSW8itvXssQ7qkvB5abU0QZPEGPkqyFWRFYADDjAgQmShyZ1ECizZlGCC2FXM3BPj2A6IIQJlvtws1Tnn7lSKBnmut7S8EpU2FhjsZKOCpmzWejoArTs0l9bVXH75/5j54Z4behV3PBB7ssghQ6AUq6140YjnkfyG5Cz9pG6zk=
+	t=1726750860; cv=none; b=Ad4q02sbCfgBoxwXYYBzqDgidFKWYw9TpSN7//S7WAZHL7f/hZxYGbKhKXotSvA51awWU01EeO9nmJiG0gw7gl1KnPn044ceXqJ90s7n4WHwlp7DjJQbVfhvubh7i3Z6oqIpjD+ldn+cvrd4R4Ssz4KjBE1Br/SOYP2dGmQgGEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726750308; c=relaxed/simple;
-	bh=SlJmwhGl3SrJKXIOv4Gm2FmJKvlW3Kv5wJXm0Ihsfbs=;
+	s=arc-20240116; t=1726750860; c=relaxed/simple;
+	bh=+KPAsjX34xbAwq1NL0SgPf0Wc1ZNqJh0/Z/0io7fmSE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rv3Fxx8CDx3pdwyotjiygZoKTcJq150zU6tMWg0DLReUgNndJbMGuRXR58ueR0Veni1osD6zN3XwiYAlKxg/AZwkt3IaPPQinLxyBgxr4deBtIpeyMTzmECXOot+8e241Cgg3aSduz/2cZ+YHLwGcf/V6WH3nLryvdNDPchnvLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=xdswiPZ3; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a8ce5db8668so115338566b.1
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2024 05:51:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1726750305; x=1727355105; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G2ods2eZT8RMxJfTBuByt96hZQnySzfhNv8GJfRYckM=;
-        b=xdswiPZ3zpI4ykYr/NoPyiNg5Cjuvudh40FXhFvATIpMm6YKJld59brEhi+RXEsXBU
-         9sE4iY9T2hzc9sttavp15D4N52vagV25k3I3/uHzb+Sjt1/yePPSTpqAV5VIBcbxHDfF
-         pP2fOht/6DLjwPkXmKIXu+RhrnjRyMTm4sksHN8BEMcOwLaTljH0BInRIJcgnaoawNhR
-         d4fIHeD2fMx19HOiy1niyZXm2LF81eXuA/MN1TItTniMBmHQF5KP5uRYYOP91HkVw8e/
-         lt8s52rmFKzO9ZFFyityDtvoscTzVMjbDyiNhg9p013aFAcbg/b17cqz9xxKLoOZ+Jfc
-         rugg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726750305; x=1727355105;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G2ods2eZT8RMxJfTBuByt96hZQnySzfhNv8GJfRYckM=;
-        b=r++IwxxFQzDcGCU4exunMeRcBW4I4QcDIhlpyLCykmCUafynsoco41j9dQosFmVCfw
-         BiXHgCdoqVUKgzrZgMJbsxJSVzMxt3OelDFT31y/kYvcsP4Ozjxxz5F6gki3UN4jZg8v
-         vO0MKAAd3W8Nnhsh8DggGPzJG3wfR3OQGkJyXa1GDXM6SAaAEv5BPzURza6c4hDS6UCQ
-         /ih01m7oQlay9kN0A7PIZITq9gLUbNDxkPajlDKKI4AIIohnMT6qDPIAokXfqtwTVUAL
-         oxq46SEjPEoMzPn179/ZHXIEOh5ZDLorItxEgfCm4GVfcxVFjLemOMgYl6tJZFi0wtzO
-         gq9A==
-X-Forwarded-Encrypted: i=1; AJvYcCWBVvT6TsrfKUPeSGQ8yzN5/GEuVi4IaVkk6ZIZc0/r9/tqTqK6BGMi/sa1/M/AOXJmkpk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlQKMy5E4jOqrv1GZJFWJrAQ7zYlnIlA7rYYjO/JyLo2/8w2Q0
-	CQDD4woW2jsgGj6fKEyfxEDFt3m3GTb9QmzpcDYW3v2Zl5dPKl6sj/t8fpIUcc8=
-X-Google-Smtp-Source: AGHT+IGZqgve+KamWKCTyn5ghHOmYZoUojN3YplaJpvEJ6WqeTRtpjQs7A0Ut18Ni9wirgc/SkN/uw==
-X-Received: by 2002:a17:907:36cd:b0:a90:b73f:61d7 with SMTP id a640c23a62f3a-a90b73f63bamr599108766b.42.1726750305479;
-        Thu, 19 Sep 2024 05:51:45 -0700 (PDT)
-Received: from [10.130.6.89] ([83.68.141.146])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90610968b9sm718971366b.5.2024.09.19.05.51.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Sep 2024 05:51:44 -0700 (PDT)
-Message-ID: <18d61c52-be6f-4ef3-b020-d597ba7cdaeb@daynix.com>
-Date: Thu, 19 Sep 2024 14:51:43 +0200
+	 In-Reply-To:Content-Type; b=os5UrdtTJZsx/dnfOmb2cncr/i8FMx91dpQ61NB81lnyyXn9YgYfzmfoB7EtFZPjH6xydkOjyJwIT+OZadqIRZ+EIZ2wnFTUcmcFCXMsZPIICpHFnnKDCQWBomr8q8oHCnK9qXPFdD/K5rJBXHBfbCK922VKZoINGevjp2x2Tjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iFioIop1; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726750858; x=1758286858;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+KPAsjX34xbAwq1NL0SgPf0Wc1ZNqJh0/Z/0io7fmSE=;
+  b=iFioIop1B++V0/Udb0hBJwyLv74xJgUnqjp8vTplVF2ZCed+avpNXKvd
+   R2KVZuKLfuy0f0ScWjLikxf1jsYuNU7ytLTCv71awD0nIIH4V7WXXic77
+   tI1Zw4lgyOtShTqdYOwymU+n/BXk3vYPDydKdlvm80ASbu9Jz+MdcU6NY
+   Ia1qdUeG0pRryJJEWcQhZxznWcN4rv+0tV2Q1D7xnWdzOTpXMpT15RwVM
+   +nqO6F/sYZ2evT1yWzVYqQPLYrsLSXVSjI89qImvYJ23Esm2AOcc994jV
+   PemboUkhIa+FC+Xw1cRf/h28vUVxSCQc4isfn6gRJFVerSmQP8yKwTKW+
+   A==;
+X-CSE-ConnectionGUID: j6+ltzppTX2vlsAL9229XQ==
+X-CSE-MsgGUID: 7CaU7igLSZerZD0WgZJTqQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="25231229"
+X-IronPort-AV: E=Sophos;i="6.10,241,1719903600"; 
+   d="scan'208";a="25231229"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2024 06:00:58 -0700
+X-CSE-ConnectionGUID: 6nR+txzsQe+hsFkJlZ70eg==
+X-CSE-MsgGUID: P8erXjGnQ1GWRsEFukyRNA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,241,1719903600"; 
+   d="scan'208";a="69953033"
+Received: from linux.intel.com ([10.54.29.200])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2024 06:00:57 -0700
+Received: from [10.212.121.54] (kliang2-mobl1.ccr.corp.intel.com [10.212.121.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by linux.intel.com (Postfix) with ESMTPS id AF77720CFEE5;
+	Thu, 19 Sep 2024 06:00:54 -0700 (PDT)
+Message-ID: <1db598cd-328e-4b4d-a147-7030eb697ece@linux.intel.com>
+Date: Thu, 19 Sep 2024 09:00:53 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,71 +73,185 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 2/9] virtio_net: Add functions for hashing
-To: gur.stavi@huawei.com
-Cc: andrew@daynix.com, corbet@lwn.net, davem@davemloft.net,
- edumazet@google.com, jasowang@redhat.com, kuba@kernel.org,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- mst@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org,
- virtualization@lists.linux-foundation.org, willemdebruijn.kernel@gmail.com,
- xuanzhuo@linux.alibaba.com, yuri.benditovich@daynix.com
-References: <20240916071253.462-1-gur.stavi@huawei.com>
- <20240916080137.508-1-gur.stavi@huawei.com>
+Subject: Re: [RFC PATCH v3 14/58] perf: Add switch_interrupt() interface
+To: Manali Shukla <manali.shukla@amd.com>, Mingwei Zhang
+ <mizhang@google.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>,
+ Zhenyu Wang <zhenyuw@linux.intel.com>, Sandipan Das <sandipan.das@amd.com>
+Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+ gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
+ Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+ Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+ Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-15-mizhang@google.com>
+ <9bf5ba7d-d65e-4f2c-96fb-1a1ca0193732@amd.com>
 Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20240916080137.508-1-gur.stavi@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <9bf5ba7d-d65e-4f2c-96fb-1a1ca0193732@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2024/09/16 10:01, gur.stavi@huawei.com wrote:
+
+
+On 2024-09-19 2:02 a.m., Manali Shukla wrote:
+> On 8/1/2024 10:28 AM, Mingwei Zhang wrote:
+>> From: Kan Liang <kan.liang@linux.intel.com>
+>>
+>> There will be a dedicated interrupt vector for guests on some platforms,
+>> e.g., Intel. Add an interface to switch the interrupt vector while
+>> entering/exiting a guest.
+>>
+>> When PMI switch into a new guest vector, guest_lvtpc value need to be
+>> reflected onto HW, e,g., guest clear PMI mask bit, the HW PMI mask
+>> bit should be cleared also, then PMI can be generated continuously
+>> for guest. So guest_lvtpc parameter is added into perf_guest_enter()
+>> and switch_interrupt().
+>>
+>> At switch_interrupt(), the target pmu with PASSTHROUGH cap should
+>> be found. Since only one passthrough pmu is supported, we keep the
+>> implementation simply by tracking the pmu as a global variable.
+>>
+>> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+>>
+>> [Simplify the commit with removal of srcu lock/unlock since only one pmu is
+>> supported.]
+>>
+>> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+>> ---
+>>  include/linux/perf_event.h |  9 +++++++--
+>>  kernel/events/core.c       | 36 ++++++++++++++++++++++++++++++++++--
+>>  2 files changed, 41 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+>> index 75773f9890cc..aeb08f78f539 100644
+>> --- a/include/linux/perf_event.h
+>> +++ b/include/linux/perf_event.h
+>> @@ -541,6 +541,11 @@ struct pmu {
+>>  	 * Check period value for PERF_EVENT_IOC_PERIOD ioctl.
+>>  	 */
+>>  	int (*check_period)		(struct perf_event *event, u64 value); /* optional */
 >> +
->> +static inline void virtio_net_toeplitz(struct virtio_net_toeplitz_state *state,
->> +				       const __be32 *input, size_t len)
->>
->> The function calculates a hash value but its name does not make it
->> clear. Consider adding a 'calc'.
->>
+>> +	/*
+>> +	 * Switch the interrupt vectors, e.g., guest enter/exit.
+>> +	 */
+>> +	void (*switch_interrupt)	(bool enter, u32 guest_lvtpc); /* optional */
+>>  };
+>>  
+>>  enum perf_addr_filter_action_t {
+>> @@ -1738,7 +1743,7 @@ extern int perf_event_period(struct perf_event *event, u64 value);
+>>  extern u64 perf_event_pause(struct perf_event *event, bool reset);
+>>  int perf_get_mediated_pmu(void);
+>>  void perf_put_mediated_pmu(void);
+>> -void perf_guest_enter(void);
+>> +void perf_guest_enter(u32 guest_lvtpc);
+>>  void perf_guest_exit(void);
+>>  #else /* !CONFIG_PERF_EVENTS: */
+>>  static inline void *
+>> @@ -1833,7 +1838,7 @@ static inline int perf_get_mediated_pmu(void)
+>>  }
+>>  
+>>  static inline void perf_put_mediated_pmu(void)			{ }
+>> -static inline void perf_guest_enter(void)			{ }
+>> +static inline void perf_guest_enter(u32 guest_lvtpc)		{ }
+>>  static inline void perf_guest_exit(void)			{ }
+>>  #endif
+>>  
+>> diff --git a/kernel/events/core.c b/kernel/events/core.c
+>> index 57ff737b922b..047ca5748ee2 100644
+>> --- a/kernel/events/core.c
+>> +++ b/kernel/events/core.c
+>> @@ -422,6 +422,7 @@ static inline bool is_include_guest_event(struct perf_event *event)
+>>  
+>>  static LIST_HEAD(pmus);
+>>  static DEFINE_MUTEX(pmus_lock);
+>> +static struct pmu *passthru_pmu;
+>>  static struct srcu_struct pmus_srcu;
+>>  static cpumask_var_t perf_online_mask;
+>>  static struct kmem_cache *perf_event_cache;
+>> @@ -5941,8 +5942,21 @@ void perf_put_mediated_pmu(void)
+>>  }
+>>  EXPORT_SYMBOL_GPL(perf_put_mediated_pmu);
+>>  
+>> +static void perf_switch_interrupt(bool enter, u32 guest_lvtpc)
 >> +{
->> +	u32 key;
+>> +	/* Mediated passthrough PMU should have PASSTHROUGH_VPMU cap. */
+>> +	if (!passthru_pmu)
+>> +		return;
 >> +
->> +	while (len) {
->> +		state->key++;
->> +		key = be32_to_cpu(*state->key);
->>
->> You perform be32_to_cpu to support both CPU endianities.
->> If you will follow with an unconditional swab32, you could run the
->> following loop on a more natural 0 to 31 always referring to bit 0
->> and avoiding !!(key & bit):
->>
->> key = swab32(be32_to_cpu(*state->key));
->> for (i = 0; i < 32; i++, key >>= 1) {
->> 	if (be32_to_cpu(*input) & 1)
->> 		state->hash ^= state->key_buffer;
->> 	state->key_buffer = (state->key_buffer << 1) | (key & 1);
->> }
->>
+>> +	if (passthru_pmu->switch_interrupt &&
+>> +	    try_module_get(passthru_pmu->module)) {
+>> +		passthru_pmu->switch_interrupt(enter, guest_lvtpc);
+>> +		module_put(passthru_pmu->module);
+>> +	}
+>> +}
+>> +
+>>  /* When entering a guest, schedule out all exclude_guest events. */
+>> -void perf_guest_enter(void)
+>> +void perf_guest_enter(u32 guest_lvtpc)
+>>  {
+>>  	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+>>  
+>> @@ -5962,6 +5976,8 @@ void perf_guest_enter(void)
+>>  		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
+>>  	}
+>>  
+>> +	perf_switch_interrupt(true, guest_lvtpc);
+>> +
+>>  	__this_cpu_write(perf_in_guest, true);
+>>  
+>>  unlock:
+>> @@ -5980,6 +5996,8 @@ void perf_guest_exit(void)
+>>  	if (WARN_ON_ONCE(!__this_cpu_read(perf_in_guest)))
+>>  		goto unlock;
+>>  
+>> +	perf_switch_interrupt(false, 0);
+>> +
+>>  	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
+>>  	ctx_sched_in(&cpuctx->ctx, EVENT_GUEST);
+>>  	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
+>> @@ -11842,7 +11860,21 @@ int perf_pmu_register(struct pmu *pmu, const char *name, int type)
+>>  	if (!pmu->event_idx)
+>>  		pmu->event_idx = perf_event_idx_default;
+>>  
+>> -	list_add_rcu(&pmu->entry, &pmus);
+>> +	/*
+>> +	 * Initialize passthru_pmu with the core pmu that has
+>> +	 * PERF_PMU_CAP_PASSTHROUGH_VPMU capability.
+>> +	 */
+>> +	if (pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU) {
+>> +		if (!passthru_pmu)
+>> +			passthru_pmu = pmu;
+>> +
+>> +		if (WARN_ONCE(passthru_pmu != pmu, "Only one passthrough PMU is supported\n")) {
+>> +			ret = -EINVAL;
+>> +			goto free_dev;
+>> +		}
+>> +	}
 > 
-> Fixing myself, in previous version 'input' was tested against same bit.
-> Advantage is less clear now, replacing !! with extra shift.
-> However, since little endian CPUs are more common, the combination of
-> swab32(be32_to_cpu(x) will actually become a nop.
-> Similar tactic may be applied to 'input' by assigning it to local
-> variable. This may produce more efficient version but not necessary
-> easier to understand.
 > 
-> key = bswap32(be32_to_cpu(*state->key));
-> for (u32 bit = BIT(31); bit; bit >>= 1, key >>= 1) {
-> 	if (be32_to_cpu(*input) & bit)
-> 		state->hash ^= state->key_buffer;
-> 	state->key_buffer =
-> 		(state->key_buffer << 1) | (key & 1);
-> }
+> Our intention is to virtualize IBS PMUs (Op and Fetch) using the same framework. However, 
+> if IBS PMUs are also using the PERF_PMU_CAP_PASSTHROUGH_VPMU capability, IBS PMU registration
+> fails at this point because the Core PMU is already registered with PERF_PMU_CAP_PASSTHROUGH_VPMU.
+>
 
-This unfortunately does not work. swab32() works at *byte*-level but we 
-need to reverse the order of *bits*. bitrev32() is what we need, but it 
-cannot eliminate be32_to_cpu().
+The original implementation doesn't limit the number of PMUs with
+PERF_PMU_CAP_PASSTHROUGH_VPMU. But at that time, we could not find a
+case of more than one PMU with the flag. After several debates, the
+patch was simplified only to support one PMU with the flag.
+It should not be hard to change it back.
 
-Regards,
-Akihiko Odaki
+Thanks,
+Kan
+
+>> +
+>> +	list_add_tail_rcu(&pmu->entry, &pmus);
+>>  	atomic_set(&pmu->exclusive_cnt, 0);
+>>  	ret = 0;
+>>  unlock:
+> 
+> 
 
