@@ -1,147 +1,128 @@
-Return-Path: <kvm+bounces-27198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E8BE97D1DE
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2024 09:40:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DCC6397D22C
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2024 10:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD782B22AF7
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2024 07:40:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A33CB2243B
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2024 08:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A2F7E111;
-	Fri, 20 Sep 2024 07:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA40A7E111;
+	Fri, 20 Sep 2024 08:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="LoUFRYLz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RXDlIzGh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188FF78C6C
-	for <kvm@vger.kernel.org>; Fri, 20 Sep 2024 07:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFDA6F06D;
+	Fri, 20 Sep 2024 08:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726817972; cv=none; b=Pr9KjSF+D7CimKBrZCLQJGSIv0TvtHxEBGgpUqiq1jG4mXBbUNRNoHz81dMSvkQxXF/II5hsBhc9YRmCbkzrE3eX0uxt/5CU2rAG2hAdM3km1oUKwxmDYeRy07BA/jjGtNPz4FndgK+wVeCSystwEP92UjW5C0d3sGttAWSwaZU=
+	t=1726819255; cv=none; b=hrleDqUP3jh8iBtFhazUNuKew+ElhNg9JZYxj7X/mP2wfuUHSNRgNb6skyR28TmRJlKuZpMT849NumUTmTZAG0XYpERwdfSihTd3j0GAJofg1AUTHC/dzCh1+roT+DC6u2xip71v5flm/vpPhpEqko3NRDnDEvieybLzgY195I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726817972; c=relaxed/simple;
-	bh=H2dmJr8hpjnnkdgnm3AAwF3pNuKwnFfGeFFtmmrBeZo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZUsiccwTDssKs5tezbGdhAK0RBurI4zV3Y7lzhKzWQFTCFPLNioDx68gu3cuo6TGjif/u4Ddvg5pk+ScLQxIq8JZ/zapHA131lpjPwg7KhzVOi/Mvq7DznE252wJCxysFGZMlcNo8oNWPiggC/exxC9JmBGQbpugJNkb45X1MSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=LoUFRYLz; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-205909afad3so21735435ad.2
-        for <kvm@vger.kernel.org>; Fri, 20 Sep 2024 00:39:30 -0700 (PDT)
+	s=arc-20240116; t=1726819255; c=relaxed/simple;
+	bh=k4UBv5oM8ZQK9M7hz87ok25yEW72lwpNhD8VMqaimyo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h/+sSpV7+VW1ss++tiWYN1RLG2zHBBhL1i1Qazsg+hBLq7xZcT11DmtwWMQQeWrDW0eIS2DrB339jAFXozFN7hDRIJm3+pjMExAnlfLtkg8o50HopROf2aZs9+5vqlB0SltwMeoc463k/p/3wGleV5NeUG9KlBI5y0bHsxhWWBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RXDlIzGh; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2f7ba97ebaaso15506171fa.2;
+        Fri, 20 Sep 2024 01:00:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1726817970; x=1727422770; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=56knnfie3gn40U1586qIcyfLVXwVK5l1OK1pmMi2fA0=;
-        b=LoUFRYLzxWPzVjkoFV9ao0yf/yF09mqx+0jqO39Uk0Z7jIBuwE3Fd/H238IuD6/jZX
-         3rne++r3wl/LLYumWU3MVL5NKxzkeKqoc9IeoZut4dtixnpjZZj+xIOJIxhRQrH7iJQK
-         j+/NqbYzfh7L3v1cooKZ79aJm8Zbirjz6Lf8tzuy/JS8P+hj3yQfnt+AhDqmIEk/AH4p
-         TLCV+K5G2KUeFq+H7SeuiF0+XJM0RchFYDxsVtmJ+yqlRMxUpdFMXfsBa+nQtJhblyu2
-         9YTx7CpiHsZvP+Pgg0wpwVF6qhjJLJic9ZAx4Vx0FAwSMZQCI2t2jOiVImFXRHki8jDM
-         BKqw==
+        d=gmail.com; s=20230601; t=1726819252; x=1727424052; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cKGSAgTHXJwfTJQ4CbnLCIVfjXQKqwfB17w7eFL+kk4=;
+        b=RXDlIzGhVBXyhXb1UTOhana4Ilx66Bmke43kI6Fyb7wtP2JBM03beDNgYMnqgi8YvX
+         SmG7p+NJmVzDS/xBf8JKKcNT75RVjHsXxiUqgq+zMwPMYkLOdPbrVSsT2gQmKpN2xz2W
+         CVc1J6bnpzjQhDpNhUBW2LFY6P2jx9MwDYNMQsAp0JO02yUpJxGN38JGg+QV3m0xyFWu
+         ZoZpPhH+3XPZ1ipBLVH3hFbimeUbKWKLcAhTFSQuU6IQnhmJ/k60z3Caq4Vo91dzMz+r
+         gcrtigafnANanjkE5ACaq8sLqCWBK4Cy/OEJD/NBRTyxmAniwsnGOy5x1t2GuA6PEF89
+         wu9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726817970; x=1727422770;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=56knnfie3gn40U1586qIcyfLVXwVK5l1OK1pmMi2fA0=;
-        b=IdsYfNYChYXtK2PCFDrbgTMxzHixZKDi9sjsfoJMUEtw0cVerLdSWAeDkb52UBpGj2
-         wOgYvBIeZgGYNXUM8DNlXlY0cz6divCaHjhmf/EDd+JFDUMhW41tkwHc51oZTQC/byxw
-         UgQMETSGNGxMSz8JoUcGCJeUJPNJPV7yMHgdwCcKoIblxMGrAQ0FMbWEEmDsxnfQSbGc
-         QVYYGtF1QOYAdaKiRtynDeG62o2fIj9nl2M0smyAIn68BNYUfXL0hjyEo33P1sk9hVF3
-         hdbzXGecC8KS0OzadPHB/CThMHRdmWV3Jf+A8r9qeihm8x9ZQqmf+W8Fo42PNOu8uNeR
-         Wvug==
-X-Forwarded-Encrypted: i=1; AJvYcCVNCMlFGh5ebrlVFRfm3UI87yuAIsiCm0vV4V5XwvIrvJOZRC2igJ/JHNLfmXVn7eHTJb0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7PmrxTd0VuGi3d4PMbj/6UfXFuOkB0PIGcao1MofE65yGz1eS
-	K4sGSxEj2SsXAt4ONRzvMD+zFuk8+nDFfG9xcgcoiBz4hobobZnzmlbQxqlz9yk=
-X-Google-Smtp-Source: AGHT+IFdJWu48cTXjfm7pmPi0SJjjpoM8oaSNh7cs+sv8ppa+Eh8rcIfQI/ARHDbsMfIMGKI31JoxA==
-X-Received: by 2002:a17:903:8c8:b0:205:410c:f3b3 with SMTP id d9443c01a7336-208d8442483mr26756335ad.59.1726817970349;
-        Fri, 20 Sep 2024 00:39:30 -0700 (PDT)
-Received: from [127.0.1.1] (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946fcaa4sm89645805ad.212.2024.09.20.00.39.27
+        d=1e100.net; s=20230601; t=1726819252; x=1727424052;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cKGSAgTHXJwfTJQ4CbnLCIVfjXQKqwfB17w7eFL+kk4=;
+        b=eSTaf7aw/YNHzZ/NRHtYKDsGJ8nhIgVFqu2vNMa/mb1A9GmOojJ2sq0XB454ae9UBs
+         e+lgISwnZOiMmMGNJcJlx6lYibpE41nJOt8XY4IQbRpd4rHIup4DhJzskRdWmOez7Itp
+         F98W7c9jZC+zCZEnz6arCtKbb/zUy4AXuTzyQzqsxbXBXNBRhZMfA/CLZlcqXOA/z23d
+         XwU/yV67+5ukqDtMBPpkGgcVJuQsr9TGy8UFKkBXvOoV71wv8T4SzDn4LEozXdE91RVF
+         ToQ4Yz3xnsT42FiQjiqj/wLHW2Py0w3TSFXBE/c36na3Ijeqn6JIw/ZePDX1cyBS41kk
+         ubzA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1jw9cl0+JbvYhd+Aqa7wzW7RyLHjLM43THonDOIC+bPaFOu3i/2HvpkRMBQ90tJcS80M=@vger.kernel.org, AJvYcCUjRqoppkWi7OVeSxgVKyfGdYu4Od4WD0TLW2EaKY2eI7bkuvMb1rBd0bIg80hE9Mozok12HM1mk/liRa0s@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrePPM6GggH7IFxDAaWDCb/NOrBlVS+m+oUApNMkXI7enTRLFv
+	Z/NA8urXE4tsGe+LZzJcfB8zLVMRk6OGE4/08Ha9lytX0QGP4pWa
+X-Google-Smtp-Source: AGHT+IEi0InguyJTVeAUW05C1ZpK+FrFhyDloEtZI0L5JXbPegVcd85wGsavAsedcuSfsSPmCagR+A==
+X-Received: by 2002:a05:6512:3b8c:b0:530:c212:4a5a with SMTP id 2adb3069b0e04-536ad161b33mr1001511e87.22.1726819251762;
+        Fri, 20 Sep 2024 01:00:51 -0700 (PDT)
+Received: from localhost.localdomain (2001-14ba-7262-6300-2e4b-7b61-96a9-b101.rev.dnainternet.fi. [2001:14ba:7262:6300:2e4b:7b61:96a9:b101])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-536870c55d1sm2070030e87.305.2024.09.20.01.00.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Sep 2024 00:39:29 -0700 (PDT)
-From: Max Hsu <max.hsu@sifive.com>
-Date: Fri, 20 Sep 2024 15:39:05 +0800
-Subject: [PATCH RFC 3/3] riscv: KVM: Add Svukte extension support for
- Guest/VM
+        Fri, 20 Sep 2024 01:00:51 -0700 (PDT)
+From: =?UTF-8?q?Markku=20Ahvenj=C3=A4rvi?= <mankku@gmail.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>
+Cc: mankku@gmail.com,
+	janne.karhunen@gmail.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/1] KVM: nVMX: update VPPR on vmlaunch/vmresume
+Date: Fri, 20 Sep 2024 10:59:42 +0300
+Message-ID: <20240920080012.74405-1-mankku@gmail.com>
+X-Mailer: git-send-email 2.44.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240920-dev-maxh-svukte-rebase-v1-3-7864a88a62bd@sifive.com>
-References: <20240920-dev-maxh-svukte-rebase-v1-0-7864a88a62bd@sifive.com>
-In-Reply-To: <20240920-dev-maxh-svukte-rebase-v1-0-7864a88a62bd@sifive.com>
-To: Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>
-Cc: Palmer Dabbelt <palmer@sifive.com>, linux-riscv@lists.infradead.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
- Max Hsu <max.hsu@sifive.com>, Samuel Holland <samuel.holland@sifive.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1319; i=max.hsu@sifive.com;
- h=from:subject:message-id; bh=H2dmJr8hpjnnkdgnm3AAwF3pNuKwnFfGeFFtmmrBeZo=;
- b=owEB7QES/pANAwAKAdID/Z0HeUC9AcsmYgBm7SalRgR20+oKL/qOJCPUSe6TlQ9TxOvvbzCZ3
- /oFZ1j4YAyJAbMEAAEKAB0WIQTqXmcbOhS2KZE9X2jSA/2dB3lAvQUCZu0mpQAKCRDSA/2dB3lA
- vWC7DAC6wEj/n9CbTmnWTmX1V13illBvFuFZRuglicYsApqy50khOjplX6PJZuGQ95zwOU7MgL0
- R3EiVMLLWH+svNhI0RKdAYZgkYaC+ebdN6rmtFUPZoTDzYN29PcsufuUTCYGVx6yhvRJ6tUsKz5
- XsfgxNU5bsp2/TrTrtpBr9ikId9PSeSaZjSvYX+XjxRKaRAUBl1ZEOjWlR6QKCMo0GO4KW5CSWx
- jptrxxQmq5XHZvg6nChHyWTNRYK6hDH2Kn6+AjKgyNIjnl/0QzAv4UalKsaHJk5wiwJWMQ3oCa4
- lQcTWE/+8v3Dtz9RlFFQHkuyEY06ph9ETUWB9+qstgSGitlZYBMi9uaOTRlXgoK9XF1yo0VmF7L
- p/gBoLYn0F29Vo7Zu2MiEfzlww2NgqTkTtIHEt5VgQZac5TIQq52VSoq/Bwz8S+4LBKeb1gOeR6
- bCoaMInYzf6Jur0ktZwEGciz7Mw/YS+SFW3LprnqtS5bHDVHzRYf9Tp9JY0o4dbSO3Yuw=
-X-Developer-Key: i=max.hsu@sifive.com; a=openpgp;
- fpr=EA5E671B3A14B629913D5F68D203FD9D077940BD
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Add KVM ISA extension ONE_REG interface to allow VMM tools to
-detect and enable Svukte extension for Guest/VM.
+Hello,
 
-Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
-Signed-off-by: Max Hsu <max.hsu@sifive.com>
----
- arch/riscv/include/uapi/asm/kvm.h | 1 +
- arch/riscv/kvm/vcpu_onereg.c      | 1 +
- 2 files changed, 2 insertions(+)
+We experience hanging of the guest when running a hypervisor under KVM on
+VMX. The L1 guest hypervisor in this particular case is pKVM for Intel
+Architecture [1]. The hang occurs when a second nested guest is launched (the
+first being de-privileged host). We observed that external interrupt
+vmexit would not be passed to L1, instead L0 would attempt to resume L2.
 
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index e97db3296456e19f79ca02e4c4f70ae1b4abb48b..41b466b7ffaec421e8389d3f5b178580091a2c98 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -175,6 +175,7 @@ enum KVM_RISCV_ISA_EXT_ID {
- 	KVM_RISCV_ISA_EXT_ZCF,
- 	KVM_RISCV_ISA_EXT_ZCMOP,
- 	KVM_RISCV_ISA_EXT_ZAWRS,
-+	KVM_RISCV_ISA_EXT_SVUKTE,
- 	KVM_RISCV_ISA_EXT_MAX,
- };
- 
-diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-index b319c4c13c54ce22d2a7552f4c9f256a0c50780e..67237d6e53882a9fcd2cf265aa1704f25cc4a701 100644
---- a/arch/riscv/kvm/vcpu_onereg.c
-+++ b/arch/riscv/kvm/vcpu_onereg.c
-@@ -41,6 +41,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
- 	KVM_ISA_EXT_ARR(SVINVAL),
- 	KVM_ISA_EXT_ARR(SVNAPOT),
- 	KVM_ISA_EXT_ARR(SVPBMT),
-+	KVM_ISA_EXT_ARR(SVUKTE),
- 	KVM_ISA_EXT_ARR(ZACAS),
- 	KVM_ISA_EXT_ARR(ZAWRS),
- 	KVM_ISA_EXT_ARR(ZBA),
+We isolated the problem to VPPR not being updated on nested vmlaunch/vmresume,
+and that causes vmx_has_apicv_interrupt() in nested_vmx_enter_non_root_mode()
+to miss interrupts. Updating VPPR in vmx_has_apicv_interrupt() ensures VPPR
+to be up-to-date.
+
+We don't fully understand why VPPR problem appears with pKVM-IA as L1, but not
+with normal KVM as L1. On pKVM-IA some of the host functionality is moved from
+vmx root to non-root, but I would appreciate if someone could clarify why
+normal KVM as L1 is seemingly unaffected.
+
+Thanks,
+Markku
+
+[1]: https://lore.kernel.org/kvm/20230312180048.1778187-1-jason.cj.chen@intel.com
+
+Markku Ahvenjärvi (1):
+  KVM: nVMX: update VPPR on vmlaunch/vmresume
+
+ arch/x86/kvm/lapic.c      | 9 +++++----
+ arch/x86/kvm/lapic.h      | 1 +
+ arch/x86/kvm/vmx/nested.c | 5 +++--
+ 3 files changed, 9 insertions(+), 6 deletions(-)
 
 -- 
-2.43.2
+2.44.1
 
 
