@@ -1,222 +1,231 @@
-Return-Path: <kvm+bounces-27204-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27205-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B011A97D2CD
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2024 10:35:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD8D097D30C
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2024 10:54:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D4D72829CA
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2024 08:35:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D1401F2344D
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2024 08:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4307E107;
-	Fri, 20 Sep 2024 08:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA32134CF5;
+	Fri, 20 Sep 2024 08:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="HRvOPU+G"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0723BQL+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2070.outbound.protection.outlook.com [40.107.92.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4757A3CF6A
-	for <kvm@vger.kernel.org>; Fri, 20 Sep 2024 08:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726821301; cv=none; b=lxWw4qBdyOnwcRGbqpacxkTDfgRs4ihPQ98o6LOQKioYqwKq8cfeXKBn+gmgB9SJjGvkfTCiOSuio/Pt9wesrPow3gq7+aoDUpMepEUwQhBGN7vSKmArZWUanAtckjb0UBJ5TFfcXQ3tcdOGLv06XV0e1dqpc3yjYYs1JJM4zVw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726821301; c=relaxed/simple;
-	bh=I79psXUWQ0+2Lm/txwfde2VUpAtrxO/m/za3/igBxQI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YQjf64/xA8p3+Y00gmgXCI4wwRDMBI5HQV2xj/wKQAtdamvYF/HqvwJSbAjJ7Rl6zMSDxmGpLfD6Pad6Zulp+ZI9nEsfp4iCfXenn67c9LMrshFpGdZWn21OWBW4tOpZrmc6DakB5X14J6LFwsQ0fZ1QzS+w0PzTNsQlLG+vOmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=HRvOPU+G; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-82a151a65b8so86171439f.2
-        for <kvm@vger.kernel.org>; Fri, 20 Sep 2024 01:34:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1726821298; x=1727426098; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xMiWTjaHnHS0JzzbhnLCVrfpCgiv+dcBe7V+IIK3140=;
-        b=HRvOPU+G/4MCwYeh1LKmFC6J0A4ZTI10CRaqIec25BarEYyc6ltn1FuQwNW8N+hWqy
-         Ip0BgIcPGSaGP+isDk32oyRWZQDT0Bxxo0WMGJYQ57AKmC6ahrnCPA74hvaS/beS5IaE
-         IAS+2yMqy/OYicy0hauYXtwf9DBA9tP3g6K8KHdu5wIfDgVK1hdjjHZorkdvt8UqBQ7m
-         LHKkCDZKTHrX1tj7X3Qbzun6EFGu7A//KL+XDv+JqcfYFRRwO8Kfi84lMdUaIRoRB8gs
-         byWrGSz0OAVS9aEmYL85gvfIVPgRhq85/ndsRLT6rqvOp2kPL1XpsotpIGofiVheMoG8
-         CQYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726821298; x=1727426098;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xMiWTjaHnHS0JzzbhnLCVrfpCgiv+dcBe7V+IIK3140=;
-        b=QmLi0k+8ZWL/TZbNvb0GZQzBD7BSWBNOyn16+O2UKBZ5k6IWfYPGzTYoK2KsfjVvwL
-         Tf0xDh+4d+4IatWIYJiFsjqyblGe15caffdvtBcFOTrKMVuDjiC2bDgtaw6S5Cis+QKs
-         1cCw/t51uda809nUvn+D4lKCZuJpxWliHeXPWAX3KbKV8SWRak6rSmKwMni6sfmKjKDY
-         xbLR18daiHxa6pqESA5VJSsaWkbGQhXR/eTCgBCufBqPKrGMjH7G+4pHkZHZZSkpeu5l
-         nVcyzrkuUmIYIVxzL66GVUQziZCZs56c6YP0undPtcHHLVKAGCQ0so1Oo27iJydps/0k
-         qmuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWw0mudCphaMBfsZwnVLP/2kDNUGJIFZedpWjhoTTgXPBJk9X6nLfADvnaoKmfxZgpk/lY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywx/1RW9OUNHuNBTdRZGLGyJ3nQuQAImXUD/C5En0muZkIdetAr
-	hoOnVhzwHPwE/GnHPVeosjy2JdRvm5XyfXbkJdUmQprrCUWJRnqDWb5lQm7NBWZpTTVCdF1/+jE
-	AFLong9lcHL/Qm0ujNBa6mQK56wiyLUp6YGl0sA==
-X-Google-Smtp-Source: AGHT+IHq6B1rRJenopqNmyWR6VL8HDws3rxiWv+qj9OzdKYH3N6807kKyhX5RCCNU3zx9rqm2laOp98JD8OY2gJr63k=
-X-Received: by 2002:a05:6e02:1aa3:b0:3a0:a21c:d2b2 with SMTP id
- e9e14a558f8ab-3a0c8ca7795mr25933665ab.11.1726821298213; Fri, 20 Sep 2024
- 01:34:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6D22AE77;
+	Fri, 20 Sep 2024 08:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726822465; cv=fail; b=OcvoGghBYHSjDwEbeFAfno4mYp3x543dIt553ewK7ryBlVWpV03dhh0ujpGfSDUNJhigkzDoEEgr+/xuWCN6RyxT1cSLVDLFUQQdua4AGRAz3q7vhaUtwsbtu+WEuvgVAWrIwq2ObtKDf6c/PQjjXRzwLGD0UwVhdm5yHu5EB74=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726822465; c=relaxed/simple;
+	bh=Dm5oCSLhGnliZPd/kd4wRudXQm4u9W+3RDHlkw/PSJc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=sjRY1odW8EnXLF6WJpttiJ+PM+IiiRXP2ROKClAbxz2RMgahBwUtJiq561bosNH7MjqDK/jVPt7SDTtjFw28dA0qSnMePkvr6Z/tCr5fE95aAuDs19hSxL5DPlkm1+2xWC8hL7hIZ9wgOw99kJEdyu6I/I4WMaZQkHG9qvqj7LY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0723BQL+; arc=fail smtp.client-ip=40.107.92.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jo0rjjlntPv4QprYg71wLNNV7HTbnWWHBqx3RbuRn9KZLhWfRYsk5wSRWReCH1QdopbyYmwcyCUjZGlB+fIoV6Hc+RY6SSWiEsPM7z5kr//kD8lwLx0urr4dQzBwJOdVTctztHyjiG3yMNNbOsyXOtT35g3Cx079G+Eqs1RHSPv7tGrDW6qDstfHEGcVtjvEpDvivl8PTJt6y0p0GwmDzVtE/hW4fyXXI+rlmmSLMM43e9hGaRTztahVwgo2gBrYeVrDIleUk9RXh2bnXO/53p95sUq9VjQP4nEzwb69vQwcCIvojRml86g+2ADJ6DZTrucO3QwzeEGgGGYe2wiGMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=69E9lEYd7EWHyOuZ7im6NWZPAYOKXsr0n/eER0lo28I=;
+ b=VCoUmOJfzx5j9vKh6MFMJLhUm4RnSGQJoOAT1mS3n95miX7dEEzZ58OgADcwnejliSbzbX8qw+VBhS/gErmwW+TZga5ljAdhGiNoebYzuRizTWQsMI4u11fiQOAYbci9aqTI2ibmZHjAxW6nDOIhdf+4KjqykZfeOI+nMgo2SgK/Z+go04wL5ZPfafbDiBeQYpXqA6Nz4nuB73BBQAKwc7A3TRlK7SchgY239tDOi9ySsB5Yi7AOWeXqv1ruFisA7afUwOzs9xeU3OEZyFSWY/XptTO5aFKlKF2D+skvMs8GSI6BNIjsnQHGyRPcThJLM9MkTxz5H1UkDaWXmskFcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=69E9lEYd7EWHyOuZ7im6NWZPAYOKXsr0n/eER0lo28I=;
+ b=0723BQL+m7A6wT+JhURr85Qln0V+k4M4vvDI/dQInp4U7M/LCIJy3FFzFyRNgItUzLbiiISP11zBBPU27WrLORUxeLblXOI2OGvdxjTcjnP3yHXnCDadajR/G4ejEAFl8BLYcKemJljZKvCuHNAWc1ULirY004ia/ybVfb6GrRs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ SA1PR12MB6679.namprd12.prod.outlook.com (2603:10b6:806:252::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.16; Fri, 20 Sep
+ 2024 08:54:19 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec%6]) with mapi id 15.20.7982.016; Fri, 20 Sep 2024
+ 08:54:19 +0000
+Message-ID: <4cc88621-d548-d3a1-d667-13586b7bfea8@amd.com>
+Date: Fri, 20 Sep 2024 14:24:10 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH v11 19/20] x86/kvmclock: Skip kvmclock when Secure TSC is
+ available
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de,
+ x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+ dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com
+References: <20240731150811.156771-1-nikunj@amd.com>
+ <20240731150811.156771-20-nikunj@amd.com> <ZuR2t1QrBpPc1Sz2@google.com>
+ <9a218564-b011-4222-187d-cba9e9268e93@amd.com> <ZurCbP7MesWXQbqZ@google.com>
+ <2870c470-06c8-aa9c-0257-3f9652a4ccd8@amd.com> <Zu0iiMoLJprb4nUP@google.com>
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <Zu0iiMoLJprb4nUP@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0172.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:de::16) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAAhSdy05BXUZu6BNUoDWoEVd_YiM0Dpqg=t5WYUX7+cacnO2Hg@mail.gmail.com>
- <mhng-1e3d83bb-a7f4-4fa7-8cfa-2550835026de@palmer-ri-x1c9>
-In-Reply-To: <mhng-1e3d83bb-a7f4-4fa7-8cfa-2550835026de@palmer-ri-x1c9>
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 20 Sep 2024 14:04:47 +0530
-Message-ID: <CAAhSdy08j_noBGi2CRf0oLBxFnmk983W24oQezmdg1pw6pFksQ@mail.gmail.com>
-Subject: Re: [PATCH v8 0/5] Add Svade and Svadu Extensions Support
-To: Palmer Dabbelt <palmer@rivosinc.com>
-Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, greentime.hu@sifive.com, 
-	vincent.chen@sifive.com, yongxuan.wang@sifive.com, 
-	Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|SA1PR12MB6679:EE_
+X-MS-Office365-Filtering-Correlation-Id: 69404169-216b-47ef-2dfd-08dcd951d02b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?eWQvN0ZocWUvTXFOVzM0Nm9aWWFDc0ROS2xMbytGNDdlNGVNSkNyYVByclRX?=
+ =?utf-8?B?ZElvbUxBbzZWSkl1cE1tZHQ5czBWYnVxT09xZ3NFd1BXQzB3MlNxSU1DRmNL?=
+ =?utf-8?B?R0NmT0Q0WUtieFBZSWpmM3pSUFlFZmRQYm14bTFWTk1EeDhKZFhjemJqdXpo?=
+ =?utf-8?B?b3NkTStPN1hTbVIxNHJZaFg5aDlxWUFPUUtmM0swTVA1YnhTRVRvVko0eC91?=
+ =?utf-8?B?U29GbFdVa01YVkhxVU1PczU0bmFsQ3o5eXljSTFNUHY3U3o5ekkzOUxuM0JS?=
+ =?utf-8?B?em1XT2g0R1lsbXRIU3dVaVRtYzY2bkZMYXRYSzVOcWVETjNSRS9mdWtLTC9n?=
+ =?utf-8?B?Z3BJOTJmdkpTMTBPcFE1WjM0QU9ZRnFSYUE1K0RSeVRpVDNZcStXWjZNZXJF?=
+ =?utf-8?B?U1d4WXZTWEFUQVRXQXdtYTFhZFBXU1dPUkhZbVhRaE0wY0lmR1ZEQjR3bko0?=
+ =?utf-8?B?NzB4VVYxaG1POStOL2h6akVydnRMME93dzNqMWFReGw1K3QwUTh1cmJMR3BW?=
+ =?utf-8?B?OFNsakZTelZ3enBvQXZVNWFDeTBVUlpKbUUyZHI4Vzc5bkVRZXE1S0tUdEdD?=
+ =?utf-8?B?Ykc3YVdwdVczVDNZbDROWlBFY2tNODBFU2psY0hqK3BXbHpTNExBM3ZWdFk2?=
+ =?utf-8?B?d1AyV0lZT1ZZMHI1UHBCVWljZlNnVFl4Uk9FTlJnRW5mNVpMV0RXVDNQNFk5?=
+ =?utf-8?B?cmtqaGttak5pZld0bFhDUkFVa3VpbVlkQ2YvL0VQeTZSNjM0OGFRWld5V3Ir?=
+ =?utf-8?B?QStQNnBhNkhQSDBERW1HSnBqb3F2ZkJEbE9mSFdoT3NsUWVwR2RiamF1S0Jn?=
+ =?utf-8?B?eXhxL3Bra0xjZjZPK1VSSnpFMnpJR2ZDcWRydnVCWUFNWDcwREJMLzhLa2R1?=
+ =?utf-8?B?akpaYVlxUVRWYnpwdUNsRUd0UUZJSHJuRk5uVHFIci91eFhlZ3NqUVB4aUJa?=
+ =?utf-8?B?WlpWZkVqbFNtV3RGNm9naU9ySjBnMTlLWGF2RVJJaHB5MHZZeVNaZjFhZDdN?=
+ =?utf-8?B?UG9hcjRWRWsyazBpQUJpSkMwYlcyUzdXcUpTa1h3WEZqTmlydEkvbTJDRHo0?=
+ =?utf-8?B?clRmdnFVRm1nV3FjSWNOeDJtY3JUY1dtK3JEQWVyYjk0NmU1YVUyQ1NRM0w0?=
+ =?utf-8?B?ZGYyeTBHcUUvQUZPOFNPVE5RQzIzaFlpV2J5ejBzT0NMQjJINzdxd2hxWGhn?=
+ =?utf-8?B?S3JmVHVTL3hzWmlUR0pHd1pURHhuQy9hNXFiazk5NnQ4U0cvZm5PZGxRbTA5?=
+ =?utf-8?B?cG5zNEpaQnpORWlSQzZZejhYYTkyc2d5WUsreHUwaU1hS2lpWWxZOXlQT0pZ?=
+ =?utf-8?B?a0RQbXpSNFNWM3gvOFBWR1c2WkV2WjhXVk01NDJrU0d2bjFWVHJxZTZlR0ht?=
+ =?utf-8?B?ME0welhYeXRycFBaL1pyaHk5N0NubWZQOXd4bTBZN3dKNE04dVN0eEg3SWcy?=
+ =?utf-8?B?WFV6UHA1VmpMTUd2WmhFSE8vbmJZbGYxQUhwcEp3MGhvQmZUaHFBY2lpWExq?=
+ =?utf-8?B?cUpOMUdGSk9pS1c1aGZEb0piV1RRTDNId2I5SVROOFVtMzhGb0lJYmtOOCtK?=
+ =?utf-8?B?VjZvVnpGNzMyOUdYWlV6MXRWZFcySW12ZExpeVRZb0R2V2svVUZSbSs4SFZn?=
+ =?utf-8?B?SnJ0MVhpL2JwRWNCRkZiWUF3dENuRFJyQ0dLa1J4VVVGbDd6WWsvRlJVbTZE?=
+ =?utf-8?B?ODJ3MkhsM1Z4cU8rRWt2ZEpnWEhkY1J0V2IzOGF2ajhySzJ3VTZZYXpSSVVr?=
+ =?utf-8?B?eXBndS85WGNoa2xYNDJUdTJ2ZW9CeWFwMzNxanpNdnRiN282cHNkNFd5TXda?=
+ =?utf-8?B?SU9qYTl0OGpZOWJRdkJqUT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d1N3U1pxT2hrdkozaGxTV3RPYmRCenMvZnhNeEJhb2w3Qy9TdHpLZDc3N2sv?=
+ =?utf-8?B?VWZnOUx5dHJGczIxc1RFYTh2VzUyd2Zsa1EzT0hrcnpLaERUaC9kWm1DZ3ZH?=
+ =?utf-8?B?b0pNcGYrYW5EMElWVGRlZndpWWZRV3VwYjgwVFZ3eEZSTHp6bTh4Z1ltKzBt?=
+ =?utf-8?B?TENodVBtMTBrajZUK25qNHRrZXZpTGZOeDhoTVh4TXJBcytneVpKQlRyQVlS?=
+ =?utf-8?B?bDMvWFh4UkYrTStxSTNoTnczWEdYb3hzV2lHU3I0NDJvRUViNzNGQWZ1bjZ2?=
+ =?utf-8?B?dEJLUnh4WGp4VzlqVFZHMm5pVEpKRDNKWWc4QWloa3k0QS9ObHo3dTlsNGtT?=
+ =?utf-8?B?YStNUTE1eU9nZy95cys4MTlTZVNtb0ZWODVQTkc3YkVuQkdJSXd0OXJPQ09M?=
+ =?utf-8?B?NFRRVnVXOGZaTWQwNGhaMFpaVUcvUnQ2a2E4WTFOank5cElRWkZDZGJGekNV?=
+ =?utf-8?B?c2hlQnc0eUc5Mzl2WjlWMTVrV1Uyai9QQkczODhKc1VoRUpkTW90MG53UHdR?=
+ =?utf-8?B?Yy9Mb2NtUkRURzBhL0RmS2hMRXQvTGNybENFU2N4OXFNcUVWNUpTaVhoeGhs?=
+ =?utf-8?B?MW1oTEhMREhyOHh5YkFWWE01L2lLMHEyQlRIT1FXeEpST1BDbzJTbjJyT0sy?=
+ =?utf-8?B?b0duVEFDbmVJMHdJaDZ2bVdUajlFYWJtckEwYUJoc3RJcE1id0dWWU1Yb1JR?=
+ =?utf-8?B?ems4ZVRBY3hOd2gvQkVhN2ppMFNZaW1rVDE1WGlBN0ZRZDJNbG14d01ORHZJ?=
+ =?utf-8?B?NjZiRFVySEo5cmtlTFZNbzd1SHdKYzhIV05hUzZZaWl5VHMxb1F1UDJpOXJr?=
+ =?utf-8?B?bVBhRDIrclNZTmcvekNyYVp5ZUdsTU4zUlJtWHN0TU5PcFExSVpSR1ROUGxS?=
+ =?utf-8?B?NEVib2hQUDlScnBJeXRVYjRVK0pmVktqL3VXKzVRU2JTZzdXdTg5cm9pNkRq?=
+ =?utf-8?B?amhjZk11OWZiN3crRnVqd3ZRQ3ByUDF1anRGZldQRjZ6K3lOOGVtdVZ4TjZw?=
+ =?utf-8?B?ZTdndVNCUnVYTjNCbTdvTHY4dDl5KzZLZXR0b1NwOTYrNU5idUl5VEJQZjNE?=
+ =?utf-8?B?bnBWc2RPOW1SOFRhNnp1N0RCUzdPZ045MnpWd0VEZzlXLzFtRmh4U0pTcGUw?=
+ =?utf-8?B?c3pBbG8zblVicVZKZ2s5M1dEOC9KVWhLa21vMmJrd3ZrRXRVOEtxdytYL2RG?=
+ =?utf-8?B?cDBtb3VwVE0rbktTb3NmSUFIaHEvRllUNHYzaDB5ZHQ1YlFLcVJhTnFQR25p?=
+ =?utf-8?B?a2ZTMmduL1lDeXpwT0lxenlhUElEVHBvMnRhTmRuMS8xY0daMk5zOW1vQUZ2?=
+ =?utf-8?B?UmFjaUV4S1NqdFhBWVhHRUNFR21YbkZORVp3NFBUQmVrdHNtRE04dFpNSjFU?=
+ =?utf-8?B?bWhGOGlzOTlvZGNuUHpqWUJ0SlBnT1h6SjhlSnpxaTMrN1BoaGloazV4WWZW?=
+ =?utf-8?B?NU9YczUxb0VObFBQUTVuOFo0RXlMOXlYYTZUVkFIYXlXejJkZzUvUW0zSWpw?=
+ =?utf-8?B?eWx1OWRTNlliYVRzdVVyUTd3M2x6aHM4Z2poZXRlNlRvLzVFNWVnT044TjJq?=
+ =?utf-8?B?OTVNbjh3VmxwdmNNMk4vY3o2WEwybm9ZUm05VVpxdkpzOVViN0Q3NVAwbyt3?=
+ =?utf-8?B?VjRwa05UMXJ2MHZKbDZCYWFYSnZvMGhLdXNwYW9QQXkvUXhPcThoTU1OWUlm?=
+ =?utf-8?B?Z2M5N2hCajltNDdqSi9pUzdwaWtsbEFScTJ6WEhPejhqTHlrQ0FnZ2VtL0RT?=
+ =?utf-8?B?N2xBYnRDTnF6WTV4amNUZXFhdVA5bmZjdjQxbWVXMi9MZ3BTOWNuVFdkVTNk?=
+ =?utf-8?B?eU9DRE92SElFL2JSMTdYZDFUOW0reGpNcU5pcjJzd2ZYRzNNZ2h3NUZBOWN5?=
+ =?utf-8?B?bXJZdjczbXFGQ3Rwa2YwNGxEOG5rS2xvZlp3a1ZqTzczVStUSy9FVGVQbTVI?=
+ =?utf-8?B?ejlhVEVHRDl0NmtNZnhtTEQreWtYN1NXelAzZUh3dlRlZGpXNnRRTDlFbnVG?=
+ =?utf-8?B?bkNpamRwNW9EVUsrb2FYU25TRDdIRVNiRWpCMXovMkV3Tmw5bnFFSSt4aHB3?=
+ =?utf-8?B?enFJdjhIV0JHRmk5UkdSNFNHdzd1RmtMUnNzZmwxN1JMN1B2bkpLM0lWSWtU?=
+ =?utf-8?Q?rhFQarcDKwKcuyQQL9LtszUpr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69404169-216b-47ef-2dfd-08dcd951d02b
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2024 08:54:19.1816
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4gVLWsvmnaIyQFicjaZA73NmRCaQ8XxKt1ADkG9rQlzbNPr2MdOq4U9+LfkLZ4dCbGzWIaS5uQMRXF/IzjW7SQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6679
 
-On Fri, Sep 20, 2024 at 1:53=E2=80=AFPM Palmer Dabbelt <palmer@rivosinc.com=
-> wrote:
+On 9/20/2024 12:51 PM, Sean Christopherson wrote:
+> On Fri, Sep 20, 2024, Nikunj A. Dadhania wrote:
+>> On 9/18/2024 5:37 PM, Sean Christopherson wrote:
+>>> On Mon, Sep 16, 2024, Nikunj A. Dadhania wrote:
+>>>> On 9/13/2024 11:00 PM, Sean Christopherson wrote:
+>>>>>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>>>>>> Tested-by: Peter Gonda <pgonda@google.com>
+>>>>>> ---
+>>>>>>  arch/x86/kernel/kvmclock.c | 2 +-
+>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
+>>>>>> index 5b2c15214a6b..3d03b4c937b9 100644
+>>>>>> --- a/arch/x86/kernel/kvmclock.c
+>>>>>> +++ b/arch/x86/kernel/kvmclock.c
+>>>>>> @@ -289,7 +289,7 @@ void __init kvmclock_init(void)
+>>>>>>  {
+>>>>>>  	u8 flags;
+>>>>>>  
+>>>>>> -	if (!kvm_para_available() || !kvmclock)
+>>>>>> +	if (!kvm_para_available() || !kvmclock || cc_platform_has(CC_ATTR_GUEST_SECURE_TSC))
+>>>>>
+>>>>> I would much prefer we solve the kvmclock vs. TSC fight in a generic way.  Unless
+>>>>> I've missed something, the fact that the TSC is more trusted in the SNP/TDX world
+>>>>> is simply what's forcing the issue, but it's not actually the reason why Linux
+>>>>> should prefer the TSC over kvmclock.  The underlying reason is that platforms that
+>>>>> support SNP/TDX are guaranteed to have a stable, always running TSC, i.e. that the
+>>>>> TSC is a superior timesource purely from a functionality perspective.  That it's
+>>>>> more secure is icing on the cake.
+>>>>
+>>>> Are you suggesting that whenever the guest is either SNP or TDX, kvmclock
+>>>> should be disabled assuming that timesource is stable and always running?
+>>>
+>>> No, I'm saying that the guest should prefer the raw TSC over kvmclock if the TSC
+>>> is stable, irrespective of SNP or TDX.  This is effectively already done for the
+>>> timekeeping base (see commit 7539b174aef4 ("x86: kvmguest: use TSC clocksource if
+>>> invariant TSC is exposed")), but the scheduler still uses kvmclock thanks to the
+>>> kvm_sched_clock_init() code.
+>>
+>> The kvm-clock and tsc-early both are having the rating of 299. As they are of
+>> same rating, kvm-clock is being picked up first.
+>>
+>> Is it fine to drop the clock rating of kvmclock to 298 ? With this tsc-early will
+>> be picked up instead.
+> 
+> IMO, it's ugly, but that's a problem with the rating system inasmuch as anything.
 >
-> On Wed, 21 Aug 2024 07:43:20 PDT (-0700), anup@brainfault.org wrote:
-> > Hi Palmer,
-> >
-> > On Fri, Jul 26, 2024 at 2:19=E2=80=AFPM Yong-Xuan Wang <yongxuan.wang@s=
-ifive.com> wrote:
-> >>
-> >> Svade and Svadu extensions represent two schemes for managing the PTE =
-A/D
-> >> bit. When the PTE A/D bits need to be set, Svade extension intdicates =
-that
-> >> a related page fault will be raised. In contrast, the Svadu extension
-> >> supports hardware updating of PTE A/D bits. This series enables Svade =
-and
-> >> Svadu extensions for both host and guest OS.
-> >>
-> >> Regrading the mailing thread[1], we have 4 possible combinations of
-> >> these extensions in the device tree, the default hardware behavior for
-> >> these possibilities are:
-> >> 1) Neither Svade nor Svadu present in DT =3D> It is technically
-> >>    unknown whether the platform uses Svade or Svadu. Supervisor
-> >>    software should be prepared to handle either hardware updating
-> >>    of the PTE A/D bits or page faults when they need updated.
-> >> 2) Only Svade present in DT =3D> Supervisor must assume Svade to be
-> >>    always enabled.
-> >> 3) Only Svadu present in DT =3D> Supervisor must assume Svadu to be
-> >>    always enabled.
-> >> 4) Both Svade and Svadu present in DT =3D> Supervisor must assume
-> >>    Svadu turned-off at boot time. To use Svadu, supervisor must
-> >>    explicitly enable it using the SBI FWFT extension.
-> >>
-> >> The Svade extension is mandatory and the Svadu extension is optional i=
-n
-> >> RVA23 profile. Platforms want to take the advantage of Svadu can choos=
-e
-> >> 3. Those are aware of the profile can choose 4, and Linux won't get th=
-e
-> >> benefit of svadu until the SBI FWFT extension is available.
-> >>
-> >> [1] https://lore.kernel.org/linux-kernel/20240527-e9845c06619bca5cd285=
-098c@orel/T/#m29644eb88e241ec282df4ccd5199514e913b06ee
-> >>
-> >> ---
-> >> v8:
-> >> - fix typo in PATCH1 (Samuel)
-> >> - use the new extension validating API in PATCH1 (Cl=C3=A9ment)
-> >> - update the dtbinding in PATCH2 (Samuel, Conor)
-> >> - add PATCH4 to fix compile error in get-reg-list test.
-> >>
-> >> v7:
-> >> - fix alignment in PATCH1
-> >> - update the dtbinding in PATCH2 (Conor, Jessica)
-> >>
-> >> v6:
-> >> - reflect the platform's behavior by riscv_isa_extension_available() a=
-nd
-> >>   update the the arch_has_hw_pte_young() in PATCH1 (Conor, Andrew)
-> >> - update the dtbinding in PATCH2 (Alexandre, Andrew, Anup, Conor)
-> >> - update the henvcfg condition in PATCH3 (Andrew)
-> >> - check if Svade is allowed to disabled based on arch_has_hw_pte_young=
-()
-> >>   in PATCH3
-> >>
-> >> v5:
-> >> - remove all Acked-by and Reviewed-by (Conor, Andrew)
-> >> - add Svade support
-> >> - update the arch_has_hw_pte_young() in PATCH1
-> >> - update the dtbinding in PATCH2 (Alexandre, Andrew)
-> >> - check the availibility of Svadu for Guest/VM based on
-> >>   arch_has_hw_pte_young() in PATCH3
-> >>
-> >> v4:
-> >> - fix 32bit kernel build error in PATCH1 (Conor)
-> >> - update the status of Svadu extension to ratified in PATCH2
-> >> - add the PATCH4 to suporrt SBI_FWFT_PTE_AD_HW_UPDATING for guest OS
-> >> - update the PATCH1 and PATCH3 to integrate with FWFT extension
-> >> - rebase PATCH5 on the lastest get-reg-list test (Andrew)
-> >>
-> >> v3:
-> >> - fix the control bit name to ADUE in PATCH1 and PATCH3
-> >> - update get-reg-list in PATCH4
-> >>
-> >> v2:
-> >> - add Co-developed-by: in PATCH1
-> >> - use riscv_has_extension_unlikely() to runtime patch the branch in PA=
-TCH1
-> >> - update dt-binding
-> >>
-> >> Yong-Xuan Wang (5):
-> >>   RISC-V: Add Svade and Svadu Extensions Support
-> >>   dt-bindings: riscv: Add Svade and Svadu Entries
-> >>   RISC-V: KVM: Add Svade and Svadu Extensions Support for Guest/VM
-> >>   KVM: riscv: selftests: Fix compile error
-> >>   KVM: riscv: selftests: Add Svade and Svadu Extension to get-reg-list
-> >>     test
-> >>
-> >>  .../devicetree/bindings/riscv/extensions.yaml | 28 ++++++++++++++++++=
-+
-> >>  arch/riscv/Kconfig                            |  1 +
-> >>  arch/riscv/include/asm/csr.h                  |  1 +
-> >>  arch/riscv/include/asm/hwcap.h                |  2 ++
-> >>  arch/riscv/include/asm/pgtable.h              | 13 ++++++++-
-> >>  arch/riscv/include/uapi/asm/kvm.h             |  2 ++
-> >>  arch/riscv/kernel/cpufeature.c                | 12 ++++++++
-> >>  arch/riscv/kvm/vcpu.c                         |  4 +++
-> >>  arch/riscv/kvm/vcpu_onereg.c                  | 15 ++++++++++
-> >>  .../selftests/kvm/riscv/get-reg-list.c        | 16 ++++++++---
-> >>  10 files changed, 89 insertions(+), 5 deletions(-)
-> >>
-> >> --
-> >> 2.17.1
-> >>
-> >>
-> >
-> > Let me know if this series can be taken through the KVM RISC-V tree.
-> > I can provide you with a shared tag as well.
->
-> I think the patchwork bot got confused by patch 4 going to fixes?  It
-> says this was merged.
->
-> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
->
-> if you still want to take it, otherwise just LMK and I'll pick it up.
->
+> But the kernel will still be using kvmclock for the scheduler clock, which is
+> undesirable.
 
-I already sent KVM RISC-V PR for 6.12 which has been merged
-as well. Please take this series (except PATCH4) through the
-RISC-V tree.
+Agree, kvm_sched_clock_init() is still being called. The above hunk was to use
+tsc-early/tsc as the clocksource and not kvm-clock.
 
-Thanks,
-Anup
+Regards,
+Nikunj
 
