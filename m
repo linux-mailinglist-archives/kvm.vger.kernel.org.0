@@ -1,123 +1,134 @@
-Return-Path: <kvm+bounces-27242-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27243-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87ADC97DE15
-	for <lists+kvm@lfdr.de>; Sat, 21 Sep 2024 19:29:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2692697DF53
+	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2024 00:06:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 465711F21ABF
-	for <lists+kvm@lfdr.de>; Sat, 21 Sep 2024 17:29:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D42D3281F27
+	for <lists+kvm@lfdr.de>; Sat, 21 Sep 2024 22:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FEB176FDB;
-	Sat, 21 Sep 2024 17:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E741515445D;
+	Sat, 21 Sep 2024 22:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OFyejPFo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eaFW6f6H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3EB16F265
-	for <kvm@vger.kernel.org>; Sat, 21 Sep 2024 17:29:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D46EEBE;
+	Sat, 21 Sep 2024 22:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726939742; cv=none; b=YN3rrmGsc21/hNFjN4NPGHf8vVdUzeLMP3Q9OIRZOtMCTc3k8Obm3MpjWA0WlxRYZ/stIz/F4rgN4ABYhalAKCXG1t8OKUL2Y94V0Xyuu0RbyGPFbo843Qz3IXo+3YObgN6g/++arpYwkC7n+o1yL7PphpSSXuu0tB2izRe2fgE=
+	t=1726956359; cv=none; b=IZjK5CAVTC0sHzNzOq/OnHJGQUZFpiIxvZ1o1HRaZ0xLpJAXaeqYFb2Oc/C7fSZ+qYyB/CbpY29IcSQpG9ZMqwrFinDUiJxt5tftWRnv6Y9OkNnUv9HbvbOoR6rapmNTO/6CNfC8607oJDxSn/cqF4aYt22633nUQRPd5PKWXPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726939742; c=relaxed/simple;
-	bh=XkZ8EqP3YUt9TcIO8/N9L/IuUrNSlk9YL/IUUQn9iOI=;
+	s=arc-20240116; t=1726956359; c=relaxed/simple;
+	bh=/X57ncqkKV685Tc73lC69jepq5DQEY1k/4jxl0qDY1I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hiO4fmGszCGfJ9Oyu3ccm0IG/CN9LNx/gQ7dy/lZAjR0USgUy5+npIHP6lC08eiLZnePxZ5X/vx3/CGlI70rtZMVoREP8D3EGQgyevtkudqgfk3ulpdvDfn9yYwiIaRvKEYzloBciQ/ojImI3qGWQ2o5nqi40fh63WSGfFa2NdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OFyejPFo; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726939741; x=1758475741;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XkZ8EqP3YUt9TcIO8/N9L/IuUrNSlk9YL/IUUQn9iOI=;
-  b=OFyejPFoj0sUXHiL4kS0PkpuVdXfNIGVlhyMvz4XYDZ95lP6wtwupKdQ
-   CZxEY5ZhMFZk/cLGdKEUElvsq+Z7RVLU13SWVdZLKN/0EqTOcEyFijoVJ
-   Fo4asxs4PQ1rPg2qsGkHtw7BMw6ViMKCaXA5Oc/ePiPeFPnhtIG2L7Qca
-   +lWSMe1krwl+J8Sav8OsQApwRBZJEex1zf7arW1SuVvml0dhU4iOI2aL5
-   Z8tBvpGWT/LLQFrm9jBMWp0ckVbMivHYMeOdHhprYgTVptItoF8ybFcsU
-   qJfUmBlfHnXpsRys0u9OYHvZ+hwu6RdudYBcCvT8iPCe1Zkac6s8CUB7c
-   A==;
-X-CSE-ConnectionGUID: V7mSI9GNT86TbfrnJ1xz0Q==
-X-CSE-MsgGUID: NzfIX91fQreDA01rvqH7IQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11202"; a="29719650"
-X-IronPort-AV: E=Sophos;i="6.10,247,1719903600"; 
-   d="scan'208";a="29719650"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2024 10:29:01 -0700
-X-CSE-ConnectionGUID: yQNEjcEbQOaj15Zd8ov60A==
-X-CSE-MsgGUID: mJr0SVTNRAC6LaO1gJyAFA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,247,1719903600"; 
-   d="scan'208";a="70914300"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 21 Sep 2024 10:28:58 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ss3ui-000Fdp-0H;
-	Sat, 21 Sep 2024 17:28:56 +0000
-Date: Sun, 22 Sep 2024 01:28:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Srujana Challa <schalla@marvell.com>, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, mst@redhat.com, jasowang@redhat.com,
-	eperezma@redhat.com, ndabilpuram@marvell.com, jerinj@marvell.com
-Subject: Re: [PATCH v2 1/2] vhost-vdpa: introduce module parameter for
- no-IOMMU mode
-Message-ID: <202409220134.x63FmsHx-lkp@intel.com>
-References: <20240920140530.775307-2-schalla@marvell.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TrDLyybuCXBeWyzzQVi/FO+kb+UdIQ9R2IC+faS9xBFkyL+OROw063Sd72hvnVAbZHtZgg3m7S1CIP07thkIsG0lsxXoDTx2+q2aoCoZjwXSgX9XQmqUcDWYEi+oRIs3wx7Pt8s/w2ztIHnGmNY5m3fjpCbA/kaRdrF9Nx5p6ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eaFW6f6H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDEE8C4CEC2;
+	Sat, 21 Sep 2024 22:05:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726956358;
+	bh=/X57ncqkKV685Tc73lC69jepq5DQEY1k/4jxl0qDY1I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eaFW6f6H4UbmenZx+RBfLxcjVcGtlv6PLhDt7CBFjY7+rsSkXYal+pGf8Y9K0/ApG
+	 aP+3br8KzKBaSNGIWK73F1GLmQa06AlB3jQ2yTUJNQJW50Z3KwCB8gjCNU8AbuzxhL
+	 n+d+6QS5euVbHibGXG80FHn2iGlM9DIPLErFhBioSqAUxwRCfSHRkDa1fmiAWRnONE
+	 euQiKvpVXbdfRRv0QRhsr1t+iq02bSsK/xnZB5lNBTlIb4cvMz4gT4OynYkSATAXhT
+	 7R6wthhKyj7+sgApV1KTWMw3oHPPLX/LyKH3mFbPfvDLTplyCVzs88G3VKW2IjGgwC
+	 iENCPkcAOpbdg==
+Date: Sat, 21 Sep 2024 23:05:53 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Max Hsu <max.hsu@sifive.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Palmer Dabbelt <palmer@sifive.com>, linux-riscv@lists.infradead.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	Samuel Holland <samuel.holland@sifive.com>
+Subject: Re: [PATCH RFC 1/3] dt-bindings: riscv: Add Svukte entry
+Message-ID: <20240921-shock-purge-d91482d191a1@spud>
+References: <20240920-dev-maxh-svukte-rebase-v1-0-7864a88a62bd@sifive.com>
+ <20240920-dev-maxh-svukte-rebase-v1-1-7864a88a62bd@sifive.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="e1yUmKuhmIxAjSpf"
+Content-Disposition: inline
+In-Reply-To: <20240920-dev-maxh-svukte-rebase-v1-1-7864a88a62bd@sifive.com>
+
+
+--e1yUmKuhmIxAjSpf
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240920140530.775307-2-schalla@marvell.com>
+Content-Transfer-Encoding: quoted-printable
 
-Hi Srujana,
+On Fri, Sep 20, 2024 at 03:39:03PM +0800, Max Hsu wrote:
+> Add an entry for the Svukte extension to the riscv,isa-extensions
+> property.
+>=20
+> Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
+> Signed-off-by: Max Hsu <max.hsu@sifive.com>
+> ---
+>  Documentation/devicetree/bindings/riscv/extensions.yaml | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Do=
+cumentation/devicetree/bindings/riscv/extensions.yaml
+> index a06dbc6b4928958704855c8993291b036e3d1a63..df96aea5e53a70b0cb8905332=
+464a42a264e56e6 100644
+> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> @@ -171,6 +171,13 @@ properties:
+>              memory types as ratified in the 20191213 version of the priv=
+ileged
+>              ISA specification.
+> =20
+> +        - const: svukte
+> +          description:
+> +            The standard Svukte supervisor-level extensions for making u=
+ser-mode
+> +            accesses to supervisor memory raise page faults in constant =
+time,
+> +            mitigating attacks that attempt to discover the supervisor
+> +            software's address-space layout, as PR#1564 of riscv-isa-man=
+ual.
 
-kernel test robot noticed the following build warnings:
+I'm surprised this doesn't fail dt_binding_check, with the # in it. I'd
+like to see a commit hash here though, in the same format as the other
+extensions using them.
 
-[auto build test WARNING on mst-vhost/linux-next]
-[also build test WARNING on linus/master v6.11 next-20240920]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> +
+>          - const: zacas
+>            description: |
+>              The Zacas extension for Atomic Compare-and-Swap (CAS) instru=
+ctions
+>=20
+> --=20
+> 2.43.2
+>=20
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Srujana-Challa/vhost-vdpa-introduce-module-parameter-for-no-IOMMU-mode/20240920-220751
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-patch link:    https://lore.kernel.org/r/20240920140530.775307-2-schalla%40marvell.com
-patch subject: [PATCH v2 1/2] vhost-vdpa: introduce module parameter for no-IOMMU mode
-config: x86_64-randconfig-122-20240921 (https://download.01.org/0day-ci/archive/20240922/202409220134.x63FmsHx-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240922/202409220134.x63FmsHx-lkp@intel.com/reproduce)
+--e1yUmKuhmIxAjSpf
+Content-Type: application/pgp-signature; name="signature.asc"
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409220134.x63FmsHx-lkp@intel.com/
+-----BEGIN PGP SIGNATURE-----
 
-sparse warnings: (new ones prefixed by >>)
->> drivers/vhost/vdpa.c:39:6: sparse: sparse: symbol 'vhost_vdpa_noiommu' was not declared. Should it be static?
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZu9DQQAKCRB4tDGHoIJi
+0vpuAP92NYEC9FM8e8Y7BhVJDJvf069DI4tcoz+kx+BoYjEtzQD9Fp1Wj8hFfHNh
+s70/gx+0/zuAYgjxNfQ7GnUDfjIW7A8=
+=lQCo
+-----END PGP SIGNATURE-----
 
-vim +/vhost_vdpa_noiommu +39 drivers/vhost/vdpa.c
-
-    38	
-  > 39	bool vhost_vdpa_noiommu;
-    40	module_param_named(enable_vhost_vdpa_unsafe_noiommu_mode,
-    41			   vhost_vdpa_noiommu, bool, 0644);
-    42	MODULE_PARM_DESC(enable_vhost_vdpa_unsafe_noiommu_mode, "Enable UNSAFE, no-IOMMU mode.  This mode provides no device isolation, no DMA translation, no host kernel protection, cannot be used for device assignment to virtual machines, requires RAWIO permissions, and will taint the kernel.  If you do not know what this is for, step away. (default: false)");
-    43	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--e1yUmKuhmIxAjSpf--
 
