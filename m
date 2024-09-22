@@ -1,484 +1,348 @@
-Return-Path: <kvm+bounces-27277-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27278-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FBDA97E1C6
-	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2024 15:11:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A6A697E26B
+	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2024 18:18:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 988D2280FF9
-	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2024 13:11:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CFDA1F21461
+	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2024 16:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A3F28EE;
-	Sun, 22 Sep 2024 13:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF8D2576F;
+	Sun, 22 Sep 2024 16:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qmkSbYjE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kRenC6FD"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2062.outbound.protection.outlook.com [40.107.102.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653D363D
-	for <kvm@vger.kernel.org>; Sun, 22 Sep 2024 13:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727010699; cv=fail; b=qSawrXl7TBgaa3Dxa5QT00hm5El4tYX0qlHU1zihgDIahI8Jcgg50uOv1hXvrQBY36BIjQql2diGGDGA7CTRRSTDFg9y4z4SMLDEnXrFJ3osE/ASy5o0ck7qMbICs0SqqNaVALKusGAC3JjFAd3BDZ5Pt4Ghabul0+xY4VEu5Y0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727010699; c=relaxed/simple;
-	bh=Yaisr4SQnPXvgZmO1DkJdIXjd7zUktRsP6I3QghcBuo=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SDjnFETkMLrkq0ACKJBBgIhhIkoJE+wGUTJPCNkmaBzjJ8k3RKklHMZNyUfSCMaMRSu2H2PRVrkTN0S2Q0gcjSJk7amBbwkU0x6gt1RzCqtVsGv11o7anG8nZPfui213MGaIgFQW6f8CvoaNXz/VsMI25fSgAe66YcWCRrJNM0o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qmkSbYjE; arc=fail smtp.client-ip=40.107.102.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eJieYsAVg9Ck1pbAGMOucZV35IaCOcw3iTl53daU9qRPbZzH+rFI3YWUn7kdTcm2TmXvUQ5TpDCwXcibgaOAZS6+y4FHQeny2CMpILsTVe4y8kYwWbYYttAqwHywj1G87zPjrR4dFA4WIk8EdZXm9QcbveTxwhOwjEN/9s5Lx40kM+vIdieJv7jzR9GFiSibGrioiqrD3AuaFDr8EcSwmb9qqIQF+hHRMmIG1Z11SeQ/qQMIMItTAhonFUdhHui+zeafLNmHe9rBkjFJwn1gA1rEnJ95Y24D6+dBYge/qEd5JbLgKffWiXijEmfzBLe9ifpIbriikVQud9awd8bi+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cwMBdJuZPlHG+FZbM2Z4U8yWW6bsnyNKmbk/1pTjli0=;
- b=NT8S4eU1j5x0nmVuQLb3hQ6w8jUrjTswMRlWwRvVnZSjCi+9+Tfcnlvbcik4CQ76vU9exRKDdMjYgHgkRMveu3ok15yfEwWfTpxYHNBLP7E9qxDV2A1vEE4NG5UsPz/CqJiwLt/OizhkBuVjsaRIjJ/S605X5twqKS29+/yZ+G2KO829qaHCBCLqZSDFbRevoFSgCwWGVLlVWFXQp8jdd6ssAla28Yuz6hgMGNITpfnwQkChel/vuwsubZfTZbqV6lY2QdUwYxVxE2+6AK1OTUU0YLh67WeruLqdtw/BekK0SzFi0+7ufQfzePiQPf+Ba/PF6cPNYpNf4rHwBC2fZg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cwMBdJuZPlHG+FZbM2Z4U8yWW6bsnyNKmbk/1pTjli0=;
- b=qmkSbYjEepWrjDhcgAMp7tl/PpT6MPoR05ADkmGNdh72hIWZ3aUJMB9ayYChb5nsJZnxVa4qZnAfbIfHzbihmuzJ8NtALJcpePagmiJ6EnLFyYgEyC/Z/I3GMMPgIrA3KLaTRUvO0HPxVvp7NpBj4nOTqsOZMMXh1XQGxodLd+hv2olNvZ/gM1yKj4GXsj+ulH8U1FtcbnH9pZFOsJLKiLFhPNmEr4saxVJv7llz0chLSOcd3beavijwV73AOL8HowSQhE//jsQSyq01FdcvlMDeKJLu1O0yC0OcXo8sbddEsw0Pe6048hLkCuPwSqYlcDGiFH+MC5n+pYnnfhhsqA==
-Received: from CH0PR03CA0360.namprd03.prod.outlook.com (2603:10b6:610:11a::11)
- by SJ0PR12MB8092.namprd12.prod.outlook.com (2603:10b6:a03:4ee::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.24; Sun, 22 Sep
- 2024 13:11:30 +0000
-Received: from DS3PEPF000099D3.namprd04.prod.outlook.com
- (2603:10b6:610:11a:cafe::7d) by CH0PR03CA0360.outlook.office365.com
- (2603:10b6:610:11a::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.26 via Frontend
- Transport; Sun, 22 Sep 2024 13:11:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- DS3PEPF000099D3.mail.protection.outlook.com (10.167.17.4) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.13 via Frontend Transport; Sun, 22 Sep 2024 13:11:30 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 22 Sep
- 2024 06:11:26 -0700
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 22 Sep 2024 06:11:26 -0700
-Received: from localhost (10.127.8.11) by mail.nvidia.com (10.126.190.182)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Sun, 22 Sep
- 2024 06:11:22 -0700
-Date: Sun, 22 Sep 2024 16:11:21 +0300
-From: Zhi Wang <zhiw@nvidia.com>
-To: <kvm@vger.kernel.org>, <nouveau@lists.freedesktop.org>
-CC: <alex.williamson@redhat.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>,
-	<airlied@gmail.com>, <daniel@ffwll.ch>, <acurrid@nvidia.com>,
-	<cjia@nvidia.com>, <smitra@nvidia.com>, <ankita@nvidia.com>,
-	<aniketa@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
-	<zhiwang@kernel.org>, <bskeggs@nvidia.com>
-Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
-Message-ID: <20240922161121.000060a0.zhiw@nvidia.com>
-In-Reply-To: <20240922124951.1946072-1-zhiw@nvidia.com>
-References: <20240922124951.1946072-1-zhiw@nvidia.com>
-Organization: NVIDIA
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C4D1C695
+	for <kvm@vger.kernel.org>; Sun, 22 Sep 2024 16:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727021891; cv=none; b=M/+MY3bDsfAvTpFkKrHZKOpfubDPMj0b/JDqGo7N63Wj2yiSWFkB4sAQ8eaWaBKS2gElcptFHK1BJMhqDHZw1wQQuThH2acexxmv52R7kkSGtWUqADVj0wXkQqsL3FWtNsRoGp9EfiwSM/gXKj14nqmtE1Cj8kwxBTgEW5Rnn2E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727021891; c=relaxed/simple;
+	bh=l+pHHFaaTt0v8pBAAKbKlDUDZo041W6MKNZhaK3bKtI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WGToaMRZGe+aFvbLMsDOrPAscTV5mjAJZjjp6M8z4gccQNMqsLu9Fpr1Y06oWDvvARKP9+yOFv70lv8hyNSoKABt3g3PmyNU15j4q1wFR8g1Kk/fGEI1YeJ4GtJkuX598LQk/YHa0OwlFfB0XKsLesQS3jqdwg6fcuW5AEN0lXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kRenC6FD; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-207510f3242so46919625ad.0
+        for <kvm@vger.kernel.org>; Sun, 22 Sep 2024 09:18:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727021889; x=1727626689; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8C0hzk3cftIt6mgnsy72jgk6JMieI7UypLC5PItOVw=;
+        b=kRenC6FDlisiR0LIXr9EZid0GCVay9zER9psxiZ2U02GiCleEsNYlQEqWa0lKpec0N
+         sfz+uFq06RPGxvHs6xMjf+3kdSBv9HRuRTjtefg6SPyQs6n2nMTOqQOuMtGqAysGCBvm
+         jw8/Y7eamrlqa4vLhfdzAOHyGXorms/4uyJbGByi9zlxZnOuP/hF4Sw00q0SYLRSzcnI
+         7tCfosBqTsjCBIHjr9jf+ockMs+ojZOTzmpgJ69ZRHVaJ8mJBRkkf6H0vharWx776xKo
+         Qtx3qkLnzWZgi4FgDF5/GF8WycGm4ceBnnvIXisMAfVUkNw+1FwvBNrIfB8Ii3YNS6za
+         KYCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727021889; x=1727626689;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8C0hzk3cftIt6mgnsy72jgk6JMieI7UypLC5PItOVw=;
+        b=v+3hEMrMHH7MrpGPJxOETgykEXuiYpcPTySCsI7Ehn2wQGb9UBfUqjp03UrJqbrrSM
+         t7Kbcdm+WVMnUeLeCsIldyyfKiYkyVqWXFUneyP4P5FYIWl0aeN5gLdDNHIMKE3eVisv
+         ymnYTHS9mYrXgSVCOZj20ve+FrvFOb507ukp6n7jyViHOgEIdwDDJXhy4za9+jqkwGt+
+         CV54aWywfhrJvoCURie7nGrJVaquxzj635hFAQd6FcBEChZ5egQShSNenq2ijIfiGMnw
+         xjiQvBmHJeYGyBMgXBJuyPUCUJ5SmKLov5H8q2Jqg/+kXlE8NxlpeKhKSC7h1k49tWe4
+         HIyQ==
+X-Gm-Message-State: AOJu0YzKDuMx9xKCZNk8JnK4XX85tPGIllgOao/pIvwy/+hOvLDKNKFW
+	Qvjq+IhykmAjVyeVzOvAy0s6j26QB15u139e1kWS53OnORXzD/MzhIHn5pVoRXKfQNEwwyPjOZ8
+	jNw==
+X-Google-Smtp-Source: AGHT+IEosLx2lddQGGIDPXkRP/2Rd2dCs7XcOgrC4ORS29XnzMIqTpa4/aNZsQ/utBFHJOxiR3G+rfv6gqs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e543:b0:206:c5ec:1445 with SMTP id
+ d9443c01a7336-208d8549200mr2148095ad.8.1727021888940; Sun, 22 Sep 2024
+ 09:18:08 -0700 (PDT)
+Date: Sun, 22 Sep 2024 09:17:58 -0700
+In-Reply-To: <20240920154422.2890096-1-vkuznets@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099D3:EE_|SJ0PR12MB8092:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4e8e3a53-b85c-4515-8d0f-08dcdb0812cb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?anFUZVpHUlRKajNDSSttUFJzV3NIbW5sNnRvUmZMR2haUis4aFM3VXB1a3lq?=
- =?utf-8?B?UG1MNVBPekNRamVhem1ibzU5Tk5rZGgvOEg4OGk3aVlDMWtvbjZDQ3IzenN5?=
- =?utf-8?B?Vkw0OStmbm01WHA5TXFlZ3dzTmYzTWhNQWdxa1hxYmgza3lVaXBWbW5GTzhs?=
- =?utf-8?B?V1dtZlFGQkJOTWxuR3FGd2JReE1kUnBvQXZqUG5iVHF6MGhhVkZNanRHZGFn?=
- =?utf-8?B?dm11TWZHNGowOXVHdGx6RnZSSENUZUYzQkFmM1JWbWowRk9DQ2c0ejJoQWk4?=
- =?utf-8?B?SENyS2hzS1JTYTQ4YTFlSlJUZTEvR2JSZ2IxbVRiSUNHQnlKK2JnODlJRFlP?=
- =?utf-8?B?cVVrY2xhZXBIMzBGK0JGdUdYcSs4NHpHK2RLd1l1bC92YjB4NUt6SnhXbW5I?=
- =?utf-8?B?K05hQUkxS291NzR2QW0zRTYzWUJqdHNuSjBVSG13LzNNK21aaUU0SGUwK0ZF?=
- =?utf-8?B?c3Y5NGtjOGlCb2NNNFRtSHVkcHk3OWJBQVpvbFByUzBZeXZPcjFsSEdQRUtC?=
- =?utf-8?B?SDVsNEd2aWU2N1gxcHZmOTY4M2dmMStnQ3B0NlZVb2tjb1ZobUJUaGZWQnE3?=
- =?utf-8?B?dnhWYmc1bVI3blVTQ29wUkVYOUdyZUF3WnJNVm9QbE40ZjdzS2hHTk0zd2lY?=
- =?utf-8?B?TndNaWwzdElDSkJjWGU3RkRTRkVCVkNBdlo4cTNoc212dHVwNHVoVnFIcmYv?=
- =?utf-8?B?T3NublU4ODhvUEM1MXFNTkIrMWl3b2NFYzFoOWhPZU5DQkZ5ZmxTZWlFb3hH?=
- =?utf-8?B?UllRUk9wVEIxY3lldVhtdytxdm4yVjJwN2NEdVZLTllxbTZFb3Z6MlQzRjdh?=
- =?utf-8?B?VGt0RHJkbk1sQXhHK0s4MkRGLzlKcm9DVTdZMzBITE5CL3Q0WTNRaVl4SFlQ?=
- =?utf-8?B?V2x1dHBVbk9wdFF2L3RTTEoycjQ2Tm1wbGpVUFAvN3d5YzdsWmR6YTdQWmJF?=
- =?utf-8?B?dFNDU3gwTjhSdjU3QTFLV1NUc1JMZExHNWVNZG5NdGpSdTRLeFQ4NGxlbjJT?=
- =?utf-8?B?YUQ1Q2cwR05KTWROZXlsaW1ZcG9DelV0UThRU1o4M21nYy83UFhzdGdKUWt5?=
- =?utf-8?B?Ui8vTUdoRERZN011ZUVYMXpBbHRZOUJ1akkvU1RBbWJ0RkhFYkNwV3FxUTB0?=
- =?utf-8?B?aHNxai85ZVIxYlgwaTNKWUdiTzZSRUZNUDJqZERWNytBT3hmSGtBSWU1M3ZB?=
- =?utf-8?B?M3gyWGxrT3ptQjZvQmZhWnk5Sml1cnE1d3dUUCt0aUVTc003MVVNVWt6VFc5?=
- =?utf-8?B?MTd5djBveVBaam1PVDhsOFFNM3A0YVprYmxiNG9zWjJxYVRpdk04bGM5MlRN?=
- =?utf-8?B?U2ZWSGx0R3BhYXBSbkZ0VkgzVzR2eGVOamR3T1NlbXUxUTViYmcreUJZWkpl?=
- =?utf-8?B?Z3o1bUkyYmJ4OXUydjdOQmdmNU9XM2lGazZZTXRSY3pPYUNqT0xlRWQzNGhx?=
- =?utf-8?B?ZXZNL2dwbkhqdnhBUnpVb2VqZWhtS0Z6Z2o0QTgxSWRQUTVlVVVjMWNDR2pP?=
- =?utf-8?B?MUpjZVRIbUZVRXkxSUZ3YXZxekxPYXV0Y0gweWI5Q083aU9RVyt2dXhwcUxZ?=
- =?utf-8?B?NVFHd3hXcDlWSDZISUROR3NmbktjcEtxWUpjTkdhd2VqZk0rY0l2WENFQW52?=
- =?utf-8?B?T05kc09RdkV2cTNDdHZWa29ZRCtGYlJWSUZTaXhSblZ0QThVSzkraWVLYnp4?=
- =?utf-8?B?OXRLek0xN2JnNXVYUCs3YUgvR1JyZklFRi8rZVhGY001K0VrTGtaNG9WK1hG?=
- =?utf-8?B?c1d4Y1Y0NUlWSnd2WERRcG1IV3JhSjRodWd6MnBTRDJ5ODhaTVAwb2dwM0JO?=
- =?utf-8?B?ME14eVZrUWRxd1IzMGlEcGJzNVNCUGs2TnZTb1V6SjRBVTk5SjVSSEw3dUZN?=
- =?utf-8?B?ZHdCTGpDVDJFYXphTmRpNDdCVlhLY0JHYytqZGxFODNic3FwZEFLUGhRZmZF?=
- =?utf-8?Q?RrVXX2i6e0VZHm4UI1ogqWD5Wu99NOmE?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2024 13:11:30.0225
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e8e3a53-b85c-4515-8d0f-08dcdb0812cb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099D3.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8092
+Mime-Version: 1.0
+References: <20240920154422.2890096-1-vkuznets@redhat.com>
+Message-ID: <ZvBDNpFG6SbDYDDl@google.com>
+Subject: Re: [PATCH] KVM: selftests: x86: Avoid using SSE/AVX instructions
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jan Richter <jarichte@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Sun, 22 Sep 2024 05:49:22 -0700
-Zhi Wang <zhiw@nvidia.com> wrote:
+On Fri, Sep 20, 2024, Vitaly Kuznetsov wrote:
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 48d32c5aa3eb..3f1b24ed7245 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -238,6 +238,7 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+>  	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+>  	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+>  	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
+> +	-march=x86-64-v2 \
 
-+Ben.
+I would rather go straight to playing nice with AVX.  Not because I care about
+being able to use AVX, but because pretty much every instance where KVM selftests
+punts setup to individual tests eventually leads to gross copy+paste code.
 
-Forget to add you. My bad.=20
-=20
+The diff ends up being bigger than I was hoping, but that's largely because tests
+are already manually enabling stuff in XCR0 (see above copy+paste complaint).
 
-> 1. Background
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> NVIDIA vGPU[1] software enables powerful GPU performance for workloads
-> ranging from graphics-rich virtual workstations to data science and
-> AI, enabling IT to leverage the management and security benefits of
-> virtualization as well as the performance of NVIDIA GPUs required for
-> modern workloads. Installed on a physical GPU in a cloud or enterprise
-> data center server, NVIDIA vGPU software creates virtual GPUs that can
-> be shared across multiple virtual machines.
->=20
-> The vGPU architecture[2] can be illustrated as follow:
->=20
->  +--------------------+    +--------------------+
-> +--------------------+ +--------------------+ | Hypervisor         |
->   | Guest VM           | | Guest VM           | | Guest VM
-> | |                    |    | +----------------+ | |
-> +----------------+ | | +----------------+ | | +----------------+ |
-> | |Applications... | | | |Applications... | | | |Applications... | |
-> | |  NVIDIA        | |    | +----------------+ | | +----------------+
-> | | +----------------+ | | |  Virtual GPU   | |    |
-> +----------------+ | | +----------------+ | | +----------------+ | |
-> |  Manager       | |    | |  Guest Driver  | | | |  Guest Driver  | |
-> | |  Guest Driver  | | | +------^---------+ |    | +----------------+
-> | | +----------------+ | | +----------------+ | |        |
-> |    +---------^----------+ +----------^---------+
-> +----------^---------+ |        |           |              |
->              |                      | |        |
-> +--------------+-----------------------+----------------------+---------+
-> |        |                          |                       |
->              |         | |        |                          |
->                |                      |         |
-> +--------+--------------------------+-----------------------+------------=
-----------+---------+
-> +---------v--------------------------+-----------------------+-----------=
------------+----------+
-> | NVIDIA                  +----------v---------+
-> +-----------v--------+ +-----------v--------+ | | Physical GPU
->     |   Virtual GPU      | |   Virtual GPU      | |   Virtual GPU
->  | | |                         +--------------------+
-> +--------------------+ +--------------------+ |
-> +------------------------------------------------------------------------=
-----------------------+
->=20
-> Each NVIDIA vGPU is analogous to a conventional GPU, having a fixed
-> amount of GPU framebuffer, and one or more virtual display outputs or
-> "heads". The vGPU=E2=80=99s framebuffer is allocated out of the physical
-> GPU=E2=80=99s framebuffer at the time the vGPU is created, and the vGPU
-> retains exclusive use of that framebuffer until it is destroyed.
->=20
-> The number of physical GPUs that a board has depends on the board.
-> Each physical GPU can support several different types of virtual GPU
-> (vGPU). vGPU types have a fixed amount of frame buffer, number of
-> supported display heads, and maximum resolutions. They are grouped
-> into different series according to the different classes of workload
-> for which they are optimized. Each series is identified by the last
-> letter of the vGPU type name.
->=20
-> NVIDIA vGPU supports Windows and Linux guest VM operating systems. The
-> supported vGPU types depend on the guest VM OS.
->=20
-> 2. Proposal for upstream
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> 2.1 Architecture
-> ----------------
->=20
-> Moving to the upstream, the proposed architecture can be illustrated
-> as followings:
->=20
->                             +--------------------+
-> +--------------------+ +--------------------+ | Linux VM           |
-> | Windows VM         | | Guest VM           | | +----------------+ |
-> | +----------------+ | | +----------------+ | | |Applications... | |
-> | |Applications... | | | |Applications... | | | +----------------+ |
-> | +----------------+ | | +----------------+ | ... |
-> +----------------+ | | +----------------+ | | +----------------+ | |
-> |  Guest Driver  | | | |  Guest Driver  | | | |  Guest Driver  | | |
-> +----------------+ | | +----------------+ | | +----------------+ |
-> +---------^----------+ +----------^---------+ +----------^---------+
-> |                       |                      |
-> +--------------------------------------------------------------------+
-> |+--------------------+ +--------------------+
-> +--------------------+| ||       QEMU         | |       QEMU
-> | |       QEMU         || ||                    | |
->  | |                    || |+--------------------+
-> +--------------------+ +--------------------+|
-> +--------------------------------------------------------------------+
-> |                       |                      |
-> +------------------------------------------------------------------------=
------------------------+
-> |
-> +----------------------------------------------------------------+  |
-> |                           |                                VFIO
->                        |  | |                           |
->                                                    |  | |
-> +-----------------------+ | +------------------------+
-> +---------------------------------+|  | | |  Core Driver vGPU     | |
-> |                        |  |                                 ||  | |
-> |       Support        <--->|                       <---->
->                     ||  | | +-----------------------+ | | NVIDIA vGPU
-> Manager    |  | NVIDIA vGPU VFIO Variant Driver ||  | | |    NVIDIA
-> GPU Core    | | |                        |  |
->         ||  | | |        Driver         | |
-> +------------------------+  +---------------------------------+|  | |
-> +--------^--------------+
-> +----------------------------------------------------------------+  |
-> |          |                          |                       |
->                |          |
-> +------------------------------------------------------------------------=
------------------------+
-> |                          |                       |
->     |
-> +----------|--------------------------|-----------------------|----------=
-------------|----------+
-> |          v               +----------v---------+
-> +-----------v--------+ +-----------v--------+ | |  NVIDIA
->      |       PCI VF       | |       PCI VF       | |       PCI VF
->   | | |  Physical GPU            |                    | |
->        | |                    | | |                          |
-> (Virtual GPU)    | |   (Virtual GPU)    | |    (Virtual GPU)   | | |
->                         +--------------------+ +--------------------+
-> +--------------------+ |
-> +------------------------------------------------------------------------=
------------------------+
->=20
-> The supported GPU generations will be Ada which come with the
-> supported GPU architecture. Each vGPU is backed by a PCI virtual
-> function.
->=20
-> The NVIDIA vGPU VFIO module together with VFIO sits on VFs, provides
-> extended management and features, e.g. selecting the vGPU types,
-> support live migration and driver warm update.
->=20
-> Like other devices that VFIO supports, VFIO provides the standard
-> userspace APIs for device lifecycle management and advance feature
-> support.
->=20
-> The NVIDIA vGPU manager provides necessary support to the NVIDIA vGPU
-> VFIO variant driver to create/destroy vGPUs, query available vGPU
-> types, select the vGPU type, etc.
->=20
-> On the other side, NVIDIA vGPU manager talks to the NVIDIA GPU core
-> driver, which provide necessary support to reach the HW functions.
->=20
-> 2.2 Requirements to the NVIDIA GPU core driver
-> ----------------------------------------------
->=20
-> The primary use case of CSP and enterprise is a standalone minimal
-> drivers of vGPU manager and other necessary components.
->=20
-> NVIDIA vGPU manager talks to the NVIDIA GPU core driver, which provide
-> necessary support to:
->=20
-> - Load the GSP firmware, boot the GSP, provide commnication channel.
-> - Manage the shared/partitioned HW resources. E.g. reserving FB
-> memory, channels for the vGPU mananger to create vGPUs.
-> - Exception handling. E.g. delivering the GSP events to vGPU manager.
-> - Host event dispatch. E.g. suspend/resume.
-> - Enumerations of HW configuration.
->=20
-> The NVIDIA GPU core driver, which sits on the PCI device interface of
-> NVIDIA GPU, provides support to both DRM driver and the vGPU manager.
->=20
-> In this RFC, the split nouveau GPU driver[3] is used as an example to
-> demostrate the requirements of vGPU manager to the core driver. The
-> nouveau driver is split into nouveau (the DRM driver) and nvkm (the
-> core driver).
->=20
-> 3 Try the RFC patches
-> -----------------------
->=20
-> The RFC supports to create one VM to test the simple GPU workload.
->=20
-> - Host kernel:
-> https://github.com/zhiwang-nvidia/linux/tree/zhi/vgpu-mgr-rfc
-> - Guest driver package: NVIDIA-Linux-x86_64-535.154.05.run [4]
->=20
->   Install guest driver:
->   # export GRID_BUILD=3D1
->   # ./NVIDIA-Linux-x86_64-535.154.05.run
->=20
-> - Tested platforms: L40.
-> - Tested guest OS: Ubutnu 24.04 LTS.
-> - Supported experience: Linux rich desktop experience with simple 3D
->   workload, e.g. glmark2
->=20
-> 4 Demo
-> ------
->=20
-> A demo video can be found at: https://youtu.be/YwgIvvk-V94
->=20
-> [1] https://www.nvidia.com/en-us/data-center/virtual-solutions/
-> [2]
-> https://docs.nvidia.com/vgpu/17.0/grid-vgpu-user-guide/index.html#archite=
-cture-grid-vgpu
-> [3]
-> https://lore.kernel.org/dri-devel/20240613170211.88779-1-bskeggs@nvidia.c=
-om/T/
-> [4]
-> https://us.download.nvidia.com/XFree86/Linux-x86_64/535.154.05/NVIDIA-Lin=
-ux-x86_64-535.154.05.run
->=20
-> Zhi Wang (29):
->   nvkm/vgpu: introduce NVIDIA vGPU support prelude
->   nvkm/vgpu: attach to nvkm as a nvkm client
->   nvkm/vgpu: reserve a larger GSP heap when NVIDIA vGPU is enabled
->   nvkm/vgpu: set the VF partition count when NVIDIA vGPU is enabled
->   nvkm/vgpu: populate GSP_VF_INFO when NVIDIA vGPU is enabled
->   nvkm/vgpu: set RMSetSriovMode when NVIDIA vGPU is enabled
->   nvkm/gsp: add a notify handler for GSP event
->     GPUACCT_PERFMON_UTIL_SAMPLES
->   nvkm/vgpu: get the size VMMU segment from GSP firmware
->   nvkm/vgpu: introduce the reserved channel allocator
->   nvkm/vgpu: introduce interfaces for NVIDIA vGPU VFIO module
->   nvkm/vgpu: introduce GSP RM client alloc and free for vGPU
->   nvkm/vgpu: introduce GSP RM control interface for vGPU
->   nvkm: move chid.h to nvkm/engine.
->   nvkm/vgpu: introduce channel allocation for vGPU
->   nvkm/vgpu: introduce FB memory allocation for vGPU
->   nvkm/vgpu: introduce BAR1 map routines for vGPUs
->   nvkm/vgpu: introduce engine bitmap for vGPU
->   nvkm/vgpu: introduce pci_driver.sriov_configure() in nvkm
->   vfio/vgpu_mgr: introdcue vGPU lifecycle management prelude
->   vfio/vgpu_mgr: allocate GSP RM client for NVIDIA vGPU manager
->   vfio/vgpu_mgr: introduce vGPU type uploading
->   vfio/vgpu_mgr: allocate vGPU FB memory when creating vGPUs
->   vfio/vgpu_mgr: allocate vGPU channels when creating vGPUs
->   vfio/vgpu_mgr: allocate mgmt heap when creating vGPUs
->   vfio/vgpu_mgr: map mgmt heap when creating a vGPU
->   vfio/vgpu_mgr: allocate GSP RM client when creating vGPUs
->   vfio/vgpu_mgr: bootload the new vGPU
->   vfio/vgpu_mgr: introduce vGPU host RPC channel
->   vfio/vgpu_mgr: introduce NVIDIA vGPU VFIO variant driver
->=20
->  .../drm/nouveau/include/nvkm/core/device.h    |   3 +
->  .../drm/nouveau/include/nvkm/engine/chid.h    |  29 +
->  .../gpu/drm/nouveau/include/nvkm/subdev/gsp.h |   1 +
->  .../nouveau/include/nvkm/vgpu_mgr/vgpu_mgr.h  |  45 ++
->  .../nvidia/inc/ctrl/ctrl2080/ctrl2080gpu.h    |  12 +
->  drivers/gpu/drm/nouveau/nvkm/Kbuild           |   1 +
->  drivers/gpu/drm/nouveau/nvkm/device/pci.c     |  33 +-
->  .../gpu/drm/nouveau/nvkm/engine/fifo/chid.c   |  49 +-
->  .../gpu/drm/nouveau/nvkm/engine/fifo/chid.h   |  26 +-
->  .../gpu/drm/nouveau/nvkm/engine/fifo/r535.c   |   3 +
->  .../gpu/drm/nouveau/nvkm/subdev/gsp/r535.c    |  14 +-
->  drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/Kbuild  |   3 +
->  drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/vfio.c  | 302 +++++++++++
->  .../gpu/drm/nouveau/nvkm/vgpu_mgr/vgpu_mgr.c  | 234 ++++++++
->  drivers/vfio/pci/Kconfig                      |   2 +
->  drivers/vfio/pci/Makefile                     |   2 +
->  drivers/vfio/pci/nvidia-vgpu/Kconfig          |  13 +
->  drivers/vfio/pci/nvidia-vgpu/Makefile         |   8 +
->  drivers/vfio/pci/nvidia-vgpu/debug.h          |  18 +
->  .../nvidia/inc/ctrl/ctrl0000/ctrl0000system.h |  30 +
->  .../nvidia/inc/ctrl/ctrl2080/ctrl2080gpu.h    |  33 ++
->  .../ctrl/ctrl2080/ctrl2080vgpumgrinternal.h   | 152 ++++++
->  .../common/sdk/nvidia/inc/ctrl/ctrla081.h     | 109 ++++
->  .../nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h | 213 ++++++++
->  .../common/sdk/nvidia/inc/nv_vgpu_types.h     |  51 ++
->  .../common/sdk/vmioplugin/inc/vmioplugin.h    |  26 +
->  .../pci/nvidia-vgpu/include/nvrm/nvtypes.h    |  24 +
->  drivers/vfio/pci/nvidia-vgpu/nvkm.h           |  94 ++++
->  drivers/vfio/pci/nvidia-vgpu/rpc.c            | 242 +++++++++
->  drivers/vfio/pci/nvidia-vgpu/vfio.h           |  43 ++
->  drivers/vfio/pci/nvidia-vgpu/vfio_access.c    | 297 ++++++++++
->  drivers/vfio/pci/nvidia-vgpu/vfio_main.c      | 511
-> ++++++++++++++++++ drivers/vfio/pci/nvidia-vgpu/vgpu.c           |
-> 352 ++++++++++++ drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.c       | 144
-> +++++ drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h       |  89 +++
->  drivers/vfio/pci/nvidia-vgpu/vgpu_types.c     | 466 ++++++++++++++++
->  include/drm/nvkm_vgpu_mgr_vfio.h              |  61 +++
->  37 files changed, 3702 insertions(+), 33 deletions(-)
->  create mode 100644 drivers/gpu/drm/nouveau/include/nvkm/engine/chid.h
->  create mode 100644
-> drivers/gpu/drm/nouveau/include/nvkm/vgpu_mgr/vgpu_mgr.h create mode
-> 100644 drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/Kbuild create mode
-> 100644 drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/vfio.c create mode
-> 100644 drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/vgpu_mgr.c create mode
-> 100644 drivers/vfio/pci/nvidia-vgpu/Kconfig create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/Makefile create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/debug.h create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl=
-0000/ctrl0000system.h
-> create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl=
-2080/ctrl2080gpu.h
-> create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl=
-2080/ctrl2080vgpumgrinternal.h
-> create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl=
-a081.h
-> create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/dev_vgpu_=
-gsp.h
-> create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/nv_vgpu_t=
-ypes.h
-> create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/vmioplugin/inc/vmiop=
-lugin.h
-> create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/include/nvrm/nvtypes.h create mode
-> 100644 drivers/vfio/pci/nvidia-vgpu/nvkm.h create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/rpc.c create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/vfio.h create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/vfio_access.c create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/vfio_main.c create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/vgpu.c create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.c create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h create mode 100644
-> drivers/vfio/pci/nvidia-vgpu/vgpu_types.c create mode 100644
-> include/drm/nvkm_vgpu_mgr_vfio.h
->=20
+I can post the below later this week (probably as multiple patches).
+
+Note, -march=x86-64-v3 is there just to make it easy to test, I won't actually
+include that in the patches :-)
+
+---
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../selftests/kvm/include/x86_64/processor.h  |  5 ++++
+ .../selftests/kvm/lib/x86_64/processor.c      | 24 +++++++++++++++++++
+ tools/testing/selftests/kvm/x86_64/amx_test.c | 23 ++++--------------
+ .../testing/selftests/kvm/x86_64/cpuid_test.c |  6 ++++-
+ .../selftests/kvm/x86_64/sev_smoke_test.c     | 11 ---------
+ .../testing/selftests/kvm/x86_64/state_test.c |  5 ----
+ .../selftests/kvm/x86_64/xcr0_cpuid_test.c    | 11 ++++++---
+ 8 files changed, 47 insertions(+), 39 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 960cf6a77198..7ef4b3cc403d 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -238,6 +238,7 @@ else
+ LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
+ endif
+ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
++	-march=x86-64-v3 \
+ 	-Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCONFIG_64BIT \
+ 	-fno-builtin-memcmp -fno-builtin-memcpy \
+ 	-fno-builtin-memset -fno-builtin-strnlen \
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index e247f99e0473..645200e95f89 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -1049,6 +1049,11 @@ static inline void vcpu_set_cpuid(struct kvm_vcpu *vcpu)
+ 	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
+ }
+ 
++static inline void vcpu_get_cpuid(struct kvm_vcpu *vcpu)
++{
++	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
++}
++
+ void vcpu_set_cpuid_property(struct kvm_vcpu *vcpu,
+ 			     struct kvm_x86_cpu_property property,
+ 			     uint32_t value);
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 974bcd2df6d7..636b29ba8985 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -506,6 +506,8 @@ static void vcpu_init_sregs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ 
+ 	sregs.cr0 = X86_CR0_PE | X86_CR0_NE | X86_CR0_PG;
+ 	sregs.cr4 |= X86_CR4_PAE | X86_CR4_OSFXSR;
++	if (kvm_cpu_has(X86_FEATURE_XSAVE))
++		sregs.cr4 |= X86_CR4_OSXSAVE;
+ 	sregs.efer |= (EFER_LME | EFER_LMA | EFER_NX);
+ 
+ 	kvm_seg_set_unusable(&sregs.ldt);
+@@ -519,6 +521,20 @@ static void vcpu_init_sregs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ 	vcpu_sregs_set(vcpu, &sregs);
+ }
+ 
++static void vcpu_init_xcrs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++{
++	struct kvm_xcrs xcrs = {
++		.nr_xcrs = 1,
++		.xcrs[0].xcr = 0,
++		.xcrs[0].value = kvm_cpu_supported_xcr0(),
++	};
++
++	if (!kvm_cpu_has(X86_FEATURE_XSAVE))
++		return;
++
++	vcpu_xcrs_set(vcpu, &xcrs);
++}
++
+ static void set_idt_entry(struct kvm_vm *vm, int vector, unsigned long addr,
+ 			  int dpl, unsigned short selector)
+ {
+@@ -675,6 +691,7 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
+ 	vcpu = __vm_vcpu_add(vm, vcpu_id);
+ 	vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
+ 	vcpu_init_sregs(vm, vcpu);
++	vcpu_init_xcrs(vm, vcpu);
+ 
+ 	/* Setup guest general purpose registers */
+ 	vcpu_regs_get(vcpu, &regs);
+@@ -686,6 +703,13 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
+ 	mp_state.mp_state = 0;
+ 	vcpu_mp_state_set(vcpu, &mp_state);
+ 
++	/*
++	 * Refresh CPUID after setting SREGS and XCR0, so that KVM's "runtime"
++	 * updates to guest CPUID, e.g. for OSXSAVE and XSAVE state size, are
++	 * reflected into selftests' vCPU CPUID cache, i.e. so that the cache
++	 * is consistent with vCPU state.
++	 */
++	vcpu_get_cpuid(vcpu);
+ 	return vcpu;
+ }
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
+index 903940c54d2d..f4ce5a185a7d 100644
+--- a/tools/testing/selftests/kvm/x86_64/amx_test.c
++++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
+@@ -86,6 +86,8 @@ static inline void __xsavec(struct xstate *xstate, uint64_t rfbm)
+ 
+ static void check_xtile_info(void)
+ {
++	GUEST_ASSERT((xgetbv(0) & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE);
++
+ 	GUEST_ASSERT(this_cpu_has_p(X86_PROPERTY_XSTATE_MAX_SIZE_XCR0));
+ 	GUEST_ASSERT(this_cpu_property(X86_PROPERTY_XSTATE_MAX_SIZE_XCR0) <= XSAVE_SIZE);
+ 
+@@ -122,29 +124,12 @@ static void set_tilecfg(struct tile_config *cfg)
+ 	}
+ }
+ 
+-static void init_regs(void)
+-{
+-	uint64_t cr4, xcr0;
+-
+-	GUEST_ASSERT(this_cpu_has(X86_FEATURE_XSAVE));
+-
+-	/* turn on CR4.OSXSAVE */
+-	cr4 = get_cr4();
+-	cr4 |= X86_CR4_OSXSAVE;
+-	set_cr4(cr4);
+-	GUEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
+-
+-	xcr0 = xgetbv(0);
+-	xcr0 |= XFEATURE_MASK_XTILE;
+-	xsetbv(0x0, xcr0);
+-	GUEST_ASSERT((xgetbv(0) & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE);
+-}
+-
+ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
+ 						    struct tile_data *tiledata,
+ 						    struct xstate *xstate)
+ {
+-	init_regs();
++	GUEST_ASSERT(this_cpu_has(X86_FEATURE_XSAVE) &&
++		     this_cpu_has(X86_FEATURE_OSXSAVE));
+ 	check_xtile_info();
+ 	GUEST_SYNC(1);
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/cpuid_test.c b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
+index 8c579ce714e9..e79a6577254f 100644
+--- a/tools/testing/selftests/kvm/x86_64/cpuid_test.c
++++ b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
+@@ -37,7 +37,11 @@ static void test_guest_cpuids(struct kvm_cpuid2 *guest_cpuid)
+ 
+ 		GUEST_ASSERT_EQ(eax, guest_cpuid->entries[i].eax);
+ 		GUEST_ASSERT_EQ(ebx, guest_cpuid->entries[i].ebx);
+-		GUEST_ASSERT_EQ(ecx, guest_cpuid->entries[i].ecx);
++		__GUEST_ASSERT(ecx == guest_cpuid->entries[i].ecx,
++			       "CPUID.0x%x.0x%x.ECX 0%x != 0x%x",
++			       guest_cpuid->entries[i].function,
++			       guest_cpuid->entries[i].index,
++			       ecx, guest_cpuid->entries[i].ecx);
+ 		GUEST_ASSERT_EQ(edx, guest_cpuid->entries[i].edx);
+ 	}
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c b/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
+index 2e9197eb1652..59a5a2227944 100644
+--- a/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
++++ b/tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
+@@ -70,12 +70,6 @@ static void test_sync_vmsa(uint32_t policy)
+ 
+ 	double x87val = M_PI;
+ 	struct kvm_xsave __attribute__((aligned(64))) xsave = { 0 };
+-	struct kvm_sregs sregs;
+-	struct kvm_xcrs xcrs = {
+-		.nr_xcrs = 1,
+-		.xcrs[0].xcr = 0,
+-		.xcrs[0].value = XFEATURE_MASK_X87_AVX,
+-	};
+ 
+ 	vm = vm_sev_create_with_one_vcpu(KVM_X86_SEV_ES_VM, guest_code_xsave, &vcpu);
+ 	gva = vm_vaddr_alloc_shared(vm, PAGE_SIZE, KVM_UTIL_MIN_VADDR,
+@@ -84,11 +78,6 @@ static void test_sync_vmsa(uint32_t policy)
+ 
+ 	vcpu_args_set(vcpu, 1, gva);
+ 
+-	vcpu_sregs_get(vcpu, &sregs);
+-	sregs.cr4 |= X86_CR4_OSFXSR | X86_CR4_OSXSAVE;
+-	vcpu_sregs_set(vcpu, &sregs);
+-
+-	vcpu_xcrs_set(vcpu, &xcrs);
+ 	asm("fninit\n"
+ 	    "vpcmpeqb %%ymm4, %%ymm4, %%ymm4\n"
+ 	    "fldl %3\n"
+diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
+index 1c756db329e5..141b7fc0c965 100644
+--- a/tools/testing/selftests/kvm/x86_64/state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/state_test.c
+@@ -145,11 +145,6 @@ static void __attribute__((__flatten__)) guest_code(void *arg)
+ 
+ 		memset(buffer, 0xcc, sizeof(buffer));
+ 
+-		set_cr4(get_cr4() | X86_CR4_OSXSAVE);
+-		GUEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
+-
+-		xsetbv(0, xgetbv(0) | supported_xcr0);
+-
+ 		/*
+ 		 * Modify state for all supported xfeatures to take them out of
+ 		 * their "init" state, i.e. to make them show up in XSTATE_BV.
+diff --git a/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c b/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
+index 95ce192d0753..c8a5c5e51661 100644
+--- a/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
+@@ -48,16 +48,16 @@ do {									\
+ 
+ static void guest_code(void)
+ {
+-	uint64_t xcr0_reset;
++	uint64_t initial_xcr0;
+ 	uint64_t supported_xcr0;
+ 	int i, vector;
+ 
+ 	set_cr4(get_cr4() | X86_CR4_OSXSAVE);
+ 
+-	xcr0_reset = xgetbv(0);
++	initial_xcr0 = xgetbv(0);
+ 	supported_xcr0 = this_cpu_supported_xcr0();
+ 
+-	GUEST_ASSERT(xcr0_reset == XFEATURE_MASK_FP);
++	GUEST_ASSERT(initial_xcr0 == supported_xcr0);
+ 
+ 	/* Check AVX */
+ 	ASSERT_XFEATURE_DEPENDENCIES(supported_xcr0,
+@@ -79,6 +79,11 @@ static void guest_code(void)
+ 	ASSERT_ALL_OR_NONE_XFEATURE(supported_xcr0,
+ 				    XFEATURE_MASK_XTILE);
+ 
++	vector = xsetbv_safe(0, XFEATURE_MASK_FP);
++	__GUEST_ASSERT(!vector,
++		       "Expected success on XSETBV(FP), got vector '0x%x'",
++		       vector);
++
+ 	vector = xsetbv_safe(0, supported_xcr0);
+ 	__GUEST_ASSERT(!vector,
+ 		       "Expected success on XSETBV(0x%lx), got vector '0x%x'",
+
+base-commit: 3f8df6285271d9d8f17d733433e5213a63b83a0b
+-- 
 
 
