@@ -1,93 +1,93 @@
-Return-Path: <kvm+bounces-27275-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27274-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5DD897E1BC
-	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2024 14:53:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7107597E1BD
+	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2024 14:53:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 600DC2811D5
-	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2024 12:53:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E308FB214E9
+	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2024 12:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DBC59164;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 200BD58AD0;
 	Sun, 22 Sep 2024 12:51:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NjzO66JU"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GUrlyS4v"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2077.outbound.protection.outlook.com [40.107.95.77])
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2081.outbound.protection.outlook.com [40.107.96.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AC879DE
-	for <kvm@vger.kernel.org>; Sun, 22 Sep 2024 12:51:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B82B7489
+	for <kvm@vger.kernel.org>; Sun, 22 Sep 2024 12:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.81
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727009471; cv=fail; b=jTGz+3weMkHEJP+/GDeKaZKPpU2B3mWofnIjxwL3xlvp40JH5RXVTnMH5sIYb659QMYChEJ3Jiin65NBvuHxBtnOjvfQp4143G0528/TrfXDXH2LanZWsMrNqcYLBmzrLz2ZKWUT2L37L85scUnVvCFqx7SMv7WG87OGxmJLWRQ=
+	t=1727009471; cv=fail; b=dAUlfhEot1nbfQf2yFjzcM7KjIp3HoxlwbchNMCETXcK2C1vlqevrQYKfulKODbAWjiikGCNqluwHPOEHeuOHCB3a/Ri7mH9rGKEqBzB/JoaytvSYKBpDBibReFEivxTrAq8KMHox0oPjLD0kgTV7fSo6z2DLzwETciVJuSZg/o=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1727009471; c=relaxed/simple;
-	bh=PIfzpcDhoynjzPHCW7yuWS0S2PkK1aRM4LUBT70tR+k=;
+	bh=mWAur9sYpWSZbsDXaS3F0dCp4UHonddEFIfCRRlDA94=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HZRjc7f8kiWzy9FewFtl6SUhICp5KZxhZPF0rZmTUE9P07S3/+R5hZfvjJtUxtQIuVc49gdM6WdHmg1Ee1qZIguIZv2VtrcFGmSboPRLZE15hRbpGJ144WWvDrw4C7ocxTmr4+SMm94dsjZBh26jo71r9q3oQh64wzE3UC7VMt8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NjzO66JU; arc=fail smtp.client-ip=40.107.95.77
+	 MIME-Version:Content-Type; b=SjWkrz411BX8ItIPlwBFq98K+lyqhTVBja0E1bm3H8QN8pMcV/s+rPkon0V5AcFOoqI6+37F/rQG0LpHcalHhOO/DkX14FkhsOvWc6KDc09XSGBBctK20B8VAY1O5wjOsnpeKUaqpdZnIXeBg92U12lsgxP6KLzqbZSflBfe64I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GUrlyS4v; arc=fail smtp.client-ip=40.107.96.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pvJ7/sJKrISjXHaKEn1xQiLmP4jFdv8l1G+Do5/S0qTnWWiur2UgUjHJR6hnHReSqWnfOkinA3PhJ4Sj2TV0ClDHxInKawEC9AjU6K9pn+W/WD7N3nyBL/hMUgjKkAXRQku8G6mEagCQybHtT4RnVLPmYSSyVlKWzFfv8LU75SMliOU5MXmeEL3ZWJQLnHCJ5S3EwZEeiDiQ1ci4gMC1qcmFPjKVDwyD3BLhZ5/k+g1gKiWVcu9q/8fgZME1M740D+K/ZRt6dCkuNc3FBcgf04UgoayyTjwy/alBnS5ux6NmFaBAsG8CvRPOGXF4xMUxVRwWmv1G4yGEEfZgX/WKug==
+ b=xTo6ImueNYBucZQCFnLHET9JC14YiFjcXsQuiQJDxqz6ZCH1IBbs8DlR5WiWEAXMXRstIN6JL2dxyGVE/YBdsAhIO/HLbSXxiYpppYhKbzHIrrwHwSl2A9q58WG8PxBHZuok4APkGYJpiiA0MJK/clSjLiOl+SeYtkODHSZwDVWTrGYmwiyxLXli9CAUSTojNKkt6bOFpdsXcwzc6CYCKWwwUVJZoO4gtQO6CkjguFLsgkrpm/Jk2pkRZzVvk1W6y9x7eCa8tOSygjO89taoTTGpH7nB7r7vyeiDZBZhMO4eXnHoCF0zDd/XKJP+/63NeniBEA916gGGEdPDyMhOXg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BleeluwThKtArWNEFfcTK34nznhGQWdAt359OAmj5hM=;
- b=pBdKjTzh+cdhqa3cQCu9SiHLSBLo7lkXuM30olG4Hpj1t0mrrD8+BzuOgJ94hTQ4xoCBN3jtJzn1LjsRMfqPSnbk1X1Wl4ZOo45TEGURs0CaDAgJS4b03YQzf9Xbuy08VsXfE5eeev214qFOyXAWYqJweA4k5kY7Yuyz6H8WVLQNEbY6TAe/xzvavKvWfF/mHSbjV8P8W0T84nlqx1QevNvFI6ozjuWrxM/C/+nw+EZ6eR78gnM9GQPAeiH6pXs4D0V3vwcuj5xxf94gP4sYPMhUpah/URbbpDZQRnKepwqWBIsU8+31ZkD5B/R5egnHzsrWk2teCZ8PSkNI6JxEzA==
+ bh=2jVCiig4wQkEsHJ2djmxlaLFeWRiIf4rWWQ+EMJrKiQ=;
+ b=iEfEfaESq+EsNvfdUfXarx26c/ieii25IkXL/fKBBAXEe39kIU40bOe2YtinMLj1YckCwAE+pxlRxXiXuW51NIym5K9pzq5kR0c8a4ccTe3EEg63Gw8lSXKtWHT9oxsAr7GSnBsj6HejkvHfsCCumjbaTzDdrRPidCub8HZJy/cIdFbCnzJL2hbbO+IUeI6tmrjSd/wx9PJBYo19tCI22h2T+z/W3gPZxVPVRufVAxo0rqqqTdVuvhf5eGKlKCqCAqzKGn0rCs8PxtPv3YSR0ZsEvQr9BjfvaAxjQxVFCfxlA0DtzFSpfrVriX+rHiGhsIYGjVnHDV7morcIKde/wQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BleeluwThKtArWNEFfcTK34nznhGQWdAt359OAmj5hM=;
- b=NjzO66JU53OZAiBvM6B/UrE6a+ApkHWAdWRxZB914PxEJNz9x2DEMydHU9cZfCrK8KL0ftyTY1mQjyjPkkIsCawMqJmVTIvXjFwXaXarBS23JLFHjOqyLkfE7RNC3rf2iX0+R2AxEO/MxwhwjQZVMGcrJ5D8Deq4MvrPcJRqWQMrx01WEov7tREeTzP9OTRNApHtZCc8FA+mm+QWbX8hM9CN6pjX+yez/iw8NhT0f0fVTq6wCfql0GIaufB3z97PJU2wUJA0hGYTzFrVO+H+WrYPfXQ47CPuB/kf+xjpEeb2NVOx5YAmjSwj+/AJa+nwzCLOEfYLW2cwoEDKiSWZmw==
-Received: from MN2PR11CA0027.namprd11.prod.outlook.com (2603:10b6:208:23b::32)
- by PH7PR12MB5655.namprd12.prod.outlook.com (2603:10b6:510:138::16) with
+ bh=2jVCiig4wQkEsHJ2djmxlaLFeWRiIf4rWWQ+EMJrKiQ=;
+ b=GUrlyS4v/+GXrf7gHEE/ViRCANxvCmR9dQOpT27CuhcC8zDzKaC4NXNVwCnJRh0/jvnz9W9sl2947GuDaADnNtRPy3zf+u1wVjos3J4UYWwbcV6V9yfL/eo0ZJyZQ2ET8nFEkMvpj6+ul0YhpI2Le8xc7fySEb3WizH+JyJCRrDO5AgfmHl3YxeZkV55LvmrNBYZnWM6jEK9D/uJGSfeV0eepZhT4/INN/PjoDBNlPL6V8ss4QC/vu83RJdgwoYE5xzM4rbjd0Ny2gvne3Isu08KKnf4tMD3MGupsbmoI9BVaAzUf0BOCrmJWfjpQUjeu6kI3jZIW58TFlHoZ2MtlQ==
+Received: from MW4P221CA0026.NAMP221.PROD.OUTLOOK.COM (2603:10b6:303:8b::31)
+ by BY5PR12MB4195.namprd12.prod.outlook.com (2603:10b6:a03:200::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.24; Sun, 22 Sep
- 2024 12:51:00 +0000
-Received: from BL6PEPF00020E63.namprd04.prod.outlook.com
- (2603:10b6:208:23b:cafe::76) by MN2PR11CA0027.outlook.office365.com
- (2603:10b6:208:23b::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.29 via Frontend
- Transport; Sun, 22 Sep 2024 12:50:59 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.25; Sun, 22 Sep
+ 2024 12:50:59 +0000
+Received: from CO1PEPF000075F1.namprd03.prod.outlook.com
+ (2603:10b6:303:8b:cafe::f7) by MW4P221CA0026.outlook.office365.com
+ (2603:10b6:303:8b::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.25 via Frontend
+ Transport; Sun, 22 Sep 2024 12:50:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BL6PEPF00020E63.mail.protection.outlook.com (10.167.249.24) with Microsoft
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ CO1PEPF000075F1.mail.protection.outlook.com (10.167.249.40) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.13 via Frontend Transport; Sun, 22 Sep 2024 12:50:59 +0000
+ 15.20.7918.13 via Frontend Transport; Sun, 22 Sep 2024 12:50:58 +0000
 Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 22 Sep
- 2024 05:50:38 -0700
+ 2024 05:50:39 -0700
 Received: from drhqmail203.nvidia.com (10.126.190.182) by
  drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.2.1544.4; Sun, 22 Sep 2024 05:50:38 -0700
 Received: from inno-linux.nvidia.com (10.127.8.13) by mail.nvidia.com
  (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Sun, 22 Sep 2024 05:50:37 -0700
+ Transport; Sun, 22 Sep 2024 05:50:38 -0700
 From: Zhi Wang <zhiw@nvidia.com>
 To: <kvm@vger.kernel.org>, <nouveau@lists.freedesktop.org>
 CC: <alex.williamson@redhat.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>,
 	<airlied@gmail.com>, <daniel@ffwll.ch>, <acurrid@nvidia.com>,
 	<cjia@nvidia.com>, <smitra@nvidia.com>, <ankita@nvidia.com>,
 	<aniketa@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
-	<zhiw@nvidia.com>, <zhiwang@kernel.org>
-Subject: [RFC 28/29] vfio/vgpu_mgr: introduce vGPU host RPC channel
-Date: Sun, 22 Sep 2024 05:49:50 -0700
-Message-ID: <20240922124951.1946072-29-zhiw@nvidia.com>
+	<zhiw@nvidia.com>, <zhiwang@kernel.org>, Vinay Kabra <vkabra@nvidia.com>
+Subject: [RFC 29/29] vfio/vgpu_mgr: introduce NVIDIA vGPU VFIO variant driver
+Date: Sun, 22 Sep 2024 05:49:51 -0700
+Message-ID: <20240922124951.1946072-30-zhiw@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240922124951.1946072-1-zhiw@nvidia.com>
 References: <20240922124951.1946072-1-zhiw@nvidia.com>
@@ -102,867 +102,1009 @@ Content-Transfer-Encoding: 8bit
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00020E63:EE_|PH7PR12MB5655:EE_
-X-MS-Office365-Filtering-Correlation-Id: bc7552e1-411c-44b5-0c59-08dcdb053556
+X-MS-TrafficTypeDiagnostic: CO1PEPF000075F1:EE_|BY5PR12MB4195:EE_
+X-MS-Office365-Filtering-Correlation-Id: 48f60ba1-526d-4e70-c890-08dcdb0534e4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bHhiRkE5RXoxL2NURTZ2dm1sYVdFdDNpdnlveHlQS3ZsaXF1ZVZvUjY5aXpB?=
- =?utf-8?B?S3RBM2xLM3V0WGhHMGhzVm5TMHNmM0RWOW51SkwzUGc4aW9pdnd6S2w2UVpQ?=
- =?utf-8?B?Z082dGlGMkxtaHJXdTJ5bmVPQnJTZ1F2VjlCTTlNdWk2RVZYR0FISFNEVlZ2?=
- =?utf-8?B?a0VMY09HRUVYUFUyaHBabmtRRkZNVzNpdVcyZmJ1d1BSZnFXM3dyUjJvSnl1?=
- =?utf-8?B?NVg2dTFlbHpnUGVER2VoeDJLYXlGREU0WVhBWm0zd0JGRGE2dEFpcGxZc1I0?=
- =?utf-8?B?c1hBMmpyOExDWENOR1o5dUQwdyswUXBlM1FybDBvemx0MW42Y3p2bmhUR0xM?=
- =?utf-8?B?M1hVWDFSeXA4Mlp2QnJzNXJaQXBOaEZSdXYyeXpmOEYxU3lKLy9FaCtwcXJn?=
- =?utf-8?B?ck80MGNlMUZCdEhFV00vd05obXFDSDlId3gzdm9xSkxQN1htZmtSN2ZWT3JG?=
- =?utf-8?B?Tkw2SWxQVmJMb2Jndlk1cTN6YWhNYjluamRuY2RlNFBObXV6aEYvdmV3eDFl?=
- =?utf-8?B?UzRMTldST1N5QThwZTlOQ0V5SytHUVgwOHF3Nkx1emZJelR2bFltQitMQndh?=
- =?utf-8?B?Y09yY1lSUjkxMEJLOXZKeDVjVS9UcFFpaEhJSFo2QTBmVlIza0szeWNZVkpo?=
- =?utf-8?B?dXI4cVgwUE5vVzhkUUxPOUNtb2loWDB1WGRrMVdvT1BxeGFUa1VOY1hPQXhW?=
- =?utf-8?B?SkFPdjQ5QnBYemhpZFF3eEp3VE90STBqaXNRRGRmSnhtVkVRTlB3ZTFlR0tk?=
- =?utf-8?B?TWhicFVZUmNSemFSUTMzT0VaZVhEMVdPb0hCKzQxN3ZTVzljcUZkS2lRT1ZW?=
- =?utf-8?B?Sm81QTVPai9TYVVJWGhhMGxkcnNBam1EalBabGdEODZhcTJDb0ZvbllpN1hs?=
- =?utf-8?B?UHFWYUJOSFhRZHVpY0VnTTZjL0tVWUdqRlAwUFpZRWdGVTgyaDVJclR4d0hG?=
- =?utf-8?B?LytxbE5DcSt5dG01YjhxbkRhUHZiYnVKdjZubVZMa1hLQ2lvaUlaK0tDWUxl?=
- =?utf-8?B?WnlKNlVqbjB3VFdPcjA4bGZza2JFR0IxN0VEWld5aWk4WjF1a1J1OERkNUxi?=
- =?utf-8?B?NldLT0FQTEdkTVRGZU5zVWM0LysrNTJSYk41eU5ibzRrb3dPODlEZCtGQlhk?=
- =?utf-8?B?TUlnZGhhQ3V2ejcwdzRIYW40UWtZWTR4Ty9zZHRYTldWdTl5Mm1XZ3RRLytk?=
- =?utf-8?B?aCtTVGEzY0xnVjYwV0lFWGR3WFBwc0ZaZkIyVUF1WXNRd081RWNBZ3JhNkhW?=
- =?utf-8?B?ajlSenNaS2hNWUt5dkdORTR6OWppWjJwSElBSm9URGlXMTFQRGlOaVF2cVdq?=
- =?utf-8?B?UnpTU3h4YS82R3hsNTVoRUVNL0Q4Z0Z3NUFQSEgwZHJMclQ3L1NEbHJ5ZlBE?=
- =?utf-8?B?Sm92SGYvMEszN0V2QUZWV2E5SHBMMHA1MWRoSUhTZlJBWnJSdVZaYURrejZs?=
- =?utf-8?B?SHdHNGE1a1huK3NkdWVLMUlxNGJ0SHVnMXBEb2FObnBjalY3bXJQOHN0dXJm?=
- =?utf-8?B?eWZRRGtrL25idnlJK3IzeldFTyt0Q0RXeXBIRGR6NXFTZjU4NUl5Njh2QUNV?=
- =?utf-8?B?ZjA4emo1MERyOVZYYThhcjEzYWxoRGF4WGdrcmE2NFBGWTk1YnhoMzZ5c09K?=
- =?utf-8?B?enJjZ3lRZ0lyUkZpemRSMkFHb2phdXpRcVliQ3FHWGR0dGJPQWZtbFlnaWJv?=
- =?utf-8?B?bmVuNUZiZlRTcDBYbUY2YTV0SG1HTkRzcms0Z3U0dHJmR2lnN2paMTY5eEVj?=
- =?utf-8?B?NnZNNng4Smt4TWpRZHpsdFNhVUVQdUkyS3RVemZ1UG9xa25YWk9RNUpvK3du?=
- =?utf-8?B?aGEzWmpFU25Ta1V2blc2THlGcTV5TDlxS0YyZkVtSllUOG5JV0tSNGR3cmpU?=
- =?utf-8?Q?zyuRP8pE6T3zJ?=
+	=?utf-8?B?MldNM1VuRVVFbjMzSjRFRWpKV25XdUljNkVocnRWQVNGVDdoWGtnWG5JYWpo?=
+ =?utf-8?B?SllYWFl3bGFXUkNYMUNqV0lWcTNqNnlVT0FzMDVhZVNnSW44MmMrc3g1cjJ6?=
+ =?utf-8?B?ek5NU3VkL2JnWnpQUVI5eGJ1andjZ1o0RmVmWFd1bk1OSnVkOVhuVWdCNFdv?=
+ =?utf-8?B?UmkraEJHNVo4RDdUZ3JUdzI1Um5hU29scHFOTWZwT0VnaHlsbS84L2lVODNt?=
+ =?utf-8?B?Sk0xRTRMNUxXOWt4dzVkK3FFdjgxR2xIblc5dE01NGxNUlhhMi9ZT0h4aG0v?=
+ =?utf-8?B?Zm1zemd5R2w4TkNwL3JYWUZaNnFyYzcvbTE5VncxUGJSaDhoVXpZYnJnRVht?=
+ =?utf-8?B?eEZONWUrRU1vRUIzcjk2a2JtNy8wb2RCS0lrWVRxeXdUQUcra1R0ZVI3VWdO?=
+ =?utf-8?B?S3lXRVdrU3Z6QzdzR3c5TTFPQlV1K3ptcnh3aVVHRTJFVStjb1NGN0NWdW9B?=
+ =?utf-8?B?QXE2TExFckJnZkdpejQxbi9Hb2V5bGdFMW44M01zdndRbXEvV2pVRitvV29C?=
+ =?utf-8?B?cDhGYUx5ckdsZU4xcWlsRVhoc1RRRWJ5YkdZczRCeUozU3U3aGpmUEU5MGwz?=
+ =?utf-8?B?OVhhTmpUcGxQNHFlL0hmWFpNcmt3NDN4ZXpmUTJJZElxbTFOMnFmS2c5M1JZ?=
+ =?utf-8?B?Mm9JT3lzNmM5MzBEYW5tbHNyczZqS2lwZjM5SHFNSTYzWU9YeGhhZmpyUkcx?=
+ =?utf-8?B?UkxXVU83dXVuU2VwMFlFajAzVGZVYkJoYWZJTFRzVnN4QkQwaDBuSitpZWNG?=
+ =?utf-8?B?d2JCdmx6K0x0RmlMdkpNUldaWlpRazlKR2t1M3lDSFNPNlVGcndqTjIwOXpF?=
+ =?utf-8?B?MEoxTGFlK1VFY0NJSzFlc2tVVzBrMmF4N3dGaXFieVkxMGRNMHF6bFIwVUFH?=
+ =?utf-8?B?S1d6UzhEclF4WEk5SUNLNEMwNkZuQWpFcEFGS1RZNFZSZFJsdTVMUTV3K2ox?=
+ =?utf-8?B?SVJkc2dHdXBNTzJtTW0xRWt2TVRrVmhQbnJ3RTg3WVpDcDQwTnQ2SzlBRnVq?=
+ =?utf-8?B?RzNkNlVDU1FZMDJJUkJLSWYxaW5oaGhiSnpTcU1saVp5TWc3bnRaNGRDdDdm?=
+ =?utf-8?B?dkhNa1VGYnhiaFBScmZJTmdtSmpiWVlQRTZmQVZuZzFlS0tBY05KWm4wSkdv?=
+ =?utf-8?B?Si9NMG9OV2dGSzBYMGI3ZURoZEJRVS9aWXc0ZWNOSXJhT0l3NjNGQmczU3d2?=
+ =?utf-8?B?aGJ1cFN1NEdQV2RDN2JPVGQ1a00xdzVHaVkrai9OK29wWFVVaW9mV3ZuVHEr?=
+ =?utf-8?B?STQ4UVNuUDRFZzlnL1p0L1JHOEVOYlkreDNEQ0pMSkZFaEU0bDRCTndBKzRD?=
+ =?utf-8?B?aC8rQnVHWStkbnhuejhONi9NUGFpTHpDY2xEZXJQL3NzMkREb1N3cnVZTlpj?=
+ =?utf-8?B?TGpJeVBkZWFLRWJpTFVVMVM1UGZ5Sld4Nll3YkZhcXpDdEpXOXZvd080eWpH?=
+ =?utf-8?B?MndRRjgvdHFqaCtVMTllT2NZRW10UmlVSkF4SnE4OVVjRFNRYnEzRVVvaUdZ?=
+ =?utf-8?B?clh6cHpZbkkxS0NscUlTeFZmVStvcEF6N1VXK0tIcWNXYUx0Zm9ueVdldDV5?=
+ =?utf-8?B?ZHk3YVV2Vkp4ZVJCc2Q3cWRzV1BNdEtaOEVibDVvSUNjQWRCc3RXY0F0UzBw?=
+ =?utf-8?B?dzVKMTdGaGpzOVFxUTgxTWFkazJYVGhPZ0dDVllUK21RV3U1dFFVSGc3VFpK?=
+ =?utf-8?B?aEl5QVU1THlTeHRYZDBnV25yU245NWxhY05Db2Myd0g5d2JYT1NHVHIzUDVS?=
+ =?utf-8?B?WHlXSVBpeE9CZ0J0cW9nVTdoWGEyR2MwL0JueWNtYUVQQjFLbWtiOHdSYW82?=
+ =?utf-8?B?elh4MlJjRkk4ZzJvWlhHaHY2cVRrd3RLL2FIYW1kekd0THFmU3lBZnF5THh0?=
+ =?utf-8?Q?USFX6M1hFOr9l?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2024 12:50:59.3887
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2024 12:50:58.7714
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc7552e1-411c-44b5-0c59-08dcdb053556
+X-MS-Exchange-CrossTenant-Network-Message-Id: 48f60ba1-526d-4e70-c890-08dcdb0534e4
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00020E63.namprd04.prod.outlook.com
+	CO1PEPF000075F1.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5655
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4195
 
-A newly created vGPU requires some runtime configuration to be uploaded
-before moving on.
+A VFIO variant driver module is designed to extend the capabilities of
+the existing VFIO (Virtual Function I/O), offering device management
+interfaces to the userspace and advanced feature support.
 
-Introduce the vGPU host RPCs manipulation APIs to send vGPU RPCs.
-Send vGPU RPCs to upload the runtime configuration of a vGPU.
+For the userspace to use the NVIDIA vGPU, a new vGPU VFIO variant driver
+is introduced to provide vGPU management, like selecting/creating vGPU
+instance, support advance features like live migration.
+
+Introduce the NVIDIA vGPU VFIO variant driver to support vGPU lifecycle
+management UABI and the future advancd features.
 
 Cc: Neo Jia <cjia@nvidia.com>
 Cc: Surath Mitra <smitra@nvidia.com>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: Vinay Kabra <vkabra@nvidia.com>
+Cc: Ankit Agrawal <ankita@nvidia.com>
 Signed-off-by: Zhi Wang <zhiw@nvidia.com>
 ---
- drivers/vfio/pci/nvidia-vgpu/Makefile         |   2 +-
- drivers/vfio/pci/nvidia-vgpu/debug.h          |  18 ++
- .../nvidia/inc/ctrl/ctrl0000/ctrl0000system.h |  30 +++
- .../nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h | 213 +++++++++++++++
- .../common/sdk/nvidia/inc/nv_vgpu_types.h     |  51 ++++
- .../common/sdk/vmioplugin/inc/vmioplugin.h    |  26 ++
- drivers/vfio/pci/nvidia-vgpu/rpc.c            | 242 ++++++++++++++++++
- drivers/vfio/pci/nvidia-vgpu/vgpu.c           |  11 +
- drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.c       |  31 +++
- drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h       |  21 ++
- 10 files changed, 644 insertions(+), 1 deletion(-)
- create mode 100644 drivers/vfio/pci/nvidia-vgpu/debug.h
- create mode 100644 drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl0000/ctrl0000system.h
- create mode 100644 drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h
- create mode 100644 drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/nv_vgpu_types.h
- create mode 100644 drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/vmioplugin/inc/vmioplugin.h
- create mode 100644 drivers/vfio/pci/nvidia-vgpu/rpc.c
+ drivers/vfio/pci/nvidia-vgpu/Makefile      |   3 +
+ drivers/vfio/pci/nvidia-vgpu/vfio.h        |  43 ++
+ drivers/vfio/pci/nvidia-vgpu/vfio_access.c | 297 ++++++++++++
+ drivers/vfio/pci/nvidia-vgpu/vfio_main.c   | 511 +++++++++++++++++++++
+ drivers/vfio/pci/nvidia-vgpu/vgpu.c        |  22 +
+ drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h    |   2 +-
+ 6 files changed, 877 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/vfio/pci/nvidia-vgpu/vfio.h
+ create mode 100644 drivers/vfio/pci/nvidia-vgpu/vfio_access.c
+ create mode 100644 drivers/vfio/pci/nvidia-vgpu/vfio_main.c
 
 diff --git a/drivers/vfio/pci/nvidia-vgpu/Makefile b/drivers/vfio/pci/nvidia-vgpu/Makefile
-index bd65fa548ea1..fade9d49df97 100644
+index fade9d49df97..99c47e2f436d 100644
 --- a/drivers/vfio/pci/nvidia-vgpu/Makefile
 +++ b/drivers/vfio/pci/nvidia-vgpu/Makefile
-@@ -2,4 +2,4 @@
- ccflags-y += -I$(srctree)/$(src)/include
+@@ -3,3 +3,6 @@ ccflags-y += -I$(srctree)/$(src)/include
  
  obj-$(CONFIG_NVIDIA_VGPU_MGR) += nvidia-vgpu-mgr.o
--nvidia-vgpu-mgr-y := vgpu_mgr.o vgpu.o vgpu_types.o
-+nvidia-vgpu-mgr-y := vgpu_mgr.o vgpu.o vgpu_types.o rpc.o
-diff --git a/drivers/vfio/pci/nvidia-vgpu/debug.h b/drivers/vfio/pci/nvidia-vgpu/debug.h
+ nvidia-vgpu-mgr-y := vgpu_mgr.o vgpu.o vgpu_types.o rpc.o
++
++obj-$(CONFIG_NVIDIA_VGPU_VFIO_PCI) += nvidia-vgpu-vfio-pci.o
++nvidia-vgpu-vfio-pci-y := vfio_main.o vfio_access.o
+diff --git a/drivers/vfio/pci/nvidia-vgpu/vfio.h b/drivers/vfio/pci/nvidia-vgpu/vfio.h
 new file mode 100644
-index 000000000000..bc1c4273f089
+index 000000000000..fa6bbf81552d
 --- /dev/null
-+++ b/drivers/vfio/pci/nvidia-vgpu/debug.h
-@@ -0,0 +1,18 @@
++++ b/drivers/vfio/pci/nvidia-vgpu/vfio.h
+@@ -0,0 +1,43 @@
 +/* SPDX-License-Identifier: GPL-2.0 OR MIT */
 +/*
 + * Copyright © 2024 NVIDIA Corporation
 + */
 +
-+#ifndef __NVIDIA_VGPU_DEBUG_H__
-+#define __NVIDIA_VGPU_DEBUG_H__
++#ifndef _NVIDIA_VGPU_VFIO_H__
++#define _NVIDIA_VGPU_VFIO_H__
 +
-+#define nv_vgpu_dbg(v, f, a...) \
-+	pci_dbg(v->pdev, "nvidia-vgpu %d: "f, v->info.id, ##a)
-+
-+#define nv_vgpu_info(v, f, a...) \
-+	pci_info(v->pdev, "nvidia-vgpu %d: "f, v->info.id, ##a)
-+
-+#define nv_vgpu_err(v, f, a...) \
-+	pci_err(v->pdev, "nvidia-vgpu %d: "f, v->info.id, ##a)
-+
-+#endif
-diff --git a/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl0000/ctrl0000system.h b/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl0000/ctrl0000system.h
-new file mode 100644
-index 000000000000..871c498fb666
---- /dev/null
-+++ b/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl0000/ctrl0000system.h
-@@ -0,0 +1,30 @@
-+#ifndef __src_common_sdk_nvidia_inc_ctrl_ctrl0000_ctrl0000system_h__
-+#define __src_common_sdk_nvidia_inc_ctrl_ctrl0000_ctrl0000system_h__
-+
-+/* Excerpt of RM headers from https://github.com/NVIDIA/open-gpu-kernel-modules/tree/535.113.01 */
-+
-+/*
-+ * SPDX-FileCopyrightText: Copyright (c) 2005-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-+ * SPDX-License-Identifier: MIT
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a
-+ * copy of this software and associated documentation files (the "Software"),
-+ * to deal in the Software without restriction, including without limitation
-+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-+ * and/or sell copies of the Software, and to permit persons to whom the
-+ * Software is furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-+ * DEALINGS IN THE SOFTWARE.
-+ */
-+
-+#define NV0000_CTRL_CMD_SYSTEM_GET_VGX_SYSTEM_INFO_BUFFER_SIZE 256U
-+#endif
-diff --git a/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h b/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h
-new file mode 100644
-index 000000000000..8f3ea48ef10d
---- /dev/null
-+++ b/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h
-@@ -0,0 +1,213 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR MIT */
-+/*
-+ * Copyright © 2024 NVIDIA Corporation
-+ */
-+#ifndef __src_common_sdk_nvidia_inc_vgpu_dev_nv_vgpu_gsp_h__
-+#define __src_common_sdk_nvidia_inc_vgpu_dev_nv_vgpu_gsp_h__
-+
-+#include "nv_vgpu_types.h"
-+
-+#define GSP_PLUGIN_BOOTLOADED 0x4E654A6F
-+
-+/******************************************************************************/
-+/* GSP Control buffer shared between CPU Plugin and GSP Plugin - START        */
-+/******************************************************************************/
-+
-+/*    GSP Plugin heap memory layout
-+      +--------------------------------+ offset = 0
-+      |         CONTROL BUFFER         |
-+      +--------------------------------+
-+      |        RESPONSE BUFFER         |
-+      +--------------------------------+
-+      |         MESSAGE BUFFER         |
-+      +--------------------------------+
-+      |        MIGRATION BUFFER        |
-+      +--------------------------------+
-+      |    GSP PLUGIN ERROR BUFFER     |
-+      +--------------------------------+
-+      |    INIT TASK LOG BUFFER        |
-+      +--------------------------------+
-+      |    VGPU TASK LOG BUFFER        |
-+      +--------------------------------+
-+      |      MEMORY AVAILABLE FOR      |
-+      | GSP PLUGIN INTERNAL HEAP USAGE |
-+      +--------------------------------+
-+ */
-+#define VGPU_CPU_GSP_CTRL_BUFF_VERSION              0x1
-+#define VGPU_CPU_GSP_CTRL_BUFF_REGION_SIZE          4096
-+#define VGPU_CPU_GSP_RESPONSE_BUFF_REGION_SIZE      4096
-+#define VGPU_CPU_GSP_MESSAGE_BUFF_REGION_SIZE       4096
-+#define VGPU_CPU_GSP_MIGRATION_BUFF_REGION_SIZE     (2 * 1024 * 1024)
-+#define VGPU_CPU_GSP_ERROR_BUFF_REGION_SIZE         4096
-+#define VGPU_CPU_GSP_INIT_TASK_LOG_BUFF_REGION_SIZE (128 * 1024)
-+#define VGPU_CPU_GSP_VGPU_TASK_LOG_BUFF_REGION_SIZE (256 * 1024)
-+#define VGPU_CPU_GSP_COMMUNICATION_BUFF_TOTAL_SIZE  (VGPU_CPU_GSP_CTRL_BUFF_REGION_SIZE          + \
-+		VGPU_CPU_GSP_RESPONSE_BUFF_REGION_SIZE      + \
-+		VGPU_CPU_GSP_MESSAGE_BUFF_REGION_SIZE       + \
-+		VGPU_CPU_GSP_MIGRATION_BUFF_REGION_SIZE     + \
-+		VGPU_CPU_GSP_ERROR_BUFF_REGION_SIZE         + \
-+		VGPU_CPU_GSP_INIT_TASK_LOG_BUFF_REGION_SIZE + \
-+		VGPU_CPU_GSP_VGPU_TASK_LOG_BUFF_REGION_SIZE)
-+
-+//
-+// Control buffer: CPU Plugin -> GSP Plugin
-+// CPU Plugin - Write only
-+// GSP Plugin - Read only
-+//
-+typedef union {
-+	NvU8 buf[VGPU_CPU_GSP_CTRL_BUFF_REGION_SIZE];
-+	struct {
-+		volatile NvU32  version;                        // Version of format
-+		volatile NvU32  message_type;                   // Task to be performed by GSP Plugin
-+		volatile NvU32  message_seq_num;                // Incrementing sequence number to identify the RPC packet
-+		volatile NvU64  response_buff_offset;           // Buffer used to send data from GSP Plugin -> CPU Plugin
-+		volatile NvU64  message_buff_offset;            // Buffer used to send RPC data between CPU and GSP Plugin
-+		volatile NvU64  migration_buff_offset;          // Buffer used to send migration data between CPU and GSP Plugin
-+		volatile NvU64  error_buff_offset;              // Buffer used to send error data from GSP Plugin -> CPU Plugin
-+		volatile NvU32  migration_buf_cpu_access_offset;// CPU plugin GET/PUT offset of migration buffer
-+		volatile NvBool is_migration_in_progress;       // Is migration active or cancelled
-+		volatile NvU32  error_buff_cpu_get_idx;         // GET pointer into ERROR Buffer for CPU Plugin
-+		volatile NvU32 attached_vgpu_count;
-+		volatile struct {
-+			NvU32 vgpu_type_id;
-+			NvU32 host_gpu_pci_id;
-+			NvU32 pci_dev_id;
-+			NvU8  vgpu_uuid[VM_UUID_SIZE];
-+		} host_info[VMIOPD_MAX_INSTANCES];
-+	};
-+} VGPU_CPU_GSP_CTRL_BUFF_REGION;
-+
-+//
-+// Specify actions intended on getting
-+// notification from CPU Plugin -> GSP plugin
-+//
-+typedef enum {
-+	NV_VGPU_CPU_RPC_MSG_VERSION_NEGOTIATION = 1,
-+	NV_VGPU_CPU_RPC_MSG_SETUP_CONFIG_PARAMS_AND_INIT,
-+	NV_VGPU_CPU_RPC_MSG_RESET,
-+	NV_VGPU_CPU_RPC_MSG_MIGRATION_STOP_WORK,
-+	NV_VGPU_CPU_RPC_MSG_MIGRATION_CANCEL_STOP,
-+	NV_VGPU_CPU_RPC_MSG_MIGRATION_SAVE_STATE,
-+	NV_VGPU_CPU_RPC_MSG_MIGRATION_CANCEL_SAVE,
-+	NV_VGPU_CPU_RPC_MSG_MIGRATION_RESTORE_STATE,
-+	NV_VGPU_CPU_RPC_MSG_MIGRATION_RESTORE_DEFERRED_STATE,
-+	NV_VGPU_CPU_RPC_MSG_MIGRATION_RESUME_WORK,
-+	NV_VGPU_CPU_RPC_MSG_CONSOLE_VNC_STATE,
-+	NV_VGPU_CPU_RPC_MSG_VF_BAR0_REG_ACCESS,
-+	NV_VGPU_CPU_RPC_MSG_UPDATE_BME_STATE,
-+	NV_VGPU_CPU_RPC_MSG_GET_GUEST_INFO,
-+	NV_VGPU_CPU_RPC_MSG_MAX,
-+} MESSAGE;
-+
-+//
-+// Params structure for NV_VGPU_CPU_RPC_MSG_VERSION_NEGOTIATION
-+//
-+typedef struct {
-+	volatile NvU32 version_cpu;        /* Sent by CPU Plugin */
-+	volatile NvU32 version_negotiated; /* Updated by GSP Plugin */
-+} NV_VGPU_CPU_RPC_DATA_VERSION_NEGOTIATION;
-+
-+//
-+// Host CPU arch
-+//
-+typedef enum {
-+	NV_VGPU_HOST_CPU_ARCH_AARCH64 = 1,
-+	NV_VGPU_HOST_CPU_ARCH_X86_64,
-+} NV_VGPU_HOST_CPU_ARCH;
-+
-+//
-+// Params structure for NV_VGPU_CPU_RPC_MSG_COPY_CONFIG_PARAMS
-+//
-+typedef struct {
-+	volatile NvU8   vgpu_uuid[VM_UUID_SIZE];
-+	volatile NvU32  dbdf;
-+	volatile NvU32  driver_vm_vf_dbdf;
-+	volatile NvU32  vgpu_device_instance_id;
-+	volatile NvU32  vgpu_type;
-+	volatile NvU32  vm_pid;
-+	volatile NvU32  swizz_id;
-+	volatile NvU32  num_channels;
-+	volatile NvU32  num_plugin_channels;
-+	volatile NvU32  vmm_cap;
-+	volatile NvU32  migration_feature;
-+	volatile NvU32  hypervisor_type;
-+	volatile NvU32  host_cpu_arch;
-+	volatile NvU64  host_page_size;
-+	volatile NvBool rev1[2];
-+	volatile NvBool enable_uvm;
-+	volatile NvBool linux_interrupt_optimization;
-+	volatile NvBool vmm_migration_supported;
-+	volatile NvBool rev2;
-+	volatile NvBool enable_console_vnc;
-+	volatile NvBool use_non_stall_linux_events;
-+	volatile NvU32  rev3;
-+} NV_VGPU_CPU_RPC_DATA_COPY_CONFIG_PARAMS;
-+
-+// Params structure for NV_VGPU_CPU_RPC_MSG_UPDATE_BME_STATE
-+typedef struct {
-+	volatile NvBool enable;
-+	volatile NvBool allowed;
-+} NV_VGPU_CPU_RPC_DATA_UPDATE_BME_STATE;
-+//
-+// Message Buffer:
-+// CPU Plugin - Read/Write
-+// GSP Plugin - Read/Write
-+//
-+typedef union {
-+	NvU8 buf[VGPU_CPU_GSP_MESSAGE_BUFF_REGION_SIZE];
-+	NV_VGPU_CPU_RPC_DATA_VERSION_NEGOTIATION    version_data;
-+	NV_VGPU_CPU_RPC_DATA_COPY_CONFIG_PARAMS     config_data;
-+	NV_VGPU_CPU_RPC_DATA_UPDATE_BME_STATE       bme_state;
-+} VGPU_CPU_GSP_MSG_BUFF_REGION;
-+
-+typedef struct {
-+	volatile NvU64                          sequence_update_start;
-+	volatile NvU64                          sequence_update_end;
-+	volatile NvU32                          effective_fb_page_size;
-+	volatile NvU32                          rect_width;
-+	volatile NvU32                          rect_height;
-+	volatile NvU32                          surface_width;
-+	volatile NvU32                          surface_height;
-+	volatile NvU32                          surface_size;
-+	volatile NvU32                          surface_offset;
-+	volatile NvU32                          surface_format;
-+	volatile NvU32                          surface_kind;
-+	volatile NvU32                          surface_pitch;
-+	volatile NvU32                          surface_type;
-+	volatile NvU8                           surface_block_height;
-+	volatile vmiop_bool_t                   is_blanking_enabled;
-+	volatile vmiop_bool_t                   is_flip_pending;
-+	volatile vmiop_bool_t                   is_free_pending;
-+	volatile vmiop_bool_t                   is_memory_blocklinear;
-+} VGPU_CPU_GSP_DISPLAYLESS_SURFACE;
-+
-+//
-+// GSP Plugin Response Buffer:
-+// CPU Plugin - Read only
-+// GSP Plugin - Write only
-+//
-+typedef union {
-+	NvU8 buf[VGPU_CPU_GSP_RESPONSE_BUFF_REGION_SIZE];
-+	struct {
-+		// Updated by GSP Plugin once task is complete
-+		volatile NvU32                              message_seq_num_processed;
-+		// Updated by GSP on completion of RPC
-+		volatile NvU32                              result_code;
-+		volatile NvU32                              guest_rpc_version;
-+		// GSP plugin GET/PUT offset pointer of migration buffer
-+		volatile NvU32                              migration_buf_gsp_access_offset;
-+		// Current state of migration
-+		volatile NvU32                              migration_state_save_complete;
-+		// Console VNC surface information
-+		volatile VGPU_CPU_GSP_DISPLAYLESS_SURFACE   surface[VMIOPD_MAX_HEADS];
-+		// PUT pointer into ERROR Buffer for GSP Plugin
-+		volatile NvU32                              error_buff_gsp_put_idx;
-+		// Updated grid license state as received from guest
-+		volatile NvU32                              grid_license_state;
-+	};
-+} VGPU_CPU_GSP_RESPONSE_BUFF_REGION;
-+
-+/******************************************************************************/
-+/* GSP Control buffer shared between CPU Plugin and GSP Plugin - END          */
-+/******************************************************************************/
-+#endif
-diff --git a/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/nv_vgpu_types.h b/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/nv_vgpu_types.h
-new file mode 100644
-index 000000000000..903a5840366c
---- /dev/null
-+++ b/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/nv_vgpu_types.h
-@@ -0,0 +1,51 @@
-+#ifndef __src_common_sdk_nvidia_inc_nv_vgpu_types_h__
-+#define __src_common_sdk_nvidia_inc_nv_vgpu_types_h__
-+
-+/* Excerpt of RM headers from https://github.com/NVIDIA/open-gpu-kernel-modules/tree/535.113.01 */
-+
-+/*
-+ * SPDX-FileCopyrightText: Copyright (c) 2016-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-+ * SPDX-License-Identifier: MIT
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a
-+ * copy of this software and associated documentation files (the "Software"),
-+ * to deal in the Software without restriction, including without limitation
-+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-+ * and/or sell copies of the Software, and to permit persons to whom the
-+ * Software is furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-+ * DEALINGS IN THE SOFTWARE.
-+ */
-+
-+#define VM_UUID_SIZE            16
-+#define INVALID_VGPU_DEV_INST   0xFFFFFFFFU
-+#define MAX_VGPU_DEVICES_PER_VM 16U
-+
-+/* This enum represents the current state of guest dependent fields */
-+typedef enum GUEST_VM_INFO_STATE {
-+	GUEST_VM_INFO_STATE_UNINITIALIZED = 0,
-+	GUEST_VM_INFO_STATE_INITIALIZED = 1,
-+} GUEST_VM_INFO_STATE;
-+
-+/* This enum represents types of VM identifiers */
-+typedef enum VM_ID_TYPE {
-+	VM_ID_DOMAIN_ID = 0,
-+	VM_ID_UUID = 1,
-+} VM_ID_TYPE;
-+
-+/* This structure represents VM identifier */
-+typedef union VM_ID {
-+	NvU8 vmUuid[VM_UUID_SIZE];
-+	NV_DECLARE_ALIGNED(NvU64 vmId, 8);
-+} VM_ID;
-+
-+#endif
-diff --git a/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/vmioplugin/inc/vmioplugin.h b/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/vmioplugin/inc/vmioplugin.h
-new file mode 100644
-index 000000000000..58a473309e42
---- /dev/null
-+++ b/drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/vmioplugin/inc/vmioplugin.h
-@@ -0,0 +1,26 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR MIT */
-+/*
-+ * Copyright © 2024 NVIDIA Corporation
-+ */
-+#ifndef __src_common_sdk_vmioplugin_inc_vmioplugin_h__
-+#define __src_common_sdk_vmioplugin_inc_vmioplugin_h__
-+
-+#define VMIOPD_MAX_INSTANCES 16
-+#define VMIOPD_MAX_HEADS     4
-+
-+/**
-+ * Boolean type.
-+ */
-+
-+enum vmiop_bool_e {
-+	vmiop_false = 0,        /*!< Boolean false */
-+	vmiop_true = 1          /*!< Boolean true */
-+};
-+
-+/**
-+ * Boolean type.
-+ */
-+
-+typedef enum vmiop_bool_e vmiop_bool_t;
-+
-+#endif
-diff --git a/drivers/vfio/pci/nvidia-vgpu/rpc.c b/drivers/vfio/pci/nvidia-vgpu/rpc.c
-new file mode 100644
-index 000000000000..c316941f4b97
---- /dev/null
-+++ b/drivers/vfio/pci/nvidia-vgpu/rpc.c
-@@ -0,0 +1,242 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR MIT */
-+/*
-+ * Copyright © 2024 NVIDIA Corporation
-+ */
-+
-+#include <linux/delay.h>
-+#include <linux/kernel.h>
++#include <linux/vfio_pci_core.h>
 +
 +#include <nvrm/nvtypes.h>
-+#include <nvrm/common/sdk/nvidia/inc/ctrl/ctrl0000/ctrl0000system.h>
-+#include <nvrm/common/sdk/vmioplugin/inc/vmioplugin.h>
-+#include <nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h>
 +#include <nvrm/common/sdk/nvidia/inc/ctrl/ctrla081.h>
++#include <nvrm/common/sdk/nvidia/inc/ctrl/ctrl2080/ctrl2080vgpumgrinternal.h>
 +
-+#include "debug.h"
 +#include "vgpu_mgr.h"
 +
-+static void trigger_doorbell(struct nvidia_vgpu *vgpu)
++#define VGPU_CONFIG_PARAMS_MAX_LENGTH 1024
++#define DEVICE_CLASS_LENGTH 5
++#define PCI_CONFIG_SPACE_LENGTH 4096
++
++#define CAP_LIST_NEXT_PTR_MSIX 0x7c
++#define MSIX_CAP_SIZE   0xc
++
++struct nvidia_vgpu_vfio {
++	struct vfio_pci_core_device core_dev;
++	u8 config_space[PCI_CONFIG_SPACE_LENGTH];
++
++	void __iomem *bar0_map;
++
++	u8 **vgpu_types;
++	NVA081_CTRL_VGPU_INFO *curr_vgpu_type;
++	u32 num_vgpu_types;
++
++	struct nvidia_vgpu_mgr *vgpu_mgr;
++	struct nvidia_vgpu *vgpu;
++};
++
++void nvidia_vgpu_vfio_setup_config(struct nvidia_vgpu_vfio *nvdev);
++ssize_t nvidia_vgpu_vfio_access(struct nvidia_vgpu_vfio *nvdev,
++				char __user *buf, size_t count,
++				loff_t ppos, bool iswrite);
++
++#endif /* _NVIDIA_VGPU_VFIO_H__ */
+diff --git a/drivers/vfio/pci/nvidia-vgpu/vfio_access.c b/drivers/vfio/pci/nvidia-vgpu/vfio_access.c
+new file mode 100644
+index 000000000000..320c72a07dbe
+--- /dev/null
++++ b/drivers/vfio/pci/nvidia-vgpu/vfio_access.c
+@@ -0,0 +1,297 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright © 2024 NVIDIA Corporation
++ */
++
++#include <linux/string.h>
++#include <linux/pci.h>
++#include <linux/pci_regs.h>
++
++#include "vfio.h"
++
++void nvidia_vgpu_vfio_setup_config(struct nvidia_vgpu_vfio *nvdev)
 +{
-+	struct nvidia_vgpu_mgr *vgpu_mgr = vgpu->vgpu_mgr;
++	u8 *buffer = NULL;
 +
-+	u32 v = vgpu->info.gfid * 32 + 17;
++	memset(nvdev->config_space, 0, sizeof(nvdev->config_space));
 +
-+	writel(v, vgpu_mgr->bar0_vaddr + 0x00B80000 + 0x2200);
-+	readl(vgpu_mgr->bar0_vaddr + 0x00B80000 + 0x2200);
++	/* Header type 0 (normal devices) */
++	*(u16 *)&nvdev->config_space[PCI_VENDOR_ID] = 0x10de;
++	*(u16 *)&nvdev->config_space[PCI_DEVICE_ID] =
++		FIELD_GET(GENMASK(31, 16), nvdev->curr_vgpu_type->vdevId);
++	*(u16 *)&nvdev->config_space[PCI_COMMAND] = 0x0000;
++	*(u16 *)&nvdev->config_space[PCI_STATUS] = 0x0010;
++
++	buffer = &nvdev->config_space[PCI_CLASS_REVISION];
++	pci_read_config_byte(nvdev->core_dev.pdev, PCI_CLASS_REVISION, buffer);
++
++	nvdev->config_space[PCI_CLASS_PROG] = 0; /* VGA-compatible */
++	nvdev->config_space[PCI_CLASS_DEVICE] = 0; /* VGA controller */
++	nvdev->config_space[PCI_CLASS_DEVICE + 1] = 3; /* display controller */
++
++	/* BAR0: 32-bit */
++	*(u32 *)&nvdev->config_space[PCI_BASE_ADDRESS_0] = 0x00000000;
++	/* BAR1: 64-bit, prefetchable */
++	*(u32 *)&nvdev->config_space[PCI_BASE_ADDRESS_1] = 0x0000000c;
++	/* BAR2: 64-bit, prefetchable */
++	*(u32 *)&nvdev->config_space[PCI_BASE_ADDRESS_3] = 0x0000000c;
++	/* Disable BAR3: I/O */
++	*(u32 *)&nvdev->config_space[PCI_BASE_ADDRESS_5] = 0x00000000;
++
++	*(u16 *)&nvdev->config_space[PCI_SUBSYSTEM_VENDOR_ID] = 0x10de;
++	*(u16 *)&nvdev->config_space[PCI_SUBSYSTEM_ID] =
++		FIELD_GET(GENMASK(15, 0), nvdev->curr_vgpu_type->vdevId);
++
++	nvdev->config_space[PCI_CAPABILITY_LIST] = CAP_LIST_NEXT_PTR_MSIX;
++	nvdev->config_space[CAP_LIST_NEXT_PTR_MSIX + 1] = 0x0;
++
++	/* INTx disabled */
++	nvdev->config_space[0x3d] = 0;
 +}
 +
-+static void send_rpc_request(struct nvidia_vgpu *vgpu, u32 msg_type,
-+			    void *data, u64 size)
++static void read_hw_pci_config(struct pci_dev *pdev, char *buf,
++			       size_t count, loff_t offset)
 +{
-+	struct nvidia_vgpu_rpc *rpc = &vgpu->rpc;
-+	VGPU_CPU_GSP_CTRL_BUFF_REGION *ctrl_buf = rpc->ctrl_buf;
++	switch (count) {
++	case 4:
++		pci_read_config_dword(pdev, offset, (u32 *)buf);
++		break;
 +
-+	if (data && size)
-+		memcpy_toio(rpc->msg_buf, data, size);
++	case 2:
++		pci_read_config_word(pdev, offset, (u16 *)buf);
++		break;
 +
-+	ctrl_buf->message_type = msg_type;
-+
-+	rpc->msg_seq_num++;
-+	ctrl_buf->message_seq_num = rpc->msg_seq_num;
-+
-+	trigger_doorbell(vgpu);
++	case 1:
++		pci_read_config_byte(pdev, offset, (u8 *)buf);
++		break;
++	default:
++		WARN_ONCE(1, "Not supported access len\n");
++		break;
++	}
 +}
 +
-+static int wait_for_response(struct nvidia_vgpu *vgpu)
++static void write_hw_pci_config(struct pci_dev *pdev, char *buf,
++				size_t count, loff_t offset)
 +{
-+	struct nvidia_vgpu_rpc *rpc = &vgpu->rpc;
-+	VGPU_CPU_GSP_RESPONSE_BUFF_REGION *resp_buf = rpc->resp_buf;
++	switch (count) {
++	case 4:
++		pci_write_config_dword(pdev, offset, *(u32 *)buf);
++		break;
 +
-+	u64 timeout = 120 * 1000000; /* 120s */
++	case 2:
++		pci_write_config_word(pdev, offset, *(u16 *)buf);
++		break;
 +
-+	do {
-+		if (resp_buf->message_seq_num_processed == rpc->msg_seq_num)
-+			break;
-+
-+		usleep_range(1, 2);
-+	} while (--timeout);
-+
-+	return timeout ? 0 : -ETIMEDOUT;
++	case 1:
++		pci_write_config_byte(pdev, offset, *(u8 *)buf);
++		break;
++	default:
++		WARN_ONCE(1, "Not supported access len\n");
++		break;
++	}
 +}
 +
-+static int recv_rpc_response(struct nvidia_vgpu *vgpu, void *data,
-+			     u64 size, u32 *result)
++static void hw_pci_config_rw(struct pci_dev *pdev, char *buf,
++			     size_t count, loff_t offset,
++			     bool is_write)
 +{
-+	struct nvidia_vgpu_rpc *rpc = &vgpu->rpc;
-+	VGPU_CPU_GSP_RESPONSE_BUFF_REGION *resp_buf = rpc->resp_buf;
++	is_write ? write_hw_pci_config(pdev, buf, count, offset) :
++		   read_hw_pci_config(pdev, buf, count, offset);
++}
++
++static ssize_t bar0_rw(struct nvidia_vgpu_vfio *nvdev, char *buf,
++		       size_t count, loff_t ppos, bool iswrite)
++{
++	struct pci_dev *pdev = nvdev->core_dev.pdev;
++	int index = VFIO_PCI_OFFSET_TO_INDEX(ppos);
++	loff_t offset = ppos;
++	void __iomem *map;
++	u32 val;
 +	int ret;
 +
-+	ret = wait_for_response(vgpu);
-+	if (result)
-+		*result = resp_buf->result_code;
++	if (index != VFIO_PCI_BAR0_REGION_INDEX)
++		return -EINVAL;
 +
++	offset &= VFIO_PCI_OFFSET_MASK;
++
++	if (nvdev->bar0_map == NULL) {
++		ret = pci_request_selected_regions(pdev, 1 << index, "nvidia-vgpu-vfio");
++		if (ret)
++			return ret;
++
++		if (!(pci_resource_flags(pdev, index) & IORESOURCE_MEM)) {
++			pci_release_selected_regions(pdev, 1 << index);
++			return -EIO;
++		}
++
++		map = ioremap(pci_resource_start(pdev, index), pci_resource_len(pdev, index));
++		if (!map) {
++			pci_err(pdev, "Can't map BAR0 MMIO space\n");
++			pci_release_selected_regions(pdev, 1 << index);
++			return -ENOMEM;
++		}
++		nvdev->bar0_map = map;
++	} else
++		map = nvdev->bar0_map;
++
++	if (!iswrite) {
++		switch (count) {
++		case 4:
++			val = ioread32(map + offset);
++			break;
++		case 2:
++			val = ioread16(map + offset);
++			break;
++		case 1:
++			val = ioread8(map + offset);
++			break;
++		}
++		memcpy(buf, (u8 *)&val, count);
++	} else {
++		switch (count) {
++		case 4:
++			iowrite32(*(u32 *)buf, map + offset);
++			break;
++		case 2:
++			iowrite16(*(u16 *)buf, map + offset);
++			break;
++		case 1:
++			iowrite8(*(u8 *)buf, map + offset);
++			break;
++		}
++	}
++	return count;
++}
++
++static ssize_t pci_config_rw(struct nvidia_vgpu_vfio *nvdev, char *buf,
++			     size_t count, loff_t ppos, bool iswrite)
++{
++	struct pci_dev *pdev = nvdev->core_dev.pdev;
++	int index = VFIO_PCI_OFFSET_TO_INDEX(ppos);
++	loff_t offset = ppos;
++	u32 bar_mask, cfg_addr;
++	u32 val = 0;
++
++	if (index != VFIO_PCI_CONFIG_REGION_INDEX)
++		return -EINVAL;
++
++	offset &= VFIO_PCI_OFFSET_MASK;
++
++	if ((offset >= CAP_LIST_NEXT_PTR_MSIX) && (offset <
++				(CAP_LIST_NEXT_PTR_MSIX + MSIX_CAP_SIZE))) {
++		hw_pci_config_rw(pdev, buf, count, offset, iswrite);
++		return count;
++	}
++
++	if (!iswrite) {
++		memcpy(buf, (u8 *)&nvdev->config_space[offset], count);
++
++		switch (offset) {
++		case PCI_COMMAND:
++			hw_pci_config_rw(pdev, (char *)&val, count, offset, iswrite);
++
++			switch (count) {
++			case 4:
++				val = (u32)(val & 0xFFFF0000) | (val &
++					(PCI_COMMAND_PARITY | PCI_COMMAND_SERR));
++				break;
++			case 2:
++				val = (val & (PCI_COMMAND_PARITY | PCI_COMMAND_SERR));
++				break;
++			default:
++				WARN_ONCE(1, "Not supported access len\n");
++				break;
++			}
++			break;
++		case PCI_STATUS:
++			hw_pci_config_rw(pdev, (char *)&val, count, offset, iswrite);
++			break;
++
++		default:
++			break;
++		}
++		*(u32 *)buf = *(u32 *)buf | val;
++	} else {
++		switch (offset) {
++		case PCI_VENDOR_ID:
++		case PCI_DEVICE_ID:
++		case PCI_CAPABILITY_LIST:
++			break;
++
++		case PCI_STATUS:
++			hw_pci_config_rw(pdev, buf, count, offset, iswrite);
++			break;
++
++		case PCI_COMMAND:
++			if (count == 4) {
++				val = (u32)((*(u32 *)buf & 0xFFFF0000) >> 16);
++				hw_pci_config_rw(pdev, (char *)&val, 2, PCI_STATUS, iswrite);
++
++				val = (u32)(*(u32 *)buf & 0x0000FFFF);
++				*(u32 *)buf = val;
++			}
++
++			memcpy((u8 *)&nvdev->config_space[offset], buf, count);
++			break;
++
++		case PCI_BASE_ADDRESS_0:
++		case PCI_BASE_ADDRESS_1:
++		case PCI_BASE_ADDRESS_2:
++		case PCI_BASE_ADDRESS_3:
++		case PCI_BASE_ADDRESS_4:
++			cfg_addr = *(u32 *)buf;
++
++			switch (offset) {
++			case PCI_BASE_ADDRESS_0:
++				bar_mask = (u32)((~(pci_resource_len(pdev, VFIO_PCI_BAR0_REGION_INDEX)) + 1) & ~0xFul);
++				cfg_addr = (cfg_addr & bar_mask) | (nvdev->config_space[offset] & 0xFul);
++				break;
++			case PCI_BASE_ADDRESS_1:
++				bar_mask = (u32)((~(nvdev->curr_vgpu_type->bar1Length * 1024 * 1024) + 1) & ~0xFul);
++				cfg_addr = (cfg_addr & bar_mask) | (nvdev->config_space[offset] & 0xFul);
++				break;
++
++			case PCI_BASE_ADDRESS_2:
++				bar_mask = (u32)(((~(nvdev->curr_vgpu_type->bar1Length * 1024 * 1024) + 1) & ~0xFul) >> 32);
++				cfg_addr = (cfg_addr & bar_mask);
++				break;
++
++			case PCI_BASE_ADDRESS_3:
++				bar_mask = (u32)((~(pci_resource_len(pdev, VFIO_PCI_BAR3_REGION_INDEX)) + 1) & ~0xFul);
++				cfg_addr = (cfg_addr & bar_mask) | (nvdev->config_space[offset] & 0xFul);
++				break;
++
++			case PCI_BASE_ADDRESS_4:
++				bar_mask = (u32)(((~(pci_resource_len(pdev, VFIO_PCI_BAR3_REGION_INDEX)) + 1) & ~0xFul) >> 32);
++				cfg_addr = (cfg_addr & bar_mask);
++				break;
++			}
++			*(u32 *)&nvdev->config_space[offset] = cfg_addr;
++			break;
++		default:
++			break;
++
++		}
++	}
++	return count;
++}
++
++ssize_t nvidia_vgpu_vfio_access(struct nvidia_vgpu_vfio *nvdev, char *buf,
++				size_t count, loff_t ppos, bool iswrite)
++{
++	int index = VFIO_PCI_OFFSET_TO_INDEX(ppos);
++
++	if (index >= VFIO_PCI_NUM_REGIONS)
++		return -EINVAL;
++
++	switch (index) {
++	case VFIO_PCI_CONFIG_REGION_INDEX:
++		return pci_config_rw(nvdev, buf, count, ppos,
++				     iswrite);
++	case VFIO_PCI_BAR0_REGION_INDEX:
++		return bar0_rw(nvdev, buf, count, ppos, iswrite);
++	default:
++		return -EINVAL;
++	}
++	return count;
++}
+diff --git a/drivers/vfio/pci/nvidia-vgpu/vfio_main.c b/drivers/vfio/pci/nvidia-vgpu/vfio_main.c
+new file mode 100644
+index 000000000000..667ed6fb48f6
+--- /dev/null
++++ b/drivers/vfio/pci/nvidia-vgpu/vfio_main.c
+@@ -0,0 +1,511 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright © 2024 NVIDIA Corporation
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/pci.h>
++#include <linux/vfio_pci_core.h>
++#include <linux/types.h>
++
++#include "vfio.h"
++
++static int pdev_to_gfid(struct pci_dev *pdev)
++{
++	return pci_iov_vf_id(pdev) + 1;
++}
++
++static int destroy_vgpu(struct nvidia_vgpu_vfio *nvdev)
++{
++	int ret;
++
++	ret = nvidia_vgpu_mgr_destroy_vgpu(nvdev->vgpu);
 +	if (ret)
 +		return ret;
 +
-+	if (data && size)
-+		memcpy_fromio(data, rpc->msg_buf, size);
++	kfree(nvdev->vgpu);
++	nvdev->vgpu = NULL;
++	return 0;
++}
++
++static int create_vgpu(struct nvidia_vgpu_vfio *nvdev)
++{
++	struct nvidia_vgpu_mgr *vgpu_mgr = nvdev->vgpu_mgr;
++	struct pci_dev *pdev = nvdev->core_dev.pdev;
++	struct nvidia_vgpu *vgpu;
++	int ret;
++
++	vgpu = kzalloc(sizeof(*vgpu), GFP_KERNEL);
++	if (!vgpu)
++		return -ENOMEM;
++
++	vgpu->info.id = pci_iov_vf_id(pdev);
++	vgpu->info.dbdf = (0 << 16) | pci_dev_id(pdev);
++	vgpu->info.gfid = pdev_to_gfid(pdev);
++
++	vgpu->vgpu_mgr = vgpu_mgr;
++	vgpu->pdev = pdev;
++
++	ret = nvidia_vgpu_mgr_create_vgpu(vgpu,
++			(u8 *)nvdev->curr_vgpu_type);
++	if (ret) {
++		kfree(vgpu);
++		return ret;
++	}
++
++	pr_err("create_vgpu() called\n");
++	nvdev->vgpu = vgpu;
++	return 0;
++}
++
++static inline struct vfio_pci_core_device *
++vdev_to_core_dev(struct vfio_device *vdev)
++{
++	return container_of(vdev, struct vfio_pci_core_device, vdev);
++}
++
++static inline struct nvidia_vgpu_vfio *
++core_dev_to_nvdev(struct vfio_pci_core_device *core_dev)
++{
++	return container_of(core_dev, struct nvidia_vgpu_vfio, core_dev);
++}
++
++static void detach_vgpu_mgr(struct nvidia_vgpu_vfio *nvdev)
++{
++	nvidia_vgpu_mgr_put(nvdev->vgpu_mgr);
++
++	nvdev->vgpu_mgr = NULL;
++	nvdev->vgpu_types = NULL;
++	nvdev->num_vgpu_types = 0;
++}
++
++static int attach_vgpu_mgr(struct nvidia_vgpu_vfio *nvdev,
++			   struct pci_dev *pdev)
++{
++	struct nvidia_vgpu_mgr *vgpu_mgr;
++
++	vgpu_mgr = nvidia_vgpu_mgr_get(pdev);
++	if (IS_ERR(vgpu_mgr))
++		return PTR_ERR(vgpu_mgr);
++
++	nvdev->vgpu_mgr = vgpu_mgr;
++	nvdev->vgpu_types = nvdev->vgpu_mgr->vgpu_types;
++	nvdev->num_vgpu_types = nvdev->vgpu_mgr->num_vgpu_types;
 +
 +	return 0;
 +}
 +
-+int nvidia_vgpu_rpc_call(struct nvidia_vgpu *vgpu, u32 msg_type,
-+			 void *data, u64 size)
++static NVA081_CTRL_VGPU_INFO *
++find_vgpu_type(struct nvidia_vgpu_vfio *nvdev, u32 type_id)
 +{
-+	struct nvidia_vgpu_rpc *rpc = &vgpu->rpc;
-+	u32 result;
++	NVA081_CTRL_VGPU_INFO *vgpu_type;
++	u32 i;
++
++	for (i = 0; i < nvdev->num_vgpu_types; i++) {
++		vgpu_type = (NVA081_CTRL_VGPU_INFO *)nvdev->vgpu_types[i];
++		if (vgpu_type->vgpuType == type_id)
++			return vgpu_type;
++	}
++
++	return NULL;
++}
++
++static int
++nvidia_vgpu_vfio_open_device(struct vfio_device *vdev)
++{
++	struct vfio_pci_core_device *core_dev = vdev_to_core_dev(vdev);
++	struct nvidia_vgpu_vfio *nvdev = core_dev_to_nvdev(core_dev);
++	struct pci_dev *pdev = core_dev->pdev;
++	u64 pf_dma_mask;
 +	int ret;
 +
-+	if (WARN_ON(msg_type >= NV_VGPU_CPU_RPC_MSG_MAX) ||
-+		   (size > VGPU_CPU_GSP_MESSAGE_BUFF_REGION_SIZE) ||
-+		   ((size != 0) && (data == NULL)))
++	if (!nvdev->curr_vgpu_type)
++		return -ENODEV;
++
++	if (!pdev->physfn)
 +		return -EINVAL;
 +
-+	mutex_lock(&rpc->lock);
++	ret = create_vgpu(nvdev);
++	if (ret)
++		return ret;
 +
-+	send_rpc_request(vgpu, msg_type, data, size);
-+	ret = recv_rpc_response(vgpu, data, size, &result);
++	ret = pci_enable_device(pdev);
++	if (ret)
++		goto err_enable_device;
 +
-+	mutex_unlock(&rpc->lock);
-+	if (ret || result) {
-+		nv_vgpu_err(vgpu, "fail to recv RPC: result %u\n",
-+			    result);
-+		return -EINVAL;
-+	}
++	pci_set_master(pdev);
++
++	pf_dma_mask = dma_get_mask(&pdev->physfn->dev);
++	dma_set_mask(&pdev->dev, pf_dma_mask);
++	dma_set_coherent_mask(&pdev->dev, pf_dma_mask);
++
++	ret = pci_try_reset_function(pdev);
++	if (ret)
++		goto err_reset_function;
++
++	ret = nvidia_vgpu_mgr_enable_bme(nvdev->vgpu);
++	if (ret)
++		goto err_enable_bme;
++
++	return 0;
++
++err_enable_bme:
++err_reset_function:
++	pci_clear_master(pdev);
++	pci_disable_device(pdev);
++err_enable_device:
++	destroy_vgpu(nvdev);
 +	return ret;
 +}
 +
-+void nvidia_vgpu_clean_rpc(struct nvidia_vgpu *vgpu)
++static void
++nvidia_vgpu_vfio_close_device(struct vfio_device *vdev)
 +{
++	struct vfio_pci_core_device *core_dev = vdev_to_core_dev(vdev);
++	struct nvidia_vgpu_vfio *nvdev = core_dev_to_nvdev(core_dev);
++	struct pci_dev *pdev = core_dev->pdev;
++
++	WARN_ON(destroy_vgpu(nvdev));
++
++	if (nvdev->bar0_map) {
++		iounmap(nvdev->bar0_map);
++		pci_release_selected_regions(pdev, 1 << 0);
++		nvdev->bar0_map = NULL;
++	}
++
++	pci_clear_master(pdev);
++	pci_disable_device(pdev);
 +}
 +
-+static void init_rpc_buf_pointers(struct nvidia_vgpu *vgpu)
++static int
++get_region_info(struct vfio_pci_core_device *core_dev, unsigned long arg)
 +{
-+	struct nvidia_vgpu_mgmt *mgmt = &vgpu->mgmt;
-+	struct nvidia_vgpu_rpc *rpc = &vgpu->rpc;
++	struct nvidia_vgpu_vfio *nvdev = core_dev_to_nvdev(core_dev);
++	struct pci_dev *pdev = core_dev->pdev;
++	struct vfio_region_info info;
++	unsigned long minsz;
++	int ret = 0;
 +
-+	rpc->ctrl_buf = mgmt->ctrl_vaddr;
-+	rpc->resp_buf = rpc->ctrl_buf + VGPU_CPU_GSP_CTRL_BUFF_REGION_SIZE;
-+	rpc->msg_buf = rpc->resp_buf + VGPU_CPU_GSP_RESPONSE_BUFF_REGION_SIZE;
-+	rpc->migration_buf = rpc->msg_buf + VGPU_CPU_GSP_MESSAGE_BUFF_REGION_SIZE;
-+	rpc->error_buf = rpc->migration_buf + VGPU_CPU_GSP_MIGRATION_BUFF_REGION_SIZE;
-+}
++	minsz = offsetofend(struct vfio_region_info, offset);
++	if (copy_from_user(&info, (void __user *)arg, minsz))
++		return -EINVAL;
 +
-+static void init_ctrl_buf_offsets(struct nvidia_vgpu *vgpu)
-+{
-+	struct nvidia_vgpu_rpc *rpc = &vgpu->rpc;
-+	VGPU_CPU_GSP_CTRL_BUFF_REGION *ctrl_buf;
-+	u64 offset = 0;
++	if (info.argsz < minsz)
++		return -EINVAL;
 +
-+	ctrl_buf = rpc->ctrl_buf;
++	switch (info.index) {
++	case VFIO_PCI_CONFIG_REGION_INDEX:
++		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
++		info.size = PCI_CONFIG_SPACE_LENGTH;
++		info.flags = VFIO_REGION_INFO_FLAG_READ |
++			VFIO_REGION_INFO_FLAG_WRITE;
++		break;
 +
-+	ctrl_buf->version = VGPU_CPU_GSP_CTRL_BUFF_VERSION;
++	case VFIO_PCI_BAR0_REGION_INDEX ... VFIO_PCI_BAR4_REGION_INDEX:
++		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
 +
-+	offset = VGPU_CPU_GSP_CTRL_BUFF_REGION_SIZE;
-+	ctrl_buf->response_buff_offset = offset;
++		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
++		info.size = pci_resource_len(pdev, info.index);
 +
-+	offset += VGPU_CPU_GSP_RESPONSE_BUFF_REGION_SIZE;
-+	ctrl_buf->message_buff_offset = offset;
++		if (info.index == VFIO_PCI_BAR1_REGION_INDEX)
++			info.size = nvdev->curr_vgpu_type->bar1Length * 1024 * 1024;
 +
-+	offset += VGPU_CPU_GSP_MESSAGE_BUFF_REGION_SIZE;
-+	ctrl_buf->migration_buff_offset = offset;
-+
-+	offset += VGPU_CPU_GSP_MIGRATION_BUFF_REGION_SIZE;
-+	ctrl_buf->error_buff_offset = offset;
-+}
-+
-+static int wait_vgpu_plugin_task_bootloaded(struct nvidia_vgpu *vgpu)
-+{
-+	struct nvidia_vgpu_rpc *rpc = &vgpu->rpc;
-+	VGPU_CPU_GSP_CTRL_BUFF_REGION *ctrl_buf = rpc->ctrl_buf;
-+
-+	u64 timeout = 10 * 1000000; /* 10 s */
-+
-+	do {
-+		if (ctrl_buf->message_seq_num == GSP_PLUGIN_BOOTLOADED)
++		if (!info.size) {
++			info.flags = 0;
 +			break;
++		}
++		info.flags = VFIO_REGION_INFO_FLAG_READ |
++			VFIO_REGION_INFO_FLAG_WRITE |
++			VFIO_REGION_INFO_FLAG_MMAP;
 +
-+		usleep_range(1, 2);
-+	} while (--timeout);
++		if (caps.size) {
++			info.flags |= VFIO_REGION_INFO_FLAG_CAPS;
++			if (info.argsz < sizeof(info) + caps.size) {
++				info.argsz = sizeof(info) + caps.size;
++				info.cap_offset = 0;
++			} else {
++				vfio_info_cap_shift(&caps, sizeof(info));
++				if (copy_to_user((void __user *)arg +
++							sizeof(info), caps.buf,
++							caps.size)) {
++					kfree(caps.buf);
++					ret = -EFAULT;
++					break;
++				}
++				info.cap_offset = sizeof(info);
++			}
++			kfree(caps.buf);
++		}
++		break;
++	case VFIO_PCI_BAR5_REGION_INDEX:
++	case VFIO_PCI_ROM_REGION_INDEX:
++	case VFIO_PCI_VGA_REGION_INDEX:
++		info.size = 0;
++		break;
 +
-+	return timeout ? 0 : -ETIMEDOUT;
++	default:
++		if (info.index >= VFIO_PCI_NUM_REGIONS)
++			ret = -EINVAL;
++		break;
++	}
++
++	if (!ret)
++		ret = copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
++
++	return ret;
 +}
 +
-+static int negotiate_rpc_version(struct nvidia_vgpu *vgpu)
++static long nvidia_vgpu_vfio_ioctl(struct vfio_device *vdev,
++				   unsigned int cmd,
++				   unsigned long arg)
 +{
-+	return nvidia_vgpu_rpc_call(vgpu, NV_VGPU_CPU_RPC_MSG_VERSION_NEGOTIATION,
-+				    NULL, 0);
++	struct vfio_pci_core_device *core_dev = vdev_to_core_dev(vdev);
++	struct nvidia_vgpu_vfio *nvdev = core_dev_to_nvdev(core_dev);
++	int ret = 0;
++
++	if (!nvdev->curr_vgpu_type)
++		return -ENODEV;
++
++	switch (cmd) {
++	case VFIO_DEVICE_GET_REGION_INFO:
++		ret = get_region_info(core_dev, arg);
++		break;
++	case VFIO_DEVICE_GET_PCI_HOT_RESET_INFO:
++	case VFIO_DEVICE_PCI_HOT_RESET:
++	case VFIO_DEVICE_RESET:
++		break;
++
++	default:
++		ret = vfio_pci_core_ioctl(vdev, cmd, arg);
++		break;
++	}
++
++	return ret;
 +}
 +
-+unsigned char config_params[] = {
-+	0x24, 0xef, 0x8f, 0xf7, 0x3e, 0xd5, 0x11, 0xef, 0xae, 0x36, 0x97, 0x58,
-+	0xb1, 0xcb, 0x0c, 0x87, 0x04, 0xc1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x14, 0x00, 0xd0, 0xc1, 0x65, 0x03, 0x00, 0x00, 0xa1, 0x0e, 0x00, 0x00,
-+	0xff, 0xff, 0xff, 0xff, 0x40, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00,
-+	0x02, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00
++static ssize_t nvidia_vgpu_vfio_read(struct vfio_device *vdev,
++				     char __user *buf, size_t count,
++				     loff_t *ppos)
++{
++	struct vfio_pci_core_device *core_dev = vdev_to_core_dev(vdev);
++	struct nvidia_vgpu_vfio *nvdev = core_dev_to_nvdev(core_dev);
++	u64 val;
++	size_t done = 0;
++	int ret = 0, size;
++
++	if (!nvdev->curr_vgpu_type)
++		return -ENODEV;
++
++	while (count) {
++		if (count >= 4 && !(*ppos % 4))
++			size = 4;
++		else if (count >= 2 && !(*ppos % 2))
++			size = 2;
++		else
++			size = 1;
++
++		ret = nvidia_vgpu_vfio_access(nvdev, (char *)&val, size, *ppos, false);
++
++		if (ret <= 0)
++			return ret;
++
++		if (copy_to_user(buf, &val, size) != 0)
++			return -EFAULT;
++
++		*ppos += size;
++		buf += size;
++		count -= size;
++		done += size;
++	}
++
++	return done;
++}
++
++static ssize_t nvidia_vgpu_vfio_write(struct vfio_device *vdev,
++				      const char __user *buf, size_t count,
++				      loff_t *ppos)
++{
++	struct vfio_pci_core_device *core_dev = vdev_to_core_dev(vdev);
++	struct nvidia_vgpu_vfio *nvdev = core_dev_to_nvdev(core_dev);
++	u64 val;
++	size_t done = 0;
++	int ret = 0, size;
++
++	if (!nvdev->curr_vgpu_type)
++		return -ENODEV;
++
++	while (count) {
++		if (count >= 4 && !(*ppos % 4))
++			size = 4;
++		else if (count >= 2 && !(*ppos % 2))
++			size = 2;
++		else
++			size = 1;
++
++		if (copy_from_user(&val, buf, size) != 0)
++			return -EFAULT;
++
++		ret = nvidia_vgpu_vfio_access(nvdev, (char *)&val, size, *ppos, true);
++
++		if (ret <= 0)
++			return ret;
++
++		*ppos += size;
++		buf += size;
++		count -= size;
++		done += size;
++	}
++
++	return done;
++}
++
++static int nvidia_vgpu_vfio_mmap(struct vfio_device *vdev,
++				 struct vm_area_struct *vma)
++{
++	struct vfio_pci_core_device *core_dev = vdev_to_core_dev(vdev);
++	struct nvidia_vgpu_vfio *nvdev = core_dev_to_nvdev(core_dev);
++	struct pci_dev *pdev = core_dev->pdev;
++	u64 phys_len, req_len, pgoff, req_start;
++	unsigned int index;
++
++	if (!nvdev->curr_vgpu_type)
++		return -ENODEV;
++
++	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
++
++	if (index >= VFIO_PCI_BAR5_REGION_INDEX)
++		return -EINVAL;
++	if (vma->vm_end < vma->vm_start)
++		return -EINVAL;
++	if ((vma->vm_flags & VM_SHARED) == 0)
++		return -EINVAL;
++
++	phys_len = PAGE_ALIGN(pci_resource_len(pdev, index));
++	req_len = vma->vm_end - vma->vm_start;
++	pgoff = vma->vm_pgoff &
++		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
++	req_start = pgoff << PAGE_SHIFT;
++
++	if (req_len == 0)
++		return -EINVAL;
++
++	if ((req_start + req_len > phys_len) || (phys_len == 0))
++		return -EINVAL;
++
++	vma->vm_private_data = vdev;
++	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
++	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
++	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
++
++	return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff, req_len, vma->vm_page_prot);
++}
++
++static const struct vfio_device_ops nvidia_vgpu_vfio_ops = {
++	.name           = "nvidia-vgpu-vfio-pci",
++	.init		= vfio_pci_core_init_dev,
++	.release	= vfio_pci_core_release_dev,
++	.open_device    = nvidia_vgpu_vfio_open_device,
++	.close_device   = nvidia_vgpu_vfio_close_device,
++	.ioctl          = nvidia_vgpu_vfio_ioctl,
++	.device_feature = vfio_pci_core_ioctl_feature,
++	.read           = nvidia_vgpu_vfio_read,
++	.write          = nvidia_vgpu_vfio_write,
++	.mmap           = nvidia_vgpu_vfio_mmap,
++	.request	= vfio_pci_core_request,
++	.match		= vfio_pci_core_match,
++	.bind_iommufd	= vfio_iommufd_physical_bind,
++	.unbind_iommufd	= vfio_iommufd_physical_unbind,
++	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
++	.detach_ioas	= vfio_iommufd_physical_detach_ioas,
 +};
 +
-+static int send_config_params_and_init(struct nvidia_vgpu *vgpu)
++static int setup_vgpu_type(struct nvidia_vgpu_vfio *nvdev)
 +{
-+	struct nvidia_vgpu_mgr *vgpu_mgr = vgpu->vgpu_mgr;
-+	NV_VGPU_CPU_RPC_DATA_COPY_CONFIG_PARAMS params = {0};
-+	NVA081_CTRL_VGPU_INFO *info = (NVA081_CTRL_VGPU_INFO *)
-+				      vgpu->vgpu_type;
++	nvdev->curr_vgpu_type = find_vgpu_type(nvdev, 869);
++	if (!nvdev->curr_vgpu_type)
++		return -ENODEV;
++	return 0;
++}
 +
-+	memcpy(&params, config_params, sizeof(config_params));
++static int nvidia_vgpu_vfio_probe(struct pci_dev *pdev,
++				  const struct pci_device_id *id_table)
++{
++	struct nvidia_vgpu_vfio *nvdev;
++	int ret;
 +
-+	params.dbdf = vgpu->info.dbdf;
-+	params.vgpu_device_instance_id =
-+		nvidia_vgpu_mgr_get_gsp_client_handle(vgpu_mgr, &vgpu->gsp_client);
-+	params.vgpu_type = info->vgpuType;
-+	params.vm_pid = 0;
-+	params.swizz_id = 0;
-+	params.num_channels = vgpu->chid.num_chid;
-+	params.num_plugin_channels = vgpu->chid.num_plugin_channels;
++	if (!pdev->is_virtfn)
++		return -EINVAL;
 +
-+	return nvidia_vgpu_rpc_call(vgpu, NV_VGPU_CPU_RPC_MSG_SETUP_CONFIG_PARAMS_AND_INIT,
++	nvdev = vfio_alloc_device(nvidia_vgpu_vfio, core_dev.vdev,
++				  &pdev->dev, &nvidia_vgpu_vfio_ops);
++	if (IS_ERR(nvdev))
++		return PTR_ERR(nvdev);
++
++	ret = attach_vgpu_mgr(nvdev, pdev);
++	if (ret)
++		goto err_attach_vgpu_mgr;
++
++	ret = setup_vgpu_type(nvdev);
++	if (ret)
++		goto err_setup_vgpu_type;
++
++	nvidia_vgpu_vfio_setup_config(nvdev);
++
++	dev_set_drvdata(&pdev->dev, &nvdev->core_dev);
++
++	ret = vfio_pci_core_register_device(&nvdev->core_dev);
++	if (ret)
++		goto err_setup_vgpu_type;
++
++	return 0;
++
++err_setup_vgpu_type:
++	detach_vgpu_mgr(nvdev);
++
++err_attach_vgpu_mgr:
++	vfio_put_device(&nvdev->core_dev.vdev);
++
++	pci_err(pdev, "VF probe failed with ret: %d\n", ret);
++	return ret;
++}
++
++static void nvidia_vgpu_vfio_remove(struct pci_dev *pdev)
++{
++	struct vfio_pci_core_device *core_dev = dev_get_drvdata(&pdev->dev);
++	struct nvidia_vgpu_vfio *nvdev = core_dev_to_nvdev(core_dev);
++
++	vfio_pci_core_unregister_device(core_dev);
++	detach_vgpu_mgr(nvdev);
++	vfio_put_device(&core_dev->vdev);
++}
++
++struct pci_device_id nvidia_vgpu_vfio_table[] = {
++	{
++		.vendor      = PCI_VENDOR_ID_NVIDIA,
++		.device      = PCI_ANY_ID,
++		.subvendor   = PCI_ANY_ID,
++		.subdevice   = PCI_ANY_ID,
++		.class       = (PCI_CLASS_DISPLAY_3D << 8),
++		.class_mask  = ~0,
++	},
++	{ }
++};
++MODULE_DEVICE_TABLE(pci, nvidia_vgpu_vfio_table);
++
++struct pci_driver nvidia_vgpu_vfio_driver = {
++	.name               = "nvidia-vgpu-vfio",
++	.id_table           = nvidia_vgpu_vfio_table,
++	.probe              = nvidia_vgpu_vfio_probe,
++	.remove             = nvidia_vgpu_vfio_remove,
++	.driver_managed_dma = true,
++};
++
++module_pci_driver(nvidia_vgpu_vfio_driver);
++
++MODULE_LICENSE("Dual MIT/GPL");
++MODULE_AUTHOR("Vinay Kabra <vkabra@nvidia.com>");
++MODULE_AUTHOR("Kirti Wankhede <kwankhede@nvidia.com>");
++MODULE_AUTHOR("Zhi Wang <zhiw@nvidia.com>");
++MODULE_DESCRIPTION("NVIDIA vGPU VFIO Variant Driver - User Level driver for NVIDIA vGPU");
+diff --git a/drivers/vfio/pci/nvidia-vgpu/vgpu.c b/drivers/vfio/pci/nvidia-vgpu/vgpu.c
+index 93d27db30a41..003ca116b4a8 100644
+--- a/drivers/vfio/pci/nvidia-vgpu/vgpu.c
++++ b/drivers/vfio/pci/nvidia-vgpu/vgpu.c
+@@ -328,3 +328,25 @@ int nvidia_vgpu_mgr_create_vgpu(struct nvidia_vgpu *vgpu, u8 *vgpu_type)
+ 	return ret;
+ }
+ EXPORT_SYMBOL(nvidia_vgpu_mgr_create_vgpu);
++
++static int update_bme_state(struct nvidia_vgpu *vgpu)
++{
++	NV_VGPU_CPU_RPC_DATA_UPDATE_BME_STATE params = {0};
++
++	params.enable = true;
++
++	return nvidia_vgpu_rpc_call(vgpu, NV_VGPU_CPU_RPC_MSG_UPDATE_BME_STATE,
 +				    &params, sizeof(params));
 +}
 +
 +/**
-+ * nvidia_vgpu_setup_rpc - setup the vGPU host RPC channel and send runtime
-+ * configuration.
-+ * @vgpu: the vGPU instance.
-+ * @vgpu_type: the vGPU type of the vGPU instance.
++ * nvidia_vgpu_enable_bme - handle BME sequence
++ * @vf: the vGPU instance
 + *
 + * Returns: 0 on success, others on failure.
 + */
-+int nvidia_vgpu_setup_rpc(struct nvidia_vgpu *vgpu)
++int nvidia_vgpu_mgr_enable_bme(struct nvidia_vgpu *vgpu)
 +{
-+	struct nvidia_vgpu_rpc *rpc = &vgpu->rpc;
-+	int ret;
-+
-+	mutex_init(&rpc->lock);
-+
-+	init_rpc_buf_pointers(vgpu);
-+	init_ctrl_buf_offsets(vgpu);
-+
-+	ret = wait_vgpu_plugin_task_bootloaded(vgpu);
-+	if (ret) {
-+		nv_vgpu_err(vgpu, "waiting bootload timeout!\n");
-+		return ret;
-+	}
-+
-+	ret = negotiate_rpc_version(vgpu);
-+	if (ret) {
-+		nv_vgpu_err(vgpu, "fail to negotiate rpc version!\n");
-+		return ret;
-+	}
-+
-+	ret = send_config_params_and_init(vgpu);
-+	if (ret) {
-+		nv_vgpu_err(vgpu, "fail to init vgpu plugin task!\n");
-+		return ret;
-+	}
-+
-+	nv_vgpu_dbg(vgpu, "vGPU RPC initialization is done.\n");
-+
-+	return 0;
++	return update_bme_state(vgpu);
 +}
-diff --git a/drivers/vfio/pci/nvidia-vgpu/vgpu.c b/drivers/vfio/pci/nvidia-vgpu/vgpu.c
-index e06d5155bb38..93d27db30a41 100644
---- a/drivers/vfio/pci/nvidia-vgpu/vgpu.c
-+++ b/drivers/vfio/pci/nvidia-vgpu/vgpu.c
-@@ -8,6 +8,9 @@
- #include <nvrm/nvtypes.h>
- #include <nvrm/common/sdk/nvidia/inc/ctrl/ctrla081.h>
- #include <nvrm/common/sdk/nvidia/inc/ctrl/ctrl2080/ctrl2080vgpumgrinternal.h>
-+#include <nvrm/common/sdk/nvidia/inc/ctrl/ctrl0000/ctrl0000system.h>
-+#include <nvrm/common/sdk/vmioplugin/inc/vmioplugin.h>
-+#include <nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h>
- 
- #include "vgpu_mgr.h"
- 
-@@ -240,6 +243,7 @@ int nvidia_vgpu_mgr_destroy_vgpu(struct nvidia_vgpu *vgpu)
- 	if (!atomic_cmpxchg(&vgpu->status, 1, 0))
- 		return -ENODEV;
- 
-+	nvidia_vgpu_clean_rpc(vgpu);
- 	WARN_ON(shutdown_vgpu_plugin_task(vgpu));
- 	WARN_ON(cleanup_vgpu_plugin_task(vgpu));
- 	nvidia_vgpu_mgr_free_gsp_client(vgpu_mgr, &vgpu->gsp_client);
-@@ -299,10 +303,17 @@ int nvidia_vgpu_mgr_create_vgpu(struct nvidia_vgpu *vgpu, u8 *vgpu_type)
- 	if (ret)
- 		goto err_bootload_vgpu_plugin_task;
- 
-+	ret = nvidia_vgpu_setup_rpc(vgpu);
-+	if (ret)
-+		goto err_setup_rpc;
-+
- 	atomic_set(&vgpu->status, 1);
- 
- 	return 0;
- 
-+err_setup_rpc:
-+	shutdown_vgpu_plugin_task(vgpu);
-+	cleanup_vgpu_plugin_task(vgpu);
- err_bootload_vgpu_plugin_task:
- 	nvidia_vgpu_mgr_free_gsp_client(vgpu_mgr, &vgpu->gsp_client);
- err_alloc_gsp_client:
-diff --git a/drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.c b/drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.c
-index dcb314b14f91..e84cf4a845d4 100644
---- a/drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.c
-+++ b/drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.c
-@@ -7,11 +7,35 @@
- 
- DEFINE_MUTEX(vgpu_mgr_attach_lock);
- 
-+static void unmap_pf_mmio(struct nvidia_vgpu_mgr *vgpu_mgr)
-+{
-+	iounmap(vgpu_mgr->bar0_vaddr);
-+}
-+
-+static int map_pf_mmio(struct nvidia_vgpu_mgr *vgpu_mgr)
-+{
-+	struct pci_dev *pdev = vgpu_mgr->pdev;
-+	resource_size_t start, size;
-+	void *vaddr;
-+
-+	start = pci_resource_start(pdev, 0);
-+	size = pci_resource_len(pdev, 0);
-+
-+	vaddr = ioremap(start, size);
-+	if (!vaddr)
-+		return -ENOMEM;
-+
-+	vgpu_mgr->bar0_vaddr = vaddr;
-+
-+	return 0;
-+}
-+
- static void vgpu_mgr_release(struct kref *kref)
- {
- 	struct nvidia_vgpu_mgr *vgpu_mgr =
- 		container_of(kref, struct nvidia_vgpu_mgr, refcount);
- 
-+	unmap_pf_mmio(vgpu_mgr);
- 	nvidia_vgpu_mgr_free_gsp_client(vgpu_mgr, &vgpu_mgr->gsp_client);
- 	nvidia_vgpu_mgr_detach_handle(&vgpu_mgr->handle);
- 	kvfree(vgpu_mgr);
-@@ -83,6 +107,8 @@ struct nvidia_vgpu_mgr *nvidia_vgpu_mgr_get(struct pci_dev *dev)
- 	kref_init(&vgpu_mgr->refcount);
- 	mutex_init(&vgpu_mgr->vgpu_id_lock);
- 
-+	vgpu_mgr->pdev = dev->physfn;
-+
- 	ret = nvidia_vgpu_mgr_alloc_gsp_client(vgpu_mgr,
- 					       &vgpu_mgr->gsp_client);
- 	if (ret)
-@@ -92,9 +118,14 @@ struct nvidia_vgpu_mgr *nvidia_vgpu_mgr_get(struct pci_dev *dev)
- 	if (ret)
- 		goto fail_init_vgpu_types;
- 
-+	ret = map_pf_mmio(vgpu_mgr);
-+	if (ret)
-+		goto fail_map_pf_mmio;
-+
- 	mutex_unlock(&vgpu_mgr_attach_lock);
- 	return vgpu_mgr;
- 
-+fail_map_pf_mmio:
- fail_init_vgpu_types:
- 	nvidia_vgpu_mgr_free_gsp_client(vgpu_mgr, &vgpu_mgr->gsp_client);
- fail_alloc_gsp_client:
++EXPORT_SYMBOL(nvidia_vgpu_mgr_enable_bme);
 diff --git a/drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h b/drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h
-index 6f05b285484c..af922d8e539c 100644
+index af922d8e539c..2c9e0eebcb99 100644
 --- a/drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h
 +++ b/drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h
-@@ -28,6 +28,16 @@ struct nvidia_vgpu_mgmt {
- 	void __iomem *vgpu_task_log_vaddr;
- };
+@@ -84,6 +84,6 @@ int nvidia_vgpu_rpc_call(struct nvidia_vgpu *vgpu, u32 msg_type,
+ void nvidia_vgpu_clean_rpc(struct nvidia_vgpu *vgpu);
+ int nvidia_vgpu_setup_rpc(struct nvidia_vgpu *vgpu);
  
-+struct nvidia_vgpu_rpc {
-+	struct mutex lock;
-+	u32 msg_seq_num;
-+	void __iomem *ctrl_buf;
-+	void __iomem *resp_buf;
-+	void __iomem *msg_buf;
-+	void __iomem *migration_buf;
-+	void __iomem *error_buf;
-+};
-+
- struct nvidia_vgpu {
- 	struct mutex lock;
- 	atomic_t status;
-@@ -41,6 +51,7 @@ struct nvidia_vgpu {
- 	struct nvidia_vgpu_mem *fbmem_heap;
- 	struct nvidia_vgpu_chid chid;
- 	struct nvidia_vgpu_mgmt mgmt;
-+	struct nvidia_vgpu_rpc rpc;
- };
+-int nvidia_vgpu_mgr_reset_vgpu(struct nvidia_vgpu *vgpu);
++int nvidia_vgpu_mgr_enable_bme(struct nvidia_vgpu *vgpu);
  
- struct nvidia_vgpu_mgr {
-@@ -55,6 +66,9 @@ struct nvidia_vgpu_mgr {
- 	u32 num_vgpu_types;
- 
- 	struct nvidia_vgpu_gsp_client gsp_client;
-+
-+	struct pci_dev *pdev;
-+	void __iomem *bar0_vaddr;
- };
- 
- struct nvidia_vgpu_mgr *nvidia_vgpu_mgr_get(struct pci_dev *dev);
-@@ -65,4 +79,11 @@ int nvidia_vgpu_mgr_create_vgpu(struct nvidia_vgpu *vgpu, u8 *vgpu_type);
- 
- int nvidia_vgpu_mgr_init_vgpu_types(struct nvidia_vgpu_mgr *vgpu_mgr);
- 
-+int nvidia_vgpu_rpc_call(struct nvidia_vgpu *vgpu, u32 msg_type,
-+			 void *data, u64 size);
-+void nvidia_vgpu_clean_rpc(struct nvidia_vgpu *vgpu);
-+int nvidia_vgpu_setup_rpc(struct nvidia_vgpu *vgpu);
-+
-+int nvidia_vgpu_mgr_reset_vgpu(struct nvidia_vgpu *vgpu);
-+
  #endif
 -- 
 2.34.1
