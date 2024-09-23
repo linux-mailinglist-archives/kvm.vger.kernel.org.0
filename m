@@ -1,148 +1,102 @@
-Return-Path: <kvm+bounces-27298-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27299-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D7B97E8B2
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 11:30:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24F7897E8D0
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 11:34:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2B12280A52
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 09:30:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D82CE281E18
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 09:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9E4194AF4;
-	Mon, 23 Sep 2024 09:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62D2194A6F;
+	Mon, 23 Sep 2024 09:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fA9rCV/V"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="GuRhMFUE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forwardcorp1b.mail.yandex.net (forwardcorp1b.mail.yandex.net [178.154.239.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89AD194A64
-	for <kvm@vger.kernel.org>; Mon, 23 Sep 2024 09:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D72B49643;
+	Mon, 23 Sep 2024 09:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727083800; cv=none; b=svs+5df/GHsY1J128Xmcdv4aTF3X06coHWSJxH4nWc2bMcPr5svvSmw6HuP7t9TM3clYqU00aCpt1PfZ/SOaXSYjH3wJP7jpZGhQ4JpxBjcjGMfCIEMoxR+jDQKLN+oyygvNhlulT7wuPIuxvkvkvlcF8FiBOQT1Ekq2AB0XO/0=
+	t=1727084032; cv=none; b=ViS55i/Gk5i0yLVXBSINu5XqyUW1tNaTEmyYQXuaGimQk49TrXjQ1jeQqk9B1FxT17hMvbmWn195GE8TmffEJzLh2uuz+f3KHJlBSw93lahYH94QsZ4RMzhTIh55OJ5kfXVWCj1K9Tn8cwKiQQwaLktIH6GSu+wUgrZKi6hrsNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727083800; c=relaxed/simple;
-	bh=JxlWTKfLKfV1N7stRJBPiFZggE9mXH97QTo/q/pDES0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UGCaIKS6A6RkMvPXvG7jj/iSaFX0m2j+NeR8DgP1nZmQKNOjWePPmLJX293clIimSgdaUfu1HR6t9yP74G+YMIuaH0CW799jSokEszfB9gzYjDFllBlm4kj2AVG8+tCgBGdgmRjE5VSGqwaZfKAq09P/J7cedL9/qbTvgAgIjes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fA9rCV/V; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7db1762d70fso3402313a12.2
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2024 02:29:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727083798; x=1727688598; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JxlWTKfLKfV1N7stRJBPiFZggE9mXH97QTo/q/pDES0=;
-        b=fA9rCV/VNMoIic2tJjpRyqBuR6+vmd1ns6HpenQBMUId4OwuzHACAlXY9R/H+P8wjo
-         ZuNYcYVdKcENNPrkTCDmAg/fpYKAcuTyCmEfU3tB5JGmDCC59SXp5tPA8TY29RhvOjkg
-         zJU2wimE0DhAnPOfoE8jZgFkoYRIoMfGo/ufmAoimVqJmr7H9Nqn/DeUY6rPWb2h1OYm
-         rsOLtFwyuM7utymutJi3RCLSmW2IXZUUNoB9P7KCSKEi48uu60cwgSytjwr35lCNJHAR
-         Z0sm33MtFmzLh5yVHfy3sbX9P8eFH0nSG1riQ6VXbqL6/xUCEXDlZLpnqFeYzBNGErud
-         NW5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727083798; x=1727688598;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JxlWTKfLKfV1N7stRJBPiFZggE9mXH97QTo/q/pDES0=;
-        b=T0YY4m9OJ4dTFxfIG24LXxlpTdxOOCASNHIB/VnCnVT4NiQ0TlEU5cy9rAAReh3vgL
-         pABZr9ew9Zj2QdeRQHGGyT5Wn0Pm5KIqm8Pbol/bxb3MWmwmROOZAhefWppcFHX0xckD
-         NpJ70xEQStaJm0r21VtOD3xNgK6dCFHAeF/GJzJBqMTM3YLsDwaG3mOdXr6gHjuVUtKs
-         7hdtDlGmZRf5VaQ9BxXgMT7xUWsfU96u7XxgSyhrEwwYYtK4rm/IAMdYbxt8f3vW6XKe
-         cqV3Osu7laDzHY3CfB0lXCUuPjyup2ooZcC1xFMi7V2ij32LLY7jl7OHX+yISaIIVOY9
-         91fQ==
-X-Gm-Message-State: AOJu0YyT66NGSYWeJTyDF6gNJPyNhhXdLnlIWWcZ0D0z8z/NhkBf0v34
-	RcBjMjI2DN7QaPZZt9iHcItn8s/cZiZZBFFHwLaXFHPGBTvWuzy8E3Ig0gcV78acwGwINhQOWh/
-	Z3w==
-X-Google-Smtp-Source: AGHT+IFSZX5FuNM8tCzpug601r0FUEjufJORJGp2xW2npv3HHNvfqWh9QPhzOBODH4in3nPCT3E6eApyC4U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:2305:b0:7db:2689:f6ee with SMTP id
- 41be03b00d2f7-7e6ae037512mr783a12.7.1727083797611; Mon, 23 Sep 2024 02:29:57
- -0700 (PDT)
-Date: Mon, 23 Sep 2024 02:29:55 -0700
-In-Reply-To: <e5218efaceec20920166bd907416d6f88905558d.camel@redhat.com>
+	s=arc-20240116; t=1727084032; c=relaxed/simple;
+	bh=BoY4e8Jwexn+YHzxLNQ5q98ETWxzZyvkdjZLXb/msPw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KsKBvUVmytGICEOyc++aG4d7BEMMKhA1MG6lcC0oM6XJ67CFGBcis9pVWqWe259vVZCm7uiZ7KorMEd7sWGrcafv4kQtqB8u/1B1i0m+i1eMxUZg9fFMngaFJ1bA8DuQ5kWWwNg1aBXaZlPZ5x4i48skv5hHUZd545lICQG7p+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=GuRhMFUE; arc=none smtp.client-ip=178.154.239.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+Received: from mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net (mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net [IPv6:2a02:6b8:c23:1301:0:640:a2b5:0])
+	by forwardcorp1b.mail.yandex.net (Yandex) with ESMTPS id 2DFA2610E1;
+	Mon, 23 Sep 2024 12:32:18 +0300 (MSK)
+Received: from [IPV6:2a02:6b8:b081:b50b::1:11] (unknown [2a02:6b8:b081:b50b::1:11])
+	by mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id FWOoge0cv4Y0-rqTSyTtC;
+	Mon, 23 Sep 2024 12:32:16 +0300
+Precedence: bulk
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; t=1727083936;
+	bh=pJKGjkrYpQdX8rE7FgMSOSMSRbqBr0OoC7JcmvQ4qp8=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=GuRhMFUEJBilplYRdV/3yietVZle5wWq83f+EcUrG4NJxXz73QpjKQLnddDmvKUcW
+	 JA+V0oSQOhI56ippsX1kVhaU8+rAyINzE2N18GKmc3uyUd3LHSjcWnVM2oRIO/80JP
+	 goA9mCLbapvpZvVy1mr3XdRgE7TKRthUxUgD3RdY=
+Authentication-Results: mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+Message-ID: <0288f7f5-4ae8-4097-b00c-f1b747f80183@yandex-team.ru>
+Date: Mon, 23 Sep 2024 12:32:15 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231002115723.175344-1-mlevitsk@redhat.com> <ZRsYNnYEEaY1gMo5@google.com>
- <1d6044e0d71cd95c477e319d7e47819eee61a8fc.camel@redhat.com> <e5218efaceec20920166bd907416d6f88905558d.camel@redhat.com>
-Message-ID: <ZvE06wB0JGWXGxpK@google.com>
-Subject: Re: [PATCH v3 0/4] Allow AVIC's IPI virtualization to be optional
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
-	Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kvm/debugfs: add file to get vcpu steal time statistics
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, yc-core@yandex-team.ru,
+ linux-kernel@vger.kernel.org
+References: <20240917112028.278005-1-den-plotnikov@yandex-team.ru>
+ <Zu_Pl4QiBsA_yK1g@google.com>
+Content-Language: en-US
+From: Denis Plotnikov <den-plotnikov@yandex-team.ru>
+In-Reply-To: <Zu_Pl4QiBsA_yK1g@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 10, 2024, Maxim Levitsky wrote:
-> On Wed, 2023-10-04 at 16:14 +0300, Maxim Levitsky wrote:
-> > =D0=A3 =D0=BF=D0=BD, 2023-10-02 =D1=83 12:21 -0700, Sean Christopherson=
- =D0=BF=D0=B8=D1=88=D0=B5:
-> > > On Mon, Oct 02, 2023, Maxim Levitsky wrote:
-> > > > Hi!
-> > > >=20
-> > > > This patch allows AVIC's ICR emulation to be optional and thus allo=
-ws
-> > > > to workaround AVIC's errata #1235 by disabling this portion of the =
-feature.
-> > > >=20
-> > > > This is v3 of my patch series 'AVIC bugfixes and workarounds' inclu=
-ding
-> > > > review feedback.
-> > >=20
-> > > Please respond to my idea[*] instead of sending more patches.=20
-> >=20
-> > Hi,
-> >=20
-> > For the v2 of the patch I was already on the fence if to do it this way=
- or to refactor
-> > the code, and back when I posted it, I decided still to avoid the refac=
-toring.
-> >=20
-> > However, your idea of rewriting this patch, while it does change less l=
-ines of code,
-> > is even less obvious and consequently required you to write even longer=
- comment to=20
-> > justify it which is not a good sign.
-> >=20
-> > In particular I don't want someone to find out later, and in the hard w=
-ay that sometimes
-> > real physid table is accessed, and sometimes a fake copy of it is.
-> >=20
-> > So I decided to fix the root cause by not reading the physid table back=
-,
-> > which made the code cleaner, and even with the workaround the code=20
-> > IMHO is still simpler than it was before.
-> >=20
-> > About the added 'vcpu->loaded' variable, I added it also because it is =
-something that is=20
-> > long overdue to be added, I remember that in IPIv code there was also a=
- need for this,=20
-> > and probalby more places in KVM can be refactored to take advantage of =
-it,
-> > instead of various hacks.
-> >=20
-> > I did adopt your idea of using 'enable_ipiv', although I am still not 1=
-00% sure that this
-> > is more readable than 'avic_zen2_workaround'.
->=20
-> Hi!
->=20
-> Sean, can you take another look at this patch series?
 
-Ya, it might take a week or two, but it's on my todo list.
+
+On 9/22/24 11:04, Sean Christopherson wrote:
+> On Tue, Sep 17, 2024, Denis Plotnikov wrote:
+>> It's helpful to know whether some other host activity affects a virtual
+>> machine to estimate virtual machine quality of sevice.
+>> The fact of virtual machine affection from the host side can be obtained
+>> by reading "preemption_reported" counter via kvm entries of sysfs, but
+>> the exact vcpu waiting time isn't reported to the host.
+>> This patch adds this reporting.
+>>
+>> Signed-off-by: Denis Plotnikov <den-plotnikov@yandex-team.ru>
+>> ---
+>>   arch/x86/include/asm/kvm_host.h |  1 +
+>>   arch/x86/kvm/debugfs.c          | 17 +++++++++++++++++
+> 
+> Using debugfs is undesirable, as it's (a) not ABI and (b) not guaranteed to be
+> present as KVM (correctly) ignores debugfs setup errors.
+> 
+> Using debugfs is also unnecessary.  The total steal time is available in guest
+> memory, and by definition that memory is shared with the host.  To query total
+> steal time from userspace, use MSR filtering to trap writes (and reflect writes
+> back into KVM) so that the GPA of the steal time structure is known, and then
+> simply read the actual steal time from guest memory as needed.
+Thanks for the reply!
+Just to clarify, by reading the actual steal time from guest memory do 
+you mean by using some kind of new vcpu ioctl?
+
+
+Best,
+Denis
 
