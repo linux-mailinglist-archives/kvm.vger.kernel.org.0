@@ -1,383 +1,384 @@
-Return-Path: <kvm+bounces-27295-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27296-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737E297E7A5
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 10:36:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3FEA97E7B0
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 10:39:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE8FD1F21DF9
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 08:36:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D3241F21CDE
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 08:39:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8A719409C;
-	Mon, 23 Sep 2024 08:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E7E1885B9;
+	Mon, 23 Sep 2024 08:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XresYnVN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+UEnW4y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2F62F2D;
-	Mon, 23 Sep 2024 08:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D810719343D
+	for <kvm@vger.kernel.org>; Mon, 23 Sep 2024 08:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727080594; cv=none; b=dD5QNhUvtPOHbPNbtPiFnNYg/x8GAr6d/opia0D6tK+C/Fu3lUsOY3V+fz662WxZOn/rgzrsRG4JyaMq8nQFJbmqi5W/e3EoETyxGcKEIu3h8iFxCYyQZUWM8Yrh2T3/aSkU4KAibuprzu7H7MbvWgn8iyAq+NasGe4WznsVZ7M=
+	t=1727080733; cv=none; b=T42sfeDwDVIITQZe0nmvRDO5NoZrXm+A+9sFnleq/j8Juws2JB/WtOjNdvkXnhOntW8NbjaUPOnLNaAi0z/ds8LWNI1H4gYJKPtjxKXDTn0Alz1NXT3AXPVLqGJtU31eHTWD5la59ATEavum7Jb9wbUiudg+YAIjvzh3LBMSv2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727080594; c=relaxed/simple;
-	bh=hj9T9KLMta5F4b5LCjAFk0JQd/VrxCvyqamqiLDVjn4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BgGlVb7aF1z/RUMmqUSVLrAH4HDbIB4KGUAI1a07tWPsWCe1n0fO5xIGsteehuwoMxePxuQTzqERoX7uVlSPSwc32at63/oTlsEWs9e/vJRm5ULNf3o0t4emIXlsPozW8e00+mu51Z0vcB4qEdFCW0cJj38y2uJE9GQ/5RIuKaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XresYnVN; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48MLtR3D028184;
-	Mon, 23 Sep 2024 08:35:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=Z
-	ebgRWJ/R8+CfS0Y5IXDHC2bQ2zqs76xP45fSGYgpho=; b=XresYnVNvfjS8q25n
-	exIowGTcyNfPFLSf3njKFhkmtThO79Rn/l7bbDHY5upOMZ+GXc0ZNJTpfRNx3UhG
-	44r5rosQUrKJQZ1hak5YCIEaeI7KPk0HLlS/sw+TPodoA37waRXazoYyY/xPXCqq
-	AxB8S1T/7i6fdkKUH4BHHpRz+FX7etse1GGweODWy7XZ3yNn8bpysFkmJOAYLooy
-	Wc93e4uRc3SZhEmMVqGL0HO5CGVAnkQgo8ca9EVWcYW7xQlbHCJf0syievl22SaG
-	RbwQiMqlzD3Lpi9rGRz9qxTMBS7sONGm/gXX9+JNJb82jsDxIBwXYRU7WQ7dGJvQ
-	UXnwg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snvathjk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Sep 2024 08:35:11 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48N8ZAoU000989;
-	Mon, 23 Sep 2024 08:35:10 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snvathj9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Sep 2024 08:35:10 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48N7YNhe008712;
-	Mon, 23 Sep 2024 08:35:09 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41t8v0wjv3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Sep 2024 08:35:09 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48N8Z5tI34800204
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Sep 2024 08:35:05 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E8E0220040;
-	Mon, 23 Sep 2024 08:35:04 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 72FBD20043;
-	Mon, 23 Sep 2024 08:35:03 +0000 (GMT)
-Received: from [9.171.48.71] (unknown [9.171.48.71])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 23 Sep 2024 08:35:03 +0000 (GMT)
-Message-ID: <24b8e9b5-32b9-4989-b932-67c20b55377c@linux.ibm.com>
-Date: Mon, 23 Sep 2024 10:35:02 +0200
+	s=arc-20240116; t=1727080733; c=relaxed/simple;
+	bh=bsB59pEZNE+QwQkNsYP2MVJsRJuDVofZ4F2oc7np78Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WCSBbvK8sRYcMly80YIbLTFodTyA8bQTZ/8LUDPSWfd8JSflAv+ZhD8Isn680f0Gt4XV83A8DV4GYy9srzO4jIcFj7LEAR1CSZTgAgP792cY/+6uISF3kqnDinaOMC0AqqDWDHgNjmMstGZDyL0D9isZUgUrrQW8quZvL3uK4+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+UEnW4y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 034B5C4CEC4;
+	Mon, 23 Sep 2024 08:38:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727080733;
+	bh=bsB59pEZNE+QwQkNsYP2MVJsRJuDVofZ4F2oc7np78Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i+UEnW4yL/Uko5LyiPqzEJ8CdbPhR1uALRsVJYy4EoxIR6QjTp/losbSnO505ijiH
+	 3DiWz/C+Avb7yYSWIB2X1ADD5A6f9x1j87kCEFmpOpYGsClxwOFGbSkNXe2/CkUC3M
+	 7fs2RsNCfdm8A81Rx4/GSLX6lK/6DXpWFNe0NE61SaRABtdCTh8xEOPF991SaGB47j
+	 WgBoiyFJtG5xjWNb5PsxartfW9urWm1HgR+FxnqGCTDeRkCGO+ltBJV1EnytVExU6g
+	 ZZ4bbIBvPU3jjLqlyH6cpJHr3EZRzufeIWrLOTWyBUI6eB4OKJUZ3GfUrUcFFCRk/N
+	 x67JXrHLaAd0g==
+Date: Mon, 23 Sep 2024 10:38:47 +0200
+From: Danilo Krummrich <dakr@kernel.org>
+To: Zhi Wang <zhiw@nvidia.com>
+Cc: kvm@vger.kernel.org, nouveau@lists.freedesktop.org,
+	alex.williamson@redhat.com, kevin.tian@intel.com, jgg@nvidia.com,
+	airlied@gmail.com, daniel@ffwll.ch, acurrid@nvidia.com,
+	cjia@nvidia.com, smitra@nvidia.com, ankita@nvidia.com,
+	aniketa@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	zhiwang@kernel.org, bskeggs@nvidia.com
+Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
+Message-ID: <ZvEpF91AtaZ6vGA5@pollux>
+References: <20240922124951.1946072-1-zhiw@nvidia.com>
+ <20240922161121.000060a0.zhiw@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/5] perf: Hoist perf_instruction_pointer() and
- perf_misc_flags()
-To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>, Will Deacon <will@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
-References: <20240920174740.781614-1-coltonlewis@google.com>
- <20240920174740.781614-3-coltonlewis@google.com>
-Content-Language: en-US
-From: Thomas Richter <tmricht@linux.ibm.com>
-Organization: IBM
-In-Reply-To: <20240920174740.781614-3-coltonlewis@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: i312l3CDmy59jmZF1hS3jjvQU0cJGfMh
-X-Proofpoint-GUID: 7QKql6PTDhcYSEWqd73Ox4EIpbAler4w
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-23_05,2024-09-19_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 phishscore=0 clxscore=1011 spamscore=0 mlxscore=0
- adultscore=0 impostorscore=0 bulkscore=0 malwarescore=0 suspectscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409230062
+In-Reply-To: <20240922161121.000060a0.zhiw@nvidia.com>
 
-On 9/20/24 19:47, Colton Lewis wrote:
-> For clarity, rename the arch-specific definitions of these functions
-> to perf_arch_* to denote they are arch-specifc. Define the
-> generic-named functions in one place where they can call the
-> arch-specific ones as needed.
+On Sun, Sep 22, 2024 at 04:11:21PM +0300, Zhi Wang wrote:
+> On Sun, 22 Sep 2024 05:49:22 -0700
+> Zhi Wang <zhiw@nvidia.com> wrote:
 > 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  arch/arm64/include/asm/perf_event.h          |  6 +++---
->  arch/arm64/kernel/perf_callchain.c           |  4 ++--
->  arch/powerpc/include/asm/perf_event_server.h |  6 +++---
->  arch/powerpc/perf/core-book3s.c              |  4 ++--
->  arch/s390/include/asm/perf_event.h           |  6 +++---
->  arch/s390/kernel/perf_event.c                |  4 ++--
->  arch/x86/events/core.c                       |  4 ++--
->  arch/x86/include/asm/perf_event.h            | 10 +++++-----
->  include/linux/perf_event.h                   |  9 ++++++---
->  kernel/events/core.c                         | 10 ++++++++++
->  10 files changed, 38 insertions(+), 25 deletions(-)
+> +Ben.
 > 
-> diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-> index eb7071c9eb34..31a5584ed423 100644
-> --- a/arch/arm64/include/asm/perf_event.h
-> +++ b/arch/arm64/include/asm/perf_event.h
-> @@ -11,9 +11,9 @@
->  
->  #ifdef CONFIG_PERF_EVENTS
->  struct pt_regs;
-> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
-> -#define perf_misc_flags(regs)	perf_misc_flags(regs)
-> +extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
-> +extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
-> +#define perf_arch_misc_flags(regs)	perf_misc_flags(regs)
->  #define perf_arch_bpf_user_pt_regs(regs) &regs->user_regs
->  #endif
->  
-> diff --git a/arch/arm64/kernel/perf_callchain.c b/arch/arm64/kernel/perf_callchain.c
-> index e8ed5673f481..01a9d08fc009 100644
-> --- a/arch/arm64/kernel/perf_callchain.c
-> +++ b/arch/arm64/kernel/perf_callchain.c
-> @@ -39,7 +39,7 @@ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
->  	arch_stack_walk(callchain_trace, entry, current, regs);
->  }
->  
-> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
-> +unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
->  {
->  	if (perf_guest_state())
->  		return perf_guest_get_ip();
-> @@ -47,7 +47,7 @@ unsigned long perf_instruction_pointer(struct pt_regs *regs)
->  	return instruction_pointer(regs);
->  }
->  
-> -unsigned long perf_misc_flags(struct pt_regs *regs)
-> +unsigned long perf_arch_misc_flags(struct pt_regs *regs)
->  {
->  	unsigned int guest_state = perf_guest_state();
->  	int misc = 0;
-> diff --git a/arch/powerpc/include/asm/perf_event_server.h b/arch/powerpc/include/asm/perf_event_server.h
-> index 5995614e9062..af0f46e2373b 100644
-> --- a/arch/powerpc/include/asm/perf_event_server.h
-> +++ b/arch/powerpc/include/asm/perf_event_server.h
-> @@ -102,8 +102,8 @@ struct power_pmu {
->  int __init register_power_pmu(struct power_pmu *pmu);
->  
->  struct pt_regs;
-> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
-> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-> +extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
-> +extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
->  extern unsigned long int read_bhrb(int n);
->  
->  /*
-> @@ -111,7 +111,7 @@ extern unsigned long int read_bhrb(int n);
->   * if we have hardware PMU support.
->   */
->  #ifdef CONFIG_PPC_PERF_CTRS
-> -#define perf_misc_flags(regs)	perf_misc_flags(regs)
-> +#define perf_arch_misc_flags(regs)	perf_arch_misc_flags(regs)
->  #endif
->  
->  /*
-> diff --git a/arch/powerpc/perf/core-book3s.c b/arch/powerpc/perf/core-book3s.c
-> index 42867469752d..dc01aa604cc1 100644
-> --- a/arch/powerpc/perf/core-book3s.c
-> +++ b/arch/powerpc/perf/core-book3s.c
-> @@ -2332,7 +2332,7 @@ static void record_and_restart(struct perf_event *event, unsigned long val,
->   * Called from generic code to get the misc flags (i.e. processor mode)
->   * for an event_id.
->   */
-> -unsigned long perf_misc_flags(struct pt_regs *regs)
-> +unsigned long perf_arch_misc_flags(struct pt_regs *regs)
->  {
->  	u32 flags = perf_get_misc_flags(regs);
->  
-> @@ -2346,7 +2346,7 @@ unsigned long perf_misc_flags(struct pt_regs *regs)
->   * Called from generic code to get the instruction pointer
->   * for an event_id.
->   */
-> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
-> +unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
->  {
->  	unsigned long siar = mfspr(SPRN_SIAR);
->  
-> diff --git a/arch/s390/include/asm/perf_event.h b/arch/s390/include/asm/perf_event.h
-> index 9917e2717b2b..f6c7b611a212 100644
-> --- a/arch/s390/include/asm/perf_event.h
-> +++ b/arch/s390/include/asm/perf_event.h
-> @@ -37,9 +37,9 @@ extern ssize_t cpumf_events_sysfs_show(struct device *dev,
->  
->  /* Perf callbacks */
->  struct pt_regs;
-> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
-> -#define perf_misc_flags(regs) perf_misc_flags(regs)
-> +extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
-> +extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
-> +#define perf_arch_misc_flags(regs) perf_arch_misc_flags(regs)
->  #define perf_arch_bpf_user_pt_regs(regs) &regs->user_regs
->  
->  /* Perf pt_regs extension for sample-data-entry indicators */
-> diff --git a/arch/s390/kernel/perf_event.c b/arch/s390/kernel/perf_event.c
-> index 5fff629b1a89..f9000ab49f4a 100644
-> --- a/arch/s390/kernel/perf_event.c
-> +++ b/arch/s390/kernel/perf_event.c
-> @@ -57,7 +57,7 @@ static unsigned long instruction_pointer_guest(struct pt_regs *regs)
->  	return sie_block(regs)->gpsw.addr;
->  }
->  
-> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
-> +unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
->  {
->  	return is_in_guest(regs) ? instruction_pointer_guest(regs)
->  				 : instruction_pointer(regs);
-> @@ -84,7 +84,7 @@ static unsigned long perf_misc_flags_sf(struct pt_regs *regs)
->  	return flags;
->  }
->  
-> -unsigned long perf_misc_flags(struct pt_regs *regs)
-> +unsigned long perf_arch_misc_flags(struct pt_regs *regs)
->  {
->  	/* Check if the cpum_sf PMU has created the pt_regs structure.
->  	 * In this case, perf misc flags can be easily extracted.  Otherwise,
-> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> index be01823b1bb4..760ad067527c 100644
-> --- a/arch/x86/events/core.c
-> +++ b/arch/x86/events/core.c
-> @@ -2940,7 +2940,7 @@ static unsigned long code_segment_base(struct pt_regs *regs)
->  	return 0;
->  }
->  
-> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
-> +unsigned long perf_arch_instruction_pointer(struct pt_regs *regs)
->  {
->  	if (perf_guest_state())
->  		return perf_guest_get_ip();
-> @@ -2948,7 +2948,7 @@ unsigned long perf_instruction_pointer(struct pt_regs *regs)
->  	return regs->ip + code_segment_base(regs);
->  }
->  
-> -unsigned long perf_misc_flags(struct pt_regs *regs)
-> +unsigned long perf_arch_misc_flags(struct pt_regs *regs)
->  {
->  	unsigned int guest_state = perf_guest_state();
->  	int misc = 0;
-> diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-> index 91b73571412f..feb87bf3d2e9 100644
-> --- a/arch/x86/include/asm/perf_event.h
-> +++ b/arch/x86/include/asm/perf_event.h
-> @@ -536,15 +536,15 @@ struct x86_perf_regs {
->  	u64		*xmm_regs;
->  };
->  
-> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
-> -#define perf_misc_flags(regs)	perf_misc_flags(regs)
-> +extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
-> +extern unsigned long perf_arch_misc_flags(struct pt_regs *regs);
-> +#define perf_arch_misc_flags(regs)	perf_arch_misc_flags(regs)
->  
->  #include <asm/stacktrace.h>
->  
->  /*
-> - * We abuse bit 3 from flags to pass exact information, see perf_misc_flags
-> - * and the comment with PERF_EFLAGS_EXACT.
-> + * We abuse bit 3 from flags to pass exact information, see
-> + * perf_arch_misc_flags() and the comment with PERF_EFLAGS_EXACT.
->   */
->  #define perf_arch_fetch_caller_regs(regs, __ip)		{	\
->  	(regs)->ip = (__ip);					\
-> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-> index 1a8942277dda..d061e327ad54 100644
-> --- a/include/linux/perf_event.h
-> +++ b/include/linux/perf_event.h
-> @@ -1633,10 +1633,13 @@ extern void perf_tp_event(u16 event_type, u64 count, void *record,
->  			  struct task_struct *task);
->  extern void perf_bp_event(struct perf_event *event, void *data);
->  
-> -#ifndef perf_misc_flags
-> -# define perf_misc_flags(regs) \
-> +extern unsigned long perf_misc_flags(struct pt_regs *regs);
-> +extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-> +
-> +#ifndef perf_arch_misc_flags
-> +# define perf_arch_misc_flags(regs) \
->  		(user_mode(regs) ? PERF_RECORD_MISC_USER : PERF_RECORD_MISC_KERNEL)
-> -# define perf_instruction_pointer(regs)	instruction_pointer(regs)
-> +# define perf_arch_instruction_pointer(regs)	instruction_pointer(regs)
->  #endif
->  #ifndef perf_arch_bpf_user_pt_regs
->  # define perf_arch_bpf_user_pt_regs(regs) regs
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index 8a6c6bbcd658..eeabbf791a8c 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -6921,6 +6921,16 @@ void perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
->  EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
->  #endif
->  
-> +unsigned long perf_misc_flags(struct pt_regs *regs)
-> +{
-> +	return perf_arch_misc_flags(regs);
-> +}
-> +
-> +unsigned long perf_instruction_pointer(struct pt_regs *regs)
-> +{
-> +	return perf_arch_instruction_pointer(regs);
-> +}
-> +
->  static void
->  perf_output_sample_regs(struct perf_output_handle *handle,
->  			struct pt_regs *regs, u64 mask)
+> Forget to add you. My bad. 
 
-For the s390 changes:
-Acked-by: Thomas Richter <tmricht@linux.ibm.com>
--- 
-Thomas Richter, Dept 3303, IBM s390 Linux Development, Boeblingen, Germany
---
-IBM Deutschland Research & Development GmbH
+Please also add the driver maintainers!
 
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
+I had to fetch the patchset from the KVM list, since they did not hit the
+nouveau list (I'm trying to get @nvidia.com addresses whitelisted).
 
-Geschäftsführung: David Faller
+- Danilo
 
-Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
-
+>  
+> 
+> > 1. Background
+> > =============
+> > 
+> > NVIDIA vGPU[1] software enables powerful GPU performance for workloads
+> > ranging from graphics-rich virtual workstations to data science and
+> > AI, enabling IT to leverage the management and security benefits of
+> > virtualization as well as the performance of NVIDIA GPUs required for
+> > modern workloads. Installed on a physical GPU in a cloud or enterprise
+> > data center server, NVIDIA vGPU software creates virtual GPUs that can
+> > be shared across multiple virtual machines.
+> > 
+> > The vGPU architecture[2] can be illustrated as follow:
+> > 
+> >  +--------------------+    +--------------------+
+> > +--------------------+ +--------------------+ | Hypervisor         |
+> >   | Guest VM           | | Guest VM           | | Guest VM
+> > | |                    |    | +----------------+ | |
+> > +----------------+ | | +----------------+ | | +----------------+ |
+> > | |Applications... | | | |Applications... | | | |Applications... | |
+> > | |  NVIDIA        | |    | +----------------+ | | +----------------+
+> > | | +----------------+ | | |  Virtual GPU   | |    |
+> > +----------------+ | | +----------------+ | | +----------------+ | |
+> > |  Manager       | |    | |  Guest Driver  | | | |  Guest Driver  | |
+> > | |  Guest Driver  | | | +------^---------+ |    | +----------------+
+> > | | +----------------+ | | +----------------+ | |        |
+> > |    +---------^----------+ +----------^---------+
+> > +----------^---------+ |        |           |              |
+> >              |                      | |        |
+> > +--------------+-----------------------+----------------------+---------+
+> > |        |                          |                       |
+> >              |         | |        |                          |
+> >                |                      |         |
+> > +--------+--------------------------+-----------------------+----------------------+---------+
+> > +---------v--------------------------+-----------------------+----------------------+----------+
+> > | NVIDIA                  +----------v---------+
+> > +-----------v--------+ +-----------v--------+ | | Physical GPU
+> >     |   Virtual GPU      | |   Virtual GPU      | |   Virtual GPU
+> >  | | |                         +--------------------+
+> > +--------------------+ +--------------------+ |
+> > +----------------------------------------------------------------------------------------------+
+> > 
+> > Each NVIDIA vGPU is analogous to a conventional GPU, having a fixed
+> > amount of GPU framebuffer, and one or more virtual display outputs or
+> > "heads". The vGPU’s framebuffer is allocated out of the physical
+> > GPU’s framebuffer at the time the vGPU is created, and the vGPU
+> > retains exclusive use of that framebuffer until it is destroyed.
+> > 
+> > The number of physical GPUs that a board has depends on the board.
+> > Each physical GPU can support several different types of virtual GPU
+> > (vGPU). vGPU types have a fixed amount of frame buffer, number of
+> > supported display heads, and maximum resolutions. They are grouped
+> > into different series according to the different classes of workload
+> > for which they are optimized. Each series is identified by the last
+> > letter of the vGPU type name.
+> > 
+> > NVIDIA vGPU supports Windows and Linux guest VM operating systems. The
+> > supported vGPU types depend on the guest VM OS.
+> > 
+> > 2. Proposal for upstream
+> > ========================
+> > 
+> > 2.1 Architecture
+> > ----------------
+> > 
+> > Moving to the upstream, the proposed architecture can be illustrated
+> > as followings:
+> > 
+> >                             +--------------------+
+> > +--------------------+ +--------------------+ | Linux VM           |
+> > | Windows VM         | | Guest VM           | | +----------------+ |
+> > | +----------------+ | | +----------------+ | | |Applications... | |
+> > | |Applications... | | | |Applications... | | | +----------------+ |
+> > | +----------------+ | | +----------------+ | ... |
+> > +----------------+ | | +----------------+ | | +----------------+ | |
+> > |  Guest Driver  | | | |  Guest Driver  | | | |  Guest Driver  | | |
+> > +----------------+ | | +----------------+ | | +----------------+ |
+> > +---------^----------+ +----------^---------+ +----------^---------+
+> > |                       |                      |
+> > +--------------------------------------------------------------------+
+> > |+--------------------+ +--------------------+
+> > +--------------------+| ||       QEMU         | |       QEMU
+> > | |       QEMU         || ||                    | |
+> >  | |                    || |+--------------------+
+> > +--------------------+ +--------------------+|
+> > +--------------------------------------------------------------------+
+> > |                       |                      |
+> > +-----------------------------------------------------------------------------------------------+
+> > |
+> > +----------------------------------------------------------------+  |
+> > |                           |                                VFIO
+> >                        |  | |                           |
+> >                                                    |  | |
+> > +-----------------------+ | +------------------------+
+> > +---------------------------------+|  | | |  Core Driver vGPU     | |
+> > |                        |  |                                 ||  | |
+> > |       Support        <--->|                       <---->
+> >                     ||  | | +-----------------------+ | | NVIDIA vGPU
+> > Manager    |  | NVIDIA vGPU VFIO Variant Driver ||  | | |    NVIDIA
+> > GPU Core    | | |                        |  |
+> >         ||  | | |        Driver         | |
+> > +------------------------+  +---------------------------------+|  | |
+> > +--------^--------------+
+> > +----------------------------------------------------------------+  |
+> > |          |                          |                       |
+> >                |          |
+> > +-----------------------------------------------------------------------------------------------+
+> > |                          |                       |
+> >     |
+> > +----------|--------------------------|-----------------------|----------------------|----------+
+> > |          v               +----------v---------+
+> > +-----------v--------+ +-----------v--------+ | |  NVIDIA
+> >      |       PCI VF       | |       PCI VF       | |       PCI VF
+> >   | | |  Physical GPU            |                    | |
+> >        | |                    | | |                          |
+> > (Virtual GPU)    | |   (Virtual GPU)    | |    (Virtual GPU)   | | |
+> >                         +--------------------+ +--------------------+
+> > +--------------------+ |
+> > +-----------------------------------------------------------------------------------------------+
+> > 
+> > The supported GPU generations will be Ada which come with the
+> > supported GPU architecture. Each vGPU is backed by a PCI virtual
+> > function.
+> > 
+> > The NVIDIA vGPU VFIO module together with VFIO sits on VFs, provides
+> > extended management and features, e.g. selecting the vGPU types,
+> > support live migration and driver warm update.
+> > 
+> > Like other devices that VFIO supports, VFIO provides the standard
+> > userspace APIs for device lifecycle management and advance feature
+> > support.
+> > 
+> > The NVIDIA vGPU manager provides necessary support to the NVIDIA vGPU
+> > VFIO variant driver to create/destroy vGPUs, query available vGPU
+> > types, select the vGPU type, etc.
+> > 
+> > On the other side, NVIDIA vGPU manager talks to the NVIDIA GPU core
+> > driver, which provide necessary support to reach the HW functions.
+> > 
+> > 2.2 Requirements to the NVIDIA GPU core driver
+> > ----------------------------------------------
+> > 
+> > The primary use case of CSP and enterprise is a standalone minimal
+> > drivers of vGPU manager and other necessary components.
+> > 
+> > NVIDIA vGPU manager talks to the NVIDIA GPU core driver, which provide
+> > necessary support to:
+> > 
+> > - Load the GSP firmware, boot the GSP, provide commnication channel.
+> > - Manage the shared/partitioned HW resources. E.g. reserving FB
+> > memory, channels for the vGPU mananger to create vGPUs.
+> > - Exception handling. E.g. delivering the GSP events to vGPU manager.
+> > - Host event dispatch. E.g. suspend/resume.
+> > - Enumerations of HW configuration.
+> > 
+> > The NVIDIA GPU core driver, which sits on the PCI device interface of
+> > NVIDIA GPU, provides support to both DRM driver and the vGPU manager.
+> > 
+> > In this RFC, the split nouveau GPU driver[3] is used as an example to
+> > demostrate the requirements of vGPU manager to the core driver. The
+> > nouveau driver is split into nouveau (the DRM driver) and nvkm (the
+> > core driver).
+> > 
+> > 3 Try the RFC patches
+> > -----------------------
+> > 
+> > The RFC supports to create one VM to test the simple GPU workload.
+> > 
+> > - Host kernel:
+> > https://github.com/zhiwang-nvidia/linux/tree/zhi/vgpu-mgr-rfc
+> > - Guest driver package: NVIDIA-Linux-x86_64-535.154.05.run [4]
+> > 
+> >   Install guest driver:
+> >   # export GRID_BUILD=1
+> >   # ./NVIDIA-Linux-x86_64-535.154.05.run
+> > 
+> > - Tested platforms: L40.
+> > - Tested guest OS: Ubutnu 24.04 LTS.
+> > - Supported experience: Linux rich desktop experience with simple 3D
+> >   workload, e.g. glmark2
+> > 
+> > 4 Demo
+> > ------
+> > 
+> > A demo video can be found at: https://youtu.be/YwgIvvk-V94
+> > 
+> > [1] https://www.nvidia.com/en-us/data-center/virtual-solutions/
+> > [2]
+> > https://docs.nvidia.com/vgpu/17.0/grid-vgpu-user-guide/index.html#architecture-grid-vgpu
+> > [3]
+> > https://lore.kernel.org/dri-devel/20240613170211.88779-1-bskeggs@nvidia.com/T/
+> > [4]
+> > https://us.download.nvidia.com/XFree86/Linux-x86_64/535.154.05/NVIDIA-Linux-x86_64-535.154.05.run
+> > 
+> > Zhi Wang (29):
+> >   nvkm/vgpu: introduce NVIDIA vGPU support prelude
+> >   nvkm/vgpu: attach to nvkm as a nvkm client
+> >   nvkm/vgpu: reserve a larger GSP heap when NVIDIA vGPU is enabled
+> >   nvkm/vgpu: set the VF partition count when NVIDIA vGPU is enabled
+> >   nvkm/vgpu: populate GSP_VF_INFO when NVIDIA vGPU is enabled
+> >   nvkm/vgpu: set RMSetSriovMode when NVIDIA vGPU is enabled
+> >   nvkm/gsp: add a notify handler for GSP event
+> >     GPUACCT_PERFMON_UTIL_SAMPLES
+> >   nvkm/vgpu: get the size VMMU segment from GSP firmware
+> >   nvkm/vgpu: introduce the reserved channel allocator
+> >   nvkm/vgpu: introduce interfaces for NVIDIA vGPU VFIO module
+> >   nvkm/vgpu: introduce GSP RM client alloc and free for vGPU
+> >   nvkm/vgpu: introduce GSP RM control interface for vGPU
+> >   nvkm: move chid.h to nvkm/engine.
+> >   nvkm/vgpu: introduce channel allocation for vGPU
+> >   nvkm/vgpu: introduce FB memory allocation for vGPU
+> >   nvkm/vgpu: introduce BAR1 map routines for vGPUs
+> >   nvkm/vgpu: introduce engine bitmap for vGPU
+> >   nvkm/vgpu: introduce pci_driver.sriov_configure() in nvkm
+> >   vfio/vgpu_mgr: introdcue vGPU lifecycle management prelude
+> >   vfio/vgpu_mgr: allocate GSP RM client for NVIDIA vGPU manager
+> >   vfio/vgpu_mgr: introduce vGPU type uploading
+> >   vfio/vgpu_mgr: allocate vGPU FB memory when creating vGPUs
+> >   vfio/vgpu_mgr: allocate vGPU channels when creating vGPUs
+> >   vfio/vgpu_mgr: allocate mgmt heap when creating vGPUs
+> >   vfio/vgpu_mgr: map mgmt heap when creating a vGPU
+> >   vfio/vgpu_mgr: allocate GSP RM client when creating vGPUs
+> >   vfio/vgpu_mgr: bootload the new vGPU
+> >   vfio/vgpu_mgr: introduce vGPU host RPC channel
+> >   vfio/vgpu_mgr: introduce NVIDIA vGPU VFIO variant driver
+> > 
+> >  .../drm/nouveau/include/nvkm/core/device.h    |   3 +
+> >  .../drm/nouveau/include/nvkm/engine/chid.h    |  29 +
+> >  .../gpu/drm/nouveau/include/nvkm/subdev/gsp.h |   1 +
+> >  .../nouveau/include/nvkm/vgpu_mgr/vgpu_mgr.h  |  45 ++
+> >  .../nvidia/inc/ctrl/ctrl2080/ctrl2080gpu.h    |  12 +
+> >  drivers/gpu/drm/nouveau/nvkm/Kbuild           |   1 +
+> >  drivers/gpu/drm/nouveau/nvkm/device/pci.c     |  33 +-
+> >  .../gpu/drm/nouveau/nvkm/engine/fifo/chid.c   |  49 +-
+> >  .../gpu/drm/nouveau/nvkm/engine/fifo/chid.h   |  26 +-
+> >  .../gpu/drm/nouveau/nvkm/engine/fifo/r535.c   |   3 +
+> >  .../gpu/drm/nouveau/nvkm/subdev/gsp/r535.c    |  14 +-
+> >  drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/Kbuild  |   3 +
+> >  drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/vfio.c  | 302 +++++++++++
+> >  .../gpu/drm/nouveau/nvkm/vgpu_mgr/vgpu_mgr.c  | 234 ++++++++
+> >  drivers/vfio/pci/Kconfig                      |   2 +
+> >  drivers/vfio/pci/Makefile                     |   2 +
+> >  drivers/vfio/pci/nvidia-vgpu/Kconfig          |  13 +
+> >  drivers/vfio/pci/nvidia-vgpu/Makefile         |   8 +
+> >  drivers/vfio/pci/nvidia-vgpu/debug.h          |  18 +
+> >  .../nvidia/inc/ctrl/ctrl0000/ctrl0000system.h |  30 +
+> >  .../nvidia/inc/ctrl/ctrl2080/ctrl2080gpu.h    |  33 ++
+> >  .../ctrl/ctrl2080/ctrl2080vgpumgrinternal.h   | 152 ++++++
+> >  .../common/sdk/nvidia/inc/ctrl/ctrla081.h     | 109 ++++
+> >  .../nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h | 213 ++++++++
+> >  .../common/sdk/nvidia/inc/nv_vgpu_types.h     |  51 ++
+> >  .../common/sdk/vmioplugin/inc/vmioplugin.h    |  26 +
+> >  .../pci/nvidia-vgpu/include/nvrm/nvtypes.h    |  24 +
+> >  drivers/vfio/pci/nvidia-vgpu/nvkm.h           |  94 ++++
+> >  drivers/vfio/pci/nvidia-vgpu/rpc.c            | 242 +++++++++
+> >  drivers/vfio/pci/nvidia-vgpu/vfio.h           |  43 ++
+> >  drivers/vfio/pci/nvidia-vgpu/vfio_access.c    | 297 ++++++++++
+> >  drivers/vfio/pci/nvidia-vgpu/vfio_main.c      | 511
+> > ++++++++++++++++++ drivers/vfio/pci/nvidia-vgpu/vgpu.c           |
+> > 352 ++++++++++++ drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.c       | 144
+> > +++++ drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h       |  89 +++
+> >  drivers/vfio/pci/nvidia-vgpu/vgpu_types.c     | 466 ++++++++++++++++
+> >  include/drm/nvkm_vgpu_mgr_vfio.h              |  61 +++
+> >  37 files changed, 3702 insertions(+), 33 deletions(-)
+> >  create mode 100644 drivers/gpu/drm/nouveau/include/nvkm/engine/chid.h
+> >  create mode 100644
+> > drivers/gpu/drm/nouveau/include/nvkm/vgpu_mgr/vgpu_mgr.h create mode
+> > 100644 drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/Kbuild create mode
+> > 100644 drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/vfio.c create mode
+> > 100644 drivers/gpu/drm/nouveau/nvkm/vgpu_mgr/vgpu_mgr.c create mode
+> > 100644 drivers/vfio/pci/nvidia-vgpu/Kconfig create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/Makefile create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/debug.h create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl0000/ctrl0000system.h
+> > create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl2080/ctrl2080gpu.h
+> > create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrl2080/ctrl2080vgpumgrinternal.h
+> > create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/ctrl/ctrla081.h
+> > create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/dev_vgpu_gsp.h
+> > create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/nvidia/inc/nv_vgpu_types.h
+> > create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/include/nvrm/common/sdk/vmioplugin/inc/vmioplugin.h
+> > create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/include/nvrm/nvtypes.h create mode
+> > 100644 drivers/vfio/pci/nvidia-vgpu/nvkm.h create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/rpc.c create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/vfio.h create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/vfio_access.c create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/vfio_main.c create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/vgpu.c create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.c create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/vgpu_mgr.h create mode 100644
+> > drivers/vfio/pci/nvidia-vgpu/vgpu_types.c create mode 100644
+> > include/drm/nvkm_vgpu_mgr_vfio.h
+> > 
+> 
 
