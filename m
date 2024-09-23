@@ -1,158 +1,303 @@
-Return-Path: <kvm+bounces-27318-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27319-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EABC097F0C2
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 20:37:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 953F497F0D9
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 20:50:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1E47282A97
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 18:37:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03C07B21AFC
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2024 18:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C57C1A0720;
-	Mon, 23 Sep 2024 18:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A359C19F105;
+	Mon, 23 Sep 2024 18:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y92TOGnf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RGuWv/Xo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A2D823C8
-	for <kvm@vger.kernel.org>; Mon, 23 Sep 2024 18:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74771FA5
+	for <kvm@vger.kernel.org>; Mon, 23 Sep 2024 18:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727116641; cv=none; b=ZImFQXr33ljG25zIU1J0uzkfpasF2pZGyZg6GkaAHvK7QTs9R4sWxZjoeZRZUqGwAjQNrvdUSOmNu+2IKyxnoxusL+h11fq+8VwzCPnrHL7ZoqCP8eUrD5E6NZ1mGPVDsqncBsBS7MJY/lv8DU1ZZY1ZYcqX+Z2xw4Ci0cDMGS4=
+	t=1727117398; cv=none; b=CYkCpha9pt+Hei16BvrQd2zzJvweeNPy6TxyontfDa3/RQe7PctRPqDifK+70j4IUIbJvdsmJjnfFThKinxysEZD+OckOG6xZfJP+fRISh8qiuBaojpJlSG1QucZFczrDyuKtzmvOw4CwaE/Ru3pPYk3hO4o434GNq+eTVSEh4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727116641; c=relaxed/simple;
-	bh=rCYtrihX4ihGeNjXGzRivL2dCDo5huMpPoj7e/TVaqs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VBkrdTbLyN0qDl5h/VeF2VhHbZQnS4X79X6Sppu7YOqHKlQxnpieYA752aNJOHqWxIr75imxrvgiqSjhuWbaDMbhT4oy8wZcj7vUbcp32nxQh1Ojkbv2C6Z/L4mYcU/w4Fw+hS6daqVW0zUbNPsu8IRbA81LIPKK/QilGDUCfL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y92TOGnf; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1727117398; c=relaxed/simple;
+	bh=ZO9LXh5KHP0cU+65/5H2kZZJ/pKnjgCyTCgzqNWyjg4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mc0KRDT1CTmEU/Jl/w4qMgEEQ6Y3DjAfuJkW8/3fzCltVm8QDLpVpw9KYYD6pAx3JupA57BfqPUvOqwPZc/c+j2QufveGvDNZGFnlPv2SAbgLmN2UGZzBMF2GA++eZDu8r7puMgPhdsTBZ91vGYrBW/uKM2UJqoIhOFQ2Mvp5QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RGuWv/Xo; arc=none smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-206f405f453so48404245ad.1
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2024 11:37:20 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-53655b9bbcdso5458137e87.2
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2024 11:49:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727116640; x=1727721440; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/S8Wwfazfe8XPn2DgDvOZQ7LYfAriiSs2+Z1ElWXsz0=;
-        b=Y92TOGnf9V5qbP2QxmwmRCb6EtI4LbmHOtPQ8xtz8NgqHpcVGujbhS0Kxf8bnD2L2E
-         kKUX3UJO1UyLGMsGXcxyfvpMVPwY6wQvDiReA14Q6fkfW9/jcu7oHjl+Dqq4iLMacusw
-         aVMaGoJDgcwVSvIdEqLnqWN9dfgLnfDVCo6MyoC8jTd1fGh4twXc7/I1wqrKqeE/rI2R
-         3p+T/yz3OaVSLHkzm9Gzs4GpoUJHfrp5jmMEoiPIsRytfsy/c7qkTZuzuBLel6PW/1Fk
-         O+l+qvNRtQIx3CNxpw38nVBK+OsOQ++DeEGxpDy4q2g2dqA7HbGMY7g8EDuIRdLiFTEv
-         GWJQ==
+        d=google.com; s=20230601; t=1727117395; x=1727722195; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VHEixKYgmrEI0xyHRhfjGRDQ/LAZ1TpNCXaxcaw46+w=;
+        b=RGuWv/XoSwNe/CFlHhbSxTajCyxth7FcHtU428loFnThHtFpL6yiBvxE1pZpNdZwzP
+         L3nAAy7C+f63/Ko/WvOgqeH1qABZLSNAdShnMyKs4Ju2Lr+PL5RZnBfCFgfYt+v/0KLI
+         AytGQEPGkPtEMFlb+Bpb+3FCWpaFGq7sra6wGTc/SDqCJzz+OJQ87Gdq/BJJ19xUYYfd
+         HdaWx8o3v6VHwNmhsxEgl9flMz0zi9BmecKwaeuBIjVuEdWGT3JhvQUtqF4kEfFb1oJz
+         pPED/bIx261C6sFmZT1PGEuYgTEHsVdq+oAkkH6jVEGJE54ZFpRi0+2JPoE8g28gSb4Z
+         wsQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727116640; x=1727721440;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/S8Wwfazfe8XPn2DgDvOZQ7LYfAriiSs2+Z1ElWXsz0=;
-        b=B8UQd2po7joSyFOmZW3o0IXl8yJsSeTROTt5ctKuRmTcmMa0fYbBF7XrkdpCX0/yq1
-         SzceabNbiYS7Ci3RCkT8+W3CYQZe338m8eVyTdrpfqcfcMEiji3HkbqE74d4aH0DhwXC
-         nwCFY72Bwdcw3bFWLBO7M1drjtJcOYT5IzQDDfd00qHRSXwmLFRhyDWh28/04C0JM1L0
-         hmgz9EfNEsKb7ye6Qjb0kO3q5LAg8i/+d40/LtWPzpc+G+BWH55pioO32fe9EcsD9P+m
-         aXtdnk0AEuNftdYLkPoc+dR97FPbJOynTsTuhvaQCqM7v9Yts90j4bYv1KZGrFuyzhwB
-         1zvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqk5YP5NVgP929Y78AfA5BYeLv1kAsncImA7w+rAOJVAi3ETlCTbzc2lkArJng18eMeGA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcyWMllI/qcLf2MykpoxHd0EgbahtnIOwhiRBAhHUd34WHllA6
-	4N/LyQIbMdbQtABa/FtpEr1vraroMfd54nslhhYTFjOylG4KvD7wwiaMhstkx/mjcTLJVQU9BB4
-	OvA==
-X-Google-Smtp-Source: AGHT+IGAYSFuTfcgYwZi5yt7ijkpmW6T+Qrle1UNzg+3VzmewGeG3vrBFgiiN1AmLEbBc8zFvyD5CwEHs2w=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:c951:b0:206:8c37:bcc7 with SMTP id
- d9443c01a7336-208d839844dmr669435ad.1.1727116639464; Mon, 23 Sep 2024
- 11:37:19 -0700 (PDT)
-Date: Mon, 23 Sep 2024 11:37:14 -0700
-In-Reply-To: <20240703021043.13881-1-yan.y.zhao@intel.com>
+        d=1e100.net; s=20230601; t=1727117395; x=1727722195;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VHEixKYgmrEI0xyHRhfjGRDQ/LAZ1TpNCXaxcaw46+w=;
+        b=LXPmGb5Nj4Oe1/fs1MLs6v/4VsO9d80S8cQmp49uVinoJj9SO56+g4asDWy6F/mE2w
+         9WW37WrYCZahSRKQruYU4638yj9/E138WUpI2HgnUtSuEt/1Ohs5goijIlkDd44jVw9F
+         qPl9yl4ddidFjchrbhLR9GwNw5Km8ix7qIltdKlG18srmAO4EqXIbz82cYovQREPyqYP
+         C49aDdkZ73pUbULnjLkCupi7MwruKdr6I9AQKGE4KVBp7nIS54I7XaKCCLOLieaqQGcE
+         SHGCKoaqtfz1ueySp0+3EOo2fboz3xa4DlvQki0/k5P7BASrmsD2MTHtkaHYkrrz0++X
+         XAMw==
+X-Forwarded-Encrypted: i=1; AJvYcCWffpUzkOFsTjx3dZ+r9tV8snoRsOfXN+O3dLzbGapJ0Rcibf22K1SMeGln4pf31Hbeh3o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkY+cOFqvK/VJQz8VFSUqh9b0Z/uM/FEYxXneRTDSqjpr+wnx5
+	g+O9bQ7ZtrVeX2gbI83JdgizUv28rI1+BuALfMyRz7MAkq2SEFWknRV041J4hKu239zxTxvgyBu
+	Ut+guVKcmXp4tZC2IxHYtk5BvFgEBj/Vn5bO0
+X-Google-Smtp-Source: AGHT+IFnxVySKGpDWSIEApW+kDI6injuSTM5sksPv0pnAsj22lsgtW/7QLMfV+gUo2KLV0zK5Eh0bhCvx1mn0OQ3ldI=
+X-Received: by 2002:a05:6512:281c:b0:533:44a3:21b9 with SMTP id
+ 2adb3069b0e04-536acf6abdemr6263745e87.1.1727117394775; Mon, 23 Sep 2024
+ 11:49:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240703020921.13855-1-yan.y.zhao@intel.com> <20240703021043.13881-1-yan.y.zhao@intel.com>
-Message-ID: <ZvG1Wki4GvIyVWqB@google.com>
-Subject: Re: [PATCH v2 1/4] KVM: x86/mmu: Introduce a quirk to control memslot
- zap behavior
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
-	isaku.yamahata@intel.com, dmatlack@google.com, sagis@google.com, 
-	erdemaktas@google.com, graf@amazon.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240801045907.4010984-1-mizhang@google.com> <20240801045907.4010984-15-mizhang@google.com>
+ <9bf5ba7d-d65e-4f2c-96fb-1a1ca0193732@amd.com> <1db598cd-328e-4b4d-a147-7030eb697ece@linux.intel.com>
+ <3dd7e187-9fbe-4748-9be5-638c8816116e@amd.com>
+In-Reply-To: <3dd7e187-9fbe-4748-9be5-638c8816116e@amd.com>
+From: Mingwei Zhang <mizhang@google.com>
+Date: Mon, 23 Sep 2024 20:49:17 +0200
+Message-ID: <CAL715W+a9p_44CVdXZ6HCS42oUgfam=qYT_XoeN6zxfS16YY8w@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 14/58] perf: Add switch_interrupt() interface
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: "Liang, Kan" <kan.liang@linux.intel.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>, 
+	Zhenyu Wang <zhenyuw@linux.intel.com>, Sandipan Das <sandipan.das@amd.com>, 
+	Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>, 
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, 
+	gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>, 
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>, 
+	Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 03, 2024, Yan Zhao wrote:
-> Introduce the quirk KVM_X86_QUIRK_SLOT_ZAP_ALL to allow users to select
-> KVM's behavior when a memslot is moved or deleted for KVM_X86_DEFAULT_VM
-> VMs. Make sure KVM behave as if the quirk is always disabled for
-> non-KVM_X86_DEFAULT_VM VMs.
- 
-...
+On Fri, Sep 20, 2024 at 7:09=E2=80=AFAM Manali Shukla <manali.shukla@amd.co=
+m> wrote:
+>
+> On 9/19/2024 6:30 PM, Liang, Kan wrote:
+> >
+> >
+> > On 2024-09-19 2:02 a.m., Manali Shukla wrote:
+> >> On 8/1/2024 10:28 AM, Mingwei Zhang wrote:
+> >>> From: Kan Liang <kan.liang@linux.intel.com>
+> >>>
+> >>> There will be a dedicated interrupt vector for guests on some platfor=
+ms,
+> >>> e.g., Intel. Add an interface to switch the interrupt vector while
+> >>> entering/exiting a guest.
+> >>>
+> >>> When PMI switch into a new guest vector, guest_lvtpc value need to be
+> >>> reflected onto HW, e,g., guest clear PMI mask bit, the HW PMI mask
+> >>> bit should be cleared also, then PMI can be generated continuously
+> >>> for guest. So guest_lvtpc parameter is added into perf_guest_enter()
+> >>> and switch_interrupt().
+> >>>
+> >>> At switch_interrupt(), the target pmu with PASSTHROUGH cap should
+> >>> be found. Since only one passthrough pmu is supported, we keep the
+> >>> implementation simply by tracking the pmu as a global variable.
+> >>>
+> >>> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+> >>>
+> >>> [Simplify the commit with removal of srcu lock/unlock since only one =
+pmu is
+> >>> supported.]
+> >>>
+> >>> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> >>> ---
+> >>>  include/linux/perf_event.h |  9 +++++++--
+> >>>  kernel/events/core.c       | 36 ++++++++++++++++++++++++++++++++++--
+> >>>  2 files changed, 41 insertions(+), 4 deletions(-)
+> >>>
+> >>> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+> >>> index 75773f9890cc..aeb08f78f539 100644
+> >>> --- a/include/linux/perf_event.h
+> >>> +++ b/include/linux/perf_event.h
+> >>> @@ -541,6 +541,11 @@ struct pmu {
+> >>>      * Check period value for PERF_EVENT_IOC_PERIOD ioctl.
+> >>>      */
+> >>>     int (*check_period)             (struct perf_event *event, u64 va=
+lue); /* optional */
+> >>> +
+> >>> +   /*
+> >>> +    * Switch the interrupt vectors, e.g., guest enter/exit.
+> >>> +    */
+> >>> +   void (*switch_interrupt)        (bool enter, u32 guest_lvtpc); /*=
+ optional */
+> >>>  };
+> >>>
+> >>>  enum perf_addr_filter_action_t {
+> >>> @@ -1738,7 +1743,7 @@ extern int perf_event_period(struct perf_event =
+*event, u64 value);
+> >>>  extern u64 perf_event_pause(struct perf_event *event, bool reset);
+> >>>  int perf_get_mediated_pmu(void);
+> >>>  void perf_put_mediated_pmu(void);
+> >>> -void perf_guest_enter(void);
+> >>> +void perf_guest_enter(u32 guest_lvtpc);
+> >>>  void perf_guest_exit(void);
+> >>>  #else /* !CONFIG_PERF_EVENTS: */
+> >>>  static inline void *
+> >>> @@ -1833,7 +1838,7 @@ static inline int perf_get_mediated_pmu(void)
+> >>>  }
+> >>>
+> >>>  static inline void perf_put_mediated_pmu(void)                     {=
+ }
+> >>> -static inline void perf_guest_enter(void)                  { }
+> >>> +static inline void perf_guest_enter(u32 guest_lvtpc)               {=
+ }
+> >>>  static inline void perf_guest_exit(void)                   { }
+> >>>  #endif
+> >>>
+> >>> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> >>> index 57ff737b922b..047ca5748ee2 100644
+> >>> --- a/kernel/events/core.c
+> >>> +++ b/kernel/events/core.c
+> >>> @@ -422,6 +422,7 @@ static inline bool is_include_guest_event(struct =
+perf_event *event)
+> >>>
+> >>>  static LIST_HEAD(pmus);
+> >>>  static DEFINE_MUTEX(pmus_lock);
+> >>> +static struct pmu *passthru_pmu;
+> >>>  static struct srcu_struct pmus_srcu;
+> >>>  static cpumask_var_t perf_online_mask;
+> >>>  static struct kmem_cache *perf_event_cache;
+> >>> @@ -5941,8 +5942,21 @@ void perf_put_mediated_pmu(void)
+> >>>  }
+> >>>  EXPORT_SYMBOL_GPL(perf_put_mediated_pmu);
+> >>>
+> >>> +static void perf_switch_interrupt(bool enter, u32 guest_lvtpc)
+> >>> +{
+> >>> +   /* Mediated passthrough PMU should have PASSTHROUGH_VPMU cap. */
+> >>> +   if (!passthru_pmu)
+> >>> +           return;
+> >>> +
+> >>> +   if (passthru_pmu->switch_interrupt &&
+> >>> +       try_module_get(passthru_pmu->module)) {
+> >>> +           passthru_pmu->switch_interrupt(enter, guest_lvtpc);
+> >>> +           module_put(passthru_pmu->module);
+> >>> +   }
+> >>> +}
+> >>> +
+> >>>  /* When entering a guest, schedule out all exclude_guest events. */
+> >>> -void perf_guest_enter(void)
+> >>> +void perf_guest_enter(u32 guest_lvtpc)
+> >>>  {
+> >>>     struct perf_cpu_context *cpuctx =3D this_cpu_ptr(&perf_cpu_contex=
+t);
+> >>>
+> >>> @@ -5962,6 +5976,8 @@ void perf_guest_enter(void)
+> >>>             perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
+> >>>     }
+> >>>
+> >>> +   perf_switch_interrupt(true, guest_lvtpc);
+> >>> +
+> >>>     __this_cpu_write(perf_in_guest, true);
+> >>>
+> >>>  unlock:
+> >>> @@ -5980,6 +5996,8 @@ void perf_guest_exit(void)
+> >>>     if (WARN_ON_ONCE(!__this_cpu_read(perf_in_guest)))
+> >>>             goto unlock;
+> >>>
+> >>> +   perf_switch_interrupt(false, 0);
+> >>> +
+> >>>     perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
+> >>>     ctx_sched_in(&cpuctx->ctx, EVENT_GUEST);
+> >>>     perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
+> >>> @@ -11842,7 +11860,21 @@ int perf_pmu_register(struct pmu *pmu, const=
+ char *name, int type)
+> >>>     if (!pmu->event_idx)
+> >>>             pmu->event_idx =3D perf_event_idx_default;
+> >>>
+> >>> -   list_add_rcu(&pmu->entry, &pmus);
+> >>> +   /*
+> >>> +    * Initialize passthru_pmu with the core pmu that has
+> >>> +    * PERF_PMU_CAP_PASSTHROUGH_VPMU capability.
+> >>> +    */
+> >>> +   if (pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU) {
+> >>> +           if (!passthru_pmu)
+> >>> +                   passthru_pmu =3D pmu;
+> >>> +
+> >>> +           if (WARN_ONCE(passthru_pmu !=3D pmu, "Only one passthroug=
+h PMU is supported\n")) {
+> >>> +                   ret =3D -EINVAL;
+> >>> +                   goto free_dev;
+> >>> +           }
+> >>> +   }
+> >>
+> >>
+> >> Our intention is to virtualize IBS PMUs (Op and Fetch) using the same =
+framework. However,
+> >> if IBS PMUs are also using the PERF_PMU_CAP_PASSTHROUGH_VPMU capabilit=
+y, IBS PMU registration
+> >> fails at this point because the Core PMU is already registered with PE=
+RF_PMU_CAP_PASSTHROUGH_VPMU.
+> >>
+> >
+> > The original implementation doesn't limit the number of PMUs with
+> > PERF_PMU_CAP_PASSTHROUGH_VPMU. But at that time, we could not find a
+> > case of more than one PMU with the flag. After several debates, the
+> > patch was simplified only to support one PMU with the flag.
+> > It should not be hard to change it back.
 
-> Suggested-by: Kai Huang <kai.huang@intel.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
+The original implementation is by design having a terrible performance
+overhead, ie., every PMU context switch at runtime requires a SRCU
+lock pair and pmu list traversal. To reduce the overhead, we put
+"passthrough" pmus in the front of the list and quickly exit the pmu
+traversal when we just pass the last "passthrough" pmu.
 
-Bad Sean, bad.
+I honestly do not like the idea because it is simply a hacky solution
+with high maintenance cost, but I am not the right person to make the
+call. So, if perf (kernel) subsystem maintainers are happy, I can
+withdraw from this one.
 
-> +/*
-> + * Zapping leaf SPTEs with memslot range when a memslot is moved/deleted.
-> + *
-> + * Zapping non-leaf SPTEs, a.k.a. not-last SPTEs, isn't required, worst
-> + * case scenario we'll have unused shadow pages lying around until they
-> + * are recycled due to age or when the VM is destroyed.
-> + */
-> +static void kvm_mmu_zap_memslot_leafs(struct kvm *kvm, struct kvm_memory_slot *slot)
-> +{
-> +	struct kvm_gfn_range range = {
-> +		.slot = slot,
-> +		.start = slot->base_gfn,
-> +		.end = slot->base_gfn + slot->npages,
-> +		.may_block = true,
-> +	};
-> +	bool flush = false;
-> +
-> +	write_lock(&kvm->mmu_lock);
-> +
-> +	if (kvm_memslots_have_rmaps(kvm))
-> +		flush = kvm_handle_gfn_range(kvm, &range, kvm_zap_rmap);
+My second point is: if you look at the details, the only reason why we
+traverse the pmu list is to check if a pmu has implemented the
+"switch_interrupt()" API. If so, invoke it, which will change the PMI
+vector from NMI to a maskable interrupt for KVM. In AMD case, I bet
+even if there are multiple passthrough pmus, only one requires
+switching the interrupt vector. Let me know if this is wrong.
 
-This, and Paolo's merged variant, break shadow paging.  As was tried in commit
-4e103134b862 ("KVM: x86/mmu: Zap only the relevant pages when removing a memslot"),
-all shadow pages, i.e. non-leaf SPTEs, need to be zapped.  All of the accounting
-for a shadow page is tied to the memslot, i.e. the shadow page holds a reference
-to the memslot, for all intents and purposes.  Deleting the memslot without removing
-all relevant shadow pages results in NULL pointer derefs when tearing down the VM.
+Thanks.
+-Mingwei
 
-Note, that commit is/was buggy, and I suspect my follow-up attempt[*] was as well.
-https://lore.kernel.org/all/20190820200318.GA15808@linux.intel.com
-
-Rather than trying to get this functional for shadow paging (which includes nested
-TDP), I think we should scrap the quirk idea and simply make this the behavior for
-S-EPT and nothing else.
-
- BUG: kernel NULL pointer dereference, address: 00000000000000b0
- #PF: supervisor read access in kernel mode
- #PF: error_code(0x0000) - not-present page
- PGD 6085f43067 P4D 608c080067 PUD 608c081067 PMD 0 
- Oops: Oops: 0000 [#1] SMP NOPTI
- CPU: 79 UID: 0 PID: 187063 Comm: set_memory_regi Tainted: G        W          6.11.0-smp--24867312d167-cpl #395
- Tainted: [W]=WARN
- Hardware name: Google Astoria/astoria, BIOS 0.20240617.0-0 06/17/2024
- RIP: 0010:__kvm_mmu_prepare_zap_page+0x3a9/0x7b0 [kvm]
- Code:  <48> 8b 8e b0 00 00 00 48 8b 96 e0 00 00 00 48 c1 e9 09 48 29 c8 8b
- RSP: 0018:ff314a25b19f7c28 EFLAGS: 00010212
- Call Trace:
-  <TASK>
-  kvm_arch_flush_shadow_all+0x7a/0xf0 [kvm]
-  kvm_mmu_notifier_release+0x6c/0xb0 [kvm]
-  mmu_notifier_unregister+0x85/0x140
-  kvm_put_kvm+0x263/0x410 [kvm]
-  kvm_vm_release+0x21/0x30 [kvm]
-  __fput+0x8d/0x2c0
-  __se_sys_close+0x71/0xc0
-  do_syscall_64+0x83/0x160
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> >
+> > Thanks,
+> > Kan
+> >
+>
+> Yes, we have a use case to use mediated passthrough vPMU framework for IB=
+S virtualization.
+> So, we will need it.
+>
+> - Manali
+>
+> >>> +
+> >>> +   list_add_tail_rcu(&pmu->entry, &pmus);
+> >>>     atomic_set(&pmu->exclusive_cnt, 0);
+> >>>     ret =3D 0;
+> >>>  unlock:
+> >>
+> >>
+>
 
