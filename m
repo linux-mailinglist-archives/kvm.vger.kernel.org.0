@@ -1,153 +1,124 @@
-Return-Path: <kvm+bounces-27372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E88798464D
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 15:01:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A50A984665
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 15:06:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C717E1F24446
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 13:01:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE4CCB23486
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 13:06:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00A51A7269;
-	Tue, 24 Sep 2024 13:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE07C1A76C9;
+	Tue, 24 Sep 2024 13:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZOrhIEr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VCwvZzHT"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7621B85DD;
-	Tue, 24 Sep 2024 13:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF121B85DD;
+	Tue, 24 Sep 2024 13:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727182866; cv=none; b=OW/9YVpJ0/W1rjrA2dWemWZPYWGqtDHf6JZ8N9awCMY1SGFipNCiLe1CrdWILwUl319GrbIxQljE5R0DDfnztN8XDFkMtdiYlGrFy/bPn2ntaevCyImMm6dd1jE+NR34MwCqQ73DqRhBw+Q6uIxGPgIw3GQ+sd32kqyBsR3/dM0=
+	t=1727183156; cv=none; b=ISbsJ1bOdWemBKZ3Wmr9YWb/HOBT9CUNpQaVe1jKWvCt1j02RgczpYd/7dydGsAXjzG0D0FCyIHZzz/JO9CSY+55+fK5OInImp6uymwqO6dDLoCRwY+KTKScadoom+vVvPIjYUdqQVBHALDLiHVY8R2YJn/xBncB1+3peO10HmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727182866; c=relaxed/simple;
-	bh=OakmT0sLzny8R4JiJYYxGXCumP8RVBEVBkER1UAFCqc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ejbNbUrblvOlBkT2UTme3J744XnPE6YNG/Si5R3Ik+OZwPaNHPC+8AArxBKTv/19MpAWkXDLH6wav4Vit0MuQAodIqNsitULIdEURCa9oqW1kOcjXezCvMz9hK0YxZ642ssG9w6NuLF4QmIeZ7zC7R1qmAwYMwlk+0XA+UJVBJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZOrhIEr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF214C4CEC4;
-	Tue, 24 Sep 2024 13:01:01 +0000 (UTC)
+	s=arc-20240116; t=1727183156; c=relaxed/simple;
+	bh=Qjfkvp5NGxGZwA6T1g5vVDbjGsM0vKbe4sPFNhJ0gMg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TudqCn26fH6E4xST8tFornrDf++w6z59BzNxNYGSGI9neZDxBA4VlI4KwLmmpI353BF54wuLcaZ5aCYFVTYxkwkL2sJnmX0cqNwg9KbU4JrTiOADcJWDQJD2hA7VLmhI/6xTrzKY+AxmuzqnWE+2ovDIWj0KQGRJtOXhFbphfWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VCwvZzHT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 783F8C4CEC4;
+	Tue, 24 Sep 2024 13:05:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727182865;
-	bh=OakmT0sLzny8R4JiJYYxGXCumP8RVBEVBkER1UAFCqc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EZOrhIEr2zgqlMHomrBGjn4qf2AhbOE/5eB6mnm/2fuMtMJ+ZgpprUbomnoTqy7hw
-	 r845phN3j3ryzwrH2oXkLMqqrumYvGXzTZfHVZpbDthcvk5Co+iBR1CYw9D9ouqE/b
-	 S2vajtRzNG2NBx7rDe9ELDr3c7gwBmoPDeYzuRcPQ0lsg6xuk9/x5ydgxqIxvHhA3H
-	 NyvraLkHZlKLx73aIrpNLGuZdvHu0WCxU4h4Xkjook5JGxWETUEEvm6Pa44qnp0Xj+
-	 y+D8ma5QUUc8fVqqVHPKUHghpVWrRgPY/uBJ+hDsN5SDWocjSK8eIxfOXB1fnjliL8
-	 UIHsflQBF+d+Q==
-Date: Tue, 24 Sep 2024 15:00:58 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Shiju Jose
- <shiju.jose@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Ani Sinha
- <anisinha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dongjiu Geng
- <gengdongjiu1@gmail.com>, Eric Blake <eblake@redhat.com>, John Snow
- <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth
- <michael.roth@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell
- <peter.maydell@linaro.org>, Shannon Zhao <shannon.zhaosl@gmail.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-Subject: Re: [PATCH v10 00/21] Add ACPI CPER firmware first error injection
- on ARM emulation
-Message-ID: <20240924150058.4879abe9@foz.lan>
-In-Reply-To: <20240917141519.57766bb6@imammedo.users.ipa.redhat.com>
-References: <cover.1726293808.git.mchehab+huawei@kernel.org>
-	<20240917141519.57766bb6@imammedo.users.ipa.redhat.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=k20201202; t=1727183156;
+	bh=Qjfkvp5NGxGZwA6T1g5vVDbjGsM0vKbe4sPFNhJ0gMg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VCwvZzHTT9yxyAvB2n8zK8p7WY1pmoFea6z+aE9IL/IfzVWoVPfR8uXfaU1uK+Sg4
+	 zytQ0T1k6W1qH0L5t/uHf2w+AEW0SGL7DvqCAjU74Odo7Wm8BteRNN7kq7KY+XFQkm
+	 i4ctdi7zFur41pQbVczHrkGGZ/3C0kAn0E3FV44J9fauG//51XXrDXq5ZzDqfyt5Ll
+	 PvTuujfe5rWsvl4Osrr/I4gIbY55YZZcATwE26ximLa+qdY0W7GCmLr3dP5PxsxSzx
+	 6oy5XMuOsaf3CMtuZXH8HYDZLvglkF40PDca9mcjQnY26jq87AL467dB92HqgOAiwZ
+	 xpJVQjjHct5fw==
+Date: Tue, 24 Sep 2024 14:05:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	linux-kselftest@vger.kernel.org,
+	Yuri Benditovich <yuri.benditovich@daynix.com>,
+	Andrew Melnychenko <andrew@daynix.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	gur.stavi@huawei.com
+Subject: Re: [PATCH RFC v4 7/9] tun: Introduce virtio-net RSS
+Message-ID: <20240924130550.GJ4029621@kernel.org>
+References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com>
+ <20240924-rss-v4-7-84e932ec0e6c@daynix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240924-rss-v4-7-84e932ec0e6c@daynix.com>
 
-Em Tue, 17 Sep 2024 14:15:19 +0200
-Igor Mammedov <imammedo@redhat.com> escreveu:
-
-> I'm done with this round of review.
+On Tue, Sep 24, 2024 at 11:01:12AM +0200, Akihiko Odaki wrote:
+> RSS is a receive steering algorithm that can be negotiated to use with
+> virtio_net. Conventionally the hash calculation was done by the VMM.
+> However, computing the hash after the queue was chosen defeats the
+> purpose of RSS.
 > 
-> Given that the series accumulated a bunch of cleanups,
-> I'd suggest to move all cleanups/renamings not related
-> to new HEST lookup and new src id mapping to the beginning
-> of the series, so once they reviewed they could be split up into
-> a separate series that could be merged while we are ironing down
-> the new functionality. 
+> Another approach is to use eBPF steering program. This approach has
+> another downside: it cannot report the calculated hash due to the
+> restrictive nature of eBPF steering program.
+> 
+> Introduce the code to perform RSS to the kernel in order to overcome
+> thse challenges. An alternative solution is to extend the eBPF steering
+> program so that it will be able to report to the userspace, but I didn't
+> opt for it because extending the current mechanism of eBPF steering
+> program as is because it relies on legacy context rewriting, and
+> introducing kfunc-based eBPF will result in non-UAPI dependency while
+> the other relevant virtualization APIs such as KVM and vhost_net are
+> UAPIs.
+> 
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-I've rebased the series placing the preparation stuff (cleanups
-and renames) at the beginning. So, what I have now is:
+...
 
-1) preparation patches:
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
 
-41709f0898e1 acpi/ghes: get rid of ACPI_HEST_SRC_ID_RESERVED
-5409daa41c78 acpi/ghes: simplify acpi_ghes_record_errors() code
-2539f1f662b9 acpi/ghes: better handle source_id and notification
-3f19400549c1 acpi/ghes: Remove a duplicated out of bounds check
-f0b06ecede46 acpi/ghes: Change the type for source_id
-9f08301ac195 acpi/ghes: Prepare to support multiple sources on ghes
-2426cd76e868 acpi/ghes: make the GHES record generation more generic
-3fb7ec864700 acpi/ghes: better name GHES memory error function
-1a22dad3211e acpi/ghes: don't crash QEMU if ghes GED is not found
-726968d4ee20 acpi/ghes: rename etc/hardware_error file macros
-f562380da7ce docs: acpi_hest_ghes: fix documentation for CPER size
-69850f550f99 acpi/generic_event_device: add an APEI error device
+...
 
-Patches were changed to ensure that they won't be add any new
-new features. They are just code shift in order to make the diff
-of the next patches smaller.
+> @@ -333,8 +336,10 @@ static long tun_set_vnet_be(struct tun_struct *tun, int __user *argp)
+>  		return -EFAULT;
+>  
+>  	if (be) {
+> +		struct tun_vnet_hash_container *vnet_hash = rtnl_dereference(tun->vnet_hash);
+> +
+>  		if (!(tun->flags & TUN_VNET_LE) &&
+> -		    (tun->vnet_hash.flags & TUN_VNET_HASH_REPORT))
+> +		    vnet_hash && (vnet_hash->flags & TUN_VNET_HASH_REPORT))
 
-There is a small point here: the logic was simplified to only
-support a single source ID (I added an assert() to enforce it) and
-simplified the calculus in preparation for the HEST and migration
-series.
+Hi Odaki-san,
 
+I am wondering if the above should this be vnet_hash->common.flags?
+I am seeing this:
 
-2) add a BIOS pointer to HEST, using it. The migration stuff
-will be along those:
+../drivers/net/tun.c:342:44: error: ‘struct tun_vnet_hash_container’ has no member named ‘flags’
+  342 |                     vnet_hash && (vnet_hash->flags & TUN_VNET_HASH_REPORT))
 
-c24f1a8708e3 acpi/ghes: add a firmware file with HEST address
-853dce23ec39 acpi/ghes: Use HEST table offsets when preparing GHES records
-c148716fd7c8 acpi/generic_event_device: Update GHES migration to cover hest addr
-
-Up to that, still no new features, but the offset calculus will be
-relative to HEST table and will use the bios pointers stored there;
-
-3) Add support for generic error inject:
-
-f5ec0d197d82 acpi/ghes: add a notifier to notify when error data is ready
-f5e015537209 arm/virt: Wire up a GED error device for ACPI / GHES
-3b6692dbf473 qapi/acpi-hest: add an interface to do generic CPER error injection
-620a5a49f218 scripts/ghes_inject: add a script to generate GHES error inject
-
-4) MPIDR property:
-2dd6e3aae450 target/arm: add an experimental mpidr arm cpu property object
-02c88cd4daa2 scripts/arm_processor_error.py: retrieve mpidr if not filled
-
-I'm still testing if the rebase didn't cause any issues. So, the above
-may still change a little bit. I also need to address your comments to the
-cleanup patches and work at the migration, but just want to double check if
-this is what you want.
-
-If OK to you, my plan is to submit you the cleanup patches after I
-finish testing the hole series.
-
-The migration logic will require some time, and I don't want to bother
-with the cleanup stuff while doing it. So, perhaps while I'm doing it,
-you could review/merge the cleanups.
-
-We can do the same for each of the 4 above series of patches, as it
-makes review simpler as there will be less patches to look into on
-each series.
-
-Would it work for you?
-
-Thanks,
-Mauro
+...
 
