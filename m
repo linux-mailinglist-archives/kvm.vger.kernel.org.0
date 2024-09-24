@@ -1,62 +1,88 @@
-Return-Path: <kvm+bounces-27389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27390-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB35984BD8
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 21:57:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A811984C6B
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 22:51:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E6DA28478F
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 19:57:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF74B2813E5
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 20:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2722113AD20;
-	Tue, 24 Sep 2024 19:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABFC14431B;
+	Tue, 24 Sep 2024 20:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XxFXiFMw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6kJSGg9"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5285A1386C9
-	for <kvm@vger.kernel.org>; Tue, 24 Sep 2024 19:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ECD513D509
+	for <kvm@vger.kernel.org>; Tue, 24 Sep 2024 20:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727207824; cv=none; b=E9SeZDlrd0rhtBHJSkgbw/j2CiEKLbypdSW9c2lA2C8QVjwo8NcXhNi8Pa8avsTJZhLzthxHYVt8oTaN8q3Dn3xCQpwM1RRXHJT2LCJ+M2zsg96aCw5ujP6Q8goNN27NYkxGvVKgcJTPnNPefgHeOziTFzDBnhSpPsOgrt54doI=
+	t=1727211061; cv=none; b=n0pfiUkkAFaUfrXX3R9Wk1oyaFgdDWnIYiEaTU/zMewB6uAg3Q4TCthlC5tvoDz3PB0gO4j3EHksMc59WX9IeZDkNfTIeAHFiYowEN4oxcG+Wf4ZqMSn//OnlYsHEmOCKrPWryPPVVW28whra/Py4F1/gJ0GzwHEB90mAdeCU7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727207824; c=relaxed/simple;
-	bh=vs/Q00mpqMCANbeBETDP9iTGdVlpdkwKxWxZINpqxFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=st0L3COhM1WogciAh64q3lNTJTsFDA9IPYXIFqAwtXTF4p7rQ1aj5OW3BzKw2pHgQmmXEBIZ2ukbH9iFafigOz/7wbpxmrB8fWRSnKptIWaDBW10f/tdUUrKLTMrizL69KdBDZgKa6542okGX9KZ8HfmwWQUH9UQukVbEpnGOl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XxFXiFMw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7DF2C4CEC4;
-	Tue, 24 Sep 2024 19:57:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727207824;
-	bh=vs/Q00mpqMCANbeBETDP9iTGdVlpdkwKxWxZINpqxFU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XxFXiFMwZrSGnLiyTu2hLENoclsOGKfRdG0HohayTiJhJ0TO6sB6giHtySe0YMGMD
-	 3u6j5C1iTmTRoYCDSM6ZdLr1x1JC0jHgPJ/cIhuu3PKQODIXMqJqNcjB91Rw5QYFqf
-	 NXHmRcAvbCvSssZHAoXsGp+GyHoxU+zNWG2r3IRzBWzbwY5L9J3zMfYiCFUDNHrKDZ
-	 XKHuTCtSwIrMOOpintYtxEQGuQRFyZf25xAarUqPbYjrgSbXOiHOo0va4BEwjAaF8H
-	 v3e5DPlkXcw8bY9J589OVYFFezKSbLN/BWKDjSP34aJDmPH+me+5KsAALcE7kljel/
-	 UFoH0kPPnL9Uw==
-Date: Tue, 24 Sep 2024 21:56:58 +0200
-From: Danilo Krummrich <dakr@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Zhi Wang <zhiw@nvidia.com>, kvm@vger.kernel.org,
-	nouveau@lists.freedesktop.org, alex.williamson@redhat.com,
-	kevin.tian@intel.com, airlied@gmail.com, daniel@ffwll.ch,
-	acurrid@nvidia.com, cjia@nvidia.com, smitra@nvidia.com,
-	ankita@nvidia.com, aniketa@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, zhiwang@kernel.org
-Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
-Message-ID: <ZvMZisyZFO888N0E@cassiopeiae>
-References: <20240922124951.1946072-1-zhiw@nvidia.com>
- <ZvErg51xH32b8iW6@pollux>
- <20240923150140.GB9417@nvidia.com>
- <ZvHwzzp2F71W8TAs@pollux.localdomain>
- <20240924164151.GJ9417@nvidia.com>
+	s=arc-20240116; t=1727211061; c=relaxed/simple;
+	bh=q1Fzh6XcLCvsZX97wtdGvG+wbgRVQb9FWzltMHxrYhU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rW5el94+Lqjqd4knHXyrFFQdf9VMiPp0s//XFbVrMz6iVSRj7v3vshNrHgZpWCH+zrCTa7pnN+W5MPZIaJO8dAbc2BiCaJyPVfkrBR2Gd3wsJcS/haTpDpMS8PFsdS1O5L1WiAQfdj8B5f/HUM8xoHzU9i5ZnonsMs22rRZp+2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e6kJSGg9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727211058;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=Ha73YKMkXYy714HDQl55jm40mWYNmGrnegcmLNCX6UI=;
+	b=e6kJSGg9KKdaVJRtJNPi0mrW5rgrjbrXEqQYyc0tkB2/bh+OypEtJqx7213pXIDCiL359D
+	LVzfLfdYm9m9HWPXWFsSwHdcvoMNVjeSzPvjCVdnZxn2nSic5Tbc0QN9zKJlgxQsjIVwn1
+	HeBRt1poEuhY8Y4cpzcFhfoxl/ZurOg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-213-FC0Bmep3PRGuv5ZWenbchQ-1; Tue, 24 Sep 2024 16:50:53 -0400
+X-MC-Unique: FC0Bmep3PRGuv5ZWenbchQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cae209243so38211345e9.1
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2024 13:50:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727211051; x=1727815851;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ha73YKMkXYy714HDQl55jm40mWYNmGrnegcmLNCX6UI=;
+        b=kToDDyBi3f4YTM0fvV3BZ/eGTux1L2SBJyjE/IvwGmpRgEfSPo7DkmcNR+0ZIaonxM
+         y5h/sOwfSrDWiuLxPSqFzjBGiVgQtF3TsEWUcRB7xHtN3+8bPXyW36MigYaV+uCsaPw7
+         qObJYrTFWCx0oHGEx3TqwnQc7Z6vfFHltChdWmu4NwxUfcc65Txh2Ddyyln1gbx9xqej
+         aWDCd3q5x9ImSG65eC7iyrZ0LLif0jFBFzo45VzGakN6vV+nN0BCCdCbXShQ3sdseByD
+         JZBwsvI43TZ9Ywdl3xGS/20w1NfKj2+AysUxuz3QKdpQR52FwfJsoLCRkxGPNR5tmCrG
+         0IxA==
+X-Gm-Message-State: AOJu0Yxe+5QyXc8GmWTcUWS/5L20UE1tWfU2/CdJMz9sUF4MSbB2XAvW
+	PtWRf23ELAksLe33mFJsee/t5cpqUCBKymbTXS8csWpM7ar+MUoCvaRj7SjhuHk0j4i2NRt7PS5
+	hcAet5VyEp9SkLF1UrTbQvpApbDWzEQOAcc+L25xwXTXEzDfWoA==
+X-Received: by 2002:a05:600c:1e0b:b0:426:5dc8:6a63 with SMTP id 5b1f17b1804b1-42e96242214mr1865525e9.30.1727211051376;
+        Tue, 24 Sep 2024 13:50:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFiXHIUYfLg/ApdHxFIkfiGLw4xDQ4Vi/t8oKMffgZIEevAFQUBrtSqrnnQvLLtODlevmJANQ==
+X-Received: by 2002:a05:600c:1e0b:b0:426:5dc8:6a63 with SMTP id 5b1f17b1804b1-42e96242214mr1865395e9.30.1727211050977;
+        Tue, 24 Sep 2024 13:50:50 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:7405:9900:56a3:401a:f419:5de9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e754a7aedsm170062615e9.31.2024.09.24.13.50.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2024 13:50:50 -0700 (PDT)
+Date: Tue, 24 Sep 2024 16:50:46 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	david@redhat.com, dtatulea@nvidia.com, eperezma@redhat.com,
+	jasowang@redhat.com, leiyang@redhat.com, leonro@nvidia.com,
+	lihongbo22@huawei.com, luigi.leonardi@outlook.com, lulu@redhat.com,
+	marco.pinn95@gmail.com, mgurtovoy@nvidia.com, mst@redhat.com,
+	pankaj.gupta.linux@gmail.com, philipchen@chromium.org,
+	pizhenwei@bytedance.com, sgarzare@redhat.com, yuehaibing@huawei.com,
+	zhujun2@cmss.chinamobile.com
+Subject: [GIT PULL] virtio: features, fixes, cleanups
+Message-ID: <20240924165046-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,145 +91,121 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240924164151.GJ9417@nvidia.com>
+X-Mutt-Fcc: =sent
 
-On Tue, Sep 24, 2024 at 01:41:51PM -0300, Jason Gunthorpe wrote:
-> On Tue, Sep 24, 2024 at 12:50:55AM +0200, Danilo Krummrich wrote:
-> 
-> > > From the VFIO side I would like to see something like this merged in
-> > > nearish future as it would bring a previously out of tree approach to
-> > > be fully intree using our modern infrastructure. This is a big win for
-> > > the VFIO world.
-> > > 
-> > > As a commercial product this will be backported extensively to many
-> > > old kernels and that is harder/impossible if it isn't exclusively in
-> > > C. So, I think nova needs to co-exist in some way.
-> > 
-> > We'll surely not support two drivers for the same thing in the long term,
-> > neither does it make sense, nor is it sustainable.
-> 
-> What is being done here is the normal correct kernel thing to
-> do. Refactor the shared core code into a module and stick higher level
-> stuff on top of it. Ideally Nova/Nouveau would exist as peers
-> implementing DRM subsystem on this shared core infrastructure. We've
-> done this sort of thing before in other places in the kernel. It has
-> been proven to work well.
+The following changes since commit 431c1646e1f86b949fa3685efc50b660a364c2b6:
 
-So, that's where you have the wrong understanding of what we're working on: You
-seem to think that Nova is just another DRM subsystem layer on top of the NVKM
-parts (what you call the core driver) of Nouveau.
+  Linux 6.11-rc6 (2024-09-01 19:46:02 +1200)
 
-But the whole point of Nova is to replace the NVKM parts of Nouveau, since
-that's where the problems we want to solve reside in.
+are available in the Git repository at:
 
-> 
-> So, I'm not sure why you think there should be two drivers in the long
-> term? Do you have some technical reason why Nova can't fit into this
-> modular architecture?
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-Like I said above, the whole point of Nova is to be the core driver, the DRM
-parts on top are more like "the icing on the cake".
+for you to fetch changes up to 1bc6f4910ae955971097f3f2ae0e7e63fa4250ae:
 
-> 
-> Regardless, assuming Nova will eventually propose merging duplicated
-> bootup code then I suggest it should be able to fully replace the C
-> code with a kconfig switch and provide C compatible interfaces for
-> VFIO. When Rust is sufficiently mature we can consider a deprecation
-> schedule for the C version.
-> 
-> I agree duplication doesn't make sense, but if it is essential to make
-> everyone happy then we should do it to accommodate the ongoing Rust
-> experiment.
-> 
-> > We have a lot of good reasons why we decided to move forward with Nova as a
-> > successor of Nouveau for GSP-based GPUs in the long term -- I also just held a
-> > talk about this at LPC.
-> 
-> I know, but this series is adding a VFIO driver to the kernel, and a
+  vsock/virtio: avoid queuing packets when intermediate queue is empty (2024-09-12 02:54:10 -0400)
 
-I have no concerns regarding the VFIO driver, this is about the new features
-that you intend to add to Nouveau.
+----------------------------------------------------------------
+virtio: features, fixes, cleanups
 
-> complete Nova driver doesn't even exist yet. It is fine to think about
-> future plans, but let's not get too far ahead of ourselves here..
+Several new features here:
 
-Well, that's true, but we can't just add new features to something that has been
-agreed to be replaced without having a strategy for this for the successor.
+	virtio-balloon supports new stats
 
-> 
-> > For the short/mid term I think it may be reasonable to start with
-> > Nouveau, but this must be based on some agreements, for instance:
-> > 
-> > - take responsibility, e.g. commitment to help with maintainance with some of
-> >   NVKM / NVIDIA GPU core (or whatever we want to call it) within Nouveau
-> 
-> I fully expect NVIDIA teams to own this core driver and VFIO parts. I
-> see there are no changes to the MAINTAINERs file in this RFC, that
-> will need to be corrected.
+	vdpa supports setting mac address
 
-Well, I did not say to just take over the biggest part of Nouveau.
+	vdpa/mlx5 suspend/resume as well as MKEY ops are now faster
 
-Currently - and please correct me if I'm wrong - you make it sound to me as if
-you're not willing to respect the decisions that have been taken by Nouveau and
-DRM maintainers.
+	virtio_fs supports new sysfs entries for queue info
 
-> 
-> > - commitment to help with Nova in general and, once applicable, move the vGPU
-> >   parts over to Nova
-> 
-> I think you will get help with Nova based on its own merit, but I
-> don't like where you are going with this. Linus has had negative
-> things to say about this sort of cross-linking and I agree with
-> him. We should not be trying to extract unrelated promises on Nova as
-> a condition for progressing a VFIO series. :\
+	virtio/vsock performance has been improved
 
-No cross-linking, no unrelated promises.
+Fixes, cleanups all over the place.
 
-Again, we're working on a successor of Nouveau and if we keep adding features to
-Nouveau in the meantime, we have to have a strategy for the transition,
-otherwise we're effectively just ignoring this decision.
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-So, I really need you to respect the fact that there has been a decision for a
-successor and that this *is* in fact relevant for all major changes to Nouveau
-as well.
+----------------------------------------------------------------
+Cindy Lu (3):
+      vdpa: support set mac address from vdpa tool
+      vdpa_sim_net: Add the support of set mac address
+      vdpa/mlx5: Add the support of set mac address
 
-Once you do this, we get the chance to work things out for the short/mid term
-and for the long term and make everyone benefit.
+Dragos Tatulea (18):
+      vdpa/mlx5: Fix invalid mr resource destroy
+      net/mlx5: Support throttled commands from async API
+      vdpa/mlx5: Introduce error logging function
+      vdpa/mlx5: Introduce async fw command wrapper
+      vdpa/mlx5: Use async API for vq query command
+      vdpa/mlx5: Use async API for vq modify commands
+      vdpa/mlx5: Parallelize device suspend
+      vdpa/mlx5: Parallelize device resume
+      vdpa/mlx5: Keep notifiers during suspend but ignore
+      vdpa/mlx5: Small improvement for change_num_qps()
+      vdpa/mlx5: Parallelize VQ suspend/resume for CVQ MQ command
+      vdpa/mlx5: Create direct MKEYs in parallel
+      vdpa/mlx5: Delete direct MKEYs in parallel
+      vdpa/mlx5: Rename function
+      vdpa/mlx5: Extract mr members in own resource struct
+      vdpa/mlx5: Rename mr_mtx -> lock
+      vdpa/mlx5: Introduce init/destroy for MR resources
+      vdpa/mlx5: Postpone MR deletion
 
-I encourage that NVIDIA wants to move things upstream and I'm absolutely willing
-to collaborate and help with the use-cases and goals NVIDIA has. But it really
-has to be a collaboration and this starts with acknowledging the goals of *each
-other*.
+Hongbo Li (1):
+      fw_cfg: Constify struct kobj_type
 
-> 
-> > But I think the very last one naturally happens if we stop further support for
-> > new HW in Nouveau at some point.
-> 
-> I expect the core code would continue to support new HW going forward
-> to support the VFIO driver, even if nouveau doesn't use it, until Rust
-> reaches some full ecosystem readyness for the server space.
+Jason Wang (1):
+      vhost_vdpa: assign irq bypass producer token correctly
 
-From an upstream perspective the kernel doesn't need to consider OOT drivers,
-i.e. the guest driver.
+Lei Yang leiyang@redhat.com (1):
+      ack! vdpa/mlx5: Parallelize device suspend/resume
 
-This doesn't mean that we can't work something out for a seamless transition
-though.
+Luigi Leonardi (1):
+      vsock/virtio: avoid queuing packets when intermediate queue is empty
 
-But again, this can only really work if we acknowledge the goals of each other.
+Marco Pinna (1):
+      vsock/virtio: refactor virtio_transport_send_pkt_work
 
-> 
-> There are going to be a lot of users of this code, let's not rush to
-> harm them please.
+Max Gurtovoy (2):
+      virtio_fs: introduce virtio_fs_put_locked helper
+      virtio_fs: add sysfs entries for queue information
 
-Please abstain from such kind of unconstructive insinuations; it's ridiculous to
-imply that upstream kernel developers and maintainers would harm the users of
-NVIDIA GPUs.
+Philip Chen (1):
+      virtio_pmem: Check device status before requesting flush
 
-> 
-> Fortunately there is no use case for DRM and VFIO to coexist in a
-> hypervisor, so this does not turn into a such a technical problem like
-> most other dual-driver situations.
-> 
-> Jason
-> 
+Stefano Garzarella (1):
+      MAINTAINERS: add virtio-vsock driver in the VIRTIO CORE section
+
+Yue Haibing (1):
+      vdpa: Remove unused declarations
+
+Zhu Jun (1):
+      tools/virtio:Fix the wrong format specifier
+
+zhenwei pi (3):
+      virtio_balloon: introduce oom-kill invocations
+      virtio_balloon: introduce memory allocation stall counter
+      virtio_balloon: introduce memory scan/reclaim info
+
+ MAINTAINERS                                   |   1 +
+ drivers/firmware/qemu_fw_cfg.c                |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/cmd.c |  21 +-
+ drivers/nvdimm/nd_virtio.c                    |   9 +
+ drivers/vdpa/ifcvf/ifcvf_base.h               |   3 -
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h            |  47 ++-
+ drivers/vdpa/mlx5/core/mr.c                   | 291 +++++++++++++---
+ drivers/vdpa/mlx5/core/resources.c            |  76 +++-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c             | 477 +++++++++++++++++---------
+ drivers/vdpa/pds/cmds.h                       |   1 -
+ drivers/vdpa/vdpa.c                           |  79 +++++
+ drivers/vdpa/vdpa_sim/vdpa_sim_net.c          |  21 +-
+ drivers/vhost/vdpa.c                          |  16 +-
+ drivers/virtio/virtio_balloon.c               |  18 +
+ fs/fuse/virtio_fs.c                           | 164 ++++++++-
+ include/linux/vdpa.h                          |   9 +
+ include/uapi/linux/vdpa.h                     |   1 +
+ include/uapi/linux/virtio_balloon.h           |  16 +-
+ net/vmw_vsock/virtio_transport.c              | 144 +++++---
+ tools/virtio/ringtest/main.c                  |   2 +-
+ 20 files changed, 1098 insertions(+), 300 deletions(-)
+
 
