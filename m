@@ -1,82 +1,40 @@
-Return-Path: <kvm+bounces-27370-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27371-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7112E98458F
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 14:08:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C7C79845E1
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 14:26:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39380281016
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 12:08:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9164EB217AA
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 12:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E4B1A7244;
-	Tue, 24 Sep 2024 12:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BaGed3Th"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E76F1A706C;
+	Tue, 24 Sep 2024 12:26:26 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED9C1A3AB7;
-	Tue, 24 Sep 2024 12:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C184B3F9D5;
+	Tue, 24 Sep 2024 12:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727179684; cv=none; b=glh9izLwOsJ/6piTKqrvfdaej23gpz7JRpNf0IDuNMYNqVEUZ7l1k7J+YgiO4gaYw0M6JpQ6/ZfAkoacwflQtAzwJ7lTNJ7gqSkivvo4IN1lm2dYRDJkOIbDQGJJLHbpq6jrTDLLrjyaKr7vUt+SAIB9CdflAwVQlfQutt67VVo=
+	t=1727180785; cv=none; b=PWC9MVGRrVjSwSL1gAfFMl7GdUtqeGboSoSyAHzuTjBWi5NkGPRGcTBA5Ue7LhXxac0F7+unw4B/a7UgBCCSFzXL4C8SHRLPb9F6D1BeFtRWuSNRD0VHefXAR9OH4PwL2oP7Ugaza/ORMLXvep7yx+QszFcSvOJ2abaySHxqAmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727179684; c=relaxed/simple;
-	bh=nNz2+oId6mzXmRk2C0COQrwvkJHEdReK3I1joI2vNaA=;
+	s=arc-20240116; t=1727180785; c=relaxed/simple;
+	bh=ZvJfiEwfNuvwZtXC2ii8kT4EZLzx/AHELisWsC/69po=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nQm7wVwhDkXjQG4MeAhxoZD9cnhhwE+FqxR2wBlsBcTJqX/awtPtu98/FfprNXSUDqgcmY+LwWxz/dksx+Mi/45UTX2vi8o/5MzcWk9rgZ9iRt3xmgXgHG3a/tD9iWGlS8dkzRZP4sc3SBOxCQGO9m8t0pvdQeLmDcmvWodx9p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BaGed3Th; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48OBaauT008661;
-	Tue, 24 Sep 2024 12:07:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=x
-	Nc7cw9Kq0ynPaYqsSVBD/YgCtnZUZCRP85lFxbVEl0=; b=BaGed3ThF2vbJ0d8f
-	EOCd+L3gUzV5NgBca4evb1dDyhz19cRlxbAoPbkxHXJNqzqWThG417Ojaopr8YeT
-	BXluXH89AN41tLne0N9g9ASgN65xxk8KfleBD7/oPo7x2lbKXsQLWqlu33gcc8Hr
-	S6+M5529EsCjJ5QAMzaiZvXGZNdq9PDi4adVRnGj2gBVVUqOqV5jEsokougOBUkT
-	zzX6tNIhM4e4Ss7P66BsVEwN1+9sAFBgs3rYSh+B/185JncA7xcjD2iaUXM82hPO
-	HLxxN4BvpCzPHEemC+Bz95Uw9E+xlYcQ7yikhavF4Rgkj14qcER0D+CH0vdaLhhq
-	87qHg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41skjrhv72-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Sep 2024 12:07:53 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48OC7qS5000857;
-	Tue, 24 Sep 2024 12:07:53 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41skjrhv6y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Sep 2024 12:07:52 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48OAHoNU000668;
-	Tue, 24 Sep 2024 12:07:52 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41t8fum2dd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Sep 2024 12:07:52 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48OC7maI57999680
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 24 Sep 2024 12:07:48 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C7B1E20049;
-	Tue, 24 Sep 2024 12:07:48 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4EFE220040;
-	Tue, 24 Sep 2024 12:07:48 +0000 (GMT)
-Received: from [9.171.10.137] (unknown [9.171.10.137])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 24 Sep 2024 12:07:48 +0000 (GMT)
-Message-ID: <1302ec9f-ed6a-4606-a823-a4e0eb306698@linux.ibm.com>
-Date: Tue, 24 Sep 2024 14:07:48 +0200
+	 In-Reply-To:Content-Type; b=m0KgSxY7fVBrH2mZOLWWu/jY1ZIVo6qNadtow9lIAakXHEPelDTfk/JrCwBF/Y5ioHeA+yEnSUn3ooV/Ap+XUlxnPEW1CP51qx7euUG4hXfqKFAKbmiv+SR+YIA3fhAHe/vGNvQc4khViSHLX2Xv6D7RVnyn8lOtKuyS5kYVBj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BDC4DA7;
+	Tue, 24 Sep 2024 05:26:52 -0700 (PDT)
+Received: from [10.1.32.221] (R90XJLFY.arm.com [10.1.32.221])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 658753F64C;
+	Tue, 24 Sep 2024 05:26:21 -0700 (PDT)
+Message-ID: <b9367e1c-f339-46e1-8c44-d20f112a857a@arm.com>
+Date: Tue, 24 Sep 2024 13:26:20 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,91 +42,139 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/5] KVM: s390: selftests: Add regression tests for CPU
- subfunctions
-To: Hariharan Mari <hari55@linux.ibm.com>, linux-kselftest@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, shuah@kernel.org,
-        borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
-        pbonzini@redhat.com, schlameuss@linux.ibm.com
-References: <20240823130947.38323-1-hari55@linux.ibm.com>
+Subject: Re: [PATCH v2 3/4] KVM: selftests: Allow slot modification stress
+ test with quirk disabled
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com,
+ isaku.yamahata@intel.com, dmatlack@google.com, sagis@google.com,
+ erdemaktas@google.com, graf@amazon.com, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+ Mark Brown <broonie@kernel.org>, Naresh Kamboju <naresh.kamboju@linaro.org>
+References: <20240703020921.13855-1-yan.y.zhao@intel.com>
+ <20240703021206.13923-1-yan.y.zhao@intel.com>
 Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20240823130947.38323-1-hari55@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: JpBo8Wu1IcBHHquAqXtNtiSS0ABzr1Pl
-X-Proofpoint-ORIG-GUID: Dz0idRleiCKeDKGA9KR00AmR7-hXYnuJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-24_02,2024-09-24_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- spamscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0
- clxscore=1011 malwarescore=0 mlxlogscore=583 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2409240084
+From: Aishwarya TCV <aishwarya.tcv@arm.com>
+In-Reply-To: <20240703021206.13923-1-yan.y.zhao@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 8/23/24 3:05 PM, Hariharan Mari wrote:
-> This patch series introduces a set of regression tests for various s390x
-> CPU subfunctions in KVM. The tests ensure that the KVM implementation accurately
-> reflects the behavior of actual CPU instructions for these subfunctions.
-> 
-> The series adds tests for a total of 15 instructions across five patches,
-> covering a range of operations including sorting, compression, and various
-> cryptographic functions. Each patch follows a consistent testing pattern:
-> 
-> 1. Obtain the KVM_S390_VM_CPU_MACHINE_SUBFUNC attribute for the VM.
-> 2. Execute the relevant asm instructions.
-> 3. Compare KVM-reported results with direct instruction execution results.
-> 
-> Testing has been performed on s390x hardware with KVM support. All tests
-> pass successfully, verifying the correct implementation of these
-> subfunctions in KVM.
 
-I've picked this up but seem to have missed adding it to 6.12 since I 
-have a lot going on.
 
-It will be in 6.13 though.
+On 03/07/2024 03:12, Yan Zhao wrote:
+> Add a new user option to memslot_modification_stress_test to allow testing
+> with slot zap quirk KVM_X86_QUIRK_SLOT_ZAP_ALL disabled.
+> 
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  .../kvm/memslot_modification_stress_test.c    | 19 +++++++++++++++++--
+Hi Yan,
+
+When building kselftest-kvm config against next-20240924 kernel with
+Arm64 an error "'KVM_X86_QUIRK_SLOT_ZAP_ALL' undeclared" is observed.
+
+A bisect identified 218f6415004a881d116e254eeb837358aced55ab as the
+first bad commit. Bisected it on the tag "next-20240923" at repo
+"https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git".
+Reverting the change seems to fix it.
+
+This works fine on Linux version 6.11
+
+Failure log
+------------
+https://storage.kernelci.org/next/master/next-20240924/arm64/defconfig+kselftest/gcc-12/logs/kselftest.log
+
+In file included from include/kvm_util.h:8,
+                 from include/memstress.h:13,
+                 from memslot_modification_stress_test.c:21:
+memslot_modification_stress_test.c: In function ‘main’:
+memslot_modification_stress_test.c:176:38: error:
+‘KVM_X86_QUIRK_SLOT_ZAP_ALL’ undeclared (first use in this function)
+  176 |                                      KVM_X86_QUIRK_SLOT_ZAP_ALL);
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+include/test_util.h:41:15: note: in definition of macro ‘__TEST_REQUIRE’
+   41 |         if (!(f))                                               \
+      |               ^
+memslot_modification_stress_test.c:175:25: note: in expansion of macro
+‘TEST_REQUIRE’
+  175 |
+TEST_REQUIRE(kvm_check_cap(KVM_CAP_DISABLE_QUIRKS2) &
+      |                         ^~~~~~~~~~~~
+memslot_modification_stress_test.c:176:38: note: each undeclared
+identifier is reported only once for each function it appears in
+  176 |                                      KVM_X86_QUIRK_SLOT_ZAP_ALL);
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+include/test_util.h:41:15: note: in definition of macro ‘__TEST_REQUIRE’
+   41 |         if (!(f))                                               \
+      |               ^
+memslot_modification_stress_test.c:175:25: note: in expansion of macro
+‘TEST_REQUIRE’
+  175 |
+TEST_REQUIRE(kvm_check_cap(KVM_CAP_DISABLE_QUIRKS2) &
+      |                         ^~~~~~~~~~~~
+At top level:
+cc1: note: unrecognized command-line option
+‘-Wno-gnu-variable-sized-type-not-at-end’ may have been intended to
+silence earlier diagnostics
+make[4]: *** [Makefile:300:
+/tmp/kci/linux/build/kselftest/kvm/memslot_modification_stress_test.o]
+Error 1
+make[4]: Leaving directory '/tmp/kci/linux/tools/testing/selftests/kvm'
+
+
+Bisect log:
+----------
+
+git bisect start
+# good: [98f7e32f20d28ec452afb208f9cffc08448a2652] Linux 6.11
+git bisect good 98f7e32f20d28ec452afb208f9cffc08448a2652
+# bad: [ef545bc03a65438cabe87beb1b9a15b0ffcb6ace] Add linux-next
+specific files for 20240923
+git bisect bad ef545bc03a65438cabe87beb1b9a15b0ffcb6ace
+# good: [176000734ee2978121fde22a954eb1eabb204329] Merge tag
+'ata-6.12-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/libata/linux
+git bisect good 176000734ee2978121fde22a954eb1eabb204329
+# good: [f55bf3fb11d7fe32a37b8d625744d22891c02e5e] Merge branch
+'at91-next' of git://git.kernel.org/pub/scm/linux/kernel/git/at91/linux.git
+git bisect good f55bf3fb11d7fe32a37b8d625744d22891c02e5e
+# good: [1340ff0aa9e6dcb9c8ac5f86472eb78ba524b14a] Merge branch
+'for-next' of git://git.kernel.dk/linux-block.git
+git bisect good 1340ff0aa9e6dcb9c8ac5f86472eb78ba524b14a
+# bad: [51d98f15885e036a06fef35c396c987e80c47a27] Merge branch
+'char-misc-next' of
+git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc.git
+git bisect bad 51d98f15885e036a06fef35c396c987e80c47a27
+# bad: [4f216a17ef0dc3bf99c28902abbc6c70fb7798a0] Merge branch
+'usb-next' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git
+git bisect bad 4f216a17ef0dc3bf99c28902abbc6c70fb7798a0
+# bad: [b11ba58b0ef5c932303dac5ce96e17d96c127870] Merge branch 'next' of
+git://git.kernel.org/pub/scm/virt/kvm/kvm.git
+git bisect bad b11ba58b0ef5c932303dac5ce96e17d96c127870
+# good: [b7ba28772e5709196e3efffb9341c7fd698b2497] Merge branch
+'for-next' of
+git://git.kernel.org/pub/scm/linux/kernel/git/trace/linux-trace.git
+git bisect good b7ba28772e5709196e3efffb9341c7fd698b2497
+# bad: [c345344e8317176944be33f46e18812c0343dc63] Merge tag
+'kvm-x86-selftests-6.12' of https://github.com/kvm-x86/linux into HEAD
+git bisect bad c345344e8317176944be33f46e18812c0343dc63
+# bad: [7056c4e2a13a61f4e8a9e8ce27cd499f27e0e63b] Merge tag
+'kvm-x86-generic-6.12' of https://github.com/kvm-x86/linux into HEAD
+git bisect bad 7056c4e2a13a61f4e8a9e8ce27cd499f27e0e63b
+# bad: [590b09b1d88e18ae57f89930a6f7b89795d2e9f3] KVM: x86: Register
+"emergency disable" callbacks when virt is enabled
+git bisect bad 590b09b1d88e18ae57f89930a6f7b89795d2e9f3
+# bad: [70c0194337d38dd29533e63e3cb07620f8c5eae1] KVM: Rename symbols
+related to enabling virtualization hardware
+git bisect bad 70c0194337d38dd29533e63e3cb07620f8c5eae1
+# bad: [218f6415004a881d116e254eeb837358aced55ab] KVM: selftests: Allow
+slot modification stress test with quirk disabled
+git bisect bad 218f6415004a881d116e254eeb837358aced55ab
+# good: [b4ed2c67d275b85b2ab07d54f88bebd5998d61d8] KVM: selftests: Test
+slot move/delete with slot zap quirk enabled/disabled
+git bisect good b4ed2c67d275b85b2ab07d54f88bebd5998d61d8
+# first bad commit: [218f6415004a881d116e254eeb837358aced55ab] KVM:
+selftests: Allow slot modification stress test with quirk disabled
+
+Thanks,
+Aishwarya
+
 
