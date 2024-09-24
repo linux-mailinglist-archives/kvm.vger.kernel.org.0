@@ -1,180 +1,153 @@
-Return-Path: <kvm+bounces-27371-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27372-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C7C79845E1
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 14:26:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E88798464D
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 15:01:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9164EB217AA
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 12:26:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C717E1F24446
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 13:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E76F1A706C;
-	Tue, 24 Sep 2024 12:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00A51A7269;
+	Tue, 24 Sep 2024 13:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZOrhIEr"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C184B3F9D5;
-	Tue, 24 Sep 2024 12:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7621B85DD;
+	Tue, 24 Sep 2024 13:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727180785; cv=none; b=PWC9MVGRrVjSwSL1gAfFMl7GdUtqeGboSoSyAHzuTjBWi5NkGPRGcTBA5Ue7LhXxac0F7+unw4B/a7UgBCCSFzXL4C8SHRLPb9F6D1BeFtRWuSNRD0VHefXAR9OH4PwL2oP7Ugaza/ORMLXvep7yx+QszFcSvOJ2abaySHxqAmQ=
+	t=1727182866; cv=none; b=OW/9YVpJ0/W1rjrA2dWemWZPYWGqtDHf6JZ8N9awCMY1SGFipNCiLe1CrdWILwUl319GrbIxQljE5R0DDfnztN8XDFkMtdiYlGrFy/bPn2ntaevCyImMm6dd1jE+NR34MwCqQ73DqRhBw+Q6uIxGPgIw3GQ+sd32kqyBsR3/dM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727180785; c=relaxed/simple;
-	bh=ZvJfiEwfNuvwZtXC2ii8kT4EZLzx/AHELisWsC/69po=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m0KgSxY7fVBrH2mZOLWWu/jY1ZIVo6qNadtow9lIAakXHEPelDTfk/JrCwBF/Y5ioHeA+yEnSUn3ooV/Ap+XUlxnPEW1CP51qx7euUG4hXfqKFAKbmiv+SR+YIA3fhAHe/vGNvQc4khViSHLX2Xv6D7RVnyn8lOtKuyS5kYVBj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BDC4DA7;
-	Tue, 24 Sep 2024 05:26:52 -0700 (PDT)
-Received: from [10.1.32.221] (R90XJLFY.arm.com [10.1.32.221])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 658753F64C;
-	Tue, 24 Sep 2024 05:26:21 -0700 (PDT)
-Message-ID: <b9367e1c-f339-46e1-8c44-d20f112a857a@arm.com>
-Date: Tue, 24 Sep 2024 13:26:20 +0100
+	s=arc-20240116; t=1727182866; c=relaxed/simple;
+	bh=OakmT0sLzny8R4JiJYYxGXCumP8RVBEVBkER1UAFCqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ejbNbUrblvOlBkT2UTme3J744XnPE6YNG/Si5R3Ik+OZwPaNHPC+8AArxBKTv/19MpAWkXDLH6wav4Vit0MuQAodIqNsitULIdEURCa9oqW1kOcjXezCvMz9hK0YxZ642ssG9w6NuLF4QmIeZ7zC7R1qmAwYMwlk+0XA+UJVBJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZOrhIEr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF214C4CEC4;
+	Tue, 24 Sep 2024 13:01:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727182865;
+	bh=OakmT0sLzny8R4JiJYYxGXCumP8RVBEVBkER1UAFCqc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EZOrhIEr2zgqlMHomrBGjn4qf2AhbOE/5eB6mnm/2fuMtMJ+ZgpprUbomnoTqy7hw
+	 r845phN3j3ryzwrH2oXkLMqqrumYvGXzTZfHVZpbDthcvk5Co+iBR1CYw9D9ouqE/b
+	 S2vajtRzNG2NBx7rDe9ELDr3c7gwBmoPDeYzuRcPQ0lsg6xuk9/x5ydgxqIxvHhA3H
+	 NyvraLkHZlKLx73aIrpNLGuZdvHu0WCxU4h4Xkjook5JGxWETUEEvm6Pa44qnp0Xj+
+	 y+D8ma5QUUc8fVqqVHPKUHghpVWrRgPY/uBJ+hDsN5SDWocjSK8eIxfOXB1fnjliL8
+	 UIHsflQBF+d+Q==
+Date: Tue, 24 Sep 2024 15:00:58 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Shiju Jose
+ <shiju.jose@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Ani Sinha
+ <anisinha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dongjiu Geng
+ <gengdongjiu1@gmail.com>, Eric Blake <eblake@redhat.com>, John Snow
+ <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth
+ <michael.roth@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+Subject: Re: [PATCH v10 00/21] Add ACPI CPER firmware first error injection
+ on ARM emulation
+Message-ID: <20240924150058.4879abe9@foz.lan>
+In-Reply-To: <20240917141519.57766bb6@imammedo.users.ipa.redhat.com>
+References: <cover.1726293808.git.mchehab+huawei@kernel.org>
+	<20240917141519.57766bb6@imammedo.users.ipa.redhat.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/4] KVM: selftests: Allow slot modification stress
- test with quirk disabled
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com,
- isaku.yamahata@intel.com, dmatlack@google.com, sagis@google.com,
- erdemaktas@google.com, graf@amazon.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
- Mark Brown <broonie@kernel.org>, Naresh Kamboju <naresh.kamboju@linaro.org>
-References: <20240703020921.13855-1-yan.y.zhao@intel.com>
- <20240703021206.13923-1-yan.y.zhao@intel.com>
-Content-Language: en-US
-From: Aishwarya TCV <aishwarya.tcv@arm.com>
-In-Reply-To: <20240703021206.13923-1-yan.y.zhao@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+Em Tue, 17 Sep 2024 14:15:19 +0200
+Igor Mammedov <imammedo@redhat.com> escreveu:
 
-
-On 03/07/2024 03:12, Yan Zhao wrote:
-> Add a new user option to memslot_modification_stress_test to allow testing
-> with slot zap quirk KVM_X86_QUIRK_SLOT_ZAP_ALL disabled.
+> I'm done with this round of review.
 > 
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
->  .../kvm/memslot_modification_stress_test.c    | 19 +++++++++++++++++--
-Hi Yan,
+> Given that the series accumulated a bunch of cleanups,
+> I'd suggest to move all cleanups/renamings not related
+> to new HEST lookup and new src id mapping to the beginning
+> of the series, so once they reviewed they could be split up into
+> a separate series that could be merged while we are ironing down
+> the new functionality. 
 
-When building kselftest-kvm config against next-20240924 kernel with
-Arm64 an error "'KVM_X86_QUIRK_SLOT_ZAP_ALL' undeclared" is observed.
+I've rebased the series placing the preparation stuff (cleanups
+and renames) at the beginning. So, what I have now is:
 
-A bisect identified 218f6415004a881d116e254eeb837358aced55ab as the
-first bad commit. Bisected it on the tag "next-20240923" at repo
-"https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git".
-Reverting the change seems to fix it.
+1) preparation patches:
 
-This works fine on Linux version 6.11
+41709f0898e1 acpi/ghes: get rid of ACPI_HEST_SRC_ID_RESERVED
+5409daa41c78 acpi/ghes: simplify acpi_ghes_record_errors() code
+2539f1f662b9 acpi/ghes: better handle source_id and notification
+3f19400549c1 acpi/ghes: Remove a duplicated out of bounds check
+f0b06ecede46 acpi/ghes: Change the type for source_id
+9f08301ac195 acpi/ghes: Prepare to support multiple sources on ghes
+2426cd76e868 acpi/ghes: make the GHES record generation more generic
+3fb7ec864700 acpi/ghes: better name GHES memory error function
+1a22dad3211e acpi/ghes: don't crash QEMU if ghes GED is not found
+726968d4ee20 acpi/ghes: rename etc/hardware_error file macros
+f562380da7ce docs: acpi_hest_ghes: fix documentation for CPER size
+69850f550f99 acpi/generic_event_device: add an APEI error device
 
-Failure log
-------------
-https://storage.kernelci.org/next/master/next-20240924/arm64/defconfig+kselftest/gcc-12/logs/kselftest.log
+Patches were changed to ensure that they won't be add any new
+new features. They are just code shift in order to make the diff
+of the next patches smaller.
 
-In file included from include/kvm_util.h:8,
-                 from include/memstress.h:13,
-                 from memslot_modification_stress_test.c:21:
-memslot_modification_stress_test.c: In function ‘main’:
-memslot_modification_stress_test.c:176:38: error:
-‘KVM_X86_QUIRK_SLOT_ZAP_ALL’ undeclared (first use in this function)
-  176 |                                      KVM_X86_QUIRK_SLOT_ZAP_ALL);
-      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
-include/test_util.h:41:15: note: in definition of macro ‘__TEST_REQUIRE’
-   41 |         if (!(f))                                               \
-      |               ^
-memslot_modification_stress_test.c:175:25: note: in expansion of macro
-‘TEST_REQUIRE’
-  175 |
-TEST_REQUIRE(kvm_check_cap(KVM_CAP_DISABLE_QUIRKS2) &
-      |                         ^~~~~~~~~~~~
-memslot_modification_stress_test.c:176:38: note: each undeclared
-identifier is reported only once for each function it appears in
-  176 |                                      KVM_X86_QUIRK_SLOT_ZAP_ALL);
-      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
-include/test_util.h:41:15: note: in definition of macro ‘__TEST_REQUIRE’
-   41 |         if (!(f))                                               \
-      |               ^
-memslot_modification_stress_test.c:175:25: note: in expansion of macro
-‘TEST_REQUIRE’
-  175 |
-TEST_REQUIRE(kvm_check_cap(KVM_CAP_DISABLE_QUIRKS2) &
-      |                         ^~~~~~~~~~~~
-At top level:
-cc1: note: unrecognized command-line option
-‘-Wno-gnu-variable-sized-type-not-at-end’ may have been intended to
-silence earlier diagnostics
-make[4]: *** [Makefile:300:
-/tmp/kci/linux/build/kselftest/kvm/memslot_modification_stress_test.o]
-Error 1
-make[4]: Leaving directory '/tmp/kci/linux/tools/testing/selftests/kvm'
+There is a small point here: the logic was simplified to only
+support a single source ID (I added an assert() to enforce it) and
+simplified the calculus in preparation for the HEST and migration
+series.
 
 
-Bisect log:
-----------
+2) add a BIOS pointer to HEST, using it. The migration stuff
+will be along those:
 
-git bisect start
-# good: [98f7e32f20d28ec452afb208f9cffc08448a2652] Linux 6.11
-git bisect good 98f7e32f20d28ec452afb208f9cffc08448a2652
-# bad: [ef545bc03a65438cabe87beb1b9a15b0ffcb6ace] Add linux-next
-specific files for 20240923
-git bisect bad ef545bc03a65438cabe87beb1b9a15b0ffcb6ace
-# good: [176000734ee2978121fde22a954eb1eabb204329] Merge tag
-'ata-6.12-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/libata/linux
-git bisect good 176000734ee2978121fde22a954eb1eabb204329
-# good: [f55bf3fb11d7fe32a37b8d625744d22891c02e5e] Merge branch
-'at91-next' of git://git.kernel.org/pub/scm/linux/kernel/git/at91/linux.git
-git bisect good f55bf3fb11d7fe32a37b8d625744d22891c02e5e
-# good: [1340ff0aa9e6dcb9c8ac5f86472eb78ba524b14a] Merge branch
-'for-next' of git://git.kernel.dk/linux-block.git
-git bisect good 1340ff0aa9e6dcb9c8ac5f86472eb78ba524b14a
-# bad: [51d98f15885e036a06fef35c396c987e80c47a27] Merge branch
-'char-misc-next' of
-git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc.git
-git bisect bad 51d98f15885e036a06fef35c396c987e80c47a27
-# bad: [4f216a17ef0dc3bf99c28902abbc6c70fb7798a0] Merge branch
-'usb-next' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git
-git bisect bad 4f216a17ef0dc3bf99c28902abbc6c70fb7798a0
-# bad: [b11ba58b0ef5c932303dac5ce96e17d96c127870] Merge branch 'next' of
-git://git.kernel.org/pub/scm/virt/kvm/kvm.git
-git bisect bad b11ba58b0ef5c932303dac5ce96e17d96c127870
-# good: [b7ba28772e5709196e3efffb9341c7fd698b2497] Merge branch
-'for-next' of
-git://git.kernel.org/pub/scm/linux/kernel/git/trace/linux-trace.git
-git bisect good b7ba28772e5709196e3efffb9341c7fd698b2497
-# bad: [c345344e8317176944be33f46e18812c0343dc63] Merge tag
-'kvm-x86-selftests-6.12' of https://github.com/kvm-x86/linux into HEAD
-git bisect bad c345344e8317176944be33f46e18812c0343dc63
-# bad: [7056c4e2a13a61f4e8a9e8ce27cd499f27e0e63b] Merge tag
-'kvm-x86-generic-6.12' of https://github.com/kvm-x86/linux into HEAD
-git bisect bad 7056c4e2a13a61f4e8a9e8ce27cd499f27e0e63b
-# bad: [590b09b1d88e18ae57f89930a6f7b89795d2e9f3] KVM: x86: Register
-"emergency disable" callbacks when virt is enabled
-git bisect bad 590b09b1d88e18ae57f89930a6f7b89795d2e9f3
-# bad: [70c0194337d38dd29533e63e3cb07620f8c5eae1] KVM: Rename symbols
-related to enabling virtualization hardware
-git bisect bad 70c0194337d38dd29533e63e3cb07620f8c5eae1
-# bad: [218f6415004a881d116e254eeb837358aced55ab] KVM: selftests: Allow
-slot modification stress test with quirk disabled
-git bisect bad 218f6415004a881d116e254eeb837358aced55ab
-# good: [b4ed2c67d275b85b2ab07d54f88bebd5998d61d8] KVM: selftests: Test
-slot move/delete with slot zap quirk enabled/disabled
-git bisect good b4ed2c67d275b85b2ab07d54f88bebd5998d61d8
-# first bad commit: [218f6415004a881d116e254eeb837358aced55ab] KVM:
-selftests: Allow slot modification stress test with quirk disabled
+c24f1a8708e3 acpi/ghes: add a firmware file with HEST address
+853dce23ec39 acpi/ghes: Use HEST table offsets when preparing GHES records
+c148716fd7c8 acpi/generic_event_device: Update GHES migration to cover hest addr
+
+Up to that, still no new features, but the offset calculus will be
+relative to HEST table and will use the bios pointers stored there;
+
+3) Add support for generic error inject:
+
+f5ec0d197d82 acpi/ghes: add a notifier to notify when error data is ready
+f5e015537209 arm/virt: Wire up a GED error device for ACPI / GHES
+3b6692dbf473 qapi/acpi-hest: add an interface to do generic CPER error injection
+620a5a49f218 scripts/ghes_inject: add a script to generate GHES error inject
+
+4) MPIDR property:
+2dd6e3aae450 target/arm: add an experimental mpidr arm cpu property object
+02c88cd4daa2 scripts/arm_processor_error.py: retrieve mpidr if not filled
+
+I'm still testing if the rebase didn't cause any issues. So, the above
+may still change a little bit. I also need to address your comments to the
+cleanup patches and work at the migration, but just want to double check if
+this is what you want.
+
+If OK to you, my plan is to submit you the cleanup patches after I
+finish testing the hole series.
+
+The migration logic will require some time, and I don't want to bother
+with the cleanup stuff while doing it. So, perhaps while I'm doing it,
+you could review/merge the cleanups.
+
+We can do the same for each of the 4 above series of patches, as it
+makes review simpler as there will be less patches to look into on
+each series.
+
+Would it work for you?
 
 Thanks,
-Aishwarya
-
+Mauro
 
