@@ -1,250 +1,237 @@
-Return-Path: <kvm+bounces-27383-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27384-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9055984955
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 18:13:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F8F99849DB
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 18:42:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBEC61C22CCC
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 16:13:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A28991C235D9
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2024 16:42:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88941ABECA;
-	Tue, 24 Sep 2024 16:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3D41ABEB7;
+	Tue, 24 Sep 2024 16:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lPxw24MQ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Wj9U1e5F"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2051.outbound.protection.outlook.com [40.107.96.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B432745B;
-	Tue, 24 Sep 2024 16:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727194388; cv=none; b=W3dmREttpdzbTDOJRngpsk+2JOPbePFItU4foZk1Qppdz6qrbLyE21vn3mX3vS+GAhqOPzU76/JIK8F9FzuIPdvbPmnybxWp2n8FMMTvHt7ucMizvz1488t6xUSrQWaUbU7FdIiUOFIXALibJO1nHvBuJynZUKHVEIQdqYP82ys=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727194388; c=relaxed/simple;
-	bh=HpcRgmWNCisXaoxbVVfwkSkZuAQGdv5km6C6JtSnPDs=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qY1NAVSdhF7LdQoX5nzlquvmQX0IzMnG9gDu6pFH6f6Aajb9kUJudP2lG3Lr60o9PnNB/8UqnCC/wzs+CyJluGqwbK8YxzrhH4upVY8TEJzNZCqoxgtpdoDz+uZBKnb/2CYbG/V+zKE2GHvISjNhWqudpn3ZkxZFFGo4eeCzafQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lPxw24MQ; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=9NdC87PWC/rmPK2rzPPmAXcpdLbnJYcZs+fYf+Aquc4=; b=lPxw24MQrumLp5MnUP/b3XP1Pw
-	h7vEF/+mVWd3U+XlvxRV3MSNogrHd6Bm9+7dsJWCR7UYwfUOtGEQDdylJcW2kVai03c8StR23KGsP
-	7zPPEgFViwbQGChMgEcpYGz9LtT1tEvlEn61nIOx2N4Aolfnyy1lGC2lRNvkxMkfROnhmW8L4ytNe
-	2AVmI+sgVa4xAE/AnzMH7iq1LogKghZ3yBV1Tpv6tf11rNdqKvJZ+LTTYugu9xiHCYeC4RT+7MS5d
-	DExWICSV8E9YT3S4nJNsb/gkov4w/WmmXAUzjABKB+qKDDKxdKjkSglSp5xxCeMRckhIzXTe+C3Qy
-	8Hu/POag==;
-Received: from [2001:8b0:10b:5:58f5:7dd9:39e2:1ee3] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1st89s-00000001wm3-3CTK;
-	Tue, 24 Sep 2024 16:13:01 +0000
-Message-ID: <222a439df0a08d48021e80b9cff7aeb373c9b060.camel@infradead.org>
-Subject: [PATCH v4 0/6] Add PSCI v1.3 SYSTEM_OFF2 support for hibernation
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James
- Morse <james.morse@arm.com>,  Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland
- <mark.rutland@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael
- J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>, Len Brown
- <len.brown@intel.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
- linux-pm@vger.kernel.org,  linux-kselftest@vger.kernel.org
-Date: Tue, 24 Sep 2024 17:13:00 +0100
-In-Reply-To: <20240924160512.4138879-1-dwmw2@infradead.org>
-References: <20240924160512.4138879-1-dwmw2@infradead.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-ovdIoLmCuf88mYSR4DLM"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A231AB6F6
+	for <kvm@vger.kernel.org>; Tue, 24 Sep 2024 16:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727196119; cv=fail; b=nO493leQVSzmgu+04xIgwrCkUWQ+AP61xXS9sHIQemjmVXYRDURW89X/3Qz3VTXC/ss2SgTHtXmsGZia1kCXupZSvSA8kT35W+oOXt/SfJSeCNYcwH6f7zysxOms1Y/9I0lDJ/Vk+vFIC8bx3/Uvfw9vseGdS9uAreJEFtHyTZQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727196119; c=relaxed/simple;
+	bh=sCS0FlXhzwBYTtMAf77YPwejbFryTPSjzJU5JH9i+K4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=MxMJ7QWezEaIVU/0ETzNWFB1cps8H2IYgRJcs8NC4TNxsKg2wlIn7H/o+Ke32jAtoC8EGDtp3n/u3Mpa9Pbfc7ue6pxf56Jz1IEyiDPOVSxTZXVpC38RvLqxL7a4gTGoqHHhu3AqVCxfFTGlhdtt+MkP1ozVn8hDf1djWrjAlFc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Wj9U1e5F; arc=fail smtp.client-ip=40.107.96.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=u1FIsGrTOCk58+5SlQy3S99DCMawUhElrgrbP46MLQ5RpHD2jK5hoXwJtQetmPf24XWDNK6EvlfihLLvK9uByy2L/Or8bNn+ErKJeMJxsXhlNqVyskUWk83XjFq2xX+DNaN7ONcelXtE6bTYOA7UTty8fIJJn905ONHj0zwjx2HvNPUmW6Dx93kJeUtw0cLwQDTCD0fJjauAvrY65elWLMfqCSTJS+Fq1m99Ns0gz/QLV6JJwfXvp9VGrMsNCv+ePG6vXjXb6D2iHZy08WQ90Dv5R9B9WV1zKmdbI4526qlkssxShIbASHJcpLjPtQu5l0s9IaLVufdto9T+B5ku3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4X4NXFLDFBRIGmcqSFAq/c+XH3o35limhligv9qa8xY=;
+ b=pH9jM3kNhL2++w340PJSMMmpv7jRq4k+bbiuHjuMkmQT9LD5TMQ/rss3Vc3fsIBiC0S+wy6VHdBnJ8QSxMeUFMbwK4a6/y97reHBR2lgtuVVQ0zs7fb808iyRaC+bneN2NmmhSWBs2IPNamW0IHbi8TbLtGQ532oi7O7+kZa5UA9s5n8h04nlXoDS3jko1BTbgQAjaBsbMRIR1oYbL3+vrjA17utsneHZZVQcTLY6icoAPZvu1A8uGc32TL5xOtmuAEUxRbEFHTZQp57mGIlfhSri9Gxqrcw+Tysy2142uZPdE1LYixxTvUHHlbxuMN9x9xaEuGpAYFk4ZnQnpzwVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4X4NXFLDFBRIGmcqSFAq/c+XH3o35limhligv9qa8xY=;
+ b=Wj9U1e5FEFWsLnpR84zNop61lNTnboDpmt6zx6T+w/aFuTvo102Yh6rSXEIxpL0tM3C+jLxBUupJ0FrAUQWjmtBLgQtvKZ5K9FxbnpVlqgMnA2YTpgn+0UQXPpYd2D5IkskWBM2aFaxSdqKXE5iAZxr6TAv3aRY5Yl6bnRPsdDpXAhJUPqIsotDHWD9qxPfOZSRA9569olCuoXQCV7X54JJITvIf0j7jGMcUnB/DpX1gnjSlF6So23DzDGsFwVSYD0lIfRvZdEqpkPg4ZpB7y7m00xi4oMA5XNR0jmFImM0H7nze5eVHSg3ZGkFhian/xcce3T2lv2fb0Y9TwqasZw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by DM4PR12MB5818.namprd12.prod.outlook.com (2603:10b6:8:62::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.25; Tue, 24 Sep
+ 2024 16:41:53 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.7982.022; Tue, 24 Sep 2024
+ 16:41:53 +0000
+Date: Tue, 24 Sep 2024 13:41:51 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Danilo Krummrich <dakr@kernel.org>
+Cc: Zhi Wang <zhiw@nvidia.com>, kvm@vger.kernel.org,
+	nouveau@lists.freedesktop.org, alex.williamson@redhat.com,
+	kevin.tian@intel.com, airlied@gmail.com, daniel@ffwll.ch,
+	acurrid@nvidia.com, cjia@nvidia.com, smitra@nvidia.com,
+	ankita@nvidia.com, aniketa@nvidia.com, kwankhede@nvidia.com,
+	targupta@nvidia.com, zhiwang@kernel.org
+Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
+Message-ID: <20240924164151.GJ9417@nvidia.com>
+References: <20240922124951.1946072-1-zhiw@nvidia.com>
+ <ZvErg51xH32b8iW6@pollux>
+ <20240923150140.GB9417@nvidia.com>
+ <ZvHwzzp2F71W8TAs@pollux.localdomain>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZvHwzzp2F71W8TAs@pollux.localdomain>
+X-ClientProxiedBy: MN2PR06CA0006.namprd06.prod.outlook.com
+ (2603:10b6:208:23d::11) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DM4PR12MB5818:EE_
+X-MS-Office365-Filtering-Correlation-Id: c5f082a5-9b5d-4220-18f3-08dcdcb7cb5e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?WTceFln66tr1Ur6L0zISxfLhUQsfqhJ55KSIAOKBVLhqT3Z3mNHbX2c/EiUQ?=
+ =?us-ascii?Q?oHm25OfGY64Nb4UKBKLtoYkW3EGIgRowlWJe69w0FyxL6da+fq6CVWSO47fP?=
+ =?us-ascii?Q?iBP/p7iW/QnuqECwiKTYlP2el4BAzED8RIuzHI60wObOy73mL8YhYp6R2YRe?=
+ =?us-ascii?Q?+LN8X2I6mrr+ypRhqWW3apV6cJP0f6t+cElS/wK+CSulgn4C3EvJSUpp/6HS?=
+ =?us-ascii?Q?tjytdG1Yh7RcHU/vkBowTtq7NlgRr1imFMy7U+swphoA5qJgchoJS6RGPFMY?=
+ =?us-ascii?Q?xxOlwitXIIg8DAiIC9Rf4uKVplJhEnRFPW9+W2uEz3fZso5cVrsqf6QAc23H?=
+ =?us-ascii?Q?beEy6erXINvM5tt1UlJszgLcnuMV/RSDTOirYj/zJmfJQRHeZnJVRk45FXxu?=
+ =?us-ascii?Q?7boEpSg+vxI1beFRyjfY0aYL5bVCFV8xKrA4n4FC0UqTNFP4lzwHZW7bOfNc?=
+ =?us-ascii?Q?IP6xLKNgmxLl9imeiPSk2GkVCF1gK8QkANAtZXV0AmndI4Ea+MGytKkL0JNg?=
+ =?us-ascii?Q?BbxUne8vN0Z8niekXhpO6U2hKgAmiDziIxUzJnATJ7HAkVxt5Z0il4ecW+f8?=
+ =?us-ascii?Q?jiZUyWWKTzhuS0qLsM1o1PtSifnqQm2HqNfKPlqjX+Lqe2sajaG9/uLdUuZm?=
+ =?us-ascii?Q?TmcXdFwSiwa9EIDUc91WrKdoL1aF0Akv9PTtrYm/bHJvudbFXoRV3lNohQ6t?=
+ =?us-ascii?Q?XK3MPd+8qskexw3AdwNZFcmRCXaz7XNMGSiee3BqNN7zZtHbYpYLFksMylO3?=
+ =?us-ascii?Q?7Oa3FRG9TYG5JLEgTaLlPijIk7JSXOJOKjJtoU76IJiz0slgCq7ouE52q9B6?=
+ =?us-ascii?Q?33Cx9RDjhbwRrBCtfqvGSHPg+2Lzh5b1XpK1XGNen6jwnXbubjDnw/sOpi39?=
+ =?us-ascii?Q?nbp5S3IlmHLI1bvShL0laD207KeT499pFZkBGk5d4EiQHKMuvus7a1+lvESt?=
+ =?us-ascii?Q?EQ2PwpRK/hZ+sClcNdn+BC11bQcg0yMC7WFVKQkFyknXTOR7eCUNiCkrKCLj?=
+ =?us-ascii?Q?hisNUVLpyD1TQ8msjDPaWnJWvoNEUkCQD1sSuDueHQhqh4Bp+BewbPscZFr7?=
+ =?us-ascii?Q?VY9haQSu7+fIP9bejpkXLueO/qTC/dF30Ia7d5TYag6B1jgiFNAyjkQEG/Lq?=
+ =?us-ascii?Q?3Mtormq4yEW7B2t+tzDRx/NsGTpQ9VPu9gAzLevDKFXKofB07141lFc+xt6S?=
+ =?us-ascii?Q?w3SdI7zwuYHyH+pOvv7NVRN3xx+aPSIVW3qFaCVyqcaMkb2S9aTshxEGgP0R?=
+ =?us-ascii?Q?qPBk6c8XcPkKB8Sq19/d7nuXs0urcfEs7Eq01TtON7dGao9HtUzXhEcdJAU6?=
+ =?us-ascii?Q?vv/NoLelVkCtKTnQ14dENJXHGNVdrPudWMizq8magMydIw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Pmlqy5a3ps/n2APmtUTOV2pNZoDP3ooY+NNPsTQtVL2zG1k5kHRRAAMUG/Qj?=
+ =?us-ascii?Q?JH5PKJxUXDj3cJIreYYQ1KUmA0Sp7+y+X0lUkPyhuvufnbup3pym/DFFGi32?=
+ =?us-ascii?Q?VUz++C7FMsyvrXc02yabzmPBtvTwB9IDo+IuKaDxlnksXydaI6DORpqmmigQ?=
+ =?us-ascii?Q?ZpDyOoTFgschLHdP3tWyUINC8yvsJdZA0P7z7vVJKsrQ3ixM2Kxzabp7STRx?=
+ =?us-ascii?Q?evaSnHp7AEAAhGmsln7Xcm9ZFEWg+MRwUQQTmh0ZKbVIN5JnHDIUY/0HAmcI?=
+ =?us-ascii?Q?S0138nOaCOrjevlLxJqRIAZgn8oO+M+YK4/gSsTfpLVfajX4HIJfXIWIlUJ/?=
+ =?us-ascii?Q?Ic3/yznhiqv/SSEkVZD8UP89fI9tdac/jGrQstkBuC93AAFMV+6MmpcMYX0J?=
+ =?us-ascii?Q?i+3X8SlsanTc1JGahJk3M5tXbYIdAFhhUUNPe82EJx0rfTAUzqYYkN5rdUNv?=
+ =?us-ascii?Q?1EXGoYBrcJCSFKFj3AwkAjXdsRpuHHWF/Om/TDmbZirA6tI1IfKx10Jp8JI9?=
+ =?us-ascii?Q?4bRdnod0CEnhrUKw3FkKdx2O5owyauEXc+aMtSZYq32DINwlmgV3CWvWnqL7?=
+ =?us-ascii?Q?VtX9LXntr4jaQdkXkvhkbBouESTw4yKdpbotVER/DmB74tcvfn6+kIlS3lID?=
+ =?us-ascii?Q?nyYCAflo6ZLWTilIxIukGnAPVxcoFw0hHlETo/xqyQPewXjb0fO00OlS5BFa?=
+ =?us-ascii?Q?8l9FFCrxHPKRkKNgi6rRxtUobyNjIKdg0cPl/CdNoYGPYbvKuwx+RCaeDBLJ?=
+ =?us-ascii?Q?lv7A4FHFozen/MAopJht7Z3smhhZWtC7VeDdpwj7AkdcXT59UN9cVkIjVJtq?=
+ =?us-ascii?Q?onhW37RiAO9NJcxkdjvThtKiAVj4VQuRopPBtcU/NE2I5XCzspDAIddvIdXr?=
+ =?us-ascii?Q?+NDqbOUsPsesNjqIHJuQKUhpVGaSJnKTWZ4J2SRIoYEtHvHnT3zeyr55zy3G?=
+ =?us-ascii?Q?Om4Y5HLItWKjzf2pEFHqhzZ9UrOAlVexm0UEYesKS+V6IRYHgjfalTMwNncc?=
+ =?us-ascii?Q?PFm4ueY6Hik+8FAbV31GhwO+lLXXxdaSH6sgrsv9f/TtWX4NCNS6jCNO7auL?=
+ =?us-ascii?Q?PTRTHBL2OxAM1VJGNWse7fxtaEotB8fPcyYqlGKKvCASHwxymX2pOm88+BB3?=
+ =?us-ascii?Q?Sagdx3DIzFH/fESUFEpxC8tj43b5rJUrIeO1rlLLG9IFDKjcdbJFZQ1gfzfL?=
+ =?us-ascii?Q?eHU0N9Y8OzA1FRiX+hZLdDk3BEqruodY0UW+z/r2e3MPS0UzA/8PmmyBsSD2?=
+ =?us-ascii?Q?QMs+PsBiUwpmi1mBB/Lq7OOeJdXO1iszE4XQpbLoDNeWapioei5qkhB6w6jl?=
+ =?us-ascii?Q?VlQqIbWKRvnb1hvqaQk1qDKwmBMzun8bFyfloIiR8KhghAEM0HvU08Oda9Hi?=
+ =?us-ascii?Q?6WX9sBTk/cbb65EsJyoR8kGe4g8hDfQLcVQTQXhuTv4N7qmK5GF7yiJ3HFSq?=
+ =?us-ascii?Q?Ni28fOeZcLUvgqP5JXUo9QXxH7NvyvZVi2r/LmKQie+TJ5k2VmH4xoV21UC4?=
+ =?us-ascii?Q?b+jSGAlIr6O57Jdhak09QosylUeG8xncaI9x77/CUTGLfNHAUSPwX8sC//yW?=
+ =?us-ascii?Q?Y7M09xvfjT/gt4zni18=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5f082a5-9b5d-4220-18f3-08dcdcb7cb5e
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2024 16:41:53.0703
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: egadkeR5QZHhFwTlV/6b0EXk2ytKLvjcj4gLFTMPSUT6wxBvm+fqSab3PKvaGXjG
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5818
 
+On Tue, Sep 24, 2024 at 12:50:55AM +0200, Danilo Krummrich wrote:
 
---=-ovdIoLmCuf88mYSR4DLM
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> > From the VFIO side I would like to see something like this merged in
+> > nearish future as it would bring a previously out of tree approach to
+> > be fully intree using our modern infrastructure. This is a big win for
+> > the VFIO world.
+> > 
+> > As a commercial product this will be backported extensively to many
+> > old kernels and that is harder/impossible if it isn't exclusively in
+> > C. So, I think nova needs to co-exist in some way.
+> 
+> We'll surely not support two drivers for the same thing in the long term,
+> neither does it make sense, nor is it sustainable.
 
-(oops, missed --compose on that command line. You can have the cover
-letter as a reply instead)
+What is being done here is the normal correct kernel thing to
+do. Refactor the shared core code into a module and stick higher level
+stuff on top of it. Ideally Nova/Nouveau would exist as peers
+implementing DRM subsystem on this shared core infrastructure. We've
+done this sort of thing before in other places in the kernel. It has
+been proven to work well.
 
+So, I'm not sure why you think there should be two drivers in the long
+term? Do you have some technical reason why Nova can't fit into this
+modular architecture?
 
-The PSCI v1.3 spec (https://developer.arm.com/documentation/den0022)
-adds support for a SYSTEM_OFF2 function enabling a HIBERNATE_OFF state
-which is analogous to ACPI S4. This will allow hosting environments to
-determine that a guest is hibernated rather than just powered off, and
-ensure that they preserve the virtual environment appropriately to
-allow the guest to resume safely (or bump the hardware_signature in the
-FACS to trigger a clean reboot instead).
+Regardless, assuming Nova will eventually propose merging duplicated
+bootup code then I suggest it should be able to fully replace the C
+code with a kconfig switch and provide C compatible interfaces for
+VFIO. When Rust is sufficiently mature we can consider a deprecation
+schedule for the C version.
 
-This updates KVM to support advertising PSCI v1.3, and unconditionally
-enables the SYSTEM_OFF2 support when PSCI v1.3 is enabled.
+I agree duplication doesn't make sense, but if it is essential to make
+everyone happy then we should do it to accommodate the ongoing Rust
+experiment.
 
-For the guest side, add a new SYS_OFF_MODE_POWER_OFF handler with higher
-priority than the EFI one, but which *only* triggers when there's a
-hibernation in progress. There are other ways to do this (see the commit
-message for more details) but this seemed like the simplest.
+> We have a lot of good reasons why we decided to move forward with Nova as a
+> successor of Nouveau for GSP-based GPUs in the long term -- I also just held a
+> talk about this at LPC.
 
-Version 2 of the patch series splits out the psci.h definitions into a
-separate commit (a dependency for both the guest and KVM side), and adds
-definitions for the other new functions added in v1.3. It also moves the
-pKVM psci-relay support to a separate commit; although in arch/arm64/kvm
-that's actually about the *guest* side of SYSTEM_OFF2 (i.e. using it
-from the host kernel, relayed through nVHE).
+I know, but this series is adding a VFIO driver to the kernel, and a
+complete Nova driver doesn't even exist yet. It is fine to think about
+future plans, but let's not get too far ahead of ourselves here..
 
-Version 3 dropped the KVM_CAP which allowed userspace to explicitly opt
-in to the new feature like with SYSTEM_SUSPEND, and makes it depend only
-on PSCI v1.3 being exposed to the guest.
+> For the short/mid term I think it may be reasonable to start with
+> Nouveau, but this must be based on some agreements, for instance:
+> 
+> - take responsibility, e.g. commitment to help with maintainance with some of
+>   NVKM / NVIDIA GPU core (or whatever we want to call it) within Nouveau
 
-Version 4 is no longer RFC, as the PSCI v1.3 spec is finally published.
-Minor fixes from the last round of review, and an added KVM self test.
+I fully expect NVIDIA teams to own this core driver and VFIO parts. I
+see there are no changes to the MAINTAINERs file in this RFC, that
+will need to be corrected.
 
-David Woodhouse (6):
-      firmware/psci: Add definitions for PSCI v1.3 specification
-      KVM: arm64: Add PSCI v1.3 SYSTEM_OFF2 function for hibernation
-      KVM: arm64: Add support for PSCI v1.2 and v1.3
-      KVM: selftests: Add test for PSCI SYSTEM_OFF2
-      KVM: arm64: nvhe: Pass through PSCI v1.3 SYSTEM_OFF2 call
-      arm64: Use SYSTEM_OFF2 PSCI call to power off for hibernate
+> - commitment to help with Nova in general and, once applicable, move the vGPU
+>   parts over to Nova
 
- Documentation/virt/kvm/api.rst                  | 11 +++++
- arch/arm64/include/uapi/asm/kvm.h               |  6 +++
- arch/arm64/kvm/hyp/nvhe/psci-relay.c            |  2 +
- arch/arm64/kvm/hypercalls.c                     |  2 +
- arch/arm64/kvm/psci.c                           | 43 ++++++++++++++++-
- drivers/firmware/psci/psci.c                    | 37 +++++++++++++++
- include/kvm/arm_psci.h                          |  4 +-
- include/uapi/linux/psci.h                       | 20 ++++++++
- kernel/power/hibernate.c                        |  5 +-
- tools/testing/selftests/kvm/aarch64/psci_test.c | 61 +++++++++++++++++++++=
-++++
- 10 files changed, 188 insertions(+), 3 deletions(-)
+I think you will get help with Nova based on its own merit, but I
+don't like where you are going with this. Linus has had negative
+things to say about this sort of cross-linking and I agree with
+him. We should not be trying to extract unrelated promises on Nova as
+a condition for progressing a VFIO series. :\
 
+> But I think the very last one naturally happens if we stop further support for
+> new HW in Nouveau at some point.
 
---=-ovdIoLmCuf88mYSR4DLM
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+I expect the core code would continue to support new HW going forward
+to support the VFIO driver, even if nouveau doesn't use it, until Rust
+reaches some full ecosystem readyness for the server space.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI0MTYxMzAwWjAvBgkqhkiG9w0BCQQxIgQgK0Vq/hfz
-nQjBm1iJ/CmLwgch3GUiv5kT4IgMIdnnB6wwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAHfNQjTThMwZpzn6hGXYbosZrTf/EpxuEo
-nM0eB4aunXyVkTIHDwvAj+b6T8z3RMFZhK4SrIF9ef4DcmtEehdreZYM0zSm4i9Fyt6oyfU6AKGa
-SR7+/grlveB2oSaSsE8shImEjE5wbU5I5UUt/TYWvqPnL3VtLOvDkVPHiLecfJakw23/ezc/k3K0
-pUWbkXl0ayKRIN5/1ZpBCUso8ZURHADbjWeRO2BUr7ftlArd3IQ7g4E+bqJmjHJgJHbojVxTSdgl
-bgfcd8kQjuGrFYSfcdtQ4SLr0IGkQ9DJPpbxm2yuSAKEKCbkb52qRqFyz7LSSMkKKWxURCZaWHFq
-UXibsPyGMgb6W8F8KswkH11JSK90bapGO8AE7XWBnu/A5Kk3WI7UIYqwAtnH7CDhEvSNSH0zXKEb
-ofyGPQ5DdniunEscX4zASPfX5SpqN2B7LjUvQjXzRJAXf4YiQemK7Egb8XfR41qAYqkJblADEzaJ
-yP7bOdkX9KI/g8CC3lwuzzCSk04VEctz9H80J5mBD7lrycGuQuEgh1Hq193eRJZLOQVuepUSzXyk
-n5YsGDg+HLqAOeTGKwLaYO+Ve6kB3ODRto9swmv5zoMQIxqBDJg5CBQ6+Fr2tozL2/U5/fco6SoT
-Ee1KstdPHkotdD4NDrfzg8HNApwPL5wQimKbyoCUzQAAAAAAAA==
+There are going to be a lot of users of this code, let's not rush to
+harm them please.
 
+Fortunately there is no use case for DRM and VFIO to coexist in a
+hypervisor, so this does not turn into a such a technical problem like
+most other dual-driver situations.
 
---=-ovdIoLmCuf88mYSR4DLM--
+Jason
 
