@@ -1,121 +1,128 @@
-Return-Path: <kvm+bounces-27408-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27409-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449E2985527
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 10:10:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3176F9855C6
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 10:44:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0380B281446
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 08:10:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6280A1C20882
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 08:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAADD158D81;
-	Wed, 25 Sep 2024 08:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E5915B12F;
+	Wed, 25 Sep 2024 08:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DG+rbbRL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eHFDkqBu"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC4A155741
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 08:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347C715AAB6
+	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 08:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727251794; cv=none; b=D+te2+CgY/DnpxPmhwkZt7ItlSyZFKrme61OcBWHk1A/koS+yaWcW2fHhse8G6r74WZXIohqbo45ohLCxuWT7Hnhj2593bgG0svcTgW18UCqaHvSKo68sWm+uitUCYJwB+9D92/Ttz+OIV5cfSqwe+nPNISg2BRr9GUEqWrpqWk=
+	t=1727253868; cv=none; b=uuGmsyKHkpb+42mmjhnlOlMtp49G239Qght/hUIQeFz3ZorX81xVOU2om4Rl9xhWNktSfzQihkwgAXVvJyK125BkVI5QbX4d15LmeLmvI+WUIBQRikCUez0XBDLcFbrBT77TPI040mKAsIK2P++5KjrYKjmONQHgED2ZHeGkQuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727251794; c=relaxed/simple;
-	bh=gF4N/WbpCBs9EJZcuqGshEGAssyBpYUYMxaE44usRrc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YBg+ptSc6ltCCElfoH8qBbkMhafpKQrxunJ+Z3PiuOHdfpFtyYh7mNDBVD1Tf297fcudwNe1UhbZeY38ciaMTtNi7vFoLEIgHHguaFzJivRnBjN2Eg2sjYNuS98TaBiUeVAUhyeYP4L+u0KAvmCuBN1a5MJ14EGxUpsLbE2Kk7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DG+rbbRL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE8D4C4CEC3;
-	Wed, 25 Sep 2024 08:09:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727251793;
-	bh=gF4N/WbpCBs9EJZcuqGshEGAssyBpYUYMxaE44usRrc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DG+rbbRLiyvNBK+w0Cmul/A/wbudn6AqIqJQ6+gUdVnW4BRICyhz9J8Uij+8Zkjl1
-	 vzYSDqn+pbNP5tMS1BpWEnc8qUbMHMYnnHRZiNCnciWhnhlfk5aZGKAgYQDdRIw8fT
-	 +R86Q47zcwm35yWb94i6/VTxPEkXobdfRKbHGsqdvCSVqD8mIiva310lRNWdgO2l1E
-	 h+96lANKA/rsFLIRBMzioOHaHfz++XTL+eWz7oZ2Drq9+/qPLtyonFeMafq0Zo6j9X
-	 43R/WM/NvSt4In4K5aiPSuR0yPwXS0/CqaoaEKMxG6q8r98TERGVBak4Z1QBwUUk/4
-	 ncO5qllgEp2bA==
-Date: Wed, 25 Sep 2024 10:09:48 +0200
-From: Keith Busch <kbusch@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org, x86@kernel.org,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Xu Liu <liuxu@meta.com>
-Subject: Re: [PATCH RFC] kvm: emulate avx vmovdq
-Message-ID: <ZvPFTMBXAwHhrU1i@kbusch-mbp>
-References: <20240820230431.3850991-1-kbusch@meta.com>
- <ZvAUIaZiFD3lsDI_@google.com>
+	s=arc-20240116; t=1727253868; c=relaxed/simple;
+	bh=fp5Mf7idLBODRJmfv1T3S/u+ul+mXmM0kO3BnThv8HA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d5+2rq6+rHJ0hYj1PCjDx1tZ4swlj0arg54GmRS06HmfiZggx+76oSppwD+mV4bGVdSxcatRNhWPx+8NiOVS1iTrGGU3cmqCDxNBEAulmnGOFtyet1HTjD/Liz1lAVOZkaeqbZRrweVdXbRQwvWwBKfSeEpdxpoEuOxv8dzdF4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eHFDkqBu; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c2443b2581so23038a12.0
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 01:44:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727253865; x=1727858665; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fp5Mf7idLBODRJmfv1T3S/u+ul+mXmM0kO3BnThv8HA=;
+        b=eHFDkqBueOcIZLN8FyF9nfIlzluiOtMzOnkItvV7KnXYEQyMk1YXcX1I8keXjz2JTO
+         f3N6MQA4ycMgKkAPuWLDr2W1uljonPPEMq1W/s8R48c/rQZqblYXlQeaZxSyyCe+GWOg
+         P4fTEJyGyGQJHAqLJnHMz8b0bF9RuvnF3G6h1/suG0KSCnH3qUjbYNlU3adrnUus6LL3
+         RD+AJipBna+OinSEJJibddtR2wFjH0V/ql2VSQRcxeKQrhgsGfmYOcWglehLWJJai/mj
+         u4fwSXYmo/1zvR0Ovpmcnkmv4amR9FT/QZYMKigI7b0egU+kOoM2s7k+TqWCq/hZbSEJ
+         Uy4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727253865; x=1727858665;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fp5Mf7idLBODRJmfv1T3S/u+ul+mXmM0kO3BnThv8HA=;
+        b=GZr5QprJTQtHBF5+7UoWiTWmmRQyyCyex2HEoKsgB9sP/1TEiu+Wxugq1ke5LdzKw0
+         /eU1cdf2DY4aqBJwFl1488MffV/tPmnDdIj91SwcDGAbaDF1QzpNvJDFFscK4HTzFvSc
+         dM9Md0GqdNSgcpQLeFqYwS+0s4U2BnJgCMwhvyc0gbrHwSh3QnnNtpw6BQspdo0A5orJ
+         9g6DB9JHYNLDrhj0e3mEAKZnr915sTKKMG/YIo/Ou3pmU+QXV3msNC69Ci+/Ql+OagJ6
+         5WI4kcQ2hsqCbn0BKyaImrnYD1Fjajd3g+QOHN7vCBPoWXGQyYDVev5+aA9q5x+8MCmf
+         BRWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVspx4eXXstkPj8cdECcOiKJo8GhjSXoAdI8SBLIcKYQ+SP63ToAP0cS1m0jUO0GdGKgkc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCNixvVIz4SEBINkeeYklQeJVD6xVMyyDOGZCN8FiA6MdwYehN
+	4PvhbbZso/7ELS87NdYK4r+16y8zNQgwh3dtbZu+dp09wjOzUv3Ylq/+BFPFN3sQyeZBXZsVmRW
+	7fa5PLFST9kQ5oloZCZphYSoenewuv9sFmY09
+X-Google-Smtp-Source: AGHT+IHKRTDGK6cO+UR0DQQih7mccHmFaGUU/bQ5I0XVaFXESymT4q9yT3f6r4WgiGSRT/MGKTkDivZYIrZJfRkqMX4=
+X-Received: by 2002:a05:6402:520b:b0:5c5:b8fe:d1ec with SMTP id
+ 4fb4d7f45d1cf-5c720fc0a58mr263957a12.3.1727253865144; Wed, 25 Sep 2024
+ 01:44:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZvAUIaZiFD3lsDI_@google.com>
+References: <20240823132137.336874-1-aik@amd.com> <20240823132137.336874-13-aik@amd.com>
+ <ZudMoBkGCi/dTKVo@nvidia.com> <CAGtprH8C4MQwVTFPBMbFWyW4BrK8-mDqjJn-UUFbFhw4w23f3A@mail.gmail.com>
+ <BN9PR11MB527608E3B8B354502F22DFCA8C6F2@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <CAGtprH-bj_+1k-jwEVS9PcAmCOvo72Vec3VVKvL1te7T8R1ooQ@mail.gmail.com>
+ <BL1PR11MB5271327169B23A60D66965F38C6F2@BL1PR11MB5271.namprd11.prod.outlook.com>
+ <20240923160239.GD9417@nvidia.com> <BN9PR11MB527605EA6D4DB0C8A4D4AFD78C6F2@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20240924120735.GI9417@nvidia.com>
+In-Reply-To: <20240924120735.GI9417@nvidia.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 25 Sep 2024 10:44:12 +0200
+Message-ID: <CAGtprH__2qLkwu-FvKEECVDn=sek42rVLWHuin9cwSbYVAOi=w@mail.gmail.com>
+Subject: Re: [RFC PATCH 12/21] KVM: IOMMUFD: MEMFD: Map private pages
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, Alexey Kardashevskiy <aik@amd.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "iommu@lists.linux.dev" <iommu@lists.linux.dev>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, 
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, 
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
+	Alex Williamson <alex.williamson@redhat.com>, "Williams, Dan J" <dan.j.williams@intel.com>, 
+	"pratikrajesh.sampat@amd.com" <pratikrajesh.sampat@amd.com>, "michael.day@amd.com" <michael.day@amd.com>, 
+	"david.kaplan@amd.com" <david.kaplan@amd.com>, "dhaval.giani@amd.com" <dhaval.giani@amd.com>, 
+	Santosh Shukla <santosh.shukla@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
+	Michael Roth <michael.roth@amd.com>, Alexander Graf <agraf@suse.de>, Nikunj A Dadhania <nikunj@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Lukas Wunner <lukas@wunner.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Sep 22, 2024 at 05:57:05AM -0700, Sean Christopherson wrote:
-> On Tue, Aug 20, 2024, Keith Busch wrote:
-> > To test, I executed the following program against a qemu emulated pci
-> > device resource. Prior to this kernel patch, it would fail with
-> > 
-> >   traps: vmovdq[378] trap invalid opcode ip:4006b2 sp:7ffe2f5bb680 error:0 in vmovdq[6b2,400000+1000]
->  
-> ...
-> 
-> > +static const struct gprefix pfx_avx_0f_6f_0f_7f = {
-> > +	N, I(Avx | Aligned, em_mov), N, I(Avx | Unaligned, em_mov),
-> > +};
-> > +
-> > +static const struct opcode avx_0f_table[256] = {
-> > +	/* 0x00 - 0x5f */
-> > +	X16(N), X16(N), X16(N), X16(N), X16(N), X16(N),
-> > +	/* 0x60 - 0x6F */
-> > +	X8(N), X4(N), X2(N), N,
-> > +	GP(SrcMem | DstReg | ModRM | Mov, &pfx_avx_0f_6f_0f_7f),
-> > +	/* 0x70 - 0x7F */
-> > +	X8(N), X4(N), X2(N), N,
-> > +	GP(SrcReg | DstMem | ModRM | Mov, &pfx_avx_0f_6f_0f_7f),
-> > +	/* 0x80 - 0xFF */
-> > +	X16(N), X16(N), X16(N), X16(N), X16(N), X16(N), X16(N), X16(N),
-> > +};
-> 
-> Mostly as an FYI, we're likely going to run into more than just VMOVDQU sooner
-> rather than later.  E.g. gcc-13 with -march=x86-64-v3 (which per Vitaly is now
-> the default gcc behavior for some distros[*]) compiles this chunk from KVM
-> selftests' kvm_fixup_exception():
-> 
-> 	regs->rip = regs->r11;
-> 	regs->r9 = regs->vector;
-> 	regs->r10 = regs->error_code;
-> 
-> intto this monstronsity (which is clever, but oof).
-> 
->   405313:       c4 e1 f9 6e c8          vmovq  %rax,%xmm1
->   405318:       48 89 68 08             mov    %rbp,0x8(%rax)
->   40531c:       48 89 e8                mov    %rbp,%rax
->   40531f:       c4 c3 f1 22 c4 01       vpinsrq $0x1,%r12,%xmm1,%xmm0
->   405325:       49 89 6d 38             mov    %rbp,0x38(%r13)
->   405329:       c5 fa 7f 45 00          vmovdqu %xmm0,0x0(%rbp)
-> 
-> I wouldn't be surprised if the same packing shenanigans get employed when generating
-> code for a struct overlay of emulated MMIO.
+On Tue, Sep 24, 2024 at 2:07=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
+>
+> On Mon, Sep 23, 2024 at 11:52:19PM +0000, Tian, Kevin wrote:
+> > > IMHO we should try to do as best we can here, and the ideal interface
+> > > would be a notifier to switch the shared/private pages in some portio=
+n
+> > > of the guestmemfd. With the idea that iommufd could perhaps do it
+> > > atomically.
+> >
+> > yes atomic replacement is necessary here, as there might be in-fly
+> > DMAs to pages adjacent to the one being converted in the same
+> > 1G hunk. Unmap/remap could potentially break it.
+>
+> Yeah.. This integration is going to be much more complicated than I
+> originally thought about. It will need the generic pt stuff as the
+> hitless page table manipulations we are contemplating here are pretty
+> complex.
+>
+> Jason
 
-Thanks for the notice. I'm hoping we can proceed with just the mov
-instructions for now, unless someone already has a real use for these on
-emulated MMIO. Otherwise, we can cross that bridge when we get there.
-
-As it is, if just the vmovdq[u,a] are okay, I have a follow on for
-vmovdqu64, though I'm currently having trouble adding AVX-512 registers.
-Simply increasing the size of the struct x86_emulate_ctxt appears to
-break something even without trying to emulate those instructions. But I
-want to wait to see if this first part is okay before spending too much
-time on it.
+ To ensure that I understand your concern properly, the complexity of
+handling hitless page manipulations is because guests can convert
+memory at smaller granularity than the physical page size used by the
+host software. Complexity remains the same irrespective of whether
+kvm/guest_memfd is notifying iommu driver to unmap converted ranges or
+if its userspace notifying iommu driver.
 
