@@ -1,225 +1,121 @@
-Return-Path: <kvm+bounces-27407-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27408-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A0C985455
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 09:39:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 449E2985527
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 10:10:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7586A1C23167
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 07:39:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0380B281446
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 08:10:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E80158527;
-	Wed, 25 Sep 2024 07:39:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAADD158D81;
+	Wed, 25 Sep 2024 08:09:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JGxqW7+s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DG+rbbRL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D5A156F36
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 07:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC4A155741
+	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 08:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727249942; cv=none; b=Y5w9DzSLtz4cSi1rsGShxq7N+Ajg//CjknVhF2H8JiOohzStnsP0mnqT4RvmUiKTnWCwbLZ9M5ziSMGsOOBNuy772Tc21bR/465cxY4BfB6fVZFRcOH9oG9ctZVK0UA+I1hWrJsMXNyhSEpCN/WC8vs8QnSfTGhVjK1RrolPGFI=
+	t=1727251794; cv=none; b=D+te2+CgY/DnpxPmhwkZt7ItlSyZFKrme61OcBWHk1A/koS+yaWcW2fHhse8G6r74WZXIohqbo45ohLCxuWT7Hnhj2593bgG0svcTgW18UCqaHvSKo68sWm+uitUCYJwB+9D92/Ttz+OIV5cfSqwe+nPNISg2BRr9GUEqWrpqWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727249942; c=relaxed/simple;
-	bh=hA2NN7kzc70Me5M2AjVJID4so0HqKPa/tbvMgUFH6sg=;
+	s=arc-20240116; t=1727251794; c=relaxed/simple;
+	bh=gF4N/WbpCBs9EJZcuqGshEGAssyBpYUYMxaE44usRrc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pSnTGmRSBNPOBUVLeAoxqNSAHeH0GO/sFG3NtFUh05fj4lSVIO/ZWKH8AUqA4tDoLbKU4k8ENFUWewYynmLcwUiwpmGCXVKJQkBncQvnmAArgdAffFCjW/SzDA3AQ04SUI86+qOswhzZsDKFrG+V/6mdBe7vUIWigs799LjOuW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JGxqW7+s; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727249939;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k5IxqMkt8qD5qrDFPPLWnZIAs2xArm/m3qqUsZKT8ng=;
-	b=JGxqW7+sXYM+Cn1Yi3IOBnJ6fCtRE/3fY3q1Rtxj7XYtN4uL6hxaplx0Pn73Ry/boDTcmF
-	8ulnqG5HE4r2NHF32pvlmOEOFEeh5ttMY4L3sjxnllhiebi84Dphi0ZAy5EDKylIB5njKb
-	aoC9+H5agN4TzIBrw2hhLrC7z2RWLOA=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-675-y-RV9hnWNZSKAQ8R3doqeQ-1; Wed, 25 Sep 2024 03:38:57 -0400
-X-MC-Unique: y-RV9hnWNZSKAQ8R3doqeQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a8d15eff783so419212866b.3
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 00:38:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727249936; x=1727854736;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k5IxqMkt8qD5qrDFPPLWnZIAs2xArm/m3qqUsZKT8ng=;
-        b=OQlc6N61CeJJfmORSk1L4wdjAUH8Edg5SCnIKy8Nk5ZSoEurqOXqcBSx8Xg0WT6BkW
-         87/oHXp46f5NWT/oVFpHkMJUH/05oAPNs7alfNu03KFXXGRjR4NrNGC3xpID0XYSrlwr
-         zDfRKPLZCK/Ll6tqYK51KhMGT8B34YY4OBItuGfHn29q8u6XHhztjPp31icvdv9ryG5z
-         YKy4btdLiscfrYnkWD3iEgjvrd/xjRHW5JnU5s8835MHj0RkOtq9gSku6WCbRDhklfI3
-         DLf1xMwkgHCHDO+LIwVWa6qhbvbPwC+imfzJkZPtFSPtHOHctezDLQCWzovb548kVuo5
-         jarQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXHH5gtsOd9OrvEMNUbzQYHe+NKdDxXfD55gu6y3WwFDZaJhlWjTja1x7EbTRybmUUg7mQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyABtcTwafeantEUCD7zGab/uHUMc1u1MC5ssIYJHVNEs090aoS
-	mN8FlImvSKJB5vXGV8bCj4TZFkmxK2ZrfXpTGMPvcTYejtNLCoVvXqEuMAzCyk/I7Y5R/srpy8G
-	rUFccbCdl5Au38uFmw5OwF7ifRdnV7nZ+UItwBBzWlGu0nLmm8A==
-X-Received: by 2002:a17:907:2ce5:b0:a8d:2ec3:94f4 with SMTP id a640c23a62f3a-a93a066f942mr170021566b.54.1727249936540;
-        Wed, 25 Sep 2024 00:38:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEXFFtVfLBhqbQGBA31zqKMXEIhRN2UiES5o0Cy7oKF+caZsB3g/KGz5JFCowqi/0EgISF3lg==
-X-Received: by 2002:a17:907:2ce5:b0:a8d:2ec3:94f4 with SMTP id a640c23a62f3a-a93a066f942mr170015966b.54.1727249935830;
-        Wed, 25 Sep 2024 00:38:55 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9393134b3esm176178266b.198.2024.09.25.00.38.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 00:38:55 -0700 (PDT)
-Date: Wed, 25 Sep 2024 09:38:49 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	david@redhat.com, dtatulea@nvidia.com, eperezma@redhat.com, jasowang@redhat.com, 
-	leiyang@redhat.com, leonro@nvidia.com, lihongbo22@huawei.com, 
-	luigi.leonardi@outlook.com, lulu@redhat.com, marco.pinn95@gmail.com, mgurtovoy@nvidia.com, 
-	pankaj.gupta.linux@gmail.com, philipchen@chromium.org, pizhenwei@bytedance.com, 
-	yuehaibing@huawei.com, zhujun2@cmss.chinamobile.com
-Subject: Re: [GIT PULL] virtio: features, fixes, cleanups
-Message-ID: <fqvpau7doh7lf7mytane7n5yww7w2lrc4y6pyshainrl52rfyl@xi6kk7hbwyhc>
-References: <20240924165046-mutt-send-email-mst@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YBg+ptSc6ltCCElfoH8qBbkMhafpKQrxunJ+Z3PiuOHdfpFtyYh7mNDBVD1Tf297fcudwNe1UhbZeY38ciaMTtNi7vFoLEIgHHguaFzJivRnBjN2Eg2sjYNuS98TaBiUeVAUhyeYP4L+u0KAvmCuBN1a5MJ14EGxUpsLbE2Kk7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DG+rbbRL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE8D4C4CEC3;
+	Wed, 25 Sep 2024 08:09:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727251793;
+	bh=gF4N/WbpCBs9EJZcuqGshEGAssyBpYUYMxaE44usRrc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DG+rbbRLiyvNBK+w0Cmul/A/wbudn6AqIqJQ6+gUdVnW4BRICyhz9J8Uij+8Zkjl1
+	 vzYSDqn+pbNP5tMS1BpWEnc8qUbMHMYnnHRZiNCnciWhnhlfk5aZGKAgYQDdRIw8fT
+	 +R86Q47zcwm35yWb94i6/VTxPEkXobdfRKbHGsqdvCSVqD8mIiva310lRNWdgO2l1E
+	 h+96lANKA/rsFLIRBMzioOHaHfz++XTL+eWz7oZ2Drq9+/qPLtyonFeMafq0Zo6j9X
+	 43R/WM/NvSt4In4K5aiPSuR0yPwXS0/CqaoaEKMxG6q8r98TERGVBak4Z1QBwUUk/4
+	 ncO5qllgEp2bA==
+Date: Wed, 25 Sep 2024 10:09:48 +0200
+From: Keith Busch <kbusch@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org, x86@kernel.org,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Xu Liu <liuxu@meta.com>
+Subject: Re: [PATCH RFC] kvm: emulate avx vmovdq
+Message-ID: <ZvPFTMBXAwHhrU1i@kbusch-mbp>
+References: <20240820230431.3850991-1-kbusch@meta.com>
+ <ZvAUIaZiFD3lsDI_@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240924165046-mutt-send-email-mst@kernel.org>
+In-Reply-To: <ZvAUIaZiFD3lsDI_@google.com>
 
-On Tue, Sep 24, 2024 at 04:50:46PM GMT, Michael S. Tsirkin wrote:
->The following changes since commit 431c1646e1f86b949fa3685efc50b660a364c2b6:
->
->  Linux 6.11-rc6 (2024-09-01 19:46:02 +1200)
->
->are available in the Git repository at:
->
->  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
->
->for you to fetch changes up to 1bc6f4910ae955971097f3f2ae0e7e63fa4250ae:
->
->  vsock/virtio: avoid queuing packets when intermediate queue is empty (2024-09-12 02:54:10 -0400)
->
->----------------------------------------------------------------
->virtio: features, fixes, cleanups
->
->Several new features here:
->
->	virtio-balloon supports new stats
->
->	vdpa supports setting mac address
->
->	vdpa/mlx5 suspend/resume as well as MKEY ops are now faster
->
->	virtio_fs supports new sysfs entries for queue info
->
->	virtio/vsock performance has been improved
->
->Fixes, cleanups all over the place.
->
->Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
->----------------------------------------------------------------
->Cindy Lu (3):
->      vdpa: support set mac address from vdpa tool
->      vdpa_sim_net: Add the support of set mac address
->      vdpa/mlx5: Add the support of set mac address
->
->Dragos Tatulea (18):
->      vdpa/mlx5: Fix invalid mr resource destroy
->      net/mlx5: Support throttled commands from async API
->      vdpa/mlx5: Introduce error logging function
->      vdpa/mlx5: Introduce async fw command wrapper
->      vdpa/mlx5: Use async API for vq query command
->      vdpa/mlx5: Use async API for vq modify commands
->      vdpa/mlx5: Parallelize device suspend
->      vdpa/mlx5: Parallelize device resume
->      vdpa/mlx5: Keep notifiers during suspend but ignore
->      vdpa/mlx5: Small improvement for change_num_qps()
->      vdpa/mlx5: Parallelize VQ suspend/resume for CVQ MQ command
->      vdpa/mlx5: Create direct MKEYs in parallel
->      vdpa/mlx5: Delete direct MKEYs in parallel
->      vdpa/mlx5: Rename function
->      vdpa/mlx5: Extract mr members in own resource struct
->      vdpa/mlx5: Rename mr_mtx -> lock
->      vdpa/mlx5: Introduce init/destroy for MR resources
->      vdpa/mlx5: Postpone MR deletion
->
->Hongbo Li (1):
->      fw_cfg: Constify struct kobj_type
->
->Jason Wang (1):
->      vhost_vdpa: assign irq bypass producer token correctly
->
->Lei Yang leiyang@redhat.com (1):
->      ack! vdpa/mlx5: Parallelize device suspend/resume
-        ^
-This commit (fbb072d2d19133222e202ea7c267cfc1f6bd83b0) looked strange
-from the title, indeed inside it looks empty, so maybe the intent was to
-"squash" it with the previous commit acba6a443aa4 ("vdpa/mlx5:
-Parallelize VQ suspend/resume for CVQ MQ command") to bring back the
-Tested-by, right?
+On Sun, Sep 22, 2024 at 05:57:05AM -0700, Sean Christopherson wrote:
+> On Tue, Aug 20, 2024, Keith Busch wrote:
+> > To test, I executed the following program against a qemu emulated pci
+> > device resource. Prior to this kernel patch, it would fail with
+> > 
+> >   traps: vmovdq[378] trap invalid opcode ip:4006b2 sp:7ffe2f5bb680 error:0 in vmovdq[6b2,400000+1000]
+>  
+> ...
+> 
+> > +static const struct gprefix pfx_avx_0f_6f_0f_7f = {
+> > +	N, I(Avx | Aligned, em_mov), N, I(Avx | Unaligned, em_mov),
+> > +};
+> > +
+> > +static const struct opcode avx_0f_table[256] = {
+> > +	/* 0x00 - 0x5f */
+> > +	X16(N), X16(N), X16(N), X16(N), X16(N), X16(N),
+> > +	/* 0x60 - 0x6F */
+> > +	X8(N), X4(N), X2(N), N,
+> > +	GP(SrcMem | DstReg | ModRM | Mov, &pfx_avx_0f_6f_0f_7f),
+> > +	/* 0x70 - 0x7F */
+> > +	X8(N), X4(N), X2(N), N,
+> > +	GP(SrcReg | DstMem | ModRM | Mov, &pfx_avx_0f_6f_0f_7f),
+> > +	/* 0x80 - 0xFF */
+> > +	X16(N), X16(N), X16(N), X16(N), X16(N), X16(N), X16(N), X16(N),
+> > +};
+> 
+> Mostly as an FYI, we're likely going to run into more than just VMOVDQU sooner
+> rather than later.  E.g. gcc-13 with -march=x86-64-v3 (which per Vitaly is now
+> the default gcc behavior for some distros[*]) compiles this chunk from KVM
+> selftests' kvm_fixup_exception():
+> 
+> 	regs->rip = regs->r11;
+> 	regs->r9 = regs->vector;
+> 	regs->r10 = regs->error_code;
+> 
+> intto this monstronsity (which is clever, but oof).
+> 
+>   405313:       c4 e1 f9 6e c8          vmovq  %rax,%xmm1
+>   405318:       48 89 68 08             mov    %rbp,0x8(%rax)
+>   40531c:       48 89 e8                mov    %rbp,%rax
+>   40531f:       c4 c3 f1 22 c4 01       vpinsrq $0x1,%r12,%xmm1,%xmm0
+>   405325:       49 89 6d 38             mov    %rbp,0x38(%r13)
+>   405329:       c5 fa 7f 45 00          vmovdqu %xmm0,0x0(%rbp)
+> 
+> I wouldn't be surprised if the same packing shenanigans get employed when generating
+> code for a struct overlay of emulated MMIO.
 
-Thanks,
-Stefano
+Thanks for the notice. I'm hoping we can proceed with just the mov
+instructions for now, unless someone already has a real use for these on
+emulated MMIO. Otherwise, we can cross that bridge when we get there.
 
->
->Luigi Leonardi (1):
->      vsock/virtio: avoid queuing packets when intermediate queue is empty
->
->Marco Pinna (1):
->      vsock/virtio: refactor virtio_transport_send_pkt_work
->
->Max Gurtovoy (2):
->      virtio_fs: introduce virtio_fs_put_locked helper
->      virtio_fs: add sysfs entries for queue information
->
->Philip Chen (1):
->      virtio_pmem: Check device status before requesting flush
->
->Stefano Garzarella (1):
->      MAINTAINERS: add virtio-vsock driver in the VIRTIO CORE section
->
->Yue Haibing (1):
->      vdpa: Remove unused declarations
->
->Zhu Jun (1):
->      tools/virtio:Fix the wrong format specifier
->
->zhenwei pi (3):
->      virtio_balloon: introduce oom-kill invocations
->      virtio_balloon: introduce memory allocation stall counter
->      virtio_balloon: introduce memory scan/reclaim info
->
-> MAINTAINERS                                   |   1 +
-> drivers/firmware/qemu_fw_cfg.c                |   2 +-
-> drivers/net/ethernet/mellanox/mlx5/core/cmd.c |  21 +-
-> drivers/nvdimm/nd_virtio.c                    |   9 +
-> drivers/vdpa/ifcvf/ifcvf_base.h               |   3 -
-> drivers/vdpa/mlx5/core/mlx5_vdpa.h            |  47 ++-
-> drivers/vdpa/mlx5/core/mr.c                   | 291 +++++++++++++---
-> drivers/vdpa/mlx5/core/resources.c            |  76 +++-
-> drivers/vdpa/mlx5/net/mlx5_vnet.c             | 477 +++++++++++++++++---------
-> drivers/vdpa/pds/cmds.h                       |   1 -
-> drivers/vdpa/vdpa.c                           |  79 +++++
-> drivers/vdpa/vdpa_sim/vdpa_sim_net.c          |  21 +-
-> drivers/vhost/vdpa.c                          |  16 +-
-> drivers/virtio/virtio_balloon.c               |  18 +
-> fs/fuse/virtio_fs.c                           | 164 ++++++++-
-> include/linux/vdpa.h                          |   9 +
-> include/uapi/linux/vdpa.h                     |   1 +
-> include/uapi/linux/virtio_balloon.h           |  16 +-
-> net/vmw_vsock/virtio_transport.c              | 144 +++++---
-> tools/virtio/ringtest/main.c                  |   2 +-
-> 20 files changed, 1098 insertions(+), 300 deletions(-)
->
-
+As it is, if just the vmovdq[u,a] are okay, I have a follow on for
+vmovdqu64, though I'm currently having trouble adding AVX-512 registers.
+Simply increasing the size of the struct x86_emulate_ctxt appears to
+break something even without trying to emulate those instructions. But I
+want to wait to see if this first part is okay before spending too much
+time on it.
 
