@@ -1,200 +1,240 @@
-Return-Path: <kvm+bounces-27487-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27488-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55D198664E
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 20:31:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6991B986663
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 20:33:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2ADF71F2193C
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 18:31:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED0371F21C46
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 18:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C2113E028;
-	Wed, 25 Sep 2024 18:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EEA713DB99;
+	Wed, 25 Sep 2024 18:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4yg7lMjM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bXl9LiMB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538E313D8B5
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 18:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE541849;
+	Wed, 25 Sep 2024 18:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727289047; cv=none; b=PWnVEmzKSuSmiVEf5BJ5X4IZ5EXoJ2PnbzN7deYYl120BMmITMUha6IyUOId1vlzokqPK3x3l14aD+5drUNRxwjTe/ozFj9U+67SL9kCMAcfwO/nOt7ihfZcw7wxbakVOP9aAe+Hd2IS6u3cyr2P+7gU02LLjLz4g4nu4gd4MU0=
+	t=1727289186; cv=none; b=tgYBhJ9Gk2AMqoflPAQme3kVF40DCPd1jic+dT4qbM3UAbjz+FDukJ8sK/+J7pK0LhZuDrUuSH9xcgqpj4n4Dpbpsr/F3LAK3lsanpgmB8vlWKggNZJDcw8PuyBcoXmM9lvU0Rxwp9ddFhD5HchtnAp5uX9DmajdJGX4WznUNKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727289047; c=relaxed/simple;
-	bh=6JpXlaM+q70Ep1gyRy/VYd9wgs4rM1BuNKkYbnGpQz8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QgsBLm6cTcnhZxIlOKqa38DgZKub/J1d1G80QmmRqa3Vddhp2wXuZ7pdix6ThZ79H6kpiPktSMQurCDLiuPjJFm4evZ8MvKSZH+WNWVlbnbUPQ96dU9d/T2faTXEsnTDKpdfVLJgIYraXI88SHlw34eifkayIaDVL19/9U2pId8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4yg7lMjM; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2d8b4a23230so317389a91.0
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 11:30:46 -0700 (PDT)
+	s=arc-20240116; t=1727289186; c=relaxed/simple;
+	bh=a4TscZhPkFUpuRsMP0BamYUYJ4NTFPOf/N+pr3km5jk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kqJ92P2j3kcDogPsZ/HLzVIvEuPCbBxI1YJfd9XcTxKHTe8daW5Xq2hodOYIvXaSqdSMJho8gIFi6yQfz/SMkSgGpd1nQ9WGAOmKqmQNJCuX+iNKYt/Krq1NpUCQuQlIgSq9CDQWQmWwJVmTIshP1HN/cwlwJdYzIyWAgchlxII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bXl9LiMB; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2f75428b9f8so1845681fa.3;
+        Wed, 25 Sep 2024 11:33:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727289045; x=1727893845; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DciY5j00msLXR2ca5NbWEcO/RtSRLLFLfOyEd9A9Zlg=;
-        b=4yg7lMjMQ9hI4swIqO+uLyT48seao+a5Pgm6z8nG45CboRS+rJRDXygR/fJmnL+xA8
-         HjFuWt4cM82HRS9A82+7A5puL357ewSOzpttY6fSQHCOdE87xmbxf8nW+YCQo182p6lv
-         u9YWjs4s9NQ2tCkZFKzdOVpG/8TW+xhGitVXlLLNGxFqar6ll+lafyd6v8goEbFwiAiY
-         78We8TqxVlMC1ZTB+r0sIPziahHGkWsGvskZw1WqYQISl5D+9UuE1RHms75JYJyqMjns
-         ULZ3ThScg6lrEADmhu2f/GVyLCjppB9529M10bAksdKEgY2ftt7YZf+G/3za6PDF053B
-         KGog==
+        d=gmail.com; s=20230601; t=1727289183; x=1727893983; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2TaypDUy15NjLViQ9n5rNlOiyd4lGW04UgUrk3q1RZw=;
+        b=bXl9LiMBmzEzDgRr3sc7CDMCPyF4vnp2L9UB+CbKIzbtJtQ5WlMSTjAPPTqnXzeeI3
+         quDwGKG/MBmtMHmjq3csRWcD1yBmlCFAoBftNBBfOKVT56qlSAiceIbC/9Cfo+G75dWI
+         gLYFfbUtJ65ZlNVS4zv5JMoGHod+bQZAkPYQVvB0L4sqq8nYJJCejMq3cMrzk3PSrchX
+         FBKPnj0lg9//QDRcuigQt7MUxlnDYZv7ufMnQFyJQP9zZI3/5gRzy2KzgkSMHONxctLk
+         GKUSc5SnKqvX2F0NKNG/wAXtaNScuPZn4MONR5OjNgFmqfnlAbQlg9I9+sqyfH7bjVda
+         COaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727289045; x=1727893845;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DciY5j00msLXR2ca5NbWEcO/RtSRLLFLfOyEd9A9Zlg=;
-        b=bKBK1/ivfZaTsTJ0mR8NYjSQySOKOYYbQxYkY4IHtB9JMtyBNXOzbPrDCQp/VE49ca
-         4gQmRNyNvxeksZhSp35a1eozandHzql13So9zQmn5xG4iUgOYiUG/h/z/+Cn93JTbNTc
-         a4zw9Oy0Hhm6IX72Udm5nfVWWLJN70rOW8BrkXwx2ATwzmxQDAdpa8wDhBshH0rVlOl1
-         e6xJPbzFv/x0exdMnxCaeYhnLUZlKM5cdgdD9XcSxD42QL89NoR5DbY2X6VGY4k2+enP
-         MiB1Y6SSZUC3+67BhrzYfA67KYfNqU40bHwyvZYjxRlo6edjHtwBqLDZ73JK21g+Do4m
-         LJOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWwcngWjjDi36WsJoZ5ZFtw0MJWJknDGGrxcxjY3uvHG+gAcZkSQ30C8q9oSCuoUxnvXo0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv8QxO9uaHrXL5w9OVdNb8gQcN7e58yBDZKxEAaG/VD629SAkL
-	ItETRmlFhYNxB8hszk+ortimEuq1HYE/Yo7FZ1fwQpK1UGnI4rM/je47cHNpCCbbMerCRscwqvv
-	VLQ==
-X-Google-Smtp-Source: AGHT+IFpnwXmjJNlKzKlwKTPfGspfGpOspl6v/pMyaFe8Q0hMwsgEZPyhAKfpNV1pX2Mtg7RTNish6id3Gc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:a887:b0:2d8:964a:1269 with SMTP id
- 98e67ed59e1d1-2e06aff6467mr8193a91.7.1727289045207; Wed, 25 Sep 2024 11:30:45
- -0700 (PDT)
-Date: Wed, 25 Sep 2024 11:30:37 -0700
-In-Reply-To: <b06172780e3af37fe91d1cc434aceff4169f88b3.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1727289183; x=1727893983;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2TaypDUy15NjLViQ9n5rNlOiyd4lGW04UgUrk3q1RZw=;
+        b=rHtDLDzlgnuB5Va3dYXeAoZhH2pKJbUR+Mie165yL8GCtK3QNBLZOm7bSV4kODVAma
+         WLP/YDv/RT89+cY+/doqIgaGQe6W7PSxQ35q8EIFnKWAxLM3OxceHPJ2QLHpzk/H7S51
+         eFve69gtqPfgU3jDOELt8CcKqhGpLEDeiIvHU8M7d9W5zPq8SG9DQE7bKGTGMnwjBCpN
+         JU4cWjyMTKWt9bgTri1/N2liopJXb090g5E+6NWXqfq1RYQ5U2y48vrYuGiR8Nkkfyqc
+         LQkvva/+BCo15AOi71SD8N0AVzsZkXwfhJAjUz4pvcn4oGs/JxBcEY/6gmM5Z+cmsClP
+         VaNg==
+X-Forwarded-Encrypted: i=1; AJvYcCVCOESDAfMj1rrgtPrkfP3KWh4OykJLCb0Ff7Y+2rVCX+EgPw2Bhnp4UbVibYfQQZJ/fA4=@vger.kernel.org, AJvYcCVMPKGirMekiNL6aHSz1vcEhBXvHuKrE3fkNYPKSHv00zkInV8KpnxiyCetaawi5ePPgp8EQwlNyI08LRU6jOyQig==@vger.kernel.org, AJvYcCVc9QbURf7tj07gBdiaN9oukDHryNzp0EKItL/IugM815iC9MwZLKWttem1VyatBtLAjiF5Yiqv1sg=@vger.kernel.org, AJvYcCVjqJk//MeUYrkq0fptGMbWFT5yT7RLILEyCQRMkEOl97ABAcRpg94OeLLHcdY5cAYYXjwKOyb72IOz@vger.kernel.org, AJvYcCW+paV9En8u5/mcJXR3mQhZjts2oNVBL0QBKDo4xdfWct0da0y1CcZ0FepA5i+AZuetIkDWei/LNvznB0V6qF8=@vger.kernel.org, AJvYcCWpjNssfGrDBKCpAmOKEUZ18AaYuu7RpnA5CTkbywlwpNlO0FtW5UgFBmFc38+X3+zeGpzJKKilpDIv@vger.kernel.org, AJvYcCX42LE/z/XO36MN52i23UYNVqzUoiF0O+h6D43VYMULWq6mJf6MRRLG4pHNBnbGUaEcq9GP6WGIW9XJ4w==@vger.kernel.org, AJvYcCXQMH1GPR6DozAP4ICmQmfkh3n0WykoXDY/qpg+0LrADNS9KtH3td4iLIaoctersLwKm7TcRGe1LsbvuEpV@vger.kernel.org, AJvYcCXlxsQkHdbilJAS9/+qanZzyyh//O621l/pBkb2w+nRZc96ddyMLVLOx7+5/S357OtsOFE0jojZvw3+I8Dn@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYfTYzMsdVsxJ9W8yeSN9SwSQupO3aR4NAYJpmmEHR/4QWEKhF
+	VXUn+jVRvQmNg24hdLfHMjDdBUEAohqVpeK5Wg3kM3rt0+5hwVqHzCrJkOSeINKN//n8a2/O9Qd
+	OFlZD9s9iua0p4gC3D6t9B7Q+BJk=
+X-Google-Smtp-Source: AGHT+IFnZSeaSdTnLQgfoNEdeVLMhBqMGfqv8DaMO7rq1jJMGCnw0pqCqh/uqtAkx22xjLrl+mG72CuzpXzogM33B5U=
+X-Received: by 2002:a2e:be1c:0:b0:2f7:562d:cb5b with SMTP id
+ 38308e7fff4ca-2f915fc0ad0mr37129861fa.7.1727289182671; Wed, 25 Sep 2024
+ 11:33:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240725175232.337266-1-mlevitsk@redhat.com> <20240725175232.337266-3-mlevitsk@redhat.com>
- <ZrF55uIvX2rcHtSW@chao-email> <ZrY1adEnEW2N-ijd@google.com>
- <61e7e64c615aba6297006dbf32e48986d33c12ab.camel@redhat.com>
- <65fe418f079a1f9f59caa170ec0ae5d828486714.camel@redhat.com>
- <ZvQne77ycOKQ1nvU@google.com> <b06172780e3af37fe91d1cc434aceff4169f88b3.camel@redhat.com>
-Message-ID: <ZvRWzXfAV0gN2OZN@google.com>
-Subject: Re: [PATCH v3 2/2] VMX: reset the segment cache after segment
- initialization in vmx_vcpu_reset
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, 
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240925150059.3955569-30-ardb+git@google.com> <20240925150059.3955569-35-ardb+git@google.com>
+In-Reply-To: <20240925150059.3955569-35-ardb+git@google.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Wed, 25 Sep 2024 20:32:50 +0200
+Message-ID: <CAFULd4ZNwfPZO-yDjrtT2ANV509HeeYgR80b9AFachaVW5zqrg@mail.gmail.com>
+Subject: Re: [RFC PATCH 05/28] x86: Define the stack protector guard symbol explicitly
+To: Ard Biesheuvel <ardb+git@google.com>
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Juergen Gross <jgross@suse.com>, 
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
+	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
+	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	llvm@lists.linux.dev, Brian Gerst <brgerst@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 25, 2024, Maxim Levitsky wrote:
-> On Wed, 2024-09-25 at 08:08 -0700, Sean Christopherson wrote:
-> > > Finally all 3 places that read the segment cache, only access one piece of
-> > > data (SS.AR or RIP), thus it doesn't really matter if they see an old or a
-> > > new value. 
-> > > 
-> > > I mean in theory if userspace changes the SS's AR bytes out of the blue, and
-> > > then we get a preemption event, in theory as you say the old value is correct
-> > > but it really doesn't matter.
-> > > 
-> > > So IMHO, just ensuring that we invalidate the segment cache right after we do
-> > > any changes is the simplest solution.
-> > 
-> > But it's not a very maintainable solution.  It fixes the immediate problem, but
-> > doesn't do anything to help ensure that all future code invalidates the cache
-> > after writing,
-> 
-> If we wrap segment cache access with something like segment_cache_access_begin()/end(),
-> we can ensure that segment cache is only modified then (with some macros even maybe),
-> or that at least it is clear to the developer that all writes should be wrapped by these
-> functions.
-> 
-> I also do think that we should still re-order the segment cache accesses in vmx_vcpu_reset()
-> and other places just for the sake of consistency.
+On Wed, Sep 25, 2024 at 5:02=E2=80=AFPM Ard Biesheuvel <ardb+git@google.com=
+> wrote:
+>
+> From: Ard Biesheuvel <ardb@kernel.org>
+>
+> Specify the guard symbol for the stack cookie explicitly, rather than
+> positioning it exactly 40 bytes into the per-CPU area. Doing so removes
+> the need for the per-CPU region to be absolute rather than relative to
+> the placement of the per-CPU template region in the kernel image, and
+> this allows the special handling for absolute per-CPU symbols to be
+> removed entirely.
+>
+> This is a worthwhile cleanup in itself, but it is also a prerequisite
+> for PIE codegen and PIE linking, which can replace our bespoke and
+> rather clunky runtime relocation handling.
 
-Yeah, I've no objection to doing that, I just don't want that to be the long-term
-solution.
+I would like to point out a series that converted the stack protector
+guard symbol to a normal percpu variable [1], so there was no need to
+assume anything about the location of the guard symbol.
 
-> >  nor does it guarantee that all future usage of SS.AR can tolerate
-> > consuming stale values.
-> > 
-> > > I can in addition to that add a warning to kvm_register_is_available and
-> > > vmx_segment_cache_test_set, that will test that only SS.AR and RIP are read
-> > > from the interrupt context, so that if in the future someone attempts to read
-> > > more fields, this issue can be re-evaluated.
-> > 
-> > There's no need to add anything to vmx_segment_cache_test_set(), because it uses
-> > kvm_register_is_available().  I.e. adding logic in kvm_register_is_available()
-> > will suffice.
-> > 
-> > If we explicitly allow VMCS accesses from PMI callbacks, which by we *know* can
-> > tolerate stale data _and_ never run while KVM is updating segments, then we can
-> > fix the preemption case by forcing a VMREAD and bypassing the cache.
-> >  
-> > And looking to the future, if vcpu->arch.guest_state_protected is moved/exposed
-> > to common code in some way, then the common PMI code can skip trying to read guest
-> > state, and the ugliness of open coding that check in the preemption path largely
-> > goes away.
-> This is assuming that most VMs will be protected in the future?
+[1] "[PATCH v4 00/16] x86-64: Stack protector and percpu improvements"
+https://lore.kernel.org/lkml/20240322165233.71698-1-brgerst@gmail.com/
 
-No, the assumption is that other architectures will have VMs with protected guest
-state, e.g. ARM's CCA stuff, at which point handling the "don't bother reading
-guest RIP" logic in the common PMI handler is worth doing.
+Uros.
 
-> > If you're ok with the idea, I'll write changelogs and post the below (probably over
-> > two patches).  I don't love adding another kvm_x86_ops callback, but I couldn't
-> > come up with anything less ugly.
-> 
-> This was one of the reasons I didn't want to write something like that.
-> If we indeed only add callback for get_cpl_no_cache, then it is tolerable.
-
-...
-
-> > diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
-> > index b1eb46e26b2e..0370483003f6 100644
-> > --- a/arch/x86/kvm/kvm_cache_regs.h
-> > +++ b/arch/x86/kvm/kvm_cache_regs.h
-> > @@ -43,6 +43,18 @@ BUILD_KVM_GPR_ACCESSORS(r14, R14)
-> >  BUILD_KVM_GPR_ACCESSORS(r15, R15)
-> >  #endif
-> >  
-> > +/*
-> > + * Using the register cache from interrupt context is generally not allowed, as
-> > + * caching a register and marking it available/dirty can't be done atomically,
-> > + * i.e. accesses from interrupt context may clobber state or read stale data if
-> > + * the vCPU task is in the process of updating the cache.  The exception is if
-> > + * KVM is handling an IRQ/NMI from guest mode, as that bounded sequence doesn't
-> > + * touch the cache, it runs after the cache is reset (post VM-Exit), and PMIs
-> > + * need to several registers that are cacheable.
-> > + */
-> > +#define kvm_assert_register_caching_allowed(vcpu)		\
-> > +	lockdep_assert_once(in_task() ||			\
-> > +			    READ_ONCE(vcpu->arch.handling_intr_from_guest))
-> 
-> This is ugly, but on the second thought reasonable, given the circumstances.
-> 
-> How about using kvm_arch_pmi_in_guest() instead? It is a tiny bit more accurate
-> and self-documenting IMHO.
-
-Ah, yeah, good idea.
-
-> Also, how about checking for in_task() in __vmx_get_cpl() and then avoiding the cache?
-> This way we will avoid adding a new callback, and in theory if there is more code that
-> tries to read CPL from interrupt context, it will work for free. 
-> 
-> But on the other hand we might actually not want new code to get this for free. 
-> Is this the reason you added the callback?
-
-Yeah, exactly.  I actually started coding up using in_task(), but I didn't want
-to allow all reads from !in_task() because then it would do the wrong thing for
-any usage that isn't tolerant of stale data, i.e. where KVM _should_ read from
-the cache.  Even worse, such bugs wouldn't be caught because the in_task() check
-would bypass kvm_assert_register_caching_allowed().
-
-I considered guarding the in_task() code with preempt_model_preemptible() so that
-non-preemptible kernels would always use the cache, i.e. would detect unexpected
-cases.   But that felt like a bit of a hack, and for preempt_dynamic kernels
-preempt_model_preemptible() requires a function call, at which point it's entirely
-possible that reading from the cache would end up being slower than doing VMREAD.
+>
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  arch/x86/Makefile                     |  4 ++++
+>  arch/x86/include/asm/init.h           |  2 +-
+>  arch/x86/include/asm/processor.h      | 11 +++--------
+>  arch/x86/include/asm/stackprotector.h |  4 ----
+>  tools/perf/util/annotate.c            |  4 ++--
+>  5 files changed, 10 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> index 6b3fe6e2aadd..b78b7623a4a9 100644
+> --- a/arch/x86/Makefile
+> +++ b/arch/x86/Makefile
+> @@ -193,6 +193,10 @@ else
+>          KBUILD_RUSTFLAGS +=3D -Cno-redzone=3Dy
+>          KBUILD_RUSTFLAGS +=3D -Ccode-model=3Dkernel
+>
+> +        ifeq ($(CONFIG_STACKPROTECTOR),y)
+> +                KBUILD_CFLAGS +=3D -mstack-protector-guard-symbol=3Dfixe=
+d_percpu_data
+> +        endif
+> +
+>          # Don't emit relaxable GOTPCREL relocations
+>          KBUILD_AFLAGS_KERNEL +=3D -Wa,-mrelax-relocations=3Dno
+>          KBUILD_CFLAGS_KERNEL +=3D -Wa,-mrelax-relocations=3Dno
+> diff --git a/arch/x86/include/asm/init.h b/arch/x86/include/asm/init.h
+> index 14d72727d7ee..3ed0e8ec973f 100644
+> --- a/arch/x86/include/asm/init.h
+> +++ b/arch/x86/include/asm/init.h
+> @@ -2,7 +2,7 @@
+>  #ifndef _ASM_X86_INIT_H
+>  #define _ASM_X86_INIT_H
+>
+> -#define __head __section(".head.text")
+> +#define __head __section(".head.text") __no_stack_protector
+>
+>  struct x86_mapping_info {
+>         void *(*alloc_pgt_page)(void *); /* allocate buf for page table *=
+/
+> diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/proc=
+essor.h
+> index 4a686f0e5dbf..56bc36116814 100644
+> --- a/arch/x86/include/asm/processor.h
+> +++ b/arch/x86/include/asm/processor.h
+> @@ -402,14 +402,9 @@ struct irq_stack {
+>  #ifdef CONFIG_X86_64
+>  struct fixed_percpu_data {
+>         /*
+> -        * GCC hardcodes the stack canary as %gs:40.  Since the
+> -        * irq_stack is the object at %gs:0, we reserve the bottom
+> -        * 48 bytes of the irq stack for the canary.
+> -        *
+> -        * Once we are willing to require -mstack-protector-guard-symbol=
+=3D
+> -        * support for x86_64 stackprotector, we can get rid of this.
+> +        * Since the irq_stack is the object at %gs:0, the bottom 8 bytes=
+ of
+> +        * the irq stack are reserved for the canary.
+>          */
+> -       char            gs_base[40];
+>         unsigned long   stack_canary;
+>  };
+>
+> @@ -418,7 +413,7 @@ DECLARE_INIT_PER_CPU(fixed_percpu_data);
+>
+>  static inline unsigned long cpu_kernelmode_gs_base(int cpu)
+>  {
+> -       return (unsigned long)per_cpu(fixed_percpu_data.gs_base, cpu);
+> +       return (unsigned long)&per_cpu(fixed_percpu_data, cpu);
+>  }
+>
+>  extern asmlinkage void entry_SYSCALL32_ignore(void);
+> diff --git a/arch/x86/include/asm/stackprotector.h b/arch/x86/include/asm=
+/stackprotector.h
+> index 00473a650f51..d1dcd22a0a4c 100644
+> --- a/arch/x86/include/asm/stackprotector.h
+> +++ b/arch/x86/include/asm/stackprotector.h
+> @@ -51,10 +51,6 @@ static __always_inline void boot_init_stack_canary(voi=
+d)
+>  {
+>         unsigned long canary =3D get_random_canary();
+>
+> -#ifdef CONFIG_X86_64
+> -       BUILD_BUG_ON(offsetof(struct fixed_percpu_data, stack_canary) !=
+=3D 40);
+> -#endif
+> -
+>         current->stack_canary =3D canary;
+>  #ifdef CONFIG_X86_64
+>         this_cpu_write(fixed_percpu_data.stack_canary, canary);
+> diff --git a/tools/perf/util/annotate.c b/tools/perf/util/annotate.c
+> index 37ce43c4eb8f..7ecfedf5edb9 100644
+> --- a/tools/perf/util/annotate.c
+> +++ b/tools/perf/util/annotate.c
+> @@ -2485,10 +2485,10 @@ static bool is_stack_operation(struct arch *arch,=
+ struct disasm_line *dl)
+>
+>  static bool is_stack_canary(struct arch *arch, struct annotated_op_loc *=
+loc)
+>  {
+> -       /* On x86_64, %gs:40 is used for stack canary */
+> +       /* On x86_64, %gs:0 is used for stack canary */
+>         if (arch__is(arch, "x86")) {
+>                 if (loc->segment =3D=3D INSN_SEG_X86_GS && loc->imm &&
+> -                   loc->offset =3D=3D 40)
+> +                   loc->offset =3D=3D 0)
+>                         return true;
+>         }
+>
+> --
+> 2.46.0.792.g87dc391469-goog
+>
 
