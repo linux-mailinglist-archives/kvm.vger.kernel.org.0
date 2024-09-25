@@ -1,132 +1,152 @@
-Return-Path: <kvm+bounces-27398-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27399-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8450A985090
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 03:13:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A183E98509C
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 03:23:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B6FAB23AB7
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 01:13:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE51A1C22C3D
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 01:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DDF139D03;
-	Wed, 25 Sep 2024 01:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77F013D2BC;
+	Wed, 25 Sep 2024 01:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NUOLCo4K"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fnjvZq9M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF51DDA6
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 01:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4688C13C683
+	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 01:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727226535; cv=none; b=BosB6vgvVFiWF3nCF83cTHU/hWUminYWseZAL2Tb/pQdqi51PjjWfL4cWRliPpgsc8gOtTC4kdcuRuBYr9OBXg6fM73L92GwhUM2Gu6wgicA2HClFWmIs0KZ4WqK67egABBxYEo0qxbWXCfIpdZ8TxlWOTfar2SxfY4LK4/6ehI=
+	t=1727227380; cv=none; b=qdmFgDZBLaQxwKoO1Xj0T+dOWVmaIB1DHzNFPpeZZzPLAd9Naua4YU7CtLcWEKuLySKDWiOScXVOHgoF26F8YpYEqvd2UYwUWcJb/fQ78R+dw09fREIVfdDKr3wgV9ZUrxJGtCsRvxvT2zDUxUqk3TyvGHhqSfj/w9Opbdu3nIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727226535; c=relaxed/simple;
-	bh=wFAUhxj4Kr7iOTjExUj5M2PBKlhGdBn7aCFOohPbPc8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UcHD9GQRh84dzEVyOLDg5/l3Jgt4UPM9h0RphjoWfJ9kBeaLNioYwV57w8ZJjMtJzxqkSARf3TdYEiSeHuwa4Y1Xj7SHItPZKGPUbPndh3YZISu1vu+TvRpuCgLEsfEETFuEh85A4znfyMDgmgC5jNxGw5KI4unE1N4tEa/2FUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NUOLCo4K; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a8a897bd4f1so906265566b.3
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2024 18:08:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727226532; x=1727831332; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=wFAUhxj4Kr7iOTjExUj5M2PBKlhGdBn7aCFOohPbPc8=;
-        b=NUOLCo4KKB5pkJWNVZuSd2NOBQJsOeVtOsR9uuGNTAEHH5yxvV9C78c0HVR8YqZP3K
-         eo00qh9cGcgC2GTkbNz5XlcjsUDiU1GuU3S2szp7AnRvRnTnzYQom6l39a3PnD2FKbRS
-         AeqiK7BiOxdhiYmNUBcyNH02ZdUdhEp7OaOsaAFX8d6WKkWR/qBdG+QT3aCaD0kbUJXC
-         vcgdYl37DtHqfA8WpmWrdjH0BHZi6Z1x3q1OvOjCcshnUs97+UWqypcUhTIlbU8xf8BP
-         Aob6oGKpzHBR67NGIc8dFKIDKsclliwhiYZIlFy7fKO2x63hZs5AwEOC78g3ihtwj8OO
-         EOUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727226532; x=1727831332;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wFAUhxj4Kr7iOTjExUj5M2PBKlhGdBn7aCFOohPbPc8=;
-        b=cLwqGVzOT1Ju2yD7dupPmR8/o4hkjMD1xn8hogmNOjCc/CEk7ZrWdHKlplVuo9fCHa
-         sf1yrfkBuJY2KkQVvXa3yhYnjUD/OjKn+BJj+1CsBuvNtq79c39GttouHgj3qe6QQ+ic
-         WxnBq739DHYO+Rk5wiwFgrCq0LiTQbxPptClVMHtdSERtzeJuD0PT5L5pdO3Cpg9B1S/
-         FuMGStRu98lvhjlkTR/U0Ll/l+mZGfmf96JAHRjRiLoG5YCy+TXy90vj0JtV9246hi5D
-         TrcoXr/ff1TgkNNOhy3/S2LReULeuyencJGPjRL3/N0idq7Gv4aVJRfd6d8Z+PiXDPMc
-         UkcA==
-X-Forwarded-Encrypted: i=1; AJvYcCV0kIyXWT7k+83Bc2pWvNB2BAiVXg+adm7DgtYYIcRAlQDSqImTtpcU2/SExFzEMxbKyW8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiL5S9RuQF95gPEA7dB+zO2cSq5cHjTJZihplrZqQDSGTVzCpH
-	F+b844DPtbwDnwm91MOXMqyRDmRFD6Ggix9i5mlHyQlz/NzU+4xYkIKe8+7aouo1JPQfQqpgL9+
-	xjqmbvIygGLITmzYSpEzU6dOfLvi5xP2H
-X-Google-Smtp-Source: AGHT+IEIjo509tzx3eRQJC8AkaBkgUW0IgYo/PQA10yu/71sYo7VaaTNdbJJ8jeexI8JmtiSLjp03DQBUL6S4sxDKaY=
-X-Received: by 2002:a17:907:709:b0:a8d:f04:b19b with SMTP id
- a640c23a62f3a-a93a0341d2cmr77597466b.2.1727226531995; Tue, 24 Sep 2024
- 18:08:51 -0700 (PDT)
+	s=arc-20240116; t=1727227380; c=relaxed/simple;
+	bh=wQvjgJUa25divElc33WjJ9NN9k+brV4M9RdBg97EQUM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lR7Xzs+vNpnjo+y8h880nAByNnfkjO0tB4pI6vaq1tbDc/CNDI5ouEVn4927WxGwrK6M8lMaBLUcQNkg+nbWlAdm/TJUIcKSIurMZWNb9bMiwXjMPmfbxGvMzEWVkKCitAPWWomBwSPGykVx7FJEIEdEn7kxN4XTjq3HzqLYtGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fnjvZq9M; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727227378; x=1758763378;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=wQvjgJUa25divElc33WjJ9NN9k+brV4M9RdBg97EQUM=;
+  b=fnjvZq9MnjVETOZvaqg+MdUDl3N0Luew7zCkNUgfQGPzCEkcYJZtXnjl
+   DsqsS98B7B1WYeQ2Ld94XtBuge+YKIA2qJAm3RyW6jbmQwmYUSxKUq0qg
+   nPgGC9XwoAQKoqldgUzsB2pC3F8jW50bV/gsfbyv5DLbl7r/c3bN215kD
+   5wlPfIkWT+ulXfGG8qXs5oQYM8pu+BNScFhvf3IqYlm0DqDFCgKTKYVch
+   NDpGxxXmMQDbmExx0920KvlotB10NWEsWr6ZT53ARN8QDYOfaBXnX1Ckd
+   2hoo+R0DwBYB9aDsQksQcwI+K/d2znyc9O+n724CO0TdBrvVW9KxQ+kPE
+   g==;
+X-CSE-ConnectionGUID: U8CKx4SpQ9mh7YwBYLKGzQ==
+X-CSE-MsgGUID: +y7wEHlLSeKXVsGL2QnL4Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11205"; a="26406508"
+X-IronPort-AV: E=Sophos;i="6.10,256,1719903600"; 
+   d="scan'208";a="26406508"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2024 18:22:57 -0700
+X-CSE-ConnectionGUID: oT0T1v7YQum/2ZBh8EblmQ==
+X-CSE-MsgGUID: OMLmzN8sT+2BnNhyH+ZWeg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,256,1719903600"; 
+   d="scan'208";a="71899562"
+Received: from unknown (HELO [10.238.8.207]) ([10.238.8.207])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2024 18:22:56 -0700
+Message-ID: <e4ea1632-f6bf-4e81-942b-54e3529a306b@linux.intel.com>
+Date: Wed, 25 Sep 2024 09:22:53 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240922124951.1946072-1-zhiw@nvidia.com> <ZvErg51xH32b8iW6@pollux>
- <20240923150140.GB9417@nvidia.com> <ZvHwzzp2F71W8TAs@pollux.localdomain>
- <20240924164151.GJ9417@nvidia.com> <ZvMZisyZFO888N0E@cassiopeiae> <20240925005319.GP9417@nvidia.com>
-In-Reply-To: <20240925005319.GP9417@nvidia.com>
-From: Dave Airlie <airlied@gmail.com>
-Date: Wed, 25 Sep 2024 11:08:40 +1000
-Message-ID: <CAPM=9txix6tO7B+kRtsNXSVPfLGU4vbfga=pt9yqmszecuEbyw@mail.gmail.com>
-Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Danilo Krummrich <dakr@kernel.org>, Zhi Wang <zhiw@nvidia.com>, kvm@vger.kernel.org, 
-	nouveau@lists.freedesktop.org, alex.williamson@redhat.com, 
-	kevin.tian@intel.com, daniel@ffwll.ch, acurrid@nvidia.com, cjia@nvidia.com, 
-	smitra@nvidia.com, ankita@nvidia.com, aniketa@nvidia.com, 
-	kwankhede@nvidia.com, targupta@nvidia.com, zhiwang@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v7 0/5] x86: Add test cases for LAM
+To: kvm@vger.kernel.org, seanjc@google.com
+Cc: pbonzini@redhat.com, chao.gao@intel.com, robert.hu@linux.intel.com,
+ robert.hoo.linux@gmail.com
+References: <20240701073010.91417-1-binbin.wu@linux.intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20240701073010.91417-1-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 25 Sept 2024 at 10:53, Jason Gunthorpe <jgg@nvidia.com> wrote:
->
-> On Tue, Sep 24, 2024 at 09:56:58PM +0200, Danilo Krummrich wrote:
->
-> > Currently - and please correct me if I'm wrong - you make it sound to me as if
-> > you're not willing to respect the decisions that have been taken by Nouveau and
-> > DRM maintainers.
->
-> I've never said anything about your work, go do Nova, have fun.
->
-> I'm just not agreeing to being forced into taking Rust dependencies in
-> VFIO because Nova is participating in the Rust Experiment.
->
-> I think the reasonable answer is to accept some code duplication, or
-> try to consolidate around a small C core. I understad this is
-> different than you may have planned so far for Nova, but all projects
-> are subject to community feedback, especially when faced with new
-> requirements.
->
-> I think this discussion is getting a little overheated, there is lots
-> of space here for everyone to do their things. Let's not get too
-> excited.
 
-How do you intend to solve the stable ABI problem caused by the GSP firmware?
+Ping...
 
-If you haven't got an answer to that, that is reasonable, you can talk
-about VFIO and DRM and who is in charge all you like, but it doesn't
-matter.
+On 7/1/2024 3:30 PM, Binbin Wu wrote:
+> Intel Linear-address masking (LAM) [1], modifies the checking that is applied to
+> *64-bit* linear addresses, allowing software to use of the untranslated address
+> bits for metadata.
+>
+> The patch series add test cases for KVM LAM:
+>
+> Patch 1 moves struct invpcid_desc to header file for new test cases.
+> Patch 2 makes change to allow setting of CR3 LAM bits in vmlaunch tests.
+> Patch 3~5 add test cases for LAM supervisor mode and user mode, including:
+> - For supervisor mode
+>    CR4.LAM_SUP toggle
+>    Memory/MMIO access with tagged pointer
+>    INVLPG
+>    INVPCID
+>    INVVPID (also used to cover VMX instruction VMExit path)
+> - For user mode
+>    CR3 LAM bits toggle
+>    Memory/MMIO access with tagged pointer
+>
+> [1] Intel ISE https://cdrdv2.intel.com/v1/dl/getContent/671368
+>      Chapter Linear Address Masking (LAM)
+> ---
+> Changelog:
+> v7
+> - Move struct invpcid_desc to header file instead of defining a new copy in lam.c.
+> - Rename is_la57()/lam_sup_active() to is_la57_enabled()/is_lam_sup_enabled(),
+>    and move them to processor.h (Sean)
+> - Drop cr4_set_lam_sup()/cr4_clear_lam_sup() and use write_cr4_safe() instead. (Sean)
+> - Add get_lam_mask() to get lam status based on the address and vCPU state. (Sean)
+> - Drop the wrappers for INVLPG since INVLPG never faults. (Sean)
+> - Drop the wrapper for INVPCID and use invpcid_safe() instead. (Sean)
+> - Drop the check for X86_FEATURE_PCID. (Sean)
+> - Rename lam_{u48,u57}_active() to is_lam_{u48,u57}_enabled(), and move them to
+>    processor.h (Sean)
+> - Test LAM userspace address in kernel mode directly to simplify the interface
+>    of test_ptr() since LAM identifies a address as kernel or user only based on
+>    the address itself.
+> - Add comments about the virtualization hole of CR3 LAM bits.
+> - Drop the check of X86_FEATURE_LA57 when check LA57. (Sean)
+>
+> v6
+> - https://lore.kernel.org/kvm/20240122085354.9510-1-binbin.wu@linux.intel.com/
+>
+> v5
+> - https://lore.kernel.org/kvm/20230530024356.24870-1-binbin.wu@linux.intel.com/
+>
+> Binbin Wu (4):
+>    x86: Move struct invpcid_desc to processor.h
+>    x86: Allow setting of CR3 LAM bits if LAM supported
+>    x86: Add test cases for LAM_{U48,U57}
+>    x86: Add test case for INVVPID with LAM
+>
+> Robert Hoo (1):
+>    x86: Add test case for LAM_SUP
+>
+>   lib/x86/processor.h |  41 +++++++
+>   x86/Makefile.x86_64 |   1 +
+>   x86/lam.c           | 281 ++++++++++++++++++++++++++++++++++++++++++++
+>   x86/pcid.c          |   6 -
+>   x86/unittests.cfg   |  10 ++
+>   x86/vmx_tests.c     |  51 +++++++-
+>   6 files changed, 382 insertions(+), 8 deletions(-)
+>   create mode 100644 x86/lam.c
+>
+>
+> base-commit: d301d0187f5db09531a1c2c7608997cc3b0a5c7d
 
-Fundamentally the problem is the unstable API exposure isn't something
-you can build a castle on top of, the nova idea is to use rust to
-solve a fundamental problem with the NVIDIA driver design process
-forces on us (vfio included), I'm not seeing anything constructive as
-to why doing that in C would be worth the investment. Nothing has
-changed from when we designed nova, this idea was on the table then,
-it has all sorts of problems leaking the unstable ABI that have to be
-solved, and when I see a solution for that in C that is maintainable
-and doesn't leak like a sieve I might be interested, but you know keep
-thinking we are using rust so we can have fun, not because we are
-using it to solve maintainability problems caused by an internal
-NVIDIA design decision over which we have zero influence.
-
-Dave.
 
