@@ -1,181 +1,130 @@
-Return-Path: <kvm+bounces-27414-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27415-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BEE398576D
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 12:56:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3551985793
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 13:05:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4594D285425
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 10:56:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B963D285CF9
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 11:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338A6183CA1;
-	Wed, 25 Sep 2024 10:55:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635701474CE;
+	Wed, 25 Sep 2024 11:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXVw64MJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jnJS2904"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D41515DBAE
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 10:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E0F335A5
+	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 11:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727261751; cv=none; b=j0IUEh9gVa7e7ElYUJd1bstD9MHuHHyp9lfSQMQQw2jZFHr+jqApXxI7naZOEGF2lJueYBNBg172xh+YJJnpG0/EmGYKdzwrMvb6/K/Yyn9lFkhfLqmN2WMy6+OZlekiE2ZwnsrWYWGgadqoh5roO7Mt4ZifJgHOwQqXimLJLHk=
+	t=1727262293; cv=none; b=pEG/e95rWBEMTIcyMnS8jy/ms0fulyzKILZeuTVaeLvoJ9itplR0Om5lRvg6rZTrh35H+r0UkspnmxABqUySqN7JsA2uE7/kSmF5+VstxK0/ERPbvL58y7hzdU4u+aPeM4+xjmpyRRzd1guOeim0FTMU1QS3l7F18hyXMeWeAKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727261751; c=relaxed/simple;
-	bh=w59fsBYTm2jesRnmJ5WyaPgj8Bmrwwx6gRDeIrJFrxY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T66NrH4S2acpeBmmCgj55Q/VdoXBk61TF5p5ax5KCBQNj3asSFpl6RnEiQeh9IBj7So4T2OL9ADdAomfDQV2jJt4pUsoM7I93Q/cz3tQaruiPm7Q4YVGeP/Wwr8SRBfHJXDXxkM8BvWXxQ3p6UG7kiLmNCJEukT5ehed8zxHagw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fXVw64MJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E632C4CEC7;
-	Wed, 25 Sep 2024 10:55:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727261750;
-	bh=w59fsBYTm2jesRnmJ5WyaPgj8Bmrwwx6gRDeIrJFrxY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fXVw64MJk4YqlwPDzVRI0omGyDr7fUFkELy+vSfBpmAwUaFMZRF0TIFoDoBYJroPk
-	 EtclFOr2lRCQrLD0hY9fAqjCSn4RFri/8wKDBA7Zu3f/D0LD9uBBPWcbr5ENAK9fqx
-	 iwQHJGADlWjklHlrm1wUyczBUNl02y0cczQe/6GZski54AL92+PUr3xkcPb3INXXVR
-	 OxpGCIA9ueXmNuKaTPZ8vqnxoGOcOYHxJw26TZuWSgY9164oQKRhfuy4Hnf9XTqQro
-	 rm2f/0UGTbSrejLj9ucf296StNFjjWioNrAuaaDb8QTLxdFFFXe1t2CZ+Gde07rYr8
-	 VjJoEayBpe3zQ==
-Date: Wed, 25 Sep 2024 12:55:44 +0200
-From: Danilo Krummrich <dakr@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Zhi Wang <zhiw@nvidia.com>, kvm@vger.kernel.org,
-	nouveau@lists.freedesktop.org, alex.williamson@redhat.com,
-	kevin.tian@intel.com, airlied@gmail.com, daniel@ffwll.ch,
-	acurrid@nvidia.com, cjia@nvidia.com, smitra@nvidia.com,
-	ankita@nvidia.com, aniketa@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, zhiwang@kernel.org
-Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
-Message-ID: <ZvPsMKytGbcSLACo@pollux>
-References: <20240922124951.1946072-1-zhiw@nvidia.com>
- <ZvErg51xH32b8iW6@pollux>
- <20240923150140.GB9417@nvidia.com>
- <ZvHwzzp2F71W8TAs@pollux.localdomain>
- <20240924164151.GJ9417@nvidia.com>
- <ZvMZisyZFO888N0E@cassiopeiae>
- <20240925005319.GP9417@nvidia.com>
+	s=arc-20240116; t=1727262293; c=relaxed/simple;
+	bh=4mTSjNe+7yH5jk8z+uv1VxR1vgZ0gnWMbo2mKTCsPC8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RhE0T0Y52SkHJ3YbQUTLbZY361OOQUa258Uy8aOiS+iHRQAObeo0J7kUslcHSwRFufYv+r6qzRlHfddvXbhp/pSUk0XWRu8lEikR6Pz+GOwf/6VFKPLkuG6XJLvedh5sj2Cyy107kp9h4EwiwMhK1yu3hwtGHLXou5Wmn5zhDfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jnJS2904; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-45826431d4bso46203801cf.0
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 04:04:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727262291; x=1727867091; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f3QwF2q/Skq7fz13dE6HLbzon2hB22ZQ3sW+CQbjSQU=;
+        b=jnJS2904zaK6Ml1Qmtdqeb2M/l/LvlV0JW4icjqstUBAEV7/sp+9JRKgKetohhpqDi
+         TBp4QM4bmnGWfhqryQXTk6QTYNZ3p3djRIdUUFW6M9QWRbskotIgcT0+uiL39iozUGP3
+         ZmsE6A2koxoLyTcmLANNFh01sGEhow50ugVZbSxxp8+sNFUFj3gXRtnopfbe8B+g+2pH
+         C0AXzMVFQL/Dz0CKCGf+qTW7TeT9uSfeylllsoI1ucc9m/2c2Y8srDSc5l6U0wwsCW3a
+         hGZBVzyRH82x0yE5ly2Mme50nRRm1FXD6tqkIAwNQX8HfaXrrmzfg61bDp9+3AOcQysR
+         rOBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727262291; x=1727867091;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f3QwF2q/Skq7fz13dE6HLbzon2hB22ZQ3sW+CQbjSQU=;
+        b=iD5/xHOGU/dZ6H6N27QjHF7eXsFpkWTm65eaVEB6IQlH5VqbsGnUa724qj/LFapj6E
+         R75jca2KbkkSUBdEODP0E4hlhYUJHmNgPrboqHDdeFCwKnovqKm63Tvptj9MlV+eesjK
+         WCVgAM3qTjK02UBsFhEwnSASJJQyxm42xtdZ5eWZPgHzR56cEwM8jcsir/GFg+ydvJ17
+         VajYegjsPpdiR3CdkWH0xtz9mHJFGXctV3Z1W5rL7pL3+ys6hVnedwd040//mzCve0Z9
+         ddV2SteuWx//H/be0OLWzLRv+VddRNkx6e0zRXUiPz7PhTmsFzKMmciK7ksDbRrkSqLJ
+         Db8g==
+X-Forwarded-Encrypted: i=1; AJvYcCVPV9tlBfulLXtiIrth4BsqK6KipqZyRIZrvz+fxcalQq7JCSD8KHyl9C0FeMcEBBonCrg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCsK0YKDVccy3IBeB6unPX5EcG4cQaGf8xTV8niYIp54aA0heH
+	HO10iNCHKRU7I/YCTlGWHDYaRRoBYEOQbDHd7am7jBilYPsQ97+Vf3gu1DVeRG5WFcvvBNasVy9
+	51gRMU27ODZ1BjsWtPB9HVffiM0Dthvdge8gQ
+X-Google-Smtp-Source: AGHT+IF8WiIvUTGbGx8K3g3Qj7TGWZHnCSivOTa2bmhXpPp3pdx24k+5JyMttKT924MJIdYsJvYxOOhs+xqkrhWZUkk=
+X-Received: by 2002:ac8:5d4a:0:b0:458:2a05:6b66 with SMTP id
+ d75a77b69052e-45b5e0af268mr36374701cf.55.1727262290665; Wed, 25 Sep 2024
+ 04:04:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240925005319.GP9417@nvidia.com>
+References: <20240911111522.1110074-1-suleiman@google.com>
+In-Reply-To: <20240911111522.1110074-1-suleiman@google.com>
+From: Suleiman Souhlal <suleiman@google.com>
+Date: Wed, 25 Sep 2024 20:04:37 +0900
+Message-ID: <CABCjUKCbsm5xywfG-jvZcHssgNcPk2B2h7n3jbSY6_M8p3YxSA@mail.gmail.com>
+Subject: Re: [PATCH v2] sched: Don't try to catch up excess steal time.
+To: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>
+Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Valentin Schneider <vschneid@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, joelaf@google.com, 
+	vineethrp@google.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	ssouhlal@freebsd.org, Srikar Dronamraju <srikar@linux.ibm.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 24, 2024 at 09:53:19PM -0300, Jason Gunthorpe wrote:
-> On Tue, Sep 24, 2024 at 09:56:58PM +0200, Danilo Krummrich wrote:
-> 
-> > Currently - and please correct me if I'm wrong - you make it sound to me as if
-> > you're not willing to respect the decisions that have been taken by Nouveau and
-> > DRM maintainers.
-> 
-> I've never said anything about your work, go do Nova, have fun.
+On Wed, Sep 11, 2024 at 8:16=E2=80=AFPM Suleiman Souhlal <suleiman@google.c=
+om> wrote:
+>
+> When steal time exceeds the measured delta when updating clock_task, we
+> currently try to catch up the excess in future updates.
+> However, this results in inaccurate run times for the future things using
+> clock_task, as they end up getting additional steal time that did not
+> actually happen.
+>
+> For example, suppose a task in a VM runs for 10ms and had 15ms of steal
+> time reported while it ran. clock_task rightly doesn't advance. Then, a
+> different taks runs on the same rq for 10ms without any time stolen in
+> the host.
+> Because of the current catch up mechanism, clock_sched inaccurately ends
+> up advancing by only 5ms instead of 10ms even though there wasn't any
+> actual time stolen. The second task is getting charged for less time
+> than it ran, even though it didn't deserve it.
+> This can result in tasks getting more run time than they should actually
+> get.
+>
+> So, we instead don't make future updates pay back past excess stolen time=
+.
+>
+> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+> ---
+> v2:
+> - Slightly changed to simply moving one line up instead of adding
+>   new variable.
+>
+> v1: https://lore.kernel.org/lkml/20240806111157.1336532-1-suleiman@google=
+.com
+> ---
+>  kernel/sched/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-See, that's the attitude that doesn't get us anywhere.
+Friendly ping.
 
-You act as if we'd just be toying around to have fun, position yourself as the
-one who wants to do the "real deal" and just claim that our decisions would harm
-users.
-
-And at the same time you proof that you did not get up to speed on what were the
-reasons to move in this direction and what are the problems we try to solve.
-
-This just won't lead to a constructive discussion that addresses your concerns.
-
-Try to not go like a bull at a gate. Instead start with asking questions to
-understand why we chose this direction and then feel free to raise concerns.
-
-I assure you, we will hear and recognize them! And I'm also sure that we'll find
-solutions and compromises.
-
-> 
-> I'm just not agreeing to being forced into taking Rust dependencies in
-> VFIO because Nova is participating in the Rust Experiment.
-> 
-> I think the reasonable answer is to accept some code duplication, or
-> try to consolidate around a small C core. I understad this is
-> different than you may have planned so far for Nova, but all projects
-> are subject to community feedback, especially when faced with new
-> requirements.
-
-Fully agree, and I'm absolutely open to consider feedback and new requirements.
-
-But again, consider what I said above -- you're creating counterproposals out of
-thin air, without considering what we have planned for so far at all.
-
-So, I wonder what kind of reaction you expect approaching things this way?
-
-> 
-> I think this discussion is getting a little overheated, there is lots
-> of space here for everyone to do their things. Let's not get too
-> excited.
-> 
-> > I encourage that NVIDIA wants to move things upstream and I'm absolutely willing
-> > to collaborate and help with the use-cases and goals NVIDIA has. But it really
-> > has to be a collaboration and this starts with acknowledging the goals of *each
-> > other*.
-> 
-> I've always acknowledged Nova's goal - it is fine.
-> 
-> It is just quite incompatible with the VFIO side requirement of no
-> Rust in our stack until the ecosystem can consume it.
-> 
-> I belive there is no reason we can't find an agreeable compromise.
-
-I'm pretty sure we indeed can find agreeable compromise. But again, please
-understand that the way of approaching this you've chosen so far won't get us
-there.
-
-> 
-> > > I expect the core code would continue to support new HW going forward
-> > > to support the VFIO driver, even if nouveau doesn't use it, until Rust
-> > > reaches some full ecosystem readyness for the server space.
-> > 
-> > From an upstream perspective the kernel doesn't need to consider OOT drivers,
-> > i.e. the guest driver.
-> 
-> ?? VFIO already took the decision that it is agnostic to what is
-> running in the VM. Run Windows-only VMs for all we care, it is still
-> supposed to be virtualized correctly.
-> 
-> > > There are going to be a lot of users of this code, let's not rush to
-> > > harm them please.
-> > 
-> > Please abstain from such kind of unconstructive insinuations; it's ridiculous to
-> > imply that upstream kernel developers and maintainers would harm the users of
-> > NVIDIA GPUs.
-> 
-> You literally just said you'd want to effectively block usable VFIO
-> support for new GPU HW when "we stop further support for new HW in
-> Nouveau at some point" and "move the vGPU parts over to Nova(& rust)".
-
-Well, working on a successor means that once it's in place the support for the
-replaced thing has to end at some point.
-
-This doesn't mean that we can't work out ways to address your concerns.
-
-You just make it a binary thing and claim that if we don't choose 1 we harm
-users.
-
-This effectively denies looking for solutions of your concerns in the first
-place. And again, this won't get us anywhere. It just creates the impression
-that you're not interested in solutions, but push through your agenda.
-
-> 
-> I don't agree to that, it harms VFIO users, and is not acknowledging
-> that conflicting goals exist.
-> 
-> VFIO will decide when it starts to depend on rust, Nova should not
-> force that decision on VFIO. They are very different ecosystems with
-> different needs.
-> 
-> Jason
-> 
+Thanks,
+-- Suleiman
 
