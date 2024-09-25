@@ -1,331 +1,158 @@
-Return-Path: <kvm+bounces-27428-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27429-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59892986194
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 16:56:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C86EC9861D1
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 17:02:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 702791C26C4A
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 14:56:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E54D1F2C763
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 15:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7A518C002;
-	Wed, 25 Sep 2024 14:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9A617C989;
+	Wed, 25 Sep 2024 14:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EhGnPsFI"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nAHGq7eZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65F718BB8B;
-	Wed, 25 Sep 2024 14:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0545518CBF1;
+	Wed, 25 Sep 2024 14:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727274426; cv=none; b=H4ln90yyKpYNOuD0Ebp3E6+XKcCJeNsN3ks9m773aiZSjyeuC0qsHf7aKZnDIMLclurnRZcUIhKeVc5ng8N/4g/nUl3QooSlnt8rqxHbo6+JoB+sBZ8xOGMJCeMY1BlW8xG7UZuk1zft0whW5JimPkrnqKUtLpTX2WS8Z4+ZVgM=
+	t=1727275036; cv=none; b=DSB2EMOXMqqS4G8OS1+qu6MPyIOd00ithSsqewARnaXr/hFeZhug6gwAEEiutSS6WE5mdfqrQHTUuZJsvFthjtoXTgbjaSKuwTKwFnhNj8r8dC3XtQGB4OVL2d50Q87ivyiE7m7d89t0lYcPwUXg4RuOV+21pf79SqGqQVibbZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727274426; c=relaxed/simple;
-	bh=4Ig+5R8qDEAU+XOfkWd2fOMIZB02YTTbS3m+LfgCIsk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nk2xS484fazZknhEdVQleCURzZUtLFYL8TzLC/MjK+4IRW8CRBL0xfIAxO3h+/5ZYTuIsxWm8GkVdMpVHwXwziWHHa8Bq4lW7N0i0A2FMAcnyZpZmPJ0LA4OrHFBCPdxl624z0ESUEoZBQ3/DSbJX1HP1GmGB+1hlbG0MQ1bTpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EhGnPsFI; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=4Ig+5R8qDEAU+XOfkWd2fOMIZB02YTTbS3m+LfgCIsk=; b=EhGnPsFIDlfuhpBbpbmNUgTeo9
-	xDzRgxYNzZDDxvaSiQWvM8ZZhcFv15Dh/MRZ/XZdcLq/oGajm2Vl9uij3DI1leHiB/cpmUeSKhVx/
-	DIF55K8JFQSCy4QGGmIG5UxCq7bGHXGkhU1iWE8CRfV2Ysgszoy4uFdvPPgoC7528vxgoZfpXoeBL
-	bv778X5o2wXI2yfQS6HispikHzK0rVtQiYm2tM9s+10LtrI3//oI86g22shn6R8Vao+Z2SpEY/p+D
-	c5aVnTXgFNbxB2u7mOtvzNkEQ1Mqs1NOVXdmsdyQxZLzfFeVeG8C5Uw7N7KmUULwopZyW/jPC/GEX
-	iRJprpKg==;
-Received: from [2001:8b0:10b:5:4842:e5e7:476e:c7a8] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1stSym-00000004ALv-0YMM;
-	Wed, 25 Sep 2024 14:26:57 +0000
-Message-ID: <c393230b8c258ab182f85b74cbc9f866acc2a5a2.camel@infradead.org>
-Subject: Re: [PATCH v2] sched: Don't try to catch up excess steal time.
-From: David Woodhouse <dwmw2@infradead.org>
-To: Suleiman Souhlal <ssouhlal@freebsd.org>
-Cc: Suleiman Souhlal <suleiman@google.com>, Ingo Molnar <mingo@redhat.com>, 
- Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann
- <dietmar.eggemann@arm.com>,  Steven Rostedt <rostedt@goodmis.org>, Ben
- Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, Valentin
- Schneider <vschneid@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- joelaf@google.com,  vineethrp@google.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, Srikar Dronamraju <srikar@linux.ibm.com>, Sean
- Christopherson <seanjc@google.com>
-Date: Wed, 25 Sep 2024 15:26:56 +0100
-In-Reply-To: <ZvQPTYo2oCN-4YTM@freefall.freebsd.org>
-References: <20240911111522.1110074-1-suleiman@google.com>
-	 <f0535c47ea81a311efd5cade70543cdf7b25b15c.camel@infradead.org>
-	 <ZvQPTYo2oCN-4YTM@freefall.freebsd.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-VF04UKnM+tLDn7596QOR"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1727275036; c=relaxed/simple;
+	bh=33LMCYs4ZAMWUAeDvSpTN6EjILkxtvhX9lBP6A7goaE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mCrEISckdb3uL8ITOz/ykBHYbqQWvOyBeOsforqTdT6T30d1SDBK4IjWBCt/LJsvkbnzWzghUQ2ulxX2dHnE0JeZdyDKU+gCayFYrDL5R1Nw9PgwrXTyKrQCDbbP0e4EZszTF0wiu1tm0i+4UUhySybkpzZZtRK1eg51NDAAeqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nAHGq7eZ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48P1X8BE005761;
+	Wed, 25 Sep 2024 14:37:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	b1uqCTj7RZo8GESVV5hiVMQ9MJSDCuFgBtvmHa3hTX0=; b=nAHGq7eZFjA6y0y0
+	87wdzmZGA91T7HhktPHqyo29xzu49o4C1qf30g7ciIyVIbXMc4FYERsW86pfODQ1
+	SUt2w6lcsYZoVAMaSFQ7au0LPeVXYbWo1Q1A5dvdXOEM16qw0vK4IDp6NgCeFfrs
+	sfngaKyNILCTvslZUUN7ZJCbqWb9FsZlQlrPGPHRTulJEzkd3IXZO2m/+VX3mb3A
+	0hI7LHl5JJcsJGCvYstm+Q9pZ7k3ejLRhiBV09tfV4oX7jQ15tm+SBdriKECk+xk
+	dFSGlyvToG5FGVFGs20TEuMpWWEVEEcucLVFieUy6dP6Hz+JW6SgNZDN8bONj8HD
+	rtfl0A==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snnagrwj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 14:37:12 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48PEXx4H018588;
+	Wed, 25 Sep 2024 14:37:12 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snnagrwg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 14:37:12 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48PBx6tB001138;
+	Wed, 25 Sep 2024 14:37:11 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41t8futa5q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 14:37:11 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48PEb7Bu47645160
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 25 Sep 2024 14:37:07 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7414720043;
+	Wed, 25 Sep 2024 14:37:07 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 40E6220040;
+	Wed, 25 Sep 2024 14:37:07 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 25 Sep 2024 14:37:07 +0000 (GMT)
+Date: Wed, 25 Sep 2024 16:37:05 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nico Boehr <nrb@linux.ibm.com>
+Cc: frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: edat: move LC_SIZE to
+ arch_def.h
+Message-ID: <20240925163705.0f8235ce@p-imbrenda.boeblingen.de.ibm.com>
+In-Reply-To: <20240923062820.319308-3-nrb@linux.ibm.com>
+References: <20240923062820.319308-1-nrb@linux.ibm.com>
+	<20240923062820.319308-3-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: PeIcZLOMMc3C1Cy4krRnpFAHtaLTRG-E
+X-Proofpoint-ORIG-GUID: dS9vUiRfknAdxqYmbvQwtYg3Mtntz0pY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-25_04,2024-09-25_02,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ mlxscore=0 mlxlogscore=999 spamscore=0 impostorscore=0 priorityscore=1501
+ phishscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
+ definitions=main-2409250103
 
+On Mon, 23 Sep 2024 08:26:04 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
---=-VF04UKnM+tLDn7596QOR
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> struct lowcore is defined in arch_def.h and LC_SIZE is useful to other
+> tests as well, therefore move it to arch_def.h.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-On Wed, 2024-09-25 at 13:25 +0000, Suleiman Souhlal wrote:
-> On Wed, Sep 25, 2024 at 12:45:55PM +0100, David Woodhouse wrote:
-> > On Wed, 2024-09-11 at 20:15 +0900, Suleiman Souhlal wrote:
-> > > When steal time exceeds the measured delta when updating clock_task,
-> > > we
-> > > currently try to catch up the excess in future updates.
-> > > However, this results in inaccurate run times for the future things
-> > > using
-> > > clock_task, as they end up getting additional steal time that did not
-> > > actually happen.
-> > >=20
-> > > For example, suppose a task in a VM runs for 10ms and had 15ms of
-> > > steal
-> > > time reported while it ran. clock_task rightly doesn't advance. Then,
-> > > a
-> > > different taks runs on the same rq for 10ms without any time stolen
-> > > in
-> > > the host.
-> > > Because of the current catch up mechanism, clock_sched inaccurately
-> > > ends
-> > > up advancing by only 5ms instead of 10ms even though there wasn't any
-> > > actual time stolen. The second task is getting charged for less time
-> > > than it ran, even though it didn't deserve it.
-> > > This can result in tasks getting more run time than they should
-> > > actually
-> > > get.
-> > >=20
-> > > So, we instead don't make future updates pay back past excess stolen
-> > > time.
-> > >=20
-> > > Signed-off-by: Suleiman Souhlal <suleiman@google.com>
-> > > ---
-> > > v2:
-> > > - Slightly changed to simply moving one line up instead of adding
-> > > =C2=A0 new variable.
-> > >=20
-> > > v1:
-> > > https://lore.kernel.org/lkml/20240806111157.1336532-1-suleiman@google=
-.com
-> > > ---
-> > > =C2=A0kernel/sched/core.c | 2 +-
-> > > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> > > index f3951e4a55e5..6c34de8b3fbb 100644
-> > > --- a/kernel/sched/core.c
-> > > +++ b/kernel/sched/core.c
-> > > @@ -730,11 +730,11 @@ static void update_rq_clock_task(struct rq *rq,
-> > > s64 delta)
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (static_key_false(=
-(&paravirt_steal_rq_enabled))) {
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0steal =3D paravirt_steal_clock(cpu_of(rq));
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0steal -=3D rq->prev_steal_time_rq;
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0rq->prev_steal_time_rq +=3D steal;
-> >=20
-> > The above two lines are essentially:
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0steal -=3D prev;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0prev +=3D steal;
-> >=20
-> > It's like one of those clever ways of exchanging two variables with
-> > three XOR operations. I don't like it :)
-> >=20
-> > Ultimately, you're just setting rq->prev_steal_time_rq to the latest
-> > value that you just read from paravirt_steal_clock(). And then setting
-> > 'steal' to the delta between the new reading and the previous one.
-> >=20
-> > The code above is *far* from obvious. At the very least it wants a
-> > comment, but I'd rather see it refactored so that it doesn't need one.=
-=20
-> >=20
-> > =C2=A0=C2=A0=C2=A0 u64 abs_steal_now =3D paravirt_steal_clock(cpu_of(rq=
-));
-> > =C2=A0=C2=A0=C2=A0 steal =3D abs_steal_now - rq->prev_steal_time_rq;
-> > =C2=A0=C2=A0=C2=A0 rq->prev_steal_time_rq =3D abs_steal_now;
->=20
-> That is what v1 did:
-> https://lore.kernel.org/lkml/20240806111157.1336532-1-suleiman@google.com=
-/
->=20
-> It is also more obvious to me, but the feedback I received was that
-> the way in the current iteration is better.
->=20
-> I don't feel strongly about it, and I'd be ok with either version applied=
-.=20
+I find this patch a little weird here, since it's not used for the
+previous patch, and doesn't seem to have anything to do with it either.
 
-Fair enough. Not really a hill anyone should choose to die on, I
-suppose.
+the patch itself is otherwise good, I'm just a little puzzled.
 
-> >=20
-> > I'm still not utterly convinced this is the right thing to do, though.
-> > It means you will constantly undermeasure the accounting of steal time
-> > as you discard the excess each time.
-> >=20
-> > The underlying bug here is that we are sampling the steal time and the
-> > time slice at *different* times. This update_rq_clock_task() function
-> > could be called with a calculated 'delta' argument... and then
-> > experience a large amount of steal time *before* calling
-> > paravirt_steal_clock(), which is how we end up in the situation where
-> > the calculated steal time exceeds the running time of the previous
-> > task.
-> >=20
-> > Which task *should* that steal time be accounted to? At the moment it
-> > ends up being accounted to the next task to run =E2=80=94 which seems t=
-o make
-> > sense to me. In the situation I just described, we can consider the
-> > time stolen in update_rq_clock_task() itself to have been stolen from
-> > the *incoming* task, not the *outgoing* one. But that seems to be what
-> > you're objecting to?
->=20
-> This is a good description of the problem, except that the time stolen
-> in update_rq_clock_task() itself is actually being stolen from the=20
-> outgoing task. This is because we are still trying to calculate how long
-> it ran for (update_curr()), and time hasn't started ticking for the
-> incoming task yet. We haven't set the incoming task's exec_start with the
-> new clock_task time yet.
->=20
-> So, in my opinion, it's wrong to give that time to the incoming task.
+nonetheless:
 
-That makes sense. That steal time is actually stolen from *neither*
-task, since it's after the 'end' timestamp of the outgoing task, and
-before the 'start' timestamp of the incoming task.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-So where *should* it be accounted?
+> ---
+>  lib/s390x/asm/arch_def.h | 1 +
+>  s390x/edat.c             | 1 -
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 745a33878de5..5574a45156a9 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -119,6 +119,7 @@ enum address_space {
+>  
+>  #define CTL2_GUARDED_STORAGE		(63 - 59)
+>  
+> +#define LC_SIZE	(2 * PAGE_SIZE)
+>  struct lowcore {
+>  	uint8_t		pad_0x0000[0x0080 - 0x0000];	/* 0x0000 */
+>  	uint32_t	ext_int_param;			/* 0x0080 */
+> diff --git a/s390x/edat.c b/s390x/edat.c
+> index 16138397017c..e664b09d9633 100644
+> --- a/s390x/edat.c
+> +++ b/s390x/edat.c
+> @@ -17,7 +17,6 @@
+>  
+>  #define PGD_PAGE_SHIFT (REGION1_SHIFT - PAGE_SHIFT)
+>  
+> -#define LC_SIZE	(2 * PAGE_SIZE)
+>  #define VIRT(x)	((void *)((unsigned long)(x) + (unsigned long)mem))
+>  
+>  static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
 
-Or is it actually correct to drop it completely?
-
-If you can make a coherent case for the fact that dropping it is really
-the right thing to do (not *just* that it doesn't belong to the
-outgoing task, which is the case you make in your existing commit
-message), then I suppose I'm OK with your patch as-is.
->=20
-
---=-VF04UKnM+tLDn7596QOR
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI1MTQyNjU2WjAvBgkqhkiG9w0BCQQxIgQgFBIBl41J
-cHDphcjeqeXvGBYZM0EIpTmMxMuGnPQyHV4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA9JURSFsaQ/NozOr5FAQoNVunEZqek7DmS
-wK4T2oYyJAeUpOe6yNZIL3iivLVi3D7Wjjab+iKg90u0NfJbYdU/wPbcSCnAUv30Mfy96fgoH588
-m4KMvf5zc4oMhCajGFIpXNsH9xT1Pmhj7wPUS4kxhs/jjgn2TYd6Vj9I2gTIenJUxaSN4UGPG+KD
-VbEgo8WUldM+cGLMzan/tMpx4YNujA3nLBTDnoY7cYLwyAxZcF7/IWjOximgXRFOS+QOltoZEXyh
-QnbRN0114tlWsgm2oB2FIFGa6TSnIobDmbi92VpLuTLggJRL8oQwmD+neOFd0yomEpJ4H1fubFsN
-g24vroycyaV/dMybTGt2zCbLb9Y8iUJVVccaelbPaiA4w+oVY06dw2muGwsUgcNQ794fDukeIXlE
-TM+dhD8vLCQjXWwNT5DDTuvCcW77TdXUqwgG2pnGD4VWeJosahiLxgeyGHOOegnHwNARhkzIJBeZ
-NWgudPBjKsAdAifWo/U3oX+FfIb5ARC1ydBT1E5QoefOMXwE5+ZZlIYQxAQGwgh5gdBq1JjfWdff
-aL0xmz6Q8OeL28udDaPYF7oVDuNrt77JmlfPfzNcY40O1h8nklk88OhNVEeqPOLwPzAgErewA1ZE
-9Ku6GXZ121xuetNd2zYCd7ZTEstnu3doGIXJefXiLgAAAAAAAA==
-
-
---=-VF04UKnM+tLDn7596QOR--
 
