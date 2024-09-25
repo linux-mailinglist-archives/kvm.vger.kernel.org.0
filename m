@@ -1,245 +1,166 @@
-Return-Path: <kvm+bounces-27465-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27467-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB7C69864A4
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 18:18:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 735B99864D1
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 18:29:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43849B27406
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 15:54:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EABA01F2524F
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 16:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F170A3B295;
-	Wed, 25 Sep 2024 15:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1DB4962E;
+	Wed, 25 Sep 2024 16:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uBo8zCYc"
+	dkim=pass (2048-bit key) header.d=freebsd.org header.i=@freebsd.org header.b="ChT2OcBH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx2.freebsd.org (mx2.freebsd.org [96.47.72.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201371BC23
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 15:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727279646; cv=none; b=l2Lk8kcNUqjKW+cIwBTvsDJFuqK+cwU+bhuVCll9IFkbzMyA7CsZ9ZDpyifxH3l9p2NmSg1LpTzj+6vRm9RKVfyjXID8xgZfd0YF6OVL0T/goiLFOkhP3wssNKIVTFeooNKMABItkUsBJ1s1EYC+5c1mXwweWby309vWA+mdfnc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727279646; c=relaxed/simple;
-	bh=viYabtJz1TITnQz4Qa7lIMio94cIQKuN9RXprlUUn20=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J5M9UlNQy8+1Nk2hu1BrwpcbHB6UaY9b+PwRr4R+bxuT7mjfKSfCwhtE22MQXQI37tThmST8Y0mN3qxd1DtwMLXtCHmd6xLmf7xmS10z+A/HTuXX/rGX1OKzUQOevmsouCTgHNaAc0YInP1bO4sLU0r5alJJdE7U6a1bgqEVVyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uBo8zCYc; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a1a662a633so313625ab.1
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 08:54:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727279642; x=1727884442; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mtlWMtq+JiEyWaKdO0nlwORQa61CRpWkCRYLpleOmWc=;
-        b=uBo8zCYcIUJhS/PETf/69bupBGH621jT9YSETyyoKqXOKliYYHE14wU2XYwl3A0Sxs
-         avFXLpOlKG1iDnsgjPremaiZ/sL8gi+DhtPwdzSnvI9BAx2FWDnXRCsGB00rhwxzIPSC
-         y3Bmqq/uDBl+VjgBgr8MJd6URamV2xVVzRYBUjPI5rZAOeS5jZGZQZrKMFy1fM9TP5ji
-         K1iPoZA+53P9UDeQG5OUIKnrRY6lKNRw6n6gWP3NWCb6oLnR5jncL6e/W8GqmOJwZx/2
-         6CfvKnZYnueW+VBXDB4Z2aXesW6PBGjI7CM1zz957Cg0zLfk2PmXluePf7E1SPKoB+cz
-         tdrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727279642; x=1727884442;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mtlWMtq+JiEyWaKdO0nlwORQa61CRpWkCRYLpleOmWc=;
-        b=T/F1LXGPCgpptgzf0IbF8D6BS6ap3SvgMC6L892shhAYSupR2tJPfEhVN76L5eKJE9
-         NVM7QOABi3bVOsy95EQebo9phdEnI2H6KAlOotYNkyJLU0cKM43QGgQEssa9t8+4GoXd
-         QZ8IET6OxoSeqRmMEC9V2FlFXW8wgRzeC6A78lil2sWKZkKC+jR4qTEoOQcRzdtSy4iw
-         RzHlQmKwgHTh6vBMmKU4kHxbkX9OPKW88WWmVHYZ3SoSJRLdwfnRR3ya8u64H7c+fMAz
-         qExZ8h5wgidKy6CMK1U7wWFf0t+EZlifeNIb9T3pU8IjOdU0y8PnNn2KPejk/WtWSXuI
-         NvMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVR/OIQFaIuaJ84r6+DfBKMoxSrXsCsdC3fYp3cpb9+b5H91a087i1eZfsjsMy5Qs95qd8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk62uIy9Xc0s7QX0nh6R/kH1b1dzOP1vKfWFy7J+GM+PNAgjPZ
-	GVzjMn7aVAuLQ/c7WH8sDRHjisjFoEOwMGxlhuu8naMNKfw2huORLGPLFCONrp6WcGhEbqlMlR3
-	8qWPo6Lcy5Loln7cdpCfFTx8cJrqY+w+TUSTZ
-X-Google-Smtp-Source: AGHT+IECKVgNpXJyra6xJfQTQh6aQ7i0vY0ZTk0QtA5OBdxknRIVX3nOfLE4llLAa859tdiG19FbtS4i20eJ0xsZ7pg=
-X-Received: by 2002:a05:6e02:b2e:b0:3a0:926a:8d35 with SMTP id
- e9e14a558f8ab-3a27443ee75mr1540455ab.17.1727279641904; Wed, 25 Sep 2024
- 08:54:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D39F367;
+	Wed, 25 Sep 2024 16:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=96.47.72.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727281744; cv=pass; b=gacKsM9ZwkQHJ+oJrg2EwbUrQi0BBR0No0pGxl8i+H4OXmMo7Ly7znpP4K5/kh3YVbXjWbTJfXW9+Jy+KdHv2EnizfOoJUiUz3fmjky9H8swqFZgVI+peu2Y+7WI14Kngh1SMyrpuJR0n4XZkZ7U3NSvaBn0ylEHqXkc3KvkT/I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727281744; c=relaxed/simple;
+	bh=Drg62vbidm313cp43ukPdG1u2UTDR9VUvpU0FvdN/7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gNV45QOUKP4X+A0bacn3GVv1E18rFM+ZtcrGbcGcV1F9GcN/4a3KyqCWZCCKFlfjizV4x4Bnno9a3+j0PjykqpzA/AsUIJFNQY5pKX8yc42Nyo+L8pbnMk0m8jZIFKVdunrE/Lx+q/18TED195zXcovM+zgaDKuagsKM9GrxMyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=freebsd.org; spf=pass smtp.mailfrom=freebsd.org; dkim=pass (2048-bit key) header.d=freebsd.org header.i=@freebsd.org header.b=ChT2OcBH; arc=pass smtp.client-ip=96.47.72.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=freebsd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freebsd.org
+Received: from mx1.freebsd.org (mx1.freebsd.org [IPv6:2610:1c1:1:606c::19:1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits)
+	 client-signature RSA-PSS (4096 bits))
+	(Client CN "mx1.freebsd.org", Issuer "R10" (verified OK))
+	by mx2.freebsd.org (Postfix) with ESMTPS id 4XDMcY25Z3z4Xjy;
+	Wed, 25 Sep 2024 16:29:01 +0000 (UTC)
+	(envelope-from ssouhlal@freebsd.org)
+Received: from freefall.freebsd.org (freefall.freebsd.org [96.47.72.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "freefall.freebsd.org", Issuer "R11" (verified OK))
+	by mx1.freebsd.org (Postfix) with ESMTPS id 4XDMcX6Tx4z4VZx;
+	Wed, 25 Sep 2024 16:29:00 +0000 (UTC)
+	(envelope-from ssouhlal@freebsd.org)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=freebsd.org; s=dkim;
+	t=1727281740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QvovojzBC4sqSXOUEmyBpaOxWWALChCLJNU1wSv3wE4=;
+	b=ChT2OcBH/OLGrN/hySzAcnNSTVjaimwU1m4zXRgiI0qtdqf8kEHYzI48mk1RtMNIuYDgh6
+	JPShnfRLy5hlFQpBMEc/WkTXUVUxRMTVrOpiNpXPG7R351/2k6BLFUtXE7ZihgikSXG88E
+	V00k3XqcrG04VG3itQ9/Z6rf2wwpFNB7637pro0f8MVsHwinqB01g4PnAe+1aRXyJIdRV9
+	2hC9iLr4Wc1SAIMP7TG9yhOfOTrWiZpRLPSz8evCm+VH+3hQABHjH9fBowWNRqTh0p4z6H
+	b9NpIYLM1kCCI29C9tGP0ckVW3mr5amsdospnFzjs+nQIrlHNYH60g2kfM+s3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=freebsd.org;
+	s=dkim; t=1727281740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QvovojzBC4sqSXOUEmyBpaOxWWALChCLJNU1wSv3wE4=;
+	b=A277neFBlBIU+Zx5S1UOAZQ6dNd4CfWQip/JYgc+zFnlAycfgg4gfW99F9jMxRmOgA8Mj6
+	uMEl8NDDDFEHhOVBEgk/n1bYnw3uWL9bKwjTJjdORR3kCTUO6LSf7U40iQ4QXOp82T/m0s
+	pkXRmBEkM1UBX3q8bjcwnzRO0jybjTogJfSl3RZPhYvwmO+l4uNHn1BRS4X9PXNOD2mP4s
+	13Rof+CyYN48WYARxMertpSMGFE1nd8OUgm4FSyMURfd1CY049RpFJj6kS2beGRi+nfgp1
+	bChMNo8bDc4iTYqH/MgKSvDAhxsRjx/SILpSYDb2GoF5LklLUcMFZbcVs7osRQ==
+ARC-Authentication-Results: i=1;
+	mx1.freebsd.org;
+	none
+ARC-Seal: i=1; s=dkim; d=freebsd.org; t=1727281740; a=rsa-sha256; cv=none;
+	b=tm3HfbMSD0p9XYaPvvtMZcfZNm4wXISgH7zunh3h7CsBcLszX0fCwf/icqrmN2v4sBqQRq
+	QrOEjprdzzcaRiXPyJrbJhRhiy9vY1TT6abHxyqPdihX6vsDmCdKo6dKnYwo4c2xu69KvA
+	scmqX8zDE+uqDDgLim1usGkiwTOwnj5Z54PNtvT3hY7PpwWGF+uZK0sOvUbr+49fsQcljJ
+	r7YXwqMDT0m7pxCnCHjrOuWYyvOkGax9o0LLmdhj1SwMnb4HjHpvD0kKTswrO4aUtTZDHO
+	DyRjTYEgpT5fq/UHIY5nQl+RWUSOnLDgfyq7f9MJyz/U8YuIcidppJMSlEZ0mg==
+Received: by freefall.freebsd.org (Postfix, from userid 1026)
+	id C07D6EC81; Wed, 25 Sep 2024 16:29:00 +0000 (UTC)
+Date: Wed, 25 Sep 2024 16:29:00 +0000
+From: Suleiman Souhlal <ssouhlal@freebsd.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Suleiman Souhlal <suleiman@google.com>, Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, joelaf@google.com,
+	vineethrp@google.com, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Srikar Dronamraju <srikar@linux.ibm.com>,
+	Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v2] sched: Don't try to catch up excess steal time.
+Message-ID: <ZvQ6TKth0uySk3eJ@freefall.freebsd.org>
+References: <20240911111522.1110074-1-suleiman@google.com>
+ <f0535c47ea81a311efd5cade70543cdf7b25b15c.camel@infradead.org>
+ <ZvQPTYo2oCN-4YTM@freefall.freebsd.org>
+ <c393230b8c258ab182f85b74cbc9f866acc2a5a2.camel@infradead.org>
+ <ZvQo9gJgTlZ3nB03@freefall.freebsd.org>
+ <982d866bd387964b47148b0492fe9aada3b9ae32.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240925150059.3955569-30-ardb+git@google.com> <20240925150059.3955569-35-ardb+git@google.com>
-In-Reply-To: <20240925150059.3955569-35-ardb+git@google.com>
-From: Ian Rogers <irogers@google.com>
-Date: Wed, 25 Sep 2024 08:53:50 -0700
-Message-ID: <CAP-5=fXw1rcgWgMeDSVqiDYh2XYApyaJpNvukvJ7vMs7ZPMr6g@mail.gmail.com>
-Subject: Re: [RFC PATCH 05/28] x86: Define the stack protector guard symbol explicitly
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Uros Bizjak <ubizjak@gmail.com>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
-	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>, 
-	linux-doc@vger.kernel.org, linux-pm@vger.kernel.org, kvm@vger.kernel.org, 
-	xen-devel@lists.xenproject.org, linux-efi@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-sparse@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <982d866bd387964b47148b0492fe9aada3b9ae32.camel@infradead.org>
 
-On Wed, Sep 25, 2024 at 8:02=E2=80=AFAM Ard Biesheuvel <ardb+git@google.com=
-> wrote:
->
-> From: Ard Biesheuvel <ardb@kernel.org>
->
-> Specify the guard symbol for the stack cookie explicitly, rather than
-> positioning it exactly 40 bytes into the per-CPU area. Doing so removes
-> the need for the per-CPU region to be absolute rather than relative to
-> the placement of the per-CPU template region in the kernel image, and
-> this allows the special handling for absolute per-CPU symbols to be
-> removed entirely.
->
-> This is a worthwhile cleanup in itself, but it is also a prerequisite
-> for PIE codegen and PIE linking, which can replace our bespoke and
-> rather clunky runtime relocation handling.
->
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  arch/x86/Makefile                     |  4 ++++
->  arch/x86/include/asm/init.h           |  2 +-
->  arch/x86/include/asm/processor.h      | 11 +++--------
->  arch/x86/include/asm/stackprotector.h |  4 ----
->  tools/perf/util/annotate.c            |  4 ++--
->  5 files changed, 10 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-> index 6b3fe6e2aadd..b78b7623a4a9 100644
-> --- a/arch/x86/Makefile
-> +++ b/arch/x86/Makefile
-> @@ -193,6 +193,10 @@ else
->          KBUILD_RUSTFLAGS +=3D -Cno-redzone=3Dy
->          KBUILD_RUSTFLAGS +=3D -Ccode-model=3Dkernel
->
-> +        ifeq ($(CONFIG_STACKPROTECTOR),y)
-> +                KBUILD_CFLAGS +=3D -mstack-protector-guard-symbol=3Dfixe=
-d_percpu_data
-> +        endif
-> +
->          # Don't emit relaxable GOTPCREL relocations
->          KBUILD_AFLAGS_KERNEL +=3D -Wa,-mrelax-relocations=3Dno
->          KBUILD_CFLAGS_KERNEL +=3D -Wa,-mrelax-relocations=3Dno
-> diff --git a/arch/x86/include/asm/init.h b/arch/x86/include/asm/init.h
-> index 14d72727d7ee..3ed0e8ec973f 100644
-> --- a/arch/x86/include/asm/init.h
-> +++ b/arch/x86/include/asm/init.h
-> @@ -2,7 +2,7 @@
->  #ifndef _ASM_X86_INIT_H
->  #define _ASM_X86_INIT_H
->
-> -#define __head __section(".head.text")
-> +#define __head __section(".head.text") __no_stack_protector
->
->  struct x86_mapping_info {
->         void *(*alloc_pgt_page)(void *); /* allocate buf for page table *=
-/
-> diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/proc=
-essor.h
-> index 4a686f0e5dbf..56bc36116814 100644
-> --- a/arch/x86/include/asm/processor.h
-> +++ b/arch/x86/include/asm/processor.h
-> @@ -402,14 +402,9 @@ struct irq_stack {
->  #ifdef CONFIG_X86_64
->  struct fixed_percpu_data {
->         /*
-> -        * GCC hardcodes the stack canary as %gs:40.  Since the
-> -        * irq_stack is the object at %gs:0, we reserve the bottom
-> -        * 48 bytes of the irq stack for the canary.
-> -        *
-> -        * Once we are willing to require -mstack-protector-guard-symbol=
-=3D
-> -        * support for x86_64 stackprotector, we can get rid of this.
-> +        * Since the irq_stack is the object at %gs:0, the bottom 8 bytes=
- of
-> +        * the irq stack are reserved for the canary.
->          */
-> -       char            gs_base[40];
->         unsigned long   stack_canary;
->  };
->
-> @@ -418,7 +413,7 @@ DECLARE_INIT_PER_CPU(fixed_percpu_data);
->
->  static inline unsigned long cpu_kernelmode_gs_base(int cpu)
->  {
-> -       return (unsigned long)per_cpu(fixed_percpu_data.gs_base, cpu);
-> +       return (unsigned long)&per_cpu(fixed_percpu_data, cpu);
->  }
->
->  extern asmlinkage void entry_SYSCALL32_ignore(void);
-> diff --git a/arch/x86/include/asm/stackprotector.h b/arch/x86/include/asm=
-/stackprotector.h
-> index 00473a650f51..d1dcd22a0a4c 100644
-> --- a/arch/x86/include/asm/stackprotector.h
-> +++ b/arch/x86/include/asm/stackprotector.h
-> @@ -51,10 +51,6 @@ static __always_inline void boot_init_stack_canary(voi=
-d)
->  {
->         unsigned long canary =3D get_random_canary();
->
-> -#ifdef CONFIG_X86_64
-> -       BUILD_BUG_ON(offsetof(struct fixed_percpu_data, stack_canary) !=
-=3D 40);
-> -#endif
-> -
->         current->stack_canary =3D canary;
->  #ifdef CONFIG_X86_64
->         this_cpu_write(fixed_percpu_data.stack_canary, canary);
-> diff --git a/tools/perf/util/annotate.c b/tools/perf/util/annotate.c
-> index 37ce43c4eb8f..7ecfedf5edb9 100644
-> --- a/tools/perf/util/annotate.c
-> +++ b/tools/perf/util/annotate.c
-> @@ -2485,10 +2485,10 @@ static bool is_stack_operation(struct arch *arch,=
- struct disasm_line *dl)
->
->  static bool is_stack_canary(struct arch *arch, struct annotated_op_loc *=
-loc)
->  {
-> -       /* On x86_64, %gs:40 is used for stack canary */
-> +       /* On x86_64, %gs:0 is used for stack canary */
->         if (arch__is(arch, "x86")) {
->                 if (loc->segment =3D=3D INSN_SEG_X86_GS && loc->imm &&
-> -                   loc->offset =3D=3D 40)
-> +                   loc->offset =3D=3D 0)
+On Wed, Sep 25, 2024 at 04:34:57PM +0100, David Woodhouse wrote:
+> On Wed, 2024-09-25 at 15:15 +0000, Suleiman Souhlal wrote:
+> > Yes, that's a good way to put it: The excess steal time isn't actually
+> > being stolen from anyone.
+> > And since it's not being stolen from anyone, isn't the right thing to do
+> > to drop it?
+> 
+> It's being stolen from the system, isn't it? Just not any specific
+> userspace process?
 
-As a new perf tool  can run on old kernels we may need to have this be
-something like:
-(loc->offset =3D=3D 40 /* pre v6.xx kernels */ || loc->offset =3D=3D 0 /*
-v6.xx and later */ )
+I guess it depends what you mean by "stolen". I would argue that it's not
+stolen from anyone since the time isn't actually counted anywhere.
 
-We could make this dependent on the kernel by processing the os_release str=
-ing:
-https://git.kernel.org/pub/scm/linux/kernel/git/perf/perf-tools-next.git/tr=
-ee/tools/perf/util/env.h#n55
-but that could well be more trouble than it is worth.
+> 
+> If we have separate "end of outgoing task" and "start of incoming task"
+> timestamps, surely the time between those two must be accounted
+> *somewhere*?
 
-Thanks,
-Ian
+Not exactly. clock_task is essentially frozen until the next
+update_rq_clock(), at which point we'll look at how much sched_clock_cpu
+advanced and subtract how much steal time advanced. The two things
+are done in separate spots (update_rq_clock() and update_rq_clock_task()),
+indepedently (which is where the race is happening).
+As far as I can tell, the time between the two isn't really accounted
+anywhere.
 
->                         return true;
->         }
+The "end of outgoing task" and "start of incoming task" timestamps should
+end up being the same.
 
->
-> --
-> 2.46.0.792.g87dc391469-goog
->
+> 
+> > There might still be extra steal time that doesn't exceed the current
+> > 'delta' from the race between reading the two values, that would still
+> > be erroneously accounted to the outgoing task, which this patch doesn't
+> > address, but we know that any steal > delta is from this race and should
+> > be dropped.
+> 
+> Well that's what we want the atomic paired read for :)
+
+Right, but I don't think it's that simple. We aren't only reading memory
+but also a clock.
+It might be possible to address this with a mechanism like rseq, but that
+would be a much bigger patch set than the current one (and I don't think
+anyone has ever attempted to do rseq for VMs yet).
+
+(There is also another potential issue I spotted with steal time, that
+has to do with reading another VCPU's steal time while it's not running,
+but I'll start a separate discussion about that with a different patch set.)
+
+Thanks for the discussion.
+-- Suleiman
 
