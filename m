@@ -1,176 +1,241 @@
-Return-Path: <kvm+bounces-27421-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27422-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF00986083
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 16:25:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8104E9860C9
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 16:33:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 075B91F25208
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 14:25:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07A9F1F26FC6
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 14:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5358C1A76A0;
-	Wed, 25 Sep 2024 13:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD501B14F1;
+	Wed, 25 Sep 2024 13:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=freebsd.org header.i=@freebsd.org header.b="mQ5QGde8"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mx2.freebsd.org (mx2.freebsd.org [96.47.72.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0841A704B;
-	Wed, 25 Sep 2024 13:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727269528; cv=none; b=tr4k8oF5wHa5KT7ufIjckftXaGFrDmHAvKJe4fBB4zMyeXwwlLotPuR49Lsp93a1QDvfl1C2+oOBqaSs1H7OrfRCKAJej5Cp3yRHoIFjPwrnJUqAgaYy6HusnWZY1J4hUk1bjT7ij1XyyfraNwmBIYw8FzQrncqwabN7oLF0A1M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727269528; c=relaxed/simple;
-	bh=Z8A+F6g+ckcqDRO/xPuowSQmdScdm2BzOdA9oeqi8hI=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W5zPbAfZP5AOd1A12r7TsUit1+GOqejWWY7S1rJcWgxlXTvmLT3zZxMdZJ3/uQ/adxF/yNLldB5dw6C32T3yOwqub6/7ZKS7DUR2eK1CY57SoRA8Kfk606qffTC1wNEiA+5KA12nQ9KpwgZl/DIYZpmMjelnTlSa2wCnbOlT51g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XDH0862gfz6K9B2;
-	Wed, 25 Sep 2024 21:00:40 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id D06A9140F63;
-	Wed, 25 Sep 2024 21:05:17 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 25 Sep
- 2024 15:05:16 +0200
-Date: Wed, 25 Sep 2024 14:05:15 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Zhi Wang <zhiw@nvidia.com>
-CC: "Tian, Kevin" <kevin.tian@intel.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-cxl@vger.kernel.org"
-	<linux-cxl@vger.kernel.org>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, "Schofield,
- Alison" <alison.schofield@intel.com>, "Williams, Dan J"
-	<dan.j.williams@intel.com>, "Jiang, Dave" <dave.jiang@intel.com>,
-	"dave@stgolabs.net" <dave@stgolabs.net>, "Weiny, Ira" <ira.weiny@intel.com>,
-	"Verma, Vishal L" <vishal.l.verma@intel.com>, "alucerop@amd.com"
-	<alucerop@amd.com>, Andy Currid <ACurrid@nvidia.com>, Neo Jia
-	<cjia@nvidia.com>, Surath Mitra <smitra@nvidia.com>, "Ankit Agrawal"
-	<ankita@nvidia.com>, Aniket Agashe <aniketa@nvidia.com>, "Kirti Wankhede"
-	<kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	"zhiwang@kernel.org" <zhiwang@kernel.org>
-Subject: Re: [RFC 00/13] vfio: introduce vfio-cxl to support CXL type-2
- accelerator passthrough
-Message-ID: <20240925140515.000077f5@Huawei.com>
-In-Reply-To: <75c0c6f1-07e4-43c1-819c-2182bdd0b47c@nvidia.com>
-References: <20240920223446.1908673-1-zhiw@nvidia.com>
-	<BN9PR11MB5276B821A9732BF0A9EC67988C6F2@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<75c0c6f1-07e4-43c1-819c-2182bdd0b47c@nvidia.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F7B1B0126;
+	Wed, 25 Sep 2024 13:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=96.47.72.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727270737; cv=pass; b=ivm5RmsW7V1rKOAAymhsIxsFoai4w8V9y+DCuMBNie7Y02uuEx/V7EHEd7amjv8At/PzYZsM4y1Z3KQnHu4yeVtPNuUjkh8Qiz/zAkC1m3+oSRVYzwJUJA64DX45IKTUACkHwyC6QzCR5O2A930/xRBOioegfMQ/0KQHEdfM9bk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727270737; c=relaxed/simple;
+	bh=Fe7FCm7RW03CVhyxUi/vygxJhyLwUh1g5pqIE6udzS0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kkFgVHjSsPs2GkmRZjSbBP7kBVtAmizWT1/VxOE6ad5J9hylOxM1b783kZFr5WKIgj8jK4bRQZzC6lkQxZQ+O8JwCSQDWF7MiUlgfe4H8puFSkT24EpbVz13Cgcu1d8GUI64PH0cVHJUHFJK+vgColZIgstzfy8nMHIPlvADGuE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=freebsd.org; spf=pass smtp.mailfrom=freebsd.org; dkim=pass (2048-bit key) header.d=freebsd.org header.i=@freebsd.org header.b=mQ5QGde8; arc=pass smtp.client-ip=96.47.72.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=freebsd.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freebsd.org
+Received: from mx1.freebsd.org (mx1.freebsd.org [96.47.72.80])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits)
+	 client-signature RSA-PSS (4096 bits))
+	(Client CN "mx1.freebsd.org", Issuer "R10" (verified OK))
+	by mx2.freebsd.org (Postfix) with ESMTPS id 4XDHXs2xvHz3m0j;
+	Wed, 25 Sep 2024 13:25:33 +0000 (UTC)
+	(envelope-from ssouhlal@freebsd.org)
+Received: from freefall.freebsd.org (freefall.freebsd.org [IPv6:2610:1c1:1:6074::16:84])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "freefall.freebsd.org", Issuer "R11" (verified OK))
+	by mx1.freebsd.org (Postfix) with ESMTPS id 4XDHXs26R4z42qN;
+	Wed, 25 Sep 2024 13:25:33 +0000 (UTC)
+	(envelope-from ssouhlal@freebsd.org)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=freebsd.org; s=dkim;
+	t=1727270733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZhUKa5mLtSQgeXQTIq8+FnMk1elUt4b5ryl5TJg4/Rc=;
+	b=mQ5QGde8iA51w95D7ZqDFKGFXVJ97Zz7ovWyb+XGOzzGFjFOIMN+2fi+OWq8t4jIaGt+mL
+	3lL67Vx4c8afcaIqYh5ejhBfNADtx3btYGQhh5yyC3bVz+tnZua4pB/Sm8krFrejsAas6D
+	1H4MkCoxjWbnL5MuC4EvV0sbGGe4mcKz+LvcEUa0aRMY/ib6b15wda4NVYBnPvFrzURXfO
+	SvdwRmsnYh3SS0/TOKOc+62Q/VTcRCA/+SYVw39ALcdf69OO9cx1zmFYIL1jkK13qBh8+2
+	7DrkVJXi3AssEJi6wD9AsKn/JV3oX3PygGopPxVciWa5XNdBARz7YZB95keFQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=freebsd.org;
+	s=dkim; t=1727270733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZhUKa5mLtSQgeXQTIq8+FnMk1elUt4b5ryl5TJg4/Rc=;
+	b=gpJRwOfPvRDG3vPXaLiLzc60JUfckld/jZFAiC6AB1nJbjwOW9L5k3dgvR/Tp0u8/Ynn/y
+	HiBz7jG9xZdhkaYSpaGgzsFe9uat2F5U5BScy7j4PaU1M/QBEC8ENZy3wzQzio4oe/e9bS
+	6iTBS6fSAna0Phv/vGNf/nDg/llc3RnVR4R50HR+vkZTENxdeBDX3YQ9ARxmj0wjIPLva2
+	QOvn+Njn+1hf8wmGu0ueZw2MWxdjFZOKI7hvZsJmG5lmoCZVLWgA1rv6Q8UTyxp3PpSb0Q
+	vD2sVp5IzHrs+BExHtIyJT5XkJRUb4A0mNROcNbA+dN4Tur1x7kmZA7xD6MAhg==
+ARC-Authentication-Results: i=1;
+	mx1.freebsd.org;
+	none
+ARC-Seal: i=1; s=dkim; d=freebsd.org; t=1727270733; a=rsa-sha256; cv=none;
+	b=QDhDT0gZtiVagrzhbQMyPpvyRQdhYvQaF9JIcvH0sUPb7fUMxhLF3GgXJmMl9sXa3JjcBC
+	P65F1RhVqaYOFVNP/GrdREfJS+DOxFkqoPeUBjPlvNTeO6XHiBWfZo9984fkvpSmTUOWuF
+	hKwPcLnuySk7/q9dt4WxlXjcvjxaZM+AniOfrypNmUBkfsZWwLsDJUN8B/YgFhNG/7Hzez
+	pgwLFgZbPFH04G2bv6Jytf7QBIEBgRLMuUjR5IlyzqcRyzv1IlFgD/jH+hggqDEA/xAmPc
+	pRfqpNmHDnkxvrI5bthrOmfbylGIVACO3XRSoNUG50cw/qOkp1OziK+nks3aHQ==
+Received: by freefall.freebsd.org (Postfix, from userid 1026)
+	id 40EB0E158; Wed, 25 Sep 2024 13:25:33 +0000 (UTC)
+Date: Wed, 25 Sep 2024 13:25:33 +0000
+From: Suleiman Souhlal <ssouhlal@freebsd.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Suleiman Souhlal <suleiman@google.com>, Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, joelaf@google.com,
+	vineethrp@google.com, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Srikar Dronamraju <srikar@linux.ibm.com>,
+	Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v2] sched: Don't try to catch up excess steal time.
+Message-ID: <ZvQPTYo2oCN-4YTM@freefall.freebsd.org>
+References: <20240911111522.1110074-1-suleiman@google.com>
+ <f0535c47ea81a311efd5cade70543cdf7b25b15c.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f0535c47ea81a311efd5cade70543cdf7b25b15c.camel@infradead.org>
 
-On Tue, 24 Sep 2024 08:30:17 +0000
-Zhi Wang <zhiw@nvidia.com> wrote:
-
-> On 23/09/2024 11.00, Tian, Kevin wrote:
-> > External email: Use caution opening links or attachments
+On Wed, Sep 25, 2024 at 12:45:55PM +0100, David Woodhouse wrote:
+> On Wed, 2024-09-11 at 20:15 +0900, Suleiman Souhlal wrote:
+> > When steal time exceeds the measured delta when updating clock_task,
+> > we
+> > currently try to catch up the excess in future updates.
+> > However, this results in inaccurate run times for the future things
+> > using
+> > clock_task, as they end up getting additional steal time that did not
+> > actually happen.
 > > 
-> >   
-> >> From: Zhi Wang <zhiw@nvidia.com>
-> >> Sent: Saturday, September 21, 2024 6:35 AM
-> >>  
-> > [...]  
-> >> - Create a CXL region and map it to the VM. A mapping between HPA and DPA
-> >> (Device PA) needs to be created to access the device memory directly. HDM
-> >> decoders in the CXL topology need to be configured level by level to
-> >> manage the mapping. After the region is created, it needs to be mapped to
-> >> GPA in the virtual HDM decoders configured by the VM.  
+> > For example, suppose a task in a VM runs for 10ms and had 15ms of
+> > steal
+> > time reported while it ran. clock_task rightly doesn't advance. Then,
+> > a
+> > different taks runs on the same rq for 10ms without any time stolen
+> > in
+> > the host.
+> > Because of the current catch up mechanism, clock_sched inaccurately
+> > ends
+> > up advancing by only 5ms instead of 10ms even though there wasn't any
+> > actual time stolen. The second task is getting charged for less time
+> > than it ran, even though it didn't deserve it.
+> > This can result in tasks getting more run time than they should
+> > actually
+> > get.
 > > 
-> > Any time when a new address space is introduced it's worthy of more
-> > context to help people who have no CXL background better understand
-> > the mechanism and think any potential hole.
+> > So, we instead don't make future updates pay back past excess stolen
+> > time.
 > > 
-> > At a glance looks we are talking about a mapping tier:
+> > Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+> > ---
+> > v2:
+> > - Slightly changed to simply moving one line up instead of adding
+> >   new variable.
 > > 
-> >    GPA->HPA->DPA
+> > v1:
+> > https://lore.kernel.org/lkml/20240806111157.1336532-1-suleiman@google.com
+> > ---
+> >  kernel/sched/core.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > > 
-> > The location/size of HPA/DPA for a cxl region are decided and mapped
-> > at @open_device and the HPA range is mapped to GPA at @mmap.
-> > 
-> > In addition the guest also manages a virtual HDM decoder:
-> > 
-> >    GPA->vDPA
-> > 
-> > Ideally the vDPA range selected by guest is a subset of the physical
-> > cxl region so based on offset and vHDM the VMM may figure out
-> > which offset in the cxl region to be mmaped for the corresponding
-> > GPA (which in the end maps to the desired DPA).
-> > 
-> > Is this understanding correct?
-> >   
+> > diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+> > index f3951e4a55e5..6c34de8b3fbb 100644
+> > --- a/kernel/sched/core.c
+> > +++ b/kernel/sched/core.c
+> > @@ -730,11 +730,11 @@ static void update_rq_clock_task(struct rq *rq,
+> > s64 delta)
+> >         if (static_key_false((&paravirt_steal_rq_enabled))) {
+> >                 steal = paravirt_steal_clock(cpu_of(rq));
+> >                 steal -= rq->prev_steal_time_rq;
+> > +               rq->prev_steal_time_rq += steal;
 > 
-> Yes. Many thanks to summarize this. It is a design decision from a 
-> discussion in the CXL discord channel.
+> The above two lines are essentially:
 > 
-> > btw is one cxl device only allowed to create one region? If multiple
-> > regions are possible how will they be exposed to the guest?
-> >  
+> 	steal -= prev;
+> 	prev += steal;
 > 
-> It is not an (shouldn't be) enforced requirement from the VFIO cxl core. 
-> It is really requirement-driven. I am expecting what kind of use cases 
-> in reality that needs multiple CXL regions in the host and then passing 
-> multiple regions to the guest.
+> It's like one of those clever ways of exchanging two variables with
+> three XOR operations. I don't like it :)
+> 
+> Ultimately, you're just setting rq->prev_steal_time_rq to the latest
+> value that you just read from paravirt_steal_clock(). And then setting
+> 'steal' to the delta between the new reading and the previous one.
+> 
+> The code above is *far* from obvious. At the very least it wants a
+> comment, but I'd rather see it refactored so that it doesn't need one. 
+> 
+>     u64 abs_steal_now = paravirt_steal_clock(cpu_of(rq));
+>     steal = abs_steal_now - rq->prev_steal_time_rq;
+>     rq->prev_steal_time_rq = abs_steal_now;
 
-Mix of back invalidate and non back invalidate supporting device memory
-maybe?  A bounce region for p2p traffic would the obvious reason to do
-this without paying the cost of large snoop filters. If anyone puts PMEM
-on the device, then maybe mix of that at volatile. In theory you might
-do separate regions for QoS reasons but seems unlikely to me...
+That is what v1 did:
+https://lore.kernel.org/lkml/20240806111157.1336532-1-suleiman@google.com/
 
-Anyhow not an immediately problem as I don't know of any
-BI capable hosts yet and doubt anyone (other than Dan) cares about PMEM :)
+It is also more obvious to me, but the feedback I received was that
+the way in the current iteration is better.
 
+I don't feel strongly about it, and I'd be ok with either version applied. 
 
 > 
-> Presumably, the host creates one large CXL region that covers the entire 
-> DPA, while QEMU can virtually partition it into different regions and 
-> map them to different virtual CXL region if QEMU presents multiple HDM 
-> decoders to the guest.
-
-I'm not sure why it would do that. Can't think why you'd break up
-a host region - maybe I'm missing something.
-
-...
-
-> >> In the L2 guest, a dummy CXL device driver is provided to attach to the
-> >> virtual pass-thru device.
-> >>
-> >> The dummy CXL type-2 device driver can successfully be loaded with the
-> >> kernel cxl core type2 support, create CXL region by requesting the CXL
-> >> core to allocate HPA and DPA and configure the HDM decoders.  
-> > 
-> > It'd be good to see a real cxl device working to add confidence on
-> > the core design.  
+> I'm still not utterly convinced this is the right thing to do, though.
+> It means you will constantly undermeasure the accounting of steal time
+> as you discard the excess each time.
 > 
-> To leverage the opportunity of F2F discussion in LPC, I proposed this 
-> patchset to start the discussion and meanwhile offered an environment 
-> for people to try and hack around. Also patches is good base for 
-> discussion. We see what we will get. :)
+> The underlying bug here is that we are sampling the steal time and the
+> time slice at *different* times. This update_rq_clock_task() function
+> could be called with a calculated 'delta' argument... and then
+> experience a large amount of steal time *before* calling
+> paravirt_steal_clock(), which is how we end up in the situation where
+> the calculated steal time exceeds the running time of the previous
+> task.
 > 
-> There are devices already there and on-going. AMD's SFC (patches are 
-> under review) and I think they are going to be the first variant driver 
-> that use the core. NVIDIA's device is also coming and NVIDIA's variant 
-> driver is going upstream for sure. Plus this emulated device, I assume 
-> we will have three in-tree variant drivers talks to the CXL core.
-Nice.
+> Which task *should* that steal time be accounted to? At the moment it
+> ends up being accounted to the next task to run — which seems to make
+> sense to me. In the situation I just described, we can consider the
+> time stolen in update_rq_clock_task() itself to have been stolen from
+> the *incoming* task, not the *outgoing* one. But that seems to be what
+> you're objecting to?
+
+This is a good description of the problem, except that the time stolen
+in update_rq_clock_task() itself is actually being stolen from the 
+outgoing task. This is because we are still trying to calculate how long
+it ran for (update_curr()), and time hasn't started ticking for the
+incoming task yet. We haven't set the incoming task's exec_start with the
+new clock_task time yet.
+
+So, in my opinion, it's wrong to give that time to the incoming task.
+
 > 
-> Thanks,
-> Zhi.
+> In
+> https://lore.kernel.org/all/20240522001817.619072-22-dwmw2@infradead.org/
+> I put a limit on the amount of steal time carried forward from one
+> timeslice to the next, as it was misbehaving when a bad hypervisor
+> reported negative steal time. But I don't think the limit should be
+> zero.
+> 
+> Of course, *ideally* we'd be able to sample the time and steal time
+> *simultaneously*, with a single sched_clock_cpu_and_steal() function so
+> that we don't have to deal with this slop between readings. Then none
+> of this would be necessary. But that seems hard.
+
+I agree that that would be ideal.
+
+Thanks,
+-- Suleiman
 
 
