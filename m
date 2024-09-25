@@ -1,158 +1,295 @@
-Return-Path: <kvm+bounces-27429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C86EC9861D1
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 17:02:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B74F986238
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 17:09:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E54D1F2C763
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 15:02:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4E431F28AEC
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 15:09:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9A617C989;
-	Wed, 25 Sep 2024 14:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B57487B0;
+	Wed, 25 Sep 2024 15:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nAHGq7eZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HBWrXLE+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0545518CBF1;
-	Wed, 25 Sep 2024 14:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E333A28B
+	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 15:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727275036; cv=none; b=DSB2EMOXMqqS4G8OS1+qu6MPyIOd00ithSsqewARnaXr/hFeZhug6gwAEEiutSS6WE5mdfqrQHTUuZJsvFthjtoXTgbjaSKuwTKwFnhNj8r8dC3XtQGB4OVL2d50Q87ivyiE7m7d89t0lYcPwUXg4RuOV+21pf79SqGqQVibbZE=
+	t=1727276513; cv=none; b=LOP3COz2LTgrDTdJDPeJI7umDAhp7z0MumPmtRdKeFvMUsyEVHFXaOcM4DV8mnSWSC3ZwnRNy+bzlke1qEOcmr6Rr9f3l1NwursknjF64gnjI+kBPAjmK7jrHCefFEaSdJw34qbH9VhJVZf3B23zeRKISX/qYkpmeEj6xBgK01s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727275036; c=relaxed/simple;
-	bh=33LMCYs4ZAMWUAeDvSpTN6EjILkxtvhX9lBP6A7goaE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mCrEISckdb3uL8ITOz/ykBHYbqQWvOyBeOsforqTdT6T30d1SDBK4IjWBCt/LJsvkbnzWzghUQ2ulxX2dHnE0JeZdyDKU+gCayFYrDL5R1Nw9PgwrXTyKrQCDbbP0e4EZszTF0wiu1tm0i+4UUhySybkpzZZtRK1eg51NDAAeqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nAHGq7eZ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48P1X8BE005761;
-	Wed, 25 Sep 2024 14:37:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	b1uqCTj7RZo8GESVV5hiVMQ9MJSDCuFgBtvmHa3hTX0=; b=nAHGq7eZFjA6y0y0
-	87wdzmZGA91T7HhktPHqyo29xzu49o4C1qf30g7ciIyVIbXMc4FYERsW86pfODQ1
-	SUt2w6lcsYZoVAMaSFQ7au0LPeVXYbWo1Q1A5dvdXOEM16qw0vK4IDp6NgCeFfrs
-	sfngaKyNILCTvslZUUN7ZJCbqWb9FsZlQlrPGPHRTulJEzkd3IXZO2m/+VX3mb3A
-	0hI7LHl5JJcsJGCvYstm+Q9pZ7k3ejLRhiBV09tfV4oX7jQ15tm+SBdriKECk+xk
-	dFSGlyvToG5FGVFGs20TEuMpWWEVEEcucLVFieUy6dP6Hz+JW6SgNZDN8bONj8HD
-	rtfl0A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snnagrwj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Sep 2024 14:37:12 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48PEXx4H018588;
-	Wed, 25 Sep 2024 14:37:12 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snnagrwg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Sep 2024 14:37:12 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48PBx6tB001138;
-	Wed, 25 Sep 2024 14:37:11 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41t8futa5q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Sep 2024 14:37:11 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48PEb7Bu47645160
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Sep 2024 14:37:07 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7414720043;
-	Wed, 25 Sep 2024 14:37:07 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 40E6220040;
-	Wed, 25 Sep 2024 14:37:07 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 25 Sep 2024 14:37:07 +0000 (GMT)
-Date: Wed, 25 Sep 2024 16:37:05 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Nico Boehr <nrb@linux.ibm.com>
-Cc: frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: edat: move LC_SIZE to
- arch_def.h
-Message-ID: <20240925163705.0f8235ce@p-imbrenda.boeblingen.de.ibm.com>
-In-Reply-To: <20240923062820.319308-3-nrb@linux.ibm.com>
-References: <20240923062820.319308-1-nrb@linux.ibm.com>
-	<20240923062820.319308-3-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1727276513; c=relaxed/simple;
+	bh=GyK5LYy4hT2Mza2Xl9rezrZ2kXob9EVtau0/Aicjkyk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eXZtcrZHMQKKJ9CPZ5+CzI5DScUZ1R1q7G6QwrKeoG85AkjSdYpz+7rQlTmriIU/HnPuFSTciSA7OJIA0IMgXJayHetUps5pS7OtHW13uLGVjoWkxvlpWbUQ7kwsMv67DIEzqZSJljS0wLykO8yXQjiDqF2yO6fkUoGdfO63r90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HBWrXLE+; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e03b3f48c65so9627502276.0
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 08:01:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727276509; x=1727881309; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6z7k17OsGZKMVFB80yPIaoy18RpZ7zGlccSFIk096uA=;
+        b=HBWrXLE+RxrFNPpG2yxPXm0QKtrpPQwtZYwyUTWmsAgybBjgE+ZkiheCe+wEK2qhIC
+         d/OwUrHaR7BnsDQ13NmYMQ/T/Wxi2ngNY5h8VPXXWaJHhYbetQqkeu8aq1hjPTj5c9PW
+         F12qtXfhVCgQvbKpGGLwXP3lVR+FS4RxBTRCl4juHGkPeUJSzdGXWNveVg8EvVuJ4N0b
+         n4j2jj9BHczdrpbNCNb7o8/n3xibw3CH9qigfds7ZpiBeSfkGorPGe2XFwqB9V8/L7xS
+         WpgVQZn1xoY3UU0VM6Rs1+gNKrmFDLnP0OE/Gjp0Wlkz6a4YqIRuRZD34s3EH2vnC4ok
+         KCnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727276509; x=1727881309;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6z7k17OsGZKMVFB80yPIaoy18RpZ7zGlccSFIk096uA=;
+        b=oreZW6xhBGUMAZo4ew7QLsKLUiy6RrDNuKHLlH6ZDx5gW2ZUYOvDQunAD70YszQkc9
+         eQO2Zk//PLvd1X0xRltuWml5y4DbzlGCHAhJ/kA4kI8gwO21TEj4JNz6lSrgRFKXrebS
+         3tvDo02ga5EdyHFNqxA7M0Kxbttfvm4Qrs0p++h1Eo8TMTdI4f+OHUNKzG/5g3rZKESx
+         lcDI6TmoStJEpL7UaAE1m9llCnbb5Y3y08w/bLVt2EdlxYyzIrMVdDtgpGwsannhRIh0
+         q4jG1TjVgywa7u5iCjwIBgyiEcgVfsPWFHrCQJ7FyB4f0772AlMnIJrZ4b+QhrPlYdYu
+         wF5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU7gi2mX08c+CeXarsU59TFrr5V/PjRPVEk9COlOKuw5MV5tl2mmeoAfXDv/v7FFc+JUyo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywmv13mU+kq4DiotL+1DjlO1EIC94cLg4Ei/YDqIMrOzeZ1gl6p
+	ZixwZZZnhtsImguIjv1CLsabsHFZaC5pEyZohTqicbM9Ghh3IRi9Uo6oEQvEv7sWIV8B7A==
+X-Google-Smtp-Source: AGHT+IGRJUFrs1DoPRrR5c+MJEZ6tG0DheITTu8FPFLiXZOk+NGplm3eXqMcHGaqBYVKwyJOtED+Rs3U
+X-Received: from palermo.c.googlers.com ([fda3:e722:ac3:cc00:7b:198d:ac11:8138])
+ (user=ardb job=sendgmr) by 2002:a25:d695:0:b0:e24:9ec4:7297 with SMTP id
+ 3f1490d57ef6-e24da58666emr14424276.11.1727276509248; Wed, 25 Sep 2024
+ 08:01:49 -0700 (PDT)
+Date: Wed, 25 Sep 2024 17:01:00 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: PeIcZLOMMc3C1Cy4krRnpFAHtaLTRG-E
-X-Proofpoint-ORIG-GUID: dS9vUiRfknAdxqYmbvQwtYg3Mtntz0pY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-25_04,2024-09-25_02,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- mlxscore=0 mlxlogscore=999 spamscore=0 impostorscore=0 priorityscore=1501
- phishscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2409250103
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9188; i=ardb@kernel.org;
+ h=from:subject; bh=vMX7ogGZLEc8VPljv97RuDVJFn/JAzUBXeH6mBcebRA=;
+ b=owGbwMvMwCFmkMcZplerG8N4Wi2JIe2L6pr9k37ZPn8uK8IvcW92T9PETT9Xrz4h19DckCOrf
+ uS7om11RykLgxgHg6yYIovA7L/vdp6eKFXrPEsWZg4rE8gQBi5OAZiIeBIjQ8cjt/vNFnlpcQoK
+ wSbqqaeUo8XjLsnZ2/zNu6XorPO9luG/9+LkrdV5d/tnvdg2VzHvwaxNexRvHney2v1TP02udn4 IIwA=
+X-Mailer: git-send-email 2.46.0.792.g87dc391469-goog
+Message-ID: <20240925150059.3955569-30-ardb+git@google.com>
+Subject: [RFC PATCH 00/28] x86: Rely on toolchain for relocatable code
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-kernel@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Uros Bizjak <ubizjak@gmail.com>, 
+	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Juergen Gross <jgross@suse.com>, 
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
+	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
+	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 23 Sep 2024 08:26:04 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+From: Ard Biesheuvel <ardb@kernel.org>
 
-> struct lowcore is defined in arch_def.h and LC_SIZE is useful to other
-> tests as well, therefore move it to arch_def.h.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+The x86_64 port has a number of historical quirks that result in a
+reliance on toolchain features that are either poorly specified or
+basically implementation details of the toolchain:
 
-I find this patch a little weird here, since it's not used for the
-previous patch, and doesn't seem to have anything to do with it either.
+- the 'kernel' C model implemented by the compiler is intended for
+  position dependent code residing in the 'negative' 2 GiB of the
+  virtual address space, but is used to create a position independent
+  executable (for virtual KASLR);
 
-the patch itself is otherwise good, I'm just a little puzzled.
+- the 'kernel' C model has other properties that are not written down
+  anywhere, and may therefore deviate between compilers and versions,
+  which now includes the Rust compilers too (e.g., use %gs not %fs for
+  per-CPU references); 
 
-nonetheless:
+- the relocation format used to perform the PIE relocation at boot is
+  complicated and non-standard, as it deals with 3 types of
+  displacements, including 32-bit negative displacements for
+  RIP-relative per-CPU references that are not subject to relocation
+  fixups (as they are places in a separate, disjoint address space);
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+- the relocation table is generated from static relocation metadata
+  taken from the ELF input objects into the linker, and these describe
+  the input not the output - relaxations or other linker tweaks may
+  result in a mismatch between the two, and GNU ld and LLD display
+  different behavior here;
 
-> ---
->  lib/s390x/asm/arch_def.h | 1 +
->  s390x/edat.c             | 1 -
->  2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 745a33878de5..5574a45156a9 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -119,6 +119,7 @@ enum address_space {
->  
->  #define CTL2_GUARDED_STORAGE		(63 - 59)
->  
-> +#define LC_SIZE	(2 * PAGE_SIZE)
->  struct lowcore {
->  	uint8_t		pad_0x0000[0x0080 - 0x0000];	/* 0x0000 */
->  	uint32_t	ext_int_param;			/* 0x0080 */
-> diff --git a/s390x/edat.c b/s390x/edat.c
-> index 16138397017c..e664b09d9633 100644
-> --- a/s390x/edat.c
-> +++ b/s390x/edat.c
-> @@ -17,7 +17,6 @@
->  
->  #define PGD_PAGE_SHIFT (REGION1_SHIFT - PAGE_SHIFT)
->  
-> -#define LC_SIZE	(2 * PAGE_SIZE)
->  #define VIRT(x)	((void *)((unsigned long)(x) + (unsigned long)mem))
->  
->  static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
+- this disjoint per-CPU address space requires elaborate hacks in the
+  linker script and the startup code;
+
+- some of the startup code executes from a 1:1 mapping of memory, where
+  RIP-relative references are mandatory, whereas RIP-relative per-CPU
+  variable references can only work correctly from the kernel virtual
+  mapping (as they need to wrap around from the negative 2 GiB space
+  into the 0x0 based per-CPU region);
+
+The reason for this odd situation wrt per-CPU variable addressing is the
+fact that we rely on the user-space TLS arrangement for per-task stack
+cookies, and this was implemented using a fixed offset of 40 bytes from
+%GS. If we bump the minimum GCC version to 8.1, we can switch to symbol
+based stack cookie references, allowing the same arrangement to be
+adopted as on other architectures, i.e., where the CPU register carries
+the per-CPU offset, and UP or boot-time per-CPU references point into
+the per-CPU load area directly (using an offset of 0x0).
+
+With that out of the way, we can untangle this whole thing, and replace
+the bespoke tooling and relocation formats with ordinary, linker
+generated relocation tables, using the RELR format that reduces the
+memory footprint of the relocation table by 20x. The compilers can
+efficiently generate position independent code these days, without
+unnecessary indirections via the Global Object Table (GOT) except for a
+handful of special cases (see the KVM patch for an example where a
+GOT-based indirection is the best choice for pushing the absolute
+address of a symbol onto the stack in a position independent manner when
+there are no free GPRs)
+
+It also brings us much closer to the ordinary PIE relocation model used
+for most of user space, which is therefore much better supported and
+less likely to create problems as we increase the range of compilers and
+linkers that need to be supported.
+
+Tested on GCC 8 - 14 and Clang 15 - 17, using EFI and bare metal boot
+using a variety of entry points (decompressor, EFI stub, XenPV, PVH)
+ 
+Cc: x86@kernel.org
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Uros Bizjak <ubizjak@gmail.com>
+Cc: Dennis Zhou <dennis@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Lameter <cl@linux.com>
+Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Juergen Gross <jgross@suse.com>
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Kees Cook <kees@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Keith Packard <keithp@keithp.com>
+Cc: Justin Stitt <justinstitt@google.com>
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc: Namhyung Kim <namhyung@kernel.org>
+Cc: Jiri Olsa <jolsa@kernel.org>
+Cc: Ian Rogers <irogers@google.com>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Kan Liang  <kan.liang@linux.intel.com>
+Cc: linux-doc@vger.kernel.org
+Cc: linux-pm@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: xen-devel@lists.xenproject.org
+Cc: linux-efi@vger.kernel.org
+Cc: linux-arch@vger.kernel.org
+Cc: linux-sparse@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-perf-users@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org
+Cc: llvm@lists.linux.dev
+
+Ard Biesheuvel (28):
+  x86/pvh: Call C code via the kernel virtual mapping
+  Documentation: Bump minimum GCC version to 8.1
+  x86/tools: Use mmap() to simplify relocs host tool
+  x86/boot: Permit GOTPCREL relocations for x86_64 builds
+  x86: Define the stack protector guard symbol explicitly
+  x86/percpu: Get rid of absolute per-CPU variable placement
+  scripts/kallsyms: Avoid 0x0 as the relative base
+  scripts/kallsyms: Remove support for absolute per-CPU variables
+  x86/tools: Remove special relocation handling for per-CPU variables
+  x86/xen: Avoid relocatable quantities in Xen ELF notes
+  x86/pvh: Avoid absolute symbol references in .head.text
+  x86/pm-trace: Use RIP-relative accesses for .tracedata
+  x86/kvm: Use RIP-relative addressing
+  x86/rethook: Use RIP-relative reference for return address
+  x86/sync_core: Use RIP-relative addressing
+  x86/entry_64: Use RIP-relative addressing
+  x86/hibernate: Prefer RIP-relative accesses
+  x86/boot/64: Determine VA/PA offset before entering C code
+  x86/boot/64: Avoid intentional absolute symbol references in
+    .head.text
+  x64/acpi: Use PIC-compatible references in wakeup_64.S
+  x86/head: Use PIC-compatible symbol references in startup code
+  asm-generic: Treat PIC .data.rel.ro sections as .rodata
+  tools/objtool: Mark generated sections as writable
+  tools/objtool: Treat indirect ftrace calls as direct calls
+  x86: Use PIE codegen for the core kernel
+  x86/boot: Implement support for ELF RELA/RELR relocations
+  x86/kernel: Switch to PIE linking for the core kernel
+  x86/tools: Drop x86_64 support from 'relocs' tool
+
+ Documentation/admin-guide/README.rst    |   2 +-
+ Documentation/arch/x86/zero-page.rst    |   3 +-
+ Documentation/process/changes.rst       |   2 +-
+ arch/x86/Kconfig                        |   3 +-
+ arch/x86/Makefile                       |  22 +-
+ arch/x86/boot/Makefile                  |   1 +
+ arch/x86/boot/compressed/Makefile       |   2 +-
+ arch/x86/boot/compressed/misc.c         |  16 +-
+ arch/x86/entry/calling.h                |   9 +-
+ arch/x86/entry/entry_64.S               |  12 +-
+ arch/x86/entry/vdso/Makefile            |   1 +
+ arch/x86/include/asm/desc.h             |   1 -
+ arch/x86/include/asm/init.h             |   2 +-
+ arch/x86/include/asm/percpu.h           |  22 -
+ arch/x86/include/asm/pm-trace.h         |   4 +-
+ arch/x86/include/asm/processor.h        |  14 +-
+ arch/x86/include/asm/setup.h            |   3 +-
+ arch/x86/include/asm/stackprotector.h   |   4 -
+ arch/x86/include/asm/sync_core.h        |   3 +-
+ arch/x86/include/uapi/asm/bootparam.h   |   2 +-
+ arch/x86/kernel/acpi/wakeup_64.S        |  11 +-
+ arch/x86/kernel/head64.c                |  76 +++-
+ arch/x86/kernel/head_64.S               |  40 +-
+ arch/x86/kernel/irq_64.c                |   1 -
+ arch/x86/kernel/kvm.c                   |   8 +-
+ arch/x86/kernel/relocate_kernel_64.S    |   6 +-
+ arch/x86/kernel/rethook.c               |   3 +-
+ arch/x86/kernel/setup_percpu.c          |   9 +-
+ arch/x86/kernel/vmlinux.lds.S           |  75 ++--
+ arch/x86/platform/pvh/head.S            |  57 ++-
+ arch/x86/power/hibernate_asm_64.S       |   4 +-
+ arch/x86/realmode/rm/Makefile           |   1 +
+ arch/x86/tools/Makefile                 |   2 +-
+ arch/x86/tools/relocs.c                 | 425 +++-----------------
+ arch/x86/tools/relocs.h                 |  11 +-
+ arch/x86/tools/relocs_64.c              |  18 -
+ arch/x86/tools/relocs_common.c          |  11 +-
+ arch/x86/xen/xen-head.S                 |  16 +-
+ drivers/base/power/trace.c              |   6 +-
+ drivers/firmware/efi/libstub/x86-stub.c |   2 +
+ include/asm-generic/vmlinux.lds.h       |  10 +-
+ include/linux/compiler.h                |   2 +-
+ init/Kconfig                            |   5 -
+ kernel/kallsyms.c                       |  12 +-
+ scripts/kallsyms.c                      |  53 +--
+ scripts/link-vmlinux.sh                 |   4 -
+ tools/objtool/check.c                   |  43 +-
+ tools/objtool/elf.c                     |   2 +-
+ tools/objtool/include/objtool/special.h |   2 +-
+ tools/perf/util/annotate.c              |   4 +-
+ 50 files changed, 380 insertions(+), 667 deletions(-)
+ delete mode 100644 arch/x86/tools/relocs_64.c
+
+-- 
+2.46.0.792.g87dc391469-goog
 
 
