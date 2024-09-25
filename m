@@ -1,91 +1,211 @@
-Return-Path: <kvm+bounces-27496-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27497-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C5F9867DA
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 22:50:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87EF1986823
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 23:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E65EA1F236CE
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 20:50:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A3031F23CF7
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 21:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CAF156677;
-	Wed, 25 Sep 2024 20:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F044157A67;
+	Wed, 25 Sep 2024 21:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="KkDNER+0"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="h6Z48oLx"
 X-Original-To: kvm@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2073.outbound.protection.outlook.com [40.107.94.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8925F1534EC;
-	Wed, 25 Sep 2024 20:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727297410; cv=none; b=r2D+sED9sSeQfavQEU8x9IO8paV1ngHOnYzm2YPXyO6IpJX2iTmtZvwkSozFvXUIReRZuTMh5kbFL57IShD0XFEGMO+XySUrUoKsjNLjQEH9ebpPH8D2pmdGpF2CZUwGIegPw1g1BL8GecKEf8c/M0tUM+cm6TYYTMxnh5hEl7Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727297410; c=relaxed/simple;
-	bh=GLEGXW/IRreMuP+Ewe2MM2lF19EhyviiE352szWHvaE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hm3YfGuPf8UQORwkuh4WTlmcxumXif6Hdo2cYVBBHJi1FC+2dbtxfuG/gP6FBKZbQIzwP5h3ttSjS0DUkoPgrOpEPNp5N21ezEtehjMRaK0DECzmf5kqSyUMqg8yZNtrcbkFRSXf5+cNFBZUQZg7bjlYNAFy2JI867JbosDxVAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=KkDNER+0; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=9Fw6nSSCpgyFPlJKUOs3JFoolcvYhoNhkTP59zcOyUg=; b=KkDNER+0neATPShnr3UWEAMMfc
-	EUgLliRk49wD+jn7X3Mm0nrgEBxGYQCk1K6fi3UN0XOQjC0dvC1R466n6Nbs7j4GjabOkxvSOw8qC
-	X5RprFLMo6NGy1TjcTYJty2SJ5jiF+RyZkzOX8jyChUozIxu3TiBFc9udU7GVyYN+jlW+xiodAhJ3
-	Aq5fi9rteygETWNqwOk8PvCHRgkQTvKt1GHzbOkXjGJHDiiCWu/5e8lbcKVy2DsaO+YZBEKHk/UVH
-	JgCWh7EKohG++4t/SyQpgiraYfRBU5/tfwiUE4MFcJvqWrY50jstTrRbZCGsHY5VRq8ItjuGdpeG1
-	1Q5Lti9Q==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1stYxZ-0000000FVTV-3oxD;
-	Wed, 25 Sep 2024 20:50:05 +0000
-Date: Wed, 25 Sep 2024 21:50:05 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Tiwei Bie <tiwei.bie@intel.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] vhost-vdpa: Refactor copy_to_user() usage in
- vhost_vdpa_get_config()
-Message-ID: <20240925205005.GL3550746@ZenIV>
-References: <79b2f48a-f6a1-4bfc-9a8d-cb09777f2a07@web.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A417B22EE4;
+	Wed, 25 Sep 2024 21:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727298668; cv=fail; b=Am4+LQmF5FKO2G6qDd3ZFcc9e0L767CLY+37zUIDkKcQPMbMIhN3/0Wi+SAa+ALmNF2ecBQEYgPr1AIXW9e75frIirR8xZzukDQIyl7FzfXfqRkIOCYWN5S0JZPG4ntPrhzjtR1MoGNQgJSWSl2zxiZIMw/Sv39eDGEMqOuMctg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727298668; c=relaxed/simple;
+	bh=ssIs9WtPLkYu01Dj+z1Mc0lHQSYIPGLQzn3LK0r2/QY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=nmZubnjtzeo37Vd0oyCEeADQhdp7jZcYPsplNXarjctQjsSfiTAN053gDItAUxlL2MGWEp65jgbWO8anyWR2QXWdh94wBvIikBukvO8Vstuv2S7XLkgMJc2ndLtG/vX6ge36KxNAIj8eBB7rOS3RgEXwjGL6Pc9ktxBv5ccRQP4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=h6Z48oLx; arc=fail smtp.client-ip=40.107.94.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cqT95vw/VV8DqM7+q5RQ6kDVcqMAiEwJReRSupa/k+gLdONpBQdJ2y/3AW7axB8SHameZOsfWdjlVxIYzNAqaHreHmaY9F9tzniJ9wnXWAF+NaLP3JHsCBXkyzHHy1jkmekYqo1N/P2yPFozWn5j1L+uVxF/LdoiBzgh3auZ9vEeImmmXhPvIFpbqIezwOfyjlYfCN7OIiQxAJHxS7szfrt0/ZmQwbnylt6y6+fFwGiGI75GSVBwz13RxfGcgZ22H1N/SYMHL7NjtMJVcE5Bf5QmjtWEXv05+HQH8XGuQi3N3MSEsW1tEvpl/Y7/biiR6Xl+udnyb2sxoX4Dba8ryg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G0seTHlNHKQRCkaKgJf0QsO+AMWS+fi600xH0eeDjsI=;
+ b=VS5xwu3RXucPSM5uqoxfFbbVTpKUyM9XXS179XfKTfjvz61gR88GBCEkvycxDmVJQ3pyOJkxFSXgVqzTzoA8b/z5wZHyZHR09xUU2JkcB0aHrhpWxM9exJhz4ryCF2cRrTbD3lk792bx5lEfgehNxJtq97Giskga75h5UPWdsWeURwf1DziEkpaOvwQCiboUxPnsVSitPD+klPLSXDKUjx6GK0z6UZUC6a4Ez0AnFFME3mmeO+SSsleGm9iEyCcUJElA8lKYor8nQYdAmCwcJZcob50HvTQTH4TW9NaZ5VNOkBYEQCMWYXy3ekKXuyJCKzG/DirZhxPD9s/y9swvig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G0seTHlNHKQRCkaKgJf0QsO+AMWS+fi600xH0eeDjsI=;
+ b=h6Z48oLxyTskg8BvMmpDA2Eomh1ZNb0XlNtkZW9UttutjmeSvHlMuO41N/vpI4bAu+2QspT6lYEOmybH4l/+K+E6ekA4vKGZyIoHda+WMm/d/w4LWhSY18YifIqOHyerA2eBy8YhFqt25NEiVzW9bIv7JRmi2aLL0jtb2ZzwKDM=
+Received: from BN9P221CA0014.NAMP221.PROD.OUTLOOK.COM (2603:10b6:408:10a::19)
+ by SA0PR12MB4430.namprd12.prod.outlook.com (2603:10b6:806:70::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.28; Wed, 25 Sep
+ 2024 21:11:03 +0000
+Received: from BN2PEPF000055DC.namprd21.prod.outlook.com
+ (2603:10b6:408:10a:cafe::3a) by BN9P221CA0014.outlook.office365.com
+ (2603:10b6:408:10a::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.26 via Frontend
+ Transport; Wed, 25 Sep 2024 21:11:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN2PEPF000055DC.mail.protection.outlook.com (10.167.245.6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8026.0 via Frontend Transport; Wed, 25 Sep 2024 21:11:03 +0000
+Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 25 Sep
+ 2024 16:11:03 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB05.amd.com
+ (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 25 Sep
+ 2024 16:11:02 -0500
+Received: from [172.18.112.153] (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Wed, 25 Sep 2024 16:10:59 -0500
+Message-ID: <81fb3f6b-4ded-41d1-be66-d86af4f22171@amd.com>
+Date: Wed, 25 Sep 2024 17:10:56 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79b2f48a-f6a1-4bfc-9a8d-cb09777f2a07@web.de>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 11/28] x86/pvh: Avoid absolute symbol references in
+ .head.text
+To: Ard Biesheuvel <ardb+git@google.com>, <linux-kernel@vger.kernel.org>
+CC: Ard Biesheuvel <ardb@kernel.org>, <x86@kernel.org>, "H. Peter Anvin"
+	<hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra
+	<peterz@infradead.org>, Uros Bizjak <ubizjak@gmail.com>, Dennis Zhou
+	<dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter
+	<cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Juergen Gross <jgross@suse.com>, Boris Ostrovsky
+	<boris.ostrovsky@oracle.com>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada
+	<masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, Nathan Chancellor
+	<nathan@kernel.org>, Keith Packard <keithp@keithp.com>, Justin Stitt
+	<justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, "Arnaldo
+ Carvalho de Melo" <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
+	"Jiri Olsa" <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, Adrian
+ Hunter <adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>,
+	<linux-doc@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
+	<linux-efi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-sparse@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
+	<linux-perf-users@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+	<llvm@lists.linux.dev>
+References: <20240925150059.3955569-30-ardb+git@google.com>
+ <20240925150059.3955569-41-ardb+git@google.com>
+Content-Language: en-US
+From: Jason Andryuk <jason.andryuk@amd.com>
+In-Reply-To: <20240925150059.3955569-41-ardb+git@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: None (SATLEXMB05.amd.com: jason.andryuk@amd.com does not
+ designate permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000055DC:EE_|SA0PR12MB4430:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2a8b3ce5-d2b6-407b-9a44-08dcdda69057
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OEJwb29wcWhNT2x0SDFYTTlrdFNpeXNaNG1QcnFKM2hsMDlQS2RMOHNXSWNw?=
+ =?utf-8?B?QTZrKzVTaytRaWk2WFU0Z1RHWjJxNkJ3ZGNoeTNtYVBGQXU5TkxNZDJPZWtO?=
+ =?utf-8?B?ZXFSNm5xQm50blV0UGpWaUlXQy9XZC9wZXAzL3Avd09mdHZ5MjFGTEZ5czlU?=
+ =?utf-8?B?Tmtidk93YjdEc0xScG1qYXJtcUNTNjI5NDlCbmZZWHM2TUxZVE9NK3ZmWFZk?=
+ =?utf-8?B?b2crQlBOOFdJa3VUWkZXQkd6T2Yyb2wzTThLbDUxVTJMN205azNmWEQzUzlS?=
+ =?utf-8?B?UVluRmtYNXp5eEYwL0c1TXVJb2RXSDAvdjNmTC8ramFpVmVNZGdqY1Nma2RT?=
+ =?utf-8?B?WFB5ZExVdDdYd0pJTGtGNGdra2lJMkE4emxBdk9HZTNRR3BwQk5pdk83L1Rl?=
+ =?utf-8?B?UVNTNE9Nakc0SDZQZ3crVFNoZjFKZkhjRVoydStBQmQxeDl3RnN3MDFQVXlP?=
+ =?utf-8?B?ZEpxbndkZDlqMjY0VzBhUENpQWFlMTlGcTFxNzV4aEJHV1Jnai9jelpOMGRR?=
+ =?utf-8?B?eFk2WWh5c3pOTmpYN2ZhVVg5aWhoTVV4Sm5BcWhod3RVOEROWVcwaHcrYWxQ?=
+ =?utf-8?B?WGdLZEovZFRjSWx2NFlRdlorclQwdUg5TG9KS3pxTEhkbUFPMGFNeUhhb3d3?=
+ =?utf-8?B?bkxxYUpZbkMxcnpJby9hTGpkNnRyVEdHSDczeUlYNUgwYU9HYnF1OHE2emZU?=
+ =?utf-8?B?OXpNMEZnVXJjNmpKY3hQbVhMT3Awc3lzVmE0andMbVU4Sld1d2Rqa3VSZGp3?=
+ =?utf-8?B?MS9jTk8yVW5NbGVkZU1yZ1BIVTE1UVZ2UlRlL0EwN0VwZ2lySEdqbktHK2M2?=
+ =?utf-8?B?bExaZ0pIcHR1OTlIcGNDYTE4ZnFoTGFiR2dqOW1JWXVhdWl3YVNJZDJTeWpR?=
+ =?utf-8?B?YzlpaEk3UEszMWw5cUd0RmpOb1ZuMU41N3pHQ28zRVdDNVhaTGFFeS9MbVI1?=
+ =?utf-8?B?Z2ZyVTJsYU43cUlkT21scHN5OHVFWUlraSs4OHVFWnRLVzhNL1lxVEJDNTZm?=
+ =?utf-8?B?OEdKTmk1dmw0eHM1U0c3QzkxT0ZRL0Y4Uks0T21mc1RsNXB0WjMxdCtnN2ZN?=
+ =?utf-8?B?OEpxZU43c2F0UVhnSXlaSGYwZjFrWkNzQ0tOMzFCQnhZYnJYY1VqVmVsN2Ex?=
+ =?utf-8?B?ZG9xajlZU0ZpNndCWHI5Z2gyOFF6M3pNODNKcGE4blgrYzA4Wk55eFViN1RT?=
+ =?utf-8?B?WndIZ3RGTDhDSWNBYnM3S0toOVd5OWdzY3JlODhFdTFHaGF0RUp5RkcwWVk5?=
+ =?utf-8?B?NTNjL3laaFNBUDVFd3hPYVZTajZ2Ykk3OUJBM1I2aHl4bzdYZGlieUp0NDdi?=
+ =?utf-8?B?T3dTT25XNHBZbnBsTlMwNzZzWFdUNkVkWWxrTWJCbDFvUkZ4VVNtTzc4cXB4?=
+ =?utf-8?B?VUFuVmh0b2FsbzY5dlhXWTBCMS9IMzY4TjVZSTNpZjU1c2NFRVNBUC9OdTFQ?=
+ =?utf-8?B?NzFvRjYrTDlrbjFRWWIrTzFvYTVvN2pBOEJacnQ0UkYrQUczUWRONVc1eVp0?=
+ =?utf-8?B?aHVwQW5sOU9uWWtJeExZSFlKQU9hVE8rT2dxbUVuRCt4bVFjNmF5VHlGTEhZ?=
+ =?utf-8?B?bjQxY0tadnlMb0hYVUlBOG5PZTBMSEdCdDdmTUVSRmRDRXVqamNxRVpjYkRp?=
+ =?utf-8?B?aC9BQ0RuUWJ1VzRwTmpmamtNWVJocUxnRkxGajQyZ3M4THl0cUJOQVhtaEFI?=
+ =?utf-8?B?UHJ0bWs1bkluR0xVOWJMUnJBMDRibXcwVFN5S05kajZJdE43aWtQS1Qwa2J5?=
+ =?utf-8?B?c2JsblY3Um5TY1g3SUgrTWN5bStOdkVpSmxjK3RRaStBUS9XL3ArR3NVcndr?=
+ =?utf-8?B?cVp5S0pZTHNBd0lZM2oxOHVRVkFiS2FUWXY1YzFJVnkvOFRCUmhhZjhNdXpJ?=
+ =?utf-8?Q?quEuBNmFiQ/hN?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2024 21:11:03.4956
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a8b3ce5-d2b6-407b-9a44-08dcdda69057
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000055DC.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4430
 
-On Wed, Sep 25, 2024 at 08:48:16PM +0200, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Wed, 25 Sep 2024 20:36:35 +0200
+Hi Ard,
+
+On 2024-09-25 11:01, Ard Biesheuvel wrote:
+> From: Ard Biesheuvel <ardb@kernel.org>
 > 
-> Assign the return value from a copy_to_user() call to an additional
-> local variable so that a kvfree() call and return statement can be
-> omitted accordingly.
+> The .head.text section contains code that may execute from a different
+> address than it was linked at. This is fragile, given that the x86 ABI
+> can refer to global symbols via absolute or relative references, and the
+> toolchain assumes that these are interchangeable, which they are not in
+> this particular case.
+> 
+> In the case of the PVH code, there are some additional complications:
+> - the absolute references are in 32-bit code, which get emitted with
+>    R_X86_64_32 relocations, and these are not permitted in PIE code;
+> - the code in question is not actually relocatable: it can only run
+>    correctly from the physical load address specified in the ELF note.
+> 
+> So rewrite the code to only rely on relative symbol references: these
+> are always 32-bits wide, even in 64-bit code, and are resolved by the
+> linker at build time.
+> 
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
-Ugly and unidiomatic.
+Juergen queued up my patches to make the PVH entry point position 
+independent (5 commits):
+https://git.kernel.org/pub/scm/linux/kernel/git/xen/tip.git/log/?h=linux-next
 
-> This issue was detected by using the Coccinelle software.
+My commit that corresponds to this patch of yours is:
+https://git.kernel.org/pub/scm/linux/kernel/git/xen/tip.git/commit/?h=linux-next&id=1db29f99edb056d8445876292f53a63459142309
 
-What issue?
+(There are more changes to handle adjusting the page tables.)
 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-
-Nevermind (and I really need more coffee, seeing that I'd missed the
-obvious indicator of garbage and failed to hit delete)...
+Regards,
+Jason
 
