@@ -1,146 +1,148 @@
-Return-Path: <kvm+bounces-27499-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27500-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8495E9868AE
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 23:50:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 868AE986919
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 00:14:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7C7F1C20DE3
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 21:50:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3393F1F26DEB
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 22:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3940015CD55;
-	Wed, 25 Sep 2024 21:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDBD158DC3;
+	Wed, 25 Sep 2024 22:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ur/3nHyr"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Qqkv7BK4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3498A4C91;
-	Wed, 25 Sep 2024 21:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56CC71D5AD5;
+	Wed, 25 Sep 2024 22:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727301027; cv=none; b=VGVc129jLv2PqzKXFfKHM3XxPURPQ9RGxz/aoTSeVJZiVg6tollZFFCJkqcx/4rQT2esslVEH+NLTSUm2PbYgWgfUE7PiNk1UHkb1K+U4+ahomcFapX85YYnl8tOdrxRfGbSnWAI5YdQ0WlarDgymy/cwsgX9ro6dlUkGLyXJK8=
+	t=1727302449; cv=none; b=ie0rw/CDtOjEWQZndfPsZRt2ZGXI5BkQb330fRJMBqdnAezQtJ7kSR3wCCiMKzaRP4LiC2KnxYrrOPMVQq3wQq70pP2JsxZfSo3WurkMAbfZ8ZbCqw+U0QNR8i6q0YPTY8wnLiVsnpUU7oDcFZh+puVfhRz33OWYInKR2JZcPKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727301027; c=relaxed/simple;
-	bh=1lEhoW6WR1MzdDMJddixyg5DPptKnPhIlRVYn7j8lQg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OucniQHqheOaC1RUTwPT4jJywAApNqyp3aOkxNYHMQSMIYy+9UZq6Qc8V6f4fL97TeWKAvVgZ7LdNP6txqg547CaltGwfGaWGzy/WC7MRK6xalTHcQ4ff3ZUqBK+XSlVMwGig6fFF984H30Qc/c0xcphOXY1Qb1MAxtHUjv0G+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ur/3nHyr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBFCAC4AF09;
-	Wed, 25 Sep 2024 21:50:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727301026;
-	bh=1lEhoW6WR1MzdDMJddixyg5DPptKnPhIlRVYn7j8lQg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ur/3nHyrhZZPu0Yh+dxx9IKm8wfPUcwkSUQRT5/24oDl5DsWgNcYT0e6Eea2tNJEj
-	 e7kkusZnvqM4WaMdV8I/B88HrhGKrbpU1NmXjGCDHN50ORnxvzmOycJHLxIoyGwsDO
-	 ExoHCIyOj9vlAWjwlo1VC3vyBOmMfPmkVdu53MKdw2rUvIg+EICDRFsYyGF/ME23Kr
-	 OQb1mqpKJ2KcOIs7wkgcqQbNW9IxvVRHKG6I1vwEmJlaj0YC21mvFP8GdjxaBxyry9
-	 jndDvY46F1MqAtmxQOq27Nb8WyvN+IBfi0EcE/uMfNIYvCFZoSopABS7dcRnOBsVSy
-	 JHKCzVeyLclIw==
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2f75aaaade6so3504161fa.1;
-        Wed, 25 Sep 2024 14:50:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU41Yl1sttTg6M09g6XFlPWgM6aKYUPcyKAZuJi1MFpolUjBY6EX3rjid7yiMuIPFvcxwtqxGDi8A1e@vger.kernel.org, AJvYcCUBjZa2k9ktNoszDdBbGsmUYkoo+UBysl/zvy9zEChTzav8UykXq5KYmPVktYLgeiDJYa8JdVW5Iahoig==@vger.kernel.org, AJvYcCUEhDAfbKmtW+zDQTSj8AFR1LX8pKPrayJ2WSXwEbHSJXbIRSWMLY+ST+VMmtIHzTHHMx3uO7FPSku0Gatc@vger.kernel.org, AJvYcCUWEzhuPr/DJK5KOA2tsWED2rzTCuDC8XPWG6Kmt+EtUzuFt4w/e0WCCiuvVO5U5g2SoVuADYMSTZy2n3t8@vger.kernel.org, AJvYcCV8+3qzx+hE0bn/8reGc0wt841uez3ElAs+KnYznZL0spqZvZYTjnETCbwmxGXO0JQahGzQHymsFQ7NJsOl3T1Hog==@vger.kernel.org, AJvYcCVil+zKdn6eUJiaXguneqD7UclkSAfYRhmSG6G04Z/HMf7GbyCdTAkhnba+IZsEwMuesIJU8qPBZCCR@vger.kernel.org, AJvYcCVqtgmdPe9Ln076tMvVEt+OM5yyog9qM/HupRRpc6WUb+6I976IxRiEWCESwprKDHBS1BccOVD4wX6wKbjc@vger.kernel.org, AJvYcCW/FNYUPHIWOKdbh/UZ+L/OmwCj4u8w5bDaQJaGJ8LFENeElMIVdgKoOQhW3fUcrE9aFsE=@vger.kernel.org, AJvYcCWCyAZNBGjwnxfsNNWHE4QLxncQYVf5ho6jd0xc8YuyNeyoJqOEJU/SB88FRn54XbVKBB0h2AVYZaI=@vger.kernel.org, AJvYcCX1eEHLdus66GmS/KJZX7ITtZ4P
- hpHnLhnuipufilF2AaNvFnZTir3rIUqqP8eyDxUB0v0K2px304CrLGEx+Mg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwC/c5a8nTdg728+loAEpIpQH2/3bfHpgP/Pb8IhyKv6zUgqkq
-	4XO8JKXu/IlLKxQFKeqtk+quVTXt7z5G02PQrvFQqFzSkBcT9AUMWurT07LdmtiZlv6HEuTl5FW
-	YMQHXC+TLhm8muCz6BoP/T4Im1m4=
-X-Google-Smtp-Source: AGHT+IFAZ+6hWU7rSBzvDQXewHWYdV56nlJpCG7le3cONkuZamphf5guvKvreSQ+Lzis3ZFjbCnAEt7u29iA4vUB0Ko=
-X-Received: by 2002:a05:651c:1991:b0:2f6:5f7b:e5cf with SMTP id
- 38308e7fff4ca-2f915fdfea6mr30629271fa.14.1727301024993; Wed, 25 Sep 2024
- 14:50:24 -0700 (PDT)
+	s=arc-20240116; t=1727302449; c=relaxed/simple;
+	bh=IF41UnyDrl53g+NYIdXxL2UzRFa3oU7Z0qkEPuNrQUI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M4HunHpjgu0nlFvvx8LzC5V3DKIkLwcw/YDHhpnn9mbxakp6S4slO3/xL3YhKYHhXMimCSfSbXFei3VQotQXSTEdSO+Cbgy1Hn5wSfSvhDrsKtKbtXRzUJxbX/0dtBkKNOr1r2SfRQqQKR3rumGu31ImlLlJHny363CLW5rrPoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Qqkv7BK4; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.205] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 48PMDMTL889345
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 25 Sep 2024 15:13:23 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 48PMDMTL889345
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024091601; t=1727302404;
+	bh=g5RH7RZbXQVW+UpYk6LsTd2oLH0NAup72AHZEkEBk7g=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Qqkv7BK45SoUUrLPuZ/VMtYlhuHPSof+LhTQxp8X/Gvmn+rODfXnAU3V3BVtyAnI0
+	 7ydgtN+JW3vBfCJ9cAOv6BDDDcfTDKBf+d22xo7htig+8t8ztVE/GO22Z4TB5ederi
+	 g2I4ENVx51wLUbicAj4LER+Y+36gdqblDdv1SNKzJaScfqY5x9aysxBn3dgYZIWYzE
+	 jSgPy1Mnodt5JfhK7ggCPgEQfYTsvv0Vo0YTWbqRGYbE+gCD+irBBlyagDtek6wpd1
+	 ZeseV3vbk1FZu5vtYVv9WJQr9mmCfX0HIvLSnM/Fe2ivl98Do5wblJvmSBV3c1q/jh
+	 a+4RC7gAe27Aw==
+Message-ID: <496a337d-a20d-4122-93a9-1520779c6d2d@zytor.com>
+Date: Wed, 25 Sep 2024 15:13:22 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240925150059.3955569-30-ardb+git@google.com>
- <20240925150059.3955569-41-ardb+git@google.com> <81fb3f6b-4ded-41d1-be66-d86af4f22171@amd.com>
-In-Reply-To: <81fb3f6b-4ded-41d1-be66-d86af4f22171@amd.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 25 Sep 2024 23:50:13 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGj25bn2R9vWPqG5+SSSjJp6rzopssDbjk8uOvi=cAiUw@mail.gmail.com>
-Message-ID: <CAMj1kXGj25bn2R9vWPqG5+SSSjJp6rzopssDbjk8uOvi=cAiUw@mail.gmail.com>
-Subject: Re: [RFC PATCH 11/28] x86/pvh: Avoid absolute symbol references in .head.text
-To: Jason Andryuk <jason.andryuk@amd.com>
-Cc: Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Uros Bizjak <ubizjak@gmail.com>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
-	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
-	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/25] KVM: VMX: Set intercept for FRED MSRs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Chao Gao <chao.gao@intel.com>, Xin Li <xin3.li@intel.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, shuah@kernel.org, vkuznets@redhat.com,
+        peterz@infradead.org, ravi.v.shankar@intel.com
+References: <20240207172646.3981-1-xin3.li@intel.com>
+ <20240207172646.3981-8-xin3.li@intel.com> <ZiJzFsoHR41Sd8lE@chao-email>
+ <ZmoT0jaX_3Ww3Uzu@google.com>
+ <feefa9d1-f266-414f-bb7b-b770ef0d8ec6@zytor.com>
+ <ZuNJlzXntREQVb3n@google.com>
+ <d65e62d2-ca64-4b29-8656-bb8411fe837d@zytor.com>
+ <ZvQaNRhrsSJTYji3@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <ZvQaNRhrsSJTYji3@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 25 Sept 2024 at 23:11, Jason Andryuk <jason.andryuk@amd.com> wrote:
->
-> Hi Ard,
->
-> On 2024-09-25 11:01, Ard Biesheuvel wrote:
-> > From: Ard Biesheuvel <ardb@kernel.org>
-> >
-> > The .head.text section contains code that may execute from a different
-> > address than it was linked at. This is fragile, given that the x86 ABI
-> > can refer to global symbols via absolute or relative references, and the
-> > toolchain assumes that these are interchangeable, which they are not in
-> > this particular case.
-> >
-> > In the case of the PVH code, there are some additional complications:
-> > - the absolute references are in 32-bit code, which get emitted with
-> >    R_X86_64_32 relocations, and these are not permitted in PIE code;
-> > - the code in question is not actually relocatable: it can only run
-> >    correctly from the physical load address specified in the ELF note.
-> >
-> > So rewrite the code to only rely on relative symbol references: these
-> > are always 32-bits wide, even in 64-bit code, and are resolved by the
-> > linker at build time.
-> >
-> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
->
-> Juergen queued up my patches to make the PVH entry point position
-> independent (5 commits):
-> https://git.kernel.org/pub/scm/linux/kernel/git/xen/tip.git/log/?h=linux-next
->
-> My commit that corresponds to this patch of yours is:
-> https://git.kernel.org/pub/scm/linux/kernel/git/xen/tip.git/commit/?h=linux-next&id=1db29f99edb056d8445876292f53a63459142309
->
-> (There are more changes to handle adjusting the page tables.)
->
+On 9/25/2024 7:12 AM, Sean Christopherson wrote:
+> On Wed, Sep 18, 2024, Xin Li wrote:
+>> You mean the following patch set, right?
+> 
+> Yep, and presumably the KVM support as well:
 
-Thanks for the head's up. Those changes look quite similar, so I guess
-I should just rebase my stuff onto the xen tree.
+I assume it's close to KVM upstreaming criteria :)
 
-The only thing that I would like to keep from my version is
+> 
+> https://lore.kernel.org/all/20240219074733.122080-1-weijiang.yang@intel.com
+> 
+>> https://lore.kernel.org/kvm/20240531090331.13713-1-weijiang.yang@intel.com/
+> 
+...
+>>
+>> When FRED is advertised to a guest, KVM should allow FRED SSP MSRs
+>> accesses through disabling FRED SSP MSRs interception no matter whether
+>> supervisor shadow stacks are enabled or not.
+> 
+> KVM doesn't necessarily need to disabling MSR interception, e.g. if the expectation
+> is that the guest will rarely/never access the MSRs when CET is unsupported, then
+> we're likely better off going with a trap-and-emulate model.  KVM needs to emulate
+> RDMSR and WRMSR no matter what, e.g. in case the guest triggers a WRMSR when KVM
+> is emulating, and so that userspace can get/set MSR values.
+> 
+> And this means that yes, FRED virtualization needs to land after CET virtualization,
+> otherwise managing the conflicts/dependencies will be a nightmare.
+> 
 
-+ lea (gdt - pvh_start_xen)(%ebp), %eax
-+ add %eax, 2(%eax)
-+ lgdt (%eax)
+No argument.
 
-and
-
-- .word gdt_end - gdt_start
-- .long _pa(gdt_start)
-+ .word gdt_end - gdt_start - 1
-+ .long gdt_start - gdt
-
-The first line is a bugfix, btw, so perhaps I should send that out
-separately. But my series relies on all 32-bit absolute symbol
-references being removed, since the linker rejects those when running
-in PIE mode, and so the second line is needed to get rid of the _pa()
-there.
+Thanks!
+     Xin
 
