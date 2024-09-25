@@ -1,299 +1,209 @@
-Return-Path: <kvm+bounces-27419-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27420-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A685985D55
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 15:07:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB337986071
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 16:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B68628191C
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 13:07:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DB121F26B50
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 14:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB231DFE37;
-	Wed, 25 Sep 2024 12:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0921A4E72;
+	Wed, 25 Sep 2024 12:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Tof12Q/j"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d4nHFf9C"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DBD1DEFD2;
-	Wed, 25 Sep 2024 12:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FBE18A6AA
+	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 12:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727265796; cv=none; b=IME5uebzBqtBFmz6UhXY+lrj2XDKyWNbrwsGMJ2CRLH25L2sY/Ng4KhuaE9wKKC25gwKNB1ohCNCilqAorS0FL7B7w+2S+6LenxBa70v2+TGFBlA+3XzUYG0WuAlWkOxifRfjPeIg1kVooRUwTs/0I+e6JjmnUIqPuCA7ZDl9rA=
+	t=1727268944; cv=none; b=n55rerbVxvqEszcFOZuHRHzSu8niUEg9SX1tbBWKKEF4qtOxB6jfS3Szt3PFlqE2Br/pMI7WBhKqNFI9n42DZ/f/PNghrWBzSslU/Q1pGLGbe1C5zLolNvKmm8OiaNApQuopP+pPziXVDfSUB0laY5pgQCs7GtYYMnfbu3VioCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727265796; c=relaxed/simple;
-	bh=Cnw2nPhFB4eewFYSgZ5Amg4XlZK121K2ddAmcX7QR/g=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=MPUpoaXnn5/W/EQi4Cxv2nzPz7pFdjTVoHTKBOAradE59xEcMYK9g2TjXP+W9s1GithVjmdHUJaT4Gn4+xJ3E+ldKGLpOolc1ItnbWcNaZh0BkMFwPcAPbJ29MM6+pzPAGxrJBK0P6riz+SIZP6qRcYae1UdnL5Yv7FozRG61zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Tof12Q/j; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=fXrloWCadyWWQqOik5L/M8MK3dU8Cot3mYEaPXuCIE0=; b=Tof12Q/jGJPdQV5n5Su91VQ30k
-	zlMVE0IutVHuVwFucC25aB9R0KTlCL4AvsjOmjxQAE7QuRgJH/z26i3So6tcIucrVDpn2uG7Yo/5a
-	ztfwY5geJjvVuEMGjj5sOF8MIOcOWF26zY6O4Fm7O8Ds4R0p+5uC6JXj9Dtczhl8ghFIRIuOAqIMj
-	oQI+tjqssdLo53Xd5d1GF3047cLa0bHJdTQCpL+pv4318thJVE7ophPKYsVQ0uah8OApQyxpTV5YU
-	8YOn8+NXVSlRCfgjXvpfWdKR3bx0hE5FLLQ9pALMn1A/GKQZDAQUQ/+tcnkIj/aWctZqhtNijO2jx
-	KaYJzcIw==;
-Received: from [2001:8b0:10b:5:4842:e5e7:476e:c7a8] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1stQSy-00000003pRD-0RwJ;
-	Wed, 25 Sep 2024 11:45:56 +0000
-Message-ID: <f0535c47ea81a311efd5cade70543cdf7b25b15c.camel@infradead.org>
-Subject: Re: [PATCH v2] sched: Don't try to catch up excess steal time.
-From: David Woodhouse <dwmw2@infradead.org>
-To: Suleiman Souhlal <suleiman@google.com>, Ingo Molnar <mingo@redhat.com>, 
- Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>
-Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt
- <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, Mel Gorman
- <mgorman@suse.de>, Valentin Schneider <vschneid@redhat.com>, Paolo Bonzini
- <pbonzini@redhat.com>, joelaf@google.com, vineethrp@google.com, 
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, ssouhlal@freebsd.org,
- Srikar Dronamraju <srikar@linux.ibm.com>, Sean Christopherson
- <seanjc@google.com>
-Date: Wed, 25 Sep 2024 12:45:55 +0100
-In-Reply-To: <20240911111522.1110074-1-suleiman@google.com>
-References: <20240911111522.1110074-1-suleiman@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-guk9RDG76xd8OH6x4KLL"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1727268944; c=relaxed/simple;
+	bh=SqsrNamKhqSmaf/1oFdKI6QM7JNNm91uH+KndaDN+GM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=d8AGI5iN4dX6GPo+sC/nSmmctmz3S1wncspzO397q/yef+UHTmhMbKS0nO689GKue8o6rfT6eryPPYrglohcwOR1Pk3U4gKU4m9Qpe+JGXIsSNeff9gMbWpN0oKTtHFm9PwTTqshl4U7qLwIkp2D2q9CuJx38YFVEgNPK6bsPWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d4nHFf9C; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e21d0bfba7so15155897b3.3
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 05:55:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727268940; x=1727873740; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ejU8vvarcUji1scLaHFX1ADT3z35bJpwvhsMj4+OLE4=;
+        b=d4nHFf9C6GZ1aBjMSMjzhlY0M0WSlkLd1VfrIvmnTshVasLe3Uom/Z4BAJbPOgC+f6
+         jMbpLmgydJcnk1EO+I/aOmJfe9kMhCuk+C+WyaO7O7Vt1jR3trxKz5aR/B+gw3lfWn+B
+         eRBdImzYNmKX/8e8Qys30/rryQ6Gk+J8T2NNK0akXyZR+6UjiCf3jjJ4ZvQqNT6xKC1R
+         r3yLYsTHZpgmMfVWYilMX6+Ba+UBLrfUXjZhmcggkJTxW3TDacJknXAygVNLnlj0Hozw
+         QFBE+Abub0UmpjmIVRTWFDCj8s43li+FzZkzsbwIHxglaE2hT0AqniH7PWuyWe6QHa9n
+         DgUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727268940; x=1727873740;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ejU8vvarcUji1scLaHFX1ADT3z35bJpwvhsMj4+OLE4=;
+        b=pqFFYdwjSt6n1I3ChcFCUBfgVXYxsu95FUpgUhKYuAPJMoo9J+swKIgsBSSs4bEXKf
+         CGI/gNsd+fZbMQ+LsdqadOnNEEPT3johaiMFTSaqmNmFchES8lV7jB2IkkuZ4uXl041p
+         TTDSKn8pwnBVsKtXjIv3Fyfgf/UteD61fmcZ7BLg4vfV3ajsyHccoiSil98SJS6RF2lI
+         GwyIEdowCZoRKxIPNCxFYgmwg53Z99FiUcbXUbMFM2M/S/Avt5oCnMDmAVkaM7Eg0BqE
+         U0XeAUEv2QjnK3RfCKGzlDmWx1yTjWOApLMr2r7ioKlB0MiagJnLfK3bhVuRGvVtHCz0
+         FpDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHeWrjD1PQsZ3IJJ8FMrLQ699wyqZPeCh663t8R4fSTM2zFG4zvR5MLWxqHktsHfXdUVI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyifKok2Zg+JC62Ge7Yb9j3vVRowQhvu0xmR+uE5gdvDA59ycGe
+	VwUCSzWVEzb3MUF9ILdCMqIaJzSbKfNumW+D1+MnBjwu0FTddcT8qIPcNBbbUP2sUAS/kUAuLZg
+	6Ng==
+X-Google-Smtp-Source: AGHT+IHV+hKp0Q9Hx5xYHjlPSEL8B7B2ZZTX/32jkpd2zuCYjaKxoOK6gQ4TjmMkDZqskxjv4Q7RPav9iq0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:580a:b0:6dd:c0f7:2121 with SMTP id
+ 00721157ae682-6e21d9fc431mr30527b3.5.1727268939762; Wed, 25 Sep 2024 05:55:39
+ -0700 (PDT)
+Date: Wed, 25 Sep 2024 05:55:38 -0700
+In-Reply-To: <ef194c25-22d8-204e-ffb6-8f9f0a0621fb@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Mime-Version: 1.0
+References: <20240731150811.156771-1-nikunj@amd.com> <20240731150811.156771-20-nikunj@amd.com>
+ <ZuR2t1QrBpPc1Sz2@google.com> <9a218564-b011-4222-187d-cba9e9268e93@amd.com>
+ <ZurCbP7MesWXQbqZ@google.com> <2870c470-06c8-aa9c-0257-3f9652a4ccd8@amd.com>
+ <Zu0iiMoLJprb4nUP@google.com> <4cc88621-d548-d3a1-d667-13586b7bfea8@amd.com> <ef194c25-22d8-204e-ffb6-8f9f0a0621fb@amd.com>
+Message-ID: <ZvQHpbNauYTBgU6M@google.com>
+Subject: Re: [PATCH v11 19/20] x86/kvmclock: Skip kvmclock when Secure TSC is available
+From: Sean Christopherson <seanjc@google.com>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de, 
+	x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de, 
+	dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com, 
+	peterz@infradead.org, gautham.shenoy@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-
---=-guk9RDG76xd8OH6x4KLL
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 2024-09-11 at 20:15 +0900, Suleiman Souhlal wrote:
-> When steal time exceeds the measured delta when updating clock_task,
-> we
-> currently try to catch up the excess in future updates.
-> However, this results in inaccurate run times for the future things
-> using
-> clock_task, as they end up getting additional steal time that did not
-> actually happen.
->=20
-> For example, suppose a task in a VM runs for 10ms and had 15ms of
-> steal
-> time reported while it ran. clock_task rightly doesn't advance. Then,
-> a
-> different taks runs on the same rq for 10ms without any time stolen
-> in
-> the host.
-> Because of the current catch up mechanism, clock_sched inaccurately
-> ends
-> up advancing by only 5ms instead of 10ms even though there wasn't any
-> actual time stolen. The second task is getting charged for less time
-> than it ran, even though it didn't deserve it.
-> This can result in tasks getting more run time than they should
-> actually
-> get.
->=20
-> So, we instead don't make future updates pay back past excess stolen
-> time.
->=20
-> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+On Wed, Sep 25, 2024, Nikunj A. Dadhania wrote:
+> >>>>> Are you suggesting that whenever the guest is either SNP or TDX, kvmclock
+> >>>>> should be disabled assuming that timesource is stable and always running?
+> >>>>
+> >>>> No, I'm saying that the guest should prefer the raw TSC over kvmclock if the TSC
+> >>>> is stable, irrespective of SNP or TDX.  This is effectively already done for the
+> >>>> timekeeping base (see commit 7539b174aef4 ("x86: kvmguest: use TSC clocksource if
+> >>>> invariant TSC is exposed")), but the scheduler still uses kvmclock thanks to the
+> >>>> kvm_sched_clock_init() code.
+> >>>
+> >>> The kvm-clock and tsc-early both are having the rating of 299. As they are of
+> >>> same rating, kvm-clock is being picked up first.
+> >>>
+> >>> Is it fine to drop the clock rating of kvmclock to 298 ? With this tsc-early will
+> >>> be picked up instead.
+> >>
+> >> IMO, it's ugly, but that's a problem with the rating system inasmuch as anything.
+> >>
+> >> But the kernel will still be using kvmclock for the scheduler clock, which is
+> >> undesirable.
+> > 
+> > Agree, kvm_sched_clock_init() is still being called. The above hunk was to use
+> > tsc-early/tsc as the clocksource and not kvm-clock.
+> 
+> How about the below patch:
+> 
+> From: Nikunj A Dadhania <nikunj@amd.com>
+> Date: Tue, 28 Nov 2023 18:29:56 +0530
+> Subject: [RFC PATCH] x86/kvmclock: Prefer invariant TSC as the clocksource and
+>  scheduler clock
+> 
+> For platforms that support stable and always running TSC, although the
+> kvm-clock rating is dropped to 299 to prefer TSC, the guest scheduler clock
+> still keeps on using the kvm-clock which is undesirable. Moreover, as the
+> kvm-clock and early-tsc clocksource are both registered with 299 rating,
+> kvm-clock is being picked up momentarily instead of selecting more stable
+> tsc-early clocksource.
+> 
+>   kvm-clock: Using msrs 4b564d01 and 4b564d00
+>   kvm-clock: using sched offset of 1799357702246960 cycles
+>   clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+>   tsc: Detected 1996.249 MHz processor
+>   clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x398cadd9d93, max_idle_ns: 881590552906 ns
+>   clocksource: Switched to clocksource kvm-clock
+>   clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x398cadd9d93, max_idle_ns: 881590552906 ns
+>   clocksource: Switched to clocksource tsc
+> 
+> Drop the kvm-clock rating to 298, so that tsc-early is picked up before
+> kvm-clock and use TSC for scheduler clock as well when the TSC is invariant
+> and stable.
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> 
 > ---
-> v2:
-> - Slightly changed to simply moving one line up instead of adding
-> =C2=A0 new variable.
->=20
-> v1:
-> https://lore.kernel.org/lkml/20240806111157.1336532-1-suleiman@google.com
+> 
+> The issue we see here is that on bare-metal if the TSC is marked unstable,
+> then the sched-clock will fall back to jiffies. In the virtualization case,
+> do we want to fall back to kvm-clock when TSC is marked unstable?
+
+In the general case, yes.  Though that might be a WARN-able offense if the TSC
+is allegedly constant+nonstop.  And for SNP and TDX, it might be a "panic and do
+not boot" offense, since using kvmclock undermines the security of the guest.
+
 > ---
-> =C2=A0kernel/sched/core.c | 2 +-
-> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> index f3951e4a55e5..6c34de8b3fbb 100644
-> --- a/kernel/sched/core.c
-> +++ b/kernel/sched/core.c
-> @@ -730,11 +730,11 @@ static void update_rq_clock_task(struct rq *rq,
-> s64 delta)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (static_key_false((&pa=
-ravirt_steal_rq_enabled))) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0steal =3D paravirt_steal_clock(cpu_of(rq));
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0steal -=3D rq->prev_steal_time_rq;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0rq->prev_steal_time_rq +=3D steal;
+>  arch/x86/kernel/kvmclock.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
+> index 5b2c15214a6b..c997b2628c4b 100644
+> --- a/arch/x86/kernel/kvmclock.c
+> +++ b/arch/x86/kernel/kvmclock.c
+> @@ -317,9 +317,6 @@ void __init kvmclock_init(void)
+>  	if (kvm_para_has_feature(KVM_FEATURE_CLOCKSOURCE_STABLE_BIT))
+>  		pvclock_set_flags(PVCLOCK_TSC_STABLE_BIT);
+>  
+> -	flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
+> -	kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
+> -
+>  	x86_platform.calibrate_tsc = kvm_get_tsc_khz;
+>  	x86_platform.calibrate_cpu = kvm_get_tsc_khz;
+>  	x86_platform.get_wallclock = kvm_get_wallclock;
+> @@ -341,8 +338,12 @@ void __init kvmclock_init(void)
+>  	 */
+>  	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
+>  	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
+> -	    !check_tsc_unstable())
+> -		kvm_clock.rating = 299;
+> +	    !check_tsc_unstable()) {
+> +		kvm_clock.rating = 298;
+> +	} else {
+> +		flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
+> +		kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
+> +	}
 
-The above two lines are essentially:
+I would really, really like to fix this in a centralized location, not by having
+each PV clocksource muck with their clock's rating.  I'm not even sure the existing
+code is entirely correct, as kvmclock_init() runs _before_ tsc_early_init().  Which
+is desirable in the legacy case, as it allows calibrating the TSC using kvmclock,
 
-	steal -=3D prev;
-	prev +=3D steal;
+  	x86_platform.calibrate_tsc = kvm_get_tsc_khz;
 
-It's like one of those clever ways of exchanging two variables with
-three XOR operations. I don't like it :)
+but on modern setups that's definitely undesirable, as it means the kernel won't
+use CPUID.0x15, which every explicitly tells software the frequency of the TSC.
 
-Ultimately, you're just setting rq->prev_steal_time_rq to the latest
-value that you just read from paravirt_steal_clock(). And then setting
-'steal' to the delta between the new reading and the previous one.
+And I don't think we want to simply point at native_calibrate_tsc(), because that
+thing is not at all correct for a VM, where checking x86_vendor and x86_vfm is at
+best sketchy.  E.g. I would think it's in AMD's interest for Secure TSC to define
+the TSC frequency using CPUID.0x15, even if AMD CPUs don't (yet) natively support
+CPUID.0x15.
 
-The code above is *far* from obvious. At the very least it wants a
-comment, but I'd rather see it refactored so that it doesn't need one.=20
+In other words, I think we need to overhaul the PV clock vs. TSC logic so that it
+makes sense for modern CPUs+VMs, not just keep hacking away at kvmclock.  I don't
+expect the code would be all that complex in the end, the hardest part is likely
+just figuring out (and agreeing on) what exactly the kernel should be doing.
 
-    u64 abs_steal_now =3D paravirt_steal_clock(cpu_of(rq));
-    steal =3D abs_steal_now - rq->prev_steal_time_rq;
-    rq->prev_steal_time_rq =3D abs_steal_now;
-
-I'm still not utterly convinced this is the right thing to do, though.
-It means you will constantly undermeasure the accounting of steal time
-as you discard the excess each time.
-
-The underlying bug here is that we are sampling the steal time and the
-time slice at *different* times. This update_rq_clock_task() function
-could be called with a calculated 'delta' argument... and then
-experience a large amount of steal time *before* calling
-paravirt_steal_clock(), which is how we end up in the situation where
-the calculated steal time exceeds the running time of the previous
-task.
-
-Which task *should* that steal time be accounted to? At the moment it
-ends up being accounted to the next task to run =E2=80=94 which seems to ma=
-ke
-sense to me. In the situation I just described, we can consider the
-time stolen in update_rq_clock_task() itself to have been stolen from
-the *incoming* task, not the *outgoing* one. But that seems to be what
-you're objecting to?
-
-In
-https://lore.kernel.org/all/20240522001817.619072-22-dwmw2@infradead.org/
-I put a limit on the amount of steal time carried forward from one
-timeslice to the next, as it was misbehaving when a bad hypervisor
-reported negative steal time. But I don't think the limit should be
-zero.
-
-Of course, *ideally* we'd be able to sample the time and steal time
-*simultaneously*, with a single sched_clock_cpu_and_steal() function so
-that we don't have to deal with this slop between readings. Then none
-of this would be necessary. But that seems hard.
-
---=-guk9RDG76xd8OH6x4KLL
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI1MTE0NTU1WjAvBgkqhkiG9w0BCQQxIgQgqS8eP/Fr
-Klx2zUArkVGe9l+CVzc6JOKzWtYP3ubtuAkwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCmLPSUhHPAfZKAJSpCoGjaF+Z2c6cLpnM+
-s3ZZ9PowgZwJD8SSOrwUCQnyRYYDkZR10n0SMjInneN/SsqAfWxM1mwUoJ8/c86vxWCx1g3GkwjO
-B0Vhw77I9Kw4aeWWLjlMUuY6K0/Kzgaby5bJ4QrJ1fjMycDcYahKD02RcAIJEOWRE/umabvyOtKn
-XsyBvCTM/ghIl298e+d/+BXqCvygz+CSdaImwDfV4IqYWDGs8xDr7dt0CkfOYvA9dOkieUP0eVtX
-YWzfXoCQjh5lG4LuZTlpiQc2yODlLBNAECp5XlqVV0PgIRGAhUwotbBJ/8HL6k6y8mV/xqV2D4hA
-ixrf8g16VPrMOHipQicSuWuQ3MX9+dLtK/UA3IDAMkgkkpHFVT2rP4ZvVj2H71esbB3J0s2mKUuZ
-KN0Edr0qdJAZ5yZL51g2EuQkP+8b5FTmPuF4rskmn/1nTAHqLfuYFOqOhjhbrtvncWLlqLWQKKcb
-gLeVPBY8FUkpeJ6oh9dxNI4vHxJuFgutPo3FlEzNR/ZtgACU+9mKxEGQLv9mr8H2a1zMQe8p0kA2
-tRCPXrkuxXc6UWxv8GBiy1hUUGr/fEt/gvwXyzGoDfGi0ajOxkcLwG0mJtKrZASqYdzI2bIf9nbc
-7Sb4GjDgsSF/1Kp5P5L91azjxrdTJ+j8tyKU3TiF2wAAAAAAAA==
-
-
---=-guk9RDG76xd8OH6x4KLL--
+>  	clocksource_register_hz(&kvm_clock, NSEC_PER_SEC);
+>  	pv_info.name = "KVM";
+> -- 
+> 2.34.1
+> 
 
