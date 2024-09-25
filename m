@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-27476-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27471-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D61CC98655D
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 19:12:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43316986558
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 19:11:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96FEE281AF8
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 17:12:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97EC7282291
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 17:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34501369BC;
-	Wed, 25 Sep 2024 17:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4F55476B;
+	Wed, 25 Sep 2024 17:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tF40LMqk"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VO17VUNc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2780884A2C
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 17:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A4217BB4
+	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 17:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727284311; cv=none; b=tgATTVow+RyktMgZ+OqHiWVGwVei7vhNW6sOxT/EAJNyojWajRPksBn58JEhlbEO1Q/wX5fdeD49TosjcOIQlprx1L8L7Y9RWY+l4it5y65+ypUTdIYuwOner8Pk1rfbHUVorfEkqfVfl/z98vdAtUMUXThybd5//WCpmb/zNDc=
+	t=1727284305; cv=none; b=C2wgnQaLLLKSeen6Vej6TzfzvxvDSL1UewI4CiAz/NQ2pSfZA0yYKeh1VzRhSFmK8fGDgzTtvyCXZppxuGDKvbUcALY4MeYsCLwBcx4M5e9Z1uGR8JI50Zj4IYk5uWGeXUs0+FFj+ISdXnOYQvQnIKO0OCBR5wDphTVEDxVOtwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727284311; c=relaxed/simple;
-	bh=3ocp18cipe28Y1G4M2yx66dkQYTqfF/PEb1KxGFg+rU=;
+	s=arc-20240116; t=1727284305; c=relaxed/simple;
+	bh=aS2l+vmDfLF2uLItNIzgkZDSryR40qUXakZxJbkgV9Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iSyMAnorUrz+3gc8RDIKnpN4bFA4XpnlqPaabXFXdMw0kEeGy+zK4JhwqBj60/HaDXAT3CjHXqeigrnq4MTkBZ91dWxR2RRU+3fQNBQBy/ZwUrS5KV1YbJmbxKIrLWdZ6kF4gXrgI0H63Zdmxj44CT54SI5ADYEbYqVxgP0iPHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tF40LMqk; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version:Content-Type; b=r3+PUoTpUvE/L3gazXzCd/xgfo1W1WQIcvThfRliS3I3z7vAOIukh1DbOz6K5Wk2ztAvwL2a2kLXWSGAMRa60LHQKM5VLGORWcp+qVViWHMSrZQVs9QjVBVYcHF/8Tt0yjC8CXjA2yxhaxB3fomaUMxSdBERQ6k/iPi+2n5uWzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VO17VUNc; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-37cc4e718ecso27476f8f.0
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 10:11:48 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cb60aff1eso235685e9.0
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 10:11:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1727284307; x=1727889107; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1727284302; x=1727889102; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FXjwiUjPDmRUKmjejukivCx1FVXlutJ/frWtXF30WgI=;
-        b=tF40LMqk2ISNDRwNasCuRpLI7/vY247CWXBRfajCHNuTRl1Pq46zeG+jJc2z1AE9hp
-         P0YKxZaGucZ6/n2RMe7Wt8aFdjQXLIRbjP4GkXmqfaf19dktvGAKywu+KlmYwM859oaY
-         c9w7rRmylpW7UxIg+zAK95PdrBz9uWCFFRT2y2tyhc7+9a+x6s3azoby0qy0TJ2/bCEI
-         D9pbJdG2/voi5r6rI1ViJVizk//Ec8Kn5+JPZOjNQnIQrBowyI2WgFQN02yTrEuNEPVO
-         xw/a6JhBIDw94qMjXhJFasptAXSjTIVWPANxqVqzVTLi3sqS9JOgido/yLna58AelI9f
-         vuSw==
+        bh=LfxPswSzpy5PJY7wIfJ4Znven71oBCSA3p2JUb9OqOg=;
+        b=VO17VUNcgMzvb8c4i2t/HnDfOc7GKe9crW0ZjqHmX+uKDOpQyoSnYLckX/SXoIQg1m
+         m8svMDM26+h5xpD7IlBQJDC8LHe0zU5DV8L+uqChDeN0Sp/aLLNw93FRsAYzWAY4Qg9Q
+         esDtW2cYw9sh2+mmg5TFgDH+9rQIl51iZyxt6ScKGZChxusfLNAUkSNQ3sf3mOf/jLHt
+         lNqWtY2b5xbEdNfk1tJdzuOTiMPAYaI4H4vRFSNTN762AhiB4lW6Lzhk0riMBKNT5nBV
+         5bONQiBlvXoKNdB1bGOT7nqCdgss/m53Dl/xrs8rELj12q7xrPTXW8o4vrmenMufz2oY
+         VDrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727284307; x=1727889107;
+        d=1e100.net; s=20230601; t=1727284302; x=1727889102;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FXjwiUjPDmRUKmjejukivCx1FVXlutJ/frWtXF30WgI=;
-        b=ZQkXKNXwjVWHn07okOUq+Nbs1RGe1gf9sUr6h1a390eY0XoRkB+2gDbfHNAao4z6Ey
-         6I2GSZeBBftxC9Jgg9aORxxIlZ65XE2oeP2rT3aoeF3GBhe8D/TBTTzuwjXVia2RbYCJ
-         EafizR9DOK2beElXBqjGuDXU/ax0tQjcoNj7GaKZyVw8mp9FmObQWp4YXUftlCiVyCjI
-         E413NB7L+Aq0FXT+z1TuwCm29i+Fee5A/h6qSC/CYuY3DecGtFfQ2p8gW0qwA5EaI0Ki
-         USJSbrQJ0M7hCaLpqTr9czddn2PNKzcsu+CgS0N9C8rScBhp0rAOe5oYCTjJEkL6/l8d
-         fJnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGzuHhnupAo4ptE7JTi4jWseM6VtTPMCVrgLxeq8GLAJmxwyLLbXZNUraSpBnvMi5Zzus=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrhBBJ4IhykKn5SQec1T0aQ4cnETPc12NDUfvcsJ1sC60jo/2k
-	lyTEGaN2YxBCa918e9e0ywFLjVMXsG0Joaq8gM6b6TuMgmL1WIs+8y6GvjLxk1s=
-X-Google-Smtp-Source: AGHT+IHV6HV/eWaJfeffMpjzbiz3n6OhSG/OKMDSorPfnryDAPUV5GyUbaXuXJP53F/aVYvFjacx1g==
-X-Received: by 2002:a5d:6685:0:b0:374:c977:7453 with SMTP id ffacd0b85a97d-37cc24762e0mr2263987f8f.25.1727284307287;
-        Wed, 25 Sep 2024 10:11:47 -0700 (PDT)
+        bh=LfxPswSzpy5PJY7wIfJ4Znven71oBCSA3p2JUb9OqOg=;
+        b=ajI+U2hH62VX7GkJYg/VjXk4mEC5nv1JW0YbXXyrks3b+aD2f3Ha2PFKStFxaqdxVe
+         LjJprqa9B5afgqjZuJt3vWJmgLSoHdsN86YqU+6I5C4L2rXoBieBqsRUGsnM1jIpGVeC
+         Z6EK1uSX57nhSg7uyJsnXsBpJKunrCFCwuPe9Ct69VCB4HCU1iV3OFevXSlE+AbTV5m1
+         v3cnysj+9utGeFOOszi2UCd3RNsZMVr6B5F+VP32tYHF2p+hcSHmZV0kUsnc3fgmcDtt
+         Pt/wJ3+rFiXqJ91aSV5hwMXEs4FB7d0elHP77hwxKtcuE9C0aQjlQWGRyQbSovMlvbvg
+         Isaw==
+X-Forwarded-Encrypted: i=1; AJvYcCULjaxp9HJ9Bfn/CUFQZfcayP3IqF1/CvBw5BRomp2KsEFklx5vU2rTXPXqcuuFqTk1y1k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxsz7HD7wuLuMTiQ9QUBtGbD1pDOYdtkRa0hp8/LfraQiYeEMTk
+	tl8+sboITLIpHa5zYmZ90o6Cjl+hRXf9NrqXBcDvb3+0acRNNHR3UsR1+SlQOLE=
+X-Google-Smtp-Source: AGHT+IHV5SzRp2SHf6HbaLc2hBK/7UiOfq+WQLl5ES6CuTB3Awe3uqUh07rnjOOYTKUVx2htHojcQw==
+X-Received: by 2002:a05:600c:3b18:b0:426:5fe1:ec7a with SMTP id 5b1f17b1804b1-42e96242e81mr22084905e9.31.1727284301933;
+        Wed, 25 Sep 2024 10:11:41 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e90274aa0sm35547145e9.0.2024.09.25.10.11.41
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2a8a8fsm4443984f8f.15.2024.09.25.10.11.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 10:11:44 -0700 (PDT)
+        Wed, 25 Sep 2024 10:11:41 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 8619C5F92F;
+	by draig.lan (Postfix) with ESMTP id 9DF1C5F94F;
 	Wed, 25 Sep 2024 18:11:40 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -95,11 +95,10 @@ Cc: Zhao Liu <zhao1.liu@intel.com>,
 	Laurent Vivier <laurent@vivier.eu>,
 	Yanan Wang <wangyanan55@huawei.com>,
 	Thomas Huth <thuth@redhat.com>,
-	Beraldo Leal <bleal@redhat.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>
-Subject: [PATCH 02/10] tests/docker: Fix microblaze atomics
-Date: Wed, 25 Sep 2024 18:11:32 +0100
-Message-Id: <20240925171140.1307033-3-alex.bennee@linaro.org>
+	Beraldo Leal <bleal@redhat.com>
+Subject: [PATCH 03/10] tests/docker: add NOFETCH env variable for testing
+Date: Wed, 25 Sep 2024 18:11:33 +0100
+Message-Id: <20240925171140.1307033-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20240925171140.1307033-1-alex.bennee@linaro.org>
 References: <20240925171140.1307033-1-alex.bennee@linaro.org>
@@ -112,73 +111,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Ilya Leoshkevich <iii@linux.ibm.com>
+Testing non-auto built docker containers (i.e. custom built compilers)
+is a bit fiddly as you couldn't continue a build with a previously
+locally built container. While you can play games with REGISTRY its
+simpler to allow a NOFETCH that will go through the cached build
+process when you run the tests.
 
-GCC produces invalid code for microblaze atomics.
-
-The fix is unfortunately not upstream, so fetch it from an external
-location and apply it locally.
-
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
-Message-Id: <20240919152308.10440-1-iii@linux.ibm.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .../debian-microblaze-cross.d/build-toolchain.sh          | 8 ++++++++
- tests/docker/dockerfiles/debian-toolchain.docker          | 7 +++++++
- 2 files changed, 15 insertions(+)
+ tests/docker/Makefile.include | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/debian-microblaze-cross.d/build-toolchain.sh b/tests/docker/dockerfiles/debian-microblaze-cross.d/build-toolchain.sh
-index 23ec0aa9a7..c5cd0aa931 100755
---- a/tests/docker/dockerfiles/debian-microblaze-cross.d/build-toolchain.sh
-+++ b/tests/docker/dockerfiles/debian-microblaze-cross.d/build-toolchain.sh
-@@ -10,6 +10,8 @@ TOOLCHAIN_INSTALL=/usr/local
- TOOLCHAIN_BIN=${TOOLCHAIN_INSTALL}/bin
- CROSS_SYSROOT=${TOOLCHAIN_INSTALL}/$TARGET/sys-root
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 681feae744..fead7d3abe 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -92,10 +92,10 @@ endif
+ docker-image-alpine: NOUSER=1
  
-+GCC_PATCH0_URL=https://raw.githubusercontent.com/Xilinx/meta-xilinx/refs/tags/xlnx-rel-v2024.1/meta-microblaze/recipes-devtools/gcc/gcc-12/0009-Patch-microblaze-Fix-atomic-boolean-return-value.patch
-+
- export PATH=${TOOLCHAIN_BIN}:$PATH
- 
- #
-@@ -31,6 +33,12 @@ mv gcc-11.2.0 src-gcc
- mv musl-1.2.2 src-musl
- mv linux-5.10.70 src-linux
- 
-+#
-+# Patch gcc
-+#
-+
-+wget -O - ${GCC_PATCH0_URL} | patch -d src-gcc -p1
-+
- mkdir -p bld-hdr bld-binu bld-gcc bld-musl
- mkdir -p ${CROSS_SYSROOT}/usr/include
- 
-diff --git a/tests/docker/dockerfiles/debian-toolchain.docker b/tests/docker/dockerfiles/debian-toolchain.docker
-index 687a97fec4..ab4ce29533 100644
---- a/tests/docker/dockerfiles/debian-toolchain.docker
-+++ b/tests/docker/dockerfiles/debian-toolchain.docker
-@@ -10,6 +10,8 @@ FROM docker.io/library/debian:11-slim
- # ??? The build-dep isn't working, missing a number of
- # minimal build dependiencies, e.g. libmpc.
- 
-+RUN sed 's/^deb /deb-src /' </etc/apt/sources.list >/etc/apt/sources.list.d/deb-src.list
-+
- RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-@@ -33,6 +35,11 @@ RUN cd /root && ./build-toolchain.sh
- # and the build trees by restoring the original image,
- # then copying the built toolchain from stage 0.
- FROM docker.io/library/debian:11-slim
-+RUN apt update && \
-+    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
-+    DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --no-install-recommends \
-+        libmpc3
- COPY --from=0 /usr/local /usr/local
- # As a final step configure the user (if env is defined)
- ARG USER
+ debian-toolchain-run = \
+-	$(if $(NOCACHE), 						\
++	$(if $(NOCACHE)$(NOFETCH),					\
+ 		$(call quiet-command,					\
+ 			$(DOCKER_SCRIPT) build -t qemu/$1 -f $< 	\
+-			$(if $V,,--quiet) --no-cache 			\
++			$(if $V,,--quiet) $(if $(NOCACHE),--no-cache)	\
+ 			--registry $(DOCKER_REGISTRY) --extra-files	\
+ 			$(DOCKER_FILES_DIR)/$1.d/build-toolchain.sh,	\
+ 			"BUILD", $1),				        \
+@@ -177,6 +177,7 @@ docker:
+ 	@echo '    NETWORK=$$BACKEND     Enable virtual network interface with $$BACKEND.'
+ 	@echo '    NOUSER=1             Define to disable adding current user to containers passwd.'
+ 	@echo '    NOCACHE=1            Ignore cache when build images.'
++	@echo '    NOFETCH=1            Do not fetch from the registry.'
+ 	@echo '    EXECUTABLE=<path>    Include executable in image.'
+ 	@echo '    EXTRA_FILES="<path> [... <path>]"'
+ 	@echo '                         Include extra files in image.'
 -- 
 2.39.5
 
