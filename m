@@ -1,233 +1,457 @@
-Return-Path: <kvm+bounces-27461-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27462-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70520986399
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 17:32:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 092729863AE
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 17:35:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9221D1C253C5
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 15:32:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F585288428
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 15:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A746208D1;
-	Wed, 25 Sep 2024 15:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768741D5ABB;
+	Wed, 25 Sep 2024 15:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KO1Sq+U1"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iriWs/sX"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2053.outbound.protection.outlook.com [40.107.243.53])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EF11D5AA0
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 15:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727278088; cv=fail; b=KfU9CTYd0mAj2wpfP6YjpL53FR4HdS2h3TAebLy9s5TAnA+zgLrGr6JkqGhIVA0eqPIXokU0hqb3tVGuUkiu4MkzHBb9gY6d8l4APs7Qu0Ik3z1erAFTLeRP0L84kXKqhL5A394V+PZN0NTY05VOo9/fddIXmVUTD4QD1/FLMvY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727278088; c=relaxed/simple;
-	bh=Of2yiiUjOdN7xrtjlmYRpGiJEM/sy58I15JJQNmYoCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=L1kbBZERSelLumglZOYNtle9vmGFwiuqoFI/iU4Q3Vu/RDvmzObciAo27g/bgSrEDXZBqvXb2pxHs7GUR2ZgJFUXrDDJ8kRlxYV6b/e4EEcI3oFgl3x/YFBpo9QnL/+oSsJo5juh9BV/4DIi2zGimE6h/Ve95cVYFYWw85U7x9Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KO1Sq+U1; arc=fail smtp.client-ip=40.107.243.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NR/ZcCul3MgjQgl06GWfpZn0sO7oD/L27zPtCgf3kpdBtP3tmHZh4q3Cao7aZ4sDW31DOaTsDKJ9aqHYzBjvU/RnwcqXLTGKPjA0UYoUKNmgd0Fz0RI6V902n72A4aewpHxmhrf78Ur8Yf70dSgnA68xKobE25ziF5UYsu4C6wbtiSRIiq1J4gGapTe+4vDMF3u3yvY39dmKZoklv+vXe8zpuK5doCChVKsnQDIWuJv9gxeJenNhiIVuytlSXenQgT1QJQ7z6cw9BRhwyfmnFKcU8OrTUaegmk3cBP+gLBp+R58gPghMV250iJceHWwbZvEgB6goXpqGVYv/N9AU6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+qV4XbLTRNKVQo1ku3vtsETw9cksulhi3gC+CFh80wg=;
- b=UG62jprqLubBxafhDpW1tIn2ETHIOO+xaPM0y1B2mkutWPs+Zytn4iCronPqbZSVHqDrhY4Dx2KjGdOjsi5IPWG3Ud8jatpg5aLbql/CufUwBHZQNFCyjoM50+bKNKxIbpyOUqUgyMyL5J/QMl3yO9GK6rSDiVQ4XBsLYdiYVjmqB7f5i9EoSw3qUAmhbT9UqOr0wXW2TaXyFe20/jhPNXuSTG/Z4ghfzGcTysdsptRIPDH1rpSDAWiDTd5AgpZkCKtz5BTHjEHoADo8g6uIi4hgEd8CYICfJTfl4J9M+J0SMS4l4qTpV8o6UlK8NGukTzHxg1BlrJd5xY/7fBwNzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+qV4XbLTRNKVQo1ku3vtsETw9cksulhi3gC+CFh80wg=;
- b=KO1Sq+U1tcEFREMcqujyzGAeW2qE/Ie8dnieFzgjCflbxqy53zy1vbJc2PgjwCn/OmR4CrhnupL6nbSR/r9iupnyUBTOXdIOycoz9YA0kyUafB3t0x28J6n0oBJKOMrtxNZknDzkvea4qeTVsrTpXDpVKRYCPT558gIFPKZ4OQJSZQEmmhYyE2o8Ux5NDUgPqzg3UvsjmzqBZ7h9wy8XBvMbCurBguGD8t1qOS+V8Et2SMULh2qKrOyWiF0bCb2XeWdMA4iDbmZGMsPbyN13XBtUKp4aC1SiqKOK71SO16wbfymcmg36pqanZT6FTyla//dNr2EnUu3Jq7yUSyQRjg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by DS0PR12MB7873.namprd12.prod.outlook.com (2603:10b6:8:142::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.27; Wed, 25 Sep
- 2024 15:28:01 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.7982.022; Wed, 25 Sep 2024
- 15:28:01 +0000
-Date: Wed, 25 Sep 2024 12:28:00 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Dave Airlie <airlied@gmail.com>
-Cc: Danilo Krummrich <dakr@kernel.org>, Zhi Wang <zhiw@nvidia.com>,
-	kvm@vger.kernel.org, nouveau@lists.freedesktop.org,
-	alex.williamson@redhat.com, kevin.tian@intel.com, daniel@ffwll.ch,
-	acurrid@nvidia.com, cjia@nvidia.com, smitra@nvidia.com,
-	ankita@nvidia.com, aniketa@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, zhiwang@kernel.org
-Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
-Message-ID: <20240925152800.GT9417@nvidia.com>
-References: <20240922124951.1946072-1-zhiw@nvidia.com>
- <ZvErg51xH32b8iW6@pollux>
- <20240923150140.GB9417@nvidia.com>
- <ZvHwzzp2F71W8TAs@pollux.localdomain>
- <20240924164151.GJ9417@nvidia.com>
- <ZvMZisyZFO888N0E@cassiopeiae>
- <20240925005319.GP9417@nvidia.com>
- <CAPM=9txix6tO7B+kRtsNXSVPfLGU4vbfga=pt9yqmszecuEbyw@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPM=9txix6tO7B+kRtsNXSVPfLGU4vbfga=pt9yqmszecuEbyw@mail.gmail.com>
-X-ClientProxiedBy: BN9P221CA0014.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:408:10a::19) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D53A79C4;
+	Wed, 25 Sep 2024 15:35:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727278504; cv=none; b=nrYm9bmXQ29l4W2y5JIfFJDb9b8IcTfwERZOs4vHyHh0SFrP3vtfSgpaMim/Ju2uLzDoaPTsXRRfyv3M06lpKXcUoLhTfKeSjyQ0evuSj+ha4rq/DtlxqKlWow9SsinnBM67z/v6YdK48MZV/zbdfhEBzigTNGU4Ljo+lJ6T2sI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727278504; c=relaxed/simple;
+	bh=z3q3GjFVywwq2ocN5TULCG0CsJuBNiZ6jZaDuxNjFXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WSoiFeYwk/t7tVgu8td45iGz7LTQv4UNltwODfMqFp3HgDxflHBWRVfJUlHuBwYfPrDN3sDjtuKAiR1ih40GTkrrJ7ayqukv4SE9176Ysua7E0ricwmWh4Rb2G3Uxc910KQ/YaPhi77EFxL7wBr9iWpn/FKk051FhXKeOdKXjZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iriWs/sX; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48PEuQPi020947;
+	Wed, 25 Sep 2024 15:35:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	JQNLR8XETTwARjCB7ac+l9z5NKznlVAK54UpeHtbTPw=; b=iriWs/sXrtrMUEtk
+	5TiNZ2OltMxhvebNXozBbIh1HfT3CVHmja0v0b7kIOPOyUox9pHq9eMcKPl5oRZ2
+	Rn+rhcwf5vWaUlFqsbebD3k30n/fWiph6oFnrOvDyHMp9eslCeG33e6orVukrGAr
+	D3DHF36hcQqjeqPIBrJtJiBMhDpYSxlwgmluv7QZptSGE0mdQrHDCyjIBmRGrMWr
+	lHyF/M/rwSokSuL2l0HAExQkPR3D0v++/+yvme4HeBkovrU+ulPKf1vLSGlEujh8
+	ApV8PMTI3ot4/4DZisPs+lzGaOtctR1mXWDXDg/ldT9hjNG3a94hIJRMEXf0yUVN
+	J4sH2A==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snvb910m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 15:35:00 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48PFYxrh004080;
+	Wed, 25 Sep 2024 15:34:59 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snvb910h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 15:34:59 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48PCu9LF012541;
+	Wed, 25 Sep 2024 15:34:58 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41t9fq2cgx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 15:34:58 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48PFYsD043450788
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 25 Sep 2024 15:34:54 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 70A1320043;
+	Wed, 25 Sep 2024 15:34:54 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4597C20040;
+	Wed, 25 Sep 2024 15:34:54 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 25 Sep 2024 15:34:54 +0000 (GMT)
+Date: Wed, 25 Sep 2024 17:34:52 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nico Boehr <nrb@linux.ibm.com>
+Cc: frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v2 1/2] s390x: add test for diag258
+Message-ID: <20240925173452.5781864f@p-imbrenda.boeblingen.de.ibm.com>
+In-Reply-To: <20240923062820.319308-2-nrb@linux.ibm.com>
+References: <20240923062820.319308-1-nrb@linux.ibm.com>
+	<20240923062820.319308-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DS0PR12MB7873:EE_
-X-MS-Office365-Filtering-Correlation-Id: d0e8a5fa-5b79-4c0c-5888-08dcdd76a407
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kQSzRX7nJaq8jHBo9TjE06gJqd8OS/Ka3ul+s3HsTBnb58sWcQHm3fp9dBhz?=
- =?us-ascii?Q?C9xr4RMy2Gbvvmn80U5gv3svZzJ6DC6PNzephQR165FcuJ7QVa6wmCRBvXFA?=
- =?us-ascii?Q?TN3ZcODawXrBBXrsykfP+uivz0O3QawHZ46xZ1k02Ge3PavPP3xvZf/3Z1DE?=
- =?us-ascii?Q?bmj5PP5nsi2TNrIX4pX8OTwBV55DPskTfvAm96GTRUCzSHZxKEvtvTCF2/lH?=
- =?us-ascii?Q?upw+ueD77Vhqmyq2sGU3dOx2W7xjS0VZb/doFit+s3a+Ys3HXfmWIGhKParR?=
- =?us-ascii?Q?QvlrU92YGcPAmmwX1HLYIn9pBtN4bzDmxtn2zsZ1+8tWMj4vU6uepuCrFeuF?=
- =?us-ascii?Q?DoifYVmR1OpXYIFOA1x2R6QfVz3gFfrKnrt1CbaiQC6zhcUQM9mChXsGnule?=
- =?us-ascii?Q?csWcZaX72H2YbGFPcUsaGoHwGkS4QKnUWGMX8vN+W9wayPdgKKI1XahODNel?=
- =?us-ascii?Q?s99UhcgPzC5Rb/7tRLxgD/TeqZUnfI3iRxkUEH9ntkhIF1yaDX7Aa8rX4sNI?=
- =?us-ascii?Q?m8/QKOBwILY7638U9VOOS8hwjMXZjwGLwisJgelrJZegYguIZhne0r0ThiR5?=
- =?us-ascii?Q?r7o3LMx82qx/SyylN0BP9/cCdM5PbXtY0ACxDpW0w4AmdiZkmlqOxgKUHYKy?=
- =?us-ascii?Q?vsMVfKJjs96aUaTs9DSMANrPkXc6xD3KwJK+5pXPc3H3m/Lvude2ZxwxWEIX?=
- =?us-ascii?Q?0Mj+iH2RMr99OunSprneZA/9otfyYnRdnEj1vku6cU1kHCHjC9eLbmWK0Tnm?=
- =?us-ascii?Q?BADFvuJ/dglJnHXtO8U0dcW2w27rdzYOn1UItnT1xnc4fyn41osFp7uLZJLa?=
- =?us-ascii?Q?exbkIQIQzsNwSHA2APILJGNQ6hd08tDqLQNVhJQTliwwUl/tEGbmD3w2jfWd?=
- =?us-ascii?Q?1Dshvv7zMRdN739REa4SlASrQSr1YC/b/0MYzzejF26nq6/1SlSutJ4BfP3m?=
- =?us-ascii?Q?qxIXAvk7WDxisLsAXPsD0q2xuaHMKohAQYF7+sOXiPg1jmHkDIKvjdudB+hj?=
- =?us-ascii?Q?mxCA313JJQIcoNs5Ty4v+bft33hy29K3EWJhoDqTSocqvqmaMkYafQaZJ9RI?=
- =?us-ascii?Q?HYz/zJmSV+r/cHCj24WJ47tTy+QP6NbydoSWuswhMmjAjlZtmJRjKbQDDe9t?=
- =?us-ascii?Q?fx46msZJKjcx2hyDUGd5b31G/cIEekKnWGKEDQGpVJFMrYaukOEIeddPdR2P?=
- =?us-ascii?Q?peBi3EjaQsL3gOU7Ld57zTJjwcRtpeMLxZn8TLpiUELi4UetKq+AGoEq6NS9?=
- =?us-ascii?Q?UUTItP+LWBf78e681LK+JUzzJSFS+4KnvpfVTCsijQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rB2O1yuzXKI8oLXqXBO+uMKliVxefbacM3OVpiVtdSJ37g3aRnHAYtpgAOFa?=
- =?us-ascii?Q?Yp3TW0h61hMDVV5mFAzvgLo24eg1SPfQOE4IVW8sbeF1iQAbBPRQPz2RPLJG?=
- =?us-ascii?Q?N/VM3xv1+RXEMt1fOUlBHK0aUhnoJ5KH/471s4WNkuItX0fh9/OfSaWlVFIx?=
- =?us-ascii?Q?JxTFXQAprMI1JC8bZy1aTR1ozpRYu4OwkG7Gaj1ec9lfszDASynbuwANx6lF?=
- =?us-ascii?Q?4HJ36ngaLcTdrXVDFM62cGONvmJR5Wi3O+Jp6ESh+jbgpm53E2v9vIkgTwKu?=
- =?us-ascii?Q?GIIJ1Tm9DcBee3FfLmdGPIJFB9M8j7Y2CMep6OzIF2rmkeGiC74beEg7XJoN?=
- =?us-ascii?Q?BdU4hIBxDelVmpAn4FGTa9vi/GTsJ3+13hXxIfKJ/umzK2bb1btsfYJ4E/5f?=
- =?us-ascii?Q?T6Ns8CHe2sCa25tDGR9SPyOsdqNpCRCAGZfvB1wckAbbJ5c0QMb6+JFbkC2S?=
- =?us-ascii?Q?+OpRjeZuSzQMV6JzR+T0YzflOdyOVE5HoQTjvlco7qyGNB2c/9RYUU+JxcO1?=
- =?us-ascii?Q?PWCysCLd0jyFFTtFJjPNTEpAsHjgOdNPrahM/nn6yU/EehfK3ou5G7lMMA14?=
- =?us-ascii?Q?Woq8L4PoJ+eCiD22wxQL8p7NUqXYyrmLb3P9wKokqYN3afZMTSJeRU5q1uHi?=
- =?us-ascii?Q?Izz6nWufXs5RYixoDmFpTSHG7yZM/ftSYmMj5yX1s8wP4hP/QE9QRf6u7mBa?=
- =?us-ascii?Q?QplZEmPa0SxuYf1UovreVq/zP/U24MgGfwxLFs78r5hgfZsQF/HUKYFvWTw/?=
- =?us-ascii?Q?3AS2QvisMmoDYH2KzqXMunsFUNJHrPK72NHs7vv+svTxmH22OSjqETYY0ZaV?=
- =?us-ascii?Q?ux5ofrL7c+2yKivbx2ylZqlX6o+RlppIYHJpl5bxjSEvhjiAGiQwCd9dxU/9?=
- =?us-ascii?Q?u5M1FNaYs8Zy2IWIJi2IOQBCIlvj0YSDjMLdmUE8P/1u1OOor8pkUECQhNKX?=
- =?us-ascii?Q?/ZuVCBHxiJz+rAtrwrVPYZdObb9W1aKpVO6lF/5G0YEBM/iZ7XA66VT2ytcc?=
- =?us-ascii?Q?3eMFdlrP7gaWgjBIqqdIEyCf21IWufTZtrwCerwcv5Y3zzpvV9ITEKni+6gE?=
- =?us-ascii?Q?HD17lqTf3EATIWeHLhFXOare3PMNAaWckDH9oxBpobYLFn+9l7Z4BCIs2nim?=
- =?us-ascii?Q?7hC/8bPuFce5UVRx7xT1TnS6Zy2rckmJbEOPwFAg2mb2ZauC8VPcnuVpJrUn?=
- =?us-ascii?Q?PRvr+GxDaBrRw8A2F4OnR2u/8wYYft+++94M3feMly0A57Tj28TSa97QgvoB?=
- =?us-ascii?Q?vyRKYaUKb+YXGN14ePKp8+s37g4/7mY6EVSDV2uuBvo4ACugCKdwvD4xUTGR?=
- =?us-ascii?Q?BUPmIzFTjcZ67GTdWJWLG8+f5ljdsYGNgqEV1YKhZtzOorx4nDIkKiJpoA6i?=
- =?us-ascii?Q?39D9nBVWR4l0WHLe1Z0JGUxxMlNklM0BYxmwDAaABjBa1bkS/NKKiKsfvd2N?=
- =?us-ascii?Q?eMGS+VTtP2wD+rSVEdGUpHY89bvTvu5upyGzGNMx5mZHRDl4QqYzPZUthqev?=
- =?us-ascii?Q?GQ+8LRpz0nAOIk9qQKB63kzagk28Gl1GIRWPNCT9HDxly0ZmVrp+5TbyzRIO?=
- =?us-ascii?Q?OPPzhSNxjNWtSpW5lJg=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0e8a5fa-5b79-4c0c-5888-08dcdd76a407
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2024 15:28:00.9267
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sweOTu5S2LpccBmFazGIrEiyhlCW/k867uFHSYYbedttnsCLN+cW6knegQ68Lrv6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7873
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: B0DBGuMphd6pnKPfQp58xaPgKjkSu73m
+X-Proofpoint-GUID: hMOLP1tWvvURQdJaKe4fiiNvwLaLN1hm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-25_10,2024-09-25_02,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 clxscore=1015 spamscore=0 mlxscore=0
+ adultscore=0 impostorscore=0 bulkscore=0 malwarescore=0 suspectscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409250111
 
-On Wed, Sep 25, 2024 at 11:08:40AM +1000, Dave Airlie wrote:
-> On Wed, 25 Sept 2024 at 10:53, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >
-> > On Tue, Sep 24, 2024 at 09:56:58PM +0200, Danilo Krummrich wrote:
-> >
-> > > Currently - and please correct me if I'm wrong - you make it sound to me as if
-> > > you're not willing to respect the decisions that have been taken by Nouveau and
-> > > DRM maintainers.
-> >
-> > I've never said anything about your work, go do Nova, have fun.
-> >
-> > I'm just not agreeing to being forced into taking Rust dependencies in
-> > VFIO because Nova is participating in the Rust Experiment.
-> >
-> > I think the reasonable answer is to accept some code duplication, or
-> > try to consolidate around a small C core. I understad this is
-> > different than you may have planned so far for Nova, but all projects
-> > are subject to community feedback, especially when faced with new
-> > requirements.
-> >
-> > I think this discussion is getting a little overheated, there is lots
-> > of space here for everyone to do their things. Let's not get too
-> > excited.
+On Mon, 23 Sep 2024 08:26:03 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> This adds a test for diag258 (page ref service/async page fault).
 > 
-> How do you intend to solve the stable ABI problem caused by the GSP firmware?
+> There recently was a virtual-real address confusion bug, so we should
+> test:
+> - diag258 parameter Rx is a real adress
+> - crossing the end of RAM with the parameter list yields an addressing
+>   exception
+> - invalid diagcode in the parameter block yields an specification
+>   exception
+> - diag258 correctly applies prefixing.
 > 
-> If you haven't got an answer to that, that is reasonable, you can talk
-> about VFIO and DRM and who is in charge all you like, but it doesn't
-> matter.
+> Note that we're just testing error cases as of now.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>  s390x/Makefile      |   1 +
+>  s390x/diag258.c     | 258 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |   3 +
+>  3 files changed, 262 insertions(+)
+>  create mode 100644 s390x/diag258.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 23342bd64f44..66d71351caab 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -44,6 +44,7 @@ tests += $(TEST_DIR)/exittime.elf
+>  tests += $(TEST_DIR)/ex.elf
+>  tests += $(TEST_DIR)/topology.elf
+>  tests += $(TEST_DIR)/sie-dat.elf
+> +tests += $(TEST_DIR)/diag258.elf
+>  
+>  pv-tests += $(TEST_DIR)/pv-diags.elf
+>  pv-tests += $(TEST_DIR)/pv-icptcode.elf
+> diff --git a/s390x/diag258.c b/s390x/diag258.c
+> new file mode 100644
+> index 000000000000..5337534f60d1
+> --- /dev/null
+> +++ b/s390x/diag258.c
+> @@ -0,0 +1,258 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Diag 258: Async Page Fault Handler
+> + *
+> + * Copyright (c) 2024 IBM Corp
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <asm-generic/barrier.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/mem.h>
+> +#include <asm/pgtable.h>
+> +#include <mmu.h>
+> +#include <sclp.h>
+> +#include <vmalloc.h>
+> +
+> +static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
 
-I suggest the same answer everyone else building HW in the kernel
-operates under. You get to update your driver with your new HW once
-per generation.
+wait, you are using LC_SIZE in this file... even though it's only
+defined in the next patch.
 
-Not once per FW release, once per generation. That is a similar level
-of burden to maintain as most drivers. It is not as good as the
-excellence Mellanox does (no SW change for a new HW generation), but
-it is still good.
+I think you should swap patch 1 and 2
 
-I would apply this logic to Nova as well, no reason to be supporting
-random ABI changes coming out every month(s).
+> +
+> +#define __PF_RES_FIELD 0x8000000000000000UL
+> +
+> +/* copied from Linux arch/s390/mm/pfault.c */
+> +struct pfault_refbk {
+> +	u16 refdiagc;
+> +	u16 reffcode;
+> +	u16 refdwlen;
+> +	u16 refversn;
+> +	u64 refgaddr;
+> +	u64 refselmk;
+> +	u64 refcmpmk;
+> +	u64 reserved;
+> +};
+> +
+> +uint64_t pfault_token = 0x0123fadec0fe3210UL;
+> +
+> +static struct pfault_refbk pfault_init_refbk __attribute__((aligned(8))) = {
+> +	.refdiagc = 0x258,
+> +	.reffcode = 0, /* TOKEN */
+> +	.refdwlen = sizeof(struct pfault_refbk) / sizeof(uint64_t),
+> +	.refversn = 2,
+> +	.refgaddr = (u64)&pfault_token,
+> +	.refselmk = 1UL << 48,
+> +	.refcmpmk = 1UL << 48,
+> +	.reserved = __PF_RES_FIELD
+> +};
+> +
+> +static struct pfault_refbk pfault_cancel_refbk __attribute((aligned(8))) = {
+> +	.refdiagc = 0x258,
+> +	.reffcode = 1, /* CANCEL */
+> +	.refdwlen = sizeof(struct pfault_refbk) / sizeof(uint64_t),
+> +	.refversn = 2,
+> +	.refgaddr = 0,
+> +	.refselmk = 0,
+> +	.refcmpmk = 0,
+> +	.reserved = 0
+> +};
+> +
+> +static inline int diag258(struct pfault_refbk *refbk)
+> +{
+> +	int rc = -1;
+> +
+> +	asm volatile(
+> +		"	diag	%[refbk],%[rc],0x258\n"
+> +		: [rc] "+d" (rc)
+> +		: [refbk] "a" (refbk), "m" (*(refbk))
+> +		: "cc");
+> +	return rc;
+> +}
+> +
+> +static void test_priv(void)
+> +{
+> +	report_prefix_push("privileged");
+> +	expect_pgm_int();
+> +	enter_pstate();
+> +	diag258(&pfault_init_refbk);
+> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void* page_map_outside_real_space(phys_addr_t page_real)
+> +{
+> +	pgd_t *root = (pgd_t *)(stctg(1) & PAGE_MASK);
+> +	void* vaddr = alloc_vpage();
+> +
+> +	install_page(root, page_real, vaddr);
+> +
+> +	return vaddr;
+> +}
+> +
+> +/*
+> + * Verify that the refbk pointer is a real address and not a virtual
+> + * address. This is tested by enabling DAT and establishing a mapping
+> + * for the refbk that is outside of the bounds of our (guest-)physical
 
-> Fundamentally the problem is the unstable API exposure isn't something
-> you can build a castle on top of, the nova idea is to use rust to
-> solve a fundamental problem with the NVIDIA driver design process
-> forces on us (vfio included), 
+s/physical/real/ (or absolute)
 
-I firmly believe you can't solve a stable ABI problem with language
-features in an OS. The ABI is totally unstable, it will change
-semantically, the order and nature of functions you need will
-change. New HW will need new behaviors and semantics.
+> + * address space.
+> + */
+> +static void test_refbk_real(void)
+> +{
+> +	pgd_t *root;
+> +	struct pfault_refbk *refbk;
+> +	void *refbk_page;
 
-Language support can certainly handle the mindless churn that ideally
-shouldn't even be happening in the first place.
+please reverse Christmas tree
 
-The way you solve this is at the root, in the FW. Don't churn
-everything. I'm a big believer and supporter of the Mellanox
-super-stable approach that has really proven how valuable this concept
-is to everyone.
+> +
+> +	report_prefix_push("refbk is real");
+> +
+> +	/* Set up virtual memory and allocate a physical page for storing the refbk */
+> +	setup_vm();
+> +	refbk_page = alloc_page();
+> +
+> +	/* Map refblk page outside of physical memory identity mapping */
+> +	root = (pgd_t *)(stctg(1) & PAGE_MASK);
+> +	refbk = page_map_outside_real_space(virt_to_pte_phys(root, refbk_page));
+> +
+> +	/* Assert the mapping really is outside identity mapping */
+> +	report_info("refbk is at 0x%lx", (u64)refbk);
+> +	report_info("ram size is 0x%lx", get_ram_size());
+> +	assert((u64)refbk > get_ram_size());
+> +
+> +	/* Copy the init refbk to the page */
+> +	memcpy(refbk, &pfault_init_refbk, sizeof(struct pfault_refbk));
+> +
+> +	/* Protect the virtual mapping to avoid diag258 actually doing something */
+> +	protect_page(refbk, PAGE_ENTRY_I);
+> +
+> +	expect_pgm_int();
+> +	diag258(refbk);
+> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+> +	report_prefix_pop();
+> +
+> +	free_page(refbk_page);
+> +	disable_dat();
+> +	irq_set_dat_mode(false, 0);
+> +}
+> +
+> +/*
+> + * Verify diag258 correctly applies prefixing.
+> + */
+> +static void test_refbk_prefixing(void)
+> +{
+> +	uint64_t ry;
+> +	uint32_t old_prefix;
+> +	struct pfault_refbk *refbk_in_prefix, *refbk_in_reverse_prefix;
+> +	const size_t lowcore_offset_for_refbk = offsetof(struct lowcore, pad_0x03a0);
 
-So I agree with you, the extreme unstableness is not OK in upstream,
-it needs to slow down a lot to be acceptable. I don't necessarily
-agree to Mellanox like gold standard as the bar, but certainly must be
-way better than it is now.
+reverse Christmas tree here too
 
-FWIW when I discussed the VFIO patches I was given some impression
-there would not be high levels of ABI churn on the VFIO side, and that
-there was awareness and understanding of this issue on Zhi's side.
+> +
+> +	report_prefix_push("refbk prefixing");
+> +
+> +	report_info("refbk at lowcore offset 0x%lx", lowcore_offset_for_refbk);
+> +
+> +	assert((unsigned long)&prefix_buf < SZ_2G);
+> +
+> +	memcpy(prefix_buf, 0, LC_SIZE);
+> +
+> +	/*
+> +	 * After the call to set_prefix() below, this will refer to absolute
+> +	 * address lowcore_offset_for_refbk (reverse prefixing).
+> +	 */
+> +	refbk_in_reverse_prefix = (struct pfault_refbk *)(&prefix_buf[0] + lowcore_offset_for_refbk);
+> +
+> +	/*
+> +	 * After the call to set_prefix() below, this will refer to absolute
+> +	 * address &prefix_buf[0] + lowcore_offset_for_refbk (forward prefixing).
+> +	 */
+> +	refbk_in_prefix = (struct pfault_refbk *)OPAQUE_PTR(lowcore_offset_for_refbk);
+> +
+> +	old_prefix = get_prefix();
+> +	set_prefix((uint32_t)(uintptr_t)prefix_buf);
+> +
+> +	/*
+> +	 * If diag258 would not be applying prefixing on access to
+> +	 * refbk_in_reverse_prefix correctly, it would access absolute address
+> +	 * refbk_in_reverse_prefix (which to us is accessible at real address
+> +	 * refbk_in_prefix).
+> +	 * Make sure it really fails by putting invalid function code
+> +	 * at refbk_in_prefix.
+> +	 */
+> +	refbk_in_prefix->refdiagc = 0xc0fe;
+> +
+> +	/*
+> +	 * Put a valid refbk at refbk_in_reverse_prefix.
+> +	 */
+> +	memcpy(refbk_in_reverse_prefix, &pfault_init_refbk, sizeof(pfault_init_refbk));
+> +
+> +	ry = diag258(refbk_in_reverse_prefix);
+> +	report(!ry, "real address refbk accessed");
+> +
+> +	/*
+> +	 * Activating should have worked. Cancel the activation and expect
+> +	 * return 0. If activation would not have worked, this should return with
+> +	 * 4 (pfault handshaking not active).
+> +	 */
+> +	ry = diag258(&pfault_cancel_refbk);
+> +	report(!ry, "handshaking canceled");
+> +
+> +	set_prefix(old_prefix);
+> +
+> +	report_prefix_pop();
+> +}
 
-Jason
+it seems like you are only testing the first page of lowcore; can you
+expand the test to also test the second page?
+
+> +
+> +/*
+> + * Verify that a refbk exceeding physical memory is not accepted, even
+> + * when crossing a frame boundary.
+> + */
+> +static void test_refbk_crossing(void)
+> +{
+> +	const size_t bytes_in_last_page = 8;
+
+are there any alignment requirements for the buffer?
+if so, that should also be tested (either that a fault is triggered or
+that the lowest bytes are ignored, depending on how it is defined to
+work)
+
+> +	struct pfault_refbk *refbk = (struct pfault_refbk *)(get_ram_size() - bytes_in_last_page);
+> +
+> +	report_prefix_push("refbk crossing");
+> +
+> +	report_info("refbk is at 0x%lx", (u64)refbk);
+> +	report_info("ram size is 0x%lx", get_ram_size());
+> +	assert(sizeof(struct pfault_refbk) > bytes_in_last_page);
+> +
+> +	/* Copy bytes_in_last_page bytes of the init refbk to the page */
+> +	memcpy(refbk, &pfault_init_refbk, bytes_in_last_page);
+> +
+> +	expect_pgm_int();
+> +	diag258(refbk);
+> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+> +	report_prefix_pop();
+> +}
+> +
+> +/*
+> + * Verify that a refbk with an invalid refdiagc is not accepted.
+> + */
+> +static void test_refbk_invalid_diagcode(void)
+> +{
+> +	struct pfault_refbk refbk = pfault_init_refbk;
+> +
+> +	report_prefix_push("invalid refdiagc");
+> +	refbk.refdiagc = 0xc0fe;
+
+other testcases in this file depend on invalid codes failing; maybe
+move this test up?
+
+> +
+> +	expect_pgm_int();
+> +	diag258(&refbk);
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("diag258");
+> +
+> +	expect_pgm_int();
+> +	diag258(&pfault_init_refbk);
+> +	if (clear_pgm_int() == PGM_INT_CODE_SPECIFICATION) {
+> +		report_skip("diag258 not supported");
+> +	} else {
+> +		test_priv();
+> +		test_refbk_real();
+
+should probably go here....
+
+> +		test_refbk_prefixing();
+> +		test_refbk_crossing();
+> +		test_refbk_invalid_diagcode();
+
+.... this one ^
+
+> +	}
+> +
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 3a9decc932f2..8131ba105d3f 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -392,3 +392,6 @@ file = sie-dat.elf
+>  
+>  [pv-attest]
+>  file = pv-attest.elf
+> +
+> +[diag258]
+> +file = diag258.elf
+
 
