@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-27481-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27477-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67B9D986562
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 19:12:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2808E98655E
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 19:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25729289B71
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 17:12:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 585D21C24C04
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 17:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F4A13CA9C;
-	Wed, 25 Sep 2024 17:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1693C13A863;
+	Wed, 25 Sep 2024 17:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JYwKNOCS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CU+Ciedv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2729B13B5AF
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 17:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E2885628
+	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 17:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727284314; cv=none; b=lvDYpU5K95z04ICJeIdQ56O4dBGqYIBRNavj4gAFKYRlB29JjMAJMUIAseXmCe0S3k358sDsrAuUrfirTY5kMmo+VCgirhMtBqwuONQlyYxgp1JVe5fVz/N/Elwov0+1J/oXUtQGWBAhMXU7wdkz4YHIg2SMRCZFX2knz+cyg0o=
+	t=1727284311; cv=none; b=AWkKWY1XTg6XZwjWXsSc+8heX+mE89LivwL9j3X4g7l4FUf/FZ7NiGSzDvDtIGFIL+5XNvXDZwWiu3o+VrgYb/ooCDkxvwpvypNwdeMOcaxeP9H1Sjc6UpCPAPxAUUF+WBCbgQdUn3Tl7spoKlL7EWCIS7NzP6eAc+cehSGF7ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727284314; c=relaxed/simple;
-	bh=rPqdeMZHjsIWZRK4nVVQap0ga9cDd7eG9O38cGJ5E8o=;
+	s=arc-20240116; t=1727284311; c=relaxed/simple;
+	bh=lOeioTiHb1xpwW5Cln9C3vr+QU6UmszUoUpZcKnkq+k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=My97xwci0O0r9nmGNxGXiOfql0G0QiaeveTOndGPL9PC2cdI2omAQwwfmfasObEhl7CS8bdJC7416CxwcoyM7TFFkoDX8BKl9YqVMJK1hzcaAu7rjw0XuNFtok5pUqBeLIuQWYLUFksqNHGE1rOlU6t/1sG39BpZ6F7e5KiPcpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JYwKNOCS; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version:Content-Type; b=abnFsgMZorJdBMZn5pDcrJZcAiNodkKlwyaL+1n1+Lmob+WvpoIn9XP02EXmDMLE4g+UInsL04OClpAl+qaiA6UXrnAX450mcXtqvtG4qCaFn3Ce2tYD7DuGKPL+ehj64HFxFFAJTopekkMIfRMhgI4vIGYJXQss3TkayER08RY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CU+Ciedv; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-42cbe624c59so137725e9.3
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 10:11:52 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42cb1e623d1so349245e9.0
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 10:11:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1727284311; x=1727889111; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1727284308; x=1727889108; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iZZo1oPZPqzjBeoixQ7wpptFRyTvJhgIff9wczeHXgQ=;
-        b=JYwKNOCSqjfhEutUz0FnhXlUBEElYxDIpTT/qGJfF2pWQsGT0rOZiiS7dMgbtOZ5Qn
-         v/rrkTabiITvodbTzYccFzZce9m5izkq3iVm5oQ6jNYzZl0CwLVmhzgCiNSaaOkcUGPF
-         Gi/UpU3LLgG2rz4uUvI+T5hdGRlW5qavGmxbHw23DAJ5tjejuvVVvV8QP+tOmQZ32IYM
-         AmJ8kwLk8d6GhV5QvjlyoJfnb5ZkDv9OKuZEU9kAyv/XAqao1bO3c79ObROSTFjp9Atj
-         lisFrFmB0Y9B+99vJ/DskF+zDXhM0PCISDEI5nMzOWvQkwmL8s9/m28cw/JUAfHOoQb7
-         Cw8g==
+        bh=oPetPS+iPOZ9YsbRPGkth2UTt050VfI/4VOs20g6hTI=;
+        b=CU+Ciedvv+lsH5zaV5GhPVx2PMvID12wdv1UQpCKcBvDzIMrHic2Q9T60amYWCIJJm
+         LE7w2eivTqcvUARoarfg2UW5l1LsKQb0AIS95ZYEAsd1v4r2+KhIzY5C1oz1uvo0OO2f
+         St95hKta9fWasj3Clhf7Rjj9sEnO/V+iiIPLLPuEHrDbIrF3eZYemgpG5dQdOLpeLuje
+         YUZ2TNxH4+RU6Ybnb4mjchW/4u50CZ+SbL5V2lzdpFA0pES2WZ60vyw/F4m9tEmnl/As
+         ti2USiUPWa6hcdtXLCNzQW5K/AinAhoIMAIaM0pc8jLT2BR6Beffl168dNFfT8XGcitc
+         XQbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727284311; x=1727889111;
+        d=1e100.net; s=20230601; t=1727284308; x=1727889108;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iZZo1oPZPqzjBeoixQ7wpptFRyTvJhgIff9wczeHXgQ=;
-        b=K88LzDdcO3fOhkB0/52/1Y4exEh+Rq+jffoSHDMWCK5AJYcj7lqq2W4z7XexEChWNg
-         XCHwBZE8nO0pr4zxx9gWFTtALfKkk/oBjFLeYLMJq13rcUGzWSHE+16TC+vjWDRE08eT
-         AXazsMvQ/D/4qW67O4KmAsI0uVdGGHRjxz6yzOHu24Ls0f9Uxu52DUHaqWG0ceU2QODw
-         2Mor+ZpQLXekgi9Ydoz74MMf7r/ddcr5xEswrQZ4cu/JZ8jEZHAqs4wsgSiFQQwXFLFV
-         V12yyeOgzhathB9errNIlc0KtWK9YRtN4cIEL7NUAc6W6jJlIvqcezereuuw7ImOsYJ3
-         4u2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVSJpMpQby7/8Z3YzfXLr69bXoaQ0ObjE8p4fYhFbsRJl4LyGM//A0rEhkpJpkVYSCa8fM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykfDejG17qp8Efod8lJF19MudzOW/G5fnO2nAeVBl57lD290nh
-	DTYcwo4oTUzg3725NPCQ3ZG8IbyB1CM1bkZLa931kumKuhkMyQht7gmK9tLPRLo=
-X-Google-Smtp-Source: AGHT+IFF+UGt9GzWgAvvLZ7Qs1yQKbnDMQ6FQT6ids8iYDWVRm/vi2jxBGcUDOaNTjhDnY7/U8c6BQ==
-X-Received: by 2002:a05:600c:468b:b0:42c:c401:6d8b with SMTP id 5b1f17b1804b1-42e96103b5emr22700045e9.7.1727284311162;
-        Wed, 25 Sep 2024 10:11:51 -0700 (PDT)
+        bh=oPetPS+iPOZ9YsbRPGkth2UTt050VfI/4VOs20g6hTI=;
+        b=RpyItbcFuit59Y3uUW2fZcvnEoXraAqYLXRSOTQJGXaokauUWxS/lxgKdHFUWrZ8ZN
+         g8sraCHB9BErN2AwliFJV8AmMISksFyH4c2McuGbe53XnjjTTxNVVx4WPv+HZj6bVNXP
+         kWWC48N3KvlCWm9HX72IO9PBairEiSzotFYTgNMgUjFlbTJAkyWYOwaiMjAljHDViPDt
+         PFOwwhMZbZnZqfVS+gLmJAHFPnE9h9SWXxnfo/wrUzLXwtg/4F40PejwlNTa0d8XXsF8
+         Fpq3ezXWmgIF6wG1UFUmRj4EOSeI7xc2Wpeo4edYV1ZMdDFr1CxH2MqrA2EnAAwTqWg+
+         3LOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVN5Al4Ib0Np+NUckLYep6geXYZhicMT5+KZ1cq3vxxEyd06pHGG4K+7A0LpOol256LQ7c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxF9CCfWRSeKkET9PGrjAqiheEDXDAIVmWlccMZK/cPGIh0pFBy
+	mkKvemNLpjVlc9kpSHr93iyB+ZKn61j2XdkvN7Cy5v6kRlCrrRVVxm5jWVkECeU=
+X-Google-Smtp-Source: AGHT+IGBCTHIWfSfgWAoxWqUTo8+jlKpLyEBTIm6tcnrukMNtvBJLrfotsddLNAtN5yhINvOVzR10A==
+X-Received: by 2002:a05:600c:1c05:b0:42c:b63e:fea6 with SMTP id 5b1f17b1804b1-42e961362e8mr25316905e9.22.1727284307691;
+        Wed, 25 Sep 2024 10:11:47 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e96a36287sm24053595e9.29.2024.09.25.10.11.42
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e90cd2d3dsm44179475e9.1.2024.09.25.10.11.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 25 Sep 2024 10:11:44 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 05F675FA4B;
+	by draig.lan (Postfix) with ESMTP id 1C5475FA77;
 	Wed, 25 Sep 2024 18:11:41 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -96,9 +96,9 @@ Cc: Zhao Liu <zhao1.liu@intel.com>,
 	Yanan Wang <wangyanan55@huawei.com>,
 	Thomas Huth <thuth@redhat.com>,
 	Beraldo Leal <bleal@redhat.com>
-Subject: [PATCH 07/10] docs/devel: update tsan build documentation
-Date: Wed, 25 Sep 2024 18:11:37 +0100
-Message-Id: <20240925171140.1307033-8-alex.bennee@linaro.org>
+Subject: [PATCH 08/10] MAINTAINERS: mention my gdbstub/next tree
+Date: Wed, 25 Sep 2024 18:11:38 +0100
+Message-Id: <20240925171140.1307033-9-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20240925171140.1307033-1-alex.bennee@linaro.org>
 References: <20240925171140.1307033-1-alex.bennee@linaro.org>
@@ -111,66 +111,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Make it easy for people to see what is already queued.
 
-Mention it's now possible to build with gcc, instead of clang, and
-explain how to build a sanitized glib version.
-
-Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20240910174013.1433331-4-pierrick.bouvier@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- docs/devel/testing/main.rst | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/docs/devel/testing/main.rst b/docs/devel/testing/main.rst
-index 09725e8ea9..91f4dc61fb 100644
---- a/docs/devel/testing/main.rst
-+++ b/docs/devel/testing/main.rst
-@@ -628,20 +628,38 @@ Building and Testing with TSan
- It is possible to build and test with TSan, with a few additional steps.
- These steps are normally done automatically in the docker.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7ac2252303..f34b8843e4 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3028,6 +3028,7 @@ F: gdb-xml/
+ F: tests/tcg/multiarch/gdbstub/*
+ F: scripts/feature_to_c.py
+ F: scripts/probe-gdb-support.py
++T: git https://gitlab.com/stsquad/qemu gdbstub/next
  
--There is a one time patch needed in clang-9 or clang-10 at this time:
-+TSan is supported for clang and gcc.
-+One particularity of sanitizers is that all the code, including shared objects
-+dependencies, should be built with it.
-+In the case of TSan, any synchronization primitive from glib (GMutex for
-+instance) will not be recognized, and will lead to false positives.
-+
-+To build a tsan version of glib:
- 
- .. code::
- 
--  sed -i 's/^const/static const/g' \
--      /usr/lib/llvm-10/lib/clang/10.0.0/include/sanitizer/tsan_interface.h
-+   $ git clone --depth=1 --branch=2.81.0 https://github.com/GNOME/glib.git
-+   $ cd glib
-+   $ CFLAGS="-O2 -g -fsanitize=thread" meson build
-+   $ ninja -C build
- 
- To configure the build for TSan:
- 
- .. code::
- 
--  ../configure --enable-tsan --cc=clang-10 --cxx=clang++-10 \
-+  ../configure --enable-tsan \
-                --disable-werror --extra-cflags="-O0"
- 
-+When executing qemu, don't forget to point to tsan glib:
-+
-+.. code::
-+
-+   $ glib_dir=/path/to/glib
-+   $ export LD_LIBRARY_PATH=$glib_dir/build/gio:$glib_dir/build/glib:$glib_dir/build/gmodule:$glib_dir/build/gobject:$glib_dir/build/gthread
-+   # check correct version is used
-+   $ ldd build/qemu-x86_64 | grep glib
-+   $ qemu-system-x86_64 ...
-+
- The runtime behavior of TSAN is controlled by the TSAN_OPTIONS environment
- variable.
- 
+ Memory API
+ M: Paolo Bonzini <pbonzini@redhat.com>
 -- 
 2.39.5
 
