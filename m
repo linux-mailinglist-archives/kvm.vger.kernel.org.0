@@ -1,209 +1,176 @@
-Return-Path: <kvm+bounces-27420-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27421-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB337986071
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 16:23:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF00986083
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 16:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DB121F26B50
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 14:23:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 075B91F25208
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2024 14:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0921A4E72;
-	Wed, 25 Sep 2024 12:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d4nHFf9C"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5358C1A76A0;
+	Wed, 25 Sep 2024 13:05:29 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FBE18A6AA
-	for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 12:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0841A704B;
+	Wed, 25 Sep 2024 13:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727268944; cv=none; b=n55rerbVxvqEszcFOZuHRHzSu8niUEg9SX1tbBWKKEF4qtOxB6jfS3Szt3PFlqE2Br/pMI7WBhKqNFI9n42DZ/f/PNghrWBzSslU/Q1pGLGbe1C5zLolNvKmm8OiaNApQuopP+pPziXVDfSUB0laY5pgQCs7GtYYMnfbu3VioCg=
+	t=1727269528; cv=none; b=tr4k8oF5wHa5KT7ufIjckftXaGFrDmHAvKJe4fBB4zMyeXwwlLotPuR49Lsp93a1QDvfl1C2+oOBqaSs1H7OrfRCKAJej5Cp3yRHoIFjPwrnJUqAgaYy6HusnWZY1J4hUk1bjT7ij1XyyfraNwmBIYw8FzQrncqwabN7oLF0A1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727268944; c=relaxed/simple;
-	bh=SqsrNamKhqSmaf/1oFdKI6QM7JNNm91uH+KndaDN+GM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=d8AGI5iN4dX6GPo+sC/nSmmctmz3S1wncspzO397q/yef+UHTmhMbKS0nO689GKue8o6rfT6eryPPYrglohcwOR1Pk3U4gKU4m9Qpe+JGXIsSNeff9gMbWpN0oKTtHFm9PwTTqshl4U7qLwIkp2D2q9CuJx38YFVEgNPK6bsPWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d4nHFf9C; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e21d0bfba7so15155897b3.3
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 05:55:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727268940; x=1727873740; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ejU8vvarcUji1scLaHFX1ADT3z35bJpwvhsMj4+OLE4=;
-        b=d4nHFf9C6GZ1aBjMSMjzhlY0M0WSlkLd1VfrIvmnTshVasLe3Uom/Z4BAJbPOgC+f6
-         jMbpLmgydJcnk1EO+I/aOmJfe9kMhCuk+C+WyaO7O7Vt1jR3trxKz5aR/B+gw3lfWn+B
-         eRBdImzYNmKX/8e8Qys30/rryQ6Gk+J8T2NNK0akXyZR+6UjiCf3jjJ4ZvQqNT6xKC1R
-         r3yLYsTHZpgmMfVWYilMX6+Ba+UBLrfUXjZhmcggkJTxW3TDacJknXAygVNLnlj0Hozw
-         QFBE+Abub0UmpjmIVRTWFDCj8s43li+FzZkzsbwIHxglaE2hT0AqniH7PWuyWe6QHa9n
-         DgUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727268940; x=1727873740;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ejU8vvarcUji1scLaHFX1ADT3z35bJpwvhsMj4+OLE4=;
-        b=pqFFYdwjSt6n1I3ChcFCUBfgVXYxsu95FUpgUhKYuAPJMoo9J+swKIgsBSSs4bEXKf
-         CGI/gNsd+fZbMQ+LsdqadOnNEEPT3johaiMFTSaqmNmFchES8lV7jB2IkkuZ4uXl041p
-         TTDSKn8pwnBVsKtXjIv3Fyfgf/UteD61fmcZ7BLg4vfV3ajsyHccoiSil98SJS6RF2lI
-         GwyIEdowCZoRKxIPNCxFYgmwg53Z99FiUcbXUbMFM2M/S/Avt5oCnMDmAVkaM7Eg0BqE
-         U0XeAUEv2QjnK3RfCKGzlDmWx1yTjWOApLMr2r7ioKlB0MiagJnLfK3bhVuRGvVtHCz0
-         FpDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUHeWrjD1PQsZ3IJJ8FMrLQ699wyqZPeCh663t8R4fSTM2zFG4zvR5MLWxqHktsHfXdUVI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyifKok2Zg+JC62Ge7Yb9j3vVRowQhvu0xmR+uE5gdvDA59ycGe
-	VwUCSzWVEzb3MUF9ILdCMqIaJzSbKfNumW+D1+MnBjwu0FTddcT8qIPcNBbbUP2sUAS/kUAuLZg
-	6Ng==
-X-Google-Smtp-Source: AGHT+IHV+hKp0Q9Hx5xYHjlPSEL8B7B2ZZTX/32jkpd2zuCYjaKxoOK6gQ4TjmMkDZqskxjv4Q7RPav9iq0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:580a:b0:6dd:c0f7:2121 with SMTP id
- 00721157ae682-6e21d9fc431mr30527b3.5.1727268939762; Wed, 25 Sep 2024 05:55:39
- -0700 (PDT)
-Date: Wed, 25 Sep 2024 05:55:38 -0700
-In-Reply-To: <ef194c25-22d8-204e-ffb6-8f9f0a0621fb@amd.com>
+	s=arc-20240116; t=1727269528; c=relaxed/simple;
+	bh=Z8A+F6g+ckcqDRO/xPuowSQmdScdm2BzOdA9oeqi8hI=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W5zPbAfZP5AOd1A12r7TsUit1+GOqejWWY7S1rJcWgxlXTvmLT3zZxMdZJ3/uQ/adxF/yNLldB5dw6C32T3yOwqub6/7ZKS7DUR2eK1CY57SoRA8Kfk606qffTC1wNEiA+5KA12nQ9KpwgZl/DIYZpmMjelnTlSa2wCnbOlT51g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XDH0862gfz6K9B2;
+	Wed, 25 Sep 2024 21:00:40 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id D06A9140F63;
+	Wed, 25 Sep 2024 21:05:17 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 25 Sep
+ 2024 15:05:16 +0200
+Date: Wed, 25 Sep 2024 14:05:15 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Zhi Wang <zhiw@nvidia.com>
+CC: "Tian, Kevin" <kevin.tian@intel.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-cxl@vger.kernel.org"
+	<linux-cxl@vger.kernel.org>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, "Schofield,
+ Alison" <alison.schofield@intel.com>, "Williams, Dan J"
+	<dan.j.williams@intel.com>, "Jiang, Dave" <dave.jiang@intel.com>,
+	"dave@stgolabs.net" <dave@stgolabs.net>, "Weiny, Ira" <ira.weiny@intel.com>,
+	"Verma, Vishal L" <vishal.l.verma@intel.com>, "alucerop@amd.com"
+	<alucerop@amd.com>, Andy Currid <ACurrid@nvidia.com>, Neo Jia
+	<cjia@nvidia.com>, Surath Mitra <smitra@nvidia.com>, "Ankit Agrawal"
+	<ankita@nvidia.com>, Aniket Agashe <aniketa@nvidia.com>, "Kirti Wankhede"
+	<kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+	"zhiwang@kernel.org" <zhiwang@kernel.org>
+Subject: Re: [RFC 00/13] vfio: introduce vfio-cxl to support CXL type-2
+ accelerator passthrough
+Message-ID: <20240925140515.000077f5@Huawei.com>
+In-Reply-To: <75c0c6f1-07e4-43c1-819c-2182bdd0b47c@nvidia.com>
+References: <20240920223446.1908673-1-zhiw@nvidia.com>
+	<BN9PR11MB5276B821A9732BF0A9EC67988C6F2@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<75c0c6f1-07e4-43c1-819c-2182bdd0b47c@nvidia.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240731150811.156771-1-nikunj@amd.com> <20240731150811.156771-20-nikunj@amd.com>
- <ZuR2t1QrBpPc1Sz2@google.com> <9a218564-b011-4222-187d-cba9e9268e93@amd.com>
- <ZurCbP7MesWXQbqZ@google.com> <2870c470-06c8-aa9c-0257-3f9652a4ccd8@amd.com>
- <Zu0iiMoLJprb4nUP@google.com> <4cc88621-d548-d3a1-d667-13586b7bfea8@amd.com> <ef194c25-22d8-204e-ffb6-8f9f0a0621fb@amd.com>
-Message-ID: <ZvQHpbNauYTBgU6M@google.com>
-Subject: Re: [PATCH v11 19/20] x86/kvmclock: Skip kvmclock when Secure TSC is available
-From: Sean Christopherson <seanjc@google.com>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de, 
-	x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de, 
-	dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com, 
-	peterz@infradead.org, gautham.shenoy@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Wed, Sep 25, 2024, Nikunj A. Dadhania wrote:
-> >>>>> Are you suggesting that whenever the guest is either SNP or TDX, kvmclock
-> >>>>> should be disabled assuming that timesource is stable and always running?
-> >>>>
-> >>>> No, I'm saying that the guest should prefer the raw TSC over kvmclock if the TSC
-> >>>> is stable, irrespective of SNP or TDX.  This is effectively already done for the
-> >>>> timekeeping base (see commit 7539b174aef4 ("x86: kvmguest: use TSC clocksource if
-> >>>> invariant TSC is exposed")), but the scheduler still uses kvmclock thanks to the
-> >>>> kvm_sched_clock_init() code.
-> >>>
-> >>> The kvm-clock and tsc-early both are having the rating of 299. As they are of
-> >>> same rating, kvm-clock is being picked up first.
-> >>>
-> >>> Is it fine to drop the clock rating of kvmclock to 298 ? With this tsc-early will
-> >>> be picked up instead.
-> >>
-> >> IMO, it's ugly, but that's a problem with the rating system inasmuch as anything.
-> >>
-> >> But the kernel will still be using kvmclock for the scheduler clock, which is
-> >> undesirable.
+On Tue, 24 Sep 2024 08:30:17 +0000
+Zhi Wang <zhiw@nvidia.com> wrote:
+
+> On 23/09/2024 11.00, Tian, Kevin wrote:
+> > External email: Use caution opening links or attachments
 > > 
-> > Agree, kvm_sched_clock_init() is still being called. The above hunk was to use
-> > tsc-early/tsc as the clocksource and not kvm-clock.
+> >   
+> >> From: Zhi Wang <zhiw@nvidia.com>
+> >> Sent: Saturday, September 21, 2024 6:35 AM
+> >>  
+> > [...]  
+> >> - Create a CXL region and map it to the VM. A mapping between HPA and DPA
+> >> (Device PA) needs to be created to access the device memory directly. HDM
+> >> decoders in the CXL topology need to be configured level by level to
+> >> manage the mapping. After the region is created, it needs to be mapped to
+> >> GPA in the virtual HDM decoders configured by the VM.  
+> > 
+> > Any time when a new address space is introduced it's worthy of more
+> > context to help people who have no CXL background better understand
+> > the mechanism and think any potential hole.
+> > 
+> > At a glance looks we are talking about a mapping tier:
+> > 
+> >    GPA->HPA->DPA
+> > 
+> > The location/size of HPA/DPA for a cxl region are decided and mapped
+> > at @open_device and the HPA range is mapped to GPA at @mmap.
+> > 
+> > In addition the guest also manages a virtual HDM decoder:
+> > 
+> >    GPA->vDPA
+> > 
+> > Ideally the vDPA range selected by guest is a subset of the physical
+> > cxl region so based on offset and vHDM the VMM may figure out
+> > which offset in the cxl region to be mmaped for the corresponding
+> > GPA (which in the end maps to the desired DPA).
+> > 
+> > Is this understanding correct?
+> >   
 > 
-> How about the below patch:
+> Yes. Many thanks to summarize this. It is a design decision from a 
+> discussion in the CXL discord channel.
 > 
-> From: Nikunj A Dadhania <nikunj@amd.com>
-> Date: Tue, 28 Nov 2023 18:29:56 +0530
-> Subject: [RFC PATCH] x86/kvmclock: Prefer invariant TSC as the clocksource and
->  scheduler clock
+> > btw is one cxl device only allowed to create one region? If multiple
+> > regions are possible how will they be exposed to the guest?
+> >  
 > 
-> For platforms that support stable and always running TSC, although the
-> kvm-clock rating is dropped to 299 to prefer TSC, the guest scheduler clock
-> still keeps on using the kvm-clock which is undesirable. Moreover, as the
-> kvm-clock and early-tsc clocksource are both registered with 299 rating,
-> kvm-clock is being picked up momentarily instead of selecting more stable
-> tsc-early clocksource.
-> 
->   kvm-clock: Using msrs 4b564d01 and 4b564d00
->   kvm-clock: using sched offset of 1799357702246960 cycles
->   clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
->   tsc: Detected 1996.249 MHz processor
->   clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x398cadd9d93, max_idle_ns: 881590552906 ns
->   clocksource: Switched to clocksource kvm-clock
->   clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x398cadd9d93, max_idle_ns: 881590552906 ns
->   clocksource: Switched to clocksource tsc
-> 
-> Drop the kvm-clock rating to 298, so that tsc-early is picked up before
-> kvm-clock and use TSC for scheduler clock as well when the TSC is invariant
-> and stable.
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> 
-> ---
-> 
-> The issue we see here is that on bare-metal if the TSC is marked unstable,
-> then the sched-clock will fall back to jiffies. In the virtualization case,
-> do we want to fall back to kvm-clock when TSC is marked unstable?
+> It is not an (shouldn't be) enforced requirement from the VFIO cxl core. 
+> It is really requirement-driven. I am expecting what kind of use cases 
+> in reality that needs multiple CXL regions in the host and then passing 
+> multiple regions to the guest.
 
-In the general case, yes.  Though that might be a WARN-able offense if the TSC
-is allegedly constant+nonstop.  And for SNP and TDX, it might be a "panic and do
-not boot" offense, since using kvmclock undermines the security of the guest.
+Mix of back invalidate and non back invalidate supporting device memory
+maybe?  A bounce region for p2p traffic would the obvious reason to do
+this without paying the cost of large snoop filters. If anyone puts PMEM
+on the device, then maybe mix of that at volatile. In theory you might
+do separate regions for QoS reasons but seems unlikely to me...
 
-> ---
->  arch/x86/kernel/kvmclock.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+Anyhow not an immediately problem as I don't know of any
+BI capable hosts yet and doubt anyone (other than Dan) cares about PMEM :)
+
+
 > 
-> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-> index 5b2c15214a6b..c997b2628c4b 100644
-> --- a/arch/x86/kernel/kvmclock.c
-> +++ b/arch/x86/kernel/kvmclock.c
-> @@ -317,9 +317,6 @@ void __init kvmclock_init(void)
->  	if (kvm_para_has_feature(KVM_FEATURE_CLOCKSOURCE_STABLE_BIT))
->  		pvclock_set_flags(PVCLOCK_TSC_STABLE_BIT);
->  
-> -	flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
-> -	kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
-> -
->  	x86_platform.calibrate_tsc = kvm_get_tsc_khz;
->  	x86_platform.calibrate_cpu = kvm_get_tsc_khz;
->  	x86_platform.get_wallclock = kvm_get_wallclock;
-> @@ -341,8 +338,12 @@ void __init kvmclock_init(void)
->  	 */
->  	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
->  	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
-> -	    !check_tsc_unstable())
-> -		kvm_clock.rating = 299;
-> +	    !check_tsc_unstable()) {
-> +		kvm_clock.rating = 298;
-> +	} else {
-> +		flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
-> +		kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
-> +	}
+> Presumably, the host creates one large CXL region that covers the entire 
+> DPA, while QEMU can virtually partition it into different regions and 
+> map them to different virtual CXL region if QEMU presents multiple HDM 
+> decoders to the guest.
 
-I would really, really like to fix this in a centralized location, not by having
-each PV clocksource muck with their clock's rating.  I'm not even sure the existing
-code is entirely correct, as kvmclock_init() runs _before_ tsc_early_init().  Which
-is desirable in the legacy case, as it allows calibrating the TSC using kvmclock,
+I'm not sure why it would do that. Can't think why you'd break up
+a host region - maybe I'm missing something.
 
-  	x86_platform.calibrate_tsc = kvm_get_tsc_khz;
+...
 
-but on modern setups that's definitely undesirable, as it means the kernel won't
-use CPUID.0x15, which every explicitly tells software the frequency of the TSC.
-
-And I don't think we want to simply point at native_calibrate_tsc(), because that
-thing is not at all correct for a VM, where checking x86_vendor and x86_vfm is at
-best sketchy.  E.g. I would think it's in AMD's interest for Secure TSC to define
-the TSC frequency using CPUID.0x15, even if AMD CPUs don't (yet) natively support
-CPUID.0x15.
-
-In other words, I think we need to overhaul the PV clock vs. TSC logic so that it
-makes sense for modern CPUs+VMs, not just keep hacking away at kvmclock.  I don't
-expect the code would be all that complex in the end, the hardest part is likely
-just figuring out (and agreeing on) what exactly the kernel should be doing.
-
->  	clocksource_register_hz(&kvm_clock, NSEC_PER_SEC);
->  	pv_info.name = "KVM";
-> -- 
-> 2.34.1
+> >> In the L2 guest, a dummy CXL device driver is provided to attach to the
+> >> virtual pass-thru device.
+> >>
+> >> The dummy CXL type-2 device driver can successfully be loaded with the
+> >> kernel cxl core type2 support, create CXL region by requesting the CXL
+> >> core to allocate HPA and DPA and configure the HDM decoders.  
+> > 
+> > It'd be good to see a real cxl device working to add confidence on
+> > the core design.  
 > 
+> To leverage the opportunity of F2F discussion in LPC, I proposed this 
+> patchset to start the discussion and meanwhile offered an environment 
+> for people to try and hack around. Also patches is good base for 
+> discussion. We see what we will get. :)
+> 
+> There are devices already there and on-going. AMD's SFC (patches are 
+> under review) and I think they are going to be the first variant driver 
+> that use the core. NVIDIA's device is also coming and NVIDIA's variant 
+> driver is going upstream for sure. Plus this emulated device, I assume 
+> we will have three in-tree variant drivers talks to the CXL core.
+Nice.
+> 
+> Thanks,
+> Zhi.
+
 
