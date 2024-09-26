@@ -1,72 +1,64 @@
-Return-Path: <kvm+bounces-27555-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27556-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7919870FE
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 12:01:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 731AA9870FD
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 12:00:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06620B27CC0
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 10:00:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 983F51C24A67
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 10:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DED81AB6E8;
-	Thu, 26 Sep 2024 10:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E111AC895;
+	Thu, 26 Sep 2024 10:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tM9Prv4z"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PndBQQTI"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF5D18786D;
-	Thu, 26 Sep 2024 09:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D118154BEC;
+	Thu, 26 Sep 2024 10:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727344803; cv=none; b=rW+1Zzfqhwi3RQz0gFobzudyZN3zw4eRzZ6e0Lrj4aguqxuz5P95Pn6Mg/d3EJ6QoO6p7dI2GKQw3ixGf+ap4EYfRVRI9Cw1MEME4zsiaUq9q8QhW+8eg9EyM9hcj48Jihlkk0cB49Dh0Id55QK1qT1TBTdi0wOxGbHK4MKihJ4=
+	t=1727344844; cv=none; b=E+o+EbT+nxRbSTYo2n2Lzd1R2gK9kxPWuu0jACbhpDWhUNwZUqQOSzv7CXHERogQm4D+5wXEUfcxh2noGW5P9AjRDVXWye2phZ66UcTaWwvH6owKiEHxDlmqcoZTaFDEE7Q+W4j7LeSHEpJfu512Kl2i/cP2LI1VEAKuhELrQtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727344803; c=relaxed/simple;
-	bh=/mgsSaZ0OV7MzePJBGGbNoUXiQOw3zuU35iMtOrKqIQ=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sMqVPCAwX8dY+KpQ1OKE4nqIHnCyf4Ahd8szrfRa40E9QzDzWeBmTveJx8Gx3vCoMkc8CjvxvtrWDuKjeped9gkOtDkGAtWZWos826fvanWh3MurnBXx1r8YHvlT2qWfSICz1zhIpNp7ICcoItDZVsCUAFieLOcjS0Ef1PLNRQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=tM9Prv4z; arc=none smtp.client-ip=90.155.50.34
+	s=arc-20240116; t=1727344844; c=relaxed/simple;
+	bh=3o6FHL+Hd+ksolKn81lihV/MwUPBOP0E6nfCnoM9lsc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PBfbsnyxjEOS6ei3eX2ysa+BSzcu70Bs7A+i+jUy/60dvlupSUab8aRmKcseSHocKYskGJGbxk1BDgHxRkdrqJNI3mrUmaFTJh+NnHmbWv0IxHWyqOaoGYOCG/TDw4Y6ECGB24YEOihXh8hcV3rSJTS5pp1hhJraZAqB9bQlxa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PndBQQTI; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=/mgsSaZ0OV7MzePJBGGbNoUXiQOw3zuU35iMtOrKqIQ=; b=tM9Prv4zGvNL18xi8Ihf8Wp01N
-	GLsqvFmBgzg5yTozj/CIwyxFpkO7Tb1BHOrCCJle2ILy5vsKQhq1DKE6YUkTOGwdZWcZDkLPfy5Z9
-	FlPNoclyn8whDr74d26YI9tjlr6poG3fRvg4OgH7ROOSSELDJT9UiVlU82+zu9ko5o/w9dJgJ81DD
-	cpHAuSq7OLkbhzTd5wmC4lq7uOxl2H7CrAumGACj9m+fpK/95R+9jhLKJMNUPMwyND4EBBHcwBKmV
-	chjpGaNR8NySUOtapu1UTqqQzOoeMrxHiQLTmcCtFn/Zx02ogvDl4BxHovxwl853by4LSkQT8aQKz
-	HQ6Pk62w==;
+	bh=3o6FHL+Hd+ksolKn81lihV/MwUPBOP0E6nfCnoM9lsc=; b=PndBQQTIraZ2Cx8izLVC9CzuXR
+	hMwLWBMeGUA5XXf56pxe04lAuVfVaq/Er4Rxp8xnqOyxEDvyYNhh4puc4qzlXocnlSw6Bctjgn1/P
+	ca5Dd3CEhOnzXEWfdsn2xJB1i/Way40u69CGScjJ3Nw869rJXbXzCrNZ89hLAQrwhkmiuFv4gkgR9
+	uIoP1Na1EIqgnvkrWjXyU2HuOyNPoYagOZUNEAqx8MeLg3DIBADvyF2QGxZQzE9hvagOqE9OxF9wL
+	falegJSHIWncPAKk0NDc8lFPHCfIsXHAjqoYFOxyer4kqkPaLUaqXbze7r2pg2E6RIzYyaM1tqeV4
+	SCrO4HXQ==;
 Received: from [2001:8b0:10b:5:16cf:fc6a:25d9:f696] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1stlHU-00000006LTw-0Oxk;
-	Thu, 26 Sep 2024 09:59:29 +0000
-Message-ID: <9b8989f06548d373cef8830f2a1f9b02934540c8.camel@infradead.org>
-Subject: Re:  [PATCH v4 1/6] firmware/psci: Add definitions for PSCI v1.3
- specification
+	id 1stlId-00000006LbT-3IMz;
+	Thu, 26 Sep 2024 10:00:40 +0000
+Message-ID: <c309adcc88d7fb55d1ca7fdb9c32a6cd9c827c74.camel@infradead.org>
+Subject: Re: [PATCH 0/8] *** RFC: ARM KVM dirty tracking device ***
 From: David Woodhouse <dwmw2@infradead.org>
-To: Francesco Lavra <francescolavra.fl@gmail.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier
- <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James Morse
- <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui
- Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Lorenzo
- Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>, Shuah Khan
- <shuah@kernel.org>,  kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev,  linux-pm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Date: Thu, 26 Sep 2024 10:59:25 +0100
-In-Reply-To: <15f38d57ca10606e444ca422f802e0961908f02f.camel@gmail.com>
-References: <20240924160512.4138879-1-dwmw2@infradead.org>
-	 <15f38d57ca10606e444ca422f802e0961908f02f.camel@gmail.com>
+To: Oliver Upton <oliver.upton@linux.dev>, Lilit Janpoladyan
+ <lilitj@amazon.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, nh-open-source@amazon.com, 
+	kvmarm@lists.linux.dev
+Date: Thu, 26 Sep 2024 11:00:39 +0100
+In-Reply-To: <Zuvq18Nrgy6j_pZW@linux.dev>
+References: <20240918152807.25135-1-lilitj@amazon.com>
+	 <Zuvq18Nrgy6j_pZW@linux.dev>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-t+PnZWYM+3p8ekKG78Z0"
+	boundary="=-X7RhqzEhlTPh06y7CJRW"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -77,30 +69,82 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-t+PnZWYM+3p8ekKG78Z0
+--=-X7RhqzEhlTPh06y7CJRW
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2024-09-26 at 10:55 +0200, Francesco Lavra wrote:
-> On Tue, 2024-09-24 at 17:05 +0100, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > The v1.3 PSCI spec (https://developer.arm.com/documentation/den0022)
-> > adds
-> > SYSTEM_OFF2, CLEAN_INV_MEMREGION and CLEAN_INV_MEMREGION_ATTRIBUTES
-> > functions. Add definitions for them and their parameters, along with
-> > the
-> > new TIMEOUT, RATE_LIMITED and BUSY error values.
+On Thu, 2024-09-19 at 02:11 -0700, Oliver Upton wrote:
+> Hi Lilit,
 >=20
-> The CLEAN_INV_MEMREGION and CLEAN_INV_MEMREGION_ATTRIBUTES
-> functions were added in the alpha release of the spec but have been
-> dropped in the beta release, and are not included in the final spec. So
-> IMO the uapi header file should not contain these definitions.
-> The same goes for the TIMEOUT, RATE_LIMITED and BUSY error values.
+> +cc kvmarm mailing list, get_maintainer is your friend :)
+>=20
+> On Wed, Sep 18, 2024 at 03:27:59PM +0000, Lilit Janpoladyan wrote:
+> > An example of a device that tracks accesses to stage-2 translations and=
+ will
+> > implement page_tracking_device interface is AWS Graviton Page Tracking =
+Agent
+> > (PTA). We'll be posting code for the Graviton PTA device driver in a se=
+parate
+> > series of patches.
+>=20
+> In order to actually review these patches, we need to see an
+> implementation of such a page tracking device. Otherwise it's hard to
+> tell that the interface accomplishes the right abstractions.
 
-Thanks. I'll drop those.
+Absolutely. That one is coming soon, but I was chasing the team to post
+the API and KVM glue parts as early as possible to kick-start the
+discussion, especially about the upcoming architectural solution.
 
---=-t+PnZWYM+3p8ekKG78Z0
+> Beyond that, I have some reservations about maintaining support for
+> features that cannot actually be tested outside of your own environment.
+
+That's more about the hardware driver itself which will follow, than
+the core API posted here.
+
+I understand the reservation, but I think it's fine.=C2=A0In general, Linux
+does support esoteric hardware that not everyone can test every
+time.=C2=A0We do sweeping changes across all Ethernet drivers, for example,
+and some of those barely even exist any more.
+
+This particular device should be available on bare metal EC2 instances,
+of course, but perhaps we should also implement it in QEMU. That would
+actually be beneficial for our internal testing anyway, as it would
+allow us to catch regressions much earlier in our own development
+process.
+
+> > When ARM architectural solution (FEAT_HDBSS feature) is available, we i=
+ntend to
+> > use it via the same interface most likely with adaptations.
+>=20
+> Will the PTA stuff eventually get retired once you get support for FEAT_H=
+DBSS
+> in hardware?
+
+I don't think there is a definitive answer to that which is ready to
+tape out, but it certainly seems possible that future generations will
+eventually move to FEAT_HDBSS, maybe even reaching production by the
+end of the decade, at the earliest? And then a decade or two later, the
+existing hardware generations might even get retired, yes=C2=B9.
+
+=C2=B9 #include <forward-looking statement.disclaimer>
+
+> I think the best way forward here is to implement the architecture, and
+> hopefully after that your legacy driver can be made to fit the
+> interface. The FVP implements FEAT_HDBSS, so there's some (slow)
+> reference hardware to test against.
+
+Is there actually any documentation available about FEAT_HDBSS? We've
+been asking, but haven't received it. I can find one or two mentions
+e.g. https://arm.jonpalmisc.com/2023_09_sysreg/AArch64-hdbssbr_el2 but
+nothing particularly useful.
+
+The main reason for posting this series early is to make sure we do all
+we can to accommodate FEAT_HDBSS. It's not the *end* of the world if
+the kernel-internal API has to be tweaked slightly when FEAT_HDBSS
+actually becomes reality in future, but obviously we'd prefer to
+support it right from the start.
+
+--=-X7RhqzEhlTPh06y7CJRW
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -192,25 +236,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI2MDk1OTI1WjAvBgkqhkiG9w0BCQQxIgQgWf2XmEvn
-M4tz/qkUsU5d3tboHdtlP+gf5sNHfxpDpOcwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI2MTAwMDM5WjAvBgkqhkiG9w0BCQQxIgQgKf7ucjpf
+ZlpX7QDlIuFImfH+xNyCeweAOMPVO9Zqgf8wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCmuuzm9ePYYbEeHyaWW6sP5ibQFvKpK8GF
-CKYYoDWnMVOhnWJSwrismKJYDx7Q03nRq3YBdwkMSSXqhQNdqEy/yZ9rdPJe5UI1bml2h9wyvEdT
-bdhlk7eyK1LxWEph0x+zoh8uHNnuHUF549U00oAe3E46KqMx12GM5lfj6Ah1K5RkiBcNzcRrchDU
-9j0F14jVg8ubEWP52idzdvctrfnNzYFfsXcr1nVPVqj83jTZ0nCM0V8qR964/6odpaQP7QWD5dqV
-cPO8laR9qs9A7qQDdGvB++08R0hpk7xifwhGFdrMkSZRpA5kEglk1dl02HefFUrGD8y8MWl0BYrt
-4n7sWWWGEDSKOamtPnHn0gXl1KWIX4taG3iqP6ZorjWqjkHduDr7OxKYcVeVto5RigT38m3larg6
-7CSCe7OedAj03UyWQKrE6UiAAlvm3O/vhcrVBSC3hG6P9E5v+uh2h9sdmwbMH6B9OTiuWkp0y1fj
-qygliFLMaknEiZI6vP/ATO3YPIVcAXetfEnWfXaJAnAg31Lg/9Kf+Ug6qoEHSCD6jmrZqrAMjgO7
-hC1AsV0LdyenixpU6RBkrns8Xat5mLPnSXL4pkuuxiAVBU4++iP/0kp/FxtWJ+3jS8P09m3IoCYu
-3RGEX4CCT7zVJlC48pwrOHYurFN1RyzmO+lykOOXugAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAI22biPFKFZHHwLwtm6PsT0Yro/LzjWDAR
+J2nonn11MWLY/XsaTPFZgvtQUKOClV0FxGeHkNYFYr3HUiKLdVkPoHMsNc/nCprRXL5X0odzBSdO
+kwKcrg60Lc9BqCOmnP4xxy8maz+X30Y/ys3/dpgMTbMkMBTA0qsbZwwR54535ozMPOQU3M8sGelr
+yX4h8uxFcriZUqstpyCgZ9JXyf+LUgevy2tOW70rbA9ZjDNy6G1LxZv3rMZfujRivk9eW6aQg8AU
+WzxuGZqf4xM20iBBp75kehiXnMvzPt7ZrN56T5BWtNiQ0fdeMs5BTVrzTViBX1XtO1EVN6tPARc8
+b/3iWk5JquQi8sUMVAHKlUuI73FhTBeqskZFxwdjLOT/9wJea2RlC6WLwtKEdId3twgzcWK/qWjK
+fjtTpoIlMCeuRZwLwgpsLc4AXu1M3Fo0j9Czd6Ew/wLvLj0MicFErltub7rv4b6NVNPm79NUFThv
+hQ75w49L9quEcOXt9m8Sm+9zzRJ0qdd2gHLuUCf93nRa0d9htYFeoF+W/HIh0WRa8CALLfugV4RT
+MkwYhs9JgtakD1zLtpidbTIhP8tb4KKgFr2NvvEGgwvktxJlyUbZiLim1byhGAERCiIo+I3u/2UY
+/zcTuOtPKh2rA89oLq5VDuOt2cJAx9ZzbhFYfaq8agAAAAAAAA==
 
 
---=-t+PnZWYM+3p8ekKG78Z0--
+--=-X7RhqzEhlTPh06y7CJRW--
 
