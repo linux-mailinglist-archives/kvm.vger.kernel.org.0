@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-27521-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20434986A7F
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 03:36:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52FFC986A83
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 03:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 490421C21AEC
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 01:36:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE3971F22596
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 01:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BAF189509;
-	Thu, 26 Sep 2024 01:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE2618C32D;
+	Thu, 26 Sep 2024 01:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jdNQFy2N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jNXTG1Op"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77BD180021
-	for <kvm@vger.kernel.org>; Thu, 26 Sep 2024 01:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1716187FF5
+	for <kvm@vger.kernel.org>; Thu, 26 Sep 2024 01:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727314523; cv=none; b=JTHqhLSJIhqN6eDO0pyfiw5n5sqySQS5Yq+e9xgTTXKyLthcC738tWZ9qt1JcneUpUBNlCbzkLSDZopRarn7RZU1E9BpzUAlfJN7WaPk1HR30Cl02mSRSSx3XB/REoYekQZPD81GVE+9j0dWUSS3hIsyMErwPTk1szxOoHOCS0s=
+	t=1727314524; cv=none; b=K9ZAnwEKT2L1gJSGaO1/ElF2+qYGhQLdQU8oLYOhiFnEEOxKq0Jd53sqB4FraxvKziHnF4K3+RtPtzbAxFVukrNp2e33iPRmhBXi4AfXHlJqPlpQT3yEFXtHDhlwHY77MbXxV+Ff3cJJYy3/xBgan3pUWtLUbSeFXqJ2OPY9MjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727314523; c=relaxed/simple;
-	bh=MSP16v22spRDZgdygkuPyo99YM6MsaYwZUFeeUwYgi0=;
+	s=arc-20240116; t=1727314524; c=relaxed/simple;
+	bh=hkxJqdv7VrfnIe/UVtmf3L4Q0b/v0J4ZLYo2Ee8Rysg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=alGgkjuovq/EZhG+RqwtQ6MlKxbD/qUtemZmcZuEejdYcO13I2+plJ9LW38zMejBMoE30wMUgfuhgUAXe15+JAmNOLvzZiyPo2f0OLjYNgPDBTdOXGDLqqQm5fCxIhneFEipX6KPZEMD6ohkr8KOoeV19XrKWuZJXvfbAa4O2ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jdNQFy2N; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=GXZ8teoZ6D9YXdb5eiGY3wbDeaMwq2BVygdxj8mJqdypIsyw02P9JHFvqg96PDMgE6sWhgu/OF81vWoypiBdMpSA/PSvFEWRb38KJKsPl/uswB4GvM2qdCU5pJZoXAgmgYRf1rpciu9gP8NRgk7GZgGyaWJFpPTi3MUeVu6LEic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jNXTG1Op; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-690404fd230so9149297b3.3
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 18:35:21 -0700 (PDT)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-458353d3635so9499231cf.0
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 18:35:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727314521; x=1727919321; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727314522; x=1727919322; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dAogBQT7i8/Ut4GrJolXC+/DUS73zZR+MbirDcTLTRg=;
-        b=jdNQFy2NwTQ/OEl/hYfrxySWsR8l5S0fLcHy36u1gHEPeSSqeOIURi7gCyXgLwvZpc
-         AQO1EgdhVH3Wyclw+tAf6dHCbiRyIfIkv8PSQUMww8F7cTGmOPQrYag7f3ktOutu/fG9
-         Ka5UoTl5Ll9GXwft750H3YchpS0SzknkFW/yX71291unvDA/ifaiGSfi03T7dFhYlg7l
-         6ydSFpeOKNqgE6lsec/GLG7e9oKL2XPyGQ+vPRpZErDtqYk6GWnjSAEUVgoCnnejuHm6
-         D3Y9FWxHPs9CFnd7czVolKBHWenxIu/YR/fBx+Nn8dSyp8HrqhX34PgGc8fcyvzLphHZ
-         L/dQ==
+        bh=ZiB+e++yi01uCPO64xcLvipIH38DTgOpYlfSBrXkWpM=;
+        b=jNXTG1OpLevsGbcR+MqpfVMZwgPXRmUJxePMjPFbYIVYVnzjIa+2vHGoF1izPxKCyt
+         9SVTXm1FZnY3ncNWznXj4uBLnlXbdn2GeYtWZWpSXKkcI5H3SRsxERO9Xp+TVqY0h7S+
+         AK30Cd/4CwnroUusiuT3bDUODwiI7Aiujsa4He4egeauG62IKDi7Z8XpvvvANOBOstGE
+         ab8DFXXdhao4wNIwzqzYKiYMkXuvTcCXsOegUdstL1z6VfFEkPiNlo8fthIxpWJKkQWD
+         +P/bZkinHQZmCIy1Tla4re1ec/smNsh3DEB6tzVDDAm5dWHrZMZaRzhmuv5d7cQ9ZxIL
+         pklQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727314521; x=1727919321;
+        d=1e100.net; s=20230601; t=1727314522; x=1727919322;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dAogBQT7i8/Ut4GrJolXC+/DUS73zZR+MbirDcTLTRg=;
-        b=vhEj4P6yxiSpjXrm95K9qbwiZd2AdS94AgG19+wH9zIn5R/zlX7rrEcDypnKYf2908
-         Ws1XvyIVXaGII7mdAE7Jib4Pg7yxtFrgCpqUMIIeDrZ2i1DSBK1tZRNxb4FND6BKhO2v
-         UZ4sJQHeZ/E0mS/66Mc6xnizi4Atjn/P4rHlVwbuSPSJZGEv7G0bpYZh7WI52iSLz0ZB
-         7woHgxIp8bENh/aNFMZT6duNsgz3lR57/tI1PQL/GpWy88CSdvPSSd6CBCoi3pVYnuhw
-         dibxPK+RtHA1BC3O16UGwWDCChlfDq2EJucZbewJ72xkpZMTzqrOT5Rq2Cs3IQ7GQ+Ek
-         jpbw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCZfyFIFUESXTUEOorGj0lct1gYmWlYa+GbLBU53dCPiLBEulzPDz4Aqk2Mm/xz0GjeM0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxW21GgOEEQFH2JiAp6TqctFoxP5BsFKeQdeOKvDjKal/b6bJCF
-	WXlqRB3F7fJz3fIcraQ2wyoD7V5uEYwYKyvksqYgNNtn83FTp3m8kLbRwL2DyDstMdCbqVUjE3a
-	szoY9JJMG5s++tPIJAw==
-X-Google-Smtp-Source: AGHT+IFQs3DNBWoE9LT9ciS2x6yC/841ISG2URP+wJo+4FsamoM+oSoqTqpMkGycanRDnHNwxgVEwB1O11ztgMfN
+        bh=ZiB+e++yi01uCPO64xcLvipIH38DTgOpYlfSBrXkWpM=;
+        b=alorpNtTUhKmw1qXMDQWgzqLyK9cBBSDlTxRKbQZvwwdlY7c2OZiYIcYDADMb638+e
+         6q2PQN1hAhtNBsb94e7aXPUTQrLjF/2OyBs6JclVvtiVDBa4WRiVtmGsdO1zjAOfq9xA
+         T6GELKjYNrU7247y0PJLTLlP8Ou6woqQRYL7C7djHP3p1n2EOVjj15OCI5ki53pNJ/0+
+         JUfDx0gtLFlGEgVbfvyKIxbzhIJIb4LN1jrIVbX12O/b8yE/67ufX24OHE/vFjlCVTsh
+         2XPt2AUs8zTN+9ZzlE4MW2yrhQ4ymrI0mYtQ79kD9cFOyazDCSGzxWTwp0GqbPsGIIEs
+         Dxwg==
+X-Forwarded-Encrypted: i=1; AJvYcCXANV5hakuW5SHGpiiWBMdL7LeiMlv9Ijb7nuUoQDwz+cRKUrPuscNvir0f0f4M2sJu3H8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXQE9cnGAiSzmveXtuD0KodGNouJsdVkV9ZKn+0+JVbxmxwFWW
+	WHG0qtKTAFB3bVAWq4eCV22EPhDktKEirvU+ArOlZz6phfi5gs6JTJBcKezlhRVjA083cCpQU8+
+	p7wRkiyhqJ0tswN/pAA==
+X-Google-Smtp-Source: AGHT+IEij2jZTZ7Qfz4w3meuEhq8eeslauQ2yZtvTlXKLk5ZsUhbavG3fPazfw188lkIpQjxnlBFPCvmtl1c33sQ
 X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:13d:fb22:ac12:a84b])
- (user=jthoughton job=sendgmr) by 2002:a05:6902:1782:b0:e11:7a38:8883 with
- SMTP id 3f1490d57ef6-e24d9613a90mr3400276.7.1727314520739; Wed, 25 Sep 2024
- 18:35:20 -0700 (PDT)
-Date: Thu, 26 Sep 2024 01:34:53 +0000
+ (user=jthoughton job=sendgmr) by 2002:ac8:43cf:0:b0:458:4a61:2020 with SMTP
+ id d75a77b69052e-45c9493ec3dmr13541cf.2.1727314521861; Wed, 25 Sep 2024
+ 18:35:21 -0700 (PDT)
+Date: Thu, 26 Sep 2024 01:34:54 +0000
 In-Reply-To: <20240926013506.860253-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240926013506.860253-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.46.0.792.g87dc391469-goog
-Message-ID: <20240926013506.860253-6-jthoughton@google.com>
-Subject: [PATCH v7 05/18] KVM: x86/mmu: Rearrange kvm_{test_,}age_gfn
+Message-ID: <20240926013506.860253-7-jthoughton@google.com>
+Subject: [PATCH v7 06/18] KVM: x86/mmu: Only check gfn age in shadow MMU if
+ indirect_shadow_pages > 0
 From: James Houghton <jthoughton@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, David Matlack <dmatlack@google.com>, 
@@ -86,61 +87,49 @@ Cc: Andrew Morton <akpm@linux-foundation.org>, David Matlack <dmatlack@google.co
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 
-Reorder the TDP MMU check to be first for both kvm_test_age_gfn and
-kvm_age_gfn. For kvm_test_age_gfn, this allows us to completely avoid
-needing to grab the MMU lock when the TDP MMU reports that the page is
-young. Do the same for kvm_age_gfn merely for consistency.
+Optimize both kvm_age_gfn and kvm_test_age_gfn's interaction with the
+shadow MMU by, rather than checking if our memslot has rmaps, check if
+there are any indirect_shadow_pages at all.
 
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 355a66c26517..03df592284ac 100644
+index 03df592284ac..b4e543bdf3f0 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1649,15 +1649,15 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	bool young = false;
- 
-+	if (tdp_mmu_enabled)
-+		young = kvm_tdp_mmu_age_gfn_range(kvm, range);
-+
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		write_lock(&kvm->mmu_lock);
--		young = kvm_rmap_age_gfn_range(kvm, range, false);
-+		young |= kvm_rmap_age_gfn_range(kvm, range, false);
- 		write_unlock(&kvm->mmu_lock);
- 	}
- 
--	if (tdp_mmu_enabled)
--		young |= kvm_tdp_mmu_age_gfn_range(kvm, range);
--
+@@ -1645,6 +1645,11 @@ static bool kvm_rmap_age_gfn_range(struct kvm *kvm,
  	return young;
  }
  
-@@ -1665,15 +1665,15 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++static bool kvm_has_shadow_mmu_sptes(struct kvm *kvm)
++{
++	return !tdp_mmu_enabled || READ_ONCE(kvm->arch.indirect_shadow_pages);
++}
++
+ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
  {
  	bool young = false;
+@@ -1652,7 +1657,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	if (tdp_mmu_enabled)
+ 		young = kvm_tdp_mmu_age_gfn_range(kvm, range);
  
 -	if (kvm_memslots_have_rmaps(kvm)) {
-+	if (tdp_mmu_enabled)
-+		young = kvm_tdp_mmu_test_age_gfn(kvm, range);
-+
-+	if (!young && kvm_memslots_have_rmaps(kvm)) {
++	if (kvm_has_shadow_mmu_sptes(kvm)) {
  		write_lock(&kvm->mmu_lock);
--		young = kvm_rmap_age_gfn_range(kvm, range, true);
-+		young |= kvm_rmap_age_gfn_range(kvm, range, true);
+ 		young |= kvm_rmap_age_gfn_range(kvm, range, false);
  		write_unlock(&kvm->mmu_lock);
- 	}
+@@ -1668,7 +1673,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	if (tdp_mmu_enabled)
+ 		young = kvm_tdp_mmu_test_age_gfn(kvm, range);
  
--	if (tdp_mmu_enabled)
--		young |= kvm_tdp_mmu_test_age_gfn(kvm, range);
--
- 	return young;
- }
- 
+-	if (!young && kvm_memslots_have_rmaps(kvm)) {
++	if (!young && kvm_has_shadow_mmu_sptes(kvm)) {
+ 		write_lock(&kvm->mmu_lock);
+ 		young |= kvm_rmap_age_gfn_range(kvm, range, true);
+ 		write_unlock(&kvm->mmu_lock);
 -- 
 2.46.0.792.g87dc391469-goog
 
