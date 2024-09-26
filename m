@@ -1,260 +1,103 @@
-Return-Path: <kvm+bounces-27556-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27557-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 731AA9870FD
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 12:00:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 232B5987340
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 14:08:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 983F51C24A67
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 10:00:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 534781C23131
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 12:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E111AC895;
-	Thu, 26 Sep 2024 10:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PndBQQTI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E085E1741FE;
+	Thu, 26 Sep 2024 12:08:09 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D118154BEC;
-	Thu, 26 Sep 2024 10:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD8214F9FD;
+	Thu, 26 Sep 2024 12:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727344844; cv=none; b=E+o+EbT+nxRbSTYo2n2Lzd1R2gK9kxPWuu0jACbhpDWhUNwZUqQOSzv7CXHERogQm4D+5wXEUfcxh2noGW5P9AjRDVXWye2phZ66UcTaWwvH6owKiEHxDlmqcoZTaFDEE7Q+W4j7LeSHEpJfu512Kl2i/cP2LI1VEAKuhELrQtE=
+	t=1727352489; cv=none; b=ad+lbAJ1xgRIcosN4AaYc3TP3p8NXaUOlPsAD/Q/6+3a3TEV8zr3wYVJIKK4RueauLsd+ihBOIZ/7/T11IVNS1A85RqWJITK3h3DAMSUhyfaAPKHndt4WAAywMWAz56zBmXPlr0Ezh+O7zrGivmohVGxmFLLobbFYZKa29q3zVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727344844; c=relaxed/simple;
-	bh=3o6FHL+Hd+ksolKn81lihV/MwUPBOP0E6nfCnoM9lsc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PBfbsnyxjEOS6ei3eX2ysa+BSzcu70Bs7A+i+jUy/60dvlupSUab8aRmKcseSHocKYskGJGbxk1BDgHxRkdrqJNI3mrUmaFTJh+NnHmbWv0IxHWyqOaoGYOCG/TDw4Y6ECGB24YEOihXh8hcV3rSJTS5pp1hhJraZAqB9bQlxa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PndBQQTI; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=3o6FHL+Hd+ksolKn81lihV/MwUPBOP0E6nfCnoM9lsc=; b=PndBQQTIraZ2Cx8izLVC9CzuXR
-	hMwLWBMeGUA5XXf56pxe04lAuVfVaq/Er4Rxp8xnqOyxEDvyYNhh4puc4qzlXocnlSw6Bctjgn1/P
-	ca5Dd3CEhOnzXEWfdsn2xJB1i/Way40u69CGScjJ3Nw869rJXbXzCrNZ89hLAQrwhkmiuFv4gkgR9
-	uIoP1Na1EIqgnvkrWjXyU2HuOyNPoYagOZUNEAqx8MeLg3DIBADvyF2QGxZQzE9hvagOqE9OxF9wL
-	falegJSHIWncPAKk0NDc8lFPHCfIsXHAjqoYFOxyer4kqkPaLUaqXbze7r2pg2E6RIzYyaM1tqeV4
-	SCrO4HXQ==;
-Received: from [2001:8b0:10b:5:16cf:fc6a:25d9:f696] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1stlId-00000006LbT-3IMz;
-	Thu, 26 Sep 2024 10:00:40 +0000
-Message-ID: <c309adcc88d7fb55d1ca7fdb9c32a6cd9c827c74.camel@infradead.org>
-Subject: Re: [PATCH 0/8] *** RFC: ARM KVM dirty tracking device ***
-From: David Woodhouse <dwmw2@infradead.org>
-To: Oliver Upton <oliver.upton@linux.dev>, Lilit Janpoladyan
- <lilitj@amazon.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, nh-open-source@amazon.com, 
-	kvmarm@lists.linux.dev
-Date: Thu, 26 Sep 2024 11:00:39 +0100
-In-Reply-To: <Zuvq18Nrgy6j_pZW@linux.dev>
-References: <20240918152807.25135-1-lilitj@amazon.com>
-	 <Zuvq18Nrgy6j_pZW@linux.dev>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-X7RhqzEhlTPh06y7CJRW"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1727352489; c=relaxed/simple;
+	bh=PO57L/uFfP7LlHOyaDgLFn5H9GT+LWQKvPwHx9D9P/s=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G8OevxDCtwChhSZq7wSOwlSNEC2Qcio2PyI3Hipx5Dw/H6/XUVKK5w5284tbZV2oTuCg04Zx8OULY4+aVptO+VQuNmD8wMevQVaXeFqJVyauxJG0h0B7RC/V62m67zvnaFMz1rKbVMOXgXvqoMXLdCA/JkvvIPOAQOqbmsUmvvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XDsm93tdkz6J7Y4;
+	Thu, 26 Sep 2024 20:07:21 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 946571401F3;
+	Thu, 26 Sep 2024 20:07:56 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 26 Sep
+ 2024 14:07:55 +0200
+Date: Thu, 26 Sep 2024 13:07:54 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+CC: Igor Mammedov <imammedo@redhat.com>, Shiju Jose <shiju.jose@huawei.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Ani Sinha <anisinha@redhat.com>,
+	Dongjiu Geng <gengdongjiu1@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <qemu-arm@nongnu.org>,
+	<qemu-devel@nongnu.org>
+Subject: Re: [PATCH 11/15] acpi/ghes: better name GHES memory error function
+Message-ID: <20240926130754.000041ab@Huawei.com>
+In-Reply-To: <f4c031c627e761b2a48267f1cec1af3a7ad0acbb.1727236561.git.mchehab+huawei@kernel.org>
+References: <cover.1727236561.git.mchehab+huawei@kernel.org>
+	<f4c031c627e761b2a48267f1cec1af3a7ad0acbb.1727236561.git.mchehab+huawei@kernel.org>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ frapeml500008.china.huawei.com (7.182.85.71)
+
+On Wed, 25 Sep 2024 06:04:16 +0200
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+
+> The current function used to generate GHES data is specific for
+> memory errors. Give a better name for it, as we now have a generic
+> function as well.
+> 
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+In general fine, but question below on what looks to be an unrelated change.
+
+Jonathan
 
 
---=-X7RhqzEhlTPh06y7CJRW
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 849e2e21b304..57192285fb96 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -2373,7 +2373,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+>               */
+>              if (code == BUS_MCEERR_AR) {
+>                  kvm_cpu_synchronize_state(c);
+> -                if (!acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
+> +                if (!acpi_ghes_memory_errors(ARM_ACPI_HEST_SRC_ID_SYNC,
+The parameter changes seems unconnected to rest of the patch...  Maybe at least
+mention it in the patch description.
+I can't find the definition of ARM_ACPI_HEST_SRC_ID_SYNC either so where
+did that come from?
 
-On Thu, 2024-09-19 at 02:11 -0700, Oliver Upton wrote:
-> Hi Lilit,
->=20
-> +cc kvmarm mailing list, get_maintainer is your friend :)
->=20
-> On Wed, Sep 18, 2024 at 03:27:59PM +0000, Lilit Janpoladyan wrote:
-> > An example of a device that tracks accesses to stage-2 translations and=
- will
-> > implement page_tracking_device interface is AWS Graviton Page Tracking =
-Agent
-> > (PTA). We'll be posting code for the Graviton PTA device driver in a se=
-parate
-> > series of patches.
->=20
-> In order to actually review these patches, we need to see an
-> implementation of such a page tracking device. Otherwise it's hard to
-> tell that the interface accomplishes the right abstractions.
+> +                                             paddr)) {
+>                      kvm_inject_arm_sea(c);
+>                  } else {
+>                      error_report("failed to record the error");
 
-Absolutely. That one is coming soon, but I was chasing the team to post
-the API and KVM glue parts as early as possible to kick-start the
-discussion, especially about the upcoming architectural solution.
-
-> Beyond that, I have some reservations about maintaining support for
-> features that cannot actually be tested outside of your own environment.
-
-That's more about the hardware driver itself which will follow, than
-the core API posted here.
-
-I understand the reservation, but I think it's fine.=C2=A0In general, Linux
-does support esoteric hardware that not everyone can test every
-time.=C2=A0We do sweeping changes across all Ethernet drivers, for example,
-and some of those barely even exist any more.
-
-This particular device should be available on bare metal EC2 instances,
-of course, but perhaps we should also implement it in QEMU. That would
-actually be beneficial for our internal testing anyway, as it would
-allow us to catch regressions much earlier in our own development
-process.
-
-> > When ARM architectural solution (FEAT_HDBSS feature) is available, we i=
-ntend to
-> > use it via the same interface most likely with adaptations.
->=20
-> Will the PTA stuff eventually get retired once you get support for FEAT_H=
-DBSS
-> in hardware?
-
-I don't think there is a definitive answer to that which is ready to
-tape out, but it certainly seems possible that future generations will
-eventually move to FEAT_HDBSS, maybe even reaching production by the
-end of the decade, at the earliest? And then a decade or two later, the
-existing hardware generations might even get retired, yes=C2=B9.
-
-=C2=B9 #include <forward-looking statement.disclaimer>
-
-> I think the best way forward here is to implement the architecture, and
-> hopefully after that your legacy driver can be made to fit the
-> interface. The FVP implements FEAT_HDBSS, so there's some (slow)
-> reference hardware to test against.
-
-Is there actually any documentation available about FEAT_HDBSS? We've
-been asking, but haven't received it. I can find one or two mentions
-e.g. https://arm.jonpalmisc.com/2023_09_sysreg/AArch64-hdbssbr_el2 but
-nothing particularly useful.
-
-The main reason for posting this series early is to make sure we do all
-we can to accommodate FEAT_HDBSS. It's not the *end* of the world if
-the kernel-internal API has to be tweaked slightly when FEAT_HDBSS
-actually becomes reality in future, but obviously we'd prefer to
-support it right from the start.
-
---=-X7RhqzEhlTPh06y7CJRW
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI2MTAwMDM5WjAvBgkqhkiG9w0BCQQxIgQgKf7ucjpf
-ZlpX7QDlIuFImfH+xNyCeweAOMPVO9Zqgf8wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAI22biPFKFZHHwLwtm6PsT0Yro/LzjWDAR
-J2nonn11MWLY/XsaTPFZgvtQUKOClV0FxGeHkNYFYr3HUiKLdVkPoHMsNc/nCprRXL5X0odzBSdO
-kwKcrg60Lc9BqCOmnP4xxy8maz+X30Y/ys3/dpgMTbMkMBTA0qsbZwwR54535ozMPOQU3M8sGelr
-yX4h8uxFcriZUqstpyCgZ9JXyf+LUgevy2tOW70rbA9ZjDNy6G1LxZv3rMZfujRivk9eW6aQg8AU
-WzxuGZqf4xM20iBBp75kehiXnMvzPt7ZrN56T5BWtNiQ0fdeMs5BTVrzTViBX1XtO1EVN6tPARc8
-b/3iWk5JquQi8sUMVAHKlUuI73FhTBeqskZFxwdjLOT/9wJea2RlC6WLwtKEdId3twgzcWK/qWjK
-fjtTpoIlMCeuRZwLwgpsLc4AXu1M3Fo0j9Czd6Ew/wLvLj0MicFErltub7rv4b6NVNPm79NUFThv
-hQ75w49L9quEcOXt9m8Sm+9zzRJ0qdd2gHLuUCf93nRa0d9htYFeoF+W/HIh0WRa8CALLfugV4RT
-MkwYhs9JgtakD1zLtpidbTIhP8tb4KKgFr2NvvEGgwvktxJlyUbZiLim1byhGAERCiIo+I3u/2UY
-/zcTuOtPKh2rA89oLq5VDuOt2cJAx9ZzbhFYfaq8agAAAAAAAA==
-
-
---=-X7RhqzEhlTPh06y7CJRW--
 
