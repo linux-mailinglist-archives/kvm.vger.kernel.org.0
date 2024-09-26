@@ -1,198 +1,264 @@
-Return-Path: <kvm+bounces-27571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27572-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8ACF9877DA
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 18:53:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E35559878DA
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 20:08:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96B93B20DBB
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 16:53:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E546B23C37
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 18:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE8A158DCC;
-	Thu, 26 Sep 2024 16:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D50016088F;
+	Thu, 26 Sep 2024 18:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AOdRbXhQ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AvMw6Lcb"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2055.outbound.protection.outlook.com [40.107.236.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF8F3F9D5
-	for <kvm@vger.kernel.org>; Thu, 26 Sep 2024 16:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727369577; cv=none; b=Fd+nyA8jnsYbW2YNqHW4dsIlLtuIUpWA/tnW9YilfBj1Z6fHk95TH+9R+1pr89Zy57SGpAmFzeRghMG2W17CnThob9VFavNGm7r2ZkDyTR7Qo8B6WOp74ImeR57EAcNfTH5GeTgDNHUVqBmMYJ99Nzk2cklv41dp4W6n9vDtT9E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727369577; c=relaxed/simple;
-	bh=J1OH4P2HGJb32Si+0OTL/MFTqDk02Yeh0y6VNt4C7to=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MORtxW2GAzHnbD5v3H3lY3M+CI0QzAn2VDcSgXJt27lFYHGTlC58DZi+p6BMjjl9eI1JJWSVNpSZLQRPxwN6LTDnJ42WorMIqfEgxxPNAx29efg/oyXXZyZjaogfw/KM2rx+sOR3jI58rPPNXxRurtTUxLiEOqBoJ7FaaCKhKSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AOdRbXhQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727369573;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=zj9vLyVeTUrkXFtErPVwTTDYQdcUkLzh1lKD/qYC/0s=;
-	b=AOdRbXhQVx45k80zWPRPfhWMvvfZdljeRG0xCbSwHALxB1rjLIykVdhgLS/hbDaJj03aO3
-	L6YB2EBRR7cLCpfi5OTYR9x44ySjVrWVaLhhYlXde6ChaXuh56FqAZQDHiGvf5K5GhNKKF
-	6eJdcM7s6K6dMe7tR8iLfpg2yZEV+wk=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-474-W1WLAXHbN5q564E23SXjTQ-1; Thu, 26 Sep 2024 12:52:52 -0400
-X-MC-Unique: W1WLAXHbN5q564E23SXjTQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7a7fa073718so222397185a.3
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2024 09:52:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727369572; x=1727974372;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zj9vLyVeTUrkXFtErPVwTTDYQdcUkLzh1lKD/qYC/0s=;
-        b=Hg/YH728IQaK3JsteDcp5hjXGRBTVPedJ1jcWXR0U5EZR6oawMqdDz182DveIUghKE
-         qkmnmaUBxJ+nL6hV/LJXKM/gLUeCN541ZKk+rUP093D/Mubj3i/8HjTqPgiEWnXEL0lz
-         KYE3StV197xAP/NuuFBsobtf/Bta2JwNnnz8adHCAl3gbgskeutKY2W45a9DaohcxDkk
-         DRsgEV73iwshLYP4dmtbXZpJoI8bvYw3Auo+s2Q0mRf/cvzux2XXRGjLZ+qqgGd45zfa
-         6g3N79TQPV/Goe6dWaIuK+vBpMD48WcLv+PnRROsNH2h1e1FcWA5MVaM91T7lonpTWIb
-         V6Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCVMW2gwcW+XtHtVBxiNCIfHxk5USuNAi/Xkb8zzJGtoVIxxV/IiPsUjLLtjqIbM9ZMo6GA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNFjly0VjMRwMAvHPl3IEYMDdqi26f920HvtMk/2TX+ehysAd4
-	zyJ2a2P9Vg7nOWze2v+uOZDbcLviOPzNJwHmMltX70T7p7GXa2olfjiCDsOkqKmtYAldcBAxff7
-	ckfwP3aKgyJ8POp8Jp2oNlnLezZ2ibYM2JMtXnsviJGDyU2jD/w==
-X-Received: by 2002:a05:620a:4305:b0:7ab:3511:4eda with SMTP id af79cd13be357-7ae37859606mr28692885a.34.1727369572046;
-        Thu, 26 Sep 2024 09:52:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHEc18+Y15wl3KbfQPxhfJugWm0iv4GLJ2pqlzsLF1lv3cavBK20N0dqbclFhcsiP8FYcVCfA==
-X-Received: by 2002:a05:620a:4305:b0:7ab:3511:4eda with SMTP id af79cd13be357-7ae37859606mr28688285a.34.1727369571647;
-        Thu, 26 Sep 2024 09:52:51 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:280:24f0:576b:abc6:6396:ed4a? ([2a01:e0a:280:24f0:576b:abc6:6396:ed4a])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ae3782c5f1sm6537285a.74.2024.09.26.09.52.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2024 09:52:51 -0700 (PDT)
-Message-ID: <104676c7-9732-4972-b00e-8f65ce9eb259@redhat.com>
-Date: Thu, 26 Sep 2024 18:52:47 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D027613A24D
+	for <kvm@vger.kernel.org>; Thu, 26 Sep 2024 18:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.55
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727374104; cv=fail; b=Y6wtVSFI0zjAJCbUj/98n5sh+9zi9M0N0kyeUA7lBEH374PK5ZvF/9zXmJhVqgmd8gEQ45OlBsrzhwqW7hy+qYemJhBodzvaTAgYdASkyPvDqvfZqtQYU8X1Uh4qBI8GzuS05okwMpWvHHXTz0OdF+bOLqrWv4XfrARnxWDtptg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727374104; c=relaxed/simple;
+	bh=opNUZbpX3EV84OzymwPmDU5k2IaHNy5G0oznApwUihI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UveAmqh3OyTym9RPrt+UyD8NwDDk4PEW/ZvqCoWcIOYruiDr7JlDKj0sIdV9GLDsz3q6RZjdxpg+QcVeajklQ8MQ7Wl+bKailyMHe4UScCsnKBpJ+rd6ViDXgoMm8XNuMyNSFifPqsU4XFwja9Q3d7kUIKqPmWX/F3LU2+pZveY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AvMw6Lcb; arc=fail smtp.client-ip=40.107.236.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HvjmcEYgnl7IlMPVUfaRVJJw+4SiQCXxtoPtj6gy/VGEZ7HrKG7La+csOHe28C1TGP0rRM6M61EYZQ9G1hJDfQKkDLlTIEjm8SkYqCFBPuMSLI4CWQQY5sJqLrP3C4y9f5u99pEF4XRsKLBUY52OStIcsCtW9kWbgr2F8wlaJcxqj2/u/xzQVc/yI2XhuYWyBAEer322lEHoRYNPz+EVoFkg78/QJhsKHXbxiQyrJSQ8eIztG00hM4K7Eea6t9qx75fRe8Xrz14KCX+nMMqabTFfo/URrt8s0XoEAr98VDrcO2EUbZyQQt0+1KoxWbE0TNyngnGr6AqvbGHfP0CFPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5iyjnLQkQbG57217JEYmGvWCduuakoy4/wuQiAMsDXY=;
+ b=GP7jnLMW/1zgLxsunkbZCMzj4JKQH22cA1yLH7/MV4stmJxBrUV+jFwtjzCtKylbY5noafmNSOdzGI/ZqMAS5xcZETjr/IRRqG9HVZgPiUu2Bl/93paaMXWstIOgWdH607OS7Sq/CptY0eslGRp3Z+8JyxMb37TKx3gEMRMhq4MFggJV1ORMB2VCitH/saMeDFIBPH7J5YAA7P9+kI7c6onv3ifYf6pn14wXg+iij+u0MzxRQvyEx1suoRifE9TlE+kM2fGSjyuLYXZby4raERn5gxEaq0QaopG+DxAWgFhBn81SJrbCUZ0ckqwClwPbZpJn/37Zsj/ixl7m1E8yuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=ffwll.ch smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5iyjnLQkQbG57217JEYmGvWCduuakoy4/wuQiAMsDXY=;
+ b=AvMw6Lcbwlyy99EpjbgIFwxUzNGcDy7TCYHlThxOfDzRVdyNFXMw4ucyjLR3IxdTy+wMLuOz8pjBMI83d7aLUxSFdKwxMJkrXCSbyBRzJy8E1qqnF1MYXIw/zJGw6sWLN+HfHLZzCFULBNh5B05Ir/4x3mpJbj3P163IiB0iUefa+lOFHEG82/lW6EPyE4uqd8oPEcn2u+wKOzLJtU9bKxAYVAR+a8t66CHG1xMOoDJ2tSk57tTiRaUMssWqHEiMSGA6caMUXT+p7irzXXdnCVDeNDZC6nNIRhzbIl7gJAYZ8La0AT+i8yW2zWZ3Co/tYV1afe85mAkBG60CyYEW4w==
+Received: from SJ0PR03CA0084.namprd03.prod.outlook.com (2603:10b6:a03:331::29)
+ by DM4PR12MB5963.namprd12.prod.outlook.com (2603:10b6:8:6a::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7982.29; Thu, 26 Sep 2024 18:08:16 +0000
+Received: from SJ5PEPF000001D0.namprd05.prod.outlook.com
+ (2603:10b6:a03:331:cafe::3f) by SJ0PR03CA0084.outlook.office365.com
+ (2603:10b6:a03:331::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.22 via Frontend
+ Transport; Thu, 26 Sep 2024 18:08:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ5PEPF000001D0.mail.protection.outlook.com (10.167.242.52) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8005.15 via Frontend Transport; Thu, 26 Sep 2024 18:08:16 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 26 Sep
+ 2024 11:08:02 -0700
+Received: from localhost (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 26 Sep
+ 2024 11:08:02 -0700
+Date: Thu, 26 Sep 2024 11:07:56 -0700
+From: Andy Ritger <aritger@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Greg KH <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>,
+	Zhi Wang <zhiw@nvidia.com>, <kvm@vger.kernel.org>,
+	<nouveau@lists.freedesktop.org>, <alex.williamson@redhat.com>,
+	<kevin.tian@intel.com>, <airlied@gmail.com>, <daniel@ffwll.ch>,
+	<acurrid@nvidia.com>, <cjia@nvidia.com>, <smitra@nvidia.com>,
+	<ankita@nvidia.com>, <aniketa@nvidia.com>, <kwankhede@nvidia.com>,
+	<targupta@nvidia.com>, <zhiwang@kernel.org>
+Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
+Message-ID: <ZvWi_NawH9zzznzi@bartok.localdomain>
+References: <20240922124951.1946072-1-zhiw@nvidia.com>
+ <ZvErg51xH32b8iW6@pollux>
+ <20240923150140.GB9417@nvidia.com>
+ <2024092614-fossil-bagful-1d59@gregkh>
+ <20240926124239.GX9417@nvidia.com>
+ <2024092619-unglazed-actress-0a0f@gregkh>
+ <20240926144057.GZ9417@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 0/1] Introduce vfio-cxl to support CXL type-2 device
- passthrough
-To: Zhi Wang <zhiw@nvidia.com>, kvm@vger.kernel.org, linux-cxl@vger.kernel.org
-Cc: alex.williamson@redhat.com, kevin.tian@intel.com, jgg@nvidia.com,
- alison.schofield@intel.com, dan.j.williams@intel.com, dave.jiang@intel.com,
- dave@stgolabs.net, jonathan.cameron@huawei.com, ira.weiny@intel.com,
- vishal.l.verma@intel.com, alucerop@amd.com, qemu-devel@nongnu.org,
- acurrid@nvidia.com, cjia@nvidia.com, smitra@nvidia.com, ankita@nvidia.com,
- aniketa@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
- zhiwang@kernel.org
-References: <20240921071440.1915876-1-zhiw@nvidia.com>
-Content-Language: en-US, fr
-From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-Autocrypt: addr=clg@redhat.com; keydata=
- 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
- uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <20240921071440.1915876-1-zhiw@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240926144057.GZ9417@nvidia.com>
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D0:EE_|DM4PR12MB5963:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b42b470-078d-49cc-505c-08dcde5631fa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?aCT5KBqHDlgav5dEM9ZLiFoXGIXRURjee+EOWdvQW9zzgeUtDtMs16BSXrFK?=
+ =?us-ascii?Q?y7y9MqvjRe4ZXd37jOSaohoJPm0N3oDw4gtyG6ww5TbxoNPjkKtu6uolPUAk?=
+ =?us-ascii?Q?iovwWlKei77ot/XQjZy1up+VjcCwi4/W79kcXkeahEjiaKQY3DveyHSu+h5q?=
+ =?us-ascii?Q?t2at5xhmAyfZonvwZbTz2lGmrVA9T3ShxcDVzwddFiwvMUBfM5GN+V9Ghr/H?=
+ =?us-ascii?Q?d45JXRfI/d3IsunpKJOahJe2kxLhCidq+FIBDCyP8097FTDphA0wyWKrpc1A?=
+ =?us-ascii?Q?DlWTOno83XLbyxuuiF2tehYsWXZw2uUOIUh8St6VYBeLwRvnph2JdyaYSUCn?=
+ =?us-ascii?Q?CCfbp4SPwAfe2W4M0H9kJTuVEqqFsrMCvnVXgQTWR5DCUqVzvtx8AWt5pKhB?=
+ =?us-ascii?Q?vlTaGcmU2K9kZBa8HCi5vIZv4w38nMZe78FB9AXhhccUgX+tgiuBMG3gxSDn?=
+ =?us-ascii?Q?TiyW/dCsxcG3j/54KepKhjJL8U3HeWAOD1fdrdXpdQQRaXkujNi5glXEnGaD?=
+ =?us-ascii?Q?EJzAVAx2mo16I0t6K87wFektd0l6UPc2RWPRNIKeTnKRWUxT3bNUg/ZCzHWw?=
+ =?us-ascii?Q?oOurkKVHWmHMvOan4iOEaMCJJgouuv/COKj4/raziRXL0Jn354C6gfKcySzk?=
+ =?us-ascii?Q?n1O7Wshq9AI567nlGYqnYNCJ7aW1UxLwQLFkJWgmrhvu6nwLQ6dakXeEyYSm?=
+ =?us-ascii?Q?dE4aE5OQiLCEgAeWKbN5DjiCrbGpe0YT47MoYrhQnhyQNOvHl8Cyg4FMHrQz?=
+ =?us-ascii?Q?B74Rtqey6UA6WWPaoVXsgJLX+I1LPMC8dXXQoQ10l9rJBDaCJOe+Ay0MQAKj?=
+ =?us-ascii?Q?cLhTqXqJjoYDZH2wWofLc3bMwZlSoevCMkEhG+j38TEDBZ7PmoiD0RCMyfHS?=
+ =?us-ascii?Q?NwrVmvqqit9Z2KXJkHJ3R5x1cp2zbYPceAqivAKx7WLsgcXyZ/k5xDcTF/sH?=
+ =?us-ascii?Q?NOhPXTwo2PvxPr+HY9M+M4rUW2CevHqPWITzrBBYQLKXxRve3CogdNKqDRsy?=
+ =?us-ascii?Q?fzDMjS7sxXTy9HH5zjchVrRqjwQIC6MsaP31AEDZN85xDUU4jBA0d7pDYA9d?=
+ =?us-ascii?Q?0qTNpPR1M7rPuUcJrdXWCazpe5NffzKRv+Pxqzp+k6cC16oEYdctlKs59Izv?=
+ =?us-ascii?Q?4z1lidQ9YABdY+7CTdUc+h2fE1ReNdtAQXoAU74r50ohlw3zYk/aCaalxgg6?=
+ =?us-ascii?Q?IjN9TMtcHpsatEeopzdleVBAceXggu+kMgxkL9YxcG5GiA6wOvlJAr3qUnaZ?=
+ =?us-ascii?Q?rDXFTNLVWy8IBzk3Pk3I7+c3W+dV3bMadxplJp2OK4A4hMBIAr43itkZ+Ez7?=
+ =?us-ascii?Q?iTQaOK1L11hUIwPXaj1HAgzRGMLfU8tKyYQ+WdiXcKfxDrfhn4N0t3hFiDWJ?=
+ =?us-ascii?Q?xp2E0ctDecTcJ2ng1kn+c7BXpgdOuGqfNRGxDEPgBw/g+UIiiHYcahCAhCVn?=
+ =?us-ascii?Q?Iovj3IlGAooPxo2W67OWmz3luVlFW+u2?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2024 18:08:16.4934
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b42b470-078d-49cc-505c-08dcde5631fa
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001D0.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5963
 
-Hello Zhi,
 
-On 9/21/24 09:14, Zhi Wang wrote:
-> Compute Express Link (CXL) is an open standard interconnect built upon
-> industrial PCI layers to enhance the performance and efficiency of data
-> centers by enabling high-speed, low-latency communication between CPUs
-> and various types of devices such as accelerators, memory.
+I hope and expect the nova and vgpu_mgr efforts to ultimately converge.
+
+First, for the fw ABI debacle: yes, it is unfortunate that we still don't
+have a stable ABI from GSP.  We /are/ working on it, though there isn't
+anything to show, yet.  FWIW, I expect the end result will be a much
+simpler interface than what is there today, and a stable interface that
+NVIDIA can guarantee.
+
+But, for now, we have a timing problem like Jason described:
+
+- We have customers eager for upstream vfio support in the near term,
+  and that seems like something NVIDIA can develop/contribute/maintain in
+  the near term, as an incremental step forward.
+
+- Nova is still early in its development, relative to nouveau/nvkm.
+
+- From NVIDIA's perspective, we're nervous about the backportability of
+  rust-based components to enterprise kernels in the near term.
+
+- The stable GSP ABI is not going to be ready in the near term.
+
+
+I agree with what Dave said in one of the forks of this thread, in the context of
+NV2080_CTRL_VGPU_MGR_INTERNAL_BOOTLOAD_GSP_VGPU_PLUGIN_TASK_PARAMS:
+
+> The GSP firmware interfaces are not guaranteed stable. Exposing these
+> interfaces outside the nvkm core is unacceptable, as otherwise we
+> would have to adapt the whole kernel depending on the loaded firmware.
+>
+> You cannot use any nvidia sdk headers, these all have to be abstracted
+> behind things that have no bearing on the API.
+
+Agreed.  Though not infinitely scalable, and not
+as clean as in rust, it seems possible to abstract
+NV2080_CTRL_VGPU_MGR_INTERNAL_BOOTLOAD_GSP_VGPU_PLUGIN_TASK_PARAMS behind
+a C-implemented abstraction layer in nvkm, at least for the short term.
+
+Is there a potential compromise where vgpu_mgr starts its life with a
+dependency on nvkm, and as things mature we migrate it to instead depend
+on nova?
+
+
+On Thu, Sep 26, 2024 at 11:40:57AM -0300, Jason Gunthorpe wrote:
+> On Thu, Sep 26, 2024 at 02:54:38PM +0200, Greg KH wrote:
 > 
-> Although CXL is built upon the PCI layers, passing a CXL type-2 device can
-> be different than PCI devices according to CXL specification. Thus,
-> addtional changes on are required.
+> > That's fine, but again, do NOT make design decisions based on what you
+> > can, and can not, feel you can slide by one of these companies to get it
+> > into their old kernels.  That's what I take objection to here.
 > 
-> vfio-cxl is introduced to support the CXL type-2 device passthrough.
-> This is the QEMU VFIOStub draft changes to support it.
+> It is not slide by. It is a recognition that participating in the
+> community gives everyone value. If you excessively deny value from one
+> side they will have no reason to participate.
 > 
-> More details (patches, repos, kernel config) all what you need to test
-> and hack around, plus a demo video shows the kernel/QEMU command line
-> can be found at:
-> https://lore.kernel.org/kvm/20240920223446.1908673-7-zhiw@nvidia.com/T/
-
-
-I have started looking at the software stack and the QEMU trees
-are quite old. Could you please rebase the branches on the latest ?
-
-Also, I think having a single branch per project would be easier.
-
-For linux :
-   [v2] cxl: add Type2 device support
-   [RFC] vfio: introduce vfio-cxl to support CXL type-2
-   [RFC] samples: introduce QEMU CXL accel driver
-
-Same for QEMU.
-
-Thanks,
-
-C.
-
-
-
+> In this case the value is that, with enough light work, the
+> kernel-fork community can deploy this code to their users. This has
+> been the accepted bargin for a long time now.
 > 
-> Zhi Wang (1):
->    vfio: support CXL device in VFIO stub
+> There is a great big question mark over Rust regarding what impact it
+> actually has on this dynamic. It is definitely not just backport a few
+> hundred upstream patches. There is clearly new upstream development
+> work needed still - arch support being a very obvious one.
 > 
->   hw/vfio/common.c              |   3 +
->   hw/vfio/pci.c                 | 134 ++++++++++++++++++++++++++++++++++
->   hw/vfio/pci.h                 |  10 +++
->   include/hw/pci/pci.h          |   2 +
->   include/hw/vfio/vfio-common.h |   1 +
->   linux-headers/linux/vfio.h    |  14 ++++
->   6 files changed, 164 insertions(+)
+> > Also always remember please, that the % of overall Linux kernel
+> > installs, even counting out Android and embedded, is VERY tiny for these
+> > companies.  The huge % overall is doing the "right thing" by using
+> > upstream kernels.  And with the laws in place now that % is only going
+> > to grow and those older kernels will rightfully fall away into even
+> > smaller %.
 > 
-
+> Who is "doing the right thing"? That is not what I see, we sell
+> server HW to *everyone*. There are a couple sites that are "near"
+> upstream, but that is not too common. Everyone is running some kind of
+> kernel fork.
+> 
+> I dislike this generalization you do with % of users. Almost 100% of
+> NVIDIA server HW are running forks. I would estimate around 10% is
+> above a 6.0 baseline. It is not tiny either, NVIDIA sold like $60B of
+> server HW running Linux last year with this kind of demographic. So
+> did Intel, AMD, etc.
+> 
+> I would not describe this as "VERY tiny". Maybe you mean RHEL-alike
+> specifically, and yes, they are a diminishing install share. However,
+> the hyperscale companies more than make up for that with their
+> internal secret proprietary forks :(
+> 
+> > > Otherwise, let's slow down here. Nova is still years away from being
+> > > finished. Nouveau is the in-tree driver for this HW. This series
+> > > improves on Nouveau. We are definitely not at the point of refusing
+> > > new code because it is not writte in Rust, RIGHT?
+> > 
+> > No, I do object to "we are ignoring the driver being proposed by the
+> > developers involved for this hardware by adding to the old one instead"
+> > which it seems like is happening here.
+> 
+> That is too harsh. We've consistently taken a community position that
+> OOT stuff doesn't matter, and yes that includes OOT stuff that people
+> we trust and respect are working on. Until it is ready for submission,
+> and ideally merged, it is an unknown quantity. Good well meaning
+> people routinely drop their projects, good projects run into
+> unexpected roadblocks, and life happens.
+> 
+> Nova is not being ignored, there is dialog, and yes some disagreement.
+> 
+> Again, nobody here is talking about disrupting Nova. We just want to
+> keep going as-is until we can all agree together it is ready to make a
+> change.
+> 
+> Jason
 
