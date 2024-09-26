@@ -1,103 +1,148 @@
-Return-Path: <kvm+bounces-27557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 232B5987340
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 14:08:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC6998734F
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 14:10:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 534781C23131
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 12:08:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88631B25309
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 12:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E085E1741FE;
-	Thu, 26 Sep 2024 12:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFB71741C0;
+	Thu, 26 Sep 2024 12:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xypqOioA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tQ3HjyUZ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xypqOioA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tQ3HjyUZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD8214F9FD;
-	Thu, 26 Sep 2024 12:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A4C78C90;
+	Thu, 26 Sep 2024 12:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727352489; cv=none; b=ad+lbAJ1xgRIcosN4AaYc3TP3p8NXaUOlPsAD/Q/6+3a3TEV8zr3wYVJIKK4RueauLsd+ihBOIZ/7/T11IVNS1A85RqWJITK3h3DAMSUhyfaAPKHndt4WAAywMWAz56zBmXPlr0Ezh+O7zrGivmohVGxmFLLobbFYZKa29q3zVw=
+	t=1727352644; cv=none; b=aMNpGvmBjWwCW0XgX8vNvmZjK7m43M9tbDi/h1YZNQGlCo0iE5eeJmd/clFmHwGhgJzH5Eu36VlKNugvkV8dmC3Dcy0iLnSadMJ/QB0XcILm0AMrQAVSfq/lkeFeg4UmbE+LZ6SaY4Qq/WM8HjMpLSO7mK58+NUwb0SKDug6nkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727352489; c=relaxed/simple;
-	bh=PO57L/uFfP7LlHOyaDgLFn5H9GT+LWQKvPwHx9D9P/s=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G8OevxDCtwChhSZq7wSOwlSNEC2Qcio2PyI3Hipx5Dw/H6/XUVKK5w5284tbZV2oTuCg04Zx8OULY4+aVptO+VQuNmD8wMevQVaXeFqJVyauxJG0h0B7RC/V62m67zvnaFMz1rKbVMOXgXvqoMXLdCA/JkvvIPOAQOqbmsUmvvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XDsm93tdkz6J7Y4;
-	Thu, 26 Sep 2024 20:07:21 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 946571401F3;
-	Thu, 26 Sep 2024 20:07:56 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 26 Sep
- 2024 14:07:55 +0200
-Date: Thu, 26 Sep 2024 13:07:54 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-CC: Igor Mammedov <imammedo@redhat.com>, Shiju Jose <shiju.jose@huawei.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Ani Sinha <anisinha@redhat.com>,
-	Dongjiu Geng <gengdongjiu1@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <qemu-arm@nongnu.org>,
-	<qemu-devel@nongnu.org>
-Subject: Re: [PATCH 11/15] acpi/ghes: better name GHES memory error function
-Message-ID: <20240926130754.000041ab@Huawei.com>
-In-Reply-To: <f4c031c627e761b2a48267f1cec1af3a7ad0acbb.1727236561.git.mchehab+huawei@kernel.org>
-References: <cover.1727236561.git.mchehab+huawei@kernel.org>
-	<f4c031c627e761b2a48267f1cec1af3a7ad0acbb.1727236561.git.mchehab+huawei@kernel.org>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1727352644; c=relaxed/simple;
+	bh=2JosmBuvO1uzpshMRCBoVMz1FQum5GKJW/gaxu6C7NU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=be4kzvUfV84SDUcJ0rtcylyJuvym0XHDgvXZO5TgTwvrHG+vYd75w0ydZeUn5ltMVmJ9GGX6YVMv+BDWWZApLmhM628vIHlrjdCHqxuT9CC4xOAoXyOweO1OZMtYkuys1/cn80uSypwoxXIk7BD1PUnYvLgtrUxjVHR7OnZ+QEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xypqOioA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tQ3HjyUZ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xypqOioA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tQ3HjyUZ; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from kitsune.suse.cz (unknown [10.100.12.127])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 7BB011F853;
+	Thu, 26 Sep 2024 12:10:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727352634; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mO+mBgqQ/T6X+tSWYJekgurpKW0Dnm8xbzizv8ba9T8=;
+	b=xypqOioAmz3znrCC0ei4IJzk5VUn5OhOzGsdS/R0MwtXqBZMP3BsT1mp5mKXFJuGn0bh1e
+	sAUrAoxgHeS4vLbI1w8Zf4a4rFzR2hl8NsTEWwF0sAqezLt+M4gLLOszNmvyaYJoe0hH3N
+	FWE96gOnF0RdB7Xw6mlYwzLKl+4n96k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727352634;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mO+mBgqQ/T6X+tSWYJekgurpKW0Dnm8xbzizv8ba9T8=;
+	b=tQ3HjyUZ+i6qEqCkzhCWjFTO7FEy2dx6rGn5HaE37/gpFbhVNIlTNWsj3vTeBfPbZrWJr6
+	ddCuNn3fdMiLEtBg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727352634; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mO+mBgqQ/T6X+tSWYJekgurpKW0Dnm8xbzizv8ba9T8=;
+	b=xypqOioAmz3znrCC0ei4IJzk5VUn5OhOzGsdS/R0MwtXqBZMP3BsT1mp5mKXFJuGn0bh1e
+	sAUrAoxgHeS4vLbI1w8Zf4a4rFzR2hl8NsTEWwF0sAqezLt+M4gLLOszNmvyaYJoe0hH3N
+	FWE96gOnF0RdB7Xw6mlYwzLKl+4n96k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727352634;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mO+mBgqQ/T6X+tSWYJekgurpKW0Dnm8xbzizv8ba9T8=;
+	b=tQ3HjyUZ+i6qEqCkzhCWjFTO7FEy2dx6rGn5HaE37/gpFbhVNIlTNWsj3vTeBfPbZrWJr6
+	ddCuNn3fdMiLEtBg==
+Date: Thu, 26 Sep 2024 14:10:33 +0200
+From: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc: Jordan Niethe <jniethe5@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+	mikey@neuling.org, sbhat@linux.ibm.com, kvm@vger.kernel.org,
+	amachhiw@linux.vnet.ibm.com, gautam@linux.ibm.com,
+	npiggin@gmail.com, David.Laight@aculab.com, kvm-ppc@vger.kernel.org,
+	sachinp@linux.ibm.com, kconsul@linux.vnet.ibm.com
+Subject: Re: [PATCH v5 00/11] KVM: PPC: Nested APIv2 guest support
+Message-ID: <ZvVPOW-GmK3G7wnH@kitsune.suse.cz>
+References: <20230914030600.16993-1-jniethe5@gmail.com>
+ <ZvRIG1LHwqa5_kgP@kitsune.suse.cz>
+ <874j636l9a.fsf@vajain21.in.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <874j636l9a.fsf@vajain21.in.ibm.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_ZERO(0.00)[0];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,lists.ozlabs.org,neuling.org,linux.ibm.com,vger.kernel.org,linux.vnet.ibm.com,aculab.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-On Wed, 25 Sep 2024 06:04:16 +0200
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
-
-> The current function used to generate GHES data is specific for
-> memory errors. Give a better name for it, as we now have a generic
-> function as well.
+On Thu, Sep 26, 2024 at 10:53:45AM +0530, Vaibhav Jain wrote:
+> Hi Michal,
 > 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-In general fine, but question below on what looks to be an unrelated change.
+> Michal Suchánek <msuchanek@suse.de> writes:
+> 
+> <snip>
+> 
+> > Hello,
+> >
+> > are there any machines on which this is supposed to work?
+> >
+> > On a 9105-22A with ML1050_fw1050.20 (78) and
+> 
+> On 9105-22A you need atleast:
+> Firmware level: FW1060.10
 
-Jonathan
+Indeed, upgrading to FW1060 makes the KVM functionality available.
 
+Thanks
 
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 849e2e21b304..57192285fb96 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -2373,7 +2373,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->               */
->              if (code == BUS_MCEERR_AR) {
->                  kvm_cpu_synchronize_state(c);
-> -                if (!acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
-> +                if (!acpi_ghes_memory_errors(ARM_ACPI_HEST_SRC_ID_SYNC,
-The parameter changes seems unconnected to rest of the patch...  Maybe at least
-mention it in the patch description.
-I can't find the definition of ARM_ACPI_HEST_SRC_ID_SYNC either so where
-did that come from?
-
-> +                                             paddr)) {
->                      kvm_inject_arm_sea(c);
->                  } else {
->                      error_report("failed to record the error");
-
+Michal
 
