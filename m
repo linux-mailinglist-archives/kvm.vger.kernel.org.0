@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-27525-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27526-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73794986A8B
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 03:37:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79C03986A8E
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 03:37:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00A441F22316
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 01:37:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ADD41C24857
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 01:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D313519AD56;
-	Thu, 26 Sep 2024 01:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0231175D53;
+	Thu, 26 Sep 2024 01:35:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m/VTRhi4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0izLu6WE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1550118133C
-	for <kvm@vger.kernel.org>; Thu, 26 Sep 2024 01:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3726C1925A2
+	for <kvm@vger.kernel.org>; Thu, 26 Sep 2024 01:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727314529; cv=none; b=CjdgOjcC7MoB0wNcG/X3hQVsyvi2uWEMTsAQBH2PeR7MMP6PLLRX7dVimkT3fl0mGb3hspWl/hA391I5DaKndGFaz8yLrmuZrQ9uhg3HMkWJMO2WG7qQc69EOndC7L6e3yRj1hC+L5mR46C/PWCCICxbeTQx+2CZo+tUhFMABuQ=
+	t=1727314529; cv=none; b=PnltiSK52u3uAkpMia1dLuu0Q7YwVWzbDw7Id93yvPVQvrteMGTE9IwH6hG8F3kEs+8uzOZj3mhOLkK2r7lh+rI3/DOXfpoiW6QmOf3aen/tdLj/81qLa0trU0eqPRussImeIRd9udU0vWtw3UAFx3X/bjdQCChZeh73HL/LJvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1727314529; c=relaxed/simple;
-	bh=0raPSAp7HnmbBOxblzsQepM7TqKA7NY1yCc61VEgCKk=;
+	bh=E9AQ6b+xH0X6/PhVwSlcvCw/vsOlfjn0RvQXxr2pYnI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lm+OjA0xuROBgiOK81n69CPBn/jbNXTlY+z+5ma6V5wxcojjeObbWID/T6xYxkS96/7zgdKJopQ8w64jPECuVvN28x2l1P/1aLce6cyLVhNGApPmTDpXI4pcHBQRBY4pvQQChx8pIKORtEbSlUY2Ubi5mtDb5cpOHhiJZcYIYqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m/VTRhi4; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=qZ8SRY+nP8y95TC0Kk1YgFSE8C85DvCm5BD9mhA3pPndA/XFX8p5sY9ZvzJgqCK55lRiIbV3WR05kueSRJUztO2FxENAPGNMzBLivktyeVO/R65dGcmBIW/cvUJc03A5nSYwZFa0pokZ2bSiie72xtvROK0Nex2n0z283GAMJiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0izLu6WE; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6dbffbae597so10507187b3.2
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 18:35:26 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e202bc54767so649343276.0
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 18:35:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727314526; x=1727919326; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727314527; x=1727919327; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MfYThc4u3zoEwhsYqTZzHZoRr9LypPNnm95GFpy1spA=;
-        b=m/VTRhi4Vb+l3sQ9+TsKzd34SVYj5ofUYIRw29d46kdZg/s++sbiH2HxV6TUSI+WVe
-         qrvHnx2MdK5vGGg7epJE12uX2HJOeFDslmOQvTk+RW6WJqC/GIttuF5sNSWF2IDe6r84
-         Oyl3FwIKr2RwMmIGCk06foCowlPWYirhsg5auSAa1k2dFNi/fcTElYCMWW0g9JrQCR8Q
-         RnZw2JSWLo2sbZpZx2YFITuhzBYe2UAHX3CfkY8Ofe7gULoecF/Wfp1c+cyBdt5dJB8M
-         Z9MCwdscIWgwu8MHVeq7SYR0pGIa7TpFAEsABLL5UCGNWygeUXj11bZIfoczL/UeldZR
-         DvPw==
+        bh=/OnVwOE5c+4OTD3Iw61tcspb9ex9OyShqju36BWGlvg=;
+        b=0izLu6WEdFEPHrK/MbRSe9pZuZy4p0cKedOL1sv1PuE2bbREDrC481Ox9J+4niq0xq
+         v49/Ld2Loax18tzQHKvCS94xKcy4PFvbee6ZzAQWTKhPoTiMlO9T0a+eqZlOUkY1gdje
+         bTf6yOM5DVXF/J1yDnLgXRLGjaiUBKgl3O7OoN9WQ4XiOo/SHkcUSA2DGauqtOn80CjQ
+         dbIHMeZ8pBQsySmgS6ekGHDwf+i06pv/G4Iee79JfNhMuCBqrXeVwjA6ZkMg9NnKA7lN
+         FD6dMdhIkWNg+yjV4tPG305pRHCjliH3d+iGG6LJcdn2X0JSG6DFZl0qslgSyMoVaaey
+         D0dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727314526; x=1727919326;
+        d=1e100.net; s=20230601; t=1727314527; x=1727919327;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MfYThc4u3zoEwhsYqTZzHZoRr9LypPNnm95GFpy1spA=;
-        b=HM9gnF0+Xh1jZY3pa1Ie3HUFhDGo3mRIjCeMWbqkwf+2AeZ1NMq+Xa47l2DGdeIajP
-         rfNlcVXkzgCb743qAsB972Bhm1WTuDyMCxUDNmk4ZJevya2EI/Sks50U2IaOAlCV+lAq
-         XB3NiysdD2jpfi3QAJ79krFtRwUFajQ0q2XOAqn5Hw7fURhXLafHy0VS/NE9UMHUPYvc
-         ANkOKnmedO4TXV0z+7lZzsbloJwzA+KOWupcBjMD5zy3nIp7SQhyq7g2suUi3UAgQ3iC
-         7z9VvsH3PSgq9pxb06AHSm0sPw8c2klCpG9C02k1qynBxYa+ZOoFR8MzUPKFpo413+Bh
-         91Gg==
-X-Forwarded-Encrypted: i=1; AJvYcCXaFl9nLZdiCGj0oJ0kUDUBL8xfjWLyD7Zm+YlaZkysV6s+tSA9ku3ku2eJ9a/Lag2iF6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLOLMYCEmY3Oz7XB0NFhkpT/9p919yAsiABs1LlN0XVEFQxovc
-	pSzMoYbIBiVzGGUwkhN6eJR3Z+OoQ8JVn7Sq/kmew88HUfjiJqyHblrc0axkBxNbqe5xQ9zejAd
-	S4wmXoh6GYkuO/Kdtig==
-X-Google-Smtp-Source: AGHT+IFc2BTb/n/6/Pa4YiRnYJohGJI1GOQLPmGDGx2avUwnGUEvHFpkm5PUE1m++wXUG9sRJDYpg95gpRMXrHPb
+        bh=/OnVwOE5c+4OTD3Iw61tcspb9ex9OyShqju36BWGlvg=;
+        b=LhaVgXpdcUAtWYWeQNERsXmzIwbIUELRt5S9AiqOgoQxli401/9W9lhlXTZgYXSKry
+         EiivD8/0KAjwSzDhp7CPX54UNkw7aoTInu++Slgo3iwf1fVHzl0eflVRHvTLZIOYIEAb
+         SnJn42Bt192eG+z0uzzJwvVvKtIht/fL6EiZG97oi9jN9tRQmAGvOJ1ZuDWAI1oGDFe9
+         BleOdbckSOtlwGYAqVXRuwemxS5zk87kqw5hzOPWR5bA5zDASo6vWu+oXJwLFOaNxx1K
+         teGPUt8sti6fbWZx5azaiQGrXNZsVh+3hT7qgLrp97sBHMzpI/UgmrQ0wAzXL2dh3qao
+         dYbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWCFtkCTDfwcMt4/TVKB88C28QT3G81OMU/pvk3+dEAoHNvtZhMy3HWavkja0tCOCrRGHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH7YOtRnDZ20sf8ectOo4KbaoMI9etJMjA7TjHyIEPPwn67SI0
+	J4Kre1QUhUbjc77z5/PpW/T0ebGL0X/fQlRL3r7Rs2uPLeg3CTB2KJObKZDMBbvqsUsgwdHzQ5A
+	EkBVWOtXoN0HdM62GRA==
+X-Google-Smtp-Source: AGHT+IFP6wbu5d5xFxibAPH1VEJb74N56TVg2vvH80n5yLYaLmdn9VnaHIq1SmzVQiXoW0zSRxLWmsPWaG4W/Pg1
 X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:13d:fb22:ac12:a84b])
- (user=jthoughton job=sendgmr) by 2002:a05:690c:5086:b0:6e2:1b8c:39bf with
- SMTP id 00721157ae682-6e21d835b06mr289447b3.2.1727314525948; Wed, 25 Sep 2024
- 18:35:25 -0700 (PDT)
-Date: Thu, 26 Sep 2024 01:34:57 +0000
+ (user=jthoughton job=sendgmr) by 2002:a25:74cc:0:b0:e25:cced:3e3f with SMTP
+ id 3f1490d57ef6-e25cced3f41mr11837276.4.1727314527042; Wed, 25 Sep 2024
+ 18:35:27 -0700 (PDT)
+Date: Thu, 26 Sep 2024 01:34:58 +0000
 In-Reply-To: <20240926013506.860253-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240926013506.860253-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.46.0.792.g87dc391469-goog
-Message-ID: <20240926013506.860253-10-jthoughton@google.com>
-Subject: [PATCH v7 09/18] KVM: x86/mmu: Add support for lockless walks of rmap SPTEs
+Message-ID: <20240926013506.860253-11-jthoughton@google.com>
+Subject: [PATCH v7 10/18] KVM: x86/mmu: Support rmap walks without holding
+ mmu_lock when aging gfns
 From: James Houghton <jthoughton@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, David Matlack <dmatlack@google.com>, 
@@ -88,228 +89,116 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Sean Christopherson <seanjc@google.com>
 
-Add a lockless version of for_each_rmap_spte(), which is pretty much the
-same as the normal version, except that it doesn't BUG() the host if a
-non-present SPTE is encountered.  When mmu_lock is held, it should be
-impossible for a different task to zap a SPTE, _and_ zapped SPTEs must
-be removed from their rmap chain prior to dropping mmu_lock.  Thus, the
-normal walker BUG()s if a non-present SPTE is encountered as something is
-wildly broken.
+Because an L1 KVM can disable A/D bits for its L2, even if
+kvm_ad_enabled() in L0, we cannot always locklessly age, as aging
+requires marking non-A/D sptes for access tracking, which is not
+supported locklessly yet.
 
-When walking rmaps without holding mmu_lock, the SPTEs pointed at by the
-rmap chain can be zapped/dropped, and so a lockless walk can observe a
-non-present SPTE if it runs concurrently with a different operation that
-is zapping SPTEs.
+We can always gather age information locklessly though.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
-[jthoughton: Added lockdep assertion for kvm_rmap_lock, synchronization fixup]
+[jthoughton: Added changelog, adjusted conditional]
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 75 +++++++++++++++++++++++-------------------
- 1 file changed, 42 insertions(+), 33 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 66 +++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 62 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 79676798ba77..72c682fa207a 100644
+index 72c682fa207a..a63497bbcc61 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -932,7 +932,7 @@ static struct kvm_memory_slot *gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu
+@@ -1014,13 +1014,11 @@ static unsigned long kvm_rmap_get(struct kvm_rmap_head *rmap_head)
+  * locking is the same, but the caller is disallowed from modifying the rmap,
+  * and so the unlock flow is a nop if the rmap is/was empty.
   */
- #define KVM_RMAP_LOCKED	BIT(1)
- 
--static unsigned long kvm_rmap_lock(struct kvm_rmap_head *rmap_head)
-+static unsigned long __kvm_rmap_lock(struct kvm_rmap_head *rmap_head)
+-__maybe_unused
+ static unsigned long kvm_rmap_lock_readonly(struct kvm_rmap_head *rmap_head)
  {
- 	unsigned long old_val, new_val;
- 
-@@ -976,14 +976,25 @@ static unsigned long kvm_rmap_lock(struct kvm_rmap_head *rmap_head)
- 	 */
- 	} while (!atomic_long_try_cmpxchg_acquire(&rmap_head->val, &old_val, new_val));
- 
--	/* Return the old value, i.e. _without_ the LOCKED bit set. */
-+	/*
-+	 * Return the old value, i.e. _without_ the LOCKED bit set.  It's
-+	 * impossible for the return value to be 0 (see above), i.e. the read-
-+	 * only unlock flow can't get a false positive and fail to unlock.
-+	 */
- 	return old_val;
+ 	return __kvm_rmap_lock(rmap_head);
  }
  
-+static unsigned long kvm_rmap_lock(struct kvm *kvm,
-+				   struct kvm_rmap_head *rmap_head)
+-__maybe_unused
+ static void kvm_rmap_unlock_readonly(struct kvm_rmap_head *rmap_head,
+ 				     unsigned long old_val)
+ {
+@@ -1736,8 +1734,53 @@ static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+ 	__rmap_add(vcpu->kvm, cache, slot, spte, gfn, access);
+ }
+ 
+-static bool kvm_rmap_age_gfn_range(struct kvm *kvm,
+-				   struct kvm_gfn_range *range, bool test_only)
++static bool kvm_rmap_age_gfn_range_lockless(struct kvm *kvm,
++					    struct kvm_gfn_range *range,
++					    bool test_only)
 +{
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+	return __kvm_rmap_lock(rmap_head);
++	struct kvm_rmap_head *rmap_head;
++	struct rmap_iterator iter;
++	unsigned long rmap_val;
++	bool young = false;
++	u64 *sptep;
++	gfn_t gfn;
++	int level;
++	u64 spte;
++
++	for (level = PG_LEVEL_4K; level <= KVM_MAX_HUGEPAGE_LEVEL; level++) {
++		for (gfn = range->start; gfn < range->end;
++		     gfn += KVM_PAGES_PER_HPAGE(level)) {
++			rmap_head = gfn_to_rmap(gfn, level, range->slot);
++			rmap_val = kvm_rmap_lock_readonly(rmap_head);
++
++			for_each_rmap_spte_lockless(rmap_head, &iter, sptep, spte) {
++				if (!is_accessed_spte(spte))
++					continue;
++
++				if (test_only) {
++					kvm_rmap_unlock_readonly(rmap_head, rmap_val);
++					return true;
++				}
++
++				/*
++				 * Marking SPTEs for access tracking outside of
++				 * mmu_lock is unsupported.  Report the page as
++				 * young, but otherwise leave it as-is.
++				 */
++				if (spte_ad_enabled(spte))
++					clear_bit((ffs(shadow_accessed_mask) - 1),
++						  (unsigned long *)sptep);
++				young = true;
++			}
++
++			kvm_rmap_unlock_readonly(rmap_head, rmap_val);
++		}
++	}
++	return young;
 +}
 +
- static void kvm_rmap_unlock(struct kvm_rmap_head *rmap_head,
- 			    unsigned long new_val)
++static bool __kvm_rmap_age_gfn_range(struct kvm *kvm,
++				     struct kvm_gfn_range *range, bool test_only)
  {
--	WARN_ON_ONCE(new_val & KVM_RMAP_LOCKED);
-+	KVM_MMU_WARN_ON(new_val & KVM_RMAP_LOCKED);
- 	/*
- 	 * Ensure that all accesses to the rmap have completed
- 	 * before we actually unlock the rmap.
-@@ -1023,14 +1034,14 @@ static void kvm_rmap_unlock_readonly(struct kvm_rmap_head *rmap_head,
- /*
-  * Returns the number of pointers in the rmap chain, not counting the new one.
-  */
--static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
--			struct kvm_rmap_head *rmap_head)
-+static int pte_list_add(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-+			u64 *spte, struct kvm_rmap_head *rmap_head)
- {
- 	unsigned long old_val, new_val;
- 	struct pte_list_desc *desc;
- 	int count = 0;
- 
--	old_val = kvm_rmap_lock(rmap_head);
-+	old_val = kvm_rmap_lock(kvm, rmap_head);
- 
- 	if (!old_val) {
- 		new_val = (unsigned long)spte;
-@@ -1110,7 +1121,7 @@ static void pte_list_remove(struct kvm *kvm, u64 *spte,
- 	unsigned long rmap_val;
- 	int i;
- 
--	rmap_val = kvm_rmap_lock(rmap_head);
-+	rmap_val = kvm_rmap_lock(kvm, rmap_head);
- 	if (KVM_BUG_ON_DATA_CORRUPTION(!rmap_val, kvm))
- 		goto out;
- 
-@@ -1154,7 +1165,7 @@ static bool kvm_zap_all_rmap_sptes(struct kvm *kvm,
- 	unsigned long rmap_val;
- 	int i;
- 
--	rmap_val = kvm_rmap_lock(rmap_head);
-+	rmap_val = kvm_rmap_lock(kvm, rmap_head);
- 	if (!rmap_val)
- 		return false;
- 
-@@ -1246,23 +1257,18 @@ static u64 *rmap_get_first(struct kvm_rmap_head *rmap_head,
- 			   struct rmap_iterator *iter)
- {
- 	unsigned long rmap_val = kvm_rmap_get(rmap_head);
--	u64 *sptep;
- 
- 	if (!rmap_val)
- 		return NULL;
- 
- 	if (!(rmap_val & KVM_RMAP_MANY)) {
- 		iter->desc = NULL;
--		sptep = (u64 *)rmap_val;
--		goto out;
-+		return (u64 *)rmap_val;
- 	}
- 
- 	iter->desc = (struct pte_list_desc *)(rmap_val & ~KVM_RMAP_MANY);
- 	iter->pos = 0;
--	sptep = iter->desc->sptes[iter->pos];
--out:
--	BUG_ON(!is_shadow_present_pte(*sptep));
--	return sptep;
-+	return iter->desc->sptes[iter->pos];
- }
- 
- /*
-@@ -1272,14 +1278,11 @@ static u64 *rmap_get_first(struct kvm_rmap_head *rmap_head,
-  */
- static u64 *rmap_get_next(struct rmap_iterator *iter)
- {
--	u64 *sptep;
--
- 	if (iter->desc) {
- 		if (iter->pos < PTE_LIST_EXT - 1) {
- 			++iter->pos;
--			sptep = iter->desc->sptes[iter->pos];
--			if (sptep)
--				goto out;
-+			if (iter->desc->sptes[iter->pos])
-+				return iter->desc->sptes[iter->pos];
- 		}
- 
- 		iter->desc = iter->desc->more;
-@@ -1287,20 +1290,24 @@ static u64 *rmap_get_next(struct rmap_iterator *iter)
- 		if (iter->desc) {
- 			iter->pos = 0;
- 			/* desc->sptes[0] cannot be NULL */
--			sptep = iter->desc->sptes[iter->pos];
--			goto out;
-+			return iter->desc->sptes[iter->pos];
- 		}
- 	}
- 
- 	return NULL;
--out:
--	BUG_ON(!is_shadow_present_pte(*sptep));
--	return sptep;
- }
- 
--#define for_each_rmap_spte(_rmap_head_, _iter_, _spte_)			\
--	for (_spte_ = rmap_get_first(_rmap_head_, _iter_);		\
--	     _spte_; _spte_ = rmap_get_next(_iter_))
-+#define __for_each_rmap_spte(_rmap_head_, _iter_, _sptep_)	\
-+	for (_sptep_ = rmap_get_first(_rmap_head_, _iter_);	\
-+	     _sptep_; _sptep_ = rmap_get_next(_iter_))
-+
-+#define for_each_rmap_spte(_rmap_head_, _iter_, _sptep_)			\
-+	__for_each_rmap_spte(_rmap_head_, _iter_, _sptep_)			\
-+		if (!WARN_ON_ONCE(!is_shadow_present_pte(*(_sptep_))))	\
-+
-+#define for_each_rmap_spte_lockless(_rmap_head_, _iter_, _sptep_, _spte_)	\
-+	__for_each_rmap_spte(_rmap_head_, _iter_, _sptep_)			\
-+		if (is_shadow_present_pte(_spte_ = mmu_spte_get_lockless(sptep)))
- 
- static void drop_spte(struct kvm *kvm, u64 *sptep)
- {
-@@ -1396,11 +1403,12 @@ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 	struct slot_rmap_walk_iterator iterator;
  	struct rmap_iterator iter;
- 	bool flush = false;
- 
--	for_each_rmap_spte(rmap_head, &iter, sptep)
-+	for_each_rmap_spte(rmap_head, &iter, sptep) {
- 		if (spte_ad_need_write_protect(*sptep))
- 			flush |= spte_wrprot_for_clear_dirty(sptep);
- 		else
- 			flush |= spte_clear_dirty(sptep);
-+	}
- 
- 	return flush;
- }
-@@ -1710,7 +1718,7 @@ static void __rmap_add(struct kvm *kvm,
- 	kvm_update_page_stats(kvm, sp->role.level, 1);
- 
- 	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
--	rmap_count = pte_list_add(cache, spte, rmap_head);
-+	rmap_count = pte_list_add(kvm, cache, spte, rmap_head);
- 
- 	if (rmap_count > kvm->stat.max_mmu_rmap_size)
- 		kvm->stat.max_mmu_rmap_size = rmap_count;
-@@ -1859,13 +1867,14 @@ static unsigned kvm_page_table_hashfn(gfn_t gfn)
- 	return hash_64(gfn, KVM_MMU_HASH_SHIFT);
+@@ -1776,6 +1819,21 @@ static bool kvm_rmap_age_gfn_range(struct kvm *kvm,
+ 	return young;
  }
  
--static void mmu_page_add_parent_pte(struct kvm_mmu_memory_cache *cache,
-+static void mmu_page_add_parent_pte(struct kvm *kvm,
-+				    struct kvm_mmu_memory_cache *cache,
- 				    struct kvm_mmu_page *sp, u64 *parent_pte)
++static bool kvm_rmap_age_gfn_range(struct kvm *kvm,
++				   struct kvm_gfn_range *range, bool test_only)
++{
++	/*
++	 * We can always locklessly test if an spte is young. Because marking
++	 * non-A/D sptes for access tracking without holding the mmu_lock is
++	 * not currently supported, we cannot always locklessly clear.
++	 */
++	if (test_only)
++		return kvm_rmap_age_gfn_range_lockless(kvm, range, test_only);
++
++	lockdep_assert_held_write(&kvm->mmu_lock);
++	return __kvm_rmap_age_gfn_range(kvm, range, test_only);
++}
++
+ static bool kvm_has_shadow_mmu_sptes(struct kvm *kvm)
  {
- 	if (!parent_pte)
- 		return;
- 
--	pte_list_add(cache, parent_pte, &sp->parent_ptes);
-+	pte_list_add(kvm, cache, parent_pte, &sp->parent_ptes);
- }
- 
- static void mmu_page_remove_parent_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
-@@ -2555,7 +2564,7 @@ static void __link_shadow_page(struct kvm *kvm,
- 
- 	mmu_spte_set(sptep, spte);
- 
--	mmu_page_add_parent_pte(cache, sp, sptep);
-+	mmu_page_add_parent_pte(kvm, cache, sp, sptep);
- 
- 	/*
- 	 * The non-direct sub-pagetable must be updated before linking.  For
+ 	return !tdp_mmu_enabled || READ_ONCE(kvm->arch.indirect_shadow_pages);
 -- 
 2.46.0.792.g87dc391469-goog
 
