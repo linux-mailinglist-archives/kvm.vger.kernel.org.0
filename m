@@ -1,170 +1,140 @@
-Return-Path: <kvm+bounces-27564-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27565-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98802987490
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 15:39:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56AE987514
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 16:06:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49CF1288B59
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 13:39:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3101A1F26D4B
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 14:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63AB713049E;
-	Thu, 26 Sep 2024 13:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C12136352;
+	Thu, 26 Sep 2024 14:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tFpkbNET"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IbnP3/KR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC353B7A8;
-	Thu, 26 Sep 2024 13:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B432D1C6B2;
+	Thu, 26 Sep 2024 14:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727357922; cv=none; b=WCQQi4vbwCkxQDml/CRvbeQDevm6pzMmgT8GZOr8FtNxmS4QoTRACLUN8ABTytP+SI/n91zc4zDvMyOCHunldtQdzoegVou12BwJv9jFH9HHg03FtbeEGrc6rMr9wO3QA3Px6cOLB0P2qSy2beFv8GAckQ/uvjjiI8sYPkzAL2A=
+	t=1727359570; cv=none; b=oc4fWNnyHybCTNmuk48GjFKjghwQfvzzSzQFjGSEKHW2/jgAWOvLYsPl90+K6a6yi31MsOn6hhBpruR1rMfT9lLzQvU98c1aq7d2lpNw7VEJrBm5msTBFT8wwpJObTgs/kqowsHyAAQbOxcpkABECsVPhpplaF9RxKYNIoN3AL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727357922; c=relaxed/simple;
-	bh=OPIQS2t62p13UwMnk1FiF+unfRr5Zwe9MubLOeGiJyM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SWI4Ov3/hPpmp4ekefjXgITt1acMdx2JHaai2YW3K++Jlnhk++5i0P+tQeLR5cckoEm+Y8I8qPrbkPzhS/p3c9jXKyw8/v7oh6LfGDbNLRoKKEc5idpk11WTZtEEigmpwQj72fMED3moCd6l+C2DMO5b5F5TLYKA1fRV81s9rYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tFpkbNET; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D596EC4CECE;
-	Thu, 26 Sep 2024 13:38:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727357921;
-	bh=OPIQS2t62p13UwMnk1FiF+unfRr5Zwe9MubLOeGiJyM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=tFpkbNET0czPRtMPovfI/tw3gSCaREnEFLqAxcDb3uZoTaN1MUsL6oFQbeAJWaXFI
-	 CeZWZV2EQC3jkUVUyeFkJ+3vTNfdldDlcwSemGpaMMeK9dMpCn+eo3NwP7qHalae2l
-	 VkYErS8T+eLlgBYIpVtrHU2I5PcdP6mhLc1DUl1KUsQKtRR5hqOVwbYWqQHd51bOSc
-	 0RXX9eQm9K7Euav9Ek8BEAPCErl0m7IiVuV8uXmMnTrDNFw9GHP2lFmVOsqkL2L43u
-	 cjWMgiSR1KtLVxjFC81BklSOZDD2JwvftlNBn0/eOD6Pyn0J+4KRnR0e//rfp7F508
-	 d7FbSWxfvv7MQ==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f75aaaade6so11868661fa.1;
-        Thu, 26 Sep 2024 06:38:41 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUXGse6vbc6FpYz4lgSlKDQJ3qHeN8YH1qg4ceNUpAOgf2a3chMjIK0ENodL3waku7Y6v9btiPZYwo=@vger.kernel.org, AJvYcCVHSf69uGrWCz6BRS1+JmcB0WwHMJusjUz5DzJz6OyyNCwKaGdkiV6aC7dllcXHLJDaeF58Iu+R6pkWfkE5@vger.kernel.org, AJvYcCVTuIuwxeKYKbgD/ed5IBfUTO7U1Ejx7RhUMhftttnafsBMVSpnvTc9K/Q5OeTJhgPJkdtAzjFih+qoU3yY@vger.kernel.org, AJvYcCVtRQGxusNOZWYtaUh1loOVtMx1E0c7HHDguIWYo9ealgtYxuWTRpJmBSWUo7f5zHlNPOM1Gw8mgXFiZ8mY@vger.kernel.org, AJvYcCWnzRX1k3MUWDUeu7WRrtNXnuRWLBPxMs1hH9mzwU5NkneQMn6dD/qskBYd2ZFzC5TMylmYyoNk3rnPXw==@vger.kernel.org, AJvYcCWwRwkLEtUjeqDHvxaVwTFatpqwvjxPRnP0dO3vppSWiwK189Ows6GwGumhRSpTmyH4CWEalcL0gdCD@vger.kernel.org, AJvYcCX2LMIhQ6EVmnkECm5H1xOqA26099cMKqZHDLb3snQOaHAII2I5pbbgC2ScvY2UAJCHWL9K3nvrFknz1qONp+CPMw==@vger.kernel.org, AJvYcCXc6rBX4B7tDEFX89zlzTTdnMaKavPMzO6FCLF0Fp51dWzHpePLktp9KpDsTPBEb2azHKHXUxYL49arAuSU2bQ=@vger.kernel.org, AJvYcCXgB42XCutcroFoVKxqmQ3xVd06k4oIAcHRUvkIUAQRtVdVKECbH9h9M9zw29dh6Av1J9g=@vger.kernel.org, AJvYcCXvi5cxeCUvrafei1Um
- rndmyryPFc3Yjd/XjPlDWE8wKBKBqfauz/iR5f6TXTsiAmqgA/04JIOBiM57@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywss9HWQbBVgJHtvIqk1Wu4DkB/i43GOJbJ7pSBIffBAxWqmqfp
-	RPSo3fNJedto7dlLNTrd34VBZVBaW6YphvSAysX7nCs1Y6E5lZVzu/a9j9jwmABqE2Bgu0nLqyB
-	6em3OiiG3xXVqSuX9z1jAxXZ5Yl4=
-X-Google-Smtp-Source: AGHT+IGDysp0zVaI/G56jPcUmenrli6iDQ7ZCklZUQ9W3MAWEI6d8p2NALI8I7dIlWV2Pg4Oztsl5Tqp++gl5gafuuo=
-X-Received: by 2002:a2e:4a0a:0:b0:2ef:1784:a20 with SMTP id
- 38308e7fff4ca-2f91ca68786mr32564001fa.38.1727357920170; Thu, 26 Sep 2024
- 06:38:40 -0700 (PDT)
+	s=arc-20240116; t=1727359570; c=relaxed/simple;
+	bh=0GQOr+LIbUulabpQaa69HJI0LcUX9XLKPsx3EwY06XI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=jpFRjf8mabx3OazR7mXncm0IyUqR6IaVXVOYjou73C1iCtAQbUyYs0r049IoqmVTj4VaTs4GUEm4FHe2GbO0WQ2VD3wVh5dMA6Ebqb/LE7HXnB/OB3+t0DGv6yLMbmvZMSy77KKM2wVAM68FWAduE4D64ErPrvbEnOpgt10Qj/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IbnP3/KR; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727359570; x=1758895570;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=0GQOr+LIbUulabpQaa69HJI0LcUX9XLKPsx3EwY06XI=;
+  b=IbnP3/KRg7la3SCA6bAzTkJoQXztjKZ4PiUf0XchH8J1gXZ3L3LMIEV5
+   +JC+IYfZxLWr3aCo9yjucBrRPaN9Q1flAgBHZh33sSOSsC3UnsiVkDFWc
+   wDxazLhUTv2KRjsj+dFqsjB/BKlbwwXCC1boAPYxwFlkyLOb1U0WH/Hxy
+   WUYx3/a+nv3//SttPafP2tT5+Q5ohkfHL6NeGXvxVzlsSxC4zyYY4QUC9
+   6PE8CIRTHOFUHNZwdM34a1AXaRWujly172Oh3pWm+XxNOx0fcF4fquBht
+   rQ+8maVzD+2T7crZUSbHZ+4m3teQHEnUXS5+lN/0NQ4Pczn7qECuhjD4v
+   A==;
+X-CSE-ConnectionGUID: CLE4TiOBSN6EdwDwGdboqg==
+X-CSE-MsgGUID: vaH6swcMTYye0Fvqt4Ml8Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11207"; a="26593976"
+X-IronPort-AV: E=Sophos;i="6.11,155,1725346800"; 
+   d="scan'208";a="26593976"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2024 07:05:49 -0700
+X-CSE-ConnectionGUID: W9ZCflfUTy+O/y2gjZS+QQ==
+X-CSE-MsgGUID: UfRvfteSRPSAaor/1UiUOw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,155,1725346800"; 
+   d="scan'208";a="76939292"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.89.141])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2024 07:05:42 -0700
+Message-ID: <b2671dab-9efa-4a56-bbe4-9b9140708120@intel.com>
+Date: Thu, 26 Sep 2024 17:05:36 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240925150059.3955569-30-ardb+git@google.com>
- <20240925150059.3955569-57-ardb+git@google.com> <4eca972d-a462-4cc5-9238-5d63485e1af4@oracle.com>
-In-Reply-To: <4eca972d-a462-4cc5-9238-5d63485e1af4@oracle.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 26 Sep 2024 15:38:27 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEOFDwoYrLH9f-d46HRPMw7HjWRQGNdMu5_D_Ny3UtPxg@mail.gmail.com>
-Message-ID: <CAMj1kXEOFDwoYrLH9f-d46HRPMw7HjWRQGNdMu5_D_Ny3UtPxg@mail.gmail.com>
-Subject: Re: [RFC PATCH 27/28] x86/kernel: Switch to PIE linking for the core kernel
-To: Vegard Nossum <vegard.nossum@oracle.com>
-Cc: Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Uros Bizjak <ubizjak@gmail.com>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
-	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
-	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] KVM: x86: Fix Intel PT Host/Guest mode when host
+ tracing also
+From: Adrian Hunter <adrian.hunter@intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>
+Cc: Zhenyu Wang <zhenyuw@linux.intel.com>, kvm@vger.kernel.org,
+ Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+ Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, H Peter Anvin <hpa@zytor.com>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Ian Rogers <irogers@google.com>,
+ Kan Liang <kan.liang@linux.intel.com>, linux-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, mizhang@google.com
+References: <20240906130026.10705-1-adrian.hunter@intel.com>
+Content-Language: en-US
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <20240906130026.10705-1-adrian.hunter@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 25 Sept 2024 at 22:25, Vegard Nossum <vegard.nossum@oracle.com> wrote:
->
->
-> On 25/09/2024 17:01, Ard Biesheuvel wrote:
-> > From: Ard Biesheuvel <ardb@kernel.org>
-> >
-> > Build the kernel as a Position Independent Executable (PIE). This
-> > results in more efficient relocation processing for the virtual
-> > displacement of the kernel (for KASLR). More importantly, it instructs
-> > the linker to generate what is actually needed (a program that can be
-> > moved around in memory before execution), which is better than having to
-> > rely on the linker to create a position dependent binary that happens to
-> > tolerate being moved around after poking it in exactly the right manner.
-> >
-> > Note that this means that all codegen should be compatible with PIE,
-> > including Rust objects, so this needs to switch to the small code model
-> > with the PIE relocation model as well.
-> >
-> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> > ---
-> >   arch/x86/Kconfig                        |  2 +-
-> >   arch/x86/Makefile                       | 11 +++++++----
-> >   arch/x86/boot/compressed/misc.c         |  2 ++
-> >   arch/x86/kernel/vmlinux.lds.S           |  5 +++++
-> >   drivers/firmware/efi/libstub/x86-stub.c |  2 ++
-> >   5 files changed, 17 insertions(+), 5 deletions(-)
-> >
-...
->
-> This patch causes a build failure here (on 64-bit):
->
->    LD      .tmp_vmlinux2
->    NM      .tmp_vmlinux2.syms
->    KSYMS   .tmp_vmlinux2.kallsyms.S
->    AS      .tmp_vmlinux2.kallsyms.o
->    LD      vmlinux
->    BTFIDS  vmlinux
-> WARN: resolve_btfids: unresolved symbol bpf_lsm_key_free
-> FAILED elf_update(WRITE): invalid section entry size
-> make[5]: *** [scripts/Makefile.vmlinux:34: vmlinux] Error 255
-> make[5]: *** Deleting file 'vmlinux'
-> make[4]: *** [Makefile:1153: vmlinux] Error 2
-> make[3]: *** [debian/rules:74: build-arch] Error 2
-> dpkg-buildpackage: error: make -f debian/rules binary subprocess
-> returned exit status 2
-> make[2]: *** [scripts/Makefile.package:121: bindeb-pkg] Error 2
-> make[1]: *** [/home/opc/linux-mainline-worktree2/Makefile:1544:
-> bindeb-pkg] Error 2
-> make: *** [Makefile:224: __sub-make] Error 2
->
-> The parent commit builds fine. With V=1:
->
-> + ldflags='-m elf_x86_64 -z noexecstack --pie -z text -z
-> call-nop=suffix-nop -z max-page-size=0x200000 --build-id=sha1
-> --orphan-handling=warn --script=./arch/x86/kernel/vmlinux.lds
-> -Map=vmlinux.map'
-> + ld -m elf_x86_64 -z noexecstack --pie -z text -z call-nop=suffix-nop
-> -z max-page-size=0x200000 --build-id=sha1 --orphan-handling=warn
-> --script=./arch/x86/kernel/vmlinux.lds -Map=vmlinux.map -o vmlinux
-> --whole-archive vmlinux.a .vmlinux.export.o init/version-timestamp.o
-> --no-whole-archive --start-group --end-group .tmp_vmlinux2.kallsyms.o
-> .tmp_vmlinux1.btf.o
-> + is_enabled CONFIG_DEBUG_INFO_BTF
-> + grep -q '^CONFIG_DEBUG_INFO_BTF=y' include/config/auto.conf
-> + info BTFIDS vmlinux
-> + printf '  %-7s %s\n' BTFIDS vmlinux
->    BTFIDS  vmlinux
-> + ./tools/bpf/resolve_btfids/resolve_btfids vmlinux
-> WARN: resolve_btfids: unresolved symbol bpf_lsm_key_free
-> FAILED elf_update(WRITE): invalid section entry size
->
-> I can send the full config off-list if necessary, but looks like it
-> might be enough to set CONFIG_DEBUG_INFO_BTF=y.
->
+On 6/09/24 16:00, Adrian Hunter wrote:
+> Hi
+> 
+> There is a long-standing problem whereby running Intel PT on host and guest
+> in Host/Guest mode, causes VM-Entry failure.
+> 
+> The motivation for this patch set is to provide a fix for stable kernels
+> prior to the advent of the "Mediated Passthrough vPMU" patch set:
+> 
+> 	https://lore.kernel.org/kvm/20240801045907.4010984-1-mizhang@google.com/
+> 
+> which would render a large part of the fix unnecessary but likely not be
+> suitable for backport to stable due to its size and complexity.
+> 
+> Ideally, this patch set would be applied before "Mediated Passthrough vPMU"
+> 
+> Note that the fix does not conflict with "Mediated Passthrough vPMU", it
+> is just that "Mediated Passthrough vPMU" will make the code to stop and
+> restart Intel PT unnecessary.
 
-Thanks for the report. Turns out that adding the GOT to .rodata bumps
-the section's sh_entsize to 8, and libelf complains if the section
-size is not a multiple of the entry size.
+Any comments?
 
-I'll include a fix in the next revision.
+> 
+> 
+> Adrian Hunter (3):
+>       KVM: x86: Fix Intel PT IA32_RTIT_CTL MSR validation
+>       KVM: x86: Fix Intel PT Host/Guest mode when host tracing also
+>       KVM: selftests: Add guest Intel PT test
+> 
+>  arch/x86/events/intel/pt.c                         | 131 ++++++-
+>  arch/x86/events/intel/pt.h                         |  10 +
+>  arch/x86/include/asm/intel_pt.h                    |   4 +
+>  arch/x86/kvm/vmx/vmx.c                             |  26 +-
+>  arch/x86/kvm/vmx/vmx.h                             |   1 -
+>  tools/testing/selftests/kvm/Makefile               |   1 +
+>  .../selftests/kvm/include/x86_64/processor.h       |   1 +
+>  tools/testing/selftests/kvm/x86_64/intel_pt.c      | 381 +++++++++++++++++++++
+>  8 files changed, 532 insertions(+), 23 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/intel_pt.c
+> 
+> base-commit: d45aab436cf06544abeeffc607110f559a3af3b4
+> 
+> 
+> Regards
+> Adrian
+
 
