@@ -1,56 +1,74 @@
-Return-Path: <kvm+bounces-27541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85DCB986C3C
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 08:04:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A739986C67
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 08:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DBCAB2528C
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 06:04:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5114B251C7
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2024 06:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A6A188CD2;
-	Thu, 26 Sep 2024 06:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C155189913;
+	Thu, 26 Sep 2024 06:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="geGWS3MN"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="H2LOkvf6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCADD178CD9;
-	Thu, 26 Sep 2024 06:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29CC5178397
+	for <kvm@vger.kernel.org>; Thu, 26 Sep 2024 06:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727330672; cv=none; b=IwxOU1+vTycpRQaPWOk3bKrdjppnWB/SfMLgAUsgg8b0vYnHQYePfPHOI4Zy5WKdvjwdEecIl9LwC+e/pnV4/hDo8FSeRCflsK7L8BSTaEKUEBgcvSvYK+jlaK6aep96o7Y0ni+W6tiDEpVq8gxR8IZVLh6G/ubNwTQD/BsaWFE=
+	t=1727331684; cv=none; b=R4N8WCvwQeBHSx0vQh550mSOVHwrv6Ey6rkSqCefRItFQ3vpyqqV0AoBCqMH748DcWH5a4cw8Cfl8hw0bY5qODDYxP4KHpjprsya8Ujrd2E2RtEfqwIzF5/xYrJF/WJz7zJbB+EGx2ji4x7gQylWgjTFmrJTl+5wdKq4UNjSJHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727330672; c=relaxed/simple;
-	bh=ZeQD+1PUyDnjoFlVO8O8D6pVFxmJOJGsc7xOxz4eNag=;
+	s=arc-20240116; t=1727331684; c=relaxed/simple;
+	bh=1pLxbC8I7m5jJNxnqEC6sj7C1ca8cV6A29jVK2+lQFo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iX0tM56XLRjB7C7TU9pZCXG7NNkOqhxJnN+e5QPKJ3Gl7C/oy0BSfnWjimerA8Uff9JAB7sokhWdv7NkyUzt1RXadHXQfsXwXwikNA5ijIb43fZ88Bo+JToXygL642jopypIKdILbk86Ww2/z/1ET2LDp60bEW2lX6udGi9WLMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=geGWS3MN; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1727330658; x=1727935458; i=markus.elfring@web.de;
-	bh=ZeQD+1PUyDnjoFlVO8O8D6pVFxmJOJGsc7xOxz4eNag=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=geGWS3MNungZvnuSeB/oIbiFxq5h613Eo7Pmd5iPT8OnEu74B6H5Cv6IDacsh1p3
-	 PAplQeyDw/8pZ/vsybQYlvPoIEgk87jIa7I+EXqv8cupdPWgW0ycVUhX3JihKkUWD
-	 9M6rzX8L1iFabgaKwl3iLr4x2DaObYAY81EulSWpMuJu/jbdZP7deLuFjxFAv8DTo
-	 13lG/TcT0jfoey2FgJFzG0+BAeKsUMsXH3lni4QinSy2UM6hr4jxs7NLPU+gl7Cfx
-	 MobJJY+1JQqd9htCqwg0ebAuqmwJCdhomePq1IlFEelwb+BVOETsiAG3156uGcNDS
-	 1U6v8H8zh87WwTAcQA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.84.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MFayq-1si6E02S7i-00EemW; Thu, 26
- Sep 2024 08:04:18 +0200
-Message-ID: <c32f24e8-9e4e-4ee5-9b5d-276dc99ace9f@web.de>
-Date: Thu, 26 Sep 2024 08:04:06 +0200
+	 In-Reply-To:Content-Type; b=f2UP71Ur2o8jUsfP8Wqh9Rlv5X27wYmkrRPi0G20QNWafVEZ/nmL3QJKtxe8Zp/OZF9NBrm7DgHniIxflb5a62g1jKKdNm0ywBQqa669WJd8Re5cpo3JtcseFulmLHLR3k2FB/RVCV5o7pDWdxsjAi6gq92y95U9mnpmQ3TZmVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=H2LOkvf6; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a8d29b7edc2so68408866b.1
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2024 23:21:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1727331677; x=1727936477; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oYMCwkQPVxKJ+cMHOHVL5c+5ytaGE64SeE8g5ixOBss=;
+        b=H2LOkvf6723jQxMkj0NU2J6eql+i7LeBQKQvCat1N7UMPIXKjsNbUWeeW8xqmLtalZ
+         NZ8rlt+785Jqhuc12DOF0JjbBzQaR6PD718oHoOfWD1ZsxdlKQtOsPT0B3YLuP8/4/2T
+         n7tgZzoebTKdVmEbXKqTnqSsCs3V5/jdM0SfvylZf15iABMHkpFm3vfEjNizE+95QqTH
+         yt+L22pElkbXqpnic8SBF9ElsSAiwtEU7NkRrkHEXcY11CMpnlu1waIQ6fflEd0bKWqZ
+         wKsC5itTeWWkz1iT0fAixEHenRgtdobaFuBIxfPoG4D6s+f0OYURqbGs10k46QBrBAHS
+         AxTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727331677; x=1727936477;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oYMCwkQPVxKJ+cMHOHVL5c+5ytaGE64SeE8g5ixOBss=;
+        b=U2hmHiHbED5g4Tk4rOK+a6ywID+R0m1M0u5WRhGzgWk8so4wjzsxv30K+RlA2wvr3U
+         fCKUk9IEjmcflwkm8UBSL70cxdHGx686s6nfYdingy62q7cTphlYhVbVTByFJll2Ld5A
+         rvZiKlbwqpPjWTqTjj1AHsDsR9DxKj3KovebVLZ89UnodESDuLwc/9sGkWOBONhL/8w0
+         H7Q7PxJmWGnVQkOyiHmDxSrklXUPut5tVNGwZ8fp4/XupFeo8XzXipruzzw02Djkp6T2
+         HvNSmz4HayfFCoEj7iOx9APxNUDoCBNbz3pNvq3++bgqpy2Gm1MYpAmCtQdY73Kg29oa
+         wMQg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5pzATncAcJJpsGnqoxa5QYgAzKTZKlbntAV3yYN92xjdS/7Ox2wHpbWesjVG2NDAJeQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz840ErwCxAcd8ZRAgKyUxuQsBUYsoUlqEjU/B8u4LD5ElZHQpF
+	z2a1Boi062/MZgtJgFulpFzMktibMNCrieutLYyYBfE0jIfjgIUFKEWcOeC6b6E=
+X-Google-Smtp-Source: AGHT+IGq6JdSzSznwPxVPi2beVS6+2KfvKJjCPl73nGi+bdpGccswpYOVUmzs63z0PbobAmD2I0QlQ==
+X-Received: by 2002:a17:907:940c:b0:a86:bb90:93fa with SMTP id a640c23a62f3a-a93a05e7e73mr470458966b.44.1727331677393;
+        Wed, 25 Sep 2024 23:21:17 -0700 (PDT)
+Received: from ?IPV6:2a10:bac0:b000:75b8:7285:c2ff:fedd:7e3a? ([2a10:bac0:b000:75b8:7285:c2ff:fedd:7e3a])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9392f34076sm308151066b.7.2024.09.25.23.21.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Sep 2024 23:21:17 -0700 (PDT)
+Message-ID: <d8351d41-b7ee-48b4-a11c-5d1cd7f39ae2@suse.com>
+Date: Thu, 26 Sep 2024 09:21:15 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,51 +76,65 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: vhost-vdpa: Refactor copy_to_user() usage in
- vhost_vdpa_get_config()
-To: Al Viro <viro@zeniv.linux.org.uk>, virtualization@lists.linux.dev,
- kvm@vger.kernel.org, netdev@vger.kernel.org,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
-References: <79b2f48a-f6a1-4bfc-9a8d-cb09777f2a07@web.de>
- <20240925205005.GL3550746@ZenIV>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240925205005.GL3550746@ZenIV>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:pMsomcAkr28z9Z3EwUnEnq8peCVCV4ch6FTAdwlR6QcGeSH397q
- mwXSzn1m+/eTNu8QxabM8wniDml2HEouJF+v+zmlpqqfiRdjJHM+f7stabRGQiiJCofbSU6
- SeBaV3Wbogs6nwukNAXgqZBAWBx0p9+Qi32QvgOQ+7/W+1RzdWwou9iJRVUh/ofJFj4vKST
- unWUrr4RZdlMDGVIWVYYw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:DF04tBPKcp8=;FCU+bf/qUQwvP8X7G4VCbyxZEjL
- F/FjNs231Xf2O15kcVJfSF8C7ImdV8e0ZuyXpQ623+BFZpjQP93RoYJmdC4hgPIwHdTkLNMan
- Vf/VPB94EE5J/N66oZWsfQ6vK1YSUFrmiF6/X+Nbbo4rHsA2hlRNpVoxt/uaWd2qzpOObrjtf
- BZyNW2BfqHoVradMDH2Lcqh//wddskWbZpHcnXAlyVXtTkxhsWt646CA8ecFnresbyjPNaoK6
- lRLU6xoSWbHkmYf8MmW/8Kbw5HG29xCQsR3UPy34SqJh+9HDUtp0ipftW5iNsI27JN8vYyDSU
- dtoKSGUG48TFDYLWU9nnMjhbgU4gyChgdd/9e1cL3MbRi2MhnmedugiwxFP4Ahw6zT4tSTOgY
- nw9cdnJzeao5xD53TsF+mOo2697CoMaskTfnH2jXK+QuSKK4Mk23hIbPnKmQ1QI6bIwVArE3H
- BDmbZKIAfaXJ7Qqaplorqh+lsATrSlX0TuoBMgFSJ44v6DAYt2zI35/OHQIHVNnS2RqAaVQ+l
- sqxfa7NudJquU0iZfZ9qT1i10fFO6DmKDUoh+l+CPJWXGo/Dl9j1LPM8xvJyDzZA+ZrgBUVez
- bVTnoz3BWlH+rcfRLYS/6GwC3gW0paUj9nynEw3Nma+t+ZN0aCxiCBVWadsKxLGUDkEoQvFqo
- e7M9ttVBU29Mbxz//cL9cjsP6V+3Iu4eT8SPfDBjkCYVdFO8v11KH7M3KajMONiVPygyrzuiU
- QaV0sLGb/rtVkikdmV8AWfAMaUNFGwUkax7XrkSDr1/rbEhW8XEMZ0p1e5hgO64gekvOmchwZ
- 10mULOtL5104495OANasWuAA==
+Subject: Re: [PATCH v4 5/8] x86/virt/tdx: Start to track all global metadata
+ in one structure
+To: Kai Huang <kai.huang@intel.com>, dave.hansen@intel.com,
+ kirill.shutemov@linux.intel.com, tglx@linutronix.de, bp@alien8.de,
+ peterz@infradead.org, mingo@redhat.com, hpa@zytor.com,
+ dan.j.williams@intel.com, seanjc@google.com, pbonzini@redhat.com
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, adrian.hunter@intel.com
+References: <cover.1727173372.git.kai.huang@intel.com>
+ <014302e0bd2f0797aa7d27ed8b730603d2859c2d.1727173372.git.kai.huang@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+In-Reply-To: <014302e0bd2f0797aa7d27ed8b730603d2859c2d.1727173372.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
->> Assign the return value from a copy_to_user() call to an additional
->> local variable so that a kvfree() call and return statement can be
->> omitted accordingly.
->
-> Ugly and unidiomatic.
->
->> This issue was detected by using the Coccinelle software.
->
-> What issue?
 
-Opportunities for the reduction of duplicate source code.
 
-Regards,
-Markus
+On 24.09.24 г. 14:28 ч., Kai Huang wrote:
+> The TDX module provides a set of "Global Metadata Fields".  They report
+> things like TDX module version, supported features, and fields related
+> to create/run TDX guests and so on.
+> 
+> Currently the kernel only reads "TD Memory Region" (TDMR) related fields
+> for module initialization.  There are immediate needs which require the
+> TDX module initialization to read more global metadata including module
+> version, supported features and "Convertible Memory Regions" (CMRs).
+> 
+> Also, KVM will need to read more metadata fields to support baseline TDX
+> guests.  In the longer term, other TDX features like TDX Connect (which
+> supports assigning trusted IO devices to TDX guest) may also require
+> other kernel components such as pci/vt-d to access global metadata.
+> 
+> To meet all those requirements, the idea is the TDX host core-kernel to
+> to provide a centralized, canonical, and read-only structure for the
+> global metadata that comes out from the TDX module for all kernel
+> components to use.
+> 
+> As the first step, introduce a new 'struct tdx_sys_info' to track all
+> global metadata fields.
+> 
+> TDX categories global metadata fields into different "Classes".  E.g.,
+> the TDMR related fields are under class "TDMR Info".  Instead of making
+> 'struct tdx_sys_info' a plain structure to contain all metadata fields,
+> organize them in smaller structures based on the "Class".
+> 
+> This allows those metadata fields to be used in finer granularity thus
+> makes the code more clear.  E.g., the construct_tdmr() can just take the
+> structure which contains "TDMR Info" metadata fields.
+> 
+> Add a new function get_tdx_sys_info() as the placeholder to read all
+> metadata fields, and call it at the beginning of init_tdx_module().  For
+> now it only calls get_tdx_sys_info_tdmr() to read TDMR related fields.
+> 
+> Note there is a functional change: get_tdx_sys_info_tdmr() is moved from
+> after build_tdx_memlist() to before it, but it is fine to do so.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Reviewed-by: Adrian Hunter <adrian.hunter@intel.com>
+
+Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
 
