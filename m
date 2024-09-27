@@ -1,174 +1,110 @@
-Return-Path: <kvm+bounces-27614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C0CB9883F8
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 14:13:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A49789884C9
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 14:31:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DF92B20F9C
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 12:13:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5C971C21E3B
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 12:31:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8221218BB8F;
-	Fri, 27 Sep 2024 12:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="C+s65evJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA1818CC16;
+	Fri, 27 Sep 2024 12:30:39 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310F718B469;
-	Fri, 27 Sep 2024 12:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E00C18CC02
+	for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 12:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727439218; cv=none; b=qxw+WozdBzHf0PEE5B1AEo9O/z9xs0+TNHSry/ocrtUp3U21StCkDzlBzs/iPg0i/SNl3zJLkB1dTEbBJ2rgW5ZWicGVAhz4LLj3pr3qShHAVPZANa0DqVjqhN++bbPMzoC4H1fFM7xsnhLM6eYxNykz5LhsObHDjSCgmk94r6I=
+	t=1727440239; cv=none; b=m49l8qIIg74hSrrPufQ5b6NNipP+ZwebfjijjBTOKD8tJ22foCGdBV1GVROPYP1lVA6NZqgt5/MCY42sQVQ1WAqpIjYbp1cf0SOyrOg5qjOm99mXsiKirv1N2QNpZLzfuFrHUbGjNjYkxyLtj2JHeZh+0zNJ11GWUO6zqvC052Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727439218; c=relaxed/simple;
-	bh=BnosdaO32ZN/pUvy3DU6b7SaAw/p453VVtLuoKccxgA=;
-	h=Subject:Date:From:To:CC:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h8cQpcKT6VWtptXui01N2KfHoQAmRxvwTMO8aQSD+2w9Lu6QJGpEXjCnARjDJnzDEegOsJmcVgvc1vFCSuZK0H2pbuoyGoleI7iMqM+IwvIzHKvI/+NLL8WEfyQwO9spnCObW0Qt2fUipOn4mn75jF769o5QMNllqrignbnKxkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=C+s65evJ; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1727439217; x=1758975217;
-  h=date:from:to:cc:message-id:references:mime-version:
-   in-reply-to:subject;
-  bh=ZL5/JF3OF7nq2YesB9F5TMPjivF22f+PhP8u0LLBew0=;
-  b=C+s65evJhe1dKKZbJ3bFLEGmZUEqJzhLjrXeHCAzPQIikcZzsNl7AaB5
-   QOSyaLmkU+izPPvyMAgkWHpQRpKNkZsM1wQ4Yin53u3UEsBuHcIQi5Js8
-   8wvYjkdUlfaaFGCN1NTV9mCpAWI+bcqU4kKCbn8q5ueHTup8Vs8ySFQYn
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.11,158,1725321600"; 
-   d="scan'208";a="130899921"
-Subject: Re: [PATCH 0/4] Process some MMIO-related errors without KVM exit
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2024 12:13:31 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:21628]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.17.12:2525] with esmtp (Farcaster)
- id d530fc8f-b548-4fc5-99d8-ac8d61b8565d; Fri, 27 Sep 2024 12:13:30 +0000 (UTC)
-X-Farcaster-Flow-ID: d530fc8f-b548-4fc5-99d8-ac8d61b8565d
-Received: from EX19D033EUB004.ant.amazon.com (10.252.61.103) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 27 Sep 2024 12:13:30 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (10.250.64.143) by
- EX19D033EUB004.ant.amazon.com (10.252.61.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 27 Sep 2024 12:13:30 +0000
-Received: from email-imr-corp-prod-pdx-1box-2b-ecca39fb.us-west-2.amazon.com
- (10.25.36.210) by mail-relay.amazon.com (10.250.64.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Fri, 27 Sep 2024 12:13:29 +0000
-Received: from dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com [10.253.74.38])
-	by email-imr-corp-prod-pdx-1box-2b-ecca39fb.us-west-2.amazon.com (Postfix) with ESMTP id 6A72380067;
-	Fri, 27 Sep 2024 12:13:29 +0000 (UTC)
-Received: by dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (Postfix, from userid 29210185)
-	id F21C9AA3B; Fri, 27 Sep 2024 12:13:28 +0000 (UTC)
-Date: Fri, 27 Sep 2024 12:13:28 +0000
-From: Ivan Orlov <iorlov@amazon.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Jack Allister <jalliste@amazon.co.uk>, Ivan Orlov <iorlov@amazon.co.uk>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"bp@alien8.de" <bp@alien8.de>, "dave.hansen@linux.intel.com"
-	<dave.hansen@linux.intel.com>, "hpa@zytor.com" <hpa@zytor.com>,
-	"mingo@redhat.com" <mingo@redhat.com>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"nh-open-source@amazon.com" <nh-open-source@amazon.com>, "shuah@kernel.org"
-	<shuah@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"x86@kernel.org" <x86@kernel.org>
-Message-ID: <20240927121328.GA37012@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
-References: <20240923141810.76331-1-iorlov@amazon.com>
- <ZvGfnARMqZS0mkg-@google.com>
- <cb06b33acdad04bef8c9541b4247a36f51cf2d36.camel@amazon.co.uk>
- <ZvHhqRWW04jmk8TW@google.com>
- <20240924095422.GA66922@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
- <ZvSllYdtddzHv7vM@google.com>
+	s=arc-20240116; t=1727440239; c=relaxed/simple;
+	bh=3Pn9eA1WNvxj7KUL7ubzyUfODv2qFAQBlZ/vrM5V+PU=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=tqwe7VnLNAccKh8MYzwRX9RpoQ45ZIbFPDc1Glf5a2KAGdpVDThwBl20Mwj0fZV5/3NJxqRQZHUD6dEdT6hcxmPMNtUfGMyNPMZbheYeVx6Q8x4LrjJ0/QVQKdzS7s26ITMUCcArWIM3VFjTifzFs7WmMePUeTzZz0LieSK0NE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XFV9k2JpdzWf3d;
+	Fri, 27 Sep 2024 20:28:10 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 71EA618010A;
+	Fri, 27 Sep 2024 20:30:28 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 27 Sep 2024 20:30:27 +0800
+Subject: Re: [PATCH] KVM: arm64: Another reviewer reshuffle
+To: Marc Zyngier <maz@kernel.org>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Joey Gouly
+	<joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon
+	<will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
+References: <20240927104956.1223658-1-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <17304d38-d435-2e97-9e5e-329b4479bbca@huawei.com>
+Date: Fri, 27 Sep 2024 20:30:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZvSllYdtddzHv7vM@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20240927104956.1223658-1-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Wed, Sep 25, 2024 at 05:06:45PM -0700, Sean Christopherson wrote:
+On 2024/9/27 18:49, Marc Zyngier wrote:
+> It has been a while since James had any significant bandwidth to
+> review KVM/arm64 patches. But in the meantime, Joey has stepped up
+> and did a really good job reviewing some terrifying patch series.
 > 
-> Yeah, but only because the alternative sucks worse.  If KVM unconditionally exited
-> with an emulation error, then unsuspecting (read: old) VMMs would likely terminate
-> the guest, which gives guest userspace a way to DoS the entire VM, especially on
-> older CPUs where KVM needs to emulate much more often.
+> Having talked with the interested parties, it appears that James
+> is unlikely to have time for KVM in the near future, and that Joey
+> is willing to take more responsibilities.
 > 
->         if (kvm->arch.exit_on_emulation_error ||
->             (emulation_type & EMULTYPE_SKIP)) {
->                 prepare_emulation_ctxt_failure_exit(vcpu);
->                 return 0;
->         }
-> 
->         kvm_queue_exception(vcpu, UD_VECTOR);
-> 
->         if (!is_guest_mode(vcpu) && kvm_x86_call(get_cpl)(vcpu) == 0) {
->                 prepare_emulation_ctxt_failure_exit(vcpu);
->                 return 0;
->         }
-> 
->         return 1;
-> 
-> And that's exactly why KVM_CAP_EXIT_ON_EMULATION_FAILURE exists.  VMMs that know
-> they won't unintentionally give guest userspace what amounts to a privilege
-> escalation can trap the emulation failure, do some logging or whatever, and then
-> take whatever action it wants to take.
-> 
+> So let's appoint Joey as an official reviewer, and give James some
+> breathing space, as well as my personal thanks. I'm sure he will
+> be back one way or another!
 
-Hi Sean,
+With my thanks to James :-)
 
-Makes sense, thank you for the explanation.
-
-> > and I believe how we do this
-> > is debatable. I maintain we should either set a flag in emulation_failure.flags
-> > to indicate that the error happened due to fetch from mmio (to give more
-> > information to VMM),
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Joey Gouly <joey.gouly@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Generally speaking, I'm not opposed to adding more information along those lines.
-> Though realistically, I don't know that an extra flag is warranted in this case,
-> as it shouldn't be _that_ hard for userspace to deduce what went wrong, especially
-> if KVM_TRANSLATE2[*] lands (though I'm somewhat curious as to why QEMU doesn't do
-> the page walks itself).
-> 
-> [*] https://lore.kernel.org/all/20240910152207.38974-1-nikwip@amazon.de
-> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 878dcd23b3317..fe2028b5b250f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -12270,7 +12270,7 @@ F:	virt/kvm/*
+>  KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
+>  M:	Marc Zyngier <maz@kernel.org>
+>  M:	Oliver Upton <oliver.upton@linux.dev>
+> -R:	James Morse <james.morse@arm.com>
+> +R:	Joey Gouly <joey.gouly@arm.com>
+>  R:	Suzuki K Poulose <suzuki.poulose@arm.com>
+>  R:	Zenghui Yu <yuzenghui@huawei.com>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
 
-Fair enough, but I still believe that it would be good to provide more
-information about the failure to the VMM (considering the fact that KVM
-tries to emulate an instruction anyway, adding a flag won't introduce any
-performance overhead). I'll think about how we could do that without
-being redundant :)
+Acked-by: Zenghui Yu <yuzenghui@huawei.com>
 
-> > or we shouldn't return an error at all... Maybe it should be KVM_EXIT_MMIO with
-> > some flag set? What do you think?
-> 
-> It'd be a breaking change and added complexity, for no benefit as far as I can
-> tell.  KVM_EXIT_INTERNAL_ERROR is _not_ a death sentence, or at least it doesn't
-> have to be.  Most VMMs do terminate the guest, but nothing is stopping userspace
-> from grabbing RIP and emulating the instruction.  I.e. userspace doesn't need
-> "permission" in the form of KVM_EXIT_MMIO to try and keep the guest alive.
-
-Yeah, I just thought that "internal error" is not the best exit code for
-the situations when guest fetches from MMIO (since it is a perfectly legal
-operation from the architectural point of view). But I agree that it
-would be a breaking change without functional benefit ( especially if we
-provide a flag about what happened :) ).
-
-P.S. I tested the latest kvm/next, and if we set the IDT descriptor base to
-an MMIO address it still falls into the infinite loop on SVM. I'm going
-to send the fix in the next couple of days.
-
-Kind regards,
-Ivan Orlov
+Welcome!
 
