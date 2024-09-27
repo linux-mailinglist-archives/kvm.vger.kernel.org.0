@@ -1,165 +1,141 @@
-Return-Path: <kvm+bounces-27638-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27639-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABBA098893D
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 18:41:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B50379889C8
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 19:50:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5A48B235D1
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 16:41:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E4711F225B2
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 17:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287281C175C;
-	Fri, 27 Sep 2024 16:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59D71C1ABF;
+	Fri, 27 Sep 2024 17:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2YsbGfSN"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Y67HVPvl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59EE13CA81
-	for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 16:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F7923B0;
+	Fri, 27 Sep 2024 17:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727455263; cv=none; b=nsBp+JsRR/knz6YgliDY7o4B96PQ22reohYomCw0auXUOFQVU+H+E5CItlUj5ddsmg0MocYt8tD6ZyBZP4AZP4V0BJ7mjlV4QU0MjCXMZuMgt8o4U5wq1rFOh+QJRVNdirDs4fOq6A8buschpSdDqzjZOd3ixPJHiIsQAUy4quc=
+	t=1727459402; cv=none; b=q8z1aa3T2c73yd6HD4NtHH+chmyGml9H9aWO9lOwWNuV+s6Fw1S+y1ef0gwsGD4DvkVc8G5Yb8nHONItxYZEjDrWxOeWhxX88O72XM7BERJ4Jbx0sXcNrPmdwXyOe26blDv88NpSK2P0SlW7dkIZrHrXUueN/0u+khxof2n7u2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727455263; c=relaxed/simple;
-	bh=8ObVtIZ+UJHNr5088o2tQ6P8qxaunfkuhXf2P3pFZrU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aiuO/PfZdxhGdAXc6X6DLDzjuG9rnJqTOrHNJpkxvVVx09RsgagT3sywWGbSZ2u8ixjdWX+8w09Sf04eTXuOk3WKholkoljvh7jdTw0YuDm8aXDx0HHdC561QtEF94xNxSRT6W2vQnd7VkzRmoJddHOTci5YYF+OyENxN4RD1jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2YsbGfSN; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e25c9297cc8so3634644276.1
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 09:41:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727455261; x=1728060061; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pd5lh7JLuf3aCdh6awjMGA+eiHlMKt4pDNu1P6/6DGQ=;
-        b=2YsbGfSNrcFZNOLF/5PoRW1Q0io4LNlMXtWW9sWwBTm6p6ifLf2C7TmF9HCdGb204W
-         /RdWkU9aYO1N1+HQ5wS/VcH+wdLuNCHxhI+W86E/6YpTul658eZ8XClEdVrOrZYxI1j7
-         ep4ySYitT8erqEu/c56dlUOvkFG5Zce/79h+6B5PfAn0n/ayh0H0N5Ok9EBDfdIF3x9K
-         kSkc2tJDe8WKxW9IKeXlmipx9OVeKEx0zMouwKlWfpPjnCrDXV4fXaAq5Mf5yI7ip0T2
-         qLvre+OBpA5Te7lD5uJ9H4e3OO5xuVh6wGWbAN/31x75gEtC4wzCIQcC54kjBsgvcD5d
-         ilTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727455261; x=1728060061;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pd5lh7JLuf3aCdh6awjMGA+eiHlMKt4pDNu1P6/6DGQ=;
-        b=IzQcdnYXA5PwUFmpMcyaIEOLg18ZgliKUa7mWcX9i6BakTy0wJBTResqlghUfOSc/w
-         ppGMsHmeyjhA85QObRbkNd6IILgrF5rU43+J2/d2KI7kgqciKrLXdsDuDJUNc0cGXWkh
-         4sEENOv6lpfkpVloeHo4Bvr4wZVyAbFLsJs/OEIH7AGrmftlw9GcIOr7RyFJBeE23SP0
-         L5EtlZjD8aMSzE4Q4vqh1ZC8VKVYEWD/7Auo2eq3uIa5NqhB8kMlw6f+9IG+LCWo7wJY
-         T52n4ugyXqwHbvK9BJbf9CX2CqxQNAWM78lb/vnhPbAQWL3oB6AYIOZeDNHYaFFFhMgg
-         EQaQ==
-X-Gm-Message-State: AOJu0Ywu0C0KrzHGIIMqWuioYKL4hsIra+zKKFZDvEkBVG8DALVHJzDq
-	20EiKZureQ/TgJ1JkLRH6mvLf+T+BRSUaBqkELafqHLlIlxh5+DfqpDazOlGdv+qjn9p67r1GHZ
-	biA==
-X-Google-Smtp-Source: AGHT+IGzN/iJoSyKupIZzhJVlVgfect+jrg1VTPfRFBnX66cr5FLio6KOONGPDE6VR5u3Gj59NiUEUOgtpU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:69cc:0:b0:e24:c3eb:ad03 with SMTP id
- 3f1490d57ef6-e2604ca607bmr2516276.10.1727455260887; Fri, 27 Sep 2024 09:41:00
- -0700 (PDT)
-Date: Fri, 27 Sep 2024 09:40:59 -0700
-In-Reply-To: <de586a25-1ede-482a-8317-cb700be697b4@redhat.com>
+	s=arc-20240116; t=1727459402; c=relaxed/simple;
+	bh=OQ8UJ21YYnXWk8uGEtOeg4cUNizdeSHYo13CO6Dp/7c=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=silTTQXtJjq59jAZSgMWPyJWwweEXsgjVF1CRH6wvOJfVkc91RPHHTjOI4t46UbdyeqgZ9OTsF0Avyg8jTkYeimSacqzs+TpqXIvsBIZ4VAtiRHH1pz3f7U2uMHTbv4q4o7XNsFCJOm9GDoXH1YdCweRaXfuhc5VM+zfAwfrS60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Y67HVPvl; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.205] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 48RHmuBk1788498
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Fri, 27 Sep 2024 10:48:56 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 48RHmuBk1788498
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024091601; t=1727459337;
+	bh=SF0FL9WmYDEbaKMO13C88v3yLZ0MrWkzlusCVl5FVsI=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=Y67HVPvl61EVkWatxnhOVeXKW63UykF8TU4cDEDQiKbePtlNSYbVPcCS7S1o7qRmW
+	 ki644wA0aln7/r+v87u68bpGmD+gJ/XFRJKJrP2lvuXu2IkbCYXV8wReZwNVkJATHP
+	 fv8LId0DEgqsrTbBisdaSSSwg/iEGOY7mz+Zw5EA5ttwpHkdZfOpefApYvzPdlNxU0
+	 Kcerz93cj51dM7YRIk4YWSUMNUJ9bx2cTpxJKXy8J3kiE8gNmPf/uB48ITrEvtSZJX
+	 bgR0btyYoKr9XBOBoeWKFWPg8KpyBiiMmKXHJSWil8jM0W79ajOOIfFEkfQt9keelb
+	 vIPxGdpQNNGNg==
+Message-ID: <208429ae-d9c5-4b73-86ff-a9b31e68f7eb@zytor.com>
+Date: Fri, 27 Sep 2024 10:48:55 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240927001635.501418-1-seanjc@google.com> <de586a25-1ede-482a-8317-cb700be697b4@redhat.com>
-Message-ID: <ZvbgG95G3Fp9Zq98@google.com>
-Subject: Re: [PATCH 0/4] KVM: x86: Revert SLOT_ZAP_ALL quirk
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kai Huang <kai.huang@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Yan Zhao <yan.y.zhao@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/25] KVM: VMX: Set intercept for FRED MSRs
+From: Xin Li <xin@zytor.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Chao Gao <chao.gao@intel.com>, Xin Li <xin3.li@intel.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, shuah@kernel.org, vkuznets@redhat.com,
+        peterz@infradead.org, ravi.v.shankar@intel.com
+References: <20240207172646.3981-1-xin3.li@intel.com>
+ <20240207172646.3981-8-xin3.li@intel.com> <ZiJzFsoHR41Sd8lE@chao-email>
+ <ZmoT0jaX_3Ww3Uzu@google.com>
+ <feefa9d1-f266-414f-bb7b-b770ef0d8ec6@zytor.com>
+ <ZuNJlzXntREQVb3n@google.com>
+ <d65e62d2-ca64-4b29-8656-bb8411fe837d@zytor.com>
+ <ZvQaNRhrsSJTYji3@google.com>
+ <496a337d-a20d-4122-93a9-1520779c6d2d@zytor.com>
+Content-Language: en-US
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <496a337d-a20d-4122-93a9-1520779c6d2d@zytor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 27, 2024, Paolo Bonzini wrote:
-> On Fri, Sep 27, 2024 at 2:18=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >=20
-> > Revert the entire KVM_X86_QUIRK_SLOT_ZAP_ALL series, as the code is bug=
-gy
-> > for shadow MMUs, and I'm not convinced a quirk is actually the right wa=
-y
-> > forward.  I'm not totally opposed to it (obviously, given that I sugges=
-ted
-> > it at one point), but I would prefer to give ourselves ample time to so=
-rt
-> > out exactly how we want to move forward, i.e. not rush something in to
-> > unhose v6.12.
->=20
-> Yeah, the code is buggy but I think it's safe enough to use code like the
-> one you wrote back in 2019; untested patch follows:
+>>> When FRED is advertised to a guest, KVM should allow FRED SSP MSRs
+>>> accesses through disabling FRED SSP MSRs interception no matter whether
+>>> supervisor shadow stacks are enabled or not.
+>>
+>> KVM doesn't necessarily need to disabling MSR interception, e.g. if 
+>> the expectation
+>> is that the guest will rarely/never access the MSRs when CET is 
+>> unsupported, then
+>> we're likely better off going with a trap-and-emulate model.  KVM 
+>> needs to emulate
+>> RDMSR and WRMSR no matter what, e.g. in case the guest triggers a 
+>> WRMSR when KVM
+>> is emulating, and so that userspace can get/set MSR values.
+>>
+>> And this means that yes, FRED virtualization needs to land after CET 
+>> virtualization,
+>> otherwise managing the conflicts/dependencies will be a nightmare.
+>>
 
-...
+I still plan to send another iteration of the FRED patch set for review,
+however I haven't seen your x86 KVM changes land into Linus' tree, it
+will happen soon, right?
 
-> (Not too sure about using the sp_has_gptes() test, which is why I haven't
-> posted this yet).
-
-Heh, I was going to ask about that too.  Luckily I read ahead :-)
-
-To be 100% safe, I think the zap needs to purge everything, even invalid SP=
-s.
-I doubt it would ever cause problems to leave dangling invalid SPs, but I d=
-on't
-love the idea of avoiding UAF purely by relying on KVM not consuming stale =
-info.
-
-The other thing that makes my head hurt is how SPs are tracked by direct SP=
-s in
-the shadow MMU, i.e. by the effect of direct_map() and the guest hugepage c=
-ase
-(it would be weird, but legal for the guest to create a hugepage that strad=
-dles
-a memslot boundary) rounding the gfn for the level when creating SPs.
-
-Hmm, but I suppose that's an argument against being paranoid for the !sp_ha=
-s_gptes()
-case, as KVM already creates SPs with a target gfn that isn't covered by a =
-memslot.
-Blech.
-
-> With respect to the choice of API, the quirk is at least good for
-> testing; this was already proven, I guess.
-
-True.  I do think the documentation should be updated to be less prescripti=
-ve,
-i.e. to give KVM wiggle room.  Disabling the quirk should only _allow_ KVM =
-to
-a targeted/partial zap, it shouldn't _force_ KVM to do so.
-
-> Also I think it's safe to enable it for SEV/SEV-ES VM types: they
-> pretty much depend on NPT (see sev_hardware_setup), and with the
-> TDP MMU it should always be better to kill the PTEs for the memslot
-> (even if invalidating the whole MMU is cheap) to avoid having to
-> fault all the remainder of the memory back in.  So I think the current
-> version of kvm_memslot_flush_zap_all() is better than using e.g.
-> kvm_arch_has_private_mem().
-
-In practice, you're probably right.  Realistically, the only memslot remova=
-l that
-would be problematic is the deletion of a large memslot, at which point SEV=
-+ VMs
-are in for a world of hurt no matter what.
-
-> The only straggler is software-protected VMs, which I don't care
-> too much about; but if anything it's better to make them closer to
-> SNP and TDX VM types.
->=20
-> For now I think I'll send the existing kvm/next to Linus and we
-> can sort it out next week, as the weekend (and the closure of the
-> merge window) is impending...
-
-Works for me.  Thanks!
+> 
+> No argument.
 
