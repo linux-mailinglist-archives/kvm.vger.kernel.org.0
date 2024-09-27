@@ -1,257 +1,154 @@
-Return-Path: <kvm+bounces-27626-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27627-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3864988710
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 16:25:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 156A998872B
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 16:35:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3BE61C229BE
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 14:25:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0121283101
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 14:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD97481AB;
-	Fri, 27 Sep 2024 14:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4163157A41;
+	Fri, 27 Sep 2024 14:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WGXNlhov"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hzg9T+MA"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76EC612E1D1;
-	Fri, 27 Sep 2024 14:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F61101F2
+	for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 14:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727447101; cv=none; b=nn4HUaBpNQ7DJ12zub1AYdxHrcalgXLHHqoeJTBUJccQha2O3cqnMgup4sGGPD8NAiISNHLBXUlPqEk5n8IpWQl7hVb89nwOwslTiVAtXBF9l6y3FLBz0YKw4BVBiMnhh8FYDJutdBPNecSSRlwoqzpUAORXPSJ2Dqo4XQsMjTw=
+	t=1727447705; cv=none; b=pRmX38BfOXLa7CB1yYr0cz7LbFWgqd0p6GtlGT4pc4BPU42n8iztExlAJnCvTQOpSWGofXJ7AmlVBvSYhbiFCgmIW2r74LBiEx1zmhvIhIbIM4X4Dhoth23A/TdmhEuWHIspOGPsYce27gv17Owox2fvXTtNmanOTnpR+c+95rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727447101; c=relaxed/simple;
-	bh=gavA5CmzkoOwq9uc9AHy+DZvNBptdrIcT+g38MDxCH0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=lsri1oXGRlgHI2QwLqYbRmgcrwItv/RODGhOP65ipysHG9rYshGqT7jvfEDSFgwi+FfvJKwlUjWEMb1o+s2zbK2UjT65nEUDfssNIWRKczVVIn9fvLplKEMvG6HynJYndafF+pDiRRfR6P60oAir+8DqrFN01AbJFToRYgmSYZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WGXNlhov; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Rs01ZRpIZLcrUgd9cPMujX8QNFJErEnOgp1YcqWPRDo=; b=WGXNlhovxvsg5jB3c+meL5xRd4
-	zhOCnFqErk++hfhGEScKuRPxN2b0uLJ/ASyP7K8o3gZQGBG/p3BWykcS+g4EVJdhz9sc30+cWyx81
-	YK2oQ1Cnj/BOvFgMsz+tSF91EUNl2GMfAVx9abYKdZ+LDtr90v+CHBqisY73/NH1joxkyYw7DyRM0
-	HUBsf01T/pf9OGLVh7U70n6jjcFTonz3FgbwraqEaPuPJ818jUo0ExL0P/OWfx+AqVKG/Jk3g3T/L
-	v2W0rtA6Kal5gqHHSwDf8AprzZovcOGYg5dBLzpGQETRfjEZSGKdp9EQG0F4Iq71CNSph28Ow0fwG
-	j+k/HwmQ==;
-Received: from [2001:8b0:10b:5:40e6:99a4:ff80:ef9a] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1suBtl-00000009nbt-3apL;
-	Fri, 27 Sep 2024 14:24:46 +0000
-Message-ID: <378d3797a94df5df655d47b3bd733da8853cc2e4.camel@infradead.org>
-Subject: Re: [PATCH v4 1/6] firmware/psci: Add definitions for PSCI v1.3
- specification
-From: David Woodhouse <dwmw2@infradead.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: Souvik Chakravarty <Souvik.Chakravarty@arm.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier
- <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James Morse
- <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui
- Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Lorenzo
- Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>, Shuah Khan
- <shuah@kernel.org>,  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
- <kvmarm@lists.linux.dev>, "linux-pm@vger.kernel.org"
- <linux-pm@vger.kernel.org>,  "linux-kselftest@vger.kernel.org"
- <linux-kselftest@vger.kernel.org>
-Date: Fri, 27 Sep 2024 15:24:45 +0100
-In-Reply-To: <CB344CC7-E6E2-4325-9669-9BE7EA47C56B@oracle.com>
-References: <20240924160512.4138879-1-dwmw2@infradead.org>
-	 <2868989D-73CA-4208-8B54-CC3C78A2F1EF@oracle.com>
-	 <d23d2cdcab3a2fca5cb36023b42ad9d4a0c7ff22.camel@infradead.org>
-	 <CB344CC7-E6E2-4325-9669-9BE7EA47C56B@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-OXU5+e/3aAwPCT5oBvKH"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1727447705; c=relaxed/simple;
+	bh=26xfhZSnR38tIySAMPTN+tZMdkMAV+uEJr9WkWvF/ag=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OS9euYUGPhoHxPSu/uP2lhHk7CavD22mSdsBEmXZsSNr0g6cI4aB3TtLn/EZY63wfxYGuooAyzznWG19pjtqHwYBHf3sUUu66XexZG2OB19WHRkHthmMv7sxB8XyuXNSZSNT2rRzJPQHYgZME+XD14QfJzoe3WuRninMtWt0aFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hzg9T+MA; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e258c0e02a9so3246992276.3
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 07:35:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727447703; x=1728052503; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=x7ySq9WAF3LhSVhIL2gzm1kyClTrXusjtIOTa8ObngI=;
+        b=hzg9T+MAYpX7YqRRal7w6+nyv/v1i1T3kE9TuATZWKFCHgSqmOHXjgF3xq4KB/AWVG
+         vXvO8bIttzMRDYZcXp5M+TkmUSeGISKoRo9jYFUAzGXWtZt1E0/ADarXexwJqNXLIwoj
+         +nH6AZKaY9v+2P2DfT7ZrBXmy1e48ug9wUTzIupEp1a9XT3UyxwvUaaf6zFv8uCrgnIA
+         4p7dYygRkoX6bxExxPY3yZ4/qQuWZ1+wVShH6O8dos91tiWRDxcl6EVEOY/1CSkpYBV6
+         +AKcm48axBCtnDuL5vbR01K5dWw5j0LosS7w0EwOMyGC3Dg2poiDhTcFid9UF9gqiS+X
+         qs9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727447703; x=1728052503;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x7ySq9WAF3LhSVhIL2gzm1kyClTrXusjtIOTa8ObngI=;
+        b=HfMiowBNxcUlPYTSDs7fygg9PN7aSvVz1bRyVOv6HVr05MZwYsjp+IuiaStSs+wdwO
+         TSBlsVTMG88HKFDTmeIhQ4KeTq9RnjOpfuyxezHNYn794idgjeHEgpNvBAsWyhPdnte0
+         4GuZuFsOesDcmNWcRrRCrcS7lgxWP6EaixTZo9+212yhIP56yFVeV3kX4bwRinVV1Haz
+         aJoRJX4diEH0/K1wJoNqDm3oY7Jfe62ewYUQJ9V5EktZKBOSEYDb9hURJ7zqe0kX4B6w
+         30kIgCNhqBeDbR2itQIv78ojYk0+E/8D9zgIAY/BXyytIfcZXH2Hf9LU9yeObJBhZn2K
+         wywQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUcI/2IC9krPRPqPEtaxeZr1zeHgZ7TtAGL4sthYB9s7Mj4EYfA7LK1tu11RIVtnd1JxYc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPvaYsZRQJPz+umbAWfI68NQlneDAbN53jRdEfu88uJSUQCh5y
+	o+CtFg5rvQZU0m8tHZavwOD8C1GI7jZanRfbeyVhpZn7aAz4YTSKawAUz2q5oIJ3r6haPjwYIEQ
+	1tg==
+X-Google-Smtp-Source: AGHT+IHK44G6MEuSuK54ez0WbjUBvQMLb5IMMQ1FLEA4b5+xVcS/FEkwgYEE6D4iDUrKga1UOzUKK7X15ww=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:14c:0:b0:e25:2491:d005 with SMTP id
+ 3f1490d57ef6-e2604b84f89mr2788276.8.1727447703410; Fri, 27 Sep 2024 07:35:03
+ -0700 (PDT)
+Date: Fri, 27 Sep 2024 07:32:10 -0700
+In-Reply-To: <Zva4aORxE9ljlMNe@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Mime-Version: 1.0
+References: <6eecc450d0326c9bedfbb34096a0279410923c8d.1726182754.git.isaku.yamahata@intel.com>
+ <ZuOCXarfAwPjYj19@google.com> <ZvUS+Cwg6DyA62EC@yzhao56-desk.sh.intel.com> <Zva4aORxE9ljlMNe@google.com>
+Message-ID: <ZvbB6s6MYZ2dmQxr@google.com>
+Subject: Re: [PATCH] KVM: x86/tdp_mmu: Trigger the callback only when an
+ interesting change
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org, sagis@google.com, 
+	chao.gao@intel.com, pbonzini@redhat.com, rick.p.edgecombe@intel.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
+On Fri, Sep 27, 2024, Sean Christopherson wrote:
+> On Thu, Sep 26, 2024, Yan Zhao wrote:
+> > On Thu, Sep 12, 2024 at 05:07:57PM -0700, Sean Christopherson wrote:
+> > > On Thu, Sep 12, 2024, Isaku Yamahata wrote:
+> > > Right now, the fixes for make_spte() are sitting toward the end of the massive
+> > > kvm_follow_pfn() rework (80+ patches and counting), but despite the size, I am
+> > > fairly confident that series can land in 6.13 (lots and lots of small patches).
+> > > 
+> > > ---
+> > > Author:     Sean Christopherson <seanjc@google.com>
+> > > AuthorDate: Thu Sep 12 16:23:21 2024 -0700
+> > > Commit:     Sean Christopherson <seanjc@google.com>
+> > > CommitDate: Thu Sep 12 16:35:06 2024 -0700
+> > > 
+> > >     KVM: x86/mmu: Flush TLBs if resolving a TDP MMU fault clears W or D bits
+> > >     
+> > >     Do a remote TLB flush if installing a leaf SPTE overwrites an existing
+> > >     leaf SPTE (with the same target pfn) and clears the Writable bit or the
+> > >     Dirty bit.  KVM isn't _supposed_ to clear Writable or Dirty bits in such
+> > >     a scenario, but make_spte() has a flaw where it will fail to set the Dirty
+> > >     if the existing SPTE is writable.
+> > >     
+> > >     E.g. if two vCPUs race to handle faults, the KVM will install a W=1,D=1
+> > >     SPTE for the first vCPU, and then overwrite it with a W=1,D=0 SPTE for the
+> > >     second vCPU.  If the first vCPU (or another vCPU) accesses memory using
+> > >     the W=1,D=1 SPTE, i.e. creates a writable, dirty TLB entry, and that is
+> > >     the only SPTE that is dirty at the time of the next relevant clearing of
+> > >     the dirty logs, then clear_dirty_gfn_range() will not modify any SPTEs
+> > >     because it sees the D=0 SPTE, and thus will complete the clearing of the
+> > >     dirty logs without performing a TLB flush.
+> > But it looks that kvm_flush_remote_tlbs_memslot() will always be invoked no
+> > matter clear_dirty_gfn_range() finds a D bit or not.
+> 
+> Oh, right, I forgot about that.  I'll tweak the changelog to call that out before
+> posting.  Hmm, and I'll drop the Cc: stable@ too, as commit b64d740ea7dd ("kvm:
+> x86: mmu: Always flush TLBs when enabling dirty logging") was a bug fix, i.e. if
+> anything should be backported it's that commit.
 
---=-OXU5+e/3aAwPCT5oBvKH
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Actually, a better idea.  I think it makes sense to fully commit to not flushing
+when overwriting SPTEs, and instead rely on the dirty logging logic to do a remote
+TLB flush.
 
-On Fri, 2024-09-27 at 12:43 +0000, Miguel Luis wrote:
->=20
-> The common factor being the bit offset in the bitmap for SYSTEM_OFF2 disc=
-overy
-> and argument to call SYSTEM_OFF2 as well. Would it be clearer something l=
-ike:
->=20
-> #define=C2=A0 PSCI_1_3_HIBERNATE_TYPE_OFF BIT(0)
+E.g. on top of this change in the mega-series is a cleanup to unify the TDP MMU
+and shadow MMU logic for clearing Writable and Dirty bits, with this comment
+(which is a massaged version of an existing comment for mmu_spte_update()):
 
-I've updated the tree at
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/psci-hi=
-bernate
-to do it that way.
+/*
+ * Whenever an MMU-writable SPTE is overwritten with a read-only SPTE, remote
+ * TLBs must be flushed.  Otherwise write-protecting the gfn may find a read-
+ * only SPTE, even though the writable SPTE might be cached in a CPU's TLB.
+ *
+ * Remote TLBs also need to be flushed if the Dirty bit is cleared, as false
+ * negatives are not acceptable, e.g. if KVM is using D-bit based PML on VMX.
+ *
+ * Don't flush if the Accessed bit is cleared, as access tracking tolerates
+ * false negatives, and the one path that does care about TLB flushes,
+ * kvm_mmu_notifier_clear_flush_young(), uses mmu_spte_update_no_track().
+ *
+ * Note, this logic only applies to leaf SPTEs.  The caller is responsible for
+ * determining whether or not a TLB flush is required when modifying a shadow-
+ * present non-leaf SPTE.
+ */
 
-As I did so, I realised that KVM *does* care about the argument to
-SYSTEM_OFF2. This is a straight copy of the SYSTEM_RESET2 handling.
-Although it doesn't pass the argument up to userspace (presumably
-userspace is expected to look at the registers if it cares), it *does*
-check it's within the range of permitted values and return
-PSCI_RET_INVALID_PARAMS if not.
-
-I've changed that check to:
-
-		arg =3D smccc_get_arg1(vcpu);
-		/*
-		 * Permit zero to mean HIBERNATE_OFF as well as the bitmap
-		 * form which was introduced in PSCI v1.3 beta.
-		 */
-		if (arg && arg !=3D PSCI_1_3_HIBERNATE_TYPE_OFF) {
-			val =3D PSCI_RET_INVALID_PARAMS;
-			break;
-		}
-		kvm_psci_system_off2(vcpu);
-
-
-On the guest side, I've changed the invocation to:
-
-static int psci_sys_hibernate(struct sys_off_data *data)
-{
-	/*
-	 * Zero is an acceptable alternative to PSCI_1_3_HIBERNATE_TYPE_OFF
-	 * and is supported by hypervisors implementing an earlier version
-	 * of the pSCI v1.3 spec.
-	 */
-	if (system_entering_hibernation())
-		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2),
-			       0 /*PSCI_1_3_HIBERNATE_TYPE_OFF*/, 0, 0);
-	return NOTIFY_DONE;
-}
-
-I'm going to do some careful interop testing with existing and new
-hypervisors before reposting this version.
-
---=-OXU5+e/3aAwPCT5oBvKH
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwOTI3MTQyNDQ1WjAvBgkqhkiG9w0BCQQxIgQgvsgBsJq1
-eMZ08pCEouB07yA5zNCeARz1AEfZMpyHwjUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCF6DdrxaNzp7m2JJFI8pImTHozLJEB0rRH
-TI8Rf9dMnWgt51XafsZsl/osnIxmqCnQL4dQpwWOXZ9O9SgbpFjwXrvDMzujALSRv0Xt6VnWGwTU
-Jjp1MVd+IAhjQMH/+H+GvHhRjYYfz4UMEvYwqNRqVc90egwkCeVIvsuJlYTINi5IP9lqVW4M6mMb
-EI++DLjMM4AALJiYZfdkGA2rpqFKaZODllVPWgysXrRUwvHdryxB6OKkBawBGNOxrjJuhVuPA6BA
-guBJyghUAEloPFapYf4BcwUc7jUtpxZBcN5vINwbugQ/xCzPUZaQuhC4zITeO8H3LaaKaYTOchZS
-dDw9cZrYHfAo/gL7MwbnuZDQWGsd3GW+jalUKG26orsKCpXQ7EOQn9HG8Q8aTUM3ez1nXov7Zz8E
-cfQRsiZGPNcPNDxcjDf2eQdM6DqITwzwfQaua2chFAtvMnTaDYASTaymyvONLNmm5RXzD5gHg4Rl
-o9lF7yO1xsyr75C750tgUGvLjSgfCZHljyvpygSqXh+oa2OCsdDqGf4CsC1p4480TojEZB+dXsBo
-d1xjc2/ByTrwY9TWfYS7LgbNyHMIz6bU7zpihXt5QuS6+4IlRjBtgQBocDoyxwkJJUCoQX8T50fJ
-V5UMU6ceWeszc+JNf5Gj/rz2/koAPEtdnLDNMFOw9AAAAAAAAA==
-
-
---=-OXU5+e/3aAwPCT5oBvKH--
+But that comment is was made stale by commit b64d740ea7dd.  And looking through
+the dirty logging logic, KVM (luckily? thankfully?) flushes based on whether or
+not dirty bitmap/ring entries are reaped, not based on whether or not SPTEs were
+modified.
 
