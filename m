@@ -1,171 +1,146 @@
-Return-Path: <kvm+bounces-27636-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD6D49888ED
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 18:18:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97AFE9888EB
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 18:18:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DDF5284244
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 16:18:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 401E01F214AF
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 16:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960491C175A;
-	Fri, 27 Sep 2024 16:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7AE21C2420;
+	Fri, 27 Sep 2024 16:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jjew5vEN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r7UAltnm"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D0518BC26;
-	Fri, 27 Sep 2024 16:17:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDE11C1AC9
+	for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 16:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727453848; cv=none; b=b5GEP+VojNOqI942MtIm5rsYadjUDDU221okCf3pt2S55nEUcdS8ul7iCjVtfdXct7qH0lOKw7+EKlaXwGnLao5f4TNyFpJl/NpJgh1PIH91zaoLmDxHXtsoGxEzcgKJcayBQQFCf4GKJu0SOF16LwsXKTrtqDBYlaKbjJrp6rg=
+	t=1727453836; cv=none; b=Oh06v13ioxDA1r7+noosExBcTx2ORdPZvtv3uGHHBy1nuaDNQbMQjOx+VbwUGFwwHSaAwWse8TT7a9AGpU4j/PCkxQF6bVM1IihAs1JeoxO6VEUnZmah3kIEOb+l+L5gKVFinOjCcpeOIHAIs2xqoowAkeUr80NsHMb3wRIw1oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727453848; c=relaxed/simple;
-	bh=bITM0Aeng2J6eq1p6hx8dT3atihTw0CutEtJW/1eOSY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t9ll2GHB6+MEuGKe0ai1gkZXKNu6FaXlm3sV6qY9iqgy2Pn6DX18vgiCD/hrttjvy02oCLqLikGhNDVBTgdT3quXOKxxRqi4v7MKmxbWJyL9rViMTZ7DYb4YJJSD5bLCWH9+LvuPu/tHaWZ4Xdf6OFLeeZQ8aatdifBc8e4qFCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jjew5vEN; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1727453836; c=relaxed/simple;
+	bh=IrmsNWrvHiijIwgsOGZldHTBszQqR9KLkth8sn+BUF4=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=E8GgRzyoein/lQA9f99inHh5lIkOa2L6LeAlBnjvRr69XoLXfp7YJpuVpqdIrGfuzit3W3vBzfyrcYR/oxFetmgVd7ofPSO8Vj3tP4vfQ52Q/RZ0lWJbJ1oPKL19Jt1oPVyKrlltCnAvZ0yOoE47apGXG0ckVLbz7kgp5d+yZEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r7UAltnm; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4582a5b495cso253451cf.1
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 09:17:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1727453847; x=1758989847;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=v/pCxVzGGt00J4HeXCQPyQbX0vz+zoWW8SfA60zWySw=;
-  b=jjew5vENxA3E9TV4WkYMc6Xn069QMqTuqjL3cYUK4LnuofUv0CMYfMsu
-   YYMmhtNE1TKDtYMsT/WPzqJ4VoVkFMDA80MgE6PjvbLBCIaiHpWaaciZE
-   q3lkcyhey0IHWaXtFHRkdbYYF8PswhSYfGewn855c9plc9KTt15/dSBWI
-   U=;
-X-IronPort-AV: E=Sophos;i="6.11,159,1725321600"; 
-   d="scan'208";a="335991852"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2024 16:17:10 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:14418]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.9.81:2525] with esmtp (Farcaster)
- id f6dd7ae9-f1d5-4b5e-bace-701045ca9ffd; Fri, 27 Sep 2024 16:17:08 +0000 (UTC)
-X-Farcaster-Flow-ID: f6dd7ae9-f1d5-4b5e-bace-701045ca9ffd
-Received: from EX19D031EUB001.ant.amazon.com (10.252.61.29) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 27 Sep 2024 16:17:08 +0000
-Received: from EX19MTAUEA002.ant.amazon.com (10.252.134.9) by
- EX19D031EUB001.ant.amazon.com (10.252.61.29) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 27 Sep 2024 16:17:08 +0000
-Received: from email-imr-corp-prod-iad-all-1b-85daddd1.us-east-1.amazon.com
- (10.43.8.2) by mail-relay.amazon.com (10.252.134.34) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Fri, 27 Sep 2024 16:17:07 +0000
-Received: from dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com (dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com [10.253.74.38])
-	by email-imr-corp-prod-iad-all-1b-85daddd1.us-east-1.amazon.com (Postfix) with ESMTPS id 854B8403DD;
-	Fri, 27 Sep 2024 16:17:06 +0000 (UTC)
-From: Ivan Orlov <iorlov@amazon.com>
-To: <bp@alien8.de>, <dave.hansen@linux.intel.com>, <mingo@redhat.com>,
-	<pbonzini@redhat.com>, <seanjc@google.com>, <shuah@kernel.org>,
-	<tglx@linutronix.de>
-CC: Ivan Orlov <iorlov@amazon.com>, <hpa@zytor.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<x86@kernel.org>, <jalliste@amazon.com>, <nh-open-source@amazon.com>,
-	<pdurrant@amazon.co.uk>
-Subject: [PATCH 3/3] selftests: KVM: Add test case for MMIO during event delivery
-Date: Fri, 27 Sep 2024 16:16:57 +0000
-Message-ID: <20240927161657.68110-4-iorlov@amazon.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240927161657.68110-1-iorlov@amazon.com>
-References: <20240927161657.68110-1-iorlov@amazon.com>
+        d=google.com; s=20230601; t=1727453834; x=1728058634; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=IrmsNWrvHiijIwgsOGZldHTBszQqR9KLkth8sn+BUF4=;
+        b=r7UAltnmtQc+ee/E0uc69/TIZUWMsbnzTrHclz4ZoXcIwIzd+C8swIb4N5JuCArb89
+         nwLj03ez5jxP1Ro2BPv7PU/1w4bAaJmy62tiMR4FgLiqvhixlgvF9sEKeVz3ywxfBR+0
+         UJ/IldGTjydB38P/1Qq7A1F5NtjMeLOPsflGYPNPWbFREbTNHQnpmLT1AGdpVBjVViSE
+         TukUDxtWDKdubWbfmEzk/hi/Oi2n/XKFo3SIhyr/724D5ym3o9rrXGGMiazFFmfwFqYT
+         N/oEH/MiN6wdcoRRoqansg7H+D8d65O3j68rZ21za6qoqVUhR3a+AwaXdROUYZhofS+5
+         Y5sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727453834; x=1728058634;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IrmsNWrvHiijIwgsOGZldHTBszQqR9KLkth8sn+BUF4=;
+        b=nYbpy5WUflktBd/KYO4iVIWKt0+8CdCkbzwRFBhqNNvKXDggkBt07qhgUhNRAjVzYP
+         U53YHNPaRKYwFVcy4uH87qVUghB1YxV0NSaoaZXbQRANh9f2VLS2l9kmueqA+yZtOxtC
+         JxToSjJOwwpDqNleYTlObb1rkG2OV52Vimuvme+cKWzvHOlNJ3VqQkqrGiRaXuI578X2
+         X+eGH+9Vy5ztlRlTWLnzCNklP1krjq7MbrbiVCWuUbFe28ycJmL9xXzkh1FAFsQz0cMi
+         AvMaYiSUPgPkLVjFi6KUSKH6XyQ9jTyfyxwJo3gr+IRlfXIWqv73nYfK9aSISEBVODf+
+         FcgQ==
+X-Gm-Message-State: AOJu0YzNwWRvZ14KWD3kuPvUG+Vh78MPPFLRq9Q5ifTbuNBHw5J3Zf5m
+	JJqJNHj1MtCLP5bRt3Cgua3UygAckENHL17pUvhCYQM0p10UJb4eqdQPmQcIIW5UrvLFuhHRDRm
+	9scUVNrvQki1NzDN++RqvNsHRF4KPVLleGqMNsWQp87OcQm6lPRTV
+X-Google-Smtp-Source: AGHT+IF/EHyONOm6DGsdDw/xeeoLCpy0uibL0MWQ+Y2vArC8Yk7URe7f5FuII2AVFIYcDABJ9AomaCSbLH4fMYBcyag=
+X-Received: by 2002:a05:622a:7913:b0:453:62ee:3fe with SMTP id
+ d75a77b69052e-45ca1ad8c37mr2635581cf.17.1727453833916; Fri, 27 Sep 2024
+ 09:17:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+From: Mostafa Saleh <smostafa@google.com>
+Date: Fri, 27 Sep 2024 17:17:02 +0100
+Message-ID: <CAFgf54rCCWjHLsLUxrMspNHaKAa1o8n3Md2_ZNGVtj0cU_dOPg@mail.gmail.com>
+Subject: [RFC] Simple device assignment with VFIO platform
+To: kvm@vger.kernel.org, open list <linux-kernel@vger.kernel.org>
+Cc: Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
+	kwankhede@nvidia.com, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	Quentin Perret <qperret@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Extend the 'set_memory_region_test' with a test case which covers the
-MMIO during event delivery error handling. The test case
+Hi All,
 
-1) Tries to set an IDT descriptor base to point to an MMIO address
-2) Generates a #GP
-3) Verifies that we got a correct exit reason (KVM_EXIT_INTERNAL_ERROR)
-   and suberror code (KVM_INTERNAL_ERROR_DELIVERY_EV)
-4) Verifies that we got a corrent "faulty" GPA in internal.data[3]
+Background
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+I have been looking into assigning simple devices which are not DMA
+capable to VMs on Android using VFIO platform.
 
-Signed-off-by: Ivan Orlov <iorlov@amazon.com>
----
- .../selftests/kvm/set_memory_region_test.c    | 46 +++++++++++++++++++
- 1 file changed, 46 insertions(+)
+I have been mainly looking with respect to Protected KVM (pKVM), which
+would need some extra modifications mostly to KVM-VFIO, that is quite
+early under prototyping at the moment, which have core pending pKVM
+dependencies upstream as guest memfd[1] and IOMMUs support[2].
 
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index a8267628e9ed..e9e97346edf1 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -553,6 +553,51 @@ static void test_add_overlapping_private_memory_regions(void)
- 	close(memfd);
- 	kvm_vm_free(vm);
- }
-+
-+static const struct desc_ptr faulty_idt_desc = {
-+	.address = MEM_REGION_GPA,
-+	.size = 0xFFF,
-+};
-+
-+static void guest_code_faulty_idt_desc(void)
-+{
-+	__asm__ __volatile__("lidt %0"::"m"(faulty_idt_desc));
-+
-+	/* Generate a #GP by dereferencing a non-canonical address */
-+	*((uint8_t *)0xDEADBEEFDEADBEEFULL) = 0x1;
-+
-+	/* We should never reach this point */
-+	GUEST_ASSERT(0);
-+}
-+
-+/*
-+ * This test tries to point the IDT descriptor base to an MMIO address. This action
-+ * should cause a KVM internal error, so the VMM could handle such situations gracefully.
-+ */
-+static void test_faulty_idt_desc(void)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+
-+	pr_info("Testing a faulty IDT descriptor pointing to an MMIO address\n");
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_faulty_idt_desc);
-+	virt_map(vm, MEM_REGION_GPA, MEM_REGION_GPA, 1);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_INTERNAL_ERROR);
-+	TEST_ASSERT(vcpu->run->internal.suberror == KVM_INTERNAL_ERROR_DELIVERY_EV,
-+		    "Unexpected suberror = %d", vcpu->run->internal.suberror);
-+	TEST_ASSERT(vcpu->run->internal.ndata > 4, "Unexpected internal error data array size = %d",
-+		    vcpu->run->internal.ndata);
-+
-+	/* The "faulty" GPA address should be = IDT base + offset of the GP vector */
-+	TEST_ASSERT(vcpu->run->internal.data[3] == MEM_REGION_GPA +
-+		    GP_VECTOR * sizeof(struct idt_entry),
-+		    "Unexpected GPA = %llx", vcpu->run->internal.data[3]);
-+
-+	kvm_vm_free(vm);
-+}
- #endif
- 
- int main(int argc, char *argv[])
-@@ -568,6 +613,7 @@ int main(int argc, char *argv[])
- 	 * KVM_RUN fails with ENOEXEC or EFAULT.
- 	 */
- 	test_zero_memory_regions();
-+	test_faulty_idt_desc();
- #endif
- 
- 	test_invalid_memory_region_flags();
--- 
-2.43.0
+However, this problem is not pKVM(or KVM) specific, and about the
+design of VFIO.
 
+[1] https://lore.kernel.org/kvm/20240801090117.3841080-1-tabba@google.com/
+[2] https://lore.kernel.org/kvmarm/20230201125328.2186498-1-jean-philippe@l=
+inaro.org/
+
+Problem
+=3D=3D=3D=3D=3D=3D=3D
+At the moment, VFIO platform will deny a device from probing (through
+vfio_group_find_or_alloc()), if it=E2=80=99s not part of an IOMMU group,
+unless (CONFIG_VFIO_NOIOMMU is configured)
+
+As far as I understand the current solutions to pass through platform
+devices that are not DMA capable are:
+- Use VFIO platform + (CONFIG_VFIO_NOIOMMU): The problem with that, it
+taints the kernel and this doesn=E2=80=99t actually fit the device descript=
+ion
+as the device doesn=E2=80=99t only have an IOMMU, but it=E2=80=99s not DMA =
+capable at
+all, so the kernel should be safe with assigning the device without
+DMA isolation.
+
+- Use VFIO mdev with an emulated IOMMU, this seems it could work. But
+many of the code would be duplicate with the VFIO platform code as the
+device is a platform device.
+
+- Use UIO: Can map MMIO to userspace which seems to be focused for
+userspace drivers rather than VM passthrough and I can=E2=80=99t find its
+support in Qemu.
+
+One other benefit from supporting this in VFIO platform, that we can
+use the existing UAPI for platform devices (and support in VMMs)
+
+Proposal
+=3D=3D=3D=3D=3D=3D=3D=3D
+Extend VFIO platform to allow assigning devices without an IOMMU, this
+can be possibly done by
+- Checking device capability from the platform bus (would be something
+ACPI/OF specific similar to how it configures DMA from
+platform_dma_configure(), we can add a new function something like
+platfrom_dma_capable())
+
+- Using emulated IOMMU for such devices
+(vfio_register_emulated_iommu_dev()), instead of having intrusive
+changes about IOMMUs existence.
+
+If that makes sense I can work on RFC(I don=E2=80=99t have any code at the =
+moment)
+
+Thanks,
+Mostafa
 
