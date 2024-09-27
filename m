@@ -1,182 +1,170 @@
-Return-Path: <kvm+bounces-27624-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27625-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 335159886BA
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 16:14:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C6D988704
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 16:23:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D485A283F8A
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 14:14:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA94FB228DB
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2024 14:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65973130E27;
-	Fri, 27 Sep 2024 14:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6091339A4;
+	Fri, 27 Sep 2024 14:22:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nS56KZqJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuDB5ZFd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF7F4D8DA
-	for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 14:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87EE481AB
+	for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 14:22:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727446439; cv=none; b=HKu/jooQsXzvBy/n12IqiL5+zdNritGJXqmRYzUeabfQDMJ3Ls+gbRvm5CsteWT2KBMP5YH0FG//bN169w//xvhm7oMbGscaB+ajcLG4lzvnnWtnsH0vSqBHSYPHW04sspxxBGPmfw6sMlxlMW5Wl7veoPnysXi3v5dtemeD7I4=
+	t=1727446959; cv=none; b=HjCc39XNZvUTYMU1RLTLL0pRC4Wq3yuw+jm2X1vSWklWujnr5eycQEVD/zeguxlj2wk/47rm1EsQcnAy6mqZtCp8isXygYpl7sapO8ccDehsqamArZ6bfsFptZyqYKXmylKTXp2e9MG79IbflCXyWUKCD698xd+SYfOvXfw3SMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727446439; c=relaxed/simple;
-	bh=E+FCtvX5tiAUXaQC8bDj+CjwksAplbtuAStfl9vHjvA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rBoWV77MPe/Oe0IV59y7xcI+q1EahDLFJx9V0WuqPqEeKsOJLywzvQehI2HoRBS2VJ53UqG5D3TxCxK5j54F0TOMcWeyurgsfocv3s69BReGQ13tnLyHD/fLW23QrO5mnDZaTC6W6aEb/8beYZNS20anOEMqWU4bYzkFPp6sJMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nS56KZqJ; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e25e3d7f514so2101555276.0
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2024 07:13:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727446436; x=1728051236; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oxHmrqFeJJMvL0LXe9u6VdmgiJC7okRqJH0b/bUsNDM=;
-        b=nS56KZqJheHcYeB1MSWekLxH4U9E7TUxYGjM6r63K7IGiNuFI/z7jyQZxH2Tmvhs0L
-         0JscEPHmY/dH1X+/rPTL6CcmumbcdkSz+T9Z6IKwjf1CfMJmIsYfECGrF/Ol3PiI8uWh
-         GvrTkIbzqeqsLmBoT+DeJY2mea5LBktWoNjea2dKYT0OYbi8kiZ6zIsGyRNiF/gCBvKx
-         XK5nsGv8GokoWi9fBQ8cHXuNZf6Ue4LrWsoVA6zOwgzl1ZqOjtGVFOcj9hQamtlRBxGx
-         PVrRwFSGEUMltk2ncpC1/YA2EQwUXsFMQdoAbqgH3XWh+zDK6iDDu8uPaTyNB+JjKieU
-         sBhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727446436; x=1728051236;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oxHmrqFeJJMvL0LXe9u6VdmgiJC7okRqJH0b/bUsNDM=;
-        b=Bxates9zUEZL1aBuRb+zOilYWj4+0po9/ESTp/w2FmnKx2Y9XaloBy73v0Z5y0cjUL
-         QIwAKd0YGLDzwvwxN9AHUie+vx/0kb5/4dKtAjDdHqaNhvGNXVmQ3VV1tk2AP23KWhG8
-         g2v2cwCaPjXXbvpdryreJAGGG9QqCZqbnsdkAeX5xKPppHVqPfuOT9xB5Ly8ORUZ3sHy
-         dE6HewfWajhXjbXg3OKJd5kIrzOy/teFetUPG6dzTgoDWher4Qc9hEfMt5bfVDzV0V34
-         ZgPpH3YwbSSDciUr/QR2wTGQRitZ25WqwBVgUQvoIWg58DIqAjYf1iUiqdCvJSrRBvsG
-         VF0g==
-X-Gm-Message-State: AOJu0YyzMSnLL6V/hdgbmn8BwAsCUkSU0mX6zPdAmIdGq6PpZWkqrnm8
-	G+SHpKd0oTQCF+J3VMsDCLDx36J5vobICW/FrMl4Pw1YZSWeD1VeUkTaO2riRDaIQ35wQK0e1TM
-	wVw==
-X-Google-Smtp-Source: AGHT+IEnEGSzHCyg8dQbKDMJQILv716YQPrF4czXU/rTygWR1FZcg+eAhEhlInCTmo02d/T8LRkvFnOJR68=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:1c2:0:b0:e25:d596:4847 with SMTP id
- 3f1490d57ef6-e2604c8e14cmr25663276.6.1727446435931; Fri, 27 Sep 2024 07:13:55
- -0700 (PDT)
-Date: Fri, 27 Sep 2024 07:13:54 -0700
-In-Reply-To: <66f4164d.050a0220.211276.0032.GAE@google.com>
+	s=arc-20240116; t=1727446959; c=relaxed/simple;
+	bh=A1PgpXPfAVOOpNUrS1DLHR5nv951c/mmKxo+FSRbEfw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ntUuHEhXnvQEGnY4wgkoYkusEgKpi26vdRz9bCfhM9OhgE+j+MqUAYgrhaODvIR2v5WEEX7Z3O4vd5KbtK3Pb20EDBuAUnD4Yl1egCnafpfog7GQWDqCt7O2opuIeYD329L2xvDGXW5dezic7lDb1xE5oEmzxv6O3K/dqvEJwVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WuDB5ZFd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19117C4CECE;
+	Fri, 27 Sep 2024 14:22:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727446958;
+	bh=A1PgpXPfAVOOpNUrS1DLHR5nv951c/mmKxo+FSRbEfw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WuDB5ZFdJ97sLE5y7JpTD2s5k6uqWKmDVD2jj+6Nz8qBzK7WJRwe6ZVBbtWAcsJoE
+	 ioZ41PE2RSqVoTbLbWm/M8qm9bocumkqMfANSi2Pqd1xIlo0RtDg94wLfwR3+5FBhd
+	 /SybbFZe4J7C0LHSjECGgFKg6KCVErWVZ4zqAMtjvnETskestmu74pttYIpEQQVueM
+	 GbOrD3SnPOpFUZPUDJS9qZiq9xUjX+N8N6hUkUVyZJ07PpLSI6xfH/uNNxGAu2+B1K
+	 NEucUHZBvam/B4q3RTlA/gAtRLxDEhcYgGm0rzVJZKBFsKuxPPc5RHUqTE9inBcIsj
+	 P2vcqeyPis4WQ==
+Date: Fri, 27 Sep 2024 16:22:32 +0200
+From: Danilo Krummrich <dakr@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Zhi Wang <zhiw@nvidia.com>,
+	kvm@vger.kernel.org, nouveau@lists.freedesktop.org,
+	alex.williamson@redhat.com, kevin.tian@intel.com, airlied@gmail.com,
+	daniel@ffwll.ch, acurrid@nvidia.com, cjia@nvidia.com,
+	smitra@nvidia.com, ankita@nvidia.com, aniketa@nvidia.com,
+	kwankhede@nvidia.com, targupta@nvidia.com, zhiwang@kernel.org
+Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
+Message-ID: <Zva_qP2B4rndSiCw@pollux>
+References: <20240922124951.1946072-1-zhiw@nvidia.com>
+ <ZvErg51xH32b8iW6@pollux>
+ <20240923150140.GB9417@nvidia.com>
+ <2024092614-fossil-bagful-1d59@gregkh>
+ <20240926124239.GX9417@nvidia.com>
+ <2024092619-unglazed-actress-0a0f@gregkh>
+ <20240926144057.GZ9417@nvidia.com>
+ <ZvXjcPOCVUSlALZZ@pollux.localdomain>
+ <20240927125115.GZ9417@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <66f4164d.050a0220.211276.0032.GAE@google.com>
-Message-ID: <Zva9oi6jfBSoGwn0@google.com>
-Subject: Re: [syzbot] [kvm?] WARNING in srcu_check_nmi_safety (2)
-From: Sean Christopherson <seanjc@google.com>
-To: syzbot <syzbot+314c2cfd4071ad738810@syzkaller.appspotmail.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com, Kent Overstreet <kent.overstreet@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240927125115.GZ9417@nvidia.com>
 
-+Kent
+On Fri, Sep 27, 2024 at 09:51:15AM -0300, Jason Gunthorpe wrote:
+> On Fri, Sep 27, 2024 at 12:42:56AM +0200, Danilo Krummrich wrote:
+> > On Thu, Sep 26, 2024 at 11:40:57AM -0300, Jason Gunthorpe wrote:
+> > > On Thu, Sep 26, 2024 at 02:54:38PM +0200, Greg KH wrote:
+> > > > 
+> > > > No, I do object to "we are ignoring the driver being proposed by the
+> > > > developers involved for this hardware by adding to the old one instead"
+> > > > which it seems like is happening here.
+> > > 
+> > > That is too harsh. We've consistently taken a community position that
+> > > OOT stuff doesn't matter, and yes that includes OOT stuff that people
+> > > we trust and respect are working on. Until it is ready for submission,
+> > > and ideally merged, it is an unknown quantity. Good well meaning
+> > > people routinely drop their projects, good projects run into
+> > > unexpected roadblocks, and life happens.
+> > 
+> > That's not the point -- at least it never was my point.
+> > 
+> > Upstream has set a strategy, and it's totally fine to raise concerns, discuss
+> > them, look for solutions, draw conclusions and do adjustments where needed.
+> 
+> We don't really do strategy in the kernel. This language is a bit
+> off putting. Linux runs on community consensus and if any strategy
+> exists it is reflected by the code actually merged.
 
-On Wed, Sep 25, 2024, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    abf2050f51fd Merge tag 'media/v6.12-1' of git://git.kernel..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=114cc99f980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=bc30a30374b0753
-> dashboard link: https://syzkaller.appspot.com/bug?extid=314c2cfd4071ad738810
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-abf2050f.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/2179ebeade58/vmlinux-abf2050f.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/f05289b5cf7c/bzImage-abf2050f.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+314c2cfd4071ad738810@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> CPU 0 old state 2 new state 1
-> WARNING: CPU: 0 PID: 73 at kernel/rcu/srcutree.c:708 srcu_check_nmi_safety+0xca/0x150 kernel/rcu/srcutree.c:708
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 73 Comm: kswapd0 Not tainted 6.11.0-syzkaller-09959-gabf2050f51fd #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:srcu_check_nmi_safety+0xca/0x150 kernel/rcu/srcutree.c:708
-> Code: 81 c3 c8 01 00 00 48 89 d8 48 c1 e8 03 42 0f b6 04 20 84 c0 75 77 8b 33 48 c7 c7 20 0c 0c 8c 89 ea 44 89 f9 e8 b7 8c db ff 90 <0f> 0b 90 90 eb 0c 42 0f b6 04 23 84 c0 75 3d 45 89 3e 48 83 c4 08
-> RSP: 0018:ffffc90000e464e0 EFLAGS: 00010246
-> RAX: 41404736cdfea900 RBX: ffffe8ffffc414c8 RCX: ffff88801efb0000
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-> RBP: 0000000000000002 R08: ffffffff8155aaa2 R09: 1ffff11003f8519a
-> R10: dffffc0000000000 R11: ffffed1003f8519b R12: dffffc0000000000
-> R13: 0000607fe0041300 R14: ffffe8ffffc41320 R15: 0000000000000001
-> FS:  0000000000000000(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000564aa6d10940 CR3: 0000000011c68000 CR4: 0000000000352ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  srcu_read_lock include/linux/srcu.h:248 [inline]
->  __kvm_handle_hva_range virt/kvm/kvm_main.c:612 [inline]
->  kvm_handle_hva_range virt/kvm/kvm_main.c:684 [inline]
->  kvm_mmu_notifier_clear_flush_young+0xe6/0x820 virt/kvm/kvm_main.c:867
->  __mmu_notifier_clear_flush_young+0x11d/0x1d0 mm/mmu_notifier.c:379
->  mmu_notifier_clear_flush_young include/linux/mmu_notifier.h:410 [inline]
->  folio_referenced_one+0xb9d/0x2160 mm/rmap.c:895
->  rmap_walk_anon+0x4cd/0x8a0 mm/rmap.c:2638
->  rmap_walk mm/rmap.c:2716 [inline]
->  folio_referenced+0x394/0x7a0 mm/rmap.c:1008
->  folio_check_references mm/vmscan.c:863 [inline]
->  shrink_folio_list+0xe96/0x8cc0 mm/vmscan.c:1198
->  evict_folios+0x549b/0x7b50 mm/vmscan.c:4583
->  try_to_shrink_lruvec+0x9ab/0xbb0 mm/vmscan.c:4778
->  shrink_one+0x3b9/0x850 mm/vmscan.c:4816
->  shrink_many mm/vmscan.c:4879 [inline]
->  lru_gen_shrink_node mm/vmscan.c:4957 [inline]
->  shrink_node+0x3799/0x3de0 mm/vmscan.c:5937
->  kswapd_shrink_node mm/vmscan.c:6765 [inline]
->  balance_pgdat mm/vmscan.c:6957 [inline]
->  kswapd+0x1ca3/0x3700 mm/vmscan.c:7226
->  kthread+0x2f0/0x390 kernel/kthread.c:389
->  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->  </TASK>
+We can also just call it "goals", but either way, of course maintainers set
+goals for the components they maintain and hence have some sort of "strategy"
+how they want to evolve their components, to solve existing or foreseeable
+problems.
 
-#syz set subsystems: bcachefs
+However, I agree that those things may be reevaluated based on community
+feedback and consensus. And I'm happy to do that.
 
-Looks like another bcachefs shutdown problem.  The failure happened on a kernel
-with d293ece10810 ("bcachefs: Fix shutdown ordering"), so it's not the exact same
-thing as reported in https://lore.kernel.org/all/Zr-bCqSWRS3yob7V@google.com.
+See, you're twisting my words and imply that we wouldn't look for community
+consensus, while I'm *explicitly* asking you to let us do exactly that. I want
+to find consensus on the long term goals that we all work on *together*, because
+I don't want to end up with competing projects.
 
-[   82.068524][ T5112] bcachefs (loop0): going read-write
-[   82.076688][ T4530] Bluetooth: hci0: command tx timeout
-[   82.092465][ T5112] bcachefs (loop0): journal_replay... done
-[   82.150223][ T5112] bcachefs (loop0): resume_logged_ops... done
-[   82.152607][ T5112] bcachefs (loop0): delete_dead_inodes... done
-[   82.164815][ T5112] bcachefs (loop0): Fixed errors, running fsck a second time to verify fs is clean
-[   82.176357][ T5112] bcachefs (loop0): resume_logged_ops... done
-[   82.178950][ T5112] bcachefs (loop0): delete_dead_inodes... done
-[   82.188910][ T5112] bcachefs (loop0): done starting filesystem
-[   82.302896][ T5112] bcachefs (loop0): shutting down
-[   82.305956][ T5112] bcachefs (loop0): going read-only
-[   82.317925][ T5112] bcachefs (loop0): finished waiting for writes to stop
-[   82.328724][ T5112] bcachefs (loop0): flushing journal and stopping allocators, journal seq 17
-[   82.354271][ T5113] netlink: 16 bytes leftover after parsing attributes in process `syz.0.0'.
-[   82.366356][ T5112] bcachefs (loop0): flushing journal and stopping allocators complete, journal seq 18
-[   82.386917][ T5112] bcachefs (loop0): shutdown complete, journal seq 19
-[   82.390927][ T5112] bcachefs (loop0): marking filesystem clean
-[   82.472328][ T5112] bcachefs (loop0): shutdown complete
-[   82.504701][   T73] ------------[ cut here ]------------
-[   82.507314][   T73] CPU 0 old state 2 new state 1
-[   82.509635][   T73] WARNING: CPU: 0 PID: 73 at kernel/rcu/srcutree.c:708 srcu_check_nmi_safety+0xca/0x150
-[   82.513331][   T73] Modules linked in:
+And I think it's reasonable to first consider the goals that have been set
+already. Again, feel free to raise concerns and we'll discuss them and look for
+solutions, but please not just ignore the existing goals.
+
+> 
+> When you say things like this it comes across as though you are
+> implying there are two tiers to the community. Ie those that set the
+> strategy and those that don't.
+
+This isn't true, I just ask you to consider the goals that have been set
+already, because we have been working on this already.
+
+*We can discuss them*, but I indeed ask you to accept the current direction as a
+baseline for discussion. I don't think this is unreasonable, is it?
+
+> 
+> > But, we have to agree on a long term strategy and work towards the corresponding
+> > goals *together*.
+> 
+> I think we went over all the options already. IMHO the right one is
+> for nova and vfio to share some kind of core driver. The choice of
+> Rust for nova complicates planning this, but it doesn't mean anyone is
+> saying no to it.
+
+This is the problem, you're many steps ahead.
+
+You should start with understanding why we want the core driver to be in Rust.
+You then can raise your concerns about it and then we can discuss them and see
+if we can find solutions / consensus.
+
+But you're not even considering it, and instead start with a counter proposal.
+This isn't acceptable to me.
+
+> 
+> My main point is when this switches from VFIO on nouveau to VFIO on
+> Nova is something that needs to be a mutual decision with the VFIO
+> side and user community as well.
+
+To me it's important that we agree on the goals and work towards them together.
+If we seriously do that, then the "when" should be trival to agree on.
+
+> 
+> > So, when you say things like "go do Nova, have fun", it really just sounds like
+> > as if you just want to do your own thing and ignore the existing upstream
+> > strategy instead of collaborate and shape it.
+> 
+> I am saying I have no interest in interfering with your
+> project. Really, I read your responses as though you feel Nova is
+> under attack and I'm trying hard to say that is not at all my
+> intention.
+
+I don't read this as Nova "being under attack" at all. I read it as "I don't
+care about the goal to have the core driver in Rust, nor do I care about the
+reasons you have for this.".
+
+> 
+> Jason
+> 
 
