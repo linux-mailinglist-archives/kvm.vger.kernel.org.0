@@ -1,180 +1,273 @@
-Return-Path: <kvm+bounces-27648-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27649-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6889A989360
-	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 09:11:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89553989484
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 11:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23BF3285DB6
-	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 07:11:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 180171F240B9
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 09:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33C0137C35;
-	Sun, 29 Sep 2024 07:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EBB148FEC;
+	Sun, 29 Sep 2024 09:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="lH5SQ1u3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fcoto6dm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF0C7DA84
-	for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 07:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727593855; cv=none; b=ddwIm+1BreDbb0aLf8252YH4g1+t8THTo0HD6ZfXzumUuBjb6XYkuIWPFRLUMkbOshg/8UrzqMeD85K87N91zrVGrIaQpRmlAbk90QqRD3h+xRJHaW0IBdindmLDYIv1ayvtnURvlB5XptEPL7un0d2KOdn36NqcL8OcpfI+MCg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727593855; c=relaxed/simple;
-	bh=n4Jy/g4Eh6+BSVVGvl01aw6en9RlnVRu3g0HXU8COnc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NIr376RyrNa832FHw3vGdRQINjAA7+mdY5/SgWVD92fb8Rcf5yi0c89sbzD6CWxWQow/Xqc1wQTGOKcnhfzIBY5iiRqHand0asK4DJhvvFZtr7V+nRmn6acYqjaS7qbVnVk0E0dXs2MLwnLl1fmKf5oHLzovSfG2kL+a2T1kRKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=lH5SQ1u3; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7d916b6a73aso2217127a12.1
-        for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 00:10:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727593853; x=1728198653; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wupXfiTFRgbbCCMXc+w3GmGZhuh2PGEq/8NKT31sCcc=;
-        b=lH5SQ1u3H+QhpHmcIbUuQdBBmCtOCKG3bZbvt+aUo4LUny7tHnubZu1hhHoIgmJzI6
-         6SUWkb3PtRXZ/UsqDhMgT6kgMNUBhq6jZYS7ks+cQuIyXZgMzpN+W1ONEyfIHHK/eqVT
-         F10TO1N3TXHgnts3vk3vFsJkUR8++cvRCRg3De7U6E8cru3qlL+wORqJX4BBd+KcCgwj
-         2SEQCTz3+SECmvUfQA2LWVFuOUhiy4DGFAl0XbSNVU4lABaoWfsz1wQ/arEMTfvRfNdk
-         flOOasikzJXONwTtskHjfXnQxDPSxP3vAyIuz2ldv35mSLsuXr+H3iCxGejFD8ymlqVe
-         4H6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727593853; x=1728198653;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wupXfiTFRgbbCCMXc+w3GmGZhuh2PGEq/8NKT31sCcc=;
-        b=sgS0j3QO9WQaurnMOrwIGSy5fINzlvdKo5MYuNo5+0IdskVsHztsJz/Th6V8uVjoQC
-         3+h/SdUvbO2Nj4A0QChqmHZ0z8Qq7rMj28yk8uZ6oPsP7B5OPa5ua2Ku259kwBvTvxNZ
-         08urEUMtgMkM3+bIzAl4nNj79aXOxcJ1ve8/fDU5ffWyxnZvssRY4AO9phn9TDq9zL7X
-         qd4etT/ptedVMwCyRLawC6SW3J5OSSnRpkQRglUEusUKqb1VbIP4+U2DiQ+SB5uR5aAx
-         KkoyttRIbdNmgY7YXNagINUajF0UFE0ipObuXHUzmtIASereijyKiPERLH6PfPj4nORh
-         Oznw==
-X-Forwarded-Encrypted: i=1; AJvYcCUeAs7w7Zq3KLPhp2HPjMwT1vEAUGNnFLi5bHyA9RDbH2CY3R4gFcRQyRsnqzn1f8r1cVQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaWmydIsltzzWkYgmXPyu5l5ZqhjX6HBcIVVV/VMmCvgpTJMIN
-	Cc8HO6MJTy99zvf4E2/Sru78XLXoS8d5YYkr9kcOyzeK4wksNJmcAiACX/jZgTc=
-X-Google-Smtp-Source: AGHT+IGrcYY05To+/yLZrdZKHUuaT4lGmCtj4wsgyrCWwclUUaolM2+fnTgp4t6z/cgOYbzvWvn9bg==
-X-Received: by 2002:a17:90a:ad91:b0:2d4:924:8891 with SMTP id 98e67ed59e1d1-2e0b8ede168mr9323964a91.38.1727593852980;
-        Sun, 29 Sep 2024 00:10:52 -0700 (PDT)
-Received: from [157.82.207.107] ([157.82.207.107])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0b6c7942csm5324497a91.16.2024.09.29.00.10.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 Sep 2024 00:10:52 -0700 (PDT)
-Message-ID: <447dca19-58c5-4c01-b60e-cfe5e601961a@daynix.com>
-Date: Sun, 29 Sep 2024 16:10:47 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6CE13B286;
+	Sun, 29 Sep 2024 09:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727602197; cv=fail; b=hoiwUPTXOZR+oFI+NdqHsutL4GnPcbykTK5qjwXLGn/QF2zFESKrXl3151dezRlxm1iCCNnCUg8Mm8aQL1HYi8de4NfTSUz0V7xrp7QKvfFDK4ZmLlwuKIXfnlnXaR/OLWSKiLcMFSL1qaqViZkHWSid/e2hWeDWI8c8Daeo5pE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727602197; c=relaxed/simple;
+	bh=uLKDU1pZwAkCutDOkjIogz9mLUl7ighQbWc37TL4nAI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nHqFyUv+WMFVvSPYHspf5+TgaYcL+J0DXpdm6ZPBXbKI5Fgcf/JDZw08xeklZ1E1sGf9VH1TTTp46CvL3loONkvr1O8+zAY80WaErRx6yfigjqHGbM4hZ9WLlXO8dFnF95oRQZ30JX/LMauDTHYkc2vSKdMN172zWj38+J75KpA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fcoto6dm; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727602196; x=1759138196;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=uLKDU1pZwAkCutDOkjIogz9mLUl7ighQbWc37TL4nAI=;
+  b=fcoto6dmfix71OIkad3941tkfC7QGgwF5IhMN7rAOjc39FYiOoYcPydZ
+   F/HNcz1Si8o1w8xS4GoXUL7eYgD4xGzl2oJ70bg8CQClR86s23zeCoA5L
+   tRjMGs2N76sB4m8MtYImbrciu7u/gyc0ECSsAnB7A5/ixErASIJ/NmcrQ
+   YGJwv7MIPaf+6jIHvBSNSjL8rsJNJEasv3NR08MQAXiKgX6LpNMRSZpo8
+   xG4+oa6P3TD41u5zVuBFSbzBHTocqU1Ax/AquaGzGvDuYl3cd38Yr/N/E
+   xLNiT+Im44tP4A0ti7Xqk5DBnqusK/YhZ3Qezlzwdanj4qIJg1OWMPjbu
+   w==;
+X-CSE-ConnectionGUID: /oZJ9yXVTFOT5HXsi8P0Hw==
+X-CSE-MsgGUID: X8PCukhtTqGpgJ8jB3I33Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11209"; a="44220680"
+X-IronPort-AV: E=Sophos;i="6.11,162,1725346800"; 
+   d="scan'208";a="44220680"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2024 02:29:55 -0700
+X-CSE-ConnectionGUID: TI1mHUYYRPmRJdmY/pDvnw==
+X-CSE-MsgGUID: PwdcWCGpQPOvkXrs2Fn9GA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,162,1725346800"; 
+   d="scan'208";a="73305679"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Sep 2024 02:29:55 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sun, 29 Sep 2024 02:29:54 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sun, 29 Sep 2024 02:29:54 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Sun, 29 Sep 2024 02:29:54 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.174)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sun, 29 Sep 2024 02:29:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RQDWWib5kZO+bxygNsdbI4ejW25VyfNH+2iFjKI66zNGCcb4xA3t0TeP4b2WjnNARq3wWIMMCu3cM568I7WtKbn8s/3HzkFpiyqYp8Lo25s2SmRjpSQbDvl627SVf2LSQSt1ymAFZAnT49Jd7orItjrAdWgy1jgVP2HovT3SG82bu5FMH9a1N0wEKLIvt7ZmVdKjbAAbZMN+p9VMtv/f95wpUIayxJcRGWfCdLU8YrQl85VVPJ/rxfxxJbKUYqZTRadZPsQGQ1pxjALrfCd/maaazGLdZA3BfW7GmKpAFZjUXo3WHD/i2bjxXG11Fn3z7bgEH9uGh4f9UI7nYbhBNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2HXLv+YB6O2AXHA7RXvLSCRiuG3hjIOhZo1qlCLn+c0=;
+ b=KvrAse8ioPDba7LiljCbP/1/3jAecBYysmU7/mRAHRmjapKRGkJeBTgA80qRJK5gc+zOdnHuTbFqvmDZU0b6ky1Zg5xo73I4oQishM6LdJZZjh67gD1Un5tDYLDGkXQzQqXY7bo40bpt99hfuBH38oawQhN2F6Km8HhQxzVCz26izQLNyqn1ixN8iPt4q0JV5bCscs1v248cCAKovjRiYIuzb+Nb6BhYUI0DjdUbw0UW0bZlDh5Xq0sSSlBlwN/PZkAvq0uLqUvEXfvVjjS17J2FTMgpCDAPWdpdTtvmeYggjlsg/hJHYk5378AoNie11tx1YhkpfYSN8pSJxoceQg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ DS0PR11MB7578.namprd11.prod.outlook.com (2603:10b6:8:141::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8005.24; Sun, 29 Sep 2024 09:29:52 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.8005.024; Sun, 29 Sep 2024
+ 09:29:51 +0000
+Date: Sun, 29 Sep 2024 17:27:44 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Isaku Yamahata <isaku.yamahata@intel.com>, <kvm@vger.kernel.org>,
+	<sagis@google.com>, <chao.gao@intel.com>, <pbonzini@redhat.com>,
+	<rick.p.edgecombe@intel.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: x86/tdp_mmu: Trigger the callback only when an
+ interesting change
+Message-ID: <ZvkdkAQkN5LmDaE6@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <6eecc450d0326c9bedfbb34096a0279410923c8d.1726182754.git.isaku.yamahata@intel.com>
+ <ZuOCXarfAwPjYj19@google.com>
+ <ZvUS+Cwg6DyA62EC@yzhao56-desk.sh.intel.com>
+ <Zva4aORxE9ljlMNe@google.com>
+ <ZvbB6s6MYZ2dmQxr@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZvbB6s6MYZ2dmQxr@google.com>
+X-ClientProxiedBy: SG2PR06CA0233.apcprd06.prod.outlook.com
+ (2603:1096:4:ac::17) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v4 0/9] tun: Introduce virtio-net hashing feature
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
-References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com>
- <CACGkMEvMuBe5=wQxZMns4R-oJtVOWGhKM3sXy8U6wSQX7c=iWQ@mail.gmail.com>
- <c3bc8d58-1f0e-4633-bb01-d646fcd03f54@daynix.com>
- <CACGkMEu3u=_=PWW-=XavJRduiHJuZwv11OrMZbnBNVn1fptRUw@mail.gmail.com>
- <6c101c08-4364-4211-a883-cb206d57303d@daynix.com>
- <CACGkMEtscr17UOufUtyPp1OvALL8LcycpbRp6CyVMF=jYzAjAA@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEtscr17UOufUtyPp1OvALL8LcycpbRp6CyVMF=jYzAjAA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS0PR11MB7578:EE_
+X-MS-Office365-Filtering-Correlation-Id: ea1c87f0-43d7-4588-0b39-08dce0694546
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?5lQ9PAh/zcHXIqfXxKAXwe7Fu07yTf5cAMlSuW9e1BlcneHRb++melr6iCf6?=
+ =?us-ascii?Q?HQJnscuvIUwGgt4kSJmMoWbsGpbMF0Ocl3GeL10PjTaRkNVm+CUf8u5NN9uC?=
+ =?us-ascii?Q?9tpfk9RKx5NZWkUXqWzfhHyxnFzmmDEqLb2YJD3fmrSisBZR0TVdEfOf8ABX?=
+ =?us-ascii?Q?C+p9dHXTZEjqI3Ub5v9wN56Q3kdkpzmZMmv5AwWIUCkCHqTOLISQ/5hi1qo/?=
+ =?us-ascii?Q?bMf4p+bfKjIH07ifFzO4KiBGIV+mB7igTIQA9gyosX1UBjLfsNpbRzXAVgO+?=
+ =?us-ascii?Q?N/61Y/d43cSxzaQfL7r8dyiJutHjTmD8pGNa/kbUUTMG2UA+U/kbrOXlC8+h?=
+ =?us-ascii?Q?rMfWuXHfRSo7w0QNHBPjJgeUOSO1wMupNxhB7UvcC+WXwKxnjDCjWC/aBxbO?=
+ =?us-ascii?Q?SDyVYjxBU1/865YCDCZbsri5iySBquduqNmwTT2WsxnIPsH7UfOwn7ETkCEz?=
+ =?us-ascii?Q?9pvygE6secCQTqWcfO6jjnTir6PgokbSsxjvFt+R4JxWBfI1W9dWhGEXtzKD?=
+ =?us-ascii?Q?LvI4zoOnJKQIArBuCI7u9n3AskHd/dgJKi+3nUB7sKi/+Mxrjmwkit65U+TO?=
+ =?us-ascii?Q?NRwDuXOsqVSgXfypEubHBC9hqUPlT8nGuPOawdzlVCxAvAtaIxFzLfVyjH1D?=
+ =?us-ascii?Q?/tXl9S2JhjGMVp3OtSeC3hYq+4TjVp2ys9RM1hWhNp2slxUsCuMgre4/bGxv?=
+ =?us-ascii?Q?lVqCmoHpIdUZ+Pk/UbvyTyFWUN2/DVVgCWx6nb2DVleEOGoun4DhzEBYH+Kl?=
+ =?us-ascii?Q?0Tw7sBTgh56ViqR0lrTbLa8nfRh5CzUffK81CO0AyrASkHW8KURIHiLOl1dZ?=
+ =?us-ascii?Q?hnDkx9bLabB6lb4nzoP143ZxXKVu8KWag+dESKIZdgjHNbdPG/q97YtHq/CN?=
+ =?us-ascii?Q?6qiIkMvi8+PEYm9gK3La3zpUyiuPJczkbD5p7fq+ntB19FMe/GcfN22zZZZF?=
+ =?us-ascii?Q?DgJCpW7H7y+P6ODEDaWMpU7TtsUT9quuVMdzYy2VsZ0QGtW4b5gJclsT5OPJ?=
+ =?us-ascii?Q?xb8UbMF/r2L9pd33y24Z/ZHtVjfkRQHfWKGlk7MDWXaDis8/rAE96pb/hBeV?=
+ =?us-ascii?Q?8HuAw8pk6CQoI/Pd9Mk6rHTh/7wnhBPQWTD21HsQ53pNYgWkQMqCJqkG3xhi?=
+ =?us-ascii?Q?87yUcvDeqKkzVOwRCDcG4Phpu7h85VYwsnVap4uHe/1Rxmt3/X+aZIJi9ePU?=
+ =?us-ascii?Q?WCNWgQn008z3HlfTRZ5+Y5OtaPVMWCWS4YvevRJmGdgAXkopBb9oOHNjxxtj?=
+ =?us-ascii?Q?AHJ/Q02YDCGOjW1zoT+lotUD2teMy/hpNdWJYYvOmIfbYGpWiS8+nBxWhzkt?=
+ =?us-ascii?Q?tB+Zihu2EpkgJgsCkq+hXjtqUUoS3eCKLzywYWJvhf+T4Q=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bl/zC1J9orh2ryCGvN78cv34SX2Y34ELZ+jqWXy2pTEjOZb+tBQv8kVC7T0U?=
+ =?us-ascii?Q?wlLPT9ziOfo3om3k7CRKvPJ5s+mnSxBwCWQyAcGGuJLg9dVOd2KHq4zHCFz3?=
+ =?us-ascii?Q?yf+I8eOW1WrF+4WYEOUYHVZCut2ZpFTCfnwiwUDT5IgTQl4oSCWHxs81ZIPK?=
+ =?us-ascii?Q?M2XMWbmphSFkB4SAb7jHpkaLbpEiAUbDsB6fMMBj/40Yv3X5gYvGMMrJmtBW?=
+ =?us-ascii?Q?Ys27O6vFp+vjYKTAB2McoAmCITh3CqJM+shntOb7jnRz4p/IBc8LNCpJEDzb?=
+ =?us-ascii?Q?LPQyDIMkIcfM76H6KyS0o6Lf0cETm8nvVp20rpwl1HreQsqZKY2nUkANQknw?=
+ =?us-ascii?Q?ARilkCRoTsJsaTikaIubABW8GgFSTEoCCMbOJfFL1XY45KrfpISBTJZ9bKLD?=
+ =?us-ascii?Q?7s73abupd9ICeUGtjGaRN1ixX3BHgBr4ADWtKmvqVE/Y5YtDJ1phXmCBYxUL?=
+ =?us-ascii?Q?g+XK+7In2mQAVWVzGjHME0XCtyEtNCZbwPa7rYPrWXQ9e5F5joIdoReUdtYm?=
+ =?us-ascii?Q?BL0P1hZhNXYsW5dApmNNo48zhBN/TxSNO7vFBm5987HfE+xbBwRjjxe+cEfx?=
+ =?us-ascii?Q?gevSYxVO9Ao6pgmQdwl9pO6fDZ1QHZhrY0CfLeUmu2/acsRbrqxq2ce8JnLk?=
+ =?us-ascii?Q?HaYciQzg2uqNv7V6sUgD+Onth2MKk49eFlEUjcgLLy2kNO78Ri8TvQy0VEyo?=
+ =?us-ascii?Q?ywmG3HnFuoq/lA6NFhWcrVDmW8Fuf4kK2l/ISoLhcIrwMK/uSXKsW+ld8tTz?=
+ =?us-ascii?Q?i0KNc4P+04HGBI/1eJTYGqkt3F7YocPUy4z/w6SxRZS3+k+XiPaLO/VbHGGB?=
+ =?us-ascii?Q?L98WhQ89xiZq1humF6ncRs5gdTEjXf8QY9oCMluV8SVtTY0017fHJkhJRlkP?=
+ =?us-ascii?Q?uUU3859eLKdeCuA1BezCucJXptxXD3lCdIOp4HbFXv2ngP8fohL/GINDfyqb?=
+ =?us-ascii?Q?LbetybPcR1DxeQ4EXsdW99iLzO6SAM2x87M4qgCoIA1BiDVNAn7R/BRlSENE?=
+ =?us-ascii?Q?YWzbUz2O/UscR55P082cZUDWo604RL8r3RPZMurgoxsg0l6817hbHzjtBaHu?=
+ =?us-ascii?Q?gL58YlIVk5bKI8AU9fbRggcxVXdaXkwS7ig6vxTJS9j2aFah4rbQwBilXgF6?=
+ =?us-ascii?Q?ZBXfaAJbb0geNy/mS6C4JfiAOwfBIZyLJHP2h/JySojTXHfH1mkP6YwnSyBn?=
+ =?us-ascii?Q?F54mrE4n8bnIMyJlZGtLkx3TA7kS+THtdCtvg9+1d0TVYx04t+AFg3HUTDn3?=
+ =?us-ascii?Q?YACpftXLoFF5XFqp8700GiFSbjT6YfIfJZetcp8Y44mcqpUtGfJAg/h7vWHC?=
+ =?us-ascii?Q?CxjB4DbpcypcFPJhr11aheA0YQ7+bKOTJXujQU3ehDKz2ImRdusmJHKWvQWu?=
+ =?us-ascii?Q?bgqHAJMPygyI3ALa3PiQU0rZVjyfluw/lFHAAQC7FwZ+MUxwIvqP9rK7Sj0G?=
+ =?us-ascii?Q?dHXR/patxvuG81rn7DiqBsGx2gvX0AXZP4wYjd4HcK8sVajPpKTjeK8XPE/Y?=
+ =?us-ascii?Q?rmFKpx6qUgVWDjaN/p9imBJzQtRO4N6yEhBkSjuCMhcx/6ECbll1vPXi8ERV?=
+ =?us-ascii?Q?w5wqJ+/aqideWZgAibdzJR9IEMmdmsEg1XFuI35Y?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea1c87f0-43d7-4588-0b39-08dce0694546
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2024 09:29:51.9286
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: r9ptP7cNHIxl3oFgzx8I8DpD+SGn/GBZdhHouQyS/mfyHwO85wVTOviAob5sOSbnnw3AFXiMJtYf8N6UFhN4bQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7578
+X-OriginatorOrg: intel.com
 
-On 2024/09/29 11:07, Jason Wang wrote:
-> On Fri, Sep 27, 2024 at 3:51 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2024/09/27 13:31, Jason Wang wrote:
->>> On Fri, Sep 27, 2024 at 10:11 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> On 2024/09/25 12:30, Jason Wang wrote:
->>>>> On Tue, Sep 24, 2024 at 5:01 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>>
->>>>>> virtio-net have two usage of hashes: one is RSS and another is hash
->>>>>> reporting. Conventionally the hash calculation was done by the VMM.
->>>>>> However, computing the hash after the queue was chosen defeats the
->>>>>> purpose of RSS.
->>>>>>
->>>>>> Another approach is to use eBPF steering program. This approach has
->>>>>> another downside: it cannot report the calculated hash due to the
->>>>>> restrictive nature of eBPF.
->>>>>>
->>>>>> Introduce the code to compute hashes to the kernel in order to overcome
->>>>>> thse challenges.
->>>>>>
->>>>>> An alternative solution is to extend the eBPF steering program so that it
->>>>>> will be able to report to the userspace, but it is based on context
->>>>>> rewrites, which is in feature freeze. We can adopt kfuncs, but they will
->>>>>> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
->>>>>> and vhost_net).
->>>>>>
->>>>>
->>>>> I wonder if we could clone the skb and reuse some to store the hash,
->>>>> then the steering eBPF program can access these fields without
->>>>> introducing full RSS in the kernel?
->>>>
->>>> I don't get how cloning the skb can solve the issue.
->>>>
->>>> We can certainly implement Toeplitz function in the kernel or even with
->>>> tc-bpf to store a hash value that can be used for eBPF steering program
->>>> and virtio hash reporting. However we don't have a means of storing a
->>>> hash type, which is specific to virtio hash reporting and lacks a
->>>> corresponding skb field.
->>>
->>> I may miss something but looking at sk_filter_is_valid_access(). It
->>> looks to me we can make use of skb->cb[0..4]?
->>
->> I didn't opt to using cb. Below is the rationale:
->>
->> cb is for tail call so it means we reuse the field for a different
->> purpose. The context rewrite allows adding a field without increasing
->> the size of the underlying storage (the real sk_buff) so we should add a
->> new field instead of reusing an existing field to avoid confusion.
->>
->> We are however no longer allowed to add a new field. In my
->> understanding, this is because it is an UAPI, and eBPF maintainers found
->> it is difficult to maintain its stability.
->>
->> Reusing cb for hash reporting is a workaround to avoid having a new
->> field, but it does not solve the underlying problem (i.e., keeping eBPF
->> as stable as UAPI is unreasonably hard). In my opinion, adding an ioctl
->> is a reasonable option to keep the API as stable as other virtualization
->> UAPIs while respecting the underlying intention of the context rewrite
->> feature freeze.
+On Fri, Sep 27, 2024 at 07:32:10AM -0700, Sean Christopherson wrote:
+> On Fri, Sep 27, 2024, Sean Christopherson wrote:
+> > On Thu, Sep 26, 2024, Yan Zhao wrote:
+> > > On Thu, Sep 12, 2024 at 05:07:57PM -0700, Sean Christopherson wrote:
+> > > > On Thu, Sep 12, 2024, Isaku Yamahata wrote:
+> > > > Right now, the fixes for make_spte() are sitting toward the end of the massive
+> > > > kvm_follow_pfn() rework (80+ patches and counting), but despite the size, I am
+> > > > fairly confident that series can land in 6.13 (lots and lots of small patches).
+> > > > 
+> > > > ---
+> > > > Author:     Sean Christopherson <seanjc@google.com>
+> > > > AuthorDate: Thu Sep 12 16:23:21 2024 -0700
+> > > > Commit:     Sean Christopherson <seanjc@google.com>
+> > > > CommitDate: Thu Sep 12 16:35:06 2024 -0700
+> > > > 
+> > > >     KVM: x86/mmu: Flush TLBs if resolving a TDP MMU fault clears W or D bits
+> > > >     
+> > > >     Do a remote TLB flush if installing a leaf SPTE overwrites an existing
+> > > >     leaf SPTE (with the same target pfn) and clears the Writable bit or the
+> > > >     Dirty bit.  KVM isn't _supposed_ to clear Writable or Dirty bits in such
+> > > >     a scenario, but make_spte() has a flaw where it will fail to set the Dirty
+> > > >     if the existing SPTE is writable.
+> > > >     
+> > > >     E.g. if two vCPUs race to handle faults, the KVM will install a W=1,D=1
+> > > >     SPTE for the first vCPU, and then overwrite it with a W=1,D=0 SPTE for the
+> > > >     second vCPU.  If the first vCPU (or another vCPU) accesses memory using
+> > > >     the W=1,D=1 SPTE, i.e. creates a writable, dirty TLB entry, and that is
+> > > >     the only SPTE that is dirty at the time of the next relevant clearing of
+> > > >     the dirty logs, then clear_dirty_gfn_range() will not modify any SPTEs
+> > > >     because it sees the D=0 SPTE, and thus will complete the clearing of the
+> > > >     dirty logs without performing a TLB flush.
+> > > But it looks that kvm_flush_remote_tlbs_memslot() will always be invoked no
+> > > matter clear_dirty_gfn_range() finds a D bit or not.
+> > 
+> > Oh, right, I forgot about that.  I'll tweak the changelog to call that out before
+> > posting.  Hmm, and I'll drop the Cc: stable@ too, as commit b64d740ea7dd ("kvm:
+> > x86: mmu: Always flush TLBs when enabling dirty logging") was a bug fix, i.e. if
+> > anything should be backported it's that commit.
 > 
-> Fair enough.
+> Actually, a better idea.  I think it makes sense to fully commit to not flushing
+> when overwriting SPTEs, and instead rely on the dirty logging logic to do a remote
+> TLB flush.
 > 
-> Btw, I remember DPDK implements tuntap RSS via eBPF as well (probably
-> via cls or other). It might worth to see if anything we miss here.
+> E.g. on top of this change in the mega-series is a cleanup to unify the TDP MMU
+> and shadow MMU logic for clearing Writable and Dirty bits, with this comment
+> (which is a massaged version of an existing comment for mmu_spte_update()):
+> 
+> /*
+>  * Whenever an MMU-writable SPTE is overwritten with a read-only SPTE, remote
+>  * TLBs must be flushed.  Otherwise write-protecting the gfn may find a read-
+>  * only SPTE, even though the writable SPTE might be cached in a CPU's TLB.
+>  *
+>  * Remote TLBs also need to be flushed if the Dirty bit is cleared, as false
+>  * negatives are not acceptable, e.g. if KVM is using D-bit based PML on VMX.
+>  *
+>  * Don't flush if the Accessed bit is cleared, as access tracking tolerates
+>  * false negatives, and the one path that does care about TLB flushes,
+>  * kvm_mmu_notifier_clear_flush_young(), uses mmu_spte_update_no_track().
+I have a question about why access tracking tolerates false negatives on the
+path kvm_mmu_notifier_clear_flush_young().
 
-Thanks for the information. I wonder why they used cls instead of 
-steering program. Perhaps it may be due to compatibility with macvtap 
-and ipvtap, which don't steering program.
+kvm_mmu_notifier_clear_flush_young() invokes kvm_flush_remote_tlbs()
+only when kvm_age_gfn() returns true. But age_gfn_range()/kvm_age_rmap() will
+return false if the old spte is !is_accessed_spte().
 
-Their RSS implementation looks cleaner so I will improve my RSS 
-implementation accordingly.
+So, if the Access bit is cleared in make_spte(), is a TLB flush required to
+avoid that it's not done in kvm_mmu_notifier_clear_flush_young()?
 
-Regards,
-Akihiko Odaki
+>  *
+>  * Note, this logic only applies to leaf SPTEs.  The caller is responsible for
+>  * determining whether or not a TLB flush is required when modifying a shadow-
+>  * present non-leaf SPTE.
+>  */
+> 
+> But that comment is was made stale by commit b64d740ea7dd.  And looking through
+> the dirty logging logic, KVM (luckily? thankfully?) flushes based on whether or
+> not dirty bitmap/ring entries are reaped, not based on whether or not SPTEs were
+> modified.
+> 
 
