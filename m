@@ -1,153 +1,197 @@
-Return-Path: <kvm+bounces-27659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27660-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 509E49896C0
-	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 20:21:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 863409896C2
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 20:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7625B23217
-	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 18:21:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23D9DB23298
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 18:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C254C537E9;
-	Sun, 29 Sep 2024 18:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C0844375;
+	Sun, 29 Sep 2024 18:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="JTkHnp8s"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="fDpG0mqD"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51B43398B
-	for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 18:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87D94317C
+	for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 18:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727634086; cv=none; b=WXdAe8gwhb2l6OorZ28l89wAYhMel8K/0fPManpFW7h31MWIOlMvDqFnhXlch5P9RAscCzJAdrzQ+VfUnlhBdFWfy8nxeNJeaWTbGv7NogM8XyK9/WVBUZyX7MltLbjPD/9Nru/EU6u974WoETpVQqJiACLFdiK2ZA1/7f6OT4E=
+	t=1727634226; cv=none; b=E8sujiqkNy4hsfzD2YaWJPqKce+yNV0baaWtAPwkbAGYZ+sc8SEwi3hSAyWOiaSfsWfFUoj2evKMUwAj1jBVUIWHcqKGttZ2cZ8ExkJhyyt5hop9JJ5R+SkIqXbScMUcfgevkFBMzBs1StoD2Yz89HFNS3buwdh5Y8RXi+RJ9t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727634086; c=relaxed/simple;
-	bh=IiI7k5eKIv3t3egjU4Ltp6qafG9X3D4ad7adQ1hTsrs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hmjm2XHTEed/ENiuIo5oQPkGFLz/RACSkNEH/AN6s4VFLM19TFZHCLZz5EejW0ucf0sCnLXbu6lJcQR2eaLB1zARm/oc2qBieuL1EKGujcx27AWeHH2gUcocswedg7o7QNfvDi84Yt8jMLX7reTqDWNZ0k4hnqcUJUhRIoRSLiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=JTkHnp8s; arc=none smtp.client-ip=185.125.188.122
+	s=arc-20240116; t=1727634226; c=relaxed/simple;
+	bh=EaeEbDkfqftHCixGBXyCEafafRodMqBM5hSAt75SEGo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QW36NVNOvy3/MmpMpMTmMd20t5OLS8UYSEw0lryK2JLEekV994b0LB96SbxNqtYEmVFOFKlR71+Ki07Kog1tdUU40eyCTjogRBkrnvOc+9GfVeen8Tw/Mq6OjbtoQI+6mXQKKReSGWLBIB3mIQTKzoG2qURyJfASn/ivb7e/xe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=fDpG0mqD; arc=none smtp.client-ip=185.125.188.122
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com [209.85.217.70])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id D15843F427
-	for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 18:21:20 +0000 (UTC)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 8DA873F5BB
+	for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 18:23:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1727634080;
-	bh=NcSFbsIXgiNSIJxntSXwkK9zAY/t+TLdWZ5xLvbV6u8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=JTkHnp8s6k+gJbbZgFS4BB1kLdAjjM7ktdb/5StUZ3B7Fepl9qIC/ssnTA5BFFEst
-	 QHn/NCi5ePPNTn3LJenRjuyn7j1YykP0buURCX03+ehUIdA2E9KMDXoQRcgf/Dgr6i
-	 pl53t4ao+RO4FOiCLBzPfp+/q4BPII3a97MwBYrCmtvetum7WMnr320xKQC1H7v9Sc
-	 VdNdA63dh9mPfMA/GkWU85BhpiKGxqK6jKI3wAEFdXh+kWg3yBvmFmaGKJ8oJJksB2
-	 AktGuBlSmXEHnvJDSr3o80XnK1B7oWC6I8Rk+DpJRx3mHKrZl3eLOFmY1RlFerFlMI
-	 tIlZagQO0gBeg==
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a93d0b27d37so213656166b.0
-        for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 11:21:20 -0700 (PDT)
+	s=20210705; t=1727634221;
+	bh=okf6FMMM+QSBRqpYSwuMmX++XMeaDITgAwFtVVXn02Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=fDpG0mqDLSfRmx3Uu72uXTvQqcS9F3sR3JR9kczFuIsZxwEUygU7qc5aY7leohfDp
+	 dDMAl0mbwBHei5WzdaKn8Ij/SBI7+0XgcS2yLDANgg/qYUHSY63oniAa/AaVjRDZBX
+	 CBlv8lC2W6TrDJFzXyiyctL4+KPCIfbmNrp8Zdbtbgz1UzKCPKRcyQBCBmG2bdrUHz
+	 xQdF3ojINdOoFv/hkhi5u8RDyGOfOwPvjKsDHGelGLbxceYT8SgTwbFUgu+gg0RS9y
+	 XmigwiEuAkmEotJvvWlJTqsEt5Ra9LCkRhAXpTtUspwN9lLl0DOCu9OcAKb8XzmHKu
+	 4RnjHDGN5WH3g==
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-4a39ee3a8a6so776456137.0
+        for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 11:23:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727634080; x=1728238880;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NcSFbsIXgiNSIJxntSXwkK9zAY/t+TLdWZ5xLvbV6u8=;
-        b=h7hVcVDngYZlYzqmtBtrSBvNnhZ7Sh7nGPErH50rNtjj/sOpLDgdRHD7sTII92wVUy
-         SfYeB9u5T/aqgfnbZv0J3eoNtiofvarYqOq3Inc2IdPyriIEyuuJ5l38OByMkVStVa65
-         68jFKAGkSxfEH6rCsiMZjZEo38fbGRYg2OXMxzghqW3RpGYtMyeUy6QhSgCIAlQMqUsX
-         28QS7GExOg5pKSjngGH/Q+ECYARp0ujrIy+SG1xRl6JGx8P1spbACUV/+fYz7J3fpZ/Y
-         REa/8QNDLm2UB647oVkTrWXNIViHD8IFxdzRXP+LdH53s60sH73a94dAWEIdE4DWnL67
-         0ocQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaIOf3/lY4KxVtiLAhIFHIGRk/VnvAY6WIUpB1ixmxfmsrZKnprULLA1daWL3xN8i9q8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjxoAtQI5zf2A0Vd7E6lmgHH5jXQs52Y9/RjTJgUt90AIcgxGt
-	cBglqoXdhWO6J+ky5A3aAkG5kbZUaURb/rn18Aw+5pgXkfwPcgumsPhjGkJZcbk4l9t99jIh8ww
-	8ST5k3bzeQoMPq3N2GnvkbuxczHYlLkbXBJporjVnCIRSOJu2mbGSX5gzfv3JNsuh0Q==
-X-Received: by 2002:a17:906:6a02:b0:a8d:2c00:949a with SMTP id a640c23a62f3a-a93c48f2108mr1109688266b.9.1727634080075;
-        Sun, 29 Sep 2024 11:21:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH/dwfX8CpFC/wMaqb9ON9AqBmf3Q6FpW0kLVPD+7epq6zvyosEb7pk9U9oZmP8xLkgLxMtPw==
-X-Received: by 2002:a17:906:6a02:b0:a8d:2c00:949a with SMTP id a640c23a62f3a-a93c48f2108mr1109685266b.9.1727634079417;
-        Sun, 29 Sep 2024 11:21:19 -0700 (PDT)
-Received: from amikhalitsyn.lan (ipbcc0714d.dynamic.kabel-deutschland.de. [188.192.113.77])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c88248af1bsm3420056a12.75.2024.09.29.11.21.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Sep 2024 11:21:18 -0700 (PDT)
-From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-To: stefanha@redhat.com
-Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] vhost/vsock: specify module version
-Date: Sun, 29 Sep 2024 20:21:03 +0200
-Message-Id: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1727634220; x=1728239020;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=okf6FMMM+QSBRqpYSwuMmX++XMeaDITgAwFtVVXn02Y=;
+        b=I4xVnss88esPV+oUCxQwOICJJjTVZ6OoeKzZet4csCcj089dYf2e2gO6Kx5G1VZQ4y
+         nRIYg+MIwiABeglaBzPha8kV1ku+KRwnt4nT+ExLv3rPgWkvRF+laSHIqcjp63On68yG
+         pH81upkN5yq5RA/18pMdoe7/lMYhtSbEcQwYgCvvNPPv0M7b0E/e8uVQCSUr1Wxo2VWT
+         pzUMAPVj5mH1Z28Le/nDUzyAWXj1RENNuOH9c/X8uyceU+sy1x9xekiMWZYkLgIHTIhU
+         LFMR5ypta04g3CKd8xRGmkU7Jy9eADZ3VubO/ND+GgUlbj29+SffHCKMGt0CfNxFclwg
+         TtIA==
+X-Forwarded-Encrypted: i=1; AJvYcCVeb0f7R44WZdHEa4B24Bd7gUDruQ9r7bZD3+Fov6i9h9OYXPK5AmYG2GVX6PKge0Z5bWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcjCwnfm8Uip620Hbvns9nqw8Tduk5dYQCGY0kFp2J02UV59Yp
+	3pXCXqNtWvomqsWMTv3jEogh9SfjxL+yUIQ+73zvRa6BVp/8Rx3H8FIpnpoL70qo+coDFfAIPWN
+	Zny+wEk+bWdLpyQouT3T2TTEGQy3yWCL+9DQqW0GBSOK8FddnLEnehYbPVJMu3tn/9kiKBl5G0L
+	LA7vqHVzPQQzbMhNty5+6B7x95qxWf5dIOrFbp22Ha
+X-Received: by 2002:a05:6102:3912:b0:4a3:bb4d:1965 with SMTP id ada2fe7eead31-4a3bb4d294dmr1008914137.28.1727634220311;
+        Sun, 29 Sep 2024 11:23:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGeieKktbBVAoln7mvsJyimo6C4kSg2QAt1DTPZnW60fFczXHi2RIRQWDMAhbz0rX/GbM/Gp7ua5YQ7uLAy6bE=
+X-Received: by 2002:a05:6102:3912:b0:4a3:bb4d:1965 with SMTP id
+ ada2fe7eead31-4a3bb4d294dmr1008911137.28.1727634219979; Sun, 29 Sep 2024
+ 11:23:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240926161641.189193-1-aleksandr.mikhalitsyn@canonical.com>
+ <20240929125245-mutt-send-email-mst@kernel.org> <CAEivzxdiEu3Tzg7rK=TqDg4Ats-H+=JiPjvZRAnmqO7-jZv2Zw@mail.gmail.com>
+ <20240929134815-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240929134815-mutt-send-email-mst@kernel.org>
+From: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Date: Sun, 29 Sep 2024 20:23:29 +0200
+Message-ID: <CAEivzxfX-H15e6Lt78F0_Rkp=g5QnmDH4Z3m8z7imNFaKcL6TQ@mail.gmail.com>
+Subject: Re: [PATCH] vhost/vsock: specify module version
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: stefanha@redhat.com, Stefano Garzarella <sgarzare@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add an explicit MODULE_VERSION("0.0.1") specification for the vhost_vsock module.
+On Sun, Sep 29, 2024 at 7:48=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Sun, Sep 29, 2024 at 07:35:35PM +0200, Aleksandr Mikhalitsyn wrote:
+> > On Sun, Sep 29, 2024 at 6:56=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com> wrote:
+> > >
+> > > On Thu, Sep 26, 2024 at 06:16:40PM +0200, Alexander Mikhalitsyn wrote=
+:
+> > > > Add an explicit MODULE_VERSION("0.0.1") specification
+> > > > for a vhost_vsock module. It is useful because it allows
+> > > > userspace to check if vhost_vsock is there when it is
+> > > > configured as a built-in.
+> > > >
+> > > > Without this change, there is no /sys/module/vhost_vsock directory.
+> > > >
+> > > > With this change:
+> > > > $ ls -la /sys/module/vhost_vsock/
+> > > > total 0
+> > > > drwxr-xr-x   2 root root    0 Sep 26 15:59 .
+> > > > drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
+> > > > --w-------   1 root root 4096 Sep 26 15:59 uevent
+> > > > -r--r--r--   1 root root 4096 Sep 26 15:59 version
+> > > >
+> > > > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonic=
+al.com>
+> > >
+> > >
+> >
+> > Dear Michael,
+> >
+> > > Why not check that the misc device is registered?
+> >
+> > It is possible to read /proc/misc and check if "241 vhost-vsock" is
+> > there, but it means that userspace
+> > needs to have a specific logic for vsock. At the same time, it's quite
+> > convenient to do something like:
+> >     if [ ! -d /sys/modules/vhost_vsock ]; then
+> >         modprobe vhost_vsock
+> >     fi
+> >
+> > > I'd rather not add a new UAPI until actually necessary.
+> >
+> > I don't insist. I decided to send this patch because, while I was
+> > debugging a non-related kernel issue
+> > on my local dev environment I accidentally discovered that LXD
+> > (containers and VM manager)
+> > fails to run VMs because it fails to load the vhost_vsock module (but
+> > it was built-in in my debug kernel
+> > and the module file didn't exist). Then I discovered that before
+> > trying to load a module we
+> > check if /sys/module/<module name> exists. And found that, for some
+> > reason /sys/module/vhost_vsock
+> > does not exist when vhost_vsock is configured as a built-in, and
+> > /sys/module/vhost_vsock *does* exist when
+> > vhost_vsock is loaded as a module. It looks like an inconsistency and
+> > I also checked that other modules in
+> > drivers/vhost have MODULE_VERSION specified and version is 0.0.1. I
+> > thought that this change looks legitimate
+> > and convenient for userspace consumers.
+> >
+> > Kind regards,
+> > Alex
+>
+>
+> I'll ask you to put this explanation in the commit log,
+> and I'll pick this up.
 
-It is useful because it allows userspace to check if vhost_vsock is there when it is
-configured as a built-in.
+Have done:
+https://lore.kernel.org/kvm/20240929182103.21882-1-aleksandr.mikhalitsyn@ca=
+nonical.com
 
-This is what we have *without* this change and when vhost_vsock is configured
-as a module and loaded:
+Thanks, Michael!
 
-$ ls -la /sys/module/vhost_vsock
-total 0
-drwxr-xr-x   5 root root    0 Sep 29 19:00 .
-drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
--r--r--r--   1 root root 4096 Sep 29 20:05 coresize
-drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
--r--r--r--   1 root root 4096 Sep 29 20:05 initsize
--r--r--r--   1 root root 4096 Sep 29 20:05 initstate
-drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
--r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
-drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
--r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
--r--r--r--   1 root root 4096 Sep 29 20:05 taint
---w-------   1 root root 4096 Sep 29 19:00 uevent
+Kind regards,
+Alex
 
-When vhost_vsock is configured as a built-in there is *no* /sys/module/vhost_vsock directory at all.
-And this looks like an inconsistency.
-
-With this change, when vhost_vsock is configured as a built-in we get:
-$ ls -la /sys/module/vhost_vsock/
-total 0
-drwxr-xr-x   2 root root    0 Sep 26 15:59 .
-drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
---w-------   1 root root 4096 Sep 26 15:59 uevent
--r--r--r--   1 root root 4096 Sep 26 15:59 version
-
-Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
----
- drivers/vhost/vsock.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index 802153e23073..287ea8e480b5 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
- 
- module_init(vhost_vsock_init);
- module_exit(vhost_vsock_exit);
-+MODULE_VERSION("0.0.1");
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Asias He");
- MODULE_DESCRIPTION("vhost transport for vsock ");
--- 
-2.34.1
-
+>
+> > >
+> > > > ---
+> > > >  drivers/vhost/vsock.c | 1 +
+> > > >  1 file changed, 1 insertion(+)
+> > > >
+> > > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > > > index 802153e23073..287ea8e480b5 100644
+> > > > --- a/drivers/vhost/vsock.c
+> > > > +++ b/drivers/vhost/vsock.c
+> > > > @@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
+> > > >
+> > > >  module_init(vhost_vsock_init);
+> > > >  module_exit(vhost_vsock_exit);
+> > > > +MODULE_VERSION("0.0.1");
+> > > >  MODULE_LICENSE("GPL v2");
+> > > >  MODULE_AUTHOR("Asias He");
+> > > >  MODULE_DESCRIPTION("vhost transport for vsock ");
+> > > > --
+> > > > 2.34.1
+> > >
+>
 
