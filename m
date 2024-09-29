@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-27657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D149896A7
-	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 19:48:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81ADE9896AC
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 19:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E5971F22535
-	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 17:48:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A6831F22845
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2024 17:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FEF42070;
-	Sun, 29 Sep 2024 17:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F6B45948;
+	Sun, 29 Sep 2024 17:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FKd+HW3T"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TdWDHJd9"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A46339FD9
-	for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 17:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F3E42070
+	for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 17:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727632097; cv=none; b=e9f4LR9D1pDzQY3rHjkL1wpEOqr+hCfNzUsMVZh1vENDVUTubDVild1nNvjYPaqhd3Nk0xP5gB84HR9vgSR1zv4j3El4KhwMnV8/ysXeFGtudoJWWN9yh6xYaTzk8vmwGh1ZTI2jSCBLWcqwPtttpWqn5XA0ity6x/yG5DpuwCs=
+	t=1727632128; cv=none; b=otmtdWrR/5d552wAaMO5BM35gxIUxAtNzHbl4BTSdOMzrQoNAXlEbB+QqYsnI9Zj0Me74edny7kqRyJXnptUJ0+WLa31ygYW5aNCkXX447ZM76QMriFvMIGj0hizGzUDh8CGwi3BxPhR+prm+vJs43t8OkcP1Yz9LslPwuCFWpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727632097; c=relaxed/simple;
-	bh=AvobsG1jhuHDFE/RNGfVUQyDfh3hzzI1idLKQDaPtl4=;
+	s=arc-20240116; t=1727632128; c=relaxed/simple;
+	bh=do27kc5Fwyi6Kx7WwmJUxF9V16BLmQ7JLqwuhDUy4Yc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OhAiU1IM5lAs8jPZItw5XYPmW6ivsQvraKPgwxWuH6N/6qPw4sEtqcx/rAQ3+ab1y4tbwF7qCspd0bTmJFYzIGKi8KhOnMtdYAKimruhSjO3eKd8fPd+0sK1DtaSwYpL+1RpxAr3EvDGTXlNcOFDhsJUDEnHrtiwhZqSkHv9EEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FKd+HW3T; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=quAXd1f2f2XbMFlrDeCpERpBAnv3qeemyN8T5yd0QtJiatV+osQNf+8eZyaDDDaiZTbjBX0WItM28zZEt6MVfb7ifEJOdLExnHilT8YYDFcXfn9R2c4MjBCiWWRsK7gOLfxIPTQVRRg2FldAT3JNm6n1BWpGYX6O99DlnLc0+Hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TdWDHJd9; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727632095;
+	s=mimecast20190719; t=1727632126;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=V2SJ25HQ+fRHsgbGXM+/9uz/n92kl540u3O+51RIevY=;
-	b=FKd+HW3ThDYaNv7b4TY2kl2g/lAUyO0aTmWNUJtEo6iJhl2WSLV4qPpXwhKV4FuubGvyXq
-	+A+/keq0ByBoaqyAfi4f3AgMuKemya9sByaY5FYpvogqPmVQbpR6JpkdBF4Zn8qORuU8Jn
-	kxS9NMitGOKz4Kuik/Iq9LQYO2R9krA=
+	bh=wPatogrvfeQytgMf1DGOYNKKTCyiWPsjq+uNPqesLks=;
+	b=TdWDHJd9BPPH2HTP4lnkPvCAjdjmWM6jZqnCaKxeXcMhsS/uvCF8XFUw65X3k9Poog3Ofm
+	5xZfkf1wKjKMp5SKgY13J5HSbVqzbFT02aoD7siQeQvhKS5TsYTyfSNWaLj++4MLAPqCrz
+	paxrOeD9H24r+NnplX06YSc6+/BM8pQ=
 Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
  [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-XS-DKsrWM2iCRv1onEKZUw-1; Sun, 29 Sep 2024 13:48:13 -0400
-X-MC-Unique: XS-DKsrWM2iCRv1onEKZUw-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a8a80667ad8so324941166b.2
-        for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 10:48:13 -0700 (PDT)
+ us-mta-70-ywBprEKdMISDISaxtlCt7g-1; Sun, 29 Sep 2024 13:48:44 -0400
+X-MC-Unique: ywBprEKdMISDISaxtlCt7g-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a8d1a00e0beso20435166b.0
+        for <kvm@vger.kernel.org>; Sun, 29 Sep 2024 10:48:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727632092; x=1728236892;
+        d=1e100.net; s=20230601; t=1727632123; x=1728236923;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V2SJ25HQ+fRHsgbGXM+/9uz/n92kl540u3O+51RIevY=;
-        b=UQCX8yRjLl7bJ26n8ut9gggDuDlgeH3aG/sENxSHNIGHC7IWgjY+0Fpw4LEfNvvUqJ
-         HoDuu6Jol6TQXb9J0Mznn14gDp97saeer7SqQq/9FsdAK1AgKi63V7jdH0kD0TVfADWW
-         zCG/Rep6CADpPHe1MmIq5DlTJsZgps79s2DfzYlr4A0YbbqAUMw13NFrFFtXgR8v2Pe3
-         4pu22wq99Vm3ivJKplyVbEsxRXHbLzFA3aFHDoagI5KbX9CNn9ZgziHlZkkzis50c0L3
-         HD0z+ogAqoUQ8k6TZUlOF3TTfqPpo+PT5N9GJK45YRlOZM9rMQd92IwLVWP+pb7Vfk5l
-         O69g==
-X-Forwarded-Encrypted: i=1; AJvYcCVJAl3BSbSkIJAy2qT2zsIqg5uRyEzcYuXTmiNxcqvATunsiGysIRZy/mWaqi2bnucJD00=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxYxzownxoUHxk0+42tElIFtyI2xF4iFQzTzAOi0UTNL8Me891
-	DbP4bJdIVqIcMo9Pq28e5RxXlbBjAUcQuDEQvw8aBAWP5Z6hahl72fESqO7xzqcf84Az7fTWfXM
-	owP3TNz6JceK7N+//EMDgdPYAZLGIRVZsTjJPsp8uG78kgd5PBw==
-X-Received: by 2002:a17:907:5083:b0:a93:d5d3:be4 with SMTP id a640c23a62f3a-a93d5d30c76mr524244466b.13.1727632092395;
-        Sun, 29 Sep 2024 10:48:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGjqTNCryWEzIqqf/1Btme4Xway6eGbeCP9wgNBqt//k4KeV1eDqkHhHROUxGnKGL7CROE+tg==
-X-Received: by 2002:a17:907:5083:b0:a93:d5d3:be4 with SMTP id a640c23a62f3a-a93d5d30c76mr524242566b.13.1727632091972;
-        Sun, 29 Sep 2024 10:48:11 -0700 (PDT)
+        bh=wPatogrvfeQytgMf1DGOYNKKTCyiWPsjq+uNPqesLks=;
+        b=MKcdj2QrecDKLwZVW5uW/gi9jsqc7eUdCOPROipNoEv6/WOrNoDxPkmWGgHSwTcTni
+         zCEdC5C0XOsD5ESMqs32j5QKK2dOD9RKUgmJEcXZMb/Ja3fY3Mup5UXrC/LAcn75GJiu
+         wztfzMb6v1rCQU064F4uMKQlO8b1omUUz+Ox94sSjXHxiyCOashG3IJnqpVeKcF9AOHN
+         hmdXunlsicqsH8Njl1t2TdC7AXBVTzVMoTgz9A/rpYIrFjiYQMmXlzIlek5B4AVXo9T6
+         ts//6xYubpxohj/2xcm0T5BEXIXUYuBNQTH/N0cH8q2rJjxQR1HKWP3l8cL+SeK3Qtq8
+         a2CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUpag5OVVjOTgCozbfpXk4mzq1jUSoxgq6shcVE7Tq1IesfAgW7OEFVbZ8xhPJZOif1foY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsOCeeub00SOlSFBwtTAUlrHnljFusCpLUFrbNNxv7dG9v/Tuo
+	RAsNsGzq2+WacS5s/Q7IaG0LaxQDke3sBKMMpYMzvUP1PvfyQhR6l9/KCe65gxUCX49ShoPGLGT
+	bQaC01g7bOkV6R1Yc2Uba4TRokffAH2/4Le29ncp4sEgpj4Ea/Q==
+X-Received: by 2002:a17:907:8687:b0:a8d:4954:c209 with SMTP id a640c23a62f3a-a93b165dacamr1584445066b.22.1727632123590;
+        Sun, 29 Sep 2024 10:48:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG8yhcltAXNNOPlgdZbg2eX/lkfZ7eFhPOsGjV+HlVBPUltwDUsyTd38J3Fyn/QINeqZ/Q5XA==
+X-Received: by 2002:a17:907:8687:b0:a8d:4954:c209 with SMTP id a640c23a62f3a-a93b165dacamr1584442566b.22.1727632122934;
+        Sun, 29 Sep 2024 10:48:42 -0700 (PDT)
 Received: from redhat.com ([2a02:14f:17b:822e:847c:4023:a734:1389])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93c297a4d2sm403334966b.155.2024.09.29.10.48.09
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93c2948fc7sm404346366b.137.2024.09.29.10.48.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Sep 2024 10:48:11 -0700 (PDT)
-Date: Sun, 29 Sep 2024 13:48:05 -0400
+        Sun, 29 Sep 2024 10:48:42 -0700 (PDT)
+Date: Sun, 29 Sep 2024 13:48:36 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 Cc: stefanha@redhat.com, Stefano Garzarella <sgarzare@redhat.com>,
@@ -82,7 +82,7 @@ Cc: stefanha@redhat.com, Stefano Garzarella <sgarzare@redhat.com>,
 	kvm@vger.kernel.org, virtualization@lists.linux.dev,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] vhost/vsock: specify module version
-Message-ID: <20240929134716-mutt-send-email-mst@kernel.org>
+Message-ID: <20240929134815-mutt-send-email-mst@kernel.org>
 References: <20240926161641.189193-1-aleksandr.mikhalitsyn@canonical.com>
  <20240929125245-mutt-send-email-mst@kernel.org>
  <CAEivzxdiEu3Tzg7rK=TqDg4Ats-H+=JiPjvZRAnmqO7-jZv2Zw@mail.gmail.com>
@@ -155,10 +155,9 @@ On Sun, Sep 29, 2024 at 07:35:35PM +0200, Aleksandr Mikhalitsyn wrote:
 > Kind regards,
 > Alex
 
-Aha, that's a different matter.
-Given userspace already depends on this UAPI, it's easier
-to fix it in the kernel.
 
+I'll ask you to put this explanation in the commit log,
+and I'll pick this up.
 
 > >
 > > > ---
