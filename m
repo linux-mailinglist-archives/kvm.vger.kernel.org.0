@@ -1,202 +1,228 @@
-Return-Path: <kvm+bounces-27700-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27701-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60F9198AAB0
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 19:10:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D32E598AAE9
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 19:18:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E805C1F22081
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 17:10:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 638831F21F57
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 17:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14999198838;
-	Mon, 30 Sep 2024 17:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCBE1957F4;
+	Mon, 30 Sep 2024 17:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RcFenGLm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f50r3ayZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE3C1957FF
-	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 17:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CAE273FD
+	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 17:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727716222; cv=none; b=HAUmR72dq05up5QErNjvZ//ZYOfrGBFYsrldviSpvy+/ca8l6QW7iAXdS2Cy+/Sa5jOQjEfelnBGeMJZJGnit1aOmU7PWluiVsFVEid5st4iam13WpOaQgBrBdS7FNx919rTiDB7+Vuu2dUHRxhDnOu5/OWRSOWkRoO0ubRpxw0=
+	t=1727716677; cv=none; b=ZixE22ZcTUBFVGrdWXeHw21etAwQKuCu7onDU9H1OP2eiaSvmC3lSiXL7Z0BQYYaSBJgOCA148DgaZMhqExA7DVW3UBCT0Npe4yBK9vz7z5yPpYm/LE638SHKv1HqGJi1uPuCc7ghoXeOjXHSNAkxEp2r9GlfgJMgnVr6+ziqZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727716222; c=relaxed/simple;
-	bh=5wCtd/qenl5aQFXC8VeDAnkSJ10rUAbKI4NRMVb1cAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fcye8lpGf7f8LedcZPp43WU23ldmph+QLmJ+4BFdFZ1V0VCU0wLxwxVcbowFZFOslONW88d18mF6kfJzpJk2nssQzu76jTLB5+CCHoZUB3HBe4av+Ydudi1QITB+Aq0h5Vm/2ZpMJ5TTAT3PoMc9W/n68Q9ve2b4ml739RHbdrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RcFenGLm; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1727716677; c=relaxed/simple;
+	bh=NvPBwyfXuKXWiV7WztrR3/MoDQYRIo2q+HCemDNtZBY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HCr+cxOOr0tANovNmjExQhwvHWRe1ZbggixdpDCfDeIbUKIh09tjo3CECrOnh4+ESEj/F1KNOaWJknqFlleivShikrXMkIyvD3H3ubQBdnWHsklJ/gyPUEfL6wj2BiAJAcqq3oQpAKMX9MgtA8Ix+/PLxXVqRvmPXk3Ky9NgpV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f50r3ayZ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727716219;
+	s=mimecast20190719; t=1727716674;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NVt/DmzawSuKCiIPGGvUBbDL08MEsVeaKZJjhuNhC/w=;
-	b=RcFenGLmsIah7wyYIWilIkSn+UWEXo8fCWCAYGQO1twTqjEoT8nLL6HcAOuHFJ/nL4S0XO
-	fB29vPXH9j3KMhKMT/ZEHQ7LhTYFijd5EsFyfRkgx33eqJosyWut8Pg9kIgozekrvyjQsN
-	IRMguI1G4OaQB5peTlZD9hKzP29M8Ro=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=XelBiNVf3qEnPLGuRSPY0Kckuvuub64gIAfIBwRaWcM=;
+	b=f50r3ayZBkqnQCAY9Yfr4dyaqVANA7W84dh8di7PZkzKJHAfBBJT4LbYF4lzrJQEOVNWam
+	PfbZDhlW0VN7+KAUwrO1IegNjy5DPrwYn2lTjq80awDbkInGdiHc6OjSj84GJbln6bU4P3
+	dNRrRc7WRay0Tj5lQrvA+2lUTqzhRbQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-107-xnOgh3SBNDimMiD3U_Xw5w-1; Mon, 30 Sep 2024 13:10:16 -0400
-X-MC-Unique: xnOgh3SBNDimMiD3U_Xw5w-1
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a359fcfb2dso1704835ab.1
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 10:10:16 -0700 (PDT)
+ us-mta-425-2bEP6mI6Pj2vKz26JJWPfQ-1; Mon, 30 Sep 2024 13:17:53 -0400
+X-MC-Unique: 2bEP6mI6Pj2vKz26JJWPfQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cb808e9fcso28631825e9.0
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 10:17:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727716216; x=1728321016;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NVt/DmzawSuKCiIPGGvUBbDL08MEsVeaKZJjhuNhC/w=;
-        b=vbWgfjoQAeUwr0Jmq3NFZIW/asEJj85lhlea/1HQapq6GV19ABLF9VKiLpfAJtZ7fL
-         MnA4TB15u5vKX/O5RC63fGgGtXPxMovfzBxvM87jY5rJX5emVAp6fAtr6aIOf31+e/Yu
-         udHBp6ovfKbUd3dv/m/G1GpTyi7zl0o+Gy0ZBTHMGcjpB7Lytk5MHInov/K79W1XUZUh
-         AZdcjetDIY3W10Q4VRpv3zBHv7xydpN31jMP+MHFENqbLB9WUFRcWCo790ys6QS7MVBy
-         5I68kdc5Lmku1t+JRyt6OedarKl3BtJiI5yx275907NDTOOcWX8ZwqPQUKHf8H56HfAA
-         6+Wg==
-X-Gm-Message-State: AOJu0YzmLI+yk9PsgyjM7wPbFIraOEOKDFVNnp17N63F62DLXwM2KXZI
-	0ratMSBneMzqpKuYsjug08zT1LnBt6l40ayScLohbBD4juLRpqvmhxEzDrEG8sahmqeacxLtJQy
-	447JK8A855y4O71tx716mJ6qFToizO09ihfXnXYntcH/KSCdYwQ==
-X-Received: by 2002:a05:6e02:1a62:b0:3a0:a1ab:7ce6 with SMTP id e9e14a558f8ab-3a34b39e8bamr23120215ab.1.1727716215891;
-        Mon, 30 Sep 2024 10:10:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEVY1jcjHI2++bqrj08cP6Loolvcj7a+HYSyjOjpjVAkhKXYhKioDRhz48pxKUu4rJq3/AzdA==
-X-Received: by 2002:a05:6e02:1a62:b0:3a0:a1ab:7ce6 with SMTP id e9e14a558f8ab-3a34b39e8bamr23120065ab.1.1727716215513;
-        Mon, 30 Sep 2024 10:10:15 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d8888f979csm2181143173.164.2024.09.30.10.10.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 10:10:14 -0700 (PDT)
-Date: Mon, 30 Sep 2024 11:10:13 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: kvm@vger.kernel.org, open list <linux-kernel@vger.kernel.org>, Eric
- Auger <eric.auger@redhat.com>, kwankhede@nvidia.com, Marc Zyngier
- <maz@kernel.org>, Will Deacon <will@kernel.org>, Quentin Perret
- <qperret@google.com>
-Subject: Re: [RFC] Simple device assignment with VFIO platform
-Message-ID: <20240930111013.2478261c.alex.williamson@redhat.com>
-In-Reply-To: <CAFgf54rCCWjHLsLUxrMspNHaKAa1o8n3Md2_ZNGVtj0cU_dOPg@mail.gmail.com>
-References: <CAFgf54rCCWjHLsLUxrMspNHaKAa1o8n3Md2_ZNGVtj0cU_dOPg@mail.gmail.com>
-Organization: Red Hat
+        d=1e100.net; s=20230601; t=1727716672; x=1728321472;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XelBiNVf3qEnPLGuRSPY0Kckuvuub64gIAfIBwRaWcM=;
+        b=BB9E/V5q+H07nn+SYDMb9+EiohPIb7sDnUUMqDJtPc5mKgpspVEAAy2daKKi5fYHOw
+         pBWjmQcGGuoGfwzackCGlczSxz4pSR7RVSZpfWNJ2GGpGPODgz/W7FGQh4u5NPSJSaao
+         s5ovUWUYquf10ISoaOLRq/sF4XPqMMOBmSsgr1ublCP0mGRGzjBKZQiFQimifUAScORH
+         8n5Km8r3eGPe11XwI6CUdoXfC5IcrhBH7WJ0qtdP648qLN/Tnws9kEY79x5anX2roRSm
+         IQ1UUlkd3ihvER8kbmyH2P8lLbgCSa+rgTfuX1ak537w9BtpDlFavbZ8wXtV8cyG6rMi
+         V2EA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5xF1AkSWsW78NfjLMKhsTcoiI3l0aivdGyCUwr0i3oHvMZWS35I72d99gpdP8mcw5D7E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxR8EPFsyOe1wsuifgd8KC7XPJbQvhPj2SnjzG7ku4IRN6hXQUc
+	wTkIRBH5msDKhnZ3UP0udEuj2sN15wf7yE85dZhns6GyHl2Z8rJZJsHild1HY2KgiaKQZ2+G2RP
+	Vz7ngIwHqcglOFLbMACHFS9c6C3b0FsOjF3udHKkWP17zyMdmKg==
+X-Received: by 2002:a05:600c:4515:b0:428:10ec:e5ca with SMTP id 5b1f17b1804b1-42f584160b6mr94431705e9.14.1727716672054;
+        Mon, 30 Sep 2024 10:17:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEU2xwDc0Ap4WXKeAzUiUdjfNfK9b2yJ4SYTzwEhkrbpYdpY4QjKEvH4BAcgpH1AioHmiJTlg==
+X-Received: by 2002:a05:600c:4515:b0:428:10ec:e5ca with SMTP id 5b1f17b1804b1-42f584160b6mr94431555e9.14.1727716671636;
+        Mon, 30 Sep 2024 10:17:51 -0700 (PDT)
+Received: from [192.168.10.81] ([151.95.43.71])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42f57e13944sm109836835e9.30.2024.09.30.10.17.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Sep 2024 10:17:51 -0700 (PDT)
+Message-ID: <34b68d1e-7982-48e0-8d8a-5d3e0737ab42@redhat.com>
+Date: Mon, 30 Sep 2024 19:17:50 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] KVM/x86 changes for Linux 6.12
+To: Sean Christopherson <seanjc@google.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Farrah Chen <farrah.chen@intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20240928153302.92406-1-pbonzini@redhat.com>
+ <CAHk-=wiQ2m+zkBUhb1m=m6S-H1syAgWmCHzit9=5y7XsriKFvw@mail.gmail.com>
+ <a402dec0-c8f5-4f10-be5d-8d7263789ba1@redhat.com>
+ <ZvrXbRLzAThvpoj4@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <ZvrXbRLzAThvpoj4@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, 27 Sep 2024 17:17:02 +0100
-Mostafa Saleh <smostafa@google.com> wrote:
+On 9/30/24 18:53, Sean Christopherson wrote:
+> On Mon, Sep 30, 2024, Paolo Bonzini wrote:
+>> On Sun, Sep 29, 2024 at 7:36 PM Linus Torvalds <torvalds@linux-foundation.org> wrote:
+>>> The culprit is commit 590b09b1d88e ("KVM: x86: Register "emergency
+>>> disable" callbacks when virt is enabled"), and the reason seems to be
+>>> this:
+>>>
+>>>    #if IS_ENABLED(CONFIG_KVM_INTEL) || IS_ENABLED(CONFIG_KVM_AMD)
+>>>    void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback);
+>>>    ...
+>>>
+>>> ie if you have a config with KVM enabled, but neither KVM_INTEL nor
+>>> KVM_AMD set, you don't get that callback thing.
+>>>
+>>> The fix may be something like the attached.
+>>
+>> Yeah, there was an attempt in commit 6d55a94222db ("x86/reboot:
+>> Unconditionally define cpu_emergency_virt_cb typedef") but that only
+>> covers the headers and the !CONFIG_KVM case; not the !CONFIG_KVM_INTEL
+>> && !CONFIG_KVM_AMD one that you stumbled upon.
+>>
+>> Your fix is not wrong, but there's no point in compiling kvm.ko if
+>> nobody is using it.
+>>
+>> This is what I'll test more and submit:
+>>
+>> ------------------ 8< ------------------
+>> From: Paolo Bonzini <pbonzini@redhat.com>
+>> Subject: [PATCH] KVM: x86: leave kvm.ko out of the build if no vendor module is requested
+>> kvm.ko is nothing but library code shared by kvm-intel.ko and kvm-amd.ko.
+>> It provides no functionality on its own and it is unnecessary unless one
+>> of the vendor-specific module is compiled.  In particular, /dev/kvm is
+>> not created until one of kvm-intel.ko or kvm-amd.ko is loaded.
+>> Use CONFIG_KVM to decide if it is built-in or a module, but use the
+>> vendor-specific modules for the actual decision on whether to build it.
+>> This also fixes a build failure when CONFIG_KVM_INTEL and CONFIG_KVM_AMD
+>> are both disabled.  The cpu_emergency_register_virt_callback() function
+>> is called from kvm.ko, but it is only defined if at least one of
+>> CONFIG_KVM_INTEL and CONFIG_KVM_AMD is provided.
+>>
+>> Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+>> index 4287a8071a3a..aee054a91031 100644
+>> --- a/arch/x86/kvm/Kconfig
+>> +++ b/arch/x86/kvm/Kconfig
+>> @@ -17,8 +17,8 @@ menuconfig VIRTUALIZATION
+>>   if VIRTUALIZATION
+>> -config KVM
+>> -	tristate "Kernel-based Virtual Machine (KVM) support"
+>> +config KVM_X86_COMMON
+>> +	def_tristate KVM if KVM_INTEL || KVM_AMD
+>>   	depends on HIGH_RES_TIMERS
+>>   	depends on X86_LOCAL_APIC
+>>   	select KVM_COMMON
+>> @@ -46,6 +47,9 @@ config KVM
+>>   	select KVM_GENERIC_HARDWARE_ENABLING
+>>   	select KVM_GENERIC_PRE_FAULT_MEMORY
+>>   	select KVM_WERROR if WERROR
+>> +
+>> +config KVM
+>> +	tristate "Kernel-based Virtual Machine (KVM) support"
+> 
+> I like the idea, but allowing users to select KVM=m|y but not building any parts
+> of KVM seems like it will lead to confusion.  What if we hide KVM entirely, and
+> autoselect m/y/n based on the vendor modules?  AFAICT, this behaves as expected.
 
-> Hi All,
->=20
-> Background
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> I have been looking into assigning simple devices which are not DMA
-> capable to VMs on Android using VFIO platform.
->=20
-> I have been mainly looking with respect to Protected KVM (pKVM), which
-> would need some extra modifications mostly to KVM-VFIO, that is quite
-> early under prototyping at the moment, which have core pending pKVM
-> dependencies upstream as guest memfd[1] and IOMMUs support[2].
->=20
-> However, this problem is not pKVM(or KVM) specific, and about the
-> design of VFIO.
->=20
-> [1] https://lore.kernel.org/kvm/20240801090117.3841080-1-tabba@google.com/
-> [2] https://lore.kernel.org/kvmarm/20230201125328.2186498-1-jean-philippe=
-@linaro.org/
->=20
-> Problem
-> =3D=3D=3D=3D=3D=3D=3D
-> At the moment, VFIO platform will deny a device from probing (through
-> vfio_group_find_or_alloc()), if it=E2=80=99s not part of an IOMMU group,
-> unless (CONFIG_VFIO_NOIOMMU is configured)
->=20
-> As far as I understand the current solutions to pass through platform
-> devices that are not DMA capable are:
-> - Use VFIO platform + (CONFIG_VFIO_NOIOMMU): The problem with that, it
-> taints the kernel and this doesn=E2=80=99t actually fit the device descri=
-ption
-> as the device doesn=E2=80=99t only have an IOMMU, but it=E2=80=99s not DM=
-A capable at
-> all, so the kernel should be safe with assigning the device without
-> DMA isolation.
+Showing the KVM option is useful anyway as a grouping for other options 
+(e.g. SW-protected VMs, Xen, etc.).  I can play with reordering 
+everything and using "select" to group these options, but I doubt it
+will be better/more user-friendly than the above minimal change.
 
-If the device is not capable of DMA, then what do you get from using
-vfio?  Essentially the device is reduced to some MMIO ranges and
-something to configure line level interrupt notification.
-Traditionally this is the realm of UIO.
-=20
-> - Use VFIO mdev with an emulated IOMMU, this seems it could work. But
-> many of the code would be duplicate with the VFIO platform code as the
-> device is a platform device.
+And also...
 
-Per Eric's talk recently at KVM Forum[1] we're already at an inflection
-point for vfio-platform.  We're suffering from lack of contributions
-for any current devices, agreement in the community to end it as a
-failed experiment, while at the same time vendors quietly indicate they
-depend on it.  It seems that at a minimum, we can't support
-vfio-platform like we do vfio-pci, where a meta driver pretends it can
-support exposing any platform device.  There's not enough definition to
-a platform device.  Therefore if vfio-platform is to survive, it's
-probably going to need to do so through device specific drivers which
-understands how a specific device operates, and potentially whether it
-can or cannot perform DMA.  That might mean that vfio-platform needs to
-take the mdev or vfio-pci variant driver approach, and the code
-duplication you're concerned about should instead be refactoring in
-order to re-use the existing code from more device specific drivers.
+> Not having documentation for kvm.ko is unfortunate, but explaining how kvm.ko
+> interacts with kvm-{amd,intel}.ko probably belongs in Documentation/virt/kvm/?
+> anyways.
 
-> - Use UIO: Can map MMIO to userspace which seems to be focused for
-> userspace drivers rather than VM passthrough and I can=E2=80=99t find its
-> support in Qemu.
+... documentation changes can wait for 6.13 anyway, unlike fixing
+the build (even if in a rare config that would mostly be hit by
+randconfig).
 
-This would need to be device specific code on the QEMU side, so there's
-probably not much to share here.
+> If you haven't already, can you also kill off KVM_COMMON?  The only usage is in
+> scripts/gdb/linux/constants.py.in, to print Intel's posted interrupt IRQs in
+> scripts/gdb/linux/interrupts.py, which is quite ridiculous.
 
-> One other benefit from supporting this in VFIO platform, that we can
-> use the existing UAPI for platform devices (and support in VMMs)
+Sure.
 
-But it's not like there's ubiquitous support for vfio-platform devices
-in QEMU either.  Each platform device needs hooks to at least setup
-device tree entries to describe the device to the VM.  AIUI, QEMU needs
-to understand the device and how to describe it to the VM whether the
-approach is vfio-platform or UIO.
-=20
-> Proposal
-> =3D=3D=3D=3D=3D=3D=3D=3D
-> Extend VFIO platform to allow assigning devices without an IOMMU, this
-> can be possibly done by
-> - Checking device capability from the platform bus (would be something
-> ACPI/OF specific similar to how it configures DMA from
-> platform_dma_configure(), we can add a new function something like
-> platfrom_dma_capable())
->=20
-> - Using emulated IOMMU for such devices
-> (vfio_register_emulated_iommu_dev()), instead of having intrusive
-> changes about IOMMUs existence.
->=20
-> If that makes sense I can work on RFC(I don=E2=80=99t have any code at th=
-e moment)
-
-As noted in the thread referenced by Eric, I don't think we want to add
-any sort of vfio no-iommu into QEMU.  vfio-platform in particular is in
-no position drive such a feature.  If you want to use vfio for this,
-the most viable approach would seem to be one of using an emulated
-IOMMU in a device specific context which can understand the device is
-not capable of DMA.  We likely need to let vfio-platform die as generic
-means to expose arbitrary platform devices.  Thanks,
-
-Alex
-
-[1]https://www.youtube.com/watch?v=3DQ5BOSbtwRr8
+Paolo
 
 
