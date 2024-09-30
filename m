@@ -1,85 +1,122 @@
-Return-Path: <kvm+bounces-27666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27667-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB64D989A81
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 08:28:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB04989B61
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 09:25:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C95541C212F1
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 06:28:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B639B20FB9
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 07:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8EE614A0AB;
-	Mon, 30 Sep 2024 06:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336C516EB4C;
+	Mon, 30 Sep 2024 07:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="t/RlMdjl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AIJtguJL"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2069.outbound.protection.outlook.com [40.107.243.69])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FCF23BE;
-	Mon, 30 Sep 2024 06:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C331F16A956;
+	Mon, 30 Sep 2024 07:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727677691; cv=fail; b=HwuBke0URQNSIMOTxHMH0Ye/qQvWWAWN4/3WRW/meQck3w5C0V/tdd8Dvm44ct612yuMT8FHz7MgABcdruR8HjXW1LIDsEoSih8NF9bXwa/XeuXGLx11FRGJrj9dMW6Yyf0rxTHMpY1RUKd2G9QIeO8vmvh3OzUD5AIlLz/aYQM=
+	t=1727681107; cv=fail; b=IKNQ8l7J3SnqnwYUtyyfRmCKM8OZxh08BR4GR3aQ53JRgjobR2Ts/F61111yU1XFw57hAIXCP3kSuDOeBAqR7RsAjrJqdUbYr6JJr0Gs7LvHvbA6v0kun9sSNT5kYvhjuoIoq4zXaQjYBcR3gKRLfo40EuRVvcSXowS0QmbuIrw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727677691; c=relaxed/simple;
-	bh=KI5ifkprfprqg472YS3vTzZDOaf8O3infdlgIo1p/LA=;
-	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YbhHv7O2d1kloc/2kw19JMcfq8X3OxP/OgLHVJvassUTZglaibZVpynzaDf64mbpCTTWBlS3LfMdwb2c8L/fGAElmO0H9qe24bc8bHzTsgHil05c42/0dRKiRlUV0X8BiracpMEy2Rhe9bmZarx37Zt6AoJNgKpBynkqgOQeJZ8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=t/RlMdjl; arc=fail smtp.client-ip=40.107.243.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1727681107; c=relaxed/simple;
+	bh=eLMpqzIQGpVrmg47I4cMuK0mbd5U3fKSg7EEkilWRmc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ly3y/dSsU2TFLqO05qFMvVGqkIDxTICcZ2jQ4P1Ns+0qj0/qur8V3IWdO9WWWwuP280dtdnnmPDhSnHaJbkA5x0WhbrqVcwqEuBZT4vSUPdahIRWTx7V1kZIO0To9IxHKPjiGqy5HZpiccqv65CJ6x7x4u7ym4Af0G4JhU7nF1I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AIJtguJL; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727681106; x=1759217106;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=eLMpqzIQGpVrmg47I4cMuK0mbd5U3fKSg7EEkilWRmc=;
+  b=AIJtguJLOdtr3EyeSsB/unU+qtfGjWi5JUE1Be5RdFOzAHbSpfEsNzMa
+   Pdf9IRGFa9Eeih8afvuruG+dL8KWvuTQA+n1xhI6106qPBDMgrlLykezJ
+   D3dzmKDm3RXmL3urzsZ/DUFrH6QPVUYLdI4yQZONvMspcp74+TVqKrqba
+   tOyfQQHeaN84q0ymzemL6UKS1mphYL/eyg/KXW7O4TVtmsb4Th8eFQpeD
+   0h2KgY86axDU1tBtrjUeWKYQepV4JuKHhEwgtwsA/kclZGuQ8bu2JJIWB
+   o34TUWgPOtgfcKQQvLFg0dA8zscJNO08HH5e19GlsZ/myvKtN9Ru5g/e/
+   w==;
+X-CSE-ConnectionGUID: uYuRuWfYT6e2Mjeh+kohKA==
+X-CSE-MsgGUID: Tj/4awenSVa6FBdKgvz8sw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11210"; a="30549905"
+X-IronPort-AV: E=Sophos;i="6.11,165,1725346800"; 
+   d="scan'208";a="30549905"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 00:25:05 -0700
+X-CSE-ConnectionGUID: Ki9Ap1zFQLOUikE6hbahJw==
+X-CSE-MsgGUID: /01yvM15QVW2kvmaDbRsyw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,165,1725346800"; 
+   d="scan'208";a="110691297"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Sep 2024 00:25:05 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 30 Sep 2024 00:25:04 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 30 Sep 2024 00:14:33 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 30 Sep 2024 00:14:32 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 30 Sep 2024 00:14:32 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.40) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 30 Sep 2024 00:14:32 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Z7hK0VmYdJ3cv87DcJVh244GzEE6RD2t3CMujkyoilufXFjxn4PHNbpf3LFV+hWzlxG8AYhYElaxYGvOIuu3hb2OjPC3KuvYd5oIh+y9fwoqkstqOP2vaxSY4xfQZS7ZxCJKqJMrfh2qqJvQ50SlsgpCu1Oc5gaOWfNkv/HZisP48BSZbUcHQgSHqBwEsBvLCwJlDNbbO3kllZMF1o4mpelh6G1Trh/jJ2xDhv680XKppSno9+cNkpwsFnMMm6ttHnWI+6yDfBzUYG09zEIERoaLtgg0dspWIUxc6d08aMlrD+lovQ8LfvjTBidNHo2VAkjRUfNY3bJCYn3HsJRuiQ==
+ b=GGDeZOZC+E2SwV0yVIW3vAgnGxQ1fzTHPEDd0tql+HqQndtPnqskCSvYCIqPosi3Jq/L9TJ8pj5IQwvePt/VIQUdv379CpERqbd7fenIdr+cOF8Uf4ywUyM2NvkObkJ2imMEJjfyXq5/X8SwHkth5+eQmeNpGCCb2ap5MOYRazbrdPVbIzQbQLFSUxY4j9XZab0pCT25dZMDe6wRPuhF5EGmC3QqBQivNHbratWAybMlsL0/asytuXRcv0f2pJQYbJqzr2AmEq6h88xE2WuRpv1ibQuawwM5I1Bhx9Ricu9qcD7AzU8IzFOnzBS8jvIXtPotAAZeaI9ggnU35GIyAg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eH2m7sJTTFq5Tpr4dytmvX44Mm14fsmoV5phvYKpbIg=;
- b=C7hxitwFTQ2MJ4eUkjOEbm8xiD5MowNkitfTB35+lE/BIDUfDYxIFlBqBXE7DH3AVUSbjHOhvTb+lBuZrdBAEIeykt8ejS6yPATtFkzzfeB7kw6NoMbevntBE5pYW8dlwUSancV/WJo72ZOZZZfG6Ll8SdFvM0OgbDmEt4+vL0L+5/dmPGgVemp/h6zS+AYbxGLs6OkI7SMVSi3nh3ErjLE9m18sQOomuiShv3GBSzsAyCLZyp6DFUuEhzGMjYsxAkwsTVdl38qHiOLB/pYVVtI5phM0qKLyg54cFrgV1Mu1d7b0YzLNFJiSbH2zHUuA85vyrT/GUt7mZdNB0RaGEQ==
+ bh=ywHAGu5547x2hNo0j0zKDfPOTddLyQTOpVCovjAmuyI=;
+ b=yR9Qr74YmSpkBkxdKVSI1y3hrAttDoOl9uBl0MUfngdH/7eaX88sDP355hXBFPheDsbRCsE4MbH/FbjWBvZ23JTSzc7eBeqg1n8SBg4ysLy5RMLP/u8iD52IAWQe7ru4plnAGQMYreixS5IvVjtAKNj/Lv/Oru/1F6CDixr6bFfPSJ7VA3sQhHCxLPEjerMlVdAOdzlK9ekCubvnikHGDavjGXRFfjANWNnTj+ItLdGRLge3fiBorNe8c6hLZVEsLkHH+hUagXAjBcv3lt9W0BkqPGP2lqWI29HglX/9uTiSkaO/bK+D9lCrbZACn67TOrfz+H7ga0ZtQYhP4jwGZQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eH2m7sJTTFq5Tpr4dytmvX44Mm14fsmoV5phvYKpbIg=;
- b=t/RlMdjlfMZbb2uYT4QQl7nS2TFVHP2KLDG4tNel0qpylnRuMaelI4N085CgPXnxkt9uV0u1o/Q8MLOPAcJN/0GC4V9H2sSIlRkoHS/fIqPd/o93oWdol94lYYjk+UaKiJVOsKsMtvOP5Eu5tZkYLMiHiO8uapfVhVYFc+wg9AU=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- PH0PR12MB8176.namprd12.prod.outlook.com (2603:10b6:510:290::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.26; Mon, 30 Sep
- 2024 06:28:04 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec%6]) with mapi id 15.20.8005.024; Mon, 30 Sep 2024
- 06:28:04 +0000
-Message-ID: <64813123-e1e2-17e2-19e8-bd5c852b6a32@amd.com>
-Date: Mon, 30 Sep 2024 11:57:54 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-Subject: Re: [PATCH v11 19/20] x86/kvmclock: Skip kvmclock when Secure TSC is
- available
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de,
- x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
- dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com,
- peterz@infradead.org, gautham.shenoy@amd.com
-References: <20240731150811.156771-1-nikunj@amd.com>
- <20240731150811.156771-20-nikunj@amd.com> <ZuR2t1QrBpPc1Sz2@google.com>
- <9a218564-b011-4222-187d-cba9e9268e93@amd.com> <ZurCbP7MesWXQbqZ@google.com>
- <2870c470-06c8-aa9c-0257-3f9652a4ccd8@amd.com> <Zu0iiMoLJprb4nUP@google.com>
- <4cc88621-d548-d3a1-d667-13586b7bfea8@amd.com>
- <ef194c25-22d8-204e-ffb6-8f9f0a0621fb@amd.com> <ZvQHpbNauYTBgU6M@google.com>
-In-Reply-To: <ZvQHpbNauYTBgU6M@google.com>
-Content-Type: text/plain; charset=UTF-8
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by DM3PR11MB8669.namprd11.prod.outlook.com (2603:10b6:0:14::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8005.26; Mon, 30 Sep 2024 07:14:30 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a%4]) with mapi id 15.20.8005.024; Mon, 30 Sep 2024
+ 07:14:30 +0000
+Message-ID: <27b1055b-aee3-4d00-a4f8-d7d026cfbdd6@intel.com>
+Date: Mon, 30 Sep 2024 15:19:05 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] Simple device assignment with VFIO platform
+To: Mostafa Saleh <smostafa@google.com>, <kvm@vger.kernel.org>, open list
+	<linux-kernel@vger.kernel.org>
+CC: Eric Auger <eric.auger@redhat.com>, Alex Williamson
+	<alex.williamson@redhat.com>, <kwankhede@nvidia.com>, Marc Zyngier
+	<maz@kernel.org>, Will Deacon <will@kernel.org>, Quentin Perret
+	<qperret@google.com>
+References: <CAFgf54rCCWjHLsLUxrMspNHaKAa1o8n3Md2_ZNGVtj0cU_dOPg@mail.gmail.com>
+Content-Language: en-US
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <CAFgf54rCCWjHLsLUxrMspNHaKAa1o8n3Md2_ZNGVtj0cU_dOPg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN2PR01CA0233.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:eb::12) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+X-ClientProxiedBy: SI2PR02CA0015.apcprd02.prod.outlook.com
+ (2603:1096:4:194::16) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,373 +124,168 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|PH0PR12MB8176:EE_
-X-MS-Office365-Filtering-Correlation-Id: caf97ef1-84b6-4fb1-0f0f-08dce1190a18
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|DM3PR11MB8669:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4ca714e-82c7-410e-369c-08dce11f86aa
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cFNETzFZMzJmNUg1V2QvU0drOEltZEVhcnZPZmtJbWtXN1h5U0Vvd3JDS2FY?=
- =?utf-8?B?NFMxSnp1MjhlMXMyWkZUK09vRHU2b1Y5ZVM5MG04VkM4SkpMMFg1aTYwQ2k5?=
- =?utf-8?B?djVNYmtOV09icUxDdVQ5cEt5R2RWSVVOTFdkK25qYUt3K2xsblJrZ1NYYlho?=
- =?utf-8?B?dG5Ra2VkaHNSbjhGcjVHMVZEVlBkK0JXa0hjMElrb09LK1E5cmtsR3ljUTg2?=
- =?utf-8?B?aDVwOXNMTjZtVnBSTUlIeVBpbGtiQ3BrUFQ1b2hITDVHN3o4N0hkOEFCMElW?=
- =?utf-8?B?bDZISTYxcjZDL0FtaHpEVHdqajJxTEpiN2VieWJoY0pOR21xRDZvS1ZaeGgy?=
- =?utf-8?B?S1pianRPTEFTSy9RK3NaN1Nzb1BzTzAvRU9XaVdSY3ZyYWhHZjZKTXhCcFRS?=
- =?utf-8?B?UTNydjBrNDBoMEtuQUl2WWpad3FEdEJBamM0OVR1VU1iN3VLK294dlRSMzQr?=
- =?utf-8?B?YjI1cC9DTzN3djNqWEhWSDkzTU5uYlh4VzBjSFYyV2Y3UVhkN2diek5Eb2xv?=
- =?utf-8?B?VFp5a2FTK0ZNckUra1dnY1M5NTF6ellCSG44UDJzUm9YcVRKSDFnYWR4eFQr?=
- =?utf-8?B?V1hTOVdpbUtiQVBkcEpJQ0x0TkZJNmlCakRTdEpJMWsxRjR2ZTlTbVF5aVFh?=
- =?utf-8?B?b2dtTmlnT2krVTlpb25aVlhuaXp3bmdyenlWWU1aRlNIWk1mZ25aU0U3QkVL?=
- =?utf-8?B?ZkoyeVhndVgza2xOaEcxOGllRDMrTzRBejdieGsySGcyQi8rQWwyMGdDa1Rp?=
- =?utf-8?B?MGRmOGtHRU9JTkdxQWpPUS9rV1RTMDc2RUpQOE5RbjlCYTZtRm5oSWF5UDRJ?=
- =?utf-8?B?aU5HdWtyc3VQcjNjeVZFV1BLWndVTUJKQWJSdDJFOTBXYk5PVWFBSVlNSXJn?=
- =?utf-8?B?L2tmZ3hFNmg1eS9mVmo5QmNEaWJPT1MvT0c3c3dVUHdSR0tPSUdiOGpha2VO?=
- =?utf-8?B?aE9aWXVmZ3ltaVI2a3R3VGxQVURZaTdhSHYwTkVub1BXeE8vV0REcUpNeFJ2?=
- =?utf-8?B?ZDM2aU5wK2JUM1U0U1FJMFhxMkd5SytBOExkUGR2S3kzR2ZZMUhSN3l5dk05?=
- =?utf-8?B?SXVoTGRyNGlxWklIbEpYNGNPRkFXc1IvK1VUd0pGdUZlYlhNMGZwbW1OUGdF?=
- =?utf-8?B?MFNoTVU3M3ZCRXVlVVp3TzhYRUNwT1RWekZzU1dxdlJiN21aS3g5VG44QnVP?=
- =?utf-8?B?N29NR00rN3ptNnRaUEtVdDFoTXEwemFrTW84M3dDS1Y3dHBzeUtoenV2azgw?=
- =?utf-8?B?MzlDK013VW1kUk56SjBybkpFaTBtbE0yL1JEcTNlTHFoUHRySit1SllCUkxr?=
- =?utf-8?B?T3B3WTFXWDU2bUYycGFRbGZZSExlM3hCQ3JPN3J4ZGNZNFp5OVltR0U4QTFv?=
- =?utf-8?B?dHNFTkRiVWVBay9KRFVmVGtNdE9yQVRYMjBTOWZUbmJwdGJlRW5RaFRjY0FJ?=
- =?utf-8?B?QjN0a2Z3Q2l1UGJNa1BUSmdPVHF5VlJma05DZGdrbTZuZm5MNldUeStaNmVD?=
- =?utf-8?B?bWs2clBCaWJqUkxhL1plYmhlU3VCS1I0OStVRmdIQzEvb1NJS0tFWHZKdDZj?=
- =?utf-8?B?Ny9kZnN4UlZibHgzNnE4bnpUQmdsYUxMeER3T2tRdzFZeXJkWHVuaXpXNlE3?=
- =?utf-8?B?ajUyUk9TdkplcDRrZmxCVHhyM05aQ1BxL3JiOHV0eEFuck5lVzJZQ29Bd3ZB?=
- =?utf-8?B?d3RyWXdtOXJTcEhzc1l0UDhKOUd3ZHY3N0o0YUQzeCtpWERYenM3QjRBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TERhTnJaVk5vRDJPRFhFaW0wN2hFZXFsV0N2SjhGVnZqMHZCNk5Bc29Cc0ZH?=
+ =?utf-8?B?M0x1Mk1oNGhXRXhoS1BHejlXU2NQQXVWc3M0ZjBadzgzKzhQaVhIdzltSEp3?=
+ =?utf-8?B?Rm92aUlyN1hoUHNxMjhmTGhVM1lsYUcwcmJKYnJTWVVPd0pnY3RDREZ4ckl2?=
+ =?utf-8?B?YTdJYkhwNExrOGVWZmtBZktoY2IzSkdLem14eTlpa0V4cGJpMmdidlJXQUJV?=
+ =?utf-8?B?M1lkRHBUWXFXV2srUURzSnJpTk11c1NzK1h1Y1NNTVpnWmt1NmVQcVBSTlFM?=
+ =?utf-8?B?K3k0Rjc0enp6RCtOWkRBMmVZKytrRUZjY2JtWHQrUXo0dFBnVEFobGFMeXJs?=
+ =?utf-8?B?RU1OcmN0Z1ZMUHhPZXRGWGNvWEMwK2JwaDZuRjcra0Rna0pvcFhqM3UrYnp0?=
+ =?utf-8?B?ZzNUdVY0TytGYkhrN1U5aU9oQ0t5cWJhQmlhMlFzNEFNb0thODlxa0FzNUs2?=
+ =?utf-8?B?ZDJJN3RqdWNKV21Xc1BtKzB1MGFUVmRoZVA3L0Vvb0VFb2tuSEZCWXB4TFBZ?=
+ =?utf-8?B?UW40bXVSakM5RHhCdGtoOWVkSEN4NWp4b3Q0ZmRoQzd5WVFKUkFrQ2l0b1I4?=
+ =?utf-8?B?QytsOFcwQjBJeTY2U2JYUmJPYXh2NitTbDZRK1lsRzh2STBuV0ZWTU5WNzNO?=
+ =?utf-8?B?QnRwM2hjMUdPNVNtaEtBUjZvcTgwU2FSc3dWcGoydnROOTZXRXF0dm90RGlY?=
+ =?utf-8?B?WnNneURMYktIMEZyVWFISU1SV3FoYnJEZnQzNnVLT1BlVDdkdlhlbTB2bEVX?=
+ =?utf-8?B?Skdpb09vVHdHcDlUcHpPbERVc2xWYmlYb1NpSk5RU25KTUdQTGdpZVUvK1ZG?=
+ =?utf-8?B?ZGRmcHZjRVhHUVliQ1Jrdlo1Ri9wTjBZOGlmS0JhNHRYdG9yUjUzUTgzWEww?=
+ =?utf-8?B?cmNBQzhJUFNYSXhMZmpSWkdMNnRtUkVGR3IyMUpMS1ErU2NXZzR1RHo5RFBP?=
+ =?utf-8?B?N3kwbnhNR003a2VpZ1ZwR3BKa3NHNElXUHZJbkplYjFVa3dvcXEwbDVLd0tm?=
+ =?utf-8?B?Tm5xcyt4eHJKZ2NsdVkzRndGeU5wRTBJalJQNWRCZ0c2Nkg0ZmlEN3JwWWRB?=
+ =?utf-8?B?bHQrSDRLeExaK0tyMVJkczBPMUV0QThtc3I4b05VaGtrRlhZZElHUVBGWHll?=
+ =?utf-8?B?MFpwQVBUcVdTYUFRekQ1alVna2xpWjlSOWlmMXAvOWRTYndtdXlhT21hdTI4?=
+ =?utf-8?B?amovdUlneTVzWmFwb1VBbGhxL1hWbmo4d3hTakEvQ3Z1djgyS1NpRktMczdE?=
+ =?utf-8?B?ZktzRHcvaEIzOGNBbTN3OVpWbC9HK1JaNmNhM2Z2L2w4aVdRT21JUytNQmIy?=
+ =?utf-8?B?ZjY2QndMQVZZNUZCTUFvcnVyTDc1cm91VFh2SVBVK3Ryd25PSVlrZFFVWlNy?=
+ =?utf-8?B?aVl1WngzSjlZQk14cDZrejRPNHRuaDYvZHh2djRlQy9zSFlGa3BMVUxZcnMw?=
+ =?utf-8?B?Q3BHblcvMDVGYWNiUGJsTWppNkkyUGJYckxjcDl2bEk0VUdoM1ZhMFF3UEMz?=
+ =?utf-8?B?SnY1RG4xZTRDWXBEV1R1WVFwZFJzSkpWdnBmUzhCdCtjOUZPYjRCaWNOZ25M?=
+ =?utf-8?B?TWREM3ROUDVpL3VIaTJFL1lxcG04b3FvSFljMmJJL2RkQlJhS2JsUGRqaW5p?=
+ =?utf-8?B?Q1lLVzZPc1U1a1hmVFo2akxrV1V6MjRYT3JzVGdTQ05za0RkbWt2WkFjd1Jt?=
+ =?utf-8?B?RzBaYVk1RWNxd3pMeDVCZW5ELzdjTnJ2NXpNNTR6d3dqcmIyQlVadEZzVVZT?=
+ =?utf-8?B?UkE5WVZSaDFjc0tXWUVsVjduYVdyTE9YUDhGdnpSTWJTeWJWd0VuNEM5TlZq?=
+ =?utf-8?Q?kglkvJTgr/Appldq3QiVqNVXINj+dtA0zqBvA=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RFQrbmtETHBhV1ZrbUlzdXBwZGI0cTM5c3B3czVDbVJWRWYwMXB0d3JhajFk?=
- =?utf-8?B?czNrL2FTelplQ3lVNk5wYU9mZzE3eUJzNkVPV3U3Ui84cXR5dXI4eW1iM0tu?=
- =?utf-8?B?NGExcDFaYjg2Q2hvMmlxcWt6V1RJSU1DVDQrWEhzMW1NOVExSmc2ZVRNNlRP?=
- =?utf-8?B?TXlQemwwY3E2SUc3ZFk4UmdqUXhIUDZjKzV4ZkVnS3V5RzJVMjlHbGJHSE53?=
- =?utf-8?B?d1BydVljdWZNMEp1NHJVWWFiUUhDMjhsSUZGR2g3WG5pbVVNcjQ2SVNyb2Uy?=
- =?utf-8?B?dno1K1NDTE5pM1J4UzNFeVZXYXAyc3MrWmlaOXVnb2hoZHozYlp5ZEVqNy9o?=
- =?utf-8?B?WDRBbHgwQ05DMW5tVjBvUEJrMHBIV2NrQk4yS0dKRklKZldNazdESGxDZUpC?=
- =?utf-8?B?MjdrK2kveTlLS2dtNXQyamxBRGN3UDR2a2ZRKzZNeHNiVGIzZTlEM3ZmTFFB?=
- =?utf-8?B?MkM0TDRVOW81RENLcVF3bWFlOGdsT0VpclVmYkFya2lqUGw0cTdscWZUUzR4?=
- =?utf-8?B?YlRabUJaTmRwa0ZCNjZyVUE1MXJ2bVFkZXJCYzNkOFkrd1I4VkNaMzNDZTVi?=
- =?utf-8?B?ZldCOENhY05NRTEvcHdEdTBlZXFyRlkreDJkY2hCRkFlUWp4T2RPMnNQZmNu?=
- =?utf-8?B?Q3JJVzN3R1AxVnh3Nk8yM1dEdUlZdEZNYWlkdlZlQzdjOFBJOHFGZm5GbVVW?=
- =?utf-8?B?VHVOdzYrSmtMU1R4bGVxM0xqdU1CUjE1aGlJOGtESTRwbEtBUWVweDZLZFor?=
- =?utf-8?B?R2Y4T3BDZUkxMHFxaGtLRHRmeUtpMWdYbjA1b1lueEFqSFhIK2tQUVJnNGk1?=
- =?utf-8?B?cTNHY3RuTTZveWlwUzJ6WnlvVFNUdDdwL01tMitURmIvcnZPK04rZ054YW5S?=
- =?utf-8?B?UXN2eE90S0tyY1laU3haU01UV2pUM0tMc3pBbFZCQko5ZUc2RHByOG9Sb1h1?=
- =?utf-8?B?dHpiOHd3Q0tZYk4yT3BtMUxrKyt0Q2V3b3BBSHlRZXRxdnh5MWg1UmVQKytz?=
- =?utf-8?B?amxnb09OZmdpV014d2kzMHNKZEVLT0M2N3pVQm40aEZhNE1jNk9BOXRXVW1E?=
- =?utf-8?B?K2pxd1V6ZXpxT3R6Q1AyZEdLSTV6Z2lCOHZzdE1OK3IyS1RGS1cxNldDMTBv?=
- =?utf-8?B?bW1jQ3lGV1B4WWFoT005Z3YxRHpLZkZ6N1hrVmVqVnh6dE8xbitoWjlvdENt?=
- =?utf-8?B?K244QnE5QWlJQ1RCNG5PUWRWSGhOWVRPb2VidzVhZUo0NFhkdzlxcTJkM2tC?=
- =?utf-8?B?TFFDQktZaFQ3TDl6cTlwZ2RCTmNDTGVSQ0JkRUduV3ZpWnBicXdKWS9oL2gv?=
- =?utf-8?B?M1RoWlBVYVc2SmdnbTZSa29EVVJXU3ZpazUrcWVoak1zSGRuSkpMdGxTWTQ1?=
- =?utf-8?B?UWRCYzZMOXMyaFdMbTRMY3UwaEpuMFdBM0V5KzF5ZXRVNDI0OVp5aTdMK3Fn?=
- =?utf-8?B?RGdCNnU3MXZLLzdVZFJ0cXZzRzlxUG5ITkpZd1VhTHg4aWUxOUo0M28rV3hp?=
- =?utf-8?B?VGdZSTNwN1AyVnVGSGJYSG5MRlNpWjlGNU45M3ZDM0hwSVVSQUxUOTBZdSt1?=
- =?utf-8?B?M3pSNTU1UlJrRWIwQ2RDNkg5YStCS1hrRnBxVjFUNmYrVVNkQWFZT3ZpWGYw?=
- =?utf-8?B?blZabWwvTXNzNE1oc3lxQ21QdjRMTVg2SkN4TnRnSWROSEMrZ3FkdVZ4Rmlu?=
- =?utf-8?B?TFNKUHEySGpZMWF6YVdyVzhVbHk2QlNrQ2NzRUl1Z2d3ZjZXUXNRN2VvUFAr?=
- =?utf-8?B?RHVucnV6VWRDaFR4ajFmbmZVaGhMdXc1djNVbUFFem9GTUdVMy9mRCsydWls?=
- =?utf-8?B?UTF4amlLZ3lsYnBpaXdRdTJqaG55c2ZmUzJHeEU3cjNLcTdNemxVR3h4R0M4?=
- =?utf-8?B?WVhVRUdnWWZzejVDY25hT0RaU3pGL2hGOWFiWllkK2s2Yk1ubXpXdEtRbWhH?=
- =?utf-8?B?bDZIdHRHSVcxbTM3UmVvMnpCZ2NsTTFaR0tmTmN4SWc1aFcwTnpaMmNoMVhY?=
- =?utf-8?B?anlvd2JMdU8wY2syQngvaEI5ZlJFa2Z4YXZjWE1rTE1Yb0FPc1k4bVZkbHR2?=
- =?utf-8?B?NmVrMmJwdXE5czFOa0c5WEtmNEtLNXFIa0tTVi9vMzk0c0ZkVHlKWXkzaDRX?=
- =?utf-8?Q?hiQ7Dg94i798oIHtxz1LPymWY?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: caf97ef1-84b6-4fb1-0f0f-08dce1190a18
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RjNqMUdhcitLQ2htcHgydjVITWtlWC9LbHJhZGsrNjB4cXdoVFdFd3FzbW1a?=
+ =?utf-8?B?YWtuZ05RVW5CZ0gxSmc1WGNDaUpoa0U0M2xjVVF4TEhSZUdJK0JGTjQzN25u?=
+ =?utf-8?B?NkVCSUJ0YlR6M2RISU14MlpHSXM2RHZHRVUxL0VsalNTWUV2cU9uOFFFZi9U?=
+ =?utf-8?B?WjlhM3o2cnEwZVRvdlpDeS9BMWltYnBYVzFpUHA0MmFvK1ZKTldJRnhzNDVK?=
+ =?utf-8?B?bkVNck16c1FyQldOcFRXV1lVV0RnWXFQZVdteU45czZPOVJBa2hHRGFGOUx3?=
+ =?utf-8?B?b0xBUjZEcWRjZW80R1RsSk0xRGNuMGovNnZwa2ZKRW5KK0NvcVFVV1NUczNF?=
+ =?utf-8?B?MmZWZTFwUnNRUUZZY09GdjB6OHZmRytwZk1PME4vMlZQKzdEQkZ4QlIrUjB6?=
+ =?utf-8?B?TlFMNUp1QXVLWlhibk5wZlp6SkxwN3dqRGJYYW5EdFVHNnhMUUVkVnNuRUMz?=
+ =?utf-8?B?Myt5WWZaUWJiVjBVK3VFUXgrRVFUZm5NVGxqNElVVTRqbVU2bEdIVmNQQ09X?=
+ =?utf-8?B?VnlraGtIVmFWdU1Eb0ZXTFRsMWZURWFUZitKRnhVYmJJTkx5N3BjR2VvZHll?=
+ =?utf-8?B?TmVuY0xmTkZ3emdOY1haUlVoSitFMjlzc0c3cVFqVG9SS0NibTNDOE44UWwz?=
+ =?utf-8?B?QmtncFlybm1ISEsxbzRSL3huWWFxSlNhLzJGdEk5WEtLWXdRWDRkWmUxU2Zy?=
+ =?utf-8?B?dmhnakg2bWNRdjFsVlVCbzVRUktLOWh5TzJnUEFySGYrSW12bkFxMitLMzVC?=
+ =?utf-8?B?dFk5WWZ6OE4yd0N2SGRGT2VQR0o5OVQ1aWNERWZVUTZTSzVzWUVod1JxZWJv?=
+ =?utf-8?B?eGxYbTNoZVlYajQ3eDYwa281cEo5YXhnK1FLUjcwSGk0R0l5dWppRGVoM3BL?=
+ =?utf-8?B?SjgrME5hc0Q2MXRLeDFsVHI5OGVGWVRRbGZWZ0wzUk85Z1d0c1VTNTA3bmZl?=
+ =?utf-8?B?NVN6Q1lmY3dHRHhaNkJ3dG9DQ05kZUUvckdLN2hudlFMT3g2VCtUUThUaCtE?=
+ =?utf-8?B?UzB3RkY5NnpJZUQ3UzE0UXdsbkhwSXo1SG92N2tPYnBJUTNnNHRmcUpBamJx?=
+ =?utf-8?B?ckJRM0dXakFacEtVQk5PanBKZ0NtNitCdVQ5ZkRlODNlaklJeXl4dSt1QlJR?=
+ =?utf-8?B?VTZMYXEvY1FLMitZd1dqeWFCZzZza3NLMWd0S1JPYmxhZkNJS2VYRVBmR2hS?=
+ =?utf-8?B?S3doV2NiZmpWcVdxYlRwcmVuR3JNWVFVQXRQNzNPOXJ6L1JUR2s2MnFqOG9L?=
+ =?utf-8?B?MzMxVzdGYndxUGZHTUxHY0dDVVQwY1RMWDhKeXFmZkNXR3h1YXdtblI2dEhZ?=
+ =?utf-8?B?MFR6akxaWmlhNVN4bExySDJDd1pJaUFlWXQyZXM5RXJFNzBtSlVXNWJnMTlY?=
+ =?utf-8?B?dEsvMm1GYWNqVW5BVWUrc2FpU0pLZTV6aUx4ZGg5TXZldm9DdzR2MDNISE5P?=
+ =?utf-8?B?Y041aUxSUTE0Z1dIUkIwdHlvNXFpK0NpL3ZlQXdkVEtGSk1ZL3ZOczhBbmFB?=
+ =?utf-8?B?K1dKb2srUDBtSFRyMzR6OXpSNXNsWlNEZVluVGx2MXpHb3p3dTlHeGN4T0pZ?=
+ =?utf-8?B?ZTV6VnY5SFhSYUdpVnFVZGFJY0p2VlpNcFpuazV6bERCWm1zRUFnS3dacjF2?=
+ =?utf-8?B?YVdHUHJJaHVZWEwzQTZlQmpXZWoxVjUrYnpPZXVmUHZUUmU2c2JFdHAzemxt?=
+ =?utf-8?B?djhId0NZUnMreklXWGdTbzk5d0tWQmx6cklWR3UvZ3FJYjE3ckMxUHNSWGlO?=
+ =?utf-8?B?Y25makVaWmVhL0ZFTWJMcVdScVFWZ0VRTkxROWJneTkyOG5VaXhYMnk0b3gr?=
+ =?utf-8?B?WnZuaVpCblc5U1JSdW9IR0YxMUZtdEd1bGExR1hBbkVIcDNyOXg0c01oUVdi?=
+ =?utf-8?B?b3FINEpzbG1yKzF5SDFJRUFkV1E1bjB1VVFTU1d1VzRQVjFxb2VNMVFTMjA0?=
+ =?utf-8?B?VU5neUN1czNpTGs0aEhBSVlwUWpQMWZyanlIS1VkVzIvWXhkSHhEVEowQVhE?=
+ =?utf-8?B?a1dyRElxNHpiWE56a05Bd1I0N1U2Njgvd3R0OGYwOEIvZk5kSlNsUUd1TzNP?=
+ =?utf-8?B?NHh5ZEVlQnptenFGdWpyTGpzLy9mS0QyZVlpbEVFU2F3UURtMEVwRnFUZDI3?=
+ =?utf-8?Q?xqXn6IPf+splhxgfpRLQZU08d?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4ca714e-82c7-410e-369c-08dce11f86aa
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2024 06:28:04.3042
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2024 07:14:30.2067
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: A9kqvZh3oHapEGwqQVETu8K03GKGm8FXD5h10xH3D4WuOVwSyAHX+feHLzbUZ2UyyvPsbmUDofj9kdBEsSoHJA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8176
+X-MS-Exchange-CrossTenant-UserPrincipalName: sNRXSCMWWIlK+cSI8tbrQFabGfbIgzgaOtLoCo2kxR8zNsCVprH+I7ywEFLyQuEQ/RPrO0UXxMx6jSMnor9oyw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR11MB8669
+X-OriginatorOrg: intel.com
 
-
-
-On 9/25/2024 6:25 PM, Sean Christopherson wrote:
-> On Wed, Sep 25, 2024, Nikunj A. Dadhania wrote:
->>>>>>> Are you suggesting that whenever the guest is either SNP or TDX, kvmclock
->>>>>>> should be disabled assuming that timesource is stable and always running?
->>>>>>
->>>>>> No, I'm saying that the guest should prefer the raw TSC over kvmclock if the TSC
->>>>>> is stable, irrespective of SNP or TDX.  This is effectively already done for the
->>>>>> timekeeping base (see commit 7539b174aef4 ("x86: kvmguest: use TSC clocksource if
->>>>>> invariant TSC is exposed")), but the scheduler still uses kvmclock thanks to the
->>>>>> kvm_sched_clock_init() code.
->>>>>
->>>>> The kvm-clock and tsc-early both are having the rating of 299. As they are of
->>>>> same rating, kvm-clock is being picked up first.
->>>>>
->>>>> Is it fine to drop the clock rating of kvmclock to 298 ? With this tsc-early will
->>>>> be picked up instead.
->>>>
->>>> IMO, it's ugly, but that's a problem with the rating system inasmuch as anything.
->>>>
->>>> But the kernel will still be using kvmclock for the scheduler clock, which is
->>>> undesirable.
->>>
->>> Agree, kvm_sched_clock_init() is still being called. The above hunk was to use
->>> tsc-early/tsc as the clocksource and not kvm-clock.
->>
->> How about the below patch:
->>
->> From: Nikunj A Dadhania <nikunj@amd.com>
->> Date: Tue, 28 Nov 2023 18:29:56 +0530
->> Subject: [RFC PATCH] x86/kvmclock: Prefer invariant TSC as the clocksource and
->>  scheduler clock
->>
->> For platforms that support stable and always running TSC, although the
->> kvm-clock rating is dropped to 299 to prefer TSC, the guest scheduler clock
->> still keeps on using the kvm-clock which is undesirable. Moreover, as the
->> kvm-clock and early-tsc clocksource are both registered with 299 rating,
->> kvm-clock is being picked up momentarily instead of selecting more stable
->> tsc-early clocksource.
->>
->>   kvm-clock: Using msrs 4b564d01 and 4b564d00
->>   kvm-clock: using sched offset of 1799357702246960 cycles
->>   clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
->>   tsc: Detected 1996.249 MHz processor
->>   clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x398cadd9d93, max_idle_ns: 881590552906 ns
->>   clocksource: Switched to clocksource kvm-clock
->>   clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x398cadd9d93, max_idle_ns: 881590552906 ns
->>   clocksource: Switched to clocksource tsc
->>
->> Drop the kvm-clock rating to 298, so that tsc-early is picked up before
->> kvm-clock and use TSC for scheduler clock as well when the TSC is invariant
->> and stable.
->>
->> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
->>
->> ---
->>
->> The issue we see here is that on bare-metal if the TSC is marked unstable,
->> then the sched-clock will fall back to jiffies. In the virtualization case,
->> do we want to fall back to kvm-clock when TSC is marked unstable?
+On 2024/9/28 00:17, Mostafa Saleh wrote:
+> Hi All,
 > 
-> In the general case, yes.  Though that might be a WARN-able offense if the TSC
-> is allegedly constant+nonstop.  And for SNP and TDX, it might be a "panic and do
-> not boot" offense, since using kvmclock undermines the security of the guest.
+> Background
+> ==========
+> I have been looking into assigning simple devices which are not DMA
+> capable to VMs on Android using VFIO platform.
 > 
->> ---
->>  arch/x86/kernel/kvmclock.c | 11 ++++++-----
->>  1 file changed, 6 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
->> index 5b2c15214a6b..c997b2628c4b 100644
->> --- a/arch/x86/kernel/kvmclock.c
->> +++ b/arch/x86/kernel/kvmclock.c
->> @@ -317,9 +317,6 @@ void __init kvmclock_init(void)
->>  	if (kvm_para_has_feature(KVM_FEATURE_CLOCKSOURCE_STABLE_BIT))
->>  		pvclock_set_flags(PVCLOCK_TSC_STABLE_BIT);
->>  
->> -	flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
->> -	kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
->> -
->>  	x86_platform.calibrate_tsc = kvm_get_tsc_khz;
->>  	x86_platform.calibrate_cpu = kvm_get_tsc_khz;
->>  	x86_platform.get_wallclock = kvm_get_wallclock;
->> @@ -341,8 +338,12 @@ void __init kvmclock_init(void)
->>  	 */
->>  	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
->>  	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
->> -	    !check_tsc_unstable())
->> -		kvm_clock.rating = 299;
->> +	    !check_tsc_unstable()) {
->> +		kvm_clock.rating = 298;
->> +	} else {
->> +		flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
->> +		kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
->> +	}
+> I have been mainly looking with respect to Protected KVM (pKVM), which
+> would need some extra modifications mostly to KVM-VFIO, that is quite
+> early under prototyping at the moment, which have core pending pKVM
+> dependencies upstream as guest memfd[1] and IOMMUs support[2].
 > 
-> I would really, really like to fix this in a centralized location, not by having
-> each PV clocksource muck with their clock's rating.  
-
-TSC Clock Rating Adjustment:
-* During TSC initialization, downgrade the TSC clock rating to 200 if TSC is not
-  constant/reliable, placing it below HPET.
-* Ensure the kvm-clock rating is set to 299 by default in the 
-  struct clocksource kvm_clock.
-* Avoid changing the kvm clock rating based on the availability of reliable
-  clock sources. Let the TSC clock source determine and downgrade itself.
-
-The above will make sure that the PV clocksource rating remain
-unaffected.
-
-Clock soure selection order when the ratings match:
-* Currently, clocks are registered and enqueued based on their rating.
-* When clock ratings are tied, use the advertised clock frequency(freq_khz) as a
-  secondary key to favor clocks with better frequency.
-
-This approach improves the selection process by considering both rating and
-frequency. Something like below:
-
-diff --git a/kernel/time/clocksource.c b/kernel/time/clocksource.c
-index d0538a75f4c6..591451ccc0fa 100644
---- a/kernel/time/clocksource.c
-+++ b/kernel/time/clocksource.c
-@@ -1098,6 +1098,9 @@ static void clocksource_enqueue(struct clocksource *cs)
- 		/* Keep track of the place, where to insert */
- 		if (tmp->rating < cs->rating)
- 			break;
-+		if (tmp->rating == cs->rating && tmp->freq_khz < cs->freq_khz)
-+			break;
-+
- 		entry = &tmp->list;
- 	}
- 	list_add(&cs->list, entry);
-@@ -1133,6 +1136,9 @@ void __clocksource_update_freq_scale(struct clocksource *cs, u32 scale, u32 freq
- 		 * clocksource with mask >= 40-bit and f >= 4GHz. That maps to
- 		 * ~ 0.06ppm granularity for NTP.
- 		 */
-+
-+		cs->freq_khz = freq * scale / 1000;
-+
- 		sec = cs->mask;
- 		do_div(sec, freq);
- 		do_div(sec, scale);
-
-
-> I'm not even sure the existing
-> code is entirely correct, as kvmclock_init() runs _before_ tsc_early_init().  Which
-> is desirable in the legacy case, as it allows calibrating the TSC using kvmclock,
+> However, this problem is not pKVM(or KVM) specific, and about the
+> design of VFIO.
 > 
->   	x86_platform.calibrate_tsc = kvm_get_tsc_khz;
+> [1] https://lore.kernel.org/kvm/20240801090117.3841080-1-tabba@google.com/
+> [2] https://lore.kernel.org/kvmarm/20230201125328.2186498-1-jean-philippe@linaro.org/
 > 
-> but on modern setups that's definitely undesirable, as it means the kernel won't
-> use CPUID.0x15, which every explicitly tells software the frequency of the TSC.
->
-> And I don't think we want to simply point at native_calibrate_tsc(), because that
-> thing is not at all correct for a VM, where checking x86_vendor and x86_vfm is at
-> best sketchy.  
->
-> E.g. I would think it's in AMD's interest for Secure TSC to define
-> the TSC frequency using CPUID.0x15, even if AMD CPUs don't (yet) natively support
-> CPUID.0x15.
+> Problem
+> =======
+> At the moment, VFIO platform will deny a device from probing (through
+> vfio_group_find_or_alloc()), if it’s not part of an IOMMU group,
+> unless (CONFIG_VFIO_NOIOMMU is configured)
 
-For SecureTSC: GUEST_TSC_FREQ MSR (C001_0134h) provides the TSC frequency.
+so your device does not have an IOMMU and also it does not do DMA at all?
 
-> In other words, I think we need to overhaul the PV clock vs. TSC logic so that it
-> makes sense for modern CPUs+VMs, not just keep hacking away at kvmclock.  I don't
-> expect the code would be all that complex in the end, the hardest part is likely
-> just figuring out (and agreeing on) what exactly the kernel should be doing.
+> As far as I understand the current solutions to pass through platform
+> devices that are not DMA capable are:
+> - Use VFIO platform + (CONFIG_VFIO_NOIOMMU): The problem with that, it
+> taints the kernel and this doesn’t actually fit the device description
+> as the device doesn’t only have an IOMMU, but it’s not DMA capable at
+> all, so the kernel should be safe with assigning the device without
+> DMA isolation.
 
-To summarise this thread with respect to TSC vs KVM clock, there three key questions:
+you need to set the vfio_noiommu parameter as well. yes, this would give
+your device a fake iommu group. But the kernel would say this taints it.
 
-1) When should kvmclock init be done?
-2) How should the TSC frequency be discovered?
-3) What should be the sched clock source and how should it be selected in a generic way?
+> 
+> - Use VFIO mdev with an emulated IOMMU, this seems it could work. But
+> many of the code would be duplicate with the VFIO platform code as the
+> device is a platform device.
+> 
+> - Use UIO: Can map MMIO to userspace which seems to be focused for
+> userspace drivers rather than VM passthrough and I can’t find its
+> support in Qemu.
 
-○ Legacy CPU/VMs: VMs running on platforms without non-stop/constant TSC 
-  + kvm-clock should be registered before tsc-early/tsc
-  + Need to calibrate TSC frequency
-  + Use kvmclock wallclock
-  + Use kvmclock for sched clock selected dynamicaly
-    (using clocksource enable()/disable() callback)
+QEMU is for device passthrough, it makes sense it needs to use the VFIO
+without noiommu instead of UIO. The below link has more explanations.
 
-○ Modern CPU/VMs: VMs running on platforms supporting constant, non-stop and reliable TSC
-  + kvm-clock should be registered before tsc-early/tsc
-  + TSC Frequency:
-      Intel: TSC frequency using CPUID 0x15H/ 0x16H ?
+https://wiki.qemu.org/Features/VT-d
 
-      For SecureTSC: GUEST_TSC_FREQ MSR (C001_0134h) provides the TSC frequency, other 
-      AMD guests need to calibrate the TSC frequency.
-  + Use kvmclock wallclock
-  + Use TSC for sched clock
+As the introduction of vfio cdev, you may compile the vfio group out
+by CONFIG_VFIO_GROUP==n. Supposedly, you will not be blocked by the
+vfio_group_find_or_alloc(). But you might be blocked due to no present
+iommu. You may have a try though.
 
-After reviewing the code, the current init sequence looks correct for both legacy
-and modern VMs/CPUs. Let kvmclock go ahead and register itself as a clocksource, although 
-registration of the sched clock can be deferred until the kvm-clock is picked up as the clock 
-source. And restore the old sched clock when kvmclock is disabled. Something like the below
-patch, lightly tested:
+> One other benefit from supporting this in VFIO platform, that we can
+> use the existing UAPI for platform devices (and support in VMMs)
+> 
+> Proposal
+> ========
+> Extend VFIO platform to allow assigning devices without an IOMMU, this
+> can be possibly done by
+> - Checking device capability from the platform bus (would be something
+> ACPI/OF specific similar to how it configures DMA from
+> platform_dma_configure(), we can add a new function something like
+> platfrom_dma_capable())
+> 
+> - Using emulated IOMMU for such devices
+> (vfio_register_emulated_iommu_dev()), instead of having intrusive
+> changes about IOMMUs existence.
 
-diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-index 5b2c15214a6b..7167caa3348d 100644
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -21,6 +21,7 @@
- #include <asm/hypervisor.h>
- #include <asm/x86_init.h>
- #include <asm/kvmclock.h>
-+#include <asm/timer.h>
- 
- static int kvmclock __initdata = 1;
- static int kvmclock_vsyscall __initdata = 1;
-@@ -148,12 +149,41 @@ bool kvm_check_and_clear_guest_paused(void)
- 	return ret;
- }
- 
-+static u64 (*old_pv_sched_clock)(void);
-+
-+static void enable_kvm_schedclock_work(struct work_struct *work)
-+{
-+	u8 flags;
-+
-+	old_pv_sched_clock = static_call_query(pv_sched_clock);
-+	flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
-+	kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
-+}
-+
-+static DECLARE_DELAYED_WORK(enable_kvm_sc, enable_kvm_schedclock_work);
-+
-+static void disable_kvm_schedclock_work(struct work_struct *work)
-+{
-+	if (old_pv_sched_clock)
-+		paravirt_set_sched_clock(old_pv_sched_clock);
-+}
-+static DECLARE_DELAYED_WORK(disable_kvm_sc, disable_kvm_schedclock_work);
-+
- static int kvm_cs_enable(struct clocksource *cs)
- {
-+	u8 flags;
-+
- 	vclocks_set_used(VDSO_CLOCKMODE_PVCLOCK);
-+	schedule_delayed_work(&enable_kvm_sc, 0);
-+
- 	return 0;
- }
- 
-+static void kvm_cs_disable(struct clocksource *cs)
-+{
-+	schedule_delayed_work(&disable_kvm_sc, 0);
-+}
-+
- static struct clocksource kvm_clock = {
- 	.name	= "kvm-clock",
- 	.read	= kvm_clock_get_cycles,
-@@ -162,6 +192,7 @@ static struct clocksource kvm_clock = {
- 	.flags	= CLOCK_SOURCE_IS_CONTINUOUS,
- 	.id     = CSID_X86_KVM_CLK,
- 	.enable	= kvm_cs_enable,
-+	.disable = kvm_cs_disable,
- };
- 
- static void kvm_register_clock(char *txt)
-@@ -287,8 +318,6 @@ static int kvmclock_setup_percpu(unsigned int cpu)
- 
- void __init kvmclock_init(void)
- {
--	u8 flags;
--
- 	if (!kvm_para_available() || !kvmclock)
- 		return;
- 
-@@ -317,9 +346,6 @@ void __init kvmclock_init(void)
- 	if (kvm_para_has_feature(KVM_FEATURE_CLOCKSOURCE_STABLE_BIT))
- 		pvclock_set_flags(PVCLOCK_TSC_STABLE_BIT);
- 
--	flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
--	kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
--
- 	x86_platform.calibrate_tsc = kvm_get_tsc_khz;
- 	x86_platform.calibrate_cpu = kvm_get_tsc_khz;
- 	x86_platform.get_wallclock = kvm_get_wallclock;
+is it the mdev approach listed in the above?
 
-Regards
-Nikunj
+-- 
+Regards,
+Yi Liu
 
