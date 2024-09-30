@@ -1,123 +1,118 @@
-Return-Path: <kvm+bounces-27705-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27706-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33F8F98AD38
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 21:48:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46AB298AE1D
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 22:21:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2A922818C9
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 19:48:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5EFBB24FC1
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 20:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A5D19DF61;
-	Mon, 30 Sep 2024 19:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548591A0BCE;
+	Mon, 30 Sep 2024 20:20:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="da9EiT4s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bsKOHMEA"
 X-Original-To: kvm@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8AE192D63;
-	Mon, 30 Sep 2024 19:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC3A1A0B0E
+	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 20:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727725684; cv=none; b=BRQkFQLWxpNSnnCkQYiP5aXIzHy/KYIoyZ6JdTJMOyo1YZOusrjPygfwUb5Hc3ChTbARArgCBeELyqlvQ4Xdo1q4sw+mGc1C1cqjsF9eqSA3CwuiV8fZA+Nm/EDL49FERFkFWh7hX1kVpsPdvzYmApI7QQHSVZIAGkDkBRq+e2s=
+	t=1727727646; cv=none; b=jhvsn4ueEHct1T8ape/fGdr0jAtu1dZlU68PWR8z3+ymot3NKwSk3PLcrYSrt15djJAEMxTIS49SV+sKBwUgxvETjE8GqCIhw2Oysrev7uIwkG0TtZyrW997X4cWAp/mObERS0S2I66lo8mFDZY1WPpfCyPsWaKF9R+VOroFkaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727725684; c=relaxed/simple;
-	bh=zX7Xv4j1Jpsk1DHjtJhzuQXPGJa1B1XRYJxc7YlDcfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B90EBLgLzmkwuo4jAQ78rBg3OKoCxUGN2zFw5WUItTWE4NEx48R7jme69NjZch0H5yrvuT/R1e/qLaOc3B0PGnkoBPL3+CJKBFqx8dOyG/82upqBEz8wGyAvdQxW3gCEo1r35wy+zIXT+r/PTQEaTeU4lv/GJJ4v8GridSYFz08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=da9EiT4s; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5pKQqLfBTINSnLOUO4PPSoPYAul9k4y7qrDes6Ya/zA=; b=da9EiT4smaqz9J4nKnLz9YIVEw
-	wTkXmBPpdWjucPrSppu+46W3tMA/tggdniQKO9ztb3f+JC1cXdVp5ozLGE+x0VO02BB2fHW1hEtCs
-	14BRvtpRB3FjgGjcEcPY9Iqqz1eA8854uSb/2gLFihLjtclXOSCQ08s+FlsKszzOUIJU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1svMNC-008eqQ-Lj; Mon, 30 Sep 2024 21:47:58 +0200
-Date: Mon, 30 Sep 2024 21:47:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, kuba@kernel.org,
-	stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mcgrof@kernel.org
-Subject: Re: [PATCH v2] vhost/vsock: specify module version
-Message-ID: <a4e8d2ac-a303-4c5b-9a1d-3ba6c09d92dc@lunn.ch>
-References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
- <w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
- <CAEivzxe6MJWMPCYy1TEkp9fsvVMuoUu-k5XOt+hWg4rKR57qTw@mail.gmail.com>
- <ib52jo3gqsdmr23lpmsipytbxhecwvmjbjlgiw5ygwlbwletlu@rvuyibtxezwl>
- <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
+	s=arc-20240116; t=1727727646; c=relaxed/simple;
+	bh=bOMPmIHvBV79RsdCMJ/twS2JSTbXpQa08SrYHL+koc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gofj0diIr0hSxg/vDqMWup2hwCs8G80KiRFJ8ZIOUZkv96rdHarZWxPSQFQ17VaMYMdP+u2aNEIVIo9GQgUAQE1lC0xthHJH5/zLF7iiMzbSeiPkv9o1m0tWbR2VRp7P9OzSQSLI+lygHXsEDR0kQ1n+lfWxN8ChDjH5pNWwXgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bsKOHMEA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727727643;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xkcw94t3j20WRs3mHwczBVeXMbfcHgmN6neJP9J08Ek=;
+	b=bsKOHMEAMwMmC3XQqRmw6hq4KUft7csLhVjXfzMnetNm+2hMcdOmalAGNGppBcLAf/5E4o
+	l8ZN/7gq2w19jg5sDbiCv2pIIlHHaA4bzhMX3QUJgQvBJ7Ss7tI+d3r27On0YYssMWwQuu
+	GmrReQXNqXh/ksGUfHaCXxAITy47xBg=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-135-aTBYXRd2PlmPZaun4JWDbg-1; Mon, 30 Sep 2024 16:20:41 -0400
+X-MC-Unique: aTBYXRd2PlmPZaun4JWDbg-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-82be60b9809so39341839f.3
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 13:20:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727727641; x=1728332441;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Xkcw94t3j20WRs3mHwczBVeXMbfcHgmN6neJP9J08Ek=;
+        b=NLWaaSW3AgGrI+61tdyIVgPohDvr3xfPlPcHFyYf/aQiJI9qbFotFX3ftQW+jjhSoZ
+         ToYiPYHDmAeXciEilRutrErE3E4h3GrF6HGj/4uXRVtAX682iw2mfiP/yPL40BbU3su1
+         MyJyEyAPOduuCVlfWQHb1L7uIt5GoEFd22MXu2kakrqufRCHBn8lF6PO8apSCnrRyQCn
+         7+Ouwx0rnqrr05APQcCNEAlBeb5F61DCwejoxY2838y6eLhtfcCYLUZKJqQw2FYYQeQj
+         U7gaSOdlys4SF9nXV+4Vjp3smKlJi60Cvg4KwasjBN+reh5GLEWo7IwoUVeIKRX5H5Zr
+         D2TA==
+X-Gm-Message-State: AOJu0YzHJdStCsmb/tDl0+mnGz5uYO19YQvIo1jmIvi80WonwX41tEDm
+	q9Gvh4G1shJfKu0OKXGQGZtB+aO4y2k8kEPyI1ya6se2ezPxJbb+hSAzfYJWP5QHyU5ikqEn48E
+	faQR6qf7f7T3LZD9dh/WpVolEmxJRqXUp7ZaBrxBxKTGfaWDw5w==
+X-Received: by 2002:a05:6e02:13a3:b0:3a0:8fb0:7a2a with SMTP id e9e14a558f8ab-3a34b4ac126mr20193195ab.3.1727727641231;
+        Mon, 30 Sep 2024 13:20:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFAWJbz5K/I4awdXoMsoaDT8ZQs4FT9DHSRQe2Ntp91u4IjmmGZXHmuHgqFOMNjHzd3W/bUUQ==
+X-Received: by 2002:a05:6e02:13a3:b0:3a0:8fb0:7a2a with SMTP id e9e14a558f8ab-3a34b4ac126mr20193145ab.3.1727727640925;
+        Mon, 30 Sep 2024 13:20:40 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a344d82ac7sm26731865ab.23.2024.09.30.13.20.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 13:20:40 -0700 (PDT)
+Date: Mon, 30 Sep 2024 14:20:38 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: kvm@vger.kernel.org, Laine Stump <laine@redhat.com>, Kirti Wankhede
+ <kwankhede@nvidia.com>
+Subject: Re: Can class_compat usage in vfio/mdev be removed?
+Message-ID: <20240930142038.11e428cb.alex.williamson@redhat.com>
+In-Reply-To: <8c55ce81-6b0a-42f5-8e05-5557933ca3b8@gmail.com>
+References: <8c55ce81-6b0a-42f5-8e05-5557933ca3b8@gmail.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > >Hi Stefano,
-> > >
-> > >>
-> > >> I was looking at other commits to see how versioning is handled in order
-> > >> to make sense (e.g. using the same version of the kernel), and I saw
-> > >> many commits that are removing MODULE_VERSION because they say it
-> > >> doesn't make sense in in-tree modules.
-> > >
-> > >Yeah, I agree absolutely. I guess that's why all vhost modules have
-> > >had version 0.0.1 for years now
-> > >and there is no reason to increment version numbers at all.
-> >
-> > Yeah, I see.
-> >
-> > >
-> > >My proposal is not about version itself, having MODULE_VERSION
-> > >specified is a hack which
-> > >makes a built-in module appear in /sys/modules/ directory.
-> >
-> > Hmm, should we base a kind of UAPI on a hack?
+On Tue, 17 Sep 2024 09:57:23 +0200
+Heiner Kallweit <hkallweit1@gmail.com> wrote:
+
+> After 7e722083fcc3 ("i2c: Remove I2C_COMPAT config symbol and related code")
+> vfio/mdev is that last user of class_compat. This compatibility functionality
+> is meant to be used temporarily, and it has been in vfio/mdev since 2016.
+> Can it be removed? Or is there any userspace tool which hasn't been updated
+> to use the bus interface instead?
+> If class_compat can be removed in vfio/mdev, then we may be able to remove
+> this functionality completely.
 > 
-> Good question ;-)
-> 
-> >
-> > I don't want to block this change, but I just wonder why many modules
-> > are removing MODULE_VERSION and we are adding it instead.
-> 
-> Yep, that's a good point. I didn't know that other modules started to
-> remove MODULE_VERSION.
 
-As you said, all over vhost modules say version 0.0.1 for years. But
-the kernel around these modules has had many changes. So 0.0.1 tells
-you nothing useful. When a user reports a problem using vhost_vsock
-version 0.0.1 your first question is going to be, what kernel version
-from which distribution?
+Hi Heiner,
 
-If the information is useless, let just remove it.
+I'm afraid we have active userspace tools dependent on
+/sys/class/mdev_bus currently, libvirt for one.  We link mdev parent
+devices here and I believe it's the only way for userspace to find
+those parent devices registered for creating mdev devices.  If there's a
+desire to remove class_compat, we might need to add some mdev
+infrastructure to register the class ourselves to maintain the parent
+links.  Thanks,
 
-I would not base a kAPI around this. Isn't there a system call you can
-perform and get an EOPNOTSUPP, ENODEV, EMORECOFFEE?
-
-Also, at least in networking and probably in other subsystems,
-performing an operation is often needed to trigger the module to
-load. So it not being listed in /sys/modules does not mean the module
-is missing, it could be its just not been needed until now.
-
-Take a step back, what is your real use case here? Describe it and
-maybe we can think of a better kAPI.
-
-	Andrew
+Alex
 
 
