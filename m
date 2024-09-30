@@ -1,168 +1,141 @@
-Return-Path: <kvm+bounces-27690-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27691-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 231D398A94D
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 18:05:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91DE998A99F
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 18:19:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D79BB245EE
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 16:04:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2841E1C23283
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 16:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8D6193071;
-	Mon, 30 Sep 2024 16:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EEF0192D97;
+	Mon, 30 Sep 2024 16:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GQalLAEl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ETSlSepj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B1E192D68
-	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 16:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6298B1E507
+	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 16:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727712266; cv=none; b=sBZHt4yBQrzI6F+BjRtkIc0gXlQmOjPxBxCYXPJxV3K6rV5haUkCceyr13hJ8LE+crzjgQXNqhTqoAX3mMaaryD63TOnj+mmW74zV7mxZIDTrf89k5sNvDF9DxPgzgTBF2iIYmNzNhzYufTsCZJ/Bs4d0RIzoQFR4GaU/hdfCmg=
+	t=1727713182; cv=none; b=FiEmtCfEFLXSi2k45BALpEOnvdgUGWjipbo6Zm5EP8sguQr6Bb+cuNkK7SPIax/n81/UxUYlQhlhrldCA6uPhc0YFrZ9uujS37AcNG0FwmGrQL1dkDFfy2oUcsvqgo8DbGK7lVFiP7cyb/JvCARieZkfNzzibDzGlpDYZEX/OkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727712266; c=relaxed/simple;
-	bh=dVOtEFflHz9cQq8g/90blsyTaVAoQK/Ef0RTO5W+Q7g=;
+	s=arc-20240116; t=1727713182; c=relaxed/simple;
+	bh=RQmbciJp+3HvVOT4BZZm0kN1UG2KYPfBnDMMw4gg9Wg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gJpcel1J70lngXaYe/gaxTSbMnB8WpSb3kNrvO+2JtoSEo620eqRzECj86p26lsHxeNB8ArlePfV+Qg5vdkL+oa9YBqq54TzUbobe15OV7z5bsEXmGYr6EXwmWEASVNfBaUuyc2FqRKSXLSM81/rAK+LJATN7xD+us9i3lZBTKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GQalLAEl; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=XWbXXygKOdWz49YljZVyH1q+6hnDv/byRby1x34CS4kaaMsFk2XSXma8Q/R1Ds87GK8u3ST/b0vL75Uh8Y7FqcG9hG2rQ4JNJ3m1o4TvDEfJlTfYWvDUkRCN7yTqDDWb8R4V/CKjbpdSeF/enDSCn49BV9+I1obRTcE8aUx8m3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ETSlSepj; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e20937a68bso80159847b3.3
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 09:04:25 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7db6dbaca2cso5758618a12.0
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 09:19:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727712264; x=1728317064; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727713181; x=1728317981; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DZOI0ZtiEf+KO3gdJcLblXQ+4fi4rP+GU4jZn3dbVFs=;
-        b=GQalLAEldx9pj+j8mhLxdOhVQPM+QCGxrzakjHRKl+kGYceQNnenZc1Ldt/oRJH2c3
-         jTz1SAV+oBN9imosynXNwkK0H7VqYMvHPkKruhSVESh87v42qLj3pmL57Wa/DDG2C2oz
-         4XWhYrrQj3/h6XsbGUqFo/sZsLUsFPxwQB4GAHtZlS61Uth/JiRURKB8wECGj4SJiGU8
-         MYywE5wS6AvJT/vaNm5j/HFSljiVKHhouF6IfOkKPbn74cLdWCV2DX6YiGtXr1cWCWxv
-         26JB1IzYoKtImmZmMym0YHOk/3U75EqVBtvBjXGyeTMQ6/QPwMe/KeAGf4lKw+fOhnfr
-         4Mvw==
+        bh=REWAk9yOZ/oV5DFOSR0fdNCr64LBBiwPareu4SRJi5Y=;
+        b=ETSlSepjaP+Ja4j09nXgBKKNZphifIdG2dgqqROxeND7gVvjp9YKLTmPWNX1s9Ecjl
+         ufPoYuNrMotUXS1lTGOXww3oxm6YLoNDU898Xfkfk4l3yyhSuenfy4S6sHQq5QM2a5GS
+         ZYVqoBsRguA25rBoGdBsbrjkgtXpnjMljK3eApKrePzhuWoR8xKiEV3+ug50YpJLUcNq
+         FHXR9R4so5nxZIMxY8ynw+lJ4T2hP4zY0Q8Bh/K8t1N/MWT0r0T6RqsiKlPImVSqa+kj
+         Bc1WIjr41uoaZbhB9CFcMh4xPE0ChyVt6ASlFH1E1MlLDxHBOpGNKggWTpaWuyujWfBI
+         uZAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727712264; x=1728317064;
+        d=1e100.net; s=20230601; t=1727713181; x=1728317981;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=DZOI0ZtiEf+KO3gdJcLblXQ+4fi4rP+GU4jZn3dbVFs=;
-        b=RIZOwWD6WFjMRLzY9NmX2+hDGQAS3tDWfjltB49Op7+Oac7aqepkwPxj0qFfIY+4zL
-         49EO9Tnts82/PN2KBZ6LJ8IDQ1VG16cXLI50pKk9G1vycIMoi1POgzm+djXoASCmYt2e
-         OxkKWy4odYbYUWSVwf7C7L9dWYrbeMCAAsq389SGPJZcFxoKeMWKmTA582gVZOCY/79b
-         wY+YZo1q414DxxkJm0DArOLOzbmmj50J+f3TtwAWReJGd9GVyr5frlEHMqN/ExRiO7lE
-         ygmvAbek+n1HFTLPUD7CBAyQnd7lmiWo/1oZ3WV7AHTI64jtpSibmYBF/+yrpE4SFsF0
-         O/7w==
-X-Forwarded-Encrypted: i=1; AJvYcCWyCSO2LJPxRjiuOqAbf11RCUPd0dT478eSjhZUe5KqFUHyAqZjADRUwAvL6QVVej9+NrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXWPTINSMlDuFy85iiS0VA/7dBT5wVxm7op18Z+LT4ocS2WgHE
-	/mY0lEmzPQJAuQ9gK0lpTJagbBZF+r3UIN44nyP1uE8PXfu1Fe0yPzIhZ0eYwOfqBKxA5koEyVs
-	MMA==
-X-Google-Smtp-Source: AGHT+IFUb4pS11OWBjXuobxc0ron+yQSC6Q9zzmSWv8uoCzJridNyycF3g5Ujfe/0Nu39VcVWYmxIH4oe+8=
+        bh=REWAk9yOZ/oV5DFOSR0fdNCr64LBBiwPareu4SRJi5Y=;
+        b=oZTS66ZZH0hL0ZPBzfA2NRimXeeBCvnxj0+zr++fJiwpo1br6EdcsJE9iEiflzis9z
+         Ab+POwiZ7YZGa2i6UPWWL+AhBOjPD8RWW/XqkYNV6XM5+/xufK/IpLl8lIpxDCqnf4SB
+         aWNJxuzvu22VEroHKeZtmg2WCsB1TnJVzI9rAfx1FkdDWBQBFtaJ31s2JI4witraiwqe
+         jMmU7fM2rzEObyTmI41sMc725ZvcuyEQ5XWuhMgkpQ1Mq44P3lSMu+oTRocMhhnvkUZx
+         FPlhuFkvm5+zOg+CSxs9LrGJJxRgxWUQS671E12+j7nfN5ERRAKYypHxMhTE2Rm7FGY9
+         qKSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWKqPMQ2jthphCSC2tTf8dEGMEdKd5E6j8BssN+SBnF+gROB2HOM/7jDS2WtfXuIl0QvJg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8mKLXLBDG3oN/xzR/VbDCfDQo192PVRmCVmHkdU5ieWcvEBEh
+	2ledrQE4tpaupP3f9vfAlUDvIgrvw7yzfL+g81HwfOnWLWLk7x0Y1J91WTKn0JZ4vtxMtK4Dwkd
+	7eA==
+X-Google-Smtp-Source: AGHT+IHkNqpgIOhZDhQLlT+HB+EF4VbjJnvLgjGrAFw/cN8YVeiOCtV2Yk4NeWEWfkYzuZMUGCpEPJE8NW0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:e344:0:b0:62f:1f63:ae4f with SMTP id
- 00721157ae682-6e2474bd2b7mr1154347b3.1.1727712264357; Mon, 30 Sep 2024
- 09:04:24 -0700 (PDT)
-Date: Mon, 30 Sep 2024 09:04:22 -0700
-In-Reply-To: <20240930055035.31412-1-suravee.suthikulpanit@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a63:2482:0:b0:7cb:c8c3:3811 with SMTP id
+ 41be03b00d2f7-7e6db03fe9bmr15004a12.5.1727713180514; Mon, 30 Sep 2024
+ 09:19:40 -0700 (PDT)
+Date: Mon, 30 Sep 2024 09:19:38 -0700
+In-Reply-To: <CALMp9eSd49O_J=hJKdE0QAcYFY1N1cxG1rKDJH-GUZL7i_VJig@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240930055035.31412-1-suravee.suthikulpanit@amd.com>
-Message-ID: <ZvrMBs-eScleFMOT@google.com>
-Subject: Re: [PATCH] KVM: SVM: Disable AVIC on SNP-enabled system without
- HvInUseWrAllowed feature
+References: <20240913173242.3271406-1-jmattson@google.com> <CALMp9eSd49O_J=hJKdE0QAcYFY1N1cxG1rKDJH-GUZL7i_VJig@mail.gmail.com>
+Message-ID: <ZvrPmnUeNHXaS7_E@google.com>
+Subject: Re: [PATCH v4 0/3] Distinguish between variants of IBPB
 From: Sean Christopherson <seanjc@google.com>
-To: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	david.kaplan@amd.com
+To: Jim Mattson <jmattson@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Sandipan Das <sandipan.das@amd.com>, 
+	Kai Huang <kai.huang@intel.com>, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 30, 2024, Suravee Suthikulpanit wrote:
-> On SNP-enabled system, VMRUN marks AVIC Backing Page as in-use while
-> the guest is running for both secure and non-secure guest. This causes
-> any attempts to modify the RMP entries for the backing page to result in
-> FAIL_INUSE response. This is to ensure that the AVIC backing page is not
-> maliciously assigned to an SNP guest while the unencrypted guest is activ=
-e.
+On Fri, Sep 27, 2024, Jim Mattson wrote:
+> On Fri, Sep 13, 2024 at 10:32=E2=80=AFAM Jim Mattson <jmattson@google.com=
+> wrote:
+> >
+> > Prior to Zen4, AMD's IBPB did not flush the RAS (or, in Intel
+> > terminology, the RSB). Hence, the older version of AMD's IBPB was not
+> > equivalent to Intel's IBPB. However, KVM has been treating them as
+> > equivalent, synthesizing Intel's CPUID.(EAX=3D7,ECX=3D0):EDX[bit 26] on=
+ any
+> > platform that supports the synthetic features X86_FEATURE_IBPB and
+> > X86_FEATURE_IBRS.
+> >
+> > Equivalence also requires a previously ignored feature on the AMD side,
+> > CPUID Fn8000_0008_EBX[IBPB_RET], which is enumerated on Zen4.
+> >
+> > v4: Added "guaranteed" to X86_FEATURE_IBPB comment [Pawan]
+> >     Changed logic for deducing AMD IBPB features from Intel IBPB featur=
+es
+> >     in kvm_set_cpu_caps [Tom]
+> >     Intel CPUs that suffer from PBRSB can't claim AMD_IBPB_RET [myself]
+> >
+> > v3: Pass through IBPB_RET from hardware to userspace. [Tom]
+> >     Derive AMD_IBPB from X86_FEATURE_SPEC_CTRL rather than
+> >     X86_FEATURE_IBPB. [Tom]
+> >     Clarify semantics of X86_FEATURE_IBPB.
+> >
+> > v2: Use IBPB_RET to identify semantic equality. [Venkatesh]
+> >
+> > Jim Mattson (3):
+> >   x86/cpufeatures: Define X86_FEATURE_AMD_IBPB_RET
+> >   KVM: x86: Advertise AMD_IBPB_RET to userspace
+> >   KVM: x86: AMD's IBPB is not equivalent to Intel's IBPB
 >=20
-> Currently, an attempt to run AVIC guest would result in the following err=
-or:
+> Oops. I forgot to include the v3 responses:
 >=20
->     BUG: unable to handle page fault for address: ff3a442e549cc270
->     #PF: supervisor write access in kernel mode
->     #PF: error_code(0x80000003) - RMP violation
->     PGD b6ee01067 P4D b6ee02067 PUD 10096d063 PMD 11c540063 PTE 800000011=
-49cc163
->     SEV-SNP: PFN 0x1149cc unassigned, dumping non-zero entries in 2M PFN =
-region: [0x114800 - 0x114a00]
->     ...
+> > For the series:
+> >
+> > Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+>=20
+> and
+>=20
+> > Assuming this goes through the KVM tree:
+> >
+> > Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+>=20
+> The only substantive change was to patch 3/3.
+>=20
+> Sean: Are you willing to take this through KVM/x86?
 
-This should be "fixed" by commit 75253db41a46 ("KVM: SEV: Make AVIC backing=
-, VMSA
-and VMCB memory allocation SNP safe"), no?
-
-> Newer AMD system is enhanced to allow hypervisor to modify RMP entries of
-> the backing page for non-secure guest on SNP-enabled system. This
-> enhancement is available when the CPUID Fn8000_001F_EAX bit 30 is set
-> (HvInUseWrAllowed) See the AMD64 Architecture Programmer=E2=80=99s Manual=
- (APM)
-> Volume 2 for detail. (https://www.amd.com/content/dam/amd/en/documents/
-> processor-tech-docs/programmer-references/40332.pdf)
->=20
-> Therefore, add logic to check the new CPUID bit before enabling AVIC
-> on SNP-enabled system.
->=20
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  arch/x86/kvm/svm/avic.c            | 6 ++++++
->  2 files changed, 7 insertions(+)
->=20
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cp=
-ufeatures.h
-> index dd4682857c12..921b6de80e24 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -448,6 +448,7 @@
->  #define X86_FEATURE_SME_COHERENT	(19*32+10) /* AMD hardware-enforced cac=
-he coherency */
->  #define X86_FEATURE_DEBUG_SWAP		(19*32+14) /* "debug_swap" AMD SEV-ES fu=
-ll debug state swap support */
->  #define X86_FEATURE_SVSM		(19*32+28) /* "svsm" SVSM present */
-> +#define X86_FEATURE_HV_INUSE_WR_ALLOWED	(19*32+30) /* Write to in-use hy=
-pervisor-owned pages allowed */
-> =20
->  /* AMD-defined Extended Feature 2 EAX, CPUID level 0x80000021 (EAX), wor=
-d 20 */
->  #define X86_FEATURE_NO_NESTED_DATA_BP	(20*32+ 0) /* No Nested Data Break=
-points */
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 4b74ea91f4e6..42f2caf17d6a 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -1199,6 +1199,12 @@ bool avic_hardware_setup(void)
->  		return false;
->  	}
-> =20
-> +	if (cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
-> +	    !boot_cpu_has(X86_FEATURE_HV_INUSE_WR_ALLOWED)) {
-> +		pr_warn("AVIC disabled: missing HvInUseWrAllowed on SNP-enabled system=
-");
-> +		return false;
-> +	}
-> +
->  	if (boot_cpu_has(X86_FEATURE_AVIC)) {
->  		pr_info("AVIC enabled\n");
->  	} else if (force_avic) {
-> --=20
-> 2.34.1
->=20
+Yep, and I can fixup the reviews when applying.
 
