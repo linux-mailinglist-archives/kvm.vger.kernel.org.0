@@ -1,125 +1,221 @@
-Return-Path: <kvm+bounces-27707-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27708-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B623098AEF0
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 23:20:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A3E498AF15
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 23:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CEE41F23500
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 21:20:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0D25B24125
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 21:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977691A2576;
-	Mon, 30 Sep 2024 21:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48ADF1A2851;
+	Mon, 30 Sep 2024 21:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JqxOLwmG";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="E3iwWgUO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WzcvG1R0"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D84117C7B6;
-	Mon, 30 Sep 2024 21:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE59B1A2566
+	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 21:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727731218; cv=none; b=cUcXFtRDvRTK/X12heigzBwbKS4Ys6h/S1NF9ngkKiUrhHYSV7IZhEBGvyDZp7cFAZbJfUXjcZX0phyZLc7XvnbmgR2L/TVXoJyLpJO7OG+mfHZZ5KMI7Wm8dNljrGCXu1emDf02DmyVS0bdygWE5BppRG7TI2vzj92UppnGa6g=
+	t=1727731666; cv=none; b=ea3aJt1GThun95iYSU9ZA6guhgKjEPw+l+S3FsjNEIJMygt9UyJNChASIxXZdqgMh8q0/EWNeKO8mkjBw4J2Tu5uzUKnsMS7w/94QG9Qsl5mQBW2a9KV0JRjonyYNTm7uJHNQUpYsbPPX1AJBFiEudvQfRS8lOEU9Olp86U9BOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727731218; c=relaxed/simple;
-	bh=tY8XocEtgtVSdAPIezhDjjECcvAHq3nAVZmpJDnJL9s=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=aT/t4BM20g1wDbDVDqtQmHzRM/gruOnI3G79A/P/akp7fUPABjjfHrChWCwvvgafSGGmKbz5JEDPQk7beNM72b9R9Jyz71ux1cWiGUkiUlkS4e+JvPRQrVbj/6TgX+MEe7247wvoorgxrKvRY2xzgHs0PvM7pM7SIraA2nTDwHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JqxOLwmG; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=E3iwWgUO; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1727731215;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UVrodz+zVYZqHTHz5n+k7AAFqLETeJjEjKXZHvgoB0I=;
-	b=JqxOLwmG2pWJtkHKwi9eTbkC8aEqoukfcrT4mIHYwmjv8MNJouahg40RQrm7g3gI0jHj5M
-	ujnBkdkKWe4P/3ag+sNTZOljjuuw0HcR8/91ep6saRvRSDbN4MX59FUC54pI1qqELLjGWx
-	I00XlzhJcOFPv6FuVxCne8p9DL9zd0OVpXEL8QhJcpaYHqUrVaYX0fQAxeD3UCTj2eJS8p
-	f412+joiU9gks7pok/rDn/TgjDs1/2J7T+xeU0xlIwjXoMQReGl5kuqaO0lb++ByBIcwru
-	EkG8frFf9sBxFMjshIbCZYWBSEN7hNYVopOwAlDlvHNviO2A+vcOCaGcAVO6Lw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1727731215;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UVrodz+zVYZqHTHz5n+k7AAFqLETeJjEjKXZHvgoB0I=;
-	b=E3iwWgUONvf3wmjcoDIGkl6chDOPaVvQDj48A9FONl4al4CY6txgJ5FpltYOPQUQjegeFP
-	UfCETTVtz4JpUqCw==
-To: "Nikunj A. Dadhania" <nikunj@amd.com>, Sean Christopherson
- <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de,
- x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com,
- dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com,
- peterz@infradead.org, gautham.shenoy@amd.com
-Subject: Re: [PATCH v11 19/20] x86/kvmclock: Skip kvmclock when Secure TSC
- is available
-In-Reply-To: <64813123-e1e2-17e2-19e8-bd5c852b6a32@amd.com>
-References: <20240731150811.156771-1-nikunj@amd.com>
- <20240731150811.156771-20-nikunj@amd.com> <ZuR2t1QrBpPc1Sz2@google.com>
- <9a218564-b011-4222-187d-cba9e9268e93@amd.com>
- <ZurCbP7MesWXQbqZ@google.com>
- <2870c470-06c8-aa9c-0257-3f9652a4ccd8@amd.com>
- <Zu0iiMoLJprb4nUP@google.com>
- <4cc88621-d548-d3a1-d667-13586b7bfea8@amd.com>
- <ef194c25-22d8-204e-ffb6-8f9f0a0621fb@amd.com>
- <ZvQHpbNauYTBgU6M@google.com>
- <64813123-e1e2-17e2-19e8-bd5c852b6a32@amd.com>
-Date: Mon, 30 Sep 2024 23:20:14 +0200
-Message-ID: <87setgzvn5.ffs@tglx>
+	s=arc-20240116; t=1727731666; c=relaxed/simple;
+	bh=3M8h7q9Pxa+KqWk46f6MFbZxx801ltg9CgK8WSTwKU8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dzhNcbD8z4BoyJLydGat/TeAAk5Bj9tgbA8ngEXRL7YFmhQ86KDVx61h4VNW5YHOuvYTpN3J8tyjgz4jbvFgmihDlx0zVaDfZBTyn34ulC6PFeR7z9qcYPodluGauaZcZtTLjNOefAX4gwCVK2+vW+tGHUKy/o2ueKWGOSUP1RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WzcvG1R0; arc=none smtp.client-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-84ea658b647so1420018241.1
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 14:27:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727731663; x=1728336463; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FdW//+Tr0a+ne7swPURE2HA/J0aJVeP59/NQKu0ikls=;
+        b=WzcvG1R0j1HS91T2LHmaqJMwP+CEIQ6wQjtWiOgZlr5Jcn89ycR6TR8XzaCy7Io5qF
+         D5GMoZchSXS4HZkQViIxPADHCd+pYxbay0t2RGV9BcfT7tLUBHgZDEow8tqNgGXYU1at
+         WGgWoPT7xl/OZDOG+7ze6tdjJdHl9wW5UQLBFiAmqkxzSzIfcnWspcIMxvivrJ8GPpfB
+         4xTtYode6/+QOROI+5luo+wWQUYMje+nJY7HgcO3EIaDkJ6Qh6xWjp7NmG7/NSqAEQMF
+         nBGVKrMKcl88eG2WCA/dphCNMCYqS0TIo/aShx5G/5sauX7uM2vFSiJm25a2jzctCn9S
+         3zDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727731663; x=1728336463;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FdW//+Tr0a+ne7swPURE2HA/J0aJVeP59/NQKu0ikls=;
+        b=HLIeUz2vfp9TEHAE9NtZDQkcOekeOFKP8i7hEq46dXMrfVd/PokA/l33Y1lOBVJnY4
+         FGFvFn5WOKbWd8ADPxHx77Z2hzwFeIOGCFIC3ZP6z8Ol5YHvtGY+lkfmPtR71lz7tx30
+         RYMqVRfeKm0+WwRfNoowln5xnKNfth1x76GtIJp085dKSArhXnZnu7c97b+QUqiHBTgS
+         7943JOGLrUUX4mf+q4EELGvuDg7qlsP/0QdQyGcjYFsxv3uq9t21wKh6dzZfuy9yvmHY
+         A3jK/ONZ9gQWyn+pudSUeyMYVFy9cxV3Ss1cWoTM/ddQnuDNtL7bqCecN7iCU93nPHJe
+         Fx2g==
+X-Gm-Message-State: AOJu0YxCio8TKOVqMdLH0qMQ5xNaWT7nOVUkAevgD8mApS5SSCNdfuNR
+	JdKlsGUNAUVrkbDXQSbiXJugsv5XtlBvXWB/MxyCapBcndIDjXjeGzsGR3akT5hQI7bw5m9337E
+	qBKfg/P+FZOgQB4mcs/7bA2vimQU=
+X-Google-Smtp-Source: AGHT+IHlsMoe8BB6gp/9qJg4t9ZOr5LVIJbfii/Iw6VyG5Ul3OWGEinqe20k/GGPUWIkASccQApdVUDv9fToctSFRmI=
+X-Received: by 2002:a05:6122:3105:b0:4f2:a974:29e5 with SMTP id
+ 71dfb90a1353d-507816b9ccamr8712022e0c.1.1727731663443; Mon, 30 Sep 2024
+ 14:27:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <CACcEcgQq_yxvjAo7BticTw6ne8S2uUjbCFxPTnWHT24oMkxf=w@mail.gmail.com>
+ <e3680d93-0463-42d6-be13-03dd90bb0d8a@intel.com>
+In-Reply-To: <e3680d93-0463-42d6-be13-03dd90bb0d8a@intel.com>
+From: Michael Williamson <mike.a.williamson@gmail.com>
+Date: Mon, 30 Sep 2024 17:27:33 -0400
+Message-ID: <CACcEcgTuhgX5RYCCCwU+sWS7iGKUVpGQkFGdh8yWyTVxoU=fiw@mail.gmail.com>
+Subject: Re: Supporting VFIO on nVidia's Orin platform
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: kvm@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>, Nicolin Chen <nicolinc@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 30 2024 at 11:57, Nikunj A. Dadhania wrote:
-> TSC Clock Rating Adjustment:
-> * During TSC initialization, downgrade the TSC clock rating to 200 if TSC is not
->   constant/reliable, placing it below HPET.
-
-Downgrading a constant TSC is a bad idea. Reliable just means that it
-does not need a watchdog clocksource. If it's non-constant it's
-downgraded anyway.
-
-> * Ensure the kvm-clock rating is set to 299 by default in the 
->   struct clocksource kvm_clock.
-> * Avoid changing the kvm clock rating based on the availability of reliable
->   clock sources. Let the TSC clock source determine and downgrade itself.
-
-Why downgrade? If it's the best one you want to upgrade it so it's
-preferred over the others.
-
-> The above will make sure that the PV clocksource rating remain
-> unaffected.
+On Mon, Sep 30, 2024 at 12:00=E2=80=AFAM Yi Liu <yi.l.liu@intel.com> wrote:
 >
-> Clock soure selection order when the ratings match:
-> * Currently, clocks are registered and enqueued based on their rating.
-> * When clock ratings are tied, use the advertised clock frequency(freq_khz) as a
->   secondary key to favor clocks with better frequency.
+> On 2024/9/29 23:02, Michael Williamson wrote:
+> > Hello,
+> >
+> > I've been trying to get VFIO working on nVidia's Orin platform (ARM64) =
+in
+> > order to support moving data efficiently off of an attached FPGA PCIe b=
+oard
+> > using the SMMU from a user space application.  We have a full applicati=
+on
+> > working on x86/x64 boxes that properly support the VFIO interface.  We'=
+re
+> > trying to port support to the Orin.
+> >
+> > I'm on nVidia's 5.15.36 branch.  It doesn't work out of the box, as the
+> > tegra194-pcie platform controller is lumped in the same iommu group as =
+the
+> > actual PCIe card.  The acs override patch didn't help to separate them.
+> >
+> > I have a patch below that *seems* to work for us, but I will admit I do=
+ not
+> > know the implications of what I am doing here.
 >
-> This approach improves the selection process by considering both rating and
-> frequency. Something like below:
+> your below patch is to pass the vfio_dev_viable() check I suppose. If you
 
-What does the frequency tell us? Not really anything. It's not
-necessarily the better clocksource.
+yes.
 
-Higher frequency gives you a slightly better resolution, but as all of
-this is usually sub-nanosecond resolution already that's not making a
-difference in practice.
+> are sure the tegra194-pcie platform controller will not issue DMA, then i=
+t
+> is fine. If not, you should be careful about it.
+>
 
-So if you know you want TSC to be selected, then upgrade the rating of
-both the early and the regular TSC clocksource and be done with it.
+There are multiple tegra194-pcie platform controllers defined in the dts.  =
+This
+one only has the one PCIe slot we are working with and nothing else.  There
+are other instances of the tegra194-pcie controllers that have control over
+other PCIe devices in the system.  There appear to be two main smmu control=
+lers
+that support multiple masters.  The tegra194-pcie platform controller tied
+to the PCIe bus I want has a unique smmu/iommu master ID but is sharing the=
+ main
+smmu controller with other devices.  However, they are all assigned to
+different iommu groups, so I think this is OK?
 
-Thanks,
+> > Can anyone let me know if this is (and why it is) a bad idea, and what =
+really
+> > needs to be done?  Or if this is the wrong mailing list, point me in th=
+e right
+> > direction?
+>
+> this is the right place to ask. +NV folks I know.
+>
 
-        tglx
+I appreciate the insight.  Thank you.
+
+> > Thanks,
+> > Mike
+> >
+> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> > index 818e47fc0896..a598a2204781 100644
+> > --- a/drivers/vfio/vfio.c
+> > +++ b/drivers/vfio/vfio.c
+> > @@ -638,8 +638,15 @@ static struct vfio_device
+> > *vfio_group_get_device(struct vfio_group *group,
+> >    * breaks anything, it only does so for user owned devices downstream=
+.  Note
+> >    * that error notification via MSI can be affected for platforms that=
+ handle
+> >    * MSI within the same IOVA space as DMA.
+> > + *
+> > + * [MAW] - the tegra194-pcie driver is a platform PCie device controll=
+er and
+> > + * fails the dev_is_pci() check below.  Not sure if it's because its g=
+rouping
+> > + * needs to be reworked, but I don't know how this is (or if it
+> > should be) done.
+> > + * This is a hack to see if we can get it going well enough to use the
+> > + * SMMU from user space.  The other two devices (for the Orin) in the =
+group
+> > + * are the host bridge and the PCIe card itself.
+> >    */
+> > -static const char * const vfio_driver_allowed[] =3D { "pci-stub" };
+> > +static const char * const vfio_driver_allowed[] =3D { "pci-stub",
+> > "tegra194-pcie" };
+> >
+> >   static bool vfio_dev_driver_allowed(struct device *dev,
+> >                                      struct device_driver *drv)
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_=
+type1.c
+> > index 66bbb125d761..e34fbe17ae1a 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -45,7 +45,8 @@
+> >   #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>=
+"
+> >   #define DRIVER_DESC     "Type1 IOMMU driver for VFIO"
+> >
+> > -static bool allow_unsafe_interrupts;
+> > +/** [MAW] - hack, need this set for Orin test, not compiled is module
+> > currently */
+> > +static bool allow_unsafe_interrupts =3D true;
+> >   module_param_named(allow_unsafe_interrupts,
+> >                     allow_unsafe_interrupts, bool, S_IRUGO | S_IWUSR);
+> >   MODULE_PARM_DESC(allow_unsafe_interrupts,
+> > @@ -1733,8 +1734,18 @@ static int vfio_bus_type(struct device *dev, voi=
+d *data)
+> >   {
+> >          struct bus_type **bus =3D data;
+> >
+> > -       if (*bus && *bus !=3D dev->bus)
+> > +       /**
+> > +        * [MAW] - hack.  the orin tegra194-pcie is in this group and
+> > +        * reports in as bus-type of "platform".  We will ignore it
+> > +        * in an attempt to get vfio to play along.
+> > +        */
+> > +       if (!strcmp(dev->bus->name,"platform")) {
+> > +               return 0;
+> > +       }
+> > +
+> > +       if (*bus && *bus !=3D dev->bus) {
+> >                  return -EINVAL;
+> > +       }
+> >
+> >          *bus =3D dev->bus;
+> >
+>
+> --
+> Regards,
+> Yi Liu
+
+
+
+--=20
+Mike Williamson
+OpenPGP Public Key
 
