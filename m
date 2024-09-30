@@ -1,227 +1,205 @@
-Return-Path: <kvm+bounces-27673-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27674-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E46C989F0E
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 12:01:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34D8E98A22F
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 14:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FB97B26614
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 10:01:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E929F284659
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 12:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A3918E039;
-	Mon, 30 Sep 2024 09:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3130418E346;
+	Mon, 30 Sep 2024 12:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="END76dyT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jYNUBsH2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F6018C011
-	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 09:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F7618FDDA
+	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 12:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727690384; cv=none; b=aOfWm5Wzvj2KanzuHLrtqJvNebLbxkDCUAqp4SMv4ov+GbbZfdfaH0lH3/AdvojCLW0ILp1m/DgMkcXAupZBgodsWaDu4+30QBqv0I4rmSSZY7DoTmtK9JU4GHJNePR0pOSQaqIfWmHtzpoHQ4Jpuy+1ROy68ULkOlrms/iQ3+w=
+	t=1727698701; cv=none; b=TImKyC4plU4cqCrpp/DWs53gT00L44XchcKUbC6lMs4i9vJhK/T9/j4DXKLXZWFI5WYgQ8vKmdDD2hlQTFzepY8Gs1jBy8u1C0Zqw3VH4mkEGFAENooDaTCDvjE9cHE+1XmbVfN5sDVb2sL9/cl1A57RgegA5bKrFK5mJlulcm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727690384; c=relaxed/simple;
-	bh=WAJ6Wi+YQ0Os0c/LUUNFeApVMyhsSUYzpTbbqzAegbY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Omm78LioSbxQiIS74l1EXbuxKMLQ5qae3vo6FVYvdMfwDZaOojozm9XjsgzTLTX362z44ybZT/SJfl1+4TCiba6oX99VhXlOYX69LX2qk3QPHuMHY0PpMMPEMqbJ/fYic+E2vfyfKjx6n+2EB5x0h9Rn3ml03YZSq1kFNXeUFag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=END76dyT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727690381;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=7AHK5SExUsiemEnpNI5Wh7Ji94huWLGDyLlvxGfVapQ=;
-	b=END76dyTcmQBI6ZbF1x/kawcjuIz+cuq4E6F16nsWAvk5E5Es3QxPUhyhuyb0P+FPRAM4A
-	gt/JjpNNmJlL7wNysFNnK64QezMjDxnfwZgqlghFAUhF9w38d+FutYlrIXR96MLUTgGXMq
-	96cjTl9IFnkSS98gkpFJHpKPvFOnRYk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-zjmsY4ylOkWz70UWzF9s9g-1; Mon, 30 Sep 2024 05:59:39 -0400
-X-MC-Unique: zjmsY4ylOkWz70UWzF9s9g-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cb050acc3so22048385e9.1
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 02:59:39 -0700 (PDT)
+	s=arc-20240116; t=1727698701; c=relaxed/simple;
+	bh=Sfw0mdEMDh/K3VhBFy3s8i5VHolr+g/Xq0J0N41drMk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ow0+cbqq0uxD6HCWKDXZWDucI6FzovRQm88hgZ/AdFFbPUX1aMevY2emHo/6hWw1MD5bBcNd91fC/o2hFStlzw4eKaoejPRI5eyGDoCCiIC5OWblPz43mKrF3wt4ktemYf/2QXLMPzpYP1RQ3tWzJjgiJrIDmP9XEkBl1DYfONQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jYNUBsH2; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42cae4ead5bso201525e9.1
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 05:18:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727698698; x=1728303498; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Ep8QUlUnrds1SGucXi/YgAp2nqtwi1+G8zbAJEqKkms=;
+        b=jYNUBsH2+D6AwBTcF9MZyJVUlB3DJfOlxljIPTnpEgUUxuXMJbElREFKhkFQV5rEbI
+         9ZJV8xmon6JdBe0VGJVvQdhWlvHA9LBzl7gkIA0y1i4IFmJRPfclyg0/gFCOY4mU+aSc
+         MySspSr0EOgMd43BTnYaVeT2pOGQCvQhXnDKxdkM+7fo4xAr5LrTEHd5DLJ2Z55z5UrG
+         mV+f15dTYuDvK2vWLcIGGrv9HCjV+cILDnsAYrSZV2jRIopPzyapfDbjdLCPP++dT4U8
+         3ZQ0nZvByldlkCV28RE64SQott+i1V8iBEU8WxhL7+tEabYkQyXw4Fue2hAS6Fx2/KAN
+         E3mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727690378; x=1728295178;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7AHK5SExUsiemEnpNI5Wh7Ji94huWLGDyLlvxGfVapQ=;
-        b=KoJSbSlo7jeFAZPH42zoDi6BSP02TgTcx57z2tk5bLUV43EU6yChf4Pzlf/RkCeKfP
-         iyA5go/7qdMtOFYIt/RNLbpjiwe4jZILpLISUtlfV/NFe9m+/EQRpHn3GoidO+sBVTd4
-         yrtBXeRhbfdjkskUsPAfXTZ1PE8cXEBZeXFfEWWAGkXT/rdk90ntYv7xfRYvjk9sZp1R
-         Z0bvLrA4HjaYT+BTMprruBB9WiMGNsV/Pl9huKN+cdm7GxRlPO2MCFLQdT4jlHgD+vV6
-         +ezociGGW+gY3XZXgTLMnA9DRabWKUG1ZXmerGySau5VzqC6oIFtsW3lMDrQw2FSarjy
-         CSlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOdER8e7wT+hROStbEda4cWIUIG8rPrJBIBpxbSlDu6UyHRy2ZxJjB8o8ZI4UcWfN4f4g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzARHJn+3EApoLe9vE3LBXo1bOtKuRgtb96ZZ3AHuq2VaKyfbNk
-	oyFJQaeAbjTwf+AK4TzNi/OaKYwK/xMTnN66uZMHCXfFZHkMsPeIGtqdp7DePpD0ZcdB+vCRSLq
-	Vygz9N5rSJxVIJ0gEuzp1Flc3u2piTMOEYzou4bXxVylXg+gefg==
-X-Received: by 2002:a05:600c:1ca9:b0:42c:b67b:816b with SMTP id 5b1f17b1804b1-42f521c42famr93341105e9.1.1727690377993;
-        Mon, 30 Sep 2024 02:59:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFXgmKZegqfT1L8VbvhCoDAAY5hNnrSVIJfuFR120fwW5rC9UXmwaARjoNjUKZHAeFh+J3OOw==
-X-Received: by 2002:a05:600c:1ca9:b0:42c:b67b:816b with SMTP id 5b1f17b1804b1-42f521c42famr93340885e9.1.1727690377509;
-        Mon, 30 Sep 2024 02:59:37 -0700 (PDT)
-Received: from [192.168.10.81] ([151.95.43.71])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42e969ddb1fsm145611885e9.3.2024.09.30.02.59.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Sep 2024 02:59:36 -0700 (PDT)
-Message-ID: <a402dec0-c8f5-4f10-be5d-8d7263789ba1@redhat.com>
-Date: Mon, 30 Sep 2024 11:59:35 +0200
+        d=1e100.net; s=20230601; t=1727698698; x=1728303498;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ep8QUlUnrds1SGucXi/YgAp2nqtwi1+G8zbAJEqKkms=;
+        b=KkacQ+NTtdCeq6jhTpG8jUilGXI0zPd97fWuGbQsEabPG2jrHPBCXSWqOBT+sI5AAt
+         9hVzfLU2LnAezka7Bv+jNOnE4yFU8TPWcKC0lFCI2ZzaTr1v/u+RnlBK4mUGSqV7bUDB
+         z92oWa8EBlRYjQgnnTCrTkDPQ7cB8fs55ZfOhm0FH230WDmzqNaD9Bs7gxrfatbcrQTT
+         yCKYLyTk1wDUUvL/c+o29Bskhoqvej3pH5OYEhdZNqr/poO8D/P6xTDUKDk2UDrr8TQX
+         cuYk596RoDr8IqX+rrm6j3xgKFMDxxffpDKWXBoApeZQHnvgii5qldq8hR2BuqVr13OZ
+         rfAg==
+X-Gm-Message-State: AOJu0YxhDsQp3iYl8an6UE1neUqBlFTQae74BaCgkk7xeUQL5hBvQlgM
+	hdxMwJPl3lSJn8UZ+pmNu7f33qKMMaeGI8MHaP2Z9jUDY9Kkvmu3PY5HuCzXUg==
+X-Google-Smtp-Source: AGHT+IH+eizAu2CnZGC3hefAOZi6cXpOLeMx7dOz1tK0DzkSpIg3YK9bWw+nq6Fd1qcBeFmDAlYILQ==
+X-Received: by 2002:a05:600c:1e15:b0:426:66a0:6df6 with SMTP id 5b1f17b1804b1-42f5e86ebbdmr5573495e9.0.1727698697581;
+        Mon, 30 Sep 2024 05:18:17 -0700 (PDT)
+Received: from google.com (105.93.155.104.bc.googleusercontent.com. [104.155.93.105])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cd56e645fsm8861945f8f.59.2024.09.30.05.18.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 05:18:17 -0700 (PDT)
+Date: Mon, 30 Sep 2024 12:18:13 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: kvm@vger.kernel.org, open list <linux-kernel@vger.kernel.org>,
+	Eric Auger <eric.auger@redhat.com>,
+	Alex Williamson <alex.williamson@redhat.com>, kwankhede@nvidia.com,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>
+Subject: Re: [RFC] Simple device assignment with VFIO platform
+Message-ID: <ZvqXBY12_53HLV9k@google.com>
+References: <CAFgf54rCCWjHLsLUxrMspNHaKAa1o8n3Md2_ZNGVtj0cU_dOPg@mail.gmail.com>
+ <27b1055b-aee3-4d00-a4f8-d7d026cfbdd6@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [GIT PULL] KVM/x86 changes for Linux 6.12
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Sean Christopherson <seanjc@google.com>, Kai Huang <kai.huang@intel.com>,
- Chao Gao <chao.gao@intel.com>, Farrah Chen <farrah.chen@intel.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20240928153302.92406-1-pbonzini@redhat.com>
- <CAHk-=wiQ2m+zkBUhb1m=m6S-H1syAgWmCHzit9=5y7XsriKFvw@mail.gmail.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <CAHk-=wiQ2m+zkBUhb1m=m6S-H1syAgWmCHzit9=5y7XsriKFvw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <27b1055b-aee3-4d00-a4f8-d7d026cfbdd6@intel.com>
 
+Hi Yi,
 
+Thanks a lot for the feedback.
 
-On Sun, Sep 29, 2024 at 7:36 PM Linus Torvalds <torvalds@linux-foundation.org> wrote:
-> The culprit is commit 590b09b1d88e ("KVM: x86: Register "emergency
-> disable" callbacks when virt is enabled"), and the reason seems to be
-> this:
->
->   #if IS_ENABLED(CONFIG_KVM_INTEL) || IS_ENABLED(CONFIG_KVM_AMD)
->   void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback);
->   ...
->
-> ie if you have a config with KVM enabled, but neither KVM_INTEL nor
-> KVM_AMD set, you don't get that callback thing.
->
-> The fix may be something like the attached.
+On Mon, Sep 30, 2024 at 03:19:05PM +0800, Yi Liu wrote:
+> On 2024/9/28 00:17, Mostafa Saleh wrote:
+> > Hi All,
+> > 
+> > Background
+> > ==========
+> > I have been looking into assigning simple devices which are not DMA
+> > capable to VMs on Android using VFIO platform.
+> > 
+> > I have been mainly looking with respect to Protected KVM (pKVM), which
+> > would need some extra modifications mostly to KVM-VFIO, that is quite
+> > early under prototyping at the moment, which have core pending pKVM
+> > dependencies upstream as guest memfd[1] and IOMMUs support[2].
+> > 
+> > However, this problem is not pKVM(or KVM) specific, and about the
+> > design of VFIO.
+> > 
+> > [1] https://lore.kernel.org/kvm/20240801090117.3841080-1-tabba@google.com/
+> > [2] https://lore.kernel.org/kvmarm/20230201125328.2186498-1-jean-philippe@linaro.org/
+> > 
+> > Problem
+> > =======
+> > At the moment, VFIO platform will deny a device from probing (through
+> > vfio_group_find_or_alloc()), if it’s not part of an IOMMU group,
+> > unless (CONFIG_VFIO_NOIOMMU is configured)
+> 
+> so your device does not have an IOMMU and also it does not do DMA at all?
 
-Yeah, there was an attempt in commit 6d55a94222db ("x86/reboot:
-Unconditionally define cpu_emergency_virt_cb typedef") but that only
-covers the headers and the !CONFIG_KVM case; not the !CONFIG_KVM_INTEL
-&& !CONFIG_KVM_AMD one that you stumbled upon.
+Exactly.
 
-Your fix is not wrong, but there's no point in compiling kvm.ko if
-nobody is using it.
+> 
+> > As far as I understand the current solutions to pass through platform
+> > devices that are not DMA capable are:
+> > - Use VFIO platform + (CONFIG_VFIO_NOIOMMU): The problem with that, it
+> > taints the kernel and this doesn’t actually fit the device description
+> > as the device doesn’t only have an IOMMU, but it’s not DMA capable at
+> > all, so the kernel should be safe with assigning the device without
+> > DMA isolation.
+> 
+> you need to set the vfio_noiommu parameter as well. yes, this would give
+> your device a fake iommu group. But the kernel would say this taints it.
 
-This is what I'll test more and submit:
+Yes, that would be the main problem with this approach.
 
------------------- 8< ------------------
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] KVM: x86: leave kvm.ko out of the build if no vendor module is requested
-     
-kvm.ko is nothing but library code shared by kvm-intel.ko and kvm-amd.ko.
-It provides no functionality on its own and it is unnecessary unless one
-of the vendor-specific module is compiled.  In particular, /dev/kvm is
-not created until one of kvm-intel.ko or kvm-amd.ko is loaded.
-     
-Use CONFIG_KVM to decide if it is built-in or a module, but use the
-vendor-specific modules for the actual decision on whether to build it.
-     
-This also fixes a build failure when CONFIG_KVM_INTEL and CONFIG_KVM_AMD
-are both disabled.  The cpu_emergency_register_virt_callback() function
-is called from kvm.ko, but it is only defined if at least one of
-CONFIG_KVM_INTEL and CONFIG_KVM_AMD is provided.
+> 
+> > 
+> > - Use VFIO mdev with an emulated IOMMU, this seems it could work. But
+> > many of the code would be duplicate with the VFIO platform code as the
+> > device is a platform device.
+> > 
+> > - Use UIO: Can map MMIO to userspace which seems to be focused for
+> > userspace drivers rather than VM passthrough and I can’t find its
+> > support in Qemu.
+> 
+> QEMU is for device passthrough, it makes sense it needs to use the VFIO
+> without noiommu instead of UIO. The below link has more explanations.
+> 
 
-Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+I agree, the reason I considered UIO, is that it allows mmap of the device
+MMIO, so in theory those can be passed to KVM, but that might be abuse of
+the UAPI? Specially I can’t find any VMM support for that.
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 4287a8071a3a..aee054a91031 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -17,8 +17,8 @@ menuconfig VIRTUALIZATION
-  
-  if VIRTUALIZATION
-  
--config KVM
--	tristate "Kernel-based Virtual Machine (KVM) support"
-+config KVM_X86_COMMON
-+	def_tristate KVM if KVM_INTEL || KVM_AMD
-  	depends on HIGH_RES_TIMERS
-  	depends on X86_LOCAL_APIC
-  	select KVM_COMMON
-@@ -46,6 +47,9 @@ config KVM
-  	select KVM_GENERIC_HARDWARE_ENABLING
-  	select KVM_GENERIC_PRE_FAULT_MEMORY
-  	select KVM_WERROR if WERROR
-+
-+config KVM
-+	tristate "Kernel-based Virtual Machine (KVM) support"
-  	help
-  	  Support hosting fully virtualized guest machines using hardware
-  	  virtualization extensions.  You will need a fairly recent
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 5494669a055a..4304c89d6b64 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -32,7 +32,7 @@ kvm-intel-y		+= vmx/vmx_onhyperv.o vmx/hyperv_evmcs.o
-  kvm-amd-y		+= svm/svm_onhyperv.o
-  endif
-  
--obj-$(CONFIG_KVM)	+= kvm.o
-+obj-$(CONFIG_KVM_X86_COMMON) += kvm.o
-  obj-$(CONFIG_KVM_INTEL)	+= kvm-intel.o
-  obj-$(CONFIG_KVM_AMD)	+= kvm-amd.o
-  
------------------- 8< ------------------
+> https://wiki.qemu.org/Features/VT-d
+> 
+> As the introduction of vfio cdev, you may compile the vfio group out
+> by CONFIG_VFIO_GROUP==n. Supposedly, you will not be blocked by the
+> vfio_group_find_or_alloc(). But you might be blocked due to no present
+> iommu. You may have a try though.
 
-On top of this, the CONFIG_KVM #ifdefs could be changed to either
-CONFIG_KVM_X86_COMMON or (most of them) to CONFIG_KVM_INTEL; I started
-cleaning up the Kconfigs a few months ago and it's time to finish it
-off for 6.13.
+That fails at probe also, because of the device has no IOMMU as
+vfio_platform_probe() ends up calling device_iommu_capable().
 
-Paolo
+Also, AFAIU, using cdev must be tied with IOMMUFD, which assumes
+existence of IOMMU and would failt at bind.
 
+> 
+> > One other benefit from supporting this in VFIO platform, that we can
+> > use the existing UAPI for platform devices (and support in VMMs)
+> > 
+> > Proposal
+> > ========
+> > Extend VFIO platform to allow assigning devices without an IOMMU, this
+> > can be possibly done by
+> > - Checking device capability from the platform bus (would be something
+> > ACPI/OF specific similar to how it configures DMA from
+> > platform_dma_configure(), we can add a new function something like
+> > platfrom_dma_capable())
+> > 
+> > - Using emulated IOMMU for such devices
+> > (vfio_register_emulated_iommu_dev()), instead of having intrusive
+> > changes about IOMMUs existence.
+> 
+> is it the mdev approach listed in the above?
+
+No, I meant to extended VFIO-platform to understand that, so in case the
+device has no IOMMU group, it can check with the platform bus if the
+device is DMA capable or not and it can allow those devices (maybe
+gated behind a command line) to be probed with emulated group.
+
+Having an new mdev just for platform devices with no DMA capabilities might
+be good if we don’t want to change VFIO platform, but my main concern is that
+might need more code + duplication with VFIO-platform.
+
+Thanks,
+Mostafa
+
+> -- 
+> Regards,
+> Yi Liu
 
