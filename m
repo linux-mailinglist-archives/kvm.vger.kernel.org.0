@@ -1,151 +1,168 @@
-Return-Path: <kvm+bounces-27689-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27690-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E60DE98A944
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 18:00:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 231D398A94D
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 18:05:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23B301C23107
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 16:00:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D79BB245EE
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 16:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E9E192B9A;
-	Mon, 30 Sep 2024 16:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8D6193071;
+	Mon, 30 Sep 2024 16:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJTWCMdV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GQalLAEl"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E236C192B90
-	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 16:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B1E192D68
+	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 16:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727712003; cv=none; b=EM8AnB4/DX2o38bp11P4qcPD6OA4/La+P0rOpm8WzYh8DVlIdbG+dO6C/6fW3Yz/1eI7uda4Fa+liVoj+ykHBmZsmWDnUea/IuSkNB28HPnhVfnCXud1VQfzSGq/6ZBjpTjm4rnVXWVCQgyGqnybDbNJ7VNzvO+fNdXUyuIGU5U=
+	t=1727712266; cv=none; b=sBZHt4yBQrzI6F+BjRtkIc0gXlQmOjPxBxCYXPJxV3K6rV5haUkCceyr13hJ8LE+crzjgQXNqhTqoAX3mMaaryD63TOnj+mmW74zV7mxZIDTrf89k5sNvDF9DxPgzgTBF2iIYmNzNhzYufTsCZJ/Bs4d0RIzoQFR4GaU/hdfCmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727712003; c=relaxed/simple;
-	bh=xpl15b9FyDkcN8x9JvtrD+Sty/utwKCzq04E/ZiAnmM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MjUl1Fq1G5hnJztokIAhEZ6QFvJfblJ/8myyFcYMEbfogqLcWFjHivbe76eJ/6scu4ZKbfTRZ0IsA4rRtd55H1A/f+IC15PimaIyLviv75zyPbJxb169tHGS66ugKDQxcOKMTmAf1Tl/PWEeYiJcoYPyKZpV5XWLyaNHKZlyPzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lJTWCMdV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 017BFC4CEC7;
-	Mon, 30 Sep 2024 15:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727712002;
-	bh=xpl15b9FyDkcN8x9JvtrD+Sty/utwKCzq04E/ZiAnmM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lJTWCMdVUT1qkIF+nZtNE9OtRn9uJAp5uH9XE5HbZQU+zRc7ZoM5L4U3m7b3SYS0T
-	 8h4bw4fjMuV9u8XnTgdSgB5RDJgBK8zUL4itI16ADTRme0clGjTHVwkMXYTVitIbv9
-	 raPsNuNi5bNC1Cjy7WHFUBUp75+xVztFKQLs5Ih2MsAf6KYe8hN+weLY6/CIE18lNQ
-	 wqjLQft2ypTXR8dq2C09Un1BpVi4ZRS17EPmi4YRVKTV1ukNnOEolr61sOzzgTbDsz
-	 HkwDK9yrYKpeIVLDXG//sdfcfcRjzG5nvidJVqgG11DT/5Gs1GWvDtgBvLFYv+aan3
-	 A51do83VMrxsg==
-Date: Mon, 30 Sep 2024 17:59:56 +0200
-From: Danilo Krummrich <dakr@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Zhi Wang <zhiw@nvidia.com>,
-	kvm@vger.kernel.org, nouveau@lists.freedesktop.org,
-	alex.williamson@redhat.com, kevin.tian@intel.com, airlied@gmail.com,
-	daniel@ffwll.ch, acurrid@nvidia.com, cjia@nvidia.com,
-	smitra@nvidia.com, ankita@nvidia.com, aniketa@nvidia.com,
-	kwankhede@nvidia.com, targupta@nvidia.com, zhiwang@kernel.org
-Subject: Re: [RFC 00/29] Introduce NVIDIA GPU Virtualization (vGPU) Support
-Message-ID: <ZvrK_H0RUpglhdaz@pollux>
-References: <ZvErg51xH32b8iW6@pollux>
- <20240923150140.GB9417@nvidia.com>
- <2024092614-fossil-bagful-1d59@gregkh>
- <20240926124239.GX9417@nvidia.com>
- <2024092619-unglazed-actress-0a0f@gregkh>
- <20240926144057.GZ9417@nvidia.com>
- <ZvXjcPOCVUSlALZZ@pollux.localdomain>
- <20240927125115.GZ9417@nvidia.com>
- <Zva_qP2B4rndSiCw@pollux>
- <20240927152724.GC4568@nvidia.com>
+	s=arc-20240116; t=1727712266; c=relaxed/simple;
+	bh=dVOtEFflHz9cQq8g/90blsyTaVAoQK/Ef0RTO5W+Q7g=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gJpcel1J70lngXaYe/gaxTSbMnB8WpSb3kNrvO+2JtoSEo620eqRzECj86p26lsHxeNB8ArlePfV+Qg5vdkL+oa9YBqq54TzUbobe15OV7z5bsEXmGYr6EXwmWEASVNfBaUuyc2FqRKSXLSM81/rAK+LJATN7xD+us9i3lZBTKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GQalLAEl; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e20937a68bso80159847b3.3
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 09:04:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727712264; x=1728317064; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DZOI0ZtiEf+KO3gdJcLblXQ+4fi4rP+GU4jZn3dbVFs=;
+        b=GQalLAEldx9pj+j8mhLxdOhVQPM+QCGxrzakjHRKl+kGYceQNnenZc1Ldt/oRJH2c3
+         jTz1SAV+oBN9imosynXNwkK0H7VqYMvHPkKruhSVESh87v42qLj3pmL57Wa/DDG2C2oz
+         4XWhYrrQj3/h6XsbGUqFo/sZsLUsFPxwQB4GAHtZlS61Uth/JiRURKB8wECGj4SJiGU8
+         MYywE5wS6AvJT/vaNm5j/HFSljiVKHhouF6IfOkKPbn74cLdWCV2DX6YiGtXr1cWCWxv
+         26JB1IzYoKtImmZmMym0YHOk/3U75EqVBtvBjXGyeTMQ6/QPwMe/KeAGf4lKw+fOhnfr
+         4Mvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727712264; x=1728317064;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DZOI0ZtiEf+KO3gdJcLblXQ+4fi4rP+GU4jZn3dbVFs=;
+        b=RIZOwWD6WFjMRLzY9NmX2+hDGQAS3tDWfjltB49Op7+Oac7aqepkwPxj0qFfIY+4zL
+         49EO9Tnts82/PN2KBZ6LJ8IDQ1VG16cXLI50pKk9G1vycIMoi1POgzm+djXoASCmYt2e
+         OxkKWy4odYbYUWSVwf7C7L9dWYrbeMCAAsq389SGPJZcFxoKeMWKmTA582gVZOCY/79b
+         wY+YZo1q414DxxkJm0DArOLOzbmmj50J+f3TtwAWReJGd9GVyr5frlEHMqN/ExRiO7lE
+         ygmvAbek+n1HFTLPUD7CBAyQnd7lmiWo/1oZ3WV7AHTI64jtpSibmYBF/+yrpE4SFsF0
+         O/7w==
+X-Forwarded-Encrypted: i=1; AJvYcCWyCSO2LJPxRjiuOqAbf11RCUPd0dT478eSjhZUe5KqFUHyAqZjADRUwAvL6QVVej9+NrI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXWPTINSMlDuFy85iiS0VA/7dBT5wVxm7op18Z+LT4ocS2WgHE
+	/mY0lEmzPQJAuQ9gK0lpTJagbBZF+r3UIN44nyP1uE8PXfu1Fe0yPzIhZ0eYwOfqBKxA5koEyVs
+	MMA==
+X-Google-Smtp-Source: AGHT+IFUb4pS11OWBjXuobxc0ron+yQSC6Q9zzmSWv8uoCzJridNyycF3g5Ujfe/0Nu39VcVWYmxIH4oe+8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:e344:0:b0:62f:1f63:ae4f with SMTP id
+ 00721157ae682-6e2474bd2b7mr1154347b3.1.1727712264357; Mon, 30 Sep 2024
+ 09:04:24 -0700 (PDT)
+Date: Mon, 30 Sep 2024 09:04:22 -0700
+In-Reply-To: <20240930055035.31412-1-suravee.suthikulpanit@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240927152724.GC4568@nvidia.com>
+Mime-Version: 1.0
+References: <20240930055035.31412-1-suravee.suthikulpanit@amd.com>
+Message-ID: <ZvrMBs-eScleFMOT@google.com>
+Subject: Re: [PATCH] KVM: SVM: Disable AVIC on SNP-enabled system without
+ HvInUseWrAllowed feature
+From: Sean Christopherson <seanjc@google.com>
+To: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, 
+	david.kaplan@amd.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 27, 2024 at 12:27:24PM -0300, Jason Gunthorpe wrote:
-> On Fri, Sep 27, 2024 at 04:22:32PM +0200, Danilo Krummrich wrote:
-> > > When you say things like this it comes across as though you are
-> > > implying there are two tiers to the community. Ie those that set the
-> > > strategy and those that don't.
-> > 
-> > This isn't true, I just ask you to consider the goals that have been set
-> > already, because we have been working on this already.
-> 
-> Why do keep saying I haven't?
+On Mon, Sep 30, 2024, Suravee Suthikulpanit wrote:
+> On SNP-enabled system, VMRUN marks AVIC Backing Page as in-use while
+> the guest is running for both secure and non-secure guest. This causes
+> any attempts to modify the RMP entries for the backing page to result in
+> FAIL_INUSE response. This is to ensure that the AVIC backing page is not
+> maliciously assigned to an SNP guest while the unencrypted guest is activ=
+e.
+>=20
+> Currently, an attempt to run AVIC guest would result in the following err=
+or:
+>=20
+>     BUG: unable to handle page fault for address: ff3a442e549cc270
+>     #PF: supervisor write access in kernel mode
+>     #PF: error_code(0x80000003) - RMP violation
+>     PGD b6ee01067 P4D b6ee02067 PUD 10096d063 PMD 11c540063 PTE 800000011=
+49cc163
+>     SEV-SNP: PFN 0x1149cc unassigned, dumping non-zero entries in 2M PFN =
+region: [0x114800 - 0x114a00]
+>     ...
 
-Because I haven't seen you to acknowlege that the current direction we're moving
-to is that we're trying to move away from Nouveau and start over with a new
-GSP-only solution.
+This should be "fixed" by commit 75253db41a46 ("KVM: SEV: Make AVIC backing=
+, VMSA
+and VMCB memory allocation SNP safe"), no?
 
-Instead you propose a huge architectural rework of Nouveau, extract a core
-driver from Nouveau and make this the long term solution.
-
-> 
-> I have no intention of becoming involved in your project or
-> nouveau. My only interest here is to get an agreement that we can get
-> a VFIO driver (to improve the VFIO subsystem and community!) in the
-> near term on top of in-tree nouveau.
-
-Two aspects about this.
-
-First, Nova isn't a different project in this sense, it's the continuation of
-Nouveau to overcome several problems we have with Nouveau.
-
-Second, of course you have the intention of becoming involved in the Nouveau /
-Nova project. You ask for huge architectural changes of Nouveau, including new
-interfaces for a VFIO driver on top. If that's not becoming involved what else
-would it be?
-
-> 
-> > > > But, we have to agree on a long term strategy and work towards the corresponding
-> > > > goals *together*.
-> > > 
-> > > I think we went over all the options already. IMHO the right one is
-> > > for nova and vfio to share some kind of core driver. The choice of
-> > > Rust for nova complicates planning this, but it doesn't mean anyone is
-> > > saying no to it.
-> > 
-> > This is the problem, you're many steps ahead.
-> > 
-> > You should start with understanding why we want the core driver to be in Rust.
-> > You then can raise your concerns about it and then we can discuss them and see
-> > if we can find solutions / consensus.
-> 
-> I don't want to debate with you about Nova. It is too far in the
-> future, and it doesn't intersect with anything I am doing.
-
-Sure it does. Again, Nova is intended to be the continuation of Nouveau. So, if
-you want to do a major rework in Nouveau (and hence become involved in the
-project) we have to make sure that we progress things in the same direction.
-
-How do you expect the project to be successful in the long term, if the involved
-parties are not willing to agree at a direction and common goals for the
-project?
-
-Or is it that you are simply not interested in long term? Do you have reasons to
-think that the problems we have with Nouveau just go away in the long term? Do
-you plan to solve them within Nouveau? If so, how do you plan to do that?
-
-> 
-> > But you're not even considering it, and instead start with a counter proposal.
-> > This isn't acceptable to me.
-> 
-> I'm even agreeing to a transition into a core driver in Rust, someday,
-> when the full community can agree it is the right time.
-> 
-> What more do you want from me?
-
-I want that the people involved in the project seriously discuss and align on
-the direction and goals for the project in the long term and work towards them
-together.
+> Newer AMD system is enhanced to allow hypervisor to modify RMP entries of
+> the backing page for non-secure guest on SNP-enabled system. This
+> enhancement is available when the CPUID Fn8000_001F_EAX bit 30 is set
+> (HvInUseWrAllowed) See the AMD64 Architecture Programmer=E2=80=99s Manual=
+ (APM)
+> Volume 2 for detail. (https://www.amd.com/content/dam/amd/en/documents/
+> processor-tech-docs/programmer-references/40332.pdf)
+>=20
+> Therefore, add logic to check the new CPUID bit before enabling AVIC
+> on SNP-enabled system.
+>=20
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> ---
+>  arch/x86/include/asm/cpufeatures.h | 1 +
+>  arch/x86/kvm/svm/avic.c            | 6 ++++++
+>  2 files changed, 7 insertions(+)
+>=20
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cp=
+ufeatures.h
+> index dd4682857c12..921b6de80e24 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -448,6 +448,7 @@
+>  #define X86_FEATURE_SME_COHERENT	(19*32+10) /* AMD hardware-enforced cac=
+he coherency */
+>  #define X86_FEATURE_DEBUG_SWAP		(19*32+14) /* "debug_swap" AMD SEV-ES fu=
+ll debug state swap support */
+>  #define X86_FEATURE_SVSM		(19*32+28) /* "svsm" SVSM present */
+> +#define X86_FEATURE_HV_INUSE_WR_ALLOWED	(19*32+30) /* Write to in-use hy=
+pervisor-owned pages allowed */
+> =20
+>  /* AMD-defined Extended Feature 2 EAX, CPUID level 0x80000021 (EAX), wor=
+d 20 */
+>  #define X86_FEATURE_NO_NESTED_DATA_BP	(20*32+ 0) /* No Nested Data Break=
+points */
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 4b74ea91f4e6..42f2caf17d6a 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -1199,6 +1199,12 @@ bool avic_hardware_setup(void)
+>  		return false;
+>  	}
+> =20
+> +	if (cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
+> +	    !boot_cpu_has(X86_FEATURE_HV_INUSE_WR_ALLOWED)) {
+> +		pr_warn("AVIC disabled: missing HvInUseWrAllowed on SNP-enabled system=
+");
+> +		return false;
+> +	}
+> +
+>  	if (boot_cpu_has(X86_FEATURE_AVIC)) {
+>  		pr_info("AVIC enabled\n");
+>  	} else if (force_avic) {
+> --=20
+> 2.34.1
+>=20
 
