@@ -1,172 +1,128 @@
-Return-Path: <kvm+bounces-27703-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27704-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D670398ABAF
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 20:10:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D4498ABC6
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 20:16:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 817841F215AF
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 18:10:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23E7D1C2190E
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 18:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05511991BA;
-	Mon, 30 Sep 2024 18:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 720D51991C8;
+	Mon, 30 Sep 2024 18:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYiS4Yb1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKsM05iy"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FA22B9A5;
-	Mon, 30 Sep 2024 18:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979F3CA62;
+	Mon, 30 Sep 2024 18:15:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727719842; cv=none; b=BTkd6gpLB5r2CWQl1xvVAfLNJ4dQ5tkjP8VX99rrA2DLeV6FjxNfIvZyQKRBeMnbnZ2CQrwR3HRjkxSv+18BrdvkrXfFcLRydj4Gxn8vMsOdCUu7eo66PRkFGqyfIQABQhWrkfQPqBuIs9sKfazs6oQSGlOFHD4EukJgV6L/m/w=
+	t=1727720148; cv=none; b=Pq07mfb+MghBUVngSoPLhCwxmtJg9yJZWcdpclJkJ5rGrHgGy0isH1pKmD3EzPKpMlSDQU/MdJ9W7eg5Ssc9dorTJWL9UXnGMwz6tS6qzopsoGh1kzRYVw0QnJyJCjJ6E8b/tL+elm/Cq/EGVJyNl7DzGVB3o4HEyDbwrZ2u89Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727719842; c=relaxed/simple;
-	bh=p+4eAbKdm/M8VlSF2gSqSAFLMDWbjTItNCInUwxMqGw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Trcop4hdelnOfjx1lG20Hmvj0ZxVa6kUg7Wthcn40BcT/ycMo5CAcYAOfb/3OODjm2HEYQ8PeDcjqeZGU+sthubGDq0GYroe+Syh1sDJS2X2S37LHDpGdxNQsWdxCPWqcdgrZ5vNDGU2v7ZBoYvltG7gt9GwUhbNsxAcnP491wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYiS4Yb1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F19F9C4CEC7;
-	Mon, 30 Sep 2024 18:10:39 +0000 (UTC)
+	s=arc-20240116; t=1727720148; c=relaxed/simple;
+	bh=8w6aemunhl1GcKeGEbidxWOmKwoFjJ23FEHAaLFPSm4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I0cW0MfNzW4xr9UVk9msVOypGaBNKh+aMh2R2Dtfo4pR0fwjxaNh6+LUVixxe8EX47nFfprKuC4sYK52mzZCIW9gXDic3YPODo1FDpemtOlIVCN1rZ/Kl2ku6pdoFJyRndYr/47i4CweMcAtEeQDToeESj2GKGdmERHtCrsRo60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bKsM05iy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41ED3C4CECE;
+	Mon, 30 Sep 2024 18:15:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727719841;
-	bh=p+4eAbKdm/M8VlSF2gSqSAFLMDWbjTItNCInUwxMqGw=;
-	h=From:Date:Subject:To:Cc:From;
-	b=lYiS4Yb1vCHuIAsCaQcTurAgVqrd3o1pN7jYZ5wSdF+fxhFopn8+QirlCd+aza+KS
-	 jn+y4x3yErrHJuxoRqj/mrHgdMPkhQghEUQ9rPCt8x9Tmxh0sbCRG5kIDr0kv+KBJ8
-	 p+M+SdKs8tdfelhfKKwXerdKIb3BGS2vKNiye0eIT0onJ4ONB7jPM7zkNL8NHeHKTb
-	 u/uljz3u9M4zj3OUdqFoxM/GqtM4TWTEB2Rz/DpbeoDfYTiMKIjXkmV3QIC1hOMDr8
-	 fbfLnEA5C0vQLkqMMG1C1+6r2xfhJNqjSMYBYZU01x9B0Sb0OfOVvcY06oV+32Lm7L
-	 f9Rg0BaIpkpLQ==
+	s=k20201202; t=1727720148;
+	bh=8w6aemunhl1GcKeGEbidxWOmKwoFjJ23FEHAaLFPSm4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bKsM05iy6LwXedFlNA9P88AZMUa8dOWjBMdv3qLzB/+Rw5Z+Aupi82hzvRLTaRt/B
+	 DG+3+oeJ3b4ROVePYcFHva+uStHF60trz2IvYhwBKEtD5nvlKhBzTLOlu2OsLzmXNA
+	 10grlOx9xQAjiUasA+WXMOt2qp3xXYgkZPU9V+7yHkqoksTw13zbllDiMqwF0CtByG
+	 vhuEGN8988XyaU15kmXyEnRpIcYCBF628evstqoZpYrzLJjpR7FelIhhm+VYnWEsUw
+	 OKrdLqAkxbmYuHV1pOiIHVikIrFi35gPqz2yaRQdjFzMr0bGE/yHtLt2hDnisxetlh
+	 Ce/LBRw8bP7RQ==
+Date: Mon, 30 Sep 2024 19:15:42 +0100
 From: Mark Brown <broonie@kernel.org>
-Date: Mon, 30 Sep 2024 19:10:33 +0100
-Subject: [PATCH] KVM: selftests: Fix build on architectures other than
- x86_64
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Aishwarya TCV <aishwarya.tcv@arm.com>, rick.p.edgecombe@intel.com,
+	kai.huang@intel.com, isaku.yamahata@intel.com, dmatlack@google.com,
+	sagis@google.com, erdemaktas@google.com, graf@amazon.com,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH v2 3/4] KVM: selftests: Allow slot modification stress
+ test with quirk disabled
+Message-ID: <0398a8b5-2d7b-4a85-8452-0e2f51a4fde4@sirena.org.uk>
+References: <20240703020921.13855-1-yan.y.zhao@intel.com>
+ <20240703021206.13923-1-yan.y.zhao@intel.com>
+ <b9367e1c-f339-46e1-8c44-d20f112a857a@arm.com>
+ <ZvNckKjlieCN56th@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240930-kvm-build-breakage-v1-1-866fad3cc164@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAJnp+mYC/x2MWwqAIBAArxL7nWBmz6tEH5ZrLfZCSQLp7kmfA
- zMTwaMj9NBnERwG8nQeCYo8g3lVx4KMdGIQXEjelZzZsLPppk2zyaGyKhmqksLIWjet6SCFl0N
- Dzz8dxvf9AN36tLNkAAAA
-To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Yan Zhao <yan.y.zhao@intel.com>
-Cc: Aishwarya TCV <aishwarya.tcv@arm.com>, 
- Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-99b12
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3597; i=broonie@kernel.org;
- h=from:subject:message-id; bh=p+4eAbKdm/M8VlSF2gSqSAFLMDWbjTItNCInUwxMqGw=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBm+umeiXL+eBh5K8EcsK4TkH6siaEAZW1gBwAN0rXH
- 66pWKBmJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZvrpngAKCRAk1otyXVSH0NQCCA
- CFHs6avAhs/x2OVh92gsETEmnBwAymAqp9QZlyOU/JWZmPGxk/vEPxmoMKdTs7oFjpZY3N5bRY2Okr
- ALJcKqLzISnAt3XOKme7zK2ydzUL7oXLWMLDXmCP0AwDWOkT+xUYq2bl87NhRhxInzWYWoM1ovoyqs
- Ms0L2FOG4AY3B/x6iiYKs9zkrUWdbHJAYUJ+/u5mp5MN/wHiZRgCbMa096xObhEvPa/AC96CoaKZ3g
- zLzVkmjgHSFIj9z7JJqlhoQqHHU0clTKlc9jEgwhGFt/tDsBNnXe5UsEBSf2ZsRn5jXBgXKd6CsIdn
- E4RSa6Hw6j0GVWwR74bYYKQsiRUlMA
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="apOrv3T8X8gNzi94"
+Content-Disposition: inline
+In-Reply-To: <ZvNckKjlieCN56th@yzhao56-desk.sh.intel.com>
+X-Cookie: My EARS are GONE!!
 
-The recent addition of support for testing with the x86 specific quirk
-KVM_X86_QUIRK_SLOT_ZAP_ALL disabled in the generic memslot tests broke the
-build of the KVM selftests for all other architectures:
 
-In file included from include/kvm_util.h:8,
-                 from include/memstress.h:13,
-                 from memslot_modification_stress_test.c:21:
-memslot_modification_stress_test.c: In function ‘main’:
-memslot_modification_stress_test.c:176:38: error: ‘KVM_X86_QUIRK_SLOT_ZAP_ALL’ undeclared (first use in this function)
-  176 |                                      KVM_X86_QUIRK_SLOT_ZAP_ALL);
-      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+--apOrv3T8X8gNzi94
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Add __x86_64__ guard defines to avoid building the relevant code on other
-architectures.
+On Wed, Sep 25, 2024 at 08:42:56AM +0800, Yan Zhao wrote:
+> On Tue, Sep 24, 2024 at 01:26:20PM +0100, Aishwarya TCV wrote:
+> > On 03/07/2024 03:12, Yan Zhao wrote:
 
-Fixes: 61de4c34b51c ("KVM: selftests: Test memslot move in memslot_perf_test with quirk disabled")
-Fixes: 218f6415004a ("KVM: selftests: Allow slot modification stress test with quirk disabled")
-Reported-by: Aishwarya TCV <aishwarya.tcv@arm.com>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
-This is obviously disruptive for testing of KVM changes on non-x86
-architectures.
----
- tools/testing/selftests/kvm/memslot_modification_stress_test.c | 2 ++
- tools/testing/selftests/kvm/memslot_perf_test.c                | 6 ++++++
- 2 files changed, 8 insertions(+)
+> > > Add a new user option to memslot_modification_stress_test to allow te=
+sting
+> > > with slot zap quirk KVM_X86_QUIRK_SLOT_ZAP_ALL disabled.
 
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-index e3343f0df9e1..c81a84990eab 100644
---- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -169,12 +169,14 @@ int main(int argc, char *argv[])
- 		case 'i':
- 			p.nr_iterations = atoi_positive("Number of iterations", optarg);
- 			break;
-+#ifdef __x86_64__
- 		case 'q':
- 			p.disable_slot_zap_quirk = true;
- 
- 			TEST_REQUIRE(kvm_check_cap(KVM_CAP_DISABLE_QUIRKS2) &
- 				     KVM_X86_QUIRK_SLOT_ZAP_ALL);
- 			break;
-+#endif
- 		case 'h':
- 		default:
- 			help(argv[0]);
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index 893366982f77..989ffe0d047f 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -113,7 +113,9 @@ static_assert(ATOMIC_BOOL_LOCK_FREE == 2, "atomic bool is not lockless");
- static sem_t vcpu_ready;
- 
- static bool map_unmap_verify;
-+#ifdef __x86_64__
- static bool disable_slot_zap_quirk;
-+#endif
- 
- static bool verbose;
- #define pr_info_v(...)				\
-@@ -579,8 +581,10 @@ static bool test_memslot_move_prepare(struct vm_data *data,
- 	uint32_t guest_page_size = data->vm->page_size;
- 	uint64_t movesrcgpa, movetestgpa;
- 
-+#ifdef __x86_64__
- 	if (disable_slot_zap_quirk)
- 		vm_enable_cap(data->vm, KVM_CAP_DISABLE_QUIRKS2, KVM_X86_QUIRK_SLOT_ZAP_ALL);
-+#endif
- 
- 	movesrcgpa = vm_slot2gpa(data, data->nslots - 1);
- 
-@@ -971,11 +975,13 @@ static bool parse_args(int argc, char *argv[],
- 		case 'd':
- 			map_unmap_verify = true;
- 			break;
-+#ifdef __x86_64__
- 		case 'q':
- 			disable_slot_zap_quirk = true;
- 			TEST_REQUIRE(kvm_check_cap(KVM_CAP_DISABLE_QUIRKS2) &
- 				     KVM_X86_QUIRK_SLOT_ZAP_ALL);
- 			break;
-+#endif
- 		case 's':
- 			targs->nslots = atoi_paranoid(optarg);
- 			if (targs->nslots <= 1 && targs->nslots != -1) {
+> > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 
----
-base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
-change-id: 20240930-kvm-build-breakage-a542f46d78f9
+> > When building kselftest-kvm config against next-20240924 kernel with
+> > Arm64 an error "'KVM_X86_QUIRK_SLOT_ZAP_ALL' undeclared" is observed.
 
-Best regards,
--- 
-Mark Brown <broonie@kernel.org>
+> Ah, I forgot to hide =20
 
+>   "TEST_REQUIRE(kvm_check_cap(KVM_CAP_DISABLE_QUIRKS2) &
+>                        KVM_X86_QUIRK_SLOT_ZAP_ALL)"
+> inside "#ifdef __x86_64__" when parsing opts though it's done in run_test=
+().
+
+This bug, which Aishwarya originally reported against -next, is now
+present in mainline:
+
+   https://storage.kernelci.org/mainline/master/v6.12-rc1/arm64/defconfig+k=
+selftest/gcc-12/logs/kselftest.log
+
+I couldn't find a fix being posted so I sent:
+
+   https://lore.kernel.org/r/20240930-kvm-build-breakage-v1-1-866fad3cc164@=
+kernel.org=20
+
+which also fixes the same issue in memslot_perf_test.c.
+
+--apOrv3T8X8gNzi94
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmb66s0ACgkQJNaLcl1U
+h9Cpvwf9F6p+I5rne9eBrOGO2/lCR5D/LKNMoUdlgLWT4orWtOZtsAmnYqwVEiY1
+Rg4GN0Bw3C79CXNQN/+queNelSrK/60MMX7C3Rcsez6EAgyhEWg7SWiG+JoEOsF5
+gVzTA5kwHZwD6Q8Ld6v0QRnrEjRVqh5EbP7JvGF+XSBT90UjOifAP06yIbzokbZW
+W9v6EcAsKqgQ17YzmcUNJ4pSNc3xXt0J1zoVT43uG7NVX53eDefdxGbdZP9afPOy
+P/vL1ezzRJ3K3nxX1mDyPbxO6Y5XWOHtEMhvCBDXi3/oRSxkieQO/eloosHZLstC
+a+eu6WCs5IZ11Tk4fMoR5LSnU8qjog==
+=gwu6
+-----END PGP SIGNATURE-----
+
+--apOrv3T8X8gNzi94--
 
