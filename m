@@ -1,83 +1,85 @@
-Return-Path: <kvm+bounces-27674-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27675-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D8E98A22F
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 14:23:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5BF098A25C
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 14:27:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E929F284659
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 12:23:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7800D281DDB
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 12:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3130418E346;
-	Mon, 30 Sep 2024 12:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B518018E047;
+	Mon, 30 Sep 2024 12:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jYNUBsH2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MXwF7pwr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F7618FDDA
-	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 12:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371281714C0
+	for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 12:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727698701; cv=none; b=TImKyC4plU4cqCrpp/DWs53gT00L44XchcKUbC6lMs4i9vJhK/T9/j4DXKLXZWFI5WYgQ8vKmdDD2hlQTFzepY8Gs1jBy8u1C0Zqw3VH4mkEGFAENooDaTCDvjE9cHE+1XmbVfN5sDVb2sL9/cl1A57RgegA5bKrFK5mJlulcm0=
+	t=1727699225; cv=none; b=luJVk3xwL/xKr1vEPk35aNwpk+Il16UlDHGuPfa3XLNN1fdSdoz5CNWYAgnaNdnfWYnn4qPrsD+dgtS/ErVMX58YG9/yHPtAh5ptxc69iYOuyEh5MPp5tFV6LiDTIf/I6tjpt2xRaTVYWWEBE0OoXGU1LZa5djrscaaJixYjmxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727698701; c=relaxed/simple;
-	bh=Sfw0mdEMDh/K3VhBFy3s8i5VHolr+g/Xq0J0N41drMk=;
+	s=arc-20240116; t=1727699225; c=relaxed/simple;
+	bh=VCKt0535H/iWdjXW60FMbqfftTGog7/qBtA6opzPV9I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ow0+cbqq0uxD6HCWKDXZWDucI6FzovRQm88hgZ/AdFFbPUX1aMevY2emHo/6hWw1MD5bBcNd91fC/o2hFStlzw4eKaoejPRI5eyGDoCCiIC5OWblPz43mKrF3wt4ktemYf/2QXLMPzpYP1RQ3tWzJjgiJrIDmP9XEkBl1DYfONQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jYNUBsH2; arc=none smtp.client-ip=209.85.128.54
+	 Content-Type:Content-Disposition:In-Reply-To; b=VOZrGKVblp1xDMEmHrTkb7uIQeuaCyrpYBgFI/VQRdP4m48uk8EbSgnz0HfkZx/RVbLO1t/hZ0/fdoo9PODv+voLJFPVyat69XjXTOkki1Dz7FhMwgzXAaXiKtjnomeTs21+M41BlW4sAG8upOiAIVbVvSzwxthMb0cAPLAT1ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MXwF7pwr; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42cae4ead5bso201525e9.1
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 05:18:19 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42cae4ead5bso203375e9.1
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2024 05:27:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727698698; x=1728303498; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727699222; x=1728304022; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Ep8QUlUnrds1SGucXi/YgAp2nqtwi1+G8zbAJEqKkms=;
-        b=jYNUBsH2+D6AwBTcF9MZyJVUlB3DJfOlxljIPTnpEgUUxuXMJbElREFKhkFQV5rEbI
-         9ZJV8xmon6JdBe0VGJVvQdhWlvHA9LBzl7gkIA0y1i4IFmJRPfclyg0/gFCOY4mU+aSc
-         MySspSr0EOgMd43BTnYaVeT2pOGQCvQhXnDKxdkM+7fo4xAr5LrTEHd5DLJ2Z55z5UrG
-         mV+f15dTYuDvK2vWLcIGGrv9HCjV+cILDnsAYrSZV2jRIopPzyapfDbjdLCPP++dT4U8
-         3ZQ0nZvByldlkCV28RE64SQott+i1V8iBEU8WxhL7+tEabYkQyXw4Fue2hAS6Fx2/KAN
-         E3mw==
+        bh=1IjSRUAtTDtw2SGctv/5ydlstMiEmxSV2M7xlf1TUGA=;
+        b=MXwF7pwrGo02o5IPK9P+TjQvQuZ408E3a7s6IuICnZ/xaRImzMRWmaZhRgFAd3HF0r
+         VWLQfXC5/ARW1XBupbHknpTbwxJjN4v3MrFeQsPpbajG3Z+Tay741GyYc145gPp9NAij
+         2nFVU3bxAIG0DRKbg6vf9YoLu7X5JYlBCUi+ekgGXZW19go79+aKpuewcA5C+7MH+tjI
+         EIBPb5176TnXBUG7dSgkJKIlFLOTZTwSgh4VjWW8mfYHZah4emvvtTKbzTJ+5OD895Ds
+         HiGIpY43onbO1xzmqAPyzzpGG45nZmkvsolq/EugKKU/DHV266A3R6hc0Za1pYKi2lDG
+         BWmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727698698; x=1728303498;
+        d=1e100.net; s=20230601; t=1727699222; x=1728304022;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ep8QUlUnrds1SGucXi/YgAp2nqtwi1+G8zbAJEqKkms=;
-        b=KkacQ+NTtdCeq6jhTpG8jUilGXI0zPd97fWuGbQsEabPG2jrHPBCXSWqOBT+sI5AAt
-         9hVzfLU2LnAezka7Bv+jNOnE4yFU8TPWcKC0lFCI2ZzaTr1v/u+RnlBK4mUGSqV7bUDB
-         z92oWa8EBlRYjQgnnTCrTkDPQ7cB8fs55ZfOhm0FH230WDmzqNaD9Bs7gxrfatbcrQTT
-         yCKYLyTk1wDUUvL/c+o29Bskhoqvej3pH5OYEhdZNqr/poO8D/P6xTDUKDk2UDrr8TQX
-         cuYk596RoDr8IqX+rrm6j3xgKFMDxxffpDKWXBoApeZQHnvgii5qldq8hR2BuqVr13OZ
-         rfAg==
-X-Gm-Message-State: AOJu0YxhDsQp3iYl8an6UE1neUqBlFTQae74BaCgkk7xeUQL5hBvQlgM
-	hdxMwJPl3lSJn8UZ+pmNu7f33qKMMaeGI8MHaP2Z9jUDY9Kkvmu3PY5HuCzXUg==
-X-Google-Smtp-Source: AGHT+IH+eizAu2CnZGC3hefAOZi6cXpOLeMx7dOz1tK0DzkSpIg3YK9bWw+nq6Fd1qcBeFmDAlYILQ==
-X-Received: by 2002:a05:600c:1e15:b0:426:66a0:6df6 with SMTP id 5b1f17b1804b1-42f5e86ebbdmr5573495e9.0.1727698697581;
-        Mon, 30 Sep 2024 05:18:17 -0700 (PDT)
+        bh=1IjSRUAtTDtw2SGctv/5ydlstMiEmxSV2M7xlf1TUGA=;
+        b=NLzgESJR1JAIV+z+un25Z3TOmzzB5F0wF6e0cC3NEgRNcUo/bDcjFBqrgut/vi2CTq
+         xnjNh7xlK4rOxsLMpquFmWLMSAB/DxkJHEtRDjjyoO4S9tc0vBWT1S552sBsqodM8Xaw
+         ooHSy6dMpaYSGsy764xRH/XnrHXraJHde9Idh/TeZh5YwShLRPi0h0BjYFioKYIbNuXO
+         5Wh89GJ0ViyAzlmn9cmrUInjH5IkbmT9YAVQ/AjkM/936gn9atMEWdBasKmghlggyuH2
+         Jqgo3OUi1YfmR9XyFdzpdUyewI0bfnfV0XneHQrTfbL2cxfs4lqHJkD4halFSYXlK6cp
+         VHgQ==
+X-Gm-Message-State: AOJu0YwMNH4HYhHYF+Oo0xWWidlhLxdkaMJI59yLV2LbnsNjNoKt7yy6
+	VLbvorP78Cz5e6DFJ60xAd7q9PCLV7IvNcwslYtVPeF+arXHjBeKy3llHa3O3w==
+X-Google-Smtp-Source: AGHT+IHgJFuT9e8DkPTpiSpg/nrd/94uflEZL4okr6gBL1sZLvKqEg789WKj1/ePMHv1kjPGo1UirA==
+X-Received: by 2002:a05:600c:1e15:b0:426:66a0:6df6 with SMTP id 5b1f17b1804b1-42f5e86ebbdmr5613975e9.0.1727699222269;
+        Mon, 30 Sep 2024 05:27:02 -0700 (PDT)
 Received: from google.com (105.93.155.104.bc.googleusercontent.com. [104.155.93.105])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cd56e645fsm8861945f8f.59.2024.09.30.05.18.16
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f57e13524sm101738295e9.37.2024.09.30.05.27.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 05:18:17 -0700 (PDT)
-Date: Mon, 30 Sep 2024 12:18:13 +0000
+        Mon, 30 Sep 2024 05:27:01 -0700 (PDT)
+Date: Mon, 30 Sep 2024 12:26:57 +0000
 From: Mostafa Saleh <smostafa@google.com>
-To: Yi Liu <yi.l.liu@intel.com>
-Cc: kvm@vger.kernel.org, open list <linux-kernel@vger.kernel.org>,
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
 	Eric Auger <eric.auger@redhat.com>,
-	Alex Williamson <alex.williamson@redhat.com>, kwankhede@nvidia.com,
+	Alex Williamson <alex.williamson@redhat.com>,
+	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
 	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
 	Quentin Perret <qperret@google.com>
 Subject: Re: [RFC] Simple device assignment with VFIO platform
-Message-ID: <ZvqXBY12_53HLV9k@google.com>
+Message-ID: <ZvqZEUFUlpAqhYkV@google.com>
 References: <CAFgf54rCCWjHLsLUxrMspNHaKAa1o8n3Md2_ZNGVtj0cU_dOPg@mail.gmail.com>
- <27b1055b-aee3-4d00-a4f8-d7d026cfbdd6@intel.com>
+ <BN9PR11MB52768B9199FAEAF8B9CC378E8C762@BN9PR11MB5276.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,14 +89,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <27b1055b-aee3-4d00-a4f8-d7d026cfbdd6@intel.com>
+In-Reply-To: <BN9PR11MB52768B9199FAEAF8B9CC378E8C762@BN9PR11MB5276.namprd11.prod.outlook.com>
 
-Hi Yi,
+Hi Tian,
 
-Thanks a lot for the feedback.
-
-On Mon, Sep 30, 2024 at 03:19:05PM +0800, Yi Liu wrote:
-> On 2024/9/28 00:17, Mostafa Saleh wrote:
+On Mon, Sep 30, 2024 at 08:19:45AM +0000, Tian, Kevin wrote:
+> > From: Mostafa Saleh <smostafa@google.com>
+> > Sent: Saturday, September 28, 2024 12:17 AM
+> > 
 > > Hi All,
 > > 
 > > Background
@@ -110,20 +112,17 @@ On Mon, Sep 30, 2024 at 03:19:05PM +0800, Yi Liu wrote:
 > > However, this problem is not pKVM(or KVM) specific, and about the
 > > design of VFIO.
 > > 
-> > [1] https://lore.kernel.org/kvm/20240801090117.3841080-1-tabba@google.com/
-> > [2] https://lore.kernel.org/kvmarm/20230201125328.2186498-1-jean-philippe@linaro.org/
+> > [1] https://lore.kernel.org/kvm/20240801090117.3841080-1-
+> > tabba@google.com/
+> > [2] https://lore.kernel.org/kvmarm/20230201125328.2186498-1-jean-
+> > philippe@linaro.org/
 > > 
 > > Problem
 > > =======
 > > At the moment, VFIO platform will deny a device from probing (through
 > > vfio_group_find_or_alloc()), if it’s not part of an IOMMU group,
 > > unless (CONFIG_VFIO_NOIOMMU is configured)
-> 
-> so your device does not have an IOMMU and also it does not do DMA at all?
-
-Exactly.
-
-> 
+> > 
 > > As far as I understand the current solutions to pass through platform
 > > devices that are not DMA capable are:
 > > - Use VFIO platform + (CONFIG_VFIO_NOIOMMU): The problem with that, it
@@ -131,44 +130,33 @@ Exactly.
 > > as the device doesn’t only have an IOMMU, but it’s not DMA capable at
 > > all, so the kernel should be safe with assigning the device without
 > > DMA isolation.
-> 
-> you need to set the vfio_noiommu parameter as well. yes, this would give
-> your device a fake iommu group. But the kernel would say this taints it.
-
-Yes, that would be the main problem with this approach.
-
-> 
 > > 
 > > - Use VFIO mdev with an emulated IOMMU, this seems it could work. But
 > > many of the code would be duplicate with the VFIO platform code as the
 > > device is a platform device.
+> 
+> emulated IOMMU is not tied to mdev:
+
+Makes sense, I see it’s used by a couple of other drivers also, so in
+that case it can be just a driver and not an mdev.
+
+> 
+>         /*
+>          * Virtual device without IOMMU backing. The VFIO core fakes up an
+>          * iommu_group as the iommu_group sysfs interface is part of the
+>          * userspace ABI.  The user of these devices must not be able to
+>          * directly trigger unmediated DMA.
+>          */
+>         VFIO_EMULATED_IOMMU,
+> 
+> Except it's not a virtual device, it does match the last sentence that
+> such device cannot trigger unmediated DMA.
+> 
 > > 
 > > - Use UIO: Can map MMIO to userspace which seems to be focused for
 > > userspace drivers rather than VM passthrough and I can’t find its
 > > support in Qemu.
-> 
-> QEMU is for device passthrough, it makes sense it needs to use the VFIO
-> without noiommu instead of UIO. The below link has more explanations.
-> 
-
-I agree, the reason I considered UIO, is that it allows mmap of the device
-MMIO, so in theory those can be passed to KVM, but that might be abuse of
-the UAPI? Specially I can’t find any VMM support for that.
-
-> https://wiki.qemu.org/Features/VT-d
-> 
-> As the introduction of vfio cdev, you may compile the vfio group out
-> by CONFIG_VFIO_GROUP==n. Supposedly, you will not be blocked by the
-> vfio_group_find_or_alloc(). But you might be blocked due to no present
-> iommu. You may have a try though.
-
-That fails at probe also, because of the device has no IOMMU as
-vfio_platform_probe() ends up calling device_iommu_capable().
-
-Also, AFAIU, using cdev must be tied with IOMMUFD, which assumes
-existence of IOMMU and would failt at bind.
-
-> 
+> > 
 > > One other benefit from supporting this in VFIO platform, that we can
 > > use the existing UAPI for platform devices (and support in VMMs)
 > > 
@@ -184,22 +172,14 @@ existence of IOMMU and would failt at bind.
 > > - Using emulated IOMMU for such devices
 > > (vfio_register_emulated_iommu_dev()), instead of having intrusive
 > > changes about IOMMUs existence.
+> > 
+> > If that makes sense I can work on RFC(I don’t have any code at the moment)
 > 
-> is it the mdev approach listed in the above?
+> This sounds the best option out of my head now...
 
-No, I meant to extended VFIO-platform to understand that, so in case the
-device has no IOMMU group, it can check with the platform bus if the
-device is DMA capable or not and it can allow those devices (maybe
-gated behind a command line) to be probed with emulated group.
-
-Having an new mdev just for platform devices with no DMA capabilities might
-be good if we don’t want to change VFIO platform, but my main concern is that
-might need more code + duplication with VFIO-platform.
+Thanks a lot for the feedback, I will work on RFC patches unless someone
+strongly disagrees with the approach.
 
 Thanks,
 Mostafa
-
-> -- 
-> Regards,
-> Yi Liu
 
