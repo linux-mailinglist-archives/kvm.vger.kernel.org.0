@@ -1,100 +1,87 @@
-Return-Path: <kvm+bounces-27713-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD5DF98B0DA
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 01:35:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E06898B307
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 06:27:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F252EB21709
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2024 23:35:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D1CE1C22CEB
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 04:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB172188A3E;
-	Mon, 30 Sep 2024 23:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC1C1B78F1;
+	Tue,  1 Oct 2024 04:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="BC/p+cCF";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="gzcTq9+f"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QZkSZ8mY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2069.outbound.protection.outlook.com [40.107.102.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134573E479;
-	Mon, 30 Sep 2024 23:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B891B5EA0;
+	Tue,  1 Oct 2024 04:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727739313; cv=fail; b=ObCarM687t/55KA4gz1CcAZoh7ft/0YQVVFMT8LGg0YehNbU0/gg6ODgqGczqLckYZZ6UO9qp8dHGIKOwiYaHpoFamT+F5q8K1S2nrErCUUquw5u2NxzbzGe03phPfYvawObORPEuyuupUgnLlx5M/QJL4HHAJaj6YJhlXgvmkY=
+	t=1727756776; cv=fail; b=orxGcz9dX2610O9SPxTWeJaTEdwSpiFm20ei4OK1ETCB79LZjth8BzbPwrSZXWB99aM3ALZ3FGLCiaeBiCKyRQXYwZhQ/Gez2WjZ5jsBZkV91giNYla5VDRO5cvDs/DJgATWdKIMoZ6Bz6OzGrRsfxPiSadg3bC8XyK++7xqxk8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727739313; c=relaxed/simple;
-	bh=ttlcQXpakBNgdWSBDPvQXFCXpkT9jf3Bg8Xgfi5CX4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e4IBCovWUC1GC6kCl/S3stqJGxfZxDks8IiL0yunQkf8uWzE0VVBKg91RkcrvkPuuYyJ62Yc/ov4SiETwx0eXNe19w5uNQOlyxl1Vv5WNncyBOIVJJdoxjtJZzC+effpV/U5anS96XZG0BDzpgUJgI0ONBfmpnd5X2Chy5MkMM0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=BC/p+cCF; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=gzcTq9+f; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48UMta1D020227;
-	Mon, 30 Sep 2024 23:35:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:content-type:content-transfer-encoding:mime-version; s=
-	corp-2023-11-20; bh=Cs4v8GYve/ClJKgLPHbU8MPjXzCCLofZCuYeOGpi0ic=; b=
-	BC/p+cCFuPPege1Dg4TA+FMFVUEebe0CrFeu9Dfz2UeIGfd9rwtFdhQxvOsrmlM3
-	hxvGWcfUQ1UADQKOOIW+HVoUF/KpUDc6F3iAXE7yOuLzCMvi9+hikTmcAA0lTEPL
-	GUS5WiauPltOGHUGbanYLG7+nqximlAAI0vFzk8ibwWY7B3IWZdEh4TE/ztdojIS
-	x/aswZIMoqcKs3lZSC9gfLMUiwYvAaLv1x+BNWK9LiG63BuQf+CvcmvL0C3E79xP
-	/s9kNKATN1VBsWCtOiljW/k53VFxNNqua/V36Dn+RR9hQGJB5k4aGtrtx4sQNWTf
-	Fp70wYyvmdeF/NS7F7EDtg==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 41x9ucn2x8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Sep 2024 23:35:05 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 48UMEtmX012527;
-	Mon, 30 Sep 2024 23:35:05 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2170.outbound.protection.outlook.com [104.47.58.170])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 41x886g7k0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Sep 2024 23:35:05 +0000
+	s=arc-20240116; t=1727756776; c=relaxed/simple;
+	bh=78h4+EyaqpALSP9ca8yTcfyYx4zDrh/5P/oZ7Wi8p8Y=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oKTKltrw7s0ZAZUPkeDu+eqREh+KZU2zIHtgD7BQA7/tAru8ivJMvGTBV/nbmLyGWhploOu+7XsiVscVBSoqbdgTa7YrQCfmDVfsTPYxetHsBHyTM+7a/9870zUr+E2lC6QVM3217/mH+EKrZrRDykYy1CiJ5oHFdsY6bByii3s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QZkSZ8mY; arc=fail smtp.client-ip=40.107.102.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Bi8k82afrgFZSkFVmLlvE8QWnpnDrx19j9W4g+igI6xVDsIKbX9R5W/AmIARdl/5Q1U0G9z8hCL79jhicCwBpdGDA5WRJMYYmmqi8NRCkVHcfRvwUE6BPjY9pADYEk+GGkfDGLLRvgVe5CcJXoywhZmqmWSn3YXRTj292JK26LzAan7a1Q3o43IfdAjCQWol+VPyYk8faU6rGZiSyHq7lCV3O7w1t3gm7csuMP5RLT1Ipp/AvY6SWvaznp6QBZX5b2LXlRoVv0JFuJN5m8y+6k/z3DYQEBc17ad80ZAT3PGAzVll+rshYnqicCdXueMIBDR80GYDpnrgl48HVj2sLA==
+ b=Oz6et8i5vqFXPc7SmWEyJ4jZermaV2R++OESWr/Iao6P3Vg8FbnIFr/cERaNS2n79yd92HshPoABTgRLnHgLhp0+u2YrHHMY8If+IVjwLO/RMz5gH5m/SLncBy/t2QTMLoZp+j9y0gEBGppDgDIZ3TZC/Z3fsvyg+FPz10MtEwoJ0dVRRr6ZE1d2eVKmA/9yTQBLeLaCXfAbKX2nesXDPtKGQrIY1+rsruxdmoaKSF6AX1pgq8f8jShTswHy4QnHszy4aYel2Tic1Fn6+dRS3GSpJDojES8x3568yq0qprK38w2sBzyaUkmLFX+kQseYbhwhPamRKBdP9MUUfdCnng==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Cs4v8GYve/ClJKgLPHbU8MPjXzCCLofZCuYeOGpi0ic=;
- b=v1mfN26Di3r1zvXQHO4SnBln9oLJT8ly6ofmdrIsskRD7AJnXyLnKpwsu2wsEBJj1KgqDI1QzTdtjnrZ3DyWHKHMYOEqdF0lB8wrKWZ8FCEGc+QMc97u55s1+idZkNOoO9vWtqMfZBBKkss/YfRhCq1Dj6/FTNrtLaQh2/viNQaQgT507SFSEhUSThYMSbtK3IjZfX3sMVgZT8l5sOg7EjvzYxajwpMy+Ei+J8phGl9zlh6xvzSmdYxflMup+AykvTwROi2zZWVNilaHPG11wFMZow0MSssvpDCsC+WZg06I8/UqjUmhqz9/u+38cYSaf7umUXWFHEejJFYw1I3nog==
+ bh=Ucy2OAb+70yd5/aTC1VxeqaYROHq8vk64Wk52DLoyis=;
+ b=rSXoeHuP9Nc2OxpeGZKF6cm81N/Oo7cqW6KX9sMaTnwJrfHHxDi+ViV/Q4p9qHepNOyXnbsVhClYYoyLTGZAqQdjQc1Xtjb0CupLl+dDkTskSVZpQ2Jcb8f/J1SQAhUKoQRjqKw3CkczMXsy/6/YVNtS5kQSZhiP5JMzA3dG5CyW7CDsA6LlE1lG+g6pE/k8xl7ilQ5gFqWu05Q33D7QGvmwfz2KFu+txfBpxY3Mp6ER+8wSvQHtNaZDXLi4Yn4hO9O/UBPTSPpT+g95xe+RiZGQmIMn8GceZxN/bum/QujTHig4rmkNUceRnQD9QoSkFQ+m0Eft/1m1BmGj2yVaHA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cs4v8GYve/ClJKgLPHbU8MPjXzCCLofZCuYeOGpi0ic=;
- b=gzcTq9+fX3nOUt2zPWmRyreR2qCiF+6HnRnKab0pKz3hAlK64uZ5eUyaz4ab8AjlfZBFGgd9X8qHspeICAz+KluqThxyQLw0aC6S+LP2Sv6oE6BEC1DP2q9IwW6Fi1wsZFCsWKRUKBCNmgqum3yhg337Qf+YSe7WP0gzmkWxF+E=
-Received: from MN2PR10MB4269.namprd10.prod.outlook.com (2603:10b6:208:1d1::8)
- by SJ0PR10MB5717.namprd10.prod.outlook.com (2603:10b6:a03:3ec::8) with
+ bh=Ucy2OAb+70yd5/aTC1VxeqaYROHq8vk64Wk52DLoyis=;
+ b=QZkSZ8mYzdzoU1dX5edz7IvlRnzCxfbyuc134cf/87uEsR9hEnXS+nIKxKy3J9vUDRIMY9LYoih86W4i7/Yg1DEnYU3U86HQCPqNaNLW06PfaPYAOSVHSAxzycvg25fuzfle30/JHO4UT4xbeZelxjOb245Uad8ea+FXuR8eiRE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ PH7PR12MB6738.namprd12.prod.outlook.com (2603:10b6:510:1a9::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.13; Mon, 30 Sep
- 2024 23:35:03 +0000
-Received: from MN2PR10MB4269.namprd10.prod.outlook.com
- ([fe80::f430:b41f:d4c4:9f9]) by MN2PR10MB4269.namprd10.prod.outlook.com
- ([fe80::f430:b41f:d4c4:9f9%3]) with mapi id 15.20.8026.009; Mon, 30 Sep 2024
- 23:35:02 +0000
-From: Eric Mackay <eric.mackay@oracle.com>
-To: imammedo@redhat.com
-Cc: boris.ostrovsky@oracle.com, eric.mackay@oracle.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
-Subject: Re: [PATCH] KVM/x86: Do not clear SIPI while in SMM
-Date: Mon, 30 Sep 2024 16:34:57 -0700
-Message-ID: <20240930233458.27182-1-eric.mackay@oracle.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240927112839.1b59ca46@imammedo.users.ipa.redhat.com>
-References: <20240927112839.1b59ca46@imammedo.users.ipa.redhat.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.27; Tue, 1 Oct
+ 2024 04:26:11 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec%6]) with mapi id 15.20.8005.024; Tue, 1 Oct 2024
+ 04:26:10 +0000
+Message-ID: <156dc1ab-1239-0508-1161-ab0cd13d35b1@amd.com>
+Date: Tue, 1 Oct 2024 09:56:00 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH v11 19/20] x86/kvmclock: Skip kvmclock when Secure TSC is
+ available
+To: Thomas Gleixner <tglx@linutronix.de>,
+ Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de,
+ x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com,
+ dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com,
+ peterz@infradead.org, gautham.shenoy@amd.com
+References: <20240731150811.156771-1-nikunj@amd.com>
+ <20240731150811.156771-20-nikunj@amd.com> <ZuR2t1QrBpPc1Sz2@google.com>
+ <9a218564-b011-4222-187d-cba9e9268e93@amd.com> <ZurCbP7MesWXQbqZ@google.com>
+ <2870c470-06c8-aa9c-0257-3f9652a4ccd8@amd.com> <Zu0iiMoLJprb4nUP@google.com>
+ <4cc88621-d548-d3a1-d667-13586b7bfea8@amd.com>
+ <ef194c25-22d8-204e-ffb6-8f9f0a0621fb@amd.com> <ZvQHpbNauYTBgU6M@google.com>
+ <64813123-e1e2-17e2-19e8-bd5c852b6a32@amd.com> <87setgzvn5.ffs@tglx>
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <87setgzvn5.ffs@tglx>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BLAPR03CA0123.namprd03.prod.outlook.com
- (2603:10b6:208:32e::8) To MN2PR10MB4269.namprd10.prod.outlook.com
- (2603:10b6:208:1d1::8)
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0111.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:96::10) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -102,221 +89,146 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR10MB4269:EE_|SJ0PR10MB5717:EE_
-X-MS-Office365-Filtering-Correlation-Id: 59afff8b-e51a-4e88-c7e4-08dce1a88120
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|PH7PR12MB6738:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87b9ff28-a494-4037-1f83-08dce1d12d17
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bjFqWGlVbXZCdFNJcVNrODEzRUZ2cmluaitxZXlFRitrbUpHbExEKzZUMDNl?=
- =?utf-8?B?elZUTGZCNE9DTmUyVXNUVW1EL0FrR3o5dFNoRjhHNWszUFhGSnZ0Tzc2UVpY?=
- =?utf-8?B?QzUzNm5VaDk1R09vSnlHV1hnVTBVQ2Zvckd2dmZzZWlaVXk4OGwrM0NiWHZX?=
- =?utf-8?B?QkYwRUtVRXR1bHUxb2VCVmJyT2NaRXN6NFIvYnV4SEhlVEdwUXk1UlNiaVN5?=
- =?utf-8?B?bUhVeUhrdGgxVGFWZ0Y2dndoSW5oYW80YVFYU1lWYis0R01Ud2ttSnRma0N6?=
- =?utf-8?B?dkZCUFZrYkhMRWlyVFQzOVMzaTNwUzlnLzczZEdvdml4SzEvajBaY3hXWTV3?=
- =?utf-8?B?aThMTGgyeDFoQnlNenhaaWJWUUpqTDBQdDJhR3VYMkxVeGk0eGNsN2NYQUhh?=
- =?utf-8?B?MmU2SmsrTkJRWi8vYmllRHJnRm9BdXQyR2NMc1dKVHVnRU44UEVPMlhKaDdN?=
- =?utf-8?B?NkIzeW81Q2NHbEREOW5lN3pnN3RhaG5rUnlZdndKeVBsY24zZTdYaFJwYmF4?=
- =?utf-8?B?U1I2WGVPL0FVY1c1ZFcxbkJhbzMwdExBR0JEbUZCWitHQTBwVDNUekJ3aHVv?=
- =?utf-8?B?L3Rjdy9KVXpydTBKYmhLaHd5VEIrRDcyVVlXUFhiaHBHZTFHbzBSREduRXF2?=
- =?utf-8?B?dElqK2c3UXMyQWg0WVJmNUUvQWJJVWxKTTMzblgvSmhzVTZlOHVWNjJPS2cr?=
- =?utf-8?B?VUpGZUtNQ2ZPUWtQOWVtc2RtM2hoMEFycFZaTmlRZFFkSDVFUlEzUk5SQVlI?=
- =?utf-8?B?NFRwVncraTh1K3ZSaDRKQUU5K1lNMlBUTXJJVjUvNjlQWVlmK29ZTnZmWVZa?=
- =?utf-8?B?T3hmOEwzcktmZjNINDVRQTgycE52RTdLWU13SlZiRVdOcHZaRTgzWHZncEht?=
- =?utf-8?B?R3QvcitvZUJ3K1c1Q04xMnJCWkMyNGowbHl6TFdzWnBZWmRSTGZoNllRRlNm?=
- =?utf-8?B?T1l5UGpTdkwwWXBYWTVCenMzanh6bDFWeUlidjhNSWJoNnk0aktPUHBRYURx?=
- =?utf-8?B?Q1Q0NjlyejgvdTBoMXJJcFZWV0Z0VlZNcVNkSEJSUmx4eE01NHMwaUU1MTVx?=
- =?utf-8?B?OEFTSkpPam9raFVpUW9uT1FkQTVidnc2Y0N1NUJFTnpvTWNhamVJMDFaUzBI?=
- =?utf-8?B?WWlGUFZUanFDQVppVmpzSWMrVzFFNkNrSlNRT1FXb2Vob0plQUN6MFNrY0Qz?=
- =?utf-8?B?V0JneUdlZXZlUXN3WlI2SitKY3dqenpVVW5rT3hhSFZkOC9nOSs4cy9WUmVs?=
- =?utf-8?B?eHdTdGJZUzZ1Q2h1akdxczFld3N1NzZ0dTErTTFyM2lKdWZoOElFL1VreEwv?=
- =?utf-8?B?TGM5WlhKOXpsMjRQK2g5TzJPK3had0V0NzRwbFBaUG9IQlp5Z2QxZ2NxMk9w?=
- =?utf-8?B?aWM4SE9mOXNBYktVSmR6aUxaU0FXVHN4VlUzeUxHSVl6V3dPcW9PUXJJd21X?=
- =?utf-8?B?NlVnUXEvZHlDUHRWWE5GeExHTzdRVkpqcndPQTRHOENpdlZSWGxsd0kwUEVt?=
- =?utf-8?B?T1dVeUxWcmg4dTdzNk5lTFQzRHZoWFdqWjgrZFlRWFM0OGpnY2lHMWE1RkNY?=
- =?utf-8?B?alRvQUUrYjdXb3ZDV2M1MmxVelZybEk4WnFXRnBBQUNUc3dEWGhSZndtWVFY?=
- =?utf-8?Q?X7anOEmKGvqFbXXj5KLYHPQ9yGDhgx5X0TemvREM64+E=3D?=
+	=?utf-8?B?NWhwak9IVXRXMWlCTTRYWVdJMEJwbmsrMkFMNGJuZkwya252MVV5aU9mZ2pO?=
+ =?utf-8?B?LzlQWXdtemp3anUvTWtOcFU0dm1aZmxXL1FyMWZLN1BoNlhieWx5ZElqVXpu?=
+ =?utf-8?B?Yk9mUldqTFJGNkNBYnRJVnNUS0k2Y0ZMUzE3N0V2dXlkR1ZwbW9sMEtIUjBo?=
+ =?utf-8?B?dzVBcW9mRXEvS2Z2eFlTa2V1a00xbTR0eFVRZVljSUNIMnBGemh2dXNuakxw?=
+ =?utf-8?B?aVhCcnFIbFo4bTNMNGlJUkZTbGJMUXMzTUlsQXFwYVYwcDBKQzhqVmhYQ3RW?=
+ =?utf-8?B?V3QxZDRCM2dIZFJmYzkyWFQwcXREWlpVMis3OVYrZjFsOFV5YTJOd1hLZnV6?=
+ =?utf-8?B?R2FUWmtVTEF1VTdtbUk5UTZTZlBnTWt1dW5vbzlNd2VKNFdiL0lVK29KS3BX?=
+ =?utf-8?B?WG14RlovQnZhKytsYmJJZ1AyOENuZDVYdXptMnRGdW1JSmZRWnRNTW1EczRk?=
+ =?utf-8?B?UG1JaVNDUmxnYkxZM2loRDczSC9qek5rbXRjcVlEbFdsOFhPbkQxY2RiNXo2?=
+ =?utf-8?B?ODBJRU9BR2lYRzBhVG52cEswTVM0WVdhSHpSZ0tXWElhdENjcGY4dHhuOW5U?=
+ =?utf-8?B?WU83T2hnR3JTTmZvZUluSHpjV0ZxNzdGeXFCbHdhb0xHZmxaVENSMGpCL1hC?=
+ =?utf-8?B?RHM4RmRYMEdWUXluWTN0SFJOeElWcmRheklTSnBQMHpxUlg3cTlTa1pFdDhl?=
+ =?utf-8?B?QUFFWjhwL000b2d5eWNHOUNTRTNTemRxVDUyanJha0hldlFERHlxSmRhdnk3?=
+ =?utf-8?B?Z1QyY0QrdWlCTHorZC9rOEZQRUM4TW84blhLR05YNFdNSFNWbGVZTWJ0dHZM?=
+ =?utf-8?B?NERrRmhkQzAwdExHaVdycGsvTGVzd3V3QTJKaU5HMnRaT2VBQXYvWmJpVXRx?=
+ =?utf-8?B?Q1JWMlMwdUgxS0t2V081dE5oUU13UytWUXVZUDNYOG1pWXFhbTV6ek1MR3pm?=
+ =?utf-8?B?QkFpSTJUTzhnYmZjcEZSWTA0VEFJb2FvSWlKVlcrdzByTXM3dlUyMmtCek9E?=
+ =?utf-8?B?alZYQ1hRRGtwbjRUQzlEOXJZckhXcTZ5ck1lTnd1d2s4VFR5VGdicFVCNGFq?=
+ =?utf-8?B?YWw4bDlsc2E1VnVvMDFRTE5DZHJDL0VYcXZJT0tDVTFtNW0yOXNIbUtVWHBY?=
+ =?utf-8?B?RXdaSVpvRFVnUXcyMnc5YlBiSGt6WEJOMW92YjBDZkJhcUZZWXUxUDNWcEIr?=
+ =?utf-8?B?UXVNcVY3ZU95L3dwZVRXV0dvSHZDRG9RTHRMbzhRUlVtckltcjFZYXpRYng2?=
+ =?utf-8?B?WjZoa3VGWnhDNy8zSjFtYXg3NDI5NmppWml1ZEZSZklhY1d6QzVDSWcxNVdZ?=
+ =?utf-8?B?ZGRFTXhKZTY1eGEzTEljWTU2RVh6bVdiRlNsa0N4ME1ZcFhWVnRoSlF5Zktq?=
+ =?utf-8?B?R0NpSno5ei9LT0VjeTdaRG9WeTh2bFFwZGRUc0JrQmlFandwekNLT2s1QzBi?=
+ =?utf-8?B?eGExZm83dUhmNldsbmEyK0xCYzNKclB4VlBSQjVlNUxJMDloL0NwM3BvOVV1?=
+ =?utf-8?B?QmtiSUVRUDNQK2JjVEQrWWQzTFRpaU4rYVJJUGlUNDNvTG9ZZEx5bFpWWkxz?=
+ =?utf-8?B?dmF0Mi80THZMNGU2QmozZkxEN3ZZUXptLzRYU2pIQ1kwb1BJOUdFeVdRMG96?=
+ =?utf-8?B?ZUdDQlhnbVR2aXhNcEZWb09YTjAxODlFb1RJSnlxQS9uYVIxbE1CTllremxQ?=
+ =?utf-8?B?WnFKTm5neWVzL0FsUS9ZQS93VVVOSXZ6MGg5KzNUdjJVMCtSZ2dxT3BLSldH?=
+ =?utf-8?B?blBXNHgyN1licVI0aTJyZmMvTi9iK3pkanp3RXljZVZiWkZqMmlkZCtxVEx3?=
+ =?utf-8?B?VnJ3RFBGOXo4NTNWTDBOQT09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR10MB4269.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dlAvUVZESjdnMWZ6RWVORUpEZlByQjVzOE5STU1HNkZYc3d0VzNZY3gxaWY4?=
- =?utf-8?B?RXBDbksvQ2FmWXYvbEZHMFpndE9IK2k5U2FTYVY5anV6blpxVjVzdk5LekZZ?=
- =?utf-8?B?MGhaQ1p5TXhrbWZCOTcrWVhtM1Y5akoxZGFUK0RzZXN6Vll1eHVDZG9DVlIz?=
- =?utf-8?B?My9RN3VZQmZMbHZXZTlMUGNMQ1BnVmQweUdQZVVoaStmd2hUZE9ZczVrS3ZX?=
- =?utf-8?B?RjE5cUk0cmJ0eVVxOTVIaWpkUzhvRTZjU0U1ZFVzZW03c0VXVjJoVkdrZklk?=
- =?utf-8?B?RnNMQkcwTmZMMFVYYWhFR3ZwZHNzWVdLZjcza2FZK2gyd1NCRG54SzNZc1Fj?=
- =?utf-8?B?eHhsbkZSRkNPVWRHZXdyalNGTGF2RzJkanp3RlEvNE0xNUd2Nm1EWm5pK2x5?=
- =?utf-8?B?RTQvMGZ3aHdFRGh5WTZiWnh0emNQRHFHbENtMm9DZnYrWnNmaGRXL0JVU1oz?=
- =?utf-8?B?NzRJUXAzaE1yY2Jwcng1SGxiUGMzeGJiV3NDbGdDZUNURHJPZngrcUs2eGhE?=
- =?utf-8?B?UXMxZjF1Uk5USTM3Yk54b09hOXNuU21UbDBFYjZRTlErVzRtYStEYlhpZ3R4?=
- =?utf-8?B?MDhqWU9RNEVnL1U5ekJWU2RldTM0Z05oYnlsWm9Ncm1PQ0tSbk1VRk5DVXB6?=
- =?utf-8?B?eDBSOVpDU1ZQbDJVeVcybUdGdmJuQWNUdjB0LzdXREZzZmpEUEZRYkh1MVhY?=
- =?utf-8?B?bGt0ek4zUXQ1cWxJM1JJTmM1VGFxdncrYXJYOWN1NkxmVU9TSjA5cHlYM2Ew?=
- =?utf-8?B?TUh2b1FUcUdkQ015MUUveVJWTGw3RGZaaUlaVHZuaHhhLy83UHNLczV6WmdB?=
- =?utf-8?B?dERXMm1SekZvNGFweE9BcDdmMklYRERIQmJoeEs4WUUza2I3YlB2bC9IM3Nl?=
- =?utf-8?B?WFhYK1YwQjlhTUQ0QUpyRC8zUEFrK3NFeFNWeWM0RVZNQzM5SDUxaU5pRFBh?=
- =?utf-8?B?RzJNVzJZZHN1ZjgyRWRpME13VHV1dE5kL2k1a1k3bVdid2FUNnErUlRWSVVV?=
- =?utf-8?B?emp2MmNIeHl5RU1od2cvYTVWZzZBTFU3aDViaHFRcjg5Z0tCVlFVaTBmNXY4?=
- =?utf-8?B?R3BHOS9LOGcvYm81R1p6RlpCTlBpVDRvSURJL1lIRmJzaVF5WnJmeG1OdnBa?=
- =?utf-8?B?NFkxVEhpcmczTHhRWGVEdm1rN09VL1ZkVUZqVXEwdUVBazFDQkJOMkFtMHNn?=
- =?utf-8?B?U1V0QlJFRDhXc3Q4NVhMdm94ZDBGcXVRc3Z4Z2JTcVdidGUxek9ST0pxeXpw?=
- =?utf-8?B?UUtQcG9DMEtCV2NKUmpOdWRKWkF1U1UzdDR3ZDVnZnZOWlZHMU0vRG43NnZU?=
- =?utf-8?B?U1U2d1V1Y0FpTEZYcnBMcTJCeDBWbHp0c0M4OS9oQzh1SzZ6b3pURm1nUUlz?=
- =?utf-8?B?c2thM1l3cWdxSTV2UXNnRDg1VjR5SE5TUldjUVN1OVN4azQ1UWdUUlRJeC9r?=
- =?utf-8?B?b3diQ09Id2RVenJFL2ROOHJPc1JnTFpyamJ2cUJjUWRMQzNtdDZhU2REaVlZ?=
- =?utf-8?B?L1RsS3ozNU5VUEsxZERKLzBKRnVUTElLWEQ0VE8zS2M3WFdBSEtsWThCVTY1?=
- =?utf-8?B?aFh1b21FNzlwMEo0UE1xQXNleHdhRm0wOTBIYVo5dXNvNm9Kbm5IM3lkSFhy?=
- =?utf-8?B?YkFtUHhNZFhHTU9MRFhQLytqMXZXUE41QjBoU05OQ0FQZGtGQW5GblhVMmpW?=
- =?utf-8?B?YVdiVThaQVF3bzlPdkxGVFZVRDhxOWljKzl1VlFVeWNjNzhicHZnMW80ZGdi?=
- =?utf-8?B?UEd1ZmpnM2xaUzM5RWJWNC9ZaENmRk1NbGU2MVhTakJ5S1JGVlEyZzBLZzUv?=
- =?utf-8?B?dkJNZDZNWXk0NGI2SURSeVAxVG03MG15YkJNRFQ3bzlYTkZ5TkVGaG1Rd25Y?=
- =?utf-8?B?MlY1WWdZRHovcjNwbzA0K0FFaTEwanRPaXgyNWdoeGpkM0JCb01MRXpQenBK?=
- =?utf-8?B?bVhrclEwUjZjTGxvY3diSFZMVi84ckNiRlhvSzVObG9WcVRGdUQwTC9sSnBZ?=
- =?utf-8?B?OXZuc25yUE1MTXc1eFdFSXF4MkFNRkhuZkxlZTM4Ui9QN25GUE5qbkdRWjQ4?=
- =?utf-8?B?MCtFOHRLbGxYZlVTMk5iMnV1WHFHT3JCQ1pQWW5yQUQ2bU9WeklZYTM1RjBo?=
- =?utf-8?Q?mYwACtfif2FmTb5HkNNqwSD3k?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	AJlSCalR1LWJDLWSzuDmNbDxA4RrmLh8pe9wcc42GlOA0ZAod1H9DeHh7IU3qcFPFQmPwywAbRmHgvziTWJV2dyapWItLIM8KB3JHgQfy/Dkv7Kqo7C4RJ3L+V/FHf7zstQu9LCR3eiwL+bS2cuXB3dOoweaMzxRE+JY0s12eQJJQYkSxh/Gx2iy/XR1kEq/wTcP438GXZ/Kpoqt/YBVU4B7lFHFz8+k6U9pWzCNquyIc4yJ55R2ZJeYDqXpkjI7BstJ8dalI1IrbljnjZp/Uy+a+Pwo21WrzXTJGTQVzNRSDFNVcZ4cO5PPIxdhO3EqOO15nvAlfy9RpEacGSHLqnoAUjGB+xFo+zOsbPvMGHetSZ579bnOZcGsYVRGgRkPy0GqMhaHwWWYlZ2ilaURuFy5dk9hj8dVyv9jqg3PrjOs3cna03N5AUjBK0w93Jwb6+4gZ2flkCTZJmkfYustGN1RyJRZz3Awa/g8CpLuYJ46MHdSh5ekQ2wPhSwD+PaF0bZaBIvbgDdd0W3jHlQRCT3jN6j7kCTixrObUoP6kcJVitl7e/Q9ajVDHtPRyiTztursYUt9486+tk48qkmpwK62qj0DrolHq07w4F5Z8Uk=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 59afff8b-e51a-4e88-c7e4-08dce1a88120
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR10MB4269.namprd10.prod.outlook.com
+	=?utf-8?B?L01NSzFaRnpGNW5LWHcycHVXRXdWSHRmTXU1ano5TktwNDB0Y0t0Vk05MDBF?=
+ =?utf-8?B?SytFTGlYMGtaVWFLZ0tzZUpUeGRKNVNMdEo4Y2ZQcW5vZEE2MTlydFcwblBi?=
+ =?utf-8?B?WU9XU2JtM3RVKzA1Vnppc2dGU2J6QjZ1YWRFbGlseW9ZWkl1UHJteWdORXFW?=
+ =?utf-8?B?QWxyQTBoWWcyQXJnbk1KcFk0elAzWTV2ajdzaHRPRTNtNWFPSUJLaGpZakVM?=
+ =?utf-8?B?OVBLVWczRHBQOGlOUmxFMCtTc2FMd3hhSHh5YXNocitKaGcvNE01a2pLMU9z?=
+ =?utf-8?B?dHlkbUhXQk8wODFreDlKMHlZcWxwK0w0cnpRY29pc2kwYUI5dFpnRVBrN2cy?=
+ =?utf-8?B?ejdvOTJXQTJVUWxwdi8zaXQvT1VrVWkvUjk3SGV4TjJBaWliU3ZZcVNhamQw?=
+ =?utf-8?B?dmg4WkdSL05jY0lUeUlBcDRFaTYzTjhZcERtUE5FcGJxNVQyTzZRVkk5VlNU?=
+ =?utf-8?B?TVhDb1VIZDN1U3Y2aUJ4RVNGSVcwTXJCNHFwc2ZTMWdJYzkzZ09LRWgxdVhJ?=
+ =?utf-8?B?ZzcyL2JZcW9nM2NEMFlXZHdrc2g1cElqU1NBczJ6T1YvYnY1MjRFVlNYcmRv?=
+ =?utf-8?B?L3RJbWc3bUFHQWFGSnVZWFlYWjgzYmlhb3RKNFkzVzN1bit2em9Sd3ZzU3dN?=
+ =?utf-8?B?dVE1VWVrNTMra0hOWmpUUmRUNVU4NzFYY2U1UkJzeWMzVEQ4V29jeEh4Ulkz?=
+ =?utf-8?B?cENSYzdBYm05ZUdCenBkcElMVFdNaHlmei9pQ29lWDJsOEN1TUl6Z2VsYkNh?=
+ =?utf-8?B?RjgrL05teDlZNHZJdlpiNk9aa3JuZGQrdm5mNTJBbmFUaWlERWNTZk1OVXM2?=
+ =?utf-8?B?NmwxQmNuaVd2RFEyMm5VWFh3OU9MN0Z4MVp2M29adjF6U3VNeEx2dG5TMmxt?=
+ =?utf-8?B?MnZhdUs2WTdVaWlubjI2OVJ3aVE5N0hnVUtxTHFZKzJJcE9ISnRHYWVhTmJj?=
+ =?utf-8?B?SnhGaDByQnI2ekYycC9JN0NQWVh0MEJNMXQ4eXpIdlc0emU5ckw2QzljNUo3?=
+ =?utf-8?B?aFRrS1A0Q3NoNUhjWVpaWjZPdEVQeVhFUVQ0VGcrRWhrbXgvZU5pTERpei9E?=
+ =?utf-8?B?dzQ4ZDhERmpuM2dXRDlCTlJ3WUExa1ZEcERNbWp1U1grNHozRHg1b0o4akx6?=
+ =?utf-8?B?UXZyYmtLMll0RERha2xQK0hBdlRxeWFmMkhJMkkvSVJQS1FGdTZvdWdVYTcy?=
+ =?utf-8?B?Q3d5bEprMGhlYzQ0aG5rczlXRHBpNkF3UU5Uc0szRTVVdlhkNnpSQTdTdWdT?=
+ =?utf-8?B?UmtMZ2ZWQW8zZHVNU2JrUEJ0ZzZ2eTF1b2ZBdmQyUzNja2xCemR4dFRXdmFx?=
+ =?utf-8?B?NTJkMnJ4amVXT3VPKzY3dTJ3WkY4L2l4OFFSTG9DelBYN29HZWZqSlhVeTgw?=
+ =?utf-8?B?RXFBYWs0a3JvZ2ZzaDY0dFN5NkZHZkVpNWpoMHBZUHdNZGNWWjk5N0g0SjhO?=
+ =?utf-8?B?WXE4cHh0bmd6K3lzU2VlMFEvbW9JaGhROUxiVzZ4dUh3aEdKdTBmaDFVVEVJ?=
+ =?utf-8?B?Q1NHZlRYZUpHaVBTS24reXNWTUVObmYwOEVkWDF3Tk51UHhBY1hnY2ZNazNL?=
+ =?utf-8?B?SndhSVM1Y3RNUUdGSVFRalMreDdJRDVxamNQQVJrR2JPVXNUeWNwSXY2a05N?=
+ =?utf-8?B?Z2FVSldqK2toNCtDQW5PQzNTMFVVTFRGSjdKbHk5TGgzL21mcEVOVkJGWHYv?=
+ =?utf-8?B?QytyTjhZZDFtbTluRmY0K3hWY2M3Z3NidkN3R1VIT01FQ1RVL0d5VE9UZWFs?=
+ =?utf-8?B?M1RNeE5EdEQ1VlVvVEpmOCtaWnNKWklRZTFPZlcxL3Y3UG8zazhpa0lCQ2Vt?=
+ =?utf-8?B?ZGM1Uk0xbWlIa1dWeU9Yck91RkorMDNhalpCaDBoaGk2TUpLLzJqNER6bkhH?=
+ =?utf-8?B?Sy95VTRsWkVzVnpvYUZIZ2pVREppdTI0Nm5BeG9sYlJYbFRueHpUTFhkV25B?=
+ =?utf-8?B?M1l1TnRaemdXVTZyM0hGWENtT283WVAwTEF3Y0c5OGJ1dzQrV1NVWGJWTlZk?=
+ =?utf-8?B?WXlmS3YxY0I3aEd5K3RQeEtCdGN4SG1KekkxaktRQ0VxNlRFd01jbjdlc1pN?=
+ =?utf-8?B?YkhiZ2Nwa1NoU2lDeGxmL2VUdWczSlhpQUlFNmh4aTN4MHZHKzF0VDdKMmoy?=
+ =?utf-8?Q?JDjjqc15hsd3zvt3UF9eQYKht?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87b9ff28-a494-4037-1f83-08dce1d12d17
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2024 23:35:02.1623
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2024 04:26:10.3943
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1tEKDlvS1RD99dzwiH/yDxFjdHCXUzCpQL9iSz4w6jG0GXfS9vf77sJmfQGO/1siQA6yOVhBygKaLXvtx4JwJA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB5717
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-09-30_21,2024-09-30_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- malwarescore=0 mlxscore=0 spamscore=0 suspectscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2408220000 definitions=main-2409300167
-X-Proofpoint-GUID: Fmfg_D0K-gOsRpz2R6DPLot51upvYRI2
-X-Proofpoint-ORIG-GUID: Fmfg_D0K-gOsRpz2R6DPLot51upvYRI2
+X-MS-Exchange-CrossTenant-UserPrincipalName: B0Zz2MuURw8rWJ/hNAjiAYRIc8Ln3umvD22d2GF4KnogrL2Zt6RPVxMz2ljKzfC4/bMp4lvP++PZdbeDUzQnAg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6738
 
-> On Thu, 26 Sep 2024 18:22:39 -0700
-> Eric Mackay <eric.mackay@oracle.com> wrote:
-> > > On 9/24/24 5:40 AM, Igor Mammedov wrote:  
-> > >> On Fri, 19 Apr 2024 12:17:01 -0400
-> > >> boris.ostrovsky@oracle.com wrote:
-> > >>   
-> > >>> On 4/17/24 9:58 AM, boris.ostrovsky@oracle.com wrote:  
-> > >>>>
-> > >>>> I noticed that I was using a few months old qemu bits and now I am
-> > >>>> having trouble reproducing this on latest bits. Let me see if I can get
-> > >>>> this to fail with latest first and then try to trace why the processor
-> > >>>> is in this unexpected state.  
-> > >>>
-> > >>> Looks like 012b170173bc "system/qdev-monitor: move drain_call_rcu call
-> > >>> under if (!dev) in qmp_device_add()" is what makes the test to stop failing.
-> > >>>
-> > >>> I need to understand whether lack of failures is a side effect of timing
-> > >>> changes that simply make hotplug fail less likely or if this is an
-> > >>> actual (but seemingly unintentional) fix.  
-> > >> 
-> > >> Agreed, we should find out culprit of the problem.  
-> > >
-> > >
-> > > I haven't been able to spend much time on this unfortunately, Eric is 
-> > > now starting to look at this again.
-> > >
-> > > One of my theories was that ich9_apm_ctrl_changed() is sending SMIs to 
-> > > vcpus serially while on HW my understanding is that this is done as a 
-> > > broadcast so I thought this could cause a race. I had a quick test with 
-> > > pausing and resuming all vcpus around the loop but that didn't help.
-> > >
-> > >  
-> > >> 
-> > >> PS:
-> > >> also if you are using AMD host, there was a regression in OVMF
-> > >> where where vCPU that OSPM was already online-ing, was yanked
-> > >> from under OSMP feet by OVMF (which depending on timing could
-> > >> manifest as lost SIPI).
-> > >> 
-> > >> edk2 commit that should fix it is:
-> > >>      https://github.com/tianocore/edk2/commit/1c19ccd5103b
-> > >> 
-> > >> Switching to Intel host should rule that out at least.
-> > >> (or use fixed edk2-ovmf-20240524-5.el10.noarch package from centos,
-> > >> if you are forced to use AMD host)  
-> > 
-> > I haven't been able to reproduce the issue on an Intel host thus far,
-> > but it may not be an apples-to-apples comparison because my AMD hosts
-> > have a much higher core count.
-> > 
-> > >
-> > > I just tried with latest bits that include this commit and still was 
-> > > able to reproduce the problem.
-> > >
-> > >
-> > >-boris  
-> > 
-> > The initial hotplug of each CPU appears to complete from the
-> > perspective of OVMF and OSPM. SMBASE relocation succeeds, and the new
-> > CPU reports back from the pen. It seems to be the later INIT-SIPI-SIPI
-> > sequence sent from the guest that doesn't complete.
-> > 
-> > My working theory has been that some CPU/AP is lagging behind the others
-> > when the BSP is waiting for all the APs to go into SMM, and the BSP just
-> > gives up and moves on. Presumably the INIT-SIPI-SIPI is sent while that
-> > CPU does finally go into SMM, and other CPUs are in normal mode.
-> > 
-> > I've been able to observe the SMI handler for the problematic CPU will
-> > sometimes start running when no BSP is elected. This means we have a
-> > window of time where the CPU will ignore SIPI, and least 1 CPU is in
-> > normal mode (the BSP) which is capable of sending INIT-SIPI-SIPI from
-> > the guest.
-> 
-> I've re-read whole thread and noticed Boris were saying:
->   > On Tue, Apr 16, 2024 at 10:57 PM <boris.ostrovsky@oracle.com> wrote:
->   > > On 4/16/24 4:53 PM, Paolo Bonzini wrote:  
->   ...
->   > > >
->   > > > What is the reproducer for this?  
->   > >
->   > > Hotplugging/unplugging cpus in a loop, especially if you oversubscribe
->   > > the guest, will get you there in 10-15 minutes.
->   ...
-> 
-> So there was unplug involved as well, which was broken since forever.
-> 
-> Recent patch
->  https://patchew.org/QEMU/20230427211013.2994127-1-alxndr@bu.edu/20230427211013.2994127-2-alxndr@bu.edu/
-> has exposed issue (unexpected uplug/unplug flow) with root cause in OVMF.
-> Firmware was letting non involved APs run wild in normal mode.
-> As result AP that was calling _EJ0 and holding ACPI lock was
-> continuing _EJ0 and releasing ACPI lock, while BSP and a being removed
-> CPU were still in SMM world. And any other plug/unplug op
-> were able to grab ACPI lock and trigger another SMI, which breaks
-> hotplug flow expectations (aka exclusive access to hotplug registers
-> during plug/unplug op)
-> Perhaps that's what you are observing.
-> 
-> Please check if following helps:
->   https://github.com/kraxel/edk2/commit/738c09f6b5ab87be48d754e62deb72b767415158
-> 
 
-I haven't actually seen the guest crash during unplug, though certainly
-there have been unplug failures. I haven't been keeping track of the
-unplug failures as closely, but a test I ran over the weekend with this
-patch added seemed to show less unplug failures.
 
-I'm still getting hotplug failures that cause a guest crash though, so
-that mystery remains.
+On 10/1/2024 2:50 AM, Thomas Gleixner wrote:
+> On Mon, Sep 30 2024 at 11:57, Nikunj A. Dadhania wrote:
+>> TSC Clock Rating Adjustment:
+>> * During TSC initialization, downgrade the TSC clock rating to 200 if TSC is not
+>>   constant/reliable, placing it below HPET.
+> 
+> Downgrading a constant TSC is a bad idea. Reliable just means that it
+> does not need a watchdog clocksource. If it's non-constant it's
+> downgraded anyway.
+> 
+>> * Ensure the kvm-clock rating is set to 299 by default in the 
+>>   struct clocksource kvm_clock.
+>> * Avoid changing the kvm clock rating based on the availability of reliable
+>>   clock sources. Let the TSC clock source determine and downgrade itself.
+> 
+> Why downgrade? If it's the best one you want to upgrade it so it's
+> preferred over the others.
 
-> So yes, SIPI can be lost (which should be expected as others noted)
-> but that normally shouldn't be an issue as wakeup_secondary_cpu_via_init()
-> do resend SIPI.
-> However if wakeup_secondary_cpu is set to another handler that doesn't
-> resend SIPI, It might be an issue.
+Thanks for confirming that upgrading the TSC rating is fine.
 
-We're using wakeup_secondary_cpu_via_init(). acpi_wakeup_cpu() and
-wakeup_cpu_via_vmgexit(), for example, are a bit opaque to me, so I'm
-not sure if those code paths include a SIPI resend.
+> The above will make sure that the PV clocksource rating remain
+>> unaffected.
+>>
+>> Clock soure selection order when the ratings match:
+>> * Currently, clocks are registered and enqueued based on their rating.
+>> * When clock ratings are tied, use the advertised clock frequency(freq_khz) as a
+>>   secondary key to favor clocks with better frequency.
+>>
+>> This approach improves the selection process by considering both rating and
+>> frequency. Something like below:
+> 
+> What does the frequency tell us? Not really anything. It's not
+> necessarily the better clocksource.
+> 
+> Higher frequency gives you a slightly better resolution, but as all of
+> this is usually sub-nanosecond resolution already that's not making a
+> difference in practice.
+> 
+> So if you know you want TSC to be selected, then upgrade the rating of
+> both the early and the regular TSC clocksource and be done with it.
+
+Sure Thomas, I will modify the patch accordingly and send an RFC.
+
+Also I realized that, for the guests, instead of rdtsc(), we should be 
+calling rdtsc_ordered() to make sure that time moves forward even when
+vCPUs are migrated.
+
+Thanks,
+Nikunj
+
+
 
