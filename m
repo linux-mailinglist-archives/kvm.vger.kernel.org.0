@@ -1,313 +1,144 @@
-Return-Path: <kvm+bounces-27750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F2E98B48C
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 08:35:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C242098B4FC
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 08:56:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDE03B20B32
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 06:35:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEA78B237AB
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 06:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F62A1BD509;
-	Tue,  1 Oct 2024 06:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80ECC1BCA18;
+	Tue,  1 Oct 2024 06:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="S0NNkrrS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XwBYHQaz"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2085.outbound.protection.outlook.com [40.107.237.85])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14C21BD504;
-	Tue,  1 Oct 2024 06:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727764484; cv=fail; b=laZffNukiqFyH4oSpPc4gK8oZuMJzS14TfbShJRdWTE/BZVRg1BvfuS98x/3hhhTOqEQhEA+rgNOHN35iKoEp/gtLAsfq4GMRNGwHGAxD2G6gh8pm7nO0RhATXddksRvrMVDJufVssKmcQauKT48ttIJ27LCkMyEF4fsPjgpAKg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727764484; c=relaxed/simple;
-	bh=bGCIAq0XNODp4VvlaTSFyrtLZRV4LehTY8Dagx8n8pE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DVkZJKs4zMtLPZ2tJmRgromXbJ8Lc90S/uH4w60GLIH5ZXSQqjJfTJDCYAVvrZ2zi2gJ3+gRI0pjK5Q2tIebz8JCeF6SFl+F47E0ajFl++orYIePb/Mc+077Ieru0s5f68Lh/knqdbecBmPOdQgjsJlemoqhBVHyAaVoWHXxzuM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=S0NNkrrS; arc=fail smtp.client-ip=40.107.237.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZmXyEBXaHoW1fRRY52HAXBpXIds5S9ty/riHvW1vmrWo+ZwV51CaK8bzW2bMl4ER73d827/wAzPeFjEzem4o8Q+5j0PcpMWm3a4v01Cbl2RJpalFJp+iSLUWsju8q/kF9WFZZh9tlNd8lfFa72rLR/x69pr/RxKR2qSKXdqk+XNMejiQv5Qr+DD9rmykXMg915iHaMGHer1aC3hnpLKLvYjBpUufzGWFw+/iYEb7J7bypS8FWZoWaWxxdEUZUaOYRpTtA0j9nYAbB/nV1p2yifv1jqTBv9fgVU+O5R5w4eoU984oi7nvNvuYS6IQWBVPKgSYrL45nFC4dcCQ0eb2Pw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4bneuj8dJUYnpYJ/crtKf1QdMoIS+NDfkqTcIZ4q7js=;
- b=wtXJDj06YAjv+E5T1kjFxmxti5FKhmoh5q8vKCU/7/YZ5hel/vOhDSYRl9YrfAxO45IMmre6n8bwJLnjze86y1Edg+lwLW4VRcXYn4404EKeHC3McOm6KSbniSHSrY11hPMGgx3gOWILeYpa/9tAZBVRjGrcLGbdtQxH6wZGcX1OB6VsL1FySE68xW85AL2RoufCDGw/BIcvbNHh6evKFCfpob6sfyoKE0DHT4p93c+lwT+dcwx68nGPFKshE5SSFh1Azu3+hJme9+APlwI1O3XiwBCr+1mvxQiWTZsmINL0INoOgTGsw71E5RywB9kBkiOg8yt+4DaJrJlHoUXFIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4bneuj8dJUYnpYJ/crtKf1QdMoIS+NDfkqTcIZ4q7js=;
- b=S0NNkrrSdcXnY7uLPBgjnigj6Sfs5Oz/HbJiJts7Tc+OE+fIzh/NG2fS57j/DONXJPplRNIh4ytaJZYXGDclQeXFtmvTdm/Ozn0OYB4RUeYvdJ/Lnp7Lnmp+xY77P2SrIfkwpXMmI3qie8I10BGv+zHzendjUnMHrIZtY9XkYLk=
-Received: from PH8PR07CA0045.namprd07.prod.outlook.com (2603:10b6:510:2cf::14)
- by DS7PR12MB5912.namprd12.prod.outlook.com (2603:10b6:8:7d::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.15; Tue, 1 Oct
- 2024 06:34:38 +0000
-Received: from SN1PEPF000397B2.namprd05.prod.outlook.com
- (2603:10b6:510:2cf:cafe::ad) by PH8PR07CA0045.outlook.office365.com
- (2603:10b6:510:2cf::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.27 via Frontend
- Transport; Tue, 1 Oct 2024 06:34:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF000397B2.mail.protection.outlook.com (10.167.248.56) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8026.11 via Frontend Transport; Tue, 1 Oct 2024 06:34:37 +0000
-Received: from chalupa-d178host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 1 Oct
- 2024 01:34:34 -0500
-From: Manali Shukla <manali.shukla@amd.com>
-To: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <shuah@kernel.org>,
-	<nikunj@amd.com>, <thomas.lendacky@amd.com>, <vkuznets@redhat.com>,
-	<manali.shukla@amd.com>, <bp@alien8.de>, <babu.moger@amd.com>
-Subject: [RFC PATCH v2 5/5] KVM: selftests: Add bus lock exit test
-Date: Tue, 1 Oct 2024 06:34:13 +0000
-Message-ID: <20241001063413.687787-6-manali.shukla@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241001063413.687787-1-manali.shukla@amd.com>
-References: <20241001063413.687787-1-manali.shukla@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8905C27468;
+	Tue,  1 Oct 2024 06:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727765786; cv=none; b=WwI9bai10R1XdL5LvCdb60Ruj9EB4kX1IGGN+h9nI5NZ9qPbYpIkMeyT5OTlNhgLB+lgqIZpgiIEI0WnXPUoCP9QKPi8W28/awQxt9RFTUXWQc3Uys3Q+YAeHh9ufhWGPMP/5ka6xxDme+P+dyWtvbW0YkkoKpNk9j85/RXHcq8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727765786; c=relaxed/simple;
+	bh=D6cq+9W5AquN6Xivssj0gJ1Jk4JQ0mfYEn2CA9+npXI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CxADuRegO1vz5uNQcUlg99joUnxiXrQXHSTRxJYot8Pq1tCJjYCwa80x7P2k0gSL8iyvT71njphVgQkQUFvITGEgs2P6ZWUjgyIwZPPyDMOwVBXwoCR7wRBBsr2qb39kovT9ncNHFtza4nqLDn4umvNMnEPrpBLKwFThMo5Yxtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XwBYHQaz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C6F4C4CED6;
+	Tue,  1 Oct 2024 06:56:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727765786;
+	bh=D6cq+9W5AquN6Xivssj0gJ1Jk4JQ0mfYEn2CA9+npXI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=XwBYHQazazbTC4OwId3vnrFAgc6CpLItRV3CT+Z8Gu23wph58CKcedFo7OLdarXFj
+	 CfBr/fhizt+I319h5X05aQeNiGEwLpOlTkxFwdMvZp5tn26hL9grIrgluiUanZgVrj
+	 0ryllcIGgHjRky7zD5Cq7OsKZqK4RkRI4/CJstCL2fYk+KBEVoQob6cme8zRgaORsv
+	 8IC6faZd2aGl4jfIjpTmpGu86/o4/aahDo/ckVnRLhdwe1cSJTcyxtGmwBVe5kWta6
+	 zAbfWFj5Dzv5UH3KDkLJ7Igmws7XQ8kbnjqJSF3yJWaphRu3BKFYLpSFA19jzUWCHz
+	 4bi5hwVR6eikg==
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f75c56f16aso60880411fa.0;
+        Mon, 30 Sep 2024 23:56:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUb5hyErHg8L+nlaYnCMwManPT29OgGG75N5SMSKloatCgBuklXXMSx2eV4yimmif3wUk8ctXjcp+vHOMVG@vger.kernel.org, AJvYcCUiBBqDH1Rk5CQ8vLslCmC/Xi7qfEu1NX1BRQKP+EkyP2E2Nxqt67MaUQJC2NBcMlkyWJ7BNb4szZUvsAtmjdo=@vger.kernel.org, AJvYcCUm6kZGpEHb76YAe/a1ZfTGVchBQlyX4EUgpNQJijcgQRPxvVg0m69emcfJL0xlA1ObScZoM0+UmgWo9PMd@vger.kernel.org, AJvYcCVR23sffSw7+s8WHHsh/QRWZqSUnBSfBzFlHy3NdQaSePyRp27+SUuWpX3dUSA+s7btKv4KtlpfYmsc@vger.kernel.org, AJvYcCVk7EvOcGbNafkzEELiaW0XX4/dAMKhzeaP9myUqJqYPUW+CaA72tq2XrwVjJcbalYY0KIWAQ2Ox6I9qrCtHBjbWQ==@vger.kernel.org, AJvYcCVkqg2FaRqXxkztdXl6Qg2ZLbyRAxc2++5Icc2R0fpNfIdY7w/OUH2F5t1fyxYuXRrjA9F6fJvJhWjB@vger.kernel.org, AJvYcCWJUthhIvNr4CBi7JTh00/Xf1hcUNTTMWspSCRlOgkq8BnBYIUFIahac9hC/CIWpK4L8K4=@vger.kernel.org, AJvYcCWMyKtbai3/+CMUxxUAWRaUoxT63Z6NiQHeXfwlK375Wkv/AXfBxKIUq9xOBgn0rLyBsG1TO3IKXQUHNQ==@vger.kernel.org, AJvYcCWazTJ/MRGwc1ZpLlQfAWrTj54guFFdiwwwZU2AwyRDc04z+N9tCqfvuKOXEKqEthvzJvjNPjXmmw8=@vger.kernel.org, AJvYcCWk4JcjjEkIQZslMHYb9A45
+ qkunEL5rjByj2wasO2nknJYRCQbyly1eTO7stb84m02o0HvxOYqZAK3wIjIp@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqCf21TVLxRAj0tdVi4muVfet14Czx+Po9K0dRbSUE3e13C7ZA
+	FwfRn3JNAuGYoPW7FQfz3unhiD5XPLAeSVO+cjc6yjjLmGndQpraItuRkPFrv5+hLyJ1eBVfCej
+	WbVPyB8lHYF9xlgLA6eI+GQreT8I=
+X-Google-Smtp-Source: AGHT+IGjtx2HGlRUUxfHLsgxZrMc5HOLfFzS5jvtirjyIPXJpZcKEYpq6gBAXQaDQEq6eyp0Tbbah6SY1D/EzYnBAjs=
+X-Received: by 2002:a05:6512:3b8d:b0:52b:bf8e:ffea with SMTP id
+ 2adb3069b0e04-5389fc6429dmr8367147e87.40.1727765784329; Mon, 30 Sep 2024
+ 23:56:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000397B2:EE_|DS7PR12MB5912:EE_
-X-MS-Office365-Filtering-Correlation-Id: d909b733-701e-492b-1853-08dce1e31f1b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?DmJHrqq6jOZHIcLHj7VAcKQEPVaUWOs9i3WSi60RDcIaToAMI966tljg12yM?=
- =?us-ascii?Q?Y01uPphqsK4AqFgFyGk3CoFj6EHWmT0+MfbZJh+MPY5/hvVjuzhzVjgTSkrA?=
- =?us-ascii?Q?BfKTY9EiSZohKxQfNKzUK5q3h3oE5GvmHuHMYTGfJECCop/B1Ibb/uLh12Vj?=
- =?us-ascii?Q?HchGD90fY491PNxhHg/q8cT9j74f5s0C6ENp20l5EdUrfmIKC47c0zF4eRJ6?=
- =?us-ascii?Q?hTWRzyPDGGf9bzod0CyjAjVOu4eG3+fC6Y5vH14ba1SLL7fu+rS3MVXbAokR?=
- =?us-ascii?Q?yT3vhn/ufr69O/ZFMsj5+sgxvlM5HLgM/ANEyWbaQv3rtj00jVUEvYH3QwAy?=
- =?us-ascii?Q?svDPIwJrMDhrgP5QgAerCL4BI6EI02ue4bxzmbWbAWQzMYrShJd15PNd1hdy?=
- =?us-ascii?Q?XlNeIgSvfj6jCMCoXPe+FNtrHLoKfCumqH6hi4zua76qzmX5g8CfWcomNfI1?=
- =?us-ascii?Q?KQpXXd7yQir6XhGnYutDWleVuyUTj5i0OXtnKLqskwg1UxHyIQNcUYlYw40X?=
- =?us-ascii?Q?D8n+Q8nd4J1bnMJMqot0Y6zilrIFS/aEOIASDOCrIvhWE2hyvMkbe489shnN?=
- =?us-ascii?Q?pNy5nnE8EgD5Y1yE76oTlU1Bg/039IO4NMUthBkXOuSFKnZJEs5UjRBsPXgs?=
- =?us-ascii?Q?fWiM52JkD0feXL1hwe711BTS2vPw1DQBm9StvmMk/3bwj90yAboby6uA92Oe?=
- =?us-ascii?Q?ucSt9mHC+WC+Cfdi3xwd9e1gj+0Gij/qUnHXzSIc9rvE5o4bwEM5f181vEoA?=
- =?us-ascii?Q?XBpCs1hRD6PblHvaR3Rai5Cpa2bmNW2jE7nDIf8IYG+RUjX7eGdHx85Mnb0l?=
- =?us-ascii?Q?Pv7/aRNc3q4sAvpv7ZKc0rYm+pNnzFCQjTvhUqRp1FmzEjcA1Fo9ud5JKbQF?=
- =?us-ascii?Q?v5kATVvHeeqr+dld4u+TZOevmxP+txzTB65f0h0Jdgrpj8SPIQL5saqW7uTD?=
- =?us-ascii?Q?EwHgKJVE66h2MRK3vEM4q9xOX789RARhS4+DChGfrT6Qgf1WC9gOTHjYKpew?=
- =?us-ascii?Q?jiMa/X/IJwYUh5waWaW2CyoxsmMJ8t1JdqyAtV0E978HC91n7VN46ytU50ad?=
- =?us-ascii?Q?Bq524Y930HaTmEmAybVvQOKzJS8ZccIC445O5u78BTBywRJcLPPaMxiUPSY8?=
- =?us-ascii?Q?Kxb6JTSfoi9J7HLjU6Kda7PxaqeG/D8EkDwqV0ySqpC33Noeoz/3l5avX6xt?=
- =?us-ascii?Q?1YYpBMtwyvoR2VuE1CHOEfZFPNjbA9ggOI8nDyuci5DVOYYC1tUz4JPlAodd?=
- =?us-ascii?Q?zg987uwsz87SsCA3BXyBZ6lz2gJHOsDsFZX50qDGO00/Of1W6MO3aS/caF/4?=
- =?us-ascii?Q?TDEQsjVLkd1bHt4MpMAvleN39ci5vLejuAzDeaRGjpg7cIafZqjvOz/DM/vs?=
- =?us-ascii?Q?6eZ/c/NKzrH5OqnaKjZkLJdids2DSDjRiY9UggR7zCC87X4mdArJ5ysTG90K?=
- =?us-ascii?Q?Q/xHoo4Ti7HcebJTUi0y3dA0XT3G21sP?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2024 06:34:37.4525
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d909b733-701e-492b-1853-08dce1e31f1b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000397B2.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5912
+References: <20240925150059.3955569-30-ardb+git@google.com>
+ <20240925150059.3955569-34-ardb+git@google.com> <20241001053318.elfwwiyluw6rlynz@treble>
+In-Reply-To: <20241001053318.elfwwiyluw6rlynz@treble>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 1 Oct 2024 08:56:12 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFyd7zDqnFzHTZmcR+ktxRVdOnuF-VOW+E0PYPNaQGXzQ@mail.gmail.com>
+Message-ID: <CAMj1kXFyd7zDqnFzHTZmcR+ktxRVdOnuF-VOW+E0PYPNaQGXzQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/28] x86/boot: Permit GOTPCREL relocations for
+ x86_64 builds
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Uros Bizjak <ubizjak@gmail.com>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
+	Justin Stitt <justinstitt@google.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>, 
+	linux-doc@vger.kernel.org, linux-pm@vger.kernel.org, kvm@vger.kernel.org, 
+	xen-devel@lists.xenproject.org, linux-efi@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-sparse@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-From: Nikunj A Dadhania <nikunj@amd.com>
+On Tue, 1 Oct 2024 at 07:33, Josh Poimboeuf <jpoimboe@kernel.org> wrote:
+>
+> On Wed, Sep 25, 2024 at 05:01:04PM +0200, Ard Biesheuvel wrote:
+> > +             if (r_type == R_X86_64_GOTPCREL) {
+> > +                     Elf_Shdr *s = &secs[sec->shdr.sh_info].shdr;
+> > +                     unsigned file_off = offset - s->sh_addr + s->sh_offset;
+> > +
+> > +                     /*
+> > +                      * GOTPCREL relocations refer to instructions that load
+> > +                      * a 64-bit address via a 32-bit relative reference to
+> > +                      * the GOT.  In this case, it is the GOT entry that
+> > +                      * needs to be fixed up, not the immediate offset in
+> > +                      * the opcode. Note that the linker will have applied an
+> > +                      * addend of -4 to compensate for the delta between the
+> > +                      * relocation offset and the value of RIP when the
+> > +                      * instruction executes, and this needs to be backed out
+> > +                      * again. (Addends other than -4 are permitted in
+> > +                      * principle, but make no sense in practice so they are
+> > +                      * not supported.)
+> > +                         */
+> > +                     if (rel->r_addend != -4) {
+> > +                             die("invalid addend (%ld) for %s relocation: %s\n",
+> > +                                 rel->r_addend, rel_type(r_type), symname);
+> > +                             break;
+> > +                     }
+>
+> For x86 PC-relative addressing, the addend is <reloc offset> -
+> <subsequent insn offset>.  So a PC-relative addend can be something
+> other than -4 when the relocation applies to the middle of an
+> instruction, e.g.:
+>
+>    5b381:       66 81 3d 00 00 00 00 01 06      cmpw   $0x601,0x0(%rip)        # 5b38a <generic_validate_add_page+0x4a> 5b384: R_X86_64_PC32    boot_cpu_data-0x6
+>
+>    5f283:       81 3d 00 00 00 00 ff ff ff 00   cmpl   $0xffffff,0x0(%rip)        # 5f28d <x86_acpi_suspend_lowlevel+0x9d>      5f285: R_X86_64_PC32    smpboot_control-0x8
+>
+>    72f67:       c6 05 00 00 00 00 01    movb   $0x1,0x0(%rip)        # 72f6e <sched_itmt_update_handler+0x6e>   72f69: R_X86_64_PC32    x86_topology_update-0x5
+>
+> Presumably that could also happen with R_X86_64_GOTPCREL?
+>
 
-Add a test case to verify the Bus Lock exit feature
+In theory, yes.
 
-The main thing that the selftest verifies is that when a Buslock is
-generated in the guest context, the KVM_EXIT_X86_BUS_LOCK is triggered
-for SVM or VMX when the KVM capability KVM_CAP_X86_BUS_LOCK_EXIT is
-enabled.
+But for the class of GOTPCREL relaxable instructions listed in the
+psABI, the addend is always -4, and these are the only ones we might
+expect from the compiler when using -fpic with 'hidden' visibility
+and/or -mdirect-extern-access. Note that the memory operand
+foo@GOTPCREL(%rip) produces the *address* of foo, and so it is always
+the source operand, appearing at the end of the encoding.
 
-This test case also verifies the Bus Lock exit in nested scenario.
+Alternatively, we might simply subtract the addend from 'offset'
+before applying the displacement from the opcode.
 
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-Co-developed-by: Manali Shukla <manali.shukla@amd.com>
-Signed-off-by: Manali Shukla <manali.shukla@amd.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/kvm_buslock_test.c   | 130 ++++++++++++++++++
- 2 files changed, 131 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/kvm_buslock_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 0c4b254ab56b..fd7b43fd2a8b 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -81,6 +81,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_tlb_flush
- TEST_GEN_PROGS_x86_64 += x86_64/kvm_clock_test
- TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
-+TEST_GEN_PROGS_x86_64 += x86_64/kvm_buslock_test
- TEST_GEN_PROGS_x86_64 += x86_64/monitor_mwait_test
- TEST_GEN_PROGS_x86_64 += x86_64/nested_exceptions_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
-diff --git a/tools/testing/selftests/kvm/x86_64/kvm_buslock_test.c b/tools/testing/selftests/kvm/x86_64/kvm_buslock_test.c
-new file mode 100644
-index 000000000000..82693520485c
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/kvm_buslock_test.c
-@@ -0,0 +1,130 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2024 Advanced Micro Devices, Inc.
-+ */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+#include "vmx.h"
-+
-+#define NR_ITERATIONS 100
-+#define L2_GUEST_STACK_SIZE 64
-+
-+struct buslock_test {
-+	unsigned char pad[PAGE_SIZE - 2];
-+	atomic_long_t val;
-+} __packed;
-+
-+struct buslock_test test __aligned(PAGE_SIZE);
-+
-+static __always_inline void buslock_atomic_add(int i, atomic_long_t *v)
-+{
-+	asm volatile(LOCK_PREFIX "addl %1,%0"
-+		     : "+m" (v->counter)
-+		     : "ir" (i) : "memory");
-+}
-+
-+static void buslock_add(void)
-+{
-+	/*
-+	 * Increment a page unaligned variable atomically.
-+	 * This should generate a bus lock exit.
-+	 */
-+	for (int i = 0; i < NR_ITERATIONS; i++)
-+		buslock_atomic_add(2, &test.val);
-+}
-+
-+static void l2_guest_code(void)
-+{
-+	buslock_add();
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code(struct svm_test_data *svm)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb = svm->vmcb;
-+
-+	generic_svm_setup(svm, l2_guest_code,
-+			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+	run_guest(vmcb, svm->vmcb_gpa);
-+	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-+	GUEST_DONE();
-+}
-+
-+static void l1_vmx_code(struct vmx_pages *vmx)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+
-+	GUEST_ASSERT_EQ(prepare_for_vmx_operation(vmx), true);
-+	GUEST_ASSERT_EQ(load_vmcs(vmx), true);
-+
-+	prepare_vmcs(vmx, NULL, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	GUEST_ASSERT(!vmwrite(GUEST_RIP, (u64)l2_guest_code));
-+	GUEST_ASSERT(!vmlaunch());
-+
-+	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_REASON), EXIT_REASON_VMCALL);
-+	GUEST_DONE();
-+}
-+
-+static void guest_code(void *test_data)
-+{
-+	buslock_add();
-+
-+	if (this_cpu_has(X86_FEATURE_SVM))
-+		l1_svm_code(test_data);
-+	else
-+		l1_vmx_code(test_data);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+	vm_vaddr_t nested_test_data_gva;
-+
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM) || kvm_cpu_has(X86_FEATURE_VMX));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_BUS_LOCK_EXIT));
-+
-+	vm = vm_create(1);
-+	vm_enable_cap(vm, KVM_CAP_X86_BUS_LOCK_EXIT, KVM_BUS_LOCK_DETECTION_EXIT);
-+	vcpu = vm_vcpu_add(vm, 0, guest_code);
-+
-+	if (kvm_cpu_has(X86_FEATURE_SVM))
-+		vcpu_alloc_svm(vm, &nested_test_data_gva);
-+	else
-+		vcpu_alloc_vmx(vm, &nested_test_data_gva);
-+
-+	vcpu_args_set(vcpu, 1, nested_test_data_gva);
-+
-+	run = vcpu->run;
-+
-+	for (;;) {
-+		struct ucall uc;
-+
-+		vcpu_run(vcpu);
-+
-+		if (run->exit_reason == KVM_EXIT_IO) {
-+			switch (get_ucall(vcpu, &uc)) {
-+			case UCALL_ABORT:
-+				REPORT_GUEST_ASSERT(uc);
-+				/* NOT REACHED */
-+			case UCALL_SYNC:
-+				continue;
-+			case UCALL_DONE:
-+				goto done;
-+			default:
-+				TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
-+			}
-+		}
-+
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_X86_BUS_LOCK);
-+	}
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.34.1
-
+Note that this code gets removed again in the last patch, after
+switching to PIE linking.
 
