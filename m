@@ -1,144 +1,126 @@
-Return-Path: <kvm+bounces-27751-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27752-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C242098B4FC
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 08:56:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8583798B527
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 09:04:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEA78B237AB
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 06:56:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B38361C2243A
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 07:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80ECC1BCA18;
-	Tue,  1 Oct 2024 06:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0881BD4F4;
+	Tue,  1 Oct 2024 07:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XwBYHQaz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U48KyXAp"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8905C27468;
-	Tue,  1 Oct 2024 06:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FD51BC9EC;
+	Tue,  1 Oct 2024 07:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727765786; cv=none; b=WwI9bai10R1XdL5LvCdb60Ruj9EB4kX1IGGN+h9nI5NZ9qPbYpIkMeyT5OTlNhgLB+lgqIZpgiIEI0WnXPUoCP9QKPi8W28/awQxt9RFTUXWQc3Uys3Q+YAeHh9ufhWGPMP/5ka6xxDme+P+dyWtvbW0YkkoKpNk9j85/RXHcq8=
+	t=1727766251; cv=none; b=kHrjGlseE61eTumwkxFJE/v1F3VHVLWU3J0X1oA1jgwqF3JBBJz3N9okSsWM77PrZsifLqEFq5bB586ODcIansn9+VDrwkb1F+NqbeCUNRMxikxF/EAXP/MAR5x4hUgfqFaOWeCpapbSrhA318MzqNN/QNqvOytVaIFlurysVos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727765786; c=relaxed/simple;
-	bh=D6cq+9W5AquN6Xivssj0gJ1Jk4JQ0mfYEn2CA9+npXI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CxADuRegO1vz5uNQcUlg99joUnxiXrQXHSTRxJYot8Pq1tCJjYCwa80x7P2k0gSL8iyvT71njphVgQkQUFvITGEgs2P6ZWUjgyIwZPPyDMOwVBXwoCR7wRBBsr2qb39kovT9ncNHFtza4nqLDn4umvNMnEPrpBLKwFThMo5Yxtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XwBYHQaz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C6F4C4CED6;
-	Tue,  1 Oct 2024 06:56:26 +0000 (UTC)
+	s=arc-20240116; t=1727766251; c=relaxed/simple;
+	bh=YxTGQndDRXUrIv1rcoZzDFrSZkpN1CHT/gS1t6B9Ipo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vh72BhbmxdBqiqyUpAUhg2OJWYccs7pnezxLkeOePeUo8q8HpT2FL85kQlTpOF/dx3HImpqEGvCDcqewle1yuzhXWJ+1NIFiwJLajRvEhitNcsRLMLZwYoRTeWfrzLY4484lPKHv1N53qGIf6f4i/hue9uAgEctZujtqz/rFQ7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U48KyXAp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F49AC4CED2;
+	Tue,  1 Oct 2024 07:04:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727765786;
-	bh=D6cq+9W5AquN6Xivssj0gJ1Jk4JQ0mfYEn2CA9+npXI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=XwBYHQazazbTC4OwId3vnrFAgc6CpLItRV3CT+Z8Gu23wph58CKcedFo7OLdarXFj
-	 CfBr/fhizt+I319h5X05aQeNiGEwLpOlTkxFwdMvZp5tn26hL9grIrgluiUanZgVrj
-	 0ryllcIGgHjRky7zD5Cq7OsKZqK4RkRI4/CJstCL2fYk+KBEVoQob6cme8zRgaORsv
-	 8IC6faZd2aGl4jfIjpTmpGu86/o4/aahDo/ckVnRLhdwe1cSJTcyxtGmwBVe5kWta6
-	 zAbfWFj5Dzv5UH3KDkLJ7Igmws7XQ8kbnjqJSF3yJWaphRu3BKFYLpSFA19jzUWCHz
-	 4bi5hwVR6eikg==
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f75c56f16aso60880411fa.0;
-        Mon, 30 Sep 2024 23:56:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUb5hyErHg8L+nlaYnCMwManPT29OgGG75N5SMSKloatCgBuklXXMSx2eV4yimmif3wUk8ctXjcp+vHOMVG@vger.kernel.org, AJvYcCUiBBqDH1Rk5CQ8vLslCmC/Xi7qfEu1NX1BRQKP+EkyP2E2Nxqt67MaUQJC2NBcMlkyWJ7BNb4szZUvsAtmjdo=@vger.kernel.org, AJvYcCUm6kZGpEHb76YAe/a1ZfTGVchBQlyX4EUgpNQJijcgQRPxvVg0m69emcfJL0xlA1ObScZoM0+UmgWo9PMd@vger.kernel.org, AJvYcCVR23sffSw7+s8WHHsh/QRWZqSUnBSfBzFlHy3NdQaSePyRp27+SUuWpX3dUSA+s7btKv4KtlpfYmsc@vger.kernel.org, AJvYcCVk7EvOcGbNafkzEELiaW0XX4/dAMKhzeaP9myUqJqYPUW+CaA72tq2XrwVjJcbalYY0KIWAQ2Ox6I9qrCtHBjbWQ==@vger.kernel.org, AJvYcCVkqg2FaRqXxkztdXl6Qg2ZLbyRAxc2++5Icc2R0fpNfIdY7w/OUH2F5t1fyxYuXRrjA9F6fJvJhWjB@vger.kernel.org, AJvYcCWJUthhIvNr4CBi7JTh00/Xf1hcUNTTMWspSCRlOgkq8BnBYIUFIahac9hC/CIWpK4L8K4=@vger.kernel.org, AJvYcCWMyKtbai3/+CMUxxUAWRaUoxT63Z6NiQHeXfwlK375Wkv/AXfBxKIUq9xOBgn0rLyBsG1TO3IKXQUHNQ==@vger.kernel.org, AJvYcCWazTJ/MRGwc1ZpLlQfAWrTj54guFFdiwwwZU2AwyRDc04z+N9tCqfvuKOXEKqEthvzJvjNPjXmmw8=@vger.kernel.org, AJvYcCWk4JcjjEkIQZslMHYb9A45
- qkunEL5rjByj2wasO2nknJYRCQbyly1eTO7stb84m02o0HvxOYqZAK3wIjIp@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqCf21TVLxRAj0tdVi4muVfet14Czx+Po9K0dRbSUE3e13C7ZA
-	FwfRn3JNAuGYoPW7FQfz3unhiD5XPLAeSVO+cjc6yjjLmGndQpraItuRkPFrv5+hLyJ1eBVfCej
-	WbVPyB8lHYF9xlgLA6eI+GQreT8I=
-X-Google-Smtp-Source: AGHT+IGjtx2HGlRUUxfHLsgxZrMc5HOLfFzS5jvtirjyIPXJpZcKEYpq6gBAXQaDQEq6eyp0Tbbah6SY1D/EzYnBAjs=
-X-Received: by 2002:a05:6512:3b8d:b0:52b:bf8e:ffea with SMTP id
- 2adb3069b0e04-5389fc6429dmr8367147e87.40.1727765784329; Mon, 30 Sep 2024
- 23:56:24 -0700 (PDT)
+	s=k20201202; t=1727766251;
+	bh=YxTGQndDRXUrIv1rcoZzDFrSZkpN1CHT/gS1t6B9Ipo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=U48KyXApci3UtxQWQZGJOivaoaBm54OMwNhLIDUKNMLk/lKydMXiobmwy5JQap02V
+	 ycIF3JFoJWdIMs/UAvzUC3/ph6sbhe+8p9rONZY8gMkG5DaG6tCMFpQh+YRcE7TrE3
+	 o2L/4EL8amY1ChcXXLqz796i7CFCMGM34YgBOWVx5K+r0l42fRA+2OayziUVTvJAur
+	 WG4RpsH+W6KDcvbDE3UWuyXneac9Sa2ZoAHqJDlHanFq5uo1JxlRYY4tF6WRsj5t90
+	 DsbjQketoBNk9Ar24iXB5vVQSgrEKe9hgWNIWvnXkFPCTKafUu6+l69lJCe1TiOWuN
+	 0QE6YNbFDuxzA==
+Received: from mchehab by mail.kernel.org with local (Exim 4.98)
+	(envelope-from <mchehab@kernel.org>)
+	id 1svWvY-00000001V0L-18y3;
+	Tue, 01 Oct 2024 09:04:08 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Dongjiu Geng <gengdongjiu1@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Shannon Zhao <shannon.zhaosl@gmail.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 00/15] Prepare GHES driver to support error injection
+Date: Tue,  1 Oct 2024 09:03:37 +0200
+Message-ID: <cover.1727766088.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240925150059.3955569-30-ardb+git@google.com>
- <20240925150059.3955569-34-ardb+git@google.com> <20241001053318.elfwwiyluw6rlynz@treble>
-In-Reply-To: <20241001053318.elfwwiyluw6rlynz@treble>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 1 Oct 2024 08:56:12 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFyd7zDqnFzHTZmcR+ktxRVdOnuF-VOW+E0PYPNaQGXzQ@mail.gmail.com>
-Message-ID: <CAMj1kXFyd7zDqnFzHTZmcR+ktxRVdOnuF-VOW+E0PYPNaQGXzQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 04/28] x86/boot: Permit GOTPCREL relocations for
- x86_64 builds
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Uros Bizjak <ubizjak@gmail.com>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
-	Justin Stitt <justinstitt@google.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>, 
-	linux-doc@vger.kernel.org, linux-pm@vger.kernel.org, kvm@vger.kernel.org, 
-	xen-devel@lists.xenproject.org, linux-efi@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-sparse@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
 
-On Tue, 1 Oct 2024 at 07:33, Josh Poimboeuf <jpoimboe@kernel.org> wrote:
->
-> On Wed, Sep 25, 2024 at 05:01:04PM +0200, Ard Biesheuvel wrote:
-> > +             if (r_type == R_X86_64_GOTPCREL) {
-> > +                     Elf_Shdr *s = &secs[sec->shdr.sh_info].shdr;
-> > +                     unsigned file_off = offset - s->sh_addr + s->sh_offset;
-> > +
-> > +                     /*
-> > +                      * GOTPCREL relocations refer to instructions that load
-> > +                      * a 64-bit address via a 32-bit relative reference to
-> > +                      * the GOT.  In this case, it is the GOT entry that
-> > +                      * needs to be fixed up, not the immediate offset in
-> > +                      * the opcode. Note that the linker will have applied an
-> > +                      * addend of -4 to compensate for the delta between the
-> > +                      * relocation offset and the value of RIP when the
-> > +                      * instruction executes, and this needs to be backed out
-> > +                      * again. (Addends other than -4 are permitted in
-> > +                      * principle, but make no sense in practice so they are
-> > +                      * not supported.)
-> > +                         */
-> > +                     if (rel->r_addend != -4) {
-> > +                             die("invalid addend (%ld) for %s relocation: %s\n",
-> > +                                 rel->r_addend, rel_type(r_type), symname);
-> > +                             break;
-> > +                     }
->
-> For x86 PC-relative addressing, the addend is <reloc offset> -
-> <subsequent insn offset>.  So a PC-relative addend can be something
-> other than -4 when the relocation applies to the middle of an
-> instruction, e.g.:
->
->    5b381:       66 81 3d 00 00 00 00 01 06      cmpw   $0x601,0x0(%rip)        # 5b38a <generic_validate_add_page+0x4a> 5b384: R_X86_64_PC32    boot_cpu_data-0x6
->
->    5f283:       81 3d 00 00 00 00 ff ff ff 00   cmpl   $0xffffff,0x0(%rip)        # 5f28d <x86_acpi_suspend_lowlevel+0x9d>      5f285: R_X86_64_PC32    smpboot_control-0x8
->
->    72f67:       c6 05 00 00 00 00 01    movb   $0x1,0x0(%rip)        # 72f6e <sched_itmt_update_handler+0x6e>   72f69: R_X86_64_PC32    x86_topology_update-0x5
->
-> Presumably that could also happen with R_X86_64_GOTPCREL?
->
+During the development of a patch series meant to allow GHESv2 error injections,
+it was requested a change on how CPER offsets are calculated, by adding a new
+BIOS pointer and reworking the GHES logic. See:
 
-In theory, yes.
+https://lore.kernel.org/qemu-devel/cover.1726293808.git.mchehab+huawei@kernel.org/
 
-But for the class of GOTPCREL relaxable instructions listed in the
-psABI, the addend is always -4, and these are the only ones we might
-expect from the compiler when using -fpic with 'hidden' visibility
-and/or -mdirect-extern-access. Note that the memory operand
-foo@GOTPCREL(%rip) produces the *address* of foo, and so it is always
-the source operand, appearing at the end of the encoding.
+Such change ended being a big patch, so several intermediate steps are needed,
+together with several cleanups and renames.
 
-Alternatively, we might simply subtract the addend from 'offset'
-before applying the displacement from the opcode.
+As agreed duing v10 review, I'll be splitting the big patch series into separate pull 
+requests, starting with the cleanup series. This is the first patch set, containing
+only such preparation patches.
 
-Note that this code gets removed again in the last patch, after
-switching to PIE linking.
+The next series will contain the shift to use offsets from the location of the
+HEST table, together with a migration logic to make it compatible with 9.1.
+
+---
+
+v2: 
+- some indentation fixes;
+- some description improvements;
+- fixed a badly-solved merge conflict that ended renaming a parameter.
+
+Mauro Carvalho Chehab (15):
+  acpi/ghes: get rid of ACPI_HEST_SRC_ID_RESERVED
+  acpi/ghes: simplify acpi_ghes_record_errors() code
+  acpi/ghes: simplify the per-arch caller to build HEST table
+  acpi/ghes: better handle source_id and notification
+  acpi/ghes: Fix acpi_ghes_record_errors() argument
+  acpi/ghes: Remove a duplicated out of bounds check
+  acpi/ghes: Change the type for source_id
+  acpi/ghes: Prepare to support multiple sources on ghes
+  acpi/ghes: make the GHES record generation more generic
+  acpi/ghes: move offset calculus to a separate function
+  acpi/ghes: better name GHES memory error function
+  acpi/ghes: don't crash QEMU if ghes GED is not found
+  acpi/ghes: rename etc/hardware_error file macros
+  acpi/ghes: better name the offset of the hardware error firmware
+  docs: acpi_hest_ghes: fix documentation for CPER size
+
+ docs/specs/acpi_hest_ghes.rst  |   6 +-
+ hw/acpi/generic_event_device.c |   4 +-
+ hw/acpi/ghes-stub.c            |   2 +-
+ hw/acpi/ghes.c                 | 279 ++++++++++++++++++++-------------
+ hw/arm/virt-acpi-build.c       |  10 +-
+ include/hw/acpi/ghes.h         |  34 ++--
+ target/arm/kvm.c               |   3 +-
+ 7 files changed, 206 insertions(+), 132 deletions(-)
+
+-- 
+2.46.0
+
+
 
