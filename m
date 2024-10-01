@@ -1,266 +1,253 @@
-Return-Path: <kvm+bounces-27757-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C58C98B65F
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 10:00:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B024098B69E
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 10:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7C91281511
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 08:00:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C10031C22111
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2024 08:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929F41BF337;
-	Tue,  1 Oct 2024 07:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739981990BE;
+	Tue,  1 Oct 2024 08:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xa/QMWAq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2SrU10w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40361BE233;
-	Tue,  1 Oct 2024 07:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B0438396
+	for <kvm@vger.kernel.org>; Tue,  1 Oct 2024 08:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727769577; cv=none; b=EM9PNPpxPJR/5NTUXMmZQJVfQ5LXmklreF/qlfy1zGxCzFcUJKh/jL5DRreMfuLqO+WTWk+LLApZM2Ww3sq+pgpFSAKpvVApMUWPlamAktdGpY+U3cL/0N240xukOQYiwhoY23V/Eky0g/HHB7yqkeEwIgZHVGSiOaDXcH1nqE8=
+	t=1727770713; cv=none; b=uToSDZa0Ob7Dh3xXvjlxfvccjKl7HMpyYKPINVcMPC2Lo8vGOkr29zqZrMxLTI/J0lDrgQM/bJgY8eGNMjGYOcasCTwf0j70QeuME8ETSxfwNVEFw7obJGB8DtQnC7I/oUmzGxZE6uj03cLRQRWJF/N6gVf++4FfHBDbJlRhtf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727769577; c=relaxed/simple;
-	bh=7u9cByNn+AJUO28aQhpxRgxL9HZmWejhnVAxuPd9L1k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E4IfsA46EdGbBC24K4EjnSlFYrUZL6EqEQU0K7wOEnZXa/d94ylRT+DOVGqxU8Wj43whitm2KgnG7tKw7JNLVLRbI/H3+H/FTEoaFyUTnDm/+ZG5aj8Qrzi666FYmD9z8k5HETVqZRhYhoW6yB9YbrptRrgRS+iYtS3V/7dDk3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xa/QMWAq; arc=none smtp.client-ip=209.85.216.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-2e0b93157caso2999958a91.0;
-        Tue, 01 Oct 2024 00:59:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727769574; x=1728374374; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vktSfFznxxqxdyooYxAJtLpLR+uBOH4pDsLUZk+TldI=;
-        b=Xa/QMWAqks6qScJW12s0S833sVNmt+nAJafSNF43CyInb/4ovUMob56d781hkMSw5v
-         ZbJAGD2sZCo+65WzVpahoVSYtCbEeqHtfvsqY3R7lzEtwsMHKP+NGuRcMBfNcrC8y/q4
-         8Hdin0EkcZaqTBrSfUiUo7CW6Zjrf92tjYrq6GrJKlZx/xRcQn/OR/I7CMiJQLwY+p8w
-         7IUHf0hdq8LRfEQzwOFkTXR1tRlphNpewrOo0N2EHKOaSzmQthfyN7BzxGBCnaP9a/SL
-         5RSLz0XhkC7BKL+o85j/X0VC57RU7DPlLbY5w7L++Zd4QFsBHKuQwmThvG/Aun0paJKg
-         nhpw==
+	s=arc-20240116; t=1727770713; c=relaxed/simple;
+	bh=FVxXA/46bA5Ju+Ip7o8RoCF1qH4WFWf5J+bvz/jXLNo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ByvidbfIQGYvrnANDrSAHKrAGpoFptduK7CYSYZpx5b5mH54HdSc0djhP/kRDuRllg32c/+7IB/5RuCOjqItlOCjTs5622rC8AptFbPH8+AIu77nMjJU/CiadiPTNA4JNXOGrdvWacKIY4Ogo/zvB32cdBYYC3nfa+XoOvLcXDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X2SrU10w; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727770710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6fHoFX0PDnSZTfecN4IZ6eBr8XhvG76aRuFk6iUg1wg=;
+	b=X2SrU10wxz1xKAnN9Gep020hPJNhuF1E0LHb5OkGHHnIyjXNnwHt4zyTJhb00G96Ntk+Pz
+	htzFvnmUy/oW1PlSulOk1aw45XeIarMPAOEe002iJBrqKpaNom4TliYbFsN8vlazXRb6fj
+	b8MZPj4ICUslQEB2S1DiBHpYu7FUZa0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-633-g6xlseJAOQ-ZjUz2fAoUcQ-1; Tue, 01 Oct 2024 04:18:28 -0400
+X-MC-Unique: g6xlseJAOQ-ZjUz2fAoUcQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42cdeac2da6so43501595e9.2
+        for <kvm@vger.kernel.org>; Tue, 01 Oct 2024 01:18:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727769574; x=1728374374;
+        d=1e100.net; s=20230601; t=1727770707; x=1728375507;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vktSfFznxxqxdyooYxAJtLpLR+uBOH4pDsLUZk+TldI=;
-        b=c7KMF2IQASHCBS1rwMwfA4NG+Ui/qyhBGBRqAwIeviJR2sN0BylR6ceD7AK+PQ+sfJ
-         4GAG9E2T8BwW4qOgjGoy2dBATFPwzc6aOMz5dXYzUOUTCIsp+oQ0euE0+96KXKe7Ao9J
-         uvm+H+eTXEEo8ZBG1qstx28veof5siHYh8kUAVndsR1jZC/J209veot9G2CkZT+5WWNm
-         PGz+3/cJCKOgU6eobmAH0BJbZLjcG+fSWpT7wMOh6wKQOfDXqVVWYm60N08Wq/+MrSi0
-         zzpc4rAk7RmXykpzEarW5teOwEmgGy7CfrKFHZTsqr0FatlCF1Dcp+73BcEDqSUkN8kc
-         41Ng==
-X-Forwarded-Encrypted: i=1; AJvYcCUJ2qgfKZqP3TWW8lIf51hHl++qBjeiVByTwMEIIkSo2YLIHot5eoa8GC2xvoPcs4GVCpYjx/JlZFHN@vger.kernel.org, AJvYcCVjsVdmc2yDJ078YzHJsJLTOaAZHxBd8fhKOCv9jCpBb9JraCA7fApM7zzgj7rvY8SWQ08=@vger.kernel.org, AJvYcCWRqPZKKqEwre1g8uwjeeITxgUjNlJMnnrQLU9Vpczwz6c+84IuBJhh97Q4k2RTnz+XknuktLeI8luOx3vQ@vger.kernel.org, AJvYcCWdEcMha8DtqH/Ob2upuzntMvclFNIQQRqy3/PxGPKM4oJweE2gO2LI6ZZ/vfa2QxlD6tnWoxST2KHz/byVbHTS@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0b8ywHaOQAe1hOtw0juwsyG+EQvhnwOuBKVENSftESZQxg5cT
-	epdSrCTAqt9WDNMe/D2cVtOwMd7IqUWswiHmRnaJFj7TNdngsSi1
-X-Google-Smtp-Source: AGHT+IH1qx+VpqO/M0ZFFo8jx2Ltv6BvYYP7WVtyTnNPIJSUx7pF6s/8RS08Pp9OK0t2pqi6/zCT9A==
-X-Received: by 2002:a17:90a:2f65:b0:2d8:999a:bc37 with SMTP id 98e67ed59e1d1-2e15a34cfe8mr3372002a91.19.1727769574029;
-        Tue, 01 Oct 2024 00:59:34 -0700 (PDT)
-Received: from yunshenglin-MS-7549.. ([2409:8a55:301b:e120:88bd:a0fb:c6d6:c4a2])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e06e16d6d2sm13168168a91.2.2024.10.01.00.59.27
+        bh=6fHoFX0PDnSZTfecN4IZ6eBr8XhvG76aRuFk6iUg1wg=;
+        b=g1tattynPKzE+z4IE5QyF6RuOQUxttOzWh2mNOL88VLaLYuT5XB+U0XNVrMmFUv6cs
+         7M1VbSjvs5QOYB2uFVRDprm+VyfiTkKWK7XquD1Z1ugkHYcmAobuDZ6P7lgr6CPvywH7
+         kZpkr+cZ7ZjzDxjJNzhhPYxHKbu9cZ3DDIKSCW+cVQOQx5ON0jRVwXEG0v0F5aad9udi
+         mBPkqowMDEK/qzXc66AvG3EyroGE1RSJ1/gRPux2Oi2nZ5WyTSV9gs53UEUqo+5jQn68
+         NTcvoyTN/XJ1F5QlDqihg/Oe8VdOtLRJZuAKHNzCl4aU6lUN1CHOIesyXLzCNeCVuMnM
+         4mGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWeRzuPHnbsv8rQgHiIXL7mUgcOkBuurYhdrC2dNUfRpnlHoUXanKEAmWlDVYik97sOprQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0p90E4IkrwsJHKcbz1hT6kZMTghmW3N2BwOBcODyz4UOXgQZV
+	lZIpnEP9TUzhWr7eYaZjt20+CqZtul+VXadVeRzmcRK4nzLOYqKzUyDBqqsjKTiU/1w7NHyisPD
+	J4IBlEk84OkleC16PfcMn/+tsOp5uOH2pcj1Ze8UbjV6n6nvU6A==
+X-Received: by 2002:a05:600c:a4b:b0:42c:b6e4:e3aa with SMTP id 5b1f17b1804b1-42f5840d0e8mr111361495e9.5.1727770707342;
+        Tue, 01 Oct 2024 01:18:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFw8ufUH6F5nDbkSSNEqTEzuf4KWYsJLQeJtg49jP8WrSSKL+9gbTDJ/scSAsPl74EhIIVgvA==
+X-Received: by 2002:a05:600c:a4b:b0:42c:b6e4:e3aa with SMTP id 5b1f17b1804b1-42f5840d0e8mr111361235e9.5.1727770706900;
+        Tue, 01 Oct 2024 01:18:26 -0700 (PDT)
+Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cd56e6875sm11227722f8f.55.2024.10.01.01.18.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 00:59:33 -0700 (PDT)
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-X-Google-Original-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Eric Dumazet <edumazet@google.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Shuah Khan <shuah@kernel.org>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-afs@lists.infradead.org,
-	linux-nfs@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v19 04/14] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
-Date: Tue,  1 Oct 2024 15:58:47 +0800
-Message-Id: <20241001075858.48936-5-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241001075858.48936-1-linyunsheng@huawei.com>
-References: <20241001075858.48936-1-linyunsheng@huawei.com>
+        Tue, 01 Oct 2024 01:18:26 -0700 (PDT)
+Date: Tue, 1 Oct 2024 10:18:25 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Eric Mackay <eric.mackay@oracle.com>
+Cc: boris.ostrovsky@oracle.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
+Subject: Re: [PATCH] KVM/x86: Do not clear SIPI while in SMM
+Message-ID: <20241001101825.38b23397@imammedo.users.ipa.redhat.com>
+In-Reply-To: <20240930233458.27182-1-eric.mackay@oracle.com>
+References: <20240927112839.1b59ca46@imammedo.users.ipa.redhat.com>
+	<20240930233458.27182-1-eric.mackay@oracle.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Use appropriate frag_page API instead of caller accessing
-'page_frag_cache' directly.
+On Mon, 30 Sep 2024 16:34:57 -0700
+Eric Mackay <eric.mackay@oracle.com> wrote:
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
-Acked-by: Chuck Lever <chuck.lever@oracle.com>
----
- drivers/vhost/net.c                                   |  2 +-
- include/linux/page_frag_cache.h                       | 10 ++++++++++
- net/core/skbuff.c                                     |  6 +++---
- net/rxrpc/conn_object.c                               |  4 +---
- net/rxrpc/local_object.c                              |  4 +---
- net/sunrpc/svcsock.c                                  |  6 ++----
- tools/testing/selftests/mm/page_frag/page_frag_test.c |  2 +-
- 7 files changed, 19 insertions(+), 15 deletions(-)
+> > On Thu, 26 Sep 2024 18:22:39 -0700
+> > Eric Mackay <eric.mackay@oracle.com> wrote: =20
+> > > > On 9/24/24 5:40 AM, Igor Mammedov wrote:   =20
+> > > >> On Fri, 19 Apr 2024 12:17:01 -0400
+> > > >> boris.ostrovsky@oracle.com wrote:
+> > > >>    =20
+> > > >>> On 4/17/24 9:58 AM, boris.ostrovsky@oracle.com wrote:   =20
+> > > >>>>
+> > > >>>> I noticed that I was using a few months old qemu bits and now I =
+am
+> > > >>>> having trouble reproducing this on latest bits. Let me see if I =
+can get
+> > > >>>> this to fail with latest first and then try to trace why the pro=
+cessor
+> > > >>>> is in this unexpected state.   =20
+> > > >>>
+> > > >>> Looks like 012b170173bc "system/qdev-monitor: move drain_call_rcu=
+ call
+> > > >>> under if (!dev) in qmp_device_add()" is what makes the test to st=
+op failing.
+> > > >>>
+> > > >>> I need to understand whether lack of failures is a side effect of=
+ timing
+> > > >>> changes that simply make hotplug fail less likely or if this is an
+> > > >>> actual (but seemingly unintentional) fix.   =20
+> > > >>=20
+> > > >> Agreed, we should find out culprit of the problem.   =20
+> > > >
+> > > >
+> > > > I haven't been able to spend much time on this unfortunately, Eric =
+is=20
+> > > > now starting to look at this again.
+> > > >
+> > > > One of my theories was that ich9_apm_ctrl_changed() is sending SMIs=
+ to=20
+> > > > vcpus serially while on HW my understanding is that this is done as=
+ a=20
+> > > > broadcast so I thought this could cause a race. I had a quick test =
+with=20
+> > > > pausing and resuming all vcpus around the loop but that didn't help.
+> > > >
+> > > >   =20
+> > > >>=20
+> > > >> PS:
+> > > >> also if you are using AMD host, there was a regression in OVMF
+> > > >> where where vCPU that OSPM was already online-ing, was yanked
+> > > >> from under OSMP feet by OVMF (which depending on timing could
+> > > >> manifest as lost SIPI).
+> > > >>=20
+> > > >> edk2 commit that should fix it is:
+> > > >>      https://github.com/tianocore/edk2/commit/1c19ccd5103b
+> > > >>=20
+> > > >> Switching to Intel host should rule that out at least.
+> > > >> (or use fixed edk2-ovmf-20240524-5.el10.noarch package from centos,
+> > > >> if you are forced to use AMD host)   =20
+> > >=20
+> > > I haven't been able to reproduce the issue on an Intel host thus far,
+> > > but it may not be an apples-to-apples comparison because my AMD hosts
+> > > have a much higher core count.
+> > >  =20
+> > > >
+> > > > I just tried with latest bits that include this commit and still wa=
+s=20
+> > > > able to reproduce the problem.
+> > > >
+> > > >
+> > > >-boris   =20
+> > >=20
+> > > The initial hotplug of each CPU appears to complete from the
+> > > perspective of OVMF and OSPM. SMBASE relocation succeeds, and the new
+> > > CPU reports back from the pen. It seems to be the later INIT-SIPI-SIPI
+> > > sequence sent from the guest that doesn't complete.
+> > >=20
+> > > My working theory has been that some CPU/AP is lagging behind the oth=
+ers
+> > > when the BSP is waiting for all the APs to go into SMM, and the BSP j=
+ust
+> > > gives up and moves on. Presumably the INIT-SIPI-SIPI is sent while th=
+at
+> > > CPU does finally go into SMM, and other CPUs are in normal mode.
+> > >=20
+> > > I've been able to observe the SMI handler for the problematic CPU will
+> > > sometimes start running when no BSP is elected. This means we have a
+> > > window of time where the CPU will ignore SIPI, and least 1 CPU is in
+> > > normal mode (the BSP) which is capable of sending INIT-SIPI-SIPI from
+> > > the guest. =20
+> >=20
+> > I've re-read whole thread and noticed Boris were saying: =20
+> >   > On Tue, Apr 16, 2024 at 10:57=E2=80=AFPM <boris.ostrovsky@oracle.co=
+m> wrote: =20
+> >   > > On 4/16/24 4:53 PM, Paolo Bonzini wrote:   =20
+> >   ... =20
+> >   > > >
+> >   > > > What is the reproducer for this?   =20
+> >   > >
+> >   > > Hotplugging/unplugging cpus in a loop, especially if you oversubs=
+cribe
+> >   > > the guest, will get you there in 10-15 minutes. =20
+> >   ...
+> >=20
+> > So there was unplug involved as well, which was broken since forever.
+> >=20
+> > Recent patch
+> >  https://patchew.org/QEMU/20230427211013.2994127-1-alxndr@bu.edu/202304=
+27211013.2994127-2-alxndr@bu.edu/
+> > has exposed issue (unexpected uplug/unplug flow) with root cause in OVM=
+F.
+> > Firmware was letting non involved APs run wild in normal mode.
+> > As result AP that was calling _EJ0 and holding ACPI lock was
+> > continuing _EJ0 and releasing ACPI lock, while BSP and a being removed
+> > CPU were still in SMM world. And any other plug/unplug op
+> > were able to grab ACPI lock and trigger another SMI, which breaks
+> > hotplug flow expectations (aka exclusive access to hotplug registers
+> > during plug/unplug op)
+> > Perhaps that's what you are observing.
+> >=20
+> > Please check if following helps:
+> >   https://github.com/kraxel/edk2/commit/738c09f6b5ab87be48d754e62deb72b=
+767415158
+> >  =20
+>=20
+> I haven't actually seen the guest crash during unplug, though certainly
+> there have been unplug failures. I haven't been keeping track of the
+> unplug failures as closely, but a test I ran over the weekend with this
+> patch added seemed to show less unplug failures.
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index f16279351db5..9ad37c012189 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->pf_cache.va = NULL;
-+	page_frag_cache_init(&n->pf_cache);
- 
- 	return 0;
- }
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index 67ac8626ed9b..0a52f7a179c8 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -7,6 +7,16 @@
- #include <linux/mm_types_task.h>
- #include <linux/types.h>
- 
-+static inline void page_frag_cache_init(struct page_frag_cache *nc)
-+{
-+	nc->va = NULL;
-+}
-+
-+static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
-+{
-+	return !!nc->pfmemalloc;
-+}
-+
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 74149dc4ee31..ca01880c7ad0 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -753,14 +753,14 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
- 	if (in_hardirq() || irqs_disabled()) {
- 		nc = this_cpu_ptr(&netdev_alloc_cache);
- 		data = page_frag_alloc(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 	} else {
- 		local_bh_disable();
- 		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 
- 		nc = this_cpu_ptr(&napi_alloc_cache.page);
- 		data = page_frag_alloc(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 
- 		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 		local_bh_enable();
-@@ -850,7 +850,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		len = SKB_HEAD_ALIGN(len);
- 
- 		data = page_frag_alloc(&nc->page, len, gfp_mask);
--		pfmemalloc = nc->page.pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	}
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe7..694c4df7a1a3 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
- 	 */
- 	rxrpc_purge_queue(&conn->rx_queue);
- 
--	if (conn->tx_data_alloc.va)
--		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
--					conn->tx_data_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&conn->tx_data_alloc);
- 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
- }
- 
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..a8cffe47cf01 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
- #endif
- 	rxrpc_purge_queue(&local->rx_queue);
- 	rxrpc_purge_client_connections(local);
--	if (local->tx_alloc.va)
--		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
--					local->tx_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&local->tx_alloc);
- }
- 
- /*
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 825ec5357691..b785425c3315 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1608,7 +1608,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1618,8 +1617,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
--	if (pfc->va)
--		__page_frag_cache_drain(virt_to_head_page(pfc->va),
--					pfc->pagecnt_bias);
-+
-+	page_frag_cache_drain(&svsk->sk_frag_cache);
- 	kfree(svsk);
- }
-diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-index fdf204550c9a..36543a129e40 100644
---- a/tools/testing/selftests/mm/page_frag/page_frag_test.c
-+++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-@@ -117,7 +117,7 @@ static int __init page_frag_test_init(void)
- 	u64 duration;
- 	int ret;
- 
--	test_nc.va = NULL;
-+	page_frag_cache_init(&test_nc);
- 	atomic_set(&nthreads, 2);
- 	init_completion(&wait);
- 
--- 
-2.34.1
+it's not only about unplug, unfortunately.
+QEMU that includes Alexander's patch, essentially denies access to hotplug
+registers if unplug is in process. So if there is hotplug going at the same
+time, it may be broken by that access deny.
+To exclude this issue, you need to test with edk2 fix or use older QEMU
+without Alexander's patch.
+
+
+> I'm still getting hotplug failures that cause a guest crash though, so
+> that mystery remains.
+>=20
+> > So yes, SIPI can be lost (which should be expected as others noted)
+> > but that normally shouldn't be an issue as wakeup_secondary_cpu_via_ini=
+t()
+> > do resend SIPI.
+> > However if wakeup_secondary_cpu is set to another handler that doesn't
+> > resend SIPI, It might be an issue. =20
+>=20
+> We're using wakeup_secondary_cpu_via_init(). acpi_wakeup_cpu() and
+> wakeup_cpu_via_vmgexit(), for example, are a bit opaque to me, so I'm
+> not sure if those code paths include a SIPI resend.
+
+wakeup_secondary_cpu_via_init() should re-send SIPI.
+If you can reproduce with KVM tracing and guest kernel debug enabled,
+I'd try to do that and check if SIPI are being re-sent or not.
+That at least should give a hint if we should look at guest side or at KVM/=
+QEMU.
 
 
