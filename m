@@ -1,133 +1,135 @@
-Return-Path: <kvm+bounces-27821-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27822-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E72498E336
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 20:56:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 665F898E3D2
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 22:02:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63B711C22B0F
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 18:56:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC554B23D95
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 20:02:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E19217300;
-	Wed,  2 Oct 2024 18:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29C5216A17;
+	Wed,  2 Oct 2024 20:02:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="VYeJxk1L"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="F6YCI9X7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A3E216A0F
-	for <kvm@vger.kernel.org>; Wed,  2 Oct 2024 18:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28CE1946A0
+	for <kvm@vger.kernel.org>; Wed,  2 Oct 2024 20:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727895325; cv=none; b=tyjLUXUE6K0Ap3uwjpIwfYHn44YPJS5rXrCY41+g0ShUFVj3z0Qjb8PbGg0GTMQPyONGvkdS4HtzJbJma9eeVzDhABZhwbR3CNWu4r+CX/T+SxMJG3kQYOScX2iFcStB4x1MBbvSFCSTtvFBnfjP7SiELTWXbuHip9EQ7ueVBmQ=
+	t=1727899337; cv=none; b=Er3+j+Kl4yMjwdqRvbMXj1rWfrmkzV2j281bmQNmtlMGJXjupDH78tjTCdDrd48M8HsrYBZ9BXgll/9GQ+zxrckixPA8knZnTYYg9QEq/hHsXTbd8zbLaVWu6Hc9E/uHredyYTzMItpbwAH6tiFUhPRdbAVZDsKlVzJZV7MQre4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727895325; c=relaxed/simple;
-	bh=0ElWqU503cDmthQrkETKoibn+yxrDRTlI0NA4DOSxVY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ttOXBGnfxFzRkFCgMLWIdjiicdEFhURKn1RWf8Y1fMMwtmIY6zXDp4SoWJ4vwchHIeo0YuhOai2gI+t62Vx1wtwXYUQ9W2KmMxmHJjA/zIQAnZ4ErTwR9RVY83GvEECeaaazD3xPW0XqbxfFjbGqZKfRdPd+huJbo+Xy657KD5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=VYeJxk1L; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e25cfe70b37so130081276.1
-        for <kvm@vger.kernel.org>; Wed, 02 Oct 2024 11:55:23 -0700 (PDT)
+	s=arc-20240116; t=1727899337; c=relaxed/simple;
+	bh=26ch3VLdZlgASzApmc+sdmN42sQrSbzi8ri/yXB2hcg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YBnfehUnktm+vnQwOrjmTGYtsYDZek4W4MkapUGowN5YTsdcsfSsnGuDNalpwiAOTwOzxReB+Qlwe4mqpZWS5Jyi5GblBOHp5tm2XRNffmg5kiQEIXT+tQG4dGoM1FM0KQrqjhcim3r7KKqorTu/raNEC3TaoqIXtN9nzN/1eB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=F6YCI9X7; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5399651d21aso118413e87.3
+        for <kvm@vger.kernel.org>; Wed, 02 Oct 2024 13:02:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1727895322; x=1728500122; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0ElWqU503cDmthQrkETKoibn+yxrDRTlI0NA4DOSxVY=;
-        b=VYeJxk1L6Smd6iHmZ08M4AKC6KTz3GEIw9WBw8D1yfw9EtwO/bvbZ4zSY7WhkzjThf
-         zsIxy91GCL/4ZtdHCSfcB+YTZFMzKzyVRerXw2xxrMnO7Z7daTXZODNvhBcD5jdh+tNW
-         zagH9R39VAH0qQzqAmthVEC7Emon9OtEP5FqD0QbvooZ8G3+C/HvS2LmUAPNfLXj5Y8j
-         FXSDEjqCbggq1rmB1amKimSj23dBuuszFCeRIQUM+MBctu8nx1gTBjgcLzBW9Hs5gxlY
-         jwI0sQZhAWmOh5+23lE+rnm+bu2mDgHZjQX/uJ8Ie8wzJvWXt1KYJgozTVNlHbnMY7+o
-         kK5w==
+        d=linux-foundation.org; s=google; t=1727899333; x=1728504133; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=felyUMZ1epn3qYN0qQZjWDzIrXK7nsXRUmOCiXehfgQ=;
+        b=F6YCI9X7JvHDccGLljtWDsml9Fk9JCWOzOadJ7FR4STve1GUn+OxFA8fjopuxE+sUq
+         txxI1BfH7pszy/lcBFHCjG49xAtMEfaLpDLNwzH7SKQrL7PVi7lu/XK1wouZaimjUt6q
+         i3Uy4CXRrFl3rrXYlddf8CvoVkXLjopVEcRqs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727895322; x=1728500122;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0ElWqU503cDmthQrkETKoibn+yxrDRTlI0NA4DOSxVY=;
-        b=RlNAhEvdFogpXpBcBIYUef/5exmqs9vtfTLIw0vzxHsJHor8+Kll0yflp+8jbt40Sq
-         FYwpAL7DaVeFjV51+3WX5FPc3us0DU33bpu7kc6s08YvAe4olnzF3pEMcdAhlSy3WQyK
-         JMPfJx1MvTpEzA8evf4dwl6NVWJoOxFD5oV6n/edyvznxVG/VpwOSgoAPzcUtDzJw5C5
-         noA1ZGN26J6tjn3T1QzLgkq2zpBLkfTlJMZaURq3udLA3+g+QhjYUmk9U3VPW5bLWl9T
-         RxmITSh3sfnmsK1YXnK1O4RH10y58uFSaB+TAiBlrjqzz610YoyggUFqXJvz2ck2nq1h
-         ZHEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUy2MsSV7/qSSZybzgs6ULug6BagXj1QhEWusg5oKV8qGJdkC52qEUZJGOXMr/KyokHeMI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfBdIio8QV3W0Qc2f53lkTtJLn6YuuvFlUHyiHJbYtP7TN6UeU
-	Ss7FXJcahJPfkpSD9KXIWu7iErjwgclqRG1AF5S00C8fshrS/aEYFxK624+gj2k=
-X-Google-Smtp-Source: AGHT+IE/4YDKGNMGbzf1cBV3ciJ6gTYpbDOAXQ+3Q/QHeGIUP/Ee9BC7INUAzJEGFa5vHK8ha9AvWQ==
-X-Received: by 2002:a05:6902:1002:b0:e20:268b:8ad0 with SMTP id 3f1490d57ef6-e263838509amr3699684276.5.1727895322247;
-        Wed, 02 Oct 2024 11:55:22 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45d74dacc1csm20873031cf.36.2024.10.02.11.55.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 11:55:21 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sw4VM-00AAFG-Sb;
-	Wed, 02 Oct 2024 15:55:20 -0300
-Date: Wed, 2 Oct 2024 15:55:20 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: James Gowans <jgowans@amazon.com>
-Cc: linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	"Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
-	iommu@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Alexander Graf <graf@amazon.de>, anthony.yznaga@oracle.com,
-	steven.sistare@oracle.com, nh-open-source@amazon.com,
-	"Saenz Julienne, Nicolas" <nsaenz@amazon.es>
-Subject: Re: [RFC PATCH 05/13] iommufd: Serialise persisted iommufds and ioas
-Message-ID: <20241002185520.GL1369530@ziepe.ca>
-References: <20240916113102.710522-1-jgowans@amazon.com>
- <20240916113102.710522-6-jgowans@amazon.com>
+        d=1e100.net; s=20230601; t=1727899333; x=1728504133;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=felyUMZ1epn3qYN0qQZjWDzIrXK7nsXRUmOCiXehfgQ=;
+        b=lyF6vNQkrx+s2Zy4ScsseMEOvMM3eyE8aJ9sjMrFS5yYLFBKynm6uM9tF5mIrZTMH5
+         K7ISCKZ21qVJu94JTIoHIdimCGcU2bBo7qtvMEOuU018/ANRtDuCSE3xjkkuZqdthJNy
+         maT9yIoxQzYeWPPg/QWS/xF5xWrneFANZw9p7Qk5RnQfMR3K6ZfkmFZwn4RGxo95k173
+         wnp/tMfZQn5q9rKuvajQc10cJsLgHo/aEGgbImdiGUFgUgsvPun+vudK6oO4ZSPFDgFL
+         +XYYDpXEbzh6XHOz0ePXtjyAtu7tBbJp5XWfTmE8POr09US4lecRjscclhCJrLh772se
+         KBvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHdb10FTJYA9thozrUlTJnWw5P/3TplZZ4+4vnEk0V1CRp9fem4zG+dkeVuhlKRDLqU90=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkKgpt573rZlAFIE5kY+2GwlHzVJjQUDlGEWcFRDWSVFJBhbYa
+	fU+rM9GGNhml/ioEGh1NtTgTPcCnEIBss/66TFfmQ2g+CLQ8TLlf5DNeeRUSkqijJZLFk6m2uW7
+	+qliOwA==
+X-Google-Smtp-Source: AGHT+IGdH4AHai3EimNffnKXbhEls73vKL0Rjz/dqpkUcdzbRYoADVzY8CTMH01UQJ2WFUi6cAG0gA==
+X-Received: by 2002:a05:6512:158d:b0:533:45dc:d2f0 with SMTP id 2adb3069b0e04-539a079e82bmr2297980e87.46.1727899332809;
+        Wed, 02 Oct 2024 13:02:12 -0700 (PDT)
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com. [209.85.167.49])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-538a0439a72sm2014766e87.202.2024.10.02.13.02.09
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Oct 2024 13:02:09 -0700 (PDT)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5399651d21aso118349e87.3
+        for <kvm@vger.kernel.org>; Wed, 02 Oct 2024 13:02:09 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUvvXoiHWKfKSvuc9KTYw5CJ/z2/QSSX+/YQKJbtLXWLoGg97JWYGE910k5ycyVZhtMpV0=@vger.kernel.org
+X-Received: by 2002:a05:6512:e9e:b0:535:6795:301a with SMTP id
+ 2adb3069b0e04-539a079eb59mr2506573e87.47.1727899328912; Wed, 02 Oct 2024
+ 13:02:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240916113102.710522-6-jgowans@amazon.com>
+References: <20240925150059.3955569-30-ardb+git@google.com>
+ <20240925150059.3955569-55-ardb+git@google.com> <99446363-152f-43a8-8b74-26f0d883a364@zytor.com>
+ <CAMj1kXG7ZELM8D7Ft3H+dD5BHqENjY9eQ9kzsq2FzTgP5+2W3A@mail.gmail.com>
+In-Reply-To: <CAMj1kXG7ZELM8D7Ft3H+dD5BHqENjY9eQ9kzsq2FzTgP5+2W3A@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 2 Oct 2024 13:01:52 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wj0HG2M1JgoN-zdCwFSW=N7j5iMB0RR90aftTS3oqwKTg@mail.gmail.com>
+Message-ID: <CAHk-=wj0HG2M1JgoN-zdCwFSW=N7j5iMB0RR90aftTS3oqwKTg@mail.gmail.com>
+Subject: Re: [RFC PATCH 25/28] x86: Use PIE codegen for the core kernel
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Uros Bizjak <ubizjak@gmail.com>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
+	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
+	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Sep 16, 2024 at 01:30:54PM +0200, James Gowans wrote:
-> Now actually implementing the serialise callback for iommufd.
-> On KHO activate, iterate through all persisted domains and write their
-> metadata to the device tree format. For now just a few fields are
-> serialised to demonstrate the concept. To actually make this useful a
-> lot more field and related objects will need to be serialised too.
+On Wed, 2 Oct 2024 at 08:31, Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> I guess you are referring to the use of a GOT? That is a valid
+> concern, but it does not apply here. With hidden visibility and
+> compiler command line options like -mdirect-access-extern, all emitted
+> symbol references are direct.
 
-But isn't that a rather difficult problem? The "a lot more fields"
-include things like pointers to the mm struct, the user_struct and
-task_struct, then all the pinning accounting as well.
+I absolutely hate GOT entries. We definitely shouldn't ever do
+anything that causes them on x86-64.
 
-Coming work extends this to memfds and more is coming. I would expect
-this KHO stuff to use the memfd-like path to access the physical VM
-memory too.
+I'd much rather just do boot-time relocation, and I don't think the
+"we run code at a different location than we told the linker" is an
+arghument against it.
 
-I think expecting to serialize and restore everything like this is
-probably much too complicated.
+Please, let's make sure we never have any of the global offset table horror.
 
-If you could just retain a small portion and then directly reconstruct
-the missing parts it seems like it would be more maintainable.
+Yes, yes, you can't avoid them on other architectures.
 
-Ie "recover" a HWPT from a KHO on a manually created a IOAS with the
-right "memfd" for the backing storage. Then the recovery can just
-validate that things are correct and adopt the iommu_domain as the
-hwpt.
+That said, doing changes like changing "mov $sym" to "lea sym(%rip)" I
+feel are a complete no-brainer and should be done regardless of any
+other code generation issues.
 
-Eventually you'll want this to work for the viommus as well, and that
-seems like a lot more tricky complexity..
+Let's not do relocation for no good reason.
 
-Jason
+             Linus
 
