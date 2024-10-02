@@ -1,248 +1,416 @@
-Return-Path: <kvm+bounces-27818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C5B898E18C
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 19:20:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A25FD98E2C3
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 20:44:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 014FB1F23FDC
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 17:20:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A36E1F21727
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 18:44:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70761D151B;
-	Wed,  2 Oct 2024 17:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E2B2141C5;
+	Wed,  2 Oct 2024 18:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IbjqXHK2"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kJPT6CUD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2058.outbound.protection.outlook.com [40.107.96.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA261C9B91
-	for <kvm@vger.kernel.org>; Wed,  2 Oct 2024 17:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727889615; cv=none; b=Z0Fmj7cjjdmFTOZOMppugQaOR7OCHaXC2e5ZjYtV98N7qJTo0vVxCJegXbpNOcdRags8qVZZSnoVuQOf5l2C7o22sQz86N3pDVLcOLmdeEMzSJyJ6Qe4438sNCq/FL6ea4q+p3WRNLjYmv79nraMLgtAwGwBn4I6+344zV64pmQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727889615; c=relaxed/simple;
-	bh=R4SspyOREhpRqw0U0DoPB6rQ4u2LCvhJhBxstmn19aA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dgd6Rhn/SngjzjDhXMdOwkjR5ypKNjwCOr0uYvdZmAHX9h1qxMU2vESHtj9Ox3L5AkZbZmuRia4yUmz5Vt4a6ck9jZBTpjsQ72wZdSWB/+OENeQYMyGGsdVvTtEBWCXQ3XWZEii2TaGbnf82qVFEFGoSaJ+gFQNJeknTIyDufO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IbjqXHK2; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e2608234531so63134276.1
-        for <kvm@vger.kernel.org>; Wed, 02 Oct 2024 10:20:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727889613; x=1728494413; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/uCdyI8jS804JsslUk1rsNaBCSgvYPSl8E/59XMS004=;
-        b=IbjqXHK2IqOJvbeX0/jsAiW2p1r8MrC/YTHti0scEkDGLLm+2xhtge1b3VdB7Tnjz9
-         hFqfU+QSTaRQftwOW4avGPnerfuTDK/Gw6D023FNn2rTCYh3HZuI2GQr0v/LvpVGeqo/
-         /4gWJ0WkGSWggjNXfc2yHyhM4FIZtJZDqL3lxZIYzJn/FdG6GgFZNVG5Ouw7DgtgzlYd
-         SMLg2Vl4wY17ckIGA9VuuJjMdVECyeHs6ef1V2P9UbzBdux1EFVo4HhWVAUm6KZjIPo0
-         GH2KNPN1ZACLVouohUyl4G85A4qNSR2m6REEujxU+g5nzphvmGaJSbHHUY9T4DTsCAvs
-         geAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727889613; x=1728494413;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/uCdyI8jS804JsslUk1rsNaBCSgvYPSl8E/59XMS004=;
-        b=wpzhCM9bWW6ePCHWhxDYqdzFEWhKi5oulqO32FKlZShtWJF/y7UAnZt2+WDIBvIcwL
-         wORWsIFyn0gfX+FP+NY4eictDRuTngtHM7xsJfUuYc63J0AIhIvB2TXgpNskvKvePMDG
-         Y8ZQPvkp7zEBFg0ZXAxBFge3smbupWt/wg8aUlBBpZ2vlout4I919pXSeSqV3jx1E3hT
-         L7anCVt/JeQzegmjJbjq3tw/q82RZlyd/0iWtZIzjJmvXnPGAcN+atMU/FHKQwwuoHiD
-         gOTy4NWT/JOFTjKeqQ0FinkPZjH+rGHgudvvzxG1iYZafgiQGNiyBpUj8n55bbVK54Du
-         DQ5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUJA5bVAiOtZeY7bU48hTrqPldYMpPcoiIGStj1gJM9TSxG8AJ0zHbz6zurlQIE4uSJtcY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVo5beyn1yWp+O+CqCSTAje5r0tls/0E6Z+Lhhea7p37oH2Wkm
-	hCMQFP4LtvANb0YT++WdtffpF2LtN9vp6ayWRP5+TtKCXpXq8KJyJMMnTqjC5jMtA2Ab96D6225
-	UPA==
-X-Google-Smtp-Source: AGHT+IHTxB/8VT06nMzewGt7WwSwpKYJ7w64wy6nIv6mhyMEe5hYfA0MoR0becM2jWbBgW7TTsSnyvHcxIc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:10c7:b0:e24:a00a:518e with SMTP id
- 3f1490d57ef6-e263840d766mr18373276.7.1727889613028; Wed, 02 Oct 2024 10:20:13
- -0700 (PDT)
-Date: Wed, 2 Oct 2024 10:20:11 -0700
-In-Reply-To: <Zv15trTQIBxxiSFy@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3606F2141B9;
+	Wed,  2 Oct 2024 18:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727894685; cv=fail; b=gi0f0fKM/4EqhYkScBUqfqzeHYull33S/Wiw8vSv93je8HuZMamN7EUIRxCzTZjl0LdiX9op8uPjEiE1Tm5mRRL7j4NQ/YO6e/Q4xqSwpUdiBt9zxwhXDx3RCBVD1YYEiwXjrpizkctuuKgKMpqS6q1jRtcn8fwo79InspmCxOI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727894685; c=relaxed/simple;
+	bh=N5XeXQNuO8k+AxowErcqXb3Z8KuOD7ufJlmGnYUESc0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QTxn1pyARuV8HBij/dqEkrX2cMCLU+bsvrLqVNyyQzkQM4EMgG8L5O39YCzx0U5vJL1u+rJpmCHTDC9fSRoB8ipgwqUy1nATZMsCw8iIfQKtZsdtrujFg1HJwOaNAw0hjBaioTo/pONzw9JBpeiCfkjVV0r31RvTVtfrWi9bH2M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=kJPT6CUD; arc=fail smtp.client-ip=40.107.96.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WuJZjdSR0fT+CYu1D9wJFgCPXbD8JOC7URqdV958S4/EOlIPJb6CWF6PF16sf4v2tE8HnQnL6AT0bJYfpjqZOILzhOi2IfY9Qh87poXa8hyBvv+uziO+PuHeizURJGlhItRQeqyYlBORGJJAHbRzjt3Ky78bde2nyyn8CL4twslh8C83yaIOppXZ+1cYaiCLCDVy2PQu3LcSEZI2QcebObwGq7TQwAhCFfLQhd8h4NXK1seE07kLQpl0AIiRpD34MocR4K/uuQS9dt65omU4extj8io9cdDJ3+75Vy1ZdADA4qlaGxVc+ccaeddVy3ngmUtBWVbI7TbYN6GKpgRGnQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+1GKFABZhIQ7QgPJpOg/JRw24oBn+5uCW30J1p5T6MY=;
+ b=bvod/zELnwXNNrNERM5rB57RqQ5sXmgN7553SmbANqYKJFY0HGUWLKc5lo0EMK0CbW3o+Ki6LZo/SzLTfqhgOaxzE7kET92QyFEeTWVsLOHDCJS4Jc5FnGajnHXMwPqRBVkXqFZJ1loEQkXZdnbLqSRJ2xHNPFcBzLZTtUGBmkpj5qfBcJpSQHidE5MQ8qrUOvIBWZ+1w6URhax4HhHV0CBukECLtqncfIFIxzExYlhG3CCclXDUDRJ1/BxgeP5o3ikjaUoPvElc3Xgxl/ZmJF4pMBziG6WQfYc03MaRgr6APf5AkMz0EsKtqQdfinA0t6TVnle9sQsu7A25NSgOcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+1GKFABZhIQ7QgPJpOg/JRw24oBn+5uCW30J1p5T6MY=;
+ b=kJPT6CUDmsS+obXlsg2B6oLcoQWSOuXkGL1E3b6B6ydwuuzhvAIMWqP2LTw0CRINqK7LKau/Q604SW/Yn7J68gaaTjVnym7pzu2qBV8ZYgMzzHFEtwEEK51/e/IecsKjtJ7HAghCmuk5DE5ae7Kz28ekmQwAmcqjEY3PrPeq5DA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by CH3PR12MB8260.namprd12.prod.outlook.com (2603:10b6:610:12a::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.27; Wed, 2 Oct
+ 2024 18:44:39 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef%7]) with mapi id 15.20.8005.026; Wed, 2 Oct 2024
+ 18:44:39 +0000
+Message-ID: <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com>
+Date: Wed, 2 Oct 2024 13:44:35 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
+Content-Language: en-US
+To: Peter Gonda <pgonda@google.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+ herbert@gondor.apana.org.au, x86@kernel.org, john.allen@amd.com,
+ davem@davemloft.net, thomas.lendacky@amd.com, michael.roth@amd.com,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+References: <cover.1726602374.git.ashish.kalra@amd.com>
+ <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
+ <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com>
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN7PR04CA0033.namprd04.prod.outlook.com
+ (2603:10b6:806:120::8) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <Zu0vvRyCyUaQ2S2a@google.com> <20241002124324.14360-1-mankku@gmail.com>
- <Zv1gbzT1KTYpNgY1@google.com> <Zv15trTQIBxxiSFy@google.com>
-Message-ID: <Zv2Ay9Y3TswTwW_B@google.com>
-Subject: Re: [PATCH 1/1] KVM: nVMX: update VPPR on vmlaunch/vmresume
-From: Sean Christopherson <seanjc@google.com>
-To: "Markku =?utf-8?Q?Ahvenj=C3=A4rvi?=" <mankku@gmail.com>
-Cc: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	janne.karhunen@gmail.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mingo@redhat.com, pbonzini@redhat.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Oct 02, 2024, Sean Christopherson wrote:
-> On Wed, Oct 02, 2024, Sean Christopherson wrote:
-> > On Wed, Oct 02, 2024, Markku Ahvenj=C3=A4rvi wrote:
-> > > Hi Sean,
-> > >=20
-> > > > On Fri, Sep 20, 2024, Markku Ahvenj=C3=A4rvi wrote:
-> > > > > Running certain hypervisors under KVM on VMX suffered L1 hangs af=
-ter
-> > > > > launching a nested guest. The external interrupts were not proces=
-sed on
-> > > > > vmlaunch/vmresume due to stale VPPR, and L2 guest would resume wi=
-thout
-> > > > > allowing L1 hypervisor to process the events.
-> > > > >=20
-> > > > > The patch ensures VPPR to be updated when checking for pending
-> > > > > interrupts.
-> > > >
-> > > > This is architecturally incorrect, PPR isn't refreshed at VM-Enter.
-> > >=20
-> > > I looked into this and found the following from Intel manual:
-> > >=20
-> > > "30.1.3 PPR Virtualization
-> > >=20
-> > > The processor performs PPR virtualization in response to the followin=
-g
-> > > operations: (1) VM entry; (2) TPR virtualization; and (3) EOI virtual=
-ization.
-> > >=20
-> > > ..."
-> > >=20
-> > > The section "27.3.2.5 Updating Non-Register State" further explains t=
-he VM
-> > > enter:
-> > >=20
-> > > "If the =E2=80=9Cvirtual-interrupt delivery=E2=80=9D VM-execution con=
-trol is 1, VM entry loads
-> > > the values of RVI and SVI from the guest interrupt-status field in th=
-e VMCS
-> > > (see Section 25.4.2). After doing so, the logical processor first cau=
-ses PPR
-> > > virtualization (Section 30.1.3) and then evaluates pending virtual in=
-terrupts
-> > > (Section 30.2.1). If a virtual interrupt is recognized, it may be del=
-ivered in
-> > > VMX non-root operation immediately after VM entry (including any spec=
-ified
-> > > event injection) completes; ..."
-> > >=20
-> > > According to that, PPR is supposed to be refreshed at VM-Enter, or am=
- I
-> > > missing something here?
-> >=20
-> > Huh, I missed that.  It makes sense I guess; VM-Enter processes pending=
- virtual
-> > interrupts, so it stands that VM-Enter would refresh PPR as well.
-> >=20
-> > Ugh, and looking again, KVM refreshes PPR every time it checks for a pe=
-nding
-> > interrupt, including the VM-Enter case (via kvm_apic_has_interrupt()) w=
-hen nested
-> > posted interrupts are in use:
-> >=20
-> > 	/* Emulate processing of posted interrupts on VM-Enter. */
-> > 	if (nested_cpu_has_posted_intr(vmcs12) &&
-> > 	    kvm_apic_has_interrupt(vcpu) =3D=3D vmx->nested.posted_intr_nv) {
-> > 		vmx->nested.pi_pending =3D true;
-> > 		kvm_make_request(KVM_REQ_EVENT, vcpu);
-> > 		kvm_apic_clear_irr(vcpu, vmx->nested.posted_intr_nv);
-> > 	}
-> >=20
-> > I'm still curious as to what's different about your setup, but certainl=
-y not
-> > curious enough to hold up a fix.
->=20
-> Actually, none of the above is even relevant.  PPR virtualization in the =
-nested
-> VM-Enter case would be for _L2's_ vPRR, not L1's.  And that virtualizatio=
-n is
-> performed by hardware (vmcs02 has the correct RVI, SVI, and vAPIC informa=
-tion
-> for L2).
->=20
-> Which means my initial instinct that KVM is missing a PPR update somewher=
-e is
-> likely correct.
-
-Talking to myself :-)
-
-Assuming it actually fixes your issue, this is what I'm planning on posting=
-.  I
-suspect KVM botches something when the deprivileged host is active, but giv=
-en
-that the below will allow for additional cleanups, and practically speaking=
- doesn't
-have any downsides, I don't see any reason to withhold the hack-a-fix.  Tho=
-ugh
-hopefully we'll someday figure out exactly what's broken.
-
----
-From: Sean Christopherson <seanjc@google.com>
-Date: Wed, 2 Oct 2024 08:53:23 -0700
-Subject: [PATCH] KVM: nVMX: Explicitly update vPPR on successful nested
- VM-Enter
 MIME-Version: 1.0
-Content-Type: text/plain; charset=3DUTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|CH3PR12MB8260:EE_
+X-MS-Office365-Filtering-Correlation-Id: 98a4f5ef-148a-43e7-4c6b-08dce31245a1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OWJMUXJhQjl1SW9DbnpQTERLMFZBMnFuZUJJczhzek8rcGQ4VDVWQVJsK01V?=
+ =?utf-8?B?eGtDellRMlg2ZXpYRHh0aGRFVVJmVGxJQ3hWRkM3aVhjL1cvcFlnQUg2cFl2?=
+ =?utf-8?B?cUdadE9QYytqTjg2VklSVjdKVzFEbGkwaTY1ekYvV1ZBYTJOUFZGRE9UWXpI?=
+ =?utf-8?B?NzM3Wm0yYkVWa1R2OHRvdDZPc0ZnS2lkc01XUkxGMzFSZGUrTmJXdnJ6R3Zk?=
+ =?utf-8?B?SUJYOC81MHVIVGZkV1Q0WlhNQi9TWnBqL2h5ZzdxWEdoUWd0Y3YzY2lMdi80?=
+ =?utf-8?B?UUpoQ2FoWUR0YkNHZkNCOU4wOGluTnhNS1pzczhLU052Q1Q2SmF4NS9PaGpq?=
+ =?utf-8?B?eEhkM2Z6dlM1TU5INEFVQmt2QzVVbHVOaFd0WVhIV2swRUhiQ1hqTXB1NHBV?=
+ =?utf-8?B?VnhIMlZHWFVjSEEwT0dsWmwrOWZYTnAxdkVJWVVQRStxOW5ycnpGNnRpY1cv?=
+ =?utf-8?B?QzVFbnZubFJMVWpxbWFyS2NvMmhtclR3N1FqMlRtUG9LZ1I5S1UxcHJ4WVRn?=
+ =?utf-8?B?Y09WZ3NxZU16c2I2Y29RN0ZHTE5VNlIzWFVUWG5oakdYZHQ0eGFBWjdKMXJl?=
+ =?utf-8?B?RU9Gbm1lcktFQ1ZWSDBKanh5WVZaOExONVNBUGtuV0IrNzRLYnR5RTliRDhL?=
+ =?utf-8?B?bUZRK1lLUnF4MnAzeEEzRFJYSk81ZUZJWm1Zbnhqc0Q5SkZpWmlvNklveExP?=
+ =?utf-8?B?a01janVjTkc4YXlVMmhaTjgxSGJKNjJNcTVxMllQaXpLY1g4c2JYZWZycEMw?=
+ =?utf-8?B?bDh4cFlEeXZFczB5bSswZHp2MWNEWWM4ei81OW1rb2tkVWtybzVqdGNqSUMw?=
+ =?utf-8?B?R0FVdkg2WktkTCtGQ1hWb0JJdEh6ZzArcWxGbVlQYVVHSjZubXFzOEptdStV?=
+ =?utf-8?B?cFFEQTBFMTRRRm93bklsRElqekZxUml1TjkzNHp6SmpCdlBDR2ZaalVOVTI4?=
+ =?utf-8?B?bTVnR2VFdFQ0UC9TTUhFdS9FT0ozcHdBc3EzYS83bmZuYXY4aDVuR1dTMVA0?=
+ =?utf-8?B?Wm42WDZzVXhvZmFaYXBCM05qU0p3VUJUdDhVRzBIdlBBN0d2VFpWdVlqTVBU?=
+ =?utf-8?B?RVBZeXFJenovSGZmMHJjL3FxTEhleW0xREdYS0VZTUJDV3JqNGpkajFKRFl2?=
+ =?utf-8?B?OXlzb093UlR1NHdlekRPM1VRM1FvU2hOT1RzODZ5WkVCYi9qNy9Fa1R1ZE5D?=
+ =?utf-8?B?RHR5eGxBZnhmNFRJS3BkSTlvUDhxL1NpWmx2dlpicE1kdDM2ekh6empHM3Z4?=
+ =?utf-8?B?N2t1TlBhVEdQNUVwSmhWOWh1Yjl5alhKMmQ1aDBKNHFCOEtWa0FtZk83Q1JB?=
+ =?utf-8?B?ZzlTbFEvRy9nYVJsYmE1NWlMcUdkZWltVWZOTXJqUFZTazd1bFI0SWZ6eTFN?=
+ =?utf-8?B?TW5ZSEwvN1JUSFJBdnp4eC8rV2NUdSsxb1BOYkV0a1RFSlUvUjhmcjhpYWhw?=
+ =?utf-8?B?S1RFc0E4ZGpaaThOY3UwY3crRUgxRnZTdjQ4WnBUWi9kWVlxc0pUMG95ZnFu?=
+ =?utf-8?B?TkJ1azJBSTlTN0RRNVJLTE5ZQjhteFlMd2EwOHlxSTczOWRndFF4eVNRZXM0?=
+ =?utf-8?B?TlQ4NVZEM2drOU4vSklaSDBNRGtoMURPTjVkWGVaY1ZGZmJKajZKOWZLaFdC?=
+ =?utf-8?B?UURONjV6dTA5bmlIN1B0LzJnclYxSVVWQ2tjckNWTllsc2ZQQkhRWkxFMHNo?=
+ =?utf-8?B?OWRVVGpHKzRFQVRncDczYk5WUGtLWFY5enpvWHZWVldFbXh2NThBMlVRPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TSsyQWdITFk3dTBZcDNXT0NPS0ZSUkppdEY5bS81ZVduend0WGg5SWsrcjlM?=
+ =?utf-8?B?R3RaUmlyNzdMZXEvZlUyNlZaeFhabGFVU0RwUkpXMnVwejl2bWl4Vzd5V0hw?=
+ =?utf-8?B?b3NTRDgwSklLNGZqMldMMFdYbTI2bkZHVmR1a0ljeU1VMFY2TS9RT2tQTm45?=
+ =?utf-8?B?UlVlNDJmT2R6OVpDTW8wWUtYajBmSDdFQmhYSi9CVW5PeEJhNHBGa1ErYU8y?=
+ =?utf-8?B?YjBsVXJpUHYvWXNrbE9ZSTA3WW9CclhzNUsvVjRZVmZsaElkT04yOTZnays5?=
+ =?utf-8?B?N09GbmpUVGdQSnBjRGRvems1djFudWI0ZUdrYXRqOGNRZlJMeklQSm9mVklD?=
+ =?utf-8?B?a005cGhuUWNOT0MxYjFpQ0ZmVEZEY1J0dEVYSWM5WmxKQjNOMWk4d2hzRFBr?=
+ =?utf-8?B?TnQ5SlJSb2pwQ3RMbE1DVTNCaGtsNmdhUGNHejMxUTNSeGhYVk5hOXJaaWVD?=
+ =?utf-8?B?SmJxeXozRktRYWJheGFDUXVHZHpMb3ZIUCsva1hQWG1SVld1QnJRVWF2TjVm?=
+ =?utf-8?B?enRtT21lMnB3dzVjZDExaEVQdXEyQ3RDaWZLZkxYZXEreldybEZMTWVCenZM?=
+ =?utf-8?B?dTlrLy9qUkFnMFFEd1NSYmFTR0hBcnljZ2w2eW5nT3ErcW5yeUtoRG5KN1pG?=
+ =?utf-8?B?TVE5ODdQOHlMMWYydHYvQWlSUnF4R2hyZmcybENLSXc3YXpTZWxLQ3lwM1dp?=
+ =?utf-8?B?ZUgyQnE3MEZzNUFlNURLQll4N1FMNG5RUHJmUjR2RmhLbVpRUDk5NnF0QVRr?=
+ =?utf-8?B?amNuOThLR3Y4QWJKQnkxS2xEZHIzUXRKRngra2loL1lnaVZ4RU1QcDBJcnlK?=
+ =?utf-8?B?WVpydS9sWU5hSVJrb0RjeFNFUlBYU2hpSXVsU0JtekxwTCs4bC9WSCtuZkUw?=
+ =?utf-8?B?dGhJeTkwUS8zUkZXSjBONDhPQmhxNHk4Ylgwd3pRcWRmSTQ5UyttVWo3ejFn?=
+ =?utf-8?B?ZXgrbUpqK3JhU3p6V0VJYzBMclZFNGpvbjFuWjVkWlpXRVdlUjhlSGtUR2NN?=
+ =?utf-8?B?c3VGZVFXTnJpb1VkR0IydGFCOUxFeU40UkxZN3BoTXRSZzA4UHN3UkpMYnFH?=
+ =?utf-8?B?U1B4R0ZVTlAzUXBDNndXUlB0b083SXRRbE9qWTcyQ2FDUHlRd3pRZmc2Ly9i?=
+ =?utf-8?B?djJFaUJBZnZpL2NBYnVmOTRoSWZVamMxTmY5RjdveGZyZWtvYlFPcVg5bEg4?=
+ =?utf-8?B?akZoRmNjTHJpRVptOEU5WWk2MHlhbVgwUnFKVnI0eDdCdCtFVkk1amFOVW13?=
+ =?utf-8?B?ZGt4eTRKd1BXOEtnYW1mSndtZFcxbnN2WGlZR3BPeDU2dDlKUDU0MXNmbm91?=
+ =?utf-8?B?eGNhTGRUQS9YcHNYS0dzaTJBTnRxMlQyRWcvVENlVEdLVGJCcjYyMDZuNllO?=
+ =?utf-8?B?Rm56cDJUQUJMYVZyeGw2OW5GSW5obE1rNmpyV2U4NjhHbVlVd0lIdWZ5aEdH?=
+ =?utf-8?B?TElDdE4ya1NjeEpaWmtTVmg4VHc3VE5vNGFjRXNscnZacWpaN2Q3Sk1LNU9N?=
+ =?utf-8?B?VEFyOEdwRkZxNldIWkdPOC96R2NmSm9qOUhCOUIwam9nVnBaWlNTTmNOUWwr?=
+ =?utf-8?B?aFVoWXBBbkJOeFFmSVZFMDh2TGNoUTE3Qkpqa1kzMHorMGJSLzBpQjNlSGZ0?=
+ =?utf-8?B?a1Fwb3lGaXlGODFRbXQ2cE8rMDRxdlhQRzJ3K3ZGZXljYTBzalpDNlR6T2ZT?=
+ =?utf-8?B?NUFXRTVBdGJuSzZieEFsZ2d5cUlsaFNKZGpYUWx2a2o3ODVnZURZL1VUY016?=
+ =?utf-8?B?M0Z6dTFSR3FYelJveENkdkh3eFZjN04zWGM1RzJXUUt3bzFmeGl3MUVJcjFr?=
+ =?utf-8?B?cG1Oc1laSyt4SXhHSTJ4eHR5bWhDUEVMOVBOTnZ0bXF4SnMxWHE4aGNzQkdi?=
+ =?utf-8?B?bU1JVGFwWUJyRmcyTnZyTFBkUUx2T2NCMVQyWmIrcE9RbzAzc3RUU1FVZGJq?=
+ =?utf-8?B?RUlTU0x1RHRBeFhhdG13RTc4aWhNNTJ2TXdOSkM2Rnp5aFB6Y25JQ3BEM2Uy?=
+ =?utf-8?B?b2ZCNzFidUlPMi9UOGczTFhxaVFRaUc3dkw3R3pQMzBGRTdHZmNsUWFxZmNI?=
+ =?utf-8?B?bmNVanZBTVVCcGlKdGRGRE8wNUlYcXhITE9jay9NenRZNkI2SWVhV1pNeEJO?=
+ =?utf-8?Q?22zya42r+0zZ+mqyFshm72i/A?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98a4f5ef-148a-43e7-4c6b-08dce31245a1
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2024 18:44:39.8247
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0+pxqDTtD8fABYLdzGVJPsfwOmLhUKJdiLrUHJwmQXQf457vH2fSCMT+CPI3h6xLqeiJVkpwprOG4hu8UfbS5A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8260
 
-Request pending event evaluation after successful nested VM-Enter if L1
-has a pending IRQ, which in turn refreshes vPPR based on vTPR and vISR.
-This fixes an issue where KVM will fail to deliver a pending IRQ to L1
-when running an atypical hypervisor in L1, e.g. the pKVM port to VMX.
+Hello Peter,
 
-Odds are very good that refreshing L1's vPPR is papering over a missed
-PPR update somewhere, e.g. the underlying bug likely related to the fact
-that pKVM passes through its APIC to the depriveleged host (which is an
-L2 guest from KVM's perspective).
+On 10/2/2024 9:58 AM, Peter Gonda wrote:
+> On Tue, Sep 17, 2024 at 2:17 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>
+>> Ciphertext hiding prevents host accesses from reading the ciphertext of
+>> SNP guest private memory. Instead of reading ciphertext, the host reads
+>> will see constant default values (0xff).
+>>
+>> Ciphertext hiding separates the ASID space into SNP guest ASIDs and host
+>> ASIDs. All SNP active guests must have an ASID less than or equal to
+>> MAX_SNP_ASID provided to the SNP_INIT_EX command. All SEV-legacy guests
+>> (SEV and SEV-ES) must be greater than MAX_SNP_ASID.
+>>
+>> This patch-set adds a new module parameter to the CCP driver defined as
+>> max_snp_asid which is a user configurable MAX_SNP_ASID to define the
+>> system-wide maximum SNP ASID value. If this value is not set, then the
+>> ASID space is equally divided between SEV-SNP and SEV-ES guests.
+>>
+>> Ciphertext hiding needs to be enabled on SNP_INIT_EX and therefore this
+>> new module parameter has to added to the CCP driver.
+>>
+>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>> ---
+>>  arch/x86/kvm/svm/sev.c       | 26 ++++++++++++++----
+>>  drivers/crypto/ccp/sev-dev.c | 52 ++++++++++++++++++++++++++++++++++++
+>>  include/linux/psp-sev.h      | 12 +++++++--
+>>  3 files changed, 83 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 0b851ef937f2..a345b4111ad6 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -171,7 +171,7 @@ static void sev_misc_cg_uncharge(struct kvm_sev_info *sev)
+>>         misc_cg_uncharge(type, sev->misc_cg, 1);
+>>  }
+>>
+>> -static int sev_asid_new(struct kvm_sev_info *sev)
+>> +static int sev_asid_new(struct kvm_sev_info *sev, unsigned long vm_type)
+>>  {
+>>         /*
+>>          * SEV-enabled guests must use asid from min_sev_asid to max_sev_asid.
+>> @@ -199,6 +199,18 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+>>
+>>         mutex_lock(&sev_bitmap_lock);
+>>
+>> +       /*
+>> +        * When CipherTextHiding is enabled, all SNP guests must have an
+>> +        * ASID less than or equal to MAX_SNP_ASID provided on the
+>> +        * SNP_INIT_EX command and all the SEV-ES guests must have
+>> +        * an ASID greater than MAX_SNP_ASID.
+>> +        */
+>> +       if (snp_cipher_text_hiding && sev->es_active) {
+>> +               if (vm_type == KVM_X86_SNP_VM)
+>> +                       max_asid = snp_max_snp_asid;
+>> +               else
+>> +                       min_asid = snp_max_snp_asid + 1;
+>> +       }
+>>  again:
+>>         asid = find_next_zero_bit(sev_asid_bitmap, max_asid + 1, min_asid);
+>>         if (asid > max_asid) {
+>> @@ -440,7 +452,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>>         if (vm_type == KVM_X86_SNP_VM)
+>>                 sev->vmsa_features |= SVM_SEV_FEAT_SNP_ACTIVE;
+>>
+>> -       ret = sev_asid_new(sev);
+>> +       ret = sev_asid_new(sev, vm_type);
+>>         if (ret)
+>>                 goto e_no_asid;
+>>
+>> @@ -3059,14 +3071,18 @@ void __init sev_hardware_setup(void)
+>>                                                                        "unusable" :
+>>                                                                        "disabled",
+>>                         min_sev_asid, max_sev_asid);
+>> -       if (boot_cpu_has(X86_FEATURE_SEV_ES))
+>> +       if (boot_cpu_has(X86_FEATURE_SEV_ES)) {
+>> +               if (snp_max_snp_asid >= (min_sev_asid - 1))
+>> +                       sev_es_supported = false;
+>>                 pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+>>                         sev_es_supported ? "enabled" : "disabled",
+>> -                       min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
+>> +                       min_sev_asid > 1 ? snp_max_snp_asid ? snp_max_snp_asid + 1 : 1 :
+>> +                                                             0, min_sev_asid - 1);
+>> +       }
+>>         if (boot_cpu_has(X86_FEATURE_SEV_SNP))
+>>                 pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
+>>                         sev_snp_supported ? "enabled" : "disabled",
+>> -                       min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
+>> +                       min_sev_asid > 1 ? 1 : 0, snp_max_snp_asid ? : min_sev_asid - 1);
+>>
+>>         sev_enabled = sev_supported;
+>>         sev_es_enabled = sev_es_supported;
+>> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+>> index 564daf748293..77900abb1b46 100644
+>> --- a/drivers/crypto/ccp/sev-dev.c
+>> +++ b/drivers/crypto/ccp/sev-dev.c
+>> @@ -73,11 +73,27 @@ static bool psp_init_on_probe = true;
+>>  module_param(psp_init_on_probe, bool, 0444);
+>>  MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
+>>
+>> +static bool cipher_text_hiding = true;
+>> +module_param(cipher_text_hiding, bool, 0444);
+>> +MODULE_PARM_DESC(cipher_text_hiding, "  if true, the PSP will enable Cipher Text Hiding");
+>> +
+>> +static int max_snp_asid;
+>> +module_param(max_snp_asid, int, 0444);
+>> +MODULE_PARM_DESC(max_snp_asid, "  override MAX_SNP_ASID for Cipher Text Hiding");
+> My read of the spec is if Ciphertext hiding is not enabled there is no
+> additional split in the ASID space. Am I understanding that correctly?
+Yes that is correct.
+> If so, I don't think we want to enable ciphertext hiding by default
+> because it might break whatever management of ASIDs systems already
+> have. For instance right now we have to split SEV-ES and SEV ASIDS,
+> and SNP guests need SEV-ES ASIDS. This change would half the # of SNP
+> enable ASIDs on a system.
 
-However, KVM updates PPR _constantly_, even when PPR technically shouldn't
-be refreshed, e.g. kvm_vcpu_has_events() re-evaluates PPR if IRQs are
-unblocked, by way of the same kvm_apic_has_interrupt() check.  Ditto for
-nested VM-Enter itself, when nested posted interrupts are enabled.  Thus,
-trying to avoid a PPR update on VM-Enter just to be pedantically accurate
-is ridiculous, given the behavior elsewhere in KVM.
+My thought here is that we probably want to enable Ciphertext hiding by default as that should fix any security issues and concerns around SNP encryption as .Ciphertext hiding prevents host accesses from reading the ciphertext of SNP guest private memory.
 
-Unconditionally checking for interrupts will also allow for additional
-cleanups, e.g. the manual RVI check earlier in VM-Enter emulation by
-by vmx_has_apicv_interrupt() can be dropped, and the aforementioned nested
-posted interrupt logic can be massaged to better honor priority between
-concurrent events.
+This patch does add a new CCP module parameter, max_snp_asid, which can be used to dedicate all SEV-ES ASIDs to SNP guests.
 
-Link: https://lore.kernel.org/kvm/20230312180048.1778187-1-jason.cj.chen@in=
-tel.com
-Reported-by: Markku Ahvenj=C3=A4rvi <mankku@gmail.com>
-Closes: https://lore.kernel.org/all/20240920080012.74405-1-mankku@gmail.com
-Suggested-by: Markku Ahvenj=C3=A4rvi <mankku@gmail.com>
-Cc: Janne Karhunen <janne.karhunen@gmail.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/nested.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> Also should we move the ASID splitting code to be all in one place?
+> Right now KVM handles it in sev_hardware_setup().
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a8e7bc04d9bf..784b61c9810b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3593,7 +3593,8 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mo=
-de(struct kvm_vcpu *vcpu,
- 	 * effectively unblock various events, e.g. INIT/SIPI cause VM-Exit
- 	 * unconditionally.
- 	 */
--	if (unlikely(evaluate_pending_interrupts))
-+	if (unlikely(evaluate_pending_interrupts) ||
-+	    kvm_apic_has_interrupt(vcpu))
- 		kvm_make_request(KVM_REQ_EVENT, vcpu);
-=20
- 	/*
+Yes, but there is going to be a separate set of patches to move all ASID handling code to CCP module.
 
-base-commit: e32cde8d2bd7d251a8f9b434143977ddf13dcec6
---=20
+This refactoring won't be part of the SNP ciphertext hiding support patches.
+
+Thanks, Ashish
+
+>> +
+>>  MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
+>>  MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
+>>  MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
+>>  MODULE_FIRMWARE("amd/amd_sev_fam19h_model1xh.sbin"); /* 4th gen EPYC */
+>>
+>> +/* Cipher Text Hiding Enabled */
+>> +bool snp_cipher_text_hiding;
+>> +EXPORT_SYMBOL(snp_cipher_text_hiding);
+>> +
+>> +/* MAX_SNP_ASID */
+>> +unsigned int snp_max_snp_asid;
+>> +EXPORT_SYMBOL(snp_max_snp_asid);
+>> +
+>>  static bool psp_dead;
+>>  static int psp_timeout;
+>>
+>> @@ -1064,6 +1080,38 @@ static void snp_set_hsave_pa(void *arg)
+>>         wrmsrl(MSR_VM_HSAVE_PA, 0);
+>>  }
+>>
+>> +static void sev_snp_enable_ciphertext_hiding(struct sev_data_snp_init_ex *data, int *error)
+>> +{
+>> +       struct psp_device *psp = psp_master;
+>> +       struct sev_device *sev;
+>> +       unsigned int edx;
+>> +
+>> +       sev = psp->sev_data;
+>> +
+>> +       /*
+>> +        * Check if CipherTextHiding feature is supported and enabled
+>> +        * in the Platform/BIOS.
+>> +        */
+>> +       if ((sev->feat_info.ecx & SNP_CIPHER_TEXT_HIDING_SUPPORTED) &&
+>> +           sev->snp_plat_status.ciphertext_hiding_cap) {
+>> +               /* Retrieve SEV CPUID information */
+>> +               edx = cpuid_edx(0x8000001f);
+>> +               /* Do sanity checks on user-defined MAX_SNP_ASID */
+>> +               if (max_snp_asid >= edx) {
+>> +                       dev_info(sev->dev, "max_snp_asid module parameter is not valid, limiting to %d\n",
+>> +                                edx - 1);
+>> +                       max_snp_asid = edx - 1;
+>> +               }
+>> +               snp_max_snp_asid = max_snp_asid ? : (edx - 1) / 2;
+>> +
+>> +               snp_cipher_text_hiding = 1;
+>> +               data->ciphertext_hiding_en = 1;
+>> +               data->max_snp_asid = snp_max_snp_asid;
+>> +
+>> +               dev_dbg(sev->dev, "SEV-SNP CipherTextHiding feature support enabled\n");
+>> +       }
+>> +}
+>> +
+>>  static void snp_get_platform_data(void)
+>>  {
+>>         struct sev_device *sev = psp_master->sev_data;
+>> @@ -1199,6 +1247,10 @@ static int __sev_snp_init_locked(int *error)
+>>                 }
+>>
+>>                 memset(&data, 0, sizeof(data));
+>> +
+>> +               if (cipher_text_hiding)
+>> +                       sev_snp_enable_ciphertext_hiding(&data, error);
+>> +
+>>                 data.init_rmp = 1;
+>>                 data.list_paddr_en = 1;
+>>                 data.list_paddr = __psp_pa(snp_range_list);
+>> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+>> index 6068a89839e1..2102248bd436 100644
+>> --- a/include/linux/psp-sev.h
+>> +++ b/include/linux/psp-sev.h
+>> @@ -27,6 +27,9 @@ enum sev_state {
+>>         SEV_STATE_MAX
+>>  };
+>>
+>> +extern bool snp_cipher_text_hiding;
+>> +extern unsigned int snp_max_snp_asid;
+>> +
+>>  /**
+>>   * SEV platform and guest management commands
+>>   */
+>> @@ -746,10 +749,13 @@ struct sev_data_snp_guest_request {
+>>  struct sev_data_snp_init_ex {
+>>         u32 init_rmp:1;
+>>         u32 list_paddr_en:1;
+>> -       u32 rsvd:30;
+>> +       u32 rapl_dis:1;
+>> +       u32 ciphertext_hiding_en:1;
+>> +       u32 rsvd:28;
+>>         u32 rsvd1;
+>>         u64 list_paddr;
+>> -       u8  rsvd2[48];
+>> +       u16 max_snp_asid;
+>> +       u8  rsvd2[46];
+>>  } __packed;
+>>
+>>  /**
+>> @@ -841,6 +847,8 @@ struct snp_feature_info {
+>>         u32 edx;
+>>  } __packed;
+>>
+>> +#define SNP_CIPHER_TEXT_HIDING_SUPPORTED       BIT(3)
+>> +
+>>  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+>>
+>>  /**
+>> --
+>> 2.34.1
+>>
+>>
 
