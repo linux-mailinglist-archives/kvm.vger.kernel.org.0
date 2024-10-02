@@ -1,142 +1,265 @@
-Return-Path: <kvm+bounces-27811-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27812-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9F398DF34
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 17:32:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B76F98DFD3
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 17:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DBDAB279AE
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 15:29:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E92B1F2A398
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 15:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A28B1D0E1B;
-	Wed,  2 Oct 2024 15:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6F51D0DF9;
+	Wed,  2 Oct 2024 15:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="j5oW9u09"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FPYg4SPp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2851D0DDD;
-	Wed,  2 Oct 2024 15:27:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE4742AA2
+	for <kvm@vger.kernel.org>; Wed,  2 Oct 2024 15:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727882856; cv=none; b=quMD5fc/srNF7frS6KDNnvxEzRgHZVQXd8qzjZBbLABoVGIzGxBDZR+dKqIB1YN/Vq/cR2z+ONjNrK+mNjcWBWFWnXz810z0p0iyPMS8TK8L5shlCcA9SEGo0KxEGoDmIwzVFqP2dj4n4RbtwdjcTU6zHqMEZCu+HnwTwZX7pS8=
+	t=1727884378; cv=none; b=d7fxF1yGTbMSdH9PLosztLc0ZyMRL7AWYjgzHFDfQlgc7TYZ/E9GGeOwBSq15bfczuRkTmeBepLuxk6vyKTGmnR0bov7nMlg9eEtPzT36Pemy8uZkoNrbmVMrjqpJ9eoK9D7wVXQ2IIkwc7BT0RVWta7f5fG/I0U/Fqe4NN7RUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727882856; c=relaxed/simple;
-	bh=gF0LNo6VaA21WNn5gsVFmUNn8h6ziDWmDXH7txSWGsE=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=uw7cb75uewjv7dxKqWFqYnaI4n2rVXdGDMUfHQlqM8E+TcZivCO8K+ROdAXZx7XTe1MgjvSdi3PVXYcwbrHdPWtqjCgLLDak8+S4TcGkRDKDJhCKATU+4t2tNAQ4JTY+CpIvrM04bbc+FE408ru4t9U1sx7omsOuaUYD83tpvjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=j5oW9u09; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 492EP98F026879;
-	Wed, 2 Oct 2024 15:27:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	content-type:mime-version:content-transfer-encoding:in-reply-to
-	:references:subject:from:cc:to:date:message-id; s=pp1; bh=N7TZr/
-	cro3WJJ4MdF4MbjrVtPA14Uj5HFV/VVMpbPBU=; b=j5oW9u09ZDWUME9PXVrVnd
-	/NtvwN18SdiFGyRRv9qribISQrWCXOJZqSfpjrvdDBWv+T1n/IgzpcxJ1bScCBXk
-	mrSP/oIYK+XJhjjZLrr+zRUw8n6LqXnRe7qd0cPHn8SbaWdnuC1HTgc0MyV+Tyw5
-	h90mrIBoKWHr4mgOf4yrbVnlAFevCnvqddYMovVUlxfLDRo1QKJSpVjEzJUL74kM
-	Ke9b7y72j9L+lN71BVLzNs1UZA6OE9zzycPdr6ilAQMPKhUU0ifwLWVd9Vfmxfim
-	8/ERDQAk3LUAtMY0yoAf/YV6yL5NSi77Rj1tXYCB3+qqaEYTb2YRg26IFvg5vG8w
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4217wx08yu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 02 Oct 2024 15:27:32 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 492FR3nZ015936;
-	Wed, 2 Oct 2024 15:27:31 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4217wx08yt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 02 Oct 2024 15:27:31 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 492CgHNT007989;
-	Wed, 2 Oct 2024 15:27:31 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41xvgy36q4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 02 Oct 2024 15:27:31 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 492FRPCu54133130
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 2 Oct 2024 15:27:25 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0F0022004B;
-	Wed,  2 Oct 2024 15:27:25 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E0CF920043;
-	Wed,  2 Oct 2024 15:27:24 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.74.111])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  2 Oct 2024 15:27:24 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1727884378; c=relaxed/simple;
+	bh=jgyYNHVGUJHqurtjL+tFw+Bf0SDAQlYN4jDbAjN3kwg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qgQ76PNZw73bTnEorIEQeYZf0bdKpCGEwdkQasDHwpMO2Jt6E0amY16gor4NVTArvSJymB5xtPpHwgosvRAMuiVrXdM+ymzw8hzA3FLTkxphpk0jR5a4RfkCJdS9bVBeAXmMH0OQcxVOqrSYJriV45mAOLRsTHD9PfWGpiOQCXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FPYg4SPp; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e148d4550bso4842a91.1
+        for <kvm@vger.kernel.org>; Wed, 02 Oct 2024 08:52:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727884376; x=1728489176; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XXJXQs/xEx4lHkiALypwDMfhGbvgouY1MUMfF7pgmg8=;
+        b=FPYg4SPp9SLRLBTYspP5d34L3KQcIf4iK83LYJV27li5lc/XFvCYyF99ZGN8hOv3/4
+         CNU0tPbjoNwNay8qGOdI0ASQRiFc2dgXsgQOYq8yVNipPz3iXfS6QR5tCXKb+/gw1PLR
+         utgm4e9MgQhRu/AEOgshN9TQGaGuVubUZKR8kOxYdukOH4VfO2V+oePHKWSzvJhJzBb9
+         1LAuWsjaijyS979gOQi76Z/DTOphoNT11OUH17Ho2oobB4f6vtWYy5LD+FUVqSYkqP98
+         PN0h+MCl0mWfrdGrWcLZIDhTwjlgETuc0JRYnB2kPNiWpRWdzvYca1ZlB7qwg9EowVyb
+         htrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727884376; x=1728489176;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XXJXQs/xEx4lHkiALypwDMfhGbvgouY1MUMfF7pgmg8=;
+        b=O2aEtuhB/9NCxnpdJSq0qeU/8xSzsHw0v4ZbQLuxJMWnYIxrOymiHj8tM4EFsX7cwo
+         i50pyQesItbT9ST6dqgXBUaH1IPb6bcsr30s0/8MHt/oIxFLLg+lVRs4dCzwId2i1I9g
+         A5M/lJwvnTZJguSwOl+QVpnzLyYXcnfncpY3R9Ix0otI9ymB7aojofEinODqHRXIGlv2
+         AQKYJTn12T44nmw1z3D67x5ooGJMQkxN+ZnN93rlCWKk7o/ggFH7Z3Dr2X6wWbR1P9Dc
+         F0YSH/MJJcJMBf/v3R50DRHSzvJM7YNhIG4v3t8QUkD/yopDdh9t5IkgmSgHb4xpx9is
+         W5CA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCbMJwf06XjiKhdtZp8nQfDO69Rkk/or9ibfUdBjJXjJa7LFFwrjFEdA9Kg1P+eGXVJGQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtXJwom6zMo7IQLlBxjfYunve6/J6RSfaRZ3xmt0ZK9qHSBYcd
+	WI/DW63bJOvnBnA1Pkk4MwCbhFE9CfvtChpw4xT9LPC4jXehxN0qJslkC3BZzp0iEEy3o6juAq7
+	/uQ==
+X-Google-Smtp-Source: AGHT+IHNCQDIvuUM0kgE3VfsIGDY89jbI56rsZBS6XJ21z3kKEZ3wjjgmbannD/iW6mRw5+d+JuSV9Fidl4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:514e:b0:2e0:876c:8cb6 with SMTP id
+ 98e67ed59e1d1-2e184523937mr17881a91.2.1727884376008; Wed, 02 Oct 2024
+ 08:52:56 -0700 (PDT)
+Date: Wed, 2 Oct 2024 08:52:54 -0700
+In-Reply-To: <20241002124324.14360-1-mankku@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <Zu0vvRyCyUaQ2S2a@google.com> <20241002124324.14360-1-mankku@gmail.com>
+Message-ID: <Zv1gbzT1KTYpNgY1@google.com>
+Subject: Re: [PATCH 1/1] KVM: nVMX: update VPPR on vmlaunch/vmresume
+From: Sean Christopherson <seanjc@google.com>
+To: "Markku =?utf-8?Q?Ahvenj=C3=A4rvi?=" <mankku@gmail.com>
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	janne.karhunen@gmail.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mingo@redhat.com, pbonzini@redhat.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20241001113640.55210-1-imbrenda@linux.ibm.com>
-References: <20241001113640.55210-1-imbrenda@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 1/1] s390x: edat: test 2G large page spanning end of memory
-From: Nico Boehr <nrb@linux.ibm.com>
-Cc: frankja@linux.ibm.com, borntraeger@de.ibm.com, david@redhat.com,
-        thuth@redhat.com, linux-s390@vger.kernel.org
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Date: Wed, 02 Oct 2024 17:27:22 +0200
-Message-ID: <172788284289.78915.13149730018195904612@t14-nrb.local>
-User-Agent: alot/0.10
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: TPRHHbK-UYrqtxrR_CLsmCOGvWVQNC5f
-X-Proofpoint-GUID: RMdZzrl-V5h2oqB6GxRgp8unQb12dj-s
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-02_15,2024-09-30_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
- priorityscore=1501 bulkscore=0 mlxscore=0 clxscore=1015 impostorscore=0
- spamscore=0 suspectscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2410020110
 
-Quoting Claudio Imbrenda (2024-10-01 13:36:40)
-[...]
-> diff --git a/s390x/edat.c b/s390x/edat.c
-> index 16138397..1f582efc 100644
-> --- a/s390x/edat.c
-> +++ b/s390x/edat.c
-[...]
-> @@ -206,7 +208,21 @@ static void test_edat2(void)
->         /* Prefixing should not work with huge pages, just like large pag=
-es */
->         report(!memcmp(0, VIRT(prefix_buf), LC_SIZE) &&
->                 !memcmp(prefix_buf, VIRT(0), LC_SIZE),
-> -               "pmd, large, prefixing");
-> +               "pud, large, prefixing");
-> +
-> +       mem_end =3D get_ram_size();
-> +       if (mem_end >=3D BIT_ULL(REGION3_SHIFT)) {
+On Wed, Oct 02, 2024, Markku Ahvenj=C3=A4rvi wrote:
+> Hi Sean,
+>=20
+> > On Fri, Sep 20, 2024, Markku Ahvenj=C3=A4rvi wrote:
+> > > Running certain hypervisors under KVM on VMX suffered L1 hangs after
+> > > launching a nested guest. The external interrupts were not processed =
+on
+> > > vmlaunch/vmresume due to stale VPPR, and L2 guest would resume withou=
+t
+> > > allowing L1 hypervisor to process the events.
+> > >=20
+> > > The patch ensures VPPR to be updated when checking for pending
+> > > interrupts.
+> >
+> > This is architecturally incorrect, PPR isn't refreshed at VM-Enter.
+>=20
+> I looked into this and found the following from Intel manual:
+>=20
+> "30.1.3 PPR Virtualization
+>=20
+> The processor performs PPR virtualization in response to the following
+> operations: (1) VM entry; (2) TPR virtualization; and (3) EOI virtualizat=
+ion.
+>=20
+> ..."
+>=20
+> The section "27.3.2.5 Updating Non-Register State" further explains the V=
+M
+> enter:
+>=20
+> "If the =E2=80=9Cvirtual-interrupt delivery=E2=80=9D VM-execution control=
+ is 1, VM entry loads
+> the values of RVI and SVI from the guest interrupt-status field in the VM=
+CS
+> (see Section 25.4.2). After doing so, the logical processor first causes =
+PPR
+> virtualization (Section 30.1.3) and then evaluates pending virtual interr=
+upts
+> (Section 30.2.1). If a virtual interrupt is recognized, it may be deliver=
+ed in
+> VMX non-root operation immediately after VM entry (including any specifie=
+d
+> event injection) completes; ..."
+>=20
+> According to that, PPR is supposed to be refreshed at VM-Enter, or am I
+> missing something here?
 
-Do you mind introducting REGION3_SIZE like the kernel has?
+Huh, I missed that.  It makes sense I guess; VM-Enter processes pending vir=
+tual
+interrupts, so it stands that VM-Enter would refresh PPR as well.
+
+Ugh, and looking again, KVM refreshes PPR every time it checks for a pendin=
+g
+interrupt, including the VM-Enter case (via kvm_apic_has_interrupt()) when =
+nested
+posted interrupts are in use:
+
+	/* Emulate processing of posted interrupts on VM-Enter. */
+	if (nested_cpu_has_posted_intr(vmcs12) &&
+	    kvm_apic_has_interrupt(vcpu) =3D=3D vmx->nested.posted_intr_nv) {
+		vmx->nested.pi_pending =3D true;
+		kvm_make_request(KVM_REQ_EVENT, vcpu);
+		kvm_apic_clear_irr(vcpu, vmx->nested.posted_intr_nv);
+	}
+
+I'm still curious as to what's different about your setup, but certainly no=
+t
+curious enough to hold up a fix.
+
+Anyways, back to the code, I think we can and should shoot for a more compl=
+ete
+cleanup (on top of a minimal fix).  As Chao suggested[*], the above nested =
+posted
+interrupt code shouldn't exist, as KVM should handle nested posted interrup=
+ts as
+part of vmx_check_nested_events(), which honors event priority.  And I see =
+a way,
+albeit a bit of an ugly way, to avoid regressing performance when there's p=
+ending
+nested posted interrupt at VM-Enter.
+
+The other aspect of this code is that I don't think we need to limit the ch=
+eck
+to APICv, i.e. KVM can simply check kvm_apic_has_interrupt() after VM-Enter
+succeeds (the funky pre-check is necessary to read RVI from vmcs01, with th=
+e
+event request deferred until KVM knows VM-Enter will be successful).
+
+Arguably, that's probably more correct, as PPR virtualization should only o=
+ccur
+if VM-Enter is successful (or at least guest past the VM-Fail checks).
+
+So, for an immediate fix, I _think_ we can do:
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index a8e7bc04d9bf..784b61c9810b 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3593,7 +3593,8 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mo=
+de(struct kvm_vcpu *vcpu,
+         * effectively unblock various events, e.g. INIT/SIPI cause VM-Exit
+         * unconditionally.
+         */
+-       if (unlikely(evaluate_pending_interrupts))
++       if (unlikely(evaluate_pending_interrupts) ||
++           kvm_apic_has_interrupt(vcpu))
+                kvm_make_request(KVM_REQ_EVENT, vcpu);
+=20
+        /*
+
+and then eventually make nested_vmx_enter_non_root_mode() look like the bel=
+ow.
+
+Can you verify that the above fixes your setup?  If it does, I'll put toget=
+her a
+small series with that change and the cleanups I have in mind.
+
+Thanks much!
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index a8e7bc04d9bf..77f0695784d8 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3483,7 +3483,6 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mo=
+de(struct kvm_vcpu *vcpu,
+        struct vcpu_vmx *vmx =3D to_vmx(vcpu);
+        struct vmcs12 *vmcs12 =3D get_vmcs12(vcpu);
+        enum vm_entry_failure_code entry_failure_code;
+-       bool evaluate_pending_interrupts;
+        union vmx_exit_reason exit_reason =3D {
+                .basic =3D EXIT_REASON_INVALID_STATE,
+                .failed_vmentry =3D 1,
+@@ -3502,13 +3501,6 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_m=
+ode(struct kvm_vcpu *vcpu,
+=20
+        kvm_service_local_tlb_flush_requests(vcpu);
+=20
+-       evaluate_pending_interrupts =3D exec_controls_get(vmx) &
+-               (CPU_BASED_INTR_WINDOW_EXITING | CPU_BASED_NMI_WINDOW_EXITI=
+NG);
+-       if (likely(!evaluate_pending_interrupts) && kvm_vcpu_apicv_active(v=
+cpu))
+-               evaluate_pending_interrupts |=3D vmx_has_apicv_interrupt(vc=
+pu);
+-       if (!evaluate_pending_interrupts)
+-               evaluate_pending_interrupts |=3D kvm_apic_has_pending_init_=
+or_sipi(vcpu);
+-
+        if (!vmx->nested.nested_run_pending ||
+            !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
+                vmx->nested.pre_vmenter_debugctl =3D vmcs_read64(GUEST_IA32=
+_DEBUGCTL);
+@@ -3591,9 +3583,13 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_m=
+ode(struct kvm_vcpu *vcpu,
+         * Re-evaluate pending events if L1 had a pending IRQ/NMI/INIT/SIPI
+         * when it executed VMLAUNCH/VMRESUME, as entering non-root mode ca=
+n
+         * effectively unblock various events, e.g. INIT/SIPI cause VM-Exit
+-        * unconditionally.
++        * unconditionally.  Take care to pull data from vmcs01 as appropri=
+ate,
++        * e.g. when checking for interrupt windows, as vmcs02 is now loade=
+d.
+         */
+-       if (unlikely(evaluate_pending_interrupts))
++       if ((__exec_controls_get(&vmx->vmcs01) & (CPU_BASED_INTR_WINDOW_EXI=
+TING |
++                                                 CPU_BASED_NMI_WINDOW_EXIT=
+ING)) ||
++           kvm_apic_has_pending_init_or_sipi(vcpu) ||
++           kvm_apic_has_interrupt(vcpu))
+                kvm_make_request(KVM_REQ_EVENT, vcpu);
+=20
+        /*
 
 
-> +               report_skip("pud spanning end of memory");
-> +       } else {
-> +               for (i =3D 0; i < mem_end; i +=3D PAGE_SIZE)
-> +                       READ_ONCE(*(uint64_t *)VIRT(i));
-> +               for (i =3D mem_end; i < BIT_ULL(REGION3_SHIFT); i +=3D PA=
-GE_SIZE) {
-> +                       expect_pgm_int();
-> +                       READ_ONCE(*(uint64_t *)VIRT(i));
-
-Would a write behave any different here?
-
-With or without the suggestions above:
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+[*] https://lore.kernel.org/all/Zp%2FC5IlwfzC5DCsl@chao-email
 
