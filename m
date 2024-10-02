@@ -1,91 +1,133 @@
-Return-Path: <kvm+bounces-27802-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27806-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0914E98DA6E
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 16:21:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B78998DB68
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 16:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B49CC1F2182E
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 14:21:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C495028243A
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 14:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F5B1D1F4E;
-	Wed,  2 Oct 2024 14:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1F81D26EC;
+	Wed,  2 Oct 2024 14:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EwWY+ofT"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MvhZ5WPP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72051D0E3A;
-	Wed,  2 Oct 2024 14:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56111CEEAF;
+	Wed,  2 Oct 2024 14:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727878563; cv=none; b=YCV1qdVDarpBo7BVeON/r9oJHoSWj68HQ1gaVNFrw3kaaa9nnjvsLMbpl8FkAlvAwCI3kZOC01Y4HnupnA+qMxq2XgXLTk0Xl9avNg3X58GFm1z3Zeun/MzLvOTZChMLeWIQD69ixFwLzmAaet7+EAkABwk0wk5d1D5FH8Nw/Dc=
+	t=1727879150; cv=none; b=t0BZ/HyVFf6LJ1l51vYIjJcEZaGMlmXbdmFKvOQUhLYhD+VmsrpiCUpnkypJW1Bth2/xkZLqwFCiObBoAbfgfQaPjW5aRlCq71xtfHj33iSPG2QQ41BzELsD0hvHmP9tLS5ZVBB9V0/CP9gu2b8kb/DkE3OJUixfR4toiSQCzII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727878563; c=relaxed/simple;
-	bh=yT+r31n70xCHi9EJMEKqCQB+IFdPVXH1wU6lHdxyhaY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ogxHdMhTT84wJPaGovU94l/nH2soRBbyVKJdFG1+jGT2QZQEdGhLNWV57ABx6ohkzABdiyL6V1OGYcfWoRU6eXfji2AzI3ErrVH3IiH+HUz3zr83dqPocPq7vOCi0vd1Tw2g90xGvV2MXbxRbUYNp9mSkMfVWLH/kJy798RGbCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EwWY+ofT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBFEAC4CEC5;
-	Wed,  2 Oct 2024 14:16:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727878563;
-	bh=yT+r31n70xCHi9EJMEKqCQB+IFdPVXH1wU6lHdxyhaY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EwWY+ofTD1RSYoGGOL6Vcvz9EuF+qNPMnvZDH48oUuKzgPank5dJBlTdcWuZQjeQx
-	 RPK7QrHcfjLn4OhDBF1x6E8qByaJqxsXwu5RVXAV238lE2ev/IrSEp7z/kgTWzuwsJ
-	 iBUBL9pao1WJXmUH5P8USJ/xE0zO/Y3pvfFBUItQGXhNEoKN9SwCrSyZHvZKJyVtZ3
-	 aE3JUqnZi4SvXAjlPc/BvFJeMzQA8q9uwImceqlGnxE8Nm8uOg38gvA6aeMwn6h+R+
-	 nKv5rZQ2CPdKemFAu7st/jNezRO0kbukwY0dwNNQFaaFMzxuow6TsqtmQ7f9vN4sgG
-	 B0xvu5FSWOuGw==
-Date: Wed, 2 Oct 2024 07:16:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, stefanha@redhat.com, "Michael
- S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, mcgrof@kernel.org
-Subject: Re: [PATCH v2] vhost/vsock: specify module version
-Message-ID: <20241002071602.793d3e2d@kernel.org>
-In-Reply-To: <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
-References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
-	<w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
-	<CAEivzxe6MJWMPCYy1TEkp9fsvVMuoUu-k5XOt+hWg4rKR57qTw@mail.gmail.com>
-	<ib52jo3gqsdmr23lpmsipytbxhecwvmjbjlgiw5ygwlbwletlu@rvuyibtxezwl>
-	<CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
+	s=arc-20240116; t=1727879150; c=relaxed/simple;
+	bh=R3rceRteG8fgjwgLlNJi7VzP837GAstprFERWFU60QM=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=q6qTwrWAlUhJ5Jqdti7KaEbzM8S4eBk0/lkxC82pLYUdRJ7f3fwaZBvUKcxUmP6awS3W5GK2Z7cjL83ae/ChuObA4hGBgHnE+pNDJ4LZIjc2LV495rPt8hs1YSsiRY33OF4zhu1UkCOIqDa0mNDCxeWdcl9m8gr1MJglZxTkcDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MvhZ5WPP; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 492EP66l026779;
+	Wed, 2 Oct 2024 14:25:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-type:mime-version:content-transfer-encoding:in-reply-to
+	:references:subject:from:cc:to:date:message-id; s=pp1; bh=mPziYV
+	JIuUL9desjvVrYcKa8x1g6tYrEAgthMPitYLI=; b=MvhZ5WPPuAOrl3IGF1tRRz
+	eHf4Ot9osTPoMJFY9HnayOKzE7TiWyLh8GnwvOZyzw4IMcYNgWGtL2XK5f8dyYib
+	NC59t3nAjZge0YyfzYIF6sFmK9VBv826XnToGhIExFtO0IlHn2IzBhIJCQoaUspy
+	+lIsGPT94RYo3ct9HoctytQUClUJuzvMfUveHflg5So1ifxV8+vLKAtvNMB1VVqP
+	DqqP5WJr+olchutdf5+30okljwGzpSvPrXR47kvfrNN5okws+GbnPK+kZwl+0la+
+	G6UA+oiyLAmDVzZ3YMn3pw8H/vesd3eUVJdNnb374g+ruz7e8HFMnU+KUBa3jxLw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4217wx0036-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Oct 2024 14:25:47 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 492EPlJ7027679;
+	Wed, 2 Oct 2024 14:25:47 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4217wx0035-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Oct 2024 14:25:47 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 492DCThD018356;
+	Wed, 2 Oct 2024 14:25:46 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41xw4n2t0k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Oct 2024 14:25:46 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 492EPeIE54460918
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 2 Oct 2024 14:25:40 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 73E5120043;
+	Wed,  2 Oct 2024 14:25:40 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 55C1B20040;
+	Wed,  2 Oct 2024 14:25:40 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.74.111])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  2 Oct 2024 14:25:40 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20241001113640.55210-1-imbrenda@linux.ibm.com>
+References: <20241001113640.55210-1-imbrenda@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 1/1] s390x: edat: test 2G large page spanning end of memory
+From: Nico Boehr <nrb@linux.ibm.com>
+Cc: frankja@linux.ibm.com, borntraeger@de.ibm.com, david@redhat.com,
+        thuth@redhat.com, linux-s390@vger.kernel.org
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Date: Wed, 02 Oct 2024 16:25:39 +0200
+Message-ID: <172787913947.65827.12438423086547383920@t14-nrb.local>
+User-Agent: alot/0.10
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: jTioX4bkMEe3tFVAGx2gDV1fo_hj38zg
+X-Proofpoint-GUID: RzGXxmKH_JrxImIXbhKQhjkLkZXR2TsJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-02_14,2024-09-30_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ priorityscore=1501 bulkscore=0 mlxscore=0 clxscore=1015 impostorscore=0
+ spamscore=0 suspectscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
+ definitions=main-2410020103
 
-On Mon, 30 Sep 2024 19:03:52 +0200 Aleksandr Mikhalitsyn wrote:
-> > At this point my question is, should we solve the problem higher and
-> > show all the modules in /sys/modules, either way?  
-> 
-> Probably, yes. We can ask Luis Chamberlain's opinion on this one.
-> 
-> +cc Luis Chamberlain <mcgrof@kernel.org>
-> 
-> >
-> > Your use case makes sense to me, so that we could try something like
-> > that, but obviously it requires more work I think.  
-> 
-> I personally am pretty happy to do more work on the generic side if
-> it's really valuable
-> for other use cases and folks support the idea.
+Quoting Claudio Imbrenda (2024-10-01 13:36:40)
+[...]
+> diff --git a/s390x/edat.c b/s390x/edat.c
+> index 16138397..1f582efc 100644
+> --- a/s390x/edat.c
+> +++ b/s390x/edat.c
+> @@ -196,6 +196,8 @@ static void test_edat1(void)
+> =20
+>  static void test_edat2(void)
+>  {
+[...]
+> @@ -206,7 +208,21 @@ static void test_edat2(void)
+>         /* Prefixing should not work with huge pages, just like large pag=
+es */
+>         report(!memcmp(0, VIRT(prefix_buf), LC_SIZE) &&
+>                 !memcmp(prefix_buf, VIRT(0), LC_SIZE),
+> -               "pmd, large, prefixing");
+> +               "pud, large, prefixing");
+> +
+> +       mem_end =3D get_ram_size();
+> +       if (mem_end >=3D BIT_ULL(REGION3_SHIFT)) {
+> +               report_skip("pud spanning end of memory");
 
-IMHO a generic solution would be much better. I can't help but feel
-like exposing an arbitrary version to get the module to show up in 
-sysfs is a hack.
-
-IIUC the list of built in modules is available in
-/lib/modules/*/modules.builtin, the user space can't read that?
+Does it make sense to explicitly add a mem parameter in unittests.cfg so
+this will never be the case?
 
