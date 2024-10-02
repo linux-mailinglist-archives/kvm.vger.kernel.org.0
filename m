@@ -1,265 +1,434 @@
-Return-Path: <kvm+bounces-27812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B76F98DFD3
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 17:53:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91CD698DFF4
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 17:57:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E92B1F2A398
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 15:53:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94BC81C250F3
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2024 15:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6F51D0DF9;
-	Wed,  2 Oct 2024 15:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028851D0B97;
+	Wed,  2 Oct 2024 15:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FPYg4SPp"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F0XZSZuY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE4742AA2
-	for <kvm@vger.kernel.org>; Wed,  2 Oct 2024 15:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9941CF7DD;
+	Wed,  2 Oct 2024 15:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727884378; cv=none; b=d7fxF1yGTbMSdH9PLosztLc0ZyMRL7AWYjgzHFDfQlgc7TYZ/E9GGeOwBSq15bfczuRkTmeBepLuxk6vyKTGmnR0bov7nMlg9eEtPzT36Pemy8uZkoNrbmVMrjqpJ9eoK9D7wVXQ2IIkwc7BT0RVWta7f5fG/I0U/Fqe4NN7RUQ=
+	t=1727884660; cv=none; b=I3cnYOKK/KkREn4m1H6OcX1cOoAAkuF7oHJABSqBING/vOcKs0DHUexdSQ2ox+FrtkQRpHrdnLr+YTwAwNW3Qw5j/Z+IcP2uc8XPUA2m1AlzsJ5dYiZZ7bVp6xR86saHd08id4UmkmxMnCB/p8K9sHcc3pVlcoPKAev1v4ZL6d8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727884378; c=relaxed/simple;
-	bh=jgyYNHVGUJHqurtjL+tFw+Bf0SDAQlYN4jDbAjN3kwg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qgQ76PNZw73bTnEorIEQeYZf0bdKpCGEwdkQasDHwpMO2Jt6E0amY16gor4NVTArvSJymB5xtPpHwgosvRAMuiVrXdM+ymzw8hzA3FLTkxphpk0jR5a4RfkCJdS9bVBeAXmMH0OQcxVOqrSYJriV45mAOLRsTHD9PfWGpiOQCXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FPYg4SPp; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e148d4550bso4842a91.1
-        for <kvm@vger.kernel.org>; Wed, 02 Oct 2024 08:52:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727884376; x=1728489176; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XXJXQs/xEx4lHkiALypwDMfhGbvgouY1MUMfF7pgmg8=;
-        b=FPYg4SPp9SLRLBTYspP5d34L3KQcIf4iK83LYJV27li5lc/XFvCYyF99ZGN8hOv3/4
-         CNU0tPbjoNwNay8qGOdI0ASQRiFc2dgXsgQOYq8yVNipPz3iXfS6QR5tCXKb+/gw1PLR
-         utgm4e9MgQhRu/AEOgshN9TQGaGuVubUZKR8kOxYdukOH4VfO2V+oePHKWSzvJhJzBb9
-         1LAuWsjaijyS979gOQi76Z/DTOphoNT11OUH17Ho2oobB4f6vtWYy5LD+FUVqSYkqP98
-         PN0h+MCl0mWfrdGrWcLZIDhTwjlgETuc0JRYnB2kPNiWpRWdzvYca1ZlB7qwg9EowVyb
-         htrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727884376; x=1728489176;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=XXJXQs/xEx4lHkiALypwDMfhGbvgouY1MUMfF7pgmg8=;
-        b=O2aEtuhB/9NCxnpdJSq0qeU/8xSzsHw0v4ZbQLuxJMWnYIxrOymiHj8tM4EFsX7cwo
-         i50pyQesItbT9ST6dqgXBUaH1IPb6bcsr30s0/8MHt/oIxFLLg+lVRs4dCzwId2i1I9g
-         A5M/lJwvnTZJguSwOl+QVpnzLyYXcnfncpY3R9Ix0otI9ymB7aojofEinODqHRXIGlv2
-         AQKYJTn12T44nmw1z3D67x5ooGJMQkxN+ZnN93rlCWKk7o/ggFH7Z3Dr2X6wWbR1P9Dc
-         F0YSH/MJJcJMBf/v3R50DRHSzvJM7YNhIG4v3t8QUkD/yopDdh9t5IkgmSgHb4xpx9is
-         W5CA==
-X-Forwarded-Encrypted: i=1; AJvYcCWCbMJwf06XjiKhdtZp8nQfDO69Rkk/or9ibfUdBjJXjJa7LFFwrjFEdA9Kg1P+eGXVJGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtXJwom6zMo7IQLlBxjfYunve6/J6RSfaRZ3xmt0ZK9qHSBYcd
-	WI/DW63bJOvnBnA1Pkk4MwCbhFE9CfvtChpw4xT9LPC4jXehxN0qJslkC3BZzp0iEEy3o6juAq7
-	/uQ==
-X-Google-Smtp-Source: AGHT+IHNCQDIvuUM0kgE3VfsIGDY89jbI56rsZBS6XJ21z3kKEZ3wjjgmbannD/iW6mRw5+d+JuSV9Fidl4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:514e:b0:2e0:876c:8cb6 with SMTP id
- 98e67ed59e1d1-2e184523937mr17881a91.2.1727884376008; Wed, 02 Oct 2024
- 08:52:56 -0700 (PDT)
-Date: Wed, 2 Oct 2024 08:52:54 -0700
-In-Reply-To: <20241002124324.14360-1-mankku@gmail.com>
+	s=arc-20240116; t=1727884660; c=relaxed/simple;
+	bh=JZeji/FxHNwV+Jx8i1h7qqCBP5YZkbXTm8DP5HyDISY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KDh2NfN/6RNbLryLmVL7zKiNJw8Pq6MZlO50voTfKT2905hLFPx4OBaaatzKnQRc3eeoZPFXv0zYpWrrTZiSFIbJ6xDz8hbV4aCsZOkrGU4io7zLTX5OKaAhPRkkWE+LEOu9mlceBaJcim1Tmg4PImyemkMLIlIPi8sSyZ34CvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=F0XZSZuY; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 492FsXYB031344;
+	Wed, 2 Oct 2024 15:57:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	CxMNrL+Hv8Xo784nxUV+c4sJddx3UY6uBo6niNrc+L4=; b=F0XZSZuYFng+zCHb
+	5geBiSZriAttfqJYSWfOrAS/CHLdr/Xlz5qpTx54RShARasqiTYf/xzQiJGCdv9z
+	ZOpU2N842oPc57/a2cS/ZbiKk54J1DYI1b9Cr/t1Kg9MqJ325QlmPm5fibL/TKtE
+	+zdLW+Z23JOjNJaR7bbzjbYVxmCRpTJ3J8bDDnLRZu67fSTs2HxwqqgWIo+Hhgg0
+	+d57wk6wgjLwBetucoNx0FM9TgZCKx5Rpd1/Ke5ZgOwc+byTq+B6LjOMTI6FYlU2
+	MJf3Ic5Mt3FCLc4UTySU/1YnMmwhBOpCZAqUPKldYN+EizHhOIe0jqraU903TL7D
+	m3RlbA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42197sr0c5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Oct 2024 15:57:36 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 492Fva30005975;
+	Wed, 2 Oct 2024 15:57:36 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42197sr0by-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Oct 2024 15:57:36 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 492Dghdd017845;
+	Wed, 2 Oct 2024 15:57:35 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41xw4n36dp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Oct 2024 15:57:35 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 492FvVb141419130
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 2 Oct 2024 15:57:31 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4C3052004D;
+	Wed,  2 Oct 2024 15:57:31 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 286682004B;
+	Wed,  2 Oct 2024 15:57:31 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  2 Oct 2024 15:57:31 +0000 (GMT)
+Date: Wed, 2 Oct 2024 17:57:29 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nico Boehr <nrb@linux.ibm.com>
+Cc: frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v3 2/2] s390x: add test for diag258
+Message-ID: <20241002175729.47aa5471@p-imbrenda.boeblingen.de.ibm.com>
+In-Reply-To: <20241002141616.357618-3-nrb@linux.ibm.com>
+References: <20241002141616.357618-1-nrb@linux.ibm.com>
+	<20241002141616.357618-3-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <Zu0vvRyCyUaQ2S2a@google.com> <20241002124324.14360-1-mankku@gmail.com>
-Message-ID: <Zv1gbzT1KTYpNgY1@google.com>
-Subject: Re: [PATCH 1/1] KVM: nVMX: update VPPR on vmlaunch/vmresume
-From: Sean Christopherson <seanjc@google.com>
-To: "Markku =?utf-8?Q?Ahvenj=C3=A4rvi?=" <mankku@gmail.com>
-Cc: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	janne.karhunen@gmail.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mingo@redhat.com, pbonzini@redhat.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: X_konR-78pzD3EI8NkTylUINrlvI1nRh
+X-Proofpoint-ORIG-GUID: prCGkhEkQPkKyi4qI21a-U3ja7jZuLPg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-02_15,2024-09-30_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 adultscore=0 suspectscore=0 priorityscore=1501
+ malwarescore=0 clxscore=1015 spamscore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
+ definitions=main-2410020114
 
-On Wed, Oct 02, 2024, Markku Ahvenj=C3=A4rvi wrote:
-> Hi Sean,
->=20
-> > On Fri, Sep 20, 2024, Markku Ahvenj=C3=A4rvi wrote:
-> > > Running certain hypervisors under KVM on VMX suffered L1 hangs after
-> > > launching a nested guest. The external interrupts were not processed =
-on
-> > > vmlaunch/vmresume due to stale VPPR, and L2 guest would resume withou=
-t
-> > > allowing L1 hypervisor to process the events.
-> > >=20
-> > > The patch ensures VPPR to be updated when checking for pending
-> > > interrupts.
-> >
-> > This is architecturally incorrect, PPR isn't refreshed at VM-Enter.
->=20
-> I looked into this and found the following from Intel manual:
->=20
-> "30.1.3 PPR Virtualization
->=20
-> The processor performs PPR virtualization in response to the following
-> operations: (1) VM entry; (2) TPR virtualization; and (3) EOI virtualizat=
-ion.
->=20
-> ..."
->=20
-> The section "27.3.2.5 Updating Non-Register State" further explains the V=
-M
-> enter:
->=20
-> "If the =E2=80=9Cvirtual-interrupt delivery=E2=80=9D VM-execution control=
- is 1, VM entry loads
-> the values of RVI and SVI from the guest interrupt-status field in the VM=
-CS
-> (see Section 25.4.2). After doing so, the logical processor first causes =
-PPR
-> virtualization (Section 30.1.3) and then evaluates pending virtual interr=
-upts
-> (Section 30.2.1). If a virtual interrupt is recognized, it may be deliver=
-ed in
-> VMX non-root operation immediately after VM entry (including any specifie=
-d
-> event injection) completes; ..."
->=20
-> According to that, PPR is supposed to be refreshed at VM-Enter, or am I
-> missing something here?
+On Wed,  2 Oct 2024 16:15:55 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-Huh, I missed that.  It makes sense I guess; VM-Enter processes pending vir=
-tual
-interrupts, so it stands that VM-Enter would refresh PPR as well.
+> This adds a test for diag258 (page ref service/async page fault).
+> 
+> There recently was a virtual-real address confusion bug, so we should
+> test:
+> - diag258 parameter Rx is a real adress
+> - crossing the end of RAM with the parameter list yields an addressing
+>   exception
+> - invalid diagcode in the parameter block yields an specification
+>   exception
+> - diag258 correctly applies prefixing.
+> 
+> Note that we're just testing error cases as of now.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>  s390x/Makefile      |   1 +
+>  s390x/diag258.c     | 259 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |   3 +
+>  3 files changed, 263 insertions(+)
+>  create mode 100644 s390x/diag258.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 23342bd64f44..66d71351caab 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -44,6 +44,7 @@ tests += $(TEST_DIR)/exittime.elf
+>  tests += $(TEST_DIR)/ex.elf
+>  tests += $(TEST_DIR)/topology.elf
+>  tests += $(TEST_DIR)/sie-dat.elf
+> +tests += $(TEST_DIR)/diag258.elf
+>  
+>  pv-tests += $(TEST_DIR)/pv-diags.elf
+>  pv-tests += $(TEST_DIR)/pv-icptcode.elf
+> diff --git a/s390x/diag258.c b/s390x/diag258.c
+> new file mode 100644
+> index 000000000000..1342b39a04fc
+> --- /dev/null
+> +++ b/s390x/diag258.c
+> @@ -0,0 +1,259 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Diag 258: Async Page Fault Handler
+> + *
+> + * Copyright (c) 2024 IBM Corp
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <asm-generic/barrier.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/mem.h>
+> +#include <asm/pgtable.h>
+> +#include <mmu.h>
+> +#include <sclp.h>
+> +#include <vmalloc.h>
+> +
+> +static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
+> +
+> +#define __PF_RES_FIELD 0x8000000000000000UL
+> +
+> +/* copied from Linux arch/s390/mm/pfault.c */
+> +struct pfault_refbk {
+> +	u16 refdiagc;
+> +	u16 reffcode;
+> +	u16 refdwlen;
+> +	u16 refversn;
+> +	u64 refgaddr;
+> +	u64 refselmk;
+> +	u64 refcmpmk;
+> +	u64 reserved;
+> +};
+> +
+> +uint64_t pfault_token = 0x0123fadec0fe3210UL;
+> +
+> +static struct pfault_refbk pfault_init_refbk __attribute__((aligned(8))) = {
 
-Ugh, and looking again, KVM refreshes PPR every time it checks for a pendin=
-g
-interrupt, including the VM-Enter case (via kvm_apic_has_interrupt()) when =
-nested
-posted interrupts are in use:
+the alignment attribute is not so useful when you use this as an
+initializer. the variables you initialize this with should also have
+the attribute. maybe it's cleaner to put the attribute on the struct
+instead?
 
-	/* Emulate processing of posted interrupts on VM-Enter. */
-	if (nested_cpu_has_posted_intr(vmcs12) &&
-	    kvm_apic_has_interrupt(vcpu) =3D=3D vmx->nested.posted_intr_nv) {
-		vmx->nested.pi_pending =3D true;
-		kvm_make_request(KVM_REQ_EVENT, vcpu);
-		kvm_apic_clear_irr(vcpu, vmx->nested.posted_intr_nv);
-	}
+otherwise transform these variables into initializers like 
+#define INIT_REFBK ((struct pfault_refbk) { .refdiagc = 0x258, etc... })
 
-I'm still curious as to what's different about your setup, but certainly no=
-t
-curious enough to hold up a fix.
+(but then you need the alignment attributes for each variable)
 
-Anyways, back to the code, I think we can and should shoot for a more compl=
-ete
-cleanup (on top of a minimal fix).  As Chao suggested[*], the above nested =
-posted
-interrupt code shouldn't exist, as KVM should handle nested posted interrup=
-ts as
-part of vmx_check_nested_events(), which honors event priority.  And I see =
-a way,
-albeit a bit of an ugly way, to avoid regressing performance when there's p=
-ending
-nested posted interrupt at VM-Enter.
+> +	.refdiagc = 0x258,
+> +	.reffcode = 0, /* TOKEN */
+> +	.refdwlen = sizeof(struct pfault_refbk) / sizeof(uint64_t),
+> +	.refversn = 2,
+> +	.refgaddr = (u64)&pfault_token,
+> +	.refselmk = 1UL << 48,
+> +	.refcmpmk = 1UL << 48,
+> +	.reserved = __PF_RES_FIELD
+> +};
+> +
+> +static struct pfault_refbk pfault_cancel_refbk __attribute((aligned(8))) = {
+> +	.refdiagc = 0x258,
+> +	.reffcode = 1, /* CANCEL */
+> +	.refdwlen = sizeof(struct pfault_refbk) / sizeof(uint64_t),
+> +	.refversn = 2,
+> +	.refgaddr = 0,
+> +	.refselmk = 0,
+> +	.refcmpmk = 0,
+> +	.reserved = 0
+> +};
+> +
+> +static inline int diag258(struct pfault_refbk *refbk)
+> +{
+> +	int rc = -1;
+> +
+> +	asm volatile(
+> +		"	diag	%[refbk],%[rc],0x258\n"
+> +		: [rc] "+d" (rc)
+> +		: [refbk] "a" (refbk), "m" (*(refbk))
+> +		: "cc");
+> +	return rc;
+> +}
+> +
+> +static void test_priv(void)
+> +{
+> +	report_prefix_push("privileged");
+> +	expect_pgm_int();
+> +	enter_pstate();
+> +	diag258(&pfault_init_refbk);
+> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void* page_map_outside_real_space(phys_addr_t page_real)
+> +{
+> +	pgd_t *root = (pgd_t *)(stctg(1) & PAGE_MASK);
+> +	void* vaddr = alloc_vpage();
+> +
+> +	install_page(root, page_real, vaddr);
+> +
+> +	return vaddr;
+> +}
+> +
+> +/*
+> + * Verify that the refbk pointer is a real address and not a virtual
+> + * address. This is tested by enabling DAT and establishing a mapping
+> + * for the refbk that is outside of the bounds of our (guest-)physical
+> + * address space.
+> + */
+> +static void test_refbk_real(void)
+> +{
+> +	struct pfault_refbk *refbk;
+> +	void *refbk_page;
+> +	pgd_t *root;
+> +
+> +	report_prefix_push("refbk is real");
+> +
+> +	/* Set up virtual memory and allocate a physical page for storing the refbk */
+> +	setup_vm();
+> +	refbk_page = alloc_page();
+> +
+> +	/* Map refblk page outside of physical memory identity mapping */
+> +	root = (pgd_t *)(stctg(1) & PAGE_MASK);
+> +	refbk = page_map_outside_real_space(virt_to_pte_phys(root, refbk_page));
+> +
+> +	/* Assert the mapping really is outside identity mapping */
+> +	report_info("refbk is at 0x%lx", (u64)refbk);
+> +	report_info("ram size is 0x%lx", get_ram_size());
+> +	assert((u64)refbk > get_ram_size());
+> +
+> +	/* Copy the init refbk to the page */
+> +	memcpy(refbk, &pfault_init_refbk, sizeof(struct pfault_refbk));
+> +
+> +	/* Protect the virtual mapping to avoid diag258 actually doing something */
+> +	protect_page(refbk, PAGE_ENTRY_I);
+> +
+> +	expect_pgm_int();
+> +	diag258(refbk);
+> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+> +	report_prefix_pop();
+> +
+> +	free_page(refbk_page);
+> +	disable_dat();
+> +	irq_set_dat_mode(false, 0);
+> +}
+> +
+> +/*
+> + * Verify diag258 correctly applies prefixing.
+> + */
+> +static void test_refbk_prefixing(void)
+> +{
+> +	const size_t lowcore_offset_for_refbk = offsetof(struct lowcore, pad_0x03a0);
+> +	struct pfault_refbk *refbk_in_prefix, *refbk_in_reverse_prefix;
+> +	uint32_t old_prefix;
+> +	uint64_t ry;
+> +
+> +	report_prefix_push("refbk prefixing");
+> +
+> +	report_info("refbk at lowcore offset 0x%lx", lowcore_offset_for_refbk);
+> +
+> +	assert((unsigned long)&prefix_buf < SZ_2G);
+> +
+> +	memcpy(prefix_buf, 0, LC_SIZE);
+> +
+> +	/*
+> +	 * After the call to set_prefix() below, this will refer to absolute
+> +	 * address lowcore_offset_for_refbk (reverse prefixing).
+> +	 */
+> +	refbk_in_reverse_prefix = (struct pfault_refbk *)(&prefix_buf[0] + lowcore_offset_for_refbk);
+> +
+> +	/*
+> +	 * After the call to set_prefix() below, this will refer to absolute
+> +	 * address &prefix_buf[0] + lowcore_offset_for_refbk (forward prefixing).
+> +	 */
+> +	refbk_in_prefix = (struct pfault_refbk *)OPAQUE_PTR(lowcore_offset_for_refbk);
+> +
+> +	old_prefix = get_prefix();
+> +	set_prefix((uint32_t)(uintptr_t)prefix_buf);
+> +
+> +	/*
+> +	 * If diag258 would not be applying prefixing on access to
+> +	 * refbk_in_reverse_prefix correctly, it would access absolute address
+> +	 * refbk_in_reverse_prefix (which to us is accessible at real address
+> +	 * refbk_in_prefix).
+> +	 * Make sure it really fails by putting invalid function code
+> +	 * at refbk_in_prefix.
+> +	 */
+> +	refbk_in_prefix->refdiagc = 0xc0fe;
+> +
+> +	/*
+> +	 * Put a valid refbk at refbk_in_reverse_prefix.
+> +	 */
+> +	memcpy(refbk_in_reverse_prefix, &pfault_init_refbk, sizeof(pfault_init_refbk));
+> +
+> +	ry = diag258(refbk_in_reverse_prefix);
+> +	report(!ry, "real address refbk accessed");
+> +
+> +	/*
+> +	 * Activating should have worked. Cancel the activation and expect
+> +	 * return 0. If activation would not have worked, this should return with
+> +	 * 4 (pfault handshaking not active).
+> +	 */
+> +	ry = diag258(&pfault_cancel_refbk);
+> +	report(!ry, "handshaking canceled");
+> +
+> +	set_prefix(old_prefix);
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +/*
+> + * Verify that a refbk exceeding physical memory is not accepted, even
+> + * when crossing a frame boundary.
+> + */
+> +static void test_refbk_crossing(void)
+> +{
+> +	const size_t bytes_in_last_page = 8;
+> +	struct pfault_refbk *refbk = (struct pfault_refbk *)(get_ram_size() - bytes_in_last_page);
+> +
+> +	report_prefix_push("refbk crossing");
+> +
+> +	report_info("refbk is at 0x%lx", (u64)refbk);
+> +	report_info("ram size is 0x%lx", get_ram_size());
+> +	assert(sizeof(struct pfault_refbk) > bytes_in_last_page);
+> +
+> +	/* Copy bytes_in_last_page bytes of the init refbk to the page */
+> +	memcpy(refbk, &pfault_init_refbk, bytes_in_last_page);
+> +
+> +	expect_pgm_int();
+> +	diag258(refbk);
+> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+> +	report_prefix_pop();
+> +}
+> +
+> +/*
+> + * Verify that a refbk with an invalid refdiagc is not accepted.
+> + */
+> +static void test_refbk_invalid_diagcode(void)
+> +{
+> +	struct pfault_refbk refbk = pfault_init_refbk;
+> +
+> +	report_prefix_push("invalid refdiagc");
+> +	refbk.refdiagc = 0xc0fe;
+> +
+> +	expect_pgm_int();
+> +	diag258(&refbk);
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("diag258");
+> +
+> +	expect_pgm_int();
+> +	diag258((struct pfault_refbk *)0xfffffffffffffff0);
+> +	if (clear_pgm_int() == PGM_INT_CODE_SPECIFICATION) {
+> +		report_skip("diag258 not supported");
+> +	} else {
+> +		test_priv();
+> +		/* Other tests rely on invalid diagcodes doing nothing */
+> +		test_refbk_invalid_diagcode();
+> +		test_refbk_real();
+> +		test_refbk_prefixing();
+> +		test_refbk_crossing();
+> +	}
+> +
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 3a9decc932f2..8131ba105d3f 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -392,3 +392,6 @@ file = sie-dat.elf
+>  
+>  [pv-attest]
+>  file = pv-attest.elf
+> +
+> +[diag258]
+> +file = diag258.elf
 
-The other aspect of this code is that I don't think we need to limit the ch=
-eck
-to APICv, i.e. KVM can simply check kvm_apic_has_interrupt() after VM-Enter
-succeeds (the funky pre-check is necessary to read RVI from vmcs01, with th=
-e
-event request deferred until KVM knows VM-Enter will be successful).
-
-Arguably, that's probably more correct, as PPR virtualization should only o=
-ccur
-if VM-Enter is successful (or at least guest past the VM-Fail checks).
-
-So, for an immediate fix, I _think_ we can do:
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a8e7bc04d9bf..784b61c9810b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3593,7 +3593,8 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mo=
-de(struct kvm_vcpu *vcpu,
-         * effectively unblock various events, e.g. INIT/SIPI cause VM-Exit
-         * unconditionally.
-         */
--       if (unlikely(evaluate_pending_interrupts))
-+       if (unlikely(evaluate_pending_interrupts) ||
-+           kvm_apic_has_interrupt(vcpu))
-                kvm_make_request(KVM_REQ_EVENT, vcpu);
-=20
-        /*
-
-and then eventually make nested_vmx_enter_non_root_mode() look like the bel=
-ow.
-
-Can you verify that the above fixes your setup?  If it does, I'll put toget=
-her a
-small series with that change and the cleanups I have in mind.
-
-Thanks much!
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a8e7bc04d9bf..77f0695784d8 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3483,7 +3483,6 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mo=
-de(struct kvm_vcpu *vcpu,
-        struct vcpu_vmx *vmx =3D to_vmx(vcpu);
-        struct vmcs12 *vmcs12 =3D get_vmcs12(vcpu);
-        enum vm_entry_failure_code entry_failure_code;
--       bool evaluate_pending_interrupts;
-        union vmx_exit_reason exit_reason =3D {
-                .basic =3D EXIT_REASON_INVALID_STATE,
-                .failed_vmentry =3D 1,
-@@ -3502,13 +3501,6 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_m=
-ode(struct kvm_vcpu *vcpu,
-=20
-        kvm_service_local_tlb_flush_requests(vcpu);
-=20
--       evaluate_pending_interrupts =3D exec_controls_get(vmx) &
--               (CPU_BASED_INTR_WINDOW_EXITING | CPU_BASED_NMI_WINDOW_EXITI=
-NG);
--       if (likely(!evaluate_pending_interrupts) && kvm_vcpu_apicv_active(v=
-cpu))
--               evaluate_pending_interrupts |=3D vmx_has_apicv_interrupt(vc=
-pu);
--       if (!evaluate_pending_interrupts)
--               evaluate_pending_interrupts |=3D kvm_apic_has_pending_init_=
-or_sipi(vcpu);
--
-        if (!vmx->nested.nested_run_pending ||
-            !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
-                vmx->nested.pre_vmenter_debugctl =3D vmcs_read64(GUEST_IA32=
-_DEBUGCTL);
-@@ -3591,9 +3583,13 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_m=
-ode(struct kvm_vcpu *vcpu,
-         * Re-evaluate pending events if L1 had a pending IRQ/NMI/INIT/SIPI
-         * when it executed VMLAUNCH/VMRESUME, as entering non-root mode ca=
-n
-         * effectively unblock various events, e.g. INIT/SIPI cause VM-Exit
--        * unconditionally.
-+        * unconditionally.  Take care to pull data from vmcs01 as appropri=
-ate,
-+        * e.g. when checking for interrupt windows, as vmcs02 is now loade=
-d.
-         */
--       if (unlikely(evaluate_pending_interrupts))
-+       if ((__exec_controls_get(&vmx->vmcs01) & (CPU_BASED_INTR_WINDOW_EXI=
-TING |
-+                                                 CPU_BASED_NMI_WINDOW_EXIT=
-ING)) ||
-+           kvm_apic_has_pending_init_or_sipi(vcpu) ||
-+           kvm_apic_has_interrupt(vcpu))
-                kvm_make_request(KVM_REQ_EVENT, vcpu);
-=20
-        /*
-
-
-[*] https://lore.kernel.org/all/Zp%2FC5IlwfzC5DCsl@chao-email
 
