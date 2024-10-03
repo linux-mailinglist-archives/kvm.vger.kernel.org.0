@@ -1,115 +1,183 @@
-Return-Path: <kvm+bounces-27885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9878998FAEE
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 01:46:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFDA998FAC8
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 01:43:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59D23284639
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 23:46:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 203F31C225F5
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 23:43:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371E41D2B2C;
-	Thu,  3 Oct 2024 23:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938851D0411;
+	Thu,  3 Oct 2024 23:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gnj2GkHD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R6sGEK0S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9C91D2B04
-	for <kvm@vger.kernel.org>; Thu,  3 Oct 2024 23:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544571CF2B1
+	for <kvm@vger.kernel.org>; Thu,  3 Oct 2024 23:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727999039; cv=none; b=pOJFpwbv7YQDAWFMG24j8u3IYttoKsPZrBbGP46nThavpldVKSv1SbU66qniBbjzKioUadnlO+MJf4pad6mt42FG6n+TOUezbcZf0IPrr/tMduWYH0tHuTqY4JxMVwOBmAh1ikucADhTyJon8iapl7nX4moNsnucOKndENuoKLA=
+	t=1727999018; cv=none; b=QsjjeUzXfHkVJqMo6W3RTAKmr0IdiSy2GyhxgRTJtpuY06dtW5p3fBQOJloM53FcJWsCnCHYlPmH3tbLLAAHQoEYaTVQO7sxItjsGtX/uEcevr5arxhl6BIIZvM4OFkXIEd38PS2H9aI/m3Sy/sz3h7oYSXT3crV52TdQnXi6FY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727999039; c=relaxed/simple;
-	bh=xqBlrWuS6MCxk0gww17oourN4jowUONsWvqCnk9wPn4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=T/ydsmNs8wz0B+e7HKa1Raal4Iu5i1P6ZLvbEw/qFVmGdedz3xcT1wuqwYZfLfy2tvRXir6QcZu2JoT4ULYavV51jP4NRD5m3wqb+5PZ19fA5dW+qH1Og2Or9I7V610ozRXzBFElW79x3xWumTyhahgdznvd8xCNKAEI5U2EDQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gnj2GkHD; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1727999018; c=relaxed/simple;
+	bh=5U29iZZFBxQGptPoLMifIvs/bpbj5DZBwz1fHxqdbD8=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=r8dSYRyOqWlxyp2MhgbPBXjp1PAt+PW5pdVl4CXxHqeno/bAk9CzRySNowF+lVUKLILiQlTzD+IDmwMKUl3f/8wyzbU4clyKr2VKuPlKNKd7QQyiBxsJAljm+ftqRzmAQImpobNwkDIy6Fx4hM53cy4m9q/9l3r2iHsNUzSiETw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R6sGEK0S; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7e6cc094c2fso2792232a12.1
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2024 16:43:57 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2e0d77c602aso1556451a91.2
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2024 16:43:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727999037; x=1728603837; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=lHVxAupwVdLj9JS6H09y9gDY/v8cy7swDNQclaU5Fj0=;
-        b=gnj2GkHD8H7lDTYPvn9kCqFhDvtxpsIaGjxuYiU9RxwrELTxOjmbGcSLg0lI3OLt5L
-         Ul9h+sC8EK9sVF4hA0f1BiHB1Mmy8h7+CeEzHKOkyl1I9Eb7e9E+shTIQoLXZeNSt6l1
-         fdOmPQ3mcZfdo5HGiIwbGIeetjrOJnwy9hh1fLlS05YBeGE2dwJFdm3AWQTsmARXlnBq
-         Bogd0xGiLGRoFKJIlj7qpHfTOEhD4Eo6YZF3Q3hw5+Ao9tpEmmJpld8iF9KazCwSFiTe
-         itkM3KiaX+xjwSzNYci0LcGcIuOK87kgNcraXB4kt60/O9bmXVJfPL0spN8Ei5l7i8Ns
-         abNQ==
+        d=google.com; s=20230601; t=1727999017; x=1728603817; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=SN3dVjC5fB1CQSshX6WwUlOM21L2K4T7gTVUDpU5VO4=;
+        b=R6sGEK0SG4OOmzKed1UA7F7lPzL4KmkbrArDZb192L9hwUxy2xew76wDcibZdyIdow
+         bKKkP9r3jV82sI7qBZg8p3jBaFRgdsfm76/YTe/MYa27Di5bO8HcVKifYDDnz3tQm6uY
+         GzvO2/GuBaTRJMUCaGJr7BWP8B+07lLTeqbroj3coeQpqfvBxhZa56jaTqJXOcST2fzj
+         xLtkuidp+n0FWreMRXKGvLWheBGSYotgygi1cdvt91E6LzHdcDLt4Ag6aIJEqTt7BM6n
+         LaPPZDQWkAtW25g7mLgo9oiB6ogJpulukrd8DzBJl39EUTrK3nXh8aKUHfNt29/GGvRE
+         KCLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727999037; x=1728603837;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lHVxAupwVdLj9JS6H09y9gDY/v8cy7swDNQclaU5Fj0=;
-        b=ZZMiMKRlLFxCxed5/lxy6WTU02Nm3irlUXrUo3AlLqBaCmSrE7ecJWHnmzNebtNkST
-         e4jVaLS46Gn7AG+3D3ihsba74QO6Dl9qbsudk8Q/XuNFfoMLdCMu0IlmEC8qmkWY8Uub
-         pwnhrMiElyZq1vHsgVbWNlkvFC52Yb0/NQN/iwQ8n0vDeu5Gs79OqmKxyZEyREKayKOf
-         9HS9n68E4QCBziEukglbIxos/Vj7ttbhleQiDBIICsIXoV/QloJ9q6j/2ZPVPOWLmZ9k
-         syFbVOTaZACPwZnnLhi5oh4Kbiw76qjtX8LJroBtUoHOMu5ly9P7M4eCzcN0tQm2yApc
-         mKHQ==
-X-Gm-Message-State: AOJu0Yx5huOuOIu/cbhWoCrB7pz8v1krMpDj3/sfGfN3C7CgZTISp3s4
-	bUkZT4CJglE1ERuXWEM0AaJnhSrqREFmns8ZWrf7DMUIgn1v+Ds/UnhiXe/iI5xbVnf68YRxecs
-	W4Q==
-X-Google-Smtp-Source: AGHT+IGKroOpNriNfmU45AkA6nSG4g4BolcTa1/5RFMDjU2V8x+RltKhqqMU4YNPO1VDq4XZodpXpHwhZw0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:17ca:b0:2e0:8e0f:7bfd with SMTP id
- 98e67ed59e1d1-2e1b393e2eemr25111a91.2.1727999037305; Thu, 03 Oct 2024
- 16:43:57 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  3 Oct 2024 16:43:35 -0700
-In-Reply-To: <20241003234337.273364-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1727999017; x=1728603817;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SN3dVjC5fB1CQSshX6WwUlOM21L2K4T7gTVUDpU5VO4=;
+        b=d/Md6Dmu+OtUPBm7jCknb2dXUq2t0sri3Rf3m74vRbj9Evt7ciFWhDlH0dehN/sBwm
+         6eee9lWk7SppD/uxJZ9JSGZO1By0L6uy0uTioWVysRXeDMAIPUyEKjugnwmkdX9hfKaJ
+         fYB89chNoVGfFqL/FyDy6UXHkF8Z7ssm9kveVT0KNFT6JjhnPLSSSOumxLDiC/Za3D1i
+         B/w1peZg6z9cAqoQDx91TXIjxeMZgtw6G5y5C2CWx4BUSXE5rVHiAThR7HAT2bNhFYu6
+         YXhJvFnWMCxZE3BFVLWi35x3ahPrKaKFmnkuleVWeAQaKkXpp2eE6BgLznnlXma8DsWC
+         cH5A==
+X-Forwarded-Encrypted: i=1; AJvYcCXhmJ2epLTsdnr73thhoUc+yetnlrTlQqR5iGqTyH2khcyTUtBArgYn1FT5vVKpaJ2p8b4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEejiKgVCWnysIMoIFN4x820+VRGmu5LytY43CI6FZsBiclxMB
+	GCKE9CWRyhTzSltKUSszLUP8L/FMZGDedef//opq4qCEdWzWYfi8si6f/kO7ckAuxP9P+v/yEFI
+	8bsAjzT5FMrTGjnC7efg9lA==
+X-Google-Smtp-Source: AGHT+IHBOIxM9r0ehPl4c3IhMwECnflPechWmOVBJu0WiGbLsRHWGkU66D8A48Rkw+4e+C8ZFyGr8wE06O6tn38x1g==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:146:b875:ac13:a9fc])
+ (user=ackerleytng job=sendgmr) by 2002:a17:90a:51c7:b0:2e0:72ab:98e9 with
+ SMTP id 98e67ed59e1d1-2e1e5dc5fcemr2279a91.0.1727999016517; Thu, 03 Oct 2024
+ 16:43:36 -0700 (PDT)
+Date: Thu, 03 Oct 2024 23:43:35 +0000
+In-Reply-To: <diqzzfnkswiv.fsf@ackerleytng-ctop.c.googlers.com> (message from
+ Ackerley Tng on Thu, 03 Oct 2024 21:32:08 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241003234337.273364-1-seanjc@google.com>
-X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
-Message-ID: <20241003234337.273364-10-seanjc@google.com>
-Subject: [PATCH 09/11] KVM: selftests: Drop manual XCR0 configuration from
- state test
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>
+Message-ID: <diqzwmiosqfs.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 30/39] KVM: guest_memfd: Handle folio preparation for
+ guest_memfd mmap
+From: Ackerley Tng <ackerleytng@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: quic_eberman@quicinc.com, tabba@google.com, roypat@amazon.co.uk, 
+	jgg@nvidia.com, peterx@redhat.com, david@redhat.com, rientjes@google.com, 
+	fvdl@google.com, jthoughton@google.com, seanjc@google.com, 
+	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com, 
+	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev, 
+	mike.kravetz@oracle.com, erdemaktas@google.com, vannapurve@google.com, 
+	qperret@google.com, jhubbard@nvidia.com, willy@infradead.org, 
+	shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
+	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
+	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
+	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
+	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-fsdevel@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 
-Now that CR4.OSXSAVE and XCR0 are setup by default, drop the manual
-enabling from the state test, which is fully redundant with the default
-behavior.
+Ackerley Tng <ackerleytng@google.com> writes:
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/x86_64/state_test.c | 5 -----
- 1 file changed, 5 deletions(-)
+> Elliot Berman <quic_eberman@quicinc.com> writes:
+>
+>> On Tue, Sep 10, 2024 at 11:44:01PM +0000, Ackerley Tng wrote:
+>>> Since guest_memfd now supports mmap(), folios have to be prepared
+>>> before they are faulted into userspace.
+>>>
+>>> When memory attributes are switched between shared and private, the
+>>> up-to-date flags will be cleared.
+>>>
+>>> Use the folio's up-to-date flag to indicate being ready for the guest
+>>> usage and can be used to mark whether the folio is ready for shared OR
+>>> private use.
+>>
+>> Clearing the up-to-date flag also means that the page gets zero'd out
+>> whenever it transitions between shared and private (either direction).
+>> pKVM (Android) hypervisor policy can allow in-place conversion between
+>> shared/private.
+>>
+>> I believe the important thing is that sev_gmem_prepare() needs to be
+>> called prior to giving page to guest. In my series, I had made a
+>> ->prepare_inaccessible() callback where KVM would only do this part.
+>> When transitioning to inaccessible, only that callback would be made,
+>> besides the bookkeeping. The folio zeroing happens once when allocating
+>> the folio if the folio is initially accessible (faultable).
+>>
+>> From x86 CoCo perspective, I think it also makes sense to not zero
+>> the folio when changing faultiblity from private to shared:
+>>  - If guest is sharing some data with host, you've wiped the data and
+>>    guest has to copy again.
+>>  - Or, if SEV/TDX enforces that page is zero'd between transitions,
+>>    Linux has duplicated the work that trusted entity has already done.
+>>
+>> Fuad and I can help add some details for the conversion. Hopefully we
+>> can figure out some of the plan at plumbers this week.
+>
+> Zeroing the page prevents leaking host data (see function docstring for
+> kvm_gmem_prepare_folio() introduced in [1]), so we definitely don't want
+> to introduce a kernel data leak bug here.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
-index 1c756db329e5..141b7fc0c965 100644
---- a/tools/testing/selftests/kvm/x86_64/state_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/state_test.c
-@@ -145,11 +145,6 @@ static void __attribute__((__flatten__)) guest_code(void *arg)
- 
- 		memset(buffer, 0xcc, sizeof(buffer));
- 
--		set_cr4(get_cr4() | X86_CR4_OSXSAVE);
--		GUEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
--
--		xsetbv(0, xgetbv(0) | supported_xcr0);
--
- 		/*
- 		 * Modify state for all supported xfeatures to take them out of
- 		 * their "init" state, i.e. to make them show up in XSTATE_BV.
--- 
-2.47.0.rc0.187.ge670bccf7e-goog
+Actually it seems like filemap_grab_folio() already gets a zeroed page.
 
+filemap_grab_folio() eventually calls __alloc_pages_noprof()
+-> get_page_from_freelist()
+   -> prep_new_page()
+      -> post_alloc_hook()
+
+and post_alloc_hook() calls kernel_init_pages(), which zeroes the page,
+depending on kernel config.
+
+Paolo, was calling clear_highpage() in kvm_gmem_prepare_folio() zeroing an
+already empty page returned from filemap_grab_folio()?
+
+> In-place conversion does require preservation of data, so for
+> conversions, shall we zero depending on VM type?
+>
+> + Gunyah: don't zero since ->prepare_inaccessible() is a no-op
+> + pKVM: don't zero
+> + TDX: don't zero
+> + SEV: AMD Architecture Programmers Manual 7.10.6 says there is no
+>   automatic encryption and implies no zeroing, hence perform zeroing
+> + KVM_X86_SW_PROTECTED_VM: Doesn't have a formal definition so I guess
+>   we could require zeroing on transition?
+>
+> This way, the uptodate flag means that it has been prepared (as in
+> sev_gmem_prepare()), and zeroed if required by VM type.
+>
+> Regarding flushing the dcache/tlb in your other question [2], if we
+> don't use folio_zero_user(), can we relying on unmapping within core-mm
+> to flush after shared use, and unmapping within KVM To flush after
+> private use?
+>
+> Or should flush_dcache_folio() be explicitly called on kvm_gmem_fault()?
+>
+> clear_highpage(), used in the non-hugetlb (original) path, doesn't flush
+> the dcache. Was that intended?
+>
+>> Thanks,
+>> Elliot
+>>
+>>>
+>>> <snip>
+>
+> [1] https://lore.kernel.org/all/20240726185157.72821-8-pbonzini@redhat.com/
+> [2] https://lore.kernel.org/all/diqz34ldszp3.fsf@ackerleytng-ctop.c.googlers.com/
 
