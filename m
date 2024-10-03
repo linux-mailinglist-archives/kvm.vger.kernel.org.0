@@ -1,119 +1,129 @@
-Return-Path: <kvm+bounces-27843-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27844-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF10C98EE26
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 13:31:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4252198F058
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 15:27:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F77F280D7A
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 11:31:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC0F1283186
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 13:27:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A1E155A53;
-	Thu,  3 Oct 2024 11:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F14D19B5BE;
+	Thu,  3 Oct 2024 13:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WbDe+GRa"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="D4KoFvFn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F5B10E0;
-	Thu,  3 Oct 2024 11:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B1F195F17
+	for <kvm@vger.kernel.org>; Thu,  3 Oct 2024 13:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727955077; cv=none; b=TUONC3zHy0t6pSTUw3acX6ZR/Ilk9tr/PJlYvoIoVRRh0M052tgxHOQUlv5AqunDF5Oq4knl1QphNv7tQj/q3w+kmWFmOA6dccT/N64/JMHqYkNH6w1G7dMy8S0UcU3b8OqHZvpGdskeZVkbANlmbiBs/Hynd0K+wXq76OX8FJM=
+	t=1727962049; cv=none; b=Ax6zabsGaEn5QOm1QKkCIq5pDdJQbw8HA3ITNIvnrQ9XRCIm4MZon0IRaHOq/vhO0+1TVDJ9H/sBSEwYTn/1W0ZJz7Iil9l4epUmKocyQT8CshLYNc/C5je2p0S1XtNq+bsBDvOIOS24ioBThdYYXrSw9JKE6FVnAwQYEBIvUnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727955077; c=relaxed/simple;
-	bh=dPHtbssT/NfJUfG2R3Ok7RLINFOaiqY1cVbe7NbvboI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GGbB/udtAK+TS5qlfEaNoDr8VTd2IzTTaMJw19aNCX2RGl2quJX9XIw6U7Jr+2K1MwqE3u2RSL2gc2bZxDPE/fOPyduGf5cxYZ9UrEjNP21LodDXq5qpU9y0HZ9FxCLQMJyqhHvjEEb36vySW2FdKguYaxFGdYQp5UQaslovt00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WbDe+GRa; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5398e58ceebso883028e87.0;
-        Thu, 03 Oct 2024 04:31:16 -0700 (PDT)
+	s=arc-20240116; t=1727962049; c=relaxed/simple;
+	bh=bQDBIqvjgHLFGYT9bOVK3nBw3OiQmakouIHTBhyKrVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jgm0lIPRSevvlr5ilX6BCe2oScHjn/4veZssCgSrCAvqO8Tu7WBn196sxa+ejVpH/+r41IpYs2SYqRntYa6gz9HvjqRZkVVRNLcDRpJr/5wmTGdJ9wPnuDpVKU6Q4o74/w3OPcLoEE1N9D9aVp6gEdiHN1yiCse+ptRe7lnbI68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=D4KoFvFn; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-45821ebb4e6so7534801cf.2
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2024 06:27:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727955074; x=1728559874; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LGgGQGbdcBITdaCsGfvse9I6NkHWAfU3zmrPhGTl0so=;
-        b=WbDe+GRa9p7/sKBpsgsMThEG3D8beTjBAddv5rUUrBS8d+l1dqYj5XTxPqUUK101nz
-         DFxB0yPOOBWh5lclohmFwC7Z5CRfoWD/P1ZCip66BL0G25sFEC/6F7XvPIGY43iZG4/M
-         6KKPDqoB4MBC2VEz61mEtjycHmC69JX+kVxpT1r4HGC6vXTisNAl0gjOpzlgbRuXL77Z
-         UeD1JhNIUwdtg4/emjVNXdrz8jbwyaJLtKr6juep5XT0oQSLIpAvjTDw+acBNHBoP9qx
-         saV7Pj4CYth5+vJBUMxTvnk5cS6L7Y3jaXD/l4et+DU02QZ51HeEySTS5o0F4hDcDNJz
-         CnOw==
+        d=ziepe.ca; s=google; t=1727962046; x=1728566846; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cc2GtirUmQ6kR3TGzhvl/zPuGFrMGbjNkhjuKGHEBZE=;
+        b=D4KoFvFnVfvIPUuYScbf6zxmMXbcTEIRwZSiT+SLdWxuIkMx9ZKtHk4bxJBvTKtmvL
+         yJG4cuUQ/D+528SD/ryh4jQ+3qOZy+yYVBA9j43nAShSJoYxC5GQHeRwO15SR5k/gP4t
+         JWNfZIGMOm85MHq4k+omu8oIQ7qUPl8IyaC0rQ0YLMbZiCo+pIEBMAoJNWfsCKvO8vhX
+         MNnte7/ah+I0xGptDEz9+bUOxsyXo8Eo51ZceOfmNKSBDbRw2ziXHX7h0/Cg+Ks6bdtX
+         vr2l9VOC0kENiwdCDUCFyF/fZrp2n4KszkDJnbFL0GnjchO20m9CCa1m+G0/zh9Vrg/H
+         OCGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727955074; x=1728559874;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LGgGQGbdcBITdaCsGfvse9I6NkHWAfU3zmrPhGTl0so=;
-        b=Uocg82Z/pusgBd9KPdqvQkVUO4oXW+6nfuupbiowcU8NdmyjkbWWeD5qjgxPONi7dV
-         M+elZeuohhwLKpRsLyKy7ntBpmQXMpzoSPj4StxWYgAOsgtxKqs+gz7b7Cx6eZr4vDMq
-         F/9IdjmXf8ya7E/SsTli32Z+uUlb0MeVw++JfVo8XhlRTpLqLGItKz/g+uRyP3TBTSaW
-         c5ituPCMkNzsrzG6sdYJMU0+CHaJS8Qs4DY794v0evsUivM55iXq3QH4/Us+5w603NPG
-         9h51Vx6ETCtN8XX80ibgVLLIgMHHO4/cLW2rMbrboSvl8FUdi22j3JNkV4BPxeQ5m/a9
-         oZdA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4BzcE7XcVTH+z9OOJVlzpwGxjKb5SZn60p6rXNeE8ulnwjfwSBNxUC0rjDjcPepbrM6Y=@vger.kernel.org, AJvYcCWjY03a5aGzZGYyFDTahmPIEbkfPbm1wRoRzurhfUz6a+v4JUW2EhrfKPb3mUeev7/HS7H0eN9oDcZiO3OU@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUQ9CdddrrHAXPXK/fGt+uaYP5x2+wVnDeuFEXhyMlHm5xXGrQ
-	3PSM+xHhBg1GcdeT02oi/YAbucfRWmPYdyuT03RDA+taTmowBy/W
-X-Google-Smtp-Source: AGHT+IHDBJJJkhVZ4zol7APNI5YIcYH9QdNSCLSVIno0G0gjDlcotlo7GFg5T65cfp2+5zcr9h9/DQ==
-X-Received: by 2002:a05:6512:a8b:b0:533:4784:6aec with SMTP id 2adb3069b0e04-539a627691cmr1075184e87.27.1727955074073;
-        Thu, 03 Oct 2024 04:31:14 -0700 (PDT)
-Received: from localhost.localdomain (2001-14ba-7262-6300-e292-a4f4-185c-9cdf.rev.dnainternet.fi. [2001:14ba:7262:6300:e292:a4f4:185c:9cdf])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-539a8256af9sm158105e87.94.2024.10.03.04.31.13
+        d=1e100.net; s=20230601; t=1727962046; x=1728566846;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cc2GtirUmQ6kR3TGzhvl/zPuGFrMGbjNkhjuKGHEBZE=;
+        b=QLlrKEuKeuX/bdq2twSIugdphEjBwMN2anIEkbYJ+Al9kbWWqx9J4OAlqc7yROdW8i
+         PZv9ldPuL+y5/nLXASG6MEebdTIE6oPBQqKPFomMbqLZySRrVnPXhV2fa3/eD5dNFM4F
+         3hf0UUdw2a8X8I0/AjW2WIABMOev8O3y2niAnktGY5FyitcAS8/a548JR9paNPvtOaNj
+         Ot43EaJbl/6OsuJVZ2hrz1PEg8AlGejmn5QgfaOqfyM9jghccztfhJDyeZWm/AzMDRAR
+         supRgOMkWScyFs7lJy6HBLXxRihQWdAl2OLRjVCUbjrhSJN60SjZ3uK2iavlEVW5Hq9j
+         crFg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQLd1HOpadCMu9fuOxkJ6MGXWnil2GiyvBHo1gIBCmArFzV8KVQUekRnIU66YYKqfvZto=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykYv7NFEDCMxXiKt/6MWjWreTvIBSuoQjEQnU8XyEOxv22ycMl
+	RMumLFJA9iqSLqKK/lXhde9qzVPPgfj0PvGou9jY+VE+sXFDDkVDU4KKk7Hf1IE=
+X-Google-Smtp-Source: AGHT+IHdsqmMnAikLaL30SlmXTNHCfwHdVdF6V4bu8a+VKbWoQ7V+K/jqGWmGx8IKfbi50OEOlxglA==
+X-Received: by 2002:ac8:5746:0:b0:45d:7ebd:76e0 with SMTP id d75a77b69052e-45d8054de1emr92224521cf.44.1727962046402;
+        Thu, 03 Oct 2024 06:27:26 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45d92e30a82sm5511161cf.57.2024.10.03.06.27.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 04:31:13 -0700 (PDT)
-From: =?UTF-8?q?Markku=20Ahvenj=C3=A4rvi?= <mankku@gmail.com>
-To: seanjc@google.com
-Cc: bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	janne.karhunen@gmail.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mankku@gmail.com,
-	mingo@redhat.com,
-	pbonzini@redhat.com,
-	tglx@linutronix.de,
-	x86@kernel.org
-Subject: Re: [PATCH 1/1] KVM: nVMX: update VPPR on vmlaunch/vmresume
-Date: Thu,  3 Oct 2024 14:29:25 +0300
-Message-ID: <20241003113050.22875-1-mankku@gmail.com>
-X-Mailer: git-send-email 2.44.1
-In-Reply-To: <Zv2Ay9Y3TswTwW_B@google.com>
-References: <Zv2Ay9Y3TswTwW_B@google.com>
+        Thu, 03 Oct 2024 06:27:25 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1swLrZ-00ASSm-2s;
+	Thu, 03 Oct 2024 10:27:25 -0300
+Date: Thu, 3 Oct 2024 10:27:25 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: James Gowans <jgowans@amazon.com>
+Cc: linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	"Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+	iommu@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Alexander Graf <graf@amazon.de>, anthony.yznaga@oracle.com,
+	steven.sistare@oracle.com, nh-open-source@amazon.com,
+	"Saenz Julienne, Nicolas" <nsaenz@amazon.es>
+Subject: Re: [RFC PATCH 03/13] iommu/intel: zap context table entries on kexec
+Message-ID: <20241003132725.GA2456194@ziepe.ca>
+References: <20240916113102.710522-1-jgowans@amazon.com>
+ <20240916113102.710522-4-jgowans@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240916113102.710522-4-jgowans@amazon.com>
 
-Hi Sean,
+On Mon, Sep 16, 2024 at 01:30:52PM +0200, James Gowans wrote:
+> Instead of fully shutting down the IOMMU on kexec, rather zap context
+> table entries for devices. This is the initial step to be able to
+> persist some domains. Once a struct iommu_domain can be marked
+> persistent then those persistent domains will be skipped when doing the
+> IOMMU shut down.
+> ---
+>  drivers/iommu/intel/dmar.c  |  1 +
+>  drivers/iommu/intel/iommu.c | 34 ++++++++++++++++++++++++++++++----
+>  drivers/iommu/intel/iommu.h |  2 ++
+>  3 files changed, 33 insertions(+), 4 deletions(-)
 
-> Talking to myself :-)
-A good monologue. :)
+We should probably try to avoid doing this kind of stuff in
+drivers. The core code can generically ask drivers to attach a
+BLOCKING domain as part of the kexec sequence and the core code can
+then decide which devices should be held over.
 
-As you said, PPR is updated constantly with kvm_vcpu_has_events() anyways.
+There is also some complexity here around RMRs, we can't always apply
+a blocking domain... Not sure what you'd do in those cases.
 
-Actually implicit updates, especially in kvm_apic_has_interrupt(), makes it a
-bit difficult to follow when these updates take place. It is quite easy to
-accidentally make an update in architecturally incorrect place. Could be
-useful to make it explicit.
+IIRC we already do something like this with the bus master enable on
+the PCI side?? At least, if the kernel is deciding to block DMA when
+the IOMMU is on it should do it consistently and inhibit the PCI
+device as well.
 
-> Assuming it actually fixes your issue, this is what I'm planning on posting.  I
-> suspect KVM botches something when the deprivileged host is active, but given
-> that the below will allow for additional cleanups, and practically speaking doesn't
-> have any downsides, I don't see any reason to withhold the hack-a-fix.  Though
-> hopefully we'll someday figure out exactly what's broken.
-
-It fixes the issue. Thanks a lot Sean!
-
-Kind regards,
-Markku
+Jason
 
