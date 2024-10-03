@@ -1,416 +1,158 @@
-Return-Path: <kvm+bounces-27841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AAE198ED9C
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 13:08:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15DC198EDAC
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 13:14:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 209C31F22A28
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 11:08:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDCA52829C5
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 11:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E30153820;
-	Thu,  3 Oct 2024 11:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE151547EC;
+	Thu,  3 Oct 2024 11:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="vy80CldH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jo5b2EyM"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2070.outbound.protection.outlook.com [40.107.243.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B56614431B;
-	Thu,  3 Oct 2024 11:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727953727; cv=fail; b=EQ1EXt1LRM4s2jZbJJmqfmcANtxNrjZ9TNf4xhWV1stEuhrQ1J4PNYVNClgS+6rGR2uVvIKNhT7lvVLMdLhO1uDo3nsARc1PjUdjD8KJE18IonmwaSY5vv8g8spousRcoREsPtAsLWjauHtxwfbogEFtTJOmes4LOZprjunDFdU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727953727; c=relaxed/simple;
-	bh=HzYJ2WP0mMXs+AlRgNp6XVtKs3s18t6/tuvqfZExKJc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=hiRjAPblezgLL3mGXbeG113T0U+mO/4eTupotdww/xRJ1pERLECuAtxTA4f7IBOTsnZO9xHxgqvTL6jIy5m01K3NcJV93zR4CKsGVhljBY2lNR0Cuj84OhfqiGF12vT2dU9B028BNVbu3nxKcBSxrA/Y/qaFkIP2GQLDpxWp9kU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=vy80CldH; arc=fail smtp.client-ip=40.107.243.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FoTOLphHlLO+i9ZCncGKR8wt0iPdN6gUe7Iy7ftKP/0PIV46tPpfoDWR5jQKgcM9kRc0ZXJUkT26tsB6TZNG7XJlPvEakcbfgzUbE+zyGVhM/dClrFnDXdonB7ENhc0Zuo2Unw1H+k9McJ7PpS02TxHoguzIuAMoAnyCn3uAyVOH9Gmig68hP4nU3Qx83m50W1rGQAU04jVtrgsUTut0ew2TPGYLBGPJ/Kxp0YmsIPOPg63CHWJn/vAVURLy1WPOBaUVymBVhTBN+7+4ofTMHYpvbrU4kXJkIUrbVfU8FgubLx6IQp2PVdg8In/itoekFnmClNaH4MwmVayD28TzKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DMCRRFq2PYg412EIlRmokJEH3yZxX1ATO3ltuEJO6XE=;
- b=u4ESneXoOUe7SmYgeRBBciB3hjmOVvT1RYofFu/g+sv9lg5F+4w3tGOqj997iEi/CPwGUic2NY51QcSXuYPN39ZO9rSktXYEYQQZpK994I2lGeEQPxXPjFgA9Cv6y269tVqT5TG7bjT6zkSfPiSGiJYXz0nJQOGi4IGX9hRIPNSR/6ejFV78bakp2Yf6h0AyK0kQcjAF2OKAM7SzHDSFrYvnMXTAKuRqlyN3KGNvctpsg8sbxZsVUCJy6UYPVunVwC9nez3W4A+C7m27KG+8dqtPKGnRJCA3Q+z9q3dAPkWtOhuIa2xuOKaARY3fkY92x+t8W3niifMQqx2b7VlDbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DMCRRFq2PYg412EIlRmokJEH3yZxX1ATO3ltuEJO6XE=;
- b=vy80CldHwPZPUkvNUSNRZWAFsQmeHuD5rVctNnDrPtaTr21WNdtyWRupLD6ERgnH7XYRJU0ZuwzZynhh8BJyDNxrPfDJf9vwk0s++E+dIe+q36JuYPa7Z+9R41mS89MzZLt8phkx3dd7pNsAxZ8olpTI37fveO7MVVv2+AREyXU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- PH7PR12MB7379.namprd12.prod.outlook.com (2603:10b6:510:20e::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16; Thu, 3 Oct
- 2024 11:08:42 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb%5]) with mapi id 15.20.8026.017; Thu, 3 Oct 2024
- 11:08:42 +0000
-Message-ID: <a4c77249-919e-4450-b41d-6b82dec032c7@amd.com>
-Date: Thu, 3 Oct 2024 16:38:33 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 3/5] KVM: SVM: Enable Bus lock threshold exit
-To: Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, nikunj@amd.com,
- vkuznets@redhat.com, bp@alien8.de, babu.moger@amd.com,
- Manali Shukla <manali.shukla@amd.com>
-References: <20241001063413.687787-1-manali.shukla@amd.com>
- <20241001063413.687787-4-manali.shukla@amd.com>
- <728df37b-b162-8adf-8639-86233d0cf770@amd.com>
-Content-Language: en-US
-From: Manali Shukla <manali.shukla@amd.com>
-In-Reply-To: <728df37b-b162-8adf-8639-86233d0cf770@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0169.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:de::13) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8964414431B;
+	Thu,  3 Oct 2024 11:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727954034; cv=none; b=RnTvpHk6QXcQiB6o8HEEdYp8nOUGzI3YA7ilzFIfB6XHeHjGlH52mUXXYc0xr8HH5ohBBM32wXftJYcoLJTqkYSOwB29SnKVn7+mJYhWBsY2ufYWKwDtfu0f3b3R081vXJt7iviSeHGBGmYRzzXSmWqwRzhAhvqSDH6qZyOxJK0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727954034; c=relaxed/simple;
+	bh=ncshirJSuuxVYT6Rg4hMRMg6qTFNBzUzykD4N2BkVY8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kPHSvaGKTWN8C0Nx37QsvMHDiJT6HLS64DtcWGxae2zf39VWSoA27me9CYpyUqVRwF4+8WeJMGg4N5tNvpBE+56XS0M66lBlX14WFwtEEYSRYswezlEZzDTamgqwcsSlUDI9I83gZnikxGS0BA6+RFEgARFxKs9gz5EtnPICyPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jo5b2EyM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02029C4CED4;
+	Thu,  3 Oct 2024 11:13:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727954034;
+	bh=ncshirJSuuxVYT6Rg4hMRMg6qTFNBzUzykD4N2BkVY8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Jo5b2EyMOS3uk9JDlHSQeU5R1aJyjAs0+fTPWkZCep6Wfe3FtEcKX92qY2mtaY2EK
+	 Ci8TPn6Ee42qRsmfrcj1l+x8zMsi6bvfBaExW2NU/fSlbTuDXDF1+X8cFBydkm8Y27
+	 lb+XzyBozg7zRqcDdBoznF0nnozWrNcR9tzS6b9UomNb4g91qxhdupQuTqUK4zEuA4
+	 z7g+nzwCR3g6dyxU7168Y4P6qlP/X9DMrNre/R3uCNKxAg+BkBWF+gHp9jrQW3cTIh
+	 xrWMcRuCjU0dRKRqqjEvI0IIIfAguu/05IPATBt+DaAJfq3OXiy9Jf7zCzIbXi+uOl
+	 853BOc6UvNv1A==
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53995380bb3so1051099e87.1;
+        Thu, 03 Oct 2024 04:13:53 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUMZ83aPs6Y9Mc8/76A84iJla1AJCX9Et2K13+KujubLe2sgHbvnKgZl4NuiD05HVtyE8WoJyooTELHDKJc@vger.kernel.org, AJvYcCUol65TBElcH6VRPdOKTevF5/Lg0Bgvr04QoHuzeJ3vv0tXAom1N8dA6JhOhqxEsnpwFieSoEgOiaao@vger.kernel.org, AJvYcCV2cpTVxzMwed+BQGXixWf2l6Z1qOjOhdS+ZPRILONG3juJVUAa0l4Zf0jyUO+AN/tX3AubuqvbL+Ht2w==@vger.kernel.org, AJvYcCV7SHMXRybZNmiZtR6oeW3XlhWJ1sPvIu0OCAp6W/yr/M2Cr8GVxev0QSXYb8S9gB2bsNWEFlveQx67vqKTdRY1vw==@vger.kernel.org, AJvYcCVJycArIR3VPg10j8rte3NuVKrN4Dmbp658AY1jhRwXGJa6NxFlF4vgRLHCCLJxjzLUtOflFlJdVswb13Kq@vger.kernel.org, AJvYcCVKCH+27bj3KprvYndBy1OLWcz2gzFauQzBYu9karbRPFXS4JY+qZ4NI2zETiEcLm3JbJYurHJFJ5km@vger.kernel.org, AJvYcCVcx5OIiA5GHF2O32Qr+FTzWaMyGUhNjGDurLGNpEP0zFwdIVFyFcGZXSv+fycttd4RGuQJgTfOEOqmVPTc@vger.kernel.org, AJvYcCVvZrcqj31MD4y8rXNg+pz6HKBUIvYSj4JzJcBz5q6QkdO4qgoD/0iJh9oAg1i2BZougKDDXCgcp0ZWV9zi33E=@vger.kernel.org, AJvYcCWmGLvSpl1papB8MvSTPgS3BfainKQddGsUq0U3iaLkR/wjmAjqJFIMpmXpdpYTYMxfqmwnOXYCzns=@vger.kernel.org, AJvYcCXEL4X4VlMI
+ XN6mutoyZsnTaiRR8MYaOjH0ixRxr5SsiEgXOfAD6OYUkpqwMxpR9paJcRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYusTtmvHCpx+fbQj35DhxxIcDdBxZMUegSYe4vdI008LT62L9
+	POZO1ex2ELV2iUqAp2JCPWCr6iQo88kkk52Cdhf6Ls8/9HA/oIsCmBfOcw6nZCIp93wnszGav6m
+	/VNPGY8sBWRRCLFdtEFGdi7TAss8=
+X-Google-Smtp-Source: AGHT+IH0sWh3HiA/Y/FG77TM2NrCKaNhbA4eJ/qwHE/WqxSdpNeBFdDDl6WpEY+OacY7yD9godh5OoCJmImz57qPZ+Q=
+X-Received: by 2002:a05:6512:1241:b0:536:9ef0:d829 with SMTP id
+ 2adb3069b0e04-539a07a1db9mr3832198e87.44.1727954032228; Thu, 03 Oct 2024
+ 04:13:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|PH7PR12MB7379:EE_
-X-MS-Office365-Filtering-Correlation-Id: 007cc2b3-44fe-42a5-dd12-08dce39bbd95
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VGNxQWhqclJNWXRJbjJ2bU9XNVVwZnR4RHZ0NFFLckRHcmdtN0N6SEM1TkFE?=
- =?utf-8?B?ZW5HRW1CYUkvNWxxdE1LeXE3VC84U3VwNGpPNnpMa1dxZmNaWnVBTVBkNlFY?=
- =?utf-8?B?ZVJKeHBTRVFSVFJnZWhtSklqelRyMjhTcGtndkp3NW5DY1I5SWhEb2l3QkhL?=
- =?utf-8?B?TnlkMk5KbVZLVi9NWmRtZWlYU3FjZ09DNlR2YittcHFPRG5EVmRHK1lWa1k5?=
- =?utf-8?B?V3REM1RzMDJldUsyT09TTndLeDl4aVFyblBIcDlUVGd1NEFMbXl3RmJGS2h2?=
- =?utf-8?B?aEJNMzNmYUMyMFNEQU44VkVPM1d3dVcxRGZwejJOaC9KU0xJOG9QSWptS3BY?=
- =?utf-8?B?WFdaZ0l3NVBHNW4xYWp5cFRkRVYwUDVWUmtVNVp2c0hVV1R6K2FLMWhWeEFy?=
- =?utf-8?B?YTg5NnFISE1pNXBxWlFlcmRRaTJmSUY2NHhmYmpGT1N6R05NZTJNU3FKOW16?=
- =?utf-8?B?eHZXZU5IVVdMc01kbTZRcXNrTHh0Y1QvN1NMencvTW9xMXV2WGlaM0pxcU80?=
- =?utf-8?B?bGV3TWZDazBQUHhGaVR6cWFXUWhSRmhvS0crUExhQVBEZDlWdDNWeVpvYzVR?=
- =?utf-8?B?VThNdVFBUjBmVmo3cndhOC9YNHlNMlZ0Z1N4YlltVEV3bVRIYWtSL2UzVGJG?=
- =?utf-8?B?UTVhMEhIVFgrL0NHNnlRcHJNZ3Iwa050QlJJNEFmbXBDb0NNWnpUOWVUcXJN?=
- =?utf-8?B?WWI1Z0M5NGpXcU45eUdmWEpxeHFJbkt0ZUs2dlVvNFJtNzNXTE05VDYralZo?=
- =?utf-8?B?Q1VxR3cyVElzcE1ZMTJPL2QyZDFTd0pOdEhPRm1sOUJOVytrWlJEcmlRZ0Uv?=
- =?utf-8?B?R0IxbUo5NkMvanRJN28rZGNXR3RxOEk1alphRzRuQ3lLOGx1bU5CdjhMWENR?=
- =?utf-8?B?S1JXdUliYXR4YXJLTEFBWVM0dzZ5bVpzQmJpWlBqdVNmRnpIQTFuYzNpb3A0?=
- =?utf-8?B?K0lYYkVhYU1RNjF2cnMwZFV4TzNMVEtEK0F2UWNoaVpwOHBHS2ZVd1Jhbk9t?=
- =?utf-8?B?eldLRStkamcyR1FEVkwrV1dyczdtb2UralFvZDk1djJ3M3pzM2FyQjhBblFM?=
- =?utf-8?B?Y3RRWlNlRm5mNTR1RDlUa2pQbWZMNUJzM1R4WjU3VHBMV1dtNE5RS2JaVDA5?=
- =?utf-8?B?Qm9YbDZXb3Y0THI5amVnaUJVNWpjbVZFZysvN3pwSUx1NGhlWUpleHBERHhP?=
- =?utf-8?B?UmZTV0RkcjdoZ3hndVZZV2VsMnExQTJoR3JwamhVblhPZ0lTeUxIQmoxTjBT?=
- =?utf-8?B?VEQ1TW5mc1dxdnRCQTdOQzRVU29lK3FqYmJWT2xINkF6eXZCdGwwL2lCR0Vp?=
- =?utf-8?B?c3Y1R3oyaFRQQUsvTkxlTUJIU3phK0poVGMyeURvc0dnOHFIRFFlOExlRGJn?=
- =?utf-8?B?L25KZnNOVXhsL3pKQlhYWEJneVBnemo3bzVabE5jcUhVbVgyS21Xb1IwS2FB?=
- =?utf-8?B?clNla2xja3QxdE9rQVNQVEhoZWpBQ3VCTXpBRU92RHo2ckllbUhZS0VPVjQ2?=
- =?utf-8?B?L285MmFPR0l3UUZKczVPQW84bDRHSXEzUGV3aU1Ea2FHbm03MExkOG56OHdL?=
- =?utf-8?B?ZEJBZDBpVmx2R0lnMDk3YTBzYndnWVJFOGtqL1hUYnN2RU1VeHI5bk9lVkNJ?=
- =?utf-8?B?Y2w3SkJkeHdWdnZHcFkzNE9sVVJJOGsxODhMd2RrV2NkZm5tbWI1cjdseS9C?=
- =?utf-8?B?VjRoazYwVngzVWNVN2pTODVLc0d1NEVVVTZQVFZBK3U3SXJhS3Q3VEpnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TzZ3T01UaEFtSnZiQ3ZjcjI2YzlGWWVWRzAwODVlaGZVVjdsVE80SnphYzRV?=
- =?utf-8?B?SnExZGg4ZExjYzBGY3ZFSXVKeVVKR1BaaS93ek5GQllMN1psbXVCUUt6SzBu?=
- =?utf-8?B?bnZKZjZHOTNmQVZ4KzdnVTM4L2V4d1MrcXJvNis5cDJodVM3UXBMeHhWNnM3?=
- =?utf-8?B?K3VlTFdoejJwV2xUbW9WZ2dCckR6Q3dYR28zb0tqMXVtRmJxM21RR0lla3hT?=
- =?utf-8?B?anVKT1hhNzZHQmFSZVNWYzNtbkdhd1RDVC91WFp0dEZnQjg2ZnU5TGQ5WW10?=
- =?utf-8?B?S09mVFdYZ2JTc0NFdFpBUEtzM29mZHNBdkVzU3hxN1NaODgrb255bEF6cm15?=
- =?utf-8?B?WHFNeWN4TXJWeGwwUkpFWnBLUjdtRVhSY3IyYmNtenFOWVlxWmlJRUtEaDBW?=
- =?utf-8?B?OXY0enRmakVuSU55NTZJYVhMU2t0czRBZFAxVGsyNUhyWjM3ak1PUUdNQnFG?=
- =?utf-8?B?elM4cU52S2VVNFlNUW5HYTZFblgrTmdwZ2Z3WTFoNWtmZDh6WmRrazJtNzVv?=
- =?utf-8?B?MHc3YkNnU3JFVEViZnVMd1dlSGNZY2E0djR0VzNKSkxSTitKdEZTWGUrTVls?=
- =?utf-8?B?T203RXhncmhmcjFKdGIyMCtyM0pHZ0VXMDVuNVQ4enRkSlFHUFRscSs3MlBY?=
- =?utf-8?B?bXQvYmxIWDRyek95ZTlySmlpcGxHTjBORE42dm1vaS9vcno1RFpJSFQzbmFR?=
- =?utf-8?B?U3QwczZ2ZHNiSVAwSTdpTW94RXIvNXhaTFBscldCWnJ6c0RDNStvd1lEUDc5?=
- =?utf-8?B?c1gxLzI1VThVTzJWR0IwU2hsZSt5UEZjdnVVWnhFeXZ0TEVEaGVIcEJtNVF4?=
- =?utf-8?B?c2FzUVN4K292L2x6aW1RQzUyZjZxdFlJcmlveUpZKzVDc0x1NzVYc0tEOGI5?=
- =?utf-8?B?bFNrb0RaSC9RUWVLWTl6MzJaVkUwSlBsK0NvdkU1QVRYbm9meWlPcEk4MW5o?=
- =?utf-8?B?NDNEY1hNRVNVRnhFN2pIWlBOcGxKdGpjV3lML3cwbk5vdTcrdDRDMkhLZ3Iw?=
- =?utf-8?B?dnRJR0prdlozMEM3TE5MOFRZYjdXUVJ5OE42SDRBbmlTenZWd1MzRkhlQzRR?=
- =?utf-8?B?MVlkU0FsK2R0bVZGMlpHY0lqQTlJL3pETHZQUC9rUzJETk4xVUJOVDRRMjJz?=
- =?utf-8?B?c2ZTMGJsdVZjeHhhZFR2TDRPck1pL1NzaGF6eXYvcko3SDVZZURlZHBTZWVu?=
- =?utf-8?B?WVNYRUJidlVlbGtlb3loTXNMVlpJTVlxVnk1eWs1bVJ1dG14QjJIU1A0dDZh?=
- =?utf-8?B?WHVQV2cvZk9ZUVkxM2dUTlcrVVZKUEJLd1dDOTRnSVlCRE9EL0ZCV1M0ejhh?=
- =?utf-8?B?Ukl3NFN4b3FjbUc5aDkrUW9GS0U1ZlRUMVBCRE5oeDhHeFp6djZqaWR0ZEhF?=
- =?utf-8?B?KzQ2V3hJaFVaODBkdkZKQ0NpSDhkMHNHdXppMVlDcW1ab0E2cUNrYUNxMTJq?=
- =?utf-8?B?SDE5b2p2R1g0N3VMYjlsdXZSS3BiaW8rUTBoT0w2VkRLWjdsdlpzeURYN2RR?=
- =?utf-8?B?T3BkeHdReUdTUm1hR2lxOVp2eGFCMzRDaWZsMUkycFBtTU9FVmQ1dm9kZ09G?=
- =?utf-8?B?NWsyWFlTNmxZenZSM2lDcXFONFhZdW5hVlU2c25rRFQ5YVhhVjF6NlFuMG1K?=
- =?utf-8?B?QnBPaWltbHFqVGkvSVFBdVZQSFBUSm04RUVDY0FLSGg2ZWlEZVBSSXBFT2tR?=
- =?utf-8?B?cDVlRUpMMzMvTzBKYWx1WE1VTlloRmZabkpDWTYwRVFHaEN4ZDBuTmlGMmJs?=
- =?utf-8?B?YkxJR2FZNWcycVFnM3AvYThNOWVoNmI2RllWUnI0eHNaWmpCdkRGNVF0NEhw?=
- =?utf-8?B?L25TcjI5NHVzOG5jTVNNMmQxLzFVNE05L29HbHR4Q1c0TWh6YWtRV0VYVVQ0?=
- =?utf-8?B?TXhoT09ZSTRhbTRqRDhUVytuVTZCQ1l3TDdIdDVQRlBYeExtQktzQ1ZlZklN?=
- =?utf-8?B?T3BVK0ZxUktmaWQzbzBORmpIVmZvZVRXRDJSZklNZVdpTUJuM0dTaUpZckVW?=
- =?utf-8?B?bTB4aEdGVDZ6UTdES21Sd2hmUml1cTBYNzdkTzFieG9GbythRmJUc3RZYkFF?=
- =?utf-8?B?cTU2N3lvc1NOYzdhMlJpM1NRWC9ueU1SR1lobGxFcncrYUhIZ2kwelZGbVND?=
- =?utf-8?Q?f5hx43XpFDiPQpiXNDereEU3t?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 007cc2b3-44fe-42a5-dd12-08dce39bbd95
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2024 11:08:42.3384
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pj7kmWBK3+u62nlwmITlcg3LcPd0z3ED37f+kOk7hc8zUf69+j2/74KoN9/Nb+0XvHTlPmqzYM00pwMXuterVg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7379
+References: <20240925150059.3955569-30-ardb+git@google.com>
+ <20240925150059.3955569-55-ardb+git@google.com> <99446363-152f-43a8-8b74-26f0d883a364@zytor.com>
+ <CAMj1kXG7ZELM8D7Ft3H+dD5BHqENjY9eQ9kzsq2FzTgP5+2W3A@mail.gmail.com> <CAHk-=wj0HG2M1JgoN-zdCwFSW=N7j5iMB0RR90aftTS3oqwKTg@mail.gmail.com>
+In-Reply-To: <CAHk-=wj0HG2M1JgoN-zdCwFSW=N7j5iMB0RR90aftTS3oqwKTg@mail.gmail.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 3 Oct 2024 13:13:40 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEU5RU0i11zqD0433_LMMyNQH2gCoSkU7GeXmaRXGF1Yw@mail.gmail.com>
+Message-ID: <CAMj1kXEU5RU0i11zqD0433_LMMyNQH2gCoSkU7GeXmaRXGF1Yw@mail.gmail.com>
+Subject: Re: [RFC PATCH 25/28] x86: Use PIE codegen for the core kernel
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Uros Bizjak <ubizjak@gmail.com>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
+	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
+	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Tom,
+On Wed, 2 Oct 2024 at 22:02, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Wed, 2 Oct 2024 at 08:31, Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > I guess you are referring to the use of a GOT? That is a valid
+> > concern, but it does not apply here. With hidden visibility and
+> > compiler command line options like -mdirect-access-extern, all emitted
+> > symbol references are direct.
+>
+> I absolutely hate GOT entries. We definitely shouldn't ever do
+> anything that causes them on x86-64.
+>
+> I'd much rather just do boot-time relocation, and I don't think the
+> "we run code at a different location than we told the linker" is an
+> arghument against it.
+>
+> Please, let's make sure we never have any of the global offset table horror.
+>
+> Yes, yes, you can't avoid them on other architectures.
+>
 
-Thank you for reviewing my patches.
+GCC/binutils never needs them. GCC 13 and older will emit some
+horrible indirect fentry hook calls via the GOT, but those are NOPed
+out by objtool anyway, so that is easily fixable.
 
-On 10/1/2024 7:13 PM, Tom Lendacky wrote:
-> On 10/1/24 01:34, Manali Shukla wrote:
->> From: Nikunj A Dadhania <nikunj@amd.com>
->>
->> Virtual machines can exploit bus locks to degrade the performance of
->> the system. Bus locks can be caused by Non-WB(Write back) and
->> misaligned locked RMW (Read-modify-Write) instructions and require
->> systemwide synchronization among all processors which can result into
->> significant performance penalties.
->>
->> To address this issue, the Bus Lock Threshold feature is introduced to
->> provide ability to hypervisor to restrict guests' capability of
->> initiating mulitple buslocks, thereby preventing system slowdowns.
->>
->> Support for the buslock threshold is indicated via CPUID function
->> 0x8000000A_EDX[29].
->>
->> On the processors that support the Bus Lock Threshold feature, the
->> VMCB provides a Bus Lock Threshold enable bit and an unsigned 16-bit
->> Bus Lock threshold count.
->>
->> VMCB intercept bit
->> VMCB Offset	Bits	Function
->> 14h	        5	Intercept bus lock operations
->>                         (occurs after guest instruction finishes)
->>
->> Bus lock threshold count
->> VMCB Offset	Bits	Function
->> 120h	        15:0	Bus lock counter
->>
->> When a VMRUN instruction is executed, the bus lock threshold count is
->> loaded into an internal count register. Before the processor executes
->> a bus lock in the guest, it checks the value of this register:
->>
->>  - If the value is greater than '0', the processor successfully
->>    executes the bus lock and decrements the count.
->>
->>  - If the value is '0', the bus lock is not executed, and a #VMEXIT to
->>    the VMM is taken.
->>
->> The bus lock threshold #VMEXIT is reported to the VMM with the VMEXIT
->> code A5h, SVM_EXIT_BUS_LOCK.
->>
->> When SVM_EXIT_BUS_LOCK occurs, the value of the current Bus Lock
->> Threshold counter, which is '0', is loaded into the VMCB. This value
->> must be reset to a default greater than '0' in bus_lock_exit handler
->> in hypervisor, because the behavior of SVM_EXIT_BUS_LOCK is fault
->> like, so the bus lock exit to userspace  happens with the RIP pointing
->> to the offending instruction (which generates buslocks).
->>
->> So, if the value of the Bus Lock Threshold counter remains '0', the
->> guest continuously exits with SVM_EXIT_BUS_LOCK.
->>
->> The generated SVM_EXIT_BUS_LOCK in kvm will exit to user space by
->> setting the KVM_RUN_BUS_LOCK flag in vcpu->run->flags, indicating to
->> the user space that a bus lock has been detected in the guest.
->>
->> Use the already available KVM capability KVM_CAP_X86_BUS_LOCK_EXIT to
->> enable the feature. This feature is disabled by default, it can be
->> enabled explicitly from user space.
->>
->> More details about the Bus Lock Threshold feature can be found in AMD
->> APM [1].
-> 
-> You should mention in the commit message that this implementation is set
-> up to intercept every guest bus lock. The initial value of the threshold
-> is 0 in the VMCB, so the very first bus lock will exit, set the
-> threshold to 1 (so that the offending instruction can make forward
-> progress) but then the value is at 0 again so the next bus lock will exit.
+Clang/LLD is slightly trickier, because Clang emits relaxable GOTPCREL
+relocations, but LLD doesn't update the relocations emitted via
+--emit-relocs, so the relocs tool gets confused. This is one of the
+reasons I had for proposing to simply switch to PIE linking, and let
+the linker deal with all of that. Note that Clang may emit these even
+when not generating PIC/PIE code at all.
 
-Sure. I will add to V3.
+So this is the reason I wanted to add support for GOTPCREL relocations
+in the relocs tool - it is really quite trivial to do, and makes our
+jobs slightly easier when dealing with these compiler quirks. The
+alternative would be to teach objtool how to relax 'movq
+foo@GOTPCREL(%rip)' into 'leaq foo(%rip)' - these are GOTPCREL
+relaxations described in the x86_64 psABI for ELF, which is why
+compilers are assuming more and more that emitting these is fine even
+without -fpic, given that the linker is supposed to elide them if
+possible.
 
-> 
->>
->> [1]: AMD64 Architecture Programmer's Manual Pub. 24593, April 2024,
->>      Vol 2, 15.14.5 Bus Lock Threshold.
->>      https://bugzilla.kernel.org/attachment.cgi?id=306250
->>
->> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
->> Co-developed-by: Manali Shukla <manali.shukla@amd.com>
->> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
->> ---
->>  arch/x86/include/asm/svm.h      |  5 ++++-
->>  arch/x86/include/uapi/asm/svm.h |  2 ++
->>  arch/x86/kvm/svm/nested.c       | 12 ++++++++++++
->>  arch/x86/kvm/svm/svm.c          | 29 +++++++++++++++++++++++++++++
->>  4 files changed, 47 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
->> index f0dea3750ca9..bad9723f40e1 100644
->> --- a/arch/x86/include/asm/svm.h
->> +++ b/arch/x86/include/asm/svm.h
->> @@ -116,6 +116,7 @@ enum {
->>  	INTERCEPT_INVPCID,
->>  	INTERCEPT_MCOMMIT,
->>  	INTERCEPT_TLBSYNC,
->> +	INTERCEPT_BUSLOCK,
->>  };
->>  
->>  
->> @@ -158,7 +159,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
->>  	u64 avic_physical_id;	/* Offset 0xf8 */
->>  	u8 reserved_7[8];
->>  	u64 vmsa_pa;		/* Used for an SEV-ES guest */
->> -	u8 reserved_8[720];
->> +	u8 reserved_8[16];
->> +	u16 bus_lock_counter;	/* Offset 0x120 */
->> +	u8 reserved_9[702];
->>  	/*
->>  	 * Offset 0x3e0, 32 bytes reserved
->>  	 * for use by hypervisor/software.
->> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
->> index 1814b413fd57..abf6aed88cee 100644
->> --- a/arch/x86/include/uapi/asm/svm.h
->> +++ b/arch/x86/include/uapi/asm/svm.h
->> @@ -95,6 +95,7 @@
->>  #define SVM_EXIT_CR14_WRITE_TRAP		0x09e
->>  #define SVM_EXIT_CR15_WRITE_TRAP		0x09f
->>  #define SVM_EXIT_INVPCID       0x0a2
->> +#define SVM_EXIT_BUS_LOCK			0x0a5
->>  #define SVM_EXIT_NPF           0x400
->>  #define SVM_EXIT_AVIC_INCOMPLETE_IPI		0x401
->>  #define SVM_EXIT_AVIC_UNACCELERATED_ACCESS	0x402
->> @@ -224,6 +225,7 @@
->>  	{ SVM_EXIT_CR4_WRITE_TRAP,	"write_cr4_trap" }, \
->>  	{ SVM_EXIT_CR8_WRITE_TRAP,	"write_cr8_trap" }, \
->>  	{ SVM_EXIT_INVPCID,     "invpcid" }, \
->> +	{ SVM_EXIT_BUS_LOCK,     "buslock" }, \
->>  	{ SVM_EXIT_NPF,         "npf" }, \
->>  	{ SVM_EXIT_AVIC_INCOMPLETE_IPI,		"avic_incomplete_ipi" }, \
->>  	{ SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_access" }, \
->> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->> index 6f704c1037e5..670092d31f77 100644
->> --- a/arch/x86/kvm/svm/nested.c
->> +++ b/arch/x86/kvm/svm/nested.c
->> @@ -669,6 +669,12 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
->>  	vmcb02->control.iopm_base_pa = vmcb01->control.iopm_base_pa;
->>  	vmcb02->control.msrpm_base_pa = vmcb01->control.msrpm_base_pa;
->>  
->> +	/*
->> +	 * The bus lock threshold count should keep running across nested
->> +	 * transitions.
->> +	 * Copied the buslock threshold count from vmcb01 to vmcb02.
-> 
-> No need to start this part of the comment on a separate line. Also,
-> s/Copied/Copy/ (ditto below).
-> 
+Note that there are 1 or 2 cases in the asm code where it is actually
+quite useful to refer to the address of foo as 'foo@GOTPCREL(%rip)' in
+instructions that take memory operands, but those individual cases are
+easily converted to something else if even having a GOT with just 2
+entries is a dealbreaker for you.
 
-Ack.
+> That said, doing changes like changing "mov $sym" to "lea sym(%rip)" I
+> feel are a complete no-brainer and should be done regardless of any
+> other code generation issues.
+>
 
->> +	 */
->> +	vmcb02->control.bus_lock_counter = vmcb01->control.bus_lock_counter;
->>  	/* Done at vmrun: asid.  */
->>  
->>  	/* Also overwritten later if necessary.  */
->> @@ -1035,6 +1041,12 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->>  
->>  	}
->>  
->> +	/*
->> +	 * The bus lock threshold count should keep running across nested
->> +	 * transitions.
->> +	 * Copied the buslock threshold count from vmcb02 to vmcb01.
->> +	 */
->> +	vmcb01->control.bus_lock_counter = vmcb02->control.bus_lock_counter;
->>  	nested_svm_copy_common_state(svm->nested.vmcb02.ptr, svm->vmcb01.ptr);
->>  
->>  	svm_switch_vmcb(svm, &svm->vmcb01);
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 5ab2c92c7331..41c773a40f99 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -1372,6 +1372,11 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
->>  		svm->vmcb->control.int_ctl |= V_GIF_ENABLE_MASK;
->>  	}
->>  
->> +	if (vcpu->kvm->arch.bus_lock_detection_enabled)
->> +		svm_set_intercept(svm, INTERCEPT_BUSLOCK);
->> +	else
->> +		svm_clr_intercept(svm, INTERCEPT_BUSLOCK);
-> 
-> Is the else path really needed?
-> 
-> Thanks,
-> Tom
-Correct. It is not needed. I will remove from V3.
+Yes, this is the primary reason I ended up looking into this in the
+first place. Earlier this year, we ended up having to introduce
+RIP_REL_REF() to emit those RIP-relative references explicitly, in
+order to prevent the C code that is called via the early 1:1 mapping
+from exploding. The amount of C code called in that manner has been
+growing steadily over time with the introduction of 5-level paging and
+SEV-SNP and TDX support, which need to play all kinds of tricks before
+the normal kernel mappings are created.
 
-> 
->> +
->>  	if (sev_guest(vcpu->kvm))
->>  		sev_init_vmcb(svm);
->>  
->> @@ -3283,6 +3288,24 @@ static int invpcid_interception(struct kvm_vcpu *vcpu)
->>  	return kvm_handle_invpcid(vcpu, type, gva);
->>  }
->>  
->> +static int bus_lock_exit(struct kvm_vcpu *vcpu)
->> +{
->> +	struct vcpu_svm *svm = to_svm(vcpu);
->> +
->> +	vcpu->run->exit_reason = KVM_EXIT_X86_BUS_LOCK;
->> +	vcpu->run->flags |= KVM_RUN_X86_BUS_LOCK;
->> +
->> +	/*
->> +	 * Reload the counter with value greater than '0'.
->> +	 * The bus lock exit on SVM happens with RIP pointing to the guilty
->> +	 * instruction. So, reloading the value of bus_lock_counter to '0'
->> +	 * results into generating continuous bus lock exits.
->> +	 */
->> +	svm->vmcb->control.bus_lock_counter = 1;
->> +
->> +	return 0;
->> +}
->> +
->>  static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
->>  	[SVM_EXIT_READ_CR0]			= cr_interception,
->>  	[SVM_EXIT_READ_CR3]			= cr_interception,
->> @@ -3350,6 +3373,7 @@ static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
->>  	[SVM_EXIT_CR4_WRITE_TRAP]		= cr_trap,
->>  	[SVM_EXIT_CR8_WRITE_TRAP]		= cr_trap,
->>  	[SVM_EXIT_INVPCID]                      = invpcid_interception,
->> +	[SVM_EXIT_BUS_LOCK]			= bus_lock_exit,
->>  	[SVM_EXIT_NPF]				= npf_interception,
->>  	[SVM_EXIT_RSM]                          = rsm_interception,
->>  	[SVM_EXIT_AVIC_INCOMPLETE_IPI]		= avic_incomplete_ipi_interception,
->> @@ -5212,6 +5236,11 @@ static __init void svm_set_cpu_caps(void)
->>  		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
->>  	}
->>  
->> +	if (cpu_feature_enabled(X86_VIRT_FEATURE_BUS_LOCK_THRESHOLD)) {
->> +		pr_info("Bus Lock Threashold supported\n");
->> +		kvm_caps.has_bus_lock_exit = true;
->> +	}
->> +
->>  	/* CPUID 0x80000008 */
->>  	if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
->>  	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
-
--Manali
+Compiling with -fpie and linking with --pie -z text produces an
+executable that is guaranteed to have only RIP-relative references in
+the .text segment, removing the need for RIP_REL_REF entirely (it
+already does nothing when __pic__ is #define'd).
 
