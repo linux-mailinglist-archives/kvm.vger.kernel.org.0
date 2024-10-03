@@ -1,96 +1,99 @@
-Return-Path: <kvm+bounces-27846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27847-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2FD298F08A
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 15:37:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4312498F09B
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 15:39:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AA4FB243B8
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 13:37:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74B741C21487
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 13:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D5819CC1E;
-	Thu,  3 Oct 2024 13:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6331019CC3C;
+	Thu,  3 Oct 2024 13:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="k2IO6VDr"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="IWyIHgdE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3A586277
-	for <kvm@vger.kernel.org>; Thu,  3 Oct 2024 13:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1228C19C57F
+	for <kvm@vger.kernel.org>; Thu,  3 Oct 2024 13:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727962621; cv=none; b=R9RZ1QtHz98BozMOhf5mO/anOaVaQL8zakogpnjCAeGd2kbHRMLCUjP9dGzxmWfsvhMyLwtKc6Rvd2AlVILUAy+y9wohLuXTR6v49Svm8NUKOui0sCLR8Md9Quznho70arkSLQx4Uar9mTj4VsYRMHLNwAtTPkckmZuQAfxTzDw=
+	t=1727962733; cv=none; b=sznJNhj72kHjRerOtJKekP4yImfimbdPIhAoD09imkqa3Ar9udaANo/rsuvXeHNKwNEzYW7/HqtckbnS5EKpk3nWVDWFH1Pxnfb4WVQuFwfeaNhVgXrVxYqM2weD7bR3aTIpyEnW7ZgLkGRT3PZrlxFLIyEoaDpQrly5kvhrWqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727962621; c=relaxed/simple;
-	bh=oKcjYtaHEPTRj+7CRpP5G980TAaVih1dYRjGdvPPRjc=;
+	s=arc-20240116; t=1727962733; c=relaxed/simple;
+	bh=2yRHoyoZovFhtKX/Tu0sqMjpkMS+w41Nsd0gnTQ9W0o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YGZSvSsjoWTyHEoWHFNsX6hvTYW2jEpdv6PDNRJyU8cIsyGX+aqcbk7rw4O+N9tspNT/lOKXdP2e9DLwwOnbpx58HsCBJnYmvOjIRZ36/H0oPgZbqf4NIKlOuN1KBkUmytg2kJACNEG3mr4mCYEL+/3oZaTThMKdYjdD0s65x4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=k2IO6VDr; arc=none smtp.client-ip=209.85.222.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=INi6y0taxBv9wqDg+ZQAc2J1ngvKH58iRUeQAq0MI9pjXfRnuIXxcKgvzKn+haZzMDAA4YFEmCwXBKjHgssKqC1dgyZykZM3+jhM5ZHoqbhHQP92bzYQE5HahuFy6i4hXY8gObK/rnmuWc21JCg5wk2iPpWNP+R8K/KjiZQh77I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=IWyIHgdE; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7ae3e3db294so58731585a.2
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2024 06:37:00 -0700 (PDT)
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4581ee65b46so8462151cf.3
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2024 06:38:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1727962619; x=1728567419; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1727962731; x=1728567531; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tP7tolVS+NskbYnx6Ke2dpQNeCMyn7tnciZU6uuI/aM=;
-        b=k2IO6VDrNWvOFBxGhdsxrtFEnB0OhGxar+bAhGV1IRLN+KHSQrRvoHiTKqqeazDHqT
-         51BJZLciLg9CprNSg7ilohJ/zeX/EsqxF18tJRY381e7JsMXEPErL+WP1wU8QEFro/cK
-         SCHBDJiXOXr8nVA2dJ0sENHFLbYBpDaM+C9U8d03gJWlEJMm2qPlKieQfXVqqD3WJXhP
-         t/ZAwTVa0KJkOfrJZQ5Urr+3OXU1aLTje2ad/ZW+pRad3su0x0T2dhLi+m9CsmZR/35f
-         2CY1+U3LCBwi3c/NYRa1tQPMU1i3zEu0F3TOIyaOyrit8QLaZ+73PNoeT8xKCanbwyq8
-         gG2w==
+        bh=7cYlQ8sS3dSodfjWbJOUDRW+BCri6YPN6Z8wFgeEOOM=;
+        b=IWyIHgdEIAYIvvo8M/x0YnNA0KN7yB9ejBqtkur3ScdlZQyxNduRq0jYw7SNbMxyF4
+         7MGCrkKW4sJr1OOhW7zuqVovOJxjWTWuq3B9eij1y1HByuiI+V8DcDB5ZXkmji8Ec4qK
+         sBZADW8Le7x21pEq8TtXoMIhGmWA2aETfCfZxbbknI+y7c8N+qBt/uETaRG8pU0oSq65
+         ufC7HKUP9oPCI6J9g9LQJU8859pcCgWJWrXvmY1uK6IWaEjjdInV2B8yqvpSuuI/WY+r
+         TLv0NwkHxX9bWB959A/pEaivLiBtoNTj34wXMxIumHMSNPviZIGa2uhfhOisOFjn0tHY
+         B7wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727962619; x=1728567419;
+        d=1e100.net; s=20230601; t=1727962731; x=1728567531;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tP7tolVS+NskbYnx6Ke2dpQNeCMyn7tnciZU6uuI/aM=;
-        b=HMZ87Hbx0HPLFzVlbxAxfjTOzxPWaGNsQ3xBqYsaL4miYxX+4gHwCZn7zIyTFR2Ag6
-         jnNNWxKftw8jCOFfBHF9/rHaDnsy2ZvqI/nxPeF0uM7MHp7k0rWofmSgwwlhJOEhIjDy
-         yGwb4fwiTETsce+29hbpT1qM+UPucOvX6AkAMPE3Fbl8K5GBveaeupIOz0dizGXEC3T2
-         8OSp5D5WLTo3EJiJs6kxWl6KDMTeDi+WxvthX5vEpNEPNd7ieZLU5qgdUn+TmZ2OYgz1
-         cAyDhUVwYv9nUQ0tf6D35lr5eFogEhm2IS8p2zbxlq1rt4JU9imnJ1FnsW8A/W11A77j
-         hTKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUVApt/KVh/4ELUYP5NM6P+EDp7mIe9M1lX7aLmD78r//+ul4WJ/S2XEWE7VF+gwlIgDPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb+LxyEfQ/+Wqa90zf2p8ebkQZwvyEzHNlrjUQwNwXe5j/g7mq
-	IkmvRvpt91SlGY6EPyZLae5DBz0M2R7c+1Er4/GHgB+b+bY3Qg+DeCr+G4YZpno=
-X-Google-Smtp-Source: AGHT+IExX5PZU6X//DLAfhUc+pV/DvO3M0gA3yCG/nuBqNATFkOVsDt5pX3W468d8vfh0nt7guWskA==
-X-Received: by 2002:a05:6214:3a8a:b0:6cb:4eb9:d279 with SMTP id 6a1803df08f44-6cb819d867dmr105528216d6.21.1727962619279;
-        Thu, 03 Oct 2024 06:36:59 -0700 (PDT)
+        bh=7cYlQ8sS3dSodfjWbJOUDRW+BCri6YPN6Z8wFgeEOOM=;
+        b=N7PeFLcy7q/8NKZ95JYfqFRIYG+on7Z59I9/9KV0Q/3nOZ5N319rdte86hlYUknw/q
+         A9k1C/Cqt1gO0lQw2ZZYDKc2rpWwtzmFmFkISM8qxvmQd2aq/Wuz2wf4CCNG1rQUbe51
+         KJsH58/DnaJBcS5mQW/Z/bgZ4vg0HLd9a1V8JkS423c1PsTgiPh05Cgei2Sw3clkB5a3
+         qBchMCv75Uc+NxWhJoTXiWDEqDQSA27LdFpXG9eNuhd+63U6+GiL/imPsvHjsuABfNXg
+         1L2R8PlJEMdDbYFoO/vlsNx7sk1aiSnYoG2Y4zwj84DUvXpmHPuU1xf8us+VRV0DM/0A
+         6r3w==
+X-Forwarded-Encrypted: i=1; AJvYcCXH2+QmJbVqIn//kAgVyioVgvsIZoWnAZJtdvDC6USGL4EdIujLYB3zoEXBFDFbcRuIiHg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJ09AhTVQTmuWu6vjIsNKwlaoKt6QHHlqTdnwuC52nqXPoR8x6
+	PeLH494Ze2dd2qAao0ZOactBW1eXU232lcOukC2RVzWuleKeulvkDKpGpCnnycG4iQ7kHzmVNvW
+	Y
+X-Google-Smtp-Source: AGHT+IEeXln8uxBBs7r0qbtw2wolKdiK0oe/fV/z2xXXfZUZhaM6OzDUMtsWVXSO1oxDdjO6OayXDA==
+X-Received: by 2002:ac8:58c4:0:b0:458:2795:4853 with SMTP id d75a77b69052e-45d804d3296mr96964851cf.32.1727962730877;
+        Thu, 03 Oct 2024 06:38:50 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb9359c01esm6550426d6.2.2024.10.03.06.36.58
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45d92ed4dcesm5550881cf.69.2024.10.03.06.38.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 06:36:58 -0700 (PDT)
+        Thu, 03 Oct 2024 06:38:50 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1swM0o-00ASYX-0T;
-	Thu, 03 Oct 2024 10:36:58 -0300
-Date: Thu, 3 Oct 2024 10:36:58 -0300
+	id 1swM2b-00ASZK-KP;
+	Thu, 03 Oct 2024 10:38:49 -0300
+Date: Thu, 3 Oct 2024 10:38:49 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
-To: James Gowans <jgowans@amazon.com>
-Cc: linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	"Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
-	iommu@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Alexander Graf <graf@amazon.de>, anthony.yznaga@oracle.com,
-	steven.sistare@oracle.com, nh-open-source@amazon.com,
-	"Saenz Julienne, Nicolas" <nsaenz@amazon.es>
-Subject: Re: [RFC PATCH 12/13] iommufd, guestmemfs: Ensure persistent file
- used for persistent DMA
-Message-ID: <20241003133658.GC2456194@ziepe.ca>
-References: <20240916113102.710522-1-jgowans@amazon.com>
- <20240916113102.710522-13-jgowans@amazon.com>
+To: Timothy Pearson <tpearson@raptorengineering.com>
+Cc: Shivaprasad G Bhat <sbhat@linux.ibm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+	Michael Ellerman <mpe@ellerman.id.au>, npiggin <npiggin@gmail.com>,
+	christophe leroy <christophe.leroy@csgroup.eu>,
+	aneesh kumar <aneesh.kumar@kernel.org>,
+	naveen n rao <naveen.n.rao@linux.ibm.com>,
+	gbatra <gbatra@linux.vnet.ibm.com>, brking@linux.vnet.ibm.com,
+	Alexey Kardashevskiy <aik@ozlabs.ru>, robh@kernel.org,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	kvm <kvm@vger.kernel.org>, aik <aik@amd.com>, msuchanek@suse.de,
+	jroedel <jroedel@suse.de>, vaibhav <vaibhav@linux.ibm.com>,
+	svaidy@linux.ibm.com
+Subject: Re: [RFC PATCH 1/3] powerpc/pseries/iommu: Bring back userspace view
+ for single level TCE tables
+Message-ID: <20241003133849.GD2456194@ziepe.ca>
+References: <171026724548.8367.8321359354119254395.stgit@linux.ibm.com>
+ <171026725393.8367.17497620074051138306.stgit@linux.ibm.com>
+ <20240319143202.GA66976@ziepe.ca>
+ <1386271253.24278379.1710873411133.JavaMail.zimbra@raptorengineeringinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -99,32 +102,29 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240916113102.710522-13-jgowans@amazon.com>
+In-Reply-To: <1386271253.24278379.1710873411133.JavaMail.zimbra@raptorengineeringinc.com>
 
-On Mon, Sep 16, 2024 at 01:31:01PM +0200, James Gowans wrote:
+On Tue, Mar 19, 2024 at 01:36:51PM -0500, Timothy Pearson wrote:
+> > On Tue, Mar 12, 2024 at 01:14:20PM -0500, Shivaprasad G Bhat wrote:
+> >> The commit 090bad39b237a ("powerpc/powernv: Add indirect levels to
+> >> it_userspace") which implemented the tce indirect levels
+> >> support for PowerNV ended up removing the single level support
+> >> which existed by default(generic tce_iommu_userspace_view_alloc/free()
+> >> calls). On pSeries the TCEs are single level, and the allocation
+> >> of userspace view is lost with the removal of generic code.
+> > 
+> > :( :(
+> > 
+> > If this has been broken since 2018 and nobody cared till now can we
+> > please go in a direction of moving this code to the new iommu APIs
+> > instead of doubling down on more of this old stuff that apparently
+> > almost nobody cares about ??
+> 
+> Just FYI Raptor is working on porting things over to the new APIs.
+> RFC patches should be posted in the next week or two.
 
-> +#ifdef CONFIG_GUESTMEMFS_FS
-> +		struct vm_area_struct *vma;
-> +		struct mm_struct *mm = current->mm;
-> +
-> +		mmap_read_lock(mm);
-> +		vma = find_vma_intersection(current->mm,
-> +				 cmd->user_va, cmd->user_va + cmd->length);
-> +		if (!vma || !is_guestmemfs_file(vma->vm_file)) {
-> +			mmap_read_unlock(mm);
-> +			return -EFAULT;
-> +		}
-> +		mmap_read_unlock(mm);
-> +#else
-
-Any kind of FD interaction needs to go through the new FD path that
-Steve is building:
-
-https://lore.kernel.org/linux-iommu/1727190338-385692-1-git-send-email-steven.sistare@oracle.com
-
-I'm expecting multiple kinds of fds to fall into that pattern,
-including memfs, guestmemfd, and dmabuf. guestmemfd can just be one
-more..
+There was a discussion about this at LPC a few weeks ago, did any
+patches get prepared?
 
 Jason
 
