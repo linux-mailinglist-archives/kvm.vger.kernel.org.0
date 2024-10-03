@@ -1,194 +1,188 @@
-Return-Path: <kvm+bounces-27858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F68B98F730
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 21:48:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 374EE98F754
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 21:52:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63F78283B3F
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 19:48:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B25131F228D0
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 19:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CADA1AD3F6;
-	Thu,  3 Oct 2024 19:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4171C331A;
+	Thu,  3 Oct 2024 19:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAmI5UPQ"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="iaCjs6Wo"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9EC1A4F0F;
-	Thu,  3 Oct 2024 19:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A6F1AC8B9;
+	Thu,  3 Oct 2024 19:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727984904; cv=none; b=o+ur7rwP1PHFGXi7PAHlTEzT6GG9r7cX+eaLcKaDARzVi1bWnrEdnJWClAH4zWQz/q8Cp4+KwOCC9grchZS7ELdvdxBiQQno6bNiZFbZ8CDGa+FlP8r5gxpFYr9wZ1yfrDQ40kc9vuukk177n1j0efX4nkpRTHT8LfhtzftuMco=
+	t=1727985078; cv=none; b=ewVvQeQKviZOsQ4Ex9NBQOXt+1hcpkJyiLS+CBLU04Ykp1uCq5AZPo2vNMI3j55KYP2OsHTYzMApVK1WkT2goWy+bnjrKney2ZJoQ3B8gCjy5PEBuptuZ0avedRR1tId2z7h3MT67AiJAshb4wPsgwSX3GN0GbeLzpVLSk0+b7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727984904; c=relaxed/simple;
-	bh=qqtwyKHdqGFDaQm8XpSYQcJY1KwB0a1nrS7ZyxA15TY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IJA19NNdyGpBXRYS42Vj4XgCl1ObhX6ywZckfjX2RG9FJc+VZyEf7AJjakkbHAHBa3H00u5+IiIO6NNdLmSriovzgqmFDAmZYl99P2Xh9lyMikhQxNr9BDbzRh2eN9LUEBhjluMuQOInFttIJ4Qap5SpP35o14ZQFII+vE73L3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAmI5UPQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C088CC4CEC5;
-	Thu,  3 Oct 2024 19:48:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727984904;
-	bh=qqtwyKHdqGFDaQm8XpSYQcJY1KwB0a1nrS7ZyxA15TY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VAmI5UPQD76BOp3/CbtoGgE9LU5UY72qHe7Uon2iTn7vUs+7cQ3W9oj9xI8qsYbc8
-	 6OTGBA1ps6XoKk9GN18YtDi7q+OuOJfJe/aBvkO+qg74E3mHREZCPi75wxY5NlpU8b
-	 rz4L2xwngxBLhcsFx0tygoBILHedxri66rdoGazleOOSPIgXB6lMK+4sgbfpI3ykkj
-	 OkC9ke0aHEymouPQS8nPlXa099bUhTYRL7dBjFNMm8oRqvwgUMpgkYy+gw4YWWuwxi
-	 OrMwaU6R5HUpSXIU4vcc0zjU7EajPrKjG0ekD2nPC1dyRiR+4Rj1TF4vXmc97LhjSa
-	 Gz2Ca5vdfz4zw==
-Date: Thu, 3 Oct 2024 12:48:22 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-	Lucas De Marchi <lucas.demarchi@intel.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, kuba@kernel.org,
-	stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-modules@vger.kernel.org
-Subject: Re: [PATCH v2] vhost/vsock: specify module version
-Message-ID: <Zv71BrHKO_YwDhG_@bombadil.infradead.org>
-References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
- <w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
- <CAEivzxe6MJWMPCYy1TEkp9fsvVMuoUu-k5XOt+hWg4rKR57qTw@mail.gmail.com>
- <ib52jo3gqsdmr23lpmsipytbxhecwvmjbjlgiw5ygwlbwletlu@rvuyibtxezwl>
- <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
+	s=arc-20240116; t=1727985078; c=relaxed/simple;
+	bh=LvXuW07DElmphyGOeOxZTYcc5I17BlWgMBispM9Tm0w=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=FVxH7YzJs+ZvUNrgabBhGhvOhApLzQzWtjoYSLIsNFwNRajk6KBnhDxfxuMJyl149y4CDA4mogrxWXhwZtOUYrFZ2rcc1/NbFCnQkN0ALdIeiaD/5cd6d0XcrnI9JidAF3Olle+Dp7s3hQBYANOUXfflhSGcqu6tLYEbvWn/GKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=iaCjs6Wo; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
+	by linux.microsoft.com (Postfix) with ESMTPSA id D046520DB35D;
+	Thu,  3 Oct 2024 12:51:09 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D046520DB35D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1727985069;
+	bh=nHGX8zwwOomC34dyU6ixeYDufe9vxK5rO4mA9Rus51s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=iaCjs6WodUbua+uhfLTMTGJP+jo8u/Ibyom3MPqrld6rOPAcIq3clyN04GFNZxD7o
+	 F4+idAjqql3s/AtcZibCieqsrWZnfMrJuFDoVS423rFzlmEeEiKcqiOibiDmoiNPXF
+	 l+KBC+uTKON85PgSs1bs0u1xWYYmhsJOVKSYjthI=
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	iommu@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	luto@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	daniel.lezcano@linaro.org,
+	joro@8bytes.org,
+	robin.murphy@arm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	lpieralisi@kernel.org,
+	kw@linux.com,
+	robh@kernel.org,
+	bhelgaas@google.com,
+	arnd@arndb.de,
+	sgarzare@redhat.com,
+	jinankjain@linux.microsoft.com,
+	muminulrussell@gmail.com,
+	skinsburskii@linux.microsoft.com,
+	mukeshrathor@microsoft.com
+Subject: [PATCH 0/5] Add new headers for Hyper-V Dom0
+Date: Thu,  3 Oct 2024 12:50:59 -0700
+Message-Id: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
 
-+ linux-modules@vger.kernel.org + Lucas
+To support Hyper-V Dom0 (aka Linux as root partition), many new
+definitions are required.
 
-On Mon, Sep 30, 2024 at 07:03:52PM +0200, Aleksandr Mikhalitsyn wrote:
-> On Mon, Sep 30, 2024 at 5:43 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >
-> > Hi Aleksandr,
-> >
-> > On Mon, Sep 30, 2024 at 04:43:36PM GMT, Aleksandr Mikhalitsyn wrote:
-> > >On Mon, Sep 30, 2024 at 4:27 PM Stefano Garzarella
-> > ><sgarzare@redhat.com> wrote:
-> > >>
-> > >> On Sun, Sep 29, 2024 at 08:21:03PM GMT, Alexander Mikhalitsyn wrote:
-> > >> >Add an explicit MODULE_VERSION("0.0.1") specification for the vhost_vsock module.
-> > >> >
-> > >> >It is useful because it allows userspace to check if vhost_vsock is there when it is
-> > >> >configured as a built-in.
-> > >> >
-> > >> >This is what we have *without* this change and when vhost_vsock is
-> > >> >configured
-> > >> >as a module and loaded:
-> > >> >
-> > >> >$ ls -la /sys/module/vhost_vsock
-> > >> >total 0
-> > >> >drwxr-xr-x   5 root root    0 Sep 29 19:00 .
-> > >> >drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
-> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 coresize
-> > >> >drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
-> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 initsize
-> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 initstate
-> > >> >drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
-> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
-> > >> >drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
-> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
-> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 taint
-> > >> >--w-------   1 root root 4096 Sep 29 19:00 uevent
-> > >> >
-> > >> >When vhost_vsock is configured as a built-in there is *no* /sys/module/vhost_vsock directory at all.
-> > >> >And this looks like an inconsistency.
-> > >> >
-> > >> >With this change, when vhost_vsock is configured as a built-in we get:
-> > >> >$ ls -la /sys/module/vhost_vsock/
-> > >> >total 0
-> > >> >drwxr-xr-x   2 root root    0 Sep 26 15:59 .
-> > >> >drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
-> > >> >--w-------   1 root root 4096 Sep 26 15:59 uevent
-> > >> >-r--r--r--   1 root root 4096 Sep 26 15:59 version
-> > >> >
-> > >> >Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-> > >> >---
-> > >> > drivers/vhost/vsock.c | 1 +
-> > >> > 1 file changed, 1 insertion(+)
-> > >> >
-> > >> >diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > >> >index 802153e23073..287ea8e480b5 100644
-> > >> >--- a/drivers/vhost/vsock.c
-> > >> >+++ b/drivers/vhost/vsock.c
-> > >> >@@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
-> > >> >
-> > >> > module_init(vhost_vsock_init);
-> > >> > module_exit(vhost_vsock_exit);
-> > >> >+MODULE_VERSION("0.0.1");
-> > >
-> > >Hi Stefano,
-> > >
-> > >>
-> > >> I was looking at other commits to see how versioning is handled in order
-> > >> to make sense (e.g. using the same version of the kernel), and I saw
-> > >> many commits that are removing MODULE_VERSION because they say it
-> > >> doesn't make sense in in-tree modules.
-> > >
-> > >Yeah, I agree absolutely. I guess that's why all vhost modules have
-> > >had version 0.0.1 for years now
-> > >and there is no reason to increment version numbers at all.
-> >
-> > Yeah, I see.
-> >
-> > >
-> > >My proposal is not about version itself, having MODULE_VERSION
-> > >specified is a hack which
-> > >makes a built-in module appear in /sys/modules/ directory.
-> >
-> > Hmm, should we base a kind of UAPI on a hack?
-> 
-> Good question ;-)
-> 
-> >
-> > I don't want to block this change, but I just wonder why many modules
-> > are removing MODULE_VERSION and we are adding it instead.
-> 
-> Yep, that's a good point. I didn't know that other modules started to
-> remove MODULE_VERSION.
+The plan going forward is to directly import headers from
+Hyper-V. This is a more maintainable way to import definitions
+rather than via the TLFS doc. This patch series introduces
+new headers (hvhdk.h, hvgdk.h, etc, see patch #3) directly
+derived from Hyper-V code.
 
-MODULE_VERSION was a stupid idea and there is no real value to it.
-I agree folks should just remove its use and we remove it.
+This patch series replaces hyperv-tlfs.h with hvhdk.h, but only
+in Microsoft-maintained Hyper-V code where they are needed. This
+leaves the existing hyperv-tlfs.h in use elsewhere - notably for
+Hyper-V enlightenments on KVM guests.
 
-> > >I spent some time reading the code in kernel/params.c and
-> > >kernel/module/sysfs.c to figure out
-> > >why there is no /sys/module/vhost_vsock directory when vhost_vsock is
-> > >built-in. And figured out the
-> > >precise conditions which must be satisfied to have a module listed in
-> > >/sys/module.
-> > >
-> > >To be more precise, built-in module X appears in /sys/module/X if one
-> > >of two conditions are met:
-> > >- module has MODULE_VERSION declared
-> > >- module has any parameter declared
-> >
-> > At this point my question is, should we solve the problem higher and
-> > show all the modules in /sys/modules, either way?
+An intermediary header "hv_defs.h" is introduced to conditionally
+include either hyperv-tlfs.h or hvhdk.h. This is required because
+several headers which today include hyperv-tlfs.h, are shared
+between Hyper-V and KVM code (e.g. mshyperv.h).
 
-Because if you have no attribute to list why would you? The thing you
-are trying to ask is different: "is this a module built-in" and for that we
-have userpsace solution already suggested: /lib/modules/*/modules.builtin
+Summary:
+Patch 1-2: Cleanup patches
+Patch 3: Add the new headers (hvhdk.h, etc..) in include/hyperv/
+Patch 4: Add hv_defs.h and use it in mshyperv.h, svm.h,
+         hyperv_timer.h
+Patch 5: Switch to the new headers, only in Hyper-V code
 
-> Probably, yes. We can ask Luis Chamberlain's opinion on this one.
-> 
-> +cc Luis Chamberlain <mcgrof@kernel.org>
+Nuno Das Neves (5):
+  hyperv: Move hv_connection_id to hyperv-tlfs.h
+  hyperv: Remove unnecessary #includes
+  hyperv: Add new Hyper-V headers
+  hyperv: Add hv_defs.h to conditionally include hyperv-tlfs.h or
+    hvhdk.h
+  hyperv: Use hvhdk.h instead of hyperv-tlfs.h in Hyper-V code
 
-Please use linux-modules in the future as I'm not the only maintainer.
+ arch/arm64/hyperv/hv_core.c              |    3 +-
+ arch/arm64/hyperv/mshyperv.c             |    1 +
+ arch/arm64/include/asm/mshyperv.h        |    2 +-
+ arch/x86/entry/vdso/vma.c                |    1 +
+ arch/x86/hyperv/hv_apic.c                |    2 +-
+ arch/x86/hyperv/hv_init.c                |    3 +-
+ arch/x86/hyperv/hv_proc.c                |    4 +-
+ arch/x86/hyperv/hv_spinlock.c            |    1 +
+ arch/x86/hyperv/hv_vtl.c                 |    1 +
+ arch/x86/hyperv/irqdomain.c              |    1 +
+ arch/x86/hyperv/ivm.c                    |    2 +-
+ arch/x86/hyperv/mmu.c                    |    2 +-
+ arch/x86/hyperv/nested.c                 |    2 +-
+ arch/x86/include/asm/kvm_host.h          |    1 -
+ arch/x86/include/asm/mshyperv.h          |    3 +-
+ arch/x86/include/asm/svm.h               |    2 +-
+ arch/x86/include/asm/vdso/gettimeofday.h |    1 +
+ arch/x86/kernel/cpu/mshyperv.c           |    2 +-
+ arch/x86/kernel/cpu/mtrr/generic.c       |    1 +
+ arch/x86/kvm/vmx/vmx_onhyperv.h          |    1 -
+ arch/x86/mm/pat/set_memory.c             |    2 -
+ drivers/clocksource/hyperv_timer.c       |    2 +-
+ drivers/hv/channel.c                     |    1 +
+ drivers/hv/channel_mgmt.c                |    1 +
+ drivers/hv/connection.c                  |    1 +
+ drivers/hv/hv.c                          |    1 +
+ drivers/hv/hv_balloon.c                  |    5 +-
+ drivers/hv/hv_common.c                   |    2 +-
+ drivers/hv/hv_kvp.c                      |    1 -
+ drivers/hv/hv_snapshot.c                 |    1 -
+ drivers/hv/hv_util.c                     |    1 +
+ drivers/hv/hyperv_vmbus.h                |    1 -
+ drivers/hv/ring_buffer.c                 |    1 +
+ drivers/hv/vmbus_drv.c                   |    1 +
+ drivers/iommu/hyperv-iommu.c             |    1 +
+ drivers/net/hyperv/netvsc.c              |    1 +
+ drivers/pci/controller/pci-hyperv.c      |    1 +
+ include/asm-generic/hyperv-tlfs.h        |    9 +
+ include/asm-generic/mshyperv.h           |    2 +-
+ include/clocksource/hyperv_timer.h       |    2 +-
+ include/hyperv/hv_defs.h                 |   29 +
+ include/hyperv/hvgdk.h                   |   66 ++
+ include/hyperv/hvgdk_ext.h               |   46 +
+ include/hyperv/hvgdk_mini.h              | 1212 ++++++++++++++++++++++
+ include/hyperv/hvhdk.h                   |  733 +++++++++++++
+ include/hyperv/hvhdk_mini.h              |  310 ++++++
+ include/linux/hyperv.h                   |   12 +-
+ net/vmw_vsock/hyperv_transport.c         |    1 -
+ 48 files changed, 2442 insertions(+), 40 deletions(-)
+ create mode 100644 include/hyperv/hv_defs.h
+ create mode 100644 include/hyperv/hvgdk.h
+ create mode 100644 include/hyperv/hvgdk_ext.h
+ create mode 100644 include/hyperv/hvgdk_mini.h
+ create mode 100644 include/hyperv/hvhdk.h
+ create mode 100644 include/hyperv/hvhdk_mini.h
 
-  Luis
+-- 
+2.34.1
+
 
