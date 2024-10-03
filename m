@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-27884-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27885-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72EB498FAEC
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 01:46:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9878998FAEE
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 01:46:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99CD11C22FF1
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 23:46:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59D23284639
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 23:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B832F1D2B13;
-	Thu,  3 Oct 2024 23:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371E41D2B2C;
+	Thu,  3 Oct 2024 23:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l2yQJtIB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gnj2GkHD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657441D2793
-	for <kvm@vger.kernel.org>; Thu,  3 Oct 2024 23:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9C91D2B04
+	for <kvm@vger.kernel.org>; Thu,  3 Oct 2024 23:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727999037; cv=none; b=iVJqJwEL4yOBdfFapHKHg+UdihW7oZnVJpDlI7FntntURgRLNuTexfi9UY1ICvp3TD0AKxTRNl2hRor5+5TGO+GGn7cDAu+kLeqARlmJcFn9UclAfUUCvsAXWhLC1EElGiBkHsqS/yGFmwm0gaES9C4TdG+KYRd8o3UnykXANEg=
+	t=1727999039; cv=none; b=pOJFpwbv7YQDAWFMG24j8u3IYttoKsPZrBbGP46nThavpldVKSv1SbU66qniBbjzKioUadnlO+MJf4pad6mt42FG6n+TOUezbcZf0IPrr/tMduWYH0tHuTqY4JxMVwOBmAh1ikucADhTyJon8iapl7nX4moNsnucOKndENuoKLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727999037; c=relaxed/simple;
-	bh=V7rKuwPrSY+SRxJi0K7vLggqsnLA/DoeF2YXdfDToSY=;
+	s=arc-20240116; t=1727999039; c=relaxed/simple;
+	bh=xqBlrWuS6MCxk0gww17oourN4jowUONsWvqCnk9wPn4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bdeENhur5CJi6RwTUNa5dG/Miu7kIjCj4N9irjjJZYZ8/H0VBX7RheI/486b0seOUxq+Flb8p4j6rL2fk+g0VisietaFykVbD9lKT3cfQYo32ieSaovImhfNDdgUjIA2bid1LJxkiInyj1i7B60zH9Rra3aLM7k2ztlSaUA6DLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l2yQJtIB; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=T/ydsmNs8wz0B+e7HKa1Raal4Iu5i1P6ZLvbEw/qFVmGdedz3xcT1wuqwYZfLfy2tvRXir6QcZu2JoT4ULYavV51jP4NRD5m3wqb+5PZ19fA5dW+qH1Og2Or9I7V610ozRXzBFElW79x3xWumTyhahgdznvd8xCNKAEI5U2EDQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gnj2GkHD; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ddbcc96984so23911907b3.2
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2024 16:43:56 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7e6cc094c2fso2792232a12.1
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2024 16:43:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727999035; x=1728603835; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727999037; x=1728603837; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=cYdreTQ2dGWT694xFw76MeJwXKyqFrydL4ES/jVoY04=;
-        b=l2yQJtIB38Znd+mhBEM7C0hGpm/tqgYVtznuP/a3WnRKKT+e6oR5VlTiaBM4OZWw48
-         o3q9FqDgV/hDqNJUNqO/FuT9xKH/DQkrhGTNUBYLIsTcBTaTz4kEsrB9PriagXNeAWqT
-         UIXG4QRTRu/cUIGp9UUFAtLXuxY3CeayzuA+t3AOgPmICPYAXCOXjpTG5LE9qMUHHT2N
-         NaO7RfDGXV75r+T1wBPog7Rnnp77iRIWAl6d2ck5q+1dyMi6cBmjt47I+j55TEzrW7Y/
-         PxVK/TzBxq+oIKa8xgiEtYf5zogMQnjXGEjOGhXs2bkyBp9Mla8CSX/OBlIA54W38RlA
-         AaWw==
+        bh=lHVxAupwVdLj9JS6H09y9gDY/v8cy7swDNQclaU5Fj0=;
+        b=gnj2GkHD8H7lDTYPvn9kCqFhDvtxpsIaGjxuYiU9RxwrELTxOjmbGcSLg0lI3OLt5L
+         Ul9h+sC8EK9sVF4hA0f1BiHB1Mmy8h7+CeEzHKOkyl1I9Eb7e9E+shTIQoLXZeNSt6l1
+         fdOmPQ3mcZfdo5HGiIwbGIeetjrOJnwy9hh1fLlS05YBeGE2dwJFdm3AWQTsmARXlnBq
+         Bogd0xGiLGRoFKJIlj7qpHfTOEhD4Eo6YZF3Q3hw5+Ao9tpEmmJpld8iF9KazCwSFiTe
+         itkM3KiaX+xjwSzNYci0LcGcIuOK87kgNcraXB4kt60/O9bmXVJfPL0spN8Ei5l7i8Ns
+         abNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727999035; x=1728603835;
+        d=1e100.net; s=20230601; t=1727999037; x=1728603837;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cYdreTQ2dGWT694xFw76MeJwXKyqFrydL4ES/jVoY04=;
-        b=R6sGirtfVufaqBVckJcbG4Ka61ERfqZzycwYcTEpTm2kBYejrTZyAD5O2eN7EA8h7i
-         hD52ue7XjwvzGNoLZLh9bPnzwHbRWeYoDmgui+llKIPXBHRPwzeg9TN9WiKNB2WOJOs0
-         bzFAbXhFCPB0yNP6cJPJb+bLIDcIwm43rlFgJS/dhYd9nZlugYBtyYww9LBFR3XmNOrv
-         49nnRfMDfjbdC6dnN86EiVLl1rsqerhgJIonJacG9aWXDHp0J7DRGoVaVhrk3WvkKzzQ
-         evINi6DelByvPsfUW7ZsV0wMhv7kGkzFGBmQXXfN2D7skeZmYb3N10Iy4OcH4gZvRatP
-         SdIQ==
-X-Gm-Message-State: AOJu0Ywouz05Tk7zEDocVlMSPoCQIZYPtf0ZMhsMAUEC9z4CTrKlY/KA
-	92/W8W449o4nSIwWXtYYkVn63Rvtkkh6CE2miJ6mABifymXxbyuIJNCJviAql1JCQpR2GAhN12G
-	p+A==
-X-Google-Smtp-Source: AGHT+IEd91DInd0W/wFySOQh235Qh88p94i5fGTLkUED1r7q1hClizhaqe0VKQW4C1DefHLLlGROsyVnmok=
+        bh=lHVxAupwVdLj9JS6H09y9gDY/v8cy7swDNQclaU5Fj0=;
+        b=ZZMiMKRlLFxCxed5/lxy6WTU02Nm3irlUXrUo3AlLqBaCmSrE7ecJWHnmzNebtNkST
+         e4jVaLS46Gn7AG+3D3ihsba74QO6Dl9qbsudk8Q/XuNFfoMLdCMu0IlmEC8qmkWY8Uub
+         pwnhrMiElyZq1vHsgVbWNlkvFC52Yb0/NQN/iwQ8n0vDeu5Gs79OqmKxyZEyREKayKOf
+         9HS9n68E4QCBziEukglbIxos/Vj7ttbhleQiDBIICsIXoV/QloJ9q6j/2ZPVPOWLmZ9k
+         syFbVOTaZACPwZnnLhi5oh4Kbiw76qjtX8LJroBtUoHOMu5ly9P7M4eCzcN0tQm2yApc
+         mKHQ==
+X-Gm-Message-State: AOJu0Yx5huOuOIu/cbhWoCrB7pz8v1krMpDj3/sfGfN3C7CgZTISp3s4
+	bUkZT4CJglE1ERuXWEM0AaJnhSrqREFmns8ZWrf7DMUIgn1v+Ds/UnhiXe/iI5xbVnf68YRxecs
+	W4Q==
+X-Google-Smtp-Source: AGHT+IGKroOpNriNfmU45AkA6nSG4g4BolcTa1/5RFMDjU2V8x+RltKhqqMU4YNPO1VDq4XZodpXpHwhZw0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6a0c:b0:6dd:bc07:2850 with SMTP id
- 00721157ae682-6e2c7295006mr136787b3.6.1727999035387; Thu, 03 Oct 2024
- 16:43:55 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:17ca:b0:2e0:8e0f:7bfd with SMTP id
+ 98e67ed59e1d1-2e1b393e2eemr25111a91.2.1727999037305; Thu, 03 Oct 2024
+ 16:43:57 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  3 Oct 2024 16:43:34 -0700
+Date: Thu,  3 Oct 2024 16:43:35 -0700
 In-Reply-To: <20241003234337.273364-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241003234337.273364-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
-Message-ID: <20241003234337.273364-9-seanjc@google.com>
-Subject: [PATCH 08/11] KVM: selftests: Drop manual XCR0 configuration from AMX test
+Message-ID: <20241003234337.273364-10-seanjc@google.com>
+Subject: [PATCH 09/11] KVM: selftests: Drop manual XCR0 configuration from
+ state test
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -84,58 +85,30 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 
 Now that CR4.OSXSAVE and XCR0 are setup by default, drop the manual
-enabling of OXSAVE and XTILE from the AMX test.
+enabling from the state test, which is fully redundant with the default
+behavior.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/x86_64/amx_test.c | 23 ++++---------------
- 1 file changed, 4 insertions(+), 19 deletions(-)
+ tools/testing/selftests/kvm/x86_64/state_test.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index 903940c54d2d..f4ce5a185a7d 100644
---- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -86,6 +86,8 @@ static inline void __xsavec(struct xstate *xstate, uint64_t rfbm)
+diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
+index 1c756db329e5..141b7fc0c965 100644
+--- a/tools/testing/selftests/kvm/x86_64/state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/state_test.c
+@@ -145,11 +145,6 @@ static void __attribute__((__flatten__)) guest_code(void *arg)
  
- static void check_xtile_info(void)
- {
-+	GUEST_ASSERT((xgetbv(0) & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE);
-+
- 	GUEST_ASSERT(this_cpu_has_p(X86_PROPERTY_XSTATE_MAX_SIZE_XCR0));
- 	GUEST_ASSERT(this_cpu_property(X86_PROPERTY_XSTATE_MAX_SIZE_XCR0) <= XSAVE_SIZE);
+ 		memset(buffer, 0xcc, sizeof(buffer));
  
-@@ -122,29 +124,12 @@ static void set_tilecfg(struct tile_config *cfg)
- 	}
- }
- 
--static void init_regs(void)
--{
--	uint64_t cr4, xcr0;
+-		set_cr4(get_cr4() | X86_CR4_OSXSAVE);
+-		GUEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
 -
--	GUEST_ASSERT(this_cpu_has(X86_FEATURE_XSAVE));
+-		xsetbv(0, xgetbv(0) | supported_xcr0);
 -
--	/* turn on CR4.OSXSAVE */
--	cr4 = get_cr4();
--	cr4 |= X86_CR4_OSXSAVE;
--	set_cr4(cr4);
--	GUEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
--
--	xcr0 = xgetbv(0);
--	xcr0 |= XFEATURE_MASK_XTILE;
--	xsetbv(0x0, xcr0);
--	GUEST_ASSERT((xgetbv(0) & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE);
--}
--
- static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
- 						    struct tile_data *tiledata,
- 						    struct xstate *xstate)
- {
--	init_regs();
-+	GUEST_ASSERT(this_cpu_has(X86_FEATURE_XSAVE) &&
-+		     this_cpu_has(X86_FEATURE_OSXSAVE));
- 	check_xtile_info();
- 	GUEST_SYNC(1);
- 
+ 		/*
+ 		 * Modify state for all supported xfeatures to take them out of
+ 		 * their "init" state, i.e. to make them show up in XSTATE_BV.
 -- 
 2.47.0.rc0.187.ge670bccf7e-goog
 
