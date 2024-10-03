@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-27845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27846-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC17A98F079
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 15:33:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2FD298F08A
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 15:37:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6000C1F223D8
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 13:33:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AA4FB243B8
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2024 13:37:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960A919C55D;
-	Thu,  3 Oct 2024 13:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D5819CC1E;
+	Thu,  3 Oct 2024 13:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="aC5Bd2/d"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="k2IO6VDr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2F319B3ED
-	for <kvm@vger.kernel.org>; Thu,  3 Oct 2024 13:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3A586277
+	for <kvm@vger.kernel.org>; Thu,  3 Oct 2024 13:37:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727962407; cv=none; b=OMe3jUf9qYXKCjIKjbDXNuktjuwfhoOWFGAUCKAGWyp+gHJbtwL9Tme4mA9skYibHSNczF1FIuqTp8Ym2gL6EnKgARhRs1PLRO5rqCN0vAxfEMS37LkHImtLz+4dVB/49668YUOTwtZJ9wU1jCgys5q5rQu+ZSVTRQ+rutEn6PY=
+	t=1727962621; cv=none; b=R9RZ1QtHz98BozMOhf5mO/anOaVaQL8zakogpnjCAeGd2kbHRMLCUjP9dGzxmWfsvhMyLwtKc6Rvd2AlVILUAy+y9wohLuXTR6v49Svm8NUKOui0sCLR8Md9Quznho70arkSLQx4Uar9mTj4VsYRMHLNwAtTPkckmZuQAfxTzDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727962407; c=relaxed/simple;
-	bh=ru5EfHEC2xYx7sJrFNE6UgCz7R3Tdiv5uWDzLygWL3k=;
+	s=arc-20240116; t=1727962621; c=relaxed/simple;
+	bh=oKcjYtaHEPTRj+7CRpP5G980TAaVih1dYRjGdvPPRjc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RBsuY3OCmBkCGaN2E3qwqFjN8mcVhc5TWLFBfug04fcWRn0/mh8Djt8jz9PJke3zo1pANUm3n/oJi3ltV5yar5T0NuogwIITURS6PoSnKlrvrI72tOJ8JSxbz/sLc4vugt5OMtDHUMdPi0jUrY65Tq6nCfSDpp9AMmFhSJbR17A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=aC5Bd2/d; arc=none smtp.client-ip=209.85.219.54
+	 Content-Type:Content-Disposition:In-Reply-To; b=YGZSvSsjoWTyHEoWHFNsX6hvTYW2jEpdv6PDNRJyU8cIsyGX+aqcbk7rw4O+N9tspNT/lOKXdP2e9DLwwOnbpx58HsCBJnYmvOjIRZ36/H0oPgZbqf4NIKlOuN1KBkUmytg2kJACNEG3mr4mCYEL+/3oZaTThMKdYjdD0s65x4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=k2IO6VDr; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6cb22e9c6dbso6055856d6.1
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2024 06:33:25 -0700 (PDT)
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7ae3e3db294so58731585a.2
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2024 06:37:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1727962405; x=1728567205; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1727962619; x=1728567419; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8dQ/gk58hUlGStzLPNPz+tqcQ3+D0/hVEA8eHIyZCn0=;
-        b=aC5Bd2/dhJf9fKs2BqfXGibi0Rb4Paggm5wxNHOi+8dgkaKZl3sYSoajE8lr7P57r5
-         CZsVfdN+KptxetJ8VkdW4U6EhvcgPubogkttCVRdzmcDLFUnrmDZ3zgJhLslJOaZTxMT
-         v437LvvpyTQTkG2QNdYV4ophc2M38YjG1kuufs1gHYh+Np/zRPG0rN1JCFu6bXBU52SH
-         G9aaSliwRdB9v44X/TGeS1mR5Ok+3CRSKGk5tYJnaV3K0oqzBpo4+YdR2br98+J7+VUw
-         SRwxiBmPdGZMWZmYAFrhRyCtiqQGE0IRLgQHKBPMTdNazzJ7r4ibjNBE/XV1xzfB4kjM
-         4koQ==
+        bh=tP7tolVS+NskbYnx6Ke2dpQNeCMyn7tnciZU6uuI/aM=;
+        b=k2IO6VDrNWvOFBxGhdsxrtFEnB0OhGxar+bAhGV1IRLN+KHSQrRvoHiTKqqeazDHqT
+         51BJZLciLg9CprNSg7ilohJ/zeX/EsqxF18tJRY381e7JsMXEPErL+WP1wU8QEFro/cK
+         SCHBDJiXOXr8nVA2dJ0sENHFLbYBpDaM+C9U8d03gJWlEJMm2qPlKieQfXVqqD3WJXhP
+         t/ZAwTVa0KJkOfrJZQ5Urr+3OXU1aLTje2ad/ZW+pRad3su0x0T2dhLi+m9CsmZR/35f
+         2CY1+U3LCBwi3c/NYRa1tQPMU1i3zEu0F3TOIyaOyrit8QLaZ+73PNoeT8xKCanbwyq8
+         gG2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727962405; x=1728567205;
+        d=1e100.net; s=20230601; t=1727962619; x=1728567419;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8dQ/gk58hUlGStzLPNPz+tqcQ3+D0/hVEA8eHIyZCn0=;
-        b=pRIMYXnz7G9sw1W0ugG+eWn/Axi0zwNWV62SSGLSeMKgJu5qnrDw0wKIwEF22Obg5v
-         x1YMteT1sL5hKh5UH8f70RUIcRy2ZqNKcaNyvtYN9o9fiwxE4/4GeyluZYOBOlrF/1Hk
-         I9jGUnpvefW9pRXY8a1FqS4MsYVWcPojcmUQm8AV5pwvtkJ1Cw6DXym2s71z/J9WNFRG
-         5BNEmmTBq2kdIqAl0oq7ahsxBB7cZQ3+BzgNupZdsq+Q/XvWm0ZbVGrJWNiCm3ArbKr1
-         GqmrAp1Oo3AsKCefZS1W2fT2uI4sk8Smjhshs+3SV8drqaQf5uJXl2PTQSRJ9r6oxPvw
-         8diQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWou9StCueBIkc5rmmM+4Spp9wY+8Z1zw+i3Kvmmspz3oxWZx9AiU/D7rqAEyr4E3Rp20c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKWKEm9v9vB1Lq0dT6r5oA8T5nVstlqAFkVJUFdBtNITROuDCD
-	+Eaqq2HEa+D+943x2ZX/XSagRgMARwBBJ7HVl4DYDCTQL4xgy1q9ICnda+dD9EY=
-X-Google-Smtp-Source: AGHT+IHs6HB9tlbYAhVev9UHmvUhD6mUcL6pLiiMeMpBirOjKBi5OGNhsG7hwNB7h9ua6MEKwvVLvw==
-X-Received: by 2002:a05:6214:450c:b0:6cb:3644:7ee1 with SMTP id 6a1803df08f44-6cb81a1066emr94967236d6.28.1727962404750;
-        Thu, 03 Oct 2024 06:33:24 -0700 (PDT)
+        bh=tP7tolVS+NskbYnx6Ke2dpQNeCMyn7tnciZU6uuI/aM=;
+        b=HMZ87Hbx0HPLFzVlbxAxfjTOzxPWaGNsQ3xBqYsaL4miYxX+4gHwCZn7zIyTFR2Ag6
+         jnNNWxKftw8jCOFfBHF9/rHaDnsy2ZvqI/nxPeF0uM7MHp7k0rWofmSgwwlhJOEhIjDy
+         yGwb4fwiTETsce+29hbpT1qM+UPucOvX6AkAMPE3Fbl8K5GBveaeupIOz0dizGXEC3T2
+         8OSp5D5WLTo3EJiJs6kxWl6KDMTeDi+WxvthX5vEpNEPNd7ieZLU5qgdUn+TmZ2OYgz1
+         cAyDhUVwYv9nUQ0tf6D35lr5eFogEhm2IS8p2zbxlq1rt4JU9imnJ1FnsW8A/W11A77j
+         hTKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVApt/KVh/4ELUYP5NM6P+EDp7mIe9M1lX7aLmD78r//+ul4WJ/S2XEWE7VF+gwlIgDPw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywb+LxyEfQ/+Wqa90zf2p8ebkQZwvyEzHNlrjUQwNwXe5j/g7mq
+	IkmvRvpt91SlGY6EPyZLae5DBz0M2R7c+1Er4/GHgB+b+bY3Qg+DeCr+G4YZpno=
+X-Google-Smtp-Source: AGHT+IExX5PZU6X//DLAfhUc+pV/DvO3M0gA3yCG/nuBqNATFkOVsDt5pX3W468d8vfh0nt7guWskA==
+X-Received: by 2002:a05:6214:3a8a:b0:6cb:4eb9:d279 with SMTP id 6a1803df08f44-6cb819d867dmr105528216d6.21.1727962619279;
+        Thu, 03 Oct 2024 06:36:59 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb9359bad5sm6515846d6.5.2024.10.03.06.33.24
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb9359c01esm6550426d6.2.2024.10.03.06.36.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 06:33:24 -0700 (PDT)
+        Thu, 03 Oct 2024 06:36:58 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1swLxL-00ASUf-OH;
-	Thu, 03 Oct 2024 10:33:23 -0300
-Date: Thu, 3 Oct 2024 10:33:23 -0300
+	id 1swM0o-00ASYX-0T;
+	Thu, 03 Oct 2024 10:36:58 -0300
+Date: Thu, 3 Oct 2024 10:36:58 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: James Gowans <jgowans@amazon.com>
 Cc: linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
@@ -86,11 +86,11 @@ Cc: linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
 	Alexander Graf <graf@amazon.de>, anthony.yznaga@oracle.com,
 	steven.sistare@oracle.com, nh-open-source@amazon.com,
 	"Saenz Julienne, Nicolas" <nsaenz@amazon.es>
-Subject: Re: [RFC PATCH 11/13] iommu: Add callback to restore persisted
- iommu_domain
-Message-ID: <20241003133323.GB2456194@ziepe.ca>
+Subject: Re: [RFC PATCH 12/13] iommufd, guestmemfs: Ensure persistent file
+ used for persistent DMA
+Message-ID: <20241003133658.GC2456194@ziepe.ca>
 References: <20240916113102.710522-1-jgowans@amazon.com>
- <20240916113102.710522-12-jgowans@amazon.com>
+ <20240916113102.710522-13-jgowans@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -99,57 +99,32 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240916113102.710522-12-jgowans@amazon.com>
+In-Reply-To: <20240916113102.710522-13-jgowans@amazon.com>
 
-On Mon, Sep 16, 2024 at 01:31:00PM +0200, James Gowans wrote:
-> diff --git a/drivers/iommu/iommufd/serialise.c b/drivers/iommu/iommufd/serialise.c
-> index 9519969bd201..baac7d6150cb 100644
-> --- a/drivers/iommu/iommufd/serialise.c
-> +++ b/drivers/iommu/iommufd/serialise.c
-> @@ -139,7 +139,14 @@ static int rehydrate_iommufd(char *iommufd_name)
->  		    area->node.last = *iova_start + *iova_len - 1;
->  		    interval_tree_insert(&area->node, &ioas->iopt.area_itree);
->  	    }
-> -	    /* TODO: restore link from ioas to hwpt. */
-> +	    /*
-> +	     * Here we should do something to associate struct iommufd_device with the
-> +	     * ictx, then get the iommu_ops via dev_iommu_ops(), and call the new
-> +	     * .domain_restore callback to get the struct iommu_domain.
-> +	     * Something like:
-> +	     * hwpt->domain = ops->domain_restore(dev, persistent_id);
-> +	     * Hand wavy - the details allude me at the moment...
-> +	     */
->  	}
+On Mon, Sep 16, 2024 at 01:31:01PM +0200, James Gowans wrote:
 
-The core code should request a iommu_domain handle for the
-pre-existing translation very early on, it should not leave the device
-in some weird NULL domain state. I have been trying hard to eliminate
-that.
-
-The special domain would need to remain attached and some protocol
-would be needed to carefully convey that past vfio to iommufd,
-including inhibiting attaching a blocked domain in VFIO
-startup. Including blocking FLRs from VFIO and rejecting attaches to
-other non-VFIO drivers.
-
-This is a twisty complicated path, it needs some solid definition of
-what the lifecycle of this special domain is, and some sensible exits
-if userspace isn't expecting/co-operating with the hand over, or it
-crashes while doing this..
-
-> @@ -576,6 +578,9 @@ struct iommu_ops {
->  	struct iommu_domain *(*domain_alloc_sva)(struct device *dev,
->  						 struct mm_struct *mm);
->  
-> +	struct iommu_domain *(*domain_restore)(struct device *dev,
-> +			unsigned long persistent_id);
+> +#ifdef CONFIG_GUESTMEMFS_FS
+> +		struct vm_area_struct *vma;
+> +		struct mm_struct *mm = current->mm;
 > +
+> +		mmap_read_lock(mm);
+> +		vma = find_vma_intersection(current->mm,
+> +				 cmd->user_va, cmd->user_va + cmd->length);
+> +		if (!vma || !is_guestmemfs_file(vma->vm_file)) {
+> +			mmap_read_unlock(mm);
+> +			return -EFAULT;
+> +		}
+> +		mmap_read_unlock(mm);
+> +#else
 
-Why do we need an ID? There is only one persistent domain per device,
-right?
+Any kind of FD interaction needs to go through the new FD path that
+Steve is building:
 
-This may need PASID, at least Intel requires the hypervisor to handle
-PASID domains, and they would need to persist as well.
+https://lore.kernel.org/linux-iommu/1727190338-385692-1-git-send-email-steven.sistare@oracle.com
+
+I'm expecting multiple kinds of fds to fall into that pattern,
+including memfs, guestmemfd, and dmabuf. guestmemfd can just be one
+more..
 
 Jason
 
