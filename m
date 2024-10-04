@@ -1,237 +1,147 @@
-Return-Path: <kvm+bounces-27989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D62F990F90
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 22:02:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48AFC991007
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 22:16:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC7CB1C22A02
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 20:02:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4781C238DE
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 20:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3321FB3E8;
-	Fri,  4 Oct 2024 19:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYfU5nCF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD875231C80;
+	Fri,  4 Oct 2024 19:50:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87471DDC02;
-	Fri,  4 Oct 2024 19:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A64231C87
+	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 19:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728069075; cv=none; b=Td1tO3vdfWUccAsCTmcT/S2izMHAP/UrkuqznWewkh/iXnA3UB0TrZtW198U6KRHiB9AmrP49GTwXunnA9pUWEUAxzT/XEe2tCpMcHprUdDPOD24TqpjX60mQLfAEM1SV/+JcVaSnN40Wqd6+Wtnvt+CeI3a4pglWMnuAvKtPRA=
+	t=1728071431; cv=none; b=WcBZPGCuHD/2X6R3zfRKk0MommzHbWiYPTiOo/AK0+RNz5HV0j2EKaxW6DHWRYlKXEb9G71nKXJzlkyTZ4qxEZRxpXFV6ep1WlCPbecoyzRNpG7BW6+X3wYJjvBgJ+qUtWRmxHa15nyVtCebfGlCJMDiDDydH4FNazFxj62gOwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728069075; c=relaxed/simple;
-	bh=YYYFR4xM6pq64tyhxGwfZ3sPFhLIXiPYgsZ0dStL10M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=drByXn6E+WvRJYgCQxuk7XS/szLTW1Y7Q646CX38oIcjFp28X5ZJYCSieDG5BrdQ05ZLpHl2fv8wtBRjfWKRYS8CrcjRHbdEv3hJA1utieY6gMqwSb4/TjASoMT8CaaNPaESw6Oo2NE0CTMylVklkgQuWsKIx6n+/6MoiWhRHhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYfU5nCF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 109CEC4CEC6;
-	Fri,  4 Oct 2024 19:11:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728069074;
-	bh=YYYFR4xM6pq64tyhxGwfZ3sPFhLIXiPYgsZ0dStL10M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LYfU5nCF1IhcG9r/BLUlZ83fopNKYX/W4gNeO7INGLlb3hG5q7ZfL/MItsNOF7lvD
-	 Z0TfCzp7GYj74VR2pfNgN7Q//fzAy3lRSXTLX/YNyIB2c4P24z0ZJizhfSxu/y8/Bn
-	 xtlL5gXdG/ygxQ8t7ZTAswkYupUyG+14LV5wjlxC3QTC+B4Tkat8cU/9fQIjRu407n
-	 Y2dIB/ITsG6b2oH0nwxPpgrhcjKCN2rWwK6UkDUe5m6pkwrygKAZJO1vGsl8PPR86D
-	 dHzMujwLCbQYn7S/FYdKe9qAowdS8s5p4I9nlpPVoY+oHL3F3dHvy5JJATMDW8qHln
-	 fk6pRwV/iNalA==
-Date: Fri, 4 Oct 2024 20:11:04 +0100
-From: Simon Horman <horms@kernel.org>
-To: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	virtualization@lists.linux.dev, kys@microsoft.com,
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-	catalin.marinas@arm.com, will@kernel.org, luto@kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
-	daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com,
-	robh@kernel.org, bhelgaas@google.com, arnd@arndb.de,
-	sgarzare@redhat.com, jinankjain@linux.microsoft.com,
-	muminulrussell@gmail.com, skinsburskii@linux.microsoft.com,
-	mukeshrathor@microsoft.com
-Subject: Re: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in
- Hyper-V code
-Message-ID: <20241004191104.GI1310185@kernel.org>
-References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
- <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
+	s=arc-20240116; t=1728071431; c=relaxed/simple;
+	bh=d+uNb1YxSbc18Y/ikkvakxRW0zWVs7tZrrGcMxydxoM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i8zzIT7WZcM21crQG6CNJ2z6XAU/EF5Zo4CCVL6S0iNedwkcFSrO+zXtN+lQlpGYZ5uwsAxPTne/ghZjj9BORwOSrlzV3VvgWEoUY6UHkN4QEshrjs9eq/Wdfp0xsqkyXjHCAta19xyIFSRjkeovMBAnloAbZ8iI9HTu7vi18Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1swoJg-0001qQ-83; Fri, 04 Oct 2024 21:50:20 +0200
+Message-ID: <4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
+Date: Fri, 4 Oct 2024 21:50:18 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
-
-On Thu, Oct 03, 2024 at 12:51:04PM -0700, Nuno Das Neves wrote:
-> To move toward importing headers from Hyper-V directly, switch to
-> using hvhdk.h in all Hyper-V code. KVM code that uses Hyper-V
-> definitions from hyperv-tlfs.h remains untouched.
-> 
-> Add HYPERV_NONTLFS_HEADERS everywhere mshyperv.h, asm/svm.h,
-> clocksource/hyperv_timer.h is included in Hyper-V code.
-> 
-> Replace hyperv-tlfs.h with hvhdk.h directly in linux/hyperv.h, and
-> define HYPERV_NONTLFS_HEADERS there, since it is only used in
-> Hyper-V device code.
-> 
-> Update a couple of definitions to updated names found in the new
-> headers: HV_EXT_MEM_HEAT_HINT, HV_SUBNODE_TYPE_ANY.
-> 
-> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-
-...
-
-> diff --git a/arch/arm64/hyperv/mshyperv.c b/arch/arm64/hyperv/mshyperv.c
-> index b1a4de4eee29..62b2a270ae65 100644
-> --- a/arch/arm64/hyperv/mshyperv.c
-> +++ b/arch/arm64/hyperv/mshyperv.c
-> @@ -15,6 +15,7 @@
->  #include <linux/errno.h>
->  #include <linux/version.h>
->  #include <linux/cpuhotplug.h>
-> +#define HYPERV_NONTLFS_HEADERS
->  #include <asm/mshyperv.h>
->  
->  static bool hyperv_initialized;
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
+ address
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
+References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+ <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+ <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
+ <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
+Content-Language: en-US
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
 
 Hi,
 
-With this change in place I see allmodconfig x86_64 builds reporting that
-HV_REGISTER_FEATURES is undeclared.
+On 04.10.24 14:10, Peter Maydell wrote:
+> On Fri, 4 Oct 2024 at 12:51, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>> On 04.10.24 12:40, Peter Maydell wrote:
+>>> Don't do this -- KVM doesn't support it. For access to MMIO,
+>>> stick to instructions which will set the ISV bit in ESR_EL1.
+>>>
+>>> That is:
+>>>
+>>>  * AArch64 loads and stores of a single general-purpose register
+>>>    (including the register specified with 0b11111, including those
+>>>    with Acquire/Release semantics, but excluding Load Exclusive
+>>>    or Store Exclusive and excluding those with writeback).
+>>>  * AArch32 instructions where the instruction:
+>>>     - Is an LDR, LDA, LDRT, LDRSH, LDRSHT, LDRH, LDAH, LDRHT,
+>>>       LDRSB, LDRSBT, LDRB, LDAB, LDRBT, STR, STL, STRT, STRH,
+>>>       STLH, STRHT, STRB, STLB, or STRBT instruction.
+>>>     - Is not performing register writeback.
+>>>     - Is not using R15 as a source or destination register.
+>>>
+>>> Your instruction is doing writeback. Do the address update
+>>> as a separate instruction.
 
-arch/arm64/hyperv/mshyperv.c: In function 'hyperv_init':
-arch/arm64/hyperv/mshyperv.c:53:26: error: 'HV_REGISTER_FEATURES' undeclared (first use in this function); did you mean 'HV_REGISTER_FEATURES_INFO'?
-   53 |         hv_get_vpreg_128(HV_REGISTER_FEATURES, &result);
-      |                          ^~~~~~~~~~~~~~~~~~~~
-      |                          HV_REGISTER_FEATURES_INFO
-arch/arm64/hyperv/mshyperv.c:53:26: note: each undeclared identifier is reported only once for each function it appears in
-arch/arm64/hyperv/mshyperv.c:58:26: error: 'HV_REGISTER_ENLIGHTENMENTS' undeclared (first use in this function); did you mean 'HV_ACCESS_REENLIGHTENMENT'?
-   58 |         hv_get_vpreg_128(HV_REGISTER_ENLIGHTENMENTS, &result);
-      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~
-      |                          HV_ACCESS_REENLIGHTENMENT
+With readl/writel implemented in assembly, I get beyond that point, but
+now I get a data abort running an DC IVAC instruction on address 0x1000,
+where the cfi-flash is located. This instruction is part of a routine
+to remap the cfi-flash to start a page later, so the zero page can be
+mapped faulting.
 
-> diff --git a/arch/x86/entry/vdso/vma.c b/arch/x86/entry/vdso/vma.c
-> index 6d83ceb7f1ba..5f4053c49658 100644
-> --- a/arch/x86/entry/vdso/vma.c
-> +++ b/arch/x86/entry/vdso/vma.c
-> @@ -25,6 +25,7 @@
->  #include <asm/page.h>
->  #include <asm/desc.h>
->  #include <asm/cpufeature.h>
-> +#define HYPERV_NONTLFS_HEADERS
->  #include <clocksource/hyperv_timer.h>
->  
->  #undef _ASM_X86_VVAR_H
-> diff --git a/arch/x86/hyperv/hv_apic.c b/arch/x86/hyperv/hv_apic.c
-> index f022d5f64fb6..4fe3b3b13256 100644
-> --- a/arch/x86/hyperv/hv_apic.c
-> +++ b/arch/x86/hyperv/hv_apic.c
-> @@ -26,6 +26,7 @@
->  #include <linux/slab.h>
->  #include <linux/cpuhotplug.h>
->  #include <asm/hypervisor.h>
-> +#define HYPERV_NONTLFS_HEADERS
->  #include <asm/mshyperv.h>
->  #include <asm/apic.h>
->  
-> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
-> index fc3c3d76c181..680c4abc456e 100644
-> --- a/arch/x86/hyperv/hv_init.c
-> +++ b/arch/x86/hyperv/hv_init.c
-> @@ -19,6 +19,7 @@
->  #include <asm/sev.h>
->  #include <asm/ibt.h>
->  #include <asm/hypervisor.h>
-> +#define HYPERV_NONTLFS_HEADERS
->  #include <asm/mshyperv.h>
->  #include <asm/idtentry.h>
->  #include <asm/set_memory.h>
+Simple reproducer:
 
-And here too, with x86_64 allmodconfig.
+start:
+        ldr     x0, =0x1000
+        ldr     x1, =0x1040
+        bl      v8_inv_dcache_range
 
-In file included from ./include/linux/string.h:390,
-                 from ./include/linux/efi.h:16,
-                 from arch/x86/hyperv/hv_init.c:12:
-arch/x86/hyperv/hv_init.c: In function 'get_vtl':
-./include/linux/overflow.h:372:23: error: invalid application of 'sizeof' to incomplete type 'struct hv_get_vp_registers_input'
-  372 |                 sizeof(*(p)) + flex_array_size(p, member, count),       \
-      |                       ^
-./include/linux/fortify-string.h:502:42: note: in definition of macro '__fortify_memset_chk'
-  502 |         size_t __fortify_size = (size_t)(size);                         \
-      |                                          ^~~~
-arch/x86/hyperv/hv_init.c:427:9: note: in expansion of macro 'memset'
-  427 |         memset(input, 0, struct_size(input, element, 1));
-      |         ^~~~~~
-arch/x86/hyperv/hv_init.c:427:26: note: in expansion of macro 'struct_size'
-  427 |         memset(input, 0, struct_size(input, element, 1));
-      |                          ^~~~~~~~~~~
+        mov     w10, '!'
+        bl      putch
 
-[errors trimmed for the sake of brevity]
+        ret
 
-...
+v8_inv_dcache_range:
+        mrs     x3, ctr_el0
+        lsr     x3, x3, #16
+        and     x3, x3, #0xf
+        mov     x2, #0x4
+        lsl     x2, x2, x3
+        sub     x3, x2, #0x1
+        bic     x0, x0, x3
+1:
+        dc      ivac, x0
+        add     x0, x0, x2
+        cmp     x0, x1
+        b.cc    1b
+        dsb     sy
+        ret
 
-> diff --git a/arch/x86/hyperv/hv_vtl.c b/arch/x86/hyperv/hv_vtl.c
-> index 04775346369c..a8bb6ad7efb6 100644
-> --- a/arch/x86/hyperv/hv_vtl.c
-> +++ b/arch/x86/hyperv/hv_vtl.c
-> @@ -10,6 +10,7 @@
->  #include <asm/boot.h>
->  #include <asm/desc.h>
->  #include <asm/i8259.h>
-> +#define HYPERV_NONTLFS_HEADERS
->  #include <asm/mshyperv.h>
->  #include <asm/realmode.h>
->  #include <../kernel/smpboot.h>
+This prints ! without KVM, but triggers a data abort before that with -enable-kvm:
 
-And, likewise, with this patch applied I see a number of errors when
-compiling this file. This is with allmodconfig on x86_64 with:
+  DABT (current EL) exception (ESR 0x96000010) at 0x0000000000001000
+  elr: 000000007fbe0550 lr : 000000007fbe01ac
+  [snip]
 
-Modified: CONFIG_HYPERV=y (instead of m)
-Added: CONFIG_HYPERV_VTL_MODE=y
+  Call trace:
+  [<7fbe0550>] (v8_inv_dcache_range+0x1c/0x34) from [<7fbe0218>] (arch_remap_range+0x64/0x70)
+  [<7fbe0218>] (arch_remap_range+0x64/0x70) from [<7fb8795c>] (of_platform_device_create+0x1e8/0x22c)
+  [<7fb8795c>] (of_platform_device_create+0x1e8/0x22c) from [<7fb87a04>] (of_platform_bus_create+0x64/0xbc)
+  [snip]
 
-arch/x86/hyperv/hv_vtl.c: In function 'hv_vtl_bringup_vcpu':
-arch/x86/hyperv/hv_vtl.c:154:34: error: 'HVCALL_ENABLE_VP_VTL' undeclared (first use in this function)
-  154 |         status = hv_do_hypercall(HVCALL_ENABLE_VP_VTL, input, NULL);
-      |                                  ^~~~~~~~~~~~~~~~~~~~
-arch/x86/hyperv/hv_vtl.c:154:34: note: each undeclared identifier is reported only once for each function it appears in
-In file included from ./include/linux/string.h:390,
-                 from ./include/linux/bitmap.h:13,
-                 from ./include/linux/cpumask.h:12,
-                 from ./arch/x86/include/asm/apic.h:5,
-                 from arch/x86/hyperv/hv_vtl.c:9:
-arch/x86/hyperv/hv_vtl.c: In function 'hv_vtl_apicid_to_vp_id':
-arch/x86/hyperv/hv_vtl.c:189:32: error: invalid application of 'sizeof' to incomplete type 'struct hv_get_vp_from_apic_id_in'
-  189 |         memset(input, 0, sizeof(*input));
-      |                                ^
-./include/linux/fortify-string.h:502:42: note: in definition of macro '__fortify_memset_chk'
-  502 |         size_t __fortify_size = (size_t)(size);                         \
-      |                                          ^~~~
-arch/x86/hyperv/hv_vtl.c:189:9: note: in expansion of macro 'memset'
-  189 |         memset(input, 0, sizeof(*input));
-      |         ^~~~~~
-arch/x86/hyperv/hv_vtl.c:190:14: error: invalid use of undefined type 'struct hv_get_vp_from_apic_id_in'
-  190 |         input->partition_id = HV_PARTITION_ID_SELF;
-      |              ^~
-arch/x86/hyperv/hv_vtl.c:191:14: error: invalid use of undefined type 'struct hv_get_vp_from_apic_id_in'
-  191 |         input->apic_ids[0] = apic_id;
-      |              ^~
-arch/x86/hyperv/hv_vtl.c:195:45: error: 'HVCALL_GET_VP_ID_FROM_APIC_ID' undeclared (first use in this function)
-  195 |         control = HV_HYPERCALL_REP_COMP_1 | HVCALL_GET_VP_ID_FROM_APIC_ID;
-      |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Any idea what this is about?
 
-...
+Thanks,
+Ahmad
+
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
