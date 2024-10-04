@@ -1,121 +1,96 @@
-Return-Path: <kvm+bounces-27984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FDEE99085F
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 18:02:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 605FB990863
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 18:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAB741F2193E
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 16:02:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 117D7287E69
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 16:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE151C82E1;
-	Fri,  4 Oct 2024 15:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBA21E283C;
+	Fri,  4 Oct 2024 15:58:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yvIB5SB4"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="gF4x0mXg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79971C3023
-	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 15:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619A61C82EE;
+	Fri,  4 Oct 2024 15:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728057491; cv=none; b=Gdx6dx0GYvgqvrLFsU5KTvB576JC+G/0m8y/YXP3AAnlgKQk/plpGwQ+8sohJbqgvxd27lN/Np+UtEOJLKWTcbvmvtImy4mLXxq1uh9BVJ3XTQnhKGWhJzLf5uKghox6OUAA/e4pHgh9ADuXSsBQ891wXYfxc0e+mUhMcaUfOhs=
+	t=1728057495; cv=none; b=S6XqXh5c4cOLpkIxG2IONj1AxZBwfj3d6Zzx8KDXwC5DlfllohP6eWamEGhS97cLBpwRVI+qW+cQeQuwY5nV2ujBdiuoMca6fjA5WWHm4kAH1BISj/ligZxGEzTAOOOkRUqzRumSvGBfVgCOxuGN/HiVIjd+rsG3n3MjfesWJFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728057491; c=relaxed/simple;
-	bh=HWGViDOQRtvE03XV98m1bwgXILGc5l07x+W+qORtMAQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JNA045RDDwknpSHClCCkOGHj52uPPnNMwKjMMlbjAdXowakzvOZGMJk3WBrFPByXrA1odcDtCgeQ3bnYhCCN7oRP0C/ab+/5EsTmoc9oeAd4bX+1Kk/huFLdVgHvJyivw3kQpiV4wRWfd+dsU1sXBYIGQD+67lxN85d0/ixTxws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yvIB5SB4; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2fadc95ccfcso27020491fa.1
-        for <kvm@vger.kernel.org>; Fri, 04 Oct 2024 08:58:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728057488; x=1728662288; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HWGViDOQRtvE03XV98m1bwgXILGc5l07x+W+qORtMAQ=;
-        b=yvIB5SB4KT8ijBpySPm3WIx+51XuySIu9KMvFgJ6ZRsm2conth3qRoarocARCxMWGO
-         Rs76YzYdRPxX+YmQBy0o2uOs80yS6BGk5pUAy8/04ebnagYwzK/zVuJ/O21/7r69Ajze
-         WaV0LWbpHpvTz+mzSKzKW11+8ksjolTdX1lQ7Xa8oPSZTQl21byasVKXxJP3lLxolM5D
-         Gh3Y2LHBpSRYK82wwexZmB3JFm+AGKTs4qY4a/kFQX+ItGm1wvbGFuMxKrNGZ1/I+aSe
-         MmmHjXsxP45tN356yeahZa3jZANNwlSOzfmA4Hj1fD5Kv8jG2j7UcF1zdzyzr8VKlV05
-         Bhuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728057488; x=1728662288;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HWGViDOQRtvE03XV98m1bwgXILGc5l07x+W+qORtMAQ=;
-        b=jHDLzBmFVlTgwbcPmOX0eIJOlRBCDKAjHNYZ81naHfLoXw/3JgsMr68eWSTyE0DPei
-         HNeWoZIYTqllaADjBp6X2QR6ICfS1EHiaLtMsqrfIrVCHZ7saMOXxbfJlmMHS1Tw1KU8
-         0MZLX1PdU7M82OK0RYSUiESJebWOfi3qOEyWrZudl/QfkrxCKAYGx3TQ1fmgKndtuuvB
-         7jyAy5qHu26BfjRpim3uJx/Hs0WfvhaCMNYGY3tG8c6QUpuv5+rBeinoJnEsAkM/9YRe
-         Qvw9FIUJX6GC+hRo2uFH+5X4DXk0qPAux+D255fujDQPj9Dm6DpOrXkEHE4/B/GS0fsO
-         Haxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUE2eUhJuiLbKap09d389rI1qQLNNwrKucjzrW0tQoz4ru4ujMHfAe+kd1abbOosf6mHIE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoRqlwQt7VXLsZpEA7Gz7hrgK6f5IcjEIZf6/CEfkxidWEAzXW
-	0LueroKDAoPqcrGFMvQwTEEgUQRT1sP/zHx4iuIY8z+lh011PSM8JFDNcsdR/bn29qdQmsw92u5
-	FP9mxxlUp2E2ycT72YixQYu30k2Ki3yWoIIM6ug==
-X-Google-Smtp-Source: AGHT+IE6D/ytJI1XEuL5RjuLmHf7kTMpHr2stdM6cvQcL3VbC95ix/TXwe9hvfiPDKge6XKhF4GO1QqzUMMpBNOmpEg=
-X-Received: by 2002:a2e:e1a:0:b0:2fa:c57a:3b1c with SMTP id
- 38308e7fff4ca-2faf3c63ed4mr17625661fa.17.1728057487436; Fri, 04 Oct 2024
- 08:58:07 -0700 (PDT)
+	s=arc-20240116; t=1728057495; c=relaxed/simple;
+	bh=8uh4TNkp6twpeWAanVhV11PWicdwb1B5v29oz3feF58=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZCwkLbJF6j4pJ/qKH4UaOHz1lYY6D4MiiVXCPOXSX8Jr26XkJeI2Eq5RIZJPFM/J9M0+VuCKvSTqHETdIyvCUaqqA9VJZdh+mX+HnP1Z/akrrj/dQgn7OW/Go/yY4pqMcok0T+/UAv9xN9aDBtvLPNep84kUHdb4bETNZPEG5Hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=gF4x0mXg; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from skinsburskii. (c-73-193-101-196.hsd1.wa.comcast.net [73.193.101.196])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 1C52C20DB372;
+	Fri,  4 Oct 2024 08:58:13 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1C52C20DB372
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1728057493;
+	bh=/pii58jwh0dxjUTnCB4wKd4qDYL0zJalmcFRaKg1Rk0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gF4x0mXgY2976aPpUyHfvCeU5mN01LE3LGlyOHoNNmhz8QucEf5NFFia21mNaMF+J
+	 A9fhvHE8aJt2tUhuBAhwTZK0iABMpBt/d6Vl5LxteuF02PZuyT5njzYTAvaoKnCvMd
+	 7onaHNpCblZSb2s/35ZJ8j+tjDmi+pvAwj4hrA2k=
+Date: Fri, 4 Oct 2024 08:58:10 -0700
+From: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+To: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	virtualization@lists.linux.dev, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+	catalin.marinas@arm.com, will@kernel.org, luto@kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+	daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com,
+	robh@kernel.org, bhelgaas@google.com, arnd@arndb.de,
+	sgarzare@redhat.com, jinankjain@linux.microsoft.com,
+	muminulrussell@gmail.com, mukeshrathor@microsoft.com
+Subject: Re: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in
+ Hyper-V code
+Message-ID: <20241004155810.GA15304@skinsburskii.>
+References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
- <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
- <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de> <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
- <ZwAPWc-v9GhMbERF@linux.dev>
-In-Reply-To: <ZwAPWc-v9GhMbERF@linux.dev>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Oct 2024 16:57:56 +0100
-Message-ID: <CAFEAcA9bnJR__3v2ixjjEyQD+Kwz4oR9+HO=w8u6JsVjgnXE2w@mail.gmail.com>
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Ahmad Fatoum <a.fatoum@pengutronix.de>, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
 
-On Fri, 4 Oct 2024 at 16:53, Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> On Fri, Oct 04, 2024 at 01:10:48PM +0100, Peter Maydell wrote:
-> > On Fri, 4 Oct 2024 at 12:51, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> > > > Strictly speaking this is a missing feature in KVM (in an
-> > > > ideal world it would let you do MMIO with any instruction
-> > > > that you could use on real hardware).
-> > >
-> > > I assume that's because KVM doesn't want to handle interruptions
-> > > in the middle of such "composite" instructions?
-> >
-> > It's because with the ISV=1 information in the ESR_EL2,
-> > KVM has everything it needs to emulate the load/store:
-> > it has the affected register number, the data width, etc. When
-> > ISV is 0, simulating the load/store would require KVM
-> > to load the actual instruction word, decode it to figure
-> > out what kind of load/store it was, and then emulate
-> > its behaviour. The instruction decode would be complicated
-> > and if done in the kernel would increase the attack surface
-> > exposed to the guest.
->
-> On top of that, the only way to 'safely' fetch the instruction would be
-> to pause all vCPUs in the VM to prevent the guest from remapping the
-> address space behind either KVM or the VMM's back.
+Hi Nuno,
 
-Do we actually care about that, though? If the guest does
-that isn't it equivalent to a hardware CPU happening to
-fetch the insn just-after a remapping rather than just-before?
-If you decode the insn and it's not a store you could just
-restart the guest...
+On Thu, Oct 03, 2024 at 12:51:04PM -0700, Nuno Das Neves wrote:
+> diff --git a/arch/arm64/hyperv/hv_core.c b/arch/arm64/hyperv/hv_core.c
+> index 9d1969b875e9..bb7f28f74bf4 100644
+> --- a/arch/arm64/hyperv/hv_core.c
+> +++ b/arch/arm64/hyperv/hv_core.c
+> @@ -14,6 +14,7 @@
+>  #include <linux/arm-smccc.h>
+>  #include <linux/module.h>
+>  #include <asm-generic/bug.h>
+> +#define HYPERV_NONTLFS_HEADERS
+>  #include <asm/mshyperv.h>
+>  
 
-thanks
--- PMM
+Perhaps it would be cleaner to introduce a new header file to be
+included, containing the new define and including <asm/mshyperv.h> instead.
+
+Stas
 
