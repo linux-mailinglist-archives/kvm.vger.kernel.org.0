@@ -1,120 +1,202 @@
-Return-Path: <kvm+bounces-27922-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27923-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E5599060A
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 16:28:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D545399066C
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 16:43:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93FA71C2155C
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 14:28:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CE0428139D
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 14:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030FB21733A;
-	Fri,  4 Oct 2024 14:27:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SIJRMp6i"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87988217911;
+	Fri,  4 Oct 2024 14:43:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC12969D2B
-	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 14:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FBC20FAA1;
+	Fri,  4 Oct 2024 14:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728052073; cv=none; b=MH4UMpIyzhJh9VG42IDGLCJbd85KFXN4ywhomOveGcMF6LBeF10+dI/bS7R+nIlUCRM9BJ83imfxDq3D1NbVqfxnnnB88ydnHeiAkfrv3tmzP9Uipd8CoNjg+bqWRlB+vo3fjehx35dUzMT+G7lG9rlm8TbdfUOtaY2DXM1r2gE=
+	t=1728053010; cv=none; b=cYaedbL6LlE7TZhSPkTuhNTfn7zMf+fBJAXxU5c6AQwhV9dQPZxiErQLIAt3/zQUNXLrb4L83lCcAAkA3QSnFAgKWisDJ+05BhUlDYIULw4GzzC9c0G9EMqcH7VDr/BhdSbg/BiRbc+xgAXP9d9axMfGiA9fjk3CB/3jiTDVfaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728052073; c=relaxed/simple;
-	bh=jNaRSN4lfwD9Y7dsEmPIHxFmOPd1ozcTRFWPbbj42Fw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uvarhQZt+fETD1D89LPd+FHDT/OOl/6gt5gDYC0uHMotbSzTbjbHaDQoEWd7RqtQlMZdnFC/QvYUjm9JNYOuDmDK/myDfQNtNU7BPOWQ8JTdo4WYYW3YSJHQRBN3ZU9FA/BFU3GX4LMGQFvZYKbW1ns8O6vxnH1ZnpQuI90kTgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SIJRMp6i; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e25cef43f5aso2578371276.3
-        for <kvm@vger.kernel.org>; Fri, 04 Oct 2024 07:27:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728052071; x=1728656871; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fs/WqP0RMB3E5hV2bwyTtiNtyEoT7gsNPUDlAFSWfQs=;
-        b=SIJRMp6iZ4vS1ezpaVTF15WSIi6Bg7Cc3ajIhGYoDjwKtWwdf9l+4nj478G5/w6AL8
-         o0vUNcNjf/kWTxqzpE+kRz3x3ukWLQxXRhbpbhtIINTkQzMdD6pe1Dc6pS6ViyJv7dUW
-         9Mxxm0GpFtHnKKhtUmYmWxc+zKcuKo5XOpCHxogtNEkrmCzbBbjZS9a9s25fx0nmy5oo
-         zRTSLUpNnJAi9PnHSEJU3X0lksctSfmFEmHEDYRx6xdw2ryh63+8jXsZ7fb0jdH3XGF3
-         hNGN6ZHtK53EgC9YL4oeFBLgKYcVaQ1K9NJPSGnkeRPIo2DG9nuZCs12zzW0hnmHZHkR
-         9vew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728052071; x=1728656871;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fs/WqP0RMB3E5hV2bwyTtiNtyEoT7gsNPUDlAFSWfQs=;
-        b=tDaXgsKYp8ugtrWOOnKI8Cz5IKai82tFWSBXfnh3BlmRrOfoYvjR9SGLTGgPDI2pOs
-         23+uyBDvw8e+OtNqFhLgekwAMW2nZWPwkY6Zgn4j2K8ALyjLxGSNHi9lArhdphOYt8O9
-         X/ZvtV5VA5179a7c+mKBJRErMjzqcprnADZim5SYoVefBueoM6w0sAeck6YVQK9ifj+i
-         kuHmA+FeOuZ5iAbwPwRuK2yUwUkVHmZI7ZuDwdySzUDJXYMlFde/7GwYnOe9/wwRf+Ux
-         ajOD9oRtXAvIiNdKBmHPWaWBWAtrDs+eTwNYn+0U1pvVsq2aIahNEJgwoBQpe0910wZl
-         wpNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsr7yeaF+YkIO9aCxnxg3ceLRaNTylG98A5MtL2O6Zwrdg8CLdYd0b0t6f5stfkIEnsLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRjeiO2Fo2SH3Hutx/OmuUMDqJkKiOxjBux/iwY6cb5RTHQaaH
-	Nv7cplGG0hQsO2Q+AhBkknSMsycnkVy/U6xF1d5rznVGte6zztYKNjQj3AmxX7NdDH+Xr/Tt6Qu
-	Uww==
-X-Google-Smtp-Source: AGHT+IF/3JwwL+JA6ZaGXNANpUIsMpJrYFnMBSFbgNBEKo6bK1QMK0DNXl9g4EtHgHDg397Ca4b+MIr/cEU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a5b:6c6:0:b0:e22:5f73:1701 with SMTP id
- 3f1490d57ef6-e28934fdfc5mr5059276.0.1728052070882; Fri, 04 Oct 2024 07:27:50
- -0700 (PDT)
-Date: Fri, 4 Oct 2024 07:27:49 -0700
-In-Reply-To: <20241003230806.229001-2-pbonzini@redhat.com>
+	s=arc-20240116; t=1728053010; c=relaxed/simple;
+	bh=V/n3a/RmyEFaEXOi7ye94B3gyl3XifclsxOHGAcIQLQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bBn/uWKwaf0/BERX0aisEckLrKtKVMcvX4PVLkmLRw/DG9QusV8JZ+Jdr3SLo6tjsPac4PXOUjNq94WVGQHKZMtb3OpXtuoj7iyQK0AZlcaPbPYkSsoigPK16n6h+aYV6EiNYk2toCXhV0aRbD22cFn4ciJa8E2k9rDVzbpR6ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1388A339;
+	Fri,  4 Oct 2024 07:43:56 -0700 (PDT)
+Received: from e122027.cambridge.arm.com (unknown [10.1.25.25])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2305E3F58B;
+	Fri,  4 Oct 2024 07:43:21 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [PATCH v6 00/11] arm64: Support for running as a guest in Arm CCA
+Date: Fri,  4 Oct 2024 15:42:55 +0100
+Message-Id: <20241004144307.66199-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241003230806.229001-1-pbonzini@redhat.com> <20241003230806.229001-2-pbonzini@redhat.com>
-Message-ID: <Zv_0GzOkrPVCRfP1@google.com>
-Subject: Re: [PATCH 1/2] KVM: x86: leave kvm.ko out of the build if no vendor
- module is requested
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	torvalds@linux-foundation.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 03, 2024, Paolo Bonzini wrote:
-> kvm.ko is nothing but library code shared by kvm-intel.ko and kvm-amd.ko.
-> It provides no functionality on its own and it is unnecessary unless one
-> of the vendor-specific module is compiled.  In particular, /dev/kvm is
-> not created until one of kvm-intel.ko or kvm-amd.ko is loaded.
-> 
-> Use CONFIG_KVM to decide if it is built-in or a module, but use the
-> vendor-specific modules for the actual decision on whether to build it.
-> 
-> This also fixes a build failure when CONFIG_KVM_INTEL and CONFIG_KVM_AMD
-> are both disabled.  The cpu_emergency_register_virt_callback() function
-> is called from kvm.ko, but it is only defined if at least one of
-> CONFIG_KVM_INTEL and CONFIG_KVM_AMD is provided.
-> 
-> Fixes: 590b09b1d88e ("KVM: x86: Register "emergency disable" callbacks when virt is enabled")
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/Kconfig  | 7 +++++--
->  arch/x86/kvm/Makefile | 2 +-
->  2 files changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index 730c2f34d347..81bce9dd9331 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -17,8 +17,8 @@ menuconfig VIRTUALIZATION
->  
->  if VIRTUALIZATION
->  
-> -config KVM
-> -	tristate "Kernel-based Virtual Machine (KVM) support"
-> +config KVM_X86_COMMON
+This series adds support for running Linux in a protected VM under the
+Arm Confidential Compute Architecture (CCA). This is a trimmed down
+series following the feedback from the v5 posting[1]. Thanks for the
+feedback!
 
-Maybe just KVM_X86?  I doubt anyone in KVM will care too much, and for the rest
-of the kernel, CONFIG_KVM_X86 is likely more intuitive than CONFIG_KVM_X86_COMMON.
+Individual patches have a change log. But things to highlight:
+
+ * Some patches have been merged already. The first two patches from v4
+   were borrowed from pKVM were merged as part of that series. The GIC
+   ITS patches[2][3] have been merged via the tip tree.
+
+ * Final RMM v1.0 spec[4] - only minor changes over the previous spec,
+   but we've now got a proper release.
+
+ * Probing/initialisation of the RMM is now done later. This means
+   there's no need for finding the PSCI conduit and can drop the patch
+   for that.
+
+ * The patches for set_fixmap_io() is also gone - we the RMM is detected
+   later it's now too late for earlycon. See below for instructions on
+   how to use earlycon.
+
+ * Mainline no longer uses PHYS_MASK_SHIFT for manipulating PTEs, so we
+   can drop the patch for making that dynamic.
+
+ * There's now some documentation! In particular this clarifies a change
+   in the boot requirements - memory must now be RIPAS RAM for a realm
+   guest.
+
+This series is based on v6.12-rc1.
+
+Testing
+=======
+
+Since a couple of the patches have been merged separately, and there was
+also a bug[5] in -rc1 which impacts 9p filesystems, I've provided the
+below git tree with everything you need for a CCA guest:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v6
+
+Back by popular demand is also a tree with both host and guest changes:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-full/v5+v6
+
+(I'll post the v5 series of the host changes shortly)
+
+You will also need an up-to-date RMM - the necessary changes have been
+merged into the 'main' branch of upstream:
+
+https://git.trustedfirmware.org/TF-RMM/tf-rmm.git main
+
+And you also need an updated kvmtool, there's a branch with the
+necessary changes here:
+
+https://git.gitlab.arm.com/linux-arm/kvmtool-cca.git cca/v3
+
+earlycon
+--------
+
+If using 'earlycon' on the kernel command line it is now necessary to
+pass the address of the serial port *in the unprotected IPA*. This is
+because the fixmap changes were dropped (due to the late probing of the
+RMM). E.g. for kvmtool you will need:
+
+  earlycon=uart,mmio,0x101000000
+
+This is the main drawback to late probing. One potential improvement
+would be an option like "earlycon=realm" to identify that the earlycon
+uart is in the unprotected space without having to know the actual IPA.
+I've left this out for now as I'm not sure whether there is any actual
+interest in this.
+
+[1] https://lore.kernel.org/r/20240819131924.372366-1-steven.price%40arm.com
+[2] e36d4165f079 ("irqchip/gic-v3-its: Rely on genpool alignment")
+[3] b08e2f42e86b ("irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor")
+[4] https://developer.arm.com/documentation/den0137/1-0rel0/
+[5] https://lore.kernel.org/all/cbaf141ba6c0e2e209717d02746584072844841a.1727722269.git.osandov@fb.com/
+
+Sami Mujawar (1):
+  virt: arm-cca-guest: TSM_REPORT support for realms
+
+Steven Price (4):
+  arm64: realm: Query IPA size from the RMM
+  arm64: Enforce bounce buffers for realm DMA
+  arm64: mm: Avoid TLBI when marking pages as valid
+  arm64: Document Arm Confidential Compute
+
+Suzuki K Poulose (6):
+  arm64: rsi: Add RSI definitions
+  arm64: Detect if in a realm and set RIPAS RAM
+  arm64: rsi: Add support for checking whether an MMIO is protected
+  arm64: rsi: Map unprotected MMIO as decrypted
+  efi: arm64: Map Device with Prot Shared
+  arm64: Enable memory encrypt for Realms
+
+ Documentation/arch/arm64/arm-cca.rst          |  67 ++++++
+ Documentation/arch/arm64/booting.rst          |   3 +
+ Documentation/arch/arm64/index.rst            |   1 +
+ arch/arm64/Kconfig                            |   3 +
+ arch/arm64/include/asm/io.h                   |   8 +
+ arch/arm64/include/asm/mem_encrypt.h          |   9 +
+ arch/arm64/include/asm/pgtable-prot.h         |   4 +
+ arch/arm64/include/asm/pgtable.h              |   5 +
+ arch/arm64/include/asm/rsi.h                  |  68 ++++++
+ arch/arm64/include/asm/rsi_cmds.h             | 160 +++++++++++++
+ arch/arm64/include/asm/rsi_smc.h              | 193 ++++++++++++++++
+ arch/arm64/include/asm/set_memory.h           |   3 +
+ arch/arm64/kernel/Makefile                    |   3 +-
+ arch/arm64/kernel/efi.c                       |  12 +-
+ arch/arm64/kernel/rsi.c                       | 141 ++++++++++++
+ arch/arm64/kernel/setup.c                     |   3 +
+ arch/arm64/mm/init.c                          |  10 +-
+ arch/arm64/mm/pageattr.c                      |  98 +++++++-
+ drivers/virt/coco/Kconfig                     |   2 +
+ drivers/virt/coco/Makefile                    |   1 +
+ drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
+ drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
+ .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
+ 23 files changed, 1010 insertions(+), 8 deletions(-)
+ create mode 100644 Documentation/arch/arm64/arm-cca.rst
+ create mode 100644 arch/arm64/include/asm/rsi.h
+ create mode 100644 arch/arm64/include/asm/rsi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rsi_smc.h
+ create mode 100644 arch/arm64/kernel/rsi.c
+ create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
+ create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
+ create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+
+-- 
+2.34.1
+
 
