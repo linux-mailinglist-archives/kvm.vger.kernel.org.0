@@ -1,149 +1,138 @@
-Return-Path: <kvm+bounces-27912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8DD39903AC
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 15:15:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2C55990487
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 15:35:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9B2F1C2188D
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 13:15:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79B85B20B42
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 13:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3A82101B6;
-	Fri,  4 Oct 2024 13:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B333A2101A8;
+	Fri,  4 Oct 2024 13:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kjjnc/L9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nQZyQRxZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0FD33D5;
-	Fri,  4 Oct 2024 13:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F7420FA9D
+	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 13:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728047737; cv=none; b=d9DT47shIa10mgdOzP7sht/xD87J/ufz2CffKYROPQt2ndY1t8yyk65uoxHtIchvcC14WQfGctnnhLrtWZ1jhcJ+/CI0nmW1n5RxnLHmlm5ZyHdfJ7vHcqyvLagyxdkNG4DLXA1/WsMZ7XiiWzpdVxE9uJ3tDnbThUp8OvbFKtU=
+	t=1728048932; cv=none; b=cPTiMutbkDxyRf4Hn2ECUhJXvpxqR8I9q+ObBRjNCq9Wn8f+ZXSSK6YZ95Au6qVPq2V2Ey3DbW8Dpuk5nWAB2YmjBsfbA2EzYWQzt3wamtXeZ49+b+wIpVhew3mN/e3btPHkyKQQuxi2Bdl6HfmDfOH9lZuUQ7zpwhdTtAmad9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728047737; c=relaxed/simple;
-	bh=1JZwYefyhSOCZB3CuZertgMGY1R4ZnxNXU0IyQGN6qM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FlgaPWhJ+EOxi1ZQc3ajSdI5kBpOAuwHU4/d0jOy2WK63DXND8085wBbMLqOEhRwllPAyrD60ssL8NqnMcMxSIRPtI390w+HDBYQdQvdhu99zZozOOPrNHB9bvHZvzBXnWMtkyVTASefFQ6kSJrzjqWiZWEr8c0DruvIhJ1f7mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kjjnc/L9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8116C4CEC7;
-	Fri,  4 Oct 2024 13:15:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728047736;
-	bh=1JZwYefyhSOCZB3CuZertgMGY1R4ZnxNXU0IyQGN6qM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Kjjnc/L90TMtexTjGYxAYy1SQ1QLyKkvF/CbvX4DRZe3QZLNjgmA043In5Mn3i/rw
-	 6B5X+WF05mnRkF5MPsreCu1/RWhlYy0+kTzNNOgDa8rsLpPqegA7XxXK7Rhx0nUxa6
-	 IBkZJ2pdiTlc6pHGbh4RfTk0ZTnhtJZsbARiZlcRcR6BaSSw9ooGopO2oN7M88zaKP
-	 i9ZukewwH6dgft/J+7smkC7XLiCKWNYuCiKQdA/fHzzcPvpm6QIq/WKqZBvWKoD11P
-	 SHCZ55g+iyuo9/ex9afVt1+UpR3QIha2xI0NPLiyaKR+gtHkWFsHfMyaquC5SiCFd1
-	 mpOvPGs/3yVlw==
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-539983beb19so2824507e87.3;
-        Fri, 04 Oct 2024 06:15:36 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU+38R09j1hQxllWs0EaTrFh1t2MRF8v0dzcOegKbfaiS5alnA6Rjl00TvgfJBZhTuhQYhmcALOH+cVNDXP@vger.kernel.org, AJvYcCULDnRsmKZmGZZ98TwuF1ZH4+GH7Fr530imtFW9lxbETVqJVXZfU65rPPvDlmojIxNvhVcVdFKYkLvoQKojN1s=@vger.kernel.org, AJvYcCUVTF6W9Sbppy6KFSyHwLvooq67LPP5VL802W4CWiAe7IpDMTY6khkzpo7hGsWxMvwFstIz5DO0q5KIahrn@vger.kernel.org, AJvYcCV91q/sGry1hbxKADzHDs0ju/SACiuwk/yFnHXON8Sb0iW9D5RNGxPFtCuSBgKe3pXkmkRh4WRAhxiRcOjz@vger.kernel.org, AJvYcCVVVpSpkuylnUz66AK6tJcyw4LZB2j74FsXSFsP0DqiHVPWk5fLLwyai5rqa4y17bBqWT4cJHG5vKMj+jMXhkLiSg==@vger.kernel.org, AJvYcCWA2gfASVi9frLe93G6t17nR1yShVtHaTnLCkoVFhtMIjQ5GeUHLYmbOeTOkZumD6zxFAnLKKMrieJQ@vger.kernel.org, AJvYcCWFdmrYIxjlAVrycNuUVzUwiS2ehdmzsxQi5FyJdWnVQlacT2uPeomp2Rj39SXjQvFEJI54ElEmzJRZ@vger.kernel.org, AJvYcCWtd9b6skN2pLy2u9KwqX+NKHfaGn0v4Eo1OIzGas8ESpGURmF32XiV/9LlvVt1ROFCivAcoJZkyJU=@vger.kernel.org, AJvYcCXKOkcGvbcFlTu4Hf/DZIPOnRvbIM9GbnXAqdnXQ5I5efT3uUdsXrog/lxFo5cNHWM2sZtyCkhdBINWFA==@vger.kernel.org, AJvYcCXrnVncpaUX
- YrLcbTnyhKaiVGFWHwnAFNkCOaIqEWUE9xcl3y/O9QfJdzbzJLPzS8sXceg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyI7+FGOM+QMg4bA9wtb9EgMm5mg3L7T78RlRBywebeG3xWaWEe
-	xwsBzJ8fB6aGyarypEtg6a+7SG31yiREjBfrIsOIqHnNPvJniclUQgEP7RblozXftN1YC0//0MZ
-	a5IzbyggY1NuLWKORTrUOKMOkzQ8=
-X-Google-Smtp-Source: AGHT+IEuHrt3V5yx40A/FQDIn91vq5WH5zeRnx8eS4s+O/De09fFFzzyl2W2oN2bUPJ3C1JSY+Ea24ADde6nXP4PqRA=
-X-Received: by 2002:a05:6512:3096:b0:539:a2e0:4e75 with SMTP id
- 2adb3069b0e04-539ab8662d1mr1636973e87.14.1728047734917; Fri, 04 Oct 2024
- 06:15:34 -0700 (PDT)
+	s=arc-20240116; t=1728048932; c=relaxed/simple;
+	bh=ZkmyxQ3QOTQso2mGTJ7hRHIUqp7vFnEruN8aoDO2Jok=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NHnLTLXlW5x4mL8LomwcC8zdNhXcGRvifYlsYObpx0fmiD65IRttI+qwXJb5WbUBx84l2tezHPZyLEPiexAdbfBXkhU64jcCHkMi29uhI5nQnfWjeYe1eclY+sBFzzKnVazjEFvBSgjumWbR2EGzgCn5NaA8XSpvFWWZ4V7PXuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nQZyQRxZ; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e262e764f46so3472103276.1
+        for <kvm@vger.kernel.org>; Fri, 04 Oct 2024 06:35:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728048930; x=1728653730; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iRKRcRUT8iLe/fkq4dl/vkLTjdTfTheBiakbS3Xtaxg=;
+        b=nQZyQRxZ3Gwr5xPE4/CkHe/lVN1U9IMNaO1D7fMmUM6rqVi4ryEwcqaScLovw+SK78
+         SV6njv7uAT/XO1sRhVO5FBsDKi6ewQyBgyXAvvux94UQnGpcBX3aEI64jFlqGtHzZM7F
+         aVsL2IMViUnztx4Y3uobrARcx+dZc4c7zeSevTJSXvbZkxWXcJjjNgmKt0lqJku+0Haf
+         H8iBbV1U5t1auqvuB0rAj1RXDt9ZXxO0XEWsLB+czn2LY3ZdhMidkej30HAuu11k2BnA
+         +JWgKM/PtDm37AQqPwA9mTHuXZ5sAcLbb+nyfpoAIKOmXl9z9xJw/uFTSFeZZcFNzkTD
+         VZ1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728048930; x=1728653730;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iRKRcRUT8iLe/fkq4dl/vkLTjdTfTheBiakbS3Xtaxg=;
+        b=ltBYctQz57yUHb6/Totn7WQ5fjCd3KQ0r/wR83DIJ114cuKzBzKN0h93JclEvBAbkL
+         ygvKjaFNyzpfkVsgjTT/wlQdvFg9IkWH0M4Aqu17TWZuPzYXoe+vb8AAJmXfxGjT5BGa
+         dkHs3Trik+hTCXy56JCirf+v8evvCx6a/qo2aR7yaM0Dd6K/55i9xNZ6x/DOHOtT5tei
+         E/Qwl5aC3xWOCFiyLygmybpwNB6suGkqgHDHz3QcaVMUjMnuOrfC1E4vnxI6E37HJ70Q
+         hPZtwnfgUpX9AoL7HJBhRrRd7IfCVapLUgaqTtLFv7y1ujO7YJP7X4FZbNMqAGOMSkXs
+         bRIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU6CsV74BEcQi9FHHf8cANT87PHs8lKen39TeTrKv2L3s8va6eTBqR3j/izmeAzh/h5V2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqbzAI8dzkIHADtwjEifCbjhwjNLt5IWzolDIlqrAvdrHhrAa2
+	zS4ubNNfpA3LEUT0WH9b69pGWNHD1JN03ixBARlPpBWvVFnUAjk8TJ2gluFlXkFNeNO8KqNdIT2
+	Xgw==
+X-Google-Smtp-Source: AGHT+IGrQhmBThdQjeJmJqP3+NLqTBL86x6LnHPI+mDohnEHno+IVTKZ8ehf4O7OsYSKHm7wAkLZux85E7s=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:d804:0:b0:e28:8f00:896a with SMTP id
+ 3f1490d57ef6-e289393a895mr1609276.8.1728048930376; Fri, 04 Oct 2024 06:35:30
+ -0700 (PDT)
+Date: Fri, 4 Oct 2024 06:35:29 -0700
+In-Reply-To: <87v7y8i6m3.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240925150059.3955569-30-ardb+git@google.com>
- <20240925150059.3955569-35-ardb+git@google.com> <CAFULd4ZNwfPZO-yDjrtT2ANV509HeeYgR80b9AFachaVW5zqrg@mail.gmail.com>
- <CAMzpN2j4uj=mhdi7QHaA7y_NLtaHuRpnit38quK6RjvxdUYQew@mail.gmail.com>
-In-Reply-To: <CAMzpN2j4uj=mhdi7QHaA7y_NLtaHuRpnit38quK6RjvxdUYQew@mail.gmail.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 4 Oct 2024 15:15:22 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXF3_Hj9j2f_cBtwTFWvEmB0UoEs_cGkRiWc4AErDx0ftQ@mail.gmail.com>
-Message-ID: <CAMj1kXF3_Hj9j2f_cBtwTFWvEmB0UoEs_cGkRiWc4AErDx0ftQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 05/28] x86: Define the stack protector guard symbol explicitly
-To: Brian Gerst <brgerst@gmail.com>
-Cc: Uros Bizjak <ubizjak@gmail.com>, Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
-	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
-	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20241003234337.273364-1-seanjc@google.com> <20241003234337.273364-6-seanjc@google.com>
+ <87v7y8i6m3.fsf@redhat.com>
+Message-ID: <Zv_uvVT9RmiN84y_@google.com>
+Subject: Re: [PATCH 05/11] KVM: selftests: Configure XCR0 to max supported
+ value by default
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Sat, 28 Sept 2024 at 15:41, Brian Gerst <brgerst@gmail.com> wrote:
->
-> On Wed, Sep 25, 2024 at 2:33=E2=80=AFPM Uros Bizjak <ubizjak@gmail.com> w=
-rote:
+On Fri, Oct 04, 2024, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > To play nice with compilers generating AVX instructions, set CR4.OSXSAVE
+> > and configure XCR0 by default when creating selftests vCPUs.  Some distros
+> > have switched gcc to '-march=x86-64-v3' by default, and while it's hard to
+> > find a CPU which doesn't support AVX today, many KVM selftests fail with
 > >
-> > On Wed, Sep 25, 2024 at 5:02=E2=80=AFPM Ard Biesheuvel <ardb+git@google=
-.com> wrote:
-> > >
-> > > From: Ard Biesheuvel <ardb@kernel.org>
-> > >
-> > > Specify the guard symbol for the stack cookie explicitly, rather than
-> > > positioning it exactly 40 bytes into the per-CPU area. Doing so remov=
-es
-> > > the need for the per-CPU region to be absolute rather than relative t=
-o
-> > > the placement of the per-CPU template region in the kernel image, and
-> > > this allows the special handling for absolute per-CPU symbols to be
-> > > removed entirely.
-> > >
-> > > This is a worthwhile cleanup in itself, but it is also a prerequisite
-> > > for PIE codegen and PIE linking, which can replace our bespoke and
-> > > rather clunky runtime relocation handling.
+> >   ==== Test Assertion Failure ====
+> >     lib/x86_64/processor.c:570: Unhandled exception in guest
+> >     pid=72747 tid=72747 errno=4 - Interrupted system call
+> >     Unhandled exception '0x6' at guest RIP '0x4104f7'
 > >
-> > I would like to point out a series that converted the stack protector
-> > guard symbol to a normal percpu variable [1], so there was no need to
-> > assume anything about the location of the guard symbol.
+> > due to selftests not enabling AVX by default for the guest.  The failure
+> > is easy to reproduce elsewhere with:
 > >
-> > [1] "[PATCH v4 00/16] x86-64: Stack protector and percpu improvements"
-> > https://lore.kernel.org/lkml/20240322165233.71698-1-brgerst@gmail.com/
+> >    $ make clean && CFLAGS='-march=x86-64-v3' make -j && ./x86_64/kvm_pv_test
 > >
-> > Uros.
->
-> I plan on resubmitting that series sometime after the 6.12 merge
-> window closes.  As I recall from the last version, it was decided to
-> wait until after the next LTS release to raise the minimum GCC version
-> to 8.1 and avoid the need to be compatible with the old stack
-> protector layout.
->
+> > E.g. gcc-13 with -march=x86-64-v3 compiles this chunk from selftests'
+> > kvm_fixup_exception():
+> >
+> >         regs->rip = regs->r11;
+> >         regs->r9 = regs->vector;
+> >         regs->r10 = regs->error_code;
+> >
+> > into this monstronsity (which is clever, but oof):
+> >
+> >   405313:       c4 e1 f9 6e c8          vmovq  %rax,%xmm1
+> >   405318:       48 89 68 08             mov    %rbp,0x8(%rax)
+> >   40531c:       48 89 e8                mov    %rbp,%rax
+> >   40531f:       c4 c3 f1 22 c4 01       vpinsrq $0x1,%r12,%xmm1,%xmm0
+> >   405325:       49 89 6d 38             mov    %rbp,0x38(%r13)
+> >   405329:       c5 fa 7f 45 00          vmovdqu %xmm0,0x0(%rbp)
+> >
+> > Alternatively, KVM selftests could explicitly restrict the compiler to
+> > -march=x86-64-v2, but odds are very good that punting on AVX enabling will
+> > simply result in tests that "need" AVX doing their own thing, e.g. there
+> > are already three or so additional cleanups that can be done on top.
+> 
+> Ideally, we may still want to precisely pin the set of instructions
+> which are used to generete guest code in selftests as the environment
+> where this code runs is defined by us and it may not match the host. I
+> can easily imaging future CPU features leading to similar issues in case
+> they require explicit enablement.
 
-Hi Brian,
+Maybe.  I suspect the cross-section of features that require explicit enablement
+*and* will be generated by the compiler for "regular" code will be limited to AVX
+and the like.  E.g. the only new in -v4 is AVX512.
 
-I'd be more than happy to compare notes on that - I wasn't aware of
-your intentions here, or I would have reached out before sending this
-RFC.
+> To achive this, we can probably separate guest code from each test into its
+> own compilation unit.
 
-There are two things that you would need to address for Clang support
-to work correctly:
-- the workaround I cc'ed you on the other day [0],
-- a workaround for the module loader so it tolerates the GOTPCRELX
-relocations that Clang emits [1]
-
-
-
-[0] https://lore.kernel.org/all/20241002092534.3163838-2-ardb+git@google.co=
-m/
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/commit/?=
-id=3Da18121aabbdd
+Hopefully we don't need to worry about that for years and years :-)
 
