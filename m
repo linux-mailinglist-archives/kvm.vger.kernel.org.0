@@ -1,329 +1,143 @@
-Return-Path: <kvm+bounces-27935-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27936-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB61B990725
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 17:05:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8657A990739
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 17:15:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90CDF283A55
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 15:05:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B31131C211AD
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 15:15:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B7B1C3041;
-	Fri,  4 Oct 2024 15:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8582C1AA7AC;
+	Fri,  4 Oct 2024 15:15:00 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B140A1AA7A7;
-	Fri,  4 Oct 2024 15:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B33E1741DC;
+	Fri,  4 Oct 2024 15:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728054326; cv=none; b=SeMihjQI3ffDRx8HVB5z6ycbD7VeSAmcFTxFuwxupG/3HwBAYDFSFc7KWmaZtUNoNX+mXCBaHU2Z1JvLy2EChbtnZSJy8Etwcj6/GuMt7aqnWwCtZwfFBNHKVd/G48xNyt8b3bMCgWQeFTb/1kP4sxhqR3brEkjE2MaspTTckc8=
+	t=1728054900; cv=none; b=FQe0B+xQZsECc+p2urxAxOLndHg3x2sq5axglqUigDwa7FBd34CG63JyBpOG1AgNEUahyzfgBfzYfvaDGTAt2/+IxIsV1ev4E8cfHdwFSu3Gh5kl1mbU7aEnHlhPyQw3yA9rB4KVIuF/e2xQ9nNzrWpuzQ9AdYVnKoxqS2euKHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728054326; c=relaxed/simple;
-	bh=2CmLgUGcu2mav0PWca+261/vB/u7pLjpuKZvF8743S4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yq8fQkxtMNldQJD2DeD3uWlT2erjpzS+Hwb2jB7NEgZG5fzShhcrzyXlu1yx0BKZngXMDIB/nHE8mjKKsiPJ3YORgf5HGtQ8oyirAPyS90DtFxYLdhrcdpF6sckTD7sUk/1ES7kLclx7/Gz1hFgVAr22zIcZMDmaR4smELplRqQ=
+	s=arc-20240116; t=1728054900; c=relaxed/simple;
+	bh=XuU41cUY651vrvEuIIokCiSfp8fKXEBCuJCdw/qwKDE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UH9XORg7JuVMWxuORrn2q8/8py6DWxLBvPbmDz9bxloSrkI7Mst9Yd8JzsiBFhVLVMgH+WiEOAWWE8CmTWmXOlnYzlnN0Y3h7MvPIXhZJApsklA4j6zd0IDYW9xr5Kd5Q+JECh/OLRoSPkr6vro+75GF+FscBCQRrNvoR0DZ420=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 862B6339;
-	Fri,  4 Oct 2024 08:05:53 -0700 (PDT)
-Received: from [10.1.25.25] (unknown [10.1.25.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E1C73F640;
-	Fri,  4 Oct 2024 08:05:19 -0700 (PDT)
-Message-ID: <085896de-9a39-4f90-9a2d-3f8662c2e2a2@arm.com>
-Date: Fri, 4 Oct 2024 16:05:17 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3131339;
+	Fri,  4 Oct 2024 08:15:26 -0700 (PDT)
+Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 493D13F640;
+	Fri,  4 Oct 2024 08:14:52 -0700 (PDT)
+Date: Fri, 4 Oct 2024 16:14:47 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+	Sean Christopherson <seanjc@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Kan Liang <kan.liang@linux.intel.com>,
+	Will Deacon <will@kernel.org>, Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v5 1/5] arm: perf: Drop unused functions
+Message-ID: <ZwAGZ5YB-eYemlYR@J2N7QTR9R3.cambridge.arm.com>
+References: <20240920174740.781614-1-coltonlewis@google.com>
+ <20240920174740.781614-2-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 02/11] arm64: Detect if in a realm and set RIPAS RAM
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-3-steven.price@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20241004144307.66199-3-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240920174740.781614-2-coltonlewis@google.com>
 
-On 04/10/2024 15:42, Steven Price wrote:
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+On Fri, Sep 20, 2024 at 05:47:36PM +0000, Colton Lewis wrote:
+> For arm's implementation, perf_instruction_pointer() and
+> perf_misc_flags() are equivalent to the generic versions in
+> include/linux/perf_event.h so arch/arm doesn't need to provide its
+> own versions. Drop them here.
 > 
-> Detect that the VM is a realm guest by the presence of the RSI
-> interface. This is done after PSCI has been initialised so that we can
-> check the SMCCC conduit before making any RSI calls.
-> 
-> If in a realm then all memory needs to be marked as RIPAS RAM initially,
-> the loader may or may not have done this for us. To be sure iterate over
-> all RAM and mark it as such. Any failure is fatal as that implies the
-> RAM regions passed to Linux are incorrect - which would mean failing
-> later when attempting to access non-existent RAM.
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 
-And it appears I didn't review this closely enough before posting ;)
-Suzuki pointed out to me that this patch description doesn't make sense
-given my comments in the cover letter about the VMM or bootloader having
-to set everything RIPAS RAM.
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 
-I should have reworded this commit message to something like:
+Mark.
 
-"""
-Detect that the VM is a realm guest by the presence of the RSI
-interface. This is done after PSCI has been initialised so that we can
-check the SMCCC conduit before making any RSI calls.
-
-If in a realm then iterate over all memory ensuring that it is marked as
-RIPAS RAM. The loader is required to do this for us, however if some
-memory is missed this will cause the guest to receive a hard to debug
-external abort at some random point in the future. So for a
-belt-and-braces approach set all memory to RIPAS RAM. Any failure here
-implies that the RAM regions passed to Linux are incorrect so panic()
-promptly to make the situation clear.
-"""
-
-Steve
-
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Co-developed-by: Steven Price <steven.price@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
-> Changes since v5:
->  * Replace BUG_ON() with a panic() call that provides a message with the
->    memory range that couldn't be set to RIPAS_RAM.
->  * Move the call to arm64_rsi_init() later so that it is after PSCI,
->    this means we can use arm_smccc_1_1_get_conduit() to check if it is
->    safe to make RSI calls.
-> Changes since v4:
->  * Minor tidy ups.
-> Changes since v3:
->  * Provide safe/unsafe versions for converting memory to protected,
->    using the safer version only for the early boot.
->  * Use the new psci_early_test_conduit() function to avoid calling an
->    SMC if EL3 is not present (or not configured to handle an SMC).
-> Changes since v2:
->  * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
->    static_key_false".
->  * Rename set_memory_range() to rsi_set_memory_range().
->  * Downgrade some BUG()s to WARN()s and handle the condition by
->    propagating up the stack. Comment the remaining case that ends in a
->    BUG() to explain why.
->  * Rely on the return from rsi_request_version() rather than checking
->    the version the RMM claims to support.
->  * Rename the generic sounding arm64_setup_memory() to
->    arm64_rsi_setup_memory() and move the call site to setup_arch().
-> ---
->  arch/arm64/include/asm/rsi.h | 66 +++++++++++++++++++++++++++++++
->  arch/arm64/kernel/Makefile   |  3 +-
->  arch/arm64/kernel/rsi.c      | 75 ++++++++++++++++++++++++++++++++++++
->  arch/arm64/kernel/setup.c    |  3 ++
->  4 files changed, 146 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/include/asm/rsi.h
->  create mode 100644 arch/arm64/kernel/rsi.c
+>  arch/arm/include/asm/perf_event.h |  7 -------
+>  arch/arm/kernel/perf_callchain.c  | 17 -----------------
+>  2 files changed, 24 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
-> new file mode 100644
-> index 000000000000..e4c01796c618
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rsi.h
-> @@ -0,0 +1,66 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2024 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_RSI_H_
-> +#define __ASM_RSI_H_
-> +
-> +#include <linux/errno.h>
-> +#include <linux/jump_label.h>
-> +#include <asm/rsi_cmds.h>
-> +
-> +DECLARE_STATIC_KEY_FALSE(rsi_present);
-> +
-> +void __init arm64_rsi_init(void);
-> +
-> +static inline bool is_realm_world(void)
-> +{
-> +	return static_branch_unlikely(&rsi_present);
-> +}
-> +
-> +static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t end,
-> +				       enum ripas state, unsigned long flags)
-> +{
-> +	unsigned long ret;
-> +	phys_addr_t top;
-> +
-> +	while (start != end) {
-> +		ret = rsi_set_addr_range_state(start, end, state, flags, &top);
-> +		if (WARN_ON(ret || top < start || top > end))
-> +			return -EINVAL;
-> +		start = top;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Convert the specified range to RAM. Do not use this if you rely on the
-> + * contents of a page that may already be in RAM state.
-> + */
-> +static inline int rsi_set_memory_range_protected(phys_addr_t start,
-> +						 phys_addr_t end)
-> +{
-> +	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
-> +				    RSI_CHANGE_DESTROYED);
-> +}
-> +
-> +/*
-> + * Convert the specified range to RAM. Do not convert any pages that may have
-> + * been DESTROYED, without our permission.
-> + */
-> +static inline int rsi_set_memory_range_protected_safe(phys_addr_t start,
-> +						      phys_addr_t end)
-> +{
-> +	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
-> +				    RSI_NO_CHANGE_DESTROYED);
-> +}
-> +
-> +static inline int rsi_set_memory_range_shared(phys_addr_t start,
-> +					      phys_addr_t end)
-> +{
-> +	return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY,
-> +				    RSI_CHANGE_DESTROYED);
-> +}
-> +#endif /* __ASM_RSI_H_ */
-> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> index 2b112f3b7510..71c29a2a2f19 100644
-> --- a/arch/arm64/kernel/Makefile
-> +++ b/arch/arm64/kernel/Makefile
-> @@ -33,7 +33,8 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
->  			   return_address.o cpuinfo.o cpu_errata.o		\
->  			   cpufeature.o alternative.o cacheinfo.o		\
->  			   smp.o smp_spin_table.o topology.o smccc-call.o	\
-> -			   syscall.o proton-pack.o idle.o patching.o pi/
-> +			   syscall.o proton-pack.o idle.o patching.o pi/	\
-> +			   rsi.o
+> diff --git a/arch/arm/include/asm/perf_event.h b/arch/arm/include/asm/perf_event.h
+> index bdbc1e590891..c08f16f2e243 100644
+> --- a/arch/arm/include/asm/perf_event.h
+> +++ b/arch/arm/include/asm/perf_event.h
+> @@ -8,13 +8,6 @@
+>  #ifndef __ARM_PERF_EVENT_H__
+>  #define __ARM_PERF_EVENT_H__
 >  
->  obj-$(CONFIG_COMPAT)			+= sys32.o signal32.o			\
->  					   sys_compat.o
-> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-> new file mode 100644
-> index 000000000000..9bf757b4b00c
-> --- /dev/null
-> +++ b/arch/arm64/kernel/rsi.c
-> @@ -0,0 +1,75 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/jump_label.h>
-> +#include <linux/memblock.h>
-> +#include <linux/psci.h>
-> +#include <asm/rsi.h>
-> +
-> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
-> +EXPORT_SYMBOL(rsi_present);
-> +
-> +static bool rsi_version_matches(void)
-> +{
-> +	unsigned long ver_lower, ver_higher;
-> +	unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
-> +						&ver_lower,
-> +						&ver_higher);
-> +
-> +	if (ret == SMCCC_RET_NOT_SUPPORTED)
-> +		return false;
-> +
-> +	if (ret != RSI_SUCCESS) {
-> +		pr_err("RME: RMM doesn't support RSI version %lu.%lu. Supported range: %lu.%lu-%lu.%lu\n",
-> +		       RSI_ABI_VERSION_MAJOR, RSI_ABI_VERSION_MINOR,
-> +		       RSI_ABI_VERSION_GET_MAJOR(ver_lower),
-> +		       RSI_ABI_VERSION_GET_MINOR(ver_lower),
-> +		       RSI_ABI_VERSION_GET_MAJOR(ver_higher),
-> +		       RSI_ABI_VERSION_GET_MINOR(ver_higher));
-> +		return false;
-> +	}
-> +
-> +	pr_info("RME: Using RSI version %lu.%lu\n",
-> +		RSI_ABI_VERSION_GET_MAJOR(ver_lower),
-> +		RSI_ABI_VERSION_GET_MINOR(ver_lower));
-> +
-> +	return true;
-> +}
-> +
-> +static void __init arm64_rsi_setup_memory(void)
-> +{
-> +	u64 i;
-> +	phys_addr_t start, end;
-> +
-> +	/*
-> +	 * Iterate over the available memory ranges and convert the state to
-> +	 * protected memory. We should take extra care to ensure that we DO NOT
-> +	 * permit any "DESTROYED" pages to be converted to "RAM".
-> +	 *
-> +	 * panic() is used because if the attempt to switch the memory to
-> +	 * protected has failed here, then future accesses to the memory are
-> +	 * simply going to be reflected as a SEA (Synchronous External Abort)
-> +	 * which we can't handle.  Bailing out early prevents the guest limping
-> +	 * on and dying later.
-> +	 */
-> +	for_each_mem_range(i, &start, &end) {
-> +		if (rsi_set_memory_range_protected_safe(start, end))
-> +			panic("Failed to set memory range to protected: %pa-%pa",
-> +			      &start, &end);
-> +	}
-> +}
-> +
-> +void __init arm64_rsi_init(void)
-> +{
-> +	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC)
-> +		return;
-> +	if (!rsi_version_matches())
-> +		return;
-> +
-> +	arm64_rsi_setup_memory();
-> +
-> +	static_branch_enable(&rsi_present);
-> +}
-> +
-> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> index b22d28ec8028..b5e1e306fa51 100644
-> --- a/arch/arm64/kernel/setup.c
-> +++ b/arch/arm64/kernel/setup.c
-> @@ -43,6 +43,7 @@
->  #include <asm/cpu_ops.h>
->  #include <asm/kasan.h>
->  #include <asm/numa.h>
-> +#include <asm/rsi.h>
->  #include <asm/scs.h>
->  #include <asm/sections.h>
->  #include <asm/setup.h>
-> @@ -351,6 +352,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
->  	else
->  		psci_acpi_init();
->  
-> +	arm64_rsi_init();
-> +
->  	init_bootcpu_ops();
->  	smp_init_cpus();
->  	smp_build_mpidr_hash();
-
+> -#ifdef CONFIG_PERF_EVENTS
+> -struct pt_regs;
+> -extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+> -extern unsigned long perf_misc_flags(struct pt_regs *regs);
+> -#define perf_misc_flags(regs)	perf_misc_flags(regs)
+> -#endif
+> -
+>  #define perf_arch_fetch_caller_regs(regs, __ip) { \
+>  	(regs)->ARM_pc = (__ip); \
+>  	frame_pointer((regs)) = (unsigned long) __builtin_frame_address(0); \
+> diff --git a/arch/arm/kernel/perf_callchain.c b/arch/arm/kernel/perf_callchain.c
+> index 1d230ac9d0eb..a2601b1ef318 100644
+> --- a/arch/arm/kernel/perf_callchain.c
+> +++ b/arch/arm/kernel/perf_callchain.c
+> @@ -96,20 +96,3 @@ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *re
+>  	arm_get_current_stackframe(regs, &fr);
+>  	walk_stackframe(&fr, callchain_trace, entry);
+>  }
+> -
+> -unsigned long perf_instruction_pointer(struct pt_regs *regs)
+> -{
+> -	return instruction_pointer(regs);
+> -}
+> -
+> -unsigned long perf_misc_flags(struct pt_regs *regs)
+> -{
+> -	int misc = 0;
+> -
+> -	if (user_mode(regs))
+> -		misc |= PERF_RECORD_MISC_USER;
+> -	else
+> -		misc |= PERF_RECORD_MISC_KERNEL;
+> -
+> -	return misc;
+> -}
+> -- 
+> 2.46.0.792.g87dc391469-goog
+> 
 
