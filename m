@@ -1,128 +1,112 @@
-Return-Path: <kvm+bounces-27907-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27908-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB0E2990198
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 12:50:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EDD799022E
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 13:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86E8F1F217DD
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 10:50:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11E1B1F2228C
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 11:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92B113B5B7;
-	Fri,  4 Oct 2024 10:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="DrSOV8v9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C16158DC5;
+	Fri,  4 Oct 2024 11:40:22 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990B413AD03
-	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 10:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE0428E8;
+	Fri,  4 Oct 2024 11:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728039009; cv=none; b=hKBZzMwCFnU+cOnp/yRHX7sDpxdpEaX2dqs9zW3O+z0ZSLN84uFcYjxcjjpgOqt4AU7YXjmw4c/PaMTu8e0lAMhrzWcdXKyjq7pL5z09CbTOyXoiMU9qKa8XuWFakNkPu5B05LrcsJm3VzJJe4q89IHRIr60JFtC5jRVOM4mK1Y=
+	t=1728042022; cv=none; b=D6xIOA4fy/2EBN8b40/96uTXg4iYomOzRZcSbGWAgvNoS3NrQfQyyNNkuc/TkONk/dPp6Y6THrPtkympCyqXTy1A3LV54POSpabznaOen19iuQYitOc0C6Yt0GE+D7j66xG6WggwlojOZmip/C61TiK57FWairh+oXOtBPqkPvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728039009; c=relaxed/simple;
-	bh=xEusqPbHWqC2kSvOa0CNTBI7KMX/dFPG15n+u2klxls=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pXFLKpErKFsxe0D6JPahi3dfZd9SJuOVMD5hChkvDcGqAcQygBdlZ6hhWILMSCtlKO+iYfsBWd7arygOXhkCfjA7Q4TwANoXCTDdg1ThEllhzEyH5iWfNw9lB0SIYjdRGtUaR+h+J6iyyETxX8F6ZdmEY7J+k5JrMiadxydknzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=DrSOV8v9; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3e03981dad2so1775157b6e.1
-        for <kvm@vger.kernel.org>; Fri, 04 Oct 2024 03:50:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1728039006; x=1728643806; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ywSS2L490J8CU6HcXGs1TjYnaQVhnORicV0t1QQIhzc=;
-        b=DrSOV8v97XvumGn5kHUJgA8MaOlUWIbaw+Ktv/H+U/ss/oiZi7xQSZJzZL/pKUY3Gb
-         T4pXWd01O0MIBFcYWPrNsy24NgnVfTDIE9QJBNEM5vuNoOTrqQcn8zJ81BHvPm4rTlyk
-         zY4oH/3z/7vBBhxH62keek9azUrTNHs3p04S70N77PxZE2tu4X2nsmz8nDTcoO1ZLr1h
-         J3loSpqm9f0YGg2t0scvVonMBIjYeWYQmolFlq2LoIg1pelpHzGNEf2Qx97QYdZlZGMF
-         N2OId7Kw51nEPhDimsshT7+8ZMV3krHQSRy1Rxl013ILvaizcWXFoK6cu5Nz58se6Atq
-         Yp7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728039006; x=1728643806;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ywSS2L490J8CU6HcXGs1TjYnaQVhnORicV0t1QQIhzc=;
-        b=v27BtjdLGtf2PuLRmcdxxBT7aAtnit1li7Ts8kkabm8S4qFv4jCWnBWCcJAg9FIx21
-         1ce55S3XOD6HKPO0MxwYVqPZArpKIjj7ywlU8U005qiaMbFPOLSSdgsfzYcII+LbhtSd
-         vObkuE4DeK++iEBSMQ2H+rsZ2DgBCmucqDrlq+f5VEaK9HpLPFkaa/ouP5UzTrDRnTBp
-         I0zvSrFq6wz47fK8hNI0r+YQl2Hm90J6u9bv4ZLT2d4jtL/1SXftK9LjTaMEH92hfWz4
-         pEnRnsmN4IFIwW9snulR7Ka2utGghHei0BR2QEMIJulVLDLZlSIcT8X9t7jhnKoMVwSW
-         iaWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXXi2C6ez1ZdRu4a4qRo6oX7Es7/DbYDzNAwsUBPuqAoOE9EjDuCJ5kdZSay9oVVe9k28Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOql41IA17H4e7P8OqbsPa81avrmIc+ADmMxk+od7gqS8yOWL3
-	1F0I9+swSlKkfAhpmwg0MH3iQBub3k2IBJF3RfZMYRJ7CEWXoZ1KMQPDH6dOMXneJohZPaayw+9
-	SjLRAYBWBn/MpiAdeLhVRBypRhG+zWO75CvURiA==
-X-Google-Smtp-Source: AGHT+IFdS1NgCgffh0R0p2aEd2ZRC4hGoiJ1ekyWkNR4iWURqjLghfq2K21CKe2rjB4nMhlYIqLz4cS31CYnPsoOl4o=
-X-Received: by 2002:aca:1118:0:b0:3e3:b291:833e with SMTP id
- 5614622812f47-3e3ba1adb0dmr2801841b6e.9.1728039006554; Fri, 04 Oct 2024
- 03:50:06 -0700 (PDT)
+	s=arc-20240116; t=1728042022; c=relaxed/simple;
+	bh=zj/v/YSZm7JOt2SMXu1c+xcBVS6L9M+HRftbnsyzSPQ=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oo01DR/hvg0zw7XZED3B5PBYINkEyHglDyqB1/JqpCXUJPgQmUOrQR4zJYLmSfKjj0LgdM5onT1O3Wyx02bI5PywZUOfxWRWNF4EFF3jHe22ER3lNdqSA8hznt6O58FSYxFCHasLOAqZS5a+miEkCwfODFnq48qgupuSegSJygI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XKmhM2X03z6L774;
+	Fri,  4 Oct 2024 19:36:03 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 26059140B63;
+	Fri,  4 Oct 2024 19:40:15 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 4 Oct
+ 2024 13:40:14 +0200
+Date: Fri, 4 Oct 2024 12:40:13 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Zhi Wang <zhiw@nvidia.com>
+CC: "Tian, Kevin" <kevin.tian@intel.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-cxl@vger.kernel.org"
+	<linux-cxl@vger.kernel.org>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, "Schofield,
+ Alison" <alison.schofield@intel.com>, "Williams, Dan J"
+	<dan.j.williams@intel.com>, "Jiang, Dave" <dave.jiang@intel.com>,
+	"dave@stgolabs.net" <dave@stgolabs.net>, "Weiny, Ira" <ira.weiny@intel.com>,
+	"Verma, Vishal L" <vishal.l.verma@intel.com>, "alucerop@amd.com"
+	<alucerop@amd.com>, Andy Currid <ACurrid@nvidia.com>, Neo Jia
+	<cjia@nvidia.com>, Surath Mitra <smitra@nvidia.com>, Ankit Agrawal
+	<ankita@nvidia.com>, Aniket Agashe <aniketa@nvidia.com>, Kirti Wankhede
+	<kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+	"zhiwang@kernel.org" <zhiwang@kernel.org>
+Subject: Re: [RFC 00/13] vfio: introduce vfio-cxl to support CXL type-2
+ accelerator passthrough
+Message-ID: <20241004124013.00004bca@Huawei.com>
+In-Reply-To: <5ad34682-5fa9-44ee-b36b-b17317256187@nvidia.com>
+References: <20240920223446.1908673-1-zhiw@nvidia.com>
+	<BN9PR11MB5276B821A9732BF0A9EC67988C6F2@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<75c0c6f1-07e4-43c1-819c-2182bdd0b47c@nvidia.com>
+	<20240925140515.000077f5@Huawei.com>
+	<5ad34682-5fa9-44ee-b36b-b17317256187@nvidia.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240808081439.24661-1-yongxuan.wang@sifive.com>
-In-Reply-To: <20240808081439.24661-1-yongxuan.wang@sifive.com>
-From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Date: Fri, 4 Oct 2024 18:49:55 +0800
-Message-ID: <CAMWQL2gBOma5c_A4JPnTK6uDfbyqcbcf_4qZ4Pt_S3mvBY3s0w@mail.gmail.com>
-Subject: Re: [PATCH 1/1] RISC-V: KVM: Fix APLIC in_clrip and clripnum write emulation
-To: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc: greentime.hu@sifive.com, vincent.chen@sifive.com, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-ping
 
-On Thu, Aug 8, 2024 at 4:14=E2=80=AFPM Yong-Xuan Wang <yongxuan.wang@sifive=
-.com> wrote:
->
-> In the section "4.7 Precise effects on interrupt-pending bits"
-> of the RISC-V AIA specification defines that:
->
-> If the source mode is Level1 or Level0 and the interrupt domain
-> is configured in MSI delivery mode (domaincfg.DM =3D 1):
-> The pending bit is cleared whenever the rectified input value is
-> low, when the interrupt is forwarded by MSI, or by a relevant
-> write to an in_clrip register or to clripnum.
->
-> Update the aplic_write_pending() to match the spec.
->
-> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
-> ---
->  arch/riscv/kvm/aia_aplic.c | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
-> index da6ff1bade0d..97c6dbcabf47 100644
-> --- a/arch/riscv/kvm/aia_aplic.c
-> +++ b/arch/riscv/kvm/aia_aplic.c
-> @@ -142,8 +142,6 @@ static void aplic_write_pending(struct aplic *aplic, =
-u32 irq, bool pending)
->
->         if (sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_HIGH ||
->             sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_LOW) {
-> -               if (!pending)
-> -                       goto skip_write_pending;
->                 if ((irqd->state & APLIC_IRQ_STATE_INPUT) &&
->                     sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_LOW)
->                         goto skip_write_pending;
-> --
-> 2.17.1
->
+> >   
+> >>
+> >> Presumably, the host creates one large CXL region that covers the entire
+> >> DPA, while QEMU can virtually partition it into different regions and
+> >> map them to different virtual CXL region if QEMU presents multiple HDM
+> >> decoders to the guest.  
+> > 
+> > I'm not sure why it would do that. Can't think why you'd break up
+> > a host region - maybe I'm missing something.
+> >   
+> 
+> It is mostly concerning about a device can have multiple HDM decoders. 
+> In the current design, a large physical CXL (pCXL) region with the whole 
+> DPA will be passed to the userspace. Thinking that the guest will see 
+> the virtual multiple HDM decoders, which usually SW is asking for, the 
+> guest SW might create multiple virtual CXL regions. In that case QEMU 
+> needs to map them into different regions of the pCXL region.
+
+Don't let the guest see multiple HDM decoders?
+
+There is no obvious reason why it would want them other than type
+differences.
+
+Why is it useful for a type 2 device to be setup for multiple CXL regions?
+It shouldn't be a performance thing. Might be convenient for management
+I guess, but the driver can layer it's own allocator etc on top of a single
+region so I'm not sure I see a reason to do this...
+
+Jonathan
+
+
 
