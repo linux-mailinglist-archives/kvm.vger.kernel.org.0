@@ -1,149 +1,122 @@
-Return-Path: <kvm+bounces-27904-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27905-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4794D99006D
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 12:02:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9BBC990180
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 12:41:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FB961C23C4B
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 10:02:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6232AB2276C
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 10:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B846914B07A;
-	Fri,  4 Oct 2024 10:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CAA155C9E;
+	Fri,  4 Oct 2024 10:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UNjlsAZz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPdCJHwR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A3A146A72;
-	Fri,  4 Oct 2024 10:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F741369BB
+	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 10:40:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728036114; cv=none; b=LVvx6h1A1Y7dnQnqjZIF+G5vg/Lzcd8juilIXmmjWPy80WEUd1c4VZKbj11i/OpmdJtIdFL2cCsrlMSXw8Vvi7WWc3+3jH8MGKB8/qEnPtI6+82C0MsPGUA4OE95YG3rvr4JD9vLBvlwBuPGgME0vjqI6Pzl7W8wNrjW3lM5zrY=
+	t=1728038459; cv=none; b=I8vBN65NaFPewOni15hwBqEKJg/jisTZZC+o9NgxiiXW8rTCOGvC8yMBwv9HkxRG06nRl3lV0/MqFZT2ZRtj/Kp5J+b1rX+YYYO1jhs+nb6hU9dRiqsU4EltMdYiHc4uN1q6bLsfALubYky6dtXHPbylKMEHUGyYQXlSt7zc8no=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728036114; c=relaxed/simple;
-	bh=nuE9Wx0dXnlPfKn5kpp9tKPB9VOjIJcG2joICPhGO2k=;
+	s=arc-20240116; t=1728038459; c=relaxed/simple;
+	bh=lu6Ci95X3ixh416Hp8eWMyA2WcZFrjpot9w6voMZyBY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dxuDaNkUWZeLGBipsBdeCkhm6Mej4WktzAc6c+HhnzgApFvpstkfBdjGFYWORpjLDzEffawWbJCZRYBNRWCv74pTI1h5Rqt+euN4zAwby+phc3yR/CLWG7Qtx70Afr6RhBKhxBQJWvruta4wuVkbmdtE/aorvMxTZU3ee0e7v84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UNjlsAZz; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2faccada15bso20055361fa.3;
-        Fri, 04 Oct 2024 03:01:52 -0700 (PDT)
+	 To:Cc:Content-Type; b=HMyXoTQo7Vgbb2xxai4cNR5y5A6935bHEPe6FoUuUvvhe9hOKCe8nMRvGV2LXTbNABzOT1Bc0FEIVxzAWr5/hZFgFIts8SxdolVBwtdm4WzBtI8Qv7slxoiJugPAXGT0ye0lyCBfjE74jxCCiUgpbFV2xaclAqCu6SCL8xJZPVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iPdCJHwR; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2fac3f20f1dso22640811fa.3
+        for <kvm@vger.kernel.org>; Fri, 04 Oct 2024 03:40:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728036111; x=1728640911; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cieeCIQbn3uKGp6ANoCcdjT0voB4iLaxe9sLqJZ6O1w=;
-        b=UNjlsAZz7sXdg9PcAuShFuTpjC5GIO3G7ZtoMn/gCYPFhFP6szeN6CMksFj2Mz7CX9
-         25E2h7rpMX8Yy7FK0nJlHpqOfNHH7OsiuX5yXdjLrS3BUNUDTsmagyFzmyayhb0/KvuM
-         bXHYcRlukQ3AwkuhIt2hoOKF+IwgXkmX0A73CKaCZ2sHUApI0UffEZuwngDk9UIBElEb
-         Z28/ABXaoxNiF0Pg8YwjQdTYrw4aEr/VmzBY47CwdQvVwvp5GEYM0H/TsPONY4+RZcSA
-         gKWMDhlSUAOt8oP72N2S0dQPs15n3DPYf59+4hc/TD7AWGtzQDgTVCkWio0vUxK5tZWj
-         t0Zg==
+        d=linaro.org; s=google; t=1728038455; x=1728643255; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vPl3qITF2ywrXWkVItFCsKUU6jByCU7uvcVLmVgL0Vg=;
+        b=iPdCJHwRVMgP3WCCBNhjC+0vBfcOJaa9Zywst+qdiKM93a4Yhq6n9kgjKGVw5+Lagc
+         elXimcndlYTBxZsfY2HT4qvs1yS9c6UzVYRa/DaUrSz4EKXLTrShViOE0pjIXpMz4f/N
+         z2MHMPPfszsbLxKr+jc/0PW4hj5Q0LAPFzZCqptjPzKLsC4NCXCpYDxZE8eZ0/ASaRL7
+         Qcs7Q0FEq+zfKIDPpt9ne/o00RDQiemwxQMUvGNJchogLHxo0bqo9IcZtkQO79vIuGih
+         VH+Ge8+Mqh2V8tWP8jZ9Zq2nRqH2iuTy/WvwIQfNLjFaQeRP56UmxnQvqpWEb2uR349D
+         Mn7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728036111; x=1728640911;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cieeCIQbn3uKGp6ANoCcdjT0voB4iLaxe9sLqJZ6O1w=;
-        b=GDf7o7thQUd4t/9w7KIlh1KmxPFRcaD6uklICZwdEnHm3/yndanZx3Sw6CQDASJIqf
-         7Z/tWYi9XvQ1pPcPwdKsGePmpQMXPAJskAy0pIaO7QzY2jCvxS1lQDt9U3ZC6+Pgns35
-         zBjg+kEKzUnUvyzQprtsVQXayLLjdx8HBVQrf8aVDxAx7ZaXX4pgZdBC5eN19GeUNb9y
-         FicRdcNpsZnEJEUCXEZuJkQAWPM28TCJDktw3KxFzJYySBj7tBT8vquP+we/aoHNhnxz
-         Bwr2+gY8+thv6rmh5RTYzDp/FRWy6E1ULpVMMEvzzbd54K9cfIC4hfTCwNXa9+Ic4ox9
-         U/4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU84yheG384U6F9uEf227dUGedLNtPKxD4sgwOjafNm4coPN0Vay10n5gQR2dDuY02UR+4=@vger.kernel.org, AJvYcCU8MaO+7GOuKN1euj5QwNyqnAlWjxFkdgspotEa/YpNXFgneBOA8LxcBLa5JuLr7PUafSuw+2LftcL5evfc@vger.kernel.org, AJvYcCUqAT0d+M8dC+FDiTd8RL09YjbHdGtfjkGALZPRLcAi00ATgc4fG/Vsxz5ZVPRrkht6fzsOWLfeU+o=@vger.kernel.org, AJvYcCVYedjxx8giapV3RYq3wRyoRTRyTIK/WIi9aukN/dyXpxKlsR/fKgZUYDcAyl9lPvxLssjlQexNvHAJFCHIIkc=@vger.kernel.org, AJvYcCWOi9kaT7Qj8ZkFH74IawTmk3VlIHs2choKSxkvObE30vTwMvnp8rUKU96oCkQztuH5O+tRLB+hZ9YnGFt0@vger.kernel.org, AJvYcCWQ+cGSwMhisD7ZFcXR5KHuZeAz8DXcw5QHYvaxaozvNNQhoaTNio27cKMrPKjDqsp3TJLOnbybNbv0@vger.kernel.org, AJvYcCX5hZ5Sa0eVKmquPw9TYFXfnx1MkqK75toj5gz6jTR31v0LmacNgJePNN4j4Ga5OgukOW8XrbPOY/6euYKVuHc7EQ==@vger.kernel.org, AJvYcCXoInKUyj9p/A+snT8qzUOE+x0AOGHl07pMAmUBFhJdxABlIDAOZdLAf4Eq9eFjMN0FlOZsUJwJGJQI@vger.kernel.org, AJvYcCXpqKwrQdjWjD1Pij3zUecNM9k0oYVOsRU7bieE4++E+Yjw7GkQgkSTZzwstI21foPmU8hWSadWw1F0uw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8f8ucLTA9BwO78upx78NfYlu5K7z1qJt1N7ESvd8czW9KXuNd
-	TDOdMP7qL6FxQfSbBTtNH+P34Xsf/LD6fy65nBPt7yLsxcGhLSB4T72dIaRjHTGKEf6ftknGjaz
-	QLSBrX/ROQ2TLf5jYRsSc3atwJCo=
-X-Google-Smtp-Source: AGHT+IFNljN6dwZlkogrdacVOY8k+lgMnJISEE8yVKjz9PNhP8aN8ZuhCudCHYoRMsLr1EPgwfyfZf3qjEWBYLSi1O4=
-X-Received: by 2002:a2e:b889:0:b0:2ef:20ae:d113 with SMTP id
- 38308e7fff4ca-2faf3d8a95emr9412991fa.40.1728036110938; Fri, 04 Oct 2024
- 03:01:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728038455; x=1728643255;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vPl3qITF2ywrXWkVItFCsKUU6jByCU7uvcVLmVgL0Vg=;
+        b=cxq4Fafc4U2ZkBNy+kfdSuTtaC4ey0oB5BRD4FNJH5CYOpMxTf8R7zYRsLdekS491c
+         cvCB3XyV61NhpneMqLbz2x9xhF26KyIuEKBGsEnJO0XEs51rWm7qjvtw4MVGsdYPx4Vc
+         n4KJU1qelsvvgPIZiM6FZS+U74mrDh4Q//KhdR7w3p2lQR1Cu0QECO91kyYZVLODKhy1
+         y43J21Y7dJjPDNGjWaVjW9Wx6Z/oZ3QwsGuJIOQ/1gmqfHfhbtln1NHQWiN2nRkFPFx4
+         /TX7uXETdoCq3UDrbFnziA/nRdX/iD4Np3LebXgY7YFQX2HH8cfIOI7KGMbWnNjV/QzC
+         F9hA==
+X-Forwarded-Encrypted: i=1; AJvYcCVSLIIg3LpgrjEYTwLp31iQCQq55U01FfEditM7vGqQAXkk6N7CCahPUTO5P3Jb7ph8zqM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJXSpSoy6AQwHwbSZHrWK12cOAvlfuaFvHfUha3atG4RczIopU
+	Jgt8fJz4AcNdvDdoh6eEX0d7xDqiA/G8qmWAXmDJhse0uJLHMxjc6LjFsv8xfXchwk7Bf/0u5p8
+	3P43A+EfqdwVeJKYtFwJUkMtj9pDmth9JTabG9A==
+X-Google-Smtp-Source: AGHT+IGyX8sJve6KuRoZVubMXfXMSG/8RucVj3x3PQo8hA72yHvToyC+q/FEh2ZXeQHdHLakNHyPv/O/fqOogsK6RDg=
+X-Received: by 2002:a2e:d01:0:b0:2f7:4c9d:7a83 with SMTP id
+ 38308e7fff4ca-2faf3d70157mr9230261fa.40.1728038455301; Fri, 04 Oct 2024
+ 03:40:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240925150059.3955569-30-ardb+git@google.com> <20240925150059.3955569-35-ardb+git@google.com>
-In-Reply-To: <20240925150059.3955569-35-ardb+git@google.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Fri, 4 Oct 2024 12:01:39 +0200
-Message-ID: <CAFULd4an+aN4iJ7T0DdMQDOBWrTZPJ4Oyy9ULm6R29fLNQND9Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 05/28] x86: Define the stack protector guard symbol explicitly
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Juergen Gross <jgross@suse.com>, 
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
-	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
-	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	llvm@lists.linux.dev
+References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+In-Reply-To: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Oct 2024 11:40:44 +0100
+Message-ID: <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
+To: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc: qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 25, 2024 at 5:02=E2=80=AFPM Ard Biesheuvel <ardb+git@google.com=
-> wrote:
+On Fri, 4 Oct 2024 at 10:47, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> I am investigating a data abort affecting the barebox bootloader built for aarch64
+> that only manifests with qemu-system-aarch64 -enable-kvm.
 >
-> From: Ard Biesheuvel <ardb@kernel.org>
+> The issue happens when using the post-indexed form of LDR on a MMIO address:
 >
-> Specify the guard symbol for the stack cookie explicitly, rather than
-> positioning it exactly 40 bytes into the per-CPU area. Doing so removes
-> the need for the per-CPU region to be absolute rather than relative to
-> the placement of the per-CPU template region in the kernel image, and
-> this allows the special handling for absolute per-CPU symbols to be
-> removed entirely.
->
-> This is a worthwhile cleanup in itself, but it is also a prerequisite
-> for PIE codegen and PIE linking, which can replace our bespoke and
-> rather clunky runtime relocation handling.
->
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  arch/x86/Makefile                     |  4 ++++
->  arch/x86/include/asm/init.h           |  2 +-
->  arch/x86/include/asm/processor.h      | 11 +++--------
->  arch/x86/include/asm/stackprotector.h |  4 ----
->  tools/perf/util/annotate.c            |  4 ++--
->  5 files changed, 10 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-> index 6b3fe6e2aadd..b78b7623a4a9 100644
-> --- a/arch/x86/Makefile
-> +++ b/arch/x86/Makefile
-> @@ -193,6 +193,10 @@ else
->          KBUILD_RUSTFLAGS +=3D -Cno-redzone=3Dy
->          KBUILD_RUSTFLAGS +=3D -Ccode-model=3Dkernel
->
-> +        ifeq ($(CONFIG_STACKPROTECTOR),y)
-> +                KBUILD_CFLAGS +=3D -mstack-protector-guard-symbol=3Dfixe=
-d_percpu_data
+>         ldr     x0, =0x9000fe0           // MMIO address
+>         ldr     w1, [x0], #4             // data abort, but only with -enable-kvm
 
-Looking at:
+Don't do this -- KVM doesn't support it. For access to MMIO,
+stick to instructions which will set the ISV bit in ESR_EL1.
+That is:
 
-> +        * Since the irq_stack is the object at %gs:0, the bottom 8 bytes=
- of
-> +        * the irq stack are reserved for the canary.
+ * AArch64 loads and stores of a single general-purpose register
+   (including the register specified with 0b11111, including those
+   with Acquire/Release semantics, but excluding Load Exclusive
+   or Store Exclusive and excluding those with writeback).
+ * AArch32 instructions where the instruction:
+    - Is an LDR, LDA, LDRT, LDRSH, LDRSHT, LDRH, LDAH, LDRHT,
+      LDRSB, LDRSBT, LDRB, LDAB, LDRBT, STR, STL, STRT, STRH,
+      STLH, STRHT, STRB, STLB, or STRBT instruction.
+    - Is not performing register writeback.
+    - Is not using R15 as a source or destination register.
 
-Please note that %gs:0 can also be achieved with
--mstack-protector-guard-offset=3D0
+Your instruction is doing writeback. Do the address update
+as a separate instruction.
 
-Uros.
+Strictly speaking this is a missing feature in KVM (in an
+ideal world it would let you do MMIO with any instruction
+that you could use on real hardware). In practice it is not
+a major issue because you don't typically want to do odd
+things when you're doing MMIO, you just want to load or
+store a single data item. If you're running into this then
+your guest software is usually doing something a bit strange.
+
+thanks
+-- PMM
 
