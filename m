@@ -1,146 +1,237 @@
-Return-Path: <kvm+bounces-27988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E5839909D0
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 19:00:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D62F990F90
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 22:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C94C51F222A8
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 17:00:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC7CB1C22A02
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 20:02:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728631D9A68;
-	Fri,  4 Oct 2024 17:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3321FB3E8;
+	Fri,  4 Oct 2024 19:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E4/e1zkf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYfU5nCF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1526B1C3040;
-	Fri,  4 Oct 2024 17:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87471DDC02;
+	Fri,  4 Oct 2024 19:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728061206; cv=none; b=U6aOPUJnLpFufbLwGo0Fq7o8mN01RbIsyXc/GxW+5GR4O2WJTmnccuD3PUETy9w/EXFVP5IenN0R+WEA//yDZbnEvxZoExsbd6ZDRIMDEiIGqGXcEr7cosVmB1wcWosdfalYix8VHD2oXk90ay6gk1eir4Q7G3vZ39v/WGwTyH8=
+	t=1728069075; cv=none; b=Td1tO3vdfWUccAsCTmcT/S2izMHAP/UrkuqznWewkh/iXnA3UB0TrZtW198U6KRHiB9AmrP49GTwXunnA9pUWEUAxzT/XEe2tCpMcHprUdDPOD24TqpjX60mQLfAEM1SV/+JcVaSnN40Wqd6+Wtnvt+CeI3a4pglWMnuAvKtPRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728061206; c=relaxed/simple;
-	bh=kGMr9XJwmR/6XMbdyM0sz2yO0/poueWM7SpCkZ9rr1E=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=sU295U3c4fX8bO7koIimxwnnObFKFySmLee/6IfNjfFdDOWRN9iMp/+CHeJbynKmetbaF4eyus7q8C8uM351BZzmNY/iJX6iqvhXPTxFtNj53AOdPXRxg1WwcuAWxY1LSlUn7I0ywAg/d/cwCOkN7rXszE8X0mf+RpP4n9LDHv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E4/e1zkf; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728061205; x=1759597205;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=kGMr9XJwmR/6XMbdyM0sz2yO0/poueWM7SpCkZ9rr1E=;
-  b=E4/e1zkfcV8/YbYYullDUZHy95C9+/VUkTTxnikeOJuOHF8Vg2B/ynM/
-   RZ3TeaM8IUL6E2BZLflJVR/Z1/W/crSLrD1ruTsLAMXXwNTfl5o7c2l44
-   gR/1NbeK7kgNfMlMYxDGgqXYBY1eO9ugoCIvHfzqtP3e+uy0e9sB9wDck
-   6gsF+ZMq3/vXyQhopeLT/BMsIC+RizWXDmJRsTCq6AG7q52TbR5eIvjJ4
-   1aUMySWz3c4DXkHtXspg0rkHxZfQau39lX09HFvDzrcJXOq8lidFRVwZY
-   NrhTG4ivVshk7Ky4/vYuZyl2CCi3rh7z8rMbmCbGTBYp91e3013RmhFgC
-   w==;
-X-CSE-ConnectionGUID: Y9tpcUhzTDCcf1qReMs4ZA==
-X-CSE-MsgGUID: wnRrIcKwTnudsTfabq89mQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11215"; a="37895482"
-X-IronPort-AV: E=Sophos;i="6.11,178,1725346800"; 
-   d="scan'208";a="37895482"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 10:00:04 -0700
-X-CSE-ConnectionGUID: JcEuj40hRqKVOfr6zgygJg==
-X-CSE-MsgGUID: KKBvCfawQvirj++5TeV3Xg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,178,1725346800"; 
-   d="scan'208";a="105614661"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.166.93])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 09:59:56 -0700
-Message-ID: <ddf6960c-a48a-48df-b09d-f70797042413@intel.com>
-Date: Fri, 4 Oct 2024 19:59:50 +0300
+	s=arc-20240116; t=1728069075; c=relaxed/simple;
+	bh=YYYFR4xM6pq64tyhxGwfZ3sPFhLIXiPYgsZ0dStL10M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=drByXn6E+WvRJYgCQxuk7XS/szLTW1Y7Q646CX38oIcjFp28X5ZJYCSieDG5BrdQ05ZLpHl2fv8wtBRjfWKRYS8CrcjRHbdEv3hJA1utieY6gMqwSb4/TjASoMT8CaaNPaESw6Oo2NE0CTMylVklkgQuWsKIx6n+/6MoiWhRHhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYfU5nCF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 109CEC4CEC6;
+	Fri,  4 Oct 2024 19:11:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728069074;
+	bh=YYYFR4xM6pq64tyhxGwfZ3sPFhLIXiPYgsZ0dStL10M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LYfU5nCF1IhcG9r/BLUlZ83fopNKYX/W4gNeO7INGLlb3hG5q7ZfL/MItsNOF7lvD
+	 Z0TfCzp7GYj74VR2pfNgN7Q//fzAy3lRSXTLX/YNyIB2c4P24z0ZJizhfSxu/y8/Bn
+	 xtlL5gXdG/ygxQ8t7ZTAswkYupUyG+14LV5wjlxC3QTC+B4Tkat8cU/9fQIjRu407n
+	 Y2dIB/ITsG6b2oH0nwxPpgrhcjKCN2rWwK6UkDUe5m6pkwrygKAZJO1vGsl8PPR86D
+	 dHzMujwLCbQYn7S/FYdKe9qAowdS8s5p4I9nlpPVoY+oHL3F3dHvy5JJATMDW8qHln
+	 fk6pRwV/iNalA==
+Date: Fri, 4 Oct 2024 20:11:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	iommu@lists.linux.dev, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	virtualization@lists.linux.dev, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+	catalin.marinas@arm.com, will@kernel.org, luto@kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+	daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com,
+	robh@kernel.org, bhelgaas@google.com, arnd@arndb.de,
+	sgarzare@redhat.com, jinankjain@linux.microsoft.com,
+	muminulrussell@gmail.com, skinsburskii@linux.microsoft.com,
+	mukeshrathor@microsoft.com
+Subject: Re: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in
+ Hyper-V code
+Message-ID: <20241004191104.GI1310185@kernel.org>
+References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] KVM: x86: Fix Intel PT Host/Guest mode when host
- tracing also
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>
-Cc: Zhenyu Wang <zhenyuw@linux.intel.com>, kvm@vger.kernel.org,
- Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, H Peter Anvin <hpa@zytor.com>,
- Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Ian Rogers <irogers@google.com>,
- Kan Liang <kan.liang@linux.intel.com>, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, mizhang@google.com
-References: <20240906130026.10705-1-adrian.hunter@intel.com>
- <b2671dab-9efa-4a56-bbe4-9b9140708120@intel.com>
-Content-Language: en-US
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <b2671dab-9efa-4a56-bbe4-9b9140708120@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
 
-On 26/09/24 17:05, Adrian Hunter wrote:
-> On 6/09/24 16:00, Adrian Hunter wrote:
->> Hi
->>
->> There is a long-standing problem whereby running Intel PT on host and guest
->> in Host/Guest mode, causes VM-Entry failure.
->>
->> The motivation for this patch set is to provide a fix for stable kernels
->> prior to the advent of the "Mediated Passthrough vPMU" patch set:
->>
->> 	https://lore.kernel.org/kvm/20240801045907.4010984-1-mizhang@google.com/
->>
->> which would render a large part of the fix unnecessary but likely not be
->> suitable for backport to stable due to its size and complexity.
->>
->> Ideally, this patch set would be applied before "Mediated Passthrough vPMU"
->>
->> Note that the fix does not conflict with "Mediated Passthrough vPMU", it
->> is just that "Mediated Passthrough vPMU" will make the code to stop and
->> restart Intel PT unnecessary.
+On Thu, Oct 03, 2024 at 12:51:04PM -0700, Nuno Das Neves wrote:
+> To move toward importing headers from Hyper-V directly, switch to
+> using hvhdk.h in all Hyper-V code. KVM code that uses Hyper-V
+> definitions from hyperv-tlfs.h remains untouched.
 > 
-> Any comments?
-
-Any comments?
-
+> Add HYPERV_NONTLFS_HEADERS everywhere mshyperv.h, asm/svm.h,
+> clocksource/hyperv_timer.h is included in Hyper-V code.
 > 
->>
->>
->> Adrian Hunter (3):
->>       KVM: x86: Fix Intel PT IA32_RTIT_CTL MSR validation
->>       KVM: x86: Fix Intel PT Host/Guest mode when host tracing also
->>       KVM: selftests: Add guest Intel PT test
->>
->>  arch/x86/events/intel/pt.c                         | 131 ++++++-
->>  arch/x86/events/intel/pt.h                         |  10 +
->>  arch/x86/include/asm/intel_pt.h                    |   4 +
->>  arch/x86/kvm/vmx/vmx.c                             |  26 +-
->>  arch/x86/kvm/vmx/vmx.h                             |   1 -
->>  tools/testing/selftests/kvm/Makefile               |   1 +
->>  .../selftests/kvm/include/x86_64/processor.h       |   1 +
->>  tools/testing/selftests/kvm/x86_64/intel_pt.c      | 381 +++++++++++++++++++++
->>  8 files changed, 532 insertions(+), 23 deletions(-)
->>  create mode 100644 tools/testing/selftests/kvm/x86_64/intel_pt.c
->>
->> base-commit: d45aab436cf06544abeeffc607110f559a3af3b4
->>
->>
->> Regards
->> Adrian
+> Replace hyperv-tlfs.h with hvhdk.h directly in linux/hyperv.h, and
+> define HYPERV_NONTLFS_HEADERS there, since it is only used in
+> Hyper-V device code.
 > 
+> Update a couple of definitions to updated names found in the new
+> headers: HV_EXT_MEM_HEAT_HINT, HV_SUBNODE_TYPE_ANY.
+> 
+> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
 
+...
+
+> diff --git a/arch/arm64/hyperv/mshyperv.c b/arch/arm64/hyperv/mshyperv.c
+> index b1a4de4eee29..62b2a270ae65 100644
+> --- a/arch/arm64/hyperv/mshyperv.c
+> +++ b/arch/arm64/hyperv/mshyperv.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/version.h>
+>  #include <linux/cpuhotplug.h>
+> +#define HYPERV_NONTLFS_HEADERS
+>  #include <asm/mshyperv.h>
+>  
+>  static bool hyperv_initialized;
+
+Hi,
+
+With this change in place I see allmodconfig x86_64 builds reporting that
+HV_REGISTER_FEATURES is undeclared.
+
+arch/arm64/hyperv/mshyperv.c: In function 'hyperv_init':
+arch/arm64/hyperv/mshyperv.c:53:26: error: 'HV_REGISTER_FEATURES' undeclared (first use in this function); did you mean 'HV_REGISTER_FEATURES_INFO'?
+   53 |         hv_get_vpreg_128(HV_REGISTER_FEATURES, &result);
+      |                          ^~~~~~~~~~~~~~~~~~~~
+      |                          HV_REGISTER_FEATURES_INFO
+arch/arm64/hyperv/mshyperv.c:53:26: note: each undeclared identifier is reported only once for each function it appears in
+arch/arm64/hyperv/mshyperv.c:58:26: error: 'HV_REGISTER_ENLIGHTENMENTS' undeclared (first use in this function); did you mean 'HV_ACCESS_REENLIGHTENMENT'?
+   58 |         hv_get_vpreg_128(HV_REGISTER_ENLIGHTENMENTS, &result);
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                          HV_ACCESS_REENLIGHTENMENT
+
+> diff --git a/arch/x86/entry/vdso/vma.c b/arch/x86/entry/vdso/vma.c
+> index 6d83ceb7f1ba..5f4053c49658 100644
+> --- a/arch/x86/entry/vdso/vma.c
+> +++ b/arch/x86/entry/vdso/vma.c
+> @@ -25,6 +25,7 @@
+>  #include <asm/page.h>
+>  #include <asm/desc.h>
+>  #include <asm/cpufeature.h>
+> +#define HYPERV_NONTLFS_HEADERS
+>  #include <clocksource/hyperv_timer.h>
+>  
+>  #undef _ASM_X86_VVAR_H
+> diff --git a/arch/x86/hyperv/hv_apic.c b/arch/x86/hyperv/hv_apic.c
+> index f022d5f64fb6..4fe3b3b13256 100644
+> --- a/arch/x86/hyperv/hv_apic.c
+> +++ b/arch/x86/hyperv/hv_apic.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/cpuhotplug.h>
+>  #include <asm/hypervisor.h>
+> +#define HYPERV_NONTLFS_HEADERS
+>  #include <asm/mshyperv.h>
+>  #include <asm/apic.h>
+>  
+> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
+> index fc3c3d76c181..680c4abc456e 100644
+> --- a/arch/x86/hyperv/hv_init.c
+> +++ b/arch/x86/hyperv/hv_init.c
+> @@ -19,6 +19,7 @@
+>  #include <asm/sev.h>
+>  #include <asm/ibt.h>
+>  #include <asm/hypervisor.h>
+> +#define HYPERV_NONTLFS_HEADERS
+>  #include <asm/mshyperv.h>
+>  #include <asm/idtentry.h>
+>  #include <asm/set_memory.h>
+
+And here too, with x86_64 allmodconfig.
+
+In file included from ./include/linux/string.h:390,
+                 from ./include/linux/efi.h:16,
+                 from arch/x86/hyperv/hv_init.c:12:
+arch/x86/hyperv/hv_init.c: In function 'get_vtl':
+./include/linux/overflow.h:372:23: error: invalid application of 'sizeof' to incomplete type 'struct hv_get_vp_registers_input'
+  372 |                 sizeof(*(p)) + flex_array_size(p, member, count),       \
+      |                       ^
+./include/linux/fortify-string.h:502:42: note: in definition of macro '__fortify_memset_chk'
+  502 |         size_t __fortify_size = (size_t)(size);                         \
+      |                                          ^~~~
+arch/x86/hyperv/hv_init.c:427:9: note: in expansion of macro 'memset'
+  427 |         memset(input, 0, struct_size(input, element, 1));
+      |         ^~~~~~
+arch/x86/hyperv/hv_init.c:427:26: note: in expansion of macro 'struct_size'
+  427 |         memset(input, 0, struct_size(input, element, 1));
+      |                          ^~~~~~~~~~~
+
+[errors trimmed for the sake of brevity]
+
+...
+
+> diff --git a/arch/x86/hyperv/hv_vtl.c b/arch/x86/hyperv/hv_vtl.c
+> index 04775346369c..a8bb6ad7efb6 100644
+> --- a/arch/x86/hyperv/hv_vtl.c
+> +++ b/arch/x86/hyperv/hv_vtl.c
+> @@ -10,6 +10,7 @@
+>  #include <asm/boot.h>
+>  #include <asm/desc.h>
+>  #include <asm/i8259.h>
+> +#define HYPERV_NONTLFS_HEADERS
+>  #include <asm/mshyperv.h>
+>  #include <asm/realmode.h>
+>  #include <../kernel/smpboot.h>
+
+And, likewise, with this patch applied I see a number of errors when
+compiling this file. This is with allmodconfig on x86_64 with:
+
+Modified: CONFIG_HYPERV=y (instead of m)
+Added: CONFIG_HYPERV_VTL_MODE=y
+
+arch/x86/hyperv/hv_vtl.c: In function 'hv_vtl_bringup_vcpu':
+arch/x86/hyperv/hv_vtl.c:154:34: error: 'HVCALL_ENABLE_VP_VTL' undeclared (first use in this function)
+  154 |         status = hv_do_hypercall(HVCALL_ENABLE_VP_VTL, input, NULL);
+      |                                  ^~~~~~~~~~~~~~~~~~~~
+arch/x86/hyperv/hv_vtl.c:154:34: note: each undeclared identifier is reported only once for each function it appears in
+In file included from ./include/linux/string.h:390,
+                 from ./include/linux/bitmap.h:13,
+                 from ./include/linux/cpumask.h:12,
+                 from ./arch/x86/include/asm/apic.h:5,
+                 from arch/x86/hyperv/hv_vtl.c:9:
+arch/x86/hyperv/hv_vtl.c: In function 'hv_vtl_apicid_to_vp_id':
+arch/x86/hyperv/hv_vtl.c:189:32: error: invalid application of 'sizeof' to incomplete type 'struct hv_get_vp_from_apic_id_in'
+  189 |         memset(input, 0, sizeof(*input));
+      |                                ^
+./include/linux/fortify-string.h:502:42: note: in definition of macro '__fortify_memset_chk'
+  502 |         size_t __fortify_size = (size_t)(size);                         \
+      |                                          ^~~~
+arch/x86/hyperv/hv_vtl.c:189:9: note: in expansion of macro 'memset'
+  189 |         memset(input, 0, sizeof(*input));
+      |         ^~~~~~
+arch/x86/hyperv/hv_vtl.c:190:14: error: invalid use of undefined type 'struct hv_get_vp_from_apic_id_in'
+  190 |         input->partition_id = HV_PARTITION_ID_SELF;
+      |              ^~
+arch/x86/hyperv/hv_vtl.c:191:14: error: invalid use of undefined type 'struct hv_get_vp_from_apic_id_in'
+  191 |         input->apic_ids[0] = apic_id;
+      |              ^~
+arch/x86/hyperv/hv_vtl.c:195:45: error: 'HVCALL_GET_VP_ID_FROM_APIC_ID' undeclared (first use in this function)
+  195 |         control = HV_HYPERCALL_REP_COMP_1 | HVCALL_GET_VP_ID_FROM_APIC_ID;
+      |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+...
 
