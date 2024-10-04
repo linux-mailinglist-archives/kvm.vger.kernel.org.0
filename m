@@ -1,122 +1,106 @@
-Return-Path: <kvm+bounces-27905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9BBC990180
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 12:41:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B51990187
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 12:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6232AB2276C
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 10:41:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97CB0282B74
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 10:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CAA155C9E;
-	Fri,  4 Oct 2024 10:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E77A15688C;
+	Fri,  4 Oct 2024 10:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPdCJHwR"
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="oR3Of1Wf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F741369BB
-	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 10:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469B01553AF;
+	Fri,  4 Oct 2024 10:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728038459; cv=none; b=I8vBN65NaFPewOni15hwBqEKJg/jisTZZC+o9NgxiiXW8rTCOGvC8yMBwv9HkxRG06nRl3lV0/MqFZT2ZRtj/Kp5J+b1rX+YYYO1jhs+nb6hU9dRiqsU4EltMdYiHc4uN1q6bLsfALubYky6dtXHPbylKMEHUGyYQXlSt7zc8no=
+	t=1728038694; cv=none; b=VTC1qoZVdqikqieLCW9evSw9D+A3mMBVJAMoYqmYk6XPEniGeJAALueCmfJEu6BVKYS/Br9LaOWAdK4SNnRflaInxw89umRUy1LcJMWfzJTQ11Mc4vCUorUmfc/G7Zt+d9MS7UM325IwNnrFXUyT7d66TEbmzxBE772d4NUA3p8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728038459; c=relaxed/simple;
-	bh=lu6Ci95X3ixh416Hp8eWMyA2WcZFrjpot9w6voMZyBY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HMyXoTQo7Vgbb2xxai4cNR5y5A6935bHEPe6FoUuUvvhe9hOKCe8nMRvGV2LXTbNABzOT1Bc0FEIVxzAWr5/hZFgFIts8SxdolVBwtdm4WzBtI8Qv7slxoiJugPAXGT0ye0lyCBfjE74jxCCiUgpbFV2xaclAqCu6SCL8xJZPVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iPdCJHwR; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2fac3f20f1dso22640811fa.3
-        for <kvm@vger.kernel.org>; Fri, 04 Oct 2024 03:40:57 -0700 (PDT)
+	s=arc-20240116; t=1728038694; c=relaxed/simple;
+	bh=pPE4/I601JrMIy+XM5295Vjl31RBUgIJ/rXqcSjo5c4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=nlK6slzXIppXnp3zt4ZxM0EL3EXGaRtu2UADOLpoF4kyIQUIMMmnImmsNzhsEP0hM0DWtgUlMB5wutdzqD/fhfepEPL8IXH7ni+tGC4sN+rU5jm8XNe0nsv11n6Kj74OK/ENAQYcXSldnGNvjHbH6+T1IDJQRibRlZzvJfjKQE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=oR3Of1Wf; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728038455; x=1728643255; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vPl3qITF2ywrXWkVItFCsKUU6jByCU7uvcVLmVgL0Vg=;
-        b=iPdCJHwRVMgP3WCCBNhjC+0vBfcOJaa9Zywst+qdiKM93a4Yhq6n9kgjKGVw5+Lagc
-         elXimcndlYTBxZsfY2HT4qvs1yS9c6UzVYRa/DaUrSz4EKXLTrShViOE0pjIXpMz4f/N
-         z2MHMPPfszsbLxKr+jc/0PW4hj5Q0LAPFzZCqptjPzKLsC4NCXCpYDxZE8eZ0/ASaRL7
-         Qcs7Q0FEq+zfKIDPpt9ne/o00RDQiemwxQMUvGNJchogLHxo0bqo9IcZtkQO79vIuGih
-         VH+Ge8+Mqh2V8tWP8jZ9Zq2nRqH2iuTy/WvwIQfNLjFaQeRP56UmxnQvqpWEb2uR349D
-         Mn7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728038455; x=1728643255;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vPl3qITF2ywrXWkVItFCsKUU6jByCU7uvcVLmVgL0Vg=;
-        b=cxq4Fafc4U2ZkBNy+kfdSuTtaC4ey0oB5BRD4FNJH5CYOpMxTf8R7zYRsLdekS491c
-         cvCB3XyV61NhpneMqLbz2x9xhF26KyIuEKBGsEnJO0XEs51rWm7qjvtw4MVGsdYPx4Vc
-         n4KJU1qelsvvgPIZiM6FZS+U74mrDh4Q//KhdR7w3p2lQR1Cu0QECO91kyYZVLODKhy1
-         y43J21Y7dJjPDNGjWaVjW9Wx6Z/oZ3QwsGuJIOQ/1gmqfHfhbtln1NHQWiN2nRkFPFx4
-         /TX7uXETdoCq3UDrbFnziA/nRdX/iD4Np3LebXgY7YFQX2HH8cfIOI7KGMbWnNjV/QzC
-         F9hA==
-X-Forwarded-Encrypted: i=1; AJvYcCVSLIIg3LpgrjEYTwLp31iQCQq55U01FfEditM7vGqQAXkk6N7CCahPUTO5P3Jb7ph8zqM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJXSpSoy6AQwHwbSZHrWK12cOAvlfuaFvHfUha3atG4RczIopU
-	Jgt8fJz4AcNdvDdoh6eEX0d7xDqiA/G8qmWAXmDJhse0uJLHMxjc6LjFsv8xfXchwk7Bf/0u5p8
-	3P43A+EfqdwVeJKYtFwJUkMtj9pDmth9JTabG9A==
-X-Google-Smtp-Source: AGHT+IGyX8sJve6KuRoZVubMXfXMSG/8RucVj3x3PQo8hA72yHvToyC+q/FEh2ZXeQHdHLakNHyPv/O/fqOogsK6RDg=
-X-Received: by 2002:a2e:d01:0:b0:2f7:4c9d:7a83 with SMTP id
- 38308e7fff4ca-2faf3d70157mr9230261fa.40.1728038455301; Fri, 04 Oct 2024
- 03:40:55 -0700 (PDT)
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1728038694; x=1759574694;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=pPE4/I601JrMIy+XM5295Vjl31RBUgIJ/rXqcSjo5c4=;
+  b=oR3Of1Wf3HEo0dnwjdj9QbOoKLlal8JmUjY1VqjmajiWOso5ovkldN2a
+   nW3HSKi2u16NPX0mCuCfjeOhqn2MYK1icoyhHtZwgINDo1LHvqJKtIGZM
+   dJkftOs02UjrtQ1EUALedb+9lnWyUkHF1IzVWw2JMVw2OxvCyZwR/u/Me
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.11,177,1725321600"; 
+   d="scan'208";a="372905230"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 10:44:44 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:37237]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.45.76:2525] with esmtp (Farcaster)
+ id 1351fef0-1ef8-4c2c-b61d-a56b05783d23; Fri, 4 Oct 2024 10:44:42 +0000 (UTC)
+X-Farcaster-Flow-ID: 1351fef0-1ef8-4c2c-b61d-a56b05783d23
+Received: from EX19D041EUB003.ant.amazon.com (10.252.61.118) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 4 Oct 2024 10:44:41 +0000
+Received: from [10.95.86.80] (10.95.86.80) by EX19D041EUB003.ant.amazon.com
+ (10.252.61.118) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Fri, 4 Oct 2024
+ 10:44:35 +0000
+Message-ID: <3208be2b-7e9f-413b-a9dc-c36ef4e3d177@amazon.de>
+Date: Fri, 4 Oct 2024 12:44:30 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
-In-Reply-To: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Oct 2024 11:40:44 +0100
-Message-ID: <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/15] KVM: x86: Introduce new ioctl KVM_TRANSLATE2
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+	<seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+CC: Nicolas Saenz Julienne <nsaenz@amazon.com>, Alexander Graf
+	<graf@amazon.de>, James Gowans <jgowans@amazon.com>,
+	<nh-open-source@amazon.com>, Thomas Gleixner <tglx@linutronix.de>, "Ingo
+ Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <x86@kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <kvmarm@lists.linux.dev>,
+	<kvm-riscv@lists.infradead.org>, Nikolas Wipper <nik.wipper@gmx.de>
+References: <20240910152207.38974-1-nikwip@amazon.de>
+From: Nikolas Wipper <nikwip@amazon.de>
+Content-Language: en-US
+In-Reply-To: <20240910152207.38974-1-nikwip@amazon.de>
+X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
+ EX19D041EUB003.ant.amazon.com (10.252.61.118)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 
-On Fri, 4 Oct 2024 at 10:47, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> I am investigating a data abort affecting the barebox bootloader built for aarch64
-> that only manifests with qemu-system-aarch64 -enable-kvm.
->
-> The issue happens when using the post-indexed form of LDR on a MMIO address:
->
->         ldr     x0, =0x9000fe0           // MMIO address
->         ldr     w1, [x0], #4             // data abort, but only with -enable-kvm
+SSBzYXcgdGhpcyBvbiBhbm90aGVyIHNlcmllc1sqXToKCj4gaWYgS1ZNX1RSQU5TTEFURTIgbGFu
+ZHMgKHRob3VnaCBJJ20gc29tZXdoYXQgY3VyaW91cyBhcyB0byB3aHkgUUVNVSBkb2Vzbid0IGRv
+Cj4gdGhlIHBhZ2Ugd2Fsa3MgaXRzZWxmKS4KClRoZSBzaW1wbGUgcmVhc29uIGZvciBrZWVwaW5n
+IHRoaXMgZnVuY3Rpb25hbGl0eSBpbiBLVk0sIGlzIHRoYXQgaXQgYWxyZWFkeQpoYXMgYSBtYXR1
+cmUsIHByb2R1Y3Rpb24tbGV2ZWwgcGFnZSB3YWxrZXIgKHdoaWNoIGlzIGFscmVhZHkgZXhwb3Nl
+ZCkgYW5kCmNyZWF0aW5nIHNvbWV0aGluZyBzaW1pbGFyIFFFTVUgd291bGQgdGFrZSBhIGxvdCBs
+b25nZXIgYW5kIHdvdWxkIGJlIG11Y2gKaGFyZGVyIHRvIG1haW50YWluIHRoYW4ganVzdCBjcmVh
+dGluZyBhbiBBUEkgdGhhdCBsZXZlcmFnZXMgdGhlIGV4aXN0aW5nCndhbGtlci4KClsqXSBodHRw
+czovL2xvcmUua2VybmVsLm9yZy9sa21sL1p2SnNlVm9UN2dOX0dCRzNAZ29vZ2xlLmNvbS9ULyNt
+YjBiMjNhMWY1MDIzMTkyYTQ0MmRiNGExNjYyOWQ5Y2E3NGViNmI1ZQoKcHM6IHRoaXMgaXMgYWxz
+byBhIGdlbnRsZSBwaW5nIGZvciByZXZpZXcsIGlmIHRoaXMgZ290IGxvc3QgaW4gYmV0d2Vlbgpj
+b25mZXJlbmNlcwoKCgpBbWF6b24gV2ViIFNlcnZpY2VzIERldmVsb3BtZW50IENlbnRlciBHZXJt
+YW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzog
+Q2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dl
+cmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDI1Nzc2NCBCClNpdHo6IEJlcmxpbgpVc3Qt
+SUQ6IERFIDM2NSA1MzggNTk3Cg==
 
-Don't do this -- KVM doesn't support it. For access to MMIO,
-stick to instructions which will set the ISV bit in ESR_EL1.
-That is:
-
- * AArch64 loads and stores of a single general-purpose register
-   (including the register specified with 0b11111, including those
-   with Acquire/Release semantics, but excluding Load Exclusive
-   or Store Exclusive and excluding those with writeback).
- * AArch32 instructions where the instruction:
-    - Is an LDR, LDA, LDRT, LDRSH, LDRSHT, LDRH, LDAH, LDRHT,
-      LDRSB, LDRSBT, LDRB, LDAB, LDRBT, STR, STL, STRT, STRH,
-      STLH, STRHT, STRB, STLB, or STRBT instruction.
-    - Is not performing register writeback.
-    - Is not using R15 as a source or destination register.
-
-Your instruction is doing writeback. Do the address update
-as a separate instruction.
-
-Strictly speaking this is a missing feature in KVM (in an
-ideal world it would let you do MMIO with any instruction
-that you could use on real hardware). In practice it is not
-a major issue because you don't typically want to do odd
-things when you're doing MMIO, you just want to load or
-store a single data item. If you're running into this then
-your guest software is usually doing something a bit strange.
-
-thanks
--- PMM
 
