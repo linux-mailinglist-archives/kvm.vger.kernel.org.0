@@ -1,183 +1,178 @@
-Return-Path: <kvm+bounces-28000-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28001-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B383991282
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 00:49:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8337B991323
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 01:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8F421F23F19
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 22:49:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3940C1F24249
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 23:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471C614C59C;
-	Fri,  4 Oct 2024 22:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971EE156C4B;
+	Fri,  4 Oct 2024 23:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VFMWUCaI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE1813A416;
-	Fri,  4 Oct 2024 22:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D710154C0D;
+	Fri,  4 Oct 2024 23:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728082157; cv=none; b=g5z0NRuvLAQj/wWnm3fD7yUS5zPjkxhoBDG0SePbDHoTIrGyjrzuLPxEI1mwVphJEMUS9mhOZ4Teu4yjZWf68VBmNXGLYUBGJYZjAN3LA2MBCxFkg55rkTVx2E6VZRxdCyJZ7b9xgChZeVgrHyDk68H0zpvdvZNc2SLexJ2rz28=
+	t=1728084978; cv=none; b=bbe9fc6RdmkWL9P1rFA0Xj+JvcrVN8E/v0edkkkEAFJR3LxoVNplMcMHlcRidesCx58tBLdiF8AWCl6yDuZmksueOijB3a+e0ht0SZnap4Fths8xuVI7Cf52xk21dZQDrZM5p8FeRi57uPWom6fCnQkvo+jVROejpsgZWiCmrm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728082157; c=relaxed/simple;
-	bh=7gbu8TSTG4G00UJGD2ZWIOIDAk2kWtxyV0dx7BUzd4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=chiUAIl96CqUv2bxYktWSjsQwoMMj2+LioDnJy+mqPJ0+XSY8DEaLG6uoQjRgB0wVR4/z+3N77cCr5dJ3AqM0/3z3rpHCvHJhgbMj8y8CVAPYm3KUZl3jh8hy4GR5mlyjZeedEUIqkWP36a9e+KG9WhUUJ2JtRQ7/OwyZaIEtQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E0A2C4CEC6;
-	Fri,  4 Oct 2024 22:49:14 +0000 (UTC)
-Date: Fri, 4 Oct 2024 18:50:10 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Patrick Roy <roypat@amazon.co.uk>
-Cc: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
- <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
- <x86@kernel.org>, <hpa@zytor.com>, <mhiramat@kernel.org>,
- <mathieu.desnoyers@efficios.com>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
- <quic_eberman@quicinc.com>, <dwmw@amazon.com>, <david@redhat.com>,
- <tabba@google.com>, <rppt@kernel.org>, <linux-mm@kvack.org>,
- <dmatlack@google.com>, <graf@amazon.com>, <jgowans@amazon.com>,
- <derekmn@amazon.com>, <kalyazin@amazon.com>, <xmarcalx@amazon.com>
-Subject: Re: [RFC PATCH v2 06/10] kvm: gmem: add tracepoints for gmem
- share/unshare
-Message-ID: <20241004185010.60807289@gandalf.local.home>
-In-Reply-To: <20240910163038.1298452-7-roypat@amazon.co.uk>
-References: <20240910163038.1298452-1-roypat@amazon.co.uk>
-	<20240910163038.1298452-7-roypat@amazon.co.uk>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1728084978; c=relaxed/simple;
+	bh=iQeWTsGfFnfHDK7LMNoqjyhkjqdxiz1+pWQDmHMP8bU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AoOYocW7kxO1W/FXX+FLNd7DDYXB3JIAalFmKQJyR4JjDUdE+uhI1gQA33oC2i19t6CFx0C/WinKTajO0v9GwgRkJyRni4SNV5XxqP2j9zzVQVDTlVG9qeflgS+BWOa5NVurk7AtpFR/wuenQbnLJNa6NSIeP+Owu6mi9jW8ikU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VFMWUCaI; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.0.0.114] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 2A53520DB378;
+	Fri,  4 Oct 2024 16:36:10 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2A53520DB378
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1728084971;
+	bh=12axO/5wR11TqDYAjMUHSrOD2AfHvidYKZrZQKRTf6A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VFMWUCaIBQ8EPngTdqNePaLPH2kkoNqFcBK/p9OaD+RiCdUGSPby/3CpF48CZYHaY
+	 eY/NnzTien9H0BMtpRrMbaLJvgp4vqtsKvnLlAgaJ8zjpzojV8LzZ/bwvHv8uwKT4B
+	 kWIeP6x8lWVWbV3kya4o+mW+YLB+SThKWXYXNOSo=
+Message-ID: <17d5a6fd-9f4e-4987-a9fd-dff45cae10a2@linux.microsoft.com>
+Date: Fri, 4 Oct 2024 16:36:06 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in
+ Hyper-V code
+To: Simon Horman <horms@kernel.org>
+Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, iommu@lists.linux.dev,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
+ kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, catalin.marinas@arm.com, will@kernel.org,
+ luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+ daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com, robh@kernel.org,
+ bhelgaas@google.com, arnd@arndb.de, sgarzare@redhat.com,
+ jinankjain@linux.microsoft.com, muminulrussell@gmail.com,
+ skinsburskii@linux.microsoft.com, mukeshrathor@microsoft.com
+References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
+ <20241004191104.GI1310185@kernel.org>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <20241004191104.GI1310185@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Sep 2024 17:30:32 +0100
-Patrick Roy <roypat@amazon.co.uk> wrote:
-
-> Add tracepoints for calls to kvm_gmem_get_folio that cause the returned
-> folio to be considered "shared" (e.g. accessible by host KVM), and
-> tracepoint for when KVM is done accessing a gmem pfn
-> (kvm_gmem_put_shared_pfn).
+On 10/4/2024 12:11 PM, Simon Horman wrote:
+> Hi,
 > 
-> The above operations can cause folios to be insert/removed into/from the
-> direct map. We want to be able to make sure that only those gmem folios
-> that we expect KVM to access are ever reinserted into the direct map,
-> and that all folios that are temporarily reinserted are also removed
-> again at a later point. Processing ftrace output is one way to verify
-> this.
+> With this change in place I see allmodconfig x86_64 builds reporting that
+> HV_REGISTER_FEATURES is undeclared.
 > 
-> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
-> ---
->  include/trace/events/kvm.h | 43 ++++++++++++++++++++++++++++++++++++++
->  virt/kvm/guest_memfd.c     |  7 ++++++-
->  2 files changed, 49 insertions(+), 1 deletion(-)
+> arch/arm64/hyperv/mshyperv.c: In function 'hyperv_init':
+> arch/arm64/hyperv/mshyperv.c:53:26: error: 'HV_REGISTER_FEATURES' undeclared (first use in this function); did you mean 'HV_REGISTER_FEATURES_INFO'?
+>    53 |         hv_get_vpreg_128(HV_REGISTER_FEATURES, &result);
+>       |                          ^~~~~~~~~~~~~~~~~~~~
+>       |                          HV_REGISTER_FEATURES_INFO
+> arch/arm64/hyperv/mshyperv.c:53:26: note: each undeclared identifier is reported only once for each function it appears in
+> arch/arm64/hyperv/mshyperv.c:58:26: error: 'HV_REGISTER_ENLIGHTENMENTS' undeclared (first use in this function); did you mean 'HV_ACCESS_REENLIGHTENMENT'?
+>    58 |         hv_get_vpreg_128(HV_REGISTER_ENLIGHTENMENTS, &result);
+>       |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~
+>       |                          HV_ACCESS_REENLIGHTENMENT
 > 
-> diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-> index 74e40d5d4af42..4a40fd4c22f91 100644
-> --- a/include/trace/events/kvm.h
-> +++ b/include/trace/events/kvm.h
-> @@ -489,6 +489,49 @@ TRACE_EVENT(kvm_test_age_hva,
->  	TP_printk("mmu notifier test age hva: %#016lx", __entry->hva)
->  );
->  
-> +#ifdef CONFIG_KVM_PRIVATE_MEM
-> +TRACE_EVENT(kvm_gmem_share,
-> +	TP_PROTO(struct folio *folio, pgoff_t index),
-> +	TP_ARGS(folio, index),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(unsigned int, sharing_count)
-> +		__field(kvm_pfn_t, pfn)
-> +		__field(pgoff_t, index)
-> +		__field(unsigned long,  npages)
 
-Looking at the TP_printk() format below, the pfn is 8 bytes and
-sharing_count is 4. This will likely create a hole between the two fields
-for alignment reasons. Should put the sharing_count at the end.
+Ah, I did forgot to check arm64. Thanks for the catch, I'll be sure to
+fix it for v2.
 
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->sharing_count = refcount_read(folio_get_private(folio));
-> +		__entry->pfn = folio_pfn(folio);
-> +		__entry->index = index;
-> +		__entry->npages = folio_nr_pages(folio);
-> +	),
-> +
-> +	TP_printk("pfn=0x%llx index=%lu pages=%lu (refcount now %d)",
-> +	          __entry->pfn, __entry->index, __entry->npages, __entry->sharing_count - 1)
-> +);
-> +
-> +TRACE_EVENT(kvm_gmem_unshare,
-> +	TP_PROTO(kvm_pfn_t pfn),
-> +	TP_ARGS(pfn),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(unsigned int, sharing_count)
-> +		__field(kvm_pfn_t, pfn)
+> 
+> And here too, with x86_64 allmodconfig.
+> 
+> In file included from ./include/linux/string.h:390,
+>                  from ./include/linux/efi.h:16,
+>                  from arch/x86/hyperv/hv_init.c:12:
+> arch/x86/hyperv/hv_init.c: In function 'get_vtl':
+> ./include/linux/overflow.h:372:23: error: invalid application of 'sizeof' to incomplete type 'struct hv_get_vp_registers_input'
+>   372 |                 sizeof(*(p)) + flex_array_size(p, member, count),       \
+>       |                       ^
+> ./include/linux/fortify-string.h:502:42: note: in definition of macro '__fortify_memset_chk'
+>   502 |         size_t __fortify_size = (size_t)(size);                         \
+>       |                                          ^~~~
+> arch/x86/hyperv/hv_init.c:427:9: note: in expansion of macro 'memset'
+>   427 |         memset(input, 0, struct_size(input, element, 1));
+>       |         ^~~~~~
+> arch/x86/hyperv/hv_init.c:427:26: note: in expansion of macro 'struct_size'
+>   427 |         memset(input, 0, struct_size(input, element, 1));
+>       |                          ^~~~~~~~~~~
+> 
+> [errors trimmed for the sake of brevity]
+> 
+> ...
+> 
 
-Same here. It should swap the two fields. Note, if you already added this,
-it will not break backward compatibility swapping them, as tooling should
-use the format files that state where these fields are located in the raw
-data.
+Thanks
 
--- Steve
+> 
+> And, likewise, with this patch applied I see a number of errors when
+> compiling this file. This is with allmodconfig on x86_64 with:
+> 
+> Modified: CONFIG_HYPERV=y (instead of m)
+> Added: CONFIG_HYPERV_VTL_MODE=y
+> 
 
+Thanks again,
+Ah, I wish there was a way to check these different combinations of y/m
+more easily.
 
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->sharing_count = refcount_read(folio_get_private(pfn_folio(pfn)));
-> +		__entry->pfn = pfn;
-> +	),
-> +
-> +	TP_printk("pfn=0x%llx (refcount now %d)",
-> +	          __entry->pfn, __entry->sharing_count - 1)
-> +)
-> +
-> +#endif
-> +
->  #endif /* _TRACE_KVM_MAIN_H */
->  
->  /* This part must be outside protection */
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 6772253497e4d..742eba36d2371 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -7,6 +7,7 @@
->  #include <linux/set_memory.h>
->  
->  #include "kvm_mm.h"
-> +#include "trace/events/kvm.h"
->  
->  struct kvm_gmem {
->  	struct kvm *kvm;
-> @@ -204,8 +205,10 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, unsi
->  	if (r)
->  		goto out_err;
->  
-> -	if (share)
-> +	if (share) {
->  		refcount_inc(folio_get_private(folio));
-> +		trace_kvm_gmem_share(folio, index);
-> +	}
->  
->  out:
->  	/*
-> @@ -759,6 +762,8 @@ int kvm_gmem_put_shared_pfn(kvm_pfn_t pfn) {
->  	if (refcount_read(sharing_count) == 1)
->  		r = kvm_gmem_folio_set_private(folio);
->  
-> +	trace_kvm_gmem_unshare(pfn);
-> +
->  	return r;
->  }
->  EXPORT_SYMBOL_GPL(kvm_gmem_put_shared_pfn);
+> arch/x86/hyperv/hv_vtl.c: In function 'hv_vtl_bringup_vcpu':
+> arch/x86/hyperv/hv_vtl.c:154:34: error: 'HVCALL_ENABLE_VP_VTL' undeclared (first use in this function)
+>   154 |         status = hv_do_hypercall(HVCALL_ENABLE_VP_VTL, input, NULL);
+>       |                                  ^~~~~~~~~~~~~~~~~~~~
+> arch/x86/hyperv/hv_vtl.c:154:34: note: each undeclared identifier is reported only once for each function it appears in
+> In file included from ./include/linux/string.h:390,
+>                  from ./include/linux/bitmap.h:13,
+>                  from ./include/linux/cpumask.h:12,
+>                  from ./arch/x86/include/asm/apic.h:5,
+>                  from arch/x86/hyperv/hv_vtl.c:9:
+> arch/x86/hyperv/hv_vtl.c: In function 'hv_vtl_apicid_to_vp_id':
+> arch/x86/hyperv/hv_vtl.c:189:32: error: invalid application of 'sizeof' to incomplete type 'struct hv_get_vp_from_apic_id_in'
+>   189 |         memset(input, 0, sizeof(*input));
+>       |                                ^
+> ./include/linux/fortify-string.h:502:42: note: in definition of macro '__fortify_memset_chk'
+>   502 |         size_t __fortify_size = (size_t)(size);                         \
+>       |                                          ^~~~
+> arch/x86/hyperv/hv_vtl.c:189:9: note: in expansion of macro 'memset'
+>   189 |         memset(input, 0, sizeof(*input));
+>       |         ^~~~~~
+> arch/x86/hyperv/hv_vtl.c:190:14: error: invalid use of undefined type 'struct hv_get_vp_from_apic_id_in'
+>   190 |         input->partition_id = HV_PARTITION_ID_SELF;
+>       |              ^~
+> arch/x86/hyperv/hv_vtl.c:191:14: error: invalid use of undefined type 'struct hv_get_vp_from_apic_id_in'
+>   191 |         input->apic_ids[0] = apic_id;
+>       |              ^~
+> arch/x86/hyperv/hv_vtl.c:195:45: error: 'HVCALL_GET_VP_ID_FROM_APIC_ID' undeclared (first use in this function)
+>   195 |         control = HV_HYPERCALL_REP_COMP_1 | HVCALL_GET_VP_ID_FROM_APIC_ID;
+>       |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> ...
 
+Looks like I'm missing a one or two definitions in the new headers, and the
+names have changed slightly in couple of cases. I'll do some more thorough
+checking and have it all fixed for v2.
+
+I didn't know about this allmodconfig target, that will make it a bit easier!
+
+Nuno
 
