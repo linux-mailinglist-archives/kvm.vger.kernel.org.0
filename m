@@ -1,185 +1,162 @@
-Return-Path: <kvm+bounces-27910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27911-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E12509902BC
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 14:11:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1765899032B
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 14:39:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBF1D1C21763
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 12:11:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89FE2B23761
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 12:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C006715C121;
-	Fri,  4 Oct 2024 12:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189061D4144;
+	Fri,  4 Oct 2024 12:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bvTainF3"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Vo6JWqkI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3183A15A84D
-	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 12:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31EF1D3631
+	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 12:39:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728043864; cv=none; b=W3Wy77suJEnxGbGQN99wggtQRTZZe6uyqJT+bbapQcfDLuETt3pJDnSQ3M96ZqEYap0BabO6Vw41cWqAJ+c2LvgHROiJ6jTvU0kwU57FnStlIuoVBJbJFcqNV/cc6yGnruyvxFblg+T88Admritqt5bjOk9c4RSaWgroDYFW4wc=
+	t=1728045562; cv=none; b=RjJq4wky2Egfm24m7sx5soKoNv/xHcde/oSvQvR1d/cld+FM+gXrwAyOm5YZH6vRgl5WnOH83+ol3v0LEUItnPQdU5J2266mZlbE9WrCigKDVL09AQalYYFtRJNUPksi5TW0c/9UCOruIgaPTBIwFmCADrVIRihRpIdYzPmcFxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728043864; c=relaxed/simple;
-	bh=98x+DS7oU+wIiN6bcto2bvBmsfMEBT/Omef5cOzT0d4=;
+	s=arc-20240116; t=1728045562; c=relaxed/simple;
+	bh=X2mGDVX2E9KlO65D6ugG0PaUXCCsl/kzQRawbka/fKw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iWMzgI/GohX2vfRrDNKhYToQw2fs7VVv+MDoik8lYdGTT5BlVdaunIIk93pSXZtFuLSJJ97U2XiiUjlpgpZ5CDAbURVqGhy/Vo+L2+YQgqhmW+H6QC2pwSorR9SkYIF2N6VhpM7QrWaMYMT9m1KYZLsmWbajZereNKqWfjloenU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bvTainF3; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c89668464cso2613450a12.1
-        for <kvm@vger.kernel.org>; Fri, 04 Oct 2024 05:11:01 -0700 (PDT)
+	 To:Cc:Content-Type; b=OM2fLy9Jq9p315kBboA6br1WUyCzm154DPlJ8GCheX3nUhjwTLjLzuV+k86jPiGqc4QMesTYMu5CuvRCBCk1QIx/G8GQ586JcFG9ibKSkPenUZVQVV2q/yHkhOTw1zZ647sZV4CpgAf+jBgEVlXW3EErhr5p/gqnNPdnNZkJZ/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Vo6JWqkI; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3a1a90bd015so6913555ab.1
+        for <kvm@vger.kernel.org>; Fri, 04 Oct 2024 05:39:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728043860; x=1728648660; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=nLRWxfYoK6Cafgt/qUAdxdQ9UmXyz/QoFGn6MQbA2BY=;
-        b=bvTainF3tWs5FEcYEWo3awx79xdZ6VWXjufjU7G2h/gVNLjxSKfEfiPBHObIRY9nma
-         o3JdkyZORkuncougHNNwpgO8tCPHyTN1lfszYO81nROLK50Kxxe3KBjA0J6k7ghDTkhA
-         SU2vj4yPUjj2/tOJwHKYADO2QrctUPkjleSdsYIQPBwoom9fhR/O4tGt75tN8UDHOMH5
-         Abygufr+badQcSVZh/ydz7kRozUPw4cF1F0BK9beA/g6r1jhtxg26M0FfSzCb+F9kd1B
-         z9d8Hb69lT9vEL35Cw8qWFxIVyXCvNyR+9ApXH26yljegOTHE29QbhBlcb7x5dKm0rAm
-         o/Gg==
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1728045560; x=1728650360; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NrR+z/iOWphYqWkj8zj/mNFQmOZdBilN97SXK8kmVvA=;
+        b=Vo6JWqkIzVrE7ixCel+zlbp2wiRS+qnsKgzDoogeesGKy3GfNpri2ge4F9Q/PKk4Yq
+         wquxUJazvBW9P9x4QLAoCXoTwHQgrV2DLY1/KLugEXvB9TmXzoxMzDB8eYIxaQZ2GqBm
+         tEvdOVyfGLbO961K2tfDTsXnRX0lUeUqXuXLfUHeSjcC+1pDvr6JfQFF/YWcMxxidTtz
+         +uBNexwYG5CMFjuFrxBM+9GfKzgvT7N55jfwOnMDLybLrbPzeQsG4x81QHwXdkRbHR9B
+         hEuUHe8pt/aeFRNyWma6eG7DvkLW72OrfgFFYQjg5FLL3tFpEnQFPqmcl70kJtxE8Iri
+         QC4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728043860; x=1728648660;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nLRWxfYoK6Cafgt/qUAdxdQ9UmXyz/QoFGn6MQbA2BY=;
-        b=UAD1ftCVN1f1RrwaUCZbe+P3aSXYIM0EvYh8EpPK20hc9qwVz8THYImnHpQVoqNbjY
-         D7GtZpAl8F5gVe3zVk8khLFVkv0MS9X/2O9kOQ3CrIdhlEwkcSMZ4b76L2yXbe0xUTBm
-         aGLrGz2ixZVHURwPzkguxRU0q/EJpKw8OLvjkymZsM/wS1KcIgNN7cuw12YR2GPG+F9t
-         n2bjH8waZTEqfCAdz/5rmRw52Js9EZGuKwcmVemLoiYSEDLuLFGrISSf/dj7tEdCAyEI
-         unvfXVjKSDe+P2N51/i0NfcH1t+ETdtUKT1EfoWETzKNR1dOS7ggDBdcqmKWxAlgf3+5
-         ZbBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUj5puPg7ZnNclpY6tT9At1k7i4ya4mj0a+GdPDBQ3GaqCbtS1Lu+nLqE80AIITZSqHe30=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYf94vJfEZQJBigsBfE9hHqIrjge7Hhcwtb3TKmDRzNEHP1IZg
-	FXSTBQiHu1wZCJrGrmE1mJWkq8URc3IeBAw2FwWIvbyp9yiXfiKBx7zcX8GekOIzRnT0XX/kEQC
-	W8rVuG6XYBihg70zQLNHLoBhlIt3ieb0ktL6Q6EWWJ5ILT9HV
-X-Google-Smtp-Source: AGHT+IHMRD9ZbIfy5bdEm2JLsi5cSDroxj58zllMuaymeta2yhL1+Kk1fvT9teC49Lco6qfh+Pen4M9kMGDH3ABd5E8=
-X-Received: by 2002:a05:6402:26c8:b0:5c8:ae9e:baba with SMTP id
- 4fb4d7f45d1cf-5c8d2dfcf50mr1510339a12.2.1728043860273; Fri, 04 Oct 2024
- 05:11:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728045560; x=1728650360;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NrR+z/iOWphYqWkj8zj/mNFQmOZdBilN97SXK8kmVvA=;
+        b=jtzd2uSOx46LxDcCRSrzONnZwRs/dMt3RfzUtKSePNP3PB0Yp5KLlViImctUpoeQQH
+         BHUrkacAlu5U+PKjMRrOcYlSahxu/pf7mYFHBucPhwWO76eob5QvJvcb3lz7iBV0Yg3F
+         JS3x2fdKFj/O+1+Oo1qwO2vwEYaqMAZ215sVXNykRJYGLGm4PpIndQG1SzqIHI8LSMUq
+         t1DRB5OCY/rxlyetsW1MMWpjCFYJR02AdWAfRFJ3uyHjOxV6VhMNJYlHk88m5mIrQt/q
+         2Jh10o68kTLRb+Wb5DoLZfxjxxViy17Nd6R1xA9xKRz7UcyZL/Vs9K/AzriVFd1u8J64
+         D37A==
+X-Forwarded-Encrypted: i=1; AJvYcCUhuziio4WjP0kwCa2sOOeV6E0sAhiBCKFeQt50nuOy21sh/blL3/812StpBEfVC3DjBbU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHNSn0ktE+6lZoXugpmW6jly3m+ousUFGMT4WFi/N4M3W0ySVs
+	pHKkVCwv5nnmu6hDPUUS/VV3bUOQBpOdHg4vwOB07vYSw4q7vtOfzGtYG077WFm5fdVc7Vl7FaA
+	pcD3MKBSNeTfT14VSNWnmwVTRTkT8FKPImE7CwxqXePbGnYCY+B1ong==
+X-Google-Smtp-Source: AGHT+IERttoYjRNGdgoaAQ88VzrKxhKUIyjVinnKzTvAvFXZVff+YX6a4gsUWvibRQguSUrLvPreBNI4l6WqAmGFfdQ=
+X-Received: by 2002:a05:6e02:13a6:b0:3a0:a385:911d with SMTP id
+ e9e14a558f8ab-3a3757d92e5mr22058205ab.0.1728045559512; Fri, 04 Oct 2024
+ 05:39:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
- <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com> <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
-In-Reply-To: <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Oct 2024 13:10:48 +0100
-Message-ID: <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
+References: <20240808081439.24661-1-yongxuan.wang@sifive.com>
+In-Reply-To: <20240808081439.24661-1-yongxuan.wang@sifive.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 4 Oct 2024 18:09:06 +0530
+Message-ID: <CAAhSdy3NmwbHY9Qef9LUeXfr0iE7wC-u0d_fHzC47PXk-MzmRg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] RISC-V: KVM: Fix APLIC in_clrip and clripnum write emulation
+To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, greentime.hu@sifive.com, 
+	vincent.chen@sifive.com, Atish Patra <atishp@atishpatra.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 4 Oct 2024 at 12:51, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+On Thu, Aug 8, 2024 at 1:44=E2=80=AFPM Yong-Xuan Wang <yongxuan.wang@sifive=
+.com> wrote:
 >
-> Hello Peter,
+> In the section "4.7 Precise effects on interrupt-pending bits"
+> of the RISC-V AIA specification defines that:
 >
-> Thanks for your quick response.
+> If the source mode is Level1 or Level0 and the interrupt domain
+> is configured in MSI delivery mode (domaincfg.DM =3D 1):
+> The pending bit is cleared whenever the rectified input value is
+> low, when the interrupt is forwarded by MSI, or by a relevant
+> write to an in_clrip register or to clripnum.
 >
-> On 04.10.24 12:40, Peter Maydell wrote:
-> > On Fri, 4 Oct 2024 at 10:47, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> >> I am investigating a data abort affecting the barebox bootloader built for aarch64
-> >> that only manifests with qemu-system-aarch64 -enable-kvm.
-> >>
-> >> The issue happens when using the post-indexed form of LDR on a MMIO address:
-> >>
-> >>         ldr     x0, =0x9000fe0           // MMIO address
-> >>         ldr     w1, [x0], #4             // data abort, but only with -enable-kvm
-> >
-> > Don't do this -- KVM doesn't support it. For access to MMIO,
-> > stick to instructions which will set the ISV bit in ESR_EL1.
-> >
-> > That is:
-> >
-> >  * AArch64 loads and stores of a single general-purpose register
-> >    (including the register specified with 0b11111, including those
-> >    with Acquire/Release semantics, but excluding Load Exclusive
-> >    or Store Exclusive and excluding those with writeback).
-> >  * AArch32 instructions where the instruction:
-> >     - Is an LDR, LDA, LDRT, LDRSH, LDRSHT, LDRH, LDAH, LDRHT,
-> >       LDRSB, LDRSBT, LDRB, LDAB, LDRBT, STR, STL, STRT, STRH,
-> >       STLH, STRHT, STRB, STLB, or STRBT instruction.
-> >     - Is not performing register writeback.
-> >     - Is not using R15 as a source or destination register.
-> >
-> > Your instruction is doing writeback. Do the address update
-> > as a separate instruction.
+> Update the aplic_write_pending() to match the spec.
 >
-> This was enlightening, thanks. I will prepare patches to implement
-> readl/writel in barebox in ARM assembly, like Linux does
-> instead of the current fallback to the generic C version
-> that just does volatile accesses.
->
-> > Strictly speaking this is a missing feature in KVM (in an
-> > ideal world it would let you do MMIO with any instruction
-> > that you could use on real hardware).
->
-> I assume that's because KVM doesn't want to handle interruptions
-> in the middle of such "composite" instructions?
 
-It's because with the ISV=1 information in the ESR_EL2,
-KVM has everything it needs to emulate the load/store:
-it has the affected register number, the data width, etc. When
-ISV is 0, simulating the load/store would require KVM
-to load the actual instruction word, decode it to figure
-out what kind of load/store it was, and then emulate
-its behaviour. The instruction decode would be complicated
-and if done in the kernel would increase the attack surface
-exposed to the guest. (In practice KVM will these days
-bounce the ISV=0 failure out to the userspace VMM, but
-no VMM that I know of implements the decode of load/store
-instructions in userspace either, so that just changes which
-part prints the failure message.)
+Fixes tag ?
 
-> > In practice it is not
-> > a major issue because you don't typically want to do odd
-> > things when you're doing MMIO, you just want to load or
-> > store a single data item. If you're running into this then
-> > your guest software is usually doing something a bit strange.
+> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
+> ---
+>  arch/riscv/kvm/aia_aplic.c | 2 --
+>  1 file changed, 2 deletions(-)
 >
-> The AMBA Peripheral ID consists of 4 bytes with some padding
-> in-between. The barebox code to read it out looks is this:
+> diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
+> index da6ff1bade0d..97c6dbcabf47 100644
+> --- a/arch/riscv/kvm/aia_aplic.c
+> +++ b/arch/riscv/kvm/aia_aplic.c
+> @@ -142,8 +142,6 @@ static void aplic_write_pending(struct aplic *aplic, =
+u32 irq, bool pending)
 >
-> static inline u32 amba_device_get_pid(void *base, u32 size)
-> {
->         int i;
->         u32 pid;
->
->         for (pid = 0, i = 0; i < 4; i++)
->                 pid |= (readl(base + size - 0x20 + 4 * i) & 255) <<
->                         (i * 8);
->
->         return pid;
-> }
->
-> static inline u32 __raw_readl(const volatile void __iomem *addr)
-> {
->         return *(const volatile u32 __force *)addr;
-> }
->
-> I wouldn't necessarily characterize this as strange, we just erroneously
-> assumed that with strongly ordered memory for MMIO regions and volatile
-> accesses we had our bases covered and indeed we did until the bases
-> shifted to include hardware-assisted virtualization. :-)
+>         if (sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_HIGH ||
+>             sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_LOW) {
+> -               if (!pending)
+> -                       goto skip_write_pending;
 
-I'm not a fan of doing MMIO access via 'volatile' in C code,
-personally -- I think the compiler has a tendency to do more
-clever recombination than you might actually want, because
-it doesn't know that the thing you're accessing isn't RAM-like.
+I agree that aplic_write_pending() is not handling the case
+where it is called for in_clrip or clripnum writes but this still
+looks incomplete.
 
-thanks
--- PMM
+The below two if() should be checked only when pending =3D=3D true.
+
+>                 if ((irqd->state & APLIC_IRQ_STATE_INPUT) &&
+>                     sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_LOW)
+>                         goto skip_write_pending;
+
+How about this ?
+
+diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
+index da6ff1bade0d..93ccc2a49f2b 100644
+--- a/arch/riscv/kvm/aia_aplic.c
++++ b/arch/riscv/kvm/aia_aplic.c
+@@ -143,7 +143,7 @@ static void aplic_write_pending(struct aplic
+*aplic, u32 irq, bool pending)
+        if (sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_HIGH ||
+            sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_LOW) {
+                if (!pending)
+-                       goto skip_write_pending;
++                       goto noskip_write_pending;
+                if ((irqd->state & APLIC_IRQ_STATE_INPUT) &&
+                    sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_LOW)
+                        goto skip_write_pending;
+@@ -151,6 +151,7 @@ static void aplic_write_pending(struct aplic
+*aplic, u32 irq, bool pending)
+                    sm =3D=3D APLIC_SOURCECFG_SM_LEVEL_HIGH)
+                        goto skip_write_pending;
+        }
++noskip_write_pending:
+
+        if (pending)
+                irqd->state |=3D APLIC_IRQ_STATE_PENDING;
+
+Regards,
+Anup
 
