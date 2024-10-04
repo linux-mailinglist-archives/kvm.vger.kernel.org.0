@@ -1,175 +1,149 @@
-Return-Path: <kvm+bounces-27903-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27904-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5D9D99002F
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 11:48:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4794D99006D
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 12:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3262EB21316
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 09:48:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FB961C23C4B
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 10:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8A114659B;
-	Fri,  4 Oct 2024 09:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B846914B07A;
+	Fri,  4 Oct 2024 10:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UNjlsAZz"
 X-Original-To: kvm@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FD933FD
-	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 09:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A3A146A72;
+	Fri,  4 Oct 2024 10:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728035274; cv=none; b=sktMu2Xt9f+jOk/rzJ/GfDZJxVp9VEorGpsqBrsW5/l+8vMPiutdlSRE5FHt//h40i7Hut++g352oexGgu38oRfsT7UOrseTkRemD2VpCHbereqXVlb0COIF2TJJatFH5XcTAQvEmLH7rYu3C3awDym0mYQtEIIi9BPiYnJdkFU=
+	t=1728036114; cv=none; b=LVvx6h1A1Y7dnQnqjZIF+G5vg/Lzcd8juilIXmmjWPy80WEUd1c4VZKbj11i/OpmdJtIdFL2cCsrlMSXw8Vvi7WWc3+3jH8MGKB8/qEnPtI6+82C0MsPGUA4OE95YG3rvr4JD9vLBvlwBuPGgME0vjqI6Pzl7W8wNrjW3lM5zrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728035274; c=relaxed/simple;
-	bh=9A6k4PPTKD+QchoqbxsN/vE8iMob1frembJFyHQRBTE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:Cc:To:Content-Type; b=n0xAuuvILhw9aBmHFUzfmI9/xJ+p9CbsfMeSRo6vvlZpYdAU6t3GrRb3dP/7kmJjmem8bg9z5swlG/smfyah3ZNBRsogIzLqBR+0TuX0OfnAlD895ZCpStzqZemNFIGunPuTJXEdTZuNySDWyUmKFpUn/TRiFyh99NhA8EOG/jI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1sweuW-0007En-7h; Fri, 04 Oct 2024 11:47:44 +0200
-Message-ID: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
-Date: Fri, 4 Oct 2024 11:47:41 +0200
+	s=arc-20240116; t=1728036114; c=relaxed/simple;
+	bh=nuE9Wx0dXnlPfKn5kpp9tKPB9VOjIJcG2joICPhGO2k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dxuDaNkUWZeLGBipsBdeCkhm6Mej4WktzAc6c+HhnzgApFvpstkfBdjGFYWORpjLDzEffawWbJCZRYBNRWCv74pTI1h5Rqt+euN4zAwby+phc3yR/CLWG7Qtx70Afr6RhBKhxBQJWvruta4wuVkbmdtE/aorvMxTZU3ee0e7v84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UNjlsAZz; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2faccada15bso20055361fa.3;
+        Fri, 04 Oct 2024 03:01:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728036111; x=1728640911; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cieeCIQbn3uKGp6ANoCcdjT0voB4iLaxe9sLqJZ6O1w=;
+        b=UNjlsAZz7sXdg9PcAuShFuTpjC5GIO3G7ZtoMn/gCYPFhFP6szeN6CMksFj2Mz7CX9
+         25E2h7rpMX8Yy7FK0nJlHpqOfNHH7OsiuX5yXdjLrS3BUNUDTsmagyFzmyayhb0/KvuM
+         bXHYcRlukQ3AwkuhIt2hoOKF+IwgXkmX0A73CKaCZ2sHUApI0UffEZuwngDk9UIBElEb
+         Z28/ABXaoxNiF0Pg8YwjQdTYrw4aEr/VmzBY47CwdQvVwvp5GEYM0H/TsPONY4+RZcSA
+         gKWMDhlSUAOt8oP72N2S0dQPs15n3DPYf59+4hc/TD7AWGtzQDgTVCkWio0vUxK5tZWj
+         t0Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728036111; x=1728640911;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cieeCIQbn3uKGp6ANoCcdjT0voB4iLaxe9sLqJZ6O1w=;
+        b=GDf7o7thQUd4t/9w7KIlh1KmxPFRcaD6uklICZwdEnHm3/yndanZx3Sw6CQDASJIqf
+         7Z/tWYi9XvQ1pPcPwdKsGePmpQMXPAJskAy0pIaO7QzY2jCvxS1lQDt9U3ZC6+Pgns35
+         zBjg+kEKzUnUvyzQprtsVQXayLLjdx8HBVQrf8aVDxAx7ZaXX4pgZdBC5eN19GeUNb9y
+         FicRdcNpsZnEJEUCXEZuJkQAWPM28TCJDktw3KxFzJYySBj7tBT8vquP+we/aoHNhnxz
+         Bwr2+gY8+thv6rmh5RTYzDp/FRWy6E1ULpVMMEvzzbd54K9cfIC4hfTCwNXa9+Ic4ox9
+         U/4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU84yheG384U6F9uEf227dUGedLNtPKxD4sgwOjafNm4coPN0Vay10n5gQR2dDuY02UR+4=@vger.kernel.org, AJvYcCU8MaO+7GOuKN1euj5QwNyqnAlWjxFkdgspotEa/YpNXFgneBOA8LxcBLa5JuLr7PUafSuw+2LftcL5evfc@vger.kernel.org, AJvYcCUqAT0d+M8dC+FDiTd8RL09YjbHdGtfjkGALZPRLcAi00ATgc4fG/Vsxz5ZVPRrkht6fzsOWLfeU+o=@vger.kernel.org, AJvYcCVYedjxx8giapV3RYq3wRyoRTRyTIK/WIi9aukN/dyXpxKlsR/fKgZUYDcAyl9lPvxLssjlQexNvHAJFCHIIkc=@vger.kernel.org, AJvYcCWOi9kaT7Qj8ZkFH74IawTmk3VlIHs2choKSxkvObE30vTwMvnp8rUKU96oCkQztuH5O+tRLB+hZ9YnGFt0@vger.kernel.org, AJvYcCWQ+cGSwMhisD7ZFcXR5KHuZeAz8DXcw5QHYvaxaozvNNQhoaTNio27cKMrPKjDqsp3TJLOnbybNbv0@vger.kernel.org, AJvYcCX5hZ5Sa0eVKmquPw9TYFXfnx1MkqK75toj5gz6jTR31v0LmacNgJePNN4j4Ga5OgukOW8XrbPOY/6euYKVuHc7EQ==@vger.kernel.org, AJvYcCXoInKUyj9p/A+snT8qzUOE+x0AOGHl07pMAmUBFhJdxABlIDAOZdLAf4Eq9eFjMN0FlOZsUJwJGJQI@vger.kernel.org, AJvYcCXpqKwrQdjWjD1Pij3zUecNM9k0oYVOsRU7bieE4++E+Yjw7GkQgkSTZzwstI21foPmU8hWSadWw1F0uw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8f8ucLTA9BwO78upx78NfYlu5K7z1qJt1N7ESvd8czW9KXuNd
+	TDOdMP7qL6FxQfSbBTtNH+P34Xsf/LD6fy65nBPt7yLsxcGhLSB4T72dIaRjHTGKEf6ftknGjaz
+	QLSBrX/ROQ2TLf5jYRsSc3atwJCo=
+X-Google-Smtp-Source: AGHT+IFNljN6dwZlkogrdacVOY8k+lgMnJISEE8yVKjz9PNhP8aN8ZuhCudCHYoRMsLr1EPgwfyfZf3qjEWBYLSi1O4=
+X-Received: by 2002:a2e:b889:0:b0:2ef:20ae:d113 with SMTP id
+ 38308e7fff4ca-2faf3d8a95emr9412991fa.40.1728036110938; Fri, 04 Oct 2024
+ 03:01:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Subject: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
- address
-Cc: peter.maydell@linaro.org, kvm@vger.kernel.org,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
-To: qemu-arm@nongnu.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+References: <20240925150059.3955569-30-ardb+git@google.com> <20240925150059.3955569-35-ardb+git@google.com>
+In-Reply-To: <20240925150059.3955569-35-ardb+git@google.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Fri, 4 Oct 2024 12:01:39 +0200
+Message-ID: <CAFULd4an+aN4iJ7T0DdMQDOBWrTZPJ4Oyy9ULm6R29fLNQND9Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 05/28] x86: Define the stack protector guard symbol explicitly
+To: Ard Biesheuvel <ardb+git@google.com>
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Juergen Gross <jgross@suse.com>, 
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
+	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
+	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, Sep 25, 2024 at 5:02=E2=80=AFPM Ard Biesheuvel <ardb+git@google.com=
+> wrote:
+>
+> From: Ard Biesheuvel <ardb@kernel.org>
+>
+> Specify the guard symbol for the stack cookie explicitly, rather than
+> positioning it exactly 40 bytes into the per-CPU area. Doing so removes
+> the need for the per-CPU region to be absolute rather than relative to
+> the placement of the per-CPU template region in the kernel image, and
+> this allows the special handling for absolute per-CPU symbols to be
+> removed entirely.
+>
+> This is a worthwhile cleanup in itself, but it is also a prerequisite
+> for PIE codegen and PIE linking, which can replace our bespoke and
+> rather clunky runtime relocation handling.
+>
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  arch/x86/Makefile                     |  4 ++++
+>  arch/x86/include/asm/init.h           |  2 +-
+>  arch/x86/include/asm/processor.h      | 11 +++--------
+>  arch/x86/include/asm/stackprotector.h |  4 ----
+>  tools/perf/util/annotate.c            |  4 ++--
+>  5 files changed, 10 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> index 6b3fe6e2aadd..b78b7623a4a9 100644
+> --- a/arch/x86/Makefile
+> +++ b/arch/x86/Makefile
+> @@ -193,6 +193,10 @@ else
+>          KBUILD_RUSTFLAGS +=3D -Cno-redzone=3Dy
+>          KBUILD_RUSTFLAGS +=3D -Ccode-model=3Dkernel
+>
+> +        ifeq ($(CONFIG_STACKPROTECTOR),y)
+> +                KBUILD_CFLAGS +=3D -mstack-protector-guard-symbol=3Dfixe=
+d_percpu_data
 
-I am investigating a data abort affecting the barebox bootloader built for aarch64
-that only manifests with qemu-system-aarch64 -enable-kvm.
+Looking at:
 
-The issue happens when using the post-indexed form of LDR on a MMIO address:
+> +        * Since the irq_stack is the object at %gs:0, the bottom 8 bytes=
+ of
+> +        * the irq stack are reserved for the canary.
 
-        ldr     x0, =0x9000fe0           // MMIO address
-        ldr     w1, [x0], #4             // data abort, but only with -enable-kvm
+Please note that %gs:0 can also be achieved with
+-mstack-protector-guard-offset=3D0
 
-Here's a full example to reproduce this:
-
-start:
-        mov     w10, 'o'
-        bl      putch
-
-        bl      amba_device_read_pid
-
-        mov     w10, 'k'
-        bl      putch
-
-        ret
-
-amba_device_read_pid:
-        ldr     x0, =0x9000fe0
-        ldr     w1, [x0], #4             // data abort unless #4 is removed or KVM disabled
-        ret
-
-putch:
-        ldr     x8, =0x9000018
-1:
-        /* Wait until there is space in the FIFO */
-        ldr     w9, [x8]
-        tbnz    w9, #5, 1b
-
-        /* Send the character */
-        mov     x9, #0x9000000
-        str     w10, [x9]
-2:
-        /* Wait to make sure it hits the line, in case we die too soon. */
-        ldr     w9, [x8]
-        tbnz    w9, #5, 2b
-        ret
-
-It assumes 0x9000000-0x9000fff is a PL011 UART as is the case on the Virt platform.
-It will print an 'o', try to access 0x9000fe0, which contains the first byte
-of the AMBA Product ID and then print a 'k' using the same PL011.
-
-To build:
-
-  aarch64-linux-gnu-as reproducer.S -o reproducer.o
-  aarch64-linux-gnu-objcopy -O binary reproducer.o reproducer.bin
-
-To run (whether -bios or -kernel doesn't seem to matter):
-
-  taskset -a --cpu-list 2-5 qemu-system-aarch64 -bios reproducer.bin -machine virt,secure=off \
-  -cpu max -m 1024M -nographic -serial mon:stdio -trace file=/dev/null
-
-When run _without_ kvm, this will output:
-
-  ok
-
-When run with -enable-kvm, this will trigger a data abort in amba_device_read_pid:
-
-  o
-
-The data abort can also be avoided by removing the post index-increment:
-
-  -ldr     w1, [x0], #4
-  +ldr     w1, [x0]
-
-This doesn't introduce a functional difference, because x0 isn't used again anyway,
-but it makes the code work under KVM.
-
-I am using debian-arm64 Bookworm on an Amlogic A311D (4x CA72, 2x CA53) with:
-
-  QEMU emulator version 9.1.50 (v9.1.0-704-g423be09ab9)
-  Linux 6.11-arm64 #1 SMP Debian 6.11-1~exp1 (2024-09-19) aarch64 GNU/Linux
-
-This issue was first noticed by openembedded-core CI while testing this patch series
-adding support for testing the barebox and U-Boot bootloaders:
-
-https://lore.kernel.org/all/ee536d88a5b6468b20e37f3daabe4aa63047d1ad.camel@pengutronix.de/
-
-AFAICS, the U-Boot breakage has the same root cause as barebox', except that it's
-a str instruction that has the post-increment and the PCI MMIO region is what's
-being accessed.
-
-I haven't been successful in getting QEMU/GDB to trap on data aborts, so here's an
-excerpt from my original barebox stack trace instead that sent me down the rabbit
-hole:
-
-  DABT (current EL) exception (ESR 0x96000010) at 0x0000000009030fe0
-  elr: 000000007fb2221c lr : 000000007fb22250
-  [...]
-  
-  Call trace:
-  [<7fb2221c>] (amba_device_get_pid.constprop.0.isra.0+0x10/0x34) from [<7fb01e3c>] (start_barebox+0x88/0xb4)
-  [...]
-
-This looks pretty much like a bug to me, but then I would have expected more
-software to be affected by this.. Maybe it's memory mapping related?
-I only tested with either MMU disabled or MMIO region mapped strongly-ordered.
-
-Please let me know if there's further information I can provide.
-
-Thanks,
-Ahmad
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
-
+Uros.
 
