@@ -1,138 +1,194 @@
-Return-Path: <kvm+bounces-27913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-27914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2C55990487
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 15:35:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5B0499055E
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 16:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79B85B20B42
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 13:35:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C43E1F22BBD
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2024 14:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B333A2101A8;
-	Fri,  4 Oct 2024 13:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A944A215F6B;
+	Fri,  4 Oct 2024 14:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nQZyQRxZ"
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="dJaxc4Dm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F7420FA9D
-	for <kvm@vger.kernel.org>; Fri,  4 Oct 2024 13:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802562141DC;
+	Fri,  4 Oct 2024 14:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728048932; cv=none; b=cPTiMutbkDxyRf4Hn2ECUhJXvpxqR8I9q+ObBRjNCq9Wn8f+ZXSSK6YZ95Au6qVPq2V2Ey3DbW8Dpuk5nWAB2YmjBsfbA2EzYWQzt3wamtXeZ49+b+wIpVhew3mN/e3btPHkyKQQuxi2Bdl6HfmDfOH9lZuUQ7zpwhdTtAmad9Q=
+	t=1728050904; cv=none; b=uJUzllNFjEiu4drhf20enhh1VoXN8w5AnyJzQFMQsoWhPW7KL7l6VDhA8L13a+Zu06L2xBrExgnVQyuHohaA27moMz57WBQGc2zkf7H7mDz8KMAFOw8xj2WPEQ6x2CpMogG+j3hPXBDb9eq/XYTvhQTSDtzYKRz9f4TV4oCpxjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728048932; c=relaxed/simple;
-	bh=ZkmyxQ3QOTQso2mGTJ7hRHIUqp7vFnEruN8aoDO2Jok=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NHnLTLXlW5x4mL8LomwcC8zdNhXcGRvifYlsYObpx0fmiD65IRttI+qwXJb5WbUBx84l2tezHPZyLEPiexAdbfBXkhU64jcCHkMi29uhI5nQnfWjeYe1eclY+sBFzzKnVazjEFvBSgjumWbR2EGzgCn5NaA8XSpvFWWZ4V7PXuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nQZyQRxZ; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e262e764f46so3472103276.1
-        for <kvm@vger.kernel.org>; Fri, 04 Oct 2024 06:35:31 -0700 (PDT)
+	s=arc-20240116; t=1728050904; c=relaxed/simple;
+	bh=dEFXc+lJNzaKiiAH+N4aUTtNjda1w1YYpte7n0oZRSU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GrFpvL5AfJao4oPzDyK1VHoHJoGrkylDirdNkJOJjxVqeSf7GN8T9GP7tQ7TsiRZYkpPt6XYFmjiXgdsfQlQCIJcSjnxasGV/6mCq5yJ4YMqSBqQtC3EtEt16fnRSiyoHVhx8qBPoZ78ngBGNv/ouVYCSqoXfWYBZcBKFsZ2yEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=dJaxc4Dm; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728048930; x=1728653730; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iRKRcRUT8iLe/fkq4dl/vkLTjdTfTheBiakbS3Xtaxg=;
-        b=nQZyQRxZ3Gwr5xPE4/CkHe/lVN1U9IMNaO1D7fMmUM6rqVi4ryEwcqaScLovw+SK78
-         SV6njv7uAT/XO1sRhVO5FBsDKi6ewQyBgyXAvvux94UQnGpcBX3aEI64jFlqGtHzZM7F
-         aVsL2IMViUnztx4Y3uobrARcx+dZc4c7zeSevTJSXvbZkxWXcJjjNgmKt0lqJku+0Haf
-         H8iBbV1U5t1auqvuB0rAj1RXDt9ZXxO0XEWsLB+czn2LY3ZdhMidkej30HAuu11k2BnA
-         +JWgKM/PtDm37AQqPwA9mTHuXZ5sAcLbb+nyfpoAIKOmXl9z9xJw/uFTSFeZZcFNzkTD
-         VZ1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728048930; x=1728653730;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iRKRcRUT8iLe/fkq4dl/vkLTjdTfTheBiakbS3Xtaxg=;
-        b=ltBYctQz57yUHb6/Totn7WQ5fjCd3KQ0r/wR83DIJ114cuKzBzKN0h93JclEvBAbkL
-         ygvKjaFNyzpfkVsgjTT/wlQdvFg9IkWH0M4Aqu17TWZuPzYXoe+vb8AAJmXfxGjT5BGa
-         dkHs3Trik+hTCXy56JCirf+v8evvCx6a/qo2aR7yaM0Dd6K/55i9xNZ6x/DOHOtT5tei
-         E/Qwl5aC3xWOCFiyLygmybpwNB6suGkqgHDHz3QcaVMUjMnuOrfC1E4vnxI6E37HJ70Q
-         hPZtwnfgUpX9AoL7HJBhRrRd7IfCVapLUgaqTtLFv7y1ujO7YJP7X4FZbNMqAGOMSkXs
-         bRIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6CsV74BEcQi9FHHf8cANT87PHs8lKen39TeTrKv2L3s8va6eTBqR3j/izmeAzh/h5V2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqbzAI8dzkIHADtwjEifCbjhwjNLt5IWzolDIlqrAvdrHhrAa2
-	zS4ubNNfpA3LEUT0WH9b69pGWNHD1JN03ixBARlPpBWvVFnUAjk8TJ2gluFlXkFNeNO8KqNdIT2
-	Xgw==
-X-Google-Smtp-Source: AGHT+IGrQhmBThdQjeJmJqP3+NLqTBL86x6LnHPI+mDohnEHno+IVTKZ8ehf4O7OsYSKHm7wAkLZux85E7s=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d804:0:b0:e28:8f00:896a with SMTP id
- 3f1490d57ef6-e289393a895mr1609276.8.1728048930376; Fri, 04 Oct 2024 06:35:30
- -0700 (PDT)
-Date: Fri, 4 Oct 2024 06:35:29 -0700
-In-Reply-To: <87v7y8i6m3.fsf@redhat.com>
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1728050903; x=1759586903;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uPg7F0nSFvjnhLWmD+reVh0IDZxY4LYEuXfZgFaWKT4=;
+  b=dJaxc4DmNVVjMBMLYjT0cfhGlInhamQqi7IzfgtKSmbkfcppFGqUzXtB
+   vFbsMwk+REgvAQf972IMpQPAGUlOulf7t3IWmYaP0Pr84s3jUhaCR+39/
+   0DkTWW/Hs1OqlOTpNTejKRC4ov6A2EoLW+xEdM1WRhSsJ05Gt5nD8kmcq
+   w=;
+X-IronPort-AV: E=Sophos;i="6.11,177,1725321600"; 
+   d="scan'208";a="428887629"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 14:08:19 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:4822]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.100:2525] with esmtp (Farcaster)
+ id 22c93a9c-ae03-4c8d-b0d2-293a9c1b4d54; Fri, 4 Oct 2024 14:08:17 +0000 (UTC)
+X-Farcaster-Flow-ID: 22c93a9c-ae03-4c8d-b0d2-293a9c1b4d54
+Received: from EX19D020UWA001.ant.amazon.com (10.13.138.249) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 4 Oct 2024 14:08:14 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (10.250.64.202) by
+ EX19D020UWA001.ant.amazon.com (10.13.138.249) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 4 Oct 2024 14:08:14 +0000
+Received: from email-imr-corp-prod-pdx-all-2c-475d797d.us-west-2.amazon.com
+ (10.25.36.210) by mail-relay.amazon.com (10.250.64.203) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.34 via Frontend Transport; Fri, 4 Oct 2024 14:08:14 +0000
+Received: from dev-dsk-nikwip-1b-bc9ec026.eu-west-1.amazon.com (dev-dsk-nikwip-1b-bc9ec026.eu-west-1.amazon.com [10.253.74.52])
+	by email-imr-corp-prod-pdx-all-2c-475d797d.us-west-2.amazon.com (Postfix) with ESMTPS id 6F1C3A03AD;
+	Fri,  4 Oct 2024 14:08:11 +0000 (UTC)
+From: Nikolas Wipper <nikwip@amazon.de>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+CC: Nicolas Saenz Julienne <nsaenz@amazon.com>, Alexander Graf
+	<graf@amazon.de>, James Gowans <jgowans@amazon.com>,
+	<nh-open-source@amazon.com>, Sean Christopherson <seanjc@google.com>, "Paolo
+ Bonzini" <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, "Ingo
+ Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, Nikolas Wipper <nik.wipper@gmx.de>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <x86@kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kselftest@vger.kernel.org>, "Nikolas
+ Wipper" <nikwip@amazon.de>
+Subject: [PATCH 0/7] KVM: x86: Introduce new ioctl KVM_HYPERV_SET_TLB_FLUSH_INHIBIT
+Date: Fri, 4 Oct 2024 14:08:03 +0000
+Message-ID: <20241004140810.34231-1-nikwip@amazon.de>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241003234337.273364-1-seanjc@google.com> <20241003234337.273364-6-seanjc@google.com>
- <87v7y8i6m3.fsf@redhat.com>
-Message-ID: <Zv_uvVT9RmiN84y_@google.com>
-Subject: Re: [PATCH 05/11] KVM: selftests: Configure XCR0 to max supported
- value by default
-From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 04, 2024, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > To play nice with compilers generating AVX instructions, set CR4.OSXSAVE
-> > and configure XCR0 by default when creating selftests vCPUs.  Some distros
-> > have switched gcc to '-march=x86-64-v3' by default, and while it's hard to
-> > find a CPU which doesn't support AVX today, many KVM selftests fail with
-> >
-> >   ==== Test Assertion Failure ====
-> >     lib/x86_64/processor.c:570: Unhandled exception in guest
-> >     pid=72747 tid=72747 errno=4 - Interrupted system call
-> >     Unhandled exception '0x6' at guest RIP '0x4104f7'
-> >
-> > due to selftests not enabling AVX by default for the guest.  The failure
-> > is easy to reproduce elsewhere with:
-> >
-> >    $ make clean && CFLAGS='-march=x86-64-v3' make -j && ./x86_64/kvm_pv_test
-> >
-> > E.g. gcc-13 with -march=x86-64-v3 compiles this chunk from selftests'
-> > kvm_fixup_exception():
-> >
-> >         regs->rip = regs->r11;
-> >         regs->r9 = regs->vector;
-> >         regs->r10 = regs->error_code;
-> >
-> > into this monstronsity (which is clever, but oof):
-> >
-> >   405313:       c4 e1 f9 6e c8          vmovq  %rax,%xmm1
-> >   405318:       48 89 68 08             mov    %rbp,0x8(%rax)
-> >   40531c:       48 89 e8                mov    %rbp,%rax
-> >   40531f:       c4 c3 f1 22 c4 01       vpinsrq $0x1,%r12,%xmm1,%xmm0
-> >   405325:       49 89 6d 38             mov    %rbp,0x38(%r13)
-> >   405329:       c5 fa 7f 45 00          vmovdqu %xmm0,0x0(%rbp)
-> >
-> > Alternatively, KVM selftests could explicitly restrict the compiler to
-> > -march=x86-64-v2, but odds are very good that punting on AVX enabling will
-> > simply result in tests that "need" AVX doing their own thing, e.g. there
-> > are already three or so additional cleanups that can be done on top.
-> 
-> Ideally, we may still want to precisely pin the set of instructions
-> which are used to generete guest code in selftests as the environment
-> where this code runs is defined by us and it may not match the host. I
-> can easily imaging future CPU features leading to similar issues in case
-> they require explicit enablement.
+This series introduces a new ioctl KVM_HYPERV_SET_TLB_FLUSH_INHIBIT. It
+allows hypervisors to inhibit remote TLB flushing of a vCPU coming from
+Hyper-V hyper-calls (namely HvFlushVirtualAddressSpace(Ex) and
+HvFlushirtualAddressList(Ex)). It is required to implement the
+HvTranslateVirtualAddress hyper-call as part of the ongoing effort to
+emulate VSM within KVM and QEMU. The hyper-call requires several new KVM
+APIs, one of which is KVM_HYPERV_SET_TLB_FLUSH_INHIBIT.
 
-Maybe.  I suspect the cross-section of features that require explicit enablement
-*and* will be generated by the compiler for "regular" code will be limited to AVX
-and the like.  E.g. the only new in -v4 is AVX512.
+Once the inhibit flag is set, any processor attempting to flush the TLB on
+the marked vCPU, with a HyperV hyper-call, will be suspended until the
+flag is cleared again. During the suspension the vCPU will not run at all,
+neither receiving events nor running other code. It will wake up from
+suspension once the vCPU it is waiting on clears the inhibit flag. This
+behaviour is specified in Microsoft's "Hypervisor Top Level Functional
+Specification" (TLFS).
 
-> To achive this, we can probably separate guest code from each test into its
-> own compilation unit.
+The vCPU will block execution during the suspension, making it transparent
+to the hypervisor. An alternative design to what is proposed here would be
+to exit from the Hyper-V hypercall upon finding an inhibited vCPU. We
+decided against it, to allow for a simpler and more performant
+implementation. Exiting to user space would create an additional
+synchronisation burden and make the resulting code more complex.
+Additionally, since the suspension is specific to HyperV events, it
+wouldn't provide any functional benefits.
 
-Hopefully we don't need to worry about that for years and years :-)
+The TLFS specifies that the instruction pointer is not moved during the
+suspension, so upon unsuspending the hyper-calls is re-executed. This
+means that, if the vCPU encounters another inhibited TLB and is
+resuspended, any pending events and interrupts are still executed. This is
+identical to the vCPU receiving such events right before the hyper-call.
+
+This inhibiting of TLB flushes is necessary, to securely implement
+intercepts. These allow a higher "Virtual Trust Level" (VTL) to react to
+a lower VTL accessing restricted memory. In such an intercept the VTL may
+want to emulate a memory access in software, however, if another processor
+flushes the TLB during that operation, incorrect behaviour can result.
+
+The patch series includes basic testing of the ioctl and suspension state.
+All previously passing KVM selftests and KVM unit tests still pass.
+
+Series overview:
+- 1: Document the new ioctl
+- 2: Implement the suspension state
+- 3: Update TLB flush hyper-call in preparation
+- 4-5: Implement the ioctl
+- 6: Add traces
+- 7: Implement testing
+
+As the suspension state is transparent to the hypervisor, testing is
+complicated. The current version makes use of a set time intervall to give
+the vCPU time to enter the hyper-call and get suspended. Ideas for
+improvement on this are very welcome.
+
+This series, alongside my series [1] implementing KVM_TRANSLATE2, the
+series by Nicolas Saenz Julienne [2] implementing the core building blocks
+for VSM and the accompanying QEMU implementation [3], is capable of
+booting Windows Server 2019 with VSM/CredentialGuard enabled.
+
+All three series are also available on GitHub [4].
+
+[1] https://lore.kernel.org/linux-kernel/20240910152207.38974-1-nikwip@amazon.de/
+[2] https://lore.kernel.org/linux-hyperv/20240609154945.55332-1-nsaenz@amazon.com/
+[3] https://github.com/vianpl/qemu/tree/vsm/next
+[4] https://github.com/vianpl/linux/tree/vsm/next
+
+Best,
+Nikolas
+
+Nikolas Wipper (7):
+  KVM: Add API documentation for KVM_HYPERV_SET_TLB_FLUSH_INHIBIT
+  KVM: x86: Implement Hyper-V's vCPU suspended state
+  KVM: x86: Check vCPUs before enqueuing TLB flushes in
+    kvm_hv_flush_tlb()
+  KVM: Introduce KVM_HYPERV_SET_TLB_FLUSH_INHIBIT
+  KVM: x86: Implement KVM_HYPERV_SET_TLB_FLUSH_INHIBIT
+  KVM: x86: Add trace events to track Hyper-V suspensions
+  KVM: selftests: Add tests for KVM_HYPERV_SET_TLB_FLUSH_INHIBIT
+
+ Documentation/virt/kvm/api.rst                |  41 +++
+ arch/x86/include/asm/kvm_host.h               |   5 +
+ arch/x86/kvm/hyperv.c                         |  86 +++++-
+ arch/x86/kvm/hyperv.h                         |  17 ++
+ arch/x86/kvm/trace.h                          |  39 +++
+ arch/x86/kvm/x86.c                            |  41 ++-
+ include/uapi/linux/kvm.h                      |  15 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/x86_64/hyperv_tlb_flush_inhibit.c     | 274 ++++++++++++++++++
+ 9 files changed, 503 insertions(+), 16 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush_inhibit.c
+
+-- 
+2.40.1
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
+
 
