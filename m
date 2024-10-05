@@ -1,136 +1,177 @@
-Return-Path: <kvm+bounces-28015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28016-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36EDD991557
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 10:32:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11B05991603
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 12:32:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F02482841BC
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 08:32:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C882F283EC8
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 10:32:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B692514375D;
-	Sat,  5 Oct 2024 08:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502E4149C4D;
+	Sat,  5 Oct 2024 10:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OQu1KS/F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NaA1b/iz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58932231C8F;
-	Sat,  5 Oct 2024 08:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE9313CABC;
+	Sat,  5 Oct 2024 10:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728117110; cv=none; b=AHUKk98nqHkDqcniESqKC000HHEppf3SXLdE34Lhyt/LZU38h2UHaBQ4paoHZRt8Cbxet5zH7MRwQ+/6WhKvlX87LAco5/0uDfA8R0/JF1yIMJiuJD7/t3TeLjKUHJ49/r0Q42xmJvrp9qPYhrOvvAwdfSaDskCwjpBkcjQY+P8=
+	t=1728124309; cv=none; b=fnAZ2dILRZccsaNNeQaZld4SLZTcEbwbzGnffAKbFUCMQp/Psiwhz5yB+vpgQAuXxD+L/ySQyQSHvcJyIsoX67ls2xuCfHhTmchY3aoRvOm23p2ChhNZXQEVbeehWB6KnqukmNNQQDvzGEmXBCIQ6DGBq9b/608t6GemQ3Pkly0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728117110; c=relaxed/simple;
-	bh=70cU5jNP52zmkSWZHO+lBdHOcE1V/JTH2eNm2kkh0zg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PzZ4FuRn+JzFUNpYK4eeftCryJu7St05ef86z20wxvzoTydIzblrRlWu7UBIg/MBZ4/r1RCanAsOsQc4hqP0GWn+ZbUDIJ8XqsFysviuYPFNmI55Ve9Ui4f/LwkwTFaOJslTCTOKur8wg2ukeGfdEBgmC64kZ1buMOUmFjAgIdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OQu1KS/F; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fac63abf63so29110871fa.1;
-        Sat, 05 Oct 2024 01:31:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728117106; x=1728721906; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=70cU5jNP52zmkSWZHO+lBdHOcE1V/JTH2eNm2kkh0zg=;
-        b=OQu1KS/FWp+vzB8M90wWzv2DwL28c54821ES4HbZa+/kKuP7aC4tPzCuACELJth2qQ
-         pc9TZ2ISdUc6Q3VGwRml0HF61sHqy00yXzh/B7M2IYtDQuGOx1FTY9tXqGMCjG+Uh1YI
-         CH3l6iMAReMliUXAh/KUG1C9XYkm5rF9WqkNCAPtjOQVYHZNAGUauycZEaAo4d/sUvs9
-         8Ja3w2AraLXHPkaWD0taM65FMiEx++s1FLs/fIjQAloxQA4Xc/uWuxjbem80Duk1xzYe
-         jg4nn9ac/6E4uKdgBLnCooPggnnO0dcKcg03qHT9C/RWGNVAI7CsSpDC6hVc+Emg3af5
-         ZAkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728117106; x=1728721906;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=70cU5jNP52zmkSWZHO+lBdHOcE1V/JTH2eNm2kkh0zg=;
-        b=BU8HxWJkL0J0MvXjRkBZlUS+kEYYoccrQm/bQBdvqHzhlYDa0a6bJjifAVO1zSrMB0
-         0tP2oTQp2sr0GN9oCneHl2sQOx+0hANGRBQWMOvZk9ZIQHsUjeIFsInPLFFvAWZzTMBc
-         VYPKcH71a7DlwQeN2hJ5QM/r9SClkvXEN0tBGBotKXEQ1701RVKxfekgea2rBRuny09F
-         z92N0WGYw56iYGtYmPmWcYNbLmpI3IAMWwPqioZ+CsOdNV2NeIdVKswvcFiu7ldu3C6J
-         CN41cP9yNOhnGMiMeGoLYPJQ+Ew4LIvaTXTCyAV8cidBszwsE3Wo1m2w1FmCSVhyAz0E
-         D7VQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUPitWEeOD/aD62yn7DZZSU7JaVuaUVQq63I5CtmFD+j1DMntN2JyOFJ5aRDQN2PpB31dHqzLqeRozpf1bN@vger.kernel.org, AJvYcCUUu5XYKZkbzD5ywYHVCuo/Oew/4JpdnctTarrOSg34Op3ZjuHbg04SmfqDfGoSTXFh1p09IU3GLx4HRCC3PCnNaw==@vger.kernel.org, AJvYcCUgZvCOfGNX4TJSytk7wDmxGhD+1RQxiPpvhElemmASV3+V1qIVuinUiQjMHnZAavfVd8G5r1NLSbRX@vger.kernel.org, AJvYcCV5wmWz2VgZgJEQcX3F+wkZMCnZF+RHkLhJgNuAOgIGb5mbzChbkA9hyJvvI+8uubsEYlmFYMx5GC+nyNJq@vger.kernel.org, AJvYcCVD6Sla1wkCBvjYeoYBeokskNlnZai5vX4pjC8PLoFq+8JVkKxUhtPhkBdOiAauXSYQ9fxTqCEz7Gds@vger.kernel.org, AJvYcCVVksKusLXvQcncn6esUy7zSDSKvfSj4K6GQcSEkitc+S20k+5xLeyxtgMvzku/+zQVqLHwmAOWpqo=@vger.kernel.org, AJvYcCW3iH3oRT9iEo7Ws8ml7G4upB5KNWRBt0lXaRAmtbM4vq4z/bSGdvjh+/xJijE+qTU1LRs=@vger.kernel.org, AJvYcCW7AaJe08TpCmIEfn4tXdnQQYzQcDSiKnZ6lZaG/LJuQCLREvQEnMf12WWLT1TGZ6qUCx1pDwNO8NueKO5yopk=@vger.kernel.org, AJvYcCWWelSF+HpJ8dD8RyCnk7ab1i9zhoCd5FuYnEKeZnQFdZkrZFIgBfN+XmSVRY72IXbJCPnxqB9ndzfSng==@vger.kernel.org, AJvYcCXssYm+wkam8a1z6IjlfmkP
- d85FzcygzwPgGkLqzEOE0CU1XAd/Knko2Fdzd/aGj2WDSSGFqGyR9T4g3BB0@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEN7mgZAeB2itvJi8KUsdLt48HLvHeVuRj1Vy3oZYcJlb8QqXO
-	J53RBjYQ1FbS5u9EWG26BNQ81bxsl1FjR4yrVfTRzIxm3gjWS/TzE76MOzV85kl+nDZrJtiW6i7
-	ysifs0ldfc9CJwDHmo6KecaiQ5II=
-X-Google-Smtp-Source: AGHT+IGi0j/icjLt8RhHlOdJvbjdouTPFKKMu/CT/oe6l0e9sNaP3mHWfqnG22Q9j4GVb6Cdm+e2KfCpXo/Kl8KNmek=
-X-Received: by 2002:a05:651c:1547:b0:2fa:d978:a6c4 with SMTP id
- 38308e7fff4ca-2faf3d73888mr22769461fa.30.1728117106123; Sat, 05 Oct 2024
- 01:31:46 -0700 (PDT)
+	s=arc-20240116; t=1728124309; c=relaxed/simple;
+	bh=dRfL9j9fox9VAJqc0lt4h4UbPL3AelM/FiWAIcNnBLk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L0fbRCL84dCv07y0gUB1kHubwzLJ3pechk5VLFCtG/nM7va1QGwVrN/jYBF2am0/5hunnMvZC2hZxr3T9LAnXhttQyQA7QHVqgUuHwz8JkXY0anPmYry79tbsgHnJAmpG51GfdRzXE1Tjj0rseo5iJ5NQYjZb8ah/jeO0Utz3yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NaA1b/iz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2FAEC4CEC2;
+	Sat,  5 Oct 2024 10:31:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728124308;
+	bh=dRfL9j9fox9VAJqc0lt4h4UbPL3AelM/FiWAIcNnBLk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NaA1b/izRRpGy/Uf2jvZ6tDEg8GmC5EAzwKkwpPGT531aHilzWSVikSp/xeg3vJXF
+	 AZ1MKt49KnY28ZaOyxgw1RGpt1RAgVn0Ee5euMoiu7BzSghRMkAT/LDmHjIq4SEfMk
+	 YJQEOhI/KpjzA0tziqpWGorvzg2U87cFgi9K+BEdJy8a8/Fxqn9xQOM65K+Ikl7EkU
+	 SarcI7gNmfRfw4gyniazOgpihH4zU1+snZ0RKQc+UXxqyaqNSwJMWePibMVGO0XgsZ
+	 cYyQNqt6neknw0DZRQU3N/0GuqhqLlDCLjahFfPViCE7AZUJIUjAMwZeKWtxl+tysE
+	 iO4u/m4eQI9kA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sx24g-000YxZ-Jq;
+	Sat, 05 Oct 2024 11:31:46 +0100
+Date: Sat, 05 Oct 2024 11:31:45 +0100
+Message-ID: <864j5q7sdq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-arm@nongnu.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	"linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+	Enrico Joerns <ejo@pengutronix.de>
+Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
+In-Reply-To: <4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
+References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
+	<CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
+	<a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
+	<CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
+	<4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240925150059.3955569-30-ardb+git@google.com>
- <20240925150059.3955569-55-ardb+git@google.com> <99446363-152f-43a8-8b74-26f0d883a364@zytor.com>
- <CAMj1kXG7ZELM8D7Ft3H+dD5BHqENjY9eQ9kzsq2FzTgP5+2W3A@mail.gmail.com>
- <CAHk-=wj0HG2M1JgoN-zdCwFSW=N7j5iMB0RR90aftTS3oqwKTg@mail.gmail.com>
- <CAMj1kXEU5RU0i11zqD0433_LMMyNQH2gCoSkU7GeXmaRXGF1Yw@mail.gmail.com> <5c7490bb-aa74-427b-849e-c28c343b7409@zytor.com>
-In-Reply-To: <5c7490bb-aa74-427b-849e-c28c343b7409@zytor.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Sat, 5 Oct 2024 10:31:37 +0200
-Message-ID: <CAFULd4Yj9LfTnWFu=c1M7Eh44+XFk0ibwL57r5H7wZjvKZ8yaA@mail.gmail.com>
-Subject: Re: [RFC PATCH 25/28] x86: Use PIE codegen for the core kernel
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Dennis Zhou <dennis@kernel.org>, 
-	Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Juergen Gross <jgross@suse.com>, 
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
-	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
-	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: a.fatoum@pengutronix.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, ejo@pengutronix.de
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Oct 4, 2024 at 11:06=E2=80=AFPM H. Peter Anvin <hpa@zytor.com> wrot=
-e:
->
-> On 10/3/24 04:13, Ard Biesheuvel wrote:
-> >
-> >> That said, doing changes like changing "mov $sym" to "lea sym(%rip)" I
-> >> feel are a complete no-brainer and should be done regardless of any
-> >> other code generation issues.
-> >
-> > Yes, this is the primary reason I ended up looking into this in the
-> > first place. Earlier this year, we ended up having to introduce
-> > RIP_REL_REF() to emit those RIP-relative references explicitly, in
-> > order to prevent the C code that is called via the early 1:1 mapping
-> > from exploding. The amount of C code called in that manner has been
-> > growing steadily over time with the introduction of 5-level paging and
-> > SEV-SNP and TDX support, which need to play all kinds of tricks before
-> > the normal kernel mappings are created.
-> >
->
-> movq $sym to leaq sym(%rip) which you said ought to be smaller (and in
-> reality appears to be the same size, 7 bytes) seems like a no-brainer
-> and can be treated as a code quality issue -- in other words, file bug
-> reports against gcc and clang.
+On Fri, 04 Oct 2024 20:50:18 +0100,
+Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> 
+> Hi,
+> 
+> On 04.10.24 14:10, Peter Maydell wrote:
+> > On Fri, 4 Oct 2024 at 12:51, Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> >> On 04.10.24 12:40, Peter Maydell wrote:
+> >>> Don't do this -- KVM doesn't support it. For access to MMIO,
+> >>> stick to instructions which will set the ISV bit in ESR_EL1.
+> >>>
+> >>> That is:
+> >>>
+> >>>  * AArch64 loads and stores of a single general-purpose register
+> >>>    (including the register specified with 0b11111, including those
+> >>>    with Acquire/Release semantics, but excluding Load Exclusive
+> >>>    or Store Exclusive and excluding those with writeback).
+> >>>  * AArch32 instructions where the instruction:
+> >>>     - Is an LDR, LDA, LDRT, LDRSH, LDRSHT, LDRH, LDAH, LDRHT,
+> >>>       LDRSB, LDRSBT, LDRB, LDAB, LDRBT, STR, STL, STRT, STRH,
+> >>>       STLH, STRHT, STRB, STLB, or STRBT instruction.
+> >>>     - Is not performing register writeback.
+> >>>     - Is not using R15 as a source or destination register.
+> >>>
+> >>> Your instruction is doing writeback. Do the address update
+> >>> as a separate instruction.
+> 
+> With readl/writel implemented in assembly, I get beyond that point, but
+> now I get a data abort running an DC IVAC instruction on address 0x1000,
+> where the cfi-flash is located. This instruction is part of a routine
+> to remap the cfi-flash to start a page later, so the zero page can be
+> mapped faulting.
+> 
+> Simple reproducer:
+> 
+> start:
+>         ldr     x0, =0x1000
+>         ldr     x1, =0x1040
+>         bl      v8_inv_dcache_range
+> 
+>         mov     w10, '!'
+>         bl      putch
+> 
+>         ret
+> 
+> v8_inv_dcache_range:
+>         mrs     x3, ctr_el0
+>         lsr     x3, x3, #16
+>         and     x3, x3, #0xf
+>         mov     x2, #0x4
+>         lsl     x2, x2, x3
+>         sub     x3, x2, #0x1
+>         bic     x0, x0, x3
+> 1:
+>         dc      ivac, x0
+>         add     x0, x0, x2
+>         cmp     x0, x1
+>         b.cc    1b
+>         dsb     sy
+>         ret
+> 
+> This prints ! without KVM, but triggers a data abort before that with -enable-kvm:
+> 
+>   DABT (current EL) exception (ESR 0x96000010) at 0x0000000000001000
+>   elr: 000000007fbe0550 lr : 000000007fbe01ac
+>   [snip]
+> 
+>   Call trace:
+>   [<7fbe0550>] (v8_inv_dcache_range+0x1c/0x34) from [<7fbe0218>] (arch_remap_range+0x64/0x70)
+>   [<7fbe0218>] (arch_remap_range+0x64/0x70) from [<7fb8795c>] (of_platform_device_create+0x1e8/0x22c)
+>   [<7fb8795c>] (of_platform_device_create+0x1e8/0x22c) from [<7fb87a04>] (of_platform_bus_create+0x64/0xbc)
+>   [snip]
+> 
+> Any idea what this is about?
 
-It is the kernel assembly source that should be converted to
-rip-relative form, gcc (and probably clang) have nothing with it.
+IIRC, the QEMU flash is implemented as a read-only memslot. A data
+cache invalidation is a *write*, as it can be (and is) upgraded to a
+clean+invalidate by the HW.
 
-Uros.
+KVM cannot satisfy the write, for obvious reasons, and tells the guest
+to bugger off (__gfn_to_pfn_memslot() returns KVM_PFN_ERR_RO_FAULT,
+which satisfies is_error_noslot_pfn() -- a slight oddity, but hey, why
+not).
+
+In the end, you get an exception. We could relax this by
+special-casing CMOs to RO memslots, but this doesn't look great.
+
+The real question is: what are you trying to achieve with this?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
