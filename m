@@ -1,124 +1,120 @@
-Return-Path: <kvm+bounces-28002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28003-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 926E9991365
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 02:08:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D472D991384
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 02:32:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC3521C233D6
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 00:08:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C82C2840A8
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 00:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BE4D2FA;
-	Sat,  5 Oct 2024 00:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27AAC125;
+	Sat,  5 Oct 2024 00:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="QwXm5TQI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ChbyQTVj"
 X-Original-To: kvm@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABC64C9F;
-	Sat,  5 Oct 2024 00:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7903B4A3E;
+	Sat,  5 Oct 2024 00:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728086880; cv=none; b=RFwVyn2+p2RSv3lZ/+NiQ7AKwKMnYoytW9G46KnB9jCdDbNTrSRq1ZemoM+LxP5a/FKr+kyOWHJML9s0MVu4oFDM6jIHQfGs91alfHQwbyS2f/LTGSDcLT2h766z5SmsCP4zuD9Qxb+qErqoMmNX4DkxFrcCD1he//KJ7/8OXP8=
+	t=1728088311; cv=none; b=XxJHCGCAeJfn3/gIPuRBt0LnErML/3b3w/GBtSqNHBH3WxJjHJKoQn/kTnR7Mpx6RRyiMikl7Uw8zkVzMiPUEOMDK9eVnP8AJpNbk6q/kkd86oJHT7PnbTzA2kjpWottewPxbdiMepokStI84iX6H5cflzB39Mw8bG1qB5lVxlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728086880; c=relaxed/simple;
-	bh=+MfI7OYcWAd2dMDXZEx5YG70J88IUHYEYwpDpb4OTfw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jOUs5mkGm58iKzfJ322IAndukiF9r2Dgvg/1GJcvuzRq30r5onNK2jH0Vq7O9MqWTH15ed1IrWlT5UsRq7QWLM0UKp3SmoSm3DRWQLaHKTTzBMLwElmXUhqoBSw8AqVqVral3ujQO0UJ51kATM05QGc6lvmoYAEKdp0uE8mJHik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=QwXm5TQI; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.0.0.114] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 6066F20DB37A;
-	Fri,  4 Oct 2024 17:07:57 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6066F20DB37A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1728086878;
-	bh=LBnzr8OIIg6knuVrAj3ZPsyJbh5bMJgu1ZuS7jAuHyU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QwXm5TQI+PpevcOJwLiQCmf2iHFL2kqrYd0jPp70SOf4xm+OCFOAqJbgR3wBT8CJp
-	 R/gJF6q6xzALLspZdmutH4Q3khZWgia3ohn/0g5Qh3Q/lC0UNfd1K1IdM1Y6f4Suuk
-	 LDBu/TrXOY7jsq6vFSeig5g6GL1r0TQ5r0DbxDSU=
-Message-ID: <3b2e7170-1229-4981-8905-02b16bd2a85d@linux.microsoft.com>
-Date: Fri, 4 Oct 2024 17:07:53 -0700
+	s=arc-20240116; t=1728088311; c=relaxed/simple;
+	bh=fisvYHlAi5uYfnh9DKgiQuCX0NawSYHqjeYtsvrspLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XaPJGHstYM5LSyDvM3NJUBdcS001kuhT9Jb3s2/BoRfBNQoznSLr3cKJw8aD/vV69uTTslL7U5Zpq6VDVyqPt82JRzrF9mgD5H+Wl/+O7P7qiVlNQPjDOo0dHS05e7lAimiCUEvWFKYf7Pbsr84uqYEnUJ9DG1trKfg1uKkEwLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ChbyQTVj; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728088309; x=1759624309;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=fisvYHlAi5uYfnh9DKgiQuCX0NawSYHqjeYtsvrspLg=;
+  b=ChbyQTVjetzYvlAhADKGaPw5jKQfX5KILwdPH4BgEAMdVbJcUw1GEkyJ
+   angn/ORabg7v7NuBLDfl4AX0elTCCssaCXrgyUCdbevH++YWmVK1ZjWjB
+   92pkyzWwslwt5BIeR3K3gkRDM0aUfFWv8hlhOis/wGipMVayAJekCg79s
+   j/+02zcbZZZ/ma79QlZ4OCngCfCgEhAM5JmwalWWcHG/DjjyVcpohK5VS
+   lQBVD2B4L1dAi0pJb+PFfd9XP+6VPAEj2wUDTOPasI2J2cPGvGqkNnynI
+   WJ9ja2w7VtB+dJ3g5vCMzZjzNeU5ImsiCHC4h4ub8/WbCC7qeVwCkRTeJ
+   Q==;
+X-CSE-ConnectionGUID: rWPu/aubSvSR49g/rHKwRw==
+X-CSE-MsgGUID: RlBX/SWfRv2EPEIO1Ir2lA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11215"; a="49851941"
+X-IronPort-AV: E=Sophos;i="6.11,178,1725346800"; 
+   d="scan'208";a="49851941"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 17:31:49 -0700
+X-CSE-ConnectionGUID: 5Y3LDSg9R2+kKS3QBRFAMA==
+X-CSE-MsgGUID: 441BmZfhR26UoJ5rU1Or5w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,178,1725346800"; 
+   d="scan'208";a="75296114"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 04 Oct 2024 17:31:48 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1swsi0-0002NT-2t;
+	Sat, 05 Oct 2024 00:31:44 +0000
+Date: Sat, 5 Oct 2024 08:30:45 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: Paul Gazzillo <paul@pgazz.com>,
+	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+	oe-kbuild-all@lists.linux.dev, seanjc@google.com,
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH 1/2] KVM: x86: leave kvm.ko out of the build if no vendor
+ module is requested
+Message-ID: <202410050850.Ztr6bJEq-lkp@intel.com>
+References: <20241003230806.229001-2-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in
- Hyper-V code
-To: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, iommu@lists.linux.dev,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
- kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, catalin.marinas@arm.com, will@kernel.org,
- luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
- daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com, robh@kernel.org,
- bhelgaas@google.com, arnd@arndb.de, sgarzare@redhat.com,
- jinankjain@linux.microsoft.com, muminulrussell@gmail.com,
- mukeshrathor@microsoft.com
-References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
- <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
- <20241004155810.GA15304@skinsburskii.>
-Content-Language: en-US
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-In-Reply-To: <20241004155810.GA15304@skinsburskii.>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241003230806.229001-2-pbonzini@redhat.com>
 
-On 10/4/2024 8:58 AM, Stanislav Kinsburskii wrote:
-> Hi Nuno,
-> 
-> On Thu, Oct 03, 2024 at 12:51:04PM -0700, Nuno Das Neves wrote:
->> diff --git a/arch/arm64/hyperv/hv_core.c b/arch/arm64/hyperv/hv_core.c
->> index 9d1969b875e9..bb7f28f74bf4 100644
->> --- a/arch/arm64/hyperv/hv_core.c
->> +++ b/arch/arm64/hyperv/hv_core.c
->> @@ -14,6 +14,7 @@
->>  #include <linux/arm-smccc.h>
->>  #include <linux/module.h>
->>  #include <asm-generic/bug.h>
->> +#define HYPERV_NONTLFS_HEADERS
->>  #include <asm/mshyperv.h>
->>  
-> 
-> Perhaps it would be cleaner to introduce a new header file to be
-> included, containing the new define and including <asm/mshyperv.h> instead.
-> 
-> Stas
+Hi Paolo,
 
-If I understand correctly, you're suggesting adding another stub named e.g.
-"hv_mshyperv.h", containing:
+kernel test robot noticed the following build warnings:
 
-#define HYPERV_NONTLFS_HEADERS
-#include<asm/mshyperv.h>
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on linus/master v6.12-rc1 next-20241004]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Then in the roughly 24 places in this patch where we have:
+url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Bonzini/KVM-x86-leave-kvm-ko-out-of-the-build-if-no-vendor-module-is-requested/20241004-071034
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20241003230806.229001-2-pbonzini%40redhat.com
+patch subject: [PATCH 1/2] KVM: x86: leave kvm.ko out of the build if no vendor module is requested
+config: x86_64-kismet-CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES-CONFIG_KVM_GENERIC_PRIVATE_MEM-0-0 (https://download.01.org/0day-ci/archive/20241005/202410050850.Ztr6bJEq-lkp@intel.com/config)
+reproduce: (https://download.01.org/0day-ci/archive/20241005/202410050850.Ztr6bJEq-lkp@intel.com/reproduce)
 
-+#define HYPERV_NONTLFS_HEADERS
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410050850.Ztr6bJEq-lkp@intel.com/
 
-Instead, we'd have:
+kismet warnings: (new ones prefixed by >>)
+>> kismet: WARNING: unmet direct dependencies detected for KVM_GENERIC_MEMORY_ATTRIBUTES when selected by KVM_GENERIC_PRIVATE_MEM
+   WARNING: unmet direct dependencies detected for KVM_GENERIC_MEMORY_ATTRIBUTES
+     Depends on [n]: KVM_GENERIC_MMU_NOTIFIER [=n]
+     Selected by [y]:
+     - KVM_GENERIC_PRIVATE_MEM [=y]
 
--#include <asm/mshyperv.h>
-+#include <hyperv/hv_mshyperv.h>
-
-I suppose the current version is a bit opaque - it's not immediately clear
-why HYPERV_NONTLFs_HEADERS is defined, and that it must be defined before
-including asm/mshyperv.h - someone reading the code would have to go find
-hv_defs.h to puzzle that out.
-
-This improves the situation slightly by associating the #define with
-asm/mshyperv.h. I'll consider it for v2, thanks!
-
-Nuno
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
