@@ -1,133 +1,111 @@
-Return-Path: <kvm+bounces-28013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A19B8991535
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 10:01:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21314991543
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 10:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D32D21C21E12
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 08:01:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3553B22B32
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 08:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB2E713D62B;
-	Sat,  5 Oct 2024 08:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="jsuN7eKg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D94313C8E8;
+	Sat,  5 Oct 2024 08:25:13 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from isrv.corpit.ru (isrv.corpit.ru [86.62.121.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFEE3BBE5
-	for <kvm@vger.kernel.org>; Sat,  5 Oct 2024 08:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03132F5B
+	for <kvm@vger.kernel.org>; Sat,  5 Oct 2024 08:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=86.62.121.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728115263; cv=none; b=i0kP2nuvUJqI1Rkj4NDG/6a62WyE3WAEIQyMMyRD37EjaU5FietJrVrBV0TZiJGLmr1FwSKsSkYn17WguimpIotaIDHDT714kDN+MPWz6HnJsebsZDqtTX16UC/XTADNnwQgb3Au9jmQZaLlE3qojOK3ilWGb17Tc5cpNFMDYho=
+	t=1728116712; cv=none; b=R/bjiwiSD6aIqr5CHFHxLNWOdGFlkHgrb1R3XS2nh+1aQhfLIQ5qNviHqwd/ADCuOYFu6vBGWRFxQKZ6rcRRji89RklnLU0zYKr/csWynvqLP92D/Lny6HUeDXK1TSAh3YOoCGRb/fGSV2Gi9LiK5y4XYZrJVcXQrp/d67SP5Pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728115263; c=relaxed/simple;
-	bh=ZHKp6susW+DmRi09Ty1jgVH69v0kE/OAgAo9YVToyXs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DfqzLiLm+DrxfwsSiojGKy2oG8geYEfHDdAg5QL0NCCJUY+cDefUWY4nhhoVmBsSSS/BB9WlQYSe88UTxw3RAbnGCP6cBLGNRsRUE65urx+yQpBb6ZFoEBT74LaOl9lHdZ3EjmBMYjXa1K3hLXqxXAu0J7zEWN2YdajtyfQBu5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=jsuN7eKg; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2e1c91fe739so1996817a91.2
-        for <kvm@vger.kernel.org>; Sat, 05 Oct 2024 01:01:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1728115262; x=1728720062; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LnTudTyVELXhybVtVq++J6lTF/E6Jxcldx86tlZwzWc=;
-        b=jsuN7eKgJ7FwY5O1rYyqeGvkCIOMGVhdK8Uf3DBfvHsjVVF9Ld08Qd2iJDW2qUOyN3
-         E0nbv8qO0UUDuACwT1/msRh3YruvTm/Gisuuaq7Vm8e9IcOoXkMM8CwRCYiwS/2fJcBc
-         QRveV7j+fnCf7/Ka4mA6LEvkPdQmYdsfc0C29xNtRjhNsQlAmL1rqDH/rpjptTftPFBo
-         idA+1dXLBgZfS8Xrf3YPWzyeqJnmS4dN+J7KPZnJnMR8vmFWu5WMFgIZxh3JWoJxVB7r
-         YOej+B6WVwT7Kz04yDoB8o9hyfaaVF4v/TrsZSx2bWtLY2t3a2679fn353UZQq7UVIdY
-         ywTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728115262; x=1728720062;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LnTudTyVELXhybVtVq++J6lTF/E6Jxcldx86tlZwzWc=;
-        b=W/AAk115beNuvYeguZh71UlMPr7CdbNWM2ihLOD7xkLHPdB4rlOMJNKYugjyvGE35z
-         FWSnJ5CE1OT1sAnmuYRzKeJZ3hk5ZBGQF2IR6MC0DK3/LFdUQZw1Ff9rfmUNtja/HmoL
-         1Bf5+Rq8f3jojrXmDgdZSN+NrBuOtSkrs5EeHS1/APWYsaVotVkvz4ZBhfwuDFCnUpvK
-         qtZrbUfTw8zuxdwikSVh7rohVCjzb4a69VOD/0PrPTonn5nyi+3Xisu17lB7kHNsFtH6
-         g8cJ84PMgioHdA8uz49wyBHn6WGfzzsfiQEj4LiiZbj/Wj/eYICqmUQKrJpd9FX+A8eX
-         YZ3A==
-X-Forwarded-Encrypted: i=1; AJvYcCX22TKVxWcQ+zQMPdG4T54nvU98LkBEyE6Fwb2yw5lEAWmE/wqKZAtgmoFU++7uoaVfEyA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz02CUGVE7SVGOY8Fs1iAglrapZEN6k9KvYu1bcWnGqaWFddwuD
-	QzzAjx1d0OwbwMM93u+ppi2E2Lh+X9mVBkUn7fteEqf3fJBETOoVnzHW90oNGgE=
-X-Google-Smtp-Source: AGHT+IEnuOzukj3EhhTiLkX34VWObsDOqzoeGnbWToEK7upZYPpjOZtBKbVZDiiQSLbHdYOq3pg6gQ==
-X-Received: by 2002:a17:90a:e7c7:b0:2e0:9b59:c0d0 with SMTP id 98e67ed59e1d1-2e1e63e3315mr4881500a91.41.1728115261841;
-        Sat, 05 Oct 2024 01:01:01 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([223.185.135.6])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e20ae69766sm1259172a91.8.2024.10.05.01.00.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 01:01:01 -0700 (PDT)
-From: Anup Patel <apatel@ventanamicro.com>
-To: Will Deacon <will@kernel.org>,
-	julien.thierry.kdev@gmail.com,
-	maz@kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	Anup Patel <apatel@ventanamicro.com>
-Subject: [kvmtool PATCH v2 8/8] riscv: Add Zimop extension support
-Date: Sat,  5 Oct 2024 13:30:24 +0530
-Message-ID: <20241005080024.11927-9-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241005080024.11927-1-apatel@ventanamicro.com>
-References: <20241005080024.11927-1-apatel@ventanamicro.com>
+	s=arc-20240116; t=1728116712; c=relaxed/simple;
+	bh=aRVdVD7ClZDKmOrXtOauU+rY0yYGbwyKVq/WJWeEwZc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MML2AZObeBmN2uY191KxOqKz1dGkrnQ/5Ui5XRgc6rgCI4YVaze9FEJhOePONafUpVT6OCrN7MiDxtkBaGrz4ZMy8sgMH0TogA4E2+Y7SHtisaw3ePQct6CopOY3Y6ytPV49fnjVK2kc+y41iYIaWub/O833eO4fm7i2qt9RUeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru; spf=pass smtp.mailfrom=tls.msk.ru; arc=none smtp.client-ip=86.62.121.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tls.msk.ru
+Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
+	by isrv.corpit.ru (Postfix) with ESMTP id 3338C957BB;
+	Sat,  5 Oct 2024 11:15:22 +0300 (MSK)
+Received: from [192.168.177.130] (mjt.wg.tls.msk.ru [192.168.177.130])
+	by tsrv.corpit.ru (Postfix) with ESMTP id 4C58514DE17;
+	Sat,  5 Oct 2024 11:15:25 +0300 (MSK)
+Message-ID: <d0ef1ab6-2e22-4884-8e66-0cf6dd9e308e@tls.msk.ru>
+Date: Sat, 5 Oct 2024 11:15:25 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 54/65] q35: Introduce smm_ranges property for
+ q35-pci-host
+To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ Michael Roth <michael.roth@amd.com>, Claudio Fontana <cfontana@suse.de>,
+ Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
+ <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20240229063726.610065-1-xiaoyao.li@intel.com>
+ <20240229063726.610065-55-xiaoyao.li@intel.com>
+Content-Language: en-US, ru-RU
+From: Michael Tokarev <mjt@tls.msk.ru>
+Autocrypt: addr=mjt@tls.msk.ru; keydata=
+ xsBLBETIiwkBCADh3cFB56BQYPjtMZCfK6PSLR8lw8EB20rsrPeJtd91IoNZlnCjSoxd9Th1
+ bLUR8YlpRJ2rjc6O1Bc04VghqUOHgS/tYt8vLjcGWixzdhSLJgPDK3QQZPAvBjMbCt1B6euC
+ WuD87Pv5Udlpnzf4aMwxkgfTusx+ynae/o+T5r7tXD+isccbC3SiGhmAPxFyY3zGcFk4+Rxc
+ 0tP8YY2FWE/baHu+lBDTUN79efWAkHhex1XzVZsV7ZD16rzDbXFK5m6ApvGJWlr5YDEEydTF
+ WwmvwBfr4OINVxzEG/ujNiG4fpMf2NsnFGyB9aSbFjXZevB4qWkduYYW+xpK1EryszHtAAYp
+ zSBNaWNoYWVsIFRva2FyZXYgPG1qdEB0bHMubXNrLnJ1PsLAlgQTAQoAQAIbAwYLCQgHAwIE
+ FQIIAwQWAgMBAh4BAheAAhkBFiEEbuGV0Yhuj/uBDUMkRXzgoIBEZcUFAmBbcjwFCS5e6jMA
+ CgkQRXzgoIBEZcUTIQgA1hPsOF82pXxbcJXBMc4zB9OQu4AlnZvERoGyw7I2222QzaN3RFuj
+ Fia//mapXzpIQNF08l/AA6cx+CKPeGnXwyZfF9fLa4RfifmdNKME8C00XlqnoJDZBGzq8yMy
+ LAKDxl9OQWFcDwDxV+irg5U3fbtNVhvV0kLbS2TyQ0aU5w60ERS2NcyDWplOo7AOzZWChcA4
+ UFf78oVdZdCW8YDtU0uQFhA9moNnrePy1HSFqduxnlFHEI+fDj/TiOm2ci48b8SBBJOIJFjl
+ SBgH8+SfT9ZqkzhN9vh3YJ49831NwASVm0x1rDHcIwWD32VFZViZ3NjehogRNH9br0PSUYOC
+ 3s7ATQRX2BjLAQgAnak3m0imYOkv2tO/olULFa686tlwuvl5kL0NWCdGQeXv2uMxy36szcrh
+ K1uYhpiQv4r2qNd8BJtYlnYIK16N8GBdkplaDIHcBMbU4t+6bQzEIJIaWoq1hzakmHHngE2a
+ pNMnUf/01GFvCRPlv3imkujE/5ILbagjtdyJaHF0wGOSlTnNT4W8j+zPJ/XK0I5EVQwtbmoc
+ GY62LKxxz2pID6sPZV4zQVY4JdUQaFvOz1emnBxakkt0cq3Qnnqso1tjiy7vyH9CAwPR/48W
+ fpK6dew4Fk+STYtBeixOTfSUS8qRS/wfpUeNa5RnEdTtFQ9IcjpQ/nPrvJJsu9FqwlpjMwAR
+ AQABwsBlBBgBCAAPBQJX2BjLAhsMBQkSzAMAAAoJEEV84KCARGXFUKcH/jqKETECkbyPktdP
+ cWVqw2ZIsmGxMkIdnZTbPwhORseGXMHadQODayhU9GWfCDdSPkWDWzMamD+qStfl9MhlVT60
+ HTbo6wu1W/ogUS70qQPTY9IfsvAj6f8TlSlK0eLMa3s2UxL2oe5FkNs2CnVeRlr4Yqvp/ZQV
+ 6LXtew4GPRrmplUT/Cre9QIUqR4pxYCQaMoOXQQw3Y0csBwoDYUQujn3slbDJRIweHoppBzT
+ rM6ZG5ldWQN3n3d71pVuv80guylX8+TSB8Mvkqwb5I36/NAFKl0CbGbTuQli7SmNiTAKilXc
+ Y5Uh9PIrmixt0JrmGVRzke6+11mTjVlio/J5dCM=
+In-Reply-To: <20240229063726.610065-55-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When the Zimop extension is available expose it to the guest
-via device tree so that guest can use it.
+29.02.2024 09:37, Xiaoyao Li wrote:
+> From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+> 
+> Add a q35 property to check whether or not SMM ranges, e.g. SMRAM, TSEG,
+> etc... exist for the target platform.  TDX doesn't support SMM and doesn't
+> play nice with QEMU modifying related guest memory ranges.
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- riscv/fdt.c                         | 1 +
- riscv/include/kvm/kvm-config-arch.h | 3 +++
- 2 files changed, 4 insertions(+)
+This change introduces a newly reported issue with windows XP:
+https://gitlab.com/qemu-project/qemu/-/issues/2608
 
-diff --git a/riscv/fdt.c b/riscv/fdt.c
-index 768ee1f..8189601 100644
---- a/riscv/fdt.c
-+++ b/riscv/fdt.c
-@@ -49,6 +49,7 @@ struct isa_ext_info isa_info_arr[] = {
- 	{"zihintntl", KVM_RISCV_ISA_EXT_ZIHINTNTL},
- 	{"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
- 	{"zihpm", KVM_RISCV_ISA_EXT_ZIHPM},
-+	{"zimop", KVM_RISCV_ISA_EXT_ZIMOP},
- 	{"zknd", KVM_RISCV_ISA_EXT_ZKND},
- 	{"zkne", KVM_RISCV_ISA_EXT_ZKNE},
- 	{"zknh", KVM_RISCV_ISA_EXT_ZKNH},
-diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-index 5d655cf..7a9ca60 100644
---- a/riscv/include/kvm/kvm-config-arch.h
-+++ b/riscv/include/kvm/kvm-config-arch.h
-@@ -124,6 +124,9 @@ struct kvm_config_arch {
- 	OPT_BOOLEAN('\0', "disable-zihpm",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZIHPM],	\
- 		    "Disable Zihpm Extension"),				\
-+	OPT_BOOLEAN('\0', "disable-zimop",				\
-+		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZIMOP],	\
-+		    "Disable Zimop Extension"),				\
- 	OPT_BOOLEAN('\0', "disable-zknd",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZKND],	\
- 		    "Disable Zknd Extension"),				\
--- 
-2.43.0
+Can you take a look please?  I've no idea if this is a bug in qemu or not.
 
+Thanks,
+
+/mjt
 
