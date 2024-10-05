@@ -1,167 +1,158 @@
-Return-Path: <kvm+bounces-28022-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28023-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61018991ADD
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 23:36:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AF41991B6A
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 01:38:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9A73B215F9
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 21:36:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A378D1C213EF
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 23:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882DC165EFA;
-	Sat,  5 Oct 2024 21:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B45A1714B4;
+	Sat,  5 Oct 2024 23:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nOpfuY9R"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="BghJEQ18"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2ED518E1F;
-	Sat,  5 Oct 2024 21:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1E11F61C;
+	Sat,  5 Oct 2024 23:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728164152; cv=none; b=PUZyLP77U8RBJa/pBuf4YIwE+UrwYDb8r3u0Hpq199+zr0ws8IWQDgCiPZmA8wFZ2PvVgYILiR/9vxJcqvOcQl2JuM6m6oamsFYChwRtokK8zXS4ytIiLmUGZUdGuSMUy8eqbSfNt11d+5OXGtf/c3RAislbEkx5T3Dfis10eQs=
+	t=1728171493; cv=none; b=MkhGRwL5kySByy9jseb/PRjoGzZEjYHZqSM9MBOnAp2ecQFsCnF50/W2SnQcDzILLdEC0fegXM6EZoF6XSu10aSdrzth/NiwFYR+J/yTnJvMVU6eu44tkgvgYybA2cgRWV/b69iVSRblOPf/wg9wQPSF9e8jnKSG1jwq5oE1PhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728164152; c=relaxed/simple;
-	bh=4sfPDWl1oJaJQh9DQfDD4n4dpgiSjjXdaE92+qki+no=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rIALBscndcVJnmNBpeiJX67Nh83xqhPnObdktu5adgh3I2776aXdqUVP8d4mf38H6G31dJdr9NQ9H6BgIwK1PeYyu67mE4hbitUN/zBNEmxXZ2za7SW59EYH2PGLGfYX+4PrbHmigImq75sUwQgHNtYT4CUQXr6GoEOMdiUZ0r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nOpfuY9R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F30C4CECC;
-	Sat,  5 Oct 2024 21:35:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728164152;
-	bh=4sfPDWl1oJaJQh9DQfDD4n4dpgiSjjXdaE92+qki+no=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nOpfuY9RkAvbGr1+JirOtWdENC8a8hWxm/fOFqgfo4xdotxuvlbrkvdQJVCOzVYed
-	 oEDTlkg4EHoaUSYvw0EafAfcLbV2SAfH53l8Zgyv7dx1xfKDWsf269E3LGWmsOdtyn
-	 2uf1vXvDzqMiUOUJlwUe3t+/mGiAjlT/khk8qmaKdIY2Ww+Rwxq96pP4K9MWFCqdZe
-	 p1FcHyhU0XyArpT9kczq4YZeT1imC4CahdX8/sP+kuFmwkPl9d/tXGTunaPlxCdl6d
-	 0SiTSmoOXKMRIbhrJUw9dOnDDfJnJus7M+I/qcnyadOv8wdrsU0Vc4UocmvcjLC6h0
-	 uqhqGrSdG5krA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sxCRK-000h6U-1X;
-	Sat, 05 Oct 2024 22:35:50 +0100
-Date: Sat, 05 Oct 2024 22:35:49 +0100
-Message-ID: <87a5fiutai.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Enrico Joerns <ejo@pengutronix.de>
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
-In-Reply-To: <65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
-	<CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
-	<a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
-	<CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
-	<4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
-	<864j5q7sdq.wl-maz@kernel.org>
-	<65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1728171493; c=relaxed/simple;
+	bh=Ub3jK6SsxvGHuG2/fm1/AWnleUfV4tsAHwDVlmCsMmY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fsp5e8A7E/+CgIw2ZhxqRBNo6yYefh/KcUqW/IQt39vspBwwIddvQRNhjttpjKqVJtTpfJ/9vKh02hU/e/0Lfm340B124eoPK3F5z0Sm997jsfTUc5h2DciUsJNPnZ0Pwa+Y5MIVa0o6ve6TZmWck19e03LFoYECI+3oag3a9MU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=BghJEQ18; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [172.27.0.16] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 495NapwS1593555
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sat, 5 Oct 2024 16:36:52 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 495NapwS1593555
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2024091601; t=1728171417;
+	bh=m2bDCv+JjGunSzRwzd1ZUTedJ+jUnwm4JpAQk4uZ2LU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BghJEQ18w7kVZdQoBcXCZs0SU3bcgDNp6CXGpXr7UatIaOcHRnO7Ki4rpVZIgv9pe
+	 Nz/Yk9sWAKxmvlzBMFe+EzcwMpOVx8UY7o5nMcwClHG2k8LpXw0UQzSqj2Ekiu9nFP
+	 wt8vdbGEEzYAHkF9s6cSQNFQmtVxTKG2NMzwvRANGuDKm19FSlXxR5j1m1jSvaYdtx
+	 sgCWbTe/DYdl96GonJp4olM5FfNyVaxnYW3tvOSS7nL1Z6OVpcsDWxBZnYXqBOzYxJ
+	 3JEuMDZsQny031HV9xMehx7Re34CsvirpbQ/mcBdKSCBdY6WlekkljNm2jzhEgdjiU
+	 mKVdT3IwdQMNA==
+Message-ID: <3bbb85ae-8ba5-4777-999f-d20705c386e7@zytor.com>
+Date: Sat, 5 Oct 2024 16:36:48 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: a.fatoum@pengutronix.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, ejo@pengutronix.de
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 25/28] x86: Use PIE codegen for the core kernel
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>, Dennis Zhou <dennis@kernel.org>,
+        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Juergen Gross <jgross@suse.com>,
+        Boris Ostrovsky
+ <boris.ostrovsky@oracle.com>,
+        Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <masahiroy@kernel.org>,
+        Kees Cook <kees@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+        Keith Packard <keithp@keithp.com>,
+        Justin Stitt <justinstitt@google.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org,
+        linux-pm@vger.kernel.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-efi@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-sparse@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        rust-for-linux@vger.kernel.org, llvm@lists.linux.dev
+References: <20240925150059.3955569-30-ardb+git@google.com>
+ <20240925150059.3955569-55-ardb+git@google.com>
+ <99446363-152f-43a8-8b74-26f0d883a364@zytor.com>
+ <CAMj1kXG7ZELM8D7Ft3H+dD5BHqENjY9eQ9kzsq2FzTgP5+2W3A@mail.gmail.com>
+ <CAHk-=wj0HG2M1JgoN-zdCwFSW=N7j5iMB0RR90aftTS3oqwKTg@mail.gmail.com>
+ <CAMj1kXEU5RU0i11zqD0433_LMMyNQH2gCoSkU7GeXmaRXGF1Yw@mail.gmail.com>
+ <5c7490bb-aa74-427b-849e-c28c343b7409@zytor.com>
+ <CAFULd4Yj9LfTnWFu=c1M7Eh44+XFk0ibwL57r5H7wZjvKZ8yaA@mail.gmail.com>
+Content-Language: en-US
+From: "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <CAFULd4Yj9LfTnWFu=c1M7Eh44+XFk0ibwL57r5H7wZjvKZ8yaA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, 05 Oct 2024 19:38:23 +0100,
-Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+On 10/5/24 01:31, Uros Bizjak wrote:
+>>
+>> movq $sym to leaq sym(%rip) which you said ought to be smaller (and in
+>> reality appears to be the same size, 7 bytes) seems like a no-brainer
+>> and can be treated as a code quality issue -- in other words, file bug
+>> reports against gcc and clang.
 > 
-> Hello Marc,
+> It is the kernel assembly source that should be converted to
+> rip-relative form, gcc (and probably clang) have nothing with it.
 > 
-> On 05.10.24 12:31, Marc Zyngier wrote:
-> > On Fri, 04 Oct 2024 20:50:18 +0100,
-> > Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> >> With readl/writel implemented in assembly, I get beyond that point, but
-> >> now I get a data abort running an DC IVAC instruction on address 0x1000,
-> >> where the cfi-flash is located. This instruction is part of a routine
-> >> to remap the cfi-flash to start a page later, so the zero page can be
-> >> mapped faulting.
-> 
-> [snip]
-> 
-> >> Any idea what this is about?
-> > 
-> > IIRC, the QEMU flash is implemented as a read-only memslot. A data
-> > cache invalidation is a *write*, as it can be (and is) upgraded to a
-> > clean+invalidate by the HW.
-> 
-> So it's a write, even if there are no dirty cache lines?
 
-Yes.
+Sadly, that is not correct; neither gcc nor clang uses lea:
 
-At the point where this is handled, the CPU has no clue about the
-dirty state of an arbitrary cache line, at an arbitrary cache level.
-The CPU simply forward the CMO downstream, and the permission check
-happens way before that.
+	-hpa
 
-> > KVM cannot satisfy the write, for obvious reasons, and tells the guest
-> > to bugger off (__gfn_to_pfn_memslot() returns KVM_PFN_ERR_RO_FAULT,
-> > which satisfies is_error_noslot_pfn() -- a slight oddity, but hey, why
-> > not).
-> > 
-> > In the end, you get an exception. We could relax this by
-> > special-casing CMOs to RO memslots, but this doesn't look great.
-> > 
-> > The real question is: what are you trying to achieve with this?
-> 
-> barebox sets up the MMU, but tries to keep a 1:1 mapping. On Virt, we
-> want to map the zero page faulting, but still have access to the first
-> block of the cfi-flash.
-> 
-> Therefore, barebox will map the cfi-flash one page later
-> (virt 0x1000,0x2000,... -> phys 0x0000,0x1000,...) and so on, so the first
-> page can be mapped faulting.
-> 
-> The routine[1] that does this remapping invalidates the virtual address range,
-> because the attributes may change[2]. This invalidate also happens for cfi-flash,
-> but we should never encounter dirty cache lines there as the remap is done
-> before driver probe.
->
-> Can you advise what should be done differently?
 
-If you always map the flash as Device memory, there is no need for
-CMOs. Same thing if you map it as NC. And even if you did map it as
-Cacheable, it wouldn't matter. KVM already handles coherency when the
-flash is switching between memory-mapped and programming mode, as the
-physical address space changes (the flash literally drops from the
-memory map).
+gcc version 14.2.1 20240912 (Red Hat 14.2.1-3) (GCC)
 
-In general, issuing CMOs to a device is a bizarre concept, because it
-is pretty rare that a device can handle a full cache-line as
-write-back. Devices tend to handle smaller, register-sized accesses,
-not a full 64-byte eviction.
+hpa@tazenda:/tmp$ cat foo.c
+int foobar;
 
-Now, I'm still wondering whether we should simply forward the CMO to
-userspace as we do for other writes, and let the VMM deal with it. The
-main issue is that there is no current way to describe this.
+int *where_is_foobar(void)
+{
+         return &foobar;
+}
 
-The alternative would be to silently handle the trap and pretend it
-never occurred, as we do for other bizarre behaviours. But that'd be
-something only new kernels would support, and I guess you'd like your
-guest to work today, not tomorrow.
+hpa@tazenda:/tmp$ gcc -mcmodel=kernel -O2 -c -o foo.o foo.c
+hpa@tazenda:/tmp$ objdump -dr foo.o
 
-	M.
+foo.o:     file format elf64-x86-64
 
--- 
-Without deviation from the norm, progress is not possible.
+
+Disassembly of section .text:
+
+0000000000000000 <where_is_foobar>:
+    0:   48 c7 c0 00 00 00 00    mov    $0x0,%rax
+                         3: R_X86_64_32S foobar
+    7:   c3                      ret
+
+clang version 18.1.8 (Fedora 18.1.8-1.fc40)
+
+hpa@tazenda:/tmp$ clang -mcmodel=kernel -O2 -c -o foo.o foo.c
+hpa@tazenda:/tmp$ objdump -dr foo.o
+
+foo.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <where_is_foobar>:
+    0:   48 c7 c0 00 00 00 00    mov    $0x0,%rax
+                         3: R_X86_64_32S foobar
+    7:   c3                      ret
+
 
