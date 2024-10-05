@@ -1,111 +1,136 @@
-Return-Path: <kvm+bounces-28014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21314991543
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 10:25:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36EDD991557
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 10:32:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3553B22B32
-	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 08:25:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F02482841BC
+	for <lists+kvm@lfdr.de>; Sat,  5 Oct 2024 08:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D94313C8E8;
-	Sat,  5 Oct 2024 08:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B692514375D;
+	Sat,  5 Oct 2024 08:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OQu1KS/F"
 X-Original-To: kvm@vger.kernel.org
-Received: from isrv.corpit.ru (isrv.corpit.ru [86.62.121.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03132F5B
-	for <kvm@vger.kernel.org>; Sat,  5 Oct 2024 08:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=86.62.121.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58932231C8F;
+	Sat,  5 Oct 2024 08:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728116712; cv=none; b=R/bjiwiSD6aIqr5CHFHxLNWOdGFlkHgrb1R3XS2nh+1aQhfLIQ5qNviHqwd/ADCuOYFu6vBGWRFxQKZ6rcRRji89RklnLU0zYKr/csWynvqLP92D/Lny6HUeDXK1TSAh3YOoCGRb/fGSV2Gi9LiK5y4XYZrJVcXQrp/d67SP5Pc=
+	t=1728117110; cv=none; b=AHUKk98nqHkDqcniESqKC000HHEppf3SXLdE34Lhyt/LZU38h2UHaBQ4paoHZRt8Cbxet5zH7MRwQ+/6WhKvlX87LAco5/0uDfA8R0/JF1yIMJiuJD7/t3TeLjKUHJ49/r0Q42xmJvrp9qPYhrOvvAwdfSaDskCwjpBkcjQY+P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728116712; c=relaxed/simple;
-	bh=aRVdVD7ClZDKmOrXtOauU+rY0yYGbwyKVq/WJWeEwZc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MML2AZObeBmN2uY191KxOqKz1dGkrnQ/5Ui5XRgc6rgCI4YVaze9FEJhOePONafUpVT6OCrN7MiDxtkBaGrz4ZMy8sgMH0TogA4E2+Y7SHtisaw3ePQct6CopOY3Y6ytPV49fnjVK2kc+y41iYIaWub/O833eO4fm7i2qt9RUeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru; spf=pass smtp.mailfrom=tls.msk.ru; arc=none smtp.client-ip=86.62.121.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tls.msk.ru
-Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
-	by isrv.corpit.ru (Postfix) with ESMTP id 3338C957BB;
-	Sat,  5 Oct 2024 11:15:22 +0300 (MSK)
-Received: from [192.168.177.130] (mjt.wg.tls.msk.ru [192.168.177.130])
-	by tsrv.corpit.ru (Postfix) with ESMTP id 4C58514DE17;
-	Sat,  5 Oct 2024 11:15:25 +0300 (MSK)
-Message-ID: <d0ef1ab6-2e22-4884-8e66-0cf6dd9e308e@tls.msk.ru>
-Date: Sat, 5 Oct 2024 11:15:25 +0300
+	s=arc-20240116; t=1728117110; c=relaxed/simple;
+	bh=70cU5jNP52zmkSWZHO+lBdHOcE1V/JTH2eNm2kkh0zg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PzZ4FuRn+JzFUNpYK4eeftCryJu7St05ef86z20wxvzoTydIzblrRlWu7UBIg/MBZ4/r1RCanAsOsQc4hqP0GWn+ZbUDIJ8XqsFysviuYPFNmI55Ve9Ui4f/LwkwTFaOJslTCTOKur8wg2ukeGfdEBgmC64kZ1buMOUmFjAgIdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OQu1KS/F; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fac63abf63so29110871fa.1;
+        Sat, 05 Oct 2024 01:31:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728117106; x=1728721906; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=70cU5jNP52zmkSWZHO+lBdHOcE1V/JTH2eNm2kkh0zg=;
+        b=OQu1KS/FWp+vzB8M90wWzv2DwL28c54821ES4HbZa+/kKuP7aC4tPzCuACELJth2qQ
+         pc9TZ2ISdUc6Q3VGwRml0HF61sHqy00yXzh/B7M2IYtDQuGOx1FTY9tXqGMCjG+Uh1YI
+         CH3l6iMAReMliUXAh/KUG1C9XYkm5rF9WqkNCAPtjOQVYHZNAGUauycZEaAo4d/sUvs9
+         8Ja3w2AraLXHPkaWD0taM65FMiEx++s1FLs/fIjQAloxQA4Xc/uWuxjbem80Duk1xzYe
+         jg4nn9ac/6E4uKdgBLnCooPggnnO0dcKcg03qHT9C/RWGNVAI7CsSpDC6hVc+Emg3af5
+         ZAkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728117106; x=1728721906;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=70cU5jNP52zmkSWZHO+lBdHOcE1V/JTH2eNm2kkh0zg=;
+        b=BU8HxWJkL0J0MvXjRkBZlUS+kEYYoccrQm/bQBdvqHzhlYDa0a6bJjifAVO1zSrMB0
+         0tP2oTQp2sr0GN9oCneHl2sQOx+0hANGRBQWMOvZk9ZIQHsUjeIFsInPLFFvAWZzTMBc
+         VYPKcH71a7DlwQeN2hJ5QM/r9SClkvXEN0tBGBotKXEQ1701RVKxfekgea2rBRuny09F
+         z92N0WGYw56iYGtYmPmWcYNbLmpI3IAMWwPqioZ+CsOdNV2NeIdVKswvcFiu7ldu3C6J
+         CN41cP9yNOhnGMiMeGoLYPJQ+Ew4LIvaTXTCyAV8cidBszwsE3Wo1m2w1FmCSVhyAz0E
+         D7VQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPitWEeOD/aD62yn7DZZSU7JaVuaUVQq63I5CtmFD+j1DMntN2JyOFJ5aRDQN2PpB31dHqzLqeRozpf1bN@vger.kernel.org, AJvYcCUUu5XYKZkbzD5ywYHVCuo/Oew/4JpdnctTarrOSg34Op3ZjuHbg04SmfqDfGoSTXFh1p09IU3GLx4HRCC3PCnNaw==@vger.kernel.org, AJvYcCUgZvCOfGNX4TJSytk7wDmxGhD+1RQxiPpvhElemmASV3+V1qIVuinUiQjMHnZAavfVd8G5r1NLSbRX@vger.kernel.org, AJvYcCV5wmWz2VgZgJEQcX3F+wkZMCnZF+RHkLhJgNuAOgIGb5mbzChbkA9hyJvvI+8uubsEYlmFYMx5GC+nyNJq@vger.kernel.org, AJvYcCVD6Sla1wkCBvjYeoYBeokskNlnZai5vX4pjC8PLoFq+8JVkKxUhtPhkBdOiAauXSYQ9fxTqCEz7Gds@vger.kernel.org, AJvYcCVVksKusLXvQcncn6esUy7zSDSKvfSj4K6GQcSEkitc+S20k+5xLeyxtgMvzku/+zQVqLHwmAOWpqo=@vger.kernel.org, AJvYcCW3iH3oRT9iEo7Ws8ml7G4upB5KNWRBt0lXaRAmtbM4vq4z/bSGdvjh+/xJijE+qTU1LRs=@vger.kernel.org, AJvYcCW7AaJe08TpCmIEfn4tXdnQQYzQcDSiKnZ6lZaG/LJuQCLREvQEnMf12WWLT1TGZ6qUCx1pDwNO8NueKO5yopk=@vger.kernel.org, AJvYcCWWelSF+HpJ8dD8RyCnk7ab1i9zhoCd5FuYnEKeZnQFdZkrZFIgBfN+XmSVRY72IXbJCPnxqB9ndzfSng==@vger.kernel.org, AJvYcCXssYm+wkam8a1z6IjlfmkP
+ d85FzcygzwPgGkLqzEOE0CU1XAd/Knko2Fdzd/aGj2WDSSGFqGyR9T4g3BB0@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEN7mgZAeB2itvJi8KUsdLt48HLvHeVuRj1Vy3oZYcJlb8QqXO
+	J53RBjYQ1FbS5u9EWG26BNQ81bxsl1FjR4yrVfTRzIxm3gjWS/TzE76MOzV85kl+nDZrJtiW6i7
+	ysifs0ldfc9CJwDHmo6KecaiQ5II=
+X-Google-Smtp-Source: AGHT+IGi0j/icjLt8RhHlOdJvbjdouTPFKKMu/CT/oe6l0e9sNaP3mHWfqnG22Q9j4GVb6Cdm+e2KfCpXo/Kl8KNmek=
+X-Received: by 2002:a05:651c:1547:b0:2fa:d978:a6c4 with SMTP id
+ 38308e7fff4ca-2faf3d73888mr22769461fa.30.1728117106123; Sat, 05 Oct 2024
+ 01:31:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 54/65] q35: Introduce smm_ranges property for
- q35-pci-host
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org,
- Michael Roth <michael.roth@amd.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20240229063726.610065-1-xiaoyao.li@intel.com>
- <20240229063726.610065-55-xiaoyao.li@intel.com>
-Content-Language: en-US, ru-RU
-From: Michael Tokarev <mjt@tls.msk.ru>
-Autocrypt: addr=mjt@tls.msk.ru; keydata=
- xsBLBETIiwkBCADh3cFB56BQYPjtMZCfK6PSLR8lw8EB20rsrPeJtd91IoNZlnCjSoxd9Th1
- bLUR8YlpRJ2rjc6O1Bc04VghqUOHgS/tYt8vLjcGWixzdhSLJgPDK3QQZPAvBjMbCt1B6euC
- WuD87Pv5Udlpnzf4aMwxkgfTusx+ynae/o+T5r7tXD+isccbC3SiGhmAPxFyY3zGcFk4+Rxc
- 0tP8YY2FWE/baHu+lBDTUN79efWAkHhex1XzVZsV7ZD16rzDbXFK5m6ApvGJWlr5YDEEydTF
- WwmvwBfr4OINVxzEG/ujNiG4fpMf2NsnFGyB9aSbFjXZevB4qWkduYYW+xpK1EryszHtAAYp
- zSBNaWNoYWVsIFRva2FyZXYgPG1qdEB0bHMubXNrLnJ1PsLAlgQTAQoAQAIbAwYLCQgHAwIE
- FQIIAwQWAgMBAh4BAheAAhkBFiEEbuGV0Yhuj/uBDUMkRXzgoIBEZcUFAmBbcjwFCS5e6jMA
- CgkQRXzgoIBEZcUTIQgA1hPsOF82pXxbcJXBMc4zB9OQu4AlnZvERoGyw7I2222QzaN3RFuj
- Fia//mapXzpIQNF08l/AA6cx+CKPeGnXwyZfF9fLa4RfifmdNKME8C00XlqnoJDZBGzq8yMy
- LAKDxl9OQWFcDwDxV+irg5U3fbtNVhvV0kLbS2TyQ0aU5w60ERS2NcyDWplOo7AOzZWChcA4
- UFf78oVdZdCW8YDtU0uQFhA9moNnrePy1HSFqduxnlFHEI+fDj/TiOm2ci48b8SBBJOIJFjl
- SBgH8+SfT9ZqkzhN9vh3YJ49831NwASVm0x1rDHcIwWD32VFZViZ3NjehogRNH9br0PSUYOC
- 3s7ATQRX2BjLAQgAnak3m0imYOkv2tO/olULFa686tlwuvl5kL0NWCdGQeXv2uMxy36szcrh
- K1uYhpiQv4r2qNd8BJtYlnYIK16N8GBdkplaDIHcBMbU4t+6bQzEIJIaWoq1hzakmHHngE2a
- pNMnUf/01GFvCRPlv3imkujE/5ILbagjtdyJaHF0wGOSlTnNT4W8j+zPJ/XK0I5EVQwtbmoc
- GY62LKxxz2pID6sPZV4zQVY4JdUQaFvOz1emnBxakkt0cq3Qnnqso1tjiy7vyH9CAwPR/48W
- fpK6dew4Fk+STYtBeixOTfSUS8qRS/wfpUeNa5RnEdTtFQ9IcjpQ/nPrvJJsu9FqwlpjMwAR
- AQABwsBlBBgBCAAPBQJX2BjLAhsMBQkSzAMAAAoJEEV84KCARGXFUKcH/jqKETECkbyPktdP
- cWVqw2ZIsmGxMkIdnZTbPwhORseGXMHadQODayhU9GWfCDdSPkWDWzMamD+qStfl9MhlVT60
- HTbo6wu1W/ogUS70qQPTY9IfsvAj6f8TlSlK0eLMa3s2UxL2oe5FkNs2CnVeRlr4Yqvp/ZQV
- 6LXtew4GPRrmplUT/Cre9QIUqR4pxYCQaMoOXQQw3Y0csBwoDYUQujn3slbDJRIweHoppBzT
- rM6ZG5ldWQN3n3d71pVuv80guylX8+TSB8Mvkqwb5I36/NAFKl0CbGbTuQli7SmNiTAKilXc
- Y5Uh9PIrmixt0JrmGVRzke6+11mTjVlio/J5dCM=
-In-Reply-To: <20240229063726.610065-55-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240925150059.3955569-30-ardb+git@google.com>
+ <20240925150059.3955569-55-ardb+git@google.com> <99446363-152f-43a8-8b74-26f0d883a364@zytor.com>
+ <CAMj1kXG7ZELM8D7Ft3H+dD5BHqENjY9eQ9kzsq2FzTgP5+2W3A@mail.gmail.com>
+ <CAHk-=wj0HG2M1JgoN-zdCwFSW=N7j5iMB0RR90aftTS3oqwKTg@mail.gmail.com>
+ <CAMj1kXEU5RU0i11zqD0433_LMMyNQH2gCoSkU7GeXmaRXGF1Yw@mail.gmail.com> <5c7490bb-aa74-427b-849e-c28c343b7409@zytor.com>
+In-Reply-To: <5c7490bb-aa74-427b-849e-c28c343b7409@zytor.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Sat, 5 Oct 2024 10:31:37 +0200
+Message-ID: <CAFULd4Yj9LfTnWFu=c1M7Eh44+XFk0ibwL57r5H7wZjvKZ8yaA@mail.gmail.com>
+Subject: Re: [RFC PATCH 25/28] x86: Use PIE codegen for the core kernel
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Dennis Zhou <dennis@kernel.org>, 
+	Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Juergen Gross <jgross@suse.com>, 
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
+	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
+	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-29.02.2024 09:37, Xiaoyao Li wrote:
-> From: Isaku Yamahata <isaku.yamahata@linux.intel.com>
-> 
-> Add a q35 property to check whether or not SMM ranges, e.g. SMRAM, TSEG,
-> etc... exist for the target platform.  TDX doesn't support SMM and doesn't
-> play nice with QEMU modifying related guest memory ranges.
+On Fri, Oct 4, 2024 at 11:06=E2=80=AFPM H. Peter Anvin <hpa@zytor.com> wrot=
+e:
+>
+> On 10/3/24 04:13, Ard Biesheuvel wrote:
+> >
+> >> That said, doing changes like changing "mov $sym" to "lea sym(%rip)" I
+> >> feel are a complete no-brainer and should be done regardless of any
+> >> other code generation issues.
+> >
+> > Yes, this is the primary reason I ended up looking into this in the
+> > first place. Earlier this year, we ended up having to introduce
+> > RIP_REL_REF() to emit those RIP-relative references explicitly, in
+> > order to prevent the C code that is called via the early 1:1 mapping
+> > from exploding. The amount of C code called in that manner has been
+> > growing steadily over time with the introduction of 5-level paging and
+> > SEV-SNP and TDX support, which need to play all kinds of tricks before
+> > the normal kernel mappings are created.
+> >
+>
+> movq $sym to leaq sym(%rip) which you said ought to be smaller (and in
+> reality appears to be the same size, 7 bytes) seems like a no-brainer
+> and can be treated as a code quality issue -- in other words, file bug
+> reports against gcc and clang.
 
-This change introduces a newly reported issue with windows XP:
-https://gitlab.com/qemu-project/qemu/-/issues/2608
+It is the kernel assembly source that should be converted to
+rip-relative form, gcc (and probably clang) have nothing with it.
 
-Can you take a look please?  I've no idea if this is a bug in qemu or not.
-
-Thanks,
-
-/mjt
+Uros.
 
