@@ -1,128 +1,166 @@
-Return-Path: <kvm+bounces-28026-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FDA991CC4
-	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 08:26:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B35991D0C
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 10:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0027B211D6
-	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 06:26:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61E291F21C7D
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 08:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D6916BE01;
-	Sun,  6 Oct 2024 06:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5047C1714BD;
+	Sun,  6 Oct 2024 07:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="bI7GUOyp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XqsSvYq2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B13158862;
-	Sun,  6 Oct 2024 06:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941B238F83
+	for <kvm@vger.kernel.org>; Sun,  6 Oct 2024 07:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728196006; cv=none; b=JuU1JEBXHNt9vBvK6j9vjfjW0JtFfsffR1O81aV/4J2REPSNn82HCMr7yCJ2FtzWouU1RJW+K/OuFTiR/GCHjDGNA46dAhNQin44cHqAehpl7xvjUfrZxzha/jCqaLXPbFvR4s3jVRbk+st7gTlg4yUnbmBsmWAxf5GznBIsE10=
+	t=1728201598; cv=none; b=eugMHhNb8bq4W2uIcvUmdafJLrrqqOvMj2KU8+FofQa7BTe8TMcuDJykYmBk0B4i9Rn8YrlARPcfqWr6BW3V9BI2OemZBv90sw53VZ0AafLABcvENg/kOW0tCJJp9vZF4Tw3TKGyN7XXyJx6O3YfIs2ABkxz3x2hp6Tu6jNd9PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728196006; c=relaxed/simple;
-	bh=BwSmet5U3UeygxPIkLXf2oFWJOec+/C3NC4O/tCdlU8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=MF3Mtmkp+ik1kigfql32gyvn7EcQf/0gZiOXCei19bgyRFPi7+uyAIhB6nbRhGCQLA8ISSep5bctKoG2f6AeT7Ev78CKBJl3wUDY7DEfGVOZsLPn8d+1NqvTS+YrRMMUQY52gLrxgv3In8yVOQJMPRF6mFwi3lfjcemznFtLe+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=bI7GUOyp; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0AB5440E021E;
-	Sun,  6 Oct 2024 06:26:35 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id tJkNPRUveA0w; Sun,  6 Oct 2024 06:26:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1728195990; bh=FSNhRWJawPKwGCAyC5UzTVAx9BVH6LPc3vWgO6rGn44=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=bI7GUOypuitxvx6A+tgaftVrKiqqLnbjfUzlqS0WjU21fVUB4WCRpNB/yPQsNSeqO
-	 r6/1CFDLLf1zJwWsa6KBMiFVosQ1WX1srs/z4j/yyWU7gIx0TvBw/GbhNr9N6KHlqn
-	 tm6T2txMVhQxrF+AbC5vRuSNKJ3EnAr6T17W4nnf+a7fe1CHLFq37aRKGCbUnV/Kmi
-	 2BMaRsT6a1CCnXIiV5ibLprOMBhG+PAKkIYMqy8cv5PZypNTdfOufm8mV4VbSTEfhD
-	 UE9oGV56eDAkoxDW2zbQ3Gml6vr9GfZrBbNWPMpl30yEX5p56aHIqsoImTxX9iCP7Q
-	 u6L8SQWj5aXHQlHgjr6JDaq0tyPGUVv+9EwQ/ozyKetbxJYfUGGw2qKm+Gbx4TdgKd
-	 QvF/Jrl7z5b34nRranQCAKe1dA3JOvSqqeYRYc4SQ8hC9sELerXr1X/PvpA+lRHk7i
-	 KN1afkIWJPvbqDFTfVsrYu49Dxk0uaVI5ldEh5dT7P0KEQ0CXO4d8Bmh8XdaM/gplg
-	 IvWTWdJY/XTDC6+C9jSzaeigIPDC0A4j4eMsAshGS9yEHRF+ldqk2NpefFabSKx5YZ
-	 AG17X1tVho9SoanOOJpDDbL6HlLPgv50dvnO20F7YIW1E7Tq6I80Mi+JiPXZk7gMNp
-	 mmNShvLi2IoZLwx9LKMuArW0=
-Received: from [127.0.0.1] (dynamic-176-003-046-066.176.3.pool.telefonica.de [176.3.46.66])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F2F1340E0184;
-	Sun,  6 Oct 2024 06:26:19 +0000 (UTC)
-Date: Sun, 06 Oct 2024 08:26:16 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-CC: pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, nikunj@amd.com,
- thomas.lendacky@amd.com, vkuznets@redhat.com, manali.shukla@amd.com,
- babu.moger@amd.com
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v3_1/4=5D_x86/cpufeatures=3A_Add_CP?=
- =?US-ASCII?Q?UID_feature_bit_for_the_Bus_Lock_Threshold?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20241004053341.5726-2-manali.shukla@amd.com>
-References: <20241004053341.5726-1-manali.shukla@amd.com> <20241004053341.5726-2-manali.shukla@amd.com>
-Message-ID: <213827CA-4A73-4E3C-A4D1-3B325E34768D@alien8.de>
+	s=arc-20240116; t=1728201598; c=relaxed/simple;
+	bh=VqlHx3gXbvON1CW3A1JRBpxXo8Luo3Qf9007uz5xumM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b/BIZGWm6MYhVwoD61LLayDp//U1TdqsTTOa4EWfNyMwmhEGtyp+FxauEoHll5ur1v4xQ7xxKphHN4YPD9zS2+OIyPBN4ykTT76aOdZYTQ3lHJmZ+MSoI+YrJC/qIk0OF529mA1+fK1iRm+V4zykW9ZeHYa2MTbBX7rDYq5qLuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XqsSvYq2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728201595;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/sKPRBl2RV4hr7+8R+wr2nRbBs8Om/Tz2zinJX3Ieis=;
+	b=XqsSvYq2/aWbjTYRzgpoELgDMEx+aTKTFiCKDq5DIZAgp67SfONcb8NK7swEIg3qbCbm0O
+	q+FQkha9e3liRdYsgvGmNL2ykLK7dCozMPGB23oIqvsCYALMYqR60wZvcv76O2yoqDijrL
+	z5FhtVD6zewsE1QqxcDgxOi6kDch9zo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-tYZdBIyIPyi3LhnPaXVtxw-1; Sun, 06 Oct 2024 03:59:54 -0400
+X-MC-Unique: tYZdBIyIPyi3LhnPaXVtxw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37ccbb420a9so2099553f8f.3
+        for <kvm@vger.kernel.org>; Sun, 06 Oct 2024 00:59:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728201593; x=1728806393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/sKPRBl2RV4hr7+8R+wr2nRbBs8Om/Tz2zinJX3Ieis=;
+        b=G7DStgEwG6tLcEPc2CleJgExwectgkaxupzj6aw3u0q+HEE0WJ/x30FMwrPe9Q6o83
+         Ny7BvSvrRIlzcqjgdBASjS/449u6zU2firC+uzOf1ynJPerZpR2G7ZJfNYZqQnWnu6H0
+         9ZJDCTzsQo9e8eNSefZuKOgNGiL9cnzTqGsn0N2UUAwVIrqlwlYPYwz6lKtax0CT/5zC
+         OmW/tPN+fSFeGToyOilMU1UsbLMrOrEz2AJYEJZGrc4ZKrdwSpUwymsMiBSKE0U6BBZh
+         zY/lfkzVoyip9pgQUxdn7mDRI+gTEzYxP88cIZaIIxQ3iU2pi+9sFhPTkIopJxSjG87K
+         LCTw==
+X-Forwarded-Encrypted: i=1; AJvYcCVfNPaqkiEsvC42Qn8nQj5XnbLk7ORllFrXOtWBClK9S+6OpCIMmEh3q/3+cW16Glx3oqw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGBWScASbKZ/weX2GhH/bFcxxjJnuGxvQRKzOhWdJIF08t74oU
+	Ih0h+KqPGlsR17QL9ow2WdbpyLDKADOlPUCNd9XGr7E5xKEj/deZd5y6iSv2O065bH4sLfh5Y9p
+	SRxuyWP9PnGMia4861FWv+E7Vqlph0X2j4aXktkAKJ+veqkqrioX7VUOqIVFpA9FWe1veAw8dLk
+	dD97oajK/7fuCIc0y5hlpMy/xT
+X-Received: by 2002:a05:6000:4590:b0:368:68d3:32b3 with SMTP id ffacd0b85a97d-37d0e778fd7mr4471287f8f.26.1728201592809;
+        Sun, 06 Oct 2024 00:59:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF0IitrfMDm0CuVeldEaxDs7MDfVljOsqopy8zQjl8XORThr1m0EK3xfHV86KNe6+eIaQLcapC0D/CpoDuFBNc=
+X-Received: by 2002:a05:6000:4590:b0:368:68d3:32b3 with SMTP id
+ ffacd0b85a97d-37d0e778fd7mr4471274f8f.26.1728201592462; Sun, 06 Oct 2024
+ 00:59:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <20241003203723.2062286-1-maz@kernel.org>
+In-Reply-To: <20241003203723.2062286-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sun, 6 Oct 2024 09:59:39 +0200
+Message-ID: <CABgObfbP2mkkU+3kxDG_zHA2raSNG9XJhAqpfm8M59vveC9d9Q@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.12, take #1
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Mark Brown <broonie@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Will Deacon <will@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, James Morse <james.morse@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On October 4, 2024 7:33:38 AM GMT+02:00, Manali Shukla <manali=2Eshukla@amd=
-=2Ecom> wrote:
->Misbehaving guests can cause bus locks to degrade the performance of
->the system=2E The Bus Lock Threshold feature can be used to address this
->issue by providing capability to the hypervisor to limit guest's
->ability to generate bus lock, thereby preventing system slowdown due
->to performance penalities=2E
+On Thu, Oct 3, 2024 at 10:37=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
 >
->When the Bus Lock Threshold feature is enabled, the processor checks
->the bus lock threshold count before executing the buslock and decides
->whether to trigger bus lock exit or not=2E
+> Paolo,
 >
->The value of the bus lock threshold count '0' generates bus lock
->exits, and if the value is greater than '0', the bus lock is executed
->successfully and the bus lock threshold count is decremented=2E
+> Here's the first set of fixes for 6.12. We have fixes for a couple of
+> pretty theoretical pKVM issues, plus a slightly more annoying fix for
+> the feature detection infrastructure (details in the tag below). I
+> expect to have a few more fixes in the coming weeks. Oh, and Joey is
+> now an official reviewer, replacing James
 >
->Presence of the Bus Lock threshold feature is indicated via CPUID
->function 0x8000000A_EDX[29]=2E
+> Please pull,
 >
->Signed-off-by: Manali Shukla <manali=2Eshukla@amd=2Ecom>
->---
-> arch/x86/include/asm/cpufeatures=2Eh | 1 +
-> 1 file changed, 1 insertion(+)
->
->diff --git a/arch/x86/include/asm/cpufeatures=2Eh b/arch/x86/include/asm/=
-cpufeatures=2Eh
->index dd4682857c12=2E=2E77fa8e743ccc 100644
->--- a/arch/x86/include/asm/cpufeatures=2Eh
->+++ b/arch/x86/include/asm/cpufeatures=2Eh
->@@ -382,6 +382,7 @@
-> #define X86_FEATURE_V_SPEC_CTRL		(15*32+20) /* "v_spec_ctrl" Virtual SPE=
-C_CTRL */
-> #define X86_FEATURE_VNMI		(15*32+25) /* "vnmi" Virtual NMI */
-> #define X86_FEATURE_SVME_ADDR_CHK	(15*32+28) /* SVME addr check */
->+#define X86_FEATURE_BUS_LOCK_THRESHOLD	(15*32+29) /* "buslock" Bus lock =
-threshold */
+>         M.
 
-Why does this feature flag need to be visible in /proc/cpuinfo?=20
+Done, thanks!
 
+Paolo
 
---=20
-Sent from a small device: formatting sucks and brevity is inevitable=2E 
+> The following changes since commit 9852d85ec9d492ebef56dc5f229416c925758e=
+dc:
+>
+>   Linux 6.12-rc1 (2024-09-29 15:06:19 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.12-1
+>
+> for you to fetch changes up to a1d402abf8e3ff1d821e88993fc5331784fac0da:
+>
+>   KVM: arm64: Fix kvm_has_feat*() handling of negative features (2024-10-=
+03 19:35:27 +0100)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.12, take #1
+>
+> - Fix pKVM error path on init, making sure we do not change critical
+>   system registers as we're about to fail
+>
+> - Make sure that the host's vector length is at capped by a value
+>   common to all CPUs
+>
+> - Fix kvm_has_feat*() handling of "negative" features, as the current
+>   code is pretty broken
+>
+> - Promote Joey to the status of official reviewer, while James steps
+>   down -- hopefully only temporarly
+>
+> ----------------------------------------------------------------
+> Marc Zyngier (2):
+>       KVM: arm64: Another reviewer reshuffle
+>       KVM: arm64: Fix kvm_has_feat*() handling of negative features
+>
+> Mark Brown (1):
+>       KVM: arm64: Constrain the host to the maximum shared SVE VL with pK=
+VM
+>
+> Vincent Donnefort (1):
+>       KVM: arm64: Fix __pkvm_init_vcpu cptr_el2 error path
+>
+>  MAINTAINERS                             |  2 +-
+>  arch/arm64/include/asm/kvm_host.h       | 25 +++++++++++++------------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 12 +++++++-----
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c          |  6 ++++--
+>  5 files changed, 26 insertions(+), 21 deletions(-)
+>
+
 
