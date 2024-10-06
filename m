@@ -1,166 +1,129 @@
-Return-Path: <kvm+bounces-28029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA180991D0D
-	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 10:00:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF85991D18
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 10:07:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CF76282342
-	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 08:00:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FF712824CD
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 08:07:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E27170822;
-	Sun,  6 Oct 2024 08:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595C7170A01;
+	Sun,  6 Oct 2024 08:06:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ADQyojO1"
 X-Original-To: kvm@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA9E171E5A
-	for <kvm@vger.kernel.org>; Sun,  6 Oct 2024 08:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15FA4C8C;
+	Sun,  6 Oct 2024 08:06:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728201609; cv=none; b=dzbI1oJ3wiorXlIlIc0yYo4wwHe6TIjrJLu9097GAX+VlEkSEGxCbxo+sA935vpQGyJI8ypNfK/BtVagF5HNeqK2YgY4u/MvVZnoaDozweT+gh5eoEleLT1Fv3UmlfYYGqtUuBo18K9o4N9bcQM/DLGwJEITXkIF4ECuULoPjXA=
+	t=1728202004; cv=none; b=F0RcWYE4WpfjAZbqKYYSPcZguu4KWCQ7As+10KtGWGebvg36cN0FLuHaieD17QLXgQ6he9uo8s3YGzq41INtDrxk37T8DBrl3ZZJuu+8aMqqWSsOr+EhlfSWiXtOA9tkOv5f16fuPmfRyIseoQAajmrzESXmP4MFW/1RJ6hLEn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728201609; c=relaxed/simple;
-	bh=2Dg/aX+fyf4J6P7e0Zqi6a7C94EFVWd6VSqDE+btM+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CmzNLw8BHaw8lDceOpYLZNbVn5/u7xq0EQi/BQiEyRVtTHwVY2UwikEnKZyLGObGBcnpj6DtAO/n841MDH8cMOC7ZCr2HKDcEuH0pe+XoUAzPGFzveWUQONtGbxR/uGUkLbcFLR9sT9wzQENOH2U482C+RczduVGqn7ROtLBo0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1sxMBJ-0005Tc-KL; Sun, 06 Oct 2024 09:59:57 +0200
-Message-ID: <0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
-Date: Sun, 6 Oct 2024 09:59:56 +0200
+	s=arc-20240116; t=1728202004; c=relaxed/simple;
+	bh=puHS7d7azwqNXLt828Ye1D2ZDeZMXjrh1xk6a66e+BY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=roNF5bDbsvuUWU10g48JuYfh+U9ITXISe9Wx/I3XdXJxserno76LiARLxwkHk1xHXSEXL9o3i9BB6/+dHmSdEHDjkrMdrSRxKUznvCMZgOQDWky9kd9/rsOWi7YCAnBz8WolHpcpa3nN4EMixDGsT59rPYHsNDP/jptAcAfoL+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ADQyojO1; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fac60ab585so35853791fa.0;
+        Sun, 06 Oct 2024 01:06:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728202001; x=1728806801; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=puHS7d7azwqNXLt828Ye1D2ZDeZMXjrh1xk6a66e+BY=;
+        b=ADQyojO1oVFojpQ/OG07teh+doGSlmlCOI1svEsXZuCE4Pp3VxQ59FFZBFhXa9VncC
+         jbcCoTvmwV4jgS7xpikpA/Vo1es4yEwEJpZgHQ/YXxFwhcYCNbeEQNm7LIbM0BxNNc7g
+         S4Eve/4A1OefjTgzCmQUHDFMqiVjRHI0GSKQzBe5i+zvzsWj2MYydbKm3G0SZ285awrN
+         V0Fm88fhRq8KTL3vc8UydwbhWTw3PTSjOD+aD5Ceeq16kD+X0FCHD722t2XZpy+691Jt
+         l0AnEpr9Lu6QJNsBRJauh/i3MzLPhzXWzs3OQEp0m1vTM9E0t3+WLKwLt7VyklpDHNfW
+         FT0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728202001; x=1728806801;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=puHS7d7azwqNXLt828Ye1D2ZDeZMXjrh1xk6a66e+BY=;
+        b=IEoPEpSWp3B0Gem0y7RwFGyMQ3q/fe6rncF5S/MfFvwo4R3ELRQP9oEDt+ZpXyYAfa
+         t8L4u6hnXkoaD+BVAY/Cl718hC9Tic+GQJkhaTQh3VZ9YE62j5p3/Xdu8ZTUopiVVbZf
+         PtCgsaiZG8msFtoNqmU/FgEUwHpU6hS2ChFQGY55AR2O3y5kScblMLZqh0gyLwLC/OMy
+         8kwlaXOu9clqIH4d/8lfXojCq3efSYNMy6GVNbKNg4IoBq23oTZhXlJvrK70km/4GVYr
+         b56ROMfqN5g89p0lFkTsjfvgtZDVbsJ/badF/Ew/BGKhV/W+j0M0rUwIhotteLQwE3Dy
+         leLg==
+X-Forwarded-Encrypted: i=1; AJvYcCU6QA2RL4oyszVN9UUX6y3Ue5LQnWVaixOmPWAweHnvqFathJsuW5eSWfRpHY21TjNfA0vSQ3TXizW2rzm1@vger.kernel.org, AJvYcCUKEH8ZY6Na8NvB4dqZRAZFf5u09HKTNhv8/rvJ67X17f/F/CM0fVVSfhbSD9ORzjNq5EU=@vger.kernel.org, AJvYcCUN77sKUAACC4XEoy6YJS+O4o3ZtmKjyyhUbe24EkocPgFyTVtnL/+PXlBfdnCTuFa8Yfl7B7sy5Mx7v86c+zGdvg==@vger.kernel.org, AJvYcCVPTjxdfLrBiEG2Z+npArJSd1y44Iu82Tf7icI/5VJQ9bboxI8rWRkZfT+bM2PQfjcZ0qrpDA8lY3QCGuKVE0c=@vger.kernel.org, AJvYcCVS41bQ6HlrLcWJlIitUx2U7oCRUqdRZrdc3mZykB+/nVZsKS5pVbJUOgPwId8FYv4kZZAd18nZits=@vger.kernel.org, AJvYcCVhV3TgrqqvwnBzq/QZXFgavknhBFfV4Dvm2JWLMZLahsuue+WoJsyn/dlmBLnHRhpICK0Qwu66A7RwYg==@vger.kernel.org, AJvYcCWD1mH5DohvmF0CxhD9LZ5E52s6txrWNsQNM6rvOOHc8NyUIjRhAzHwFy+19Lm8AnqULXu6QVKm4lbC@vger.kernel.org, AJvYcCX5X8CQWs+tFp2OREDCcerSsopvpSi1qEmC+U6+Nk8vZIxKbDlPjQ2DvDOvEl8zOKW1W2hP5aD/nmwmE/95@vger.kernel.org, AJvYcCXrM8oDH9wpZ425e7xtbvafmXMfM7mdL9C11mLw/SURft+KhmtgZZFE2K0TwOFFaV5ECT0kZKRbNqnL@vger.kernel.org, AJvYcCXw1ADMC3RR5jn61tFhVPv2
+ lS9GQmJZgqTPZQxwSLPDM6Cx6Veocw7YY/cYmzRxearHkNhr9l31QJYm91Qb@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0slVW+OOMz0NUGHQeWBEvjPBkM/ILY/X/cimx72O0pEGmFE9E
+	ifjuDIQnJnMxiZNYxPOf4+hF7HF3KmI873g0Y/abzGV8G1Ipnc4lgPOHhN27h+i+oEJtiOLA3Sp
+	Ls4cnJPLdfuq35JT1xWP5qBe/6IY=
+X-Google-Smtp-Source: AGHT+IGS61n/I1TuC+MWyJZpRj63R+p8y0BprOkKwk0SOVREtUnFaMblR5HhGoJzVJpp1ktZzeiYw7JUqStdLpYUPwI=
+X-Received: by 2002:a2e:bc0e:0:b0:2fa:cc50:41b with SMTP id
+ 38308e7fff4ca-2faf3c508ffmr41878031fa.5.1728202000783; Sun, 06 Oct 2024
+ 01:06:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO
- address
-To: Marc Zyngier <maz@kernel.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, Enrico Joerns <ejo@pengutronix.de>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
- <CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
- <a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
- <CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
- <4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
- <864j5q7sdq.wl-maz@kernel.org>
- <65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
- <87a5fiutai.wl-maz@kernel.org>
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <87a5fiutai.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+References: <20240925150059.3955569-30-ardb+git@google.com>
+ <20240925150059.3955569-55-ardb+git@google.com> <99446363-152f-43a8-8b74-26f0d883a364@zytor.com>
+ <CAMj1kXG7ZELM8D7Ft3H+dD5BHqENjY9eQ9kzsq2FzTgP5+2W3A@mail.gmail.com>
+ <CAHk-=wj0HG2M1JgoN-zdCwFSW=N7j5iMB0RR90aftTS3oqwKTg@mail.gmail.com>
+ <CAMj1kXEU5RU0i11zqD0433_LMMyNQH2gCoSkU7GeXmaRXGF1Yw@mail.gmail.com>
+ <5c7490bb-aa74-427b-849e-c28c343b7409@zytor.com> <CAFULd4Yj9LfTnWFu=c1M7Eh44+XFk0ibwL57r5H7wZjvKZ8yaA@mail.gmail.com>
+ <3bbb85ae-8ba5-4777-999f-d20705c386e7@zytor.com> <CAHk-=wgkgnyW2V4gQQTDAOKXGZH0fqN=hApz1LFAE3OC3fhhrQ@mail.gmail.com>
+In-Reply-To: <CAHk-=wgkgnyW2V4gQQTDAOKXGZH0fqN=hApz1LFAE3OC3fhhrQ@mail.gmail.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Sun, 6 Oct 2024 10:06:33 +0200
+Message-ID: <CAFULd4ZZxrJvJ9gF5tC-m-tmcDMvVM3te4xc7vnbF_OFU0D2=A@mail.gmail.com>
+Subject: Re: [RFC PATCH 25/28] x86: Use PIE codegen for the core kernel
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>, Ard Biesheuvel <ardb+git@google.com>, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Dennis Zhou <dennis@kernel.org>, 
+	Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Juergen Gross <jgross@suse.com>, 
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
+	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
+	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello Marc,
+On Sun, Oct 6, 2024 at 2:00=E2=80=AFAM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Sat, 5 Oct 2024 at 16:37, H. Peter Anvin <hpa@zytor.com> wrote:
+> >
+> > Sadly, that is not correct; neither gcc nor clang uses lea:
+>
+> Looking around, this may be intentional. At least according to Agner,
+> several cores do better at "mov immediate" compared to "lea".
+>
+> Eg a RIP-relative LEA on Zen 2 gets a throughput of two per cycle, but
+> a "MOV r,i" gets four. That got fixed in Zen 3 and later, but
+> apparently Intel had similar issues (Ivy Bridge: 1 LEA per cycle, vs 3
+> "mov i,r". Haswell is 1:4).
 
-On 05.10.24 23:35, Marc Zyngier wrote:
-> On Sat, 05 Oct 2024 19:38:23 +0100,
-> Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>> IIRC, the QEMU flash is implemented as a read-only memslot. A data
->>> cache invalidation is a *write*, as it can be (and is) upgraded to a
->>> clean+invalidate by the HW.
->>
->> So it's a write, even if there are no dirty cache lines?
-> 
-> Yes.
-> 
-> At the point where this is handled, the CPU has no clue about the
-> dirty state of an arbitrary cache line, at an arbitrary cache level.
-> The CPU simply forward the CMO downstream, and the permission check
-> happens way before that.
+Yes, this is the case. I just missed your reply when replying to
+Peter's mail with a not so precise answer.
 
-I see. When I added that invalidation, it was suggested[1] that instead
-of invalidation after the remapping, I would clean the range before
-remapping. Cleaning the zero page triggered a data abort, which I didn't
-understand as there should be no dirty lines, but now I get it.
-
-One more question: This upgrading of DC IVAC to DC CIVAC is because
-the code is run under virtualization, right?
-
-[1]: https://lore.barebox.org/barebox/9809c04c-58c5-6888-2b14-cf17fa7c4b1a@pengutronix.de/
-
->> The routine[1] that does this remapping invalidates the virtual address range,
->> because the attributes may change[2]. This invalidate also happens for cfi-flash,
->> but we should never encounter dirty cache lines there as the remap is done
->> before driver probe.
->>
->> Can you advise what should be done differently?
-> 
-> If you always map the flash as Device memory, there is no need for
-> CMOs. Same thing if you map it as NC.
-
-Everything, except for RAM, is mapped Device-nGnRnE.
-
-> And even if you did map it as
-> Cacheable, it wouldn't matter. KVM already handles coherency when the
-> flash is switching between memory-mapped and programming mode, as the
-> physical address space changes (the flash literally drops from the
-> memory map).
-> 
-> In general, issuing CMOs to a device is a bizarre concept, because it
-> is pretty rare that a device can handle a full cache-line as
-> write-back. Devices tend to handle smaller, register-sized accesses,
-> not a full 64-byte eviction.
-
-The same remap_range function is used to:
-
-  - remap normal memory:
-    - Mapping memory regions uncached for memory test
-    - Mapping memory buffers coherent or write-combine
-  - remap ROMs: BootROMs at address zero may be hidden behind the NULL
-    page and need to be mapped differently when calling/peeking into it.
-  - remap device memory, e.g. in the case of the cfi-flash here
-
-The invalidation is done unconditionally for all of them, although it
-makes only the sense in the first case.
-
-> Now, I'm still wondering whether we should simply forward the CMO to
-> userspace as we do for other writes, and let the VMM deal with it. The
-> main issue is that there is no current way to describe this.
-> 
-> The alternative would be to silently handle the trap and pretend it
-> never occurred, as we do for other bizarre behaviours. But that'd be
-> something only new kernels would support, and I guess you'd like your
-> guest to work today, not tomorrow.
-
-I think following fix on the barebox side may work:
-
-  - Walk all pages about to be remapped
-  - Execute the AT instruction on the page's base address
-  - Only if the page was previously mapped cacheable, clean + invalidate
-    the cache
-  - Remove the current cache invalidation after remap
-
-Does that sound sensible?
-
-Thanks,
-Ahmad
-
-> 
-> 	M.
-> 
-
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Uros.
 
