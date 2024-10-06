@@ -1,127 +1,168 @@
-Return-Path: <kvm+bounces-28037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 998DE992032
-	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 20:01:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3672C992073
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 20:43:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51F1B2826B1
-	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 18:01:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A96291F21963
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 18:43:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E78189917;
-	Sun,  6 Oct 2024 18:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A222618A6A8;
+	Sun,  6 Oct 2024 18:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RBQBQdwP"
 X-Original-To: kvm@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2083.outbound.protection.outlook.com [40.107.95.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A954E18870F
-	for <kvm@vger.kernel.org>; Sun,  6 Oct 2024 18:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728237674; cv=none; b=Xd4AUy3BVTGEHhfkozdL4fqWI6KXYcV/kXqTXMGpqUMNhIH6b9k9fytLhP3qeI0YfRQgzOpMod3M2GbvxmHbc3kqGXxveKoRgTbsba1IFwZaVs0bw/ikbJIFWaHzcxn90KRWh3rmwJMIXrdqxBNH/HlaIyeDQreIRZVbU3+Hrgs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728237674; c=relaxed/simple;
-	bh=FkhNFIIFvw1W8y+fSpzP+oy4ku0OcIzn7m22e7sZu8I=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=lwIkmB8vtKlp9sos7lJfuCNMcX/dwnfrHws1cbaygIS1wxiA4Y8oOwBrMzyd3Iya29/MaLjfJB9MJmKWNsNUMsX8t9f+Y3NnKC4qF6X0p2dsNw8fXfLvztE+yTjTV4a3ymstMP6iQ9sUUZ3nVXVMqrgFuq2UU6j14/KhSImMhZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-241-ir4EC8PtM6i_SZDW15CpKA-1; Sun, 06 Oct 2024 19:01:03 +0100
-X-MC-Unique: ir4EC8PtM6i_SZDW15CpKA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 6 Oct
- 2024 19:00:09 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Sun, 6 Oct 2024 19:00:09 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Uros Bizjak' <ubizjak@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>
-CC: Ard Biesheuvel <ardb@kernel.org>, Linus Torvalds
-	<torvalds@linux-foundation.org>, Ard Biesheuvel <ardb+git@google.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"x86@kernel.org" <x86@kernel.org>, Andy Lutomirski <luto@kernel.org>, "Peter
- Zijlstra" <peterz@infradead.org>, Dennis Zhou <dennis@kernel.org>, Tejun Heo
-	<tj@kernel.org>, Christoph Lameter <cl@linux.com>, Mathieu Desnoyers
-	<mathieu.desnoyers@efficios.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	"Vitaly Kuznetsov" <vkuznets@redhat.com>, Juergen Gross <jgross@suse.com>,
-	"Boris Ostrovsky" <boris.ostrovsky@oracle.com>, Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada
-	<masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, Nathan Chancellor
-	<nathan@kernel.org>, Keith Packard <keithp@keithp.com>, Justin Stitt
-	<justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, "Arnaldo
- Carvalho de Melo" <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
-	"Jiri Olsa" <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, Adrian
- Hunter <adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "xen-devel@lists.xenproject.org"
-	<xen-devel@lists.xenproject.org>, "linux-efi@vger.kernel.org"
-	<linux-efi@vger.kernel.org>, "linux-arch@vger.kernel.org"
-	<linux-arch@vger.kernel.org>, "linux-sparse@vger.kernel.org"
-	<linux-sparse@vger.kernel.org>, "linux-kbuild@vger.kernel.org"
-	<linux-kbuild@vger.kernel.org>, "linux-perf-users@vger.kernel.org"
-	<linux-perf-users@vger.kernel.org>, "rust-for-linux@vger.kernel.org"
-	<rust-for-linux@vger.kernel.org>, "llvm@lists.linux.dev"
-	<llvm@lists.linux.dev>
-Subject: RE: [RFC PATCH 25/28] x86: Use PIE codegen for the core kernel
-Thread-Topic: [RFC PATCH 25/28] x86: Use PIE codegen for the core kernel
-Thread-Index: AQHbF8Wqw+hKPqg6T0aWZJZtJXxJh7J5/LJw
-Date: Sun, 6 Oct 2024 18:00:09 +0000
-Message-ID: <bfa1a86c3e4348159049e8277e9859dd@AcuMS.aculab.com>
-References: <20240925150059.3955569-30-ardb+git@google.com>
- <20240925150059.3955569-55-ardb+git@google.com>
- <99446363-152f-43a8-8b74-26f0d883a364@zytor.com>
- <CAMj1kXG7ZELM8D7Ft3H+dD5BHqENjY9eQ9kzsq2FzTgP5+2W3A@mail.gmail.com>
- <CAHk-=wj0HG2M1JgoN-zdCwFSW=N7j5iMB0RR90aftTS3oqwKTg@mail.gmail.com>
- <CAMj1kXEU5RU0i11zqD0433_LMMyNQH2gCoSkU7GeXmaRXGF1Yw@mail.gmail.com>
- <5c7490bb-aa74-427b-849e-c28c343b7409@zytor.com>
- <CAFULd4Yj9LfTnWFu=c1M7Eh44+XFk0ibwL57r5H7wZjvKZ8yaA@mail.gmail.com>
- <3bbb85ae-8ba5-4777-999f-d20705c386e7@zytor.com>
- <CAFULd4b==a7H0zdGVfABntL0efrS-F3eeHGu-63oyz1eh1DwXQ@mail.gmail.com>
-In-Reply-To: <CAFULd4b==a7H0zdGVfABntL0efrS-F3eeHGu-63oyz1eh1DwXQ@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221AD2C853
+	for <kvm@vger.kernel.org>; Sun,  6 Oct 2024 18:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728240218; cv=fail; b=pczPcLNSrQrb4aL4OCJHGLSarcQOBoygAIjb/gfStt+aTAl55zVAam4YcTgfRreVQNchRKHi+9Tv2h7aolBhobEchUEPw7AFpy7jR13b4yBJ4GRJ2xe+HV7PhatzCXW9x+k2V/TGQ1tVIHBswBIK1xdfQDg3JiksTYx0zpvM6oE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728240218; c=relaxed/simple;
+	bh=5Tm9yDk2u3Tc/59BCiv819NpDm+4+ip/BNwTPZWrq3M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FtEVBfD1zIQAU9WlnGagYy54WzHpZtUZVeb2ML58Uvob5VW9RdyWRX8qM2m1tHQrJd/fJVjM93p+CtN1oMFsNObKBL18fVtS/jlO0CZQZkrnZ+8rjaBfAl2T8zYJlfUESgP3U1qzrrAW6NVESC4I2c1NFPBqIswtRgCVplOnd0w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RBQBQdwP; arc=fail smtp.client-ip=40.107.95.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=C816oqcYuElYoRRR9NVVrUxVWzhZyGWSRaQ06DY/a5PhwkmKM+RETaWb8F7nf4t+2oanagWIaiQOm/45rbC14tvZ1BxRBb55ceg3DF3+QvC4nlqO6PEY371Gf6MX7sDb441oYbVQTh7TNOPG8klz06CzG31OsIv5T3dtmQtZnu7/pLzPi/r5lR7UK3ZLgUB/BEh0VP6Zbon/uM70bZJfcQbwYUMR7bKdUXKWG2c4UMWbOAAmX+TrmRe2aSILa+vJY44nes1RP5x9QkMNHNfvQ+tbt5rUzv6oEpOwHOK5PgqJJI7PLZxnMTfgJU9CFaM5fVdDRDQUTN+lbw9i55/dfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QJMlM69dnuq5XM1hRa++btzeXy7hX01Way5WLX8M6S8=;
+ b=dgkeSg/pFzgtTM8JWLeIpZifiDd1I4DW1+sqXIe+Krgk82wFPpSXoodgeIqORf+vCAVAg2+lKxYYUy7FvI2oB9rqlz/cM/XAsOlAOPkymQrrvhcW+ABiLe1FKQdfDl+pjWnBCClqdDRuzQW7Rv/Iw8gK5w1tK7REIafKesd7OZ6Q0f/HdXYWonUohuHhogCqKs/ZhGEM7pMwIrCtVz1en1tHNpYpr0587PNxXwK8QkPvPNxwQqLtR9UwlS7A8etDYsmWh2wwrlE3YywMorTL4jbbTIViM4BUyJht3WgMKTd4xt4LHjNeoKNh0Rz45/VfslSbqJTmLVqCAafUca56lQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QJMlM69dnuq5XM1hRa++btzeXy7hX01Way5WLX8M6S8=;
+ b=RBQBQdwPZFsQcFHBnWT5uc80gUWoK/PoB1sGgUT4pcYHhYu9iR271OSY88Q++ffaWop/u0XiV3RCWLWJNxiTLkMz+fOvgTd0j1UAdTRuGq1QyPbP9GegqcaXYhvQAjSFvE7jNh2Z5WtL8rZMWjR0fGWvTNLSRPxuZewE1ohVIXDJIe4/Y2nu0M6fNyPECyvbzF8yOw4ozeLsBobPfJwyyMhGvj7DpqyGG3c5H6TO29Vm2vHYr/cx5+6IcWlHMcC4LOPK8MoT1X0LLLIJhjxuX7DPF0OhrGgbZ0l0S09+227Prlti978BbXodOkmrpASvcjwe0xVM8Vjmy7G/wGzbMA==
+Received: from MN0PR04CA0020.namprd04.prod.outlook.com (2603:10b6:208:52d::19)
+ by DS0PR12MB8366.namprd12.prod.outlook.com (2603:10b6:8:f9::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.20; Sun, 6 Oct
+ 2024 18:43:32 +0000
+Received: from BN3PEPF0000B069.namprd21.prod.outlook.com
+ (2603:10b6:208:52d:cafe::60) by MN0PR04CA0020.outlook.office365.com
+ (2603:10b6:208:52d::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.20 via Frontend
+ Transport; Sun, 6 Oct 2024 18:43:32 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN3PEPF0000B069.mail.protection.outlook.com (10.167.243.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8069.0 via Frontend Transport; Sun, 6 Oct 2024 18:43:31 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 6 Oct 2024
+ 11:43:27 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 6 Oct 2024
+ 11:43:27 -0700
+Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Sun, 6 Oct 2024 11:43:24 -0700
+From: Max Gurtovoy <mgurtovoy@nvidia.com>
+To: <stefanha@redhat.com>, <virtualization@lists.linux.dev>, <mst@redhat.com>,
+	Miklos Szeredi <mszeredi@redhat.com>
+CC: <kvm@vger.kernel.org>, <pgootzen@nvidia.com>, <larora@nvidia.com>,
+	<oren@nvidia.com>, Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: [PATCH 1/1] virtio_fs: add informative log for new tag discovery
+Date: Sun, 6 Oct 2024 21:43:24 +0300
+Message-ID: <20241006184324.8497-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B069:EE_|DS0PR12MB8366:EE_
+X-MS-Office365-Filtering-Correlation-Id: 651f1058-63ef-41d1-3701-08dce636c6f4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?N1WVU6L8o57PztIjrdHtdWl7ytA9QVtxd26vNEPLgHJWL+GeUXxID8XK0b4M?=
+ =?us-ascii?Q?kBj/EmTjxnDip18IsGZxEwROKur+HZIg4x+/Y8UUc6MPbT0q2kkvmiJBBieG?=
+ =?us-ascii?Q?JRcrWzqZuFGjOoMsl+rYRehqNpuFEG2aQX5jSRVyfhKm57uz3vc4eh+Dzlf4?=
+ =?us-ascii?Q?JJpzDaUBKyDu2svvoVMlJIng22rqEcwP5xyTdwW0F4GlrfsZHUYoOD909iF2?=
+ =?us-ascii?Q?kizUTIT1byYPBs+t759BHXQ4iHlS0bGYBymh03GH+cO8vlDFrBtFHszh9GKJ?=
+ =?us-ascii?Q?07yhaCz364Hsbp0qolIhOovFNNzP3osRL5SxYxzfpqoKmV/dUJeYYKDynUe7?=
+ =?us-ascii?Q?fht/DY2UDjmTfJYudD3mlWE4rGc/Y6EzftICwbIYewIgbH1K5vLxKbdgg16e?=
+ =?us-ascii?Q?b5muoPcvILpqi/Vr3J2yem+2+SBhAB34jgjlFmwAEWs+3mERZtcTPrwbuQZY?=
+ =?us-ascii?Q?FjQ73WtApBgeokUNUeerN+YyYlsK5VhenpHJHw/YGSvcMYsRGS8DdmGwlGhV?=
+ =?us-ascii?Q?QXQGfxnvel1cxg6aEXbov4Iewe+L5KaKnrTk/vye2Zcn0Sh8kJEmwk+EsKI7?=
+ =?us-ascii?Q?/8LPhM16N3T9DCV1P3AXXPoWkNNtkzBR4wPwTKUfCo5J6KGIQMRp5kEaf66J?=
+ =?us-ascii?Q?0kaKKy0bYN99wDhOAi2Na0ZAu5Cj/Tt7NfwHxCY+5SKS1xBXqg7cyIDbtscJ?=
+ =?us-ascii?Q?I5aDLQLGOe3lYXm3R7m+poHNpDKcX2L+anp330sBlnA+NomGAFjl6yDgFSln?=
+ =?us-ascii?Q?NgtPm4KisrWcOakrfQyxoi6YIFvvNKQAzYQXYgLft3kHyO2SwPM5xPbakD2T?=
+ =?us-ascii?Q?6uONb9uxNbffm5SVXzM0c0jACtPtJGFi2Zqn1YHWjn+sCPILhwCXDaOySAKn?=
+ =?us-ascii?Q?zjCkkDZPku0L+km+76rCINoPz7UQt2t/lFyUqnpKbXLmE7jaWldk81lNdoY6?=
+ =?us-ascii?Q?ENSxFpKgK9RX0VrqUtS1Dio9g0ptPn7XWgAH3zL/4qAE+U9Cv2ShGFxQK15o?=
+ =?us-ascii?Q?mMNmkcbQ9KiM38EnlcgSOC1Z7WZG2TFs+nGV4M2SEymq0FeNZtPWLmErSrKz?=
+ =?us-ascii?Q?L+LU1GaWGDeeUOsBgpAJb7pB9CcqDMzJSzw/o0c2EMb1ECRl/vcQUbmjcgnQ?=
+ =?us-ascii?Q?eAH1t8YTddLL/3q0u7/2CETC0qRkJsbTDRYOGjvTY3sRfbxpOF6+NzbNQ8Fe?=
+ =?us-ascii?Q?+fYb0lG9NFwZPq/u6a9E0tXDXw9IgFI5Yw/ey1B91QKn/5bLKDurjPrA0iGq?=
+ =?us-ascii?Q?CVozJnCOIO2AYOpvYk27A1JjZsBh8wPlRnyvEWFkLvO6I7p+9NBD8plL1i5A?=
+ =?us-ascii?Q?xFkQ/iWIjOTvFvFzpQTdf0baE//begX+jI7MderhGOySxQo74icyLUdWCJUR?=
+ =?us-ascii?Q?GeXuQ+Z8peZm6Dkw2+xwDjPb+1/r?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Oct 2024 18:43:31.8252
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 651f1058-63ef-41d1-3701-08dce636c6f4
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B069.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8366
 
-Li4uDQo+IER1ZSB0byB0aGUgbm9uLW5lZ2xpZ2libGUgaW1wYWN0IG9mIFBJRSwgcGVyaGFwcyBz
-b21lIGtpbmQgb2YNCj4gQ09ORklHX1BJRSBjb25maWcgZGVmaW5pdGlvbiBzaG91bGQgYmUgaW50
-cm9kdWNlZCwgc28gdGhlIGFzc2VtYmx5DQo+IGNvZGUgd291bGQgYmUgYWJsZSB0byBjaG9vc2Ug
-b3B0aW1hbCBhc20gc2VxdWVuY2Ugd2hlbiBQSUUgYW5kIG5vbi1QSUUNCj4gaXMgcmVxdWVzdGVk
-Pw0KDQpJIHdvdWxkbid0IGhhdmUgdGhvdWdodCB0aGF0IHBlcmZvcm1hbmNlIG1hdHRlcmVkIGlu
-IHRoZSBhc20gY29kZQ0KdGhhdCBydW5zIGR1cmluZyBzdGFydHVwPw0KDQpXaGlsZSB4ODYtODQg
-Y29kZSAoaWdub3JpbmcgZGF0YSByZWZlcmVuY2VzKSBpcyBwcmV0dHkgbXVjaCBhbHdheXMNCnBv
-c2l0aW9uIGluZGVwZW5kZW50LCB0aGUgc2FtZSBpc24ndCB0cnVlIG9mIGFsbCBhcmNoaXRlY3R1
-cmVzLg0KU29tZSAoYXQgbGVhc3QgTmlvcy1JSSkgb25seSBoYXZlIGFic29sdXRlIGNhbGwgaW5z
-dHJ1Y3Rpb25zLg0KU28geW91IGNhbid0IHJlYWxseSBtb3ZlIHRvIHBpYyBjb2RlIGdsb2JhbGx5
-Lg0KDQpZb3UnZCBhbHNvIHdhbnQgJ2JhZCcgcGljIGNvZGUgdGhhdCBjb250YWluZWQgc29tZSBm
-aXh1cHMgdGhhdA0KbmVlZGVkIHRoZSBjb2RlIHBhdGNoaW5nLg0KKFdoaWNoIHlvdSByZWFsbHkg
-ZG9uJ3Qgd2FudCBmb3IgYSBzaGFyZWQgbGlicmFyeS4pDQpPdGhlcndpc2UgeW91IGdldCBhbiBl
-eHRyYSBpbnN0cnVjdGlvbiBmb3Igbm9uLXRyaXZpYWwgZGF0YQ0KYWNjZXNzZXMuDQoNClRoaW5r
-aW5nLi4uLg0KRG9lc24ndCB0aGUgY29kZSBnZW5lcmF0ZWQgZm9yIC1mcGljIGFzc3VtZSB0aGF0
-IHRoZSBkeW5hbWljIGxvYWRlcg0KaGFzIHByb2Nlc3NlZCB0aGUgcmVsb2NhdGlvbnMgYmVmb3Jl
-IGl0IGlzIHJ1bj8NCkJ1dCB0aGUga2VybmVsIHN0YXJ0dXAgY29kZSBpcyBydW5uaW5nIGJlZm9y
-ZSB0aGV5IGNhbiBoYXZlIGJlZW4gZG9uZT8NClNvIGV2ZW4gaWYgdGhhdCBDIGNvZGUgd2VyZSAn
-cGljJyBpdCBjb3VsZCBzdGlsbCBjb250YWluIHRoaW5ncyB0aGF0DQphcmUgaW52YWxpZCAocHJv
-YmFibHkgYXJyYXlzIG9mIHBvaW50ZXJzPykuDQpTbyB5b3UgbG9zZSBvbmUgc2V0IG9mIGJ1Z3Mg
-YW5kIGdhaW4gYW5vdGhlci4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtl
-c2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBV
-Sw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+Enhance the device probing process by adding a log message when a new
+virtio-fs tag is successfully discovered. This improvement provides
+better visibility into the initialization of virtio-fs devices.
+
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+ fs/fuse/virtio_fs.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/fuse/virtio_fs.c b/fs/fuse/virtio_fs.c
+index 44f2580db4c2..e2f48a1c57ee 100644
+--- a/fs/fuse/virtio_fs.c
++++ b/fs/fuse/virtio_fs.c
+@@ -521,6 +521,7 @@ static int virtio_fs_read_tag(struct virtio_device *vdev, struct virtio_fs *fs)
+ 		return -EINVAL;
+ 	}
+ 
++	dev_info(&vdev->dev, "discovered new tag: %s\n", fs->tag);
+ 	return 0;
+ }
+ 
+-- 
+2.18.1
 
 
