@@ -1,212 +1,161 @@
-Return-Path: <kvm+bounces-28035-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28036-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1545A991DD7
-	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 12:29:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 658D4991DE3
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 12:38:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71E1AB21FD2
-	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 10:29:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A06D282746
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2024 10:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC234175D42;
-	Sun,  6 Oct 2024 10:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2631741FD;
+	Sun,  6 Oct 2024 10:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K3IxjiMy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="csmzoKfK"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35DA17557C;
-	Sun,  6 Oct 2024 10:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FF21714A8
+	for <kvm@vger.kernel.org>; Sun,  6 Oct 2024 10:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728210506; cv=none; b=iNuTpcwi6gsY9Uwll066qucQm0soUyOfQjte/b9X/aA6ovxAHuNScg6cKgt4Mb4k4H+rpUHD5ThfEM4FvCa1nYqoQ9wVbX8gYnM7p6CfFpTSwsIUxc5capdiU3vGt9bRHNft5ptcT3stzDCupych7KdK+JiuxyWShdgnC52AsWw=
+	t=1728211104; cv=none; b=Ozd1wdOMFVRnavuRB50x6Qi4KyHuoEUIz2X0hBi2jefaRtaZT8z1oWyGkO1IDbcy2LSzOl1+cGjZwPyXbzsBB/stlVyEkQ1XHFWMoPS5rXI2MP/fI9zOF3YPa1AeKLMnNxlHVpQ6m9J8l2zLqjZUbp93jUd+GJ5yp7pfCF+6s20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728210506; c=relaxed/simple;
-	bh=qQResh1CcWQO+c6Odpl8c5StGvv2HmNjqiNTYvGALNg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iQJ6eb1YCAaltvTcp39zsB4HgqdBzTpXF2uRg1NgSNONuFlglYdGFJPSdF2t19WwJBbmqUDt6Vz13AuGunbrtWMTIMu20Qe5pSSBA0VwuIxiqHwr5hHGTrWeTDoVhEv/gWm2kXu4tlYd7xJM1Or+XWzFNvVbqV26BEWWicVtasw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K3IxjiMy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 437DFC4CEC5;
-	Sun,  6 Oct 2024 10:28:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728210506;
-	bh=qQResh1CcWQO+c6Odpl8c5StGvv2HmNjqiNTYvGALNg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K3IxjiMyyiajCHdln/10sV19fD/J+xDyFqAVAcIXluVkjYnKNvOlapBiT7Y/HSrNP
-	 uhgMmCLkK1CkoE++6Bb38HEl3VHA4CME0DyCPvl1aHLksbZ6p39/GulEkPn7Y73aFe
-	 OW89w/nZAikRIJ3qGed6/jnmAIXr6cqQxW5a+eX2rypOtqdgQvju3rGiDGtvnixXdm
-	 0KxnRa1t1l3qcHdFdzXgZngHL3LJF0kxtOhBzIBWmwGgXG2t5yy0PcTZh+5gzDlHzU
-	 xNxhMRG5TduTIc/ZYMLMNpSjllc4di4751gj7gWX4UUQiIL31gHN0seMnPy4P7tTgL
-	 dNkRzVCPcs9rg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sxOUy-000lyd-1W;
-	Sun, 06 Oct 2024 11:28:24 +0100
-Date: Sun, 06 Oct 2024 11:28:23 +0100
-Message-ID: <8634l97cfs.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Enrico Joerns <ejo@pengutronix.de>
-Subject: Re: [BUG] ARM64 KVM: Data abort executing post-indexed LDR on MMIO address
-In-Reply-To: <0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
-References: <89f184d6-5b61-4c77-9f3b-c0a8f6a75d60@pengutronix.de>
-	<CAFEAcA_Yv2a=XCKw80y9iyBRoC27UL6Sfzgy4KwFDkC1gbzK7w@mail.gmail.com>
-	<a4c06f55-28ec-4620-b594-b7ff0bb1e162@pengutronix.de>
-	<CAFEAcA9F3AR-0OCKDy__eVBJRMi80G7bWNfANGZRR2W8iMhfJA@mail.gmail.com>
-	<4d559b9e-c208-46f3-851a-68086dc8a50f@pengutronix.de>
-	<864j5q7sdq.wl-maz@kernel.org>
-	<65ab10d7-6594-490c-be07-39f83ac3559a@pengutronix.de>
-	<87a5fiutai.wl-maz@kernel.org>
-	<0352a327-0e78-48d4-a876-d33689fcd766@pengutronix.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1728211104; c=relaxed/simple;
+	bh=f2xxi2DKOs66PGZFJ5bjsk68GauCtWp8hrFiJiYR5JA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fGdP/Fx3R3CtV+UQTF59reV9wOSNevFzTZoS0KXI/lmdpdBtNyKiJXqqd1RyPtCu7ik8Iwt3CwW2jj591uoxcIUxNUamdqclARvS2h3fzLGSPUItlfbX5teuPVBzmWOx2jpM91tv+8SiHrxCE2sV1BrUtPzUjutMYLy6oKMIL0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=csmzoKfK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728211102;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3jIevzNX1rCjaTgjZLvCdPeQriMBLs6C6UIuyj0VsKA=;
+	b=csmzoKfKIKa+wYSgLpVFG9D7KrgRfJhgt/gofk67A+ki175DsGz1QpQzUwTkttsD/wxyyb
+	a1mW4qxsiXM9nF4qfeDU5qp123QPIug0PtJD+SqG3g6+JUX0GlKCbTq4F5XayakhTAxhzM
+	XyuqPRvvziH+KvFnU+VR4WPK1WxeS3U=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-407-78peGwRyNuKpBPgpg-meZQ-1; Sun, 06 Oct 2024 06:38:20 -0400
+X-MC-Unique: 78peGwRyNuKpBPgpg-meZQ-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a8a92ab4cdbso329607566b.0
+        for <kvm@vger.kernel.org>; Sun, 06 Oct 2024 03:38:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728211099; x=1728815899;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3jIevzNX1rCjaTgjZLvCdPeQriMBLs6C6UIuyj0VsKA=;
+        b=fp7+JMwZxGv4GfbcOK+vr4itrY2RduI3ERBNC9JQzWww72OMbLuVuVmpMFiZyxFIsH
+         yxlD9q0ZoXW0iq+U260LgX2Wc34n40zxYdDUaCTtkmgY4i6MIiGFn1UZck3/tUsSLo9H
+         Lv9JQ9GCM5iabdWKeFoEXA2yWuvDPQCLIYA32YYBGZgvM627SmrTYttdpYVx3kMNKJHr
+         lYWJfl1QHtyep8nP1gH4m7ExvgnpB+N5T0StYrc+KmWid0NBSvmBk0OHRWjDxSWUD56I
+         lrTE4+WT9ZmhQGta3dY/JcFjQx1catgVX+377vGPXRFxnM0hfZsumEArNZHUvF1Lxla1
+         r9bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMOvaVatiTPSlxjDo3eUXh6rSweCqI+0QsN27+X6o9Z4nPvHOhu3O1iwsqCPrEBMO2GLQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhLy0icl9Rv5GffzHge6eURIqeC2d+jQ7zH2oTyDZeMVYjA6Cv
+	ZBpyuFPNSQMt/ZKaSnytrzroHuZIqYlrnT0JS/yG64aA/qeTL1YtQzhBmgAi/J1FESHiDLtC6VM
+	BcdmPRLa++V9vQVL3PjHmQmmxg81YMvvUW6kagMIfYzHN8N9i4YOgMp4pr+nF
+X-Received: by 2002:a17:907:97d5:b0:a99:3eae:87f3 with SMTP id a640c23a62f3a-a993eae8b86mr403715866b.47.1728211098984;
+        Sun, 06 Oct 2024 03:38:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGnLTM5tVtHu/M77oCObxmLChhB1MJWc1zEWDoVC80fUmtRwNGJNwtxYPzjHmHgXDBx8JZuTQ==
+X-Received: by 2002:a17:907:97d5:b0:a99:3eae:87f3 with SMTP id a640c23a62f3a-a993eae8b86mr403713766b.47.1728211098583;
+        Sun, 06 Oct 2024 03:38:18 -0700 (PDT)
+Received: from avogadro.local ([151.95.43.71])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9937dbb84csm204933666b.99.2024.10.06.03.38.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Oct 2024 03:38:17 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 6.12-rc2
+Date: Sun,  6 Oct 2024 12:38:14 +0200
+Message-ID: <20241006103814.1173034-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: a.fatoum@pengutronix.de, peter.maydell@linaro.org, qemu-arm@nongnu.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, ejo@pengutronix.de
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sun, 06 Oct 2024 08:59:56 +0100,
-Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> 
-> Hello Marc,
-> 
-> On 05.10.24 23:35, Marc Zyngier wrote:
-> > On Sat, 05 Oct 2024 19:38:23 +0100,
-> > Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> >>> IIRC, the QEMU flash is implemented as a read-only memslot. A data
-> >>> cache invalidation is a *write*, as it can be (and is) upgraded to a
-> >>> clean+invalidate by the HW.
-> >>
-> >> So it's a write, even if there are no dirty cache lines?
-> > 
-> > Yes.
-> > 
-> > At the point where this is handled, the CPU has no clue about the
-> > dirty state of an arbitrary cache line, at an arbitrary cache level.
-> > The CPU simply forward the CMO downstream, and the permission check
-> > happens way before that.
-> 
-> I see. When I added that invalidation, it was suggested[1] that instead
-> of invalidation after the remapping, I would clean the range before
-> remapping. Cleaning the zero page triggered a data abort, which I didn't
-> understand as there should be no dirty lines, but now I get it.
-> 
-> One more question: This upgrading of DC IVAC to DC CIVAC is because
-> the code is run under virtualization, right?
+Linus,
 
-Not necessarily. Virtualisation mandates the upgrade, but CIVAC is
-also a perfectly valid implementation of both IVAC and CVAC.  And it
-isn't uncommon that CPUs implement everything the same way.
+The following changes since commit 9852d85ec9d492ebef56dc5f229416c925758edc:
 
-This is why, if you dare looking at the definition of ESR_ELx for a
-data abort, you will notice that ESR_ELx.WnR (which indicates whether
-the abort was triggered by a read or a write) is always 1 (denoting a
-write) on a CMO, irrespective of what CMO triggered it.
+  Linux 6.12-rc1 (2024-09-29 15:06:19 -0700)
 
-Additionally, FEAT_CMOW requires both read and write permissions to
-not trigger faults on CMOs, but that's a bit orthogonal to your
-problem.
+are available in the Git repository at:
 
-> 
-> [1]: https://lore.barebox.org/barebox/9809c04c-58c5-6888-2b14-cf17fa7c4b1a@pengutronix.de/
-> 
-> >> The routine[1] that does this remapping invalidates the virtual address range,
-> >> because the attributes may change[2]. This invalidate also happens for cfi-flash,
-> >> but we should never encounter dirty cache lines there as the remap is done
-> >> before driver probe.
-> >>
-> >> Can you advise what should be done differently?
-> > 
-> > If you always map the flash as Device memory, there is no need for
-> > CMOs. Same thing if you map it as NC.
-> 
-> Everything, except for RAM, is mapped Device-nGnRnE.
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-Right, no problem then.
+for you to fetch changes up to c8d430db8eec7d4fd13a6bea27b7086a54eda6da:
 
-> 
-> > And even if you did map it as
-> > Cacheable, it wouldn't matter. KVM already handles coherency when the
-> > flash is switching between memory-mapped and programming mode, as the
-> > physical address space changes (the flash literally drops from the
-> > memory map).
-> > 
-> > In general, issuing CMOs to a device is a bizarre concept, because it
-> > is pretty rare that a device can handle a full cache-line as
-> > write-back. Devices tend to handle smaller, register-sized accesses,
-> > not a full 64-byte eviction.
-> 
-> The same remap_range function is used to:
-> 
->   - remap normal memory:
->     - Mapping memory regions uncached for memory test
->     - Mapping memory buffers coherent or write-combine
->   - remap ROMs: BootROMs at address zero may be hidden behind the NULL
->     page and need to be mapped differently when calling/peeking into it.
->   - remap device memory, e.g. in the case of the cfi-flash here
-> 
-> The invalidation is done unconditionally for all of them, although it
-> makes only the sense in the first case.
+  Merge tag 'kvmarm-fixes-6.12-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2024-10-06 03:59:22 -0400)
 
-Indeed.
+----------------------------------------------------------------
+ARM64:
 
-> 
-> > Now, I'm still wondering whether we should simply forward the CMO to
-> > userspace as we do for other writes, and let the VMM deal with it. The
-> > main issue is that there is no current way to describe this.
-> > 
-> > The alternative would be to silently handle the trap and pretend it
-> > never occurred, as we do for other bizarre behaviours. But that'd be
-> > something only new kernels would support, and I guess you'd like your
-> > guest to work today, not tomorrow.
-> 
-> I think following fix on the barebox side may work:
-> 
->   - Walk all pages about to be remapped
->   - Execute the AT instruction on the page's base address
+* Fix pKVM error path on init, making sure we do not change critical
+  system registers as we're about to fail
 
-Why do you need AT if you are walking the PTs? If you walk, you
-already have access to the memory attributes. In general, AT can be
-slower than an actual walk.
+* Make sure that the host's vector length is at capped by a value
+  common to all CPUs
 
-Or did you actually mean iterating over the VA range? Even in that
-case, AT can be a bad idea, as you are likely to iterate in page-size
-increments even if you have a block mapping. Walking the PTs tells you
-immediately how much a leaf is mapping (assuming you don't have any
-other tracking).
+* Fix kvm_has_feat*() handling of "negative" features, as the current
+  code is pretty broken
 
->   - Only if the page was previously mapped cacheable, clean + invalidate
->     the cache
->   - Remove the current cache invalidation after remap
-> 
-> Does that sound sensible?
+* Promote Joey to the status of official reviewer, while James steps
+  down -- hopefully only temporarly
 
-This looks reasonable (apart from the AT thingy).
+x86:
 
-Thanks,
+* Fix compilation with KVM_INTEL=KVM_AMD=n
 
-	M.
+* Fix disabling KVM_X86_QUIRK_SLOT_ZAP_ALL when shadow MMU is in use
 
--- 
-Without deviation from the norm, progress is not possible.
+Selftests:
+
+* Fix compilation on non-x86 architectures
+
+----------------------------------------------------------------
+Marc Zyngier (2):
+      KVM: arm64: Another reviewer reshuffle
+      KVM: arm64: Fix kvm_has_feat*() handling of negative features
+
+Mark Brown (2):
+      KVM: arm64: Constrain the host to the maximum shared SVE VL with pKVM
+      KVM: selftests: Fix build on architectures other than x86_64
+
+Paolo Bonzini (4):
+      KVM: x86/mmu: fix KVM_X86_QUIRK_SLOT_ZAP_ALL for shadow MMU
+      KVM: x86: leave kvm.ko out of the build if no vendor module is requested
+      x86/reboot: emergency callbacks are now registered by common KVM code
+      Merge tag 'kvmarm-fixes-6.12-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+
+Vincent Donnefort (1):
+      KVM: arm64: Fix __pkvm_init_vcpu cptr_el2 error path
+
+ MAINTAINERS                                        |  2 +-
+ arch/arm64/include/asm/kvm_host.h                  | 25 ++++-----
+ arch/arm64/kvm/hyp/include/hyp/switch.h            |  2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c                 | 12 +++--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                     |  6 ++-
+ arch/x86/include/asm/reboot.h                      |  4 +-
+ arch/x86/kernel/reboot.c                           |  4 +-
+ arch/x86/kvm/Kconfig                               |  9 ++--
+ arch/x86/kvm/Makefile                              |  2 +-
+ arch/x86/kvm/mmu/mmu.c                             | 60 +++++++++++++++++-----
+ .../kvm/memslot_modification_stress_test.c         |  2 +
+ tools/testing/selftests/kvm/memslot_perf_test.c    |  6 +++
+ 12 files changed, 91 insertions(+), 43 deletions(-)
+
 
