@@ -1,136 +1,182 @@
-Return-Path: <kvm+bounces-28052-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28053-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DBB39928C7
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 12:07:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5C2992910
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 12:22:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C65A01F24BF2
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 10:07:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADD7DB23960
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 10:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7451C174B;
-	Mon,  7 Oct 2024 10:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LVk8pTD4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33571B86E6;
+	Mon,  7 Oct 2024 10:22:22 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76171AF4DC
-	for <kvm@vger.kernel.org>; Mon,  7 Oct 2024 10:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EEB01B78F6;
+	Mon,  7 Oct 2024 10:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728295521; cv=none; b=nLwfVz9WYvoqdVUqWXqU9ehKD2WPd7WVBI8h9FtuE9p4t4Ab1hdkgaVu0D+iUI3XQasMuJHYDlLWyC4adewN5CG6Dt1AK4vucPySvxFGwSs5QB56W44s623jhqhqSLhZAcpVDSDikMh4zC/xTAqr8AgJ4U3z6Y5cJkkA087/oFE=
+	t=1728296542; cv=none; b=L/8aEDPtmQT0BB8/Our4oTLsITOjZn2g4Oxh7OP/Q2V3R/qzml5+8zD1NaEtn3s7c/28NaYxdzAJOAnZ52TdL/Mp5jQactfj/YCkYLzXAVe6fHxx3QVlZvJ1WR/ftDirdbqoOTKzkxqfl+3dz25nnHhNtkKOtw98WPqxoHK32gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728295521; c=relaxed/simple;
-	bh=AnOcALsZJg/wxyrcnpW+cGt1cV5NfTexgZo0XTBcLLw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i3w6cIHrGLWqIJ4/FriEF9ff5OGPsqSiCQRHc2r2LOGAjSqVuumjBt0H+J5DGw7p35wBiY1ao2pbRQkUlYygVy2s8kskgndZ3FHxIhzCtjO5Hj701uzNMYZUAU0eudbCq2sBY2AKuElbBzL/qz7KUjLhAKcYkR2jCne9p2iRg0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LVk8pTD4; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728295520; x=1759831520;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=AnOcALsZJg/wxyrcnpW+cGt1cV5NfTexgZo0XTBcLLw=;
-  b=LVk8pTD41pTxqGJ6Hr40+Fb2Z0KbVUx6DzrZHI+6SsE+larhlpeW/y2i
-   TB9MTCA2BXMDPkfIJG+mluhQPRaPA3cMyLpiR55HYI4RLjN4MDMFaExgH
-   iDj3mK8w8ihCuNay/9jWdwQWTzvLrTIdQhzgqrgL2vP5aghno9wK2/5g2
-   VnXJeArlMKbJF09J2gHDzKr/rbZ5EYEKuExEd6w+JlrlW3PLvcJHVQqcr
-   zWMUzAGUX/bT72epzMKejt2EXn2yKi7splbCDSLhLklUh5FfC+13clkoL
-   iMho02x0qmCCMy7m6/WzYJMFYWsj3Sj6i7tEJLBjjumFnc85fyzWfHYih
-   A==;
-X-CSE-ConnectionGUID: q6H7Yf3LRZqQ1fMpZgjIug==
-X-CSE-MsgGUID: Fz8mK0qVTWWJnuPkoFrdSQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11217"; a="27319851"
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="27319851"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 03:05:19 -0700
-X-CSE-ConnectionGUID: 7gJQIEZzT8mpzKFWqrHFdQ==
-X-CSE-MsgGUID: ogeD7LVYT4KOliHP51MW6A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="75258677"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orviesa010.jf.intel.com with ESMTP; 07 Oct 2024 03:05:13 -0700
-Date: Mon, 7 Oct 2024 18:21:24 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Alireza Sanaee <alireza.sanaee@huawei.com>
-Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S.Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [PATCH v2 6/7] i386/cpu: Update cache topology with machine's
- configuration
-Message-ID: <ZwO2JIMJ+lX0N61h@intel.com>
-References: <20240908125920.1160236-1-zhao1.liu@intel.com>
- <20240908125920.1160236-7-zhao1.liu@intel.com>
- <20240911110028.00001d3d@huawei.com>
+	s=arc-20240116; t=1728296542; c=relaxed/simple;
+	bh=kTc+AjP0b7abuuU4psMJVQLsuk/9Sn+RLxkMe+/u/mc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ARB3SV1Yqszmixq6Jau+9QwLkhrF9CFC4qQl8d2LRjpscCljv1NPp7o4nrG8fWVlo73+4rJT1wm8aNut4z7G8zPnNcGrwG6197ipAj1HcBTA8jSPb7deyni1PHQ9zF8NN1vMTFaf3YT4YwsO+O8nQ7tN7sJvg3cTB+0dK42+PVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E2E7FEC;
+	Mon,  7 Oct 2024 03:22:49 -0700 (PDT)
+Received: from [10.57.78.166] (unknown [10.57.78.166])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B63263F64C;
+	Mon,  7 Oct 2024 03:22:15 -0700 (PDT)
+Message-ID: <3dd5059b-a42d-496b-8de3-e16012d6dafd@arm.com>
+Date: Mon, 7 Oct 2024 11:22:13 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911110028.00001d3d@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 19/43] KVM: arm64: Handle realm MMIO emulation
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>
+References: <20241004152804.72508-1-steven.price@arm.com>
+ <20241004152804.72508-20-steven.price@arm.com> <yq5awmik5yai.fsf@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <yq5awmik5yai.fsf@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Ali,
-
-[snip]
-
-> > +
-> > +    /*
-> > +     * TODO: Add a SMPCompatProps.has_caches flag to avoid useless
-> > Updates
-> > +     * if user didn't set smp_cache.
-> > +     */
-> Hi Zhao,
+On 07/10/2024 05:31, Aneesh Kumar K.V wrote:
+> Steven Price <steven.price@arm.com> writes:
 > 
-> Thanks for sending this patchset so quickly. I really appreciate the
-> TODO already :)
-
-Welcome! And I'm also sorry for a long silence. Now I'm back from the
-vacation and will keep pushing this series forward.
-
-> It also helps me avoid going through every single
-> layer, especially when I want to avoid matching system registers in
-> ARM, particularly when there's no description in the command line.
-
-Great! I also noticed your patch for this "TODO" and will help you
-review it soon.
-
-Regards,
-Zhao
-
-> > +    x86_cpu_update_smp_cache_topo(ms, cpu);
-> > +
-> >      qemu_register_reset(x86_cpu_machine_reset_cb, cpu);
-> >  
-> >      if (cpu->env.features[FEAT_1_EDX] & CPUID_APIC || ms->smp.cpus >
-> > 1) {
+>> MMIO emulation for a realm cannot be done directly with the VM's
+>> registers as they are protected from the host. However, for emulatable
+>> data aborts, the RMM uses GPRS[0] to provide the read/written value.
+>> We can transfer this from/to the equivalent VCPU's register entry and
+>> then depend on the generic MMIO handling code in KVM.
+>>
+>> For a MMIO read, the value is placed in the shared RecExit structure
+>> during kvm_handle_mmio_return() rather than in the VCPU's register
+>> entry.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> v3: Adapt to previous patch changes
+>> ---
+>>  arch/arm64/kvm/mmio.c     | 10 +++++++++-
+>>  arch/arm64/kvm/rme-exit.c |  6 ++++++
+>>  2 files changed, 15 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+>> index cd6b7b83e2c3..66a838b3776a 100644
+>> --- a/arch/arm64/kvm/mmio.c
+>> +++ b/arch/arm64/kvm/mmio.c
+>> @@ -6,6 +6,7 @@
+>>  
+>>  #include <linux/kvm_host.h>
+>>  #include <asm/kvm_emulate.h>
+>> +#include <asm/rmi_smc.h>
+>>  #include <trace/events/kvm.h>
+>>  
+>>  #include "trace.h"
+>> @@ -90,6 +91,9 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>>  
+>>  	vcpu->mmio_needed = 0;
+>>  
+>> +	if (vcpu_is_rec(vcpu))
+>> +		vcpu->arch.rec.run->enter.flags |= REC_ENTER_EMULATED_MMIO;
+>> +
+>>  	if (!kvm_vcpu_dabt_iswrite(vcpu)) {
+>>  		struct kvm_run *run = vcpu->run;
+>>  
+>> @@ -108,7 +112,11 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>>  		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+>>  			       &data);
+>>  		data = vcpu_data_host_to_guest(vcpu, data, len);
+>> -		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
+>> +
+>> +		if (vcpu_is_rec(vcpu))
+>> +			vcpu->arch.rec.run->enter.gprs[0] = data;
+>> +		else
+>> +			vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu), data);
+>>  	}
+>>  
+>>  	/*
+>>
 > 
+> Does a kvm_incr_pc(vcpu); make sense for realm guest? Should we do
+
+The PC is ignored when restarting realm guest, so kvm_incr_pr() is
+effectively a no-op. But I guess REC_ENTER_EMULATED_MMIO is our way of
+signalling to the RMM that it should skip the instruction, so your
+proposed patch below makes the code slightly clearer.
+
+Thanks,
+Steve
+
+> modified   arch/arm64/kvm/mmio.c
+> @@ -91,9 +91,6 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>  
+>  	vcpu->mmio_needed = 0;
+>  
+> -	if (vcpu_is_rec(vcpu))
+> -		vcpu->arch.rec.run->enter.flags |= RMI_EMULATED_MMIO;
+> -
+>  	if (!kvm_vcpu_dabt_iswrite(vcpu)) {
+>  		struct kvm_run *run = vcpu->run;
+>  
+> @@ -123,7 +120,10 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+>  	 * The MMIO instruction is emulated and should not be re-executed
+>  	 * in the guest.
+>  	 */
+> -	kvm_incr_pc(vcpu);
+> +	if (vcpu_is_rec(vcpu))
+> +		vcpu->arch.rec.run->enter.flags |= RMI_EMULATED_MMIO;
+> +	else
+> +		kvm_incr_pc(vcpu);
+>  
+>  	return 1;
+>  }
+> 
+> 
+> 
+>> diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
+>> index e96ea308212c..1ddbff123149 100644
+>> --- a/arch/arm64/kvm/rme-exit.c
+>> +++ b/arch/arm64/kvm/rme-exit.c
+>> @@ -25,6 +25,12 @@ static int rec_exit_reason_notimpl(struct kvm_vcpu *vcpu)
+>>  
+>>  static int rec_exit_sync_dabt(struct kvm_vcpu *vcpu)
+>>  {
+>> +	struct realm_rec *rec = &vcpu->arch.rec;
+>> +
+>> +	if (kvm_vcpu_dabt_iswrite(vcpu) && kvm_vcpu_dabt_isvalid(vcpu))
+>> +		vcpu_set_reg(vcpu, kvm_vcpu_dabt_get_rd(vcpu),
+>> +			     rec->run->exit.gprs[0]);
+>> +
+>>  	return kvm_handle_guest_abort(vcpu);
+>>  }
+>>  
+>> -- 
+>> 2.34.1
 
 
