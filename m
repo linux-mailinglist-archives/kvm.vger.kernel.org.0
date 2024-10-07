@@ -1,134 +1,134 @@
-Return-Path: <kvm+bounces-28079-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28080-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E69199352B
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 19:38:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DEEB9935AC
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 20:07:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF9F61C23359
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 17:38:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 446231F23C2F
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 18:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27EE1DD9D4;
-	Mon,  7 Oct 2024 17:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 132A01DCB3A;
+	Mon,  7 Oct 2024 18:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ePNugoc1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0v2IUBOK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7141DD9BE
-	for <kvm@vger.kernel.org>; Mon,  7 Oct 2024 17:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B521E187342
+	for <kvm@vger.kernel.org>; Mon,  7 Oct 2024 18:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728322696; cv=none; b=uXxqdLG84LHpjNP8bw2nY9OuxrZjw6/Eo9EkIM7wKtZbIKOGV4NLWEy9qfXRpua6pO43VyAL2GC0Q/UE2FoUcas9ZIZXqQcvILDYOz3JK5s+/GNIgycalyrU/H8QOCUhj2oY9ef420Lz3Uc581ojiduET18af8uWbK0nuLd7UPg=
+	t=1728324437; cv=none; b=IhWhVFRVh2v+6Qn0ytOV/rSZzok/bv35DOv0RfRE/qm37tmbEnRXt0a9c/3s+PU1wCNrVxuHNpMX+gbpXS13325no5ljgn4ZLU/BIAofMzYglQ6q9MQ6ZsvAeJ5IlG8MrsXRHg961l0QZLR6DIkCqgnncNhdzFhlByYpiNBxkCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728322696; c=relaxed/simple;
-	bh=/k6vljXwBlgCjmZ3+FeBxgnPubYqyHVa/VgKHxklvOc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QonQNblc7zTKrRM9hN4txCFKObuc7oGPOrCaCnUFcludVSCOlFYkXQiR0Ks+XLgVn5nnDiCf64ALaIOyNJorzB57C9b7OOyJm0ZHs+o1jHnKkf/vac2AGYu1te3E3gMjwWlqquMPDmGN+ejwRk709xRwr0GSoTNHMxeJTEG1zpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ePNugoc1; arc=none smtp.client-ip=209.85.160.182
+	s=arc-20240116; t=1728324437; c=relaxed/simple;
+	bh=Ni6BX5KQWkzUj/pu9p2vgFWSsJfGNsVDTxDa1tFaf6Y=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Db8yNEE500QI95+6Yt0ToSFDksFwXxgYkjgolopdoH7Bavg0olnRAnxpGgbVZgELj1jCgGz6lh6TNrxVY3qu8TSvStXAkfTezYc+O54kqTmWqFLgBpJlMcvhJGnLGxwTS+PQQ4YB624CECb4rUuLrV9cey8XdmH/7lQIKEOwN68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0v2IUBOK; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4581cec6079so24071cf.0
-        for <kvm@vger.kernel.org>; Mon, 07 Oct 2024 10:38:14 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e278b2a5c4so81619587b3.2
+        for <kvm@vger.kernel.org>; Mon, 07 Oct 2024 11:07:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728322693; x=1728927493; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QS16seDgTrfXYQ3DhtlLPe9kHa0/3e1Rh1j402yuupk=;
-        b=ePNugoc1yj/dc9bPt5kWLsVHYYr4CaEq4WDTr4Vx9VDqVy9yPxKm5MBCZY9ADm7c8t
-         Q7VCumDOy9AQJhdo5HDV0h3VNz/qlL3jGxRTVwnjEAMuIyLgW90XSClV5md4JIMMLs7S
-         ueYgf4HN/mMBMe9ic+75yTs1QdGi5pxO3rJJa0K73FLpJu1htrYobEFRGZDanHMDDShX
-         2RrneFS/5l4HY+Rn9rhMq014zn61Q0QD91lTr0MLhEr0NheX+ZFTEdK5iipOE767V9rN
-         mfKnzMneVe3YCBq4bmzBNLqrDqFhXHD16z+OaZx04leybCbSfvXvS9Mhd2eg0D5ZYkC9
-         NvzA==
+        d=google.com; s=20230601; t=1728324435; x=1728929235; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VwUJF7s5S6rOFwH/1ywEO9n1mm6Mhiq+H2CN8zBkDE8=;
+        b=0v2IUBOK+x18EUXR1n1nwsizUB5Roj62CqDqS7Gdor9ID+FG85A+1JHbgqRSva4HwP
+         vMJX0+MbuO7b69cNw+ldKHKSI8rH5zVOKSbSKTiNJPjKmmJit7lJeNCsS+CCUtDtLg6J
+         YJ5tib9NBcm9bZPF98kEdszPhmZ5Nf6qc3ZR9fp39eh01ZKx8YkUqRcZ7LhpJinMb+Hd
+         RNxlQjNWtI+ZF9pflzwhiuSvahRKliDP8Bd9uFYwWR7jwbuxr54B8Bkq4/mb1S3cmRIZ
+         I0eXLJCA/iNCHSpnAkFTujwsUPd4wpvy1XY+m5pHj1Tp9hNR74+y/pv8SiIFkUWrEOeG
+         gdpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728322693; x=1728927493;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QS16seDgTrfXYQ3DhtlLPe9kHa0/3e1Rh1j402yuupk=;
-        b=KJjAUTKwV0r/QjSA9bsgFe4NCxr1A5txrvjQl4+kd3n8OG9+MTIXbFOmPBGB7gsbPO
-         Pb7bPEZ7sb19ahJ7YJML9Q3lmtfXq5qvqtOBMqjp437QjarnQ3Lwnl+fdocBqP6r+rVX
-         nlogDFqbWQXoOazPPudlm1KF9NuKXpe+Og61xG5bGtO4Qs/n/SFH28BLCpbdpyecncBv
-         ayPaxqOELCQoOVmKtvM75t677d/H8tO1Wz4EaPs8xzKviQ4NUR08qEFbMtiMwebn7aL2
-         HZcTq/vSs37B6SvhFie04/yzgaF8eok+3VXTuATdvKTK3lzeVNMDPkVUJLzvIIGlKbsL
-         IRNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVUQ+X65qw8ongQvOI9WawkCDgPkoUCkleGHEXD0/Ayak8WsquCItv36PSZwHKy55AttXc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyd7zfcgCa74ZcniZtPn9vDjAA9aG8gDmrB6fRXntq1yKWTssND
-	U8h1R+bFVh0Uvq8HoRJW/C7PcMBGyoyyk8TKgSwz6Lb09TjK4KsDer8eB9wyPrC0P2fG3qElbVc
-	If4I9mPW38L/b8Fp3hxb6eln8Kl1dYavYOpiV
-X-Google-Smtp-Source: AGHT+IEpqvxvf+zPWcZiQ0lIWhuFlOh+jjsrdaovB5Fk7Ch8SA+B6A3r9V3OzIKYc/kDyDbDW9nioC5hsWFKF7dDsdQ=
-X-Received: by 2002:a05:622a:8611:b0:45c:9b41:248f with SMTP id
- d75a77b69052e-45da98514dbmr6843251cf.25.1728322693424; Mon, 07 Oct 2024
- 10:38:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728324435; x=1728929235;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VwUJF7s5S6rOFwH/1ywEO9n1mm6Mhiq+H2CN8zBkDE8=;
+        b=heCMp94AlwQEbl4mK7OYLmT6MQVQIsgmTwjxMUoCslRq/buYm0H794d/4EhNDB37fV
+         MQmiDW/PEBPEHus86sUKNT6tSHhl+4V9eye7qhld2YzRokKY6+bhThfaklSzCmfe/B2C
+         qRMY0eotz0g6izmhODkdWEeHNanp+hZ5Fg+9qGbQAmTtc5IHGVO5cHfUojvN36Bxkkt8
+         7XRVWG57QNeEOArlWgNjwOqLoaltdGdNhscfueChKjaUQTfQfTCRbOY1SGtG7Efy5Owr
+         +wX16XypJv3HiTv4OaKoZNPKG1SbbfUHx+Gq5NMnQhArWY0giK2Y11YYFmmeHbqDYPa1
+         UfIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUUceUE+bmZDIKvEwxEkFW5MVfOZlHsWHXmp4pK0zKjS0AVYQPaMM0YAu+s8AKLP/4J/Hc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHht5T6g9KiKjEcse+cLuAnhQvidhPXHVcGkQ9TVNgcW+KhsGj
+	3/8IYcxCifd8TXYOloeWz6OV/Ibo+rJYzvFyF2sXCiYcjLV1xltOJX/EQpt25dkr2F3HX/1i8If
+	hHg==
+X-Google-Smtp-Source: AGHT+IHojWqKAomAE3uCrn8YPheGegyZrXwQOFdq//Fbnc7LqjEGMuDdg5hyz5LsciiapY8/UB+3hx/1cng=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:961:b0:6db:54ae:fd0f with SMTP id
+ 00721157ae682-6e2c72aeb70mr1228017b3.7.1728324434662; Mon, 07 Oct 2024
+ 11:07:14 -0700 (PDT)
+Date: Mon, 7 Oct 2024 18:07:13 +0000
+In-Reply-To: <SA1PR10MB7815C826ABBCA3AC3B3F3B12E97D2@SA1PR10MB7815.namprd10.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240913173242.3271406-1-jmattson@google.com> <20240913173242.3271406-2-jmattson@google.com>
- <20241007143019.GAZwPwe286itXE2Wj2@fat_crate.local>
-In-Reply-To: <20241007143019.GAZwPwe286itXE2Wj2@fat_crate.local>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 7 Oct 2024 10:38:01 -0700
-Message-ID: <CALMp9eSZX_fEy6=wWr=HY_6kDULE6-8_16cRGgfjoVhGguF7AQ@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] x86/cpufeatures: Define X86_FEATURE_AMD_IBPB_RET
-To: Borislav Petkov <bp@alien8.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Sandipan Das <sandipan.das@amd.com>, Kai Huang <kai.huang@intel.com>, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Venkatesh Srinivas <venkateshs@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <SA1PR10MB7815C826ABBCA3AC3B3F3B12E97D2@SA1PR10MB7815.namprd10.prod.outlook.com>
+Message-ID: <ZwQjUSOle6sWARsr@google.com>
+Subject: Re: KVM default behavior change on module loading in kernel 6.12
+From: Sean Christopherson <seanjc@google.com>
+To: Vadim Galitsin <vadim.galitsyn@oracle.com>
+Cc: Klaus Espenlaub <klaus.espenlaub@oracle.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Oct 7, 2024 at 7:30=E2=80=AFAM Borislav Petkov <bp@alien8.de> wrote=
-:
->
-> On Fri, Sep 13, 2024 at 10:32:27AM -0700, Jim Mattson wrote:
-> > AMD's initial implementation of IBPB did not clear the return address
-> > predictor. Beginning with Zen4, AMD's IBPB *does* clear the return
-> > address predictor. This behavior is enumerated by
-> > CPUID.80000008H:EBX.IBPB_RET[bit 30].
-> >
-> > Define X86_FEATURE_AMD_IBPB_RET for use in KVM_GET_SUPPORTED_CPUID,
-> > when determining cross-vendor capabilities.
-> >
-> > Suggested-by: Venkatesh Srinivas <venkateshs@chromium.org>
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > ---
-> >  arch/x86/include/asm/cpufeatures.h | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/=
-cpufeatures.h
-> > index cabd6b58e8ec..a222a24677d7 100644
-> > --- a/arch/x86/include/asm/cpufeatures.h
-> > +++ b/arch/x86/include/asm/cpufeatures.h
-> > @@ -215,7 +215,7 @@
-> >  #define X86_FEATURE_SPEC_STORE_BYPASS_DISABLE        ( 7*32+23) /* Dis=
-able Speculative Store Bypass. */
-> >  #define X86_FEATURE_LS_CFG_SSBD              ( 7*32+24)  /* AMD SSBD i=
-mplementation via LS_CFG MSR */
-> >  #define X86_FEATURE_IBRS             ( 7*32+25) /* "ibrs" Indirect Bra=
-nch Restricted Speculation */
-> > -#define X86_FEATURE_IBPB             ( 7*32+26) /* "ibpb" Indirect Bra=
-nch Prediction Barrier without RSB flush */
->
-> I see upstream
->
-> #define X86_FEATURE_IBPB                ( 7*32+26) /* "ibpb" Indirect Bra=
-nch Prediction Barrier */
->
-> Where does "without RSB flush" come from?
++lists and Paolo
 
-Bad git hygiene. This should have been a 4 patch set, not a 3 patch
-set. Sigh. I'll send out v5.
+On Mon, Oct 07, 2024, Vadim Galitsin wrote:
+> Hi Sean,
+> 
+> My name is Vadim. I am from Oracle's VirtualBox team.
+> 
+> I noticed your commit b4886fab6fb6 (KVM: Add a module param to allow enabling
+> virtualization when KVM is loaded) which is a part of 6.12-rc1 (and newer)
+> kernel.
+> 
+> The issue I am observing on VBox side is that no VBox VMs can now be started
+> by default. Historically, Qemu and VBox VMs cannot run in parallel (either of
+> them should enable virtualization by its own). Previously, when
+> virtualization was enabled at the event when Qemu VM starts, there was no
+> such issue. I suspect VMware guys might have exactly the same problem now.
+> 
+> Commit has absolute sense for server virtualization and of course, feature
+> can be disabled by specifying "kvm.enable_virt_at_load=0" in kernel command
+> line (or by unloading kvmXXX module(s) manually), but it is probably rather
+> inconvenient for desktop virtualization users who run other than Qemu VMs I
+> think.
+> 
+> Would you consider to change the default behavior by having
+> "kvm.enable_virt_at_load=0", so people who really need it, could explicitly
+> enable it in kernel command line?
+
+I'm not dead set against it, but my preference would be to force out-of-tree
+hypervisor modules to adjust.  Leaving enable_virt_at_load off by default risks
+performance regressions due to the CPU hotplug framework serially operating on
+CPUs[1].  And, no offence to VirtualBox or VMware, I care much more about not
+regressing KVM users than I care about inconveniencing out-of-tree hypervisors.
+
+Long term, the right answer to this problem is to move virtualization enabling
+to a separate module (*very* roughly sketeched out here[2]), which would allow
+out-of-tree hypervisor modules to co-exist with KVM.  They would obviously need
+to give up control of CR4.VMXE/VMXON/EFER.SVME, but I don't think that's an
+unreasonable ask.
+
+The multi-KVM idea aside, TDX support for trusted devices is coming down the pipe
+and will need to enable VMX without KVM being involved in order to perform SEAMCALLs
+from other subsystems.  I.e. sooner or later, I expect virtualization enabling to
+be moved out of KVM.
+
+Short term, one idea would be to have VirtualBox's module (and others) prepare
+for that future by pinning kvm-{amd,intel}.ko, and then playing nice if VMX/SVM
+is already enabled.
+
+[1] https://lore.kernel.org/all/20240608000639.3295768-9-seanjc@google.com
+[2] https://lore.kernel.org/all/20231107202002.667900-14-aghulati@google.com
 
