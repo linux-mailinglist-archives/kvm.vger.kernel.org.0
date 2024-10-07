@@ -1,211 +1,159 @@
-Return-Path: <kvm+bounces-28060-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28061-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BA42992A52
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 13:37:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C56992D3D
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 15:29:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9892CB2294D
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 11:37:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA7C9281901
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 13:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D301D2229;
-	Mon,  7 Oct 2024 11:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31AF11D4152;
+	Mon,  7 Oct 2024 13:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PynCCTF1"
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="cBvSzaX1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B97101C4
-	for <kvm@vger.kernel.org>; Mon,  7 Oct 2024 11:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E04E14AD17;
+	Mon,  7 Oct 2024 13:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728301025; cv=none; b=eca6tW6hzTyJHSj7sFVu4Rg2LR5EYyvSLsi4e15R40D8TrAKMZsV1TEleOl//u3ZQ7iakaoHuJ35U2VrBdgW4KFtrvGG4vHcva1/nCDxtLEeTZwHhDJa8x5+Nue7rT5L/MFBmCLxZiWp9C91XpIxclWY3YxPZRjZyZvCXVVLmKs=
+	t=1728307730; cv=none; b=N0YG015a0T69QxxgXfugX9kWAjrX8GWcXs7IbvLoNkgRWnkLUtpctEGrbZT+XSgSVMrQmOd93jwRa1XeJxP2IJKGjHUDTLBZwHpCH4yDOxmlOaBgqVQGwXKPxUsq2YuyYJUpDmJaeXhTSrsgRm0ViRyjmYalB3LchN1XpUrKQpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728301025; c=relaxed/simple;
-	bh=jaVghokLkYagComBJOIsqVtMl7fwxtcDqAjAsloR16M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=grZ8s4HTdaa59S0KRtrS4ELp5sSYmHNgBLSepvt/UpDrxLesURZ60Y+xh7g/9TXcr6yh6o2MRaH9fVoynJKmqOiW+gKnJcR800D1N5HST/wQNkcqeM7OftNfRXqfrMSKfxhTuqebigeMg68KUxRqqputFuvnk4O6ZWZK11DsmV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PynCCTF1; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728301023; x=1759837023;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jaVghokLkYagComBJOIsqVtMl7fwxtcDqAjAsloR16M=;
-  b=PynCCTF1oUTkHO17PhfTJHVy25v5beq68hwv/MpLOgE46MzsJvzqWi7K
-   mzqCcaPTOTMF8Pi2BdWZudsyHp1OC9R75ewwpZGK1zdtEqrboch/uRngt
-   C0uoFWVBNCl1X1MpLSBTYLPGv0MtUu0AygzqmRc6o61kTXZKIXeRe8rt2
-   0xprKZ713+tGeAWoRjOLBETTFSoQli/kn7NdE8Y6G2jF4diYRtrw+Wndf
-   4MNIHD+XlrdwOMZn2ZU/KYFFLOOF8bjbcsqH6vdCS8kmFvhL7W3607yI9
-   Un0aQQpbfhZeBT0OUU6c57MrcLJkhjBovIG2k+k/7zyY4SI+S5DZUV6hy
-   g==;
-X-CSE-ConnectionGUID: 8Ub2MuRxQFiQGMZq5Vh1QQ==
-X-CSE-MsgGUID: kEbDLTE/TEuKfVDCHJXvzQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11217"; a="31237677"
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="31237677"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 04:37:03 -0700
-X-CSE-ConnectionGUID: 0/ZcA+bqQ8i8F/qPbC/qAA==
-X-CSE-MsgGUID: b1Gs2tQfTSqj5/6woMuvZg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="98764773"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmviesa002.fm.intel.com with ESMTP; 07 Oct 2024 04:36:57 -0700
-Date: Mon, 7 Oct 2024 19:53:08 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S.Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>,
-	Alireza Sanaee <alireza.sanaee@huawei.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [PATCH v2 7/7] i386/pc: Support cache topology in -machine for
- PC machine
-Message-ID: <ZwPLpOt/DIvNO70f@intel.com>
-References: <20240908125920.1160236-1-zhao1.liu@intel.com>
- <20240908125920.1160236-8-zhao1.liu@intel.com>
- <20240917101631.00003dcb@Huawei.com>
+	s=arc-20240116; t=1728307730; c=relaxed/simple;
+	bh=2x9rsaa8iTmcG2twzW+CkXJmOpdY/1uUQPABbulSBBw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sJ+NYzQ3vt2KL4fHbp+PctGo/slidGpZzrYP7doWb8frbw5AqJyw/qqZOzUAJDFy/8Aj6Si2yecOjlEA7UkRvRByCJdRAcl0bzCGui+JlXFsD6ayZON5ARc/ZvtsWiW+nzjLQ/fNSlj7fMdff5/4oouN4Gyct+R56nsGqCqO2tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=cBvSzaX1; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	In-Reply-To:References; bh=Du4Jp3msWdr1YHLI++k/TEgkgoTmT+soplizTMXw94k=;
+	t=1728307728; x=1728739728; b=cBvSzaX1AFDuEXuK/c3pIGf4xDxMW96f1IOrSSDOouBT/uC
+	gyD5Zrd/B1BMqJHc3KvtkzZ0GkSaHgiNMfPzHtOPVhcNFaAKWcayyaL/29cI+acQte6VI88BZq+bt
+	aaVHg8vgjS7gcDP9WYel3BYq3L37PrykfyMBnZBKISL9eoO1Qn88mgXMORCfHg0BakwN8Z8x8jmic
+	FJ+Q2GC/rjx8v4nbPZht0JBOC86nPLFULOsad9/247yk9+/gIpUheU/TBp6LVqw3mUiMxPwkHfFAL
+	V1GeUmgovCfi0xOP7ajiYDzFaDgF4YQ3S+pfna9LoePih9KX5sDNH2rbjifqTgCg==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1sxnmx-0006XB-M1; Mon, 07 Oct 2024 15:28:39 +0200
+Message-ID: <df3c6560-dd37-4ec2-9b7e-1ad4c3ceba07@leemhuis.info>
+Date: Mon, 7 Oct 2024 15:28:38 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240917101631.00003dcb@Huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] KVM: VMX: Always honor guest PAT on CPUs that support
+ self-snoop
+To: Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, rcu@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Kevin Tian <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ Yiwei Zhang <zzyiwei@google.com>, Lai Jiangshan <jiangshanlai@gmail.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Josh Triplett <josh@joshtriplett.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Linux kernel regressions list <regressions@lists.linux.dev>
+References: <20240309010929.1403984-1-seanjc@google.com>
+ <20240309010929.1403984-6-seanjc@google.com> <877cbyuzdn.fsf@redhat.com>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Content-Language: en-US, de-DE
+Autocrypt: addr=linux@leemhuis.info; keydata=
+ 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 n7RI
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <877cbyuzdn.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1728307728;37d721fc;
+X-HE-SMSGID: 1sxnmx-0006XB-M1
 
-On Tue, Sep 17, 2024 at 10:16:31AM +0100, Jonathan Cameron wrote:
-> Date: Tue, 17 Sep 2024 10:16:31 +0100
-> From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-> Subject: Re: [PATCH v2 7/7] i386/pc: Support cache topology in -machine for
->  PC machine
-> X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+On 30.08.24 11:35, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> On Sun,  8 Sep 2024 20:59:20 +0800
-> Zhao Liu <zhao1.liu@intel.com> wrote:
+>> Unconditionally honor guest PAT on CPUs that support self-snoop, as
+>> Intel has confirmed that CPUs that support self-snoop always snoop caches
+>> and store buffers.  I.e. CPUs with self-snoop maintain cache coherency
+>> even in the presence of aliased memtypes, thus there is no need to trust
+>> the guest behaves and only honor PAT as a last resort, as KVM does today.
+>>
+>> Honoring guest PAT is desirable for use cases where the guest has access
+>> to non-coherent DMA _without_ bouncing through VFIO, e.g. when a virtual
+>> (mediated, for all intents and purposes) GPU is exposed to the guest, along
+>> with buffers that are consumed directly by the physical GPU, i.e. which
+>> can't be proxied by the host to ensure writes from the guest are performed
+>> with the correct memory type for the GPU.
 > 
-> > Allow user to configure l1d, l1i, l2 and l3 cache topologies for PC
-> > machine.
-> > 
-> > Additionally, add the document of "-machine smp-cache" in
-> > qemu-options.hx.
-> > 
-> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> > Tested-by: Yongwei Ma <yongwei.ma@intel.com>
->
-> Trivial language suggestions.
-> In general looks good to me.
+> Necroposting!
 > 
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> 
-> Hopefully QOM maintainers and others will get to this soon. 
-> I'd like Ali's ARM series to land this cycle as well
-> as the lack of this support has been a pain point for us
-> for a while.
->
-> Jonathan
+> Turns out that this change broke "bochs-display" driver in QEMU even
+> when the guest is modern (don't ask me 'who the hell uses bochs for
+> modern guests', it was basically a configuration error :-). E.g:
+> [...]
 
-Thanks! I'll refresh a new version.
+This regression made it to the list of tracked regressions. It seems
+this thread stalled a while ago. Was this ever fixed? Does not look like
+it, but I might have missed something. Or is this a regression I should
+just ignore for one reason or another?
 
-[snip]
 
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index d94e2cbbaeb1..3936ff3e77f9 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -39,7 +39,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-> >      "                memory-encryption=@var{} memory encryption object to use (default=none)\n"
-> >      "                hmat=on|off controls ACPI HMAT support (default=off)\n"
-> >      "                memory-backend='backend-id' specifies explicitly provided backend for main RAM (default=none)\n"
-> > -    "                cxl-fmw.0.targets.0=firsttarget,cxl-fmw.0.targets.1=secondtarget,cxl-fmw.0.size=size[,cxl-fmw.0.interleave-granularity=granularity]\n",
-> > +    "                cxl-fmw.0.targets.0=firsttarget,cxl-fmw.0.targets.1=secondtarget,cxl-fmw.0.size=size[,cxl-fmw.0.interleave-granularity=granularity]\n"
-> > +    "                smp-cache.0.cache=cachename,smp-cache.0.topology=topologylevel\n",
-> 
-> Now my cxl-fmw stuff has competition for most hideous element :)
-> When we add a few more properties maybe we'll get an even longer line!
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
-May JSON support can save us :). When I have time I will consider this.
-Command line's keyval format is more convenient for configuring a single
-element in an array.
- 
-> >      QEMU_ARCH_ALL)
-> >  SRST
-> >  ``-machine [type=]name[,prop=value[,...]]``
-> > @@ -159,6 +160,31 @@ SRST
-> >          ::
-> >  
-> >              -machine cxl-fmw.0.targets.0=cxl.0,cxl-fmw.0.targets.1=cxl.1,cxl-fmw.0.size=128G,cxl-fmw.0.interleave-granularity=512
-> > +
-> > +    ``smp-cache.0.cache=cachename,smp-cache.0.topology=topologylevel``
-> > +        Define cache properties (now only the cache topology level) for SMP
-> > +        system.
-> 
-> I'd drop the 'now only' bit.  Just means we have add noise updating that
-> later.   It's easy enough to look down and see what is available anyway give
-> the parameter docs follow immediately after this.
-
-Agree.
-
-> > +
-> > +        ``cache=cachename`` specifies the cache that the properties will be
-> > +        applied on. This field is the combination of cache level and cache
-> > +        type. Currently it supports ``l1d`` (L1 data cache), ``l1i`` (L1
-> 
-> Drop the word Currently as I don't think it adds anything to he meaning.
-> We are never going to add docs that say 'previously it supported' or 'in the
-> future it will support'.
-> 
-> 	   "Supports ...
-> 
-
-Thanks! I will change to "It supports ..."
-
-> > +        instruction cache), ``l2`` (L2 unified cache) and ``l3`` (L3 unified
-> > +        cache).
-> > +
-> > +        ``topology=topologylevel`` sets the cache topology level. It accepts
-> > +        CPU topology levels including ``thread``, ``core``, ``module``,
-> > +        ``cluster``, ``die``, ``socket``, ``book``, ``drawer`` and a special
-> > +        value ``default``. If ``default`` is set, then the cache topology will
-> > +        follow the architecture's default cache topology model. If other CPU
-> If another topology level is set
-> 
-> would be clearer.   I briefly read this as saying the topology for another CPU
-> rather than a different value here.
-
-Ah, yes, I agree.
-
-> > +        topology level is set, the cache will be shared at corresponding CPU
-> > +        topology level. For example, ``topology=core`` makes the cache shared
-> > +        in a core.
-> "by all threads within a core." perhaps?
-
-Nice, it's more accurate.
-
-Thanks,
-Zhao
+#regzbot poke
 
 
