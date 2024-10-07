@@ -1,139 +1,136 @@
-Return-Path: <kvm+bounces-28051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC2189927AA
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 10:57:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DBB39928C7
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 12:07:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02E26B22DF7
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 08:57:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C65A01F24BF2
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 10:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D2818C32F;
-	Mon,  7 Oct 2024 08:57:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7451C174B;
+	Mon,  7 Oct 2024 10:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZwgNzrpL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LVk8pTD4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8081D18BBA6;
-	Mon,  7 Oct 2024 08:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76171AF4DC
+	for <kvm@vger.kernel.org>; Mon,  7 Oct 2024 10:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728291433; cv=none; b=OaYv/XASopequnulk/YceNAox3oydVmObvFfJBWeTzE4eJ+mrt3AwRp2HGLzvWnUREZ/eRySDBJyuEsrvd/21jmMgEJvqQw6nBXuacdauuWjr7rWj662HKuuxWC6LSv/LPsRQ1EsREANiU3DmLyEqduM5ZjusucwOZYktHqqFoE=
+	t=1728295521; cv=none; b=nLwfVz9WYvoqdVUqWXqU9ehKD2WPd7WVBI8h9FtuE9p4t4Ab1hdkgaVu0D+iUI3XQasMuJHYDlLWyC4adewN5CG6Dt1AK4vucPySvxFGwSs5QB56W44s623jhqhqSLhZAcpVDSDikMh4zC/xTAqr8AgJ4U3z6Y5cJkkA087/oFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728291433; c=relaxed/simple;
-	bh=DJbexe+ttiZ5x77hbQXF2Mka5pGwQQWWP1++J/3f+8k=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=BqX2lNkn9/E1C+9MY+L0coSw7rBPIARMEbJXl2b4pb7oFwycmjdEuKbw64CFy5HTTx+Bs1UQ5eR1CDxhuy7g2YHgoNtki8NXvqnd/RjlHDdWLwmiNcm16JWpidkeMOit9Bt/OUQuUaR4cxXIwdV0yJuBXIOSGPUENteuewTQWA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZwgNzrpL; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728291432; x=1759827432;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=DJbexe+ttiZ5x77hbQXF2Mka5pGwQQWWP1++J/3f+8k=;
-  b=ZwgNzrpLXRiyg109oaJJYV1CvV0pOyFusMm1fIuxVQ7Yx80nhMAsCrXP
-   OlT3FLutfvFg4tGFbF2JvOWC4txZ1wNc/WQtS0pD7yfLDeLZBSglxjhr8
-   fmwqxjdWpI+xDEi+86cZmGrvuvHfgmAMDqbhE2+WuDwUqH6bkbEr9PWlg
-   A=;
-X-IronPort-AV: E=Sophos;i="6.11,184,1725321600"; 
-   d="scan'208";a="135547122"
-Subject: Re: [RFC PATCH 05/13] iommufd: Serialise persisted iommufds and ioas
-Thread-Topic: [RFC PATCH 05/13] iommufd: Serialise persisted iommufds and ioas
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 08:57:09 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:56144]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.46.202:2525] with esmtp (Farcaster)
- id a248f77f-5ebc-4dfe-9e52-0d5791a16722; Mon, 7 Oct 2024 08:57:08 +0000 (UTC)
-X-Farcaster-Flow-ID: a248f77f-5ebc-4dfe-9e52-0d5791a16722
-Received: from EX19D004EUC003.ant.amazon.com (10.252.51.249) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 7 Oct 2024 08:57:08 +0000
-Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
- EX19D004EUC003.ant.amazon.com (10.252.51.249) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 7 Oct 2024 08:57:08 +0000
-Received: from EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41]) by
- EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41%3]) with mapi id
- 15.02.1258.034; Mon, 7 Oct 2024 08:57:07 +0000
-From: "Gowans, James" <jgowans@amazon.com>
-To: "jgg@ziepe.ca" <jgg@ziepe.ca>, "dwmw2@infradead.org" <dwmw2@infradead.org>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rppt@kernel.org"
-	<rppt@kernel.org>, "kw@linux.com" <kw@linux.com>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, "madvenka@linux.microsoft.com"
-	<madvenka@linux.microsoft.com>, "anthony.yznaga@oracle.com"
-	<anthony.yznaga@oracle.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"nh-open-source@amazon.com" <nh-open-source@amazon.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>, "Saenz Julienne, Nicolas"
-	<nsaenz@amazon.es>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>, "maz@kernel.org"
-	<maz@kernel.org>, "steven.sistare@oracle.com" <steven.sistare@oracle.com>,
-	"Graf (AWS), Alexander" <graf@amazon.de>, "will@kernel.org"
-	<will@kernel.org>, "joro@8bytes.org" <joro@8bytes.org>
-Thread-Index: AQHbCCwuWjwUDEQNSEmjPqzUeT3bK7Jz6OkAgAcvr4CAAAJBgIAAAo+A
-Date: Mon, 7 Oct 2024 08:57:07 +0000
-Message-ID: <1d331c55a299d414e49ba5eb6f46dccb525bf788.camel@amazon.com>
-References: <20240916113102.710522-1-jgowans@amazon.com>
-	 <20240916113102.710522-6-jgowans@amazon.com>
-	 <20241002185520.GL1369530@ziepe.ca>
-	 <d6328467adc9b7512f6dd88a6f8f843b8efdc154.camel@amazon.com>
-	 <e458d48a797043b7efc853fc65b9c4d043b12ed4.camel@infradead.org>
-In-Reply-To: <e458d48a797043b7efc853fc65b9c4d043b12ed4.camel@infradead.org>
-Accept-Language: en-ZA, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A16D75C62307944AA0B838AFB87120FC@amazon.com>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1728295521; c=relaxed/simple;
+	bh=AnOcALsZJg/wxyrcnpW+cGt1cV5NfTexgZo0XTBcLLw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i3w6cIHrGLWqIJ4/FriEF9ff5OGPsqSiCQRHc2r2LOGAjSqVuumjBt0H+J5DGw7p35wBiY1ao2pbRQkUlYygVy2s8kskgndZ3FHxIhzCtjO5Hj701uzNMYZUAU0eudbCq2sBY2AKuElbBzL/qz7KUjLhAKcYkR2jCne9p2iRg0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LVk8pTD4; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728295520; x=1759831520;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AnOcALsZJg/wxyrcnpW+cGt1cV5NfTexgZo0XTBcLLw=;
+  b=LVk8pTD41pTxqGJ6Hr40+Fb2Z0KbVUx6DzrZHI+6SsE+larhlpeW/y2i
+   TB9MTCA2BXMDPkfIJG+mluhQPRaPA3cMyLpiR55HYI4RLjN4MDMFaExgH
+   iDj3mK8w8ihCuNay/9jWdwQWTzvLrTIdQhzgqrgL2vP5aghno9wK2/5g2
+   VnXJeArlMKbJF09J2gHDzKr/rbZ5EYEKuExEd6w+JlrlW3PLvcJHVQqcr
+   zWMUzAGUX/bT72epzMKejt2EXn2yKi7splbCDSLhLklUh5FfC+13clkoL
+   iMho02x0qmCCMy7m6/WzYJMFYWsj3Sj6i7tEJLBjjumFnc85fyzWfHYih
+   A==;
+X-CSE-ConnectionGUID: q6H7Yf3LRZqQ1fMpZgjIug==
+X-CSE-MsgGUID: Fz8mK0qVTWWJnuPkoFrdSQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11217"; a="27319851"
+X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
+   d="scan'208";a="27319851"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 03:05:19 -0700
+X-CSE-ConnectionGUID: 7gJQIEZzT8mpzKFWqrHFdQ==
+X-CSE-MsgGUID: ogeD7LVYT4KOliHP51MW6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
+   d="scan'208";a="75258677"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa010.jf.intel.com with ESMTP; 07 Oct 2024 03:05:13 -0700
+Date: Mon, 7 Oct 2024 18:21:24 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Alireza Sanaee <alireza.sanaee@huawei.com>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S.Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [PATCH v2 6/7] i386/cpu: Update cache topology with machine's
+ configuration
+Message-ID: <ZwO2JIMJ+lX0N61h@intel.com>
+References: <20240908125920.1160236-1-zhao1.liu@intel.com>
+ <20240908125920.1160236-7-zhao1.liu@intel.com>
+ <20240911110028.00001d3d@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911110028.00001d3d@huawei.com>
 
-T24gTW9uLCAyMDI0LTEwLTA3IGF0IDA5OjQ3ICswMTAwLCBEYXZpZCBXb29kaG91c2Ugd3JvdGU6
-DQo+IE9uIE1vbiwgMjAyNC0xMC0wNyBhdCAwODozOSArMDAwMCwgR293YW5zLCBKYW1lcyB3cm90
-ZToNCj4gPiANCj4gPiBJIHRoaW5rIHdlIGhhdmUgdHdvIG90aGVyIHBvc3NpYmxlIGFwcHJvYWNo
-ZXMgaGVyZToNCj4gPiANCj4gPiAxLiBXaGF0IHRoaXMgUkZDIGlzIHNrZXRjaGluZyBvdXQsIHNl
-cmlhbGlzaW5nIGZpZWxkcyBmcm9tIHRoZSBzdHJ1Y3RzDQo+ID4gYW5kIHNldHRpbmcgdGhvc2Ug
-ZmllbGRzIGFnYWluIG9uIGRlc2VyaWFsaXNlLiBBcyB5b3UgcG9pbnQgb3V0IHRoaXMNCj4gPiB3
-aWxsIGJlIGNvbXBsaWNhdGVkLg0KPiA+IA0KPiA+IDIuIEdldCB1c2Vyc3BhY2UgdG8gZG8gdGhl
-IHdvcms6IHVzZXJzcGFjZSBuZWVkcyB0byByZS1kbyB0aGUgaW9jdGxzDQo+ID4gYWZ0ZXIga2V4
-ZWMgdG8gcmVjb25zdHJ1Y3QgdGhlIG9iamVjdHMuIE15IG1haW4gaXNzdWUgd2l0aCB0aGlzIGFw
-cHJvYWNoDQo+ID4gaXMgdGhhdCB0aGUga2VybmVsIG5lZWRzIHRvIGRvIHNvbWUgc29ydCBvZiB0
-cnVzdCBidXQgdmVyaWZ5IGFwcHJvYWNoIHRvDQo+ID4gZW5zdXJlIHRoYXQgdXNlcnNwYWNlIGNv
-bnN0cnVjdHMgZXZlcnl0aGluZyB0aGUgc2FtZSB3YXkgYWZ0ZXIga2V4ZWMgYXMNCj4gPiBpdCB3
-YXMgYmVmb3JlIGtleGVjLiBXZSBkb24ndCB3YW50IHRvIGVuZCB1cCBpbiBhIHN0YXRlIHdoZXJl
-IHRoZQ0KPiA+IGlvbW11ZmQgb2JqZWN0cyBkb24ndCBtYXRjaCB0aGUgcGVyc2lzdGVkIHBhZ2Ug
-dGFibGVzLg0KPiANCj4gVG8gd2hhdCBleHRlbnQgZG9lcyB0aGUga2VybmVsIHJlYWxseSBuZWVk
-IHRvIHRydXN0IG9yIHZlcmlmeT8gQXQgTFBDDQo+IHdlIHNlZW1lZCB0byBzcGVhayBvZiBhIG1v
-ZGVsIHdoZXJlIHVzZXJzcGFjZSBidWlsZHMgYSAibmV3IiBhZGRyZXNzDQo+IHNwYWNlIGZvciBl
-YWNoIGRldmljZSBhbmQgdGhlbiBhdG9taWNhbGx5IHN3aXRjaGVzIHRvIHRoZSBuZXcgcGFnZQ0K
-PiB0YWJsZXMgaW5zdGVhZCBvZiB0aGUgb3JpZ2luYWwgb25lcyBpbmhlcml0ZWQgZnJvbSB0aGUg
-cHJldmlvdXMga2VybmVsLg0KPiANCj4gVGhhdCBkb2VzIGludm9sdmUgaGF2aW5nIHNwYWNlIGZv
-ciBhbm90aGVyIHNldCBvZiBwYWdlIHRhYmxlcywgb2YNCj4gY291cnNlLCBidXQgdGhhdCdzIG5v
-dCBpbXBvc3NpYmxlLg0KDQpUaGUgaWRlYSBvZiBjb25zdHJ1Y3RpbmcgZnJlc2ggcGFnZSB0YWJs
-ZXMgYW5kIHRoZW4gc3dhcHBpbmcgb3ZlciB0bw0KdGhhdCBpcyBpbmRlZWQgYXBwZWFsaW5nLCBi
-dXQgSSBkb24ndCBrbm93IGlmIHRoYXQncyBhbHdheXMgcG9zc2libGUuDQpXaXRoIHRoZSBBUk0g
-U01NVXYzIGZvciBleGFtcGxlIEkgdGhpbmsgdGhlcmUgYXJlIGJyZWFrLWJlZm9yZS1tYWtlDQpy
-ZXF1aXJlbWVudCwgc28gaXMgaXQgcG9zc2libGUgdG8gZG8gYW4gYXRvbWljIHN3aXRjaCBvZiB0
-aGUgU01NVXYzIHBhZ2UNCnRhYmxlIFBHRCBpbiBhIGhpdGxlc3Mgd2F5PyBFdmVyeXRoaW5nIGhl
-cmUgbXVzdCBiZSBoaXRsZXNzIC0gc2VyaWFsaXNlDQphbmQgZGVzZXJpYWxpc2UgbXVzdCBub3Qg
-Y2F1c2UgYW55IERNQSBmYXVsdHMuDQoNCklmIGl0J3Mgbm90IHBvc3NpYmxlIHRvIGRvIGEgaGl0
-bGVzcyBhdG9taWMgc3dpdGNoIChJIGFtIHVuc3VyZSBhYm91dA0KdGhpcywgbmVlZCB0byBSVEZN
-KSB0aGVuIHdlJ3JlIGNvbXBlbGxlZCB0byByZS11c2UgdGhlIGV4aXN0aW5nIHBhZ2UNCnRhYmxl
-cyBhbmQgaWYgdGhhdCdzIHRoZSBjYXNlIEkgdGhpbmsgdGhlIGtlcm5lbCBNVVNUIGVuc3VyZSB0
-aGF0IHRoZQ0KaW9tbXVmZCBJT0FTIG9iamVjdCBleGFjdGx5IG1hdGNoIHRoZSBvbmVzIGJlZm9y
-ZSBrZXhlYy4gSSBjYW4gaW1hZ2luZQ0KYWxsIHNvcnRzIG9mIG1lc3MgaWYgdGhvc2UgZ28gb3V0
-IG9mIHN5bmMhIA0KDQo=
+Hi Ali,
+
+[snip]
+
+> > +
+> > +    /*
+> > +     * TODO: Add a SMPCompatProps.has_caches flag to avoid useless
+> > Updates
+> > +     * if user didn't set smp_cache.
+> > +     */
+> Hi Zhao,
+> 
+> Thanks for sending this patchset so quickly. I really appreciate the
+> TODO already :)
+
+Welcome! And I'm also sorry for a long silence. Now I'm back from the
+vacation and will keep pushing this series forward.
+
+> It also helps me avoid going through every single
+> layer, especially when I want to avoid matching system registers in
+> ARM, particularly when there's no description in the command line.
+
+Great! I also noticed your patch for this "TODO" and will help you
+review it soon.
+
+Regards,
+Zhao
+
+> > +    x86_cpu_update_smp_cache_topo(ms, cpu);
+> > +
+> >      qemu_register_reset(x86_cpu_machine_reset_cb, cpu);
+> >  
+> >      if (cpu->env.features[FEAT_1_EDX] & CPUID_APIC || ms->smp.cpus >
+> > 1) {
+> 
+
 
