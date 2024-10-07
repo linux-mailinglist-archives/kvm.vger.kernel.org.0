@@ -1,138 +1,160 @@
-Return-Path: <kvm+bounces-28064-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28065-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6092B992E3C
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 16:05:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16DE8992ED9
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 16:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 859251C22F43
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 14:05:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A1531C236DD
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 14:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5650B1D54FD;
-	Mon,  7 Oct 2024 14:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73CC1D88DF;
+	Mon,  7 Oct 2024 14:19:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="QexIW1ta"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="en9pM/JD"
 X-Original-To: kvm@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F0F1D417B;
-	Mon,  7 Oct 2024 14:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569371D799E
+	for <kvm@vger.kernel.org>; Mon,  7 Oct 2024 14:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728309870; cv=none; b=F1j9gYIa/o5tiX4Sj7OUbYbgQVjWr/lmeYvrRWakwLCzNSQcvS5IBC0MUBLjDQzJXzLYOAgIY1uGgb1IOT7YQ4Z+9w/egfSRTR8Lt36AOQC3zGhwbIkzHbyNuli/rQoBXsCDLcdPKxqBwNPbYH616t01psr7H1ozibVHivZ1Qs0=
+	t=1728310762; cv=none; b=Kcx938yTf2i2N7T6SQfvHUkyYLRXWO76FY0tE87ZgZqheeRacCTmkuKk6chpVYqg8YnAusgUtVModNSRN5VzzIlBUZwyif5XZF/rog934dxmthBDwGHcQAv1KuwWCuD+wRu4ih+52VJqd8EahpFKSHM7JEf39hUZL7/hpIhrUK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728309870; c=relaxed/simple;
-	bh=rYFip1NklXra7HzTO1VszgtuzTsU+opowy+ALEYJL4c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lqEncr0jfU/B6Z0n6XfrsejBvcWduP+RxOSjf+9oq6lGerRDtiD5M1/XZg1TIYl6o0gRhdMQENaYWWX/nKeKGlEWQ9pxOgspyL1t1EY58aJo/6XimlyuaYHjcMrTUl05LSn9CV4Dh3rqkOR2sRiJ7Gp3zZ1dqhn6INZgFfQx/9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=QexIW1ta; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=5BN/qPr4UHro54JgcseHqfbV3VVI2TKoS2hEvYZX07s=;
-	t=1728309868; x=1728741868; b=QexIW1taqCqeM9s91UlHbuoMAukJ6TLBLJ/iQXrO6BykbXs
-	YRq2BCigAw/rGcJqfqdxHmUsH/MCg+TgQXtWiAhgaBthPzTx5BPlmyDCz9BZHMS/vxP9z8hdC+N7B
-	9b/rRABkQrmaXtxmHKGrsvLuLm8WDDH6kw387B9N+YUs2CIjwCsKmMQy76VIerngmj7oZV2lwb/mm
-	lNwWrZfaECe9P+8LnSNcAB5tLlMWzYG/vrUF6aDWOtfSZ9Wmj0XbiRMg3SH7HiK8kxcIi/ahZS9qY
-	Zgmf3t6yGCX3SriniSx1vgc2LfjhCGo4uZGZ8ZlcKq3IiRCUOn9DUmYl5XEsxnZw==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1sxoLZ-0005v6-Qm; Mon, 07 Oct 2024 16:04:25 +0200
-Message-ID: <ba91a7cc-c647-4e33-82f3-0c4e52ce89ea@leemhuis.info>
-Date: Mon, 7 Oct 2024 16:04:24 +0200
+	s=arc-20240116; t=1728310762; c=relaxed/simple;
+	bh=fPpRhAkOlLyr7I5GWfCVLmcMUp2CHa8v4oEGbZ9nCQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CNNwnyoEyPNY+IsNVqDkrUf6wrYSGs4Y143pSO0i4gz6yrdGdoY2PkN83UIG9a0HT1UhJENHM3P81MKHHSe5wuq/5kadmwskE6v5n80vWmgNdii21nrm6OjHL3Ke5KZ2FBY9xp951PGjy9bK+OK6T7Gf9x/9BGCioLKsa/nCbZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=en9pM/JD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728310759;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1kPk7t5vf7Zw0tZf27l+JYytji+SaN7OikNPmFvip+c=;
+	b=en9pM/JDPcXzG01BLKoyi+Wl2d5bc1nxbMWCK3KwcVRb1cVJnYExwppt9NzvRMz57oAkxE
+	dEpmtUZA6A7XzG9PdUCjKbnk06u1/faoxbbgiKujqn8hi60UpVsq3DVbMriPnyTSDRYxM2
+	DyLQEevD93at8CKFlhUQG5H6EWPKcgc=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-368-YcBOvX1-PxefTCj49MLtPQ-1; Mon, 07 Oct 2024 10:19:18 -0400
+X-MC-Unique: YcBOvX1-PxefTCj49MLtPQ-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-834a9a3223aso64310139f.0
+        for <kvm@vger.kernel.org>; Mon, 07 Oct 2024 07:19:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728310757; x=1728915557;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1kPk7t5vf7Zw0tZf27l+JYytji+SaN7OikNPmFvip+c=;
+        b=d4YB/CNrsK3DzDRbvohrygHDkMhRp/23MhbBCOoOVVGV+zX1W1u379smMn6d0h9r3a
+         lSt2xpMx2fmf61tS+NaftMH8jBW+KrBEHxDR1nkUe0SpgcTGd3+2JIcUywZTDbXyhUEv
+         iGX+PV0ZLjMkOCEOPGW+FbpArd+uzRcjlDqOwv1rVPletUpAIk4tfQfobawtmZ3SgdiU
+         zY3bwXl78TRXWLSmkkWPtOOyP2BJubGV3GMJy9+svTZJwhrz6AchCnaOW034Nqw+Uwm5
+         5nOZyDiVNQFYJkduZgWS/y9F9EM6KTgtLvorVK85qNiTMQbvuiKiWQczU3IxEBSm7PX1
+         6+vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUW+0iKEDw245mc0BAEreBrDbuuC114OLSkhuLI3bGIw39QpFgAtuu19OOUtZFVdaiOIu0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw46ihhrErWIpaadFLXba8wOv88dgQ6ch8qtjPZ0VjLdRhkx8CB
+	vpHPrvvjMpncWjy/zfhOa63RaFTRFOhNqisa39FfShqx6ZZnCmaUh8T6KcahJNk28jFhAQgTwgN
+	8a5rSrEpoLo1bzhEN8qBP/NZ0/NJM24rs6ZkIXHtpELDttjSqCA==
+X-Received: by 2002:a05:6e02:1fc8:b0:3a2:57d2:3489 with SMTP id e9e14a558f8ab-3a375be37d2mr28439585ab.3.1728310757364;
+        Mon, 07 Oct 2024 07:19:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGLWUg4d6eCvTKO1CP5bCnvIo2LY6WKj6iaBq4rEUA4pzdXrjH5RxquxJO/p3ji7vOzKVrjxQ==
+X-Received: by 2002:a05:6e02:1fc8:b0:3a2:57d2:3489 with SMTP id e9e14a558f8ab-3a375be37d2mr28439335ab.3.1728310756968;
+        Mon, 07 Oct 2024 07:19:16 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db71114d91sm1080564173.130.2024.10.07.07.19.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 07:19:16 -0700 (PDT)
+Date: Mon, 7 Oct 2024 08:19:13 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: <ankita@nvidia.com>
+Cc: <jgg@nvidia.com>, <yishaih@nvidia.com>,
+ <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+ <zhiw@nvidia.com>, <aniketa@nvidia.com>, <cjia@nvidia.com>,
+ <kwankhede@nvidia.com>, <targupta@nvidia.com>, <vsethi@nvidia.com>,
+ <acurrid@nvidia.com>, <apopple@nvidia.com>, <jhubbard@nvidia.com>,
+ <danw@nvidia.com>, <anuaggarwal@nvidia.com>, <mochs@nvidia.com>,
+ <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1 0/3] vfio/nvgrace-gpu: Enable grace blackwell boards
+Message-ID: <20241007081913.74b3deed.alex.williamson@redhat.com>
+In-Reply-To: <20241006102722.3991-1-ankita@nvidia.com>
+References: <20241006102722.3991-1-ankita@nvidia.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] KVM: VMX: Always honor guest PAT on CPUs that support
- self-snoop
-To: Vitaly Kuznetsov <vkuznets@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, rcu@vger.kernel.org, linux-kernel@vger.kernel.org,
- Kevin Tian <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
- Yiwei Zhang <zzyiwei@google.com>, Lai Jiangshan <jiangshanlai@gmail.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Josh Triplett <josh@joshtriplett.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Linux kernel regressions list <regressions@lists.linux.dev>
-References: <20240309010929.1403984-1-seanjc@google.com>
- <20240309010929.1403984-6-seanjc@google.com> <877cbyuzdn.fsf@redhat.com>
- <df3c6560-dd37-4ec2-9b7e-1ad4c3ceba07@leemhuis.info>
- <87iku4ghiw.fsf@redhat.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <87iku4ghiw.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1728309868;6e9e8a64;
-X-HE-SMSGID: 1sxoLZ-0005v6-Qm
 
-On 07.10.24 15:38, Vitaly Kuznetsov wrote:
-> "Linux regression tracking (Thorsten Leemhuis)"
-> <regressions@leemhuis.info> writes:
+On Sun, 6 Oct 2024 10:27:19 +0000
+<ankita@nvidia.com> wrote:
+
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
->> On 30.08.24 11:35, Vitaly Kuznetsov wrote:
->>> Sean Christopherson <seanjc@google.com> writes:
->>>
->>>> Unconditionally honor guest PAT on CPUs that support self-snoop, as
->>>> Intel has confirmed that CPUs that support self-snoop always snoop caches
->>>> and store buffers.  I.e. CPUs with self-snoop maintain cache coherency
->>>> even in the presence of aliased memtypes, thus there is no need to trust
->>>> the guest behaves and only honor PAT as a last resort, as KVM does today.
->>>>
->>>> Honoring guest PAT is desirable for use cases where the guest has access
->>>> to non-coherent DMA _without_ bouncing through VFIO, e.g. when a virtual
->>>> (mediated, for all intents and purposes) GPU is exposed to the guest, along
->>>> with buffers that are consumed directly by the physical GPU, i.e. which
->>>> can't be proxied by the host to ensure writes from the guest are performed
->>>> with the correct memory type for the GPU.
->>>
->>> Necroposting!
->>>
->>> Turns out that this change broke "bochs-display" driver in QEMU even
->>> when the guest is modern (don't ask me 'who the hell uses bochs for
->>> modern guests', it was basically a configuration error :-). E.g:
->>> [...]
->>
->> This regression made it to the list of tracked regressions. It seems
->> this thread stalled a while ago. Was this ever fixed? Does not look like
->> it, but I might have missed something. Or is this a regression I should
->> just ignore for one reason or another?
->>
+> NVIDIA's recently introduced Grace Blackwell (GB) Superchip in
+> continuation with the Grace Hopper (GH) superchip that provides a
+> cache coherent access to CPU and GPU to each other's memory with
+> an internal proprietary chip-to-chip (C2C) cache coherent interconnect.
+> The in-tree nvgrace-gpu driver manages the GH devices. The intention
+> is to extend the support to the new Grace Blackwell boards.
+
+Where do we stand on QEMU enablement of GH, or the GB support here?
+IIRC, the nvgrace-gpu variant driver was initially proposed with QEMU
+being the means through which the community could make use of this
+driver, but there seem to be a number of pieces missing for that
+support.  Thanks,
+
+Alex
+
+> There is a HW defect on GH to support the Multi-Instance GPU (MIG)
+> feature [1] that necessiated the presence of a 1G carved out from
+> the device memory and mapped uncached. The 1G region is shown as a
+> fake BAR (comprising region 2 and 3) to workaround the issue.
 > 
-> The regression was addressed in by reverting 377b2f359d1f in 6.11
+> The GB systems differ from GH systems in the following aspects.
+> 1. The aforementioned HW defect is fixed on GB systems.
+> 2. There is a usable BAR1 (region 2 and 3) on GB systems for the
+> GPUdirect RDMA feature [2].
 > 
-> commit 9d70f3fec14421e793ffbc0ec2f739b24e534900
-> Author: Paolo Bonzini <pbonzini@redhat.com>
-> Date:   Sun Sep 15 02:49:33 2024 -0400
+> This patch series accommodate those GB changes by showing the real
+> physical device BAR1 (region2 and 3) to the VM instead of the fake
+> one. This takes care of both the differences.
 > 
->     Revert "KVM: VMX: Always honor guest PAT on CPUs that support self-snoop"
-
-Thx. Sorry, missed that, thx for pointing me towards it. I had looked
-for things like that, but seems I messed up my lore query. Apologies for
-the noise!
-
-> Also, there's a (pending) DRM patch fixing it from the guest's side:
-> https://gitlab.freedesktop.org/drm/misc/kernel/-/commit/9388ccf69925223223c87355a417ba39b13a5e8e
-
-Great!
-
-Ciao, Thorsten
-
-P.S.:
-
-#regzbot fix: 9d70f3fec14421e793ffbc0ec2f739b24e534900
-
+> The presence of the fix for the HW defect is communicated by the
+> firmware through a DVSEC PCI config register. The module reads
+> this to take a different codepath on GB vs GH.
+> 
+> To improve system bootup time, HBM training is moved out of UEFI
+> in GB system. Poll for the register indicating the training state.
+> Also check the C2C link status if it is ready. Fail the probe if
+> either fails.
+> 
+> Link: https://www.nvidia.com/en-in/technologies/multi-instance-gpu/ [1]
+> Link: https://docs.nvidia.com/cuda/gpudirect-rdma/ [2]
+> 
+> Applied over next-20241003.
+> 
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> 
+> Ankit Agrawal (3):
+>   vfio/nvgrace-gpu: Read dvsec register to determine need for uncached
+>     resmem
+>   vfio/nvgrace-gpu: Expose the blackwell device PF BAR1 to the VM
+>   vfio/nvgrace-gpu: Check the HBM training and C2C link status
+> 
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 115 ++++++++++++++++++++++++++--
+>  1 file changed, 107 insertions(+), 8 deletions(-)
+> 
 
 
