@@ -1,135 +1,205 @@
-Return-Path: <kvm+bounces-28073-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28074-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A046A993208
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 17:52:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDDBA99326C
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 18:04:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E25D281105
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 15:52:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C237B27C83
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 15:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DB71D9A44;
-	Mon,  7 Oct 2024 15:52:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A771DB369;
+	Mon,  7 Oct 2024 15:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K4JUALLg"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="rQ2qtdDH"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B02F1D7E25
-	for <kvm@vger.kernel.org>; Mon,  7 Oct 2024 15:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550761D95A3;
+	Mon,  7 Oct 2024 15:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728316328; cv=none; b=mhO0MjEg1r/jCqpKySiWd0EgwDVGgLPgT9skPVZQL939pRtNE9l8kV4HSaH5yrG7Jc1xTI/uqPCLq2L5NtpMLxM7dFb8kmXPJl5SBMYLfksosvmv8e34S+KzJtjX+pmqrer/3pMPEFlvJtrQBTHROJ92XxTXCgsGRHcrNM3xzEk=
+	t=1728316624; cv=none; b=l9Yy+D+0QiLxcaNSmKO0TssaKI1y42RCTqSd82fByrTRa8gv1xvRsq4I6a2pVVBq4P8VXWsrCN6E718nIgJqJfgOI1H7ulp5A3Wl32UJqYjf2/3uGhXML03A/jfoyx5o+uK315ECg7CXQUUY3Nyt8OTkS7a+0dNqo5E42jqJhSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728316328; c=relaxed/simple;
-	bh=/EZ8uL9G3hFtdF20Zk/ubx5oExJilk/BwdV79vc3cnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=XkK70TVY0M557niD8rSdrnlrZjtwj8uOhPJaFsuKxhtJ1DWLuvRmvHGkmREG1p90J3Io5FxLwDcFKYK5VaER8yzfQ/AcPFDcG0Racahli62J1/t6rOM1TsaiWwG0rof//j5nKmSx9f86azyJiDxPo2WqCIYuy07zEvVSgYdvWyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K4JUALLg; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728316326;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=G9TXcvGmMkyb4Jec0+mQTLksqLLOXrKvoY/7ZxCB8eE=;
-	b=K4JUALLgNwKkiTZJCXHOITztXW1y+9CUCd99Z0DMEwZjZo/8CYa2mjOlbRSg607y8wxOxA
-	A3quqvuLwjIxwodV2VMwuRQ7PwC5UJbHdZWXLbjwKC1HMuBhyPiHgcnY2uJx0FvoTvXx0D
-	ulsQ+DuydqjfwH6BlTmsnOgazEcxIDI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-501-wW4efmzkMEWO5Eu4zkWl4Q-1; Mon, 07 Oct 2024 11:52:05 -0400
-X-MC-Unique: wW4efmzkMEWO5Eu4zkWl4Q-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42cb5f6708aso29374985e9.2
-        for <kvm@vger.kernel.org>; Mon, 07 Oct 2024 08:52:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728316324; x=1728921124;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G9TXcvGmMkyb4Jec0+mQTLksqLLOXrKvoY/7ZxCB8eE=;
-        b=opHLPPbBX2GIazeLhtfDWQ9X4JaskJmfCGg592UQN0q4fKTsBTz/6XZFj7QizEYT8I
-         ZShUe7pEmXrVx2dKoNF5ju/IylqerhrRxxjX46F0z2kt7F7PtNELpkKwSJxyzvo0QJvW
-         heVdtqXyQkkh69pphhgMfjWa3LCE2F2RYGHo2Urqrs8p3S8zta94pRGaV3L9QkwqEowN
-         j55z7aPKGGdnxMGKArxsmTiEXLYz3eDeRqG+ayyzGCfV5Q2uZRTCYpFN6auXspF5Pwgs
-         ema0/2mhX31m/rVDk9aeaZ4kkVaTcBIkj3OItfxwJSWoX95k1ygTmS6i4DjgfyrW1jJn
-         O+SQ==
-X-Gm-Message-State: AOJu0YwehMA9Qwv0ceR7KaTTXk0WTL8ek9q1m80nf4WLzfr3HVYP7Tjv
-	OMMo0+CH2nDNxdmYPc8VEsnAxSPqh36z2iN9ijrw3XoYTlHiVhcHxAiFpEjQBGdyL7hYxknr1xH
-	q1TCbBGDXW6v496IJ+rsm8RAEkf98sKcAojhwxB2GJtMOTYIezA==
-X-Received: by 2002:a05:600c:350c:b0:42e:8d0d:bca5 with SMTP id 5b1f17b1804b1-42f85aa1a76mr80142225e9.2.1728316323915;
-        Mon, 07 Oct 2024 08:52:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6www5QFkt0BJe4rLwpAGtQvp+gL9TCRDjcvZWpHi7aBIelswHzZJHbt+bvyCApLkp6Y2R5Q==
-X-Received: by 2002:a05:600c:350c:b0:42e:8d0d:bca5 with SMTP id 5b1f17b1804b1-42f85aa1a76mr80141915e9.2.1728316323509;
-        Mon, 07 Oct 2024 08:52:03 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:174:8906:45ec:feb4:98e4:6184])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86b1d7aasm95666195e9.27.2024.10.07.08.52.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 08:52:03 -0700 (PDT)
-Date: Mon, 7 Oct 2024 11:51:58 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	brauner@kernel.org, dan.carpenter@linaro.org, elver@google.com,
-	jasowang@redhat.com, lkp@intel.com, luigi.leonardi@outlook.com,
-	michael.christie@oracle.com, mst@redhat.com, schalla@marvell.com,
-	sgarzare@redhat.com,
-	syzbot+8a02104389c2e0ef5049@syzkaller.appspotmail.com,
-	wh1sper@zju.edu.cn
-Subject: [GIT PULL] virtio: bugfixes
-Message-ID: <20241007115158-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1728316624; c=relaxed/simple;
+	bh=7s8rQAcIg97vHRkLNkkiG3T/6K73DTRu5PGFhizuEtw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=OWs7UEOEY5YKoHYIQaBprs/v2zRtAyM28N0Vt3Es7bGSBFB9jfvo3emF/P3IhT8nfKNJwvXIX+3JDPB9LTInPj49rY+RBvCJZX/gCfSAPk5scR3DzUIVrHwgx+QCsmILgSWXAqBw6JaCZXlfi+j6RRkl+nzmJ2Jkfcg0zrTpTSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=rQ2qtdDH; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1728316622; x=1759852622;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GiJM5/3RB7kREr4++92FJZ3G6aQv+RCcdKcWV7SOVMk=;
+  b=rQ2qtdDHyrOfDpWi2gcjv13g/aLBmcVr6dDQ9OYEKNsoBNWqtzQWqTSr
+   +ndmZ3bTPv3FKZ673a+rXeWQFJiTb5HshPcGBjDXnjDPRR6/Xr5i+7ZDK
+   jPzmKoynjXpv7jaGDOcR04gzoLDHk52agtzubCh7gzf+iIZ6oMvTe0QwM
+   s=;
+X-IronPort-AV: E=Sophos;i="6.11,184,1725321600"; 
+   d="scan'208";a="438881514"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 15:56:55 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:63359]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.198:2525] with esmtp (Farcaster)
+ id dee9626c-3d64-4128-98b5-9eed2f937ae6; Mon, 7 Oct 2024 15:56:55 +0000 (UTC)
+X-Farcaster-Flow-ID: dee9626c-3d64-4128-98b5-9eed2f937ae6
+Received: from EX19D003UWC003.ant.amazon.com (10.13.138.173) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 7 Oct 2024 15:56:48 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19D003UWC003.ant.amazon.com (10.13.138.173) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 7 Oct 2024 15:56:48 +0000
+Received: from email-imr-corp-prod-iad-all-1a-6ea42a62.us-east-1.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.34 via Frontend Transport; Mon, 7 Oct 2024 15:56:48 +0000
+Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
+	by email-imr-corp-prod-iad-all-1a-6ea42a62.us-east-1.amazon.com (Postfix) with ESMTPS id 4CFBD4027E;
+	Mon,  7 Oct 2024 15:56:43 +0000 (UTC)
+Message-ID: <e8f55fef-1821-408e-88ed-b25200ef66c9@amazon.co.uk>
+Date: Mon, 7 Oct 2024 16:56:42 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 30/39] KVM: guest_memfd: Handle folio preparation for
+ guest_memfd mmap
+To: Ackerley Tng <ackerleytng@google.com>, Elliot Berman
+	<quic_eberman@quicinc.com>
+CC: <tabba@google.com>, <jgg@nvidia.com>, <peterx@redhat.com>,
+	<david@redhat.com>, <rientjes@google.com>, <fvdl@google.com>,
+	<jthoughton@google.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
+	<zhiquan1.li@intel.com>, <fan.du@intel.com>, <jun.miao@intel.com>,
+	<isaku.yamahata@intel.com>, <muchun.song@linux.dev>,
+	<mike.kravetz@oracle.com>, <erdemaktas@google.com>, <vannapurve@google.com>,
+	<qperret@google.com>, <jhubbard@nvidia.com>, <willy@infradead.org>,
+	<shuah@kernel.org>, <brauner@kernel.org>, <bfoster@redhat.com>,
+	<kent.overstreet@linux.dev>, <pvorel@suse.cz>, <rppt@kernel.org>,
+	<richard.weiyang@gmail.com>, <anup@brainfault.org>, <haibo1.xu@intel.com>,
+	<ajones@ventanamicro.com>, <vkuznets@redhat.com>,
+	<maciej.wieczor-retman@intel.com>, <pgonda@google.com>,
+	<oliver.upton@linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-fsdevel@kvack.org>, James Gowans
+	<jgowans@amazon.com>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Manwaring,
+ Derek" <derekmn@amazon.com>
+References: <diqzzfnkswiv.fsf@ackerleytng-ctop.c.googlers.com>
+From: Patrick Roy <roypat@amazon.co.uk>
+Content-Language: en-US
+Autocrypt: addr=roypat@amazon.co.uk; keydata=
+ xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
+ NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
+ wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
+ CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
+ AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
+ AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
+ IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
+ 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
+ 8hlxFQM=
+In-Reply-To: <diqzzfnkswiv.fsf@ackerleytng-ctop.c.googlers.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-The following changes since commit efcd71af38be403fa52223092f79ada446e121ba:
+Hi Ackerley,
 
-  vsock/virtio: avoid queuing packets when intermediate queue is empty (2024-09-25 07:07:44 -0400)
+On Thu, 2024-10-03 at 22:32 +0100, Ackerley Tng wrote:
+> Elliot Berman <quic_eberman@quicinc.com> writes:
+> 
+>> On Tue, Sep 10, 2024 at 11:44:01PM +0000, Ackerley Tng wrote:
+>>> Since guest_memfd now supports mmap(), folios have to be prepared
+>>> before they are faulted into userspace.
+>>>
+>>> When memory attributes are switched between shared and private, the
+>>> up-to-date flags will be cleared.
+>>>
+>>> Use the folio's up-to-date flag to indicate being ready for the guest
+>>> usage and can be used to mark whether the folio is ready for shared OR
+>>> private use.
+>>
+>> Clearing the up-to-date flag also means that the page gets zero'd out
+>> whenever it transitions between shared and private (either direction).
+>> pKVM (Android) hypervisor policy can allow in-place conversion between
+>> shared/private.
+>>
+>> I believe the important thing is that sev_gmem_prepare() needs to be
+>> called prior to giving page to guest. In my series, I had made a
+>> ->prepare_inaccessible() callback where KVM would only do this part.
+>> When transitioning to inaccessible, only that callback would be made,
+>> besides the bookkeeping. The folio zeroing happens once when allocating
+>> the folio if the folio is initially accessible (faultable).
+>>
+>> From x86 CoCo perspective, I think it also makes sense to not zero
+>> the folio when changing faultiblity from private to shared:
+>>  - If guest is sharing some data with host, you've wiped the data and
+>>    guest has to copy again.
+>>  - Or, if SEV/TDX enforces that page is zero'd between transitions,
+>>    Linux has duplicated the work that trusted entity has already done.
+>>
+>> Fuad and I can help add some details for the conversion. Hopefully we
+>> can figure out some of the plan at plumbers this week.
+> 
+> Zeroing the page prevents leaking host data (see function docstring for
+> kvm_gmem_prepare_folio() introduced in [1]), so we definitely don't want
+> to introduce a kernel data leak bug here.
+> 
+> In-place conversion does require preservation of data, so for
+> conversions, shall we zero depending on VM type?
+> 
+> + Gunyah: don't zero since ->prepare_inaccessible() is a no-op
+> + pKVM: don't zero
+> + TDX: don't zero
+> + SEV: AMD Architecture Programmers Manual 7.10.6 says there is no
+>   automatic encryption and implies no zeroing, hence perform zeroing
+> + KVM_X86_SW_PROTECTED_VM: Doesn't have a formal definition so I guess
+>   we could require zeroing on transition?
 
-are available in the Git repository at:
+Maybe for KVM_X86_SW_PROTECTED_VM we could make zero-ing configurable
+via some CREATE_GUEST_MEMFD flag, instead of forcing one specific
+behavior. 
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+For the "non-CoCo with direct map entries removed" VMs that we at AWS
+are going for, we'd like a VM type with host-controlled in-place
+conversions which doesn't zero on transitions, so if
+KVM_X86_SW_PROTECTED_VM ends up zeroing, we'd need to add another new VM
+type for that.
 
-for you to fetch changes up to 221af82f606d928ccef19a16d35633c63026f1be:
+Somewhat related sidenote: For VMs that allow inplace conversions and do
+not zero, we do not need to zap the stage-2 mappings on memory attribute
+changes, right?
 
-  vhost/scsi: null-ptr-dereference in vhost_scsi_get_req() (2024-10-07 11:47:56 -0400)
+> This way, the uptodate flag means that it has been prepared (as in
+> sev_gmem_prepare()), and zeroed if required by VM type.
+> 
+> Regarding flushing the dcache/tlb in your other question [2], if we
+> don't use folio_zero_user(), can we relying on unmapping within core-mm
+> to flush after shared use, and unmapping within KVM To flush after
+> private use?
+> 
+> Or should flush_dcache_folio() be explicitly called on kvm_gmem_fault()?
+> 
+> clear_highpage(), used in the non-hugetlb (original) path, doesn't flush
+> the dcache. Was that intended?
+> 
+>> Thanks,
+>> Elliot
+>>
+>>>
+>>> <snip>
+> 
+> [1] https://lore.kernel.org/all/20240726185157.72821-8-pbonzini@redhat.com/
+> [2] https://lore.kernel.org/all/diqz34ldszp3.fsf@ackerleytng-ctop.c.googlers.com/
 
-----------------------------------------------------------------
-virtio: bugfixes
-
-Several small bugfixes all over the place.
-Most notably, fixes the vsock allocation with GFP_KERNEL in atomic
-context, which has been triggering warnings for lots of testers.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Haoran Zhang (1):
-      vhost/scsi: null-ptr-dereference in vhost_scsi_get_req()
-
-Michael S. Tsirkin (3):
-      virtio_ring: tag event_triggered as racy for KCSAN
-      virtio_console: fix misc probe bugs
-      vsock/virtio: use GFP_ATOMIC under RCU read lock
-
-Srujana Challa (1):
-      vdpa/octeon_ep: Fix format specifier for pointers in debug messages
-
- drivers/char/virtio_console.c          | 18 ++++++++++--------
- drivers/vdpa/octeon_ep/octep_vdpa_hw.c | 12 ++++++------
- drivers/vhost/scsi.c                   | 25 ++++++++++++++-----------
- drivers/virtio/virtio_ring.c           |  2 +-
- net/vmw_vsock/virtio_transport.c       |  8 ++++----
- 5 files changed, 35 insertions(+), 30 deletions(-)
-
+Best, 
+Patrick
 
