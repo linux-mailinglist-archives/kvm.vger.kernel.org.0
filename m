@@ -1,127 +1,126 @@
-Return-Path: <kvm+bounces-28066-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28067-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AA8A992F70
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 16:33:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2E4499306E
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 17:03:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E3451F22E94
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 14:33:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0065F1C212F6
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2024 15:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCED1D95B1;
-	Mon,  7 Oct 2024 14:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740BC1DA314;
+	Mon,  7 Oct 2024 15:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Jbc9WKPy"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="EsG8/Azs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE5F1D416B;
-	Mon,  7 Oct 2024 14:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B574D1D79AF
+	for <kvm@vger.kernel.org>; Mon,  7 Oct 2024 15:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728311457; cv=none; b=kQ8DEL931PjMn57dOBtt1UTrii8L1kVAuCNmImA1F8/Cancc9ll/ZHHZBzBR1HaTCjb25ELGMzAol+Nz2gV6QV6yHeR6REa2z3nirABAZ+g2DTdLvhiwGb0Q3v7U85wBXu/CjUYbrC2nww3TQD6dJWFnTTGEN09Sg7XkoQGU/WI=
+	t=1728313303; cv=none; b=CED0APxOfH0QAOMaSg8oRm9yksxknQhVDIn40sY/2ER8DTAzygdqGndNe0PdtjY7qt3E6L8RhZxIZgadG4O2rsE4zf00TGmsTtD+L1YMJ0cD8AaBpNsy6Dni601j/X2WvgTw81ToIbVIG0+2WftjiXIt1huiM2K3XijX1pmxE8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728311457; c=relaxed/simple;
-	bh=bqNnpLGSI8ObeGs4CLpY9ivgJb2h8lo/nKnIR/o6eW4=;
+	s=arc-20240116; t=1728313303; c=relaxed/simple;
+	bh=rRVuIaOx8RNrteaDGFooPVCgbWZsVHEatmlbzj7fViY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B/NJVdVTczCSVSK2gQiC4N7ILKz0shnGF/0PWyU+WhjHXNqfnjpq8f+RZPn4kF4FKu8NWVYcOo6A1XEayBIaVkHLljBt80lvoSMS8LLLGuLdu7Te1wqLby0CE27sr7dPVQNFYLXg+jTTX9iiZqdolFu30YI4CUw0P3AQKfK4ank=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Jbc9WKPy; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id ECF2040E0198;
-	Mon,  7 Oct 2024 14:30:45 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 4YkEZfVcnZj2; Mon,  7 Oct 2024 14:30:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1728311440; bh=iszCQnjQ8pE33VOc40q9Nefpswx6WyKznXbi97JB8FY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Jbc9WKPyCjxe9DEy9ApzeqjDe8lJosJuGoQI/02RCy/JBxL3edIAq2fju8l8tz572
-	 fo6b/rJar65VaP03zYLsCAxg9xpNTPfVzZKKfMQuykG3qhNh6TMvGX8/JWTIggRQRF
-	 nccYVmaiB23kFW0P0cKuFqP/37f3OpUxpE3Bwixywg61EXtz39P6DyC6zZInfM/y3m
-	 zikwew7zVRmAM89tV0lQUz5XUnxNxH3lplawuvzPhJxZPdMh+kqoMoesit3Ns9EFxq
-	 b2bfyvL9uYmlXrVsI5vVUZIjQqtDSq7MFxEqZ7fvUN6yAH4PQvJ/sZ6a/1DbgmEkhw
-	 rwJK9bvYQ6k9og4OkqNaY6vB0DlM0p9LncTLrR/illPctiD1itsgC1UTSkbkjB8Uoe
-	 mrOk2roSsLEgIjhKWIfmYcfKUJIJle1Zu/Khuwa147XePHKuUl+QjlgQRKotlKczMO
-	 DZ9J4H/qVnln7yYkpRRQYn8dUKG7hii+eE3cVhCjU1ZN6t2NX8650aRtBMQgmGgkE+
-	 w1IEvD23ZoqB8U28+L4cVp3domYhQaHFt4iGh0jHQjhWZirBHeaMpilCmC7IVDjhEW
-	 yqKPrBhmd742NccrTb0LHmZwtfm+r2bJzszC+zfrSMdyJz43ow+7T30tO91C4oTzjz
-	 o6b5BM1sz32j5rMYVrrkf6xw=
-Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8A65440E0169;
-	Mon,  7 Oct 2024 14:30:25 +0000 (UTC)
-Date: Mon, 7 Oct 2024 16:30:19 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Jim Mattson <jmattson@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Venkatesh Srinivas <venkateshs@chromium.org>
-Subject: Re: [PATCH v4 1/3] x86/cpufeatures: Define X86_FEATURE_AMD_IBPB_RET
-Message-ID: <20241007143019.GAZwPwe286itXE2Wj2@fat_crate.local>
-References: <20240913173242.3271406-1-jmattson@google.com>
- <20240913173242.3271406-2-jmattson@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aOQzGm90b4ETSBGpeJBTK25Uaj4U4N/QLahaJ0zJ7GT/fh9wpxOouRdER7XC4r0xdLv3IHXSKDDh/6R3vTG3cs9k5KLZBRvv3EPz+X3Ld9/ZDh4CF64Bn06VPKD0LccerW5s/dZCLDkp2Eds44H+BEiv0jdQ6fo8zNCWaNWGKmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=EsG8/Azs; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7acd7d9dbefso475262585a.3
+        for <kvm@vger.kernel.org>; Mon, 07 Oct 2024 08:01:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1728313300; x=1728918100; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4bInHqGw/7pXdDA3IXyTgOVdi79kStxfjp6yDL0daeE=;
+        b=EsG8/Azs6QNi2ZnSa0so8tY9ftg0gKXL7pk4qP9hzK5qrt0wUFXXRvdMYKCbCcRS9p
+         n49LNm/AILbZ/GDgD7o4iZrfiVTp10yzlTfOP1at0rgWo+Un3HbPw37hBXVX1npXym2E
+         75TORHgNOBV7807m/bcEecsmrYSnyysT6xOMVmgja6O3AN3nWzREdUH+c3z1WX1aeiaV
+         +TTkJPo6/GuAw6WGrxIcMID64yV8iz4PyH/ikIIDPUPoZyNs1ibCA2KoclqId9viUvGm
+         Z8QVkWCS1B8n6P26wYl0PK8tvNxHwCGz5xblLTJZSpJHo2+lb6k13l3kA07ltMsfvxmD
+         tJHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728313300; x=1728918100;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4bInHqGw/7pXdDA3IXyTgOVdi79kStxfjp6yDL0daeE=;
+        b=PQqbsI7t1w62hXP1zrGzgYMOjUwcjZ/jYhxvQHIH+xvV05o1/MwLHlSt2Ul+eESTbG
+         VaeCgqRTsfDbZXTumF+Mpb+JCr3FB6U3b0Q/e96kTFfvewPBzMS6p1lTKBvu504uOmvP
+         3HhLW4AgVGflXP+BfNJqGozxFzO5bJ4CQnw4ml2b5DAbpqd9+d0eoxaT4dl0t65w+zSD
+         nTKJ6l/VjXaXiuxn9pfQvT+mc6AarZafysCGk80+rSHhwo6D8ksFjb7971B0G+1fxtbl
+         1g5ry8GhMbgzbWwnAecRpreDzDlXPesyzPtb2/JgohK30nPE++gPTqIf0KKTcSPqdDJg
+         rvRg==
+X-Forwarded-Encrypted: i=1; AJvYcCWnqw/yn17iEX+Rlb4jrNALwLCXK2/lEL9r7MtazrG9g5i53zzS4DwatMJxGIdqIevBzBY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKWg+D0BiHn0Ks7+EIAnQJizvOKdzrzg8JGUiMaRWDyV47nx0V
+	dJdpNDLfu56k4G7FG+/FC6NIqWaSbUmX52KEny/bkyZfumnk6bl0fqBTo4UP6/0=
+X-Google-Smtp-Source: AGHT+IEC12fI88Gp57MHDcshS4/IkrApM2kBYgZQIiBILAEfDwFMFN//oZi0JmEkR0VcJlcGa+25Vw==
+X-Received: by 2002:a05:620a:40cd:b0:7a9:b914:279c with SMTP id af79cd13be357-7ae6f3aecbamr1931318585a.0.1728313300551;
+        Mon, 07 Oct 2024 08:01:40 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ae7563619fsm264722085a.62.2024.10.07.08.01.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 08:01:39 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sxpEw-002Wvt-Te;
+	Mon, 07 Oct 2024 12:01:38 -0300
+Date: Mon, 7 Oct 2024 12:01:38 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: "Gowans, James" <jgowans@amazon.com>
+Cc: "dwmw2@infradead.org" <dwmw2@infradead.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"rppt@kernel.org" <rppt@kernel.org>, "kw@linux.com" <kw@linux.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"madvenka@linux.microsoft.com" <madvenka@linux.microsoft.com>,
+	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>,
+	"robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+	"nh-open-source@amazon.com" <nh-open-source@amazon.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Saenz Julienne, Nicolas" <nsaenz@amazon.es>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"steven.sistare@oracle.com" <steven.sistare@oracle.com>,
+	"Graf (AWS), Alexander" <graf@amazon.de>,
+	"will@kernel.org" <will@kernel.org>,
+	"joro@8bytes.org" <joro@8bytes.org>
+Subject: Re: [RFC PATCH 05/13] iommufd: Serialise persisted iommufds and ioas
+Message-ID: <20241007150138.GM2456194@ziepe.ca>
+References: <20240916113102.710522-1-jgowans@amazon.com>
+ <20240916113102.710522-6-jgowans@amazon.com>
+ <20241002185520.GL1369530@ziepe.ca>
+ <d6328467adc9b7512f6dd88a6f8f843b8efdc154.camel@amazon.com>
+ <e458d48a797043b7efc853fc65b9c4d043b12ed4.camel@infradead.org>
+ <1d331c55a299d414e49ba5eb6f46dccb525bf788.camel@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240913173242.3271406-2-jmattson@google.com>
+In-Reply-To: <1d331c55a299d414e49ba5eb6f46dccb525bf788.camel@amazon.com>
 
-On Fri, Sep 13, 2024 at 10:32:27AM -0700, Jim Mattson wrote:
-> AMD's initial implementation of IBPB did not clear the return address
-> predictor. Beginning with Zen4, AMD's IBPB *does* clear the return
-> address predictor. This behavior is enumerated by
-> CPUID.80000008H:EBX.IBPB_RET[bit 30].
-> 
-> Define X86_FEATURE_AMD_IBPB_RET for use in KVM_GET_SUPPORTED_CPUID,
-> when determining cross-vendor capabilities.
-> 
-> Suggested-by: Venkatesh Srinivas <venkateshs@chromium.org>
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index cabd6b58e8ec..a222a24677d7 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -215,7 +215,7 @@
->  #define X86_FEATURE_SPEC_STORE_BYPASS_DISABLE	( 7*32+23) /* Disable Speculative Store Bypass. */
->  #define X86_FEATURE_LS_CFG_SSBD		( 7*32+24)  /* AMD SSBD implementation via LS_CFG MSR */
->  #define X86_FEATURE_IBRS		( 7*32+25) /* "ibrs" Indirect Branch Restricted Speculation */
-> -#define X86_FEATURE_IBPB		( 7*32+26) /* "ibpb" Indirect Branch Prediction Barrier without RSB flush */
+On Mon, Oct 07, 2024 at 08:57:07AM +0000, Gowans, James wrote:
+> With the ARM SMMUv3 for example I think there are break-before-make
+> requirement, so is it possible to do an atomic switch of the SMMUv3 page
+> table PGD in a hitless way? 
 
-I see upstream
+The BBM rules are only about cached translations. If all your IOPTEs
+result in the same translation *size* then you are safe. You can
+change the radix memory storing the IOPTEs freely, AFAIK.
 
-#define X86_FEATURE_IBPB		( 7*32+26) /* "ibpb" Indirect Branch Prediction Barrier */
+BBM level 2 capable HW doesn't have those limitations either and
+everything is possible.
 
-Where does "without RSB flush" come from?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jason
 
