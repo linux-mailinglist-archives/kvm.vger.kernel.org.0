@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-28148-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28149-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84845995681
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 20:26:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9A3995762
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 21:05:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B0761F23D04
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 18:26:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2371128747A
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 19:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFAE2212D0E;
-	Tue,  8 Oct 2024 18:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661C62139B1;
+	Tue,  8 Oct 2024 19:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWJNBO7b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vHB4YlKP"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276FA21265D
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 18:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917FC1F4FA9
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 19:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728411977; cv=none; b=GgRjzfxhT9iG8ATwVILOgbbfy/8r7Lk+e7BIEk2hapKrQ1SayvJ4CprZZhJWEw81TgCRPIDvTeeYSZStZNoEU2TNXGFl07NEqbGvuuNhorYF52zHKI74d6aug0VkhF+auAVcekjHcd2TAQIfo9TGegWUtXWOwEDGsK11Om1+iRI=
+	t=1728414349; cv=none; b=aIyMiWKaeP1+5ybm54wqSh3btRUoZJxm6PfeYm0MJI3mitsnAl2r79fIFDmWe5LL70lfJ3BbLXB5JhuCvm3af60jO4OWOBzQZVsWU3nMUOv0lrjoUTsmTw0HDloqZQTlYgVKNyE7XQx8ItrzOD2L7ryeny9ERlBSb5kJkmVQa5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728411977; c=relaxed/simple;
-	bh=eB0DyQgeQu6eDVGvg3o4WWKRmZXFTLiUXQDLjTXP/hQ=;
+	s=arc-20240116; t=1728414349; c=relaxed/simple;
+	bh=gloWWZjFWR0ms5VsZAoCfqgUDfnc+RKJiqI9uyKjec4=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BGxu3OCFQfhQ/K/StayghG+TRXN91pUbVdRDfOSXp+5Y6I4g+6QPQvTX+iXGpT1O2L6JF2eocC2HLW7KrFCSWTsgJAR2Skau1XqU7geYRUD666MaRbqkxC/hpDk5RvBot32w8fUrPjTyMfF4o4W9q4ActI5/ErZ0VIgf+9qc1po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWJNBO7b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A0AA8C4CED4
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 18:26:16 +0000 (UTC)
+	 Content-Type:MIME-Version; b=B2qXFFPk52fSHDT/ZQKPEdgnrJ53Oy8nNBJ+xH347BzKD/kGp7gPuoPrjleyxHby2YghgHZy+zu3JtQoHnb9dstpUnACzVo4DMAmBroQy8Qhd6zf1Zd1t3km4wCYfu/niJ4pt9eRD2BNAC6K7fe9C7zOzXFOJM4Xjpm1v+6pG04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vHB4YlKP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 11276C4CED3
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 19:05:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728411976;
-	bh=eB0DyQgeQu6eDVGvg3o4WWKRmZXFTLiUXQDLjTXP/hQ=;
+	s=k20201202; t=1728414349;
+	bh=gloWWZjFWR0ms5VsZAoCfqgUDfnc+RKJiqI9uyKjec4=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=GWJNBO7bFsz3Bcnls9YBZr29pv5vA+zD83wfAMcT7ROvjD/Z4jR1Wli+8SqDQn2Oc
-	 u/KaNgV5Z5UpRZoqXP8biwHTWeAj2vMs1m4EvfDyEBzRjy9ZPPdsqaD0AOIiqivOa5
-	 drClg1WaBHKGh0PCj8Se+XGDC7bfzMybSVUFqZEFutQK1g1yDETPuVc1qAqFLZa37t
-	 RkVQwG7I6ZSpYDKqUP8nonGK1PSUIxQcEvPCBn3o6T/CTxDKIWOAtqZGQHFhekdoQ7
-	 fcDngYcG7jihZSjAfw2WZ0yJR09zDIxRu/nHzTOsqC0Z4863HMAMFKo30EI6GyXUam
-	 44VjNeGrNupLQ==
+	b=vHB4YlKPKQ0O04J3FWDNzI+7a4Z0kZAUvFrsUbS0mSPN2c0IFmtS+LGzCWkJpMsJ+
+	 lfoBr+Yp808FtsyKJx1wm+htsjpLuIQ3IxmOhsvBmmMby14vyvCReXMFQsBDywmRdd
+	 nfEcchvbXw1iXCL71FOPgeXgy9Xzd2H+4OfTRJXv/rf3sXCfzaNNVNsplywqq7KRox
+	 GRmgAqkfoAX/UlwoghhDYsYhWJqHDW/jrwSoD7J1BoYDgXKJGv0sHViVx/9bTDwYEv
+	 OCxzsyhw2xiegiyCvzGy3DmIc5b/TmjutDyXBmu6xav7jYwP2CXjgNWWQJsIRVFHbK
+	 EhAr07+3r9w6g==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 9BCD2C53BC1; Tue,  8 Oct 2024 18:26:16 +0000 (UTC)
+	id 0A921C53BCA; Tue,  8 Oct 2024 19:05:49 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
 Subject: [Bug 219009] Random host reboots on Ryzen 7000/8000 using nested VMs
  (vls suspected)
-Date: Tue, 08 Oct 2024 18:26:16 +0000
+Date: Tue, 08 Oct 2024 19:05:48 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -56,14 +56,14 @@ X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: blake@volian.org
+X-Bugzilla-Who: michal.litwinczuk@op.pl
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219009-28872-e7xKgXfcuO@https.bugzilla.kernel.org/>
+Message-ID: <bug-219009-28872-fHUfdNKHMU@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219009-28872@https.bugzilla.kernel.org/>
 References: <bug-219009-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -79,30 +79,35 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219009
 
---- Comment #28 from blake (blake@volian.org) ---
-All of ours are running Debian Bookworm, stock kernel
-linux-image-6.1.0-26-amd64. And then hosts are 6.8.12-2-pve
+--- Comment #29 from h4ck3r (michal.litwinczuk@op.pl) ---
+(In reply to mlevitsk from comment #26)
+> But the question is - did they use nested virtualization on Linux actively
+> and with vls enabled?
+>=20
+>=20
+> The use case which causes the reboots as I understand is Hyperv enabled
+> Windows, in which case pretty much the whole Windows is running as a nest=
+ed
+> VM, nested to the Hyperv hypervisor.
+>=20
+> Once I get my hands on a client Zen4 machine (I only have Zen2 at home), I
+> will also try to reproduce this but not promises when this will happen.=20
+>=20
+> Meanwhile I really hope that someone from AMD can take a look a this, and
+> either confirm that this is or will be fixed with a microcode patch or
+> confirm that we have to disable vls on the affected CPUs.
+>=20
+> Best regards,
+>        Maxim Levitsky
 
-On Tue, Oct 8, 2024, at 12:53 PM, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D219009
->=20
-> --- Comment #27 from =C5=BDilvinas =C5=BDaltiena (zaltys@natrix.lt) ---
-> (In reply to blake from comment #13)
-> > I recently experienced this. I built a proxmox cluster with 7950x. Every
-> > node that I tested on would hard reset with no logs when a VM was doing
-> > nested virtualization.
-> >=20
-> > Our CI testing uses VMs, and putting the CI in a VM itself makes it pre=
-tty
-> > easy to reproduce, just takes some time.
->=20
-> Blake, what OS is used in your VMs ?
->=20
-> --=20
-> You may reply to this email to add a comment.
->=20
-> You are receiving this mail because:
-> You are on the CC list for the bug.
+Not really - most of them are microservice type ones.
+That would also mean there is less chance of corruption since they occupied
+less host memory.
+And windows uses nested virt even if hyperv is not installed somehow.
+(installation does not, but freshly booted guest crashed my node)
+
+Im afraid it might be unresolvable issue, even with microcode.
+At least most things point to similar issue as memory leaks on their igpus.
 
 --=20
 You may reply to this email to add a comment.
