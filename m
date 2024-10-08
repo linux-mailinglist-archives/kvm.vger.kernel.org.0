@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-28133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE1229948AF
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 14:15:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A833D994CC3
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 14:58:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5059AB20D79
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 12:15:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCBFE1C24FC6
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 12:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9FD1DDC06;
-	Tue,  8 Oct 2024 12:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90EF21DE8A0;
+	Tue,  8 Oct 2024 12:57:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ru0k7M/H"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="j0f2NqQ6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFAD1E485;
-	Tue,  8 Oct 2024 12:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CC91DE4DB;
+	Tue,  8 Oct 2024 12:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728389737; cv=none; b=HyPYDfvJtlLkFdvT2yScobxH0YaSxJCuXVYBfUCS0lnZlNBwg6/WPtxM9X0d16bQhVn8jpS0baBC/sWGF4/LU5Sut7BFXykJODW/ARnFpvf0CuMaMqBeetvGRbZ7cZdqGBDqyw8vV+76z39fHHrDaNVzrhNCatVu1ALElppRIjU=
+	t=1728392222; cv=none; b=c2eMipYWj59/Cgz2Yp9Zd8I8g0jk1F5jYQqkKDycazQecT2YbKTIsdMlB7EHgiT23HlFR3EKZ7rY0MGgRrvCXUt4ah3wiG/6byTfRFR1IQDFNVHfCtamdAl5VBYfaiJ19zaL2suTdStpG8pDmaJqyQbhZL7Ig2rYhryP4Gv3ZTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728389737; c=relaxed/simple;
-	bh=rfLeZv8FubnCAd0PFU+nY8XTBaYUV7FJ4UPjvxW79k8=;
+	s=arc-20240116; t=1728392222; c=relaxed/simple;
+	bh=xdOWaPKbu1cOqqCkZsfgUqBQC85j4W0td459gcxQ4LI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Sd/FbHWGUbrOxoEEY7lm4vkfVRiFc44OMMxm+8x5LrK0KDwKMX8A0M4UT3fT4t1UMaXAYQQ5+f9PL6ueEZo07GuQlghisaNk89j0c2/0laV3vdY+RpgI0ocn1XrOGtqkekqyTluSwnSzh/jNOV0D9qxSoAEvnU1jf64t123tdbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ru0k7M/H; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=UXV8UaJVx3S1h9Io6ioW11xEqSe3kpklj5In12qB5+9xzwjVsGVDqYDtUAMyZNjFns1z444bNbDgCyPVKLeJm6ZTcLhRvH69eTeDgX+4aoL/bKURBTXu3dtu3O7jxkk5VrySdtbbZEDoW8U/uiSKmJfTZKwaTzAVq4P+7L6qcHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=j0f2NqQ6; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 498AJjrg000354;
-	Tue, 8 Oct 2024 12:15:33 GMT
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 498CpBH1004270;
+	Tue, 8 Oct 2024 12:56:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
 	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=D
-	/Yih5U/uDSx89i9n8GFG//aFMjKF2HQpQcU9YGqz3g=; b=Ru0k7M/H4dq7Ia0pg
-	kWz17N3JvAveoYuKGehmt4Q4RuE4X5ImrhhFlsngFiX9cN1ZKRtGzeFTPY0ePGUe
-	wlVqKCSitcnXR4U1A4vMxi0U8l9bEbNrjjvCAyLTUKp76ek7l6yvMlw+Qz5T9u6E
-	uhPbW64AgLtmZADr3msUtfqbCFwWqBhk/Jma6G2Xv31L206WAJnqOwxd0i9SZGCL
-	1TcUcqRhvf8RSujofMu41/YxJrAVCTgoYvSTbWlGBoUvILFiiS4KMs31fkTfjJ++
-	fTPfeyABoG8wXbPgiE61oO92zJDGX/LY+5YVvcO7yIBESqV8OygxNF6DHfzcz0xC
-	w6VRw==
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=n
+	Owv8Na5jDsAXqj/JxHQXljGqHLewVvbpc663u5fgRE=; b=j0f2NqQ622zp129jX
+	V4O3ertyfG+orFzz12gMM+gk1wzyXjQsVWHqnuo8Q3i1XQPhDOy9y7xIr9mdDxOu
+	01bcdPVWdL4Qz6HlFd8pFN5HKjwy2i+ic4YEif0FEF9sMciYS4Y37LY1hWdb89UR
+	RJyYkRFn0wnQF/MwAnZ37QIcBXx4Qnjq4lbVd5rlaGe8pwguc2D1VN0uBcmxKgDi
+	fmiqUKx0Q61DfZyJldAy42CZb/A2S1gLlmTPlpsAQdkAxL+ApqB6UI4VPyHUOunZ
+	29k/YFZJiVRK/Z3he8KzZZqIdNQnx7yxQOzH8tLwtbf3j3GkZqjRzVcI10pDo/pS
+	/aXQw==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4252vpghq6-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42553hr11x-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Oct 2024 12:15:32 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 498CFWKG016521;
-	Tue, 8 Oct 2024 12:15:32 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4252vpghq3-1
+	Tue, 08 Oct 2024 12:56:58 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 498CraVQ010130;
+	Tue, 8 Oct 2024 12:56:58 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42553hr11n-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Oct 2024 12:15:32 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 498AVNMS022867;
-	Tue, 8 Oct 2024 12:15:31 GMT
+	Tue, 08 Oct 2024 12:56:57 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 498C7Afr011535;
+	Tue, 8 Oct 2024 12:56:56 GMT
 Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 423jg0usr9-1
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 423g5xmek9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Oct 2024 12:15:31 +0000
+	Tue, 08 Oct 2024 12:56:56 +0000
 Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 498CFRfu18743674
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 498CuqBU18874744
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 8 Oct 2024 12:15:27 GMT
+	Tue, 8 Oct 2024 12:56:52 GMT
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A17BC2004B;
-	Tue,  8 Oct 2024 12:15:27 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id D39C02004B;
+	Tue,  8 Oct 2024 12:56:52 +0000 (GMT)
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 318EF20043;
-	Tue,  8 Oct 2024 12:15:27 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 6468220040;
+	Tue,  8 Oct 2024 12:56:52 +0000 (GMT)
 Received: from [9.171.9.6] (unknown [9.171.9.6])
 	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  8 Oct 2024 12:15:27 +0000 (GMT)
-Message-ID: <fb005423-3bc4-48fe-85eb-f4fadbabeef4@linux.ibm.com>
-Date: Tue, 8 Oct 2024 14:15:26 +0200
+	Tue,  8 Oct 2024 12:56:52 +0000 (GMT)
+Message-ID: <fbed12b9-a6fb-4258-9ece-cee1b8559d92@linux.ibm.com>
+Date: Tue, 8 Oct 2024 14:56:52 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,8 +84,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/4] selftests: kvm: s390: Fix whitespace confusion in
- ucontrol test
+Subject: Re: [PATCH v5 3/4] selftests: kvm: s390: Verify reject memory region
+ operations for ucontrol VMs
 To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
@@ -93,7 +93,7 @@ Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>
 References: <20241008074253.370481-1-schlameuss@linux.ibm.com>
- <20241008074253.370481-5-schlameuss@linux.ibm.com>
+ <20241008074253.370481-4-schlameuss@linux.ibm.com>
 Content-Language: en-US
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
@@ -138,26 +138,30 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20241008074253.370481-5-schlameuss@linux.ibm.com>
+In-Reply-To: <20241008074253.370481-4-schlameuss@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: U9P8WDRKT1HDuhxFnTQcg9waUxViHMiy
-X-Proofpoint-GUID: LV3Mf7rAJt9HYO5RcowrghVB_JHX_w5A
+X-Proofpoint-ORIG-GUID: ulWoAZ72i_kOXrGK6OxddQ4K8Epf1OK-
+X-Proofpoint-GUID: UbuymfJiej52TzXliQh019DYRfb4a5Zp
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-08_10,2024-10-08_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
- bulkscore=0 adultscore=0 mlxlogscore=802 suspectscore=0 clxscore=1015
- malwarescore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2409260000 definitions=main-2410080075
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ suspectscore=0 clxscore=1015 mlxlogscore=763 priorityscore=1501
+ malwarescore=0 bulkscore=0 phishscore=0 lowpriorityscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410080080
 
 On 10/8/24 9:42 AM, Christoph Schlameuss wrote:
-> Checkpatch thinks that we're doing a multiplication but we're obviously
-> not. Fix 4 instances where we adhered to wrong checkpatch advice.
+> Add a test case verifying KVM_SET_USER_MEMORY_REGION and
+> KVM_SET_USER_MEMORY_REGION2 cannot be executed on ucontrol VMs.
 > 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> Executing this test case on not patched kernels will cause a null
+> pointer dereference in the host kernel.
+> This is fixed with commit:
+> commit 7816e58967d0 ("kvm: s390: Reject memory region operations for ucontrol VMs")
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+I'm going to remove the "commit" prefix from the line above when picking.
+
 
