@@ -1,130 +1,152 @@
-Return-Path: <kvm+bounces-28128-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28129-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449A99945BD
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 12:46:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B41E99945F8
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 12:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 042D92875DB
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 10:46:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B8681F25852
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 10:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8C51C3F27;
-	Tue,  8 Oct 2024 10:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1615E1CF5E7;
+	Tue,  8 Oct 2024 10:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jhxig615"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iGCQ6NPv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A741D0496;
-	Tue,  8 Oct 2024 10:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18E81C9B77;
+	Tue,  8 Oct 2024 10:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728384335; cv=none; b=Gebc35VuXm3JfCo2zueicki0DhYMxUIAVNYTwX6Eqt5u76p1WfHacUfRcilXTs4XpOXGiKzJACpQeJ2ZMusM5e5yQCHFcdS3GfeFN0PsbweJ8CTIRWFNLH1z1Q0FtXR9mnfKZO1RnzDgIn7gXuaP1N2Yz666ncsKPH95WWXzhqw=
+	t=1728385187; cv=none; b=FrrUNS6+UbVTmJVbc1aVhq6+9ao+kMe0At8mKWoHGgHYqoSaw+ck7M7UTPCfydJKhm8r7fxX2CXRzwOHXEgxP8YESLOPfAtncDktDPLfMsSSmu6l32+wZu2zwvdLDbfFsf1X7HVDpQ81rKqdJips5QNQ7Zw5jInQ0/XoJrpHz5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728384335; c=relaxed/simple;
-	bh=/Wy3bEmK+Z2Csvv6DBysE2rgjF97bye9ch+Y+NPQ9vw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mzD0U6XyT+aDrrs44BWn/4hQ5X6ZG01rS5VE+1qvSGneM33CuwDfmScKfDXCJmUSsvtwulKd35Mx+RCIgAMV7r48iv02yDtDpZVYtHCzEoXHn7W+h/gviKe/4Bntt+vPzD2AUp5B7wlv99gw0BxpHggCN0faPDdQM+Ik5ynn0co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jhxig615; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728384333; x=1759920333;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/Wy3bEmK+Z2Csvv6DBysE2rgjF97bye9ch+Y+NPQ9vw=;
-  b=Jhxig6155VgLoVHiV3ffcYVcb/b0Hidf0r3dHRkeNA/WGQynCbG2Y/Et
-   8GM+MA5CYdFCwhKBEiEnjbScY99VtGilO9+D2c3Jvi6d9JmVHmGRtSFs0
-   fx7ZyrK2GZPlVsJgQHziXrxNd2yeLaDvLV493zLlOFWur2ewtcOf6No08
-   v+bCDQc2is+lwy6b1zoARgUY/gYXCBl6Rej3OH2OAGXmhuu7lr8Z5FomH
-   pOaVEjCCR1/FL0jyld4O6CIvB0mQH2V3dDgXqMrVgrclucNoCQCnmCwyu
-   iJ8VCTIlyBMIqy+mRIo9WTRQHXc4Kkbq9qJ/RUCaezK5R/RA9l3apHyws
-   Q==;
-X-CSE-ConnectionGUID: //8ed1ffRfyYemUtHGDcXw==
-X-CSE-MsgGUID: S7ooEgGTTuK/J5/CRAtZYg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="45033839"
-X-IronPort-AV: E=Sophos;i="6.11,186,1725346800"; 
-   d="scan'208";a="45033839"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 03:45:31 -0700
-X-CSE-ConnectionGUID: h4kYvybrTwmALhhG/u1m0A==
-X-CSE-MsgGUID: jIdiX7nLSFCzVuXbVVVpjA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,186,1725346800"; 
-   d="scan'208";a="76166929"
-Received: from sramkris-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.222.88])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 03:45:30 -0700
-From: Kai Huang <kai.huang@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com,
-	kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Kai Huang <kai.huang@intel.com>
-Subject: [PATCH 2/2] KVM: x86: Fix a comment inside __kvm_set_or_clear_apicv_inhibit()
-Date: Tue,  8 Oct 2024 23:45:14 +1300
-Message-ID: <e462e7001b8668649347f879c66597d3327dbac2.1728383775.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <cover.1728383775.git.kai.huang@intel.com>
-References: <cover.1728383775.git.kai.huang@intel.com>
+	s=arc-20240116; t=1728385187; c=relaxed/simple;
+	bh=zeUqvI7SPlfEDQRc680LktQNkR1koKFBn87cj8I1z5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=QLmIgnSPDNZuCHXK5+ySxTS8MBo/+hYxeUJkqI6ohreUzbw2HJLdKS4l9QwQ5dJhuHi0Fzj2zRM5wIZUCU5eYro3QE50OUPx59CPU3Qrb2cdAkPcNDAmywuXHwmqe6h+8z85ec8b4XXTNCByVPd5J3S9WWk5xE4JC0IgDl3KUKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iGCQ6NPv; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4989Juau020507;
+	Tue, 8 Oct 2024 10:59:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	4A8DJyWg8LQ+N4AyllITtSSlkQcxiPJBfcJryBouwNw=; b=iGCQ6NPvXDS1rNyW
+	E6O4S/UM3bGpjThxzuzn/CT/+jJ5uwSI3upOn+Bb8jK2LW5jWYz2kFkUvN02mBrh
+	uX1QuXrwtxrStlfiBwxMRs72vBeVtNcyeIWBuJYzaM89/nxj9ZtIEJuTJjdJ28Hp
+	y/InN8D+QBpDvKjuA2Nk/3UI0IlGPVgBhY4pTJY4WlPASG5UMwLiZnR841fzs6Yt
+	j07YJRa2I1S0N5VVNmG3jqW2bfq1liE2o0QN+1Biie09Io4NTJXXir6ii9N1y/vf
+	LNLPRV+rPMj/OOFEwgZvozygUwyn/O4aVF/7Se+L+RlJF3SemQg871GrZpK6Seac
+	FmZkuA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42520hggw6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Oct 2024 10:59:38 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 498Awb8d021450;
+	Tue, 8 Oct 2024 10:59:37 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42520hggw4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Oct 2024 10:59:37 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4989FaVT011516;
+	Tue, 8 Oct 2024 10:59:37 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 423g5xkx7c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Oct 2024 10:59:37 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 498AxXN542271164
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 8 Oct 2024 10:59:33 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2B5BE2004D;
+	Tue,  8 Oct 2024 10:59:33 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 57AEC20043;
+	Tue,  8 Oct 2024 10:59:32 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.179.3.110])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Tue,  8 Oct 2024 10:59:32 +0000 (GMT)
+Date: Tue, 8 Oct 2024 12:59:30 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: "Marc Hartmayer" <mhartmay@linux.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Eric Farman <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        "Martin
+ K. Petersen" <martin.petersen@oracle.com>,
+        Robin Murphy
+ <robin.murphy@arm.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>, linux-s390@vger.kernel.org,
+        virtualization@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Halil Pasic
+ <pasic@linux.ibm.com>
+Subject: Re: [PATCH 1/1] s390/virtio_ccw: fix dma_parm pointer not set up
+Message-ID: <20241008125930.33578456.pasic@linux.ibm.com>
+In-Reply-To: <875xq3yo97.fsf@linux.ibm.com>
+References: <20241007201030.204028-1-pasic@linux.ibm.com>
+	<875xq3yo97.fsf@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0olIk7itJFa692_e9qiWOsWSRvlhRHRt
+X-Proofpoint-ORIG-GUID: ZOgQRSixwEq07pQDdsufZ9psI2fkElxs
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-08_09,2024-10-08_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0
+ mlxlogscore=647 malwarescore=0 clxscore=1015 spamscore=0 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410080066
 
-Change svm_vcpu_run() to vcpu_enter_guest() in the comment of
-__kvm_set_or_clear_apicv_inhibit() to make it reflect the fact.
+On Tue, 08 Oct 2024 10:47:48 +0200
+"Marc Hartmayer" <mhartmay@linux.ibm.com> wrote:
 
-When one thread updates VM's APICv state due to updating the APICv
-inhibit reasons, it kicks off all vCPUs and makes them wait until the
-new reason has been updated and can be seen by all vCPUs.
+> > Closes: https://bugzilla.linux.ibm.com/show_bug.cgi?id=209131  
+> 
+> I guess, this line can be removed as it’s internal only.
 
-There was one WARN() to make sure VM's APICv state is consistent with
-vCPU's APICv state in the svm_vcpu_run().  Commit ee49a8932971 ("KVM:
-x86: Move SVM's APICv sanity check to common x86") moved that WARN() to
-x86 common code vcpu_enter_guest() due to the logic is not unique to
-SVM, and added comments to both __kvm_set_or_clear_apicv_inhibit() and
-vcpu_enter_guest() to explain this.
+checkpatch.pl complains about the Reported-by if I do. 
 
-However, although the comment in __kvm_set_or_clear_apicv_inhibit()
-mentioned the WARN(), it seems forgot to reflect that the WARN() had
-been moved to x86 common, i.e., it still mentioned the svm_vcpu_run()
-but not vcpu_enter_guest().  Fix it.
+It does not complain about
+Closes: N/A
+but if I read the process documentation correctly if the report
+is not available on the web Closes should be omitted:
+"""
+Using Reported-by:, Tested-by:, Reviewed-by:, Suggested-by: and Fixes:
+----------------------------------------------------------------------
 
-Note after the change the first line that contains vcpu_enter_guest()
-exceeds 80 characters, but leave it as is to make the diff clean.
+The Reported-by tag gives credit to people who find bugs and report them and it
+hopefully inspires them to help us again in the future. The tag is intended for
+bugs; please do not use it to credit feature requests. The tag should be
+followed by a Closes: tag pointing to the report, unless the report is not
+available on the web.
+"""
 
-Fixes: ee49a8932971 ("KVM: x86: Move SVM's APICv sanity check to common x86")
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- arch/x86/kvm/x86.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+So I guess I have to make peace with getting checkpatch warnings when I
+give credits to the reporter for reports not available on the web.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index afd70c274692..7b347e564d10 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10606,11 +10606,11 @@ void __kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
- 	if (!!old != !!new) {
- 		/*
- 		 * Kick all vCPUs before setting apicv_inhibit_reasons to avoid
--		 * false positives in the sanity check WARN in svm_vcpu_run().
-+		 * false positives in the sanity check WARN in vcpu_enter_guest().
- 		 * This task will wait for all vCPUs to ack the kick IRQ before
- 		 * updating apicv_inhibit_reasons, and all other vCPUs will
- 		 * block on acquiring apicv_update_lock so that vCPUs can't
--		 * redo svm_vcpu_run() without seeing the new inhibit state.
-+		 * redo vcpu_enter_guest() without seeing the new inhibit state.
- 		 *
- 		 * Note, holding apicv_update_lock and taking it in the read
- 		 * side (handling the request) also prevents other vCPUs from
--- 
-2.46.0
-
+Regards,
+Halil
 
