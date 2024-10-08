@@ -1,213 +1,632 @@
-Return-Path: <kvm+bounces-28138-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28139-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8F88995406
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 18:07:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C78B699546F
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 18:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AB782847C4
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 16:07:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B9AC2864A8
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 16:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A451E0DC4;
-	Tue,  8 Oct 2024 16:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XYOfN1Jb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4891E1E0DD2;
+	Tue,  8 Oct 2024 16:31:19 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5683F1E498
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 16:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E6541A80;
+	Tue,  8 Oct 2024 16:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728403643; cv=none; b=HR0WvuXvGzbTYEXVkyp2i/ub5FrDF9URmhrIiUpko/g+0PV2Fh3fGMce2ZSJ5HpbD+e5j9oRynRyuDgn14AQWgTxxpUfwGeALLjnShdJ2d4f1/k4XYGUX3+/5Q084LRBi4xCTWskKMYwui8yszRTrBL48FShP2W+mzo6M3uUFwA=
+	t=1728405078; cv=none; b=melpsJEogRfWtGWDhxEZ6L5DxwZL9Fm1thce+iYWanEz6+CtI6hg3BjLyYDLQqb6OKLhA2K9XT1QMuFroMj0+JmAR4/EcjvamCBTk6dP2fUH0Azdw3tNRKjTV5OwqlFpBMPOFeqdS4IvanxGFX/50omHxx/YkOfYvMOkCpOvOYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728403643; c=relaxed/simple;
-	bh=Jryp7LH+8F0BmJi4LTiGbJ1Y9iu7yCp25arP1ycMQNo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YtHF1mFX3+kXKcggWVi+OPA/sf2nRe+AXT6WzG1MS8ZrxbY/RgiFF91DnC5fAZ4xaUDaEIaWJxri1eKWvtY/UxX7K5XWtLd5OCNeG2xq5SM1x73MQ6Htx+cKU7FeoWADhMWKt0fkXFCpZdvVL8pU1tN0FC1kaJPW65z5xneyi98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XYOfN1Jb; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e30cf0cf1bso26989187b3.0
-        for <kvm@vger.kernel.org>; Tue, 08 Oct 2024 09:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728403639; x=1729008439; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C2GrBB1U08T2w/p1kNVN37u8zyKk4xj/d7lqFEpuNQg=;
-        b=XYOfN1JbzS2aorkz30evFJxxXmQJs00IgZr8H/J1o1FMAQ3HfuaHr6zVBRJcRYOrmn
-         iadKwcG0xWYrkOjbH0HlZenghlaWmo9ZVCsO+D8i8x6QXlvfx4wdJAcbdQTK19mJ3KLo
-         weFACiXtaa0imsJKY1Tyhd5hVkkR7Ku2/qEFNxVBBqiTwe5KC5eCXi39i4di0jx4zGKz
-         TbbXgqXg1Sy2M0pR4j/sBf/iwXAz+KLPlmO5gACTctIdlr9/zDJ5iTfnGBHcuYlJ8iyI
-         w9xb5eUEKdd4J6P2A5/209ag0Gz/S031EY6/TAZM9kpTDBYRupicgbO4feiNoFTRx/0e
-         Ir6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728403639; x=1729008439;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C2GrBB1U08T2w/p1kNVN37u8zyKk4xj/d7lqFEpuNQg=;
-        b=O8RMJgrgDFBN1ut/82YM/F5aFfm+RxxAEKQwUbkMgZorh1zng+PfOy2DoDQT+4VVLc
-         5FByPEin8e1U0OlLGQtwZsGQdxVgst37/w6SNQexJnM4KN10p/y17kMnagTKGpMh8DRN
-         xHn4RTFfYM9Si2GmFTnqvo2inHKvfY3HkJ+sscBXxgVAgLO0kvIKXTB3RyQVkXV62jrX
-         SYBmGW8hT5EOMFfVFSSKxgo7x6hhMoiUrKO1qDKYXT218wk1x0qJNtpKkcAMpDXwqhQx
-         vicjxOfF8WpzMcYBTkk1D3sBZXyqLGlc0fx1CiOjhWEn6wLVRBuhGhXKgSjLYgssSYh1
-         WZ8w==
-X-Forwarded-Encrypted: i=1; AJvYcCXOwuPJdyPQJIjg5+2AYp0ebXl9NmY8w0ZTFYDxEY1oPuXPceyuEnHgqeWsnH+rL/Er7Z8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxx6Soslds7xt97tm3yrNtS+QTym/9Fq4Fxm8B9p3r10GXTrnXG
-	7bKhO7pIkHYv1H7jf1KUIFg8zpSAU+Sf880rR6DZZpUN5aUiFbGngQknsxSTJ7AjIXK0M+scyLR
-	30A==
-X-Google-Smtp-Source: AGHT+IEkX/NNjX7Bqm2H8qUc1h2OJv8Pv4ROroEQ8Ifzfk0p1QvySMglhwTVS6UCdy4Zjq8Lob8owYfcAXw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:a206:0:b0:e03:53a4:1a7 with SMTP id
- 3f1490d57ef6-e289394dedemr66667276.10.1728403639316; Tue, 08 Oct 2024
- 09:07:19 -0700 (PDT)
-Date: Tue, 8 Oct 2024 09:07:17 -0700
-In-Reply-To: <ZwSAZ0uiwhKOZVlN@yzhao56-desk.sh.intel.com>
+	s=arc-20240116; t=1728405078; c=relaxed/simple;
+	bh=DJ9rx/Y/n8OytLpHy2GEh1cAHPy/N/iuOEYUEAyFwuI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J+PJZUkfo48URDR9b9MOapkuogbO9yUwOeiJQNFyUqm52iv3Q580l3ry4JTdPsaNd8BNFQ7tHuovtveTeQd0MtthSPgjxBNUKjCK1ggv6p0QEVZ72ICoNZRnH72bCK9+nhardZXL288l7zHkWr6AYiTrmF+RMZcZGrWlfQ9ros0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 370BDDA7;
+	Tue,  8 Oct 2024 09:31:45 -0700 (PDT)
+Received: from [10.96.9.239] (PW05DSGS.arm.com [10.96.9.239])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F208A3F73F;
+	Tue,  8 Oct 2024 09:31:10 -0700 (PDT)
+Message-ID: <391c0a7d-99da-407b-8a34-38ce5e24776d@arm.com>
+Date: Tue, 8 Oct 2024 17:31:08 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <6eecc450d0326c9bedfbb34096a0279410923c8d.1726182754.git.isaku.yamahata@intel.com>
- <ZuOCXarfAwPjYj19@google.com> <ZvUS+Cwg6DyA62EC@yzhao56-desk.sh.intel.com>
- <Zva4aORxE9ljlMNe@google.com> <ZvbB6s6MYZ2dmQxr@google.com>
- <ZvkdkAQkN5LmDaE6@yzhao56-desk.sh.intel.com> <ZvrJvucBw1iIwEG6@google.com> <ZwSAZ0uiwhKOZVlN@yzhao56-desk.sh.intel.com>
-Message-ID: <ZwVYtaKFKat0OeWY@google.com>
-Subject: Re: [PATCH] KVM: x86/tdp_mmu: Trigger the callback only when an
- interesting change
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org, sagis@google.com, 
-	chao.gao@intel.com, pbonzini@redhat.com, rick.p.edgecombe@intel.com, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 09/43] arm64: RME: ioctls to create and configure
+ realms
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20241004152804.72508-1-steven.price@arm.com>
+ <20241004152804.72508-10-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20241004152804.72508-10-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 08, 2024, Yan Zhao wrote:
-> On Mon, Sep 30, 2024 at 08:54:38AM -0700, Sean Christopherson wrote:
-> > On Sun, Sep 29, 2024, Yan Zhao wrote:
-> > > On Fri, Sep 27, 2024 at 07:32:10AM -0700, Sean Christopherson wrote:
-> > > >  * Don't flush if the Accessed bit is cleared, as access tracking tolerates
-> > > >  * false negatives, and the one path that does care about TLB flushes,
-> > > >  * kvm_mmu_notifier_clear_flush_young(), uses mmu_spte_update_no_track().
-> > > I have a question about why access tracking tolerates false negatives on the
-> > > path kvm_mmu_notifier_clear_flush_young().
-> > > 
-> > > kvm_mmu_notifier_clear_flush_young() invokes kvm_flush_remote_tlbs()
-> > > only when kvm_age_gfn() returns true. But age_gfn_range()/kvm_age_rmap() will
-> > > return false if the old spte is !is_accessed_spte().
-> > > 
-> > > So, if the Access bit is cleared in make_spte(), is a TLB flush required to
-> > > avoid that it's not done in kvm_mmu_notifier_clear_flush_young()?
-> > 
-> > Because access tracking in general is tolerant of stale results due to lack of
-> > TLB flushes.  E.g. on many architectures, the primary MMU has omitted TLB flushes
-> > for years (10+ years on x86, commit b13b1d2d8692).  The basic argument is that if
-> > there is enough memory pressure to trigger reclaim, then there will be enough TLB
-> > pressure to ensure that omitting the TLB flush doesn't result in a large number
-> > of "bad" reclaims[1].  And conversely, if there isn't much TLB pressure, then the
-> > kernel shouldn't be reclaiming.
-> > 
-> > For KVM, I want to completely eliminate the TLB flush[2] for all architectures
-> > where it's architecturally legal.  Because for KVM, the flushes are often even
-> > more expensive than they are for the primary MMU, e.g. due to lack of batching,
-> > the cost of VM-Exit => VM-Enter (for architectures without broadcast flushes).
-> > 
-> > [1] https://lore.kernel.org/all/CAOUHufYCmYNngmS=rOSAQRB0N9ai+mA0aDrB9RopBvPHEK42Ng@mail.gmail.com
-> > [2] https://lore.kernel.org/all/Zmnbb-Xlyz4VXNHI@google.com
+Hi Steven
+
+On 04/10/2024 16:27, Steven Price wrote:
+> Add the KVM_CAP_ARM_RME_CREATE_RD ioctl to create a realm. This involves
+> delegating pages to the RMM to hold the Realm Descriptor (RD) and for
+> the base level of the Realm Translation Tables (RTT). A VMID also need
+> to be picked, since the RMM has a separate VMID address space a
+> dedicated allocator is added for this purpose.
 > 
-> It makes sense. Thanks for explanation and the provided links!
+> KVM_CAP_ARM_RME_CONFIG_REALM is provided to allow configuring the realm
+> before it is created. Configuration options can be classified as:
 > 
-> Thinking more about the prefetched SPTEs, though the A bit tolerates fault
-> negative, do you think we still can have a small optimization to grant A bit to
-> prefetched SPTEs if the old_spte has already set it? So that if a prefault
-> happens right after a real fault, the A bit would not be cleared, basing on that
-> KVM not changing PFNs without first zapping the old SPTE.
-> (but I'm not sure if you have already covered this optmication in the
-> mega-series).
+>   1. Parameters specific to the Realm stage2 (e.g. IPA Size, vmid, stage2
+>      entry level, entry level RTTs, number of RTTs in start level, LPA2)
+>      Most of these are not measured by RMM and comes from KVM book
+>      keeping.
+> 
+>   2. Parameters controlling "Arm Architecture features for the VM". (e.g.
+>      SVE VL, PMU counters, number of HW BRPs/WPs), configured by the VMM
+>      using the "user ID register write" mechanism. These will be
+>      supported in the later patches.
+> 
+>   3. Parameters are not part of the core Arm architecture but defined
+>      by the RMM spec (e.g. Hash algorithm for measurement,
+>      Personalisation value). These are programmed via
+>      KVM_CAP_ARM_RME_CONFIG_REALM.
+> 
+> For the IPA size there is the possibility that the RMM supports a
+> different size to the IPA size supported by KVM for normal guests. At
+> the moment the 'normal limit' is exposed by KVM_CAP_ARM_VM_IPA_SIZE and
+> the IPA size is configured by the bottom bits of vm_type in
+> KVM_CREATE_VM. This means that it isn't easy for the VMM to discover
+> what IPA sizes are supported for Realm guests. Since the IPA is part of
+> the measurement of the realm guest the current expectation is that the
+> VMM will be required to pick the IPA size demanded by attestation and
+> therefore simply failing if this isn't available is fine. An option
+> would be to expose a new capability ioctl to obtain the RMM's maximum
+> IPA size if this is needed in the future.
+> 
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v2:
+>   * Improved commit description.
+>   * Improved return failures for rmi_check_version().
+>   * Clear contents of PGD after it has been undelegated in case the RMM
+>     left stale data.
+>   * Minor changes to reflect changes in previous patches.
 
-Already handled :-)
+Looks fine to me. Some minor comments below.
 
-Though I need to test the shadow MMU code, as I was initially thinking the issue
-was unique to the TDP MMU (no idea why I thought that).
+> ---
+>   arch/arm64/include/asm/kvm_emulate.h |   5 +
+>   arch/arm64/include/asm/kvm_rme.h     |  19 ++
+>   arch/arm64/kvm/arm.c                 |  18 ++
+>   arch/arm64/kvm/mmu.c                 |  20 +-
+>   arch/arm64/kvm/rme.c                 | 283 +++++++++++++++++++++++++++
+>   5 files changed, 341 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index c7bfb6788c96..5edcfb1b6c68 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -705,6 +705,11 @@ static inline enum realm_state kvm_realm_state(struct kvm *kvm)
+>   	return READ_ONCE(kvm->arch.realm.state);
+>   }
+>   
+> +static inline bool kvm_realm_is_created(struct kvm *kvm)
+> +{
+> +	return kvm_is_realm(kvm) && kvm_realm_state(kvm) != REALM_STATE_NONE;
+> +}
+> +
+>   static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>   {
+>   	return false;
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> index 69af5c3a1e44..209cd99f03dd 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -6,6 +6,8 @@
+>   #ifndef __ASM_KVM_RME_H
+>   #define __ASM_KVM_RME_H
+>   
+> +#include <uapi/linux/kvm.h>
+> +
+>   /**
+>    * enum realm_state - State of a Realm
+>    */
+> @@ -46,11 +48,28 @@ enum realm_state {
+>    * struct realm - Additional per VM data for a Realm
+>    *
+>    * @state: The lifetime state machine for the realm
+> + * @rd: Kernel mapping of the Realm Descriptor (RD)
+> + * @params: Parameters for the RMI_REALM_CREATE command
+> + * @num_aux: The number of auxiliary pages required by the RMM
+> + * @vmid: VMID to be used by the RMM for the realm
+> + * @ia_bits: Number of valid Input Address bits in the IPA
+>    */
+>   struct realm {
+>   	enum realm_state state;
+> +
+> +	void *rd;
+> +	struct realm_params *params;
+> +
+> +	unsigned long num_aux;
+> +	unsigned int vmid;
+> +	unsigned int ia_bits;
+>   };
+>   
+>   void kvm_init_rme(void);
+> +u32 kvm_realm_ipa_limit(void);
+> +
+> +int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+> +int kvm_init_realm_vm(struct kvm *kvm);
+> +void kvm_destroy_realm(struct kvm *kvm);
+>   
+>   #endif
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 57da48357ce8..f75cece24217 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -154,6 +154,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>   		}
+>   		mutex_unlock(&kvm->slots_lock);
+>   		break;
+> +	case KVM_CAP_ARM_RME:
+> +		if (!kvm_is_realm(kvm))
+> +			return -EINVAL;
+> +		mutex_lock(&kvm->lock);
+> +		r = kvm_realm_enable_cap(kvm, cap);
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+>   	default:
+>   		break;
+>   	}
+> @@ -216,6 +223,13 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   
+>   	bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
+>   
+> +	/* Initialise the realm bits after the generic bits are enabled */
+> +	if (kvm_is_realm(kvm)) {
+> +		ret = kvm_init_realm_vm(kvm);
+> +		if (ret)
+> +			goto err_free_cpumask;
+> +	}
+> +
+>   	return 0;
+>   
+>   err_free_cpumask:
+> @@ -275,6 +289,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>   	kvm_unshare_hyp(kvm, kvm + 1);
+>   
+>   	kvm_arm_teardown_hypercalls(kvm);
+> +	kvm_destroy_realm(kvm);
+>   }
+>   
+>   static bool kvm_has_full_ptr_auth(void)
+> @@ -422,6 +437,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES:
+>   		r = BIT(0);
+>   		break;
+> +	case KVM_CAP_ARM_RME:
+> +		r = static_key_enabled(&kvm_rme_is_available);
+> +		break;
+>   	default:
+>   		r = 0;
+>   	}
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index a509b63bd4dd..e01faf72021d 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -862,11 +862,16 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>   	.icache_inval_pou	= invalidate_icache_guest_page,
+>   };
+>   
+> -static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+> +static int kvm_init_ipa_range(struct kvm *kvm,
+> +			      struct kvm_s2_mmu *mmu, unsigned long type)
+>   {
+>   	u32 kvm_ipa_limit = get_kvm_ipa_limit();
+>   	u64 mmfr0, mmfr1;
+>   	u32 phys_shift;
+> +	u32 ipa_limit = kvm_ipa_limit;
 
-Hmm, though I think something like what you've proposed may be in order.  There
-are currently four cases where @prefetch will be true:
+minor nit: Addition of the "ipa_limit" looks unnecessary, and we could
+reuse the kvm_ipa_limit.
 
- 1. Prefault
- 2. Async #PF
- 3. Prefetching
- 4. FNAME(sync_spte)
+> +
+> +	if (kvm_is_realm(kvm))
+> +		ipa_limit = kvm_realm_ipa_limit();
+>   
+>   	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+>   		return -EINVAL;
+> @@ -875,12 +880,12 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+>   	if (is_protected_kvm_enabled()) {
+>   		phys_shift = kvm_ipa_limit;
+>   	} else if (phys_shift) {
+> -		if (phys_shift > kvm_ipa_limit ||
+> +		if (phys_shift > ipa_limit ||
+>   		    phys_shift < ARM64_MIN_PARANGE_BITS)
+>   			return -EINVAL;
+>   	} else {
+>   		phys_shift = KVM_PHYS_SHIFT;
+> -		if (phys_shift > kvm_ipa_limit) {
+> +		if (phys_shift > ipa_limit) {
+>   			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
+>   				     current->comm);
+>   			return -EINVAL;
+> @@ -932,7 +937,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>   		return -EINVAL;
+>   	}
+>   
+> -	err = kvm_init_ipa_range(mmu, type);
+> +	err = kvm_init_ipa_range(kvm, mmu, type);
+>   	if (err)
+>   		return err;
+>   
+> @@ -1055,6 +1060,13 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>   	struct kvm_pgtable *pgt = NULL;
+>   
+>   	write_lock(&kvm->mmu_lock);
+> +	if (kvm_is_realm(kvm) &&
+> +	    (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
+> +	     kvm_realm_state(kvm) != REALM_STATE_NONE)) {
+> +		/* Tearing down RTTs will be added in a later patch */
+> +		write_unlock(&kvm->mmu_lock);
+> +		return;
+> +	}
 
-For 1-3, KVM shouldn't overwrite an existing shadow-present SPTE, which is what
-my code does.
+Do we need to add a comment here on why we return and have to come
+back later from realm_destroy()?
 
-But for 4, FNAME(sync_spte) _needs_ to overwrite an existing SPTE.  And, ignoring
-the awful A/D-disabled case, FNAME(prefetch_invalid_gpte) ensures the gPTE is
-Accessed, i.e. there's no strong argument for clearing the Accessed bit.
+>   	pgt = mmu->pgt;
+>   	if (pgt) {
+>   		mmu->pgd_phys = 0;
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index 418685fbf6ed..4d21ec5f2910 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -5,9 +5,20 @@
+>   
+>   #include <linux/kvm_host.h>
+>   
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_mmu.h>
+>   #include <asm/rmi_cmds.h>
+>   #include <asm/virt.h>
+>   
+> +#include <asm/kvm_pgtable.h>
+> +
+> +static unsigned long rmm_feat_reg0;
+> +
+> +static bool rme_supports(unsigned long feature)
+> +{
+> +	return !!u64_get_bits(rmm_feat_reg0, feature);
+> +}
+> +
+>   static int rmi_check_version(void)
+>   {
+>   	struct arm_smccc_res res;
+> @@ -36,6 +47,272 @@ static int rmi_check_version(void)
+>   	return 0;
+>   }
+>   
+> +u32 kvm_realm_ipa_limit(void)
+> +{
+> +	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
+> +}
+> +
+> +static int get_start_level(struct realm *realm)
+> +{
+> +	return 4 - stage2_pgtable_levels(realm->ia_bits);
+> +}
+> +
+> +static int realm_create_rd(struct kvm *kvm)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
+> +	struct realm_params *params = realm->params;
+> +	void *rd = NULL;
+> +	phys_addr_t rd_phys, params_phys;
+> +	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> +	int i, r;
+> +
+> +	if (WARN_ON(realm->rd) || WARN_ON(!realm->params))
+> +		return -EEXIST;
+> +
+> +	rd = (void *)__get_free_page(GFP_KERNEL);
+> +	if (!rd)
+> +		return -ENOMEM;
+> +
+> +	rd_phys = virt_to_phys(rd);
+> +	if (rmi_granule_delegate(rd_phys)) {
+> +		r = -ENXIO;
+> +		goto free_rd;
+> +	}
+> +
+> +	for (i = 0; i < pgt->pgd_pages; i++) {
+> +		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
+> +
+> +		if (rmi_granule_delegate(pgd_phys)) {
+> +			r = -ENXIO;
+> +			goto out_undelegate_tables;
+> +		}
+> +	}
+> +
+> +	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+> +
+> +	params->s2sz = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+> +	params->rtt_level_start = get_start_level(realm);
+> +	params->rtt_num_start = pgt->pgd_pages;
+> +	params->rtt_base = kvm->arch.mmu.pgd_phys;
+> +	params->vmid = realm->vmid;
+> +
+> +	params_phys = virt_to_phys(params);
+> +
+> +	if (rmi_realm_create(rd_phys, params_phys)) {
+> +		r = -ENXIO;
+> +		goto out_undelegate_tables;
+> +	}
+> +
+> +	realm->rd = rd;
 
-Hrm, but the _only_ "speculative" access type when commit 947da5383069 ("KVM:
-MMU: Set the accessed bit on non-speculative shadow ptes") went in was the
-FNAME(sync_spte) case (at the time called FNAME(update_pte)).  I.e. KVM deliberately
-clears the Accessed bit for that case.
+Please could we move this after we have don the REC_AUX_COUNT check
+to avoid holding onto a free'd page ?
 
-But, I'm unconvinced that's actually appropriate.  As above, the gPTE is accessed,
-and kvm_sync_spte() ensures the SPTE is shadow-present (with an asterisk, because
-it deliberately doesn't use is_shadow_present() SPTE so that KVM can sync MMIO
-SPTEs).
+> +
+> +	if (WARN_ON(rmi_rec_aux_count(rd_phys, &realm->num_aux))) {
+> +		WARN_ON(rmi_realm_destroy(rd_phys));
+> +		goto out_undelegate_tables;
 
-Aha!  Before commit c76e0ad27084 ("KVM: x86/mmu: Mark page/folio accessed only
-when zapping leaf SPTEs"), clearing the Accessed bit kinda sorta makes sense,
-because KVM propagates the information to the underlying struct page.  But when
-that code is removed, KVM's SPTEs are the "source of truth" so to speak.
+> +	}
+> +
 
-Double aha!  Spurious clearing of the Accessed (and Dirty) was mitigated by commit
-e6722d9211b2 ("KVM: x86/mmu: Reduce the update to the spte in FNAME(sync_spte)"),
-which changed FNAME(sync_spte) to only overwrite SPTEs if the protections are
-actually changing.
+here :
 
-So at the very least, somewhere in all of this, we should do as you suggest and
-explicitly preserve the Accessed bit.  Though I'm quite tempted to be more aggressive
-and always mark the SPTE as accessed when synchronizing, because odds are very
-good that the guest still cares about the page that's pointed at by the unsync
-SPTE.  E.g. the most common case where FNAME(sync_spte) actually overwrites an
-existing SPTE is CoW in the guest.
+realm->rd = rd;
 
-I'll think a bit more on this, and either go with a variant of the below, or
-something like:
+> +	return 0;
+> +
+> +out_undelegate_tables:
+> +	while (--i >= 0) {
+> +		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
+> +
+> +		WARN_ON(rmi_granule_undelegate(pgd_phys));
+> +	}
+> +	WARN_ON(rmi_granule_undelegate(rd_phys));
+> +free_rd:
+> +	free_page((unsigned long)rd);
+> +	return r;
+> +}
+> +
+> +/* Protects access to rme_vmid_bitmap */
+> +static DEFINE_SPINLOCK(rme_vmid_lock);
+> +static unsigned long *rme_vmid_bitmap;
+> +
+> +static int rme_vmid_init(void)
+> +{
+> +	unsigned int vmid_count = 1 << kvm_get_vmid_bits();
+> +
+> +	rme_vmid_bitmap = bitmap_zalloc(vmid_count, GFP_KERNEL);
+> +	if (!rme_vmid_bitmap) {
+> +		kvm_err("%s: Couldn't allocate rme vmid bitmap\n", __func__);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int rme_vmid_reserve(void)
+> +{
+> +	int ret;
+> +	unsigned int vmid_count = 1 << kvm_get_vmid_bits();
+> +
+> +	spin_lock(&rme_vmid_lock);
+> +	ret = bitmap_find_free_region(rme_vmid_bitmap, vmid_count, 0);
+> +	spin_unlock(&rme_vmid_lock);
+> +
+> +	return ret;
+> +}
+> +
+> +static void rme_vmid_release(unsigned int vmid)
+> +{
+> +	spin_lock(&rme_vmid_lock);
+> +	bitmap_release_region(rme_vmid_bitmap, vmid, 0);
+> +	spin_unlock(&rme_vmid_lock);
+> +}
+> +
+> +static int kvm_create_realm(struct kvm *kvm)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
+> +	int ret;
+> +
+> +	if (!kvm_is_realm(kvm))
+> +		return -EINVAL;
+> +	if (kvm_realm_is_created(kvm))
+> +		return -EEXIST;
+> +
+> +	ret = rme_vmid_reserve();
+> +	if (ret < 0)
+> +		return ret;
+> +	realm->vmid = ret;
+> +
+> +	ret = realm_create_rd(kvm);
+> +	if (ret) {
+> +		rme_vmid_release(realm->vmid);
+> +		return ret;
+> +	}
+> +
+> +	WRITE_ONCE(realm->state, REALM_STATE_NEW);
+> +
+> +	/* The realm is up, free the parameters.  */
+> +	free_page((unsigned long)realm->params);
+> +	realm->params = NULL;
+> +
+> +	return 0;
+> +}
+> +
+> +static int config_realm_hash_algo(struct realm *realm,
+> +				  struct kvm_cap_arm_rme_config_item *cfg)
+> +{
+> +	switch (cfg->hash_algo) {
+> +	case KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA256:
+> +		if (!rme_supports(RMI_FEATURE_REGISTER_0_HASH_SHA_256))
+> +			return -EINVAL;
+> +		break;
+> +	case KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA512:
+> +		if (!rme_supports(RMI_FEATURE_REGISTER_0_HASH_SHA_512))
+> +			return -EINVAL;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +	realm->params->hash_algo = cfg->hash_algo;
+> +	return 0;
+> +}
+> +
+> +static int kvm_rme_config_realm(struct kvm *kvm, struct kvm_enable_cap *cap)
+> +{
+> +	struct kvm_cap_arm_rme_config_item cfg;
+> +	struct realm *realm = &kvm->arch.realm;
+> +	int r = 0;
+> +
+> +	if (kvm_realm_is_created(kvm))
+> +		return -EBUSY;
+> +
+> +	if (copy_from_user(&cfg, (void __user *)cap->args[1], sizeof(cfg)))
+> +		return -EFAULT;
+> +
+> +	switch (cfg.cfg) {
+> +	case KVM_CAP_ARM_RME_CFG_RPV:
+> +		memcpy(&realm->params->rpv, &cfg.rpv, sizeof(cfg.rpv));
+> +		break;
+> +	case KVM_CAP_ARM_RME_CFG_HASH_ALGO:
+> +		r = config_realm_hash_algo(realm, &cfg);
+> +		break;
+> +	default:
+> +		r = -EINVAL;
+> +	}
+> +
+> +	return r;
+> +}
+> +
+> +int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+> +{
+> +	int r = 0;
+> +
+> +	if (!kvm_is_realm(kvm))
+> +		return -EINVAL;
+> +
+> +	switch (cap->args[0]) {
+> +	case KVM_CAP_ARM_RME_CONFIG_REALM:
+> +		r = kvm_rme_config_realm(kvm, cap);
+> +		break;
+> +	case KVM_CAP_ARM_RME_CREATE_RD:
+> +		r = kvm_create_realm(kvm);
+> +		break;
+> +	default:
+> +		r = -EINVAL;
+> +		break;
+> +	}
+> +
+> +	return r;
+> +}
+> +
+> +void kvm_destroy_realm(struct kvm *kvm)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
+> +	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> +	int i;
+> +
+> +	if (realm->params) {
+> +		free_page((unsigned long)realm->params);
+> +		realm->params = NULL;
+> +	}
+> +
+> +	if (!kvm_realm_is_created(kvm))
+> +		return;
+> +
+> +	WRITE_ONCE(realm->state, REALM_STATE_DYING);
+> +
+> +	if (realm->rd) {
+> +		phys_addr_t rd_phys = virt_to_phys(realm->rd);
+> +
+> +		if (WARN_ON(rmi_realm_destroy(rd_phys)))
+> +			return;
+> +		if (WARN_ON(rmi_granule_undelegate(rd_phys)))
+> +			return;
+> +		free_page((unsigned long)realm->rd);
+> +		realm->rd = NULL;
+> +	}
+> +
+> +	rme_vmid_release(realm->vmid);
+> +
+> +	for (i = 0; i < pgt->pgd_pages; i++) {
+> +		phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i * PAGE_SIZE;
+> +
+> +		if (WARN_ON(rmi_granule_undelegate(pgd_phys)))
+> +			return;
+> +
+> +		clear_page(phys_to_virt(pgd_phys));
 
-	if (!prefetch || synchronizing)
-		spte |= spte_shadow_accessed_mask(spte);
+nit: Is this really needed ? If so, please could we have a comment ?
 
-> --- a/arch/x86/kvm/mmu/spte.c
-> +++ b/arch/x86/kvm/mmu/spte.c
-> @@ -163,6 +163,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->         int level = sp->role.level;
->         u64 spte = SPTE_MMU_PRESENT_MASK;
->         bool wrprot = false;
-> +       bool remove_accessed = prefetch && (!is_shadow_present_pte(old_spte) ||
-> +                              !s_last_spte(old_spte, level) || !is_accessed_spte(old_spte))
->         /*
->          * For the EPT case, shadow_present_mask has no RWX bits set if
-> @@ -178,7 +180,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->                 spte |= SPTE_TDP_AD_WRPROT_ONLY;
->  
->         spte |= shadow_present_mask;
-> -       if (!prefetch)
-> +       if (!remove_accessed)
->                 spte |= spte_shadow_accessed_mask(spte);
->  
->         /*
-> @@ -259,7 +261,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->                 spte |= spte_shadow_dirty_mask(spte);
->  
->  out:
-> -       if (prefetch)
-> +       if (remove_accessed)
->                 spte = mark_spte_for_access_track(spte);
->  
->         WARN_ONCE(is_rsvd_spte(&vcpu->arch.mmu->shadow_zero_check, spte, level),
+> +	}
+> +
+> +	WRITE_ONCE(realm->state, REALM_STATE_DEAD);
+> +
+> +	/* Now that the Realm is destroyed, free the entry level RTTs */
+> +	kvm_free_stage2_pgd(&kvm->arch.mmu);
+> +}
+> +
+> +int kvm_init_realm_vm(struct kvm *kvm)
+> +{
+> +	struct realm_params *params;
+> +
+> +	params = (struct realm_params *)get_zeroed_page(GFP_KERNEL);
+> +	if (!params)
+> +		return -ENOMEM;
+> +
+> +	kvm->arch.realm.params = params;
+> +	return 0;
+> +}
+> +
+>   void kvm_init_rme(void)
+>   {
+>   	if (PAGE_SIZE != SZ_4K)
+> @@ -46,5 +323,11 @@ void kvm_init_rme(void)
+>   		/* Continue without realm support */
+>   		return;
+>   
+> +	if (WARN_ON(rmi_features(0, &rmm_feat_reg0)))
+> +		return;
+> +
+> +	if (rme_vmid_init())
+> +		return;
+> +
+>   	/* Future patch will enable static branch kvm_rme_is_available */
+>   }
+
+Suzuki
+
+
+
 
