@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-28124-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28125-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A18EF99452B
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 12:17:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF4B199457D
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 12:31:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B51E5B251F1
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 10:17:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F6BC1F21E6E
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 10:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B199E18FDB7;
-	Tue,  8 Oct 2024 10:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C5417D366;
+	Tue,  8 Oct 2024 10:30:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97779EEC8
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 10:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14EBC179953
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 10:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728382619; cv=none; b=boqqYqws73v91i/JIcGnuWeKTI/JPit9eCDF4+BsvRCd9toUUay7YzdO3AvRIV1ivPxK+X9blcLvp41QGiqmkPG2PaF+JVKaOXCPiTkslsqe4Pey768LTFpSYcrY85Sd7mGzcqQJrPv+sqJSjZmJDTrtm2cR4qiv6hs5i3qJgWs=
+	t=1728383445; cv=none; b=Hyq0w/Doc8WXMKQd0fk6elTieujK7IIvfCi5L3hLBs/A4gTe79V8/tyGOraIX3ZQQgW7omSfyBMjmPf4CFBHZ6+C5YI2WsouR2JGBp2uLDgAx4rcBBvWLn9QaBy3XiHQwqT0kVfRIZKw4F7a/l4d7Yax+gZB3uxAosV3sGQbqT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728382619; c=relaxed/simple;
-	bh=+Q0fF7RnAGuWLFWtgeZxb2xG06HjK3PhaG/KJBfe3so=;
+	s=arc-20240116; t=1728383445; c=relaxed/simple;
+	bh=zrtPbLQaSil9fjg/THgjKh3gCY9RQjJztw1pnryS1MY=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y2BafS6RkMvGvF1UKcz9vHxKeUFzlj/RKLVrZk/1I+NFsCUNyb0BwI+WZJfqj8hGMigKHaEbIur4lfGumGBtc3VVCn5ASwEU8OzB90MCbyENGULTqpJ1ggqfAUllbXIOTJZrc+ufbaK90ZWpMIBX4tRLvbOZbokrjq/55ViJ1HE=
+	 MIME-Version:Content-Type; b=E+rmIRTgQbitj3oqvdf1EqcWamvlssJaL5NH9/QYJ12SNqudwXuD1htj4U3BUAJNTug5FHu7dXvVjnFOnrzmI4hq/FSs9NfFjUAwJMF+W3zkuDENEvU7Zd0cvYbdkCmDZfJnTFnQpQleizUBeW0aqtcd6p2Jm0ipz2OvlLIy+Lc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XNBkv1GZFz6K5rX;
-	Tue,  8 Oct 2024 18:16:39 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XNBy71NNgz6GFS5;
+	Tue,  8 Oct 2024 18:26:23 +0800 (CST)
 Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id C4996140391;
-	Tue,  8 Oct 2024 18:16:53 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id D6A581402C6;
+	Tue,  8 Oct 2024 18:30:40 +0800 (CST)
 Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
  (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 8 Oct
- 2024 12:16:52 +0200
-Date: Tue, 8 Oct 2024 11:16:51 +0100
+ 2024 12:30:39 +0200
+Date: Tue, 8 Oct 2024 11:30:38 +0100
 From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
 To: Zhao Liu <zhao1.liu@intel.com>
 CC: "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>, "Igor
@@ -57,12 +57,11 @@ CC: "Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>, "Igor
 	<qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
 	"Zhenyu Wang" <zhenyu.z.wang@intel.com>, Dapeng Mi
 	<dapeng1.mi@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>
-Subject: Re: [RFC v2 05/12] hw/core/machine: Introduce custom CPU topology
- with max limitations
-Message-ID: <20241008111651.000025ab@Huawei.com>
-In-Reply-To: <20240919061128.769139-6-zhao1.liu@intel.com>
+Subject: Re: [RFC v2 00/12] Introduce Hybrid CPU Topology via Custom
+ Topology Tree
+Message-ID: <20241008113038.00007ee4@Huawei.com>
+In-Reply-To: <20240919061128.769139-1-zhao1.liu@intel.com>
 References: <20240919061128.769139-1-zhao1.liu@intel.com>
-	<20240919061128.769139-6-zhao1.liu@intel.com>
 Organization: Huawei Technologies Research and Development (UK) Ltd.
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
@@ -73,183 +72,52 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
  frapeml500008.china.huawei.com (7.182.85.71)
 
-On Thu, 19 Sep 2024 14:11:21 +0800
+On Thu, 19 Sep 2024 14:11:16 +0800
 Zhao Liu <zhao1.liu@intel.com> wrote:
 
-> Custom topology allows user to create CPU topology totally via -device
-> from CLI.
+
+> -smp maxsockets=1,maxdies=1,maxmodules=2,maxcores=2,maxthreads=2
+> -machine pc,custom-topo=on \
+> -device cpu-socket,id=sock0 \
+> -device cpu-die,id=die0,bus=sock0 \
+> -device cpu-module,id=mod0,bus=die0 \
+> -device cpu-module,id=mod1,bus=die0 \
+> -device x86-intel-core,id=core0,bus=mod0 \
+> -device x86-intel-atom,id=core1,bus=mod1 \
+> -device x86-intel-atom,id=core2,bus=mod1 \
+> -device host-x86_64-cpu,id=cpu0,socket-id=0,die-id=0,module-id=0,core-id=0,thread-id=0 \
+> -device host-x86_64-cpu,id=cpu1,socket-id=0,die-id=0,module-id=0,core-id=0,thread-id=1 \
+> -device host-x86_64-cpu,id=cpu2,socket-id=0,die-id=0,module-id=1,core-id=0,thread-id=0 \
+> -device host-x86_64-cpu,id=cpu3,socket-id=0,die-id=0,module-id=1,core-id=1,thread-id=0
+
+I quite like this as a way of doing the configuration but that needs
+some review from others.
+
+Peter, Alex, do you think this scheme is flexible enough to ultimately
+allow us to support this for arm? 
+
 > 
-> Once custom topology is enabled, machine will stop the default CPU
-> creation and expect user's CPU topology tree built from CLI.
-> 
-> With custom topology, any CPU topology, whether symmetric or hybrid
-> (aka, heterogeneous), can be created naturally.
-> 
-> However, custom topology also needs to be restricted because
-> possible_cpus[] requires some preliminary topology information for
-> initialization, which is the max limitation (the new max parameters in
-> -smp). Custom topology will be subject to this max limitation.
-> 
-> Max limitations are necessary because creating custom topology before
-> initializing possible_cpus[] would compromise future hotplug scalability.
-> 
-> Max limitations are placed in -smp, even though custom topology can be
-> defined as hybrid. From an implementation perspective, any hybrid
-> topology can be considered a subset of a complete SMP structure.
-> Therefore, semantically, using max limitations to constrain hybrid
-> topology is consistent.
-> 
-> Introduce custom CPU topology related properties in MachineClass. At the
-> same time, add and parse max parameters from -smp, and store the max
-> limitations in CPUSlot.
-> 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> This does not accommodate hybrid topologies. Therefore, we introduce
+> max* parameters: maxthreads/maxcores/maxmodules/maxdies/maxsockets
+> (for x86), to predefine the topology framework for the machine. These
+> parameters also constrain subsequent custom topologies, ensuring the
+> number of child devices under each parent device does not exceed the
+> specified max limits.
 
-A few code style comments inline.
+To my thinking this seems like a good solution even though it's a
+bunch more smp parameters.
 
-J
-> diff --git a/hw/cpu/cpu-slot.c b/hw/cpu/cpu-slot.c
-> index 1cc3b32ed675..2d16a2729501 100644
-> --- a/hw/cpu/cpu-slot.c
-> +++ b/hw/cpu/cpu-slot.c
+What does this actually mean for hotplug of CPUs?  What cases work
+with this setup?
+ 
+> Therefore, once user wants to customize topology by "-machine
+> custom-topo=on", the machine, that supports custom topology, will skip
+> the default topology creation as well as the default CPU creation.
 
-> +
-> +bool machine_parse_custom_topo_config(MachineState *ms,
-> +                                      const SMPConfiguration *config,
-> +                                      Error **errp)
-> +{
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> +    CPUSlot *slot = ms->topo;
-> +    bool is_valid;
-> +    int maxcpus;
-> +
-> +    if (!slot) {
-> +        return true;
-> +    }
-> +
-> +    is_valid = config->has_maxsockets && config->maxsockets;
-> +    if (mc->smp_props.custom_topo_supported) {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_SOCKET].max_limit =
-> +            is_valid ? config->maxsockets : ms->smp.sockets;
-> +    } else if (is_valid) {
-> +        error_setg(errp, "maxsockets > 0 not supported "
-> +                   "by this machine's CPU topology");
-> +        return false;
-> +    } else {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_SOCKET].max_limit =
-> +            ms->smp.sockets;
-> +    }
-Having the error condition in the middle is rather confusing to
-read to my eyes. Playing with equivalents I wonder what works best..
+Seems sensible to me.
 
-
-    if (!is_valid) {
-        slot->stat.entries[CPU_TOPOLOGY_LEVEL_SOCKET].max_limit =
-            ms->smp.sockets;
-    } else if (mc->smp_props.custom_topo_supported) {
-        slot->stat.entries[CPU_TOPOLOGY_LEVEL_SOCKET].max_limit =
-            config->max_sockets;
-    } else {
-        error_setg...
-        return false;
-    }
-
-or take the bad case out first.  Maybe this is a little obscure
-though (assuming I even got it right) as it relies on the fact
-that is_valid must be false for the legacy path.
-
-    if (!mc->smp_props.custom_topo_supported && is_valid) {
-        error_setg();
-        return false;
-    }
-
-    slot->stat.entries[CPU_TOPOLOGY_LEVEL_SOCKET].max_limit =
-          is_valid ? config->maxsockets : ms->smp.sockets;
-
-Similar for other cases.
-
-> +
-> +    is_valid = config->has_maxdies && config->maxdies;
-> +    if (mc->smp_props.custom_topo_supported &&
-> +        mc->smp_props.dies_supported) {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_DIE].max_limit =
-> +            is_valid ? config->maxdies : ms->smp.dies;
-> +    } else if (is_valid) {
-> +        error_setg(errp, "maxdies > 0 not supported "
-> +                   "by this machine's CPU topology");
-> +        return false;
-> +    } else {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_DIE].max_limit =
-> +            ms->smp.dies;
-> +    }
-> +
-> +    is_valid = config->has_maxmodules && config->maxmodules;
-> +    if (mc->smp_props.custom_topo_supported &&
-> +        mc->smp_props.modules_supported) {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_MODULE].max_limit =
-> +            is_valid ? config->maxmodules : ms->smp.modules;
-> +    } else if (is_valid) {
-> +        error_setg(errp, "maxmodules > 0 not supported "
-> +                   "by this machine's CPU topology");
-> +        return false;
-> +    } else {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_MODULE].max_limit =
-> +            ms->smp.modules;
-> +    }
-> +
-> +    is_valid = config->has_maxcores && config->maxcores;
-> +    if (mc->smp_props.custom_topo_supported) {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_CORE].max_limit =
-> +            is_valid ? config->maxcores : ms->smp.cores;
-> +    } else if (is_valid) {
-> +        error_setg(errp, "maxcores > 0 not supported "
-> +                   "by this machine's CPU topology");
-> +        return false;
-> +    } else {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_CORE].max_limit =
-> +            ms->smp.cores;
-> +    }
-> +
-> +    is_valid = config->has_maxthreads && config->maxthreads;
-> +    if (mc->smp_props.custom_topo_supported) {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_THREAD].max_limit =
-> +            is_valid ? config->maxthreads : ms->smp.threads;
-> +    } else if (is_valid) {
-> +        error_setg(errp, "maxthreads > 0 not supported "
-> +                   "by this machine's CPU topology");
-> +        return false;
-> +    } else {
-> +        slot->stat.entries[CPU_TOPOLOGY_LEVEL_THREAD].max_limit =
-> +            ms->smp.threads;
-> +    }
-> +
-> +    maxcpus = 1;
-> +    /* Initizlize max_limit to 1, as members of CpuTopology. */
-> +    for (int i = 0; i < CPU_TOPOLOGY_LEVEL__MAX; i++) {
-> +        maxcpus *= slot->stat.entries[i].max_limit;
-> +    }
-> +
-> +    if (!config->has_maxcpus) {
-> +        ms->smp.max_cpus = maxcpus;
-Maybe early return here to get rid of need for the else?
-
-> +    } else {
-> +        if (maxcpus != ms->smp.max_cpus) {
-
-Unless this is going to get more complex later,  else if probably appropriate here
-(if you don't drop the else above.
-
-> +            error_setg(errp, "maxcpus (%d) should be equal to "
-> +                       "the product of the remaining max parameters (%d)",
-> +                       ms->smp.max_cpus, maxcpus);
-> +            return false;
-> +        }
-> +    }
-> +
-> +    return true;
-> +}
-
+Jonathan
 
