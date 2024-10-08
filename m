@@ -1,140 +1,132 @@
-Return-Path: <kvm+bounces-28096-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28092-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF22993D69
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 05:19:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E375993D0F
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 04:51:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0B471C22C05
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 03:19:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DE3B1F212CA
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 02:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8507D34CF5;
-	Tue,  8 Oct 2024 03:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6DC25779;
+	Tue,  8 Oct 2024 02:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R8R8Kn7x"
 X-Original-To: kvm@vger.kernel.org
-Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C560722611
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 03:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE98C1DFE8
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 02:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728357573; cv=none; b=nZhkfgSeWkJXpNxVIqvtTF5hDejGy7rBtiXAdtro4i+MlfKU+Vo+shwWXKO2xRDniIWw34VvwwtNNNbVI0Qt5YVvBGyvDl/fLDA4BMzAr8DXzEMaqPyKy/bz/u1xRmh9EqWOwe0d0e4bdnPS6TlgnH5e2OkhLT0/JS9lNqBs+Co=
+	t=1728355893; cv=none; b=sdHOWH0lFi8pVpPAUEuPgCtX93S52yAzw7mHYEb/Lu1Ma+vJdhkURnWyJRU4EmzyWBW3uYi7OnOXbnlDy0fVbE5jDIML0ieGyxI6jAULjpXhHnF3/Slp3rc1+JpiHXEAdHOdrtmaVQ+e7mPzFOzhzgRPc82mlEjSY1d141AGrOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728357573; c=relaxed/simple;
-	bh=1v6Fj68HsPnGJ8vgiACtZGne6PZXXkqWbbP8SmZXbuY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DsmoD2d9/7QFqOPSSd4AgiUkb8Er62Vd1twkhM7NuSN+WVJhCIs5rXikzJVp8ljWBNUglHd7r6nKejimkZqpMPDAonoyiji4aTL/Z6ys5vW5fjDYu60syui8ziUMoXTJovSB8OJ2ADHDw+TgSghuBnGEFOnNoHfrwZpSBUb6r1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: "Gao,Shiyuan" <gaoshiyuan@baidu.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v1 1/1] x86: Add support save/load HWCR MSR
-Thread-Topic: [PATCH v1 1/1] x86: Add support save/load HWCR MSR
-Thread-Index: AQHbD8m2GzzAu7a83kSSJ9vdQ5PkZLJ8OV4A
-Date: Tue, 8 Oct 2024 02:47:54 +0000
-Message-ID: <0EDECA68-F61C-4668-83F0-B8F5E8219196@baidu.com>
-References: <20240926040808.9158-1-gaoshiyuan@baidu.com>
-In-Reply-To: <20240926040808.9158-1-gaoshiyuan@baidu.com>
-Accept-Language: en-US, zh-CN
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AD1849B55D93F34AB28D5B5998D9BE78@internal.baidu.com>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1728355893; c=relaxed/simple;
+	bh=fLMDCQsubowFDRbzB3GNMUKP1kvwbKmtntwMRelY1Ag=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PFipBOUTE7/baoozNk5hTqL+p2FGNWy48ZX5NX/qZufKv8ulMTW8S9LmLpsO9SkPP1aWIwwT5XZ4xzQoDg9NB4zEngTX1ZYy7T57+eYG/1yUVouDBlAJseYvGsvbGAl4P+eMYCf09TF9VVsVkZ+0reMmjH9cMXvivDU9/F1kYiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R8R8Kn7x; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728355891;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M4sFhYYgaf5zWGjjw37V+FmIhrEBzr4NtQ/62b1VBOU=;
+	b=R8R8Kn7x6EhOW6Hb0s80a82qjl59Gj09uAMIIiOQ/uxyoMLheWrYs1it3dJHjO9aW58WT3
+	U0pNqnO2F26ypbcEWMz6lagVEUVbDoA5PTx+nw3TX9ACefjrP0n3K/thrfP17K+etjL6gv
+	z441CipZ2jF3Rqd4V1VH2K9ppTHhv30=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-130-6XYs77TGO42HCjtswh8qVg-1; Mon, 07 Oct 2024 22:51:30 -0400
+X-MC-Unique: 6XYs77TGO42HCjtswh8qVg-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2e2812b5ff8so421193a91.1
+        for <kvm@vger.kernel.org>; Mon, 07 Oct 2024 19:51:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728355889; x=1728960689;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M4sFhYYgaf5zWGjjw37V+FmIhrEBzr4NtQ/62b1VBOU=;
+        b=thH2lEZP6bmGRwhcp9ulTaDMpEaFDPiNnXKUyvCSTNo6j2AXrkOn37s7sA7BSnheQf
+         f0WmopaJ9KDsYCHy65Y+Gn4nSo1UpVER3qKz4NN2JVoGP+KzGnKrmgjQE+20TakPYNvN
+         afcnZPVQvemUeabWndn+mi5v+Ic7YeNQ0cmCQO5K2vg6UQFrA2pSo8Vm/3EAE4Tv0Asr
+         Ezd02rtHFRN27La0L8c09iOw4S3dEbmCPNJJnFb7nvmqW4txHn5xwJ22bzg4aZduxoZG
+         uBwHWzd+PwSaKW3YUS+NX9WZ9ze3GuSAu7EVW41y/qNV9JTWg1oPFllfmyYYz0KAzHur
+         Oa1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWUrxZZFFpyeHQX15GaVrRY2jmFTnPoj1Ksn0sD1636yDs4UZTHJ0AopiBUVyGjYKDHe6s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKDLALcP23BIpQytpnpoqgGWaD6Zjp52AosrWk4hS8JlGUNoLt
+	c1Uf0fXCiuJl7M/a/mcmxu8HHyteM+VvgNxKpPrsaLvt95lt1Gl7Z0MAIMkvu4juGBf6cr36zzF
+	bmlA981/FWh/ALTQ6EggzX+fRbVSNNk0lojKm5ccW1wBXc1brZQ==
+X-Received: by 2002:a17:90a:3d81:b0:2d8:8d60:a198 with SMTP id 98e67ed59e1d1-2e1e6366bd6mr19154105a91.37.1728355888977;
+        Mon, 07 Oct 2024 19:51:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG1a155oDsYUskhbrb04GQtySwR7IiTCMTLOrXqEs3PGt+CLIahMwaNAu0NiGjx/qhM6odUKA==
+X-Received: by 2002:a17:90a:3d81:b0:2d8:8d60:a198 with SMTP id 98e67ed59e1d1-2e1e6366bd6mr19154081a91.37.1728355888658;
+        Mon, 07 Oct 2024 19:51:28 -0700 (PDT)
+Received: from [192.168.68.54] ([103.210.27.132])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e20b0f9c7csm6264516a91.38.2024.10.07.19.51.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Oct 2024 19:51:28 -0700 (PDT)
+Message-ID: <01f08a52-3b96-4384-b9cf-aa74ea1d5faf@redhat.com>
+Date: Tue, 8 Oct 2024 12:51:20 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 10.127.64.13
-X-FE-Last-Public-Client-IP: 100.100.100.60
-X-FE-Policy-ID: 52:10:53:SYSTEM
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 07/11] arm64: Enforce bounce buffers for realm DMA
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20241004144307.66199-1-steven.price@arm.com>
+ <20241004144307.66199-8-steven.price@arm.com>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20241004144307.66199-8-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-UGluZy4NCg0KPiBLVk0gY29tbWl0IDE5MWM4MTM3YTkzOSAoIng4Ni9rdm06IEltcGxlbWVudCBI
-V0NSIHN1cHBvcnQiKQ0KPiBpbnRyb2R1Y2VkIHN1cHBvcnQgZm9yIGVtdWxhdGluZyBIV0NSIE1T
-Ui4NCj4NCj4gQWRkIHN1cHBvcnQgZm9yIFFFTVUgdG8gc2F2ZS9sb2FkIHRoaXMgTVNSIGZvciBt
-aWdyYXRpb24gcHVycG9zZXMuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IEdhbyBTaGl5dWFuIDxnYW9z
-aGl5dWFuQGJhaWR1LmNvbT4NCj4gLS0tDQo+IHRhcmdldC9pMzg2L2NwdS5jICAgICB8ICAxICsN
-Cj4gdGFyZ2V0L2kzODYvY3B1LmggICAgIHwgIDUgKysrKysNCj4gdGFyZ2V0L2kzODYva3ZtL2t2
-bS5jIHwgMTIgKysrKysrKysrKysrDQo+IHRhcmdldC9pMzg2L21hY2hpbmUuYyB8IDIwICsrKysr
-KysrKysrKysrKysrKysrDQo+IDQgZmlsZXMgY2hhbmdlZCwgMzggaW5zZXJ0aW9ucygrKQ0KPg0K
-PiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYvY3B1LmMgYi90YXJnZXQvaTM4Ni9jcHUuYw0KPiBp
-bmRleCA4NWVmNzQ1MmMwLi4zMzkxMzFhMzlhIDEwMDY0NA0KPiAtLS0gYS90YXJnZXQvaTM4Ni9j
-cHUuYw0KPiArKysgYi90YXJnZXQvaTM4Ni9jcHUuYw0KPiBAQCAtNzA5Myw2ICs3MDkzLDcgQEAg
-c3RhdGljIHZvaWQgeDg2X2NwdV9yZXNldF9ob2xkKE9iamVjdCAqb2JqLCBSZXNldFR5cGUgdHlw
-ZSkNCj4gICAgICBlbnYtPmEyMF9tYXNrID0gfjB4MDsNCj4gICAgICBlbnYtPnNtYmFzZSA9IDB4
-MzAwMDA7DQo+ICAgICAgZW52LT5tc3Jfc21pX2NvdW50ID0gMDsNCj4gKyAgICBlbnYtPmh3Y3Ig
-PSAwOw0KPg0KPiAgICAgIGVudi0+aWR0LmxpbWl0ID0gMHhmZmZmOw0KPiAgICAgIGVudi0+Z2R0
-LmxpbWl0ID0gMHhmZmZmOw0KPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYvY3B1LmggYi90YXJn
-ZXQvaTM4Ni9jcHUuaA0KPiBpbmRleCAxNGVkZDU3YTM3Li5hMTliMWNlZGE0IDEwMDY0NA0KPiAt
-LS0gYS90YXJnZXQvaTM4Ni9jcHUuaA0KPiArKysgYi90YXJnZXQvaTM4Ni9jcHUuaA0KPiBAQCAt
-NTM5LDYgKzUzOSw4IEBAIHR5cGVkZWYgZW51bSBYODZTZWcgew0KPg0KPiAjZGVmaW5lIE1TUl9B
-TUQ2NF9UU0NfUkFUSU9fREVGQVVMVCAgICAgMHgxMDAwMDAwMDBVTEwNCj4NCj4gKyNkZWZpbmUg
-TVNSX0s3X0hXQ1IgICAgICAgICAgICAgICAgICAgICAweGMwMDEwMDE1DQo+ICsNCj4gI2RlZmlu
-ZSBNU1JfVk1fSFNBVkVfUEEgICAgICAgICAgICAgICAgIDB4YzAwMTAxMTcNCj4NCj4gI2RlZmlu
-ZSBNU1JfSUEzMl9YRkQgICAgICAgICAgICAgICAgICAgIDB4MDAwMDAxYzQNCj4gQEAgLTE4NTks
-NiArMTg2MSw5IEBAIHR5cGVkZWYgc3RydWN0IENQVUFyY2hTdGF0ZSB7DQo+ICAgICAgdWludDY0
-X3QgbXNyX2xicl9kZXB0aDsNCj4gICAgICBMQlJFbnRyeSBsYnJfcmVjb3Jkc1tBUkNIX0xCUl9O
-Ul9FTlRSSUVTXTsNCj4NCj4gKyAgICAvKiBIYXJkd2FyZSBDb25maWd1cmF0aW9uIE1TUiAqLw0K
-PiArICAgIHVpbnQ2NF90IGh3Y3I7DQo+ICsNCj4gICAgICAvKiBleGNlcHRpb24vaW50ZXJydXB0
-IGhhbmRsaW5nICovDQo+ICAgICAgaW50IGVycm9yX2NvZGU7DQo+ICAgICAgaW50IGV4Y2VwdGlv
-bl9pc19pbnQ7DQo+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9rdm0va3ZtLmMgYi90YXJnZXQv
-aTM4Ni9rdm0va3ZtLmMNCj4gaW5kZXggYWRhNTgxYzVkNi4uMjE1YzEzZWIxMyAxMDA2NDQNCj4g
-LS0tIGEvdGFyZ2V0L2kzODYva3ZtL2t2bS5jDQo+ICsrKyBiL3RhcmdldC9pMzg2L2t2bS9rdm0u
-Yw0KPiBAQCAtMTQ1LDYgKzE0NSw3IEBAIHN0YXRpYyBib29sIGhhc19tc3JfdWNvZGVfcmV2Ow0K
-PiBzdGF0aWMgYm9vbCBoYXNfbXNyX3ZteF9wcm9jYmFzZWRfY3RsczI7DQo+IHN0YXRpYyBib29s
-IGhhc19tc3JfcGVyZl9jYXBhYnM7DQo+IHN0YXRpYyBib29sIGhhc19tc3JfcGtyczsNCj4gK3N0
-YXRpYyBib29sIGhhc19tc3JfaHdjcjsNCj4NCj4gc3RhdGljIHVpbnQzMl90IGhhc19hcmNoaXRl
-Y3R1cmFsX3BtdV92ZXJzaW9uOw0KPiBzdGF0aWMgdWludDMyX3QgbnVtX2FyY2hpdGVjdHVyYWxf
-cG11X2dwX2NvdW50ZXJzOw0KPiBAQCAtMjU1NCw2ICsyNTU1LDggQEAgc3RhdGljIGludCBrdm1f
-Z2V0X3N1cHBvcnRlZF9tc3JzKEtWTVN0YXRlICpzKQ0KPiAgICAgICAgICAgICAgY2FzZSBNU1Jf
-SUEzMl9QS1JTOg0KPiAgICAgICAgICAgICAgICAgIGhhc19tc3JfcGtycyA9IHRydWU7DQo+ICAg
-ICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgICAgICBjYXNlIE1TUl9LN19IV0NSOg0K
-PiArICAgICAgICAgICAgICAgIGhhc19tc3JfaHdjciA9IHRydWU7DQo+ICAgICAgICAgICAgICB9
-DQo+ICAgICAgICAgIH0NCj4gICAgICB9DQo+IEBAIC0zODI0LDYgKzM4MjcsOSBAQCBzdGF0aWMg
-aW50IGt2bV9wdXRfbXNycyhYODZDUFUgKmNwdSwgaW50IGxldmVsKQ0KPiAgICAgIGlmIChoYXNf
-bXNyX3ZpcnRfc3NiZCkgew0KPiAgICAgICAgICBrdm1fbXNyX2VudHJ5X2FkZChjcHUsIE1TUl9W
-SVJUX1NTQkQsIGVudi0+dmlydF9zc2JkKTsNCj4gICAgICB9DQo+ICsgICAgaWYgKGhhc19tc3Jf
-aHdjcikgew0KPiArICAgICAgICBrdm1fbXNyX2VudHJ5X2FkZChjcHUsIE1TUl9LN19IV0NSLCBl
-bnYtPmh3Y3IpOw0KPiArICAgIH0NCj4NCj4gI2lmZGVmIFRBUkdFVF9YODZfNjQNCj4gICAgICBp
-ZiAobG1fY2FwYWJsZV9rZXJuZWwpIHsNCj4gQEAgLTQzMDgsNiArNDMxNCw5IEBAIHN0YXRpYyBp
-bnQga3ZtX2dldF9tc3JzKFg4NkNQVSAqY3B1KQ0KPiAgICAgICAgICBrdm1fbXNyX2VudHJ5X2Fk
-ZChjcHUsIE1TUl9JQTMyX1RTQywgMCk7DQo+ICAgICAgICAgIGVudi0+dHNjX3ZhbGlkID0gIXJ1
-bnN0YXRlX2lzX3J1bm5pbmcoKTsNCj4gICAgICB9DQo+ICsgICAgaWYgKGhhc19tc3JfaHdjcikg
-ew0KPiArICAgICAgICBrdm1fbXNyX2VudHJ5X2FkZChjcHUsIE1TUl9LN19IV0NSLCAwKTsNCj4g
-KyAgICB9DQo+DQo+ICNpZmRlZiBUQVJHRVRfWDg2XzY0DQo+ICAgICAgaWYgKGxtX2NhcGFibGVf
-a2VybmVsKSB7DQo+IEBAIC00ODI3LDYgKzQ4MzYsOSBAQCBzdGF0aWMgaW50IGt2bV9nZXRfbXNy
-cyhYODZDUFUgKmNwdSkNCj4gICAgICAgICAgY2FzZSBNU1JfQVJDSF9MQlJfSU5GT18wIC4uLiBN
-U1JfQVJDSF9MQlJfSU5GT18wICsgMzE6DQo+ICAgICAgICAgICAgICBlbnYtPmxicl9yZWNvcmRz
-W2luZGV4IC0gTVNSX0FSQ0hfTEJSX0lORk9fMF0uaW5mbyA9IG1zcnNbaV0uZGF0YTsNCj4gICAg
-ICAgICAgICAgIGJyZWFrOw0KPiArICAgICAgICBjYXNlIE1TUl9LN19IV0NSOg0KPiArICAgICAg
-ICAgICAgZW52LT5od2NyID0gbXNyc1tpXS5kYXRhOw0KPiArICAgICAgICAgICAgYnJlYWs7DQo+
-ICAgICAgICAgIH0NCj4gICAgICB9DQo+DQo+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9tYWNo
-aW5lLmMgYi90YXJnZXQvaTM4Ni9tYWNoaW5lLmMNCj4gaW5kZXggMzlmODI5NGYyNy4uMmRiODNh
-Y2FmYSAxMDA2NDQNCj4gLS0tIGEvdGFyZ2V0L2kzODYvbWFjaGluZS5jDQo+ICsrKyBiL3Rhcmdl
-dC9pMzg2L21hY2hpbmUuYw0KPiBAQCAtMTU0Myw2ICsxNTQzLDI1IEBAIHN0YXRpYyBjb25zdCBW
-TVN0YXRlRGVzY3JpcHRpb24gdm1zdGF0ZV9tc3JfeGZkID0gew0KPiAgICAgIH0NCj4gfTsNCj4N
-Cj4gK3N0YXRpYyBib29sIG1zcl9od2NyX25lZWRlZCh2b2lkICpvcGFxdWUpDQo+ICt7DQo+ICsg
-ICAgWDg2Q1BVICpjcHUgPSBvcGFxdWU7DQo+ICsgICAgQ1BVWDg2U3RhdGUgKmVudiA9ICZjcHUt
-PmVudjsNCj4gKw0KPiArICAgIHJldHVybiBlbnYtPmh3Y3IgIT0gMDsNCj4gK30NCj4gKw0KPiAr
-c3RhdGljIGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbiB2bXN0YXRlX21zcl9od2NyID0gew0KPiAr
-ICAgIC5uYW1lID0gImNwdS9tc3JfaHdjciIsDQo+ICsgICAgLnZlcnNpb25faWQgPSAxLA0KPiAr
-ICAgIC5taW5pbXVtX3ZlcnNpb25faWQgPSAxLA0KPiArICAgIC5uZWVkZWQgPSBtc3JfaHdjcl9u
-ZWVkZWQsDQo+ICsgICAgLmZpZWxkcyA9IChWTVN0YXRlRmllbGRbXSkgew0KPiArICAgICAgICBW
-TVNUQVRFX1VJTlQ2NChlbnYuaHdjciwgWDg2Q1BVKSwNCj4gKyAgICAgICAgVk1TVEFURV9FTkRf
-T0ZfTElTVCgpDQo+ICsgICAgfQ0KPiArfTsNCj4gKw0KPiAjaWZkZWYgVEFSR0VUX1g4Nl82NA0K
-PiBzdGF0aWMgYm9vbCBpbnRlbF9mcmVkX21zcnNfbmVlZGVkKHZvaWQgKm9wYXF1ZSkNCj4gew0K
-PiBAQCAtMTc3Myw2ICsxNzkyLDcgQEAgY29uc3QgVk1TdGF0ZURlc2NyaXB0aW9uIHZtc3RhdGVf
-eDg2X2NwdSA9IHsNCj4gICAgICAgICAgJnZtc3RhdGVfbXNyX2ludGVsX3NneCwNCj4gICAgICAg
-ICAgJnZtc3RhdGVfcGRwdHJzLA0KPiAgICAgICAgICAmdm1zdGF0ZV9tc3JfeGZkLA0KPiArICAg
-ICAgICAmdm1zdGF0ZV9tc3JfaHdjciwNCj4gI2lmZGVmIFRBUkdFVF9YODZfNjQNCj4gICAgICAg
-ICAgJnZtc3RhdGVfbXNyX2ZyZWQsDQo+ICAgICAgICAgICZ2bXN0YXRlX2FteF94dGlsZSwNCj4g
-LS0NCj4gMi4zNC4xDQoNCg==
+On 10/5/24 12:43 AM, Steven Price wrote:
+> Within a realm guest it's not possible for a device emulated by the VMM
+> to access arbitrary guest memory. So force the use of bounce buffers to
+> ensure that the memory the emulated devices are accessing is in memory
+> which is explicitly shared with the host.
+> 
+> This adds a call to swiotlb_update_mem_attributes() which calls
+> set_memory_decrypted() to ensure the bounce buffer memory is shared with
+> the host. For non-realm guests or hosts this is a no-op.
+> 
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> v3: Simplify mem_init() by using a 'flags' variable.
+> ---
+>   arch/arm64/kernel/rsi.c |  1 +
+>   arch/arm64/mm/init.c    | 10 +++++++++-
+>   2 files changed, 10 insertions(+), 1 deletion(-)
+> 
+
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+
 
