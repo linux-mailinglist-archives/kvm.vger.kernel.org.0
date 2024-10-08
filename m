@@ -1,129 +1,96 @@
-Return-Path: <kvm+bounces-28155-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F80995810
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 22:02:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF38199594D
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 23:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07F421C20FC5
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 20:02:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C64C61C219F7
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 21:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5531D215026;
-	Tue,  8 Oct 2024 20:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1327212D2F;
+	Tue,  8 Oct 2024 21:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rN+E6v8u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qqxEWUkc"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F64238DD6;
-	Tue,  8 Oct 2024 20:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022FC2AEFE
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 21:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728417746; cv=none; b=XnZ8GUmHQfB9wZhIN03KB7n7quy50H1Zd6twTmkUVMEu0ZT61Si5ZosCKqSW6//FJaU0brsRGvp+Ie1eG3XTHvftGI8WmiQGjwcQ6qS089FeSzIs9LT9Z0vz+FtPgsnOmlbnEW1yaKICXBJ64i8+J3oGcHtK9LAHaiOr7rYHwBM=
+	t=1728423306; cv=none; b=ZA3BoGC048Dqp7eBTvgdr7l96PRe1GZcrGuuSfW14hazbS0B2VEzyThpgtyE7+hROGnTiATzsBebCjhpFdhnwvph6ypd2v3E8rDcfTsM/R/hjAbXBPVHDEfCQlVl5JvNqJRVxGQrGOqOc2+kkoMODSYpKDEcjm/ev23h4/f4lIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728417746; c=relaxed/simple;
-	bh=mwnu9JDu0/QJ39vaeqgzPRoqn/uQOdBvX8cshH9rI2M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q1cIcYBCVNp+r5958RzSWAtJhnMaiL5euuPCKQL5pMVioAfzAKJmSrJQfUO+/nVOgA0zSrCyJn09aeVYiT0aPRQcVCNb+KSJhjVGS4i/ECavHN/HZ+tMCE8xMs/wjbKDP0+2kwoHE0THApl+GH01VNEjRNUD+yG2eIQHyk3R5hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rN+E6v8u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF43C4CEC7;
-	Tue,  8 Oct 2024 20:02:25 +0000 (UTC)
+	s=arc-20240116; t=1728423306; c=relaxed/simple;
+	bh=m5BMcqwy3SqOXFBwLFk7fhpM47mCTk6T0xkUPZFwDuo=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=c0Rwh6LOhL8bH8vDehRu51bwg3MNDr00B/ABDGaj5K1VwJ7ytLF2FTqj7qaya7UEkKtgph+HkuNtuimo+onc8SgWBi9rUGW1a4FU7YSucA/5em8Ednm8TCzSNSD3J9600CFohWc9ROu/R7Dk3cE3EHcEDMLVXRj+ttPiHWmJp4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qqxEWUkc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CD6CC4CED3
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 21:35:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728417745;
-	bh=mwnu9JDu0/QJ39vaeqgzPRoqn/uQOdBvX8cshH9rI2M=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=rN+E6v8uF4ioUNKLIm91KJY7WajT816xax0xLKmMg82r/VdNKxRi2SuPyaYp5mvMp
-	 3iEUmIoUxBqAzw3S+3xHFwxDjNUXJ1ms4vvTgy40qSQdbS1e5YsXgihqx/FlfH41CR
-	 B5yXHM1xV2RQDH8pdQ+oYSffGAkWue72wxmp8FzHSdYe8F0+gQDgEtxtt3iMaFayap
-	 QQgLNNDuCW4krxkjKxBJa5Jy1wKnBCXJ8lwHOvYQ4u/HYgc6yow8XGPEF6rU7+hsiS
-	 Kkfhf7h/1UX7Uoiu1m8M2TLxAcmXcKHBMcjwCNjgHqioPraMS1As8rwzYnC/B4K15R
-	 l1T7CHnBap8VA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 56F9BCE0DD1; Tue,  8 Oct 2024 13:02:25 -0700 (PDT)
-Date: Tue, 8 Oct 2024 13:02:25 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	kasan-dev <kasan-dev@googlegroups.com>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <acf7a96b-facb-469b-8079-edbec7770780@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
- <ZnFT1Czb8oRb0SE7@pc636>
- <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
- <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
- <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
- <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
- <ZnVInAV8BXhgAjP_@pc636>
- <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
- <b3d9710a-805e-4e37-8295-b5ec1133d15c@paulmck-laptop>
- <37807ec7-d521-4f01-bcfc-a32650d5de25@suse.cz>
+	s=k20201202; t=1728423305;
+	bh=m5BMcqwy3SqOXFBwLFk7fhpM47mCTk6T0xkUPZFwDuo=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=qqxEWUkcNdNRb5Y98P73EmAibtY47omMxAdx6wcmtV5ZbbXxZYTxOJk+khHe7wvvK
+	 6GgMeXpRYU9c3z4dtYYcOoOoXAIKLP4TRYjjEmpy7CHv9cqNLj10JHzcKKZv60G0b3
+	 KwID+5IFhPkYKXEf89ht+Z6QZP91z0d/3WLK2ZZrtPZHwZKDOymiusI3AXGNkb9XdM
+	 Rw3RjnW2fO/+w/JZZXr8YEVrgZrREjEirHRZxALCdery0nw1sow9MJlAYVaBBG6s8m
+	 1e+WcfZ1Pg31UrXWhKiNOZS2YGPIxSLaoyTkNqACIcLqcT5rgs+5uxyUMIAp0LRnHc
+	 ptLzB83oZFqLg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 82B2CC53BCA; Tue,  8 Oct 2024 21:35:05 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219009] Random host reboots on Ryzen 7000/8000 using nested VMs
+ (vls suspected)
+Date: Tue, 08 Oct 2024 21:35:04 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: ozonehelix@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219009-28872-OGVBXygMUl@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219009-28872@https.bugzilla.kernel.org/>
+References: <bug-219009-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <37807ec7-d521-4f01-bcfc-a32650d5de25@suse.cz>
 
-On Tue, Oct 08, 2024 at 06:41:12PM +0200, Vlastimil Babka wrote:
-> On 7/24/24 15:53, Paul E. McKenney wrote:
-> > On Mon, Jul 15, 2024 at 10:39:38PM +0200, Vlastimil Babka wrote:
-> >> On 6/21/24 11:32 AM, Uladzislau Rezki wrote:
-> >> > On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
-> >> > One question. Maybe it is already late but it is better to ask rather than not.
-> >> > 
-> >> > What do you think if we have a small discussion about it on the LPC 2024 as a
-> >> > topic? It might be it is already late or a schedule is set by now. Or we fix
-> >> > it by a conference time.
-> >> > 
-> >> > Just a thought.
-> >> 
-> >> Sorry for the late reply. The MM MC turned out to be so packed I didn't even
-> >> propose a slab topic. We could discuss in hallway track or a BOF, but
-> >> hopefully if the current direction taken by my RFC brings no unexpected
-> >> surprise, and the necessary RCU barrier side is also feasible, this will be
-> >> settled by time of plumbers.
-> > 
-> > That would be even better!
-> > 
-> > 							Thanx, Paul
-> 
-> Hah, so it was close but my hope was fulfilled in the end!
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219009
 
-Nice, and thank you!!!
+--- Comment #31 from Ben Hirlston (ozonehelix@gmail.com) ---
+in my case I am on Arch Linux and I am running 6.11.2-zen1-1-zen the Zen
+Kernel. I need to disable vls for my VM to remain stable if I don't my syst=
+em
+will randomly reboot after a random amount of time. disabling vls helps stop
+that but it makes nested virtualization stop working so I can't run WSL 2 i=
+n my
+Windows 11 guest. or Hyper V correctly
 
-							Thanx, Paul
+--=20
+You may reply to this email to add a comment.
 
-> commit bdf56c7580d267a123cc71ca0f2459c797b76fde
-> Merge: efdfcd40ad5e ecc4d6af979b
-> Author: Linus Torvalds <torvalds@linux-foundation.org>
-> Date:   Wed Sep 18 08:53:53 2024 +0200
-> 
->     Merge tag 'slab-for-6.12' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/vbabka/slab
-> 
-> So that was at 8:53 Vienna time, and Plumbers started at 10:00...
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
