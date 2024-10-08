@@ -1,100 +1,114 @@
-Return-Path: <kvm+bounces-28143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28144-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 267209955A9
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 19:32:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 644519955D6
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 19:39:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C863A1F21878
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 17:32:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3341B261F0
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 17:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9114320A5D1;
-	Tue,  8 Oct 2024 17:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F7C20ADED;
+	Tue,  8 Oct 2024 17:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bj5vu36h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wwRkBKfq"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9778209F54
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 17:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6432071F4
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 17:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728408738; cv=none; b=nn0jCzLkaz2ubnPAo5gu6ER4ze/Yypo0xVJFk9Wj1kuSazD2jv5KTeYXNOZLbNzUp9HsmC0hTUmDH9Y6LuRXlOKzgiWXDxK2hYNK6I/wLwefHREYGUi44JeiBXVkxyTdTSbT5vJveLJAHAWhOGngk2VPKEs18LF5NeNrMDQPTmM=
+	t=1728409149; cv=none; b=Y+og3eabM/ADfDF3+sKZ/omytyzrbp+IOxErHkhlKl9q9WBpVsX5PXzutVc/MnQ8ibbIci5TVYb75qsthSfE7ERLv15CscWZ1zpqKnAb4c0JENCW7DOA9aNwUOINVygd19iyW3HyYrxq53+hu5Z/CLcmqhFghq6YecRre4eMl0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728408738; c=relaxed/simple;
-	bh=8Qq2nw8SaYJU0R5lXZxDcPHDZa+Tgv7YPY8pbR101Tw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tUUZBKR+dpRM9h6Jps4LpwjpREuqwgFPdnU7/IpL/l5J/KFTSlQgBSyPFe1k8RGeuZe+PTTVxqUnOVc6e43W9XohMed4Zs2kC4hfrpNPwpvKMOKAwpFb9oMLoxnMyzOkDeeCFEVSAFQOgfowsBQr+c5GVoLzdCdI5QVpIp3GcjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bj5vu36h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3ABA8C4CED3
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 17:32:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728408738;
-	bh=8Qq2nw8SaYJU0R5lXZxDcPHDZa+Tgv7YPY8pbR101Tw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Bj5vu36hdJ29ma5jf0fBqpL5fjf2gOGDUsHsyJ2ymdtv3V76ay6AKkJojDQJuAy1q
-	 tNmnpJR3TJVp/CMebTs9PbcykvfLfs5ImNWGXw6VKQ+AlyQNjF1ykhCIpyxumGUZTQ
-	 HbArGFqIorS0M7TkP2kEHZ0inv/7UKWSwbOYHxoMtoJnkfgjTHXxj67H6RJNW5jk4P
-	 M1bmDOljRneh9Tt6XP5U5N5OuvjDiPZaborWaabWZLrsuXo2JbtW+idew3aU7/ZUx1
-	 cPr9RD7IySLstdc2dLoP4OR7RWUhwWL6Y/YLb31KHeigFBvwDTi1WYdz/irBP2/srN
-	 YWCDXi4652nbQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 3424BC53BCA; Tue,  8 Oct 2024 17:32:18 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219009] Random host reboots on Ryzen 7000/8000 using nested VMs
- (vls suspected)
-Date: Tue, 08 Oct 2024 17:32:17 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: michal.litwinczuk@op.pl
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219009-28872-ZfiHZpzzsK@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219009-28872@https.bugzilla.kernel.org/>
-References: <bug-219009-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1728409149; c=relaxed/simple;
+	bh=K0qRIU2gct1IAPurPWsNp/o/kDxBWiDGIlxlCte6ZbU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=S5m4ZMtZns1ZyImZFGNuHz/uyQwsc2Y/XQjvk87KdM7qt2bzdF2+KgI7dKd5n5KKeBSnsS2/hqDHfn7D8t91bhVi1JYO5UZMNhq9H6P9+c+sloTrmiGTn1lztEFwQGmUwXpUPlEtFhvRLrUf++y9GCnl1ydPzTkosZi25kS/ZCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wwRkBKfq; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e2baf2ff64so90097617b3.0
+        for <kvm@vger.kernel.org>; Tue, 08 Oct 2024 10:39:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728409147; x=1729013947; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o+utCni1L2If5Zb0kQ119kpHr19HtdYxR1+3jlY+lTQ=;
+        b=wwRkBKfqW4WZ2aLiKxV7rIL+/nFb4G79d/oJWpmvuyuPY5i8ODqPiCrFyZEfj3HSmt
+         +WHZd+O8hYTQsdMkyqDlsEbzyjLVG3X7YZlIfNXOt4cjC3G8K8VQ/y4qMuwnJNuP+Pf7
+         3NpcXGTJmsf+0ZaATpzBH3R71XtZJjjK1hmbbfOdhT4SFQ/fiCwh7vhWZobF/EU0cuTg
+         4mvK0xyG31BekIwsFcxhAe+lYXyrDOdNdzPspZgOzKbxF6v2XusuzRUpGekGaD+eFqJE
+         Lt/phmZ30GW8fw4a0w+Zi8RWgd27imaxlUIoYFm5F5v5fRJ9OtcmBt5+hJGEArzzdX8M
+         ndew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728409147; x=1729013947;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=o+utCni1L2If5Zb0kQ119kpHr19HtdYxR1+3jlY+lTQ=;
+        b=YERtcVws4Wcck391iMaS91cn75etSVSsCd1DT6soBU/CqhXkpJmMtxmq4jWiU5lPbs
+         mvt5AAT7EAePvG/H6819+qKd4YeBbIYnoe8ES/N8bsZM7M9l5YGJ7IGrUMA2g6Y7VcQQ
+         YkbKqwplsPOfsQgF+Hx8c/Q64483VvHHuPRRIvlrwRD2WtPsizAAIFME3mTenSDbg1tD
+         Rp2C8+1Dp9waTZs5nM+0EUzmmrrWOq2S7Pk0VK/fM8h2xtbc9ajbwSsU/cfQ2qwquyaZ
+         6BwIeplDjbkLpWVj77S1xUJ9JucfIh0P8BXk5kDjA16ozPyUQoVKIIv2VRrbnQnnLbZl
+         Bd6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUK4Zg3K5Cqx9XVTjoA7aI8bg+OeL+Wyce1uz7l9ezoV9nZ3WOAlP2jTnHnhPA2NwA2jFc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVq5WYHYu2PAxls9vKCPKEVymL2KYYF8CzWVUcc5vGzsD+HfjQ
+	tWkK7MtYIAFg22gRqjYWKce5ZwNoCd9WuYR1flaQZ1YGaotVRiMCnaww9wDXpDAHp7EPW1kQWEJ
+	8+g==
+X-Google-Smtp-Source: AGHT+IHCrhL61p8TLN8MW0pIpAL39LcUBMdbO9ONRNweIKqSy4bXfgwZV7m363hRkWMG9A1o+J60cMmmihw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:6a07:b0:6dd:bcce:7cd4 with SMTP id
+ 00721157ae682-6e2c6fd835amr3356707b3.2.1728409147081; Tue, 08 Oct 2024
+ 10:39:07 -0700 (PDT)
+Date: Tue, 8 Oct 2024 10:39:05 -0700
+In-Reply-To: <13d192bf-8151-415f-b508-7a4ebe4766f2@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20240802195120.325560-1-seanjc@google.com> <20240802195120.325560-6-seanjc@google.com>
+ <13d192bf-8151-415f-b508-7a4ebe4766f2@amd.com>
+Message-ID: <ZwVuOcRujpzo9yTb@google.com>
+Subject: Re: [PATCH 5/5] KVM: x86: Add fastpath handling of HLT VM-Exits
+From: Sean Christopherson <seanjc@google.com>
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	nikunj@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219009
+On Tue, Oct 08, 2024, Manali Shukla wrote:
+> Hi Sean,
+> 
+> On 8/3/2024 1:21 AM, Sean Christopherson wrote:
+> > Add a fastpath for HLT VM-Exits by immediately re-entering the guest if
+> > it has a pending wake event.  When virtual interrupt delivery is enabled,
+> > i.e. when KVM doesn't need to manually inject interrupts, this allows KVM
+> > to stay in the fastpath run loop when a vIRQ arrives between the guest
+> > doing CLI and STI;HLT.  Without AMD's Idle HLT-intercept support, the CPU
+> > generates a HLT VM-Exit even though KVM will immediately resume the guest.
+> > 
+> > Note, on bare metal, it's relatively uncommon for a modern guest kernel to
+> > actually trigger this scenario, as the window between the guest checking
+> > for a wake event and committing to HLT is quite small.  But in a nested
+> > environment, the timings change significantly, e.g. rudimentary testing
+> > showed that ~50% of HLT exits where HLT-polling was successful would be
+> > serviced by this fastpath, i.e. ~50% of the time that a nested vCPU gets
+> > a wake event before KVM schedules out the vCPU, the wake event was pending
+> > even before the VM-Exit.
+> > 
+> 
+> Could you please help me with the test case that resulted in an approximately
+> 50% improvement for the nested scenario?
 
---- Comment #25 from h4ck3r (michal.litwinczuk@op.pl) ---
-I've recently talked to person which insisted they never had issues on their
-guests running on host cpu type without disabling vls.
-From what i asked it seems that all guests were linix based and lacked pci
-passthrought (proxmox newest kernel as of time of this post)
+It's not a 50% improvement, it was simply an observation that ~50% of the time
+_that HLT-polling is successful_, the wake event was already pending when the
+VM-Exit occurred.  That is _wildly_ different than a "50% improvement".
 
-Further testing is required.
-
-I'm gonna spin up linux guest with approx half of host memory (no balooning)
-without any external device attached to see if stability can be archived th=
-at
-way.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+As for the test case, it's simply running a lightly loaded VM as L2.
 
