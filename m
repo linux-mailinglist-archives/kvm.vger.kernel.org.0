@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-28153-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28154-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A5B9957A2
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 21:30:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24AD49957FA
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 21:57:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 686B51F26879
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 19:30:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E6171F2251C
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 19:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBEE213EED;
-	Tue,  8 Oct 2024 19:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365FF21500C;
+	Tue,  8 Oct 2024 19:56:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UIwU5yFg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sNLVO2Y+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F67212D16
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 19:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5ED7213EF2
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 19:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728415817; cv=none; b=imR6pGX96+nMM2BaMc1sR36wd+xFf5OACdywEla4Dol6cGriLYmSAMaitC00bpOyzndB/w/kVKBXM0ka4r6iiWW2LdjJW62XLw9ythn0iIvz5HudkNlZ8grlqeWsFGk4N4wtcFCW5ul89koQBRaYqhnB/FnWKK/5sNuiRSNM4og=
+	t=1728417409; cv=none; b=GM7NR8KJKjJGIuWtqUlUgiefXODT1ZhLqvcoQnqz83gaGob8X6A6bcT/fvBC85oTyCgtqqa/2c8UW/LR898KwsiE5ofIMiiBV/EVvMLXOktNg4Pzh+oNg7I7Tw+kL6K4qoZEpim8xq7zLHCR/nfWJbAguvE+P5Uzq5zEOmy+w0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728415817; c=relaxed/simple;
-	bh=i02dTDaEPMSaL7Z/bKJlJnWAWdq0QL8dv8eDCHe+D5Y=;
+	s=arc-20240116; t=1728417409; c=relaxed/simple;
+	bh=lJ13KuCMxM+rGS6o4c5nzT7RJcxdk/8pPHoQ2SxGCac=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SDgADTThiFqD7AdXpE3vRhh5qmqzJ2TpFCJdKw5+s1Vo9IX7WzWvgG8ufvGzVstQC90VwPgQD1lc1F5QH6hx78ricb4RH7tv1QoYCQU5Eqke3syU508bkg6yQZJcfsx4M24w7l/7oUWT9ayrbh/EFU/QRbDbmXpl+GzqM+e20kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UIwU5yFg; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=iBvOf0pPfuVjK58lwDVbWBR4wysK74XhRDkF39ZZB8irQhM6anFwrKzZXO7+gLfV/XIFekYd2A3uMZYqONURhza+nujatvEaY+AxuYpvMcdI/W4vM+NTLU8Rq2mtPdaTlGQop0w9lvV2xfh3Pk/Q9VInnXqHYtg+779PNHZW14A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sNLVO2Y+; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e1159159528so394971276.1
-        for <kvm@vger.kernel.org>; Tue, 08 Oct 2024 12:30:15 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7163489149fso6786897a12.3
+        for <kvm@vger.kernel.org>; Tue, 08 Oct 2024 12:56:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728415815; x=1729020615; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728417407; x=1729022207; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FPlkG7ZoRlkbHr9vPUwi8+LWYYFCuq+IrymeH+44AKA=;
-        b=UIwU5yFgsMUQJwNCpx1R7rpIhIAgxbFTTJu+vxcmwAsY7ZKqgzmrqB8xgiBkOsFCE2
-         /3jjw5rh7I/62TbNuL1ABPkFYNxS/nr2Afmh6DShg337D8GrWrBcEabum9Aqd2KlZXLW
-         07qphvO8jb2GqLRYFtZXJJ9Z+ECC/ATMhU6wsEHtLWAKvufuauReEqxjqFXtzzEoy8Ra
-         mvkdIocZU6pP3a1dXP2e1XMluxLMxvD7Y4nmBia/y/q8fO3bJCdjCHidaB4daVy/HIPt
-         hA2106BR4knvJ+sgeXOJ8qGI1mTEPRMhCdpLYcJKBIwLdHOgU0zjKltm7Myr/k7D6KGz
-         ELlw==
+        bh=z/G+V8S+q0QrqWGrvEamJlOg78EP9KmYBGMaK7S1DW0=;
+        b=sNLVO2Y+ZGXrk6RtwKZE7YqHM8bPryppBG+/7hGML41/pnL1cb/uihynRVuhIT/ZlK
+         cEwInNPyDzNquXLvfArwe/FIvYjCqrfFqMVPo9YBdimTTB3u5To4uIPlvkhkF748E7Om
+         QRoUSnsGVY4AEmlp8cAy0t+w3o34FsIJ4zekxPBKrX5qiAPJFuuV+StMJmL/OjgW9uJR
+         weCi/a0VosIKdn14acfTv5m6inmMw4+RIUY4EUsf8TqW4ADgB4qU/4iL7danprnteY8T
+         GuhehGFM9f9i/mHNwXs4BLpZWYbdu251+bcluXcYp4lpNXny8gE408jDLn+bMn6mtE0/
+         n7HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728415815; x=1729020615;
+        d=1e100.net; s=20230601; t=1728417407; x=1729022207;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FPlkG7ZoRlkbHr9vPUwi8+LWYYFCuq+IrymeH+44AKA=;
-        b=sXFk9/sO+CzWaJcR9EdITzrvReXJwCQIBT3tsCjmCmHPJ7OL04gIfKpNtaKgg0DXBK
-         kbkIaCrV3VKfMumL5VFwfh8guyQ2OtAT8WFqyi57rjnPgXsGlt7c9jHOWwVMPyN0ojkh
-         YOP+twqdOV347LdbwFn8ir39d2hPI20b9kG4LLY/A133gxlM/UQ+tgZ+toYaJm8Z+qrN
-         15ycDOCGZgHvb5ATDq8835wjIJK2UTYiGi4VtXmwlooyGg+5+6TvUgIPy7S0HIkQJoAI
-         j1bvJc5rH+sEMtCebwz2EHr89YGbzZik3Hk9AH32ur5y7YB2BYf+hfta5K6uF8r4garo
-         KC6g==
-X-Forwarded-Encrypted: i=1; AJvYcCU/82PNDXK5yPlvzK8HK8YI7kRkR6KIapPgi/5FYVLyLSB0nFCAmomIBm/fZSYSvxgkTUY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5lfOBDTjgwwAtdjeZBcbsWif80on6GrcwutBtLlmgcpM6Tcs9
-	zTAgM8UPT153pUdJ48WithQNG/XgZqxpmeTjfkWKG0xM/5MF3fAfbuRC4o755sl4NTcfpgPfg3T
-	zeQ==
-X-Google-Smtp-Source: AGHT+IFES2vX7FGCe5EWWJU/+OHopxi8E9cAc1VIHr9YudNnvp5Ss8FEVKKEmYVcxwyacMvNG/vZGf7wOOo=
+        bh=z/G+V8S+q0QrqWGrvEamJlOg78EP9KmYBGMaK7S1DW0=;
+        b=Opm781YjWBFt0QrgQVUCkmvsvXch3NvjKmv35h63SrOIpbJmu8Sbb+plkOpwI/+62i
+         yfRk3RNbBbHYK1Fq4EQzuYkRSVuVL8XYJXH7KwZ2IxomslgzcSzOKQ7lGnkrCxrBPrmA
+         Apuv/joEIjgsxxQkvV16lM4iuVrDIolh890r2ypmL9g0cdiFnRafWFj8l1f56RYTa52x
+         vzrGDLV3kW619blIhzuc+71YHl9rdUTOKaQntp7W4j0ByBxrAmHLg9ZuvD8m0T9AujmP
+         ziHeIM3XDPTlSDp23IiXAiwfd8+sLXScc2ApAFl3C3a5X6BEyv5MaGIrOYlnhzHDKldV
+         eTpg==
+X-Forwarded-Encrypted: i=1; AJvYcCU5YJ5WeMKvU/4ENZ40EermUvnMEg6EBv4oLOKQBx7WUSyIiAm8y7ZTXGO16lH5YR5SIrI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY4o4uIA97pRkfR56XHy36qLcn8+gANA40WZKjgyexyJUrSM26
+	TmsCBCkxJrvdSi5HcFhuntWBV+L91jmluvsgOIp/rp+Ade6v7K7zkeMu/P6xwY4OQMaZQGtdMbZ
+	pgQ==
+X-Google-Smtp-Source: AGHT+IHyx9QyjvcH0QuqsTJ5s9OSvQOQBKzDDSMtuR28E1GHQRe/I98C0rGCGAu3RxyW1QfCFMI9GKgHUE4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:2d1a:0:b0:e28:e97f:5397 with SMTP id
- 3f1490d57ef6-e28fe4604a9mr320276.3.1728415814755; Tue, 08 Oct 2024 12:30:14
+ (user=seanjc job=sendgmr) by 2002:a63:f151:0:b0:7e9:f98c:e9f7 with SMTP id
+ 41be03b00d2f7-7ea320f3304mr172a12.10.1728417406827; Tue, 08 Oct 2024 12:56:46
  -0700 (PDT)
-Date: Tue, 8 Oct 2024 12:30:13 -0700
-In-Reply-To: <diqzwmiosqfs.fsf@ackerleytng-ctop.c.googlers.com>
+Date: Tue, 8 Oct 2024 12:56:45 -0700
+In-Reply-To: <diqz1q0qtqnd.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <diqzzfnkswiv.fsf@ackerleytng-ctop.c.googlers.com> <diqzwmiosqfs.fsf@ackerleytng-ctop.c.googlers.com>
-Message-ID: <ZwWIRW7zoX2PBsnF@google.com>
+References: <e8f55fef-1821-408e-88ed-b25200ef66c9@amazon.co.uk> <diqz1q0qtqnd.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <ZwWOfXd9becAm4lH@google.com>
 Subject: Re: [RFC PATCH 30/39] KVM: guest_memfd: Handle folio preparation for
  guest_memfd mmap
 From: Sean Christopherson <seanjc@google.com>
 To: Ackerley Tng <ackerleytng@google.com>
-Cc: quic_eberman@quicinc.com, tabba@google.com, roypat@amazon.co.uk, 
+Cc: Patrick Roy <roypat@amazon.co.uk>, quic_eberman@quicinc.com, tabba@google.com, 
 	jgg@nvidia.com, peterx@redhat.com, david@redhat.com, rientjes@google.com, 
 	fvdl@google.com, jthoughton@google.com, pbonzini@redhat.com, 
 	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
@@ -90,54 +90,70 @@ Cc: quic_eberman@quicinc.com, tabba@google.com, roypat@amazon.co.uk,
 	anup@brainfault.org, haibo1.xu@intel.com, ajones@ventanamicro.com, 
 	vkuznets@redhat.com, maciej.wieczor-retman@intel.com, pgonda@google.com, 
 	oliver.upton@linux.dev, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-fsdevel@kvack.org
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-fsdevel@kvack.org, 
+	jgowans@amazon.com, kalyazin@amazon.co.uk, derekmn@amazon.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Oct 03, 2024, Ackerley Tng wrote:
-> Ackerley Tng <ackerleytng@google.com> writes:
-> 
-> > Elliot Berman <quic_eberman@quicinc.com> writes:
-> >> From x86 CoCo perspective, I think it also makes sense to not zero
-> >> the folio when changing faultiblity from private to shared:
-> >>  - If guest is sharing some data with host, you've wiped the data and
-> >>    guest has to copy again.
-> >>  - Or, if SEV/TDX enforces that page is zero'd between transitions,
-> >>    Linux has duplicated the work that trusted entity has already done.
-> >>
-> >> Fuad and I can help add some details for the conversion. Hopefully we
-> >> can figure out some of the plan at plumbers this week.
-> >
-> > Zeroing the page prevents leaking host data (see function docstring for
-> > kvm_gmem_prepare_folio() introduced in [1]), so we definitely don't want
-> > to introduce a kernel data leak bug here.
-> 
-> Actually it seems like filemap_grab_folio() already gets a zeroed page.
-> 
-> filemap_grab_folio() eventually calls __alloc_pages_noprof()
-> -> get_page_from_freelist()
->    -> prep_new_page()
->       -> post_alloc_hook()
-> 
-> and post_alloc_hook() calls kernel_init_pages(), which zeroes the page,
-> depending on kernel config.
-> 
-> Paolo, was calling clear_highpage() in kvm_gmem_prepare_folio() zeroing an
-> already empty page returned from filemap_grab_folio()?
+On Tue, Oct 08, 2024, Ackerley Tng wrote:
+> Patrick Roy <roypat@amazon.co.uk> writes:
+> > For the "non-CoCo with direct map entries removed" VMs that we at AWS
+> > are going for, we'd like a VM type with host-controlled in-place
+> > conversions which doesn't zero on transitions,
 
-Yes and no.  CONFIG_INIT_ON_ALLOC_DEFAULT_ON and init_on_alloc are very much
-hardening features, not functional behavior that other code _needs_ to be aware
-of.  E.g. enabling init-on-alloc comes with a measurable performance cost.
+Hmm, your use case shouldn't need conversions _for KVM_, as there's no need for
+KVM to care if userspace or the guest _wants_ a page to be shared vs. private.
+Userspace is fully trusted to manage things; KVM simply reacts to the current
+state of things.
 
-Ignoring hardening, the guest_memfd mapping specifically sets the gfp_mask to
-GFP_HIGHUSER, i.e. doesn't set __GFP_ZERO.
+And more importantly, whether or not the direct map is zapped needs to be a
+property of the guest_memfd inode, i.e. can't be associated with a struct kvm.
+I forget who got volunteered to do the work, but we're going to need similar
+functionality for tracking the state of individual pages in a huge folio, as
+folio_mark_uptodate() is too coarse-grained.  I.e. at some point, I expect that
+guest_memfd will make it easy-ish to determine whether or not the direct map has
+been obliterated.
 
-That said, I wouldn't be opposed to skipping the clear_highpage() call when
-want_init_on_alloc() is true.
+The shared vs. private attributes tracking in KVM is still needed (I think), as
+it communicates what userspace _wants_, whereas he guest_memfd machinery will
+track what the state _is_.
 
-Also, the intended behavior (or at least, what  intended) of kvm_gmem_prepare_folio()
-was it would do clear_highpage() if and only if a trusted entity does NOT zero
-the page.  Factoring that in is a bit harder, as it probably requires another
-arch hook (or providing an out-param from kvm_arch_gmem_prepare()).  I.e. the
-want_init_on_alloc() case isn't the only time KVM could shave cycles by not
-redundantly zeroing memory.
+> > so if KVM_X86_SW_PROTECTED_VM ends up zeroing, we'd need to add another new
+> > VM type for that.
+
+Maybe we should sneak in a s/KVM_X86_SW_PROTECTED_VM/KVM_X86_SW_HARDENED_VM rename?
+The original thought behind "software protected VM" was to do a slow build of
+something akin to pKVM, but realistically I don't think that idea is going anywhere.
+
+Alternatively, depending on how KVM accesses guest memory that's been removed from
+the direct map, another solution would be to allow "regular" VMs to bind memslots
+to guest_memfd, i.e. if the non-CoCo use case needs/wnats to bind all memory to
+guest_memfd, not just "private" mappings.
+
+That's probably the biggest topic of discussion: how do we want to allow mapping
+guest_memfd into the guest, without direct map entries, but while still allowing
+KVM to access guest memory as needed, e.g. for shadow paging.  One approach is
+your RFC, where KVM maps guest_memfd pfns on-demand.
+
+Another (slightly crazy) approach would be use protection keys to provide the
+security properties that you want, while giving KVM (and userspace) a quick-and-easy
+override to access guest memory.
+
+ 1. mmap() guest_memfd into userpace with RW protections
+ 2. Configure PKRU to make guest_memfd memory inaccessible by default
+ 3. Swizzle PKRU on-demand when intentionally accessing guest memory
+
+It's essentially the same idea as SMAP+STAC/CLAC, just applied to guest memory
+instead of to usersepace memory.
+
+The benefit of the PKRU approach is that there are no PTE modifications, and thus
+no TLB flushes, and only the CPU that is access guest memory gains temporary
+access.  The big downside is that it would be limited to modern hardware, but
+that might be acceptable, especially if it simplifies KVM's implementation.
+
+> > Somewhat related sidenote: For VMs that allow inplace conversions and do
+> > not zero, we do not need to zap the stage-2 mappings on memory attribute
+> > changes, right?
+
+See above.  I don't think conversions by toggling the shared/private flag in
+KVM's memory attributes is the right fit for your use case.
 
