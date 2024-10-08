@@ -1,183 +1,167 @@
-Return-Path: <kvm+bounces-28136-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28137-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F7ED9951E4
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 16:36:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FEAE995266
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 16:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A32B21C2564A
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 14:36:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6D1C284AE1
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 14:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6F41E00A6;
-	Tue,  8 Oct 2024 14:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5211E0480;
+	Tue,  8 Oct 2024 14:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nmUog/XW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cnHFE9D0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33BA1DFE17;
-	Tue,  8 Oct 2024 14:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2F81DFE16
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 14:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728398179; cv=none; b=nWL4YamAYOBUMnVel+vkt2OycmsrM6gfmDlH2MbpFl2FLspuMV3NuJE2XJdkQ7LtK5GSI7sjcBMsOtRY7gvHqtU/sjKqiBg5Wa4yVKd+HnzoP3qvqklI3ixi0GqDU70YSG9JLtSPUlWxetsufsAFYWbnMEfhRPqmLnOXOLScy1A=
+	t=1728399078; cv=none; b=IX92zYchAi9VA/EzVbZ6mS46i8vatjCk7Zo6ABqMShSdxPoKHZJAJlWAJ5zocsSgKUs4eHOJxvKzXtpiFFLfwR8bBFmVOavANhEmWMUB0py5QX2kSH9QkkysuqnZgbdj3RaQTwipWlFqsR/grBl1TqOJEDzUer51HqpfFNh6fkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728398179; c=relaxed/simple;
-	bh=gxxx5O9eecv163qWQ61f/5In0s1MkC0h2hYsYBgpd4o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S/zO1Y80mmqXqTMlScSxEJVGhXux7CI3+0h3l1ITSR0pAxNutZWEtYPlD1L1ILqXY4Obv1k3kDD/b0fs47HVIWiJ+KR5gxwzJvwngpKZV88XMLkADWzqKt4dbEa4UHxZDAO+MsCJysGykz8ZvJ6j3ZtlKUC9Gu0oF4qBFkqm5KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nmUog/XW; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5398df2c871so6110679e87.1;
-        Tue, 08 Oct 2024 07:36:17 -0700 (PDT)
+	s=arc-20240116; t=1728399078; c=relaxed/simple;
+	bh=ZgSRuvfGZ0ItcV/YwoUKTRPIr6VJ33TVYlDf96a8E7w=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=aGi8XurmYYYur2eAKwumh5lSa5dbgNcT9AI4RFRQHp2GGCh2J5hMhpQRunK8pH86b0bvvmO7dlIxFglMRTd2wa2tsj02dU+Hn7Cw1oNKfYP35v4aaf5szj7zqM8t0cfEpC+jRBANuW7vbx66seoblxjZgJW3ceiNH1f7gP6leRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cnHFE9D0; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e262e764f46so9604939276.1
+        for <kvm@vger.kernel.org>; Tue, 08 Oct 2024 07:51:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728398176; x=1729002976; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RAzASSCUQ2aUVsiLqBLU+OR2T2BBF/GKBA/6/Hrht2Y=;
-        b=nmUog/XWxHE98vP1aRBWOdqqiTdra1AWS575jFpoHyM53Y6e7zQN/FcquPeBMs14bf
-         aPuy8kgYFX4JqI1OEv6cuEYAJkv41Tv58BA3MLW378DfwBfALhXp0zSiXBDrK6w7hoW3
-         SG9RMRTkD8IVJ42W+dtP+a6tAMQEg1rJYKi/saiMrSfX5FJsZrQrmOEKrYBQV59PGzpI
-         IgXkUWLLJ3LOEIu4wlQNrUJEkpUiZ7oLKlMCMO5E3EhblLMHa1t47qP28WXxD19DHR4I
-         rTKc3hWJ5y8llNFRd5BhofZh2BWz/9wUnCLGFOznXC6rfN+BioUMPiQDaJZ7Ke4/hRW4
-         NwVw==
+        d=google.com; s=20230601; t=1728399076; x=1729003876; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=emQng1abso/nTmgu6ZsfIn6KMzH8O2Ep6fGhK6qECAo=;
+        b=cnHFE9D0vSc+ODj4Khd3GrOFDWrGjz8ZB5mJj7b+bmjXN70DXMU/qYD8GJhXf7/5lE
+         aWzR1PKdtQNnRibh07lsrpvTzJnKRnib5FOvfLwC9BDowlsHxvmn80TSwrURLYqHVDUC
+         vZjEJ6bTlg7Ofwh3NxKXiLbUap5DjHlsn1DlckAe2TmBeHR9oxCumWC4iRgdXlhn0nnf
+         t2jrQxXzr2ghj2zDAnVIKjKpHqPp68MjGyYxX1gm4UjNFlWcHPfviHK+c/Accv8LEf5n
+         ZiF6f53ZBuMRmJK0sZ9BD00TzuvPeF+w/5DvypGZ1k4lG/udOiJddfEZhTyv3+Kh0Qe7
+         AytQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728398176; x=1729002976;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RAzASSCUQ2aUVsiLqBLU+OR2T2BBF/GKBA/6/Hrht2Y=;
-        b=cYrnuD6RbOItIqsgKi4Co2aWslD+EwsN3jUQhNiAtOp6qvExTX6N9+ftVK+/AZGwiH
-         JxTsDcZhuTt+TMDo2KtZsyRGE6t6Bto6S4ayh9f47KEolDx1AVBt2hYdXjWNsFGdVY8G
-         +6HtqRc7CWHDRV6iq1c0e+aLo/dS3rthVgz3OLWpP0xe3ME93FK+H67o0MNpAIqiQ2mP
-         3EY3L+6H9cWtEnM4/hw3HSRIBRgXupPWhFZhnEBgzymHGSDH5MxhWC8ByX3HiUEKa0/4
-         BPEu3CoBjRl3COPCGOinc3kVND830H7LjlrvpDM/jCSBPiG1GXFF9v6aduIhwNK6R6mR
-         jjvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJtH3awfDZ/nC626VnAxYOHkTfVIoH3kIfaoPqDVOK+deP8D57oWriGhIVI7f1VE1Nc88=@vger.kernel.org, AJvYcCUbgGK+kyLacPBfXwZh6DEUgiTVHXLqk+aXtuYMPOhFH+/s+wGhu0dOB7i0wxyaju3rnxRqg/5J97wWBAJ+OeU=@vger.kernel.org, AJvYcCV2rCp5g1JppC/inIrPY76DYPlOaZ2xdBwksr4sgPt/Jd/MlJKupA6Ss8yv/s7PmIv0dqsyysSJTTA=@vger.kernel.org, AJvYcCV9IJ38l6X5LroDzXttFFINdkD3yzgOGnA1lfHoX1xiWG07l8nircOfoo/CsvDyIKP8qCEoSAbLz9hRx0Fi@vger.kernel.org, AJvYcCVWn6u/U1hLaeP8nOPLa/UO6ryUAre4UzB1KTNdeCyAeBTsUrbB955DjqJ/0egzzQSkzPZFeRObE6bh@vger.kernel.org, AJvYcCVZr08z2eEiFB9qZZQPQKg8EQQs1YfSFER4TatCiaj9fipOsjvktYDR35dyW9iYDSkA8vsM9JAdwBB0i5AJ@vger.kernel.org, AJvYcCVzdyFAcpZ+cokUng73bgS8Mm6UjHR1k2FuWrlvxUoysZiXou+QER3OJJFz/rCqDionXvoGGH39/cyMTa34HNMNVA==@vger.kernel.org, AJvYcCW2ura4tB0AkWNuocgWJ/GET8txWB1PrLflKqFDMyIXRUY+r7qInkWU7DBBDWFKZ3mASs4deA9mHlQuCU4b@vger.kernel.org, AJvYcCXOwPz5SHzaAEeTdRy4S8wp0rdekZ+too4VPiu6TVIcNiu1UZgMWkMEqQIw9/6EEkH6qPERZIuOt1AOmQ==@vger.kernel.org, AJvYcCXRdDe3dubXYb9lSLHe
- HJulIH3EjKyZ63P0AScc+aR+KbyToGrF5T8LxAHKUceMsS0bCo0zyrlwIn5B@vger.kernel.org
-X-Gm-Message-State: AOJu0YzliAqJ64I6yuE+5ZCA/YTG3cGnD2sjQRftKzH5Y0Ebmv6K1Sl/
-	C4xahBG5gp7Vs51HXDV0eE5S8WzB4cq5Df6LvATxzE6KbikHc3Na75TCB4u8MbFmIeHdl+CRyiR
-	6oNV9T++a/Dw7Kxvp+mbzH/8JrA==
-X-Google-Smtp-Source: AGHT+IFk7uSGpMKxSJMgul6omDcmQyMQl5Zy1l8C5NVTbpCgjnnjxrxdxyhpPaT355keXYtQRCu422aiN8olYIcP4XU=
-X-Received: by 2002:a05:6512:3085:b0:539:8a9a:4e56 with SMTP id
- 2adb3069b0e04-539ab8c6fb8mr8574397e87.53.1728398175714; Tue, 08 Oct 2024
- 07:36:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728399076; x=1729003876;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=emQng1abso/nTmgu6ZsfIn6KMzH8O2Ep6fGhK6qECAo=;
+        b=cb1/w1D/44pXfpfk5EEuWMiHzRFkRtj2N2D6dcZSayHdp2d9FJaLVxK9MxPunseJdw
+         jDc/Xue+E6GLIq3loVbsKNYJzjKCxVcsfxV1ts8VeO1bo4p9b2wN5n6Fh0S1d62e3/J0
+         SdCNMS1jOvE+pUXHPQPts3adtZAC8ZmpEoO8UPBCsQyz/0hHkY2riu7GYNxauSrSy7f7
+         RwSNC7gLvB9VDTKMT3TWoBDPmqT2JMXcY5/qBu7NsZd+um99MXvBcd/7mLt8usppqAOe
+         8hcy/UbufaGE2WvaE/6LDgTXhUpLuqCj1ClA8JjqYoe1/aKSn1jaYmVmK33cWlZJwfWL
+         tgZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4E51OPB2WUIFq30L3IZ1lBv2RZCfC57l2zIpRCY7GpwdL2Xj04QfbbwP839K/NrpJkc8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAgzBCmJeTHHmbEcQaK1pUUcNnFssrtRm4hIbEor2TAJvgkz9K
+	fDqAZk5WC89XY8uewzqGDWNiNLn65iqemVjQovttg1kad+rLVGUrKDbFp/9VcdaXmLh27NmDnsD
+	fKQ==
+X-Google-Smtp-Source: AGHT+IFiI3ay5y7w5pgPUPFBTOQ/KW+bT1HbnjiMC1wKY+tCLdLaTeLJvIQHLRs+a2IawRP+op3DZpb5qBc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:d658:0:b0:e28:f8e4:cc5e with SMTP id
+ 3f1490d57ef6-e28f8e4ced4mr209276.2.1728399075773; Tue, 08 Oct 2024 07:51:15
+ -0700 (PDT)
+Date: Tue, 8 Oct 2024 07:51:13 -0700
+In-Reply-To: <ZvPrqMj1BWrkkwqN@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240925150059.3955569-30-ardb+git@google.com>
- <20240925150059.3955569-35-ardb+git@google.com> <CAFULd4ZNwfPZO-yDjrtT2ANV509HeeYgR80b9AFachaVW5zqrg@mail.gmail.com>
- <CAMzpN2j4uj=mhdi7QHaA7y_NLtaHuRpnit38quK6RjvxdUYQew@mail.gmail.com> <CAMj1kXF3_Hj9j2f_cBtwTFWvEmB0UoEs_cGkRiWc4AErDx0ftQ@mail.gmail.com>
-In-Reply-To: <CAMj1kXF3_Hj9j2f_cBtwTFWvEmB0UoEs_cGkRiWc4AErDx0ftQ@mail.gmail.com>
-From: Brian Gerst <brgerst@gmail.com>
-Date: Tue, 8 Oct 2024 10:36:03 -0400
-Message-ID: <CAMzpN2jWRV8-JzM2FjSvSz+VoDrNVeEJPgF7N5ksLaADHpnHsA@mail.gmail.com>
-Subject: Re: [RFC PATCH 05/28] x86: Define the stack protector guard symbol explicitly
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Uros Bizjak <ubizjak@gmail.com>, Ard Biesheuvel <ardb+git@google.com>, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Christoph Lameter <cl@linux.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Keith Packard <keithp@keithp.com>, 
-	Justin Stitt <justinstitt@google.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Kan Liang <kan.liang@linux.intel.com>, linux-doc@vger.kernel.org, 
-	linux-pm@vger.kernel.org, kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	linux-efi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-sparse@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <1bbe3a78-8746-4db9-a96c-9dc5f1190f16@redhat.com>
+ <ZuBQYvY6Ib4ZYBgx@google.com> <CABgObfayLGyWKERXkU+0gjeUg=Sp3r7GEQU=+13sUMpo36weWg@mail.gmail.com>
+ <ZuBsTlbrlD6NHyv1@google.com> <655170f6a09ad892200cd033efe5498a26504fec.camel@intel.com>
+ <ZuCE_KtmXNi0qePb@google.com> <ZuP5eNXFCljzRgWo@yzhao56-desk.sh.intel.com>
+ <ZuR09EqzU1WbQYGd@google.com> <ZuVXBDCWS615bsVa@yzhao56-desk.sh.intel.com> <ZvPrqMj1BWrkkwqN@yzhao56-desk.sh.intel.com>
+Message-ID: <ZwVG4bQ4g5Tm2jrt@google.com>
+Subject: Re: [PATCH 09/21] KVM: TDX: Retry seamcall when TDX_OPERAND_BUSY with
+ operand SEPT
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Yuan Yao <yuan.yao@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"dmatlack@google.com" <dmatlack@google.com>, "nik.borisov@suse.com" <nik.borisov@suse.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Oct 4, 2024 at 9:15=E2=80=AFAM Ard Biesheuvel <ardb@kernel.org> wro=
-te:
->
-> On Sat, 28 Sept 2024 at 15:41, Brian Gerst <brgerst@gmail.com> wrote:
-> >
-> > On Wed, Sep 25, 2024 at 2:33=E2=80=AFPM Uros Bizjak <ubizjak@gmail.com>=
- wrote:
-> > >
-> > > On Wed, Sep 25, 2024 at 5:02=E2=80=AFPM Ard Biesheuvel <ardb+git@goog=
-le.com> wrote:
-> > > >
-> > > > From: Ard Biesheuvel <ardb@kernel.org>
-> > > >
-> > > > Specify the guard symbol for the stack cookie explicitly, rather th=
-an
-> > > > positioning it exactly 40 bytes into the per-CPU area. Doing so rem=
-oves
-> > > > the need for the per-CPU region to be absolute rather than relative=
- to
-> > > > the placement of the per-CPU template region in the kernel image, a=
-nd
-> > > > this allows the special handling for absolute per-CPU symbols to be
-> > > > removed entirely.
-> > > >
-> > > > This is a worthwhile cleanup in itself, but it is also a prerequisi=
-te
-> > > > for PIE codegen and PIE linking, which can replace our bespoke and
-> > > > rather clunky runtime relocation handling.
-> > >
-> > > I would like to point out a series that converted the stack protector
-> > > guard symbol to a normal percpu variable [1], so there was no need to
-> > > assume anything about the location of the guard symbol.
-> > >
-> > > [1] "[PATCH v4 00/16] x86-64: Stack protector and percpu improvements=
-"
-> > > https://lore.kernel.org/lkml/20240322165233.71698-1-brgerst@gmail.com=
-/
-> > >
-> > > Uros.
-> >
-> > I plan on resubmitting that series sometime after the 6.12 merge
-> > window closes.  As I recall from the last version, it was decided to
-> > wait until after the next LTS release to raise the minimum GCC version
-> > to 8.1 and avoid the need to be compatible with the old stack
-> > protector layout.
-> >
->
-> Hi Brian,
->
-> I'd be more than happy to compare notes on that - I wasn't aware of
-> your intentions here, or I would have reached out before sending this
-> RFC.
->
-> There are two things that you would need to address for Clang support
-> to work correctly:
-> - the workaround I cc'ed you on the other day [0],
-> - a workaround for the module loader so it tolerates the GOTPCRELX
-> relocations that Clang emits [1]
->
->
->
-> [0] https://lore.kernel.org/all/20241002092534.3163838-2-ardb+git@google.=
-com/
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/commit=
-/?id=3Da18121aabbdd
+On Wed, Sep 25, 2024, Yan Zhao wrote:
+> On Sat, Sep 14, 2024 at 05:27:32PM +0800, Yan Zhao wrote:
+> > On Fri, Sep 13, 2024 at 10:23:00AM -0700, Sean Christopherson wrote:
+> > > On Fri, Sep 13, 2024, Yan Zhao wrote:
+> > > > This is a lock status report of TDX module for current SEAMCALL retry issue
+> > > > based on code in TDX module public repo https://github.com/intel/tdx-module.git
+> > > > branch TDX_1.5.05.
+> > > > 
+> > > > TL;DR:
+> > > > - tdh_mem_track() can contend with tdh_vp_enter().
+> > > > - tdh_vp_enter() contends with tdh_mem*() when 0-stepping is suspected.
+> > > 
+> > > The zero-step logic seems to be the most problematic.  E.g. if KVM is trying to
+> > > install a page on behalf of two vCPUs, and KVM resumes the guest if it encounters
+> > > a FROZEN_SPTE when building the non-leaf SPTEs, then one of the vCPUs could
+> > > trigger the zero-step mitigation if the vCPU that "wins" and gets delayed for
+> > > whatever reason.
+> > > 
+> > > Since FROZEN_SPTE is essentially bit-spinlock with a reaaaaaly slow slow-path,
+> > > what if instead of resuming the guest if a page fault hits FROZEN_SPTE, KVM retries
+> > > the fault "locally", i.e. _without_ redoing tdh_vp_enter() to see if the vCPU still
+> > > hits the fault?
+> > > 
+> > > For non-TDX, resuming the guest and letting the vCPU retry the instruction is
+> > > desirable because in many cases, the winning task will install a valid mapping
+> > > before KVM can re-run the vCPU, i.e. the fault will be fixed before the
+> > > instruction is re-executed.  In the happy case, that provides optimal performance
+> > > as KVM doesn't introduce any extra delay/latency.
+> > > 
+> > > But for TDX, the math is different as the cost of a re-hitting a fault is much,
+> > > much higher, especially in light of the zero-step issues.
+> > > 
+> > > E.g. if the TDP MMU returns a unique error code for the frozen case, and
+> > > kvm_mmu_page_fault() is modified to return the raw return code instead of '1',
+> > > then the TDX EPT violation path can safely retry locally, similar to the do-while
+> > > loop in kvm_tdp_map_page().
+> > > 
+> > > The only part I don't like about this idea is having two "retry" return values,
+> > > which creates the potential for bugs due to checking one but not the other.
+> > > 
+> > > Hmm, that could be avoided by passing a bool pointer as an out-param to communicate
+> > > to the TDX S-EPT fault handler that the SPTE is frozen.  I think I like that
+> > > option better even though the out-param is a bit gross, because it makes it more
+> > > obvious that the "frozen_spte" is a special case that doesn't need attention for
+> > > most paths.
+> > Good idea.
+> > But could we extend it a bit more to allow TDX's EPT violation handler to also
+> > retry directly when tdh_mem_sept_add()/tdh_mem_page_aug() returns BUSY?
+> I'm asking this because merely avoiding invoking tdh_vp_enter() in vCPUs seeing
+> FROZEN_SPTE might not be enough to prevent zero step mitigation.
 
-The first patch should be applied independently as a bug fix, since it
-already affects the 32-bit build with clang.
+The goal isn't to make it completely impossible for zero-step to fire, it's to
+make it so that _if_ zero-step fires, KVM can report the error to userspace without
+having to retry, because KVM _knows_ that advancing past the zero-step isn't
+something KVM can solve.
 
-I don't have an environment with an older clang compiler to test the
-second patch, but I'll assume it will be necessary.  I did run into an
-issue with the GOTPCRELX relocations before [1], but I thought it was
-just an objtool issue and didn't do more testing to know if modules
-were broken or not.
+ : I'm not worried about any performance hit with zero-step, I'm worried about KVM
+ : not being able to differentiate between a KVM bug and guest interference.  The
+ : goal with a local retry is to make it so that KVM _never_ triggers zero-step,
+ : unless there is a bug somewhere.  At that point, if zero-step fires, KVM can
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ : report the error to userspace instead of trying to suppress guest activity, and
+ : potentially from other KVM tasks too.
 
-Brian Gerst
+In other words, for the selftest you crafted, KVM reporting an error to userspace
+due to zero-step would be working as intended.  
 
-[1] https://lore.kernel.org/all/20231026160100.195099-6-brgerst@gmail.com/
+> E.g. in below selftest with a TD configured with pending_ve_disable=N,
+> zero step mitigation can be triggered on a vCPU that is stuck in EPT violation
+> vm exit for more than 6 times (due to that user space does not do memslot
+> conversion correctly).
+> 
+> So, if vCPU A wins the chance to call tdh_mem_page_aug(), the SEAMCALL may
+> contend with zero step mitigation code in tdh_vp_enter() in vCPU B stuck
+> in EPT violation vm exits.
 
