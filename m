@@ -1,159 +1,129 @@
-Return-Path: <kvm+bounces-28154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28155-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24AD49957FA
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 21:57:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3F80995810
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 22:02:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E6171F2251C
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 19:57:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07F421C20FC5
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 20:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365FF21500C;
-	Tue,  8 Oct 2024 19:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5531D215026;
+	Tue,  8 Oct 2024 20:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sNLVO2Y+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rN+E6v8u"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5ED7213EF2
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 19:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F64238DD6;
+	Tue,  8 Oct 2024 20:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728417409; cv=none; b=GM7NR8KJKjJGIuWtqUlUgiefXODT1ZhLqvcoQnqz83gaGob8X6A6bcT/fvBC85oTyCgtqqa/2c8UW/LR898KwsiE5ofIMiiBV/EVvMLXOktNg4Pzh+oNg7I7Tw+kL6K4qoZEpim8xq7zLHCR/nfWJbAguvE+P5Uzq5zEOmy+w0w=
+	t=1728417746; cv=none; b=XnZ8GUmHQfB9wZhIN03KB7n7quy50H1Zd6twTmkUVMEu0ZT61Si5ZosCKqSW6//FJaU0brsRGvp+Ie1eG3XTHvftGI8WmiQGjwcQ6qS089FeSzIs9LT9Z0vz+FtPgsnOmlbnEW1yaKICXBJ64i8+J3oGcHtK9LAHaiOr7rYHwBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728417409; c=relaxed/simple;
-	bh=lJ13KuCMxM+rGS6o4c5nzT7RJcxdk/8pPHoQ2SxGCac=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iBvOf0pPfuVjK58lwDVbWBR4wysK74XhRDkF39ZZB8irQhM6anFwrKzZXO7+gLfV/XIFekYd2A3uMZYqONURhza+nujatvEaY+AxuYpvMcdI/W4vM+NTLU8Rq2mtPdaTlGQop0w9lvV2xfh3Pk/Q9VInnXqHYtg+779PNHZW14A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sNLVO2Y+; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7163489149fso6786897a12.3
-        for <kvm@vger.kernel.org>; Tue, 08 Oct 2024 12:56:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728417407; x=1729022207; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z/G+V8S+q0QrqWGrvEamJlOg78EP9KmYBGMaK7S1DW0=;
-        b=sNLVO2Y+ZGXrk6RtwKZE7YqHM8bPryppBG+/7hGML41/pnL1cb/uihynRVuhIT/ZlK
-         cEwInNPyDzNquXLvfArwe/FIvYjCqrfFqMVPo9YBdimTTB3u5To4uIPlvkhkF748E7Om
-         QRoUSnsGVY4AEmlp8cAy0t+w3o34FsIJ4zekxPBKrX5qiAPJFuuV+StMJmL/OjgW9uJR
-         weCi/a0VosIKdn14acfTv5m6inmMw4+RIUY4EUsf8TqW4ADgB4qU/4iL7danprnteY8T
-         GuhehGFM9f9i/mHNwXs4BLpZWYbdu251+bcluXcYp4lpNXny8gE408jDLn+bMn6mtE0/
-         n7HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728417407; x=1729022207;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z/G+V8S+q0QrqWGrvEamJlOg78EP9KmYBGMaK7S1DW0=;
-        b=Opm781YjWBFt0QrgQVUCkmvsvXch3NvjKmv35h63SrOIpbJmu8Sbb+plkOpwI/+62i
-         yfRk3RNbBbHYK1Fq4EQzuYkRSVuVL8XYJXH7KwZ2IxomslgzcSzOKQ7lGnkrCxrBPrmA
-         Apuv/joEIjgsxxQkvV16lM4iuVrDIolh890r2ypmL9g0cdiFnRafWFj8l1f56RYTa52x
-         vzrGDLV3kW619blIhzuc+71YHl9rdUTOKaQntp7W4j0ByBxrAmHLg9ZuvD8m0T9AujmP
-         ziHeIM3XDPTlSDp23IiXAiwfd8+sLXScc2ApAFl3C3a5X6BEyv5MaGIrOYlnhzHDKldV
-         eTpg==
-X-Forwarded-Encrypted: i=1; AJvYcCU5YJ5WeMKvU/4ENZ40EermUvnMEg6EBv4oLOKQBx7WUSyIiAm8y7ZTXGO16lH5YR5SIrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY4o4uIA97pRkfR56XHy36qLcn8+gANA40WZKjgyexyJUrSM26
-	TmsCBCkxJrvdSi5HcFhuntWBV+L91jmluvsgOIp/rp+Ade6v7K7zkeMu/P6xwY4OQMaZQGtdMbZ
-	pgQ==
-X-Google-Smtp-Source: AGHT+IHyx9QyjvcH0QuqsTJ5s9OSvQOQBKzDDSMtuR28E1GHQRe/I98C0rGCGAu3RxyW1QfCFMI9GKgHUE4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a63:f151:0:b0:7e9:f98c:e9f7 with SMTP id
- 41be03b00d2f7-7ea320f3304mr172a12.10.1728417406827; Tue, 08 Oct 2024 12:56:46
- -0700 (PDT)
-Date: Tue, 8 Oct 2024 12:56:45 -0700
-In-Reply-To: <diqz1q0qtqnd.fsf@ackerleytng-ctop.c.googlers.com>
+	s=arc-20240116; t=1728417746; c=relaxed/simple;
+	bh=mwnu9JDu0/QJ39vaeqgzPRoqn/uQOdBvX8cshH9rI2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q1cIcYBCVNp+r5958RzSWAtJhnMaiL5euuPCKQL5pMVioAfzAKJmSrJQfUO+/nVOgA0zSrCyJn09aeVYiT0aPRQcVCNb+KSJhjVGS4i/ECavHN/HZ+tMCE8xMs/wjbKDP0+2kwoHE0THApl+GH01VNEjRNUD+yG2eIQHyk3R5hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rN+E6v8u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF43C4CEC7;
+	Tue,  8 Oct 2024 20:02:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728417745;
+	bh=mwnu9JDu0/QJ39vaeqgzPRoqn/uQOdBvX8cshH9rI2M=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=rN+E6v8uF4ioUNKLIm91KJY7WajT816xax0xLKmMg82r/VdNKxRi2SuPyaYp5mvMp
+	 3iEUmIoUxBqAzw3S+3xHFwxDjNUXJ1ms4vvTgy40qSQdbS1e5YsXgihqx/FlfH41CR
+	 B5yXHM1xV2RQDH8pdQ+oYSffGAkWue72wxmp8FzHSdYe8F0+gQDgEtxtt3iMaFayap
+	 QQgLNNDuCW4krxkjKxBJa5Jy1wKnBCXJ8lwHOvYQ4u/HYgc6yow8XGPEF6rU7+hsiS
+	 Kkfhf7h/1UX7Uoiu1m8M2TLxAcmXcKHBMcjwCNjgHqioPraMS1As8rwzYnC/B4K15R
+	 l1T7CHnBap8VA==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 56F9BCE0DD1; Tue,  8 Oct 2024 13:02:25 -0700 (PDT)
+Date: Tue, 8 Oct 2024 13:02:25 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <acf7a96b-facb-469b-8079-edbec7770780@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+ <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
+ <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
+ <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
+ <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
+ <ZnVInAV8BXhgAjP_@pc636>
+ <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
+ <b3d9710a-805e-4e37-8295-b5ec1133d15c@paulmck-laptop>
+ <37807ec7-d521-4f01-bcfc-a32650d5de25@suse.cz>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <e8f55fef-1821-408e-88ed-b25200ef66c9@amazon.co.uk> <diqz1q0qtqnd.fsf@ackerleytng-ctop.c.googlers.com>
-Message-ID: <ZwWOfXd9becAm4lH@google.com>
-Subject: Re: [RFC PATCH 30/39] KVM: guest_memfd: Handle folio preparation for
- guest_memfd mmap
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Patrick Roy <roypat@amazon.co.uk>, quic_eberman@quicinc.com, tabba@google.com, 
-	jgg@nvidia.com, peterx@redhat.com, david@redhat.com, rientjes@google.com, 
-	fvdl@google.com, jthoughton@google.com, pbonzini@redhat.com, 
-	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
-	isaku.yamahata@intel.com, muchun.song@linux.dev, mike.kravetz@oracle.com, 
-	erdemaktas@google.com, vannapurve@google.com, qperret@google.com, 
-	jhubbard@nvidia.com, willy@infradead.org, shuah@kernel.org, 
-	brauner@kernel.org, bfoster@redhat.com, kent.overstreet@linux.dev, 
-	pvorel@suse.cz, rppt@kernel.org, richard.weiyang@gmail.com, 
-	anup@brainfault.org, haibo1.xu@intel.com, ajones@ventanamicro.com, 
-	vkuznets@redhat.com, maciej.wieczor-retman@intel.com, pgonda@google.com, 
-	oliver.upton@linux.dev, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-fsdevel@kvack.org, 
-	jgowans@amazon.com, kalyazin@amazon.co.uk, derekmn@amazon.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37807ec7-d521-4f01-bcfc-a32650d5de25@suse.cz>
 
-On Tue, Oct 08, 2024, Ackerley Tng wrote:
-> Patrick Roy <roypat@amazon.co.uk> writes:
-> > For the "non-CoCo with direct map entries removed" VMs that we at AWS
-> > are going for, we'd like a VM type with host-controlled in-place
-> > conversions which doesn't zero on transitions,
+On Tue, Oct 08, 2024 at 06:41:12PM +0200, Vlastimil Babka wrote:
+> On 7/24/24 15:53, Paul E. McKenney wrote:
+> > On Mon, Jul 15, 2024 at 10:39:38PM +0200, Vlastimil Babka wrote:
+> >> On 6/21/24 11:32 AM, Uladzislau Rezki wrote:
+> >> > On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
+> >> > One question. Maybe it is already late but it is better to ask rather than not.
+> >> > 
+> >> > What do you think if we have a small discussion about it on the LPC 2024 as a
+> >> > topic? It might be it is already late or a schedule is set by now. Or we fix
+> >> > it by a conference time.
+> >> > 
+> >> > Just a thought.
+> >> 
+> >> Sorry for the late reply. The MM MC turned out to be so packed I didn't even
+> >> propose a slab topic. We could discuss in hallway track or a BOF, but
+> >> hopefully if the current direction taken by my RFC brings no unexpected
+> >> surprise, and the necessary RCU barrier side is also feasible, this will be
+> >> settled by time of plumbers.
+> > 
+> > That would be even better!
+> > 
+> > 							Thanx, Paul
+> 
+> Hah, so it was close but my hope was fulfilled in the end!
 
-Hmm, your use case shouldn't need conversions _for KVM_, as there's no need for
-KVM to care if userspace or the guest _wants_ a page to be shared vs. private.
-Userspace is fully trusted to manage things; KVM simply reacts to the current
-state of things.
+Nice, and thank you!!!
 
-And more importantly, whether or not the direct map is zapped needs to be a
-property of the guest_memfd inode, i.e. can't be associated with a struct kvm.
-I forget who got volunteered to do the work, but we're going to need similar
-functionality for tracking the state of individual pages in a huge folio, as
-folio_mark_uptodate() is too coarse-grained.  I.e. at some point, I expect that
-guest_memfd will make it easy-ish to determine whether or not the direct map has
-been obliterated.
+							Thanx, Paul
 
-The shared vs. private attributes tracking in KVM is still needed (I think), as
-it communicates what userspace _wants_, whereas he guest_memfd machinery will
-track what the state _is_.
-
-> > so if KVM_X86_SW_PROTECTED_VM ends up zeroing, we'd need to add another new
-> > VM type for that.
-
-Maybe we should sneak in a s/KVM_X86_SW_PROTECTED_VM/KVM_X86_SW_HARDENED_VM rename?
-The original thought behind "software protected VM" was to do a slow build of
-something akin to pKVM, but realistically I don't think that idea is going anywhere.
-
-Alternatively, depending on how KVM accesses guest memory that's been removed from
-the direct map, another solution would be to allow "regular" VMs to bind memslots
-to guest_memfd, i.e. if the non-CoCo use case needs/wnats to bind all memory to
-guest_memfd, not just "private" mappings.
-
-That's probably the biggest topic of discussion: how do we want to allow mapping
-guest_memfd into the guest, without direct map entries, but while still allowing
-KVM to access guest memory as needed, e.g. for shadow paging.  One approach is
-your RFC, where KVM maps guest_memfd pfns on-demand.
-
-Another (slightly crazy) approach would be use protection keys to provide the
-security properties that you want, while giving KVM (and userspace) a quick-and-easy
-override to access guest memory.
-
- 1. mmap() guest_memfd into userpace with RW protections
- 2. Configure PKRU to make guest_memfd memory inaccessible by default
- 3. Swizzle PKRU on-demand when intentionally accessing guest memory
-
-It's essentially the same idea as SMAP+STAC/CLAC, just applied to guest memory
-instead of to usersepace memory.
-
-The benefit of the PKRU approach is that there are no PTE modifications, and thus
-no TLB flushes, and only the CPU that is access guest memory gains temporary
-access.  The big downside is that it would be limited to modern hardware, but
-that might be acceptable, especially if it simplifies KVM's implementation.
-
-> > Somewhat related sidenote: For VMs that allow inplace conversions and do
-> > not zero, we do not need to zap the stage-2 mappings on memory attribute
-> > changes, right?
-
-See above.  I don't think conversions by toggling the shared/private flag in
-KVM's memory attributes is the right fit for your use case.
+> commit bdf56c7580d267a123cc71ca0f2459c797b76fde
+> Merge: efdfcd40ad5e ecc4d6af979b
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Wed Sep 18 08:53:53 2024 +0200
+> 
+>     Merge tag 'slab-for-6.12' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/vbabka/slab
+> 
+> So that was at 8:53 Vienna time, and Plumbers started at 10:00...
 
