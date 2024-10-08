@@ -1,178 +1,140 @@
-Return-Path: <kvm+bounces-28090-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28096-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D933993BE3
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 02:46:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF22993D69
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 05:19:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11A7B282FF0
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 00:46:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0B471C22C05
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 03:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB012C147;
-	Tue,  8 Oct 2024 00:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFzSBh86"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8507D34CF5;
+	Tue,  8 Oct 2024 03:19:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BB510F1;
-	Tue,  8 Oct 2024 00:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C560722611
+	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 03:19:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728348364; cv=none; b=X2XmbqELrkE/aPx+h1r0rRIWJ/CsVt7g6Hp73fs58OvrR5Bs/1RidGcLtbH8x14zu5dQN547OAiXL2NfLQpMmRoBKygVQslM2g+tHjz4deh1y2G9kMIcMuv2V+DzA7tCe+7q1OxXDPWpoiWQJ62PLlbEjGpzpAwu446ERlWuglk=
+	t=1728357573; cv=none; b=nZhkfgSeWkJXpNxVIqvtTF5hDejGy7rBtiXAdtro4i+MlfKU+Vo+shwWXKO2xRDniIWw34VvwwtNNNbVI0Qt5YVvBGyvDl/fLDA4BMzAr8DXzEMaqPyKy/bz/u1xRmh9EqWOwe0d0e4bdnPS6TlgnH5e2OkhLT0/JS9lNqBs+Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728348364; c=relaxed/simple;
-	bh=6Gor2689cfKtERd+MZJEELlNXHgAt1WIN5uGOjLUqsU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VAz36DfZC8FT6/8O0LsfWrxY6Wjy6u0J3MdboFlD1YvyuRLlPyJw5k5ut8/4F5B9FmIfTouF1FUfdMh+JTg+UdniCsIMf3puikM5o+UFPTBH3xR2AohcczRh34ODR3dMQp1Jku/H3C6fS60pF93vMULhq/+BQ38kdYCBsd68sc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZFzSBh86; arc=none smtp.client-ip=209.85.222.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-84f98af14a0so212509241.2;
-        Mon, 07 Oct 2024 17:46:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728348362; x=1728953162; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DwrZU7+WRXa2SBCQtrdGDwpBC/7fI0xHGdzxrY4bl/4=;
-        b=ZFzSBh86Dl7SKH0IChlQS8dgbXIOhCWDnsB5F3kzErZRYDdjthn1yec++yoHgXu2/L
-         be4iwie9gRtzu4BTnQHT9FBsEJoILR+yf5CdcxSHIS943+ZEmSUGzdcDSv+n1p8M6n+3
-         DxOz36v3JooI+jHd2xwrzaW/aaWkzFeiOhPttvDu9XUN/ZXh9qf9xnftCFNixVA8S2fO
-         o1uieB8rMpXWzQSre5OXYqK7on9RWNpkp7t1Gb1BSdxTfHvDh5IxJk6l84OkzjG4q8yh
-         0VQmdGlh0/1VFi/rYlB8xsiCvLbKhYXDmXVgEOh4Icrd+VNKKrFATd5YmxcYRm3nZaaw
-         G0IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728348362; x=1728953162;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DwrZU7+WRXa2SBCQtrdGDwpBC/7fI0xHGdzxrY4bl/4=;
-        b=WVejRz0pk64gJPsO3FXenF24BFYG45Wz4jKTROZqGJilrYjrdzxvNVUEmEBjNi3r62
-         XxcxzcIrA1crZSGe3HCae+7nDrsfhH31l9ZYQXSgH+Y1Q4jKhjmTWxtymHMx2+FV8KHf
-         8BKCKeEYH8CBmvv+Z8BHWEkEMNxVb+zg0hXX+8qobSuM9nnWcdPZiKlSMtAmY8WRGfL5
-         7ou+z54ikLB9VhEc0Na3KXsrDenNDOoRTyiea8zCLIxGUKrdgHq1RBSxsQ5UcAfn+klT
-         rN4T7lcDdcjZ2tuyvSar81WviS/VvhIwNy1oyAwvgvgZxIlNbzJW1WCXhdsrjzE9Wlhz
-         ZdZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVc1NDi7fMpLzzFw2R7jzj0YpSFUenPJszoB+vL5sr5T0MUkfSab0ET5qdJBAQDksWf5OY=@vger.kernel.org, AJvYcCVc7yq/wEVxOUZuPCa0DINUHpdi1WeiIARH/OWG30Nc4ggMD9Q1sqXx6ZmSIasFlxEqieTkGQIIvF/qmG/t@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHiiAstFmLv1nFaowJCjx0pQD/r2+r4uQ8WgwlzqhChcYb3z1Z
-	He9JuThnjBHKmedOlymOLJ0hq9/3Q9Uifky6zUhuo7iwZ5P6Fxy8n2rX8Ox2bEJuME6P1WEyqsJ
-	kkufRJBDdBVKn97eQ3Y3pbEFbW9E=
-X-Google-Smtp-Source: AGHT+IHSJlvK4jZXDTbKT7zFv1I0YNJsGBRL7BUreec71rnnZExDUt435St1qHWdGUc4qJLEHqo7Brx0xwV9I6zN6Oo=
-X-Received: by 2002:a05:6102:440b:b0:4a3:c830:81e9 with SMTP id
- ada2fe7eead31-4a40574966fmr11623307137.6.1728348362222; Mon, 07 Oct 2024
- 17:46:02 -0700 (PDT)
+	s=arc-20240116; t=1728357573; c=relaxed/simple;
+	bh=1v6Fj68HsPnGJ8vgiACtZGne6PZXXkqWbbP8SmZXbuY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DsmoD2d9/7QFqOPSSd4AgiUkb8Er62Vd1twkhM7NuSN+WVJhCIs5rXikzJVp8ljWBNUglHd7r6nKejimkZqpMPDAonoyiji4aTL/Z6ys5vW5fjDYu60syui8ziUMoXTJovSB8OJ2ADHDw+TgSghuBnGEFOnNoHfrwZpSBUb6r1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: "Gao,Shiyuan" <gaoshiyuan@baidu.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v1 1/1] x86: Add support save/load HWCR MSR
+Thread-Topic: [PATCH v1 1/1] x86: Add support save/load HWCR MSR
+Thread-Index: AQHbD8m2GzzAu7a83kSSJ9vdQ5PkZLJ8OV4A
+Date: Tue, 8 Oct 2024 02:47:54 +0000
+Message-ID: <0EDECA68-F61C-4668-83F0-B8F5E8219196@baidu.com>
+References: <20240926040808.9158-1-gaoshiyuan@baidu.com>
+In-Reply-To: <20240926040808.9158-1-gaoshiyuan@baidu.com>
+Accept-Language: en-US, zh-CN
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AD1849B55D93F34AB28D5B5998D9BE78@internal.baidu.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240916181633.366449-1-heinrich.schuchardt@canonical.com>
- <20240917-f45624310204491aede04703@orel> <15c359a4-b3c1-4cb0-be2e-d5ca5537bc5b@canonical.com>
- <20240917-b13c51d41030029c70aab785@orel> <8b24728f-8b6e-4c79-91f6-7cbb79494550@canonical.com>
- <20240918-039d1e3bebf2231bd452a5ad@orel> <CAFEAcA-Yg9=5naRVVCwma0Ug0vFZfikqc6_YiRQTrfBpoz9Bjw@mail.gmail.com>
- <bab7a5ce-74b6-49ae-b610-9a0f624addc0@canonical.com> <CAFEAcA-L7sQfK6MNt1ZbZqUMk+TJor=uD3Jj-Pc6Vy9j9JHhYQ@mail.gmail.com>
- <f1e41b95-c499-4e06-91cb-006dcd9d29e6@canonical.com> <CAFEAcA_ePVwnpVVWJSx8=-8v2h_z2imfSdyAZd62RhXaZUTojA@mail.gmail.com>
-In-Reply-To: <CAFEAcA_ePVwnpVVWJSx8=-8v2h_z2imfSdyAZd62RhXaZUTojA@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 8 Oct 2024 10:45:36 +1000
-Message-ID: <CAKmqyKPoom+iQbrNn7xuebRdd9DfX3GAJQQM+8fswEqfRi3e_A@mail.gmail.com>
-Subject: Re: [PATCH 1/1] target/riscv: enable floating point unit
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>, 
-	Weiwei Li <liwei1518@gmail.com>, Daniel Henrique Barboza <dbarboza@ventanamicro.com>, 
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, qemu-riscv@nongnu.org, qemu-devel@nongnu.org, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Andrew Jones <ajones@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-FEAS-Client-IP: 10.127.64.13
+X-FE-Last-Public-Client-IP: 100.100.100.60
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-On Thu, Sep 19, 2024 at 1:34=E2=80=AFAM Peter Maydell <peter.maydell@linaro=
-.org> wrote:
->
-> On Wed, 18 Sept 2024 at 14:49, Heinrich Schuchardt
-> <heinrich.schuchardt@canonical.com> wrote:
-> >
-> > On 18.09.24 15:12, Peter Maydell wrote:
-> > > On Wed, 18 Sept 2024 at 14:06, Heinrich Schuchardt
-> > > <heinrich.schuchardt@canonical.com> wrote:
-> > >> Thanks Peter for looking into this.
-> > >>
-> > >> QEMU's cpu_synchronize_all_post_init() and
-> > >> do_kvm_cpu_synchronize_post_reset() both end up in
-> > >> kvm_arch_put_registers() and that is long after Linux
-> > >> kvm_arch_vcpu_create() has been setting some FPU state. See the outp=
-ut
-> > >> below.
-> > >>
-> > >> kvm_arch_put_registers() copies the CSRs by calling
-> > >> kvm_riscv_put_regs_csr(). Here we can find:
-> > >>
-> > >>       KVM_RISCV_SET_CSR(cs, env, sstatus, env->mstatus);
-> > >>
-> > >> This call enables or disables the FPU according to the value of
-> > >> env->mstatus.
-> > >>
-> > >> So we need to set the desired state of the floating point unit in QE=
-MU.
-> > >> And this is what the current patch does both for TCG and KVM.
-> > >
-> > > If it does this for both TCG and KVM then I don't understand
-> > > this bit from the commit message:
-> > >
-> > > # Without this patch EDK II with TLS enabled crashes when hitting the=
- first
-> > > # floating point instruction while running QEMU with --accel kvm and =
-runs
-> > > # fine with --accel tcg.
-> > >
-> > > Shouldn't this guest crash the same way with both KVM and TCG without
-> > > this patch, because the FPU state is the same for both?
->
-> > By default `qemu-system-riscv64 --accel tcg` runs OpenSBI as firmware
-> > which enables the FPU.
-> >
-> > If you would choose a different SBI implementation which does not enabl=
-e
-> > the FPU you could experience the same crash.
->
-> Ah, so KVM vs TCG is a red herring and it's actually "some guest
-> firmware doesn't enable the FPU itself, and if you run that then it will
-> fall over, whether you do it in KVM or TCG" ? That makes more sense.
->
-> I don't have an opinion on whether you want to do that or not,
-> not knowing what the riscv architecture mandates. (On Arm this
-> would be fairly clearly "the guest software is broken and
-> should be fixed", but that's because the Arm architecture
-> says you can't assume the FPU is enabled from reset.)
-
-RISC-V is the same. Section "3.4 Reset" states that:
-
-"All other hart state is UNSPECIFIED." (the paragraph doesn't mention
-the FS state).
-
-So it's unspecified what the value is on reset. Guest software
-shouldn't assume anything about it and it does seem like a guest
-software bug.
-
-In saying that, we are allowed to set it then as the spec doesn't say
-it should be 0. So setting it to 0x01 (Initial) doesn't seem like a
-bad idea, as the name kind of implies that it should be 0x01 on reset
-
-Alistair
-
->
-> I do think the commit message could use clarification to
-> explain this.
->
-> thanks
-> -- PMM
->
+UGluZy4NCg0KPiBLVk0gY29tbWl0IDE5MWM4MTM3YTkzOSAoIng4Ni9rdm06IEltcGxlbWVudCBI
+V0NSIHN1cHBvcnQiKQ0KPiBpbnRyb2R1Y2VkIHN1cHBvcnQgZm9yIGVtdWxhdGluZyBIV0NSIE1T
+Ui4NCj4NCj4gQWRkIHN1cHBvcnQgZm9yIFFFTVUgdG8gc2F2ZS9sb2FkIHRoaXMgTVNSIGZvciBt
+aWdyYXRpb24gcHVycG9zZXMuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IEdhbyBTaGl5dWFuIDxnYW9z
+aGl5dWFuQGJhaWR1LmNvbT4NCj4gLS0tDQo+IHRhcmdldC9pMzg2L2NwdS5jICAgICB8ICAxICsN
+Cj4gdGFyZ2V0L2kzODYvY3B1LmggICAgIHwgIDUgKysrKysNCj4gdGFyZ2V0L2kzODYva3ZtL2t2
+bS5jIHwgMTIgKysrKysrKysrKysrDQo+IHRhcmdldC9pMzg2L21hY2hpbmUuYyB8IDIwICsrKysr
+KysrKysrKysrKysrKysrDQo+IDQgZmlsZXMgY2hhbmdlZCwgMzggaW5zZXJ0aW9ucygrKQ0KPg0K
+PiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYvY3B1LmMgYi90YXJnZXQvaTM4Ni9jcHUuYw0KPiBp
+bmRleCA4NWVmNzQ1MmMwLi4zMzkxMzFhMzlhIDEwMDY0NA0KPiAtLS0gYS90YXJnZXQvaTM4Ni9j
+cHUuYw0KPiArKysgYi90YXJnZXQvaTM4Ni9jcHUuYw0KPiBAQCAtNzA5Myw2ICs3MDkzLDcgQEAg
+c3RhdGljIHZvaWQgeDg2X2NwdV9yZXNldF9ob2xkKE9iamVjdCAqb2JqLCBSZXNldFR5cGUgdHlw
+ZSkNCj4gICAgICBlbnYtPmEyMF9tYXNrID0gfjB4MDsNCj4gICAgICBlbnYtPnNtYmFzZSA9IDB4
+MzAwMDA7DQo+ICAgICAgZW52LT5tc3Jfc21pX2NvdW50ID0gMDsNCj4gKyAgICBlbnYtPmh3Y3Ig
+PSAwOw0KPg0KPiAgICAgIGVudi0+aWR0LmxpbWl0ID0gMHhmZmZmOw0KPiAgICAgIGVudi0+Z2R0
+LmxpbWl0ID0gMHhmZmZmOw0KPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYvY3B1LmggYi90YXJn
+ZXQvaTM4Ni9jcHUuaA0KPiBpbmRleCAxNGVkZDU3YTM3Li5hMTliMWNlZGE0IDEwMDY0NA0KPiAt
+LS0gYS90YXJnZXQvaTM4Ni9jcHUuaA0KPiArKysgYi90YXJnZXQvaTM4Ni9jcHUuaA0KPiBAQCAt
+NTM5LDYgKzUzOSw4IEBAIHR5cGVkZWYgZW51bSBYODZTZWcgew0KPg0KPiAjZGVmaW5lIE1TUl9B
+TUQ2NF9UU0NfUkFUSU9fREVGQVVMVCAgICAgMHgxMDAwMDAwMDBVTEwNCj4NCj4gKyNkZWZpbmUg
+TVNSX0s3X0hXQ1IgICAgICAgICAgICAgICAgICAgICAweGMwMDEwMDE1DQo+ICsNCj4gI2RlZmlu
+ZSBNU1JfVk1fSFNBVkVfUEEgICAgICAgICAgICAgICAgIDB4YzAwMTAxMTcNCj4NCj4gI2RlZmlu
+ZSBNU1JfSUEzMl9YRkQgICAgICAgICAgICAgICAgICAgIDB4MDAwMDAxYzQNCj4gQEAgLTE4NTks
+NiArMTg2MSw5IEBAIHR5cGVkZWYgc3RydWN0IENQVUFyY2hTdGF0ZSB7DQo+ICAgICAgdWludDY0
+X3QgbXNyX2xicl9kZXB0aDsNCj4gICAgICBMQlJFbnRyeSBsYnJfcmVjb3Jkc1tBUkNIX0xCUl9O
+Ul9FTlRSSUVTXTsNCj4NCj4gKyAgICAvKiBIYXJkd2FyZSBDb25maWd1cmF0aW9uIE1TUiAqLw0K
+PiArICAgIHVpbnQ2NF90IGh3Y3I7DQo+ICsNCj4gICAgICAvKiBleGNlcHRpb24vaW50ZXJydXB0
+IGhhbmRsaW5nICovDQo+ICAgICAgaW50IGVycm9yX2NvZGU7DQo+ICAgICAgaW50IGV4Y2VwdGlv
+bl9pc19pbnQ7DQo+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9rdm0va3ZtLmMgYi90YXJnZXQv
+aTM4Ni9rdm0va3ZtLmMNCj4gaW5kZXggYWRhNTgxYzVkNi4uMjE1YzEzZWIxMyAxMDA2NDQNCj4g
+LS0tIGEvdGFyZ2V0L2kzODYva3ZtL2t2bS5jDQo+ICsrKyBiL3RhcmdldC9pMzg2L2t2bS9rdm0u
+Yw0KPiBAQCAtMTQ1LDYgKzE0NSw3IEBAIHN0YXRpYyBib29sIGhhc19tc3JfdWNvZGVfcmV2Ow0K
+PiBzdGF0aWMgYm9vbCBoYXNfbXNyX3ZteF9wcm9jYmFzZWRfY3RsczI7DQo+IHN0YXRpYyBib29s
+IGhhc19tc3JfcGVyZl9jYXBhYnM7DQo+IHN0YXRpYyBib29sIGhhc19tc3JfcGtyczsNCj4gK3N0
+YXRpYyBib29sIGhhc19tc3JfaHdjcjsNCj4NCj4gc3RhdGljIHVpbnQzMl90IGhhc19hcmNoaXRl
+Y3R1cmFsX3BtdV92ZXJzaW9uOw0KPiBzdGF0aWMgdWludDMyX3QgbnVtX2FyY2hpdGVjdHVyYWxf
+cG11X2dwX2NvdW50ZXJzOw0KPiBAQCAtMjU1NCw2ICsyNTU1LDggQEAgc3RhdGljIGludCBrdm1f
+Z2V0X3N1cHBvcnRlZF9tc3JzKEtWTVN0YXRlICpzKQ0KPiAgICAgICAgICAgICAgY2FzZSBNU1Jf
+SUEzMl9QS1JTOg0KPiAgICAgICAgICAgICAgICAgIGhhc19tc3JfcGtycyA9IHRydWU7DQo+ICAg
+ICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgICAgICBjYXNlIE1TUl9LN19IV0NSOg0K
+PiArICAgICAgICAgICAgICAgIGhhc19tc3JfaHdjciA9IHRydWU7DQo+ICAgICAgICAgICAgICB9
+DQo+ICAgICAgICAgIH0NCj4gICAgICB9DQo+IEBAIC0zODI0LDYgKzM4MjcsOSBAQCBzdGF0aWMg
+aW50IGt2bV9wdXRfbXNycyhYODZDUFUgKmNwdSwgaW50IGxldmVsKQ0KPiAgICAgIGlmIChoYXNf
+bXNyX3ZpcnRfc3NiZCkgew0KPiAgICAgICAgICBrdm1fbXNyX2VudHJ5X2FkZChjcHUsIE1TUl9W
+SVJUX1NTQkQsIGVudi0+dmlydF9zc2JkKTsNCj4gICAgICB9DQo+ICsgICAgaWYgKGhhc19tc3Jf
+aHdjcikgew0KPiArICAgICAgICBrdm1fbXNyX2VudHJ5X2FkZChjcHUsIE1TUl9LN19IV0NSLCBl
+bnYtPmh3Y3IpOw0KPiArICAgIH0NCj4NCj4gI2lmZGVmIFRBUkdFVF9YODZfNjQNCj4gICAgICBp
+ZiAobG1fY2FwYWJsZV9rZXJuZWwpIHsNCj4gQEAgLTQzMDgsNiArNDMxNCw5IEBAIHN0YXRpYyBp
+bnQga3ZtX2dldF9tc3JzKFg4NkNQVSAqY3B1KQ0KPiAgICAgICAgICBrdm1fbXNyX2VudHJ5X2Fk
+ZChjcHUsIE1TUl9JQTMyX1RTQywgMCk7DQo+ICAgICAgICAgIGVudi0+dHNjX3ZhbGlkID0gIXJ1
+bnN0YXRlX2lzX3J1bm5pbmcoKTsNCj4gICAgICB9DQo+ICsgICAgaWYgKGhhc19tc3JfaHdjcikg
+ew0KPiArICAgICAgICBrdm1fbXNyX2VudHJ5X2FkZChjcHUsIE1TUl9LN19IV0NSLCAwKTsNCj4g
+KyAgICB9DQo+DQo+ICNpZmRlZiBUQVJHRVRfWDg2XzY0DQo+ICAgICAgaWYgKGxtX2NhcGFibGVf
+a2VybmVsKSB7DQo+IEBAIC00ODI3LDYgKzQ4MzYsOSBAQCBzdGF0aWMgaW50IGt2bV9nZXRfbXNy
+cyhYODZDUFUgKmNwdSkNCj4gICAgICAgICAgY2FzZSBNU1JfQVJDSF9MQlJfSU5GT18wIC4uLiBN
+U1JfQVJDSF9MQlJfSU5GT18wICsgMzE6DQo+ICAgICAgICAgICAgICBlbnYtPmxicl9yZWNvcmRz
+W2luZGV4IC0gTVNSX0FSQ0hfTEJSX0lORk9fMF0uaW5mbyA9IG1zcnNbaV0uZGF0YTsNCj4gICAg
+ICAgICAgICAgIGJyZWFrOw0KPiArICAgICAgICBjYXNlIE1TUl9LN19IV0NSOg0KPiArICAgICAg
+ICAgICAgZW52LT5od2NyID0gbXNyc1tpXS5kYXRhOw0KPiArICAgICAgICAgICAgYnJlYWs7DQo+
+ICAgICAgICAgIH0NCj4gICAgICB9DQo+DQo+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9tYWNo
+aW5lLmMgYi90YXJnZXQvaTM4Ni9tYWNoaW5lLmMNCj4gaW5kZXggMzlmODI5NGYyNy4uMmRiODNh
+Y2FmYSAxMDA2NDQNCj4gLS0tIGEvdGFyZ2V0L2kzODYvbWFjaGluZS5jDQo+ICsrKyBiL3Rhcmdl
+dC9pMzg2L21hY2hpbmUuYw0KPiBAQCAtMTU0Myw2ICsxNTQzLDI1IEBAIHN0YXRpYyBjb25zdCBW
+TVN0YXRlRGVzY3JpcHRpb24gdm1zdGF0ZV9tc3JfeGZkID0gew0KPiAgICAgIH0NCj4gfTsNCj4N
+Cj4gK3N0YXRpYyBib29sIG1zcl9od2NyX25lZWRlZCh2b2lkICpvcGFxdWUpDQo+ICt7DQo+ICsg
+ICAgWDg2Q1BVICpjcHUgPSBvcGFxdWU7DQo+ICsgICAgQ1BVWDg2U3RhdGUgKmVudiA9ICZjcHUt
+PmVudjsNCj4gKw0KPiArICAgIHJldHVybiBlbnYtPmh3Y3IgIT0gMDsNCj4gK30NCj4gKw0KPiAr
+c3RhdGljIGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbiB2bXN0YXRlX21zcl9od2NyID0gew0KPiAr
+ICAgIC5uYW1lID0gImNwdS9tc3JfaHdjciIsDQo+ICsgICAgLnZlcnNpb25faWQgPSAxLA0KPiAr
+ICAgIC5taW5pbXVtX3ZlcnNpb25faWQgPSAxLA0KPiArICAgIC5uZWVkZWQgPSBtc3JfaHdjcl9u
+ZWVkZWQsDQo+ICsgICAgLmZpZWxkcyA9IChWTVN0YXRlRmllbGRbXSkgew0KPiArICAgICAgICBW
+TVNUQVRFX1VJTlQ2NChlbnYuaHdjciwgWDg2Q1BVKSwNCj4gKyAgICAgICAgVk1TVEFURV9FTkRf
+T0ZfTElTVCgpDQo+ICsgICAgfQ0KPiArfTsNCj4gKw0KPiAjaWZkZWYgVEFSR0VUX1g4Nl82NA0K
+PiBzdGF0aWMgYm9vbCBpbnRlbF9mcmVkX21zcnNfbmVlZGVkKHZvaWQgKm9wYXF1ZSkNCj4gew0K
+PiBAQCAtMTc3Myw2ICsxNzkyLDcgQEAgY29uc3QgVk1TdGF0ZURlc2NyaXB0aW9uIHZtc3RhdGVf
+eDg2X2NwdSA9IHsNCj4gICAgICAgICAgJnZtc3RhdGVfbXNyX2ludGVsX3NneCwNCj4gICAgICAg
+ICAgJnZtc3RhdGVfcGRwdHJzLA0KPiAgICAgICAgICAmdm1zdGF0ZV9tc3JfeGZkLA0KPiArICAg
+ICAgICAmdm1zdGF0ZV9tc3JfaHdjciwNCj4gI2lmZGVmIFRBUkdFVF9YODZfNjQNCj4gICAgICAg
+ICAgJnZtc3RhdGVfbXNyX2ZyZWQsDQo+ICAgICAgICAgICZ2bXN0YXRlX2FteF94dGlsZSwNCj4g
+LS0NCj4gMi4zNC4xDQoNCg==
 
