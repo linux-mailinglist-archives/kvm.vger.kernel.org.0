@@ -1,237 +1,225 @@
-Return-Path: <kvm+bounces-28130-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28131-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED8C5994637
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 13:10:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5829A9946DE
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 13:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71CFD1F29012
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 11:10:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92F3EB22227
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2024 11:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024311DFE13;
-	Tue,  8 Oct 2024 11:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="flky8EG1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FA541DE4DC;
+	Tue,  8 Oct 2024 11:27:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B491DFE10
-	for <kvm@vger.kernel.org>; Tue,  8 Oct 2024 11:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CA01DD548;
+	Tue,  8 Oct 2024 11:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728385546; cv=none; b=rSOBHqw1dVAMG2ZCl4OYKM+D78SH8i1B8BWXiYWNdIwTqrO9odTF/M1q5HCQUDF7j59Xj+Z8ZimWO9FsmksEGZKlvnRtG6HnqpE62OT5AYRgOMuRfKH8OB0QH3uOJSQj30blAKKspnsAN66kSoCCCE81OYUDNjZDJuXamal/0f4=
+	t=1728386831; cv=none; b=pP/FXIXA3W6CawNS6yt9HeqFjn2SY2gS8DZblI5ym5RaiikDIj7ghtHG5jG+F362OH2DfcUJ+hJYc1hm51xuXW+JCHv3EE6DtMGru2Mig0dU6WnvPHm6pmjgJ4Vp1Kwlt3rjSikLaea640NUf5QBdQbZ7lFkiMtgqs1luyxZMR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728385546; c=relaxed/simple;
-	bh=blpyLMsuFMn24VZPPL8dDbNZnSR7Pou7ksJj/nytLXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H3jGceMMjrq4RI0kBsc2rJZrxjnLrnfgTxHrkCqYX/128oeoeF+NNg0bb6vWaY4/AoqyBqzAMZYh6CJJ9l6IMKcUKwYwZwTrv//cxQY8Kx8PoxLgG6pLYlSqelT5dCZGWw0O8R8lngiPeVGrSCa/fNNlsVS8JxheqWV2Ce0c4zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=flky8EG1; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fabb837ddbso75250901fa.1
-        for <kvm@vger.kernel.org>; Tue, 08 Oct 2024 04:05:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728385542; x=1728990342; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wxNxFS3ZbI3W4kQXbO0lCunpQ22o9dZ3gjnqPR7i4vQ=;
-        b=flky8EG1aHAhFOZU+fcGyaSoCVgdRKxcMW1PgG2kjfaTz3yfqrkb1WLRICnPxb+DNl
-         oqmBGTxO5Y7HL40xafgfz3W5cIdheWosnGfdrSCMqljJt39HueOFrSBRuUkXrNEqJdi7
-         +ctEqm20qppIzVTPqDzYH+tygvEC6OyKlDKyfwquW+HYUpBC3f594JJ+az1U+fsLjkyo
-         qFNcYFnISfjGozqdh+9/+dFSwliMNEZxmPq7NdXjoQJut3458cCV+df/shjSQCob/a03
-         fgr+XQ6fAG+/yKuMpX3ZaCYMSGgLDtSbLVY718zqcPJPjN6HO/TDBbC3COG85n5FQDpX
-         +hbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728385542; x=1728990342;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wxNxFS3ZbI3W4kQXbO0lCunpQ22o9dZ3gjnqPR7i4vQ=;
-        b=Teb5lZ7HzQTpcUAhY8ojcTgF4Tuv05suSWew3eL0vXs0fmtRrzO0mxxArlWRvTd5SA
-         Kcp/sp/wgwtVBV+dLj6q258XlDnXzaE5Xpb3s2m6qEL5coKK3E7W6YDM5snSzI+m+20Z
-         wIexOTGsViV1WqqKt2olysFgl7XCo1TznqonXryNK9qmEE3rR942DSzs1hjo9BOf02La
-         1ZUgNh3gqbdcyxfxrpSAu+TEtMOC2Aok+5DoiueQQQxatAir4iMvHJ0AgdpaiG02Rc6G
-         yf1Sxg1KabXVovAHb77WMrURG2yt7YBa5i7HI7G7EV20Gx1+wmnYDuAKFINepA9whk40
-         Hz6Q==
-X-Gm-Message-State: AOJu0Yw7/NqM6HvPU090kXOS7aNfDch+JssbAp/Z/R56eJgrldwnfnWe
-	B0SHMIdFgBqb7e6qqv09GzOrDFsEZsxLNozfazmyMhDUhR8n+EpdU1TqQwnHGQ8=
-X-Google-Smtp-Source: AGHT+IFUUVsOSGGJPAphsOFCoHIZ+0khfsB4/lk7TDogJccRq5ZqzE4wbYgRX+9fbyD9s7dMaYkATg==
-X-Received: by 2002:a05:651c:2211:b0:2f0:27da:6864 with SMTP id 38308e7fff4ca-2faf3c1e75emr93401371fa.17.1728385529761;
-        Tue, 08 Oct 2024 04:05:29 -0700 (PDT)
-Received: from myrica ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a993d92ed5dsm434265866b.63.2024.10.08.04.05.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 04:05:29 -0700 (PDT)
-Date: Tue, 8 Oct 2024 12:05:49 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [PATCH v6 11/11] arm64: Document Arm Confidential Compute
-Message-ID: <20241008110549.GA1058742@myrica>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-12-steven.price@arm.com>
+	s=arc-20240116; t=1728386831; c=relaxed/simple;
+	bh=XoHsQ7qwJruBKKANIQ1jxKeElUiyTS3ggUghVH8t8Qo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FQpASnuT0tlHSkPQL2tMgxAxETQkXAOGe7LooR8p02JCyv5gB2i20V+H71HIXGJnOSSxo2ucKrFK/Z4tUDz68z0gWuj6nyYkkvPyvnsZeM2bA76ojYVCAtmTrDYU0iXZ5PeYQlTWwdXcvFHI2FS6aezcUvSHdrmN4o3KL158/m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XNDFQ6x3Xzfd5N;
+	Tue,  8 Oct 2024 19:24:42 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 434271800DE;
+	Tue,  8 Oct 2024 19:27:06 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 8 Oct 2024 19:27:05 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
+	Alexander Duyck <alexanderduyck@fb.com>, Chuck Lever
+	<chuck.lever@oracle.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, =?UTF-8?q?Eugenio=20P=C3=A9rez?=
+	<eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
+ Dumazet <edumazet@google.com>, David Howells <dhowells@redhat.com>, Marc
+ Dionne <marc.dionne@auristor.com>, Trond Myklebust <trondmy@kernel.org>, Anna
+ Schumaker <anna@kernel.org>, Jeff Layton <jlayton@kernel.org>, Neil Brown
+	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Shuah Khan
+	<shuah@kernel.org>, <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-mm@kvack.org>, <linux-afs@lists.infradead.org>,
+	<linux-nfs@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+Subject: [PATCH net-next v20 04/14] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
+Date: Tue, 8 Oct 2024 19:20:38 +0800
+Message-ID: <20241008112049.2279307-5-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20241008112049.2279307-1-linyunsheng@huawei.com>
+References: <20241008112049.2279307-1-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241004144307.66199-12-steven.price@arm.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Fri, Oct 04, 2024 at 03:43:06PM +0100, Steven Price wrote:
-> Add some documentation on Arm CCA and the requirements for running Linux
-> as a Realm guest. Also update booting.rst to describe the requirement
-> for RIPAS RAM.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  Documentation/arch/arm64/arm-cca.rst | 67 ++++++++++++++++++++++++++++
->  Documentation/arch/arm64/booting.rst |  3 ++
->  Documentation/arch/arm64/index.rst   |  1 +
->  3 files changed, 71 insertions(+)
->  create mode 100644 Documentation/arch/arm64/arm-cca.rst
-> 
-> diff --git a/Documentation/arch/arm64/arm-cca.rst b/Documentation/arch/arm64/arm-cca.rst
-> new file mode 100644
-> index 000000000000..ab7f90e64c2f
-> --- /dev/null
-> +++ b/Documentation/arch/arm64/arm-cca.rst
-> @@ -0,0 +1,67 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +=====================================
-> +Arm Confidential Compute Architecture
-> +=====================================
-> +
-> +Arm systems that support the Realm Management Extension (RME) contain
-> +hardware to allow a VM guest to be run in a way which protects the code
-> +and data of the guest from the hypervisor. It extends the older "two
-> +world" model (Normal and Secure World) into four worlds: Normal, Secure,
-> +Root and Realm. Linux can then also be run as a guest to a monitor
-> +running in the Realm world.
-> +
-> +The monitor running in the Realm world is known as the Realm Management
-> +Monitor (RMM) and implements the Realm Management Monitor
-> +specification[1]. The monitor acts a bit like a hypervisor (e.g. it runs
-> +in EL2 and manages the stage 2 page tables etc of the guests running in
-> +Realm world), however much of the control is handled by a hypervisor
-> +running in the Normal World. The Normal World hypervisor uses the Realm
-> +Management Interface (RMI) defined by the RMM specification to request
-> +the RMM to perform operations (e.g. mapping memory or executing a vCPU).
-> +
-> +The RMM defines an environment for guests where the address space (IPA)
-> +is split into two. The lower half is protected - any memory that is
-> +mapped in this half cannot be seen by the Normal World and the RMM
-> +restricts what operations the Normal World can perform on this memory
-> +(e.g. the Normal World cannot replace pages in this region without the
-> +guest's cooperation). The upper half is shared, the Normal World is free
-> +to make changes to the pages in this region, and is able to emulate MMIO
-> +devices in this region too.
-> +
-> +A guest running in a Realm may also communicate with the RMM to request
-> +changes in its environment or to perform attestation about its
-> +environment. In particular it may request that areas of the protected
-> +address space are transitioned between 'RAM' and 'EMPTY' (in either
-> +direction). This allows a Realm guest to give up memory to be returned
-> +to the Normal World, or to request new memory from the Normal World.
-> +Without an explicit request from the Realm guest the RMM will otherwise
-> +prevent the Normal World from making these changes.
+Use appropriate frag_page API instead of caller accessing
+'page_frag_cache' directly.
 
-We could mention that this interface is "RSI", so readers know what to
-look for next
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+Acked-by: Chuck Lever <chuck.lever@oracle.com>
+---
+ drivers/vhost/net.c                                   |  2 +-
+ include/linux/page_frag_cache.h                       | 10 ++++++++++
+ net/core/skbuff.c                                     |  6 +++---
+ net/rxrpc/conn_object.c                               |  4 +---
+ net/rxrpc/local_object.c                              |  4 +---
+ net/sunrpc/svcsock.c                                  |  6 ++----
+ tools/testing/selftests/mm/page_frag/page_frag_test.c |  2 +-
+ 7 files changed, 19 insertions(+), 15 deletions(-)
 
-> +
-> +Linux as a Realm Guest
-> +----------------------
-> +
-> +To run Linux as a guest within a Realm, the following must be provided
-> +either by the VMM or by a `boot loader` run in the Realm before Linux:
-> +
-> + * All protected RAM described to Linux (by DT or ACPI) must be marked
-> +   RIPAS RAM before handing over the Linux.
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index f16279351db5..9ad37c012189 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
+ 			vqs[VHOST_NET_VQ_RX]);
+ 
+ 	f->private_data = n;
+-	n->pf_cache.va = NULL;
++	page_frag_cache_init(&n->pf_cache);
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
+index 67ac8626ed9b..0a52f7a179c8 100644
+--- a/include/linux/page_frag_cache.h
++++ b/include/linux/page_frag_cache.h
+@@ -7,6 +7,16 @@
+ #include <linux/mm_types_task.h>
+ #include <linux/types.h>
+ 
++static inline void page_frag_cache_init(struct page_frag_cache *nc)
++{
++	nc->va = NULL;
++}
++
++static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
++{
++	return !!nc->pfmemalloc;
++}
++
+ void page_frag_cache_drain(struct page_frag_cache *nc);
+ void __page_frag_cache_drain(struct page *page, unsigned int count);
+ void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 74149dc4ee31..ca01880c7ad0 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -753,14 +753,14 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
+ 	if (in_hardirq() || irqs_disabled()) {
+ 		nc = this_cpu_ptr(&netdev_alloc_cache);
+ 		data = page_frag_alloc(nc, len, gfp_mask);
+-		pfmemalloc = nc->pfmemalloc;
++		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
+ 	} else {
+ 		local_bh_disable();
+ 		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
+ 
+ 		nc = this_cpu_ptr(&napi_alloc_cache.page);
+ 		data = page_frag_alloc(nc, len, gfp_mask);
+-		pfmemalloc = nc->pfmemalloc;
++		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
+ 
+ 		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+ 		local_bh_enable();
+@@ -850,7 +850,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
+ 		len = SKB_HEAD_ALIGN(len);
+ 
+ 		data = page_frag_alloc(&nc->page, len, gfp_mask);
+-		pfmemalloc = nc->page.pfmemalloc;
++		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
+ 	}
+ 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+ 
+diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
+index 1539d315afe7..694c4df7a1a3 100644
+--- a/net/rxrpc/conn_object.c
++++ b/net/rxrpc/conn_object.c
+@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
+ 	 */
+ 	rxrpc_purge_queue(&conn->rx_queue);
+ 
+-	if (conn->tx_data_alloc.va)
+-		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
+-					conn->tx_data_alloc.pagecnt_bias);
++	page_frag_cache_drain(&conn->tx_data_alloc);
+ 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
+ }
+ 
+diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
+index 504453c688d7..a8cffe47cf01 100644
+--- a/net/rxrpc/local_object.c
++++ b/net/rxrpc/local_object.c
+@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
+ #endif
+ 	rxrpc_purge_queue(&local->rx_queue);
+ 	rxrpc_purge_client_connections(local);
+-	if (local->tx_alloc.va)
+-		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
+-					local->tx_alloc.pagecnt_bias);
++	page_frag_cache_drain(&local->tx_alloc);
+ }
+ 
+ /*
+diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+index 825ec5357691..b785425c3315 100644
+--- a/net/sunrpc/svcsock.c
++++ b/net/sunrpc/svcsock.c
+@@ -1608,7 +1608,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
+ static void svc_sock_free(struct svc_xprt *xprt)
+ {
+ 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
+-	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
+ 	struct socket *sock = svsk->sk_sock;
+ 
+ 	trace_svcsock_free(svsk, sock);
+@@ -1618,8 +1617,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
+ 		sockfd_put(sock);
+ 	else
+ 		sock_release(sock);
+-	if (pfc->va)
+-		__page_frag_cache_drain(virt_to_head_page(pfc->va),
+-					pfc->pagecnt_bias);
++
++	page_frag_cache_drain(&svsk->sk_frag_cache);
+ 	kfree(svsk);
+ }
+diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+index fdf204550c9a..36543a129e40 100644
+--- a/tools/testing/selftests/mm/page_frag/page_frag_test.c
++++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+@@ -117,7 +117,7 @@ static int __init page_frag_test_init(void)
+ 	u64 duration;
+ 	int ret;
+ 
+-	test_nc.va = NULL;
++	page_frag_cache_init(&test_nc);
+ 	atomic_set(&nthreads, 2);
+ 	init_completion(&wait);
+ 
+-- 
+2.33.0
 
-"handing control over to Linux", or something like that?
-
-> +
-> + * MMIO devices must be either unprotected (e.g. emulated by the Normal
-> +   World) or marked RIPAS DEV.
-> +
-> + * MMIO devices emulated by the Normal World and used very early in boot
-> +   (specifically earlycon) must be specified in the upper half of IPA.
-> +   For earlycon this can be done by specifying the address on the
-> +   command line, e.g.: ``earlycon=uart,mmio,0x101000000``
-
-This is going to be needed frequently, so maybe we should explain in a
-little more detail how we come up with this value: "e.g. with an IPA size
-of 33 and the base address of the emulated UART at 0x1000000,
-``earlycon=uart,mmio,0x101000000``"
-
-(Because the example IPA size is rather unintuitive and specific to the
-kvmtool memory map)
-
-Thanks,
-Jean
-
-> +
-> + * Linux will use bounce buffers for communicating with unprotected
-> +   devices. It will transition some protected memory to RIPAS EMPTY and
-> +   expect to be able to access unprotected pages at the same IPA address
-> +   but with the highest valid IPA bit set. The expectation is that the
-> +   VMM will remove the physical pages from the protected mapping and
-> +   provide those pages as unprotected pages.
-> +
-> +References
-> +----------
-> +[1] https://developer.arm.com/documentation/den0137/
-> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
-> index b57776a68f15..30164fb24a24 100644
-> --- a/Documentation/arch/arm64/booting.rst
-> +++ b/Documentation/arch/arm64/booting.rst
-> @@ -41,6 +41,9 @@ to automatically locate and size all RAM, or it may use knowledge of
->  the RAM in the machine, or any other method the boot loader designer
->  sees fit.)
->  
-> +For Arm Confidential Compute Realms this includes ensuring that all
-> +protected RAM has a Realm IPA state (RIPAS) of "RAM".
-> +
->  
->  2. Setup the device tree
->  -------------------------
-> diff --git a/Documentation/arch/arm64/index.rst b/Documentation/arch/arm64/index.rst
-> index 78544de0a8a9..12c243c3af20 100644
-> --- a/Documentation/arch/arm64/index.rst
-> +++ b/Documentation/arch/arm64/index.rst
-> @@ -10,6 +10,7 @@ ARM64 Architecture
->      acpi_object_usage
->      amu
->      arm-acpi
-> +    arm-cca
->      asymmetric-32bit
->      booting
->      cpu-feature-registers
-> -- 
-> 2.34.1
-> 
-> 
 
