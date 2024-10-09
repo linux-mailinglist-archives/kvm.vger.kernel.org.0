@@ -1,267 +1,268 @@
-Return-Path: <kvm+bounces-28200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69D77996546
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 11:26:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7035996558
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 11:29:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA7C6B287CB
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 09:26:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEF721C22363
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 09:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52EF5190685;
-	Wed,  9 Oct 2024 09:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BCF18B482;
+	Wed,  9 Oct 2024 09:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NH582tsb"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jCRSKpOt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2067.outbound.protection.outlook.com [40.107.212.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D3818E754;
-	Wed,  9 Oct 2024 09:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E559817;
+	Wed,  9 Oct 2024 09:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728465859; cv=fail; b=olpGxqfuKaL6TBHqiZC4g2PXviPadsG4qZBo7FXq9zPWkkp1+hTRYzhhYI5ieNF1ShHwY4jxrfR+kvVAkXgJQRJk6fL4qGetRTOWxOIu5YlLzZWI7/kQjcRbhj2x6OI9I7/XOYOR7D3O+1VpQJKxaAuQ+50p5pfvbU4MXnN+sqY=
+	t=1728466157; cv=fail; b=NqulGyNyq0ZwCEGSn5dsqPNP5r3Uzm3kWAXAqyohXqg5W4GPUCmEjhqWGJT89NraOPGncKVYeGGgAvIqI0ctvijwbAF15JSFubdk1Mv1FitF/OxUDzWxS8Nq6lpnak3zw9FOXDJoqt6qliqvTdXUqP5zSXHygyFv/DW8hwgE2Mc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728465859; c=relaxed/simple;
-	bh=uyOw+QleugpBZpzovhwltTN6DFy8uWkSql5AhQhZ/co=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=uH3iSVy0HMBSa4UFofsu3aKr+3E8kF113TmtB4zPaJFxKCSQzDT0bLZijkqDXyZCjNJlSlSgNnE2uVpqC9kw1FpJJRnxU5zNnH6QKXWE9YvqDQ4GmbGDRXekDjvy6fD4N8hZmmouki192LBKt71yNIZiWqZVKkwJJnO88fHOCNc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NH582tsb; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728465857; x=1760001857;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=uyOw+QleugpBZpzovhwltTN6DFy8uWkSql5AhQhZ/co=;
-  b=NH582tsbHwoinP3fF8b65TnCZQm2ZYwJjDjDACaI6dE8OoYwUJuoeyOa
-   +Hj9FaSPr9DHiSramFwqHAz7FiJJvHJekXMDnY4MeGyBvS1VNuozXH43X
-   1b4hkJUTh4a/sC9rWTtYIa+Px1mcRHHIYJjyP97qut4x/DnKV3zS8CllH
-   5Pi3qtyj546+Qob3eHH2lqSe+xhl1GtU0CkexIwvwD26wne/+8BW20B4E
-   ATK0c5kDZ2MdyapYxEEho+PnaoCdK5Ef2HTbkvKfvcZVibo91ZaOVVZ9R
-   Xr+jlmIdDWr387yNFgULux8mutuiq4ku1klZ+IrpnjPlgOk902k6oGmJr
-   Q==;
-X-CSE-ConnectionGUID: 3Jm24labRnOGvgSOv1giuw==
-X-CSE-MsgGUID: da2R9YxkRaKTAnarx+QaAA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11219"; a="27202801"
-X-IronPort-AV: E=Sophos;i="6.11,189,1725346800"; 
-   d="scan'208";a="27202801"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 02:24:17 -0700
-X-CSE-ConnectionGUID: /xDLPZ16Rfilr6HuITPLRA==
-X-CSE-MsgGUID: W0jvZSaHQ12fmC/9DGGk3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,189,1725346800"; 
-   d="scan'208";a="76148648"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Oct 2024 02:24:17 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 9 Oct 2024 02:24:16 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 9 Oct 2024 02:24:16 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.40) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 9 Oct 2024 02:24:15 -0700
+	s=arc-20240116; t=1728466157; c=relaxed/simple;
+	bh=K9wAB3/a4JCYNl1PFLvApWe8Poe/oFSmpEjlrDTR3x8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gaMWhejH4GPThYaMDSEHOYhT0NiJqkgJ+bVJZGuyCbFC5SfcZpjKw7PF7AeG6mec9AFwj/bgny+jlZNn5RTBHMgZ/Z2Nqp4a2CizSDEVDKgWVB/XJm3LZxRLTsaHDcoW1WrI9OzkDEYkF3oYza+7nlGXPME8afd8I63MbZZEvgk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jCRSKpOt; arc=fail smtp.client-ip=40.107.212.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EMNhR37nts+FjCiXWd2JiBcLknT0/XX6z3Dbj6+O+r0VoUk2P/vwAgX2gM8K9ZFpdoJHzzbBKG4/Bslw6ZjuNz3TwD/4QdD6U44UbFxtS+iXG/a0fh4HPvT2GNoGUW20fNoDkAmlj+ME7MBoD8qbyxZHlISpoJgEOs3ZHTQ13tX38gcTnnJziOqRC6d3XpsslyGmHCPS9BLRLtL6xS1aGzzZxxpLa7dVxWdLLVqPTWYSHrGmH5MDwoIoxiyg98trfV4kEAQT393ONFvYXOsKCltXtW7W4wUccYPHlXAa0s5lJX+Ukdftotq6gt2LXkiyrfmvxGLsnRZU+7uYxpJ5BQ==
+ b=eU6Kk8cf2y5fivsWckvKH56dVCnO5tMOHWUIQMgR/HuBcvvI/sg0AeVih1rDs1bO6UNhnwCRhN1u6OWkaohSDofCmTtkFRgid5xFzg/7E/34eCZ4ruQRsDyNJSaBnCLy29m4ABHFuqjDGMsTvKJmN6hK1R4xwNEUUCFYnvkJnXdFBLIzsb0n0YQX7AGPDbf6mPOcG92cXBaoR9g8cgHVoIstxNoSxBtShNuCBK+K+mwnOC9uSOAquITQtYm/iAnGEcVs2+VqszhfWogBqyoGVFevhfL2orj75742MZwXmzklMPudXNg9fRKWHLh9PW+orp4UlNJVrxtJ4POkviCFgw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fcFeRkW8WsA8Anl+HtYiFX/K6042mAMSa9Ma5qTlYcc=;
- b=PhjxZN/GHYR5yG8tM46CUdRJGuniixrnR362pEU5K8WJg+zNTiRIEQPk1cP3HSIEcBDju8oni7KxIxoxvoptl3Vyf5D3PcYVS8r34bGoB+EdePNjWpQqBVXRQguTlgKCj/hDTHOnDEJSvKkQIQfk8jcsIO+gBinXxUcWWiVJ4fWj8T0qPZF2XVfR9Xl2Y8C1x9vUhtfjxee5YauedFQiDBJoXbhxHqM3ipfjOthUz3Va0Mt2dX0Djc/nb8StSdGloajUYyk/3UwswTZEGfo/XegK9mrCfR6CEZPovS8jFgiy7zU2W1p+5fSQvAASN9y++GyMS0QubH9IBMdUpLYXlw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- DS7PR11MB6295.namprd11.prod.outlook.com (2603:10b6:8:95::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8048.16; Wed, 9 Oct 2024 09:24:13 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.8048.013; Wed, 9 Oct 2024
- 09:24:13 +0000
-Date: Wed, 9 Oct 2024 17:21:59 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Isaku Yamahata <isaku.yamahata@intel.com>, <kvm@vger.kernel.org>,
-	<sagis@google.com>, <chao.gao@intel.com>, <pbonzini@redhat.com>,
-	<rick.p.edgecombe@intel.com>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: x86/tdp_mmu: Trigger the callback only when an
- interesting change
-Message-ID: <ZwZLN3i3wcJ4Tv4E@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <6eecc450d0326c9bedfbb34096a0279410923c8d.1726182754.git.isaku.yamahata@intel.com>
- <ZuOCXarfAwPjYj19@google.com>
- <ZvUS+Cwg6DyA62EC@yzhao56-desk.sh.intel.com>
- <Zva4aORxE9ljlMNe@google.com>
- <ZvbB6s6MYZ2dmQxr@google.com>
- <ZvbJ7sJKmw1rWPsq@google.com>
- <ZwWEwnv1_9eayJjN@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZwWEwnv1_9eayJjN@google.com>
-X-ClientProxiedBy: KL1PR01CA0126.apcprd01.prod.exchangelabs.com
- (2603:1096:820:4::18) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+ bh=JtzwqcROgaFK2oO+UdVSrOkkMNkVMgEd5BqPcT+NERo=;
+ b=rCAwQGutlaDqb092KaH1OxokpL8De3zfNN2SLWj4/D6nPG2zzxYcS48KogzOkVl1LKLuoxqdIj+BGJnWKDZCPadC2cGV8DegmdhNzKgzTjyBM5EojpsuWK2QU/yk5PEwjAwvNbkXsAOSuZ//gsUTz3IpRl2Kh+WT/MccIBvkpF1dt8hH1rqh5Ze2vTPKitO8NI3GHKZ/HWnvzUc+Z8YpI0GlYiVOHr5aSVqyUQkljaV6L5UPpO94Xp889uNzupAFdbt3hoRnY/xlu525Q0dtc8OtrXRzdHcKLrnvU5A2asPZdK9pItVUG/36x/jndBaHZafFgAo7EB8ALUKeNrmGKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JtzwqcROgaFK2oO+UdVSrOkkMNkVMgEd5BqPcT+NERo=;
+ b=jCRSKpOtIVbKmmr3i8jiVipXJ6leZ9Oy7dV4RRWh/Qj44jLVoaanIK6M3y/UIjHJFdJ4I/5neIIoBsT3Q5rDMsbAF3KV8aGXto/4ooPRmjvJ4tlbJBHoYtuIE+lr9Vyv7hSlpIid/bLRCk4deJwoKS5rw+cGSeiC3+4dxdQhnyI=
+Received: from BN9PR03CA0102.namprd03.prod.outlook.com (2603:10b6:408:fd::17)
+ by SA1PR12MB8600.namprd12.prod.outlook.com (2603:10b6:806:257::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16; Wed, 9 Oct
+ 2024 09:29:11 +0000
+Received: from BL02EPF00021F6E.namprd02.prod.outlook.com
+ (2603:10b6:408:fd:cafe::91) by BN9PR03CA0102.outlook.office365.com
+ (2603:10b6:408:fd::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.17 via Frontend
+ Transport; Wed, 9 Oct 2024 09:29:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF00021F6E.mail.protection.outlook.com (10.167.249.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8048.13 via Frontend Transport; Wed, 9 Oct 2024 09:29:10 +0000
+Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 9 Oct
+ 2024 04:29:06 -0500
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: <linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>, <bp@alien8.de>,
+	<x86@kernel.org>, <kvm@vger.kernel.org>
+CC: <mingo@redhat.com>, <tglx@linutronix.de>, <dave.hansen@linux.intel.com>,
+	<pgonda@google.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
+	<nikunj@amd.com>
+Subject: [PATCH v12 00/19] Add Secure TSC support for SNP guests
+Date: Wed, 9 Oct 2024 14:58:31 +0530
+Message-ID: <20241009092850.197575-1-nikunj@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS7PR11MB6295:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6424ca9e-c5cb-45cf-0976-08dce84423a3
+X-MS-TrafficTypeDiagnostic: BL02EPF00021F6E:EE_|SA1PR12MB8600:EE_
+X-MS-Office365-Filtering-Correlation-Id: b3ae81c2-9694-4df2-0360-08dce844d513
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?i74VQ7Usl8QVCJOlTvW7vSxv/w7XRJpG6nTyAB56VzwEl1dhJrKKhJoTibMY?=
- =?us-ascii?Q?yhPKhSfvXv0ahUKd/mZd7G/K2b5sJeZiq9e1MgUh6j4/1FSbJ0zq8AI8mvuQ?=
- =?us-ascii?Q?dErs8YlSoL2d+f85hIHGYG6IIdGsIjzP0Q1xUvpm+rcxe5V1+iHpqtXVtWlZ?=
- =?us-ascii?Q?Ic9cnfzd2dofp4CW+mtn53W4ruiLAPWb1gOcjUFWvXacOk79mtuVgmIiuURI?=
- =?us-ascii?Q?z5eAMx+eI3RJcu/MHuSb+xO93Y0S9jacrlYKQUPS8tmjeWbBdRtAJVQqbISJ?=
- =?us-ascii?Q?lqlneK3q3pRHipuHtX0O42/agGEWPphZfC3Rc9LiiO7G5YFzwqNb/lMCJs9D?=
- =?us-ascii?Q?xNSgwFea0NY7t7F35L8iFCInzHNWTAz+7zdp+vbeePMeoxBTRpd9E51LjHA4?=
- =?us-ascii?Q?5QRinwgngVn8gw2tSvg9WH6nZG6Dd6IHNgmsM7P78VjBu42KHOTrkz9Sqmk0?=
- =?us-ascii?Q?2FR68WKCB5dlkxCNQf4RhTlKiLTtP1tZWack3kDghxGMbZkw7gR1gq8+ECM0?=
- =?us-ascii?Q?fCB+XOY2hIBo7aEiUhC4dFdLdwbELB/Vc6AixJhMsIkH53BY5VeeAJmYAcbT?=
- =?us-ascii?Q?ArNBtIZx/61z0GcVUkO3LGRRS9GvRZFZ6zy//tNjB7g7PVsEvhO10FSJFHze?=
- =?us-ascii?Q?m9u5QDEFuCPaj3pQRa7/oBRO1Uj65DwqV5QgXGpz5EPCWNgS48TAJ5bAHBjb?=
- =?us-ascii?Q?ndq9SCgB2YfUH/eZEbQOCbBKGV8+keK//knN8uiY+u3qV3ffgH0QrpBA275l?=
- =?us-ascii?Q?7KH7uSCxSxLfCjkR3MpaZr1krKHeBMm9965B5QP0vYMQeZzLGWVNIwki26Cb?=
- =?us-ascii?Q?lJcp9aCVSHOc1yJ2BfIIOzwYw8b/G2aciQgFiBpkkoLgWr17vc782r3aaaK7?=
- =?us-ascii?Q?vSqc+sRH+5ete21q8zoA02jnXvStN7HqDmlhdAiiMf8civwMR9EdrJ7llihy?=
- =?us-ascii?Q?xfhEBhE26ZzYZyf1awLWy7LXbiQVNPCxMb62E5qzr0DXtSuDXzzIa5DdDcC2?=
- =?us-ascii?Q?UTldKXj1gg9zyoj9scCdKqnygVmiIhAdNH93p0JsGdcTqeJHN/nmiHlaVOgN?=
- =?us-ascii?Q?XKeeWFOunFNewoCGkBwsqKas/sIYIQY2ZOhqjhDwLh41iJwAY4CHQYrXjh1m?=
- =?us-ascii?Q?iSDEVis1HHpQ4BW+uLsejYIMrVjY30UZDdJNq7xoPdRZLb2GRfl4l7EyA7By?=
- =?us-ascii?Q?ky3UlsLpC0jEzmzcafxQAxhMdJjDhSdEMlq2F0AlgvqBxiOe8AxkgBfnqCSU?=
- =?us-ascii?Q?4LmbuXVN1RnCoO3gjnsxc7wIRd4rBIkSRWh8f51QDw=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3RUT7vycP9cUqxRtMR5Yl/i7ulojeV42As0f2SXzZVvrHoez8l/jm/OUgSUH?=
- =?us-ascii?Q?ODj8kRvbm/LF7IqEtozMGOzfuN0rcwirGE9Ya97R0kHwbhy3NUV1+V3iq0u6?=
- =?us-ascii?Q?/YWQSWvN4ERHeaWqlOnmgAPfKxyehNkRSYPxu1l5YlDjwIJD2CIgMAwFejSJ?=
- =?us-ascii?Q?yHdJumolAAcxDUgug+aA/5LtV1CHB5U0jesCzX9th8Uxtfc50Y4o1cgm08GS?=
- =?us-ascii?Q?N1TFZSFOSgvpLRH2lwHvEO1awHFLOm/EWUz8Fpq6quNya68jKNyvbyYiG/at?=
- =?us-ascii?Q?HEJ30OfJuv12BFx9rCJMuP7Zm6k1pk/Y7P4f1suL/0jL24OtdEUfJToFrGzY?=
- =?us-ascii?Q?55WbGinLWVsfC3nEDV/Kqv70NkWG0p2S/fORj2jPP0uW1de5O0ZOCUydiTW0?=
- =?us-ascii?Q?AZYmMnaKyNBbpqBy1mrXjZ2cCE5qrQ42Oc/XibtpFN/nxnPSSkutzjeYgKXL?=
- =?us-ascii?Q?LIQUhrMP88scxeHW3kCq1DRLjRhZcZuKdL1JIveBenuEiANsSQVEQXONdqaF?=
- =?us-ascii?Q?g+TsOizGwhaH9eDKbZaMXWEC4KTNjqVAV5ogEpcYFrsy/Bt4TCaF7slNGjN3?=
- =?us-ascii?Q?LrY6H5Hf21q8jE+MTMt+xZOfSKmWxs3p+ot+R+u6IYRsoiSm5Ba9Mxl24gAv?=
- =?us-ascii?Q?jthXK6na4TbvYeATqPmrwe+Tt9A9Txe3nDfWdNibPVy9ufC0U2kBObYjXmo/?=
- =?us-ascii?Q?dEFgiln5ZLnryGPnHBEKRhixxoVpsRLoQul5Ty+XvkfDZlVPtkldQtKew/5d?=
- =?us-ascii?Q?V5S/xpJqM5vxVCCVa4/2gdsH5mhFxR+KVkWEZoE+Yv+TP6e/YZHY88gjNDVq?=
- =?us-ascii?Q?tXlNzcNrJk9vdEfjsHo+XQOdYP049rznbnXOPI8S9716h4TZozFhOoi817hS?=
- =?us-ascii?Q?BMXROaGYtT+AsSRc44/x+SxbYHEig08IEzdk4CFMGwWmwrG+3Hpa5QNz/I6f?=
- =?us-ascii?Q?gaMinqs7Uj1SgAIaygZBZf/vlMb1zZBdMrXWR9G4LPF82Aem6BylTHnMaE6/?=
- =?us-ascii?Q?Pc9xEH/egYd+pfkuFt7MMvnQJpTL7FRMN/6xNY3DSteRGAjyQzRNAXqweS93?=
- =?us-ascii?Q?dloBGP/XdpShIbROscojV+kkqRNCnesS8dP4VcanziBcPLBT7Etth2/9cDsg?=
- =?us-ascii?Q?nwMo9d8B7ltfWWNivw4a1iLhWVPNRVUVQtSCEIw3Yp8oTdaDCOW6HmKi3JUb?=
- =?us-ascii?Q?JzL53C/LfbLyAap+oM/1uYtA3pQVS2UH/tF0bNTTNbt5/w/iohLkPyosL+Bv?=
- =?us-ascii?Q?ifM7Ym4cT5RieeD7pYGvuDzGE0wBFsP6xc8T+4kXqfTxw8DnASluxCyUax+H?=
- =?us-ascii?Q?1fxj+7ZEHLCmCZv/03zB2otS1wV2pB5myOtRFbOFAai/VcgVhMBw+uRvxNxu?=
- =?us-ascii?Q?W7ePXd74R2WdqBtoyqTSPjWnGAY52l3gsQhxWbORWjAbbNGMS8wKLV+vim0o?=
- =?us-ascii?Q?sptR+3RRhLy68SuwURYDp8KDCfp/XOmN2yPK7kHYaQYD7cCTXfekrChtOBpI?=
- =?us-ascii?Q?sjlpmVO5Bpmg2eLvC+icv/z1r4PMH/lPQw8axuUioDQUd+P6osMqocNsfRzy?=
- =?us-ascii?Q?WaNr7lszMCCeyqx2aJMViofrVq+qKeCMBo1WerQG?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6424ca9e-c5cb-45cf-0976-08dce84423a3
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2024 09:24:13.4120
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|36860700013|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?zMDzEjDsey6zhDyEZVBcC58Kp+52pLHH2rCzimAcUVu0twMe811JpslgCE9v?=
+ =?us-ascii?Q?gXMGLJ7h15IQ1RxbZJRp+p5XsaADXUUOMgwnp6dSjlKFVV0PfZKtIhBWiszT?=
+ =?us-ascii?Q?/i/quq8+g7GeOyfe8REWrrJw2jjRnjqDa1DYLQDIRJTTZO2dy8spjsmfVyqQ?=
+ =?us-ascii?Q?x9rH/BIU9clILGDx5k1MqlvfRYeKpOHFeoqH3R3k/bKx3uLAp8Jur00KqZN2?=
+ =?us-ascii?Q?YUhxk0padmY4mTmM9/l+PQbSPH+lkJlA86Ce2CX12wN5mpHsp1cWW4w86LlT?=
+ =?us-ascii?Q?+qyWnK+XH5RRGdWyIEGmHoEU+1xsWVS41yqQv9dZj8njI7KNYx9cpV1ggWlT?=
+ =?us-ascii?Q?tHWqBebKWdOMRUKIQ+Hhql4fvwWiiObNWv761FAY7vkTOovKIckCQj3pC4U0?=
+ =?us-ascii?Q?1BkaCIg5Soqb4D9XPzNX/snNUkUjSfBYyhb62KQtpOrWp6G72L8FM4lE3fry?=
+ =?us-ascii?Q?4JRL4e1aPOAYH4iusU0gwbZkBpUI3kIpz7YLRTqUmPYQi1TZ7RI67wB2HWz+?=
+ =?us-ascii?Q?l+q3nIotZYiUJQIVjNieEuK373ogrmbuafADPoSj/Xlik+kiSWolnLGrP9DD?=
+ =?us-ascii?Q?966mgxKOA8rfJFT4Mx15p8O54m1R0LxSU6qIa53RTeLJdDlHtYojaLme1o8W?=
+ =?us-ascii?Q?hM4o6zR+ZQSstPuNGOLH/bjENGyzhfHfV3xYaQiZjfah+px7w9SacxSR0ipU?=
+ =?us-ascii?Q?NAOClTA9MpisM4s9r+QjCydnPJKe21Xezrv4zgzrp+07q2WGSqtvdXUxNSvs?=
+ =?us-ascii?Q?2JBPXj8ydvNn4xrzTGjyzWcOqqwgCRXX0icL0vbxMtOOAI5kxL61lTWBSyJ5?=
+ =?us-ascii?Q?lnHJOVazEhr5l0ghkS1OZnGZzNaegG53Yna0XnOAMorVp84VdItnrALqizEG?=
+ =?us-ascii?Q?4qx5dXbRMf5ae/walYWnB2sPgPUGDJHf6Ism4Pyub5N400/MCOMMG3pZ0qeD?=
+ =?us-ascii?Q?4LZdKl65GEiImgPXzTt0jWctEazd5mmtX/mwftyizDiMHcA9ZBOKgawUXBXj?=
+ =?us-ascii?Q?7SzYIO+88ZQ9uK4ePsKhPtRNMT9SkYg0qn6NYt1XiMmcsvE1u4bmiyQvNRrK?=
+ =?us-ascii?Q?DMDu9UcUh6zZErGNU9WT5g6HIBfYtTSd9gYwUBINaUMVhQh4/VpYCw3FanNU?=
+ =?us-ascii?Q?I4N+wjZ5bnigOD+nNAuh10I2xO3nr8g4M8Pis8pU4/fPO1m822IMKpzqEbqw?=
+ =?us-ascii?Q?P5xLkTjzPoevSo1G9knOYgk5KVxW9GRIKc9hUwRcnvGfqJaZq4nemOxAUStP?=
+ =?us-ascii?Q?PFVYSUpQ1bMkrG+MAsLtxpaftBKubnQpReKkCxkPyQxM+b30x/4VozKE4vKh?=
+ =?us-ascii?Q?MPIpHiDRBzVRvlyhyy4wcg75WDl4nCmKClOYODe4J3SUjSivMJa/svslyxH/?=
+ =?us-ascii?Q?UpxoV7AHU2X/yrdMyr7Udf4L06P0?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2024 09:29:10.8887
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ImIf6MYSUk8+u6y3IZ/m1gGltb73VMOl64zKhF0gBJD5FddP4DBK+8WYvugoR0X5jMYwnOYeD+aR+UVGkZgWbg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6295
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3ae81c2-9694-4df2-0360-08dce844d513
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF00021F6E.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8600
 
-On Tue, Oct 08, 2024 at 12:15:14PM -0700, Sean Christopherson wrote:
-> On Fri, Sep 27, 2024, Sean Christopherson wrote:
-> > On Fri, Sep 27, 2024, Sean Christopherson wrote:
-> > > On Fri, Sep 27, 2024, Sean Christopherson wrote:
-> 
-> ...
-> 
-> > > > Oh, right, I forgot about that.  I'll tweak the changelog to call that out before
-> > > > posting.  Hmm, and I'll drop the Cc: stable@ too, as commit b64d740ea7dd ("kvm:
-> > > > x86: mmu: Always flush TLBs when enabling dirty logging") was a bug fix, i.e. if
-> > > > anything should be backported it's that commit.
-> > > 
-> > > Actually, a better idea.  I think it makes sense to fully commit to not flushing
-> > > when overwriting SPTEs, and instead rely on the dirty logging logic to do a remote
-> > > TLB flush.
-> > 
-> > Oooh, but there's a bug.
-> 
-> Nope, there's not.
-> 
-> > KVM can tolerate/handle stale Dirty/Writable TLB entries when dirty logging,
-> > but KVM cannot tolerate stale Writable TLB entries when write- protecting for
-> > shadow paging.  The TDP MMU always flushes when clearing the MMU- writable
-> > flag (modulo a bug that would cause KVM to make the SPTE !MMU-writable in the
-> > page fault path), but the shadow MMU does not.
-> > 
-> > So I'm pretty sure we need the below, and then it may or may not make sense to have
-> > a common "flush needed" helper (outside of the write-protecting flows, KVM probably
-> > should WARN if MMU-writable is cleared).
-> > 
-> > ---
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index ce8323354d2d..7bd9c296f70e 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -514,9 +514,12 @@ static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
-> >  /* Rules for using mmu_spte_update:
-> >   * Update the state bits, it means the mapped pfn is not changed.
-> >   *
-> > - * Whenever an MMU-writable SPTE is overwritten with a read-only SPTE, remote
-> > - * TLBs must be flushed. Otherwise rmap_write_protect will find a read-only
-> > - * spte, even though the writable spte might be cached on a CPU's TLB.
-> > + * If the MMU-writable flag is cleared, i.e. the SPTE is write-protected for
-> > + * write-tracking, remote TLBs must be flushed, even if the SPTE was read-only,
-> > + * as KVM allows stale Writable TLB entries to exist.  When dirty logging, KVM
-> > + * flushes TLBs based on whether or not dirty bitmap/ring entries were reaped,
-> > + * not whether or not SPTEs were modified, i.e. only the write-protected case
-> > + * needs to precisely flush when modifying SPTEs.
-> >   *
-> >   * Returns true if the TLB needs to be flushed
-> >   */
-> > @@ -533,8 +536,7 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
-> >          * we always atomically update it, see the comments in
-> >          * spte_has_volatile_bits().
-> >          */
-> > -       if (is_mmu_writable_spte(old_spte) &&
-> > -             !is_writable_pte(new_spte))
-> > +       if (is_mmu_writable_spte(old_spte) && !is_mmu_writable_spte(new_spte))
-> 
-> It took me forever and a day to realize this, but !is_writable_pte(new_spte) is
-> correct, because the logic is checking if the new SPTE is !Writable, it's *not*
-> checking to see if the Writable bit is _cleared_.  I.e. KVM will flush if the
-> old SPTE is read-only but MMU-writable.
-For read-only, host-writable is false, so MMU-writable can't be true?
+This patchset is also available at:
 
-Compared to "!is_writable_pte(new_spte)", "!is_mmu_writable_spte(new_spte)" just
-skips the case "MMU-writalbe=1 + !Writable", which is for dirty logging.
-> 
-> That said, I'm still going to include this change, albet with a drastically
-> different changelog.  Checking is_mmu_writable_spte() instead of is_writable_pte()
-> is still desirable, as it avoids unnecessary TLB flushes in the rare case where
-> KVM "refreshes" a !Writable SPTE.  Of course, with the other change to not clobber
-> SPTEs when prefetching, that scenario becomes even more rare, but it's still worth
-> doing, especially since IMO it makes it more obvious when KVM _does_ need to do a
-> remote TLB flush (before dropping mmu_lock).
-> 
+  https://github.com/AMDESE/linux-kvm/tree/sectsc-guest-latest
+
+and is based on v6.12-rc2
+
+Overview
+--------
+
+Secure TSC allows guests to securely use RDTSC/RDTSCP instructions as the
+parameters being used cannot be changed by hypervisor once the guest is
+launched. More details in the AMD64 APM Vol 2, Section "Secure TSC".
+
+In order to enable secure TSC, SEV-SNP guests need to send a TSC_INFO guest
+message before the APs are booted. Details from the TSC_INFO response will
+then be used to program the VMSA before the APs are brought up. See "SEV
+Secure Nested Paging Firmware ABI Specification" document (currently at
+https://www.amd.com/system/files/TechDocs/56860.pdf) section "TSC Info"
+
+SEV-guest driver has the implementation for guest and AMD Security
+Processor communication. As the TSC_INFO needs to be initialized during
+early boot before APs are started, move the guest messaging code from
+sev-guest driver to sev/core.c and provide well defined APIs to the
+sev-guest driver.
+
+Patches:
+   01: Use AES GCM library
+02-03: SNP init error handling and cache secrets page address
+04-06: Preparatory patches for code movement
+07-08: Patches moving SNP guest messaging code from SEV guest driver to
+       SEV common code
+09-14: SecureTSC enablement patches
+15-16: Generic TSC/kvmclock improvements
+17-19: SecureTSC enablement patches.
+
+Testing SecureTSC
+-----------------
+
+SecureTSC hypervisor patches based on top of SEV-SNP Guest MEMFD series:
+https://github.com/AMDESE/linux-kvm/tree/sectsc-host-latest
+
+QEMU changes:
+https://github.com/nikunjad/qemu/tree/snp-securetsc-latest
+
+QEMU commandline SEV-SNP with SecureTSC:
+
+  qemu-system-x86_64 -cpu EPYC-Milan-v2 -smp 4 \
+    -object memory-backend-memfd,id=ram1,size=1G,share=true,prealloc=false,reserve=false \
+    -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,secure-tsc=on \
+    -machine q35,confidential-guest-support=sev0,memory-backend=ram1 \
+    ...
+
+Changelog:
+----------
+v12:
+* Rebased on top of v6.12-rc2
+* Collected Reviewed-by (Tom)
+* Improve error handling in sme_enable() (Boris)
+* Drop handle_guest_request() copying routine (Boris)
+* Move VMPCK empty check inside the lock (Tom)
+* Drop export symbol for snp_issue_guest_request() (Tom)
+* Rename CC_ATTR_GUEST_SECURE_TSC as CC_ATTR_GUEST_SNP_SECURE_TSC (Tom)
+* Upgrade the tsc early and regular clock rating when TSC is invariant,
+  non-stop and stable (tglx)
+* Initialize kvm sched clock only when the kvmclock source is selected (Sean)
+* Abort SecureTSC enabled guests when kvmclock is selected (Sean)
+* Added patch to use TSC frequency using GUEST_TSC_FREQ MSR (Sean)
+
+v11: https://lore.kernel.org/lkml/20240731150811.156771-1-nikunj@amd.com/
+* Rebased on top of v6.11-rc1
+* Added Acked-by/Reviewed-by
+* Moved SEV Guest driver cleanups in the beginning of the series
+* Commit message updates
+* Enforced PAGE_SIZE constraints for snp_guest_msg
+* After offline discussion with Boris, redesigned and exported
+  SEV guest messaging APIs to sev-guest driver
+* Dropped VMPCK rework patches
+* Make sure movement of SEV core routines does not break the SEV Guest
+  driver midway of the series.
+
+
+Nikunj A Dadhania (19):
+  virt: sev-guest: Use AES GCM crypto library
+  x86/sev: Handle failures from snp_init()
+  x86/sev: Cache the secrets page address
+  virt: sev-guest: Consolidate SNP guest messaging parameters to a
+    struct
+  virt: sev-guest: Reduce the scope of SNP command mutex
+  virt: sev-guest: Carve out SNP message context structure
+  x86/sev: Carve out and export SNP guest messaging init routines
+  x86/sev: Relocate SNP guest messaging routines to common code
+  x86/cc: Add CC_ATTR_GUEST_SNP_SECURE_TSC
+  x86/sev: Add Secure TSC support for SNP guests
+  x86/sev: Change TSC MSR behavior for Secure TSC enabled guests
+  x86/sev: Prevent RDTSC/RDTSCP interception for Secure TSC enabled
+    guests
+  x86/sev: Mark Secure TSC as reliable clocksource
+  tsc: Use the GUEST_TSC_FREQ MSR for discovering TSC frequency
+  tsc: Upgrade TSC clocksource rating
+  x86/kvmclock: Use clock source callback to update kvm sched clock
+  x86/kvmclock: Abort SecureTSC enabled guest when kvmclock is selected
+  x86/cpu/amd: Do not print FW_BUG for Secure TSC
+  x86/sev: Allow Secure TSC feature for SNP guests
+
+ arch/x86/include/asm/msr-index.h        |   1 +
+ arch/x86/include/asm/sev-common.h       |   1 +
+ arch/x86/include/asm/sev.h              | 165 +++++-
+ arch/x86/include/asm/svm.h              |   6 +-
+ include/linux/cc_platform.h             |   8 +
+ arch/x86/boot/compressed/sev.c          |   3 +-
+ arch/x86/coco/core.c                    |   3 +
+ arch/x86/coco/sev/core.c                | 612 +++++++++++++++++++--
+ arch/x86/coco/sev/shared.c              |  10 +
+ arch/x86/kernel/cpu/amd.c               |   3 +-
+ arch/x86/kernel/kvmclock.c              |  42 +-
+ arch/x86/kernel/tsc.c                   |  22 +
+ arch/x86/mm/mem_encrypt.c               |   4 +
+ arch/x86/mm/mem_encrypt_amd.c           |   4 +
+ arch/x86/mm/mem_encrypt_identity.c      |  11 +-
+ drivers/virt/coco/sev-guest/sev-guest.c | 671 +++---------------------
+ arch/x86/Kconfig                        |   1 +
+ drivers/virt/coco/sev-guest/Kconfig     |   3 -
+ 18 files changed, 891 insertions(+), 679 deletions(-)
+
+
+base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
+-- 
+2.34.1
+
 
