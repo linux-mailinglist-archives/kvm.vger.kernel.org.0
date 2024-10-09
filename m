@@ -1,106 +1,174 @@
-Return-Path: <kvm+bounces-28248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ABAA996F14
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 17:01:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B05996F1D
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 17:02:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 819CFB275D8
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 15:01:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6398B28768E
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 15:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D131A2C21;
-	Wed,  9 Oct 2024 15:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC231A0B12;
+	Wed,  9 Oct 2024 15:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JAEebPt/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SPtoK/NM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55C61A2651
-	for <kvm@vger.kernel.org>; Wed,  9 Oct 2024 15:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713EC1A00D2;
+	Wed,  9 Oct 2024 15:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728486003; cv=none; b=e1tUgLTsV4kM0PWnxv5Swy4karAUH8fgSr3idcSFk71uTC80BFGWVrzlYxHG/hUvCi+ZtfV1R/JButpgzTcTPuH2dwAGQpzCVT+qOH2Qj9VDayE1+6k4abWpwspeoAIn6/re0GWb+IdHby48Ywbz9gVX6YAQWW72uNmrJh0ouJ4=
+	t=1728486092; cv=none; b=XLFLEuXZhGdLGVyRD4PpdRs8hRptVCCCR8UakHTWYbtvVi/DlI8zuSNW8hbJXzpWcct4AucORzjP9QhDjmEjLvoLMSWdSxNve20NDC8VxDzt/tzhw8m0dNWuSAgaB34U3XfhQcxcObvZjzfgVFEEQ+jaMhyAz9Ebc8FiZMaOQ54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728486003; c=relaxed/simple;
-	bh=LGY4oUqQWryGMKVmPMGwdkvn25gik+HeWTMLPKKxQyc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NP1wzWPONZJ2gaJgw2D0HQAwhw+1b7owAmoD+ujTd79LaojF+h68F6coq+bPhpWh1PiihFfO004F1klE4n4J4c9ozcuunCYKFoi+jV8Fs0ZIy+yfmTmXkTxnb7IrH8bQC8b/NuaWIaUU/gsTLxDvxoEDBPKOuN3+DycNkfCkjkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JAEebPt/; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e2270a147aso103046947b3.0
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2024 08:00:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728486001; x=1729090801; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+0uUBPQSFAQQIdkTMB/6iIcqnDNVMg8rmlOcTA+5BoE=;
-        b=JAEebPt/5nRYD7wkHEjunlzSc5DGrHq6y7KbEhM23jxI2b93B1PGtD21vN0A0EEVbC
-         vr2d8RoL4Q27UK+xbfI4UfCoZEjnrXx8CNBicAeyx/bkCahvgnkubFL59xwC8AWzbvQw
-         1jV8rst0TYI5ciuxXjU2my/nlJmse3MWLYL88lG7stXBpMrBiMnFgylI0KtLM5klbmPI
-         j0wuJ7gS/weC+qSXBaPrO/D0M+zzAy//mX4E5DQFRh/GfTQbkdbpeLXZm1sF8LnNJc4u
-         1Dvz8hVIv2Yx7KJkN9onxlTqxY6UHuXR1VrPbzvjaP4lFPor+RIMUZ7XoNsc0vJquPrQ
-         2Fkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728486001; x=1729090801;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+0uUBPQSFAQQIdkTMB/6iIcqnDNVMg8rmlOcTA+5BoE=;
-        b=rTaVHYJeyIJ+q7BPyNIXKMkG/Y0kCuyFMKcia/DSE+o7UjKY9FWdphOBPoR8iMRDPN
-         RLqHmlKh2ZleZqbNktN9AbyZC0C83sCm/oXRTk0qMrFgUusJQ0m3yq1Le5RIzx/m9fxi
-         tBk015TrsVnC8J8zTAxglxgsy3W0A3zz9Ifepmg6gu844h1IJ5UyA9TXCnRnKQQMv+vZ
-         VxfwTIhpzz8AE9DiQYF+TrdtC/w0lU3S//mzS8yiXQtexlKdkJP0Y4SuQ6WsuecQIFaA
-         9dzIo3EyX1InzczN9U7FKYcgRdTDf+UTDl0unrpe5hs402uUgtOt7K7R8eqOf3yXK56y
-         H1eA==
-X-Forwarded-Encrypted: i=1; AJvYcCUc9ayRI95+dQdR53BkBGFxxRbdfYQfEWOZ1nhJaCSVqaW6piYac0+YY+H+hHQyHfCA8uo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX/JK8lVi4SAmRpS6OFlg05jJAG9AZHehvQzozd4XQpA5H0vFM
-	UN9/MRHu3v4mYEfx9Oubona5Z9bNPihv2OeaSvyX3U6bObklwUcZiLFjLhsQv6yvkJOuXht8Ybk
-	lEQ==
-X-Google-Smtp-Source: AGHT+IF/nkuM8mTX6eEIPtpXC3uFcim6/FbrmSBU5spuO/mMq9bhEb/S7uXyfA/6mqy+WzaQwvCHjRh5kYw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a0d:f043:0:b0:6db:c6eb:bae9 with SMTP id
- 00721157ae682-6e3220dbc31mr347747b3.2.1728486000856; Wed, 09 Oct 2024
- 08:00:00 -0700 (PDT)
-Date: Wed,  9 Oct 2024 07:58:22 -0700
-In-Reply-To: <20241004220153.287459-1-mlevitsk@redhat.com>
+	s=arc-20240116; t=1728486092; c=relaxed/simple;
+	bh=fVRTwtcaoT0WmKjrFpk1DDIfYhMFQjs89fQ0qX3twgY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lXQ4bPvO8LuJW7xIrdLlLHeHWelsqLf9pEs/3eGOJyVqrk6ICp7tQe+sMNqjDuAyEwpsLQNF2GQvFQod0T46bp6V7gXwt5z6fvSpFbDUBl46sA5OWantnIuiDWF6TyeZqWBZSCwbBE+xM7WJjP3Rn0BC6ael6w9mT4CH9DbL5Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SPtoK/NM; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728486091; x=1760022091;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fVRTwtcaoT0WmKjrFpk1DDIfYhMFQjs89fQ0qX3twgY=;
+  b=SPtoK/NMn//+oNsyOxMG2mxlq+qcm/F/CbaIOFNJun219dNq9Ln2ZVJl
+   qzqka2KQpefRkFAwPmIRFO/cfPGQT8V5C8nKiOOQHHcjxf7k/RvJvNlFu
+   DUY2dTr1O1eLqR6dDXWPAhWAWl9UsU8hTkOt8XIb9BQSI+NeQQXjucEie
+   sKJBX4NSUGLJMU8slfFbfN4Fy3EVfKJ7SmCeiOnR1ZRYkgkzluv6HDxL3
+   lxntuDsQ1MKiduGdEKkY0ogYGEfwN4WPD8ce0FvlSmTY64/CcBi7rHO7f
+   xbIHAc7R63kOJ43wPwmqLJryfd+uBF2VSL2wIugq/8vgUAC0kXgUW+VUW
+   g==;
+X-CSE-ConnectionGUID: lAl/6/KGSxOhTYmB6kv0ZA==
+X-CSE-MsgGUID: thc+uxylSjWR94dy78v2WQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="27740355"
+X-IronPort-AV: E=Sophos;i="6.11,190,1725346800"; 
+   d="scan'208";a="27740355"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 08:01:30 -0700
+X-CSE-ConnectionGUID: vlgJ5M3jTiOZj4mbfcBUhw==
+X-CSE-MsgGUID: 9mYwFaXSTPav/TcJ9Syvdg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,190,1725346800"; 
+   d="scan'208";a="81297872"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.89.141])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 08:01:26 -0700
+Message-ID: <1a200cd3-ad73-4a53-bc48-661f7d022ac0@intel.com>
+Date: Wed, 9 Oct 2024 18:01:19 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241004220153.287459-1-mlevitsk@redhat.com>
-X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
-Message-ID: <172848588854.1055233.16718265016131437325.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: selftests: memslot_perf_test: increase guest sync timeout
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kselftest@vger.kernel.org, 
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 18/25] KVM: TDX: Do TDX specific vcpu initialization
+To: Yuan Yao <yuan.yao@linux.intel.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+ kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
+ linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>,
+ Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-19-rick.p.edgecombe@intel.com>
+ <20240813080009.zowu3woyffwlyazu@yy-desk-7060>
+Content-Language: en-US
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <20240813080009.zowu3woyffwlyazu@yy-desk-7060>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 04 Oct 2024 18:01:53 -0400, Maxim Levitsky wrote:
-> When memslot_perf_test is run nested, first iteration of test_memslot_rw_loop
-> testcase, sometimes takes more than 2 seconds due to build of shadow page tables.
+On 13/08/24 11:00, Yuan Yao wrote:
+> On Mon, Aug 12, 2024 at 03:48:13PM -0700, Rick Edgecombe wrote:
+>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>
+>> TD guest vcpu needs TDX specific initialization before running.  Repurpose
+>> KVM_MEMORY_ENCRYPT_OP to vcpu-scope, add a new sub-command
+>> KVM_TDX_INIT_VCPU, and implement the callback for it.
+>>
+>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+>> ---
+
+<SNIP>
+
+>> @@ -884,6 +930,149 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+>>  	return r;
+>>  }
+>>
+>> +/* VMM can pass one 64bit auxiliary data to vcpu via RCX for guest BIOS. */
+>> +static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+>> +{
+
+<SNIP>
+
+>> +	if (modinfo->tdx_features0 & MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM)
+>> +		err = tdh_vp_init_apicid(tdx, vcpu_rcx, vcpu->vcpu_id);
+>> +	else
+>> +		err = tdh_vp_init(tdx, vcpu_rcx);
 > 
-> Following iterations are fast.
+> This can cause incorrect topology information to guest
+> silently:
 > 
-> To be on the safe side, bump the timeout to 10 seconds.
+> A user space VMM uses "-smp 8,threads=4,cores=2" but doesn't
+> pass any 0x1f leaf data to KVM, means no 0x1f value to TDX
+> module for this TD. The topology TD guest observed is:
 > 
-> [...]
+> Thread(s) per core:                 2
+> Core(s) per socket:                 4
+> 
+> I suggest to use tdh_vp_init_apicid() only when 0x1f is
+> valid. This will disable the 0x1f/0xb topology feature per
+> the spec, but leaf 0x1/0x4 still are available to present
+> right topology in this example. It presents correct topology
+> information to guest if user space VMM doesn't use 0x1f for
+> simple topology and run on TDX module w/ FEATURES0_TOPOLOGY.
 
-Nice timing (lol), the alarm can also fire spuriously when running selftests
-on a loaded arm64 host.
+tdh_vp_init_apicid() passes x2APIC ID to TDH.VP.INIT which
+is one of the steps for the TDX Module to support topology
+information for the guest i.e. CPUID leaf 0xB and CPUID leaf 0x1F.
 
-Applied to kvm-x86 fixes, thanks!
+If the host VMM does not provide CPUID leaf 0x1F values
+(i.e. the values are 0), then the TDX Module will use native
+values for both CPUID leaf 0x1F and CPUID leaf 0xB.
 
-[1/1] KVM: selftests: memslot_perf_test: increase guest sync timeout
-      https://github.com/kvm-x86/linux/commit/7d4e28327d7e
+To get 0x1F/0xB the guest must also opt-in by setting
+TDCS.TD_CTLS.ENUM_TOPOLOGY to 1.  AFAICT currently Linux
+does not do that.
 
---
-https://github.com/kvm-x86/linux/tree/next
+In the tdh_vp_init() case, topology information will not be
+supported.
+
+If topology information is not supported CPUID leaf 0xB and
+CPUID leaf 0x1F will #VE, and a Linux guest will return zeros.
+
+So, yes, it seems like tdh_vp_init_apicid() should only
+be called if there is non-zero CPUID leaf 0x1F values provided
+by host VMM. e.g. add a helper function
+
+bool tdx_td_enum_topology(struct kvm_cpuid2 *cpuid)
+{
+	const struct tdx_sys_info_features *modinfo = &tdx_sysinfo->features;
+	const struct kvm_cpuid_entry2 *entry;
+
+	if (!(modinfo->tdx_features0 & MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM))
+		return false;
+
+	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0x1f, 0);
+	if (!entry)
+		return false;
+
+	return entry->eax || entry->ebx || entry->ecx || entry->edx;
+}
+
+
 
