@@ -1,46 +1,64 @@
-Return-Path: <kvm+bounces-28158-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28159-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B742995DE2
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 04:37:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F366995E59
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 05:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31418282E72
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 02:37:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EAE71F276AB
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 03:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3D513B58D;
-	Wed,  9 Oct 2024 02:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765C414D6F9;
+	Wed,  9 Oct 2024 03:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Kcw6IMDh"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084A11C6BE;
-	Wed,  9 Oct 2024 02:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54B910FF;
+	Wed,  9 Oct 2024 03:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728441442; cv=none; b=CQynom1QeyiZaSG/ybaF6W6yqaGhJkS69XXxX658DjwRgDuAMomMWtBIcKlKp4pN1eFqmU3ApwASLsAvFBTVYS3m+Xyd+v4lIi+53qXc1lbBWCQlsvu8Rfoo5GUwgaoradgajNIPp+V0zmQRPE316fMTxnEgtaOdNkNuKqW86oI=
+	t=1728445884; cv=none; b=Ux4wh6UJOMOGtSgI/Loh1cZffxxry0AH0UHQCtuY/zMN4jtX3cPJcLCHx6ijjl/LraRQNpzAXy3UvFtvXiN4EEHewBQbNH9sc3il4SnRuyaoVjFr1M4hdTe1nq8BMKgwQDrX2vsTnk05lVE1an1hVoBCWicr8nKrfnE5z9890/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728441442; c=relaxed/simple;
-	bh=ke+cx/U8Sjvi4bxCZyHFXJr+dGotHmeW77I7vgAAiaQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=rhyCobiA0cPMVSj5RzsHFDHJhETYIwlornJ20bFpuLBWSmlRxluJWgEm7Wd1ZH3dr7y4tiFQkVlGckQRPgLFAcFtxzVIF4FT7Nva3q8fBDqzExKYGNrXCmrIZv4c6lTKOIhoIcZKKHqG57HyRi1bskZR3wBav5WhDetc+ERvgh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XNcTg56XYz20pj7;
-	Wed,  9 Oct 2024 10:36:39 +0800 (CST)
-Received: from kwepemh100008.china.huawei.com (unknown [7.202.181.93])
-	by mail.maildlp.com (Postfix) with ESMTPS id D7A7E1A016C;
-	Wed,  9 Oct 2024 10:37:15 +0800 (CST)
-Received: from [10.67.121.90] (10.67.121.90) by kwepemh100008.china.huawei.com
- (7.202.181.93) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 9 Oct
- 2024 10:37:14 +0800
-Message-ID: <f8a1f85b-c4bf-4c38-81bf-728f72a4f2fe@huawei.com>
-Date: Wed, 9 Oct 2024 10:37:12 +0800
+	s=arc-20240116; t=1728445884; c=relaxed/simple;
+	bh=Fz6m3s5wR0Xe7bKylBUoyAUXiZbhWI4E69+DbXptgGU=;
+	h=Message-ID:Date:MIME-Version:To:CC:References:Subject:From:
+	 In-Reply-To:Content-Type; b=GajoB/BzpYM91vzjiwUbzcv4LnUlOAh2SUzT2qHcBnEOHEn1Y6iaGjHDu1FCOTXfsPtmJQbDo/XjYMqQZnBIQNlaIrxqS1vb8jHzcm/6m3PAPUzKEFwaQAy2b1UnsPTHALY+bzVU7fw6jDC4Mnhdap4mMeD3K+TGWz7LfFN+7lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Kcw6IMDh; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728445883; x=1759981883;
+  h=message-id:date:mime-version:to:cc:references:subject:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Fz6m3s5wR0Xe7bKylBUoyAUXiZbhWI4E69+DbXptgGU=;
+  b=Kcw6IMDh+CAWZNPpmwpzpu0AgleuTw6KPrzkTeBh+BcC4ICy6nq0JXQl
+   1EzaMHcxVYrGdCQSVVTwxbEvwkPn5hSWTh1SSkwcsTXLuH5dcJ8Jsh0dB
+   3+sg+PovgioDKfHosHKNOzOPeycMbmpMoASjEuctTVjbXYUOywnSD2oZ1
+   A=;
+X-IronPort-AV: E=Sophos;i="6.11,188,1725321600"; 
+   d="scan'208";a="433642865"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 03:51:19 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:59909]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.199:2525] with esmtp (Farcaster)
+ id acf9dcc9-ae36-4c0e-a2a8-553270007ea0; Wed, 9 Oct 2024 03:51:18 +0000 (UTC)
+X-Farcaster-Flow-ID: acf9dcc9-ae36-4c0e-a2a8-553270007ea0
+Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 9 Oct 2024 03:51:18 +0000
+Received: from [192.168.205.151] (10.106.100.42) by
+ EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 9 Oct 2024 03:51:14 +0000
+Message-ID: <ac337485-f8ab-45a4-b223-eb846e21c762@amazon.com>
+Date: Tue, 8 Oct 2024 20:51:13 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -48,297 +66,85 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 00/11] Enable haltpoll on arm64
-To: Ankur Arora <ankur.a.arora@oracle.com>, <linux-pm@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <catalin.marinas@arm.com>, <will@kernel.org>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, <hpa@zytor.com>, <pbonzini@redhat.com>,
-	<wanpengli@tencent.com>, <vkuznets@redhat.com>, <rafael@kernel.org>,
-	<daniel.lezcano@linaro.org>, <peterz@infradead.org>, <arnd@arndb.de>,
-	<lenb@kernel.org>, <mark.rutland@arm.com>, <harisokn@amazon.com>,
-	<mtosatti@redhat.com>, <sudeep.holla@arm.com>, <cl@gentwo.org>,
-	<misono.tomohiro@fujitsu.com>, <maobibo@loongson.cn>,
-	<joao.m.martins@oracle.com>, <boris.ostrovsky@oracle.com>,
-	<konrad.wilk@oracle.com>, Jie Zhan <zhanjie9@hisilicon.com>,
-	<lihuisong@huawei.com>
-References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
-From: "zhenglifeng (A)" <zhenglifeng1@huawei.com>
-In-Reply-To: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
+To: <seanjc@google.com>, <andrew.cooper3@citrix.com>,
+	<dave.hansen@linux.intel.com>
+CC: <ackerleytng@google.com>, <ajones@ventanamicro.com>,
+	<anup@brainfault.org>, <bfoster@redhat.com>, <brauner@kernel.org>,
+	<david@redhat.com>, <derekmn@amazon.com>, <erdemaktas@google.com>,
+	<fan.du@intel.com>, <fvdl@google.com>, <haibo1.xu@intel.com>,
+	<isaku.yamahata@intel.com>, <jgg@nvidia.com>, <jgowans@amazon.com>,
+	<jhubbard@nvidia.com>, <jthoughton@google.com>, <jun.miao@intel.com>,
+	<kalyazin@amazon.co.uk>, <kent.overstreet@linux.dev>, <kvm@vger.kernel.org>,
+	<linux-fsdevel@kvack.org>, <linux-kernel@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
+	<maciej.wieczor-retman@intel.com>, <mike.kravetz@oracle.com>,
+	<muchun.song@linux.dev>, <oliver.upton@linux.dev>, <pbonzini@redhat.com>,
+	<peterx@redhat.com>, <pgonda@google.com>, <pvorel@suse.cz>,
+	<qperret@google.com>, <quic_eberman@quicinc.com>,
+	<richard.weiyang@gmail.com>, <rientjes@google.com>, <roypat@amazon.co.uk>,
+	<rppt@kernel.org>, <shuah@kernel.org>, <tabba@google.com>,
+	<vannapurve@google.com>, <vkuznets@redhat.com>, <willy@infradead.org>,
+	<zhiquan1.li@intel.com>, <graf@amazon.de>, <mlipp@amazon.at>,
+	<canellac@amazon.at>
+References: <ZwWOfXd9becAm4lH@google.com>
+Subject: Re: [RFC PATCH 30/39] KVM: guest_memfd: Handle folio preparation for
+ guest_memfd mmap
+Content-Language: en-US
+From: "Manwaring, Derek" <derekmn@amazon.com>
+In-Reply-To: <ZwWOfXd9becAm4lH@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemh100008.china.huawei.com (7.202.181.93)
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
+ EX19D003UWC002.ant.amazon.com (10.13.138.169)
+
+On 2024-10-08 at 19:56+0000 Sean Christopherson wrote:
+> Another (slightly crazy) approach would be use protection keys to provide the
+> security properties that you want, while giving KVM (and userspace) a quick-and-easy
+> override to access guest memory.
+>
+>  1. mmap() guest_memfd into userpace with RW protections
+>  2. Configure PKRU to make guest_memfd memory inaccessible by default
+>  3. Swizzle PKRU on-demand when intentionally accessing guest memory
+>
+> It's essentially the same idea as SMAP+STAC/CLAC, just applied to guest memory
+> instead of to usersepace memory.
+>
+> The benefit of the PKRU approach is that there are no PTE modifications, and thus
+> no TLB flushes, and only the CPU that is access guest memory gains temporary
+> access.  The big downside is that it would be limited to modern hardware, but
+> that might be acceptable, especially if it simplifies KVM's implementation.
+
+Yeah this might be worth it if it simplifies significantly. Jenkins et
+al. showed MPK worked for stopping in-process Spectre V1 [1]. While
+future hardware bugs are always possible, the host kernel would still
+offer better protection overall since discovery of additional Spectre
+approaches and gadgets in the kernel is more likely (I think it's a
+bigger surface area than hardware-specific MPK transient execution
+issues).
+
+Patrick, we talked about this a couple weeks ago and ended up focusing
+on within-userspace protection, but I see keys can also be used to stop
+kernel access like Andrew's project he mentioned during Dave's MPK
+session at LPC [2]. Andrew, could you share that here?
+
+It's not clear to me how reliably the kernel prevents its own access to
+such pages. I see a few papers that warrant more investigation:
+
+"we found multiple interfaces that Linux, by design, provides for
+accessing process memory that ignore PKU domains on a page." [3]
+
+"Though Connor et al. demonstrate that existing MPK protections can be
+bypassed by using the kernel as a confused deputy, compelling recent
+work indicates that MPK operations can be made secure." [4]
+
+Dave and others, if you're aware of resources clarifying how strong the
+boundaries are, that would be helpful.
+
+Derek
 
 
-
-On 2024/9/26 7:24, Ankur Arora wrote:
-> This patchset enables the cpuidle-haltpoll driver and its namesake
-> governor on arm64. This is specifically interesting for KVM guests by
-> reducing IPC latencies.
-> 
-> Comparing idle switching latencies on an arm64 KVM guest with 
-> perf bench sched pipe:
-> 
->                                      usecs/op       %stdev   
-> 
->   no haltpoll (baseline)               13.48       +-  5.19%
->   with haltpoll                         6.84       +- 22.07%
-> 
-> 
-> No change in performance for a similar test on x86:
-> 
->                                      usecs/op        %stdev   
-> 
->   haltpoll w/ cpu_relax() (baseline)     4.75      +-  1.76%
->   haltpoll w/ smp_cond_load_relaxed()    4.78      +-  2.31%
-> 
-> Both sets of tests were on otherwise idle systems with guest VCPUs
-> pinned to specific PCPUs. One reason for the higher stdev on arm64
-> is that trapping of the WFE instruction by the host KVM is contingent
-> on the number of tasks on the runqueue.
-> 
-> Tomohiro Misono and Haris Okanovic also report similar latency
-> improvements on Grace and Graviton systems (for v7) [1] [2].
-> 
-> The patch series is organized in three parts: 
-> 
->  - patch 1, reorganizes the poll_idle() loop, switching to
->    smp_cond_load_relaxed() in the polling loop.
->    Relatedly patches 2, 3 mangle the config option ARCH_HAS_CPU_RELAX,
->    renaming it to ARCH_HAS_OPTIMIZED_POLL.
-> 
->  - patches 4-6 reorganize the haltpoll selection and init logic
->    to allow architecture code to select it. 
-> 
->  - and finally, patches 7-11 add the bits for arm64 support.
-> 
-> What is still missing: this series largely completes the haltpoll side
-> of functionality for arm64. There are, however, a few related areas
-> that still need to be threshed out:
-> 
->  - WFET support: WFE on arm64 does not guarantee that poll_idle()
->    would terminate in halt_poll_ns. Using WFET would address this.
->  - KVM_NO_POLL support on arm64
->  - KVM TWED support on arm64: allow the host to limit time spent in
->    WFE.
-> 
-> 
-> Changelog:
-> 
-> v8: No logic changes. Largely respin of v7, with changes
-> noted below:
-> 
->  - move selection of ARCH_HAS_OPTIMIZED_POLL on arm64 to its
->    own patch.
->    (patch-9 "arm64: select ARCH_HAS_OPTIMIZED_POLL")
->    
->  - address comments simplifying arm64 support (Will Deacon)
->    (patch-11 "arm64: support cpuidle-haltpoll")
-> 
-> v7: No significant logic changes. Mostly a respin of v6.
-> 
->  - minor cleanup in poll_idle() (Christoph Lameter)
->  - fixes conflicts due to code movement in arch/arm64/kernel/cpuidle.c
->    (Tomohiro Misono)
-> 
-> v6:
-> 
->  - reordered the patches to keep poll_idle() and ARCH_HAS_OPTIMIZED_POLL
->    changes together (comment from Christoph Lameter)
->  - threshes out the commit messages a bit more (comments from Christoph
->    Lameter, Sudeep Holla)
->  - also rework selection of cpuidle-haltpoll. Now selected based
->    on the architectural selection of ARCH_CPUIDLE_HALTPOLL.
->  - moved back to arch_haltpoll_want() (comment from Joao Martins)
->    Also, arch_haltpoll_want() now takes the force parameter and is
->    now responsible for the complete selection (or not) of haltpoll.
->  - fixes the build breakage on i386
->  - fixes the cpuidle-haltpoll module breakage on arm64 (comment from
->    Tomohiro Misono, Haris Okanovic)
-> 
-> 
-> v5:
->  - rework the poll_idle() loop around smp_cond_load_relaxed() (review
->    comment from Tomohiro Misono.)
->  - also rework selection of cpuidle-haltpoll. Now selected based
->    on the architectural selection of ARCH_CPUIDLE_HALTPOLL.
->  - arch_haltpoll_supported() (renamed from arch_haltpoll_want()) on
->    arm64 now depends on the event-stream being enabled.
->  - limit POLL_IDLE_RELAX_COUNT on arm64 (review comment from Haris Okanovic)
->  - ARCH_HAS_CPU_RELAX is now renamed to ARCH_HAS_OPTIMIZED_POLL.
-> 
-> v4 changes from v3:
->  - change 7/8 per Rafael input: drop the parens and use ret for the final check
->  - add 8/8 which renames the guard for building poll_state
-> 
-> v3 changes from v2:
->  - fix 1/7 per Petr Mladek - remove ARCH_HAS_CPU_RELAX from arch/x86/Kconfig
->  - add Ack-by from Rafael Wysocki on 2/7
-> 
-> v2 changes from v1:
->  - added patch 7 where we change cpu_relax with smp_cond_load_relaxed per PeterZ
->    (this improves by 50% at least the CPU cycles consumed in the tests above:
->    10,716,881,137 now vs 14,503,014,257 before)
->  - removed the ifdef from patch 1 per RafaelW
-> 
-> Please review.
-> 
-> [1] https://lore.kernel.org/lkml/TY3PR01MB111481E9B0AF263ACC8EA5D4AE5BA2@TY3PR01MB11148.jpnprd01.prod.outlook.com/
-> [2] https://lore.kernel.org/lkml/104d0ec31cb45477e27273e089402d4205ee4042.camel@amazon.com/
-> 
-> Ankur Arora (6):
->   cpuidle: rename ARCH_HAS_CPU_RELAX to ARCH_HAS_OPTIMIZED_POLL
->   cpuidle-haltpoll: condition on ARCH_CPUIDLE_HALTPOLL
->   arm64: idle: export arch_cpu_idle
->   arm64: select ARCH_HAS_OPTIMIZED_POLL
->   cpuidle/poll_state: limit POLL_IDLE_RELAX_COUNT on arm64
->   arm64: support cpuidle-haltpoll
-> 
-> Joao Martins (4):
->   Kconfig: move ARCH_HAS_OPTIMIZED_POLL to arch/Kconfig
->   cpuidle-haltpoll: define arch_haltpoll_want()
->   governors/haltpoll: drop kvm_para_available() check
->   arm64: define TIF_POLLING_NRFLAG
-> 
-> Mihai Carabas (1):
->   cpuidle/poll_state: poll via smp_cond_load_relaxed()
-> 
->  arch/Kconfig                              |  3 +++
->  arch/arm64/Kconfig                        |  7 +++++++
->  arch/arm64/include/asm/cpuidle_haltpoll.h | 24 +++++++++++++++++++++++
->  arch/arm64/include/asm/thread_info.h      |  2 ++
->  arch/arm64/kernel/idle.c                  |  1 +
->  arch/x86/Kconfig                          |  5 ++---
->  arch/x86/include/asm/cpuidle_haltpoll.h   |  1 +
->  arch/x86/kernel/kvm.c                     | 13 ++++++++++++
->  drivers/acpi/processor_idle.c             |  4 ++--
->  drivers/cpuidle/Kconfig                   |  5 ++---
->  drivers/cpuidle/Makefile                  |  2 +-
->  drivers/cpuidle/cpuidle-haltpoll.c        | 12 +-----------
->  drivers/cpuidle/governors/haltpoll.c      |  6 +-----
->  drivers/cpuidle/poll_state.c              | 22 +++++++++++++++------
->  drivers/idle/Kconfig                      |  1 +
->  include/linux/cpuidle.h                   |  2 +-
->  include/linux/cpuidle_haltpoll.h          |  5 +++++
->  17 files changed, 83 insertions(+), 32 deletions(-)
->  create mode 100644 arch/arm64/include/asm/cpuidle_haltpoll.h
-> 
-
-Hi Ankur,
-
-Thanks for the patches!
-
-We have tested these patches on our machine, with an adaptation of ACPI LPI
-states rather than c-states.
-
-Include polling state, there would be three states to get in. Comparing idle
-switching latencies of different state with perf bench sched pipe:
-
-                                     usecs/op       %stdev   
-
-  state0(polling state)                7.36       +-  0.35%
-  state1                               8.78       +-  0.46%
-  state2                              77.32       +-  5.50%
-  
-It turns out that it works on our machine.
-
-Tested-by: Lifeng Zheng <zhenglifeng1@huawei.com>
-
-The adaptation of ACPI LPI states is shown below as a patch. Feel free to
-include this patch as part of your series, or I can also send it out after
-your series being merged.
-
-From: Lifeng Zheng <zhenglifeng1@huawei.com>
-
-ACPI: processor_idle: Support polling state for LPI
-
-Initialize an optional polling state besides LPI states.
-
-Wrap up a new enter method to correctly reflect the actual entered state
-when the polling state is enabled.
-
-Signed-off-by: Lifeng Zheng <zhenglifeng1@huawei.com>
-Reviewed-by: Jie Zhan <zhanjie9@hisilicon.com>
----
- drivers/acpi/processor_idle.c | 39 ++++++++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/acpi/processor_idle.c b/drivers/acpi/processor_idle.c
-index 44096406d65d..d154b5d77328 100644
---- a/drivers/acpi/processor_idle.c
-+++ b/drivers/acpi/processor_idle.c
-@@ -1194,20 +1194,46 @@ static int acpi_idle_lpi_enter(struct cpuidle_device *dev,
- 	return -EINVAL;
- }
- 
-+/* To correctly reflect the entered state if the poll state is enabled. */
-+static int acpi_idle_lpi_enter_with_poll_state(struct cpuidle_device *dev,
-+			       struct cpuidle_driver *drv, int index)
-+{
-+	int entered_state;
-+
-+	if (unlikely(index < 1))
-+		return -EINVAL;
-+
-+	entered_state = acpi_idle_lpi_enter(dev, drv, index - 1);
-+	if (entered_state < 0)
-+		return entered_state;
-+
-+	return entered_state + 1;
-+}
-+
- static int acpi_processor_setup_lpi_states(struct acpi_processor *pr)
- {
--	int i;
-+	int i, count;
- 	struct acpi_lpi_state *lpi;
- 	struct cpuidle_state *state;
- 	struct cpuidle_driver *drv = &acpi_idle_driver;
-+	typeof(state->enter) enter_method;
- 
- 	if (!pr->flags.has_lpi)
- 		return -EOPNOTSUPP;
- 
-+	if (IS_ENABLED(CONFIG_ARCH_HAS_OPTIMIZED_POLL)) {
-+		cpuidle_poll_state_init(drv);
-+		count = 1;
-+		enter_method = acpi_idle_lpi_enter_with_poll_state;
-+	} else {
-+		count = 0;
-+		enter_method = acpi_idle_lpi_enter;
-+	}
-+
- 	for (i = 0; i < pr->power.count && i < CPUIDLE_STATE_MAX; i++) {
- 		lpi = &pr->power.lpi_states[i];
- 
--		state = &drv->states[i];
-+		state = &drv->states[count];
- 		snprintf(state->name, CPUIDLE_NAME_LEN, "LPI-%d", i);
- 		strscpy(state->desc, lpi->desc, CPUIDLE_DESC_LEN);
- 		state->exit_latency = lpi->wake_latency;
-@@ -1215,11 +1241,14 @@ static int acpi_processor_setup_lpi_states(struct acpi_processor *pr)
- 		state->flags |= arch_get_idle_state_flags(lpi->arch_flags);
- 		if (i != 0 && lpi->entry_method == ACPI_CSTATE_FFH)
- 			state->flags |= CPUIDLE_FLAG_RCU_IDLE;
--		state->enter = acpi_idle_lpi_enter;
--		drv->safe_state_index = i;
-+		state->enter = enter_method;
-+		drv->safe_state_index = count;
-+		count++;
-+		if (count == CPUIDLE_STATE_MAX)
-+			break;
- 	}
- 
--	drv->state_count = i;
-+	drv->state_count = count;
- 
- 	return 0;
- }
--- 
-2.33.0
-
-
-
+[1] https://www.cs.dartmouth.edu/~sws/pubs/jas2020.pdf
+[2] https://www.youtube.com/watch?v=gEUeMfrNH94&t=1028s
+[3] https://www.usenix.org/system/files/sec20-connor.pdf
+[4] https://ics.uci.edu/~dabrowsa/kirth-eurosys22-pkru.pdf
 
