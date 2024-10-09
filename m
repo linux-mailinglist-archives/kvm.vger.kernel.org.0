@@ -1,185 +1,146 @@
-Return-Path: <kvm+bounces-28222-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28223-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E5B9965F2
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 11:52:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FFCC9966B5
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 12:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0523E1C222A5
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 09:52:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 223D41F22F77
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 10:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6142818BC26;
-	Wed,  9 Oct 2024 09:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06A3191489;
+	Wed,  9 Oct 2024 10:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="ffodqbRU";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cPzper/j"
 X-Original-To: kvm@vger.kernel.org
-Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5771918BB97
-	for <kvm@vger.kernel.org>; Wed,  9 Oct 2024 09:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A2718E750;
+	Wed,  9 Oct 2024 10:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728467513; cv=none; b=IkZfdP7jg8KYlKeBcSgl1j7ofvAoLtXy9bW2hj4joekRHmzAH52wx8lrP1LEAErbVUR3GJRMgP4uOiUadZYP8SWdHOGBhc1BBg72rEA19NZ5VV2tD95zKdnMl1kETTPUWgypZuvwt7EnzxOxdgC92XjnKzlywabrILX2Lk9A23o=
+	t=1728468672; cv=none; b=a0iklJorCbKGgLh9QMprVTdbcMALTMr+k0W4ZFEsWDOlW0p3yZTvJ6cI0z5xcBLetQ6r3EpHyY3PnpqpLv50cxbZaPKQNhdCGAPONp/upVRSwqr4+TzaU4z++isOa60NOzsw7ZMEBYp29XIvpPAwHzEqyNAuZEbihQcvv+/M++4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728467513; c=relaxed/simple;
-	bh=cQ//5Z/aHT58dJFimFEpti7T6d2J3UMkSf94gm3e64c=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EnPFbhydk+8jjbey90Mv93SAtWzEhohwGNLRgl7tpWivQuvzMdYvzwDnJXvsbprBNFG7XMgz9xjshx4yZSJYc6cAlVogDGbEtAL6uCOLEJ8SavYpE1IqninctwYil/i7OkdY9aEaH6AiOnZL7moBa48Mclt+qn47amneQY+S9v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: Gao Shiyuan <gaoshiyuan@baidu.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
-	<mtosatti@redhat.com>, Zhao Liu <zhao1.liu@intel.com>
-CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <gaoshiyuan@baidu.com>,
-	<wangliang44@baidu.com>
-Subject: [PATCH v2 1/1] x86: Add support save/load HWCR MSR
-Date: Wed, 9 Oct 2024 17:51:09 +0800
-Message-ID: <20241009095109.66843-1-gaoshiyuan@baidu.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1728468672; c=relaxed/simple;
+	bh=v2nhH4U7+pRaikn9lz83A6uasD9Dg5SjNELX0FjgBCo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GJOaApRcVcAYttue67s26yTrTdD8+LsqnOEOeK4lmZAteamfrdUuZCSaJ+mapxd+aUB4VcD0snAvYCnRec/7c/H/aLP9HziCKobS0CqmzT4LTCfak0/QxEoYPBATsa8jqMM4s2jgovXZZ3+9jRXjIasERNqrc19xqW86evNLyl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=ffodqbRU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cPzper/j; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id E766113806C1;
+	Wed,  9 Oct 2024 06:11:09 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Wed, 09 Oct 2024 06:11:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1728468669; x=
+	1728555069; bh=RyIYYgkZHDkV5usg9WzH6NVr4irSdm1yZQbwtmB/jUM=; b=f
+	fodqbRUF4pxa7Ke1pfJx1vo7rnbBIM11phY1BAZjuJyd0SFX2G6vBXQ7rE3JYZZr
+	IMoAU0/+HmDdcuScrCrqsikUwM1aeokwKZHfQXUEQU14HUdCa8gNEUO3SjI7+Eh2
+	Kgzpb1gMo3XL0rSl1EJkzx8dvBu2Qz22PP4Oz9C7R/OwQ/7yxglUP+RibDhR1YRd
+	WZNW4XoNF47eM/ES/qTIrz+Ioq9eYkYH73dieENr3VmSAFIgsdB8wRtfBfy+n7fC
+	FsenkpefsgkHcsVpoTJ55F89SNTRwu1HCUn4kdO2rtzCqVYlGsgudE5XMx1yXW6Y
+	DQCeEPPNNgf1kLgxl5dIg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1728468669; x=1728555069; bh=RyIYYgkZHDkV5usg9WzH6NVr4irS
+	dm1yZQbwtmB/jUM=; b=cPzper/jYXuRhVCVcH+gi3MxiERvQwmW1nfVcLAEXHUd
+	aAHGq3iiPYMHjpKKGg7uqq23rphoUbfbk01hqdsCPCEfesLzACCjbdtdpSPq9/cy
+	k5GxPKjkePzojQBdZ8cbEy50QN2rY/GJ092mLLtveXCOA3KvEAlFVf1fM9UxoS4J
+	Mbcp3VqKi3jmk+z4ebHlipgtwGwHFt6/xkfQhowtZ+CLSD0EkWxHDFQLyrkIsvEm
+	VQ6jOrVkMVa5FOlKs7HFh5gulxtuHeyHH1J3pwoQThrh4pBxJlxCIsSZHdqpEwcB
+	YkpAetRkLxJm2Vv2wdIxC8pr9OLXNa3XpcFgvgvZuA==
+X-ME-Sender: <xms:vVYGZ-td6euj-nebkwjw9CNCf9hCf8JJbLTVdFa4boc_vUueFePHlw>
+    <xme:vVYGZzc7WMO4sNH1qD6MAv7_0NiH2FlCQKVTElNDLwWpI62xB7YFCTt-65z7MT83U
+    pjocComileVxn7HfIg>
+X-ME-Received: <xmr:vVYGZ5z42LH5BBycVER84Ec1koPKYWqKq_AMLPey78j04J_KVASAdf3qxc2oPAO4pO5Y4Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeffedgvdeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvden
+    ucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlse
+    hshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpeffvdevueetudfhhfff
+    veelhfetfeevveekleevjeduudevvdduvdelteduvefhkeenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhv
+    rdhnrghmvgdpnhgspghrtghpthhtohepudekpdhmohguvgepshhmthhpohhuthdprhgtph
+    htthhopehnvggvrhgrjhdruhhprgguhhihrgihsegrmhgurdgtohhmpdhrtghpthhtohep
+    sghpsegrlhhivghnkedruggvpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvgh
+    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhglhigsehlihhnuhhtrhhonhhi
+    gidruggvpdhrtghpthhtohepmhhinhhgohesrhgvughhrghtrdgtohhmpdhrtghpthhtoh
+    epuggrvhgvrdhhrghnshgvnheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthho
+    pehthhhomhgrshdrlhgvnhgurggtkhihsegrmhgurdgtohhmpdhrtghpthhtohepnhhikh
+    hunhhjsegrmhgurdgtohhmpdhrtghpthhtohepshgrnhhtohhshhdrshhhuhhklhgrsegr
+    mhgurdgtohhm
+X-ME-Proxy: <xmx:vVYGZ5NucWVhCjtxdHuRas6mlOuFs-Cv1KlsN9ipchXPHFXrxO2SvA>
+    <xmx:vVYGZ-_qa8CvnR4CzX3TbW7IQr2T49GN2EuatEZlsvSV_Y-GnkvXVQ>
+    <xmx:vVYGZxVeQDoeYhjXjlgFnTkQmdAOfwt5pjLUuejCoQcT38tTS93NTw>
+    <xmx:vVYGZ3d-6AWNVysadjRD7ZcQWmuTK43vvT6GN6BD_aijpKgzdVU0Jg>
+    <xmx:vVYGZx0Lb6t5kf3XhUwDW1xQeOEqtz6E8Fcyn__etrlwAqUec1-IHawM>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 9 Oct 2024 06:11:03 -0400 (EDT)
+Date: Wed, 9 Oct 2024 13:10:58 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, bp@alien8.de
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com, 
+	Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, 
+	x86@kernel.org, hpa@zytor.com, peterz@infradead.org, seanjc@google.com, 
+	pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [RFC 01/14] x86/apic: Add new driver for Secure AVIC
+Message-ID: <sng54pb3ck25773jnajmnci3buczq4tnvuofht6rnqbfqpu77s@vucyk6py2wyf>
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
+ <20240913113705.419146-2-Neeraj.Upadhyay@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BC-Mail-EX07.internal.baidu.com (172.31.51.47) To
- bjkjy-mail-ex26.internal.baidu.com (172.31.50.42)
-X-FEAS-Client-IP: 172.31.51.54
-X-FE-Policy-ID: 52:10:53:SYSTEM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240913113705.419146-2-Neeraj.Upadhyay@amd.com>
 
-KVM commit 191c8137a939 ("x86/kvm: Implement HWCR support")
-introduced support for emulating HWCR MSR.
+On Fri, Sep 13, 2024 at 05:06:52PM +0530, Neeraj Upadhyay wrote:
+> diff --git a/include/linux/cc_platform.h b/include/linux/cc_platform.h
+> index caa4b4430634..801208678450 100644
+> --- a/include/linux/cc_platform.h
+> +++ b/include/linux/cc_platform.h
+> @@ -88,6 +88,14 @@ enum cc_attr {
+>  	 * enabled to run SEV-SNP guests.
+>  	 */
+>  	CC_ATTR_HOST_SEV_SNP,
+> +
+> +	/**
+> +	 * @CC_ATTR_SNP_SECURE_AVIC: Secure AVIC mode is active.
+> +	 *
+> +	 * The host kernel is running with the necessary features enabled
+> +	 * to run SEV-SNP guests with full Secure AVIC capabilities.
+> +	 */
+> +	CC_ATTR_SNP_SECURE_AVIC,
 
-Add support for QEMU to save/load this MSR for migration purposes.
+I don't think CC attributes is the right way to track this kind of
+features. My understanding of cc_platform interface is that it has to be
+used to advertise some kind of property of the platform that generic code
+and be interested in, not a specific implementation.
 
-Signed-off-by: Gao Shiyuan <gaoshiyuan@baidu.com>
-Signed-off-by: Wang Liang <wangliang44@baidu.com>
----
- target/i386/cpu.h     |  5 +++++
- target/i386/kvm/kvm.c | 12 ++++++++++++
- target/i386/machine.c | 20 ++++++++++++++++++++
- 3 files changed, 37 insertions(+)
+For the same reason, I think CC_ATTR_GUEST/HOST_SEV_SNP is also a bad use
+of the interface.
 
-v1 -> v2:
-* Rename hwcr to msr_hwcr
-* Remove msr_hwcr reset from x86_cpu_reset_hold
+Borislav, I know we had different view on this. What is your criteria on
+what should and shouldn't be a CC attribute? I don't think we want a
+parallel X86_FEATURE_*.
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 9c39384ac0..4b6245dc15 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -533,6 +533,8 @@ typedef enum X86Seg {
- 
- #define MSR_AMD64_TSC_RATIO_DEFAULT     0x100000000ULL
- 
-+#define MSR_K7_HWCR                     0xc0010015
-+
- #define MSR_VM_HSAVE_PA                 0xc0010117
- 
- #define MSR_IA32_XFD                    0x000001c4
-@@ -1854,6 +1856,9 @@ typedef struct CPUArchState {
-     uint64_t msr_lbr_depth;
-     LBREntry lbr_records[ARCH_LBR_NR_ENTRIES];
- 
-+    /* AMD MSRC001_0015 Hardware Configuration */
-+    uint64_t msr_hwcr;
-+
-     /* exception/interrupt handling */
-     int error_code;
-     int exception_is_int;
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index e6f94900f3..c83b46f4b7 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -165,6 +165,7 @@ static bool has_msr_ucode_rev;
- static bool has_msr_vmx_procbased_ctls2;
- static bool has_msr_perf_capabs;
- static bool has_msr_pkrs;
-+static bool has_msr_hwcr;
- 
- static uint32_t has_architectural_pmu_version;
- static uint32_t num_architectural_pmu_gp_counters;
-@@ -2574,6 +2575,8 @@ static int kvm_get_supported_msrs(KVMState *s)
-             case MSR_IA32_PKRS:
-                 has_msr_pkrs = true;
-                 break;
-+            case MSR_K7_HWCR:
-+                has_msr_hwcr = true;
-             }
-         }
-     }
-@@ -3916,6 +3919,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_virt_ssbd) {
-         kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, env->virt_ssbd);
-     }
-+    if (has_msr_hwcr) {
-+        kvm_msr_entry_add(cpu, MSR_K7_HWCR, env->msr_hwcr);
-+    }
- 
- #ifdef TARGET_X86_64
-     if (lm_capable_kernel) {
-@@ -4400,6 +4406,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         kvm_msr_entry_add(cpu, MSR_IA32_TSC, 0);
-         env->tsc_valid = !runstate_is_running();
-     }
-+    if (has_msr_hwcr) {
-+        kvm_msr_entry_add(cpu, MSR_K7_HWCR, 0);
-+    }
- 
- #ifdef TARGET_X86_64
-     if (lm_capable_kernel) {
-@@ -4919,6 +4928,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
-             env->lbr_records[index - MSR_ARCH_LBR_INFO_0].info = msrs[i].data;
-             break;
-+        case MSR_K7_HWCR:
-+            env->msr_hwcr = msrs[i].data;
-+            break;
-         }
-     }
- 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 39f8294f27..b4610325aa 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -1543,6 +1543,25 @@ static const VMStateDescription vmstate_msr_xfd = {
-     }
- };
- 
-+static bool msr_hwcr_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->msr_hwcr != 0;
-+}
-+
-+static const VMStateDescription vmstate_msr_hwcr = {
-+    .name = "cpu/msr_hwcr",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = msr_hwcr_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.msr_hwcr, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- #ifdef TARGET_X86_64
- static bool intel_fred_msrs_needed(void *opaque)
- {
-@@ -1773,6 +1792,7 @@ const VMStateDescription vmstate_x86_cpu = {
-         &vmstate_msr_intel_sgx,
-         &vmstate_pdptrs,
-         &vmstate_msr_xfd,
-+        &vmstate_msr_hwcr,
- #ifdef TARGET_X86_64
-         &vmstate_msr_fred,
-         &vmstate_amx_xtile,
 -- 
-2.34.1
-
+  Kiryl Shutsemau / Kirill A. Shutemov
 
