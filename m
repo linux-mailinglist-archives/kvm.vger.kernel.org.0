@@ -1,150 +1,109 @@
-Return-Path: <kvm+bounces-28159-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28160-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F366995E59
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 05:51:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 032C1995EEE
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 07:24:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EAE71F276AB
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 03:51:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2CEA1F25E5B
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 05:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765C414D6F9;
-	Wed,  9 Oct 2024 03:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1953D15CD49;
+	Wed,  9 Oct 2024 05:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Kcw6IMDh"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="OAfmZLhb"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54B910FF;
-	Wed,  9 Oct 2024 03:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5D639AEB;
+	Wed,  9 Oct 2024 05:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728445884; cv=none; b=Ux4wh6UJOMOGtSgI/Loh1cZffxxry0AH0UHQCtuY/zMN4jtX3cPJcLCHx6ijjl/LraRQNpzAXy3UvFtvXiN4EEHewBQbNH9sc3il4SnRuyaoVjFr1M4hdTe1nq8BMKgwQDrX2vsTnk05lVE1an1hVoBCWicr8nKrfnE5z9890/g=
+	t=1728451450; cv=none; b=H7r5hNzNy6QOgf9e5REksZvqM69wLBrzO4SphuME2rv6RXTHXB6r0UI/Ue7OXAor1U3LGoNkFCNr7tlq99bqJmaJjWgiA/EEqKUi2z5HfoS+gFNFjD7LyQDIGh2nSq6K4YVuA/FUZYtulvLDc6xO4Sb8zXRJug7Y9S0Ntd5S54c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728445884; c=relaxed/simple;
-	bh=Fz6m3s5wR0Xe7bKylBUoyAUXiZbhWI4E69+DbXptgGU=;
-	h=Message-ID:Date:MIME-Version:To:CC:References:Subject:From:
-	 In-Reply-To:Content-Type; b=GajoB/BzpYM91vzjiwUbzcv4LnUlOAh2SUzT2qHcBnEOHEn1Y6iaGjHDu1FCOTXfsPtmJQbDo/XjYMqQZnBIQNlaIrxqS1vb8jHzcm/6m3PAPUzKEFwaQAy2b1UnsPTHALY+bzVU7fw6jDC4Mnhdap4mMeD3K+TGWz7LfFN+7lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Kcw6IMDh; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728445883; x=1759981883;
-  h=message-id:date:mime-version:to:cc:references:subject:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Fz6m3s5wR0Xe7bKylBUoyAUXiZbhWI4E69+DbXptgGU=;
-  b=Kcw6IMDh+CAWZNPpmwpzpu0AgleuTw6KPrzkTeBh+BcC4ICy6nq0JXQl
-   1EzaMHcxVYrGdCQSVVTwxbEvwkPn5hSWTh1SSkwcsTXLuH5dcJ8Jsh0dB
-   3+sg+PovgioDKfHosHKNOzOPeycMbmpMoASjEuctTVjbXYUOywnSD2oZ1
-   A=;
-X-IronPort-AV: E=Sophos;i="6.11,188,1725321600"; 
-   d="scan'208";a="433642865"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 03:51:19 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:59909]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.199:2525] with esmtp (Farcaster)
- id acf9dcc9-ae36-4c0e-a2a8-553270007ea0; Wed, 9 Oct 2024 03:51:18 +0000 (UTC)
-X-Farcaster-Flow-ID: acf9dcc9-ae36-4c0e-a2a8-553270007ea0
-Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 9 Oct 2024 03:51:18 +0000
-Received: from [192.168.205.151] (10.106.100.42) by
- EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 9 Oct 2024 03:51:14 +0000
-Message-ID: <ac337485-f8ab-45a4-b223-eb846e21c762@amazon.com>
-Date: Tue, 8 Oct 2024 20:51:13 -0700
+	s=arc-20240116; t=1728451450; c=relaxed/simple;
+	bh=PoSZ4w50I3l6g8tbsbVsp8+HhLHPpIhi8GGnIcTkIu4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LG04t+e5GrdkKLPYHDBcjlY85OSyv66N4TB5y2e8oeKQ3w9tW6KN5/xzaXoUkUkKTdMND/EHbg/iSXNKYcQWHn+uvsKE1vtNjs52p00kF/XguQREaisdKdPVX72hhFcnsYY2SVUp+RRe7rNdcAVnhrJft4QFf1BWQ5qKVbweYHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=OAfmZLhb; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id CD6BA40E0263;
+	Wed,  9 Oct 2024 05:24:03 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id BWLhazLo0C82; Wed,  9 Oct 2024 05:24:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1728451439; bh=fa5EYiN5E+PNX8HO3SypS+kUz012vaZqA5LR5h5ExUc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OAfmZLhbAJbHDoGnObGP1E7Rb2gEpyYS/ocOT3x0T0FjRicvRddCCfEo8lxX6Rzvs
+	 l+zu4w6MUgWKMYZJ2ofwEvwEHOrE21XhuO6HPLTmgz5FPXE6T/G6tIo0PLWx2kZofM
+	 SQ6N5fRcRgrHiK6s5+R70o7mY0UoUXZu2wVz1Ps5Ryax1f74w7v+FIRFBRq37E14bu
+	 GDjU5R5h4pTUw53f4VHZeXFrzgVr/fMB5boGYnnYNvCr9XPhS0Fs32FjCxp6VkG8fg
+	 NKyUuAXRnOOm2TaraWXzle1St1M8wEGudtSsFFgsHwL0YpkJkslr8owK/L2/1+t9y7
+	 jRaqgEkqGYr64075diaPaII4BmhnaFeHXSgnApg2768LPWfJgV/DfCv7mrEZiuq+3e
+	 p5jUddjwBSZx67lfzpAC66Oh7BYJlTXWuxlz+YVbyAmcGG5fkDr8Zk5LNizIBIKX8d
+	 T8gpvFjHrygREs0QQ7UwiUXy4uYDmsTUyb8Nw2AXvmdbquXV/rZ4bPDVZs2ZalTUcD
+	 xIDqYjhvnn9G+Nal/2tLNCoD82PxB412fhcFsi5n3ekitQ4hi4JEv3J8t6rpq2kpCi
+	 Cs0wAaFoWMqBTx4xb3Yms/CsQuIafKMuursAmE4pU3DLr2TfVb8kZRJ9LahReGJcxT
+	 cNU4eKFnC4RX4ZB5yTeXtQwo=
+Received: from zn.tnic (p5de8e8eb.dip0.t-ipconnect.de [93.232.232.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 67C1840E0163;
+	Wed,  9 Oct 2024 05:23:42 +0000 (UTC)
+Date: Wed, 9 Oct 2024 07:23:36 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [RFC 01/14] x86/apic: Add new driver for Secure AVIC
+Message-ID: <20241009052336.GAZwYTWDLWfSPtZe5b@fat_crate.local>
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
+ <20240913113705.419146-2-Neeraj.Upadhyay@amd.com>
+ <20241008191556.GNZwWE7EsxceGh4HM4@fat_crate.local>
+ <8d0f9d2c-0ae4-442c-9ee4-288fd014599f@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: <seanjc@google.com>, <andrew.cooper3@citrix.com>,
-	<dave.hansen@linux.intel.com>
-CC: <ackerleytng@google.com>, <ajones@ventanamicro.com>,
-	<anup@brainfault.org>, <bfoster@redhat.com>, <brauner@kernel.org>,
-	<david@redhat.com>, <derekmn@amazon.com>, <erdemaktas@google.com>,
-	<fan.du@intel.com>, <fvdl@google.com>, <haibo1.xu@intel.com>,
-	<isaku.yamahata@intel.com>, <jgg@nvidia.com>, <jgowans@amazon.com>,
-	<jhubbard@nvidia.com>, <jthoughton@google.com>, <jun.miao@intel.com>,
-	<kalyazin@amazon.co.uk>, <kent.overstreet@linux.dev>, <kvm@vger.kernel.org>,
-	<linux-fsdevel@kvack.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-mm@kvack.org>,
-	<maciej.wieczor-retman@intel.com>, <mike.kravetz@oracle.com>,
-	<muchun.song@linux.dev>, <oliver.upton@linux.dev>, <pbonzini@redhat.com>,
-	<peterx@redhat.com>, <pgonda@google.com>, <pvorel@suse.cz>,
-	<qperret@google.com>, <quic_eberman@quicinc.com>,
-	<richard.weiyang@gmail.com>, <rientjes@google.com>, <roypat@amazon.co.uk>,
-	<rppt@kernel.org>, <shuah@kernel.org>, <tabba@google.com>,
-	<vannapurve@google.com>, <vkuznets@redhat.com>, <willy@infradead.org>,
-	<zhiquan1.li@intel.com>, <graf@amazon.de>, <mlipp@amazon.at>,
-	<canellac@amazon.at>
-References: <ZwWOfXd9becAm4lH@google.com>
-Subject: Re: [RFC PATCH 30/39] KVM: guest_memfd: Handle folio preparation for
- guest_memfd mmap
-Content-Language: en-US
-From: "Manwaring, Derek" <derekmn@amazon.com>
-In-Reply-To: <ZwWOfXd9becAm4lH@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
- EX19D003UWC002.ant.amazon.com (10.13.138.169)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8d0f9d2c-0ae4-442c-9ee4-288fd014599f@amd.com>
 
-On 2024-10-08 at 19:56+0000 Sean Christopherson wrote:
-> Another (slightly crazy) approach would be use protection keys to provide the
-> security properties that you want, while giving KVM (and userspace) a quick-and-easy
-> override to access guest memory.
->
->  1. mmap() guest_memfd into userpace with RW protections
->  2. Configure PKRU to make guest_memfd memory inaccessible by default
->  3. Swizzle PKRU on-demand when intentionally accessing guest memory
->
-> It's essentially the same idea as SMAP+STAC/CLAC, just applied to guest memory
-> instead of to usersepace memory.
->
-> The benefit of the PKRU approach is that there are no PTE modifications, and thus
-> no TLB flushes, and only the CPU that is access guest memory gains temporary
-> access.  The big downside is that it would be limited to modern hardware, but
-> that might be acceptable, especially if it simplifies KVM's implementation.
+On Wed, Oct 09, 2024 at 07:26:55AM +0530, Neeraj Upadhyay wrote:
+> As SECURE_AVIC feature is not supported (as reported by snp_get_unsupported_features())
+> by guest at this patch in the series, it is added to SNP_FEATURES_IMPL_REQ here. The bit
+> value within SNP_FEATURES_IMPL_REQ hasn't changed with this change as the same bit pos
+> was part of MSR_AMD64_SNP_RESERVED_MASK before this patch. In patch 14 SECURE_AVIC guest
+> support is indicated by guest.
 
-Yeah this might be worth it if it simplifies significantly. Jenkins et
-al. showed MPK worked for stopping in-process Spectre V1 [1]. While
-future hardware bugs are always possible, the host kernel would still
-offer better protection overall since discovery of additional Spectre
-approaches and gadgets in the kernel is more likely (I think it's a
-bigger surface area than hardware-specific MPK transient execution
-issues).
+So what's the point of adding it to SNP_FEATURES_IMPL_REQ here? What does that
+do at all in this patch alone? Why is this change needed in here?
 
-Patrick, we talked about this a couple weeks ago and ended up focusing
-on within-userspace protection, but I see keys can also be used to stop
-kernel access like Andrew's project he mentioned during Dave's MPK
-session at LPC [2]. Andrew, could you share that here?
+IOW, why don't you do all the feature bit handling in the last patch, where it
+all belongs logically?
 
-It's not clear to me how reliably the kernel prevents its own access to
-such pages. I see a few papers that warrant more investigation:
+In the last patch you can start *testing* for
+MSR_AMD64_SNP_SECURE_AVIC_ENABLED *and* enforce it with SNP_FEATURES_PRESENT.
 
-"we found multiple interfaces that Linux, by design, provides for
-accessing process memory that ignore PKU domains on a page." [3]
+-- 
+Regards/Gruss,
+    Boris.
 
-"Though Connor et al. demonstrate that existing MPK protections can be
-bypassed by using the kernel as a confused deputy, compelling recent
-work indicates that MPK operations can be made secure." [4]
-
-Dave and others, if you're aware of resources clarifying how strong the
-boundaries are, that would be helpful.
-
-Derek
-
-
-[1] https://www.cs.dartmouth.edu/~sws/pubs/jas2020.pdf
-[2] https://www.youtube.com/watch?v=gEUeMfrNH94&t=1028s
-[3] https://www.usenix.org/system/files/sec20-connor.pdf
-[4] https://ics.uci.edu/~dabrowsa/kirth-eurosys22-pkru.pdf
+https://people.kernel.org/tglx/notes-about-netiquette
 
