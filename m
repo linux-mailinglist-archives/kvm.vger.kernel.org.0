@@ -1,174 +1,127 @@
-Return-Path: <kvm+bounces-28249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28250-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5B05996F1D
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 17:02:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F78996F4C
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 17:12:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6398B28768E
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 15:02:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE5831F22695
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 15:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC231A0B12;
-	Wed,  9 Oct 2024 15:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6CE1D271C;
+	Wed,  9 Oct 2024 15:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SPtoK/NM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hefr1fPy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713EC1A00D2;
-	Wed,  9 Oct 2024 15:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED57519995D
+	for <kvm@vger.kernel.org>; Wed,  9 Oct 2024 15:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728486092; cv=none; b=XLFLEuXZhGdLGVyRD4PpdRs8hRptVCCCR8UakHTWYbtvVi/DlI8zuSNW8hbJXzpWcct4AucORzjP9QhDjmEjLvoLMSWdSxNve20NDC8VxDzt/tzhw8m0dNWuSAgaB34U3XfhQcxcObvZjzfgVFEEQ+jaMhyAz9Ebc8FiZMaOQ54=
+	t=1728486300; cv=none; b=ieAFIzO/vivCg81JNmp9U1VzJEaJZi8wqsHXElbYUCjA5WWtoLYk+sz1kI0qmXygSiIP8em3D4ZLAay2J1kKYfe8bhwnbzXgwOrLTE6pGgT/nzXP5z2421rneV0nWKyxTGUgBxjWChsEFb0trba0tnIimx18teP63i09T4t96Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728486092; c=relaxed/simple;
-	bh=fVRTwtcaoT0WmKjrFpk1DDIfYhMFQjs89fQ0qX3twgY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lXQ4bPvO8LuJW7xIrdLlLHeHWelsqLf9pEs/3eGOJyVqrk6ICp7tQe+sMNqjDuAyEwpsLQNF2GQvFQod0T46bp6V7gXwt5z6fvSpFbDUBl46sA5OWantnIuiDWF6TyeZqWBZSCwbBE+xM7WJjP3Rn0BC6ael6w9mT4CH9DbL5Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SPtoK/NM; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728486091; x=1760022091;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=fVRTwtcaoT0WmKjrFpk1DDIfYhMFQjs89fQ0qX3twgY=;
-  b=SPtoK/NMn//+oNsyOxMG2mxlq+qcm/F/CbaIOFNJun219dNq9Ln2ZVJl
-   qzqka2KQpefRkFAwPmIRFO/cfPGQT8V5C8nKiOOQHHcjxf7k/RvJvNlFu
-   DUY2dTr1O1eLqR6dDXWPAhWAWl9UsU8hTkOt8XIb9BQSI+NeQQXjucEie
-   sKJBX4NSUGLJMU8slfFbfN4Fy3EVfKJ7SmCeiOnR1ZRYkgkzluv6HDxL3
-   lxntuDsQ1MKiduGdEKkY0ogYGEfwN4WPD8ce0FvlSmTY64/CcBi7rHO7f
-   xbIHAc7R63kOJ43wPwmqLJryfd+uBF2VSL2wIugq/8vgUAC0kXgUW+VUW
-   g==;
-X-CSE-ConnectionGUID: lAl/6/KGSxOhTYmB6kv0ZA==
-X-CSE-MsgGUID: thc+uxylSjWR94dy78v2WQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="27740355"
-X-IronPort-AV: E=Sophos;i="6.11,190,1725346800"; 
-   d="scan'208";a="27740355"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 08:01:30 -0700
-X-CSE-ConnectionGUID: vlgJ5M3jTiOZj4mbfcBUhw==
-X-CSE-MsgGUID: 9mYwFaXSTPav/TcJ9Syvdg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,190,1725346800"; 
-   d="scan'208";a="81297872"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.245.89.141])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 08:01:26 -0700
-Message-ID: <1a200cd3-ad73-4a53-bc48-661f7d022ac0@intel.com>
-Date: Wed, 9 Oct 2024 18:01:19 +0300
+	s=arc-20240116; t=1728486300; c=relaxed/simple;
+	bh=uPUaOv2QrzSaUf4LArS8+PSibvq85NPqivVxaIxcqnY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=raj+qRoU/byntLjeArXvZr8QWZxUBG6vZ7fgKDh3XHrsNDiaR3b+SsVZFyCrWgIdzeYXhiyGuQq6mfSh8P2g51QUC42Ll1c7RfjacDdkJKmBNRzHl7Wif5vEI7pTl4cdKp8Q3cKdw4P7R0mKryY1GG48GJPs5frDYIzg3zqkG4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hefr1fPy; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e29b4f8837so14077267b3.0
+        for <kvm@vger.kernel.org>; Wed, 09 Oct 2024 08:04:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728486298; x=1729091098; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a8TTqJOaZnfBA+i3DdeHlnHy8Opvxrk5SUeEQ665whA=;
+        b=hefr1fPyrNDihae/WRAOV3FfbL2F/7jPh7jJGngO2Vi4WF1EPdyWquMDuWIBX4MXvX
+         xtQ8atO52mQIdk+NO/rJNKjxJRzkZ3gUhTd1YHdNgRy8hCbPiadzKfncEFKSOfAK2x73
+         24CHiFUmvrxHnyi1XEpoFVQ/Yhz6eEjVfoZgd9PYkeAe3gxVCyTXRl65fczI3wV1JfUS
+         f4EYtNRpO+B2cr9ebW+gWQW+EIZm24xBHINCnFJmRQho2FdqL8WavN1M5y4ky15DHr9h
+         iaV4GwrLeI0vweAvPYKREbiyZ8aqwxA4uTP5Z++3WSyNDAWhrDHKTZHDbqMTf09/NxuK
+         2asg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728486298; x=1729091098;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a8TTqJOaZnfBA+i3DdeHlnHy8Opvxrk5SUeEQ665whA=;
+        b=QIu6TPu34F4987xin6dd/8G1SZG4ylp5SvMFBLOcJ1REoR8st+AZ7U/BmV3vzB3LIf
+         AkN9ZvRhnYgSJZzHEPaKLErTY9QKnj4Gt+O/7h6zTckLszpyM4oKe9Rqa0rgojzIx6fL
+         tEZpwmmWvzMAJA3qeGl7SJAv1k8fOmtJRw1qpN7AY5GZSu5FGYsoBHl7fgYFnG8dr8vy
+         aWS9clrkFbZvYPQtZdoWJ56J70ggz8rzFT1uqfarDa5/V8P35pYP4B1bTplecZmj3/TR
+         S/qQGyGHHlju7E8Fb1mmAQ87s3eG3OH19H2l5KUWdZBp9g0oWVMpVHmdYwNgRLziQGTn
+         0cew==
+X-Gm-Message-State: AOJu0YxC+Bt8eHNPHjTilml3IbJP/M9MIsp+QDKEzOU5S2eGAZTlQC6S
+	D9t0NmdlyVgFfXFD7U8flFraD49pI3sQ/TVttCPD+B5IJLIn/qEtFNXH4ZHSf6BVWlaQjBK61VU
+	9lw==
+X-Google-Smtp-Source: AGHT+IGxFiVDW/oEtOCIg0CVNCO6RB2GNcn8OUHtfbGXlgiBNs0NANmOo24ozhMrY1k+G+YEoGSelxcuUgI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:2e81:b0:6be:523:af53 with SMTP id
+ 00721157ae682-6e30dfbaae9mr206247b3.3.1728486297981; Wed, 09 Oct 2024
+ 08:04:57 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed,  9 Oct 2024 08:04:49 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 18/25] KVM: TDX: Do TDX specific vcpu initialization
-To: Yuan Yao <yuan.yao@linux.intel.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
- kai.huang@intel.com, isaku.yamahata@gmail.com,
- tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
- linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>,
- Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-19-rick.p.edgecombe@intel.com>
- <20240813080009.zowu3woyffwlyazu@yy-desk-7060>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <20240813080009.zowu3woyffwlyazu@yy-desk-7060>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
+Message-ID: <20241009150455.1057573-1-seanjc@google.com>
+Subject: [PATCH 0/6] KVM: Fix bugs in vCPUs xarray usage
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Will Deacon <will@kernel.org>, Michal Luczaj <mhal@rbox.co>, Sean Christopherson <seanjc@google.com>, 
+	Alexander Potapenko <glider@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 
-On 13/08/24 11:00, Yuan Yao wrote:
-> On Mon, Aug 12, 2024 at 03:48:13PM -0700, Rick Edgecombe wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> TD guest vcpu needs TDX specific initialization before running.  Repurpose
->> KVM_MEMORY_ENCRYPT_OP to vcpu-scope, add a new sub-command
->> KVM_TDX_INIT_VCPU, and implement the callback for it.
->>
->> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
->> ---
+This series stems from Will's observation[*] that kvm_vm_ioctl_create_vcpu()'s
+handling of xa_store() failure when inserting into vcpu_array is technically
+broken, although in practice it's impossible for xa_store() to fail.
 
-<SNIP>
+After much back and forth and staring, I realized that commit afb2acb2e3a3
+("KVM: Fix vcpu_array[0] races") papered over underlying bugs in
+kvm_get_vcpu() and kvm_for_each_vcpu().  The core problem is that KVM
+allowed other tasks to see vCPU0 while online_vcpus==0, and thus trying
+to gracefully error out of vCPU creation led to use-after-free failures.
 
->> @@ -884,6 +930,149 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->>  	return r;
->>  }
->>
->> +/* VMM can pass one 64bit auxiliary data to vcpu via RCX for guest BIOS. */
->> +static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
->> +{
+So, rather than trying to solve the unsolvable problem for an error path
+that should be impossible to hit, fix the underlying issue and ensure that
+vcpu_array[0] is accessed if and only if online_vcpus is non-zero.
 
-<SNIP>
+Patch 3 fixes a race Michal identified when we were trying to figure out
+how to handle the xa_store() mess.
 
->> +	if (modinfo->tdx_features0 & MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM)
->> +		err = tdh_vp_init_apicid(tdx, vcpu_rcx, vcpu->vcpu_id);
->> +	else
->> +		err = tdh_vp_init(tdx, vcpu_rcx);
-> 
-> This can cause incorrect topology information to guest
-> silently:
-> 
-> A user space VMM uses "-smp 8,threads=4,cores=2" but doesn't
-> pass any 0x1f leaf data to KVM, means no 0x1f value to TDX
-> module for this TD. The topology TD guest observed is:
-> 
-> Thread(s) per core:                 2
-> Core(s) per socket:                 4
-> 
-> I suggest to use tdh_vp_init_apicid() only when 0x1f is
-> valid. This will disable the 0x1f/0xb topology feature per
-> the spec, but leaf 0x1/0x4 still are available to present
-> right topology in this example. It presents correct topology
-> information to guest if user space VMM doesn't use 0x1f for
-> simple topology and run on TDX module w/ FEATURES0_TOPOLOGY.
+Patch 4 reverts afb2acb2e3a3.
 
-tdh_vp_init_apicid() passes x2APIC ID to TDH.VP.INIT which
-is one of the steps for the TDX Module to support topology
-information for the guest i.e. CPUID leaf 0xB and CPUID leaf 0x1F.
+Patches 5 and 6 are tangentially related cleanups.
 
-If the host VMM does not provide CPUID leaf 0x1F values
-(i.e. the values are 0), then the TDX Module will use native
-values for both CPUID leaf 0x1F and CPUID leaf 0xB.
+[*] https://lkml.kernel.org/r/20240730155646.1687-1-will%40kernel.org
 
-To get 0x1F/0xB the guest must also opt-in by setting
-TDCS.TD_CTLS.ENUM_TOPOLOGY to 1.  AFAICT currently Linux
-does not do that.
+Sean Christopherson (6):
+  KVM: Explicitly verify target vCPU is online in kvm_get_vcpu()
+  KVM: Verify there's at least one online vCPU when iterating over all
+    vCPUs
+  KVM: Grab vcpu->mutex across installing the vCPU's fd and bumping
+    online_vcpus
+  Revert "KVM: Fix vcpu_array[0] races"
+  KVM: Don't BUG() the kernel if xa_insert() fails with -EBUSY
+  KVM: Drop hack that "manually" informs lockdep of kvm->lock vs.
+    vcpu->mutex
 
-In the tdh_vp_init() case, topology information will not be
-supported.
+ include/linux/kvm_host.h | 16 ++++++++--
+ virt/kvm/kvm_main.c      | 68 ++++++++++++++++++++++++++++++----------
+ 2 files changed, 65 insertions(+), 19 deletions(-)
 
-If topology information is not supported CPUID leaf 0xB and
-CPUID leaf 0x1F will #VE, and a Linux guest will return zeros.
 
-So, yes, it seems like tdh_vp_init_apicid() should only
-be called if there is non-zero CPUID leaf 0x1F values provided
-by host VMM. e.g. add a helper function
-
-bool tdx_td_enum_topology(struct kvm_cpuid2 *cpuid)
-{
-	const struct tdx_sys_info_features *modinfo = &tdx_sysinfo->features;
-	const struct kvm_cpuid_entry2 *entry;
-
-	if (!(modinfo->tdx_features0 & MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM))
-		return false;
-
-	entry = kvm_find_cpuid_entry2(cpuid->entries, cpuid->nent, 0x1f, 0);
-	if (!entry)
-		return false;
-
-	return entry->eax || entry->ebx || entry->ecx || entry->edx;
-}
-
+base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
+-- 
+2.47.0.rc0.187.ge670bccf7e-goog
 
 
