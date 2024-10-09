@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-28308-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28309-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 630A19974C7
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 20:19:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370FD9974C9
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 20:20:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 114991F22EC5
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 18:19:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3FE01F2116F
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 18:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C233B1E32BE;
-	Wed,  9 Oct 2024 18:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36951E3770;
+	Wed,  9 Oct 2024 18:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IwBjmCun"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gcIw2BMi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE0A1E283F
-	for <kvm@vger.kernel.org>; Wed,  9 Oct 2024 18:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF051E2604
+	for <kvm@vger.kernel.org>; Wed,  9 Oct 2024 18:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728497878; cv=none; b=oSthG0+v1APiFezN1w1bVmgk/2ZT0vC3/DTjQyfa/mERNvObg1is6ZCOH2Hg3UHQYcx1W6hLhjxcLZAROifnHshWt54ZPvsMkC+PxPju5dk9E5IrI3Axhmx7aVo8GvD10fccp2OnD8Zx4x9nH/AmjWkeD4aSVdkozgfa5hu4iIg=
+	t=1728497879; cv=none; b=AwPEeSMpsV0sGg3nRQkt2YOUma6TFvzo9MY1pQInVG39XouSUOq3wIiI6OVQepCLa8ylj9DuaAHxHxMtYN9UugYp8uxgibwKHvuHXlwAl8dbu7/a2UmK7SocR7t16Bql3J7g4Mor5qjOVDpKhckosCHwoATYF1Qr6Qt1NgqVNes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728497878; c=relaxed/simple;
-	bh=lT1ZYT62nfExH90IUevqSKyYCT9nh/Q35XBGNwwaFTA=;
+	s=arc-20240116; t=1728497879; c=relaxed/simple;
+	bh=ExK2B45+IldPIhcp+mgV/yZse0LGT5sPNb9IYvCVpXQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aDdNoMrYyf09FgppivnWGJvGgHrXsbZZ5IL4QPONIYWfcRrqAqe/q1Rvv7IJoQwZfMjeCufLO5IZpZVMuAhYX7PVuJZT8T8jKct+Fghrz4ZVah5IqmjIl6xRwmnSlK+NGqAqbI+t06MPh0dql7n2f+Ps4OrNAss0WZGdhHLS4wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IwBjmCun; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=kGA95wHswqg5Yly0zkyxNYoHWhgF/riTzsZTdv+HkzEjVL/FYMnSKizFPRtrv37n2Db3CCVRIh1saNwi0tcRxkMlfeCWEdyra9X3NhrQQOYu+VJ5D/0L48a4RocRF2xZQ1FmxKvEVbbqGV3/bOp+5PAZP9ibaDRIYm40xTb4V+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gcIw2BMi; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e26ba37314so5833737b3.0
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2024 11:17:56 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2e1346983c8so173216a91.0
+        for <kvm@vger.kernel.org>; Wed, 09 Oct 2024 11:17:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728497875; x=1729102675; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728497877; x=1729102677; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kt7FHOB1935LxbC6vNqAogsIeVnq7546lEYAivm6tgg=;
-        b=IwBjmCunJKcjnpHjPu3yLpGnAYlIglcmQtpe5d5tZReInudwhtCzZSrUX/i/zXaq44
-         Bgi0CG9LiUR3NwKYcyx9ZWXY3crwgMSONiEfemSS8j7AHQ483g8iOmxWF3bynlaQUlmJ
-         QR7bD0dKTRXl7pNYGiKQR1qYcG5gmzxjfsW8ZGzc8czwNiwnSvYcmwWDAxbBjMZFekas
-         5wihCJjsCMtqqGxktX1RGaITxnl/xh+MAAbsD6YE5sgYiJEhxp/S8lLWXZm7RO6Fn9iz
-         aSh767f6xIGpwSnZ/2KOjWDRxCGnIqEQrN2W3/dIi0kS3Uxo/b2GxaMI7D+hgEvxJH82
-         WMLw==
+        bh=MaWbmPdh1mO0Nq8ZJC6BrpKNBUmVzBfz3tM+bJ0ag3A=;
+        b=gcIw2BMi/bfSPdDa4tBo7uKhSBh3/pnSwyGnAkUxFr0gR9ECcOUUSqHugiRYlba5XF
+         IKXq7BPM+Pr3C7mlIu3E39myJEVsPwOw62HecrAvXJgHiBYblUqGIBY87TKc8N5w4Oks
+         1nVcA8+Mx4doXEjL6R6zWweUo3Hl16rfnk/xYUc8WxJ8hcvLEH6mrNv51VwAlK4/TMoz
+         DU7HkI7EshmXbilQlp7+e8NY0ePgVfZXAct3Tscg+4WNzOGPtIgGHVdpnTVX6rXZz1yw
+         A3CNvy6tPe5/j8oz5A7ZjOu85YiYHe4gsNcZVFpax9SXQ7gVC3Cwkm4Yy6CpjWPKVVoe
+         PXJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728497875; x=1729102675;
+        d=1e100.net; s=20230601; t=1728497877; x=1729102677;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Kt7FHOB1935LxbC6vNqAogsIeVnq7546lEYAivm6tgg=;
-        b=SD4ApxTChB21g6H5Lb/r8WHmdF4dnxU0tmEzu0R0SVgrBseV3B7YKKB7O/dl0Wde8Y
-         7Zf0uZu/C4+CB+Peg1hOf0FAOVXFIoMN79gswlHJxR1kXhJQlkjdNlHwDktRfdRunUu3
-         o9v4u6wSpYxASsoawAflF26jwc9YOMbqWoSmRTO+h4zPc5zB+h7mMU5iWGiPLl5/9RU3
-         OpRYxaHSSeHuPWi1GgEix/9xp4NiXYsHEOmCw8CkvenJWcFBsMEkFF/BI6pZSexifcDC
-         OUwt/xjqWw00/qtrrEBSUIqqMsVlTf32zv8tEF5OA2tk0yuccA9BNIef/COZDS1zqUKS
-         izgQ==
-X-Gm-Message-State: AOJu0YyeMChXHGPhZUr5ZJ8EChmoWqh0lZwpObICNz8SJ8ZC+hkU2ziZ
-	XnCrC7AVk+fgaolYcG3s1YM8vpRbOkXRHlBCUCqZQBV4YVy008Y4mEv6G4uFeRVSVCmEGs8gNK9
-	GXQ==
-X-Google-Smtp-Source: AGHT+IGocRXOmVCQlqmoBkHUcGAAivPICXDUGWlVk79DtpyGqwVyyI7/c8wZnPktuAFL8/nvHRwhlb2HbiE=
+        bh=MaWbmPdh1mO0Nq8ZJC6BrpKNBUmVzBfz3tM+bJ0ag3A=;
+        b=u6FLNi8nGbfaXWN1YEkKcCZyBJJCJ04I5/MLOZ15qnrTdvCnJWkAl//AiRYu8gFCxt
+         qBqlMMEyn9k2i7acECEcIrK+cxUB/epjrSq+aevamnRrQ3Mky/zUnWqwH5jDNWAI+lfR
+         NOokVh57ovivOSulfBgBTFDHgXtvX6sen8X6SYCMUwjjCClu2KXki+AFYxV/fFI2w1t7
+         mmpArWrAIg8GCTwtoy1C16yEaQhBP2BjevQxCPnsmUM1/h5EOyM8iIVNQSDk7SNjbcRf
+         MpUZoSCqMX83VJU7Oax5nfgGu1jYjX4fXIAhVDWuefPdErt4Vr3ujHyVOR/jhLcpc3Mb
+         LElg==
+X-Gm-Message-State: AOJu0YyjC+cjWHri0l7oNhRz3uD9MKJW93TvviBFSM+A+0Cszdau6dyv
+	eGqEzag4uoqL/dAqbt+uGAoVq3057tjqnYgi3gOxJAvBEeDipWQbnTjJ7Z7za28vc7tWrtthyoi
+	GqA==
+X-Google-Smtp-Source: AGHT+IGNIE/edZnSUhMLEyYIvFpZ/Bc88mfOHpXxJTPoPiSpDG28tToOr/MFA+a/5VyqkU8h8H9o9tS/A/o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:d806:0:b0:e22:5fcb:5e22 with SMTP id
- 3f1490d57ef6-e28fe33b922mr2742276.3.1728497875306; Wed, 09 Oct 2024 11:17:55
+ (user=seanjc job=sendgmr) by 2002:a17:90b:815:b0:2e2:bf47:956e with SMTP id
+ 98e67ed59e1d1-2e2c7ff9325mr656a91.1.1728497877077; Wed, 09 Oct 2024 11:17:57
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  9 Oct 2024 11:17:40 -0700
+Date: Wed,  9 Oct 2024 11:17:41 -0700
 In-Reply-To: <20241009181742.1128779-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,111 +75,49 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241009181742.1128779-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241009181742.1128779-7-seanjc@google.com>
-Subject: [PATCH 6/7] KVM: x86: Rename APIC base setters to better capture
- their relationship
+Message-ID: <20241009181742.1128779-8-seanjc@google.com>
+Subject: [PATCH 7/7] KVM: x86: Make kvm_recalculate_apic_map() local to lapic.c
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Rename kvm_set_apic_base() and kvm_lapic_set_base() to kvm_apic_set_base()
-and __kvm_apic_set_base() respectively to capture that the underscores
-version is a "special" variant (it exists purely to avoid recalculating
-the optimized map multiple times when stuffing the RESET value).
+Make kvm_recalculate_apic_map() local to lapic.c now that all external
+callers are gone.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/lapic.c | 8 ++++----
- arch/x86/kvm/lapic.h | 3 +--
- arch/x86/kvm/x86.c   | 4 ++--
- 3 files changed, 7 insertions(+), 8 deletions(-)
+ arch/x86/kvm/lapic.c | 2 +-
+ arch/x86/kvm/lapic.h | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 6239cfd89aad..0a73d9a09fe0 100644
+index 0a73d9a09fe0..21fe50aad603 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -2577,7 +2577,7 @@ u64 kvm_lapic_get_cr8(struct kvm_vcpu *vcpu)
- 	return (tpr & 0xf0) >> 4;
- }
+@@ -382,7 +382,7 @@ enum {
+ 	DIRTY
+ };
  
--void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
-+static void __kvm_apic_set_base(struct kvm_vcpu *vcpu, u64 value)
+-void kvm_recalculate_apic_map(struct kvm *kvm)
++static void kvm_recalculate_apic_map(struct kvm *kvm)
  {
- 	u64 old_value = vcpu->arch.apic_base;
- 	struct kvm_lapic *apic = vcpu->arch.apic;
-@@ -2628,7 +2628,7 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
- 	}
- }
- 
--int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-+int kvm_apic_set_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
- 	enum lapic_mode old_mode = kvm_get_apic_mode(vcpu);
- 	enum lapic_mode new_mode = kvm_apic_mode(msr_info->data);
-@@ -2644,7 +2644,7 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 	}
- 
--	kvm_lapic_set_base(vcpu, msr_info->data);
-+	__kvm_apic_set_base(vcpu, msr_info->data);
- 	kvm_recalculate_apic_map(vcpu->kvm);
- 	return 0;
- }
-@@ -2752,7 +2752,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- 		msr_val = APIC_DEFAULT_PHYS_BASE | MSR_IA32_APICBASE_ENABLE;
- 		if (kvm_vcpu_is_reset_bsp(vcpu))
- 			msr_val |= MSR_IA32_APICBASE_BSP;
--		kvm_lapic_set_base(vcpu, msr_val);
-+		__kvm_apic_set_base(vcpu, msr_val);
- 	}
- 
- 	if (!apic)
+ 	struct kvm_apic_map *new, *old = NULL;
+ 	struct kvm_vcpu *vcpu;
 diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index fc4bd36d44cf..0dd5055852ad 100644
+index 0dd5055852ad..fdd6cf29a0be 100644
 --- a/arch/x86/kvm/lapic.h
 +++ b/arch/x86/kvm/lapic.h
 @@ -95,7 +95,6 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event);
  u64 kvm_lapic_get_cr8(struct kvm_vcpu *vcpu);
  void kvm_lapic_set_tpr(struct kvm_vcpu *vcpu, unsigned long cr8);
  void kvm_lapic_set_eoi(struct kvm_vcpu *vcpu);
--void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value);
- void kvm_recalculate_apic_map(struct kvm *kvm);
+-void kvm_recalculate_apic_map(struct kvm *kvm);
  void kvm_apic_set_version(struct kvm_vcpu *vcpu);
  void kvm_apic_after_set_mcg_cap(struct kvm_vcpu *vcpu);
-@@ -117,7 +116,7 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
- 		struct kvm_lapic_irq *irq, int *r, struct dest_map *dest_map);
- void kvm_apic_send_ipi(struct kvm_lapic *apic, u32 icr_low, u32 icr_high);
- 
--int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
-+int kvm_apic_set_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
- int kvm_apic_get_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s);
- int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s);
- int kvm_lapic_find_highest_irr(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a2a2a6126e67..803db3e9ab8a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3858,7 +3858,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_MTRRdefType:
- 		return kvm_mtrr_set_msr(vcpu, msr, data);
- 	case MSR_IA32_APICBASE:
--		return kvm_set_apic_base(vcpu, msr_info);
-+		return kvm_apic_set_base(vcpu, msr_info);
- 	case APIC_BASE_MSR ... APIC_BASE_MSR + 0xff:
- 		return kvm_x2apic_msr_write(vcpu, msr, data);
- 	case MSR_IA32_TSC_DEADLINE:
-@@ -11865,7 +11865,7 @@ static int __set_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs,
- 
- 	apic_base_msr.data = sregs->apic_base;
- 	apic_base_msr.host_initiated = true;
--	if (kvm_set_apic_base(vcpu, &apic_base_msr))
-+	if (kvm_apic_set_base(vcpu, &apic_base_msr))
- 		return -EINVAL;
- 
- 	if (vcpu->arch.guest_state_protected)
+ bool kvm_apic_match_dest(struct kvm_vcpu *vcpu, struct kvm_lapic *source,
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
