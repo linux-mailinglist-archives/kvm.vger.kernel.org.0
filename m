@@ -1,167 +1,157 @@
-Return-Path: <kvm+bounces-28352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28353-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC559975CF
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 21:42:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B3A99760D
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 21:57:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 950331C20FAB
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 19:42:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CD841F21C15
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 19:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6CC1E1C37;
-	Wed,  9 Oct 2024 19:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FD61E22F9;
+	Wed,  9 Oct 2024 19:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="haTjw/NP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hhBUjPzv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8CC1D356C;
-	Wed,  9 Oct 2024 19:41:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2D61E22E3
+	for <kvm@vger.kernel.org>; Wed,  9 Oct 2024 19:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728502895; cv=none; b=g1cC/aaL6EWSSH0Hag/8kR3uWC0lD61aWlT0m9Bs5EQuepG8JzgAntotFhOSskSW6QFYHt4e3UfxGNsok/klRqfbJZaMSnlZY8DFA099KAr9unM+4mBUITyVflL0O5JqFvKr8G3nBDbP5BhLFSE+fIm1FL02JSLhyKBzzJyWt1I=
+	t=1728503734; cv=none; b=J5L6gp9ZOEkibu7fEiDKMdZGG27pliu48O0AznlLUvkFLBhmTNmZfoJ4c8dwz6wW1rIdFECjYs3nQVwWCeh1U7QIhcJtadG+lDpyCVUuHEJzUZ7k11H2ZYtMLD2PpFZ64uNvvEaa6K10Iuzb/vY9NqJwI8h/ZLnnCOH6AY65wns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728502895; c=relaxed/simple;
-	bh=PDYidJaYfrjomUChvobIVbDDlDk1zVlAhYjbjjNl6kk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o+H6CCfb8S18xrvBoRqcrxuvK2RRal1DHcSnX2ZBkqtDbClthcm0cRGwortuoHHDu2cK1bhUCvdxzZRQqAXZKR40/e9WddzRxpcwGHlg4TlAXJO62R7Wswi5m0J0MtwmQqqcZd5aTdSD/EblOfl1EO6oF392m2GoH/6bKpoBKxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=haTjw/NP; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5398e4ae9efso144254e87.1;
-        Wed, 09 Oct 2024 12:41:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728502891; x=1729107691; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Io1G2uneGwHsYKAwtaIvvynFX0xlOmokHD97rmisdy0=;
-        b=haTjw/NP+LFmeIQsSVNPf46SPLroR5wQ6AWCHPRSbBBpgw+F6LbzczPdcsxcj+Ntjb
-         Nz53fEVzXDtDgQNHs4YvCQFq3scwom4q7Jfy/LNzPIlpg3NjS37nVLmv76Yp9FkUm/kg
-         73M4DFwUZ2524KA7afsKQ6mC5Pd0PSaXtdRuveZK6UuySuZr2OvgF0+hDhkQ8SZzxkAG
-         g6xqFbldrYLghmZ79erydEMRhTRtzoGlntkYwY4GZhkHaa1ndHkSN+4U3G30rSQtJ011
-         DQ7bN805MPsPBhc76d1uB6IcsFmR1ph0njamTa6rC3IvoAUaAbLnGFbA7vNfoh2rb1aE
-         8uMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728502891; x=1729107691;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Io1G2uneGwHsYKAwtaIvvynFX0xlOmokHD97rmisdy0=;
-        b=TAHtC2oKWz/rC+oStk+Qrp/2m4qlyakCppJiS7x7wfGdcouh/eWmtns7uDUZj9Qw27
-         cBKExlIULxsPuMzdsRD6IxIppMFX5qOJTKaws07idfRt5yp4RYHKO6CqArLCTgat2aGe
-         1qICug8nF/H5/hkFTqwsKABKFTx2NUKj1+1bsDyU8y5T14uFzJKpDi2M79m46Gw0H9H0
-         Vb7NKBdFQxV+b/ABO9c17eksRs/f0AdxzCidUXTca2kdv7rQdLxoXUjZfajnC/+aquOx
-         lEf7h7VRvKUsrgyF8JMJZYR3hlBjvy1ZdG+mhrDaUiTnraDa9VRGX3hV7zbgaugt441Y
-         6Pzg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+FoGUdopiBLaS396PRGQ1dcvifUv6/uOOjMI30S6hw3fkdIs7nB4JZ/qVJ95DMA1o5YQ=@vger.kernel.org, AJvYcCU22lMiFkBD47zTH1OVp42UllylRYTA8BaPK+5oeWsurulvQ+FZepWEvOQsJjjjFcXyOvhqkJgYunpWqOqI@vger.kernel.org, AJvYcCUQIOAiUh1+OhuV1XKs2WYqtdbhRK6gBiThEMqZ7QXlEf0FPi19sSH5QC0X63R6E0rKwjWqAykhCnB7A8c=@vger.kernel.org, AJvYcCUpn7+BKorWkP5TURiNPAFZkDACudsaiEgtA0rBqo3UPCz9+GDst1+fYYC71HJNqssh8sBzMKqIB4VtRvk=@vger.kernel.org, AJvYcCVHZSJTCpiYlUTG4ZzaCDn2rN5OfROlhYPZb3RzvEgCgNtQG60k2FcCfxV8ovfUKFZ5t7cL/mD0Xeh5@vger.kernel.org, AJvYcCVKQT4GGqBKq28G8wsXdWfAOZsHyzXXW7f8ubmcG9ZYwEWZ5VFX4ZLSEqjoICk2kNrlQELg9zcQ@vger.kernel.org, AJvYcCWm/ZJt1tfbyTgNklluDJ+yVCuB/1Lp6Qg+ebxjMwl2gQNVL7YiS26V+QQSIEG+uDA8Wh6WaoGSHlMAxTS69Jg=@vger.kernel.org, AJvYcCX7HocRTfGz+82QIOjFXYcnVjkZeWdZ4mo51gwqzInVN5VgXiiFeJfEsaqMh7j/xLAZWi1ZTrhccfqz@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywufx1+08hjwgh9xWcbKb/6OFM0cKZ9CbuFaDBBBwAsM56qqrra
-	zESJ3Bw/q7PzGQAIUJ+CZ/6u+0zoLRHL+9U3B/k8CRaRppt660RY
-X-Google-Smtp-Source: AGHT+IEJ7Hh7KYSEFQ7TnvOgBW+KHHTbn0YpY2aq9eVXupaQTxUm7Wi9eOrRO7yFgrSR7VO5SquDug==
-X-Received: by 2002:a05:6512:224b:b0:539:921a:44af with SMTP id 2adb3069b0e04-539c4967bbemr2532382e87.48.1728502891046;
-        Wed, 09 Oct 2024 12:41:31 -0700 (PDT)
-Received: from [192.168.2.105] (p54a0712c.dip0.t-ipconnect.de. [84.160.113.44])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430ccf5f3adsm28720915e9.22.2024.10.09.12.41.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2024 12:41:30 -0700 (PDT)
-Message-ID: <411f3c94-58b5-471e-bc58-e23d89d2078f@gmail.com>
-Date: Wed, 9 Oct 2024 21:41:25 +0200
+	s=arc-20240116; t=1728503734; c=relaxed/simple;
+	bh=Sc4nKdsPXx5tCl7kmTjYsRcV+p7U/RIuhom/uIbzdng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PPYveirTgS98Vp5yE9vrWwJ0a57OTheeSRG0pqbg6O8EOD6aYYGkH6vrAbrYbCdS1vvfJWNrFtMTFSBM+U+KL+0J31B6WfW1uf7yGxX3qpX56HvGBgNVnVAb7dx1XUjowsqIAxlAclp+eFSEhmqMd04Pzd3+y7z2XsXIQTUg6Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hhBUjPzv; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 9 Oct 2024 12:55:21 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728503730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HZO8ZUZ4JIYjAEgdyh9A4+ZHn421cNn46YVdgA+yVeY=;
+	b=hhBUjPzv2ppG7U3cT1WxcIVI+Ynk3LJC5aRTUlzkg1L8ZjZfvX8szPPsA7CIni6wh9ZNB3
+	cZCmKsQjlK8P2TPb0VN4+w0SsEe56T6uSgi335RaAcOYmdZAWghYnPp64jeCbrYjhNCtcV
+	bII/V3+ViQ2fwKsYl5ApipIztcH6Rxo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 07/36] KVM: arm64: nv: Save/Restore vEL2 sysregs
+Message-ID: <ZwbfqaxYFoThx_mc@linux.dev>
+References: <20241009190019.3222687-1-maz@kernel.org>
+ <20241009190019.3222687-8-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 10/13] staging: rts5280: Use always-managed version of
- pci_intx()
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Philipp Stanner <pstanner@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
- Sergey Shtylyov <s.shtylyov@omp.ru>,
- Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri Kosina
- <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>, Alex Dubov <oakad@yahoo.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>,
- Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Alex Williamson <alex.williamson@redhat.com>, Juergen Gross
- <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Mario Limonciello <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>,
- Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
- Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Mostafa Saleh <smostafa@google.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
- Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yi Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>,
- Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
- =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
- <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Kai Vehmanen <kai.vehmanen@linux.intel.com>,
- Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
- Rui Salvaterra <rsalvaterra@gmail.com>, Marc Zyngier <maz@kernel.org>,
- linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-input@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org, linux-staging@lists.linux.dev,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-sound@vger.kernel.org
-References: <20241009083519.10088-1-pstanner@redhat.com>
- <20241009083519.10088-11-pstanner@redhat.com>
- <2024100936-brunette-flannels-0d82@gregkh>
-Content-Language: en-US
-From: Philipp Hortmann <philipp.g.hortmann@gmail.com>
-In-Reply-To: <2024100936-brunette-flannels-0d82@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241009190019.3222687-8-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On 10/9/24 11:38, Greg Kroah-Hartman wrote:
-> On Wed, Oct 09, 2024 at 10:35:16AM +0200, Philipp Stanner wrote:
->> pci_intx() is a hybrid function which can sometimes be managed through
->> devres. To remove this hybrid nature from pci_intx(), it is necessary to
->> port users to either an always-managed or a never-managed version.
->>
->> rts5208 enables its PCI-Device with pcim_enable_device(). Thus, it needs the
->> always-managed version.
->>
->> Replace pci_intx() with pcim_intx().
->>
->> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
->> ---
->>   drivers/staging/rts5208/rtsx.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Oct 09, 2024 at 07:59:50PM +0100, Marc Zyngier wrote:
+> +static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 val;
+> +
+> +	/* These registers are common with EL1 */
+> +	write_sysreg(__vcpu_sys_reg(vcpu, PAR_EL1),	par_el1);
+> +	write_sysreg(__vcpu_sys_reg(vcpu, TPIDR_EL1),	tpidr_el1);
+> +
+> +	write_sysreg(read_cpuid_id(),				vpidr_el2);
+
+I don't think we need to restore VPIDR_EL2 here, so long as we do it on
+vcpu_put() when leaving a nested VM context. That seems like the right
+place to have it, as we could be running a mix of nested and non-nested
+VMs and don't ever poke VPIDR_EL2 for non-NV VMs.
+
+> @@ -89,7 +192,29 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+>  	 */
+>  	__sysreg32_restore_state(vcpu);
+>  	__sysreg_restore_user_state(guest_ctxt);
+> -	__sysreg_restore_el1_state(guest_ctxt);
+> +
+> +	if (unlikely(__is_hyp_ctxt(guest_ctxt))) {
+> +		__sysreg_restore_vel2_state(vcpu);
+> +	} else {
+> +		if (vcpu_has_nv(vcpu)) {
+> +			/*
+> +			 * Only set VPIDR_EL2 for nested VMs, as this is the
+> +			 * only time it changes. We'll restore the MIDR_EL1
+> +			 * view on put.
+> +			 */
+
+Slightly ambiguous what "VPIDR_EL2" this is referring to (hardware reg
+v. guest value). Maybe:
+
+			/*
+			 * Use the guest hypervisor's VPIDR_EL2 when in a nested
+			 * state. The hardware value of MIDR_EL1 gets restored on
+			 * put.
+			 */
+
+> +			write_sysreg(ctxt_sys_reg(guest_ctxt, VPIDR_EL2), vpidr_el2);
+> +
+> +			/*
+> +			 * As we're restoring a nested guest, set the value
+> +			 * provided by the guest hypervisor.
+> +			 */
+> +			mpidr = ctxt_sys_reg(guest_ctxt, VMPIDR_EL2);
+> +		} else {
+> +			mpidr = ctxt_sys_reg(guest_ctxt, MPIDR_EL1);
+> +		}
+> +
+> +		__sysreg_restore_el1_state(guest_ctxt, mpidr);
+> +	}
+>  
+>  	vcpu_set_flag(vcpu, SYSREGS_ON_CPU);
+>  }
+> @@ -112,12 +237,20 @@ void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
+>  
+>  	host_ctxt = host_data_ptr(host_ctxt);
+>  
+> -	__sysreg_save_el1_state(guest_ctxt);
+> +	if (unlikely(__is_hyp_ctxt(guest_ctxt)))
+> +		__sysreg_save_vel2_state(vcpu);
+> +	else
+> +		__sysreg_save_el1_state(guest_ctxt);
+> +
+>  	__sysreg_save_user_state(guest_ctxt);
+>  	__sysreg32_save_state(vcpu);
+>  
+>  	/* Restore host user state */
+>  	__sysreg_restore_user_state(host_ctxt);
+>  
+> +	/* If leaving a nesting guest, restore MPIDR_EL1 default view */
+
+typo: MIDR_EL1
+
+> +	if (vcpu_has_nv(vcpu))
+> +		write_sysreg(read_cpuid_id(),	vpidr_el2);
+> +
+>  	vcpu_clear_flag(vcpu, SYSREGS_ON_CPU);
+>  }
+> -- 
+> 2.39.2
 > 
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> 
 
-Hi Philipp,
-
-this driver (rts5208) will be removed soon - patch is send in.
-
-Discussion about removal:
-https://lore.kernel.org/linux-staging/2024100943-shank-washed-a765@gregkh/T/#t
-
-Thanks for your support.
-
-Bye Philipp
-
+-- 
+Thanks,
+Oliver
 
