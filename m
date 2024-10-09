@@ -1,128 +1,185 @@
-Return-Path: <kvm+bounces-28221-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28222-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7DF29965A5
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 11:39:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E5B9965F2
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 11:52:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 647A81F232EE
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 09:39:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0523E1C222A5
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2024 09:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5724218CC05;
-	Wed,  9 Oct 2024 09:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="AcLymq+h"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6142818BC26;
+	Wed,  9 Oct 2024 09:51:54 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from baidu.com (mx24.baidu.com [111.206.215.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A4C18A92C;
-	Wed,  9 Oct 2024 09:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5771918BB97
+	for <kvm@vger.kernel.org>; Wed,  9 Oct 2024 09:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728466729; cv=none; b=prFeuXZjxjZBc93wv8edNPbqcUY1KofiAl5gt6F1U2olnTZJTVY7jBw0FAp1AH+Jtmz3qOitdoP5botYwkKbfXAtgai+BMC4YUUNhLYpkII8cQnbCd7JqpmMbACAT84AYuY6e30o/UgM0a2NpudWHZITDXhXhddnwoFDsVleVjg=
+	t=1728467513; cv=none; b=IkZfdP7jg8KYlKeBcSgl1j7ofvAoLtXy9bW2hj4joekRHmzAH52wx8lrP1LEAErbVUR3GJRMgP4uOiUadZYP8SWdHOGBhc1BBg72rEA19NZ5VV2tD95zKdnMl1kETTPUWgypZuvwt7EnzxOxdgC92XjnKzlywabrILX2Lk9A23o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728466729; c=relaxed/simple;
-	bh=Jw9m9MFXObg+vZ7wq05G3wqyWtyj3AK1eBeQfJJK90U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FBlxEih2Csikk9VWf4y7W32fhYH4ScQE7t2bYKCeDP3giTH2VRNUpP9HVnbJmTsdAAEc1U9vteu+PNRk6E1rZBJsHb748tm6n5wVcPCDGwXrjBbuHGus/jVA863Kve8xMVKb3t9GLN7RA3XKnJ7MPKhq4ScYwVtTEUw39Ma8gGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=AcLymq+h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B808BC4CEC5;
-	Wed,  9 Oct 2024 09:38:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1728466728;
-	bh=Jw9m9MFXObg+vZ7wq05G3wqyWtyj3AK1eBeQfJJK90U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AcLymq+hoDLhN3h3N8nHp58BgFOa4jDynBqk5dzipxHtlbGOU9EoJHZr1xWIGUvqd
-	 1/8BzU9GNB5AWykOOa82//nU/OkQpZ2Tl07ETsLRXZZMd4MYEMeaOwuFdvt3dbdEkn
-	 E0Fd5uSJFrxi3J4FjD1qWeIfBp1sHnDUf7i3tpjk=
-Date: Wed, 9 Oct 2024 11:38:45 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Basavaraj Natikar <basavaraj.natikar@amd.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>, Alex Dubov <oakad@yahoo.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Igor Mitsyanko <imitsyanko@quantenna.com>,
-	Sergey Matyukevich <geomatsi@gmail.com>,
-	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Chen Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Hannes Reinecke <hare@suse.de>,
-	John Garry <john.g.garry@oracle.com>,
-	Soumya Negi <soumya.negi97@gmail.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
-	Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
-	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
-	Rui Salvaterra <rsalvaterra@gmail.com>,
-	Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ntb@lists.linux.dev, linux-pci@vger.kernel.org,
-	linux-staging@lists.linux.dev, kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Subject: Re: [RFC PATCH 10/13] staging: rts5280: Use always-managed version
- of pci_intx()
-Message-ID: <2024100936-brunette-flannels-0d82@gregkh>
-References: <20241009083519.10088-1-pstanner@redhat.com>
- <20241009083519.10088-11-pstanner@redhat.com>
+	s=arc-20240116; t=1728467513; c=relaxed/simple;
+	bh=cQ//5Z/aHT58dJFimFEpti7T6d2J3UMkSf94gm3e64c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EnPFbhydk+8jjbey90Mv93SAtWzEhohwGNLRgl7tpWivQuvzMdYvzwDnJXvsbprBNFG7XMgz9xjshx4yZSJYc6cAlVogDGbEtAL6uCOLEJ8SavYpE1IqninctwYil/i7OkdY9aEaH6AiOnZL7moBa48Mclt+qn47amneQY+S9v0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+From: Gao Shiyuan <gaoshiyuan@baidu.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
+	<mtosatti@redhat.com>, Zhao Liu <zhao1.liu@intel.com>
+CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <gaoshiyuan@baidu.com>,
+	<wangliang44@baidu.com>
+Subject: [PATCH v2 1/1] x86: Add support save/load HWCR MSR
+Date: Wed, 9 Oct 2024 17:51:09 +0800
+Message-ID: <20241009095109.66843-1-gaoshiyuan@baidu.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009083519.10088-11-pstanner@redhat.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BC-Mail-EX07.internal.baidu.com (172.31.51.47) To
+ bjkjy-mail-ex26.internal.baidu.com (172.31.50.42)
+X-FEAS-Client-IP: 172.31.51.54
+X-FE-Policy-ID: 52:10:53:SYSTEM
 
-On Wed, Oct 09, 2024 at 10:35:16AM +0200, Philipp Stanner wrote:
-> pci_intx() is a hybrid function which can sometimes be managed through
-> devres. To remove this hybrid nature from pci_intx(), it is necessary to
-> port users to either an always-managed or a never-managed version.
-> 
-> rts5208 enables its PCI-Device with pcim_enable_device(). Thus, it needs the
-> always-managed version.
-> 
-> Replace pci_intx() with pcim_intx().
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> ---
->  drivers/staging/rts5208/rtsx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+KVM commit 191c8137a939 ("x86/kvm: Implement HWCR support")
+introduced support for emulating HWCR MSR.
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Add support for QEMU to save/load this MSR for migration purposes.
+
+Signed-off-by: Gao Shiyuan <gaoshiyuan@baidu.com>
+Signed-off-by: Wang Liang <wangliang44@baidu.com>
+---
+ target/i386/cpu.h     |  5 +++++
+ target/i386/kvm/kvm.c | 12 ++++++++++++
+ target/i386/machine.c | 20 ++++++++++++++++++++
+ 3 files changed, 37 insertions(+)
+
+v1 -> v2:
+* Rename hwcr to msr_hwcr
+* Remove msr_hwcr reset from x86_cpu_reset_hold
+
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 9c39384ac0..4b6245dc15 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -533,6 +533,8 @@ typedef enum X86Seg {
+ 
+ #define MSR_AMD64_TSC_RATIO_DEFAULT     0x100000000ULL
+ 
++#define MSR_K7_HWCR                     0xc0010015
++
+ #define MSR_VM_HSAVE_PA                 0xc0010117
+ 
+ #define MSR_IA32_XFD                    0x000001c4
+@@ -1854,6 +1856,9 @@ typedef struct CPUArchState {
+     uint64_t msr_lbr_depth;
+     LBREntry lbr_records[ARCH_LBR_NR_ENTRIES];
+ 
++    /* AMD MSRC001_0015 Hardware Configuration */
++    uint64_t msr_hwcr;
++
+     /* exception/interrupt handling */
+     int error_code;
+     int exception_is_int;
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index e6f94900f3..c83b46f4b7 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -165,6 +165,7 @@ static bool has_msr_ucode_rev;
+ static bool has_msr_vmx_procbased_ctls2;
+ static bool has_msr_perf_capabs;
+ static bool has_msr_pkrs;
++static bool has_msr_hwcr;
+ 
+ static uint32_t has_architectural_pmu_version;
+ static uint32_t num_architectural_pmu_gp_counters;
+@@ -2574,6 +2575,8 @@ static int kvm_get_supported_msrs(KVMState *s)
+             case MSR_IA32_PKRS:
+                 has_msr_pkrs = true;
+                 break;
++            case MSR_K7_HWCR:
++                has_msr_hwcr = true;
+             }
+         }
+     }
+@@ -3916,6 +3919,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+     if (has_msr_virt_ssbd) {
+         kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, env->virt_ssbd);
+     }
++    if (has_msr_hwcr) {
++        kvm_msr_entry_add(cpu, MSR_K7_HWCR, env->msr_hwcr);
++    }
+ 
+ #ifdef TARGET_X86_64
+     if (lm_capable_kernel) {
+@@ -4400,6 +4406,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+         kvm_msr_entry_add(cpu, MSR_IA32_TSC, 0);
+         env->tsc_valid = !runstate_is_running();
+     }
++    if (has_msr_hwcr) {
++        kvm_msr_entry_add(cpu, MSR_K7_HWCR, 0);
++    }
+ 
+ #ifdef TARGET_X86_64
+     if (lm_capable_kernel) {
+@@ -4919,6 +4928,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
+             env->lbr_records[index - MSR_ARCH_LBR_INFO_0].info = msrs[i].data;
+             break;
++        case MSR_K7_HWCR:
++            env->msr_hwcr = msrs[i].data;
++            break;
+         }
+     }
+ 
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 39f8294f27..b4610325aa 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -1543,6 +1543,25 @@ static const VMStateDescription vmstate_msr_xfd = {
+     }
+ };
+ 
++static bool msr_hwcr_needed(void *opaque)
++{
++    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
++
++    return env->msr_hwcr != 0;
++}
++
++static const VMStateDescription vmstate_msr_hwcr = {
++    .name = "cpu/msr_hwcr",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = msr_hwcr_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(env.msr_hwcr, X86CPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ #ifdef TARGET_X86_64
+ static bool intel_fred_msrs_needed(void *opaque)
+ {
+@@ -1773,6 +1792,7 @@ const VMStateDescription vmstate_x86_cpu = {
+         &vmstate_msr_intel_sgx,
+         &vmstate_pdptrs,
+         &vmstate_msr_xfd,
++        &vmstate_msr_hwcr,
+ #ifdef TARGET_X86_64
+         &vmstate_msr_fred,
+         &vmstate_amx_xtile,
+-- 
+2.34.1
+
 
