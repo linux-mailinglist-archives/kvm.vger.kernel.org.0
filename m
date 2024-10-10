@@ -1,177 +1,208 @@
-Return-Path: <kvm+bounces-28392-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28393-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79E71998149
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 11:01:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C1B8998156
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 11:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CEC61C20E9B
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 09:01:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD386B273F0
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 09:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76211C57A0;
-	Thu, 10 Oct 2024 08:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A805C1C330C;
+	Thu, 10 Oct 2024 08:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BPBCV2yU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lsBYXzpT"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891DF1AF4E9
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 08:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4429A1C2DD4
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 08:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728550682; cv=none; b=UVhD7ZiiIJI7X9D33Ux7NmDz4kKG7TyiD3StaWryq/s9YCH6hucN/M7/BoWPmG0WK7fMsjvfZnZuhNOUZ8kMgjRry9ZDJE6HhVwCZ6VkmATTExfSQNL9+RYnliuPgwtRAFtspOq+vINAxVft+ZnPH2PzYbtDdyx6oPaadF3fWao=
+	t=1728550775; cv=none; b=EvVpCpJ2qkcfOy3xuGkAq7Q14tmiFkKcnLpnHpAkjPKBo+pCOrZ9C8NZyIdrb5fs1jL0wwmhWWlPjjKQTvpEqpBt9qqy2Yz/7QORFkDqJOX+/fXsTK2Cm6WZkSiLxJbc9KFaLd/x2kRgxSCkG8Ee0Ze5OPws+e3FZ8x1KB4U11Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728550682; c=relaxed/simple;
-	bh=uEoD+N+ErCzjUQzAybretMtYvnPznERIurac1+tT/ug=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=WPQ1886ucTQTV8V6vEFMSMPxOjwRirtgp6FdGswRPBt9r7mjVQzZlO+u20LBMoFQJ1ODPQev2g+E4BSgMvZFxgOGDAYiEB0refbwTNMDTJlJfGpxakMEcElY/Xh/i9fG5KKAOqhwjXTbdQvm3YZ77k6atxoU0wQMXMjsEJn7RIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BPBCV2yU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728550679;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V3mfLBxE7mgA5D2j+dKOJ0660aCNEHB3kXbTGLynC34=;
-	b=BPBCV2yUr/1yFMwuHtkIMBME2oPxGZE5HOpc9Budoa4tDQbnuOHITHaoQppR4tfAg7ov76
-	0w5o+DCiBT3wrVnbMU+TG7vFn0WTLNqBBmthENe6cQvq1EaDRnzQSI2Bt+Us6jFUtOmb0G
-	EnRZiGq1yjWW6l5Y0GvS3pZnDvHoqAk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-133-OEaqkyw9OPKDevaNNrMgwg-1; Thu, 10 Oct 2024 04:57:58 -0400
-X-MC-Unique: OEaqkyw9OPKDevaNNrMgwg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cdeac2da6so4089975e9.2
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 01:57:57 -0700 (PDT)
+	s=arc-20240116; t=1728550775; c=relaxed/simple;
+	bh=re/D/+YA56tDapuXK2wkAttwNTUfFjzM1HwHleL/Zuk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Y3vP2vVQOODCVQ4iRZ7j0IElIfDbLhQPejVeMdyB9Bi0N44iOInDCw3QvamizpJ+K7pkM1b5eN/SkrSiEvN6npS57+Gb3OYBL6CqwTdn+HyOlF/jcEauky/xq9zup1/C7NTuj++Ir/OZOaGkUJ1OpE1czqEAcSIvXMrV4ByMjNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lsBYXzpT; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e165fc5d94fso1001359276.2
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 01:59:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728550773; x=1729155573; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=44RrF/B9Ex8nQJPJovZzgohUiCEdgUa9GoiqQfAe37s=;
+        b=lsBYXzpT4UE0dzRC12uVfBpp5RLtsP3yGhDD8XXklnBYTHb+bqAK9bF5ydzOH7rTUf
+         106fjChhyxjAURvBUK9eH4HtpavPlEeQVx3dO9IoR/+HqD76H3PE+m8UG/jrrq/aqtVp
+         CLzEz10Oxl9F8jFBUFBSkRWyjbHnFRWf9jhJ9uHivMd8Zi2iSygbC4pL+j0siFnPoh1a
+         FoKa/Wp9lq2oD/niHYCo/kHnbvRiNdxM15+CvIoHjg8jfysRO3ksjAYUehW4jN/9ShAc
+         gHd+pRgdutA8Bi8nDt30qMaJxXvpd4tw8jpTQWiC/TFhnDwWGDAgrYJQzcb4EH4HiB1F
+         puXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728550677; x=1729155477;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V3mfLBxE7mgA5D2j+dKOJ0660aCNEHB3kXbTGLynC34=;
-        b=DoGf5LZhvIPfHJ3f/gRbO1wxg/B2Kc9FQMIy9kJ7cyLyHq8MZ9uy9FQwNCGRwrHD5r
-         gGAJC8hrWj2ERl3lHV98d7+b8kyKSODOqthE/fCHOn/PvQfflLkTdblKK53GVZeDcKyM
-         CTGDYfSHvBR3mwYY6c0pJCjGSJx7oZxfRgRDFNRhJ5dGa4DIpTQAcPVChpljqP4A6H2F
-         +6XWn7sbdO4Ch2yqs65JNMNS5wcyuCHvutGvi4UtXcAtLj0TzjvLUzr/rlBZqVP+HPBR
-         L/548fDnCIuyoqUnXxfnoEVQ19r85E86SjJxZXxsuFwpESB1Ng3xE1E5HyP6dmSsqrMp
-         KkJA==
-X-Forwarded-Encrypted: i=1; AJvYcCXGMiZXKRvNVXtCf8c0Ny8ki2WsWxVERHn1hYtoSgkn5g/WfVGpiQ9Iwu+7jhU+wD3aKV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/hhQ38+CIwQDMUE7XzcZEDoazP1PU+nP6LGpbtqrxR27OsEey
-	fPd4nPiekN3VAr2a13uUSJfDwxCDE89HlYqmKR5cWDHDVrIGLqj2xM4Xpk24QqF5enzAyAteGs2
-	bySUBahFmwQRm14pF0wMjihb3KTQxZeWsM8q/vVryyhunv4GS6g==
-X-Received: by 2002:a05:600c:a08:b0:42f:7ed4:4c26 with SMTP id 5b1f17b1804b1-430ccf1d794mr43479705e9.12.1728550676804;
-        Thu, 10 Oct 2024 01:57:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFO2YZz0KIdt9CH7YpTmaKm1V5sN7oLsDloXPoVkbSMJb4dyCl0+OpMHrvepMEuByPjcRlSzQ==
-X-Received: by 2002:a05:600c:a08:b0:42f:7ed4:4c26 with SMTP id 5b1f17b1804b1-430ccf1d794mr43479505e9.12.1728550676374;
-        Thu, 10 Oct 2024 01:57:56 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b6a8666sm913435f8f.22.2024.10.10.01.57.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 01:57:56 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Nikolas Wipper <nikwip@amazon.de>
-Cc: Nicolas Saenz Julienne <nsaenz@amazon.com>, Alexander Graf
- <graf@amazon.de>, James Gowans <jgowans@amazon.com>,
- nh-open-source@amazon.com, Sean Christopherson <seanjc@google.com>, Paolo
- Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo
- Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, Nikolas Wipper <nik.wipper@gmx.de>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 1/7] KVM: Add API documentation for
- KVM_HYPERV_SET_TLB_FLUSH_INHIBIT
-In-Reply-To: <20241004140810.34231-2-nikwip@amazon.de>
-References: <20241004140810.34231-1-nikwip@amazon.de>
- <20241004140810.34231-2-nikwip@amazon.de>
-Date: Thu, 10 Oct 2024 10:57:55 +0200
-Message-ID: <874j5kgwrw.fsf@redhat.com>
+        d=1e100.net; s=20230601; t=1728550773; x=1729155573;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=44RrF/B9Ex8nQJPJovZzgohUiCEdgUa9GoiqQfAe37s=;
+        b=dX63EpvNZpQxTNbRdjk6kOlGqVk8HZO04RCg1uifsSyOiu6pudrWrpe9F/tF9z2SW4
+         kFxN5dAyhQqElxF/XfS5nqNwDxP6foFAuwc23j4emDwA1RdMZLxdGzbm0TmGlEjkzJ26
+         54Daw3nkiA3wiwW5U6okMVxDp4G9Gbkv2CjXKgrU6AZu8YwiN8xGfHAV7xeNKWK64d1I
+         ArwrrVdw8hJB0+txwAn23y22ecrG0iG7NhVJB9vcjONNzkIVbAfmRt819h7+5UkNuxDK
+         OaWf4M1vweJa2oyJsREtzWgAXx8shijRXUWpPoDD8GMel8C//emmix5CaxGrB39cnOV9
+         R3KQ==
+X-Gm-Message-State: AOJu0YwSllh+wj1X3ept4Kph56fVjh/iOCXX/G3yI9BYDWpUkS6QRuUO
+	H6hbBVglPbgm8bcdf6FRrbw8YY3hA5KV5evFwND36LrOJJFdOPq+Jd7YnjW3dvk27HkZ5j4IB8G
+	NS4+KgiiO0r78nNl77hXzisLU1CSowx5nJZ6uXe3uXBMd4UdRr7IUvsnFkaZ7rCwa+7Ulu2migJ
+	xjIEAo//utwq3mcdNU++JQNOE=
+X-Google-Smtp-Source: AGHT+IE48pBjjjaVu8xZXl4soeW7srzTlab264gBCoBpdD51ajco5eIPVFv17ipdIxXgjEAxnQnx2cZ6PA==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a25:ab51:0:b0:e28:fb8b:9155 with SMTP id
+ 3f1490d57ef6-e28fe41c747mr48174276.9.1728550772449; Thu, 10 Oct 2024 01:59:32
+ -0700 (PDT)
+Date: Thu, 10 Oct 2024 09:59:19 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
+Message-ID: <20241010085930.1546800-1-tabba@google.com>
+Subject: [PATCH v3 00/11] KVM: Restricted mapping of guest_memfd at the host
+ and arm64 support
+From: Fuad Tabba <tabba@google.com>
+To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Nikolas Wipper <nikwip@amazon.de> writes:
+This series adds restricted mmap() support to guest_memfd, as
+well as support for guest_memfd on arm64. It is based on Linux
+6.12-rc2.
 
-> Add API documentation for the new KVM_HYPERV_SET_TLB_FLUSH_INHIBIT ioctl.
->
-> Signed-off-by: Nikolas Wipper <nikwip@amazon.de>
-> ---
->  Documentation/virt/kvm/api.rst | 41 ++++++++++++++++++++++++++++++++++
->  1 file changed, 41 insertions(+)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index a4b7dc4a9dda..9c11a8af336b 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6443,6 +6443,47 @@ the capability to be present.
->  `flags` must currently be zero.
->  
->  
-> +4.144 KVM_HYPERV_SET_TLB_FLUSH_INHIBIT
-> +--------------------------------------
-> +
-> +:Capability: KVM_CAP_HYPERV_TLB_FLUSH_INHIBIT
-> +:Architectures: x86
-> +:Type: vcpu ioctl
-> +:Parameters: struct kvm_hyperv_tlb_flush_inhibit
-> +:returnReturns: 0 on success, this ioctl can't fail
-> +
-> +KVM_HYPERV_SET_TLB_FLUSH_INHIBIT allows userspace to prevent Hyper-V
-> hyper-calls
+Changes since V2 [1]:
+- Use refcount to determine whether a page/folio is mapped by the
+host rather than folio_mapcount()+folio_maybe_dma_pinned()
+(DavidH)
+- Track of mappability of guest memory at the host in the
+guest_memfd inode (Ackerly)
+- Refactoring and tidying up (Sean, Ackerly)
 
-Very minor nitpick: I suggest standardize on "hypercall" spelling
-without the dash because:
+By design, guest_memfd cannot be mapped, read, or written by the
+host. In pKVM, memory shared between a protected guest and the
+host is shared in-place, unlike other confidential computing
+solutions that guest_memfd was originally envisaged for (e.g,
+TDX). When initializing a guest, as well as when accessing memory
+shared by a protected guest with the host, it would be useful to
+support mapping guest memory at the host to avoid copying its
+contents.
 
-$ grep -c hypercall Documentation/virt/kvm/api.rst
-56
-$ grep -c hyper-call Documentation/virt/kvm/api.rst
-3
+One of the benefits of guest_memfd is that it prevents a
+misbehaving host from crashing the system when attempting to
+access private guest memory (deliberately or accidentally), since
+this memory isn't mapped to begin with. Without guest_memfd, the
+hypervisor would still prevent such accesses, but in certain
+cases the host kernel wouldn't be able to recover, causing the
+system to crash.
 
-(I see all three 'hypercall', 'hyper-call', 'hyper call' usages in the
-wild and I honestly don't think it matters but it would be nice to
-adhere to one share across the same file / KVM docs).
+Support for mmap() in this patch series maintains the invariant
+that only memory shared with the host, either explicitly by the
+guest or implicitly before the guest has started running (in
+order to populate its memory) is allowed to have a valid mapping
+at the host. At no point should _private_ guest memory have any
+mappings at the host.
 
-> +that remotely flush a vCPU's TLB, i.e. HvFlushVirtualAddressSpace(Ex)/
-> +HvFlushVirtualAddressList(Ex). When the flag is set, a vCPU attempting to flush
-> +an inhibited vCPU will be suspended and will only resume once the flag is
-> +cleared again using this ioctl. During suspension, the vCPU will not finish the
-> +hyper-call, but may enter the guest to retry it. Because it is caused by a
-> +hyper-call, the suspension naturally happens on a guest instruction boundary.
-> +This behaviour and the suspend state itself are specified in Microsoft's
-> +"Hypervisor Top Level Functional Specification" (TLFS).
-> +
-> +::
-> +
-> +  /* for KVM_HYPERV_SET_TLB_FLUSH_INHIBIT */
-> +  struct kvm_hyperv_tlb_flush_inhibit {
-> +      /* in */
-> +      __u16 flags;
-> +  #define KVM_HYPERV_UNINHIBIT_TLB_FLUSH 0
-> +  #define KVM_HYPERV_INHIBIT_TLB_FLUSH 1
-> +      __u8  inhibit;
-> +      __u8 padding[5];
-> +  };
-> +
-> +No flags are specified so far, the corresponding field must be set to zero,
-> +otherwise the ioctl will fail with exit code -EINVAL.
-> +
-> +The suspension is transparent to userspace. It won't cause KVM_RUN to return or
-> +the MP state to be changed. The suspension cannot be manually induced or exited
-> +apart from changing the TLB flush inhibit flag of a targeted processor.
-> +
-> +There is no way for userspace to query the state of the flush inhibit flag.
-> +Userspace must keep track of the required state itself.
-> +
->  5. The kvm_run structure
->  ========================
+This patch series is divided into two parts:
 
+The first part is to the KVM core code. It adds opt-in support
+for mapping guest memory only as long as it is shared, or
+optionally when it is first created. For that, the host needs to
+know the mappability status of guest memory. Therefore, the
+series adds a structure to track whether memory is mappable. This
+new structure is associated with each guest_memfd inode object.
+
+The second part of the series adds guest_memfd support for arm64.
+
+The patch series enforces the invariant that only memory shared
+with the host can be mapped by the host userspace in
+vm_operations_struct:fault(), instead of file_operations:mmap().
+On a fault, we check whether the page is allowed to be mapped. If
+not, we deliver a SIGBUS to the current task, as discussed in the
+Linux MM Alignment Session and LPC 2024 on this topic [2,3 ].
+
+Currently, there's no support for huge pages, which is something
+we hope to support in the near future [4].
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20240801090117.3841080-1-tabba@google.com/
+
+[2] https://lore.kernel.org/all/20240712232937.2861788-1-ackerleytng@google.com/
+
+[3] https://lpc.events/event/18/sessions/183/#20240919
+
+[4] https://lore.kernel.org/all/cover.1726009989.git.ackerleytng@google.com/
+
+Ackerley Tng (2):
+  KVM: guest_memfd: Make guest mem use guest mem inodes instead of
+    anonymous inodes
+  KVM: guest_memfd: Track mappability within a struct kvm_gmem_private
+
+Fuad Tabba (9):
+  KVM: guest_memfd: Introduce kvm_gmem_get_pfn_locked(), which retains
+    the folio lock
+  KVM: guest_memfd: Allow host to mmap guest_memfd() pages when shared
+  KVM: guest_memfd: Add guest_memfd support to
+    kvm_(read|/write)_guest_page()
+  KVM: guest_memfd: Add KVM capability to check if guest_memfd is host
+    mappable
+  KVM: guest_memfd: Add a guest_memfd() flag to initialize it as
+    mappable
+  KVM: guest_memfd: selftests: guest_memfd mmap() test when mapping is
+    allowed
+  KVM: arm64: Skip VMA checks for slots without userspace address
+  KVM: arm64: Handle guest_memfd()-backed guest page faults
+  KVM: arm64: Enable guest_memfd private memory when pKVM is enabled
+
+ Documentation/virt/kvm/api.rst                |   4 +
+ arch/arm64/include/asm/kvm_host.h             |   3 +
+ arch/arm64/kvm/Kconfig                        |   1 +
+ arch/arm64/kvm/mmu.c                          | 120 +++++-
+ include/linux/kvm_host.h                      |  63 +++
+ include/uapi/linux/kvm.h                      |   2 +
+ include/uapi/linux/magic.h                    |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/guest_memfd_test.c  |  57 ++-
+ virt/kvm/Kconfig                              |   4 +
+ virt/kvm/guest_memfd.c                        | 397 ++++++++++++++++--
+ virt/kvm/kvm_main.c                           | 279 +++++++++++-
+ 12 files changed, 877 insertions(+), 55 deletions(-)
+
+
+base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
 -- 
-Vitaly
+2.47.0.rc0.187.ge670bccf7e-goog
 
 
