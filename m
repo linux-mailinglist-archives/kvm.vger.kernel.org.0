@@ -1,183 +1,172 @@
-Return-Path: <kvm+bounces-28453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40969998AB3
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:59:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E98C998B19
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 17:12:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF0B81F25F02
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:59:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B2A2293BA5
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 15:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D441F4FD7;
-	Thu, 10 Oct 2024 14:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D5E01CBEA7;
+	Thu, 10 Oct 2024 15:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HzrPiJMu"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NqSAje06"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C691CB301;
-	Thu, 10 Oct 2024 14:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50FD1CB309;
+	Thu, 10 Oct 2024 15:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728571848; cv=none; b=gzO501AaXSdndmUJFu9Ms0GOBVnde49TPdQ1GNnrCj/ix2q4ccC2CgcBMCBsx25UgfH7BPQaI/Apk1txLazliAF4CtlMfvfn3WSz80dzwAj8zfMTsWD6M61COWHRLzyjPG+773tbjvULGZv6VWx5cZAN4VJBnhwOcqA2dILxoks=
+	t=1728573139; cv=none; b=bghxGybJebt8/kw6JXIEge8OPd1t1kye3mrML0rf2tED+dveOQZ8vBYS7bM3rufhMX4jvhGu+odrH3XEio/+tNyO55B4QAto5lY2P6rk+VnFfjERVHEdu86u+1HpjwlQceVEVQiKgG5VQJbSIIeQYB7x156S9+mIyiRAN/o8X9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728571848; c=relaxed/simple;
-	bh=sibCqydeqQiNQIf/lBDGFiiLV6uF5mNsecPlSRVwL9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B3/scKROThIj3haRrGDKbpf/DI6sLwIJXqFP4NEEuUqrEil3zLx+S6JIGezTJ7XtW/cMHpy8pKkCedx+vLZvrLhO2cdzQAYdQTjcLrt9GiSrkItJRJUd5XZ5Q3x7mCVqhREOiRSF1XgLgfOvKeBIQjXGPkM7REGy1+K9rTvbOnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HzrPiJMu; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728571848; x=1760107848;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=sibCqydeqQiNQIf/lBDGFiiLV6uF5mNsecPlSRVwL9Y=;
-  b=HzrPiJMuD2f3mp/TH4iEQ0T1f3sseukJKhhNrIKpJV8F/ZhP+DkZw8+a
-   3uiMySVHDpJx0VmG8HQbfdLeIdZZx2wtZfGfewytc0KIlIVEWcGIEAG28
-   UeEl329Pd64uocuSzvQXExl+5i/Un0s3kie7q/rSpCN36QYAZEAJf+7ET
-   YVbisKNnTImnkcHA3Ck/cxK9BUROl7lZMaJrQgTGgmoA4u9l7mg/J0yVR
-   LraoxaWTVFlrBJE+m8mNfdUPKZDbz9Tv7J8pbVvdGJI19qPMdQrrrh+NG
-   tA5fSgsCvD/2tbH3KVcuI5qgsyU/PUJxE32O19OVgRtIAqf69aAilT6BF
-   A==;
-X-CSE-ConnectionGUID: NmRIE5LLTFq5Iz2muUcGXA==
-X-CSE-MsgGUID: f6YHws0fQ1GM8x850rpSwQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="27880006"
-X-IronPort-AV: E=Sophos;i="6.11,193,1725346800"; 
-   d="scan'208";a="27880006"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 07:50:46 -0700
-X-CSE-ConnectionGUID: 7wY/4jxvQLCPgvYMG4Ai+Q==
-X-CSE-MsgGUID: 2AQrvW1rQX2PPbhnm34TWQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,193,1725346800"; 
-   d="scan'208";a="114082669"
-Received: from smile.fi.intel.com ([10.237.72.154])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 07:50:31 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1syuUj-00000001ZJ4-117L;
-	Thu, 10 Oct 2024 17:50:25 +0300
-Date: Thu, 10 Oct 2024 17:50:25 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Basavaraj Natikar <basavaraj.natikar@amd.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alex Dubov <oakad@yahoo.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Igor Mitsyanko <imitsyanko@quantenna.com>,
-	Sergey Matyukevich <geomatsi@gmail.com>,
-	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Chen Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mostafa Saleh <smostafa@google.com>, Hannes Reinecke <hare@suse.de>,
-	John Garry <john.g.garry@oracle.com>,
-	Soumya Negi <soumya.negi97@gmail.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
-	Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
-	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
-	Rui Salvaterra <rsalvaterra@gmail.com>,
-	Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ntb@lists.linux.dev, linux-pci@vger.kernel.org,
-	linux-staging@lists.linux.dev, kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Subject: Re: [RFC PATCH 00/13] Remove implicit devres from pci_intx()
-Message-ID: <ZwfpsSxnwm7K4eMF@smile.fi.intel.com>
-References: <20241009083519.10088-1-pstanner@redhat.com>
- <8643a212-884c-48de-a2d0-0f068fc49ca2@gmail.com>
- <6468cf3e4a06c008644c98a7a79f81a1c04752b8.camel@redhat.com>
+	s=arc-20240116; t=1728573139; c=relaxed/simple;
+	bh=XYbYMyrvyIZznB5NrpkR3LG5qcSt9nJ42W4qjIjJPrY=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=GvXxyCHylVnhwGFbInP8ew6qrC34w5lEVkRy8KMfCGiP9qlSmhGZctzJ+rKgbsDD6omhq51TQDB+zdKpsYljglBgn464WI5YmVCJ3W0c/7w2BRVQi2bkKG+9qeq1uQt0MlOBydwPzfXv9038ZEkXC7POQTDSZZUJEvM0JcjqkWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NqSAje06; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728573138; x=1760109138;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=XYbYMyrvyIZznB5NrpkR3LG5qcSt9nJ42W4qjIjJPrY=;
+  b=NqSAje06bXGmt+6LHi5gvcYmBNDgSUv7XZgrAnOLeIGJuhjxz3iuZKTD
+   ZGnpZH39sEUtbz9cUx+du+sBmgJX3qu11/mSzML7lMKexkw7F9TqZFVTx
+   EIoAtY20NImb0ZTRXlv1U/Y1XskahQMXS4j/O6PtR1bB8RazIANe3iBwo
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.11,193,1725321600"; 
+   d="scan'208";a="459640414"
+Subject: Re: [RFC PATCH 05/13] iommufd: Serialise persisted iommufds and ioas
+Thread-Topic: [RFC PATCH 05/13] iommufd: Serialise persisted iommufds and ioas
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 15:12:11 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.10.100:42932]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.0.200:2525] with esmtp (Farcaster)
+ id 90e4b000-0dbf-4a04-b95f-00a5f0e18b9e; Thu, 10 Oct 2024 15:12:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 90e4b000-0dbf-4a04-b95f-00a5f0e18b9e
+Received: from EX19D004EUC002.ant.amazon.com (10.252.51.225) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 10 Oct 2024 15:12:10 +0000
+Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
+ EX19D004EUC002.ant.amazon.com (10.252.51.225) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 10 Oct 2024 15:12:09 +0000
+Received: from EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41]) by
+ EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41%3]) with mapi id
+ 15.02.1258.034; Thu, 10 Oct 2024 15:12:09 +0000
+From: "Gowans, James" <jgowans@amazon.com>
+To: "jgg@ziepe.ca" <jgg@ziepe.ca>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rppt@kernel.org"
+	<rppt@kernel.org>, "kw@linux.com" <kw@linux.com>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>, "madvenka@linux.microsoft.com"
+	<madvenka@linux.microsoft.com>, "anthony.yznaga@oracle.com"
+	<anthony.yznaga@oracle.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+	"nh-open-source@amazon.com" <nh-open-source@amazon.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "Saenz Julienne, Nicolas"
+	<nsaenz@amazon.es>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>, "dwmw2@infradead.org"
+	<dwmw2@infradead.org>, "steven.sistare@oracle.com"
+	<steven.sistare@oracle.com>, "Graf (AWS), Alexander" <graf@amazon.de>,
+	"will@kernel.org" <will@kernel.org>, "joro@8bytes.org" <joro@8bytes.org>,
+	"maz@kernel.org" <maz@kernel.org>
+Thread-Index: AQHbCCwuWjwUDEQNSEmjPqzUeT3bK7Jz6OkAgAcvr4CAAAJBgIAAAo+AgABl3QCAAu2RAIAADFAAgAHADQA=
+Date: Thu, 10 Oct 2024 15:12:09 +0000
+Message-ID: <673df8a09723d3398ca9e9c638893547b0b0ec63.camel@amazon.com>
+References: <20240916113102.710522-1-jgowans@amazon.com>
+	 <20240916113102.710522-6-jgowans@amazon.com>
+	 <20241002185520.GL1369530@ziepe.ca>
+	 <d6328467adc9b7512f6dd88a6f8f843b8efdc154.camel@amazon.com>
+	 <e458d48a797043b7efc853fc65b9c4d043b12ed4.camel@infradead.org>
+	 <1d331c55a299d414e49ba5eb6f46dccb525bf788.camel@amazon.com>
+	 <20241007150138.GM2456194@ziepe.ca>
+	 <b76aa005c0fb75199cbb1fa0790858b9c808c90a.camel@amazon.com>
+	 <20241009122830.GF762027@ziepe.ca>
+In-Reply-To: <20241009122830.GF762027@ziepe.ca>
+Accept-Language: en-ZA, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F8E3F23707ECCD428D0DF754138CB191@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6468cf3e4a06c008644c98a7a79f81a1c04752b8.camel@redhat.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Thu, Oct 10, 2024 at 10:09:12AM +0200, Philipp Stanner wrote:
-> On Wed, 2024-10-09 at 20:32 +0200, Heiner Kallweit wrote:
-> > On 09.10.2024 10:35, Philipp Stanner wrote:
-
-...
-
-> > > To do so, a pci_intx() version that is always-managed, and one that
-> > > is
-> > > never-managed are provided. Then, all pci_intx() users are ported
-> > > to the
-> > > version they need. Afterwards, pci_intx() can be cleaned up and the
-> > > users of the never-managed version be ported back to pci_intx().
-> > > 
-> > > This way we'd get this PCI API consistent again.
-> > > 
-> > AFAICS pci_intx() is used only by drivers which haven't been
-> > converted
-> > to the pci_alloc_irq_vectors() API yet. Wouldn't it be better to do
-> > this
-> > instead of trying to improve pci_intx()?
-
-My first impression was the same...
-
-> This would be the créme-de-la-créme-solution, yes.
-> 
-> But such a portation would require more detailed knowledge of the old
-> drivers.
-> 
-> In this discussion, Alex points out that at least in some drivers, you
-> can't replace pci_intx() without further ado:
-> https://lore.kernel.org/all/20240904151020.486f599e.alex.williamson@redhat.com/
-> 
-> What we could do is mark pci_intx() and pcim_intx() as deprecated and
-> point everyone to pci_alloc_irq_vectors(). Then someone can look into
-> porting the old drivers at some point in the future.
-
-...but here I got the point by Philipp.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+T24gV2VkLCAyMDI0LTEwLTA5IGF0IDA5OjI4IC0wMzAwLCBKYXNvbiBHdW50aG9ycGUgd3JvdGU6
+DQo+IE9uIFdlZCwgT2N0IDA5LCAyMDI0IGF0IDExOjQ0OjMwQU0gKzAwMDAsIEdvd2FucywgSmFt
+ZXMgd3JvdGU6DQo+IA0KPiA+IE9rYXksIGJ1dCBpbiBnZW5lcmFsIHRoaXMgc3RpbGwgbWVhbnMg
+dGhhdCB0aGUgcGFnZSB0YWJsZXMgbXVzdCBoYXZlDQo+ID4gZXhhY3RseSB0aGUgc2FtZSB0cmFu
+c2xhdGlvbnMgaWYgd2UgdHJ5IHRvIHN3aXRjaCBmcm9tIG9uZSBzZXQgdG8NCj4gPiBhbm90aGVy
+LiBJZiBpdCBpcyBwb3NzaWJsZSB0byBjaGFuZ2UgdHJhbnNsYXRpb25zIHRoZW4gdHJhbnNsYXRp
+b24gdGFibGUNCj4gPiBlbnRyaWVzIGNvdWxkIGJlIGNyZWF0ZWQgYXQgZGlmZmVyZW50IGdyYW51
+bGFyaXR5IChQVEUsIFBNRCwgUFVEKSBsZXZlbA0KPiA+IHdoaWNoIHdvdWxkIHZpb2xhdGUgdGhp
+cyByZXF1aXJlbWVudC4NCj4gDQo+IFllcywgYnV0IHdlIHN0cml2ZSB0byBtYWtlIHBhZ2UgdGFi
+bGVzIGNvbnNpc3RlbnRseSBhbmQgaXQgaXNuJ3QgdGhhdA0KPiBvZnRlbiB0aGF0IHdlIGdldCBu
+ZXcgZmVhdHVyZXMgdGhhdCB3b3VsZCBjaGFuZyB0aGUgbGF5b3V0IChjb250aWcgYml0DQo+IGZv
+ciBpbnN0YW5jZSkuIEknZCBzdWdnZXN0IGluIHRoZXNlIGNhc2VzIHlvdSdkIGFkZCBzb21lIGNy
+ZWF0aW9uIGZsYWcNCj4gdG8gdGhlIEhXUFQgdGhhdCBjYW4gaW5oaWJpdCB0aGUgbmV3IGZlYXR1
+cmUgYW5kIHlvdXIgVk1NIHdpbGwgZGVhbA0KPiB3aXRoIGl0Lg0KPiANCj4gT3IgeW91IHN3ZWVw
+IGl0IGFuZCBtYW51YWxseSBzcGxpdC9qb2luIHRvIGRlYWwgd2l0aCBCQk0gPCBsZXZlbA0KPiAy
+LiBHZW5lcmljIHB0IHdpbGwgaGF2ZSBjb2RlIHRvIGRvIGFsbCBvZiB0aGlzIHNvIGl0IGlzIG5v
+dCB0aGF0IGJhZC4NCj4gDQo+IElmIHRoaXMgbGl0dGxlIGlzc3VlIGFscmVhZHkgc2NhcmVzIHlv
+dSB0aGVuIEkgZG9uJ3QgdGhpbmsgSSB3YW50IHRvDQo+IHNlZSB5b3Ugc2VyaWFsaXplIGFueXRo
+aW5nIG1vcmUgY29tcGxleCwgdGhlcmUgYXJlIGVuZGxlc3Mgc2NlbmFyaW9zDQo+IGZvciBjb21w
+YXRpYmlsaXR5IHByb2JsZW1zIDpcDQoNClRoZSB0aGluZ3MgdGhhdCBzY2FyZSBtZSBpcyBzb21l
+IHN1YnRsZSBwYWdlIHRhYmxlIGRpZmZlcmVuY2Ugd2hpY2gNCmNhdXNlcyBzaWxlbnQgZGF0YSBj
+b3JydXB0aW9uLi4uIFRoaXMgaXMgb25lIG9mIHRoZSByZWFzb25zIEkgbGlrZWQgcmUtDQp1c2lu
+ZyB0aGUgZXhpc3RpbmcgdGFibGVzLCB0aGVyZSBpcyBubyB3YXkgZm9yIHRoaXMgc29ydCBvZiBz
+dWJ0bGUgYnVnDQp0byBoYXBwZW4uDQpJbiBnZW5lcmFsIEkgYWdyZWUgd2l0aCB5b3VyIHBvaW50
+IGFib3V0IHJlZHVjaW5nIHRoZSBjb21wbGV4aXR5IG9mIHdoYXQNCndlIHNlcmlhbGlzZSBhbmQg
+cmF0aGVyIGV4ZXJjaXNpbmcgdGhlIG1hY2hpbmVyeSBhZ2FpbiBhZnRlciBrZXhlYyB0bw0KY3Jl
+YXRlIGZyZXNoIG9iamVjdHMuIFRoZSBvbmx5ICg/KSBjb3VudGVyIHBvaW50IHRvIHRoYXQgaXMg
+YWJvdXQNCnBlcmZvcm1hbmNlIG9mIGFueXRoaW5nIGluIHRoZSBob3QgcGF0aCAoZGlzY3Vzc2Vk
+IG1vcmUgYmVsb3cpLg0KDQoNCj4gDQo+ID4gSWYgd2Ugc2F5IHRoYXQgdG8gYmUgc2FmZS9jb3Jy
+ZWN0IGluIHRoZSBnZW5lcmFsIGNhc2UgdGhlbiBpdCBpcw0KPiA+IG5lY2Vzc2FyeSBmb3IgdGhl
+IHRyYW5zbGF0aW9ucyB0byBiZSAqZXhhY3RseSogdGhlIHNhbWUgYmVmb3JlIGFuZCBhZnRlcg0K
+PiA+IGtleGVjLCBpcyB0aGVyZSBhbnkgYmVuZWZpdCB0byBidWlsZGluZyBuZXcgdHJhbnNsYXRp
+b24gdGFibGVzIGFuZA0KPiA+IHN3aXRjaGluZyB0byB0aGVtPyBXZSBtYXkgYXMgd2VsbCBjb250
+aW51ZSB0byB1c2UgdGhlIGV4YWN0IHNhbWUgcGFnZQ0KPiA+IHRhYmxlcyBhbmQgY29uc3RydWN0
+IGlvbW11ZmQgb2JqZWN0cyAoSU9BUywgZXRjKSB0byBtYXRjaC4NCj4gDQo+IFRoZSBiZW5pZml0
+IGlzIHByaW5jaXBhbGx5IHRoYXQgeW91IGRpZCBhbGwgdGhlIG1hY2hpbmVyeSB0byBnZXQgdXAg
+dG8NCj4gdGhhdCBwb2ludCwgaW5jbHVkaW5nIHJlLXBpbm5pbmcgYW5kIHNvIGZvcnRoIGFsbCB0
+aGUgbWVtb3J5LCBpbnN0ZWFkDQo+IG9mIHRyeWluZyB0byBtYWdpY2FsbHkgcmVjb3ZlciB0aGF0
+IGFkZGl0aW9uYWwgc3RhdGUuDQo+IA0KPiBUaGlzIGlzIHRoZSBwaGlsb3NvcGh5IHRoYXQgeW91
+IHJlcGxheSBpbnN0ZWFkIG9mIGRlLXNlcmlhbGl6ZSwgc28geW91DQo+IGhhdmUgdG8gcmVwbGF5
+IGludG8gYSBwYWdlIHRhYmxlIGF0IHNvbWUgbGV2ZWwgdG8gbWFrZSB0aGF0IHdvcmsuDQoNCldl
+IGNvdWxkIGhhdmUgc29tZSAic2tpcF9wZ3RhYmxlX3VwZGF0ZSIgZmxhZyB3aGljaCB0aGUgcmVw
+bGF5IG1hY2hpbmVyeQ0Kc2V0cywgYWxsb3dpbmcgSU9NTVVGRCB0byBjcmVhdGUgZnJlc2ggb2Jq
+ZWN0cyBpbnRlcm5hbGx5IGFuZCBsZWF2ZSB0aGUNCnBhZ2UgdGFibGVzIGFsb25lPw0KDQpBbnl3
+YXksIHRoYXQgc29ydCBvZiB0aGluZyBpcyBhIHBvdGVudGlhbCBmdXR1cmUgb3B0aW1pc2F0aW9u
+IHdlIGNvdWxkDQpkby4gSW4gdGhlIGludGVyZXN0cyBvZiBtYWtpbmcgcHJvZ3Jlc3MgSSdsbCBy
+ZS13b3JrIHRoaXMgUkZDIHRvIHJlLQ0KY3JlYXRlIGV2ZXJ5dGhpbmcgKGlvbW11ZmQgb2JqZWN0
+cywgSU9NTVUgZHJpdmVyIGRvbWFpbnMgYW5kIHBhZ2UNCnRhYmxlcykgYW5kIGRvIHRoZSBhdG9t
+aWMgaGFuZG92ZXIgb2YgcGFnZSB0YWJsZXMgYWZ0ZXIgcmUtDQppbml0aWFsaXNhdGlvbi4NCg0K
+PiANCj4gDQo+ID4gdGhlbiBpdCB3b3VsZCBiZSB1c2VmdWwgdG8gYXZvaWQgcmVidWlsZGluZyBp
+ZGVudGljYWwgdGFibGVzLiBNYXliZSBpdA0KPiA+IGVuZHMgdXAgYmVpbmcgaW4gdGhlICJ3YXJt
+IiBwYXRoIC0gdGhlIFZNIGNhbiBzdGFydCBydW5uaW5nIGJ1dCB3aWxsDQo+ID4gc2xlZXAgaWYg
+dGFraW5nIGEgcGFnZSBmYXVsdCBiZWZvcmUgSU9NTVVGRCBpcyByZS1pbml0YWxpc2VkLi4uDQo+
+IA0KPiBJIGRpZG4ndCB0aGluayB5b3UnZCBzdXBwb3J0IHBhZ2UgZmF1bHRzPyBUaGVyZSBhcmUg
+YmlnZ2VyIGlzc3VlcyBoZXJlDQo+IGlmIHlvdSBleHBlY3QgdG8gaGF2ZSBhIHZJT01NVSBpbiB0
+aGUgZ3Vlc3QuDQoNCnZJT01NVSBpcyBvbmUgY2FzZSwgYnV0IGFub3RoZXIgaXMgbWVtb3J5IG92
+ZXJzdWJzY3JpcHRpb24uIFdpdGggUFJJL0FUUw0Kd2UgY2FuIG92ZXJzdWJzY3JpYmUgbWVtb3J5
+IHdoaWNoIGlzIERNQSBtYXBwZWQuIEluIHRoYXQgY2FzZSBhIHBhZ2UNCmZhdWx0IHdvdWxkIGJl
+IGEgYmxvY2tpbmcgb3BlcmF0aW9uIHVudGlsIElPTU1VRkQgaXMgYWxsIHNldCB1cCBhbmQNCnJl
+YWR5IHRvIGdvLiBJIHN1c3BlY3QgdGhlcmUgd2lsbCBiZSBiZW5lZml0IGluIGdldHRpbmcgdGhp
+cyBmYXN0LCBidXQNCmFzIGxvbmcgYXMgd2UgaGF2ZSBhIHBhdGggdG8gb3B0aW1pc2UgaXQgaW4g
+ZnV0dXJlIEknbSB0b3RhbGx5IGZpbmUgdG8NCnN0YXJ0IHdpdGggcmUtY3JlYXRpbmcgZXZlcnl0
+aGluZy4NCg0KSkcNCg==
 
