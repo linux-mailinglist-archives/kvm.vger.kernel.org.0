@@ -1,135 +1,149 @@
-Return-Path: <kvm+bounces-28457-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28458-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F4F998C6D
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 17:55:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE0A6998CCA
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 303791C24238
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 15:55:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0E471C24DF5
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE801CDFBB;
-	Thu, 10 Oct 2024 15:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA24C1CDFD7;
+	Thu, 10 Oct 2024 16:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Te0gVPet"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGxTUdEH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71001CCEC2
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 15:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C44B1CCB2D
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 16:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728575666; cv=none; b=TwkNI8lLCaGhMe8Zib4X9oxsvPzuH451jImpE2tmjYXHkyzOVxp28hOT6IxmQAcGheWdPYOVc/BvyQGOPGLN6GWnK7ceZOqfcNPmDm24vQ3kaoOeS5qGjCYp4mQbjluJavXSt3nL1SVfqzUwUvqpbnmt7CysbfBBQ8YXNZfugtg=
+	t=1728576415; cv=none; b=NBjttMxd+KjulYxvI2Vv/zL+RBKOa1YN8znmCUwKyMjKG8BqeZ1MycQLl7v/lQDS4YuutT6mUVyAdAxAn9BlZ3xP1FnzqPBEQ9bPDW8M7500mJRFSg5W8idBbFd4biDhNfvsVHKKp8N807Jb/gY/ziDgNHAXfA1y2exYLu0U7a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728575666; c=relaxed/simple;
-	bh=exMIV8Nrlv5VDsW7LyILeqag4PrIbwaBSGqnuHxKDCM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oMC0wZSpUJVBiCM0mIIPswR3Zsct4M6J7ormkrxzLa84BOJ9bhPSfTTZ7AXVdhNd7zyCEGBmWRQosVx6Pkl63TkabV71uNJY68mipzkmdDIh3kQG+OZ/sB36x4syiU2h43dGMu1zv1k6CC71bu/ne8/IS8rBMrdoBsulFyBZgQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Te0gVPet; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e28fc8902e6so1504522276.0
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 08:54:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728575664; x=1729180464; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7sMwEF0t04Xf03z8JmTNU0su6EV0vlEJErGb+yyXXCE=;
-        b=Te0gVPet9qAS4fshTWsr1ipo5NiATG0k2qjPQofocrdund1E03q5LLoQSdBDFsDL9s
-         LtsVSmf7OhbTWSwdrWxjHIO/xanP0dcxhH45E51b8F57bWW6UyyoFFO81Iv2Jz+YBCvi
-         7SpHhTUKzMwGVTeQKZvihuNroZZCdXqviY8PVNteMC5y9RLLN8XOQ9HSntwLK9KkSZL9
-         H3ro0JwZgJ/GX/in8jcrUax9R7Ax//jtoz5JjYHMIrbYFDBDEe+J87n1/0MkkqGrWrTb
-         wSJV9fLY/NBHY3gOr/EtsLQAAhc4nCZzUMTW+TOljPh+yz+Dc1MRGzL9SSj/06dCt1sX
-         kVNQ==
+	s=arc-20240116; t=1728576415; c=relaxed/simple;
+	bh=iiFqIaeGWzn5Xw4KqI1wHYf2EWVoHUdUhd1tZQSD++s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dpYhVj2VcrJWJpC4SQPW7q0eU1a8cI8FkAWoL2sjH3/M35/RkBAybTpsyZI/YF9AdIN68prmaqwlU3yHBariP5SpDjVOslGbKYY9wut5hZODeHN0sUbEcb9Wwdtrrd/4PtDY/18oqwieSAtm/hMZTqCh6F5Y6Qh9z5aMErdLW80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QGxTUdEH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728576413;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S/HNyejBOzZNAS2pmhlTCa73HqHtmX71UiVQvzZUuQU=;
+	b=QGxTUdEHfw9YI7qTW6dVvwz5Bz/HVK36p0i7c9QcpFAh6PjuJEnznjLzl/q616+DxlUA2y
+	BqCAMWExhUGpGjnOKiYex2E2JVxDvUCf6ApKaakQihXMVzrgGmvDWLifPzzY3ks/gduVWK
+	jbeiWW3W4aJOEANxLQNusFF5G7UwGR8=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-443-URZPmGdLMVSj71fLNmKUaw-1; Thu, 10 Oct 2024 12:06:51 -0400
+X-MC-Unique: URZPmGdLMVSj71fLNmKUaw-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-71dfd9fc0e5so971050b3a.2
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 09:06:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728575664; x=1729180464;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7sMwEF0t04Xf03z8JmTNU0su6EV0vlEJErGb+yyXXCE=;
-        b=NdHyMKp/493dMfCRvABsYQHd10gAvEUjDxyo/yHDZM4WVMh2vzKMIlmBVuJ3uAuWfa
-         p+n5ua4E4e45NrnQhL2PPbrzJGfIPYCucLzPzTUtuFlaRu03ho1uue5+W3P2ifHSWSg7
-         pEMRJX8LHUMt/RpE6Zyx8aXybZaJnl+/iyJTa/mKFx1cAY4Ue/gx4atR2R0WFcwHoaKk
-         xbDPucNEeU9UxAiOs4LLLr2s4bzDgfww2iIRit9a9VHUY2oL9raN81QNjUEzqM0dXKOk
-         FxVX1GXJzaQUl312kJWRoznXGhffz2aBF0RNCT1M2vUdnFmh5ctScPQjgG0XLVkq6cTC
-         6D5w==
-X-Forwarded-Encrypted: i=1; AJvYcCW5Ks9DEkKkS0LdyySoc6WBW28pnieD6CQ/tVQIo9KOnZKVFsW+K7MqWcgjy0+8Wc8uWuI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiOVZwyIHGi5lq/sXedMnil/uNJ1xq4HeQy+hrnxSB8R1wS4IS
-	+aVdy+VgtCjRT3zKH56fkE4pCSfXEv6HecUwbR/3dzqrBhx+RFykZXfpuX6P5G43eCCIlIwyjqR
-	gJw==
-X-Google-Smtp-Source: AGHT+IFaTEQVvJEtWhp3ZxUl43YQFKv0vyHXzstBhIqqSy0TgE8/HNjhOVfOl877/xE21b5MkSaX03T1TNo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:ab51:0:b0:e28:fb8b:9155 with SMTP id
- 3f1490d57ef6-e28fe41c747mr57834276.9.1728575663673; Thu, 10 Oct 2024 08:54:23
- -0700 (PDT)
-Date: Thu, 10 Oct 2024 08:54:21 -0700
-In-Reply-To: <cf2aabe2-7339-740a-6145-17e458302979@amd.com>
+        d=1e100.net; s=20230601; t=1728576410; x=1729181210;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S/HNyejBOzZNAS2pmhlTCa73HqHtmX71UiVQvzZUuQU=;
+        b=l4ggbohqFngS6AAD7OBOXniQgS9+9pmJejEfaWX9CzuqDOkI49ji2WF8dMt7AOqxzt
+         P5zP44HVtnUYuIHJa9pXAV3R1kYt60RVm9ITf7G3xDjh8ghxVyZc36KPiL8RBZeVbCYV
+         E2Rzy2XHPpRXy6ppMVJjnm8MBifgq5dMMfoiaBeiGGlfP5CecRGkMNwtMawILi15sThK
+         oNkUhvExR1KGAmrCFOOetJSkLq8rUcU29yJ3V7axI7HPfn9lPmwha+jm1likuU8h0Gy4
+         BdCy6Wc6xnz+pvRrITf+4a+tFLc8vI9WqRqS0oyTcwlD1DU0C/GaGnVNkBqsct/catNI
+         98jA==
+X-Forwarded-Encrypted: i=1; AJvYcCWd9MbwyHkeYNxLOgOKEv1kGyc/54lJoZeWpJgvm4AkcYae/a94vLVNKX0RtKiFisuPbJU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzT//ArKh8w9VjIGgWvCHAUerghKix6W5bCYgKBRFl8u8TxOdq9
+	HbWRRBANstcEwzERTr0Pe5S3H3rO+LkZN85iNveZOPzHi1+2s12RQKpmCQR81tclS+/176/+MTX
+	uDRDxDSEWziS/iVOud/1JPcvyg5yJyCCUSU9LZwTCaY67VGLfsw==
+X-Received: by 2002:a05:6a00:179b:b0:719:7475:f07e with SMTP id d2e1a72fcca58-71e1db6481fmr11819859b3a.4.1728576410006;
+        Thu, 10 Oct 2024 09:06:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG+7f1RLhbjySKF/4qyAXiKo7lGpEQ+qrTVlBlzhq+59C96dfh+Iq8tKg2tVLc+cHIQsd5gOg==
+X-Received: by 2002:a05:6a00:179b:b0:719:7475:f07e with SMTP id d2e1a72fcca58-71e1db6481fmr11819813b3a.4.1728576409638;
+        Thu, 10 Oct 2024 09:06:49 -0700 (PDT)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e2a9ea46csm1229368b3a.17.2024.10.10.09.06.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Oct 2024 09:06:48 -0700 (PDT)
+Date: Thu, 10 Oct 2024 12:06:43 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk,
+	jgg@nvidia.com, david@redhat.com, rientjes@google.com,
+	fvdl@google.com, jthoughton@google.com, seanjc@google.com,
+	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com,
+	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev,
+	mike.kravetz@oracle.com, erdemaktas@google.com,
+	vannapurve@google.com, qperret@google.com, jhubbard@nvidia.com,
+	willy@infradead.org, shuah@kernel.org, brauner@kernel.org,
+	bfoster@redhat.com, kent.overstreet@linux.dev, pvorel@suse.cz,
+	rppt@kernel.org, richard.weiyang@gmail.com, anup@brainfault.org,
+	haibo1.xu@intel.com, ajones@ventanamicro.com, vkuznets@redhat.com,
+	maciej.wieczor-retman@intel.com, pgonda@google.com,
+	oliver.upton@linux.dev, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-fsdevel@kvack.org
+Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
+ struct kvm_gmem_private
+Message-ID: <Zwf7k1wmPqEEaRxz@x1n>
+References: <cover.1726009989.git.ackerleytng@google.com>
+ <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241009150455.1057573-1-seanjc@google.com> <20241009150455.1057573-2-seanjc@google.com>
- <cf2aabe2-7339-740a-6145-17e458302979@amd.com>
-Message-ID: <Zwf4rfOFBlnMtdLQ@google.com>
-Subject: Re: [PATCH 1/6] KVM: Explicitly verify target vCPU is online in kvm_get_vcpu()
-From: Sean Christopherson <seanjc@google.com>
-To: Pankaj Gupta <pankaj.gupta@amd.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Will Deacon <will@kernel.org>, Michal Luczaj <mhal@rbox.co>, Alexander Potapenko <glider@google.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
 
-On Thu, Oct 10, 2024, Pankaj Gupta wrote:
-> On 10/9/2024 5:04 PM, Sean Christopherson wrote:
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index db567d26f7b9..450dd0444a92 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -969,6 +969,15 @@ static inline struct kvm_io_bus *kvm_get_bus(struct kvm *kvm, enum kvm_bus idx)
-> >   static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
-> >   {
-> >   	int num_vcpus = atomic_read(&kvm->online_vcpus);
-> > +
-> > +	/*
-> > +	 * Explicitly verify the target vCPU is online, as the anti-speculation
-> > +	 * logic only limits the CPU's ability to speculate, e.g. given a "bad"
-> > +	 * index, clamping the index to 0 would return vCPU0, not NULL.
-> > +	 */
-> > +	if (i >= num_vcpus)
-> > +		return NULL;
+On Tue, Sep 10, 2024 at 11:43:57PM +0000, Ackerley Tng wrote:
+> The faultability xarray is stored on the inode since faultability is a
+> property of the guest_memfd's memory contents.
 > 
-> Would sev.c needs a NULL check for?
+> In this RFC, presence of an entry in the xarray indicates faultable,
+> but this could be flipped so that presence indicates unfaultable. For
+> flexibility, a special value "FAULT" is used instead of a simple
+> boolean.
 > 
-> sev_migrate_from()
-> ...
-> src_vcpu = kvm_get_vcpu(src_kvm, i);
-> src_svm = to_svm(src_vcpu);
-> ...
+> However, at some stages of a VM's lifecycle there could be more
+> private pages, and at other stages there could be more shared pages.
+> 
+> This is likely to be replaced by a better data structure in a future
+> revision to better support ranges.
+> 
+> Also store struct kvm_gmem_hugetlb in struct kvm_gmem_hugetlb as a
+> pointer. inode->i_mapping->i_private_data.
 
-Nope, sev_check_source_vcpus() verifies the source and destination have the same
-number of online vCPUs before calling sev_migrate_from(), and it's all done with
-both VMs locked.
+Could you help explain the difference between faultability v.s. the
+existing KVM_MEMORY_ATTRIBUTE_PRIVATE?  Not sure if I'm the only one who's
+confused, otherwise might be good to enrich the commit message.
 
-static int sev_check_source_vcpus(struct kvm *dst, struct kvm *src)
-{
-	struct kvm_vcpu *src_vcpu;
-	unsigned long i;
+The latter is per-slot, so one level higher, however I don't think it's a
+common use case for mapping the same gmemfd in multiple slots anyway for
+KVM (besides corner cases like live upgrade).  So perhaps this is not about
+layering but something else?  For example, any use case where PRIVATE and
+FAULTABLE can be reported with different values.
 
-	if (!sev_es_guest(src))
-		return 0;
+Another higher level question is, is there any plan to support non-CoCo
+context for 1G?
 
-	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
-		return -EINVAL;
+I saw that you also mentioned you have working QEMU prototypes ready in
+another email.  It'll be great if you can push your kernel/QEMU's latest
+tree (including all dependency patches) somewhere so anyone can have a
+closer look, or play with it.
 
-	kvm_for_each_vcpu(i, src_vcpu, src) {
-		if (!src_vcpu->arch.guest_state_protected)
-			return -EINVAL;
-	}
+Thanks,
 
-	return 0;
-}
+-- 
+Peter Xu
+
 
