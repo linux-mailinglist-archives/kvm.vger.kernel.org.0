@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-28529-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28530-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC7DE9990F1
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 20:42:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 282A89990F4
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 20:43:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86A3A285D49
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:42:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C016E287C97
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF95207216;
-	Thu, 10 Oct 2024 18:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC2C207A15;
+	Thu, 10 Oct 2024 18:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g5hzo9jY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lmtzsAHw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9712071E2
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 18:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E53420720B
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 18:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584805; cv=none; b=O4l3GRD9EyvdDVTQygJdygDmKPVUkU8Jqkl/RHh7LqNrRvf06RhrmzHjCdvmWphr/CfpfRaftFTYJPXfnngYvkGc5/1t0Cgd06LtitIQekjJIfCWrbEDrVMEZCRk/k0VvB6pCGqk9J9g+C+jpTnBWsa2kcu/IrMUWmgnv5eIo4s=
+	t=1728584807; cv=none; b=qfblW+IqM8P8tbp7zw0T7NFB5t14M8tHQIMtVDQENUCGKFIsDIMT2nTQNqDErtVYlH28EkayoNmQqMyKyKXuJsGKFxueNWeiLE3tG3DwCxLDPT+Q0NDXLp1qiqc84SnhqFDjFcpFeUeiK0P6Tz3/2xJ7eg6d4RpJRZZ2pCAb7k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584805; c=relaxed/simple;
-	bh=NP4IgcbBDVq5DZEeFtyiO8CdEZFJxxnULnDPMD13pKg=;
+	s=arc-20240116; t=1728584807; c=relaxed/simple;
+	bh=kbjwflG2kz8fn2XlGwl/ZUkp2MoQm+/BMH1MpANV1Tw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PPATC4KFtowOFz5A0n0CKFjXmInIZnfW1ZO7bRtqvzN7JSoWuB6RUBaKSZjjDZN/dz3UFouA2xlYIEcD1WH1isBXo6Ru6MQjzywJAzGO3CFlFpFYmQ6/eZeXKO2fgwbDgNgNq9/pnSW9c33iandvvAzgOBF7c4cO+YyNTauj8ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g5hzo9jY; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=PoozIGhyILTkiuy8nnO48iY8oKzUalat0ee0Ld2gSQ2zm336JYakyRyRu4JkzCljzkohGV/mbdDjT7O0po8LtdB/ykf06DC6uezM1wUZlz5cocK3dyme5t3Hu44sDUJ2nq7DgPSiDjRbsbcheZfGUg2comGhcvEmjfZ9TCaruf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lmtzsAHw; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e29b4f8837so18952267b3.0
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 11:26:44 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2e2d3d5fb4eso897525a91.2
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 11:26:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584803; x=1729189603; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728584805; x=1729189605; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=/fC7L3Fchvvuu9GyGKk9VEzuiyLOIeBtO2SWEaXDNWE=;
-        b=g5hzo9jYuMsLef5elH7BXii/Rz3O5NNAzg3BaELLMkoxekYgKvv3GlwOx0MeUswR5S
-         u7D79PlxCqfi2Eui27GQ/wf2PDK/FtSU9HQpxYIEp6FYcUNcZ4RxRkWKsOxypmmScggd
-         bXGvbabN+3GVR3u3Z5evpvBvV7hTapUH6bSv1xuzsGrxP42UL0bRjk5kLAIDqUd2xwc1
-         HxptH7WG5BO6Qq5eztg3t9rrh5agOngJ9zqfaGOzOhRlW/rHlxLQl7mVwlclH/5jU39z
-         SiwFtCrrtukpmLM9KZ9QtNIJl9cGgY/kEqCKhzMSjtywjCUbz1pRhU34CDuRasgyTV4R
-         S5uw==
+        bh=RAEBOjiR86B8MKio5svj+gL/GJb0VtWq7ImNxArS0H8=;
+        b=lmtzsAHwQyNwRvm4YycGayWTaD3mMWa0KP6qhPQcjm6Xns70mqWPYJS1kLd7s22LTY
+         /T7yWx+i0180z3+0c870icqFaPkxG/5jw4mabTqo8QyB0EcckP0wh91y7Mr5DVDEcAvZ
+         hQO7SxtZXgjJ+5PNG6GYQ8lhMuxPsiaTv7bKN0qEUlt9rMOH5ix6Gd6u/08WvrX8BdhV
+         sxBtnyqiiR8igp8kOk/PVonv0d4Scqtx+EB6UWy3fO105xlv1kZig9jJkbcTPFSX83n6
+         4g/v3dji6XZ61FVYO2EBHHk9ucMefuuWtbYJ3TSw4Isga9JWzpWIfkjpdmCzxAee0iT7
+         Q0eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584803; x=1729189603;
+        d=1e100.net; s=20230601; t=1728584805; x=1729189605;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/fC7L3Fchvvuu9GyGKk9VEzuiyLOIeBtO2SWEaXDNWE=;
-        b=et9MFAwz/MLNQlqE6lr2ZnupGslnicGRhNry2nRXr9GTxtkE++uOQFbWrod0T8y0mm
-         HLel7OKczqgjgcqiW349d7vZWYvWtzwSUSBnchUNCjc8fNus+envY7XsIqFQMWL6PfF+
-         9bQKeTCOLSLJf/8T+VyDAclrgRBoo/Lc9d+HrZxQOwoNudVAZml/P6fV1pMe9qGhmV7i
-         JIIpiVmfhAswSj43UYiH4qzdl59XXEocbe+z4TUZBcQOkPNMX0B45Ujsz4PYzeo4YhXL
-         5KkwBLqeRVW2B8A0EaygFGLkZ2zxyihFyPaPpYlpj9BxMtuVUnHZxcQZZrr4tPFiaurU
-         B4Lg==
-X-Gm-Message-State: AOJu0YwYvPS7OCXcf2cX3AEEefjiOt8DaJUECaYW29Nvj4ZYLEI1Lnzg
-	JzEYtCLnmGfBZnqv3B++/N33VrxNljgSp1gRtl/r70H/6JZp2XGlMFBMm+6kDvP3gc1jL3ho7Z8
-	Vsg==
-X-Google-Smtp-Source: AGHT+IF0bQSeBV+k7XDKFBXYzNvC7N99ueMTlOEEH5KNk6JZHzu/00W1ndtLnT51eyBFoV94Bmz3yNyB+P4=
+        bh=RAEBOjiR86B8MKio5svj+gL/GJb0VtWq7ImNxArS0H8=;
+        b=cWrAvGy8TQ357PeajtOg49U+ZzTSIwNjTYNNRPAQYrhEe+JM479OvPUuQML9juISnm
+         +Z5ulE62TPp1dOYJSU1DfxoTtegUzGrYqLUdogq9LUEJs1M3VGm02FwhoxEsRv5aYoTq
+         rziG4950uUiwoziGxWbpD+Z+9bKuDdwW+Q2TAaPwZeKlNxvrzfrTWRtkzfY767MlSdjh
+         3ifFsQDqijUkILwdqGspOaLjgwPTR0VEeVy823Rockz/tp0GoTa09VfPon8d1s/Favb7
+         hg9PRwr7BoMjIWUj7nIQCuRamvfrxC+ZLId496L9nhNxOBGZuc2a79cP+DwEdJQ863FM
+         ADPw==
+X-Gm-Message-State: AOJu0Yy1o1lvRtobVZWbc/kdWduk1UoN3V+J4LD0RVub4Jia5NhZeKGj
+	pPtHqyywjtwZ5h8gFjGDXZZKU9NJXBP6mB65KZSHJ2VurucKlKBJ8YR/aC+GPSi47t+IpxesDnh
+	m7g==
+X-Google-Smtp-Source: AGHT+IH3g+or1uGKI8zaqA7g6VjAId1uToioip8sNGZo/KyXggeZoODfUOK1q5z450FXHERnWYgwR7EwX2I=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:dd1:b0:6db:e464:addc with SMTP id
- 00721157ae682-6e344ce9308mr1337b3.4.1728584803335; Thu, 10 Oct 2024 11:26:43
+ (user=seanjc job=sendgmr) by 2002:a17:90a:5107:b0:2e2:ca3e:10fe with SMTP id
+ 98e67ed59e1d1-2e2f0f88a54mr24a91.8.1728584805241; Thu, 10 Oct 2024 11:26:45
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 11:23:54 -0700
+Date: Thu, 10 Oct 2024 11:23:55 -0700
 In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241010182427.1434605-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010182427.1434605-53-seanjc@google.com>
-Subject: [PATCH v13 52/85] KVM: PPC: e500: Mark "struct page" dirty in kvmppc_e500_shadow_map()
+Message-ID: <20241010182427.1434605-54-seanjc@google.com>
+Subject: [PATCH v13 53/85] KVM: PPC: e500: Mark "struct page" pfn accessed
+ before dropping mmu_lock
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -95,64 +96,34 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Andrew Jones <ajones@ventanamicro.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Mark the underlying page as dirty in kvmppc_e500_ref_setup()'s sole
-caller, kvmppc_e500_shadow_map(), which will allow converting e500 to
-__kvm_faultin_pfn() + kvm_release_faultin_page() without having to do
-a weird dance between ref_setup() and shadow_map().
-
-Opportunistically drop the redundant kvm_set_pfn_accessed(), as
-shadow_map() puts the page via kvm_release_pfn_clean().
+Mark pages accessed before dropping mmu_lock when faulting in guest memory
+so that shadow_map() can convert to kvm_release_faultin_page() without
+tripping its lockdep assertion on mmu_lock being held.  Marking pages
+accessed outside of mmu_lock is ok (not great, but safe), but marking
+pages _dirty_ outside of mmu_lock can make filesystems unhappy.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/powerpc/kvm/e500_mmu_host.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ arch/powerpc/kvm/e500_mmu_host.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
-index c664fdec75b1..5c2adfd19e12 100644
+index 5c2adfd19e12..334dd96f8081 100644
 --- a/arch/powerpc/kvm/e500_mmu_host.c
 +++ b/arch/powerpc/kvm/e500_mmu_host.c
-@@ -242,7 +242,7 @@ static inline int tlbe_is_writable(struct kvm_book3e_206_tlb_entry *tlbe)
- 	return tlbe->mas7_3 & (MAS3_SW|MAS3_UW);
- }
+@@ -498,11 +498,9 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
+ 	kvmppc_mmu_flush_icache(pfn);
  
--static inline void kvmppc_e500_ref_setup(struct tlbe_ref *ref,
-+static inline bool kvmppc_e500_ref_setup(struct tlbe_ref *ref,
- 					 struct kvm_book3e_206_tlb_entry *gtlbe,
- 					 kvm_pfn_t pfn, unsigned int wimg)
- {
-@@ -252,11 +252,7 @@ static inline void kvmppc_e500_ref_setup(struct tlbe_ref *ref,
- 	/* Use guest supplied MAS2_G and MAS2_E */
- 	ref->flags |= (gtlbe->mas2 & MAS2_ATTRIB_MASK) | wimg;
- 
--	/* Mark the page accessed */
--	kvm_set_pfn_accessed(pfn);
+ out:
+-	spin_unlock(&kvm->mmu_lock);
 -
--	if (tlbe_is_writable(gtlbe))
--		kvm_set_pfn_dirty(pfn);
-+	return tlbe_is_writable(gtlbe);
+ 	/* Drop refcount on page, so that mmu notifiers can clear it */
+ 	kvm_release_pfn_clean(pfn);
+-
++	spin_unlock(&kvm->mmu_lock);
+ 	return ret;
  }
  
- static inline void kvmppc_e500_ref_release(struct tlbe_ref *ref)
-@@ -337,6 +333,7 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
- 	unsigned int wimg = 0;
- 	pgd_t *pgdir;
- 	unsigned long flags;
-+	bool writable = false;
- 
- 	/* used to check for invalidations in progress */
- 	mmu_seq = kvm->mmu_invalidate_seq;
-@@ -490,7 +487,9 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
- 			goto out;
- 		}
- 	}
--	kvmppc_e500_ref_setup(ref, gtlbe, pfn, wimg);
-+	writable = kvmppc_e500_ref_setup(ref, gtlbe, pfn, wimg);
-+	if (writable)
-+		kvm_set_pfn_dirty(pfn);
- 
- 	kvmppc_e500_setup_stlbe(&vcpu_e500->vcpu, gtlbe, tsize,
- 				ref, gvaddr, stlbe);
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
