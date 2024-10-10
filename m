@@ -1,71 +1,73 @@
-Return-Path: <kvm+bounces-28452-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28453-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27569998A96
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:57:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40969998AB3
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:59:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB867289E42
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:57:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF0B81F25F02
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F461CFEC1;
-	Thu, 10 Oct 2024 14:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D441F4FD7;
+	Thu, 10 Oct 2024 14:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cjXn76xN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HzrPiJMu"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BDE38DE1;
-	Thu, 10 Oct 2024 14:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C691CB301;
+	Thu, 10 Oct 2024 14:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728571647; cv=none; b=tKWQLTFDoBIJ9FkGrZmYODpDtWJX9O658dniIgsNy4bUhm4Vu1Zhk6mrxynBck0NT62kXPx7qycbQPnJXRfmxO4OWfkQXeaPLW6MPy2L8lnpqVbOZ3+msdR8TPDNm4QfDuIwUooDA2pCcC1N3OiSHTy/+S5w/UzNmGZi0vZt0Us=
+	t=1728571848; cv=none; b=gzO501AaXSdndmUJFu9Ms0GOBVnde49TPdQ1GNnrCj/ix2q4ccC2CgcBMCBsx25UgfH7BPQaI/Apk1txLazliAF4CtlMfvfn3WSz80dzwAj8zfMTsWD6M61COWHRLzyjPG+773tbjvULGZv6VWx5cZAN4VJBnhwOcqA2dILxoks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728571647; c=relaxed/simple;
-	bh=c86bZx+YmfvhEWvQvzDAR3YRQcbqsE152hsx636Xtrw=;
+	s=arc-20240116; t=1728571848; c=relaxed/simple;
+	bh=sibCqydeqQiNQIf/lBDGFiiLV6uF5mNsecPlSRVwL9Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z0tghszancg217vKw3ZupWTIddBcJh8uotV9qFhaJElrD0Evr0/ZB2Hk29sgyFvlhVrUTxNk7AmWgWFVtwRK+mZlO9Cz4cgFiMYeSHTgVv/LyuhzhIbSkoI5jORf+Xfipo1fQ7Wuk8fGX1fVFu+mjevHJcMtJqSbtqoEJI4LEAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cjXn76xN; arc=none smtp.client-ip=198.175.65.21
+	 Content-Type:Content-Disposition:In-Reply-To; b=B3/scKROThIj3haRrGDKbpf/DI6sLwIJXqFP4NEEuUqrEil3zLx+S6JIGezTJ7XtW/cMHpy8pKkCedx+vLZvrLhO2cdzQAYdQTjcLrt9GiSrkItJRJUd5XZ5Q3x7mCVqhREOiRSF1XgLgfOvKeBIQjXGPkM7REGy1+K9rTvbOnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HzrPiJMu; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728571646; x=1760107646;
+  t=1728571848; x=1760107848;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=c86bZx+YmfvhEWvQvzDAR3YRQcbqsE152hsx636Xtrw=;
-  b=cjXn76xNUrzThL9oezEvYokDxFyB3lSnf9n/ExLNu85cE7mZnJpjPueo
-   UMalUqfiPoU8rsTYpnunQNfoXnm0WGu97PXnUD3EOZURTbySxfSrGn+OJ
-   7rTGjTp1QU3J0oWCT/KwHCfy7DE6xdG5IyGSZJOqfxlqZMHSnQCiHnmKl
-   0e6Hw1Tq2VngcUyn0knxdZhFb6Wa7GR865w3SRNt2JMvc2NrfMbLPa9G8
-   dcTB13MtnRjB9FaiDf/VmMQSG8Ea2vd6ut2EYLqRiQqxtiJO0iqocaAlT
-   d6sUqjThcex52eQbppSgO4yDHL12mExEt4ZMptW8DZaxdL2S49yhTQPNI
-   w==;
-X-CSE-ConnectionGUID: e1ORoMKCS9SShZHv2GS+gg==
-X-CSE-MsgGUID: oSSq0bGBTn2QQeRTCyEnyQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="27879191"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=sibCqydeqQiNQIf/lBDGFiiLV6uF5mNsecPlSRVwL9Y=;
+  b=HzrPiJMuD2f3mp/TH4iEQ0T1f3sseukJKhhNrIKpJV8F/ZhP+DkZw8+a
+   3uiMySVHDpJx0VmG8HQbfdLeIdZZx2wtZfGfewytc0KIlIVEWcGIEAG28
+   UeEl329Pd64uocuSzvQXExl+5i/Un0s3kie7q/rSpCN36QYAZEAJf+7ET
+   YVbisKNnTImnkcHA3Ck/cxK9BUROl7lZMaJrQgTGgmoA4u9l7mg/J0yVR
+   LraoxaWTVFlrBJE+m8mNfdUPKZDbz9Tv7J8pbVvdGJI19qPMdQrrrh+NG
+   tA5fSgsCvD/2tbH3KVcuI5qgsyU/PUJxE32O19OVgRtIAqf69aAilT6BF
+   A==;
+X-CSE-ConnectionGUID: NmRIE5LLTFq5Iz2muUcGXA==
+X-CSE-MsgGUID: f6YHws0fQ1GM8x850rpSwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="27880006"
 X-IronPort-AV: E=Sophos;i="6.11,193,1725346800"; 
-   d="scan'208";a="27879191"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 07:47:19 -0700
-X-CSE-ConnectionGUID: CFVtLA2bR8m8vXo4U4Ht/Q==
-X-CSE-MsgGUID: 75L4zIgtTbi5nHx/jM5AKw==
+   d="scan'208";a="27880006"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 07:50:46 -0700
+X-CSE-ConnectionGUID: 7wY/4jxvQLCPgvYMG4Ai+Q==
+X-CSE-MsgGUID: 2AQrvW1rQX2PPbhnm34TWQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,193,1725346800"; 
-   d="scan'208";a="76227214"
+   d="scan'208";a="114082669"
 Received: from smile.fi.intel.com ([10.237.72.154])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 07:47:03 -0700
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 07:50:31 -0700
 Received: from andy by smile.fi.intel.com with local (Exim 4.98)
 	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1syuRN-00000001ZEK-3XKp;
-	Thu, 10 Oct 2024 17:46:57 +0300
-Date: Thu, 10 Oct 2024 17:46:57 +0300
+	id 1syuUj-00000001ZJ4-117L;
+	Thu, 10 Oct 2024 17:50:25 +0300
+Date: Thu, 10 Oct 2024 17:50:25 +0300
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Philipp Stanner <pstanner@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
 	Sergey Shtylyov <s.shtylyov@omp.ru>,
 	Basavaraj Natikar <basavaraj.natikar@amd.com>,
 	Jiri Kosina <jikos@kernel.org>,
@@ -118,44 +120,60 @@ Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
 	ntb@lists.linux.dev, linux-pci@vger.kernel.org,
 	linux-staging@lists.linux.dev, kvm@vger.kernel.org,
 	xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Subject: Re: [RFC PATCH 02/13] ALSA: hda: hda_intel: Use always-managed
- version of pcim_intx()
-Message-ID: <Zwfo4dr4bfqQGGyl@smile.fi.intel.com>
+Subject: Re: [RFC PATCH 00/13] Remove implicit devres from pci_intx()
+Message-ID: <ZwfpsSxnwm7K4eMF@smile.fi.intel.com>
 References: <20241009083519.10088-1-pstanner@redhat.com>
- <20241009083519.10088-3-pstanner@redhat.com>
+ <8643a212-884c-48de-a2d0-0f068fc49ca2@gmail.com>
+ <6468cf3e4a06c008644c98a7a79f81a1c04752b8.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20241009083519.10088-3-pstanner@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6468cf3e4a06c008644c98a7a79f81a1c04752b8.camel@redhat.com>
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Wed, Oct 09, 2024 at 10:35:08AM +0200, Philipp Stanner wrote:
-> pci_intx() is a hybrid function which can sometimes be managed through
-> devres. To remove this hybrid nature from pci_intx(), it is necessary to
-> port users to either an always-managed or a never-managed version.
-> 
-> hda_intel enables its PCI-Device with pcim_enable_device(). Thus, it needs
-> the always-managed version.
-> 
-> Replace pci_intx() with pcim_intx().
+On Thu, Oct 10, 2024 at 10:09:12AM +0200, Philipp Stanner wrote:
+> On Wed, 2024-10-09 at 20:32 +0200, Heiner Kallweit wrote:
+> > On 09.10.2024 10:35, Philipp Stanner wrote:
 
 ...
 
->  	bus->irq = chip->pci->irq;
->  	chip->card->sync_irq = bus->irq;
-> -	pci_intx(chip->pci, !chip->msi);
-> +	pcim_intx(chip->pci, !chip->msi);
->  	return 0;
+> > > To do so, a pci_intx() version that is always-managed, and one that
+> > > is
+> > > never-managed are provided. Then, all pci_intx() users are ported
+> > > to the
+> > > version they need. Afterwards, pci_intx() can be cleaned up and the
+> > > users of the never-managed version be ported back to pci_intx().
+> > > 
+> > > This way we'd get this PCI API consistent again.
+> > > 
+> > AFAICS pci_intx() is used only by drivers which haven't been
+> > converted
+> > to the pci_alloc_irq_vectors() API yet. Wouldn't it be better to do
+> > this
+> > instead of trying to improve pci_intx()?
 
-I believe each driver needs an individual approach. Looking at the above
-I would first to understand why this one is being used and why we can't
-switch to pci{m}_alloc_irq_vectors(). (Yeah, managed pci_alloc_irq_vectors()
-is probably still missing, I don't remember if you introduced it or not.
+My first impression was the same...
+
+> This would be the créme-de-la-créme-solution, yes.
+> 
+> But such a portation would require more detailed knowledge of the old
+> drivers.
+> 
+> In this discussion, Alex points out that at least in some drivers, you
+> can't replace pci_intx() without further ado:
+> https://lore.kernel.org/all/20240904151020.486f599e.alex.williamson@redhat.com/
+> 
+> What we could do is mark pci_intx() and pcim_intx() as deprecated and
+> point everyone to pci_alloc_irq_vectors(). Then someone can look into
+> porting the old drivers at some point in the future.
+
+...but here I got the point by Philipp.
 
 -- 
 With Best Regards,
