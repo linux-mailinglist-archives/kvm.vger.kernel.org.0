@@ -1,127 +1,116 @@
-Return-Path: <kvm+bounces-28461-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28462-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD8C0998D17
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:19:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5993D998DDD
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:55:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79503284544
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:19:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C226B2B791
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFEC71CDFBD;
-	Thu, 10 Oct 2024 16:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF261CDFB6;
+	Thu, 10 Oct 2024 16:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kWWCbLRu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PTcuAOF4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94CC1C2DA1
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 16:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6516F185B6B;
+	Thu, 10 Oct 2024 16:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728577141; cv=none; b=HNUAOeumDiJPnn3ufXSDAIdSmEmHhVDzMNmRilR5L/aWlLoZijg3fReF5lfblMKhgixS0bnsJZYRY3XeGnkaFAeY8Bf8RcVIyTdsDUl0vNuEJjBpjXyL7/onJuI6JvW73mfUPR+4kS1ZOhy88uJ166fMBLzAIaeVHAPEBBm3yuY=
+	t=1728577245; cv=none; b=nhdxUydbbtQ8OZYhy4iW0FyD/f7GyC8PxJynkHDitLJqjbDC3IPJ8+HIsBT2ovYisiK8YspwZvwb7kfBbtqsnya6aIguypIoAMyLk1IoX7erR8ovHFw6gUJiEODPa6BHJqO4ouOHXCbFEqPj2soYoBJ8dy0bU+hxqrfUFjTS9uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728577141; c=relaxed/simple;
-	bh=0taRQhQ9LqfmmG+vQ7qFCD+ZjBUWXq1z8qfHRkn6bZg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=c1+snGA6S8w+N7HV5OKc30d63ASXWZK5P0bHwPToYsk6+XPpgRr12zNoX4xl7fNPFNhADCPuTGMotzUcsGRrQieiWzkrMqaAlwYOlciooyhtuGU5y2lMGgbqXme1VSQGGb068k6ObleyvuicRmpEfUW3MiMG2p/bY9KnG+pAmIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kWWCbLRu; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e290222fde4so1204484276.1
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 09:18:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728577139; x=1729181939; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D6G7OUX8q4BUWDj+3AyCy0cvuvdbRoe5UQJNlr3xoSc=;
-        b=kWWCbLRuo7dJPl8n9SJ/OOo8+MMeZAEl0/Q5fd42OGcNy28G4UdvT/MO1WkOIEs9uH
-         l0yG6MKSKGLFm4EoKeI/83pfYsqZzKW89DHkP4DsrZsgDoC/+b9s2Z77IGsX4qghrH3t
-         0SK7FENveCC0T/5bE6R21o9S7NOMv/Eth+XwrjJYyqnMgcIPiRaJLmPzgWpb5dRwZ413
-         rCpxH3QR6U/x3FH06VQ0dr7/+HYnrLuJjRNA5bdihob4cntVkjpTmNQo8QdJuUmLyaOY
-         QD+8FRDGOOzuYsg9MSudjY8K8JEt24oQf6E7jRk93Zv/4PZ0jDIC4YtBu+4tAzPXS50C
-         cbKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728577139; x=1729181939;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=D6G7OUX8q4BUWDj+3AyCy0cvuvdbRoe5UQJNlr3xoSc=;
-        b=XNdyjs/HRctvs3ot3bc8HlWlByiVqyWx3zADeW0BMbquEyo7DfFkEsJVp0JibAsKNo
-         FP3Ad1yyJUMmnCJ+VZG+AxXo9aBQRzCemEQyLEjIKmRDZLcs6YvvaNtv5CfLFjW9do9t
-         cnr8q30mVbd8G+HHylL4aCNXPxsn6SpKBhSTzdfT07qYUfPI0dJVkt1k5oa3/0hGjr7Q
-         /o7LJoUaGqmJ7SrOf29bp9qZ3heDGy+6apkZO7uemCIVeF4v9vW40wpWIyP/BZiV0GJa
-         wQOOOTfWoWizc/nqcgVKwFLKuh/IKQim4lYS53no03VfT5RONXaTLVTwRwHffZqF6xCK
-         TD3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXbbtMKjbkJ/GGGG1epyyG5QDIkX/un+EW6YTOaWV/jqMkJAqH/POhLQ9pjIEYvpHuMfgM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXTNqBdtMObJKPbCSGnH5E9W2+hFEuRRwpU5+2SqkLvJS6xUJ1
-	Idkv1lj0p3sEb8vTVTBn1RkzTUkhT9RiQKwR6MhQjDbQGtwZpkd3XEgSaLn34wY7CNa2pmInZJl
-	nYw==
-X-Google-Smtp-Source: AGHT+IEs3IpuQOP/zvRG77UWqmGygsitarAq+g3ot9CvViFEmkmJwJvNdEkRmxmn8vkxRVvB44456Fm4Qgg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:d353:0:b0:e28:e74f:4cb with SMTP id
- 3f1490d57ef6-e28fe0df614mr95229276.0.1728577138650; Thu, 10 Oct 2024 09:18:58
- -0700 (PDT)
-Date: Thu, 10 Oct 2024 09:18:57 -0700
-In-Reply-To: <028501cdd2469a678df3b77c25c3cd9a1b6eff66.camel@gmx.de>
+	s=arc-20240116; t=1728577245; c=relaxed/simple;
+	bh=1TMPxMWmvd6Kf4NRLsvezV5L9HKWRBqdlpJ2USYyLEI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BP9HPhiPjm9XaWnjN2SVyg4xder0jJDBXhb6KSG9bEdoJxnXeICnyWb7j1qrg/UB08hjMZTCCOtCGeey2h86sa5a03haEG1QHGT/2nHks9PBxnLKq2dKhT6BGKxSOQxI/rkKheNdpx5SFMUFXih2G5qLHrp0aW0aU9wZav8jTd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTcuAOF4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93DD8C4CECC;
+	Thu, 10 Oct 2024 16:20:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728577245;
+	bh=1TMPxMWmvd6Kf4NRLsvezV5L9HKWRBqdlpJ2USYyLEI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PTcuAOF455dLBeILPFIyJjVIb6QjIRJFHaig2+Cqq5A1u5/tpqyMwCO39yKuIqAlg
+	 kOqlItq24BeMxcQqnU2mGWvWOmyVfLFyXirX3MX0mkv5Zr1q46MssxwwaQQ9kq7jLC
+	 SqUyD9ymaj6YUtpJsNHByd07qff9KkBe4TI6ISCNVvVbbCPHGFC5Hcq/0dRGG74Orc
+	 tlbAhUCsxdtRnZo3zQC6euqqwjAO06BR5ErFMYkBQui1xQJPsfSNma9fNIqvuLsZTP
+	 x+3Cu2oB2L8zqjsYiqJLtt5td+aW8VvmakGg2bt2FUmN6Ld07hyuam+yEyN9irfmBJ
+	 1nU5tDcVRSAyw==
+Date: Thu, 10 Oct 2024 17:20:41 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v4 10/36] arm64: Define ID_AA64MMFR1_EL1.HAFDBS
+ advertising FEAT_HAFT
+Message-ID: <Zwf-2eW-ypRTZXfx@finisterre.sirena.org.uk>
+References: <20241009190019.3222687-1-maz@kernel.org>
+ <20241009190019.3222687-11-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240727102732.960974693@infradead.org> <20240727105030.226163742@infradead.org>
- <CGME20240828223802eucas1p16755f4531ed0611dc4871649746ea774@eucas1p1.samsung.com>
- <5618d029-769a-4690-a581-2df8939f26a9@samsung.com> <ZwdA0sbA2tJA3IKh@google.com>
- <028501cdd2469a678df3b77c25c3cd9a1b6eff66.camel@gmx.de>
-Message-ID: <Zwf-cfADFwt0awj3@google.com>
-Subject: Re: [PATCH 17/24] sched/fair: Implement delayed dequeue
-From: Sean Christopherson <seanjc@google.com>
-To: Mike Galbraith <efault@gmx.de>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>, Peter Zijlstra <peterz@infradead.org>, mingo@redhat.com, 
-	juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com, 
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de, vschneid@redhat.com, 
-	linux-kernel@vger.kernel.org, kprateek.nayak@amd.com, 
-	wuyun.abel@bytedance.com, youssefesmat@chromium.org, tglx@linutronix.de, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="q4WValHa0s1+hPNt"
+Content-Disposition: inline
+In-Reply-To: <20241009190019.3222687-11-maz@kernel.org>
+X-Cookie: Editing is a rewording activity.
 
-On Thu, Oct 10, 2024, Mike Galbraith wrote:
-> On Wed, 2024-10-09 at 19:49 -0700, Sean Christopherson wrote:
-> >
-> > Any thoughts on how best to handle this?=C2=A0 The below hack-a-fix res=
-olves the issue,
-> > but it's obviously not appropriate.=C2=A0 KVM uses vcpu->preempted for =
-more than just
-> > posted interrupts, so KVM needs equivalent functionality to current->on=
--rq as it
-> > was before this commit.
-> >
-> > @@ -6387,7 +6390,7 @@ static void kvm_sched_out(struct preempt_notifier=
- *pn,
-> > =C2=A0
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 WRITE_ONCE(vcpu->scheduled_o=
-ut, true);
-> > =C2=A0
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (current->on_rq && vcpu->wants=
-_to_run) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (se_runnable(&current->se) && =
-vcpu->wants_to_run) {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 WRITE_ONCE(vcpu->preempted, true);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 WRITE_ONCE(vcpu->ready, true);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
-> Why is that deemed "obviously not appropriate"?  ->on_rq in and of
-> itself meaning only "on rq" doesn't seem like a bad thing.
 
-Doh, my wording was unclear.  I didn't mean the logic was inappropriate, I =
-meant
-that KVM shouldn't be poking into an internal sched/ helper.
+--q4WValHa0s1+hPNt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Wed, Oct 09, 2024 at 07:59:53PM +0100, Marc Zyngier wrote:
+> This definition is missing, and we are going to need it to sanitise
+> TCR2_ELx.
+
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 3c812fd28eca2..8db4431093b26 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -1688,6 +1688,7 @@ UnsignedEnum	3:0	HAFDBS
+>  	0b0000	NI
+>  	0b0001	AF
+>  	0b0010	DBM
+> +	0b0011	HAFT
+>  EndEnum
+
+This is correct in so far as it goes, but we are also mising HDBSS
+according to the 2024-09 XML, plus a couple of new revisions of ETS.
+I'll send a patch doing the full update, it should just be a trivial
+add/add conflict.
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+It tends to make life a bit easier to note which version of the spec is
+being referenced with these updates.
+
+--q4WValHa0s1+hPNt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcH/tgACgkQJNaLcl1U
+h9BewAgAg/hv4R39tRrvxenHo8RtrEfIf/f2jS3aePgmsbrWspqBl0gt+J2BdsIb
+FecMHHcUpPnUVLMbvJZCYFdCdo4NyMT5Rm5+7GIzFRxLVyzRMcbDsLMZKh+ufb20
+2iOegrNkRPi3RuBYoU+R45wo5WtD7HCOlm5U0E2ai7gYgjxzKaTWQOPToRmfuYum
+Q2Wt0cpWzI2xFAGLoqt/+8T9FPgV2FM2JjzuuRFbPjoW5T1E90A9F4h6sP3MdzZr
+a3ZQp5fE1gAOlquDUFqPxMWi5sCHrnqT3TLSZ3XWQBLh1EIFL8zAx/nilLbWURnW
++39qiG2mtS+Vdx8rHxttdnEer5wyBA==
+=Jh8J
+-----END PGP SIGNATURE-----
+
+--q4WValHa0s1+hPNt--
 
