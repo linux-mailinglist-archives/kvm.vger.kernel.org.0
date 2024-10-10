@@ -1,136 +1,109 @@
-Return-Path: <kvm+bounces-28415-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28416-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD01699837F
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 12:25:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 056559983DB
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 12:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FCE01F226F8
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 10:25:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 176291C22BC1
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 10:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE071BE857;
-	Thu, 10 Oct 2024 10:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3968B1C0DCC;
+	Thu, 10 Oct 2024 10:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pRXMscBv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CnM0V1/2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF5B1BDAB8
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 10:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4BC19E7D0;
+	Thu, 10 Oct 2024 10:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728555876; cv=none; b=aJpJeVE+uGnfDZQ4vmWp0ofrHdRSPBY70/q4TyVmtKg3agKG6QUNb0LPJ3K5i1eiqqDUFPlKuZS5RUNSPeNGMjIkOnCVFWq2lwxE5nezgtqE1fzl8hz7ZUsSOiz3Hex7uw6gM6qjzgr+UcUJJFT/oRKex7GeFuUwPOvZf/9k2a0=
+	t=1728556581; cv=none; b=DA4Wx4tDWeP7mFu7DCkMzyNZ5UpcTVMLKHVYANWdup9GJ90Xb7q9veN+ppXVvFCcLSopS4TqiRZPbLDa5Q6RcELFujAA9xX610AVvJArRaEDxUbKdVbYKaHYCvLZyitnKtNC7iKMqjkBfRT372k+LfHghplWr13MJjDi4ftz6eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728555876; c=relaxed/simple;
-	bh=fFCNlWru5+pdNkh5QLeCqMQctRHkljYByudCKs4aFmk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KmubbaFUc3zvZ11IM4oXYIuMpV5NJaG0SrkkvKKm17k5aNnL9jiPis2QDs0ldwTjI5eYUuhYhsrMTM4woJ8kMetS/lrY8sF88djyphE2pOi45ODR3zEk+geMA5HTlX+NNs0Zwb+FiAg5fk+cUaSPpvWtZOa4l52eA/OnqiW9++U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pRXMscBv; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-431141cb4efso214155e9.0
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 03:24:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728555873; x=1729160673; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OzRLepl01rBIXpKHqICQ+VG1MuVzX81celcTfUwqlgU=;
-        b=pRXMscBvWOklh5qqGefn55MF5TZ+PgIdn9PG4HliizTi3aFK3J1MiZ2EFshqp6knBX
-         ljuGWaa++VNlUXKx9xFLsIE+1nYVtnUQmA+6hRheVxVE/gjXYZKPQiDHl32VpgXIW1wG
-         6dIXRKQk0cKtKnRaBbJV8Alxe1x0w9JFoDJ7bTqtxKzK1mgcrF7LNEFXsh6uz8UhZxYQ
-         IhN4Y0r4cdwImmw3ukP4Ta7KnD30/MEFnfpu9q2m0yNBRqpHpSS00SDczGkeIeM0O1To
-         1If17pamiRJKEROLwWJF6TClGh7DHdaRJFZfL+29qC9zQbQZn6a8D96ugyknZIKEMJcc
-         I3pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728555873; x=1729160673;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OzRLepl01rBIXpKHqICQ+VG1MuVzX81celcTfUwqlgU=;
-        b=bljaQVs8SYHJI0WimMpJmmbX64w+r2ZEpw1gCD0DpKhyFVXoIYJcNjA4YyrrggT8wk
-         1x4k6LyjlbcVcRuY0AO4o98jJZa39VbbCizQk+rkRZlHTn9WD9NR/xoLLtrrMAfN6Dzs
-         OAmAO5003e54sdaw5KZpZvsb0mesO+6czRdyUg7MeGjjk1j+I7fPCHrFW2jgks/f/G4c
-         3hLXV6I3TemU1Uj/wh9T++AEqCVmaFKtNN2KjVacq3KV1mMP6lCgXrCmtLBHdMy5USDt
-         ihLxZds0e+3CxXqM3XHymC/lETZypx5rIzpo5hCm1OlUiUU2sYV1assjNoOj67Qfhxi5
-         nZtQ==
-X-Gm-Message-State: AOJu0Yx0AQoM8Lc/ctS60HV9wajTyshLlfXwfDugGBJkalrRYwrYGT8T
-	mWyvZ+U27oa423A6Hpj33hmJpbJ5D5ho/bmmVib0YM0Htrw8dqOPSKE4VYaOznlW0HGNalZIO2G
-	hBetC2wo14NPy0jvCVOGG5B4yVcXXG41dKeLu
-X-Google-Smtp-Source: AGHT+IGFf0e8gomwA6a0slETrpo9MsW4kTd5EZtJLAbPns5yYHIued/ItYJ6plaUZhkrBipZGu+G9pNHAZZCl+u+1Kk=
-X-Received: by 2002:a05:600c:1e21:b0:42b:a8fc:3937 with SMTP id
- 5b1f17b1804b1-431161b4011mr3744105e9.4.1728555872435; Thu, 10 Oct 2024
- 03:24:32 -0700 (PDT)
+	s=arc-20240116; t=1728556581; c=relaxed/simple;
+	bh=gQqKk10pAyRy63nmdJoeEtOLWCVNkzBN/hKzrk+TGN8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G+O40MBQazDmiEVyknQETgc9nFs/MhPGN3/f1qsJo1k/jei/YYQHnZcDkm6FTCGC1onUrDrdnciGYupYvtRHjmP5XYdgOiush5yrRcN2MEuGbdZ9Ov5t68hsPNEP5cSTzsD7KzOoAKlFniNCzjgJJxaDj1QT2RNVfQk3UfFi6bU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CnM0V1/2; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728556580; x=1760092580;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gQqKk10pAyRy63nmdJoeEtOLWCVNkzBN/hKzrk+TGN8=;
+  b=CnM0V1/2LfJGi63eOdKDp5hRzk3Qrhks7LsvHJpmklZUHd/N4wAxYL1F
+   ZyhGvZgDPmzTnzT1ahdjOhjR+BXlOH5HBbkPd+jeCU6MuHIU4NIsTa2Dt
+   3rqKdEuZ+abyTZ6oxm9OdJh7ICMUYibxjLU7Cl1X3DqXrNy3OncJBtLw9
+   8GL1R5zVfJ7otTwROxNAT5+5KTmVeImfFh2iN55kDY+5a27a4INYmSvgu
+   XWG1/ATlCtq5ifGfA54b8XG3hA4+uk/QN2IriL4TMTULrj2eyayZT4zvJ
+   omenL+IF5OwCYrJdQ4fuo4JL+gmEKSdyfLhsSttvoiV9MV97Faz/fSR/z
+   Q==;
+X-CSE-ConnectionGUID: QysAjBI4QNuyhUNLkcGhsw==
+X-CSE-MsgGUID: aUgEyZ1vTo2dbXItQWQOwA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="27376827"
+X-IronPort-AV: E=Sophos;i="6.11,192,1725346800"; 
+   d="scan'208";a="27376827"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 03:36:19 -0700
+X-CSE-ConnectionGUID: KGM/QkRPRoqUkEvTHk6vQw==
+X-CSE-MsgGUID: nvI/NMsoRWGJ40Kksv9lww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,192,1725346800"; 
+   d="scan'208";a="107396403"
+Received: from sschumil-mobl2.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.114])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 03:36:15 -0700
+Date: Thu, 10 Oct 2024 13:36:09 +0300
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
+	isaku.yamahata@gmail.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 22/25] KVM: TDX: Use guest physical address to configure
+ EPT level and GPAW
+Message-ID: <ZweuGbBxy5ZfBi82@tlindgre-MOBL1>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-23-rick.p.edgecombe@intel.com>
+ <f04c20f6-fce1-49e3-9cc8-c696032720fc@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241010085930.1546800-1-tabba@google.com> <20241010085930.1546800-5-tabba@google.com>
- <i44qkun5ddu3vwli7dxh27je72ywlrb7m5ercjhvprhleapv6x@52dwi3kwp2zx>
-In-Reply-To: <i44qkun5ddu3vwli7dxh27je72ywlrb7m5ercjhvprhleapv6x@52dwi3kwp2zx>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 10 Oct 2024 11:23:55 +0100
-Message-ID: <CA+EHjTwOsbNRN=6ZQ4rAJLhpVNifrtmLLs84q4_kOixghaSHBg@mail.gmail.com>
-Subject: Re: [PATCH v3 04/11] KVM: guest_memfd: Allow host to mmap
- guest_memfd() pages when shared
-To: "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f04c20f6-fce1-49e3-9cc8-c696032720fc@intel.com>
 
-Hi Kirill,
+On Thu, Oct 10, 2024 at 05:13:43PM +0800, Xiaoyao Li wrote:
+> On 8/13/2024 6:48 AM, Rick Edgecombe wrote:
+> > From: Xiaoyao Li <xiaoyao.li@intel.com>
+> > 
+> > KVM reports guest physical address in CPUID.0x800000008.EAX[23:16],
+> > which is similar to TDX's GPAW. Use this field as the interface for
+> > userspace to configure the GPAW and EPT level for TDs.
+> > 
+> > Note,
+> > 
+> > 1. only value 48 and 52 are supported. 52 means GPAW-52 and EPT level
+> >     5, and 48 means GPAW-48 and EPT level 4.
+> > 2. value 48, i.e., GPAW-48 is always supported. value 52 is only
+> >     supported when the platform supports 5 level EPT.
+> > 
+> > Current TDX module doesn't support max_gpa configuration. However
+> > current implementation relies on max_gpa to configure  EPT level and
+> > GPAW. Hack KVM to make it work.
+> 
+> This patch needs to be squashed into patch 14.
 
-On Thu, 10 Oct 2024 at 11:14, Kirill A. Shutemov <kirill@shutemov.name> wrote:
->
-> On Thu, Oct 10, 2024 at 09:59:23AM +0100, Fuad Tabba wrote:
-> > +out:
-> > +     if (ret != VM_FAULT_LOCKED) {
-> > +             folio_put(folio);
-> > +             folio_unlock(folio);
->
-> Hm. Here and in few other places you return reference before unlocking.
->
-> I think it is safe because nobody can (or can they?) remove the page from
-> pagecache while the page is locked so we have at least one refcount on the
-> folie, but it *looks* like a use-after-free bug.
->
-> Please follow the usual pattern: _unlock() then _put().
+Yes agreed that makes sense.
 
-That is deliberate, since these patches rely on the refcount to check
-whether the host has any mappings, and the folio lock in order not to
-race. It's not that it's not safe to decrement the refcount after
-unlocking, but by doing that i cannot rely on the folio lock to ensure
-that there aren't any races between the code added to check whether a
-folio is mappable, and the code that checks whether the refcount is
-safe. It's a tiny window, but it's there.
+Regards,
 
-What do you think?
-
-Thanks,
-/fuad
-
-> --
->   Kiryl Shutsemau / Kirill A. Shutemov
+Tony
 
