@@ -1,71 +1,72 @@
-Return-Path: <kvm+bounces-28492-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28493-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0545E99904C
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 20:30:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0981999053
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 20:31:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7400A1F24FBC
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:30:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B7D01F24D39
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D37F1F12F4;
-	Thu, 10 Oct 2024 18:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D655B1F4717;
+	Thu, 10 Oct 2024 18:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TYQRQk+w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WvslKqNS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1071EF937
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 18:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56011F12E4
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 18:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584726; cv=none; b=cwNVgq5gpLOVtbaRmz/5hbNKay5RfKsavnVqqV6IdqNboZsbuKSlXlTETwQ8dUTu9yRqLTVSUPv262vPNBkgSg5JaZAgqHbvjxieqj6CODiO6ZyT6a08DRrIGOVL8tU7tT10hoeCX6Fv+bdQ/hWZB/4BJque+8USmd01o8ntuYc=
+	t=1728584729; cv=none; b=AEtErrGi3TuL7OBQwzScR1ahMIbYtfqVkV7/Zq9idQzLoHCw4As/SmonJ1tdM3t9MYnZ0TPc03KtYV+LQCWNKfywDQWJApcf5I6nn4ZkMSTO9FfJq4FRZBwzYtHHX3j2Z25OYQLewYHJnW0g2FN/85uNYzEZV76axe3mn5i2VgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584726; c=relaxed/simple;
-	bh=xKxLUn1wM/pJucT4/ZxvVNmNhzhyHMbiLj3YVf1FNHQ=;
+	s=arc-20240116; t=1728584729; c=relaxed/simple;
+	bh=42VPy3Va09DWIWyeI7bQhF4N8yIw+oK2ibHTdiPXTHw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hIF4vwXmjczPA+1dll0kHaeh5kgazP1q6uL3i5pTc0MzEgKw6quKNj9hT3KWnJ6Z6zrQGfRxL9FMEEMJqtGz1nBJWStdRnb39ECFAqVQKEtm84uIvXkT2bTvuAMnUi6SAARTMNPmYukZuOsQi+M3wcGT/d+dZmqE6+a9QFRjMjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TYQRQk+w; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=KI2KsorXhVj91B4vykMkA03kS2bbkQegqLZrvYEj84x4JdCcJsAtVXz9Ne1EDAmxTOB1NguTvqKNxCqiZSz/ZfF0Uj2u4pgkvMKETd8YqxM6JGT9ob00h51+31+ITKirvTA/9L2jWRwaWsqiki0VwxJKoeyfV/k1XacoomygEM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WvslKqNS; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e3231725c9so23542457b3.1
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 11:25:24 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-71e048c1595so1304412b3a.1
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 11:25:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584724; x=1729189524; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=86tNdlyX8HXR/WHFYCj/131p34DPDBwWgQrhOuSjETM=;
-        b=TYQRQk+w7SZ6hxu000ERFTE/19nobGDZp4qfI4lUGaKSkx65llk5i8OtSPaWktaPe+
-         5XozsAEpjOmnyoNqatnrYMAZ60RWiIscI44p1xR028Kq4YBFHeziOBq1g5YMW369+ewe
-         DBbnBBj7uyWKhzvNHIsKPh1xm7J41dcuSCTEYZDqgPyXGvJRHeKaxnjlU+Q7xVjJlTj+
-         Py4wWC7F64nR2FkwHexXSLRXrQRj5eudodYY+PhBwB9w0LCVub3wGLZ+EE1KRXqo1yqd
-         P1/WIlzQG/PMilWwZm1sDFH2cYInsL65Bp0RatNOaVo01u0iAbnToWRI8vRt9jBA3Mti
-         z40w==
+        d=google.com; s=20230601; t=1728584726; x=1729189526; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:reply-to:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H+RZpPtsk3Pe/RqqhWN1oE7ZGzOesPmt7slwmkU09yw=;
+        b=WvslKqNSO5DKemaosV5Ekaavvk/7eArebNvJycUuLBkZGB/XJaMFX6aV1iKkGUFwP0
+         ZNwz0bY08AVY+Ai+JzYMIfwVM/iwhmIFh6ypp19yQJ7xlLlH4E1/h5/i4lkEIEswxRX6
+         G1V1+MDdkMXxuUeQhS2FytA/DTRX5CMGC7SlmlvH24EV5qDMrezu16iTJ094fO53XMoJ
+         CGl31UkFsqipIwaYzOCagq4DAomkEhANFb6QoDU2IIOMnJOpIdKn8veU7TKRO0XUkEuU
+         U8S1Qx2j8B7VTqF/nKa6l80LAoqMwmyO08nUTDqCHn4jvA8Xb+kpNd8Sq1I3C8YK6lcV
+         TOiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584724; x=1729189524;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=86tNdlyX8HXR/WHFYCj/131p34DPDBwWgQrhOuSjETM=;
-        b=fn8WYU8oK7GYy+0BRDX/gdMy/fvR8Mq0WRgWgQNPo5dh8kV1sOnZV88htqylY8Qr64
-         51GvufVha3v3jajq/4N601rZgZdR47GrnmCETxSvBoHmO51NWlE4kTakA/alVhvBw70j
-         sVrhcok5c9SdhjiMa71SCMicTRp/Rewab/hDbXDUtFTWBgZ9hecHGRo6e9wePGvpdDDn
-         AUEGXFsSufl6j8jR/FlqoDFPkOijrgnvcNgSn1FR13caVE+4r2c6qAdc2tqTPIvalMgH
-         3ZCtGW1t9rOQfg7H2g7z+IeJhERmiV6FRyv1oEm8VvNSTAFIKaRnSr2Tb4JNKnC0rIUp
-         oWCQ==
-X-Gm-Message-State: AOJu0YwV/W63yydUDVaFhEMPcgbMhAkCpsY4HHvhzdt4l5gZZGKR6xai
-	As2iiBg72u6oYEy5yiSLfIASaQPjwyGXvL/PV20l51nnW4Bn/oNAKsWCVvvsQvxjdhlyekGLgUs
-	iGA==
-X-Google-Smtp-Source: AGHT+IGf82b/hxj2IWFe54/TAnEDS4XyhakmYGUWxryxrCLTzb83+cUU5J1DZhSXbLBNZQvipdjBbhmVkR8=
+        d=1e100.net; s=20230601; t=1728584726; x=1729189526;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:reply-to:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=H+RZpPtsk3Pe/RqqhWN1oE7ZGzOesPmt7slwmkU09yw=;
+        b=ucNSWN+4IDKA/fccgMbM4U22Omvfj/tDBznRkMisyM8RkPZf+zXxGMgzWG23BQnS7z
+         4smEIlJQ6vwgMfyn1AMTIXF2RGaB23P6CY8yF3w04RFCATJpW9Mv5lzZbHEvzStyE3Ph
+         SKOkVLxXY6heeedQGtDQGKg6rM+WpBC54JlDeyOdN/0gsB71BGzb+eCrnyDn2rCN14zO
+         RtTUn4Tdky+wm2zuwnuyG/NtUd0eMI3wpqNTyHGMw5OEJwj6KUTWdDf/1qnxVXwqMiCF
+         Kp4Ysc2yCGzPYa8/xWyQjimexlUIjSUex+nj4044Gqfe2FdVqN+z643zHoaEoc7FtQVf
+         Zt4g==
+X-Gm-Message-State: AOJu0YwWNnhdhyTO9cUxaPnhkASVL5O9QV5kCkqxIWp91bZLSKAPzBbx
+	J0Iw1Sg8s9om8ZX+S4tfen+08VUMaXfkFHe6ImiIl/V5YDiq6Ty6iOZdiSdmrA6SmwV4MDXu5eS
+	caQ==
+X-Google-Smtp-Source: AGHT+IEgY3dn5eo0Xr6pp3rAg0uVd1WuwbDag/Dk23UVvT7MMuxyKVAtWc2T42TlMp1H8D9GJ1Oltmo921o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:8e09:0:b0:e28:ef25:5f13 with SMTP id
- 3f1490d57ef6-e28fe0e7352mr200743276.0.1728584723790; Thu, 10 Oct 2024
- 11:25:23 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:8c17:b0:71d:f452:ee99 with SMTP id
+ d2e1a72fcca58-71e1dbcac44mr6866b3a.3.1728584725637; Thu, 10 Oct 2024 11:25:25
+ -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 11:23:17 -0700
+Date: Thu, 10 Oct 2024 11:23:18 -0700
 In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241010182427.1434605-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010182427.1434605-16-seanjc@google.com>
-Subject: [PATCH v13 15/85] KVM: Drop extra GUP (via check_user_page_hwpoison())
- to detect poisoned page
+Message-ID: <20241010182427.1434605-17-seanjc@google.com>
+Subject: [PATCH v13 16/85] KVM: Replace "async" pointer in gfn=>pfn with
+ "no_wait" and error code
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -95,77 +96,237 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>, 
 	Andrew Jones <ajones@ventanamicro.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Remove check_user_page_hwpoison() as it's effectively dead code.  Prior to
-commit 234b239bea39 ("kvm: Faults which trigger IO release the mmap_sem"),
-hva_to_pfn_slow() wasn't actually a slow path in all cases, i.e. would do
-get_user_pages_fast() without ever doing slow GUP with FOLL_HWPOISON.
+From: David Stevens <stevensd@chromium.org>
 
-Now that hva_to_pfn_slow() is a straight shot to get_user_pages_unlocked(),
-and unconditionally passes FOLL_HWPOISON, it is impossible for hva_to_pfn()
-to get an -errno that needs to be morphed to -EHWPOISON.
+Add a pfn error code to communicate that hva_to_pfn() failed because I/O
+was needed and disallowed, and convert @async to a constant @no_wait
+boolean.  This will allow eliminating the @no_wait param by having callers
+pass in FOLL_NOWAIT along with other FOLL_* flags.
 
-There are essentially four cases in KVM:
-
-  - npages == 0, then FOLL_NOWAIT, a.k.a. @async, must be true, and thus
-    check_user_page_hwpoison() will not be called
-  - npages == 1 || npages == -EHWPOISON, all good
-  - npages == -EINTR || npages == -EAGAIN, bail early, all good
-  - everything else, including -EFAULT, can go down the vma_lookup() path,
-    as npages < 0 means KVM went through hva_to_pfn_slow() which passes
-    FOLL_HWPOISON
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: David Stevens <stevensd@chromium.org>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/kvm_main.c | 17 ++---------------
- 1 file changed, 2 insertions(+), 15 deletions(-)
+ arch/x86/kvm/mmu/mmu.c   | 18 +++++++++++-------
+ include/linux/kvm_host.h |  3 ++-
+ virt/kvm/kvm_main.c      | 27 ++++++++++++++-------------
+ virt/kvm/kvm_mm.h        |  2 +-
+ virt/kvm/pfncache.c      |  4 ++--
+ 5 files changed, 30 insertions(+), 24 deletions(-)
 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 0e235f276ee5..fa8f3fb7c14b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4374,17 +4374,21 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu =
+*vcpu,
+=20
+ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault =
+*fault)
+ {
+-	bool async;
+-
+ 	if (fault->is_private)
+ 		return kvm_faultin_pfn_private(vcpu, fault);
+=20
+-	async =3D false;
+-	fault->pfn =3D __gfn_to_pfn_memslot(fault->slot, fault->gfn, false, &asyn=
+c,
++	fault->pfn =3D __gfn_to_pfn_memslot(fault->slot, fault->gfn, false, true,
+ 					  fault->write, &fault->map_writable,
+ 					  &fault->hva);
+-	if (!async)
+-		return RET_PF_CONTINUE; /* *pfn has correct page already */
++
++	/*
++	 * If resolving the page failed because I/O is needed to fault-in the
++	 * page, then either set up an asynchronous #PF to do the I/O, or if
++	 * doing an async #PF isn't possible, retry with I/O allowed.  All
++	 * other failures are terminal, i.e. retrying won't help.
++	 */
++	if (fault->pfn !=3D KVM_PFN_ERR_NEEDS_IO)
++		return RET_PF_CONTINUE;
+=20
+ 	if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
+ 		trace_kvm_try_async_get_page(fault->addr, fault->gfn);
+@@ -4402,7 +4406,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, s=
+truct kvm_page_fault *fault
+ 	 * to wait for IO.  Note, gup always bails if it is unable to quickly
+ 	 * get a page and a fatal signal, i.e. SIGKILL, is pending.
+ 	 */
+-	fault->pfn =3D __gfn_to_pfn_memslot(fault->slot, fault->gfn, true, NULL,
++	fault->pfn =3D __gfn_to_pfn_memslot(fault->slot, fault->gfn, true, true,
+ 					  fault->write, &fault->map_writable,
+ 					  &fault->hva);
+ 	return RET_PF_CONTINUE;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 2faafc7a56ae..071a0a1f1c60 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -97,6 +97,7 @@
+ #define KVM_PFN_ERR_HWPOISON	(KVM_PFN_ERR_MASK + 1)
+ #define KVM_PFN_ERR_RO_FAULT	(KVM_PFN_ERR_MASK + 2)
+ #define KVM_PFN_ERR_SIGPENDING	(KVM_PFN_ERR_MASK + 3)
++#define KVM_PFN_ERR_NEEDS_IO	(KVM_PFN_ERR_MASK + 4)
+=20
+ /*
+  * error pfns indicate that the gfn is in slot but faild to
+@@ -1233,7 +1234,7 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn,=
+ bool write_fault,
+ 		      bool *writable);
+ kvm_pfn_t gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn=
+);
+ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t g=
+fn,
+-			       bool interruptible, bool *async,
++			       bool interruptible, bool no_wait,
+ 			       bool write_fault, bool *writable, hva_t *hva);
+=20
+ void kvm_release_pfn_clean(kvm_pfn_t pfn);
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ebba5d22db2d..87f81e74cbc0 100644
+index 87f81e74cbc0..dd5839abef6c 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -2746,14 +2746,6 @@ unsigned long kvm_vcpu_gfn_to_hva_prot(struct kvm_vcpu *vcpu, gfn_t gfn, bool *w
- 	return gfn_to_hva_memslot_prot(slot, gfn, writable);
- }
- 
--static inline int check_user_page_hwpoison(unsigned long addr)
--{
--	int rc, flags = FOLL_HWPOISON | FOLL_WRITE;
--
--	rc = get_user_pages(addr, 1, flags, NULL);
--	return rc == -EHWPOISON;
--}
--
- /*
-  * The fast path to get the writable pfn which will be stored in @pfn,
-  * true indicates success, otherwise false is returned.
-@@ -2948,14 +2940,10 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool interruptible, bool *async,
+@@ -2778,7 +2778,7 @@ static bool hva_to_pfn_fast(unsigned long addr, bool =
+write_fault,
+  * The slow path to get the pfn of the specified host virtual address,
+  * 1 indicates success, -errno is returned if error is detected.
+  */
+-static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fau=
+lt,
++static int hva_to_pfn_slow(unsigned long addr, bool no_wait, bool write_fa=
+ult,
+ 			   bool interruptible, bool *writable, kvm_pfn_t *pfn)
+ {
+ 	/*
+@@ -2801,7 +2801,7 @@ static int hva_to_pfn_slow(unsigned long addr, bool *=
+async, bool write_fault,
+=20
+ 	if (write_fault)
+ 		flags |=3D FOLL_WRITE;
+-	if (async)
++	if (no_wait)
+ 		flags |=3D FOLL_NOWAIT;
+ 	if (interruptible)
+ 		flags |=3D FOLL_INTERRUPTIBLE;
+@@ -2912,8 +2912,8 @@ static int hva_to_pfn_remapped(struct vm_area_struct =
+*vma,
+  * Pin guest page in memory and return its pfn.
+  * @addr: host virtual address which maps memory to the guest
+  * @interruptible: whether the process can be interrupted by non-fatal sig=
+nals
+- * @async: whether this function need to wait IO complete if the
+- *         host page is not in the memory
++ * @no_wait: whether or not this function need to wait IO complete if the
++ *	     host page is not in the memory
+  * @write_fault: whether we should get a writable host page
+  * @writable: whether it allows to map a writable host page for !@write_fa=
+ult
+  *
+@@ -2922,7 +2922,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct =
+*vma,
+  * 2): @write_fault =3D false && @writable, @writable will tell the caller
+  *     whether the mapping is writable.
+  */
+-kvm_pfn_t hva_to_pfn(unsigned long addr, bool interruptible, bool *async,
++kvm_pfn_t hva_to_pfn(unsigned long addr, bool interruptible, bool no_wait,
+ 		     bool write_fault, bool *writable)
+ {
+ 	struct vm_area_struct *vma;
+@@ -2934,7 +2934,7 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool interru=
+ptible, bool *async,
+ 	if (hva_to_pfn_fast(addr, write_fault, writable, &pfn))
  		return pfn;
- 	if (npages == -EINTR || npages == -EAGAIN)
- 		return KVM_PFN_ERR_SIGPENDING;
-+	if (npages == -EHWPOISON)
-+		return KVM_PFN_ERR_HWPOISON;
- 
- 	mmap_read_lock(current->mm);
--	if (npages == -EHWPOISON ||
--	      (!async && check_user_page_hwpoison(addr))) {
--		pfn = KVM_PFN_ERR_HWPOISON;
--		goto exit;
--	}
--
- retry:
- 	vma = vma_lookup(current->mm, addr);
- 
-@@ -2972,7 +2960,6 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool interruptible, bool *async,
- 			*async = true;
- 		pfn = KVM_PFN_ERR_FAULT;
+=20
+-	npages =3D hva_to_pfn_slow(addr, async, write_fault, interruptible,
++	npages =3D hva_to_pfn_slow(addr, no_wait, write_fault, interruptible,
+ 				 writable, &pfn);
+ 	if (npages =3D=3D 1)
+ 		return pfn;
+@@ -2956,16 +2956,17 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool inter=
+ruptible, bool *async,
+ 		if (r < 0)
+ 			pfn =3D KVM_PFN_ERR_FAULT;
+ 	} else {
+-		if (async && vma_is_valid(vma, write_fault))
+-			*async =3D true;
+-		pfn =3D KVM_PFN_ERR_FAULT;
++		if (no_wait && vma_is_valid(vma, write_fault))
++			pfn =3D KVM_PFN_ERR_NEEDS_IO;
++		else
++			pfn =3D KVM_PFN_ERR_FAULT;
  	}
--exit:
  	mmap_read_unlock(current->mm);
  	return pfn;
  }
--- 
+=20
+ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t g=
+fn,
+-			       bool interruptible, bool *async,
++			       bool interruptible, bool no_wait,
+ 			       bool write_fault, bool *writable, hva_t *hva)
+ {
+ 	unsigned long addr =3D __gfn_to_hva_many(slot, gfn, NULL, write_fault);
+@@ -2987,21 +2988,21 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_mem=
+ory_slot *slot, gfn_t gfn,
+ 		writable =3D NULL;
+ 	}
+=20
+-	return hva_to_pfn(addr, interruptible, async, write_fault, writable);
++	return hva_to_pfn(addr, interruptible, no_wait, write_fault, writable);
+ }
+ EXPORT_SYMBOL_GPL(__gfn_to_pfn_memslot);
+=20
+ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+ 		      bool *writable)
+ {
+-	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, NULL,
++	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, false,
+ 				    write_fault, writable, NULL);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_pfn_prot);
+=20
+ kvm_pfn_t gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn=
+)
+ {
+-	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL, NULL);
++	return __gfn_to_pfn_memslot(slot, gfn, false, false, true, NULL, NULL);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot);
+=20
+diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+index a3fa86f60d6c..51f3fee4ca3f 100644
+--- a/virt/kvm/kvm_mm.h
++++ b/virt/kvm/kvm_mm.h
+@@ -20,7 +20,7 @@
+ #define KVM_MMU_UNLOCK(kvm)		spin_unlock(&(kvm)->mmu_lock)
+ #endif /* KVM_HAVE_MMU_RWLOCK */
+=20
+-kvm_pfn_t hva_to_pfn(unsigned long addr, bool interruptible, bool *async,
++kvm_pfn_t hva_to_pfn(unsigned long addr, bool interruptible, bool no_wait,
+ 		     bool write_fault, bool *writable);
+=20
+ #ifdef CONFIG_HAVE_KVM_PFNCACHE
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 58c706a610e5..32dc61f48c81 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -197,8 +197,8 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cac=
+he *gpc)
+ 			cond_resched();
+ 		}
+=20
+-		/* We always request a writeable mapping */
+-		new_pfn =3D hva_to_pfn(gpc->uhva, false, NULL, true, NULL);
++		/* We always request a writable mapping */
++		new_pfn =3D hva_to_pfn(gpc->uhva, false, false, true, NULL);
+ 		if (is_error_noslot_pfn(new_pfn))
+ 			goto out_error;
+=20
+--=20
 2.47.0.rc1.288.g06298d1525-goog
 
 
