@@ -1,134 +1,151 @@
-Return-Path: <kvm+bounces-28410-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28412-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02DBE9982CA
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 11:50:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05CC9998327
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 12:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DDE21C21363
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 09:50:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 352491C21476
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 10:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264AF1C1758;
-	Thu, 10 Oct 2024 09:49:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B38C91BE85C;
+	Thu, 10 Oct 2024 10:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fjtd1GYd"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BanpF6HT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2901BD4FD;
-	Thu, 10 Oct 2024 09:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760D618C03D;
+	Thu, 10 Oct 2024 10:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728553764; cv=none; b=uIMFI0uZHP0zv5OKlgl40ExHJgv1tH69zpuGshsDniI7oht2zHMIoKGld+t2scVZ4liNV+Yc1hN5jIOY0Z6LTbhT72GOJENBrrUsiT4LtYQz/J+2A2h50Pj50dKlm81BGociWchvXMSVyL+jgRu+ri8xOyf1J6L3lAYBvO9XQoM=
+	t=1728554937; cv=none; b=SfGireK6rBpsxwcrtIOBLi2w1OZWvN1I8advoZlp88M33BqYmgAFGC/pRXxeWR3X6arqqVLKtkdiKjUaNn2019h1MBwICXngzwOzf1tX9prurmyqPmbvHnPeu+AAIcKHip9c749Yd0f99TqITftVdyFnidMXZyN2cevshF1Amp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728553764; c=relaxed/simple;
-	bh=YKwBaNRBcMS2JUEZSf0dCWw9etVXQcaFKd1Ay07y9YE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eGs0bMr5Cd3IQXV6x1QyUfsEbQAHVqkU9htzIELyiip6hwLlMnDDSktgdCNCI7as/IZ2ynF5uyjbyH/EXv5jmIaWgWRnUayyxKitIflKFV6xGWD2j+krOxOXtnPBcSt829tdc6wYEk0894Vf/nY/7LDXIh/QTFIlZ9ft+lLBV/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fjtd1GYd; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728553763; x=1760089763;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YKwBaNRBcMS2JUEZSf0dCWw9etVXQcaFKd1Ay07y9YE=;
-  b=Fjtd1GYd0eXRGZuwRmoGN6G/tf3emSx9JrrNmvs+oU15gK18Lb1IwPMu
-   ks2AcMgXze4I6Ro+MEusQHZDELT78GN9jh0pAtu3jpGVFS+nYbdac9P0n
-   4Z2ALKnusmdFuHO94LhnSued7bGs0EMj9BvZdvrNko+EXLjaYke2laBvq
-   R1qEwxMHCO4ASpBTapmkxqBOrr6queaXkdVsvtdpBHZt9+tL2vBwVKVji
-   VjmQu9pwqm9G93ayUW2e9G6In6TqGR4hJ4EDIujxXvkeZaK990//fL3W8
-   RbwE29OaKwkTvEub6hErKRpTGDdUtZZ9A4F/zkDH/UwBTgalP4AAktc5I
-   A==;
-X-CSE-ConnectionGUID: +lAWoJ5pRg+ZpSA4LWyj/w==
-X-CSE-MsgGUID: u4JlRoVbQ1uJm3Jz/0uL+w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="39265377"
-X-IronPort-AV: E=Sophos;i="6.11,192,1725346800"; 
-   d="scan'208";a="39265377"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 02:49:22 -0700
-X-CSE-ConnectionGUID: WTr7bdOISeOZ2Up/vEvgNQ==
-X-CSE-MsgGUID: EH9vSkLlSRm8b9lQnQPmQw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,192,1725346800"; 
-   d="scan'208";a="81538325"
-Received: from sschumil-mobl2.ger.corp.intel.com (HELO tlindgre-MOBL1) ([10.245.246.114])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 02:49:18 -0700
-Date: Thu, 10 Oct 2024 12:49:11 +0300
-From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
-	kvm@vger.kernel.org, kai.huang@intel.com, isaku.yamahata@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 10/25] KVM: TDX: Initialize KVM supported capabilities
- when module setup
-Message-ID: <ZwejF11FxumXLFFr@tlindgre-MOBL1>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-11-rick.p.edgecombe@intel.com>
- <b8ed694f-3ab1-453c-b14b-25113defbdb6@suse.com>
- <Zs_-YqQ-9MUAEubx@tlindgre-MOBL1>
- <b3a46758-b0ac-4136-934b-ec38fc845eeb@redhat.com>
- <ZuFPBPLy9MqgTsR1@tlindgre-MOBL1>
- <3275645a-ffd9-4dd4-bfa4-037186a989ae@intel.com>
+	s=arc-20240116; t=1728554937; c=relaxed/simple;
+	bh=qf7nU/89BlzHddkiR5Ah6NYm8BRaW0Dkwo9DPkOtPw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oKz/DM4LNV2lY0r0Fg8W6o3vZrdiuuOX/SnyyxhcUfgq1U9cTeADaEc1qNaGoJnM1txlSI4Vsc4ERXbVmSbahKirE3AoT2Sz9/mTYGvrN2tFN0jpDucEZFU4/6/hF6NmQxrK8zE9Mw1tZbvNms24vyi1lxJO5vd0QWXLxRUiDKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BanpF6HT; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49A3opwW009445;
+	Thu, 10 Oct 2024 10:08:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	aL//amxx9YdMMLbbRrJYlGUmmzOy3nusublparPcj28=; b=BanpF6HTCG9dbVeu
+	2dyS4pmAUwK9OFYDowEYBFPq9NQy89KoecZ9geHIvu6jU3+Z8Q/vZdcZ9RPr5+It
+	7x83jYv/7rp9r+1tFDtHtW19o/dYrzF16Y1mbUBsJynsB6wpUonWdmSi81McSy6u
+	wkYCpeHGhqcxxahQZ3zSLuXH1sJMKQigiAy7i7LI9dh0wZJoqXPB+xj/1fkabWtv
+	2wVaFhYuX6k0CjV7nHRVP6bU5YVuYSlxktJWRKLK0xpmS0EWTt8bIsj/tG2+DirE
+	pDBtLqd+bBdeRHyfCHITAAfK7TUaQWUbHPI2VLnJ99w8tdAbiFTKGOAbHWU7vm5e
+	4WCiBQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4267cmsray-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Oct 2024 10:08:55 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49AA8suU023460;
+	Thu, 10 Oct 2024 10:08:54 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4267cmsrau-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Oct 2024 10:08:54 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49A7M3CU022861;
+	Thu, 10 Oct 2024 10:08:54 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 423jg16tnk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Oct 2024 10:08:54 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49AA8oUA26608174
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 10 Oct 2024 10:08:50 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7280A20079;
+	Thu, 10 Oct 2024 10:08:50 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 13A3520078;
+	Thu, 10 Oct 2024 10:08:50 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.66.107])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 10 Oct 2024 10:08:49 +0000 (GMT)
+Date: Thu, 10 Oct 2024 12:07:29 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nico Boehr <nrb@linux.ibm.com>
+Cc: frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v4 1/2] s390x: edat: move LC_SIZE to
+ arch_def.h
+Message-ID: <20241010120729.74417d7a@p-imbrenda>
+In-Reply-To: <20241010071228.565038-2-nrb@linux.ibm.com>
+References: <20241010071228.565038-1-nrb@linux.ibm.com>
+	<20241010071228.565038-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3275645a-ffd9-4dd4-bfa4-037186a989ae@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: QrklSppjDOa8axqHyeByuKcZTde49OXz
+X-Proofpoint-GUID: cOMhPNVn8eVEnlvnyEUbZc7sMcnJdEmG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-10_07,2024-10-09_02,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 malwarescore=0 adultscore=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 mlxscore=0 spamscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410100065
 
-On Thu, Oct 10, 2024 at 04:25:30PM +0800, Xiaoyao Li wrote:
-> On 9/11/2024 7:04 PM, Tony Lindgren wrote:
-> > On Tue, Sep 10, 2024 at 07:15:12PM +0200, Paolo Bonzini wrote:
-> > > On 8/29/24 06:51, Tony Lindgren wrote:
-> > > > > nit: Since there are other similarly named functions that come later how
-> > > > > about rename this to init_kvm_tdx_caps, so that it's clear that the
-> > > > > functions that are executed ones are prefixed with "init_" and those that
-> > > > > will be executed on every TDV boot up can be named prefixed with "setup_"
-> > > > We can call setup_kvm_tdx_caps() from from tdx_get_kvm_supported_cpuid(),
-> > > > and drop the struct kvm_tdx_caps. So then the setup_kvm_tdx_caps() should
-> > > > be OK.
-> > > 
-> > > I don't understand this suggestion since tdx_get_capabilities() also needs
-> > > kvm_tdx_caps.  I think the code is okay as it is with just the rename that
-> > > Nik suggested (there are already some setup_*() functions in KVM but for
-> > > example setup_vmcs_config() is called from hardware_setup()).
-> > 
-> > Oh sorry for the confusion, looks like I pasted the function names wrong
-> > way around above and left out where setup_kvm_tdx_caps() can be called
-> > from.
-> > 
-> > I meant only tdx_get_capabilities() needs to call setup_kvm_tdx_caps().
-> > And setup_kvm_tdx_caps() calls tdx_get_kvm_supported_cpuid().
-> > 
-> > The data in kvm_tdx_caps is only needed for tdx_get_capabilities(). It can
-> > be generated from the data already in td_conf.
-> > 
-> > At least that's what it looks like to me, but maybe I'm missing something.
+On Thu, 10 Oct 2024 09:11:51 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> struct lowcore is defined in arch_def.h and LC_SIZE is useful to other
+> tests as well, therefore move it to arch_def.h.
 > 
-> kvm_tdx_caps is setup in __tdx_bringup() because it also serves the purpose
-> to validate the KVM's capabilities against the specific TDX module. If KVM
-> and TDX module are incompatible, it needs to fail the bring up of TDX in
-> KVM. It's too late to validate it when KVM_TDX_CAPABILITIES issued.  E.g.,
-> if the TDX module reports some fixed-1 attribute bit while KVM isn't aware
-> of, in such case KVM needs to set enable_tdx to 0 to reflect that TDX cannot
-> be enabled/brought up.
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-OK makes sense, thanks for clarifying the use case for __tdx_bringup().
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-We can check the attributes_fixed1 and xfam_fixed1 also on __tdx_bringup()
-no problem.
+> ---
+>  lib/s390x/asm/arch_def.h | 1 +
+>  s390x/edat.c             | 1 -
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 745a33878de5..5574a45156a9 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -119,6 +119,7 @@ enum address_space {
+>  
+>  #define CTL2_GUARDED_STORAGE		(63 - 59)
+>  
+> +#define LC_SIZE	(2 * PAGE_SIZE)
+>  struct lowcore {
+>  	uint8_t		pad_0x0000[0x0080 - 0x0000];	/* 0x0000 */
+>  	uint32_t	ext_int_param;			/* 0x0080 */
+> diff --git a/s390x/edat.c b/s390x/edat.c
+> index 16138397017c..e664b09d9633 100644
+> --- a/s390x/edat.c
+> +++ b/s390x/edat.c
+> @@ -17,7 +17,6 @@
+>  
+>  #define PGD_PAGE_SHIFT (REGION1_SHIFT - PAGE_SHIFT)
+>  
+> -#define LC_SIZE	(2 * PAGE_SIZE)
+>  #define VIRT(x)	((void *)((unsigned long)(x) + (unsigned long)mem))
+>  
+>  static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
 
-Regards,
-
-Tony
 
