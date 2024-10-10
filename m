@@ -1,191 +1,128 @@
-Return-Path: <kvm+bounces-28526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28476-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB48A9990E7
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 20:41:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3DA2998FD2
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 20:24:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81AC5288118
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:41:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3E4B1F25658
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE30206970;
-	Thu, 10 Oct 2024 18:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205931CEE85;
+	Thu, 10 Oct 2024 18:23:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xxvwKwOg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s0JwQEt2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088CD20607E
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 18:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7621E19D06D
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 18:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584798; cv=none; b=U8QheQHxul50NSZ7QysUEJni/07+EdEm9+VjWHCgCTuxztESuXijnRL2BMh9f6uI701CpM1E4OzaLTQ/fQsbttyVWDcsj24Wauy6d0F17m477jqBXUuKIKKxFSNNHxAHorSN91dIameK+mpnXjNNgi2y8Q5QPtoGjVnEt13hvv0=
+	t=1728584638; cv=none; b=kdT5cTuRiAmaf955uCDSvkTM9OUiJd1LJBsa/rL9wfhlmAnQPkAgCijPXh7q+tpQ6fjdCXbjmM5ZXavfninp0pIjvkeM4pNgLMJHOa8TefSBUcBeBALzKbXlyYCY65R9Ob+QgzeAVKjtXqtjXQZO/1yp9DygFrnJ9XW6LdnIlD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584798; c=relaxed/simple;
-	bh=7Japh8LNPjEnA4nandXvXnjfnzZjLu2hqYfo+wet/X8=;
+	s=arc-20240116; t=1728584638; c=relaxed/simple;
+	bh=Wmg0PWvt3WloQSDzy40kPeWutCLR/9gx0+GwUl5x7Rc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GvHP/uRSbre5kyMZOu+0OE/9H3h35fms8iAxlzfujk41gcrkM4r/3cd3C2AIf2xYFbbTJ43Gh1ctH2IKNme9v3PTIJmTBQvfT0KI20cNDfSi78HziKYEsNxD2h2sTEOuL4By+dfGqnfyr1ZqxW2p6OrEU1V4/ss3J8ILRI/fQ1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xxvwKwOg; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=CwHLYsQ++VHizVbKtHW44f4rCzCs2a1cMwDHXydxJ8bUdXuiXYuMXFNIV03yrsFOa1AK66rEyOwkn07swg7V6ZLfrqL6yPrfXAl4yJWMiDqhZfnMETDQPc4s4pMLFLdiV0X2gU9l5LGRNLBUmZMsUjL5tZbP9KjEysgROgdZ+3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s0JwQEt2; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7b696999c65so863526a12.3
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 11:26:36 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e2baf2ff64so22451957b3.0
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 11:23:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584796; x=1729189596; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:reply-to:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ndpfmsd07O3XHkbROvy9SWySHpmtrF0LUOG5EHCQjAE=;
-        b=xxvwKwOgsGq9OHAeEg7ulS5M+xc0H7aGJvU84LLWDRvOqgU3TkZZQEPsrvINQkKuQh
-         a0kSZ2m3MyVoMs8rT3NEB6ipyNHqf7wvINEndO31pndYJIj4JwdiGbpEIOldXIyZ4JUH
-         m2Xwt+waP1WmBQ71gKCZlGDkYqz50bxSUom0dv824jufQ4rZn5keWyyQCE4jabUEcNHX
-         8IIDaN8klrGuagpek/bjhFComuRxJZEumPnJcNvLYqDKl0lJxlPsm74awlyYEz6E8Cx5
-         VMALXIP+FsaprgSWZvSmcNFCJoD0wV5yGOvsPvB1jxazYhU9yqzSqRKG2eEf1zu2lj+c
-         BfPQ==
+        d=google.com; s=20230601; t=1728584634; x=1729189434; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OqewRWhuvMwo0Bco6jB7T6q+2ZKwD2xyzgsyOWDZbow=;
+        b=s0JwQEt2ps+OyXU5RZG6JiilD0HFAADPnWVy+nKLZTSvB+/WQCf4U7nJn6YXj3cnkk
+         Yf4mTlUQeoqm2EUY/zkccOJX+yY505wIDEUggufsXKty5o7WKfIgiR70ZEe1zwxFIjkp
+         WWaXXLI8gKkX9RYhB/Pfgz7OOdA4/nfmNYAgkt1gs45Oo8eg8XT04ZgZDvYHvm83pZnz
+         aiGJxQRZsdylzO4TZot35N+yy8e6cuezGCOxogvPgSHIAMD9lJzqNVomzm1cNNCfjbWM
+         VGmROtDMzP3Uq4aLXR58y37nTGOGzDFyo56OSy6Ulw/bZrn3KyjXmsJbV96KuW2sA8i5
+         b3pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584796; x=1729189596;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:reply-to:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Ndpfmsd07O3XHkbROvy9SWySHpmtrF0LUOG5EHCQjAE=;
-        b=bzsRct92CKlT9gKKJOsCZHETjvNo8FfcKOV0VIIXuDV8LZw/nKjn3ldiDZaEtt1FDk
-         DFVQOuAFcmmgpJ1wCioAcNkSQfi0bmIloK5kpdJyeC1XICq75XX9daRGonvDJtRZZ8xM
-         eM+TrEep135VzVgZL8yxssTxa16IlGN3Oh+bvV9KOjMe8uWkgE+fQatPJEgPuoF3Wvtx
-         kNI8q1B9jfPIF/4dnBPGjNOn07LLiqNxm0sn/6C6KBchIo7dO5fAZRqZd5VMNNmR01eR
-         N1iCF4mWpq40ThH/NAPl98jV0fHo6vhEXR2pB9v9VXT0wi7gRWVuUcMbdC45P93HPRxM
-         cJHw==
-X-Gm-Message-State: AOJu0Yzc/qhF8j+C5VS9NquRos4y/F30gt0tT8vQcFo1JodV/ukaKFQI
-	u69CFg0ByJBMJdBwdEHcFplbxDjMC2C8pReGZCvk+/hmyo3zz04Ah48JKqT2v90wG0eYSPizvN1
-	zFg==
-X-Google-Smtp-Source: AGHT+IGJc8hgBZq6lOovV4Dgly5ctIXEs7jDnJfEupYxVqninaLorgqTg5WNW0BPJZYnJnHdEtp0yWaf7UM=
+        d=1e100.net; s=20230601; t=1728584634; x=1729189434;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OqewRWhuvMwo0Bco6jB7T6q+2ZKwD2xyzgsyOWDZbow=;
+        b=kHiXT/o6ZWAbuAdDaS5tossDWrkSp2BEBFL1oEvZh/sCzBEcALXPLVa2CSoJYtxMz6
+         9PmeO7wrMXelbI1MQb2j02Zg9K5FVwpFCc9RxhguEswHfB72ZSto3Ycgb+wBHwT2cxJ+
+         XVpKFFECvX+pfUeeZ4CiT1V19I6Xt+eY85dWmU+iNbaLiNySzTndROjJtsWOvb5llEB+
+         EDOEpxiE7YBYdhcvXh+HQgjiFjD4U5ykJvk7zkq+OZWbe2FIGCQviDA4sEAdUz7xfTjb
+         nihz2sC8xGFCb3NKrkB4yyfaGnegjTZ+3AHBzBNQpO6+sJXFDMBzBYiRhTuHQikL38D+
+         2bOw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4E5JPUnOTeX/ma6gFKm+SptE3viC80TBZzq8yEyN5fHW/UIStJ4OeAA6HP/uff/4eQF8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyn6JG4DmmyEuubgI5jisnLJ4ya7qUsI43dn09k7m5inE1TOMbP
+	9x2V9Xfovv9BNFejwhGo8oEEgbMD6F+g5VnPMcT/XkJLlrBTZbPR6qPFRikvQgspXhEhdvUMmql
+	RJg==
+X-Google-Smtp-Source: AGHT+IH9ywuf6nxC3oZt4wl64os4x2Nl/eKP0XQEvyFMCWMOfF9Ka8reJJL/xMnlzP7eGHO8qjM9XEpQziI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a65:450a:0:b0:717:a912:c302 with SMTP id
- 41be03b00d2f7-7ea53525e73mr49a12.1.1728584796119; Thu, 10 Oct 2024 11:26:36
+ (user=seanjc job=sendgmr) by 2002:a05:6902:b19:b0:e28:f19d:ed45 with SMTP id
+ 3f1490d57ef6-e28fe348675mr93685276.4.1728584634284; Thu, 10 Oct 2024 11:23:54
  -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 11:23:51 -0700
-In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
+Date: Thu, 10 Oct 2024 11:23:52 -0700
+In-Reply-To: <20241010091843.GK33184@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241010182427.1434605-1-seanjc@google.com>
-X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010182427.1434605-50-seanjc@google.com>
-Subject: [PATCH v13 49/85] KVM: Move x86's API to release a faultin page to
- common KVM
+References: <20240727102732.960974693@infradead.org> <20240727105030.226163742@infradead.org>
+ <CGME20240828223802eucas1p16755f4531ed0611dc4871649746ea774@eucas1p1.samsung.com>
+ <5618d029-769a-4690-a581-2df8939f26a9@samsung.com> <ZwdA0sbA2tJA3IKh@google.com>
+ <20241010081940.GC17263@noisy.programming.kicks-ass.net> <20241010091843.GK33184@noisy.programming.kicks-ass.net>
+Message-ID: <ZwgbuA5rggErT7ev@google.com>
+Subject: Re: [PATCH 17/24] sched/fair: Implement delayed dequeue
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	"=?UTF-8?q?Alex=20Benn=C3=A9e?=" <alex.bennee@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>, 
-	Andrew Jones <ajones@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>, mingo@redhat.com, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com, 
+	linux-kernel@vger.kernel.org, kprateek.nayak@amd.com, 
+	wuyun.abel@bytedance.com, youssefesmat@chromium.org, tglx@linutronix.de, 
+	efault@gmx.de, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Move KVM x86's helper that "finishes" the faultin process to common KVM
-so that the logic can be shared across all architectures.  Note, not all
-architectures implement a fast page fault path, but the gist of the
-comment applies to all architectures.
+On Thu, Oct 10, 2024, Peter Zijlstra wrote:
+> On Thu, Oct 10, 2024 at 10:19:40AM +0200, Peter Zijlstra wrote:
+> > On Wed, Oct 09, 2024 at 07:49:54PM -0700, Sean Christopherson wrote:
+> > 
+> > > TL;DR: Code that checks task_struct.on_rq may be broken by this commit.
+> > 
+> > Correct, and while I did look at quite a few, I did miss KVM used it,
+> > damn.
+> > 
+> > > Peter,
+> > > 
+> > > Any thoughts on how best to handle this?  The below hack-a-fix resolves the issue,
+> > > but it's obviously not appropriate.  KVM uses vcpu->preempted for more than just
+> > > posted interrupts, so KVM needs equivalent functionality to current->on-rq as it
+> > > was before this commit.
+> > > 
+> > > @@ -6387,7 +6390,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
+> > >  
+> > >         WRITE_ONCE(vcpu->scheduled_out, true);
+> > >  
+> > > -       if (current->on_rq && vcpu->wants_to_run) {
+> > > +       if (se_runnable(&current->se) && vcpu->wants_to_run) {
+> > >                 WRITE_ONCE(vcpu->preempted, true);
+> > >                 WRITE_ONCE(vcpu->ready, true);
+> > >         }
+> > 
+> > se_runnable() isn't quite right, but yes, a helper along those lines is
+> > probably best. Let me try and grep more to see if there's others I
+> > missed as well :/
+> 
+> How's the below? I remember looking at the freezer thing before and
+> deciding it isn't a correctness thing, but given I added the helper, I
+> changed it anyway. I've added a bunch of comments and the perf thing is
+> similar to KVM, it wants to know about preemptions so that had to change
+> too.
 
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c   | 24 ++----------------------
- include/linux/kvm_host.h | 26 ++++++++++++++++++++++++++
- 2 files changed, 28 insertions(+), 22 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e14b84d2f55b..5acdaf3b1007 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4370,28 +4370,8 @@ static u8 kvm_max_private_mapping_level(struct kvm *=
-kvm, kvm_pfn_t pfn,
- static void kvm_mmu_finish_page_fault(struct kvm_vcpu *vcpu,
- 				      struct kvm_page_fault *fault, int r)
- {
--	lockdep_assert_once(lockdep_is_held(&vcpu->kvm->mmu_lock) ||
--			    r =3D=3D RET_PF_RETRY);
--
--	if (!fault->refcounted_page)
--		return;
--
--	/*
--	 * If the page that KVM got from the *primary MMU* is writable, and KVM
--	 * installed or reused a SPTE, mark the page/folio dirty.  Note, this
--	 * may mark a folio dirty even if KVM created a read-only SPTE, e.g. if
--	 * the GFN is write-protected.  Folios can't be safely marked dirty
--	 * outside of mmu_lock as doing so could race with writeback on the
--	 * folio.  As a result, KVM can't mark folios dirty in the fast page
--	 * fault handler, and so KVM must (somewhat) speculatively mark the
--	 * folio dirty if KVM could locklessly make the SPTE writable.
--	 */
--	if (r =3D=3D RET_PF_RETRY)
--		kvm_release_page_unused(fault->refcounted_page);
--	else if (!fault->map_writable)
--		kvm_release_page_clean(fault->refcounted_page);
--	else
--		kvm_release_page_dirty(fault->refcounted_page);
-+	kvm_release_faultin_page(vcpu->kvm, fault->refcounted_page,
-+				 r =3D=3D RET_PF_RETRY, fault->map_writable);
- }
-=20
- static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 504483d35197..9f7682ece4a1 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1231,6 +1231,32 @@ static inline void kvm_release_page_unused(struct pa=
-ge *page)
- void kvm_release_page_clean(struct page *page);
- void kvm_release_page_dirty(struct page *page);
-=20
-+static inline void kvm_release_faultin_page(struct kvm *kvm, struct page *=
-page,
-+					    bool unused, bool dirty)
-+{
-+	lockdep_assert_once(lockdep_is_held(&kvm->mmu_lock) || unused);
-+
-+	if (!page)
-+		return;
-+
-+	/*
-+	 * If the page that KVM got from the *primary MMU* is writable, and KVM
-+	 * installed or reused a SPTE, mark the page/folio dirty.  Note, this
-+	 * may mark a folio dirty even if KVM created a read-only SPTE, e.g. if
-+	 * the GFN is write-protected.  Folios can't be safely marked dirty
-+	 * outside of mmu_lock as doing so could race with writeback on the
-+	 * folio.  As a result, KVM can't mark folios dirty in the fast page
-+	 * fault handler, and so KVM must (somewhat) speculatively mark the
-+	 * folio dirty if KVM could locklessly make the SPTE writable.
-+	 */
-+	if (unused)
-+		kvm_release_page_unused(page);
-+	else if (dirty)
-+		kvm_release_page_dirty(page);
-+	else
-+		kvm_release_page_clean(page);
-+}
-+
- kvm_pfn_t __kvm_faultin_pfn(const struct kvm_memory_slot *slot, gfn_t gfn,
- 			    unsigned int foll, bool *writable,
- 			    struct page **refcounted_page);
---=20
-2.47.0.rc1.288.g06298d1525-goog
-
+Fixes KVM's woes!  Thanks!
 
