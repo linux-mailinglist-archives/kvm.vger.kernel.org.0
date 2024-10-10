@@ -1,113 +1,106 @@
-Return-Path: <kvm+bounces-28372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777D1997FC6
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 10:30:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FFE0997FD2
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 10:32:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 147D81F25044
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 08:30:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECB7C281569
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 08:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AEAC1FF7CE;
-	Thu, 10 Oct 2024 07:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184FC201111;
+	Thu, 10 Oct 2024 07:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QA9sA4Tb"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D6F1B5337;
-	Thu, 10 Oct 2024 07:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E213F1C9EB3
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 07:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728546314; cv=none; b=uv5WIlUBb3dZ63ItG2Xl9ozHWtg7NLGMCvAKwWtHHAVLcubyHBGvlhVxf8FdnzGG1KhUB/CEH19hH6VFxEr54toabVffRcU1TNIZZKGXJnlfMD1CdtwszFpgCNUnB3ycbyuOTLHSvHR68WIzKuf0V6mgAN8nN6gA5VMOOkWjgbs=
+	t=1728546666; cv=none; b=aiynJXD4i7V5uftZWm1SoWA2Ntutvdyzia/Xwmz0xYBIbkn22/uSIc1OsxM2zN4Pg+VUzojx7mm3kmIsKgKRm591FNifuglwLAy4RjvNbcpMD7cOuBfU60O7+xdgSl2LYFwxCXyE5oj/vwoRs2nofA6Tgs489Ok5OFS1tEwYrnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728546314; c=relaxed/simple;
-	bh=cS2TIFxGUB5Comdq0Q2G2vFiFm96puaf/ga5iXFe2ts=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Pdy6o0Oz2QpAF+13FG4U0f7tY4ZA8m6JH6rwiDnHGJUE/ahgiRW8ZZ9ATWE1c4tCFWKafKYsjgvYKkSmBmHbw9fls339qW/clPfMoKBZzv8eDhC8eG7qCjxJIZz92QGDP+Lym5HS/MAefpIvxKZabUfAtCG6+H8BdjqTjFWOaKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XPMDQ21KDzfdCy;
-	Thu, 10 Oct 2024 15:42:46 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 700BB1400D8;
-	Thu, 10 Oct 2024 15:45:10 +0800 (CST)
-Received: from [10.174.178.247] (10.174.178.247) by
- dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 10 Oct 2024 15:45:09 +0800
-Subject: Re: [PATCH v3 3/9] ACPI/IORT: Support CANWBS memory access flag
-To: Jason Gunthorpe <jgg@nvidia.com>, <acpica-devel@lists.linux.dev>,
-	<iommu@lists.linux.dev>, Joerg Roedel <joro@8bytes.org>, Kevin Tian
-	<kevin.tian@intel.com>, <kvm@vger.kernel.org>, Len Brown <lenb@kernel.org>,
-	<linux-acpi@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, Lorenzo
- Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
-	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>
-CC: Alex Williamson <alex.williamson@redhat.com>, Eric Auger
-	<eric.auger@redhat.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Moritz Fischer <mdf@kernel.org>, Michael Shavit <mshavit@google.com>, Nicolin
- Chen <nicolinc@nvidia.com>, <patches@lists.linux.dev>, "Rafael J. Wysocki"
-	<rafael.j.wysocki@intel.com>, Shameerali Kolothum Thodi
-	<shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
-References: <3-v3-e2e16cd7467f+2a6a1-smmuv3_nesting_jgg@nvidia.com>
-From: Hanjun Guo <guohanjun@huawei.com>
-Message-ID: <180134a4-051e-3a92-1652-0c3c53ffd6fa@huawei.com>
-Date: Thu, 10 Oct 2024 15:45:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+	s=arc-20240116; t=1728546666; c=relaxed/simple;
+	bh=uWStj+xilcv9N3dioWNYj7e75BdSNr2PhR0d2cGpAts=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WgjbdEuvxq8E5iVNne6HEaC9hYJTLEIHDlqFMu6ZUhlhttcNxMMm6hiyaTRM7dA03iiWJa2mQX4Jav++ckYuP0RJAan1Fh/HwSHNmfxwbekDfdMeNXpnaStSPJ6osJtDmk2DMqbMMPc1GSnVZDzS3Y938V1+QIsYkoPtCR4HhhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QA9sA4Tb; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 10 Oct 2024 00:50:53 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728546660;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n9ENzHg7tPYpJtE43PefYJwyU05UEoBmVVMbi+fFu3o=;
+	b=QA9sA4TbDGSie23xU+ntyEWDGUOLiEwOX3TkWQYWCbFKYsmJmdpKWBYZYLvyRymvlauJG+
+	LedOFexrTPRxdSlRldpf1A5Q29PMCM4vnNrjnVzPBCSKl+Ooq5s9jnBuPqfyQRQXcAc1Bd
+	thdOH+OIX1WMpZV1l2oz3boZKN2PwOM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 23/36] KVM: arm64: Hide TCR2_EL1 from userspace when
+ disabled for guests
+Message-ID: <ZweHXW2lUMmFLw5h@linux.dev>
+References: <20241009190019.3222687-1-maz@kernel.org>
+ <20241009190019.3222687-24-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <3-v3-e2e16cd7467f+2a6a1-smmuv3_nesting_jgg@nvidia.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241009190019.3222687-24-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On 2024/10/10 0:23, Jason Gunthorpe wrote:
-> From: Nicolin Chen<nicolinc@nvidia.com>
+On Wed, Oct 09, 2024 at 08:00:06PM +0100, Marc Zyngier wrote:
+> From: Mark Brown <broonie@kernel.org>
 > 
-> The IORT spec, Issue E.f (April 2024), adds a new CANWBS bit to the Memory
-> Access Flag field in the Memory Access Properties table, mainly for a PCI
-> Root Complex.
-> 
-> This CANWBS defines the coherency of memory accesses to be not marked IOWB
-> cacheable/shareable. Its value further implies the coherency impact from a
-> pair of mismatched memory attributes (e.g. in a nested translation case):
->    0x0: Use of mismatched memory attributes for accesses made by this
->         device may lead to a loss of coherency.
->    0x1: Coherency of accesses made by this device to locations in
->         Conventional memory are ensured as follows, even if the memory
->         attributes for the accesses presented by the device or provided by
->         the SMMU are different from Inner and Outer Write-back cacheable,
->         Shareable.
-> 
-> Note that the loss of coherency on a CANWBS-unsupported HW typically could
-> occur to an SMMU that doesn't implement the S2FWB feature where additional
-> cache flush operations would be required to prevent that from happening.
-> 
-> Add a new ACPI_IORT_MF_CANWBS flag and set IOMMU_FWSPEC_PCI_RC_CANWBS upon
-> the presence of this new flag.
-> 
-> CANWBS and S2FWB are similar features, in that they both guarantee the VM
-> can not violate coherency, however S2FWB can be bypassed by PCI No Snoop
-> TLPs, while CANWBS cannot. Thus CANWBS meets the requirements to set
-> IOMMU_CAP_ENFORCE_CACHE_COHERENCY.
-> 
-> Architecturally ARM has expected that VFIO would disable No Snoop through
-> PCI Config space, if this is done then the two would have the same
-> protections.
+> When the guest does not support FEAT_TCR2 we should not allow any access
+> to it in order to ensure that we do not create spurious issues with guest
+> migration. Add a visibility operation for it.
 
-Acked-by: Hanjun Guo <guohanjun@huawei.com>
+This should come at the beginning of ths series (same for the subsequent
+S1PIE patch) so the EL2 registers use the correct visibility filtering
+from the start.
 
-Thanks
-Hanjun
+> Fixes: fbff56068232 ("KVM: arm64: Save/restore TCR2_EL1")
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> Link: https://lore.kernel.org/r/20240822-kvm-arm64-hide-pie-regs-v2-2-376624fa829c@kernel.org
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>  arch/arm64/kvm/sys_regs.c         | 29 ++++++++++++++++++++++++++---
+>  2 files changed, 29 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1a5477181447c..197a7a08b3af5 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1511,4 +1511,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+>  	(system_supports_fpmr() &&			\
+>  	 kvm_has_feat((k), ID_AA64PFR2_EL1, FPMR, IMP))
+>  
+> +#define kvm_has_tcr2(k)				\
+> +	(kvm_has_feat((k), ID_AA64MMFR3_EL1, TCRX, IMP))
+> +
+
+nit: we should consistently use this predicate if we want to keep it.
+
+-- 
+Thanks,
+Oliver
 
