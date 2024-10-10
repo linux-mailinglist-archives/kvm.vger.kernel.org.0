@@ -1,426 +1,148 @@
-Return-Path: <kvm+bounces-28411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28413-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B1F7998325
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 12:09:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD7E99834F
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 12:14:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BE0E1C21234
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 10:09:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D28231F21B08
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 10:14:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CAA1BE23D;
-	Thu, 10 Oct 2024 10:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393671BE874;
+	Thu, 10 Oct 2024 10:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Uiw1b4S5"
+	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="d6UDYk1y";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GTucPEDk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6A336D;
-	Thu, 10 Oct 2024 10:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2530118C03D;
+	Thu, 10 Oct 2024 10:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728554936; cv=none; b=ZON4w8as71vYTPf5CLi9xgkeCj1bBrhrAtL84QIepS/YKJn5kVxVUMLhROP834CYylJTOBB3GO3ZqXXwwZrFlgJKohnkT9RJz7qfHJU05+xRUoETsuGyrgp06AG38EqUCmzA+Tzbg+4WE84tSeql9CjzQkMd/fj0nxWzfn/Ne14=
+	t=1728555271; cv=none; b=Mnl66BeEa+jK3+CAN6aaFPrlKLySa/PxImXR6eCKz+gPnGAflCoZsgN95E7E6vK3N23KwsFxE16n7rcZB17tj9ct2aPOZK0yWx9CBzW4yeqpU/Qlspx6/97QHhRyBKLmExYuajwmkUYDJgh1kbht69DC8xEAO2qpTef1wnFokLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728554936; c=relaxed/simple;
-	bh=AM5wiL/LAHmrp9MJeCAPosh56rDeJLXgfZBDQrODLKo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jk4D2/VVytC5pGndTnJkzIf6CXCjfDQ0w81mjrReiAqt6F5o4BTuP9H2A4SN3zRCk+lhwe1anrurl+wRqK1kLRXJvj6+uZx0SuRo79FlZinl3VQD8Eg6ICv3uKFy9nJ+tuc/IHnwY3tE3DDnLi4DA7W70oMAiOt+gvGS56+4fMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Uiw1b4S5; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49A9nNTh031430;
-	Thu, 10 Oct 2024 10:08:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	V6IH8ZXVXXPXnAgRw/mvcZbkNdnKVcaoUFpos5cBy2U=; b=Uiw1b4S5Fb99/rY+
-	aSSM8ixeAAm9upuugBz2avpZ9g+aLlc/dqH+zrbz4wP5eImoyH41Z+rNzKtm/Y+x
-	UGcEsTMNxfh411VDwEwM4XhxuKk8vTEoYF7erSZajIsSP1gupZUuyxHh85GJrgbL
-	5ZmHGUx+22fvVbC8ENNmH1AbVtVxrI9toLCGlghsxe5PFeP7PhmH0KZALriNAC6B
-	0NOkreFU7KnOe8WUtIN8l6/hF/PVNwIjefXLAho4u9oFjmSIu8HtRz2fFfAa7l8v
-	lglj0x4NCiU3HBw4ZTOhuXoAEWTZKpBTwDK+2/6UE5aDWD94lxPq+f+6ot5lkg9r
-	Z/zl8Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 426cmq03j8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Oct 2024 10:08:53 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49AA7kjv005028;
-	Thu, 10 Oct 2024 10:08:52 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 426cmq03j3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Oct 2024 10:08:52 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49A72LkK010703;
-	Thu, 10 Oct 2024 10:08:52 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 423j0jpx6r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Oct 2024 10:08:51 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49AA8mVm20316482
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 10 Oct 2024 10:08:48 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 49BAD20075;
-	Thu, 10 Oct 2024 10:08:48 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DFA812007A;
-	Thu, 10 Oct 2024 10:08:47 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.66.107])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu, 10 Oct 2024 10:08:47 +0000 (GMT)
-Date: Thu, 10 Oct 2024 12:08:35 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Nico Boehr <nrb@linux.ibm.com>
-Cc: frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v4 2/2] s390x: add test for diag258
-Message-ID: <20241010120835.363a1927@p-imbrenda>
-In-Reply-To: <20241010071228.565038-3-nrb@linux.ibm.com>
-References: <20241010071228.565038-1-nrb@linux.ibm.com>
-	<20241010071228.565038-3-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1728555271; c=relaxed/simple;
+	bh=4XOtTBDm80OCEtb00/GJBSJ0Kj8E7EAKTwU4AEHFFIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RU3JeXwU8aKOJw4ilZ2PbohZ1KailyyKDlUHmM3MEKcnoPztSM1pFiDaQFBRR9HDWZfyS4wUuL232wjEbctQ00SkrmsLwSQgJdGb+qxclWh7feaZ5pr6ITRB65Hiyvtc/54nqFUt9BNuzOXuKYlII9CSEQ7LxlxK10qspiB4VhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=d6UDYk1y; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GTucPEDk; arc=none smtp.client-ip=103.168.172.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailflow.phl.internal (Postfix) with ESMTP id 1B9A5200A8D;
+	Thu, 10 Oct 2024 06:14:28 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 10 Oct 2024 06:14:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1728555268; x=
+	1728562468; bh=NXHWpk/5+EQAj4xJzSdQnJKqj7apSDgb8yWFmClPgYI=; b=d
+	6UDYk1yz+a/v0elUD0ReW9J/h7naA0kWjZwY1SmcWd23AWrO27HUenUp3BCOVYKW
+	Y5kPp7n7Xhaw/2Sdof5rHtNh5n6FgWET88Is8foFKHfSPrYCLyUZKbVJGx7X7i4Y
+	WbvBRyVPUNokB3Xd2QySpCCGZf5GFzSqfPS3GSxGTUNtTblxPb/cIWJrs3mfmLVQ
+	61sRKuylLJypcU0aa9mTyKY/3I0BlRrHh0bx0yzy4eud736yMqxOx0DZE5I2sSu/
+	fxGw95L6riD8ClxHUKVAOyfrJHDb5AkRRrUpCJ2yO7XD0EeJm1aRgjU2jM9qLf4g
+	6aMJdEAZ9PO3QxCNCH3TQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1728555268; x=1728562468; bh=NXHWpk/5+EQAj4xJzSdQnJKqj7ap
+	SDgb8yWFmClPgYI=; b=GTucPEDkbbaL9wcHDUrx+QDdHlrrQx9GJxTx/JRgyh7y
+	gzth01EghcsdF2lpsLBy2eZA88mMZWclDNG6pcN9F4Pp2PTjFleW0kY+Mv+QSzGo
+	CZW97jdGXZEu6cuKgj87Hay8yRCdf4n1RUQL5aolbJJd5dAzpzvGWcZprbOrv7pG
+	3XUSZ3C2E2fGPM1Svt0wu9WGL7pDk3jOGm2EceC1um4mHtfzmxLbWxcEgUurJTzf
+	pVs75J1pg5/cg7/eoq0BiMkXRApI1Hcd1p9Uqkl+8hWBUrvEvr8Z4cgSCt6Zy2R0
+	9gEg0zxboWudIufgDw3Q5mYvHkkSAAyoFr7goiHMfQ==
+X-ME-Sender: <xms:AKkHZ3tx2lp6y25YOCi1TiKPcSVw6WDGepNp_xRbQFkxbzhG1edG5A>
+    <xme:AKkHZ4fvUIAMx9savshJg6R82OPDDalOuzMbFG8AVo9_ma2ApDEThRzbZ4ojnXKg4
+    GjrZJGfS82TGX6ojoQ>
+X-ME-Received: <xmr:AKkHZ6yefTOeZpEa7uECkJ7zqr8qstNsC5_efEiogLhGgAeFNBh-SpTbxyGlbxBPvzXW1Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdefhedgvdejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvden
+    ucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlse
+    hshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpeffvdevueetudfhhfff
+    veelhfetfeevveekleevjeduudevvdduvdelteduvefhkeenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhv
+    rdhnrghmvgdpnhgspghrtghpthhtohepiedupdhmohguvgepshhmthhpohhuthdprhgtph
+    htthhopehtrggssggrsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkvhhmsehvghgv
+    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvh
+    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhmmheskhhvrggt
+    khdrohhrghdprhgtphhtthhopehpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdhrtg
+    hpthhtoheptghhvghnhhhurggtrghisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehm
+    phgvsegvlhhlvghrmhgrnhdrihgurdgruhdprhgtphhtthhopegrnhhuphessghrrghinh
+    hfrghulhhtrdhorhhgpdhrtghpthhtohepphgruhhlrdifrghlmhhslhgvhiesshhifhhi
+    vhgvrdgtohhm
+X-ME-Proxy: <xmx:AKkHZ2ODfnzocGPow7KDLhe41iato70gAk-7vPYXfbRfvN02muJXag>
+    <xmx:AKkHZ3-ncOE6aD2k7LuD51g8_jc18sWtwQJGuCMw3Wnb9e643uTiuA>
+    <xmx:AKkHZ2UHbj8BuMxQ5qHVW1rXiXqWW2VyGweeRTrXcj5h9cBWWge0cA>
+    <xmx:AKkHZ4d1N7Yqtbt4bQDOZL_fd5XxlgxvmD0uog2S1wt07Gj2cpNWUg>
+    <xmx:BKkHZ_am_WdwVLgVtjHltkYQp8SuLRBIluzNFJsfn3VPZcavTYCIa7RL>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 10 Oct 2024 06:14:08 -0400 (EDT)
+Date: Thu, 10 Oct 2024 13:14:03 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ 	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, 	paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, 	viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, 	akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, 	chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ 	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, 	vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, 	david@redhat.com, michael.roth@amd.com,
+ wei.w.wang@intel.com, 	liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, 	suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com,
+ 	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, 	quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+ 	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
+ 	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org,
+ qperret@google.com, 	keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, 	jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com,
+ 	hughd@google.com, jthoughton@google.com
+Subject: Re: [PATCH v3 04/11] KVM: guest_memfd: Allow host to mmap
+ guest_memfd() pages when shared
+Message-ID: <i44qkun5ddu3vwli7dxh27je72ywlrb7m5ercjhvprhleapv6x@52dwi3kwp2zx>
+References: <20241010085930.1546800-1-tabba@google.com>
+ <20241010085930.1546800-5-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: tJDHg1J6UqWVpfOGtms7N1AVUa7bFrhM
-X-Proofpoint-GUID: 9V60ncwgQUi8wO4vMtu2n1Tzuq9wUHfm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-10_07,2024-10-09_02,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 phishscore=0 priorityscore=1501 mlxlogscore=999
- bulkscore=0 mlxscore=0 malwarescore=0 adultscore=0 spamscore=0
- clxscore=1015 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2409260000 definitions=main-2410100065
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241010085930.1546800-5-tabba@google.com>
 
-On Thu, 10 Oct 2024 09:11:52 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+On Thu, Oct 10, 2024 at 09:59:23AM +0100, Fuad Tabba wrote:
+> +out:
+> +	if (ret != VM_FAULT_LOCKED) {
+> +		folio_put(folio);
+> +		folio_unlock(folio);
 
-> This adds a test for diag258 (page ref service/async page fault).
-> 
-> There recently was a virtual-real address confusion bug, so we should
-> test:
-> - diag258 parameter Rx is a real adress
-> - crossing the end of RAM with the parameter list yields an addressing
->   exception
-> - invalid diagcode in the parameter block yields an specification
->   exception
-> - diag258 correctly applies prefixing.
-> 
-> Note that we're just testing error cases as of now.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+Hm. Here and in few other places you return reference before unlocking.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+I think it is safe because nobody can (or can they?) remove the page from
+pagecache while the page is locked so we have at least one refcount on the
+folie, but it *looks* like a use-after-free bug.
 
-> ---
->  s390x/Makefile      |   1 +
->  s390x/diag258.c     | 259 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |   3 +
->  3 files changed, 263 insertions(+)
->  create mode 100644 s390x/diag258.c
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 23342bd64f44..66d71351caab 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -44,6 +44,7 @@ tests += $(TEST_DIR)/exittime.elf
->  tests += $(TEST_DIR)/ex.elf
->  tests += $(TEST_DIR)/topology.elf
->  tests += $(TEST_DIR)/sie-dat.elf
-> +tests += $(TEST_DIR)/diag258.elf
->  
->  pv-tests += $(TEST_DIR)/pv-diags.elf
->  pv-tests += $(TEST_DIR)/pv-icptcode.elf
-> diff --git a/s390x/diag258.c b/s390x/diag258.c
-> new file mode 100644
-> index 000000000000..4746615bb944
-> --- /dev/null
-> +++ b/s390x/diag258.c
-> @@ -0,0 +1,259 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Diag 258: Async Page Fault Handler
-> + *
-> + * Copyright (c) 2024 IBM Corp
-> + *
-> + * Authors:
-> + *  Nico Boehr <nrb@linux.ibm.com>
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <asm-generic/barrier.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/mem.h>
-> +#include <asm/pgtable.h>
-> +#include <mmu.h>
-> +#include <sclp.h>
-> +#include <vmalloc.h>
-> +
-> +static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
-> +
-> +#define __PF_RES_FIELD 0x8000000000000000UL
-> +
-> +/* copied from Linux arch/s390/mm/pfault.c */
-> +struct pfault_refbk {
-> +	u16 refdiagc;
-> +	u16 reffcode;
-> +	u16 refdwlen;
-> +	u16 refversn;
-> +	u64 refgaddr;
-> +	u64 refselmk;
-> +	u64 refcmpmk;
-> +	u64 reserved;
-> +};
-> +
-> +uint64_t pfault_token = 0x0123fadec0fe3210UL;
-> +
-> +static struct pfault_refbk pfault_init_refbk __attribute__((aligned(8))) = {
-> +	.refdiagc = 0x258,
-> +	.reffcode = 0, /* TOKEN */
-> +	.refdwlen = sizeof(struct pfault_refbk) / sizeof(uint64_t),
-> +	.refversn = 2,
-> +	.refgaddr = (u64)&pfault_token,
-> +	.refselmk = 1UL << 48,
-> +	.refcmpmk = 1UL << 48,
-> +	.reserved = __PF_RES_FIELD
-> +};
-> +
-> +static struct pfault_refbk pfault_cancel_refbk __attribute((aligned(8))) = {
-> +	.refdiagc = 0x258,
-> +	.reffcode = 1, /* CANCEL */
-> +	.refdwlen = sizeof(struct pfault_refbk) / sizeof(uint64_t),
-> +	.refversn = 2,
-> +	.refgaddr = 0,
-> +	.refselmk = 0,
-> +	.refcmpmk = 0,
-> +	.reserved = 0
-> +};
-> +
-> +static inline int diag258(struct pfault_refbk *refbk)
-> +{
-> +	int rc = -1;
-> +
-> +	asm volatile(
-> +		"	diag	%[refbk],%[rc],0x258\n"
-> +		: [rc] "+d" (rc)
-> +		: [refbk] "a" (refbk), "m" (*(refbk))
-> +		: "cc");
-> +	return rc;
-> +}
-> +
-> +static void test_priv(void)
-> +{
-> +	report_prefix_push("privileged");
-> +	expect_pgm_int();
-> +	enter_pstate();
-> +	diag258(&pfault_init_refbk);
-> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void* page_map_outside_real_space(phys_addr_t page_real)
-> +{
-> +	pgd_t *root = (pgd_t *)(stctg(1) & PAGE_MASK);
-> +	void* vaddr = alloc_vpage();
-> +
-> +	install_page(root, page_real, vaddr);
-> +
-> +	return vaddr;
-> +}
-> +
-> +/*
-> + * Verify that the refbk pointer is a real address and not a virtual
-> + * address. This is tested by enabling DAT and establishing a mapping
-> + * for the refbk that is outside of the bounds of our (guest-)physical
-> + * address space.
-> + */
-> +static void test_refbk_real(void)
-> +{
-> +	struct pfault_refbk *refbk;
-> +	void *refbk_page;
-> +	pgd_t *root;
-> +
-> +	report_prefix_push("refbk is real");
-> +
-> +	/* Set up virtual memory and allocate a physical page for storing the refbk */
-> +	setup_vm();
-> +	refbk_page = alloc_page();
-> +
-> +	/* Map refblk page outside of physical memory identity mapping */
-> +	root = (pgd_t *)(stctg(1) & PAGE_MASK);
-> +	refbk = page_map_outside_real_space(virt_to_pte_phys(root, refbk_page));
-> +
-> +	/* Assert the mapping really is outside identity mapping */
-> +	report_info("refbk is at 0x%lx", (u64)refbk);
-> +	report_info("ram size is 0x%lx", get_ram_size());
-> +	assert((u64)refbk > get_ram_size());
-> +
-> +	/* Copy the init refbk to the page */
-> +	memcpy(refbk, &pfault_init_refbk, sizeof(struct pfault_refbk));
-> +
-> +	/* Protect the virtual mapping to avoid diag258 actually doing something */
-> +	protect_page(refbk, PAGE_ENTRY_I);
-> +
-> +	expect_pgm_int();
-> +	diag258(refbk);
-> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
-> +	report_prefix_pop();
-> +
-> +	free_page(refbk_page);
-> +	disable_dat();
-> +	irq_set_dat_mode(false, 0);
-> +}
-> +
-> +/*
-> + * Verify diag258 correctly applies prefixing.
-> + */
-> +static void test_refbk_prefixing(void)
-> +{
-> +	const size_t lowcore_offset_for_refbk = offsetof(struct lowcore, pad_0x03a0);
-> +	struct pfault_refbk *refbk_in_prefix, *refbk_in_reverse_prefix;
-> +	uint32_t old_prefix;
-> +	uint64_t ry;
-> +
-> +	report_prefix_push("refbk prefixing");
-> +
-> +	report_info("refbk at lowcore offset 0x%lx", lowcore_offset_for_refbk);
-> +
-> +	assert((unsigned long)&prefix_buf < SZ_2G);
-> +
-> +	memcpy(prefix_buf, 0, LC_SIZE);
-> +
-> +	/*
-> +	 * After the call to set_prefix() below, this will refer to absolute
-> +	 * address lowcore_offset_for_refbk (reverse prefixing).
-> +	 */
-> +	refbk_in_reverse_prefix = (struct pfault_refbk *)(&prefix_buf[0] + lowcore_offset_for_refbk);
-> +
-> +	/*
-> +	 * After the call to set_prefix() below, this will refer to absolute
-> +	 * address &prefix_buf[0] + lowcore_offset_for_refbk (forward prefixing).
-> +	 */
-> +	refbk_in_prefix = (struct pfault_refbk *)OPAQUE_PTR(lowcore_offset_for_refbk);
-> +
-> +	old_prefix = get_prefix();
-> +	set_prefix((uint32_t)(uintptr_t)prefix_buf);
-> +
-> +	/*
-> +	 * If diag258 would not be applying prefixing on access to
-> +	 * refbk_in_reverse_prefix correctly, it would access absolute address
-> +	 * refbk_in_reverse_prefix (which to us is accessible at real address
-> +	 * refbk_in_prefix).
-> +	 * Make sure it really fails by putting invalid function code
-> +	 * at refbk_in_prefix.
-> +	 */
-> +	refbk_in_prefix->refdiagc = 0xc0fe;
-> +
-> +	/*
-> +	 * Put a valid refbk at refbk_in_reverse_prefix.
-> +	 */
-> +	memcpy(refbk_in_reverse_prefix, &pfault_init_refbk, sizeof(pfault_init_refbk));
-> +
-> +	ry = diag258(refbk_in_reverse_prefix);
-> +	report(!ry, "real address refbk accessed");
-> +
-> +	/*
-> +	 * Activating should have worked. Cancel the activation and expect
-> +	 * return 0. If activation would not have worked, this should return with
-> +	 * 4 (pfault handshaking not active).
-> +	 */
-> +	ry = diag258(&pfault_cancel_refbk);
-> +	report(!ry, "handshaking canceled");
-> +
-> +	set_prefix(old_prefix);
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * Verify that a refbk exceeding physical memory is not accepted, even
-> + * when crossing a frame boundary.
-> + */
-> +static void test_refbk_crossing(void)
-> +{
-> +	const size_t bytes_in_last_page = 8;
-> +	struct pfault_refbk *refbk = (struct pfault_refbk *)(get_ram_size() - bytes_in_last_page);
-> +
-> +	report_prefix_push("refbk crossing");
-> +
-> +	report_info("refbk is at 0x%lx", (u64)refbk);
-> +	report_info("ram size is 0x%lx", get_ram_size());
-> +	assert(sizeof(struct pfault_refbk) > bytes_in_last_page);
-> +
-> +	/* Copy bytes_in_last_page bytes of the init refbk to the page */
-> +	memcpy(refbk, &pfault_init_refbk, bytes_in_last_page);
-> +
-> +	expect_pgm_int();
-> +	diag258(refbk);
-> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
-> +	report_prefix_pop();
-> +}
-> +
-> +/*
-> + * Verify that a refbk with an invalid refdiagc is not accepted.
-> + */
-> +static void test_refbk_invalid_diagcode(void)
-> +{
-> +	struct pfault_refbk refbk __attribute__((aligned(8))) = pfault_init_refbk;
-> +
-> +	report_prefix_push("invalid refdiagc");
-> +	refbk.refdiagc = 0xc0fe;
-> +
-> +	expect_pgm_int();
-> +	diag258(&refbk);
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +	report_prefix_pop();
-> +}
-> +
-> +int main(void)
-> +{
-> +	report_prefix_push("diag258");
-> +
-> +	expect_pgm_int();
-> +	diag258((struct pfault_refbk *)0xfffffffffffffff0);
-> +	if (clear_pgm_int() == PGM_INT_CODE_SPECIFICATION) {
-> +		report_skip("diag258 not supported");
-> +	} else {
-> +		test_priv();
-> +		/* Other tests rely on invalid diagcodes doing nothing */
-> +		test_refbk_invalid_diagcode();
-> +		test_refbk_real();
-> +		test_refbk_prefixing();
-> +		test_refbk_crossing();
-> +	}
-> +
-> +	report_prefix_pop();
-> +	return report_summary();
-> +}
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index 3a9decc932f2..8131ba105d3f 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -392,3 +392,6 @@ file = sie-dat.elf
->  
->  [pv-attest]
->  file = pv-attest.elf
-> +
-> +[diag258]
-> +file = diag258.elf
+Please follow the usual pattern: _unlock() then _put().
 
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
