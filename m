@@ -1,232 +1,287 @@
-Return-Path: <kvm+bounces-28562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D6D399916F
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 20:59:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2979B999161
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 20:57:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7808BB28937
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:54:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FE691F25729
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D86521D194;
-	Thu, 10 Oct 2024 18:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5791EBFE8;
+	Thu, 10 Oct 2024 18:33:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xyu1Nn/r"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EuZXlSMa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2041.outbound.protection.outlook.com [40.107.93.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA22921D163
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 18:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584876; cv=none; b=UrrLX3L+hEHVzxS67Az3GulqcfSOOFagrRJtA8wi96v3+VIm6TYfoCfvvqswAn/csmKU5h0UJJP1Enf21ugdLb17aRmAtOLdjKAra+TNbUvtCjlrAu1hE2WewtC/Vvvu9EQE9ALvQRqFRdoM+pld1N56E3a8g4MTGm805u1R9JE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584876; c=relaxed/simple;
-	bh=aNI4I+LkKsxzC1YKs2vCoD7b+5doZynW6Blg4vQwwvc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ftBJ6kKP+yJ14QfatZBJYd8ysfB+Ay8l/npxNleDFW84dt3OQdxdqOuvITI8e9IkpZY3JEk0Ea5xFFKLwMPEvS/a2/nwI2RDk6s84WNtid3qhLhznGZvmujG/4i5opqZParCfvDBvRJpc0pgay0VlWZMKDE59PN8L3CuCFBzofA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xyu1Nn/r; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7c6a9c1a9b8so928988a12.0
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 11:27:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584873; x=1729189673; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:reply-to:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nwXbeHTlA0ocP8s6EMi2R3V8WkxZqKgY3fo4QQ/WBXk=;
-        b=xyu1Nn/rp+FyjGRlvaySHpdLv16ogLwofUZlPSL88LrsPtUsdHxPdI4aMAZWpZ+LCb
-         G47QycBP2achTmuGd1EXNbbjK4pjlf7ihMkj5vlGqDxw6OCVDaNJvwxpCB4vy6cQt+eC
-         bPNyYrqL1IWM+djQgloaSwHlTl/m9PsGRY+UQiNbQLuX8csAdsfFUDyRbBcmemNyquwH
-         u56PAc5JRwdiVO7tt7yODdJN/pEha8mrjjtisATQgI2/uYcwTl1QzP6LKGp+KqXDTb7X
-         W3csPJXsIxIBK/YbHvH2KWvDbUJR0U0jHjWARSRlv5XaOYevRMa1tcC3LSfpUG2LIezf
-         k0Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584873; x=1729189673;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:reply-to:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nwXbeHTlA0ocP8s6EMi2R3V8WkxZqKgY3fo4QQ/WBXk=;
-        b=L9euDMvEL3KIASptYJeOMP5uGpI3vIpi3ty070QMA5bqEDZY0vneOSKckMfeaLQ72y
-         NkmJkIWHGr1Li5DeucDpW2jXSmYz141hfA1/WQJ9hK5GQ2wDEqRftwa/mW7+lvqc915J
-         yzPEC+WB957603hd9BE2nAJYRSeBS6v3WG4JPtjv2+AjOXrhlldW4rpIef8re+/21/hn
-         QZF16C8/wmWwKUldhgKcdqGSihuOgNQBHK1HSGVvrXTALXeh+1qxR1c0ttBy3IcGSrF+
-         28Ar7p0MzAXZ3e/ZWLPlildI9ZAStcl+XM7S/UqhGIXagx/FrUASRjJJDsgbTwpT7bTc
-         RXkw==
-X-Gm-Message-State: AOJu0YxIY4WqOUcccMdpmv8ux4s8636gxXQXNFg0Ug1m9Be0ytFSbImd
-	FGwCIhcMNaYbKu2bvONMzpr9CaEcwCodC1HeE2Gg84iEUoAS6ot/l5pc8/L5X5HLbw4tLt40x4Y
-	9EQ==
-X-Google-Smtp-Source: AGHT+IHZp/jcJ6VF/U4r8Ds8cBqCm7oOG+WyWj8b167iLxGpwwfpynwEnbVm0Ou2T4AqluEw0PW/YyS/yKE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a63:e715:0:b0:7d5:d088:57d4 with SMTP id
- 41be03b00d2f7-7ea535b6b4fmr26a12.9.1728584872016; Thu, 10 Oct 2024 11:27:52
- -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 11:24:27 -0700
-In-Reply-To: <20241010182427.1434605-1-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BB21CFEA7;
+	Thu, 10 Oct 2024 18:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728585180; cv=fail; b=f3B3RYWhmeVI4v/vCBjhXpAOW+2dG451WwpfZsD8iSaW85EngFFXLGSNPqe3Y0P+GxT6SmD3GoXanV5D4HyvZ+mxvACru1cPqNkPSOi021bGo3xm3Kiqv+AsE73EvgkObULS0pxAZIFn13KAjRVl6exo7sN0LSwdN0nU1IL63l0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728585180; c=relaxed/simple;
+	bh=eAoFVIe4QcFGmUCTuR7ptoaOpyrQi/OvIRR3QFF71oc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=pfUTlEvJCRS72cemIim+BqHscYTS4LoCjsnLtcfjYCGjaFN4pBM9+qbDdqKHKpiZ7MPtr6mEJJG9DFI94tSAZLbLR/Yfqw+QODc4VTQ+g1zKcHlm7yHTR10FahlW7rrrbTkCH8NAdOVXpIKyyJYdj6P0GKPnSSCPOgB4OiMr6tM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EuZXlSMa; arc=fail smtp.client-ip=40.107.93.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=J3GF/zH5rzXctoDnJKSyEYJ03KaJd3vAQacGjoy4c9l/xqCb5yiKdDI9x0jaH6ULA66Y24b/1Bz5AZz7D3Xb6qgTs3wx52b0VC4IOWEG/pi2j50yLCIXYF7NnIV+K+6I8eNroJ8dgt6XIaQgy/v31O9xTuo8XF1Q+scApoX5g2ZKuBtiQJtepFONhdmgZyL+7la58kwH1Euw/Dpvi7sXkKSvWOhDYxbL2TJddUzvrVLDtqumi8lAyi7bizcDGrGogIUu4/jbNpRHFAI1dphrBQpMfc8zh24uGhNpCSTo5xk7js2P3qs7Y9+mXnJqLvdA/yK7NAXdPEfdLcJ6sA1qBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LYNfQBGrhKX+ya2bZOmfWBiF8/23uoDACYucRFUgnIk=;
+ b=hbPlbTKxeEOIXV4rXD2g3ZtzIZAMajCXx++UVPi28HhHV+Z3pQaTV8qYXCHEw41e857JPNZQjckE8RhhnJcJByAgBbnhZvCtkx7/9xuMenoucAH8/44dPpAEBhOortqJmYcGuwiacq2uxZSEankYNqCSwhWmkUi5c6diIU4tfOnGC7NNS6cEJa9/sS4K7pTT6+ePjmseOc0IMHDZ6DI/E4CKf61jy8OWbVHC1W9r83ttm6OjX7zsq91+NMl3tRwRdy+11Ol7z+CIcvhrce7X0O/rxJ52JPuMzqLkRqfWYNEheJQUcaufhcpwc/Vxvx6leP3JtvRsti1a2CGMF9/C8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LYNfQBGrhKX+ya2bZOmfWBiF8/23uoDACYucRFUgnIk=;
+ b=EuZXlSMa0eYqDNWIR/wCeGLwvFuRNa/QxvjbHZdGYpjgCugyH5fqR6irtglRnYwwlLhp4ksY503as4k/VxxFA/Dh9GS3EdeB/pQoYNCO1RBGOZikUXkJiRkLLmiw2z2NM9D/PRtxc7Iytx5UlyL67Z33ski5gvXNyBtK6/ZCnzs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by PH0PR12MB7905.namprd12.prod.outlook.com (2603:10b6:510:28b::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16; Thu, 10 Oct
+ 2024 18:32:53 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.8048.017; Thu, 10 Oct 2024
+ 18:32:53 +0000
+Message-ID: <379ccd07-533d-8cbc-2d25-b5b5f4849abe@amd.com>
+Date: Thu, 10 Oct 2024 13:32:50 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v12 05/19] virt: sev-guest: Reduce the scope of SNP
+ command mutex
+To: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
+ bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
+Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+ pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+References: <20241009092850.197575-1-nikunj@amd.com>
+ <20241009092850.197575-6-nikunj@amd.com>
+Content-Language: en-US
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20241009092850.197575-6-nikunj@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA1PR03CA0021.namprd03.prod.outlook.com
+ (2603:10b6:806:2d3::24) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241010182427.1434605-1-seanjc@google.com>
-X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010182427.1434605-86-seanjc@google.com>
-Subject: [PATCH v13 85/85] KVM: Don't grab reference on VM_MIXEDMAP pfns that
- have a "struct page"
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	"=?UTF-8?q?Alex=20Benn=C3=A9e?=" <alex.bennee@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>, 
-	Andrew Jones <ajones@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|PH0PR12MB7905:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7ea0fb70-abd6-4d18-dbdd-08dce959f394
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TWxxdXpZRk0xTU9BQ1htbnhqeklGUXYvaXV2L0VtaDlpN2R3NGFSMUVHMDVT?=
+ =?utf-8?B?Ny9QTlcxbFFsekdNOElJQ3hHeXgyWHhHLzBjNG1HVUJ2TUFIdXFablh6Qllz?=
+ =?utf-8?B?c2E1R3RvaG1raWFFeFNjZVRQYjV6eGhmUW9pVmhYM2c0RUxXSld2N1B5blpa?=
+ =?utf-8?B?aFRBVjhKRHNJU0RXWHcxY3hpdVB0S0FSczhEMWFXNFZKV1lTa1VkQ2I2Yy9V?=
+ =?utf-8?B?RW96YzBVKzV1S3ZueHVNM0ltTXBsdHMxWkJseEttd2RZUFlNWDZoblBTOGk4?=
+ =?utf-8?B?bEZhQnhQY3F6T2JKTXByNmtrQmthMDVyMnBoMnpKd0l0di9tTlJQZzBHdVAy?=
+ =?utf-8?B?ZzY3RGU1Zm1qUk5KOFVKcmc4OHVGRjFHV3IrZW04bWIvaDRlT3NXYVdZSFJr?=
+ =?utf-8?B?dFd2enhsWkVuOGRNS09sdlZZckpJOENNcVNzVjVkNG9Nc3ZoVE44V015K0dI?=
+ =?utf-8?B?N3ZYSGlwemRJd0NXUTVReURpeDBlYWQvL3kxOTRtb0xIWnl3ejg2Z3JpZlVJ?=
+ =?utf-8?B?VzVZL1BTaHVVL0x0UkFScE0zYXV5M21ETU1saG45V0xGc3VtdldhNXkva21j?=
+ =?utf-8?B?QTJXR1dhYWRINWZQSjRHandUOHN3ZUMva09abXUyaGlwT2ZaWW1pZ0NHNDhw?=
+ =?utf-8?B?WFFad0owVUNpbzJXM3RWV0xYNWJITW1aQ1lBYXVxUk43TWlJV2gvQno1K3hX?=
+ =?utf-8?B?MWVod3dmc1Q0Y080TGFxb3lyZ1I2aEd5T0xBT3MveHNOd1ViY0JneU5EQTJj?=
+ =?utf-8?B?aEcvUVlEcnJ2dFVHVlB4RmVqcDJXcktKdWhsVEN0bVkrbkI1NjNlc0p3SVVt?=
+ =?utf-8?B?Q0hBV2FHUDV2Q05pQzQ3WVBWMEV3WElDLzRWWXFoNTgrK1hWNnl3dlB0SGNL?=
+ =?utf-8?B?M3dDbWxRUS96QTZ4N0FRMjJ1dm10aDdEQklWRDJSaTBiUXVUdWEvK3RvY3Na?=
+ =?utf-8?B?V2RUdkdWeEwzaU1lMDlYeXZ6a3RWQk10VzljQlBUaW95SlF1Y0RCV3BwbENT?=
+ =?utf-8?B?SXZ1TUFjbDRaQS9Sd3pTUkJoZjBCYmxZVFBXZXpWTldpV2NBdXUrYjRGWUFH?=
+ =?utf-8?B?QjcyTVd6enl2ZDdweFBDbGwwbWtKaUtTQWtwODlFSHZrTGxqTVR0aFZ1TDF0?=
+ =?utf-8?B?RmlwR0EvQ0dtY2o5NURyKzBDMWpWVE41UTJocUZqWitlMXhyanRvTVJKRFl0?=
+ =?utf-8?B?MDV1a2c5Y1F1bW4vL1M2Ym12Zld4d05udll3azBOdlFIV2wzZkdNZ2tpWlJ6?=
+ =?utf-8?B?SlFJQmJMVExPYVZLTzhCSU5tMHZTQnY0ei8vSUN1c2ZQUHNWZS9NcjJDaXpE?=
+ =?utf-8?B?VHgrME9OZElIZWJaOXhJUjE5SVhPNEJ6YkVnN2Y0S0hyOVd6MDlDakMyMmhE?=
+ =?utf-8?B?WCs1dUZrblQxeXltS3dDT09MRDU0cGdLVFdZR0VWdG5oVzgvRytSbmxtUngz?=
+ =?utf-8?B?dFZuQVozTXhJVjhtQ3UxR0h6VWxDTzlFYXNPTzhpaWUvZC9XNmxTQ3A1dUZJ?=
+ =?utf-8?B?cVdBZU05eGw2QUxBdThDcm1Lcm90U3lYdFl1aFFFYWkya0NPVkxYbU5XdGtC?=
+ =?utf-8?B?S1JNNGRoUFlXbUhFUDdHNklKSWJ2aU9yZmZMcDJ0ZndITlV6K3BDSXhSTUlV?=
+ =?utf-8?B?NFIxZEJBdmdDZEMxVy9xdFZBa2cvLzJUNEhNbWZyb01JSnNKNXU1Sk1GL0hh?=
+ =?utf-8?B?alhYRnkvSndhbGdzZkR1UFpIWkZZOVRWaGQ5cndXK2hGYUxmVCtHdmx3PT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?a3E4YUVXN1M4eEJzcGJ0Z21XdXZLTTNCMnNJOEIvRCt0QXY3UVpqODlRaXll?=
+ =?utf-8?B?MUEzWXVkVElsTTcrY1lDWjVMRTB4LzZsMWRzZENrb0c1eVJxVWJsSVRFSE5z?=
+ =?utf-8?B?TEszMkJCYTREelBXSVVBbHdFMTdkUkdCQkk1L2tBRCtnRENPdkJtYWxGbDJG?=
+ =?utf-8?B?MXFveDliUGtpd3ZqNHcrM2pYYlNLaW9OYUNSeGQwT3Z4ZjhBbXdxRy9Ub2xI?=
+ =?utf-8?B?a2hpVitHUnNoVE1DNVNxZFgzRi9rOFlhQjMvbzVmby8xaDZ3MU9LMzZOU2hk?=
+ =?utf-8?B?bEl3aFNsK00xR1ZSbHJmZjd2U1VqNWlERTZXQWxRbFhlWjZBcEMrejg3S0Mv?=
+ =?utf-8?B?Yk16bUtmMkZIVllCbEtyczNVSFB5QWZiZUFQWDBObnJ6L3RKTnVNQjV3QUlu?=
+ =?utf-8?B?Nnhud1BLcm1maDRhODBQV1Q5K0svUTJjZW93L2FuQlVJclI3bFdDTXM1Rm1C?=
+ =?utf-8?B?c3lBeFBvOXJZSFBOTm4zUlpiTmVIMzdIYWZRQmdQTmpJamJ3VE5NUWhxQSs4?=
+ =?utf-8?B?YXA2K3Qxcmg4QndENUU5S0llcTN2YnA3UUs1MWhVQXYvTW5oTXRHdkdWQmdE?=
+ =?utf-8?B?YlF1UTB5ZmRkZGNQUi9kcFFZL0lBTzJHdFlQd3RZRUxDNXZrOE90Rk1Gak1B?=
+ =?utf-8?B?UDRYQk1UV1BkcDJrV3UvQnIyRnBOekNZTzJRNGJuMjVId1RYRmlESlA1MTZI?=
+ =?utf-8?B?aTRUeEFMUi9pdzg2MUxGditjM0M5aGdHRk5BRDV0N25XcnRZMGpzWjBXakJL?=
+ =?utf-8?B?T0NXSHhsV2l0UUVhTjc2aVI5UzBYeDZSczJvdjZMUmxXZjFEYnV4QTF0cjVN?=
+ =?utf-8?B?M0lqNnhhTk4yUWhtM292eGpsK0ZhcGI1YjVKeUcxYkQzdXFaSUtjZjdIVGZV?=
+ =?utf-8?B?N1ZZRWpRRWs0YjlkamczNzAwbTh5aUVYNzRmaXRGV1gzS1ZhV1E5bFg5VzZo?=
+ =?utf-8?B?blRndVhWRitua29COTRBMnYxWEcvdVVTQUM3UzZHQ3JIQ0EySVQyYTdaeTJa?=
+ =?utf-8?B?UFJmREdiWHl4Vmd0blkyR0xIdHdnNmNLR1NPMFpkdzUwaHlrTFZ1WnB3N2I2?=
+ =?utf-8?B?ZklVUjZsSmpLcWZwejdQckdHR00rcFdyYmNpZHlpMnUrcmpyVk1BaGI1MCt3?=
+ =?utf-8?B?dUpQUUhXSStFU0tQUTgrOUpGYVdJblJMb0RuajA0encwWXNpV3RMb1kxMjd3?=
+ =?utf-8?B?bzJVZ2FIN2ZEZTlHL3lSZ252dFpkRERSZ3ZZSUhNOFNXd1pXYkJlemFudHcr?=
+ =?utf-8?B?cHowZ1hLSGJTcHlZbHJyRS9ySkNCSFlGZVYyeDc1eWpYTk1CREs0cTl4Z2tP?=
+ =?utf-8?B?OWlOR3F6R1JkVmVZSVA5djA5Q1UzMENJZFNraTc0ZzdRNFgyVlBod0pxUzJM?=
+ =?utf-8?B?enBkOFo1V3BFejVKYXl5RC9UOURoM2hZdWtSTkFxTUR4c1dxcjA4MnExOVp1?=
+ =?utf-8?B?dFpma2loWmxJY3AvVTNHTVJnYWU1ekNrcGw0cHk5b2R6MDdRT203aUt3bXBI?=
+ =?utf-8?B?dlh3TDA4VkJQMmtRSnFoZHVPcU9EY2VzSDQ4UmJMNWp4bE1INHlJeUlXR0Y3?=
+ =?utf-8?B?c1BLRDBPZGJCUFNFMWNxaFhjM0kzRmtlNzlWZGYzbnVHUmdCTGdTandZNTNM?=
+ =?utf-8?B?N05oNEthWkZYb0tmekFZT0c2M1l6WUs3cVZxQzNtTzBFZVdmT1pWaHY1RVlO?=
+ =?utf-8?B?N25ZbWZXMXlvS2JyRUhGdUlSQ3c1SFFCMG5EM2NLNGtHb2pPclBDajMwR25q?=
+ =?utf-8?B?aXFweWJDMVVlTUxIdzBrY3VUcCtYYWErakY1RnBNR0FZa3ZTT2V3WnBpV2No?=
+ =?utf-8?B?ZytYcnI5OWxZamVLTCsrbU5NK0J0OTBQVUZWeCtVb245bXlmK3FrV21Qbmtn?=
+ =?utf-8?B?YUpreDIySHBCYS9nVmZIcXcrSUQxYzJuOGRsVzBtcFM2azBCcFl6Tm1ZTkhn?=
+ =?utf-8?B?VEVpdWFrRTl3RTRUWnVyUzFUam1rK01KVzJnUTBUd25TalBPQWEvQmhEZFd5?=
+ =?utf-8?B?V2djRkV3cXFXbWFDZTErSWtRVWJDUFE2TFVOeSt2STN1LzJudkpYbnN6TFlu?=
+ =?utf-8?B?a3FTR2JZK3BUenhWOU1reE5hb21rLzdaSWFGZk5USWE3aElzcFUxZi9IWmw3?=
+ =?utf-8?Q?PrDGZ1PNiHcp4VAoUkjNSNyNJ?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ea0fb70-abd6-4d18-dbdd-08dce959f394
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2024 18:32:52.9105
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wrvC+/woMFzUteXAGINRAvWMgl5KnDM3pDJxbxQsHn5qOr4jG1EoANSKomsge5bsHbhSXKYQQNBtUaEQWGIMgA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7905
 
-Now that KVM no longer relies on an ugly heuristic to find its struct page
-references, i.e. now that KVM can't get false positives on VM_MIXEDMAP
-pfns, remove KVM's hack to elevate the refcount for pfns that happen to
-have a valid struct page.  In addition to removing a long-standing wart
-in KVM, this allows KVM to map non-refcounted struct page memory into the
-guest, e.g. for exposing GPU TTM buffers to KVM guests.
+On 10/9/24 04:28, Nikunj A Dadhania wrote:
+> The SNP command mutex is used to serialize access to the shared buffer,
+> command handling, and message sequence number.
+> 
+> All shared buffer, command handling, and message sequence updates are done
+> within snp_send_guest_request(), so moving the mutex to this function is
+> appropriate and maintains the critical section.
+> 
+> Since the mutex is now taken at a later point in time, remove the lockdep
+> checks that occur before taking the mutex.
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- include/linux/kvm_host.h |  3 --
- virt/kvm/kvm_main.c      | 75 ++--------------------------------------
- 2 files changed, 2 insertions(+), 76 deletions(-)
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d045f8310a48..02f0206fd2dc 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1730,9 +1730,6 @@ void kvm_arch_sync_events(struct kvm *kvm);
-=20
- int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu);
-=20
--struct page *kvm_pfn_to_refcounted_page(kvm_pfn_t pfn);
--bool kvm_is_zone_device_page(struct page *page);
--
- struct kvm_irq_ack_notifier {
- 	struct hlist_node link;
- 	unsigned gsi;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 396ca14f18f3..b1b10dc408a0 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -160,52 +160,6 @@ __weak void kvm_arch_guest_memory_reclaimed(struct kvm=
- *kvm)
- {
- }
-=20
--bool kvm_is_zone_device_page(struct page *page)
--{
--	/*
--	 * The metadata used by is_zone_device_page() to determine whether or
--	 * not a page is ZONE_DEVICE is guaranteed to be valid if and only if
--	 * the device has been pinned, e.g. by get_user_pages().  WARN if the
--	 * page_count() is zero to help detect bad usage of this helper.
--	 */
--	if (WARN_ON_ONCE(!page_count(page)))
--		return false;
--
--	return is_zone_device_page(page);
--}
--
--/*
-- * Returns a 'struct page' if the pfn is "valid" and backed by a refcounte=
-d
-- * page, NULL otherwise.  Note, the list of refcounted PG_reserved page ty=
-pes
-- * is likely incomplete, it has been compiled purely through people wantin=
-g to
-- * back guest with a certain type of memory and encountering issues.
-- */
--struct page *kvm_pfn_to_refcounted_page(kvm_pfn_t pfn)
--{
--	struct page *page;
--
--	if (!pfn_valid(pfn))
--		return NULL;
--
--	page =3D pfn_to_page(pfn);
--	if (!PageReserved(page))
--		return page;
--
--	/* The ZERO_PAGE(s) is marked PG_reserved, but is refcounted. */
--	if (is_zero_pfn(pfn))
--		return page;
--
--	/*
--	 * ZONE_DEVICE pages currently set PG_reserved, but from a refcounting
--	 * perspective they are "normal" pages, albeit with slightly different
--	 * usage rules.
--	 */
--	if (kvm_is_zone_device_page(page))
--		return page;
--
--	return NULL;
--}
--
- /*
-  * Switches to specified vcpu, until a matching vcpu_put()
-  */
-@@ -2804,35 +2758,10 @@ static kvm_pfn_t kvm_resolve_pfn(struct kvm_follow_=
-pfn *kfp, struct page *page,
- 	if (kfp->map_writable)
- 		*kfp->map_writable =3D writable;
-=20
--	/*
--	 * FIXME: Remove this once KVM no longer blindly calls put_page() on
--	 *	  every pfn that points at a struct page.
--	 *
--	 * Get a reference for follow_pte() pfns if they happen to point at a
--	 * struct page, as KVM will ultimately call kvm_release_pfn_clean() on
--	 * the returned pfn, i.e. KVM expects to have a reference.
--	 *
--	 * Certain IO or PFNMAP mappings can be backed with valid struct pages,
--	 * but be allocated without refcounting, e.g. tail pages of
--	 * non-compound higher order allocations.  Grabbing and putting a
--	 * reference to such pages would cause KVM to prematurely free a page
--	 * it doesn't own (KVM gets and puts the one and only reference).
--	 * Don't allow those pages until the FIXME is resolved.
--	 *
--	 * Don't grab a reference for pins, callers that pin pages are required
--	 * to check refcounted_page, i.e. must not blindly release the pfn.
--	 */
--	if (map) {
-+	if (map)
- 		pfn =3D map->pfn;
--
--		if (!kfp->pin) {
--			page =3D kvm_pfn_to_refcounted_page(pfn);
--			if (page && !get_page_unless_zero(page))
--				return KVM_PFN_ERR_FAULT;
--		}
--	} else {
-+	else
- 		pfn =3D page_to_pfn(page);
--	}
-=20
- 	*kfp->refcounted_page =3D page;
-=20
---=20
-2.47.0.rc1.288.g06298d1525-goog
-
+> ---
+>  drivers/virt/coco/sev-guest/sev-guest.c | 35 ++++++-------------------
+>  1 file changed, 8 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+> index 2a1b542168b1..1bddef822446 100644
+> --- a/drivers/virt/coco/sev-guest/sev-guest.c
+> +++ b/drivers/virt/coco/sev-guest/sev-guest.c
+> @@ -345,6 +345,14 @@ static int snp_send_guest_request(struct snp_guest_dev *snp_dev, struct snp_gues
+>  	u64 seqno;
+>  	int rc;
+>  
+> +	guard(mutex)(&snp_cmd_mutex);
+> +
+> +	/* Check if the VMPCK is not empty */
+> +	if (is_vmpck_empty(snp_dev)) {
+> +		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
+> +		return -ENOTTY;
+> +	}
+> +
+>  	/* Get message sequence and verify that its a non-zero */
+>  	seqno = snp_get_msg_seqno(snp_dev);
+>  	if (!seqno)
+> @@ -401,8 +409,6 @@ static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_io
+>  	struct snp_guest_req req = {};
+>  	int rc, resp_len;
+>  
+> -	lockdep_assert_held(&snp_cmd_mutex);
+> -
+>  	if (!arg->req_data || !arg->resp_data)
+>  		return -EINVAL;
+>  
+> @@ -449,8 +455,6 @@ static int get_derived_key(struct snp_guest_dev *snp_dev, struct snp_guest_reque
+>  	/* Response data is 64 bytes and max authsize for GCM is 16 bytes. */
+>  	u8 buf[64 + 16];
+>  
+> -	lockdep_assert_held(&snp_cmd_mutex);
+> -
+>  	if (!arg->req_data || !arg->resp_data)
+>  		return -EINVAL;
+>  
+> @@ -501,8 +505,6 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+>  	int ret, npages = 0, resp_len;
+>  	sockptr_t certs_address;
+>  
+> -	lockdep_assert_held(&snp_cmd_mutex);
+> -
+>  	if (sockptr_is_null(io->req_data) || sockptr_is_null(io->resp_data))
+>  		return -EINVAL;
+>  
+> @@ -598,15 +600,6 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
+>  	if (!input.msg_version)
+>  		return -EINVAL;
+>  
+> -	mutex_lock(&snp_cmd_mutex);
+> -
+> -	/* Check if the VMPCK is not empty */
+> -	if (is_vmpck_empty(snp_dev)) {
+> -		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
+> -		mutex_unlock(&snp_cmd_mutex);
+> -		return -ENOTTY;
+> -	}
+> -
+>  	switch (ioctl) {
+>  	case SNP_GET_REPORT:
+>  		ret = get_report(snp_dev, &input);
+> @@ -628,8 +621,6 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
+>  		break;
+>  	}
+>  
+> -	mutex_unlock(&snp_cmd_mutex);
+> -
+>  	if (input.exitinfo2 && copy_to_user(argp, &input, sizeof(input)))
+>  		return -EFAULT;
+>  
+> @@ -744,8 +735,6 @@ static int sev_svsm_report_new(struct tsm_report *report, void *data)
+>  	man_len = SZ_4K;
+>  	certs_len = SEV_FW_BLOB_MAX_SIZE;
+>  
+> -	guard(mutex)(&snp_cmd_mutex);
+> -
+>  	if (guid_is_null(&desc->service_guid)) {
+>  		call_id = SVSM_ATTEST_CALL(SVSM_ATTEST_SERVICES);
+>  	} else {
+> @@ -880,14 +869,6 @@ static int sev_report_new(struct tsm_report *report, void *data)
+>  	if (!buf)
+>  		return -ENOMEM;
+>  
+> -	guard(mutex)(&snp_cmd_mutex);
+> -
+> -	/* Check if the VMPCK is not empty */
+> -	if (is_vmpck_empty(snp_dev)) {
+> -		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
+> -		return -ENOTTY;
+> -	}
+> -
+>  	cert_table = buf + report_size;
+>  	struct snp_ext_report_req ext_req = {
+>  		.data = { .vmpl = desc->privlevel },
 
