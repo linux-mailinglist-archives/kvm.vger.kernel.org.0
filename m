@@ -1,106 +1,135 @@
-Return-Path: <kvm+bounces-28456-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90957998BE9
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 17:40:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F4F998C6D
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 17:55:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0C4D1C24992
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 15:40:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 303791C24238
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 15:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6186E1CBEAF;
-	Thu, 10 Oct 2024 15:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE801CDFBB;
+	Thu, 10 Oct 2024 15:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QoscK3Vg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Te0gVPet"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285E01CB521
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 15:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71001CCEC2
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 15:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728574787; cv=none; b=lpU40Md7qT5mr5MlZpsX9QSYmpIvrCkgCEA+q2gOEQm9nIVkPdaqLxMpA+Jk25rQPOBI5WLKRhmOiEtB9VTy0a9dmfo9t9oRi0ID01ks2IFoHQ7ac/7eWtEbZDegtDMMqxIQPO1rK4+10IGhvm1Ce2ngvUoJlzPbHZIFlfIMAQ4=
+	t=1728575666; cv=none; b=TwkNI8lLCaGhMe8Zib4X9oxsvPzuH451jImpE2tmjYXHkyzOVxp28hOT6IxmQAcGheWdPYOVc/BvyQGOPGLN6GWnK7ceZOqfcNPmDm24vQ3kaoOeS5qGjCYp4mQbjluJavXSt3nL1SVfqzUwUvqpbnmt7CysbfBBQ8YXNZfugtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728574787; c=relaxed/simple;
-	bh=MB+x1a9U6nlX5cGHyay7Cw5A6HrDfiYR8Zc6v4dtMg4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UHUAJLRKzJ0V4PrNcz8U7kkG7Ncbh2G0zEJZ9bqXqRoOpLB0Vlq8h4oaNIqdLdvqhRga3fROBffO0NVnH7ezRuhkMkyn2tboKi6a2BH6js1UPcUQf6IR3ACcQPN280y0fInB4SGxyJ3Y0+LUGodxSNqZ6nptZNPBqwVWHOYe9bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QoscK3Vg; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1728575666; c=relaxed/simple;
+	bh=exMIV8Nrlv5VDsW7LyILeqag4PrIbwaBSGqnuHxKDCM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oMC0wZSpUJVBiCM0mIIPswR3Zsct4M6J7ormkrxzLa84BOJ9bhPSfTTZ7AXVdhNd7zyCEGBmWRQosVx6Pkl63TkabV71uNJY68mipzkmdDIh3kQG+OZ/sB36x4syiU2h43dGMu1zv1k6CC71bu/ne8/IS8rBMrdoBsulFyBZgQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Te0gVPet; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e290a9a294fso1587919276.2
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 08:39:45 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e28fc8902e6so1504522276.0
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 08:54:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728574785; x=1729179585; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GtndKFxSkiIMNXcqajS67o+UVXAMLMwQ9qYaza5W5vo=;
-        b=QoscK3Vguhejvi5bKiqFQqD4nW/gz5IRKsim6uD+QeO6swXwuPHsvsb9jjDBixiJjX
-         iwMjtbUUu8iFxOyfDrU3mQHz+FIUud9JoEJwN3HbYOVrkRWr+vJNRiDRqmwDsASSnSHI
-         ZBabaJtm4kW1VJ6XXe8APng/HOvBzszKwg13WQhXqiPIzOSC8gs/vCA1g8ImGeQvg3ve
-         ll5NTEpk+n0Aq7m58wbKmneO/YeKGWed+ayAA54AUFAme7PHSoGOR+SnYwmUWDjOcwWB
-         vpSe2pDh55L5wrgq66fWTePocwNycFV3Fe/am28iR0MacOF+MIQPdTnaFh1y/o2B2wCL
-         X8Vg==
+        d=google.com; s=20230601; t=1728575664; x=1729180464; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7sMwEF0t04Xf03z8JmTNU0su6EV0vlEJErGb+yyXXCE=;
+        b=Te0gVPet9qAS4fshTWsr1ipo5NiATG0k2qjPQofocrdund1E03q5LLoQSdBDFsDL9s
+         LtsVSmf7OhbTWSwdrWxjHIO/xanP0dcxhH45E51b8F57bWW6UyyoFFO81Iv2Jz+YBCvi
+         7SpHhTUKzMwGVTeQKZvihuNroZZCdXqviY8PVNteMC5y9RLLN8XOQ9HSntwLK9KkSZL9
+         H3ro0JwZgJ/GX/in8jcrUax9R7Ax//jtoz5JjYHMIrbYFDBDEe+J87n1/0MkkqGrWrTb
+         wSJV9fLY/NBHY3gOr/EtsLQAAhc4nCZzUMTW+TOljPh+yz+Dc1MRGzL9SSj/06dCt1sX
+         kVNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728574785; x=1729179585;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GtndKFxSkiIMNXcqajS67o+UVXAMLMwQ9qYaza5W5vo=;
-        b=NnAa0adOJZdIZ59byu1vH03rTYtEhq69+XEYGPA/xo6qKDi/YdxjLQiWHiamJuE64c
-         XcV3PQadlVvKcY81VqXJS1NdsTy+H1kvrKlFS7tZY4MvazfIwlcrirKRAZNT4bjfJjV8
-         Hl2o8C+MMzFEO0iq5NLXujrRGdZ7T52JtcF2WV8OFwyMgGnZImjqU55LYJMlajvxV/uB
-         OItwjMRPZZvBfnIvAj6s9QhzyxfLPud+DmO37Y0+fo2paMEbHVqWUYNQK76DP/QReCOC
-         DrdPNlBmCu9vZYI+sd4eXEdlU2pgmVtTBsr9sinsk/9DF9Qf5GE8dfs9jr4ewdrugPFN
-         Wb8A==
-X-Gm-Message-State: AOJu0YzsMMwj+lt7gkpTCinSGupSnbIEKg9IwsCtNDpJwEBMURVVEcO7
-	2ROWqQ/ZfDl+fScCfmXL4hb33+3vJwF1FzRXpmKqt+pWHygexFHQ/kpSmDe6QqNS9LWPjy40vXg
-	NMpiO4msTUTUgP5z3xx7aDJhnW6h5+Z/cvpceHClChDIo8gHNueJFGCAZIpFWs0V6Z9AEe2vVbR
-	vPx9WALvU4guSDjGyMNUClG+eKi/oHvfzekosmNUG0Gv/WhmcV8g==
-X-Google-Smtp-Source: AGHT+IFehwsQ5KwJNwckG2ZzPDyKejuuXE+2IlGRf/4FMaQ3nHUyWS90A7iMq3IIbR4OG1mYPVlp5flRvM7EDbeI
-X-Received: from aaronlewis-2.c.googlers.com ([fda3:e722:ac3:cc00:59:977b:ac1c:39ea])
- (user=aaronlewis job=sendgmr) by 2002:a5b:b86:0:b0:e0e:8b26:484e with SMTP id
- 3f1490d57ef6-e28fe516b5amr4820276.8.1728574784735; Thu, 10 Oct 2024 08:39:44
+        d=1e100.net; s=20230601; t=1728575664; x=1729180464;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7sMwEF0t04Xf03z8JmTNU0su6EV0vlEJErGb+yyXXCE=;
+        b=NdHyMKp/493dMfCRvABsYQHd10gAvEUjDxyo/yHDZM4WVMh2vzKMIlmBVuJ3uAuWfa
+         p+n5ua4E4e45NrnQhL2PPbrzJGfIPYCucLzPzTUtuFlaRu03ho1uue5+W3P2ifHSWSg7
+         pEMRJX8LHUMt/RpE6Zyx8aXybZaJnl+/iyJTa/mKFx1cAY4Ue/gx4atR2R0WFcwHoaKk
+         xbDPucNEeU9UxAiOs4LLLr2s4bzDgfww2iIRit9a9VHUY2oL9raN81QNjUEzqM0dXKOk
+         FxVX1GXJzaQUl312kJWRoznXGhffz2aBF0RNCT1M2vUdnFmh5ctScPQjgG0XLVkq6cTC
+         6D5w==
+X-Forwarded-Encrypted: i=1; AJvYcCW5Ks9DEkKkS0LdyySoc6WBW28pnieD6CQ/tVQIo9KOnZKVFsW+K7MqWcgjy0+8Wc8uWuI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiOVZwyIHGi5lq/sXedMnil/uNJ1xq4HeQy+hrnxSB8R1wS4IS
+	+aVdy+VgtCjRT3zKH56fkE4pCSfXEv6HecUwbR/3dzqrBhx+RFykZXfpuX6P5G43eCCIlIwyjqR
+	gJw==
+X-Google-Smtp-Source: AGHT+IFaTEQVvJEtWhp3ZxUl43YQFKv0vyHXzstBhIqqSy0TgE8/HNjhOVfOl877/xE21b5MkSaX03T1TNo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:ab51:0:b0:e28:fb8b:9155 with SMTP id
+ 3f1490d57ef6-e28fe41c747mr57834276.9.1728575663673; Thu, 10 Oct 2024 08:54:23
  -0700 (PDT)
-Date: Thu, 10 Oct 2024 15:39:23 +0000
+Date: Thu, 10 Oct 2024 08:54:21 -0700
+In-Reply-To: <cf2aabe2-7339-740a-6145-17e458302979@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
-Message-ID: <20241010153922.1049039-2-aaronlewis@google.com>
-Subject: [kvm-unit-tests PATCH v2] x86: Increase the timeout for the test "vmx_apicv_test"
-From: Aaron Lewis <aaronlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, 
-	Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20241009150455.1057573-1-seanjc@google.com> <20241009150455.1057573-2-seanjc@google.com>
+ <cf2aabe2-7339-740a-6145-17e458302979@amd.com>
+Message-ID: <Zwf4rfOFBlnMtdLQ@google.com>
+Subject: Re: [PATCH 1/6] KVM: Explicitly verify target vCPU is online in kvm_get_vcpu()
+From: Sean Christopherson <seanjc@google.com>
+To: Pankaj Gupta <pankaj.gupta@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Will Deacon <will@kernel.org>, Michal Luczaj <mhal@rbox.co>, Alexander Potapenko <glider@google.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="us-ascii"
 
-This test can take over 10 seconds to run on IvyBridge in debug.
-Increase the timeout to give this test the time it needs to complete.
+On Thu, Oct 10, 2024, Pankaj Gupta wrote:
+> On 10/9/2024 5:04 PM, Sean Christopherson wrote:
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index db567d26f7b9..450dd0444a92 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -969,6 +969,15 @@ static inline struct kvm_io_bus *kvm_get_bus(struct kvm *kvm, enum kvm_bus idx)
+> >   static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
+> >   {
+> >   	int num_vcpus = atomic_read(&kvm->online_vcpus);
+> > +
+> > +	/*
+> > +	 * Explicitly verify the target vCPU is online, as the anti-speculation
+> > +	 * logic only limits the CPU's ability to speculate, e.g. given a "bad"
+> > +	 * index, clamping the index to 0 would return vCPU0, not NULL.
+> > +	 */
+> > +	if (i >= num_vcpus)
+> > +		return NULL;
+> 
+> Would sev.c needs a NULL check for?
+> 
+> sev_migrate_from()
+> ...
+> src_vcpu = kvm_get_vcpu(src_kvm, i);
+> src_svm = to_svm(src_vcpu);
+> ...
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- x86/unittests.cfg | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Nope, sev_check_source_vcpus() verifies the source and destination have the same
+number of online vCPUs before calling sev_migrate_from(), and it's all done with
+both VMs locked.
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 7c1691a988621..5f3fa9301b15b 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -349,7 +349,7 @@ file = vmx.flat
- extra_params = -cpu max,+vmx -append "apic_reg_virt_test virt_x2apic_mode_test vmx_basic_vid_test vmx_eoi_virt_test"
- arch = x86_64
- groups = vmx
--timeout = 10
-+timeout = 30
- 
- [vmx_posted_intr_test]
- file = vmx.flat
--- 
-2.47.0.rc0.187.ge670bccf7e-goog
+static int sev_check_source_vcpus(struct kvm *dst, struct kvm *src)
+{
+	struct kvm_vcpu *src_vcpu;
+	unsigned long i;
 
+	if (!sev_es_guest(src))
+		return 0;
+
+	if (atomic_read(&src->online_vcpus) != atomic_read(&dst->online_vcpus))
+		return -EINVAL;
+
+	kvm_for_each_vcpu(i, src_vcpu, src) {
+		if (!src_vcpu->arch.guest_state_protected)
+			return -EINVAL;
+	}
+
+	return 0;
+}
 
