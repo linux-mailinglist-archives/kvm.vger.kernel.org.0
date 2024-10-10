@@ -1,170 +1,189 @@
-Return-Path: <kvm+bounces-28447-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28448-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16667998A53
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:52:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4129998A5F
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:53:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFBBD2887E1
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:52:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 828A7287C1B
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AF51E1A33;
-	Thu, 10 Oct 2024 14:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D63A1EABDB;
+	Thu, 10 Oct 2024 14:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dGkuQY5P"
+	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="G6Dmp57C";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="T6CZztMf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from flow-a2-smtp.messagingengine.com (flow-a2-smtp.messagingengine.com [103.168.172.137])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51391E04BC;
-	Thu, 10 Oct 2024 14:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02571CCEFA;
+	Thu, 10 Oct 2024 14:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728570883; cv=none; b=JwOh9wb1C9jfPWbY4MSt/3v8VxCHPf2+tc1pS28Og3Sj8XJb4V8SO2u4/Tk4Ae1ucw+MBF/WgiknPfb6HJCDif6ggAO0LkATmOinmCVWc+4jK7edjcOxMpPuLCm1zZ7h7j7e6NmAFi13/wtkZRysD80yJm7i0NaNrRRjEecyHWI=
+	t=1728571022; cv=none; b=ZC4699HQ4YYYPlQ27ewfBkQS5SJ3humdquQVohgVz3AAfVnvYTbPvNnNqdk+IgPXpzv5hhZYU1nRTq2U4uioBpV62JwxZTtob2pI5o5MYuPZ3BcFvG2r2a7/uiN2zUaocz01FsM3/3JoAtZuEbTSqYF/3D5J6AG30yf2M3zyGr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728570883; c=relaxed/simple;
-	bh=F6eTrN/gp7G7YKPqRXWeb3wd7Rb9UIpk0XhBK01kcM0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fOC8bA0Tzhx2VhYsXiqHXWbdHJzzeY4UCWFk44OYz8EvsM26B5sn3e9k4UG1O+lx+fVS39y9F+ASa6sKhvtq1UF1GVUYzzAJS6r0HNz1b08QpDt53Zm9m6CZJYlZOXhWd/kY64mi6HwncgAbvwtNbYQii/VnMf9u9uEzTGxnObk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dGkuQY5P; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728570882; x=1760106882;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=F6eTrN/gp7G7YKPqRXWeb3wd7Rb9UIpk0XhBK01kcM0=;
-  b=dGkuQY5PwUUk/BxgcPqPfUTGIs2aQDGpw6M9YhgHiVVy3sbWAGTEoO9L
-   NQxD89i4F1U11HKJKbQ2FeXdWqkjAF3Vy/F+IDuEAS8QBF9ZAHIFQ0Kg5
-   FsNYmwFZwfdMWZRutjuaY7x6Tz8PGMM/bU2e5OHfN/SISIo6K/clFx9Zh
-   CKi97AnAKzxd8FMiXYG9kyfo77GgdiowEhOUN4tAtn3Slfmisou6qTjqm
-   o3ySKoURMJCeOl29gjEhnWJ0NnVmDZsNnimPdplJ4Temz+y2j+RrTk8lR
-   jG4eUs1yyLelkqCY6XxVCd3mFr3YrvFjDx9/9jnMOsYTJ35DBlKS78YIf
-   g==;
-X-CSE-ConnectionGUID: gG8xxpQCRPerZJxxq4X7Uw==
-X-CSE-MsgGUID: RnZmGuWzSfeCzOCh4y+0yA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="28064511"
-X-IronPort-AV: E=Sophos;i="6.11,193,1725346800"; 
-   d="scan'208";a="28064511"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 07:34:26 -0700
-X-CSE-ConnectionGUID: yzdwpQ+mRpCGVaDT5/ya9A==
-X-CSE-MsgGUID: Rjkp3UFjS5+APjV1DDlCbA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,193,1725346800"; 
-   d="scan'208";a="81189666"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO localhost.localdomain) ([10.246.16.81])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 07:34:16 -0700
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Peter Zijlstra <peterz@infradead.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ingo Molnar <mingo@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Thomas Richter <tmricht@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mike Leach <mike.leach@linaro.org>,
-	James Clark <james.clark@arm.com>,
-	coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	Yicong Yang <yangyicong@hisilicon.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Andi Kleen <ak@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	H Peter Anvin <hpa@zytor.com>,
-	Kan Liang <kan.liang@linux.intel.com>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>,
-	kvm@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: [PATCH V12 14/14] perf intel-pt: Add a test for pause / resume
-Date: Thu, 10 Oct 2024 17:31:51 +0300
-Message-ID: <20241010143152.19071-15-adrian.hunter@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241010143152.19071-1-adrian.hunter@intel.com>
-References: <20241010143152.19071-1-adrian.hunter@intel.com>
+	s=arc-20240116; t=1728571022; c=relaxed/simple;
+	bh=+eRxpZf4A8uSZWrwnpAMgODuE281mC7Oh2bHtUxas7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hkPsDcpyR1Psy2kg3xXBgofOtS+HuAL8pxE8XjbG3rQkV7z8dRxVk+AoemEtJQzVe9tPedvvalALtqsHaYFdcA0mjcuY14REuWvwJnYAyWn0rviu9aEQZ6wyrJxtmrmckpyXnoEO5LI4AhbBLScgGZb+fk79t/TIUe5tSRG7wm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=G6Dmp57C; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=T6CZztMf; arc=none smtp.client-ip=103.168.172.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailflow.phl.internal (Postfix) with ESMTP id D168E2007A3;
+	Thu, 10 Oct 2024 10:36:58 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Thu, 10 Oct 2024 10:36:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1728571018; x=
+	1728578218; bh=flRm1BokDLMvxzrVka91UpcRv5MTRteKyP5Z9UtyoZQ=; b=G
+	6Dmp57C8sQ6+zv6SVu5LZ/o9uljIOnJsNgWQ2OLf38ArVUZhaAT7udceSAYnbMmG
+	J2wl+vqWhxEJNXJCG+3IqZyqwqyK749SE5ibpielzwV+5rpFgj+JPmqBNXsGEl/6
+	O1N4ilE4nzy3dFYvoqiL16YMw7ivwJ8XpAr0RtM5bfTX1jRy61oaHUXSwFxk+an2
+	59A2X5x06Zgs5yk3nTh5Qd5/NJxzSRJPYcuqYxPUbgECfvZZdn2Dc1md1mwWu/Rh
+	AkeTt68L3hXshMWGXcqGASiZG7yqcgfC4nHHcEOjYTXlFcWAZvbkkkk+NolfvLmM
+	C6ucG3qzQLlYAgXSDRX/A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1728571018; x=1728578218; bh=flRm1BokDLMvxzrVka91UpcRv5MT
+	RteKyP5Z9UtyoZQ=; b=T6CZztMfwwkJxguBMq3sg4Qa+DsdBBF5N9noGqlJ24xz
+	AJKH5WVxYSxA0+IdfcY89VBA3NaSpr8EK046g400FSPFYCsSi6bGOX04C9qnn7Pt
+	43SAkNe4RNjOdO0xPF970xWSSloZdqJQhZwOeupOyJLxk66ZxNnJ8IdJO7LxF6Gr
+	KgwWHfmOpfFLV+o2JXrbmh8AHEnOuaXGbYa9YQZZ/4nwGF9eZjAAMf+ov9Fyiz1P
+	fo1/o8+hpZRST5Hvkx1wolgjUmtRmjogOI4sirASfY6OFhMaG/KrOsvF2ggVReeJ
+	+4JTDv/5Ux7epfZiyE7X2ztVF3hXOvgi+Jh1HtRNQQ==
+X-ME-Sender: <xms:iOYHZzd99__K9bi2wyMlu-g-lRxGUf6d51NBtGM_sE1s1J0hAvu1ig>
+    <xme:iOYHZ5PWib-EN-rzieFJchbC9alOYDTZvk5KSZWvZzKJlAvOHc9Ro5MQiBxAm4SVL
+    xh-KYnJXHPzHW2LQHg>
+X-ME-Received: <xmr:iOYHZ8jGXKXMheY8rKRT6au5s_qg07IasgHtt3QUQEdsBOWuC8x6ysKfvVFulrQ3H3PMXQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdefhedgkeduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvden
+    ucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlse
+    hshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpeffvdevueetudfhhfff
+    veelhfetfeevveekleevjeduudevvdduvdelteduvefhkeenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhv
+    rdhnrghmvgdpnhgspghrtghpthhtohepiedupdhmohguvgepshhmthhpohhuthdprhgtph
+    htthhopehtrggssggrsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkvhhmsehvghgv
+    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvh
+    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhmmheskhhvrggt
+    khdrohhrghdprhgtphhtthhopehpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdhrtg
+    hpthhtoheptghhvghnhhhurggtrghisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehm
+    phgvsegvlhhlvghrmhgrnhdrihgurdgruhdprhgtphhtthhopegrnhhuphessghrrghinh
+    hfrghulhhtrdhorhhgpdhrtghpthhtohepphgruhhlrdifrghlmhhslhgvhiesshhifhhi
+    vhgvrdgtohhm
+X-ME-Proxy: <xmx:iOYHZ0-_W7hu5Wp8SyaR6znszN1si28MLWPMF6Fw2-TX2wuw-utj2Q>
+    <xmx:iOYHZ_syCQgTa_Z-EWTd2w3h5dhvP4XaOZ85ECFkHqvfkWWQm28U6A>
+    <xmx:iOYHZzHTAtreKpmBFpRxbnCJrukLJBMwrdv1I8s2wdyo61RjDUpgFg>
+    <xmx:iOYHZ2ODu_6295lFX94QPuBxXBmkl1gkJpK2295FCcb8-cKPYpqZ-g>
+    <xmx:iuYHZ3IO1JbgI3yM2KATGNWCOTZB8b5VyPXiIkp_JmiB9hG5LgbVSRK3>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 10 Oct 2024 10:36:39 -0400 (EDT)
+Date: Thu, 10 Oct 2024 17:36:34 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ 	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, 	paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, 	viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, 	akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, 	chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ 	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, 	vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, 	david@redhat.com, michael.roth@amd.com,
+ wei.w.wang@intel.com, 	liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, 	suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com,
+ 	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, 	quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+ 	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
+ 	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org,
+ qperret@google.com, 	keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, 	jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com,
+ 	hughd@google.com, jthoughton@google.com
+Subject: Re: [PATCH v3 04/11] KVM: guest_memfd: Allow host to mmap
+ guest_memfd() pages when shared
+Message-ID: <w6oyjtjsroycxgiicnnrjcaddpl5vz6lfzvedtaz4miilsnkga@xyylfwo3ezcn>
+References: <20241010085930.1546800-1-tabba@google.com>
+ <20241010085930.1546800-5-tabba@google.com>
+ <i44qkun5ddu3vwli7dxh27je72ywlrb7m5ercjhvprhleapv6x@52dwi3kwp2zx>
+ <CA+EHjTwOsbNRN=6ZQ4rAJLhpVNifrtmLLs84q4_kOixghaSHBg@mail.gmail.com>
+ <mr26r6uvvvdevwqz6flhnzbqjwkf7ucictnjhk3xsuktwsujh5@ncf57r3v6w6p>
+ <CA+EHjTwEmXcQhCzGJG1icBzHvWEBUVVH33-ng60ngup6LMcC4Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwEmXcQhCzGJG1icBzHvWEBUVVH33-ng60ngup6LMcC4Q@mail.gmail.com>
 
-Add a simple sub-test to the "Miscellaneous Intel PT testing" test to
-check pause / resume.
+On Thu, Oct 10, 2024 at 03:28:38PM +0100, Fuad Tabba wrote:
+> On Thu, 10 Oct 2024 at 13:21, Kirill A. Shutemov <kirill@shutemov.name> wrote:
+> >
+> > On Thu, Oct 10, 2024 at 11:23:55AM +0100, Fuad Tabba wrote:
+> > > Hi Kirill,
+> > >
+> > > On Thu, 10 Oct 2024 at 11:14, Kirill A. Shutemov <kirill@shutemov.name> wrote:
+> > > >
+> > > > On Thu, Oct 10, 2024 at 09:59:23AM +0100, Fuad Tabba wrote:
+> > > > > +out:
+> > > > > +     if (ret != VM_FAULT_LOCKED) {
+> > > > > +             folio_put(folio);
+> > > > > +             folio_unlock(folio);
+> > > >
+> > > > Hm. Here and in few other places you return reference before unlocking.
+> > > >
+> > > > I think it is safe because nobody can (or can they?) remove the page from
+> > > > pagecache while the page is locked so we have at least one refcount on the
+> > > > folie, but it *looks* like a use-after-free bug.
+> > > >
+> > > > Please follow the usual pattern: _unlock() then _put().
+> > >
+> > > That is deliberate, since these patches rely on the refcount to check
+> > > whether the host has any mappings, and the folio lock in order not to
+> > > race. It's not that it's not safe to decrement the refcount after
+> > > unlocking, but by doing that i cannot rely on the folio lock to ensure
+> > > that there aren't any races between the code added to check whether a
+> > > folio is mappable, and the code that checks whether the refcount is
+> > > safe. It's a tiny window, but it's there.
+> > >
+> > > What do you think?
+> >
+> > I don't think your scheme is race-free either. gmem_clear_mappable() is
+> > going to fail with -EPERM if there's any transient pin on the page. For
+> > instance from any physical memory scanner.
+> 
+> I remember discussing this before. One question that I have is, is it
+> possible to get a transient pin while the folio lock is held, or would
+> that have happened before taking the lock?
 
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-Acked-by: Ian Rogers <irogers@google.com>
-Reviewed-by: Andi Kleen <ak@linux.intel.com>
----
- tools/perf/tests/shell/test_intel_pt.sh | 28 +++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Yes.
 
-diff --git a/tools/perf/tests/shell/test_intel_pt.sh b/tools/perf/tests/shell/test_intel_pt.sh
-index 723ec501f99a..e359db0d0ff2 100755
---- a/tools/perf/tests/shell/test_intel_pt.sh
-+++ b/tools/perf/tests/shell/test_intel_pt.sh
-@@ -644,6 +644,33 @@ test_pipe()
- 	return 0
- }
- 
-+test_pause_resume()
-+{
-+	echo "--- Test with pause / resume ---"
-+	if ! perf_record_no_decode -o "${perfdatafile}" -e intel_pt/aux-action=start-paused/u uname ; then
-+		echo "SKIP: pause / resume is not supported"
-+		return 2
-+	fi
-+	if ! perf_record_no_bpf -o "${perfdatafile}" \
-+			-e intel_pt/aux-action=start-paused/u \
-+			-e instructions/period=50000,aux-action=resume,name=Resume/u \
-+			-e instructions/period=100000,aux-action=pause,name=Pause/u uname  ; then
-+		echo "perf record with pause / resume failed"
-+		return 1
-+	fi
-+	if ! perf script -i "${perfdatafile}" --itrace=b -Fperiod,event | \
-+			awk 'BEGIN {paused=1;branches=0}
-+			     /Resume/ {paused=0}
-+			     /branches/ {if (paused) exit 1;branches=1}
-+			     /Pause/ {paused=1}
-+			     END {if (!branches) exit 1}' ; then
-+		echo "perf record with pause / resume failed"
-+		return 1
-+	fi
-+	echo OK
-+	return 0
-+}
-+
- count_result()
- {
- 	if [ "$1" -eq 2 ] ; then
-@@ -672,6 +699,7 @@ test_power_event			|| ret=$? ; count_result $ret ; ret=0
- test_no_tnt				|| ret=$? ; count_result $ret ; ret=0
- test_event_trace			|| ret=$? ; count_result $ret ; ret=0
- test_pipe				|| ret=$? ; count_result $ret ; ret=0
-+test_pause_resume			|| ret=$? ; count_result $ret ; ret=0
- 
- cleanup
- 
+The normal pattern is to get the pin on the page before attempting to lock
+it.
+
+In case of physical scanners it happens like this:
+
+1. pfn_to_page()/pfn_folio()
+2. get_page_unless_zero()/folio_get_nontail_page()
+3. lock_page()/folio_lock() if needed
+
 -- 
-2.43.0
-
+  Kiryl Shutsemau / Kirill A. Shutemov
 
