@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-28422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CC1F998684
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:46:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F5D9986AE
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:54:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA0712833D3
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 12:46:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D36551F22926
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 12:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACBD31C6F6E;
-	Thu, 10 Oct 2024 12:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026051C6F65;
+	Thu, 10 Oct 2024 12:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D733iDXb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FHCtasNx"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D210A1C6885
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 12:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27591C232C
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 12:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728564383; cv=none; b=OiVHWGNGUBZ8/sUp9ty9cXn8EXs6l1Fevrs2WGdvpzBMAKEsk9tQiw+aYQws9MQB68Kd5MNKK6KKilKpboyUgYVw8oeVC4WhykhnYE8WTSNyuDxlvP2BnkhUZq99B4oM9UA46F7OkaVBbPX/t+zrJatG36gNuY/ilj39F6u5kq8=
+	t=1728564836; cv=none; b=OfLfcyD7isuUZE4VtwEBMHXmS4g1i3NIBl/Dd9C7HCyed51gUYjRMc6txnbBZzlmK7piXGNtb3JbHSW10yOG7c49YEEiX/fOc+wS9UVoDinG36AO50ig/pRrn0meIzUP/HpIWLI67xF2zX1NB4LNoc2vOIRM+MJ02MfXvo4Nm48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728564383; c=relaxed/simple;
-	bh=gB/Bxcsggt/d/+PHWcnc10XGSm/R2PwjjQ6YpCvpjUA=;
+	s=arc-20240116; t=1728564836; c=relaxed/simple;
+	bh=EFme/4SxALJe+BlJbK7fmuj0KFid9zEOfCzeZRFTRg4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dVnzorrZ0G58oYGnXiiIacD+SXogZOw5yTlrC6Q/1HiOYGh9xlmOCck5aZ8AcV5wRnjjzp3HSLP/oASvzWYoA1lob2g7eYPdjrdEfLRgymU6LydLodr7o/9Q64bpNJ36QtF9tZbH2jL5+/XKfv/H4zJT+6tZ7sS40KbGfwJ+iqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D733iDXb; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=PD11pIU0OaukO9vNgoYBjKVxNS8s+raSQEWzkdFaohlqdrcqvkzEkxOQDZoj8X5W2OpdEQRtMUrnHPloC/LxzwLfSYHfUQcIbmvr6d3FRcsOpiTH8BRBgh4sxnUNqn1OCZKzEBFcEL13+pGZCdF6NVo/Gsm6HpTDHioxi3u3r7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FHCtasNx; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728564380;
+	s=mimecast20190719; t=1728564833;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Pp428+o6AOVfMNyGufRXb57C/mbuEZh30bGw/01Jeok=;
-	b=D733iDXb61lBPcryXrjYFzLuduQ936BSiMcHHgXJOD7s1mvUSVafOSNuhU/dHHtJkNYVY4
-	EVmfhFXkJ/lQLEShWgZXPk3o9g9gmuLsAU1XtEEBt9xoehHAHDiMgB1/jjW8Mj1VFjR3jG
-	aGBFzZaGHGEe6PT0iq2R5hRwh7hrlqY=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Dp6cnJFLdZ5gBOMD1Ds1O6L7Mcku1/oXYrG/mj/D0fw=;
+	b=FHCtasNxgSTtV2nHr4M9Ee1HgW7lEGdk+4UbHKCSMDHyjTaStxarbGH12UjxOp8YfVIqNw
+	/KnQ/W5jEvkZddZvzdpAkFXp6hiDWdlV+WKY414UZ9++uTiMxOpkDeU4eYYxeNklCChAND
+	+5udF27A+HR/YN1WZ7Tk6CUJ97q7Z6Y=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-620-ciN_LvbiOWC-BT_Rnl8uDg-1; Thu, 10 Oct 2024 08:46:19 -0400
-X-MC-Unique: ciN_LvbiOWC-BT_Rnl8uDg-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a994dfbb8b9so69593866b.3
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 05:46:19 -0700 (PDT)
+ us-mta-403-Ji3Dh6UwMtCpBVTHUWFZ7Q-1; Thu, 10 Oct 2024 08:53:52 -0400
+X-MC-Unique: Ji3Dh6UwMtCpBVTHUWFZ7Q-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a993fa36b2dso73497766b.2
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 05:53:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728564378; x=1729169178;
+        d=1e100.net; s=20230601; t=1728564830; x=1729169630;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Pp428+o6AOVfMNyGufRXb57C/mbuEZh30bGw/01Jeok=;
-        b=SN6IgTf1nyEKo+CiF7poRmUrciT8glsKaUMmtA5TBbQhgD3g9TkCWZN6O+YI000l/u
-         gi652ttk/1upEG8St+/AxTVMqYW7+pzvY0/lQ+7oYJkNtKALjfkkW5bogIc/O1OK3lt2
-         LWq7jS8rtm5gNVJ7pH/36aemrXZFcmXvnksgLz5diMqXdtr17KFIVahsVNT4PFsJM5A3
-         SzjUnSU6N2NQMcOC/SRBuPUf16UtbiuyWGUcevl2c1sYr5DvlcfFZrpZ0wS/n0W9WRVG
-         b+uL+mehn3liOI6zvbHG7UXx4ahP1c7ZUAKasDYX/5WwWhumlIbIQmow81vNnuYd5iDS
-         60Ew==
-X-Gm-Message-State: AOJu0YzdTdSeJIsfRDYb1vLaoSW1R5v8cnnN8iQBBKC4mcI0jPPvxgRi
-	/v498IhDyhyeI48CJ3O3EKwLuDiYHGZDROR1SFSTN9yZDU2PGqgMtRZwrfqTZweSj7Wr/nXAjuG
-	vxxGBvujJRKsqoefL8Bpv6ZQOmMPKelT3ys3kIN/sXqS5YyKMkA==
-X-Received: by 2002:a17:907:940d:b0:a99:4eac:bb98 with SMTP id a640c23a62f3a-a998d31c068mr569316566b.51.1728564378457;
-        Thu, 10 Oct 2024 05:46:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFZQJ0C4cv3iGhR09yajySYTcDf+yHyYkfG33sSJXo+9rrIeBRewHZY6fgvqwKjME2LxydoDg==
-X-Received: by 2002:a17:907:940d:b0:a99:4eac:bb98 with SMTP id a640c23a62f3a-a998d31c068mr569314266b.51.1728564378020;
-        Thu, 10 Oct 2024 05:46:18 -0700 (PDT)
+        bh=Dp6cnJFLdZ5gBOMD1Ds1O6L7Mcku1/oXYrG/mj/D0fw=;
+        b=G/IyYm3oACzv3uqjKpmD8ELJGcFpiV+RPQA7NCqbMnlJgiMduPlaiDapUE1oTlgGTq
+         is2v/c+UaOT9LSqGR7OD5drJgZIPgjO+lZttRlDEXknN3Szq830+LbQoaOkuT1NzDGbR
+         Kz6JPhBGIg9IH3YetwM8J+1SC1KjsalNNjJ9q3Z1M4IVEKs1yEBf5deu4EPxX/voiQun
+         xIyv1FSlZUb2YKbhvwMKTlViCZ6nGmJI5UVQSSM1dhqz8vqCBiCxL7jW6Ni5MeZJ75oi
+         C8fU3v1yTD6KMAwAXhjj9WroqcrUt+bfIlXa7QGinQiAdXuUxnXFPEdL22dcm+/DgUgj
+         QkAg==
+X-Gm-Message-State: AOJu0Yyk004hCZ6Jr3hdti0W+wpKpMFUm+h3re71/hMrHzJbq/DTHYxL
+	x/VCCmFyNvhldFRxvCK4z9rlcqGcEyQoD8ozeeFvB/briZUSg1iXEVXNgb1jvLF+G4hDIrOKoMY
+	FrAv+QL+RPAw3cPgGiWjtQ7qvDd4cgZx5SfdWFIY64S1kpjvefUORjQ047mJS
+X-Received: by 2002:a17:907:6e8e:b0:a8d:2b7a:ff44 with SMTP id a640c23a62f3a-a998d1f4ecdmr547192566b.32.1728564830619;
+        Thu, 10 Oct 2024 05:53:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFd2Mcs/kk09rIwxZfXjqHQaW8CeS5JeRjB1xiwk5tURERdxopVCJcBGwSOUyc4zOEz9zZmyg==
+X-Received: by 2002:a17:907:6e8e:b0:a8d:2b7a:ff44 with SMTP id a640c23a62f3a-a998d1f4ecdmr547190966b.32.1728564830225;
+        Thu, 10 Oct 2024 05:53:50 -0700 (PDT)
 Received: from [192.168.10.81] ([151.81.124.37])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a99a7ec4cd0sm84679966b.1.2024.10.10.05.46.16
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a99a7ec5894sm85691466b.42.2024.10.10.05.53.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 05:46:17 -0700 (PDT)
-Message-ID: <1baf4159-ce53-4a75-99bf-adf4b89dd07b@redhat.com>
-Date: Thu, 10 Oct 2024 14:46:16 +0200
+        Thu, 10 Oct 2024 05:53:49 -0700 (PDT)
+Message-ID: <d31a2049-da55-4ee8-bb73-6304787aa27e@redhat.com>
+Date: Thu, 10 Oct 2024 14:53:48 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,14 +82,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/6] Revert "KVM: Fix vcpu_array[0] races"
+Subject: Re: [PATCH 6/7] KVM: x86: Rename APIC base setters to better capture
+ their relationship
 To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Michal Luczaj <mhal@rbox.co>,
- Alexander Potapenko <glider@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>
-References: <20241009150455.1057573-1-seanjc@google.com>
- <20241009150455.1057573-5-seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241009181742.1128779-1-seanjc@google.com>
+ <20241009181742.1128779-7-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -127,109 +125,69 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20241009150455.1057573-5-seanjc@google.com>
+In-Reply-To: <20241009181742.1128779-7-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/9/24 17:04, Sean Christopherson wrote:
-> Now that KVM loads from vcpu_array if and only if the target index is
-> valid with respect to online_vcpus, i.e. now that it is safe to erase a
-> not-fully-onlined vCPU entry, revert to storing into vcpu_array before
-> success is guaranteed.
+On 10/9/24 20:17, Sean Christopherson wrote:
+> Rename kvm_set_apic_base() and kvm_lapic_set_base() to kvm_apic_set_base()
+> and __kvm_apic_set_base() respectively to capture that the underscores
+> version is a "special" variant (it exists purely to avoid recalculating
+> the optimized map multiple times when stuffing the RESET value).
 > 
-> If xa_store() fails, which _should_ be impossible, then putting the vCPU's
-> reference to 'struct kvm' results in a refcounting bug as the vCPU fd has
-> been installed and owns the vCPU's reference.
+> No functional change intended.
 > 
-> This was found by inspection, but forcing the xa_store() to fail
-> confirms the problem:
-> 
->   | Unable to handle kernel paging request at virtual address ffff800080ecd960
->   | Call trace:
->   |  _raw_spin_lock_irq+0x2c/0x70
->   |  kvm_irqfd_release+0x24/0xa0
->   |  kvm_vm_release+0x1c/0x38
->   |  __fput+0x88/0x2ec
->   |  ____fput+0x10/0x1c
->   |  task_work_run+0xb0/0xd4
->   |  do_exit+0x210/0x854
->   |  do_group_exit+0x70/0x98
->   |  get_signal+0x6b0/0x73c
->   |  do_signal+0xa4/0x11e8
->   |  do_notify_resume+0x60/0x12c
->   |  el0_svc+0x64/0x68
->   |  el0t_64_sync_handler+0x84/0xfc
->   |  el0t_64_sync+0x190/0x194
->   | Code: b9000909 d503201f 2a1f03e1 52800028 (88e17c08)
-> 
-> Practically speaking, this is a non-issue as xa_store() can't fail, absent
-> a nasty kernel bug.  But the code is visually jarring and technically
-> broken.
-> 
-> This reverts commit afb2acb2e3a32e4d56f7fbd819769b98ed1b7520.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Michal Luczaj <mhal@rbox.co>
-> Cc: Alexander Potapenko <glider@google.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Reported-by: Will Deacon <will@kernel.org>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   virt/kvm/kvm_main.c | 14 +++++---------
->   1 file changed, 5 insertions(+), 9 deletions(-)
+>   arch/x86/kvm/lapic.c | 8 ++++----
+>   arch/x86/kvm/lapic.h | 3 +--
+>   arch/x86/kvm/x86.c   | 4 ++--
+>   3 files changed, 7 insertions(+), 8 deletions(-)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index fca9f74e9544..f081839521ef 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4283,7 +4283,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 6239cfd89aad..0a73d9a09fe0 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2577,7 +2577,7 @@ u64 kvm_lapic_get_cr8(struct kvm_vcpu *vcpu)
+>   	return (tpr & 0xf0) >> 4;
+>   }
+>   
+> -void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+> +static void __kvm_apic_set_base(struct kvm_vcpu *vcpu, u64 value)
+>   {
+>   	u64 old_value = vcpu->arch.apic_base;
+>   	struct kvm_lapic *apic = vcpu->arch.apic;
+> @@ -2628,7 +2628,7 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+>   	}
+>   }
+>   
+> -int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> +int kvm_apic_set_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   {
+>   	enum lapic_mode old_mode = kvm_get_apic_mode(vcpu);
+>   	enum lapic_mode new_mode = kvm_apic_mode(msr_info->data);
+> @@ -2644,7 +2644,7 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			return 1;
 >   	}
 >   
->   	vcpu->vcpu_idx = atomic_read(&kvm->online_vcpus);
-> -	r = xa_reserve(&kvm->vcpu_array, vcpu->vcpu_idx, GFP_KERNEL_ACCOUNT);
-> +	r = xa_insert(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, GFP_KERNEL_ACCOUNT);
-> +	BUG_ON(r == -EBUSY);
->   	if (r)
->   		goto unlock_vcpu_destroy;
->   
-> @@ -4298,12 +4299,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
->   	kvm_get_kvm(kvm);
->   	r = create_vcpu_fd(vcpu);
->   	if (r < 0)
-> -		goto kvm_put_xa_release;
-> -
-> -	if (KVM_BUG_ON(xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
-> -		r = -EINVAL;
-> -		goto kvm_put_xa_release;
-> -	}
-> +		goto kvm_put_xa_erase;
+> -	kvm_lapic_set_base(vcpu, msr_info->data);
+> +	__kvm_apic_set_base(vcpu, msr_info->data);
+>   	kvm_recalculate_apic_map(vcpu->kvm);
+>   	return 0;
+>   }
+> @@ -2752,7 +2752,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   		msr_val = APIC_DEFAULT_PHYS_BASE | MSR_IA32_APICBASE_ENABLE;
+>   		if (kvm_vcpu_is_reset_bsp(vcpu))
+>   			msr_val |= MSR_IA32_APICBASE_BSP;
+> -		kvm_lapic_set_base(vcpu, msr_val);
+> +		__kvm_apic_set_base(vcpu, msr_val);
 
-I also find it a bit jarring though that we have to undo the insertion. 
-This is a chicken-and-egg situation where you are pick one operation B 
-that will have to undo operation A if it fails.  But what xa_store is 
-doing, is breaking this deadlock.
+Might be worth a comment here, otherwise
 
-The code is a bit longer, sure, but I don't see the point in 
-complicating the vcpu_array invariants and letting an entry disappear.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-The rest of the series is still good, of course.
+for the entire series.
 
 Paolo
-
->   	/*
->   	 * Pairs with smp_rmb() in kvm_get_vcpu.  Store the vcpu
-> @@ -4318,10 +4314,10 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
->   	kvm_create_vcpu_debugfs(vcpu);
->   	return r;
->   
-> -kvm_put_xa_release:
-> +kvm_put_xa_erase:
->   	mutex_unlock(&vcpu->mutex);
->   	kvm_put_kvm_no_destroy(kvm);
-> -	xa_release(&kvm->vcpu_array, vcpu->vcpu_idx);
-> +	xa_erase(&kvm->vcpu_array, vcpu->vcpu_idx);
->   unlock_vcpu_destroy:
->   	mutex_unlock(&kvm->lock);
->   	kvm_dirty_ring_free(&vcpu->dirty_ring);
 
 
