@@ -1,149 +1,182 @@
-Return-Path: <kvm+bounces-28458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28459-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE0A6998CCA
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:07:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62BBA998CF6
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 18:15:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0E471C24DF5
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:07:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82F8F1C22A75
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA24C1CDFD7;
-	Thu, 10 Oct 2024 16:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0946B1CDA3C;
+	Thu, 10 Oct 2024 16:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGxTUdEH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZkXWWeIG"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C44B1CCB2D
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 16:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391CF1CDA23
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 16:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728576415; cv=none; b=NBjttMxd+KjulYxvI2Vv/zL+RBKOa1YN8znmCUwKyMjKG8BqeZ1MycQLl7v/lQDS4YuutT6mUVyAdAxAn9BlZ3xP1FnzqPBEQ9bPDW8M7500mJRFSg5W8idBbFd4biDhNfvsVHKKp8N807Jb/gY/ziDgNHAXfA1y2exYLu0U7a0=
+	t=1728576887; cv=none; b=Zf8zo/i1r/x7vDS+FEO1KIdmxpFSMPkU+Wd1pDyLV3a0SlmUjYaZ6ICZHiS5Csj5vD2QIVRkkaeFOBOPqxXkfPXezqwsAX6elNL1xUWI5CRbNbkCfad7j/Xc/7ffQt5SvlDT/rA9vEsz71kJWg7AzxdhadpK5LxjdazFCE7ak80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728576415; c=relaxed/simple;
-	bh=iiFqIaeGWzn5Xw4KqI1wHYf2EWVoHUdUhd1tZQSD++s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dpYhVj2VcrJWJpC4SQPW7q0eU1a8cI8FkAWoL2sjH3/M35/RkBAybTpsyZI/YF9AdIN68prmaqwlU3yHBariP5SpDjVOslGbKYY9wut5hZODeHN0sUbEcb9Wwdtrrd/4PtDY/18oqwieSAtm/hMZTqCh6F5Y6Qh9z5aMErdLW80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QGxTUdEH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728576413;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S/HNyejBOzZNAS2pmhlTCa73HqHtmX71UiVQvzZUuQU=;
-	b=QGxTUdEHfw9YI7qTW6dVvwz5Bz/HVK36p0i7c9QcpFAh6PjuJEnznjLzl/q616+DxlUA2y
-	BqCAMWExhUGpGjnOKiYex2E2JVxDvUCf6ApKaakQihXMVzrgGmvDWLifPzzY3ks/gduVWK
-	jbeiWW3W4aJOEANxLQNusFF5G7UwGR8=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-URZPmGdLMVSj71fLNmKUaw-1; Thu, 10 Oct 2024 12:06:51 -0400
-X-MC-Unique: URZPmGdLMVSj71fLNmKUaw-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-71dfd9fc0e5so971050b3a.2
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 09:06:50 -0700 (PDT)
+	s=arc-20240116; t=1728576887; c=relaxed/simple;
+	bh=SFwqU91UqXubaMd920BJMXFwfe/8S888ClNoO2Vjj2Y=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=PQHi5p9nxesMTH5R47KJHn6muCH9r5UINRgtoGFsqA/NvMKOyKBITFiRuWucbgKVmqO61t+HNqms/ZGRaJqJ+BpJxJtBLixUnuBc0KRZx9IaEv4HCpNXKg9OJ8G9/GRyYtpl4qWA/r/zkz2UFtWXQA4creExE65mvUSsUhochS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZkXWWeIG; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e28d223794so20814117b3.0
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 09:14:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728576883; x=1729181683; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GWAVPe7k8rd+2+QlAStjk+Ev1iLgZ7m4p8ZW490ckFE=;
+        b=ZkXWWeIGsk2qEjLM8PROr20h38SMMiEjhA8qUAFs21PULrURPmeGie/qrH533w3Hwv
+         ZI2gHRFddj6LJB9+5g5LVApRIjL5JFMZEqtOzby7ptRUfBndLUsAXu4JH0B66iof7Cqi
+         RrgwlzeCglJVWCUUSBZxVwGza6wVipxggL+MAxKuquOU5EdwMPjBdyMB1JK+0USws+Ke
+         t0SQ1CjTaWAD0aRgW32DvxmKhkU+o4BOubAwhSih8GcNASWrMn7KJCR5IIUw6dTEfr+z
+         RGcZnfal5zHIkhMKzsYvNgBxrPTBXFYhLrvYn8OuVc1xCiXWIXEkXZO7mOs5eZ0wi3VY
+         BUVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728576410; x=1729181210;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S/HNyejBOzZNAS2pmhlTCa73HqHtmX71UiVQvzZUuQU=;
-        b=l4ggbohqFngS6AAD7OBOXniQgS9+9pmJejEfaWX9CzuqDOkI49ji2WF8dMt7AOqxzt
-         P5zP44HVtnUYuIHJa9pXAV3R1kYt60RVm9ITf7G3xDjh8ghxVyZc36KPiL8RBZeVbCYV
-         E2Rzy2XHPpRXy6ppMVJjnm8MBifgq5dMMfoiaBeiGGlfP5CecRGkMNwtMawILi15sThK
-         oNkUhvExR1KGAmrCFOOetJSkLq8rUcU29yJ3V7axI7HPfn9lPmwha+jm1likuU8h0Gy4
-         BdCy6Wc6xnz+pvRrITf+4a+tFLc8vI9WqRqS0oyTcwlD1DU0C/GaGnVNkBqsct/catNI
-         98jA==
-X-Forwarded-Encrypted: i=1; AJvYcCWd9MbwyHkeYNxLOgOKEv1kGyc/54lJoZeWpJgvm4AkcYae/a94vLVNKX0RtKiFisuPbJU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzT//ArKh8w9VjIGgWvCHAUerghKix6W5bCYgKBRFl8u8TxOdq9
-	HbWRRBANstcEwzERTr0Pe5S3H3rO+LkZN85iNveZOPzHi1+2s12RQKpmCQR81tclS+/176/+MTX
-	uDRDxDSEWziS/iVOud/1JPcvyg5yJyCCUSU9LZwTCaY67VGLfsw==
-X-Received: by 2002:a05:6a00:179b:b0:719:7475:f07e with SMTP id d2e1a72fcca58-71e1db6481fmr11819859b3a.4.1728576410006;
-        Thu, 10 Oct 2024 09:06:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG+7f1RLhbjySKF/4qyAXiKo7lGpEQ+qrTVlBlzhq+59C96dfh+Iq8tKg2tVLc+cHIQsd5gOg==
-X-Received: by 2002:a05:6a00:179b:b0:719:7475:f07e with SMTP id d2e1a72fcca58-71e1db6481fmr11819813b3a.4.1728576409638;
-        Thu, 10 Oct 2024 09:06:49 -0700 (PDT)
-Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e2a9ea46csm1229368b3a.17.2024.10.10.09.06.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 09:06:48 -0700 (PDT)
-Date: Thu, 10 Oct 2024 12:06:43 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk,
-	jgg@nvidia.com, david@redhat.com, rientjes@google.com,
-	fvdl@google.com, jthoughton@google.com, seanjc@google.com,
-	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com,
-	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev,
-	mike.kravetz@oracle.com, erdemaktas@google.com,
-	vannapurve@google.com, qperret@google.com, jhubbard@nvidia.com,
-	willy@infradead.org, shuah@kernel.org, brauner@kernel.org,
-	bfoster@redhat.com, kent.overstreet@linux.dev, pvorel@suse.cz,
-	rppt@kernel.org, richard.weiyang@gmail.com, anup@brainfault.org,
-	haibo1.xu@intel.com, ajones@ventanamicro.com, vkuznets@redhat.com,
-	maciej.wieczor-retman@intel.com, pgonda@google.com,
-	oliver.upton@linux.dev, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-fsdevel@kvack.org
-Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
- struct kvm_gmem_private
-Message-ID: <Zwf7k1wmPqEEaRxz@x1n>
-References: <cover.1726009989.git.ackerleytng@google.com>
- <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
+        d=1e100.net; s=20230601; t=1728576883; x=1729181683;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GWAVPe7k8rd+2+QlAStjk+Ev1iLgZ7m4p8ZW490ckFE=;
+        b=ElD2nQSAbOwSQlNhlitOvwJcEmPpamfAHQaYjyQAsup4MapnIavuCoAH1eM4850nnN
+         4r6KL+ZEQBu9RyND3KdezurdLMnPA0TYd/V2mfy8CZ9H8PmDpx2jJQalXCN+NGprLTWj
+         32QoKVlnplesiSKzjhd+RFo09zvW+KvNO8dIOAH9cx2sd7nLOAOZvDdre3TuT98qk+8E
+         heAI7+H906w6eQXiEHADaUgDqT7BmMbl6skF217cl1u97vkkgVrlYHJAQdiuP0rPqgrb
+         RDCAeqE9VBLFKcKQi57XblxGF3DZqu/6/nGcRJaa70UgVW/zpfn++qgF+wmOQjR4VFuf
+         MQyw==
+X-Forwarded-Encrypted: i=1; AJvYcCULEZ3+0uInFKm+2Za43uYN4AqSLimRlLTYg4VHHHCPJSvDFiYGmYd5Ha6fFosDMUIl8lQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3Dx6hj6lLKSvzaG8KxI/Le8YNUyfU29e+5EPABdkkae4NOy0p
+	hPXGZj0LQ3w571+EpCfjAcm+dIDxTR4VVJgRnGBaiL9DkpI7labGGuCSasvEZKiPniRRwRA2O+O
+	blQ==
+X-Google-Smtp-Source: AGHT+IHNyx9a0JKUz7Ida+yhhL4jvx1d2ijTI5cJYmB9Djr54GGWfUWTsTyzKt1LAgDAlrhUHm/H8tfL4Lo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:20a3:b0:6e3:b08:92c7 with SMTP id
+ 00721157ae682-6e321fb7d24mr222557b3.0.1728576883263; Thu, 10 Oct 2024
+ 09:14:43 -0700 (PDT)
+Date: Thu, 10 Oct 2024 09:14:41 -0700
+In-Reply-To: <Zwd75Nc8+8pIWUGm@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
+Mime-Version: 1.0
+References: <20241009192345.1148353-1-seanjc@google.com> <20241009192345.1148353-3-seanjc@google.com>
+ <Zwd75Nc8+8pIWUGm@yzhao56-desk.sh.intel.com>
+Message-ID: <Zwf9cSjhlp5clpTm@google.com>
+Subject: Re: [PATCH 2/3] KVM: x86/mmu: Add lockdep assert to enforce safe
+ usage of kvm_unmap_gfn_range()
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Sep 10, 2024 at 11:43:57PM +0000, Ackerley Tng wrote:
-> The faultability xarray is stored on the inode since faultability is a
-> property of the guest_memfd's memory contents.
+On Thu, Oct 10, 2024, Yan Zhao wrote:
+> On Wed, Oct 09, 2024 at 12:23:44PM -0700, Sean Christopherson wrote:
+> > Add a lockdep assertion in kvm_unmap_gfn_range() to ensure that either
+> > mmu_invalidate_in_progress is elevated, or that the range is being zapped
+> > due to memslot removal (loosely detected by slots_lock being held).
+> > Zapping SPTEs without mmu_invalidate_{in_progress,seq} protection is unsafe
+> > as KVM's page fault path snapshots state before acquiring mmu_lock, and
+> > thus can create SPTEs with stale information if vCPUs aren't forced to
+> > retry faults (due to seeing an in-progress or past MMU invalidation).
+> > 
+> > Memslot removal is a special case, as the memslot is retrieved outside of
+> > mmu_invalidate_seq, i.e. doesn't use the "standard" protections, and
+> > instead relies on SRCU synchronization to ensure any in-flight page faults
+> > are fully resolved before zapping SPTEs.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 09494d01c38e..c6716fd3666f 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -1556,6 +1556,16 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+> >  {
+> >  	bool flush = false;
+> >  
+> > +	/*
+> > +	 * To prevent races with vCPUs faulting in a gfn using stale data,
+> > +	 * zapping a gfn range must be protected by mmu_invalidate_in_progress
+> > +	 * (and mmu_invalidate_seq).  The only exception is memslot deletion,
+> > +	 * in which case SRCU synchronization ensures SPTEs a zapped after all
+> > +	 * vCPUs have unlocked SRCU and are guaranteed to see the invalid slot.
+> > +	 */
+> > +	lockdep_assert_once(kvm->mmu_invalidate_in_progress ||
+> > +			    lockdep_is_held(&kvm->slots_lock));
+> > +
+> Is the detection of slots_lock too loose?
+
+Yes, but I can't think of an easy way to tighten it.  My original thought was to
+require range->slot to be invalid, but KVM (correctly) passes in the old, valid
+memslot to kvm_arch_flush_shadow_memslot().
+
+The goal with the assert is to detect as many bugs as possible, without adding
+too much complexity, and also to document the rules for using kvm_unmap_gfn_range().
+
+Actually, we can tighten the check, by verifying that the slot being unmapped is
+valid, but that the slot that KVM sees is invalid.  I'm not sure I love it though,
+as it's absurdly specific.
+
+(untested)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c6716fd3666f..12b87b746b59 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1552,6 +1552,17 @@ static bool __kvm_rmap_zap_gfn_range(struct kvm *kvm,
+                                 start, end - 1, can_yield, true, flush);
+ }
+ 
++static kvm_memslot_is_being_invalidated(const struct kvm_memory_slot *old)
++{
++       const struct kvm_memory_slot *new;
++
++       if (old->flags & KVM_MEMSLOT_INVALID)
++               return false;
++
++       new = id_to_memslot(__kvm_memslots(kvm, old->as_id), old->id);
++       return new && new->flags & KVM_MEMSLOT_INVALID;
++}
++
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+        bool flush = false;
+@@ -1564,7 +1575,8 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+         * vCPUs have unlocked SRCU and are guaranteed to see the invalid slot.
+         */
+        lockdep_assert_once(kvm->mmu_invalidate_in_progress ||
+-                           lockdep_is_held(&kvm->slots_lock));
++                           (lockdep_is_held(&kvm->slots_lock) &&
++                            kvm_memslot_is_being_invalidated(range->slot));
+ 
+        if (kvm_memslots_have_rmaps(kvm))
+                flush = __kvm_rmap_zap_gfn_range(kvm, range->slot,
+
+
+> If a caller just holds slots_lock without calling
+> "synchronize_srcu_expedited(&kvm->srcu)" as that in kvm_swap_active_memslots()
+> to ensure the old slot is retired, stale data may still be encountered. 
 > 
-> In this RFC, presence of an entry in the xarray indicates faultable,
-> but this could be flipped so that presence indicates unfaultable. For
-> flexibility, a special value "FAULT" is used instead of a simple
-> boolean.
-> 
-> However, at some stages of a VM's lifecycle there could be more
-> private pages, and at other stages there could be more shared pages.
-> 
-> This is likely to be replaced by a better data structure in a future
-> revision to better support ranges.
-> 
-> Also store struct kvm_gmem_hugetlb in struct kvm_gmem_hugetlb as a
-> pointer. inode->i_mapping->i_private_data.
-
-Could you help explain the difference between faultability v.s. the
-existing KVM_MEMORY_ATTRIBUTE_PRIVATE?  Not sure if I'm the only one who's
-confused, otherwise might be good to enrich the commit message.
-
-The latter is per-slot, so one level higher, however I don't think it's a
-common use case for mapping the same gmemfd in multiple slots anyway for
-KVM (besides corner cases like live upgrade).  So perhaps this is not about
-layering but something else?  For example, any use case where PRIVATE and
-FAULTABLE can be reported with different values.
-
-Another higher level question is, is there any plan to support non-CoCo
-context for 1G?
-
-I saw that you also mentioned you have working QEMU prototypes ready in
-another email.  It'll be great if you can push your kernel/QEMU's latest
-tree (including all dependency patches) somewhere so anyone can have a
-closer look, or play with it.
-
-Thanks,
-
--- 
-Peter Xu
-
+> >  	if (kvm_memslots_have_rmaps(kvm))
+> >  		flush = __kvm_rmap_zap_gfn_range(kvm, range->slot,
+> >  						 range->start, range->end,
+> > -- 
+> > 2.47.0.rc1.288.g06298d1525-goog
+> > 
 
