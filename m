@@ -1,172 +1,134 @@
-Return-Path: <kvm+bounces-28428-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28429-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C629987FA
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 15:41:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89C97998ACA
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 17:02:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2629287C36
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 13:41:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7468EB31A4A
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA941CBEA2;
-	Thu, 10 Oct 2024 13:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCF41E104F;
+	Thu, 10 Oct 2024 14:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UVeBCXtc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="By2hAQo8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B8C1C9EB9
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 13:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F7A1A2643
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 14:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728567584; cv=none; b=E+H7VrQzqW+1Yk6Fu9ybvahpa+IBjEWJc9NvHorxFpkCe4KVokexBcg+TKG0nBrm5FkrH09J8xGWiUwJFqMf6kZM+YAScKu6dTrnXDWD1caVqMElnIziLFZp1jCU0D/hRF+sZc5WcbyNHtrYAZZFWzeCO5LdfnRXUSCiqGcDuHY=
+	t=1728570029; cv=none; b=seicWw7JCDSkzM10e69fKXBgw6aOk1bJnV9nhZY1mF3w8Xye3tK/yfa+25cyP/oYmZotOzqzT24cqYRUVMnVJaSxT7TNRjVqQy/W5eCd6/1z44Ez6Cg8LRDBdlsirnOVS6cuqig2KsbjnolecG2YM0dTq1xfvUDRqUlzhSsL1Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728567584; c=relaxed/simple;
-	bh=1K2miwdSCZxhZqUeiEsjSLBEnXQvcCeoUQ2KVwZKda8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=YX/RxbgKxiH3KCRb49b4BQCGMXhLmw5VxuCBBySRnUvylVpEY2WgApiy3VJWW3BYEcBGglgknNNLS72NuxCP4NMZklZp2rUVLFlcgKH3j1pUEkZ43jp4j+Q+cuiyrB/gEhURB9fhvddJmgGggVnP3bBfuKGX3VhkigS666YgFDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UVeBCXtc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728567582;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
-	bh=TcxBwzPjcvTkcZ6eCKYjUkHAeURHHamoe3byoX+zWu8=;
-	b=UVeBCXtclOJYni/49MetY3+1ZNXrEjzNtQHJuJD8kTCZAELOIHRKMGmypDr7hq1NsIAmt6
-	Iso60x7WZB/A9SiGuK6Ibrd9r7oJMwaoHXTKydluAPFLMXlX7N5jPLTBDIgyJ6L7eeHJFC
-	VYYjHGqD5NF1OrZJ7dTHope02jkH8Jo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-568-WCNAQXi2PNCXL1_NU_LIfg-1; Thu, 10 Oct 2024 09:39:40 -0400
-X-MC-Unique: WCNAQXi2PNCXL1_NU_LIfg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d47fdbbd6so432166f8f.3
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 06:39:40 -0700 (PDT)
+	s=arc-20240116; t=1728570029; c=relaxed/simple;
+	bh=0m9SqYCySAqopdZchO2z9y9ImtwfVto6iw57ZOvn7+g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LjTwHIJYHujiDrn1yoPtuGUy7jMQqcjeE17AjCgDwA6cUZzZh9WWsOA4UWDo5K4GHCrMwnFHbeLALvwrk87N0FAq7Mlkqcdo2U7RVYYW231982EKhAvEAT0A4U/YC9jBFbtTJJZUVG4O/uZPjHSbp/qYZztSvORRC7HFD7kypis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=By2hAQo8; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42f6995dab8so262675e9.0
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 07:20:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728570026; x=1729174826; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+w8CJ/RDPjfeti6YgAdBDMpo2FJOpLITD1r8p3bqSw8=;
+        b=By2hAQo8v3pmaWMlLD+GAgVmHSHCMlJm6InURjiUWzcNrq+vvfRWKo85mR1NnRwLiV
+         Kn71V1a6oLAn751bJmKXJHsnV8t4PN4x/7q/R3pOXhtuM+AEKp1o8Wz7343O6njQqy1o
+         SRGUjs4Hf3gKir0EWqjOL012thLAIXK3Ke61DgrgzAAz6XsqfGhtgrlmHzAXXYvGuIVZ
+         hl6CgeOnjuIQ2jhI54U4DuiV3S57OBv0FzqXiB6W1v6/lNgqHT04jrsjKWx0YhxfF26u
+         KWYbVrji8L8ykz8HEPa+gaFqBILweskH66gNdotoVgnmgs+y8iUo/G+qqT7tvKtDQie1
+         sRHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728567579; x=1729172379;
-        h=content-transfer-encoding:to:subject:organization:autocrypt:from
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TcxBwzPjcvTkcZ6eCKYjUkHAeURHHamoe3byoX+zWu8=;
-        b=SRfuVdiuCFjp3aKpozlyKO604LzqNJbb4YoJEGNzOjNXumONZUc9oe147307I67KxS
-         pz6AG+vBvJCApVZPiXN6/WelY6tu10zAbcUvARtxGGPwE8VMKjyjZjatY4wO12C7wp7p
-         UyIfH0AV3VdpDyAXmGu7H0myMNcoKWjDjksdyxZFrNu0dvTM5AZXIzouPr7yBWsA8vd8
-         ArM2wvDc5TXqx7lum2Qf4NVRd11lhxSzGejJg69JkynvRgqCNucttOVhRxTombTcyfII
-         yz2dJ8rMha/CnPu8KKx9fUHgQYT3k6c1fLHat0ANimBbwV2XvhU9dbTwRig7TgXhkKEI
-         HIbw==
-X-Forwarded-Encrypted: i=1; AJvYcCWNrQxHtZj9yGJyng0dOvDBpuDffDKIjXS/lD3pKrWUTNCDnk8LgPHREIuASw8fQQ3hHiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtgODY0r73eRzlhYVTJ86rmt9JwVvftPfzjCkTaBS6gF9rHSYN
-	oJKBgAt8BoEqjzs5XTgSwcOcZZNGct/0gOZyaqWXTbpCYAMQPZrJpnezaDSacO6a8+l+6dah5Mv
-	ZWMRFI864xmJ4s9YmQaGH9LiHUQ/oAaVVGylTumXv8+8yp7XE+8BUT0FacgyY
-X-Received: by 2002:a5d:5227:0:b0:37d:4e9d:34d1 with SMTP id ffacd0b85a97d-37d4e9d3611mr1113381f8f.37.1728567579523;
-        Thu, 10 Oct 2024 06:39:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHj79A+ygqGwiQw9Y0V9zhLp/lKWEjA1+6jBdHmLLWy31fzmpNT2dDj3/gV4sKcr8hdaCMI+g==
-X-Received: by 2002:a5d:5227:0:b0:37d:4e9d:34d1 with SMTP id ffacd0b85a97d-37d4e9d3611mr1113365f8f.37.1728567579141;
-        Thu, 10 Oct 2024 06:39:39 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c742:9200:eb2e:74f9:6f5c:3040? (p200300cbc7429200eb2e74f96f5c3040.dip0.t-ipconnect.de. [2003:cb:c742:9200:eb2e:74f9:6f5c:3040])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b7a05b3sm1604902f8f.76.2024.10.10.06.39.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 06:39:38 -0700 (PDT)
-Message-ID: <4b49248b-1cf1-44dc-9b50-ee551e1671ac@redhat.com>
-Date: Thu, 10 Oct 2024 15:39:37 +0200
+        d=1e100.net; s=20230601; t=1728570026; x=1729174826;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+w8CJ/RDPjfeti6YgAdBDMpo2FJOpLITD1r8p3bqSw8=;
+        b=Yq6c56RgCYhWhhuWWafTtPu5qJHTpGME3X6YfLXIXk/7U8X4zbyfLAyexfOL7G3oWh
+         W74r++DoGnQ8Dd2H1vJZkGu2J4vSjJDX6ek/Imtm0vK2O4nNFP6Z3KhAlfYaZUtpsBfG
+         WfbRFQ1mdT8VhWsDXgaDlF6QV9gSe341lR1KFGFye/V3UHyAWn2omGPf5idJFPOZ8XUc
+         APmEgaQizb5toEgcpTcm96zgtFeR6FtcN1Zs7XefkyIxW3+SPMjWGBjIzaitDHtyCtaC
+         U0be6h99nH+bAzMSSnGBsQVtTU74n893lifSe3IhmDtgBuq96bSQA3KD9WvB3AojssAs
+         thdA==
+X-Forwarded-Encrypted: i=1; AJvYcCXzVSLK8nzoSBsdUVCmiTtmsL7yxN7kZE4DKhngq9BtgCdrkd8nyaXp2/bpwYbzDSheZiE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz798RTXdyjUC/uznaxJryoryISLeu3PwFHZZHLXagAVRRocIQo
+	FZH0EPJFfOF74yWYqp++Ut3WJ4xye+j+Wfr9hEF6uQUl0wR+fu0nJwSdzXWM6UlE9oMa85Wh/Dh
+	qNvXh+ufPir9aNs717KVvSM3I/SMOTXyP0T0JeT+0MCzRPUylMw==
+X-Google-Smtp-Source: AGHT+IEq2nGzeSwcLcS92pWHCevoS80XziKTpELRl2C6cml/HyK+2ePkab9udoIZsfn5KZRDKpnyzsqMDxFX9pcb3R0=
+X-Received: by 2002:a05:600c:34d2:b0:42b:8ff7:bee2 with SMTP id
+ 5b1f17b1804b1-43116e3608fmr3673255e9.5.1728570025862; Thu, 10 Oct 2024
+ 07:20:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-Subject: Proposal: bi-weekly guest_memfd upstream call
-To: linux-coco@lists.linux.dev, KVM <kvm@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <4b49248b-1cf1-44dc-9b50-ee551e1671ac@redhat.com>
+In-Reply-To: <4b49248b-1cf1-44dc-9b50-ee551e1671ac@redhat.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Thu, 10 Oct 2024 19:50:12 +0530
+Message-ID: <CAGtprH848Q=RMuOvjvPGPZYhjEmZYAF-Mos2otqKKLv8+TEcMA@mail.gmail.com>
+Subject: Re: Proposal: bi-weekly guest_memfd upstream call
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-coco@lists.linux.dev, KVM <kvm@vger.kernel.org>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ahoihoi,
+On Thu, Oct 10, 2024 at 7:11=E2=80=AFPM David Hildenbrand <david@redhat.com=
+> wrote:
+>
+> Ahoihoi,
+>
+> while talking to a bunch of folks at LPC about guest_memfd, it was
+> raised that there isn't really a place for people to discuss the
+> development of guest_memfd on a regular basis.
+>
+> There is a KVM upstream call, but guest_memfd is on its way of not being
+> guest_memfd specific ("library") and there is the bi-weekly MM alignment
+> call, but we're not going to hijack that meeting completely + a lot of
+> guest_memfd stuff doesn't need all the MM experts ;)
+>
+> So my proposal would be to have a bi-weekly meeting, to discuss ongoing
+> development of guest_memfd, in particular:
+>
+> (1) Organize development: (do we need 3 different implementation
+>      of mmap() support ? ;) )
+> (2) Discuss current progress and challenges
+> (3) Cover future ideas and directions
+> (4) Whatever else makes sense
+>
+> Topic-wise it's relatively clear: guest_memfd extensions were one of the
+> hot topics at LPC ;)
+>
+> I would suggest every second Thursdays from 9:00 - 10:00am PDT (GMT-7),
+> starting Thursday next week (2024-10-17).
 
-while talking to a bunch of folks at LPC about guest_memfd, it was 
-raised that there isn't really a place for people to discuss the 
-development of guest_memfd on a regular basis.
+Thanks for starting this discussion! A dedicated forum for covering
+guest memfd specific topics sounds great. Suggested time slot works
+for me.
 
-There is a KVM upstream call, but guest_memfd is on its way of not being 
-guest_memfd specific ("library") and there is the bi-weekly MM alignment 
-call, but we're not going to hijack that meeting completely + a lot of 
-guest_memfd stuff doesn't need all the MM experts ;)
+Regards,
+Vishal
 
-So my proposal would be to have a bi-weekly meeting, to discuss ongoing 
-development of guest_memfd, in particular:
-
-(1) Organize development: (do we need 3 different implementation
-     of mmap() support ? ;) )
-(2) Discuss current progress and challenges
-(3) Cover future ideas and directions
-(4) Whatever else makes sense
-
-Topic-wise it's relatively clear: guest_memfd extensions were one of the 
-hot topics at LPC ;)
-
-I would suggest every second Thursdays from 9:00 - 10:00am PDT (GMT-7), 
-starting Thursday next week (2024-10-17).
-
-We would be using Google Meet.
-
-
-Thoughts?
-
--- 
-Cheers,
-
-David / dhildenb
-
+>
+> We would be using Google Meet.
+>
+>
+> Thoughts?
+>
+> --
+> Cheers,
+>
+> David / dhildenb
+>
+>
 
