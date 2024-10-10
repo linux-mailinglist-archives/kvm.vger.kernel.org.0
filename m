@@ -1,134 +1,156 @@
-Return-Path: <kvm+bounces-28429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89C97998ACA
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 17:02:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32FDE9989B6
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 16:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7468EB31A4A
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:26:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54CE81C24E58
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2024 14:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCF41E104F;
-	Thu, 10 Oct 2024 14:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B9B1CC15B;
+	Thu, 10 Oct 2024 14:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="By2hAQo8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nV9VWsnY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F7A1A2643
-	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 14:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEF61CB316
+	for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 14:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728570029; cv=none; b=seicWw7JCDSkzM10e69fKXBgw6aOk1bJnV9nhZY1mF3w8Xye3tK/yfa+25cyP/oYmZotOzqzT24cqYRUVMnVJaSxT7TNRjVqQy/W5eCd6/1z44Ez6Cg8LRDBdlsirnOVS6cuqig2KsbjnolecG2YM0dTq1xfvUDRqUlzhSsL1Bw=
+	t=1728570488; cv=none; b=A0SAhY/TOEvBJyUq4js5OzGnVeALaLJ/C8/ygd676iOZOyAAfSXwhNM+pKbdDRKzdXJoAPrg7Comvtw+hUFqnSmb6dg3jRRSPxr5dTFXzLYf9CnM0ZiCV5f0njc5RUOALEUd/cwXE2Chc/PzBxoiEyu8IRKQyKX1h+bgbxkN6Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728570029; c=relaxed/simple;
-	bh=0m9SqYCySAqopdZchO2z9y9ImtwfVto6iw57ZOvn7+g=;
+	s=arc-20240116; t=1728570488; c=relaxed/simple;
+	bh=W7D5zgoOX71fsrxt/wRDcTx+76rxKX+swJ0Nf9w1b3w=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LjTwHIJYHujiDrn1yoPtuGUy7jMQqcjeE17AjCgDwA6cUZzZh9WWsOA4UWDo5K4GHCrMwnFHbeLALvwrk87N0FAq7Mlkqcdo2U7RVYYW231982EKhAvEAT0A4U/YC9jBFbtTJJZUVG4O/uZPjHSbp/qYZztSvORRC7HFD7kypis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=By2hAQo8; arc=none smtp.client-ip=209.85.128.49
+	 To:Cc:Content-Type; b=KUbA4K4M4XHo8QRgZH8oFcsIRZjxdyZ8jSVKnETDbE/MUghEd9NmwapCoxFAsPUlZvKSN18YHUCt0qXQ+H5sV62j3vwwntGhhAmeK9QyRa+AwlVkBP/3brMRCEyN5Ds0QwDO75LWYhzOIJ4P3FcTqa6flWWqfrOEDpWzUpewoFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nV9VWsnY; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42f6995dab8so262675e9.0
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 07:20:27 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-431141cb4efso276865e9.0
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 07:28:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728570026; x=1729174826; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+w8CJ/RDPjfeti6YgAdBDMpo2FJOpLITD1r8p3bqSw8=;
-        b=By2hAQo8v3pmaWMlLD+GAgVmHSHCMlJm6InURjiUWzcNrq+vvfRWKo85mR1NnRwLiV
-         Kn71V1a6oLAn751bJmKXJHsnV8t4PN4x/7q/R3pOXhtuM+AEKp1o8Wz7343O6njQqy1o
-         SRGUjs4Hf3gKir0EWqjOL012thLAIXK3Ke61DgrgzAAz6XsqfGhtgrlmHzAXXYvGuIVZ
-         hl6CgeOnjuIQ2jhI54U4DuiV3S57OBv0FzqXiB6W1v6/lNgqHT04jrsjKWx0YhxfF26u
-         KWYbVrji8L8ykz8HEPa+gaFqBILweskH66gNdotoVgnmgs+y8iUo/G+qqT7tvKtDQie1
-         sRHw==
+        d=google.com; s=20230601; t=1728570485; x=1729175285; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=wBCsx6f+siqvoCuj4B+Pvu9ADkJZ7wKgsSIJdEcIngE=;
+        b=nV9VWsnYluSqxCwhvDG6HYCCMRpUlzcFziIXZDaKd/t0TPgJ3j0sl07oUm5RR59Rvq
+         ezcSk6aO5/wq6BLG38AZrloA9MCkpKWj1zizg2OayBo6u552sPxXfg4RGSY3lVhP465J
+         qYY5FslQDILBcqZws0YD0pc0NfE93ZfK8rD/6E2drbxK4iRuklZcW08kjg3ouALtOzBP
+         fEBisRJ5pY6HUPXGyFQmqdA3bRujFXcSkZYwf7oHwMo+JxoQh0c/ox7h/wt4oXb5DoUL
+         x/L7oIq3fUgCer5tQla1ryE5XzwyLzYKMhcvxMAcwFdEmVteUFaOyELUbztSq7EXqLUx
+         NfSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728570026; x=1729174826;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+w8CJ/RDPjfeti6YgAdBDMpo2FJOpLITD1r8p3bqSw8=;
-        b=Yq6c56RgCYhWhhuWWafTtPu5qJHTpGME3X6YfLXIXk/7U8X4zbyfLAyexfOL7G3oWh
-         W74r++DoGnQ8Dd2H1vJZkGu2J4vSjJDX6ek/Imtm0vK2O4nNFP6Z3KhAlfYaZUtpsBfG
-         WfbRFQ1mdT8VhWsDXgaDlF6QV9gSe341lR1KFGFye/V3UHyAWn2omGPf5idJFPOZ8XUc
-         APmEgaQizb5toEgcpTcm96zgtFeR6FtcN1Zs7XefkyIxW3+SPMjWGBjIzaitDHtyCtaC
-         U0be6h99nH+bAzMSSnGBsQVtTU74n893lifSe3IhmDtgBuq96bSQA3KD9WvB3AojssAs
-         thdA==
-X-Forwarded-Encrypted: i=1; AJvYcCXzVSLK8nzoSBsdUVCmiTtmsL7yxN7kZE4DKhngq9BtgCdrkd8nyaXp2/bpwYbzDSheZiE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz798RTXdyjUC/uznaxJryoryISLeu3PwFHZZHLXagAVRRocIQo
-	FZH0EPJFfOF74yWYqp++Ut3WJ4xye+j+Wfr9hEF6uQUl0wR+fu0nJwSdzXWM6UlE9oMa85Wh/Dh
-	qNvXh+ufPir9aNs717KVvSM3I/SMOTXyP0T0JeT+0MCzRPUylMw==
-X-Google-Smtp-Source: AGHT+IEq2nGzeSwcLcS92pWHCevoS80XziKTpELRl2C6cml/HyK+2ePkab9udoIZsfn5KZRDKpnyzsqMDxFX9pcb3R0=
-X-Received: by 2002:a05:600c:34d2:b0:42b:8ff7:bee2 with SMTP id
- 5b1f17b1804b1-43116e3608fmr3673255e9.5.1728570025862; Thu, 10 Oct 2024
- 07:20:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728570485; x=1729175285;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wBCsx6f+siqvoCuj4B+Pvu9ADkJZ7wKgsSIJdEcIngE=;
+        b=SQENq5imD70F/KOzNTzN3dwKaWxZvmAL1nV8xL2tlb71gwLXRMnVEHwowVGYarG/py
+         XkkW7REmnboQkA4+WNzB4K+zzcYEZIwsBFZ3DrQ0GtW0SlcwLQdUs10zfl6P5rl+n2Wm
+         7JhIv74LHyZcU12FNbQSrgwaox5qZAJOsbv6lrekBWyEYz/DH2l5G/lCzAiNAHalmRrc
+         qTRnsOLZBIvBWbbKh7Vg+wa1xAz/fGIHcL9YYT35Ce/p87nGAKI4opCqpPAPb9cbijmo
+         Wf+FEa3j4A35XFXPGITDxKUkvaAbSze36Pzsiqgpyz1Okk+Jv1rg7d85B+EN7Ma1ulFV
+         zn/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXus0AL7N8e2Q6qOpsXTTbtAjVbhoxdaroPdBTnjfi4Z8dy0xtqmzgmuu5yHejbu5r8CWA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqforANJCIC28XRv6RJW1N1rQqtV1+6HBByc6UQ/zuHx2Ns6n2
+	WmOI0qWtMM06tftFgdb8iQ4RUTT5BeWZFJQEpZrTjmhIKs/2oohHkxhwE41vHgUVrzWHtBSD09G
+	bjMJlnLAoGlrWbocMKkydavAQ3CyMYF9fbxmp
+X-Google-Smtp-Source: AGHT+IHMywAqitIx8zT+z6idTauONY/Ezsn94DX4sJ68/dq+KHet2i3FDOkO8nINBGJtBEPSJkUH5cPl2DbLSWlCL7g=
+X-Received: by 2002:a05:600c:3482:b0:426:66a0:6df6 with SMTP id
+ 5b1f17b1804b1-431160a6792mr4845475e9.0.1728570484599; Thu, 10 Oct 2024
+ 07:28:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4b49248b-1cf1-44dc-9b50-ee551e1671ac@redhat.com>
-In-Reply-To: <4b49248b-1cf1-44dc-9b50-ee551e1671ac@redhat.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Thu, 10 Oct 2024 19:50:12 +0530
-Message-ID: <CAGtprH848Q=RMuOvjvPGPZYhjEmZYAF-Mos2otqKKLv8+TEcMA@mail.gmail.com>
-Subject: Re: Proposal: bi-weekly guest_memfd upstream call
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-coco@lists.linux.dev, KVM <kvm@vger.kernel.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>
+References: <20241010085930.1546800-1-tabba@google.com> <20241010085930.1546800-5-tabba@google.com>
+ <i44qkun5ddu3vwli7dxh27je72ywlrb7m5ercjhvprhleapv6x@52dwi3kwp2zx>
+ <CA+EHjTwOsbNRN=6ZQ4rAJLhpVNifrtmLLs84q4_kOixghaSHBg@mail.gmail.com> <20241010120356.GB3394334@nvidia.com>
+In-Reply-To: <20241010120356.GB3394334@nvidia.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 10 Oct 2024 15:27:27 +0100
+Message-ID: <CA+EHjTwVFeegPS5yTUJeVC120Bqxz3JQ0W0o2qUBAW+JuJC2Kg@mail.gmail.com>
+Subject: Re: [PATCH v3 04/11] KVM: guest_memfd: Allow host to mmap
+ guest_memfd() pages when shared
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: "Kirill A. Shutemov" <kirill@shutemov.name>, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, rientjes@google.com, 
+	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 10, 2024 at 7:11=E2=80=AFPM David Hildenbrand <david@redhat.com=
-> wrote:
->
-> Ahoihoi,
->
-> while talking to a bunch of folks at LPC about guest_memfd, it was
-> raised that there isn't really a place for people to discuss the
-> development of guest_memfd on a regular basis.
->
-> There is a KVM upstream call, but guest_memfd is on its way of not being
-> guest_memfd specific ("library") and there is the bi-weekly MM alignment
-> call, but we're not going to hijack that meeting completely + a lot of
-> guest_memfd stuff doesn't need all the MM experts ;)
->
-> So my proposal would be to have a bi-weekly meeting, to discuss ongoing
-> development of guest_memfd, in particular:
->
-> (1) Organize development: (do we need 3 different implementation
->      of mmap() support ? ;) )
-> (2) Discuss current progress and challenges
-> (3) Cover future ideas and directions
-> (4) Whatever else makes sense
->
-> Topic-wise it's relatively clear: guest_memfd extensions were one of the
-> hot topics at LPC ;)
->
-> I would suggest every second Thursdays from 9:00 - 10:00am PDT (GMT-7),
-> starting Thursday next week (2024-10-17).
+Hi Jason,
 
-Thanks for starting this discussion! A dedicated forum for covering
-guest memfd specific topics sounds great. Suggested time slot works
-for me.
+On Thu, 10 Oct 2024 at 13:04, Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> On Thu, Oct 10, 2024 at 11:23:55AM +0100, Fuad Tabba wrote:
+> > Hi Kirill,
+> >
+> > On Thu, 10 Oct 2024 at 11:14, Kirill A. Shutemov <kirill@shutemov.name> wrote:
+> > >
+> > > On Thu, Oct 10, 2024 at 09:59:23AM +0100, Fuad Tabba wrote:
+> > > > +out:
+> > > > +     if (ret != VM_FAULT_LOCKED) {
+> > > > +             folio_put(folio);
+> > > > +             folio_unlock(folio);
+> > >
+> > > Hm. Here and in few other places you return reference before unlocking.
+> > >
+> > > I think it is safe because nobody can (or can they?) remove the page from
+> > > pagecache while the page is locked so we have at least one refcount on the
+> > > folie, but it *looks* like a use-after-free bug.
+> > >
+> > > Please follow the usual pattern: _unlock() then _put().
+> >
+> > That is deliberate, since these patches rely on the refcount to check
+> > whether the host has any mappings, and the folio lock in order not to
+> > race. It's not that it's not safe to decrement the refcount after
+> > unlocking, but by doing that i cannot rely on the folio lock to ensure
+> > that there aren't any races between the code added to check whether a
+> > folio is mappable, and the code that checks whether the refcount is
+> > safe. It's a tiny window, but it's there.
+>
+> That seems very suspicious as the folio lock does not protect the
+> refcount, and we have things like speculative refcount increments in
+> GUP.
+>
+> When we talked at LPC the notion was you could just check if the
+> refcount was 1 without sleeping or waiting, and somehow deal with !1
+> cases. Which also means you shouldn't need a lock around the refcount.
 
-Regards,
-Vishal
+The idea of the lock isn't to protect the refcount, which I know isn't
+protected by the lock. It is to protect against races with the path
+that (added in this patch series), would check whether the host is
+allowed to map a certain page/folio. But as Kirill pointed out, there
+seems to be other issues there, which I'll cover more in my reply to
+him.
 
->
-> We would be using Google Meet.
->
->
-> Thoughts?
->
-> --
-> Cheers,
->
-> David / dhildenb
->
->
+Thank you,
+/fuad
+
+
+> Jason
 
