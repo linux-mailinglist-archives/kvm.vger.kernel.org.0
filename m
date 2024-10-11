@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-28583-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28584-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74D5999A1C
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 04:13:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E20999A1D
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 04:13:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 485421F244F3
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 02:13:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B95D52816EB
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 02:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75B91F8911;
-	Fri, 11 Oct 2024 02:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292A21F8933;
+	Fri, 11 Oct 2024 02:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qdz8Pfor"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r+DkhD1N"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55961F706C
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 02:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59F91E909F
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 02:11:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728612668; cv=none; b=Eqf6eWP/T1/qfbAZDuCl6fa/k/8caVbNYxPRZEzQju5odYETkEqMH4xWnCPrYVm3ASibcBxCZ8ggk18Uk04I/0T63PsCxUIA+TKgutaJwZ+MAwMXE3ZMwVp34BOCmHtcZV+riKapbqbYS/wSLuttKKd4kAV+zJXF/kFxivM1iyU=
+	t=1728612669; cv=none; b=VWotNpE2dzGIy5m1ybqmJT1sU+obKdHUMm0EUz3CFDCDQG2MI6qaTnKy9WIzQ1+SwuPFH63WLSU9m8/JKRd9tr8Z1EM1m5NE80L+LIuxHuL5KADcp3Mdi020E17Z8dC3zstEHU6vdjmZAVsrtEriNc6s26zQOjlxfqpQv4EafXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728612668; c=relaxed/simple;
-	bh=6ySxcwhwrHJlZ4I/ATeASq5WDemLJ6Yi/XYtpmqlx9I=;
+	s=arc-20240116; t=1728612669; c=relaxed/simple;
+	bh=7T0Y7z9DkiR+xsRM8ZPFp3xmx4pcPJcLvaBoxa7kVSw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lQ4G02qhnTsX9mfYv2U21HMRyLpeSV1qQc8qo8RockzyVwelEFhHh1e7GD02/wFD3PMqM+wSoW6TSjTWU3iNEfVw++um7+PlzghZ+6kbi0k0NDEtmGfDdwM0CbRPLvd0ufZ/x57vp2eJ/AZzjXt/k4f13DFsGTIhGDvXVm8IBx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qdz8Pfor; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=Kw6BTG45CQDZQXw8EhjWSQhewVw5HtcbtOppYMTG5cNZQ6LyXjDWtZwk6ZCNG836rXujWMfahFOpsL76FocXPySb5I9FO2Ym2tkasEzxzM+iiUSDQ7IKLXhr1yYStmbTJ3S0jS3ulHlBKBUHau51PTJNlWM0I6sZlCbEwtZQy8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r+DkhD1N; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e3497c8eb0so3111937b3.0
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 19:11:05 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e28b624bfcso25178507b3.2
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 19:11:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728612665; x=1729217465; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728612667; x=1729217467; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=J6fJWudgoyhjNeokLMIpfJOGPiEm4NW5MKaOgNe3m0c=;
-        b=Qdz8PforVMb9xifm6HVypigyoGtQkLdh8cmmpSJq/4lfTLbHDzO/EM0BzRV6d/uXaP
-         7fOuj0sXvznIu7E36BFljQ5hZmve8tGVcRyZ1ot+YpGrc+vYIWJOfiQ3RX256/oklpF4
-         t4QrvRqvOGr2/gFVefXFvHDFGtMw7gDrcloEU3rLlHp6W+Wsygnb4zZct9IcQU8hi+Pz
-         H2zTMj6XX7HqHfZWR1W1Rn/Tf1Rw5qy3cJFKh2R0I9Wy87ynC16YuXp9GeYkMsIsMxgo
-         cF+AiNK17BnBcWGufdj6dI6r7ksgK72CPH5OkX7cQSZPN7cZ0ylAH79WALIpfbYvAHw9
-         DGRg==
+        bh=3KbU21e26mgdFp4CthOOUh3jNyHnk8sJBVf29vXTz6Y=;
+        b=r+DkhD1NPgjOLAefP8T58ISsLXSVejyB9xxByT5DmBSi3HmGISaYOt3XQd2m/FUDeb
+         FLTS07c4HXbcIEbnocyjxtaHwvbpYrmy/gwQI++Si9pvcBkqeottU1XfvLUHoaxZp1nt
+         7LUsnftC7NSHS8WtxS+GeNF4qeAFaoISnECX5EW/UwcsIfEnTsMifMPPAatfHdL8yoyI
+         YvYD1BULBgj6cGkpXlWtnr4XmYYZLhFji9i/31Cx4Ogy437n/4YbgZtUEvFHOYJExfdu
+         bBa/R3NinaHi6DC2ohRVbPk/bktfMKj+o0JJtcDXAvi9PBuIlr/r5WDS1BohuFleTv0x
+         7u+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728612665; x=1729217465;
+        d=1e100.net; s=20230601; t=1728612667; x=1729217467;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=J6fJWudgoyhjNeokLMIpfJOGPiEm4NW5MKaOgNe3m0c=;
-        b=Olk2RWop4mfc+RWLNGbG8NoEls6lEBzZiT/sQUZQVjhX6AxwI2M2e/UDt4WsSn+TyT
-         9pDjt/CJ+fVVo3GAdFS44sWPTJBaonUgV7s2ATw9xzRMl1IYASzWNDhI3g8vt9HGZQUm
-         I4jMqz44yOy6+f1yA6sz55olTzO0WPTuU71I5KIs32g7A6EdFZr7bQGf5hB0p+ZZbWhT
-         L04viezHWS8LeFOZ1mkeFAZzHVMYptY+vflkSqxlUUThGIaoAxh4gbSVMoPOzp0JzuSx
-         3lOV1Ao/rKCwh6U02TYO6uzYgCx8xV+2/PC27q6IDmjr/e8D7b8gdioC1S9SDvgcCW8C
-         3ihA==
-X-Gm-Message-State: AOJu0YzdNUGEcMQXiIoxX/70pH6058eAocQYnk+9fa/+NkVtRey0kFZC
-	FdlSlb4jKpAaqj1rZTBzier9hpv0zSboLAd/z3GN1GQkf6ecaKrXQlGXKqojelZEg2KBtnQVgQQ
-	r7A==
-X-Google-Smtp-Source: AGHT+IFbXi1dCiXSidWjoezcs3LfAr39NDQ+HaYJkXB3Sn0xMqcrzqVDZ2BFbhCf6XdaWRZ36muZ7O1FhMs=
+        bh=3KbU21e26mgdFp4CthOOUh3jNyHnk8sJBVf29vXTz6Y=;
+        b=jMMbIZcPS0xikOQuhmIc+6fOoioX5ovs+tU8SrFNEVJi5aelsrYIVNMffnOOr+MD+Z
+         L9C5Wu877v5UmPQfua0JVSAiqdHh/1oHwo74hjzGN0H3Qb1+8GfDPwpCGFCYS8aNGmtN
+         7BlOx1+aGNUviSpZu1UZvcvJLrqNd+wIjzrpiJFXZ2Jv5SYHkeXXOlLhtHpy3062vN0a
+         S6ps+Q09bUKcN+kIy5wsqOiCRsYoQxteeOen78sh0kHefPHj8aysZ54FESTF228SyDgT
+         03VRK0nXuRrdzdt1tJC3vTl8k1NK/CKTXxSivPjxssu+GHK9wmwEwcaK/9SheaTTcrYQ
+         lCdg==
+X-Gm-Message-State: AOJu0Yz2BPEwqXLmGRwMymL54ps8Z7TutewZz/MQVDogdynxjMuLLMMi
+	VvvVL5+2hO5Su6KD1Wp8tsMu5XBgdRVAH61ucCzMPPgy7IWlSUGhLFNYBPQ/s+rgMFV8NsnuTwM
+	BuA==
+X-Google-Smtp-Source: AGHT+IExWa1Vf1fg4dGiNvdf7Xh8WjS5MlhdfzJm0txAXEjRaSgTANl34PRIe8HLwi1sfR/J7GW5EZ4hKo0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:4706:b0:6e2:a355:7b5c with SMTP id
- 00721157ae682-6e32f33bf7emr548257b3.5.1728612664905; Thu, 10 Oct 2024
- 19:11:04 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:5f50:0:b0:e28:f2a5:f1d with SMTP id
+ 3f1490d57ef6-e2919d9e584mr1371276.4.1728612666726; Thu, 10 Oct 2024 19:11:06
+ -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 19:10:38 -0700
+Date: Thu, 10 Oct 2024 19:10:39 -0700
 In-Reply-To: <20241011021051.1557902-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241011021051.1557902-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241011021051.1557902-7-seanjc@google.com>
-Subject: [PATCH 06/18] KVM: x86/mmu: Drop ignored return value from kvm_tdp_mmu_clear_dirty_slot()
+Message-ID: <20241011021051.1557902-8-seanjc@google.com>
+Subject: [PATCH 07/18] KVM: x86/mmu: Fold mmu_spte_update_no_track() into mmu_spte_update()
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,86 +85,97 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop the return value from kvm_tdp_mmu_clear_dirty_slot() as its sole
-caller ignores the result (KVM flushes after clearing dirty logs based on
-the logs themselves, not based on SPTEs).
+Fold the guts of mmu_spte_update_no_track() into mmu_spte_update() now
+that the latter doesn't flush when clearing A/D bits, i.e. now that there
+is no need to explicitly avoid TLB flushes when aging SPTEs.
 
-Cc: David Matlack <dmatlack@google.com>
+Opportunistically WARN if mmu_spte_update() requests a TLB flush when
+aging SPTEs, as aging should never modify a SPTE in such a way that KVM
+thinks a TLB flush is needed.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 20 ++++++--------------
- arch/x86/kvm/mmu/tdp_mmu.h |  2 +-
- 2 files changed, 7 insertions(+), 15 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 50 ++++++++++++++++++------------------------
+ 1 file changed, 21 insertions(+), 29 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 91caa73a905b..9c66be7fb002 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1492,13 +1492,12 @@ static bool tdp_mmu_need_write_protect(struct kvm_mmu_page *sp)
- 	return kvm_mmu_page_ad_need_write_protect(sp) || !kvm_ad_enabled();
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index faa524d5a0e8..a72ecac63e07 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -485,32 +485,6 @@ static void mmu_spte_set(u64 *sptep, u64 new_spte)
+ 	__set_spte(sptep, new_spte);
  }
  
--static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
--			   gfn_t start, gfn_t end)
-+static void clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-+				  gfn_t start, gfn_t end)
- {
- 	const u64 dbit = tdp_mmu_need_write_protect(root) ? PT_WRITABLE_MASK :
- 							    shadow_dirty_mask;
- 	struct tdp_iter iter;
--	bool spte_set = false;
- 
- 	rcu_read_lock();
- 
-@@ -1519,31 +1518,24 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 
- 		if (tdp_mmu_set_spte_atomic(kvm, &iter, iter.old_spte & ~dbit))
- 			goto retry;
+-/*
+- * Update the SPTE (excluding the PFN), but do not track changes in its
+- * accessed/dirty status.
+- */
+-static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
+-{
+-	u64 old_spte = *sptep;
 -
--		spte_set = true;
- 	}
- 
- 	rcu_read_unlock();
--	return spte_set;
- }
- 
- /*
-  * Clear the dirty status (D-bit or W-bit) of all the SPTEs mapping GFNs in the
-- * memslot. Returns true if an SPTE has been changed and the TLBs need to be
-- * flushed.
-+ * memslot.
+-	WARN_ON_ONCE(!is_shadow_present_pte(new_spte));
+-	check_spte_writable_invariants(new_spte);
+-
+-	if (!is_shadow_present_pte(old_spte)) {
+-		mmu_spte_set(sptep, new_spte);
+-		return old_spte;
+-	}
+-
+-	if (!spte_has_volatile_bits(old_spte))
+-		__update_clear_spte_fast(sptep, new_spte);
+-	else
+-		old_spte = __update_clear_spte_slow(sptep, new_spte);
+-
+-	WARN_ON_ONCE(spte_to_pfn(old_spte) != spte_to_pfn(new_spte));
+-
+-	return old_spte;
+-}
+-
+ /* Rules for using mmu_spte_update:
+  * Update the state bits, it means the mapped pfn is not changed.
+  *
+@@ -535,10 +509,23 @@ static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
   */
--bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
-+void kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
- 				  const struct kvm_memory_slot *slot)
+ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
  {
- 	struct kvm_mmu_page *root;
--	bool spte_set = false;
+-	u64 old_spte = mmu_spte_update_no_track(sptep, new_spte);
++	u64 old_spte = *sptep;
  
- 	lockdep_assert_held_read(&kvm->mmu_lock);
- 	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id)
--		spte_set |= clear_dirty_gfn_range(kvm, root, slot->base_gfn,
--				slot->base_gfn + slot->npages);
--
--	return spte_set;
-+		clear_dirty_gfn_range(kvm, root, slot->base_gfn,
-+				      slot->base_gfn + slot->npages);
+-	if (!is_shadow_present_pte(old_spte))
++	WARN_ON_ONCE(!is_shadow_present_pte(new_spte));
++	check_spte_writable_invariants(new_spte);
++
++	if (!is_shadow_present_pte(old_spte)) {
++		mmu_spte_set(sptep, new_spte);
+ 		return false;
++	}
++
++	if (!spte_has_volatile_bits(old_spte))
++		__update_clear_spte_fast(sptep, new_spte);
++	else
++		old_spte = __update_clear_spte_slow(sptep, new_spte);
++
++	WARN_ON_ONCE(!is_shadow_present_pte(old_spte) ||
++		     spte_to_pfn(old_spte) != spte_to_pfn(new_spte));
+ 
+ 	return is_mmu_writable_spte(old_spte) && !is_mmu_writable_spte(new_spte);
  }
- 
- static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 1b74e058a81c..d842bfe103ab 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -34,7 +34,7 @@ bool kvm_tdp_mmu_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
- 
- bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
- 			     const struct kvm_memory_slot *slot, int min_level);
--bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
-+void kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
- 				  const struct kvm_memory_slot *slot);
- void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 				       struct kvm_memory_slot *slot,
+@@ -1587,8 +1574,13 @@ static bool kvm_rmap_age_gfn_range(struct kvm *kvm,
+ 				clear_bit((ffs(shadow_accessed_mask) - 1),
+ 					(unsigned long *)sptep);
+ 			} else {
++				/*
++				 * WARN if mmu_spte_update() signals the need
++				 * for a TLB flush, as Access tracking a SPTE
++				 * should never trigger an _immediate_ flush.
++				 */
+ 				spte = mark_spte_for_access_track(spte);
+-				mmu_spte_update_no_track(sptep, spte);
++				WARN_ON_ONCE(mmu_spte_update(sptep, spte));
+ 			}
+ 			young = true;
+ 		}
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
