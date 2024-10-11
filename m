@@ -1,246 +1,157 @@
-Return-Path: <kvm+bounces-28617-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28618-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDCBC99A2E1
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:40:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1323299A2E5
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:42:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 489DC1F21AFA
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:40:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA7E0283A18
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948CB216A02;
-	Fri, 11 Oct 2024 11:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E761F216A04;
+	Fri, 11 Oct 2024 11:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Et677H8t"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LgQctK44"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0359E21644D
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 11:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3231F9415;
+	Fri, 11 Oct 2024 11:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728646841; cv=none; b=RQuRotU+J/DmHB5AGLHxM0E+gCSFnygThkgRCq0004NgCPbjh8GbIr57kQ5q7Aqw0SDEAqRRJaQkQt/x+1rn1lw7bO5j/TMKLEDNC/W3j+E8zmg6rzTRLCl1H3o4CuPFMK0Ftg3eqY1YyiwEq8/KcTNtnvF3Fq7Pvn5M/uX3HZI=
+	t=1728646921; cv=none; b=dB9Ddk/COU5+cloecJLvbnuLpw/gbroD6DCx0zR29FufurVHWAVKvIn005nNohKA6vBUrhJ8/HL3d0Wk8+0SEB7DXwTncyaikdMXy5E1VoSZVphXG4SRDNBFJfl1jQW7FM/fMhykqkAnX2vOf2jVhRVwGgOhVqRGI2rCSHUhCCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728646841; c=relaxed/simple;
-	bh=iMSmSjYsaAy0YzE3nCzp+4hkZQj/IpPWLPn99PFVMG8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OKM004ETutJrCCz3x3o/qbAnXz4M7bDMz4Am6a/BaBf0ZB5FX881VQzStJSbiFlSVcDElIxxC4QnqFB5+redb0iSrc7P3WaTfvWuwfCSkCwDWbXGlqx4iGfTlYQetro4HezZuNQCB11B5YSgG6JU17OSkqRMx8wCe4jg+dETOY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Et677H8t; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728646839;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VNApqJlSEH0IHmUTUVzt3wENb7pBiZVRDjjZJypXL8E=;
-	b=Et677H8tvW7OC5FQUgPTU3EntHBbVGvdHuwLx29pR1+ipVA6kLrH5DPu5ua/DnaJIMs7HQ
-	M7agmiM2Sa1qW4ou9clh42wJwwd2xBKIpbf/wdEaL3oQLrjyplYTfwFC2zold7pjNz4Qfi
-	xvynL1a388LWuzTw0h5Zx/1MaQDQGrI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-20-UO65hh6uPNS5fdchb9w9pw-1; Fri, 11 Oct 2024 07:40:37 -0400
-X-MC-Unique: UO65hh6uPNS5fdchb9w9pw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4311cf79381so5262305e9.0
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 04:40:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728646837; x=1729251637;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VNApqJlSEH0IHmUTUVzt3wENb7pBiZVRDjjZJypXL8E=;
-        b=costHOxR/eyktfZ+qPzq3jZix0YhGMnPfhus70XgksgR65z0BtAwJtr7hBmdFerOcY
-         2+UVYFfblO/AMzpf6Zp9UJU1t8ubxnpuPBoMEqtcTm/He4n8eS5yuSNrEXC7vpceJgue
-         7NjoVBmiXWtEdD2Lw1GiFa/cnQ7fkh1CuKxqYGpRFp2f3O8ruJEghNwcAOpGtrrU45Kv
-         mZ7ppGgeW0bW192zCRlIuZqKle0sCyEyqRmyWbSlvle12G83B3hhsdtDRdm/8jDEsUt2
-         PAspqODAK5ymzv918WssTiMg08d2EXLoCHXnWxrjgODluYpjqPzVIJaMgbsb/3wE7amq
-         YKiw==
-X-Forwarded-Encrypted: i=1; AJvYcCUXsZWYeBNFNoRi8KfJ5hKy0AoHskdpRXdhG/0d1GvSYYCToRvG22FzFpVuqOzz1i/CGe4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJs0UiwVbN7r24gP/CP5RwbppC0rC1xuSUQoDHN6VVB/xPsLj7
-	VKMhf/Nzc0mXOHEyDQ8NbLIPDgYmh6PDnjKIzu0ry2dBFY9/BdqXkJwULySY/g0AFWp6Y46fGJH
-	nhM78XzQWSMH4z0jg1AR9BtsYv+H/yvDeJNjQ7o5OeRmh/bRZTw==
-X-Received: by 2002:a05:600c:3b9b:b0:42c:b843:792b with SMTP id 5b1f17b1804b1-4311deb5ef8mr17287785e9.2.1728646836615;
-        Fri, 11 Oct 2024 04:40:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH69GLSyNi6RlX5vmx6fiyWfl5SeRQP8CwWq4DB7EkJvO4xZkEQrRCitOv1WGvOnepQAjS6Qg==
-X-Received: by 2002:a05:600c:3b9b:b0:42c:b843:792b with SMTP id 5b1f17b1804b1-4311deb5ef8mr17287595e9.2.1728646836257;
-        Fri, 11 Oct 2024 04:40:36 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c749:9100:c078:eec6:f2f4:dd3b? (p200300cbc7499100c078eec6f2f4dd3b.dip0.t-ipconnect.de. [2003:cb:c749:9100:c078:eec6:f2f4:dd3b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43118305c6bsm39740645e9.22.2024.10.11.04.40.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Oct 2024 04:40:35 -0700 (PDT)
-Message-ID: <b6ba0313-6a3f-4bfc-9237-547355cd7b00@redhat.com>
-Date: Fri, 11 Oct 2024 13:40:33 +0200
+	s=arc-20240116; t=1728646921; c=relaxed/simple;
+	bh=f5/gKUV+onCFlwc+BTuEU324blfwu0E0ySgrxtQzrnk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EVook4D5It4jRNJ+WL2Dq1XanPVssBtVoc/MYPNbNtJfqzACWsI7DBJqpZ/tHeUue0q4GP5jpAtK/jVLQxH0KpUmm+XRkb0rH84Tb1yg2TvFNg9/WtiLSi6pfst8plwmnp+/cSAHeCGcpHyjiRTwkpmt25GcP9z/4k3rBUKfKiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LgQctK44; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=s0nie3up7O9BX6Pp/Xow1TsRav7XmKEP6A0jErw7/ro=; b=LgQctK44yeUsn1zwiKssE5kD4s
+	BiS8Pou2pBtwWhwceWltYXJGedWypGE7EtQ6TI0AW4TzE0pYQWvLXqIFwqErYV3Eg7GSwv+Y0Ne9W
+	5NsIaBmIYobZsDiZMf2jKuLCB4Ziwa4wOGsmQklh1Vc1HvKIzKqrLNM/1VQmC+tBNJYQvtGTSj+RH
+	cWPgst7qqmfARCSoHteMY1z7QyYSExQ/8YimlX7v8fo9EO4oDzPPZP8vRsccrRvIhOjJqFdHNuHDt
+	DMxUMaEcSM65lpUqQRLFV9ripUN8Ui2nmjcFmjEvjp1HeOhJIlQG7qf3aIZHeF/p7mVaYvX65t6Ip
+	QGTcaolQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1szE1m-0000000Ae0b-3VxG;
+	Fri, 11 Oct 2024 11:41:51 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id CC2B2300642; Fri, 11 Oct 2024 13:41:50 +0200 (CEST)
+Date: Fri, 11 Oct 2024 13:41:50 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+Cc: Mingwei Zhang <mizhang@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Xiong Zhang <xiong.y.zhang@intel.com>,
+	Kan Liang <kan.liang@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Manali Shukla <manali.shukla@amd.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Jim Mattson <jmattson@google.com>,
+	Stephane Eranian <eranian@google.com>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	gce-passthrou-pmu-dev@google.com,
+	Samantha Alt <samantha.alt@intel.com>,
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+	Like Xu <like.xu.linux@gmail.com>,
+	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [RFC PATCH v3 09/58] perf: Add a EVENT_GUEST flag
+Message-ID: <20241011114150.GO14587@noisy.programming.kicks-ass.net>
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-10-mizhang@google.com>
+ <095522b1-faad-4544-9282-4dda8be03695@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/2] mm: don't install PMD mappings when THPs are
- disabled by the hw/process/vma
-To: Ryan Roberts <ryan.roberts@arm.com>, linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org, kvm@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>, Hugh Dickins <hughd@google.com>,
- Thomas Huth <thuth@redhat.com>, "Matthew Wilcox (Oracle)"
- <willy@infradead.org>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Kefeng Wang <wangkefeng.wang@huawei.com>, Leo Fu <bfu@redhat.com>
-References: <20241011102445.934409-1-david@redhat.com>
- <20241011102445.934409-3-david@redhat.com>
- <a4ca9422-09f5-4137-88d0-88a7ec836c1a@arm.com>
- <a552416e-fd32-4b84-b5d6-40a27530c939@redhat.com>
- <4fd20101-d15c-4f9b-93c1-c780734a2294@arm.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <4fd20101-d15c-4f9b-93c1-c780734a2294@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <095522b1-faad-4544-9282-4dda8be03695@linux.intel.com>
 
-On 11.10.24 13:36, Ryan Roberts wrote:
-> On 11/10/2024 12:33, David Hildenbrand wrote:
->> On 11.10.24 13:29, Ryan Roberts wrote:
->>> On 11/10/2024 11:24, David Hildenbrand wrote:
->>>> We (or rather, readahead logic :) ) might be allocating a THP in the
->>>> pagecache and then try mapping it into a process that explicitly disabled
->>>> THP: we might end up installing PMD mappings.
->>>>
->>>> This is a problem for s390x KVM, which explicitly remaps all PMD-mapped
->>>> THPs to be PTE-mapped in s390_enable_sie()->thp_split_mm(), before
->>>> starting the VM.
->>>>
->>>> For example, starting a VM backed on a file system with large folios
->>>> supported makes the VM crash when the VM tries accessing such a mapping
->>>> using KVM.
->>>>
->>>> Is it also a problem when the HW disabled THP using
->>>> TRANSPARENT_HUGEPAGE_UNSUPPORTED? At least on x86 this would be the case
->>>> without X86_FEATURE_PSE.
->>>>
->>>> In the future, we might be able to do better on s390x and only disallow
->>>> PMD mappings -- what s390x and likely TRANSPARENT_HUGEPAGE_UNSUPPORTED
->>>> really wants. For now, fix it by essentially performing the same check as
->>>> would be done in __thp_vma_allowable_orders() or in shmem code, where this
->>>> works as expected, and disallow PMD mappings, making us fallback to PTE
->>>> mappings.
->>>>
->>>> Reported-by: Leo Fu <bfu@redhat.com>
->>>> Fixes: 793917d997df ("mm/readahead: Add large folio readahead")
->>>
->>> Will this patch be difficult to backport given it depends on the previous patch
->>> and that doesn't have a Fixes tag?
->>
->> "difficult" -- not really. Andrew might want to tag patch #1Â  with "Fixes:" as
->> well, but I can also send simple stable backports that avoid patch #1.
->>
->> (Thinking again, I assume we want to Cc:stable)
->>
->>>
->>>> Cc: Thomas Huth <thuth@redhat.com>
->>>> Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
->>>> Cc: Ryan Roberts <ryan.roberts@arm.com>
->>>> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
->>>> Cc: Janosch Frank <frankja@linux.ibm.com>
->>>> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  Â  mm/memory.c | 9 +++++++++
->>>>  Â  1 file changed, 9 insertions(+)
->>>>
->>>> diff --git a/mm/memory.c b/mm/memory.c
->>>> index 2366578015ad..a2e501489517 100644
->>>> --- a/mm/memory.c
->>>> +++ b/mm/memory.c
->>>> @@ -4925,6 +4925,15 @@ vm_fault_t do_set_pmd(struct vm_fault *vmf, struct
->>>> page *page)
->>>>  Â Â Â Â Â  pmd_t entry;
->>>>  Â Â Â Â Â  vm_fault_t ret = VM_FAULT_FALLBACK;
->>>>  Â  +Â Â Â  /*
->>>> +Â Â Â Â  * It is too late to allocate a small folio, we already have a large
->>>> +Â Â Â Â  * folio in the pagecache: especially s390 KVM cannot tolerate any
->>>> +Â Â Â Â  * PMD mappings, but PTE-mapped THP are fine. So let's simply refuse any
->>>> +Â Â Â Â  * PMD mappings if THPs are disabled.
->>>> +Â Â Â Â  */
->>>> +Â Â Â  if (thp_disabled_by_hw() || vma_thp_disabled(vma, vma->vm_flags))
->>>> +Â Â Â Â Â Â Â  return ret;
->>>
->>> Why not just call thp_vma_allowable_orders()?
->>
->> Why call thp_vma_allowable_orders() that does a lot more work that doesn't
->> really apply here? :)
+On Wed, Aug 21, 2024 at 01:27:17PM +0800, Mi, Dapeng wrote:
+> On 8/1/2024 12:58 PM, Mingwei Zhang wrote:
+
+> > +static inline u64 __perf_event_time_ctx_now(struct perf_event *event,
+> > +					    struct perf_time_ctx *time,
+> > +					    struct perf_time_ctx *timeguest,
+> > +					    u64 now)
+> > +{
+> > +	/*
+> > +	 * The exclude_guest event time should be calculated from
+> > +	 * the ctx time -  the guest time.
+> > +	 * The ctx time is now + READ_ONCE(time->offset).
+> > +	 * The guest time is now + READ_ONCE(timeguest->offset).
+> > +	 * So the exclude_guest time is
+> > +	 * READ_ONCE(time->offset) - READ_ONCE(timeguest->offset).
+> > +	 */
+> > +	if (event->attr.exclude_guest && __this_cpu_read(perf_in_guest))
 > 
-> Yeah fair enough, I was just thinking it makes the code simpler to keep all the
-> checks in one place. But no strong opinion.
+> Hi Kan,
 > 
-> Either way:
+> we see the following the warning when run perf record command after
+> enabling "CONFIG_DEBUG_PREEMPT" config item.
 > 
-> Reviewed-by: Ryan Roberts <ryan.roberts@arm.com>
+> [  166.779208] BUG: using __this_cpu_read() in preemptible [00000000] code:
+> perf/9494
+> [  166.779234] caller is __this_cpu_preempt_check+0x13/0x20
+> [  166.779241] CPU: 56 UID: 0 PID: 9494 Comm: perf Not tainted
+> 6.11.0-rc4-perf-next-mediated-vpmu-v3+ #80
+> [  166.779245] Hardware name: Quanta Cloud Technology Inc. QuantaGrid
+> D54Q-2U/S6Q-MB-MPS, BIOS 3A11.uh 12/02/2022
+> [  166.779248] Call Trace:
+> [  166.779250]  <TASK>
+> [  166.779252]  dump_stack_lvl+0x76/0xa0
+> [  166.779260]  dump_stack+0x10/0x20
+> [  166.779267]  check_preemption_disabled+0xd7/0xf0
+> [  166.779273]  __this_cpu_preempt_check+0x13/0x20
+> [  166.779279]  calc_timer_values+0x193/0x200
+> [  166.779287]  perf_event_update_userpage+0x4b/0x170
+> [  166.779294]  ? ring_buffer_attach+0x14c/0x200
+> [  166.779301]  perf_mmap+0x533/0x5d0
+> [  166.779309]  mmap_region+0x243/0xaa0
+> [  166.779322]  do_mmap+0x35b/0x640
+> [  166.779333]  vm_mmap_pgoff+0xf0/0x1c0
+> [  166.779345]  ksys_mmap_pgoff+0x17a/0x250
+> [  166.779354]  __x64_sys_mmap+0x33/0x70
+> [  166.779362]  x64_sys_call+0x1fa4/0x25f0
+> [  166.779369]  do_syscall_64+0x70/0x130
+> 
+> The season that kernel complains this is __perf_event_time_ctx_now() calls
+> __this_cpu_read() in preemption enabled context.
+> 
+> To eliminate the warning, we may need to use this_cpu_read() to replace
+> __this_cpu_read().
+> 
+> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> index ccd61fd06e8d..1eb628f8b3a0 100644
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -1581,7 +1581,7 @@ static inline u64 __perf_event_time_ctx_now(struct
+> perf_event *event,
+>          * So the exclude_guest time is
+>          * READ_ONCE(time->offset) - READ_ONCE(timeguest->offset).
+>          */
+> -       if (event->attr.exclude_guest && __this_cpu_read(perf_in_guest))
+> +       if (event->attr.exclude_guest && this_cpu_read(perf_in_guest))
+>                 return READ_ONCE(time->offset) - READ_ONCE(timeguest->offset);
+>         else
+>                 return now + READ_ONCE(time->offset);
 
-Thanks!
-
-Also, I decided to not use "thp_vma_allowable_orders" because we are 
-past the allocation phase (as indicated in the comment) and can really 
-just change the way how we map the folio (PMD vs. PTE), not really 
-*what* folio to use.
-
-Ideally, in the future we have a different way of just saying "no PMD 
-mappings please", decoupling the mapping from the allocation granularity.
-
--- 
-Cheers,
-
-David / dhildenb
-
+The saner fix is moving the preempt_disable() in
+perf_event_update_userpage() up a few lines, no?
 
