@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-28651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3187599ADED
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 23:02:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE36D99ADF7
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 23:14:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58B3E1C22850
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 21:02:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C8952846AA
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 21:14:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7554C1D1318;
-	Fri, 11 Oct 2024 21:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E13E1D1506;
+	Fri, 11 Oct 2024 21:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0x9Fe/J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IpL5Ypov"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27858199231
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 21:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCE31D12FE
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 21:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728680555; cv=none; b=R1DKhnMZnkMz6CM2gSjyUNfVHlKuDfpu+hIoHr43/gAn7CBs/31NTSKlwSTOvD72FXtyuCEMKmfjk9M3V2NBSYCUmf4h8o7pIh9rZPf12LdNdlEzPbxro6tDREp68aCE1WrDn2cy8D+F3zg7c5zRckextsJsznmry9gKnHriUTY=
+	t=1728681259; cv=none; b=TcU35kXuZl5HSGW19+HPBImWD/r5mmUL3kSiyuKV+DbNrja9GKby3P2LEFrY+RfjcdQ4QBkCeUocU4Fc21NWVRgioKVYXjdmuOyCzHuMr16LpysCHnstjYv+ASRc8lgoDcqKti/6W1Me8i8ibwhDrBUYRkPKZimpwxc87WEv4X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728680555; c=relaxed/simple;
-	bh=t7v9LrnikA0b/tdjpm95QIPigc7c4Z7Gm+7ryEqj1gE=;
+	s=arc-20240116; t=1728681259; c=relaxed/simple;
+	bh=ExMoUpCDJ/R6BehmPeDOlR4R77PKPTu6pDUU6pP5rKs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oKnxR+J8QEs2fw17B6oOPYEVyGZQhuDN2wSx0wYKG8nBEvutt/RTnFnRj57q+Rl1ZeuYlJiTx33MGt/fcrnYm7KVuTqUw/r2TdjIYIB/0vbXRtWB/Tz24hl9gcT+5BJKIOw1foA0jw9QKTCT+PZYnscP2FGiEsMX648SY1ziL18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P0x9Fe/J; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=jSiGex6KtNp03NLDQxdfyzjS9RL9vSm7bN4jkpMzC6f0uWPoR6v3prJ0Vwhm4wubjTOaWevQeNogqxkP7+eiU2l5d+BmCTMNERSxwiamJkQ5atxkfLbXCEKF29Z2U8vY0qerdUAXTLJ3Q+nVgRW+WzYMFHgzRrm7mpRb9QLxe+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IpL5Ypov; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728680552;
+	s=mimecast20190719; t=1728681256;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=M4ZF/lqPBd0UGdsnnza01sUUQe28zx1+oJm7x5DzidA=;
-	b=P0x9Fe/JDtI0+/X4y5e5Yj1hSS6MimWRgftZG3IlsgxfuqbQfAYtXvcYBj3Wb80WcOfhvv
-	ZjL/vEo2Fqc7YFCwIK61pstcOgCOlFS0AgKuofHv4JmIs821zAXW8JAOnK8g0pFwUIlql1
-	PZkMt9KeBmwRc0TH4VlWHsVTJVCPpds=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QMUBbZRfSoQvEodUgNa2TXbxyHgaQJ7LEL/v8sBXYi4=;
+	b=IpL5YpovtaBUoTJ+o0XFeGsOMOFE/4lQfESZ4jQtjMKp4see1GARVrNjoZzB14Xl29FADx
+	MZj1rnSNiwsJpZc81V7ZMi6S4WUnYVBCDrPQMZXffLTGNR5cISqLJ6ql2XVGzKnQl+EnvY
+	5Ja2gWM6u4buDz23BIEqN+h4v7ADm9I=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-605-qcrPnig2PR2_4v1IMjwoCw-1; Fri, 11 Oct 2024 17:02:30 -0400
-X-MC-Unique: qcrPnig2PR2_4v1IMjwoCw-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-837875efdbeso19357239f.2
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 14:02:30 -0700 (PDT)
+ us-mta-635-56VTZWqTNtuaoTL4qdAZWA-1; Fri, 11 Oct 2024 17:14:15 -0400
+X-MC-Unique: 56VTZWqTNtuaoTL4qdAZWA-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3e3e680b886so213731b6e.1
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 14:14:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728680550; x=1729285350;
+        d=1e100.net; s=20230601; t=1728681254; x=1729286054;
         h=content-transfer-encoding:mime-version:organization:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=M4ZF/lqPBd0UGdsnnza01sUUQe28zx1+oJm7x5DzidA=;
-        b=cPfpUqYvVBT51GqKxQUKEusIx3BIW0Fk02Uyge2T04Hkf08kHPszPtBOdWsrcFtDrc
-         mAttck+1Yhog4LUwdWSYUnsdCQaQR8ucMYW9/U4Wz9sLJMOurancC1x19lprSILpGmv5
-         kCFOC++wmgThoZJ0IvnIWMGQbo0i7M9hI0tzl3n7ofqDn3eK44g48Ty/YF1e0vVUXGbi
-         mD2xiddPJ3fLBeKLvTAbjpOCZlb6GTc0dgBH3g2Iv+AFaYAQ7R6ckCeJ/QeQVuJbbWOP
-         pwX37e7uB1S99Bg4gZCCXU0h7CJDEM3DlR+n12TAgbylFF8/npYKJK7GR40ygNtUwojf
-         /bSg==
-X-Gm-Message-State: AOJu0YzBtaIit2Frn6GQixu9j4HYpcQEwvoGUiQaSIsm/crymfE0Af46
-	XO2vvs67SwpFSJ5gtlcvvZ2uRy/PJmHetUCYP0/g0ktBq46Y11DqRVE8Nf3s4Ib2EIcPjLQTY4v
-	czZP4cynI7KA1Tb+krLffSjudYxlDp+k9d7Dkv4apotP5oBP+kQ==
-X-Received: by 2002:a05:6602:3284:b0:834:f667:217a with SMTP id ca18e2360f4ac-8379202f708mr89166439f.1.1728680550020;
-        Fri, 11 Oct 2024 14:02:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFqD2f+aFQtnYWBNo5lj3VmQuysrsCAI+ZXqdxvd+ha7KP/RQaF5OE/2Ag0jxh8N+y1wX+hmg==
-X-Received: by 2002:a05:6602:3284:b0:834:f667:217a with SMTP id ca18e2360f4ac-8379202f708mr89165039f.1.1728680549687;
-        Fri, 11 Oct 2024 14:02:29 -0700 (PDT)
+        bh=QMUBbZRfSoQvEodUgNa2TXbxyHgaQJ7LEL/v8sBXYi4=;
+        b=IBIWrKE4VouTRvyN4SrJB4Ghkslk5xbJ2hqKxAWymh4rb+RGBchvCNlKEsPiGHkZq4
+         /wJMZN5lg/d//nX3XJ3l8KPcLg2Uux4mFO6nzFG0yiNUoBQLr1rvu9qaXMLhWRr7YPVP
+         t2x/xPaXioohJnrTM8CkfSGaXU4d7PYBt9oMlmIQGxmANwYJ1LkFX59P1wQaoyNHkDDV
+         0EhGfYkoj3s+yLS0PrKQUCMqZEvMn+ABCMCI+jLhH+1aOb3uryMW7893aV1IZ9FcduXv
+         mBlnRb9YSjBDdXgibW0awa18r8CAo1cAkP3PRXRr1+rFwnYDFWSvTTeXHNNkUhZWeu6t
+         9Nog==
+X-Gm-Message-State: AOJu0Yyem7Iu8Rl/8alNmUYCR5XlcOrdcLLZK9T7f70yR5gvuzlOT/Ll
+	f6jPaVkX20ukIiKUlMPEJFMcVSFGW66/K12OHLM7kdBpwzvpOTZbrTBiDSTWG9rH1hmb18BOI4R
+	FmEilicjrrEFCu/xsXmAI/VrugPzzoOqtDN95+BdRNE3DmPttFw==
+X-Received: by 2002:a05:6808:2223:b0:3e0:38ab:718e with SMTP id 5614622812f47-3e5c9131c45mr920650b6e.10.1728681254519;
+        Fri, 11 Oct 2024 14:14:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IExBvBAUNHD/iMT7K/PYik7aFQyB3k755ifaewktdrtEizCuwl6K0a6zwI2kI4XKE/nPufnIg==
+X-Received: by 2002:a05:6808:2223:b0:3e0:38ab:718e with SMTP id 5614622812f47-3e5c9131c45mr920634b6e.10.1728681254206;
+        Fri, 11 Oct 2024 14:14:14 -0700 (PDT)
 Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbad9b15absm792043173.34.2024.10.11.14.02.28
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3e50a29d05csm809691b6e.6.2024.10.11.14.14.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 14:02:29 -0700 (PDT)
-Date: Fri, 11 Oct 2024 15:02:27 -0600
+        Fri, 11 Oct 2024 14:14:13 -0700 (PDT)
+Date: Fri, 11 Oct 2024 15:14:10 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
 To: Zhi Wang <zhiw@nvidia.com>
 Cc: <kvm@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
@@ -83,12 +83,11 @@ Cc: <kvm@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
  <cjia@nvidia.com>, <smitra@nvidia.com>, <ankita@nvidia.com>,
  <aniketa@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
  <zhiwang@kernel.org>
-Subject: Re: [RFC 10/13] vfio/pci: emulate CXL DVSEC registers in the
- configuration space
-Message-ID: <20241011150227.1b41a479.alex.williamson@redhat.com>
-In-Reply-To: <20240920223446.1908673-11-zhiw@nvidia.com>
+Subject: Re: [RFC 11/13] vfio/cxl: introduce VFIO CXL device cap
+Message-ID: <20241011151410.04ac0bc9.alex.williamson@redhat.com>
+In-Reply-To: <20240920223446.1908673-12-zhiw@nvidia.com>
 References: <20240920223446.1908673-1-zhiw@nvidia.com>
-	<20240920223446.1908673-11-zhiw@nvidia.com>
+	<20240920223446.1908673-12-zhiw@nvidia.com>
 Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -99,54 +98,141 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 20 Sep 2024 15:34:43 -0700
+On Fri, 20 Sep 2024 15:34:44 -0700
 Zhi Wang <zhiw@nvidia.com> wrote:
 
-> A CXL device has many DVSEC registers in the configuration space for
-> device control and enumeration. E.g. enable CXL.mem/CXL.cahce.
+> The userspace needs CXL device information, e.g. HDM decoder registers
+> offset to know when the VM updates the HDM decoder and re-build the
+> mapping between GPA in the virtual HDM decoder base registers and the
+> HPA of the CXL region created by the vfio-cxl-core when initialize the
+> CXL device.
 > 
-> However, the kernel CXL core owns those registers to control the device.
-> Thus, the VM is forbidden to touch the physical device control registers.
+> To acheive this, a new VFIO CXL device cap is required to convey those
+> information to the usersapce.
 > 
-> Read/write the CXL DVSEC from/to the virt configuration space.
+> Introduce a new VFIO CXL device cap to expose necessary information to
+> the userspace. Initialize the cap with the information filled when the
+> CXL device is being initialized. vfio-pci-core fills the CXL cap into
+> the caps returned to userapce when CXL is enabled.
 > 
 > Signed-off-by: Zhi Wang <zhiw@nvidia.com>
 > ---
->  drivers/vfio/pci/vfio_pci_config.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  drivers/vfio/pci/vfio_cxl_core.c | 15 +++++++++++++++
+>  drivers/vfio/pci/vfio_pci_core.c | 19 ++++++++++++++++++-
+>  include/linux/vfio_pci_core.h    |  1 +
+>  include/uapi/linux/vfio.h        | 10 ++++++++++
+>  4 files changed, 44 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> index 98f3ac2d305c..af8c0997c796 100644
-> --- a/drivers/vfio/pci/vfio_pci_config.c
-> +++ b/drivers/vfio/pci/vfio_pci_config.c
-> @@ -1902,6 +1902,15 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
+> diff --git a/drivers/vfio/pci/vfio_cxl_core.c b/drivers/vfio/pci/vfio_cxl_core.c
+> index d8b51f8792a2..cebc444b54b7 100644
+> --- a/drivers/vfio/pci/vfio_cxl_core.c
+> +++ b/drivers/vfio/pci/vfio_cxl_core.c
+> @@ -367,6 +367,19 @@ static int setup_virt_comp_regs(struct vfio_pci_core_device *core_dev)
+>  	return 0;
+>  }
 >  
->  			perm = &ecap_perms[cap_id];
->  			cap_start = vfio_find_cap_start(vdev, *ppos);
+> +static void init_vfio_cxl_cap(struct vfio_pci_core_device *core_dev)
+> +{
+> +	struct vfio_cxl *cxl = &core_dev->cxl;
 > +
-> +			if (cap_id == PCI_EXT_CAP_ID_DVSEC) {
-> +				u32 dword;
-
-This should be an __le32 and we should use an le32_to_cpu before
-comparison to PCI_VENDOR_ID_CXL.
-
+> +	cxl->cap.header.id = VFIO_DEVICE_INFO_CAP_CXL;
+> +	cxl->cap.header.version = 1;
+> +	cxl->cap.hdm_count = cxl->hdm_count;
+> +	cxl->cap.hdm_reg_offset = cxl->hdm_reg_offset;
+> +	cxl->cap.hdm_reg_size = cxl->hdm_reg_size;
+> +	cxl->cap.hdm_reg_bar_index = cxl->comp_reg_bar;
+> +	cxl->cap.dpa_size = cxl->dpa_size;
+> +}
 > +
-> +				memcpy(&dword, vdev->vconfig + cap_start + PCI_DVSEC_HEADER1, 4);
+>  int vfio_cxl_core_enable(struct vfio_pci_core_device *core_dev)
+>  {
+>  	struct vfio_cxl *cxl = &core_dev->cxl;
+> @@ -401,6 +414,8 @@ int vfio_cxl_core_enable(struct vfio_pci_core_device *core_dev)
+>  	if (ret)
+>  		goto err_enable_cxl_device;
+>  
+> +	init_vfio_cxl_cap(core_dev);
 > +
-> +				if (PCI_DVSEC_HEADER1_VID(dword) == PCI_VENDOR_ID_CXL)
-> +					perm = &virt_perms;
+>  	flags = VFIO_REGION_INFO_FLAG_READ |
+>  		VFIO_REGION_INFO_FLAG_WRITE |
+>  		VFIO_REGION_INFO_FLAG_MMAP;
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index e0f23b538858..47e65e28a42b 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -963,6 +963,15 @@ static int vfio_pci_info_atomic_cap(struct vfio_pci_core_device *vdev,
+>  	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
+>  }
+>  
+> +static int vfio_pci_info_cxl_cap(struct vfio_pci_core_device *vdev,
+> +				 struct vfio_info_cap *caps)
+> +{
+> +	struct vfio_cxl *cxl = &vdev->cxl;
+> +
+> +	return vfio_info_add_capability(caps, &cxl->cap.header,
+> +					sizeof(cxl->cap));
+> +}
+> +
+>  static int vfio_pci_ioctl_get_info(struct vfio_pci_core_device *vdev,
+>  				   struct vfio_device_info __user *arg)
+>  {
+> @@ -984,9 +993,17 @@ static int vfio_pci_ioctl_get_info(struct vfio_pci_core_device *vdev,
+>  	if (vdev->reset_works)
+>  		info.flags |= VFIO_DEVICE_FLAGS_RESET;
+>  
+> -	if (vdev->has_cxl)
+> +	if (vdev->has_cxl) {
+>  		info.flags |= VFIO_DEVICE_FLAGS_CXL;
+>  
+> +		ret = vfio_pci_info_cxl_cap(vdev, &caps);
+> +		if (ret) {
+> +			pci_warn(vdev->pdev,
+> +				 "Failed to setup CXL capabilities\n");
+> +			return ret;
+> +		}
+> +	}
+> +
+>  	info.num_regions = VFIO_PCI_NUM_REGIONS + vdev->num_regions;
+>  	info.num_irqs = VFIO_PCI_NUM_IRQS;
+>  
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> index e5646aad3eb3..d79f7a91d977 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -80,6 +80,7 @@ struct vfio_cxl {
+>  	struct resource ram_res;
+>  
+>  	struct vfio_cxl_region region;
+> +	struct vfio_device_info_cap_cxl cap;
 
-We're making an assumption here that all CXL defined DVSEC capabilities
-will have the same behavior.  Also, should we bother to expose an
-emulated, dummy capability, or should we expect the VMM to handle
-emulating it?  Doesn't the virt_perms allow the entire capability,
-including headers to be writable?  Thanks,
+We should create this dynamically on request, the device info ioctl is
+not a fast path.  Thanks,
 
 Alex
 
-> +			}
->  		} else {
->  			WARN_ON(cap_id > PCI_CAP_ID_MAX);
+>  };
 >  
+>  struct vfio_pci_core_device {
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 0895183feaac..9a5972961280 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -257,6 +257,16 @@ struct vfio_device_info_cap_pci_atomic_comp {
+>  	__u32 reserved;
+>  };
+>  
+> +#define VFIO_DEVICE_INFO_CAP_CXL		6
+> +struct vfio_device_info_cap_cxl {
+> +	struct vfio_info_cap_header header;
+> +	__u8 hdm_count;
+> +	__u8 hdm_reg_bar_index;
+> +	__u64 hdm_reg_size;
+> +	__u64 hdm_reg_offset;
+> +	__u64 dpa_size;
+> +};
+> +
+>  /**
+>   * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
+>   *				       struct vfio_region_info)
 
 
