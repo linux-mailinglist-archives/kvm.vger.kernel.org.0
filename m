@@ -1,190 +1,302 @@
-Return-Path: <kvm+bounces-28620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3528699A2FB
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:50:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3AA99A330
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 14:04:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E66C4284A7F
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:50:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 431471F251C9
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 12:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82AE72141B9;
-	Fri, 11 Oct 2024 11:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF289217306;
+	Fri, 11 Oct 2024 12:03:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I7i5ex9U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HmzvnJGf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E488017D2
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 11:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D5A20C49B
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 12:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728647428; cv=none; b=tIz3eki7pvWyih2x/CZtHf/RJS7knUWWiJw71siehKZvdWFTIF/cKJquqmn5A1Wi57HsBurx0Y2iIswIlALbzRT2ZbyhvWeuDyW4gK3xJ0xaz2q95eAvEm/euXVda645VgVBQ8YseiVEoINudukXhcbXqNz9jrZ8DimGz0kN1YI=
+	t=1728648228; cv=none; b=JzbyWs6jeBqpCwA7oKuoXATXxwr8Kd0km4Q2777/rQpiniEvjRQe9/2wwpJxfIlMBESp7OEYlgAq3Y9LptE+aViREtwx/hDujJhKBSboTzP2FWJwJWf1Phz14aonMfndw2+f9hSDYZW4KkoC5++gW7msYj5sjdAi/1kkbtbnDuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728647428; c=relaxed/simple;
-	bh=jXs+tvR3T2sfOgdDDPX36Uyoc+EueEgHAlfYIY6b4SM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VdKReU/8Tw0Emma02PuX8myoQVPgp9YWZaTPiJUqqhuMjZaKZofF53nlzv8E2qYbhoRsNE8XYAGZD+LtPpPY9eu8oUzIeoagct/atEPaTn258jAVbglAgJMI7H6XZeI8B+7jU/eszz8+wnBQy7txaJQp6Jzu3K6TmdOPzdtf4Es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I7i5ex9U; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1728648228; c=relaxed/simple;
+	bh=JWzZMjqpp/xPZ1MmHfjs2qnl7WyX+6LRJNU05aMLIA0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=dbIyMqr5FsOnU/VT7B5cQaIF3mo1389Cnjh03DOpq1dflbse6E/rY/gy5PWn0DAxP6YJwm0DyLSKbG5eGOOnPXL5dtulxGFm4cPsTQOOl52AbdZ9RYznGtuIGZD+c16XFJelDNmr0FP77tCDeMes5EcV8R1nIRrjdf2rMBsteKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HmzvnJGf; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728647424;
+	s=mimecast20190719; t=1728648225;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VNd+olTinR+Az5xuvHMtnLJBrIEidKth6Y7xvIaq0Bs=;
-	b=I7i5ex9UoyOQXUEjYpyaw4cPAi+oSTns+Rnare2VMxporhsQX2jYHlZ663mYUlrTu32LBV
-	youRB4P+/bmz9C9ALOL9Qbt4RsWFSQL9tE2i82xmL/Vfn6FSQKPsHP16/L+Q7c9c3ZUvuU
-	ZunQxq2jMT/gkAnGDfyVUAgIXnZQaIM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=3I5lHL6mHTQWMds6pJC4dZUawdNZoxrsfeR6hWpkDqM=;
+	b=HmzvnJGfYk4/e7bD5ZZtE1b+i4kla43u+mtoVdV3eKIMww2ZKVEOWNRVmCAFhxkaud0pyw
+	62ACAt5xy88XuHaqmH9HbSsBJTLndAHJoeBq1lBq+gFVhHa8vfkJfotvh9lLvIjqjSQOes
+	3b7LgyMw9NRjHxYi4hxXNfddwU04vxg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-104-dhbbBEBKO_GUsQ4AihU-Sw-1; Fri, 11 Oct 2024 07:50:23 -0400
-X-MC-Unique: dhbbBEBKO_GUsQ4AihU-Sw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4311db0f3f1so4881045e9.2
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 04:50:22 -0700 (PDT)
+ us-mta-55-8e2Z3QTKP8ugdipVYg6ZJQ-1; Fri, 11 Oct 2024 08:03:44 -0400
+X-MC-Unique: 8e2Z3QTKP8ugdipVYg6ZJQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43056c979c9so11793935e9.1
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 05:03:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728647422; x=1729252222;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VNd+olTinR+Az5xuvHMtnLJBrIEidKth6Y7xvIaq0Bs=;
-        b=HFYvbId741JyTBnEWm7D2/K7nMgJVzRnZIKTseYwb1BkKiLcBpRlffqfTAEDwBhPOb
-         a9eMaspJgdEbn7pQ1BmN/f8iXkIOmPdClMb2HB+PiVlctEDqEl6LOLFR1/ouTFSIrzN9
-         3FgV9NxqXEJbqNCfmA4t8v/KW9ig9ZTlL8VvAUD674AOBCfKU/lFbWTr4c87MHs47E2M
-         4+f0M2U2Bh9LS/8hTGTXMi8qzJSPY/UDTxNi+aEa7YnbOp1YvxtVUzM48upx2laN1LEw
-         2GCGGK1TWIyJOHZqd4qnjjW6i0BgCieHFw/Ur7EFcLq5Lvvkk5e8ds+qY8hxHwoP78v/
-         sURQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVVNdGhB/mlgirY/uBLOGikVXc4ukrqxpptkN/Sj83SwqceiopeuY48/i/U1AiuAKZr/8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9V7Y02eye9SRPDHCygkPbHrdNBxfNVMvuJf2YZOTUCLzBynYe
-	ozwGK+TFuBeNJTQlEpHowR6FLLqg7Krt6Fj3aExJva2gfIW+c4gOa5H6/u0Zwz6FOizC8KUmJrW
-	dp/nJp1jxmUfEeDxWC6+9ZH99ewoeQREuZiqxFLPVb2BuqwJpdA==
-X-Received: by 2002:a05:600c:228c:b0:42f:80f4:ab2b with SMTP id 5b1f17b1804b1-4311dee6f58mr19373145e9.19.1728647421798;
-        Fri, 11 Oct 2024 04:50:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEe4zP3dgdckIA1FJoIn+Owc99lvaOABl3u8J5ZHWT75MQxBB4REz4MYW0kPlh2glfJYYK9FA==
-X-Received: by 2002:a05:600c:228c:b0:42f:80f4:ab2b with SMTP id 5b1f17b1804b1-4311dee6f58mr19372935e9.19.1728647421395;
-        Fri, 11 Oct 2024 04:50:21 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c749:9100:c078:eec6:f2f4:dd3b? (p200300cbc7499100c078eec6f2f4dd3b.dip0.t-ipconnect.de. [2003:cb:c749:9100:c078:eec6:f2f4:dd3b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43017466e4fsm67432015e9.0.2024.10.11.04.50.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Oct 2024 04:50:21 -0700 (PDT)
-Message-ID: <d54f9b64-fc9f-4b63-8212-7d59e5d5a54d@redhat.com>
-Date: Fri, 11 Oct 2024 13:50:20 +0200
+        d=1e100.net; s=20230601; t=1728648223; x=1729253023;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3I5lHL6mHTQWMds6pJC4dZUawdNZoxrsfeR6hWpkDqM=;
+        b=aaJyFd7w5LxHKUkfQc9/gws6B9IT2I/EikY5E4JTnKDOo6GCqjV1tX9NOxctV4NkLj
+         QVYjwCL8sNKyeiWLiokxh+EYHmJw5VrbotshJugLsXEImf8uh6BuFxVULRwXSNK6+9aq
+         MwVRfSHQzexSa62oLEZBHrI4U3GReXB64RW+zFmldOQNPzWtEmSBNfxx+cnw8mLZ2SPy
+         imadVgIjdxG1DZtcpYz99hsm6ZpQdB5F92FEej5LLDukKZF7+ZHfcBZrL3/GjMvLI3y6
+         sMWAlk85xxXPZQSrojlCgICkA+SAulGooEziQsVu2/emI/t5M7KsFmvonAbAX8xuq5xN
+         VCvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrY3eCvO/xpskTix/JwFYf9m1kehbonkwbh1uNc/H+JT5jqePn/e+jwAYijNPL4Lsrr8g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgVVXkJMdja+fGxhSPHkizFshoPbBODGM2L2dU08QeQqg5toxK
+	ghVyx00AoHgIJEijPi9jmUTOExrg5EUojSg18h2cu3OBNiVGQ/YjDF1RjV/YlFbOz1tYO5HQCet
+	wOEtEyFL8CLcX32Gy9p7XnTPF1KlEvIF93JePatxaGDfDCSa0zA==
+X-Received: by 2002:a05:600c:1d1c:b0:42c:c003:edd1 with SMTP id 5b1f17b1804b1-4311decaa48mr19192245e9.10.1728648222831;
+        Fri, 11 Oct 2024 05:03:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IExbuVJr4JGcXjTZsUgf0Q1cJGFJf/2hMvz1Z5drCky7hS/DrFylID4EQn0lZzCFTWpUUq6Zw==
+X-Received: by 2002:a05:600c:1d1c:b0:42c:c003:edd1 with SMTP id 5b1f17b1804b1-4311decaa48mr19191405e9.10.1728648222253;
+        Fri, 11 Oct 2024 05:03:42 -0700 (PDT)
+Received: from eisenberg.fritz.box ([2001:16b8:3d05:4700:3e59:7d70:cabd:144b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430ccf51770sm73523925e9.22.2024.10.11.05.03.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Oct 2024 05:03:41 -0700 (PDT)
+Message-ID: <914de38f0b6b3d2ddf98c16e427085732bebfd4a.camel@redhat.com>
+Subject: Re: [RFC PATCH 01/13] PCI: Prepare removing devres from pci_intx()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+ Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
+ <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>,  Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>, Mario Limonciello <mario.limonciello@amd.com>, Chen
+ Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Mostafa Saleh
+ <smostafa@google.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
+ Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi
+ Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
+ Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Eric Auger
+ <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>, Marek
+ =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
+ <kai.vehmanen@linux.intel.com>,  Peter Ujfalusi
+ <peter.ujfalusi@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>,
+ Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-input@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-wireless@vger.kernel.org,
+ ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
+ linux-staging@lists.linux.dev, kvm@vger.kernel.org, 
+ xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Date: Fri, 11 Oct 2024 14:03:39 +0200
+In-Reply-To: <20241010114304.064f5d3d.alex.williamson@redhat.com>
+References: <20241009083519.10088-1-pstanner@redhat.com>
+	 <20241009083519.10088-2-pstanner@redhat.com>
+	 <20241010114304.064f5d3d.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Proposal: bi-weekly guest_memfd upstream call
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org
-References: <diqzy12vswvr.fsf@ackerleytng-ctop.c.googlers.com>
-Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <diqzy12vswvr.fsf@ackerleytng-ctop.c.googlers.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 10.10.24 19:14, Ackerley Tng wrote:
-> David Hildenbrand <david@redhat.com> writes:
-> 
->> Ahoihoi,
->>
->> while talking to a bunch of folks at LPC about guest_memfd, it was
->> raised that there isn't really a place for people to discuss the
->> development of guest_memfd on a regular basis.
->>
->> There is a KVM upstream call, but guest_memfd is on its way of not being
->> guest_memfd specific ("library") and there is the bi-weekly MM alignment
->> call, but we're not going to hijack that meeting completely + a lot of
->> guest_memfd stuff doesn't need all the MM experts ;)
->>
->> So my proposal would be to have a bi-weekly meeting, to discuss ongoing
->> development of guest_memfd, in particular:
->>
->> (1) Organize development: (do we need 3 different implementation
->>       of mmap() support ? ;) )
->> (2) Discuss current progress and challenges
->> (3) Cover future ideas and directions
->> (4) Whatever else makes sense
->>
->> Topic-wise it's relatively clear: guest_memfd extensions were one of the
->> hot topics at LPC ;)
->>
->> I would suggest every second Thursdays from 9:00 - 10:00am PDT (GMT-7),
->> starting Thursday next week (2024-10-17).
-> 
-> This time works for me as well, thank you!
-> 
->>
->> We would be using Google Meet.
-> 
-> Thanks too! Shall we use http://meet.google.com/wxp-wtju-jzw ?
+On Thu, 2024-10-10 at 11:43 -0600, Alex Williamson wrote:
+> On Wed,=C2=A0 9 Oct 2024 10:35:07 +0200
+> Philipp Stanner <pstanner@redhat.com> wrote:
+>=20
+> > pci_intx() is a hybrid function which sometimes performs devres
+> > operations, depending on whether pcim_enable_device() has been used
+> > to
+> > enable the pci_dev. This sometimes-managed nature of the function
+> > is
+> > problematic. Notably, it causes the function to allocate under some
+> > circumstances which makes it unusable from interrupt context.
+> >=20
+> > To, ultimately, remove the hybrid nature from pci_intx(), it is
+> > first
+> > necessary to provide an always-managed and a never-managed version
+> > of that function. Then, all callers of pci_intx() can be ported to
+> > the
+> > version they need, depending whether they use pci_enable_device()
+> > or
+> > pcim_enable_device().
+> >=20
+> > An always-managed function exists, namely pcim_intx(), for which
+> > __pcim_intx(), a never-managed version of pci_intx() had been
+> > implemented.
+> >=20
+> > Make __pcim_intx() a public function under the name
+> > pci_intx_unmanaged(). Make pcim_intx() a public function.
+> >=20
+> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> > ---
+> > =C2=A0drivers/pci/devres.c | 24 +++---------------------
+> > =C2=A0drivers/pci/pci.c=C2=A0=C2=A0=C2=A0 | 26 ++++++++++++++++++++++++=
+++
+> > =C2=A0include/linux/pci.h=C2=A0 |=C2=A0 2 ++
+> > =C2=A03 files changed, 31 insertions(+), 21 deletions(-)
+> >=20
+> > diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
+> > index b133967faef8..475a3ae5c33f 100644
+> > --- a/drivers/pci/devres.c
+> > +++ b/drivers/pci/devres.c
+> > @@ -411,31 +411,12 @@ static inline bool mask_contains_bar(int
+> > mask, int bar)
+> > =C2=A0	return mask & BIT(bar);
+> > =C2=A0}
+> > =C2=A0
+> > -/*
+> > - * This is a copy of pci_intx() used to bypass the problem of
+> > recursive
+> > - * function calls due to the hybrid nature of pci_intx().
+> > - */
+> > -static void __pcim_intx(struct pci_dev *pdev, int enable)
+> > -{
+> > -	u16 pci_command, new;
+> > -
+> > -	pci_read_config_word(pdev, PCI_COMMAND, &pci_command);
+> > -
+> > -	if (enable)
+> > -		new =3D pci_command & ~PCI_COMMAND_INTX_DISABLE;
+> > -	else
+> > -		new =3D pci_command | PCI_COMMAND_INTX_DISABLE;
+> > -
+> > -	if (new !=3D pci_command)
+> > -		pci_write_config_word(pdev, PCI_COMMAND, new);
+> > -}
+> > -
+> > =C2=A0static void pcim_intx_restore(struct device *dev, void *data)
+> > =C2=A0{
+> > =C2=A0	struct pci_dev *pdev =3D to_pci_dev(dev);
+> > =C2=A0	struct pcim_intx_devres *res =3D data;
+> > =C2=A0
+> > -	__pcim_intx(pdev, res->orig_intx);
+> > +	pci_intx_unmanaged(pdev, res->orig_intx);
+> > =C2=A0}
+> > =C2=A0
+> > =C2=A0static struct pcim_intx_devres *get_or_create_intx_devres(struct
+> > device *dev)
+> > @@ -472,10 +453,11 @@ int pcim_intx(struct pci_dev *pdev, int
+> > enable)
+> > =C2=A0		return -ENOMEM;
+> > =C2=A0
+> > =C2=A0	res->orig_intx =3D !enable;
+> > -	__pcim_intx(pdev, enable);
+> > +	pci_intx_unmanaged(pdev, enable);
+> > =C2=A0
+> > =C2=A0	return 0;
+> > =C2=A0}
+> > +EXPORT_SYMBOL(pcim_intx);
+>=20
+> What precludes this from _GPL?=C2=A0 Also note that this is now calling a
+> GPL symbol, so by default I'd assume it should also be GPL.=C2=A0 Thanks,
 
-I assume that room cannot be joined when you are not around (e.g., using 
-it right now makes me "Ask to join"). Can that be changed?
+Ah right, I overlooked that pci_intx() also has the _GPL version.
+Will make consistent.
 
-Otherwise, I think I can provide a room (Red Hat is using Google 
-Mail/Meet etc.)
+Thx,
+P.
 
-Thanks!
-
--- 
-Cheers,
-
-David / dhildenb
+>=20
+> Alex
+>=20
+> > =C2=A0
+> > =C2=A0static void pcim_disable_device(void *pdev_raw)
+> > =C2=A0{
+> > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> > index 7d85c04fbba2..318cfb5b5e15 100644
+> > --- a/drivers/pci/pci.c
+> > +++ b/drivers/pci/pci.c
+> > @@ -4476,6 +4476,32 @@ void pci_disable_parity(struct pci_dev *dev)
+> > =C2=A0	}
+> > =C2=A0}
+> > =C2=A0
+> > +/**
+> > + * pci_intx - enables/disables PCI INTx for device dev, unmanaged
+> > version
+> > + * @pdev: the PCI device to operate on
+> > + * @enable: boolean: whether to enable or disable PCI INTx
+> > + *
+> > + * Enables/disables PCI INTx for device @pdev
+> > + *
+> > + * This function behavios identically to pci_intx(), but is never
+> > managed with
+> > + * devres.
+> > + */
+> > +void pci_intx_unmanaged(struct pci_dev *pdev, int enable)
+> > +{
+> > +	u16 pci_command, new;
+> > +
+> > +	pci_read_config_word(pdev, PCI_COMMAND, &pci_command);
+> > +
+> > +	if (enable)
+> > +		new =3D pci_command & ~PCI_COMMAND_INTX_DISABLE;
+> > +	else
+> > +		new =3D pci_command | PCI_COMMAND_INTX_DISABLE;
+> > +
+> > +	if (new !=3D pci_command)
+> > +		pci_write_config_word(pdev, PCI_COMMAND, new);
+> > +}
+> > +EXPORT_SYMBOL_GPL(pci_intx_unmanaged);
+> > +
+> > =C2=A0/**
+> > =C2=A0 * pci_intx - enables/disables PCI INTx for device dev
+> > =C2=A0 * @pdev: the PCI device to operate on
+> > diff --git a/include/linux/pci.h b/include/linux/pci.h
+> > index 573b4c4c2be6..6b8cde76d564 100644
+> > --- a/include/linux/pci.h
+> > +++ b/include/linux/pci.h
+> > @@ -1353,6 +1353,7 @@ int __must_check pcim_set_mwi(struct pci_dev
+> > *dev);
+> > =C2=A0int pci_try_set_mwi(struct pci_dev *dev);
+> > =C2=A0void pci_clear_mwi(struct pci_dev *dev);
+> > =C2=A0void pci_disable_parity(struct pci_dev *dev);
+> > +void pci_intx_unmanaged(struct pci_dev *pdev, int enable);
+> > =C2=A0void pci_intx(struct pci_dev *dev, int enable);
+> > =C2=A0bool pci_check_and_mask_intx(struct pci_dev *dev);
+> > =C2=A0bool pci_check_and_unmask_intx(struct pci_dev *dev);
+> > @@ -2293,6 +2294,7 @@ static inline void pci_fixup_device(enum
+> > pci_fixup_pass pass,
+> > =C2=A0				=C2=A0=C2=A0=C2=A0 struct pci_dev *dev) { }
+> > =C2=A0#endif
+> > =C2=A0
+> > +int pcim_intx(struct pci_dev *pdev, int enabled);
+> > =C2=A0void __iomem *pcim_iomap(struct pci_dev *pdev, int bar, unsigned
+> > long maxlen);
+> > =C2=A0void __iomem *pcim_iomap_region(struct pci_dev *pdev, int bar,
+> > =C2=A0				const char *name);
+>=20
 
 
