@@ -1,147 +1,135 @@
-Return-Path: <kvm+bounces-28609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB47999A13F
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 12:25:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBA1399A294
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:19:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 748E71F22CC8
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 10:25:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39207B21092
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D2A21501D;
-	Fri, 11 Oct 2024 10:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF8921502F;
+	Fri, 11 Oct 2024 11:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eg0IZHMX"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vok1ydJj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17DB212D09
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 10:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D663E804;
+	Fri, 11 Oct 2024 11:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728642311; cv=none; b=vE9wfr6t0CS1OrmDXtQP59cO/gzGtzUH/YIbkoCNJeKvkMcYW3bFN+qUz6USP5NihAaM3ggfUMttXkFCP3Ypk1TL5cnwMypeOrMAA2XO6gkKHzbkd5iY1YT88VB7APiFCgxr30vTcXPjw3HG3PU+KfO7ZrW/e/E5zTd0tZhF4go=
+	t=1728645541; cv=none; b=IW0utCpgIHgOhhj2yZyzQhN5aHnC8PNv7FO7iFSx9/8MLu0ZZHAik/tbDIQLgveZLzCQAoE6P2fjRdvPwf6gKnxLKpf40uLGujyFiF/Wtycze48UdAK0LQOnnzwNVFGo1SbqCA6wyv9No9qe74D59WQisYvD1FpFoO6aw6r/Gb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728642311; c=relaxed/simple;
-	bh=1C83OOgMcgqb57Ddo8ncVhTx9jAr8iuBqE28xGsal7g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r0Ncq1WlqT+xHUIYg/L5DVpvvq1bc5T2evVMLtbJ+lW1uzkl9En1iO639oRfT9Xbn23o51vL8UjcvIDODwmGfAY6yfEBvMVDC7rprbst+YtpzTEgN/TUKTfAm9FxHFhYX0s6iAB1eY7fXmTZIOvyszJIh7ufte2lV8WMVt4pAZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eg0IZHMX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728642308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UZ3IdlQSiC9SBRAFeIkUjQ3G20iTXPL8FgSwyp2DDL0=;
-	b=Eg0IZHMXIT2pR11GyVUKzabwVHslxYHCT9x7YwXqKVku4WrzDVACHKWinBkKlyMrq66OJR
-	h1TOgeQOWdsc0QLTUlc/VkJdn2SQCEOkHXI2TQsCeUscc/wzbhgZlU5KWsRmin1NqCunYu
-	/Vu1hg5nRxeet4FwJob+8SSSQvZA3ts=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-638-AWsUiTUhPfSrctqTbSxh0w-1; Fri,
- 11 Oct 2024 06:25:05 -0400
-X-MC-Unique: AWsUiTUhPfSrctqTbSxh0w-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D7D91955F3D;
-	Fri, 11 Oct 2024 10:25:03 +0000 (UTC)
-Received: from t14s.fritz.box (unknown [10.22.80.4])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E484D1956089;
-	Fri, 11 Oct 2024 10:24:58 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	kvm@vger.kernel.org,
-	David Hildenbrand <david@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Hugh Dickins <hughd@google.com>,
-	Thomas Huth <thuth@redhat.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Kefeng Wang <wangkefeng.wang@huawei.com>,
-	Leo Fu <bfu@redhat.com>
-Subject: [PATCH v1 2/2] mm: don't install PMD mappings when THPs are disabled by the hw/process/vma
-Date: Fri, 11 Oct 2024 12:24:45 +0200
-Message-ID: <20241011102445.934409-3-david@redhat.com>
-In-Reply-To: <20241011102445.934409-1-david@redhat.com>
-References: <20241011102445.934409-1-david@redhat.com>
+	s=arc-20240116; t=1728645541; c=relaxed/simple;
+	bh=l/ebEG8kD/gjaGhc9sDTvLQS00rUq5c+N3DFQlZBEzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KCg8eCCOt1AsUgUq+Av/HR3hfOYOmOKYFTwYMTGfMyHEVu4IEnvwLLdXxFcGii2BFMsFajv1kx6zQrvMm6y84Gl57HBPeIqC7ZPXE0nBFNZrQKR0PsjdB3C/5rXN5h0TYWmsybWstQlY3ASYGgGY1/Je/vCe7eVowXfTkuEnqeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vok1ydJj; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=JmzYZueYdB1IqVFlxSAinoEZfpgluWHovncGAWktWlU=; b=vok1ydJjbOKAUOWv5qDBpnZuN/
+	n+fSJPCvif/g62RipbMzFvKVO1Sm1BtHEwYwExJqsHpzXzUlAjhzDlCL6iHuAoap1UVrefrlzSm4u
+	GPa3to4Qrwb8iUApEGN3suRquVGlHz5+SQzevP2oB08acHpw+N9EX+lpibwLJVK474W6KLvNwOLYA
+	8sb6Zvfs8SKs5RnLb5+g5Z/n3MGr7Ze3JMZC4GnmNfHre/xr6J2M3G0h1XKjwidhXQetXPsC2aTFi
+	8LfVeCYqZdXRxFvjh4tGy3mbjWKSRWkPYEwWQkgaZlsoXZgPgOHgvhv2LVKpnIKPwTTueMBureBRy
+	Lb9foEyg==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1szDfV-0000000AbXI-2lYb;
+	Fri, 11 Oct 2024 11:18:51 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id C8330300642; Fri, 11 Oct 2024 13:18:49 +0200 (CEST)
+Date: Fri, 11 Oct 2024 13:18:49 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Xiong Zhang <xiong.y.zhang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Kan Liang <kan.liang@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Manali Shukla <manali.shukla@amd.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Jim Mattson <jmattson@google.com>,
+	Stephane Eranian <eranian@google.com>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	gce-passthrou-pmu-dev@google.com,
+	Samantha Alt <samantha.alt@intel.com>,
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+	Like Xu <like.xu.linux@gmail.com>,
+	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [RFC PATCH v3 07/58] perf: Skip pmu_ctx based on event_type
+Message-ID: <20241011111849.GM14587@noisy.programming.kicks-ass.net>
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-8-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240801045907.4010984-8-mizhang@google.com>
 
-We (or rather, readahead logic :) ) might be allocating a THP in the
-pagecache and then try mapping it into a process that explicitly disabled
-THP: we might end up installing PMD mappings.
+On Thu, Aug 01, 2024 at 04:58:16AM +0000, Mingwei Zhang wrote:
+> @@ -3299,9 +3309,6 @@ ctx_sched_out(struct perf_event_context *ctx, enum event_type_t event_type)
+>  	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+>  	struct perf_event_pmu_context *pmu_ctx;
+>  	int is_active = ctx->is_active;
+> -	bool cgroup = event_type & EVENT_CGROUP;
+> -
+> -	event_type &= ~EVENT_CGROUP;
+>  
+>  	lockdep_assert_held(&ctx->lock);
+>  
+> @@ -3336,7 +3343,7 @@ ctx_sched_out(struct perf_event_context *ctx, enum event_type_t event_type)
+>  		barrier();
+>  	}
+>  
+> -	ctx->is_active &= ~event_type;
+> +	ctx->is_active &= ~(event_type & ~EVENT_FLAGS);
+>  	if (!(ctx->is_active & EVENT_ALL))
+>  		ctx->is_active = 0;
+>  
 
-This is a problem for s390x KVM, which explicitly remaps all PMD-mapped
-THPs to be PTE-mapped in s390_enable_sie()->thp_split_mm(), before
-starting the VM.
+> @@ -3912,9 +3919,6 @@ ctx_sched_in(struct perf_event_context *ctx, enum event_type_t event_type)
+>  {
+>  	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+>  	int is_active = ctx->is_active;
+> -	bool cgroup = event_type & EVENT_CGROUP;
+> -
+> -	event_type &= ~EVENT_CGROUP;
+>  
+>  	lockdep_assert_held(&ctx->lock);
+>  
+> @@ -3932,7 +3936,7 @@ ctx_sched_in(struct perf_event_context *ctx, enum event_type_t event_type)
+>  		barrier();
+>  	}
+>  
+> -	ctx->is_active |= (event_type | EVENT_TIME);
+> +	ctx->is_active |= ((event_type & ~EVENT_FLAGS) | EVENT_TIME);
+>  	if (ctx->task) {
+>  		if (!is_active)
+>  			cpuctx->task_ctx = ctx;
 
-For example, starting a VM backed on a file system with large folios
-supported makes the VM crash when the VM tries accessing such a mapping
-using KVM.
+Would it make sense to do something like:
 
-Is it also a problem when the HW disabled THP using
-TRANSPARENT_HUGEPAGE_UNSUPPORTED? At least on x86 this would be the case
-without X86_FEATURE_PSE.
+	enum event_type_t active_type = event_type & ~EVENT_FLAGS;
 
-In the future, we might be able to do better on s390x and only disallow
-PMD mappings -- what s390x and likely TRANSPARENT_HUGEPAGE_UNSUPPORTED
-really wants. For now, fix it by essentially performing the same check as
-would be done in __thp_vma_allowable_orders() or in shmem code, where this
-works as expected, and disallow PMD mappings, making us fallback to PTE
-mappings.
+	ctx->is_active &= ~active_type;
+and
+	ctx->is_active |= (active_type | EVENT_TIME);
 
-Reported-by: Leo Fu <bfu@redhat.com>
-Fixes: 793917d997df ("mm/readahead: Add large folio readahead")
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-Cc: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- mm/memory.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/mm/memory.c b/mm/memory.c
-index 2366578015ad..a2e501489517 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -4925,6 +4925,15 @@ vm_fault_t do_set_pmd(struct vm_fault *vmf, struct page *page)
- 	pmd_t entry;
- 	vm_fault_t ret = VM_FAULT_FALLBACK;
- 
-+	/*
-+	 * It is too late to allocate a small folio, we already have a large
-+	 * folio in the pagecache: especially s390 KVM cannot tolerate any
-+	 * PMD mappings, but PTE-mapped THP are fine. So let's simply refuse any
-+	 * PMD mappings if THPs are disabled.
-+	 */
-+	if (thp_disabled_by_hw() || vma_thp_disabled(vma, vma->vm_flags))
-+		return ret;
-+
- 	if (!thp_vma_suitable_order(vma, haddr, PMD_ORDER))
- 		return ret;
- 
--- 
-2.46.1
-
+Or something along those lines; those expressions become a little
+unwieldy otherwise.
 
