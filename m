@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-28650-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28651-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3E3699AD98
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 22:37:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3187599ADED
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 23:02:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E488B228BB
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 20:37:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58B3E1C22850
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 21:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D6F1D1518;
-	Fri, 11 Oct 2024 20:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7554C1D1318;
+	Fri, 11 Oct 2024 21:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7nD/nG7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0x9Fe/J"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D48119B3CB
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 20:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27858199231
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 21:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728679048; cv=none; b=Am2GbBXhTrRGG0sjglgp8zauN+MZ/QBxGCm0gr62OG7AlL5FqRLYileEY9Q1jMCkdeKjwG/RltGqYu8i3w4f6W1f3pDO+/HdKUWjPLSZOa7pqCRV507w/ihte3llLXqOnrkn+vQcD+/S+oCNmnYB0hk/0ElOFEduEa+G5d9HfCo=
+	t=1728680555; cv=none; b=R1DKhnMZnkMz6CM2gSjyUNfVHlKuDfpu+hIoHr43/gAn7CBs/31NTSKlwSTOvD72FXtyuCEMKmfjk9M3V2NBSYCUmf4h8o7pIh9rZPf12LdNdlEzPbxro6tDREp68aCE1WrDn2cy8D+F3zg7c5zRckextsJsznmry9gKnHriUTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728679048; c=relaxed/simple;
-	bh=ok3Uhus4o1fHHNgAgze2m5cCgEgSOBzJ+bu2Lk58iQM=;
+	s=arc-20240116; t=1728680555; c=relaxed/simple;
+	bh=t7v9LrnikA0b/tdjpm95QIPigc7c4Z7Gm+7ryEqj1gE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VdBC127qzIOAfIxk4cuIuNkMd3zQzFU5PslLXlHVWIt3xXghvU5sc3kQ5tZuaeTOh0/oOvXjpDTgJlq1UiMx6Rlifjlj9BklBXi4WCbCV7oI2Ozs4fZGDnzv71AcfSd1iQUtrVVo02Szrlc69fotm7ovsXBsRH6gxk766pFKpOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W7nD/nG7; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=oKnxR+J8QEs2fw17B6oOPYEVyGZQhuDN2wSx0wYKG8nBEvutt/RTnFnRj57q+Rl1ZeuYlJiTx33MGt/fcrnYm7KVuTqUw/r2TdjIYIB/0vbXRtWB/Tz24hl9gcT+5BJKIOw1foA0jw9QKTCT+PZYnscP2FGiEsMX648SY1ziL18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P0x9Fe/J; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728679045;
+	s=mimecast20190719; t=1728680552;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=83b1hPyOJcDieDQ667domh+NlBgqeUhWWW1JcLYMgsI=;
-	b=W7nD/nG7ZogSGduJ+FPGiglZmfV/NfY0xzksITADd95suxFlIn38NzpHDYesY9xnllTFVr
-	ihc1fVP2eVwXcPQhneHVtEh0ypyCPRbGtUXUEMJv9Yk3PyapKrWQs+Ivvz9PYlRMkQtHSP
-	ZzN+e0HTjut+wqcH+kK0ogHSIIURyE4=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=M4ZF/lqPBd0UGdsnnza01sUUQe28zx1+oJm7x5DzidA=;
+	b=P0x9Fe/JDtI0+/X4y5e5Yj1hSS6MimWRgftZG3IlsgxfuqbQfAYtXvcYBj3Wb80WcOfhvv
+	ZjL/vEo2Fqc7YFCwIK61pstcOgCOlFS0AgKuofHv4JmIs821zAXW8JAOnK8g0pFwUIlql1
+	PZkMt9KeBmwRc0TH4VlWHsVTJVCPpds=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-83-mbIQeizzP2WBcGejORqSpg-1; Fri, 11 Oct 2024 16:37:24 -0400
-X-MC-Unique: mbIQeizzP2WBcGejORqSpg-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-834add432f3so34591439f.2
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 13:37:24 -0700 (PDT)
+ us-mta-605-qcrPnig2PR2_4v1IMjwoCw-1; Fri, 11 Oct 2024 17:02:30 -0400
+X-MC-Unique: qcrPnig2PR2_4v1IMjwoCw-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-837875efdbeso19357239f.2
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 14:02:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728679043; x=1729283843;
+        d=1e100.net; s=20230601; t=1728680550; x=1729285350;
         h=content-transfer-encoding:mime-version:organization:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=83b1hPyOJcDieDQ667domh+NlBgqeUhWWW1JcLYMgsI=;
-        b=gb0UFfhOWLkcoWFY2qLwrT1xJjEMMI0kn1xDfsWd6E6Jq2oACu7xICIa+myefb/jMk
-         hTAFm11fCPeczNR4mpKCoSDFA5fr2mm3uBKZpJWdIoMr0hNpKcLj5wOkcjCqrfxa3iaX
-         nH/AHKMgD1kkKoZuTDwxu/1JKxKMqtTlDwqbMUgakwRVTujMQQ581JRL+P7ZlmiqM4zz
-         7bxtI2GtHzOPYQ4UQAMnawk7JTaQ+jBUSOzYtsxYjyCfK10aL9srzm5rQh9BwFa1427V
-         VDd4cYpNDxvpF1SYXynSaGA87wT4CV0j+OivCtqebYTjrTnhwSa2WvOzG1jb7z+A4PB1
-         4n3w==
-X-Gm-Message-State: AOJu0YxBdYvcoj6LCVfOsf98IFy7mdgqDP6Fetc+LO3Y7SUPXW8yoJfV
-	YGuLlhtytzuBlRmUuo+kyKgdmUn8JBY1nMYC5u2qv/xjj68FmG9WmqmXUPmph9c2Tbxyapf8EDE
-	Ke77BWKN1oCHsZi77omsI8i0kdO03EFxhQop1lCgcI1VmX0Kjvg==
-X-Received: by 2002:a5e:8e4d:0:b0:82a:a4f0:c95d with SMTP id ca18e2360f4ac-83794b58cf0mr91139239f.4.1728679043377;
-        Fri, 11 Oct 2024 13:37:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGGzr9L4tEu39Z7uqjYgxawSTwRkH6yKP4IuMAlzewyi0uMldGhyZLXRBPlAt1XieJJwhU9vw==
-X-Received: by 2002:a5e:8e4d:0:b0:82a:a4f0:c95d with SMTP id ca18e2360f4ac-83794b58cf0mr91136739f.4.1728679042876;
-        Fri, 11 Oct 2024 13:37:22 -0700 (PDT)
+        bh=M4ZF/lqPBd0UGdsnnza01sUUQe28zx1+oJm7x5DzidA=;
+        b=cPfpUqYvVBT51GqKxQUKEusIx3BIW0Fk02Uyge2T04Hkf08kHPszPtBOdWsrcFtDrc
+         mAttck+1Yhog4LUwdWSYUnsdCQaQR8ucMYW9/U4Wz9sLJMOurancC1x19lprSILpGmv5
+         kCFOC++wmgThoZJ0IvnIWMGQbo0i7M9hI0tzl3n7ofqDn3eK44g48Ty/YF1e0vVUXGbi
+         mD2xiddPJ3fLBeKLvTAbjpOCZlb6GTc0dgBH3g2Iv+AFaYAQ7R6ckCeJ/QeQVuJbbWOP
+         pwX37e7uB1S99Bg4gZCCXU0h7CJDEM3DlR+n12TAgbylFF8/npYKJK7GR40ygNtUwojf
+         /bSg==
+X-Gm-Message-State: AOJu0YzBtaIit2Frn6GQixu9j4HYpcQEwvoGUiQaSIsm/crymfE0Af46
+	XO2vvs67SwpFSJ5gtlcvvZ2uRy/PJmHetUCYP0/g0ktBq46Y11DqRVE8Nf3s4Ib2EIcPjLQTY4v
+	czZP4cynI7KA1Tb+krLffSjudYxlDp+k9d7Dkv4apotP5oBP+kQ==
+X-Received: by 2002:a05:6602:3284:b0:834:f667:217a with SMTP id ca18e2360f4ac-8379202f708mr89166439f.1.1728680550020;
+        Fri, 11 Oct 2024 14:02:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFqD2f+aFQtnYWBNo5lj3VmQuysrsCAI+ZXqdxvd+ha7KP/RQaF5OE/2Ag0jxh8N+y1wX+hmg==
+X-Received: by 2002:a05:6602:3284:b0:834:f667:217a with SMTP id ca18e2360f4ac-8379202f708mr89165039f.1.1728680549687;
+        Fri, 11 Oct 2024 14:02:29 -0700 (PDT)
 Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbadaa9f67sm780452173.153.2024.10.11.13.37.21
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbad9b15absm792043173.34.2024.10.11.14.02.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 13:37:22 -0700 (PDT)
-Date: Fri, 11 Oct 2024 14:37:19 -0600
+        Fri, 11 Oct 2024 14:02:29 -0700 (PDT)
+Date: Fri, 11 Oct 2024 15:02:27 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
 To: Zhi Wang <zhiw@nvidia.com>
 Cc: <kvm@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
@@ -83,11 +83,12 @@ Cc: <kvm@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
  <cjia@nvidia.com>, <smitra@nvidia.com>, <ankita@nvidia.com>,
  <aniketa@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
  <zhiwang@kernel.org>
-Subject: Re: [RFC 09/13] vfio/pci: introduce CXL device awareness
-Message-ID: <20241011143719.2c6e0458.alex.williamson@redhat.com>
-In-Reply-To: <20240920223446.1908673-10-zhiw@nvidia.com>
+Subject: Re: [RFC 10/13] vfio/pci: emulate CXL DVSEC registers in the
+ configuration space
+Message-ID: <20241011150227.1b41a479.alex.williamson@redhat.com>
+In-Reply-To: <20240920223446.1908673-11-zhiw@nvidia.com>
 References: <20240920223446.1908673-1-zhiw@nvidia.com>
-	<20240920223446.1908673-10-zhiw@nvidia.com>
+	<20240920223446.1908673-11-zhiw@nvidia.com>
 Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -98,215 +99,54 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 20 Sep 2024 15:34:42 -0700
+On Fri, 20 Sep 2024 15:34:43 -0700
 Zhi Wang <zhiw@nvidia.com> wrote:
 
-> CXL device programming interfaces are built upon PCI interfaces. Thus
-> the vfio-pci-core can be leveraged to handle a CXL device.
+> A CXL device has many DVSEC registers in the configuration space for
+> device control and enumeration. E.g. enable CXL.mem/CXL.cahce.
 > 
-> However, CXL device also has difference with PCI devicce:
+> However, the kernel CXL core owns those registers to control the device.
+> Thus, the VM is forbidden to touch the physical device control registers.
 > 
-> - No INTX support, only MSI/MSIX is supported.
-> - Resest is one via CXL reset. FLR only resets CXL.io.
+> Read/write the CXL DVSEC from/to the virt configuration space.
 > 
-> Introduce the CXL device awareness to the vfio-pci-core. Expose a new
-> VFIO device flags to the userspace to identify the VFIO device is a CXL
-> device. Disable INTX support in the vfio-pci-core. Disable FLR reset for
-> the CXL device as the kernel CXL core hasn't support CXL reset yet.
-> Disable mmap support on the CXL MMIO BAR in vfio-pci-core.
-
-Why are we disabling mmap on the entire BAR when we have sparse mmap
-support to handle disabling mmap only on a portion of the BAR, which
-seems to be the case needed here.  Am I mistaken?
- 
 > Signed-off-by: Zhi Wang <zhiw@nvidia.com>
 > ---
->  drivers/vfio/pci/vfio_cxl_core.c |  8 ++++++
->  drivers/vfio/pci/vfio_pci_core.c | 42 +++++++++++++++++++++-----------
->  include/linux/vfio_pci_core.h    |  2 ++
->  include/uapi/linux/vfio.h        |  1 +
->  4 files changed, 39 insertions(+), 14 deletions(-)
+>  drivers/vfio/pci/vfio_pci_config.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
-> diff --git a/drivers/vfio/pci/vfio_cxl_core.c b/drivers/vfio/pci/vfio_cxl_core.c
-> index bbb968cb1b70..d8b51f8792a2 100644
-> --- a/drivers/vfio/pci/vfio_cxl_core.c
-> +++ b/drivers/vfio/pci/vfio_cxl_core.c
-> @@ -391,6 +391,8 @@ int vfio_cxl_core_enable(struct vfio_pci_core_device *core_dev)
->  	if (ret)
->  		return ret;
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index 98f3ac2d305c..af8c0997c796 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -1902,6 +1902,15 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
 >  
-> +	vfio_pci_core_enable_cxl(core_dev);
+>  			perm = &ecap_perms[cap_id];
+>  			cap_start = vfio_find_cap_start(vdev, *ppos);
 > +
->  	ret = vfio_pci_core_enable(core_dev);
->  	if (ret)
->  		goto err_pci_core_enable;
-> @@ -618,6 +620,12 @@ ssize_t vfio_cxl_core_write(struct vfio_device *core_vdev, const char __user *bu
->  }
->  EXPORT_SYMBOL_GPL(vfio_cxl_core_write);
->  
-> +void vfio_pci_core_enable_cxl(struct vfio_pci_core_device *core_dev)
-> +{
-> +	core_dev->has_cxl = true;
-> +}
-> +EXPORT_SYMBOL(vfio_pci_core_enable_cxl);
+> +			if (cap_id == PCI_EXT_CAP_ID_DVSEC) {
+> +				u32 dword;
+
+This should be an __le32 and we should use an le32_to_cpu before
+comparison to PCI_VENDOR_ID_CXL.
+
 > +
->  MODULE_LICENSE("GPL");
->  MODULE_AUTHOR(DRIVER_AUTHOR);
->  MODULE_DESCRIPTION(DRIVER_DESC);
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 9373942f1acb..e0f23b538858 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -126,6 +126,9 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
->  		if (!(res->flags & IORESOURCE_MEM))
->  			goto no_mmap;
->  
-> +		if (vdev->has_cxl && bar == vdev->cxl.comp_reg_bar)
-> +			goto no_mmap;
+> +				memcpy(&dword, vdev->vconfig + cap_start + PCI_DVSEC_HEADER1, 4);
 > +
->  		/*
->  		 * The PCI core shouldn't set up a resource with a
->  		 * type but zero size. But there may be bugs that
-> @@ -487,10 +490,15 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
->  	if (ret)
->  		goto out_power;
->  
-> -	/* If reset fails because of the device lock, fail this path entirely */
-> -	ret = pci_try_reset_function(pdev);
-> -	if (ret == -EAGAIN)
-> -		goto out_disable_device;
-> +	if (!vdev->has_cxl) {
-> +		/* If reset fails because of the device lock, fail this path entirely */
-> +		ret = pci_try_reset_function(pdev);
-> +		if (ret == -EAGAIN)
-> +			goto out_disable_device;
-> +	} else {
-> +		/* CXL Reset is missing in CXL core. FLR only resets CXL.io path. */
-> +		ret = -ENODEV;
-> +	}
+> +				if (PCI_DVSEC_HEADER1_VID(dword) == PCI_VENDOR_ID_CXL)
+> +					perm = &virt_perms;
 
-Seems like this should perhaps be a prerequisite to exposing the device
-to userspace, otherwise how is the state sanitized between uses?
-
->  
->  	vdev->reset_works = !ret;
->  	pci_save_state(pdev);
-> @@ -498,14 +506,17 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
->  	if (!vdev->pci_saved_state)
->  		pci_dbg(pdev, "%s: Couldn't store saved state\n", __func__);
->  
-> -	if (likely(!nointxmask)) {
-> -		if (vfio_pci_nointx(pdev)) {
-> -			pci_info(pdev, "Masking broken INTx support\n");
-> -			vdev->nointx = true;
-> -			pci_intx(pdev, 0);
-> -		} else
-> -			vdev->pci_2_3 = pci_intx_mask_supported(pdev);
-> -	}
-> +	if (!vdev->has_cxl) {
-> +		if (likely(!nointxmask)) {
-> +			if (vfio_pci_nointx(pdev)) {
-> +				pci_info(pdev, "Masking broken INTx support\n");
-> +				vdev->nointx = true;
-> +				pci_intx(pdev, 0);
-> +			} else
-> +				vdev->pci_2_3 = pci_intx_mask_supported(pdev);
-> +		}
-> +	} else
-> +		vdev->nointx = true; /* CXL device doesn't have INTX. */
->  
-
-Why do we need to do anything here?  nointx is for exposing a device
-with INTx support as if it does not have INTx support.  If a CXL device
-simply does not support INTx, like SR-IOV VFs, this is not necessary,
-the interrupt pin register should be zero.  Is that not the case on a
-CXL device?
-
->  	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
->  	if (vdev->pci_2_3 && (cmd & PCI_COMMAND_INTX_DISABLE)) {
-> @@ -541,7 +552,6 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
->  	if (!vfio_vga_disabled() && vfio_pci_is_vga(pdev))
->  		vdev->has_vga = true;
->  
-> -
-
-Gratuitous whitespace change.
-
->  	return 0;
->  
->  out_free_zdev:
-> @@ -657,7 +667,8 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
->  	 * Disable INTx and MSI, presumably to avoid spurious interrupts
->  	 * during reset.  Stolen from pci_reset_function()
->  	 */
-> -	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
-> +	if (!vdev->nointx)
-> +		pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
-
-No, this is not what nointx is for.  Regardless it should be a no-op on
-a device that doesn't support INTx.
-
->  
->  	/*
->  	 * Try to get the locks ourselves to prevent a deadlock. The
-> @@ -973,6 +984,9 @@ static int vfio_pci_ioctl_get_info(struct vfio_pci_core_device *vdev,
->  	if (vdev->reset_works)
->  		info.flags |= VFIO_DEVICE_FLAGS_RESET;
->  
-> +	if (vdev->has_cxl)
-> +		info.flags |= VFIO_DEVICE_FLAGS_CXL;
-> +
-
-So the proposal is that a vfio-cxl device will expose *both* PCI and
-CXL device compatibility flags?  That means existing userspace
-expecting only a PCI device will try to make use of this.  Shouldn't
-the device be bound to vfio-pci rather than a vfio-cxl driver for that,
-if it's even valid?
-
->  	info.num_regions = VFIO_PCI_NUM_REGIONS + vdev->num_regions;
->  	info.num_irqs = VFIO_PCI_NUM_IRQS;
->  
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index 9d295ca9382a..e5646aad3eb3 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -113,6 +113,7 @@ struct vfio_pci_core_device {
->  	bool			needs_pm_restore:1;
->  	bool			pm_intx_masked:1;
->  	bool			pm_runtime_engaged:1;
-> +	bool			has_cxl:1;
-
-I wonder if has_cxl is based on has_vga, I would have expected is_cxl.
-A PCI device that supports VGA is a much more discrete add-on, versus
-my limited understanding of CXL is that it is a CXL device where PCI is
-mostly just the configuration and enumeration interface, ie. CXL.io.
-
->  	struct pci_saved_state	*pci_saved_state;
->  	struct pci_saved_state	*pm_save;
->  	int			ioeventfds_nr;
-> @@ -208,5 +209,6 @@ ssize_t vfio_cxl_core_read(struct vfio_device *core_vdev, char __user *buf,
->  			   size_t count, loff_t *ppos);
->  ssize_t vfio_cxl_core_write(struct vfio_device *core_vdev, const char __user *buf,
->  			    size_t count, loff_t *ppos);
-> +void vfio_pci_core_enable_cxl(struct vfio_pci_core_device *core_dev);
->  
->  #endif /* VFIO_PCI_CORE_H */
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 71f766c29060..0895183feaac 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -214,6 +214,7 @@ struct vfio_device_info {
->  #define VFIO_DEVICE_FLAGS_FSL_MC (1 << 6)	/* vfio-fsl-mc device */
->  #define VFIO_DEVICE_FLAGS_CAPS	(1 << 7)	/* Info supports caps */
->  #define VFIO_DEVICE_FLAGS_CDX	(1 << 8)	/* vfio-cdx device */
-> +#define VFIO_DEVICE_FLAGS_CXL	(1 << 9)	/* Device supports CXL support */
-
-Comment wording.  Thanks,
+We're making an assumption here that all CXL defined DVSEC capabilities
+will have the same behavior.  Also, should we bother to expose an
+emulated, dummy capability, or should we expect the VMM to handle
+emulating it?  Doesn't the virt_perms allow the entire capability,
+including headers to be writable?  Thanks,
 
 Alex
 
->  	__u32	num_regions;	/* Max region index + 1 */
->  	__u32	num_irqs;	/* Max IRQ index + 1 */
->  	__u32   cap_offset;	/* Offset within info struct of first cap */
+> +			}
+>  		} else {
+>  			WARN_ON(cap_id > PCI_CAP_ID_MAX);
+>  
 
 
