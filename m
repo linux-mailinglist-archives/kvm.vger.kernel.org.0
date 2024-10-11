@@ -1,235 +1,210 @@
-Return-Path: <kvm+bounces-28660-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28661-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87A2399AF49
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 01:21:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01EAC99AF6D
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 01:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1F75B22C57
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 23:21:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B12B928A3CA
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 23:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3EFA1D175D;
-	Fri, 11 Oct 2024 23:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 358601E412E;
+	Fri, 11 Oct 2024 23:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qm/KuQ8d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kcm7iTqR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F931D14F0
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 23:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB671D1308
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 23:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728688856; cv=none; b=rJzyUp/gIwKUowRvhuXgrLK492WTj5lhIPcwIFuH5MnuwpFHjQDxkPS5V7uWotlmPQ2I7xWnJilYfF90+ZSzYQsTQjx2vvh2qOg3lsSec2ytIDXBwAHzdG7O/yMMceCpwyAhWZM8O/AtSLMXLwWm41eu00tGNJGI7sGaHXQOTso=
+	t=1728689535; cv=none; b=M4aoH3PpnUPv2e/R3mkBuse3Bvh5tmAxP7qeAbl0xk9ItjWvAYPPmBWqCP2wgs5pQ3dvVJiRte1T3ltU1xvQnaqeHVK2pdyNQ2ia0ZhnFu/kx0+k6otbEe3/Sx7XNXhKG7zrWbm8/uoXB406iB3/3HFcOY1QuhtCVQGyJ7GjWzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728688856; c=relaxed/simple;
-	bh=MbAdx+mtP/JAUP/AgI9dJTIu78ff4Vht6ytXuf6CFRY=;
+	s=arc-20240116; t=1728689535; c=relaxed/simple;
+	bh=BU61ZVZ2YgVL7S0DDn0oL3BMc0m6p/G/2uGrI5GKAq0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PTLm7hgmEzR5Hv31cnpn7MTQd5wI/3GLm+iwOL2ohU3Gqqt5ON8lzPZ20cl9gjddfGcEcnHkoTlWfqa40+BLDHnwJpZVXHXoQPfBZ6WtUiTV31YjroYMKNa2aT6iM4P+QGLBZKNohdFchLY9D1KaBwwcM/fyLhOtNBAERyjwK/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qm/KuQ8d; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=dHDbd60jIpNj5//C2obKhNm4OWmofQoX6RETx7J4BgjaidWY96j85+oaY3pA3aRWHwtDCAFD/XJ5e/qilvXlMxHNu3RhYb+MAPGHXTeqkrrElZPUIdXCLVMDT+zXzTX7jTpS4ZSeJWRV3CQm6B5Zh3p+eS7h7vRTkXHR56jUqHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kcm7iTqR; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e36cfed818so346357b3.3
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 16:20:54 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-20bb491189aso31942075ad.3
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 16:32:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728688854; x=1729293654; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728689533; x=1729294333; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YwGhlCRXhgYSAFXqwfoqXhd5rW/XunG1cue48PxDUZE=;
-        b=Qm/KuQ8dghDOxRtusj+WV9qAaueFJvIQe7hR1TD5k1BC5QooEmXFA5ogPHHQW58nKd
-         WyJvCKQpw7BmdBhGOPb3ilun/KapQembYyusjPta62mQ0rfXM8tH8S7O7+Gucoi5KwC5
-         AhozVS0b2dSnJSukeNSgQGG+DbceLcLPamkPQhNC21OEQeJp2mVdyz28u8UwLXdawCpa
-         dxfOpIza8/ganQG4ZS7SwL0UfYmuKaSdhIosMeFbCZmoxodt29d6MRR1MLbGDfb4g5ZE
-         O79Ov6DDnsl8uAkB8SzedIwSeqIg5rNNAVttWuuYLePLJqZSLr4ZlQCIQDhelul8ZIAE
-         ddpQ==
+        bh=nQXxRrnrV7O63nBn6aNSK0Ta44wyj59/3jigJZtHDdg=;
+        b=Kcm7iTqRyqi4Zd25w749MGqSJ73zC7JtpCyD/bYafE7x+LvjLAtI7/pPxp3o9+zSB7
+         3iTp2HOsKjWgNJhHp/acP5CKDnEioDM5e+T1PmpCBzl4my+IzF1qtYEQzJ3jDhll4bsp
+         XeFjnjAzfnyKP7Kx6vXmEyVZhELeL/kELJ0qS+UDxW+x+3fRBh6/Gt1vtJt5z5Q5Skqo
+         TiiMQ2BXmpqD4kMmokjInekICzEyyClVRz9jjsly6WTP1R77el+z4AWkOk47NVleyxSO
+         J2KT3xBMD9x8+L8egokGbpSSE+9REDiV5Ad4kCgwFJD9vUGuG44Qie/6Ed2YikM1VXKI
+         zDQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728688854; x=1729293654;
+        d=1e100.net; s=20230601; t=1728689533; x=1729294333;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YwGhlCRXhgYSAFXqwfoqXhd5rW/XunG1cue48PxDUZE=;
-        b=woxCsh+4CLtNlM08EjGemTa7NAws5PidrMhd0k8mX2+MJRI2k9CL0wESLERrk7l79A
-         L5Fca919Z3IiUY5VGtRRnbIFKY6ZKM3EPbnb9Jpe6ctklxyuI6EbFciYbnQ1Vzb1rqeW
-         ma82j03B0mzI3044eJZqZu3+s2vHsZ+8US+55CUT7DmoKyQwRm02IVuCOjifqmDnm7CS
-         gwqpwP2koP98sgoXbwgWs2iikdSd/XoxuCtWlj1OF73hcKbIsatpasRHGiAiHFi6ZshY
-         9+9DvK/E0bBMGjdMBf/A6KDyQlmSQpFIefZlT1GQO+4/v4eKESkLmayg4tVoBQ1Yh7WA
-         cuAw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMy0oIEh10gRVsQfYQl2yOJYA7EmrXq3QGUJIh0jxkXguppBKNSIeJjN7ffPRdkhTxcmE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9j03Go/uunet8OBJbtstD/DFo4JXZcPa22e7+TkIlDSAHKCJ7
-	WTtGzDXM7KzHLxsVXX7RwdC8A6tH/oW77+lT30k6NWnmBaEyDiwtvYrRJtx+JehebGLkt+V16x4
-	xiw==
-X-Google-Smtp-Source: AGHT+IELihX6sWiwhxOnnagxVBxOHmb47dO+Atfy25px1Zypp6MSqk5ajFTu+RvkwVw1bBpbzuIuYM5SeAw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:4d8a:b0:6b2:6cd4:7f9a with SMTP id
- 00721157ae682-6e347c9a830mr1858947b3.8.1728688854038; Fri, 11 Oct 2024
- 16:20:54 -0700 (PDT)
-Date: Fri, 11 Oct 2024 16:20:46 -0700
-In-Reply-To: <20240927161657.68110-2-iorlov@amazon.com>
+        bh=nQXxRrnrV7O63nBn6aNSK0Ta44wyj59/3jigJZtHDdg=;
+        b=wDDfEy4GizvDyWncVKdVv+JjQ1PvcbEtxZV/KwUfdiCQks0PaZne/tR2kIeqZkX0W9
+         +mFD9hkS84mmHSkMIIaNf0GPYNK1mL6pNcfBemJdE0I/khIdOxCoJGD/Hr95cvaEOUQt
+         2KAQRStn5EdCsaOT9i0zrKFOx/MMxmdapm6Wtt/NF8Y5f52oHSk0nHRNda6E6wekE5KG
+         EkK9uQL+BwjL5ViANyVcA8RwqSuMHon6Ot31DXi2YXYR+bEsqPCksU/ZRs71e4AZsJIY
+         qifLkqwciIiQJsnYGUhAtfoJVyvfCI/decEeMt0xZWzVPIrsRHPty8i1ojO+yy7APUlm
+         oexQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX2ihQ2FFdDe2nch8ULf/VdUH9ebKMu/vSvtl4nQEaUrQiF37HfwAC3w1BKQQ2XYmpfPb4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDrURkPAIFJYNQPNSpnAn08KkBuHHU3m0nb1kM6rzpDgMK0OUb
+	Mc+1w+CFEqIJPkZIZ0M3qYk5dKsflppwbU9ncJ4ifJDvwu0IXUnqX0fo5qI2HIYgCUAh0zdwzLc
+	I8PNEm6nZswmLs0OdooNAfQ==
+X-Google-Smtp-Source: AGHT+IEr0SQ3XRg7hoB/1zJoRlSN31+WIwCwFTPdS0u4dzfqsgHYjCK/hMmgYKFzuCsnHMIZGemMQB8gxXvAks9d2g==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:146:b875:ac13:a9fc])
+ (user=ackerleytng job=sendgmr) by 2002:a17:902:c942:b0:20b:4d4d:fd1e with
+ SMTP id d9443c01a7336-20ca13dacc3mr442805ad.2.1728689532873; Fri, 11 Oct 2024
+ 16:32:12 -0700 (PDT)
+Date: Fri, 11 Oct 2024 23:32:11 +0000
+In-Reply-To: <Zwf7k1wmPqEEaRxz@x1n>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240927161657.68110-1-iorlov@amazon.com> <20240927161657.68110-2-iorlov@amazon.com>
-Message-ID: <Zwmyzg5WiKKvySS1@google.com>
-Subject: Re: [PATCH 1/3] KVM: x86, vmx: Add function for event delivery error generation
-From: Sean Christopherson <seanjc@google.com>
-To: Ivan Orlov <iorlov@amazon.com>
-Cc: bp@alien8.de, dave.hansen@linux.intel.com, mingo@redhat.com, 
-	pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, hpa@zytor.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, x86@kernel.org, jalliste@amazon.com, 
-	nh-open-source@amazon.com, pdurrant@amazon.co.uk
-Content-Type: text/plain; charset="us-ascii"
+References: <cover.1726009989.git.ackerleytng@google.com> <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
+ <Zwf7k1wmPqEEaRxz@x1n>
+Message-ID: <diqz8quunrlw.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
+ struct kvm_gmem_private
+From: Ackerley Tng <ackerleytng@google.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk, 
+	jgg@nvidia.com, david@redhat.com, rientjes@google.com, fvdl@google.com, 
+	jthoughton@google.com, seanjc@google.com, pbonzini@redhat.com, 
+	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	isaku.yamahata@intel.com, muchun.song@linux.dev, erdemaktas@google.com, 
+	vannapurve@google.com, qperret@google.com, jhubbard@nvidia.com, 
+	willy@infradead.org, shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
+	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
+	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
+	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
+	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-"KVM: VMX:" for the scope.  See "Shortlog" in Documentation/process/maintainer-kvm-x86.rst
+Peter Xu <peterx@redhat.com> writes:
 
-On Fri, Sep 27, 2024, Ivan Orlov wrote:
-> Extract KVM_INTERNAL_ERROR_DELIVERY_EV internal error generation into
-> the SVM/VMX-agnostic 'kvm_prepare_ev_delivery_failure_exit' function, as
-> it is done for KVM_INTERNAL_ERROR_EMULATION.
+> On Tue, Sep 10, 2024 at 11:43:57PM +0000, Ackerley Tng wrote:
+>> The faultability xarray is stored on the inode since faultability is a
+>> property of the guest_memfd's memory contents.
+>> 
+>> In this RFC, presence of an entry in the xarray indicates faultable,
+>> but this could be flipped so that presence indicates unfaultable. For
+>> flexibility, a special value "FAULT" is used instead of a simple
+>> boolean.
+>> 
+>> However, at some stages of a VM's lifecycle there could be more
+>> private pages, and at other stages there could be more shared pages.
+>> 
+>> This is likely to be replaced by a better data structure in a future
+>> revision to better support ranges.
+>> 
+>> Also store struct kvm_gmem_hugetlb in struct kvm_gmem_hugetlb as a
+>> pointer. inode->i_mapping->i_private_data.
+>
+> Could you help explain the difference between faultability v.s. the
+> existing KVM_MEMORY_ATTRIBUTE_PRIVATE?  Not sure if I'm the only one who's
+> confused, otherwise might be good to enrich the commit message.
 
-Use the changelog to provide a human readable summary of the change.  There are
-definitely situations where calling out functions, variables, defines, etc. by
-name is necessary, but this isn't one such situation.
+Thank you for this question, I'll add this to the commit message to the
+next revision if Fuad's patch set [1] doesn't make it first.
 
-> The order of internal.data array entries is preserved as is, so it is going
-> to be the same on VMX platforms (vectoring info, full exit reason, exit
-> qualification, GPA if error happened due to MMIO and last_vmentry_cpu of the
-> vcpu).
+Reason (a): To elaborate on the explanation in [1],
+KVM_MEMORY_ATTRIBUTE_PRIVATE is whether userspace wants this page to be
+private or shared, and faultability is whether the page is allowed to be
+faulted in by userspace.
 
-Similar to the above, let the code speak.  The "No functional change intended"
-makes it clear that the intent is to preserve the order and behavior.
+These two are similar but may not be the same thing. In pKVM, pKVM
+cannot trust userspace's configuration of private/shared, and other
+information will go into determining the private/shared setting in
+faultability.
 
-> Having it as a separate function will help us to avoid code duplication
+Perhaps Fuad can elaborate more here.
 
-Avoid pronouns as much as possible, and no "we" or "us" as a hard rule.  E.g. this
-can all be distilled down to:
+Reason (b): In this patch series (mostly focus on x86 first), we're
+using faultability to prevent any future faults before checking that
+there are no mappings.
 
---
-Extract VMX's code for reporting an unhandleable VM-Exit during event
-delivery to userspace, so that the boilerplate code can be shared by SVM.
+Having a different xarray from mem_attr_array allows us to disable
+faulting before committing to changing mem_attr_array. Please see
+`kvm_gmem_should_set_attributes_private()` in this patch [2].
 
-No functional change intended.
---
+We're not completely sure about the effectiveness of using faultability
+to block off future faults here, in future revisions we may be using a
+different approach. The folio_lock() is probably important if we need to
+check mapcount. Please let me know if you have any ideas!
 
-> when handling the MMIO during event delivery error on SVM.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Ivan Orlov <iorlov@amazon.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  2 ++
->  arch/x86/kvm/vmx/vmx.c          | 15 +++------------
->  arch/x86/kvm/x86.c              | 22 ++++++++++++++++++++++
->  3 files changed, 27 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 6d9f763a7bb9..348daba424dd 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2060,6 +2060,8 @@ void __kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu,
->  					  u64 *data, u8 ndata);
->  void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu);
->  
-> +void kvm_prepare_ev_delivery_failure_exit(struct kvm_vcpu *vcpu, gpa_t gpa, bool is_mmio);
+The starting point of having a different xarray was pKVM's requirement
+of having separate xarrays, and we later realized that the xarray could
+be used for reason (b). For x86 we could perhaps eventually remove the
+second xarray? Not sure as of now.
 
-Please wrap at 80 columns.  While checkpatch doesn't complaing until 100, my
-preference is to default to wrapping at 80, and poking past 80 only when it yields
-more readable code (which is obviously subjective, but it shouldn't be too hard
-to figure out KVM x86's preferred style).
+>
+> The latter is per-slot, so one level higher, however I don't think it's a
+> common use case for mapping the same gmemfd in multiple slots anyway for
+> KVM (besides corner cases like live upgrade).  So perhaps this is not about
+> layering but something else?  For example, any use case where PRIVATE and
+> FAULTABLE can be reported with different values.
+>
+> Another higher level question is, is there any plan to support non-CoCo
+> context for 1G?
 
->  void kvm_enable_efer_bits(u64);
->  bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
->  int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c67e448c6ebd..afd785e7f3a3 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6550,19 +6550,10 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
->  	     exit_reason.basic != EXIT_REASON_APIC_ACCESS &&
->  	     exit_reason.basic != EXIT_REASON_TASK_SWITCH &&
->  	     exit_reason.basic != EXIT_REASON_NOTIFY)) {
-> -		int ndata = 3;
-> +		gpa_t gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
-> +		bool is_mmio = exit_reason.basic == EXIT_REASON_EPT_MISCONFIG;
+I believe guest_memfd users are generally in favor of eventually using
+guest_memfd for non-CoCo use cases, which means we do want 1G (shared,
+in the case of CoCo) page support.
 
-There's no need for is_mmio, just pass INVALID_GPA when the GPA isn't known.
+However, core-mm's fault path does not support mapping at anything
+higher than the PMD level (other than hugetlb_fault(), which the
+community wants to move away from), so core-mm wouldn't be able to map
+1G pages taken from HugeTLB.
 
-> -		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_DELIVERY_EV;
-> -		vcpu->run->internal.data[0] = vectoring_info;
-> -		vcpu->run->internal.data[1] = exit_reason.full;
-> -		vcpu->run->internal.data[2] = vmx_get_exit_qual(vcpu);
-> -		if (exit_reason.basic == EXIT_REASON_EPT_MISCONFIG) {
-> -			vcpu->run->internal.data[ndata++] =
-> -				vmcs_read64(GUEST_PHYSICAL_ADDRESS);
-> -		}
-> -		vcpu->run->internal.data[ndata++] = vcpu->arch.last_vmentry_cpu;
-> -		vcpu->run->internal.ndata = ndata;
-> +		kvm_prepare_ev_delivery_failure_exit(vcpu, gpa, is_mmio);
->  		return 0;
->  	}
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 83fe0a78146f..8ee67fc23e5d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8828,6 +8828,28 @@ void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
->  }
->  EXPORT_SYMBOL_GPL(kvm_prepare_emulation_failure_exit);
->  
-> +void kvm_prepare_ev_delivery_failure_exit(struct kvm_vcpu *vcpu, gpa_t gpa, bool is_mmio)
+In this patch series, we always split pages before mapping them to
+userspace and that's how this series still works with core-mm.
 
-Hmm, I don't love the name.  I really don't like that event is abbreviated, and
-I suspect many readers will be misinterpret "event delivery failure" to mean that
-_KVM_ failed to deliver an event.  Which is kinda sorta true, but it's more
-accurate to say that the CPU triggered a VM-Exit when vectoring/delivery an event,
-and KVM doesn't have code to robustly handle the situation.
+Having 1G page support for shared memory or for non-CoCo use cases would
+probably depend on better HugeTLB integration with core-mm, which you'd
+be most familiar with.
 
-Maybe kvm_prepare_event_vectoring_exit()?  Vectoring is quite specific in Intel
-terminology.
+Thank you for looking through our patches, we need your experience and
+help! I've also just sent out the first 3 patches separately, which I
+think is useful in improving understandability of the
+resv_map/subpool/hstate reservation system in HugeTLB and can be
+considered separately. Hope you can also review/comment on [4].
 
-> +{
-> +	struct kvm_run *run = vcpu->run;
-> +	int ndata = 0;
-> +	u32 reason, intr_info, error_code;
-> +	u64 info1, info2;
+> I saw that you also mentioned you have working QEMU prototypes ready in
+> another email.  It'll be great if you can push your kernel/QEMU's latest
+> tree (including all dependency patches) somewhere so anyone can have a
+> closer look, or play with it.
 
-Reverse fir/x-mas tree for variables.  See "Coding Style" in
-Documentation/process/maintainer-kvm-x86.rst (which will redirect you to
-Documentation/process/maintainer-tip.rst, specifically "Variable declarations").
+Vishal's reply [3] might have been a bit confusing. To clarify, my team
+doesn't work with Qemu at all (we use a custom userspace VMM internally)
+so the patches in this series are tested purely with selftests.
 
-> +
-> +	kvm_x86_call(get_exit_info)(vcpu, &reason, &info1, &info2, &intr_info, &error_code);
+The selftests have fewer dependencies than full Qemu and I'd be happy to
+help with running them or explain anything that I might have missed out.
 
-Wrap.  Though calling back into vendor code is silly.  Pass the necessary info
-as parameters.  E.g. error_code and intr_info are unused, so the above is wasteful
-and weird.
+We don't have any Qemu prototypes and are not likely to be building any
+prototypes in the foreseeable future.
 
-> +
-> +	run->internal.data[ndata++] = info2;
-> +	run->internal.data[ndata++] = reason;
-> +	run->internal.data[ndata++] = info1;
-> +	if (is_mmio)
-
-And this is where keying off MMIO gets weird.
-
-> +		run->internal.data[ndata++] = (u64)gpa;
-> +	run->internal.data[ndata++] = vcpu->arch.last_vmentry_cpu;
-> +
-> +	run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> +	run->internal.suberror = KVM_INTERNAL_ERROR_DELIVERY_EV;
-> +	run->internal.ndata = ndata;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_prepare_ev_delivery_failure_exit);
-> +
->  static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->  {
->  	struct kvm *kvm = vcpu->kvm;
+>
+> Thanks,
+>
 > -- 
-> 2.43.0
-> 
+> Peter Xu
+
+[1] https://lore.kernel.org/all/20241010085930.1546800-3-tabba@google.com/
+[2] https://lore.kernel.org/all/f4ca1711a477a3b56406c05d125dce3d7403b936.1726009989.git.ackerleytng@google.com/
+[3] https://lore.kernel.org/all/CAGtprH-GczOb64XrLpdW4ObRG7Gsv8tHWNhiW7=2dE=OAF7-Rw@mail.gmail.com/
+[4] https://lore.kernel.org/all/cover.1728684491.git.ackerleytng@google.com/T/
 
