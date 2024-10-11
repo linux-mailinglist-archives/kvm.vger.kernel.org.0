@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-28619-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28620-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D58099A2E7
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:43:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3528699A2FB
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F3501C20D9C
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:43:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E66C4284A7F
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F97216A0E;
-	Fri, 11 Oct 2024 11:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82AE72141B9;
+	Fri, 11 Oct 2024 11:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/t+6sWF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I7i5ex9U"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B5C1F9415
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 11:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E488017D2
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 11:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728646989; cv=none; b=KLpRCNUgnIeIFaoUDcbrqLphKCMeOD0JyeUuZzeXFs6iBgtitW+XIn+GhaxWMg7kpTEUUUXNUxgseED99AuZjnR6SAMBx3Ye6esPshA3Ddwk8x09jO1z2a7lgX8U3OCg/RJF7dAYWgDLgE9boczqMEAFx0Ko4Y4PoNt6r5wP2MI=
+	t=1728647428; cv=none; b=tIz3eki7pvWyih2x/CZtHf/RJS7knUWWiJw71siehKZvdWFTIF/cKJquqmn5A1Wi57HsBurx0Y2iIswIlALbzRT2ZbyhvWeuDyW4gK3xJ0xaz2q95eAvEm/euXVda645VgVBQ8YseiVEoINudukXhcbXqNz9jrZ8DimGz0kN1YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728646989; c=relaxed/simple;
-	bh=Sgjt5w22q19mO2o1fLrQoj/QK7UMPU3VPOx1oyeFQFU=;
+	s=arc-20240116; t=1728647428; c=relaxed/simple;
+	bh=jXs+tvR3T2sfOgdDDPX36Uyoc+EueEgHAlfYIY6b4SM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XLhYp3nzUy9w+wYaYGY3oFutHY3s+BR3Y/Lh+KQamECL1I46Fw7Re7tC7QKAEDQHHNP0n6OlMoZRIWS2MMqLixw0QVkbrfDhWHICib3hRSyuNU0yUR+nouPPJEXfmzae721mB/+Gn9h/8tnd11wTrMNQrsGnxcE8QwwOQIF0KqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z/t+6sWF; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=VdKReU/8Tw0Emma02PuX8myoQVPgp9YWZaTPiJUqqhuMjZaKZofF53nlzv8E2qYbhoRsNE8XYAGZD+LtPpPY9eu8oUzIeoagct/atEPaTn258jAVbglAgJMI7H6XZeI8B+7jU/eszz8+wnBQy7txaJQp6Jzu3K6TmdOPzdtf4Es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I7i5ex9U; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728646986;
+	s=mimecast20190719; t=1728647424;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HUQa3KwdmY0rbn3/U0pdq3jH3GxVh1Y2Q3vqDK3K2Pc=;
-	b=Z/t+6sWFlDE+1CcDl3EKsdO/PJdYHM+5ss3hJ4Jn7kdy4bkN99TdRlGTu5lPw4nFMOrpma
-	+a6HQ0XQp1O15t2Ng1of5ip+FLFiGnB4JIYMaH9WM8+e9D/t/qWRQ6Iu0gmy0USKJwt3lU
-	xKsrV3JOH0IoY28dpjR9v3DJUPsBgJI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=VNd+olTinR+Az5xuvHMtnLJBrIEidKth6Y7xvIaq0Bs=;
+	b=I7i5ex9UoyOQXUEjYpyaw4cPAi+oSTns+Rnare2VMxporhsQX2jYHlZ663mYUlrTu32LBV
+	youRB4P+/bmz9C9ALOL9Qbt4RsWFSQL9tE2i82xmL/Vfn6FSQKPsHP16/L+Q7c9c3ZUvuU
+	ZunQxq2jMT/gkAnGDfyVUAgIXnZQaIM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-558-CmaTEkieNwaWJWqxkFLxig-1; Fri, 11 Oct 2024 07:43:05 -0400
-X-MC-Unique: CmaTEkieNwaWJWqxkFLxig-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43119e2a879so10126855e9.3
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 04:43:04 -0700 (PDT)
+ us-mta-104-dhbbBEBKO_GUsQ4AihU-Sw-1; Fri, 11 Oct 2024 07:50:23 -0400
+X-MC-Unique: dhbbBEBKO_GUsQ4AihU-Sw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4311db0f3f1so4881045e9.2
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 04:50:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728646984; x=1729251784;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=HUQa3KwdmY0rbn3/U0pdq3jH3GxVh1Y2Q3vqDK3K2Pc=;
-        b=jqEeNoIpchuOK+LHbV9SEUFzOHD3YS06w7n7X6kY7yBOqI6jXbW2H1+A0yMB+GlYwU
-         59tlmRHLOEPi/Qj/oa1y22icHL/6eo0V4E0B2dcV1VG2kwNUVKztAY8tE/mYpFzN7ZZK
-         eWTbp2WMbTOzhVuWZZKugm1o2KBzvbHNvhy+NZBJcxJBOgAy1wrNxz7tdwupNHpW+Wrw
-         b/I1rAD13VtCQ2C3LRzWHNKyYGSzd29GrJ3HIKAWiUiRkVJYScoSJjMP06/IjZeoE8dW
-         tqCtxTR6WpRZIQaV557KBVXG6oOsIgPuB16AXNNcVWfqa1IfLGh4+updEfQSZBRSh3VO
-         EmvA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2VEiKjUvQ0niWLxLfGgkqXm4v0FpyLYTvZTyPcaE8gf9ZGzus4CFmxlT4OrZGr7Fa5Ik=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDKCK1xG8+u10dTiK9dDSRwr3xsByXs1rv5C/hFRcnUbb9PAx9
-	6t5drRMQC7bjd8q6+gnt8zR4qsR69G2GSX8uJbVD5TgKKtGRKxKgaFxJNtak7RsMu3ixb5s8JSN
-	k9D5WVw7I8sT3dZffTfUKRtSQEfM5p0+WBHvVOhCPu0xPYhjzdg==
-X-Received: by 2002:adf:a313:0:b0:37d:41cd:ba4e with SMTP id ffacd0b85a97d-37d5529cb36mr1540617f8f.48.1728646983887;
-        Fri, 11 Oct 2024 04:43:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH/F6JN+8iAXfL0V9ur+rvXeWlba4pACwoQU4P3Lokk5TwcPnGkxoE62KIlS+2BBSebuXYh+A==
-X-Received: by 2002:adf:a313:0:b0:37d:41cd:ba4e with SMTP id ffacd0b85a97d-37d5529cb36mr1540607f8f.48.1728646983480;
-        Fri, 11 Oct 2024 04:43:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728647422; x=1729252222;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VNd+olTinR+Az5xuvHMtnLJBrIEidKth6Y7xvIaq0Bs=;
+        b=HFYvbId741JyTBnEWm7D2/K7nMgJVzRnZIKTseYwb1BkKiLcBpRlffqfTAEDwBhPOb
+         a9eMaspJgdEbn7pQ1BmN/f8iXkIOmPdClMb2HB+PiVlctEDqEl6LOLFR1/ouTFSIrzN9
+         3FgV9NxqXEJbqNCfmA4t8v/KW9ig9ZTlL8VvAUD674AOBCfKU/lFbWTr4c87MHs47E2M
+         4+f0M2U2Bh9LS/8hTGTXMi8qzJSPY/UDTxNi+aEa7YnbOp1YvxtVUzM48upx2laN1LEw
+         2GCGGK1TWIyJOHZqd4qnjjW6i0BgCieHFw/Ur7EFcLq5Lvvkk5e8ds+qY8hxHwoP78v/
+         sURQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVNdGhB/mlgirY/uBLOGikVXc4ukrqxpptkN/Sj83SwqceiopeuY48/i/U1AiuAKZr/8Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9V7Y02eye9SRPDHCygkPbHrdNBxfNVMvuJf2YZOTUCLzBynYe
+	ozwGK+TFuBeNJTQlEpHowR6FLLqg7Krt6Fj3aExJva2gfIW+c4gOa5H6/u0Zwz6FOizC8KUmJrW
+	dp/nJp1jxmUfEeDxWC6+9ZH99ewoeQREuZiqxFLPVb2BuqwJpdA==
+X-Received: by 2002:a05:600c:228c:b0:42f:80f4:ab2b with SMTP id 5b1f17b1804b1-4311dee6f58mr19373145e9.19.1728647421798;
+        Fri, 11 Oct 2024 04:50:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEe4zP3dgdckIA1FJoIn+Owc99lvaOABl3u8J5ZHWT75MQxBB4REz4MYW0kPlh2glfJYYK9FA==
+X-Received: by 2002:a05:600c:228c:b0:42f:80f4:ab2b with SMTP id 5b1f17b1804b1-4311dee6f58mr19372935e9.19.1728647421395;
+        Fri, 11 Oct 2024 04:50:21 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c749:9100:c078:eec6:f2f4:dd3b? (p200300cbc7499100c078eec6f2f4dd3b.dip0.t-ipconnect.de. [2003:cb:c749:9100:c078:eec6:f2f4:dd3b])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b7ef213sm3727034f8f.99.2024.10.11.04.43.02
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43017466e4fsm67432015e9.0.2024.10.11.04.50.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Oct 2024 04:43:03 -0700 (PDT)
-Message-ID: <cced8b33-f1f6-4bea-ac7f-08be729bd710@redhat.com>
-Date: Fri, 11 Oct 2024 13:43:02 +0200
+        Fri, 11 Oct 2024 04:50:21 -0700 (PDT)
+Message-ID: <d54f9b64-fc9f-4b63-8212-7d59e5d5a54d@redhat.com>
+Date: Fri, 11 Oct 2024 13:50:20 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,21 +83,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/2] mm: don't install PMD mappings when THPs are
- disabled by the hw/process/vma
-To: Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org, kvm@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>, Hugh Dickins <hughd@google.com>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Ryan Roberts <ryan.roberts@arm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Kefeng Wang <wangkefeng.wang@huawei.com>
-References: <20241011102445.934409-1-david@redhat.com>
- <33c40562-fd22-4517-9f56-1039289a55e5@redhat.com>
-From: David Hildenbrand <david@redhat.com>
+Subject: Re: Proposal: bi-weekly guest_memfd upstream call
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <diqzy12vswvr.fsf@ackerleytng-ctop.c.googlers.com>
 Content-Language: en-US
+From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -143,53 +134,53 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <33c40562-fd22-4517-9f56-1039289a55e5@redhat.com>
+In-Reply-To: <diqzy12vswvr.fsf@ackerleytng-ctop.c.googlers.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11.10.24 13:39, Thomas Huth wrote:
-> On 11/10/2024 12.24, David Hildenbrand wrote:
->> During testing, it was found that we can get PMD mappings in processes
->> where THP (and more precisely, PMD mappings) are supposed to be disabled.
->> While it works as expected for anon+shmem, the pagecache is the problematic
->> bit.
+On 10.10.24 19:14, Ackerley Tng wrote:
+> David Hildenbrand <david@redhat.com> writes:
+> 
+>> Ahoihoi,
 >>
->> For s390 KVM this currently means that a VM backed by a file located on
->> filesystem with large folio support can crash when KVM tries accessing
->> the problematic page, because the readahead logic might decide to use
->> a PMD-sized THP and faulting it into the page tables will install a
->> PMD mapping, something that s390 KVM cannot tolerate.
+>> while talking to a bunch of folks at LPC about guest_memfd, it was
+>> raised that there isn't really a place for people to discuss the
+>> development of guest_memfd on a regular basis.
 >>
->> This might also be a problem with HW that does not support PMD mappings,
->> but I did not try reproducing it.
+>> There is a KVM upstream call, but guest_memfd is on its way of not being
+>> guest_memfd specific ("library") and there is the bi-weekly MM alignment
+>> call, but we're not going to hijack that meeting completely + a lot of
+>> guest_memfd stuff doesn't need all the MM experts ;)
 >>
->> Fix it by respecting the ways to disable THPs when deciding whether we
->> can install a PMD mapping. khugepaged should already be taking care of
->> not collapsing if THPs are effectively disabled for the hw/process/vma.
+>> So my proposal would be to have a bi-weekly meeting, to discuss ongoing
+>> development of guest_memfd, in particular:
 >>
->> An earlier patch was tested by Thomas Huth, this one still needs to
->> be retested; sending it out already.
+>> (1) Organize development: (do we need 3 different implementation
+>>       of mmap() support ? ;) )
+>> (2) Discuss current progress and challenges
+>> (3) Cover future ideas and directions
+>> (4) Whatever else makes sense
+>>
+>> Topic-wise it's relatively clear: guest_memfd extensions were one of the
+>> hot topics at LPC ;)
+>>
+>> I would suggest every second Thursdays from 9:00 - 10:00am PDT (GMT-7),
+>> starting Thursday next week (2024-10-17).
 > 
-> I just finished testing your new version of these patches here, and I can
-> confirm that they are fixing the problem that I was facing, so:
+> This time works for me as well, thank you!
 > 
-> Tested-by: Thomas Huth <thuth@redhat.com>
+>>
+>> We would be using Google Meet.
 > 
-> FWIW, the problem can be reproduced by running a KVM guest on a s390x host
-> like this:
-> 
-> qemu-system-s390x -accel kvm -nographic -m 4G -d guest_errors \
->     -M s390-ccw-virtio,memory-backend=mem-machine_mem \
->     -object
-> memory-backend-file,size=4294967296,prealloc=true,mem-path=$HOME/myfile,share=true,id=mem-machine_mem
-> 
-> Without the fix, the guest crashes immediatly before being able to execute
-> the first instruction. With the fix applied, you can still see the first
-> messages of the guest firmware, indicating that the guest started successfully.
-> 
-> Thank you very much for the fix, David!
+> Thanks too! Shall we use http://meet.google.com/wxp-wtju-jzw ?
 
-Thanks for the quick test, Thomas!
+I assume that room cannot be joined when you are not around (e.g., using 
+it right now makes me "Ask to join"). Can that be changed?
+
+Otherwise, I think I can provide a room (Red Hat is using Google 
+Mail/Meet etc.)
+
+Thanks!
 
 -- 
 Cheers,
