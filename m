@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-28637-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28638-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E1C199A618
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 16:16:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 157EB99A61C
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 16:16:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 931121C23482
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 14:16:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3791B1C23482
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 14:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE2621BAF5;
-	Fri, 11 Oct 2024 14:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E910321C190;
+	Fri, 11 Oct 2024 14:14:44 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED1B21B45B;
-	Fri, 11 Oct 2024 14:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F5621BB17;
+	Fri, 11 Oct 2024 14:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728656081; cv=none; b=YIbT3K7wWeJeAQQC6T6oYGfY5R+6MvenqCNjVCkdlJ/KE3sBf3IEHs3aGqBLTeEThOD5uo25+k/WwtCosRU9pf9vPewtStqhR6gIa12CoSa90M5pQhV+6T00Nc0V6ZcqzyzBHloG8En4o7S91dAFEaR2s4G6+apJsNjXGdZXv3c=
+	t=1728656084; cv=none; b=jiZ5wKxnAvgf0dpleZ5RARRUiNypTCY8qjl2UOnnLUFxwJP4hheqrQzIwXHTwaS8Zs6Ye7ICVEdI0VElNq+4JPI2QEhMNqK2lcd3UxTmAzQueLdO11qZZ2fj0tWjGZmIzSMKXAsupBhfaYA4ghlfP4ZWk6E6YMXgxU0rvj8DGwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728656081; c=relaxed/simple;
-	bh=Sy8dZdr1FCrLbcNXlnPYYZwo4NCyWNj2PGq0r6ZkdDk=;
+	s=arc-20240116; t=1728656084; c=relaxed/simple;
+	bh=hx3NqEpss88x2cPcLraT/sKCh3o4Zthu/vHlVDApes4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OR+CqlTH2c85JlL087J7FkvmGtkcZIgG/tVueue7LwVd8aqNxW81wBPHTbNYWsIdo7n6JDUZ74qpq9F2oKfhRt4xlpR7D0mKoXE12o85Qj/j9In/W40eNMZnjRNrIeeSMd+HzQNDSfnao+IoTuNBSQOffRqkK84GhdY6xpxUOOk=
+	 In-Reply-To:Content-Type; b=faRmWdDasGk2J87mxSMX6P+LoPGnzTs09M5sv68j6JmjwpaXb3957hFnA7FfxFUkQS0EZG6F1ORIFyE5u1uOlW1vAwATOnOYDcCeBA08mkEv8f8IJAHN03rCOfjpf+m8ME1cIR4kDdkYqlw+ACNr4Tq/sy9KzhDGGzqpXsnsU2A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CA13F153B;
-	Fri, 11 Oct 2024 07:15:08 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9292E1570;
+	Fri, 11 Oct 2024 07:15:11 -0700 (PDT)
 Received: from [10.1.31.21] (e122027.cambridge.arm.com [10.1.31.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E8713F5A1;
-	Fri, 11 Oct 2024 07:14:36 -0700 (PDT)
-Message-ID: <6c306817-fbd7-402c-8425-a4523ed43114@arm.com>
-Date: Fri, 11 Oct 2024 15:14:30 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 56A8C3F5A1;
+	Fri, 11 Oct 2024 07:14:39 -0700 (PDT)
+Message-ID: <846c43a8-9720-4dd5-b40a-73ec00b9a9a7@arm.com>
+Date: Fri, 11 Oct 2024 15:14:32 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,10 +42,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 10/11] virt: arm-cca-guest: TSM_REPORT support for
- realms
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Sami Mujawar <sami.mujawar@arm.com>,
+Subject: Re: [PATCH v6 11/11] arm64: Document Arm Confidential Compute
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>,
@@ -56,419 +55,162 @@ Cc: Sami Mujawar <sami.mujawar@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
  linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, Dan Williams <dan.j.williams@intel.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
 References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-11-steven.price@arm.com>
- <5a3432d1-6a79-434c-bc93-6317c8c6435c@redhat.com>
+ <20241004144307.66199-12-steven.price@arm.com>
+ <20241008110549.GA1058742@myrica>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <5a3432d1-6a79-434c-bc93-6317c8c6435c@redhat.com>
+In-Reply-To: <20241008110549.GA1058742@myrica>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 08/10/2024 05:12, Gavin Shan wrote:
-> On 10/5/24 12:43 AM, Steven Price wrote:
->> From: Sami Mujawar <sami.mujawar@arm.com>
+On 08/10/2024 12:05, Jean-Philippe Brucker wrote:
+> On Fri, Oct 04, 2024 at 03:43:06PM +0100, Steven Price wrote:
+>> Add some documentation on Arm CCA and the requirements for running Linux
+>> as a Realm guest. Also update booting.rst to describe the requirement
+>> for RIPAS RAM.
 >>
->> Introduce an arm-cca-guest driver that registers with
->> the configfs-tsm module to provide user interfaces for
->> retrieving an attestation token.
->>
->> When a new report is requested the arm-cca-guest driver
->> invokes the appropriate RSI interfaces to query an
->> attestation token.
->>
->> The steps to retrieve an attestation token are as follows:
->>    1. Mount the configfs filesystem if not already mounted
->>       mount -t configfs none /sys/kernel/config
->>    2. Generate an attestation token
->>       report=/sys/kernel/config/tsm/report/report0
->>       mkdir $report
->>       dd if=/dev/urandom bs=64 count=1 > $report/inblob
->>       hexdump -C $report/outblob
->>       rmdir $report
->>
->> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> v3: Minor improvements to comments and adapt to the renaming of
->> GRANULE_SIZE to RSI_GRANULE_SIZE.
->> ---
->>   drivers/virt/coco/Kconfig                     |   2 +
->>   drivers/virt/coco/Makefile                    |   1 +
->>   drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
->>   drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
->>   .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
->>   5 files changed, 227 insertions(+)
->>   create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
->>   create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
->>   create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+>>  Documentation/arch/arm64/arm-cca.rst | 67 ++++++++++++++++++++++++++++
+>>  Documentation/arch/arm64/booting.rst |  3 ++
+>>  Documentation/arch/arm64/index.rst   |  1 +
+>>  3 files changed, 71 insertions(+)
+>>  create mode 100644 Documentation/arch/arm64/arm-cca.rst
 >>
->> diff --git a/drivers/virt/coco/Kconfig b/drivers/virt/coco/Kconfig
->> index d9ff676bf48d..ff869d883d95 100644
->> --- a/drivers/virt/coco/Kconfig
->> +++ b/drivers/virt/coco/Kconfig
->> @@ -14,3 +14,5 @@ source "drivers/virt/coco/pkvm-guest/Kconfig"
->>   source "drivers/virt/coco/sev-guest/Kconfig"
->>     source "drivers/virt/coco/tdx-guest/Kconfig"
->> +
->> +source "drivers/virt/coco/arm-cca-guest/Kconfig"
->> diff --git a/drivers/virt/coco/Makefile b/drivers/virt/coco/Makefile
->> index b69c30c1c720..c3d07cfc087e 100644
->> --- a/drivers/virt/coco/Makefile
->> +++ b/drivers/virt/coco/Makefile
->> @@ -7,3 +7,4 @@ obj-$(CONFIG_EFI_SECRET)    += efi_secret/
->>   obj-$(CONFIG_ARM_PKVM_GUEST)    += pkvm-guest/
->>   obj-$(CONFIG_SEV_GUEST)        += sev-guest/
->>   obj-$(CONFIG_INTEL_TDX_GUEST)    += tdx-guest/
->> +obj-$(CONFIG_ARM_CCA_GUEST)    += arm-cca-guest/
->> diff --git a/drivers/virt/coco/arm-cca-guest/Kconfig
->> b/drivers/virt/coco/arm-cca-guest/Kconfig
+>> diff --git a/Documentation/arch/arm64/arm-cca.rst b/Documentation/arch/arm64/arm-cca.rst
 >> new file mode 100644
->> index 000000000000..9dd27c3ee215
+>> index 000000000000..ab7f90e64c2f
 >> --- /dev/null
->> +++ b/drivers/virt/coco/arm-cca-guest/Kconfig
->> @@ -0,0 +1,11 @@
->> +config ARM_CCA_GUEST
->> +    tristate "Arm CCA Guest driver"
->> +    depends on ARM64
->> +    default m
->> +    select TSM_REPORTS
->> +    help
->> +      The driver provides userspace interface to request and
->> +      attestation report from the Realm Management Monitor(RMM).
+>> +++ b/Documentation/arch/arm64/arm-cca.rst
+>> @@ -0,0 +1,67 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
 >> +
->> +      If you choose 'M' here, this module will be called
->> +      arm-cca-guest.
->> diff --git a/drivers/virt/coco/arm-cca-guest/Makefile
->> b/drivers/virt/coco/arm-cca-guest/Makefile
->> new file mode 100644
->> index 000000000000..69eeba08e98a
->> --- /dev/null
->> +++ b/drivers/virt/coco/arm-cca-guest/Makefile
->> @@ -0,0 +1,2 @@
->> +# SPDX-License-Identifier: GPL-2.0-only
->> +obj-$(CONFIG_ARM_CCA_GUEST) += arm-cca-guest.o
->> diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
->> b/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
->> new file mode 100644
->> index 000000000000..e22a565cb425
->> --- /dev/null
->> +++ b/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
->> @@ -0,0 +1,211 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
+>> +=====================================
+>> +Arm Confidential Compute Architecture
+>> +=====================================
 >> +
->> +#include <linux/arm-smccc.h>
->> +#include <linux/cc_platform.h>
->> +#include <linux/kernel.h>
->> +#include <linux/module.h>
->> +#include <linux/smp.h>
->> +#include <linux/tsm.h>
->> +#include <linux/types.h>
+>> +Arm systems that support the Realm Management Extension (RME) contain
+>> +hardware to allow a VM guest to be run in a way which protects the code
+>> +and data of the guest from the hypervisor. It extends the older "two
+>> +world" model (Normal and Secure World) into four worlds: Normal, Secure,
+>> +Root and Realm. Linux can then also be run as a guest to a monitor
+>> +running in the Realm world.
 >> +
->> +#include <asm/rsi.h>
+>> +The monitor running in the Realm world is known as the Realm Management
+>> +Monitor (RMM) and implements the Realm Management Monitor
+>> +specification[1]. The monitor acts a bit like a hypervisor (e.g. it runs
+>> +in EL2 and manages the stage 2 page tables etc of the guests running in
+>> +Realm world), however much of the control is handled by a hypervisor
+>> +running in the Normal World. The Normal World hypervisor uses the Realm
+>> +Management Interface (RMI) defined by the RMM specification to request
+>> +the RMM to perform operations (e.g. mapping memory or executing a vCPU).
 >> +
->> +/**
->> + * struct arm_cca_token_info - a descriptor for the token buffer.
->> + * @granule:    PA of the page to which the token will be written
->                       ^^^^^^^^
+>> +The RMM defines an environment for guests where the address space (IPA)
+>> +is split into two. The lower half is protected - any memory that is
+>> +mapped in this half cannot be seen by the Normal World and the RMM
+>> +restricts what operations the Normal World can perform on this memory
+>> +(e.g. the Normal World cannot replace pages in this region without the
+>> +guest's cooperation). The upper half is shared, the Normal World is free
+>> +to make changes to the pages in this region, and is able to emulate MMIO
+>> +devices in this region too.
+>> +
+>> +A guest running in a Realm may also communicate with the RMM to request
+>> +changes in its environment or to perform attestation about its
+>> +environment. In particular it may request that areas of the protected
+>> +address space are transitioned between 'RAM' and 'EMPTY' (in either
+>> +direction). This allows a Realm guest to give up memory to be returned
+>> +to the Normal World, or to request new memory from the Normal World.
+>> +Without an explicit request from the Realm guest the RMM will otherwise
+>> +prevent the Normal World from making these changes.
 > 
-> s/the page/the granule. They are same thing when we have 4KB page size,
-> but there are conceptually different if I'm correct.
+> We could mention that this interface is "RSI", so readers know what to
+> look for next
 
-Indeed they are different, the granule is always 4KB, the host (and
-guest) page size could be bigger (although that's not yet supported).
+Good idea.
 
-Here 'granule' does indeed point to a (host) page (because it's returned
-from alloc_pages_exact()), but that's just a confusing detail.
-
-I'll update as you suggest.
-
->> + * @offset:    Offset within granule to start of buffer in bytes
->> + * @len:    Number of bytes of token data that was retrieved
->> + * @result:    result of rsi_attestation_token_continue operation
->> + */
->> +struct arm_cca_token_info {
->> +    phys_addr_t     granule;
->> +    unsigned long   offset;
->> +    int             result;
->> +};
 >> +
->> +/**
->> + * arm_cca_attestation_continue - Retrieve the attestation token data.
->> + *
->> + * @param: pointer to the arm_cca_token_info
->> + *
->> + * Attestation token generation is a long running operation and
->> therefore
->> + * the token data may not be retrieved in a single call. Moreover, the
->> + * token retrieval operation must be requested on the same CPU on
->> which the
->> + * attestation token generation was initialised.
->> + * This helper function is therefore scheduled on the same CPU multiple
->> + * times until the entire token data is retrieved.
->> + */
->> +static void arm_cca_attestation_continue(void *param)
->> +{
->> +    unsigned long len;
->> +    unsigned long size;
->> +    struct arm_cca_token_info *info;
+>> +Linux as a Realm Guest
+>> +----------------------
 >> +
->> +    if (!param)
->> +        return;
+>> +To run Linux as a guest within a Realm, the following must be provided
+>> +either by the VMM or by a `boot loader` run in the Realm before Linux:
+>> +
+>> + * All protected RAM described to Linux (by DT or ACPI) must be marked
+>> +   RIPAS RAM before handing over the Linux.
 > 
-> This check seems unnecessary and can be dropped.
+> "handing control over to Linux", or something like that?
 
-Ack
+Indeed that actually makes grammatical sense! ;)
 
 >> +
->> +    info = (struct arm_cca_token_info *)param;
+>> + * MMIO devices must be either unprotected (e.g. emulated by the Normal
+>> +   World) or marked RIPAS DEV.
 >> +
->> +    size = RSI_GRANULE_SIZE - info->offset;
->> +    info->result = rsi_attestation_token_continue(info->granule,
->> +                              info->offset, size, &len);
->> +    info->offset += len;
->> +}
->> +
+>> + * MMIO devices emulated by the Normal World and used very early in boot
+>> +   (specifically earlycon) must be specified in the upper half of IPA.
+>> +   For earlycon this can be done by specifying the address on the
+>> +   command line, e.g.: ``earlycon=uart,mmio,0x101000000``
 > 
-> As I suggested in another reply, the return value type of
-> rsi_attestation_token_continue()
-> needs to be 'unsigned long'. In that case, the type of struct
-> arm_cca_token_info::result
-> needs to be adjusted either.
-
-Ack
-
->> +/**
->> + * arm_cca_report_new - Generate a new attestation token.
->> + *
->> + * @report: pointer to the TSM report context information.
->> + * @data:  pointer to the context specific data for this module.
->> + *
->> + * Initialise the attestation token generation using the challenge data
->> + * passed in the TSM descriptor. Allocate memory for the attestation
->> token
->> + * and schedule calls to retrieve the attestation token on the same CPU
->> + * on which the attestation token generation was initialised.
->> + *
->> + * The challenge data must be at least 32 bytes and no more than 64
->> bytes. If
->> + * less than 64 bytes are provided it will be zero padded to 64 bytes.
->> + *
->> + * Return:
->> + * * %0        - Attestation token generated successfully.
->> + * * %-EINVAL  - A parameter was not valid.
->> + * * %-ENOMEM  - Out of memory.
->> + * * %-EFAULT  - Failed to get IPA for memory page(s).
->> + * * A negative status code as returned by smp_call_function_single().
->> + */
->> +static int arm_cca_report_new(struct tsm_report *report, void *data)
->> +{
->> +    int ret;
->> +    int cpu;
->> +    long max_size;
->> +    unsigned long token_size;
->> +    struct arm_cca_token_info info;
->> +    void *buf;
->> +    u8 *token __free(kvfree) = NULL;
->> +    struct tsm_desc *desc = &report->desc;
->> +
->> +    if (!report)
->> +        return -EINVAL;
->> +
+> This is going to be needed frequently, so maybe we should explain in a
+> little more detail how we come up with this value: "e.g. with an IPA size
+> of 33 and the base address of the emulated UART at 0x1000000,
+> ``earlycon=uart,mmio,0x101000000``"
 > 
-> This check seems unnecessary and can be dropped.
+> (Because the example IPA size is rather unintuitive and specific to the
+> kvmtool memory map)
 
-Ack
+Agreed.
 
->> +    if (desc->inblob_len < 32 || desc->inblob_len > 64)
->> +        return -EINVAL;
->> +
->> +    /*
->> +     * Get a CPU on which the attestation token generation will be
->> +     * scheduled and initialise the attestation token generation.
->> +     */
->> +    cpu = get_cpu();
->> +    max_size = rsi_attestation_token_init(desc->inblob,
->> desc->inblob_len);
->> +    put_cpu();
->> +
-> 
-> It seems that put_cpu() is called early, meaning the CPU can go away before
-> the subsequent call to arm_cca_attestation_continue() ?
-
-Indeed, good spot. I'll move it to the end of the function and update
-the error paths below.
-
->> +    if (max_size <= 0)
->> +        return -EINVAL;
->> +
->> +    /* Allocate outblob */
->> +    token = kvzalloc(max_size, GFP_KERNEL);
->> +    if (!token)
->> +        return -ENOMEM;
->> +
->> +    /*
->> +     * Since the outblob may not be physically contiguous, use a page
->> +     * to bounce the buffer from RMM.
->> +     */
->> +    buf = alloc_pages_exact(RSI_GRANULE_SIZE, GFP_KERNEL);
->> +    if (!buf)
->> +        return -ENOMEM;
->> +
->> +    /* Get the PA of the memory page(s) that were allocated. */
->> +    info.granule = (unsigned long)virt_to_phys(buf);
->> +
->> +    token_size = 0;
-> 
-> This initial assignment can be moved to where the variable is declared.
-
-Ack
-
->> +    /* Loop until the token is ready or there is an error. */
->                                                              ^^
-> 
-> Maybe it's the personal preference, I personally prefer to avoid the ending
-> character '.' for the single line of comment.
-
-I agree, my preference is the same. I'll update this.
-
->> +    do {
->> +        /* Retrieve one RSI_GRANULE_SIZE data per loop iteration. */
->> +        info.offset = 0;
->> +        do {
->> +            /*
->> +             * Schedule a call to retrieve a sub-granule chunk
->> +             * of data per loop iteration.
->> +             */
->> +            ret = smp_call_function_single(cpu,
->> +                               arm_cca_attestation_continue,
->> +                               (void *)&info, true);
->> +            if (ret != 0) {
->> +                token_size = 0;
->> +                goto exit_free_granule_page;
->> +            }
->> +
->> +            ret = info.result;
->> +        } while ((ret == RSI_INCOMPLETE) &&
->> +             (info.offset < RSI_GRANULE_SIZE));
-> 
-> It may be clearer to use 'info.result' here. Besides, unnecessary () exists
-> in the check.
-> 
->                 } while (info.result == RSI_INCOMPLETE &&
->                          info.offset < RSI_GRANULE_SIZE);
-
-Sure
-
-> Apart from that, we needn't to copy the token over when info.result isn't
-> RSI_SUCCESS nor RSI_INCOMPLETE.
-
-I'll move the error case up to avoid the copy.
-
->> +
->> +        /*
->> +         * Copy the retrieved token data from the granule
->> +         * to the token buffer, ensuring that the RMM doesn't
->> +         * overflow the buffer.
->> +         */
->> +        if (WARN_ON(token_size + info.offset > max_size))
->> +            break;
->> +        memcpy(&token[token_size], buf, info.offset);
->> +        token_size += info.offset;
->> +    } while (ret == RSI_INCOMPLETE);
->> +
-> 
-> As above, it may be clearer to use 'info.result' in the check.
-> 
->         } while (info.result == RSI_INCOMPLETE);
-
-Ack
-
->> +    if (ret != RSI_SUCCESS) {
->> +        ret = -ENXIO;
->> +        token_size = 0;
->> +        goto exit_free_granule_page;
->> +    }
->> +
->> +    report->outblob = no_free_ptr(token);
->> +exit_free_granule_page:
->> +    report->outblob_len = token_size;
->> +    free_pages_exact(buf, RSI_GRANULE_SIZE);
->> +    return ret;
->> +}
->> +
->> +static const struct tsm_ops arm_cca_tsm_ops = {
->> +    .name = KBUILD_MODNAME,
->> +    .report_new = arm_cca_report_new,
->> +};
->> +
->> +/**
->> + * arm_cca_guest_init - Register with the Trusted Security Module (TSM)
->> + * interface.
->> + *
->> + * Return:
->> + * * %0        - Registered successfully with the TSM interface.
->> + * * %-ENODEV  - The execution context is not an Arm Realm.
->> + * * %-EINVAL  - A parameter was not valid.
->> + * * %-EBUSY   - Already registered.
->> + */
->> +static int __init arm_cca_guest_init(void)
->> +{
->> +    int ret;
->> +
->> +    if (!is_realm_world())
->> +        return -ENODEV;
->> +
->> +    ret = tsm_register(&arm_cca_tsm_ops, NULL);
->> +    if (ret < 0)
->> +        pr_err("Failed to register with TSM.\n");
->> +
->> +    return ret;
->> +}
->> +module_init(arm_cca_guest_init);
->> +
-> 
-> It's probably a bit helpful to print the errno returned from
-> tsm_register().
-> 
->   pr_err("Error %d registering with TSM\n", ret);
-> 
-> The only errno that can be returned from tsm_register() is -EBUSY. So there
-> is no way for arm_cca_guest_init() to return -EINVAL. The comments need
-> correction by dropping the description relevant to -EINVAL.
-
-Ack
-
->> +/**
->> + * arm_cca_guest_exit - unregister with the Trusted Security Module
->> (TSM)
->> + * interface.
->> + */
->> +static void __exit arm_cca_guest_exit(void)
->> +{
->> +    tsm_unregister(&arm_cca_tsm_ops);
->> +}
->> +module_exit(arm_cca_guest_exit);
->> +
->> +MODULE_AUTHOR("Sami Mujawar <sami.mujawar@arm.com>");
->> +MODULE_DESCRIPTION("Arm CCA Guest TSM Driver.");
->> +MODULE_LICENSE("GPL");
-> 
-> The ending character '.' for the module's description may not be needed
-> and can be
-> dropped.
-
-Ack.
-
-Thanks for the review!
-
+Thanks,
 Steve
+
+> Thanks,
+> Jean
+> 
+>> +
+>> + * Linux will use bounce buffers for communicating with unprotected
+>> +   devices. It will transition some protected memory to RIPAS EMPTY and
+>> +   expect to be able to access unprotected pages at the same IPA address
+>> +   but with the highest valid IPA bit set. The expectation is that the
+>> +   VMM will remove the physical pages from the protected mapping and
+>> +   provide those pages as unprotected pages.
+>> +
+>> +References
+>> +----------
+>> +[1] https://developer.arm.com/documentation/den0137/
+>> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+>> index b57776a68f15..30164fb24a24 100644
+>> --- a/Documentation/arch/arm64/booting.rst
+>> +++ b/Documentation/arch/arm64/booting.rst
+>> @@ -41,6 +41,9 @@ to automatically locate and size all RAM, or it may use knowledge of
+>>  the RAM in the machine, or any other method the boot loader designer
+>>  sees fit.)
+>>  
+>> +For Arm Confidential Compute Realms this includes ensuring that all
+>> +protected RAM has a Realm IPA state (RIPAS) of "RAM".
+>> +
+>>  
+>>  2. Setup the device tree
+>>  -------------------------
+>> diff --git a/Documentation/arch/arm64/index.rst b/Documentation/arch/arm64/index.rst
+>> index 78544de0a8a9..12c243c3af20 100644
+>> --- a/Documentation/arch/arm64/index.rst
+>> +++ b/Documentation/arch/arm64/index.rst
+>> @@ -10,6 +10,7 @@ ARM64 Architecture
+>>      acpi_object_usage
+>>      amu
+>>      arm-acpi
+>> +    arm-cca
+>>      asymmetric-32bit
+>>      booting
+>>      cpu-feature-registers
+>> -- 
+>> 2.34.1
+>>
+>>
 
 
