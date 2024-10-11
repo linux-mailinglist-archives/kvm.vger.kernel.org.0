@@ -1,156 +1,253 @@
-Return-Path: <kvm+bounces-28630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28631-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72A6B99A4FF
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 15:28:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AC6999A56E
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 15:51:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2813E1F226C4
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:28:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B85E41F25369
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC016218D6D;
-	Fri, 11 Oct 2024 13:28:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D9D219C83;
+	Fri, 11 Oct 2024 13:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HMYFhmhE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fZlzaVOr"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB77321644E;
-	Fri, 11 Oct 2024 13:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70FAA218D85;
+	Fri, 11 Oct 2024 13:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728653313; cv=none; b=ldsu7SGPrMn5B7rZeLx7TamZQlTX+W/dF3v7xNfLqr10Dc4kj0gHEdGbe1eY94MXtq+vJ0zYpP7L3/0eZErRq9apt4Ki+iNlZp9e6JQNYR8irbsK5yLKYSWsBbImUYUwEBAXE2ivbnxVNr1el5YrsXV3Kw6hZNL0yEheO+ZcH64=
+	t=1728654675; cv=none; b=MYvpQhTQCOtsc2CLa6BAT8usVBNX2QSvkaWo8UYl8+uD49nxjrSiRXRIr6pP5C6QWlfwqX+EXbnNIaXg+hwF1NrfiKvSRukAOpDS+sqxbQkwt1QCBcixTu6ecjlgHrZymzlCTdXVQclwxQa+XEf7GrrriA1dzfvJraA27gak/MM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728653313; c=relaxed/simple;
-	bh=XnQ3OWZmFFbbEbN0nuRCP99ploKH8REo3FMrNxhzftk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KUq4cTCI+lRje5JkMzIjF0rSCaNACHZ/rwHQ4D97BtKAOgK8klccr+y4FTekRR/vmGC0ue79hh+dl+3GH2f/gyQcqmMs6o9B+6RgpoQIBHqRAInJw5Rz9A5VvG4OD5syb7Asdv9hFAH2a4zbeY+5Q44ux6sXlHlJp+SymOFURWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HMYFhmhE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52242C4CEC3;
-	Fri, 11 Oct 2024 13:28:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728653313;
-	bh=XnQ3OWZmFFbbEbN0nuRCP99ploKH8REo3FMrNxhzftk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HMYFhmhESzKOcwvBG48mNXHKBp3jSeryZBYdzFM5birAyAQdVuaZ7nqkACztUEiV6
-	 7Q40Zqq85bhWldnpkCKsllSU97Vumzk4iL9+uY3ek0lKO29SGdrzHaZlxw7eHaQ/5G
-	 2EowimbnmHdyOonqP6U6m160fXtirsrh1JwXBT9C1IZQLe+ftG6N6272/YbsKvoRuG
-	 HnyEQfXn6eSTBrtUE1g9nvegSUktEjq9fEocRrp1HQSByM8rGjDx/B0Lce4VOdmMeH
-	 gTtOf4NhbO6/Xv7j0CYPPdSEuui2XONFFyUSwroCiWL5T5F5XS+IEOJOvOxRyF+XeH
-	 m4IQTxxrYlkow==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1szFh1-002Z8g-Dg;
-	Fri, 11 Oct 2024 14:28:31 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexander Potapenko <glider@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.12, take #2
-Date: Fri, 11 Oct 2024 14:27:56 +0100
-Message-Id: <20241011132756.3793137-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1728654675; c=relaxed/simple;
+	bh=JZpTFHIOKgsBhrK+TAyqIMe3uV9e4+zAkXpEvbByrtE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RZHAoAkl8Jo2pK9NFbUv85zGACcbvCqnTzwL9fUtN6OnGlyAo5jHBEiyj7KiZK37Pzc2b/3aN0dLWFE696u7ZBOR84BEXkhtZU8FUrEP7i2qArKCqDn9MdzZmAkZXo/F0loXqz21AUTn7LIc3EFp2lo+nQfmhPncarczAbqj+10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fZlzaVOr; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728654674; x=1760190674;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=JZpTFHIOKgsBhrK+TAyqIMe3uV9e4+zAkXpEvbByrtE=;
+  b=fZlzaVOrCRHUNF3RJPkievhkT1A1xiCeBwdl4Ync+1CmOfkfRU9QrLub
+   fzitE0w3l1VsfdStgHZEb5jG3cmynWmY8UMkM9UYYOFUCLYZgtX+F/d3M
+   pL6l+0iz1kYBk9hn+ToOVsa6HzVDlV5BlrUoaNs1/ZmVNq2JhXXbbY4Jl
+   Iri2MJJ4Ec9gumdRmoBjUTYcAnQpGdtrKRjl9B2yWuHBo5MYEPTFqc16Z
+   G58cko1qMqSloqg1yITxdVLeV0sZ4XWOzlR0BodalU6x/1nwX+Wg5V3mQ
+   8Rgqt/ewimAaA5qBm/yJsGZTn4OvBYvH0Q5f2RlLr7E2YdmlGgceP0xIB
+   A==;
+X-CSE-ConnectionGUID: gnJlkRW4TP2awSLw3E/2rw==
+X-CSE-MsgGUID: jZ6Z4kA0QU2BnSslE7bPNg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="27862192"
+X-IronPort-AV: E=Sophos;i="6.11,196,1725346800"; 
+   d="scan'208";a="27862192"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 06:51:12 -0700
+X-CSE-ConnectionGUID: +v41otkISg+36h8OYkcGUw==
+X-CSE-MsgGUID: Wq59MZX2TDuGSzOxtLCdcA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,196,1725346800"; 
+   d="scan'208";a="76834109"
+Received: from smile.fi.intel.com ([10.237.72.154])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 06:50:58 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1szG2d-00000001uKQ-3BlX;
+	Fri, 11 Oct 2024 16:50:51 +0300
+Date: Fri, 11 Oct 2024 16:50:51 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Basavaraj Natikar <basavaraj.natikar@amd.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alex Dubov <oakad@yahoo.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+	Igor Mitsyanko <imitsyanko@quantenna.com>,
+	Sergey Matyukevich <geomatsi@gmail.com>,
+	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
+	Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Chen Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Mostafa Saleh <smostafa@google.com>, Hannes Reinecke <hare@suse.de>,
+	John Garry <john.g.garry@oracle.com>,
+	Soumya Negi <soumya.negi97@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
+	Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+	Rui Salvaterra <rsalvaterra@gmail.com>,
+	Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	ntb@lists.linux.dev, linux-pci@vger.kernel.org,
+	linux-staging@lists.linux.dev, kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Subject: Re: [RFC PATCH 01/13] PCI: Prepare removing devres from pci_intx()
+Message-ID: <ZwktO8AUmFEakhVP@smile.fi.intel.com>
+References: <20241009083519.10088-1-pstanner@redhat.com>
+ <20241009083519.10088-2-pstanner@redhat.com>
+ <ZwfnULv2myACxnVb@smile.fi.intel.com>
+ <f65e9fa01a1947782fc930876e5f84174408db67.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, glider@google.com, joey.gouly@arm.com, broonie@kernel.org, oliver.upton@linux.dev, shameerali.kolothum.thodi@huawei.com, shahuang@redhat.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <f65e9fa01a1947782fc930876e5f84174408db67.camel@redhat.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Paolo,
+On Fri, Oct 11, 2024 at 02:16:06PM +0200, Philipp Stanner wrote:
+> On Thu, 2024-10-10 at 17:40 +0300, Andy Shevchenko wrote:
+> > On Wed, Oct 09, 2024 at 10:35:07AM +0200, Philipp Stanner wrote:
+> > > pci_intx() is a hybrid function which sometimes performs devres
+> > > operations, depending on whether pcim_enable_device() has been used
+> > > to
+> > > enable the pci_dev. This sometimes-managed nature of the function
+> > > is
+> > > problematic. Notably, it causes the function to allocate under some
+> > > circumstances which makes it unusable from interrupt context.
+> > > 
+> > > To, ultimately, remove the hybrid nature from pci_intx(), it is
+> > > first
+> > > necessary to provide an always-managed and a never-managed version
+> > > of that function. Then, all callers of pci_intx() can be ported to
+> > > the
+> > > version they need, depending whether they use pci_enable_device()
+> > > or
+> > > pcim_enable_device().
 
-Here's the second set of fixes for 6.12.
+> > > An always-managed function exists, namely pcim_intx(), for which
+> > > __pcim_intx(), a never-managed version of pci_intx() had been
+> > > implemented.
+> > 
+> > > Make __pcim_intx() a public function under the name
+> > > pci_intx_unmanaged(). Make pcim_intx() a public function.
 
-We have a handful of fixes for the ID register configuration (I had
-originally queued them for -rc1, and somehow managed to accidentally
-drop the branch on the floor), our NV shadow page tables, the vgic,
-and a fix for a regression introduced in -rc1.
+It seems I got confused by these two paragraphs. Why the double underscored
+function is even mentioned here?
 
-As usual, details in the tag.
+> > To avoid an additional churn we can make just completely new APIs,
+> > namely:
+> > pcim_int_x()
+> > pci_int_x()
+> > 
+> > You won't need all dirty dances with double underscored function
+> > naming and
+> > renaming.
+> 
+> Ähm.. I can't follow. The new version doesn't use double underscores
+> anymore. __pcim_intx() is being removed, effectively.
+> After this series, we'd end up with a clean:
+> 
+> 	pci_intx() <-> pcim_intx()
+> 
+> just as in the other PCI APIs.
 
-Please pull,
+...
 
-	M.
+> > > +	pci_read_config_word(pdev, PCI_COMMAND, &pci_command);
+> > > +
+> > > +	if (enable)
+> > > +		new = pci_command & ~PCI_COMMAND_INTX_DISABLE;
+> > > +	else
+> > > +		new = pci_command | PCI_COMMAND_INTX_DISABLE;
+> > > +
+> > > +	if (new != pci_command)
+> > 
+> > I would use positive conditionals as easy to read (yes, a couple of
+> > lines
+> > longer, but also a win is the indentation and avoiding an additional
+> > churn in
+> > the future in case we need to add something in this branch.
+> 
+> I can't follow. You mean:
+> 
+> if (new == pci_command)
+>     return;
+> 
+> ?
+> 
+> That's exactly the same level of indentation.
 
-The following changes since commit a1d402abf8e3ff1d821e88993fc5331784fac0da:
+No, the body gets one level off.
 
-  KVM: arm64: Fix kvm_has_feat*() handling of negative features (2024-10-03 19:35:27 +0100)
+> Plus, I just copied the code.
+> 
+> > > +		pci_write_config_word(pdev, PCI_COMMAND, new);
 
-are available in the Git repository at:
+	if (new == pci_command)
+		return;
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.12-2
+	pci_write_config_word(pdev, PCI_COMMAND, new);
 
-for you to fetch changes up to df5fd75ee305cb5927e0b1a0b46cc988ad8db2b1:
+See the difference?
+Also, imaging adding a new code in your case:
 
-  KVM: arm64: Don't eagerly teardown the vgic on init error (2024-10-11 13:40:25 +0100)
+	if (new != pci_command)
+		pci_write_config_word(pdev, PCI_COMMAND, new);
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.12, take #2
+==>
 
-- Fix the guest view of the ID registers, making the relevant fields
-  writable from userspace (affecting ID_AA64DFR0_EL1 and ID_AA64PFR1_EL1)
+	if (new != pci_command) {
+		...foo...
+		pci_write_config_word(pdev, PCI_COMMAND, new);
+		...bar...
+	}
 
-- Correcly expose S1PIE to guests, fixing a regression introduced
-  in 6.12-rc1 with the S1POE support
+And in mine:
 
-- Fix the recycling of stage-2 shadow MMUs by tracking the context
-  (are we allowed to block or not) as well as the recycling state
+	if (new == pci_command)
+		return;
 
-- Address a couple of issues with the vgic when userspace misconfigures
-  the emulation, resulting in various splats. Headaches courtesy
-  of our Syzkaller friends
+	...foo...
+	pci_write_config_word(pdev, PCI_COMMAND, new);
+	...bar...
 
-----------------------------------------------------------------
-Marc Zyngier (2):
-      Merge branch kvm-arm64/idregs-6.12 into kvmarm/fixes
-      KVM: arm64: Don't eagerly teardown the vgic on init error
+I hope it's clear now what I meant.
 
-Mark Brown (1):
-      KVM: arm64: Expose S1PIE to guests
+-- 
+With Best Regards,
+Andy Shevchenko
 
-Oliver Upton (5):
-      KVM: arm64: Unregister redistributor for failed vCPU creation
-      KVM: arm64: nv: Keep reference on stage-2 MMU when scheduled out
-      KVM: arm64: nv: Do not block when unmapping stage-2 if disallowed
-      KVM: arm64: nv: Punt stage-2 recycling to a vCPU request
-      KVM: arm64: nv: Clarify safety of allowing TLBI unmaps to reschedule
 
-Shameer Kolothum (1):
-      KVM: arm64: Make the exposed feature bits in AA64DFR0_EL1 writable from userspace
-
-Shaoqin Huang (4):
-      KVM: arm64: Disable fields that KVM doesn't know how to handle in ID_AA64PFR1_EL1
-      KVM: arm64: Use kvm_has_feat() to check if FEAT_SSBS is advertised to the guest
-      KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
-      KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
-
- arch/arm64/include/asm/kvm_host.h                 |  7 +++
- arch/arm64/include/asm/kvm_mmu.h                  |  3 +-
- arch/arm64/include/asm/kvm_nested.h               |  4 +-
- arch/arm64/kvm/arm.c                              |  5 ++
- arch/arm64/kvm/hypercalls.c                       | 12 ++--
- arch/arm64/kvm/mmu.c                              | 15 ++---
- arch/arm64/kvm/nested.c                           | 53 +++++++++++++---
- arch/arm64/kvm/sys_regs.c                         | 75 +++++++++++++++++++++--
- arch/arm64/kvm/vgic/vgic-init.c                   | 28 +++++++--
- tools/testing/selftests/kvm/aarch64/set_id_regs.c | 16 ++++-
- 10 files changed, 183 insertions(+), 35 deletions(-)
 
