@@ -1,221 +1,565 @@
-Return-Path: <kvm+bounces-28644-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28645-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A980999AABD
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 19:57:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0A8C99AB01
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 20:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 157D1B21BA6
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 17:57:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2ED89B23389
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 18:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A079A1C244B;
-	Fri, 11 Oct 2024 17:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEE2405FB;
+	Fri, 11 Oct 2024 18:34:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pjqr5ohd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QMtf1ffu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F51C198857
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 17:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728669428; cv=fail; b=u6pVz4O3iME7WOpUksIUq+Eh2xZN82KieFjcjEVE2nhA8zqxrdxeLpxDZsXFDLmRkPgL2AfTCFCVIp97GlP/bzb3PNPVB26DVjz/VOajU2io1Q61psDgf9orC5316eA/3DJHLQDd0SzdWY7rwm3dapfmrBdaZqMKhcxBstAQp/s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728669428; c=relaxed/simple;
-	bh=B8lfRbRl655srMVFW2ja5oCHrxcKGBK3wubhiR2ZsVA=;
-	h=Date:From:To:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=M9c9vkYSUg+aJPjVzv08t5ym+UnHDv0F54JAqb+UVjP86BAB7ZDDlYVBMMoJolmu0hhERk7IiDHSS4f400oN2uhKAT2tpM0nQbCHFeth9dWJIu7Px6tNHUfLzY2v8+RP/l5Ne5ltVruwebYCnr1U1v5rZI30ooYFETLutM4ESy0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pjqr5ohd; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728669427; x=1760205427;
-  h=date:from:to:subject:message-id:references:in-reply-to:
-   mime-version;
-  bh=B8lfRbRl655srMVFW2ja5oCHrxcKGBK3wubhiR2ZsVA=;
-  b=Pjqr5ohdeY3Zv6DboE034ULm83R/rmM8cfIDKUEsGuaIjF6E0UFemyp3
-   oXX6y/IizR/79wvIUXMz4hKSPK6AYO9oZRDP+DEl5/xWLf16VNLBrgmFm
-   C1bYF14Y6DW0W7MFwcUbuLLpdGutBTkH0SgkLOy4I7vtytgq3M9e7h29s
-   GqHok9xu30HcS72G4yraXE1vA7W99T/vGXdElRn8DqBH9ubNRbdBqb5fG
-   eZWG05biqB/o5VIo+JZT95LNn3Sq9gF5Zf43UGKZomg8Esi2T1Iw8IRdd
-   41AjRjqEoL0pD4kNpmLwOESdDJwP4fUtP72DzenOZrMoOKw/D7JLXDinb
-   Q==;
-X-CSE-ConnectionGUID: nyZnQgp5SNOlCWe+y5p4nQ==
-X-CSE-MsgGUID: h0QQxQb2Sbyh9WZXjaChMA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28030571"
-X-IronPort-AV: E=Sophos;i="6.11,196,1725346800"; 
-   d="scan'208";a="28030571"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 10:57:07 -0700
-X-CSE-ConnectionGUID: gtpUBc+sTlmrTIrNFOIarQ==
-X-CSE-MsgGUID: 983qP+6mQiKKXbehhNZS1A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,196,1725346800"; 
-   d="scan'208";a="81534043"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Oct 2024 10:57:05 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 11 Oct 2024 10:57:05 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 11 Oct 2024 10:57:04 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 11 Oct 2024 10:57:04 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.43) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 11 Oct 2024 10:57:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SPKMC9NOrBUD79nQ2TpIT6hXscPUx3rBeKFs3nVJIRRh2AHU0P9pycSkhxRssFRJRC2BYY2kt0/MegwHTun/eE/4rUystpNyIrAyWRUGs3iDOjpppmBtSd6mEzmxxSMhSp5PxxF059uSPvJG/r2Ts5kXyifQ4r69gql8XoWITzCjkj9s2kZCRj9VkWThwvVBzLC2UAhB39DU+1du/RUgocMfwCwr1QY/mKh13nPsW1wxV43N1dg2yPK0ruerPNYHcIIRAWUilrV6LxDrFJKhEBnf7VxZYACOJPd/n60eoY7hhmI46f7nVcXwY8vC4cziS6N88mnirOz5GdjaUH4uAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EZkD3wytp9zLXeBHJNeMRcCYejDdz+YuSEQFm2OyPHk=;
- b=BTNmsMiWNtVKXnltB4+zK6B+pDjFoYADCY7TXGBfhIvD5wmb8f14Zj9ptuCBV8en3pPAKHHcPAkjHU8czrpa1OGzqJgxiV4pfR/EKMH126kycJwB0ZSE+Xyi+qs61rMZblbcypliBjPaqvfTDYGmGsKFQVznC53xGQ+vZhQXpoQ7RKM5J21OZZashvAy7CUlizRSHJg4RVFEBcWGljI/aIUuxXKiGdbCDP5oJMVCnEsdpey5UCTeIO0WbjXQKpfRmaI0OEGMAekRRk3rJJfiBqM+s0uPXLIOsLvLDlH/sCOc2G8zNJ31AZ2f5PEoN/DFZ3igIrActw+rzCujFCfNbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by DS0PR11MB6446.namprd11.prod.outlook.com (2603:10b6:8:c5::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.18; Fri, 11 Oct
- 2024 17:57:02 +0000
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8%5]) with mapi id 15.20.8048.017; Fri, 11 Oct 2024
- 17:57:02 +0000
-Date: Fri, 11 Oct 2024 10:57:00 -0700
-From: Dan Williams <dan.j.williams@intel.com>
-To: David Hildenbrand <david@redhat.com>, <linux-coco@lists.linux.dev>, KVM
-	<kvm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>
-Subject: Re: Proposal: bi-weekly guest_memfd upstream call
-Message-ID: <670966ec5db4e_964f2294f2@dwillia2-xfh.jf.intel.com.notmuch>
-References: <4b49248b-1cf1-44dc-9b50-ee551e1671ac@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <4b49248b-1cf1-44dc-9b50-ee551e1671ac@redhat.com>
-X-ClientProxiedBy: MW4P221CA0005.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:303:8b::10) To PH8PR11MB8107.namprd11.prod.outlook.com
- (2603:10b6:510:256::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B39819F13B
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 18:34:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728671642; cv=none; b=uidHDwfvZqydP8MtACxD2TwUwWSEKmFnOwi5xwseCobrONb51mif9nHBOCulO9huORDZIZLcWyK+H3uzk2UNRoTb+eK9yhc/CXU0WKgyC2/KNVdgfHM+/XNqIlZ8BsWrHfJ9iqNy9fcwLWIbna3HxPf3Fw0u9bipSr25jSVOTwU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728671642; c=relaxed/simple;
+	bh=3/GHCGogAuhYSv//x85j/Z6b9fGW4Nuf2Rs+fdP7h/c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lXJBruRw98VInIaD3fhEXio4zvuZ0U1xLSuXwgZPFsL4Ic4iyExzDRfbP42azzRAYGMBN3gE54c9msAoTbUsWNboPsqflQTeVRJGG9rXlbmzc6Ctn+Vobv0qE6baNNi3OxJnRTzGfiM3cqCbRGehre0w/pv+7f2nS9fgOdLFt8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QMtf1ffu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728671639;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VWEsJtQknKO+f6wwawdGRc5BYz0aknSe6+kTVKNHDEQ=;
+	b=QMtf1ffuSTMx3nhOqoB44EWZhV1c7VliyDcoh4m/GIAnI/ThBivRBfk2h1ruw6p15iUkRT
+	Q6XUuKhozjt/+a6w2+yfw+ME45uOTXOCVyG/YlReidqxl1e9xE+zqpOZN7WgJO2uZBOf87
+	u5+m5WA2936Oz6UVxvHxaAvtocM2JsQ=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-160-LOaqGv-vOEG7tt-iH1-Cdw-1; Fri, 11 Oct 2024 14:33:56 -0400
+X-MC-Unique: LOaqGv-vOEG7tt-iH1-Cdw-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-8353bd6481fso32441239f.1
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 11:33:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728671636; x=1729276436;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VWEsJtQknKO+f6wwawdGRc5BYz0aknSe6+kTVKNHDEQ=;
+        b=iF4cnQi1yNr/XjO4e3HjbrMSfwzJxD1pnfEeLCNFcsQBifKu+4dcbYgo1XH87ms7mj
+         VwiIo7LlaWZhxkBSNhRKR6+U4XKpv/DnM42pZIHn+vuW6KgXGrODKmEU8ldKFLDl+ic3
+         a+2DWJlD1jml8u97NXTG0M0JKdl04L3mnVK76Fy2zndUgrDN4mk07Ugru6aPfjH7GoVs
+         E1IKBsMfiAOROw9UtVFUV74kXvLuDWvSOZXZ6M4UJmsLfE+4CXv9zBPtP33DLeGx7U0S
+         lcFT625KUJ1rsVp1TQL7J25RbVXmjnHQwtessVk+c2ye9hPoqe4KMxbaZajIKfElEtOP
+         Vk0A==
+X-Gm-Message-State: AOJu0Yw3pWqseAF5Irn/5KvRtqNyGJTrQYwEpImg82FTbMVoERvMlJfS
+	rTwJredr5UnevrSRaEJFISzEhN1N/NsJIUy9NzYuZHCjqaAtLFeGKfnNwg7xavIatLZLbCEhqjb
+	8jrw6H+cpCu2Jrr/JDZ8D8TwssrpznjbMRzKMRwLjD0mvRr/aMQ==
+X-Received: by 2002:a5e:df09:0:b0:82c:edde:1284 with SMTP id ca18e2360f4ac-8378f459394mr85040039f.0.1728671635660;
+        Fri, 11 Oct 2024 11:33:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEd6OXg+HD0QliOBqjfCfwDOnHpiNIAAOMAgvMMk32OIcgd0iGT0f7gaPJGraeLqmTu/XYybQ==
+X-Received: by 2002:a5e:df09:0:b0:82c:edde:1284 with SMTP id ca18e2360f4ac-8378f459394mr85037139f.0.1728671635073;
+        Fri, 11 Oct 2024 11:33:55 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbada84a35sm749888173.117.2024.10.11.11.33.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Oct 2024 11:33:54 -0700 (PDT)
+Date: Fri, 11 Oct 2024 12:33:51 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Zhi Wang <zhiw@nvidia.com>
+Cc: <kvm@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+ <kevin.tian@intel.com>, <jgg@nvidia.com>, <alison.schofield@intel.com>,
+ <dan.j.williams@intel.com>, <dave.jiang@intel.com>, <dave@stgolabs.net>,
+ <jonathan.cameron@huawei.com>, <ira.weiny@intel.com>,
+ <vishal.l.verma@intel.com>, <alucerop@amd.com>, <acurrid@nvidia.com>,
+ <cjia@nvidia.com>, <smitra@nvidia.com>, <ankita@nvidia.com>,
+ <aniketa@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
+ <zhiwang@kernel.org>
+Subject: Re: [RFC 04/13] vfio: introduce vfio-cxl core preludes
+Message-ID: <20241011123351.27474f2b.alex.williamson@redhat.com>
+In-Reply-To: <20240920223446.1908673-5-zhiw@nvidia.com>
+References: <20240920223446.1908673-1-zhiw@nvidia.com>
+	<20240920223446.1908673-5-zhiw@nvidia.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|DS0PR11MB6446:EE_
-X-MS-Office365-Filtering-Correlation-Id: 33bdea9d-6f5c-446a-80c3-08dcea1e1c5a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|3613699012;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?UOCX7yRRDTQaxwzCdVn9hQlbbrYgEN0Sbpcmw0UquKgXsa/UIiXLQS7C+rhP?=
- =?us-ascii?Q?A+hBpzYr4Mq0gdl7sj4pOFZzlU/cZmwL30osE6kKzvlbB9jIJNdvVey7vrWu?=
- =?us-ascii?Q?1yZrc5Uk35WgMDu8oytmmksO5FHqKXzx9KMCRYC193mA6ISKwUcKAPRJjUfJ?=
- =?us-ascii?Q?IPSAHoXDKA+CQoeliuVfMkaaEX7TBVeEKOQaJJ3NIS18UztuPSqTk20NWhzM?=
- =?us-ascii?Q?TWbY9lqPOXeSw8RWiMTfMLlxEYLJaPGZ98shbHuqwaudcJk+ZCLBqIcuIczB?=
- =?us-ascii?Q?QhXZuBOtgI+U+Y4LUqiYFe1xJmbMJX4tiJX+81rNTLYsYYqbdroz6ij4PDh3?=
- =?us-ascii?Q?X7xtJzImsafOIKN1F1OJktLBWpyZCwmq2ZksAcgps5snmpO08izMLip5Nxiu?=
- =?us-ascii?Q?6rDOcOMo+cTLIxqzPhRZgjEBmDzat8W2iw38pGOqqhhAjFi8nKAdydZ84v98?=
- =?us-ascii?Q?vdaYNT8Opd6nhak6oSw1uKFxeo1nGUGsQTN9mQc80E9BRcZxhavfFNVhyHu/?=
- =?us-ascii?Q?nkn8cTJK9oaXgri7Z+6pRX3fwha42yBrUGwvR1vEcqw41TenodT0gCDFytiA?=
- =?us-ascii?Q?jWiad8kQazlunfcrqstbSZ541nCO6HDHLZy8I40K87A5pq2lh4+SOiyXBFAU?=
- =?us-ascii?Q?pucBr5XIeIRlk5gcQKDrTomHb9k7MDV/4D7NPHO9lyApjwD68yexkZZsOso2?=
- =?us-ascii?Q?37CJVtjheUFvefPpJFlqecGeWJK5cOlh8S4ktzG1YZqpza+hnV1nt1QuKbET?=
- =?us-ascii?Q?cTPhuWsst16ch8v+HvXEfKksCaBLe1Ee3nxq6OEPi0dpnoeYyYXSVoXovK1A?=
- =?us-ascii?Q?pDlauBmlsiOD9Bzcm0CKi7TQS3XmhVmYtkuZj+5yGQmEjniZf1O6Qto10ri1?=
- =?us-ascii?Q?5D08pz1lRjwdJG/GuOxNIplEKP6g6o91nycXHVk732YZPXPfDBu4ibyfDJKi?=
- =?us-ascii?Q?rjNIYi/1Cne6i1Kc9+gg2Iy0qSYDS2uZb4brdWyji+ymaNkgFcF7xTGVWqlg?=
- =?us-ascii?Q?uFmkTdcgTCRXtD9iE1wFP7Q26tYpnBC+Z7NCQML04xxVOKEtjSr7eyotSiSk?=
- =?us-ascii?Q?zB/ytG1KNFkS4UtPBZoNlwjJLybHmXRA44cBA1nzRG0TQIONcT7bsibpPZ1J?=
- =?us-ascii?Q?cp9RbDDV3aL/PG7cAQHJ2kmS8fjfLTUHmFV6nSZcj8ztHV++3/qosAKWlYtZ?=
- =?us-ascii?Q?PIbzULbz5hgCoihlDTQr6Jooj5M6TFfrGteJNQGdpvlwdfWV9p4J+uNCsfl3?=
- =?us-ascii?Q?wOm0aJKydaj90CowcKihFQtxQIQ6sG3z8GPv4v2X4HvUHtG44VPV6LuktnKE?=
- =?us-ascii?Q?sEAmBxB813Y8OhfBGdKCqcsP/PWaEQ6gcHFExqtEFKxIXw=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(3613699012);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nWQi6C6yL1IK2E5l90LmTKhC83+t63UVEQYEjfhvTm05/LsAk9W18ZLrYYQY?=
- =?us-ascii?Q?cJMWZQq/cb0x64YHy8rfU2BCw6i/kInf64AcKSzgKNnOaqzJrE+jVZLlLMhl?=
- =?us-ascii?Q?UPM1P2wi/Np6+riEnc+YTnCkkoHqPnl2br5ohxBQ3ijaykRddD1chfLhhW/n?=
- =?us-ascii?Q?8sHQfoSd1AfLTOPsYANnuF4jnYG8IGgGl9zHRVaWJUP7GxudULmNKfzkDuAU?=
- =?us-ascii?Q?AQHEUbrxIqLW/iDbEGIHr0MkFGzO2UG94d1QVj5Q/ZQ2scWSK1cCvS0PxyAC?=
- =?us-ascii?Q?hURKtFz/4B1QdZwUH+ho9B5B8KbeqJxnfajdIvpIQ2VkiHY/JyWM80TrTydh?=
- =?us-ascii?Q?kI1pL7S0NFm7PuaviFjKL7TZ0IMyBHgpfNyc5MDuN+NltW07z2rSFKmG/Ks/?=
- =?us-ascii?Q?K/wJAbyDW7q+wswWjwWSLgES8RwFRVZXdW8EP8IGksuydU7MkfFGtlKVr5Gr?=
- =?us-ascii?Q?2LQ8hcA/y35wWzREE6fJ1z2GiDueSRA2SecalW5U3suXPmHNjvX3eMDoJx47?=
- =?us-ascii?Q?YVT9pshHObtpAnRYlxVWpE05VW3asXqIl7AGW03QgH3ACe4/KqQ1EPWA6NtZ?=
- =?us-ascii?Q?+jRhkDRDYR2rBm7yE9qZ3MupLRtEnlJKRIuMaZon1N9zBCQ2RUYmTUYD7eXj?=
- =?us-ascii?Q?5wCb7jdC6udglH6h9RxbzCLlSpetjMrPCqtxy4oqKjiNYg83etDq6EsR8sFy?=
- =?us-ascii?Q?IiHTaENhUW2f566i6zcABrIxr+1HuMf2TTCnBuh1R8LS352gmhByvJpBH8XP?=
- =?us-ascii?Q?m3LpAdveNLePXODjwDGdrM+gp/3iLFArrThnrp5d2Njlovn1xHFx5+vG7nWk?=
- =?us-ascii?Q?ctl+c/PXeTiDwyvTa9Y7Dj91q8Bim9L6Zk1KeR/AvQnOar256BiA0dZwlNR7?=
- =?us-ascii?Q?U5/NQaekiL+Bm/5DwOnyIu2vlasHCeupw03FGeF3icBo6hJL/sovYqjBM6xT?=
- =?us-ascii?Q?jeRV2wka2Ahb+dqD/4bVlTgSTO60K2emXsnwc1vDYcWOIFNsQMFWSG9pqzDw?=
- =?us-ascii?Q?YzfgMeGlp/QX06dOi+sMrDHttRI+YFy4VEgpQFFi0UO3Nqjo432IV1hpDYLb?=
- =?us-ascii?Q?fJophKbIrc02ky/rWPfsoxRWn2SvvHXPEqE4JGT8hoAYxeiBWJD9A0G1CmbE?=
- =?us-ascii?Q?4eiGSHWIyPPYLQUVaE6V69jpusR0D61yZZMmKSqphzPl99kcggfpBOpOz2lS?=
- =?us-ascii?Q?EUUROtpTD7G76ot/iLlT15ICHlMWoUbcMv0lheWxCfUEhfVPfoLr3BZ48zBT?=
- =?us-ascii?Q?opAp8eVP7vMaLX+NTzP1wlCwmtFK2eOgtblqaUO4efNhuVcMJFnvRjd6D/cn?=
- =?us-ascii?Q?v+JBC9rIwaBq9L6Gw+r3oL8Kp/10B8L9p5vc+mcnkRn9y+NPOwb9sYfEYnPo?=
- =?us-ascii?Q?m2Fyh1339a/YHUEP6ZyaOShrCZN7hHNRebhrMo/Mdp/kpNFdZ0EprexIkOm4?=
- =?us-ascii?Q?5EkOQjQG3ujKx2IjWmk0EGTRlAZrSzylu1OKSza8SNexGUV0RM4UbFF0FjOa?=
- =?us-ascii?Q?JzvXHeetB1qyJmUitrxiPgyogrYc7ubZc+xoBh10Xdo8KQFKIQo5FaXcVwc0?=
- =?us-ascii?Q?HuVS+x0Od4gps5uFUYatwB6uVZCPFrDXMZaxOMb/fnf6j4mIKMKlIVDHhc7C?=
- =?us-ascii?Q?fg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33bdea9d-6f5c-446a-80c3-08dcea1e1c5a
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2024 17:57:02.6275
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bu4vYjjnVUdeRJF2D8DghkrVw9dfyASiqVUajQzbb7nxUtkHTd/WVx4zgt/6PXH6lrQFadjE+NcpzKy1db3en1r4/BJHRaEkMUa3ZYf1924=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6446
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-David Hildenbrand wrote:
-> Ahoihoi,
-> 
-> while talking to a bunch of folks at LPC about guest_memfd, it was 
-> raised that there isn't really a place for people to discuss the 
-> development of guest_memfd on a regular basis.
-> 
-> There is a KVM upstream call, but guest_memfd is on its way of not being 
-> guest_memfd specific ("library") and there is the bi-weekly MM alignment 
-> call, but we're not going to hijack that meeting completely + a lot of 
-> guest_memfd stuff doesn't need all the MM experts ;)
-> 
-> So my proposal would be to have a bi-weekly meeting, to discuss ongoing 
-> development of guest_memfd, in particular:
-> 
-> (1) Organize development: (do we need 3 different implementation
->      of mmap() support ? ;) )
-> (2) Discuss current progress and challenges
-> (3) Cover future ideas and directions
-> (4) Whatever else makes sense
-> 
-> Topic-wise it's relatively clear: guest_memfd extensions were one of the 
-> hot topics at LPC ;)
-> 
-> I would suggest every second Thursdays from 9:00 - 10:00am PDT (GMT-7), 
-> starting Thursday next week (2024-10-17).
-> 
-> We would be using Google Meet.
-> 
-> 
-> Thoughts?
+On Fri, 20 Sep 2024 15:34:37 -0700
+Zhi Wang <zhiw@nvidia.com> wrote:
 
-Sounds like a great idea to me, thanks for setting this up!
+> In VFIO, common functions that used by VFIO variant drivers are managed
+> in a set of "core" functions. E.g. the vfio-pci-core provides the common
+> functions used by VFIO variant drviers to support PCI device
+> passhthrough.
+> 
+> Although the CXL type-2 device has a PCI-compatible interface for device
+> configuration and programming, they still needs special handlings when
+> initialize the device:
+> 
+> - Probing the CXL DVSECs in the configuration.
+> - Probing the CXL register groups implemented by the device.
+> - Configuring the CXL device state required by the kernel CXL core.
+> - Create the CXL region.
+> - Special handlings of the CXL MMIO BAR.
+> 
+> Introduce vfio-cxl core predules to hold all the common functions used
+
+s/predules/preludes/
+
+> by VFIO variant drivers to support CXL device passthrough.
+> 
+> Signed-off-by: Zhi Wang <zhiw@nvidia.com>
+> ---
+>  drivers/vfio/pci/Kconfig         |   4 +
+>  drivers/vfio/pci/Makefile        |   3 +
+>  drivers/vfio/pci/vfio_cxl_core.c | 264 +++++++++++++++++++++++++++++++
+>  include/linux/vfio_pci_core.h    |  37 +++++
+>  4 files changed, 308 insertions(+)
+>  create mode 100644 drivers/vfio/pci/vfio_cxl_core.c
+> 
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index bf50ffa10bde..2196e79b132b 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -7,6 +7,10 @@ config VFIO_PCI_CORE
+>  	select VFIO_VIRQFD
+>  	select IRQ_BYPASS_MANAGER
+>  
+> +config VFIO_CXL_CORE
+> +	tristate
+> +	select VFIO_PCI_CORE
+
+I don't see anything in this series that depends on CXL Kconfigs, so it
+seems this will break in randconfig when the resulting vfio-cxl variant
+driver is enabled without core CXL support.
+
+> +
+>  config VFIO_PCI_MMAP
+>  	def_bool y if !S390
+>  	depends on VFIO_PCI_CORE
+> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> index cf00c0a7e55c..b51221b94b0b 100644
+> --- a/drivers/vfio/pci/Makefile
+> +++ b/drivers/vfio/pci/Makefile
+> @@ -8,6 +8,9 @@ vfio-pci-y := vfio_pci.o
+>  vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
+>  obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
+>  
+> +vfio-cxl-core-y := vfio_cxl_core.o
+> +obj-$(CONFIG_VFIO_CXL_CORE) += vfio-cxl-core.o
+> +
+>  obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
+>  
+>  obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
+> diff --git a/drivers/vfio/pci/vfio_cxl_core.c b/drivers/vfio/pci/vfio_cxl_core.c
+> new file mode 100644
+> index 000000000000..6a7859333f67
+> --- /dev/null
+> +++ b/drivers/vfio/pci/vfio_cxl_core.c
+> @@ -0,0 +1,264 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved
+> + */
+> +
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/device.h>
+> +#include <linux/eventfd.h>
+> +#include <linux/file.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/iommu.h>
+> +#include <linux/module.h>
+> +#include <linux/mutex.h>
+> +#include <linux/notifier.h>
+> +#include <linux/pci.h>
+> +#include <linux/pm_runtime.h>
+> +#include <linux/slab.h>
+> +#include <linux/types.h>
+> +#include <linux/uaccess.h>
+> +
+> +#include "vfio_pci_priv.h"
+> +
+> +#define DRIVER_AUTHOR "Zhi Wang <zhiw@nvidia.com>"
+> +#define DRIVER_DESC "core driver for VFIO based CXL devices"
+> +
+> +static int get_hpa_and_request_dpa(struct vfio_pci_core_device *core_dev)
+> +{
+> +	struct vfio_cxl *cxl = &core_dev->cxl;
+> +	struct pci_dev *pdev = core_dev->pdev;
+> +	u64 max;
+> +
+> +	cxl->cxlrd = cxl_get_hpa_freespace(cxl->endpoint, 1,
+> +					   CXL_DECODER_F_RAM |
+> +					   CXL_DECODER_F_TYPE2,
+> +					   &max);
+
+I don't see that this adhere to the comment in cxl_get_hpa_freespace()
+that the caller needs to deal with the elevated ref count on the root
+decoder.  There's no put_device() call in either the error path or
+disable path.
+
+Also, maybe this is inherent in the cxl code, but cxl->cxlrd seems
+redundant to me, couldn't we refer to this as cxl->root_decoder? (or
+some variant more descriptive than "rd")
+
+Is this exclusively a type2 extension or how do you envision type1/3
+devices with vfio?
+
+> +	if (IS_ERR(cxl->cxlrd)) {
+> +		pci_err(pdev, "Fail to get HPA space.\n");
+> +		return PTR_ERR(cxl->cxlrd);
+> +	}
+> +
+> +	if (max < cxl->region.size) {
+> +		pci_err(pdev, "No enough free HPA space %llu < %llu\n",
+> +			max, cxl->region.size);
+> +		return -ENOSPC;
+> +	}
+> +
+> +	cxl->cxled = cxl_request_dpa(cxl->endpoint, true, cxl->region.size,
+> +				     cxl->region.size);
+
+cxl->endpoint_decoder? cxl->endp_dec?
+
+> +	if (IS_ERR(cxl->cxled)) {
+> +		pci_err(pdev, "Fail to request DPA\n");
+> +		return PTR_ERR(cxl->cxled);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int create_cxl_region(struct vfio_pci_core_device *core_dev)
+> +{
+> +	struct vfio_cxl *cxl = &core_dev->cxl;
+> +	struct pci_dev *pdev = core_dev->pdev;
+> +	resource_size_t start, end;
+> +	int ret;
+> +
+> +	ret = cxl_accel_request_resource(cxl->cxlds, true);
+> +	if (ret) {
+> +		pci_err(pdev, "Fail to request CXL resource\n");
+> +		return ret;
+> +	}
+
+Where is the corresponding release_resource()?
+
+> +
+> +	if (!cxl_await_media_ready(cxl->cxlds)) {
+> +		cxl_accel_set_media_ready(cxl->cxlds);
+> +	} else {
+> +		pci_err(pdev, "CXL media is not active\n");
+> +		return ret;
+> +	}
+
+We're not capturing the media ready error for this return.  I think
+Jason would typically suggest a success oriented flow as:
+
+	ret = cxl_await_media_ready(cxl->cxlds)
+	if (ret) {
+		pci_err(...);
+		return ret;
+	}
+	cxl_accel_set_media_ready(cxl->cxlds);
+
+> +
+> +	cxl->cxlmd = devm_cxl_add_memdev(&pdev->dev, cxl->cxlds);
+> +	if (IS_ERR(cxl->cxlmd)) {
+> +		pci_err(pdev, "Fail to create CXL memdev\n");
+> +		return PTR_ERR(cxl->cxlmd);
+> +	}
+> +
+> +	cxl->endpoint = cxl_acquire_endpoint(cxl->cxlmd);
+> +	if (IS_ERR(cxl->endpoint)) {
+> +		pci_err(pdev, "Fail to acquire CXL endpoint\n");
+> +		return PTR_ERR(cxl->endpoint);
+> +	}
+> +
+> +	ret = get_hpa_and_request_dpa(core_dev);
+> +	if (ret)
+> +		goto out;
+> +
+> +	cxl->region.region = cxl_create_region(cxl->cxlrd, &cxl->cxled, 1);
+> +	if (IS_ERR(cxl->region.region)) {
+> +		ret = PTR_ERR(cxl->region.region);
+> +		pci_err(pdev, "Fail to create CXL region\n");
+> +		cxl_dpa_free(cxl->cxled);
+> +		goto out;
+> +	}
+> +
+> +	cxl_accel_get_region_params(cxl->region.region, &start, &end);
+> +
+> +	cxl->region.addr = start;
+> +out:
+> +	cxl_release_endpoint(cxl->cxlmd, cxl->endpoint);
+> +	return ret;
+> +}
+> +
+> +/* Standard CXL-type 2 driver initialization sequence */
+> +static int enable_cxl(struct vfio_pci_core_device *core_dev, u16 dvsec)
+> +{
+> +	struct vfio_cxl *cxl = &core_dev->cxl;
+> +	struct pci_dev *pdev = core_dev->pdev;
+> +	u32 count;
+> +	u64 offset, size;
+> +	int ret;
+> +
+> +	cxl->cxlds = cxl_accel_state_create(&pdev->dev, cxl->caps);
+> +	if (IS_ERR(cxl->cxlds))
+> +		return PTR_ERR(cxl->cxlds);
+> +
+> +	cxl_accel_set_dvsec(cxl->cxlds, dvsec);
+> +	cxl_accel_set_serial(cxl->cxlds, pdev->dev.id);
+
+Doesn't seem to meet the description were cxl_device_state.serial is
+described as the PCIe device serial number, not a struct device
+instance number.
+
+> +
+> +	cxl_accel_set_resource(cxl->cxlds, cxl->dpa_res, CXL_ACCEL_RES_DPA);
+> +	cxl_accel_set_resource(cxl->cxlds, cxl->ram_res, CXL_ACCEL_RES_RAM);
+> +
+> +	ret = cxl_pci_accel_setup_regs(pdev, cxl->cxlds);
+> +	if (ret) {
+> +		pci_err(pdev, "Fail to setup CXL accel regs\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = cxl_get_hdm_info(cxl->cxlds, &count, &offset, &size);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (!count || !size) {
+> +		pci_err(pdev, "Fail to find CXL HDM reg offset\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	cxl->hdm_count = count;
+> +	cxl->hdm_reg_offset = offset;
+> +	cxl->hdm_reg_size = size;
+> +
+> +	return create_cxl_region(core_dev);
+> +}
+> +
+> +static void disable_cxl(struct vfio_pci_core_device *core_dev)
+> +{
+> +	struct vfio_cxl *cxl = &core_dev->cxl;
+> +
+> +	if (cxl->region.region)
+> +		cxl_region_detach(cxl->cxled);
+> +
+> +	if (cxl->cxled)
+> +		cxl_dpa_free(cxl->cxled);
+> +}
+> +
+> +int vfio_cxl_core_enable(struct vfio_pci_core_device *core_dev)
+> +{
+> +	struct vfio_cxl *cxl = &core_dev->cxl;
+> +	struct pci_dev *pdev = core_dev->pdev;
+> +	u16 dvsec;
+> +	int ret;
+> +
+> +	dvsec = pci_find_dvsec_capability(pdev, PCI_VENDOR_ID_CXL,
+> +					  CXL_DVSEC_PCIE_DEVICE);
+> +	if (!dvsec)
+> +		return -ENODEV;
+> +
+> +	if (!cxl->region.size)
+> +		return -EINVAL;
+> +
+> +	ret = vfio_pci_core_enable(core_dev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = enable_cxl(core_dev, dvsec);
+> +	if (ret)
+> +		goto err_enable_cxl_device;
+> +
+> +	return 0;
+> +
+> +err_enable_cxl_device:
+> +	vfio_pci_core_disable(core_dev);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(vfio_cxl_core_enable);
+
+These should all be _GPL symbols by default, right?
+
+> +
+> +void vfio_cxl_core_finish_enable(struct vfio_pci_core_device *core_dev)
+> +{
+> +	vfio_pci_core_finish_enable(core_dev);
+> +}
+> +EXPORT_SYMBOL(vfio_cxl_core_finish_enable);
+> +
+> +void vfio_cxl_core_close_device(struct vfio_device *vdev)
+> +{
+> +	struct vfio_pci_core_device *core_dev =
+> +		container_of(vdev, struct vfio_pci_core_device, vdev);
+> +
+> +	disable_cxl(core_dev);
+> +	vfio_pci_core_close_device(vdev);
+> +}
+> +EXPORT_SYMBOL(vfio_cxl_core_close_device);
+> +
+> +/*
+> + * Configure the resource required by the kernel CXL core:
+> + * device DPA and device RAM size
+> + */
+> +void vfio_cxl_core_set_resource(struct vfio_pci_core_device *core_dev,
+> +				struct resource res,
+> +				enum accel_resource type)
+> +{
+> +	struct vfio_cxl *cxl = &core_dev->cxl;
+> +
+> +	switch (type) {
+> +	case CXL_ACCEL_RES_DPA:
+> +		cxl->dpa_size = res.end - res.start + 1;
+> +		cxl->dpa_res = res;
+> +		break;
+> +
+> +	case CXL_ACCEL_RES_RAM:
+> +		cxl->ram_res = res;
+> +		break;
+> +
+> +	default:
+> +		WARN(1, "invalid resource type: %d\n", type);
+> +		break;
+> +	}
+> +}
+> +EXPORT_SYMBOL(vfio_cxl_core_set_resource);
+
+It's not obvious to me why we want to multiplex these through one
+function rather than have separate functions to set the dpa and ram.
+The usage in patch 12/ doesn't really dictate a multiplexed function.
+
+> +
+> +/* Configure the expected CXL region size to be created */
+> +void vfio_cxl_core_set_region_size(struct vfio_pci_core_device *core_dev,
+> +				   u64 size)
+> +{
+> +	struct vfio_cxl *cxl = &core_dev->cxl;
+> +
+> +	if (WARN_ON(size > cxl->dpa_size))
+> +		return;
+> +
+> +	if (WARN_ON(cxl->region.region))
+> +		return;
+> +
+> +	cxl->region.size = size;
+> +}
+> +EXPORT_SYMBOL(vfio_cxl_core_set_region_size);
+> +
+> +/* Configure the driver cap required by the kernel CXL core */
+> +void vfio_cxl_core_set_driver_hdm_cap(struct vfio_pci_core_device *core_dev)
+> +{
+> +	struct vfio_cxl *cxl = &core_dev->cxl;
+> +
+> +	cxl->caps |= CXL_ACCEL_DRIVER_CAP_HDM;
+> +}
+> +EXPORT_SYMBOL(vfio_cxl_core_set_driver_hdm_cap);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR(DRIVER_AUTHOR);
+> +MODULE_DESCRIPTION(DRIVER_DESC);
+> +MODULE_IMPORT_NS(CXL);
+> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+> index fbb472dd99b3..7762d4a3e825 100644
+> --- a/include/linux/vfio_pci_core.h
+> +++ b/include/linux/vfio_pci_core.h
+> @@ -15,6 +15,8 @@
+>  #include <linux/types.h>
+>  #include <linux/uuid.h>
+>  #include <linux/notifier.h>
+> +#include <linux/cxl_accel_mem.h>
+> +#include <linux/cxl_accel_pci.h>
+>  
+>  #ifndef VFIO_PCI_CORE_H
+>  #define VFIO_PCI_CORE_H
+> @@ -49,6 +51,31 @@ struct vfio_pci_region {
+>  	u32				flags;
+>  };
+>  
+> +struct vfio_cxl_region {
+> +	u64 size;
+> +	u64 addr;
+> +	struct cxl_region *region;
+> +};
+> +
+> +struct vfio_cxl {
+> +	u8 caps;
+> +	u64 dpa_size;
+> +
+> +	u32 hdm_count;
+
+Poor packing, caps and hdm_count should at least be adjacent to leave
+only a single 24-bit gap.
+
+> +	u64 hdm_reg_offset;
+> +	u64 hdm_reg_size;
+> +
+> +	struct cxl_dev_state *cxlds;
+> +	struct cxl_memdev *cxlmd;
+> +	struct cxl_root_decoder *cxlrd;
+> +	struct cxl_port *endpoint;
+> +	struct cxl_endpoint_decoder *cxled;
+> +	struct resource dpa_res;
+> +	struct resource ram_res;
+> +
+> +	struct vfio_cxl_region region;
+> +};
+> +
+>  struct vfio_pci_core_device {
+>  	struct vfio_device	vdev;
+>  	struct pci_dev		*pdev;
+> @@ -94,6 +121,7 @@ struct vfio_pci_core_device {
+>  	struct vfio_pci_core_device	*sriov_pf_core_dev;
+>  	struct notifier_block	nb;
+>  	struct rw_semaphore	memory_lock;
+> +	struct vfio_cxl		cxl;
+
+I'd prefer we not embed a structure here that's unused for 100% of
+current use cases.  Why can't we have:
+
+struct vfio_cxl_core_device {
+	struct vfio_pci_core_device	pci_core;
+	struct vfio_cxl			clx;
+};
+
+Thanks,
+Alex
+
+>  };
+>  
+>  /* Will be exported for vfio pci drivers usage */
+> @@ -159,4 +187,13 @@ VFIO_IOREAD_DECLARATION(32)
+>  VFIO_IOREAD_DECLARATION(64)
+>  #endif
+>  
+> +int vfio_cxl_core_enable(struct vfio_pci_core_device *core_dev);
+> +void vfio_cxl_core_finish_enable(struct vfio_pci_core_device *core_dev);
+> +void vfio_cxl_core_close_device(struct vfio_device *vdev);
+> +void vfio_cxl_core_set_resource(struct vfio_pci_core_device *core_dev,
+> +				struct resource res,
+> +				enum accel_resource type);
+> +void vfio_cxl_core_set_region_size(struct vfio_pci_core_device *core_dev,
+> +				   u64 size);
+> +void vfio_cxl_core_set_driver_hdm_cap(struct vfio_pci_core_device *core_dev);
+>  #endif /* VFIO_PCI_CORE_H */
+
 
