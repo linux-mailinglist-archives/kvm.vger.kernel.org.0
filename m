@@ -1,129 +1,155 @@
-Return-Path: <kvm+bounces-28601-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28602-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B9DE999CFF
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 08:49:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC936999DE8
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 09:29:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCF77282262
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 06:49:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26829B218F4
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 07:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7761B20A5FF;
-	Fri, 11 Oct 2024 06:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE54A209F5C;
+	Fri, 11 Oct 2024 07:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=erbse.13@gmx.de header.b="mcy13GH2"
+	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="Mi10dHZN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Odbg32uh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D05A635
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 06:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4269197A9A;
+	Fri, 11 Oct 2024 07:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728629290; cv=none; b=r1+iJT99AR4y6faQgKgwJT4gnhwZ+rjX7cQqkBDrdLmFKG2R+eAoihBB7vGarg5bRgURvGAS7ql1pvBgQgVHKyfceARyvT8WEm7Ar35on5slMeachqQD4WgdoqdusbD43I9SFYeiwzcZEt7HgFnY3jaNiKjYxLVLOYIDotP26ps=
+	t=1728631777; cv=none; b=SuuQudzwEZt9kgLaO2NWLO19KOLpwEsWgNj4CkWxwCyWtp4hvGI/eKZKc0rkJd7HvRrWo/862zfYA2OnMkMc41/H6O1e/Mp3mALDSUyeChbTkjblVBNxQDO7zOSMQl3RHgWZTXeIdqX6OTkifTBdBz8U4VOiSvPT8ueJNCekCfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728629290; c=relaxed/simple;
-	bh=8iQ4A48zAvNfdQF8giTtol9jIk7dLRP3vKbhM1WtYvg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qG4VhuNBqVlwYgDVA/icdwEQiF0wX2ksY+suTYauMTyTvfau5aAGSulkaqX8dPzGy2Vy93Ejgizz4p20eHmffDpeghS67hOOvkH0akasLyGrzV6VovJkwJLllp9q6RvLZaoLIPtfqrz4SwZa2WepmR6Zijx0SH00O9ExZs6N/RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=erbse.13@gmx.de header.b=mcy13GH2; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1728629275; x=1729234075; i=erbse.13@gmx.de;
-	bh=lRYoZ8ZEfCljSmCfJERXD2hAZ7vpp+9eIza9Jf6ArUA=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=mcy13GH2c7B4b6bNWJ8EqrvoZWXM9i4Sdx/BcE0wuAqorXMKoi0NsjtqwU9gbllf
-	 HVhT/dB+YBmaHBjw3h+U7aTFB0NQHXVaMd3V0VqBzLHcbPLWgYmugic32HMIgV5tV
-	 Ru+HdLBVjpa5EP6RJi0YC9rp5RNHXruIKDTM7d6uewT0F6PqOdSnqnoO7SWW69Pn1
-	 trJcJJxrYT9+t1mOld9xlz4aSBiTmM1x4rUYKHYh+uKVnvqrbVK+d7h2dHfgzGlYK
-	 7sPkcEijyjPCcu/jUQ0e+rajnUoz97H0iD0hjPKiYIgIeOLZY6Y2+pv8oa/ROf+1o
-	 UNZrke6CdfTRCAQybg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from server ([88.152.43.130]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M1Ygz-1sxlaq0h5f-001DVC; Fri, 11
- Oct 2024 08:47:55 +0200
-From: Tom Dohrmann <erbse.13@gmx.de>
-To: qemu-devel@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: Tom Dohrmann <erbse.13@gmx.de>,
-	kvm@vger.kernel.org
-Subject: Ping: [PATCH] accel/kvm: check for KVM_CAP_READONLY_MEM on VM
-Date: Fri, 11 Oct 2024 06:47:33 +0000
-Message-Id: <20241011064733.1123414-1-erbse.13@gmx.de>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240903062953.3926498-1-erbse.13@gmx.de>
-References: <20240903062953.3926498-1-erbse.13@gmx.de>
+	s=arc-20240116; t=1728631777; c=relaxed/simple;
+	bh=Imif9mrwPFVaeXF4kQtkTzQfjhEZVNanJCSWnsWterc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l88jC/crdQYTE8AAGshAWZmPJ8vLA4OCzCXTsaF040G4RgySXeDnW79V3r415OYt1D8ttXozL+2ae9J+jSS+o3pskbvfKJVGGxXN//kRRvwH6wWZmW+U5CuvocGPoaVDGlJKiNKbt+pSFhWZGHYy7okh/TVRXg08kBFM25yFFOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=Mi10dHZN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Odbg32uh; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id B189E1140174;
+	Fri, 11 Oct 2024 03:29:34 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Fri, 11 Oct 2024 03:29:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1728631774; x=
+	1728718174; bh=myCqt/H/c9dWQNLgBGhUL4KWxptRND5SRhSn1tReYLI=; b=M
+	i10dHZN10oqj8DEiVm7jxi45dnprY5F0sdG012NXNtw3btTCK2uvpVPkokHwNH3x
+	9dUOQOhD+JlFoQ+/XiUa+9AuI99fB0arxaBXXdcuopMmQzN9Azc31yHHmAVRCelQ
+	a4nfH43OwFLxymxGHv+d9DkMjaAjG7aLrK9BthGEcEU/d+ttLeG4H9NavXLNROAA
+	KF3SAZo5XjJMMuen7Ig77SkZWu29/tcmqtHegLfIYvVtAsTbf1s5LYjPYqXve4Ct
+	slzED57JBJwBB05/q+9I3arTjAIfYdMUiCIhigtBl/yBWjhTObrWwEtBCPpnZs1L
+	H9Kp7k1jl/KnbCpPIHJNw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1728631774; x=1728718174; bh=myCqt/H/c9dWQNLgBGhUL4KWxptR
+	ND5SRhSn1tReYLI=; b=Odbg32uhqXdiX8gVepBfivWtBuWECc7wzNYtrfjUYmyd
+	58ko4NF2DGjcZtXKKrY10L1rJvOdk34z/coggkplAzylbDcHZaUXjcqymJLOqDMa
+	hPZUzbh/WQMgvYHotvJ9hSkQs2RUJv07V+nFReh/DmnS8qch5lpAzlciZy79atdM
+	5da2PKIzFMJI1d8Me84z0qVDjfdJbNzoKo3Kvs5eLfBvs+SuKrq8H6fFib2CW8Ol
+	/G+JayFzOh2ejUQb85muR5q7SCDtCzRbWkaZKYQ/Hpx9PFIWrHPQICt/+8kjz61e
+	uZvEAuuuYqvpl1WbTkiW5QAo8bdYzXWuQR6XdTkZVA==
+X-ME-Sender: <xms:3dMIZ9t3lTSk9wVLTGLCt3M8FlD9YCYqEuQu1-VkHegHLiOwluTHcA>
+    <xme:3dMIZ2fmLF0uPttXbZQT_dEA5ueM2TCeP1KJINyHnrUHcXH0WWVSg7l3BIfS-h04I
+    yoh3NGR6GdOsEqVbIo>
+X-ME-Received: <xmr:3dMIZwz8crP8iYjI4vTl8aqwaQKcvwr3zWMC9qpsLrJ4IRnZ0ehi2RnN0hGFyTq7R0YbSw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdefjedguddvfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddttddv
+    necuhfhrohhmpedfmfhirhhilhhlucetrdcuufhhuhhtvghmohhvfdcuoehkihhrihhllh
+    esshhhuhhtvghmohhvrdhnrghmvgeqnecuggftrfgrthhtvghrnhepffdvveeuteduhffh
+    ffevlefhteefveevkeelveejudduvedvuddvleetudevhfeknecuvehluhhsthgvrhfuih
+    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhlsehshhhuthgvmhho
+    vhdrnhgrmhgvpdhnsggprhgtphhtthhopedukedpmhhouggvpehsmhhtphhouhhtpdhrtg
+    hpthhtohepsghpsegrlhhivghnkedruggvpdhrtghpthhtohepnhgvvghrrghjrdhuphgr
+    ughhhigrhiesrghmugdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvh
+    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehtghhlgieslhhinhhuthhrohhn
+    ihigrdguvgdprhgtphhtthhopehmihhnghhosehrvgguhhgrthdrtghomhdprhgtphhtth
+    hopegurghvvgdrhhgrnhhsvghnsehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthht
+    ohepthhhohhmrghsrdhlvghnuggrtghkhiesrghmugdrtghomhdprhgtphhtthhopehnih
+    hkuhhnjhesrghmugdrtghomhdprhgtphhtthhopehsrghnthhoshhhrdhshhhukhhlrges
+    rghmugdrtghomh
+X-ME-Proxy: <xmx:3dMIZ0OFW77EvcyFjLJEdQCUZ-TCr7rhu2h2CVB43DZvVvC8-rmPfg>
+    <xmx:3dMIZ9-zuXYtqu6bgptk4jLneGuqfcxbQgr4HsGsqmiZMAyD0-XrHQ>
+    <xmx:3dMIZ0WMJhnZgh-G2aFVRtZiH4fkmnGw089zrvJ_MfqG0qx9PQPB8w>
+    <xmx:3dMIZ-dIqe982CzZtku4priHTjnhGMmdNLaf8a7R9zDKEVzjheajrg>
+    <xmx:3tMIZw2eniM1mvpIjsFFaCSClucwXOWTCbHQVSKaqiROBJOBVFewyMzN>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 11 Oct 2024 03:29:28 -0400 (EDT)
+Date: Fri, 11 Oct 2024 10:29:23 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com, 
+	Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, 
+	x86@kernel.org, hpa@zytor.com, peterz@infradead.org, seanjc@google.com, 
+	pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [RFC 01/14] x86/apic: Add new driver for Secure AVIC
+Message-ID: <yoqhgkq7ewwqhvrqfae23lz2ke4chetwo6es32zj7z7x6c3zc2@322aqn4s3bgq>
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
+ <20240913113705.419146-2-Neeraj.Upadhyay@amd.com>
+ <sng54pb3ck25773jnajmnci3buczq4tnvuofht6rnqbfqpu77s@vucyk6py2wyf>
+ <20241009104234.GFZwZeGsJA-VoHSkxj@fat_crate.local>
+ <7vgwuvktoqzt5ue3zmnjssjqccqahr75osn4lrdnoxrhmqp5f6@p5cy6ypkchdv>
+ <20241009112216.GHZwZnaI89RBEcEELU@fat_crate.local>
+ <wb6tvf6ausm23cq4cexwdncz5tfj52ftrrdhhvrge53za3egcf@ayitc4dd6itr>
+ <20241009135335.GKZwaK32jOZlA477HX@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:yBu2dyWc2rfrxhheMUw1/2gv0CZRx+bb9aEGiRV4t12nG6Z2+rV
- xABtV7yRCNtIR62RpiLJuuoEAK08SPtfKWWfAGKBUvE1UmB8f7d9G5yRiMdhFbL5rAMVMbw
- E3uHRQbwL0xZNnVihp2phu9lIP3lyeHYpELh81TvOp79Aau5yd+FeD8Wbv6uxCTPQbAv/KK
- sgCBtkfucoBkozorjhItg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Ji03cwJ+J28=;cQrWFO3UDht6/S+lT2Gsx8Keypb
- fTHArrX58iqM2zv7CW8U/TcW6hyDgCTYltUMTsVMh9snCDP053opKzDQNTitOcB/92HrLE/b+
- zxNFCeP1u49dIGHBVQrSzSzn7P8WGTHN9fKj6hJ/HhrV4VmTU35PmNc4uI0lgVbBlJCogNN15
- a6K2j6/4jcm8cgOgeGALOcQTEXPXHKyu+0gyQ+ltJtgSiwydwzkG+mezx38YUiMQrMZ6cvbUB
- PukxhyIVQv++ceuieF8+uYlr0EGwlpj/YDBLDj3oyvkLLP6T8ogMWfqOfEGyPcv/07Lfy4Moj
- 7KDG1lPzsfY6K6PFHNEN4augZYWr4m1y35G6JRVaG4BVrAFPmicsAgFMOerqxtTgqBKDw9n0O
- muHGKp/4dijFnuktgAaaMlUSO6xSU2fGBB8/0ONrS3yfQMmvDSqkE1FRcBR/7jfqeUUnurpHb
- QougsDgXbLa7fYQ8N/9fDYKjZi1Hvyu2C6/gTeTLRDDXuXnAFbR5EdR3l/HGUKAJimwV+CxeF
- CZfqOanuwGudoKK2XXDHIBbYLjeDHeJSRnIP1i939qTcQzVXr1s1qIExL4jo1v3+gqEnhfoys
- U2Pr9Crm35otfpoT1EHFjH16m6UPiPVGnYtB1H6e0053pu9IxvVSt2EM4LKYMwE1RG17pmmy6
- 3ecTzP1OGQpKL9m5Cj5/+h02mu0DZkHEyHoBRZ4rrCy7kLvEUwRN7x+PxMfMthIstf4Z/2Oug
- mMylFhiRikU5w6bSJxPlGoVh9s1AHU38j54Kkfz5aJ2fjg0GJH+D8v/eczwEbAovhnlT4nl2V
- n5gt2NRQ4NPhlxHHpg/sMPvSj0O5GgoTwbTjpBnWdPd1I=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241009135335.GKZwaK32jOZlA477HX@fat_crate.local>
 
-I haven't heard anything about this patch for a while.
-https://patchew.org/QEMU/20240903062953.3926498-1-erbse.13@gmx.de/
+On Wed, Oct 09, 2024 at 03:53:35PM +0200, Borislav Petkov wrote:
+> On Wed, Oct 09, 2024 at 03:12:41PM +0300, Kirill A. Shutemov wrote:
+> > If you use SNP or TDX check in generic code something is wrong.  Abstraction
+> > is broken somewhere. Generic code doesn't need to know concrete
+> > implementation.
+> 
+> That's perhaps because you're thinking that the *actual* coco implementation type
+> should be hidden away from generic code. But SNP and TDX are pretty different
+> so we might as well ask for them by their name.
+> 
+> But I can see why you'd think there might be some abstraction violation there.
+> 
+> My goal here - even though there might be some bad taste of abstraction
+> violation here - is simplicity. As expressed a bunch of times already, having
+> cc_platform *and* X86_FEATURE* things used in relation to coco code can be
+> confusing. So I'd prefer to avoid that confusion.
+> 
+> Nothing says anywhere that arch code cannot use cc_platform interfaces.
+> Absolutely nothing. So for the sake of KISS I'm going in that direction.
+> 
+> If it turns out later that this was a bad idea and we need to change it, we
+> can always can. As we do for other interfaces in the kernel.
+> 
+> If you're still not convinced, I already asked you:
+> 
+> "Do you have a better idea which is cleaner than what we do now?"
+> 
+> Your turn.
 
-=46rom 5c1ad1ff44438402ec824a224ac4659c8044ec7e Mon Sep 17 00:00:00 2001
-From: Tom Dohrmann <erbse.13@gmx.de>
-Date: Tue, 3 Sep 2024 06:25:04 +0000
-Subject: [PATCH] accel/kvm: check for KVM_CAP_READONLY_MEM on VM
+Okay, I've got your point. It is not what I would do, but I don't have
+sufficient argument to change what is already there.
 
-KVM_CAP_READONLY_MEM used to be a global capability, but with the
-introduction of AMD SEV-SNP confidential VMs, this extension is not
-always available on all VM types [1,2].
-
-Query the extension on the VM level instead of on the KVM level.
-
-[1] https://patchwork.kernel.org/project/kvm/patch/20240809190319.1710470-=
-2-seanjc@google.com/
-[2] https://patchwork.kernel.org/project/kvm/patch/20240902144219.3716974-=
-1-erbse.13@gmx.de/
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Tom Dohrmann <erbse.13@gmx.de>
-=2D--
- accel/kvm/kvm-all.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 75d11a07b2..acc23092e7 100644
-=2D-- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2603,7 +2603,7 @@ static int kvm_init(MachineState *ms)
-     }
-
-     kvm_readonly_mem_allowed =3D
--        (kvm_check_extension(s, KVM_CAP_READONLY_MEM) > 0);
-+        (kvm_vm_check_extension(s, KVM_CAP_READONLY_MEM) > 0);
-
-     kvm_resamplefds_allowed =3D
-         (kvm_check_extension(s, KVM_CAP_IRQFD_RESAMPLE) > 0);
-=2D-
-2.34.1
-
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
