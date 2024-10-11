@@ -1,73 +1,71 @@
-Return-Path: <kvm+bounces-28640-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28641-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BADCC99A893
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 18:05:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AE6D99A8A1
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 18:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 596331F2285C
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 16:05:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AAB81C2206B
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 16:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE40198E6E;
-	Fri, 11 Oct 2024 16:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C24611990C4;
+	Fri, 11 Oct 2024 16:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gzNcBMM4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F08W18lJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057798121F
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 16:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A3519753F
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 16:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728662694; cv=none; b=GCwaNLhF3+HRcCBkff9tghh7NK9oP6bNEl4jK37DKbbOnwCmSJz4EPMkuAsf4Sh1+NmuY+KYHGgUBr8UD7yuTl/3pKJHMbNTYCpgoESInMEB3gu97ND6tr8uPu5oZ8CIh8UdnDpmqJgDbCnkrdHcsYCJ5v+tRZj04boHhH3GYss=
+	t=1728663021; cv=none; b=MYpvU2TsWUYlXaoF+k/dit/gnOj35Z78+Pe2VCzBNmtMPZzmOh6atMOuo9kEU4bhhqwgObLE9Z8NdoZoQMGya6+ZepomOHh9pbDUtSkn0ZttX+k3hU5deFeV5EwPXTKm0/73yGqma/zNb8078l8h9K39SfceKJ5cgAX8DGWha/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728662694; c=relaxed/simple;
-	bh=/WvOYSc1S4lLGzVHzV0yvKIKVV854XtzSnHOuroJvCw=;
+	s=arc-20240116; t=1728663021; c=relaxed/simple;
+	bh=d5pFHwtFvdEgWUZAcnRG6GQ3fqVmE2YvgZoQxi52CO0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JFk9fmk7qkylh+LSwmoaErZ3jeA7/BNkN6w+2/SPVAyhq/xv7NfxxGZxdt702mfBWJ6IVnd9/xOjDK+FX/38+kiAafHWnAKTUfqRopFw62sthvyWJdauy9q+OSRvJPxCwcnq9hwEZ6YxLmq8BjZy5pMiS56vzclrzJH/z2hXy4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gzNcBMM4; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=Wyhoig9tWB8Xie8slSCnJt+FfYiJzUWEqT7kVoibiDZHciZljW+Jre3aSNZ13x7b9vECgQOoajWcf/NgxM5q6Q28qny8HHX3EeL/uGzIy3lk7gK3aTSzf2K57F0dvGNZjsMIvrvYKl+IhEDojDgOXmwoCOe5iM7jtVZHNiLSc6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F08W18lJ; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e32f43c797so20517207b3.1
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 09:04:52 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-71e0228d71dso2109469b3a.0
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 09:10:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728662692; x=1729267492; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aTr2NdjN0dv7LipVyeTPEwovi9SHaz0obBqhvYr++Oc=;
-        b=gzNcBMM4TN6Nrc4/633uTrsGvQ/7HbUSRo6gC8GbnlZi+CB86X2gdOG6NEAnqVXYWm
-         9qeuEssDjf7BM5+D7q5Mqa8wIR5vrMtULt103nz2cgNJe0Kqrs6UkLYLW1L+KBrqa9TE
-         u14Ou8Ckf2NsLfbAtPMZ3Z0e/lehdgig8LY6yDNWJqvhAi5MttucKN24r9brs8U/+Gcx
-         r9omklaY69Hs6kAclRTHcGcIdjBAZA8l2X3XG/axDkVLq1u6uZz7Z6cZqSqNr7w8xVrD
-         1YmPZRPxEFYf9BZ9uFWztqJTfSBBvC8eObrbYuCDk6m6M/CpXxbXktFr4NvV+7/bBVlS
-         +VGw==
+        d=google.com; s=20230601; t=1728663019; x=1729267819; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HVwJLNw5Ps10RbGac9YYaUmT3BiISrVE9h+5ma8CIGM=;
+        b=F08W18lJobjrwkrLZrWpss9qJIzMbjneHrzttJJ79DQBbNdhOjNHqlgd/jBH7g8pL9
+         qqDXxzCk1HgD88JwHDCRBqm0qG9QK8s/TDQIDhF8pGP/MQz3q6wGeRFlj4FjARoSZirr
+         JyAo/y1n77tI2ZWAJLhE68rcXPfZBFRNFPhHYu++Pn3yWP9REKP5Knkmi2tK7XOrnbwm
+         VmdLAwN5OwQydx6K9crv4Rka4Agwx2d3ZUmECZVa8Z9f24xqGC3PFQyk5JoR2weUL3gl
+         BtQjX/1Q+e64aWP5YWm73oxJaXjdxsNhkllEcLgboIS4qeIrVn8o0qKGjT34w7deOb9W
+         Ldng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728662692; x=1729267492;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=aTr2NdjN0dv7LipVyeTPEwovi9SHaz0obBqhvYr++Oc=;
-        b=MdM3+DFbAB9P/ThhuH1T5CIWUwYI3od8UTdDUQJYshAKPCILU9bW9tPZ9jR+Lbm/Kx
-         Rsjdaqss3FNgGbCqCAdxwPsQwImEB9QHWfQvUcnJ1YuSNIGcouQNQMCEEpuR5Fi2JsOu
-         482OBrXWeAL0oYIhvrvZ/MVTHUUsjZ7WDFIN4B29vIQVIc43Zv30dlUoS53Dj0kHeolb
-         uQN9yDs6o0APrNncO58O3M9MMQkhfT1HtVugwb8Vn9WP2KDpCNaNreWpFBSjh7jbT7FX
-         tuKHysG33ToeieUrBTMtwlooZ4xITVNMt2qJMhnCXwOj3hNhyaHwyxKqOTs6cctYq0cB
-         hrCA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0+kJhdQ9Qs+C1pBu5K8O/9gTaQ4XoAiHCAVr4VHISgDQdzP4OXUO0CATvks3sycolka8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXrKQNmiTG7eucOr4jZDpR9YEnU29mZqIIAKJymbSLuwMRo9oV
-	f0DaOsjKqZf56BR7tYSrZx8Lh+lfVd6ZtiKbjzEljagwSCRPULgyKOdEcBpBWK65d79jKpzM3TC
-	Paw==
-X-Google-Smtp-Source: AGHT+IEFPFvz0vBCZ+g1VXJWRI0wYgSDpPxyfmUPvTa83pFlFfSeBq9osRJtahZ4BOBwU65AgtshdTp74Lo=
+        d=1e100.net; s=20230601; t=1728663019; x=1729267819;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HVwJLNw5Ps10RbGac9YYaUmT3BiISrVE9h+5ma8CIGM=;
+        b=UURYf+BX8P+fJEoxMH+BBm/V0/zhftqmOM+GK1T3ecgrF/tVNVB17yhCgUaGt0T9R8
+         J4ma6KbHpqT6FJaPyhaPdE5RNok5AyyueEasrtju3Y9GXmKKgsVmfsqXM3y1gZvCZs7w
+         X2BDue1OErfvfOTW+fRJqCZRnyQodb6a3/CM2qlxeRVPQlPJrmPCCfM+PN49FJR0Fbta
+         sb0Z4wIAEGGhAe5tBDk8mjmWDxsuj+a4tzszOTlBNH59LbhAK1K1UOeNWUJ8YpwJXlGd
+         BMtf7PRp5L43o+jHMnEiocxGSGoPLzfhzI165qxQ2XCPk/OidJb2Rf0lYKeFQELiuv0U
+         lkMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVxtQGeG9oL2OlTtXndPKLcihJwa7E5ynlbrHyRpGMR/wSDAZiM1f13xGnuVMODnFqzGtg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmIb5DVcs7tyxbAXwf16dJSYGDMcarZKUbCDMdE5qRvaqMJQfc
+	u1T7tSNKVp7SAGSJFg1nioB19dGNW+HT8XDHPyrvsSCYcmJjo0jyH+wgZFSIOzTrD74mzcM22gB
+	iOw==
+X-Google-Smtp-Source: AGHT+IGoDuPK1quyryPvVDgAPQ7itiit1nAYgQ/fI7GScyXvb9WdEI+uZk7WOGNdYtn/6ZPqBjhCnrVE/8g=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6887:b0:6e2:ac0a:8982 with SMTP id
- 00721157ae682-6e32f07e518mr2515757b3.0.1728662691997; Fri, 11 Oct 2024
- 09:04:51 -0700 (PDT)
-Date: Fri, 11 Oct 2024 09:04:50 -0700
-In-Reply-To: <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:66d7:b0:717:8ab0:2439 with SMTP id
+ d2e1a72fcca58-71e382709f5mr5535b3a.6.1728663018282; Fri, 11 Oct 2024 09:10:18
+ -0700 (PDT)
+Date: Fri, 11 Oct 2024 09:10:16 -0700
+In-Reply-To: <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,86 +73,100 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1726602374.git.ashish.kalra@amd.com> <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
- <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com> <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com>
-Message-ID: <ZwlMojz-z0gBxJfQ@google.com>
+Message-ID: <ZwlN6F__ls3naxJq@google.com>
 Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
 From: Sean Christopherson <seanjc@google.com>
-To: Ashish Kalra <ashish.kalra@amd.com>
-Cc: Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	herbert@gondor.apana.org.au, x86@kernel.org, john.allen@amd.com, 
-	davem@davemloft.net, thomas.lendacky@amd.com, michael.roth@amd.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, herbert@gondor.apana.org.au, 
+	x86@kernel.org, john.allen@amd.com, davem@davemloft.net, 
+	thomas.lendacky@amd.com, michael.roth@amd.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Oct 02, 2024, Ashish Kalra wrote:
-> Hello Peter,
->=20
-> On 10/2/2024 9:58 AM, Peter Gonda wrote:
-> > On Tue, Sep 17, 2024 at 2:17=E2=80=AFPM Ashish Kalra <Ashish.Kalra@amd.=
-com> wrote:
-> >> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev=
-.c
-> >> index 564daf748293..77900abb1b46 100644
-> >> --- a/drivers/crypto/ccp/sev-dev.c
-> >> +++ b/drivers/crypto/ccp/sev-dev.c
-> >> @@ -73,11 +73,27 @@ static bool psp_init_on_probe =3D true;
-> >>  module_param(psp_init_on_probe, bool, 0444);
-> >>  MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initi=
-alized on module init. Else the PSP will be initialized on the first comman=
-d requiring it");
-> >>
-> >> +static bool cipher_text_hiding =3D true;
-> >> +module_param(cipher_text_hiding, bool, 0444);
-> >> +MODULE_PARM_DESC(cipher_text_hiding, "  if true, the PSP will enable =
-Cipher Text Hiding");
-> >> +
-> >> +static int max_snp_asid;
-> >> +module_param(max_snp_asid, int, 0444);
-> >> +MODULE_PARM_DESC(max_snp_asid, "  override MAX_SNP_ASID for Cipher Te=
-xt Hiding");
-> > My read of the spec is if Ciphertext hiding is not enabled there is no
-> > additional split in the ASID space. Am I understanding that correctly?
-> Yes that is correct.
-> > If so, I don't think we want to enable ciphertext hiding by default
-> > because it might break whatever management of ASIDs systems already
-> > have. For instance right now we have to split SEV-ES and SEV ASIDS,
-> > and SNP guests need SEV-ES ASIDS. This change would half the # of SNP
-> > enable ASIDs on a system.
->=20
-> My thought here is that we probably want to enable Ciphertext hiding by
-> default as that should fix any security issues and concerns around SNP
-> encryption as .Ciphertext hiding prevents host accesses from reading the
-> ciphertext of SNP guest private memory.
->=20
-> This patch does add a new CCP module parameter, max_snp_asid, which can b=
-e
-> used to dedicate all SEV-ES ASIDs to SNP guests.
->=20
-> >
-> > Also should we move the ASID splitting code to be all in one place?
-> > Right now KVM handles it in sev_hardware_setup().
->=20
-> Yes, but there is going to be a separate set of patches to move all ASID
-> handling code to CCP module.
->=20
-> This refactoring won't be part of the SNP ciphertext hiding support patch=
-es.
+On Tue, Sep 17, 2024, Ashish Kalra wrote:
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 564daf748293..77900abb1b46 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -73,11 +73,27 @@ static bool psp_init_on_probe = true;
+>  module_param(psp_init_on_probe, bool, 0444);
+>  MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
+>  
+> +static bool cipher_text_hiding = true;
+> +module_param(cipher_text_hiding, bool, 0444);
+> +MODULE_PARM_DESC(cipher_text_hiding, "  if true, the PSP will enable Cipher Text Hiding");
+> +
+> +static int max_snp_asid;
 
-It should, because that's not a "refactoring", that's a change of roles and
-responsibilities.  And this series does the same; even worse, this series l=
-eaves
-things in a half-baked state, where the CCP and KVM have a weird shared own=
-ership
-of ASID management.
+Why is this a signed int?  '0' is used as the magic "no override" value, so there's
+no reason to allow a negative value.
 
-I'm ok with essentially treating CipherText Hiding enablement as an extensi=
-on of
-firmware, e.g. it's better than having to go into UEFI settings to toggle t=
-he
-feature on/off.  But we need to have a clear, well-defined vision for how w=
-e want
-this all to look in the end.=20
+> +module_param(max_snp_asid, int, 0444);
+> +MODULE_PARM_DESC(max_snp_asid, "  override MAX_SNP_ASID for Cipher Text Hiding");
+> +
+>  MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
+>  MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
+>  MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
+>  MODULE_FIRMWARE("amd/amd_sev_fam19h_model1xh.sbin"); /* 4th gen EPYC */
+>  
+> +/* Cipher Text Hiding Enabled */
+> +bool snp_cipher_text_hiding;
+> +EXPORT_SYMBOL(snp_cipher_text_hiding);
+> +
+> +/* MAX_SNP_ASID */
+> +unsigned int snp_max_snp_asid;
+> +EXPORT_SYMBOL(snp_max_snp_asid);
+
+There is zero reason to have multiple variables.  The module param varaibles
+should be the single source of true.
+
+I'm also not entirely sure exporting individual variables is the right interface,
+which is another reason why I want to see the entire "refactoring" in one series.
+
+>  static bool psp_dead;
+>  static int psp_timeout;
+>  
+> @@ -1064,6 +1080,38 @@ static void snp_set_hsave_pa(void *arg)
+>  	wrmsrl(MSR_VM_HSAVE_PA, 0);
+>  }
+>  
+> +static void sev_snp_enable_ciphertext_hiding(struct sev_data_snp_init_ex *data, int *error)
+> +{
+> +	struct psp_device *psp = psp_master;
+> +	struct sev_device *sev;
+> +	unsigned int edx;
+> +
+> +	sev = psp->sev_data;
+> +
+> +	/*
+> +	 * Check if CipherTextHiding feature is supported and enabled
+> +	 * in the Platform/BIOS.
+> +	 */
+> +	if ((sev->feat_info.ecx & SNP_CIPHER_TEXT_HIDING_SUPPORTED) &&
+> +	    sev->snp_plat_status.ciphertext_hiding_cap) {
+
+snp_cipher_text_hiding should be set to %false if CipherTextHiding is unsupported.
+I.e. the module params need to reflect reality.
+
+> +		/* Retrieve SEV CPUID information */
+> +		edx = cpuid_edx(0x8000001f);
+> +		/* Do sanity checks on user-defined MAX_SNP_ASID */
+> +		if (max_snp_asid >= edx) {
+> +			dev_info(sev->dev, "max_snp_asid module parameter is not valid, limiting to %d\n",
+> +				 edx - 1);
+> +			max_snp_asid = edx - 1;
+> +		}
+> +		snp_max_snp_asid = max_snp_asid ? : (edx - 1) / 2;
+> +
+> +		snp_cipher_text_hiding = 1;
+
+s/1/true
+
+> +		data->ciphertext_hiding_en = 1;
+> +		data->max_snp_asid = snp_max_snp_asid;
+> +
+> +		dev_dbg(sev->dev, "SEV-SNP CipherTextHiding feature support enabled\n");
+> +	}
+> +}
 
