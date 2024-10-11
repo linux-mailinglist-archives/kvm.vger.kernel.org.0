@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-28608-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28609-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B1B999A13D
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 12:25:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB47999A13F
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 12:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 449D7B21166
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 10:25:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 748E71F22CC8
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 10:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230DB212D37;
-	Fri, 11 Oct 2024 10:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D2A21501D;
+	Fri, 11 Oct 2024 10:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRvUPBv9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eg0IZHMX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A0620C476
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 10:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17DB212D09
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 10:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728642309; cv=none; b=lTjGgX20uir6a70RsPBHyNSyNH9/ohN1zv3XXNnuQt04nQ4vjuyCjhNq7h5yxnuBdYyh7SDWE5rUIoEue4yf76tH1HUO4FlBmVDkNvRgmkcuW+ckfc/PCaersBEwl6Slp4atlwU+bLCiFbYIG5JDqsBvA0TGW9a/iylYlfR8JyM=
+	t=1728642311; cv=none; b=vE9wfr6t0CS1OrmDXtQP59cO/gzGtzUH/YIbkoCNJeKvkMcYW3bFN+qUz6USP5NihAaM3ggfUMttXkFCP3Ypk1TL5cnwMypeOrMAA2XO6gkKHzbkd5iY1YT88VB7APiFCgxr30vTcXPjw3HG3PU+KfO7ZrW/e/E5zTd0tZhF4go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728642309; c=relaxed/simple;
-	bh=r91IR9RnNN1IZS82gFZ8gu0zseWnOomd+jSCq/BfdW8=;
+	s=arc-20240116; t=1728642311; c=relaxed/simple;
+	bh=1C83OOgMcgqb57Ddo8ncVhTx9jAr8iuBqE28xGsal7g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IGAIa6n18tQNATptLnlmWPr3JSQci4yCYIQNSwC90DIjIMRN/p93hXMCc73gRo5/AqlOiKcw+LRlOURZrbw6RFblcfcDlNmFNEq2+eJFSGoWPuzXPrC3q++uW/ebc/Yfh9YCCQZsbomn05mt05nI3X+XBHpEz0q2z5hINOw8A5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YRvUPBv9; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=r0Ncq1WlqT+xHUIYg/L5DVpvvq1bc5T2evVMLtbJ+lW1uzkl9En1iO639oRfT9Xbn23o51vL8UjcvIDODwmGfAY6yfEBvMVDC7rprbst+YtpzTEgN/TUKTfAm9FxHFhYX0s6iAB1eY7fXmTZIOvyszJIh7ufte2lV8WMVt4pAZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eg0IZHMX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728642306;
+	s=mimecast20190719; t=1728642308;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VMssNf1Ju+sw1bhZpq8lk0Jjp7pzX4VBi27YvpYNCzI=;
-	b=YRvUPBv9zP5NMDpejjomNmR8r4LWaBnl4hx2xdYhybq1yXwbBzJAAvDVDDvZWain3vUsMm
-	UPNLH0Z70dRXJ812Ol179ZWeXUh9jGgAnyJFIJyl/6aDxQxCKF6tMFKV2c1KY+4nhE5285
-	LKVIvTg0BRgGetUilkIeSRDcILzjRaM=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=UZ3IdlQSiC9SBRAFeIkUjQ3G20iTXPL8FgSwyp2DDL0=;
+	b=Eg0IZHMXIT2pR11GyVUKzabwVHslxYHCT9x7YwXqKVku4WrzDVACHKWinBkKlyMrq66OJR
+	h1TOgeQOWdsc0QLTUlc/VkJdn2SQCEOkHXI2TQsCeUscc/wzbhgZlU5KWsRmin1NqCunYu
+	/Vu1hg5nRxeet4FwJob+8SSSQvZA3ts=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-543-pXT2G1CgOGWkQX4PSZq0Wg-1; Fri,
- 11 Oct 2024 06:25:00 -0400
-X-MC-Unique: pXT2G1CgOGWkQX4PSZq0Wg-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-638-AWsUiTUhPfSrctqTbSxh0w-1; Fri,
+ 11 Oct 2024 06:25:05 -0400
+X-MC-Unique: AWsUiTUhPfSrctqTbSxh0w-1
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4D2C11955F07;
-	Fri, 11 Oct 2024 10:24:58 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D7D91955F3D;
+	Fri, 11 Oct 2024 10:25:03 +0000 (UTC)
 Received: from t14s.fritz.box (unknown [10.22.80.4])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1B6E91955F42;
-	Fri, 11 Oct 2024 10:24:52 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E484D1956089;
+	Fri, 11 Oct 2024 10:24:58 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: linux-mm@kvack.org,
@@ -69,10 +69,11 @@ Cc: linux-mm@kvack.org,
 	Christian Borntraeger <borntraeger@linux.ibm.com>,
 	Janosch Frank <frankja@linux.ibm.com>,
 	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Kefeng Wang <wangkefeng.wang@huawei.com>
-Subject: [PATCH v1 1/2] mm: huge_memory: add vma_thp_disabled() and thp_disabled_by_hw()
-Date: Fri, 11 Oct 2024 12:24:44 +0200
-Message-ID: <20241011102445.934409-2-david@redhat.com>
+	Kefeng Wang <wangkefeng.wang@huawei.com>,
+	Leo Fu <bfu@redhat.com>
+Subject: [PATCH v1 2/2] mm: don't install PMD mappings when THPs are disabled by the hw/process/vma
+Date: Fri, 11 Oct 2024 12:24:45 +0200
+Message-ID: <20241011102445.934409-3-david@redhat.com>
 In-Reply-To: <20241011102445.934409-1-david@redhat.com>
 References: <20241011102445.934409-1-david@redhat.com>
 Precedence: bulk
@@ -84,91 +85,62 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-From: Kefeng Wang <wangkefeng.wang@huawei.com>
+We (or rather, readahead logic :) ) might be allocating a THP in the
+pagecache and then try mapping it into a process that explicitly disabled
+THP: we might end up installing PMD mappings.
 
-Add vma_thp_disabled() and thp_disabled_by_hw() helpers to be shared by
-shmem_allowable_huge_orders() and __thp_vma_allowable_orders().
+This is a problem for s390x KVM, which explicitly remaps all PMD-mapped
+THPs to be PTE-mapped in s390_enable_sie()->thp_split_mm(), before
+starting the VM.
 
-Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
-[ rename to vma_thp_disabled(), split out thp_disabled_by_hw() ]
+For example, starting a VM backed on a file system with large folios
+supported makes the VM crash when the VM tries accessing such a mapping
+using KVM.
+
+Is it also a problem when the HW disabled THP using
+TRANSPARENT_HUGEPAGE_UNSUPPORTED? At least on x86 this would be the case
+without X86_FEATURE_PSE.
+
+In the future, we might be able to do better on s390x and only disallow
+PMD mappings -- what s390x and likely TRANSPARENT_HUGEPAGE_UNSUPPORTED
+really wants. For now, fix it by essentially performing the same check as
+would be done in __thp_vma_allowable_orders() or in shmem code, where this
+works as expected, and disallow PMD mappings, making us fallback to PTE
+mappings.
+
+Reported-by: Leo Fu <bfu@redhat.com>
+Fixes: 793917d997df ("mm/readahead: Add large folio readahead")
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
+Cc: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/linux/huge_mm.h | 18 ++++++++++++++++++
- mm/huge_memory.c        | 13 +------------
- mm/shmem.c              |  7 +------
- 3 files changed, 20 insertions(+), 18 deletions(-)
+ mm/memory.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
-index 67d0ab3c3bba..ef5b80e48599 100644
---- a/include/linux/huge_mm.h
-+++ b/include/linux/huge_mm.h
-@@ -322,6 +322,24 @@ struct thpsize {
- 	(transparent_hugepage_flags &					\
- 	 (1<<TRANSPARENT_HUGEPAGE_USE_ZERO_PAGE_FLAG))
+diff --git a/mm/memory.c b/mm/memory.c
+index 2366578015ad..a2e501489517 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -4925,6 +4925,15 @@ vm_fault_t do_set_pmd(struct vm_fault *vmf, struct page *page)
+ 	pmd_t entry;
+ 	vm_fault_t ret = VM_FAULT_FALLBACK;
  
-+static inline bool vma_thp_disabled(struct vm_area_struct *vma,
-+		unsigned long vm_flags)
-+{
 +	/*
-+	 * Explicitly disabled through madvise or prctl, or some
-+	 * architectures may disable THP for some mappings, for
-+	 * example, s390 kvm.
++	 * It is too late to allocate a small folio, we already have a large
++	 * folio in the pagecache: especially s390 KVM cannot tolerate any
++	 * PMD mappings, but PTE-mapped THP are fine. So let's simply refuse any
++	 * PMD mappings if THPs are disabled.
 +	 */
-+	return (vm_flags & VM_NOHUGEPAGE) ||
-+	       test_bit(MMF_DISABLE_THP, &vma->vm_mm->flags);
-+}
++	if (thp_disabled_by_hw() || vma_thp_disabled(vma, vma->vm_flags))
++		return ret;
 +
-+static inline bool thp_disabled_by_hw(void)
-+{
-+	/* If the hardware/firmware marked hugepage support disabled. */
-+	return transparent_hugepage_flags & (1 << TRANSPARENT_HUGEPAGE_UNSUPPORTED);
-+}
-+
- unsigned long thp_get_unmapped_area(struct file *filp, unsigned long addr,
- 		unsigned long len, unsigned long pgoff, unsigned long flags);
- unsigned long thp_get_unmapped_area_vmflags(struct file *filp, unsigned long addr,
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 87b49ecc7b1e..2fb328880b50 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -109,18 +109,7 @@ unsigned long __thp_vma_allowable_orders(struct vm_area_struct *vma,
- 	if (!vma->vm_mm)		/* vdso */
- 		return 0;
+ 	if (!thp_vma_suitable_order(vma, haddr, PMD_ORDER))
+ 		return ret;
  
--	/*
--	 * Explicitly disabled through madvise or prctl, or some
--	 * architectures may disable THP for some mappings, for
--	 * example, s390 kvm.
--	 * */
--	if ((vm_flags & VM_NOHUGEPAGE) ||
--	    test_bit(MMF_DISABLE_THP, &vma->vm_mm->flags))
--		return 0;
--	/*
--	 * If the hardware/firmware marked hugepage support disabled.
--	 */
--	if (transparent_hugepage_flags & (1 << TRANSPARENT_HUGEPAGE_UNSUPPORTED))
-+	if (thp_disabled_by_hw() || vma_thp_disabled(vma, vm_flags))
- 		return 0;
- 
- 	/* khugepaged doesn't collapse DAX vma, but page fault is fine. */
-diff --git a/mm/shmem.c b/mm/shmem.c
-index 4f11b5506363..c5adb987b23c 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -1664,12 +1664,7 @@ unsigned long shmem_allowable_huge_orders(struct inode *inode,
- 	loff_t i_size;
- 	int order;
- 
--	if (vma && ((vm_flags & VM_NOHUGEPAGE) ||
--	    test_bit(MMF_DISABLE_THP, &vma->vm_mm->flags)))
--		return 0;
--
--	/* If the hardware/firmware marked hugepage support disabled. */
--	if (transparent_hugepage_flags & (1 << TRANSPARENT_HUGEPAGE_UNSUPPORTED))
-+	if (thp_disabled_by_hw() || (vma && vma_thp_disabled(vma, vm_flags)))
- 		return 0;
- 
- 	global_huge = shmem_huge_global_enabled(inode, index, write_end,
 -- 
 2.46.1
 
