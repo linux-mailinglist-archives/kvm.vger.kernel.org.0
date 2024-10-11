@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-28623-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28624-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 885EE99A3B0
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 14:16:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 565AF99A3E2
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 14:28:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45D3B283811
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 12:16:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02C0E283C94
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 12:28:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 543D521858E;
-	Fri, 11 Oct 2024 12:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252B62185BB;
+	Fri, 11 Oct 2024 12:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZsmP0WJv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fp6KMWPa"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE6F1BDAA1
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 12:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750202178EA
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 12:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728648974; cv=none; b=AmD63Win2dwGhBO4QZm8zq9tPxT5575X1ar7Yc0xrwDdoY/AqyzFE4vlioLK16YZiY7b/Q8ueVFHgZlnCNvHGJVzscaPSP21Pwp1uDkppfjaI6U8ZVhk9wCb/SmhJKK3aEay/fFLEC19UlWanl4SBoYUurqITdStP9qIvnug0aQ=
+	t=1728649677; cv=none; b=V+j4sDYaB1bB3vZss3Pq824VAScpZ6kgRYlaq0e/9nfoqfD9tEdoqSJChAiTJGS3ipsKLC737wqJyK5sXCvFCpxx+0eAHVBPO0OX0zB1CxSk9d8QPnRq6ca1HE9+JSAKyFrb7SQQsmLRCajhAuyYmpWadP5WN9zVzghGTasWANE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728648974; c=relaxed/simple;
-	bh=Ua4saN/auvT/81KeOxYQZAnafhhGA0y+W7JZWy3BjS4=;
+	s=arc-20240116; t=1728649677; c=relaxed/simple;
+	bh=ULnSG4geb8Txl5Cj3WsAJjHU3fohxOMG1UD3Gjc1u5Y=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LUowh+7tniwjYCNhvxJI8jexVrpZSLM4yvLRazLhTvoTYEjxmOF4dogyeT9UcO+tDPb1s/COd2y3LYRfExlBtiHBoZWgOYbGT8A+hzsqw2PJPGGV+iFN/EdXgmawwijcpYcta4xH0p39kT+FA5H5hDl5fQW/daBRaY1msTOfdR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZsmP0WJv; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=fM0LkuhYRNBO/RZAQggbKHk7WZMXVBd/y49QxETsbHlJgGXkgvhvZ9RqbpLlNsPOz6q0mFSeIwAQOAo3iyt8gTh+rB9/0yybmbmyhz9K36OF76speTaMF6sHKa+RE6+NADTsrfLTyJ/HYM7NN2GQ2rCbLAWftVUI7vNJG663gmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fp6KMWPa; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728648971;
+	s=mimecast20190719; t=1728649674;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=W3YR/eN7EDVZPnEUtVVl/DT7O1jzPEky1m6YBwoyhuE=;
-	b=ZsmP0WJvWW9igs9wdCLZ17nJ3zFMiUK054b3NgBAzVFAtgVURyVx467x7F9qMAzFs77STb
-	SIFCKWgh6uaPSNSqDL/sHY+peKg8z/hYssIc70UGCJEymjmYB7VackXQThnpOgcLCkzeGI
-	CUQJ7j684rjqTxfDPT3zX5Ed2AuNT4w=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OvgPP8URR3aRLLAeRhIGd9GfEadFvbPu0wTLuyU+TtY=;
+	b=fp6KMWPanTJLYlJUNx65p4DGmVtecsomSgEDF+ivbF5NeUvydKp19dLwtIwo5u/Nm3zxwa
+	dMp9UrbMIwsOSTdEmDlpuTZGYmSYW1USKh7euU4hgrSbbtYFodJ/uINX8yvZAvbJM+jmPY
+	qHkBYqHfCs0YDCWQbLODd5x4w5aam/0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-34-3uMLzHh6Pe-DWfV0xjpm1w-1; Fri, 11 Oct 2024 08:16:10 -0400
-X-MC-Unique: 3uMLzHh6Pe-DWfV0xjpm1w-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cb830ea86so12305355e9.3
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 05:16:10 -0700 (PDT)
+ us-mta-111-yA394T9aNRWioY7hSWMlAg-1; Fri, 11 Oct 2024 08:27:53 -0400
+X-MC-Unique: yA394T9aNRWioY7hSWMlAg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-431159f2864so9863335e9.0
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 05:27:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728648969; x=1729253769;
+        d=1e100.net; s=20230601; t=1728649672; x=1729254472;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=W3YR/eN7EDVZPnEUtVVl/DT7O1jzPEky1m6YBwoyhuE=;
-        b=mAtUMthQr8/WB1ek+4T2k+maptuRUkqYY8722MpWhbQuUj4u3/T0CC6qaxkWBwRjou
-         BbQfl4HRdI8TGa3RRFRPzZdXkY5hOvjnOx6mXD00k0gbQqcqsRueDffy7aiw8yfxGrps
-         uw7J9FxQ/EBH0hTLLBQoDFdgTFfaWPhBfaEiFmFOeuxYgPiydUjpbx7wSpFYlYdTKQoc
-         eDmY/nTaAMbS3/KHysH/qpIT4qojKRDrT7/r64zPFPr7TB1HoDbNmQ8MAqGAi/iXSfHW
-         MGEcsRPYa+SHXOPRj4oXr5hxyU4AzekfLoz8s4QG2rxALjAM1AWkXnrEpt4QnOEsJSkA
-         1dgA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGn358zONJn9g57RPwUKahQOe9WgJ2ZQoAMe+i09GDr3D2vQJsWmJXbs67zuLXuqgw52U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkJwBztAQshF9RXxPUoNWgKRWCyoMox9W/CJdDAww6UFjvl4ds
-	KRFsvZPJXjvPvEeA8/C1OK+A34DP1sXQ1nvR17dpOp1Qe4z8u/uNbYxA29lsRNi92tlKEXixqlB
-	TRiQc9DPtEE4M03UPo5WfQRmebi+XS6Wl25JzPlrG2yOrLc8m2g==
-X-Received: by 2002:a05:600c:1d0e:b0:42c:b2fa:1c0a with SMTP id 5b1f17b1804b1-4311df429c8mr19539015e9.23.1728648969386;
-        Fri, 11 Oct 2024 05:16:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHJ7w0P8euwuh1uWsgO1hBzdaK+5QHv+AFGT0Iwx99lPo3ic55Ocuel+lqlVPvlsAnC7ezD6A==
-X-Received: by 2002:a05:600c:1d0e:b0:42c:b2fa:1c0a with SMTP id 5b1f17b1804b1-4311df429c8mr19538645e9.23.1728648968995;
-        Fri, 11 Oct 2024 05:16:08 -0700 (PDT)
+        bh=OvgPP8URR3aRLLAeRhIGd9GfEadFvbPu0wTLuyU+TtY=;
+        b=N2Y40LJxbpcPK8P+oDJZkuplkf0lwD/6PAosXjq24eqTItH8Vr4JWluiNE5McEDHUU
+         KYnpqSCYj1xbHUdRgDyj7M9sQdp/YNF3SXLxiMPJqcx2i8qpqdBLjC07lkixGGyyOXoc
+         zH1hVQ2OkOUWhGrHQyfBM7Y7yjM5UYKrISQzUQPuIjOzEb/GYN/oNvk5CJ8GhjU3r4QH
+         aZQq86MI5hqnYhftqX3q6uWy7XwWyeO1G4RlttMSPdl0ulvRqCac9KZkEFwm4eCEh+up
+         dCHitBgqOcu78ZeEJ6z+vAaQtCOnuOAWIOsQGsOL1wVIDEowDk2d7xwifuW2YlNp/6K7
+         ZSQA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHRxLBeYHX2N44UD64cVUPYxeY69rzIQikfFtMqblQrKapgsjtGeTd1jeDREAsyYdvSIU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzirv3Y66ZJO28m7HhEmM9lNILDLyRjreQJsCgZYkZG88O2eWOg
+	R0AQvsEYEZKCA3D938+TgrWjtFCx3Rby+3ZvkUfIYJpTCoCdjIaZfVTKXR/gulA7h4sb+VoY63i
+	vVr6HOq5sMNu8O3NYEDV+W6yfIU0mQyfdfNyZ2DF4gyTr969AUA==
+X-Received: by 2002:a05:600c:1f8c:b0:430:c3a5:652a with SMTP id 5b1f17b1804b1-4311ded53cbmr16267895e9.12.1728649672172;
+        Fri, 11 Oct 2024 05:27:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEgVv3RNAOR2FC6mKD8YlkQf/6eOtik4XN5FWpHDbbO6uoNEPOtTgURod1/yDncIWXirvGTnQ==
+X-Received: by 2002:a05:600c:1f8c:b0:430:c3a5:652a with SMTP id 5b1f17b1804b1-4311ded53cbmr16267425e9.12.1728649671758;
+        Fri, 11 Oct 2024 05:27:51 -0700 (PDT)
 Received: from eisenberg.fritz.box ([2001:16b8:3d05:4700:3e59:7d70:cabd:144b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430ccf4841asm73010925e9.19.2024.10.11.05.16.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4311835d95bsm40843965e9.47.2024.10.11.05.27.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 05:16:08 -0700 (PDT)
-Message-ID: <f65e9fa01a1947782fc930876e5f84174408db67.camel@redhat.com>
-Subject: Re: [RFC PATCH 01/13] PCI: Prepare removing devres from pci_intx()
+        Fri, 11 Oct 2024 05:27:51 -0700 (PDT)
+Message-ID: <b13b75ae16b5238ab8b6e6d6e7a0797ed8415e80.camel@redhat.com>
+Subject: Re: [RFC PATCH 02/13] ALSA: hda: hda_intel: Use always-managed
+ version of pcim_intx()
 From: Philipp Stanner <pstanner@redhat.com>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
@@ -117,11 +118,11 @@ Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
  ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
  linux-staging@lists.linux.dev, kvm@vger.kernel.org, 
  xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Fri, 11 Oct 2024 14:16:06 +0200
-In-Reply-To: <ZwfnULv2myACxnVb@smile.fi.intel.com>
+Date: Fri, 11 Oct 2024 14:27:48 +0200
+In-Reply-To: <Zwfo4dr4bfqQGGyl@smile.fi.intel.com>
 References: <20241009083519.10088-1-pstanner@redhat.com>
-	 <20241009083519.10088-2-pstanner@redhat.com>
-	 <ZwfnULv2myACxnVb@smile.fi.intel.com>
+	 <20241009083519.10088-3-pstanner@redhat.com>
+	 <Zwfo4dr4bfqQGGyl@smile.fi.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
@@ -132,88 +133,58 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Thu, 2024-10-10 at 17:40 +0300, Andy Shevchenko wrote:
-> On Wed, Oct 09, 2024 at 10:35:07AM +0200, Philipp Stanner wrote:
-> > pci_intx() is a hybrid function which sometimes performs devres
-> > operations, depending on whether pcim_enable_device() has been used
-> > to
-> > enable the pci_dev. This sometimes-managed nature of the function
-> > is
-> > problematic. Notably, it causes the function to allocate under some
-> > circumstances which makes it unusable from interrupt context.
+On Thu, 2024-10-10 at 17:46 +0300, Andy Shevchenko wrote:
+> On Wed, Oct 09, 2024 at 10:35:08AM +0200, Philipp Stanner wrote:
+> > pci_intx() is a hybrid function which can sometimes be managed
+> > through
+> > devres. To remove this hybrid nature from pci_intx(), it is
+> > necessary to
+> > port users to either an always-managed or a never-managed version.
 > >=20
-> > To, ultimately, remove the hybrid nature from pci_intx(), it is
-> > first
-> > necessary to provide an always-managed and a never-managed version
-> > of that function. Then, all callers of pci_intx() can be ported to
-> > the
-> > version they need, depending whether they use pci_enable_device()
-> > or
-> > pcim_enable_device().
+> > hda_intel enables its PCI-Device with pcim_enable_device(). Thus,
+> > it needs
+> > the always-managed version.
 > >=20
-> > An always-managed function exists, namely pcim_intx(), for which
-> > __pcim_intx(), a never-managed version of pci_intx() had been
-> > implemented.
->=20
-> > Make __pcim_intx() a public function under the name
-> > pci_intx_unmanaged(). Make pcim_intx() a public function.
->=20
-> To avoid an additional churn we can make just completely new APIs,
-> namely:
-> pcim_int_x()
-> pci_int_x()
->=20
-> You won't need all dirty dances with double underscored function
-> naming and
-> renaming.
-
-=C3=84hm.. I can't follow. The new version doesn't use double underscores
-anymore. __pcim_intx() is being removed, effectively.
-After this series, we'd end up with a clean:
-
-	pci_intx() <-> pcim_intx()
-
-just as in the other PCI APIs.
-
-
->=20
+> > Replace pci_intx() with pcim_intx().
 >=20
 > ...
 >=20
-> > +	pci_read_config_word(pdev, PCI_COMMAND, &pci_command);
-> > +
-> > +	if (enable)
-> > +		new =3D pci_command & ~PCI_COMMAND_INTX_DISABLE;
-> > +	else
-> > +		new =3D pci_command | PCI_COMMAND_INTX_DISABLE;
-> > +
-> > +	if (new !=3D pci_command)
+> > =C2=A0	bus->irq =3D chip->pci->irq;
+> > =C2=A0	chip->card->sync_irq =3D bus->irq;
+> > -	pci_intx(chip->pci, !chip->msi);
+> > +	pcim_intx(chip->pci, !chip->msi);
+> > =C2=A0	return 0;
 >=20
-> I would use positive conditionals as easy to read (yes, a couple of
-> lines
-> longer, but also a win is the indentation and avoiding an additional
-> churn in
-> the future in case we need to add something in this branch.
-
-I can't follow. You mean:
-
-if (new =3D=3D pci_command)
-    return;
-
-?
-
-That's exactly the same level of indentation. Plus, I just copied the
-code.
-
+> I believe each driver needs an individual approach. Looking at the
+> above
+> I would first to understand why this one is being used and why we
+> can't
+> switch to pci{m}_alloc_irq_vectors(). (Yeah, managed
+> pci_alloc_irq_vectors()
+> is probably still missing, I don't remember if you introduced it or
+> not.
 >=20
-> > +		pci_write_config_word(pdev, PCI_COMMAND, new);
->=20
-> ...
->=20
-> Otherwise I'm for the idea in general.
 
-\o/
+Alright alright =E2=80=93 we touched it in the other mail briefly, but let =
+me
+point out another specific problem:
 
->=20
+pci_alloc_irq_vectors() *uses* pci_intx(). And pci_intx() can be
+managed sometimes.
+
+See the problem? :(
+
+So it's not just that I couldn't port the driver Alex is concerned
+about, it's also that MSI itself is a user of pci_intx().
+
+So a pcim_alloc_irq_vectors() might end up doing double-devres or God
+knows what else. Only once pci_intx() is clean one can start thinking
+about the code in pci/msi/
+
+It's the biggest reason why I want to clean it up as suggested here,
+and also why the only patch I'm really nervous about is number 8.
+
+
+P.
 
 
