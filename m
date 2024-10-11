@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-28592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DBC4999A2F
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 04:16:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2547B999A30
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 04:16:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 921401F2457E
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 02:16:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1AC8B24582
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 02:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7FFB1FB3ED;
-	Fri, 11 Oct 2024 02:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1768D1FB3FF;
+	Fri, 11 Oct 2024 02:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FdgOyntl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Va1ihGKY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAC81FB3D3
-	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 02:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F571FB3EB
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 02:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728612687; cv=none; b=gCnjRQmEF/nyy1nVAHeWpxogiMuanTFmdXSuXjaWy7R2xIToIJtk9S6v0Mdx1Z42sSdtFyfFKKRaR6FGvTg2ep9K+xdTIASZ9fNhbNWcOWMV22po9j4CI0WHgWDYTf6KvaPEXEVhRuchZh027vCQbum+VFqmqW42WnUhfdPWm8A=
+	t=1728612689; cv=none; b=SUf8WxXi539hxrsiq88Zzp771SNmkU4mdCoy0q7RoX7nzkWO+5GlbqhWW4RoL2xWmUxQoLjvGcIQFRnTKRDSFeRLmcfA4yX8daXKpzxQccSa56ZbyeHH32kZN0vO5JK99ZJt9YqXcx9l+oQzBx0BWbQ5UDgZvw3Uw3sehy7beMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728612687; c=relaxed/simple;
-	bh=LNXuTGR2S+iPgGGEX03rlcOFXKsH1faw0ZPmJ58DiOE=;
+	s=arc-20240116; t=1728612689; c=relaxed/simple;
+	bh=Tp2aWz/KUkLgHNMUQeB0T53YK5NkYJtBqImftywh1pg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=L9qmva7jq7pJf7RABVn2MbEZMl00AnfI2jU/47zSvw7kx7GJWFFGd0sA8Fcbp4b4HLDlLscj7vWPVTMlsBe6lF3r7M88ccaLf/WSSNJZLGHA8DlTjXLQR4QHnflz2OCTNu8twcmPnMVsWW3u6TmCiTeYN7JaHM7QP+v3lEnZJsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FdgOyntl; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=aCnqArJNa2+xrmGbr33w6Bduhvw82K+D5MAho3r65xh/bFocQTou08xvmVIKyPaSJOlcL+NqvR+xnDi0NnJ+XZHX60+w2VBITAbLUaeAjDYk8Oia/aFYT+QX8J+iQUAPqgB2NJA679JBmcg43IvrTmFmG6x6vlR4NUWWe8uOAR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Va1ihGKY; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-70ac9630e3aso1543351a12.1
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 19:11:25 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6dbbeee08f0so39660697b3.0
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2024 19:11:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728612685; x=1729217485; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728612687; x=1729217487; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=CEg0IFfdUu4UELrQOXo0lUcfHQKNBNnbMq1djiDkWGQ=;
-        b=FdgOyntliR+R53ku1l+8JOs7WqGHgzY5J/dK5vP4+B/B6lw9kgD+qUduihpl8medjW
-         ms2yX97jx7+MevWVzcwv0I/VWrHae4vpGT5Umxt+PwocoL3karL2rybxy7ihNByAsvT7
-         cTNCE6S6CdhsYwEIcq5LbRSPEAm3smllOxDeTPuvw405/MbFTfPdsKRgcMS7KFMkkL4J
-         sdD4CEmksfwBvI1oo/NZq+KhmArReJnxzUjI4LEFmtgJid28LVEhAeHD9fC7gqK8Ko4h
-         pQLCcYdRzS6bcYh3GRxkYFg9XyWm4WD+6SInx85SwUnlAP8G4+fqi1tNIsJNleQv2owJ
-         pWuA==
+        bh=VgP7ZnqG8N9jdCaiPxtHytdx2vM8g+9dqJnt13kkQQE=;
+        b=Va1ihGKY/nVmOINfhOXd8M7aT59KbsX96wpgdbJhNOvasLR7rfi4cXKK897pDwFb9U
+         06n2x/k5uhzaF1eHKcISXMkmp3ANm7qFdyOqtzNdf8oosPh+ZvIyi7wp5lOCpnuDYqrx
+         EJtcBckCfISE54OIGSKBr5PGTshjngSM9e8ziO4yH5yVBaD8Z8stDD5QiWaOR+jTVvUJ
+         T8xpaVusrO/uSap8jQ+Lv6oPyhLNNOCl3kw3zb4lpGBjSxwFRzd+2IJdaa3/Jat6O2Ve
+         ATqFKi9KPGR5JmYDOl7qlmyMXf7k0YxYPxWXIgKVRFFkwb0XeeoGduKPTdLlm7gkjp8c
+         Ck1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728612685; x=1729217485;
+        d=1e100.net; s=20230601; t=1728612687; x=1729217487;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CEg0IFfdUu4UELrQOXo0lUcfHQKNBNnbMq1djiDkWGQ=;
-        b=q9OXZAntR7h30WCiCK2aDunNAZZKws4SyONVipiirqqsDUxQvPzTWYf07B7p/CcMDw
-         fDSmThArdGXAXjROeRpcDF5Ksu3Y6h1EU22Fh3hkrEv3I2WEG5bcEKmJp0fP4UAtKZEv
-         gLi4XaCmMJqYNurJzL9t4yZM5OXfjHWxxc2bz++TTrNUe2iazUDE0vJ0rSxhkt5aGpTG
-         KWG5aIz7QF4iqUpehZ4yrDCtxHiX9l7qclRfceHOGC9mzvjv4M2wZMf/wdmU+iKRtl0a
-         J0gajSIEK7IkgkCQis5x2YangzExhL6yZVD0wsjHVEROJ4XovOzdmXAgIN+HO/rQ47Cr
-         tvZA==
-X-Gm-Message-State: AOJu0Yw+VVrSuzsy4YjvzeK4geJIt0ShhiNiJCsv3V4Teoso+QTfbAHy
-	0Krc+I7aUb8OGt3zglb3Yun0lxSfQVPzn8BsF2cY064UrMcxhdVDKB3UGRH/0FHPTPbyGvX8ovb
-	K/w==
-X-Google-Smtp-Source: AGHT+IHOAZfcUyAOkGK8+VjEG0Gb80ABIViSbVLqAW+P+s1wcIQgbwkQ7kkxk7jRjasA/YCkTBO3YYYn+wk=
+        bh=VgP7ZnqG8N9jdCaiPxtHytdx2vM8g+9dqJnt13kkQQE=;
+        b=HWmNIXspKAzBfb3/krklcPiBJ5UhBYrbhTy4/JJQaWqaABO19LQDMppneW4FtsfUsN
+         qpXaftCSjYTSINhOYjpUDMj92EeaXmAV7ld+QCRmE+5bRMHYYpoLB3E1ru79IuSxHLAA
+         fm+zM7XxNNK71EfHhzyedEx4lvr+mqQMKHyM+HXuet7wyAnNmtq/qfULEsLzIwBS7haT
+         nTSHGgx16cgFjTsI5IgM5ngV11BxLC4Tw3Nv08tYSQKMjFun1Yr/NhnbWN72FBKndG8O
+         P0qy+FeVpP5iuGFVBvBi9u/5JvAh8t2fhAMBhiIKB14O75aH2BfYjnQFc00iUDr3O1xP
+         mmRQ==
+X-Gm-Message-State: AOJu0YyOzsLwo6Qdu3ZuAyD/fBTAMPMb77Va6CVwn+s34mid+Jx8CYm0
+	HFFupYocNKgKDjFAEghlt9lW7oWINjsOcK/2qVxi/cX7lciM6t34qGdmKM9sPJ+woILRdod2wZL
+	30Q==
+X-Google-Smtp-Source: AGHT+IHfuBbi88SzKZ8fyOpKZIpd/P6uL6w934+Qz4f2IixKQEh8/8BEdcKQO7aaLExUXEvNpT4HwLrwVCw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:f8a:b0:7cd:8b5f:2567 with SMTP id
- 41be03b00d2f7-7ea535255a7mr911a12.4.1728612683541; Thu, 10 Oct 2024 19:11:23
+ (user=seanjc job=sendgmr) by 2002:a25:b104:0:b0:e29:a86:fd0d with SMTP id
+ 3f1490d57ef6-e290bb40627mr81586276.5.1728612686619; Thu, 10 Oct 2024 19:11:26
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Oct 2024 19:10:47 -0700
+Date: Thu, 10 Oct 2024 19:10:48 -0700
 In-Reply-To: <20241011021051.1557902-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241011021051.1557902-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241011021051.1557902-16-seanjc@google.com>
-Subject: [PATCH 15/18] KVM: x86/mmu: Dedup logic for detecting TLB flushes on
- leaf SPTE changes
+Message-ID: <20241011021051.1557902-17-seanjc@google.com>
+Subject: [PATCH 16/18] KVM: x86/mmu: Set Dirty bit for new SPTEs, even if
+ _hardware_ A/D bits are disabled
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -86,111 +86,48 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that the shadow MMU and TDP MMU have identical logic for detecting
-required TLB flushes when updating SPTEs, move said logic to a helper so
-that the TDP MMU code can benefit from the comments that are currently
-exclusive to the shadow MMU.
-
-No functional change intended.
+When making a SPTE, set the Dirty bit in the SPTE as appropriate, even if
+hardware A/D bits are disabled.  Only EPT allows A/D bits to be disabled,
+and for EPT, the bits are software-available (ignored by hardware) when
+A/D bits are disabled, i.e. it is perfectly legal for KVM to use the Dirty
+to track dirty pages in software.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c     | 19 +------------------
- arch/x86/kvm/mmu/spte.h    | 29 +++++++++++++++++++++++++++++
- arch/x86/kvm/mmu/tdp_mmu.c |  3 +--
- 3 files changed, 31 insertions(+), 20 deletions(-)
+ arch/x86/kvm/mmu/spte.c | 2 +-
+ arch/x86/kvm/mmu/spte.h | 6 ------
+ 2 files changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 5be3b5f054f1..f75915ff33be 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -488,23 +488,6 @@ static void mmu_spte_set(u64 *sptep, u64 new_spte)
- /* Rules for using mmu_spte_update:
-  * Update the state bits, it means the mapped pfn is not changed.
-  *
-- * If the MMU-writable flag is cleared, i.e. the SPTE is write-protected for
-- * write-tracking, remote TLBs must be flushed, even if the SPTE was read-only,
-- * as KVM allows stale Writable TLB entries to exist.  When dirty logging, KVM
-- * flushes TLBs based on whether or not dirty bitmap/ring entries were reaped,
-- * not whether or not SPTEs were modified, i.e. only the write-tracking case
-- * needs to flush at the time the SPTEs is modified, before dropping mmu_lock.
-- *
-- * Don't flush if the Accessed bit is cleared, as access tracking tolerates
-- * false negatives, and the one path that does care about TLB flushes,
-- * kvm_mmu_notifier_clear_flush_young(), flushes if a young SPTE is found, i.e.
-- * doesn't rely on lower helpers to detect the need to flush.
-- *
-- * Lastly, don't flush if the Dirty bit is cleared, as KVM unconditionally
-- * flushes when enabling dirty logging (see kvm_mmu_slot_apply_flags()), and
-- * when clearing dirty logs, KVM flushes based on whether or not dirty entries
-- * were reaped from the bitmap/ring, not whether or not dirty SPTEs were found.
-- *
-  * Returns true if the TLB needs to be flushed
-  */
- static bool mmu_spte_update(u64 *sptep, u64 new_spte)
-@@ -527,7 +510,7 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
- 	WARN_ON_ONCE(!is_shadow_present_pte(old_spte) ||
- 		     spte_to_pfn(old_spte) != spte_to_pfn(new_spte));
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 617479efd127..fd8c3c92ade0 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -237,7 +237,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 			wrprot = true;
+ 		else
+ 			spte |= PT_WRITABLE_MASK | shadow_mmu_writable_mask |
+-				spte_shadow_dirty_mask(spte);
++				shadow_dirty_mask;
+ 	}
  
--	return is_mmu_writable_spte(old_spte) && !is_mmu_writable_spte(new_spte);
-+	return is_tlb_flush_required_for_leaf_spte(old_spte, new_spte);
- }
- 
- /*
+ 	if (prefetch && !synchronizing)
 diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index c8dc75337c8b..a404279ba731 100644
+index a404279ba731..e90cc401c168 100644
 --- a/arch/x86/kvm/mmu/spte.h
 +++ b/arch/x86/kvm/mmu/spte.h
-@@ -467,6 +467,35 @@ static inline bool is_mmu_writable_spte(u64 spte)
- 	return spte & shadow_mmu_writable_mask;
+@@ -316,12 +316,6 @@ static inline bool spte_ad_need_write_protect(u64 spte)
+ 	return (spte & SPTE_TDP_AD_MASK) != SPTE_TDP_AD_ENABLED;
  }
  
-+/*
-+ * If the MMU-writable flag is cleared, i.e. the SPTE is write-protected for
-+ * write-tracking, remote TLBs must be flushed, even if the SPTE was read-only,
-+ * as KVM allows stale Writable TLB entries to exist.  When dirty logging, KVM
-+ * flushes TLBs based on whether or not dirty bitmap/ring entries were reaped,
-+ * not whether or not SPTEs were modified, i.e. only the write-tracking case
-+ * needs to flush at the time the SPTEs is modified, before dropping mmu_lock.
-+ *
-+ * Don't flush if the Accessed bit is cleared, as access tracking tolerates
-+ * false negatives, and the one path that does care about TLB flushes,
-+ * kvm_mmu_notifier_clear_flush_young(), flushes if a young SPTE is found, i.e.
-+ * doesn't rely on lower helpers to detect the need to flush.
-+ *
-+ * Lastly, don't flush if the Dirty bit is cleared, as KVM unconditionally
-+ * flushes when enabling dirty logging (see kvm_mmu_slot_apply_flags()), and
-+ * when clearing dirty logs, KVM flushes based on whether or not dirty entries
-+ * were reaped from the bitmap/ring, not whether or not dirty SPTEs were found.
-+ *
-+ * Note, this logic only applies to shadow-present leaf SPTEs.  The caller is
-+ * responsible for checking that the old SPTE is shadow-present, and is also
-+ * responsible for determining whether or not a TLB flush is required when
-+ * modifying a shadow-present non-leaf SPTE.
-+ */
-+static inline bool is_tlb_flush_required_for_leaf_spte(u64 old_spte,
-+						       u64 new_spte)
-+{
-+	return is_mmu_writable_spte(old_spte) && !is_mmu_writable_spte(new_spte);
-+}
-+
- static inline u64 get_mmio_spte_generation(u64 spte)
+-static inline u64 spte_shadow_dirty_mask(u64 spte)
+-{
+-	KVM_MMU_WARN_ON(!is_shadow_present_pte(spte));
+-	return spte_ad_enabled(spte) ? shadow_dirty_mask : 0;
+-}
+-
+ static inline bool is_access_track_spte(u64 spte)
  {
- 	u64 gen;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index f412bca206c5..615c6a84fd60 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1034,8 +1034,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- 		return RET_PF_RETRY;
- 	else if (is_shadow_present_pte(iter->old_spte) &&
- 		 (!is_last_spte(iter->old_spte, iter->level) ||
--		  WARN_ON_ONCE(is_mmu_writable_spte(iter->old_spte) &&
--			       !is_mmu_writable_spte(new_spte))))
-+		  WARN_ON_ONCE(is_tlb_flush_required_for_leaf_spte(iter->old_spte, new_spte))))
- 		kvm_flush_remote_tlbs_gfn(vcpu->kvm, iter->gfn, iter->level);
- 
- 	/*
+ 	return !spte_ad_enabled(spte) && (spte & shadow_acc_track_mask) == 0;
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
