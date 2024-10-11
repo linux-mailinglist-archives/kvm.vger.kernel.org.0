@@ -1,135 +1,155 @@
-Return-Path: <kvm+bounces-28610-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28611-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBA1399A294
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:19:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F1FB99A29D
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39207B21092
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:19:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5FC7B24EC6
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF8921502F;
-	Fri, 11 Oct 2024 11:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vok1ydJj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43093216449;
+	Fri, 11 Oct 2024 11:21:40 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D663E804;
-	Fri, 11 Oct 2024 11:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5D03D64;
+	Fri, 11 Oct 2024 11:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728645541; cv=none; b=IW0utCpgIHgOhhj2yZyzQhN5aHnC8PNv7FO7iFSx9/8MLu0ZZHAik/tbDIQLgveZLzCQAoE6P2fjRdvPwf6gKnxLKpf40uLGujyFiF/Wtycze48UdAK0LQOnnzwNVFGo1SbqCA6wyv9No9qe74D59WQisYvD1FpFoO6aw6r/Gb8=
+	t=1728645699; cv=none; b=EnaOF3dSTAF5o7QrwWasCeHrM0aqGN10SdSIGf7lBUO1TI3/95qBoyCjA0/aXP0+DCQ/IAVB6nLNU5nDJZrG3p2/kQ8NTgdyryaVxLBFZ7oKZOXW/fDTCIliBUqRudQWUNfyNdeGm4P3cpAoOppWwzM1RlGyx0P19UlbWiDKMJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728645541; c=relaxed/simple;
-	bh=l/ebEG8kD/gjaGhc9sDTvLQS00rUq5c+N3DFQlZBEzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KCg8eCCOt1AsUgUq+Av/HR3hfOYOmOKYFTwYMTGfMyHEVu4IEnvwLLdXxFcGii2BFMsFajv1kx6zQrvMm6y84Gl57HBPeIqC7ZPXE0nBFNZrQKR0PsjdB3C/5rXN5h0TYWmsybWstQlY3ASYGgGY1/Je/vCe7eVowXfTkuEnqeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vok1ydJj; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=JmzYZueYdB1IqVFlxSAinoEZfpgluWHovncGAWktWlU=; b=vok1ydJjbOKAUOWv5qDBpnZuN/
-	n+fSJPCvif/g62RipbMzFvKVO1Sm1BtHEwYwExJqsHpzXzUlAjhzDlCL6iHuAoap1UVrefrlzSm4u
-	GPa3to4Qrwb8iUApEGN3suRquVGlHz5+SQzevP2oB08acHpw+N9EX+lpibwLJVK474W6KLvNwOLYA
-	8sb6Zvfs8SKs5RnLb5+g5Z/n3MGr7Ze3JMZC4GnmNfHre/xr6J2M3G0h1XKjwidhXQetXPsC2aTFi
-	8LfVeCYqZdXRxFvjh4tGy3mbjWKSRWkPYEwWQkgaZlsoXZgPgOHgvhv2LVKpnIKPwTTueMBureBRy
-	Lb9foEyg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1szDfV-0000000AbXI-2lYb;
-	Fri, 11 Oct 2024 11:18:51 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id C8330300642; Fri, 11 Oct 2024 13:18:49 +0200 (CEST)
-Date: Fri, 11 Oct 2024 13:18:49 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Xiong Zhang <xiong.y.zhang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Kan Liang <kan.liang@intel.com>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>,
-	Manali Shukla <manali.shukla@amd.com>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Jim Mattson <jmattson@google.com>,
-	Stephane Eranian <eranian@google.com>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	gce-passthrou-pmu-dev@google.com,
-	Samantha Alt <samantha.alt@intel.com>,
-	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
-	Like Xu <like.xu.linux@gmail.com>,
-	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [RFC PATCH v3 07/58] perf: Skip pmu_ctx based on event_type
-Message-ID: <20241011111849.GM14587@noisy.programming.kicks-ass.net>
-References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-8-mizhang@google.com>
+	s=arc-20240116; t=1728645699; c=relaxed/simple;
+	bh=xL0URaUxHtaSXtH5PsRUYkQ8i/Wvh6VBzDWj0/MIm4M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mms7pE4M2QcgEgOX2RoMZ1Bqxzb5WO/+o1JSRA+e/1JTMyGPtUoLlyk5I3A2NBYTP77H9E3z4QnPnuRkjWCX0AlHo2GOmghGSNTHv3wh781dhetthlzrRXY4MuH6VvhwM8oSdOVnw1cNQY0WIcLcXD6wRpaH92MddKprbIeFdy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1E1AF497;
+	Fri, 11 Oct 2024 04:22:06 -0700 (PDT)
+Received: from [10.57.85.162] (unknown [10.57.85.162])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A2EE63F73F;
+	Fri, 11 Oct 2024 04:21:34 -0700 (PDT)
+Message-ID: <262aa3c4-fdcc-4971-bbbb-024b9086d6c3@arm.com>
+Date: Fri, 11 Oct 2024 12:21:32 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801045907.4010984-8-mizhang@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/2] mm: huge_memory: add vma_thp_disabled() and
+ thp_disabled_by_hw()
+To: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Cc: linux-mm@kvack.org, kvm@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>, Hugh Dickins <hughd@google.com>,
+ Thomas Huth <thuth@redhat.com>, "Matthew Wilcox (Oracle)"
+ <willy@infradead.org>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Kefeng Wang <wangkefeng.wang@huawei.com>
+References: <20241011102445.934409-1-david@redhat.com>
+ <20241011102445.934409-2-david@redhat.com>
+Content-Language: en-GB
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <20241011102445.934409-2-david@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 01, 2024 at 04:58:16AM +0000, Mingwei Zhang wrote:
-> @@ -3299,9 +3309,6 @@ ctx_sched_out(struct perf_event_context *ctx, enum event_type_t event_type)
->  	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
->  	struct perf_event_pmu_context *pmu_ctx;
->  	int is_active = ctx->is_active;
-> -	bool cgroup = event_type & EVENT_CGROUP;
+On 11/10/2024 11:24, David Hildenbrand wrote:
+> From: Kefeng Wang <wangkefeng.wang@huawei.com>
+> 
+> Add vma_thp_disabled() and thp_disabled_by_hw() helpers to be shared by
+> shmem_allowable_huge_orders() and __thp_vma_allowable_orders().
+> 
+> Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+> [ rename to vma_thp_disabled(), split out thp_disabled_by_hw() ]
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Looks like a nice tidy up on its own:
+
+Reviewed-by: Ryan Roberts <ryan.roberts@arm.com>
+
+> ---
+>  include/linux/huge_mm.h | 18 ++++++++++++++++++
+>  mm/huge_memory.c        | 13 +------------
+>  mm/shmem.c              |  7 +------
+>  3 files changed, 20 insertions(+), 18 deletions(-)
+> 
+> diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+> index 67d0ab3c3bba..ef5b80e48599 100644
+> --- a/include/linux/huge_mm.h
+> +++ b/include/linux/huge_mm.h
+> @@ -322,6 +322,24 @@ struct thpsize {
+>  	(transparent_hugepage_flags &					\
+>  	 (1<<TRANSPARENT_HUGEPAGE_USE_ZERO_PAGE_FLAG))
+>  
+> +static inline bool vma_thp_disabled(struct vm_area_struct *vma,
+> +		unsigned long vm_flags)
+> +{
+> +	/*
+> +	 * Explicitly disabled through madvise or prctl, or some
+> +	 * architectures may disable THP for some mappings, for
+> +	 * example, s390 kvm.
+> +	 */
+> +	return (vm_flags & VM_NOHUGEPAGE) ||
+> +	       test_bit(MMF_DISABLE_THP, &vma->vm_mm->flags);
+> +}
+> +
+> +static inline bool thp_disabled_by_hw(void)
+> +{
+> +	/* If the hardware/firmware marked hugepage support disabled. */
+> +	return transparent_hugepage_flags & (1 << TRANSPARENT_HUGEPAGE_UNSUPPORTED);
+> +}
+> +
+>  unsigned long thp_get_unmapped_area(struct file *filp, unsigned long addr,
+>  		unsigned long len, unsigned long pgoff, unsigned long flags);
+>  unsigned long thp_get_unmapped_area_vmflags(struct file *filp, unsigned long addr,
+> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+> index 87b49ecc7b1e..2fb328880b50 100644
+> --- a/mm/huge_memory.c
+> +++ b/mm/huge_memory.c
+> @@ -109,18 +109,7 @@ unsigned long __thp_vma_allowable_orders(struct vm_area_struct *vma,
+>  	if (!vma->vm_mm)		/* vdso */
+>  		return 0;
+>  
+> -	/*
+> -	 * Explicitly disabled through madvise or prctl, or some
+> -	 * architectures may disable THP for some mappings, for
+> -	 * example, s390 kvm.
+> -	 * */
+> -	if ((vm_flags & VM_NOHUGEPAGE) ||
+> -	    test_bit(MMF_DISABLE_THP, &vma->vm_mm->flags))
+> -		return 0;
+> -	/*
+> -	 * If the hardware/firmware marked hugepage support disabled.
+> -	 */
+> -	if (transparent_hugepage_flags & (1 << TRANSPARENT_HUGEPAGE_UNSUPPORTED))
+> +	if (thp_disabled_by_hw() || vma_thp_disabled(vma, vm_flags))
+>  		return 0;
+>  
+>  	/* khugepaged doesn't collapse DAX vma, but page fault is fine. */
+> diff --git a/mm/shmem.c b/mm/shmem.c
+> index 4f11b5506363..c5adb987b23c 100644
+> --- a/mm/shmem.c
+> +++ b/mm/shmem.c
+> @@ -1664,12 +1664,7 @@ unsigned long shmem_allowable_huge_orders(struct inode *inode,
+>  	loff_t i_size;
+>  	int order;
+>  
+> -	if (vma && ((vm_flags & VM_NOHUGEPAGE) ||
+> -	    test_bit(MMF_DISABLE_THP, &vma->vm_mm->flags)))
+> -		return 0;
 > -
-> -	event_type &= ~EVENT_CGROUP;
+> -	/* If the hardware/firmware marked hugepage support disabled. */
+> -	if (transparent_hugepage_flags & (1 << TRANSPARENT_HUGEPAGE_UNSUPPORTED))
+> +	if (thp_disabled_by_hw() || (vma && vma_thp_disabled(vma, vm_flags)))
+>  		return 0;
 >  
->  	lockdep_assert_held(&ctx->lock);
->  
-> @@ -3336,7 +3343,7 @@ ctx_sched_out(struct perf_event_context *ctx, enum event_type_t event_type)
->  		barrier();
->  	}
->  
-> -	ctx->is_active &= ~event_type;
-> +	ctx->is_active &= ~(event_type & ~EVENT_FLAGS);
->  	if (!(ctx->is_active & EVENT_ALL))
->  		ctx->is_active = 0;
->  
+>  	global_huge = shmem_huge_global_enabled(inode, index, write_end,
 
-> @@ -3912,9 +3919,6 @@ ctx_sched_in(struct perf_event_context *ctx, enum event_type_t event_type)
->  {
->  	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
->  	int is_active = ctx->is_active;
-> -	bool cgroup = event_type & EVENT_CGROUP;
-> -
-> -	event_type &= ~EVENT_CGROUP;
->  
->  	lockdep_assert_held(&ctx->lock);
->  
-> @@ -3932,7 +3936,7 @@ ctx_sched_in(struct perf_event_context *ctx, enum event_type_t event_type)
->  		barrier();
->  	}
->  
-> -	ctx->is_active |= (event_type | EVENT_TIME);
-> +	ctx->is_active |= ((event_type & ~EVENT_FLAGS) | EVENT_TIME);
->  	if (ctx->task) {
->  		if (!is_active)
->  			cpuctx->task_ctx = ctx;
-
-Would it make sense to do something like:
-
-	enum event_type_t active_type = event_type & ~EVENT_FLAGS;
-
-	ctx->is_active &= ~active_type;
-and
-	ctx->is_active |= (active_type | EVENT_TIME);
-
-Or something along those lines; those expressions become a little
-unwieldy otherwise.
 
