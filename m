@@ -1,157 +1,199 @@
-Return-Path: <kvm+bounces-28618-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28619-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1323299A2E5
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:42:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D58099A2E7
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 13:43:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA7E0283A18
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:42:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F3501C20D9C
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2024 11:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E761F216A04;
-	Fri, 11 Oct 2024 11:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F97216A0E;
+	Fri, 11 Oct 2024 11:43:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LgQctK44"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/t+6sWF"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3231F9415;
-	Fri, 11 Oct 2024 11:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B5C1F9415
+	for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 11:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728646921; cv=none; b=dB9Ddk/COU5+cloecJLvbnuLpw/gbroD6DCx0zR29FufurVHWAVKvIn005nNohKA6vBUrhJ8/HL3d0Wk8+0SEB7DXwTncyaikdMXy5E1VoSZVphXG4SRDNBFJfl1jQW7FM/fMhykqkAnX2vOf2jVhRVwGgOhVqRGI2rCSHUhCCE=
+	t=1728646989; cv=none; b=KLpRCNUgnIeIFaoUDcbrqLphKCMeOD0JyeUuZzeXFs6iBgtitW+XIn+GhaxWMg7kpTEUUUXNUxgseED99AuZjnR6SAMBx3Ye6esPshA3Ddwk8x09jO1z2a7lgX8U3OCg/RJF7dAYWgDLgE9boczqMEAFx0Ko4Y4PoNt6r5wP2MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728646921; c=relaxed/simple;
-	bh=f5/gKUV+onCFlwc+BTuEU324blfwu0E0ySgrxtQzrnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EVook4D5It4jRNJ+WL2Dq1XanPVssBtVoc/MYPNbNtJfqzACWsI7DBJqpZ/tHeUue0q4GP5jpAtK/jVLQxH0KpUmm+XRkb0rH84Tb1yg2TvFNg9/WtiLSi6pfst8plwmnp+/cSAHeCGcpHyjiRTwkpmt25GcP9z/4k3rBUKfKiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LgQctK44; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=s0nie3up7O9BX6Pp/Xow1TsRav7XmKEP6A0jErw7/ro=; b=LgQctK44yeUsn1zwiKssE5kD4s
-	BiS8Pou2pBtwWhwceWltYXJGedWypGE7EtQ6TI0AW4TzE0pYQWvLXqIFwqErYV3Eg7GSwv+Y0Ne9W
-	5NsIaBmIYobZsDiZMf2jKuLCB4Ziwa4wOGsmQklh1Vc1HvKIzKqrLNM/1VQmC+tBNJYQvtGTSj+RH
-	cWPgst7qqmfARCSoHteMY1z7QyYSExQ/8YimlX7v8fo9EO4oDzPPZP8vRsccrRvIhOjJqFdHNuHDt
-	DMxUMaEcSM65lpUqQRLFV9ripUN8Ui2nmjcFmjEvjp1HeOhJIlQG7qf3aIZHeF/p7mVaYvX65t6Ip
-	QGTcaolQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1szE1m-0000000Ae0b-3VxG;
-	Fri, 11 Oct 2024 11:41:51 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id CC2B2300642; Fri, 11 Oct 2024 13:41:50 +0200 (CEST)
-Date: Fri, 11 Oct 2024 13:41:50 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-Cc: Mingwei Zhang <mizhang@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Xiong Zhang <xiong.y.zhang@intel.com>,
-	Kan Liang <kan.liang@intel.com>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>,
-	Manali Shukla <manali.shukla@amd.com>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Jim Mattson <jmattson@google.com>,
-	Stephane Eranian <eranian@google.com>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	gce-passthrou-pmu-dev@google.com,
-	Samantha Alt <samantha.alt@intel.com>,
-	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
-	Like Xu <like.xu.linux@gmail.com>,
-	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [RFC PATCH v3 09/58] perf: Add a EVENT_GUEST flag
-Message-ID: <20241011114150.GO14587@noisy.programming.kicks-ass.net>
-References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-10-mizhang@google.com>
- <095522b1-faad-4544-9282-4dda8be03695@linux.intel.com>
+	s=arc-20240116; t=1728646989; c=relaxed/simple;
+	bh=Sgjt5w22q19mO2o1fLrQoj/QK7UMPU3VPOx1oyeFQFU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XLhYp3nzUy9w+wYaYGY3oFutHY3s+BR3Y/Lh+KQamECL1I46Fw7Re7tC7QKAEDQHHNP0n6OlMoZRIWS2MMqLixw0QVkbrfDhWHICib3hRSyuNU0yUR+nouPPJEXfmzae721mB/+Gn9h/8tnd11wTrMNQrsGnxcE8QwwOQIF0KqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z/t+6sWF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728646986;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=HUQa3KwdmY0rbn3/U0pdq3jH3GxVh1Y2Q3vqDK3K2Pc=;
+	b=Z/t+6sWFlDE+1CcDl3EKsdO/PJdYHM+5ss3hJ4Jn7kdy4bkN99TdRlGTu5lPw4nFMOrpma
+	+a6HQ0XQp1O15t2Ng1of5ip+FLFiGnB4JIYMaH9WM8+e9D/t/qWRQ6Iu0gmy0USKJwt3lU
+	xKsrV3JOH0IoY28dpjR9v3DJUPsBgJI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-CmaTEkieNwaWJWqxkFLxig-1; Fri, 11 Oct 2024 07:43:05 -0400
+X-MC-Unique: CmaTEkieNwaWJWqxkFLxig-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43119e2a879so10126855e9.3
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 04:43:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728646984; x=1729251784;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HUQa3KwdmY0rbn3/U0pdq3jH3GxVh1Y2Q3vqDK3K2Pc=;
+        b=jqEeNoIpchuOK+LHbV9SEUFzOHD3YS06w7n7X6kY7yBOqI6jXbW2H1+A0yMB+GlYwU
+         59tlmRHLOEPi/Qj/oa1y22icHL/6eo0V4E0B2dcV1VG2kwNUVKztAY8tE/mYpFzN7ZZK
+         eWTbp2WMbTOzhVuWZZKugm1o2KBzvbHNvhy+NZBJcxJBOgAy1wrNxz7tdwupNHpW+Wrw
+         b/I1rAD13VtCQ2C3LRzWHNKyYGSzd29GrJ3HIKAWiUiRkVJYScoSJjMP06/IjZeoE8dW
+         tqCtxTR6WpRZIQaV557KBVXG6oOsIgPuB16AXNNcVWfqa1IfLGh4+updEfQSZBRSh3VO
+         EmvA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2VEiKjUvQ0niWLxLfGgkqXm4v0FpyLYTvZTyPcaE8gf9ZGzus4CFmxlT4OrZGr7Fa5Ik=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDKCK1xG8+u10dTiK9dDSRwr3xsByXs1rv5C/hFRcnUbb9PAx9
+	6t5drRMQC7bjd8q6+gnt8zR4qsR69G2GSX8uJbVD5TgKKtGRKxKgaFxJNtak7RsMu3ixb5s8JSN
+	k9D5WVw7I8sT3dZffTfUKRtSQEfM5p0+WBHvVOhCPu0xPYhjzdg==
+X-Received: by 2002:adf:a313:0:b0:37d:41cd:ba4e with SMTP id ffacd0b85a97d-37d5529cb36mr1540617f8f.48.1728646983887;
+        Fri, 11 Oct 2024 04:43:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH/F6JN+8iAXfL0V9ur+rvXeWlba4pACwoQU4P3Lokk5TwcPnGkxoE62KIlS+2BBSebuXYh+A==
+X-Received: by 2002:adf:a313:0:b0:37d:41cd:ba4e with SMTP id ffacd0b85a97d-37d5529cb36mr1540607f8f.48.1728646983480;
+        Fri, 11 Oct 2024 04:43:03 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c749:9100:c078:eec6:f2f4:dd3b? (p200300cbc7499100c078eec6f2f4dd3b.dip0.t-ipconnect.de. [2003:cb:c749:9100:c078:eec6:f2f4:dd3b])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b7ef213sm3727034f8f.99.2024.10.11.04.43.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Oct 2024 04:43:03 -0700 (PDT)
+Message-ID: <cced8b33-f1f6-4bea-ac7f-08be729bd710@redhat.com>
+Date: Fri, 11 Oct 2024 13:43:02 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <095522b1-faad-4544-9282-4dda8be03695@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/2] mm: don't install PMD mappings when THPs are
+ disabled by the hw/process/vma
+To: Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org
+Cc: linux-mm@kvack.org, kvm@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>, Hugh Dickins <hughd@google.com>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Ryan Roberts <ryan.roberts@arm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Kefeng Wang <wangkefeng.wang@huawei.com>
+References: <20241011102445.934409-1-david@redhat.com>
+ <33c40562-fd22-4517-9f56-1039289a55e5@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <33c40562-fd22-4517-9f56-1039289a55e5@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 21, 2024 at 01:27:17PM +0800, Mi, Dapeng wrote:
-> On 8/1/2024 12:58 PM, Mingwei Zhang wrote:
+On 11.10.24 13:39, Thomas Huth wrote:
+> On 11/10/2024 12.24, David Hildenbrand wrote:
+>> During testing, it was found that we can get PMD mappings in processes
+>> where THP (and more precisely, PMD mappings) are supposed to be disabled.
+>> While it works as expected for anon+shmem, the pagecache is the problematic
+>> bit.
+>>
+>> For s390 KVM this currently means that a VM backed by a file located on
+>> filesystem with large folio support can crash when KVM tries accessing
+>> the problematic page, because the readahead logic might decide to use
+>> a PMD-sized THP and faulting it into the page tables will install a
+>> PMD mapping, something that s390 KVM cannot tolerate.
+>>
+>> This might also be a problem with HW that does not support PMD mappings,
+>> but I did not try reproducing it.
+>>
+>> Fix it by respecting the ways to disable THPs when deciding whether we
+>> can install a PMD mapping. khugepaged should already be taking care of
+>> not collapsing if THPs are effectively disabled for the hw/process/vma.
+>>
+>> An earlier patch was tested by Thomas Huth, this one still needs to
+>> be retested; sending it out already.
+> 
+> I just finished testing your new version of these patches here, and I can
+> confirm that they are fixing the problem that I was facing, so:
+> 
+> Tested-by: Thomas Huth <thuth@redhat.com>
+> 
+> FWIW, the problem can be reproduced by running a KVM guest on a s390x host
+> like this:
+> 
+> qemu-system-s390x -accel kvm -nographic -m 4G -d guest_errors \
+>     -M s390-ccw-virtio,memory-backend=mem-machine_mem \
+>     -object
+> memory-backend-file,size=4294967296,prealloc=true,mem-path=$HOME/myfile,share=true,id=mem-machine_mem
+> 
+> Without the fix, the guest crashes immediatly before being able to execute
+> the first instruction. With the fix applied, you can still see the first
+> messages of the guest firmware, indicating that the guest started successfully.
+> 
+> Thank you very much for the fix, David!
 
-> > +static inline u64 __perf_event_time_ctx_now(struct perf_event *event,
-> > +					    struct perf_time_ctx *time,
-> > +					    struct perf_time_ctx *timeguest,
-> > +					    u64 now)
-> > +{
-> > +	/*
-> > +	 * The exclude_guest event time should be calculated from
-> > +	 * the ctx time -  the guest time.
-> > +	 * The ctx time is now + READ_ONCE(time->offset).
-> > +	 * The guest time is now + READ_ONCE(timeguest->offset).
-> > +	 * So the exclude_guest time is
-> > +	 * READ_ONCE(time->offset) - READ_ONCE(timeguest->offset).
-> > +	 */
-> > +	if (event->attr.exclude_guest && __this_cpu_read(perf_in_guest))
-> 
-> Hi Kan,
-> 
-> we see the following the warning when run perf record command after
-> enabling "CONFIG_DEBUG_PREEMPT" config item.
-> 
-> [  166.779208] BUG: using __this_cpu_read() in preemptible [00000000] code:
-> perf/9494
-> [  166.779234] caller is __this_cpu_preempt_check+0x13/0x20
-> [  166.779241] CPU: 56 UID: 0 PID: 9494 Comm: perf Not tainted
-> 6.11.0-rc4-perf-next-mediated-vpmu-v3+ #80
-> [  166.779245] Hardware name: Quanta Cloud Technology Inc. QuantaGrid
-> D54Q-2U/S6Q-MB-MPS, BIOS 3A11.uh 12/02/2022
-> [  166.779248] Call Trace:
-> [  166.779250]  <TASK>
-> [  166.779252]  dump_stack_lvl+0x76/0xa0
-> [  166.779260]  dump_stack+0x10/0x20
-> [  166.779267]  check_preemption_disabled+0xd7/0xf0
-> [  166.779273]  __this_cpu_preempt_check+0x13/0x20
-> [  166.779279]  calc_timer_values+0x193/0x200
-> [  166.779287]  perf_event_update_userpage+0x4b/0x170
-> [  166.779294]  ? ring_buffer_attach+0x14c/0x200
-> [  166.779301]  perf_mmap+0x533/0x5d0
-> [  166.779309]  mmap_region+0x243/0xaa0
-> [  166.779322]  do_mmap+0x35b/0x640
-> [  166.779333]  vm_mmap_pgoff+0xf0/0x1c0
-> [  166.779345]  ksys_mmap_pgoff+0x17a/0x250
-> [  166.779354]  __x64_sys_mmap+0x33/0x70
-> [  166.779362]  x64_sys_call+0x1fa4/0x25f0
-> [  166.779369]  do_syscall_64+0x70/0x130
-> 
-> The season that kernel complains this is __perf_event_time_ctx_now() calls
-> __this_cpu_read() in preemption enabled context.
-> 
-> To eliminate the warning, we may need to use this_cpu_read() to replace
-> __this_cpu_read().
-> 
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index ccd61fd06e8d..1eb628f8b3a0 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -1581,7 +1581,7 @@ static inline u64 __perf_event_time_ctx_now(struct
-> perf_event *event,
->          * So the exclude_guest time is
->          * READ_ONCE(time->offset) - READ_ONCE(timeguest->offset).
->          */
-> -       if (event->attr.exclude_guest && __this_cpu_read(perf_in_guest))
-> +       if (event->attr.exclude_guest && this_cpu_read(perf_in_guest))
->                 return READ_ONCE(time->offset) - READ_ONCE(timeguest->offset);
->         else
->                 return now + READ_ONCE(time->offset);
+Thanks for the quick test, Thomas!
 
-The saner fix is moving the preempt_disable() in
-perf_event_update_userpage() up a few lines, no?
+-- 
+Cheers,
+
+David / dhildenb
+
 
