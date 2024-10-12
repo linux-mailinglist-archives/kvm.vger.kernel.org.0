@@ -1,183 +1,513 @@
-Return-Path: <kvm+bounces-28676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C1799B201
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 10:10:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0052B99B269
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 11:03:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 992331F2222F
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 08:10:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FBDF1F22AF3
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 09:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E864145A18;
-	Sat, 12 Oct 2024 08:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QofDKWNq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60D4149C6F;
+	Sat, 12 Oct 2024 09:03:35 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1826F142900
-	for <kvm@vger.kernel.org>; Sat, 12 Oct 2024 08:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395E92C95;
+	Sat, 12 Oct 2024 09:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728720605; cv=none; b=cl4osO9gy5rC6Yx0LzJ1H5cl1ai1RKfXh961psZvfuKI769KHu8+7h7BpO/h1Ldm/C+3EQ6t4Hhww5BzDZ7Sr7AHk9Rg9MAUOmNnIOVM72+3Eh5pbn6ei46HiWwWzbHOs5WooFS89TZYiz8P5idv+oG9eZ/0l3TVG4MhLMuIhdc=
+	t=1728723815; cv=none; b=nbbI9WsVvd3dwk4TQSvXQq7OpZZmsCTFmmKiRBNS4UKEEKBJNKHIuEzWhy/MbwwrmEclPYKg16eYBVZuc20BSu+5HT8C4Wztdn4tIJXKD95jmZJepq6OxUQT/yfTezAj9gPlsXYCOmCNukaLbQ8qjyJbdLCC8gUDUbRVMaDBbfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728720605; c=relaxed/simple;
-	bh=IRFRClIYONgdiEOMKeSINr0GwJJTjPi8PBGY44mZ92Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ePHnUxIpskj8OcDXwc0eb+Cb6MlGgGjQaQWou10dPYzMAqe7B4z0VtZ6aoIjNIvdAk6mNv7vK8p67sediNGr1bZUjEz5Ya/ut+GS7NMSIpjaVamsTp6RR7R+hyhMxcC48RcASapbar+MF5Nn6DYrIvVhYKia+lFR+R/zjlLcjq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QofDKWNq; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728720604; x=1760256604;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=IRFRClIYONgdiEOMKeSINr0GwJJTjPi8PBGY44mZ92Y=;
-  b=QofDKWNqRT3keB8aXlE7xs6PM4gxwACA2/5OFnevTfWwZNOLtBI96fKM
-   WdQSZqq5lmyCdSRK7ISAS0PJWbPeUvjccoDY1jtas17n/Kq3+XMROxc56
-   pCNY5BUlPmtg0qZe7b86iZ84ppojEeQVqRsZneGCi3FgZM+WN97HIIV1D
-   +78tf4ED0geTRQwd6+rGYb2xgLoWJRFH2EZJLqBDhP8xbd9W72Kcqh1ns
-   VBQPMam/LxRq4u4BXbW2076SbvOSKf8RV9JlgGu9VCmuk2KyWqg1N0baZ
-   8qhCUFiqK654UQXudsAQRqq8AEpeg9TZvusXJRu7LnFojLoR79R5qdfBJ
-   w==;
-X-CSE-ConnectionGUID: e+u5I1m7Rgmd7P48ctJztQ==
-X-CSE-MsgGUID: 0RngIK3bR5Glb28aGQeKSg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31001632"
-X-IronPort-AV: E=Sophos;i="6.11,198,1725346800"; 
-   d="scan'208";a="31001632"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2024 01:10:04 -0700
-X-CSE-ConnectionGUID: VZElFrpkQ8irvAlqFCqruw==
-X-CSE-MsgGUID: sUd1gg0WSpenQmblxe0jBw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,198,1725346800"; 
-   d="scan'208";a="81671048"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 12 Oct 2024 01:09:57 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1szXCE-000DBn-38;
-	Sat, 12 Oct 2024 08:09:54 +0000
-Date: Sat, 12 Oct 2024 16:09:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Robert Hu <robert.hu@intel.com>,
-	Farrah Chen <farrah.chen@intel.com>,
-	Danmei Wei <danmei.wei@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Kai Huang <kai.huang@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: [kvm:kvm-coco-queue 62/109] arch/x86/kvm/mmu/tdp_mmu.c:474:14:
- sparse: sparse: incorrect type in argument 1 (different address spaces)
-Message-ID: <202410121644.Eq7zRGPO-lkp@intel.com>
+	s=arc-20240116; t=1728723815; c=relaxed/simple;
+	bh=Yz2I6gqUBb2BaQOcUVdyzHjNz4evPu6hollR28PowmY=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=hrwY0R1KrpBJ4a3nRxI+zxeuHPpT7Ubl7cf/lBtNfWgystBYqePh1vzAfW0BTOHQaf5UJqHeFcU8XauMGtAzdV3kX+HV03TXCajUgRCKJviSFp6lLPepaOCnCKiNdnBJB0gjhJRkCqlUjMyfwTK2oyUEsdQ0eV0BeaFA5ft4fLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XQctJ5QtYzpWlf;
+	Sat, 12 Oct 2024 17:01:28 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
+	by mail.maildlp.com (Postfix) with ESMTPS id E8035180087;
+	Sat, 12 Oct 2024 17:03:27 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sat, 12 Oct 2024 17:03:27 +0800
+Subject: Re: [PATCH v9 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
+ migration driver
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
+References: <20240913095502.22940-1-liulongfang@huawei.com>
+ <20240913095502.22940-4-liulongfang@huawei.com>
+ <25ff48eaa1194484b5b4ef016d01191c@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <45134ad2-45b3-de1f-c1d5-d077ca0081c2@huawei.com>
+Date: Sat, 12 Oct 2024 17:03:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <25ff48eaa1194484b5b4ef016d01191c@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
-head:   d2c7662a6ea1c325a9ae878b3f1a265264bcd18b
-commit: b6bcd88ad43aebc2385c7ff418b0532e80e60e19 [62/109] KVM: x86/tdp_mmu: Propagate building mirror page tables
-config: x86_64-randconfig-121-20241011 (https://download.01.org/0day-ci/archive/20241012/202410121644.Eq7zRGPO-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241012/202410121644.Eq7zRGPO-lkp@intel.com/reproduce)
+On 2024/10/11 16:09, Shameerali Kolothum Thodi wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: liulongfang <liulongfang@huawei.com>
+>> Sent: Friday, September 13, 2024 10:55 AM
+>> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
+>> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>
+>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+>> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
+>> Subject: [PATCH v9 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
+>> migration driver
+>>
+>> On the debugfs framework of VFIO, if the CONFIG_VFIO_DEBUGFS macro is
+>> enabled, the debug function is registered for the live migration driver
+>> of the HiSilicon accelerator device.
+>>
+>> After registering the HiSilicon accelerator device on the debugfs
+>> framework of live migration of vfio, a directory file "hisi_acc"
+>> of debugfs is created, and then three debug function files are
+>> created in this directory:
+>>
+>>    vfio
+>>     |
+>>     +---<dev_name1>
+>>     |    +---migration
+>>     |        +--state
+>>     |        +--hisi_acc
+>>     |            +--dev_data
+>>     |            +--migf_data
+>>     |            +--cmd_state
+>>     |
+>>     +---<dev_name2>
+>>          +---migration
+>>              +--state
+>>              +--hisi_acc
+>>                  +--dev_data
+>>                  +--migf_data
+>>                  +--cmd_state
+>>
+>> dev_data file: read device data that needs to be migrated from the
+>> current device in real time
+>> migf_data file: read the migration data of the last live migration
+>> from the current driver.
+>> cmd_state: used to get the cmd channel state for the device.
+>>
+>> +----------------+        +--------------+       +---------------+
+>> | migration dev  |        |   src  dev   |       |   dst  dev    |
+>> +-------+--------+        +------+-------+       +-------+-------+
+>>         |                        |                       |
+>>         |                 +------v-------+       +-------v-------+
+>>         |                 |  saving_migf |       | resuming_migf |
+>>   read  |                 |     file     |       |     file      |
+>>         |                 +------+-------+       +-------+-------+
+>>         |                        |          copy         |
+>>         |                        +------------+----------+
+>>         |                                     |
+>> +-------v--------+                    +-------v--------+
+>> |   data buffer  |                    |   debug_migf   |
+>> +-------+--------+                    +-------+--------+
+>>         |                                     |
+>>    cat  |                                 cat |
+>> +-------v--------+                    +-------v--------+
+>> |   dev_data     |                    |   migf_data    |
+>> +----------------+                    +----------------+
+>>
+>> When accessing debugfs, user can obtain the most recent status data
+>> of the device through the "dev_data" file. It can read recent
+>> complete status data of the device. If the current device is being
+>> migrated, it will wait for it to complete.
+>> The data for the last completed migration function will be stored
+>> in debug_migf. Users can read it via "migf_data".
+>>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> ---
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 204 ++++++++++++++++++
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
+>>  2 files changed, 211 insertions(+)
+>>
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> index a8c53952d82e..da9f5b9e6c5b 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> @@ -627,15 +627,30 @@ static void hisi_acc_vf_disable_fd(struct
+>> hisi_acc_vf_migration_file *migf)
+>>  	mutex_unlock(&migf->lock);
+>>  }
+>>
+>> +static void hisi_acc_debug_migf_copy(struct hisi_acc_vf_core_device
+>> *hisi_acc_vdev,
+>> +	struct hisi_acc_vf_migration_file *src_migf)
+>> +{
+>> +	struct hisi_acc_vf_migration_file *dst_migf = hisi_acc_vdev-
+>>> debug_migf;
+>> +
+>> +	if (!dst_migf)
+>> +		return;
+>> +
+>> +	dst_migf->total_length = src_migf->total_length;
+>> +	memcpy(&dst_migf->vf_data, &src_migf->vf_data,
+>> +		sizeof(struct acc_vf_data));
+>> +}
+>> +
+>>  static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device
+>> *hisi_acc_vdev)
+>>  {
+>>  	if (hisi_acc_vdev->resuming_migf) {
+>> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev-
+>>> resuming_migf);
+>>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->resuming_migf);
+>>  		fput(hisi_acc_vdev->resuming_migf->filp);
+>>  		hisi_acc_vdev->resuming_migf = NULL;
+>>  	}
+>>
+>>  	if (hisi_acc_vdev->saving_migf) {
+>> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev-
+>>> saving_migf);
+>>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->saving_migf);
+>>  		fput(hisi_acc_vdev->saving_migf->filp);
+>>  		hisi_acc_vdev->saving_migf = NULL;
+>> @@ -1294,6 +1309,181 @@ static long hisi_acc_vfio_pci_ioctl(struct
+>> vfio_device *core_vdev, unsigned int
+>>  	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+>>  }
+>>
+>> +static int hisi_acc_vf_debug_check(struct seq_file *seq, struct vfio_device
+>> *vdev)
+>> +{
+>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+>> hisi_acc_get_vf_dev(vdev);
+>> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>> +	int ret;
+>> +
+>> +	lockdep_assert_held(&hisi_acc_vdev->open_mutex);
+>> +	/*
+>> +	 * When the device is not opened, the io_base is not mapped.
+>> +	 * The driver cannot perform device read and write operations.
+>> +	 */
+>> +	if (!hisi_acc_vdev->dev_opened) {
+>> +		seq_printf(seq, "device not opened!\n");
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	ret = qm_wait_dev_not_ready(vf_qm);
+>> +	if (ret) {
+>> +		seq_printf(seq, "VF device not ready!\n");
+>> +		return -EBUSY;
+>> +	}
+> 
+> Still not very sure this vf_qm ready() check actually helps or not? What guarantee
+> is there that the qm will stay Ready after this call?  Any read/write afterwards
+> will eventually fail if it is not ready  later for some reason, right? 
+> Perhaps helps in early detection and bails out.
+>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410121644.Eq7zRGPO-lkp@intel.com/
+The purpose here is to intercept invalid debugfs operations.
+When VF does not add a driver in Guest OS. The internal data reading and recovery
+operations of the live migration operation will be skipped.
+The data read is all empty data.
 
-sparse warnings: (new ones prefixed by >>)
->> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected void const volatile *v @@     got unsigned long long [noderef] [usertype] __rcu *__ai_ptr @@
-   arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse:     expected void const volatile *v
-   arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse:     got unsigned long long [noderef] [usertype] __rcu *__ai_ptr
->> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: cast removes address space '__rcu' of expression
->> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: cast removes address space '__rcu' of expression
->> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: cast removes address space '__rcu' of expression
->> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: cast removes address space '__rcu' of expression
->> arch/x86/kvm/mmu/tdp_mmu.c:754:29: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:754:29: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:754:29: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:1246:25: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:1246:25: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:1246:25: sparse:     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep
->> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: dereference of noderef expression
->> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: dereference of noderef expression
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
-   arch/x86/kvm/mmu/tdp_mmu.c: note: in included file (through include/linux/rbtree.h, include/linux/mm_types.h, include/linux/mmzone.h, ...):
-   include/linux/rcupdate.h:869:25: sparse: sparse: context imbalance in '__tdp_mmu_zap_root' - unexpected unlock
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:1536:33: sparse: sparse: context imbalance in 'tdp_mmu_split_huge_pages_root' - unexpected unlock
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
+>> +	return 0;
+>> +}
+>> +
+>> +static int hisi_acc_vf_debug_cmd(struct seq_file *seq, void *data)
+>> +{
+>> +	struct device *vf_dev = seq->private;
+>> +	struct vfio_pci_core_device *core_device =
+>> dev_get_drvdata(vf_dev);
+>> +	struct vfio_device *vdev = &core_device->vdev;
+>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+>> hisi_acc_get_vf_dev(vdev);
+>> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>> +	u64 value;
+>> +	int ret;
+>> +
+>> +	mutex_lock(&hisi_acc_vdev->open_mutex);
+>> +	ret = hisi_acc_vf_debug_check(seq, vdev);
+>> +	if (ret) {
+>> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
+>> +		return ret;
+>> +	}
+>> +
+>> +	value = readl(vf_qm->io_base + QM_MB_CMD_SEND_BASE);
+>> +	if (value == QM_MB_CMD_NOT_READY) {
+>> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
+>> +		seq_printf(seq, "mailbox cmd channel not ready!\n");
+>> +		return -EINVAL;
+>> +	}
+>> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>> +	seq_printf(seq, "mailbox cmd channel ready!\n");
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int hisi_acc_vf_dev_read(struct seq_file *seq, void *data)
+>> +{
+>> +	struct device *vf_dev = seq->private;
+>> +	struct vfio_pci_core_device *core_device =
+>> dev_get_drvdata(vf_dev);
+>> +	struct vfio_device *vdev = &core_device->vdev;
+>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+>> hisi_acc_get_vf_dev(vdev);
+>> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
+>> +	struct acc_vf_data *vf_data = NULL;
+>> +	int ret;
+>> +
+>> +	vf_data = kzalloc(sizeof(struct acc_vf_data), GFP_KERNEL);
+>> +	if (!vf_data)
+>> +		return -ENOMEM;\
+> 
+> You could move the allocation after the below checks and to just before
+> vf_qm_read_data().
+>
 
-vim +474 arch/x86/kvm/mmu/tdp_mmu.c
+OK.
 
-   455	
-   456	static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sptep,
-   457							 gfn_t gfn, u64 old_spte,
-   458							 u64 new_spte, int level)
-   459	{
-   460		bool was_present = is_shadow_present_pte(old_spte);
-   461		bool is_present = is_shadow_present_pte(new_spte);
-   462		bool is_leaf = is_present && is_last_spte(new_spte, level);
-   463		kvm_pfn_t new_pfn = spte_to_pfn(new_spte);
-   464		int ret = 0;
-   465	
-   466		KVM_BUG_ON(was_present, kvm);
-   467	
-   468		lockdep_assert_held(&kvm->mmu_lock);
-   469		/*
-   470		 * We need to lock out other updates to the SPTE until the external
-   471		 * page table has been modified. Use FROZEN_SPTE similar to
-   472		 * the zapping case.
-   473		 */
- > 474		if (!try_cmpxchg64(sptep, &old_spte, FROZEN_SPTE))
-   475			return -EBUSY;
-   476	
-   477		/*
-   478		 * Use different call to either set up middle level
-   479		 * external page table, or leaf.
-   480		 */
-   481		if (is_leaf) {
-   482			ret = static_call(kvm_x86_set_external_spte)(kvm, gfn, level, new_pfn);
-   483		} else {
-   484			void *external_spt = get_external_spt(gfn, new_spte, level);
-   485	
-   486			KVM_BUG_ON(!external_spt, kvm);
-   487			ret = static_call(kvm_x86_link_external_spt)(kvm, gfn, level, external_spt);
-   488		}
-   489		if (ret)
-   490			__kvm_tdp_mmu_write_spte(sptep, old_spte);
-   491		else
-   492			__kvm_tdp_mmu_write_spte(sptep, new_spte);
-   493		return ret;
-   494	}
-   495	
+>> +
+>> +	mutex_lock(&hisi_acc_vdev->open_mutex);
+>> +	ret = hisi_acc_vf_debug_check(seq, vdev);
+>> +	if (ret) {
+>> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
+>> +		goto migf_err;
+>> +	}
+>> +
+>> +	mutex_lock(&hisi_acc_vdev->state_mutex);
+>> +	vf_data->vf_qm_state = hisi_acc_vdev->vf_qm_state;
+>> +	ret = vf_qm_read_data(&hisi_acc_vdev->vf_qm, vf_data);
+>> +	if (ret) {
+>> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
+>> +		mutex_unlock(&hisi_acc_vdev->state_mutex);
+> 
+> I think it is better to unlock in the reverse order. Also probably you can move
+> the unlocks to a  goto area.
+>
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+My consideration is to release the mutex before outputting the log.
+it can be optimized.
+
+>> +		goto migf_err;
+>> +	}
+>> +
+>> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
+> 
+> Same as above.
+
+OK.
+
+> 
+>> +	seq_hex_dump(seq, "Dev Data:", DUMP_PREFIX_OFFSET, 16, 1,
+>> +			(unsigned char *)vf_data,
+>> +			vf_data_sz, false);
+>> +
+>> +	seq_printf(seq,
+>> +		 "acc device:\n"
+>> +		 "guest driver load: %u\n"
+>> +		 "data size: %lu\n",
+>> +		 hisi_acc_vdev->vf_qm_state,
+>> +		 sizeof(struct acc_vf_data));
+>> +
+>> +migf_err:
+>> +	kfree(vf_data);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static int hisi_acc_vf_migf_read(struct seq_file *seq, void *data)
+>> +{
+>> +	struct device *vf_dev = seq->private;
+>> +	struct vfio_pci_core_device *core_device =
+>> dev_get_drvdata(vf_dev);
+>> +	struct vfio_device *vdev = &core_device->vdev;
+>> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+>> hisi_acc_get_vf_dev(vdev);
+>> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
+>> +	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev-
+>>> debug_migf;
+>> +
+>> +	/* Check whether the live migration operation has been performed
+>> */
+>> +	if (debug_migf->total_length < QM_MATCH_SIZE) {
+>> +		seq_printf(seq, "device not migrated!\n");
+>> +		return -EAGAIN;
+>> +	}
+>> +
+>> +	seq_hex_dump(seq, "Mig Data:", DUMP_PREFIX_OFFSET, 16, 1,
+>> +			(unsigned char *)&debug_migf->vf_data,
+>> +			vf_data_sz, false);
+>> +
+>> +	seq_printf(seq,
+>> +		 "acc device:\n"
+>> +		 "guest driver load: %u\n"
+>> +		 "device opened: %d\n"
+>> +		 "migrate data length: %lu\n",
+>> +		 hisi_acc_vdev->vf_qm_state,
+>> +		 hisi_acc_vdev->dev_opened,
+>> +		 debug_migf->total_length);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static void hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device
+>> *hisi_acc_vdev)
+>> +{
+>> +	struct vfio_device *vdev = &hisi_acc_vdev->core_device.vdev;
+>> +	struct dentry *vfio_dev_migration = NULL;
+>> +	struct dentry *vfio_hisi_acc = NULL;
+>> +	struct device *dev = vdev->dev;
+>> +	void *migf = NULL;
+>> +
+>> +	if (!debugfs_initialized() ||
+>> +	    !IS_ENABLED(CONFIG_VFIO_DEBUGFS))
+>> +		return;
+>> +
+>> +	vfio_dev_migration = debugfs_lookup("migration", vdev-
+>>> debug_root);
+>> +	if (!vfio_dev_migration) {
+>> +		dev_err(dev, "failed to lookup migration debugfs file!\n");
+>> +		return;
+>> +	}
+>> +
+>> +	migf = kzalloc(sizeof(struct hisi_acc_vf_migration_file),
+>> GFP_KERNEL);
+>> +	if (!migf)
+>> +		return;
+>> +	hisi_acc_vdev->debug_migf = migf;
+>> +
+>> +	vfio_hisi_acc = debugfs_create_dir("hisi_acc", vfio_dev_migration);
+>> +	debugfs_create_devm_seqfile(dev, "dev_data", vfio_hisi_acc,
+>> +				  hisi_acc_vf_dev_read);
+>> +	debugfs_create_devm_seqfile(dev, "migf_data", vfio_hisi_acc,
+>> +				  hisi_acc_vf_migf_read);
+>> +	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
+>> +				  hisi_acc_vf_debug_cmd);
+>> +}
+>> +
+>> +static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device
+>> *hisi_acc_vdev)
+>> +{
+>> +	if (hisi_acc_vdev->debug_migf) {
+>> +		kfree(hisi_acc_vdev->debug_migf);
+>> +		hisi_acc_vdev->debug_migf = NULL;
+>> +	}
+>> +}
+>> +
+>>  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+>>  {
+>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+>> hisi_acc_get_vf_dev(core_vdev);
+>> @@ -1305,12 +1495,16 @@ static int hisi_acc_vfio_pci_open_device(struct
+>> vfio_device *core_vdev)
+>>  		return ret;
+>>
+>>  	if (core_vdev->mig_ops) {
+>> +		mutex_lock(&hisi_acc_vdev->open_mutex);
+>>  		ret = hisi_acc_vf_qm_init(hisi_acc_vdev);
+>>  		if (ret) {
+>> +			mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>  			vfio_pci_core_disable(vdev);
+>>  			return ret;
+>>  		}
+>>  		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
+>> +		hisi_acc_vdev->dev_opened = true;
+>> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>  	}
+>>
+>>  	vfio_pci_core_finish_enable(vdev);
+>> @@ -1322,7 +1516,10 @@ static void hisi_acc_vfio_pci_close_device(struct
+>> vfio_device *core_vdev)
+>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+>> hisi_acc_get_vf_dev(core_vdev);
+>>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>
+>> +	mutex_lock(&hisi_acc_vdev->open_mutex);
+>> +	hisi_acc_vdev->dev_opened = false;
+>>  	iounmap(vf_qm->io_base);
+>> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
+>>  	vfio_pci_core_close_device(core_vdev);
+>>  }
+>>
+>> @@ -1342,6 +1539,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct
+>> vfio_device *core_vdev)
+>>  	hisi_acc_vdev->pf_qm = pf_qm;
+>>  	hisi_acc_vdev->vf_dev = pdev;
+>>  	mutex_init(&hisi_acc_vdev->state_mutex);
+>> +	mutex_init(&hisi_acc_vdev->open_mutex);
+>>
+>>  	core_vdev->migration_flags = VFIO_MIGRATION_STOP_COPY |
+>> VFIO_MIGRATION_PRE_COPY;
+>>  	core_vdev->mig_ops = &hisi_acc_vfio_pci_migrn_state_ops;
+>> @@ -1413,6 +1611,9 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev
+>> *pdev, const struct pci_device
+>>  	ret = vfio_pci_core_register_device(&hisi_acc_vdev->core_device);
+>>  	if (ret)
+>>  		goto out_put_vdev;
+>> +
+>> +	if (ops == &hisi_acc_vfio_pci_migrn_ops)
+>> +		hisi_acc_vfio_debug_init(hisi_acc_vdev);
+> 
+> I think there was a comment earlier on this. Still not sure why it is not possible to
+> move ops == &hisi_acc_vfio_pci_migrn_ops check inside hisi_acc_vfio_debug_init().
+>
+
+The variable hisi_acc_vfio_pci_migrn_ops is declared after the function hisi_acc_vfio_debug_init.
+If placed inside the function, a compilation error will occur.
+
+>>  	return 0;
+>>
+>>  out_put_vdev:
+>> @@ -1423,8 +1624,11 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev
+>> *pdev, const struct pci_device
+>>  static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev)
+>>  {
+>>  	struct hisi_acc_vf_core_device *hisi_acc_vdev =
+>> hisi_acc_drvdata(pdev);
+>> +	struct vfio_device *vdev = &hisi_acc_vdev->core_device.vdev;
+>>
+>>  	vfio_pci_core_unregister_device(&hisi_acc_vdev->core_device);
+>> +	if (vdev->ops == &hisi_acc_vfio_pci_migrn_ops)
+>> +		hisi_acc_vf_debugfs_exit(hisi_acc_vdev);
+> 
+> Do we need to do vdev->ops == &hisi_acc_vfio_pci_migrn_ops check here?
+> 
+> Since we are checking
+>    hisi_acc_vdev->debug_migf inside the exit function, which I think is only
+> set when the ops == migrn_ops. Right?
+>
+
+"vdev->ops == &hisi_acc_vfio_pci_migrn_ops" is added here to maintain symmetry
+with the code processing in the probe.
+
+I added it also because of another reviewer¡¯s suggestion.
+
+Thanks.
+Longfang.
+
+> Thanks,
+> Shameer
+> 
+> .
+> 
 
