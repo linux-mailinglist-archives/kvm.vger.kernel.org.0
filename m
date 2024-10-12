@@ -1,199 +1,183 @@
-Return-Path: <kvm+bounces-28675-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28676-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0790599B1DE
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 09:56:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C1799B201
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 10:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6DCA284C9B
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 07:56:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 992331F2222F
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 08:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DD71487CE;
-	Sat, 12 Oct 2024 07:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E864145A18;
+	Sat, 12 Oct 2024 08:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ScQ4aNqo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QofDKWNq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B0B142900;
-	Sat, 12 Oct 2024 07:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1826F142900
+	for <kvm@vger.kernel.org>; Sat, 12 Oct 2024 08:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728719775; cv=none; b=NeJcv76jsdRY3nPrsZOPAZZRiUGM56aohfzwSczZ5ikvBTvl7QqZP2NX0QI7QMlA2BZxQq98h8wM2f/3pmkvmGWQoQD1fXZDw/HNZyeXwXbAnK5LPEeJNfgU74dUKbnBMIkCGpxJQH9iBPtLtGdsSD7SPK/xqwgYC7qarlsURDk=
+	t=1728720605; cv=none; b=cl4osO9gy5rC6Yx0LzJ1H5cl1ai1RKfXh961psZvfuKI769KHu8+7h7BpO/h1Ldm/C+3EQ6t4Hhww5BzDZ7Sr7AHk9Rg9MAUOmNnIOVM72+3Eh5pbn6ei46HiWwWzbHOs5WooFS89TZYiz8P5idv+oG9eZ/0l3TVG4MhLMuIhdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728719775; c=relaxed/simple;
-	bh=rRvsmBeBTUCzqKK3se1PbVcX4TxQnKcMtvBQ6wWmjms=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JbHBI4H+4mO06l0Nq4cs6ALhKB96U3oh5Heo3qUegDg63JCyqWJpL6pX9FSdNX1En9aaEBwN4TyRMcJcckirHSWaSKuNnYPV40I9vgQZKdeAAxKzfvBbDeNjojvYj17Mt94XfC90BCkI4+hvI8HnhimUkmqCIh5gyNLlroF5aYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ScQ4aNqo; arc=none smtp.client-ip=192.198.163.10
+	s=arc-20240116; t=1728720605; c=relaxed/simple;
+	bh=IRFRClIYONgdiEOMKeSINr0GwJJTjPi8PBGY44mZ92Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ePHnUxIpskj8OcDXwc0eb+Cb6MlGgGjQaQWou10dPYzMAqe7B4z0VtZ6aoIjNIvdAk6mNv7vK8p67sediNGr1bZUjEz5Ya/ut+GS7NMSIpjaVamsTp6RR7R+hyhMxcC48RcASapbar+MF5Nn6DYrIvVhYKia+lFR+R/zjlLcjq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QofDKWNq; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728719773; x=1760255773;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rRvsmBeBTUCzqKK3se1PbVcX4TxQnKcMtvBQ6wWmjms=;
-  b=ScQ4aNqoBBdBYk3MQvVbUpJ8ZcsMdChPnrQMAFydvYFbiEkn0LJ6Vlpe
-   mlyMJ5owtsrW0KbPoTxl3vKnAKxpBcbz99fKbgB+LSE8MmfEabeXp3AgO
-   tDXsGxbjD4zC3/suXlOnk3XXLaX7KaP/sYKqNp3wwi+m5sd6Zzvmrz5V4
-   KJs/xzVpWZ79kSebzeBpXeE3UDm2EJ1TLAaE6FP7hGfeUjyz+qX3doQWf
-   tOAxumg0sryidLzQywBlXJXQME4yrYq7PtN1TVNE3DEE9/X0EddOrbNUc
-   aoOpoM3HdJC2Pgbww8cf8vhHxOiRCFyx9OgYjw0V3FiwR82CW+YBl8G/O
-   g==;
-X-CSE-ConnectionGUID: Diol7w/lSC2s92XypXbR8Q==
-X-CSE-MsgGUID: A8AKnSTjSrW1hntbP3h1NA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="39510294"
+  t=1728720604; x=1760256604;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=IRFRClIYONgdiEOMKeSINr0GwJJTjPi8PBGY44mZ92Y=;
+  b=QofDKWNqRT3keB8aXlE7xs6PM4gxwACA2/5OFnevTfWwZNOLtBI96fKM
+   WdQSZqq5lmyCdSRK7ISAS0PJWbPeUvjccoDY1jtas17n/Kq3+XMROxc56
+   pCNY5BUlPmtg0qZe7b86iZ84ppojEeQVqRsZneGCi3FgZM+WN97HIIV1D
+   +78tf4ED0geTRQwd6+rGYb2xgLoWJRFH2EZJLqBDhP8xbd9W72Kcqh1ns
+   VBQPMam/LxRq4u4BXbW2076SbvOSKf8RV9JlgGu9VCmuk2KyWqg1N0baZ
+   8qhCUFiqK654UQXudsAQRqq8AEpeg9TZvusXJRu7LnFojLoR79R5qdfBJ
+   w==;
+X-CSE-ConnectionGUID: e+u5I1m7Rgmd7P48ctJztQ==
+X-CSE-MsgGUID: 0RngIK3bR5Glb28aGQeKSg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31001632"
 X-IronPort-AV: E=Sophos;i="6.11,198,1725346800"; 
-   d="scan'208";a="39510294"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2024 00:56:10 -0700
-X-CSE-ConnectionGUID: gbdsctEqRnuENEGHq2f8sQ==
-X-CSE-MsgGUID: BwaPHN5ET2qkteYlClU8uw==
+   d="scan'208";a="31001632"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2024 01:10:04 -0700
+X-CSE-ConnectionGUID: VZElFrpkQ8irvAlqFCqruw==
+X-CSE-MsgGUID: sUd1gg0WSpenQmblxe0jBw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,198,1725346800"; 
-   d="scan'208";a="82116742"
-Received: from ls.amr.corp.intel.com (HELO localhost) ([172.25.112.54])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2024 00:56:09 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: kvm@vger.kernel.org,
-	pbonzini@redhat.com
-Cc: Sean Christopherson <seanjc@google.com>,
-	chao.gao@intel.com,
-	isaku.yamahata@intel.com,
-	rick.p.edgecombe@intel.com,
-	yan.y.zhao@intel.com,
-	linux-kernel@vger.kernel.org,
-	isaku.yamahata@gmail.com,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH 2/2] KVM: x86: Don't allow tsc_offset, tsc_scaling_ratio to change
-Date: Sat, 12 Oct 2024 00:55:56 -0700
-Message-ID: <3a7444aec08042fe205666864b6858910e86aa98.1728719037.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <cover.1728719037.git.isaku.yamahata@intel.com>
-References: <cover.1728719037.git.isaku.yamahata@intel.com>
+   d="scan'208";a="81671048"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 12 Oct 2024 01:09:57 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1szXCE-000DBn-38;
+	Sat, 12 Oct 2024 08:09:54 +0000
+Date: Sat, 12 Oct 2024 16:09:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Robert Hu <robert.hu@intel.com>,
+	Farrah Chen <farrah.chen@intel.com>,
+	Danmei Wei <danmei.wei@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Kai Huang <kai.huang@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>
+Subject: [kvm:kvm-coco-queue 62/109] arch/x86/kvm/mmu/tdp_mmu.c:474:14:
+ sparse: sparse: incorrect type in argument 1 (different address spaces)
+Message-ID: <202410121644.Eq7zRGPO-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Add guest_tsc_protected member to struct kvm_arch_vcpu and prohibit
-changing TSC offset/multiplier when guest_tsc_protected is true.
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
+head:   d2c7662a6ea1c325a9ae878b3f1a265264bcd18b
+commit: b6bcd88ad43aebc2385c7ff418b0532e80e60e19 [62/109] KVM: x86/tdp_mmu: Propagate building mirror page tables
+config: x86_64-randconfig-121-20241011 (https://download.01.org/0day-ci/archive/20241012/202410121644.Eq7zRGPO-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241012/202410121644.Eq7zRGPO-lkp@intel.com/reproduce)
 
-Background
-X86 confidential computing technology defines protected guest TSC so that
-the VMM can't change the TSC offset/multiplier once vCPU is initialized.
-The SEV-SNP defines Secure TSC as optional.  TDX mandates it.  The TDX
-module determines the TSC offset/multiplier.  The VMM has to retrieve them.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410121644.Eq7zRGPO-lkp@intel.com/
 
-On the other hand, the x86 KVM common logic tries to guess or adjust TSC
-offset/multiplier for better guest TSC and TSC interrupt latency at KVM
-vCPU creation (kvm_arch_vcpu_postcreate()), vCPU migration over pCPU
-(kvm_arch_vcpu_load()), vCPU TSC device attributes
-(kvm_arch_tsc_set_attr()) and guest/host writing to TSC or TSC adjust MSR
-(kvm_set_msr_common()).
+sparse warnings: (new ones prefixed by >>)
+>> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected void const volatile *v @@     got unsigned long long [noderef] [usertype] __rcu *__ai_ptr @@
+   arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse:     expected void const volatile *v
+   arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse:     got unsigned long long [noderef] [usertype] __rcu *__ai_ptr
+>> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: cast removes address space '__rcu' of expression
+>> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: cast removes address space '__rcu' of expression
+>> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: cast removes address space '__rcu' of expression
+>> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: cast removes address space '__rcu' of expression
+>> arch/x86/kvm/mmu/tdp_mmu.c:754:29: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
+   arch/x86/kvm/mmu/tdp_mmu.c:754:29: sparse:     expected unsigned long long [usertype] *sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:754:29: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:1246:25: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep @@
+   arch/x86/kvm/mmu/tdp_mmu.c:1246:25: sparse:     expected unsigned long long [usertype] *sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:1246:25: sparse:     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep
+>> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: dereference of noderef expression
+>> arch/x86/kvm/mmu/tdp_mmu.c:474:14: sparse: sparse: dereference of noderef expression
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
+   arch/x86/kvm/mmu/tdp_mmu.c: note: in included file (through include/linux/rbtree.h, include/linux/mm_types.h, include/linux/mmzone.h, ...):
+   include/linux/rcupdate.h:869:25: sparse: sparse: context imbalance in '__tdp_mmu_zap_root' - unexpected unlock
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:1536:33: sparse: sparse: context imbalance in 'tdp_mmu_split_huge_pages_root' - unexpected unlock
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep @@
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     expected unsigned long long [usertype] *sptep
+   arch/x86/kvm/mmu/tdp_mmu.c:618:33: sparse:     got unsigned long long [noderef] [usertype] __rcu *[usertype] sptep
 
-Problem
-The current x86 KVM implementation conflicts with protected TSC because the
-VMM can't change the TSC offset/multiplier.  Disable or ignore the KVM
-logic to change/adjust the TSC offset/multiplier somehow.
+vim +474 arch/x86/kvm/mmu/tdp_mmu.c
 
-Because KVM emulates the TSC timer or the TSC deadline timer with the TSC
-offset/multiplier, the TSC timer interrupts is injected to the guest at the
-wrong time if the KVM TSC offset is different from what the TDX module
-determined.
+   455	
+   456	static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sptep,
+   457							 gfn_t gfn, u64 old_spte,
+   458							 u64 new_spte, int level)
+   459	{
+   460		bool was_present = is_shadow_present_pte(old_spte);
+   461		bool is_present = is_shadow_present_pte(new_spte);
+   462		bool is_leaf = is_present && is_last_spte(new_spte, level);
+   463		kvm_pfn_t new_pfn = spte_to_pfn(new_spte);
+   464		int ret = 0;
+   465	
+   466		KVM_BUG_ON(was_present, kvm);
+   467	
+   468		lockdep_assert_held(&kvm->mmu_lock);
+   469		/*
+   470		 * We need to lock out other updates to the SPTE until the external
+   471		 * page table has been modified. Use FROZEN_SPTE similar to
+   472		 * the zapping case.
+   473		 */
+ > 474		if (!try_cmpxchg64(sptep, &old_spte, FROZEN_SPTE))
+   475			return -EBUSY;
+   476	
+   477		/*
+   478		 * Use different call to either set up middle level
+   479		 * external page table, or leaf.
+   480		 */
+   481		if (is_leaf) {
+   482			ret = static_call(kvm_x86_set_external_spte)(kvm, gfn, level, new_pfn);
+   483		} else {
+   484			void *external_spt = get_external_spt(gfn, new_spte, level);
+   485	
+   486			KVM_BUG_ON(!external_spt, kvm);
+   487			ret = static_call(kvm_x86_link_external_spt)(kvm, gfn, level, external_spt);
+   488		}
+   489		if (ret)
+   490			__kvm_tdp_mmu_write_spte(sptep, old_spte);
+   491		else
+   492			__kvm_tdp_mmu_write_spte(sptep, new_spte);
+   493		return ret;
+   494	}
+   495	
 
-Originally this issue was found by cyclic test of rt-test [1] as the
-latency in TDX case is worse than VMX value + TDX SEAMCALL overhead.  It
-turned out that the KVM TSC offset is different from what the TDX module
-determines.
-
-Solution
-The solution is to keep the KVM TSC offset/multiplier the same as the value
-of the TDX module somehow.  Possible solutions are as follows.
-- Skip the logic
-  Ignore (or don't call related functions) the request to change the TSC
-  offset/multiplier.
-  Pros
-  - Logically clean.  This is similar to the guest_protected case.
-  Cons
-  - Needs to identify the call sites.
-
-- Revert the change at the hooks after TSC adjustment
-  x86 KVM defines the vendor hooks when TSC offset/multiplier are
-  changed.  The callback can revert the change.
-  Pros
-  - We don't need to care about the logic to change the TSC
-    offset/multiplier.
-  Cons:
-  - Hacky to revert the KVM x86 common code logic.
-
-Choose the first one.  With this patch series, SEV-SNP secure TSC can be
-supported.
-
-[1] https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
-
-Reported-by: Marcelo Tosatti <mtosatti@redhat.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/x86.c              | 9 ++++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 61b7e9fe5e57..112b8a4f1860 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1036,6 +1036,7 @@ struct kvm_vcpu_arch {
- 
- 	/* Protected Guests */
- 	bool guest_state_protected;
-+	bool guest_tsc_protected;
- 
- 	/*
- 	 * Set when PDPTS were loaded directly by the userspace without
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 65d871bb5b35..a6cf4422df28 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2587,6 +2587,9 @@ EXPORT_SYMBOL_GPL(kvm_calc_nested_tsc_multiplier);
- 
- static void kvm_vcpu_write_tsc_offset(struct kvm_vcpu *vcpu, u64 l1_offset)
- {
-+	if (vcpu->arch.guest_tsc_protected)
-+		return;
-+
- 	trace_kvm_write_tsc_offset(vcpu->vcpu_id,
- 				   vcpu->arch.l1_tsc_offset,
- 				   l1_offset);
-@@ -2650,6 +2653,9 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
- 
- 	lockdep_assert_held(&kvm->arch.tsc_write_lock);
- 
-+	if (vcpu->arch.guest_tsc_protected)
-+		return;
-+
- 	if (user_set_tsc)
- 		vcpu->kvm->arch.user_set_tsc = true;
- 
-@@ -5028,7 +5034,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 			u64 offset = kvm_compute_l1_tsc_offset(vcpu,
- 						vcpu->arch.last_guest_tsc);
- 			kvm_vcpu_write_tsc_offset(vcpu, offset);
--			vcpu->arch.tsc_catchup = 1;
-+			if (!vcpu->arch.guest_tsc_protected)
-+				vcpu->arch.tsc_catchup = 1;
- 		}
- 
- 		if (kvm_lapic_hv_timer_in_use(vcpu))
 -- 
-2.45.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
