@@ -1,513 +1,297 @@
-Return-Path: <kvm+bounces-28677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0052B99B269
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 11:03:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C522099B28C
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 11:28:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FBDF1F22AF3
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 09:03:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FEA1283438
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 09:28:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60D4149C6F;
-	Sat, 12 Oct 2024 09:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A46B14EC4A;
+	Sat, 12 Oct 2024 09:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZuK49Srv"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395E92C95;
-	Sat, 12 Oct 2024 09:03:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77185BA49;
+	Sat, 12 Oct 2024 09:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728723815; cv=none; b=nbbI9WsVvd3dwk4TQSvXQq7OpZZmsCTFmmKiRBNS4UKEEKBJNKHIuEzWhy/MbwwrmEclPYKg16eYBVZuc20BSu+5HT8C4Wztdn4tIJXKD95jmZJepq6OxUQT/yfTezAj9gPlsXYCOmCNukaLbQ8qjyJbdLCC8gUDUbRVMaDBbfc=
+	t=1728725319; cv=none; b=em+YuvbuBDPKw0UCyoLLpgEakAM8sgEZ1WSwiQBHTmjULsV6QvGZNWWMHBXWkesTP4JjOA4PatQsWZvlTSoqveATo5S+Qcx3BY81fORCdwxB/c7oRneK+ufi3lGgTEZJCJGE9wR1CCFxmsQuKbGhfnzToSzHgASn2REvTTaq8L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728723815; c=relaxed/simple;
-	bh=Yz2I6gqUBb2BaQOcUVdyzHjNz4evPu6hollR28PowmY=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=hrwY0R1KrpBJ4a3nRxI+zxeuHPpT7Ubl7cf/lBtNfWgystBYqePh1vzAfW0BTOHQaf5UJqHeFcU8XauMGtAzdV3kX+HV03TXCajUgRCKJviSFp6lLPepaOCnCKiNdnBJB0gjhJRkCqlUjMyfwTK2oyUEsdQ0eV0BeaFA5ft4fLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XQctJ5QtYzpWlf;
-	Sat, 12 Oct 2024 17:01:28 +0800 (CST)
-Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
-	by mail.maildlp.com (Postfix) with ESMTPS id E8035180087;
-	Sat, 12 Oct 2024 17:03:27 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sat, 12 Oct 2024 17:03:27 +0800
-Subject: Re: [PATCH v9 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
- migration driver
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-References: <20240913095502.22940-1-liulongfang@huawei.com>
- <20240913095502.22940-4-liulongfang@huawei.com>
- <25ff48eaa1194484b5b4ef016d01191c@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <45134ad2-45b3-de1f-c1d5-d077ca0081c2@huawei.com>
-Date: Sat, 12 Oct 2024 17:03:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1728725319; c=relaxed/simple;
+	bh=gu+10TgZP6EEMxKo0OdRQMUzOS7V4fol2JyZeYoQQSE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=nrOMxQ37xTcff/1tSJAMuHDvqcvTNXb6Adz4ltnJOI26xpMfl+UaSZYZD5VEvDm0KJ3MxvsaC96HSFzL2oXUZuj7F/Sfgl3Ng2GG3j+ZH+hyqXkfdM4TbIwUl2Xbd8WhHJpU4219RilyIupWDnihA8602ocXq+R8Ai9gWEouuXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZuK49Srv; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=0RHTVDLBe/9vr3Jgwfqh6xTBXyEsps5CwkahdCHTfoU=; b=ZuK49SrvhoT41xRV+baAURPiOY
+	fCOo4FEFHP03N7vKkyZfrb17KZ/SYALcbjYizcfcd3Z1WufY6CxgXj2A0gIU+jsp+beQHFcf80cIH
+	36yWMnRDeB4fRo8gqa92F5pX1e3Z5Kw5s7IPFAu30hCPrvuucdVGBPL9khTxkHSvLHko58jY6MABq
+	glQV3xjD/gaZsOxgwtVKa3vUkzKTNhYbmKGtgbAzbcvvA4QcU5htVpQMkesUqWDOw3nZW5151CciI
+	lZ5VFGPL/LVYFkNu5X7wj0lfh23ppehcVW1oqBEJw0y9SIJ6sIC6Bv9XRTHbrB6E6+XAAEaOdtREf
+	ufbJH6Vw==;
+Received: from [2001:8b0:10b:5:c41d:c7f6:3c6e:e748] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1szYPz-0000000DDp7-27zZ;
+	Sat, 12 Oct 2024 09:28:12 +0000
+Message-ID: <408b137dbf60ff4d189cbd98b7cf8cd833579f61.camel@infradead.org>
+Subject: Re: [PATCH v5 4/5] KVM: selftests: Add test for PSCI SYSTEM_OFF2
+From: David Woodhouse <dwmw2@infradead.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>,  Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Lorenzo Pieralisi
+ <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Pavel
+ Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>, Shuah Khan
+ <shuah@kernel.org>,  kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev,  linux-pm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Francesco Lavra
+ <francescolavra.fl@gmail.com>, Miguel Luis <miguel.luis@oracle.com>
+Date: Sat, 12 Oct 2024 10:28:10 +0100
+In-Reply-To: <ZvwWM7rQd075o6nb@linux.dev>
+References: <20240926184546.833516-1-dwmw2@infradead.org>
+	 <20240926184546.833516-5-dwmw2@infradead.org> <ZvwWM7rQd075o6nb@linux.dev>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-XrfaaV7BF0HTm3ihQLzH"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <25ff48eaa1194484b5b4ef016d01191c@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600005.china.huawei.com (7.193.23.191)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On 2024/10/11 16:09, Shameerali Kolothum Thodi wrote:
-> 
-> 
->> -----Original Message-----
->> From: liulongfang <liulongfang@huawei.com>
->> Sent: Friday, September 13, 2024 10:55 AM
->> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
->> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
->> <jonathan.cameron@huawei.com>
->> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
->> Subject: [PATCH v9 3/4] hisi_acc_vfio_pci: register debugfs for hisilicon
->> migration driver
->>
->> On the debugfs framework of VFIO, if the CONFIG_VFIO_DEBUGFS macro is
->> enabled, the debug function is registered for the live migration driver
->> of the HiSilicon accelerator device.
->>
->> After registering the HiSilicon accelerator device on the debugfs
->> framework of live migration of vfio, a directory file "hisi_acc"
->> of debugfs is created, and then three debug function files are
->> created in this directory:
->>
->>    vfio
->>     |
->>     +---<dev_name1>
->>     |    +---migration
->>     |        +--state
->>     |        +--hisi_acc
->>     |            +--dev_data
->>     |            +--migf_data
->>     |            +--cmd_state
->>     |
->>     +---<dev_name2>
->>          +---migration
->>              +--state
->>              +--hisi_acc
->>                  +--dev_data
->>                  +--migf_data
->>                  +--cmd_state
->>
->> dev_data file: read device data that needs to be migrated from the
->> current device in real time
->> migf_data file: read the migration data of the last live migration
->> from the current driver.
->> cmd_state: used to get the cmd channel state for the device.
->>
->> +----------------+        +--------------+       +---------------+
->> | migration dev  |        |   src  dev   |       |   dst  dev    |
->> +-------+--------+        +------+-------+       +-------+-------+
->>         |                        |                       |
->>         |                 +------v-------+       +-------v-------+
->>         |                 |  saving_migf |       | resuming_migf |
->>   read  |                 |     file     |       |     file      |
->>         |                 +------+-------+       +-------+-------+
->>         |                        |          copy         |
->>         |                        +------------+----------+
->>         |                                     |
->> +-------v--------+                    +-------v--------+
->> |   data buffer  |                    |   debug_migf   |
->> +-------+--------+                    +-------+--------+
->>         |                                     |
->>    cat  |                                 cat |
->> +-------v--------+                    +-------v--------+
->> |   dev_data     |                    |   migf_data    |
->> +----------------+                    +----------------+
->>
->> When accessing debugfs, user can obtain the most recent status data
->> of the device through the "dev_data" file. It can read recent
->> complete status data of the device. If the current device is being
->> migrated, it will wait for it to complete.
->> The data for the last completed migration function will be stored
->> in debug_migf. Users can read it via "migf_data".
->>
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> ---
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 204 ++++++++++++++++++
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
->>  2 files changed, 211 insertions(+)
->>
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> index a8c53952d82e..da9f5b9e6c5b 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> @@ -627,15 +627,30 @@ static void hisi_acc_vf_disable_fd(struct
->> hisi_acc_vf_migration_file *migf)
->>  	mutex_unlock(&migf->lock);
->>  }
->>
->> +static void hisi_acc_debug_migf_copy(struct hisi_acc_vf_core_device
->> *hisi_acc_vdev,
->> +	struct hisi_acc_vf_migration_file *src_migf)
->> +{
->> +	struct hisi_acc_vf_migration_file *dst_migf = hisi_acc_vdev-
->>> debug_migf;
->> +
->> +	if (!dst_migf)
->> +		return;
->> +
->> +	dst_migf->total_length = src_migf->total_length;
->> +	memcpy(&dst_migf->vf_data, &src_migf->vf_data,
->> +		sizeof(struct acc_vf_data));
->> +}
->> +
->>  static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device
->> *hisi_acc_vdev)
->>  {
->>  	if (hisi_acc_vdev->resuming_migf) {
->> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev-
->>> resuming_migf);
->>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->resuming_migf);
->>  		fput(hisi_acc_vdev->resuming_migf->filp);
->>  		hisi_acc_vdev->resuming_migf = NULL;
->>  	}
->>
->>  	if (hisi_acc_vdev->saving_migf) {
->> +		hisi_acc_debug_migf_copy(hisi_acc_vdev, hisi_acc_vdev-
->>> saving_migf);
->>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->saving_migf);
->>  		fput(hisi_acc_vdev->saving_migf->filp);
->>  		hisi_acc_vdev->saving_migf = NULL;
->> @@ -1294,6 +1309,181 @@ static long hisi_acc_vfio_pci_ioctl(struct
->> vfio_device *core_vdev, unsigned int
->>  	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
->>  }
->>
->> +static int hisi_acc_vf_debug_check(struct seq_file *seq, struct vfio_device
->> *vdev)
->> +{
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
->> hisi_acc_get_vf_dev(vdev);
->> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
->> +	int ret;
->> +
->> +	lockdep_assert_held(&hisi_acc_vdev->open_mutex);
->> +	/*
->> +	 * When the device is not opened, the io_base is not mapped.
->> +	 * The driver cannot perform device read and write operations.
->> +	 */
->> +	if (!hisi_acc_vdev->dev_opened) {
->> +		seq_printf(seq, "device not opened!\n");
->> +		return -EINVAL;
->> +	}
->> +
->> +	ret = qm_wait_dev_not_ready(vf_qm);
->> +	if (ret) {
->> +		seq_printf(seq, "VF device not ready!\n");
->> +		return -EBUSY;
->> +	}
-> 
-> Still not very sure this vf_qm ready() check actually helps or not? What guarantee
-> is there that the qm will stay Ready after this call?  Any read/write afterwards
-> will eventually fail if it is not ready  later for some reason, right? 
-> Perhaps helps in early detection and bails out.
->
 
-The purpose here is to intercept invalid debugfs operations.
-When VF does not add a driver in Guest OS. The internal data reading and recovery
-operations of the live migration operation will be skipped.
-The data read is all empty data.
+--=-XrfaaV7BF0HTm3ihQLzH
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->> +	return 0;
->> +}
->> +
->> +static int hisi_acc_vf_debug_cmd(struct seq_file *seq, void *data)
->> +{
->> +	struct device *vf_dev = seq->private;
->> +	struct vfio_pci_core_device *core_device =
->> dev_get_drvdata(vf_dev);
->> +	struct vfio_device *vdev = &core_device->vdev;
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
->> hisi_acc_get_vf_dev(vdev);
->> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
->> +	u64 value;
->> +	int ret;
->> +
->> +	mutex_lock(&hisi_acc_vdev->open_mutex);
->> +	ret = hisi_acc_vf_debug_check(seq, vdev);
->> +	if (ret) {
->> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
->> +		return ret;
->> +	}
->> +
->> +	value = readl(vf_qm->io_base + QM_MB_CMD_SEND_BASE);
->> +	if (value == QM_MB_CMD_NOT_READY) {
->> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
->> +		seq_printf(seq, "mailbox cmd channel not ready!\n");
->> +		return -EINVAL;
->> +	}
->> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
->> +	seq_printf(seq, "mailbox cmd channel ready!\n");
->> +
->> +	return 0;
->> +}
->> +
->> +static int hisi_acc_vf_dev_read(struct seq_file *seq, void *data)
->> +{
->> +	struct device *vf_dev = seq->private;
->> +	struct vfio_pci_core_device *core_device =
->> dev_get_drvdata(vf_dev);
->> +	struct vfio_device *vdev = &core_device->vdev;
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
->> hisi_acc_get_vf_dev(vdev);
->> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
->> +	struct acc_vf_data *vf_data = NULL;
->> +	int ret;
->> +
->> +	vf_data = kzalloc(sizeof(struct acc_vf_data), GFP_KERNEL);
->> +	if (!vf_data)
->> +		return -ENOMEM;\
-> 
-> You could move the allocation after the below checks and to just before
-> vf_qm_read_data().
->
+On Tue, 2024-10-01 at 08:33 -0700, Oliver Upton wrote:
+> On Thu, Sep 26, 2024 at 07:37:59PM +0100, David Woodhouse wrote:
+> > +static void guest_test_system_off2(void)
+> > +{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint64_t ret;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* assert that SYSTEM_OFF2 i=
+s discoverable */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GUEST_ASSERT(psci_features(P=
+SCI_1_3_FN_SYSTEM_OFF2) &
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BIT(PSCI_1_3_HIBERNATE_TYPE_O=
+FF));
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GUEST_ASSERT(psci_features(P=
+SCI_1_3_FN64_SYSTEM_OFF2) &
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BIT(PSCI_1_3_HIBERNATE_TYPE_O=
+FF));
+> > +
+>=20
+> Can you also assert that the guest gets INVALID_PARAMETERS if it sets
+> arg1 or arg2 to a reserved value?
 
-OK.
+Ack (having actually made KVM do so, as you noted on a previous patch).
 
->> +
->> +	mutex_lock(&hisi_acc_vdev->open_mutex);
->> +	ret = hisi_acc_vf_debug_check(seq, vdev);
->> +	if (ret) {
->> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
->> +		goto migf_err;
->> +	}
->> +
->> +	mutex_lock(&hisi_acc_vdev->state_mutex);
->> +	vf_data->vf_qm_state = hisi_acc_vdev->vf_qm_state;
->> +	ret = vf_qm_read_data(&hisi_acc_vdev->vf_qm, vf_data);
->> +	if (ret) {
->> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
->> +		mutex_unlock(&hisi_acc_vdev->state_mutex);
-> 
-> I think it is better to unlock in the reverse order. Also probably you can move
-> the unlocks to a  goto area.
->
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D psci_system_off2(PSC=
+I_1_3_HIBERNATE_TYPE_OFF);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GUEST_SYNC(ret);
+> > +}
+> > +
+> > +static void host_test_system_off2(void)
+> > +{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_vcpu *source, *ta=
+rget;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint64_t psci_version =3D 0;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_run *run;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_vm *vm;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vm =3D setup_vm(guest_test_s=
+ystem_off2, &source, &target);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vcpu_get_reg(target, KVM_REG=
+_ARM_PSCI_VERSION, &psci_version);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0TEST_ASSERT(psci_version >=
+=3D PSCI_VERSION(0, 2),
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Unexpected PSCI version %lu.%lu",
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PSCI_VERSION_MAJOR(psci_version),
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PSCI_VERSION_MINOR(psci_version));
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (psci_version < PSCI_VERS=
+ION(1,3))
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto skip;
+>=20
+> I'm not following this. Is there a particular reason why we'd want to
+> skip for v1.2 and fail the test for anything less than that?
 
-My consideration is to release the mutex before outputting the log.
-it can be optimized.
+These tests unconditionally set KVM_ARM_VCPU_PSCI_0_2 in setup_vm().
+Which is probably OK assuming support for that that predates
+KVM_CAP_ARM_SYSTEM_SUSPEND (which is already a TEST_REQUIRE() right at
+the start).
 
->> +		goto migf_err;
->> +	}
->> +
->> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
->> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
-> 
-> Same as above.
+So the world is very broken if KVM actually starts a VM but the version
+isn't at least 0.2, and it seemed like it warranted an actual failure.
 
-OK.
+> Just do TEST_REQUIRE(psci_version >=3D PSCI_VERSION(1, 3)), it makes the
+> requirements obvious in the case someone runs new selftests on an old
+> kernel.
 
-> 
->> +	seq_hex_dump(seq, "Dev Data:", DUMP_PREFIX_OFFSET, 16, 1,
->> +			(unsigned char *)vf_data,
->> +			vf_data_sz, false);
->> +
->> +	seq_printf(seq,
->> +		 "acc device:\n"
->> +		 "guest driver load: %u\n"
->> +		 "data size: %lu\n",
->> +		 hisi_acc_vdev->vf_qm_state,
->> +		 sizeof(struct acc_vf_data));
->> +
->> +migf_err:
->> +	kfree(vf_data);
->> +
->> +	return ret;
->> +}
->> +
->> +static int hisi_acc_vf_migf_read(struct seq_file *seq, void *data)
->> +{
->> +	struct device *vf_dev = seq->private;
->> +	struct vfio_pci_core_device *core_device =
->> dev_get_drvdata(vf_dev);
->> +	struct vfio_device *vdev = &core_device->vdev;
->> +	struct hisi_acc_vf_core_device *hisi_acc_vdev =
->> hisi_acc_get_vf_dev(vdev);
->> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
->> +	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev-
->>> debug_migf;
->> +
->> +	/* Check whether the live migration operation has been performed
->> */
->> +	if (debug_migf->total_length < QM_MATCH_SIZE) {
->> +		seq_printf(seq, "device not migrated!\n");
->> +		return -EAGAIN;
->> +	}
->> +
->> +	seq_hex_dump(seq, "Mig Data:", DUMP_PREFIX_OFFSET, 16, 1,
->> +			(unsigned char *)&debug_migf->vf_data,
->> +			vf_data_sz, false);
->> +
->> +	seq_printf(seq,
->> +		 "acc device:\n"
->> +		 "guest driver load: %u\n"
->> +		 "device opened: %d\n"
->> +		 "migrate data length: %lu\n",
->> +		 hisi_acc_vdev->vf_qm_state,
->> +		 hisi_acc_vdev->dev_opened,
->> +		 debug_migf->total_length);
->> +
->> +	return 0;
->> +}
->> +
->> +static void hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device
->> *hisi_acc_vdev)
->> +{
->> +	struct vfio_device *vdev = &hisi_acc_vdev->core_device.vdev;
->> +	struct dentry *vfio_dev_migration = NULL;
->> +	struct dentry *vfio_hisi_acc = NULL;
->> +	struct device *dev = vdev->dev;
->> +	void *migf = NULL;
->> +
->> +	if (!debugfs_initialized() ||
->> +	    !IS_ENABLED(CONFIG_VFIO_DEBUGFS))
->> +		return;
->> +
->> +	vfio_dev_migration = debugfs_lookup("migration", vdev-
->>> debug_root);
->> +	if (!vfio_dev_migration) {
->> +		dev_err(dev, "failed to lookup migration debugfs file!\n");
->> +		return;
->> +	}
->> +
->> +	migf = kzalloc(sizeof(struct hisi_acc_vf_migration_file),
->> GFP_KERNEL);
->> +	if (!migf)
->> +		return;
->> +	hisi_acc_vdev->debug_migf = migf;
->> +
->> +	vfio_hisi_acc = debugfs_create_dir("hisi_acc", vfio_dev_migration);
->> +	debugfs_create_devm_seqfile(dev, "dev_data", vfio_hisi_acc,
->> +				  hisi_acc_vf_dev_read);
->> +	debugfs_create_devm_seqfile(dev, "migf_data", vfio_hisi_acc,
->> +				  hisi_acc_vf_migf_read);
->> +	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
->> +				  hisi_acc_vf_debug_cmd);
->> +}
->> +
->> +static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device
->> *hisi_acc_vdev)
->> +{
->> +	if (hisi_acc_vdev->debug_migf) {
->> +		kfree(hisi_acc_vdev->debug_migf);
->> +		hisi_acc_vdev->debug_migf = NULL;
->> +	}
->> +}
->> +
->>  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
->>  {
->>  	struct hisi_acc_vf_core_device *hisi_acc_vdev =
->> hisi_acc_get_vf_dev(core_vdev);
->> @@ -1305,12 +1495,16 @@ static int hisi_acc_vfio_pci_open_device(struct
->> vfio_device *core_vdev)
->>  		return ret;
->>
->>  	if (core_vdev->mig_ops) {
->> +		mutex_lock(&hisi_acc_vdev->open_mutex);
->>  		ret = hisi_acc_vf_qm_init(hisi_acc_vdev);
->>  		if (ret) {
->> +			mutex_unlock(&hisi_acc_vdev->open_mutex);
->>  			vfio_pci_core_disable(vdev);
->>  			return ret;
->>  		}
->>  		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
->> +		hisi_acc_vdev->dev_opened = true;
->> +		mutex_unlock(&hisi_acc_vdev->open_mutex);
->>  	}
->>
->>  	vfio_pci_core_finish_enable(vdev);
->> @@ -1322,7 +1516,10 @@ static void hisi_acc_vfio_pci_close_device(struct
->> vfio_device *core_vdev)
->>  	struct hisi_acc_vf_core_device *hisi_acc_vdev =
->> hisi_acc_get_vf_dev(core_vdev);
->>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
->>
->> +	mutex_lock(&hisi_acc_vdev->open_mutex);
->> +	hisi_acc_vdev->dev_opened = false;
->>  	iounmap(vf_qm->io_base);
->> +	mutex_unlock(&hisi_acc_vdev->open_mutex);
->>  	vfio_pci_core_close_device(core_vdev);
->>  }
->>
->> @@ -1342,6 +1539,7 @@ static int hisi_acc_vfio_pci_migrn_init_dev(struct
->> vfio_device *core_vdev)
->>  	hisi_acc_vdev->pf_qm = pf_qm;
->>  	hisi_acc_vdev->vf_dev = pdev;
->>  	mutex_init(&hisi_acc_vdev->state_mutex);
->> +	mutex_init(&hisi_acc_vdev->open_mutex);
->>
->>  	core_vdev->migration_flags = VFIO_MIGRATION_STOP_COPY |
->> VFIO_MIGRATION_PRE_COPY;
->>  	core_vdev->mig_ops = &hisi_acc_vfio_pci_migrn_state_ops;
->> @@ -1413,6 +1611,9 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev
->> *pdev, const struct pci_device
->>  	ret = vfio_pci_core_register_device(&hisi_acc_vdev->core_device);
->>  	if (ret)
->>  		goto out_put_vdev;
->> +
->> +	if (ops == &hisi_acc_vfio_pci_migrn_ops)
->> +		hisi_acc_vfio_debug_init(hisi_acc_vdev);
-> 
-> I think there was a comment earlier on this. Still not sure why it is not possible to
-> move ops == &hisi_acc_vfio_pci_migrn_ops check inside hisi_acc_vfio_debug_init().
->
+I don't think we want to put that in main() and skip the other checks
+that would run on earlier kernels. (Even if we had easy access to
+psci_version without actually running a test and starting a VM).
 
-The variable hisi_acc_vfio_pci_migrn_ops is declared after the function hisi_acc_vfio_debug_init.
-If placed inside the function, a compilation error will occur.
+I could put it into host_test_system_off2() which runs last (and
+comment the invocations in main() to say that they're in increasing
+order of PSCI version) to accommodate such). But then it seems that I'd
+be the target of this comment in ksft_exit_skip()...
 
->>  	return 0;
->>
->>  out_put_vdev:
->> @@ -1423,8 +1624,11 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev
->> *pdev, const struct pci_device
->>  static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev)
->>  {
->>  	struct hisi_acc_vf_core_device *hisi_acc_vdev =
->> hisi_acc_drvdata(pdev);
->> +	struct vfio_device *vdev = &hisi_acc_vdev->core_device.vdev;
->>
->>  	vfio_pci_core_unregister_device(&hisi_acc_vdev->core_device);
->> +	if (vdev->ops == &hisi_acc_vfio_pci_migrn_ops)
->> +		hisi_acc_vf_debugfs_exit(hisi_acc_vdev);
-> 
-> Do we need to do vdev->ops == &hisi_acc_vfio_pci_migrn_ops check here?
-> 
-> Since we are checking
->    hisi_acc_vdev->debug_migf inside the exit function, which I think is only
-> set when the ops == migrn_ops. Right?
->
+        /*
+         * FIXME: several tests misuse ksft_exit_skip so produce
+         * something sensible if some tests have already been run
+         * or a plan has been printed.  Those tests should use
+         * ksft_test_result_skip or ksft_exit_fail_msg instead.
+         */
 
-"vdev->ops == &hisi_acc_vfio_pci_migrn_ops" is added here to maintain symmetry
-with the code processing in the probe.
+I suspect the real answer here is that the individual tests here be
+calling ksft_test_result_pass(), and the system_off2 one should call
+ksft_test_result_skip() if it skips?
 
-I added it also because of another reviewer¡¯s suggestion.
+That's probably material for a completely separate patch series, but it
+seems like we're better off leaving host_test_system_off2() as I have
+it here, so that it's just a case of adding that call before the 'goto
+skip'.
 
-Thanks.
-Longfang.
+I'll add an explicit comment about the 0.2 check though, saying that it
+should never happen so we might as well have the ASSERT for it.
 
-> Thanks,
-> Shameer
-> 
-> .
-> 
+
+--=-XrfaaV7BF0HTm3ihQLzH
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQxMDEyMDkyODEwWjAvBgkqhkiG9w0BCQQxIgQgLQN4lX6W
+xfU/l+pW72qu3D3rwrTO5w4xIGXL4DvCTYAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB9hk4Nyzc7Tdb0p+gCBlm7tClPQFTweDUn
+GkygrSsGGPJ+AYo3nWfS/TiLMIjg/LMY7tCc1pARAXkiYBpxhb4arxpj9cOUqwjZwEZtFq3kbsmt
+gSiP4SxzBPzfiziHY/kO/+5Qa1SsabIE0VvPiPw3omYVXN70sMyQ564dOWlbJOGQ+TOk8YQT+5Y8
+8GJBbi6cv1nlPiYtLPUM3F89COr0kDZjFaQO29iKKgXHFxCXNA26+a+ZbjMlmxYnwIongOcK9U/h
+/jVOS58ClOdN7vKI69kg7YyQQTzBIWqpC5OcTb4FIHQKmK1YdmRU0BAvi623YDbrLCrElKkZzeNA
+U+UjaF8YwcGnKQS5KkD5WsnDfwxBPDHEcuvTd66VX1sMrXeOJjXoi4AeGrXmM+E0mlhT8T/Roltw
+hXTHDINQ2jMM221ruRoe9eVqMv/stYewuCqvo+9XznEcQ5/tKZrp69MZwyzZvkS/IM2wThJpf3J0
+dwSf8TXfRzG9KaT1wTApFnwuYp7BR2YnHIKFYko2ZSIEtltJA4F3QlKZNzQBxk/3mQbmwRtD744B
+cDOBMUmjL0RdHAjQvG/2AtTGqspJyCxfCdTJz0ixbD9NcQb3gzuKMwkkTIwJEtkfQm9g7Na76Wnh
+bkXIotCArlLNk6x5c45bE6nSMtXOzOGCN72r2ydIRAAAAAAAAA==
+
+
+--=-XrfaaV7BF0HTm3ihQLzH--
 
