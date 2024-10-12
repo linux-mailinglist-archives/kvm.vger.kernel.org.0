@@ -1,207 +1,238 @@
-Return-Path: <kvm+bounces-28664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E19AB99AF9F
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 02:11:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B726E99AFAA
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 02:22:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F1ED28542A
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 00:10:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1DFCB226DF
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 00:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02116184E;
-	Sat, 12 Oct 2024 00:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7C18F5C;
+	Sat, 12 Oct 2024 00:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZhycIjA1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YqqkBGVz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545F238B
-	for <kvm@vger.kernel.org>; Sat, 12 Oct 2024 00:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE5C4C92
+	for <kvm@vger.kernel.org>; Sat, 12 Oct 2024 00:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728691851; cv=none; b=qwV+uC8RiFcdsYtKWlFeAsAVcA8SBGStvrMpKyf9aEHJslUmdjpRfVbwx9VUbn913WpShvhFUGnYDDwnD8e6mKsku1g5iQES3GHzuT3zTzr8IJY1wjELbfJoj4q9BO7stiVYLbjBusDrWYpS6XeNvcTtibsROe3JeX+1M2159vs=
+	t=1728692510; cv=none; b=NUOEbj3oM//v8Qt42Kc6sM4XdM8BvdWV3RLz2QJ9o4NGFUVoQLV2oORF71m1eCpX3K5AmqIXw3McoreFcPw9sjHDWFc4ulVGKKWj6VQtIkGbO9A97DnRcRDOcHSyF36KcNrPGRUEP8vxPgCV48+QS2MWuYBbA/+SwWPh0wfayfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728691851; c=relaxed/simple;
-	bh=E0RFbqikIkoA3KkqNL5ZRMolBELYaA7EJkna4JZX3OU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=uSS0b1j7JN85Q5MEDtI/2R55xPPyw0xb7Xz3unk39J0O6gt/XAMe+YkpxRTFXq8DtcljFdm4x+GvwgOqh6ZauLJCOqtsoodW8KWzSXPMGAeljKvu0qDoZeT/1cnbdITqaInK5VsvFapPMXAvXab8R9Zd2ugBZsYEKU06u5d/GYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZhycIjA1; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728691848; x=1760227848;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=E0RFbqikIkoA3KkqNL5ZRMolBELYaA7EJkna4JZX3OU=;
-  b=ZhycIjA1+hyzq7Ck8DfnElA+4r/RLAck3ccGtWSP7Kmvh8KrURUpHMO9
-   NHG2bk6FCVBE6h8rCGoXuCZyPjWJnpYDnCF7G2kk2EdqVaaWjwNDV8JZ1
-   5GNLyUWCka/opsmPruoJGgl6Uj4U1f208E5D37pBcSE26sBqAI3CrN3EV
-   Eq62Xlulze3qPdCUVGMCPG8aZiKQ6WIAgZUmi1tja5uXsHBkMDcSZIC0M
-   SzxPBvyneOKOT947YhZcOd5VZlTQ4cRSiTPu7TyWekpm6B2KzQAvFClKn
-   jH4twja15wXrxivsxmrOtJr9hC3LdwLShxQTiM4AQemUK5RnJb7+Pyp+K
-   Q==;
-X-CSE-ConnectionGUID: FEVrk0f1RyG8zXO8cwj/xA==
-X-CSE-MsgGUID: vUsig7vKR9WeyIIIXGui6A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="27584473"
-X-IronPort-AV: E=Sophos;i="6.11,197,1725346800"; 
-   d="scan'208";a="27584473"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 17:10:48 -0700
-X-CSE-ConnectionGUID: xPRTGwb5Q+WZD4NIcfaKpA==
-X-CSE-MsgGUID: NfUMoa1NQsC51LT93p9IeQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,197,1725346800"; 
-   d="scan'208";a="82052444"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 11 Oct 2024 17:10:45 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1szPiU-000Csp-0m;
-	Sat, 12 Oct 2024 00:10:42 +0000
-Date: Sat, 12 Oct 2024 08:10:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Robert Hu <robert.hu@intel.com>,
-	Farrah Chen <farrah.chen@intel.com>,
-	Danmei Wei <danmei.wei@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Kai Huang <kai.huang@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: [kvm:kvm-coco-queue 60/109] arch/x86/kvm/mmu/tdp_mmu.c:1176:25:
- sparse: sparse: incorrect type in argument 1 (different address spaces)
-Message-ID: <202410120851.DMfCaszW-lkp@intel.com>
+	s=arc-20240116; t=1728692510; c=relaxed/simple;
+	bh=DQ+hL4n7ns/jcpxR+c9OE6/V7v4D7xpS5MVAdpJyYck=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=geRcPwR/5A4IpamNoxOXiL+YMtSTjGddhliaE3skGb+QWdXSK6IziVJTsd6+TJiOLC4EtjTW4q5+55/wMqd7IN0vLhicETGU1xLHSbwEG558Ui11j5p2r5CanyJ5dopR7ZbI1zJeW1K0q02BcTm/edpoGyh2GvaMkHVv94UqUtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YqqkBGVz; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e32b43e053so36898817b3.1
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 17:21:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728692508; x=1729297308; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=80TYEvDINN/ZhWp27g0pSsVe8yEUOU5CnuEFxk9tjSI=;
+        b=YqqkBGVz0hUOc73PsfKna1WygeWXA87XyedKiQTg3r8v7lSE7ythGqmzqLsWavwDHL
+         RqfQLRAVduhXX0WtbKd1HNCiPH4ZFdSpXZY54mkc47tMV+ZYH9Tk2X2V/5xjQ09KVwt6
+         u+snJ7Q4Iq6VG9qmYfH3v2any6LR7W5HhjdXpv1/pzGCVKYVdPNtBTZ77NpUJiftW7pn
+         2sfnLKFuIsk53GYrG0yqkC4mVn+HetN3HR2V01Ue5ncodhS8WPae4/6e+i6YZo+UyGbW
+         smcgpXZ3tkevSe/HfS0jYsKkr/ahO+LoBCuCnMNT4cevCRLGQWxabEA8j0Kby7KQ+SVE
+         gJtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728692508; x=1729297308;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=80TYEvDINN/ZhWp27g0pSsVe8yEUOU5CnuEFxk9tjSI=;
+        b=VQSfbkaWo4Ro7jydQkf6VB13DdF+yUOvihp434jfQ5ulP7Ya6KZztx4Rw8F56cUwH3
+         PvTz8CFiQ1CabbO8Gf3fPtnza7qGfUqVZwa3KNCmYdzPaTAxQ9/TP3zBI1/raSvDsMLr
+         2IQJzLnyY2mFQawcVBEzuMJV+nv4L3ypnVfC3dzoOu/9IUka6efGkr2ztJ1+9iK6aDfF
+         R0iyAQqfJ/qJgWMY6kq8GNanFWgDSR1zh10hDO+zzBHUfGkriRdtCxYBoZMPMqsKXfrx
+         qCIn/NUbCVpXGwahuqtmx2sSrUwCPpzkBtwFi/6EAbZ0Bzduj9WMrNAxYtbe4phDmGta
+         /NDg==
+X-Forwarded-Encrypted: i=1; AJvYcCW5Mx4oH0PI3JBZaNaf3by2AB4E/zM4QnR5dN3hu1cDejT8CA2fdkVrmMf0+ZAlCfcD1MI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0rI6QgGQlSx4lAp57YEDFjcUrOqCil/Solfu+l7NIiyCP/Kev
+	18HhVZ8swaC6Cg64Ny7Ko/3EwxGyEkvwV0qurRB+0nA0TGC2sPJdHzf8KdHSM40WV/HBsp3kNUF
+	w9w==
+X-Google-Smtp-Source: AGHT+IE8twxV/hbdB3uHbG/bVu0SKqde502fj8APO5J/UtbrdZWgVevUlaIfsNjN+xe1tgDO/X2eQBAwzOk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:748e:0:b0:e28:e510:6ab1 with SMTP id
+ 3f1490d57ef6-e2919fe7a06mr2445276.8.1728692507770; Fri, 11 Oct 2024 17:21:47
+ -0700 (PDT)
+Date: Fri, 11 Oct 2024 17:21:46 -0700
+In-Reply-To: <20240927161657.68110-4-iorlov@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+References: <20240927161657.68110-1-iorlov@amazon.com> <20240927161657.68110-4-iorlov@amazon.com>
+Message-ID: <ZwnBGtdbvmKHc4in@google.com>
+Subject: Re: [PATCH 3/3] selftests: KVM: Add test case for MMIO during event delivery
+From: Sean Christopherson <seanjc@google.com>
+To: Ivan Orlov <iorlov@amazon.com>
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, mingo@redhat.com, 
+	pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, x86@kernel.org, jalliste@amazon.com, 
+	nh-open-source@amazon.com, pdurrant@amazon.co.uk
+Content-Type: text/plain; charset="us-ascii"
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue
-head:   d2c7662a6ea1c325a9ae878b3f1a265264bcd18b
-commit: f6ab1baaf315a860e46baf9f7b1a5bf3db99f9ec [60/109] KVM: x86/tdp_mmu: Support mirror root for TDP MMU
-config: x86_64-randconfig-121-20241011 (https://download.01.org/0day-ci/archive/20241012/202410120851.DMfCaszW-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241012/202410120851.DMfCaszW-lkp@intel.com/reproduce)
+On Fri, Sep 27, 2024, Ivan Orlov wrote:
+> Extend the 'set_memory_region_test' with a test case which covers the
+> MMIO during event delivery error handling. The test case
+> 
+> 1) Tries to set an IDT descriptor base to point to an MMIO address
+> 2) Generates a #GP
+> 3) Verifies that we got a correct exit reason (KVM_EXIT_INTERNAL_ERROR)
+>    and suberror code (KVM_INTERNAL_ERROR_DELIVERY_EV)
+> 4) Verifies that we got a corrent "faulty" GPA in internal.data[3]
+> 
+> Signed-off-by: Ivan Orlov <iorlov@amazon.com>
+> ---
+>  .../selftests/kvm/set_memory_region_test.c    | 46 +++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+> index a8267628e9ed..e9e97346edf1 100644
+> --- a/tools/testing/selftests/kvm/set_memory_region_test.c
+> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+> @@ -553,6 +553,51 @@ static void test_add_overlapping_private_memory_regions(void)
+>  	close(memfd);
+>  	kvm_vm_free(vm);
+>  }
+> +
+> +static const struct desc_ptr faulty_idt_desc = {
+> +	.address = MEM_REGION_GPA,
+> +	.size = 0xFFF,
+> +};
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410120851.DMfCaszW-lkp@intel.com/
+There's no reason this needs to be global, i.e. declare it in the function, on
+the stack.
 
-sparse warnings: (new ones prefixed by >>)
->> arch/x86/kvm/mmu/tdp_mmu.c:1176:25: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected unsigned long long [usertype] *sptep @@     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep @@
-   arch/x86/kvm/mmu/tdp_mmu.c:1176:25: sparse:     expected unsigned long long [usertype] *sptep
-   arch/x86/kvm/mmu/tdp_mmu.c:1176:25: sparse:     got unsigned long long [noderef] [usertype] __rcu *[addressable] [usertype] sptep
-   arch/x86/kvm/mmu/tdp_mmu.c: note: in included file (through include/linux/rbtree.h, include/linux/mm_types.h, include/linux/mmzone.h, ...):
-   include/linux/rcupdate.h:869:25: sparse: sparse: context imbalance in '__tdp_mmu_zap_root' - unexpected unlock
-   arch/x86/kvm/mmu/tdp_mmu.c:1459:33: sparse: sparse: context imbalance in 'tdp_mmu_split_huge_pages_root' - unexpected unlock
+> +
+> +static void guest_code_faulty_idt_desc(void)
+> +{
+> +	__asm__ __volatile__("lidt %0"::"m"(faulty_idt_desc));
 
-vim +1176 arch/x86/kvm/mmu/tdp_mmu.c
+It's not "faulty".  It specifically points at MMIO.  That is _very_ different
+than a "faulty" address, because an actual fault when vectoring an event would
+lead to triple fault shutdown.  And a benefit of declaring the descriptor locally
+is that you don't need to come up with a descriptive name :-) E.g.
 
-  1120	
-  1121	static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
-  1122					   struct kvm_mmu_page *sp, bool shared);
-  1123	
-  1124	/*
-  1125	 * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
-  1126	 * page tables and SPTEs to translate the faulting guest physical address.
-  1127	 */
-  1128	int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-  1129	{
-  1130		struct kvm_mmu_page *root = tdp_mmu_get_root_for_fault(vcpu, fault);
-  1131		struct kvm *kvm = vcpu->kvm;
-  1132		struct tdp_iter iter;
-  1133		struct kvm_mmu_page *sp;
-  1134		int ret = RET_PF_RETRY;
-  1135	
-  1136		kvm_mmu_hugepage_adjust(vcpu, fault);
-  1137	
-  1138		trace_kvm_mmu_spte_requested(fault);
-  1139	
-  1140		rcu_read_lock();
-  1141	
-  1142		tdp_mmu_for_each_pte(iter, kvm, root, fault->gfn, fault->gfn + 1) {
-  1143			int r;
-  1144	
-  1145			if (fault->nx_huge_page_workaround_enabled)
-  1146				disallowed_hugepage_adjust(fault, iter.old_spte, iter.level);
-  1147	
-  1148			/*
-  1149			 * If SPTE has been frozen by another thread, just give up and
-  1150			 * retry, avoiding unnecessary page table allocation and free.
-  1151			 */
-  1152			if (is_frozen_spte(iter.old_spte))
-  1153				goto retry;
-  1154	
-  1155			if (iter.level == fault->goal_level)
-  1156				goto map_target_level;
-  1157	
-  1158			/* Step down into the lower level page table if it exists. */
-  1159			if (is_shadow_present_pte(iter.old_spte) &&
-  1160			    !is_large_pte(iter.old_spte))
-  1161				continue;
-  1162	
-  1163			/*
-  1164			 * The SPTE is either non-present or points to a huge page that
-  1165			 * needs to be split.
-  1166			 */
-  1167			sp = tdp_mmu_alloc_sp(vcpu);
-  1168			tdp_mmu_init_child_sp(sp, &iter);
-  1169			if (is_mirror_sp(sp))
-  1170				kvm_mmu_alloc_external_spt(vcpu, sp);
-  1171	
-  1172			sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
-  1173	
-  1174			if (is_shadow_present_pte(iter.old_spte)) {
-  1175				/* Don't support large page for mirrored roots (TDX) */
-> 1176				KVM_BUG_ON(is_mirror_sptep(iter.sptep), vcpu->kvm);
-  1177				r = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
-  1178			} else {
-  1179				r = tdp_mmu_link_sp(kvm, &iter, sp, true);
-  1180			}
-  1181	
-  1182			/*
-  1183			 * Force the guest to retry if installing an upper level SPTE
-  1184			 * failed, e.g. because a different task modified the SPTE.
-  1185			 */
-  1186			if (r) {
-  1187				tdp_mmu_free_sp(sp);
-  1188				goto retry;
-  1189			}
-  1190	
-  1191			if (fault->huge_page_disallowed &&
-  1192			    fault->req_level >= iter.level) {
-  1193				spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-  1194				if (sp->nx_huge_page_disallowed)
-  1195					track_possible_nx_huge_page(kvm, sp);
-  1196				spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-  1197			}
-  1198		}
-  1199	
-  1200		/*
-  1201		 * The walk aborted before reaching the target level, e.g. because the
-  1202		 * iterator detected an upper level SPTE was frozen during traversal.
-  1203		 */
-  1204		WARN_ON_ONCE(iter.level == fault->goal_level);
-  1205		goto retry;
-  1206	
-  1207	map_target_level:
-  1208		ret = tdp_mmu_map_handle_target_level(vcpu, fault, &iter);
-  1209	
-  1210	retry:
-  1211		rcu_read_unlock();
-  1212		return ret;
-  1213	}
-  1214	
+	const struct desc_ptr idt_desc = {
+		.address = MEM_REGION_GPA,
+		.size = 0xfff,
+	};
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+And it's probably worth adding a lidt() helper in processor.h (in a separate
+commit, because there's two other users that can be converted when it's added).
+
+> +
+> +	/* Generate a #GP by dereferencing a non-canonical address */
+> +	*((uint8_t *)0xDEADBEEFDEADBEEFULL) = 0x1;
+
+Hmm, I could have sworn KVM-Unit-Tests' NONCANONICAL got pulled into selftests.
+Please do that as part of the test, e.g. add this to processor.h
+
+#define NONCANONICAL	0xaaaaaaaaaaaaaaaaull
+
+> +
+> +	/* We should never reach this point */
+
+No pronouns.  Yes, it's nitpicky, but "we" gets _very_ ambiguous when "we" could
+mean the admin, the user, the VMM, KVM, the guest, etc.
+
+> +	GUEST_ASSERT(0);
+> +}
+> +
+> +/*
+> + * This test tries to point the IDT descriptor base to an MMIO address.
+
+There is no try.  Do, or do not :-)
+
+Translation: just state what the code does, don't hedge.
+
+> This action
+
+Wrap at 89.
+
+> + * should cause a KVM internal error, so the VMM could handle such situations gracefully.
+
+Heh, don't editorialize what a VMM might do in comments.  For changelogs it's
+often helpful, as it provides justification and context for _why_ that is the
+behavior.  But for a selftest, just state what KVM's ABI is.  E.g. I guarantee
+there are plenty of VMMs that don't handle this situation gracefully :-)
+
+> + */
+> +static void test_faulty_idt_desc(void)
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	pr_info("Testing a faulty IDT descriptor pointing to an MMIO address\n");
+> +
+> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code_faulty_idt_desc);
+> +	virt_map(vm, MEM_REGION_GPA, MEM_REGION_GPA, 1);
+> +
+> +	vcpu_run(vcpu);
+> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_INTERNAL_ERROR);
+> +	TEST_ASSERT(vcpu->run->internal.suberror == KVM_INTERNAL_ERROR_DELIVERY_EV,
+> +		    "Unexpected suberror = %d", vcpu->run->internal.suberror);
+> +	TEST_ASSERT(vcpu->run->internal.ndata > 4, "Unexpected internal error data array size = %d",
+> +		    vcpu->run->internal.ndata);
+
+Capture "run", or maybe event "internal" in a local variable.  Doing so will
+shorten these lines and make the code easier to read.  I'd probably vote for
+grabbing "internal" since TEST_ASSERT_KVM_EXIT_REASON() takes care of asserting
+on the bits outside of "internal".
+
+> +	/* The "faulty" GPA address should be = IDT base + offset of the GP vector */
+
+GPA address is redundant.  GPA is Guest Physical Address.
+
+Again, avoid "faulty".  "reported" works nicely.  And try not to mix code with
+human language (though it's ok for math, e.g. the '+' is totally fine and
+preferred).  The '=' is hard to read because it looks like a typo.  And in this
+case, there's no need to actually say "equal to".  And similar to writing changelogs
+for humans instead of giving a play-by-play of the code, do the same for comments, e.g.
+
+	/* The reported GPA should be the address of the #GP entry in the IDT. */
+
+> +	TEST_ASSERT(vcpu->run->internal.data[3] == MEM_REGION_GPA +
+> +		    GP_VECTOR * sizeof(struct idt_entry),
+
+Put the math on one line, i.e.
+
+		    vcpu->run->internal.data[3] ==
+		    MEM_REGION_GPA + GP_VECTOR * sizeof(struct idt_entry),
+
+> +		    "Unexpected GPA = %llx", vcpu->run->internal.data[3]);
+
+Print what GPA was expected, so that the user doesn't have to manually figure
+that out.
+
+> +
+> +	kvm_vm_free(vm);
+> +}
+>  #endif
+>  
+>  int main(int argc, char *argv[])
+> @@ -568,6 +613,7 @@ int main(int argc, char *argv[])
+>  	 * KVM_RUN fails with ENOEXEC or EFAULT.
+>  	 */
+>  	test_zero_memory_regions();
+> +	test_faulty_idt_desc();
+>  #endif
+>  
+>  	test_invalid_memory_region_flags();
+> -- 
+> 2.43.0
+> 
 
