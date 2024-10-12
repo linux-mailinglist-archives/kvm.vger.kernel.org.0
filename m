@@ -1,247 +1,120 @@
-Return-Path: <kvm+bounces-28668-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28669-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0BAE99B129
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 08:06:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63BA499B137
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 08:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 681A61C216E3
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 06:06:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17DE51F2313E
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2024 06:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A0313777F;
-	Sat, 12 Oct 2024 06:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6383612DD88;
+	Sat, 12 Oct 2024 06:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="evTA9iNK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tjmwf6fO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3F94A1E
-	for <kvm@vger.kernel.org>; Sat, 12 Oct 2024 06:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B6883CDB;
+	Sat, 12 Oct 2024 06:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728713185; cv=none; b=M8w+T9GxUAkLNO2MIJfGG29Xo//SAE7i9kDpdQmjS//SdTweL5TK1SoBfbVhb4a0x4S0UiDIPGeri23iBXuuH1pDEORoyHimF3HPI1/bnTRlQbRJ7Z5Ey2iBOU/KzFneM9THA7IK0Tw1XoQOo4WfoH6f24CDyEq+60B6KAYuekU=
+	t=1728713584; cv=none; b=R5xde2AiKsm190MnPRL4Kwp0UGR0iKicRZIrQTbrDoHh2bobuIlwEYsdH2CucR4HKPlMJSA9Z8PJVVCYI/uzX6x8Z+RdshEo8Hn4ai10GAzuRCN9Ja/IdEAt3ocONsa3obcEk8qJa+7NtXE6PR2DWDuZvdKfeduVjzjO25sLnH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728713185; c=relaxed/simple;
-	bh=p3bhdSIz97AK70PkPUevDFL5eUaWsHkk+ULKNm4YWU4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PftOireYLZuLEcXbwYbIWuL/o186W022umkhNu5H0oyNv1r+1us6qZW0cHo8AhpVWOalhrpAlXgsAysWEft4yIAiGo62DpcTq35UxuuqHxjDazswYQRrh7osVSl0PoTmSwj6K2SA0D/L81S8IAsyZkgU+qmEvb8Q85fcgv8xXSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=evTA9iNK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728713182;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4un6uSmnhR3waOcDWroNwGLqZDQwtwFJTENyZm7BpXg=;
-	b=evTA9iNKObsfu6nqfgec4ogiGn9uF4qRvS+kgNUeMpRLMgEezRg9CA5Gzs0MJTgTFK5tFW
-	wnrwp4wvdVKkDUa/gMBTxZHHMSvZsHb7I+P/XfTA8XARl/Mcm6cQVg7Yb1o1Yd1xPLApxj
-	ZcQQEE5ws6nV2kirTIusaPfL8gfQNfA=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-144-TqI9Brk5PGGzZvnkklhgfg-1; Sat, 12 Oct 2024 02:06:21 -0400
-X-MC-Unique: TqI9Brk5PGGzZvnkklhgfg-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-6c8f99fef10so3544431a12.3
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2024 23:06:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728713179; x=1729317979;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4un6uSmnhR3waOcDWroNwGLqZDQwtwFJTENyZm7BpXg=;
-        b=TP/ui2pBA2PbW+RGluVhEUCJjH+zK3pPL8+AyzyReWHC3X41LFeZ+TnBGVvdVoB340
-         baOM3lpa+MoOikbFBSFrxpVYt08BbseqbBNX9++bh37jTduMwKEdIA8OqJoIdxiYghkW
-         B7VYS3LvE/VrfAIsn40qCuCXhVwXF7PCs/P8yVglHlK8CJX5DnNsd16H20ArnRaPQhXQ
-         h7CuA74mGqtmr++FNKP94yump60SQZgvJJZe1Sh7LdM20XXZ0TUHEoM/jNH01jd6weyy
-         lvHXUGA1t15IJxlE5kdyb/uGzmbMlhz547WwSdUU9UusgmOHGHorCV7D88eoHmgHYQaX
-         OJwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzCRODM6grxM4StPIW54LUrqfB8TrCgpGLWJwuufRQoUZZQkEsVeP6IVZPgmabIlDA/Js=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/1A4ULDMFZP5+z624weai0A5d1nMn82gbj9mCEWs6/AAzgNrE
-	sX+bvokimAQjRouSAWxEKlSB3N0i7tnYnFCPP/YDjy4+bRn/s8Jo4HozEiTx60rOHQjkk0YAK/J
-	pCqI6/aDwO8ZTa+2SqaRUlUh9hxV7u6clVQ5SQtTtCBZ5omTOnmKbMf3hsw==
-X-Received: by 2002:a05:6a21:31c8:b0:1cf:31b6:18d1 with SMTP id adf61e73a8af0-1d8c96c2ce5mr2259092637.48.1728713179234;
-        Fri, 11 Oct 2024 23:06:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG1eYiTG3wr0KgnhwPFbo8d8nOIzZ9nhtHL32SxmP6Jl4bro0T4stNrN6bmkVU9ob7oecwkzg==
-X-Received: by 2002:a05:6a21:31c8:b0:1cf:31b6:18d1 with SMTP id adf61e73a8af0-1d8c96c2ce5mr2258777637.48.1728713172412;
-        Fri, 11 Oct 2024 23:06:12 -0700 (PDT)
-Received: from [192.168.68.54] ([180.233.125.129])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea6e9a5244sm383767a12.69.2024.10.11.23.06.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Oct 2024 23:06:11 -0700 (PDT)
-Message-ID: <5999b021-0ae3-4d90-ae29-f18f187fd115@redhat.com>
-Date: Sat, 12 Oct 2024 16:06:02 +1000
+	s=arc-20240116; t=1728713584; c=relaxed/simple;
+	bh=m42CQk4y980tF4qvboDX1NWtreWtA3r69nSD6YFedPk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p6Ee+seyCBwU1iIcXfw7LtNqaBi/0CK7ZWgFiv8R+rXhgMKxPHoIuQa48ZSq2jkn7x11vJk5altd0Z8tEaPmPAgDNdUO+czOVqQ1p8HiCGJkUzcIz1qATOTLOV5q6P0jlZsR/66e8U5W9el4MftNHo/o/UXpqir1UCT2CVWzntM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tjmwf6fO; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728713583; x=1760249583;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=m42CQk4y980tF4qvboDX1NWtreWtA3r69nSD6YFedPk=;
+  b=Tjmwf6fOn9NYHRDRKiC7OWieSgWUwjg+UtwmYm1egS1YYLZVsozW83Yo
+   e8jwfJxhXRdVtaHtO1JHaCECjjkEVVrgEiHXXI8e1Xf3+98Tob7Oq1Qw0
+   gjvKMv+vAoq/NOqyE0pSv6pM5o8AnBIHSilvylRTlnNnu6dcUcOJ7js8R
+   Xf5g6mKKM5Zzf0KcPJT3wOIkWUvOme8WnMoOS1kme9qyGqCxamFFTHNwS
+   ZLEnxDWTqSqU6y3OTDeNXpwGURzrUSxLaystbJXpPX32e42XP2bcUmxRF
+   OyWjhTDNfcmw5WEr/1zCRt5S19BDMmTZXpYh+f12g7BUfE2e7EdDd9fAc
+   g==;
+X-CSE-ConnectionGUID: pXrpc4jSS1O6zTAKJOch+g==
+X-CSE-MsgGUID: o/Rlx5auQemFUeNSY91DHQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="38684798"
+X-IronPort-AV: E=Sophos;i="6.11,197,1725346800"; 
+   d="scan'208";a="38684798"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 23:13:02 -0700
+X-CSE-ConnectionGUID: oyxCgg7mQ/qA1YxHM2sphQ==
+X-CSE-MsgGUID: m1D1bpIJQ0mWI69VJg+KRQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,197,1725346800"; 
+   d="scan'208";a="77202878"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 11 Oct 2024 23:12:54 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1szVMy-000D6d-0H;
+	Sat, 12 Oct 2024 06:12:52 +0000
+Date: Sat, 12 Oct 2024 14:12:36 +0800
+From: kernel test robot <lkp@intel.com>
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+	xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, yu.c.zhang@linux.intel.com,
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+	vannapurve@google.com, ackerleytng@google.com,
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com
+Subject: Re: [PATCH v3 01/11] KVM: guest_memfd: Make guest mem use guest mem
+ inodes instead of anonymous inodes
+Message-ID: <202410121337.0ETimfvJ-lkp@intel.com>
+References: <20241010085930.1546800-2-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 10/11] virt: arm-cca-guest: TSM_REPORT support for
- realms
-To: Suzuki K Poulose <suzuki.poulose@arm.com>,
- Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Sami Mujawar <sami.mujawar@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, Dan Williams <dan.j.williams@intel.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-11-steven.price@arm.com>
- <5a3432d1-6a79-434c-bc93-6317c8c6435c@redhat.com>
- <6c306817-fbd7-402c-8425-a4523ed43114@arm.com>
- <7a83461d-40fd-4e61-8833-5dae2abaf82b@arm.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <7a83461d-40fd-4e61-8833-5dae2abaf82b@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241010085930.1546800-2-tabba@google.com>
 
-On 10/12/24 2:22 AM, Suzuki K Poulose wrote:
-> On 11/10/2024 15:14, Steven Price wrote:
->> On 08/10/2024 05:12, Gavin Shan wrote:
->>> On 10/5/24 12:43 AM, Steven Price wrote:
->>>> From: Sami Mujawar <sami.mujawar@arm.com>
->>>>
->>>> Introduce an arm-cca-guest driver that registers with
->>>> the configfs-tsm module to provide user interfaces for
->>>> retrieving an attestation token.
->>>>
->>>> When a new report is requested the arm-cca-guest driver
->>>> invokes the appropriate RSI interfaces to query an
->>>> attestation token.
->>>>
->>>> The steps to retrieve an attestation token are as follows:
->>>>     1. Mount the configfs filesystem if not already mounted
->>>>        mount -t configfs none /sys/kernel/config
->>>>     2. Generate an attestation token
->>>>        report=/sys/kernel/config/tsm/report/report0
->>>>        mkdir $report
->>>>        dd if=/dev/urandom bs=64 count=1 > $report/inblob
->>>>        hexdump -C $report/outblob
->>>>        rmdir $report
->>>>
->>>> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
->>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>> ---
->>>> v3: Minor improvements to comments and adapt to the renaming of
->>>> GRANULE_SIZE to RSI_GRANULE_SIZE.
->>>> ---
->>>>    drivers/virt/coco/Kconfig                     |   2 +
->>>>    drivers/virt/coco/Makefile                    |   1 +
->>>>    drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
->>>>    drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
->>>>    .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
->>>>    5 files changed, 227 insertions(+)
->>>>    create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
->>>>    create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
->>>>    create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
+Hi Fuad,
 
-[...]
+kernel test robot noticed the following build errors:
 
->>>> +/**
->>>> + * arm_cca_report_new - Generate a new attestation token.
->>>> + *
->>>> + * @report: pointer to the TSM report context information.
->>>> + * @data:  pointer to the context specific data for this module.
->>>> + *
->>>> + * Initialise the attestation token generation using the challenge data
->>>> + * passed in the TSM descriptor. Allocate memory for the attestation
->>>> token
->>>> + * and schedule calls to retrieve the attestation token on the same CPU
->>>> + * on which the attestation token generation was initialised.
->>>> + *
->>>> + * The challenge data must be at least 32 bytes and no more than 64
->>>> bytes. If
->>>> + * less than 64 bytes are provided it will be zero padded to 64 bytes.
->>>> + *
->>>> + * Return:
->>>> + * * %0        - Attestation token generated successfully.
->>>> + * * %-EINVAL  - A parameter was not valid.
->>>> + * * %-ENOMEM  - Out of memory.
->>>> + * * %-EFAULT  - Failed to get IPA for memory page(s).
->>>> + * * A negative status code as returned by smp_call_function_single().
->>>> + */
->>>> +static int arm_cca_report_new(struct tsm_report *report, void *data)
->>>> +{
->>>> +    int ret;
->>>> +    int cpu;
->>>> +    long max_size;
->>>> +    unsigned long token_size;
->>>> +    struct arm_cca_token_info info;
->>>> +    void *buf;
->>>> +    u8 *token __free(kvfree) = NULL;
->>>> +    struct tsm_desc *desc = &report->desc;
->>>> +
->>>> +    if (!report)
->>>> +        return -EINVAL;
->>>> +
->>>
->>> This check seems unnecessary and can be dropped.
->>
->> Ack
->>
->>>> +    if (desc->inblob_len < 32 || desc->inblob_len > 64)
->>>> +        return -EINVAL;
->>>> +
->>>> +    /*
->>>> +     * Get a CPU on which the attestation token generation will be
->>>> +     * scheduled and initialise the attestation token generation.
->>>> +     */
->>>> +    cpu = get_cpu();
->>>> +    max_size = rsi_attestation_token_init(desc->inblob,
->>>> desc->inblob_len);
->>>> +    put_cpu();
->>>> +
->>>
->>> It seems that put_cpu() is called early, meaning the CPU can go away before
->>> the subsequent call to arm_cca_attestation_continue() ?
->>
->> Indeed, good spot. I'll move it to the end of the function and update
->> the error paths below.
-> 
-> Actually this was on purpose, not to block the CPU hotplug. The
-> attestation must be completed on the same CPU.
-> 
-> We can detect the failure from "smp_call" further down and make sure
-> we can safely complete the operation or restart it.
-> 
+[auto build test ERROR on 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b]
 
-Yes, It's fine to call put_cpu() early since we're tolerant to error introduced
-by CPU unplug. It's a bit confused that rsi_attestation_token_init() is called
-on the local CPU while arm_cca_attestation_continue() is called on same CPU
-with help of smp_call_function_single(). Does it make sense to unify so that
-both will be invoked with the help of smp_call_function_single() ?
+url:    https://github.com/intel-lab-lkp/linux/commits/Fuad-Tabba/KVM-guest_memfd-Make-guest-mem-use-guest-mem-inodes-instead-of-anonymous-inodes/20241010-170821
+base:   8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
+patch link:    https://lore.kernel.org/r/20241010085930.1546800-2-tabba%40google.com
+patch subject: [PATCH v3 01/11] KVM: guest_memfd: Make guest mem use guest mem inodes instead of anonymous inodes
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20241012/202410121337.0ETimfvJ-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241012/202410121337.0ETimfvJ-lkp@intel.com/reproduce)
 
-     int cpu = smp_processor_id();
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410121337.0ETimfvJ-lkp@intel.com/
 
-     /*
-      * The calling and target CPU can be different after the calling process
-      * is migrated to another different CPU. It's guaranteed the attestatation
-      * always happen on the target CPU with smp_call_function_single().
-      */
-     ret = smp_call_function_single(cpu, rsi_attestation_token_init_wrapper,
-                                    (void *)&info, true);
-     if (ret) {
-         ...
-     }
+All errors (new ones prefixed by >>, old ones prefixed by <<):
 
-     
-Thanks,
-Gavin
+>> ERROR: modpost: "security_inode_init_security_anon" [arch/x86/kvm/kvm.ko] undefined!
 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
