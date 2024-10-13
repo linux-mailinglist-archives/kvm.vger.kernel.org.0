@@ -1,155 +1,171 @@
-Return-Path: <kvm+bounces-28699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28700-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A32BA99B9B7
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 16:27:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CC5E99B9C8
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 16:48:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46F681F216B4
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 14:27:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9042D1C20D93
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 14:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F492146000;
-	Sun, 13 Oct 2024 14:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0AE146A60;
+	Sun, 13 Oct 2024 14:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gkk5qey0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WqB/oQK5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B266A143871;
-	Sun, 13 Oct 2024 14:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464D714601C
+	for <kvm@vger.kernel.org>; Sun, 13 Oct 2024 14:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728829645; cv=none; b=eehVGrk91R1y/HlzxrhWvgg37pWWTXWANUl9ft+pmG2EacLuXTtRZy2OjKXq8vSjC6IQI5MOb2dWOKtLmT4mIYfAIiDoD83kicpdpzDHDS0CvW7IXTFSHJ+NSTrfniCV2OtV7Tz+v7rhTX0uG29RkTgFCqPAEJWOwtkdAuQNbHs=
+	t=1728830902; cv=none; b=A49np0iDxeE4UeHgR6e97xdGwCXPqz0EF3hBVt74SKo36ebdjiNwkdG48B4BW87pcsX+z+W+5DGlp0RnVH+nxNkgyPLybPC/C3QJCMrq2s8kIv87Kn20inQNblS4zTInFZBCPZhK1IW5xuC6pSaOH61ikB/I+IbtUFlzr+kYgMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728829645; c=relaxed/simple;
-	bh=1DenOp6yAbDdzFmC3Cf8Axxvq2UCc4WSNT9M1HmtA0g=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MBXgn39Ip3Ea3jrR6eeOhpJfRjzN5iL/rgVQbzJsIP92GzIhR7L9IzBBBo4D7kZDjwblofr/n8LV/1P9bIxABNIu8D+0nk3fnunWO9qxDx90KDb77LF5+frvDugL032qzWTycYCTPjFBb5DXX/4Vh4gid2zGio9gyrCN+nAv0GY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gkk5qey0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45BEBC4CEC5;
-	Sun, 13 Oct 2024 14:27:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728829645;
-	bh=1DenOp6yAbDdzFmC3Cf8Axxvq2UCc4WSNT9M1HmtA0g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gkk5qey0ATDS5bGAKlvAUMyNzDAUdsbxMX2sj+CJ8cV70/Wk/zXhOG3zos+/1gCx6
-	 DVn7sWTS5KipxxqSXqRhbuj9BnXJaX5jFOHEXEywYH1oROs9A8fspbNKJVtc5LOAUs
-	 ZDNcnrgqn8rCBuLM01v06K4A/lG3CfRw9Cpr2TlO+xokyfUqH2Z+MmaBxx6tAXbEvF
-	 1YgFglSxpaMiJz3quUjgFtlFozXIfriYmduhjp2zcPGYfmPdNa4pPQssYXKDtP/EYx
-	 smuHRqi6S9G5TLVaVcuVXvrsoMlnOInWlx3tCSTJOL8IEq/e/xEMVFBwAr6G0EKvpf
-	 5jsC+rJAyLPvA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1szzZ5-0037am-52;
-	Sun, 13 Oct 2024 15:27:23 +0100
-Date: Sun, 13 Oct 2024 15:27:22 +0100
-Message-ID: <871q0kulh1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=arc-20240116; t=1728830902; c=relaxed/simple;
+	bh=AUvPmuSjI+rSvTcZ0TXHVxonicItQiBtNVeLunp3GO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jZ6SasK/RX8vq7+JXPRMuUTAaDzmSuwiujs+eyCYkN/6ML7eSxZbiyRU3TnFIfDjYnb7TolNB/HT2uPj4BcFSIHt2PiWIIq8/nsk5LRmGoIqgJ0ROkvjX+8f9Y4XtNIsgplxEe8BUll5n7oM3TYERq8T6uy0zfMnbLjy7/952+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WqB/oQK5; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Sun, 13 Oct 2024 22:48:08 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728830893;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qI54PFvBT5PcOYDFV+12ZGlyTxkytu6jiXpb+llrzHU=;
+	b=WqB/oQK5zMokzc6EZ5aJNHBlcHl2JlV72AphlV2ZqLzNP94S2H5Q93foU9SGtJfFGvNWAC
+	ClsRLz5CegxfxEfUI5clAIe4R2WDvraNsz01JsOUesl3jES5bdb2Gs3Ss918xxkZgsmL1O
+	SLAFrH+D5N1c4e5+vT9NA1CRWYOV1zY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Leo Yan <leo.yan@linux.dev>
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: Peter Zijlstra <peterz@infradead.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Thomas Richter <tmricht@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 33/36] KVM: arm64: Disable hierarchical permissions when POE is enabled
-In-Reply-To: <ZweLbQRD6wAkG6Sz@linux.dev>
-References: <20241009190019.3222687-1-maz@kernel.org>
-	<20241009190019.3222687-34-maz@kernel.org>
-	<ZweLbQRD6wAkG6Sz@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Mike Leach <mike.leach@linaro.org>,
+	James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	Yicong Yang <yangyicong@hisilicon.com>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
+	Ian Rogers <irogers@google.com>, Andi Kleen <ak@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	H Peter Anvin <hpa@zytor.com>,
+	Kan Liang <kan.liang@linux.intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>, kvm@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH V12 11/14] perf tools: Add missing_features for
+ aux_start_paused, aux_pause, aux_resume
+Message-ID: <20241013144808.GA45976@debian-dev>
+References: <20241010143152.19071-1-adrian.hunter@intel.com>
+ <20241010143152.19071-12-adrian.hunter@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241010143152.19071-12-adrian.hunter@intel.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 10 Oct 2024 09:08:13 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, Oct 10, 2024 at 05:31:48PM +0300, Adrian Hunter wrote:
+> Display "feature is not supported" error message if aux_start_paused,
+> aux_pause or aux_resume result in a perf_event_open() error.
 > 
-> On Wed, Oct 09, 2024 at 08:00:16PM +0100, Marc Zyngier wrote:
-> > The hierarchical permissions must be disabled when POE is enabled
-> > in the translation regime used for a given table walk.
-> > 
-> > We store the two enable bits in the s1_walk_info structure so that
-> > they can be retrieved down the line, as they will be useful.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/at.c | 36 ++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 36 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > index 4921284eeedff..301399f17983f 100644
-> > --- a/arch/arm64/kvm/at.c
-> > +++ b/arch/arm64/kvm/at.c
-> > @@ -24,6 +24,8 @@ struct s1_walk_info {
-> >  	unsigned int		txsz;
-> >  	int 	     		sl;
-> >  	bool	     		hpd;
-> > +	bool			e0poe;
-> > +	bool			poe;
-> >  	bool	     		be;
-> >  	bool	     		s2;
-> >  };
-> > @@ -110,6 +112,34 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
-> >  	}
-> >  }
-> >  
-> > +static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
-> > +{
-> > +	u64 val;
-> > +
-> > +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
-> 
-> nit: kvm_has_s1pie()
+> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+> Acked-by: Ian Rogers <irogers@google.com>
+> Reviewed-by: Andi Kleen <ak@linux.intel.com>
 
-Nah, that's a gold plated bug, and really should check for S1POE. I
-guess I'll add a helper (kvm_has_s1poe), and use that throughout.
+This patch looks good to me.
 
-> 
-> > +		wi->poe = wi->e0poe = false;
-> > +		return;
-> > +	}
-> > +
-> > +	switch (wi->regime) {
-> > +	case TR_EL2:
-> > +	case TR_EL20:
-> > +		val = vcpu_read_sys_reg(vcpu, TCR2_EL2);
-> > +		wi->poe = val & TCR2_EL2_POE;
-> > +		wi->e0poe = val & TCR2_EL2_E0POE;
-> 
-> Hmm... E0POE is always false in the EL2 translation regime. The RES0
-> mask does the heavy lifting here, but that only works if we force
-> userspace to select an nVHE-only or VHE-only vCPU.
+A case is the Linux kernel has supported aux_pause_resume feature, but
+the PMU event does not support it. So we might consider to add a extra
+patch in perf:
 
-Which is the plan of record, but yeah, you can't work that out from
-this snippet.
-
-> It might make sense to have TR_EL2 force this to false to make it a bit
-> more self-documenting, albeit not a functional issue.
-
-Sure, I'll add a mask if that helps making sense of the whole thing.
+diff --git a/tools/perf/util/evsel.c b/tools/perf/util/evsel.c
+index 927aa61e7b14..9a3191df2ec5 100644
+--- a/tools/perf/util/evsel.c
++++ b/tools/perf/util/evsel.c
+@@ -3373,6 +3373,10 @@ int evsel__open_strerror(struct evsel *evsel, struct target *target,
+                        return scnprintf(msg, size,
+        "%s: PMU Hardware doesn't support 'aux_output' feature",
+                                         evsel__name(evsel));
++               if (evsel->core.attr.aux_action)
++                       return scnprintf(msg, size,
++       "%s: PMU Hardware doesn't support 'aux_action' feature",
++                                        evsel__name(evsel));
+                if (evsel->core.attr.sample_period != 0)
+                        return scnprintf(msg, size,
+        "%s: PMU Hardware doesn't support sampling/overflow-interrupts. Try 'perf stat'",
 
 Thanks,
+Leo
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> ---
+>  tools/perf/util/evsel.c | 10 +++++++++-
+>  tools/perf/util/evsel.h |  1 +
+>  2 files changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/perf/util/evsel.c b/tools/perf/util/evsel.c
+> index d34ceab9e454..927aa61e7b14 100644
+> --- a/tools/perf/util/evsel.c
+> +++ b/tools/perf/util/evsel.c
+> @@ -2147,7 +2147,13 @@ bool evsel__detect_missing_features(struct evsel *evsel)
+>  	 * Must probe features in the order they were added to the
+>  	 * perf_event_attr interface.
+>  	 */
+> -	if (!perf_missing_features.branch_counters &&
+> +	if (!perf_missing_features.aux_pause_resume &&
+> +	    (evsel->core.attr.aux_pause || evsel->core.attr.aux_resume ||
+> +	     evsel->core.attr.aux_start_paused)) {
+> +		perf_missing_features.aux_pause_resume = true;
+> +		pr_debug2_peo("Kernel has no aux_pause/aux_resume support, bailing out\n");
+> +		return false;
+> +	} else if (!perf_missing_features.branch_counters &&
+>  	    (evsel->core.attr.branch_sample_type & PERF_SAMPLE_BRANCH_COUNTERS)) {
+>  		perf_missing_features.branch_counters = true;
+>  		pr_debug2("switching off branch counters support\n");
+> @@ -3397,6 +3403,8 @@ int evsel__open_strerror(struct evsel *evsel, struct target *target,
+>  			return scnprintf(msg, size, "clockid feature not supported.");
+>  		if (perf_missing_features.clockid_wrong)
+>  			return scnprintf(msg, size, "wrong clockid (%d).", clockid);
+> +		if (perf_missing_features.aux_pause_resume)
+> +			return scnprintf(msg, size, "The 'aux_pause / aux_resume' feature is not supported, update the kernel.");
+>  		if (perf_missing_features.aux_output)
+>  			return scnprintf(msg, size, "The 'aux_output' feature is not supported, update the kernel.");
+>  		if (!target__has_cpu(target))
+> diff --git a/tools/perf/util/evsel.h b/tools/perf/util/evsel.h
+> index 15e745a9a798..778fcdb8261f 100644
+> --- a/tools/perf/util/evsel.h
+> +++ b/tools/perf/util/evsel.h
+> @@ -221,6 +221,7 @@ struct perf_missing_features {
+>  	bool weight_struct;
+>  	bool read_lost;
+>  	bool branch_counters;
+> +	bool aux_pause_resume;
+>  };
+>  
+>  extern struct perf_missing_features perf_missing_features;
+> -- 
+> 2.43.0
+> 
+> 
 
