@@ -1,96 +1,48 @@
-Return-Path: <kvm+bounces-28697-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B60C99B8C2
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 09:52:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FA5F99B8E3
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 11:02:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D04571F21B2C
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 07:52:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F4171C20C8D
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 09:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A516713A86A;
-	Sun, 13 Oct 2024 07:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Minycx4A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C483613B29F;
+	Sun, 13 Oct 2024 09:01:53 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2085.outbound.protection.outlook.com [40.107.237.85])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF4628FD;
-	Sun, 13 Oct 2024 07:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728805964; cv=fail; b=UGL39siXKcbBQEOcQL1jNLTn/CW7B3cQPrfXQd5OwgQusINsncY5KCgaw9y/S/85cTsm2ebU8hCi2WngO+ZIym6AGjU9lBRb3UTkF5OPUQ7zSVZ8c/us3fk84iQZZpaAxOBHrBJFYdacxb2jroKOvDGUwMRYD8XRx+ue30jOHng=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728805964; c=relaxed/simple;
-	bh=5WcdAzwFeMljvMFTEJIOSg7dgsZzcPCNMhBfqyTeMMc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EPTUE5ZtKbNYFduyD//Ii5tyxnqB8iJOE81F9Ro4WcyqHTN3AlNGDUVmPbgBmzoKk00NKg7oq5ZiDv+wEEXHWiskeYa2IORH4k5F5uAzi/oQGD7hJ33KSN8l5C+hqGUT5p0ZSqH8dfby38TIgmoMY3wPuPy7dKXDaddAePNjyGI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Minycx4A; arc=fail smtp.client-ip=40.107.237.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Eze/ClyGaACnUKXTuQJXqYtKACwTcK8HJPx5VqZpQ6Im7il05MrZkhJZ6WcN+J6ZeOgN8fL0FChYvkyIV3u2V5XDlKZoyX4dqa9KgwNPJv5iAam25/Q+GAyzK4/tWxN+qVwPKpVfKFnSSocKZiGhZIHZxloj13sZ9IheM7GJZ3/4038/mJWIJmsTl9xx+1A/MZLNuVaydUkZhIWlEGjbOH3ZLFAtE0mPbru3VwhsjgKdChbgRPio8Z19u/kJoAXE8suzL8gJFxCrBx+GRP9hGLDBqC8PMUxbgPI3bf+Ew4rtuQXG2ZDm1ukE6Tykxpe2v84ha/BvF5uhdX81a/bRzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tL2tz/DmAHGn5CT9wHUysn+fOtKuURaDn3KZ0YtQ+IU=;
- b=kgGJDqAIMVL+B8K2bsBXfz2IZqwuiQk24sJtbRDW7uzkX4hbRx1s/i0URS1U5NKlieA7+mJvtz7F84/yZjljr8JDzaeIsgZYIPdovrYhKz+QCvHoEVPgiYbSMnAhVw8Bkmgm2qn4TySV3TvMzES9KwnJihbyZ7q8qKAtqih6mJF5phUQ3rxkRtRmwA8cx3qUuHPyWpT9UbG7MnuYaR/HvvdJ3XpQ4Q83DtEE2hB46JYYBZVtgMFGKwcGSHvL2prrqQ4OQThkhz91B4kY55XvEfeB+3bxTQ4nMshlSXF81vmELMz1NMTssQWiYEu0ziGojOPWS/c2z9C+Y5jeo1dLhA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tL2tz/DmAHGn5CT9wHUysn+fOtKuURaDn3KZ0YtQ+IU=;
- b=Minycx4An0airT272+dGNcMyOaDRYu1UimPatluk/NmlBBLtuZZkXKh4ocmBF297+kjG/r0tK5geYw0YsrL1PE2x6dJbbg/rVCrYfZOdGtNUPKLQ4MHbMsapoMmXn3c00+XGx4HNjswW2DfbQ7uohHaGw+kQcTKg4Ao9eo6/gYs0Y5OSXszCGSE+HORoBo0BmS2uqeSgcWZj85uh6EonjOZKD/nVPb/wUhUqYI9Cg9Y+bZWAhPu11Q6sAXsQ98bJTL0VI7rNwqQx4zSirzr4mQTV+wcX6EK3ooIJVQoh3scs5BqDtMZTgmFWu6kb5oNos1mwMvVjDnHddJaup6f4Dw==
-Received: from MW4PR03CA0280.namprd03.prod.outlook.com (2603:10b6:303:b5::15)
- by SA1PR12MB7200.namprd12.prod.outlook.com (2603:10b6:806:2bb::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.24; Sun, 13 Oct
- 2024 07:52:38 +0000
-Received: from SJ1PEPF00002324.namprd03.prod.outlook.com
- (2603:10b6:303:b5:cafe::52) by MW4PR03CA0280.outlook.office365.com
- (2603:10b6:303:b5::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.24 via Frontend
- Transport; Sun, 13 Oct 2024 07:52:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ1PEPF00002324.mail.protection.outlook.com (10.167.242.87) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8048.13 via Frontend Transport; Sun, 13 Oct 2024 07:52:37 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 13 Oct
- 2024 00:52:21 -0700
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 13 Oct
- 2024 00:52:20 -0700
-Received: from localhost.nvidia.com (10.127.8.11) by mail.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4 via Frontend
- Transport; Sun, 13 Oct 2024 00:52:19 -0700
-From: <ankita@nvidia.com>
-To: <ankita@nvidia.com>, <jgg@nvidia.com>, <alex.williamson@redhat.com>,
-	<yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<kevin.tian@intel.com>, <zhiw@nvidia.com>
-CC: <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
-	<targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
-	<apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
-	<anuaggarwal@nvidia.com>, <mochs@nvidia.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH v1 1/1] vfio/nvgrace-gpu: Add a new GH200 SKU to the devid table
-Date: Sun, 13 Oct 2024 07:52:16 +0000
-Message-ID: <20241013075216.19229-1-ankita@nvidia.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40035804;
+	Sun, 13 Oct 2024 09:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728810113; cv=none; b=LSv3Tdxu6C2DW+9ghIQBMXfYJ/psGCYZLbYOnNnVK7lyGqBuTcmcO+kUxBMwJtZgfclQogPZlkrTX5ytJHqeIRwMaXAJzHYbfJIWe76EFmSpsZfEBgHvXDtEogI8wU3STMkKoZGYBdyOBsgsEB9tjO1tMAbNiy01jAHBWYrCr0k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728810113; c=relaxed/simple;
+	bh=rauAsYdONhYsT5hDvf7/b86dTBwmMtPrN/bkxgb2qlA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZIVSAz78hbT/AyhcAWmpj9QrXfLKibRMxOiLEHs8pcezWZQ1ihXnJant4HMOPqxuf41htgjfBJUecmDT8LcCOn3IsdEvrnKspkPwV8kxgn+363uvNajYlbGrzpPh+kj85NBPepDZL5pszJca0nBRtxdHPwzHdsJ+/A5jyH36B+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBA18C4CEC5;
+	Sun, 13 Oct 2024 09:01:49 +0000 (UTC)
+From: Huacai Chen <chenhuacai@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>
+Cc: kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Xuerui Wang <kernel@xen0n.name>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: [PATCH] LoongArch: KVM: Mark hrtimer to expire in hard interrupt context
+Date: Sun, 13 Oct 2024 17:01:36 +0800
+Message-ID: <20241013090136.1254036-1-chenhuacai@loongson.cn>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -98,81 +50,93 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002324:EE_|SA1PR12MB7200:EE_
-X-MS-Office365-Filtering-Correlation-Id: 96be4a37-fdc3-4be4-a7ea-08dceb5c0180
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?lySbv3e1QyvSqk9ItYOxDuaamV6DDVb3m+TUbiaUXmdFBzzprRHpvyma4l86?=
- =?us-ascii?Q?BpLlVM1Esvr60Aq0C6xvL/SdzM3uvrVFdEm+YAWNRjEV+2MGjOBQr4LYaamT?=
- =?us-ascii?Q?PkfoBJ2hoMpUYYaggigStQdn7lw4+XSu0ydSW0gCotua6qPxQ265yDRxZa2X?=
- =?us-ascii?Q?uZ2Jih/s3KWYgcoP3MO2lAypHGjPwvZMY8kbEJihtoZ4gXdQUj7jQ0PV/Pqd?=
- =?us-ascii?Q?3XNUKmGuF82n492xjNtEgp4zk6FH90s3KX6t9fAI4gmE2B4xa5qROTYLRTY9?=
- =?us-ascii?Q?YsAU+GTXCDIAqTpaxmrvy/bsRWJ9Ec8CBmmflI45lyGYMn7y7ekshS6VuQku?=
- =?us-ascii?Q?kNjlf//jXhXVtTOyVnWzcT2hmD2G5dlVlPtr8ZPDn07yYIebBYpPFe4VxK8I?=
- =?us-ascii?Q?a3Q++c7ZZlwm+2/TNkqE19co3SNkHypo4XODVz3SBiN5n7wcu0fogcvMxvg+?=
- =?us-ascii?Q?mfEFxQPqJLR2BMsvxl9m5cihZgzOoTeitkm92/Vc78wZNfOusdzeY3zovlpn?=
- =?us-ascii?Q?2euPTw6QSlq9pqnJ8yX4oNQjTZmnKH4ijT4XwIcXBQEWL4Ts13VWxtpxku3x?=
- =?us-ascii?Q?Qa+XEYmrKgVO0EtERuK9wviVusTiWkH9IK0QQEO9A5Eg1Cr54FaXIdinEsFS?=
- =?us-ascii?Q?AZVYJvBA5YYXP34NBJHFyFvZELqwWRGJN3x8Iw4UnOKlI5+b0p+w0QSotr18?=
- =?us-ascii?Q?EJ4EfaYZxgF8rdLrbEQgLl7d6Wuez0jYNYtSv7W1MRbGDoPAUDpYxeDmJfJM?=
- =?us-ascii?Q?abYxQjtHujMcFg2iv3ezvfBClktOIdRE+JvpeLee/xOQeoegfxBhA/hiQM6F?=
- =?us-ascii?Q?VOJid4pIZHIWmnJwIb/k0Mi0lyAupaPOenTiWj39HLS3W5StedOoR6fQwIyb?=
- =?us-ascii?Q?JDyLudfECu0xR2Uzns9Lz15AeeJVkkLZzRSOCysUIB9g4Krx/oDt6IzwHzmA?=
- =?us-ascii?Q?eqBjmHQATkLxNckR0ZKQc3aDmalUcOvxp3mmj+WwDf6G+bbDU4BRj3UpExHg?=
- =?us-ascii?Q?t3Ec7Ax9hjTnyh/dyaBrTEm+jpJKKurYNB8oK9a8q4ks+DfjcU1Hg84C6ODc?=
- =?us-ascii?Q?cZIIT+zGvgPPKwfdQESColMIt4bdky1QITNrVLP5Qq2AJfikMMhXQPLlusDE?=
- =?us-ascii?Q?VkPAD4MJvG9WKoSLEsPU28k+PKrCqQTALubAP/LFVnrJ30QelPa4EQAwW6xt?=
- =?us-ascii?Q?5jWofLfGybwUgqlBQnHwdkCvTYnaAE+Ghr+n0IWAVYNAI+/b5l+TkXhkY0/e?=
- =?us-ascii?Q?yTlfjYLeHyeXEBWwODIMiKS8iY6k3JDVTrRJhmjgXGrrbfg5H80YOi9smGkd?=
- =?us-ascii?Q?YoXVjLRmlogVkC3vyX+xoli1qVMaJabhzdckNquu5iwHoGycjd3w3r/2RGGx?=
- =?us-ascii?Q?W8KqsmLIO/IuxI/n84bw/J9+gbg2?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2024 07:52:37.3245
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96be4a37-fdc3-4be4-a7ea-08dceb5c0180
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002324.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7200
 
-From: Ankit Agrawal <ankita@nvidia.com>
+Like commit 2c0d278f3293fc5 ("KVM: LAPIC: Mark hrtimer to expire in hard
+interrupt context"), On PREEMPT_RT enabled kernels unmarked hrtimers are
+moved into soft interrupt expiry mode by default.
 
-NVIDIA is planning to productize a new Grace Hopper superchip
-SKU with device ID 0x2348.
+While that's not a functional requirement for the KVM constant timer
+emulation, it is a latency issue which can be avoided by marking the
+timer so hard interrupt context expiry is enforced.
 
-Add the SKU devid to nvgrace_gpu_vfio_pci_table.
+This fix a "scheduling while atomic" bug for PREEMPT_RT enabled kernels:
 
-Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+ BUG: scheduling while atomic: qemu-system-loo/1011/0x00000002
+ Modules linked in: amdgpu rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat ns
+ CPU: 1 UID: 0 PID: 1011 Comm: qemu-system-loo Tainted: G        W          6.12.0-rc2+ #1774
+ Tainted: [W]=WARN
+ Hardware name: Loongson Loongson-3A5000-7A1000-1w-CRB/Loongson-LS3A5000-7A1000-1w-CRB, BIOS vUDK2018-LoongArch-V2.0.0-prebeta9 10/21/2022
+ Stack : ffffffffffffffff 0000000000000000 9000000004e3ea38 9000000116744000
+         90000001167475a0 0000000000000000 90000001167475a8 9000000005644830
+         90000000058dc000 90000000058dbff8 9000000116747420 0000000000000001
+         0000000000000001 6a613fc938313980 000000000790c000 90000001001c1140
+         00000000000003fe 0000000000000001 000000000000000d 0000000000000003
+         0000000000000030 00000000000003f3 000000000790c000 9000000116747830
+         90000000057ef000 0000000000000000 9000000005644830 0000000000000004
+         0000000000000000 90000000057f4b58 0000000000000001 9000000116747868
+         900000000451b600 9000000005644830 9000000003a13998 0000000010000020
+         00000000000000b0 0000000000000004 0000000000000000 0000000000071c1d
+         ...
+ Call Trace:
+ [<9000000003a13998>] show_stack+0x38/0x180
+ [<9000000004e3ea34>] dump_stack_lvl+0x84/0xc0
+ [<9000000003a71708>] __schedule_bug+0x48/0x60
+ [<9000000004e45734>] __schedule+0x1114/0x1660
+ [<9000000004e46040>] schedule_rtlock+0x20/0x60
+ [<9000000004e4e330>] rtlock_slowlock_locked+0x3f0/0x10a0
+ [<9000000004e4f038>] rt_spin_lock+0x58/0x80
+ [<9000000003b02d68>] hrtimer_cancel_wait_running+0x68/0xc0
+ [<9000000003b02e30>] hrtimer_cancel+0x70/0x80
+ [<ffff80000235eb70>] kvm_restore_timer+0x50/0x1a0 [kvm]
+ [<ffff8000023616c8>] kvm_arch_vcpu_load+0x68/0x2a0 [kvm]
+ [<ffff80000234c2d4>] kvm_sched_in+0x34/0x60 [kvm]
+ [<9000000003a749a0>] finish_task_switch.isra.0+0x140/0x2e0
+ [<9000000004e44a70>] __schedule+0x450/0x1660
+ [<9000000004e45cb0>] schedule+0x30/0x180
+ [<ffff800002354c70>] kvm_vcpu_block+0x70/0x120 [kvm]
+ [<ffff800002354d80>] kvm_vcpu_halt+0x60/0x3e0 [kvm]
+ [<ffff80000235b194>] kvm_handle_gspr+0x3f4/0x4e0 [kvm]
+ [<ffff80000235f548>] kvm_handle_exit+0x1c8/0x260 [kvm]
+
+Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
 ---
- drivers/vfio/pci/nvgrace-gpu/main.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/loongarch/kvm/timer.c | 7 ++++---
+ arch/loongarch/kvm/vcpu.c  | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-index a7fd018aa548..a467085038f0 100644
---- a/drivers/vfio/pci/nvgrace-gpu/main.c
-+++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-@@ -866,6 +866,8 @@ static const struct pci_device_id nvgrace_gpu_vfio_pci_table[] = {
- 	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2342) },
- 	/* GH200 480GB */
- 	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2345) },
-+	/* GH200 SKU */
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2348) },
- 	{}
- };
+diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
+index 74a4b5c272d6..32dc213374be 100644
+--- a/arch/loongarch/kvm/timer.c
++++ b/arch/loongarch/kvm/timer.c
+@@ -161,10 +161,11 @@ static void _kvm_save_timer(struct kvm_vcpu *vcpu)
+ 	if (kvm_vcpu_is_blocking(vcpu)) {
  
+ 		/*
+-		 * HRTIMER_MODE_PINNED is suggested since vcpu may run in
+-		 * the same physical cpu in next time
++		 * HRTIMER_MODE_PINNED_HARD is suggested since vcpu may run in
++		 * the same physical cpu in next time, and the timer should run
++		 * in hardirq context even in the PREEMPT_RT case.
+ 		 */
+-		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED);
++		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED_HARD);
+ 	}
+ }
+ 
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index 0697b1064251..174734a23d0a 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -1457,7 +1457,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.vpid = 0;
+ 	vcpu->arch.flush_gpa = INVALID_GPA;
+ 
+-	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED);
++	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED_HARD);
+ 	vcpu->arch.swtimer.function = kvm_swtimer_wakeup;
+ 
+ 	vcpu->arch.handle_exit = kvm_handle_exit;
 -- 
-2.34.1
+2.43.5
 
 
