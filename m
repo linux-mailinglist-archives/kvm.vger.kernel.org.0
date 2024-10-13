@@ -1,142 +1,155 @@
-Return-Path: <kvm+bounces-28698-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28699-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FA5F99B8E3
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 11:02:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A32BA99B9B7
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 16:27:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F4171C20C8D
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 09:02:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46F681F216B4
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2024 14:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C483613B29F;
-	Sun, 13 Oct 2024 09:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F492146000;
+	Sun, 13 Oct 2024 14:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gkk5qey0"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40035804;
-	Sun, 13 Oct 2024 09:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B266A143871;
+	Sun, 13 Oct 2024 14:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728810113; cv=none; b=LSv3Tdxu6C2DW+9ghIQBMXfYJ/psGCYZLbYOnNnVK7lyGqBuTcmcO+kUxBMwJtZgfclQogPZlkrTX5ytJHqeIRwMaXAJzHYbfJIWe76EFmSpsZfEBgHvXDtEogI8wU3STMkKoZGYBdyOBsgsEB9tjO1tMAbNiy01jAHBWYrCr0k=
+	t=1728829645; cv=none; b=eehVGrk91R1y/HlzxrhWvgg37pWWTXWANUl9ft+pmG2EacLuXTtRZy2OjKXq8vSjC6IQI5MOb2dWOKtLmT4mIYfAIiDoD83kicpdpzDHDS0CvW7IXTFSHJ+NSTrfniCV2OtV7Tz+v7rhTX0uG29RkTgFCqPAEJWOwtkdAuQNbHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728810113; c=relaxed/simple;
-	bh=rauAsYdONhYsT5hDvf7/b86dTBwmMtPrN/bkxgb2qlA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZIVSAz78hbT/AyhcAWmpj9QrXfLKibRMxOiLEHs8pcezWZQ1ihXnJant4HMOPqxuf41htgjfBJUecmDT8LcCOn3IsdEvrnKspkPwV8kxgn+363uvNajYlbGrzpPh+kj85NBPepDZL5pszJca0nBRtxdHPwzHdsJ+/A5jyH36B+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBA18C4CEC5;
-	Sun, 13 Oct 2024 09:01:49 +0000 (UTC)
-From: Huacai Chen <chenhuacai@loongson.cn>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>
-Cc: kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Xuerui Wang <kernel@xen0n.name>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH] LoongArch: KVM: Mark hrtimer to expire in hard interrupt context
-Date: Sun, 13 Oct 2024 17:01:36 +0800
-Message-ID: <20241013090136.1254036-1-chenhuacai@loongson.cn>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1728829645; c=relaxed/simple;
+	bh=1DenOp6yAbDdzFmC3Cf8Axxvq2UCc4WSNT9M1HmtA0g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MBXgn39Ip3Ea3jrR6eeOhpJfRjzN5iL/rgVQbzJsIP92GzIhR7L9IzBBBo4D7kZDjwblofr/n8LV/1P9bIxABNIu8D+0nk3fnunWO9qxDx90KDb77LF5+frvDugL032qzWTycYCTPjFBb5DXX/4Vh4gid2zGio9gyrCN+nAv0GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gkk5qey0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45BEBC4CEC5;
+	Sun, 13 Oct 2024 14:27:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728829645;
+	bh=1DenOp6yAbDdzFmC3Cf8Axxvq2UCc4WSNT9M1HmtA0g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Gkk5qey0ATDS5bGAKlvAUMyNzDAUdsbxMX2sj+CJ8cV70/Wk/zXhOG3zos+/1gCx6
+	 DVn7sWTS5KipxxqSXqRhbuj9BnXJaX5jFOHEXEywYH1oROs9A8fspbNKJVtc5LOAUs
+	 ZDNcnrgqn8rCBuLM01v06K4A/lG3CfRw9Cpr2TlO+xokyfUqH2Z+MmaBxx6tAXbEvF
+	 1YgFglSxpaMiJz3quUjgFtlFozXIfriYmduhjp2zcPGYfmPdNa4pPQssYXKDtP/EYx
+	 smuHRqi6S9G5TLVaVcuVXvrsoMlnOInWlx3tCSTJOL8IEq/e/xEMVFBwAr6G0EKvpf
+	 5jsC+rJAyLPvA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1szzZ5-0037am-52;
+	Sun, 13 Oct 2024 15:27:23 +0100
+Date: Sun, 13 Oct 2024 15:27:22 +0100
+Message-ID: <871q0kulh1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 33/36] KVM: arm64: Disable hierarchical permissions when POE is enabled
+In-Reply-To: <ZweLbQRD6wAkG6Sz@linux.dev>
+References: <20241009190019.3222687-1-maz@kernel.org>
+	<20241009190019.3222687-34-maz@kernel.org>
+	<ZweLbQRD6wAkG6Sz@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Like commit 2c0d278f3293fc5 ("KVM: LAPIC: Mark hrtimer to expire in hard
-interrupt context"), On PREEMPT_RT enabled kernels unmarked hrtimers are
-moved into soft interrupt expiry mode by default.
+On Thu, 10 Oct 2024 09:08:13 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Wed, Oct 09, 2024 at 08:00:16PM +0100, Marc Zyngier wrote:
+> > The hierarchical permissions must be disabled when POE is enabled
+> > in the translation regime used for a given table walk.
+> > 
+> > We store the two enable bits in the s1_walk_info structure so that
+> > they can be retrieved down the line, as they will be useful.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/at.c | 36 ++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 36 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index 4921284eeedff..301399f17983f 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -24,6 +24,8 @@ struct s1_walk_info {
+> >  	unsigned int		txsz;
+> >  	int 	     		sl;
+> >  	bool	     		hpd;
+> > +	bool			e0poe;
+> > +	bool			poe;
+> >  	bool	     		be;
+> >  	bool	     		s2;
+> >  };
+> > @@ -110,6 +112,34 @@ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+> >  	}
+> >  }
+> >  
+> > +static void compute_s1poe(struct kvm_vcpu *vcpu, struct s1_walk_info *wi)
+> > +{
+> > +	u64 val;
+> > +
+> > +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
+> 
+> nit: kvm_has_s1pie()
 
-While that's not a functional requirement for the KVM constant timer
-emulation, it is a latency issue which can be avoided by marking the
-timer so hard interrupt context expiry is enforced.
+Nah, that's a gold plated bug, and really should check for S1POE. I
+guess I'll add a helper (kvm_has_s1poe), and use that throughout.
 
-This fix a "scheduling while atomic" bug for PREEMPT_RT enabled kernels:
+> 
+> > +		wi->poe = wi->e0poe = false;
+> > +		return;
+> > +	}
+> > +
+> > +	switch (wi->regime) {
+> > +	case TR_EL2:
+> > +	case TR_EL20:
+> > +		val = vcpu_read_sys_reg(vcpu, TCR2_EL2);
+> > +		wi->poe = val & TCR2_EL2_POE;
+> > +		wi->e0poe = val & TCR2_EL2_E0POE;
+> 
+> Hmm... E0POE is always false in the EL2 translation regime. The RES0
+> mask does the heavy lifting here, but that only works if we force
+> userspace to select an nVHE-only or VHE-only vCPU.
 
- BUG: scheduling while atomic: qemu-system-loo/1011/0x00000002
- Modules linked in: amdgpu rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat ns
- CPU: 1 UID: 0 PID: 1011 Comm: qemu-system-loo Tainted: G        W          6.12.0-rc2+ #1774
- Tainted: [W]=WARN
- Hardware name: Loongson Loongson-3A5000-7A1000-1w-CRB/Loongson-LS3A5000-7A1000-1w-CRB, BIOS vUDK2018-LoongArch-V2.0.0-prebeta9 10/21/2022
- Stack : ffffffffffffffff 0000000000000000 9000000004e3ea38 9000000116744000
-         90000001167475a0 0000000000000000 90000001167475a8 9000000005644830
-         90000000058dc000 90000000058dbff8 9000000116747420 0000000000000001
-         0000000000000001 6a613fc938313980 000000000790c000 90000001001c1140
-         00000000000003fe 0000000000000001 000000000000000d 0000000000000003
-         0000000000000030 00000000000003f3 000000000790c000 9000000116747830
-         90000000057ef000 0000000000000000 9000000005644830 0000000000000004
-         0000000000000000 90000000057f4b58 0000000000000001 9000000116747868
-         900000000451b600 9000000005644830 9000000003a13998 0000000010000020
-         00000000000000b0 0000000000000004 0000000000000000 0000000000071c1d
-         ...
- Call Trace:
- [<9000000003a13998>] show_stack+0x38/0x180
- [<9000000004e3ea34>] dump_stack_lvl+0x84/0xc0
- [<9000000003a71708>] __schedule_bug+0x48/0x60
- [<9000000004e45734>] __schedule+0x1114/0x1660
- [<9000000004e46040>] schedule_rtlock+0x20/0x60
- [<9000000004e4e330>] rtlock_slowlock_locked+0x3f0/0x10a0
- [<9000000004e4f038>] rt_spin_lock+0x58/0x80
- [<9000000003b02d68>] hrtimer_cancel_wait_running+0x68/0xc0
- [<9000000003b02e30>] hrtimer_cancel+0x70/0x80
- [<ffff80000235eb70>] kvm_restore_timer+0x50/0x1a0 [kvm]
- [<ffff8000023616c8>] kvm_arch_vcpu_load+0x68/0x2a0 [kvm]
- [<ffff80000234c2d4>] kvm_sched_in+0x34/0x60 [kvm]
- [<9000000003a749a0>] finish_task_switch.isra.0+0x140/0x2e0
- [<9000000004e44a70>] __schedule+0x450/0x1660
- [<9000000004e45cb0>] schedule+0x30/0x180
- [<ffff800002354c70>] kvm_vcpu_block+0x70/0x120 [kvm]
- [<ffff800002354d80>] kvm_vcpu_halt+0x60/0x3e0 [kvm]
- [<ffff80000235b194>] kvm_handle_gspr+0x3f4/0x4e0 [kvm]
- [<ffff80000235f548>] kvm_handle_exit+0x1c8/0x260 [kvm]
+Which is the plan of record, but yeah, you can't work that out from
+this snippet.
 
-Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
----
- arch/loongarch/kvm/timer.c | 7 ++++---
- arch/loongarch/kvm/vcpu.c  | 2 +-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+> It might make sense to have TR_EL2 force this to false to make it a bit
+> more self-documenting, albeit not a functional issue.
 
-diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
-index 74a4b5c272d6..32dc213374be 100644
---- a/arch/loongarch/kvm/timer.c
-+++ b/arch/loongarch/kvm/timer.c
-@@ -161,10 +161,11 @@ static void _kvm_save_timer(struct kvm_vcpu *vcpu)
- 	if (kvm_vcpu_is_blocking(vcpu)) {
- 
- 		/*
--		 * HRTIMER_MODE_PINNED is suggested since vcpu may run in
--		 * the same physical cpu in next time
-+		 * HRTIMER_MODE_PINNED_HARD is suggested since vcpu may run in
-+		 * the same physical cpu in next time, and the timer should run
-+		 * in hardirq context even in the PREEMPT_RT case.
- 		 */
--		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED);
-+		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED_HARD);
- 	}
- }
- 
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index 0697b1064251..174734a23d0a 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -1457,7 +1457,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.vpid = 0;
- 	vcpu->arch.flush_gpa = INVALID_GPA;
- 
--	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED);
-+	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED_HARD);
- 	vcpu->arch.swtimer.function = kvm_swtimer_wakeup;
- 
- 	vcpu->arch.handle_exit = kvm_handle_exit;
+Sure, I'll add a mask if that helps making sense of the whole thing.
+
+Thanks,
+
+	M.
+
 -- 
-2.43.5
-
+Without deviation from the norm, progress is not possible.
 
