@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-28810-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28811-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3A4A99D757
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 21:26:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A92CE99D789
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 21:35:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7A041C2257B
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 19:26:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 538601F23262
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 19:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F040A1CDA1C;
-	Mon, 14 Oct 2024 19:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3620A1CCB51;
+	Mon, 14 Oct 2024 19:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbPIdNnh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EeWx1pNG"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE881CCEDC
-	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 19:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BADB1A7273
+	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 19:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728933972; cv=none; b=K3b1/L4D0wCaLOpJx2151eeEZCv89oZP2AY6N3nFnti+w9m9tlJemiVaZoj7gSrE9goDLo+PF/ES1rqdGkgiTopFlPloo4vhiqhXHwrCGm6+eM6msEuKr8k5aP9Pb2tjLaEAjbXOdQ0miCqSoqss494t1arFAuxPmgc3MB8uXJk=
+	t=1728934536; cv=none; b=TtIKMWgWy1+/R+leu9JXgzLrafqBepeJiihuEGI/rWWZQnfQwtuHJcF1AezKOEPVSE6IAPEGjkVrWhGhNU/OWpImw8SYdR6MLdCbkoLq0qZ5LedF8SSe4Pt2L0A1+yQRMCbVxgkFKd6OuGw9zZpNgMgPZiy/1PYr+AYsV6j+nj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728933972; c=relaxed/simple;
-	bh=mzpLzrClCHVleqISh7AUGsmPYpB2iOLEtRLRcBrdom0=;
+	s=arc-20240116; t=1728934536; c=relaxed/simple;
+	bh=ATb9FQ16x78hfIMSaPpd+FQuWIsSjOLL9lHPFZfzluE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qnfrD6QprHrhKDOgszqbzNchv2n18YJYDDFlj15vYUxGMiQ5CJJVl9HloGmlejIlHnAqSwSnYJ3ejW+vpTr4rQ8eSd74xTqysWmdCJ2h/JwSuK/Nw7gEH69TVA9+madS3P+cnjJWUs1Ci2TCGt1pj3Q0+e3Teh4MnmvZ2swcyaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CbPIdNnh; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=nv8kklNfZfOTAppyo8wMk1sdrNwaWXmHmYaFn1UilRaiGg7FmmF7wtX9/0Uixzrpo/zCc9a3QVzcKxNTYWsKfeHrEFkD5eJWBuhKk22+gmnCmhB2dkrL8YoFjgQRjU6jo8mbY7AXJTDd2qj0cWInty/J/Ew4l5qFfqhM3GJrvIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EeWx1pNG; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728933969;
+	s=mimecast20190719; t=1728934532;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DuTddS/X2ZHJjeoQk4qhcSOa+j0yfxlG1Fj2goHGJ/Y=;
-	b=CbPIdNnh9wvx45Mn4frFWLq1WJElW7SyMo9etggN2GUS8j82EFClWGnmoAQFpBJ6CHQVoD
-	T/v31QUn/9il3o/B+b4GnmAs2zxwydsGH0m1u0PLSCcTz5mxqUhq58PNF363A1Y9zC6aSN
-	DeVzV6IokRnil+JhGHAyyKKJeZzyscM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=sgEXWzSvIwubbV7unridAoQa4cdce3CR6+dDgB9+5yc=;
+	b=EeWx1pNGp4aX6px7r2Sm9UnAXG1CYOAYv7yVeazGYVO6ApfUezqf3piNvZWbLvA2knZosA
+	K4Fqv9r8ZvdvdNH6LwcjFfYh7gb2sCx9EGFwCHbtonc18BjSTXxqvshZKpCJCTwFa1ShgD
+	e9kV0gzAZj8WxuIAu8G1Kr6H6KB/Omo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-163-ZwlXJWNCMvOLCRkZdVBBDA-1; Mon, 14 Oct 2024 15:26:08 -0400
-X-MC-Unique: ZwlXJWNCMvOLCRkZdVBBDA-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d533a484aso1558413f8f.0
-        for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 12:26:07 -0700 (PDT)
+ us-mta-610-yMEHXMhFPAqioBhSoWo9Cw-1; Mon, 14 Oct 2024 15:35:31 -0400
+X-MC-Unique: yMEHXMhFPAqioBhSoWo9Cw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d67f4bf98so1083470f8f.1
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 12:35:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728933967; x=1729538767;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DuTddS/X2ZHJjeoQk4qhcSOa+j0yfxlG1Fj2goHGJ/Y=;
-        b=NJ7fyZXn9X1bLPn5oVKJjSVx/AYTRdR9GEQgO5giF3Z60gke3HEbVLkBdyj0FmU1vP
-         DX1Ntsco0Y3JmO3jZbuk+6IDoKxTJybBlBog6cDHseLHkuweX/flyLeo6f0VoZ61+yAU
-         RondkAvKT4DSkfW23l9Dt626de9oIJq5+rc+1yqln9ngPyafsD3oQuORyWEr0Si/nln5
-         GXup8Zice4DxBCQmkvRTB2BkCgMuXw4CWUZu4BOaLcEBTfC3YVO16HxeR5u5msZ0bXsA
-         0rkDKA7pBdFMu+i/gjoWbE06cIGet/w6FmCp5gYOz38p/As9eBOmPAFE9Iq9yPcrlRtx
-         ovxA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFO3tFhQguPLVaSNHWyRZNYUzYuTCPgLOjJ4Xn2BqRI4hGPggswgQHAzQqGvEW9mSK5DA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV+1H0M+OsusYdvPvGUs/llVw7CM787zwJcih8Wq30yhzaObCp
-	8P0dfPvd7J+CICF2yfocvnq7dg6lVBlXzHHpjmfqDBilp6IL09uboYO5XHuJjCWLsYB0aZfiPqv
-	pg4BWJXCNje73TyqyDlglhLhDFGyNuFLypROV3WaB7euDLUJiUg==
-X-Received: by 2002:a5d:6502:0:b0:37d:321e:ef0c with SMTP id ffacd0b85a97d-37d481749f6mr13355019f8f.11.1728933966972;
-        Mon, 14 Oct 2024 12:26:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGSqIUDVAQ8yDJ3M4cXNcdYJWjEhFZPZWWc8/QCZ41ZlMC+nT4x3VWwvTySfdaFjPhnyy97+Q==
-X-Received: by 2002:a5d:6502:0:b0:37d:321e:ef0c with SMTP id ffacd0b85a97d-37d481749f6mr13355004f8f.11.1728933966496;
-        Mon, 14 Oct 2024 12:26:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728934530; x=1729539330;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sgEXWzSvIwubbV7unridAoQa4cdce3CR6+dDgB9+5yc=;
+        b=WPY28QUzFC2hVCM6ehk+13RuOelHbRfVswRXDlm+H1WioIw/Kg5JzHID0HbACbdS0E
+         skq0wOyHxvHLf3K38swl/7cizyTZwCfwNbKPGA2oikrHUAB0apCEnG6DFixNjZbV+Z3M
+         S8dO/gXczZ69Cw4dAfe0c3fMXiBfGtpE0LB52dSi2tolghwShvyQth18UjE3IGJ03jDw
+         sNNS568sIbQrKn2gwdVU8W+ul4Ft+X6sEkTVJp/02JYeBn6sAK6sS8r7K3CMSBi1Kzc8
+         XPEf6C6Kh6KoAZj1ij3G4JHbAjya03ZuaFaPGC/skqZH1ZdeQ2vEEALFNlVW9vxs7nPe
+         mPKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVF7HoN1woimbGTlDrPtWAeRp9B6WqH2pjoOSgkmMeagvFhuU2YuJqWGpzKRyH+7Ta+tso=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzi/xNJP9OGSboYSRrk0chF1N7OOvUb3dfknjv6IJYM1EQCNayZ
+	jNN++KDYGpjqsyDL1JJEfgJdonZeSb+3No6x5FcwLCBa4eHNJQw7HI2A7gB1pHtVV3UY6C4ptX3
+	vmcnvLbjkhAbwp8ZrH4wR5szV5xhisqFCgCFam66gs3NT8J33pg==
+X-Received: by 2002:adf:f98a:0:b0:37c:ce58:5a1a with SMTP id ffacd0b85a97d-37d552d22efmr8719156f8f.54.1728934529925;
+        Mon, 14 Oct 2024 12:35:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGmLVPlsR53bsF9ZXTvVKgUGcOHdy2gZRmudwBVh0AEj48pcH21cjEcwhpIbdusHD2n/ntBeg==
+X-Received: by 2002:adf:f98a:0:b0:37c:ce58:5a1a with SMTP id ffacd0b85a97d-37d552d22efmr8719138f8f.54.1728934529506;
+        Mon, 14 Oct 2024 12:35:29 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c71e:600:9fbb:f0bf:d958:5c70? (p200300cbc71e06009fbbf0bfd9585c70.dip0.t-ipconnect.de. [2003:cb:c71e:600:9fbb:f0bf:d958:5c70])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431182ffd14sm128833165e9.18.2024.10.14.12.26.04
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430ccf1f776sm163003415e9.3.2024.10.14.12.35.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Oct 2024 12:26:05 -0700 (PDT)
-Message-ID: <f93b2c89-821a-4da1-8953-73ccd129a074@redhat.com>
-Date: Mon, 14 Oct 2024 21:26:03 +0200
+        Mon, 14 Oct 2024 12:35:29 -0700 (PDT)
+Message-ID: <78e8794a-d89f-4ded-b102-afc7cea20d1d@redhat.com>
+Date: Mon, 14 Oct 2024 21:35:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,7 +83,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/7] s390/kdump: implement is_kdump_kernel()
+Subject: Re: [PATCH v2 2/7] Documentation: s390-diag.rst: make diag500 a
+ generic KVM hypercall
 To: Heiko Carstens <hca@linux.ibm.com>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
@@ -96,12 +97,12 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
  Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
  <eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
- Jonathan Corbet <corbet@lwn.net>, Mario Casquero <mcasquer@redhat.com>
+ Jonathan Corbet <corbet@lwn.net>
 References: <20241014144622.876731-1-david@redhat.com>
- <20241014144622.876731-2-david@redhat.com>
- <20241014182054.10447-D-hca@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
+ <20241014144622.876731-3-david@redhat.com>
+ <20241014180410.10447-C-hca@linux.ibm.com>
 Content-Language: en-US
+From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -147,71 +148,88 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20241014182054.10447-D-hca@linux.ibm.com>
+In-Reply-To: <20241014180410.10447-C-hca@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 14.10.24 20:20, Heiko Carstens wrote:
-> On Mon, Oct 14, 2024 at 04:46:13PM +0200, David Hildenbrand wrote:
->> s390 currently always results in is_kdump_kernel() == false, because
->> it sets "elfcorehdr_addr = ELFCORE_ADDR_MAX;" early during setup_arch to
->> deactivate the elfcorehdr= kernel parameter.
+On 14.10.24 20:04, Heiko Carstens wrote:
+> On Mon, Oct 14, 2024 at 04:46:14PM +0200, David Hildenbrand wrote:
+>> Let's make it a generic KVM hypercall, allowing other subfunctions to
+>> be more independent of virtio.
 >>
->> Let's follow the powerpc example and implement our own logic.
+>> This is a preparation for documenting a new hypercall.
 >>
->> This is required for virtio-mem to reliably identify a kdump
->> environment to not try hotplugging memory.
->>
->> Tested-by: Mario Casquero <mcasquer@redhat.com>
 >> Signed-off-by: David Hildenbrand <david@redhat.com>
 >> ---
->>   arch/s390/include/asm/kexec.h | 4 ++++
->>   arch/s390/kernel/crash_dump.c | 6 ++++++
->>   2 files changed, 10 insertions(+)
+>>   Documentation/virt/kvm/s390/s390-diag.rst | 15 ++++++++-------
+>>   1 file changed, 8 insertions(+), 7 deletions(-)
 > 
-> Looks like this could work. But the comment in smp.c above
-> dump_available() needs to be updated.
+> ...
+> 
+>> -DIAGNOSE function code 'X'500' - KVM virtio functions
+>> ------------------------------------------------------
+>> +DIAGNOSE function code 'X'500' - KVM functions
+>> +----------------------------------------------
+>>   
+>> -If the function code specifies 0x500, various virtio-related functions
+>> -are performed.
+>> +If the function code specifies 0x500, various KVM-specific functions
+>> +are performed, including virtio functions.
+>>   
+>> -General register 1 contains the virtio subfunction code. Supported
+>> -virtio subfunctions depend on KVM's userspace. Generally, userspace
+>> -provides either s390-virtio (subcodes 0-2) or virtio-ccw (subcode 3).
+>> +General register 1 contains the subfunction code. Supported subfunctions
+>> +depend on KVM's userspace. Regarding virtio subfunctions, generally
+>> +userspace provides either s390-virtio (subcodes 0-2) or virtio-ccw
+>> +(subcode 3).
+> 
+> Reading this file leaves a number of questions open: how does one know
+> which subcodes are supported, and what happens if an unsupported
+> subcode is used?
 
-A right, I remember that there was some outdated documentation.
+Currently they have to be sensed
+> 
+> I'm afraid there is no indication available and the only way to figure
+> out is to try and if it is unsupported the result is a specification
+> exception. Is that correct?
+
+Yes exactly.
 
 > 
-> Are you willing to do that, or should I provide an addon patch?
+> If so, it would be nice to document that too; but that is not
+> necessarily your problem.
+
+I can squash:
+
+diff --git a/Documentation/virt/kvm/s390/s390-diag.rst b/Documentation/virt/kvm/s390/s390-diag.rst
+index d9b7c6cbc99e..48a326d41cc0 100644
+--- a/Documentation/virt/kvm/s390/s390-diag.rst
++++ b/Documentation/virt/kvm/s390/s390-diag.rst
+@@ -50,6 +50,9 @@ Upon completion of the DIAGNOSE instruction, general register 2 contains
+  the function's return code, which is either a return code or a subcode
+  specific value.
+  
++If the specified subfunction is not supported, a SPECIFICATION exception
++will be triggered.
++
+  Subcode 0 - s390-virtio notification and early console printk
+      Handled by userspace.
+  
+
+
 > 
+> I guess we won't see too many new diag 500 subcodes, or would it make
+> sense to implement some query subcode?
 
-I can squash the following:
+In the context of STORAGE LIMIT, a "query" subfunction is not really beneficial:
 
-diff --git a/arch/s390/kernel/smp.c b/arch/s390/kernel/smp.c
-index 4df56fdb2488..a4f538876462 100644
---- a/arch/s390/kernel/smp.c
-+++ b/arch/s390/kernel/smp.c
-@@ -587,16 +587,16 @@ int smp_store_status(int cpu)
-   *    with sigp stop-and-store-status. The firmware or the boot-loader
-   *    stored the registers of the boot CPU in the absolute lowcore in the
-   *    memory of the old system.
-- * 3) kdump and the old kernel did not store the CPU state,
-- *    or stand-alone kdump for DASD
-- *    condition: OLDMEM_BASE != NULL && !is_kdump_kernel()
-+ * 3) kdump or stand-alone kdump for DASD
-+ *    condition: OLDMEM_BASE != NULL && !is_ipl_type_dump() == false
-   *    The state for all CPUs except the boot CPU needs to be collected
-   *    with sigp stop-and-store-status. The kexec code or the boot-loader
-   *    stored the registers of the boot CPU in the memory of the old system.
-- * 4) kdump and the old kernel stored the CPU state
-- *    condition: OLDMEM_BASE != NULL && is_kdump_kernel()
-- *    This case does not exist for s390 anymore, setup_arch explicitly
-- *    deactivates the elfcorehdr= kernel parameter
-+ *
-+ * Note that the old Kdump mode where the old kernel stored the CPU state
-+ * does no longer exist: setup_arch explicitly deactivates the elfcorehdr=
-+ * kernel parameter. The is_kudmp_kernel() implementation on s390 is independent
-+ * of the elfcorehdr= parameter.
-   */
-  static bool dump_available(void)
-  {
+it's either one invocation of "query", conditionally followed by one invocation of "STORAGE LIMIT"
+vs. one invocation of "STORAGE LIMIT".
 
+Once there might be a bunch of other subfunctions, a "query" might make more sense.
 
-Does that sound reasonable? I'm not so sure about the "2) stand-alone kdump for
-SCSI/NVMe (zfcp/nvme dump with swapped memory)": is that really "kdump" ?
+Thanks!
 
 -- 
 Cheers,
