@@ -1,171 +1,214 @@
-Return-Path: <kvm+bounces-28706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A576499BD3F
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 03:19:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1C7799BE3C
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 05:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A8491F21D12
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 01:19:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 678F8283217
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 03:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F8CF9D9;
-	Mon, 14 Oct 2024 01:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58AF7F477;
+	Mon, 14 Oct 2024 03:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hy9snmOa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9841BC2A;
-	Mon, 14 Oct 2024 01:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728868764; cv=none; b=oGW3e7Lf90pdElgBhgRYLxFEIFIEQIukhunCnQ3J/3VDMuPwyjeZZn0iGH8xAR3z5cPX9qRRuxIsRtmfKFBGIii9OUJJuYJYkdLpnnkwaYCRjhvUlxant8ezNSyquZrSRbl1PFc3xCqFjQwzifSjvtvEyigcJNxYmCnDpivmjOw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728868764; c=relaxed/simple;
-	bh=zUv6ILKKCU7ghNWQyBMVZ63qcvkg6BgiCPLp6kS4zzQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=HjnjAPXVQK0ib6yU+C8vLXBoz4q61jdL+qooAoTEvJV8DUMS5vuUs5kBeQPhY417rxRS3MU8bRfCmKOAtdYGvCCyHY/Lj3NzfzX3+p10ps94XgOXE6eVrR3zp0ekxN3ihEGzK6iOc2dVQNHkRS2BV8qAJB+nHnbtdLamErkmYvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Dxn_GQcQxns7MZAA--.41498S3;
-	Mon, 14 Oct 2024 09:19:12 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMAx_9WNcQxn32goAA--.13131S3;
-	Mon, 14 Oct 2024 09:19:11 +0800 (CST)
-Subject: Re: [PATCH] LoongArch: KVM: Mark hrtimer to expire in hard interrupt
- context
-To: Huacai Chen <chenhuacai@loongson.cn>, Paolo Bonzini
- <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
- Tianrui Zhao <zhaotianrui@loongson.cn>
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>
-References: <20241013090136.1254036-1-chenhuacai@loongson.cn>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <395a4ab9-ee2b-618d-3836-3ff041582ab2@loongson.cn>
-Date: Mon, 14 Oct 2024 09:18:51 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2069.outbound.protection.outlook.com [40.107.237.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E8A231CA6;
+	Mon, 14 Oct 2024 03:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728877026; cv=fail; b=ejZkNQ7HXO5MMAjxSta95CRwuoZfgWB3UGrThQb/LFAYEXIQJUCvSfOAinm+MJWoMENm5tKv923L+SSnezz4RTf+7abpUuVoySKz7K1RDhoJPe/91fW5x6nWIAM1uHuNJxzZf9LuruxMBJSzuDfPYtvSxplS4a6nrWuHEtHds90=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728877026; c=relaxed/simple;
+	bh=z9fPLjkUD5bmkn9gqMjQUEJG8G7Fn37kQ3DgDZnJVbY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=hNNKBvkG6B9hP0g1JxRqdNFtWDtI13jGhoMsvv4E+eJRbV49rA8WltDMci2LBKtiqnzNLlrHmcUmEYJHm4ztsnHt80ZrEUsf02gtGwDk0aUqmnYrYWGz+pmw5HFZPrtu/lBTghvhQHrD8MdofvemCxHEoyeBM+3oHa4aswHTTos=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hy9snmOa; arc=fail smtp.client-ip=40.107.237.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sWqcIJ+93iQvczqKvAk2xRViTOYICjiPGKPvDW8IMvR5uTs9zitYpUlW06pJX+AoJiPMHPDlW3ceyTP1XVUGW6sNCO0N/M24NjhFXjM9l0r7nmv8zE2vb6YVblvEDtCte3rDQbPqbIABFIBIn1IuTUtCmcrmmQ8aeb1taP0RusMEGXCf7Vmtvnb1SwvAbrYbmG1L5NCcEFJjeVI690b2Z1sWcNQIqnxLf3MGsWnbuI/idFK0/DxWVXECwP3VxJYaYAhV+FggQFFbghBJPslN5jzOyrUeFWXWQtd/0/evbVPASR+IrrzDFzD0QE73qmpw6XR8FPpjYDLq7x8ZGkh6TA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EcrViTubG9W2sblRoKThmVv/X3SNbdXVQxSD97Bw3bU=;
+ b=X4wocc8MinLVH2ORGMTwTI7O5akdk+nr+WpJX0Lazwu3to+OU7akxwPJdg5XdTjE86F7IRQ7yYmRH5x1qKJZ7yUROObWeSQ1x70NCEG+x8Mp4Ypc8CPkVNOYg4IcD22xFXPVpLVeNUzqRkoYJAyNIqoPbc766XU02kPhjtDuQtCJxzKgpdaXypKw8TQ0t0kipnp3bSAHuSqBcl7sTk7+7Rt3VrnuFDEm83OgCWp7zphq2nDagbf6x7HF0uomZUcveeBoqlLD8pQDCRdSLxStVRObO1j8Hjy0sFDSegv70AzO1414pEsn+WoXzAj3rgh5l2L//KZEE8Vr0dh2KkfvYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EcrViTubG9W2sblRoKThmVv/X3SNbdXVQxSD97Bw3bU=;
+ b=hy9snmOaEDPVEF8rDrf/d4l814gME95dRnI63wOMQZAOL74Q2ACLzdZWR5fzZdDd2RBJ/iFE2XCfMIQL0OUPt45HktPfcp0NlxLAwnBztjL958JaDZQn+U4xsf7VXa7KnuLphjhV2GWVUioOK5KoDPMPrJvCur/CJr9y/7IRl7Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ DS0PR12MB7926.namprd12.prod.outlook.com (2603:10b6:8:14a::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8048.21; Mon, 14 Oct 2024 03:37:01 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec%4]) with mapi id 15.20.8048.017; Mon, 14 Oct 2024
+ 03:37:00 +0000
+Message-ID: <9482e110-0837-d6e0-4f6c-a4b119da8c20@amd.com>
+Date: Mon, 14 Oct 2024 09:06:58 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH v12 14/19] tsc: Use the GUEST_TSC_FREQ MSR for discovering
+ TSC frequency
+To: Tom Lendacky <thomas.lendacky@amd.com>, linux-kernel@vger.kernel.org,
+ bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
+Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+ pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+References: <20241009092850.197575-1-nikunj@amd.com>
+ <20241009092850.197575-15-nikunj@amd.com>
+ <72407a44-fb70-52cd-a231-c80fd81e0fa3@amd.com>
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <72407a44-fb70-52cd-a231-c80fd81e0fa3@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0184.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:be::13) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241013090136.1254036-1-chenhuacai@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMAx_9WNcQxn32goAA--.13131S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxGF13tF4xur4kAw47Gr4kAFc_yoWrtF1fpr
-	WUAr48Gr48Jr17tw1jyFyDuF45Xw4DCF1xXFWUAry8Ar17Wrn8XF18KrW3JFs8Jw4UAF1x
-	Xr18tr1aqF15J3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
-	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWU
-	AwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
-	k0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
-	Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
-	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
-	cVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
-	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jepB-UUUUU=
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|DS0PR12MB7926:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52513a99-5407-46e0-4615-08dcec017649
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aXgvUmdNYTJlUVJWYTlVS0RyWitCck5ZcTFDQ0FJZE9XbnI2V0xFai9zMmxC?=
+ =?utf-8?B?Y21icnduSGtUUU1GNW8wd094a2U4V2R6QWRSaEh5VnozUGNjb3kzbUErMksy?=
+ =?utf-8?B?QzdYaWtaZGNpMnEvMHlCbTN2aGdKMlRCbEcvUHVKMXBpNEpGTlBjRVJiSnVz?=
+ =?utf-8?B?RGR2a2d3M0hIaUd4Y3lua2pSK241eHptYVR3ek1IeXRMSzRXQmdOd3lFR29V?=
+ =?utf-8?B?SUJjSEp5M1ZSU3dkNWNtMHFKdG5RZHpTMTJSM1ZxVkZjNkd1a2NtNi9aaFph?=
+ =?utf-8?B?WlNveFpaajhhemVrcmNZL2x4MisxRUlYbHdkZEdDUWcvdnVjbmswL0J1cFlY?=
+ =?utf-8?B?YXRYVzBKK0F6WHdTcTF0NHovTEExMk1OaCtVS2NzNUFoSmx1VVozamxvSnJI?=
+ =?utf-8?B?bXVSdWxNY242dXNGRm40Z2F3ZzYvYzNvVUxOWW14RXQzUzM4QXBHRTVyaUxQ?=
+ =?utf-8?B?L3Y1SkFkRWUxZWtyNzJScHI3SmxBT2grVXpoaU1jMElnaFFKTXpYYXFOYU1W?=
+ =?utf-8?B?dHR0bmo1UFJScFVDaTdDR24rUVk5RHNESS9YalN2emhqMW40Z2pYdlV6K09k?=
+ =?utf-8?B?QnFaZWNlMWpkVXJNV2s0dGUyV1VsWDdBdGwvZ3F5ajhiZEI2NDNnUEFDdkgx?=
+ =?utf-8?B?c2RtbVlhVEFCTmY1ZndIZzBtR3Zjd2lGTmNhSUIwRjhvS3RsUjJkUDZiVjR4?=
+ =?utf-8?B?c253OGlFbS9PZDBNMkpvRmlrOWhjbGlIcC8rRVZ4WWxHQ3V2VXpLYWh1RUp3?=
+ =?utf-8?B?YlhiL3JBa1VLdlc3OGNuNjdSMnBTTk4zS01hZHMrRDJwZElwZ3dDL2NkT2ZJ?=
+ =?utf-8?B?b1IvS0NPOWFwUlFNTFZDLzVqb3diclVMcGp2Smo2ZGZsc0hnNzhzUnFRem5j?=
+ =?utf-8?B?b09UVWt2ZTV0NUl4OXNsNURDZzNJSDRsYkpxQklYZGNrV1FVaXNhdWVDZ0tl?=
+ =?utf-8?B?VUxjUVVqS1FiN0dwbjJMSGllMzZjSXRPWkROaWZYc3pPSDFjbHZ2cEQzR1Uy?=
+ =?utf-8?B?dDl3VGlrM0lyQVRzN0xTd3BOeFZLUGF3cU0xaHFVNEZuTGpLOFIrbTJTNmlh?=
+ =?utf-8?B?R3liKzhXOXhtRUxKM2YyekwwSC96TmJoNDFURXkxWUJvSndOVDZhTU9yaHI1?=
+ =?utf-8?B?WURRVzhPUTNNL2ovbk56QnA2SFdYZm54eVk3aHZkVjVvV1E5dzhCUGphTTln?=
+ =?utf-8?B?RmVMSXZHanFiTlhOUnVkSW8zRTBTd2NveDAxS1JHcGg2dFpYYXJqQks2Z1Nw?=
+ =?utf-8?B?SUt6SDluN1luenU2aEp2SnhmaHRaUTUrWlBTbWFQZm9tYUpXemtRR0FLamZF?=
+ =?utf-8?B?YjgwZ0MrQlIxWGVaMWFBRENSMy9JOWsxZGxvaitQWkFlM2hOYjc3b054L29L?=
+ =?utf-8?B?YU1qMmZ0Z1Yyd1JUUDFBWHFGcUNvSVhxOEU3RWgvK2pXcWlab0FxMzFRRVA0?=
+ =?utf-8?B?Y2ZHeDIrTVJmSTZ4OTI2Rm04RWozN09XZjluZXYvakZNLzRpWktJeEJsdjRP?=
+ =?utf-8?B?NXJ5SmtKYlJpUFFwN1JPQWVUaXBRZGlVZ2VIajJLbVVFeWsxKy9ITDJBenQv?=
+ =?utf-8?B?Y1NsR1F6Zk1jcSs2YzdQaEhBQUxrN1pvL1VMOWJXMlFtQmJPZFR6ZUg2OElD?=
+ =?utf-8?B?bURvT1dYMDhWSWh1a0QrajVIOC9TM2gyV2R3Q2hkUTJUOUFteTFOZDIwemJt?=
+ =?utf-8?B?SEpBVzdabWN0TE1ob0RwSWpabUJYbkFDbyt4OHZUNkVBYUcxckU0YndnPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q2FndUpscVFSaC9FMzNJUGdMUHFyMnEzN1ZValZBdEY2cGpzS1pQdlpxa3Bl?=
+ =?utf-8?B?eXRKSHZPWi9xZlVrZjEyWEVwSTBwK2IwSGEzekRqdjBCMXFlbXFOd2x6NEE0?=
+ =?utf-8?B?SngzRURCQ2orcG13Rk1ZbzlSQTBoUkMvNUhhMTg4ZEdsTUlnOTNoNGhZZ2pG?=
+ =?utf-8?B?YkZxTWpkaGxHS0FnbytVaFRIVk9vQWNqWXozRVBIbnNBYWo2S2prMUoyUzRT?=
+ =?utf-8?B?T3NqZDF0ZjNmUGloRUNIT1doSE9HeHNvS0JBVEhiLzU3RmtwQzh4S2tPMWcw?=
+ =?utf-8?B?NE1vUmNXeE80amhZMG9Ka0JXVUFyS1IwSkRoSGlsaFczbW1VYit2T0NhZjI0?=
+ =?utf-8?B?VUNEanMwMmxCdzJZR25sbmY4Tm9lVEdoaGZFa3lMKzJVYVZ6eWtEaGd6WEoz?=
+ =?utf-8?B?ciszNUxPMTVHbVFUUnlBTjdYbGJaWTBpWW82VnZCbW91T2FucGpnb2RzNHFU?=
+ =?utf-8?B?UHR6TldrRUh2RHRwcnU2N1FYQm0zaUFaR3NncmxuV01SNHNBM0xaSXdHOHFJ?=
+ =?utf-8?B?Sjg5MitXNHVYZXhFWWJQRUR6ZUdFUlF6MWdwTFczMklPSGxTRkRXTGhhRGJW?=
+ =?utf-8?B?bGpGQ1ExRVpxczBsSWlsMitDSkJReDR2OUlqRWtGQkttOHFieDRReEJ4eDhX?=
+ =?utf-8?B?cVNjRG9TQnc2Y2I4L24zUlViU2RJU0thTFd6SkpKdlR6dUxPbXMyY3NQZkc1?=
+ =?utf-8?B?dDRUL0xtUndpc01UdnExN050UktBRGovMzRnVEtlc2gvalZJTW5pSmFDSjdV?=
+ =?utf-8?B?SnNiMnJSdUx1d29VSDZKbGM2bjBraXhNYXRzZHl2UHhXTDlEZVF3RDlhMldK?=
+ =?utf-8?B?b3VvbXNCWnlPQ2N5S3R5LzhBdG5STWVjTHB4cTZSTjd6dEdpUVVHOG9uL1I2?=
+ =?utf-8?B?UExUTDJlNFRyOUdCZ3ltM2YvM0I2L29KeVU0QUpvc24wTFpiekd5U0UrcjRM?=
+ =?utf-8?B?SnFvZEFjTWk0dnN0bHdVTFBMRjhqdjdNSGpKZWh1K3Uzb2pqVzlrZXBpbkh6?=
+ =?utf-8?B?SjQ4YUxrN1ZRdzJnTngrTDZOMGlNMlBocjl6QWZRSTN3ZU95UTJ5VndMVU5H?=
+ =?utf-8?B?Y20zU0ZpL09yN1ArQWtla3RhYys4T09zekl2emZJaGVnYlorT1ZRSVd0anpP?=
+ =?utf-8?B?SzdaZGNEeXM3T1hCcHkydERDNkFoQ3dpSFc2RFlrZjJHZ29JelhuSlhoeWVh?=
+ =?utf-8?B?alI5RXRxcC9vU1VLZE0vTEM5MFRQQUJucnUrb0ErdHhxRGdpSzI5WGxaeHV1?=
+ =?utf-8?B?RjBZekZyeVkvUFdldTFkWG9lb3dXbVN2aVBiNFZlV0orZjd1aFRsbHhtblJ1?=
+ =?utf-8?B?S09qdSszL1JzY0ZOdEFXSkdxWFJuODBVMDFWRUJIMFVONHVaa1RibklCZXFR?=
+ =?utf-8?B?MHBjenRqcG1Qcm1sL3JuVEFETmFiL3kwVDc2TUlTYW1mbnpXRERnOUhGbnBF?=
+ =?utf-8?B?QkNaQ3hxKzQya2N0bkxZc2tqTGNZU00rTTZXOUsyL2owb0dRQ2JxYzdJeWpy?=
+ =?utf-8?B?cEtpcHhKaFg0MVBycG81RlV4RlE2NFNhOE9MY1hUQ3lxRlMwWTdwQnFZNGp2?=
+ =?utf-8?B?NU9oZUN5TjY2aEtEb3BNWmpFNEhJQ3Q2SnIyTHhpMWZmVkxnTm5URmw5ZmdH?=
+ =?utf-8?B?WWlRQ2VpVEhWY1FmQzhpZG16a3I3WGFwdk5MTkowbWxqYlJUK0E3azg1WUx0?=
+ =?utf-8?B?bWk3djUwSUcwbVc1ZnRKaDBmWmxZTWJvWFhNeGpBMUFtVDBnWDEwRkpIVTFB?=
+ =?utf-8?B?UXZidlFYMEFBZXhBZ21zWFpDQ1V0UEVJbnlXRTBOaWVIQWVTOHYrSlVsZzVW?=
+ =?utf-8?B?S3dDQjRDTjVDbm5naGc2a3VCZTlUb2RJVElnVkYvSkJ0TlJTTVhkUXNEdjBJ?=
+ =?utf-8?B?UTIvVDByeDUwSHdwOVBldm94cjA4cEZ2OWNIVy9Ma1pLeVhBejQ4TzlFWXN6?=
+ =?utf-8?B?NXNWdFhRaDRlZ05DQm9kTUdDbDdqVndiZWRUSVJjZFZMTkpvOXlNODZMdlhm?=
+ =?utf-8?B?MENPMDA4TzFEbmh6NHVTalcrMXhEV2J4cEN3NWRPZGxGU0JXZHZrc2pyZXZw?=
+ =?utf-8?B?T2djT1Ard0RNTEsxakdXWHJRSTMxcGxkT0Y3VjNnUks5Y042bTFKOUxqWjdy?=
+ =?utf-8?Q?IfUUnbhD+eQUxMBkaQw5smRfH?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52513a99-5407-46e0-4615-08dcec017649
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2024 03:37:00.6958
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: L3lSSrCw4nKPm14kBU/lEZ1GphwTHJf+tkYwjYO8gcgl+AMfxKYFW6IGxO0aQ/AxC5YX8KW2a6R2nPrfWgP+Vw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7926
 
+Hi Tom,
 
+On 10/11/2024 1:09 AM, Tom Lendacky wrote:
+> On 10/9/24 04:28, Nikunj A Dadhania wrote:
+>> Calibrating the TSC frequency using the kvmclock is not correct for
+>> SecureTSC enabled guests. Use the platform provided TSC frequency via the
+>> GUEST_TSC_FREQ MSR (C001_0134h).
+>>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>> ---
+>>  arch/x86/include/asm/msr-index.h |  1 +
+>>  arch/x86/include/asm/sev.h       |  2 ++
+>>  arch/x86/coco/sev/core.c         | 16 ++++++++++++++++
+>>  arch/x86/kernel/tsc.c            |  5 +++++
+>>  4 files changed, 24 insertions(+)
 
-On 2024/10/13 下午5:01, Huacai Chen wrote:
-> Like commit 2c0d278f3293fc5 ("KVM: LAPIC: Mark hrtimer to expire in hard
-> interrupt context"), On PREEMPT_RT enabled kernels unmarked hrtimers are
-> moved into soft interrupt expiry mode by default.
+ 
+>> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+>> index 5f555f905fad..ef0def203b3f 100644
+>> --- a/arch/x86/coco/sev/core.c
+>> +++ b/arch/x86/coco/sev/core.c
+>> @@ -3100,3 +3100,19 @@ void __init snp_secure_tsc_prepare(void)
+>>  
+>>  	pr_debug("SecureTSC enabled");
+>>  }
+>> +
+>> +static unsigned long securetsc_get_tsc_khz(void)
+>> +{
+>> +	unsigned long long tsc_freq_mhz;
+>> +
+>> +	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
+>> +	rdmsrl(MSR_AMD64_GUEST_TSC_FREQ, tsc_freq_mhz);
 > 
-> While that's not a functional requirement for the KVM constant timer
-> emulation, it is a latency issue which can be avoided by marking the
-> timer so hard interrupt context expiry is enforced.
-> 
-> This fix a "scheduling while atomic" bug for PREEMPT_RT enabled kernels:
-> 
->   BUG: scheduling while atomic: qemu-system-loo/1011/0x00000002
->   Modules linked in: amdgpu rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat ns
->   CPU: 1 UID: 0 PID: 1011 Comm: qemu-system-loo Tainted: G        W          6.12.0-rc2+ #1774
->   Tainted: [W]=WARN
->   Hardware name: Loongson Loongson-3A5000-7A1000-1w-CRB/Loongson-LS3A5000-7A1000-1w-CRB, BIOS vUDK2018-LoongArch-V2.0.0-prebeta9 10/21/2022
->   Stack : ffffffffffffffff 0000000000000000 9000000004e3ea38 9000000116744000
->           90000001167475a0 0000000000000000 90000001167475a8 9000000005644830
->           90000000058dc000 90000000058dbff8 9000000116747420 0000000000000001
->           0000000000000001 6a613fc938313980 000000000790c000 90000001001c1140
->           00000000000003fe 0000000000000001 000000000000000d 0000000000000003
->           0000000000000030 00000000000003f3 000000000790c000 9000000116747830
->           90000000057ef000 0000000000000000 9000000005644830 0000000000000004
->           0000000000000000 90000000057f4b58 0000000000000001 9000000116747868
->           900000000451b600 9000000005644830 9000000003a13998 0000000010000020
->           00000000000000b0 0000000000000004 0000000000000000 0000000000071c1d
->           ...
->   Call Trace:
->   [<9000000003a13998>] show_stack+0x38/0x180
->   [<9000000004e3ea34>] dump_stack_lvl+0x84/0xc0
->   [<9000000003a71708>] __schedule_bug+0x48/0x60
->   [<9000000004e45734>] __schedule+0x1114/0x1660
->   [<9000000004e46040>] schedule_rtlock+0x20/0x60
->   [<9000000004e4e330>] rtlock_slowlock_locked+0x3f0/0x10a0
->   [<9000000004e4f038>] rt_spin_lock+0x58/0x80
->   [<9000000003b02d68>] hrtimer_cancel_wait_running+0x68/0xc0
->   [<9000000003b02e30>] hrtimer_cancel+0x70/0x80
->   [<ffff80000235eb70>] kvm_restore_timer+0x50/0x1a0 [kvm]
->   [<ffff8000023616c8>] kvm_arch_vcpu_load+0x68/0x2a0 [kvm]
->   [<ffff80000234c2d4>] kvm_sched_in+0x34/0x60 [kvm]
->   [<9000000003a749a0>] finish_task_switch.isra.0+0x140/0x2e0
->   [<9000000004e44a70>] __schedule+0x450/0x1660
->   [<9000000004e45cb0>] schedule+0x30/0x180
->   [<ffff800002354c70>] kvm_vcpu_block+0x70/0x120 [kvm]
->   [<ffff800002354d80>] kvm_vcpu_halt+0x60/0x3e0 [kvm]
->   [<ffff80000235b194>] kvm_handle_gspr+0x3f4/0x4e0 [kvm]
->   [<ffff80000235f548>] kvm_handle_exit+0x1c8/0x260 [kvm]
-> 
-> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
-> ---
->   arch/loongarch/kvm/timer.c | 7 ++++---
->   arch/loongarch/kvm/vcpu.c  | 2 +-
->   2 files changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
-> index 74a4b5c272d6..32dc213374be 100644
-> --- a/arch/loongarch/kvm/timer.c
-> +++ b/arch/loongarch/kvm/timer.c
-> @@ -161,10 +161,11 @@ static void _kvm_save_timer(struct kvm_vcpu *vcpu)
->   	if (kvm_vcpu_is_blocking(vcpu)) {
->   
->   		/*
-> -		 * HRTIMER_MODE_PINNED is suggested since vcpu may run in
-> -		 * the same physical cpu in next time
-> +		 * HRTIMER_MODE_PINNED_HARD is suggested since vcpu may run in
-> +		 * the same physical cpu in next time, and the timer should run
-> +		 * in hardirq context even in the PREEMPT_RT case.
->   		 */
-> -		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED);
-> +		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED_HARD);
->   	}
->   }
->   
-> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> index 0697b1064251..174734a23d0a 100644
-> --- a/arch/loongarch/kvm/vcpu.c
-> +++ b/arch/loongarch/kvm/vcpu.c
-> @@ -1457,7 +1457,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->   	vcpu->arch.vpid = 0;
->   	vcpu->arch.flush_gpa = INVALID_GPA;
->   
-> -	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED);
-> +	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED_HARD);
->   	vcpu->arch.swtimer.function = kvm_swtimer_wakeup;
->   
->   	vcpu->arch.handle_exit = kvm_handle_exit;
-> 
-Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+> So this MSR can be intercepted by the hypervisor. You'll need to add
+> code in the #VC handler that checks if an MSR access is for
+> MSR_AMD64_GUEST_TSC_FREQ and Secure TSC is active, then the hypervisor
+> is not cooperating and you should terminate the guest.
 
+Yes, will add this in my next revision.
+
+Regards
+Nikunj
 
