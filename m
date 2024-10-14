@@ -1,355 +1,604 @@
-Return-Path: <kvm+bounces-28789-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28790-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2C9C99D4C4
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 18:35:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 304D199D503
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 18:53:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E3A3B23672
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 16:35:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4516283E7B
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 16:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCCAE1B4F04;
-	Mon, 14 Oct 2024 16:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380541BFDF4;
+	Mon, 14 Oct 2024 16:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HXPxXU16"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="H8tAaClf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2C81E4A6
-	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 16:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728923703; cv=fail; b=eZkpZmAyei9bdRch3G0DSEKiuKO5+6efJlWYP4kONNOqsp3WXzWx1EXcMRYXO2c2xD4LWNY47H6akTJNOLmgndb78adWFE70VV/Zef+lz1UchRV3oDVJg6O67x/sV0Pi8nIYfaZJ2vz96X06asOPb01NLoe0yFWKpSRVHE/rtR8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728923703; c=relaxed/simple;
-	bh=nxewpEkCm23RVCoxDYQXnrskuP0Vk5XtrJxel7r2CWU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gIDU3TYZFdsVSWaVckZBuKpB1nBqUMHJSTbDN1XchpPXwX7KHr+Xlxvxm1NVx9uLmbKqkLrcBkUk+pclfLBPsjMAdrZKmK5jDwPrRipgoCl5DygiZuKUyyl92QpaSc6S7/HUcLf5k4AEeQMcDBybdmuSDMmx/BXm2/zUSuSNn60=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HXPxXU16; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728923702; x=1760459702;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=nxewpEkCm23RVCoxDYQXnrskuP0Vk5XtrJxel7r2CWU=;
-  b=HXPxXU16WdOCwftwSDqt85Pm5Wg0mFdjTzmSk136Hzsdqjr7189BID7m
-   aV2x9u9j7ycVmdAOGcrEtfPpTCwpehqJM48iB3oJo26ritheqU58N5LsP
-   Gsr30ZxIt42RUaJ+lsIxLPgL2/c+FAhQ8RVzS+7OI34JMfFhsl4eu00Iu
-   Mu223bc9w2WiCvUbRknrxo9euiCWCUZ8H7PxfYHtcSGB47UTwE/oJQLel
-   Pd1sQXglgUYESpu0MNWEjHc/9mVf4XBhSAIT2+KrdzZTKNdSDusls+Qbp
-   wvInm7SB02fv7CxXeZ6xCOoZ13XY1MRqtTfLO8DKFOEdJnLyW8WIMUav/
-   w==;
-X-CSE-ConnectionGUID: JbasX+nqRkiS/iXI5jvrCw==
-X-CSE-MsgGUID: 6LEdxLTcTRi8LcHBrTa3kg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11224"; a="39677172"
-X-IronPort-AV: E=Sophos;i="6.11,203,1725346800"; 
-   d="scan'208";a="39677172"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 09:35:01 -0700
-X-CSE-ConnectionGUID: I2CDCWt1QqamI1+ldaHm4A==
-X-CSE-MsgGUID: OrUes+g9RdS741VdMMMU9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,203,1725346800"; 
-   d="scan'208";a="78066557"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Oct 2024 09:35:01 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 14 Oct 2024 09:35:00 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 14 Oct 2024 09:34:59 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 14 Oct 2024 09:34:59 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.45) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1A4288B1;
+	Mon, 14 Oct 2024 16:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728924817; cv=none; b=PExEtUNoGcb5fx1vWUeQZk9jzxE4Ll26vwlxKmVFH9Mb6rsQUUF+pMKb44FydcxcJWFGFbXymU/GnTH48kA6I5SLRqPxi8l62f1NffLj4/odhK7PB92s6OqdZAug8T7tjYLbewqPj0dYa+Iyb+zFw9hPPwOFy+we9lXCwATB/A4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728924817; c=relaxed/simple;
+	bh=5/IuWFyTiCxncTxd7OrB6dxxdKxgs3f+l/Ep480x0c0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tgOki6JyagOINAdybX2E+N9rQbpVTFJL6y3Aif62322sXXGIFugT3vUH7M3pnDJ0t2XbB88ZTM686mJ+ggPO/qpsI5dIYurGCUPiVE7oxWek5GJvv0ebzVhKJZisGIlJ304++pQtcFGPyHyKXsimJGMEbiS2H51vWGQmDjhfXA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=H8tAaClf; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49EFrv0B020719;
+	Mon, 14 Oct 2024 16:52:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=pmaNs7wt7wpKejAxtezcX3Zt
+	77+U50H4OCEwJZk53jQ=; b=H8tAaClfW+GC5oznlb3+jS2Bpvw5zFGHkxQrxpAn
+	qwzeSbOpyiD04pmNckD3F2+qegI1eGusSS++rMGVWGMSg3pK7rTQ0LcJWNXx8WK8
+	tSSm+hW3jzYbYHET1BT+xMvsU6FTBbaKEepPcRPfvbLwBoUGA+3aN2E44swqmrjb
+	EfkIT/TQUlHebdBpScOKnjNtjmbHNQYfanJJnw8UamukIsaURaHllmVkz2edii3L
+	noBCMKAqjxAfE2PLWAOX5jppITklgWB2VHbKogUAyRu8J2xmXmUqTJyrlcJeLxmA
+	+Llr4pIuXCqyOzfw5IstI/ZJrouxpRK5jsA4EOfGC5vpSQ==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4296b7r4n3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 14 Oct 2024 16:52:43 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49EGqghK008224
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 14 Oct 2024 16:52:42 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 14 Oct 2024 09:34:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=v88mADh4P1zPPJftbVmyV7QPwu1+EFc0efh4cyi9lxyjkp7+JsSyOsVYSGydbsOw8lPp0BrU7/7161JfO/EFoJJH4VW/9pFIzlxCts7LeVuC+IC5z4UFf53DUtWU5LLo9pAv6l01ZzruScU1C3oTotHEUW9sy2tbZJRsGak9DkSWvwYizyP3uFEA+7l8aXskzmHH2Wvyk6jobBkWr05wVExD4FBi27Vzl5hEbKlLMbCvBIhUkL9t3pj6oskDJNm4RZ6mMU7kTET6B1J+ytpqFcopj/ZwAaETGkQnMPiKQHZLhK3prF8ov4e6MSdc7mQR9KFaMRZJFq/xrOYlcy8Lyw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nxewpEkCm23RVCoxDYQXnrskuP0Vk5XtrJxel7r2CWU=;
- b=Q5bJogrM8PT3YaETKS3TYq3lJyRGM1AUr1n1evfPWId4HMcrf1DhRK+gKny6a/wvv15wpPC4JnCXIk0HsU/kHd5jWwHW7ky3+QZ50W9Vhdx9ApmLV/sYx1ptFZ2Yy52dieRnwpeqs58mF/4pAPZ0zjvqIbTc+EMVS4xZZCSewUkFDkJGl3+4veKfTQSDDUieoiAX/wPdNrt8m8EpHC0VKbdJn+pCl11wRAghtgemET9dQ+ElWNTflwOTKvJd1g6ca1iiuRF1LnSoN8vZevxrpRw30E95hdWV/RT74u5WkpwFu6GJ7CzNGhLgRLMEhm42UbAeQAA4kyaZVKeUI51lmg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by MN2PR11MB4550.namprd11.prod.outlook.com (2603:10b6:208:267::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.27; Mon, 14 Oct
- 2024 16:34:57 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.8048.020; Mon, 14 Oct 2024
- 16:34:57 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: lkp <lkp@intel.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
-CC: "oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>, "Huang,
- Kai" <kai.huang@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-	"robert.hu@intel.com" <robert.hu@intel.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Chen,
- Farrah" <farrah.chen@intel.com>, "danmei.wei@intel.com"
-	<danmei.wei@intel.com>
-Subject: Re: [kvm:kvm-coco-queue 62/109] arch/x86/kvm/mmu/tdp_mmu.c:474:14:
- sparse: sparse: incorrect type in argument 1 (different address spaces)
-Thread-Topic: [kvm:kvm-coco-queue 62/109] arch/x86/kvm/mmu/tdp_mmu.c:474:14:
- sparse: sparse: incorrect type in argument 1 (different address spaces)
-Thread-Index: AQHbHH4pwD7IFX5fcU2FnoyL93nar7KGdQUA
-Date: Mon, 14 Oct 2024 16:34:56 +0000
-Message-ID: <8cb221fef1580b7d404f3ccbf556f4f838a422a7.camel@intel.com>
-References: <202410121644.Eq7zRGPO-lkp@intel.com>
-In-Reply-To: <202410121644.Eq7zRGPO-lkp@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|MN2PR11MB4550:EE_
-x-ms-office365-filtering-correlation-id: dec4b39f-7e1a-4a3f-6e26-08dcec6e23be
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?MkJQMVlURUpoZlRKSnZ0bHhMeW51WTNUVjFhOGhCQkU4Nmh4YVIyeHNZWGg3?=
- =?utf-8?B?alArcWxMWjJobjM2OFZOaUtMRWl3Q0xUM28vU0hRd1NvQlQ2SllyUlYvRGdi?=
- =?utf-8?B?OVRYNjdMR0lBK0NMSTlRV1FyY2NWQkJDMHhCNUJaSWxJRkxmby9VcU44UmJH?=
- =?utf-8?B?cDVPZlFMT0p4Q2JyWDNlVFlNdHUwTjl5Yk41OFJBY0dzS09taDAwYTZ1U1pE?=
- =?utf-8?B?azhJMXZxczcrRzlZSlpKVTNuQmpaMkRodFhOdy9TWExkUWpzWEZZd2MwSnkv?=
- =?utf-8?B?SmxtQUpzR3cxb0hQbCtoNTdSQ0h2MEM4RVdaTWpKbXo4N05wbjMwRFhrc3c3?=
- =?utf-8?B?UTN4VHN4NTZMMzZzZCs4TnFkanRydXJvelQ3cmQwa3B0Q1lJRCtDQXNscmU3?=
- =?utf-8?B?cVNadWMzdjFMR3gvajF6emtCcE1rWmJ6RVRoR2ZKeDJpRjF3ODZFZGZ3SzJZ?=
- =?utf-8?B?VTJmeEg1cXpsUjdhNzBsNXZmK0s4UEpYVnNUaGNXZm5FOGVRekl2SzlUTmZo?=
- =?utf-8?B?S1diaitJL0ZmWllHVTN4NmtMMFJiK1R2Mmhxd0JRdVlSeE1mT29BWGQ5MXBG?=
- =?utf-8?B?R0lxaFpXM25BTU5pN0h6SEtOOVkvMW1BbjU2bnNCaGZSY29NWS8vOXB3WGEr?=
- =?utf-8?B?RU81Sm00Vjh0cUJRcW0wV1VBZGhJb3FKUUd0Nnl0V1dvSHY4VEZyUmhIM0d1?=
- =?utf-8?B?R3NubDdvT0lxUmtkUExuZDlGQkdkdjJjR1dyL3p1N2REbFkrUUllMDBrNHo4?=
- =?utf-8?B?RExOVTZSbi9sNE43YXNwdU9jOW9lMEFhbnhoaUROTHNucmlscEJPdkFBaWpp?=
- =?utf-8?B?YU9Lclg3QzlJbThNMnRmeHNkQUNoWUlEUlFQUHdib1ZnUGFwK3lzTGJQUEdB?=
- =?utf-8?B?RlJhSGtaMXQvWmptSmY4SzRwVkdoS2tHRlJtb0ZBNUI1MU5ZSzcrTVFOUUwz?=
- =?utf-8?B?QzVWY2ZxN2tjZmthWEo0Tnh6NDZVaDNIbFY3VG12ZlgrN3czaE5HdFdYUkJO?=
- =?utf-8?B?bWVYQ3NtUlA4L2Jadkhrb3NmdW1BU2hrN0FIaXVwRFRBMytGamVDZitlVnhq?=
- =?utf-8?B?RVA5b2kwcnVTcS9lV2MrNzY5U1YzRSs5QWt0dnVUMTJucFVaVHROT2FYRk1s?=
- =?utf-8?B?MkI2MG1YQS9QMWdkMG9nSC9iVWhKdDVrakowMXBVbmJJWXh0RXc2MDlQNGhy?=
- =?utf-8?B?d2FzNDIyQWlMdzVKb1NwcmNoTWd1c0dNUjZJNURpN21FMU5XOWxGbWY4dVpJ?=
- =?utf-8?B?NTgzd0VhSCtDeVFTQmllK1h0dHZtZjRzOTl5UzJrUUhnQXBsdG8xMWpZaEsy?=
- =?utf-8?B?ZDlCWmRNaklKYWJBRHBTK1lWR3dQaTVmYy9zRUVja3FLVFM3bWF2VTEzZG81?=
- =?utf-8?B?Y1VsOHBXYlpqTG1ORzY3cHd2elg0RmtnYzNodVhrUmVCZG9ka3Fhek9kVGQ1?=
- =?utf-8?B?VjgyNm5LSXR0WEFqUHBtMDhkaDNwdlVMRVFzTlJIQkxha3pvdi9qQ3JseFFl?=
- =?utf-8?B?eHZzU29LZU5sSEVjdENTRS8vOTV3bjdoWEFDS0lpMWE3SnhjeGpkUkpvQ2lm?=
- =?utf-8?B?WnpwVWs1aUhjWllPYlhpVk82N0FSc0FUTi9uOUdhMFM1a3FKSWx6SmRSbjFi?=
- =?utf-8?B?azk3WndlL1lCK3BXVDBFdUI2a2pkUkx4OWtCV1pZOWJFN28rM3VjT3JrSytF?=
- =?utf-8?B?ZmdqZWxEcThndUVOR0M5TTZTZHRsKzRQR0UvQnQ3S2tCbzNobFJoYVlidCtT?=
- =?utf-8?Q?4KBsKFoLT8GGvt7o1Q=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cTF5QzM2WSthQTlrV2lHUjhWUktrSm5Sb0ZkOVZ6K2E4dmsxUDRnbHpEUm5G?=
- =?utf-8?B?a2ZiNWNEYzBBREFibGdzSVZXbVpoZGRTY3VuRzhtM1RoOHYwTnVWWDhRSGM4?=
- =?utf-8?B?RGZjYWNhcTArcEZndXRRK2dRTm9zdFdLK2VqOFdvMy84cS8xQk5RS2wvQnBQ?=
- =?utf-8?B?ODZJZDhSbTZSb0NwQnJDMFIybUhQOXQ4K25LVDloY2ZHYWtYMCtGV3JuVWI1?=
- =?utf-8?B?T20wK0RxV3ZIM1FzM1N2eUdtcVhIMjhyWkdqM3N1RVo5QlB0ZzdVTVRwYnRq?=
- =?utf-8?B?Y0hocjBCNGs1T2R2bVdGVzByWnN4WHVOT3BpUXowSmJ6Qm1QSUVWbEd1ZTZZ?=
- =?utf-8?B?TjRYNlVEcVZJMkZOenk4aStQQllhcVcyZFpKVDlrK2ZGRDd2Y04yT1FKRnJt?=
- =?utf-8?B?aDMzbnZEcW9VWGs5a2c5SlFtRjJnVDlSdktFMVU2dnM0TnpPVzRrSTcxNC8y?=
- =?utf-8?B?cmEwUGwxdnVWREpOK2dNV2xkNDBjbGhOeno5aFdNYzJjcGQ0MkpLRXFiQUdx?=
- =?utf-8?B?aTJNRFJIOTZLdzF0cWxEcDZiamdDMk54NVNrVEd4eVRVSENhRTFEODN4T0tJ?=
- =?utf-8?B?MXBoRGNwRVJaMFBIaStBSy9hMmtrcUZPZTVnNitaTmVKb09lNnJXN091WmNN?=
- =?utf-8?B?WHhPOTVkeEx0SktySTZjV3R2aXNPeXBIbG9FTGdtUzV5QTJ2bDZ4WUVpTEJ5?=
- =?utf-8?B?UzdxOVR0U1pBWXNVQW95d1JJeHNSa09zWE1LSDh5ckduMmZxUGM2OGJRaDMv?=
- =?utf-8?B?dTFRY0R3VDFYVFIxRGVjUlZxMGZ6V1pYZUZkcWVtbU1BWTM2VE1HQXczb29I?=
- =?utf-8?B?Uno3Q2dWTUxmUER2QkFYWEw1MG9DZ3RRc3BVS1gzWFkvbWYzeC9GblUvY3JM?=
- =?utf-8?B?VW1nVXIwYUxkeXB6eEczSU5sMlRjd0NubE0vdksyaWtwYy9iZUdDWXlXTVA0?=
- =?utf-8?B?aTBjazJsWldsc3MzOVVuZklJaksxNmZYc1drV2JzZVZUZUNibnFrQUxXQXVy?=
- =?utf-8?B?TzZTUEMyT28zcVNHNFMzL0MvWnladWlPWkhDclE4N1I1dFMvQTlWcENaeWVC?=
- =?utf-8?B?ZUswQ285Mm03dnJHM0lnNHFaSmpoM3phMVM3UG1lbE56WjNrYzhSb3Rockx4?=
- =?utf-8?B?MWR3dGNyMERweDJvVDlCMWJlRVdLMk5uQnJzMFh1ZWc4UGhJUjNBOWppa2Rz?=
- =?utf-8?B?WUVhUlJPdW9kZ2Y3eFJndFo1MWlzUzAvem5GemM2UzdHZFZucE14U0tYbGhC?=
- =?utf-8?B?SWdUWmlma1F6NmxwSEQ1aHU1UEthSVgrZi82eTVzNTNaRWd5U3BVb2YwTURx?=
- =?utf-8?B?NEFtMCtXT0thVWRxazE3Sm9rWi8yUnpCWm5tWGwzQUcyVVQ1OEJMTExQaCtm?=
- =?utf-8?B?V1dwalZodHRvbDVKSXoxcUtML0x3WG16KzVaNnh5dEJvQkdoQkd1M0dXZVU5?=
- =?utf-8?B?djZpaHVWUjlXVnpQRmh0NThaWU5LZHY5cGlJRTJqRUIvWFNIeU5PdmJMSU5Q?=
- =?utf-8?B?WVV3RUx4cm5keStkMXJTK2NFQ0k5bVRNVmJnUHdieUNwNlFZZFVzMEMzVE5t?=
- =?utf-8?B?UDNGZHVQNmVOanJpYmd0cnNaTUFqNW8rYVFPQjNkVExDR2h5UGQxbUp6RUU5?=
- =?utf-8?B?MmNtdkcrQlVnOXhGeVRqUjIrR1BvUEhFUWdjb09OMW1NK1BZQjN3bjNReFVB?=
- =?utf-8?B?bkQ1OVJ3UVp2amVDUlpYUlVkaVAreEFjR2lMRnQ2alhJdi90SzcxY3NRR3hl?=
- =?utf-8?B?SkM5d2tadXdEV1c3UUxDanRxcEJZVVJDOWMybnhPa1lObWpZazh2QnpwVG44?=
- =?utf-8?B?aFJ5amFKRHoxei9RK0p0T3FQUVp5Z0FCWnBqMG85WnUzQVQzQm1pNnp1eXZw?=
- =?utf-8?B?UUtmVW9uWUIzb3BFOWFRRnVJTUdNVUl6WWdOaXNBRXA5TWNrdlZsZEFvT1Zq?=
- =?utf-8?B?Qm03ZStwcEozWnBWR2hoVUVMbnQ0OWY3TnhSWGFHQTlHVFRzQzFReXlQc2tU?=
- =?utf-8?B?Z2NzVGVISHkxWWgzQWFrSGtHTnZ3QVpTS3BOelV6bTUxMmc5Y2lQZnJtVWlw?=
- =?utf-8?B?ODl5RXNKOFJaQXBUMkhhdFAyUzBONnhjdjZzbzJFQ3YwU3lzek1NeEZyUEI2?=
- =?utf-8?B?SXZkejlwaGxiRHAxNmxuTjRrM3g2Z1lsTDZPc1Y4anpISzQ4d3I0b3R2WjJz?=
- =?utf-8?B?OGc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C51D408AC1E493429C1211D03F471F18@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ 15.2.1544.9; Mon, 14 Oct 2024 09:52:40 -0700
+Date: Mon, 14 Oct 2024 09:52:40 -0700
+From: Elliot Berman <quic_eberman@quicinc.com>
+To: Fuad Tabba <tabba@google.com>
+CC: <kvm@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-mm@kvack.org>, <pbonzini@redhat.com>, <chenhuacai@kernel.org>,
+        <mpe@ellerman.id.au>, <anup@brainfault.org>,
+        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+        <aou@eecs.berkeley.edu>, <seanjc@google.com>,
+        <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <willy@infradead.org>,
+        <akpm@linux-foundation.org>, <xiaoyao.li@intel.com>,
+        <yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>,
+        <jarkko@kernel.org>, <amoorthy@google.com>, <dmatlack@google.com>,
+        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
+        <mic@digikod.net>, <vbabka@suse.cz>, <vannapurve@google.com>,
+        <ackerleytng@google.com>, <mail@maciej.szmigiero.name>,
+        <david@redhat.com>, <michael.roth@amd.com>, <wei.w.wang@intel.com>,
+        <liam.merwick@oracle.com>, <isaku.yamahata@gmail.com>,
+        <kirill.shutemov@linux.intel.com>, <suzuki.poulose@arm.com>,
+        <steven.price@arm.com>, <quic_mnalajal@quicinc.com>,
+        <quic_tsoni@quicinc.com>, <quic_svaddagi@quicinc.com>,
+        <quic_cvanscha@quicinc.com>, <quic_pderrin@quicinc.com>,
+        <quic_pheragu@quicinc.com>, <catalin.marinas@arm.com>,
+        <james.morse@arm.com>, <yuzenghui@huawei.com>,
+        <oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
+        <qperret@google.com>, <keirf@google.com>, <roypat@amazon.co.uk>,
+        <shuah@kernel.org>, <hch@infradead.org>, <jgg@nvidia.com>,
+        <rientjes@google.com>, <jhubbard@nvidia.com>, <fvdl@google.com>,
+        <hughd@google.com>, <jthoughton@google.com>
+Subject: Re: [PATCH v3 04/11] KVM: guest_memfd: Allow host to mmap
+ guest_memfd() pages when shared
+Message-ID: <20241011102208348-0700.eberman@hu-eberman-lv.qualcomm.com>
+References: <20241010085930.1546800-1-tabba@google.com>
+ <20241010085930.1546800-5-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dec4b39f-7e1a-4a3f-6e26-08dcec6e23be
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Oct 2024 16:34:56.9693
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RKevkQ6IxvW5byk55BqTm9oYl9uv7dA/EQqZOxXInAiq2h2BsnqzaqB/z0pMdJvP8hw++YBtHMr3pd7plJ7C4zOH0kao9YApTIAj6s7fG5g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4550
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241010085930.1546800-5-tabba@google.com>
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: eb4WAlsdVG2NAGQMCDg2OlVMDCYCyVmS
+X-Proofpoint-ORIG-GUID: eb4WAlsdVG2NAGQMCDg2OlVMDCYCyVmS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 spamscore=0
+ suspectscore=0 mlxscore=0 malwarescore=0 clxscore=1011 phishscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410140121
 
-T24gU2F0LCAyMDI0LTEwLTEyIGF0IDE2OjA5ICswODAwLCBrZXJuZWwgdGVzdCByb2JvdCB3cm90
-ZToNCj4gdHJlZTrCoMKgIGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS92aXJ0L2t2bS9r
-dm0uZ2l0wqBrdm0tY29jby1xdWV1ZQ0KPiBoZWFkOsKgwqAgZDJjNzY2MmE2ZWExYzMyNWE5YWU4
-NzhiM2YxYTI2NTI2NGJjZDE4Yg0KPiBjb21taXQ6IGI2YmNkODhhZDQzYWViYzIzODVjN2ZmNDE4
-YjA1MzJlODBlNjBlMTkgWzYyLzEwOV0gS1ZNOiB4ODYvdGRwX21tdTogUHJvcGFnYXRlIGJ1aWxk
-aW5nIG1pcnJvciBwYWdlIHRhYmxlcw0KPiBjb25maWc6IHg4Nl82NC1yYW5kY29uZmlnLTEyMS0y
-MDI0MTAxMSAoaHR0cHM6Ly9kb3dubG9hZC4wMS5vcmcvMGRheS1jaS9hcmNoaXZlLzIwMjQxMDEy
-LzIwMjQxMDEyMTY0NC5FcTd6UkdQTy1sa3BAaW50ZWwuY29tL2NvbmZpZykNCj4gY29tcGlsZXI6
-IGNsYW5nIHZlcnNpb24gMTguMS44IChodHRwczovL2dpdGh1Yi5jb20vbGx2bS9sbHZtLXByb2pl
-Y3TCoDNiNWI1YzFlYzRhMzA5NWFiMDk2ZGQ3ODBlODRkN2FiODFmM2Q3ZmYpDQo+IHJlcHJvZHVj
-ZSAodGhpcyBpcyBhIFc9MSBidWlsZCk6IChodHRwczovL2Rvd25sb2FkLjAxLm9yZy8wZGF5LWNp
-L2FyY2hpdmUvMjAyNDEwMTIvMjAyNDEwMTIxNjQ0LkVxN3pSR1BPLWxrcEBpbnRlbC5jb20vcmVw
-cm9kdWNlKQ0KPiANCj4gSWYgeW91IGZpeCB0aGUgaXNzdWUgaW4gYSBzZXBhcmF0ZSBwYXRjaC9j
-b21taXQgKGkuZS4gbm90IGp1c3QgYSBuZXcgdmVyc2lvbiBvZg0KPiB0aGUgc2FtZSBwYXRjaC9j
-b21taXQpLCBraW5kbHkgYWRkIGZvbGxvd2luZyB0YWdzDQo+ID4gUmVwb3J0ZWQtYnk6IGtlcm5l
-bCB0ZXN0IHJvYm90IDxsa3BAaW50ZWwuY29tPg0KPiA+IENsb3NlczogaHR0cHM6Ly9sb3JlLmtl
-cm5lbC5vcmcvb2Uta2J1aWxkLWFsbC8yMDI0MTAxMjE2NDQuRXE3elJHUE8tbGtwQGludGVsLmNv
-bS8NCj4gDQo+IHNwYXJzZSB3YXJuaW5nczogKG5ldyBvbmVzIHByZWZpeGVkIGJ5ID4+KQ0KPiA+
-ID4gYXJjaC94ODYva3ZtL21tdS90ZHBfbW11LmM6NDc0OjE0OiBzcGFyc2U6IHNwYXJzZTogaW5j
-b3JyZWN0IHR5cGUgaW4gYXJndW1lbnQgMSAoZGlmZmVyZW50IGFkZHJlc3Mgc3BhY2VzKSBAQMKg
-wqDCoMKgIGV4cGVjdGVkIHZvaWQgY29uc3Qgdm9sYXRpbGUgKnYgQEDCoMKgwqDCoCBnb3QgdW5z
-aWduZWQgbG9uZyBsb25nIFtub2RlcmVmXSBbdXNlcnR5cGVdIF9fcmN1ICpfX2FpX3B0ciBAQA0K
-PiDCoMKgIGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5jOjQ3NDoxNDogc3BhcnNlOsKgwqDCoMKg
-IGV4cGVjdGVkIHZvaWQgY29uc3Qgdm9sYXRpbGUgKnYNCj4gwqDCoCBhcmNoL3g4Ni9rdm0vbW11
-L3RkcF9tbXUuYzo0NzQ6MTQ6IHNwYXJzZTrCoMKgwqDCoCBnb3QgdW5zaWduZWQgbG9uZyBsb25n
-IFtub2RlcmVmXSBbdXNlcnR5cGVdIF9fcmN1ICpfX2FpX3B0cg0KPiA+ID4gYXJjaC94ODYva3Zt
-L21tdS90ZHBfbW11LmM6NDc0OjE0OiBzcGFyc2U6IHNwYXJzZTogY2FzdCByZW1vdmVzIGFkZHJl
-c3Mgc3BhY2UgJ19fcmN1JyBvZiBleHByZXNzaW9uDQo+ID4gPiBhcmNoL3g4Ni9rdm0vbW11L3Rk
-cF9tbXUuYzo0NzQ6MTQ6IHNwYXJzZTogc3BhcnNlOiBjYXN0IHJlbW92ZXMgYWRkcmVzcyBzcGFj
-ZSAnX19yY3UnIG9mIGV4cHJlc3Npb24NCj4gPiA+IGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5j
-OjQ3NDoxNDogc3BhcnNlOiBzcGFyc2U6IGNhc3QgcmVtb3ZlcyBhZGRyZXNzIHNwYWNlICdfX3Jj
-dScgb2YgZXhwcmVzc2lvbg0KPiA+ID4gYXJjaC94ODYva3ZtL21tdS90ZHBfbW11LmM6NDc0OjE0
-OiBzcGFyc2U6IHNwYXJzZTogY2FzdCByZW1vdmVzIGFkZHJlc3Mgc3BhY2UgJ19fcmN1JyBvZiBl
-eHByZXNzaW9uDQo+ID4gPiBhcmNoL3g4Ni9rdm0vbW11L3RkcF9tbXUuYzo3NTQ6Mjk6IHNwYXJz
-ZTogc3BhcnNlOiBpbmNvcnJlY3QgdHlwZSBpbiBhcmd1bWVudCAxIChkaWZmZXJlbnQgYWRkcmVz
-cyBzcGFjZXMpIEBAwqDCoMKgwqAgZXhwZWN0ZWQgdW5zaWduZWQgbG9uZyBsb25nIFt1c2VydHlw
-ZV0gKnNwdGVwIEBAwqDCoMKgwqAgZ290IHVuc2lnbmVkIGxvbmcgbG9uZyBbbm9kZXJlZl0gW3Vz
-ZXJ0eXBlXSBfX3JjdSAqW3VzZXJ0eXBlXSBzcHRlcCBAQA0KPiDCoMKgIGFyY2gveDg2L2t2bS9t
-bXUvdGRwX21tdS5jOjc1NDoyOTogc3BhcnNlOsKgwqDCoMKgIGV4cGVjdGVkIHVuc2lnbmVkIGxv
-bmcgbG9uZyBbdXNlcnR5cGVdICpzcHRlcA0KPiDCoMKgIGFyY2gveDg2L2t2bS9tbXUvdGRwX21t
-dS5jOjc1NDoyOTogc3BhcnNlOsKgwqDCoMKgIGdvdCB1bnNpZ25lZCBsb25nIGxvbmcgW25vZGVy
-ZWZdIFt1c2VydHlwZV0gX19yY3UgKlt1c2VydHlwZV0gc3B0ZXANCj4gwqDCoCBhcmNoL3g4Ni9r
-dm0vbW11L3RkcF9tbXUuYzoxMjQ2OjI1OiBzcGFyc2U6IHNwYXJzZTogaW5jb3JyZWN0IHR5cGUg
-aW4gYXJndW1lbnQgMSAoZGlmZmVyZW50IGFkZHJlc3Mgc3BhY2VzKSBAQMKgwqDCoMKgIGV4cGVj
-dGVkIHVuc2lnbmVkIGxvbmcgbG9uZyBbdXNlcnR5cGVdICpzcHRlcCBAQMKgwqDCoMKgIGdvdCB1
-bnNpZ25lZCBsb25nIGxvbmcgW25vZGVyZWZdIFt1c2VydHlwZV0gX19yY3UgKlthZGRyZXNzYWJs
-ZV0gW3VzZXJ0eXBlXSBzcHRlcCBAQA0KPiDCoMKgIGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5j
-OjEyNDY6MjU6IHNwYXJzZTrCoMKgwqDCoCBleHBlY3RlZCB1bnNpZ25lZCBsb25nIGxvbmcgW3Vz
-ZXJ0eXBlXSAqc3B0ZXANCj4gwqDCoCBhcmNoL3g4Ni9rdm0vbW11L3RkcF9tbXUuYzoxMjQ2OjI1
-OiBzcGFyc2U6wqDCoMKgwqAgZ290IHVuc2lnbmVkIGxvbmcgbG9uZyBbbm9kZXJlZl0gW3VzZXJ0
-eXBlXSBfX3JjdSAqW2FkZHJlc3NhYmxlXSBbdXNlcnR5cGVdIHNwdGVwDQo+ID4gPiBhcmNoL3g4
-Ni9rdm0vbW11L3RkcF9tbXUuYzo0NzQ6MTQ6IHNwYXJzZTogc3BhcnNlOiBkZXJlZmVyZW5jZSBv
-ZiBub2RlcmVmIGV4cHJlc3Npb24NCj4gPiA+IGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5jOjQ3
-NDoxNDogc3BhcnNlOiBzcGFyc2U6IGRlcmVmZXJlbmNlIG9mIG5vZGVyZWYgZXhwcmVzc2lvbg0K
-PiDCoMKgIGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5jOjYxODozMzogc3BhcnNlOiBzcGFyc2U6
-IGluY29ycmVjdCB0eXBlIGluIGFyZ3VtZW50IDEgKGRpZmZlcmVudCBhZGRyZXNzIHNwYWNlcykg
-QEDCoMKgwqDCoCBleHBlY3RlZCB1bnNpZ25lZCBsb25nIGxvbmcgW3VzZXJ0eXBlXSAqc3B0ZXAg
-QEDCoMKgwqDCoCBnb3QgdW5zaWduZWQgbG9uZyBsb25nIFtub2RlcmVmXSBbdXNlcnR5cGVdIF9f
-cmN1ICpbdXNlcnR5cGVdIHNwdGVwIEBADQo+IMKgwqAgYXJjaC94ODYva3ZtL21tdS90ZHBfbW11
-LmM6NjE4OjMzOiBzcGFyc2U6wqDCoMKgwqAgZXhwZWN0ZWQgdW5zaWduZWQgbG9uZyBsb25nIFt1
-c2VydHlwZV0gKnNwdGVwDQo+IMKgwqAgYXJjaC94ODYva3ZtL21tdS90ZHBfbW11LmM6NjE4OjMz
-OiBzcGFyc2U6wqDCoMKgwqAgZ290IHVuc2lnbmVkIGxvbmcgbG9uZyBbbm9kZXJlZl0gW3VzZXJ0
-eXBlXSBfX3JjdSAqW3VzZXJ0eXBlXSBzcHRlcA0KPiDCoMKgIGFyY2gveDg2L2t2bS9tbXUvdGRw
-X21tdS5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlICh0aHJvdWdoIGluY2x1ZGUvbGludXgvcmJ0
-cmVlLmgsIGluY2x1ZGUvbGludXgvbW1fdHlwZXMuaCwgaW5jbHVkZS9saW51eC9tbXpvbmUuaCwg
-Li4uKToNCj4gwqDCoCBpbmNsdWRlL2xpbnV4L3JjdXBkYXRlLmg6ODY5OjI1OiBzcGFyc2U6IHNw
-YXJzZTogY29udGV4dCBpbWJhbGFuY2UgaW4gJ19fdGRwX21tdV96YXBfcm9vdCcgLSB1bmV4cGVj
-dGVkIHVubG9jaw0KPiDCoMKgIGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5jOjYxODozMzogc3Bh
-cnNlOiBzcGFyc2U6IGluY29ycmVjdCB0eXBlIGluIGFyZ3VtZW50IDEgKGRpZmZlcmVudCBhZGRy
-ZXNzIHNwYWNlcykgQEDCoMKgwqDCoCBleHBlY3RlZCB1bnNpZ25lZCBsb25nIGxvbmcgW3VzZXJ0
-eXBlXSAqc3B0ZXAgQEDCoMKgwqDCoCBnb3QgdW5zaWduZWQgbG9uZyBsb25nIFtub2RlcmVmXSBb
-dXNlcnR5cGVdIF9fcmN1ICpbdXNlcnR5cGVdIHNwdGVwIEBADQo+IMKgwqAgYXJjaC94ODYva3Zt
-L21tdS90ZHBfbW11LmM6NjE4OjMzOiBzcGFyc2U6wqDCoMKgwqAgZXhwZWN0ZWQgdW5zaWduZWQg
-bG9uZyBsb25nIFt1c2VydHlwZV0gKnNwdGVwDQo+IMKgwqAgYXJjaC94ODYva3ZtL21tdS90ZHBf
-bW11LmM6NjE4OjMzOiBzcGFyc2U6wqDCoMKgwqAgZ290IHVuc2lnbmVkIGxvbmcgbG9uZyBbbm9k
-ZXJlZl0gW3VzZXJ0eXBlXSBfX3JjdSAqW3VzZXJ0eXBlXSBzcHRlcA0KPiDCoMKgIGFyY2gveDg2
-L2t2bS9tbXUvdGRwX21tdS5jOjYxODozMzogc3BhcnNlOiBzcGFyc2U6IGluY29ycmVjdCB0eXBl
-IGluIGFyZ3VtZW50IDEgKGRpZmZlcmVudCBhZGRyZXNzIHNwYWNlcykgQEDCoMKgwqDCoCBleHBl
-Y3RlZCB1bnNpZ25lZCBsb25nIGxvbmcgW3VzZXJ0eXBlXSAqc3B0ZXAgQEDCoMKgwqDCoCBnb3Qg
-dW5zaWduZWQgbG9uZyBsb25nIFtub2RlcmVmXSBbdXNlcnR5cGVdIF9fcmN1ICpbdXNlcnR5cGVd
-IHNwdGVwIEBADQo+IMKgwqAgYXJjaC94ODYva3ZtL21tdS90ZHBfbW11LmM6NjE4OjMzOiBzcGFy
-c2U6wqDCoMKgwqAgZXhwZWN0ZWQgdW5zaWduZWQgbG9uZyBsb25nIFt1c2VydHlwZV0gKnNwdGVw
-DQo+IMKgwqAgYXJjaC94ODYva3ZtL21tdS90ZHBfbW11LmM6NjE4OjMzOiBzcGFyc2U6wqDCoMKg
-wqAgZ290IHVuc2lnbmVkIGxvbmcgbG9uZyBbbm9kZXJlZl0gW3VzZXJ0eXBlXSBfX3JjdSAqW3Vz
-ZXJ0eXBlXSBzcHRlcA0KPiDCoMKgIGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5jOjYxODozMzog
-c3BhcnNlOiBzcGFyc2U6IGluY29ycmVjdCB0eXBlIGluIGFyZ3VtZW50IDEgKGRpZmZlcmVudCBh
-ZGRyZXNzIHNwYWNlcykgQEDCoMKgwqDCoCBleHBlY3RlZCB1bnNpZ25lZCBsb25nIGxvbmcgW3Vz
-ZXJ0eXBlXSAqc3B0ZXAgQEDCoMKgwqDCoCBnb3QgdW5zaWduZWQgbG9uZyBsb25nIFtub2RlcmVm
-XSBbdXNlcnR5cGVdIF9fcmN1ICpbdXNlcnR5cGVdIHNwdGVwIEBADQo+IMKgwqAgYXJjaC94ODYv
-a3ZtL21tdS90ZHBfbW11LmM6NjE4OjMzOiBzcGFyc2U6wqDCoMKgwqAgZXhwZWN0ZWQgdW5zaWdu
-ZWQgbG9uZyBsb25nIFt1c2VydHlwZV0gKnNwdGVwDQo+IMKgwqAgYXJjaC94ODYva3ZtL21tdS90
-ZHBfbW11LmM6NjE4OjMzOiBzcGFyc2U6wqDCoMKgwqAgZ290IHVuc2lnbmVkIGxvbmcgbG9uZyBb
-bm9kZXJlZl0gW3VzZXJ0eXBlXSBfX3JjdSAqW3VzZXJ0eXBlXSBzcHRlcA0KPiDCoMKgIGFyY2gv
-eDg2L2t2bS9tbXUvdGRwX21tdS5jOjE1MzY6MzM6IHNwYXJzZTogc3BhcnNlOiBjb250ZXh0IGlt
-YmFsYW5jZSBpbiAndGRwX21tdV9zcGxpdF9odWdlX3BhZ2VzX3Jvb3QnIC0gdW5leHBlY3RlZCB1
-bmxvY2sNCj4gwqDCoCBhcmNoL3g4Ni9rdm0vbW11L3RkcF9tbXUuYzo2MTg6MzM6IHNwYXJzZTog
-c3BhcnNlOiBpbmNvcnJlY3QgdHlwZSBpbiBhcmd1bWVudCAxIChkaWZmZXJlbnQgYWRkcmVzcyBz
-cGFjZXMpIEBAwqDCoMKgwqAgZXhwZWN0ZWQgdW5zaWduZWQgbG9uZyBsb25nIFt1c2VydHlwZV0g
-KnNwdGVwIEBAwqDCoMKgwqAgZ290IHVuc2lnbmVkIGxvbmcgbG9uZyBbbm9kZXJlZl0gW3VzZXJ0
-eXBlXSBfX3JjdSAqW3VzZXJ0eXBlXSBzcHRlcCBAQA0KPiDCoMKgIGFyY2gveDg2L2t2bS9tbXUv
-dGRwX21tdS5jOjYxODozMzogc3BhcnNlOsKgwqDCoMKgIGV4cGVjdGVkIHVuc2lnbmVkIGxvbmcg
-bG9uZyBbdXNlcnR5cGVdICpzcHRlcA0KPiDCoMKgIGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5j
-OjYxODozMzogc3BhcnNlOsKgwqDCoMKgIGdvdCB1bnNpZ25lZCBsb25nIGxvbmcgW25vZGVyZWZd
-IFt1c2VydHlwZV0gX19yY3UgKlt1c2VydHlwZV0gc3B0ZXANCj4gwqDCoCBhcmNoL3g4Ni9rdm0v
-bW11L3RkcF9tbXUuYzo2MTg6MzM6IHNwYXJzZTogc3BhcnNlOiBpbmNvcnJlY3QgdHlwZSBpbiBh
-cmd1bWVudCAxIChkaWZmZXJlbnQgYWRkcmVzcyBzcGFjZXMpIEBAwqDCoMKgwqAgZXhwZWN0ZWQg
-dW5zaWduZWQgbG9uZyBsb25nIFt1c2VydHlwZV0gKnNwdGVwIEBAwqDCoMKgwqAgZ290IHVuc2ln
-bmVkIGxvbmcgbG9uZyBbbm9kZXJlZl0gW3VzZXJ0eXBlXSBfX3JjdSAqW3VzZXJ0eXBlXSBzcHRl
-cCBAQA0KPiDCoMKgIGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5jOjYxODozMzogc3BhcnNlOsKg
-wqDCoMKgIGV4cGVjdGVkIHVuc2lnbmVkIGxvbmcgbG9uZyBbdXNlcnR5cGVdICpzcHRlcA0KPiDC
-oMKgIGFyY2gveDg2L2t2bS9tbXUvdGRwX21tdS5jOjYxODozMzogc3BhcnNlOsKgwqDCoMKgIGdv
-dCB1bnNpZ25lZCBsb25nIGxvbmcgW25vZGVyZWZdIFt1c2VydHlwZV0gX19yY3UgKlt1c2VydHlw
-ZV0gc3B0ZXANCg0KSSB0aGluayB3ZSBuZWVkIHNvbWV0aGluZyBsaWtlIHRoZSBiZWxvdy4gVGhl
-IGZpcnN0IGh1bmsgbmVlZHMgdG8gdGFyZ2V0Og0KNzBjYWFjMjgzZmIzMCBLVk06IHg4Ni9tbXU6
-IEFkZCBhbiBpc19taXJyb3IgbWVtYmVyIGZvciB1bmlvbiBrdm1fbW11X3BhZ2Vfcm9sZQ0KYW5k
-IHRoZSBzZWNvbmQ6DQoxNjFkNGY3YzZkODBlIEtWTTogeDg2L3RkcF9tbXU6IFByb3BhZ2F0ZSBi
-dWlsZGluZyBtaXJyb3IgcGFnZSB0YWJsZXMNCg0KU2hvdWxkIHdlIHNlbmQgc29tZSBwcm9wZXIg
-Zml4dXAgcGF0Y2hlcz8NCg0KZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9tbXUvc3B0ZS5oIGIv
-YXJjaC94ODYva3ZtL21tdS9zcHRlLmgNCmluZGV4IGE3MmYwZTNiZGUxNzMuLjVkMzBkNTliZWRm
-YzAgMTAwNjQ0DQotLS0gYS9hcmNoL3g4Ni9rdm0vbW11L3NwdGUuaA0KKysrIGIvYXJjaC94ODYv
-a3ZtL21tdS9zcHRlLmgNCkBAIC0yNjcsOSArMjY3LDkgQEAgc3RhdGljIGlubGluZSBzdHJ1Y3Qg
-a3ZtX21tdV9wYWdlICpyb290X3RvX3NwKGhwYV90IHJvb3QpDQogICAgICAgIHJldHVybiBzcHRl
-X3RvX2NoaWxkX3NwKHJvb3QpOw0KIH0NCiANCi1zdGF0aWMgaW5saW5lIGJvb2wgaXNfbWlycm9y
-X3NwdGVwKHU2NCAqc3B0ZXApDQorc3RhdGljIGlubGluZSBib29sIGlzX21pcnJvcl9zcHRlcCh0
-ZHBfcHRlcF90IHNwdGVwKQ0KIHsNCi0gICAgICAgcmV0dXJuIGlzX21pcnJvcl9zcChzcHRlcF90
-b19zcChzcHRlcCkpOw0KKyAgICAgICByZXR1cm4gaXNfbWlycm9yX3NwKHNwdGVwX3RvX3NwKHJj
-dV9kZXJlZmVyZW5jZSgoc3B0ZXApKSkpOw0KIH0NCiANCiBzdGF0aWMgaW5saW5lIGJvb2wgaXNf
-bW1pb19zcHRlKHN0cnVjdCBrdm0gKmt2bSwgdTY0IHNwdGUpDQpkaWZmIC0tZ2l0IGEvYXJjaC94
-ODYva3ZtL21tdS90ZHBfbW11LmMgYi9hcmNoL3g4Ni9rdm0vbW11L3RkcF9tbXUuYw0KaW5kZXgg
-MDE5YjQzNzIzZDkwMS4uNzY1MTJlMDVlMzFmMiAxMDA2NDQNCi0tLSBhL2FyY2gveDg2L2t2bS9t
-bXUvdGRwX21tdS5jDQorKysgYi9hcmNoL3g4Ni9rdm0vbW11L3RkcF9tbXUuYw0KQEAgLTUxMSw3
-ICs1MTEsNyBAQCBzdGF0aWMgaW50IF9fbXVzdF9jaGVjayBzZXRfZXh0ZXJuYWxfc3B0ZV9wcmVz
-ZW50KHN0cnVjdCBrdm0NCiprdm0sIHRkcF9wdGVwX3Qgc3ANCiAgICAgICAgICogcGFnZSB0YWJs
-ZSBoYXMgYmVlbiBtb2RpZmllZC4gVXNlIEZST1pFTl9TUFRFIHNpbWlsYXIgdG8NCiAgICAgICAg
-ICogdGhlIHphcHBpbmcgY2FzZS4NCiAgICAgICAgICovDQotICAgICAgIGlmICghdHJ5X2NtcHhj
-aGc2NChzcHRlcCwgJm9sZF9zcHRlLCBGUk9aRU5fU1BURSkpDQorICAgICAgIGlmICghdHJ5X2Nt
-cHhjaGc2NChyY3VfZGVyZWZlcmVuY2Uoc3B0ZXApLCAmb2xkX3NwdGUsIEZST1pFTl9TUFRFKSkN
-CiAgICAgICAgICAgICAgICByZXR1cm4gLUVCVVNZOw0KIA0KICAgICAgICAvKg0KDQoNCg==
+On Thu, Oct 10, 2024 at 09:59:23AM +0100, Fuad Tabba wrote:
+> Add support for mmap() and fault() for guest_memfd in the host.
+> The ability to fault in a guest page is contingent on that page
+> being shared with the host.
+> 
+> The guest_memfd PRIVATE memory attribute is not used for two
+> reasons. First because it reflects the userspace expectation for
+> that memory location, and therefore can be toggled by userspace.
+> The second is, although each guest_memfd file has a 1:1 binding
+> with a KVM instance, the plan is to allow multiple files per
+> inode, e.g. to allow intra-host migration to a new KVM instance,
+> without destroying guest_memfd.
+> 
+> The mapping is restricted to only memory explicitly shared with
+> the host. KVM checks that the host doesn't have any mappings for
+> private memory via the folio's refcount. To avoid races between
+> paths that check mappability and paths that check whether the
+> host has any mappings (via the refcount), the folio lock is held
+> in while either check is being performed.
+> 
+> This new feature is gated with a new configuration option,
+> CONFIG_KVM_GMEM_MAPPABLE.
+> 
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Co-developed-by: Elliot Berman <quic_eberman@quicinc.com>
+> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> 
+> ---
+> 
+> Note that the functions kvm_gmem_is_mapped(),
+> kvm_gmem_set_mappable(), and int kvm_gmem_clear_mappable() are
+> not used in this patch series. They are intended to be used in
+> future patches [*], which check and toggle mapability when the
+> guest shares/unshares pages with the host.
+> 
+> [*] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/guestmem-6.12-v3-pkvm
+> 
+> ---
+>  include/linux/kvm_host.h |  52 +++++++++++
+>  virt/kvm/Kconfig         |   4 +
+>  virt/kvm/guest_memfd.c   | 185 +++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/kvm_main.c      | 138 +++++++++++++++++++++++++++++
+>  4 files changed, 379 insertions(+)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index acf85995b582..bda7fda9945e 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2527,4 +2527,56 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>  				    struct kvm_pre_fault_memory *range);
+>  #endif
+>  
+> +#ifdef CONFIG_KVM_GMEM_MAPPABLE
+> +bool kvm_gmem_is_mappable(struct kvm *kvm, gfn_t gfn, gfn_t end);
+> +bool kvm_gmem_is_mapped(struct kvm *kvm, gfn_t start, gfn_t end);
+> +int kvm_gmem_set_mappable(struct kvm *kvm, gfn_t start, gfn_t end);
+> +int kvm_gmem_clear_mappable(struct kvm *kvm, gfn_t start, gfn_t end);
+> +int kvm_slot_gmem_set_mappable(struct kvm_memory_slot *slot, gfn_t start,
+> +			       gfn_t end);
+> +int kvm_slot_gmem_clear_mappable(struct kvm_memory_slot *slot, gfn_t start,
+> +				 gfn_t end);
+> +bool kvm_slot_gmem_is_mappable(struct kvm_memory_slot *slot, gfn_t gfn);
+> +#else
+> +static inline bool kvm_gmem_is_mappable(struct kvm *kvm, gfn_t gfn, gfn_t end)
+> +{
+> +	WARN_ON_ONCE(1);
+> +	return false;
+> +}
+> +static inline bool kvm_gmem_is_mapped(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +	WARN_ON_ONCE(1);
+> +	return false;
+> +}
+> +static inline int kvm_gmem_set_mappable(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +	WARN_ON_ONCE(1);
+> +	return -EINVAL;
+> +}
+> +static inline int kvm_gmem_clear_mappable(struct kvm *kvm, gfn_t start,
+> +					  gfn_t end)
+> +{
+> +	WARN_ON_ONCE(1);
+> +	return -EINVAL;
+> +}
+> +static inline int kvm_slot_gmem_set_mappable(struct kvm_memory_slot *slot,
+> +					     gfn_t start, gfn_t end)
+> +{
+> +	WARN_ON_ONCE(1);
+> +	return -EINVAL;
+> +}
+> +static inline int kvm_slot_gmem_clear_mappable(struct kvm_memory_slot *slot,
+> +					       gfn_t start, gfn_t end)
+> +{
+> +	WARN_ON_ONCE(1);
+> +	return -EINVAL;
+> +}
+> +static inline bool kvm_slot_gmem_is_mappable(struct kvm_memory_slot *slot,
+> +					     gfn_t gfn)
+> +{
+> +	WARN_ON_ONCE(1);
+> +	return false;
+> +}
+> +#endif /* CONFIG_KVM_GMEM_MAPPABLE */
+> +
+>  #endif
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index fd6a3010afa8..2cfcb0848e37 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -120,3 +120,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+>  config HAVE_KVM_ARCH_GMEM_INVALIDATE
+>         bool
+>         depends on KVM_PRIVATE_MEM
+> +
+> +config KVM_GMEM_MAPPABLE
+> +       select KVM_PRIVATE_MEM
+> +       bool
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index f414646c475b..df3a6f05a16e 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -370,7 +370,184 @@ static void kvm_gmem_init_mount(void)
+>  	kvm_gmem_mnt->mnt_flags |= MNT_NOEXEC;
+>  }
+>  
+> +#ifdef CONFIG_KVM_GMEM_MAPPABLE
+> +static struct folio *
+> +__kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
+> +		   gfn_t gfn, kvm_pfn_t *pfn, bool *is_prepared,
+> +		   int *max_order);
+> +
+> +static int gmem_set_mappable(struct inode *inode, pgoff_t start, pgoff_t end)
+> +{
+> +	struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
+> +	void *xval = xa_mk_value(true);
+> +	pgoff_t i;
+> +	bool r;
+> +
+> +	filemap_invalidate_lock(inode->i_mapping);
+> +	for (i = start; i < end; i++) {
+> +		r = xa_err(xa_store(mappable_offsets, i, xval, GFP_KERNEL));
+
+I think it might not be strictly necessary,
+
+> +		if (r)
+> +			break;
+> +	}
+> +	filemap_invalidate_unlock(inode->i_mapping);
+> +
+> +	return r;
+> +}
+> +
+> +static int gmem_clear_mappable(struct inode *inode, pgoff_t start, pgoff_t end)
+> +{
+> +	struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
+> +	pgoff_t i;
+> +	int r = 0;
+> +
+> +	filemap_invalidate_lock(inode->i_mapping);
+> +	for (i = start; i < end; i++) {
+> +		struct folio *folio;
+> +
+> +		/*
+> +		 * Holds the folio lock until after checking its refcount,
+> +		 * to avoid races with paths that fault in the folio.
+> +		 */
+> +		folio = kvm_gmem_get_folio(inode, i);
+
+We don't need to allocate the folio here. I think we can use
+
+		folio = filemap_lock_folio(inode, i);
+		if (!folio || WARN_ON_ONCE(IS_ERR(folio)))
+			continue;
+
+> +		if (WARN_ON_ONCE(IS_ERR(folio)))
+> +			continue;
+> +
+> +		/*
+> +		 * Check that the host doesn't have any mappings on clearing
+> +		 * the mappable flag, because clearing the flag implies that the
+> +		 * memory will be unshared from the host. Therefore, to maintain
+> +		 * the invariant that the host cannot access private memory, we
+> +		 * need to check that it doesn't have any mappings to that
+> +		 * memory before making it private.
+> +		 *
+> +		 * Two references are expected because of kvm_gmem_get_folio().
+> +		 */
+> +		if (folio_ref_count(folio) > 2)
+
+If we'd like to be prepared for large folios, it should be
+folio_nr_pages(folio) + 1. 
+
+> +			r = -EPERM;
+> +		else
+> +			xa_erase(mappable_offsets, i);
+> +
+> +		folio_put(folio);
+> +		folio_unlock(folio);
+> +
+> +		if (r)
+> +			break;
+> +	}
+> +	filemap_invalidate_unlock(inode->i_mapping);
+> +
+> +	return r;
+> +}
+> +
+> +static bool gmem_is_mappable(struct inode *inode, pgoff_t pgoff)
+> +{
+> +	struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
+> +	bool r;
+> +
+> +	filemap_invalidate_lock_shared(inode->i_mapping);
+> +	r = xa_find(mappable_offsets, &pgoff, pgoff, XA_PRESENT);
+> +	filemap_invalidate_unlock_shared(inode->i_mapping);
+> +
+> +	return r;
+> +}
+> +
+> +int kvm_slot_gmem_set_mappable(struct kvm_memory_slot *slot, gfn_t start, gfn_t end)
+> +{
+> +	struct inode *inode = file_inode(slot->gmem.file);
+> +	pgoff_t start_off = slot->gmem.pgoff + start - slot->base_gfn;
+> +	pgoff_t end_off = start_off + end - start;
+> +
+> +	return gmem_set_mappable(inode, start_off, end_off);
+> +}
+> +
+> +int kvm_slot_gmem_clear_mappable(struct kvm_memory_slot *slot, gfn_t start, gfn_t end)
+> +{
+> +	struct inode *inode = file_inode(slot->gmem.file);
+> +	pgoff_t start_off = slot->gmem.pgoff + start - slot->base_gfn;
+> +	pgoff_t end_off = start_off + end - start;
+> +
+> +	return gmem_clear_mappable(inode, start_off, end_off);
+> +}
+> +
+> +bool kvm_slot_gmem_is_mappable(struct kvm_memory_slot *slot, gfn_t gfn)
+> +{
+> +	struct inode *inode = file_inode(slot->gmem.file);
+> +	unsigned long pgoff = slot->gmem.pgoff + gfn - slot->base_gfn;
+> +
+> +	return gmem_is_mappable(inode, pgoff);
+> +}
+> +
+> +static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
+> +{
+> +	struct inode *inode = file_inode(vmf->vma->vm_file);
+> +	struct folio *folio;
+> +	vm_fault_t ret = VM_FAULT_LOCKED;
+> +
+> +	/*
+> +	 * Holds the folio lock until after checking whether it can be faulted
+> +	 * in, to avoid races with paths that change a folio's mappability.
+> +	 */
+> +	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> +	if (!folio)
+> +		return VM_FAULT_SIGBUS;
+> +
+> +	if (folio_test_hwpoison(folio)) {
+> +		ret = VM_FAULT_HWPOISON;
+> +		goto out;
+> +	}
+> +
+> +	if (!gmem_is_mappable(inode, vmf->pgoff)) {
+> +		ret = VM_FAULT_SIGBUS;
+> +		goto out;
+> +	}
+> +
+> +	if (!folio_test_uptodate(folio)) {
+> +		unsigned long nr_pages = folio_nr_pages(folio);
+> +		unsigned long i;
+> +
+> +		for (i = 0; i < nr_pages; i++)
+> +			clear_highpage(folio_page(folio, i));
+> +
+> +		folio_mark_uptodate(folio);
+> +	}
+> +
+> +	vmf->page = folio_file_page(folio, vmf->pgoff);
+> +out:
+> +	if (ret != VM_FAULT_LOCKED) {
+> +		folio_put(folio);
+> +		folio_unlock(folio);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static const struct vm_operations_struct kvm_gmem_vm_ops = {
+> +	.fault = kvm_gmem_fault,
+> +};
+> +
+> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> +{
+> +	if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
+> +	    (VM_SHARED | VM_MAYSHARE)) {
+> +		return -EINVAL;
+> +	}
+> +
+> +	file_accessed(file);
+> +	vm_flags_set(vma, VM_DONTDUMP);
+> +	vma->vm_ops = &kvm_gmem_vm_ops;
+> +
+> +	return 0;
+> +}
+> +#else
+> +static int gmem_set_mappable(struct inode *inode, pgoff_t start, pgoff_t end)
+> +{
+> +	WARN_ON_ONCE(1);
+> +	return -EINVAL;
+> +}
+> +#define kvm_gmem_mmap NULL
+> +#endif /* CONFIG_KVM_GMEM_MAPPABLE */
+> +
+>  static struct file_operations kvm_gmem_fops = {
+> +	.mmap		= kvm_gmem_mmap,
+>  	.open		= generic_file_open,
+>  	.release	= kvm_gmem_release,
+>  	.fallocate	= kvm_gmem_fallocate,
+> @@ -557,6 +734,14 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+>  		goto err_gmem;
+>  	}
+>  
+> +	if (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE)) {
+> +		err = gmem_set_mappable(file_inode(file), 0, size >> PAGE_SHIFT);
+> +		if (err) {
+> +			fput(file);
+> +			goto err_gmem;
+> +		}
+> +	}
+> +
+>  	kvm_get_kvm(kvm);
+>  	gmem->kvm = kvm;
+>  	xa_init(&gmem->bindings);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 05cbb2548d99..aed9cf2f1685 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3263,6 +3263,144 @@ static int next_segment(unsigned long len, int offset)
+>  		return len;
+>  }
+>  
+> +#ifdef CONFIG_KVM_GMEM_MAPPABLE
+> +static bool __kvm_gmem_is_mappable(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +	struct kvm_memslot_iter iter;
+> +
+> +	lockdep_assert_held(&kvm->slots_lock);
+> +
+> +	kvm_for_each_memslot_in_gfn_range(&iter, kvm_memslots(kvm), start, end) {
+> +		struct kvm_memory_slot *memslot = iter.slot;
+> +		gfn_t gfn_start, gfn_end, i;
+> +
+> +		gfn_start = max(start, memslot->base_gfn);
+> +		gfn_end = min(end, memslot->base_gfn + memslot->npages);
+> +		if (WARN_ON_ONCE(gfn_start >= gfn_end))
+> +			continue;
+> +
+> +		for (i = gfn_start; i < gfn_end; i++) {
+> +			if (!kvm_slot_gmem_is_mappable(memslot, i))
+> +				return false;
+> +		}
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +bool kvm_gmem_is_mappable(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +	bool r;
+> +
+> +	mutex_lock(&kvm->slots_lock);
+> +	r = __kvm_gmem_is_mappable(kvm, start, end);
+> +	mutex_unlock(&kvm->slots_lock);
+> +
+> +	return r;
+> +}
+> +
+> +static bool kvm_gmem_is_pfn_mapped(struct kvm *kvm, struct kvm_memory_slot *memslot, gfn_t gfn_idx)
+> +{
+> +	struct page *page;
+> +	bool is_mapped;
+> +	kvm_pfn_t pfn;
+> +
+> +	/*
+> +	 * Holds the folio lock until after checking its refcount,
+> +	 * to avoid races with paths that fault in the folio.
+> +	 */
+> +	if (WARN_ON_ONCE(kvm_gmem_get_pfn_locked(kvm, memslot, gfn_idx, &pfn, NULL)))
+> +		return false;
+> +
+> +	page = pfn_to_page(pfn);
+> +
+> +	/* Two references are expected because of kvm_gmem_get_pfn_locked(). */
+> +	is_mapped = page_ref_count(page) > 2;
+> +
+> +	put_page(page);
+> +	unlock_page(page);
+> +
+> +	return is_mapped;
+> +}
+> +
+> +static bool __kvm_gmem_is_mapped(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +	struct kvm_memslot_iter iter;
+> +
+> +	lockdep_assert_held(&kvm->slots_lock);
+> +
+> +	kvm_for_each_memslot_in_gfn_range(&iter, kvm_memslots(kvm), start, end) {
+> +		struct kvm_memory_slot *memslot = iter.slot;
+> +		gfn_t gfn_start, gfn_end, i;
+> +
+> +		gfn_start = max(start, memslot->base_gfn);
+> +		gfn_end = min(end, memslot->base_gfn + memslot->npages);
+> +		if (WARN_ON_ONCE(gfn_start >= gfn_end))
+> +			continue;
+> +
+> +		for (i = gfn_start; i < gfn_end; i++) {
+> +			if (kvm_gmem_is_pfn_mapped(kvm, memslot, i))
+> +				return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +bool kvm_gmem_is_mapped(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +	bool r;
+> +
+> +	mutex_lock(&kvm->slots_lock);
+> +	r = __kvm_gmem_is_mapped(kvm, start, end);
+> +	mutex_unlock(&kvm->slots_lock);
+> +
+> +	return r;
+> +}
+> +
+> +static int kvm_gmem_toggle_mappable(struct kvm *kvm, gfn_t start, gfn_t end,
+> +				    bool is_mappable)
+> +{
+> +	struct kvm_memslot_iter iter;
+> +	int r = 0;
+> +
+> +	mutex_lock(&kvm->slots_lock);
+> +
+> +	kvm_for_each_memslot_in_gfn_range(&iter, kvm_memslots(kvm), start, end) {
+> +		struct kvm_memory_slot *memslot = iter.slot;
+> +		gfn_t gfn_start, gfn_end;
+> +
+> +		gfn_start = max(start, memslot->base_gfn);
+> +		gfn_end = min(end, memslot->base_gfn + memslot->npages);
+> +		if (WARN_ON_ONCE(start >= end))
+> +			continue;
+> +
+> +		if (is_mappable)
+> +			r = kvm_slot_gmem_set_mappable(memslot, gfn_start, gfn_end);
+> +		else
+> +			r = kvm_slot_gmem_clear_mappable(memslot, gfn_start, gfn_end);
+> +
+> +		if (WARN_ON_ONCE(r))
+> +			break;
+> +	}
+> +
+> +	mutex_unlock(&kvm->slots_lock);
+> +
+> +	return r;
+> +}
+> +
+> +int kvm_gmem_set_mappable(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +	return kvm_gmem_toggle_mappable(kvm, start, end, true);
+> +}
+> +
+> +int kvm_gmem_clear_mappable(struct kvm *kvm, gfn_t start, gfn_t end)
+> +{
+> +	return kvm_gmem_toggle_mappable(kvm, start, end, false);
+> +}
+> +
+> +#endif /* CONFIG_KVM_GMEM_MAPPABLE */
+> +
+>  /* Copy @len bytes from guest memory at '(@gfn * PAGE_SIZE) + @offset' to @data */
+>  static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
+>  				 void *data, int offset, int len)
+> -- 
+> 2.47.0.rc0.187.ge670bccf7e-goog
+> 
 
