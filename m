@@ -1,209 +1,171 @@
-Return-Path: <kvm+bounces-28705-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28706-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70BFC99BCF6
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 02:31:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A576499BD3F
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 03:19:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A35071C20D8A
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 00:31:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A8491F21D12
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 01:19:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB736101EE;
-	Mon, 14 Oct 2024 00:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r9YqRKuw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F8CF9D9;
+	Mon, 14 Oct 2024 01:19:24 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0F82595;
-	Mon, 14 Oct 2024 00:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9841BC2A;
+	Mon, 14 Oct 2024 01:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728865891; cv=none; b=H17UGxqntZfMfCN1r+iBN8d17SkxMcQ2/GQObdppsiCKW5bXnE8Ho3ttxzg85UipCUdyJnCjr93Wai6+WUrjT7gwwm8vQnSpwjogLyX6fsnd+X5pnzysK5nMnoI9fHNY3R0EBt0goIHFG8KEcVokWcYO9Y8Bn+o0gZaNntsoxb0=
+	t=1728868764; cv=none; b=oGW3e7Lf90pdElgBhgRYLxFEIFIEQIukhunCnQ3J/3VDMuPwyjeZZn0iGH8xAR3z5cPX9qRRuxIsRtmfKFBGIii9OUJJuYJYkdLpnnkwaYCRjhvUlxant8ezNSyquZrSRbl1PFc3xCqFjQwzifSjvtvEyigcJNxYmCnDpivmjOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728865891; c=relaxed/simple;
-	bh=XvIpO0hMtyh3Po24emY82DbVHrbP5ytugA80vx/L/C4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U7dM2Mcd2Qlwain2vHbjwieEd40N0TVRIyRb2gUvDRMsr2Y9H0lmvnzak5s6cIx2l7wbPnd++vqqU45+Aa9q9Cq+rMMrdcBCk3z5cVf9TZTL0lPbyNAyG2EEJVg/D/pKFTgrH0qkU3xKQIJDMK95QQq3XlW5PV6+W2HPJBKdsKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r9YqRKuw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E461C4CEC5;
-	Mon, 14 Oct 2024 00:31:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728865890;
-	bh=XvIpO0hMtyh3Po24emY82DbVHrbP5ytugA80vx/L/C4=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=r9YqRKuw96RsL0f2maCvk78OVekNkjc1FC0l5peRj1xFsFUp+Wk6XpDbm8K/I8Dat
-	 NtYj6Bt7tAjktwuIEYkK2pE6Nlz6suRz3IANFU3iMXWxI7B7SBdTbd2IFcE2RMqhNe
-	 Gzl7d51zCrp3PEv9lrIW1gc/wLVjkJdAhHf/b8suVLDK9/64J6axNZwU42guB6nhKd
-	 Bi+uaQAfSmkkbJhfVBfu3ahXZQy9cxY9cRnT2opvnrVBsZZFVpqu2kKlHbRWIQ75Yc
-	 VF5aZimutRyJow22wfPFMyDIphrxGhIuf1iV5oDIrKq8jmbchhfe2c3wMu4V4yxCL9
-	 zZuh3mAA+h63Q==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 043ABCE0D17; Sun, 13 Oct 2024 17:31:30 -0700 (PDT)
-Date: Sun, 13 Oct 2024 17:31:30 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Julia Lawall <Julia.Lawall@inria.fr>
-Cc: linux-nfs@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	vbabka@suse.cz, Tom Talpey <tom@talpey.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Olga Kornievskaia <okorniev@redhat.com>, Neil Brown <neilb@suse.de>,
-	linux-can@vger.kernel.org, bridge@lists.linux.dev,
-	b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org,
-	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
-	ecryptfs@vger.kernel.org, linux-block@vger.kernel.org,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/17] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <47a98e77-8bbf-48d7-bb52-50e85a5336a0@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+	s=arc-20240116; t=1728868764; c=relaxed/simple;
+	bh=zUv6ILKKCU7ghNWQyBMVZ63qcvkg6BgiCPLp6kS4zzQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=HjnjAPXVQK0ib6yU+C8vLXBoz4q61jdL+qooAoTEvJV8DUMS5vuUs5kBeQPhY417rxRS3MU8bRfCmKOAtdYGvCCyHY/Lj3NzfzX3+p10ps94XgOXE6eVrR3zp0ekxN3ihEGzK6iOc2dVQNHkRS2BV8qAJB+nHnbtdLamErkmYvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Dxn_GQcQxns7MZAA--.41498S3;
+	Mon, 14 Oct 2024 09:19:12 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMAx_9WNcQxn32goAA--.13131S3;
+	Mon, 14 Oct 2024 09:19:11 +0800 (CST)
+Subject: Re: [PATCH] LoongArch: KVM: Mark hrtimer to expire in hard interrupt
+ context
+To: Huacai Chen <chenhuacai@loongson.cn>, Paolo Bonzini
+ <pbonzini@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>
+References: <20241013090136.1254036-1-chenhuacai@loongson.cn>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <395a4ab9-ee2b-618d-3836-3ff041582ab2@loongson.cn>
+Date: Mon, 14 Oct 2024 09:18:51 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+In-Reply-To: <20241013090136.1254036-1-chenhuacai@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMAx_9WNcQxn32goAA--.13131S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxGF13tF4xur4kAw47Gr4kAFc_yoWrtF1fpr
+	WUAr48Gr48Jr17tw1jyFyDuF45Xw4DCF1xXFWUAry8Ar17Wrn8XF18KrW3JFs8Jw4UAF1x
+	Xr18tr1aqF15J3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWU
+	AwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+	Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
+	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
+	cVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
+	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
+	6r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jepB-UUUUU=
 
-On Sun, Oct 13, 2024 at 10:16:47PM +0200, Julia Lawall wrote:
-> Since SLOB was removed and since
-> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
-> it is not necessary to use call_rcu when the callback only performs
-> kmem_cache_free. Use kfree_rcu() directly.
-> 
-> The changes were done using the following Coccinelle semantic patch.
-> This semantic patch is designed to ignore cases where the callback
-> function is used in another way.
 
-For the series:
 
-Acked-by: Paul E. McKenney <paulmck@kernel.org>
-
-> // <smpl>
-> #spatch --all-includes --include-headers
+On 2024/10/13 下午5:01, Huacai Chen wrote:
+> Like commit 2c0d278f3293fc5 ("KVM: LAPIC: Mark hrtimer to expire in hard
+> interrupt context"), On PREEMPT_RT enabled kernels unmarked hrtimers are
+> moved into soft interrupt expiry mode by default.
 > 
-> @r@
-> expression e;
-> local idexpression e2;
-> identifier cb,f,g;
-> position p;
-> @@
+> While that's not a functional requirement for the KVM constant timer
+> emulation, it is a latency issue which can be avoided by marking the
+> timer so hard interrupt context expiry is enforced.
 > 
-> (
-> call_rcu(...,e2)
-> |
-> call_rcu(&e->f,cb@p)
-> |
-> call_rcu(&e->f.g,cb@p)
-> )
+> This fix a "scheduling while atomic" bug for PREEMPT_RT enabled kernels:
 > 
-> @r1@
-> type T,T1;
-> identifier x,r.cb;
-> @@
+>   BUG: scheduling while atomic: qemu-system-loo/1011/0x00000002
+>   Modules linked in: amdgpu rfkill nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat ns
+>   CPU: 1 UID: 0 PID: 1011 Comm: qemu-system-loo Tainted: G        W          6.12.0-rc2+ #1774
+>   Tainted: [W]=WARN
+>   Hardware name: Loongson Loongson-3A5000-7A1000-1w-CRB/Loongson-LS3A5000-7A1000-1w-CRB, BIOS vUDK2018-LoongArch-V2.0.0-prebeta9 10/21/2022
+>   Stack : ffffffffffffffff 0000000000000000 9000000004e3ea38 9000000116744000
+>           90000001167475a0 0000000000000000 90000001167475a8 9000000005644830
+>           90000000058dc000 90000000058dbff8 9000000116747420 0000000000000001
+>           0000000000000001 6a613fc938313980 000000000790c000 90000001001c1140
+>           00000000000003fe 0000000000000001 000000000000000d 0000000000000003
+>           0000000000000030 00000000000003f3 000000000790c000 9000000116747830
+>           90000000057ef000 0000000000000000 9000000005644830 0000000000000004
+>           0000000000000000 90000000057f4b58 0000000000000001 9000000116747868
+>           900000000451b600 9000000005644830 9000000003a13998 0000000010000020
+>           00000000000000b0 0000000000000004 0000000000000000 0000000000071c1d
+>           ...
+>   Call Trace:
+>   [<9000000003a13998>] show_stack+0x38/0x180
+>   [<9000000004e3ea34>] dump_stack_lvl+0x84/0xc0
+>   [<9000000003a71708>] __schedule_bug+0x48/0x60
+>   [<9000000004e45734>] __schedule+0x1114/0x1660
+>   [<9000000004e46040>] schedule_rtlock+0x20/0x60
+>   [<9000000004e4e330>] rtlock_slowlock_locked+0x3f0/0x10a0
+>   [<9000000004e4f038>] rt_spin_lock+0x58/0x80
+>   [<9000000003b02d68>] hrtimer_cancel_wait_running+0x68/0xc0
+>   [<9000000003b02e30>] hrtimer_cancel+0x70/0x80
+>   [<ffff80000235eb70>] kvm_restore_timer+0x50/0x1a0 [kvm]
+>   [<ffff8000023616c8>] kvm_arch_vcpu_load+0x68/0x2a0 [kvm]
+>   [<ffff80000234c2d4>] kvm_sched_in+0x34/0x60 [kvm]
+>   [<9000000003a749a0>] finish_task_switch.isra.0+0x140/0x2e0
+>   [<9000000004e44a70>] __schedule+0x450/0x1660
+>   [<9000000004e45cb0>] schedule+0x30/0x180
+>   [<ffff800002354c70>] kvm_vcpu_block+0x70/0x120 [kvm]
+>   [<ffff800002354d80>] kvm_vcpu_halt+0x60/0x3e0 [kvm]
+>   [<ffff80000235b194>] kvm_handle_gspr+0x3f4/0x4e0 [kvm]
+>   [<ffff80000235f548>] kvm_handle_exit+0x1c8/0x260 [kvm]
 > 
->  cb(...) {
-> (
->    kmem_cache_free(...);
-> |
->    T x = ...;
->    kmem_cache_free(...,(T1)x);
-> |
->    T x;
->    x = ...;
->    kmem_cache_free(...,(T1)x);
-> )
->  }
-> 
-> @s depends on r1@
-> position p != r.p;
-> identifier r.cb;
-> @@
-> 
->  cb@p
-> 
-> @script:ocaml@
-> cb << r.cb;
-> p << s.p;
-> @@
-> 
-> Printf.eprintf "Other use of %s at %s:%d\n" cb (List.hd p).file (List.hd p).line
-> 
-> @depends on r1 && !s@
-> expression e;
-> identifier r.cb,f,g;
-> position r.p;
-> @@
-> 
-> (
-> - call_rcu(&e->f,cb@p)
-> + kfree_rcu(e,f)
-> |
-> - call_rcu(&e->f.g,cb@p)
-> + kfree_rcu(e,f.g)
-> )
-> 
-> @r1a depends on !s@
-> type T,T1;
-> identifier x,r.cb;
-> @@
-> 
-> - cb(...) {
-> (
-> -  kmem_cache_free(...);
-> |
-> -  T x = ...;
-> -  kmem_cache_free(...,(T1)x);
-> |
-> -  T x;
-> -  x = ...;
-> -  kmem_cache_free(...,(T1)x);
-> )
-> - }
-> 
-> @r2 depends on !r1@
-> identifier r.cb;
-> @@
-> 
-> cb(...) {
->  ...
-> }
-> 
-> @script:ocaml depends on !r1 && !r2@
-> cb << r.cb;
-> @@
-> 
-> Printf.eprintf "need definition for %s\n" cb
-> // </smpl>
-> 
+> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
 > ---
+>   arch/loongarch/kvm/timer.c | 7 ++++---
+>   arch/loongarch/kvm/vcpu.c  | 2 +-
+>   2 files changed, 5 insertions(+), 4 deletions(-)
 > 
->  arch/powerpc/kvm/book3s_mmu_hpte.c  |    8 ------
->  block/blk-ioc.c                     |    9 ------
->  drivers/net/wireguard/allowedips.c  |    9 +-----
->  fs/ecryptfs/dentry.c                |    8 ------
->  fs/nfsd/nfs4state.c                 |    9 ------
->  kernel/time/posix-timers.c          |    9 ------
->  net/batman-adv/translation-table.c  |   47 ++----------------------------------
->  net/bridge/br_fdb.c                 |    9 ------
->  net/can/gw.c                        |   13 ++-------
->  net/ipv4/fib_trie.c                 |    8 ------
->  net/ipv4/inetpeer.c                 |    9 +-----
->  net/ipv6/ip6_fib.c                  |    9 ------
->  net/ipv6/xfrm6_tunnel.c             |    8 ------
->  net/kcm/kcmsock.c                   |   10 -------
->  net/netfilter/nf_conncount.c        |   10 -------
->  net/netfilter/nf_conntrack_expect.c |   10 -------
->  net/netfilter/xt_hashlimit.c        |    9 ------
->  17 files changed, 23 insertions(+), 171 deletions(-)
+> diff --git a/arch/loongarch/kvm/timer.c b/arch/loongarch/kvm/timer.c
+> index 74a4b5c272d6..32dc213374be 100644
+> --- a/arch/loongarch/kvm/timer.c
+> +++ b/arch/loongarch/kvm/timer.c
+> @@ -161,10 +161,11 @@ static void _kvm_save_timer(struct kvm_vcpu *vcpu)
+>   	if (kvm_vcpu_is_blocking(vcpu)) {
+>   
+>   		/*
+> -		 * HRTIMER_MODE_PINNED is suggested since vcpu may run in
+> -		 * the same physical cpu in next time
+> +		 * HRTIMER_MODE_PINNED_HARD is suggested since vcpu may run in
+> +		 * the same physical cpu in next time, and the timer should run
+> +		 * in hardirq context even in the PREEMPT_RT case.
+>   		 */
+> -		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED);
+> +		hrtimer_start(&vcpu->arch.swtimer, expire, HRTIMER_MODE_ABS_PINNED_HARD);
+>   	}
+>   }
+>   
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 0697b1064251..174734a23d0a 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -1457,7 +1457,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>   	vcpu->arch.vpid = 0;
+>   	vcpu->arch.flush_gpa = INVALID_GPA;
+>   
+> -	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED);
+> +	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED_HARD);
+>   	vcpu->arch.swtimer.function = kvm_swtimer_wakeup;
+>   
+>   	vcpu->arch.handle_exit = kvm_handle_exit;
+> 
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+
 
