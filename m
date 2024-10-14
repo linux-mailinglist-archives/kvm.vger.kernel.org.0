@@ -1,114 +1,76 @@
-Return-Path: <kvm+bounces-28756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC6699C955
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 13:50:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B37399C98E
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 13:57:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E31F41F21C18
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 11:50:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 267411F25512
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 11:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E9E19DF7A;
-	Mon, 14 Oct 2024 11:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B88619F104;
+	Mon, 14 Oct 2024 11:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="jBd5HThY";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ONse7UCi"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UjtsQgHl"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F61F19E7E3
-	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 11:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC4D13CABC;
+	Mon, 14 Oct 2024 11:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728906601; cv=none; b=FRhte6SIIMdUwdCp1cANRzR14oBtjGDex3XWSGUfHarI/iDUNuCE+gNig9uk2YDhNlARPtx4Ao+RAfjItNfoJ5H0EwJ7xI652u0P4AXmggjGX4sXIGJSMKg2LnP/JdoEdo1ofVjDNmQlYNBbq4EnUSD1BVFOkzc3LL3UFIend8w=
+	t=1728907015; cv=none; b=H4R9CuuHkZO0lnbLOBV7CrQLvnmhXo4n+JrRRu+h001XIYRcERXWpKsSvK3+2+OV6R3Q9Cfi1Xom+QXpvIdIJthFfedfrAusspEYVW62fZvU7zvxdHldRKilJ+1dAdmm/P43Xy0XcpoYeh7KZPAodvgso/FGz0RUI2AcyUA4a0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728906601; c=relaxed/simple;
-	bh=5TB0pSPYP8QnedVlMT+s1vYwVihEgjHtCs0VO6LmVyI=;
+	s=arc-20240116; t=1728907015; c=relaxed/simple;
+	bh=9Ksq7LUElDhRQjdwOCzpVRlPmoUVDEW11ZrZdaTIR0w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W7+45eMGZ2H1yAp5E8tmCctxanHbfn9nTmUE+pt3B84zOUtvey4xIMJZ3Q2YgcbFBbsxx522bD23MXT+mJrDPFdduby/YjfKH7eAkv8k+HvqVpBsWvXysOQZFuHpa50tQHPPWZtUtPXrn3JyMs4STLuHuyfISb0t1ttfyNGyTSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=jBd5HThY; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ONse7UCi; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 447042540070;
-	Mon, 14 Oct 2024 07:49:57 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Mon, 14 Oct 2024 07:49:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1728906597; x=1728992997; bh=VH6J9qqL+8
-	tokCzUFrEcflFU8u0Nez+8Z710tOWUCPg=; b=jBd5HThYUnXGTWo6D6XPU6VvhT
-	ezPnauWJKGqBhG14U3nZ7u78Xk3e+Bm1elEQQUCepr2Vum4PgXi3r4id16gVW+9J
-	LSXbSuvvlNaCiXHfhJ/v4BGbLuolHC7Q4pithpSgdESOhfXYKunZDKluua6OcGLT
-	uRJJple0U/PjgUDTb7nxMzB5nPGmWcWQUepv7IP2vKUSGSvocUchwAGktLA6BRiR
-	nyc26DjIp9EMqKnY2TxTaQ6+mbcRYrSCoVmGHVzlXbMnEcDKnLi2y8TUl+yD7o8v
-	5kh8dIwnv3+UJ5K/8yKOUzivS+orerWg312M9R16xOekT/25B1j8XYvtCaag==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1728906597; x=1728992997; bh=VH6J9qqL+8tokCzUFrEcflFU8u0N
-	ez+8Z710tOWUCPg=; b=ONse7UCiSbFovJuyUqKgK5ovUHTqsFltajvno2ky1hFu
-	X4nU4fORh9O97d7s4Zsl8kjWfAfN6R+WVFNEP+c1xbGDJYPr3LL/wcbx6iJWcQaK
-	lfex9iwnu2ITWJeoJZDCFoOAgTF9hNd2a64AVVXEqrnns76HrFHSE0bVIDLS7b/G
-	4nK/649Z7DQA40ZkyQEWSfbfSdnL3FcQyGcYiuKKB+o28b0NOWnjeX0VHm7607kM
-	Zoug3y3tN9zzBbJdGIU4m0R47P0KL0sXHKKPBXIIZfKb4b3vs8ojL0hAM2QZbf1W
-	5mmncG6rLN8nBvB1N9vxl3RoSQBgx5PYF8on3RbbMw==
-X-ME-Sender: <xms:ZAUNZ804cUVR9dUczop5yHjCVgZvVJ--yfqeRVWNjHaECJCWbmbGDQ>
-    <xme:ZAUNZ3F5L7WBZ4YmW2N7cKIn1PLdpH288SLm3pFuZVktz5FGHhJw7jjpQWI_OFYUK
-    fapPPbzgG-aIw>
-X-ME-Received: <xmr:ZAUNZ06T3rXY5-OyP15nRN49qVn3tX2dx4dNuTtXcb6HJgUDlyLQsuYLAQUQ6DfPehUamYZnzCpwpxs5vdu8BfePldhuwILDvV3M9A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeghedggeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepifhrvghgucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrf
-    grthhtvghrnhepheegvdevvdeljeeugfdtudduhfekledtiefhveejkeejuefhtdeufefh
-    gfehkeetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epghhrvghgsehkrhhorghhrdgtohhmpdhnsggprhgtphhtthhopeefvddpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtohepiihhihifsehnvhhiughirgdrtghomhdprhgtphhtth
-    hopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhhouhhvvggr
-    uheslhhishhtshdrfhhrvggvuggvshhkthhophdrohhrghdprhgtphhtthhopegrlhgvgi
-    drfihilhhlihgrmhhsohhnsehrvgguhhgrthdrtghomhdprhgtphhtthhopehkvghvihhn
-    rdhtihgrnhesihhnthgvlhdrtghomhdprhgtphhtthhopehjghhgsehnvhhiughirgdrtg
-    homhdprhgtphhtthhopegrihhrlhhivggusehgmhgrihhlrdgtohhmpdhrtghpthhtohep
-    uggrnhhivghlsehffhiflhhlrdgthhdprhgtphhtthhopegrtghurhhrihgusehnvhhiug
-    hirgdrtghomh
-X-ME-Proxy: <xmx:ZAUNZ1046ByOb_1RW4CoxcGSCqlIQyoXwGuEK_rKAvsCjEDYqyYl4A>
-    <xmx:ZAUNZ_FRg8kdoA418zNlj5cuXPT4vpOMm2A33pSvbl1QEi0eStDJ4Q>
-    <xmx:ZAUNZ-8Fm9FAR1ao9Bi97u1SK-2q3t0VejTc7feNkPBS9-v8gErGKQ>
-    <xmx:ZAUNZ0nSR7OvxVOwn7gwrBFAgYEJyn8wwaaZEoMfWtJMMm2taIdvVw>
-    <xmx:ZQUNZ28_H89rsywTQKR1C3sbepiNfqsNSC88ksGPqYabv2ckg7GuC1T_>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 14 Oct 2024 07:49:56 -0400 (EDT)
-Date: Mon, 14 Oct 2024 13:36:18 +0200
-From: Greg KH <greg@kroah.com>
-To: Zhi Wang <zhiw@nvidia.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	"airlied@gmail.com" <airlied@gmail.com>,
-	"daniel@ffwll.ch" <daniel@ffwll.ch>,
-	Andy Currid <ACurrid@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	Surath Mitra <smitra@nvidia.com>, Ankit Agrawal <ankita@nvidia.com>,
-	Aniket Agashe <aniketa@nvidia.com>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	"zhiwang@kernel.org" <zhiwang@kernel.org>
-Subject: Re: [RFC 01/29] nvkm/vgpu: introduce NVIDIA vGPU support prelude
-Message-ID: <2024101408-splashed-criteria-6b1a@gregkh>
-References: <20240922124951.1946072-1-zhiw@nvidia.com>
- <20240922124951.1946072-2-zhiw@nvidia.com>
- <2024092604-factor-pushpin-99ee@gregkh>
- <bab2ee27-059e-4f9b-a5f8-87cee04630d1@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ONWV5Bh6SW5m4AoUERTBb+WgC9JEz7F2OclO6Q9ZT9kylPCglQwDiXaYUrCXkppVyKejiYdLseX4oVrB7Dh7cOYUSkrQNo1MU60rbdu4MuIyUtCcylauFGuSLC1B8bDro1g50tC0PvsrFr541Yn3VlaSpcRaqu3U+ox7jKSwubY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UjtsQgHl; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=8o7W3qAJQ3PM1lIoyoylBRhUiYt3aSWDMgPD4wZKpSs=; b=UjtsQgHlk9US9/iSGnbAi95dhe
+	IfQTTD53WitKn4wK2i57PLWjGu2u+uQ7ICX7g9YAvEwoJPo4PFfDp3KbXn9f0frItsjaPQVBb9IB8
+	SaNhTp3MKFBGjTEhiC840VubgrVXlQ7nsr6svB9R9QFJGPXsaG7WmahA/3Z8h83bIPET+lOg3CQm1
+	SAshMoWPO4azhJXiRRgqMqTIsnspV5aJRZn/5taGAux96UKyHbbIqnK+KKXnSBiToQo6OFr6khONS
+	6VZ8tg9ZQ8CHfZh5BdCLjQTsMgMag2u/Enq3Yn4R8a47A92T2wQ/2dyFOpbp5QEfOpDi1xs6xEsos
+	icNkmZhA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1t0Jgo-00000001ZHZ-2NTT;
+	Mon, 14 Oct 2024 11:56:43 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 87B2C300777; Mon, 14 Oct 2024 13:56:41 +0200 (CEST)
+Date: Mon, 14 Oct 2024 13:56:41 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Xiong Zhang <xiong.y.zhang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Kan Liang <kan.liang@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Manali Shukla <manali.shukla@amd.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Jim Mattson <jmattson@google.com>,
+	Stephane Eranian <eranian@google.com>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	gce-passthrou-pmu-dev@google.com,
+	Samantha Alt <samantha.alt@intel.com>,
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+	Like Xu <like.xu.linux@gmail.com>,
+	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [RFC PATCH v3 14/58] perf: Add switch_interrupt() interface
+Message-ID: <20241014115641.GE16066@noisy.programming.kicks-ass.net>
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-15-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -117,158 +79,56 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bab2ee27-059e-4f9b-a5f8-87cee04630d1@nvidia.com>
+In-Reply-To: <20240801045907.4010984-15-mizhang@google.com>
 
-On Mon, Oct 14, 2024 at 09:59:18AM +0000, Zhi Wang wrote:
-> On 26/09/2024 12.20, Greg KH wrote:
-> > External email: Use caution opening links or attachments
-> > 
-> > 
-> > On Sun, Sep 22, 2024 at 05:49:23AM -0700, Zhi Wang wrote:
-> >> NVIDIA GPU virtualization is a technology that allows multiple virtual
-> >> machines (VMs) to share the power of a single GPU, enabling greater
-> >> flexibility, efficiency, and cost-effectiveness in data centers and cloud
-> >> environments.
-> >>
-> >> The first step of supporting NVIDIA vGPU in nvkm is to introduce the
-> >> necessary vGPU data structures and functions to hook into the
-> >> (de)initialization path of nvkm.
-> >>
-> >> Introduce NVIDIA vGPU data structures and functions hooking into the
-> >> the (de)initialization path of nvkm and support the following patches.
-> >>
-> >> Cc: Neo Jia <cjia@nvidia.com>
-> >> Cc: Surath Mitra <smitra@nvidia.com>
-> >> Signed-off-by: Zhi Wang <zhiw@nvidia.com>
-> > 
-> > Some minor comments that are a hint you all aren't running checkpatch on
-> > your code...
-> > 
-> >> --- /dev/null
-> >> +++ b/drivers/gpu/drm/nouveau/include/nvkm/vgpu_mgr/vgpu_mgr.h
-> >> @@ -0,0 +1,17 @@
-> >> +/* SPDX-License-Identifier: MIT */
-> > 
-> > Wait, what?  Why?  Ick.  You all also forgot the copyright line :(
-> > 
+On Thu, Aug 01, 2024 at 04:58:23AM +0000, Mingwei Zhang wrote:
+
+> @@ -5941,8 +5942,21 @@ void perf_put_mediated_pmu(void)
+>  }
+>  EXPORT_SYMBOL_GPL(perf_put_mediated_pmu);
+>  
+> +static void perf_switch_interrupt(bool enter, u32 guest_lvtpc)
+> +{
+> +	/* Mediated passthrough PMU should have PASSTHROUGH_VPMU cap. */
+> +	if (!passthru_pmu)
+> +		return;
+> +
+> +	if (passthru_pmu->switch_interrupt &&
+> +	    try_module_get(passthru_pmu->module)) {
+> +		passthru_pmu->switch_interrupt(enter, guest_lvtpc);
+> +		module_put(passthru_pmu->module);
+> +	}
+> +}
+
+Should we move the whole module reference to perf_pmu_(,un}register() ?
+
+> @@ -11842,7 +11860,21 @@ int perf_pmu_register(struct pmu *pmu, const char *name, int type)
+>  	if (!pmu->event_idx)
+>  		pmu->event_idx = perf_event_idx_default;
+>  
+> -	list_add_rcu(&pmu->entry, &pmus);
+> +	/*
+> +	 * Initialize passthru_pmu with the core pmu that has
+> +	 * PERF_PMU_CAP_PASSTHROUGH_VPMU capability.
+> +	 */
+> +	if (pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU) {
+> +		if (!passthru_pmu)
+> +			passthru_pmu = pmu;
+> +
+> +		if (WARN_ONCE(passthru_pmu != pmu, "Only one passthrough PMU is supported\n")) {
+> +			ret = -EINVAL;
+> +			goto free_dev;
+
+Why impose this limit? Changelog also fails to explain this.
+
+> +		}
+> +	}
+> +
+> +	list_add_tail_rcu(&pmu->entry, &pmus);
+>  	atomic_set(&pmu->exclusive_cnt, 0);
+>  	ret = 0;
+>  unlock:
+> -- 
+> 2.46.0.rc1.232.g9752f9e123-goog
 > 
-> Will fix it accordingly.
-> 
-> Back to the reason, I am trying to follow the majority in the nouveau 
-> since this is the change of nouveau.
-> 
-> What's your guidelines about those already in the code?
-
-My "guidelines" is that your lawyers agree what needs to be done and to
-do that.
-
-After that, my opinion is you do the proper thing and follow the kernel
-licenses here, ESPECIALLY as you will be talking to gpl-only symbols
-(hint, MIT licensed code doesn't make any sense there, and go get your
-legal approval if you think it does...)
-
-> >> +static bool support_vgpu_mgr = false;
-> > 
-> > A global variable for the whole system?  Are you sure that will work
-> > well over time?  Why isn't this a per-device thing?
-> > 
-> >> +module_param_named(support_vgpu_mgr, support_vgpu_mgr, bool, 0400);
-> > 
-> > This is not the 1990's, please never add new module parameters, use
-> > per-device variables.  And no documentation?  That's not ok either even
-> > if you did want to have this.
-> 
-> Thanks for the comments. I am most collecting people opinion on the 
-> means of enabling/disabling the vGPU, via kernel parameter or not is 
-> just one of the options. If it is chosen, having a global kernel 
-> parameter is not expected to be in the !RFC patch.
-
-That wasn't explained anywhere I noticed, did I miss it?
-
-Please do this properly, again, kernel module parameters is not the
-proper way.
-
-> >> +static inline struct pci_dev *nvkm_to_pdev(struct nvkm_device *device)
-> >> +{
-> >> +     struct nvkm_device_pci *pci = container_of(device, typeof(*pci),
-> >> +                                                device);
-> >> +
-> >> +     return pci->pdev;
-> >> +}
-> >> +
-> >> +/**
-> >> + * nvkm_vgpu_mgr_is_supported - check if a platform support vGPU
-> >> + * @device: the nvkm_device pointer
-> >> + *
-> >> + * Returns: true on supported platform which is newer than ADA Lovelace
-> >> + * with SRIOV support.
-> >> + */
-> >> +bool nvkm_vgpu_mgr_is_supported(struct nvkm_device *device)
-> >> +{
-> >> +     struct pci_dev *pdev = nvkm_to_pdev(device);
-> >> +
-> >> +     if (!support_vgpu_mgr)
-> >> +             return false;
-> >> +
-> >> +     return device->card_type == AD100 &&  pci_sriov_get_totalvfs(pdev);
-> > 
-> > checkpatch please.
-> > 
-> 
-> I did before sending it, but it doesn't complain this line.
-> 
-> My command line
-> $ scripts/checkpatch.pl [this patch]
-
-Then something is odd as that '  ' should have been caught.
-
-> > And "AD100" is an odd #define, as you know.
-> 
-> I agree and people commented about it in the internal review. But it is 
-> from the nouveau driver and it has been used in many other places in 
-> nouveau driver. What would be your guidelines in this situation?
-
-Something properly namespaced?
-
-> >> +/**
-> >> + * nvkm_vgpu_mgr_init - Initialize the vGPU manager support
-> >> + * @device: the nvkm_device pointer
-> >> + *
-> >> + * Returns: 0 on success, -ENODEV on platforms that are not supported.
-> >> + */
-> >> +int nvkm_vgpu_mgr_init(struct nvkm_device *device)
-> >> +{
-> >> +     struct nvkm_vgpu_mgr *vgpu_mgr = &device->vgpu_mgr;
-> >> +
-> >> +     if (!nvkm_vgpu_mgr_is_supported(device))
-> >> +             return -ENODEV;
-> >> +
-> >> +     vgpu_mgr->nvkm_dev = device;
-> >> +     vgpu_mgr->enabled = true;
-> >> +
-> >> +     pci_info(nvkm_to_pdev(device),
-> >> +              "NVIDIA vGPU mananger support is enabled.\n");
-> > 
-> > When drivers work properly, they are quiet.
-> >
-> 
-> I totally understand this rule that driver should be quiet. But this is 
-> not the same as "driver is loaded". This is a feature reporting like 
-> many others
-
-And again, those "many others" need to be quiet too, we have many ways
-to properly gather system information, and the kernel boot log is not
-that.
-
-> My concern is as nouveau is a kernel driver, when a user mets a kernel 
-> panic and offers a dmesg to analyze, it would be at least nice to know 
-> if the vGPU feature is turned on or not. Sysfs is doable, but it helps 
-> in different scenarios.
-
-A kernel panic is usually way way way after this initial boot time
-message.  Again, keep the boot fast, and quiet please.
-
-thanks,
-
-greg k-h
 
