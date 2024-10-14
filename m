@@ -1,250 +1,172 @@
-Return-Path: <kvm+bounces-28764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59A3199CE32
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 16:41:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B425C99CEE0
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 16:47:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 182A2284CCC
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 14:41:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29AA0B23DB9
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 14:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7B51AB52B;
-	Mon, 14 Oct 2024 14:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70EF1BDC3;
+	Mon, 14 Oct 2024 14:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NVapV5l5"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529E7611E;
-	Mon, 14 Oct 2024 14:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47DBA1AE017
+	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 14:46:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728916878; cv=none; b=G0Y6NCUrYcz6IGflU+/P8A/VclhtxutzEcHWQ8WDvIqhYjDwdOaPmu0MEO2MC1OyQnHW33M9SKTsBShGkPkC78jaJVUZ088VdSrPqoo4bXe0/w7dGXPl1Xw6BdbFmFTuOBDfUoLcnNfjYCzV+18lUWvC+/U/zcp3aguJJfVNkYs=
+	t=1728917200; cv=none; b=hY4MkVTndndSAbPhNEdoVx+8JuV3L6sDFeVq7MCgq6LOe1rA9EvUECUAUNs0zTW0B5vVfR+gx6kv6U4B/VQ8niNK5m8HF4Wuun9M2BpurdLhTXU0Z/Pgj9FVqzcXhiXgWZMujvexl1pZVTsi8qNzslaInAVAekB4q0P34wqmt1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728916878; c=relaxed/simple;
-	bh=DFO1aR4GLZZo4R8pIqMvQlWpP7eE9cLB5QesFzKUEqg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dGw+oNTtB2BSH8C2yIQAg+Brh3svu5mwivFASUDcP42d9/xcOBx4bjUmeADJW8TXSNT1DKZFA2SNmaGisaq4QX1Uaw6pBrd9ZRqeTcspU89kzDTN9OD6j+waiFfHgFxDV4nVDxeEfUVJsqFeFPrxvjHJ7YY2ALbfYh4KNVsQt7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6198F1007;
-	Mon, 14 Oct 2024 07:41:44 -0700 (PDT)
-Received: from [10.57.21.126] (unknown [10.57.21.126])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BD6853F51B;
-	Mon, 14 Oct 2024 07:41:09 -0700 (PDT)
-Message-ID: <f3ce0718-064d-48e4-a681-7058157127b0@arm.com>
-Date: Mon, 14 Oct 2024 15:41:07 +0100
+	s=arc-20240116; t=1728917200; c=relaxed/simple;
+	bh=vyHcmYVND/8sAhmy2mkfCXOuTQ/V3gOInOxW1tqxOKE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J+xwaxfKDSrx6Z5k5+CnfX49DKdkPcssyM1lYp2YEA2zeqJI+E7EXQdpdeyKHfBx2pPumD18VAxnseA5XS01Q+Jkk6/qdACfZ6CnS7lWwbBaCRh+pedgZ6+6PjX4YDZ6ZyIkGIlaH49hjatc6qkecUqpwbHHqGV/OcVaiWeoxu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NVapV5l5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728917197;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CNpmOCUST08vkHQoeG1NSNtCSmJNv1NINO7OIcBeA0Y=;
+	b=NVapV5l5fPwEtDZJ+OTbuJ14j7Kphn7XJ6L+veIc7kyZm8Rovr7i90V3FARdLcCGN3I6bc
+	M2X3wrN2fhPk66PXaQ5FFfm/NUsQNXF1/wZWMSHpOWLxf6BWtziKZQKvT4IgdbvBJoKadb
+	LgA0bAzO/H1nM6ZMqXkV3mLUv8F7W4Q=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-NRRBshLPP-2vKK199e8dRA-1; Mon,
+ 14 Oct 2024 10:46:33 -0400
+X-MC-Unique: NRRBshLPP-2vKK199e8dRA-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 806081955F40;
+	Mon, 14 Oct 2024 14:46:31 +0000 (UTC)
+Received: from t14s.cit.tum.de (unknown [10.22.32.146])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E97671955E93;
+	Mon, 14 Oct 2024 14:46:23 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-mm@kvack.org,
+	linux-s390@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	David Hildenbrand <david@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH v2 0/7] virtio-mem: s390 support
+Date: Mon, 14 Oct 2024 16:46:12 +0200
+Message-ID: <20241014144622.876731-1-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 10/11] virt: arm-cca-guest: TSM_REPORT support for
- realms
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, Gavin Shan <gshan@redhat.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Sami Mujawar <sami.mujawar@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, Dan Williams <dan.j.williams@intel.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-11-steven.price@arm.com>
- <5a3432d1-6a79-434c-bc93-6317c8c6435c@redhat.com>
- <6c306817-fbd7-402c-8425-a4523ed43114@arm.com>
- <7a83461d-40fd-4e61-8833-5dae2abaf82b@arm.com>
- <5999b021-0ae3-4d90-ae29-f18f187fd115@redhat.com>
- <11cff100-3406-4608-9993-c29caf3d086d@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <11cff100-3406-4608-9993-c29caf3d086d@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 14/10/2024 09:56, Suzuki K Poulose wrote:
-> On 12/10/2024 07:06, Gavin Shan wrote:
->> On 10/12/24 2:22 AM, Suzuki K Poulose wrote:
->>> On 11/10/2024 15:14, Steven Price wrote:
->>>> On 08/10/2024 05:12, Gavin Shan wrote:
->>>>> On 10/5/24 12:43 AM, Steven Price wrote:
->>>>>> From: Sami Mujawar <sami.mujawar@arm.com>
->>>>>>
->>>>>> Introduce an arm-cca-guest driver that registers with
->>>>>> the configfs-tsm module to provide user interfaces for
->>>>>> retrieving an attestation token.
->>>>>>
->>>>>> When a new report is requested the arm-cca-guest driver
->>>>>> invokes the appropriate RSI interfaces to query an
->>>>>> attestation token.
->>>>>>
->>>>>> The steps to retrieve an attestation token are as follows:
->>>>>>     1. Mount the configfs filesystem if not already mounted
->>>>>>        mount -t configfs none /sys/kernel/config
->>>>>>     2. Generate an attestation token
->>>>>>        report=/sys/kernel/config/tsm/report/report0
->>>>>>        mkdir $report
->>>>>>        dd if=/dev/urandom bs=64 count=1 > $report/inblob
->>>>>>        hexdump -C $report/outblob
->>>>>>        rmdir $report
->>>>>>
->>>>>> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
->>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>>>> ---
->>>>>> v3: Minor improvements to comments and adapt to the renaming of
->>>>>> GRANULE_SIZE to RSI_GRANULE_SIZE.
->>>>>> ---
->>>>>>    drivers/virt/coco/Kconfig                     |   2 +
->>>>>>    drivers/virt/coco/Makefile                    |   1 +
->>>>>>    drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
->>>>>>    drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
->>>>>>    .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211
->>>>>> ++++++++++++ ++++++
->>>>>>    5 files changed, 227 insertions(+)
->>>>>>    create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
->>>>>>    create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
->>>>>>    create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
->>
->> [...]
->>
->>>>>> +/**
->>>>>> + * arm_cca_report_new - Generate a new attestation token.
->>>>>> + *
->>>>>> + * @report: pointer to the TSM report context information.
->>>>>> + * @data:  pointer to the context specific data for this module.
->>>>>> + *
->>>>>> + * Initialise the attestation token generation using the
->>>>>> challenge data
->>>>>> + * passed in the TSM descriptor. Allocate memory for the attestation
->>>>>> token
->>>>>> + * and schedule calls to retrieve the attestation token on the
->>>>>> same CPU
->>>>>> + * on which the attestation token generation was initialised.
->>>>>> + *
->>>>>> + * The challenge data must be at least 32 bytes and no more than 64
->>>>>> bytes. If
->>>>>> + * less than 64 bytes are provided it will be zero padded to 64
->>>>>> bytes.
->>>>>> + *
->>>>>> + * Return:
->>>>>> + * * %0        - Attestation token generated successfully.
->>>>>> + * * %-EINVAL  - A parameter was not valid.
->>>>>> + * * %-ENOMEM  - Out of memory.
->>>>>> + * * %-EFAULT  - Failed to get IPA for memory page(s).
->>>>>> + * * A negative status code as returned by
->>>>>> smp_call_function_single().
->>>>>> + */
->>>>>> +static int arm_cca_report_new(struct tsm_report *report, void *data)
->>>>>> +{
->>>>>> +    int ret;
->>>>>> +    int cpu;
->>>>>> +    long max_size;
->>>>>> +    unsigned long token_size;
->>>>>> +    struct arm_cca_token_info info;
->>>>>> +    void *buf;
->>>>>> +    u8 *token __free(kvfree) = NULL;
->>>>>> +    struct tsm_desc *desc = &report->desc;
->>>>>> +
->>>>>> +    if (!report)
->>>>>> +        return -EINVAL;
->>>>>> +
->>>>>
->>>>> This check seems unnecessary and can be dropped.
->>>>
->>>> Ack
->>>>
->>>>>> +    if (desc->inblob_len < 32 || desc->inblob_len > 64)
->>>>>> +        return -EINVAL;
->>>>>> +
->>>>>> +    /*
->>>>>> +     * Get a CPU on which the attestation token generation will be
->>>>>> +     * scheduled and initialise the attestation token generation.
->>>>>> +     */
->>>>>> +    cpu = get_cpu();
->>>>>> +    max_size = rsi_attestation_token_init(desc->inblob,
->>>>>> desc->inblob_len);
->>>>>> +    put_cpu();
->>>>>> +
->>>>>
->>>>> It seems that put_cpu() is called early, meaning the CPU can go
->>>>> away before
->>>>> the subsequent call to arm_cca_attestation_continue() ?
->>>>
->>>> Indeed, good spot. I'll move it to the end of the function and update
->>>> the error paths below.
->>>
->>> Actually this was on purpose, not to block the CPU hotplug. The
->>> attestation must be completed on the same CPU.
->>>
->>> We can detect the failure from "smp_call" further down and make sure
->>> we can safely complete the operation or restart it.
->>>
->>
->> Yes, It's fine to call put_cpu() early since we're tolerant to error
->> introduced
->> by CPU unplug. It's a bit confused that rsi_attestation_token_init()
->> is called
->> on the local CPU while arm_cca_attestation_continue() is called on
->> same CPU
->> with help of smp_call_function_single(). Does it make sense to unify
->> so that
->> both will be invoked with the help of smp_call_function_single() ?
->>
->>      int cpu = smp_processor_id();
->>
->>      /*
->>       * The calling and target CPU can be different after the calling
->> process
->>       * is migrated to another different CPU. It's guaranteed the
->> attestatation
->>       * always happen on the target CPU with smp_call_function_single().
->>       */
->>      ret = smp_call_function_single(cpu,
->> rsi_attestation_token_init_wrapper,
->>                                     (void *)&info, true);
-> 
-> Well, we want to allocate sufficient size buffer (size returned from
-> token_init())  outside an atomic context (thus not in smp_call_function()).
-> 
-> May be we could make this "allocation" restriction in a comment to
-> make it clear, why we do it this way.
+Let's finally add s390 support for virtio-mem; my last RFC was sent
+4 years ago, and a lot changed in the meantime.
 
-So if I've followed this correctly the get_cpu() route doesn't work
-because of the need to allocate outblob. So using
-smp_call_function_single() for all calls seems to be the best approach,
-along with a comment explaining what's going on. So how about:
+The latest QEMU series is available at [1], which contains some more
+details and a usage example on s390 (last patch).
 
-	/*
-	 * The attestation token 'init' and 'continue' calls must be
-	 * performed on the same CPU. smp_call_function_single() is used
-	 * instead of simply calling get_cpu() because of the need to
-	 * allocate outblob based on the returned value from the 'init'
-	 * call and that cannot be done in an atomic context.
-	 */
-	cpu = smp_processor_id();
+There is not too much in here: The biggest part is querying a new diag(500)
+STORAGE_LIMIT hypercall to obtain the proper "max_physmem_end".
 
-	info.challenge = desc->inblob;
-	info.challenge_size = desc->inblob_len;
+The last two patches are not strictly required but certainly nice-to-have.
 
-	ret = smp_call_function_single(cpu, arm_cca_attestation_init,
-				       &info, true);
-	if (ret)
-		return ret;
-	max_size = info.result;
+Note that -- in contrast to standby memory -- virtio-mem memory must be
+configured to be automatically onlined as soon as hotplugged. The easiest
+approach is using the "memhp_default_state=" kernel parameter or by using
+proper udev rules. More details can be found at [2].
 
-(with appropriate updates to the 'info' struct and a new
-arm_cca_attestation_init() wrapper for rsi_attestation_token_init()).
+I have reviving+upstreaming a systemd service to handle configuring
+that on my todo list, but for some reason I keep getting distracted ...
 
-Steve
+I tested various things, including:
+ * Various memory hotplug/hotunplug combinations
+ * Device hotplug/hotunplug
+ * /proc/iomem output
+ * reboot
+ * kexec
+ * kdump: make sure we don't hotplug memory
+
+One remaining work item is kdump support for virtio-mem memory. This will
+be sent out separately once initial support landed.
+
+[1] https://lkml.kernel.org/r/20241008105455.2302628-1-david@redhat.com
+[2] https://virtio-mem.gitlab.io/user-guide/user-guide-linux.html
+
+v1 -> v2:
+* Document the new diag500 subfunction
+* Use "s390" instead of "s390x" consistently
+
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Sven Schnelle <svens@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: "Eugenio Pérez" <eperezma@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+
+David Hildenbrand (7):
+  s390/kdump: implement is_kdump_kernel()
+  Documentation: s390-diag.rst: make diag500 a generic KVM hypercall
+  Documentation: s390-diag.rst: document diag500(STORAGE LIMIT)
+    subfunction
+  s390/physmem_info: query diag500(STORAGE LIMIT) to support QEMU/KVM
+    memory devices
+  virtio-mem: s390 support
+  lib/Kconfig.debug: default STRICT_DEVMEM to "y" on s390
+  s390/sparsemem: reduce section size to 128 MiB
+
+ Documentation/virt/kvm/s390/s390-diag.rst | 32 ++++++++++++----
+ arch/s390/boot/physmem_info.c             | 46 +++++++++++++++++++++--
+ arch/s390/include/asm/kexec.h             |  4 ++
+ arch/s390/include/asm/physmem_info.h      |  3 ++
+ arch/s390/include/asm/sparsemem.h         |  2 +-
+ arch/s390/kernel/crash_dump.c             |  6 +++
+ drivers/virtio/Kconfig                    | 12 +++---
+ lib/Kconfig.debug                         |  2 +-
+ 8 files changed, 89 insertions(+), 18 deletions(-)
+
+
+base-commit: 6485cf5ea253d40d507cd71253c9568c5470cd27
+-- 
+2.46.1
 
 
