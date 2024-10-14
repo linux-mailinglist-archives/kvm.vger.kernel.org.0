@@ -1,166 +1,269 @@
-Return-Path: <kvm+bounces-28797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1F499D5E1
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 19:54:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D91F99D60F
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 20:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9D911F234EE
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 17:54:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 719891C21A1C
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 18:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D5311C7610;
-	Mon, 14 Oct 2024 17:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31C01C82F3;
+	Mon, 14 Oct 2024 18:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MAWNDWJi"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=nik.wipper@gmx.de header.b="IlA7C4ga"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371C8231C8A;
-	Mon, 14 Oct 2024 17:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872671AB517;
+	Mon, 14 Oct 2024 18:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728928433; cv=none; b=GuIE6OypqWJsIPEjzHv/JkiLD8/nNITM18tmNpcbGe3mAEhEJxJb6H+2O5bxmyxJtvYou7oPsohSaQyGANzo4LutuWu0OD/Kd+10zczhkM7vd2WqCunJS6OHD4/t6aZR21xTPsg1U8vyky6S9k4AM4YyhoYNarMtAu/rSrNqJtc=
+	t=1728928990; cv=none; b=kJUFn5M1BS4h8dWfi5y5XFpbyZv+8+TOdzFqw9M+wwpMAoV/IBEkMLgu+avZL81O+oF4gdb05/S3Q6kr8e46+V6NtSz2J5q+T4agVuqH51RTVQpwYXkLHqoSiSwkE98YqnwD4yBphi8IZVUc5g0XFgQZOywXOm45Rto3YLMfv/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728928433; c=relaxed/simple;
-	bh=v+mnqLFStPaJF5Mc8YcJfD7J7cx62hdqhcZqrfk1hHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KSuc/tYL3whmf/AVXZor9KdNq+wr/Lf6F1+fwraHYH7Oidg2j7Zs3mIwxF7iI92t6SQHZLm81EEmxS6d4r9V/eWPEXIDeq/EGpro0YADQMEN8+JjjNCMFecpKsT344ibvWqqnWBo3D6+MJOvf/gQaA6ho85M9ZCur5I213WoNbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MAWNDWJi; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49EHpnhJ032095;
-	Mon, 14 Oct 2024 17:53:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pp1; bh=brLW2EcSwr3dgFdZYov7EsAvpYw
-	fb5CRO99N/OPunA4=; b=MAWNDWJiZRG4uc1TJl8OSC3XFdTTvCXrznd/Ha0VShH
-	wxgDeEO1JHhiA4fNVeZRYmcXUpcYsWa8YNevpkEhEw4wLakdzpXw5fPfM5gqZ5AL
-	lxtfNxAqRXGmX2nZ19xX43YlPHn/53QizNI4UlHrodNROKBuKqwaA/cZAtL8m5sM
-	CQhIukttr9i2wao0GFPvKDuKk7M138WvhHBYi0/QKdhXh2BdLsRh7yNOls0DmfNo
-	zwnXrqoEc2cY7rwOph6xiJrZTSc5u4x717kR/h8v8A00l8HzoA/+ssiXd47JFAF6
-	vuiKZBIEJSXf5qaxo0XmvKJQG3hxTNnNwFgRJuTJAhQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42982kg05s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Oct 2024 17:53:44 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49EHrhJk003502;
-	Mon, 14 Oct 2024 17:53:43 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42982kg05j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Oct 2024 17:53:43 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49EHgPUo027432;
-	Mon, 14 Oct 2024 17:53:42 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4283txfxmh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Oct 2024 17:53:41 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49EHrcwV46203318
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 14 Oct 2024 17:53:38 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3480020049;
-	Mon, 14 Oct 2024 17:53:38 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 397BC20040;
-	Mon, 14 Oct 2024 17:53:37 +0000 (GMT)
-Received: from osiris (unknown [9.171.66.174])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 14 Oct 2024 17:53:37 +0000 (GMT)
-Date: Mon, 14 Oct 2024 19:53:35 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jonathan Corbet <corbet@lwn.net>, Mario Casquero <mcasquer@redhat.com>
-Subject: Re: [PATCH v2 7/7] s390/sparsemem: reduce section size to 128 MiB
-Message-ID: <20241014175335.10447-B-hca@linux.ibm.com>
-References: <20241014144622.876731-1-david@redhat.com>
- <20241014144622.876731-8-david@redhat.com>
+	s=arc-20240116; t=1728928990; c=relaxed/simple;
+	bh=W8aMkgAZ+Y5ONq7bdlcIziDRwufOGxXYLU6KucxkSdk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cSooSUNVPWd8LncTfgMmXD8i9E24BRWAI2LKX5gGncWHDqwiSC5JuOlRURgfscYi7oH0o6ZSI/D7noQqYoTqyWugHZkJpCo1x1G+tkKlB++dLDZMfLL8NDeBhBJ2ethlMEtU9KsskIBFhIkBL0f3fqqdLY3r/34yonBstnPLI10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=nik.wipper@gmx.de header.b=IlA7C4ga; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1728928941; x=1729533741; i=nik.wipper@gmx.de;
+	bh=U0SYz3/j59gLOPkk3ixXiF+VnTvfXVwcR8ulqTsSA3c=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=IlA7C4gaOZ13fVjR6zhXguXmC3ALqk28LnpQVCWF17BvCAiJktxl+EVZZwxhBZ8g
+	 AaQtFpfQxdL7/GpZ2ZciM9XLCxJ0ckwp6vtIxleM3IxGRlI1wY+K2WZzZJMdIByRY
+	 r0iz2AVtnNfi76rXnTTmpFT2boYSdnShQAa3u1oKvKIoHxsqk6Et884JKcGZ0CMf6
+	 ZbTqhx15httRI/N7epR9rGeHQBwzVoS0s/6PZk70rZiV0BpxeHZS08rQXkgilkvtO
+	 DFXBwDQRyh0imVExXcIQGu4+Ffv2b3WhE0/y1ciLcjrWfS7MqYq8X+0ODy+RovBu3
+	 rf6n9M5vVDpvJAyuKg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.178.21] ([31.17.149.238]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MFbRs-1tAreF1Dji-00DZ1v; Mon, 14
+ Oct 2024 20:02:21 +0200
+Message-ID: <a5ed763f-beba-43e9-8846-0d140f030b94@gmx.de>
+Date: Mon, 14 Oct 2024 20:02:19 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241014144622.876731-8-david@redhat.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5D_xC6nknQqUzkF7BmFqB2_0PkJpbEq7
-X-Proofpoint-GUID: UKk9TP1S1FoYIjDngHQjul4Nmfsk5MhM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-14_12,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=4 mlxlogscore=143
- malwarescore=0 adultscore=0 suspectscore=0 clxscore=1011 impostorscore=0
- priorityscore=1501 mlxscore=4 bulkscore=0 spamscore=4 lowpriorityscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410140128
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/7] KVM: x86: Implement KVM_HYPERV_SET_TLB_FLUSH_INHIBIT
+To: Vitaly Kuznetsov <vkuznets@redhat.com>, Nikolas Wipper <nikwip@amazon.de>
+Cc: Nicolas Saenz Julienne <nsaenz@amazon.com>,
+ Alexander Graf <graf@amazon.de>, James Gowans <jgowans@amazon.com>,
+ nh-open-source@amazon.com, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241004140810.34231-1-nikwip@amazon.de>
+ <20241004140810.34231-6-nikwip@amazon.de> <878quwgwsh.fsf@redhat.com>
+Content-Language: en-US
+From: Nikolas Wipper <nik.wipper@gmx.de>
+In-Reply-To: <878quwgwsh.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:s60EtNloQQs3KKmPfO5whu58P07Anq3AbqgtpcdlipizmYtJa0L
+ gT0TvXEMaOvz2S4B4o+RjZx6i7YOWawKAh1pJZyWynMlUDltaaPLBvZ2uAaUx/oB25WsGv2
+ ePiWX/9xkks88BZmYnQGPNwF0zDBHXdHpglHr3IqH1vG8VD4IwLPBnBqrVmwYypDm3zWstq
+ CvQEZZxh2QDE2eacuyPcQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:eMD34Z6GK/A=;v3OxGWvUqPcm2kQ2aQWIAg0dzKo
+ 6ceHpgNH5K4fc0yczDcuBHCMV5mU/UjP1OYjeoZY7XeDm+uGFUzW8v0I9Vzn2vO6UpO4IsclJ
+ x1vjI9ZxkpE+d4qXFS2eMd//HPxRMCFTCf7GCFCPIkJOZ29XSAIqQUKSO5+AFO6jka+uIhaxW
+ l1eRo/y6jkGJFjUVa+1qpspAydVTb3Stpat0YKpnLyyR39unOUmHgWkTpizgCd97i1B2G7tDV
+ 9quugeIjEcMEN9hJnnGpTq34xnzUw9AXa18YHjYDBtbiLknat1yaHXbzJk34kq6RJDYZ0eNCX
+ vKOi9l7MhlR9OplErxbQqS8Ao7dQQWEa737wafOyMgR3oVpQeedTgy81mY+kPYIpt452bgAFY
+ YJ194Oft8SQZfzNfTjahBqZUPNpnzDjdl6+AaAtd+HPAvFkDI+87n0rfqsVv8UjCzNDAgSyNJ
+ yWmpxbtfflfGz3LZ0cyucIs/BfD2dBSrP3PC7ypacP0t2mQ1WTkqIbauRRw22a2B/iNpLVAZD
+ as13rBjsj/gG8eA5DRGC8ja2YssOMgd10uGvD4ZpoqQzcha2tMbeRWQaOHexE8qoila1dF654
+ nGrLrgnEevHKlUBLEiizOQ3g+xQyRvrpO5AEr4xjP45bNtdMMWZeK+8B5zmyPoUJdgMGXvkNf
+ 3pDrAI8OrMlMyGUd0N9wMk2hsaYxhK3hsPBEoSlkKZ8fE60zUw0HKAQ/OlSOuHMqv51dtyItS
+ i7zrUcJXnIla/puuMXc7/K4uq/SooOGHZZhmXIb0M3kgpiT6Vj03RnU42GZmriUvL2GXlV9sh
+ wmu7lJsgUcJ3Wj4ZW6YccBEQ==
 
-On Mon, Oct 14, 2024 at 04:46:19PM +0200, David Hildenbrand wrote:
-> Ever since commit 421c175c4d609 ("[S390] Add support for memory hot-add.")
-> we've been using a section size of 256 MiB on s390 and 32 MiB on s390.
-> Before that, we were using a section size of 32 MiB on both
-> architectures.
-> 
-> Likely the reason was that we'd expect a storage increment size of
-> 256 MiB under z/VM back then. As we didn't support memory blocks spanning
-> multiple memory sections, we would have had to handle having multiple
-> memory blocks for a single storage increment, which complicates things.
-> Although that issue reappeared with even bigger storage increment sizes
-> later, nowadays we have memory blocks that can span multiple memory
-> sections and we avoid any such issue completely.
+On 10.10.24 10:57, Vitaly Kuznetsov wrote:
+> Nikolas Wipper <nikwip@amazon.de> writes:
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
+_host.h
+>> index 7571ac578884..ab3a9beb61a2 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -698,6 +698,8 @@ struct kvm_vcpu_hv {
+>>
+>>  	bool suspended;
+>>  	int waiting_on;
+>> +
+>> +	int tlb_flush_inhibit;
+>
+> This is basically boolean, right? And we only make it 'int' to be able
+> to store 'u8' from the ioctl? This doesn't look very clean. Do you
+> envision anything but '1'/'0' in 'inhibit'? If not, maybe we can just
+> make it a flag (and e.g. extend 'flags' to be u32/u64)? This way we can
+> convert 'tlb_flush_inhibit' to a normal bool.
+>
 
-I doubt that z/VM had support for memory hotplug back then already; and the
-sclp memory hotplug code was always written in a way that it could handle
-increment sizes smaller, larger or equal to section sizes.
+Yes, inhibit would always be binary, so incorporating it into the flags
+sounds reasonable. Even with the current API, this could just be a bool
+(tlb_flush_inhibit =3D inhibit =3D=3D 1;)
 
-If I remember correctly the section size was also be used to represent each
-piece of memory in sysfs (aka memory block). So the different sizes were
-chosen to avoid an excessive number of sysfs entries on 64 bit.
+>>  };
+>>
+>>  struct kvm_hypervisor_cpuid {
+>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>> index e68fbc0c7fc1..40ea8340838f 100644
+>> --- a/arch/x86/kvm/hyperv.c
+>> +++ b/arch/x86/kvm/hyperv.c
+>> @@ -2137,6 +2137,9 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu=
+, struct kvm_hv_hcall *hc)
+>>  		bitmap_zero(vcpu_mask, KVM_MAX_VCPUS);
+>>
+>>  		kvm_for_each_vcpu(i, v, kvm) {
+>> +			if (READ_ONCE(v->arch.hyperv->tlb_flush_inhibit))
+>> +				goto ret_suspend;
+>> +
+>>  			__set_bit(i, vcpu_mask);
+>>  		}
+>>  	} else if (!is_guest_mode(vcpu)) {
+>> @@ -2148,6 +2151,9 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu=
+, struct kvm_hv_hcall *hc)
+>>  				__clear_bit(i, vcpu_mask);
+>>  				continue;
+>>  			}
+>> +
+>> +			if (READ_ONCE(v->arch.hyperv->tlb_flush_inhibit))
+>> +				goto ret_suspend;
+>>  		}
+>>  	} else {
+>>  		struct kvm_vcpu_hv *hv_v;
+>> @@ -2175,6 +2181,9 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu=
+, struct kvm_hv_hcall *hc)
+>>  						    sparse_banks))
+>>  				continue;
+>>
+>> +			if (READ_ONCE(v->arch.hyperv->tlb_flush_inhibit))
+>> +				goto ret_suspend;
+>> +
+>
+> These READ_ONCEs make me think I misunderstand something here, please
+> bear with me :-).
+>
+> Like we're trying to protect against 'tlb_flush_inhibit' being read
+> somewhere in the beginning of the function and want to generate real
+> memory accesses. But what happens if tlb_flush_inhibit changes right
+> _after_ we checked it here and _before_ we actuall do
+> kvm_make_vcpus_request_mask()? Wouldn't it be a problem? In case it
+> would, I think we need to reverse the order: do
+> kvm_make_vcpus_request_mask() anyway and after it go through vcpu_mask
+> checking whether any of the affected vCPUs has 'tlb_flush_inhibit' and
+> if it does, suspend the caller.
+>
 
-This problem went away later with the introduction of memory_block_size.
+The case you're describing is prevented through SRCU synchronisation in
+the ioctl. The hypercall actually holds a read side critical section
+during the whole of its execution, so when tlb_flush_inhibit changes
+after we read it, the ioctl would wait for the flushes to complete:
 
-Even further back in time I think there were static arrays which had
-2^(MAX_PHYSMEM_BITS - SECTION_SIZE_BITS) elements.
+vCPU 0                   | vCPU 1
+=2D------------------------+------------------------
+                         | hypercall enter
+                         | srcu_read_lock()
+ioctl enter              |
+                         | tlb_flush_inhibit read
+tlb_flush_inhibit write  |
+synchronize_srcu() start |
+                         | TLB flush reqs send
+                         | srcu_read_unlock()
+synchronize_srcu() end   |
+ioctl exit               |
 
-I just gave it a try and, as nowadays expected, bloat-o-meter doesn't
-indicate anything like that anymore.
+>>  			__set_bit(i, vcpu_mask);
+>>  		}
+>>  	}
+>> @@ -2193,6 +2202,9 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu=
+, struct kvm_hv_hcall *hc)
+>>  	/* We always do full TLB flush, set 'Reps completed' =3D 'Rep Count' =
+*/
+>>  	return (u64)HV_STATUS_SUCCESS |
+>>  		((u64)hc->rep_cnt << HV_HYPERCALL_REP_COMP_OFFSET);
+>> +ret_suspend:
+>> +	kvm_hv_vcpu_suspend_tlb_flush(vcpu, v->vcpu_id);
+>> +	return -EBUSY;
+>>  }
+>>
+>>  static void kvm_hv_send_ipi_to_many(struct kvm *kvm, u32 vector,
+>> @@ -2380,6 +2392,13 @@ static int kvm_hv_hypercall_complete(struct kvm_=
+vcpu *vcpu, u64 result)
+>>  	u32 tlb_lock_count =3D 0;
+>>  	int ret;
+>>
+>> +	/*
+>> +	 * Reached when the hyper-call resulted in a suspension of the vCPU.
+>> +	 * The instruction will be re-tried once the vCPU is unsuspended.
+>> +	 */
+>> +	if (kvm_hv_vcpu_suspended(vcpu))
+>> +		return 1;
+>> +
+>>  	if (hv_result_success(result) && is_guest_mode(vcpu) &&
+>>  	    kvm_hv_is_tlb_flush_hcall(vcpu) &&
+>>  	    kvm_read_guest(vcpu->kvm, to_hv_vcpu(vcpu)->nested.pa_page_gpa,
+>> @@ -2919,6 +2938,9 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struc=
+t kvm_cpuid2 *cpuid,
+>>
+>>  void kvm_hv_vcpu_suspend_tlb_flush(struct kvm_vcpu *vcpu, int vcpu_id)
+>>  {
+>> +	RCU_LOCKDEP_WARN(!srcu_read_lock_held(&vcpu->kvm->srcu),
+>> +			 "Suspicious Hyper-V TLB flush inhibit usage\n");
+>> +
+>>  	/* waiting_on's store should happen before suspended's */
+>>  	WRITE_ONCE(vcpu->arch.hyperv->waiting_on, vcpu_id);
+>>  	WRITE_ONCE(vcpu->arch.hyperv->suspended, true);
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 18d0a300e79a..1f925e32a927 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -4642,6 +4642,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,=
+ long ext)
+>>  	case KVM_CAP_HYPERV_CPUID:
+>>  	case KVM_CAP_HYPERV_ENFORCE_CPUID:
+>>  	case KVM_CAP_SYS_HYPERV_CPUID:
+>> +	case KVM_CAP_HYPERV_TLB_FLUSH_INHIBIT:
+>>  #endif
+>>  	case KVM_CAP_PCI_SEGMENT:
+>>  	case KVM_CAP_DEBUGREGS:
+>> @@ -5853,6 +5854,31 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_=
+vcpu *vcpu,
+>>  	}
+>>  }
+>>
+>> +static int kvm_vcpu_ioctl_set_tlb_flush_inhibit(struct kvm_vcpu *vcpu,
+>> +						struct kvm_hyperv_tlb_flush_inhibit *set)
+>> +{
+>> +	if (set->inhibit =3D=3D READ_ONCE(vcpu->arch.hyperv->tlb_flush_inhibi=
+t))
+>> +		return 0;
+>> +
+>> +	WRITE_ONCE(vcpu->arch.hyperv->tlb_flush_inhibit, set->inhibit);
+>
+> As you say before, vCPU ioctls are serialized and noone else sets
+> tlb_flush_inhibit, do I understand correctly that
+> READ_ONCE()/WRITE_ONCE() are redundant here?
+>
 
-> 128 MiB has been used by x86-64 since the very beginning. arm64 with 4k
-> base pages switched to 128 MiB as well: it's just big enough on these
-> architectures to allows for using a huge page (2 MiB) in the vmemmap in
-> sane setups with sizeof(struct page) == 64 bytes and a huge page mapping
-> in the direct mapping, while still allowing for small hot(un)plug
-> granularity.
-> 
-> For s390, we could even switch to a 64 MiB section size, as our huge page
-> size is 1 MiB: but the smaller the section size, the more sections we'll
-> have to manage especially on bigger machines. Making it consistent with
-> x86-64 and arm64 feels like te right thing for now.
+As mentioned before, since tlb_flush_inhibit is shared it needs
+these calls.
 
-That's fine with me.
-
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
+Nikolas
 
