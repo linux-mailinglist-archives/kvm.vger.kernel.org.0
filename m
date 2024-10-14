@@ -1,156 +1,167 @@
-Return-Path: <kvm+bounces-28805-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28806-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBAF699D6E2
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 20:57:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44E9F99D6FF
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 21:06:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A91E1C23595
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 18:57:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68AED1C24102
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 19:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061F51CACFD;
-	Mon, 14 Oct 2024 18:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63A91CBE8F;
+	Mon, 14 Oct 2024 19:06:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="b4XmhwEJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LASAZqtx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D274683;
-	Mon, 14 Oct 2024 18:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701FA1B85D7
+	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 19:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728932236; cv=none; b=l6U9Ke8WlgYs3hpiNksQOJ5WdCIXGdtw0tEXLpoQWJqqAuf8dgPjvJPj6KtBjJl5R9ECC12cgk6Trj3Lvvs/xe48ONHWNVnR4skytQM0xQdb/BHIFiG143qyzpA4+skqWoEagCjJax+3MyfibV6USNU49aitTho5Bqyy1zmKLL4=
+	t=1728932769; cv=none; b=nYLZxqovBoyDcH8Q+bVKTNE4iuW5rnVi5EIPZP2Eqx4phC2M30ub61tcTAsivGMCSdqCHsEK4AWUP5gP2vZBhQEJ8/djS3qRPtP2GWYGyV9O8bdGYiwGla8DiZsQBHLfBBVKaxViaeRgt2OI70pXpGEclmA7swf8NuessHiPuDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728932236; c=relaxed/simple;
-	bh=fgr0i0rvV98CmIMqJYxJOVbmMJNJIhlNgjRfyq6A+4c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kbqxHpXq6ufjImlOjIimr0ixojpAvaYdLks88U8bkldDttyTgWa3hQ3fDLF4PbpoNPISDCo4Ch75OpWY3DioGtCvQIvOOrUTzH8EEetn35QMA8vLR201uIqTrhqE8JV5czPIB4HU64UZvjN0zIXNBl6CZlzO5DZUO3PxZK9Fy4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=b4XmhwEJ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49EHpttt016170;
-	Mon, 14 Oct 2024 18:57:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pp1; bh=lqsWR+jAr90MdTD6bipNip5TTrR
-	kZNsTNWK1ovh714w=; b=b4XmhwEJ8kZjtypCGp0cOsK6GQkjPMXqa4EzpZIs84d
-	YOGBTXbn1W2WXMTpPReTFgrC7BeP9UmmiKBVpcY1P6f9Cykz30sStQ1Dc/F9BY9e
-	YVM7X2n4afWsy4MYJZSRIA2LaSeJiz3GDOkllZCJQtQc6vx0sM/aHRdbAlt/Mktn
-	Z0SuaGi7Kxq3pgF5SZuEWuDKpSkDS1XSD1p5U3PP3P9o0wosyUdhbS6l5vPIOeyi
-	fWiImR2tF2RfFPzlooBztYRKnRvsUWiO+OdipYH9NvoqD2CBSROcH0kj893n4uyE
-	XKAUPuz6f1Bxen++oKll3e9wILw36P4h5GE+JV5YZQg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42982qr7ex-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Oct 2024 18:57:07 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49EIv6GJ020091;
-	Mon, 14 Oct 2024 18:57:06 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42982qr7er-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Oct 2024 18:57:06 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49EHdVwP027480;
-	Mon, 14 Oct 2024 18:57:05 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4283txg63q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Oct 2024 18:57:05 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49EIv2bP55050696
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 14 Oct 2024 18:57:02 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F30CA2004E;
-	Mon, 14 Oct 2024 18:57:01 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 03BE92004B;
-	Mon, 14 Oct 2024 18:57:01 +0000 (GMT)
-Received: from osiris (unknown [9.171.66.174])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 14 Oct 2024 18:57:00 +0000 (GMT)
-Date: Mon, 14 Oct 2024 20:56:59 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH v2 0/7] virtio-mem: s390 support
-Message-ID: <20241014185659.10447-H-hca@linux.ibm.com>
-References: <20241014144622.876731-1-david@redhat.com>
+	s=arc-20240116; t=1728932769; c=relaxed/simple;
+	bh=Vu81vPys2CDyMCoxEAosBTJdlZFjGflRzpJDBRLNgis=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VAYdxedBYbMoGE4uPtovfKam6QdRk3P8Lk2cTGryVudBTXvIp+gn241GTgMzxL5rvjhXBcZeONG18E1fDuEjeyUM2k27CkuGYpgu9sXAPxaaQVGBap0fCKR7r/UzAOP0mGMM6TiYuIOyrNaRE5KdFcUsjEPmKcJs1bUJnpZLzQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LASAZqtx; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e1fbe2a6b1so75753597b3.2
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 12:06:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728932766; x=1729537566; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=a+8YwZPzd8hGbK2LKgFesQD2Tb42n+UtlImdb92fFxg=;
+        b=LASAZqtxGEwBXK1Xo4rHbQxnrFvsRe/VmZsekYuFDCQEqydtzgJcKQHgYeRiVOF+Bo
+         9/MonBKx2onw3HDPJm9H//HbL4JCvE9wbt6ZdR5WuC7hEAGpqkpm1zlDrL5qt7jrsvs2
+         IqSRl1rTLV4FpIvgpdHdxXhNqlyThhLx5fhBZM3gFjPkYbUJ3dQLlO6ArkFK5LXn07D/
+         19nNRpl7ZMkmsSBEdHv9bYklSl3kW5FJ0bXU0dUYW5FVoLbf5631VLQJxr6EIdbkVKib
+         74yAfs05OGnKZLJIkhriSITtsPP8NLIFb/puCG9GgnRUexvGD1PwNG/rr74SVBia49Ou
+         0cKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728932766; x=1729537566;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a+8YwZPzd8hGbK2LKgFesQD2Tb42n+UtlImdb92fFxg=;
+        b=BvW2b2B4MJ4Zx1dxMkAHWAvfru7anBlTqg9y6T1hrB6R31fi+BUCvLd+ExdIDkvoeN
+         1dG/tByzlloTXMD3HKeJ/zwcQE/Sp63zvMN3/+P7FpjlTVCgc8GAKUNZwOnuDbvmpo8/
+         4wlDCI/bS7QGzpHKAqFPHeN8vJsjVmr8Eg0+8CfXoop+ugmguDhDL458fmhMs9SlwZ1+
+         namltxBdciscjJrQwclzoJU/RZNjq9XtcMMccogjgCHEmOA849ReR00TTVvK6fPQDzFg
+         oKRq2OOjG3R0HG9SOu+Ix8hiwY7oms5dzKRPFmRQxA7SJckeFwAAKOE6yMvnGBhl08Kc
+         5xkA==
+X-Forwarded-Encrypted: i=1; AJvYcCUo35OpUsKIOlm/6ako4XIikBEsMYxEiE9MEopBsFjshETDGtqOHNAdONInOw64qeZhUSU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMWeppZzFkX8SpOvQiNJcNqQuIaU/GfG4Jp81Qt+P0/o3LYWNQ
+	Kf9pLER7eXBcW4ABecKQhQnsEaCaGjWnnP1aodBAdHiIvb42GZhJWuLfTCORsF0WVMycLM5Ae9C
+	QGQ==
+X-Google-Smtp-Source: AGHT+IFFy+ijPVSn3Z0NrUzEvtkGt60BJRFz+jmpA5cHbksFT8RdYrRabv6QwgmqYZVGdxBTWcsctzKdroU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:ef0c:0:b0:e28:f231:1aa8 with SMTP id
+ 3f1490d57ef6-e2919d51daemr51049276.2.1728932766196; Mon, 14 Oct 2024 12:06:06
+ -0700 (PDT)
+Date: Mon, 14 Oct 2024 12:06:04 -0700
+In-Reply-To: <d09669af3cc7758c740f9860f7f1f2ab5998eb3d.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241014144622.876731-1-david@redhat.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6uFDGy-zlz1QTPEIrQYEpX_XW_Pumpmi
-X-Proofpoint-ORIG-GUID: Or6XZdCkJUWtzOmMfibubfT24pmJTuiG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-14_12,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- mlxlogscore=999 phishscore=0 clxscore=1015 malwarescore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410140135
+Mime-Version: 1.0
+References: <20241009181742.1128779-1-seanjc@google.com> <20241009181742.1128779-6-seanjc@google.com>
+ <d09669af3cc7758c740f9860f7f1f2ab5998eb3d.camel@intel.com>
+Message-ID: <Zw1rnEONZ8iJQvMQ@google.com>
+Subject: Re: [PATCH 5/7] KVM: x86: Move kvm_set_apic_base() implementation to
+ lapic.c (from x86.c)
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Oct 14, 2024 at 04:46:12PM +0200, David Hildenbrand wrote:
-> Let's finally add s390 support for virtio-mem; my last RFC was sent
-> 4 years ago, and a lot changed in the meantime.
+On Mon, Oct 14, 2024, Kai Huang wrote:
+> On Wed, 2024-10-09 at 11:17 -0700, Sean Christopherson wrote:
+> > Move kvm_set_apic_base() to lapic.c so that the bulk of KVM's local APIC
+> > code resides in lapic.c, regardless of whether or not KVM is emulating the
+> > local APIC in-kernel.  This will also allow making various helpers visible
+> > only to lapic.c.
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/lapic.c | 21 +++++++++++++++++++++
+> >  arch/x86/kvm/x86.c   | 21 ---------------------
+> >  2 files changed, 21 insertions(+), 21 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index fe30f465611f..6239cfd89aad 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -2628,6 +2628,27 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+> >  	}
+> >  }
+> >  
+> > +int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> > +{
+> > +	enum lapic_mode old_mode = kvm_get_apic_mode(vcpu);
+> > +	enum lapic_mode new_mode = kvm_apic_mode(msr_info->data);
+> > +	u64 reserved_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu) | 0x2ff |
+> > +		(guest_cpuid_has(vcpu, X86_FEATURE_X2APIC) ? 0 : X2APIC_ENABLE);
+> > +
+> > +	if ((msr_info->data & reserved_bits) != 0 || new_mode == LAPIC_MODE_INVALID)
+> > +		return 1;
+> > +	if (!msr_info->host_initiated) {
+> > +		if (old_mode == LAPIC_MODE_X2APIC && new_mode == LAPIC_MODE_XAPIC)
+> > +			return 1;
+> > +		if (old_mode == LAPIC_MODE_DISABLED && new_mode == LAPIC_MODE_X2APIC)
+> > +			return 1;
+> > +	}
+> > +
+> > +	kvm_lapic_set_base(vcpu, msr_info->data);
+> > +	kvm_recalculate_apic_map(vcpu->kvm);
+> > +	return 0;
+> > +}
 > 
-> The latest QEMU series is available at [1], which contains some more
-> details and a usage example on s390 (last patch).
+> Nit:
 > 
-> There is not too much in here: The biggest part is querying a new diag(500)
-> STORAGE_LIMIT hypercall to obtain the proper "max_physmem_end".
+> It is a little bit weird to use 'struct msr_data *msr_info' as function
+> parameter if kvm_set_apic_base() is in lapic.c.  Maybe we can change to take
+> apic_base and host_initialized directly.
 > 
-> The last two patches are not strictly required but certainly nice-to-have.
-> 
-> Note that -- in contrast to standby memory -- virtio-mem memory must be
-> configured to be automatically onlined as soon as hotplugged. The easiest
-> approach is using the "memhp_default_state=" kernel parameter or by using
-> proper udev rules. More details can be found at [2].
-> 
-> I have reviving+upstreaming a systemd service to handle configuring
-> that on my todo list, but for some reason I keep getting distracted ...
-> 
-> I tested various things, including:
->  * Various memory hotplug/hotunplug combinations
->  * Device hotplug/hotunplug
->  * /proc/iomem output
->  * reboot
->  * kexec
->  * kdump: make sure we don't hotplug memory
-> 
-> One remaining work item is kdump support for virtio-mem memory. This will
-> be sent out separately once initial support landed.
+> A side gain is we can get rid of using the 'struct msr_data apic_base_msr' local
+> variable in __set_sregs_common() when calling kvm_apic_set_base():
 
-Besides the open kdump question, which I think is quite important, how
-is this supposed to go upstream?
+Ooh, nice.  I agree, it'd be better to pass in separate parameters.
 
-This could go via s390, however in any case this needs reviews and/or
-Acks from kvm folks.
+Gah, and looking at this with fresh eyes reminded me why I even started poking at
+this code in the first place.  Patch 1's changelog does a poor job of calling it
+out, but the main impetus for this series was to avoid kvm_recalculate_apic_map()
+when doing KVM_SET_SREGS without modifying APIC_BASE.  That's _mostly_ handled by
+patch 1, but it doesn't completely fix things because if the map is already DIRTY,
+then KVM will unnecessarily fall into kvm_recalculate_apic_map()'s slow path, even
+though some other vCPU/task is responsible for refreshing the calculation.
+
+I'll send a v2 with your suggested change, a better changelog for patch 1, and
+another patch at the end to short-circuit kvm_apic_set_base() (not just the inner
+helper) if the new value is the same as the old value.
+
+Thanks Kai!
+
+> static int __set_sregs_common(...)
+> {
+>         struct msr_data apic_base_msr;
+> 	...
+> 
+>         apic_base_msr.data = sregs->apic_base;
+>         apic_base_msr.host_initiated = true;
+>         if (kvm_set_apic_base(vcpu, &apic_base_msr))
+>                 return -EINVAL;
+> 	...
+> }
+> 
 
