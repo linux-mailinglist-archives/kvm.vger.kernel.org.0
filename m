@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-28753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41CFF99C901
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 13:34:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7693199C902
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 13:35:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6A301F23225
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 11:34:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A0BA1C22E38
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 11:35:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BF31AA7A4;
-	Mon, 14 Oct 2024 11:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621761AAE02;
+	Mon, 14 Oct 2024 11:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UWhoGFDw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="doUJQ+X2"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888F31AA786;
-	Mon, 14 Oct 2024 11:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A841AA7BF;
+	Mon, 14 Oct 2024 11:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728905558; cv=none; b=FpG98h57mJqOa5gL9JrGb5PWQupGI7LOJijinZQbIG2VLg+iQmuRKOrmI4lzmKIyz97skBEYd5FM2oH2MKwiOp5bvlTTA3l8zu6JF4EyWbLIJuYVzOVebHIVgi6xwtjNchgZonsjR9h0225dgbNFsh+27UAHhCvZtkwjhHq2nRA=
+	t=1728905562; cv=none; b=gHZsiXdGNwSa7+X56jvwwwnaIZR1/q+5r9M68XIBriO3oW2TSJRKZ09DpM7+jF2MtxDlMRDKabzWqXj3DvU1AKBqNTOGEYd2p1l64nfNQSV1owomTrHaP5pgJozeMgGDlc1LNoMwO0s4GdNlrNsAtB1VSzFoCQHBYMhieOg7Th0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728905558; c=relaxed/simple;
-	bh=G8yBT7WdIx28fuQzQTlC+Q/DNMdS5bKfXBVXPUHC2XI=;
+	s=arc-20240116; t=1728905562; c=relaxed/simple;
+	bh=wwCoQVJY0cFSNxaU4p/NlRzSKSJS3jn/L43L9AyUbx4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZKdBpxWKiLUj7lZLITJBOOgmxupFDmqV+5Y9vzi/A1nqRvi/+X5fKaJIM+o1pPtXs/L0OHsGwcWBM4eKgFzjJiycvF7oD4XOv4K87pDolh+mVzkInt91yY7vJGH2eyj0lGZbummWBaHsM3/JVwuD+pZvxvq9lirwGvkjiGvrf7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UWhoGFDw; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=XsYl4CHbcBk0CqsRhUtQV2owpwypfAN0N0HHquMPct17FvXhpp+ecWdPbqX6vIFE6LsLRvB+euwWSR5XxaButzSI3XehOzqRWXP6xXUsd9mrp82NLQpyBqLr0Cw4Em60IVzxd06yzYjb9b6VRx2ucaK684EduwGvOlnHPvI0dME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=doUJQ+X2; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728905556; x=1760441556;
+  t=1728905560; x=1760441560;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=G8yBT7WdIx28fuQzQTlC+Q/DNMdS5bKfXBVXPUHC2XI=;
-  b=UWhoGFDwGzTEfAZtvPbKO4XltwxVTytJwy+Z+tDPrWkGh9gMVDLSBfxb
-   ExzFvDGuV5gbaGUwwvmdIXNhDaxPDX93jrY/tnY//YCcDnBoTXqmPLxC4
-   M9/I9mwpWOoQ+3gI0JAXpqRxSr24MGvl4hwdjvzyWsbCV4ivCj7l8ShHJ
-   4og1YBhK9yNv+5qP40J8FdLGbUyezNPF6L41o1hBGduj89SwGEZx/DXMB
-   TqkYz/Lzkzm5469NU9g2v8pyuhyktO5YfAT/+VhubyCy8MAOodQHOdvbE
-   LAE4qUStGmBGA8ShrKfok4MjUdcy42Qsgh5sG+eMAhRSWcfBcL5ehB12p
+  bh=wwCoQVJY0cFSNxaU4p/NlRzSKSJS3jn/L43L9AyUbx4=;
+  b=doUJQ+X2yevFpIVlOluJNb2XweASeu2AmplZAwahKZHSm6kd/B7TQz3G
+   Wf2y3sii5BNQCz4XApEiso6gmiwsQzrEInxu2vQv2bY6TseKy//52dN9c
+   3gxO7RLyv3gTrBpKPwXZUCa3b8UyY4UGOimkPvt/3m+YudwN6MKSFCdus
+   rR5cMTaXb2uLBQLVcr70guTfavl24HsRj2xQZYmUQfPVxWdgUms8ozY0M
+   i4wxmKav43WFCyHy4A5T3OcPB5oo2l2Z08a9FI0Qfj1YJQQgq0/OjVPip
+   IDQvExThHu3Xgo8jJaeD8aQ5eFMzcvupY4qIyCuV8JKs5DedXb2JtH0Ob
    w==;
-X-CSE-ConnectionGUID: 7T+v/586Rp2QN8V3Gt3kCw==
-X-CSE-MsgGUID: 6Ox25bb5TC2hSZPNRllIUA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11224"; a="32166555"
+X-CSE-ConnectionGUID: hlBNg6QATv+KYr3IIfmzKg==
+X-CSE-MsgGUID: J4FO+iwxTrCZwQX1MDDL/Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11224"; a="32166566"
 X-IronPort-AV: E=Sophos;i="6.11,202,1725346800"; 
-   d="scan'208";a="32166555"
+   d="scan'208";a="32166566"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 04:32:36 -0700
-X-CSE-ConnectionGUID: Lw2pRwCKTwmon6nN5nQtPw==
-X-CSE-MsgGUID: 7e3kRGAsQUWN8WsOcpIo9Q==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 04:32:40 -0700
+X-CSE-ConnectionGUID: G+P7xwZyR2uWw14ITbBF3g==
+X-CSE-MsgGUID: n5tZqCKRTnKi+sm+qeE9Pg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,202,1725346800"; 
-   d="scan'208";a="82117498"
+   d="scan'208";a="82117507"
 Received: from jdoman-desk1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.220.204])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 04:32:33 -0700
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 04:32:36 -0700
 From: Kai Huang <kai.huang@intel.com>
 To: dave.hansen@intel.com,
 	kirill.shutemov@linux.intel.com,
@@ -77,9 +77,9 @@ Cc: x86@kernel.org,
 	adrian.hunter@intel.com,
 	nik.borisov@suse.com,
 	kai.huang@intel.com
-Subject: [PATCH v5 7/8] x86/virt/tdx: Require the module to assert it has the NO_RBP_MOD mitigation
-Date: Tue, 15 Oct 2024 00:31:54 +1300
-Message-ID: <d9d67a66709ed3aad162f8ba3c5bf0078cdb9529.1728903647.git.kai.huang@intel.com>
+Subject: [PATCH v5 8/8] x86/virt/tdx: Reduce TDMR's reserved areas by using CMRs to find memory holes
+Date: Tue, 15 Oct 2024 00:31:55 +1300
+Message-ID: <0a3db9e979fec7546607b3b0b37dc2b6f1ab2302.1728903647.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <cover.1728903647.git.kai.huang@intel.com>
 References: <cover.1728903647.git.kai.huang@intel.com>
@@ -91,158 +91,367 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Old TDX modules can clobber RBP in the TDH.VP.ENTER SEAMCALL.  However
-RBP is used as frame pointer in the x86_64 calling convention, and
-clobbering RBP could result in bad things like being unable to unwind
-the stack if any non-maskable exceptions (NMI, #MC etc) happens in that
-gap.
+A TDX module initialization failure was reported on a Emerald Rapids
+platform:
 
-A new "NO_RBP_MOD" feature was introduced to more recent TDX modules to
-not clobber RBP.  This feature is reported in the TDX_FEATURES0 global
-metadata field via bit 18.
+  virt/tdx: initialization failed: TDMR [0x0, 0x80000000): reserved areas exhausted.
+  virt/tdx: module initialization failed (-28)
 
-Don't initialize the TDX module if this feature is not supported [1].
+As part of initializing the TDX module, the kernel informs the TDX
+module of all "TDX-usable memory regions" using an array of TDX defined
+structure "TD Memory Region" (TDMR).  Each TDMR must be in 1GB aligned
+and in 1GB granularity, and all "non-TDX-usable memory holes" within a
+given TDMR are marked as "reserved areas".  The TDX module reports a
+maximum number of reserved areas that can be supported per TDMR (16).
 
-Link: https://lore.kernel.org/all/fc0e8ab7-86d4-4428-be31-82e1ece6dd21@intel.com/ [1]
+The kernel builds the "TDX-usable memory regions" based on memblocks
+(which reflects e820), and uses this list to find all "reserved areas"
+for each TDMR.
+
+It turns out that the kernel's view of memory holes is too fine grained
+and sometimes exceeds the number of holes that the TDX module can track
+per TDMR [1], resulting in the above failure.
+
+Thankfully the module also lists memory that is potentially convertible
+in a list of "Convertible Memory Regions" (CMRs).  That coarser grained
+CMR list tends to track usable memory in the memory map even if it might
+be reserved for host usage like 'ACPI data' [2].
+
+Use that list to relax what the kernel considers unusable memory.  If it
+falls in a CMR no need to instantiate a hole, and rely on the fact that
+kernel will keep what it considers 'reserved' out of the page allocator.
+
+Also dump the CMRs in dmesg.  They are helpful when something goes wrong
+around "constructing the TDMRs and configuring the TDX module with
+them".  Note there are no existing userspace tools that the user can get
+CMRs since they can only be read via SEAMCALL (no CPUID, MSR etc).
+
+[1] BIOS-E820 table of the problematic platform:
+
+  BIOS-e820: [mem 0x0000000000000000-0x000000000009efff] usable
+  BIOS-e820: [mem 0x000000000009f000-0x00000000000fffff] reserved
+  BIOS-e820: [mem 0x0000000000100000-0x000000005d168fff] usable
+  BIOS-e820: [mem 0x000000005d169000-0x000000005d22afff] ACPI data
+  BIOS-e820: [mem 0x000000005d22b000-0x000000005d3cefff] usable
+  BIOS-e820: [mem 0x000000005d3cf000-0x000000005d469fff] reserved
+  BIOS-e820: [mem 0x000000005d46a000-0x000000005e5b2fff] usable
+  BIOS-e820: [mem 0x000000005e5b3000-0x000000005e5c2fff] reserved
+  BIOS-e820: [mem 0x000000005e5c3000-0x000000005e5d2fff] usable
+  BIOS-e820: [mem 0x000000005e5d3000-0x000000005e5e4fff] reserved
+  BIOS-e820: [mem 0x000000005e5e5000-0x000000005eb57fff] usable
+  BIOS-e820: [mem 0x000000005eb58000-0x0000000061357fff] ACPI NVS
+  BIOS-e820: [mem 0x0000000061358000-0x000000006172afff] usable
+  BIOS-e820: [mem 0x000000006172b000-0x0000000061794fff] ACPI data
+  BIOS-e820: [mem 0x0000000061795000-0x00000000617fefff] usable
+  BIOS-e820: [mem 0x00000000617ff000-0x0000000061912fff] ACPI data
+  BIOS-e820: [mem 0x0000000061913000-0x0000000061998fff] usable
+  BIOS-e820: [mem 0x0000000061999000-0x00000000619dffff] ACPI data
+  BIOS-e820: [mem 0x00000000619e0000-0x00000000619e1fff] usable
+  BIOS-e820: [mem 0x00000000619e2000-0x00000000619e9fff] reserved
+  BIOS-e820: [mem 0x00000000619ea000-0x0000000061a26fff] usable
+  BIOS-e820: [mem 0x0000000061a27000-0x0000000061baefff] ACPI data
+  BIOS-e820: [mem 0x0000000061baf000-0x00000000623c2fff] usable
+  BIOS-e820: [mem 0x00000000623c3000-0x0000000062471fff] reserved
+  BIOS-e820: [mem 0x0000000062472000-0x0000000062823fff] usable
+  BIOS-e820: [mem 0x0000000062824000-0x0000000063a24fff] reserved
+  BIOS-e820: [mem 0x0000000063a25000-0x0000000063d57fff] usable
+  BIOS-e820: [mem 0x0000000063d58000-0x0000000064157fff] reserved
+  BIOS-e820: [mem 0x0000000064158000-0x0000000064158fff] usable
+  BIOS-e820: [mem 0x0000000064159000-0x0000000064194fff] reserved
+  BIOS-e820: [mem 0x0000000064195000-0x000000006e9cefff] usable
+  BIOS-e820: [mem 0x000000006e9cf000-0x000000006eccefff] reserved
+  BIOS-e820: [mem 0x000000006eccf000-0x000000006f6fefff] ACPI NVS
+  BIOS-e820: [mem 0x000000006f6ff000-0x000000006f7fefff] ACPI data
+  BIOS-e820: [mem 0x000000006f7ff000-0x000000006f7fffff] usable
+  BIOS-e820: [mem 0x000000006f800000-0x000000008fffffff] reserved
+  ......
+
+[2] Convertible Memory Regions of the problematic platform:
+
+  virt/tdx: CMR: [0x100000, 0x6f800000)
+  virt/tdx: CMR: [0x100000000, 0x107a000000)
+  virt/tdx: CMR: [0x1080000000, 0x207c000000)
+  virt/tdx: CMR: [0x2080000000, 0x307c000000)
+  virt/tdx: CMR: [0x3080000000, 0x407c000000)
+
+Fixes: dde3b60d572c ("x86/virt/tdx: Designate reserved areas for all TDMRs")
 Signed-off-by: Kai Huang <kai.huang@intel.com>
-Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
-Reviewed-by: Adrian Hunter <adrian.hunter@intel.com>
-Reviewed-by: Dan Williams <dan.j.williams@intel.com>
 ---
 
 v4 -> v5:
  - Rebase due to patch 3 change.
 
 v3 -> v4:
- - Move reading TDX_FEATURES0 code to this patch.
- - Change patch title and use permalink - Dan.
-
- Hi Dan, Ardian, Nikolay,
-
- The code to read TDX_FEATURES0 was not included in this patch when you
- gave your tag.  I didn't remove them.  Please let me know if you want
- me to remove your tag.  Thanks!
+ - Trim down changelog - Dan.
+ - "must be marked as reserved areas" -> "are marked as reserved areas" - Ardian.
+ - Remove all WARN_ON_ONCE() for CMR sanity checks, and clarify in the
+   comment that CMRs are verified by MCHECK before it enables TDX so we
+   can trust hardware.
+ - Change CMR_BASE(i) macro back to just define CMR_BASE and do the
+   "+i" in the code.
 
 v2 -> v3:
- - check_module_compatibility() -> check_features().
- - Improve error message.
 
- https://lore.kernel.org/kvm/cover.1721186590.git.kai.huang@intel.com/T/#md9e2eeef927838cbf20d7b361cdbea518b8aec50
+ - Add the Fixes tag, although this patch depends on previous patches.
+ - CMR_BASE0 -> CMR_BASE(_i), CMR_SIZE0 -> CMR_SIZE(_i) to silence the
+   build-check error.
+
+v1 -> v2:
+ - Change to walk over CMRs directly to find out memory holes, instead
+   of walking over TDX memory blocks and explicitly check whether a hole
+   is subregion of CMR.  (Chao)
+ - Mention any constant macro definitions in global metadata structures
+   are TDX architectural. (Binbin)
+ - Slightly improve the changelog.
+
 
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 36 ++++++++++++++++++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.h | 16 ++++++++++++++++
- 2 files changed, 52 insertions(+)
+ arch/x86/virt/vmx/tdx/tdx.c | 103 ++++++++++++++++++++++++++++++------
+ arch/x86/virt/vmx/tdx/tdx.h |  12 +++++
+ 2 files changed, 99 insertions(+), 16 deletions(-)
 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 130ddac47f64..c877d02ca057 100644
+index c877d02ca057..b1e419765ed7 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -292,6 +292,21 @@ static int __read_sys_metadata_field(u64 field_id, void *val, int size)
- 	__read_sys_metadata_field(_field_id, _val, sizeof(*(_val)));	\
- })
+@@ -327,6 +327,58 @@ static int get_tdx_sys_info_version(struct tdx_sys_info_version *sysinfo_version
+ 	return ret;
+ }
  
-+static int get_tdx_sys_info_features(struct tdx_sys_info_features *sysinfo_features)
++/* Update the @sysinfo_cmr->num_cmrs to trim tail empty CMRs */
++static void trim_empty_tail_cmrs(struct tdx_sys_info_cmr *sysinfo_cmr)
++{
++	int i;
++
++	/*
++	 * The TDX module may report the maximum number of CMRs that
++	 * TDX architecturally supports as the actual number of CMRs,
++	 * despite the latter is smaller.  In this case all the tail
++	 * CMRs will be empty.  Trim them away.
++	 *
++	 * Note MCHECK verifies CMRs before enabling TDX on hardware.
++	 * Skip other sanity checks (e.g., verify CMR is 4KB aligned)
++	 * but trust MCHECK to work properly.  CMRs are printed later
++	 * anyway, and the worst case is module fails to initialize.
++	 */
++	for (i = 0; i < sysinfo_cmr->num_cmrs; i++)
++		if (!sysinfo_cmr->cmr_size[i])
++			break;
++
++	sysinfo_cmr->num_cmrs = i;
++}
++
++static int get_tdx_sys_info_cmr(struct tdx_sys_info_cmr *sysinfo_cmr)
 +{
 +	int ret = 0;
++	u16 i;
 +
 +#define READ_SYS_INFO(_field_id, _member)				\
 +	ret = ret ?: read_sys_metadata_field(MD_FIELD_ID_##_field_id,	\
-+					&sysinfo_features->_member)
++					&sysinfo_cmr->_member)
 +
-+	READ_SYS_INFO(TDX_FEATURES0, tdx_features0);
++	READ_SYS_INFO(NUM_CMRS, num_cmrs);
 +
-+#undef READ_SYS_INFO
-+
-+	return ret;
-+}
-+
- static int get_tdx_sys_info_version(struct tdx_sys_info_version *sysinfo_version)
- {
- 	int ret = 0;
-@@ -335,6 +350,10 @@ static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
- {
- 	int ret;
- 
-+	ret = get_tdx_sys_info_features(&sysinfo->features);
 +	if (ret)
 +		return ret;
 +
- 	ret = get_tdx_sys_info_version(&sysinfo->version);
- 	if (ret)
- 		return ret;
-@@ -364,6 +383,18 @@ static void print_basic_sys_info(struct tdx_sys_info *sysinfo)
- 	print_sys_info_version(&sysinfo->version);
- }
- 
-+static int check_features(struct tdx_sys_info *sysinfo)
-+{
-+	u64 tdx_features0 = sysinfo->features.tdx_features0;
-+
-+	if (!(tdx_features0 & TDX_FEATURES0_NO_RBP_MOD)) {
-+		pr_err("frame pointer (RBP) clobber bug present, upgrade TDX module\n");
-+		return -EINVAL;
++	for (i = 0; i < sysinfo_cmr->num_cmrs; i++) {
++		READ_SYS_INFO(CMR_BASE + i, cmr_base[i]);
++		READ_SYS_INFO(CMR_SIZE + i, cmr_size[i]);
 +	}
++
++	if (ret)
++		return ret;
++
++	trim_empty_tail_cmrs(sysinfo_cmr);
++
++#undef READ_SYS_INFO
 +
 +	return 0;
 +}
 +
- /* Calculate the actual TDMR size */
- static int tdmr_size_single(u16 max_reserved_per_tdmr)
+ static int get_tdx_sys_info_tdmr(struct tdx_sys_info_tdmr *sysinfo_tdmr)
  {
-@@ -1145,6 +1176,11 @@ static int init_tdx_module(void)
+ 	int ret = 0;
+@@ -358,6 +410,10 @@ static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
+ 	if (ret)
+ 		return ret;
  
- 	print_basic_sys_info(&sysinfo);
- 
-+	/* Check whether the kernel can support this module */
-+	ret = check_features(&sysinfo);
++	ret = get_tdx_sys_info_cmr(&sysinfo->cmr);
 +	if (ret)
 +		return ret;
 +
+ 	return get_tdx_sys_info_tdmr(&sysinfo->tdmr);
+ }
+ 
+@@ -378,9 +434,23 @@ static void print_sys_info_version(struct tdx_sys_info_version *version)
+ 			version->build_date);
+ }
+ 
++static void print_sys_info_cmr(struct tdx_sys_info_cmr *sysinfo_cmr)
++{
++	int i;
++
++	for (i = 0; i < sysinfo_cmr->num_cmrs; i++) {
++		u64 cmr_base = sysinfo_cmr->cmr_base[i];
++		u64 cmr_size = sysinfo_cmr->cmr_size[i];
++
++		pr_info("CMR[%d]: [0x%llx, 0x%llx)\n", i, cmr_base,
++				cmr_base + cmr_size);
++	}
++}
++
+ static void print_basic_sys_info(struct tdx_sys_info *sysinfo)
+ {
+ 	print_sys_info_version(&sysinfo->version);
++	print_sys_info_cmr(&sysinfo->cmr);
+ }
+ 
+ static int check_features(struct tdx_sys_info *sysinfo)
+@@ -816,29 +886,28 @@ static int tdmr_add_rsvd_area(struct tdmr_info *tdmr, int *p_idx, u64 addr,
+ }
+ 
+ /*
+- * Go through @tmb_list to find holes between memory areas.  If any of
++ * Go through all CMRs in @sysinfo_cmr to find memory holes.  If any of
+  * those holes fall within @tdmr, set up a TDMR reserved area to cover
+  * the hole.
+  */
+-static int tdmr_populate_rsvd_holes(struct list_head *tmb_list,
++static int tdmr_populate_rsvd_holes(struct tdx_sys_info_cmr *sysinfo_cmr,
+ 				    struct tdmr_info *tdmr,
+ 				    int *rsvd_idx,
+ 				    u16 max_reserved_per_tdmr)
+ {
+-	struct tdx_memblock *tmb;
+ 	u64 prev_end;
+-	int ret;
++	int i, ret;
+ 
  	/*
- 	 * To keep things simple, assume that all TDX-protected memory
- 	 * will come from the page allocator.  Make sure all pages in the
+ 	 * Start looking for reserved blocks at the
+ 	 * beginning of the TDMR.
+ 	 */
+ 	prev_end = tdmr->base;
+-	list_for_each_entry(tmb, tmb_list, list) {
++	for (i = 0; i < sysinfo_cmr->num_cmrs; i++) {
+ 		u64 start, end;
+ 
+-		start = PFN_PHYS(tmb->start_pfn);
+-		end   = PFN_PHYS(tmb->end_pfn);
++		start = sysinfo_cmr->cmr_base[i];
++		end   = start + sysinfo_cmr->cmr_size[i];
+ 
+ 		/* Break if this region is after the TDMR */
+ 		if (start >= tdmr_end(tdmr))
+@@ -939,16 +1008,16 @@ static int rsvd_area_cmp_func(const void *a, const void *b)
+ 
+ /*
+  * Populate reserved areas for the given @tdmr, including memory holes
+- * (via @tmb_list) and PAMTs (via @tdmr_list).
++ * (via @sysinfo_cmr) and PAMTs (via @tdmr_list).
+  */
+ static int tdmr_populate_rsvd_areas(struct tdmr_info *tdmr,
+-				    struct list_head *tmb_list,
++				    struct tdx_sys_info_cmr *sysinfo_cmr,
+ 				    struct tdmr_info_list *tdmr_list,
+ 				    u16 max_reserved_per_tdmr)
+ {
+ 	int ret, rsvd_idx = 0;
+ 
+-	ret = tdmr_populate_rsvd_holes(tmb_list, tdmr, &rsvd_idx,
++	ret = tdmr_populate_rsvd_holes(sysinfo_cmr, tdmr, &rsvd_idx,
+ 			max_reserved_per_tdmr);
+ 	if (ret)
+ 		return ret;
+@@ -967,10 +1036,10 @@ static int tdmr_populate_rsvd_areas(struct tdmr_info *tdmr,
+ 
+ /*
+  * Populate reserved areas for all TDMRs in @tdmr_list, including memory
+- * holes (via @tmb_list) and PAMTs.
++ * holes (via @sysinfo_cmr) and PAMTs.
+  */
+ static int tdmrs_populate_rsvd_areas_all(struct tdmr_info_list *tdmr_list,
+-					 struct list_head *tmb_list,
++					 struct tdx_sys_info_cmr *sysinfo_cmr,
+ 					 u16 max_reserved_per_tdmr)
+ {
+ 	int i;
+@@ -979,7 +1048,7 @@ static int tdmrs_populate_rsvd_areas_all(struct tdmr_info_list *tdmr_list,
+ 		int ret;
+ 
+ 		ret = tdmr_populate_rsvd_areas(tdmr_entry(tdmr_list, i),
+-				tmb_list, tdmr_list, max_reserved_per_tdmr);
++				sysinfo_cmr, tdmr_list, max_reserved_per_tdmr);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -994,7 +1063,8 @@ static int tdmrs_populate_rsvd_areas_all(struct tdmr_info_list *tdmr_list,
+  */
+ static int construct_tdmrs(struct list_head *tmb_list,
+ 			   struct tdmr_info_list *tdmr_list,
+-			   struct tdx_sys_info_tdmr *sysinfo_tdmr)
++			   struct tdx_sys_info_tdmr *sysinfo_tdmr,
++			   struct tdx_sys_info_cmr *sysinfo_cmr)
+ {
+ 	int ret;
+ 
+@@ -1007,7 +1077,7 @@ static int construct_tdmrs(struct list_head *tmb_list,
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = tdmrs_populate_rsvd_areas_all(tdmr_list, tmb_list,
++	ret = tdmrs_populate_rsvd_areas_all(tdmr_list, sysinfo_cmr,
+ 			sysinfo_tdmr->max_reserved_per_tdmr);
+ 	if (ret)
+ 		tdmrs_free_pamt_all(tdmr_list);
+@@ -1203,7 +1273,8 @@ static int init_tdx_module(void)
+ 		goto err_free_tdxmem;
+ 
+ 	/* Cover all TDX-usable memory regions in TDMRs */
+-	ret = construct_tdmrs(&tdx_memlist, &tdx_tdmr_list, &sysinfo.tdmr);
++	ret = construct_tdmrs(&tdx_memlist, &tdx_tdmr_list, &sysinfo.tdmr,
++			&sysinfo.cmr);
+ 	if (ret)
+ 		goto err_free_tdmrs;
+ 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 0203528da024..18c54e1e3a4a 100644
+index 18c54e1e3a4a..eeb42bd75a75 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -31,6 +31,7 @@
-  *
-  * See the "global_metadata.json" in the "TDX 1.5 ABI definitions".
-  */
-+#define MD_FIELD_ID_TDX_FEATURES0		0x0A00000300000008ULL
- #define MD_FIELD_ID_BUILD_DATE			0x8800000200000001ULL
- #define MD_FIELD_ID_BUILD_NUM			0x8800000100000002ULL
- #define MD_FIELD_ID_MINOR_VERSION		0x0800000100000003ULL
-@@ -105,6 +106,20 @@ struct tdmr_info {
-  * those used by the kernel are.
-  */
+@@ -43,6 +43,9 @@
+ #define MD_FIELD_ID_PAMT_4K_ENTRY_SIZE		0x9100000100000010ULL
+ #define MD_FIELD_ID_PAMT_2M_ENTRY_SIZE		0x9100000100000011ULL
+ #define MD_FIELD_ID_PAMT_1G_ENTRY_SIZE		0x9100000100000012ULL
++#define MD_FIELD_ID_NUM_CMRS			0x9000000100000000ULL
++#define MD_FIELD_ID_CMR_BASE			0x9000000300000080ULL
++#define MD_FIELD_ID_CMR_SIZE			0x9000000300000100ULL
  
-+/*
-+ * Class "TDX Module Info".
-+ *
-+ * This class also contains other fields like SYS_ATTRIBUTES and the
-+ * NUM_TDX_FEATURES.  For now only TDX_FEATURES0 is needed, but still
-+ * keep the structure to follow the spec (and for future extension).
-+ */
-+struct tdx_sys_info_features {
-+	u64 tdx_features0;
+ /*
+  * Sub-field definition of metadata field ID.
+@@ -130,6 +133,14 @@ struct tdx_sys_info_version {
+ 	u32 build_date;
+ };
+ 
++/* Class "CMR Info" */
++#define TDX_MAX_CMRS	32
++struct tdx_sys_info_cmr {
++	u16 num_cmrs;
++	u64 cmr_base[TDX_MAX_CMRS];
++	u64 cmr_size[TDX_MAX_CMRS];
 +};
 +
-+/* Bit definitions of TDX_FEATURES0 metadata field */
-+#define TDX_FEATURES0_NO_RBP_MOD	_BITULL(18)
-+
- /* Class "TDX Module Version" */
- struct tdx_sys_info_version {
- 	u16 major;
-@@ -123,6 +138,7 @@ struct tdx_sys_info_tdmr {
- };
- 
+ /* Class "TDMR info" */
+ struct tdx_sys_info_tdmr {
+ 	u16 max_tdmrs;
+@@ -140,6 +151,7 @@ struct tdx_sys_info_tdmr {
  struct tdx_sys_info {
-+	struct tdx_sys_info_features	features;
+ 	struct tdx_sys_info_features	features;
  	struct tdx_sys_info_version	version;
++	struct tdx_sys_info_cmr		cmr;
  	struct tdx_sys_info_tdmr	tdmr;
  };
+ 
 -- 
 2.46.2
 
