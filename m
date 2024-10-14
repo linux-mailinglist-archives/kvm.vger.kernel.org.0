@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-28813-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28814-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0D9F99D79F
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 21:42:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAB3899D7A6
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 21:47:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6024B284141
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 19:42:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63E2D1F23055
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 19:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD631CCB51;
-	Mon, 14 Oct 2024 19:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8641F1CCED8;
+	Mon, 14 Oct 2024 19:47:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnMCbWtt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T9duOHWN"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC93C1CC158
-	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 19:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221421C9B7A
+	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 19:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728934962; cv=none; b=D2WvbRBwWglsIpuS4sOxVDG2I21P2TfPNwIJQKLKcFfhSvZssy/Q2GcgSATphgsNnguYSHIyGxv05BLNt4owQTbmUhmc+dw7Vnrq87/O7zB6qumdQUTqFiYt1de+eK5oUeYX9p63iZna/0EOaItDgN2xJP2DthfliGMSurMTtP4=
+	t=1728935241; cv=none; b=Iqkj4UZxNnFxX6CR/k4HxryRO7x8R5pTvSQ4WHvEWfEwSfiK5wMP8EjhAk1Tl0NG86x3D7pIy+On9pN9k9ESvcr2VGo1sW0/hCHEiuiki96xyXFJTP8o8dXwp4XbQN6qvZLpSM4ZHRg3JaKRnQ3NEmAIrnzVJL70rsq5MXB79Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728934962; c=relaxed/simple;
-	bh=nSN91k0MDx/3jclGR0DMRDh9nWAKkddvoKTi4MHkZc8=;
+	s=arc-20240116; t=1728935241; c=relaxed/simple;
+	bh=hNsPGQlN+tgxXlyGzBEoHTvHqz1DcphwD6h1Bbjfk0w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WY6T2/A0kJjHVfNF4CEEHDMxZqFbvwB3StpL6RNpTc7wK8Wf/vA0mAOiiI/1ZIyslewZha5Lde8GKGvM8RmRLUTwrGMrjue/ooWlJGGy9EdPZ4Cpwnp0w40GzvCBfOPd+hbS7fsj/XC1U0gpAt/brE99LlHMbUzwJsOv5iqINQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WnMCbWtt; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=oWaIbCNZtO77jk5sSMHYDNLWRveaPk6cn/dg9FkXtAbb7IdP2fu33a/hgU8ASxZayvtgk/KgdpEWATUytkI5b4mMBQCyMXaSMHHXcet83gVT/0GvSGHeYEdit4qwfpyXGGC6giHnTMk9RsmqXh0JqBPcZxVUN4/JoyHTlOiHeEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T9duOHWN; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728934958;
+	s=mimecast20190719; t=1728935239;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=30ySL8mOnC3+G7jE5IBbcnE7C3MkhR8Ag1bijqKHz78=;
-	b=WnMCbWttxIcAt2BEwvZtev0L8B4Fa6YV3scWc/B/onqHdgX+ckKtbO6CADBuzWIPEV/0wg
-	bDoJZQonXsYk7QR3IsxKN/N1Ry4WmOqkuEPs6bbaBcLZOCNL+qyD5SQpS3j9W0JmW105w0
-	8DSLoBtYc7RdozRKlWz7zQSbJvoKodc=
+	bh=9f+jPSSrcKbUmnkY+49+BdbeWERKSiibXu+1oFdZXw8=;
+	b=T9duOHWNIA735VdZp2nMT4z9OQDxoXqz9BY2HpMXu3piOt3NUCkA/rRzaziyltAd3e7L1V
+	lBPfnMZtSaq9ZvaoOmcxNUGNa1WpiU9d1JS8aghDYIBxv2inrySeh4qVvxbxNh14o40j0/
+	nYxDyZgEMQuSKae71RPUWfRnllj66zA=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-296-tLBqBSfpNROt4tlySemgYg-1; Mon, 14 Oct 2024 15:42:37 -0400
-X-MC-Unique: tLBqBSfpNROt4tlySemgYg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d4d51b4efso1741956f8f.3
-        for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 12:42:37 -0700 (PDT)
+ us-mta-164-9ai9M3xGPsuEZs_PXKRR4A-1; Mon, 14 Oct 2024 15:47:17 -0400
+X-MC-Unique: 9ai9M3xGPsuEZs_PXKRR4A-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d39bf2277so1655399f8f.2
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 12:47:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728934956; x=1729539756;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=30ySL8mOnC3+G7jE5IBbcnE7C3MkhR8Ag1bijqKHz78=;
-        b=Fh98GOcbmE7NG8cTTUSr3ZXyWVRe8dWQVnzKV9b8bSWDwEqW+jOrQ6MYPkaYPPkJGl
-         Z5omOeM14zQtxbDqMuNujfJAGAXjP6jOmqi4dKJhxF6sLCKb0Cte/ZaY9fjkHmtotvGO
-         t/5UgDpQzzCFiAsJ/0RLGElvBRhrY/ADC7MLOHCK+2ZDQcw7+37Rd8WDl/01lGNl0pd0
-         mHy3xG0oDzGqnn/nFLlFr+R0ToW5st5+3eioWvS7FVT+DwPg3pkt4IfJKE9hUOXeiyeJ
-         6bgAK+3s/xgqahtq1xU9yC/Jl26Y776R+Wd5Ozpigsm3LNaMk6lHmC7vlDQXLV0Jlo79
-         uTjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXr56xqEV07GsM3F9RR9YePTqIVRpGGTfMcovhhF6IVifjhVVSzcqlqdCGewgiycU9A60I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOdh7PAb9gygs5FmsCr75IODJ/+VtO/ifkcHpOnb87blQs79mg
-	qvmRBWxkJ9vDuHA2oMNoKWv8+l9D/rE0AzJB//PpkMe7XTCFnAzs14k4HPy/wJ5lRoLum9ww6CL
-	r5G9FgcWt17mf3tWy8a8HfP7MwuPLtn7luZrVDy3JCT6iDaH+aQ==
-X-Received: by 2002:a5d:4dc6:0:b0:37d:4818:f8b1 with SMTP id ffacd0b85a97d-37d5529b195mr9208878f8f.39.1728934956341;
-        Mon, 14 Oct 2024 12:42:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHg9eyNRc80Vvm3HusKUJW8fJac5WJyw4VreDan/GeWLXPz1wjvXZOk8pOZkz4a6HZCd2pEoA==
-X-Received: by 2002:a5d:4dc6:0:b0:37d:4818:f8b1 with SMTP id ffacd0b85a97d-37d5529b195mr9208853f8f.39.1728934955884;
-        Mon, 14 Oct 2024 12:42:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728935236; x=1729540036;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9f+jPSSrcKbUmnkY+49+BdbeWERKSiibXu+1oFdZXw8=;
+        b=T9mMFPN5cb7+FJnseq1YRkF2rL+1GRVSZFN+WPKfE6V9QukqIYsoa0tP9aaR2+mvKh
+         vQDoNiNpPmdp8tvoayZBcI4+nsScAJ0u8Cu/8v0wNJeE0vK1NRwpgrhLxAPR9ecGePQR
+         owiE+idyUeHVryw6HlzBMq5N8Rnf74F9C7d4EwIjUVs7EhLcKmK6aziRb68w+5yN8jre
+         8TQYibQ+bUJEhrfzqMMf2XY1fD1fEpPn/ERkZ0qha5p3rHAFQOUZi+icJghLYXQJglCz
+         LFPa4E2BHSYIDk0T4M9NYhcDU3wCtyG1Lgh5sfr7tp+cZv1d0BvIq6kFiqeT+SFTKMtO
+         C86A==
+X-Forwarded-Encrypted: i=1; AJvYcCWHlCBwz+I2+dBr9hynIgnwWRl0aKQNiLEP8x3uACja8FlWmmv3RhHm70VFzhkzRMgETYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7O15wCCe8OnYMGvBYCuq1LE47kFMWBq1WblEukGbpNYUXEpBC
+	wwr+na1RvgW39RsbzYM/qMkKLTovvYlPxAQIR/ZtqLE1ft7TuPybq9iDXLREvnqwKuUAIdjoV3Y
+	w8rTj+oxktZ8OnURA/KV1vN+bIOZgGR0saFK90NnoOPIAKXnD+Q==
+X-Received: by 2002:adf:e608:0:b0:37d:4fe9:b6ae with SMTP id ffacd0b85a97d-37d5519881bmr7870038f8f.7.1728935236488;
+        Mon, 14 Oct 2024 12:47:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGqcjEvb1jHHdnO97vII/IN5GoQk3c9Wr+EG2efmydey9JQVPNjY/EMzI1ifTzURmILDRW9Ww==
+X-Received: by 2002:adf:e608:0:b0:37d:4fe9:b6ae with SMTP id ffacd0b85a97d-37d5519881bmr7870025f8f.7.1728935236015;
+        Mon, 14 Oct 2024 12:47:16 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c71e:600:9fbb:f0bf:d958:5c70? (p200300cbc71e06009fbbf0bfd9585c70.dip0.t-ipconnect.de. [2003:cb:c71e:600:9fbb:f0bf:d958:5c70])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b6bfc8csm12271623f8f.45.2024.10.14.12.42.34
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b79f69dsm12226388f8f.81.2024.10.14.12.47.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Oct 2024 12:42:35 -0700 (PDT)
-Message-ID: <59199850-f9cd-4249-92b5-40904facc11b@redhat.com>
-Date: Mon, 14 Oct 2024 21:42:34 +0200
+        Mon, 14 Oct 2024 12:47:14 -0700 (PDT)
+Message-ID: <177ca9d5-9fc7-4f43-83fb-ea5105621cc8@redhat.com>
+Date: Mon, 14 Oct 2024 21:47:13 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/7] s390/physmem_info: query diag500(STORAGE LIMIT) to
- support QEMU/KVM memory devices
+Subject: Re: [PATCH v2 7/7] s390/sparsemem: reduce section size to 128 MiB
 To: Heiko Carstens <hca@linux.ibm.com>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
@@ -99,10 +98,10 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  <eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
  Jonathan Corbet <corbet@lwn.net>, Mario Casquero <mcasquer@redhat.com>
 References: <20241014144622.876731-1-david@redhat.com>
- <20241014144622.876731-5-david@redhat.com>
- <20241014184339.10447-E-hca@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
+ <20241014144622.876731-8-david@redhat.com>
+ <20241014175335.10447-B-hca@linux.ibm.com>
 Content-Language: en-US
+From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -148,67 +147,62 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20241014184339.10447-E-hca@linux.ibm.com>
+In-Reply-To: <20241014175335.10447-B-hca@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 14.10.24 20:43, Heiko Carstens wrote:
-> On Mon, Oct 14, 2024 at 04:46:16PM +0200, David Hildenbrand wrote:
->> To support memory devices under QEMU/KVM, such as virtio-mem,
->> we have to prepare our kernel virtual address space accordingly and
->> have to know the highest possible physical memory address we might see
->> later: the storage limit. The good old SCLP interface is not suitable for
->> this use case.
+On 14.10.24 19:53, Heiko Carstens wrote:
+> On Mon, Oct 14, 2024 at 04:46:19PM +0200, David Hildenbrand wrote:
+>> Ever since commit 421c175c4d609 ("[S390] Add support for memory hot-add.")
+>> we've been using a section size of 256 MiB on s390 and 32 MiB on s390.
+>> Before that, we were using a section size of 32 MiB on both
+>> architectures.
 >>
->> In particular, memory owned by memory devices has no relationship to
->> storage increments, it is always detected using the device driver, and
->> unaware OSes (no driver) must never try making use of that memory.
->> Consequently this memory is located outside of the "maximum storage
->> increment"-indicated memory range.
->>
->> Let's use our new diag500 STORAGE_LIMIT subcode to query this storage
->> limit that can exceed the "maximum storage increment", and use the
->> existing interfaces (i.e., SCLP) to obtain information about the initial
->> memory that is not owned+managed by memory devices.
->>
->> If a hypervisor does not support such memory devices, the address exposed
->> through diag500 STORAGE_LIMIT will correspond to the maximum storage
->> increment exposed through SCLP.
->>
->> To teach kdump on s390 to include memory owned by memory devices, there
->> will be ways to query the relevant memory ranges from the device via a
->> driver running in special kdump mode (like virtio-mem already implements
->> to filter /proc/vmcore access so we don't end up reading from unplugged
->> device blocks).
->>
->> Tested-by: Mario Casquero <mcasquer@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>   arch/s390/boot/physmem_info.c        | 46 ++++++++++++++++++++++++++--
->>   arch/s390/include/asm/physmem_info.h |  3 ++
->>   2 files changed, 46 insertions(+), 3 deletions(-)
+>> Likely the reason was that we'd expect a storage increment size of
+>> 256 MiB under z/VM back then. As we didn't support memory blocks spanning
+>> multiple memory sections, we would have had to handle having multiple
+>> memory blocks for a single storage increment, which complicates things.
+>> Although that issue reappeared with even bigger storage increment sizes
+>> later, nowadays we have memory blocks that can span multiple memory
+>> sections and we avoid any such issue completely.
 > 
-> ...
+> I doubt that z/VM had support for memory hotplug back then already; and the
+> sclp memory hotplug code was always written in a way that it could handle
+> increment sizes smaller, larger or equal to section sizes.
+ > > If I remember correctly the section size was also be used to 
+represent each
+> piece of memory in sysfs (aka memory block). So the different sizes were
+> chosen to avoid an excessive number of sysfs entries on 64 bit.
+ > > This problem went away later with the introduction of 
+memory_block_size.
 > 
->> +static int diag500_storage_limit(unsigned long *max_physmem_end)
->> +{
->> +	register unsigned long __nr asm("1") = 0x4;
->> +	register unsigned long __storage_limit asm("2") = 0;
->> +	unsigned long reg1, reg2;
->> +	psw_t old;
-> 
-> In general we do not allow register asm usage anymore in s390 code,
-> except for a very few defined places. This is due to all the problems
-> that we've seen with code instrumentation and register corruption.
+> Even further back in time I think there were static arrays which had
+> 2^(MAX_PHYSMEM_BITS - SECTION_SIZE_BITS) elements.
 
-Makes sense. Note that I was inspired by GENERATE_KVM_HYPERCALL_FUNC 
-that also still uses register asm usage.
+Interesting. I'll drop the "Likely ..." paragraph then!
 
 > 
-> The patch below changes your code accordingly, but it is
-> untested. Please verify that your code still works.
+> I just gave it a try and, as nowadays expected, bloat-o-meter doesn't
+> indicate anything like that anymore.
+> 
+>> 128 MiB has been used by x86-64 since the very beginning. arm64 with 4k
+>> base pages switched to 128 MiB as well: it's just big enough on these
+>> architectures to allows for using a huge page (2 MiB) in the vmemmap in
+>> sane setups with sizeof(struct page) == 64 bytes and a huge page mapping
+>> in the direct mapping, while still allowing for small hot(un)plug
+>> granularity.
+>>
+>> For s390, we could even switch to a 64 MiB section size, as our huge page
+>> size is 1 MiB: but the smaller the section size, the more sections we'll
+>> have to manage especially on bigger machines. Making it consistent with
+>> x86-64 and arm64 feels like te right thing for now.
+> 
+> That's fine with me.
+> 
+> Acked-by: Heiko Carstens <hca@linux.ibm.com>
+> 
 
-Below LGTM, I'll give it a churn, thanks!
+Thanks!
 
 -- 
 Cheers,
