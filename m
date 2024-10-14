@@ -1,293 +1,233 @@
-Return-Path: <kvm+bounces-28717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28718-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A02EB99C446
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 10:57:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5776899C4AB
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 11:05:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D251285EE5
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 08:57:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16AF72843F4
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2024 09:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A9F155300;
-	Mon, 14 Oct 2024 08:57:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D02155CBF;
+	Mon, 14 Oct 2024 09:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HE6pa4kP"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Sh3Tb7wU";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="v5Zj8dfo";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Sh3Tb7wU";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="v5Zj8dfo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF30C15747A
-	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 08:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728896220; cv=fail; b=KECPTMfOWxowXnPysWuA6O6dPyMBM9Eoy+PCho54pgXNIjqLvd7bFrUwClPD2VCbrLsS9yIwhHpTIvLtVSXTu2DVTomMECIj+oUs1Dkio8Wd8Hm9oo5mVpIHJ0qxIHDC092Add3Cn/UiQ7X/p5Cx5NsJfBNvzuyKj8ICCaEspNg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728896220; c=relaxed/simple;
-	bh=nWtyiBGIor5Eij/KIrU3GZYFuPJPEeKs1WeK69HmFvI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=GxTK8VHbS1ZKs/tYdBFxPSTLMu3ffYch+TL099ui5LrZJ91xweJfjkk8qZysqzbW+pvlGLGgXl1pqMRwdRRk6rHBh04r1fgpptbU/c0uDS18Dh0jUDcgjIBsjj2VvVodP5GLIJ0SLHr3YDRIAf2paH6tMMfySilVOd6pZnsfQuI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HE6pa4kP; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728896219; x=1760432219;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=nWtyiBGIor5Eij/KIrU3GZYFuPJPEeKs1WeK69HmFvI=;
-  b=HE6pa4kPL4N/F4yYfIGf24cwQn4D+5q0xAX/tSAhe2TkY7LKQCBQUGuV
-   fGY0LQtabOiGEqDge6Oypxc5CYKw4ex2IoMsEN/Qpumh82KTOFCYp6CxD
-   bpYk6ih2gpu7D+N4HI17fynijGLSRA0Rpds2TPqR94CBZbq+ypywpFfkc
-   NpVu1/w6aeA8+dedEH09dE/37BvIakEVSCyEs9rpU9dSsXock1DDQzjDm
-   Dnhica2gGt0pbp2UczSnPNH7qI2GHKVJMj8bCkgsKEggN81I9svzuIxW9
-   79fdQB3YuGzrFdMmhCTGGCCFJiw5Vm0fDf4RnDux774TzLzs6xUaVvUep
-   w==;
-X-CSE-ConnectionGUID: AuhfIfBZR16fb2hTcP4NDg==
-X-CSE-MsgGUID: JfVObSY/QJuh+1/P9mTBvA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11224"; a="28316643"
-X-IronPort-AV: E=Sophos;i="6.11,202,1725346800"; 
-   d="scan'208";a="28316643"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 01:56:58 -0700
-X-CSE-ConnectionGUID: MyS0cuPWSrSvUatuFeKxXA==
-X-CSE-MsgGUID: vqDIQnwlQhSnHdQ2LqZtgg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,202,1725346800"; 
-   d="scan'208";a="82539836"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Oct 2024 01:56:57 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 14 Oct 2024 01:56:56 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 14 Oct 2024 01:56:56 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 14 Oct 2024 01:56:56 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.47) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 14 Oct 2024 01:56:56 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Z7amhhHW0emLtNqxHX4diJh+ir6KKeZ4xJ7rTskmDgV6zZtGKUKWo1PKXgKslm7qu5omDCVffHcc/gDIoTV81T6yZ91/X6ezgKmLuTpWWMgAl+OSEGG3ssvx4T87JIMT/ZjWt6rFwl/Y7zSlRjSfMqKZMNAcDDISwP0JeBJ24nQZokxwORS2VxTrPzYzi/ZkUOmnHCmE8/XbMxGy7KgA3VdwG+Ax+ukTM96TMQD7Ijd2gHGBnJJZIhTsgnfigNd1M4vDib1wpidSFh5Ay65E7+8NK5UpF3GDFTWiYR2udW+1clXkUz443siFJRU3O0fXiqsZgA6GIYDM1b4vLRa8jg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O8+uWLuxi/dz6oG+9a8LnYLUxzxj4VLUy0fmyw9AELg=;
- b=Fz7X0z6jT/wJzuIyn5F5I3iiiITyKygAMnsqGcqG5NZNiRMf0mUXTez7IiIP4xmzIz+Uz5lHzYNj04e62YYOQ+WxaFr621BUCCymovM/OryrBmaLfRGtdbSaG0LWUbc9AOdvlSZQEgd09jtJNoWKGlSTY/QZTOcuOjVhuWBSQE7fUQJTVbkOlnN52L65f7HqZrfUAofOHtWgDRoyqUbrHg9HenIu/qOhqhEJ5Xe5bDi5uN23XBkAZBIAv0+QV9iCkipVOgpVeU6H2kTHVoCGa6rk/cjKPRTC5GuRIOF78tHHrBDJWKFEyLk5I1rKq3oZ5lrJi7uqtIWFLFOx+gCLlw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by CY8PR11MB6988.namprd11.prod.outlook.com (2603:10b6:930:54::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.24; Mon, 14 Oct
- 2024 08:56:54 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.8048.017; Mon, 14 Oct 2024
- 08:56:54 +0000
-Date: Mon, 14 Oct 2024 16:56:46 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Like Xu <like.xu.linux@gmail.com>
-CC: <kvm@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
-	<seanjc@google.com>, <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 0/5] nVMX: Simple posted interrupts test
-Message-ID: <ZwzczkIlYGX+QXJz@intel.com>
-References: <20231211185552.3856862-1-jmattson@google.com>
- <7fe8970c-ecb7-4e46-be76-488d7697d8db@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <7fe8970c-ecb7-4e46-be76-488d7697d8db@gmail.com>
-X-ClientProxiedBy: SI2PR01CA0014.apcprd01.prod.exchangelabs.com
- (2603:1096:4:191::17) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8A913AA53
+	for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 09:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728896746; cv=none; b=JpVHlFDZye2mDFYlkRFdp0fvfQp/8Lvod5zXz5hNtroH8IAUJ3z6YNAAYgZq07AgjuRpsMWfNsnko8kGA72C9jcC0M2MLasWw8NMcR9zVOnGqNUmcqaz3yCJgiwndWnSYjAmmOxtC4CEmfTrlziG+tdc3MaL5Z19/EZEhrmQrYQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728896746; c=relaxed/simple;
+	bh=fQtTkZoM/MSJGdvoJjSyi3rrNl5eJrIR6m2L86/0HVs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UPKQwTvUHALVX+yzuGG2MCoIIAY8zaPT1tvXrzXFCpbyY0XR9N5yRl1rGwWe3Tm+rA6BW9YM7oppE6hJIQKcmmBz4WTxtt1FSyoBqzij2LXuxHmWNj6vAN9L/GN/FdypSapLsegUjlbH7hwspRFMT0g9yAGPvU6kt8BaaurZs3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Sh3Tb7wU; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=v5Zj8dfo; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Sh3Tb7wU; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=v5Zj8dfo; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 5425F1F785;
+	Mon, 14 Oct 2024 09:05:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1728896742; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=YOL6B5GbHpYvBKABl6mTUS3xILlO6l387Hou8UX58CE=;
+	b=Sh3Tb7wUbur/FpyI1W9CayvB2R2a7MHdswF+zq7FQz944q0pwokuOj040xMnn+gy3JzNHN
+	vUs0CMAPmRxaGOFR84l7bIUtixSYcw1nBgF2A1G1OJ6EDE3TASAp+bJpUcV8XDOoOjP61P
+	UsMePSR8BAiS7CvGV/jNGOZCwu8NopQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1728896742;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=YOL6B5GbHpYvBKABl6mTUS3xILlO6l387Hou8UX58CE=;
+	b=v5Zj8dfoUiAG1lqv3gjoNDMikl/75xHzz68HpAwf4dTJUqP2PlslYsRYMTVbbdhEo23a0d
+	67/T101i7Zc1STBQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Sh3Tb7wU;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=v5Zj8dfo
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1728896742; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=YOL6B5GbHpYvBKABl6mTUS3xILlO6l387Hou8UX58CE=;
+	b=Sh3Tb7wUbur/FpyI1W9CayvB2R2a7MHdswF+zq7FQz944q0pwokuOj040xMnn+gy3JzNHN
+	vUs0CMAPmRxaGOFR84l7bIUtixSYcw1nBgF2A1G1OJ6EDE3TASAp+bJpUcV8XDOoOjP61P
+	UsMePSR8BAiS7CvGV/jNGOZCwu8NopQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1728896742;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=YOL6B5GbHpYvBKABl6mTUS3xILlO6l387Hou8UX58CE=;
+	b=v5Zj8dfoUiAG1lqv3gjoNDMikl/75xHzz68HpAwf4dTJUqP2PlslYsRYMTVbbdhEo23a0d
+	67/T101i7Zc1STBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4595913A79;
+	Mon, 14 Oct 2024 09:05:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id IjqQEObeDGdjfwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 14 Oct 2024 09:05:42 +0000
+Message-ID: <0f47fad8-50ef-425b-8954-38c26cc0a054@suse.cz>
+Date: Mon, 14 Oct 2024 11:05:42 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|CY8PR11MB6988:EE_
-X-MS-Office365-Filtering-Correlation-Id: a16ef063-ce7b-4e72-e68a-08dcec2e26c0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?V5J/SVgVFCulhmfuxQgDAEB7DUOaVxIgmt+YnTr7eq8XBnDDLl3fM/6psSVz?=
- =?us-ascii?Q?cg/6/Mh5KCPhhzf0SetpRBBVs+VEpForTP/QFSlw5BTsYFoo195ahDG4KqvP?=
- =?us-ascii?Q?6+6jAvOgv/OWmCMSVToi1vMTnkkDpVHp+yY3tP8MdeiWmdERc9ny4Oca/eHl?=
- =?us-ascii?Q?uvDeQMsk8B/eV7JUyVxMrfeyuSbGtrUu2l6i3SHLRFShvTYpBZaZu6CEDkOl?=
- =?us-ascii?Q?TZgcI4QCOFl4+rLc/h40wOKpxbqB4xi+WSNjOIqNnqqbkGyOOB/e5390ZlSx?=
- =?us-ascii?Q?h5LgMgU3yt8uSsha4R8YbD+Z6MjWhxQT06eNGWrZ64Ld85LAybn1QBVEIUE1?=
- =?us-ascii?Q?MoUgaObxcj+01wii/yHYeBXtZei1hitcN71u0PI+HsrWWG9ffdTLBkYFD1sU?=
- =?us-ascii?Q?09Qh+VnDcX0aQqbgp+9swezvF2opNVWhFBozTv5aTX2ry6mPzWmkF4xrxPsH?=
- =?us-ascii?Q?skXobJiqcRpVJ14xQ9igaZ/DtvtKrUa55dJMz87oGwCcA3eNuCikBdXGG4TX?=
- =?us-ascii?Q?IcA6qrYqBU3skUHnTF6uJCEHG7HjipDTZz10AfiRUTKKenosHZT8BRmxXSYt?=
- =?us-ascii?Q?SPIcfbyK0UYSp1A5OynIVVGDC8pROX1ufJ8bz0dIFjtIeiFfqtzmp0hqAK5v?=
- =?us-ascii?Q?khx42gdpi/m0OzaCc3mcRx/RevIna9YiS4JKSXuvie7gSIwPoSDjsA7Y8B2X?=
- =?us-ascii?Q?JEcwJwJHQYMzru02fgAuCIM/acwbJK2az4KMN1k5e47v2xR07CMZtjdzMwLB?=
- =?us-ascii?Q?vwbyK6hiMtwyM2NRsRqF/02eW28kBPDU0IUoPOEAZnwsd6vkdwBNZ3Xv2Amd?=
- =?us-ascii?Q?A9i88tdcBEHvugCwYO1oRMCCa3if5yALhtbM/mB1tVECiXQrMl/OQgJtMXqL?=
- =?us-ascii?Q?uI3GvX2y5aedduJbyODuTmXIaXsLae5MoxZteJ5GGjTP/GowlrgLXLJ1tTFu?=
- =?us-ascii?Q?y6n+r7ABi2f0x13BjiwCNHqkQSG+DfC7A2xGc/bSIXgCiPV5fPVv5M4IKS/A?=
- =?us-ascii?Q?uRQLX7ZYC4LucvqOn9FHyt1wa+Li6pzn49YzbDlbW12DtKv+/r6vZGiQXMi4?=
- =?us-ascii?Q?aecbWgkN4ivkyI79R+K/MWRYxmvXMqRD+y2S0+n5FM0Y3kPUjg92R807rc3e?=
- =?us-ascii?Q?hXuagWP+XKHQKmybN9BHrmPqT8vY3Uc+I3LC+1Dy+a7+g/H2Nfw3eIf7cI4M?=
- =?us-ascii?Q?gbZDAzSbif24yKzOv7l5ahOfGFTCK8CwrR3kxMHsoGCLso5l1s7vZ+51xKak?=
- =?us-ascii?Q?86CDSPZj4XrlKFBvwKRAMdxPVccYxoDEOkFiiY5l4Q=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GZcr2mgZVqBZLKzRFrCZngqkubondsTj165EzUTiBfc0Z5dg6iMZTp0NZlxw?=
- =?us-ascii?Q?1K687MFlfYJq/04xeAGVARlhi/H6jBUbKhnnTT3bwM4rCVccekWhOHcDimcw?=
- =?us-ascii?Q?1suSdxnotg+iFRH9UEaCLYv+PcPTFIQSJ7cHIV4cc0NhW/4SOld6tmx/z/0d?=
- =?us-ascii?Q?XkjHPGEeMftoDocQNRzidJMynELL/kRENLZ6GOcbtBMt0fb+TX3IzG8SJvRB?=
- =?us-ascii?Q?CFiAY/Ip4wfQWh++LvDHciPlz2b0md1PgWXCi/iBstqvsD9UoAuHG4hrxy/Z?=
- =?us-ascii?Q?0mpvjLeo/EZSzCS700ammI/B5RkSpV3Eo4iRLpOfw9Va0LA76Dsx9V69s+LB?=
- =?us-ascii?Q?cy2wxrrSu9/qxASqz9EKIIQqrXkEJlNN2f2D4mQ1Y3gGIm74EaHxonkzQ63i?=
- =?us-ascii?Q?FaOeN3Z77oTJuoH5TweJqthygpsUaVEz5GdworIgg47J+jwZVUOITyWXk+Bk?=
- =?us-ascii?Q?Xq8E80MFtEbunWy/Mfe/cMQQjceiRLVW8cjppVDkiG2pL9g60p5GdAfHOH1C?=
- =?us-ascii?Q?oBtOIMBG1ORP8LHJIU5DDZZVzfu6dx/MepEgYd0qPRDzbCyYU8enJnwUhNq4?=
- =?us-ascii?Q?UkwrXErxGly4ZGMBq8SGNc9pMDWrdDNPava3HD5FbnB6pqnjUJvxmnv62CNB?=
- =?us-ascii?Q?LdHpoPMvhbnvspqyw8DPK7uBKf4SjLPrPbdDLUvr5dLL094kSk9Db3Q6E973?=
- =?us-ascii?Q?v0reEgkU9/9ZoVc05jfaB9UoEZXexGK9TSC+xgN1Lfx1WYxgD1RzxGT5B6YF?=
- =?us-ascii?Q?MgbpALDG7MunN0A8VmvrG3ApmlaulACPp9Ok6OxwrYmXDo5qyYCbsAq1t9cW?=
- =?us-ascii?Q?vggLQSDfxqn5IplEv48XS7RqViOE3fkAtNpaqZd2lJDw2qLHrhZGJnfy6fuK?=
- =?us-ascii?Q?qKRSkBd5k0eBTmyLJWBrHN44dMVmZYqxDOjSZPLOVRrv6Z3jPswllyamJEtC?=
- =?us-ascii?Q?3/RB8aiRX3hX/DM01Crlp7xhXxbKBYQNVQnoywRnAZ+CVabnvnIOD3UGAsvA?=
- =?us-ascii?Q?vdNqIbLEuU9auu2m4lPM0cY6esa5bttZXxJUSXzll6ssoD5BQgu3Kr+sm7At?=
- =?us-ascii?Q?cPcr48e6ay5867xZ3E5ztqGgpeGnaStb6IjLHWUTngAy4tH86vf7jHb6WTMK?=
- =?us-ascii?Q?aygrL5tHwIhPfK2MmKEbqjt3l1SfBONl4kw9U4k/fSmwLrEtDOSX4/MkxvQt?=
- =?us-ascii?Q?bRl08eC96TXalajdlCUJMQkGx8kKUYW7Z6DEUvr+4mIbXPcMkOoLiy/IKrsJ?=
- =?us-ascii?Q?e+UvI5fY2P60OAXyaWDhsN20luxjFC/6JBuYUeyMHuT7MWFBEXU+SJtY4LnZ?=
- =?us-ascii?Q?zZmUlgi+PJ8odS/CvsSC8OrPFzFEGmLbFdJMW3/fKFYqxRXX8kVhiQOSFQeY?=
- =?us-ascii?Q?UAROJDirZK8F1ctVhRjiT1xm7Rfw9h69KLdNPxdK1r9iTwymugrE9gYcGtuo?=
- =?us-ascii?Q?GLKVcdIpEdZgmW8Pxypg6Ym+cdRG7WQzoaSCsTP6Sc/BZblSZE8et9JD36lj?=
- =?us-ascii?Q?LzxfY9mI0oFo88NINoWQMBdWPFVrkXTyq7ioEi3qO8g6fCb8xYI7tDJl0SA+?=
- =?us-ascii?Q?po3WfcN6fhMDp0CcPKk9jqjVEQdbQ2fnUn7inBNw?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a16ef063-ce7b-4e72-e68a-08dcec2e26c0
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2024 08:56:54.5869
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o4njZ31UCN/oNKVKp2yw8bdmKoa2fA+SocLglJksCZQhg4Wj3BEAZakToHjTYIYU6aXk+qewusvfrPfti9KwwQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6988
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: Proposal: bi-weekly guest_memfd upstream call
+Content-Language: en-US
+To: Ackerley Tng <ackerleytng@google.com>,
+ David Hildenbrand <david@redhat.com>
+Cc: linux-coco@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <diqzy12vswvr.fsf@ackerleytng-ctop.c.googlers.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <diqzy12vswvr.fsf@ackerleytng-ctop.c.googlers.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 5425F1F785
+X-Spam-Score: -4.51
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On Wed, Oct 09, 2024 at 02:48:28PM +0800, Like Xu wrote:
->On 12/12/23 2:55 AM, Jim Mattson wrote:
->> I reported recently that commit 26844fee6ade ("KVM: x86: never write to
->> memory from kvm_vcpu_check_block()") broke delivery of a virtualized posted
->> interrupt from an L1 vCPU to a halted L2 vCPU (see
->> https://lore.kernel.org/all/20231207010302.2240506-1-jmattson@google.com/).
->> The test that exposed the regression is the final patch of this series. The
->> others are prerequisites.
->> 
->> It would make sense to add "vmx_posted_interrupts_test" to the set of tests
->> to be run under the unit test name, "vmx_apicv_test," but that is
->> non-trivial. The vmx_posted_interrupts_test requires "smp = 2," but I find
->> that adding that to the vmx_apicv_tests causes virt_x2apic_mode_test to
->> fail with:
->> 
->> FAIL: x2apic - reading 0x310: x86/vmx_tests.c:2151: Assertion failed: (expected) == (actual)
->> 	LHS: 0x0000000000000012 - 0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0001'0010 - 18
->> 	RHS: 0x0000000000000001 - 0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0001 - 1
->> Expected VMX_VMCALL, got VMX_EXTINT.
->> 	STACK: 406ef8 40725a 41299f 402036 403f59 4001bd
->> 
->> I haven't investigated.
->
->This vmx_apicv_test test still fails when 'ept=N' (SPR + v6.12-rc2):
->
->--- Virtualize APIC accesses + Use TPR shadow test ---
->FAIL: xapic - reading 0x080: read 0x0, expected 0x70.
->FAIL: xapic - writing 0x12345678 to 0x080: exitless write; val is 0x0, want
->0x70
->
->--- APIC-register virtualization test ---
->FAIL: xapic - reading 0x020: read 0x0, expected 0x12345678.
->FAIL: xapic - writing 0x12345678 to 0x020: x86/vmx_tests.c:2164: Assertion
->failed: (expected) == (actual)
->	LHS: 0x0000000000000038 - 0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0011'1000
->- 56
->	RHS: 0x0000000000000012 - 0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0000'0001'0010
->- 18
->Expected VMX_APIC_WRITE, got VMX_VMCALL.
->	STACK: 406f7f 40d178 40202f 403f54 4001bd
+On 10/10/24 19:14, Ackerley Tng wrote:
+> David Hildenbrand <david@redhat.com> writes:
+> 
+>> Ahoihoi,
+>>
+>> while talking to a bunch of folks at LPC about guest_memfd, it was 
+>> raised that there isn't really a place for people to discuss the 
+>> development of guest_memfd on a regular basis.
+>>
+>> There is a KVM upstream call, but guest_memfd is on its way of not being 
+>> guest_memfd specific ("library") and there is the bi-weekly MM alignment 
+>> call, but we're not going to hijack that meeting completely + a lot of 
+>> guest_memfd stuff doesn't need all the MM experts ;)
+>>
+>> So my proposal would be to have a bi-weekly meeting, to discuss ongoing 
+>> development of guest_memfd, in particular:
+>>
+>> (1) Organize development: (do we need 3 different implementation
+>>      of mmap() support ? ;) )
+>> (2) Discuss current progress and challenges
+>> (3) Cover future ideas and directions
+>> (4) Whatever else makes sense
+>>
+>> Topic-wise it's relatively clear: guest_memfd extensions were one of the 
+>> hot topics at LPC ;)
+>>
+>> I would suggest every second Thursdays from 9:00 - 10:00am PDT (GMT-7), 
+>> starting Thursday next week (2024-10-17).
 
-These failures occur because KVM flushes TLB with the wrong VPID, causing TLB
-for the 'APIC-access page' to be retained across nested transitions. This TLB
-entry exists because L1 writes to that page before entering the guest, see
-test_xapic_rd():
+works for me!
 
-        /* Setup virtual APIC page */
-        if (!expectation->virtualize_apic_accesses) {
-                apic_access_address[apic_reg_index(reg)] = val;
-                virtual_apic_page[apic_reg_index(reg)] = 0;
-        } else if (exit_reason_want == VMX_VMCALL) {
-                apic_access_address[apic_reg_index(reg)] = 0;
-                virtual_apic_page[apic_reg_index(reg)] = val;
-        }
+> 
+> This time works for me as well, thank you!
+> 
+>>
+>> We would be using Google Meet.
+> 
+> Thanks too! Shall we use http://meet.google.com/wxp-wtju-jzw ?
 
+So is it going to be this one?
 
-Specifically, in the failing scenario, EPT is disabled, and VPID is enabled in
-L0 but disabled in L1. As a result, vmcs01 and vmcs02 share the same VPID
-(vmx->vpid, see prepare_vmcs02_early_rare()), and vmx->nested.vpid02 is never
-used. But during nested transitions, KVM incorrectly flushes TLB using
-vmx->nested.vpid02. The sequence is as follows:
+> 
+> And here's a calendar event if you'd like notifications:
+> https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=NDJvYjBha3FlMWpxdHFzMGNpNnQzZDk5cjBfMjAyNDEwMTdUMTYwMDAwWiBhY2tlcmxleXRuZ0Bnb29nbGUuY29t&tmsrc=ackerleytng%40google.com&scp=ALL
 
-	nested_vmx_transition_tlb_flush ->
-	  kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu) ->
-	    kvm_vcpu_flush_tlb_guest ->	
-	      vmx_flush_tlb_guest ->
-		vmx_get_current_vpid ->
+gcal says it cannot find such event?
 
-With the diff below applied, these failures disappear.
+>>
+>>
+>> Thoughts?
 
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index cce4e2aa30fb..246d9c6e20d0 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -61,13 +61,6 @@ static inline int vmx_has_valid_vmcs12(struct kvm_vcpu *vcpu)
- 		nested_vmx_is_evmptr12_set(vmx);
- }
- 
--static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
--{
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
--
--	return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
--}
--
- static inline unsigned long nested_ept_get_eptp(struct kvm_vcpu *vcpu)
- {
- 	/* return the page table to be shadowed - in our case, EPT12 */
-@@ -187,6 +180,16 @@ static inline bool nested_cpu_has_vpid(struct vmcs12 *vmcs12)
- 	return nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENABLE_VPID);
- }
- 
-+static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+
-+	if (nested_cpu_has_vpid(get_vmcs12(vcpu)) && vmx->nested.vpid02)
-+		return vmx->nested.vpid02;
-+
-+	return vmx->vpid;
-+}
-+
- static inline bool nested_cpu_has_apic_reg_virt(struct vmcs12 *vmcs12)
- {
- 	return nested_cpu_has2(vmcs12, SECONDARY_EXEC_APIC_REGISTER_VIRT);
 
