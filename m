@@ -1,128 +1,99 @@
-Return-Path: <kvm+bounces-28835-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28836-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F265399DCB0
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 05:22:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A87AC99DD03
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 05:48:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7C711F238B1
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 03:22:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9AD01C21572
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 03:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825FF16EB7C;
-	Tue, 15 Oct 2024 03:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D5D171E5F;
+	Tue, 15 Oct 2024 03:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C4qhQKCO"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vDeMPD1N"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2094516A92C
-	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 03:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5538A46B8;
+	Tue, 15 Oct 2024 03:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728962529; cv=none; b=mhBYc0BH+YHVOVlMrQ674pz+W7tAIZDy01Vyc/mqUY6ESxUrU0Y1A7abqwo+wTOwTsAXP3OZIofRmjLI5v0Xj8vfc1NUt1ymYftuAEZu74ZFLiSLp5t5G0bJ2SzMeUXmOYMmYCqGvFgZ5agSbLhkUO3m8WCoIIhC21g05mtAxW8=
+	t=1728964111; cv=none; b=KigdZuE7jGXrYHyaOFGdFOH3UqKuOkIQlOxpXJUy+qZN6Uzj9HSZ1cDfzs8HzcAb8zBNds0G9uhCcBEORIh4gJBTGRtFGjMQ6rFl3yXVCYtXqiN9Vn8HDsOvvarWWLo9Hkn5Cr5trH/2R7AefspUd3z6aL567hpjSLCKdYWoQK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728962529; c=relaxed/simple;
-	bh=DjLX5fBkgJU8CT8xqfpFI/dbFLVg02xVhUhJ9U952wA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dhc0w3coXqNrkV73bZc5wex+fuoaQj4dOzVs7+hoUoJyOzPbN+EtI5Ad8sg3hljzHSryWwFclOfyJhISziDtVfmU0xByyQO/4xofPVdxcLzBjttgPs9UcbC7gT+znhL5VSu5rA9lUzrXL5ZCw0ToTeQ5T5bnnxu59exgvrbJFes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=C4qhQKCO; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-539f72c8fc1so1680234e87.1
-        for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 20:22:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728962526; x=1729567326; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jgc3X3B5k3iTM1+4K9yayTFXC9bD3mynK1laekJ4N5Y=;
-        b=C4qhQKCOdgVXvuod1YVGZKNB8iHYFxt96g7BOZNAlu9ldstoT25kT+a9iXvhX1MmEA
-         G7U34PRIPL5uYror8Hhz7XslumxaVLaCYxFDKg1W4rBZjVPUfOQxfgjyiWzqTg5zneLW
-         zEfU8AKqZNc2vHysSa1flNR0ghK8aIrK7o7/6CU8FQ68LEUAUEScDJR34Q3FESzBmGLj
-         GBXVBsU1GvhJ8DxlLBrwz+IxGE++bkatfRyskvsBxZriLMIJdf4WitAsr6w0LwyAkECL
-         HtV7gTotqlF3t6CkmBHmshZwoTUjOggBsPWbavY+skPeRnyab7eD+exJWVDsB+R/ETqh
-         mp0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728962526; x=1729567326;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jgc3X3B5k3iTM1+4K9yayTFXC9bD3mynK1laekJ4N5Y=;
-        b=Af3dW6m7o5PIxA0AQu1iQO3prXmvkmgFDqa1PxkUJfp2+8mFNoXiW5CCcqmbCLddWZ
-         lEK40/SLfQJ646eNBPhb7cDGkdlto3z6SWyFL8EZwQKEtfYILCx++sf97HLxmNswIi4M
-         e9vkjYnJAuFpf9530jyCAyIHOb+i9okR2BdsIZrXMdZWSdL8VpC32cjF9VavUl0mGB6L
-         xKpWP+3hGPgl9ZqzhmIHWnw3uiQdUN95uXghlKS+0rPOy/g3m+O3YbYePRNOUxrz1pjT
-         tVpHpn/W+U13tBFWf7QQRZntm7VAwb582IAOQWPwJqwIMf3o5BjZpTwYdFKoGLIA2q91
-         cAMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUH8VPnLHhA92r1OCtLT7cH8z6UdmIVYmLWkeRqQa5cJ7CqTkW2aTZ9alic4uglT72DM9k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcZnTmIZomBGSY2E7KIyAI2MH7BEvYAmVCtyhn9LIkpH9fr6qo
-	ZFxFy7+OzpHmLqqrB1PF6YqaQTHWgdowMBLeetlce7GgalPu+mTYY+a9yRVCBbZHYM1T+Ez1Hv1
-	20L1PNF7AqHO+LHjbeYI0kc75dvvm7T0pF1mWiw==
-X-Google-Smtp-Source: AGHT+IF5KKFkOMyYhkCoT9zofFw4RA3mLNEAwadNBcjduiYPc6MyoAx/qz66sum4SmIdy3qH5oAV2Lmd2pGB9QF/oXw=
-X-Received: by 2002:a05:6512:2581:b0:539:e1ea:c298 with SMTP id
- 2adb3069b0e04-539e1eac668mr5428955e87.22.1728962526175; Mon, 14 Oct 2024
- 20:22:06 -0700 (PDT)
+	s=arc-20240116; t=1728964111; c=relaxed/simple;
+	bh=drrTDQ8js09DBGoaGl0soaU1qoiSTaK56Ft3tPyADfA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SRDmIXTiw18dD+gWAcUWVlO0h1o/UZJazLfqPJQ5AL26OEwdJuBfaqt0udy76mS9fp1LfMRkvWuReNzRroAKEqcQjCUKMoq+5WNl9SZbe85HVB0FZtpDX5KxG+FFf2fBhtD/CXABvkSnuK8HCDqqmS51nkpe5OewUDtmzFQpfHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vDeMPD1N; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=hRok9Qp1s40lbPIjtmrDMQyfxjUxa5tARAxC/U2urus=; b=vDeMPD1NaNZ3bgCFl/93z/j5kS
+	E0Y3xLCNOasek26fefo0kbWbUd4p10GMWNWk9k4Ej0xMGhtV34g7mJ+s4abdFyuvCalUf+a+6RJPF
+	JFpOuXePqLYF4yNVEmbo4qJdo7JVRWGV2s9YoFTIvZSerRIL6VxMCwlUVBIN2CMaxUoIkqwE3noyQ
+	U+4Gr3B216rKQZ7BpBYbYFhVkJvu8tMVSI+79Htv8ycEQmumovcSZRD7xo634df0MpCFp0pK7ZFF/
+	TADT8Pm1vl9G92FL4xLJj/KvVdw4mwBNcJs4aq7LnG5UsejCY55vQB/SFierXXYk8jRTdZ6Xn8eLW
+	7inb/vsA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1t0YXr-000000070ar-25ie;
+	Tue, 15 Oct 2024 03:48:27 +0000
+Date: Mon, 14 Oct 2024 20:48:27 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Srujana Challa <schalla@marvell.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"eperezma@redhat.com" <eperezma@redhat.com>,
+	Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>
+Subject: Re: [EXTERNAL] Re: [PATCH v2 0/2] vhost-vdpa: Add support for
+ NO-IOMMU mode
+Message-ID: <Zw3mC3Ej7m0KyZVv@infradead.org>
+References: <20240920140530.775307-1-schalla@marvell.com>
+ <Zvu3HktM4imgHpUw@infradead.org>
+ <DS0PR18MB5368BC2C0778D769C4CAC835A0442@DS0PR18MB5368.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <Zs5Fom+JFZimFpeS@Asurada-Nvidia> <CABQgh9HChfeD-H-ghntqBxA3xHrySShy+3xJCNzHB74FuncFNw@mail.gmail.com>
- <ee50c648-3fb5-4cb4-bc59-2283489be10e@linux.intel.com>
-In-Reply-To: <ee50c648-3fb5-4cb4-bc59-2283489be10e@linux.intel.com>
-From: Zhangfei Gao <zhangfei.gao@linaro.org>
-Date: Tue, 15 Oct 2024 11:21:54 +0800
-Message-ID: <CABQgh9ESU51ReMa1JXRanPr4AugKM6gJDGDPz9=2TfQ3BaAUyw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
-To: Baolu Lu <baolu.lu@linux.intel.com>
-Cc: Nicolin Chen <nicolinc@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, acpica-devel@lists.linux.dev, 
-	Hanjun Guo <guohanjun@huawei.com>, iommu@lists.linux.dev, 
-	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
-	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
-	Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Moritz Fischer <mdf@kernel.org>, 
-	Michael Shavit <mshavit@google.com>, patches@lists.linux.dev, 
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DS0PR18MB5368BC2C0778D769C4CAC835A0442@DS0PR18MB5368.namprd18.prod.outlook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, 12 Sept 2024 at 12:29, Baolu Lu <baolu.lu@linux.intel.com> wrote:
+On Mon, Oct 14, 2024 at 01:18:01PM +0000, Srujana Challa wrote:
+> > On Fri, Sep 20, 2024 at 07:35:28PM +0530, Srujana Challa wrote:
+> > > This patchset introduces support for an UNSAFE, no-IOMMU mode in the
+> > > vhost-vdpa driver. When enabled, this mode provides no device
+> > > isolation, no DMA translation, no host kernel protection, and cannot
+> > > be used for device assignment to virtual machines. It requires RAWIO
+> > > permissions and will taint the kernel.
+> > >
+> > > This mode requires enabling the
+> > "enable_vhost_vdpa_unsafe_noiommu_mode"
+> > > option on the vhost-vdpa driver and also negotiate the feature flag
+> > > VHOST_BACKEND_F_NOIOMMU. This mode would be useful to get better
+> > > performance on specifice low end machines and can be leveraged by
+> > > embedded platforms where applications run in controlled environment.
+> > 
+> > ... and is completely broken and dangerous.
+> Based on the discussions in this thread https://www.spinics.net/lists/kvm/msg357569.html,
+> we have decided to proceed with this implementation. Could you please share any
+> alternative ideas or suggestions you might have?
 
-> > Have you tested the user page fault?
-> >
-> > I got an issue, when a user page fault happens,
-> >   group->attach_handle = iommu_attach_handle_get(pasid)
-> > return NULL.
-> >
-> > A bit confused here, only find IOMMU_NO_PASID is used when attaching
-> >
-> >   __fault_domain_replace_dev
-> > ret = iommu_replace_group_handle(idev->igroup->group, hwpt->domain,
-> > &handle->handle);
-> > curr = xa_store(&group->pasid_array, IOMMU_NO_PASID, handle, GFP_KERNEL);
-> >
-> > not find where the code attach user pasid with the attach_handle.
->
-> Have you set iommu_ops::user_pasid_table for SMMUv3 driver?
+Don't do this.  It is inherently unsafe and dangerous and there is not
+valid reason to implement it.
 
-Thanks Baolu
-
-Can we send a patch to make it as default?
-
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -3570,6 +3570,7 @@ static struct iommu_ops arm_smmu_ops = {
-        .viommu_alloc           = arm_vsmmu_alloc,
-        .pgsize_bitmap          = -1UL, /* Restricted during device attach */
-        .owner                  = THIS_MODULE,
-+       .user_pasid_table       = 1,
-
-
-Thanks
+Double-Nacked-by: Christoph Hellwig <hch@lst.de>
 
