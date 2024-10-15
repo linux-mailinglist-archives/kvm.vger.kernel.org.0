@@ -1,171 +1,144 @@
-Return-Path: <kvm+bounces-28845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28846-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F40CF99E0CB
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:19:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21D4999E0E8
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3321CB2314F
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 08:19:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DDB71C2104E
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 08:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA9A1DAC95;
-	Tue, 15 Oct 2024 08:18:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4FE18A92A;
+	Tue, 15 Oct 2024 08:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e12uUUhH"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="anUFVOvv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D891CACE3
-	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 08:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986FE1C9B87;
+	Tue, 15 Oct 2024 08:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728980311; cv=none; b=P80JSUq4q24CKfN1bzeiN7tm1jD/iKbOCmZCI5aFA7XJlXQcnQm/Maj0xHWxXHM2yoclxNRZlJSilCNYxMig5o+YdRFvJmkczEc49HX3PejmvVqq1Z+FoFkwBsxnHyRQwCiRXtGxkSEWeDUIDP5hUm2y0b/Rg47LcrJKb39lvR0=
+	t=1728980525; cv=none; b=ZBSgAFS24tsYQIXvYT0K7KHMqmxWTSxLUEEc7Ac02wKUvcFNEE3SpN9ndP5fdlwofQuVnUdEPVjrjubSn3ZU/Ratoso20bYFKQfb+mHEOM63Nk5e9XRU4/tFcvgOBta8+HX0O59fb/DLheUK1K7G3/UwNYwyv9ecTjn3kTfp0ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728980311; c=relaxed/simple;
-	bh=ZvCjhxA9HJtkjiVT2jrS8KFmWhTXeVw6tlAsxhIikfI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=UzRBjlJ0oFmpAVOyaGOOwo+0NfHPxgJxVvvZzg7h3LRqN8gzPfxNHMJ30tghi/fxrlnIuQyR/QvD4o+Kle2wMPL9CQ0Hd0YHS+cizgaSww9em4dFFVvg+yhtI0pRlSgqOCMPrqYWgSOZnQM6lIM7tyzYnCgpf5eRBXY7rxi8oj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e12uUUhH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728980308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wSzugHJUE0V5VnxcNgtSlLmUlo3tP8MuSc6Q2lgQWPQ=;
-	b=e12uUUhHAqI/PgeVtnf+pMUYSVrKNSSz0t6gHX/JVwGyjrOcbHlbd2BKchk80aJh9hjMnd
-	O9707dXwnSM8EmhAbCM4u5Jj19XMKR9hI6p8fGxLC9F1Ker29vThvybb6S9HV1ErtzXyKj
-	RRVyHIf/XSbK7y8z5IXHj9UpGJfsOLw=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-79-LlpyecriP-SiS1Hdnt9KWw-1; Tue, 15 Oct 2024 04:18:27 -0400
-X-MC-Unique: LlpyecriP-SiS1Hdnt9KWw-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-539ec1a590fso1861734e87.0
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 01:18:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728980306; x=1729585106;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wSzugHJUE0V5VnxcNgtSlLmUlo3tP8MuSc6Q2lgQWPQ=;
-        b=gXPfR2eGcuoGgNOwXDCDI919tgO/3Uw9ZXZJk2BP/kTG7V+8LhrfC7IQdgXJ2QD+bf
-         PjwJHg/CrC2toCQHdjes4Boe3cu02MUSQSy9N3TfSDYUqzd3cOMX5sQkzwT7OS9bPVQy
-         pwtXj+HYkg7S4V8rfTyougzyGpWYPDK5jJ6PBrFkzLxbYV5hh4KvWZhcAVSjfZMpgzxu
-         +lTPbCSl+U9YdCTyR+KJF1n4Flq43LFMLD/3VJU7PgII4oH4TLsLPZw8s3/rALFsoAbL
-         fAwdpOyWLSqWFPa5q8Xgi2iAfhomk5eZAsIHe1TzHN2hc5o67goCybKsqqxW1DdR3bMi
-         cQkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbIsKzVb+nXz3XXew/1uLE0ugesViyw+lHDT87dDOB4tRDiiP2ETEsi5iKukMWkFx09vQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTTft62Ny3Bc+oiI4kwp/o1g8t+SlIpJD6jzgDdX1PlSLHmHXq
-	QG646vSry3cVxC0ZwtAefYeE5WckxRRGq1EqEfPf0YJzFUxcMkkh5RTuNuMvZtJTSOHRFXLX3dc
-	3G3K/XjipoIyr9PwSoPBSWqsD68hvJ6GCMRvgNSlTlyuWnRU7kPouRqNB1w==
-X-Received: by 2002:a05:6512:110c:b0:539:e65a:8a71 with SMTP id 2adb3069b0e04-539e65a8c28mr4531959e87.34.1728980305696;
-        Tue, 15 Oct 2024 01:18:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGM8egqE9jF4dTVTryZ5qbA3smtlVhU0CSpeShuRlF/pW2Bor/bfD2IwVw3AXprpgQ+VaOz1g==
-X-Received: by 2002:a05:6512:110c:b0:539:e65a:8a71 with SMTP id 2adb3069b0e04-539e65a8c28mr4531938e87.34.1728980305162;
-        Tue, 15 Oct 2024 01:18:25 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a2981765esm40175766b.129.2024.10.15.01.18.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 01:18:24 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Nikolas Wipper <nik.wipper@gmx.de>, Nikolas Wipper <nikwip@amazon.de>
-Cc: Nicolas Saenz Julienne <nsaenz@amazon.com>, Alexander Graf
- <graf@amazon.de>, James Gowans <jgowans@amazon.com>,
- nh-open-source@amazon.com, Sean Christopherson <seanjc@google.com>, Paolo
- Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo
- Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 2/7] KVM: x86: Implement Hyper-V's vCPU suspended state
-In-Reply-To: <9ef935db-459a-4738-ab9a-4bd08828cb60@gmx.de>
-References: <20241004140810.34231-1-nikwip@amazon.de>
- <20241004140810.34231-3-nikwip@amazon.de> <875xq0gws8.fsf@redhat.com>
- <9ef935db-459a-4738-ab9a-4bd08828cb60@gmx.de>
-Date: Tue, 15 Oct 2024 10:18:23 +0200
-Message-ID: <87h69dg4og.fsf@redhat.com>
+	s=arc-20240116; t=1728980525; c=relaxed/simple;
+	bh=ZyMJa6Jwuka2TO342RkLAb6dF7EpFvQESmiJFUd2SSY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oyx9/V5yr/C6AjZZiiFKiHZpSBALJBe3iDf66DWGV3JlVqTkThZ49RnyEd02XtS8zdvZ7mAls4qsrTmOWfn4ZRlsXIKdOS5nUvpQpp221idE2iLT5GrGxQ0QlHNFCgPuI8x6VIkW5Nqgb6I1dOK0HVJjlU67iYtKTqowz6ggtuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=anUFVOvv; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49F7PlOs027400;
+	Tue, 15 Oct 2024 08:21:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=c5lhar7v4eLS49jskAhJTfiKUSi6Am
+	BfPG1gKlXciwU=; b=anUFVOvvzBObet737suFF6+eMr94CEC/9Sqz5ahW4205AX
+	EwkNqsEyF73bGMJwQl5p78s7HluYc7ZF9rTKACz3eAG/HtvzwQDUOAEV/dAHj7aH
+	Gz/B+VKzY9GjviSfgbetNlxdVQRF93NFIAfiSrY2NrC3JP/692+b/eLKNTTCYXdu
+	iBqVABhfIcN6FNEhGMFnCwoC1TrdeOzlvyUgDSQEO5ZE3p4kJEe8fKCxupAzpxnr
+	wOcfZDhLAVLlV7cWfJ1R5sNwPPuJscXsm3M8/8FPQWcJ/B2hMcHNPkvf9SPlj2q6
+	9der7guBj0iBo28mqi8VZKz9ORQy43i0HdhsLNgQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429m0588nk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 08:21:56 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49F8LtqZ015991;
+	Tue, 15 Oct 2024 08:21:56 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429m0588nc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 08:21:55 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49F7gvOI027451;
+	Tue, 15 Oct 2024 08:21:54 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4283txjsbe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 08:21:54 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49F8LoqK19988858
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 15 Oct 2024 08:21:50 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A276120043;
+	Tue, 15 Oct 2024 08:21:50 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0CE2820040;
+	Tue, 15 Oct 2024 08:21:50 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.60])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 15 Oct 2024 08:21:49 +0000 (GMT)
+Date: Tue, 15 Oct 2024 10:21:48 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH v2 2/7] Documentation: s390-diag.rst: make diag500 a
+ generic KVM hypercall
+Message-ID: <20241015082148.7641-B-hca@linux.ibm.com>
+References: <20241014144622.876731-1-david@redhat.com>
+ <20241014144622.876731-3-david@redhat.com>
+ <20241014180410.10447-C-hca@linux.ibm.com>
+ <78e8794a-d89f-4ded-b102-afc7cea20d1d@redhat.com>
+ <20241015081212.7641-A-hca@linux.ibm.com>
+ <8e39522c-2853-4d1f-b5ec-64fabcca968b@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8e39522c-2853-4d1f-b5ec-64fabcca968b@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 84a_QRz4QyxkwKqhc4fD72zEUsnc0y0v
+X-Proofpoint-GUID: oPIUMjN_VobXTVvYRnEV425WV2FcuVkA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ mlxlogscore=398 phishscore=0 spamscore=0 suspectscore=0 clxscore=1015
+ mlxscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410150052
 
-Nikolas Wipper <nik.wipper@gmx.de> writes:
+On Tue, Oct 15, 2024 at 10:16:20AM +0200, David Hildenbrand wrote:
+> On 15.10.24 10:12, Heiko Carstens wrote:
+> > On Mon, Oct 14, 2024 at 09:35:27PM +0200, David Hildenbrand wrote:
+> > > On 14.10.24 20:04, Heiko Carstens wrote:
+> > "If only there would be a query subcode available, so that the program
+> > check handling would not be necessary; but in particular my new subcode
+> > is not worth adding it" :)
+> > 
+> > Anyway, I do not care too much.
+> > 
+> 
+> Okay, I see your point: it would allow for removing the program check
+> handling from the STORAGE LIMIT invocation.
+> 
+> ... if only we wouldn't need the exact same program check handling for the
+> new query subfunction :P
 
-> On 10.10.24 10:57, Vitaly Kuznetsov wrote:
-
-...
-
->>>  int kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu);
->>> +
->>> +static inline bool kvm_hv_vcpu_suspended(struct kvm_vcpu *vcpu)
->>> +{
->>> +	return vcpu->arch.hyperv_enabled &&
->>> +	       READ_ONCE(vcpu->arch.hyperv->suspended);
->>
->> I don't think READ_ONCE() means anything here, does it?
->>
->
-> It does prevent compiler optimisations and is actually required[1]. Also
-> it makes clear that this variable is shared, and may be accessed from
-> remote CPUs.
->
-> [1] https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0124r6.html#Variable%20Access
-
-It certainly does no harm but I think if we follow 'Loads from and
-stores to shared (but non-atomic) variables should be protected with the
-READ_ONCE(), WRITE_ONCE()' rule literally we will need to sprinkle them
-all over KVM/kernel ;-) And personally, this makes reading the code
-harder.
-
-To my (very limited) knowledge, we really need READ_ONCE()s when we need
-to have some sort of a serialization, e.g. the moment when this read
-happens actually makes a difference. If we can e.g. use a local variable
-in the beginning of a function and replace all READ_ONCE()s with
-reading this local variable -- then we don't need READ_ONCE()s and are
-OK with possible compiler optimizations. Similar (reversed) thoughts go
-to WRITE_ONCE().
-
-I think it's OK to keep them but it would be nice (not mandatory IMO,
-but nice) to have a comment describing which particular synchronization
-we are achieving (== the compiler optimization scenario we are protecting
-against). 
-
-In this particular case, kvm_hv_vcpu_suspended() is inline so I briefly
-looked at all kvm_hv_vcpu_suspended() call sites (there are three) in
-your series but couldn't think of a place where the READ_ONCE() makes a
-real difference. kvm_hv_hypercall_complete() looks pretty safe
-anyway. kvm_hv_vcpu_unsuspend_tlb_flush() will be simplified
-significantly if we merge 'suspended' with 'waiting_on': instead of 
-
-      kvm_for_each_vcpu(i, v, vcpu->kvm) {
-              vcpu_hv = to_hv_vcpu(v);
-
-              if (kvm_hv_vcpu_suspended(v) &&
-                  READ_ONCE(vcpu_hv->waiting_on) == vcpu->vcpu_id) {
-...
-
-you will have just
-
-      kvm_for_each_vcpu(i, v, vcpu->kvm) {
-              vcpu_hv = to_hv_vcpu(v);
-
-              if (vcpu_hv && vcpu_hv->waiting_on == vcpu->vcpu_id) {
-...
-(and yes, I also think that READ_ONCE() is superfluous here, as real
-(non-speculative) write below can't happen _before_ the check )
-
-The last one, kvm_vcpu_running(), should also be indifferent to
-READ_ONCE() in kvm_hv_vcpu_suspended(). I may had missed something, of
-course, but I hope you got my line of thought.
-
--- 
-Vitaly
-
+Yeah yeah, but I think you got that this might help in the future.
 
