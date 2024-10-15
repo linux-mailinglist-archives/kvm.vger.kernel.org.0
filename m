@@ -1,161 +1,123 @@
-Return-Path: <kvm+bounces-28894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2649E99EDB2
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 15:34:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5104699EE0C
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 15:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EE8A1F2478B
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 13:34:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1445B24148
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 13:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D53E1AF0B1;
-	Tue, 15 Oct 2024 13:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0771D5144;
+	Tue, 15 Oct 2024 13:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tYL40ZDe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uX00nqRb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C245F1AF0DF;
-	Tue, 15 Oct 2024 13:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A5D1C07CC;
+	Tue, 15 Oct 2024 13:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728999202; cv=none; b=mIWcaKDjXutUsksSW3WCaXPP5S2usFMgPz36aOBLDKxSMtiTxQcj2wb1tKocq2L7Xhq4hbjpH/U1RPgXOzPWYE7WbSgszNEG6dfJ5cbvGe54SCYpSlXnbzB/+MzjUkyVQZ6ZdggFXvyqtI7UhHFHH/Sw74bv8kW1VVNok+rJVZA=
+	t=1728999628; cv=none; b=CRPqQgcXYko0uyCHqUOnDYOa6q3AlpeIJM6t/cIKbSmBCUwI4ZQ+TXN9VbTdGsdoihjYFg6mb/e+pYgF83I03wF9IXvYGIoZTSnoVhRy8hxYJhOxJwBWa0Kox316+ZHHuZs/1KvhCwJrwI8EYaoLddNxnf8XJky6IPSafrlS8C0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728999202; c=relaxed/simple;
-	bh=eKK3YJkzGUL7LoDYmFThBpuVhS3ay6wlYdhQIEW1sIo=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=GskgxBPwplca8l2DBgaxIPRcE3GAYYL6WYTr8sNz1dl36d735Do+95JJrtVLZJ4UwnudRZ+U4etiNshVK9erpIkFoiLyM0oZ0S8pMdGgipl7BFVA0E3eFtliycU67XhVbhDFs6JEeM6rKwcKki/J08gXtqtpdt7a6+PE72PvFC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tYL40ZDe; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FCnnUl007216;
-	Tue, 15 Oct 2024 13:33:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=t4uLAP
-	lb3ElPca1lnSQXtBqmK2LFXQJJsi9UiaP00vs=; b=tYL40ZDeoKAgu6cmwb4YAy
-	3K4VGic7qGGG5JSVCLHgL3HonN+mmYVemlPRV8lt0L5Fhax6udIaAasjhGVVOC7A
-	rK35/VFYabvYIXCFrYaYhnHRb7xx+t6d94WQy2o85YQZOsE0YcJhICk782BxEh7f
-	Sx2EQseZe7KOAiwvu90NXPgVFjafxhosAWToh5Ixx0Rf8xeB9v15HWfUoRifRxs7
-	qhxr3eRb1w5Q6v+cxVdDz4NxW8baFPQqgj2hiOqIha8cCyD5aXf3GfEeIe2rO3V5
-	SeYSegx2qFki6jVCpIW3iCoRO/tEdKHh27YVgPvLu6RbGNF321wNFeB51usn08fg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429rr7r7e4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 13:33:15 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49FDXF27028138;
-	Tue, 15 Oct 2024 13:33:15 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429rr7r7e2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 13:33:15 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49FB7slr027464;
-	Tue, 15 Oct 2024 13:33:14 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4283txm54j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 13:33:13 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FDXAUs26673538
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 13:33:10 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5918420043;
-	Tue, 15 Oct 2024 13:33:10 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 326AC20040;
-	Tue, 15 Oct 2024 13:33:10 +0000 (GMT)
-Received: from darkmoore (unknown [9.179.10.245])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 15 Oct 2024 13:33:10 +0000 (GMT)
+	s=arc-20240116; t=1728999628; c=relaxed/simple;
+	bh=+eg5Ogets9SiLlYwP2uE1cyuHarfu0eMJpCc1LNOyZk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ug4MgT8fgB7kMq9hVseVE0EAWTXXezthk4GuhW0dcHjEoxnkLzY9RRTsKpoyfXf+6y4CbmDdFdnsdJ3+Ydizvu4VqhbFM6nlobQVoUO3lTsdULFp1bdrbcGGFtxlV2vm83tT/Iq/RhDT5Eu1hrDnVpRLuvgIyWIraeoWWUSSLQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uX00nqRb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1D07C4CEC6;
+	Tue, 15 Oct 2024 13:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728999626;
+	bh=+eg5Ogets9SiLlYwP2uE1cyuHarfu0eMJpCc1LNOyZk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=uX00nqRbj0TEG1Tz8shbGOT2WxuN/MzsJ0/O8D6fMk7nTY7nynwkrPoV5Izq1912G
+	 MCNxilzGTiCcfUAS5pjSXwW6q3cRG/BW6D6YbtnmlO0q+fhZtWAV8iW5Tl912r9gZP
+	 jE929Z//XzSjfIYVBdbbV+yN6bRsMcoaXu9P5SmP/HpGUsX8oWRvpS3y/CHIagsxmZ
+	 wSs02+S5+DmmcEkoZwbxu00ArbFRTvF91bDqH9pPk66sN6FjSlgd1oE0CGyqAvnLq/
+	 xoAmzPiMCVa7yA7fqt68pGzpMEomnxnAVW+/H1RaLmsld8vRk3GlFiM5j84R4We9bm
+	 NTYamxloL6Fqw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B943809A8A;
+	Tue, 15 Oct 2024 13:40:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 15 Oct 2024 15:33:04 +0200
-Message-Id: <D4WF2493HS7M.QHC37L73T9L5@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-s390@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        "Paolo
- Bonzini" <pbonzini@redhat.com>,
-        "Shuah Khan" <shuah@kernel.org>,
-        "Christian
- Borntraeger" <borntraeger@linux.ibm.com>,
-        "Claudio Imbrenda"
- <imbrenda@linux.ibm.com>,
-        "David Hildenbrand" <david@redhat.com>
-To: "Janosch Frank" <frankja@linux.ibm.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v6 2/5] selftests: kvm: s390: Add uc_skey VM test case
-X-Mailer: aerc 0.18.2
-References: <20241015083744.761838-1-schlameuss@linux.ibm.com>
- <20241015083744.761838-3-schlameuss@linux.ibm.com>
- <b7246d28-612e-4f6d-81ba-53d9a28e325b@linux.ibm.com>
-In-Reply-To: <b7246d28-612e-4f6d-81ba-53d9a28e325b@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: P9p0DbDYRCMVEG5Jh83MR1mh9nnUGZXS
-X-Proofpoint-ORIG-GUID: ckCItoD9snFp9915_xadorp9gBJWAbNF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 suspectscore=0 adultscore=0 clxscore=1015 phishscore=0
- impostorscore=0 malwarescore=0 spamscore=0 mlxscore=0 mlxlogscore=859
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410150092
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 00/17] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172899963173.1165800.13282848624565322990.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Oct 2024 13:40:31 +0000
+References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+To: Julia Lawall <julia.lawall@inria.fr>
+Cc: linux-nfs@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ vbabka@suse.cz, paulmck@kernel.org, tom@talpey.com, Dai.Ngo@oracle.com,
+ okorniev@redhat.com, neilb@suse.de, linux-can@vger.kernel.org,
+ bridge@lists.linux.dev, b.a.t.m.a.n@lists.open-mesh.org,
+ linux-kernel@vger.kernel.org, wireguard@lists.zx2c4.com,
+ netdev@vger.kernel.org, ecryptfs@vger.kernel.org,
+ linux-block@vger.kernel.org, npiggin@gmail.com, christophe.leroy@csgroup.eu,
+ naveen@kernel.org, maddy@linux.ibm.com, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
 
-On Tue Oct 15, 2024 at 3:22 PM CEST, Janosch Frank wrote:
-> On 10/15/24 10:37 AM, Christoph Schlameuss wrote:
-> > Add a test case manipulating s390 storage keys from within the ucontrol
-> > VM.
-> >=20
-> > Storage key instruction (ISKE, SSKE and RRBE) intercepts and
-> > Keyless-subset facility are disabled on first use, where the skeys are
-> > setup by KVM in non ucontrol VMs.
-> >=20
->
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Simon Wunderlich <sw@simonwunderlich.de>:
+
+On Sun, 13 Oct 2024 22:16:47 +0200 you wrote:
+> Since SLOB was removed and since
+> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
+> it is not necessary to use call_rcu when the callback only performs
+> kmem_cache_free. Use kfree_rcu() directly.
+> 
+> The changes were done using the following Coccinelle semantic patch.
+> This semantic patch is designed to ignore cases where the callback
+> function is used in another way.
+> 
 > [...]
->
-> > -/* verify SIEIC exit
-> > +/*
-> > + * Disable skey intercepts and rewind last instruction
-> > + * (KVM would init the skeys here)
-> > + */
-> > +static void uc_skey_enable(FIXTURE_DATA(uc_kvm) *self)
-> > +{
-> > +	struct kvm_s390_sie_block *sie_block =3D self->sie_block;
-> > +	int ilen =3D insn_length(sie_block->ipa >> 8);
-> > +	struct kvm_run *run =3D self->run;
-> > +
-> > +	/* disable KSS */
-> > +	sie_block->cpuflags &=3D ~CPUSTAT_KSS;
-> > +	/* disable skey inst interception */
-> > +	sie_block->ictl &=3D ~(ICTL_ISKE | ICTL_SSKE | ICTL_RRBE);
-> > +
-> > +	/* rewind to reexecute intercepted instruction */
-> > +	run->psw_addr =3D run->psw_addr - ilen;
->
-> There's a very important detail between KSS and the SKEY ICTLs:
-> KSS is (mostly) nullifying i.e. the PSW points to the instruction that=20
-> caused the KSS exit.
-> ICTL intercepts are suppressing which means the PSW points after the=20
-> instruction and hence we need to rewind the PSW if we want to re-issue=20
-> the instruction.
->
-> Re-winding on a KSS intercept makes the guest cpu execute the=20
-> instruction before the intercept producing instruction twice.
 
-Oh, yes. You are right, I did mess that up in my cleanup. I will fix that.
-Here it does now only work since the KSS is not intercepted on the second
-invocation. But I am with you, it should only be executed once.
+Here is the summary with links:
+  - [01/17] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [02/17] ipv4: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [03/17] inetpeer: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [04/17] ipv6: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [05/17] xfrm6_tunnel: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [06/17] batman-adv: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    https://git.kernel.org/netdev/net-next/c/356c81b6c494
+  - [08/17] net: bridge: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [10/17] can: gw: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [14/17] kcm: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [15/17] netfilter: nf_conncount: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [16/17] netfilter: expect: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [17/17] netfilter: xt_hashlimit: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
