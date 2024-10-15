@@ -1,107 +1,123 @@
-Return-Path: <kvm+bounces-28932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47BA399F466
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 19:51:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 226B599F4B4
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 20:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B96221F24FD0
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 17:51:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC72C1F23261
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 18:01:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99EC51FAF19;
-	Tue, 15 Oct 2024 17:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07792281EC;
+	Tue, 15 Oct 2024 18:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dIkSlvNh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KuGT0VK8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CAA1F76C4
-	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 17:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E141C227BB2;
+	Tue, 15 Oct 2024 18:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729014682; cv=none; b=kQzZaNGGlHhe2/WqT6cqNRq4Q36B0I/X5FxJDQvOVOZRBBhXcrkPEItECpBVgiV7GFo53O82zLUNVAVjii4ybB9PvbmrWHlarWGeW+y7NzvdIO4/nlWsmnptUBuanGpHB1Tvg9TdOb6rHeHToJb5FlWWvW4SjdJdz5/NnuK7mD8=
+	t=1729015236; cv=none; b=c2jM7eQf+0bM8GNsN0K0c8xvMPt61E/2NrY2Ji/f21jm7rFdjacLmRS1p/bRlmLIx8lfpoR0IT9LDGHxwImrbK6QAONEI+nS+1ZV8hQTQDaCEDMTub2sW3ukrp6+FucIDo1Z3Uual3L7+XxQLRUL+J6LN90SAmKGBGBhNEEghcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729014682; c=relaxed/simple;
-	bh=1YKM3CH5jEHgkpkOmJ9NdqwqHxCL6rD+RoUeOu+M0Zs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kHkLbYudfUtrPTzkgnC42/L3hSYIilH83hoerNuNXMHWe/OkDP7VxWB/K8toK+72f7mAdjfiUOZx6mZzUdCFmH1AQU6avLWlHDBwejKx+G70ZG7ENKKbFpgESrUFTSGkNBnUy1F6r7AWu7dG1PggL8ZouwXjW7qxsYu0OvMpZj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dIkSlvNh; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e290b8b69f8so9213256276.2
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 10:51:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729014680; x=1729619480; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LzVsLhNxP8WDtuKH9p/BsiCdMHgFRqj/PD3WiEFxpvI=;
-        b=dIkSlvNhbL9+4j+XcSeWRI+T83+mZc6CPPOglRW5LITA2rObSZNswhNjESLOlzcn5N
-         deSv6fgAaYu8M+V35Vpc4hwCabyOLQG4pZ7FboKtT3xldJQpiKpwjI72Ye60KEzU9IYn
-         HYSITN7ea6wfwaGX0ssvJLJo8tIfeTNOAAnZzjYJNtflx9vp1d47Igy3gqynBGENiabE
-         mpV5BOFtdhodpiZIXiWKV8aFuEbaTQyPafCWs20qvrezH0kAbdzcML6CzG5lNa57sOZq
-         762MEzqOo7kq9UD31SrjYUJUpdg6jjRNPPh81Px4hFe7YO51vdSKEtT5RZsVRM/VJTxh
-         mRgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729014680; x=1729619480;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LzVsLhNxP8WDtuKH9p/BsiCdMHgFRqj/PD3WiEFxpvI=;
-        b=Q/Z1yvJIGX49bwkhpnx2A3Z831pUdwGeZCU+/muvxxnECECHeDHcErvTMNN8slA3dq
-         XP4PKXH238zahe2ijJ64nNoRYLsaX/0flXYgaWbKFnrAM/Uf6cVARCNybNPQzNqtXENr
-         yiyqPJylj0Qnqzk2uP8xN/pikLc6PvyUgYiBOBzjy0t1heCTzYhxmVq0wDGBuYZJKIQW
-         pbeqaVpXhx4RXaUrQDFGJvnlFYlfNjHWQNOgFCKcyzRjlaT/Q3yiX9/BsahCWqZXftkx
-         rXmrYcNK/eYuQUYTpiWBYRwBWVpDpRLSDSvGhPFOunPymvm4Tw797rSmUdqH0g77za7z
-         5iWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXunwHTX/3t/nj9iKQh6dp3MsXPkWvpTCMR3Vm0aHZVU7Vhgys1LGKJxLZQta54FdrYUj0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk3W+XujziafVYNotVDrG1bcpcXieffFb6Euqmk2S27CYBE8jH
-	8LReBZ7LoFHyO+/DiwsziafCQZy/K17PG3vt/DTB4UhkU8oZLfWpkgfnstDceMmJrqkxkxDKfcu
-	YOw==
-X-Google-Smtp-Source: AGHT+IEfLUVkB/Zw/tV3P8pzNf5N7b8EpBCnlhsG/pzHxZYrAeEXSX/92lSxXYtVIs6Hmgm0nACho5IQsWI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a5b:505:0:b0:e28:8f00:896a with SMTP id
- 3f1490d57ef6-e2978594c30mr546276.8.1729014680360; Tue, 15 Oct 2024 10:51:20
- -0700 (PDT)
-Date: Tue, 15 Oct 2024 10:51:19 -0700
-In-Reply-To: <D4WJTFFVQ5XN.13Z7NABE3IRSM@amazon.com>
+	s=arc-20240116; t=1729015236; c=relaxed/simple;
+	bh=Sa6sgGhK0f0PdlrPB+pJBNsb8BQKXN13Ox+Haom2HEI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rOFWgFWCtnk4LDFVUepGg8Wdy5Obtp+5s6OFL/CKc93EQ78wKLcV8yACYzyKZHbBSDn4msnMRW6rT+3pbIZk4GVmnDCCR4IfDsjaOgXsftc4jryiei/ZLr8Iz/rBr3IP4aTlKeDtL8Gn2khJfxmAkplpQf/mEBGFmBMOIKGqFFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KuGT0VK8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAE2EC4CEC7;
+	Tue, 15 Oct 2024 18:00:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729015235;
+	bh=Sa6sgGhK0f0PdlrPB+pJBNsb8BQKXN13Ox+Haom2HEI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KuGT0VK8S5iZkpWwdj4icg6/wNAAUrBPevfh4SZqoijO/LK0M//4+TxvzWdvkTnPh
+	 ej10iYjREMrmMJ2Gu5Npr2RUIAnkdhPsv3wpjIS9oD4lasA8tAu3GCw1fTFYauLrpu
+	 3RuHOcS958KJIGxUYsp0ERB1QMGW0dSsPNdQ80PsrTJLr49xkilO6b+UUnJ05d1/wn
+	 JClelGibXCeLsadFDN2D9J1PR77WpKnQ3JH6qPkguuPszYj5ShJSHAIV1To4/BfUf4
+	 6EO69W5HKU6Kiqfv8lDFOsDsbIiS0OIBybyVPrn0xkepuW1lWPDAUwAp49hj4XETun
+	 TYtKkZ3F14U8g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D453809A8A;
+	Tue, 15 Oct 2024 18:00:42 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241004140810.34231-1-nikwip@amazon.de> <20241004140810.34231-3-nikwip@amazon.de>
- <875xq0gws8.fsf@redhat.com> <9ef935db-459a-4738-ab9a-4bd08828cb60@gmx.de>
- <87h69dg4og.fsf@redhat.com> <Zw6PlAv4H5rNZsBf@google.com> <D4WJTFFVQ5XN.13Z7NABE3IRSM@amazon.com>
-Message-ID: <Zw6rlxWc7UCxJFpi@google.com>
-Subject: Re: [PATCH 2/7] KVM: x86: Implement Hyper-V's vCPU suspended state
-From: Sean Christopherson <seanjc@google.com>
-To: Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Nikolas Wipper <nik.wipper@gmx.de>, 
-	Nikolas Wipper <nikwip@amazon.de>, Alexander Graf <graf@amazon.de>, James Gowans <jgowans@amazon.com>, 
-	nh-open-source@amazon.com, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 00/17] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172901524099.1243233.14809044192149107515.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Oct 2024 18:00:40 +0000
+References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+To: Julia Lawall <julia.lawall@inria.fr>
+Cc: linux-nfs@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ vbabka@suse.cz, paulmck@kernel.org, tom@talpey.com, Dai.Ngo@oracle.com,
+ okorniev@redhat.com, neilb@suse.de, linux-can@vger.kernel.org,
+ bridge@lists.linux.dev, b.a.t.m.a.n@lists.open-mesh.org,
+ linux-kernel@vger.kernel.org, wireguard@lists.zx2c4.com,
+ netdev@vger.kernel.org, ecryptfs@vger.kernel.org,
+ linux-block@vger.kernel.org, npiggin@gmail.com, christophe.leroy@csgroup.eu,
+ naveen@kernel.org, maddy@linux.ibm.com, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
 
-On Tue, Oct 15, 2024, Nicolas Saenz Julienne wrote:
-> Hi Sean,
-> 
-> On Tue Oct 15, 2024 at 3:58 PM UTC, Sean Christopherson wrote:
-> > Before we spend too much time cleaning things up, I want to first settle on the
-> > overall design, because it's not clear to me that punting HvTranslateVirtualAddress
-> > to userspace is a net positive.  We agreed that VTLs should be modeled primarily
-> > in userspace, but that doesn't automatically make punting everything to userspace
-> > the best option, especially given the discussion at KVM Forum with respect to
-> > mplementing VTLs, VMPLs, TD partitions, etc.
-> 
-> Since you mention it, Paolo said he was going to prep a doc with an
-> overview of the design we discussed there. Was it published? Did I miss
-> it?
+Hello:
 
-Nope, we're all hitting F5 mercilessly :-)
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun, 13 Oct 2024 22:16:47 +0200 you wrote:
+> Since SLOB was removed and since
+> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
+> it is not necessary to use call_rcu when the callback only performs
+> kmem_cache_free. Use kfree_rcu() directly.
+> 
+> The changes were done using the following Coccinelle semantic patch.
+> This semantic patch is designed to ignore cases where the callback
+> function is used in another way.
+> 
+> [...]
+
+Here is the summary with links:
+  - [01/17] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [02/17] ipv4: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    https://git.kernel.org/netdev/net-next/c/497e17d80759
+  - [03/17] inetpeer: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    https://git.kernel.org/netdev/net-next/c/bb5810d4236b
+  - [04/17] ipv6: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    https://git.kernel.org/netdev/net-next/c/85e48bcf294c
+  - [05/17] xfrm6_tunnel: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [06/17] batman-adv: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [08/17] net: bridge: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    https://git.kernel.org/netdev/net-next/c/4ac64e570c33
+  - [10/17] can: gw: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [14/17] kcm: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    https://git.kernel.org/netdev/net-next/c/7bb3ecbc2b6b
+  - [15/17] netfilter: nf_conncount: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [16/17] netfilter: expect: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+  - [17/17] netfilter: xt_hashlimit: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
