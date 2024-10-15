@@ -1,234 +1,214 @@
-Return-Path: <kvm+bounces-28856-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC97D99E15C
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:41:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D3C499E162
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 084DAB22EF4
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 08:41:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1EC51F21A6A
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 08:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54E91CDA08;
-	Tue, 15 Oct 2024 08:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dyPXJMzW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D4F1CDA3E;
+	Tue, 15 Oct 2024 08:43:21 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7401417BEC1
-	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 08:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F171520EB;
+	Tue, 15 Oct 2024 08:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728981689; cv=none; b=ZdmQE/v8vk7f3egmgTxn5SRbOx5qcSX0QtCMYX69YLLSJ1KT9S7p4ylasQeffQfJlHCDrLFz7MVzU8N2zpcFF2gakAi1Gv/XJPEJvypMKmFJffHYZ2fQpmluLy6x0QJxLLyLmp2eV+EtSJGbkkdYwb/Zf8NivY5ikdrjTMQjaHI=
+	t=1728981801; cv=none; b=TzSDWizeVwBo+pfWrV+INRrwLGV2N9xa/lDXF2+IpMEP8w+xaZOZYNcIvyh8cbqILjXMrqi3oKY+RuWca7N7nMLWBsKJWW/S1AxwsUypOYc5QPNY3xHCbICRyDMt6o5j1frEZgJrdePokykJ0j9kEZOLWxgnMJ82M8Hf6kjM1Xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728981689; c=relaxed/simple;
-	bh=4FRIdOjAlQ/qQDKesSjYAifVC92YFWjXAoPv2r/kGPM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DXDLQSU+0AtK1Q9YMr9aR5VqYoODrdniXTi9KbDlBKexKsLobTNMBQON69KFejjFukHKiDXazZKwg1+79ZVkU7IVDGUG2AE9cApbXiwHVIkF9xFz64cx0iIF69zmrFN+Qt5jxNEBwst++0R0iRYVws2Hw1eneT1hn1uTo1uMyQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dyPXJMzW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728981686;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=R6dQrHIK5ReTqnF0CzZPMpl0Tk4yRynTHPfhbhUh3Ns=;
-	b=dyPXJMzWEhyoQAfsL98/GL7JuIq5g1FeTR2NgofWpygsCFeFJi217W/ZZwtOvOysSQ45ov
-	JOvY8OuqjE5gsiJ5a3WgG4dTRrmUkfjB0W9/MN4SO2KhZUzD/DF3g8fpUS0MapvjlEcwPL
-	hVWu6SjvATGzLTdl2wBGlekwfZWySVc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-115-wQpte0qUN12e6qVL0gnGAQ-1; Tue, 15 Oct 2024 04:41:24 -0400
-X-MC-Unique: wQpte0qUN12e6qVL0gnGAQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d47127e69so1981339f8f.1
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 01:41:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728981684; x=1729586484;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=R6dQrHIK5ReTqnF0CzZPMpl0Tk4yRynTHPfhbhUh3Ns=;
-        b=FzGwT65eSWDl+ZgWVzC8OPNaqQ7JaJeDt5lY1rhkB/On6Xo0Y+zU6lEOs3qHs9Zicb
-         6wOIfP6yTfABG2IZzHG//vEwvVQw4k83DlTf4Spr89HrcZF4Q04x+yF9aUPl9pWj8tjK
-         F/hsLY320MPsYbvhla0QaLrFqlz6CRPF62TeQr3IU/rYQHq+++NXaoZjQ3ZW265XL1mj
-         x3UG1RUwg/B/QFfLTcGyDE9I2FTn68jgarQviB1yI8H8H/X2Hk5hkVa/mr2Tk4CiM9FM
-         5/mPo3KSs2zR4jXXLioSaBOh3UB1AfFDczNo9dO2yKe5Z4YMzMam3+LPADQyLeYyto4l
-         SfBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVDtY52IeAniWdLqAxLTPN3qziGh46BDmt0jQiusYAkZWRlCUiUDNwKAFjJ5mOeMLgcYyQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhgRljAqKLRceKbPfgTrzOubBCyuhRw74pseNn9BI3MC+OA23P
-	bpFf48ij3Jt2sgqR8s5kmTewNw9IpYyVtKa29Ubvcd66rYMZBjNk9AeYOKwOpkbZi2SFRUEJkEy
-	zmdytUMgS90/TFPGG6Tq7WV+FCz88+Go2fY2gxkwPX1hGZdPZS+2VCG3vOhxC
-X-Received: by 2002:a5d:4e0f:0:b0:37c:c5be:1121 with SMTP id ffacd0b85a97d-37d55190237mr9169831f8f.9.1728981683768;
-        Tue, 15 Oct 2024 01:41:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEZAdELzr5Ouos6fmEAgMTYb0O76aE5udbIfuFSIrv8YGlHK6qc4w4IDT3e+se4F4x2Of7teg==
-X-Received: by 2002:a5d:4e0f:0:b0:37c:c5be:1121 with SMTP id ffacd0b85a97d-37d55190237mr9169828f8f.9.1728981683310;
-        Tue, 15 Oct 2024 01:41:23 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c730:9700:d653:fb19:75e5:ab5c? (p200300cbc7309700d653fb1975e5ab5c.dip0.t-ipconnect.de. [2003:cb:c730:9700:d653:fb19:75e5:ab5c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fbf8228sm966430f8f.81.2024.10.15.01.41.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Oct 2024 01:41:22 -0700 (PDT)
-Message-ID: <0c7e876f-5648-4a82-b809-ca48f778b4a6@redhat.com>
-Date: Tue, 15 Oct 2024 10:41:21 +0200
+	s=arc-20240116; t=1728981801; c=relaxed/simple;
+	bh=f0J5zVZhMaGKaGKNMphc4e1lI9kNq70U6Hj6fFlPw88=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e/bPPCNf+JI0T5kvsSS6EsRyjrbDvi1MmJXjVKWQ+UxtJGnYHZkWUXRGLkcAjlkybUN1L/rxE+saddafSZQM79pQwkyzRI/dXyWVWWmpjTD24kfS1yJk9pGqPU9T0K0wUvbX/XBQeUU8nIhHRU+5/r37pf54uAvkmHjYGUqlPZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from zq-Legion-Y7000.. (unknown [121.237.44.89])
+	by APP-01 (Coremail) with SMTP id qwCowACHjysRKw5nbvGtBw--.46271S2;
+	Tue, 15 Oct 2024 16:42:58 +0800 (CST)
+From: zhouquan@iscas.ac.cn
+To: anup@brainfault.org,
+	ajones@ventanamicro.com,
+	atishp@atishpatra.org,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	mark.rutland@arm.com,
+	alexander.shishkin@linux.intel.com,
+	jolsa@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-perf-users@vger.kernel.org,
+	Quan Zhou <zhouquan@iscas.ac.cn>
+Subject: [PATCH v5 0/2] riscv: Add perf support to collect KVM guest statistics from host side
+Date: Tue, 15 Oct 2024 16:42:18 +0800
+Message-Id: <cover.1728980031.git.zhouquan@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/7] s390/kdump: implement is_kdump_kernel()
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
- linux-doc@vger.kernel.org, kvm@vger.kernel.org,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
- Jonathan Corbet <corbet@lwn.net>, Mario Casquero <mcasquer@redhat.com>
-References: <20241014144622.876731-1-david@redhat.com>
- <20241014144622.876731-2-david@redhat.com>
- <20241014182054.10447-D-hca@linux.ibm.com>
- <f93b2c89-821a-4da1-8953-73ccd129a074@redhat.com>
- <20241015083040.7641-C-hca@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20241015083040.7641-C-hca@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowACHjysRKw5nbvGtBw--.46271S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxuw1xJw15CF13uryDCF45KFg_yoW7WF1rpr
+	43Crsxtr4YyryIqw4Iyr1Y9ry5J397Xrn3GrnxX3yrAr4jvaykZwnFgw4xZrW0qryvgryf
+	Xr1vqFy3Kas8AFUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
+	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r
+	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
+	628vn2kIc2xKxwAKzVCY07xG64k0F24lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r
+	43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_
+	Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x
+	0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8
+	JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIx
+	AIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbfHUPUUUUU=
+	=
+X-CM-SenderInfo: 52kr31xxdqqxpvfd2hldfou0/1tbiDAgLBmcOAQGl8wAAs2
 
-On 15.10.24 10:30, Heiko Carstens wrote:
-> On Mon, Oct 14, 2024 at 09:26:03PM +0200, David Hildenbrand wrote:
->> On 14.10.24 20:20, Heiko Carstens wrote:
->>> Looks like this could work. But the comment in smp.c above
->>> dump_available() needs to be updated.
->>
->> A right, I remember that there was some outdated documentation.
->>
->>>
->>> Are you willing to do that, or should I provide an addon patch?
->>>
->>
->> I can squash the following:
->>
->> diff --git a/arch/s390/kernel/smp.c b/arch/s390/kernel/smp.c
->> index 4df56fdb2488..a4f538876462 100644
->> --- a/arch/s390/kernel/smp.c
->> +++ b/arch/s390/kernel/smp.c
->> @@ -587,16 +587,16 @@ int smp_store_status(int cpu)
->>    *    with sigp stop-and-store-status. The firmware or the boot-loader
->>    *    stored the registers of the boot CPU in the absolute lowcore in the
->>    *    memory of the old system.
->> - * 3) kdump and the old kernel did not store the CPU state,
->> - *    or stand-alone kdump for DASD
->> - *    condition: OLDMEM_BASE != NULL && !is_kdump_kernel()
->> + * 3) kdump or stand-alone kdump for DASD
->> + *    condition: OLDMEM_BASE != NULL && !is_ipl_type_dump() == false
->>    *    The state for all CPUs except the boot CPU needs to be collected
->>    *    with sigp stop-and-store-status. The kexec code or the boot-loader
->>    *    stored the registers of the boot CPU in the memory of the old system.
->> - * 4) kdump and the old kernel stored the CPU state
->> - *    condition: OLDMEM_BASE != NULL && is_kdump_kernel()
->> - *    This case does not exist for s390 anymore, setup_arch explicitly
->> - *    deactivates the elfcorehdr= kernel parameter
->> + *
->> + * Note that the old Kdump mode where the old kernel stored the CPU state
-> 
-> To be consistent with the rest of the comment, please write kdump in
-> all lower case characters, please.
+From: Quan Zhou <zhouquan@iscas.ac.cn>
 
-It obviously was too late in the evening for me :) Thanks!
+Add basic guest support to RISC-V perf, enabling it to distinguish
+whether PMU interrupts occur in the host or the guest, and then
+collect some basic guest information from the host side
+(guest os callchain is not supported for now).
 
-> 
->> + * does no longer exist: setup_arch explicitly deactivates the elfcorehdr=
->> + * kernel parameter. The is_kudmp_kernel() implementation on s390 is independent
-> 
-> Typo: kudmp.
-> 
->> Does that sound reasonable? I'm not so sure about the "2) stand-alone kdump for
->> SCSI/NVMe (zfcp/nvme dump with swapped memory)": is that really "kdump" ?
-> 
-> Yes, it is some sort of kdump, even though a bit odd.
+Based on the x86/arm implementation, tested with kvm-riscv.
+test env:
+- host: qemu-9.0.0
+- guest: qemu-9.0.0 --enable-kvm (only start one guest and run top)
 
-My concern is that we'll now have
+-----------------------------------------
+1) perf kvm top
+./perf kvm --host --guest \
+  --guestkallsyms=/<path-to-kallsyms> \
+  --guestmodules=/<path-to-modules> top
 
-bool is_kdump_kernel(void)
-{
-        return oldmem_data.start && !is_ipl_type_dump();
-}
+PerfTop:      41 irqs/sec  kernel:97.6% us: 0.0% guest kernel: 0.0% guest us: 0.0% exact:  0.0% [250Hz cycles:P],  (all, 4 CPUs)
+-------------------------------------------------------------------------------
 
-Which matches 3), but if 2) is also called "kdump", then should it 
-actually be
+    64.57%  [kernel]        [k] default_idle_call
+     3.12%  [kernel]        [k] _raw_spin_unlock_irqrestore
+     3.03%  [guest.kernel]  [g] mem_serial_out
+     2.61%  [kernel]        [k] handle_softirqs
+     2.32%  [kernel]        [k] do_trap_ecall_u
+     1.71%  [kernel]        [k] _raw_spin_unlock_irq
+     1.26%  [guest.kernel]  [g] do_raw_spin_lock
+     1.25%  [kernel]        [k] finish_task_switch.isra.0
+     1.16%  [kernel]        [k] do_idle
+     0.77%  libc.so.6       [.] ioctl
+     0.76%  [kernel]        [k] queue_work_on
+     0.69%  [kernel]        [k] __local_bh_enable_ip
+     0.67%  [guest.kernel]  [g] __noinstr_text_start
+     0.64%  [guest.kernel]  [g] mem_serial_in
+     0.41%  libc.so.6       [.] pthread_sigmask
+     0.39%  [kernel]        [k] mem_cgroup_uncharge_skmem
+     0.39%  [kernel]        [k] __might_resched
+     0.39%  [guest.kernel]  [g] _nohz_idle_balance.isra.0
+     0.37%  [kernel]        [k] sched_balance_update_blocked_averages
+     0.34%  [kernel]        [k] sched_balance_rq
 
-bool is_kdump_kernel(void)
-{
-        return oldmem_data.start;
-}
+2) perf kvm record
+./perf kvm --host --guest \
+  --guestkallsyms=/<path-to-kallsyms> \
+  --guestmodules=/<path-to-modules> record -a sleep 60
 
-?
+[ perf record: Woken up 3 times to write data ]
+[ perf record: Captured and wrote 1.292 MB perf.data.kvm (17990 samples) ]
 
-When I wrote that code I was rather convinced that the variant in this 
-patch is the right thing to do.
+3) perf kvm report
+./perf kvm --host --guest \
+  --guestkallsyms=/<path-to-kallsyms> \
+  --guestmodules=/<path-to-modules> report -i perf.data.kvm
 
+# Total Lost Samples: 0
+#
+# Samples: 17K of event 'cycles:P'
+# Event count (approx.): 269968947184
+#
+# Overhead  Command          Shared Object            Symbol                                        
+# ........  ...............  .......................  ..............................................
+#
+    61.86%  swapper          [kernel.kallsyms]        [k] default_idle_call
+     2.93%  :6463            [guest.kernel.kallsyms]  [g] do_raw_spin_lock
+     2.82%  :6462            [guest.kernel.kallsyms]  [g] mem_serial_out
+     2.11%  sshd             [kernel.kallsyms]        [k] _raw_spin_unlock_irqrestore
+     1.78%  :6462            [guest.kernel.kallsyms]  [g] do_raw_spin_lock
+     1.37%  swapper          [kernel.kallsyms]        [k] handle_softirqs
+     1.36%  swapper          [kernel.kallsyms]        [k] do_idle
+     1.21%  sshd             [kernel.kallsyms]        [k] do_trap_ecall_u
+     1.21%  sshd             [kernel.kallsyms]        [k] _raw_spin_unlock_irq
+     1.11%  qemu-system-ris  [kernel.kallsyms]        [k] do_trap_ecall_u
+     0.93%  qemu-system-ris  libc.so.6                [.] ioctl
+     0.89%  sshd             [kernel.kallsyms]        [k] __local_bh_enable_ip
+     0.77%  qemu-system-ris  [kernel.kallsyms]        [k] _raw_spin_unlock_irqrestore
+     0.68%  qemu-system-ris  [kernel.kallsyms]        [k] queue_work_on
+     0.65%  sshd             [kernel.kallsyms]        [k] handle_softirqs
+     0.44%  :6462            [guest.kernel.kallsyms]  [g] mem_serial_in
+     0.42%  sshd             libc.so.6                [.] pthread_sigmask
+     0.34%  :6462            [guest.kernel.kallsyms]  [g] serial8250_tx_chars
+     0.30%  swapper          [kernel.kallsyms]        [k] finish_task_switch.isra.0
+     0.29%  swapper          [kernel.kallsyms]        [k] sched_balance_rq
+     0.29%  sshd             [kernel.kallsyms]        [k] __might_resched
+     0.26%  swapper          [kernel.kallsyms]        [k] tick_nohz_idle_exit
+     0.26%  swapper          [kernel.kallsyms]        [k] sched_balance_update_blocked_averages
+     0.26%  swapper          [kernel.kallsyms]        [k] _nohz_idle_balance.isra.0
+     0.24%  qemu-system-ris  [kernel.kallsyms]        [k] finish_task_switch.isra.0
+     0.23%  :6462            [guest.kernel.kallsyms]  [g] __noinstr_text_start
+
+---
+Change since v4:
+- Add Reviewed-by tags
+
+Change since v3:
+- Rebased on v6.12-rc3
+
+Change since v2:
+- Rebased on v6.11-rc7
+- Keep the misc type consistent with other architectures as `unsigned long` (Andrew)
+- Add the same comment for `kvm_arch_pmi_in_guest` as in arm64. (Andrew)
+
+Change since v1:
+- Rebased on v6.11-rc3
+- Fix incorrect misc type (Andrew)
+
+---
+v4 link:
+https://lore.kernel.org/all/cover.1728957131.git.zhouquan@iscas.ac.cn/
+v3 link:
+https://lore.kernel.org/all/cover.1726126795.git.zhouquan@iscas.ac.cn/
+v2 link:
+https://lore.kernel.org/all/cover.1723518282.git.zhouquan@iscas.ac.cn/
+v1 link:
+https://lore.kernel.org/all/cover.1721271251.git.zhouquan@iscas.ac.cn/
+
+Quan Zhou (2):
+  riscv: perf: add guest vs host distinction
+  riscv: KVM: add basic support for host vs guest profiling
+
+ arch/riscv/include/asm/kvm_host.h   | 10 ++++++++
+ arch/riscv/include/asm/perf_event.h |  6 +++++
+ arch/riscv/kernel/perf_callchain.c  | 38 +++++++++++++++++++++++++++++
+ arch/riscv/kvm/Kconfig              |  1 +
+ arch/riscv/kvm/main.c               | 12 +++++++--
+ arch/riscv/kvm/vcpu.c               |  7 ++++++
+ 6 files changed, 72 insertions(+), 2 deletions(-)
+
+
+base-commit: 8e929cb546ee42c9a61d24fae60605e9e3192354
 -- 
-Cheers,
-
-David / dhildenb
+2.34.1
 
 
