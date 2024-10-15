@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-28923-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28921-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0763D99F30C
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 18:45:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF9899F30A
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 18:45:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AD8E1C224E2
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 16:45:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B92E1C222A9
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 16:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CE3227BB1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7889722739E;
 	Tue, 15 Oct 2024 16:43:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IA4bjy6p"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZytbZPv4"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696041F76B6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65C51F76D1;
 	Tue, 15 Oct 2024 16:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729010617; cv=none; b=ANpeg4iLUrayVC3AQ4daFZTYd5xyge6nS78JxQEvhjCgYe0DzMXdO0HmwwOlmFaFsAlXxQNJTzSSzc9Q+Puiwu2tc39Tnmw1btncAbpX48GBI1FE8b/oFfwOM89NYl7FJOCcJTsJG0lyLxy55i6EBoboCAAPql89ISzJk6mTENc=
+	t=1729010616; cv=none; b=AQ6auebO/ut1oj9XuEW1r/FyDBjCbYMNqOARMfYdbagrss8Fe2ZRZtkIYKSXdxtQfgm0Xqu2az8G1NBOvnf5t12DH8Jz5U+RTWdzHuVfeCCfUtjRfn0XTJtpy4JJvHUNpZ1duUGckh3+tidXgXbfH63zHhQ993JXZSo/OBIG7WY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729010617; c=relaxed/simple;
-	bh=Z9bRoxXyx3sAoKziQia3gv9KjvurarVGCYrbVX0wBQU=;
+	s=arc-20240116; t=1729010616; c=relaxed/simple;
+	bh=OD/CTOrwcg6OiHs7buhnlA46yO9ruiybpAnnQ2ioFXg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f247pytElS3dIPj0pnt+vsiMzBxAm3A5YJMp7YVfEcCuwfHYnGETTaiim+nZcoVEPit4DQ/Q/6x06Vfx6cmeCenxvxS5TuZoQ4xlsSUuJPALgb7iIgd5UStgppnRP0mjGNqaIpS7SElTGw21xo6ClB8D643XRxNpNvTR/fw+Luo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IA4bjy6p; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=gamNBTTcBoKjIAmoXzOu6NO2u24X6mQT12/saMGjSzOpdkrBqJP8ygxFUDXCiEXWIv7wgcQJCdk1PdCCf83mJAW3diRIYkNTkL3Jj4asg5CBLYDcDivphgD26sYzIxpksdP+M9Bee7E59NEjxHL+SITlc0Hw2SdISFTD4rhJotw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZytbZPv4; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FGIvUo012451;
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FFoWDb031605;
 	Tue, 15 Oct 2024 16:43:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=l22CTdoToSQBMRy+l
-	NB4xu65L+oAkrXxrMTQl1t93Lo=; b=IA4bjy6pnmOZlhiVovaZd1G+1ySDlP9eO
-	8rbbEht6DS4nvoNvfDeFRrUoQqd6ntKGLvyPIlSrQn+zoxP8xr9VKwINjRGnIY6U
-	KIOgmkLFA0DXWX2oSOzc1auIopEPfqxsxNSAduQIjLskbE/UtTYvSREFnrWg1ceR
-	yIteyoRvwZFlG5ZF89Oy3u5UgbNd2BrgL6YHnLk6jvzCF4JkbdiHV/vcLnqWkmDN
-	XkP6ZrXkcVcxDmfl0ambNhnnUrK3NgwAqDjOJ25yDgR92vzpuwpQcD6orC1OcqrA
-	bnnmq8QpjbyLZzJEaKgebJ7P+4PsqG7nmg/9fSPUU7OTehdNLCQnA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429utbr4c0-1
+	:mime-version:references:subject:to; s=pp1; bh=b1hrL5t3INOADSR8l
+	YZwbXlFlIC3oQgm2SthebZwLds=; b=ZytbZPv4e3P1bzMOue/sbbzVsbqPyTIrJ
+	ZzWDvHW9Z7VNzYfy+az5kh5PvwZVVrOKujAzxBWHB4iZP33ibMJv+vVv2YKzdTfW
+	c4yGTP42d+L1cY5FF9MwvXFdDqXCuUWahUY1ix/Zo1JqK4A6d6rUI7RHd0GenP3x
+	hAkzLrEQCFig3JfwutXa5eGNNF1KPc4zjadXlNZXu35wVfTIgN2oqmJ2NId1PbFI
+	1w2Hd1o4DomMYmkZAdZkwF0ZL9vDZcj9sBPoucmpsiuRFd5gG6ZYZMdxiDh3xHxp
+	GClhUJqyWetYgCtCaMnnRRUNFJFXlLH37VcGWbrraO3x0kN+B9bZg==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429ucwg8m0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 15 Oct 2024 16:43:33 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49FDoqOs027444;
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49FEmnAp007025;
 	Tue, 15 Oct 2024 16:43:32 GMT
 Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4283txn028-1
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4284xk4tre-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 15 Oct 2024 16:43:32 +0000
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FGhSaY50069780
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FGhSqp50069782
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 16:43:28 GMT
+	Tue, 15 Oct 2024 16:43:29 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B18EC20043;
+	by IMSVA (Postfix) with ESMTP id DDC952004B;
 	Tue, 15 Oct 2024 16:43:28 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8ACCF2004B;
+	by IMSVA (Postfix) with ESMTP id B70A320040;
 	Tue, 15 Oct 2024 16:43:28 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -74,9 +74,9 @@ Cc: borntraeger@de.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
         agordeev@linux.ibm.com, gor@linux.ibm.com,
         gerald.schaefer@linux.ibm.com, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [PATCH v3 10/11] s390/mm: Get rid of fault type switch statements
-Date: Tue, 15 Oct 2024 18:43:25 +0200
-Message-ID: <20241015164326.124987-11-imbrenda@linux.ibm.com>
+Subject: [PATCH v3 11/11] s390/mm: Convert to LOCK_MM_AND_FIND_VMA
+Date: Tue, 15 Oct 2024 18:43:26 +0200
+Message-ID: <20241015164326.124987-12-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241015164326.124987-1-imbrenda@linux.ibm.com>
 References: <20241015164326.124987-1-imbrenda@linux.ibm.com>
@@ -88,191 +88,75 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4btRNoVUpFamlLieAt3rpuCttRKOy1ab
-X-Proofpoint-ORIG-GUID: 4btRNoVUpFamlLieAt3rpuCttRKOy1ab
+X-Proofpoint-ORIG-GUID: mIwXe_1YdEff2xHHUJkxrOJMh3WJJF-U
+X-Proofpoint-GUID: mIwXe_1YdEff2xHHUJkxrOJMh3WJJF-U
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- suspectscore=0 phishscore=0 impostorscore=0 mlxscore=0 spamscore=0
- bulkscore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=956
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ mlxlogscore=641 spamscore=0 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 suspectscore=0 bulkscore=0 adultscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2409260000 definitions=main-2410150113
 
 From: Heiko Carstens <hca@linux.ibm.com>
 
-With GMAP_FAULT fault type gone, there are only KERNEL_FAULT and
-USER_FAULT fault types left. Therefore there is no need for any fault
-type switch statements left.
-
-Rename get_fault_type() into is_kernel_fault() and let it return a
-boolean value. Change all switch statements to if statements. This
-removes quite a bit of code.
+With the gmap code gone s390 can be easily converted to
+LOCK_MM_AND_FIND_VMA like it has been done for most other
+architectures.
 
 Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-Reviewed-by: Alexander Gordeev <agordeev@linux.ibm.com>
+Reviewed-by: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
 ---
- arch/s390/mm/fault.c | 70 ++++++++++++++------------------------------
- 1 file changed, 22 insertions(+), 48 deletions(-)
+ arch/s390/Kconfig    |  1 +
+ arch/s390/mm/fault.c | 13 ++-----------
+ 2 files changed, 3 insertions(+), 11 deletions(-)
 
+diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+index d339fe4fdedf..8109446f7b24 100644
+--- a/arch/s390/Kconfig
++++ b/arch/s390/Kconfig
+@@ -224,6 +224,7 @@ config S390
+ 	select HAVE_VIRT_CPU_ACCOUNTING_IDLE
+ 	select IOMMU_HELPER		if PCI
+ 	select IOMMU_SUPPORT		if PCI
++	select LOCK_MM_AND_FIND_VMA
+ 	select MMU_GATHER_MERGE_VMAS
+ 	select MMU_GATHER_NO_GATHER
+ 	select MMU_GATHER_RCU_TABLE_FREE
 diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-index 6e96fc7905fc..93ae097ef0e0 100644
+index 93ae097ef0e0..8bd2b8d64273 100644
 --- a/arch/s390/mm/fault.c
 +++ b/arch/s390/mm/fault.c
-@@ -46,11 +46,6 @@
- #include <asm/uv.h>
- #include "../kernel/entry.h"
- 
--enum fault_type {
--	KERNEL_FAULT,
--	USER_FAULT,
--};
--
- static DEFINE_STATIC_KEY_FALSE(have_store_indication);
- 
- static int __init fault_init(void)
-@@ -64,15 +59,15 @@ early_initcall(fault_init);
- /*
-  * Find out which address space caused the exception.
-  */
--static enum fault_type get_fault_type(struct pt_regs *regs)
-+static bool is_kernel_fault(struct pt_regs *regs)
- {
- 	union teid teid = { .val = regs->int_parm_long };
- 
- 	if (user_mode(regs))
--		return USER_FAULT;
-+		return false;
- 	if (teid.as == PSW_BITS_AS_SECONDARY)
--		return USER_FAULT;
--	return KERNEL_FAULT;
-+		return false;
-+	return true;
- }
- 
- static unsigned long get_fault_address(struct pt_regs *regs)
-@@ -167,17 +162,12 @@ static void dump_fault_info(struct pt_regs *regs)
- 		break;
- 	}
- 	pr_cont("mode while using ");
--	switch (get_fault_type(regs)) {
--	case USER_FAULT:
--		asce = get_lowcore()->user_asce.val;
--		pr_cont("user ");
--		break;
--	case KERNEL_FAULT:
-+	if (is_kernel_fault(regs)) {
- 		asce = get_lowcore()->kernel_asce.val;
- 		pr_cont("kernel ");
--		break;
--	default:
--		unreachable();
-+	} else {
-+		asce = get_lowcore()->user_asce.val;
-+		pr_cont("user ");
- 	}
- 	pr_cont("ASCE.\n");
- 	dump_pagetable(asce, get_fault_address(regs));
-@@ -212,7 +202,6 @@ static void do_sigsegv(struct pt_regs *regs, int si_code)
- 
- static void handle_fault_error_nolock(struct pt_regs *regs, int si_code)
- {
--	enum fault_type fault_type;
- 	unsigned long address;
- 	bool is_write;
- 
-@@ -223,17 +212,15 @@ static void handle_fault_error_nolock(struct pt_regs *regs, int si_code)
- 	}
- 	if (fixup_exception(regs))
+@@ -308,18 +308,10 @@ static void do_exception(struct pt_regs *regs, int access)
  		return;
--	fault_type = get_fault_type(regs);
--	if (fault_type == KERNEL_FAULT) {
-+	if (is_kernel_fault(regs)) {
- 		address = get_fault_address(regs);
- 		is_write = fault_is_write(regs);
- 		if (kfence_handle_page_fault(address, is_write, regs))
- 			return;
--	}
--	if (fault_type == KERNEL_FAULT)
- 		pr_alert("Unable to handle kernel pointer dereference in virtual kernel address space\n");
--	else
-+	} else {
- 		pr_alert("Unable to handle kernel paging request in virtual user address space\n");
-+	}
- 	dump_fault_info(regs);
- 	die(regs, "Oops");
- }
-@@ -267,7 +254,6 @@ static void do_exception(struct pt_regs *regs, int access)
- 	struct vm_area_struct *vma;
- 	unsigned long address;
- 	struct mm_struct *mm;
--	enum fault_type type;
- 	unsigned int flags;
- 	vm_fault_t fault;
- 	bool is_write;
-@@ -282,15 +268,8 @@ static void do_exception(struct pt_regs *regs, int access)
- 	mm = current->mm;
- 	address = get_fault_address(regs);
- 	is_write = fault_is_write(regs);
--	type = get_fault_type(regs);
--	switch (type) {
--	case KERNEL_FAULT:
-+	if (is_kernel_fault(regs) || faulthandler_disabled() || !mm)
- 		return handle_fault_error_nolock(regs, 0);
--	case USER_FAULT:
--		if (faulthandler_disabled() || !mm)
--			return handle_fault_error_nolock(regs, 0);
--		break;
--	}
- 	perf_sw_event(PERF_COUNT_SW_PAGE_FAULTS, 1, regs, address);
- 	flags = FAULT_FLAG_DEFAULT;
- 	if (user_mode(regs))
-@@ -460,8 +439,15 @@ void do_secure_storage_access(struct pt_regs *regs)
- 		 */
- 		panic("Unexpected PGM 0x3d with TEID bit 61=0");
  	}
--	switch (get_fault_type(regs)) {
--	case USER_FAULT:
-+	if (is_kernel_fault(regs)) {
-+		folio = phys_to_folio(addr);
-+		if (unlikely(!folio_try_get(folio)))
-+			return;
-+		rc = arch_make_folio_accessible(folio);
-+		folio_put(folio);
-+		if (rc)
-+			BUG();
-+	} else {
- 		mm = current->mm;
- 		mmap_read_lock(mm);
- 		vma = find_vma(mm, addr);
-@@ -470,7 +456,7 @@ void do_secure_storage_access(struct pt_regs *regs)
- 		folio = folio_walk_start(&fw, vma, addr, 0);
- 		if (!folio) {
- 			mmap_read_unlock(mm);
--			break;
-+			return;
- 		}
- 		/* arch_make_folio_accessible() needs a raised refcount. */
- 		folio_get(folio);
-@@ -480,18 +466,6 @@ void do_secure_storage_access(struct pt_regs *regs)
- 		if (rc)
- 			send_sig(SIGSEGV, current, 0);
- 		mmap_read_unlock(mm);
--		break;
--	case KERNEL_FAULT:
--		folio = phys_to_folio(addr);
--		if (unlikely(!folio_try_get(folio)))
--			break;
--		rc = arch_make_folio_accessible(folio);
--		folio_put(folio);
--		if (rc)
--			BUG();
--		break;
--	default:
--		unreachable();
+ lock_mmap:
+-	mmap_read_lock(mm);
+ retry:
+-	vma = find_vma(mm, address);
++	vma = lock_mm_and_find_vma(mm, address, regs);
+ 	if (!vma)
+-		return handle_fault_error(regs, SEGV_MAPERR);
+-	if (unlikely(vma->vm_start > address)) {
+-		if (!(vma->vm_flags & VM_GROWSDOWN))
+-			return handle_fault_error(regs, SEGV_MAPERR);
+-		vma = expand_stack(mm, address);
+-		if (!vma)
+-			return handle_fault_error_nolock(regs, SEGV_MAPERR);
+-	}
++		return handle_fault_error_nolock(regs, SEGV_MAPERR);
+ 	if (unlikely(!(vma->vm_flags & access)))
+ 		return handle_fault_error(regs, SEGV_ACCERR);
+ 	fault = handle_mm_fault(vma, address, flags, regs);
+@@ -337,7 +329,6 @@ static void do_exception(struct pt_regs *regs, int access)
  	}
- }
- NOKPROBE_SYMBOL(do_secure_storage_access);
+ 	if (fault & VM_FAULT_RETRY) {
+ 		flags |= FAULT_FLAG_TRIED;
+-		mmap_read_lock(mm);
+ 		goto retry;
+ 	}
+ 	mmap_read_unlock(mm);
 -- 
 2.47.0
 
