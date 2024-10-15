@@ -1,171 +1,161 @@
-Return-Path: <kvm+bounces-28893-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28894-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE3A299ED60
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 15:27:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2649E99EDB2
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 15:34:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D94A1F25024
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 13:27:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EE8A1F2478B
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 13:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525261B21BA;
-	Tue, 15 Oct 2024 13:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D53E1AF0B1;
+	Tue, 15 Oct 2024 13:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="labYjZUX"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tYL40ZDe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0ED61B2181;
-	Tue, 15 Oct 2024 13:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C245F1AF0DF;
+	Tue, 15 Oct 2024 13:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728998591; cv=none; b=cGRYvd/4HhRABpWnGOSABHQBuhfy43jaqJJ3SWBtzYFgQSDGRDDC/A3Yr6mCac5SzSY7VzGvvkdm0EYq1RycuDblILIDvqLH9+pHOm4C29JNe2sY3g0NYmgPGKHNEonJ4TzmlZvIz4UCeO6e9Ii0pmww8T1WfLwxb9k5vJvq14M=
+	t=1728999202; cv=none; b=mIWcaKDjXutUsksSW3WCaXPP5S2usFMgPz36aOBLDKxSMtiTxQcj2wb1tKocq2L7Xhq4hbjpH/U1RPgXOzPWYE7WbSgszNEG6dfJ5cbvGe54SCYpSlXnbzB/+MzjUkyVQZ6ZdggFXvyqtI7UhHFHH/Sw74bv8kW1VVNok+rJVZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728998591; c=relaxed/simple;
-	bh=HwZG0ynlovbLC0YjioshrHqux1oDWiaxe6IYxIZAeZQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SuUmp1jFgT0Z1hlXjVN8HgSDURL/CFgHI5+Sj3aDFQ0/2CV7o+jiRKHkKue34uYJf8/w8pacDjUhtjz37BM2NEe6TwKeTABGmJpZHsLFzK1JnRjCkrm4vRn7N+Fc3r7xJyMTngxOi0JPW9WrD1w4UJtYkaoIPHLg0FawSuzVr+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=labYjZUX; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728998590; x=1760534590;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=HwZG0ynlovbLC0YjioshrHqux1oDWiaxe6IYxIZAeZQ=;
-  b=labYjZUXujV971wBs/E0/zM4J/GjQ4F4STcj84ptebwx8NW0wcK9Z081
-   7S7nbbfjKBvY/ciXfOedUSn01nxHa8s2PbJLmIRHAdZIsmRB3PMhFw+P+
-   Emww3UYomKqSUUpIYqRuWRyvrUVdEKYaesd9hRJwcKmp8WJDZ4ajGJxAD
-   Oh7Uu8sczjIIovRgWix8AgC+tc3y95/9c2NYmarV+FDxadP1mifSX1LGo
-   mXVALKefuOacccstxjoMOdlhUs1rV0H+8Dv7m7+ZzigwzsYCQ0PWF6np0
-   9Hx1lBEmbmV0U/CEVXRdPB8P91fr6k3JWKGlxlFitoJnzFubWa4pbj58Q
-   Q==;
-X-CSE-ConnectionGUID: c8YtOIsDRUWl0fI0ZaSzdQ==
-X-CSE-MsgGUID: MtX9whZQSZS2gu3XlgDglA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11225"; a="27872579"
-X-IronPort-AV: E=Sophos;i="6.11,205,1725346800"; 
-   d="scan'208";a="27872579"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 06:23:09 -0700
-X-CSE-ConnectionGUID: hjg30QUFRZ6Ixw4g5soS5g==
-X-CSE-MsgGUID: hoeIldPMQY6kMZQKUXwk8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,205,1725346800"; 
-   d="scan'208";a="82457053"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 06:23:09 -0700
-Received: from [10.212.125.233] (kliang2-mobl1.ccr.corp.intel.com [10.212.125.233])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id 0322520CFEDE;
-	Tue, 15 Oct 2024 06:23:05 -0700 (PDT)
-Message-ID: <411cce4d-593e-4643-8c5c-d6a34cde0e54@linux.intel.com>
-Date: Tue, 15 Oct 2024 09:23:04 -0400
+	s=arc-20240116; t=1728999202; c=relaxed/simple;
+	bh=eKK3YJkzGUL7LoDYmFThBpuVhS3ay6wlYdhQIEW1sIo=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
+	 References:In-Reply-To; b=GskgxBPwplca8l2DBgaxIPRcE3GAYYL6WYTr8sNz1dl36d735Do+95JJrtVLZJ4UwnudRZ+U4etiNshVK9erpIkFoiLyM0oZ0S8pMdGgipl7BFVA0E3eFtliycU67XhVbhDFs6JEeM6rKwcKki/J08gXtqtpdt7a6+PE72PvFC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tYL40ZDe; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FCnnUl007216;
+	Tue, 15 Oct 2024 13:33:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=t4uLAP
+	lb3ElPca1lnSQXtBqmK2LFXQJJsi9UiaP00vs=; b=tYL40ZDeoKAgu6cmwb4YAy
+	3K4VGic7qGGG5JSVCLHgL3HonN+mmYVemlPRV8lt0L5Fhax6udIaAasjhGVVOC7A
+	rK35/VFYabvYIXCFrYaYhnHRb7xx+t6d94WQy2o85YQZOsE0YcJhICk782BxEh7f
+	Sx2EQseZe7KOAiwvu90NXPgVFjafxhosAWToh5Ixx0Rf8xeB9v15HWfUoRifRxs7
+	qhxr3eRb1w5Q6v+cxVdDz4NxW8baFPQqgj2hiOqIha8cCyD5aXf3GfEeIe2rO3V5
+	SeYSegx2qFki6jVCpIW3iCoRO/tEdKHh27YVgPvLu6RbGNF321wNFeB51usn08fg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429rr7r7e4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 13:33:15 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49FDXF27028138;
+	Tue, 15 Oct 2024 13:33:15 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429rr7r7e2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 13:33:15 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49FB7slr027464;
+	Tue, 15 Oct 2024 13:33:14 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4283txm54j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 13:33:13 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FDXAUs26673538
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 15 Oct 2024 13:33:10 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5918420043;
+	Tue, 15 Oct 2024 13:33:10 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 326AC20040;
+	Tue, 15 Oct 2024 13:33:10 +0000 (GMT)
+Received: from darkmoore (unknown [9.179.10.245])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 15 Oct 2024 13:33:10 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 14/58] perf: Add switch_interrupt() interface
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Mingwei Zhang <mizhang@google.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
- <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
- Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
- Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
- gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
- Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
- Like Xu <like.xu.linux@gmail.com>,
- Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org
-References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-15-mizhang@google.com>
- <20241014120354.GG16066@noisy.programming.kicks-ass.net>
- <3cc05609-4fbd-4fb8-87bf-34ea1092ab2b@linux.intel.com>
- <20241014174929.GL16066@noisy.programming.kicks-ass.net>
-Content-Language: en-US
-From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20241014174929.GL16066@noisy.programming.kicks-ass.net>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Tue, 15 Oct 2024 15:33:04 +0200
+Message-Id: <D4WF2493HS7M.QHC37L73T9L5@linux.ibm.com>
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <linux-s390@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        "Paolo
+ Bonzini" <pbonzini@redhat.com>,
+        "Shuah Khan" <shuah@kernel.org>,
+        "Christian
+ Borntraeger" <borntraeger@linux.ibm.com>,
+        "Claudio Imbrenda"
+ <imbrenda@linux.ibm.com>,
+        "David Hildenbrand" <david@redhat.com>
+To: "Janosch Frank" <frankja@linux.ibm.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v6 2/5] selftests: kvm: s390: Add uc_skey VM test case
+X-Mailer: aerc 0.18.2
+References: <20241015083744.761838-1-schlameuss@linux.ibm.com>
+ <20241015083744.761838-3-schlameuss@linux.ibm.com>
+ <b7246d28-612e-4f6d-81ba-53d9a28e325b@linux.ibm.com>
+In-Reply-To: <b7246d28-612e-4f6d-81ba-53d9a28e325b@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: P9p0DbDYRCMVEG5Jh83MR1mh9nnUGZXS
+X-Proofpoint-ORIG-GUID: ckCItoD9snFp9915_xadorp9gBJWAbNF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 suspectscore=0 adultscore=0 clxscore=1015 phishscore=0
+ impostorscore=0 malwarescore=0 spamscore=0 mlxscore=0 mlxlogscore=859
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410150092
 
+On Tue Oct 15, 2024 at 3:22 PM CEST, Janosch Frank wrote:
+> On 10/15/24 10:37 AM, Christoph Schlameuss wrote:
+> > Add a test case manipulating s390 storage keys from within the ucontrol
+> > VM.
+> >=20
+> > Storage key instruction (ISKE, SSKE and RRBE) intercepts and
+> > Keyless-subset facility are disabled on first use, where the skeys are
+> > setup by KVM in non ucontrol VMs.
+> >=20
+>
+> [...]
+>
+> > -/* verify SIEIC exit
+> > +/*
+> > + * Disable skey intercepts and rewind last instruction
+> > + * (KVM would init the skeys here)
+> > + */
+> > +static void uc_skey_enable(FIXTURE_DATA(uc_kvm) *self)
+> > +{
+> > +	struct kvm_s390_sie_block *sie_block =3D self->sie_block;
+> > +	int ilen =3D insn_length(sie_block->ipa >> 8);
+> > +	struct kvm_run *run =3D self->run;
+> > +
+> > +	/* disable KSS */
+> > +	sie_block->cpuflags &=3D ~CPUSTAT_KSS;
+> > +	/* disable skey inst interception */
+> > +	sie_block->ictl &=3D ~(ICTL_ISKE | ICTL_SSKE | ICTL_RRBE);
+> > +
+> > +	/* rewind to reexecute intercepted instruction */
+> > +	run->psw_addr =3D run->psw_addr - ilen;
+>
+> There's a very important detail between KSS and the SKEY ICTLs:
+> KSS is (mostly) nullifying i.e. the PSW points to the instruction that=20
+> caused the KSS exit.
+> ICTL intercepts are suppressing which means the PSW points after the=20
+> instruction and hence we need to rewind the PSW if we want to re-issue=20
+> the instruction.
+>
+> Re-winding on a KSS intercept makes the guest cpu execute the=20
+> instruction before the intercept producing instruction twice.
 
-
-On 2024-10-14 1:49 p.m., Peter Zijlstra wrote:
-> On Mon, Oct 14, 2024 at 11:51:06AM -0400, Liang, Kan wrote:
->> On 2024-10-14 8:03 a.m., Peter Zijlstra wrote:
->>> On Thu, Aug 01, 2024 at 04:58:23AM +0000, Mingwei Zhang wrote:
->>>> From: Kan Liang <kan.liang@linux.intel.com>
->>>>
->>>> There will be a dedicated interrupt vector for guests on some platforms,
->>>> e.g., Intel. Add an interface to switch the interrupt vector while
->>>> entering/exiting a guest.
->>>>
->>>> When PMI switch into a new guest vector, guest_lvtpc value need to be
->>>> reflected onto HW, e,g., guest clear PMI mask bit, the HW PMI mask
->>>> bit should be cleared also, then PMI can be generated continuously
->>>> for guest. So guest_lvtpc parameter is added into perf_guest_enter()
->>>> and switch_interrupt().
->>>>
->>>> At switch_interrupt(), the target pmu with PASSTHROUGH cap should
->>>> be found. Since only one passthrough pmu is supported, we keep the
->>>> implementation simply by tracking the pmu as a global variable.
->>>>
->>>> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
->>>>
->>>> [Simplify the commit with removal of srcu lock/unlock since only one pmu is
->>>> supported.]
->>>>
->>>> Signed-off-by: Mingwei Zhang <mizhang@google.com>
->>>> ---
->>>>  include/linux/perf_event.h |  9 +++++++--
->>>>  kernel/events/core.c       | 36 ++++++++++++++++++++++++++++++++++--
->>>>  2 files changed, 41 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
->>>> index 75773f9890cc..aeb08f78f539 100644
->>>> --- a/include/linux/perf_event.h
->>>> +++ b/include/linux/perf_event.h
->>>> @@ -541,6 +541,11 @@ struct pmu {
->>>>  	 * Check period value for PERF_EVENT_IOC_PERIOD ioctl.
->>>>  	 */
->>>>  	int (*check_period)		(struct perf_event *event, u64 value); /* optional */
->>>> +
->>>> +	/*
->>>> +	 * Switch the interrupt vectors, e.g., guest enter/exit.
->>>> +	 */
->>>> +	void (*switch_interrupt)	(bool enter, u32 guest_lvtpc); /* optional */
->>>>  };
->>>
->>> I'm thinking the guets_lvtpc argument shouldn't be part of the
->>> interface. That should be PMU implementation data and accessed by the
->>> method implementation.
->>
->> I think the name of the perf_switch_interrupt() is too specific.
->> Here should be to switch the guest context. The interrupt should be just
->> part of the context. Maybe a interface as below
->>
->> void (*switch_guest_ctx)	(bool enter, void *data); /* optional */
-> 
-> I don't think you even need the data thing. For example, the x86/intel
-> implementation can just look at a x86_pmu data field to find the magic
-> value.
-
-The new vector is created by KVM, not perf. So it cannot be found in the
-x86_pmu data field. Perf needs it to update the interrupt vector so the
-guest PMI can be handled by KVM directly.
-
-Thanks,
-Kan
-
+Oh, yes. You are right, I did mess that up in my cleanup. I will fix that.
+Here it does now only work since the KSS is not intercepted on the second
+invocation. But I am with you, it should only be executed once.
 
