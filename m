@@ -1,123 +1,177 @@
-Return-Path: <kvm+bounces-28933-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28934-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 226B599F4B4
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 20:01:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B67099F4E5
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 20:11:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC72C1F23261
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 18:01:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F217B1F2551B
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 18:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07792281EC;
-	Tue, 15 Oct 2024 18:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C98A1FC7D7;
+	Tue, 15 Oct 2024 18:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KuGT0VK8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="12qg7+Sc"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E141C227BB2;
-	Tue, 15 Oct 2024 18:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4851F8F17
+	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 18:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729015236; cv=none; b=c2jM7eQf+0bM8GNsN0K0c8xvMPt61E/2NrY2Ji/f21jm7rFdjacLmRS1p/bRlmLIx8lfpoR0IT9LDGHxwImrbK6QAONEI+nS+1ZV8hQTQDaCEDMTub2sW3ukrp6+FucIDo1Z3Uual3L7+XxQLRUL+J6LN90SAmKGBGBhNEEghcc=
+	t=1729015855; cv=none; b=OjvQ+LnAeVQ9P9E8IrdHKQdXy6847efWYdsV8TAcKXisGoOqJCoeKuogFMRCUDh7MkqvDvDxh92OOd7mFT3Pss41SvsHon8hc44zYLgO0SA4NQ65+ae+wuJxFWLySGI+xh8Zc+5Jhm1d1TxlY3O4FW3gsdF0xDj51cLnOHURtJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729015236; c=relaxed/simple;
-	bh=Sa6sgGhK0f0PdlrPB+pJBNsb8BQKXN13Ox+Haom2HEI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rOFWgFWCtnk4LDFVUepGg8Wdy5Obtp+5s6OFL/CKc93EQ78wKLcV8yACYzyKZHbBSDn4msnMRW6rT+3pbIZk4GVmnDCCR4IfDsjaOgXsftc4jryiei/ZLr8Iz/rBr3IP4aTlKeDtL8Gn2khJfxmAkplpQf/mEBGFmBMOIKGqFFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KuGT0VK8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAE2EC4CEC7;
-	Tue, 15 Oct 2024 18:00:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729015235;
-	bh=Sa6sgGhK0f0PdlrPB+pJBNsb8BQKXN13Ox+Haom2HEI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KuGT0VK8S5iZkpWwdj4icg6/wNAAUrBPevfh4SZqoijO/LK0M//4+TxvzWdvkTnPh
-	 ej10iYjREMrmMJ2Gu5Npr2RUIAnkdhPsv3wpjIS9oD4lasA8tAu3GCw1fTFYauLrpu
-	 3RuHOcS958KJIGxUYsp0ERB1QMGW0dSsPNdQ80PsrTJLr49xkilO6b+UUnJ05d1/wn
-	 JClelGibXCeLsadFDN2D9J1PR77WpKnQ3JH6qPkguuPszYj5ShJSHAIV1To4/BfUf4
-	 6EO69W5HKU6Kiqfv8lDFOsDsbIiS0OIBybyVPrn0xkepuW1lWPDAUwAp49hj4XETun
-	 TYtKkZ3F14U8g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D453809A8A;
-	Tue, 15 Oct 2024 18:00:42 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729015855; c=relaxed/simple;
+	bh=onARMYvCe4MEVctCzTmFfC9c9hckqdb5NrW57WWe4fY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iAGS6V7PWLkGAkDlxo/O6EawDs08qddM1Qk62+wRr2LVQ53KJvSiaf355xUQvFpo24gnQiXSgTvdWj8KgUNS4gOf5tG8NHnTOFTRe7wwd4EMJmUHpONf/XQFL15QakX8DsQYMKMVzzD7SBokH5h2Sqrihkn/440DxIZX3a+2adA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=12qg7+Sc; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e035949cc4eso8101864276.1
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 11:10:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729015853; x=1729620653; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xkQVBApGBnsFauh/NRUkLSuJKpKjtmpIspmB3NqO1qM=;
+        b=12qg7+SclH3foH+QFnrlHYEJuVgiyun3lojQ8iMgUEnH2pp1k9JODEiCOBnn9I+QXs
+         oO+AgTtVurJ5iGKtKuR82mJUoId9y004GYN9vHAJKNbRcRXRHwiA5Q6mRg7GTxm/JaLE
+         xouHtQd0zFTjh/TiF7UmliYUY8lviLGeNo6AnIMwMsRVh4+ZsdEBJ+aJG5tw6PujGyi4
+         c7OBAlLIvqBUj1zYdZXwVe7zysJgFCHE5wW4meftNq0Y6ugpLlyJk3Z5jT1NWgPq3p3M
+         g7tK9GpcIWmdqH8Ro3GhEEGRUV3ypV/+oudjWYQQwzXgxZcCHW2iKiiWcV6rAEoJW7NX
+         DtSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729015853; x=1729620653;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xkQVBApGBnsFauh/NRUkLSuJKpKjtmpIspmB3NqO1qM=;
+        b=UGXdv//aXWTFNRyxQeIu9Ja+ZfLa5/nGvMsD2h//7+Yp1b3YFIdqLumNLN/HIqT3P9
+         +P5GevzESOkbundD7G/uXlgYw8aMxiNtkFFsi2XRGwhr/S4gJulG1eN/MANtWPEjBGmD
+         E8eeDWvvT9aGH1NOp2LeN9XvFoM10fHVsqjDH8IB9uVlcID96NX0oCUFM1pSh1zcyiXy
+         yCZmh1duLsMUQMNvU2OzApyInZPeQLmuZv/CxXqIgbmqUeMhr+liFyKT5CQJkcFfgYpF
+         qvWRMuTtMN/IjbfCE5+trGUjsksyQWxfqJ6ot82seCwWB3MpmEQhccvPrBBXD3rHmnrw
+         S1GA==
+X-Forwarded-Encrypted: i=1; AJvYcCVXTT2YiVSHgJDS2t1+rHBCjVZNyU4itp5+TMozkbovru1SnH7KW8R48CXYbuWnImZrFN0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkHjF4Ck0g+p3kDXawDcTzA+YFHB+ElH3ZDHGAAlMK76QTpuOU
+	oEQwP7KSMJboGQQ0oc17cLnaMa3EMMk1FB2hbo+uhEw24YbwFqJx9Y0KVp4ViA2xDKTVCyNi5kn
+	D/g==
+X-Google-Smtp-Source: AGHT+IG5g2O//zMCPKGiWKKREPFUIbatrbPoLXHOrf551PzbHYpXNxKLEQfE9nef7o/Ugk4b+yX13BYXYnc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:112:b0:e29:7587:66db with SMTP id
+ 3f1490d57ef6-e29782b20edmr1102276.2.1729015852814; Tue, 15 Oct 2024 11:10:52
+ -0700 (PDT)
+Date: Tue, 15 Oct 2024 11:10:51 -0700
+In-Reply-To: <058a6302-3444-4fd6-a154-b81f384b63fc@gmx.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 00/17] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172901524099.1243233.14809044192149107515.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Oct 2024 18:00:40 +0000
-References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
-In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
-To: Julia Lawall <julia.lawall@inria.fr>
-Cc: linux-nfs@vger.kernel.org, kernel-janitors@vger.kernel.org,
- vbabka@suse.cz, paulmck@kernel.org, tom@talpey.com, Dai.Ngo@oracle.com,
- okorniev@redhat.com, neilb@suse.de, linux-can@vger.kernel.org,
- bridge@lists.linux.dev, b.a.t.m.a.n@lists.open-mesh.org,
- linux-kernel@vger.kernel.org, wireguard@lists.zx2c4.com,
- netdev@vger.kernel.org, ecryptfs@vger.kernel.org,
- linux-block@vger.kernel.org, npiggin@gmail.com, christophe.leroy@csgroup.eu,
- naveen@kernel.org, maddy@linux.ibm.com, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Mime-Version: 1.0
+References: <20241004140810.34231-1-nikwip@amazon.de> <20241004140810.34231-3-nikwip@amazon.de>
+ <875xq0gws8.fsf@redhat.com> <9ef935db-459a-4738-ab9a-4bd08828cb60@gmx.de>
+ <87h69dg4og.fsf@redhat.com> <Zw6PlAv4H5rNZsBf@google.com> <058a6302-3444-4fd6-a154-b81f384b63fc@gmx.de>
+Message-ID: <Zw6wKwHQJcGPfxwn@google.com>
+Subject: Re: [PATCH 2/7] KVM: x86: Implement Hyper-V's vCPU suspended state
+From: Sean Christopherson <seanjc@google.com>
+To: Nikolas Wipper <nik.wipper@gmx.de>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Nikolas Wipper <nikwip@amazon.de>, 
+	Nicolas Saenz Julienne <nsaenz@amazon.com>, Alexander Graf <graf@amazon.de>, James Gowans <jgowans@amazon.com>, 
+	nh-open-source@amazon.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 13 Oct 2024 22:16:47 +0200 you wrote:
-> Since SLOB was removed and since
-> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
-> it is not necessary to use call_rcu when the callback only performs
-> kmem_cache_free. Use kfree_rcu() directly.
+On Tue, Oct 15, 2024, Nikolas Wipper wrote:
+> On 15.10.24 17:58, Sean Christopherson wrote:
+> > ...
+> >
+> > And from a performance perspective, synchronizing on kvm->srcu is going to be
+> > susceptible to random slowdowns, because writers will have to wait until all vCPUs
+> > drop SRCU, even if they have nothing to do with PV TLB flushes.  E.g. if vCPUs
+> > are faulting in memory from swap, uninhibiting a TLB flushes could be stalled
+> > unnecessarily for an extended duration.
+> >
 > 
-> The changes were done using the following Coccinelle semantic patch.
-> This semantic patch is designed to ignore cases where the callback
-> function is used in another way.
+> This should be an easy fix, right? Just create an SRCU only for the TLB flushes only.
+
+Yes, this is a very solvable problem.  But while SRCU objects aren't expensive,
+they aren't entirely free either.
+ 
+> > Lastly, KVM_REQ_EVENT is a big hammer (triggers a lot of processing) and semantically
+> > misleading (there is no event to process).  At a glance, KVM_REQ_UNBLOCK is likely
+> > more appropriate.
+> >
+> > Before we spend too much time cleaning things up, I want to first settle on the
+> > overall design, because it's not clear to me that punting HvTranslateVirtualAddress
+> > to userspace is a net positive.  We agreed that VTLs should be modeled primarily
+> > in userspace, but that doesn't automatically make punting everything to userspace
+> > the best option, especially given the discussion at KVM Forum with respect to
+> > mplementing VTLs, VMPLs, TD partitions, etc.
+> >
 > 
-> [...]
+> I wasn't at the discussion, so maybe I'm missing something, but the hypercall
+> still needs VTL awareness. 
 
-Here is the summary with links:
-  - [01/17] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [02/17] ipv4: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    https://git.kernel.org/netdev/net-next/c/497e17d80759
-  - [03/17] inetpeer: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    https://git.kernel.org/netdev/net-next/c/bb5810d4236b
-  - [04/17] ipv6: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    https://git.kernel.org/netdev/net-next/c/85e48bcf294c
-  - [05/17] xfrm6_tunnel: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [06/17] batman-adv: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [08/17] net: bridge: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    https://git.kernel.org/netdev/net-next/c/4ac64e570c33
-  - [10/17] can: gw: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [14/17] kcm: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    https://git.kernel.org/netdev/net-next/c/7bb3ecbc2b6b
-  - [15/17] netfilter: nf_conncount: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [16/17] netfilter: expect: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [17/17] netfilter: xt_hashlimit: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
+Yeah, the KVM Forum discussion is relevant, because one of the key takeaways from
+that discussion was that KVM will need some amount of VTL awareness.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> For one, it is primarily executed from VTL0 and primarily targets VTL1
+> (primarily here means "thats what I see when I boot Windows Server 2019"), so
+> it would need to know which vCPU is the corresponding VTL (this assumes one
+> vCPU per VTL, as in the QEMU implementation).
 
+Right, but even without the takeways from KVM Forum, we need to look at big picture
+and come up with a design that makes the most sense.  E.g. if making KVM aware
+of "struct kvm" objects that represent different VTLs in the same VM greatly
+simplifies supporting HvTranslateVirtualAddress, then it's likely worth doing.
 
+> To make matters worse, the hypercall can also arbitrarily choose to target a
+> different VP.  This would require a way to map (VP index, VTL) -> (vcpu_id)
+> within KVM.
+
+I don't think so.  The TLFS definition for TlbFlushInhibit give KVM a _lot_ of
+wiggle room, e.g. KVM can retry the hypercall as many times as necessary.  To
+honor TlbFlushInhibit, KVM just needs to ensure that flushes are blocked if any
+vCPU at the target VTL is blocking flushes.  And to avoid hanging a vCPU, KVM
+only needs to ensure a vCPU is awakened if it _might_ be able to make forward
+progress.
+
+I.e. I don't think KVM needs to be super precise when waking blocking vCPUs, and
+thus there's no need to precisely track who is blocking whom.  I think :-)
+ 
+> > The cover letters for this series and KVM_TRANSLATE2 simply say they're needed
+> > for HvTranslateVirtualAddress, but neither series nor Nicolas' patch to punt
+> > HVCALL_TRANSLATE_VIRTUAL_ADDRESS[*] justifies the split between userspace and
+> > KVM.  And it very much is a split, because there are obviously a lot of details
+> > around TlbFlushInhibit that bleed into KVM.
+> >
+> > Side topic, what actually clears HvRegisterInterceptSuspend.TlbFlushInhibit?  The
+> > TLFS just says
+> >
+> >   After the memory intercept routine performs instruction completion, it should
+> >   clear the TlbFlushInhibit bit of the HvRegisterInterceptSuspend register.
+> >
+> > but I can't find anything that says _how_ it clears TlbFlushInhibit.
+> >
+> 
+> The register cannot be accessed using the HvSetVpRegisters hypercall, but the TLFS
+> talks about it elsewhere. I'm assuming this is a formatting issue (there are a few
+> elsewhere). In 15.5.1.3 it says
+> 
+>   To unlock the TLB, the higher VTL can clear this bit. Also, once a VP returns
+>   to a lower VTL, it releases all TLB locks which it holds at the time.
+> 
+> The QEMU implementation also just uninhibits on intercept exit, and that, at least,
+> does not crash.
+
+Hmm, it would be nice to bottom out on whether the higher VLT or the VMM/hypervisor
+is responsible for clearing TlbFlushInhibit, because that may influence KVM's
+design.
 
