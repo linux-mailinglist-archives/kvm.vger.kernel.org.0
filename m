@@ -1,169 +1,387 @@
-Return-Path: <kvm+bounces-28957-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9E4E99FBA9
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 00:48:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74EF099FC8E
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 01:42:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F432B2269A
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 22:48:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 342652830E4
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 23:42:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AAFB1D63ED;
-	Tue, 15 Oct 2024 22:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33DB11E6311;
+	Tue, 15 Oct 2024 23:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f6AO1YyS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zL9IBy7C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B621B0F31
-	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 22:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECA31D63DF
+	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 23:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729032501; cv=none; b=RYMzTtZBFOpLezSi1GYIstPf04VrjwmbQxEJltdabn3suFuGHJtEUB9e8iKYjfPZ8Ej25LUTy8ChRV+oWpOcTwnZYzLRjc4vdlrl8wo4IeUvacZUQ+ryWvwjR5BCXwA/v01nLkF5uihp3O4Yaj/NgbRVgvU2zqQSTb3XfzTMP4Y=
+	t=1729035749; cv=none; b=p+n02pyii377qFVQogJVwdQ3j6sxlWnL7Z+D9ix5vU4WSe0DxJmQaWIPbCBdVwhHN2d7P2iO6ASHUBqXL6xWNyKZVgxLVVXHNutVCcYXAWCilRTqOXz8cUl6P+nJ/+v9bd93OAp/VuKEnwCKFFpuYCRSgeDrvt1qLjM3/3Q2E1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729032501; c=relaxed/simple;
-	bh=y4wTt1hMw46Ajv3cIQeHDlR0RDHcUdA5/yND53W4oTs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IIJEz35O+iYAYlC0MiACvJQNxHwX11vSrC7UCUcyku0IUb1niepJ0YdkSSpUsr1vVFluIUNgG7edB49rcdMfgjicIOGOfgN1j3Sq02GuqNeP2VDi8UbcllKRxI5De7afiCE7rRoXpfpspngRDXbOwrpsxC5gBL1MUhhyxEw4IlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f6AO1YyS; arc=none smtp.client-ip=209.85.217.43
+	s=arc-20240116; t=1729035749; c=relaxed/simple;
+	bh=2XwO7NtXHdTNIRAjK6n/Kih6Ae/LV0gRdwLSe5f/pE4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gPtZ1SvxNbeggJQFM1Q1QoX1e0YZMAAfSvKwN1K7rRHkzFPcvfKdrhCxZ51JmiiIRxpAY0DBz4KZ10uRXD0iFtCdt0w2SV1LbttpjKUpP1HDYd2+DOGqvu6e/P/XHEZl1araC065uF1kMNZJkEkc2CArPFpDUYX142crLJoomIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zL9IBy7C; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-4a48477b25eso197353137.0
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 15:48:18 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-207510f3242so75681475ad.0
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 16:42:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729032498; x=1729637298; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=thjVFZ9JHy+XHx/P+OmRUKAu97VTsEznVTTuyaP0ILg=;
-        b=f6AO1YySgd60836QBSGee0wmssdZufNGSHq2M6w8crI+FrFnI5A215R9UJr7H8iwGq
-         dhJjk+Nv9z14pZG8q0H0URq9Y+4z9CNRVzlDr/5/rN23xKtMkcsaA/0Sh97JLT5i54Jk
-         kyLCVcycucs698Y83gNcXcvSkHRKrsP6ANG9+oNMKFgrh2KhUccmNs9cOmSRrhiTsl0i
-         o9k9o82RR5GQKSXLJYN/spm8AL35nOPMjg8I2OjS2py38zja4Kf3iNpT+4u1ce+PnSFG
-         oXJsufnrj8JIQF9GnsD4oJV3nGOn85VqCiS/vHeblde4rqDT4t/fNvN/OUxoM8BA5YPI
-         lYEA==
+        d=google.com; s=20230601; t=1729035747; x=1729640547; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7eUDxM17tb+gqPu2r+ZqLDYFDJ5HMZg5l07N5DJoNIg=;
+        b=zL9IBy7CeDXYNbLnKgAVS0PwzUbSss3eNkl8MhRpcR8Vlli7xjfY/nRdKnGDKXXek7
+         BmwB5FzTUJiM26M4YzxwGBRbxslh+cNZ6wSFFHkLhlmQovYsr7u/rd5Toz1D/dNCdLP4
+         wZ4C/c079pQBBC0+1dzgjxMlyEAW7MVzdlbp+2/fXJc4zhWbUY6XN6n8g5ACyDsTjYRm
+         tyfptUZnnB828PN+GrdTRrHWK9mMkL+nnQkBRYBe9pWUTllHhsLkclVKfkJnYV52OvTl
+         ENK8GCCEP41LJdgeh36oehWgcfIrV3FavZcSP5rseRi634O74v1wJ67BAyxqQOOakE07
+         zE/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729032498; x=1729637298;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=thjVFZ9JHy+XHx/P+OmRUKAu97VTsEznVTTuyaP0ILg=;
-        b=KbdiNk8poISV2g1TECkUYjAZffY4qCTLziXgAxr46APyFh5DPW5dJZkYC2hOHALsqp
-         EHzCzm8/zdFFZh+Jsg9ti6s3smmrv6eEPKZygWf3O/zpY2479E9AIovku6jvTlUFoA2s
-         IUUV28PKbT7mLwy5TjTu6Nc0EbsOBL1luRbRYh+ZSzEdxpMa1LJZ+Jq0u3M2sAik121V
-         glqBpaUyNfM/+nPASGrHL2BW0wBOfIwbOzEJxMJjJwZdeyvxHlA6AQprhA+Y38ElMhc/
-         xPG33ZACIpYpt9ld26UB2Zem9uh+8BLs6nukCPT3+eoSaGYTZMGnO8ESbPEKaCLOlWYu
-         JgEA==
-X-Forwarded-Encrypted: i=1; AJvYcCW3a4/4pvbymlSvxobu/sK5NrjIY/EsqFwx2nJnMHoMBzNQ4NOUC3Zn7awrOHw2CbpfcRc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDorHa15U7OsrVsdx48cfCY10UcoQi5MN2yMRjL3mMb/z/XEtD
-	1ZJit6B2DkzBktHNYvrvMJ4JiFsyszez7at2YrRtlv3KefrD2+7G68u0/6INfQ4M3Gu6OnCBPRh
-	ZZMcsEucgV8oodkTbJSAcx/RLcLoxzKQJpeeK
-X-Google-Smtp-Source: AGHT+IHnaSy0q/kDCz0vAJot6g5xsnJ0ihADeJJee62qYBERkh1eaBoELa9F+6Vz1W9f+tMrfIXWvAwFDhmw3bKOIJ8=
-X-Received: by 2002:a05:6102:b04:b0:4a4:72f0:7937 with SMTP id
- ada2fe7eead31-4a5b4cf873bmr2033136137.8.1729032497513; Tue, 15 Oct 2024
- 15:48:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729035747; x=1729640547;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7eUDxM17tb+gqPu2r+ZqLDYFDJ5HMZg5l07N5DJoNIg=;
+        b=tMpOyUPSlqoskml4D0L0Y+m8y0kVSaU/iRXjxbLX3wOy6zAaBhM9B2tnAj1angSsUO
+         pUiv+WJKm1ap82V5V8YLGkQ+4P+nEQWDQFv4DfNfPb8u7/+Ni56MjHxdDjy/+YU2bk9S
+         csoYxIvyVvU5CUC3JdkZOfzUaEdhJS4IKrylnTIAuzuTqKLUSHStWutWCu0MQ6x+QQRH
+         EYCyKUQCETOgX0EX32SpmHSvad4mi99EaAZTntvL6vnltNLvittsk39EQfL66bfGjAkE
+         kRLR7iX8TcDCmQuBQifPvJ5OVAtZdYnI3Aj4L40CaNz6fXfsOPplSncSn4HCgXe6sm0U
+         MShQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUdjasbZ+wgo/CrblGzWkr8XHo/yxdtQaje62aT15uzfYWjfspf6CIzqTkZM8eEdEWKRA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxjgvZgqyDPpxqFGDUWHhrk9wmmLyJlxIQyqbNw4+OeWIUhbc6
+	REErYwkJyyb1w5FclJ1jHk4C3mhIxdOYti+7QM/37NC0jMZmmaRmQjp/Nvgq9lx4k2quriiw/Ww
+	PY+ZbNA0QmgGF4uVoZoo6pg==
+X-Google-Smtp-Source: AGHT+IE4mmzougQm0PKiTlXBNiDor7G2xyOqdwtI6YCJEdFKXPWyVCN0dZyEelT/YGDmAzLpZFlN3mHqYCPBjI6hZg==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:146:b875:ac13:a9fc])
+ (user=ackerleytng job=sendgmr) by 2002:a17:902:e892:b0:20c:62e1:635d with
+ SMTP id d9443c01a7336-20d27f09861mr79095ad.7.1729035746339; Tue, 15 Oct 2024
+ 16:42:26 -0700 (PDT)
+Date: Tue, 15 Oct 2024 23:42:24 +0000
+In-Reply-To: <Zw7f3YrzqnH-iWwf@x1n>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240926013506.860253-1-jthoughton@google.com>
- <Zw2no4OGDVK7m8QR@google.com> <CADrL8HUP1=eXE5QpVrKjgQGpusr_Raejr1sY2LLW1uSigpptOw@mail.gmail.com>
-In-Reply-To: <CADrL8HUP1=eXE5QpVrKjgQGpusr_Raejr1sY2LLW1uSigpptOw@mail.gmail.com>
-From: Yu Zhao <yuzhao@google.com>
-Date: Tue, 15 Oct 2024 16:47:39 -0600
-Message-ID: <CAOUHufZU8C-48H0n2v02D52PoC8b0mYUJJS=C-dz+bruruOfdg@mail.gmail.com>
-Subject: Re: [PATCH v7 00/18] mm: multi-gen LRU: Walk secondary MMU page
- tables while aging
-To: James Houghton <jthoughton@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	David Stevens <stevensd@google.com>
+Mime-Version: 1.0
+References: <cover.1726009989.git.ackerleytng@google.com> <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
+ <Zwf7k1wmPqEEaRxz@x1n> <diqz8quunrlw.fsf@ackerleytng-ctop.c.googlers.com> <Zw7f3YrzqnH-iWwf@x1n>
+Message-ID: <diqz1q0hndb3.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
+ struct kvm_gmem_private
+From: Ackerley Tng <ackerleytng@google.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk, 
+	jgg@nvidia.com, david@redhat.com, rientjes@google.com, fvdl@google.com, 
+	jthoughton@google.com, seanjc@google.com, pbonzini@redhat.com, 
+	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	isaku.yamahata@intel.com, muchun.song@linux.dev, erdemaktas@google.com, 
+	vannapurve@google.com, qperret@google.com, jhubbard@nvidia.com, 
+	willy@infradead.org, shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
+	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
+	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
+	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
+	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 6:07=E2=80=AFPM James Houghton <jthoughton@google.c=
-om> wrote:
->
-> On Mon, Oct 14, 2024 at 4:22=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Thu, Sep 26, 2024, James Houghton wrote:
-> > > This patchset makes it possible for MGLRU to consult secondary MMUs
-> > > while doing aging, not just during eviction. This allows for more
-> > > accurate reclaim decisions, which is especially important for proacti=
-ve
-> > > reclaim.
-> >
-> > ...
-> >
-> > > James Houghton (14):
-> > >   KVM: Remove kvm_handle_hva_range helper functions
-> > >   KVM: Add lockless memslot walk to KVM
-> > >   KVM: x86/mmu: Factor out spte atomic bit clearing routine
-> > >   KVM: x86/mmu: Relax locking for kvm_test_age_gfn and kvm_age_gfn
-> > >   KVM: x86/mmu: Rearrange kvm_{test_,}age_gfn
-> > >   KVM: x86/mmu: Only check gfn age in shadow MMU if
-> > >     indirect_shadow_pages > 0
-> > >   mm: Add missing mmu_notifier_clear_young for !MMU_NOTIFIER
-> > >   mm: Add has_fast_aging to struct mmu_notifier
-> > >   mm: Add fast_only bool to test_young and clear_young MMU notifiers
-> >
-> > Per offline discussions, there's a non-zero chance that fast_only won't=
- be needed,
-> > because it may be preferable to incorporate secondary MMUs into MGLRU, =
-even if
-> > they don't support "fast" aging.
-> >
-> > What's the status on that front?  Even if the status is "TBD", it'd be =
-very helpful
-> > to let others know, so that they don't spend time reviewing code that m=
-ight be
-> > completely thrown away.
->
-> The fast_only MMU notifier changes will probably be removed in v8.
->
-> ChromeOS folks found that the way MGLRU *currently* interacts with KVM
-> is problematic. That is, today, with the MM_WALK MGLRU capability
-> enabled, normal PTEs have their Accessed bits cleared via a page table
-> scan and then during an rmap walk upon attempted eviction, whereas,
-> KVM SPTEs only have their Accessed bits cleared via the rmap walk at
-> eviction time. So KVM SPTEs have their Accessed bits cleared less
-> frequently than normal PTEs, and therefore they appear younger than
-> they should.
->
-> It turns out that this causes tab open latency regressions on ChromeOS
-> where a significant amount of memory is being used by a VM. IIUC, the
-> fix for this is to have MGLRU age SPTEs as often as it ages normal
-> PTEs; i.e., it should call the correct MMU notifiers each time it
-> clears A bits on PTEs. The final patch in this series sort of does
-> this, but instead of calling the new fast_only notifier, we need to
-> call the normal test/clear_young() notifiers regardless of how fast
-> they are.
->
-> This also means that the MGLRU changes no longer depend on the KVM
-> optimizations, as they can motivated independently.
->
-> Yu, have I gotten anything wrong here? Do you have any more details to sh=
-are?
+Peter Xu <peterx@redhat.com> writes:
 
-Yes, that's precisely the problem. My original justification [1] for
-not scanning KVM MMU when lockless is not supported turned out to be
-harmful to some workloads too.
+> On Fri, Oct 11, 2024 at 11:32:11PM +0000, Ackerley Tng wrote:
+>> Peter Xu <peterx@redhat.com> writes:
+>> 
+>> > On Tue, Sep 10, 2024 at 11:43:57PM +0000, Ackerley Tng wrote:
+>> >> The faultability xarray is stored on the inode since faultability is a
+>> >> property of the guest_memfd's memory contents.
+>> >> 
+>> >> In this RFC, presence of an entry in the xarray indicates faultable,
+>> >> but this could be flipped so that presence indicates unfaultable. For
+>> >> flexibility, a special value "FAULT" is used instead of a simple
+>> >> boolean.
+>> >> 
+>> >> However, at some stages of a VM's lifecycle there could be more
+>> >> private pages, and at other stages there could be more shared pages.
+>> >> 
+>> >> This is likely to be replaced by a better data structure in a future
+>> >> revision to better support ranges.
+>> >> 
+>> >> Also store struct kvm_gmem_hugetlb in struct kvm_gmem_hugetlb as a
+>> >> pointer. inode->i_mapping->i_private_data.
+>> >
+>> > Could you help explain the difference between faultability v.s. the
+>> > existing KVM_MEMORY_ATTRIBUTE_PRIVATE?  Not sure if I'm the only one who's
+>> > confused, otherwise might be good to enrich the commit message.
+>> 
+>> Thank you for this question, I'll add this to the commit message to the
+>> next revision if Fuad's patch set [1] doesn't make it first.
+>> 
+>> Reason (a): To elaborate on the explanation in [1],
+>> KVM_MEMORY_ATTRIBUTE_PRIVATE is whether userspace wants this page to be
+>> private or shared, and faultability is whether the page is allowed to be
+>> faulted in by userspace.
+>> 
+>> These two are similar but may not be the same thing. In pKVM, pKVM
+>> cannot trust userspace's configuration of private/shared, and other
+>> information will go into determining the private/shared setting in
+>> faultability.
+>
+> It makes sense to me that the kernel has the right to decide which page is
+> shared / private.  No matter if it's for pKVM or CoCo, I believe the normal
+> case is most / all pages are private, until some requests to share them for
+> special purposes (like DMA).  But that'll need to be initiated as a request
+> from the guest not the userspace hypervisor.
 
-On one hand, scanning KVM MMU when not lockless can cause the KVM MMU
-lock contention; on the other hand, not scanning KVM MMU can skew
-anon/file LRU aging and thrash page cache. Given the lock contention
-is being tackled, the latter seems to be the lesser of two evils.
+For TDX, the plan is that the guest will request the page to be remapped
+as shared or private, and the handler for that request will exit to
+the userspace VMM.
 
-[1] https://lore.kernel.org/linux-mm/CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmd=
-UWs5eaKmhEeyQ@mail.gmail.com/
+The userspace VMM will then do any necessary coordination (e.g. for a
+shared to private conversion it may need to unpin pages from DMA), and
+then use the KVM_SET_MEMORY_ATTRIBUTES ioctl to indicate agreement with
+the guest's requested conversion. This is where
+KVM_MEMORY_ATTRIBUTE_PRIVATE will be provided.
+
+Patch 38 [1] updates
+tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c to
+demonstrate the usage flow for x86.
+
+Fuad will be in a better position to explain the flow for pKVM. 
+
+> I must confess I totally have no idea how KVM_MEMORY_ATTRIBUTE_PRIVATE is
+> planned to be used in the future. Currently it's always set at least in
+> QEMU if gmemfd is enabled, so it doesn't yet tell me anything..
+>
+> If it's driven by the userspace side of the hypervisor, I wonder when
+> should the user app request some different value it already was, if the
+> kernel already has an answer in this case.  It made me even more confused,
+> as we have this in the API doc:
+>
+>         Note, there is no "get" API.  Userspace is responsible for
+>         explicitly tracking the state of a gfn/page as needed.
+>
+> And I do wonder whether we will still need some API just to query whether
+> the kernel allows the page to be mapped or not (aka, the "real" shared /
+> private status of a guest page).  I guess that's not directly relevant to
+> the faultability to be introduced here, but if you or anyone know please
+> kindly share, I'd love to learn about it.
+
+The userspace VMM will track the initial shared/private state, in the
+sense that when the VM is created, the mem_attr_array is initialized
+such that the guest pages are all shared.
+
+Then when the userspace VMM calls the KVM_SET_MEMORY_ATTRIBUTES ioctl,
+it should record all changes so it knows what the state is in the
+kernel.
+
+Even if userspace VMM doesn't record the state properly, if the
+KVM_SET_MEMORY_ATTRIBUTES ioctl is used to request no change
+(e.g. setting an already private page to private), it will just be a
+no-op in the kernel.
+
+>> 
+>> Perhaps Fuad can elaborate more here.
+>> 
+>> Reason (b): In this patch series (mostly focus on x86 first), we're
+>> using faultability to prevent any future faults before checking that
+>> there are no mappings.
+>> 
+>> Having a different xarray from mem_attr_array allows us to disable
+>> faulting before committing to changing mem_attr_array. Please see
+>> `kvm_gmem_should_set_attributes_private()` in this patch [2].
+>> 
+>> We're not completely sure about the effectiveness of using faultability
+>> to block off future faults here, in future revisions we may be using a
+>> different approach. The folio_lock() is probably important if we need to
+>> check mapcount. Please let me know if you have any ideas!
+>> 
+>> The starting point of having a different xarray was pKVM's requirement
+>> of having separate xarrays, and we later realized that the xarray could
+>> be used for reason (b). For x86 we could perhaps eventually remove the
+>> second xarray? Not sure as of now.
+>
+> Just had a quick look at patch 27:
+>
+> https://lore.kernel.org/all/5a05eb947cf7aa21f00b94171ca818cc3d5bdfee.1726009989.git.ackerleytng@google.com/
+>
+> I'm not yet sure what's protecting from faultability being modified against
+> a concurrent fault().
+>
+> I wonder whether one can use the folio lock to serialize that, so that one
+> needs to take the folio lock to modify/lookup the folio's faultability,
+> then it may naturally match with the fault() handler design, where
+> kvm_gmem_get_folio() needs to lock the page first.
+>
+> But then kvm_gmem_is_faultable() will need to also be called only after the
+> folio is locked to avoid races.
+
+My bad. In our rush to get this series out before LPC, the patch series
+was not organized very well. Patch 39 [2] adds the
+lock. filemap_invalidate_lock_shared() should make sure that faulting
+doesn't race with faultability updates.
+
+>> > The latter is per-slot, so one level higher, however I don't think it's a
+>> > common use case for mapping the same gmemfd in multiple slots anyway for
+>> > KVM (besides corner cases like live upgrade).  So perhaps this is not about
+>> > layering but something else?  For example, any use case where PRIVATE and
+>> > FAULTABLE can be reported with different values.
+>> >
+>> > Another higher level question is, is there any plan to support non-CoCo
+>> > context for 1G?
+>> 
+>> I believe guest_memfd users are generally in favor of eventually using
+>> guest_memfd for non-CoCo use cases, which means we do want 1G (shared,
+>> in the case of CoCo) page support.
+>> 
+>> However, core-mm's fault path does not support mapping at anything
+>> higher than the PMD level (other than hugetlb_fault(), which the
+>> community wants to move away from), so core-mm wouldn't be able to map
+>> 1G pages taken from HugeTLB.
+>
+> Have you looked at vm_operations_struct.huge_fault()?  Or maybe you're
+> referring to some other challenges?
+>
+
+IIUC vm_operations_struct.huge_fault() is used when creating a PMD, but
+PUD mappings will be needed for 1G pages, so 1G pages can't be mapped by
+core-mm using vm_operations_struct.huge_fault().
+
+>> 
+>> In this patch series, we always split pages before mapping them to
+>> userspace and that's how this series still works with core-mm.
+>> 
+>> Having 1G page support for shared memory or for non-CoCo use cases would
+>> probably depend on better HugeTLB integration with core-mm, which you'd
+>> be most familiar with.
+>
+> My understanding is the mm community wants to avoid adding major new things
+> on top of current hugetlbfs alone, I'm not sure whether this will also be
+> accounted as part of that.  IMHO it could depend on how much this series
+> will reuse hugetlbfs.  If it's only about allocations it might be ok,
+> however I still feel risky having the name "hugetlbfs" here, the allocator
+> (if refactored out of hugetlb, but to contain more functions than CMA)
+> could be named in a more generic way.  No rush on changing anything, you
+> may always want to talk with more mm people on this I guess.
+>
+
+Thanks for your feedback! We do intend to only use the allocator part of
+HugeTLB for guest_memfd, which will need some refactoring on the HugeTLB
+side. The refactoring is not expected to require any functional changes.
+
+What do you think of refactoring out the allocator part of HugeTLB in
+terms of whether it helps with HugeTLB unification?
+
+If the refactoring out of the allocator part of HugeTLB needs a name
+change, that could work too.
+
+> I also don't know how you treat things like folio_test_hugetlb() on
+> possible assumptions that the VMA must be a hugetlb vma.  I'd confess I
+> didn't yet check the rest of the patchset yet - reading a large series
+> without a git tree is sometimes challenging to me.
+>
+
+I'm thinking to basically never involve folio_test_hugetlb(), and the
+VMAs used by guest_memfd will also never be a HugeTLB VMA. That's
+because only the HugeTLB allocator is used, but by the time the folio is
+mapped to userspace, it would have already have been split. After the
+page is split, the folio loses its HugeTLB status. guest_memfd folios
+will never be mapped to userspace while they still have a HugeTLB
+status.
+
+(When 1G pages can be mapped to userspace, we will have to rethink the
+above. But possibly by then HugeTLB would have been more unified with
+core-mm and hence perhaps things will fall in place?)
+
+The current uses of folio_test_hugetlb() in this patch series are
+
+1. In alloc_migration_target_by_mpol(), which is okay because that's
+   during allocation of the HugeTLB folio, before it gets split up and
+   loses its status. When the folio is freed, before it is returned to
+   HugeTLB, the HugeTLB status will be reinstated.
+
+2. In kvm_gmem_prepare_folio(). If the folio hasn't been split yet, then
+   we use folio_zero_user() to zero the folio, and if it has been split,
+   then we use a more primitive loop to zero the folio. These two
+   methods of zeroing are actually kind of the same thing and can be
+   combined. This correctly uses folio_test_hugetlb().
+
+3. In kvm_gmem_fault(), I check if folio_test_hugetlb() when doing the
+   same zeroing described in (2), but this is not actually necessary and
+   will be removed in a future revision, since HugeTLB folios should
+   never get faulted to userspace.
+
+>> 
+>> Thank you for looking through our patches, we need your experience and
+>> help! I've also just sent out the first 3 patches separately, which I
+>> think is useful in improving understandability of the
+>> resv_map/subpool/hstate reservation system in HugeTLB and can be
+>> considered separately. Hope you can also review/comment on [4].
+>
+> I'll read and think about it.  Before that, I'll probably need to read more
+> backgrounds you need from hugetlb allocators (e.g. I remember you mentioned
+> pool management somewhere).  I tried to watch your LPC talk but the
+> recording has some issue on audio so I can mostly hear nothing in most of
+> the discussions..  I'll try to join the bi-weekly meeting two days later,
+> though.
+>
+
+Thank you!
+
+>> 
+>> > I saw that you also mentioned you have working QEMU prototypes ready in
+>> > another email.  It'll be great if you can push your kernel/QEMU's latest
+>> > tree (including all dependency patches) somewhere so anyone can have a
+>> > closer look, or play with it.
+>> 
+>> Vishal's reply [3] might have been a bit confusing. To clarify, my team
+>> doesn't work with Qemu at all (we use a custom userspace VMM internally)
+>> so the patches in this series are tested purely with selftests.
+>> 
+>> The selftests have fewer dependencies than full Qemu and I'd be happy to
+>> help with running them or explain anything that I might have missed out.
+>> 
+>> We don't have any Qemu prototypes and are not likely to be building any
+>> prototypes in the foreseeable future.
+>
+> I see, that's totally not a problem.  If there can be, especially !CoCo
+> support at some point, we're happy to test it on QEMU side.  I'll see what
+> I can do to help !CoCo kernel side getting there.
+>
+> Besides, it'll still be great if you can push a latest kernel tree
+> somewhere (or provide the base commit ID, but that needs to be on a public
+> tree I can fetch).
+
+I should have added the base commit ID.
+
+The base commit hash for this series is
+1c4246294c9841c50805cec0627030c083e019c6.
+
+>
+> Thanks,
+>
+>> 
+>> >
+>> > Thanks,
+>> >
+>> > -- 
+>> > Peter Xu
+>> 
+>> [1] https://lore.kernel.org/all/20241010085930.1546800-3-tabba@google.com/
+>> [2] https://lore.kernel.org/all/f4ca1711a477a3b56406c05d125dce3d7403b936.1726009989.git.ackerleytng@google.com/
+>> [3] https://lore.kernel.org/all/CAGtprH-GczOb64XrLpdW4ObRG7Gsv8tHWNhiW7=2dE=OAF7-Rw@mail.gmail.com/
+>> [4] https://lore.kernel.org/all/cover.1728684491.git.ackerleytng@google.com/T/
+>> 
+>
+> -- 
+> Peter Xu
+
+[1] https://lore.kernel.org/all/3ef4b32d32dca6e1b506e967c950dc2d4c3bc7ae.1726009989.git.ackerleytng@google.com/
+[2] https://lore.kernel.org/all/38723c5d5e9b530e52f28b9f9f4a6d862ed69bcd.1726009989.git.ackerleytng@google.com/
 
