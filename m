@@ -1,96 +1,225 @@
-Return-Path: <kvm+bounces-28935-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28936-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75D6499F4FA
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 20:15:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5363199F613
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 20:51:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3D95B23005
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 18:15:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D55DA1F26BE6
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 18:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FF91FAEF8;
-	Tue, 15 Oct 2024 18:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3261E1B6D09;
+	Tue, 15 Oct 2024 18:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bPon/+CV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iu4EEd5U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9681FC7CB
-	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 18:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE50D203714
+	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 18:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729016143; cv=none; b=edbe+IF9ccUzj2/NjDr2T64y9wgJdhLm74MXtR9WXP4kI3W3z5ZAxx4dHFZS+5so7X3MRoDjRvE0KUb7bZegUfiVotmEfYUJ5I+mnZiv3GimgyFbeyg32c6Py7ZP7aE/sVmFVltPjbSOTmpg3091rrigcHFpObezJBEgevvZ8Lc=
+	t=1729018305; cv=none; b=r9oRsVlftR0vf8FNfXU/GLQWzfeLdp2TRBuBAI8X5ORTCfNyxMNQUtClQvS7vxHgzbJmv4BMG0cyLvCsVvnaWfOfbRhk/gN9AGmctXGspm/31QVGtt5wtiY2Sni3gCgpJCiBoWvssmUkFcKeMnubJAA5Hulxc0HY2pBnefQou84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729016143; c=relaxed/simple;
-	bh=7jVXhg8Ithut01ABxZLBy1RgXQK7zqrguPx+HcH5s8w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hFGJYNrKC5O4hGmDCklEh9nypIoEI14TSZsUVAoTu/OR3fqTkv1dQKoC8xlEw0xzsnkpmD4imBBxV+ZSzMpxe+TMeuL72V7h1htsb6Qzv/KLDRj4pK7t2i+B83Ievr/JDuXClDLg3oLcPD7GKQiJEMASUQUgddO/M6TBSlKqSRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bPon/+CV; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-71e541be854so2749845b3a.1
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 11:15:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729016141; x=1729620941; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RGeLe7MyJKjs850UnRKPsFVzj5zQMWba4z4Ru+mUwTg=;
-        b=bPon/+CVzg09dm4S5ysv8N2zx9PqJlIa8uyPJvdBYnnqWXhhK4cD6GRq8qfDMNpswP
-         UK3TjgzUHzkxT5xZHJ3lOOTw9OjSZHZwIL+UwWPMt+tSPPIWydbtOljYBUOKxErs9P9J
-         uQg3fk/VUW52t/9uaZVQ67YnHu+aSev7w4LoFK4oSJLLe3TmxjXJFvxwcpELC09eF40m
-         ey3t6mTtwjKeUKsG3kHNMMf4xtX7ftTlvlctRWvweA9ZOzwzDMSaflCeYd7n9DQynhQU
-         cpEZ2IoMEcTP7U+N/rXk35oB0hNNppPTEWBMRJ3Qu8Lw7qRYuEcnkus5w+27YuZrCNap
-         22VQ==
+	s=arc-20240116; t=1729018305; c=relaxed/simple;
+	bh=YYwOSyuNwzPMG+/oq7uN2BePBtYq5BuqWQxzXADBcmY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UgkGG9d7CaxjabZGsBmj+Rs/uq+J9yafXtSXsL/p7ERzVioKd3YGYd7UW+JMzeRt2Ll3q7sV2gm5Td339gai3ImDS9OdQNhnUVLfvbqGKlDEmYJJlJrrDolL/y4CH6Fh/mZLJr/fMu8x9rfLmk1oLBej59in7nfJqYvBt2Xztc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iu4EEd5U; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729018302;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=N0GRF4pPtSOgd1WabJUy8wYxVfX9TEQxA2AbPtBzocc=;
+	b=Iu4EEd5Ungz9TYIabB7OQoafM2FugMHu+IEHY+MJU2v1rpk4B8WTbvCs5wF/3X848emf4u
+	lVLtjoKUo6slnKtSu/ZRcmqKSuK57Ud5UxeIQqoJFtsvSBEWVh7FjQKkp0kgz76FPLr4Nt
+	W8u8VXqQp1WlrQ88Ft9sMaRJMTj3MpY=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-595-bVmFf8PNN-Kgo3yigbfuAw-1; Tue, 15 Oct 2024 14:51:41 -0400
+X-MC-Unique: bVmFf8PNN-Kgo3yigbfuAw-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5c9217064f6so4369802a12.3
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 11:51:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729016141; x=1729620941;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RGeLe7MyJKjs850UnRKPsFVzj5zQMWba4z4Ru+mUwTg=;
-        b=tvqu9ovEGMarYls+BEjDHdkUL0PZIwQXDSIeXyIjCkI9ZilH39scAK5uwgs2BDAfAS
-         8HX+W31oazayyYfgyQofhTOIzhY4IIb/fZhAGN+kZzjBzkd1wuqKHZ5vP+cVLPrPe56R
-         rcMCJSFedZ3zx7zXvRaCaYiL71KHvSTjkXihdguiKzqkKIiajyBD5ZRhBvtESm5Iksel
-         Hegn73jUogqJhLwKi68WWNt8NqfJl50nQlq5RZVSUrfRN0r61up8vQt8gTTb3RrGxbGb
-         4mySOjcqIuTVO7k4xNj56vyNyUg4UkzmZOWT09Hy0jJK6+DOQhf4cbWjqi4Sk/orLNfT
-         dmAg==
-X-Gm-Message-State: AOJu0YzmTmtBgTMVyoWpe/CpzNdSTHnNgFYAZZm4KEaEtorziQh2gJJi
-	d0Oj57FCL8S8Uas0nwZSNdfhCo5jcWkyoIvzW+wqaTudZXNyUn/zyjFUz14lApMdqOdj7idJG31
-	yWg==
-X-Google-Smtp-Source: AGHT+IGKWdCo7eV9V+mILI4gW6qP8gu4ORKxCsa2y1RAcUSW/0uFZooXe4JyMpgc4Spi9EDGjRDxTUoJmCg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:aa7:8c10:0:b0:71e:5a62:862 with SMTP id
- d2e1a72fcca58-71e7db4d6e9mr3778b3a.3.1729016140224; Tue, 15 Oct 2024 11:15:40
- -0700 (PDT)
-Date: Tue, 15 Oct 2024 11:15:38 -0700
-In-Reply-To: <20241004053341.5726-4-manali.shukla@amd.com>
+        d=1e100.net; s=20230601; t=1729018300; x=1729623100;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N0GRF4pPtSOgd1WabJUy8wYxVfX9TEQxA2AbPtBzocc=;
+        b=IR+76iw3ArgPB08rUrjTMwz9GnL7DGPjgobleemS1U1N5a5C+dH85ArlJVnpQq8S3N
+         N9pnIkGifAvp87U4zWQlfpf3REzVQJKxSQPxHCdP33X9NCYH0QRxYGjNLDM8Z7Bd2eps
+         6H+SMV2qnE+l8WJO/oZku/CH1zg1EJ97CqW+n3VtRHmvVnr4iFMiAsZv3nsh1doA39wz
+         7WnLuEAI7auNEyqPxu8DYEV2ZV8u50+STSQV+x2A7jr+X2j3MbWfl76m/My9OVrvxsHL
+         Itxp5sC69gFRPZVRgTfA15/5ecmF5yK9VSoYSHgkJXiIz3PAHe6NYsJz4QsDGGAAw/X+
+         fNNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWzOEPhGg50K37bOBJgh2jcsw2srBTb9PLA+NtaFVg1g7FzDCOb/qFTZVkvndeJdSp2+e4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwY49qC6tKSPPQy+PTtiKRXQvi3WwI6e8onEmAw35CG97o+F8y2
+	eOvQjBkSzzJOlVjgh4il88nyAGHrNBpakyXEDejfn4XMOZQMQuObx9EFiqXooWqNrPl/PMZ63LK
+	6eKNy26NsBfbUE4EItmSe8zRqOSp1/ltU2mG/mFTIdfIN9uTd6g==
+X-Received: by 2002:a05:6402:5212:b0:5c9:547d:99 with SMTP id 4fb4d7f45d1cf-5c99501ced5mr1032548a12.2.1729018300225;
+        Tue, 15 Oct 2024 11:51:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEoUi+m94pA/sZ0UkPSNqunOeFPcNR+QjlgzRmDDQ7K7kAorm0A07Mz2aeKaa+48zMcVX+P9g==
+X-Received: by 2002:a05:6402:5212:b0:5c9:547d:99 with SMTP id 4fb4d7f45d1cf-5c99501ced5mr1032505a12.2.1729018299657;
+        Tue, 15 Oct 2024 11:51:39 -0700 (PDT)
+Received: from eisenberg.fritz.box (200116b82d5d5a0006e2615320d1d4db.dip.versatel-1u1.de. [2001:16b8:2d5d:5a00:6e2:6153:20d1:d4db])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c98d39a9a2sm974438a12.0.2024.10.15.11.51.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2024 11:51:38 -0700 (PDT)
+From: Philipp Stanner <pstanner@redhat.com>
+To: Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Basavaraj Natikar <basavaraj.natikar@amd.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alex Dubov <oakad@yahoo.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rasesh Mody <rmody@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com,
+	Igor Mitsyanko <imitsyanko@quantenna.com>,
+	Sergey Matyukevich <geomatsi@gmail.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Sanjay R Mehta <sanju.mehta@amd.com>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Jon Mason <jdmason@kudzu.us>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Chen Ni <nichen@iscas.ac.cn>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Ricky Wu <ricky_wu@realtek.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yi Liu <yi.l.liu@intel.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Ye Bin <yebin10@huawei.com>,
+	=?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+	Rui Salvaterra <rsalvaterra@gmail.com>
+Cc: linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ntb@lists.linux.dev,
+	linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	linux-sound@vger.kernel.org
+Subject: [PATCH 00/13] Remove implicit devres from pci_intx()
+Date: Tue, 15 Oct 2024 20:51:10 +0200
+Message-ID: <20241015185124.64726-1-pstanner@redhat.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241004053341.5726-1-manali.shukla@amd.com> <20241004053341.5726-4-manali.shukla@amd.com>
-Message-ID: <Zw6xSi3Om2H41fRa@google.com>
-Subject: Re: [PATCH v3 3/4] KVM: X86: Add documentation about behavioral
- difference for KVM_EXIT_BUS_LOCK
-From: Sean Christopherson <seanjc@google.com>
-To: Manali Shukla <manali.shukla@amd.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
-	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com, 
-	vkuznets@redhat.com, bp@alien8.de, babu.moger@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-x86 (lowercase 'x')
+@Driver-Maintainers: Your driver might be touched by patch "Remove
+devres from pci_intx()". You might want to take a look.
 
-On Fri, Oct 04, 2024, Manali Shukla wrote:
-> Add a note about behavioral difference for KVM_EXIT_X86_BUS_LOCK
-> between AMD CPUs and Intel CPUs in KVM_CAP_X86_BUS_LOCK_EXIT
-> capability documentation.
+Changes since the RFC [1]:
+  - Add a patch deprecating pci{m}_intx(). (Heiner, Andy, Me)
+  - Add Acked-by's already given.
+  - Export pcim_intx() as a GPL function. (Alex)
+  - Drop patch for rts5280, since this driver will be removed quite
+    soon. (Philipp Hortmann, Greg)
+  - Use early-return in pci_intx_unmanaged() and pci_intx(). (Andy)
 
-This belongs in the previous patch, especially if patch 2 is split into arch
-collateral and KVM implementation.  The KVM changes are small enough that I don't
-see a reason to separate the documentation from the code.  And there will likely
-be enough subtleties to the code that we'll want a bit more documentation.
+Hi all,
+
+this series removes a problematic feature from pci_intx(). That function
+sometimes implicitly uses devres for automatic cleanup. We should get
+rid of this implicit behavior.
+
+To do so, a pci_intx() version that is always-managed, and one that is
+never-managed are provided. Then, all pci_intx() users are ported to the
+version they need. Afterwards, pci_intx() can be cleaned up and the
+users of the never-managed version be ported back to pci_intx().
+
+This way we'd get this PCI API consistent again.
+
+Patch "Remove devres from pci_intx()" obviously reverts the previous
+patches that made drivers use pci_intx_unmanaged(). But this way it's
+easier to review and approve. It also makes sure that each checked out
+commit should provide correct behavior, not just the entire series as a
+whole.
+
+Merge plan for this is to enter through the PCI tree.
+
+[1] https://lore.kernel.org/all/20241009083519.10088-1-pstanner@redhat.com/
+
+
+Regards,
+P.
+
+Philipp Stanner (13):
+  PCI: Prepare removing devres from pci_intx()
+  ALSA: hda_intel: Use always-managed version of pcim_intx()
+  drivers/xen: Use never-managed version of pci_intx()
+  net/ethernet: Use never-managed version of pci_intx()
+  net/ntb: Use never-managed version of pci_intx()
+  misc: Use never-managed version of pci_intx()
+  vfio/pci: Use never-managed version of pci_intx()
+  PCI: MSI: Use never-managed version of pci_intx()
+  ata: Use always-managed version of pci_intx()
+  wifi: qtnfmac: use always-managed version of pcim_intx()
+  HID: amd_sfh: Use always-managed version of pcim_intx()
+  Remove devres from pci_intx()
+  PCI: Deprecate pci_intx(), pcim_intx()
+
+ drivers/ata/ahci.c                            |  2 +-
+ drivers/ata/ata_piix.c                        |  2 +-
+ drivers/ata/pata_rdc.c                        |  2 +-
+ drivers/ata/sata_sil24.c                      |  2 +-
+ drivers/ata/sata_sis.c                        |  2 +-
+ drivers/ata/sata_uli.c                        |  2 +-
+ drivers/ata/sata_vsc.c                        |  2 +-
+ drivers/hid/amd-sfh-hid/amd_sfh_pcie.c        |  4 +--
+ drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c |  2 +-
+ .../wireless/quantenna/qtnfmac/pcie/pcie.c    |  2 +-
+ drivers/pci/devres.c                          | 29 +++++--------------
+ drivers/pci/pci.c                             | 19 ++++--------
+ include/linux/pci.h                           |  1 +
+ sound/pci/hda/hda_intel.c                     |  2 +-
+ 14 files changed, 26 insertions(+), 47 deletions(-)
+
+-- 
+2.47.0
+
 
