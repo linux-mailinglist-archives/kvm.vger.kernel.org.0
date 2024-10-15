@@ -1,193 +1,161 @@
-Return-Path: <kvm+bounces-28859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70BD699E168
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:44:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D73999E175
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:47:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4902B2414B
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 08:44:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2B24B21C4B
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 08:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A6F1CF2B2;
-	Tue, 15 Oct 2024 08:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2BFC1CF28D;
+	Tue, 15 Oct 2024 08:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="InFSyYf4"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA841C8787;
-	Tue, 15 Oct 2024 08:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8D9757FC;
+	Tue, 15 Oct 2024 08:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728981836; cv=none; b=e1JOz5MZAyC55MVIvWAnixDRjgixFQKQn/yansbPbRKW6dcMMR8Nmco5j4cnXhwAGQHc7afKuiIhtAyoEnQlgbKp3dlQ9GE6kblHXocZxlQ2+Mio/fXt6DUvn/iQxdfCO6AM5U7vHnBiNLRhdyTV/19PfWl+DxoFoqjYkI/gXWk=
+	t=1728982010; cv=none; b=hbivh35Xe6dzXJKMABKWc42ckFHDnALtyo6VasjsUkQUC3vcyshA19S+gLaQUwGhpC7+W0/0SBunYC99SDQBmDzUtO07pp5YolJmrjiO+SgZ4GssYT0VXJXxBvuIb+v9lu9jNBUEltv3AHmMt4luxKR+LfHKlLSMXOLoHMMyOEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728981836; c=relaxed/simple;
-	bh=BQjouuICO8yjO21LK2K/DbVaOz18+S+vi29DpeNLs5M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fwCd+nJTvMC+CjG4uIwwmxFJUCQthLj4iMXcblV6j0efDWn8DYBxVnwapS2WKheagdt2gBNu3Hefajam3jVOdZsmEaU+gLUF+oGMSe4EPTRFDp6vnWCmc/dAQxlMhr1lktb8uqUVI3vEPNzW2Stjm/P2K43r9o0nmZN5DiEjRko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from zq-Legion-Y7000.. (unknown [121.237.44.89])
-	by APP-01 (Coremail) with SMTP id qwCowADnx7U7Kw5nCvutBw--.31767S2;
-	Tue, 15 Oct 2024 16:43:40 +0800 (CST)
-From: zhouquan@iscas.ac.cn
-To: anup@brainfault.org,
-	ajones@ventanamicro.com,
-	atishp@atishpatra.org,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	mark.rutland@arm.com,
-	alexander.shishkin@linux.intel.com,
-	jolsa@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
-	Quan Zhou <zhouquan@iscas.ac.cn>
-Subject: [PATCH v5 2/2] riscv: KVM: add basic support for host vs guest profiling
-Date: Tue, 15 Oct 2024 16:43:00 +0800
-Message-Id: <00342d535311eb0629b9ba4f1e457a48e2abee33.1728980031.git.zhouquan@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1728980031.git.zhouquan@iscas.ac.cn>
-References: <cover.1728980031.git.zhouquan@iscas.ac.cn>
+	s=arc-20240116; t=1728982010; c=relaxed/simple;
+	bh=q9Z4RrNUTo34g9ozTwIEV3B8Ve8Qma2UdhZF9OyGV8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qTkQsJHGnR/0k4+51oVeIhKNwPTqS/TilLnivHJoNBAOG5YOiERM0OWtECNcLXAx4Bq9jhNdWIPtWNQ16Lc7sAtRhQ37VvP0r4Qhvxt2N19cs168yVoaHzNio5KkraawOGqNfgPiNx6Ss8UZy1f8FVhclZ1Wo6v3FrHUI3NUM6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=InFSyYf4; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49F7teQ3025076;
+	Tue, 15 Oct 2024 08:46:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=2O8GnyJm4G3jGvPQJzneXovEocBj+f
+	NJloVLUU/yom4=; b=InFSyYf4TD/FUicAQBNVy2EH6YhWbMoFpfM8I7B7t6d8GX
+	QkbVvDBgC+YbA02E9/SFuCK9T/7SCecnSUcehBKB9iUwq1DVxXkURcVIgW05EFOR
+	jgfVdlU5UAWUuibXdCJyjuI7fYvGvCFzSqalpD6HXWYOp3WUDTKnus12iMV+e5T1
+	g1HJGfWmbcYKPZasQA6x/SIZXwf9sJ7qOuaz25k9bxrqqvgBYQuX8MZyNt0U7nGj
+	DiKTnpABJpVTlukTR56PIXNX6mWU/UFCcgwDwqCbS3xpyUGV+XnXwYUObXdo+hjY
+	HJFdZiRMUs3dA0kVxvjUts30mmxocYe9EMxMJmKg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429me108ap-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 08:46:42 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49F8jB4A014163;
+	Tue, 15 Oct 2024 08:46:41 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429me108ah-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 08:46:41 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49F7TuNN002473;
+	Tue, 15 Oct 2024 08:46:40 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4284emju4d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 08:46:40 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49F8kbVa25559804
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 15 Oct 2024 08:46:37 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3E6462004B;
+	Tue, 15 Oct 2024 08:46:37 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A47C020040;
+	Tue, 15 Oct 2024 08:46:36 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.60])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 15 Oct 2024 08:46:36 +0000 (GMT)
+Date: Tue, 15 Oct 2024 10:46:34 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH v2 2/7] Documentation: s390-diag.rst: make diag500 a
+ generic KVM hypercall
+Message-ID: <20241015084634.7641-E-hca@linux.ibm.com>
+References: <20241014144622.876731-1-david@redhat.com>
+ <20241014144622.876731-3-david@redhat.com>
+ <20241014180410.10447-C-hca@linux.ibm.com>
+ <78e8794a-d89f-4ded-b102-afc7cea20d1d@redhat.com>
+ <20241015081212.7641-A-hca@linux.ibm.com>
+ <8e39522c-2853-4d1f-b5ec-64fabcca968b@redhat.com>
+ <20241015082148.7641-B-hca@linux.ibm.com>
+ <d90566ac-dbe3-486b-bdc7-ece6c2ec6928@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowADnx7U7Kw5nCvutBw--.31767S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJFW7KrW7Kw13AFy8GFyrCrg_yoW5ur1rpF
-	Z8ur9Y9r4rKr97C34ayr1v9r45WFsYgw13Xry7CFy5Wr4Utry8Jr4vg34DAry5JFW8Xa4S
-	kFyrKFyruwn8Aw7anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26F
-	4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
-	7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbV
-	WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7Cj
-	xVA2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVAFwV
-	W8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-	6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-	Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-	Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMI
-	IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRkHUkUUUUU
-	=
-X-CM-SenderInfo: 52kr31xxdqqxpvfd2hldfou0/1tbiCRELBmcOALGnrQAAsH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d90566ac-dbe3-486b-bdc7-ece6c2ec6928@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5SQSHlUPWxfh2tLy-cwM-LSq5IpV_QTl
+X-Proofpoint-ORIG-GUID: 9aniXcWNp1HHXnm-P4vux2xj9Q6hltgG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ priorityscore=1501 mlxlogscore=313 malwarescore=0 spamscore=0 mlxscore=0
+ adultscore=0 impostorscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410150056
 
-From: Quan Zhou <zhouquan@iscas.ac.cn>
+On Tue, Oct 15, 2024 at 10:32:43AM +0200, David Hildenbrand wrote:
+> On 15.10.24 10:21, Heiko Carstens wrote:
+> > On Tue, Oct 15, 2024 at 10:16:20AM +0200, David Hildenbrand wrote:
+> > > On 15.10.24 10:12, Heiko Carstens wrote:
+> > > > On Mon, Oct 14, 2024 at 09:35:27PM +0200, David Hildenbrand wrote:
+> > > > > On 14.10.24 20:04, Heiko Carstens wrote:
+> > > > "If only there would be a query subcode available, so that the program
+> > > > check handling would not be necessary; but in particular my new subcode
+> > > > is not worth adding it" :)
+> > > > 
+> > > > Anyway, I do not care too much.
+> > > > 
+> > > 
+> > > Okay, I see your point: it would allow for removing the program check
+> > > handling from the STORAGE LIMIT invocation.
+> > > 
+> > > ... if only we wouldn't need the exact same program check handling for the
+> > > new query subfunction :P
+> > 
+> > Yeah yeah, but I think you got that this might help in the future.
+> 
+> Right. Adding it later also doesn't quite help to get rid of the checks
+> here, because some user space might implement STORAGE LIMIT without QUERY.
 
-For the information collected on the host side, we need to
-identify which data originates from the guest and record
-these events separately, this can be achieved by having
-KVM register perf callbacks.
+This would only help if the diag500 documentation would state that
+implementation of the QUERY subcode is mandatory. That is: for every
+new subcode larger than the QUERY subcode QUERY must also exist.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
----
- arch/riscv/include/asm/kvm_host.h | 10 ++++++++++
- arch/riscv/kvm/Kconfig            |  1 +
- arch/riscv/kvm/main.c             | 12 ++++++++++--
- arch/riscv/kvm/vcpu.c             |  7 +++++++
- 4 files changed, 28 insertions(+), 2 deletions(-)
+That way we only would have to implement program check handling once,
+if a program check happens on QUERY none of the newer subcodes is
+available, otherwise the return value would indicate that.
 
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 2e2254fd2a2a..35eab6e0f4ae 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -286,6 +286,16 @@ struct kvm_vcpu_arch {
- 	} sta;
- };
- 
-+/*
-+ * Returns true if a Performance Monitoring Interrupt (PMI), a.k.a. perf event,
-+ * arrived in guest context.  For riscv, any event that arrives while a vCPU is
-+ * loaded is considered to be "in guest".
-+ */
-+static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
-+{
-+	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
-+}
-+
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- 
- #define KVM_RISCV_GSTAGE_TLB_MIN_ORDER		12
-diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index 26d1727f0550..0c3cbb0915ff 100644
---- a/arch/riscv/kvm/Kconfig
-+++ b/arch/riscv/kvm/Kconfig
-@@ -32,6 +32,7 @@ config KVM
- 	select KVM_XFER_TO_GUEST_WORK
- 	select KVM_GENERIC_MMU_NOTIFIER
- 	select SCHED_INFO
-+	select GUEST_PERF_EVENTS if PERF_EVENTS
- 	help
- 	  Support hosting virtualized guest machines.
- 
-diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-index f3427f6de608..5682e338ae6d 100644
---- a/arch/riscv/kvm/main.c
-+++ b/arch/riscv/kvm/main.c
-@@ -51,6 +51,12 @@ void kvm_arch_disable_virtualization_cpu(void)
- 	csr_write(CSR_HIDELEG, 0);
- }
- 
-+static void kvm_riscv_teardown(void)
-+{
-+	kvm_riscv_aia_exit();
-+	kvm_unregister_perf_callbacks();
-+}
-+
- static int __init riscv_kvm_init(void)
- {
- 	int rc;
-@@ -105,9 +111,11 @@ static int __init riscv_kvm_init(void)
- 		kvm_info("AIA available with %d guest external interrupts\n",
- 			 kvm_riscv_aia_nr_hgei);
- 
-+	kvm_register_perf_callbacks(NULL);
-+
- 	rc = kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE);
- 	if (rc) {
--		kvm_riscv_aia_exit();
-+		kvm_riscv_teardown();
- 		return rc;
- 	}
- 
-@@ -117,7 +125,7 @@ module_init(riscv_kvm_init);
- 
- static void __exit riscv_kvm_exit(void)
- {
--	kvm_riscv_aia_exit();
-+	kvm_riscv_teardown();
- 
- 	kvm_exit();
- }
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 8d7d381737ee..e8ffb3456898 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -226,6 +226,13 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
- 	return (vcpu->arch.guest_context.sstatus & SR_SPP) ? true : false;
- }
- 
-+#ifdef CONFIG_GUEST_PERF_EVENTS
-+unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.guest_context.sepc;
-+}
-+#endif
-+
- vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- {
- 	return VM_FAULT_SIGBUS;
--- 
-2.34.1
-
+Otherwise this whole excercise would be pointless.
 
