@@ -1,81 +1,78 @@
-Return-Path: <kvm+bounces-28874-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DB7699E44F
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 12:41:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7326499E4AF
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 12:56:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C56C6B23660
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:41:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A300282364
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18CD1E7653;
-	Tue, 15 Oct 2024 10:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9851E7653;
+	Tue, 15 Oct 2024 10:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h15qE2LI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HlT67y/+"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B2B1E490B
-	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 10:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F991E04BD
+	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 10:55:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728988869; cv=none; b=SNgnghBcNxcuWQA9iNV96WMbI7KzbBGZBOm1zykB6/u+/r1zjWoO64Ptr0JtilnojXX7rFd/W8PNK631HKc7ekY7kNeiB9/ihFmbxDrmJPNLqJ8IYLtRwddJvHphEKrjDq2a8rfcC+zHzH9ir/xJWcOCdC33Zh3POXKH/qFkjuc=
+	t=1728989709; cv=none; b=FNZfJzyejb+QPUDQ8kCRxVuij9GOhEZaBaJOFZw2NpIsQU5vd8fLDEjO0Tp0qTOegA8nLWTe3F/JDX0QjUVC/MmTkyqjJkBSXhIcHvLrQ91tWKmhVhxcpJU2WnN1U/+3cht1os301VGjxsRlvIJtFTj7LoNXS69he/9Rtt61A1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728988869; c=relaxed/simple;
-	bh=9ShdzO/bmLu67IAiwcstveks6ejOJ8Y6MaKWflhjXWU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oQSawGj2czQagv/NIFUyLA3Afri07hW8y89lpb1d0XKx40HMmwFNNzt/umXbWRB72YdVjneQKS3b9L7Egre5hpXugtEF9kYMt2j9qkf48GT+wj1orY4WOZ6kz9s11EB1rfiPYzwZYv6DdF9hp+uGl4yXZjs2OPz3MHRfVV3lFlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h15qE2LI; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1728989709; c=relaxed/simple;
+	bh=gosB6q5sWMaM3u9ajSUaawR8eqhlu7jLBWeM/2NeAFo=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=g5p4hgkFCYdhJ2SDZ13QcvFPo0KsydpmiDrgMlCOw5ugm5jkviX48JjSPYbNaTbWxHekrQrH1lem0x6eEQoj2LvArCXGk5m2CofWr2s8x+8KLK+XUi1vHIlgGt8mtwM3oQEDIvhLIr4l8WJHdBJjL9xDAGL1aFvsAzCwj9L4qlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HlT67y/+; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728988867;
+	s=mimecast20190719; t=1728989706;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=o9Xc3pdTU7L6bKaIQgVX9nuyeL3ZIBH7Lpn32FEE8B0=;
-	b=h15qE2LICtZLbYyKCHdlQNKzFFQ00aYdkcQ2n0YuxtVUaCAJ6UKP+G4woH9ANo6NUNk3vw
-	vaCgGzSiTusOcIkNfRQ0MQnK5puHUN9XqT4g5RL6HrZmWXAAJ5ZLI1q07gufI+jrF/aHmC
-	a7/hXE1QsvDYBI1Ea1ilIKdxM7cwuCM=
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
+	bh=jN1OJwkAaGQtDrGUKrfe0W75Miaqbm3zRcU4TMBZuwE=;
+	b=HlT67y/+Osf3X8ziSeAfzu8gicTeidsMPVFGDkvlOZwHKweZyyUlSGQ3cClqsqdiGFYLnA
+	ZHXKMMFTtDhciEL1bQMYM4k1I81mz4Cam7oWfRGm0MEtdurX4JyPNbxdzfkKwoG3tj+mGD
+	w7jv2kO4Z0VdfmhZA1qT/Gk7R2LeaUA=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-659-c1LDjxPqMieQtQ_TXpIv0Q-1; Tue, 15 Oct 2024 06:41:03 -0400
-X-MC-Unique: c1LDjxPqMieQtQ_TXpIv0Q-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d458087c0so3106747f8f.1
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 03:41:03 -0700 (PDT)
+ us-mta-533-IQngwOwjODCe21CBG_cmOw-1; Tue, 15 Oct 2024 06:55:05 -0400
+X-MC-Unique: IQngwOwjODCe21CBG_cmOw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d603515cfso1258958f8f.1
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 03:55:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728988862; x=1729593662;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=o9Xc3pdTU7L6bKaIQgVX9nuyeL3ZIBH7Lpn32FEE8B0=;
-        b=HD1Qsm7uwP04FJ+YWthf2xdpN3PGD2fezEcmEfYKJvtNLL7JqHFAukuxAIMNhwgqig
-         lB6HsBMWz+XcvfSAFhVYia+mTlTBYeLgmCayb8COOSHH08TsUKg2DxWjwM3gRryv/V4n
-         xPsWNYMzaNFsFsmpOsGH1Gi1X1gYdl0hKAUYCtDg0/PTs7sqnaYXnaToRjz98GRt01qo
-         XylBom8YEQLIjk/7TynC6pcbSQmD2+0obXRR/dtFZP3/pWg4W3guwWcyqlqDNWjXZ+Ad
-         3CXwjWwy9Mx/M3Glgrf65vnv/5grTLdWXVgn9PHHeUYtp9KzCdzslO/z4bueG6gSrPBi
-         NXSw==
-X-Forwarded-Encrypted: i=1; AJvYcCV+XqGFufcGcqsozB99ZxKIlCmuSkTpzqEnmSN0GhL5eUY1c7zi3vCvHMUP8QROQzALH1s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwawzU37HG4TsIWao2fuIS72wpIyfOm9w3FfIKOyGnq0XJmrwpl
-	gbD5HL6XmrgVVynOQrDr+cDZV3LK5kdCoL1+y5C+dyASU3HZ0Fi2PZ78oQgyJ5rzmJ3VUS8Zhmj
-	JI3ZSVvcuuBl9O2UsnhHHQ5LO/mYmxgK/2ktoaPuWguy4guoX/Q==
-X-Received: by 2002:adf:a111:0:b0:374:bcfe:e73 with SMTP id ffacd0b85a97d-37d552cdf30mr11133684f8f.28.1728988862544;
-        Tue, 15 Oct 2024 03:41:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG7DAcwtn/nc+ImvyMGU6FVrMUn2vES2YhfCeC9HkbCeAs9L2ilLS/PV2swbFEL1HNIJja0EA==
-X-Received: by 2002:adf:a111:0:b0:374:bcfe:e73 with SMTP id ffacd0b85a97d-37d552cdf30mr11133644f8f.28.1728988862041;
-        Tue, 15 Oct 2024 03:41:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728989704; x=1729594504;
+        h=content-transfer-encoding:to:organization:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jN1OJwkAaGQtDrGUKrfe0W75Miaqbm3zRcU4TMBZuwE=;
+        b=cNdnOAO6mF9RTOr7gt6AuK9zghCOHlBAO1XNILepHwS8Rk1TBsOYuGZuPTenxvU2q7
+         H6FCjl4p8WGk0LSQFU/EozKeIJXUzUYOThYtVRAU7+bB03K5DAPCVsM4B8H2LDtPJy1r
+         cs7SDe64l3rlaLCCm+sG6Z8sp+DQhrwmF5JxbefFqvfu+b507XTR6X/BeCl3gTKgPoye
+         CixsqQCLUqyu9p4TPfyaHYXTd9VKfBUzhmwGk4ycYi8tT8iSZE9P1YWd80bTItIlH7Dr
+         ISEEJq4vffQwzTkGxzKxK0DsS0lvOnJRIOeiCzEQ++RG0PV8I2Wl+LpVAOFiWwu0NgAX
+         Yhzw==
+X-Forwarded-Encrypted: i=1; AJvYcCU6y9Ik1Ivk0UeIhXjR1lJfVyN0idzsLTa2rJEH09CiT+lu5BZLrDrAA5JY2WLCbf87ykQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrXlorTeA2/4++9Hf5qDjw4iptK3xxbj8GiQOQsF81/qs1v0T5
+	wLCjPtEZTqEey/GDKBK039739ZBpApZ0w2141xA3OlIc3cc6KP6SH3Mp+QMru/NIAzOmE0zBk2N
+	f7aubFTksILZ49SbEEh/aeD5YlgihR1iGromndvhkIt0KtStgTg==
+X-Received: by 2002:a5d:420f:0:b0:37d:446b:7dfb with SMTP id ffacd0b85a97d-37d5ff8d7e6mr6627863f8f.45.1728989704124;
+        Tue, 15 Oct 2024 03:55:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH+FpmtwsFeYVZ4qyxXjmj/bglI2Z/vCGwWlSce0jMhKU0kNC4AXcelBOe/4Li5vu4xNs79+g==
+X-Received: by 2002:a5d:420f:0:b0:37d:446b:7dfb with SMTP id ffacd0b85a97d-37d5ff8d7e6mr6627842f8f.45.1728989703672;
+        Tue, 15 Oct 2024 03:55:03 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c730:9700:d653:fb19:75e5:ab5c? (p200300cbc7309700d653fb1975e5ab5c.dip0.t-ipconnect.de. [2003:cb:c730:9700:d653:fb19:75e5:ab5c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fa92741sm1240283f8f.60.2024.10.15.03.41.00
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fa7a1c8sm1255957f8f.21.2024.10.15.03.55.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Oct 2024 03:41:01 -0700 (PDT)
-Message-ID: <a3f310d0-b878-44c4-9454-f7faf8be04ad@redhat.com>
-Date: Tue, 15 Oct 2024 12:40:59 +0200
+        Tue, 15 Oct 2024 03:55:03 -0700 (PDT)
+Message-ID: <df619e65-e65e-4856-b4ca-9938e8e08f18@redhat.com>
+Date: Tue, 15 Oct 2024 12:55:01 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,31 +80,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/7] s390/kdump: implement is_kdump_kernel()
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
- linux-doc@vger.kernel.org, kvm@vger.kernel.org,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
- Jonathan Corbet <corbet@lwn.net>, Mario Casquero <mcasquer@redhat.com>,
- Alexander Egorenkov <egorenar@linux.ibm.com>,
- Mikhail Zaslonko <zaslonko@linux.ibm.com>
-References: <20241014144622.876731-1-david@redhat.com>
- <20241014144622.876731-2-david@redhat.com>
- <20241014182054.10447-D-hca@linux.ibm.com>
- <f93b2c89-821a-4da1-8953-73ccd129a074@redhat.com>
- <20241015083040.7641-C-hca@linux.ibm.com>
- <0c7e876f-5648-4a82-b809-ca48f778b4a6@redhat.com>
- <20241015100854.7641-J-hca@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
+From: David Hildenbrand <david@redhat.com>
+Subject: [Invitation] bi-weekly guest_memfd upstream call on 2024-10-17
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -153,132 +128,43 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20241015100854.7641-J-hca@linux.ibm.com>
+To: linux-coco@lists.linux.dev, KVM <kvm@vger.kernel.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 15.10.24 12:08, Heiko Carstens wrote:
-> On Tue, Oct 15, 2024 at 10:41:21AM +0200, David Hildenbrand wrote:
->> On 15.10.24 10:30, Heiko Carstens wrote:
->>> On Mon, Oct 14, 2024 at 09:26:03PM +0200, David Hildenbrand wrote:
->>>> On 14.10.24 20:20, Heiko Carstens wrote:
->>>>> Looks like this could work. But the comment in smp.c above
->>>>> dump_available() needs to be updated.
->>>>
->>>> A right, I remember that there was some outdated documentation.
-> 
-> ...
-> 
->> My concern is that we'll now have
->>
->> bool is_kdump_kernel(void)
->> {
->>         return oldmem_data.start && !is_ipl_type_dump();
->> }
->>
->> Which matches 3), but if 2) is also called "kdump", then should it actually
->> be
->>
->> bool is_kdump_kernel(void)
->> {
->>         return oldmem_data.start;
->> }
->>
->> ?
->>
->> When I wrote that code I was rather convinced that the variant in this patch
->> is the right thing to do.
-> 
-> Oh well, we simply of too many dump options. I'll let Alexander and
-> Mikhail better comment on this :)
+Hi,
 
-Thanks!
+as discussed [1], we'll get started with a bi-weekly guest_memfd
+upstream call this Thursday, 2024-10-17 at 9:00 - 10:00am (GMT-07:00)
+Pacific Time - Vancouver.
 
-> 
-> Alexander, Mikhail, the discussion starts here, and we need a sane
-> is_kdump_kernel() for s390:
-> https://lore.kernel.org/all/20241014144622.876731-1-david@redhat.com/
-> 
-
-With the following cleanup in mind:
-
- From 9fbbff43f725a8482ce9e85857316ab8484ff3c8 Mon Sep 17 00:00:00 2001
-From: David Hildenbrand <david@redhat.com>
-Date: Tue, 15 Oct 2024 11:07:43 +0200
-Subject: [PATCH] s390: use !dump_available() instead of "!oldmem_data.start &&
-  !is_ipl_type_dump()"
-
-Let's make the code more readable:
-
-    !dump_available()
--> !(oldmem_data.start || is_ipl_type_dump())
--> !oldmem_data.start && !is_ipl_type_dump()
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
-  arch/s390/kernel/crash_dump.c | 2 +-
-  arch/s390/kernel/os_info.c    | 2 +-
-  2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/kernel/crash_dump.c b/arch/s390/kernel/crash_dump.c
-index cca1827d3d2e..fbc5de66d03b 100644
---- a/arch/s390/kernel/crash_dump.c
-+++ b/arch/s390/kernel/crash_dump.c
-@@ -609,7 +609,7 @@ int elfcorehdr_alloc(unsigned long long *addr, unsigned long long *size)
-  	u64 hdr_off;
-  
-  	/* If we are not in kdump or zfcp/nvme dump mode return */
--	if (!oldmem_data.start && !is_ipl_type_dump())
-+	if (!dump_available())
-  		return 0;
-  	/* If we cannot get HSA size for zfcp/nvme dump return error */
-  	if (is_ipl_type_dump() && !sclp.hsa_size)
-diff --git a/arch/s390/kernel/os_info.c b/arch/s390/kernel/os_info.c
-index b695f980bbde..09578f400ef7 100644
---- a/arch/s390/kernel/os_info.c
-+++ b/arch/s390/kernel/os_info.c
-@@ -148,7 +148,7 @@ static void os_info_old_init(void)
-  
-  	if (os_info_init)
-  		return;
--	if (!oldmem_data.start && !is_ipl_type_dump())
-+	if (!dump_available())
-  		goto fail;
-  	if (copy_oldmem_kernel(&addr, __LC_OS_INFO, sizeof(addr)))
-  		goto fail;
--- 
-2.46.1
+We'll be using the following Google meet: http://meet.google.com/wxp-wtju-jzw
 
 
-It looks like we create /proc/vmcore, allocating the elfcorehdr essentially
-if dump_available() && (!is_ipl_type_dump() || !sclp.hsa_size).
+Current upstream proposals that we'll likely discuss to some degree (and that
+might be reasonable to look at) are:
 
-So in the condition, we would have previously made is_kdump_kernel() happt *after* the
-fs init calls.
+* mmap support + shared vs. private [2]
+* preparations [3] for huge/gigantic page support [4]
+* guest_memfd as a "library" to make it independent of KVM [5]
 
-So I'm wondering if is_kdump_kernel() should simply translate to dump_available(). It
-doesn't sound completely right to create /proc/vmcore for "standard zfcp/nvme dump",
-but that is what we currently do.
+There is a public calender entry [6] for the meeting, but Google might
+only show it as "busy" although it is properly marked as "public". If
+you want to a proper google calendar invitation that also covers all
+future meetings, just write me a mail.
 
-I would have thought we have that special zcore thingy for that.
+Cheers,
 
-
-So I think we should either have
-
-bool is_kdump_kernel(void)
-{
-	return dump_available();
-}
-
-Or
-
-bool is_kdump_kernel(void)
-{
-	return dump_available() && (!is_ipl_type_dump() || !sclp.hsa_size);
-}
+David
 
 
-I'd prefer the first version.
+[1] https://lkml.kernel.org/r/4b49248b-1cf1-44dc-9b50-ee551e1671ac@redhat.com
+[2] https://lkml.kernel.org/r/20241010085930.1546800-1-tabba@google.com
+[3] https://lkml.kernel.org/r/cover.1728684491.git.ackerleytng@google.com
+[4] https://lkml.kernel.org/r/cover.1728684491.git.ackerleytng@google.com
+[5] https://lkml.kernel.org/r/20240829-guest-memfd-lib-v2-0-b9afc1ff3656@quicinc.com
+[6] https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=YmNqb292ajc4b2gxbXZhdmdwODRob3E3MG9fMjAyNDEwMTdUMTYwMDAwWiBjXzcyMTNiN2RiYjY0OTc2YTgxZGNjODljYzIzYzZhZGY4MzExZjRjZWI5MTM0NWI2NTY1YzI2MTUwYzZiNGVjOWVAZw&tmsrc=c_7213b7dbb64976a81dcc89cc23c6adf8311f4ceb91345b6565c26150c6b4ec9e%40group.calendar.google.com&scp=ALL
 
 -- 
 Cheers,
