@@ -1,221 +1,204 @@
-Return-Path: <kvm+bounces-28905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4511699F131
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 17:30:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5847499F22C
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 17:59:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E3CBB21B1A
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 15:30:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C80DC1F23DC4
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 15:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B161D5177;
-	Tue, 15 Oct 2024 15:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C5B1FAF01;
+	Tue, 15 Oct 2024 15:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PrRaK8Ye"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xKI1ie1X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9421B394D;
-	Tue, 15 Oct 2024 15:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B84B1F9EA7
+	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 15:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729006206; cv=none; b=tzNC1CEMfB6PIZTRG52P+k90JX6frCOpetO5n2vSTC+94uNQ4dsHRdFP0Cc67tHEpXNciRkTJPpmfsNrW6D82mXJ0Dhgs942biHSK80KcqOhehuB3JipUEZ0HEyOUev08Xyx444NYnrGi5jvZNroPJQp63RiIjIekLAO9VnWsaM=
+	t=1729007885; cv=none; b=r+DNFOmubSpSLMVMHr3opcWoTiApENfWqK68Qf6jq2Ma39LKNhCOv5ViLq+JN63tioiwe5mwJBcuyFkIVoyxXsB6b3Y4eAUZaLcBWvsAxHzG3LHWffCfl2at9OzPQwD9vbt4XQ3f68qgqNBZbdTqBasqN2WSSJX+9sBTOxGF+FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729006206; c=relaxed/simple;
-	bh=R9yKuB5ETyGTsXnCd+oZ2bAx4usPweIEciAg+bJ9wSU=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=fgiAnzOwR/fvLHsAc1W2Ezrm1fC8YWE1azb1WJ8mdQfWctYONx5QykAEvUaiTbdKSyM/bkxrxG9IOzqlpaEkbgQcpwTOHA+0kNK6w7DbC/RGJH6eRll4EikstByN1FXcvkKXMOD2wq7von6ef0sYHdovk0FXRaoAHJPF7oNPAok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PrRaK8Ye; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729006204; x=1760542204;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to;
-  bh=R9yKuB5ETyGTsXnCd+oZ2bAx4usPweIEciAg+bJ9wSU=;
-  b=PrRaK8Ye4o0RBB6qRyadRDFy5iQcNcPPAPNHepwPqenp83Cyxj/2jYtt
-   PB6KyXk3lGXjhvBpnJHbYVW5B1nDN0I1G8b6ZQUndxi8GgaB1e44zGlkQ
-   1DzBtx2bjIwTrvVhOZfRcK+f9ZHirdVusrBgSaiEnWmEGOSx5xtsXEaEK
-   Sd1aRmOaLPW+jUERrg+E6MFeiSk+G+8h4QhXkZmwXsIBhYySmjY2TdEjG
-   WNyx6NVqH5HsxpjTWJQFy9DcHO8OTZ4C2RVW3yXAqRXavwwTwLzOQYHOi
-   yz8OLZQbpXwTwmYKTeVsR4Tp3QKK/2G86TY0SCzPOKmzjx5Z8aiI+LEi2
-   g==;
-X-CSE-ConnectionGUID: 16x5W1r8Rz2Th6f+qJaKrw==
-X-CSE-MsgGUID: zPgscTnmSEGetrXhApKBBQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28296897"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="c'?py'?scan'208";a="28296897"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 08:30:03 -0700
-X-CSE-ConnectionGUID: Rxaw60SkT2apw8sCPV/9Xg==
-X-CSE-MsgGUID: CqcMeBkKSH6YlRM3mf4jiQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,205,1725346800"; 
-   d="c'?py'?scan'208";a="101262640"
-Received: from mdroper-mobl2.amr.corp.intel.com (HELO [10.124.221.110]) ([10.124.221.110])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 08:30:02 -0700
-Content-Type: multipart/mixed; boundary="------------NpMzy77HcnTmUx9NaO1L10pD"
-Message-ID: <f25673ea-08c5-474b-a841-095656820b67@intel.com>
-Date: Tue, 15 Oct 2024 08:30:01 -0700
+	s=arc-20240116; t=1729007885; c=relaxed/simple;
+	bh=aYJ3ScoRGgAobUtmWNW7wrrfHvNJK4QqvJ0rYbf6QwA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ghe9BsJP1B0anTXUWbbRud1OlkW9ZGCOyD9KyakhkDM7jQTSLjsqD8/Tffdfv0UYBEoWgvbYXeIR0DhAyRu3SLEhVOzHRdemHWr4rcEVsn8hMcTMM2k1+yLBaz0c8HvoSUrhM+buK3eKtT3qQbItkJfn9RBoZWzYWgODz4dTbjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xKI1ie1X; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-71e58fe926cso2265199b3a.3
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 08:58:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729007883; x=1729612683; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bpgcprPI+vvJsG2LB/Vt+V2mYjpRXDgXYo99nuQ4xLg=;
+        b=xKI1ie1X40VczKlusr1XxD0YPkV2zZfe/6okKWD3+t8AFuC1QFITTSPGtfYAWW+NkP
+         oD/2iSw3t5TyDU6xmFJ5lEdm0VK8bhpD9Lv6J8nT1eBicsyEIYv5GnR/JdABC/Ah1yEk
+         ADV6mXe17tOE6Pyq0mR6YTrCsaSbyrgtSKTFSu55q8oyBpCYsI2v3D0zhpfrnc9cqH1I
+         m7SaNxyMhPvljDrUfbQV7g2o5dBN8kccwLR1S/QYXaCsvLoKV3qxUhFrvr1L4y0mTMkd
+         WVtbxGYXSq2vffsS6K12kSNTkmstcq7eDCyWUYm9gNUlOZYsvrCy6Jq2LczpUM8bVnq3
+         a99g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729007883; x=1729612683;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bpgcprPI+vvJsG2LB/Vt+V2mYjpRXDgXYo99nuQ4xLg=;
+        b=CZ4b5mTACUXR7Kz5CiFy0L2dh7TndzMWgoGfQ1jVu5C9TpxuLRpEjCr+lZ919bixYr
+         uecO4MBq3XbwWW7y8QDFhYwnaj3jKnqEp9Ef5V41bOIYP6y+YtAudmDX7zAxdPP6efch
+         gfoLo7QvNSY5UCq7nmaoAaKu4SRdLso3Nbbjb/cYaQ9TP/ikOCpgDU/CuB0wjCC3Vfmw
+         n7CsZkIWlJdDu1zLT3W3tvtWh9E2HJqMUdywts7T7dEqjkniQ0mMYfC5oqbri60rQL72
+         TTLHpqJMSJQN0wTmWVwbCJ00XoRCKJKla2LAnQqyZcPqZa952Fan9qgc30hf6ycaBVYq
+         T6eQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWDKDAd0+yV4oxYyvUu4QkHo04BGLOGHtP7w44KxO5qztKUMKtXIQSoip+iwENvQmeYoXk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHXFqPSGuMcbPXgJVSwilt/b8pMm+zUCPQ+z6s33WODpg6LmaH
+	mgURpX+oOtt4LAya/OrMYW42sd5jXKLqCmLYX5shtc7BY2nCAKsgVLu3R+9PWfvY5EdvTgXoGIs
+	eAA==
+X-Google-Smtp-Source: AGHT+IEOMhUIEJb7HA5wBTCErVAFDrxkcdBMavuoBSriks4hlucPD3WdjFvME0Ck5+1DRkZ02jm1mHkhvMQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:aa7:9d81:0:b0:71e:5bf6:fef0 with SMTP id
+ d2e1a72fcca58-71e7db6d5b2mr1783b3a.6.1729007883292; Tue, 15 Oct 2024 08:58:03
+ -0700 (PDT)
+Date: Tue, 15 Oct 2024 08:58:01 -0700
+In-Reply-To: <87h69dg4og.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/8] TDX host: metadata reading tweaks, bug fix and
- info dump
-To: Kai Huang <kai.huang@intel.com>, kirill.shutemov@linux.intel.com,
- tglx@linutronix.de, bp@alien8.de, peterz@infradead.org, mingo@redhat.com,
- hpa@zytor.com, dan.j.williams@intel.com, seanjc@google.com,
- pbonzini@redhat.com
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- rick.p.edgecombe@intel.com, isaku.yamahata@intel.com,
- adrian.hunter@intel.com, nik.borisov@suse.com
-References: <cover.1728903647.git.kai.huang@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <cover.1728903647.git.kai.huang@intel.com>
+Mime-Version: 1.0
+References: <20241004140810.34231-1-nikwip@amazon.de> <20241004140810.34231-3-nikwip@amazon.de>
+ <875xq0gws8.fsf@redhat.com> <9ef935db-459a-4738-ab9a-4bd08828cb60@gmx.de> <87h69dg4og.fsf@redhat.com>
+Message-ID: <Zw6PlAv4H5rNZsBf@google.com>
+Subject: Re: [PATCH 2/7] KVM: x86: Implement Hyper-V's vCPU suspended state
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Nikolas Wipper <nik.wipper@gmx.de>, Nikolas Wipper <nikwip@amazon.de>, 
+	Nicolas Saenz Julienne <nsaenz@amazon.com>, Alexander Graf <graf@amazon.de>, James Gowans <jgowans@amazon.com>, 
+	nh-open-source@amazon.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-This is a multi-part message in MIME format.
---------------NpMzy77HcnTmUx9NaO1L10pD
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+On Tue, Oct 15, 2024, Vitaly Kuznetsov wrote:
+> Nikolas Wipper <nik.wipper@gmx.de> writes:
+> 
+> > On 10.10.24 10:57, Vitaly Kuznetsov wrote:
+> 
+> ...
+> 
+> >>>  int kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu);
+> >>> +
+> >>> +static inline bool kvm_hv_vcpu_suspended(struct kvm_vcpu *vcpu)
+> >>> +{
+> >>> +	return vcpu->arch.hyperv_enabled &&
+> >>> +	       READ_ONCE(vcpu->arch.hyperv->suspended);
+> >>
+> >> I don't think READ_ONCE() means anything here, does it?
+> >>
+> >
+> > It does prevent compiler optimisations and is actually required[1]. Also
+> > it makes clear that this variable is shared, and may be accessed from
+> > remote CPUs.
+> >
+> > [1] https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0124r6.html#Variable%20Access
+> 
+> It certainly does no harm but I think if we follow 'Loads from and
+> stores to shared (but non-atomic) variables should be protected with the
+> READ_ONCE(), WRITE_ONCE()' rule literally we will need to sprinkle them
+> all over KVM/kernel ;-) And personally, this makes reading the code
+> harder.
+> 
+> To my (very limited) knowledge, we really need READ_ONCE()s when we need
+> to have some sort of a serialization, e.g. the moment when this read
+> happens actually makes a difference. If we can e.g. use a local variable
+> in the beginning of a function and replace all READ_ONCE()s with
+> reading this local variable -- then we don't need READ_ONCE()s and are
+> OK with possible compiler optimizations. Similar (reversed) thoughts go
+> to WRITE_ONCE().
+> 
+> I think it's OK to keep them but it would be nice (not mandatory IMO,
+> but nice) to have a comment describing which particular synchronization
+> we are achieving (== the compiler optimization scenario we are protecting
+> against). 
+> 
+> In this particular case, kvm_hv_vcpu_suspended() is inline so I briefly
+> looked at all kvm_hv_vcpu_suspended() call sites (there are three) in
+> your series but couldn't think of a place where the READ_ONCE() makes a
+> real difference. kvm_hv_hypercall_complete() looks pretty safe
+> anyway. kvm_hv_vcpu_unsuspend_tlb_flush() will be simplified
+> significantly if we merge 'suspended' with 'waiting_on': instead of 
+> 
+>       kvm_for_each_vcpu(i, v, vcpu->kvm) {
+>               vcpu_hv = to_hv_vcpu(v);
+> 
+>               if (kvm_hv_vcpu_suspended(v) &&
+>                   READ_ONCE(vcpu_hv->waiting_on) == vcpu->vcpu_id) {
+> ...
+> 
+> you will have just
+> 
+>       kvm_for_each_vcpu(i, v, vcpu->kvm) {
+>               vcpu_hv = to_hv_vcpu(v);
+> 
+>               if (vcpu_hv && vcpu_hv->waiting_on == vcpu->vcpu_id) {
+> ...
+> (and yes, I also think that READ_ONCE() is superfluous here, as real
+> (non-speculative) write below can't happen _before_ the check )
+> 
+> The last one, kvm_vcpu_running(), should also be indifferent to
+> READ_ONCE() in kvm_hv_vcpu_suspended(). I may had missed something, of
+> course, but I hope you got my line of thought.
 
-I'm having one of those "I hate this all" moments.  Look at what we say
-in the code:
+I don't think you're missing anything.  In general, all of this code is more than
+a bit heavy-handed and lacks any kind of precision, which makes it *really* hard
+to see what actually guarantees a vCPU won't get stuck blocking.
 
->   * See the "global_metadata.json" in the "TDX 1.5 ABI definitions".
+Writers synchronize SRCU and readers are required to acquire SRCU, but there's
+no actual data tagged as being protected by SRCU, i.e. tlb_flush_inhibit should
+be __rcu.
 
-Basically step one in verifying that this is all right is: Hey, humans,
-please go parse a machine-readable format.  That's insanity.  If Intel
-wants to publish JSON as the canonical source of truth, that's fine.
-It's great, actually.  But let's stop playing human JSON parser and make
-the computers do it for us, OK?
+All of the {READ,WRITE}_ONCE() stuff provides some implicit compiler barriers,
+but the actual protection to ensure a vCPU either observes inhibit=false or a wake
+event is provided by the smp_wmb() in __kvm_make_request().
 
-Let's just generate the code.  Basically, as long as the generated C is
-marginally readable, I'm OK with it.  The most important things are:
+And from a performance perspective, synchronizing on kvm->srcu is going to be
+susceptible to random slowdowns, because writers will have to wait until all vCPUs
+drop SRCU, even if they have nothing to do with PV TLB flushes.  E.g. if vCPUs
+are faulting in memory from swap, uninhibiting a TLB flushes could be stalled
+unnecessarily for an extended duration.
 
- 1. Adding a field is dirt simple
- 2. Using the generated C is simple
+Lastly, KVM_REQ_EVENT is a big hammer (triggers a lot of processing) and semantically
+misleading (there is no event to process).  At a glance, KVM_REQ_UNBLOCK is likely
+more appropriate.
 
-In 99% of the cases, nobody ends up having to ever look at the generated
-code.
+Before we spend too much time cleaning things up, I want to first settle on the
+overall design, because it's not clear to me that punting HvTranslateVirtualAddress
+to userspace is a net positive.  We agreed that VTLs should be modeled primarily
+in userspace, but that doesn't automatically make punting everything to userspace
+the best option, especially given the discussion at KVM Forum with respect to
+mplementing VTLs, VMPLs, TD partitions, etc.
 
-Take a look at the attached python program and generated C file.  I
-think they qualify.  We can check the script into tools/scripts/ and it
-can get re-run when new json comes out or when a new field is needed.
-You'd could call the generated code like this:
+The cover letters for this series and KVM_TRANSLATE2 simply say they're needed
+for HvTranslateVirtualAddress, but neither series nor Nicolas' patch to punt
+HVCALL_TRANSLATE_VIRTUAL_ADDRESS[*] justifies the split between userspace and
+KVM.  And it very much is a split, because there are obviously a lot of details
+around TlbFlushInhibit that bleed into KVM.
 
-#include <generated.h>
+Side topic, what actually clears HvRegisterInterceptSuspend.TlbFlushInhibit?  The
+TLFS just says 
 
-	read_gunk(&tgm);
+  After the memory intercept routine performs instruction completion, it should
+  clear the TlbFlushInhibit bit of the HvRegisterInterceptSuspend register.
 
-and use it like this:
+but I can't find anything that says _how_ it clears TlbFlushInhibit.
 
-	foo = tgm.BUILD_NUM;
-	bar = tgm.BUILD_DATE;
-
-Any field you want to add is a single addition to the python list and
-re-running the script.  There's not even any need to do:
-
-#define TDX_FOO_BAR_BUILD_DATE 0x8800000200000001
-
-because it's unnecessary when you have:
-
-	ret |= read_...(0x8800000200000001, &tgm.BUILD_DATE);
-
-that links the magic number and the "BUILD_DATE" so closely together
-anyway.  We also don't need type safety *here* at the "read" because
-it's machine generated in the first place.  If there's a type mismatch
-between "0x8800000200000001" and "tgm.BUILD_DATE" we have bigger
-problems on our hands.
-
-All the type checking comes when the code consumes tgm.BUILD_DATE (or
-whatever).
---------------NpMzy77HcnTmUx9NaO1L10pD
-Content-Type: text/x-python; charset=UTF-8; name="tdx.py"
-Content-Disposition: attachment; filename="tdx.py"
-Content-Transfer-Encoding: base64
-
-IyEvdXNyL2Jpbi9weXRob24zCmltcG9ydCBqc29uCmltcG9ydCBzeXMKCmZpbGVmZCA9IG9w
-ZW4oc3lzLmFyZ3ZbMV0pCmpzb25zdHIgPSBmaWxlZmQucmVhZCgpCmZpbGVmZC5jbG9zZSgp
-CgpqID0ganNvbi5sb2Fkcyhqc29uc3RyKQoKcHJpbnQoInN0YXRpYyBzdHJ1Y3QgdGR4X2ds
-b2JhbF9tZXRhZGF0YSB0Z20iKQpwcmludCgieyIpCgpkZWYgZmluZF9maWVsZChuYW1lKToK
-CWZvciBmIGluIGpbJ0ZpZWxkcyddOgoJCWlmIGZbJ0ZpZWxkIE5hbWUnXSA9PSBuYW1lOgoJ
-CQlyZXR1cm4gZgoJcmV0dXJuIE5vbmUKCmZpZWxkcyA9ICIiIgpURFhfRkVBVFVSRVMwCkJV
-SUxEX0RBVEUKQlVJTERfTlVNCk1JTk9SX1ZFUlNJT04KIiIiLnN0cmlwKCkuc3BsaXQoIlxu
-IikKCmZvciBmbiBpbiBmaWVsZHM6CglmID0gZmluZF9maWVsZChmbikKCW5hbWUgPSBmWydG
-aWVsZCBOYW1lJ10KCWVsZW1lbnRfYnl0ZXMgPSBpbnQoZlsnRWxlbWVudCBTaXplIChCeXRl
-cyknXSkKCWVsZW1lbnRfYml0cyA9IGVsZW1lbnRfYnl0ZXMgKiA4CglwcmludCgiXHR1JWQg
-JXM7IiAlIChlbGVtZW50X2JpdHMsIG5hbWUpKQoKcHJpbnQoIn0iKQoKCnByaW50KCJzdGF0
-aWMgdm9pZCByZWFkX2d1bmsoKSIpCnByaW50KCJ7IikKcHJpbnQoIlx0aW50IHJldCA9IDA7
-IikKcHJpbnQoIiIpCmZvciBmbiBpbiBmaWVsZHM6CglmID0gZmluZF9maWVsZChmbikKCXBy
-aW50KCJcdHJldCB8PSByZWFkX3N5c19tZXRhZGF0YV9maWVsZCglcywgJnRnbS4lcyk7IiAl
-CgkJCShmWydCYXNlIEZJRUxEX0lEIChIZXgpJ10sCgkJCSBmWydGaWVsZCBOYW1lJ10pKQpw
-cmludCgiIikKcHJpbnQoIlx0cmV0dXJuIHJldDsiKQpwcmludCgifSIpCg==
---------------NpMzy77HcnTmUx9NaO1L10pD
-Content-Type: text/x-csrc; charset=UTF-8; name="tdxm.c"
-Content-Disposition: attachment; filename="tdxm.c"
-Content-Transfer-Encoding: base64
-
-c3RhdGljIHN0cnVjdCB0ZHhfZ2xvYmFsX21ldGFkYXRhIHRnbQp7Cgl1NjQgVERYX0ZFQVRV
-UkVTMDsKCXUzMiBCVUlMRF9EQVRFOwoJdTE2IEJVSUxEX05VTTsKCXUxNiBNSU5PUl9WRVJT
-SU9OOwp9CnN0YXRpYyB2b2lkIHJlYWRfZ3VuaygpCnsKCWludCByZXQgPSAwOwoKCXJldCB8
-PSByZWFkX3N5c19tZXRhZGF0YV9maWVsZCgweDBBMDAwMDAzMDAwMDAwMDgsICZ0Z20uVERY
-X0ZFQVRVUkVTMCk7CglyZXQgfD0gcmVhZF9zeXNfbWV0YWRhdGFfZmllbGQoMHg4ODAwMDAw
-MjAwMDAwMDAxLCAmdGdtLkJVSUxEX0RBVEUpOwoJcmV0IHw9IHJlYWRfc3lzX21ldGFkYXRh
-X2ZpZWxkKDB4ODgwMDAwMDEwMDAwMDAwMiwgJnRnbS5CVUlMRF9OVU0pOwoJcmV0IHw9IHJl
-YWRfc3lzX21ldGFkYXRhX2ZpZWxkKDB4MDgwMDAwMDEwMDAwMDAwMywgJnRnbS5NSU5PUl9W
-RVJTSU9OKTsKCglyZXR1cm4gcmV0Owp9Cg==
-
---------------NpMzy77HcnTmUx9NaO1L10pD--
+[*] https://lore.kernel.org/all/20240609154945.55332-8-nsaenz@amazon.com
 
