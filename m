@@ -1,198 +1,169 @@
-Return-Path: <kvm+bounces-28959-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28957-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DA0F99FC1B
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 01:11:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9E4E99FBA9
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 00:48:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FD1C1C241EB
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 23:10:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F432B2269A
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 22:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884F61D63EA;
-	Tue, 15 Oct 2024 23:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AAFB1D63ED;
+	Tue, 15 Oct 2024 22:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gentwo.org header.i=@gentwo.org header.b="gkNOHaCx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f6AO1YyS"
 X-Original-To: kvm@vger.kernel.org
-Received: from gentwo.org (gentwo.org [62.72.0.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F40F173357;
-	Tue, 15 Oct 2024 23:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.72.0.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B621B0F31
+	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 22:48:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729033850; cv=none; b=MLf4GR0jzqln0nUbPH2Kj/aox6kEuu16WW0/WSBYngF3WIfYrpRUvWeUea9EHsKREXnApaYu8K1fXEkWBhvYjGxV2W9B6x+scrI7rtSsEicr9iE1raXwvz6MgE1GGVR7QmsGKaygJsgJqjlceA3BMRtXCV63QmWmwLbDVoT6WD0=
+	t=1729032501; cv=none; b=RYMzTtZBFOpLezSi1GYIstPf04VrjwmbQxEJltdabn3suFuGHJtEUB9e8iKYjfPZ8Ej25LUTy8ChRV+oWpOcTwnZYzLRjc4vdlrl8wo4IeUvacZUQ+ryWvwjR5BCXwA/v01nLkF5uihp3O4Yaj/NgbRVgvU2zqQSTb3XfzTMP4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729033850; c=relaxed/simple;
-	bh=CrNU3zPe4V+PSWdy/5qXKcKFUpFWUo8dNTGLeeWXTak=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=jmieylNxGL5OW6YCFvi22mb5K80bAXIwsckh/FqfpKkA2+RunLv1URBwhj/HJiTkEU2pxy5seM6TlvvMwFlYtSpuJ6/BFiTwkMQ7yX0JtwdhMpXWyHgq+dob7pJKnDnAilQoph20KSp1wDR5rEgXM+bzLmZHMczaMcUXKxSS7yA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gentwo.org; spf=pass smtp.mailfrom=gentwo.org; dkim=pass (1024-bit key) header.d=gentwo.org header.i=@gentwo.org header.b=gkNOHaCx; arc=none smtp.client-ip=62.72.0.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gentwo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentwo.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gentwo.org;
-	s=default; t=1729032033;
-	bh=CrNU3zPe4V+PSWdy/5qXKcKFUpFWUo8dNTGLeeWXTak=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=gkNOHaCxYvhA1CiBD5NWIOWLJSFHbxggYZ/ekEHnVhTi/GOZWYN2D9D302L/VWlJ4
-	 PMSbWqw3Oi1lnz83Z7dbEaid/nmWmzbEgcM5PVetYPGgIytWzMbNFa/m9OLM/qpOqE
-	 iNRpt1jOxq39PkncVYT8TtY9ipFPSZ6genbbhkjw=
-Received: by gentwo.org (Postfix, from userid 1003)
-	id 1D6704040C; Tue, 15 Oct 2024 15:40:33 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by gentwo.org (Postfix) with ESMTP id 1C335400C9;
-	Tue, 15 Oct 2024 15:40:33 -0700 (PDT)
-Date: Tue, 15 Oct 2024 15:40:33 -0700 (PDT)
-From: "Christoph Lameter (Ampere)" <cl@gentwo.org>
-To: Ankur Arora <ankur.a.arora@oracle.com>
-cc: Catalin Marinas <catalin.marinas@arm.com>, linux-pm@vger.kernel.org, 
-    kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-    linux-kernel@vger.kernel.org, will@kernel.org, tglx@linutronix.de, 
-    mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, 
-    x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com, wanpengli@tencent.com, 
-    vkuznets@redhat.com, rafael@kernel.org, daniel.lezcano@linaro.org, 
-    peterz@infradead.org, arnd@arndb.de, lenb@kernel.org, mark.rutland@arm.com, 
-    harisokn@amazon.com, mtosatti@redhat.com, sudeep.holla@arm.com, 
-    misono.tomohiro@fujitsu.com, maobibo@loongson.cn, 
-    joao.m.martins@oracle.com, boris.ostrovsky@oracle.com, 
-    konrad.wilk@oracle.com
-Subject: Re: [PATCH v8 01/11] cpuidle/poll_state: poll via
- smp_cond_load_relaxed()
-In-Reply-To: <87jze9rq15.fsf@oracle.com>
-Message-ID: <95ba9d4a-b90c-c8e8-57f7-31d82722f39e@gentwo.org>
-References: <20240925232425.2763385-1-ankur.a.arora@oracle.com> <20240925232425.2763385-2-ankur.a.arora@oracle.com> <Zw5aPAuVi5sxdN5-@arm.com> <086081ed-e2a8-508d-863c-21f2ff7c5490@gentwo.org> <Zw6dZ7HxvcHJaDgm@arm.com> <1e56e83e-83b3-d4fd-67a8-0bc89f3e3d20@gentwo.org>
- <Zw6o_OyhzYd6hfjZ@arm.com> <87jze9rq15.fsf@oracle.com>
+	s=arc-20240116; t=1729032501; c=relaxed/simple;
+	bh=y4wTt1hMw46Ajv3cIQeHDlR0RDHcUdA5/yND53W4oTs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IIJEz35O+iYAYlC0MiACvJQNxHwX11vSrC7UCUcyku0IUb1niepJ0YdkSSpUsr1vVFluIUNgG7edB49rcdMfgjicIOGOfgN1j3Sq02GuqNeP2VDi8UbcllKRxI5De7afiCE7rRoXpfpspngRDXbOwrpsxC5gBL1MUhhyxEw4IlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f6AO1YyS; arc=none smtp.client-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-4a48477b25eso197353137.0
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 15:48:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729032498; x=1729637298; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=thjVFZ9JHy+XHx/P+OmRUKAu97VTsEznVTTuyaP0ILg=;
+        b=f6AO1YySgd60836QBSGee0wmssdZufNGSHq2M6w8crI+FrFnI5A215R9UJr7H8iwGq
+         dhJjk+Nv9z14pZG8q0H0URq9Y+4z9CNRVzlDr/5/rN23xKtMkcsaA/0Sh97JLT5i54Jk
+         kyLCVcycucs698Y83gNcXcvSkHRKrsP6ANG9+oNMKFgrh2KhUccmNs9cOmSRrhiTsl0i
+         o9k9o82RR5GQKSXLJYN/spm8AL35nOPMjg8I2OjS2py38zja4Kf3iNpT+4u1ce+PnSFG
+         oXJsufnrj8JIQF9GnsD4oJV3nGOn85VqCiS/vHeblde4rqDT4t/fNvN/OUxoM8BA5YPI
+         lYEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729032498; x=1729637298;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=thjVFZ9JHy+XHx/P+OmRUKAu97VTsEznVTTuyaP0ILg=;
+        b=KbdiNk8poISV2g1TECkUYjAZffY4qCTLziXgAxr46APyFh5DPW5dJZkYC2hOHALsqp
+         EHzCzm8/zdFFZh+Jsg9ti6s3smmrv6eEPKZygWf3O/zpY2479E9AIovku6jvTlUFoA2s
+         IUUV28PKbT7mLwy5TjTu6Nc0EbsOBL1luRbRYh+ZSzEdxpMa1LJZ+Jq0u3M2sAik121V
+         glqBpaUyNfM/+nPASGrHL2BW0wBOfIwbOzEJxMJjJwZdeyvxHlA6AQprhA+Y38ElMhc/
+         xPG33ZACIpYpt9ld26UB2Zem9uh+8BLs6nukCPT3+eoSaGYTZMGnO8ESbPEKaCLOlWYu
+         JgEA==
+X-Forwarded-Encrypted: i=1; AJvYcCW3a4/4pvbymlSvxobu/sK5NrjIY/EsqFwx2nJnMHoMBzNQ4NOUC3Zn7awrOHw2CbpfcRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDorHa15U7OsrVsdx48cfCY10UcoQi5MN2yMRjL3mMb/z/XEtD
+	1ZJit6B2DkzBktHNYvrvMJ4JiFsyszez7at2YrRtlv3KefrD2+7G68u0/6INfQ4M3Gu6OnCBPRh
+	ZZMcsEucgV8oodkTbJSAcx/RLcLoxzKQJpeeK
+X-Google-Smtp-Source: AGHT+IHnaSy0q/kDCz0vAJot6g5xsnJ0ihADeJJee62qYBERkh1eaBoELa9F+6Vz1W9f+tMrfIXWvAwFDhmw3bKOIJ8=
+X-Received: by 2002:a05:6102:b04:b0:4a4:72f0:7937 with SMTP id
+ ada2fe7eead31-4a5b4cf873bmr2033136137.8.1729032497513; Tue, 15 Oct 2024
+ 15:48:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20240926013506.860253-1-jthoughton@google.com>
+ <Zw2no4OGDVK7m8QR@google.com> <CADrL8HUP1=eXE5QpVrKjgQGpusr_Raejr1sY2LLW1uSigpptOw@mail.gmail.com>
+In-Reply-To: <CADrL8HUP1=eXE5QpVrKjgQGpusr_Raejr1sY2LLW1uSigpptOw@mail.gmail.com>
+From: Yu Zhao <yuzhao@google.com>
+Date: Tue, 15 Oct 2024 16:47:39 -0600
+Message-ID: <CAOUHufZU8C-48H0n2v02D52PoC8b0mYUJJS=C-dz+bruruOfdg@mail.gmail.com>
+Subject: Re: [PATCH v7 00/18] mm: multi-gen LRU: Walk secondary MMU page
+ tables while aging
+To: James Houghton <jthoughton@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	David Stevens <stevensd@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Here is a patch that keeps the cpuidle stuiff generic but allows an
-override by arm64..
+On Mon, Oct 14, 2024 at 6:07=E2=80=AFPM James Houghton <jthoughton@google.c=
+om> wrote:
+>
+> On Mon, Oct 14, 2024 at 4:22=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Thu, Sep 26, 2024, James Houghton wrote:
+> > > This patchset makes it possible for MGLRU to consult secondary MMUs
+> > > while doing aging, not just during eviction. This allows for more
+> > > accurate reclaim decisions, which is especially important for proacti=
+ve
+> > > reclaim.
+> >
+> > ...
+> >
+> > > James Houghton (14):
+> > >   KVM: Remove kvm_handle_hva_range helper functions
+> > >   KVM: Add lockless memslot walk to KVM
+> > >   KVM: x86/mmu: Factor out spte atomic bit clearing routine
+> > >   KVM: x86/mmu: Relax locking for kvm_test_age_gfn and kvm_age_gfn
+> > >   KVM: x86/mmu: Rearrange kvm_{test_,}age_gfn
+> > >   KVM: x86/mmu: Only check gfn age in shadow MMU if
+> > >     indirect_shadow_pages > 0
+> > >   mm: Add missing mmu_notifier_clear_young for !MMU_NOTIFIER
+> > >   mm: Add has_fast_aging to struct mmu_notifier
+> > >   mm: Add fast_only bool to test_young and clear_young MMU notifiers
+> >
+> > Per offline discussions, there's a non-zero chance that fast_only won't=
+ be needed,
+> > because it may be preferable to incorporate secondary MMUs into MGLRU, =
+even if
+> > they don't support "fast" aging.
+> >
+> > What's the status on that front?  Even if the status is "TBD", it'd be =
+very helpful
+> > to let others know, so that they don't spend time reviewing code that m=
+ight be
+> > completely thrown away.
+>
+> The fast_only MMU notifier changes will probably be removed in v8.
+>
+> ChromeOS folks found that the way MGLRU *currently* interacts with KVM
+> is problematic. That is, today, with the MM_WALK MGLRU capability
+> enabled, normal PTEs have their Accessed bits cleared via a page table
+> scan and then during an rmap walk upon attempted eviction, whereas,
+> KVM SPTEs only have their Accessed bits cleared via the rmap walk at
+> eviction time. So KVM SPTEs have their Accessed bits cleared less
+> frequently than normal PTEs, and therefore they appear younger than
+> they should.
+>
+> It turns out that this causes tab open latency regressions on ChromeOS
+> where a significant amount of memory is being used by a VM. IIUC, the
+> fix for this is to have MGLRU age SPTEs as often as it ages normal
+> PTEs; i.e., it should call the correct MMU notifiers each time it
+> clears A bits on PTEs. The final patch in this series sort of does
+> this, but instead of calling the new fast_only notifier, we need to
+> call the normal test/clear_young() notifiers regardless of how fast
+> they are.
+>
+> This also means that the MGLRU changes no longer depend on the KVM
+> optimizations, as they can motivated independently.
+>
+> Yu, have I gotten anything wrong here? Do you have any more details to sh=
+are?
 
+Yes, that's precisely the problem. My original justification [1] for
+not scanning KVM MMU when lockless is not supported turned out to be
+harmful to some workloads too.
 
-From: Christoph Lameter (Ampere) <cl@linux.com>
-Subject: Revise cpu poll idle to make full use of wfet() and wfe()
+On one hand, scanning KVM MMU when not lockless can cause the KVM MMU
+lock contention; on the other hand, not scanning KVM MMU can skew
+anon/file LRU aging and thrash page cache. Given the lock contention
+is being tackled, the latter seems to be the lesser of two evils.
 
-ARM64 has instructions that can wait for an event and timeouts.
-
-Clean up the code in drivers/cpuidle/ to wait until the end
-of a period and allow the override of the handling of the
-waiting by an architecture.
-
-Provide an optimized wait function for arm64.
-
-Signed-off-by: Christoph Lameter <cl@linux.com>
-
-Index: linux/arch/arm64/lib/delay.c
-===================================================================
---- linux.orig/arch/arm64/lib/delay.c
-+++ linux/arch/arm64/lib/delay.c
-@@ -12,6 +12,8 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/timex.h>
-+#include <linux/sched/clock.h>
-+#include <linux/cpuidle.h>
-
- #include <clocksource/arm_arch_timer.h>
-
-@@ -67,3 +69,27 @@ void __ndelay(unsigned long nsecs)
- 	__const_udelay(nsecs * 0x5UL); /* 2**32 / 1000000000 (rounded up) */
- }
- EXPORT_SYMBOL(__ndelay);
-+
-+void cpuidle_wait_for_resched_with_timeout(u64 end)
-+{
-+	u64 start;
-+
-+	while (!need_resched() && (start = local_clock_noinstr()) < end) {
-+
-+		if (alternative_has_cap_unlikely(ARM64_HAS_WFXT)) {
-+
-+			/* Processor supports waiting for a specified period */
-+			wfet(xloops_to_cycles((end - start) * 0x5UL));
-+
-+		} else
-+		if (arch_timer_evtstrm_available() && start + ARCH_TIMER_EVT_STREAM_PERIOD_US * 1000 < end) {
-+
-+			/* We can wait until a periodic event occurs */
-+			wfe();
-+
-+		} else
-+			/* Need to spin until the end */
-+			cpu_relax();
-+	}
-+}
-+
-Index: linux/drivers/cpuidle/poll_state.c
-===================================================================
---- linux.orig/drivers/cpuidle/poll_state.c
-+++ linux/drivers/cpuidle/poll_state.c
-@@ -8,35 +8,29 @@
- #include <linux/sched/clock.h>
- #include <linux/sched/idle.h>
-
--#define POLL_IDLE_RELAX_COUNT	200
-+__weak void cpuidle_wait_for_resched_with_timeout(u64 end)
-+{
-+	while (!need_resched() && local_clock_noinstr() < end) {
-+		cpu_relax();
-+	}
-+}
-
- static int __cpuidle poll_idle(struct cpuidle_device *dev,
- 			       struct cpuidle_driver *drv, int index)
- {
--	u64 time_start;
--
--	time_start = local_clock_noinstr();
-+	u64 time_start = local_clock_noinstr();
-+	u64 time_end = time_start + cpuidle_poll_time(drv, dev);
-
- 	dev->poll_time_limit = false;
-
- 	raw_local_irq_enable();
- 	if (!current_set_polling_and_test()) {
--		unsigned int loop_count = 0;
--		u64 limit;
-
--		limit = cpuidle_poll_time(drv, dev);
-+		cpuidle_wait_for_resched_with_timeout(time_end);
-+
-+		if (!need_resched())
-+			dev->poll_time_limit = true;
-
--		while (!need_resched()) {
--			cpu_relax();
--			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
--				continue;
--
--			loop_count = 0;
--			if (local_clock_noinstr() - time_start > limit) {
--				dev->poll_time_limit = true;
--				break;
--			}
--		}
- 	}
- 	raw_local_irq_disable();
-
-Index: linux/include/linux/cpuidle.h
-===================================================================
---- linux.orig/include/linux/cpuidle.h
-+++ linux/include/linux/cpuidle.h
-@@ -202,6 +202,9 @@ extern int cpuidle_play_dead(void);
- extern struct cpuidle_driver *cpuidle_get_cpu_driver(struct cpuidle_device *dev);
- static inline struct cpuidle_device *cpuidle_get_device(void)
- {return __this_cpu_read(cpuidle_devices); }
-+
-+extern __weak void cpuidle_wait_for_resched_with_timeout(u64);
-+
- #else
- static inline void disable_cpuidle(void) { }
- static inline bool cpuidle_not_available(struct cpuidle_driver *drv,
+[1] https://lore.kernel.org/linux-mm/CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmd=
+UWs5eaKmhEeyQ@mail.gmail.com/
 
