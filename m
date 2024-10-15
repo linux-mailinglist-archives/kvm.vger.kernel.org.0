@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-28916-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1508299F300
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 18:44:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA20B99F309
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 18:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD2B4281501
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 16:44:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB5B31C22341
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 16:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D89F1FAEF8;
-	Tue, 15 Oct 2024 16:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38978212D0A;
+	Tue, 15 Oct 2024 16:43:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QZVr+9wJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LMl3GBR8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891AD1F6671;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419641F76A5;
 	Tue, 15 Oct 2024 16:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729010615; cv=none; b=SFeYefE7mLD9wujKi0Iv9nHfl581b8ReVUewXK6Msix1tUPyfsbQxb/zXCa+FUy4fn8lj7Pvr9CvZjLrLFgjIOmyDFV3QAIdXWlqBWkuIe3SZFOiH3d/MwlGvdMNnULu8WeTPQwuOuOS3pIvRVNUfYlH+pP6n+CGP86xtYgb4Ig=
+	t=1729010616; cv=none; b=K/ai+jrAytGME2cZ1dC1DZTopJr4e2USx4+D7hf7FGMOpuPXXNO6D6Epm7VM9tj42uKegJD1JAV/KRXWrLHjsesrQhSWs7AO1z+wTzo9qd1CqfnsOYNhGIregHQ4vxWw4qgSTTyxLPohhiMS4QTZRiQrYd1FeVOl7PR+v/y4bMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729010615; c=relaxed/simple;
-	bh=xlPopFefVfTzh69o9E/BNWbjtqQJxBiEWh3waQB4SlE=;
+	s=arc-20240116; t=1729010616; c=relaxed/simple;
+	bh=QQvuMDB3i+1hQRxxMhfrS1fUCS2QiWa5R5FPahhxnCQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tfurTDvOfHl4j15XRfmYFFCHXTGLS24ZGLdFdCIk4o65KbC1uthRA9NJhohXMvpstPPEZW2KPhAekJwzLn2jOsaigoy/ba7kAucDv0Y23pYFDNSlQOJyDiS1fM0q/zTyasD+NMeOWXMLxl6JsdeWf4508vn8wM98011Dbm5T4Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QZVr+9wJ; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=rDjGTa8IGHxkVvDE1oARLmFPSvu4HHVvN6bx0rTadfGrY3r3/veZBkS2M9Qf6ogUpQe4PX6/Ejl3iEgO36XdpuUbN0ly1cVMdkA0coFC33YqHEwLtqLXWdoKcwaLtFjK5p0L5j3fA7hA/VJeAzKkiEi61rc7jiut0tTCa5Kh7jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LMl3GBR8; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FEtaab008895;
-	Tue, 15 Oct 2024 16:43:31 GMT
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FDJiNC008390;
+	Tue, 15 Oct 2024 16:43:32 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=SKoxVlqtMbPWGZVFn
-	uh11pMFTdjYbTM30VhHZOK5WO0=; b=QZVr+9wJCKxyW7loJZZsYirx3kodY1+9k
-	Gss3sXIOWIG2A3EWg4DoDWgLF24zKFLOMjCIqRo9UAwe0mlSYs5jBcGHnw6Kjrgd
-	9QOEHQMnGzg8FW9PgoWg8a73l431sf25M0UjcY8SPgNLXT/nBrF0X1PdIkiIbflS
-	kbNXejfqLi0zaGgob1+Wy68zJ3ACTBZ/vf4fX0iHN4MeC497dZhwO0YtYcTbUrdm
-	/mgKEe8puHpxB5WWoECd8TWaICW+OfNg3c7TVzLfzzymSq9cZUP6cRQTInTRjgqJ
-	RABraT+recVem906rwgGdG4EO35uEW2ZjSo6CUK4EDR1dVSazzH+A==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429tk78kab-1
+	:mime-version:references:subject:to; s=pp1; bh=smPbVVUTPeubekiFB
+	5BI/e3FMoGPpsz1X34wv6nlTYY=; b=LMl3GBR8domXCMBHAciEKRP09HA8QXCLf
+	6HFOUuVWx3NyW6gFv0jLaYy68JEkdGitXcSBNXhK+IRimXh64AcwhTnkyu95Touo
+	4Q37rh1AhZC4mIfdPzHbh/gbC8NepJKceTUORDqR4gg2/b6m9kvSL5cxr+3CYvIk
+	wiERo9htE7TITErxtICKg7oOMSawOBTzMXXWO54b3HG0pM8pFkLwgMhbTTYwC6St
+	5Olwe0HajogZ6+TB7eHMr6w8y+GnflAqmSvPFXkLm3oO00H4KSItmE/JxAghW+/6
+	k3zW24QhaEah1WVH+HMrWA/A7qZ3TQNHxMUOQnLTvtXXbMcrToWtQ==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429s68h427-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 15 Oct 2024 16:43:31 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49FDfnV1006674;
-	Tue, 15 Oct 2024 16:43:30 GMT
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49FE4dMF001991;
+	Tue, 15 Oct 2024 16:43:31 GMT
 Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4283erw4bu-1
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4284emmxav-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 15 Oct 2024 16:43:30 +0000
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FGhRnu49545566
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FGhRsF49545568
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Tue, 15 Oct 2024 16:43:27 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 044D220040;
+	by IMSVA (Postfix) with ESMTP id 316C520040;
 	Tue, 15 Oct 2024 16:43:27 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CFEDC20043;
-	Tue, 15 Oct 2024 16:43:26 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0952A2004B;
+	Tue, 15 Oct 2024 16:43:27 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
 	Tue, 15 Oct 2024 16:43:26 +0000 (GMT)
@@ -74,9 +74,9 @@ Cc: borntraeger@de.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
         agordeev@linux.ibm.com, gor@linux.ibm.com,
         gerald.schaefer@linux.ibm.com, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [PATCH v3 01/11] s390/entry: Remove __GMAP_ASCE and use _PIF_GUEST_FAULT again
-Date: Tue, 15 Oct 2024 18:43:16 +0200
-Message-ID: <20241015164326.124987-2-imbrenda@linux.ibm.com>
+Subject: [PATCH v3 02/11] s390/kvm: Remove kvm_arch_fault_in_page()
+Date: Tue, 15 Oct 2024 18:43:17 +0200
+Message-ID: <20241015164326.124987-3-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241015164326.124987-1-imbrenda@linux.ibm.com>
 References: <20241015164326.124987-1-imbrenda@linux.ibm.com>
@@ -88,157 +88,98 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PT-XzVbdbjTznskM3dklUHzluxo81Wud
-X-Proofpoint-GUID: PT-XzVbdbjTznskM3dklUHzluxo81Wud
+X-Proofpoint-GUID: fcOfuIXcB3I3Ax0CZ2Xalrx8EV9U60P3
+X-Proofpoint-ORIG-GUID: fcOfuIXcB3I3Ax0CZ2Xalrx8EV9U60P3
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=585 spamscore=0
- lowpriorityscore=0 impostorscore=0 priorityscore=1501 bulkscore=0
- clxscore=1015 malwarescore=0 phishscore=0 adultscore=0 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ clxscore=1015 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ mlxlogscore=999 adultscore=0 mlxscore=0 priorityscore=1501 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2409260000 definitions=main-2410150113
 
-Now that the guest ASCE is passed as a parameter to __sie64a(),
-_PIF_GUEST_FAULT can be used again to determine whether the fault was a
-guest or host fault.
-
-Since the guest ASCE will not be taken from the gmap pointer in lowcore
-anymore, __GMAP_ASCE can be removed. For the same reason the guest
-ASCE needs now to be saved into the cr1 save area unconditionally.
+kvm_arch_fault_in_page() is a useless wrapper around gmap_fault(); just
+use gmap_fault() directly instead.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Heiko Carstens <hca@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- arch/s390/include/asm/ptrace.h |  2 ++
- arch/s390/kernel/asm-offsets.c |  2 --
- arch/s390/kernel/entry.S       | 26 ++++++++++++++------------
- arch/s390/mm/fault.c           |  6 ++----
- 4 files changed, 18 insertions(+), 18 deletions(-)
+ arch/s390/kvm/intercept.c |  4 ++--
+ arch/s390/kvm/kvm-s390.c  | 18 +-----------------
+ arch/s390/kvm/kvm-s390.h  |  1 -
+ 3 files changed, 3 insertions(+), 20 deletions(-)
 
-diff --git a/arch/s390/include/asm/ptrace.h b/arch/s390/include/asm/ptrace.h
-index 2ad9324f6338..788bc4467445 100644
---- a/arch/s390/include/asm/ptrace.h
-+++ b/arch/s390/include/asm/ptrace.h
-@@ -14,11 +14,13 @@
- #define PIF_SYSCALL			0	/* inside a system call */
- #define PIF_EXECVE_PGSTE_RESTART	1	/* restart execve for PGSTE binaries */
- #define PIF_SYSCALL_RET_SET		2	/* return value was set via ptrace */
-+#define PIF_GUEST_FAULT			3	/* indicates program check in sie64a */
- #define PIF_FTRACE_FULL_REGS		4	/* all register contents valid (ftrace) */
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index b16352083ff9..5bbaadf75dc6 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -367,7 +367,7 @@ static int handle_mvpg_pei(struct kvm_vcpu *vcpu)
+ 					      reg2, &srcaddr, GACC_FETCH, 0);
+ 	if (rc)
+ 		return kvm_s390_inject_prog_cond(vcpu, rc);
+-	rc = kvm_arch_fault_in_page(vcpu, srcaddr, 0);
++	rc = gmap_fault(vcpu->arch.gmap, srcaddr, 0);
+ 	if (rc != 0)
+ 		return rc;
  
- #define _PIF_SYSCALL			BIT(PIF_SYSCALL)
- #define _PIF_EXECVE_PGSTE_RESTART	BIT(PIF_EXECVE_PGSTE_RESTART)
- #define _PIF_SYSCALL_RET_SET		BIT(PIF_SYSCALL_RET_SET)
-+#define _PIF_GUEST_FAULT		BIT(PIF_GUEST_FAULT)
- #define _PIF_FTRACE_FULL_REGS		BIT(PIF_FTRACE_FULL_REGS)
+@@ -376,7 +376,7 @@ static int handle_mvpg_pei(struct kvm_vcpu *vcpu)
+ 					      reg1, &dstaddr, GACC_STORE, 0);
+ 	if (rc)
+ 		return kvm_s390_inject_prog_cond(vcpu, rc);
+-	rc = kvm_arch_fault_in_page(vcpu, dstaddr, 1);
++	rc = gmap_fault(vcpu->arch.gmap, dstaddr, FAULT_FLAG_WRITE);
+ 	if (rc != 0)
+ 		return rc;
  
- #define PSW32_MASK_PER		_AC(0x40000000, UL)
-diff --git a/arch/s390/kernel/asm-offsets.c b/arch/s390/kernel/asm-offsets.c
-index 5529248d84fb..3a6ee5043761 100644
---- a/arch/s390/kernel/asm-offsets.c
-+++ b/arch/s390/kernel/asm-offsets.c
-@@ -13,7 +13,6 @@
- #include <linux/purgatory.h>
- #include <linux/pgtable.h>
- #include <linux/ftrace.h>
--#include <asm/gmap.h>
- #include <asm/stacktrace.h>
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index bb7134faaebf..08f0c80ef5e9 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4579,22 +4579,6 @@ int kvm_s390_try_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clo
+ 	return 1;
+ }
  
- int main(void)
-@@ -161,7 +160,6 @@ int main(void)
- 	OFFSET(__LC_PGM_TDB, lowcore, pgm_tdb);
- 	BLANK();
- 	/* gmap/sie offsets */
--	OFFSET(__GMAP_ASCE, gmap, asce);
- 	OFFSET(__SIE_PROG0C, kvm_s390_sie_block, prog0c);
- 	OFFSET(__SIE_PROG20, kvm_s390_sie_block, prog20);
- 	/* kexec_sha_region */
-diff --git a/arch/s390/kernel/entry.S b/arch/s390/kernel/entry.S
-index d6d5317f768e..454841229ef4 100644
---- a/arch/s390/kernel/entry.S
-+++ b/arch/s390/kernel/entry.S
-@@ -327,13 +327,23 @@ SYM_CODE_START(pgm_check_handler)
- 	GET_LC	%r13
- 	stpt	__LC_SYS_ENTER_TIMER(%r13)
- 	BPOFF
--	lgr	%r10,%r15
- 	lmg	%r8,%r9,__LC_PGM_OLD_PSW(%r13)
-+	xgr	%r10,%r10
-+	xgr	%r12,%r12
- 	tmhh	%r8,0x0001		# coming from user space?
- 	jno	.Lpgm_skip_asce
- 	lctlg	%c1,%c1,__LC_KERNEL_ASCE(%r13)
- 	j	3f			# -> fault in user space
- .Lpgm_skip_asce:
-+#if IS_ENABLED(CONFIG_KVM)
-+	lg	%r11,__LC_CURRENT(%r13)
-+	tm      __TI_sie(%r11),0xff
-+	jz	1f
-+	BPENTER	__SF_SIE_FLAGS(%r15),_TIF_ISOLATE_BP_GUEST
-+	SIEEXIT __SF_SIE_CONTROL(%r15),%r13
-+	lg	%r12,__SF_SIE_GUEST_ASCE(%r15)
-+	lghi	%r10,_PIF_GUEST_FAULT
-+#endif
- 1:	tmhh	%r8,0x4000		# PER bit set in old PSW ?
- 	jnz	2f			# -> enabled, can't be a double fault
- 	tm	__LC_PGM_ILC+3(%r13),0x80	# check for per exception
-@@ -344,21 +354,13 @@ SYM_CODE_START(pgm_check_handler)
- 	CHECK_VMAP_STACK __LC_SAVE_AREA,%r13,4f
- 3:	lg	%r15,__LC_KERNEL_STACK(%r13)
- 4:	la	%r11,STACK_FRAME_OVERHEAD(%r15)
--	xc	__PT_FLAGS(8,%r11),__PT_FLAGS(%r11)
-+	stg	%r10,__PT_FLAGS(%r11)
-+	stg	%r12,__PT_CR1(%r11)
- 	xc	__SF_BACKCHAIN(8,%r15),__SF_BACKCHAIN(%r15)
- 	stmg	%r0,%r7,__PT_R0(%r11)
- 	mvc	__PT_R8(64,%r11),__LC_SAVE_AREA(%r13)
- 	mvc	__PT_LAST_BREAK(8,%r11),__LC_PGM_LAST_BREAK(%r13)
--	stctg	%c1,%c1,__PT_CR1(%r11)
--#if IS_ENABLED(CONFIG_KVM)
--	ltg	%r12,__LC_GMAP(%r13)
--	jz	5f
--	clc	__GMAP_ASCE(8,%r12), __PT_CR1(%r11)
--	jne	5f
--	BPENTER	__SF_SIE_FLAGS(%r10),_TIF_ISOLATE_BP_GUEST
--	SIEEXIT __SF_SIE_CONTROL(%r10),%r13
--#endif
--5:	stmg	%r8,%r9,__PT_PSW(%r11)
-+	stmg	%r8,%r9,__PT_PSW(%r11)
- 	# clear user controlled registers to prevent speculative use
- 	xgr	%r0,%r0
- 	xgr	%r1,%r1
-diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-index ad8b0d6b77ea..a6cf33b0f339 100644
---- a/arch/s390/mm/fault.c
-+++ b/arch/s390/mm/fault.c
-@@ -68,15 +68,13 @@ early_initcall(fault_init);
- static enum fault_type get_fault_type(struct pt_regs *regs)
+-/**
+- * kvm_arch_fault_in_page - fault-in guest page if necessary
+- * @vcpu: The corresponding virtual cpu
+- * @gpa: Guest physical address
+- * @writable: Whether the page should be writable or not
+- *
+- * Make sure that a guest page has been faulted-in on the host.
+- *
+- * Return: Zero on success, negative error code otherwise.
+- */
+-long kvm_arch_fault_in_page(struct kvm_vcpu *vcpu, gpa_t gpa, int writable)
+-{
+-	return gmap_fault(vcpu->arch.gmap, gpa,
+-			  writable ? FAULT_FLAG_WRITE : 0);
+-}
+-
+ static void __kvm_inject_pfault_token(struct kvm_vcpu *vcpu, bool start_token,
+ 				      unsigned long token)
  {
- 	union teid teid = { .val = regs->int_parm_long };
--	struct gmap *gmap;
- 
- 	if (likely(teid.as == PSW_BITS_AS_PRIMARY)) {
- 		if (user_mode(regs))
- 			return USER_FAULT;
- 		if (!IS_ENABLED(CONFIG_PGSTE))
- 			return KERNEL_FAULT;
--		gmap = (struct gmap *)get_lowcore()->gmap;
--		if (gmap && gmap->asce == regs->cr1)
-+		if (test_pt_regs_flag(regs, PIF_GUEST_FAULT))
- 			return GMAP_FAULT;
- 		return KERNEL_FAULT;
+@@ -4797,7 +4781,7 @@ static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
+ 		if (kvm_arch_setup_async_pf(vcpu))
+ 			return 0;
+ 		vcpu->stat.pfault_sync++;
+-		return kvm_arch_fault_in_page(vcpu, current->thread.gmap_addr, 1);
++		return gmap_fault(vcpu->arch.gmap, current->thread.gmap_addr, FAULT_FLAG_WRITE);
  	}
-@@ -187,7 +185,7 @@ static void dump_fault_info(struct pt_regs *regs)
- 		pr_cont("user ");
- 		break;
- 	case GMAP_FAULT:
--		asce = ((struct gmap *)get_lowcore()->gmap)->asce;
-+		asce = regs->cr1;
- 		pr_cont("gmap ");
- 		break;
- 	case KERNEL_FAULT:
+ 	return vcpu_post_run_fault_in_sie(vcpu);
+ }
+diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+index e680c6bf0c9d..0765ad1031c4 100644
+--- a/arch/s390/kvm/kvm-s390.h
++++ b/arch/s390/kvm/kvm-s390.h
+@@ -394,7 +394,6 @@ int kvm_s390_handle_sigp_pei(struct kvm_vcpu *vcpu);
+ 
+ /* implemented in kvm-s390.c */
+ int kvm_s390_try_set_tod_clock(struct kvm *kvm, const struct kvm_s390_vm_tod_clock *gtod);
+-long kvm_arch_fault_in_page(struct kvm_vcpu *vcpu, gpa_t gpa, int writable);
+ int kvm_s390_store_status_unloaded(struct kvm_vcpu *vcpu, unsigned long addr);
+ int kvm_s390_vcpu_store_status(struct kvm_vcpu *vcpu, unsigned long addr);
+ int kvm_s390_vcpu_start(struct kvm_vcpu *vcpu);
 -- 
 2.47.0
 
