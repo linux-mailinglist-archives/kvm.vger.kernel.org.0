@@ -1,169 +1,249 @@
-Return-Path: <kvm+bounces-28838-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28839-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F094F99DD0C
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 05:56:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AB3C99DEA4
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 08:43:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 720511F23BC9
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 03:56:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DE7D1C2160A
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 06:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFC41714B5;
-	Tue, 15 Oct 2024 03:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B03818A956;
+	Tue, 15 Oct 2024 06:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sg2VmH3s"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="u/1YDoDf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D062716B38B
-	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 03:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3E4189F43
+	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 06:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728964568; cv=none; b=RQwF8zR+Hn4dALG4AS0x03g1ggBi5y31+kfGFYXyqGzDUrsJJV3mA8fxyBw9QpwOph74Wfk6wmjf3g6A0SrlK44Ud7u45bKhGizSmonxoUOR0UnkO+dk9XzQCmmd3kYFNbs/0D/GdizchJmxHepjUtbz0lUSK5lKj46oqLDcNmw=
+	t=1728974589; cv=none; b=hnl6gaonjZOMsusu4X5FV0wD2cwR2OWNWgnFJzb0mzeovb1wqFPpqNRdrXugYImNuH+uq2DppO9cbbSowi6wB//xWzxN/rvvmnjRdUXsCOwm3/CmRhrcGUrIYPlLca08AtefSLvnnh6IfW0aWeduydiKBR3aTWI5Fj5AUAcpRj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728964568; c=relaxed/simple;
-	bh=MgtyB/AAROrtxH1XraK2lYAW3vbCsCYiprQHNQSY0ag=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kqCTyZVi+vFKLp537EVO2vPVGj+zfv5ouhH3rV7EXQCC6U8RX9ld4rBq5zuuGMWIT7NzztymrgHEo2pZepkq6bQlc5Xxj4cx9dBlrDWSJ4eqOmtXSR5zCfSTaQAD0Sbcf3Xzc0/XqFeR3APcWb/JzJ6bJnJZTanarMz/kWYVUuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sg2VmH3s; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728964565;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/gQj7yhKGwHX3tay3bEUPL2aqsF2Bb60CY1YisKDKbg=;
-	b=Sg2VmH3srXdzxjPr1P5SpmaxF4U72H+kzlOrICxip4aD+ubId/45O8/A/19eglCE/4iunD
-	qqe5es/KuNw09IYmjyUOOnM+sd/zRpCTQtsh9BupZMbj4gD4zp6PxXnyYGRAzHG2U5rs1O
-	G4sitf8IcyhDeajG6UaSvoXrJcCwoUs=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-262-jj9yvM5_MTW5YpmXmJR0rQ-1; Mon, 14 Oct 2024 23:56:04 -0400
-X-MC-Unique: jj9yvM5_MTW5YpmXmJR0rQ-1
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-7ea999a79a2so717910a12.2
-        for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 20:56:04 -0700 (PDT)
+	s=arc-20240116; t=1728974589; c=relaxed/simple;
+	bh=q4pOo0mKq9PHvAzEjAZuBGJwLjJ61GOeJjV0JBSuu0o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ltyOgwKB+URhh7M66/mTCRdhyKjgy/Oz7savQ41kPwPG0qThk/LGPTd8krHWtZDeq5FIih76ALdBc00UVkN6lqQa7tAbLantP18kPTKYJRkczJhoo8w/adFAy9wrqyA54+MUpWWppMMQfrY0UJsiQwMVrILfY6nQAcx+TMUpEOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=u/1YDoDf; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a3b463e9b0so10892835ab.3
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2024 23:43:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1728974587; x=1729579387; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iyYlnfYOujvvEy5NpJ15tZ1d57xVnxV002iUwSLbYqo=;
+        b=u/1YDoDflZ3z8/KJlDBBugq3/PUx5GBdjHA3FGjagXCW8fBHm7XKQNEv5h378QW4SW
+         XkOFQOin3x/i/fSd23LjVYeOuz5Fa8NHLeHNrHqJzDP5ZOe7dlZfmnlG9fwDSRXNgQga
+         nAG6UbhKnYQaf664yYPZcH1+NDU1Fq3d5hHr9HMxSuViozhXavQZZoVMFQojt3Te5wTy
+         RD4diIoHulJozY6R9tSKawIZQBNI6TYZGu5PX3uupB5W4uOB0A78HuecG4zSyVaW6eJc
+         6pLea2w8Z7a7WfM/v3KUpWs7IFHgEP19bBqpSnjFlvWusdIvVtY662ddnzYMIAMcr+jd
+         PvYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728964563; x=1729569363;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/gQj7yhKGwHX3tay3bEUPL2aqsF2Bb60CY1YisKDKbg=;
-        b=kxOr7XSinH0iBu+pWi/qdNgLoIHQJjxELrA2Hp28vXcosbft1hZnT7gELmvD5oN//c
-         KBMQFe7WSVUqF0lRsE4sh7PI4KomE1VuNqCwzFzZfB/hqmoGVndrrHq223dZtfH1fExR
-         /gWKBUyPzhCzBO5ZjPs547ynAhmKMTjl1yEYq4ybTRXAbUVUVJOj3trQJgNIsPL+TYmS
-         wDBgg9mO0/tFv9wsP/fxCAK06rAYMOd/EBMIysnW8z5Fp8HWx45qYkF1QJjVoh8vqJpJ
-         dpFs1vWmawOGGOV4Sm5gLDCwGAHj44t8ZZMZ+YBPQQf3sXtFfHUkyEpunLxF5Tn1QxWQ
-         VVNg==
-X-Forwarded-Encrypted: i=1; AJvYcCUiU+9OGyU+AGOsrkhH8hJgoMkAbWH5BkKP3llr52vcyeGPufvXFRPspYPg6FmxwQpo4n4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy44VIBL6twdd/VGSKcBjNzE7tuhm9rar/oaxRs8NTLjviHDfBI
-	OUWxQurYW3X49bmRA5D5sDBZSypag4W7yPmFdtsvF4KRTtV9+U1I/CkXbzRvIaQGRPRDZvdIHJy
-	A3xW6bmzzPraisAOOSFKsqjjhZovTLRKhn4YGL5G5BhvKfmPz3Q==
-X-Received: by 2002:a05:6a21:4d8c:b0:1d8:f894:43f9 with SMTP id adf61e73a8af0-1d8f89445eamr681081637.11.1728964563166;
-        Mon, 14 Oct 2024 20:56:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGybMblrnhP5WbRv8pGItZKUwHcNnS++KdeQ7wfVC+XkNBJwpsFwHEmwrwG693wjo55GOXWsQ==
-X-Received: by 2002:a05:6a21:4d8c:b0:1d8:f894:43f9 with SMTP id adf61e73a8af0-1d8f89445eamr681045637.11.1728964562725;
-        Mon, 14 Oct 2024 20:56:02 -0700 (PDT)
-Received: from [192.168.68.54] ([180.233.125.129])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea9c6ba2d4sm339896a12.11.2024.10.14.20.55.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Oct 2024 20:56:02 -0700 (PDT)
-Message-ID: <2352629a-3742-45e9-a38f-196989918c9b@redhat.com>
-Date: Tue, 15 Oct 2024 13:55:53 +1000
+        d=1e100.net; s=20230601; t=1728974587; x=1729579387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iyYlnfYOujvvEy5NpJ15tZ1d57xVnxV002iUwSLbYqo=;
+        b=aHqIj8WjOrPDSpCjhE2NR1dFwj4qjUFO0ZmSRhRIsa/XZ2282T4SCywEGLwWvzzuCn
+         1kfSKu34eX1NyPvyvW/bpuONOSeyIEilwxDfDNBkwEWn3Yh4mvzP1+c1jeV7Cg/HTuFZ
+         oVndk6CE4TywDvL6va2q8ZZm/Bd6r3/C+ng2OiTD3O8de5OEAso+zh3Aapl8uaQt2aTk
+         SZz6RCTdqvkm0tuSJ1ZW5UfW208RK5nuqqHXUB2FVqx0HLGqXWu7NtAgvoqbFEsOt9Jn
+         RA6HWxk6ut3uGLR3HMkVX2LtD3HJDPl68xQrmIysh1Wc66nn6Jxyg2ZvOX8D5SWXA54+
+         8o7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUzObzrB63FwRc+MGuCj+kITWfJOi0BjZ7UcQlmoTdEXiC1uCBuRHtwujekUrNlcmMUeCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRY3Z6fwVDJei6TSgxzeacGXXnTG682tsZapDkEw6duBw50TtI
+	47ShEBU4o5rvj5/MIzxdVe+W3t/CEjWg050B/bcEhmRqPb8yBP6opYFAo4eMH9keqH8KISlSKNG
+	uhCA5+8LbDLvubmSTzFjJeX0uqyFr6suYK3PGzg==
+X-Google-Smtp-Source: AGHT+IGvQbC0/b5Ce2YbvHlkhebuCb+KYoHY5qbt65xUQ/y6bbyBicbUVY5plLRK82lv2VCEPUGhaowNVLFLGqH6YzQ=
+X-Received: by 2002:a05:6e02:b44:b0:3a1:f549:7272 with SMTP id
+ e9e14a558f8ab-3a3b5fc3bafmr104253155ab.23.1728974587112; Mon, 14 Oct 2024
+ 23:43:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 03/11] arm64: realm: Query IPA size from the RMM
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241004144307.66199-1-steven.price@arm.com>
- <20241004144307.66199-4-steven.price@arm.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241004144307.66199-4-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1728957131.git.zhouquan@iscas.ac.cn>
+In-Reply-To: <cover.1728957131.git.zhouquan@iscas.ac.cn>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 15 Oct 2024 12:12:55 +0530
+Message-ID: <CAAhSdy1nmpiSfi-9B0ZXS9s6CYs_R9YZfd6rrXNc-BQHucm6ww@mail.gmail.com>
+Subject: Re: [PATCH v4 0/2] riscv: Add perf support to collect KVM guest
+ statistics from host side
+To: zhouquan@iscas.ac.cn
+Cc: ajones@ventanamicro.com, atishp@atishpatra.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, mark.rutland@arm.com, 
+	alexander.shishkin@linux.intel.com, jolsa@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/5/24 12:42 AM, Steven Price wrote:
-> The top bit of the configured IPA size is used as an attribute to
-> control whether the address is protected or shared. Query the
-> configuration from the RMM to assertain which bit this is.
-> 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
+On Tue, Oct 15, 2024 at 8:28=E2=80=AFAM <zhouquan@iscas.ac.cn> wrote:
+>
+> From: Quan Zhou <zhouquan@iscas.ac.cn>
+>
+> Add basic guest support to RISC-V perf, enabling it to distinguish
+> whether PMU interrupts occur in the host or the guest, and then
+> collect some basic guest information from the host side
+> (guest os callchain is not supported for now).
+>
+> Based on the x86/arm implementation, tested with kvm-riscv.
+> test env:
+> - host: qemu-9.0.0
+> - guest: qemu-9.0.0 --enable-kvm (only start one guest and run top)
+>
+> -----------------------------------------
+> 1) perf kvm top
+> ./perf kvm --host --guest \
+>   --guestkallsyms=3D/<path-to-kallsyms> \
+>   --guestmodules=3D/<path-to-modules> top
+>
+> PerfTop:      41 irqs/sec  kernel:97.6% us: 0.0% guest kernel: 0.0% guest=
+ us: 0.0% exact:  0.0% [250Hz cycles:P],  (all, 4 CPUs)
+> -------------------------------------------------------------------------=
+------
+>
+>     64.57%  [kernel]        [k] default_idle_call
+>      3.12%  [kernel]        [k] _raw_spin_unlock_irqrestore
+>      3.03%  [guest.kernel]  [g] mem_serial_out
+>      2.61%  [kernel]        [k] handle_softirqs
+>      2.32%  [kernel]        [k] do_trap_ecall_u
+>      1.71%  [kernel]        [k] _raw_spin_unlock_irq
+>      1.26%  [guest.kernel]  [g] do_raw_spin_lock
+>      1.25%  [kernel]        [k] finish_task_switch.isra.0
+>      1.16%  [kernel]        [k] do_idle
+>      0.77%  libc.so.6       [.] ioctl
+>      0.76%  [kernel]        [k] queue_work_on
+>      0.69%  [kernel]        [k] __local_bh_enable_ip
+>      0.67%  [guest.kernel]  [g] __noinstr_text_start
+>      0.64%  [guest.kernel]  [g] mem_serial_in
+>      0.41%  libc.so.6       [.] pthread_sigmask
+>      0.39%  [kernel]        [k] mem_cgroup_uncharge_skmem
+>      0.39%  [kernel]        [k] __might_resched
+>      0.39%  [guest.kernel]  [g] _nohz_idle_balance.isra.0
+>      0.37%  [kernel]        [k] sched_balance_update_blocked_averages
+>      0.34%  [kernel]        [k] sched_balance_rq
+>
+> 2) perf kvm record
+> ./perf kvm --host --guest \
+>   --guestkallsyms=3D/<path-to-kallsyms> \
+>   --guestmodules=3D/<path-to-modules> record -a sleep 60
+>
+> [ perf record: Woken up 3 times to write data ]
+> [ perf record: Captured and wrote 1.292 MB perf.data.kvm (17990 samples) =
+]
+>
+> 3) perf kvm report
+> ./perf kvm --host --guest \
+>   --guestkallsyms=3D/<path-to-kallsyms> \
+>   --guestmodules=3D/<path-to-modules> report -i perf.data.kvm
+>
+> # Total Lost Samples: 0
+> #
+> # Samples: 17K of event 'cycles:P'
+> # Event count (approx.): 269968947184
+> #
+> # Overhead  Command          Shared Object            Symbol
+> # ........  ...............  .......................  ...................=
+...........................
+> #
+>     61.86%  swapper          [kernel.kallsyms]        [k] default_idle_ca=
+ll
+>      2.93%  :6463            [guest.kernel.kallsyms]  [g] do_raw_spin_loc=
+k
+>      2.82%  :6462            [guest.kernel.kallsyms]  [g] mem_serial_out
+>      2.11%  sshd             [kernel.kallsyms]        [k] _raw_spin_unloc=
+k_irqrestore
+>      1.78%  :6462            [guest.kernel.kallsyms]  [g] do_raw_spin_loc=
+k
+>      1.37%  swapper          [kernel.kallsyms]        [k] handle_softirqs
+>      1.36%  swapper          [kernel.kallsyms]        [k] do_idle
+>      1.21%  sshd             [kernel.kallsyms]        [k] do_trap_ecall_u
+>      1.21%  sshd             [kernel.kallsyms]        [k] _raw_spin_unloc=
+k_irq
+>      1.11%  qemu-system-ris  [kernel.kallsyms]        [k] do_trap_ecall_u
+>      0.93%  qemu-system-ris  libc.so.6                [.] ioctl
+>      0.89%  sshd             [kernel.kallsyms]        [k] __local_bh_enab=
+le_ip
+>      0.77%  qemu-system-ris  [kernel.kallsyms]        [k] _raw_spin_unloc=
+k_irqrestore
+>      0.68%  qemu-system-ris  [kernel.kallsyms]        [k] queue_work_on
+>      0.65%  sshd             [kernel.kallsyms]        [k] handle_softirqs
+>      0.44%  :6462            [guest.kernel.kallsyms]  [g] mem_serial_in
+>      0.42%  sshd             libc.so.6                [.] pthread_sigmask
+>      0.34%  :6462            [guest.kernel.kallsyms]  [g] serial8250_tx_c=
+hars
+>      0.30%  swapper          [kernel.kallsyms]        [k] finish_task_swi=
+tch.isra.0
+>      0.29%  swapper          [kernel.kallsyms]        [k] sched_balance_r=
+q
+>      0.29%  sshd             [kernel.kallsyms]        [k] __might_resched
+>      0.26%  swapper          [kernel.kallsyms]        [k] tick_nohz_idle_=
+exit
+>      0.26%  swapper          [kernel.kallsyms]        [k] sched_balance_u=
+pdate_blocked_averages
+>      0.26%  swapper          [kernel.kallsyms]        [k] _nohz_idle_bala=
+nce.isra.0
+>      0.24%  qemu-system-ris  [kernel.kallsyms]        [k] finish_task_swi=
+tch.isra.0
+>      0.23%  :6462            [guest.kernel.kallsyms]  [g] __noinstr_text_=
+start
+>
 > ---
-> Changes since v4:
->   * Make PROT_NS_SHARED check is_realm_world() to reduce impact on
->     non-CCA systems.
-> Changes since v2:
->   * Drop unneeded extra brackets from PROT_NS_SHARED.
->   * Drop the explicit alignment from 'config' as struct realm_config now
->     specifies the alignment.
+> Change since v3:
+> - Rebased on v6.12-rc3
+>
+> Change since v2:
+> - Rebased on v6.11-rc7
+> - Keep the misc type consistent with other architectures as `unsigned lon=
+g` (Andrew)
+> - Add the same comment for `kvm_arch_pmi_in_guest` as in arm64. (Andrew)
+>
+> Change since v1:
+> - Rebased on v6.11-rc3
+> - Fix incorrect misc type (Andrew)
+>
 > ---
->   arch/arm64/include/asm/pgtable-prot.h | 4 ++++
->   arch/arm64/include/asm/rsi.h          | 2 +-
->   arch/arm64/kernel/rsi.c               | 8 ++++++++
->   3 files changed, 13 insertions(+), 1 deletion(-)
-> 
+> v3 link:
+> https://lore.kernel.org/all/cover.1726126795.git.zhouquan@iscas.ac.cn/
+> v2 link:
+> https://lore.kernel.org/all/cover.1723518282.git.zhouquan@iscas.ac.cn/
+> v1 link:
+> https://lore.kernel.org/all/cover.1721271251.git.zhouquan@iscas.ac.cn/
+>
+> Quan Zhou (2):
+>   riscv: perf: add guest vs host distinction
+>   riscv: KVM: add basic support for host vs guest profiling
+>
+>  arch/riscv/include/asm/kvm_host.h   | 10 ++++++++
+>  arch/riscv/include/asm/perf_event.h |  6 +++++
+>  arch/riscv/kernel/perf_callchain.c  | 38 +++++++++++++++++++++++++++++
+>  arch/riscv/kvm/Kconfig              |  1 +
+>  arch/riscv/kvm/main.c               | 12 +++++++--
+>  arch/riscv/kvm/vcpu.c               |  7 ++++++
+>  6 files changed, 72 insertions(+), 2 deletions(-)
 
-[...]
+Please include Reviewed-by tags obtained on previous patch revisions.
 
-> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-> index 9bf757b4b00c..a6495a64d9bb 100644
-> --- a/arch/arm64/kernel/rsi.c
-> +++ b/arch/arm64/kernel/rsi.c
-> @@ -8,6 +8,11 @@
->   #include <linux/psci.h>
->   #include <asm/rsi.h>
->   
-> +struct realm_config config;
-> +
+Queued this series for Linux-6.13
 
-Nit: I think this variable is file-scoped since it has a generic name.
-In this case, 'static' is needed to match with the scope.
+Regards,
+Anup
 
-> +unsigned long prot_ns_shared;
-> +EXPORT_SYMBOL(prot_ns_shared);
-> +
->   DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
->   EXPORT_SYMBOL(rsi_present);
->   
-> @@ -67,6 +72,9 @@ void __init arm64_rsi_init(void)
->   		return;
->   	if (!rsi_version_matches())
->   		return;
-> +	if (WARN_ON(rsi_get_realm_config(&config)))
-> +		return;
-> +	prot_ns_shared = BIT(config.ipa_bits - 1);
->   
->   	arm64_rsi_setup_memory();
->   
-
-Thanks,
-Gavin
-
+>
+>
+> base-commit: 8e929cb546ee42c9a61d24fae60605e9e3192354
+> --
+> 2.34.1
+>
 
