@@ -1,292 +1,308 @@
-Return-Path: <kvm+bounces-28954-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28955-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F0699FA16
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 23:41:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9CE599FA24
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 23:42:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D2AA1C20B49
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 21:41:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 812A1284722
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 21:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE24E2003BF;
-	Tue, 15 Oct 2024 21:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95611B0F1B;
+	Tue, 15 Oct 2024 21:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kQa0ZQJ0";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="CBZgCo/2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PCexk1pu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5912003A5;
-	Tue, 15 Oct 2024 21:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729027979; cv=fail; b=M+lqxecYelJKv5ZlbwFFOfSMpZjCRGi/ztVmt78iOMTHvxWsw4xc62LZ48wBx6KvHDvF1zUTJdXwr7jjE/LqJgWxVKWVaHi0g9lBFDBVMHwoAy84lLMTIPEoP+JsG6kTEdc3F5kNNpGjaeo5CTHQaa/dJBIWkiNuWyNQL3XOT5w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729027979; c=relaxed/simple;
-	bh=tf7Uv35Op3eZ2Kc7OI/uJxWxNkVJIQJ6ojgXwUijiRE=;
-	h=References:From:To:Cc:Subject:In-reply-to:Date:Message-ID:
-	 Content-Type:MIME-Version; b=IgBRhPNgblGSWbO/a5zN1QHsABXRlYkfxn1nGNEvKi/rb7t9FR2Kk3b9E0j4k5nsk7We3lROIGJvwCTaJolhCkrE/QViCBmWctjaHuu2NNBgufis8FcMk8B+y48kBlGYWSM8YKwCNVIxhhe9s/+LEUuS+iaNWsSITL+yvyBC8ss=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=kQa0ZQJ0; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=CBZgCo/2; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FHtimm001626;
-	Tue, 15 Oct 2024 21:32:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2023-11-20; bh=8DFRwJkfA8RGSO7DeQ
-	KG8HG22t+qaBwX5/jRl2oflwM=; b=kQa0ZQJ0ofBuTam5sl1wDFfBzJLGYi1K+4
-	FKHXnW7AnVgLcs35oOk279BIJOAPVw+z78Gt0OkhRA7TpX0C1qJnYFj4uhs8WEMr
-	cpDTHy6TXMo/+LZHA8Sl5aNZasjbkBx5RvpFvjH7utuSr1+InHGJQJ7BtUV6c9o+
-	1N1jrhVR0H3A6TXE4ONV6EdYQJxcNQBxl9YrteE2VXwdmmebZ3cojPLbT34/au+O
-	RGD8FV7OFo4+/SrewK5mIrii5UIbkexA59MVw8tgpLOy0dFsRLamQeeIkbieXnLz
-	6cX1ydCU/WGzVkDLWAxSQOBXiCBuh3lj0DWlU3fS4eZ+3bJRMQTw==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 427g1aj4b6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 21:32:10 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49FK5lAD019857;
-	Tue, 15 Oct 2024 21:32:09 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2043.outbound.protection.outlook.com [104.47.58.43])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 427fj81uq0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 21:32:09 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ozzdr5OhNo/02SFamJZ4MWiyeppJpGX192fYqXkRPH3eB2J0kvIztiPT96A1gV//DT50JYZ6xHKPAA/rtSlndVdlqvEEpv28Tkn5BW/J2viuWiOXuIdnrQSjAOgizd8azL9NtO71JPQCjD/UD/flgwRc5llW9SuP/RHX0V4/vor9b/cpnE5KNRqrBMujlKDBDKuCIyU3HbW6ePS/XCP3yZSidDSllgHs9ZCvBjwLcE19jE2Wix8V3GcwdoJk/Xg/RqP5B59dzSqfNC7uwcwXfAVITbOeFyLeexCL2yt8MBaiMKje20b7KxggbrD8VEB5RMo29CnakdA44GjLIH270Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8DFRwJkfA8RGSO7DeQKG8HG22t+qaBwX5/jRl2oflwM=;
- b=ioDlSBA1GLNUREPLkPbMBKbsohOF/gE34oLTHg3MEZBKmEdrjW2JF+Drb3dl9zZvLMI4HCz6GDUXJrqhqdVP+kTZVd0H86Yo61uUDAYSRS1hjX2dacPkZg3v08IKjXlVr6ggmafEe1zjIHY/oHt+XgqSGNcYX8Lhu7iG4CFEiLyLSgIZmTkzV7pbPJ3C7Qib322o00lpFoqTXvanoxJ1G6mbzvj+fMoiqEkdafyxG1Xgi8z4IDwCc5iSnXfDSDG31p32pkKl1y9LMjJ412oWR8dYDVvB73FzKM2fu1AMZnstoFvUyhLxGrdviPs8gKtbJRE8Ch4wlyhfJ29QxDKDng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8DFRwJkfA8RGSO7DeQKG8HG22t+qaBwX5/jRl2oflwM=;
- b=CBZgCo/249VjckM+2adDXFnmv+dTnruz3ueYmJVSiSo/P/LbHyD/ixcQa+Yi9fJsBWnyAJ++2e/wppWdIsaHlNL98tccPe7ENgFH0HiXvZipOCP2J95ajAw6E2Jv8fgMhmPteO2VJrQQ0D+DMjwTFBaGwnF0nrJ4ShCrxiZh1cM=
-Received: from CO6PR10MB5409.namprd10.prod.outlook.com (2603:10b6:5:357::14)
- by BY5PR10MB4146.namprd10.prod.outlook.com (2603:10b6:a03:20d::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.28; Tue, 15 Oct
- 2024 21:32:03 +0000
-Received: from CO6PR10MB5409.namprd10.prod.outlook.com
- ([fe80::25a9:32c2:a7b0:de9e]) by CO6PR10MB5409.namprd10.prod.outlook.com
- ([fe80::25a9:32c2:a7b0:de9e%4]) with mapi id 15.20.8069.016; Tue, 15 Oct 2024
- 21:32:03 +0000
-References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
- <20240925232425.2763385-2-ankur.a.arora@oracle.com>
- <Zw5aPAuVi5sxdN5-@arm.com>
-User-agent: mu4e 1.4.10; emacs 27.2
-From: Ankur Arora <ankur.a.arora@oracle.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Ankur Arora <ankur.a.arora@oracle.com>, linux-pm@vger.kernel.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, will@kernel.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
-        wanpengli@tencent.com, vkuznets@redhat.com, rafael@kernel.org,
-        daniel.lezcano@linaro.org, peterz@infradead.org, arnd@arndb.de,
-        lenb@kernel.org, mark.rutland@arm.com, harisokn@amazon.com,
-        mtosatti@redhat.com, sudeep.holla@arm.com, cl@gentwo.org,
-        misono.tomohiro@fujitsu.com, maobibo@loongson.cn,
-        joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
-        konrad.wilk@oracle.com
-Subject: Re: [PATCH v8 01/11] cpuidle/poll_state: poll via
- smp_cond_load_relaxed()
-In-reply-to: <Zw5aPAuVi5sxdN5-@arm.com>
-Date: Tue, 15 Oct 2024 14:32:00 -0700
-Message-ID: <87ttddrr1r.fsf@oracle.com>
-Content-Type: text/plain
-X-ClientProxiedBy: MW4PR03CA0246.namprd03.prod.outlook.com
- (2603:10b6:303:b4::11) To CO6PR10MB5409.namprd10.prod.outlook.com
- (2603:10b6:5:357::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACC81B0F36
+	for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 21:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729028072; cv=none; b=JNOQbK9BU/VUsRQCDIkyK80wKkOLrXUjIdnDximMGxEcp5GqqzJMqhvSoQwso5S0+106gHqlT2x85CrFBFxoOzzuMj+9S6awnGugxmYz/byaWN3d9o4KQnqmkfCwroUc9qK/m5GtZfP6RfjVMUru2A3M37MC/rZr2GLFPnzo74I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729028072; c=relaxed/simple;
+	bh=/ZW2xEDKt0GanW5UBYvRqYCkdZF99tftr2SM7xbXSJ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pn6UAAtcXmZxbRCAb8ihZKsC1D1gRCe3cdEijLzUPCAHNBKhiuMqDhvDlaMhz0XPM1mTrVnYiJyAXd2JJq2ii5+iIqi9DL2NbIGw1Vzl9Je8fQz3yNLrBNrJ+1t3ZgMClt/4PPmNKWQzuq5tRfQQurBsWdQuLICLV1wNuL4Hmu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PCexk1pu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729028068;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yq0av3bGyebgc1yVU0KIcUx1tbCF3JSfuIpR+BT7lwY=;
+	b=PCexk1pueNiTYrgSzWhE0rgVORJfiI0K77yB/ptZn/PETsgR16Iw3zoAEmnQhE3ONVO4Fz
+	V8YO5AUMNXTcAE5XcUd7MsI4mLbavvDSF0NZojqLItLRDwnf1Ws5LanPfecyPOCHSirIg8
+	odbv69hax0nZ3cG834ipkX0MbGbwdbA=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-369-MLJwhVwkMomAvmUGbXiWUA-1; Tue, 15 Oct 2024 17:34:27 -0400
+X-MC-Unique: MLJwhVwkMomAvmUGbXiWUA-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6cbe3ff272bso115914976d6.3
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2024 14:34:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729028067; x=1729632867;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yq0av3bGyebgc1yVU0KIcUx1tbCF3JSfuIpR+BT7lwY=;
+        b=YAgANL6GRrD9R/SKg8BNZhD60Kgz4xATRwIj39Qen4Y81HqHiKJq07TbpVMh4+nRnh
+         NJxMUyVflpk+LC3IWJJk6HTPMy/fHeO7CZrJPMtLgSbR3RWQJpHkBs3f676YSx91QLpu
+         En0+xxuJepKWIqHFDXsQ7D96m9mOmqMxryeY+90CyDeH1sq+vMxLSTjFvhIC2omFO4Na
+         zXsHa2LxnugjHknuQi5KbqEjeseRnYEA26cQeiJFbdtggHk4bOzT9AocXg4X3Ik1fBrq
+         Tyxrjll9m0TvQ8+CG+9gN+PHNO+oGbg7wIrcyRACFUgHp4IiEksV4fHCRuj8uMxfQLNI
+         5FIw==
+X-Forwarded-Encrypted: i=1; AJvYcCXLjTEViSuqDANpwh8rTSbkBIvyLT/ok6MtBO1tbENzqonyIXlAG+wB9QQRVHGMs5VFy6w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBOux9B4EfqYQOe5+h9UBOCwhYQ19CXOYrpSkh4WlgF+qTthTp
+	sEC7KfFnyAtOZ7MyPw3C5bH+uvIDFFPweKrT53m4nDN3nWGPN/6BSZ6iSzJKWbWquFPjftdFL+5
+	OSwEoYvxOBAJyzfEWkdSPzuUSMX945KlUgthRfLd8YEerDzvoQA==
+X-Received: by 2002:a05:6214:3a09:b0:6cc:1322:21d9 with SMTP id 6a1803df08f44-6cc2b8bc7f2mr24038426d6.1.1729028067061;
+        Tue, 15 Oct 2024 14:34:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGFyBvM4orc/Q0IuB6eR9rP8v23e8IQslLR8DUFc0wIvIPEYh1gB3MAhDTKXriDvcrHsTOX9w==
+X-Received: by 2002:a05:6214:3a09:b0:6cc:1322:21d9 with SMTP id 6a1803df08f44-6cc2b8bc7f2mr24037916d6.1.1729028066578;
+        Tue, 15 Oct 2024 14:34:26 -0700 (PDT)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cc22990493sm10882306d6.140.2024.10.15.14.34.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2024 14:34:25 -0700 (PDT)
+Date: Tue, 15 Oct 2024 17:34:21 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk,
+	jgg@nvidia.com, david@redhat.com, rientjes@google.com,
+	fvdl@google.com, jthoughton@google.com, seanjc@google.com,
+	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com,
+	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev,
+	erdemaktas@google.com, vannapurve@google.com, qperret@google.com,
+	jhubbard@nvidia.com, willy@infradead.org, shuah@kernel.org,
+	brauner@kernel.org, bfoster@redhat.com, kent.overstreet@linux.dev,
+	pvorel@suse.cz, rppt@kernel.org, richard.weiyang@gmail.com,
+	anup@brainfault.org, haibo1.xu@intel.com, ajones@ventanamicro.com,
+	vkuznets@redhat.com, maciej.wieczor-retman@intel.com,
+	pgonda@google.com, oliver.upton@linux.dev,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
+ struct kvm_gmem_private
+Message-ID: <Zw7f3YrzqnH-iWwf@x1n>
+References: <cover.1726009989.git.ackerleytng@google.com>
+ <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
+ <Zwf7k1wmPqEEaRxz@x1n>
+ <diqz8quunrlw.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR10MB5409:EE_|BY5PR10MB4146:EE_
-X-MS-Office365-Filtering-Correlation-Id: af1af1fa-6b47-4d44-69ec-08dced60ceaa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ZN7SRT/fZd+1PVtUOn6SGCrpm5LP5fswPecTAFpUz6LNzlLz1r54qSO/x5t8?=
- =?us-ascii?Q?oO8m74UM64ChCgb2NB0XNvJAwf2FyMVxDrMtZWm3eJ/+j1os3QiBRmiayLZX?=
- =?us-ascii?Q?6XjaVgDukuSnxC42KtbJKkB4sH5kJJW+vd27+y9RdVYxArcpsosEA92PKV5G?=
- =?us-ascii?Q?QLxgs6YJP3rf26UQB7wWpSyrxYy6iTyzQ49UqsWV6FIbfd+Nf+LGsUcxOXlh?=
- =?us-ascii?Q?fpeuV33ZU6yfkRJe+1Eo+KULWjU6CFuoGw9Fe9yTU2/SGlwq0Mf2uzNVKqs9?=
- =?us-ascii?Q?fi64j1UYqtvYJOx0HXxHGex+RRMt6kCBdBN839096mjpNqCGsGLbxXClZ77L?=
- =?us-ascii?Q?ohWdUy712ewdSDr0DxOdDtSxgVXAFqrrrDW4cKQts/LDRCXDzporCILEssRd?=
- =?us-ascii?Q?ei61Qv3B5abnhlw14ufRNyU4I2OMKzeh0mRGNswarHKVadKg/QB2rPH7uRT4?=
- =?us-ascii?Q?tkN4hqtMPqS4P1r9C5Ewb6+NsYvDfd4UPb9JZuyMCSKIOL0U1+o5LuhzTFdx?=
- =?us-ascii?Q?UkFkKAb0OjC04trNf68yucpQ6kA1plyvlwyZE4b8jMc/0PgQPmpkK61o6Ly1?=
- =?us-ascii?Q?8zwMu5ilYzHe0w8tXOwvB0SVLuxVVoASiMbw+X4xMz3HnFIGL4l3cHPqQOkR?=
- =?us-ascii?Q?mKRycSUB51ORQlDrchhBPIOm2UDPVgBdOMlNKRDboL63qqEQSGf3dkXD5TKi?=
- =?us-ascii?Q?TLQOK85fGDKtDUXasjGLul/GseUu7mcyL8DK+3EwtDQFI9c9TVIPkkEaEnv5?=
- =?us-ascii?Q?Jcj97A7e8BNj7KlGYFdf+kKayVsHgPsshnx8rpvSH8r63fzWlHOUqRv6Oogf?=
- =?us-ascii?Q?BlQF9sD5AhIbI3Bw3Nxsh8pjcZWKwb1GvrF9cPBhnM2VxfaIWzId1znImhj+?=
- =?us-ascii?Q?LnNviZ8PgW7yycL+BRdE+8O1XEmIgo5cIwhXiGdCSQPKhc1ywCe9asNl0Lab?=
- =?us-ascii?Q?nBa22gnmSh10XF3EJaC98m3lL+ZlRNUNPJ+yHwmmAotAxDT3NRgEPX8yiiiU?=
- =?us-ascii?Q?dcARZI8w4ciU2FwrY+M/y6BTdIAa7LIyxlxXQS6fUQ09ZcyZ2WzzN3gOFaTx?=
- =?us-ascii?Q?iG6LKGITS/DgyCvLS091gXRDQGtXcKoAQEBfPCs4HpDWC5vFJ18S8ZaZWHy8?=
- =?us-ascii?Q?D0ejhtgfZarrUua3PsF/e2BTzBiKTIruH841Rbl8MH8BfnIWlVhZwbM1VAqc?=
- =?us-ascii?Q?9wmK6DWCnHZVCu6xYW65aKJb9veblPm9e6gVqYwR0nqQZnnHmj3U/A9Q8xlM?=
- =?us-ascii?Q?N6lSiKSXVxbClDdztogQh51h+Grd1C1UEkj5KPdGLg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR10MB5409.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rdRrbV24b3WeHXhoQGPtUq9NJv60toPNLUIcP7rgLai9EBIa+nvp7oKRvB8g?=
- =?us-ascii?Q?YRHDyBqFo9hvKHLKwBWg8bxEODeR91UivVtBDQXT5C1xgppjAryyQ9zyVNlX?=
- =?us-ascii?Q?djqnqk5ps6VsxbQpKtaDmtcdLaT9op6p5uD43EXlZ4h5T18IBfbsFtzlUSf8?=
- =?us-ascii?Q?wAC7XDa8/eXGPevc0pOHWGof8/eU/tpjT69eSmE5CnmbyNvVC7XK7OuCG7zD?=
- =?us-ascii?Q?zT6VpC4g4Muj1HuOgduwt+AbDseWgChM84dDCXSpVio4/jNVXKVtd0mci32d?=
- =?us-ascii?Q?bx0N1FqLxEP2qKWJ4gMxJHRaygsOC7wOA8zE6T6KNL5UFdtgfJ7doFKJOCxJ?=
- =?us-ascii?Q?RtxXEu4C/Gx5I/KTn/M6ETzPivqhuhegmddhabzzeGdvBiEAUiXeH78gnre1?=
- =?us-ascii?Q?y2CVGX1SUEjhQ3tBpbJ2f7P8FU+W71Yrwpfdc1QMpe6Gt99ORus34/oyOG74?=
- =?us-ascii?Q?8egJxGlymoIc080M73uykVIRqJVzN7kvYTiW653Cfwe9/uj8zyJcoP7t3sBB?=
- =?us-ascii?Q?oAdJX7+92F6PIeDNhVHLVRO1UyXSi1lzpDmUdFwJ24SlFBi2IGW2mqr0LQ/O?=
- =?us-ascii?Q?5qRQeTvN8Av37styfF84BXuUN+1o6qQpuzcbo3YK1Ehj0tMqgpXM2T7u1aW/?=
- =?us-ascii?Q?jfYssiNJ67l37qHPNtJ4vdY3fBkXLcAqkIa6ZkH7xEhst7zwJ+Yv1XAp69c7?=
- =?us-ascii?Q?ziOQd/re+lh7Areesadc8BSg/SKJ4gSBDPKubx7CEYrVTOeKd3ZNLvROuSy6?=
- =?us-ascii?Q?HyYyoVT2/MqqZh+dF2P3lf2NFAyodaOpvfUSz2lpBLOQiXUCK2RJbUKY4YCz?=
- =?us-ascii?Q?VRI1pr6W0C9z790cMlD8PO5AFJMFxuuW4/i1gEMjm81J/3Eh22iAGKRQ+jcy?=
- =?us-ascii?Q?6Q2q4RM+jInwCeoQf2UA+qyCJ49iE4ByXPvVyPX2oWn2wrz8zpSb1+QjRmni?=
- =?us-ascii?Q?UEcy12ZMjiOUCnKnDyh+fgjJWIXEWMO9yosjiBgQEFUK9p9vZ4sN3ZeDvemY?=
- =?us-ascii?Q?ImJaoWB++Zt70ug44WRnIsbW+z4DC7mIShGFsGkJE8pJvf8ctzEpDEvgA2Q7?=
- =?us-ascii?Q?cCBglqRUn49jQcDIcDOrsweP7AvTasSe+A+9ezx+YS8mfzf/VPdYI4lsu93q?=
- =?us-ascii?Q?Q1/stb2eskQkoP4kMnlmZO5y56UFXNKS1/AzeENvwS45NW2qGibx1roY5Yfv?=
- =?us-ascii?Q?nTXrgpqg4aJJ7SpMzk7QiFQ/E5eC0vHqGHi/mULB/6uiredhpnB32JA8C0KE?=
- =?us-ascii?Q?pXBDr8CcBr9p2tqY9F4MYgyTrtk2OdK5PnVeS1IzwHox1BbfZ3CNA+45HPIS?=
- =?us-ascii?Q?qbUpKcqC7AsRFKnErhxwSn/s4NegL42jASZ9bJQ2ef3dmooO+uweCyhwExFK?=
- =?us-ascii?Q?vaFUTPfr/SasXcFBo4or3YC7hnEiuvrh8IDq70tF4VuKgsYBT7Ipn3iS877P?=
- =?us-ascii?Q?UNqGJmhkTjOe5TTfHOMjsZmcr5Pu0C2x53QuBNrQvMfeONxfzdJuF/emEig5?=
- =?us-ascii?Q?u7j5gBtuQCMmG5eErkdfDgIoOZhptkyJx+BK6ngFxHu5WK+z19oeAChBiiZL?=
- =?us-ascii?Q?uJ3sG+SKoIEgGpbLOlGEdiB35ovMY9kp2BvV9lhoF+FTb/2ClErOe+/n0WX4?=
- =?us-ascii?Q?Mg=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	WQ8AQjinYFs00cqgM78/xAN1Nzs7RtfguQrxRq/r1e1fwnyR1Dm70m+2zKJGGK4xtcnDpqKC5v4cqTOUjOWuxEFBP+iXn9YULtqsJeYwx8Mz3RD7iCPkXBe/JeO8TbQNzqCD+jJkz0Sfa4JG49Sw+k9u7pSiS85KwK36HdIK7TYS02De8g22mSsdhSj9q7K1pGM8CDZPGy9D2hERUe50skXXKSkM1VeesL/GYyElgtvShg1nfZZTHHYQCmu1RW8Jaj8UxcDfpzdCE2MWhJNYJfrztPVrGy8bmX+Q8dQ+munH5oSI+dFrd6OvhVFTg6jGcDe84zW3XS6cP9OkKaq15YU8EJYE4CbmB+tz4lUuqy5siRngRPN0wuYEsJySeFiS58NT6PLvo2Sy7fC+EYzjG8PL/W9A0jTzaQtLYRGxU/i+KkRf83v8kEUl5Vvvuathzd987ufyFWDHhm4Pi0NlZOZzQM+0PjBRz5hRKjT1DIfqHexzJOkG6q+CzMCcoSPhzNGFHMCapdNq7ByjHlAbhGiB0CcgCSjWaqsVF6VTiaziJ55qJVx685Z1dRJtYC8WM1yrr0Zb4R+sjxrHRyB6RS1O8Y825XnAsiCKtt3zJB4=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: af1af1fa-6b47-4d44-69ec-08dced60ceaa
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR10MB5409.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2024 21:32:03.6551
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7Z09ZRq9cLxvHF3YNT/AdcKLkNp/bEvUwZtmGuvIWwvymDSF/id/DiVR8YLgYDPnA+bKzTy9TLv8PNldOktBZ8XOKxE1CO2N3p1UJ707dtI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4146
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_16,2024-10-15_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 phishscore=0
- adultscore=0 bulkscore=0 suspectscore=0 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
- definitions=main-2410150142
-X-Proofpoint-GUID: VlWPORKwmN_wGXfIcHoskGlho3oeM54O
-X-Proofpoint-ORIG-GUID: VlWPORKwmN_wGXfIcHoskGlho3oeM54O
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <diqz8quunrlw.fsf@ackerleytng-ctop.c.googlers.com>
 
+On Fri, Oct 11, 2024 at 11:32:11PM +0000, Ackerley Tng wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+> > On Tue, Sep 10, 2024 at 11:43:57PM +0000, Ackerley Tng wrote:
+> >> The faultability xarray is stored on the inode since faultability is a
+> >> property of the guest_memfd's memory contents.
+> >> 
+> >> In this RFC, presence of an entry in the xarray indicates faultable,
+> >> but this could be flipped so that presence indicates unfaultable. For
+> >> flexibility, a special value "FAULT" is used instead of a simple
+> >> boolean.
+> >> 
+> >> However, at some stages of a VM's lifecycle there could be more
+> >> private pages, and at other stages there could be more shared pages.
+> >> 
+> >> This is likely to be replaced by a better data structure in a future
+> >> revision to better support ranges.
+> >> 
+> >> Also store struct kvm_gmem_hugetlb in struct kvm_gmem_hugetlb as a
+> >> pointer. inode->i_mapping->i_private_data.
+> >
+> > Could you help explain the difference between faultability v.s. the
+> > existing KVM_MEMORY_ATTRIBUTE_PRIVATE?  Not sure if I'm the only one who's
+> > confused, otherwise might be good to enrich the commit message.
+> 
+> Thank you for this question, I'll add this to the commit message to the
+> next revision if Fuad's patch set [1] doesn't make it first.
+> 
+> Reason (a): To elaborate on the explanation in [1],
+> KVM_MEMORY_ATTRIBUTE_PRIVATE is whether userspace wants this page to be
+> private or shared, and faultability is whether the page is allowed to be
+> faulted in by userspace.
+> 
+> These two are similar but may not be the same thing. In pKVM, pKVM
+> cannot trust userspace's configuration of private/shared, and other
+> information will go into determining the private/shared setting in
+> faultability.
 
-Catalin Marinas <catalin.marinas@arm.com> writes:
+It makes sense to me that the kernel has the right to decide which page is
+shared / private.  No matter if it's for pKVM or CoCo, I believe the normal
+case is most / all pages are private, until some requests to share them for
+special purposes (like DMA).  But that'll need to be initiated as a request
+from the guest not the userspace hypervisor.
 
-> On Wed, Sep 25, 2024 at 04:24:15PM -0700, Ankur Arora wrote:
->> diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
->> index 9b6d90a72601..fc1204426158 100644
->> --- a/drivers/cpuidle/poll_state.c
->> +++ b/drivers/cpuidle/poll_state.c
->> @@ -21,21 +21,20 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
->>
->>  	raw_local_irq_enable();
->>  	if (!current_set_polling_and_test()) {
->> -		unsigned int loop_count = 0;
->>  		u64 limit;
->>
->>  		limit = cpuidle_poll_time(drv, dev);
->>
->>  		while (!need_resched()) {
->> -			cpu_relax();
->> -			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
->> -				continue;
->> -
->> -			loop_count = 0;
->> +			unsigned int loop_count = 0;
->>  			if (local_clock_noinstr() - time_start > limit) {
->>  				dev->poll_time_limit = true;
->>  				break;
->>  			}
->> +
->> +			smp_cond_load_relaxed(&current_thread_info()->flags,
->> +					      VAL & _TIF_NEED_RESCHED ||
->> +					      loop_count++ >= POLL_IDLE_RELAX_COUNT);
->
-> The above is not guaranteed to make progress if _TIF_NEED_RESCHED is
-> never set. With the event stream enabled on arm64, the WFE will
-> eventually be woken up, loop_count incremented and the condition would
-> become true.
+I must confess I totally have no idea how KVM_MEMORY_ATTRIBUTE_PRIVATE is
+planned to be used in the future. Currently it's always set at least in
+QEMU if gmemfd is enabled, so it doesn't yet tell me anything..
 
-That makes sense.
+If it's driven by the userspace side of the hypervisor, I wonder when
+should the user app request some different value it already was, if the
+kernel already has an answer in this case.  It made me even more confused,
+as we have this in the API doc:
 
-> However, the smp_cond_load_relaxed() semantics require that
-> a different agent updates the variable being waited on, not the waiting
-> CPU updating it itself.
+        Note, there is no "get" API.  Userspace is responsible for
+        explicitly tracking the state of a gfn/page as needed.
 
-Right. And, that seems to work well with the semantics of WFE. And,
-the event stream (if enabled) has a side effect that allows the exit
-from the loop.
+And I do wonder whether we will still need some API just to query whether
+the kernel allows the page to be mapped or not (aka, the "real" shared /
+private status of a guest page).  I guess that's not directly relevant to
+the faultability to be introduced here, but if you or anyone know please
+kindly share, I'd love to learn about it.
 
-> Also note that the event stream can be disabled
-> on arm64 on the kernel command line.
+> 
+> Perhaps Fuad can elaborate more here.
+> 
+> Reason (b): In this patch series (mostly focus on x86 first), we're
+> using faultability to prevent any future faults before checking that
+> there are no mappings.
+> 
+> Having a different xarray from mem_attr_array allows us to disable
+> faulting before committing to changing mem_attr_array. Please see
+> `kvm_gmem_should_set_attributes_private()` in this patch [2].
+> 
+> We're not completely sure about the effectiveness of using faultability
+> to block off future faults here, in future revisions we may be using a
+> different approach. The folio_lock() is probably important if we need to
+> check mapcount. Please let me know if you have any ideas!
+> 
+> The starting point of having a different xarray was pKVM's requirement
+> of having separate xarrays, and we later realized that the xarray could
+> be used for reason (b). For x86 we could perhaps eventually remove the
+> second xarray? Not sure as of now.
 
-Yes, that's a good point. In patch-11 I tried to address that aspect
-by only allowing haltpoll to be force loaded.
+Just had a quick look at patch 27:
 
-But, I guess your point is that its not just haltpoll that has a problem,
-but also regular polling -- and maybe the right thing to do would be to
-disable polling if the event stream is disabled.
+https://lore.kernel.org/all/5a05eb947cf7aa21f00b94171ca818cc3d5bdfee.1726009989.git.ackerleytng@google.com/
 
-> Does the code above break any other architecture?
+I'm not yet sure what's protecting from faultability being modified against
+a concurrent fault().
 
-Me (and others) have so far tested x86, ARM64 (with/without the
-event stream), and I believe riscv. I haven't seen any obvious
-breakage. But, that's probably because most of the time somebody would
-be set TIF_NEED_RESCHED.
+I wonder whether one can use the folio lock to serialize that, so that one
+needs to take the folio lock to modify/lookup the folio's faultability,
+then it may naturally match with the fault() handler design, where
+kvm_gmem_get_folio() needs to lock the page first.
 
-> I'd say if you want
-> something like this, better introduce a new smp_cond_load_timeout()
-> API. The above looks like a hack that may only work on arm64 when the
-> event stream is enabled.
+But then kvm_gmem_is_faultable() will need to also be called only after the
+folio is locked to avoid races.
 
-I had a preliminary version of smp_cond_load_relaxed_timeout() here:
- https://lore.kernel.org/lkml/87edae3a1x.fsf@oracle.com/
+> 
+> >
+> > The latter is per-slot, so one level higher, however I don't think it's a
+> > common use case for mapping the same gmemfd in multiple slots anyway for
+> > KVM (besides corner cases like live upgrade).  So perhaps this is not about
+> > layering but something else?  For example, any use case where PRIVATE and
+> > FAULTABLE can be reported with different values.
+> >
+> > Another higher level question is, is there any plan to support non-CoCo
+> > context for 1G?
+> 
+> I believe guest_memfd users are generally in favor of eventually using
+> guest_memfd for non-CoCo use cases, which means we do want 1G (shared,
+> in the case of CoCo) page support.
+> 
+> However, core-mm's fault path does not support mapping at anything
+> higher than the PMD level (other than hugetlb_fault(), which the
+> community wants to move away from), so core-mm wouldn't be able to map
+> 1G pages taken from HugeTLB.
 
-Even with an smp_cond_load_timeout(), we would need to fallback to
-something like the above for uarchs without WFxT.
+Have you looked at vm_operations_struct.huge_fault()?  Or maybe you're
+referring to some other challenges?
 
-> A generic option is udelay() (on arm64 it would use WFE/WFET by
-> default). Not sure how important it is for poll_idle() but the downside
-> of udelay() that it won't be able to also poll need_resched() while
-> waiting for the timeout. If this matters, you could instead make smaller
-> udelay() calls. Yet another problem, I don't know how energy efficient
-> udelay() is on x86 vs cpu_relax().
->
-> So maybe an smp_cond_load_timeout() would be better, implemented with
-> cpu_relax() generically and the arm64 would use LDXR, WFE and rely on
-> the event stream (or fall back to cpu_relax() if the event stream is
-> disabled).
+> 
+> In this patch series, we always split pages before mapping them to
+> userspace and that's how this series still works with core-mm.
+> 
+> Having 1G page support for shared memory or for non-CoCo use cases would
+> probably depend on better HugeTLB integration with core-mm, which you'd
+> be most familiar with.
 
-Yeah, something like that might work.
+My understanding is the mm community wants to avoid adding major new things
+on top of current hugetlbfs alone, I'm not sure whether this will also be
+accounted as part of that.  IMHO it could depend on how much this series
+will reuse hugetlbfs.  If it's only about allocations it might be ok,
+however I still feel risky having the name "hugetlbfs" here, the allocator
+(if refactored out of hugetlb, but to contain more functions than CMA)
+could be named in a more generic way.  No rush on changing anything, you
+may always want to talk with more mm people on this I guess.
 
---
-ankur
+I also don't know how you treat things like folio_test_hugetlb() on
+possible assumptions that the VMA must be a hugetlb vma.  I'd confess I
+didn't yet check the rest of the patchset yet - reading a large series
+without a git tree is sometimes challenging to me.
+
+> 
+> Thank you for looking through our patches, we need your experience and
+> help! I've also just sent out the first 3 patches separately, which I
+> think is useful in improving understandability of the
+> resv_map/subpool/hstate reservation system in HugeTLB and can be
+> considered separately. Hope you can also review/comment on [4].
+
+I'll read and think about it.  Before that, I'll probably need to read more
+backgrounds you need from hugetlb allocators (e.g. I remember you mentioned
+pool management somewhere).  I tried to watch your LPC talk but the
+recording has some issue on audio so I can mostly hear nothing in most of
+the discussions..  I'll try to join the bi-weekly meeting two days later,
+though.
+
+> 
+> > I saw that you also mentioned you have working QEMU prototypes ready in
+> > another email.  It'll be great if you can push your kernel/QEMU's latest
+> > tree (including all dependency patches) somewhere so anyone can have a
+> > closer look, or play with it.
+> 
+> Vishal's reply [3] might have been a bit confusing. To clarify, my team
+> doesn't work with Qemu at all (we use a custom userspace VMM internally)
+> so the patches in this series are tested purely with selftests.
+> 
+> The selftests have fewer dependencies than full Qemu and I'd be happy to
+> help with running them or explain anything that I might have missed out.
+> 
+> We don't have any Qemu prototypes and are not likely to be building any
+> prototypes in the foreseeable future.
+
+I see, that's totally not a problem.  If there can be, especially !CoCo
+support at some point, we're happy to test it on QEMU side.  I'll see what
+I can do to help !CoCo kernel side getting there.
+
+Besides, it'll still be great if you can push a latest kernel tree
+somewhere (or provide the base commit ID, but that needs to be on a public
+tree I can fetch).
+
+Thanks,
+
+> 
+> >
+> > Thanks,
+> >
+> > -- 
+> > Peter Xu
+> 
+> [1] https://lore.kernel.org/all/20241010085930.1546800-3-tabba@google.com/
+> [2] https://lore.kernel.org/all/f4ca1711a477a3b56406c05d125dce3d7403b936.1726009989.git.ackerleytng@google.com/
+> [3] https://lore.kernel.org/all/CAGtprH-GczOb64XrLpdW4ObRG7Gsv8tHWNhiW7=2dE=OAF7-Rw@mail.gmail.com/
+> [4] https://lore.kernel.org/all/cover.1728684491.git.ackerleytng@google.com/T/
+> 
+
+-- 
+Peter Xu
+
 
