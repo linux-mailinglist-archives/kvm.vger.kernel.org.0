@@ -1,135 +1,152 @@
-Return-Path: <kvm+bounces-28854-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A16ED99E14E
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:38:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4672399E153
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 10:38:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D39A91C21C35
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 08:38:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C68991F236BB
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2024 08:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3031D9A48;
-	Tue, 15 Oct 2024 08:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577931D9A70;
+	Tue, 15 Oct 2024 08:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PD9td/OJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JEjWhIpj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC081CF296;
-	Tue, 15 Oct 2024 08:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377601CF296;
+	Tue, 15 Oct 2024 08:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728981481; cv=none; b=GuxEj/hHOIqbLlnJKtHrlM90zC/xps3TtzobOBuKf6/LysF/1cb9inuYzclJo6qXHLbmgAhrJGxYQfDbAt+Bu7eOAXt6PbMLphDlThU7GZMfbzKohUDzrggUnSPmDEfgup8caOsIeAA/7c+eHQkV3OTmWEfs8zVXre3yQjfb5pw=
+	t=1728981485; cv=none; b=S1swl6tVtLpemCvTm0a1qFB7I4HesvcfkFS9Xk0E1iaR3A/x7P6TxCZmgOvyx7lMKEvqXGu9b9cpT8BkC0bmtnUOzd1G+fKaEFBLakvncNYIrOFnKG3cJe6kfwSgtkXeWh4uevF9mYPFQR0Zppx/zXep5MUGJWBfvAz4AdYHWnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728981481; c=relaxed/simple;
-	bh=lxyiRdAloX3OMwJi5pTglGoCGM/S9e+/s2470fayYg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eX61ldTKdpDeyVl9IkMyXYylEB0HzdGQy4e6cbNCnDznKfqN6AAQH4X5A3gaKkMg/sxQuFbvHOoi+jE33ntuGfsDNwMzyYDut45DDxefSzm5DQa8uoTMbzBpiZpngh8yCtuBCKF4+4UneYvzZ+upM8HEqxvztsISC6eEaVD6dg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PD9td/OJ; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1728981485; c=relaxed/simple;
+	bh=jKaAsxcZ4lli6nFjz4Ti9IlwPa+9AB62Liyvq0UwBkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jf3xAwNbHPMlF7inaW8DBFsIKxn/Esw4SHZINs6C3evbZ5C1d4c3wIy8fdhY2GkPCAJQxJVEiuYucAsPm5JPcEpucUgJEWjamayzmQbTTNEfPCH/MqKNRXdfH50u+1DPzcX9Nna5FIpjMcUYCu0KCoT4LO8tIVr5U1TDAvnvR/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JEjWhIpj; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49F7ssZ7022825;
-	Tue, 15 Oct 2024 08:37:56 GMT
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49F6Ppvn026537;
+	Tue, 15 Oct 2024 08:37:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=Nr8izOCpgTUdj+cim
-	Z1bZNzQeDkN9UIFAqAPWglx36Y=; b=PD9td/OJLZ47mfzNXsqdAS2LPekxuaxVt
-	M7C3HNVoylMIhZ6S1H+Z3t8uLLqU9KDE1IzpoXMYuY0HVRi4WmYmuDUgtzOLGkqN
-	LpEQ/Sdo98xG5qYsARhWrphS5IGxjxKxbHCxc0n8Zr8eba+65ZhmBSZwZq1BhNmT
-	ghj81p7gOuP6AUCdHgUuuqzDlIzDwH4JfX0AcdHek80xvhPdh+TVhbZs+LB63Zf+
-	X8yRPEGeHQgHYjliIfII8Wg53TH+1uEINP8H+qHu387/B9kXRhX+LoJ7TBMGbWWr
-	V9pswrCSMYVG2KIv4ut16bmOrDJ1T6NoPVRoLDR3xhYlqEDliT+KA==
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=QUa+46E8NUZzcXxa505gxyZiwH0Jg/
+	Ul9dVsztozd6I=; b=JEjWhIpjVfTfi7z8OrTAhPneHnsuC4U6IitiIygejiksTc
+	pDxJxkYqF0VMxrNOytzrqHQOOxZECextTJTQa1KSTnVHAPoqf0MU0tEsd+ote66H
+	c3uLwvz8zqvnyw8/RxC7TnQ0qamZ+I1Tpsrcdzdq1nbr/yUYDZeRqjxct6Kf1TyM
+	R1d1Rael0AvJFsk7ypTEsx/ODbSBI1aIN8nvmEk5nbxYY1K6UlZEF8cJdrmdCPXY
+	5p1mHWG1mJ2cwB1nFjfPH+ruXHrajo0Hapgk+YPnyswWnSxnT8ra9ryZ/NP1QmDD
+	jWV33tJc3zrLsmg3h+3iFvZaYiIsXF7NQ8WPs/Kg==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429me106jy-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429k3xrkwv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 08:37:57 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49F8burM018568;
+	Tue, 15 Oct 2024 08:37:56 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429k3xrkwq-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 15 Oct 2024 08:37:56 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49F8btX8026762;
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49F5aS24005951;
 	Tue, 15 Oct 2024 08:37:55 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429me106jv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 08:37:55 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49F8GaPs006415;
-	Tue, 15 Oct 2024 08:37:55 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4284xk2nqj-1
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 428650tdx2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Tue, 15 Oct 2024 08:37:55 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49F8bpng36307216
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49F8bphN56623400
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 08:37:51 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 29AA420040;
+	Tue, 15 Oct 2024 08:37:52 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DE97C20043;
 	Tue, 15 Oct 2024 08:37:51 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 93EC420043;
-	Tue, 15 Oct 2024 08:37:50 +0000 (GMT)
-Received: from darkmoore.ibmuc.com (unknown [9.171.49.63])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 15 Oct 2024 08:37:50 +0000 (GMT)
-From: Christoph Schlameuss <schlameuss@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F3AD20040;
+	Tue, 15 Oct 2024 08:37:51 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.60])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 15 Oct 2024 08:37:51 +0000 (GMT)
+Date: Tue, 15 Oct 2024 10:37:50 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, schlameuss@linux.ibm.com
-Subject: [PATCH v6 5/5] selftests: kvm: s390: correct IP.b length in uc_handle_sieic debug output
-Date: Tue, 15 Oct 2024 10:37:44 +0200
-Message-ID: <20241015083744.761838-6-schlameuss@linux.ibm.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241015083744.761838-1-schlameuss@linux.ibm.com>
-References: <20241015083744.761838-1-schlameuss@linux.ibm.com>
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>, Mario Casquero <mcasquer@redhat.com>
+Subject: Re: [PATCH v2 5/7] virtio-mem: s390 support
+Message-ID: <20241015083750.7641-D-hca@linux.ibm.com>
+References: <20241014144622.876731-1-david@redhat.com>
+ <20241014144622.876731-6-david@redhat.com>
+ <20241014184824.10447-F-hca@linux.ibm.com>
+ <ebce486f-71a0-4196-b52a-a61d0403e384@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ebce486f-71a0-4196-b52a-a61d0403e384@redhat.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7vuRUO0c8Red2-_bTbFu0SKfknQtwUJX
-X-Proofpoint-ORIG-GUID: VFSZaH-J4TsYtrZEZBy6uif2vDCFZQvA
+X-Proofpoint-GUID: EXXMZwwgVWyiaGSiPXsoCFFtmuGvYVXs
+X-Proofpoint-ORIG-GUID: Nmz2DOBP5V42-CA2w3FaC3Dux5ZSF5pS
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- priorityscore=1501 mlxlogscore=684 malwarescore=0 spamscore=0 mlxscore=0
- adultscore=0 impostorscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
+ adultscore=0 clxscore=1015 priorityscore=1501 phishscore=0 mlxlogscore=418
+ impostorscore=0 lowpriorityscore=0 bulkscore=0 mlxscore=0 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
  definitions=main-2410150056
 
-The length of the interrupt parameters (IP) are:
-a: 2 bytes
-b: 4 bytes
+On Mon, Oct 14, 2024 at 09:16:45PM +0200, David Hildenbrand wrote:
+> On 14.10.24 20:48, Heiko Carstens wrote:
+> > On Mon, Oct 14, 2024 at 04:46:17PM +0200, David Hildenbrand wrote:
+> > > to dump. Based on this, support for dumping virtio-mem memory can be
+> > Hm.. who will add this support? This looks like a showstopper to me.
+> 
+> The cover letter is clearer on that: "One remaining work item is kdump
+> support for virtio-mem memory. This will be sent out separately once initial
+> support landed."
+> 
+> I had a prototype, but need to spend some time to clean it up -- or find
+> someone to hand it over to clean it up.
+> 
+> I have to chose wisely what I work on nowadays, and cannot spend that time
+> if the basic support won't get ACKed.
+> 
+> > Who is supposed to debug crash dumps where memory parts are missing?
+> 
+> For many production use cases it certainly needs to exist.
+> 
+> But note that virtio-mem can be used with ZONE_MOVABLE, in which case mostly
+> only user data (e.g., pagecache,anon) ends up on hotplugged memory, that
+> would get excluded from makedumpfile in the default configs either way.
+> 
+> It's not uncommon to let kdump support be added later (e.g., AMD SNP
+> variants).
 
-Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/ucontrol_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-index db8776269373..e69e22504428 100644
---- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-+++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-@@ -375,7 +375,7 @@ static bool uc_handle_sieic(FIXTURE_DATA(uc_kvm) *self)
- 	struct kvm_run *run = self->run;
- 
- 	/* check SIE interception code */
--	pr_info("sieic: 0x%.2x 0x%.4x 0x%.4x\n",
-+	pr_info("sieic: 0x%.2x 0x%.4x 0x%.8x\n",
- 		run->s390_sieic.icptcode,
- 		run->s390_sieic.ipa,
- 		run->s390_sieic.ipb);
--- 
-2.47.0
-
+I'll leave it up to kvm folks to decide if we need kdump support from
+the beginning or if we are good with the current implementation.
 
