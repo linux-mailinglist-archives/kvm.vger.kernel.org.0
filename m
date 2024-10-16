@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-28999-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29000-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 372999A0BC8
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 15:41:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7F999A0C05
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 15:57:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD138B23A94
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 13:41:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0E02286593
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 13:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36747209F3C;
-	Wed, 16 Oct 2024 13:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE11A20C006;
+	Wed, 16 Oct 2024 13:57:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OVFfD8PT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Omqo1uja"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5F0125B9;
-	Wed, 16 Oct 2024 13:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21963207206;
+	Wed, 16 Oct 2024 13:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729086096; cv=none; b=d78aVLPkt4NJBYX2DxQRfBriNMJ8fdr92ByFAMSSBVScpQr5Tm3Tdsn7fttqblgEGY7cbSWXMloUuVuzWM275tkSqNPMuGqCugXaMAt9l2+KtyVefcGFcZtiLM83qorESOszQpOLBZWQyX4/G9JyErWwujOtWFsoyoC+BMES7GE=
+	t=1729087044; cv=none; b=No7hWMHsFWE84+idrgzYhx344RhSYt2JDZ19mgh5NX2whgeCThmkR6hX2vYRDUk7I+6HLV1HDLJgOziPzwgJpgPIheeTPWtNlMh2N5e+IQ5PSqklNHRF1oBaN5rCpCb6g1Et0oeFcEr/Lo3nXG27+Tc13UHbD5JiPiNeys+2Q/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729086096; c=relaxed/simple;
-	bh=tmglpRF6ockTWwBT1N80CsCLOq6CQEoYvcNiTLS5Vrc=;
+	s=arc-20240116; t=1729087044; c=relaxed/simple;
+	bh=MUBcKDVt3aHS2SRtCQBy5K4t6BpEf4pxDonW1rOFcDU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pvy/4Yh0Hw+lVI17PwbFdEExYUuv1Mlv2cCyckFNT2+kY22qk7lYZ6vn01/4PbLE5VVSmWnqP2WjGKAG1rtgK+qFiJ3ouM8R6scc+EDy0IfFzb99J10QyJGP5a15XwtIDjTwek/ojbQ0RcU68xqhymQda1TsMVpLKsIbdj2iz7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OVFfD8PT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFE09C4CEC5;
-	Wed, 16 Oct 2024 13:41:35 +0000 (UTC)
+	 MIME-Version:Content-Type; b=c9WIvJf4JP6PCDFhjZY64jkF+hCTJUzdDYCI19rQAmRWd6XDWbFInperHAVybsmGWAsvPdJZnwLtLziFUgfAeWF+w+bq3FhPB4McZKRN1NlHboHeMqIBiWJMMOpzx0Qlw9YP08zdkKmB3cEG8nMH8DhaEDF6LevJkeaMctZZpLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Omqo1uja; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EC71C4CEC5;
+	Wed, 16 Oct 2024 13:57:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729086095;
-	bh=tmglpRF6ockTWwBT1N80CsCLOq6CQEoYvcNiTLS5Vrc=;
+	s=k20201202; t=1729087043;
+	bh=MUBcKDVt3aHS2SRtCQBy5K4t6BpEf4pxDonW1rOFcDU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OVFfD8PTrs+KPUz1TPjkkG41G8USdYp01IruRF/M/oBB0xCdeP6HX1gK5helfob1T
-	 ft4DHyJfkR1rmP3cVc5ENjt1YuwKSwqAlJgpfyPxLcFWC3LvsGCieZuYBxtr0TZitJ
-	 l3dgNZWSQxPonXrQ+qJJopq+yOeioBNS/01RhhUXDbuC00mBfiRFN3L/hT0kXHIKiY
-	 ngNOoIe9v7VOyOl+gueGpVzyowxH+PRrn8tJdq1QZdyAZuBaK9zZiGAQICPSZUB3l2
-	 FJwSABVE6o8G/uyd6LQ2qp0pYFsfxTUagtTDZRQw5P4qzCT3+jnottDW/BlnGlY4uX
-	 ApLh4AlY83A7w==
+	b=Omqo1ujaHy/2qjgDGnZDc+DxU04r1CETNcFK739Rb4vc7E0r7pq2bAxelzoH5BbVD
+	 kxSmoVyx3n8HQZopglcR++ElI4x/AibhXh3154ydktYzaBJElStg3EsRgIYrxjTKWX
+	 yfyxClgJbISs9X16MEQ0hg1X2ftRqsoebpMxM9oSP7TewHdG5bikcB38BbxfOHXLnh
+	 p/eWwqwTJ4OmMUy/h7CMVvbkJ6jbRMo3U8RUT8uMYcEqm1vcoxOzZ9xAlQmgbZ/jQt
+	 IJPxNz8SRnZuK4fmZge3Cek8z5OlYte+SDLPwtMBThbLy28YmDvceO73UsYZEUmeQ+
+	 WDIite5EO4aAw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1t14HN-0046Ou-IS;
-	Wed, 16 Oct 2024 14:41:33 +0100
-Date: Wed, 16 Oct 2024 14:41:33 +0100
-Message-ID: <86zfn4412q.wl-maz@kernel.org>
+	id 1t14Wf-0046X6-8M;
+	Wed, 16 Oct 2024 14:57:21 +0100
+Date: Wed, 16 Oct 2024 14:57:20 +0100
+Message-ID: <86y12o40cf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -59,13 +59,11 @@ Cc: kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 06/36] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
-In-Reply-To: <Zw-9UvkO6eJkAaYQ@raptor>
+Subject: Re: [PATCH v4 07/36] KVM: arm64: nv: Save/Restore vEL2 sysregs
+In-Reply-To: <Zw-70Uocs5JvXz7e@raptor>
 References: <20241009190019.3222687-1-maz@kernel.org>
-	<20241009190019.3222687-7-maz@kernel.org>
-	<Zw-JTojEW5ZXa8R-@raptor>
-	<861q0g5ls1.wl-maz@kernel.org>
-	<Zw-9UvkO6eJkAaYQ@raptor>
+	<20241009190019.3222687-8-maz@kernel.org>
+	<Zw-70Uocs5JvXz7e@raptor>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -81,68 +79,182 @@ X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-k
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 16 Oct 2024 14:19:14 +0100,
+On Wed, 16 Oct 2024 14:12:49 +0100,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> > > > @@ -207,6 +222,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
-> > > >  		 */
-> > > >  		__vcpu_sys_reg(vcpu, reg) = val;
-> > > >  
-> > > > +		switch (reg) {
-> > > > +		case CNTHCTL_EL2:
-> > > > +			/*
-> > > > +			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
-> > > > +			 * Otherwise, some of the bits are backed by
-> > > > +			 * CNTKCTL_EL1, while the rest is kept in memory.
-> > > > +			 * Yes, this is fun stuff.
-> > > > +			 */
-> > > > +			if (vcpu_el2_e2h_is_set(vcpu))
-> > > > +				write_sysreg_el1(val, SYS_CNTKCTL);
-> > > 
-> > > Sorry, but I just can't seem to get my head around why the RES0 bits aren't
-> > > cleared. Is KVM relying on the guest to implement Should-Be-Zero-or-Preserved,
-> > > as per the RES0 definition?
+> Hi Marc,
+> 
+> On Wed, Oct 09, 2024 at 07:59:50PM +0100, Marc Zyngier wrote:
+> > Whenever we need to restore the guest's system registers to the CPU, we
+> > now need to take care of the EL2 system registers as well. Most of them
+> > are accessed via traps only, but some have an immediate effect and also
+> > a guest running in VHE mode would expect them to be accessible via their
+> > EL1 encoding, which we do not trap.
 > > 
-> > KVM isn't relying on anything. And it isn't about the RES0 bits not
-> > being cleared. It is about the HW not providing storage for some of
-> > the CNTHCTL_EL2 bits when the guest is using CNTKCTL_EL1 as a proxy
-> > for its own view of CNTHCTL_EL2.
+> > For vEL2 we write the virtual EL2 registers with an identical format directly
+> > into their EL1 counterpart, and translate the few registers that have a
+> > different format for the same effect on the execution when running a
+> > non-VHE guest guest hypervisor.
 > > 
-> > Namely, bits outside of CNTKCTL_VALID_BITS are not guaranteed to be
-> > stored until (IIRC) FEAT_NV2p1, which retrospectively fixes the
-> > architecture by mandating that the relevant bits have dedicated
-> > storage.
+> > Based on an initial patch from Andre Przywara, rewritten many times
+> > since.
+> > 
+> > Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
+> >  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
+> >  arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 137 ++++++++++++++++++++-
+> >  3 files changed, 139 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > index 1579a3c08a36b..d67628d01bf5e 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > @@ -152,9 +152,10 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+> >  	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
+> >  }
+> >  
+> > -static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+> > +static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+> > +					      u64 mpidr)
+> >  {
+> > -	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
+> > +	write_sysreg(mpidr,				vmpidr_el2);
+> >  
+> >  	if (has_vhe() ||
+> >  	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> > index 29305022bc048..dba101565de36 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> > @@ -28,7 +28,7 @@ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
+> >  
+> >  void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
+> >  {
+> > -	__sysreg_restore_el1_state(ctxt);
+> > +	__sysreg_restore_el1_state(ctxt, ctxt_sys_reg(ctxt, MPIDR_EL1));
+> >  	__sysreg_restore_common_state(ctxt);
+> >  	__sysreg_restore_user_state(ctxt);
+> >  	__sysreg_restore_el2_return_state(ctxt);
+> > diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> > index e12bd7d6d2dce..e0df14ead2657 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> > @@ -15,6 +15,108 @@
+> >  #include <asm/kvm_hyp.h>
+> >  #include <asm/kvm_nested.h>
+> >  
+> > +static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
+> > +{
+> > +	/* These registers are common with EL1 */
+> > +	__vcpu_sys_reg(vcpu, PAR_EL1)	= read_sysreg(par_el1);
+> > +	__vcpu_sys_reg(vcpu, TPIDR_EL1)	= read_sysreg(tpidr_el1);
+> > +
+> > +	__vcpu_sys_reg(vcpu, ESR_EL2)	= read_sysreg_el1(SYS_ESR);
+> > +	__vcpu_sys_reg(vcpu, AFSR0_EL2)	= read_sysreg_el1(SYS_AFSR0);
+> > +	__vcpu_sys_reg(vcpu, AFSR1_EL2)	= read_sysreg_el1(SYS_AFSR1);
+> > +	__vcpu_sys_reg(vcpu, FAR_EL2)	= read_sysreg_el1(SYS_FAR);
+> > +	__vcpu_sys_reg(vcpu, MAIR_EL2)	= read_sysreg_el1(SYS_MAIR);
+> > +	__vcpu_sys_reg(vcpu, VBAR_EL2)	= read_sysreg_el1(SYS_VBAR);
+> > +	__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2) = read_sysreg_el1(SYS_CONTEXTIDR);
+> > +	__vcpu_sys_reg(vcpu, AMAIR_EL2)	= read_sysreg_el1(SYS_AMAIR);
+> > +
+> > +	/*
+> > +	 * In VHE mode those registers are compatible between EL1 and EL2,
+> > +	 * and the guest uses the _EL1 versions on the CPU naturally.
+> > +	 * So we save them into their _EL2 versions here.
+> > +	 * For nVHE mode we trap accesses to those registers, so our
+> > +	 * _EL2 copy in sys_regs[] is always up-to-date and we don't need
+> > +	 * to save anything here.
+> > +	 */
+> > +	if (vcpu_el2_e2h_is_set(vcpu)) {
+> > +		u64 val;
+> > +
+> > +		/*
+> > +		 * We don't save CPTR_EL2, as accesses to CPACR_EL1
+> > +		 * are always trapped, ensuring that the in-memory
+> > +		 * copy is always up-to-date. A small blessing...
+> > +		 */
+> > +		__vcpu_sys_reg(vcpu, SCTLR_EL2)	= read_sysreg_el1(SYS_SCTLR);
+> > +		__vcpu_sys_reg(vcpu, TTBR0_EL2)	= read_sysreg_el1(SYS_TTBR0);
+> > +		__vcpu_sys_reg(vcpu, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
+> > +		__vcpu_sys_reg(vcpu, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
+> > +
+> > +		/*
+> > +		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
+> > +		 * the interesting CNTHCTL_EL2 bits live. So preserve these
+> > +		 * bits when reading back the guest-visible value.
+> > +		 */
+> > +		val = read_sysreg_el1(SYS_CNTKCTL);
+> > +		val &= CNTKCTL_VALID_BITS;
+> > +		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) &= ~CNTKCTL_VALID_BITS;
+> > +		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) |= val;
+> > +	}
+> > +
+> > +	__vcpu_sys_reg(vcpu, SP_EL2)	= read_sysreg(sp_el1);
+> > +	__vcpu_sys_reg(vcpu, ELR_EL2)	= read_sysreg_el1(SYS_ELR);
+> > +	__vcpu_sys_reg(vcpu, SPSR_EL2)	= read_sysreg_el1(SYS_SPSR);
+> > +}
+> > +
+> > +static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
+> > +{
+> > +	u64 val;
+> > +
+> > +	/* These registers are common with EL1 */
+> > +	write_sysreg(__vcpu_sys_reg(vcpu, PAR_EL1),	par_el1);
+> > +	write_sysreg(__vcpu_sys_reg(vcpu, TPIDR_EL1),	tpidr_el1);
+> > +
+> > +	write_sysreg(read_cpuid_id(),				vpidr_el2);
+> > +	write_sysreg(__vcpu_sys_reg(vcpu, MPIDR_EL1),		vmpidr_el2);
+> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, MAIR_EL2),	SYS_MAIR);
+> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, VBAR_EL2),	SYS_VBAR);
+> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2),	SYS_CONTEXTIDR);
+> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, AMAIR_EL2),	SYS_AMAIR);
+> > +
+> > +	if (vcpu_el2_e2h_is_set(vcpu)) {
+> > +		/*
+> > +		 * In VHE mode those registers are compatible between
+> > +		 * EL1 and EL2.
+> > +		 */
+> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, SCTLR_EL2),   SYS_SCTLR);
+> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, CPTR_EL2),    SYS_CPACR);
+> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR0_EL2),   SYS_TTBR0);
+> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR1_EL2),   SYS_TTBR1);
+> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TCR_EL2),	    SYS_TCR);
+> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, CNTHCTL_EL2), SYS_CNTKCTL);
+> > +	} else {
+> > +		/*
+> > +		 * CNTHCTL_EL2 only affects EL1 when running nVHE, so
+> > +		 * no need to restore it.
+> > +		 */
 > 
-> The definition for RES0 says:
+> I'm having such a hard time parsing the comment - might be just me coming back to
+> this code after such a long time.
 > 
-> 'A bit that is RES0 in a context is reserved for possible future use in that
-> context. To preserve forward compatibility, software:
->  * Must not rely on the bit reading as 0.
->  * Must use an SBZP policy to write to the bit.'
+> If CNTHCTL_EL2 only affects EL1 when running nVHE, and the else branch deals
+> with the nVHE case, why isn't CNTHCTL_EL2 restored?
+
+Because it has no impact at all? As in nothing? Niente? Rien? Zilch?
+We enter the guest's EL2, so why would we bother with restoring a
+guest register that has no influence on what we run?
+
 > 
-> where Should-Be-Zero-of-Preserved (SBZP):
+> As for the 'only' part of the comment: when E2H=1, bits 10 and 11, EL1PCTEN and
+> EL1PTEN (why isn't this named EL1PCEN if it does the same thing as bit 1 when
+> E2H=0?), trap EL1 and EL0 accesses to physical counter and timer registers.
 > 
-> 'When writing this field, software must either write all 0s to this field or, if
-> the register is being restored from a previously read state, write the
-> previously read value to this field. If this is not done, then the result is
-> unpredictable.'
+> Or 'only' in this context means only EL1, and not EL2 also?
 
-And? I can quote the ARM ARM too, but that's not going to lead us
-anywhere if you don't explain why what you quote is related to the
-problem at hand (hint, I don't think it is).
+None of this makes any sense to me. I don't understand your E2H
+consideration, nor your digression on the meaning of the word 'only'.
 
-> And what about the rest of the RES0 bits from CNTKCTL_EL1, those that are RES0
-> in both registers?
+Look at the architecture. Do you see *ANY* bit in CNTHCTL_EL2 having
+*ANY* influence on EL2 when HCR_EL2.E2H=0? Don't you then come to the
+conclusion that CNTHCTL_EL2 only affects EL1?
 
-What about them *what*?
-
-It would definitely help if you didn't write in riddles and actually
-spell out what you mean. If you think this code is wrong, please
-explain why you think it is wrong, and maybe we'll be able to make
-some progress.
-
-
-Thanks,
+But surely you've spotted something I can't see, and I must be
+specially thick today... Please enlighten me.
 
 	M.
 
