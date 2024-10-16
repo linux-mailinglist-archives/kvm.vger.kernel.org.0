@@ -1,362 +1,277 @@
-Return-Path: <kvm+bounces-29008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B589A0F22
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 17:55:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F049A0F2D
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 17:59:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B0CF1C22C17
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 15:55:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C2FC1C22DD2
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 15:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE5020F5D5;
-	Wed, 16 Oct 2024 15:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B6620F5CB;
+	Wed, 16 Oct 2024 15:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TeDfqus/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AtBBgWgc"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAA81384B3
-	for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 15:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4A31384B3
+	for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 15:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729094106; cv=none; b=E/RbwAjhTbmd5L+MhhgxxxzxH3SjizFyYHvpxO+zDGk9KM4B5n0PyBN0e+mRYxWuHgRUId4+AHdVqTHwBjt1gTppzP6jbWQ0EaiYmOTNc++/JfLvflSbvtOjxAy/rIlG+rvmyZ+e/d9GHzIpjJs5hzWWnGSIiEyzWiYnblA7tv4=
+	t=1729094371; cv=none; b=ReTjgDxzWLhT54itcSegbXAhzioY81svkgBXn0kJalsIF6YMtwNnyGw+wUQwi298/eApDfzxUtz0o2K565vbNFb0XWdhEkbUQGTECRKJ9hpC7oGMJ6XEpulL+/+6ImQp6GhdHSWkcP1IeREVsSoMQbQsWhi8myahHD6XxcwfgTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729094106; c=relaxed/simple;
-	bh=qYl2Sy0hY1O7mS4Yywghy4Pbib9+2/q8/iAS6YXwtjw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Ou/WaAyyRBNKn73DCrPAbgw4TMLXnpwuOVhGObrQb8pk1i001jm+jXCKo50IG+VzfPogx/lNzdxT/3YEj2BGXo3G5y+WGThcLTR9orlePX/DgM4i5H578CNGsEqsJcMGrWzMvdGxh+LCemavU5qkWj2jcSQ644/MHDNuUUvG4ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TeDfqus/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729094104;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=48P55mGkCCxQ03xjhgzSLSsbrSXDZPkk4TcShvxlXM8=;
-	b=TeDfqus/7IZXM2jHgTvVODWopD+Nb5G9a3FnwUbZOw0c8Qxm+v7gzOuz5Im9yaHLPZRCYC
-	uRCrTGYDbiJhp8drqjvm+Okz4sqBZ77rBqG2tw7x7L/AvyimXBLuY6ew6PK7wJprHBNrPP
-	sCJNrU9F7aSvPphf1TpZgd9zd/RWqbQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-556-HEGntZEAPMGJtmFFEkPvDA-1; Wed, 16 Oct 2024 11:55:03 -0400
-X-MC-Unique: HEGntZEAPMGJtmFFEkPvDA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d563a1af4so2011730f8f.2
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 08:55:02 -0700 (PDT)
+	s=arc-20240116; t=1729094371; c=relaxed/simple;
+	bh=cfGz0oIT2VUMmd58kRE4RTgmyoKJOCsM3kEpd8tGNHE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kYIrUDlWlC/68A6GvgGysVdUhdIvJAFt6MSrGUkCdA1hQjzRWZv65PmAfSk52j9IcEvhLouEbF1D9fmf47HSmAsW303jD+CrA5If8Stk/eNwnAxpr72Myqgx1wbStzSeGTVrF+KtdI87wKmgwa8FH2SMOSDSXfgy0cWVmzT5Npo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AtBBgWgc; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e3705b2883so521427b3.3
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 08:59:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729094369; x=1729699169; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iYXZbXCOGWbSeLqASLTyAQWqQbNT9MrywW3ddj/9vNU=;
+        b=AtBBgWgcSf1bMI7Maq/ZBjGBkBheP77W+/iz+5Mx7xw24SPKTj5cb+lIYIaq4hVrKh
+         Pi56U1oVPQscwHxw5TRkEONqgieqc4c5TWteBepkjOs+BbHMOQNdTyLf8mzgJeSZc2cK
+         j9c3jL3Ja0kdLK0+UIvC4fHTcLvzawNaUc33lEmKsoQL8okxAzhTkq+ybLs8WbJb9n7b
+         vQ/cXf4NMqdF5RdU8iShhq5d+Q5gSq7PY2uyZFKe1dQ4SIbRR+kWGOwv5W8VyBNrhAM3
+         61RCwXcmPuecNvGvC3g5a4HWuKqrqjofCLy4ZxEtW/muuECMhZK6YRvwOlI7aZlE1H8G
+         fZMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729094100; x=1729698900;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+        d=1e100.net; s=20230601; t=1729094369; x=1729699169;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=48P55mGkCCxQ03xjhgzSLSsbrSXDZPkk4TcShvxlXM8=;
-        b=jjb8b5hbFVqYh5dsGdaOUTz3Wl86U+tqPYN1eUHnF540PxJCujp7bkbVGPNdkgYLyH
-         0y7/U8qlwkI4i5AGP//+Y91erG6MMRustNJxrB12WghZaJPyfYeFSfLNi4OCBUpbBO7z
-         PDpRsuCCtPtgN8L0pMzurciiVrD2zCCuHaJdKQoDve3gvtV6QffeE9mkffZG6TJ9e3cP
-         T+qSiJwHhT2++QbkYqWYOVkSMKn5vJgWE99yP2YBawKsK+zRmpFNEl4HziMijYt+A4pM
-         WBLWs4q+qB3i/YiwpcDB56UqCZVsCDqmlLuvICpCYQDqOm7FiZPMYCg5IfS8E+Vo/K7w
-         BqQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWKtdTkAL6Ke/KY29iGF8bd7nb96TVNFCxc2wLM18fdmqwEMj1VnoVn5hHpatChtzkhkSY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdPG+RZNX672cxrMwACuu/AriB89AOn6r8DrAuN9iwqipH7z7D
-	HtfgEDz6HWg8YXNmSDHF0Oi1k0ItWCktUwFXhlAnP74pDiVh6FKu5uGLBAoKI2ihZQ5I+r5l4V0
-	/1WhLcj5QjJ8qODBxf3Ubdhm19VTX87/v6lodlguqexOa3nwkUQ==
-X-Received: by 2002:a05:6000:10c1:b0:37d:4a68:61a1 with SMTP id ffacd0b85a97d-37d601cd19amr10687169f8f.56.1729094100046;
-        Wed, 16 Oct 2024 08:55:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQtbfVTBZ5NkmWo/03oyq9JfbDyRlPhDr0wCs2j6/mCMXk6wnjrnWGYEMTUmZ0bShmT8bRQQ==
-X-Received: by 2002:a05:6000:10c1:b0:37d:4a68:61a1 with SMTP id ffacd0b85a97d-37d601cd19amr10687102f8f.56.1729094098224;
-        Wed, 16 Oct 2024 08:54:58 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c74b:d000:3a9:de5c:9ae6:ccb3? (p200300cbc74bd00003a9de5c9ae6ccb3.dip0.t-ipconnect.de. [2003:cb:c74b:d000:3a9:de5c:9ae6:ccb3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fa7a04asm4651030f8f.8.2024.10.16.08.54.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2024 08:54:57 -0700 (PDT)
-Message-ID: <87956f31-472d-4091-8061-1e55fea7a3d7@redhat.com>
-Date: Wed, 16 Oct 2024 17:54:56 +0200
+        bh=iYXZbXCOGWbSeLqASLTyAQWqQbNT9MrywW3ddj/9vNU=;
+        b=WQpG/pP0S9EZPEXFNS48GyF44D8LY1uMroZY04LEfCxzM+V+oD8NJmR80vx0h9lNCN
+         JVN4tsWQ3or5+Ufdyv6hyns7eIPnnS1z6fVwTkxlzGigGPSr+Dc+XOuazz7WzgB/PZ9S
+         fwGVlvCR7EPzaeKunJh/WvM+dA0WeRqbDS+3U8kFlxkoOuCd9jSi7ThBjswyrCrH0jc6
+         UrrBYSc8xhHjnTTiU8VcdPyFFgH1I7H1Wzwb7sUHD50HEgvL5w69vtF6soaVgIeG1t7a
+         C55geMTBQ6D7dZJhdvKkIea5NLJ8a43nVXtxeBGAARDVkWXjr8X6ZPspaHDZyvTLVNAx
+         Ikvg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrLxWT3BcRpMkuEAhwFj8cuOPA+Cyual3s6kNiOlL/4SWS321jnHoI8el6V1kHfPiLY2Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSZHLXdteccT2sqfvZxv/lhCtGCJMqPykuOdrDBio34E6OjJIy
+	Ai78h/GR+fIyCjiLaBLlf0txwkfm5/EKmipG1Fj9AmhHA73xsvrNrGrfYn7iASXEgL1B2CFH5Ss
+	nhw==
+X-Google-Smtp-Source: AGHT+IG/y4BavRDFeI7M1MIg9zdlDt7p1T4tdUb+JqsaJdWT/IiFxduapCObf6CfWr8kmS4NK50CtdTMTXY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:ad64:0:b0:e16:68fb:f261 with SMTP id
+ 3f1490d57ef6-e297830baadmr2171276.5.1729094368661; Wed, 16 Oct 2024 08:59:28
+ -0700 (PDT)
+Date: Wed, 16 Oct 2024 08:59:27 -0700
+In-Reply-To: <ZwzczkIlYGX+QXJz@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/7] s390/kdump: implement is_kdump_kernel()
-From: David Hildenbrand <david@redhat.com>
-To: Alexander Egorenkov <egorenar@linux.ibm.com>
-Cc: agordeev@linux.ibm.com, akpm@linux-foundation.org,
- borntraeger@linux.ibm.com, cohuck@redhat.com, corbet@lwn.net,
- eperezma@redhat.com, frankja@linux.ibm.com, gor@linux.ibm.com,
- hca@linux.ibm.com, imbrenda@linux.ibm.com, jasowang@redhat.com,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-s390@vger.kernel.org, mcasquer@redhat.com, mst@redhat.com,
- svens@linux.ibm.com, thuth@redhat.com, virtualization@lists.linux.dev,
- xuanzhuo@linux.alibaba.com, zaslonko@linux.ibm.com
-References: <87ed4g5fwk.fsf@li-0ccc18cc-2c67-11b2-a85c-a193851e4c5d.ibm.com>
- <76f4ed45-5a40-4ac4-af24-a40effe7725c@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <76f4ed45-5a40-4ac4-af24-a40effe7725c@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20231211185552.3856862-1-jmattson@google.com> <7fe8970c-ecb7-4e46-be76-488d7697d8db@gmail.com>
+ <ZwzczkIlYGX+QXJz@intel.com>
+Message-ID: <Zw_i37S0FmRWfhM3@google.com>
+Subject: Re: [kvm-unit-tests PATCH 0/5] nVMX: Simple posted interrupts test
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Like Xu <like.xu.linux@gmail.com>, kvm@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>, pbonzini@redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 16.10.24 17:47, David Hildenbrand wrote:
->>>
->>> When I wrote that code I was rather convinced that the variant in this patch
->>> is the right thing to do.
->>
->> A short explanation about what a stand-alone kdump is.
->>
->> * First, it's not really a _regular_ kdump activated with kexec-tools and
->>     executed by Linux itself but a regular stand-alone dump (SCSI) from the
->>     FW's perspective (one has to use HMC or dumpconf to execute it and not
->>     with kexec-tools like for the _regular_ kdump).
-> 
-> Ah, that makes sense.
-> 
->> * One has to reserve crashkernel memory region in the old crashed kernel
->>     even if it remains unused until the dump starts.
->> * zipl uses regular kdump kernel and initramfs to create stand-alone
->>     dumper images and to write them to a dump disk which is used for
->>     IPLIng the stand-alone dumper.
->> * The zipl bootloader takes care of transferring the old kernel memory
->>     saved in HSA by the FW to the crashkernel memory region reserved by the old
->>     crashed kernel before it enters the dumper. The HSA memory is released
->>     by the zipl bootloader _before_ the dumper image is entered,
->>     therefore, we cannot use HSA to read old kernel memory, and instead
->>     use memory from crashkernel region, just like the regular kdump.
->> * is_ipl_type_dump() will be true for a stand-alone kdump because we IPL
->>     the dumper like a regular stand-alone dump (e.g. zfcpdump).
->> * Summarized, zipl bootloader prepares an environment which is expected by
->>     the regular kdump for a stand-alone kdump dumper before it is entered.
-> 
-> Thanks for the details!
-> 
->>
->> In my opinion, the correct version of is_kdump_kernel() would be
->>
->> bool is_kdump_kernel(void)
->> {
->>           return oldmem_data.start;
->> }
->>
->> because Linux kernel doesn't differentiate between both the regular
->> and the stand-alone kdump where it matters while performing dumper
->> operations (e.g. reading saved old kernel memory from crashkernel memory region).
->>
-> 
-> Right, but if we consider "/proc/vmcore is available", a better version
-> would IMHO be:
-> 
-> bool is_kdump_kernel(void)
-> {
->             return dump_available();
-> }
-> 
-> Because that is mostly (not completely) how is_kdump_kernel() would have
-> worked right now *after* we had the elfcorehdr_alloc() during the
-> fs_init call.
-> 
-> 
->> Furthermore, if i'm not mistaken then the purpose of is_kdump_kernel()
->> is to tell us whether Linux kernel runs in a kdump like environment and not
->> whether the current mode is identical to the proper and true kdump,
->> right ? And if stand-alone kdump swims like a duck, quacks like one, then it
->> is one, regardless how it was started, by kexecing or IPLing
->> from a disk.
-> 
-> Same thinking here.
-> 
->>
->> The stand-alone kdump has a very special use case which most users will
->> never encounter. And usually, one just takes zfcpdump instead which is
->> more robust and much smaller considering how big kdump initrd can get.
->> stand-alone kdump dumper images cannot exceed HSA memory limit on a Z machine.
-> 
-> Makes sense, so it boils down to either
-> 
-> bool is_kdump_kernel(void)
-> {
->            return oldmem_data.start;
-> }
-> 
-> Which means is_kdump_kernel() can be "false" even though /proc/vmcore is
-> available or
-> 
-> bool is_kdump_kernel(void)
-> {
->            return dump_available();
-> }
-> 
-> Which means is_kdump_kernel() can never be "false" if /proc/vmcore is
-> available. There is the chance of is_kdump_kernel() being "true" if
-> "elfcorehdr_alloc()" fails with -ENODEV.
-> 
-> 
-> You're call :) Thanks!
-> 
+On Mon, Oct 14, 2024, Chao Gao wrote:
+> On Wed, Oct 09, 2024 at 02:48:28PM +0800, Like Xu wrote:
+> >On 12/12/23 2:55 AM, Jim Mattson wrote:
+> >> I reported recently that commit 26844fee6ade ("KVM: x86: never write t=
+o
+> >> memory from kvm_vcpu_check_block()") broke delivery of a virtualized p=
+osted
+> >> interrupt from an L1 vCPU to a halted L2 vCPU (see
+> >> https://lore.kernel.org/all/20231207010302.2240506-1-jmattson@google.c=
+om/).
+> >> The test that exposed the regression is the final patch of this series=
+. The
+> >> others are prerequisites.
+> >>=20
+> >> It would make sense to add "vmx_posted_interrupts_test" to the set of =
+tests
+> >> to be run under the unit test name, "vmx_apicv_test," but that is
+> >> non-trivial. The vmx_posted_interrupts_test requires "smp =3D 2," but =
+I find
+> >> that adding that to the vmx_apicv_tests causes virt_x2apic_mode_test t=
+o
+> >> fail with:
+> >>=20
+> >> FAIL: x2apic - reading 0x310: x86/vmx_tests.c:2151: Assertion failed: =
+(expected) =3D=3D (actual)
+> >> 	LHS: 0x0000000000000012 - 0000'0000'0000'0000'0000'0000'0000'0000'000=
+0'0000'0000'0000'0000'0000'0001'0010 - 18
+> >> 	RHS: 0x0000000000000001 - 0000'0000'0000'0000'0000'0000'0000'0000'000=
+0'0000'0000'0000'0000'0000'0000'0001 - 1
+> >> Expected VMX_VMCALL, got VMX_EXTINT.
+> >> 	STACK: 406ef8 40725a 41299f 402036 403f59 4001bd
+> >>=20
+> >> I haven't investigated.
+> >
+> >This vmx_apicv_test test still fails when 'ept=3DN' (SPR + v6.12-rc2):
+> >
+> >--- Virtualize APIC accesses + Use TPR shadow test ---
+> >FAIL: xapic - reading 0x080: read 0x0, expected 0x70.
+> >FAIL: xapic - writing 0x12345678 to 0x080: exitless write; val is 0x0, w=
+ant
+> >0x70
+> >
+> >--- APIC-register virtualization test ---
+> >FAIL: xapic - reading 0x020: read 0x0, expected 0x12345678.
+> >FAIL: xapic - writing 0x12345678 to 0x020: x86/vmx_tests.c:2164: Asserti=
+on
+> >failed: (expected) =3D=3D (actual)
+> >	LHS: 0x0000000000000038 - 0000'0000'0000'0000'0000'0000'0000'0000'0000'=
+0000'0000'0000'0000'0000'0011'1000
+> >- 56
+> >	RHS: 0x0000000000000012 - 0000'0000'0000'0000'0000'0000'0000'0000'0000'=
+0000'0000'0000'0000'0000'0001'0010
+> >- 18
+> >Expected VMX_APIC_WRITE, got VMX_VMCALL.
+> >	STACK: 406f7f 40d178 40202f 403f54 4001bd
+>=20
+> These failures occur because KVM flushes TLB with the wrong VPID, causing=
+ TLB
+> for the 'APIC-access page' to be retained across nested transitions. This=
+ TLB
+> entry exists because L1 writes to that page before entering the guest, se=
+e
+> test_xapic_rd():
+>=20
+>         /* Setup virtual APIC page */
+>         if (!expectation->virtualize_apic_accesses) {
+>                 apic_access_address[apic_reg_index(reg)] =3D val;
+>                 virtual_apic_page[apic_reg_index(reg)] =3D 0;
+>         } else if (exit_reason_want =3D=3D VMX_VMCALL) {
+>                 apic_access_address[apic_reg_index(reg)] =3D 0;
+>                 virtual_apic_page[apic_reg_index(reg)] =3D val;
+>         }
+>=20
+>=20
+> Specifically, in the failing scenario, EPT is disabled, and VPID is enabl=
+ed in
+> L0 but disabled in L1. As a result, vmcs01 and vmcs02 share the same VPID
+> (vmx->vpid, see prepare_vmcs02_early_rare()), and vmx->nested.vpid02 is n=
+ever
+> used. But during nested transitions, KVM incorrectly flushes TLB using
+> vmx->nested.vpid02. The sequence is as follows:
+>=20
+> 	nested_vmx_transition_tlb_flush ->
+> 	  kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu) ->
+> 	    kvm_vcpu_flush_tlb_guest ->=09
+> 	      vmx_flush_tlb_guest ->
+> 		vmx_get_current_vpid ->
+>=20
+> With the diff below applied, these failures disappear.
+>=20
+> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+> index cce4e2aa30fb..246d9c6e20d0 100644
+> --- a/arch/x86/kvm/vmx/nested.h
+> +++ b/arch/x86/kvm/vmx/nested.h
+> @@ -61,13 +61,6 @@ static inline int vmx_has_valid_vmcs12(struct kvm_vcpu=
+ *vcpu)
+>  		nested_vmx_is_evmptr12_set(vmx);
+>  }
+> =20
+> -static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
+> -{
+> -	struct vcpu_vmx *vmx =3D to_vmx(vcpu);
+> -
+> -	return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
+> -}
+> -
+>  static inline unsigned long nested_ept_get_eptp(struct kvm_vcpu *vcpu)
+>  {
+>  	/* return the page table to be shadowed - in our case, EPT12 */
+> @@ -187,6 +180,16 @@ static inline bool nested_cpu_has_vpid(struct vmcs12=
+ *vmcs12)
+>  	return nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENABLE_VPID);
+>  }
+> =20
+> +static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_vmx *vmx =3D to_vmx(vcpu);
+> +
+> +	if (nested_cpu_has_vpid(get_vmcs12(vcpu)) && vmx->nested.vpid02)
 
-What I think we should do is the following (improved comment + patch
-description), but I'll do whatever you think is better:
+This isn't quite right.  When KVM emulates INVVPID for L1, there is no way =
+to
+know which vmcs12 will be used and thus no way to know if KVM should invali=
+date
+vpid02 or vpid01.  So I'm fairly certain the correct fix is:
 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 1a4438358c5e..896f0fea0306 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3216,7 +3216,7 @@ void vmx_flush_tlb_all(struct kvm_vcpu *vcpu)
+=20
+ static inline int vmx_get_current_vpid(struct kvm_vcpu *vcpu)
+ {
+-       if (is_guest_mode(vcpu))
++       if (is_guest_mode(vcpu) && nested_cpu_has_vpid(get_vmcs12(vcpu)))
+                return nested_get_vpid02(vcpu);
+        return to_vmx(vcpu)->vpid;
+ }
 
- From e86194b5195c743eff33f563796b9c725fecc65f Mon Sep 17 00:00:00 2001
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 4 Sep 2024 14:57:10 +0200
-Subject: [PATCH] s390/kdump: provide custom is_kdump_kernel()
+Note, it's tempting, but subtly wrong (though not a violation of the archit=
+ecture),
+to use vpid02 when VPID is disabled in vmcs12, i.e. this would also resolve=
+ the
+issue, but would result in over-flushing.
 
-s390 currently always results in is_kdump_kernel() == false until
-vmcore_init()->elfcorehdr_alloc() ran, because it sets
-"elfcorehdr_addr = ELFCORE_ADDR_MAX;" early during setup_arch to deactivate
-any elfcorehdr= kernel parameter.
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index a8e7bc04d9bf..ce89e2e27681 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2316,7 +2316,7 @@ static void prepare_vmcs02_early_rare(struct vcpu_vmx=
+ *vmx,
+        vmcs_write64(VMCS_LINK_POINTER, INVALID_GPA);
+=20
+        if (enable_vpid) {
+-               if (nested_cpu_has_vpid(vmcs12) && vmx->nested.vpid02)
++               if (vmx->nested.vpid02)
+                        vmcs_write16(VIRTUAL_PROCESSOR_ID, vmx->nested.vpid=
+02);
+                else
+                        vmcs_write16(VIRTUAL_PROCESSOR_ID, vmx->vpid);
 
-Let's follow the powerpc example and implement our own logic. Let's use
-"dump_available()", because this is mostly (with one exception when
-elfcorehdr_alloc() fails with -ENODEV) when we would create /proc/vmcore
-and when is_kdump_kernel() would have returned "true" after
-vmcore_init().
+And it's wrong because the comment in nested_vmx_transition_tlb_flush() is =
+wrong:
 
-This is required for virtio-mem to reliably identify a kdump
-environment before vmcore_init() was called to not try hotplugging memory.
+	 * If vmcs12 doesn't use VPID, L1 expects linear and combined mappings
+	 * for *all* contexts to be flushed on VM-Enter/VM-Exit, i.e. it's a
+	 * full TLB flush from the guest's perspective
 
-Update the documentation above dump_available().
+Per the SDM, only VPID=3D0 is flushed:
 
-Tested-by: Mario Casquero <mcasquer@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
-  arch/s390/include/asm/kexec.h |  4 ++++
-  arch/s390/kernel/crash_dump.c |  6 ++++++
-  arch/s390/kernel/smp.c        | 16 ++++++++--------
-  3 files changed, 18 insertions(+), 8 deletions(-)
+  If the =E2=80=9Cenable VPID=E2=80=9D VM-execution control is 0, VM entrie=
+s and VM exits invalidate
+  linear mappings and combined mappings associated with VPID 0000H (for all=
+ PCIDs).
+  Combined mappings for VPID 0000H are invalidated for all EPTRTAs.
 
-diff --git a/arch/s390/include/asm/kexec.h b/arch/s390/include/asm/kexec.h
-index 1bd08eb56d5f..bd20543515f5 100644
---- a/arch/s390/include/asm/kexec.h
-+++ b/arch/s390/include/asm/kexec.h
-@@ -94,6 +94,9 @@ void arch_kexec_protect_crashkres(void);
-  
-  void arch_kexec_unprotect_crashkres(void);
-  #define arch_kexec_unprotect_crashkres arch_kexec_unprotect_crashkres
-+
-+bool is_kdump_kernel(void);
-+#define is_kdump_kernel is_kdump_kernel
-  #endif
-  
-  #ifdef CONFIG_KEXEC_FILE
-@@ -107,4 +110,5 @@ int arch_kexec_apply_relocations_add(struct purgatory_info *pi,
-  int arch_kimage_file_post_load_cleanup(struct kimage *image);
-  #define arch_kimage_file_post_load_cleanup arch_kimage_file_post_load_cleanup
-  #endif
-+
-  #endif /*_S390_KEXEC_H */
-diff --git a/arch/s390/kernel/crash_dump.c b/arch/s390/kernel/crash_dump.c
-index 51313ed7e617..43bbaf534dd2 100644
---- a/arch/s390/kernel/crash_dump.c
-+++ b/arch/s390/kernel/crash_dump.c
-@@ -237,6 +237,12 @@ int remap_oldmem_pfn_range(struct vm_area_struct *vma, unsigned long from,
-  						       prot);
-  }
-  
-+bool is_kdump_kernel(void)
-+{
-+	return dump_available();
-+}
-+EXPORT_SYMBOL_GPL(is_kdump_kernel);
-+
-  static const char *nt_name(Elf64_Word type)
-  {
-  	const char *name = "LINUX";
-diff --git a/arch/s390/kernel/smp.c b/arch/s390/kernel/smp.c
-index 4df56fdb2488..bd41e35a27a0 100644
---- a/arch/s390/kernel/smp.c
-+++ b/arch/s390/kernel/smp.c
-@@ -574,7 +574,7 @@ int smp_store_status(int cpu)
-  
-  /*
-   * Collect CPU state of the previous, crashed system.
-- * There are four cases:
-+ * There are three cases:
-   * 1) standard zfcp/nvme dump
-   *    condition: OLDMEM_BASE == NULL && is_ipl_type_dump() == true
-   *    The state for all CPUs except the boot CPU needs to be collected
-@@ -587,16 +587,16 @@ int smp_store_status(int cpu)
-   *    with sigp stop-and-store-status. The firmware or the boot-loader
-   *    stored the registers of the boot CPU in the absolute lowcore in the
-   *    memory of the old system.
-- * 3) kdump and the old kernel did not store the CPU state,
-- *    or stand-alone kdump for DASD
-- *    condition: OLDMEM_BASE != NULL && !is_kdump_kernel()
-+ * 3) kdump or stand-alone kdump for DASD
-+ *    condition: OLDMEM_BASE != NULL && !is_ipl_type_dump() == false
-   *    The state for all CPUs except the boot CPU needs to be collected
-   *    with sigp stop-and-store-status. The kexec code or the boot-loader
-   *    stored the registers of the boot CPU in the memory of the old system.
-- * 4) kdump and the old kernel stored the CPU state
-- *    condition: OLDMEM_BASE != NULL && is_kdump_kernel()
-- *    This case does not exist for s390 anymore, setup_arch explicitly
-- *    deactivates the elfcorehdr= kernel parameter
-+ *
-+ * Note that the old kdump mode where the old kernel stored the CPU state
-+ * does no longer exist: setup_arch explicitly deactivates the elfcorehdr=
-+ * kernel parameter. The is_kdump_kernel() implementation on s390 is independent
-+ * of the elfcorehdr= parameter, and is purely based on dump_available().
-   */
-  static bool dump_available(void)
-  {
--- 
-2.46.1
+so using vpid01, which mimics using L1's host VPID (of '0'), is correct.  A=
+s above,
+the fallout is simply that KVM will over-flush, e.g. if L1 runs L2 X with V=
+PID=3D1,
+then L2 Y with VPID disabled, and then runs X again, it's legal to retain T=
+LB
+entries for VPID=3D1 even though there was a VMX transition with VPID disab=
+led.
 
+I'll post a proper patch with lots of comments.
 
--- 
-Cheers,
-
-David / dhildenb
-
+Thanks Chao!
 
