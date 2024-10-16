@@ -1,263 +1,314 @@
-Return-Path: <kvm+bounces-29000-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29001-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F999A0C05
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 15:57:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59B109A0C51
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 16:16:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0E02286593
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 13:57:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7414F1C22106
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 14:16:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE11A20C006;
-	Wed, 16 Oct 2024 13:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA09D146013;
+	Wed, 16 Oct 2024 14:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Omqo1uja"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XMlNTgUX"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21963207206;
-	Wed, 16 Oct 2024 13:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729087044; cv=none; b=No7hWMHsFWE84+idrgzYhx344RhSYt2JDZ19mgh5NX2whgeCThmkR6hX2vYRDUk7I+6HLV1HDLJgOziPzwgJpgPIheeTPWtNlMh2N5e+IQ5PSqklNHRF1oBaN5rCpCb6g1Et0oeFcEr/Lo3nXG27+Tc13UHbD5JiPiNeys+2Q/Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729087044; c=relaxed/simple;
-	bh=MUBcKDVt3aHS2SRtCQBy5K4t6BpEf4pxDonW1rOFcDU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c9WIvJf4JP6PCDFhjZY64jkF+hCTJUzdDYCI19rQAmRWd6XDWbFInperHAVybsmGWAsvPdJZnwLtLziFUgfAeWF+w+bq3FhPB4McZKRN1NlHboHeMqIBiWJMMOpzx0Qlw9YP08zdkKmB3cEG8nMH8DhaEDF6LevJkeaMctZZpLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Omqo1uja; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EC71C4CEC5;
-	Wed, 16 Oct 2024 13:57:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729087043;
-	bh=MUBcKDVt3aHS2SRtCQBy5K4t6BpEf4pxDonW1rOFcDU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Omqo1ujaHy/2qjgDGnZDc+DxU04r1CETNcFK739Rb4vc7E0r7pq2bAxelzoH5BbVD
-	 kxSmoVyx3n8HQZopglcR++ElI4x/AibhXh3154ydktYzaBJElStg3EsRgIYrxjTKWX
-	 yfyxClgJbISs9X16MEQ0hg1X2ftRqsoebpMxM9oSP7TewHdG5bikcB38BbxfOHXLnh
-	 p/eWwqwTJ4OmMUy/h7CMVvbkJ6jbRMo3U8RUT8uMYcEqm1vcoxOzZ9xAlQmgbZ/jQt
-	 IJPxNz8SRnZuK4fmZge3Cek8z5OlYte+SDLPwtMBThbLy28YmDvceO73UsYZEUmeQ+
-	 WDIite5EO4aAw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t14Wf-0046X6-8M;
-	Wed, 16 Oct 2024 14:57:21 +0100
-Date: Wed, 16 Oct 2024 14:57:20 +0100
-Message-ID: <86y12o40cf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 07/36] KVM: arm64: nv: Save/Restore vEL2 sysregs
-In-Reply-To: <Zw-70Uocs5JvXz7e@raptor>
-References: <20241009190019.3222687-1-maz@kernel.org>
-	<20241009190019.3222687-8-maz@kernel.org>
-	<Zw-70Uocs5JvXz7e@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CC4502BE;
+	Wed, 16 Oct 2024 14:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729088167; cv=fail; b=bYLnpmI0QFCX6k8/H4qBrWm2EOK0tN546zVVOy1W8KMMH1I9UCT8XOGmULHA2olIC3Gr9W2lew0OIqjIeDwZT7aswPhx+30QL0sLtQv7zgDA4az5bDFmToW9UJaCiDrxS+nhLTs2/XKxxNW7CHIN5UnTLf20S2zrHMjA+jnfyf8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729088167; c=relaxed/simple;
+	bh=/ijA9JT3nqCfPQMcgfBu5PkVUwmWBRnlPRXCoFwlqh4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=mcdQJGDAKojDKf0p4KzS9Hhg/gkeFiY8cYv6SjTDKjoJG+XMGO9KrMeeIzrW+ZpgN3pRqE0Ug23BeXood8j5LtZRV0W99+wOLoxXhRo33S4f8veIclt27cfjjeUnbiiFvtU/J7oJe26WTJ0Nq69RSkWsqmvI6EeYqjelhVj+Q58=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XMlNTgUX; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729088164; x=1760624164;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=/ijA9JT3nqCfPQMcgfBu5PkVUwmWBRnlPRXCoFwlqh4=;
+  b=XMlNTgUXjlBeHB3JHVU4ewx2NtMuiCWp0n22UUPU2Ci8CPaW00wRr3BU
+   Y+QMdKLg04h65yqlhvX35MLbrDI1ysMuPeAtA0qKEl3KDYhxiN/YHR8Hv
+   QdIfH4E162FXruc8nAq0icd8gBZBVW+6TsXg7fNcBjr6AeQeihDjRz3zw
+   wlnRu0WoZyK/OoJHPLYnmJc2MkA7aq7224jEZlzjUJfj247V86B2q9u2n
+   FPGCATkmvFZUXoRfXP/ZtV5T9rbcbme/0rDxJOZ4u026fyRFEg5uPheIv
+   I6Tu9FZzPBaD45nFLU6XHLAKpLHLLFv4MvJ42J3vuQFPDrbO0wtwkU54Q
+   Q==;
+X-CSE-ConnectionGUID: p6qCqbhySvWbUm3mkErfKQ==
+X-CSE-MsgGUID: xLXTAHYJT4G8/0XvVZk6pw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11226"; a="31401545"
+X-IronPort-AV: E=Sophos;i="6.11,208,1725346800"; 
+   d="scan'208";a="31401545"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 07:16:03 -0700
+X-CSE-ConnectionGUID: 5cASALFVR2+kBTWUIQlzHQ==
+X-CSE-MsgGUID: wNJweS7TRgCZ19gyhoXu2Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,208,1725346800"; 
+   d="scan'208";a="78191682"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Oct 2024 07:16:02 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 16 Oct 2024 07:16:01 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 16 Oct 2024 07:16:01 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 16 Oct 2024 07:16:01 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 16 Oct 2024 07:16:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EhREBNQ3Itwb4z7DyLfM0tUU6VCB95GAsuM4M5t4YOZRomrgYIVaZM7KUb6+fHNv0kCj3/EDS/wkqXF0cP6ZM2wneJ+oJYR3/5LfbNaiYGtFZiMVdxx8beNC8Isvhrx543KzHT88zCShhQDPIdciwSjeXokBKqO+DCCebVUdXc2/3LRTGOz7iKGZeCCU/OSmRjrrwTkDojGCGPt6j/mQyStX+nXQD52RX+aDY53pECb5WrTyUpgnC1teoZguHsp9/zEOudDT2jphjYtV8fbk+gc1wMbQZLKP6QRE3Yhaki8lSojTtibqDQgA786Gjm2YjGaeo+lzHpfLmxd5ptkqEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xegdd0I+4Ff11jKjSwQWdnwp1Cqb/DJ5PP4DUObE5Hs=;
+ b=YpGQtTMRPIisjOxGR8Jqj3aOU8gbS4BBQqKMWSV6VGWwkyGGsotWoTJTMIil/GOe9yK89+0y+iWhQSfFactajJr048oeBkCP1LikTHKaw3XkBrbMjkSJqvbsjNvubNpDJfmHgBKNmxVTmC7NTuUCndqiA/iwcU13pETWFxkHjoHE0v8hFtb8Z1tl+A4SSWtfBtQNP9FL27H2URZIzfMLCB/K+PWCbmJbq3Ii5naS92LCCaMphhQio92acHFTSayHiYZEFR+Bnh9wGaCxbZe824JtImT7R+hcAHH1SYJEO3801242IUgaTS1HQ32k3Qev1pwxF56XQk+3e/bZzfpLVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ PH7PR11MB5888.namprd11.prod.outlook.com (2603:10b6:510:137::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.27; Wed, 16 Oct
+ 2024 14:15:57 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.8048.020; Wed, 16 Oct 2024
+ 14:15:57 +0000
+Date: Wed, 16 Oct 2024 22:13:38 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, Yuan Yao <yuan.yao@intel.com>, Kai Huang
+	<kai.huang@intel.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "dmatlack@google.com"
+	<dmatlack@google.com>, "nik.borisov@suse.com" <nik.borisov@suse.com>
+Subject: Re: [PATCH 09/21] KVM: TDX: Retry seamcall when TDX_OPERAND_BUSY
+ with operand SEPT
+Message-ID: <Zw/KElXSOf1xqLE7@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <ZuBsTlbrlD6NHyv1@google.com>
+ <655170f6a09ad892200cd033efe5498a26504fec.camel@intel.com>
+ <ZuCE_KtmXNi0qePb@google.com>
+ <ZuP5eNXFCljzRgWo@yzhao56-desk.sh.intel.com>
+ <ZuR09EqzU1WbQYGd@google.com>
+ <ZuVXBDCWS615bsVa@yzhao56-desk.sh.intel.com>
+ <ZvPrqMj1BWrkkwqN@yzhao56-desk.sh.intel.com>
+ <ZwVG4bQ4g5Tm2jrt@google.com>
+ <ZwdkxaqFRByTtDpw@yzhao56-desk.sh.intel.com>
+ <ZwgP6nJ-MdDjKEiZ@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZwgP6nJ-MdDjKEiZ@google.com>
+X-ClientProxiedBy: SI2PR01CA0043.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:193::12) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB5888:EE_
+X-MS-Office365-Filtering-Correlation-Id: 660bcb12-9fe2-4ec6-0d17-08dceded0dce
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?1ZRzJIOZsMA79rmmr0NFdZWhAQ4kylVQ+ye7KBgOlz4ta4fbVCgADzyX9fQ9?=
+ =?us-ascii?Q?O5eEKFCxAsltxERLRAxG0MO+FmZNIwn1uY5OUbwN7A1KJ7JlSWirFZDS9qh2?=
+ =?us-ascii?Q?JigjWiHDCnjPSmPQYKXYVMkVHF/baaiJXc3SP+dJzSG5+bAm1zufb+vfJcxU?=
+ =?us-ascii?Q?QB87tLvn0DdlFcJDHklTstgZ8BzedOKIDmFYpSiUHl54i+bYNGqlHsk/2l1d?=
+ =?us-ascii?Q?1LhStXzSmtvFwiDWkgra2Zj+Rk/iH3A20kaSkKGRuSMHqqhN6qL3kmZkS2py?=
+ =?us-ascii?Q?0aCGIXGYo2JQCr4x7BhgDPoFYUdvYXVTGnvmI5uj8WjEDojRUeFLiwVYkl7S?=
+ =?us-ascii?Q?1JM/q46PVp+jaNQUbCFcOQxuM2dZejZcAMMUvV3gptdbKABbvsRU7Ge0x707?=
+ =?us-ascii?Q?uPbCIboUK7qKfqEqLiu7w+oEQfAqXLJdtEonEMA7dKNh27rIwRPP9RaMSHgr?=
+ =?us-ascii?Q?GB3Ki7CFb6oEdGgZJi0hlrPZbLCCeMdxEjxqRt5YPNH0tSOPfdhhpRQlEoZa?=
+ =?us-ascii?Q?i0I2sHYw7abCkJKvVs2vYYbYDocrAbAb2jtOoNIuVhqqkoAtcIalh5l/WcER?=
+ =?us-ascii?Q?d88PKY877T2vRd7kq/6r+gQbyaPqTOaDrNZlzm6NXbnFcrFmHQUpUneR4omw?=
+ =?us-ascii?Q?7pYUIiglkgHYaClh8+NkzFSxR/oGQwGkn5uNAiYKstoRh8NAa8z50pkbL/1y?=
+ =?us-ascii?Q?7q4sXIFM27mlRVlAhRsM75Rri1hkOx7DHqfZC3Q8SSQ5l7O3XgCsqwzciUuy?=
+ =?us-ascii?Q?XubjL8oT5xvNnRWVNLbQHsENSMJ8ccrf7X7R8jPOaNAW+yAeNopD8dEjs080?=
+ =?us-ascii?Q?8orF51Bz9ZJBH787MoTzdExsBjB9YrMc/m4WjYYWUGu5Iu19j+KRtV53LLKd?=
+ =?us-ascii?Q?/1zMAfcff4KP/UsymV4vhe5yfxobTavsmqoiKZy2+vzzghbUKG9+XLy8YNz6?=
+ =?us-ascii?Q?eAXI41fyZ2Aypzk+5PbwoWTXdhvIh1AEmK79A2aewnqzoJYQG5QLZcMIq7hj?=
+ =?us-ascii?Q?CaQCxdpFrp2q35R47wXzKww4CXNZNHSLaI2BCAnnfy2LyXwT0ot89mv7bBwc?=
+ =?us-ascii?Q?K8oR8708RlNxAQCOLmKxltCHHbW3b3+boP0BqO7QFxJ5DTI2TQ/20ahcMrT9?=
+ =?us-ascii?Q?stRYVroF63yneucj9N9OKIIpoSXm1gjTl3mojJB3HS2c94dLhB6yHMej9cxc?=
+ =?us-ascii?Q?J9hQWQkEoT813Wipbf6SIERf6bmVkSaXjqD5VDkgDJQmrpNGlFu/c+f1E/vD?=
+ =?us-ascii?Q?/+gzhXkPMUD8t2iVW83yuTaoewv68FH0tjNdJmL48g=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?V7yZ+1THkJ57jdEpO5063n5XovjmH7rc9LYYC469HE9xQ8+1kzOvFsL/O+tc?=
+ =?us-ascii?Q?sn2sOS8cRt37y0zGFcwXteQoi7/EpHjsbvGWAa7wHimByuIyMUXr3e5kVA8W?=
+ =?us-ascii?Q?vYcYNYBf7g0EDyZ/cGVsniy4RNnnFnN3reds/wVE7CDDjKJWJeBrMDMoiTO/?=
+ =?us-ascii?Q?fUG5c+OSX0hzFH8rV6bnSdko7JLs+GRH2j3YaX5VSYzm0f6bbpJVmIc4n4XU?=
+ =?us-ascii?Q?Ij9VtuYNK7DNx4OY+eclIowgwt1H2Ii1dmBXUHLL91UGuk8CLXQPDxdKNKZ5?=
+ =?us-ascii?Q?ArzfrC48bZfN+jtPBIkmJBUmv84JhLjQ9B7YaK9gX2yz6wnEV37pVAaFFUus?=
+ =?us-ascii?Q?2m5gWa2/n3fQ6ZY/YqjD6IBNl/iWBDvBXIELos3rh68PTsgq+MBnQtrakoah?=
+ =?us-ascii?Q?uR/gN3gOxc1wfji//z5k/5Rgc71MoEkaji9VWaHAqwqO3OQkG4Z0YyPjiGGl?=
+ =?us-ascii?Q?6e99fmJLsysALGce4BKir+QqJ4PBs6dbj3I62AK7MNBl9Epkx1YPyacLeswr?=
+ =?us-ascii?Q?W7q1bhZHMbBAP/AJHJIipBqzK+LIDPTF43utLiraI77vZFmO9eCK31ZZG2vs?=
+ =?us-ascii?Q?TUtg6df+SfwIDdQe12q3YUuWBUiwIrmGFC/7lk/V46C/iCMM/MXmGWVBBHvk?=
+ =?us-ascii?Q?7gYxhgqsQjaeW91WNzJwkBmlOOOmoxUg1rTT9HIDfiJ41VRhTckD+GQrkOiq?=
+ =?us-ascii?Q?npEFtFzgj5vaaOj8mNhsX5oVw36WXqlvIG4qT6WMN6fFjVrGONjrRNDyAitM?=
+ =?us-ascii?Q?3K49gbBSsfDkhHhNdBkt1zQcr6yyzn8LgHdFWDCkvkeg3ogd8oJfWzKAIk5m?=
+ =?us-ascii?Q?ai1C3ef8+SfgPHJBW82YJ6BWxx244E5qaWP62U/ILzIGkEHQudZ/5bdzaes0?=
+ =?us-ascii?Q?p0VbAjeyYtPy/GpgPVpDTlEbdFhS1coHaOq9KIDT2kF8LMUvrv4zHTS1dN7t?=
+ =?us-ascii?Q?uAac2r4AoyDNV6DIPzt4bW9L4vSEbFkjtXJtBM0d4KXuic5ArarsDPkv5ukq?=
+ =?us-ascii?Q?AwK+lNnLadS1K2FT/O1DctzQGX6lZj0bZTnYq0g8euSkdJ3W8aDogh9ausLw?=
+ =?us-ascii?Q?VWwP4JSH3zdnAKInsxaWcl7VEp/8fRzHSi22PyJ/XsMUtctC/LRHQ3GtFzIy?=
+ =?us-ascii?Q?xI90PsXtnuNNM68d1H8rPWG3sYZU8045tszbeVczbJrgpcdxkzGQruoZcEdt?=
+ =?us-ascii?Q?rj3aC+muTUaxeD8DQNdUltov5QJcfM7OYFxNxanoDapEt4Ccu2g0xWInTP4T?=
+ =?us-ascii?Q?qVpypZRJzuIweNqZzw9HcPNuhhLPJ4dffIWwUD1773erXbJpSUb71Geh3uhS?=
+ =?us-ascii?Q?/SKbPpzpDQCWMCSLkYby7oDNmDyxUNgogRu4efDs9JI4iFgcRkInHbr5mZTy?=
+ =?us-ascii?Q?C1ZY7hzA8eDSoE9qpj6Tp7m9WvtSymzadtnKxzvKHSAVBD1WlVWHW0bczeQq?=
+ =?us-ascii?Q?TcCtuvT7/Otbb20QzPi3ZTWXLGK/TBfjIy4ray8rsJ9WdoI55jQv2KF8XHyv?=
+ =?us-ascii?Q?fYKep/sJn+w9hkLjI9GeRe0gy3Yn5BkklyHRzRYOZ14qL6WRmpIbx4OL6z0O?=
+ =?us-ascii?Q?lX/sWAAYZyYZaVp0Fl/LydRSoyhv/bISrKUawMPk?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 660bcb12-9fe2-4ec6-0d17-08dceded0dce
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 14:15:57.5864
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Zr88xKOv1S/9AnvKk11kMJQhkjoqQsWseNMVVwQDkRqTzlVAVa5rVEQhzw8ao1ZVHzu8O71feQrxzfFA5BdN9w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5888
+X-OriginatorOrg: intel.com
 
-On Wed, 16 Oct 2024 14:12:49 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Wed, Oct 09, 2024 at 07:59:50PM +0100, Marc Zyngier wrote:
-> > Whenever we need to restore the guest's system registers to the CPU, we
-> > now need to take care of the EL2 system registers as well. Most of them
-> > are accessed via traps only, but some have an immediate effect and also
-> > a guest running in VHE mode would expect them to be accessible via their
-> > EL1 encoding, which we do not trap.
+On Thu, Oct 10, 2024 at 10:33:30AM -0700, Sean Christopherson wrote:
+> On Thu, Oct 10, 2024, Yan Zhao wrote:
+> > On Tue, Oct 08, 2024 at 07:51:13AM -0700, Sean Christopherson wrote:
+> > > On Wed, Sep 25, 2024, Yan Zhao wrote:
+> > > > On Sat, Sep 14, 2024 at 05:27:32PM +0800, Yan Zhao wrote:
+> > > > > On Fri, Sep 13, 2024 at 10:23:00AM -0700, Sean Christopherson wrote:
+> > > > > > On Fri, Sep 13, 2024, Yan Zhao wrote:
+> > > > > > > This is a lock status report of TDX module for current SEAMCALL retry issue
+> > > > > > > based on code in TDX module public repo https://github.com/intel/tdx-module.git
+> > > > > > > branch TDX_1.5.05.
+> > > > > > > 
+> > > > > > > TL;DR:
+> > > > > > > - tdh_mem_track() can contend with tdh_vp_enter().
+> > > > > > > - tdh_vp_enter() contends with tdh_mem*() when 0-stepping is suspected.
+> > > > > > 
+> > > > > > The zero-step logic seems to be the most problematic.  E.g. if KVM is trying to
+> > > > > > install a page on behalf of two vCPUs, and KVM resumes the guest if it encounters
+> > > > > > a FROZEN_SPTE when building the non-leaf SPTEs, then one of the vCPUs could
+> > > > > > trigger the zero-step mitigation if the vCPU that "wins" and gets delayed for
+> > > > > > whatever reason.
+> > > > > > 
+> > > > > > Since FROZEN_SPTE is essentially bit-spinlock with a reaaaaaly slow slow-path,
+> > > > > > what if instead of resuming the guest if a page fault hits FROZEN_SPTE, KVM retries
+> > > > > > the fault "locally", i.e. _without_ redoing tdh_vp_enter() to see if the vCPU still
+> > > > > > hits the fault?
+> > > > > > 
+> > > > > > For non-TDX, resuming the guest and letting the vCPU retry the instruction is
+> > > > > > desirable because in many cases, the winning task will install a valid mapping
+> > > > > > before KVM can re-run the vCPU, i.e. the fault will be fixed before the
+> > > > > > instruction is re-executed.  In the happy case, that provides optimal performance
+> > > > > > as KVM doesn't introduce any extra delay/latency.
+> > > > > > 
+> > > > > > But for TDX, the math is different as the cost of a re-hitting a fault is much,
+> > > > > > much higher, especially in light of the zero-step issues.
+> > > > > > 
+> > > > > > E.g. if the TDP MMU returns a unique error code for the frozen case, and
+> > > > > > kvm_mmu_page_fault() is modified to return the raw return code instead of '1',
+> > > > > > then the TDX EPT violation path can safely retry locally, similar to the do-while
+> > > > > > loop in kvm_tdp_map_page().
+> > > > > > 
+> > > > > > The only part I don't like about this idea is having two "retry" return values,
+> > > > > > which creates the potential for bugs due to checking one but not the other.
+> > > > > > 
+> > > > > > Hmm, that could be avoided by passing a bool pointer as an out-param to communicate
+> > > > > > to the TDX S-EPT fault handler that the SPTE is frozen.  I think I like that
+> > > > > > option better even though the out-param is a bit gross, because it makes it more
+> > > > > > obvious that the "frozen_spte" is a special case that doesn't need attention for
+> > > > > > most paths.
+> > > > > Good idea.
+> > > > > But could we extend it a bit more to allow TDX's EPT violation handler to also
+> > > > > retry directly when tdh_mem_sept_add()/tdh_mem_page_aug() returns BUSY?
+> > > > I'm asking this because merely avoiding invoking tdh_vp_enter() in vCPUs seeing
+> > > > FROZEN_SPTE might not be enough to prevent zero step mitigation.
+> > > 
+> > > The goal isn't to make it completely impossible for zero-step to fire, it's to
+> > > make it so that _if_ zero-step fires, KVM can report the error to userspace without
+> > > having to retry, because KVM _knows_ that advancing past the zero-step isn't
+> > > something KVM can solve.
+> > > 
+> > >  : I'm not worried about any performance hit with zero-step, I'm worried about KVM
+> > >  : not being able to differentiate between a KVM bug and guest interference.  The
+> > >  : goal with a local retry is to make it so that KVM _never_ triggers zero-step,
+> > >  : unless there is a bug somewhere.  At that point, if zero-step fires, KVM can
+> > >    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > >  : report the error to userspace instead of trying to suppress guest activity, and
+> > >  : potentially from other KVM tasks too.
+> > > 
+> > > In other words, for the selftest you crafted, KVM reporting an error to userspace
+> > > due to zero-step would be working as intended.  
+> > Hmm, but the selftest is an example to show that 6 continuous EPT violations on
+> > the same GPA could trigger zero-step.
 > > 
-> > For vEL2 we write the virtual EL2 registers with an identical format directly
-> > into their EL1 counterpart, and translate the few registers that have a
-> > different format for the same effect on the execution when running a
-> > non-VHE guest guest hypervisor.
+> > For an extremely unlucky vCPU, is it still possible to fire zero step when
+> > nothing is wrong both in KVM and QEMU?
+> > e.g.
 > > 
-> > Based on an initial patch from Andre Przywara, rewritten many times
-> > since.
-> > 
-> > Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
-> >  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
-> >  arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 137 ++++++++++++++++++++-
-> >  3 files changed, 139 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > index 1579a3c08a36b..d67628d01bf5e 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > @@ -152,9 +152,10 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-> >  	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
-> >  }
-> >  
-> > -static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-> > +static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
-> > +					      u64 mpidr)
-> >  {
-> > -	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
-> > +	write_sysreg(mpidr,				vmpidr_el2);
-> >  
-> >  	if (has_vhe() ||
-> >  	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> > index 29305022bc048..dba101565de36 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
-> > @@ -28,7 +28,7 @@ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
-> >  
-> >  void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
-> >  {
-> > -	__sysreg_restore_el1_state(ctxt);
-> > +	__sysreg_restore_el1_state(ctxt, ctxt_sys_reg(ctxt, MPIDR_EL1));
-> >  	__sysreg_restore_common_state(ctxt);
-> >  	__sysreg_restore_user_state(ctxt);
-> >  	__sysreg_restore_el2_return_state(ctxt);
-> > diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> > index e12bd7d6d2dce..e0df14ead2657 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> > @@ -15,6 +15,108 @@
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_nested.h>
-> >  
-> > +static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
-> > +{
-> > +	/* These registers are common with EL1 */
-> > +	__vcpu_sys_reg(vcpu, PAR_EL1)	= read_sysreg(par_el1);
-> > +	__vcpu_sys_reg(vcpu, TPIDR_EL1)	= read_sysreg(tpidr_el1);
-> > +
-> > +	__vcpu_sys_reg(vcpu, ESR_EL2)	= read_sysreg_el1(SYS_ESR);
-> > +	__vcpu_sys_reg(vcpu, AFSR0_EL2)	= read_sysreg_el1(SYS_AFSR0);
-> > +	__vcpu_sys_reg(vcpu, AFSR1_EL2)	= read_sysreg_el1(SYS_AFSR1);
-> > +	__vcpu_sys_reg(vcpu, FAR_EL2)	= read_sysreg_el1(SYS_FAR);
-> > +	__vcpu_sys_reg(vcpu, MAIR_EL2)	= read_sysreg_el1(SYS_MAIR);
-> > +	__vcpu_sys_reg(vcpu, VBAR_EL2)	= read_sysreg_el1(SYS_VBAR);
-> > +	__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2) = read_sysreg_el1(SYS_CONTEXTIDR);
-> > +	__vcpu_sys_reg(vcpu, AMAIR_EL2)	= read_sysreg_el1(SYS_AMAIR);
-> > +
-> > +	/*
-> > +	 * In VHE mode those registers are compatible between EL1 and EL2,
-> > +	 * and the guest uses the _EL1 versions on the CPU naturally.
-> > +	 * So we save them into their _EL2 versions here.
-> > +	 * For nVHE mode we trap accesses to those registers, so our
-> > +	 * _EL2 copy in sys_regs[] is always up-to-date and we don't need
-> > +	 * to save anything here.
-> > +	 */
-> > +	if (vcpu_el2_e2h_is_set(vcpu)) {
-> > +		u64 val;
-> > +
-> > +		/*
-> > +		 * We don't save CPTR_EL2, as accesses to CPACR_EL1
-> > +		 * are always trapped, ensuring that the in-memory
-> > +		 * copy is always up-to-date. A small blessing...
-> > +		 */
-> > +		__vcpu_sys_reg(vcpu, SCTLR_EL2)	= read_sysreg_el1(SYS_SCTLR);
-> > +		__vcpu_sys_reg(vcpu, TTBR0_EL2)	= read_sysreg_el1(SYS_TTBR0);
-> > +		__vcpu_sys_reg(vcpu, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
-> > +		__vcpu_sys_reg(vcpu, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
-> > +
-> > +		/*
-> > +		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
-> > +		 * the interesting CNTHCTL_EL2 bits live. So preserve these
-> > +		 * bits when reading back the guest-visible value.
-> > +		 */
-> > +		val = read_sysreg_el1(SYS_CNTKCTL);
-> > +		val &= CNTKCTL_VALID_BITS;
-> > +		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) &= ~CNTKCTL_VALID_BITS;
-> > +		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) |= val;
-> > +	}
-> > +
-> > +	__vcpu_sys_reg(vcpu, SP_EL2)	= read_sysreg(sp_el1);
-> > +	__vcpu_sys_reg(vcpu, ELR_EL2)	= read_sysreg_el1(SYS_ELR);
-> > +	__vcpu_sys_reg(vcpu, SPSR_EL2)	= read_sysreg_el1(SYS_SPSR);
-> > +}
-> > +
-> > +static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
-> > +{
-> > +	u64 val;
-> > +
-> > +	/* These registers are common with EL1 */
-> > +	write_sysreg(__vcpu_sys_reg(vcpu, PAR_EL1),	par_el1);
-> > +	write_sysreg(__vcpu_sys_reg(vcpu, TPIDR_EL1),	tpidr_el1);
-> > +
-> > +	write_sysreg(read_cpuid_id(),				vpidr_el2);
-> > +	write_sysreg(__vcpu_sys_reg(vcpu, MPIDR_EL1),		vmpidr_el2);
-> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, MAIR_EL2),	SYS_MAIR);
-> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, VBAR_EL2),	SYS_VBAR);
-> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2),	SYS_CONTEXTIDR);
-> > +	write_sysreg_el1(__vcpu_sys_reg(vcpu, AMAIR_EL2),	SYS_AMAIR);
-> > +
-> > +	if (vcpu_el2_e2h_is_set(vcpu)) {
-> > +		/*
-> > +		 * In VHE mode those registers are compatible between
-> > +		 * EL1 and EL2.
-> > +		 */
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, SCTLR_EL2),   SYS_SCTLR);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, CPTR_EL2),    SYS_CPACR);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR0_EL2),   SYS_TTBR0);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR1_EL2),   SYS_TTBR1);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TCR_EL2),	    SYS_TCR);
-> > +		write_sysreg_el1(__vcpu_sys_reg(vcpu, CNTHCTL_EL2), SYS_CNTKCTL);
-> > +	} else {
-> > +		/*
-> > +		 * CNTHCTL_EL2 only affects EL1 when running nVHE, so
-> > +		 * no need to restore it.
-> > +		 */
+> > 1st: "fault->is_private != kvm_mem_is_private(kvm, fault->gfn)" is found.
+> > 2nd-6th: try_cmpxchg64() fails on each level SPTEs (5 levels in total)
 > 
-> I'm having such a hard time parsing the comment - might be just me coming back to
-> this code after such a long time.
-> 
-> If CNTHCTL_EL2 only affects EL1 when running nVHE, and the else branch deals
-> with the nVHE case, why isn't CNTHCTL_EL2 restored?
+> Very technically, this shouldn't be possible.  The only way for there to be
+> contention on the leaf SPTE is if some other KVM task installed a SPTE, i.e. the
+> 6th attempt should succeed, even if the faulting vCPU wasn't the one to create
+> the SPTE.
+You are right!
+I just realized that if TDX code retries internally for FROZEN_SPTEs, the 6th
+attempt should succeed.
 
-Because it has no impact at all? As in nothing? Niente? Rien? Zilch?
-We enter the guest's EL2, so why would we bother with restoring a
-guest register that has no influence on what we run?
+But I found below might be another case to return RET_PF_RETRY and trigger
+zero-step:
 
-> 
-> As for the 'only' part of the comment: when E2H=1, bits 10 and 11, EL1PCTEN and
-> EL1PTEN (why isn't this named EL1PCEN if it does the same thing as bit 1 when
-> E2H=0?), trap EL1 and EL0 accesses to physical counter and timer registers.
-> 
-> Or 'only' in this context means only EL1, and not EL2 also?
+Suppose GFNs are shared from 0x80000 - 0x80200,
+with HVA starting from hva1 of size 0x200
 
-None of this makes any sense to me. I don't understand your E2H
-consideration, nor your digression on the meaning of the word 'only'.
 
-Look at the architecture. Do you see *ANY* bit in CNTHCTL_EL2 having
-*ANY* influence on EL2 when HCR_EL2.E2H=0? Don't you then come to the
-conclusion that CNTHCTL_EL2 only affects EL1?
+     vCPU 0                                    vCPU 1
+                                     1. Access GFN 0x80002
+	                             2. convert GFN 0x80002 to private
 
-But surely you've spotted something I can't see, and I must be
-specially thick today... Please enlighten me.
+3.munmap hva1 of size 0x200
+  kvm_mmu_invalidate_begin
+  mmu_invalidate_range_start=0x80000
+  mmu_invalidate_range_end=0x80200
 
-	M.
+                                     4. kvm_faultin_pfn
+	                                mmu_invalidate_retry_gfn_unsafe of
+				        GFN 0x80002 and return RET_PF_RETRY!
 
--- 
-Without deviation from the norm, progress is not possible.
+5.kvm_mmu_invalidate_end
+
+
+Before step 5, step 4 will produce RET_PF_RETRY and re-enter guest.
+
 
