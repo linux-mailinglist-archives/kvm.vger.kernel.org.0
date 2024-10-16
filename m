@@ -1,257 +1,749 @@
-Return-Path: <kvm+bounces-29016-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29018-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDE379A10DB
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 19:42:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A25199A111F
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 20:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAA791C2251B
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 17:42:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE681B25513
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 18:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF95212F1E;
-	Wed, 16 Oct 2024 17:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D342139B5;
+	Wed, 16 Oct 2024 18:03:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bMJEl/vb"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y6Qq5Ag0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8AF1212651;
-	Wed, 16 Oct 2024 17:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729100532; cv=fail; b=ahH2zNl6dneHJ4pf51O//OZZ5x2DDuXoQ7XhLxVHJUUt8oB4q8FOe65yTs+z9YhKytCiEsapyP5a8nFY+7RIHHn3zo+wGjSj8bNMqim1JdvPbtFG2OFZZe02flA0ioYNFDddxqn6s48mNyj8h4Cxp0NZ9yW2PJpntLt/mclsxaw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729100532; c=relaxed/simple;
-	bh=quPpLeofJ5jiAsPCV/C0hhWFm29qCT23xEJj0CCQnEI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KljCIgDGxK2fVnQl2Qm4p4RjLNMeUXLUyXveJoDYdguVzCRTnjmzgXmx58i3nPidwMVouhJUMQtMJkkp2G+7m00tUjI/YWspcKx8FabMTOoyPmpsVVmErCK6SJQguV9OA2rnTlx6GNlXNwuMBKBBWsKK1mE81QcQbodDGA5QKRY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bMJEl/vb; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729100530; x=1760636530;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=quPpLeofJ5jiAsPCV/C0hhWFm29qCT23xEJj0CCQnEI=;
-  b=bMJEl/vbQN9Ahu09asjp2b6jGmxskODFBDW4CbY621XMBTuo7JQrNwi+
-   NEFIr0YIAoOQWNzLj71tPgCzTZJFjU1kkmEUuQxaX1BASlMyQ7Ak53bhG
-   +E7DYhFVK5NBvhXDOJAT2I0XYyEKDSrti4JWXtHu21rTvLAsZBTpHhH9I
-   kEd6t1ovlgfR1irX3hddE+k6pdJd1sOkUr6Cu+aYrqMUeqvsjPnG8/ENL
-   I+tFWVISEhIhpBVAoT9H8+qE54TqmV+QnwkbGb69yCPWdjRtajAnZx3JS
-   jFKBRbNLspbUKe8/0LGN4pvD5/3FRRVbga3nwTI1Tk9G0eezbHSlteAxC
-   Q==;
-X-CSE-ConnectionGUID: 8tXrwa0DQI2e4PxT2Zh8uQ==
-X-CSE-MsgGUID: KwsR6PqQQ0Si03tHnzq3VQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11226"; a="53978126"
-X-IronPort-AV: E=Sophos;i="6.11,208,1725346800"; 
-   d="scan'208";a="53978126"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 10:42:10 -0700
-X-CSE-ConnectionGUID: LI+K4Ct8SrGYWfit9LjNVg==
-X-CSE-MsgGUID: Vefb7toSReiMgpbvnJYG+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,208,1725346800"; 
-   d="scan'208";a="83373379"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Oct 2024 10:42:10 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 16 Oct 2024 10:42:09 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 16 Oct 2024 10:42:08 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 16 Oct 2024 10:42:08 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 16 Oct 2024 10:42:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Gjq3fjzFIY1ze7JSahIZGN08LD0psfrYMZ7T2KAPOH6Ja58zw+P55sLmk4xXoIcIdw3C4wsxiAb/0QGedegezC8TOCPlhH9Cd3NikvXcXtMPzFQVZoAoThh6v73mWd20CH2L0CD5QfDiT5HdbNmgzXSwow/CWRaAtwGYymBmoMFpUale9EtdKL2WrACMFsIKCdMkz5rgfQhMvpR7oEvSZ2ER+V+if29GgNT39l4E+swoB1OUOQOBeuRaIUmU49VPZAWQleUWIGY1Bo2FiV5AVvl0BYcd0bguK8fhx93gMXjiABHIZqGdNAd+ACC4IJzeNB9SKd+0IYUqZCcHRHTVlA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=quPpLeofJ5jiAsPCV/C0hhWFm29qCT23xEJj0CCQnEI=;
- b=MkD7L4ISQSMnInZYrVc3oyjKtbtVhj69C3AvOWbkBoSfbPVMxfgMN5Z8TZEXjoLWgmszeHBCX1NcGPzyY7l0bfhmh8U68718CAx8mQWpw8QBN+sPWCGsZUFUZPg6vYxl5fQNqOdtfTH+k6sxV7g87+SWkjFyPwwZnlAiKGAlP9/u1sWj4u9HsYozYM/K58WvKEzpZceoHGfh7LlttMK+q6zFXaGgAf9gN0rJQESoQiZ8be6vVaYPUe0YAg4PCcFSxeoewaQnWYS1KiPvHsCM802P47o+FSL7RGCSU8g1FZLjN+RwUVjZL20yt4p4R31vt9gM+1golJqglEg91Euutg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by SA2PR11MB5178.namprd11.prod.outlook.com (2603:10b6:806:fa::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.18; Wed, 16 Oct
- 2024 17:42:06 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%5]) with mapi id 15.20.8069.016; Wed, 16 Oct 2024
- 17:42:06 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "Hunter, Adrian" <adrian.hunter@intel.com>, "yuan.yao@linux.intel.com"
-	<yuan.yao@linux.intel.com>
-CC: "seanjc@google.com" <seanjc@google.com>, "Huang, Kai"
-	<kai.huang@intel.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH 18/25] KVM: TDX: Do TDX specific vcpu initialization
-Thread-Topic: [PATCH 18/25] KVM: TDX: Do TDX specific vcpu initialization
-Thread-Index: AQHa7QnTM8YJSmcK70mWBvdOl91Ku7Ik046AgFoKj4CACy09gA==
-Date: Wed, 16 Oct 2024 17:42:05 +0000
-Message-ID: <1be47d7f9d4b812c110572d8b413ecdbb537ceb7.camel@intel.com>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
-	 <20240812224820.34826-19-rick.p.edgecombe@intel.com>
-	 <20240813080009.zowu3woyffwlyazu@yy-desk-7060>
-	 <1a200cd3-ad73-4a53-bc48-661f7d022ac0@intel.com>
-In-Reply-To: <1a200cd3-ad73-4a53-bc48-661f7d022ac0@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|SA2PR11MB5178:EE_
-x-ms-office365-filtering-correlation-id: 5fc682a5-814a-4f8a-f5d9-08dcee09da09
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?YmNoNlh5M210V3dOeGV1ZWZuNE82OFo0Y3BKM3h1amtXTUlyMkhhRFg2MXRU?=
- =?utf-8?B?cUtReUUxRUNpREpYQ0phclgvR3BGMXNRVFlnb3dTenc5YW1xTEdua1hUd1Nt?=
- =?utf-8?B?MHF3bTRZWVlVS2R5cjM1L21oVDRLKy9TVmYrK2ZRSHlJdUxMWVh4aGdtQ1gx?=
- =?utf-8?B?U0cyRSswcjZRdFhyN3lUTDVHbHpHZkVpZGg4YzdNS2ZNNjBWYmg5WFNiaGJ6?=
- =?utf-8?B?cHZIR1JmOERlWC9pb0w1OXNBdDRMdmhQbFZxSEhzUUMxODMrdGlOMTJ1azFu?=
- =?utf-8?B?bzlXVU5tdG1LRmpNSTE4dVpZTXRleHE1M0F0b2dpOVVOTFdXRHZGZ1hocXR0?=
- =?utf-8?B?aGVvM2dQS3k2aUhJallIN0xUbStrM2hTOUpJVzBWanp5YnVpVmhHQ3N2MWlx?=
- =?utf-8?B?ZFprYUd6aEVscVZhRnJlRWExZUF5SXN4My9MMVIyUnBBbWUyQkdUa0NwUFZP?=
- =?utf-8?B?NlU0VXM1NVpVcVBnL3hGc0Q3S3JlR3FJSEtyOEI2WnNGbFkyOGh2d2c1dzky?=
- =?utf-8?B?RHRVV2o3ZlNXUElROURmMlpsMi92S0RaamdkdVc1M255d01UQ2dvWDlhaEth?=
- =?utf-8?B?QVdhbmIyUHVWQ1N4Smd1YzJGZlp0ZUVvSU1KMS9JanFFWmROMmhROWFya250?=
- =?utf-8?B?M0V0a1VRM3dySGo2QmgweFI1OTBROHZRSGVTcVpscUczYTgrU0Q1Mm5OaFdX?=
- =?utf-8?B?K2NmSlNuYUcxTE9zL1pFNDhOMTFkdkszbzBEOE9hRW53ejV4NXJSbzR2b3Nq?=
- =?utf-8?B?eS8vdk9jOVh6SHVONnNhQ01ydGdWS2ZBN1lWZUVPYzdPYksxWGp2TlhqMkY3?=
- =?utf-8?B?RjluMTVRTm5VMnNOOTNrUXBRVU1SQXJnL2d3RDROVFZYR1pENVdoSGVVWWo2?=
- =?utf-8?B?WTMra0hMN1U4VEhIaHlZWnFrbUoxbG9ycTk0ZmZEOU0rbVhuak9GS1VRWmQ5?=
- =?utf-8?B?cUkzSXdiNElKRFU4U05VUy9sRDVqU2VUcjJtSWxNVDY5Z0VZRWtYbnFsa3Zl?=
- =?utf-8?B?WXZyb0NJWGUzdmtyVGRaY0VyVHlvRVZVdmozc1lCQnZweG80cUMrTUNGU2xY?=
- =?utf-8?B?V3ljU2NMaG15Qi9oMmpJd0xpNWFsQVA1UTFocWFzYjJ3dVA5NXRSeHhkVlZr?=
- =?utf-8?B?YU9CMVppMFk3V0tkb0RIa2FuWGc3bDVTbS85S2Y0Ylo2Y0xnN0FRMWM2bk5L?=
- =?utf-8?B?ZXZ6WXN3eVd0U0ZaYlpTVE4wY2ZzOTFlVXR3VGFkZTVaMmlzbGJId3FUUGtn?=
- =?utf-8?B?SU5qVTJiR01DR1Jza2t4Q25EYS9WSEI3U09TdGppQVM3R1ZhYVF4VGtOLzhG?=
- =?utf-8?B?WjJUNmxnUm5VdEYxbHJpblFXbGJ3K0I3MUJra0RSY1A5ckgrend4QWdLcmQv?=
- =?utf-8?B?TjhsR0RzUGlsTEpTNzQxa25JZnpNY1FlUUJIQnIvZTJ4Y2tsdGh1L1NvZnFo?=
- =?utf-8?B?UzFwK2JoeFZIUkRJcVlIclRRRmhvVUg0bElwalNGd2dqcXR1VVArTU5yUWQv?=
- =?utf-8?B?VmNWWWJVR3pvRm5TdUNLU0xrZjlxdStJdUx1SGhjQ1A2ZkNwOWo1TG5zZ1Ni?=
- =?utf-8?B?Nyt4WVZDeFcrNXBZSisrSlQwTjlCeHNWd1dmOXc0S0p3WWlJcXRyNGxEbXJH?=
- =?utf-8?B?SnZGVkJzdFgrZkh2N0M5MEJ1NWxWSldkOXdMTmo5U0dka3AyYjlZUUpCMnEx?=
- =?utf-8?B?eDdJcjJGTUZUemg0ZWNCTzR6NUdZN2hOR2RLblh0MEhpWHFPWGNkUWFVbytR?=
- =?utf-8?B?cGhCb1FNRkpDb2dvY3gyc2hITDJlZkJvUGE1bXdNQkVLSnFqOXBhcVc3RWVI?=
- =?utf-8?B?c3RSWW9qVVVzV29FWWVrQT09?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZFFEb21IcjNsNkZkaStMc3BjTUtIM1BqMVhXL1lBUmpiSm5XNVVhRXNMeVl2?=
- =?utf-8?B?aTZrRXgyUk1XYlJicC9QRWx2ekZjbGtYTTJvQjczMGkreEw2NVcxNWJhalNq?=
- =?utf-8?B?TFRIT29KTjhwZStwYUI2QWlsRTUzRGtXZzR1aGFlaEtOazJCU2xocVErTmgw?=
- =?utf-8?B?ZWllMVp0YkY3UGF0YmdDdEZaQXNnMnBKNlFOYWhTWnNBMmRsNzFOU1NJN3E0?=
- =?utf-8?B?Ti92UFY1eEJoZFNnU3dnY2x6NFJuVW1EK0x0b0JPU0cwZzdPUG5KSS9vYVZM?=
- =?utf-8?B?VXoxOWhicjBpYjRFbk9kV094clNXWkJGZjczWnFCRG5kdXRaaXpkcEg4Zkdq?=
- =?utf-8?B?cmFvM3RSKzhrbUtsTzNpbCtCdmdDcEhYSVJyQXphTGZwNFo0R1N2Nzhoa3E1?=
- =?utf-8?B?clloZ3VSWlpXalFjc1pidjdXeEhQbG9WMjB5S1I4dTVDV1NWb2JMR05UckFV?=
- =?utf-8?B?NDNnMzEvWS85dFhpRjR0MXAyY1MvOVN0dzRxVnBmUmZpUndPdGNrbTZZK3Zl?=
- =?utf-8?B?WGxsVXpkbFU3YmhWelp4Q3NCMU5KTEtrUGtDYnJOaGFadTIyNnZDUGhKSzVI?=
- =?utf-8?B?b0gvM1RTZ0RtQTNsQzQwT3lreG4rQnF4Z1FrcXBsQ2hkMCtpOWpURWZWaXJn?=
- =?utf-8?B?dFk4U2NJZzF0SVRTQnBWQi83aXVBNVkwL1pSZXhGKzFLL1pxQzkxS0tzR0lV?=
- =?utf-8?B?Q3I4bTgwUzBnSFhDUm9kcFNyMU02UDFMQkx0dTdDSk9MTUZpRVQ3WThoaW92?=
- =?utf-8?B?RktrMGV6VmU3WTBSdjdyeVFOWDdZcEpwYlZHTWJuM1QrUTM5bXAwbW1aN3ha?=
- =?utf-8?B?bVhlMERMMTZWUVRvYTVXb1JGVitIQzROMUJPdTRBeHgzYjZ5ci9YcXAwVkFq?=
- =?utf-8?B?TmpmaTdjYlJSNVFaVWFxY2dFV1VZTVNoZW02ZWRGM1pYdm1pbVhtQTR0TDFw?=
- =?utf-8?B?L3R4c1VyZkxONDk2QWlNakNrZTBNa25ybkdvSCt6cThCRkhJK0hIbEdJZkda?=
- =?utf-8?B?ZTlRYnBZQVRmcGVzYnVmM056S3Bta2VWQTBjaWxjNEJ4MXJoNlBtR2xLUUR3?=
- =?utf-8?B?S3pEdkFUQlpKOHhLaTlFZklhNkNKWS9samlRcGhBVFd6b2tqYXlpZHIraFhh?=
- =?utf-8?B?WWNLL0VnSWh3RDZ0S1VDSXVaZWNpL05TM29XYWZGMFR6b3A4elJxQi9yMWc2?=
- =?utf-8?B?S3RnWmNxTmFpek1pbkhKcFZuejJGVXNBN2hVTEZ1bHJ3TGsvWklpRit1dUlH?=
- =?utf-8?B?dW5LTytMeU42VXJTWXQzMFJvbEhZeTVQYnptWUtPd0h6VTYycmFXZ1I3cVVu?=
- =?utf-8?B?TEJYeWZPWXhlSzRXTHptd01DTnpRU0I0Rkh5dXIwYlprc3ZEMjBHTFJRQlk2?=
- =?utf-8?B?ekU5djlmOFVsd2JoWllORXpBeTZpMkEvazhEK0dYcXBWMFZxSjZYNVgxOGJO?=
- =?utf-8?B?Qy9McDdoemV5bGNGYnVDd09NNk5KOXRvWWlPRmMwdHVtcEJCMHVsa3RJWjln?=
- =?utf-8?B?Mk1LZzRZdzBKcEh3MlNqSEJBYXhOT1JZenVWdVB3bHRFeXFZMll5Zys2NkZY?=
- =?utf-8?B?ODUwMy9EcllweE1MdS9yeDNzTktzc3N5ODFPZkx5RzBzazhhNS9wRU00aHJG?=
- =?utf-8?B?OHZjK3dmSnl0MkhoaEJ5cTFUUTFFcGdSZmgvSk44a1FINk02MUErbFgvZjE0?=
- =?utf-8?B?RE5wc0hyd0l4VVd5d3JZMno0dUxFZTFKN2xmeW9ZemZOc3c2MFZzbnFLOHJM?=
- =?utf-8?B?VDVQME1ia3pPUGlER2I5d1Q1QVc3SW9iNHFiNzcyUW8vSlFkSmpla0g2d0Zi?=
- =?utf-8?B?N2N6RkkxK2txYnVRb01nNVdaS1hIZ0dGSmdibnV2Y05xOTBsK29INGFtUTlF?=
- =?utf-8?B?RHNLeHVIV2d3dUFoRUJqck16OGt2aXJmZGdiRW9PaXhsUklUTWtZYVhndFcx?=
- =?utf-8?B?NDFpT2NZVGdtNW5mMGJNVmVKd05FSjVYcnAwbDQ1YVpINWoxTmx6eGllN0JC?=
- =?utf-8?B?U3BGczdla1BnWEYwM2kwTTJaMVR1Wk16ZUt2NlVIa3lGWFBmV1pNQ29LZlpw?=
- =?utf-8?B?MzdHenlZRlNyWmZxRHBHSzlHSFVvOTZkYWtac3I3aGh1ZVdTUWtnbUhJOVBz?=
- =?utf-8?B?d3NXUGRLMm8wOEdtdG8vRVpXOVdpOXB0SmNBU1oxeHV5Nk00TytHbWZiRE1G?=
- =?utf-8?B?VUE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F605C90A97E59B49B5C61DE965DFC2D3@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AAF14A09E;
+	Wed, 16 Oct 2024 18:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729101812; cv=none; b=fVofO7ZZsXaBzWKSear/+S1a8unaTQ32uWnEyEk5eGKMe5CHEj/lw5IQW2sNfLHIalz7p0hSI0GTGi3+Bwoe5d0WYyevSSG+jsuTCm8fVP0y/qMnSMoS7WLObEAoTw4RmYGhcQRbWmouk/b4XvGGOCkQwL+2oZI9hlUBGpdTcy8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729101812; c=relaxed/simple;
+	bh=UXCcOWKZV6I6/yVF2lJgJlrVeIINzW/NgqHEuwaLZT4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=blemapqO0EcsqyBBQPh7nCuepMHmS2DCaSWWl7LY3cBU+6MoF3+NU479EwJajJBpVtqDt/ykc20QH/KOLgZLe+WA6ziPE0zTKXOd5tZLjt7SGRD+8HvvbhKw5E1bti7tNdIrcQ3bZSeB/gykPi3jeRQgU6aj8z9on1paSlimgH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Y6Qq5Ag0; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49GFcfu1017296;
+	Wed, 16 Oct 2024 18:03:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=GhoLq1R3rr4ntpqOd0mFpzX3nXiEXAbiMKdPNo5ol
+	bU=; b=Y6Qq5Ag0XO4pVSLIyH8mrG4YNbaYW8+4HpzmBW9cK1ENvrg8DVc+lEEeo
+	XZsTPIwqmkkFW0PzL3Vl9PKJoDyP+JKpST08Al2sr3hljKYa41kyDffZjjVxx4Zb
+	ZETM4kDOZZjQwO67Kp6SAO5jsN+5FoMxTvSB9f5MPGTxv55bFnPoIWCXKGFSLzfy
+	gP+ZsWZnHzBD0Cg1XaPyhq6vVYV9KyfAdq19erXNTC5Avn8Xj5glt8wCHIwXUoFo
+	9In2fQTALklkevgnabz0QvgdJyrlZW9G6UknwsqjWuFgVAKkaK7O0rprLhmP8r4O
+	9pvss3sd+cIvqdsK6CWkd9rV1Lrjw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42af3t93kh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Oct 2024 18:03:28 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49GI3Rpo019979;
+	Wed, 16 Oct 2024 18:03:27 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42af3t93kf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Oct 2024 18:03:27 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49GEaAvA005377;
+	Wed, 16 Oct 2024 18:03:26 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4285njagrf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Oct 2024 18:03:26 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49GI3NpE50004464
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Oct 2024 18:03:23 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 11CF620049;
+	Wed, 16 Oct 2024 18:03:23 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AA6692004B;
+	Wed, 16 Oct 2024 18:03:22 +0000 (GMT)
+Received: from tuxmaker.lnxne.boe (unknown [9.152.85.9])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 16 Oct 2024 18:03:22 +0000 (GMT)
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: =?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>, Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v4 0/6] s390x: STFLE nested interpretation
+Date: Wed, 16 Oct 2024 20:03:11 +0200
+Message-ID: <20241016180320.686132-1-nsg@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5fc682a5-814a-4f8a-f5d9-08dcee09da09
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2024 17:42:05.9725
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2isYJ/jwxlGG4i8Hff6hz7LpCOsFhe/Cg+PptIHTSq3dy5ZyOda9SDXEsQmFnuNw+FblyQbGc3JimdiyoNHebw9WuH5YV4KVWH9qOGNwdwc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5178
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: WEho0cf4UHaqne8akJzPU35RNOqpnq45
+X-Proofpoint-ORIG-GUID: oWYUpPuIIGwB7IrPZq5ixhvv5GmGsLHI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ bulkscore=0 impostorscore=0 malwarescore=0 clxscore=1015
+ priorityscore=1501 spamscore=0 adultscore=0 phishscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410160115
 
-T24gV2VkLCAyMDI0LTEwLTA5IGF0IDE4OjAxICswMzAwLCBBZHJpYW4gSHVudGVyIHdyb3RlOg0K
-PiB0ZGhfdnBfaW5pdF9hcGljaWQoKSBwYXNzZXMgeDJBUElDIElEIHRvIFRESC5WUC5JTklUIHdo
-aWNoDQo+IGlzIG9uZSBvZiB0aGUgc3RlcHMgZm9yIHRoZSBURFggTW9kdWxlIHRvIHN1cHBvcnQg
-dG9wb2xvZ3kNCj4gaW5mb3JtYXRpb24gZm9yIHRoZSBndWVzdCBpLmUuIENQVUlEIGxlYWYgMHhC
-IGFuZCBDUFVJRCBsZWFmIDB4MUYuDQo+IA0KPiBJZiB0aGUgaG9zdCBWTU0gZG9lcyBub3QgcHJv
-dmlkZSBDUFVJRCBsZWFmIDB4MUYgdmFsdWVzDQo+IChpLmUuIHRoZSB2YWx1ZXMgYXJlIDApLCB0
-aGVuIHRoZSBURFggTW9kdWxlIHdpbGwgdXNlIG5hdGl2ZQ0KPiB2YWx1ZXMgZm9yIGJvdGggQ1BV
-SUQgbGVhZiAweDFGIGFuZCBDUFVJRCBsZWFmIDB4Qi4NCj4gDQo+IFRvIGdldCAweDFGLzB4QiB0
-aGUgZ3Vlc3QgbXVzdCBhbHNvIG9wdC1pbiBieSBzZXR0aW5nDQo+IFREQ1MuVERfQ1RMUy5FTlVN
-X1RPUE9MT0dZIHRvIDEuwqAgQUZBSUNUIGN1cnJlbnRseSBMaW51eA0KPiBkb2VzIG5vdCBkbyB0
-aGF0Lg0KPiANCj4gSW4gdGhlIHRkaF92cF9pbml0KCkgY2FzZSwgdG9wb2xvZ3kgaW5mb3JtYXRp
-b24gd2lsbCBub3QgYmUNCj4gc3VwcG9ydGVkLg0KPiANCj4gSWYgdG9wb2xvZ3kgaW5mb3JtYXRp
-b24gaXMgbm90IHN1cHBvcnRlZCBDUFVJRCBsZWFmIDB4QiBhbmQNCj4gQ1BVSUQgbGVhZiAweDFG
-IHdpbGwgI1ZFLCBhbmQgYSBMaW51eCBndWVzdCB3aWxsIHJldHVybiB6ZXJvcy4NCj4gDQo+IFNv
-LCB5ZXMsIGl0IHNlZW1zIGxpa2UgdGRoX3ZwX2luaXRfYXBpY2lkKCkgc2hvdWxkIG9ubHkNCj4g
-YmUgY2FsbGVkIGlmIHRoZXJlIGlzIG5vbi16ZXJvIENQVUlEIGxlYWYgMHgxRiB2YWx1ZXMgcHJv
-dmlkZWQNCj4gYnkgaG9zdCBWTU0uIGUuZy4gYWRkIGEgaGVscGVyIGZ1bmN0aW9uDQo+IA0KPiBi
-b29sIHRkeF90ZF9lbnVtX3RvcG9sb2d5KHN0cnVjdCBrdm1fY3B1aWQyICpjcHVpZCkNCj4gew0K
-PiAJY29uc3Qgc3RydWN0IHRkeF9zeXNfaW5mb19mZWF0dXJlcyAqbW9kaW5mbyA9ICZ0ZHhfc3lz
-aW5mby0+ZmVhdHVyZXM7DQo+IAljb25zdCBzdHJ1Y3Qga3ZtX2NwdWlkX2VudHJ5MiAqZW50cnk7
-DQo+IA0KPiAJaWYgKCEobW9kaW5mby0+dGR4X2ZlYXR1cmVzMCAmIE1EX0ZJRUxEX0lEX0ZFQVRV
-UkVTMF9UT1BPTE9HWV9FTlVNKSkNCj4gCQlyZXR1cm4gZmFsc2U7DQo+IA0KPiAJZW50cnkgPSBr
-dm1fZmluZF9jcHVpZF9lbnRyeTIoY3B1aWQtPmVudHJpZXMsIGNwdWlkLT5uZW50LCAweDFmLCAw
-KTsNCj4gCWlmICghZW50cnkpDQo+IAkJcmV0dXJuIGZhbHNlOw0KPiANCj4gCXJldHVybiBlbnRy
-eS0+ZWF4IHx8IGVudHJ5LT5lYnggfHwgZW50cnktPmVjeCB8fCBlbnRyeS0+ZWR4Ow0KPiB9DQoN
-CktWTSB1c3VhbGx5IGxlYXZlcyBpdCB1cCB0byB1c2Vyc3BhY2UgdG8gbm90IGNyZWF0ZSBub25z
-ZW5zaWNhbCBWTXMuIFNvIEkgdGhpbmsNCndlIGNhbiBza2lwIHRoZSBjaGVjayBpbiBLVk0uDQoN
-CkluIHRoYXQgY2FzZSwgZG8geW91IHNlZSBhIG5lZWQgZm9yIHRoZSB2YW5pbGxhIHRkaF92cF9p
-bml0KCkgU0VBTUNBTEwgd3JhcHBlcj8NCg0KVGhlIFREWCBtb2R1bGUgdmVyc2lvbiB3ZSBuZWVk
-IGFscmVhZHkgc3VwcG9ydHMgZW51bV90b3BvbG9neSwgc28gdGhlIGNvZGU6DQoJaWYgKG1vZGlu
-Zm8tPnRkeF9mZWF0dXJlczAgJiBNRF9GSUVMRF9JRF9GRUFUVVJFUzBfVE9QT0xPR1lfRU5VTSkN
-CgkJZXJyID0gdGRoX3ZwX2luaXRfYXBpY2lkKHRkeCwgdmNwdV9yY3gsIHZjcHUtPnZjcHVfaWQp
-Ow0KCWVsc2UNCgkJZXJyID0gdGRoX3ZwX2luaXQodGR4LCB2Y3B1X3JjeCk7DQoNClRoZSB0ZGhf
-dnBfaW5pdCgpIGJyYW5jaCBzaG91bGRuJ3QgYmUgaGl0Lg0K
+v3 -> v4:
+ * pick up R-b's (thanks Claudio, Janosch, Nick)
+ * move diag intercept functions into sie-icpt.[hc]
+   expose some more functionality to avoid interpreting the diag text
+   with bit operations
+ * move snippet exit functions into snippet-exit.h,
+   guest part in s390x/snippet/lib
+ * add barrier before snippet exit
+ * simplify test (host and guest), add skip message
+
+Add a test case that tests the interpretation of STFLE performed by a
+nested guest using a snippet.
+Also add some functionality to s390x lib, namely:
+* exit (optionally with return code) from snippet
+* add function for checking diag intercepts, replacing pv_icptdata_check_diag
+
+v2 -> v3:
+ * pick up Ack (thanks Andrew)
+ * minor cosmetic change to rand generator
+ * add sie_is_pv function
+ * extend sie_is_diag_icpt to support pv, replace pv_icptdata_check_diag
+
+v1 -> v2:
+ * implement SHA-256 based PRNG
+ * pick up R-b (thanks Claudio)
+ * change snippet exit API and implementation (thanks Claudio)
+ * add stfle-sie to unittests.cfg
+
+Nina Schoetterl-Glausch (6):
+  s390x: lib: Remove double include
+  s390x: Add sie_is_pv
+  s390x: Add function for checking diagnose intercepts
+  s390x: Add library functions for exiting from snippet
+  s390x: Use library functions for snippet exit
+  s390x: Add test for STFLE interpretive execution (format-0)
+
+ s390x/Makefile                    |   7 +-
+ lib/s390x/asm/arch_def.h          |  13 +++
+ lib/s390x/asm/facility.h          |  10 ++-
+ lib/s390x/pv_icptdata.h           |  42 ---------
+ lib/s390x/sie-icpt.h              |  39 +++++++++
+ lib/s390x/sie.h                   |   6 ++
+ lib/s390x/snippet-exit.h          |  47 ++++++++++
+ lib/s390x/sie-icpt.c              |  60 +++++++++++++
+ lib/s390x/sie.c                   |   5 +-
+ s390x/snippets/lib/snippet-exit.h |  28 ++++++
+ s390x/pv-diags.c                  |   9 +-
+ s390x/pv-icptcode.c               |  12 +--
+ s390x/pv-ipl.c                    |   8 +-
+ s390x/sie-dat.c                   |  12 +--
+ s390x/snippets/c/sie-dat.c        |  19 +---
+ s390x/snippets/c/stfle.c          |  29 +++++++
+ s390x/stfle-sie.c                 | 138 ++++++++++++++++++++++++++++++
+ s390x/unittests.cfg               |   3 +
+ 18 files changed, 399 insertions(+), 88 deletions(-)
+ delete mode 100644 lib/s390x/pv_icptdata.h
+ create mode 100644 lib/s390x/sie-icpt.h
+ create mode 100644 lib/s390x/snippet-exit.h
+ create mode 100644 lib/s390x/sie-icpt.c
+ create mode 100644 s390x/snippets/lib/snippet-exit.h
+ create mode 100644 s390x/snippets/c/stfle.c
+ create mode 100644 s390x/stfle-sie.c
+
+Range-diff against v3:
+1:  baecabf2 < -:  -------- lib: Add pseudo random functions
+2:  b30314eb ! 1:  74832900 s390x: lib: Remove double include
+    @@ Commit message
+         libcflat.h was included twice.
+     
+         Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+    +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+         Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+     
+      ## lib/s390x/sie.c ##
+3:  f2af539b ! 2:  973607d1 s390x: Add sie_is_pv
+    @@ Commit message
+     
+         Add a function to check if a guest VM is currently running protected.
+     
+    +    Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+    +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+    +    Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+         Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+     
+      ## lib/s390x/sie.h ##
+4:  c4331d19 ! 3:  56f16e10 s390x: Add function for checking diagnose intercepts
+    @@ Commit message
+     
+         Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+     
+    + ## s390x/Makefile ##
+    +@@ s390x/Makefile: cflatobjs += lib/s390x/css_lib.o
+    + cflatobjs += lib/s390x/malloc_io.o
+    + cflatobjs += lib/s390x/uv.o
+    + cflatobjs += lib/s390x/sie.o
+    ++cflatobjs += lib/s390x/sie-icpt.o
+    + cflatobjs += lib/s390x/fault.o
+    + 
+    + OBJDIRS += lib/s390x
+    +
+      ## lib/s390x/pv_icptdata.h (deleted) ##
+     @@
+     -/* SPDX-License-Identifier: GPL-2.0-only */
+    @@ lib/s390x/pv_icptdata.h (deleted)
+     -}
+     -#endif
+     
+    - ## lib/s390x/sie.h ##
+    -@@ lib/s390x/sie.h: static inline bool sie_is_pv(struct vm *vm)
+    - 	return vm->sblk->sdf == 2;
+    - }
+    - 
+    + ## lib/s390x/sie-icpt.h (new) ##
+    +@@
+    ++/* SPDX-License-Identifier: GPL-2.0-only */
+    ++/*
+    ++ * Functionality for SIE interception handling.
+    ++ *
+    ++ * Copyright IBM Corp. 2024
+    ++ */
+    ++
+    ++#ifndef _S390X_SIE_ICPT_H_
+    ++#define _S390X_SIE_ICPT_H_
+    ++
+    ++#include <libcflat.h>
+    ++#include <sie.h>
+    ++
+    ++struct diag_itext {
+    ++	uint64_t opcode   :  8;
+    ++	uint64_t r_1      :  4;
+    ++	uint64_t r_2      :  4;
+    ++	uint64_t r_base   :  4;
+    ++	uint64_t displace : 12;
+    ++	uint64_t zero     : 16;
+    ++	uint64_t          : 16;
+    ++};
+    ++
+    ++struct diag_itext sblk_ip_as_diag(struct kvm_s390_sie_block *sblk);
+    ++
+     +/**
+     + * sie_is_diag_icpt() - Check if intercept is due to diagnose instruction
+     + * @vm: the guest
+     + * @diag: the expected diagnose code
+     + *
+     + * Check that the intercept is due to diagnose @diag and valid.
+    -+ * For protected virtualisation, check that the intercept data meets additional
+    ++ * For protected virtualization, check that the intercept data meets additional
+     + * constraints.
+     + *
+     + * Returns: true if intercept is due to a valid and has matching diagnose code
+     + */
+     +bool sie_is_diag_icpt(struct vm *vm, unsigned int diag);
+    - void sie_guest_sca_create(struct vm *vm);
+    - void sie_guest_create(struct vm *vm, uint64_t guest_mem, uint64_t guest_mem_len);
+    - void sie_guest_destroy(struct vm *vm);
+    ++
+    ++#endif /* _S390X_SIE_ICPT_H_ */
+     
+    - ## lib/s390x/sie.c ##
+    -@@ lib/s390x/sie.c: void sie_check_validity(struct vm *vm, uint16_t vir_exp)
+    - 	report(vir_exp == vir, "VALIDITY: %x", vir);
+    - }
+    - 
+    -+bool sie_is_diag_icpt(struct vm *vm, unsigned int diag)
+    + ## lib/s390x/sie-icpt.c (new) ##
+    +@@
+    ++/* SPDX-License-Identifier: GPL-2.0-only */
+    ++/*
+    ++ * Functionality for SIE interception handling.
+    ++ *
+    ++ * Copyright IBM Corp. 2024
+    ++ */
+    ++
+    ++#include <sie-icpt.h>
+    ++
+    ++struct diag_itext sblk_ip_as_diag(struct kvm_s390_sie_block *sblk)
+     +{
+     +	union {
+     +		struct {
+    -+			uint64_t     : 16;
+     +			uint64_t ipa : 16;
+     +			uint64_t ipb : 32;
+    ++			uint64_t     : 16;
+     +		};
+    -+		struct {
+    -+			uint64_t          : 16;
+    -+			uint64_t opcode   :  8;
+    -+			uint64_t r_1      :  4;
+    -+			uint64_t r_2      :  4;
+    -+			uint64_t r_base   :  4;
+    -+			uint64_t displace : 12;
+    -+			uint64_t zero     : 16;
+    -+		};
+    -+	} instr = { .ipa = vm->sblk->ipa, .ipb = vm->sblk->ipb };
+    ++		struct diag_itext diag;
+    ++	} instr = { .ipa = sblk->ipa, .ipb = sblk->ipb };
+    ++
+    ++	return instr.diag;
+    ++}
+    ++
+    ++bool sie_is_diag_icpt(struct vm *vm, unsigned int diag)
+    ++{
+    ++	struct diag_itext instr = sblk_ip_as_diag(vm->sblk);
+     +	uint8_t icptcode;
+     +	uint64_t code;
+     +
+    @@ lib/s390x/sie.c: void sie_check_validity(struct vm *vm, uint16_t vir_exp)
+     +		break;
+     +	default:
+     +		/* If a new diag is introduced add it to the cases above! */
+    -+		assert_msg(false, "unknown diag");
+    ++		assert_msg(false, "unknown diag 0x%x", diag);
+     +	}
+     +
+     +	if (sie_is_pv(vm)) {
+    @@ lib/s390x/sie.c: void sie_check_validity(struct vm *vm, uint16_t vir_exp)
+     +	code = (code + instr.displace) & 0xffff;
+     +	return code == diag;
+     +}
+    -+
+    - void sie_handle_validity(struct vm *vm)
+    - {
+    - 	if (vm->sblk->icptcode != ICPT_VALIDITY)
+     
+      ## s390x/pv-diags.c ##
+     @@
+    @@ s390x/pv-diags.c
+      #include <libcflat.h>
+      #include <snippet.h>
+     -#include <pv_icptdata.h>
+    ++#include <sie-icpt.h>
+      #include <sie.h>
+      #include <sclp.h>
+      #include <asm/facility.h>
+    @@ s390x/pv-icptcode.c
+      #include <sclp.h>
+      #include <snippet.h>
+     -#include <pv_icptdata.h>
+    ++#include <sie-icpt.h>
+      #include <asm/facility.h>
+      #include <asm/barrier.h>
+      #include <asm/sigp.h>
+    @@ s390x/pv-ipl.c
+      #include <sclp.h>
+      #include <snippet.h>
+     -#include <pv_icptdata.h>
+    ++#include <sie-icpt.h>
+      #include <asm/facility.h>
+      #include <asm/uv.h>
+      
+5:  a3f92777 ! 4:  8cafb8da s390x: Add library functions for exiting from snippet
+    @@ Commit message
+         Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+     
+      ## s390x/Makefile ##
+    -@@ s390x/Makefile: cflatobjs += lib/s390x/css_lib.o
+    - cflatobjs += lib/s390x/malloc_io.o
+    - cflatobjs += lib/s390x/uv.o
+    - cflatobjs += lib/s390x/sie.o
+    -+cflatobjs += lib/s390x/snippet-host.o
+    - cflatobjs += lib/s390x/fault.o
+    +@@ s390x/Makefile: test_cases: $(tests)
+    + test_cases_binary: $(tests_binary)
+    + test_cases_pv: $(tests_pv_binary)
+    + 
+    +-INCLUDE_PATHS = $(SRCDIR)/lib $(SRCDIR)/lib/s390x $(SRCDIR)/s390x
+    ++SNIPPET_INCLUDE :=
+    ++INCLUDE_PATHS = $(SNIPPET_INCLUDE) $(SRCDIR)/lib $(SRCDIR)/lib/s390x $(SRCDIR)/s390x
+    + # Include generated header files (e.g. in case of out-of-source builds)
+    + INCLUDE_PATHS += lib
+    + CPPFLAGS = $(addprefix -I,$(INCLUDE_PATHS))
+    +@@ s390x/Makefile: endif
+    + $(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
+    + 	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
+    + 
+    ++$(SNIPPET_DIR)/c/%.o: SNIPPET_INCLUDE := $(SNIPPET_DIR)/lib
+    + $(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
+    + 	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
+      
+    - OBJDIRS += lib/s390x
+     
+      ## lib/s390x/asm/arch_def.h ##
+     @@ lib/s390x/asm/arch_def.h: static inline uint32_t get_prefix(void)
+    @@ lib/s390x/asm/arch_def.h: static inline uint32_t get_prefix(void)
+     +
+      #endif
+     
+    - ## lib/s390x/snippet-guest.h (new) ##
+    + ## lib/s390x/snippet-exit.h (new) ##
+     @@
+     +/* SPDX-License-Identifier: GPL-2.0-only */
+     +/*
+    -+ * Snippet functionality for the guest.
+    ++ * Functionality handling snippet exits
+     + *
+    -+ * Copyright IBM Corp. 2023
+    ++ * Copyright IBM Corp. 2024
+     + */
+     +
+    -+#ifndef _S390X_SNIPPET_GUEST_H_
+    -+#define _S390X_SNIPPET_GUEST_H_
+    -+
+    -+#include <asm/arch_def.h>
+    -+#include <asm/barrier.h>
+    -+
+    -+static inline void force_exit(void)
+    -+{
+    -+	diag44();
+    -+	mb(); /* allow host to modify guest memory */
+    -+}
+    -+
+    -+static inline void force_exit_value(uint64_t val)
+    -+{
+    -+	diag9c(val);
+    -+	mb(); /* allow host to modify guest memory */
+    -+}
+    -+
+    -+#endif /* _S390X_SNIPPET_GUEST_H_ */
+    -
+    - ## lib/s390x/snippet.h => lib/s390x/snippet-host.h ##
+    -@@
+    - /* SPDX-License-Identifier: GPL-2.0-only */
+    - /*
+    -- * Snippet definitions
+    -+ * Snippet functionality for the host.
+    -  *
+    -  * Copyright IBM Corp. 2021
+    -  * Author: Janosch Frank <frankja@linux.ibm.com>
+    -  */
+    - 
+    --#ifndef _S390X_SNIPPET_H_
+    --#define _S390X_SNIPPET_H_
+    -+#ifndef _S390X_SNIPPET_HOST_H_
+    -+#define _S390X_SNIPPET_HOST_H_
+    - 
+    - #include <sie.h>
+    - #include <uv.h>
+    -@@ lib/s390x/snippet-host.h: static inline void snippet_setup_guest(struct vm *vm, bool is_pv)
+    - 	}
+    - }
+    - 
+    -+bool snippet_is_force_exit(struct vm *vm);
+    -+bool snippet_is_force_exit_value(struct vm *vm);
+    -+uint64_t snippet_get_force_exit_value(struct vm *vm);
+    -+void snippet_check_force_exit_value(struct vm *vm, uint64_t exit_exp);
+    - #endif
+    -
+    - ## lib/s390x/snippet-host.c (new) ##
+    -@@
+    -+/* SPDX-License-Identifier: GPL-2.0-only */
+    -+/*
+    -+ * Snippet functionality for the host.
+    -+ *
+    -+ * Copyright IBM Corp. 2023
+    -+ */
+    ++#ifndef _S390X_SNIPPET_EXIT_H_
+    ++#define _S390X_SNIPPET_EXIT_H_
+     +
+     +#include <libcflat.h>
+    -+#include <snippet-host.h>
+     +#include <sie.h>
+    ++#include <sie-icpt.h>
+     +
+    -+bool snippet_is_force_exit(struct vm *vm)
+    ++static inline bool snippet_is_force_exit(struct vm *vm)
+     +{
+     +	return sie_is_diag_icpt(vm, 0x44);
+     +}
+     +
+    -+bool snippet_is_force_exit_value(struct vm *vm)
+    ++static inline bool snippet_is_force_exit_value(struct vm *vm)
+     +{
+     +	return sie_is_diag_icpt(vm, 0x9c);
+     +}
+     +
+    -+uint64_t snippet_get_force_exit_value(struct vm *vm)
+    ++static inline uint64_t snippet_get_force_exit_value(struct vm *vm)
+     +{
+     +	struct kvm_s390_sie_block *sblk = vm->sblk;
+     +
+     +	assert(snippet_is_force_exit_value(vm));
+     +
+    -+	return vm->save_area.guest.grs[(sblk->ipa & 0xf0) >> 4];
+    ++	return vm->save_area.guest.grs[sblk_ip_as_diag(sblk).r_1];
+     +}
+     +
+    -+void snippet_check_force_exit_value(struct vm *vm, uint64_t value_exp)
+    ++static inline void snippet_check_force_exit_value(struct vm *vm, uint64_t value_exp)
+     +{
+     +	uint64_t value;
+     +
+    @@ lib/s390x/snippet-host.c (new)
+     +		report_fail("guest forced exit with value");
+     +	}
+     +}
+    -
+    - ## lib/s390x/uv.c ##
+    -@@
+    - #include <asm/uv.h>
+    - #include <uv.h>
+    - #include <sie.h>
+    --#include <snippet.h>
+    -+#include <snippet-host.h>
+    - 
+    - static struct uv_cb_qui uvcb_qui = {
+    - 	.header.cmd = UVC_CMD_QUI,
+    -
+    - ## s390x/mvpg-sie.c ##
+    -@@
+    - #include <alloc_page.h>
+    - #include <sclp.h>
+    - #include <sie.h>
+    --#include <snippet.h>
+    -+#include <snippet-host.h>
+    - 
+    - static struct vm vm;
+    - 
+    -
+    - ## s390x/pv-diags.c ##
+    -@@
+    -  *  Janosch Frank <frankja@linux.ibm.com>
+    -  */
+    - #include <libcflat.h>
+    --#include <snippet.h>
+    -+#include <snippet-host.h>
+    - #include <sie.h>
+    - #include <sclp.h>
+    - #include <asm/facility.h>
+    -
+    - ## s390x/pv-icptcode.c ##
+    -@@
+    - #include <sie.h>
+    - #include <smp.h>
+    - #include <sclp.h>
+    --#include <snippet.h>
+    -+#include <snippet-host.h>
+    - #include <asm/facility.h>
+    - #include <asm/barrier.h>
+    - #include <asm/sigp.h>
+    -
+    - ## s390x/pv-ipl.c ##
+    -@@
+    - #include <libcflat.h>
+    - #include <sie.h>
+    - #include <sclp.h>
+    --#include <snippet.h>
+    -+#include <snippet-host.h>
+    - #include <asm/facility.h>
+    - #include <asm/uv.h>
+    - 
+    -
+    - ## s390x/sie-dat.c ##
+    -@@
+    - #include <alloc_page.h>
+    - #include <sclp.h>
+    - #include <sie.h>
+    --#include <snippet.h>
+    -+#include <snippet-host.h>
+    - #include "snippets/c/sie-dat.h"
+    - 
+    - static struct vm vm;
+    -
+    - ## s390x/spec_ex-sie.c ##
+    -@@
+    - #include <asm/arch_def.h>
+    - #include <alloc_page.h>
+    - #include <sie.h>
+    --#include <snippet.h>
+    -+#include <snippet-host.h>
+    - #include <hardware.h>
+    - 
+    - static struct vm vm;
+    -
+    - ## s390x/uv-host.c ##
+    -@@
+    - #include <sclp.h>
+    - #include <smp.h>
+    - #include <uv.h>
+    --#include <snippet.h>
+    -+#include <snippet-host.h>
+    - #include <mmu.h>
+    - #include <asm/page.h>
+    - #include <asm/pgtable.h>
+    ++
+    ++#endif /* _S390X_SNIPPET_EXIT_H_ */
+    +
+    + ## s390x/snippets/lib/snippet-exit.h (new) ##
+    +@@
+    ++/* SPDX-License-Identifier: GPL-2.0-only */
+    ++/*
+    ++ * Functionality for exiting the snippet.
+    ++ *
+    ++ * Copyright IBM Corp. 2023
+    ++ */
+    ++
+    ++#ifndef _S390X_SNIPPET_LIB_EXIT_H_
+    ++#define _S390X_SNIPPET_LIB_EXIT_H_
+    ++
+    ++#include <asm/arch_def.h>
+    ++#include <asm/barrier.h>
+    ++
+    ++static inline void force_exit(void)
+    ++{
+    ++	mb(); /* host may read any memory written by the guest before */
+    ++	diag44();
+    ++	mb(); /* allow host to modify guest memory */
+    ++}
+    ++
+    ++static inline void force_exit_value(uint64_t val)
+    ++{
+    ++	mb(); /* host may read any memory written by the guest before */
+    ++	diag9c(val);
+    ++	mb(); /* allow host to modify guest memory */
+    ++}
+    ++
+    ++#endif /* _S390X_SNIPPET_LIB_EXIT_H_ */
+6:  a1db588b ! 5:  cd79e654 s390x: Use library functions for snippet exit
+    @@ Commit message
+         Replace the existing code for exiting from snippets with the newly
+         introduced library functionality.
+     
+    +    Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+    +    Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+         Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+     
+      ## s390x/sie-dat.c ##
+    +@@
+    + #include <sclp.h>
+    + #include <sie.h>
+    + #include <snippet.h>
+    ++#include <snippet-exit.h>
+    + #include "snippets/c/sie-dat.h"
+    + 
+    + static struct vm vm;
+     @@ s390x/sie-dat.c: static void test_sie_dat(void)
+      	uint64_t test_page_gpa, test_page_hpa;
+      	uint8_t *test_page_hva, expected_val;
+    @@ s390x/snippets/c/sie-dat.c
+      #include <libcflat.h>
+      #include <asm-generic/page.h>
+      #include <asm/mem.h>
+    -+#include <snippet-guest.h>
+    ++#include <snippet-exit.h>
+      #include "sie-dat.h"
+      
+      static uint8_t test_pages[GUEST_TEST_PAGE_COUNT * PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+7:  0b89b3c6 ! 6:  1e9893b6 s390x: Add test for STFLE interpretive execution (format-0)
+    @@ s390x/snippets/c/stfle.c (new)
+     + * Snippet used by the STLFE interpretive execution facilities test.
+     + */
+     +#include <libcflat.h>
+    -+#include <snippet-guest.h>
+    ++#include <snippet-exit.h>
+     +
+     +int main(void)
+     +{
+     +	const unsigned int max_fac_len = 8;
+    ++	uint64_t len_arg = max_fac_len - 1;
+     +	uint64_t res[max_fac_len + 1];
+    ++	uint64_t fac[max_fac_len];
+     +
+    -+	res[0] = max_fac_len - 1;
+    -+	asm volatile ( "lg	0,%[len]\n"
+    ++	asm volatile ( "lgr	0,%[len]\n"
+     +		"	stfle	%[fac]\n"
+    -+		"	stg	0,%[len]\n"
+    -+		: [fac] "=QS"(*(uint64_t(*)[max_fac_len])&res[1]),
+    -+		  [len] "+RT"(res[0])
+    ++		"	lgr	%[len],0\n"
+    ++		: [fac] "=Q"(fac),
+    ++		  [len] "+d"(len_arg)
+     +		:
+     +		: "%r0", "cc"
+     +	);
+    ++	res[0] = len_arg;
+    ++	memcpy(&res[1], fac, sizeof(fac));
+     +	force_exit_value((uint64_t)&res);
+     +	return 0;
+     +}
+    @@ s390x/stfle-sie.c (new)
+     +#include <stdlib.h>
+     +#include <asm/facility.h>
+     +#include <asm/time.h>
+    -+#include <snippet-host.h>
+    ++#include <snippet.h>
+    ++#include <snippet-exit.h>
+     +#include <alloc_page.h>
+     +#include <sclp.h>
+     +#include <rand.h>
+    @@ s390x/stfle-sie.c (new)
+     +
+     +struct guest_stfle_res {
+     +	uint16_t len;
+    -+	uint64_t reg;
+     +	unsigned char *mem;
+     +};
+     +
+    @@ s390x/stfle-sie.c (new)
+     +{
+     +	struct guest_stfle_res res;
+     +	uint64_t guest_stfle_addr;
+    ++	uint64_t reg;
+     +
+     +	sie(&vm);
+     +	assert(snippet_is_force_exit_value(&vm));
+     +	guest_stfle_addr = snippet_get_force_exit_value(&vm);
+     +	res.mem = &vm.guest_mem[guest_stfle_addr];
+    -+	memcpy(&res.reg, res.mem, sizeof(res.reg));
+    -+	res.len = (res.reg & 0xff) + 1;
+    -+	res.mem += sizeof(res.reg);
+    ++	memcpy(&reg, res.mem, sizeof(reg));
+    ++	res.len = (reg & 0xff) + 1;
+    ++	res.mem += sizeof(reg);
+     +	return res;
+     +}
+     +
+    @@ s390x/stfle-sie.c (new)
+     +int main(int argc, char **argv)
+     +{
+     +	struct args args = parse_args(argc, argv);
+    ++	bool run_format_0 = test_facility(7);
+     +
+     +	if (!sclp_facilities.has_sief2) {
+     +		report_skip("SIEF2 facility unavailable");
+     +		goto out;
+     +	}
+    ++	if (!run_format_0)
+    ++		report_skip("STFLE facility not available");
+     +
+     +	report_info("PRNG seed: 0x%lx", args.seed);
+     +	prng_s = prng_init(args.seed);
+     +	setup_guest();
+    -+	if (test_facility(7))
+    ++	if (run_format_0)
+     +		test_stfle_format_0();
+     +out:
+     +	return report_summary();
+
+base-commit: f246b16099478a916eab37b9bd1eb07c743a67d5
+-- 
+2.44.0
+
 
