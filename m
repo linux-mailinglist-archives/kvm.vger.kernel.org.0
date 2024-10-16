@@ -1,174 +1,108 @@
-Return-Path: <kvm+bounces-29002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29003-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3152C9A0CC4
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 16:35:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 820F49A0CFD
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 16:41:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54FA31C20D60
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 14:35:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C2981F24DD1
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 14:41:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0136420C031;
-	Wed, 16 Oct 2024 14:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kJf14sRU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508A620C03A;
+	Wed, 16 Oct 2024 14:41:38 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FDE52F76;
-	Wed, 16 Oct 2024 14:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1C720823B;
+	Wed, 16 Oct 2024 14:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729089288; cv=none; b=WNpyebRcaFcRFB95GrYAhKK0Uy2Z08iIEeqEbO0vpJRx1FK6oA7MlFEe98+QsyD3o8G/tuTi8kFl+CAcsocnKm9IQbcty89wZWE1d8LOBtJ0f6FB/ik9tAqrz2I2LJUelTaDF/G3SGqR4yHRiJzTlfmPrbo7MQxTeAdganrWSm0=
+	t=1729089697; cv=none; b=amatYaIxCpgshBCBwK5bRPtJhT0/48isZOz6d1EMTL5ap8Zf+zfBRlCKedwyQXBBfaz7iSZQ6p+6xyu+X3WCDnPtcsyCStZbZ6tg/cCnlPGMBJAR5Sf/zNqFP8nP1P6CMbjeGBiqHQU5Sz+yIBSI4XWMJ/3o9szFzLpNwOhk2wQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729089288; c=relaxed/simple;
-	bh=9pGvOg7/zJ+sEkmg/MqTZPaUTQA12sZ3ht8GHY8VcY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NN90fFTwh/7wgUwAAM/UJ8FtX0kGOSCGvOQ0R1f10Px9GfwzFMAqyZzblevmcwoyny3oUufg2knKEB8Yv2dRWiUI6XkIxG/0JUueG7mnexXTZk8huL79bwlITvbOkpdi8/l5gsMf10XlGWh3t/XVQuOVYO90I2Uc+1gtYKNKYJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kJf14sRU; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49GBtBRi026328;
-	Wed, 16 Oct 2024 14:34:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=/2qEwJ
-	b8qhapWyJn4YJ9nNClV92VT537dWyiNsRXy1s=; b=kJf14sRUKzdQBrYgujn20V
-	NsCSGde5d4EsVgXFQzeUwpdIBZ28TP3Bg0YtWuiN3Vug4bmiTd2hmuf1mfXqW/iC
-	iGwxhDH4rg6DugbqGDXyPSWjnpOVW2V046ZVOsG9zGS3exmX0SNg1IId6K73cjLN
-	/c8zdoVMH1Zn/e348KJZd2Hc5PCCvW7xbWNo5jsbPbYlWnsZkYh+TyKfPLPnVmqD
-	8ZNdxbYQFuZcWAyKaZele+PXFGKHlr3qcH9Zy7PpwHId5FJpQPrxt4/M9Hjz6PPp
-	vb+FEng35ouuhSjOuw0Sipya5CmAQB26pqFAw1pVG9azaT3XbYPgqP0e9mVinTpw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42ad1j0u02-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 14:34:44 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49GCte5D001991;
-	Wed, 16 Oct 2024 14:34:44 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4284emsxmh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 14:34:44 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49GEYdHk26936056
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 16 Oct 2024 14:34:40 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CDCD720049;
-	Wed, 16 Oct 2024 14:34:39 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9C00B20040;
-	Wed, 16 Oct 2024 14:34:39 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 16 Oct 2024 14:34:39 +0000 (GMT)
-Date: Wed, 16 Oct 2024 16:34:37 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, borntraeger@de.ibm.com, nsg@linux.ibm.com,
-        nrb@linux.ibm.com, frankja@linux.ibm.com, seiden@linux.ibm.com,
-        agordeev@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 05/11] s390/mm/fault: Handle guest-related program
- interrupts in KVM
-Message-ID: <20241016163437.35ae1a51@p-imbrenda.boeblingen.de.ibm.com>
-In-Reply-To: <20241016100514.16801-B-hca@linux.ibm.com>
-References: <20241015164326.124987-1-imbrenda@linux.ibm.com>
-	<20241015164326.124987-6-imbrenda@linux.ibm.com>
-	<20241016100514.16801-B-hca@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1729089697; c=relaxed/simple;
+	bh=+C4883ZdFhet5m8FWwDd8zYspPmstPMs1VovJwOWnd0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C1yAlfJt6VYaKSJxlRYGlNmNBLiKLENupcCyD2X5O3Kxq2RKRffEqyBBFqmGOvs9P41UdUlH2tG5oEDAeDMOT6rdUOBnLHorT2pLmeXWhp5sBHBcoITKbxApNquKpZsVcW0uerb7l4UI+PSrouR0hzYdFE3A3EyyzFtQ5SHUC9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6BDB0FEC;
+	Wed, 16 Oct 2024 07:42:05 -0700 (PDT)
+Received: from [10.1.28.177] (XHFQ2J9959.cambridge.arm.com [10.1.28.177])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 449BE3F71E;
+	Wed, 16 Oct 2024 07:41:33 -0700 (PDT)
+Message-ID: <5621f716-1ab5-486f-ac8f-670cc68ee410@arm.com>
+Date: Wed, 16 Oct 2024 15:41:31 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 17/57] kvm: Remove PAGE_SIZE compile-time constant
+ assumption
+Content-Language: en-GB
+To: Andrew Morton <akpm@linux-foundation.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ David Hildenbrand <david@redhat.com>, Greg Marsden
+ <greg.marsden@oracle.com>, Ivan Ivanov <ivan.ivanov@suse.com>,
+ Kalesh Singh <kaleshsingh@google.com>, Marc Zyngier <maz@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Matthias Brugger <mbrugger@suse.com>,
+ Miroslav Benes <mbenes@suse.cz>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org
+References: <20241014105514.3206191-1-ryan.roberts@arm.com>
+ <20241014105912.3207374-1-ryan.roberts@arm.com>
+ <20241014105912.3207374-17-ryan.roberts@arm.com>
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <20241014105912.3207374-17-ryan.roberts@arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: W7rY38ICAyuVKEoPNw73QewcQUa1eLic
-X-Proofpoint-ORIG-GUID: W7rY38ICAyuVKEoPNw73QewcQUa1eLic
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 spamscore=0 bulkscore=0
- mlxlogscore=813 phishscore=0 adultscore=0 impostorscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410160089
 
-On Wed, 16 Oct 2024 12:05:14 +0200
-Heiko Carstens <hca@linux.ibm.com> wrote:
++ Paolo Bonzini
 
-> On Tue, Oct 15, 2024 at 06:43:20PM +0200, Claudio Imbrenda wrote:
-> > Any program interrupt that happens in the host during the execution of
-> > a KVM guest will now short circuit the fault handler and return to KVM
-> > immediately. Guest fault handling (including pfault) will happen
-> > entirely inside KVM.
-> > 
-> > When sie64a() returns zero, current->thread.gmap_int_code will contain
-> > the program interrupt number that caused the exit, or zero if the exit
-> > was not caused by a host program interrupt.
-> > 
-> > KVM will now take care of handling all guest faults in vcpu_post_run().
-> > 
-> > Since gmap faults will not be visible by the rest of the kernel, remove
-> > GMAP_FAULT, the linux fault handlers for secure execution faults, the
-> > exception table entries for the sie instruction, the nop padding after
-> > the sie instruction, and all other references to guest faults from the
-> > s390 code.  
-> 
-> ...
-> 
-> > diff --git a/arch/s390/kernel/traps.c b/arch/s390/kernel/traps.c  
-> ...
-> > @@ -317,9 +318,23 @@ void noinstr __do_pgm_check(struct pt_regs *regs)
-> >  	struct lowcore *lc = get_lowcore();
-> >  	irqentry_state_t state;
-> >  	unsigned int trapnr;
-> > +	union teid teid = { .val = lc->trans_exc_code };
-> >  
-> >  	regs->int_code = lc->pgm_int_code;
-> > -	regs->int_parm_long = lc->trans_exc_code;
-> > +	regs->int_parm_long = teid.val;
-> > +
-> > +	/*
-> > +	 * In case of a guest fault, short-circuit the fault handler and return.
-> > +	 * This way the sie64a() function will return 0; fault address and
-> > +	 * other relevant bits are saved in current->thread.gmap_teid, and
-> > +	 * the fault number in current->thread.gmap_int_code. KVM will be
-> > +	 * able to use this information to handle the fault.
-> > +	 */
-> > +	if (test_pt_regs_flag(regs, PIF_GUEST_FAULT) && (teid.as == PSW_BITS_AS_PRIMARY)) {
-> > +		current->thread.gmap_teid.val = regs->int_parm_long;
-> > +		current->thread.gmap_int_code = regs->int_code & 0xffff;
-> > +		return;
-> > +	}  
-> 
-> This check looks suboptimal to me for two reasons:
-> 
-> - if PIF_GUEST_FAULT is set it should never happen that the normal
->   exception handling code is executed; it is clearly a bug if that
->   would happen, and with the above check this may or may not be
->   recognized with a kernel crash, if I'm not mistaken.
-> 
-> - __do_pgm_check() is executed for all program interruptions. This
->   includes those interruptions which do not write a teid. Therefore
->   the above check may do something unexpected depending on what teid a
->   previous program interruption wrote. I think the teid.as check
->   should be moved to kvm as well, and only be done for those cases
->   where it is known that the teid contains a valid value.
+This was a rather tricky series to get the recipients correct for and my script
+did not realize that "supporter" was a pseudonym for "maintainer" so you were
+missed off the original post. Appologies!
 
-makes sense
+More context in cover letter:
+https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
 
-I'll move the checks into the kvm part of the code, and trigger a
-KVM_BUG if things are wrong
+
+On 14/10/2024 11:58, Ryan Roberts wrote:
+> To prepare for supporting boot-time page size selection, refactor code
+> to remove assumptions about PAGE_SIZE being compile-time constant. Code
+> intended to be equivalent when compile-time page size is active.
+> 
+> Modify BUILD_BUG_ON() to compare with page size limit.
+> 
+> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+> ---
+> 
+> ***NOTE***
+> Any confused maintainers may want to read the cover note here for context:
+> https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
+> 
+>  virt/kvm/kvm_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index cb2b78e92910f..6c862bc41a672 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4244,7 +4244,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+>  		goto vcpu_decrement;
+>  	}
+>  
+> -	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
+> +	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE_MIN);
+>  	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+>  	if (!page) {
+>  		r = -ENOMEM;
+
 
