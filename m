@@ -1,110 +1,225 @@
-Return-Path: <kvm+bounces-29031-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29032-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 502099A1496
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 23:06:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E98B9A14E2
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 23:37:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76E231C24C5E
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 21:06:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51C691C22688
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 21:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA571D27AF;
-	Wed, 16 Oct 2024 21:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22FBD1D2F61;
+	Wed, 16 Oct 2024 21:37:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="27oK8/Et"
+	dkim=pass (1024-bit key) header.d=atishpatra.org header.i=@atishpatra.org header.b="tBfYQYKc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3111BE871
-	for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 21:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FB91865E2
+	for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 21:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729112758; cv=none; b=rZCUjQTA73Hh3DDDtBAyumawER0j/OvULwlKs9AWSHzayiZNz9cuYzfB/qni7EYh3QuBEiJStwrad3kqPZZ8PKGYlk2QceeSJMM/y+dMX8CCCrbKvyVccnXDfF7CQX9kG7abyknyYOzChTdqJjSFPebtQnK/l2nVlkR5Rtya7p8=
+	t=1729114623; cv=none; b=lMlR+y+rioC3GvNXo/Ein7QZ2vi7nP0nrniovh60zqSBQpxt5OUzK1iRXnggB2+aZb5vKUOWQa39wnQADg1Cqv2j5X3kJzN5zyXFiTsYZ4LfXKdifxqMudJPgPOUFzJF8dCXkiGAE9y0UR+R4aDN53EcD8RYBTWUaVrZWsikKj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729112758; c=relaxed/simple;
-	bh=WZW00TKTaoemSd6JPBFYlmG2IMjRqCAXZEuW81RfWK8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mHcKqtF0wCKo+8ZBloGxeny2e9XUGwucgkEDaoY/0RDWUa0JP5kJVRAsPvRqPpEfRHxThl7CdAYL4EOjeG5r9EVg4MKsPgpX0AEQlP598RGel8XiYCLSpkPv3KGOdjJDmWs4VZWFzI8RcD8SouDTFpbOnmJDD6/owV1S7mrp4Lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=27oK8/Et; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e370d76c15so7226957b3.2
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 14:05:56 -0700 (PDT)
+	s=arc-20240116; t=1729114623; c=relaxed/simple;
+	bh=iN8JH5XHMrDttQd/FuXK13OhyOLPTNT7siHNd0XZ9p4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gPKc7tifadvii7sttEjGt1TWfo30vygIXpDrR9T4CYFkk5Y29Yxxa2fe2Ib0EWupeVvYe9UxUBfGyNC3k0INTkhuJeNuzxwD5cWxyBb4l8roWSCuDGgo2ELEBBKsV2VknABhgNdMKXbs5YHjSewAmL5nuSjvM4ul+2htAcBQR94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atishpatra.org; spf=pass smtp.mailfrom=atishpatra.org; dkim=pass (1024-bit key) header.d=atishpatra.org header.i=@atishpatra.org header.b=tBfYQYKc; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atishpatra.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atishpatra.org
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-539f4d8ef84so314826e87.0
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 14:36:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729112756; x=1729717556; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mc2AnrLM2UF0S090yPZTAZNfP2OSi9FUUhZDFa9DYsQ=;
-        b=27oK8/EtXtW51boOw0Cqq/s3jKRw/y/UTqIRPOQT56NKBe8PhHPV4UFfVOB40TKIJg
-         yYmIeo53THXgEd1yxIU0/59loj8xno5fElgqlKXh3wT628GKlJyxwoIxJf7Ad45dMXDz
-         /Rjbrth3yvQpD9GQJl5X9RO33SSzPurme0PdCn8y6PIqESFIjCfwm+JzRkCeK6jKDgjf
-         rZjXyemORb/LvaV9VpBa248iPwm6rfqcGoB71gYmOrWnDb0Bdjexutl2a1cJft/P6FWF
-         VsJuOXgQ0Tn1xBHucEhx5Wruc7dX795r/KTyX6+bz6xiHVta9fVV+rEcMXmmDhwGEq8T
-         1iug==
+        d=atishpatra.org; s=google; t=1729114618; x=1729719418; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jzevpsck3dJoJhpaLAHlTvmXlx+875anP82T3kvIZwQ=;
+        b=tBfYQYKc0KOPatrkQvIsGSGK2ep90UxDN7WgpaRQgJKM4DrHJxk+4g0hhndhMYY3pp
+         eZ3HpqcodO8JBAglf2CkPiEKHsdDDTiYW2WINvVaQm1mi0wB9dLNvKWQLO5PacqutxEP
+         a/av17RyN9xzTa1XR064zXstzyVeq9gROhNRc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729112756; x=1729717556;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mc2AnrLM2UF0S090yPZTAZNfP2OSi9FUUhZDFa9DYsQ=;
-        b=HzvMl5knhAxlJKNGO/IGUqWnEsuKhcC/6G3x0vmmOLWN4ebxoxA9nD4mv6t1Z4lpF0
-         1sPAIj3S4ewpHuQkyW14iSM1ygrf4fyOgEWzsONjl5YK0QZWe1blK+zRnIUbK4EMzEiy
-         3gJaaZy4UyNeAxDhJl4c3jck4ExlYVE9aRCj99Cl/ZyAXXuWF7+Rl5kMUj0ZFOD7Uzgl
-         UI9c9dHcC1/HHHDhK8/4eC2yvMdDHQb/prKtv8rFWTJaNjmG6d/c8MC2dkwjR1Yh9Guo
-         0OKj0bMe3fdckpkq/VxMhz5OgRtET/OVw4HIShMJAzle9gGN6Il0flIccmzaawY9nc8V
-         XNnw==
-X-Forwarded-Encrypted: i=1; AJvYcCWbse4nNlGgOEBZ+N8KkTIpfuXtd0//jp2HhSgnx5UURgBGCLtAp6mcT3N0sDfPOL9TJgo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUM/WpYtiIEI43gBH34ZCOw9/donwT043vQHw4MNVZpzQMUHlN
-	fRYZwWJobbn0b3fClPGs1TGeEvo/KbUYjiyZ9W7AKE5YyfAF8tj0+HXy9TR8RRc600RPfgHWcW1
-	T1g==
-X-Google-Smtp-Source: AGHT+IGkf38vmY/wJdMjW1LCURxYE7Ec+J9yr0i/d8iGrua/q+lp0G6QiUUZJgyY0LEomNIZeY0ALfUpKv0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:f407:0:b0:e1a:6bf9:aa83 with SMTP id
- 3f1490d57ef6-e29782d5fa6mr5916276.3.1729112755243; Wed, 16 Oct 2024 14:05:55
- -0700 (PDT)
-Date: Wed, 16 Oct 2024 14:05:53 -0700
-In-Reply-To: <20241015195227.GA18617@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
+        d=1e100.net; s=20230601; t=1729114618; x=1729719418;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jzevpsck3dJoJhpaLAHlTvmXlx+875anP82T3kvIZwQ=;
+        b=HPKFi1cQ1MScGCi++i7PBEjOTCxY4qt5DNMXUcUYe/RNbejTIxlsW4nG2ndqsVsFps
+         s7kzFDNtSJVq0ZgqZFXxdHvUkX7BfEhEhbhE6sEQtFiTXyKXEinOXRuTVUg3qKZaQwMZ
+         fdxpEH3uikL5393ztUupZTaOOpE084ScQdLekRSR8uxCg9ZCczs9RUaIHiHb/YcT7iJS
+         bcfxcUxT4peRH7JxWSzYisXROYS/lpt6hkKGdKmPur1kH5Vhd0Wq8fgPWNTyZioJZzZu
+         Ct7HlIOHWlZvmFRfBBuHqwrgEhlK57eX9E61pabFRH4F8eLcPae2taSpkZ51AnPrNCBM
+         WxNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFOUbnooOOBkAA+ncd+ASm0C/sfUWeQdYuSFSWEkOFSqBO0hjk7Zf/6RuwRvyL1wmvoi4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXqBgDImHtkxSPdNSvpCTBIE3jXWUFBT4b07xdVJxNGyhBh4RT
+	sdO6au/XFAwqX064aRegnIEww6wwesAvS9DMV77BdbAvoPN9I4kR/ZuujmH80lDqVy65F7qPFv2
+	tgdwWcmKj11/DX/Rg6ltky+tBkD65ywGPZCA8dV/h704FWTY=
+X-Google-Smtp-Source: AGHT+IE1H4Vh/DlQoBbaP9HRN6riUp4Ff1MfsEWkMbRb+vmeg9cRWkPijr7gnhfFeB7b6BVoGnjUIALJ+uIMkqdeJoY=
+X-Received: by 2002:a05:6512:1044:b0:530:ae4a:58d0 with SMTP id
+ 2adb3069b0e04-539da3c1d9bmr9797869e87.8.1729114617980; Wed, 16 Oct 2024
+ 14:36:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240927161657.68110-1-iorlov@amazon.com> <20240927161657.68110-2-iorlov@amazon.com>
- <Zwmyzg5WiKKvySS1@google.com> <20241015195227.GA18617@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
-Message-ID: <ZxAqscbrROD1_szG@google.com>
-Subject: Re: [PATCH 1/3] KVM: x86, vmx: Add function for event delivery error generation
-From: Sean Christopherson <seanjc@google.com>
-To: Ivan Orlov <iorlov@amazon.com>
-Cc: bp@alien8.de, dave.hansen@linux.intel.com, mingo@redhat.com, 
-	pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, hpa@zytor.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, x86@kernel.org, jalliste@amazon.com, 
-	nh-open-source@amazon.com, pdurrant@amazon.co.uk
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240719160913.342027-1-apatel@ventanamicro.com> <20240719160913.342027-4-apatel@ventanamicro.com>
+In-Reply-To: <20240719160913.342027-4-apatel@ventanamicro.com>
+From: Atish Patra <atishp@atishpatra.org>
+Date: Wed, 16 Oct 2024 14:36:46 -0700
+Message-ID: <CAOnJCUKMf4a0KQaiK5g8nAngqCKFtbnc38kQVu_nMb9ujwif1g@mail.gmail.com>
+Subject: Re: [PATCH 03/13] RISC-V: KVM: Save/restore SCOUNTEREN in C source
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 15, 2024, Ivan Orlov wrote:
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index c67e448c6ebd..afd785e7f3a3 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -6550,19 +6550,10 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
-> > >  	     exit_reason.basic != EXIT_REASON_APIC_ACCESS &&
-> > >  	     exit_reason.basic != EXIT_REASON_TASK_SWITCH &&
-> > >  	     exit_reason.basic != EXIT_REASON_NOTIFY)) {
-> > > -		int ndata = 3;
-> > > +		gpa_t gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
-> > > +		bool is_mmio = exit_reason.basic == EXIT_REASON_EPT_MISCONFIG;
-> > 
-> > There's no need for is_mmio, just pass INVALID_GPA when the GPA isn't known.
-> 
-> Ah alright, then we definitely don't need an is_mmio field. I assume we
-> can't do MMIO at GPA=0, right?
+On Fri, Jul 19, 2024 at 9:09=E2=80=AFAM Anup Patel <apatel@ventanamicro.com=
+> wrote:
+>
+> The SCOUNTEREN CSR need not be saved/restored in the low-level
+> __kvm_riscv_switch_to() function hence move the SCOUNTEREN CSR
+> save/restore to the kvm_riscv_vcpu_swap_in_guest_state() and
+> kvm_riscv_vcpu_swap_in_host_state() functions in C sources.
+>
+> Also, re-arrange the CSR save/restore and related GPR usage in
+> the low-level __kvm_riscv_switch_to() low-level function.
+>
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  arch/riscv/kvm/vcpu.c        |  2 ++
+>  arch/riscv/kvm/vcpu_switch.S | 52 +++++++++++++++---------------------
+>  2 files changed, 23 insertions(+), 31 deletions(-)
+>
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 93b1ce043482..957e1a5e081b 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -691,6 +691,7 @@ static __always_inline void kvm_riscv_vcpu_swap_in_gu=
+est_state(struct kvm_vcpu *
+>         struct kvm_vcpu_csr *csr =3D &vcpu->arch.guest_csr;
+>         struct kvm_vcpu_config *cfg =3D &vcpu->arch.cfg;
+>
+> +       vcpu->arch.host_scounteren =3D csr_swap(CSR_SCOUNTEREN, csr->scou=
+nteren);
+>         vcpu->arch.host_senvcfg =3D csr_swap(CSR_SENVCFG, csr->senvcfg);
+>         if (riscv_has_extension_unlikely(RISCV_ISA_EXT_SMSTATEEN) &&
+>             (cfg->hstateen0 & SMSTATEEN0_SSTATEEN0))
+> @@ -704,6 +705,7 @@ static __always_inline void kvm_riscv_vcpu_swap_in_ho=
+st_state(struct kvm_vcpu *v
+>         struct kvm_vcpu_csr *csr =3D &vcpu->arch.guest_csr;
+>         struct kvm_vcpu_config *cfg =3D &vcpu->arch.cfg;
+>
+> +       csr->scounteren =3D csr_swap(CSR_SCOUNTEREN, vcpu->arch.host_scou=
+nteren);
+>         csr->senvcfg =3D csr_swap(CSR_SENVCFG, vcpu->arch.host_senvcfg);
+>         if (riscv_has_extension_unlikely(RISCV_ISA_EXT_SMSTATEEN) &&
+>             (cfg->hstateen0 & SMSTATEEN0_SSTATEEN0))
+> diff --git a/arch/riscv/kvm/vcpu_switch.S b/arch/riscv/kvm/vcpu_switch.S
+> index f83643c4fdb9..3f8cbc21a644 100644
+> --- a/arch/riscv/kvm/vcpu_switch.S
+> +++ b/arch/riscv/kvm/vcpu_switch.S
+> @@ -43,30 +43,25 @@ SYM_FUNC_START(__kvm_riscv_switch_to)
+>
+>         /* Load Guest CSR values */
+>         REG_L   t0, (KVM_ARCH_GUEST_SSTATUS)(a0)
+> -       REG_L   t1, (KVM_ARCH_GUEST_SCOUNTEREN)(a0)
+> -       la      t3, .Lkvm_switch_return
+> -       REG_L   t4, (KVM_ARCH_GUEST_SEPC)(a0)
+> +       la      t1, .Lkvm_switch_return
+> +       REG_L   t2, (KVM_ARCH_GUEST_SEPC)(a0)
+>
+>         /* Save Host and Restore Guest SSTATUS */
+>         csrrw   t0, CSR_SSTATUS, t0
+>
+> -       /* Save Host and Restore Guest SCOUNTEREN */
+> -       csrrw   t1, CSR_SCOUNTEREN, t1
+> -
+>         /* Save Host STVEC and change it to return path */
+> -       csrrw   t3, CSR_STVEC, t3
+> -
+> -       /* Save Host SSCRATCH and change it to struct kvm_vcpu_arch point=
+er */
+> -       csrrw   t2, CSR_SSCRATCH, a0
+> +       csrrw   t1, CSR_STVEC, t1
+>
+>         /* Restore Guest SEPC */
+> -       csrw    CSR_SEPC, t4
+> +       csrw    CSR_SEPC, t2
+> +
+> +       /* Save Host SSCRATCH and change it to struct kvm_vcpu_arch point=
+er */
+> +       csrrw   t3, CSR_SSCRATCH, a0
+>
+>         /* Store Host CSR values */
+>         REG_S   t0, (KVM_ARCH_HOST_SSTATUS)(a0)
+> -       REG_S   t1, (KVM_ARCH_HOST_SCOUNTEREN)(a0)
+> -       REG_S   t2, (KVM_ARCH_HOST_SSCRATCH)(a0)
+> -       REG_S   t3, (KVM_ARCH_HOST_STVEC)(a0)
+> +       REG_S   t1, (KVM_ARCH_HOST_STVEC)(a0)
+> +       REG_S   t3, (KVM_ARCH_HOST_SSCRATCH)(a0)
+>
+>         /* Restore Guest GPRs (except A0) */
+>         REG_L   ra, (KVM_ARCH_GUEST_RA)(a0)
+> @@ -145,31 +140,26 @@ SYM_FUNC_START(__kvm_riscv_switch_to)
+>         REG_S   t6, (KVM_ARCH_GUEST_T6)(a0)
+>
+>         /* Load Host CSR values */
+> -       REG_L   t1, (KVM_ARCH_HOST_STVEC)(a0)
+> -       REG_L   t2, (KVM_ARCH_HOST_SSCRATCH)(a0)
+> -       REG_L   t3, (KVM_ARCH_HOST_SCOUNTEREN)(a0)
+> -       REG_L   t4, (KVM_ARCH_HOST_SSTATUS)(a0)
+> -
+> -       /* Save Guest SEPC */
+> -       csrr    t0, CSR_SEPC
+> +       REG_L   t0, (KVM_ARCH_HOST_STVEC)(a0)
+> +       REG_L   t1, (KVM_ARCH_HOST_SSCRATCH)(a0)
+> +       REG_L   t2, (KVM_ARCH_HOST_SSTATUS)(a0)
+>
+>         /* Save Guest A0 and Restore Host SSCRATCH */
+> -       csrrw   t2, CSR_SSCRATCH, t2
+> +       csrrw   t1, CSR_SSCRATCH, t1
+>
+> -       /* Restore Host STVEC */
+> -       csrw    CSR_STVEC, t1
+> +       /* Save Guest SEPC */
+> +       csrr    t3, CSR_SEPC
+>
+> -       /* Save Guest and Restore Host SCOUNTEREN */
+> -       csrrw   t3, CSR_SCOUNTEREN, t3
+> +       /* Restore Host STVEC */
+> +       csrw    CSR_STVEC, t0
+>
+>         /* Save Guest and Restore Host SSTATUS */
+> -       csrrw   t4, CSR_SSTATUS, t4
+> +       csrrw   t2, CSR_SSTATUS, t2
+>
+>         /* Store Guest CSR values */
+> -       REG_S   t0, (KVM_ARCH_GUEST_SEPC)(a0)
+> -       REG_S   t2, (KVM_ARCH_GUEST_A0)(a0)
+> -       REG_S   t3, (KVM_ARCH_GUEST_SCOUNTEREN)(a0)
+> -       REG_S   t4, (KVM_ARCH_GUEST_SSTATUS)(a0)
+> +       REG_S   t1, (KVM_ARCH_GUEST_A0)(a0)
+> +       REG_S   t2, (KVM_ARCH_GUEST_SSTATUS)(a0)
+> +       REG_S   t3, (KVM_ARCH_GUEST_SEPC)(a0)
+>
+>         /* Restore Host GPRs (except A0 and T0-T6) */
+>         REG_L   ra, (KVM_ARCH_HOST_RA)(a0)
+> --
+> 2.34.1
+>
 
-Wrong :-)
+Reviewed-by: Atish Patra <atishp@rivosinc.com>
 
-From an architectural perspective, GPA=0 is not special in any way.  E.g. prior
-to L1TF, Linux would happily use the page with PFN=0.
+--=20
+Regards,
+Atish
 
