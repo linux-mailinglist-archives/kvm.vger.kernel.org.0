@@ -1,75 +1,81 @@
-Return-Path: <kvm+bounces-28975-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28976-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F6C9A048A
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 10:43:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE8619A0490
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 10:46:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 135AC1C20F0E
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 08:43:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86F632812E4
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 08:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991AD1FDFB1;
-	Wed, 16 Oct 2024 08:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DD5202F75;
+	Wed, 16 Oct 2024 08:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HRjXu3Gd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FcDsvhFV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050171F80DC;
-	Wed, 16 Oct 2024 08:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CB920127A
+	for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 08:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729068212; cv=none; b=LOZOZ+E7D6QHPZeKnIZPR5Qoc8lfCz6yUi6yjjd9mkX2MUitqDBHR62Nx1OegLGNqvrtGc1VUh/a+8RJewzX9NjDCw29x66g/G35UvRB9fPp/9F9GWhzsx9et66Q8lS3zbRsP2diexNlYK0w9zerlg5Dl1T4Jw163DGX2JFp5dw=
+	t=1729068353; cv=none; b=aG8UuB7j3q3pggkOvigK5DfE5pFc7zW/cXJR2fqloCVXdRucQMleTMRYpzx1l7BwKi32GZW5oIgZYptLVzx1/5ajy0zrpEMxCGyAuT/bssINvLGcRsQFEf7hqLGqVAlqlk5XpS238JIXJZ9Px+UynwfuE5rCE5TQDw+z9vlysuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729068212; c=relaxed/simple;
-	bh=14MnacaspH0uCXxLAZDGV4Qd5fyJVG2BmzvS4dNts5A=;
+	s=arc-20240116; t=1729068353; c=relaxed/simple;
+	bh=y70J3nCPW4Zf4b2k0ldjKoKdq+ZYMA3aKP5ypGfzu2g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f6la4xywUavleIFfkeyaMfuIpwnxPb9PvVAL2qTKi3G6WRtdGyrsbIl5qYYSmNkGJNnHsZJbwL44A92Coq6MI8Zg1wLZudDVTEVWEX/G/j+yM4bZIHA1vs1iTQBjoVIQGdODUqNSgIKqOkzA1Pce0bqt85izN9oWq1CEnw1O/Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HRjXu3Gd; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c973697b52so4468079a12.0;
-        Wed, 16 Oct 2024 01:43:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729068209; x=1729673009; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PaNHk+1EBRyWir9RbKJJvbLwl0XroaJpy79cuY3a4Cc=;
-        b=HRjXu3GdqVq9irMJrEmtF/gwZn73M0epNQOrejy0BmCGr4tWP7RPfXij7p3kN1XMI2
-         Z4ir+vA7yP12wPMDakX8obxhuZ02q1kilswVmYl1qvgrPtCc5XOkHUU8PLDU+QQM1tq3
-         V4cgf5jxKTIJuS/Jqr1Tz6FQSJ9pt2KOoERTX/RtSlPYhdkqJJpg1xserX916Ci2A++G
-         syazLw1Fo0VYjDJcNFMOyI+7nI6+C/IxnAjDheyftl7QS4OtUo9f8ThXy6hXKaKgn/sL
-         +2l5IrAZT9YBTMy6rA1R6U4XPqq3w7fkVz1I3XLC8sJsR2hvd29Bkk4POETvAjBX6w3F
-         4MRA==
+	 In-Reply-To:Content-Type; b=Jgkrde78h5IVkfuXeCt10Lueiq37hnoZcwyxyMIuI/valRxh9yVLIbwYKlNwZGGSu6YqokNOm7zS9XW8nYqFWFWt8RaCCrv9n15dtTcw7EKhUYAEL4Mo5alsfAHKKCBwsxKM7RdEUbHkx567DgPTsWAtMv5BbaiJxTMp5D7fE/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FcDsvhFV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729068349;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2ev+BP0zQ5YqZiq4xUeL5dtzna0XCvobzokkhpa+E2A=;
+	b=FcDsvhFVIFo7ZRg3IL9yHcFE2Ze+xlG6doT7v3GfNjk/aqE13uBO8Cr+Qi+59EsI/qzMTb
+	hP96Pc8UhG6EvF3J5SzMni1RE7il0/ZLpaCXfO6D/z1rQcUc7vzljLtIcpy7EG6HHqFRhW
+	Tqiot0mHIVi1PsmpfuJZzhzP0fKr5xY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-314-_lUdbI9rOqmEq887841XxA-1; Wed, 16 Oct 2024 04:45:48 -0400
+X-MC-Unique: _lUdbI9rOqmEq887841XxA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d5016d21eso2371405f8f.3
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 01:45:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729068209; x=1729673009;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PaNHk+1EBRyWir9RbKJJvbLwl0XroaJpy79cuY3a4Cc=;
-        b=u/RqeItHSIQAEy2PWVlGGGojh9yeg2ijiQkSuJoonoz94/Z4m5+Qp6Uaf6FxFyNk87
-         MDTl7qatjPs8Xwzzbzl8Y0VEuSt+LmVBnNpvcPAD040zDZXkdn3hj+Ax6CjyTY3PcA3f
-         ZfSZxlYpUzyyWrQQfR8rW4tl00j8Q7rrjURpF9vIPhD7mSH1c5IO1hafxTD3kBVoR9em
-         x1o2QgKcRROqmPQ0l8FBhMVpnm3uEZKlRGfD5EIWSYj2CVj73+p6qr+eZWJUyhaqwYBc
-         FYu94lK9T3Hn2lVkz2Y9iOO5vIyOAPSPj2Sn0T+SK17uKiYxeMsMXXmcWEXCFJKb9ulZ
-         bHzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUGkXVaTEbWymzdRgjPiePAGxsk69MRdoMp3p0523tHdUew8c1890znvO5XVBR4Cj5/wRfIrKlgbjMkCX34@vger.kernel.org, AJvYcCVTxYGZFz9CaHFjZp7jdrPM4EHsOEYqpTr+7YTP520tvYo2G6PcNnezHu/gUoO1LT/aGX4BBCbsWyO1Lo8=@vger.kernel.org, AJvYcCVcJB3xoEGQH8y0JzdsPZI6o3A0nqxuXTWvXI/p1bvDk5ITd4wt2p9O4sjpl/sTPv8J/72Y+JfO9HSpDSWA1Q0=@vger.kernel.org, AJvYcCVfGAD03GRXq5NkxZHKGDl164CyjXu6tPJS7VOrtTrkqabZCsEGtK7WmaoQUvMyRDxW+OUx1WuH@vger.kernel.org, AJvYcCVryB64lPWbUZE7OsEU2XkxAixv7lDJ7xwqzrYp1vxDZyZYUMAfTpr2gXJPtIUrwmHRMHfuAYH269jqn9g=@vger.kernel.org, AJvYcCW/Zbb5j6xrM38NBWqxXvFu7AJrq010VDOBt0KL/zdIGqIL8S4SkXicmgcTX505QJTXTdUIFrcFKGf2@vger.kernel.org, AJvYcCWUWiR0NfDdTKIkxLGTPxwMKkE6VfBUk1ozKmyCPcJFZ+/K+fALnjd3Uo6T4R4HjFWAoec=@vger.kernel.org, AJvYcCXRGETYAyqNz3EnWR8BpDaS9LyA6cjPdHQK1zCTEfvWZMeyd+ItoqmZYOun0FPy7ajmVXBdJlF/5PzH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb2Qr3IHjwyg7SF5XAcpWA7SPAIoydTinL1YQJi2nL6jU2rqiR
-	TlGvSlq8WM4AU5lztpG13KJ6rQFuu+X3ZUKJ6VGdX+5V+m6qRvo7
-X-Google-Smtp-Source: AGHT+IG7Mc74tdlZs67Lg0fXYJgdjilcvHeVlNjg83zAHOOdY3c3eJlxhWztO741FFj+cDImqCMJ7w==
-X-Received: by 2002:a17:906:4fc8:b0:a8a:6c5d:63b2 with SMTP id a640c23a62f3a-a99b937a6d4mr1476269166b.18.1729068209160;
-        Wed, 16 Oct 2024 01:43:29 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:a554:2300:6c65:3e15:b0c4:185e? (dynamic-2a02-3100-a554-2300-6c65-3e15-b0c4-185e.310.pool.telefonica.de. [2a02:3100:a554:2300:6c65:3e15:b0c4:185e])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9a29750a9asm156042266b.88.2024.10.16.01.43.26
+        d=1e100.net; s=20230601; t=1729068347; x=1729673147;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2ev+BP0zQ5YqZiq4xUeL5dtzna0XCvobzokkhpa+E2A=;
+        b=JHaPuyGMqz3qSEfpYZEpD01eyZT1nVWyFzvpgbPwopubv98zw4KbNCyAT77aD5UD2n
+         k8e/CJp5IsR/Jx0y58D4VKZ/EJXAwhFXwojKobgp9kd/TEVE03916Rgir7v3r5/FYh0D
+         8GajQbEuvaOUNkGtqcy20caZmBP5M8JjnnRZQpwpljQtSZYn+VdIep1RyY4RjCDAiJ0j
+         kXSCWkhAk9l9ge/oI91pjTLy4yqhwrEHqVkF2rBufuVC/NwLNe0iltG/BezDkcD6yg0v
+         QBEd4b3OzyCrqzkcIsN6D6HcWWAguHOWW+5CqJTD0B7hWfSbkffcaCdCmAfiFhQzn0xG
+         PMlA==
+X-Forwarded-Encrypted: i=1; AJvYcCXDd+L8Edd9ivVtVU3BNkA07L9419OsrOLgDr9IoSgrsch3ySCraaEgBNsXhE4WfwW3ziM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw77FBQBcobo42OTuRTHfONaRMJqe6i8umciOBNj+kjW+R1U0J0
+	Ohfe39eLgD1L/Ryr4Dg4EPsQ0UIvwT5N+FN7353a08akyKltxyelr0WY2cSIgbf3AdWyW/D5jF3
+	Sh5FtLUDDaE50Zzl7Tec4va2jGUMgfOR/mzEO/x9ZfkvzupvNRA==
+X-Received: by 2002:a05:6000:50f:b0:37d:43ad:14eb with SMTP id ffacd0b85a97d-37d86bb9d5cmr1970566f8f.14.1729068346408;
+        Wed, 16 Oct 2024 01:45:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFpXiCxx4856l38kz2ACsDaUJEeW+PY/Wyi3L7UvcU+cb61TSSSAWB863WLvSHmx95G4+Grfg==
+X-Received: by 2002:a05:6000:50f:b0:37d:43ad:14eb with SMTP id ffacd0b85a97d-37d86bb9d5cmr1970519f8f.14.1729068345810;
+        Wed, 16 Oct 2024 01:45:45 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c742:a200:af8e:d144:6284:4f93? (p200300cbc742a200af8ed14462844f93.dip0.t-ipconnect.de. [2003:cb:c742:a200:af8e:d144:6284:4f93])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fa9090asm3713585f8f.57.2024.10.16.01.45.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2024 01:43:28 -0700 (PDT)
-Message-ID: <297b5511-8f6a-4798-a2b4-d4c634969aed@gmail.com>
-Date: Wed, 16 Oct 2024 10:43:27 +0200
+        Wed, 16 Oct 2024 01:45:45 -0700 (PDT)
+Message-ID: <1d243dde-2ddf-4875-890d-e6bb47931e40@redhat.com>
+Date: Wed, 16 Oct 2024 10:45:43 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,211 +83,286 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/13] PCI: Deprecate pci_intx(), pcim_intx()
-To: Philipp Stanner <pstanner@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
- Sergey Shtylyov <s.shtylyov@omp.ru>,
- Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri Kosina
- <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov
- <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
- Manish Chopra <manishc@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
- Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>,
- Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Chen Ni <nichen@iscas.ac.cn>, Mario Limonciello <mario.limonciello@amd.com>,
- Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
- Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Mostafa Saleh <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yi Liu <yi.l.liu@intel.com>, Christian Brauner <brauner@kernel.org>,
- Ankit Agrawal <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>,
- =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
- <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
- Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Kai Vehmanen <kai.vehmanen@linux.intel.com>,
- Rui Salvaterra <rsalvaterra@gmail.com>, linux-ide@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-References: <20241015185124.64726-1-pstanner@redhat.com>
- <20241015185124.64726-14-pstanner@redhat.com>
- <20241015135336.0de9795e.alex.williamson@redhat.com>
- <fc7244823a5665d3db40c94aea099a2973032a0b.camel@redhat.com>
+Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
+ struct kvm_gmem_private
+To: Ackerley Tng <ackerleytng@google.com>, Peter Xu <peterx@redhat.com>
+Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk,
+ jgg@nvidia.com, rientjes@google.com, fvdl@google.com, jthoughton@google.com,
+ seanjc@google.com, pbonzini@redhat.com, zhiquan1.li@intel.com,
+ fan.du@intel.com, jun.miao@intel.com, isaku.yamahata@intel.com,
+ muchun.song@linux.dev, erdemaktas@google.com, vannapurve@google.com,
+ qperret@google.com, jhubbard@nvidia.com, willy@infradead.org,
+ shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com,
+ kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org,
+ richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com,
+ ajones@ventanamicro.com, vkuznets@redhat.com,
+ maciej.wieczor-retman@intel.com, pgonda@google.com, oliver.upton@linux.dev,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <cover.1726009989.git.ackerleytng@google.com>
+ <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
+ <Zwf7k1wmPqEEaRxz@x1n> <diqz8quunrlw.fsf@ackerleytng-ctop.c.googlers.com>
+ <Zw7f3YrzqnH-iWwf@x1n> <diqz1q0hndb3.fsf@ackerleytng-ctop.c.googlers.com>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <fc7244823a5665d3db40c94aea099a2973032a0b.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <diqz1q0hndb3.fsf@ackerleytng-ctop.c.googlers.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 16.10.2024 08:57, Philipp Stanner wrote:
-> On Tue, 2024-10-15 at 13:53 -0600, Alex Williamson wrote:
->> On Tue, 15 Oct 2024 20:51:23 +0200
->> Philipp Stanner <pstanner@redhat.com> wrote:
->>
->>> pci_intx() and its managed counterpart pcim_intx() only exist for
->>> older
->>> drivers which have not been ported yet for various reasons. Future
->>> drivers should preferably use pci_alloc_irq_vectors().
+On 16.10.24 01:42, Ackerley Tng wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+>> On Fri, Oct 11, 2024 at 11:32:11PM +0000, Ackerley Tng wrote:
+>>> Peter Xu <peterx@redhat.com> writes:
 >>>
->>> Mark pci_intx() and pcim_intx() as deprecated and encourage usage
->>> of
->>> pci_alloc_irq_vectors() in its place.
->>
->> I don't really understand this.  As we've discussed previously
->> pci_alloc_irq_vectors() is, unsurprisingly, for allocating PCI IRQ
->> vectors while pci_intx() is for manipulating the INTx disable bit on
->> PCI devices.  The latter is a generic mechanism for preventing PCI
->> devices from generating INTx, regardless of whether there's a vector
->> allocated for it.  How does the former replace the latter and why do
->> we
->> feel the need to deprecate the latter?
->>
->> It feels like this fits some narrow narrative and makes all users of
->> these now deprecated functions second class citizens.  Why?  At it's
->> root these are simply providing mask and set or mask and clear
->> register
->> bit operations.  Thanks,
-> 
-> I got the feeling from the RFC discussion that that was basically the
-> consensus: people should use pci_alloc_irq_vectors(). Or did I
-> misunderstand Andy and Heiner?
-> 
-I think there are two different use cases for pci_intx().
-At first there are several drivers where the direct usage of pci_intx()
-can be eliminated by switching to the pci_alloc_irq_vectors() API.
-
-And then there's usage of pci_intx() in
-drivers/vfio/pci/vfio_pci_intrs.c
-drivers/xen/xen-pciback/conf_space_header.c
-There we have to keep the (AFAICS unmanaged) pci_intx() calls.
-
-> I'm perfectly happy with dropping this patch and continue offering
-> pci{m}_intx() to users, since after removing that hybrid hazzard I
-> don't see any harm in them anymore.
-> 
-> 
-> P.
-> 
->>
->> Alex
->>  
->>> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
->>> ---
->>>  drivers/pci/devres.c | 5 ++++-
->>>  drivers/pci/pci.c    | 5 ++++-
->>>  2 files changed, 8 insertions(+), 2 deletions(-)
+>>>> On Tue, Sep 10, 2024 at 11:43:57PM +0000, Ackerley Tng wrote:
+>>>>> The faultability xarray is stored on the inode since faultability is a
+>>>>> property of the guest_memfd's memory contents.
+>>>>>
+>>>>> In this RFC, presence of an entry in the xarray indicates faultable,
+>>>>> but this could be flipped so that presence indicates unfaultable. For
+>>>>> flexibility, a special value "FAULT" is used instead of a simple
+>>>>> boolean.
+>>>>>
+>>>>> However, at some stages of a VM's lifecycle there could be more
+>>>>> private pages, and at other stages there could be more shared pages.
+>>>>>
+>>>>> This is likely to be replaced by a better data structure in a future
+>>>>> revision to better support ranges.
+>>>>>
+>>>>> Also store struct kvm_gmem_hugetlb in struct kvm_gmem_hugetlb as a
+>>>>> pointer. inode->i_mapping->i_private_data.
+>>>>
+>>>> Could you help explain the difference between faultability v.s. the
+>>>> existing KVM_MEMORY_ATTRIBUTE_PRIVATE?  Not sure if I'm the only one who's
+>>>> confused, otherwise might be good to enrich the commit message.
 >>>
->>> diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
->>> index 6f8f712fe34e..4c76fc063104 100644
->>> --- a/drivers/pci/devres.c
->>> +++ b/drivers/pci/devres.c
->>> @@ -435,7 +435,7 @@ static struct pcim_intx_devres
->>> *get_or_create_intx_devres(struct device *dev)
->>>  }
->>>  
->>>  /**
->>> - * pcim_intx - managed pci_intx()
->>> + * pcim_intx - managed pci_intx() (DEPRECATED)
->>>   * @pdev: the PCI device to operate on
->>>   * @enable: boolean: whether to enable or disable PCI INTx
->>>   *
->>> @@ -443,6 +443,9 @@ static struct pcim_intx_devres
->>> *get_or_create_intx_devres(struct device *dev)
->>>   *
->>>   * Enable/disable PCI INTx for device @pdev.
->>>   * Restore the original state on driver detach.
->>> + *
->>> + * This function is DEPRECATED. Do not use it in new code.
->>> + * Use pci_alloc_irq_vectors() instead (there is no managed
->>> version, currently).
->>>   */
->>>  int pcim_intx(struct pci_dev *pdev, int enable)
->>>  {
->>> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
->>> index 7ce1d0e3a1d5..dc69e23b8982 100644
->>> --- a/drivers/pci/pci.c
->>> +++ b/drivers/pci/pci.c
->>> @@ -4477,11 +4477,14 @@ void pci_disable_parity(struct pci_dev
->>> *dev)
->>>  }
->>>  
->>>  /**
->>> - * pci_intx - enables/disables PCI INTx for device dev
->>> + * pci_intx - enables/disables PCI INTx for device dev
->>> (DEPRECATED)
->>>   * @pdev: the PCI device to operate on
->>>   * @enable: boolean: whether to enable or disable PCI INTx
->>>   *
->>>   * Enables/disables PCI INTx for device @pdev
->>> + *
->>> + * This function is DEPRECATED. Do not use it in new code.
->>> + * Use pci_alloc_irq_vectors() instead.
->>>   */
->>>  void pci_intx(struct pci_dev *pdev, int enable)
->>>  {
+>>> Thank you for this question, I'll add this to the commit message to the
+>>> next revision if Fuad's patch set [1] doesn't make it first.
+>>>
+>>> Reason (a): To elaborate on the explanation in [1],
+>>> KVM_MEMORY_ATTRIBUTE_PRIVATE is whether userspace wants this page to be
+>>> private or shared, and faultability is whether the page is allowed to be
+>>> faulted in by userspace.
+>>>
+>>> These two are similar but may not be the same thing. In pKVM, pKVM
+>>> cannot trust userspace's configuration of private/shared, and other
+>>> information will go into determining the private/shared setting in
+>>> faultability.
+>>
+>> It makes sense to me that the kernel has the right to decide which page is
+>> shared / private.  No matter if it's for pKVM or CoCo, I believe the normal
+>> case is most / all pages are private, until some requests to share them for
+>> special purposes (like DMA).  But that'll need to be initiated as a request
+>> from the guest not the userspace hypervisor.
+> 
+> For TDX, the plan is that the guest will request the page to be remapped
+> as shared or private, and the handler for that request will exit to
+> the userspace VMM.
+> 
+> The userspace VMM will then do any necessary coordination (e.g. for a
+> shared to private conversion it may need to unpin pages from DMA), and
+> then use the KVM_SET_MEMORY_ATTRIBUTES ioctl to indicate agreement with
+> the guest's requested conversion. This is where
+> KVM_MEMORY_ATTRIBUTE_PRIVATE will be provided.
+> 
+> Patch 38 [1] updates
+> tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c to
+> demonstrate the usage flow for x86.
+> 
+> Fuad will be in a better position to explain the flow for pKVM.
+> 
+>> I must confess I totally have no idea how KVM_MEMORY_ATTRIBUTE_PRIVATE is
+>> planned to be used in the future. Currently it's always set at least in
+>> QEMU if gmemfd is enabled, so it doesn't yet tell me anything..
+>>
+>> If it's driven by the userspace side of the hypervisor, I wonder when
+>> should the user app request some different value it already was, if the
+>> kernel already has an answer in this case.  It made me even more confused,
+>> as we have this in the API doc:
+>>
+>>          Note, there is no "get" API.  Userspace is responsible for
+>>          explicitly tracking the state of a gfn/page as needed.
+>>
+>> And I do wonder whether we will still need some API just to query whether
+>> the kernel allows the page to be mapped or not (aka, the "real" shared /
+>> private status of a guest page).  I guess that's not directly relevant to
+>> the faultability to be introduced here, but if you or anyone know please
+>> kindly share, I'd love to learn about it.
+> 
+> The userspace VMM will track the initial shared/private state, in the
+> sense that when the VM is created, the mem_attr_array is initialized
+> such that the guest pages are all shared.
+> 
+> Then when the userspace VMM calls the KVM_SET_MEMORY_ATTRIBUTES ioctl,
+> it should record all changes so it knows what the state is in the
+> kernel.
+> 
+> Even if userspace VMM doesn't record the state properly, if the
+> KVM_SET_MEMORY_ATTRIBUTES ioctl is used to request no change
+> (e.g. setting an already private page to private), it will just be a
+> no-op in the kernel.
+> 
+>>>
+>>> Perhaps Fuad can elaborate more here.
+>>>
+>>> Reason (b): In this patch series (mostly focus on x86 first), we're
+>>> using faultability to prevent any future faults before checking that
+>>> there are no mappings.
+>>>
+>>> Having a different xarray from mem_attr_array allows us to disable
+>>> faulting before committing to changing mem_attr_array. Please see
+>>> `kvm_gmem_should_set_attributes_private()` in this patch [2].
+>>>
+>>> We're not completely sure about the effectiveness of using faultability
+>>> to block off future faults here, in future revisions we may be using a
+>>> different approach. The folio_lock() is probably important if we need to
+>>> check mapcount. Please let me know if you have any ideas!
+>>>
+>>> The starting point of having a different xarray was pKVM's requirement
+>>> of having separate xarrays, and we later realized that the xarray could
+>>> be used for reason (b). For x86 we could perhaps eventually remove the
+>>> second xarray? Not sure as of now.
+>>
+>> Just had a quick look at patch 27:
+>>
+>> https://lore.kernel.org/all/5a05eb947cf7aa21f00b94171ca818cc3d5bdfee.1726009989.git.ackerleytng@google.com/
+>>
+>> I'm not yet sure what's protecting from faultability being modified against
+>> a concurrent fault().
+>>
+>> I wonder whether one can use the folio lock to serialize that, so that one
+>> needs to take the folio lock to modify/lookup the folio's faultability,
+>> then it may naturally match with the fault() handler design, where
+>> kvm_gmem_get_folio() needs to lock the page first.
+>>
+>> But then kvm_gmem_is_faultable() will need to also be called only after the
+>> folio is locked to avoid races.
+> 
+> My bad. In our rush to get this series out before LPC, the patch series
+> was not organized very well. Patch 39 [2] adds the
+> lock. filemap_invalidate_lock_shared() should make sure that faulting
+> doesn't race with faultability updates.
+> 
+>>>> The latter is per-slot, so one level higher, however I don't think it's a
+>>>> common use case for mapping the same gmemfd in multiple slots anyway for
+>>>> KVM (besides corner cases like live upgrade).  So perhaps this is not about
+>>>> layering but something else?  For example, any use case where PRIVATE and
+>>>> FAULTABLE can be reported with different values.
+>>>>
+>>>> Another higher level question is, is there any plan to support non-CoCo
+>>>> context for 1G?
+>>>
+>>> I believe guest_memfd users are generally in favor of eventually using
+>>> guest_memfd for non-CoCo use cases, which means we do want 1G (shared,
+>>> in the case of CoCo) page support.
+>>>
+>>> However, core-mm's fault path does not support mapping at anything
+>>> higher than the PMD level (other than hugetlb_fault(), which the
+>>> community wants to move away from), so core-mm wouldn't be able to map
+>>> 1G pages taken from HugeTLB.
+>>
+>> Have you looked at vm_operations_struct.huge_fault()?  Or maybe you're
+>> referring to some other challenges?
 >>
 > 
-> 
+> IIUC vm_operations_struct.huge_fault() is used when creating a PMD, but
+> PUD mappings will be needed for 1G pages, so 1G pages can't be mapped by
+> core-mm using vm_operations_struct.huge_fault().
+
+
+Just to clarify a bit for Peter: as has been discussed previously, there 
+are rather big difference between CoCo and non-CoCo VMs.
+
+In CoCo VMs, the primary portion of all pages are private, and they are 
+not mapped into user space. Only a handful of pages are commonly shared 
+and mapped into user space.
+
+In non-CoCo VMs, all pages are shared and (for the time being) all pages 
+are mapped into user space from where KVM will consume them.
+
+
+Installing pmd/pud mappings into user space (recall: shared memory only) 
+is currently not really a requirement for CoCo VMs, and therefore not 
+the focus of this work.
+
+Further, it's currently considered to be incompatible with getting 
+in-place private<->share conversion on *page* granularity right, as we 
+will be exposing huge/gigantic folios via individual small folios to 
+core-MM. Mapping a PMD/PUD into core-mm, that is composed of multiple 
+folios is not going to fly, unless using a PFNMAP, which has been 
+briefly discussed as well, bu disregarded so far (no page pinning support).
+
+So in the context of this work here, huge faults and PUD/PMD *user space 
+page tables* do not apply.
+
+For non-CoCo VMs there is no in-place conversion problem. One could use 
+the same CoCo implementation, but without user space pud/pmd mappings. 
+KVM and VFIO would have to consume this memory via the guest_memfd in 
+memslots instead of via the user space mappings to more easily get 
+PMD/PUD mappings into the secondary MMU. And the downsides would be 
+sacrificing the vmemmap optimization and PMD/PUD user space mappings, 
+while at the same time benefiting from being able to easily map only 
+parts of a huge/gigantic page into user space.
+
+
+So I consider pmd/pud user space mappings for non-CoCo an independent 
+work item, not something that is part of the current effort of 
+huge/gigantic pages with in-place conversion at page granularity for 
+CoCo VMs.
+
+
+More information is available in the bi-weekly upstream MM meeting (that 
+was recorded) and the LPC talks, where most of that has been discussed.
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
