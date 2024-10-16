@@ -1,297 +1,287 @@
-Return-Path: <kvm+bounces-28974-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28975-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4E139A042E
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 10:26:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F6C9A048A
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 10:43:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D903281F88
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 08:26:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 135AC1C20F0E
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 08:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9991D1E71;
-	Wed, 16 Oct 2024 08:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991AD1FDFB1;
+	Wed, 16 Oct 2024 08:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zYMgsz+a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HRjXu3Gd"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2077.outbound.protection.outlook.com [40.107.92.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3E61C07E3;
-	Wed, 16 Oct 2024 08:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729067191; cv=fail; b=oW80KliTe1Pp6VYXvsj8H+5NrVVTZwhqSC2a7CF4HZor1cxnFzVgmfHxVqaFtZ2wteodJg3efv/QF3cfDvIC22esD6vMza6HMxFLrfEAuin2JzaEZAQqCMa+M53Z9NYG3ogkvH+T1D2r3C6Tp919BmMoEWtsZihMaIMtyxGowX4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729067191; c=relaxed/simple;
-	bh=O5C6bpvbOtRPJGVbxLx/s8/RUMtt/KEux7IQaNljhJA=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tFnCkVeMK01s/be9Aiv6lSM1ETkf5hqbNsvYo2HVian9MZ7QygnEhjO8GMwNO3+CaFUyUba5KIC+23eLZ6+/LNxY2OJB4EiSGBNsUyjlXBh1O6kfXafdC/+6d7AnGOOjrvfYgl7Tvc0hUOIc7cznYxhZqyThOK5IXylTodanENc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zYMgsz+a; arc=fail smtp.client-ip=40.107.92.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wB6ZQKNwZ9BZvoiVEOLMIadx4DxHRBFq2j57MB2rOuewFUOIXZibGGHNT045FW+KkUNSfjdPuTeCspvdJYJRZt+7FpOtI3IgJLa9RpGLylwrKScLYYAWjpR2sgo8Sb5Cfa7ADGMUFhZFpontnnEySnjsq5vzDnIkcsG0LhLeIZJp7rCfn1KlJDxD3YCBpMlT7NcF0NgdIojQnFqu46jRYtkQ1hhnOm8ZfP7hmhGoujW7QzRUPw/jneqOvZrDqjieQE7mwBbN9fuJsy9uxYX51MU/6s2NwxrzNONodjGh2kWgzbKouYSGTVvSWGLtIUXcUTWoBgfFNdPVhdjk+b+P/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0d3WH+AeNsJ2Ia/LnYDaurnqcS3GdE3KGmi09iu0iEo=;
- b=RPrbh+Rib8KyPQv+yCeI77iDqJLnW+JxybFhOvGJ6uwgpgD/1WvrLFmUI/v4I3p86rTdoRfioWAYYcXI5486Yh/xdthOFIQrNkXbyulwc1GyEUQIat3RK8VA/4sUz+n6bVqZi/AHLWGD4G4e8cjkKvR4+zp+H42NpPIEriWrvBsAea3FYUwh9A7Jyat9qyq7VZPm9cPQuVY3ltNmMLI75HkJKI+JxU5RD5wOrlwW9pDv3mztpZX6AgiZwe/RRnZfrM778yL1+0UZGkJVorZX4qhD7WdMmPur17oFI2hVy51BqkZcULbTmQK31/S1zMYB0BJX3FpIjqtwKYwesGi1gA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0d3WH+AeNsJ2Ia/LnYDaurnqcS3GdE3KGmi09iu0iEo=;
- b=zYMgsz+aWrLe2oe32bwxbWRE757KkX0QBnxHZ4Yti+kGcXkABVC6Ew0I84eLAos3qPIs471MrDUj4ikqvgSENmRMIuFAKPRDMo9kJ/xzW+I6Eg8odFC1t+RPziYIlt62yaJMpx58wZchHS2KmSpE64prxFEhkMYiPiOqz5dfvhw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- PH7PR12MB5926.namprd12.prod.outlook.com (2603:10b6:510:1d9::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8048.26; Wed, 16 Oct 2024 08:26:25 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec%4]) with mapi id 15.20.8069.016; Wed, 16 Oct 2024
- 08:26:25 +0000
-Message-ID: <6e9dc202-e7ec-8dd9-62cc-66b97126618f@amd.com>
-Date: Wed, 16 Oct 2024 13:56:15 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [PATCH v12 16/19] x86/kvmclock: Use clock source callback to
- update kvm sched clock
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-To: Sean Christopherson <seanjc@google.com>,
- Ajay Kaher <ajay.kaher@broadcom.com>,
- Alexey Makhalov <alexey.makhalov@broadcom.com>, jgross@suse.com,
- boris.ostrovsky@oracle.com
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, bp@alien8.de,
- x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
- dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com,
- gautham.shenoy@amd.com, kprateek.nayak@amd.com, neeraj.upadhyay@kernel.org
-References: <20241009092850.197575-1-nikunj@amd.com>
- <20241009092850.197575-17-nikunj@amd.com> <ZwaoPJYN-FuSWRxc@google.com>
- <86d7579b-af67-4766-d3ae-851606d0b517@amd.com>
-In-Reply-To: <86d7579b-af67-4766-d3ae-851606d0b517@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0016.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:95::18) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050171F80DC;
+	Wed, 16 Oct 2024 08:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729068212; cv=none; b=LOZOZ+E7D6QHPZeKnIZPR5Qoc8lfCz6yUi6yjjd9mkX2MUitqDBHR62Nx1OegLGNqvrtGc1VUh/a+8RJewzX9NjDCw29x66g/G35UvRB9fPp/9F9GWhzsx9et66Q8lS3zbRsP2diexNlYK0w9zerlg5Dl1T4Jw163DGX2JFp5dw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729068212; c=relaxed/simple;
+	bh=14MnacaspH0uCXxLAZDGV4Qd5fyJVG2BmzvS4dNts5A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f6la4xywUavleIFfkeyaMfuIpwnxPb9PvVAL2qTKi3G6WRtdGyrsbIl5qYYSmNkGJNnHsZJbwL44A92Coq6MI8Zg1wLZudDVTEVWEX/G/j+yM4bZIHA1vs1iTQBjoVIQGdODUqNSgIKqOkzA1Pce0bqt85izN9oWq1CEnw1O/Rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HRjXu3Gd; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c973697b52so4468079a12.0;
+        Wed, 16 Oct 2024 01:43:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729068209; x=1729673009; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=PaNHk+1EBRyWir9RbKJJvbLwl0XroaJpy79cuY3a4Cc=;
+        b=HRjXu3GdqVq9irMJrEmtF/gwZn73M0epNQOrejy0BmCGr4tWP7RPfXij7p3kN1XMI2
+         Z4ir+vA7yP12wPMDakX8obxhuZ02q1kilswVmYl1qvgrPtCc5XOkHUU8PLDU+QQM1tq3
+         V4cgf5jxKTIJuS/Jqr1Tz6FQSJ9pt2KOoERTX/RtSlPYhdkqJJpg1xserX916Ci2A++G
+         syazLw1Fo0VYjDJcNFMOyI+7nI6+C/IxnAjDheyftl7QS4OtUo9f8ThXy6hXKaKgn/sL
+         +2l5IrAZT9YBTMy6rA1R6U4XPqq3w7fkVz1I3XLC8sJsR2hvd29Bkk4POETvAjBX6w3F
+         4MRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729068209; x=1729673009;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PaNHk+1EBRyWir9RbKJJvbLwl0XroaJpy79cuY3a4Cc=;
+        b=u/RqeItHSIQAEy2PWVlGGGojh9yeg2ijiQkSuJoonoz94/Z4m5+Qp6Uaf6FxFyNk87
+         MDTl7qatjPs8Xwzzbzl8Y0VEuSt+LmVBnNpvcPAD040zDZXkdn3hj+Ax6CjyTY3PcA3f
+         ZfSZxlYpUzyyWrQQfR8rW4tl00j8Q7rrjURpF9vIPhD7mSH1c5IO1hafxTD3kBVoR9em
+         x1o2QgKcRROqmPQ0l8FBhMVpnm3uEZKlRGfD5EIWSYj2CVj73+p6qr+eZWJUyhaqwYBc
+         FYu94lK9T3Hn2lVkz2Y9iOO5vIyOAPSPj2Sn0T+SK17uKiYxeMsMXXmcWEXCFJKb9ulZ
+         bHzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGkXVaTEbWymzdRgjPiePAGxsk69MRdoMp3p0523tHdUew8c1890znvO5XVBR4Cj5/wRfIrKlgbjMkCX34@vger.kernel.org, AJvYcCVTxYGZFz9CaHFjZp7jdrPM4EHsOEYqpTr+7YTP520tvYo2G6PcNnezHu/gUoO1LT/aGX4BBCbsWyO1Lo8=@vger.kernel.org, AJvYcCVcJB3xoEGQH8y0JzdsPZI6o3A0nqxuXTWvXI/p1bvDk5ITd4wt2p9O4sjpl/sTPv8J/72Y+JfO9HSpDSWA1Q0=@vger.kernel.org, AJvYcCVfGAD03GRXq5NkxZHKGDl164CyjXu6tPJS7VOrtTrkqabZCsEGtK7WmaoQUvMyRDxW+OUx1WuH@vger.kernel.org, AJvYcCVryB64lPWbUZE7OsEU2XkxAixv7lDJ7xwqzrYp1vxDZyZYUMAfTpr2gXJPtIUrwmHRMHfuAYH269jqn9g=@vger.kernel.org, AJvYcCW/Zbb5j6xrM38NBWqxXvFu7AJrq010VDOBt0KL/zdIGqIL8S4SkXicmgcTX505QJTXTdUIFrcFKGf2@vger.kernel.org, AJvYcCWUWiR0NfDdTKIkxLGTPxwMKkE6VfBUk1ozKmyCPcJFZ+/K+fALnjd3Uo6T4R4HjFWAoec=@vger.kernel.org, AJvYcCXRGETYAyqNz3EnWR8BpDaS9LyA6cjPdHQK1zCTEfvWZMeyd+ItoqmZYOun0FPy7ajmVXBdJlF/5PzH@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb2Qr3IHjwyg7SF5XAcpWA7SPAIoydTinL1YQJi2nL6jU2rqiR
+	TlGvSlq8WM4AU5lztpG13KJ6rQFuu+X3ZUKJ6VGdX+5V+m6qRvo7
+X-Google-Smtp-Source: AGHT+IG7Mc74tdlZs67Lg0fXYJgdjilcvHeVlNjg83zAHOOdY3c3eJlxhWztO741FFj+cDImqCMJ7w==
+X-Received: by 2002:a17:906:4fc8:b0:a8a:6c5d:63b2 with SMTP id a640c23a62f3a-a99b937a6d4mr1476269166b.18.1729068209160;
+        Wed, 16 Oct 2024 01:43:29 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:a554:2300:6c65:3e15:b0c4:185e? (dynamic-2a02-3100-a554-2300-6c65-3e15-b0c4-185e.310.pool.telefonica.de. [2a02:3100:a554:2300:6c65:3e15:b0c4:185e])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9a29750a9asm156042266b.88.2024.10.16.01.43.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Oct 2024 01:43:28 -0700 (PDT)
+Message-ID: <297b5511-8f6a-4798-a2b4-d4c634969aed@gmail.com>
+Date: Wed, 16 Oct 2024 10:43:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|PH7PR12MB5926:EE_
-X-MS-Office365-Filtering-Correlation-Id: c309a571-66bc-426a-e40a-08dcedbc3970
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?S1RmaHp1U1VNK2swSDl6VG9Bd2JvaEgyWWhZeVZGa0VnNlVBSlVteW5GL3lH?=
- =?utf-8?B?MFJLU054S240NXhOY3JkYjhnV1BTQVlEbUNpWUF5V1Y1ajMrMnFrTWxNNW9m?=
- =?utf-8?B?Y21NeUMvTnVRbjBnTFdKc21RL1dwMitHa0tqWjdDS0VIcXY1ZTVSNmxxYVBK?=
- =?utf-8?B?aEhMclppTlRVMEtkV0FnNVFKam9sbllxcno1M2J4aGRId0RpQTFEZkhrdVNU?=
- =?utf-8?B?NHpqVlZjWTFFRGdybTFpa0c3S2FmSEtURE8yLzBSTzdGV1ZpWStUQXo5WEp2?=
- =?utf-8?B?bW9ZVGdZT3lMdFZIcTNiR1h2SFg5Yy9iKzVueVpSUXFlQ2wyVVlMbEIrRWRU?=
- =?utf-8?B?b1JEMWZOQlRIa25PakJGUHh0U0M2SHZRdVdRemdsaVI4MGc5SlR3YjBVbkRu?=
- =?utf-8?B?NXFIVE50RFYyQ00yMEVxY2Y3L3plMnJZV1ZRR2c4TVd4cExTNnZhYzloT2xn?=
- =?utf-8?B?alJHSkgyWGRJVGY0bjZqWHkxWlIxNkF0Q1Nub2lQRjl6ZlA3bllpaWo0MWVB?=
- =?utf-8?B?ZkptNVhySmtJbnU1ZzJIc2o1b1ZIem4xWXEyM1FUSEJhcktiL28zWktSZ1pD?=
- =?utf-8?B?R042Wlk2TUhMVkpkTXAzd0xDVlFDRnBhOVdFRXo0RERoM3dYaEkwRVpFaHhZ?=
- =?utf-8?B?anMzU1RHdFJuMlp0aHZlL1UzSnNmWFVCckNmaVROb2l3WXVwTDd2aEZ3eUk3?=
- =?utf-8?B?bXRFbU1WdC96Y3FBSVg2cVNES2tTU3N5TEFFYmppcThkTittZlp6LzlsdnRO?=
- =?utf-8?B?clBFMkc3czgxaC9WN0xaV1dnZFg0djM5S0NVaVM4WFMzZ3FEY3MvQjdxWjRa?=
- =?utf-8?B?Lzc4bC9oUHd3NTYvSFIvRHRnK2l0ME95R3NqMUVBWndQK1gxOUFsM09scTJm?=
- =?utf-8?B?TkNldHB2VWVzcjZsY2F2a2s3eWRVVnJaYmYzclI0aGVjUTVRVFl0cXNIczdT?=
- =?utf-8?B?NHYyTm53Sk9panNGR25oNktGeE9UVkRpdk5zUkhlb2FzaUdpakJwWHRkRUNz?=
- =?utf-8?B?SEZUdGJzSmpmNEtZNlZIRDJrR0xoZ2tmYjBiUXR2b1hlN05UYzJPQUNwUzJt?=
- =?utf-8?B?NHZvc0tzQWU4STJ3SDc0THd1QTVJV0l0bVp5OTBUREFSMXlKZmRVbkh2UllU?=
- =?utf-8?B?c21EdnBrbHI0N2VpNlA3UUJKd2swR1EvL2RDejhJbnZRYzBzTS9Ma0JvbkRa?=
- =?utf-8?B?QkxXbGdqenh4SXdlMGJKMFJGRER4ZEpyUzM3L3FwaTRQcE5CV0U2RDZRTE05?=
- =?utf-8?B?akdUQ1VWbWg0ZGJua0JlZkFsODY1TzcxdklwWnNUMlRlTFBVOUF1R0dpTFFz?=
- =?utf-8?B?aVp4ZDJEUmhUekRKUUlBYWdMUmpaaW9ubERBaFVQZllNNzkzQ1I5VitRK2FE?=
- =?utf-8?B?RXN5MnpOOEkvTXlyRTZHMFY1aTNjTW1FYjhmT1puZkdSZGdMU1pYQ1pCYVU4?=
- =?utf-8?B?SHlVK0lRODNCQnJhTnRwQk5ZYTMzcTRlNk1QWlRLa3ZnTXBBWlJ6RGpzOVZO?=
- =?utf-8?B?dGVycjhvWC82OXRSdVgrWFJHM1FscHBzZWtSQzd1UUo5V2hzWnh6SVdmekhM?=
- =?utf-8?B?bFpBZDhKKzZBNENHZmNXbmlLOVZnQlJOQUtyblA2eFdhMHBaR0tSS0ZvZ1Bs?=
- =?utf-8?B?OGlWVU9jYVc1NG5aSTdiZ0ZnQmd6SlBVbzQ0VE5BRHBEZDY1Uk9mTFpYM0pI?=
- =?utf-8?B?cGZvUHJWZ01halAzN1lPckdvV0Q3dUs0OGxZcUZ6eWNhbGRablNCSWN3PT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aHhha0xlbkY5MGxkYktYaTlMOFBSYjlmaGRtclk1VUpMRWR1VmR2UHlMS05k?=
- =?utf-8?B?TzBkQ2wvazh0REE2TmxlZ0dianAva3J5K2o5cFN3UU5saURXeXBVZWNMd3Vp?=
- =?utf-8?B?VUdLbmxZM0RPNWM5Y28zQThXWmRUMHViemQ1V0RPZzNCQjZIMCt4TVppdWZj?=
- =?utf-8?B?aGl0ZnRKdFhXaXBhYmlCcFkxd0JhaE5RVzlBcFk1VHc0MGxRZGlCbEMwa0Jm?=
- =?utf-8?B?SU5zS1pIYW10RVdUc21KK1J3c2svSVFMakNGMFdsOHo4cGRDdHBPa2xndWRx?=
- =?utf-8?B?ZTc0UFhxVVZLK1pnazdCNDRSV01yVVh2NUhueElLRmVBRUsrV1FQNERDR09n?=
- =?utf-8?B?OSt5REN3eWJLUVpwSVZlMDVnemZjeDNLbHlRdHVCVWVnRklNKzh5Ym8rUzF0?=
- =?utf-8?B?UUtSZndXd2lkS014OTNsMkNJUGMraGkzMjVZMFI4RkZSTC9kWUJFeEZsM09v?=
- =?utf-8?B?R2lha1VBUHpSRHE4dzdvQ1lJSzIxUDUweXN2TVVnbW4zL0VMOGlNMStWR0s5?=
- =?utf-8?B?V04xR2RrL0VKL2tzbXlXQ3BWcFBLVy9GODQvM1ZaQkFkZHkzUzhQbmxQcnJo?=
- =?utf-8?B?OXhya2RIOUJMb2NvSUFjSlVuWmNGTC9VdVFWYXdtYWQxMnl1aWZKUEhvN2d5?=
- =?utf-8?B?ZWxCMHJuVG5aUWQ2YmJSdWd5WGw2U0ZLaW1BM1luUlVUMmFKRTVqSjcwU0NZ?=
- =?utf-8?B?Vi9XMDFOZUJRaEFzVGd3Wmp1bmZ6S3hqR043L3IyTDEwaXhsRjJrcWlVeTBS?=
- =?utf-8?B?Y2wvM2pPNXBnUjhVWG41eGQrWEZCbmVFS1hyNHFlSUpZMnRRdy81VVBwR2Yy?=
- =?utf-8?B?SmRzY2hqMEIrSXdCV29UL2xpbkFQWVBXZUJSWFpMeEF6MFZKczZvVHRnZ25R?=
- =?utf-8?B?S05idDJBYmdPci8xV1RvaDVjMWFZVWxYZWhKc3crelJ2SkNPQU1DWVY5ZXNO?=
- =?utf-8?B?ZkZxajNTUkpVcTBDVFB5M3crYWY2aGs3SUdINVdsZmlGbThUNE16QllJN2Fv?=
- =?utf-8?B?NjJsUElBbiswTnZHNklWY2F5djZ5YUNEKzB5MDlLWkdTa2lNSzBPNi9XM2Ra?=
- =?utf-8?B?emJwNENhOGVwdUxNU3NFSGFQNGljcG9SZkJwc3NqYUFDTFZzRHpqYjVsNWVu?=
- =?utf-8?B?VWhWN05GTGVGRGl4K08zL0lTalhjdWY4Z3B4RWJNVWFDZXU0ZWo4RHJvYlNY?=
- =?utf-8?B?TktaZ29XSXZHOXQ5VlgweDRxYWZsbVlqRzB3YS84c2x2dkxBUnF1eElWd01p?=
- =?utf-8?B?OW5JMFA1MW9pYlFqdzNSYUZlVVhUaTd4NEp4MEUvWksxYXNLV3Z0TEpnSVpp?=
- =?utf-8?B?RjFwZW5GeU1VMy84TnNuRVNBZFBGdnovZDZaUCt3cEVhalM1SjNRSTEvS295?=
- =?utf-8?B?S2d3RGQ1SFg2ZWh2QjhHb3Z4NXFDYktXU3R0T29UL09lU3VEejlsVTA5bnBy?=
- =?utf-8?B?cmxnZHljOFkzZThTZDZHVmZNQi9RUmhrMmJNTnFtVDBSVWJOR1BCMmd4QUZ2?=
- =?utf-8?B?UU1qaWJrMWV2UTlObnpCOUlWTlIwKzhXK2xlc0dza1FnR1hWc2l3Vmxoc0VI?=
- =?utf-8?B?M0VlQm9KNEFEbDd1UncyRHBRWk10NGJzNlZVdDNCVFUzM3FiK3ZPS2VRZStw?=
- =?utf-8?B?cFBpQk1ubUJEM3RVNnFLcnk5Rm9lKzdpVTV1bmZmTWN6TE50VVQwVEJsL3FH?=
- =?utf-8?B?L0YveTN3S1FYR2ZKZFYxV3BZTkI2cVU5VTBRaTI2OTdnTnVVUHJ2TkxiUUly?=
- =?utf-8?B?YzlYblNTTEtaTnUxaUk3d0FYbDFETS9WQ0UrUzFac2EzUWh4bzExMzVuaWht?=
- =?utf-8?B?dFhZYUNTalo1Q3puZ2tMTVZHS1pnNlNOVndyUzd5VTdVeTk1MGFNWUdMbHNy?=
- =?utf-8?B?THE1WDhkaXQ0TkplcVBLaS9TYnY4VlV4VmxZa0pQSDBrV2xTczdyNkV1U0FC?=
- =?utf-8?B?WGYvQlBmQXJlbk83Mm5scGZvaTVWMS9GYUVwSy9RTjlRMXpjSjB2cVQ3c29h?=
- =?utf-8?B?S3FCd2IzYU15eW9VWi9idXZTcDJmWHlOZ0dyUnA0QTZ0bjZVb3gwWjhYMHdQ?=
- =?utf-8?B?aUxBTVVpaHEwNWxGWDlXK05xSzVnSjZXWUhBdDhseDVVNGlsb0ZFWDFqaC9E?=
- =?utf-8?Q?vMDaiqmlO7uUi9AcUG15lPaEa?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c309a571-66bc-426a-e40a-08dcedbc3970
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 08:26:25.6358
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fythvvqc4pbqbQUQWK7tD3LmxWdJcLHx20gY2WuZqWZGkq6rtQy0CpbKc+dT03a/9pFissS1DKYEu9nayRwFmw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5926
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 13/13] PCI: Deprecate pci_intx(), pcim_intx()
+To: Philipp Stanner <pstanner@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri Kosina
+ <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov
+ <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+ Manish Chopra <manishc@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+ Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>,
+ Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Chen Ni <nichen@iscas.ac.cn>, Mario Limonciello <mario.limonciello@amd.com>,
+ Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
+ Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Mostafa Saleh <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yi Liu <yi.l.liu@intel.com>, Christian Brauner <brauner@kernel.org>,
+ Ankit Agrawal <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>,
+ =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+ Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+ Rui Salvaterra <rsalvaterra@gmail.com>, linux-ide@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+References: <20241015185124.64726-1-pstanner@redhat.com>
+ <20241015185124.64726-14-pstanner@redhat.com>
+ <20241015135336.0de9795e.alex.williamson@redhat.com>
+ <fc7244823a5665d3db40c94aea099a2973032a0b.camel@redhat.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <fc7244823a5665d3db40c94aea099a2973032a0b.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-
-On 10/10/2024 3:44 PM, Nikunj A. Dadhania wrote:
-> 
-> 
-> On 10/9/2024 9:28 PM, Sean Christopherson wrote:
->> On Wed, Oct 09, 2024, Nikunj A Dadhania wrote:
->>> Although the kernel switches over to stable TSC clocksource instead of
->>> kvmclock, the scheduler still keeps on using kvmclock as the sched clock.
->>> This is due to kvm_sched_clock_init() updating the pv_sched_clock()
->>> unconditionally.
+On 16.10.2024 08:57, Philipp Stanner wrote:
+> On Tue, 2024-10-15 at 13:53 -0600, Alex Williamson wrote:
+>> On Tue, 15 Oct 2024 20:51:23 +0200
+>> Philipp Stanner <pstanner@redhat.com> wrote:
 >>
->> All PV clocks are affected by this, no?
+>>> pci_intx() and its managed counterpart pcim_intx() only exist for
+>>> older
+>>> drivers which have not been ported yet for various reasons. Future
+>>> drivers should preferably use pci_alloc_irq_vectors().
+>>>
+>>> Mark pci_intx() and pcim_intx() as deprecated and encourage usage
+>>> of
+>>> pci_alloc_irq_vectors() in its place.
+>>
+>> I don't really understand this.  As we've discussed previously
+>> pci_alloc_irq_vectors() is, unsurprisingly, for allocating PCI IRQ
+>> vectors while pci_intx() is for manipulating the INTx disable bit on
+>> PCI devices.  The latter is a generic mechanism for preventing PCI
+>> devices from generating INTx, regardless of whether there's a vector
+>> allocated for it.  How does the former replace the latter and why do
+>> we
+>> feel the need to deprecate the latter?
+>>
+>> It feels like this fits some narrow narrative and makes all users of
+>> these now deprecated functions second class citizens.  Why?  At it's
+>> root these are simply providing mask and set or mask and clear
+>> register
+>> bit operations.  Thanks,
 > 
-> There are two things that we are trying to associate with a registered PV 
-> clocksource and a PV sched_clock override provided by that PV. Looking at 
-> the code of various x86 PVs
+> I got the feeling from the RFC discussion that that was basically the
+> consensus: people should use pci_alloc_irq_vectors(). Or did I
+> misunderstand Andy and Heiner?
 > 
-> a) HyperV does not override the sched clock when the TSC_INVARIANT feature is set.
->    It implements something similar to calling kvm_sched_clock_init() only when
->    tsc is not stable [1]
+I think there are two different use cases for pci_intx().
+At first there are several drivers where the direct usage of pci_intx()
+can be eliminated by switching to the pci_alloc_irq_vectors() API.
+
+And then there's usage of pci_intx() in
+drivers/vfio/pci/vfio_pci_intrs.c
+drivers/xen/xen-pciback/conf_space_header.c
+There we have to keep the (AFAICS unmanaged) pci_intx() calls.
+
+> I'm perfectly happy with dropping this patch and continue offering
+> pci{m}_intx() to users, since after removing that hybrid hazzard I
+> don't see any harm in them anymore.
 > 
-> b) VMWare: Exports a reliable TSC to the guest. Does not register a clocksource.
->    Overrides the pv_sched_clock with its own version that is using rdtsc().
 > 
-> c) Xen: Overrides the pv_sched_clock. The xen registers its own clocksource. It
->    has same problem like KVM, pv_sched_clock is not switched back to native_sched_clock()
+> P.
 > 
-> Effectively, KVM, Xen and HyperV(when TSC invariant is not available) can be handled
-> in the manner similar to this patch by registering a callback to override/restore the
-> pv_sched_clock when the corresponding clocksource is chosen as the default clocksource.
+>>
+>> Alex
+>>  
+>>> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+>>> ---
+>>>  drivers/pci/devres.c | 5 ++++-
+>>>  drivers/pci/pci.c    | 5 ++++-
+>>>  2 files changed, 8 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
+>>> index 6f8f712fe34e..4c76fc063104 100644
+>>> --- a/drivers/pci/devres.c
+>>> +++ b/drivers/pci/devres.c
+>>> @@ -435,7 +435,7 @@ static struct pcim_intx_devres
+>>> *get_or_create_intx_devres(struct device *dev)
+>>>  }
+>>>  
+>>>  /**
+>>> - * pcim_intx - managed pci_intx()
+>>> + * pcim_intx - managed pci_intx() (DEPRECATED)
+>>>   * @pdev: the PCI device to operate on
+>>>   * @enable: boolean: whether to enable or disable PCI INTx
+>>>   *
+>>> @@ -443,6 +443,9 @@ static struct pcim_intx_devres
+>>> *get_or_create_intx_devres(struct device *dev)
+>>>   *
+>>>   * Enable/disable PCI INTx for device @pdev.
+>>>   * Restore the original state on driver detach.
+>>> + *
+>>> + * This function is DEPRECATED. Do not use it in new code.
+>>> + * Use pci_alloc_irq_vectors() instead (there is no managed
+>>> version, currently).
+>>>   */
+>>>  int pcim_intx(struct pci_dev *pdev, int enable)
+>>>  {
+>>> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+>>> index 7ce1d0e3a1d5..dc69e23b8982 100644
+>>> --- a/drivers/pci/pci.c
+>>> +++ b/drivers/pci/pci.c
+>>> @@ -4477,11 +4477,14 @@ void pci_disable_parity(struct pci_dev
+>>> *dev)
+>>>  }
+>>>  
+>>>  /**
+>>> - * pci_intx - enables/disables PCI INTx for device dev
+>>> + * pci_intx - enables/disables PCI INTx for device dev
+>>> (DEPRECATED)
+>>>   * @pdev: the PCI device to operate on
+>>>   * @enable: boolean: whether to enable or disable PCI INTx
+>>>   *
+>>>   * Enables/disables PCI INTx for device @pdev
+>>> + *
+>>> + * This function is DEPRECATED. Do not use it in new code.
+>>> + * Use pci_alloc_irq_vectors() instead.
+>>>   */
+>>>  void pci_intx(struct pci_dev *pdev, int enable)
+>>>  {
+>>
 > 
-> However, since VMWare only wants to override the pv_sched_clock without registering a
-> PV clocksource, I will need to give some more thought to it as there is no callback
-> available in this case.
+> 
 
-Adding Xen and VMWare folks for comments/review:
-For modern systems that provide constant, non-stop and stable TSC, guest kernel
-will switch to TSC as the clocksource and sched_clock should also be
-switched to native_sched_clock().
-
-The below patch and patch here [1], does the above mentioned changes. Proposed
-change will override the kvm_sched_clock_read()/vmware_sched_clock()/
-xen_sched_clock() routine whenever TSC(early or regular) is selected as a
-clocksource.
-
-Special note to VMWare folks: 
-Commit 80e9a4f21fd7 ("x86/vmware: Add paravirt sched clock") in 2016 had
-introduced vmware_sched_clock(). In the current upstream version
-native_sched_clock() uses __cyc2ns_read(), which is optimized and use 
-percpu multiplier and shifts which do not change for constant tsc. Is it 
-fine for the linux guest running on VMWare to use native_sched_clock() 
-instead of vmware_sched_clock().
-
-From: Nikunj A Dadhania <nikunj@amd.com>
-Date: Tue, 28 Nov 2023 18:29:56 +0530
-Subject: [RFC PATCH] tsc: Switch to native sched clock
-
-Although the kernel switches over to stable TSC clocksource instead of PV
-clocksource, the scheduler still keeps on using PV clocks as the sched
-clock source. This is because the KVM, Xen and VMWare, switches
-the paravirt sched clock handler in their init routines. The HyperV is the
-only PV clock source that checks if the platform provides invariant TSC and
-does not switch to PV sched clock.
-
-When switching back to stable TSC, restore the scheduler clock to
-native_sched_clock().
-
-As the clock selection happens in the stop machine context, schedule
-delayed work to update the static_call()
-
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
----
- arch/x86/kernel/tsc.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
-index 8150f2104474..48ce7afd69dc 100644
---- a/arch/x86/kernel/tsc.c
-+++ b/arch/x86/kernel/tsc.c
-@@ -272,10 +272,25 @@ bool using_native_sched_clock(void)
- {
- 	return static_call_query(pv_sched_clock) == native_sched_clock;
- }
-+
-+static void enable_native_sc_work(struct work_struct *work)
-+{
-+	pr_info("using native sched clock\n");
-+	paravirt_set_sched_clock(native_sched_clock);
-+}
-+static DECLARE_DELAYED_WORK(enable_native_sc, enable_native_sc_work);
-+
-+static void enable_native_sched_clock(void)
-+{
-+	if (!using_native_sched_clock())
-+		schedule_delayed_work(&enable_native_sc, 0);
-+}
- #else
- u64 sched_clock_noinstr(void) __attribute__((alias("native_sched_clock")));
- 
- bool using_native_sched_clock(void) { return true; }
-+
-+void enable_native_sched_clock(void) { }
- #endif
- 
- notrace u64 sched_clock(void)
-@@ -1157,6 +1172,10 @@ static void tsc_cs_tick_stable(struct clocksource *cs)
- static int tsc_cs_enable(struct clocksource *cs)
- {
- 	vclocks_set_used(VDSO_CLOCKMODE_TSC);
-+
-+	/* Restore native_sched_clock() when switching to TSC */
-+	enable_native_sched_clock();
-+
- 	return 0;
- }
- 
--- 
-2.34.1
-
-1. https://lore.kernel.org/lkml/20241009092850.197575-16-nikunj@amd.com/
 
