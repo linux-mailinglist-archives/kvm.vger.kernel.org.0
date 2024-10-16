@@ -1,162 +1,235 @@
-Return-Path: <kvm+bounces-28987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 813A59A07BF
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 12:49:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAC8F9A07CA
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 12:51:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8392B22CDD
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 10:49:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BA4E286CDA
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 10:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 467642076A9;
-	Wed, 16 Oct 2024 10:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142B1207206;
+	Wed, 16 Oct 2024 10:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hY8tXSo5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z+QLV8kA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CA4206042
-	for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 10:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BED1CACDB;
+	Wed, 16 Oct 2024 10:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729075757; cv=none; b=cZwXn76XXUeNkRFfjVY8pYT5z30otkgr1eLuWVD49AedZmJN+N2EFYIOQXfTTyUA1jXgDT8wqEeDpC3q6H2oqwM4Lwx9hJTA7T4CU1sg4LIA23iUWuDy1gblE7EiXgBfJqQEN8OWCr9nOlhyCdUN9FKXkHIxJFvIWRsrYtIIdYU=
+	t=1729075860; cv=none; b=ZIhLBYDT9DObTfkDXbQ9slut5U1wUwLfFxlZot9aLt5SfP18Tq3nrgC5c/mB1Mr4sDjoVGR8fAkF9qLIWas4wGZiSF81JjDo/aIejMR3L3Iexi3ICCYlyas68Uzhj3FRXWxLID+dhyy8NJwfHugryq7133cTIemzODZ1iv/82t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729075757; c=relaxed/simple;
-	bh=p3Uy6zh8Ol2qbVeWD/3mGVLL+TASPb0miaj+Lh6GDmI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ddY4/WfqCdUyepJZuvarqo8Jd6TykUDV5ya2/L4zHGBmKs0VkcCJOgSGZkuPpzVxA8GrLxUboHV7yZ2wSAvs14CxW3KOlbgl/bmCgD4hEbiOUe+Qei3ca23ihEzD43dkNLxuFPzl17sj4PE+rQhPP9TzzfG2ks4zxnUyEs/b5oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hY8tXSo5; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5c932b47552so14643a12.0
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 03:49:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729075754; x=1729680554; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rqRqGRF1VySphqdyBOb5GNHPJs16AcbMlWU0XE/fB+o=;
-        b=hY8tXSo5B2hNXHbPz0kMTx7PcuhgBP6B998zlRKZvuJPkLhb8AoEMfSDlMFYKlLA0U
-         boEK6IymXrc9SM2hnwrRDorc8RJ+cztCA/pdKn7OmqgojXpW3m+kIUQUJTbOiabprlAX
-         oqDYSGyWWl13GVddXNCiqUeSdTm9OGlD9gmGHIJ0kLMBtJzfJL81sm2MW4sXEK0rcjkt
-         UuxP4UixGVPjS0a4WSmoTDOMEhJhAVRMv51SdcqNWIv6huxOM01iRPkKfVVZnBK5kF5U
-         OLVQyzkVMwlFZvijofBXJzD4L1q60U8zbJTfV3z8e7UkXUyk85H0/fgek1LtCLM4NDRr
-         q3RQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729075754; x=1729680554;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rqRqGRF1VySphqdyBOb5GNHPJs16AcbMlWU0XE/fB+o=;
-        b=fP51h9EGPXFQMXfVVsFAnuLrrj/B+YTdlluIhMXR3VT6aPfQNyIt6mx3vjzAV7j6fe
-         M+jLjGQiAeH6/1MZIweuUx5d3beBAJNgYRnLPXfNKq/KUx3Ant9ghBenrCOTJh1PFFuR
-         NgcPM4k5xuG+EDKUub8KvwBPqmyXeMNcoh8sTetK3oeiegxuQhG6K3vTn7+OLhyqYhtM
-         f4Bzu2jB1pj/YQfTGa2yemXG6p06BR4wndo3NeWoIKcWl92oBBVtxL0gBLK5Wm8ScZzt
-         nQ8Zi7Qv9Oon/g0LE4O0OzGgDEd0Sae3dtnyUSiGOXUkhR+Qo8LENO5fu0iYD90RhK1t
-         mvEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXIENAYZznyWW9tNRo+aZqBYpD+6m4MgEOiEQRd98649/YdKlLWyfrfgs+TyUJWJExwRdM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAIhiK55fuNJuJh6mhTUk+oaVibQMG/iVSOvuz7kBJz59pZ5+9
-	FPo0oSI4lxACtdvInuJ1tG1v+2izpZEOfxHUxRgKHqXgH515LVoVMEOHTzlrTP8MRjO6XozEh3n
-	Q87vC1zwl2EEzdSpUlxPC1er8mw5oOHpcVFDs
-X-Google-Smtp-Source: AGHT+IEOaQ4cgkPExzBkgZGD4dOtgPfim6YoQJY1ySC/ykGcUlK7ML3iO3mQ0h89zzZPsHTX3ghBdYyNrM7ENxR9XDk=
-X-Received: by 2002:a05:6402:34c6:b0:5c8:84b5:7e78 with SMTP id
- 4fb4d7f45d1cf-5c997a90d4bmr449217a12.4.1729075742925; Wed, 16 Oct 2024
- 03:49:02 -0700 (PDT)
+	s=arc-20240116; t=1729075860; c=relaxed/simple;
+	bh=PNIap9Mxdye6yXywbk16VpWNVzOz915uVCPZlmzOALo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JeNOVc8DoWwc9viau2KQBRG+tm9b2BPeeJtViDTTM4oPlXdXOO0rGmKo+lxg4+nYL/Clas35edzFLT3JF9Z/9x5vJUKY7UTEXXrrHTmZ01o6y++IIw4GXzDdbmuQm72p2fPx/WIKCc76f/gN22QlfJQYSl7Hw74h+Yi0aLrv/so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.helo=mgamail.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z+QLV8kA; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.helo=mgamail.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729075859; x=1760611859;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=PNIap9Mxdye6yXywbk16VpWNVzOz915uVCPZlmzOALo=;
+  b=Z+QLV8kAgjsiy9SSacTmEU0izrZ1GidBfDaqlNVTBWMeTIxmXsXriaCg
+   ARsYLkfpsR4mlE8EtqC86Wn8qHvW5RBPYXgrJCGbBlb3FdntxwZooL91I
+   nlxNTVCLvfiVll0WgeLKxTgc9MrDc0bD7teByrqKmTqbJIymONijrKQC8
+   x7WvmfLE8rPTA4Lutpra7zDs+lbnyO3NW5eR01V2buXW8CBHKSRDyvcgx
+   ScUF5xdnEmPVs2TK9jKr4D+uC3uGYov8lu1us+Ec7/l8eXfiqZO9feoJu
+   kvRfMhCJ2ev2v4s3O1qt5a7d0hSMzYWVOtYowoIhkCY9G8SK5s2ZLlHex
+   g==;
+X-CSE-ConnectionGUID: fg0EHjLsTtKBv2BigDVJgQ==
+X-CSE-MsgGUID: cDKpGVjdR8qXWc7Oa1+F7A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11226"; a="28395566"
+X-IronPort-AV: E=Sophos;i="6.11,207,1725346800"; 
+   d="scan'208";a="28395566"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 03:50:58 -0700
+X-CSE-ConnectionGUID: BcSritA1TJ2xJIzrN/E4tw==
+X-CSE-MsgGUID: rEYd4NKfRJOPJascwiMpVw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,207,1725346800"; 
+   d="scan'208";a="82969242"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orviesa005.jf.intel.com with ESMTP; 16 Oct 2024 03:50:51 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+	id DE448331; Wed, 16 Oct 2024 13:50:49 +0300 (EEST)
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Gaosheng Cui <cuigaosheng1@huawei.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Kai Huang <kai.huang@intel.com>,
+	Andi Kleen <ak@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org,
+	Dave Hansen <dave.hansen@intel.com>
+Subject: [PATCH] x86/mtrr: Rename mtrr_overwrite_state() to guest_force_mtrr_state()
+Date: Wed, 16 Oct 2024 13:50:48 +0300
+Message-ID: <20241016105048.757081-1-kirill.shutemov@linux.intel.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20241015095818.357915-1-kirill.shutemov@linux.intel.com>
+References: <20241015095818.357915-1-kirill.shutemov@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1726009989.git.ackerleytng@google.com> <bd163de3118b626d1005aa88e71ef2fb72f0be0f.1726009989.git.ackerleytng@google.com>
- <Zwf7k1wmPqEEaRxz@x1n> <diqz8quunrlw.fsf@ackerleytng-ctop.c.googlers.com>
- <Zw7f3YrzqnH-iWwf@x1n> <diqz1q0hndb3.fsf@ackerleytng-ctop.c.googlers.com> <9abab5ad-98c0-48bb-b6be-59f2b3d3924a@redhat.com>
-In-Reply-To: <9abab5ad-98c0-48bb-b6be-59f2b3d3924a@redhat.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Wed, 16 Oct 2024 16:18:49 +0530
-Message-ID: <CAGtprH_AiVJAd4rxKZBC9372swf2hW8kFfWG2y7zBdzCmpLRUw@mail.gmail.com>
-Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
- struct kvm_gmem_private
-To: David Hildenbrand <david@redhat.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, Peter Xu <peterx@redhat.com>, tabba@google.com, 
-	quic_eberman@quicinc.com, roypat@amazon.co.uk, jgg@nvidia.com, 
-	rientjes@google.com, fvdl@google.com, jthoughton@google.com, 
-	seanjc@google.com, pbonzini@redhat.com, zhiquan1.li@intel.com, 
-	fan.du@intel.com, jun.miao@intel.com, isaku.yamahata@intel.com, 
-	muchun.song@linux.dev, erdemaktas@google.com, qperret@google.com, 
-	jhubbard@nvidia.com, willy@infradead.org, shuah@kernel.org, 
-	brauner@kernel.org, bfoster@redhat.com, kent.overstreet@linux.dev, 
-	pvorel@suse.cz, rppt@kernel.org, richard.weiyang@gmail.com, 
-	anup@brainfault.org, haibo1.xu@intel.com, ajones@ventanamicro.com, 
-	vkuznets@redhat.com, maciej.wieczor-retman@intel.com, pgonda@google.com, 
-	oliver.upton@linux.dev, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 16, 2024 at 2:20=E2=80=AFPM David Hildenbrand <david@redhat.com=
-> wrote:
->
-> >> I also don't know how you treat things like folio_test_hugetlb() on
-> >> possible assumptions that the VMA must be a hugetlb vma.  I'd confess =
-I
-> >> didn't yet check the rest of the patchset yet - reading a large series
-> >> without a git tree is sometimes challenging to me.
-> >>
-> >
-> > I'm thinking to basically never involve folio_test_hugetlb(), and the
-> > VMAs used by guest_memfd will also never be a HugeTLB VMA. That's
-> > because only the HugeTLB allocator is used, but by the time the folio i=
-s
-> > mapped to userspace, it would have already have been split. After the
-> > page is split, the folio loses its HugeTLB status. guest_memfd folios
-> > will never be mapped to userspace while they still have a HugeTLB
-> > status.
->
-> We absolutely must convert these hugetlb folios to non-hugetlb folios.
->
-> That is one of the reasons why I raised at LPC that we should focus on
-> leaving hugetlb out of the picture and rather have a global pool, and
-> the option to move folios from the global pool back and forth to hugetlb
-> or to guest_memfd.
->
-> How exactly that would look like is TBD.
->
-> For the time being, I think we could add a "hack" to take hugetlb folios
-> from hugetlb for our purposes, but we would absolutely have to convert
-> them to non-hugetlb folios, especially when we split them to small
-> folios and start using the mapcount. But it doesn't feel quite clean.
+Rename the helper to better reflect its function.
 
-As hugepage folios need to be split up in order to support backing
-CoCo VMs with hugepages, I would assume any folio based hugepage
-memory allocation will need to go through split/merge cycles through
-the guest memfd lifetime.
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Suggested-by: Dave Hansen <dave.hansen@intel.com>
+---
+ arch/x86/hyperv/ivm.c              |  2 +-
+ arch/x86/include/asm/mtrr.h        | 10 +++++-----
+ arch/x86/kernel/cpu/mtrr/generic.c |  6 +++---
+ arch/x86/kernel/cpu/mtrr/mtrr.c    |  2 +-
+ arch/x86/kernel/kvm.c              |  2 +-
+ arch/x86/xen/enlighten_pv.c        |  4 ++--
+ 6 files changed, 13 insertions(+), 13 deletions(-)
 
-Plan through next RFC series is to abstract out the hugetlb folio
-management within guest_memfd so that any hugetlb specific logic is
-cleanly separated out and allows guest memfd to allocate memory from
-other hugepage allocators in the future.
+diff --git a/arch/x86/hyperv/ivm.c b/arch/x86/hyperv/ivm.c
+index 60fc3ed72830..90aabe1fd3b6 100644
+--- a/arch/x86/hyperv/ivm.c
++++ b/arch/x86/hyperv/ivm.c
+@@ -664,7 +664,7 @@ void __init hv_vtom_init(void)
+ 	x86_platform.guest.enc_status_change_finish = hv_vtom_set_host_visibility;
+ 
+ 	/* Set WB as the default cache mode. */
+-	mtrr_overwrite_state(NULL, 0, MTRR_TYPE_WRBACK);
++	guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
+ }
+ 
+ #endif /* defined(CONFIG_AMD_MEM_ENCRYPT) || defined(CONFIG_INTEL_TDX_GUEST) */
+diff --git a/arch/x86/include/asm/mtrr.h b/arch/x86/include/asm/mtrr.h
+index 4218248083d9..c69e269937c5 100644
+--- a/arch/x86/include/asm/mtrr.h
++++ b/arch/x86/include/asm/mtrr.h
+@@ -58,8 +58,8 @@ struct mtrr_state_type {
+  */
+ # ifdef CONFIG_MTRR
+ void mtrr_bp_init(void);
+-void mtrr_overwrite_state(struct mtrr_var_range *var, unsigned int num_var,
+-			  mtrr_type def_type);
++void guest_force_mtrr_state(struct mtrr_var_range *var, unsigned int num_var,
++			    mtrr_type def_type);
+ extern u8 mtrr_type_lookup(u64 addr, u64 end, u8 *uniform);
+ extern void mtrr_save_fixed_ranges(void *);
+ extern void mtrr_save_state(void);
+@@ -75,9 +75,9 @@ void mtrr_disable(void);
+ void mtrr_enable(void);
+ void mtrr_generic_set_state(void);
+ #  else
+-static inline void mtrr_overwrite_state(struct mtrr_var_range *var,
+-					unsigned int num_var,
+-					mtrr_type def_type)
++static inline void guest_force_mtrr_state(struct mtrr_var_range *var,
++					  unsigned int num_var,
++					  mtrr_type def_type)
+ {
+ }
+ 
+diff --git a/arch/x86/kernel/cpu/mtrr/generic.c b/arch/x86/kernel/cpu/mtrr/generic.c
+index 7b29ebda024f..2fdfda2b60e4 100644
+--- a/arch/x86/kernel/cpu/mtrr/generic.c
++++ b/arch/x86/kernel/cpu/mtrr/generic.c
+@@ -423,7 +423,7 @@ void __init mtrr_copy_map(void)
+ }
+ 
+ /**
+- * mtrr_overwrite_state - set static MTRR state
++ * guest_force_mtrr_state - set static MTRR state for a guest
+  *
+  * Used to set MTRR state via different means (e.g. with data obtained from
+  * a hypervisor).
+@@ -436,8 +436,8 @@ void __init mtrr_copy_map(void)
+  * @num_var: length of the @var array
+  * @def_type: default caching type
+  */
+-void mtrr_overwrite_state(struct mtrr_var_range *var, unsigned int num_var,
+-			  mtrr_type def_type)
++void guest_force_mtrr_state(struct mtrr_var_range *var, unsigned int num_var,
++			    mtrr_type def_type)
+ {
+ 	unsigned int i;
+ 
+diff --git a/arch/x86/kernel/cpu/mtrr/mtrr.c b/arch/x86/kernel/cpu/mtrr/mtrr.c
+index 989d368be04f..ecbda0341a8a 100644
+--- a/arch/x86/kernel/cpu/mtrr/mtrr.c
++++ b/arch/x86/kernel/cpu/mtrr/mtrr.c
+@@ -625,7 +625,7 @@ void mtrr_save_state(void)
+ static int __init mtrr_init_finalize(void)
+ {
+ 	/*
+-	 * Map might exist if mtrr_overwrite_state() has been called or if
++	 * Map might exist if guest_force_mtrr_state() has been called or if
+ 	 * mtrr_enabled() returns true.
+ 	 */
+ 	mtrr_copy_map();
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 21e9e4845354..7a422a6c5983 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -983,7 +983,7 @@ static void __init kvm_init_platform(void)
+ 	x86_platform.apic_post_init = kvm_apic_init;
+ 
+ 	/* Set WB as the default cache mode for SEV-SNP and TDX */
+-	mtrr_overwrite_state(NULL, 0, MTRR_TYPE_WRBACK);
++	guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
+ }
+ 
+ #if defined(CONFIG_AMD_MEM_ENCRYPT)
+diff --git a/arch/x86/xen/enlighten_pv.c b/arch/x86/xen/enlighten_pv.c
+index d6818c6cafda..633469fab536 100644
+--- a/arch/x86/xen/enlighten_pv.c
++++ b/arch/x86/xen/enlighten_pv.c
+@@ -171,7 +171,7 @@ static void __init xen_set_mtrr_data(void)
+ 
+ 	/* Only overwrite MTRR state if any MTRR could be got from Xen. */
+ 	if (reg)
+-		mtrr_overwrite_state(var, reg, MTRR_TYPE_UNCACHABLE);
++		guest_force_mtrr_state(var, reg, MTRR_TYPE_UNCACHABLE);
+ #endif
+ }
+ 
+@@ -195,7 +195,7 @@ static void __init xen_pv_init_platform(void)
+ 	if (xen_initial_domain())
+ 		xen_set_mtrr_data();
+ 	else
+-		mtrr_overwrite_state(NULL, 0, MTRR_TYPE_WRBACK);
++		guest_force_mtrr_state(NULL, 0, MTRR_TYPE_WRBACK);
+ 
+ 	/* Adjust nr_cpu_ids before "enumeration" happens */
+ 	xen_smp_count_cpus();
+-- 
+2.45.2
 
->
-> Simply starting with a separate global pool (e.g., boot-time allocation
-> similar to as done by hugetlb, or CMA) might be cleaner, and a lot of
-> stuff could be factored out from hugetlb code to achieve that.
-
-I am not sure if a separate global pool necessarily solves all the
-issues here unless we come up with more concrete implementation
-details. One of the concerns was the ability of implementing/retaining
-HVO while transferring memory between the separate global pool and
-hugetlb pool i.e. whether it can seamlessly serve all hugepage users
-on the host. Another question could be whether the separate
-pool/allocator simplifies the split/merge operations at runtime.
-
->
-> --
-> Cheers,
->
-> David / dhildenb
->
 
