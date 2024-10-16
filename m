@@ -1,136 +1,106 @@
-Return-Path: <kvm+bounces-29037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C7E59A158E
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 00:05:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44E529A15C2
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 00:21:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2C0028206D
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 22:05:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE4A91F21CFB
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 22:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AEB71D3584;
-	Wed, 16 Oct 2024 22:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510F41D45E2;
+	Wed, 16 Oct 2024 22:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y1M6R6mT"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="pwHcwj1Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAEAB18732A;
-	Wed, 16 Oct 2024 22:05:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48BE71D2F5F;
+	Wed, 16 Oct 2024 22:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729116312; cv=none; b=NrklBIwcJu+yXqSd4N09Lw6NvGrOYmRDB5BHpWr3cVacqGCnk04UWMKBaPCKzgDXbEpGllM98Kwvt6sRy2+snzs324TOY9rXdWNBU100sbWbxp5+vmO2XUg8PKgB8rdO59WEVvSz6t0xYD/seshHTZOgIs7wBotW2vZtZnW3sCc=
+	t=1729117257; cv=none; b=RG0XK4lNo48HxAnDfqN1DPOJCq/pWKnM32YpUdWBORMsusEuUNwzCB/DOcNeMdYWO5gfiKVGYJpfxPlv9xjz+mCBDj9wN1ch7UU9XERTx0QUCqnNwdh8gJrT6HbjtV6WTTrnkyb6B+UB/o4KiLOlfMco/1Qi7HtrglcTQFnKl98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729116312; c=relaxed/simple;
-	bh=m+ov/kVs568rdAOKI4g86lXMj+F8r3CaFxVqeHbibgA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=adoNUbSZvs46UJTZJAHdtdN++W6fqG4sjGfVAmasQ4t3/q5b3UhfRcvPYx8YghO2g21IZtWwl3FVwJxbx/PSnuSTdk/7qdwiYUhEPki+3sNOZQ9+cERP4Q2Ru4TIdc8VRpj8IpXnNAq/aenTIjibrdcixmjOk0XhqQ7kcgvYLHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y1M6R6mT; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-430558cddbeso1752575e9.1;
-        Wed, 16 Oct 2024 15:05:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729116309; x=1729721109; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eib+0uxxctBnJ3GemeBl+zs6xNFdQY858TCAdBOxxas=;
-        b=Y1M6R6mTglD51wayjA3cjZkCwxWW9vbk1JVRbFKC7OAnwHbabSxDrgOTBGnKbl1kHc
-         NFbZvc9eteKcaL9dn7NKOj+f0/piRjcqasjwE50Q4Vfe+6fR4Nu8so6witJ9CApBxn+O
-         rLIpi06aX1v46ooO4BvGD+s2vVoBrViGeUx3EQa8TWln01ilYncfHh3aKiJx8uLtnG5g
-         /81v4fN0uZT+xQ4C1OTzQO/Nj7X07ItpkqxR631zky1cGhapkIu4ZbfLSnOjGRLY8kOq
-         40O+uKgTjPCZ8vrebllX4MzKSEGPmShR3ZEyyMZKfygz97w3hFT0HDBmsmIg3XomNAAH
-         6b7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729116309; x=1729721109;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eib+0uxxctBnJ3GemeBl+zs6xNFdQY858TCAdBOxxas=;
-        b=i6o3CkcUcB02Lf7ZFmrTfbOpLWVXlZtY3Iiyvp2J88W+HnSv1WxrbuviXE6/Kk7y6X
-         8ucRhCpWLGiI56R9Vlqh302wyhfd1m6JuZ60jOaC2Y/P3Eulx8rNW1iFLZ4LzB58QxOv
-         Z9QKOrvjnkEH5CujtFbpFEGNJKivloKJw/aMxzNh8pXzW9XNx30+PN50PWgZHGgliiWl
-         1nanTRzSPg5yeigaksd34U+0Nc1aHfuopRNqY0y9ldu2c44khLioDAWYi/Y8wZSC1hwZ
-         +aImncIXq5R9vEFe+XTVwI664N7kPRcU6zKfiZFOBVfksVMd9dl8XDI5Uh/4JaSZAu5Q
-         BeuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUAqstj06XUnKykWDwzwh2lEUi+XR4mF3q94vEawmX9tjPwEWfVEhLXCcnbRYt0mrMVfvuPohJSEQPZXzI5@vger.kernel.org, AJvYcCUpoqiMsxIA08wGB0xMDnQJ77nih4KFw0MMMfEere9jjSLC/Mf7VenQ3+HFSSDpJljvBySh9LwFZSvPEnY63GD+@vger.kernel.org, AJvYcCXlBU2CD4ARM18HdpoeQaMZlOq3dK/T13/9ZYL5ahrLQLsbqvC4DrPtdvpUef65Y2o4r/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyyzq9YH/Uy+wMy0kyMwJC13cjmP5dJENvZ1de2EFd6qi2lgaFN
-	55HO8MHiOW0rCmmDjQrv9A77mohDltK89F4Mbq3VZjToYd9xnMHv
-X-Google-Smtp-Source: AGHT+IFHS7yUP+gqPUlAOVcvDGP/scaJVzDVX481vwVPL2msLYF5ZPDnJxUh9Be2IAi4QJPe7zUGvA==
-X-Received: by 2002:a05:600c:474a:b0:431:4e33:98b6 with SMTP id 5b1f17b1804b1-431587174b4mr6592285e9.5.1729116308883;
-        Wed, 16 Oct 2024 15:05:08 -0700 (PDT)
-Received: from ?IPV6:2a02:8012:e013:0:f52b:f2f2:1fbe:f0ae? ([2a02:8012:e013:0:f52b:f2f2:1fbe:f0ae])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43158c3bcdasm6021755e9.17.2024.10.16.15.05.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2024 15:05:07 -0700 (PDT)
-Message-ID: <cea2040f-7214-41cb-9e9c-98895bf5a1ec@gmail.com>
-Date: Wed, 16 Oct 2024 23:05:04 +0100
+	s=arc-20240116; t=1729117257; c=relaxed/simple;
+	bh=rpAo2bq/X0bzymyXl7qBfRjhyv0bI95I2EG0AS8gNCw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p/U1eU24D8Pxl/zH9BnRWJD/RbfNCUok8Z27wvIZmwO8w4nuTl2RytupnUmVg6CNt8lhotd41zOA9kaK218jWGQuvs/utG2UM/f8LeNWYP0BlOjUEbgTw+ciy2bg87Uo66QzOpP5oeVzzRvORyOAfFMiVXKGjBcTYskRySDcEi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=pwHcwj1Z; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from DESKTOP-0403QTC. (unknown [20.236.11.29])
+	by linux.microsoft.com (Postfix) with ESMTPSA id EEE8A20E1A5A;
+	Wed, 16 Oct 2024 15:20:48 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EEE8A20E1A5A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1729117249;
+	bh=WD3Ep8nGPeg1tM5YhegcRnyJhwTRJLT6LHrHFVSMVX8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Reply-To:From;
+	b=pwHcwj1ZTCxfkG6lQVmO6XgXN3JVRw5injt7MQgSQIWed4KS7nLVgv3LYpB2TtL2r
+	 bs8lvZwXy0FT0M1o4at49XgSDJk0rNARIBhbp2cak03QSnsWqc89pKF/luci+cTBwG
+	 5dAeCaQMoH3ZfG/Hd0bf3UA/zVrxxHpnB0UqU6mE=
+Date: Wed, 16 Oct 2024 15:20:47 -0700
+From: Jacob Pan <jacob.pan@linux.microsoft.com>
+To: James Gowans <jgowans@amazon.com>
+Cc: <linux-kernel@vger.kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin
+ Tian <kevin.tian@intel.com>, "Joerg Roedel" <joro@8bytes.org>, Krzysztof
+ =?UTF-8?B?V2lsY3p5xYRza2k=?= <kw@linux.com>, Will Deacon <will@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>, Mike Rapoport <rppt@kernel.org>,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ <iommu@lists.linux.dev>, "Sean Christopherson" <seanjc@google.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>, David Woodhouse
+ <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, Alexander Graf
+ <graf@amazon.de>, <anthony.yznaga@oracle.com>, <steven.sistare@oracle.com>,
+ <nh-open-source@amazon.com>, "Saenz Julienne, Nicolas" <nsaenz@amazon.es>,
+ jacob.pan@linux.microsoft.com
+Subject: Re: [RFC PATCH 05/13] iommufd: Serialise persisted iommufds and
+ ioas
+Message-ID: <20241016152047.2a604f08@DESKTOP-0403QTC.>
+In-Reply-To: <20240916113102.710522-6-jgowans@amazon.com>
+References: <20240916113102.710522-1-jgowans@amazon.com>
+	<20240916113102.710522-6-jgowans@amazon.com>
+Reply-To: jacob.pan@linux.microsoft.com, Saurabh Sengar
+ <ssengar@linux.microsoft.com>
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] KVM: x86, vmx: Add function for event delivery error
- generation
-To: Sean Christopherson <seanjc@google.com>, Ivan Orlov <iorlov@amazon.com>
-Cc: bp@alien8.de, dave.hansen@linux.intel.com, mingo@redhat.com,
- pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, hpa@zytor.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, x86@kernel.org, jalliste@amazon.com,
- nh-open-source@amazon.com, pdurrant@amazon.co.uk
-References: <20240927161657.68110-1-iorlov@amazon.com>
- <20240927161657.68110-2-iorlov@amazon.com> <Zwmyzg5WiKKvySS1@google.com>
- <20241015195227.GA18617@dev-dsk-iorlov-1b-d2eae488.eu-west-1.amazon.com>
- <ZxAqscbrROD1_szG@google.com>
-Content-Language: en-US
-From: Ivan Orlov <ivan.orlov0322@gmail.com>
-In-Reply-To: <ZxAqscbrROD1_szG@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 10/16/24 22:05, Sean Christopherson wrote:
-> On Tue, Oct 15, 2024, Ivan Orlov wrote:
->>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>>> index c67e448c6ebd..afd785e7f3a3 100644
->>>> --- a/arch/x86/kvm/vmx/vmx.c
->>>> +++ b/arch/x86/kvm/vmx/vmx.c
->>>> @@ -6550,19 +6550,10 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
->>>>   	     exit_reason.basic != EXIT_REASON_APIC_ACCESS &&
->>>>   	     exit_reason.basic != EXIT_REASON_TASK_SWITCH &&
->>>>   	     exit_reason.basic != EXIT_REASON_NOTIFY)) {
->>>> -		int ndata = 3;
->>>> +		gpa_t gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
->>>> +		bool is_mmio = exit_reason.basic == EXIT_REASON_EPT_MISCONFIG;
->>>
->>> There's no need for is_mmio, just pass INVALID_GPA when the GPA isn't known.
->>
->> Ah alright, then we definitely don't need an is_mmio field. I assume we
->> can't do MMIO at GPA=0, right?
-> 
-> Wrong :-)
-> 
+Hi James,
 
-Then getting rid of `is_mmio` will make distinguishing between vectoring 
-error due to MMIO with GPA=0 and non-mmio vectoring error quite hard for 
-the error reporti
+On Mon, 16 Sep 2024 13:30:54 +0200
+James Gowans <jgowans@amazon.com> wrote:
 
-Passing INVALID_GPA into the userspace due to non-mmio vectoring error 
-will change the existing internal.data order, but I can do it if it's 
-fine. Sorry for nitpicking :)
+> +static int serialise_iommufd(void *fdt, struct iommufd_ctx *ictx)
+> +{
+> +	int err = 0;
+> +	char name[24];
+> +	struct iommufd_object *obj;
+> +	unsigned long obj_idx;
+> +
+> +	snprintf(name, sizeof(name), "%lu", ictx->persistent_id);
+> +	err |= fdt_begin_node(fdt, name);
+> +	err |= fdt_begin_node(fdt, "ioases");
+> +	xa_for_each(&ictx->objects, obj_idx, obj) {
+> +		struct iommufd_ioas *ioas;
+> +		struct iopt_area *area;
+> +		int area_idx = 0;
+> +
+> +		if (obj->type != IOMMUFD_OBJ_IOAS)
+> +			continue;
+I was wondering how device state persistency is managed here. Is it
+correct to assume that all devices bound to an iommufd context should
+be persistent? If so, should we be serializing IOMMUFD_OBJ_DEVICE as
+well?
 
->  From an architectural perspective, GPA=0 is not special in any way.  E.g. prior
-> to L1TF, Linux would happily use the page with PFN=0.
-> 
-
-Cool, didn't know about this vulnerability... Thanks for the explanation!
-
--- 
-Kind regards,
-Ivan Orlov
+I'm considering this from the perspective of user mode drivers,
+including those that use noiommu mode (need to be added to iommufd
+cdev). In this scenario, we only need to maintain the device states
+persistently without IOAS.
 
