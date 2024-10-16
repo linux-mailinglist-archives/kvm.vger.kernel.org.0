@@ -1,89 +1,50 @@
-Return-Path: <kvm+bounces-28994-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28995-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 463309A091F
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 14:14:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C37519A0B16
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 15:13:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFF071F22EFE
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 12:14:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9FEC1C224B3
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 13:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D342F20821B;
-	Wed, 16 Oct 2024 12:14:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NdIdiS69"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FA220968C;
+	Wed, 16 Oct 2024 13:12:57 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E102076DA;
-	Wed, 16 Oct 2024 12:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD6220966C
+	for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 13:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729080887; cv=none; b=Jg/CSt+Zr9MUXnaGxBs3pPY/r4I+KWXTXl5H4XcJsJ1NJ6b/OtVagQCpybsjBzSD5X65BCI7/wCsDblSwZUuIoQan/Bkpf8doVyCTSe5dfV5OsHb0g2JiXTuyLFzU3hYeDhAghJjXFiMtc2SapJr/TzQv7kdlZjeJ6XKWKUCg6s=
+	t=1729084376; cv=none; b=Q+XrJf9ie68E4fBfGBHEHhD0BGcnY/uxpIryspu6Kecc7PfGuJoxPskdXF3mR9Vu8iE+yT/5SLOOwb11GvboXJCDIjN970Sb4s9PrStJtSwzCptSRkR0u+uxap6YWRnviMjTrF2D/c/L2ucjXNnNrDRHb0opAVbOCELxbgPz0N0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729080887; c=relaxed/simple;
-	bh=2/Suc9WTfhdUXwiTzxc/IflbPBFAA6X/l6N4Gk2D62g=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pFEK74nww3AcY2AtuH12GYeqcV51hLbl/OXDGCVSS2m3Qz7efT1Et20o4lAeTx/4hKjAcMifk/p9vt2f4AmXChirdU2uFlwFizA8DlIeEe77DUYnXWAxGKpHSBBIe8MAh2Nc4nZGVkzbsUYS1jAxfyfbmuqIq7xXpx+soTD0j5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NdIdiS69; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fb5111747cso35124871fa.2;
-        Wed, 16 Oct 2024 05:14:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729080884; x=1729685684; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l0eI5lAUbdT2xgG8Sg5gfm2pTZ0+zaLZVdb9X/94txA=;
-        b=NdIdiS69KcBs2gR2T+FD8BZ4KQ6rj2VTySweFm80aO0pfyyvjz4eIjjW4CGNnPr9Rj
-         gAUADkpHWQnlpRYTIftDzl2FQrQ7W8K6ELfinJZ4uhCqHTYgLOFdV9Ga5X8YnuaO9TDv
-         YXOpoB1CovDeDV5iu3qLG4whMX/wBCt4epeRKCiixBHIxh5e5rbbNy+Z5EaULtsX4Uw+
-         WmcEP393Px2yYdDCML1sHqZ7yrA8kM+vfd0ZsBXT69WW6qhoiPPDBeZfymDLCedkPfiz
-         PlDnkduo9Vi/Ymmk42EXWsgjGsOPoE/VsvcDRfckDEekNacgzh6GDQPvpjSueExxoLdz
-         q07g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729080884; x=1729685684;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l0eI5lAUbdT2xgG8Sg5gfm2pTZ0+zaLZVdb9X/94txA=;
-        b=Ged/FrJdmiG25jVUGfRvhMi6uV61Fft2I09L08pw/QxdR5+9OGyGDnrEYMkjmMTbeL
-         jZftwTq/ysR8mJ22M0Ik2ouD3HhfK4hec4m/l4rpSnVHHloPT+jQ4CsLtgzTtFJua7Ow
-         7kP4S67difREyG+XTw515rbUWhuJELusBES1oy6j3epe1sa+iQlUI8hZn2nakueSlz4X
-         HcAbpAov2yYYmsRcOuxQAi2ymZLazQJ+75qSJSObbdpWjpbJYhJlAqcqEzLCFW5mN2pY
-         263db6j1w+EurmlvCbeMaO/RIB8jNi025UeE2BSdrJtaVVwddlMLX9ISXu1d4HTKmLOi
-         O5oA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHChxVumws4hDI1pXn9PxO0nuaGp4N8xf28SKRu3CxKT1HFEA2hCuBmW7PFaaYYfEZqloQhu2Yx7EobtwUmsY=@vger.kernel.org, AJvYcCUZwFp12pewxLqUpf4VRdTBbLqbudV43EUpC76Wmw9BsHPjQzNAOp7QByTjVq7CaTuawpRmRT5llAvu2mjq@vger.kernel.org, AJvYcCXAJpkD6B9Ye+XBeCyidb+1vSHBr8Cie4SOsQL293m2cq075C7Lh8SiNTbA1CPNG/Twy2eG@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNZrykROUuBXjyu2XSf4Ila77t5CCCPaSFwEe4/W8Oad51Q3fR
-	RGt+SaLXTWiu5MHUNWHO8c/Inrg5I13zcYkxCvw08HtQ5AafvqiH
-X-Google-Smtp-Source: AGHT+IFISaLoEL1v0HSzO0EUOZSFeeQBuVf/qhinkQvpqUzk15fW+vJulRLe5xE0klVquRlwEnymMA==
-X-Received: by 2002:a05:651c:1990:b0:2fb:4f0c:e3d8 with SMTP id 38308e7fff4ca-2fb4f0cea31mr54327131fa.27.1729080883239;
-        Wed, 16 Oct 2024 05:14:43 -0700 (PDT)
-Received: from pc636 (host-95-203-1-67.mobileonline.telia.com. [95.203.1.67])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2fb5d194034sm3994531fa.78.2024.10.16.05.14.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 05:14:42 -0700 (PDT)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Wed, 16 Oct 2024 14:14:40 +0200
-To: Julia Lawall <Julia.Lawall@inria.fr>,
-	Michael Ellerman <mpe@ellerman.id.au>
-Cc: Michael Ellerman <mpe@ellerman.id.au>, kernel-janitors@vger.kernel.org,
-	vbabka@suse.cz, paulmck@kernel.org,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 13/17] KVM: PPC: replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <Zw-uMDwxBvl0R0mL@pc636>
-References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
- <20241013201704.49576-14-Julia.Lawall@inria.fr>
+	s=arc-20240116; t=1729084376; c=relaxed/simple;
+	bh=HU9U5QZ0a2UXLsRPStAGsxlBL2YCiBiLE/ramke5q+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kZnlLp95iiinEMwUxZjiK64wX31sv9r9t319v5QvtbKeWnTkHhFSSB8dVb/Sc+QWvGmn3OAqO7FRbdrNSDVUZJi698e5LDX24ar1cwovDplbN402+aM172x40ObjMRCwIso6jfaCcuYLg2IPWYkG80Of8KgQWlQkHoCd+p/hBtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CE820FEC;
+	Wed, 16 Oct 2024 06:13:23 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7D9253F528;
+	Wed, 16 Oct 2024 06:12:52 -0700 (PDT)
+Date: Wed, 16 Oct 2024 14:12:49 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 07/36] KVM: arm64: nv: Save/Restore vEL2 sysregs
+Message-ID: <Zw-70Uocs5JvXz7e@raptor>
+References: <20241009190019.3222687-1-maz@kernel.org>
+ <20241009190019.3222687-8-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,52 +53,177 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241013201704.49576-14-Julia.Lawall@inria.fr>
+In-Reply-To: <20241009190019.3222687-8-maz@kernel.org>
 
-On Sun, Oct 13, 2024 at 10:17:00PM +0200, Julia Lawall wrote:
-> Since SLOB was removed and since
-> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
-> it is not necessary to use call_rcu when the callback only performs
-> kmem_cache_free. Use kfree_rcu() directly.
+Hi Marc,
+
+On Wed, Oct 09, 2024 at 07:59:50PM +0100, Marc Zyngier wrote:
+> Whenever we need to restore the guest's system registers to the CPU, we
+> now need to take care of the EL2 system registers as well. Most of them
+> are accessed via traps only, but some have an immediate effect and also
+> a guest running in VHE mode would expect them to be accessible via their
+> EL1 encoding, which we do not trap.
 > 
-> The changes were made using Coccinelle.
+> For vEL2 we write the virtual EL2 registers with an identical format directly
+> into their EL1 counterpart, and translate the few registers that have a
+> different format for the same effect on the execution when running a
+> non-VHE guest guest hypervisor.
 > 
-> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+> Based on an initial patch from Andre Przywara, rewritten many times
+> since.
 > 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/powerpc/kvm/book3s_mmu_hpte.c |    8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
+>  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 137 ++++++++++++++++++++-
+>  3 files changed, 139 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/powerpc/kvm/book3s_mmu_hpte.c b/arch/powerpc/kvm/book3s_mmu_hpte.c
-> index ce79ac33e8d3..d904e13e069b 100644
-> --- a/arch/powerpc/kvm/book3s_mmu_hpte.c
-> +++ b/arch/powerpc/kvm/book3s_mmu_hpte.c
-> @@ -92,12 +92,6 @@ void kvmppc_mmu_hpte_cache_map(struct kvm_vcpu *vcpu, struct hpte_cache *pte)
->  	spin_unlock(&vcpu3s->mmu_lock);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> index 1579a3c08a36b..d67628d01bf5e 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> @@ -152,9 +152,10 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+>  	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
 >  }
 >  
-> -static void free_pte_rcu(struct rcu_head *head)
-> -{
-> -	struct hpte_cache *pte = container_of(head, struct hpte_cache, rcu_head);
-> -	kmem_cache_free(hpte_cache, pte);
-> -}
-> -
->  static void invalidate_pte(struct kvm_vcpu *vcpu, struct hpte_cache *pte)
+> -static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+> +static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+> +					      u64 mpidr)
 >  {
->  	struct kvmppc_vcpu_book3s *vcpu3s = to_book3s(vcpu);
-> @@ -126,7 +120,7 @@ static void invalidate_pte(struct kvm_vcpu *vcpu, struct hpte_cache *pte)
+> -	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
+> +	write_sysreg(mpidr,				vmpidr_el2);
 >  
->  	spin_unlock(&vcpu3s->mmu_lock);
+>  	if (has_vhe() ||
+>  	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> index 29305022bc048..dba101565de36 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/sysreg-sr.c
+> @@ -28,7 +28,7 @@ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt)
 >  
-> -	call_rcu(&pte->rcu_head, free_pte_rcu);
-> +	kfree_rcu(pte, rcu_head);
->  }
+>  void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt)
+>  {
+> -	__sysreg_restore_el1_state(ctxt);
+> +	__sysreg_restore_el1_state(ctxt, ctxt_sys_reg(ctxt, MPIDR_EL1));
+>  	__sysreg_restore_common_state(ctxt);
+>  	__sysreg_restore_user_state(ctxt);
+>  	__sysreg_restore_el2_return_state(ctxt);
+> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> index e12bd7d6d2dce..e0df14ead2657 100644
+> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> @@ -15,6 +15,108 @@
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_nested.h>
 >  
->  static void kvmppc_mmu_pte_flush_all(struct kvm_vcpu *vcpu)
-> 
-> 
-Reviewed-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
+> +static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
+> +{
+> +	/* These registers are common with EL1 */
+> +	__vcpu_sys_reg(vcpu, PAR_EL1)	= read_sysreg(par_el1);
+> +	__vcpu_sys_reg(vcpu, TPIDR_EL1)	= read_sysreg(tpidr_el1);
+> +
+> +	__vcpu_sys_reg(vcpu, ESR_EL2)	= read_sysreg_el1(SYS_ESR);
+> +	__vcpu_sys_reg(vcpu, AFSR0_EL2)	= read_sysreg_el1(SYS_AFSR0);
+> +	__vcpu_sys_reg(vcpu, AFSR1_EL2)	= read_sysreg_el1(SYS_AFSR1);
+> +	__vcpu_sys_reg(vcpu, FAR_EL2)	= read_sysreg_el1(SYS_FAR);
+> +	__vcpu_sys_reg(vcpu, MAIR_EL2)	= read_sysreg_el1(SYS_MAIR);
+> +	__vcpu_sys_reg(vcpu, VBAR_EL2)	= read_sysreg_el1(SYS_VBAR);
+> +	__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2) = read_sysreg_el1(SYS_CONTEXTIDR);
+> +	__vcpu_sys_reg(vcpu, AMAIR_EL2)	= read_sysreg_el1(SYS_AMAIR);
+> +
+> +	/*
+> +	 * In VHE mode those registers are compatible between EL1 and EL2,
+> +	 * and the guest uses the _EL1 versions on the CPU naturally.
+> +	 * So we save them into their _EL2 versions here.
+> +	 * For nVHE mode we trap accesses to those registers, so our
+> +	 * _EL2 copy in sys_regs[] is always up-to-date and we don't need
+> +	 * to save anything here.
+> +	 */
+> +	if (vcpu_el2_e2h_is_set(vcpu)) {
+> +		u64 val;
+> +
+> +		/*
+> +		 * We don't save CPTR_EL2, as accesses to CPACR_EL1
+> +		 * are always trapped, ensuring that the in-memory
+> +		 * copy is always up-to-date. A small blessing...
+> +		 */
+> +		__vcpu_sys_reg(vcpu, SCTLR_EL2)	= read_sysreg_el1(SYS_SCTLR);
+> +		__vcpu_sys_reg(vcpu, TTBR0_EL2)	= read_sysreg_el1(SYS_TTBR0);
+> +		__vcpu_sys_reg(vcpu, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
+> +		__vcpu_sys_reg(vcpu, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
+> +
+> +		/*
+> +		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
+> +		 * the interesting CNTHCTL_EL2 bits live. So preserve these
+> +		 * bits when reading back the guest-visible value.
+> +		 */
+> +		val = read_sysreg_el1(SYS_CNTKCTL);
+> +		val &= CNTKCTL_VALID_BITS;
+> +		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) &= ~CNTKCTL_VALID_BITS;
+> +		__vcpu_sys_reg(vcpu, CNTHCTL_EL2) |= val;
+> +	}
+> +
+> +	__vcpu_sys_reg(vcpu, SP_EL2)	= read_sysreg(sp_el1);
+> +	__vcpu_sys_reg(vcpu, ELR_EL2)	= read_sysreg_el1(SYS_ELR);
+> +	__vcpu_sys_reg(vcpu, SPSR_EL2)	= read_sysreg_el1(SYS_SPSR);
+> +}
+> +
+> +static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 val;
+> +
+> +	/* These registers are common with EL1 */
+> +	write_sysreg(__vcpu_sys_reg(vcpu, PAR_EL1),	par_el1);
+> +	write_sysreg(__vcpu_sys_reg(vcpu, TPIDR_EL1),	tpidr_el1);
+> +
+> +	write_sysreg(read_cpuid_id(),				vpidr_el2);
+> +	write_sysreg(__vcpu_sys_reg(vcpu, MPIDR_EL1),		vmpidr_el2);
+> +	write_sysreg_el1(__vcpu_sys_reg(vcpu, MAIR_EL2),	SYS_MAIR);
+> +	write_sysreg_el1(__vcpu_sys_reg(vcpu, VBAR_EL2),	SYS_VBAR);
+> +	write_sysreg_el1(__vcpu_sys_reg(vcpu, CONTEXTIDR_EL2),	SYS_CONTEXTIDR);
+> +	write_sysreg_el1(__vcpu_sys_reg(vcpu, AMAIR_EL2),	SYS_AMAIR);
+> +
+> +	if (vcpu_el2_e2h_is_set(vcpu)) {
+> +		/*
+> +		 * In VHE mode those registers are compatible between
+> +		 * EL1 and EL2.
+> +		 */
+> +		write_sysreg_el1(__vcpu_sys_reg(vcpu, SCTLR_EL2),   SYS_SCTLR);
+> +		write_sysreg_el1(__vcpu_sys_reg(vcpu, CPTR_EL2),    SYS_CPACR);
+> +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR0_EL2),   SYS_TTBR0);
+> +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TTBR1_EL2),   SYS_TTBR1);
+> +		write_sysreg_el1(__vcpu_sys_reg(vcpu, TCR_EL2),	    SYS_TCR);
+> +		write_sysreg_el1(__vcpu_sys_reg(vcpu, CNTHCTL_EL2), SYS_CNTKCTL);
+> +	} else {
+> +		/*
+> +		 * CNTHCTL_EL2 only affects EL1 when running nVHE, so
+> +		 * no need to restore it.
+> +		 */
 
---
-Uladzislau Rezki
+I'm having such a hard time parsing the comment - might be just me coming back to
+this code after such a long time.
+
+If CNTHCTL_EL2 only affects EL1 when running nVHE, and the else branch deals
+with the nVHE case, why isn't CNTHCTL_EL2 restored?
+
+As for the 'only' part of the comment: when E2H=1, bits 10 and 11, EL1PCTEN and
+EL1PTEN (why isn't this named EL1PCEN if it does the same thing as bit 1 when
+E2H=0?), trap EL1 and EL0 accesses to physical counter and timer registers.
+
+Or 'only' in this context means only EL1, and not EL2 also?
+
+Thanks,
+Alex
+
+> +		val = translate_sctlr_el2_to_sctlr_el1(__vcpu_sys_reg(vcpu, SCTLR_EL2));
+> +		write_sysreg_el1(val, SYS_SCTLR);
+> +		val = translate_cptr_el2_to_cpacr_el1(__vcpu_sys_reg(vcpu, CPTR_EL2));
+> +		write_sysreg_el1(val, SYS_CPACR);
+> +		val = translate_ttbr0_el2_to_ttbr0_el1(__vcpu_sys_reg(vcpu, TTBR0_EL2));
+> +		write_sysreg_el1(val, SYS_TTBR0);
+> +		val = translate_tcr_el2_to_tcr_el1(__vcpu_sys_reg(vcpu, TCR_EL2));
+> +		write_sysreg_el1(val, SYS_TCR);
+> +	}
 
