@@ -1,365 +1,190 @@
-Return-Path: <kvm+bounces-29023-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29025-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 779A49A1129
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 20:04:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE29E9A1133
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 20:05:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 848081C20BB2
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 18:04:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E00251C20CE6
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 18:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16ED2144B5;
-	Wed, 16 Oct 2024 18:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65D6212EF9;
+	Wed, 16 Oct 2024 18:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="A25CpTNX"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ca3EDRxR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D263210C30;
-	Wed, 16 Oct 2024 18:03:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F58E14A09E;
+	Wed, 16 Oct 2024 18:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729101813; cv=none; b=YF5dAYyeNLPK/eXpxkSs3VPU6MhNJl9EH+JnKN97mriNyKERiCL1U2OhCbuadl3KN5D4NEKObg1TGv1iO8lA6Gk4gbtzTC0W/4PjcMjN1riydeNihFnTcvP/yB+FnOGVPqlr3e8mkvR0rKR2vyxA9QxQWjQttDDMxFsLqHe//oE=
+	t=1729101888; cv=none; b=aPDa8CgmyBunvXi3NybNO6mHo6WWaMVx+pTxRI65cVfoNzJW/S4Oj90KNUQF/zxsj6BF2eHqTOpbSjS3GfEqVVog+S8DjEyp6SUdW5mTxs0ybTteYvB2K6AEB5MVu4epLOuKluOty1T/L+l+NjUssIXwVqqGAAsJnmD5LHFC8yE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729101813; c=relaxed/simple;
-	bh=w4k0yWe7V7MTju/3jNu0jY0wss1H5W0yQS13TrCYdqU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SfCQyF0e2G6NJMmeYt4yw1esrdMt4RDCKg4gJYtQO0xpNp2XqbMzNGfbkKBX9sspN65gZGUGIGjvA9I31hqSIe5fErMoPQK9A0/TAni6ap21EuMI2pD9yVf3QJXYcvjM4STSdbG0Z1Q0Ur7o9mBT14CXSa300Kbsm2m8rzoExOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=A25CpTNX; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49GHngfK005839;
-	Wed, 16 Oct 2024 18:03:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=Fti7f+V710xPWUL9A
-	+ltbzZfTlcPLhAHdT95sItFBAI=; b=A25CpTNXZcIhCc19h/W94EmPQh6xbcPJU
-	EpHp1KKANin4wBxLegQTPmYYUCTkDbMTTsSQbKQxFOcUGfJsZdjl8oYUSoj52CTT
-	rvsRc/fr1Lo/duIIdbtyb+gCDV2r7RXP5B+hqhWfwpRAu0EyjfiIGdRUdlBL42wx
-	/20EpvaVLFdRItDFEUC9MT3H/Aior3eSWFp/NizMwV9F2bQOrYj25dn4xOv1GE9A
-	vRCvBieeORgzjMrARYtcPzjwDeXSnpPIMwQgeXTPvF2SAS0HpR5UwRMwDpAJMTmj
-	V3UdwHcppAukdiI0XVjBU3lB3msfrFnIjyvmCvxBkImZntUgkp+iA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42aj7v81tf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 18:03:30 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49GI3Unx001677;
-	Wed, 16 Oct 2024 18:03:30 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42aj7v81te-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 18:03:30 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49GGFktR002426;
-	Wed, 16 Oct 2024 18:03:29 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4284emtt53-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 18:03:29 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49GI3QR854395380
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 16 Oct 2024 18:03:26 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0520E20049;
-	Wed, 16 Oct 2024 18:03:26 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AFE0020040;
-	Wed, 16 Oct 2024 18:03:25 +0000 (GMT)
-Received: from tuxmaker.lnxne.boe (unknown [9.152.85.9])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 16 Oct 2024 18:03:25 +0000 (GMT)
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>,
-        =?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: [kvm-unit-tests PATCH v4 6/6] s390x: Add test for STFLE interpretive execution (format-0)
-Date: Wed, 16 Oct 2024 20:03:17 +0200
-Message-ID: <20241016180320.686132-7-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241016180320.686132-1-nsg@linux.ibm.com>
-References: <20241016180320.686132-1-nsg@linux.ibm.com>
+	s=arc-20240116; t=1729101888; c=relaxed/simple;
+	bh=3SwVYbFol5wtjFCHhhGi1RnZJPVNjLTg+Hl+nxFfvos=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Rgsoq/Ud2wdj6G+GIRs/QrBucCwqAu1NnLoSdIuN+YdoranC2oXy57zHi4pYnB9smDoZqQEkINV+BcAheNwfPm0jSBCjPcyxiqO8/6Qt9B2EM3V39qhydo0QQs3LebMPtQznxRPRQEC20NExXv23JDX8Xzg4f4oKHQ6WduzIkbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ca3EDRxR; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729101887; x=1760637887;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=3SwVYbFol5wtjFCHhhGi1RnZJPVNjLTg+Hl+nxFfvos=;
+  b=ca3EDRxRHZyrlI0mlzha2Rob/oCFGgWogXDeIfPVIiCDCfFK0rRHTt5S
+   S2ETmd3/XdjsOUP/1M5b2Z2JLIXCHUPVBzn3dkhunHU7fvTbb/RuxUljz
+   K1pMqsUlikXmmZL+TGzTiyX/6aBVjcxYb3dKPl3WD4WVr3k7TmGHVYsKb
+   0=;
+X-IronPort-AV: E=Sophos;i="6.11,208,1725321600"; 
+   d="scan'208";a="461374783"
+Subject: Re: [PATCH v8 01/11] cpuidle/poll_state: poll via smp_cond_load_relaxed()
+Thread-Topic: [PATCH v8 01/11] cpuidle/poll_state: poll via smp_cond_load_relaxed()
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 18:04:46 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:53735]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.250:2525] with esmtp (Farcaster)
+ id 41eded31-3b27-4e62-b809-d97a7328555c; Wed, 16 Oct 2024 18:04:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 41eded31-3b27-4e62-b809-d97a7328555c
+Received: from EX19D001UWA004.ant.amazon.com (10.13.138.251) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 16 Oct 2024 18:04:45 +0000
+Received: from EX19D001UWA003.ant.amazon.com (10.13.138.211) by
+ EX19D001UWA004.ant.amazon.com (10.13.138.251) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 16 Oct 2024 18:04:45 +0000
+Received: from EX19D001UWA003.ant.amazon.com ([fe80::256a:26de:3ee6:48a2]) by
+ EX19D001UWA003.ant.amazon.com ([fe80::256a:26de:3ee6:48a2%7]) with mapi id
+ 15.02.1258.035; Wed, 16 Oct 2024 18:04:45 +0000
+From: "Okanovic, Haris" <harisokn@amazon.com>
+To: "ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>
+CC: "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mtosatti@redhat.com"
+	<mtosatti@redhat.com>, "boris.ostrovsky@oracle.com"
+	<boris.ostrovsky@oracle.com>, "mark.rutland@arm.com" <mark.rutland@arm.com>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>, "cl@gentwo.org"
+	<cl@gentwo.org>, "wanpengli@tencent.com" <wanpengli@tencent.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"mingo@redhat.com" <mingo@redhat.com>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "maobibo@loongson.cn"
+	<maobibo@loongson.cn>, "daniel.lezcano@linaro.org"
+	<daniel.lezcano@linaro.org>, "misono.tomohiro@fujitsu.com"
+	<misono.tomohiro@fujitsu.com>, "arnd@arndb.de" <arnd@arndb.de>,
+	"will@kernel.org" <will@kernel.org>, "lenb@kernel.org" <lenb@kernel.org>,
+	"hpa@zytor.com" <hpa@zytor.com>, "peterz@infradead.org"
+	<peterz@infradead.org>, "vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"sudeep.holla@arm.com" <sudeep.holla@arm.com>, "Okanovic, Haris"
+	<harisokn@amazon.com>, "rafael@kernel.org" <rafael@kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-pm@vger.kernel.org"
+	<linux-pm@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de"
+	<bp@alien8.de>
+Thread-Index: AQHbD6IrafcYoukOUEmO4vkMpFXSV7KH1W0AgAHHPICAAB7zgIAAEOEA
+Date: Wed, 16 Oct 2024 18:04:45 +0000
+Message-ID: <d468117895b5a14b7ff30de7fd4da3edbf1a6b73.camel@amazon.com>
+References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
+	 <20240925232425.2763385-2-ankur.a.arora@oracle.com>
+	 <Zw5aPAuVi5sxdN5-@arm.com>
+	 <7f7ffdcdb79eee0e8a545f544120495477832cd5.camel@amazon.com>
+	 <87wmi8ou7g.fsf@oracle.com>
+In-Reply-To: <87wmi8ou7g.fsf@oracle.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B6D0E47BE666414CB400B6DA09E84439@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fjbibJousXS8QqTqtv_4WTN8VAbJnOBH
-X-Proofpoint-ORIG-GUID: dUnCZ-93Sy7Yhcf-qD7M2jjq6ll6HEZR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- priorityscore=1501 clxscore=1015 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 suspectscore=0 malwarescore=0 spamscore=0
- impostorscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2409260000 definitions=main-2410160115
 
-The STFLE instruction indicates installed facilities.
-SIE can interpretively execute STFLE.
-Use a snippet guest executing STFLE to get the result of
-interpretive execution and check the result.
-
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
- s390x/Makefile           |   2 +
- lib/s390x/asm/facility.h |  10 ++-
- s390x/snippets/c/stfle.c |  29 ++++++++
- s390x/stfle-sie.c        | 138 +++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg      |   3 +
- 5 files changed, 181 insertions(+), 1 deletion(-)
- create mode 100644 s390x/snippets/c/stfle.c
- create mode 100644 s390x/stfle-sie.c
-
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 1caf221d..a5ef3a8e 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -44,6 +44,7 @@ tests += $(TEST_DIR)/exittime.elf
- tests += $(TEST_DIR)/ex.elf
- tests += $(TEST_DIR)/topology.elf
- tests += $(TEST_DIR)/sie-dat.elf
-+tests += $(TEST_DIR)/stfle-sie.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- pv-tests += $(TEST_DIR)/pv-icptcode.elf
-@@ -130,6 +131,7 @@ snippet_lib = $(snippet_asmlib) lib/auxinfo.o
- $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
- $(TEST_DIR)/sie-dat.elf: snippets = $(SNIPPET_DIR)/c/sie-dat.gbin
- $(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
-+$(TEST_DIR)/stfle-sie.elf: snippets = $(SNIPPET_DIR)/c/stfle.gbin
- 
- $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/pv-diag-yield.gbin
- $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/pv-diag-288.gbin
-diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
-index a66fe56a..2bad05c5 100644
---- a/lib/s390x/asm/facility.h
-+++ b/lib/s390x/asm/facility.h
-@@ -27,12 +27,20 @@ static inline void stfl(void)
- 	asm volatile("	stfl	0(0)\n" : : : "memory");
- }
- 
--static inline void stfle(uint64_t *fac, unsigned int nb_doublewords)
-+static inline unsigned int stfle(uint64_t *fac, unsigned int nb_doublewords)
- {
- 	register unsigned long r0 asm("0") = nb_doublewords - 1;
- 
- 	asm volatile("	.insn	s,0xb2b00000,0(%1)\n"
- 		     : "+d" (r0) : "a" (fac) : "memory", "cc");
-+	return r0 + 1;
-+}
-+
-+static inline unsigned long stfle_size(void)
-+{
-+	uint64_t dummy;
-+
-+	return stfle(&dummy, 1);
- }
- 
- static inline void setup_facilities(void)
-diff --git a/s390x/snippets/c/stfle.c b/s390x/snippets/c/stfle.c
-new file mode 100644
-index 00000000..42d3d7fe
---- /dev/null
-+++ b/s390x/snippets/c/stfle.c
-@@ -0,0 +1,29 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright IBM Corp. 2023
-+ *
-+ * Snippet used by the STLFE interpretive execution facilities test.
-+ */
-+#include <libcflat.h>
-+#include <snippet-exit.h>
-+
-+int main(void)
-+{
-+	const unsigned int max_fac_len = 8;
-+	uint64_t len_arg = max_fac_len - 1;
-+	uint64_t res[max_fac_len + 1];
-+	uint64_t fac[max_fac_len];
-+
-+	asm volatile ( "lgr	0,%[len]\n"
-+		"	stfle	%[fac]\n"
-+		"	lgr	%[len],0\n"
-+		: [fac] "=Q"(fac),
-+		  [len] "+d"(len_arg)
-+		:
-+		: "%r0", "cc"
-+	);
-+	res[0] = len_arg;
-+	memcpy(&res[1], fac, sizeof(fac));
-+	force_exit_value((uint64_t)&res);
-+	return 0;
-+}
-diff --git a/s390x/stfle-sie.c b/s390x/stfle-sie.c
-new file mode 100644
-index 00000000..21cf8ff8
---- /dev/null
-+++ b/s390x/stfle-sie.c
-@@ -0,0 +1,138 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright IBM Corp. 2023
-+ *
-+ * SIE with STLFE interpretive execution facilities test.
-+ */
-+#include <libcflat.h>
-+#include <stdlib.h>
-+#include <asm/facility.h>
-+#include <asm/time.h>
-+#include <snippet.h>
-+#include <snippet-exit.h>
-+#include <alloc_page.h>
-+#include <sclp.h>
-+#include <rand.h>
-+
-+static struct vm vm;
-+static uint64_t (*fac)[PAGE_SIZE / sizeof(uint64_t)];
-+static prng_state prng_s;
-+
-+static void setup_guest(void)
-+{
-+	extern const char SNIPPET_NAME_START(c, stfle)[];
-+	extern const char SNIPPET_NAME_END(c, stfle)[];
-+
-+	setup_vm();
-+	fac = alloc_pages_flags(0, AREA_DMA31);
-+
-+	snippet_setup_guest(&vm, false);
-+	snippet_init(&vm, SNIPPET_NAME_START(c, stfle),
-+		     SNIPPET_LEN(c, stfle), SNIPPET_UNPACK_OFF);
-+}
-+
-+struct guest_stfle_res {
-+	uint16_t len;
-+	unsigned char *mem;
-+};
-+
-+static struct guest_stfle_res run_guest(void)
-+{
-+	struct guest_stfle_res res;
-+	uint64_t guest_stfle_addr;
-+	uint64_t reg;
-+
-+	sie(&vm);
-+	assert(snippet_is_force_exit_value(&vm));
-+	guest_stfle_addr = snippet_get_force_exit_value(&vm);
-+	res.mem = &vm.guest_mem[guest_stfle_addr];
-+	memcpy(&reg, res.mem, sizeof(reg));
-+	res.len = (reg & 0xff) + 1;
-+	res.mem += sizeof(reg);
-+	return res;
-+}
-+
-+static void test_stfle_format_0(void)
-+{
-+	struct guest_stfle_res res;
-+
-+	report_prefix_push("format-0");
-+	for (int j = 0; j < stfle_size(); j++)
-+		WRITE_ONCE((*fac)[j], prng64(&prng_s));
-+	vm.sblk->fac = (uint32_t)(uint64_t)fac;
-+	res = run_guest();
-+	report(res.len == stfle_size(), "stfle len correct");
-+	report(!memcmp(*fac, res.mem, res.len * sizeof(uint64_t)),
-+	       "Guest facility list as specified");
-+	report_prefix_pop();
-+}
-+
-+struct args {
-+	uint64_t seed;
-+};
-+
-+static bool parse_uint64_t(const char *arg, uint64_t *out)
-+{
-+	char *end;
-+	uint64_t num;
-+
-+	if (arg[0] == '\0')
-+		return false;
-+	num = strtoul(arg, &end, 0);
-+	if (end[0] != '\0')
-+		return false;
-+	*out = num;
-+	return true;
-+}
-+
-+static struct args parse_args(int argc, char **argv)
-+{
-+	struct args args;
-+	const char *flag;
-+	unsigned int i;
-+	uint64_t arg;
-+	bool has_arg;
-+
-+	stck(&args.seed);
-+
-+	for (i = 1; i < argc; i++) {
-+		if (i + 1 < argc)
-+			has_arg = parse_uint64_t(argv[i + 1], &arg);
-+		else
-+			has_arg = false;
-+
-+		flag = "--seed";
-+		if (!strcmp(flag, argv[i])) {
-+			if (!has_arg)
-+				report_abort("%s needs an uint64_t parameter", flag);
-+			args.seed = arg;
-+			++i;
-+			continue;
-+		}
-+		report_abort("Unsupported parameter '%s'",
-+			     argv[i]);
-+	}
-+
-+	return args;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct args args = parse_args(argc, argv);
-+	bool run_format_0 = test_facility(7);
-+
-+	if (!sclp_facilities.has_sief2) {
-+		report_skip("SIEF2 facility unavailable");
-+		goto out;
-+	}
-+	if (!run_format_0)
-+		report_skip("STFLE facility not available");
-+
-+	report_info("PRNG seed: 0x%lx", args.seed);
-+	prng_s = prng_init(args.seed);
-+	setup_guest();
-+	if (run_format_0)
-+		test_stfle_format_0();
-+out:
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 3a9decc9..f2203069 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -392,3 +392,6 @@ file = sie-dat.elf
- 
- [pv-attest]
- file = pv-attest.elf
-+
-+[stfle-sie]
-+file = stfle-sie.elf
--- 
-2.44.0
-
+T24gV2VkLCAyMDI0LTEwLTE2IGF0IDEwOjA0IC0wNzAwLCBBbmt1ciBBcm9yYSB3cm90ZToNCj4g
+Q0FVVElPTjogVGhpcyBlbWFpbCBvcmlnaW5hdGVkIGZyb20gb3V0c2lkZSBvZiB0aGUgb3JnYW5p
+emF0aW9uLiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91
+IGNhbiBjb25maXJtIHRoZSBzZW5kZXIgYW5kIGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZS4NCj4g
+DQo+IA0KPiANCj4gT2thbm92aWMsIEhhcmlzIDxoYXJpc29rbkBhbWF6b24uY29tPiB3cml0ZXM6
+DQo+IA0KPiA+IE9uIFR1ZSwgMjAyNC0xMC0xNSBhdCAxMzowNCArMDEwMCwgQ2F0YWxpbiBNYXJp
+bmFzIHdyb3RlOg0KPiA+ID4gQ0FVVElPTjogVGhpcyBlbWFpbCBvcmlnaW5hdGVkIGZyb20gb3V0
+c2lkZSBvZiB0aGUgb3JnYW5pemF0aW9uLiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRh
+Y2htZW50cyB1bmxlc3MgeW91IGNhbiBjb25maXJtIHRoZSBzZW5kZXIgYW5kIGtub3cgdGhlIGNv
+bnRlbnQgaXMgc2FmZS4NCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiANCj4gPiA+IE9uIFdlZCwgU2Vw
+IDI1LCAyMDI0IGF0IDA0OjI0OjE1UE0gLTA3MDAsIEFua3VyIEFyb3JhIHdyb3RlOg0KPiA+ID4g
+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcHVpZGxlL3BvbGxfc3RhdGUuYyBiL2RyaXZlcnMvY3B1
+aWRsZS9wb2xsX3N0YXRlLmMNCj4gPiA+ID4gaW5kZXggOWI2ZDkwYTcyNjAxLi5mYzEyMDQ0MjYx
+NTggMTAwNjQ0DQo+ID4gPiA+IC0tLSBhL2RyaXZlcnMvY3B1aWRsZS9wb2xsX3N0YXRlLmMNCj4g
+PiA+ID4gKysrIGIvZHJpdmVycy9jcHVpZGxlL3BvbGxfc3RhdGUuYw0KPiA+ID4gPiBAQCAtMjEs
+MjEgKzIxLDIwIEBAIHN0YXRpYyBpbnQgX19jcHVpZGxlIHBvbGxfaWRsZShzdHJ1Y3QgY3B1aWRs
+ZV9kZXZpY2UgKmRldiwNCj4gPiA+ID4gDQo+ID4gPiA+ICAgICAgIHJhd19sb2NhbF9pcnFfZW5h
+YmxlKCk7DQo+ID4gPiA+ICAgICAgIGlmICghY3VycmVudF9zZXRfcG9sbGluZ19hbmRfdGVzdCgp
+KSB7DQo+ID4gPiA+IC0gICAgICAgICAgICAgdW5zaWduZWQgaW50IGxvb3BfY291bnQgPSAwOw0K
+PiA+ID4gPiAgICAgICAgICAgICAgIHU2NCBsaW1pdDsNCj4gPiA+ID4gDQo+ID4gPiA+ICAgICAg
+ICAgICAgICAgbGltaXQgPSBjcHVpZGxlX3BvbGxfdGltZShkcnYsIGRldik7DQo+ID4gPiA+IA0K
+PiA+ID4gPiAgICAgICAgICAgICAgIHdoaWxlICghbmVlZF9yZXNjaGVkKCkpIHsNCj4gPiA+ID4g
+LSAgICAgICAgICAgICAgICAgICAgIGNwdV9yZWxheCgpOw0KPiA+ID4gPiAtICAgICAgICAgICAg
+ICAgICAgICAgaWYgKGxvb3BfY291bnQrKyA8IFBPTExfSURMRV9SRUxBWF9DT1VOVCkNCj4gPiA+
+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29udGludWU7DQo+ID4gPiA+IC0NCj4g
+PiA+ID4gLSAgICAgICAgICAgICAgICAgICAgIGxvb3BfY291bnQgPSAwOw0KPiA+ID4gPiArICAg
+ICAgICAgICAgICAgICAgICAgdW5zaWduZWQgaW50IGxvb3BfY291bnQgPSAwOw0KPiA+ID4gPiAg
+ICAgICAgICAgICAgICAgICAgICAgaWYgKGxvY2FsX2Nsb2NrX25vaW5zdHIoKSAtIHRpbWVfc3Rh
+cnQgPiBsaW1pdCkgew0KPiA+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkZXYt
+PnBvbGxfdGltZV9saW1pdCA9IHRydWU7DQo+ID4gPiA+ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGJyZWFrOw0KPiA+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgfQ0KPiA+ID4gPiAr
+DQo+ID4gPiA+ICsgICAgICAgICAgICAgICAgICAgICBzbXBfY29uZF9sb2FkX3JlbGF4ZWQoJmN1
+cnJlbnRfdGhyZWFkX2luZm8oKS0+ZmxhZ3MsDQo+ID4gPiA+ICsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgVkFMICYgX1RJRl9ORUVEX1JFU0NIRUQgfHwNCj4gPiA+
+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsb29wX2NvdW50
+KysgPj0gUE9MTF9JRExFX1JFTEFYX0NPVU5UKTsNCj4gPiA+IA0KPiA+ID4gVGhlIGFib3ZlIGlz
+IG5vdCBndWFyYW50ZWVkIHRvIG1ha2UgcHJvZ3Jlc3MgaWYgX1RJRl9ORUVEX1JFU0NIRUQgaXMN
+Cj4gPiA+IG5ldmVyIHNldC4gV2l0aCB0aGUgZXZlbnQgc3RyZWFtIGVuYWJsZWQgb24gYXJtNjQs
+IHRoZSBXRkUgd2lsbA0KPiA+ID4gZXZlbnR1YWxseSBiZSB3b2tlbiB1cCwgbG9vcF9jb3VudCBp
+bmNyZW1lbnRlZCBhbmQgdGhlIGNvbmRpdGlvbiB3b3VsZA0KPiA+ID4gYmVjb21lIHRydWUuIEhv
+d2V2ZXIsIHRoZSBzbXBfY29uZF9sb2FkX3JlbGF4ZWQoKSBzZW1hbnRpY3MgcmVxdWlyZSB0aGF0
+DQo+ID4gPiBhIGRpZmZlcmVudCBhZ2VudCB1cGRhdGVzIHRoZSB2YXJpYWJsZSBiZWluZyB3YWl0
+ZWQgb24sIG5vdCB0aGUgd2FpdGluZw0KPiA+ID4gQ1BVIHVwZGF0aW5nIGl0IGl0c2VsZi4gQWxz
+byBub3RlIHRoYXQgdGhlIGV2ZW50IHN0cmVhbSBjYW4gYmUgZGlzYWJsZWQNCj4gPiA+IG9uIGFy
+bTY0IG9uIHRoZSBrZXJuZWwgY29tbWFuZCBsaW5lLg0KPiA+IA0KPiA+IEFsdGVybmF0ZWx5IGNv
+dWxkIHdlIGNvbmRpdGlvbiBhcmNoX2hhbHRwb2xsX3dhbnQoKSBvbg0KPiA+IGFyY2hfdGltZXJf
+ZXZ0c3RybV9hdmFpbGFibGUoKSwgbGlrZSB2Nz8NCj4gDQo+IFllcywgSSdtIHRoaW5raW5nIG9m
+IHN0YWdpbmcgaXQgc29tZXdoYXQgbGlrZSB0aGF0LiBGaXJzdCBhbg0KPiBzbXBfY29uZF9sb2Fk
+X3JlbGF4ZWQoKSB3aGljaCBnZXRzIHJpZCBvZiB0aGlzIGlzc3VlLCBmb2xsb3dlZCBieQ0KPiBv
+bmUgYmFzZWQgb24gc21wX2NvbmRfbG9hZF9yZWxheGVkX3RpbWVvdXQoKS4NCj4gDQo+IFRoYXQg
+c2FpZCwgY29uZGl0aW9uaW5nIGp1c3QgYXJjaF9oYWx0cG9sbF93YW50KCkgd29uJ3Qgc3VmZmlj
+ZSBzaW5jZQ0KPiB3aGF0IENhdGFsaW4gcG9pbnRlZCBvdXQgYWZmZWN0cyBhbGwgdXNlcnMgb2Yg
+cG9sbF9pZGxlKCksIG5vdCBqdXN0DQo+IGhhbHRwb2xsLg0KDQpUaGUgb25seSBvdGhlciB1c2Vy
+cyBJIHNlZSB0b2RheSBhcmUgYXBtX2luaXQoKSBhbmQNCmFjcGlfcHJvY2Vzc29yX3NldHVwX2Nz
+dGF0ZXMoKSwgYm90aCBpbiB4ODYgcGF0aC4gUGVyaGFwcyBub3QgaWRlYWwsDQpidXQgc2hvdWxk
+IGJlIHN1ZmZpY2llbnQuDQoNCj4gDQo+IFJpZ2h0IG5vdyB0aGVyZSdzIG9ubHkgaGFsdHBvbGwg
+YnV0IHRoZXJlIGFyZSBmdXR1cmUgdXNlcnMgbGlrZQ0KPiB6aGVuZ2xpZmVuZyB3aXRoIGEgcGF0
+Y2ggZm9yIGFjcGktaWRsZSBoZXJlOg0KPiANCj4gICBodHRwczovL2xvcmUua2VybmVsLm9yZy9h
+bGwvZjhhMWY4NWItYzRiZi00YzM4LTgxYmYtNzI4ZjcyYTRmMmZlQGh1YXdlaS5jb20vDQo+IA0K
+PiA+ID4gRG9lcyB0aGUgY29kZSBhYm92ZSBicmVhayBhbnkgb3RoZXIgYXJjaGl0ZWN0dXJlPyBJ
+J2Qgc2F5IGlmIHlvdSB3YW50DQo+ID4gPiBzb21ldGhpbmcgbGlrZSB0aGlzLCBiZXR0ZXIgaW50
+cm9kdWNlIGEgbmV3IHNtcF9jb25kX2xvYWRfdGltZW91dCgpDQo+ID4gPiBBUEkuIFRoZSBhYm92
+ZSBsb29rcyBsaWtlIGEgaGFjayB0aGF0IG1heSBvbmx5IHdvcmsgb24gYXJtNjQgd2hlbiB0aGUN
+Cj4gPiA+IGV2ZW50IHN0cmVhbSBpcyBlbmFibGVkLg0KPiA+ID4gDQo+ID4gPiBBIGdlbmVyaWMg
+b3B0aW9uIGlzIHVkZWxheSgpIChvbiBhcm02NCBpdCB3b3VsZCB1c2UgV0ZFL1dGRVQgYnkNCj4g
+PiA+IGRlZmF1bHQpLiBOb3Qgc3VyZSBob3cgaW1wb3J0YW50IGl0IGlzIGZvciBwb2xsX2lkbGUo
+KSBidXQgdGhlIGRvd25zaWRlDQo+ID4gPiBvZiB1ZGVsYXkoKSB0aGF0IGl0IHdvbid0IGJlIGFi
+bGUgdG8gYWxzbyBwb2xsIG5lZWRfcmVzY2hlZCgpIHdoaWxlDQo+ID4gPiB3YWl0aW5nIGZvciB0
+aGUgdGltZW91dC4gSWYgdGhpcyBtYXR0ZXJzLCB5b3UgY291bGQgaW5zdGVhZCBtYWtlIHNtYWxs
+ZXINCj4gPiA+IHVkZWxheSgpIGNhbGxzLiBZZXQgYW5vdGhlciBwcm9ibGVtLCBJIGRvbid0IGtu
+b3cgaG93IGVuZXJneSBlZmZpY2llbnQNCj4gPiA+IHVkZWxheSgpIGlzIG9uIHg4NiB2cyBjcHVf
+cmVsYXgoKS4NCj4gPiA+IA0KPiA+ID4gU28gbWF5YmUgYW4gc21wX2NvbmRfbG9hZF90aW1lb3V0
+KCkgd291bGQgYmUgYmV0dGVyLCBpbXBsZW1lbnRlZCB3aXRoDQo+ID4gPiBjcHVfcmVsYXgoKSBn
+ZW5lcmljYWxseSBhbmQgdGhlIGFybTY0IHdvdWxkIHVzZSBMRFhSLCBXRkUgYW5kIHJlbHkgb24N
+Cj4gPiA+IHRoZSBldmVudCBzdHJlYW0gKG9yIGZhbGwgYmFjayB0byBjcHVfcmVsYXgoKSBpZiB0
+aGUgZXZlbnQgc3RyZWFtIGlzDQo+ID4gPiBkaXNhYmxlZCkuDQo+ID4gPiANCj4gPiA+IC0tDQo+
+ID4gPiBDYXRhbGluDQo+IA0KPiANCj4gLS0NCj4gYW5rdXINCg0K
 
