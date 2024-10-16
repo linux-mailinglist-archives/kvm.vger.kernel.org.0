@@ -1,50 +1,61 @@
-Return-Path: <kvm+bounces-28982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-28983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E40339A05B1
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 11:37:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45D8F9A0626
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 11:55:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21C451C268E5
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 09:37:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5AC7B21853
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2024 09:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28E320604C;
-	Wed, 16 Oct 2024 09:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F91206069;
+	Wed, 16 Oct 2024 09:55:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A436205E28
-	for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 09:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4A0205E31;
+	Wed, 16 Oct 2024 09:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729071446; cv=none; b=O6Y3rvQIWepnCtrwBM/JezS6LwfEfiQaVggCtpj8VxPDd1QrMmNk7/RwVRvPGaPJBwGkxhQs33+wMWc6Y0IKooA764tsar/LcLckxT4k8mKN6GmrVrl2bWArwpqoE7MApDfPM9fA8T1vq5BDTQ1uOaXafthHBcQB4XUpsz+IJD4=
+	t=1729072503; cv=none; b=h8iKaoIT2nZ0Ubi3v6pPYQhrbBN2NCmNn0UO41dF+1a6DwcxGYb6LRYB9lQiD16ERtyOOJDTtevLKFFDdzrERnfcYXCkrhuBEl0hlVzAkMtj7zsNsRmHe+D2pXbWALri4vZ3CRzIs5/d+exyyuP1nnvaWs/DES3aVcqSSAEq+DU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729071446; c=relaxed/simple;
-	bh=DMdduzklBMbOnU2TBHdpQjl81F9o4dksoyXjfw+yiQk=;
+	s=arc-20240116; t=1729072503; c=relaxed/simple;
+	bh=8M58HS/R4VvqGI6hFuODSqEOAwlVkg+xTN/g/Q6zmBg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FCobYb8Nnzw1NDPrjumMm8i3Wfl+1nWuxlmbwxJlJ4uuO1criEkBAQoQxBSDzpoSStfP62pVpLCfKAER0+EsKnO5q2Q3ynoZBmKox3hL6DKzIN15Z/1iaEt1y08J39dDElLK/M9GhZ19zUcqUIsnACVTv4LNSPgiNhsHt49SaaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 98778FEC;
-	Wed, 16 Oct 2024 02:37:52 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4338B3F528;
-	Wed, 16 Oct 2024 02:37:21 -0700 (PDT)
-Date: Wed, 16 Oct 2024 10:37:18 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 06/36] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
-Message-ID: <Zw-JTojEW5ZXa8R-@raptor>
-References: <20241009190019.3222687-1-maz@kernel.org>
- <20241009190019.3222687-7-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iCyDEGnv5s95+AZrojMy0sP1nz1BAJMZnlXWzAlvtGRwOLBN+yGgV02QOfFk7dHxTul7P99mptq+ayh4wktf8b8p1kYjgrPPbu/6A6i2eTC8tGoMTzVytjOu+rfyIsDzFX3c9lVTIpYMQSyS+8Zi8NVNMh7s6OauUZDroCqTf/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC7F1C4CEC5;
+	Wed, 16 Oct 2024 09:54:57 +0000 (UTC)
+Date: Wed, 16 Oct 2024 10:54:55 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: "Christoph Lameter (Ampere)" <cl@gentwo.org>
+Cc: Ankur Arora <ankur.a.arora@oracle.com>, linux-pm@vger.kernel.org,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, will@kernel.org, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
+	wanpengli@tencent.com, vkuznets@redhat.com, rafael@kernel.org,
+	daniel.lezcano@linaro.org, peterz@infradead.org, arnd@arndb.de,
+	lenb@kernel.org, mark.rutland@arm.com, harisokn@amazon.com,
+	mtosatti@redhat.com, sudeep.holla@arm.com,
+	misono.tomohiro@fujitsu.com, maobibo@loongson.cn,
+	joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
+	konrad.wilk@oracle.com
+Subject: Re: [PATCH v8 01/11] cpuidle/poll_state: poll via
+ smp_cond_load_relaxed()
+Message-ID: <Zw-Nb-o76JeHw30G@arm.com>
+References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
+ <20240925232425.2763385-2-ankur.a.arora@oracle.com>
+ <Zw5aPAuVi5sxdN5-@arm.com>
+ <086081ed-e2a8-508d-863c-21f2ff7c5490@gentwo.org>
+ <Zw6dZ7HxvcHJaDgm@arm.com>
+ <1e56e83e-83b3-d4fd-67a8-0bc89f3e3d20@gentwo.org>
+ <Zw6o_OyhzYd6hfjZ@arm.com>
+ <87jze9rq15.fsf@oracle.com>
+ <95ba9d4a-b90c-c8e8-57f7-31d82722f39e@gentwo.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -53,102 +64,62 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241009190019.3222687-7-maz@kernel.org>
+In-Reply-To: <95ba9d4a-b90c-c8e8-57f7-31d82722f39e@gentwo.org>
 
-Hi Marc,
-
-I'm planning to have a look at (some) of the patches, do you have a timeline for
-merging the series? Just so I know what to prioritise.
-
-On Wed, Oct 09, 2024 at 07:59:49PM +0100, Marc Zyngier wrote:
-> Accessing CNTHCTL_EL2 is fraught with danger if running with
-> HCR_EL2.E2H=1: half of the bits are held in CNTKCTL_EL1, and
-> thus can be changed behind our back, while the rest lives
-> in the CNTHCTL_EL2 shadow copy that is memory-based.
+On Tue, Oct 15, 2024 at 03:40:33PM -0700, Christoph Lameter (Ampere) wrote:
+> Index: linux/arch/arm64/lib/delay.c
+> ===================================================================
+> --- linux.orig/arch/arm64/lib/delay.c
+> +++ linux/arch/arm64/lib/delay.c
+> @@ -12,6 +12,8 @@
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/timex.h>
+> +#include <linux/sched/clock.h>
+> +#include <linux/cpuidle.h>
 > 
-> Yes, this is a lot of fun!
+>  #include <clocksource/arm_arch_timer.h>
 > 
-> Make sure that we merge the two on read access, while we can
-> write to CNTKCTL_EL1 in a more straightforward manner.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c    | 28 ++++++++++++++++++++++++++++
->  include/kvm/arm_arch_timer.h |  3 +++
->  2 files changed, 31 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 3cd54656a8e2f..932d2fb7a52a0 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -157,6 +157,21 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->  		if (!is_hyp_ctxt(vcpu))
->  			goto memory_read;
->  
-> +		/*
-> +		 * CNTHCTL_EL2 requires some special treatment to
-> +		 * account for the bits that can be set via CNTKCTL_EL1.
-> +		 */
-> +		switch (reg) {
-> +		case CNTHCTL_EL2:
-> +			if (vcpu_el2_e2h_is_set(vcpu)) {
-> +				val = read_sysreg_el1(SYS_CNTKCTL);
-> +				val &= CNTKCTL_VALID_BITS;
-> +				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
-> +				return val;
-> +			}
-> +			break;
-> +		}
+> @@ -67,3 +69,27 @@ void __ndelay(unsigned long nsecs)
+>  	__const_udelay(nsecs * 0x5UL); /* 2**32 / 1000000000 (rounded up) */
+>  }
+>  EXPORT_SYMBOL(__ndelay);
 > +
->  		/*
->  		 * If this register does not have an EL1 counterpart,
->  		 * then read the stored EL2 version.
-> @@ -207,6 +222,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
->  		 */
->  		__vcpu_sys_reg(vcpu, reg) = val;
->  
-> +		switch (reg) {
-> +		case CNTHCTL_EL2:
-> +			/*
-> +			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
-> +			 * Otherwise, some of the bits are backed by
-> +			 * CNTKCTL_EL1, while the rest is kept in memory.
-> +			 * Yes, this is fun stuff.
-> +			 */
-> +			if (vcpu_el2_e2h_is_set(vcpu))
-> +				write_sysreg_el1(val, SYS_CNTKCTL);
-
-Sorry, but I just can't seem to get my head around why the RES0 bits aren't
-cleared. Is KVM relying on the guest to implement Should-Be-Zero-or-Preserved,
-as per the RES0 definition?
-
-> +			return;
-> +		}
+> +void cpuidle_wait_for_resched_with_timeout(u64 end)
+> +{
+> +	u64 start;
 > +
->  		/* No EL1 counterpart? We're done here.? */
->  		if (reg == el1r)
->  			return;
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index c819c5d16613b..fd650a8789b91 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -147,6 +147,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt);
->  void kvm_timer_cpu_up(void);
->  void kvm_timer_cpu_down(void);
->  
-> +/* CNTKCTL_EL1 valid bits as of DDI0487J.a */
-> +#define CNTKCTL_VALID_BITS	(BIT(17) | GENMASK_ULL(9, 0))
-
-This does match CNTHCTL_EL2_VHE().
-
-Thanks,
-Alex
-
+> +	while (!need_resched() && (start = local_clock_noinstr()) < end) {
 > +
->  static inline bool has_cntpoff(void)
->  {
->  	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
-> -- 
-> 2.39.2
-> 
+> +		if (alternative_has_cap_unlikely(ARM64_HAS_WFXT)) {
+> +
+> +			/* Processor supports waiting for a specified period */
+> +			wfet(xloops_to_cycles((end - start) * 0x5UL));
+> +
+> +		} else
+> +		if (arch_timer_evtstrm_available() && start + ARCH_TIMER_EVT_STREAM_PERIOD_US * 1000 < end) {
+> +
+> +			/* We can wait until a periodic event occurs */
+> +			wfe();
+> +
+> +		} else
+> +			/* Need to spin until the end */
+> +			cpu_relax();
+> +	}
+> +}
+
+The behaviour above is slightly different from the current poll_idle()
+implementation. The above is more like poll every timeout period rather
+than continuously poll until either the need_resched() condition is true
+_or_ the timeout expired. From Ankur's email, an IPI may not happen so
+we don't have any guarantee that WFET will wake up before the timeout.
+The only way for WFE/WFET to wake up on need_resched() is to use LDXR to
+arm the exclusive monitor. That's what smp_cond_load_relaxed() does.
+
+If you only need the behaviour proposed above, you might as well go for
+udelay() directly. Otherwise I think we need to revisit Ankur's
+smp_cond_load_timeout() proposal from earlier this year.
+
+-- 
+Catalin
 
