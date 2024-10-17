@@ -1,199 +1,217 @@
-Return-Path: <kvm+bounces-29093-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29094-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56E0F9A286C
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 18:20:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1229C9A28C5
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 18:28:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5D62B274DB
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 16:20:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C62D628A11E
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 16:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884B01DF267;
-	Thu, 17 Oct 2024 16:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2591DF989;
+	Thu, 17 Oct 2024 16:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TiFkoobF"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Kqwgjx1f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B541DEFF6
-	for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 16:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3494C1DEFFB;
+	Thu, 17 Oct 2024 16:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729182017; cv=none; b=Uad0Ilbfc+rLypeu2SFSoj/7oHVXAnZoKZAN9QV6l/64RieDh0qde4qQJU1sucXZqaVBrhSC5i20P9qBiYxtOVQxs1r1pOzEbVudUiBweZjONMy9iWvORdH17drfZABh3nQNszG4hogLnfs9Ou8EEUeJ7fXBu/1IIkmYiitiiwk=
+	t=1729182441; cv=none; b=F73kKhigIcB4jxo6DbXECf1RZPJt9DYZBXlUTw3OnYfPGXanc82R/FXpGD/JgzsBsT4B143XqtHDaCpYWHvs+cu+igZCqOby470nQz54tZ/Lc75d9Y0QLqMXyD8KFWBnRBfN6E3fbEo/BFQVtSP5CXmjLwJfD24JpX4LURJUl8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729182017; c=relaxed/simple;
-	bh=Wna39gDDseGpvHU38IFbcJdQbyF2QYRr0Fwo1lzdwvg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DT7DdE5YdfG1u329Ma+fttVggtsyVwuJ2Y58y2qZR+DJekYi9mGbhErn3S7JtDSkHqbccVgn26BsBKq5hLguUyAAGCiD33LJ3ZUsqHgjoQ1OkrrfHh7IPV28o3Y4AqfcXU7etw3ogMtqqtBTszhMBLPPitBpa881Nfnq4eHIGNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TiFkoobF; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e291ac8dcf3so1721034276.3
-        for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 09:20:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729182015; x=1729786815; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6TNhzPJgm6ahtMirM8FpCRpTy9fAvxEyNvEQkfjArmU=;
-        b=TiFkoobFA8gMb3qqTMu090tyFC465XDcAdzjDUnLl5oUvfzkECRTdytJHs5Xsao4Pg
-         KbkTEDgJgHkFnh2WdAAkNgMAQ68d2TVQGqTlkIXr9gfOijCFudUfNxhAZXmMxX8yk9aU
-         ug/wjkU/Z2Jlj5eXhecI3Tmks78b4LYSTVzo2XR0KpE0kPAUnv51z0joxh1Glls0u8uW
-         5UhDPZv/L1iLJAv3DwpW/BeqF88EiHxJNeCeQeIYIBPZFxE9uwH+WnZu/ODvrXUbE6e2
-         tRIt8Qr/PAxStNGs1HBXQ64aXpIgiA89/nP9EB7mJ4KMZ/Xour/mvdpjJjajCN69Eugh
-         djIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729182015; x=1729786815;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6TNhzPJgm6ahtMirM8FpCRpTy9fAvxEyNvEQkfjArmU=;
-        b=AkN3Pj+yPHAP7bDDB9BcB7kyjcGJxDVPysNf90OX6MCKkLy/VEpPcbfrT6baZ+ne9f
-         gv9fa2zoe2MbqLXZi59b2BSgFIm/quzjO5aCBfwqMVGY5nwsRSaQqoJJ7+Xq49wUfCuc
-         gGkHYb00zfLA3JURHTqlwZhvM2urqVus+JS+x18rNaYx2KAxhwQNIMP2xq8kYXfzvYsn
-         Zor/cqFAnx3+SW6wCNgTL/OlWdG+6VvQctPid5ApRyP3i7dP0kytyWZ3eJjUU2pVRGza
-         4JAZwInzkBm3vyI4DEeXWXXdwPo9jkh6ZRjbKgTGm+Dvnp+XYE/KiEJa3SEmJw2vW6jr
-         iwxw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSfFXOD95a8yrji5Ssh0S3n4tmdkKVou+tMTlw3kSlaL4+FYcJ//eej3iv2bVQKZxmhBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbogXZe2osuiBnE8wny8if4GXuPOUcd6JgOa++6Is35uEoiCPW
-	eSP2RPJFKMYoDTN8FT5yZ9htNPkqXxvAa+zpRx2fwU84CnO9rGmdtQ9gqlhV/hwYF8EUjxAxB+h
-	vxw==
-X-Google-Smtp-Source: AGHT+IHsGe4Hv+bg4+MmRWEsVf0uSYOOLHi2t3q7KoObLMA2GYC/g110gqN2qHyL69OnjdL/alOhfUjSF7w=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:9bc9:0:b0:e2b:a511:2e51 with SMTP id
- 3f1490d57ef6-e2ba5112f27mr2471276.11.1729182014972; Thu, 17 Oct 2024 09:20:14
- -0700 (PDT)
-Date: Thu, 17 Oct 2024 09:20:13 -0700
-In-Reply-To: <2b954265-9ec0-4ee6-99c8-6ac080687d02@gmail.com>
+	s=arc-20240116; t=1729182441; c=relaxed/simple;
+	bh=n5T55SOso5//cZ8wH/1sSe+ubkwRgPtoxBElhBTHjfc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WTCC+rvRjrbxxg+aU4FhoqNm7Ml70IveRC9VIaM2YT8GJk2X2gR1iZwYVMMmxaYMeyjTIO2Vrdp/7Jmn9KwQisTKXakBFPDL3Vpl9VnFEvLcwx0SVEdepnHHG3q+Zma5fkf/jluGHb9lz1LB2YDZLn19UzxqFqtSbcSw0fND4jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Kqwgjx1f; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=n5T55SOso5//cZ8wH/1sSe+ubkwRgPtoxBElhBTHjfc=; b=Kqwgjx1f0TJVbmN/R3n+KAwNec
+	PMYl1MZK39OpFukK3CcAvTtm8CRgFDcMiL5SaG7CnGiMYrw2vymii5h9+d4hC875YXY1iu422CYXx
+	fFN9MlaayfqKhrsMgopk1IrbuJ2LySPYVlVIdhRTrNmGHqynpyBf06H2n7bCGCk/DsOkvFoMigCEr
+	6cNgO02B8QQE8zI1wp7eXCGQY9qPiVzEFBNyRo5QbTGq0AawhxcY1BWk4ffCthVERyCT7fPxr4qM6
+	UyNto5ZadopVNcfR8OHfjFJRu+9PWxwVQxkjcGlZtrKPo1n5v7LbmobnuVi7Zw3X8eUQ/vwAIMwAl
+	E5udBt7w==;
+Received: from [2001:8b0:10b:5:8c83:3b30:72b3:bfef] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1t1TL9-0000000BWzU-02GB;
+	Thu, 17 Oct 2024 16:27:07 +0000
+Message-ID: <bd116c27908111619b6cfffbe9a25e98e0e7cc20.camel@infradead.org>
+Subject: Re: [PATCH 3/3] selftests: KVM: Add test case for MMIO during event
+ delivery
+From: David Woodhouse <dwmw2@infradead.org>
+To: Sean Christopherson <seanjc@google.com>, Ivan Orlov <iorlov@amazon.com>
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, mingo@redhat.com, 
+	pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, x86@kernel.org, jalliste@amazon.com, 
+	nh-open-source@amazon.com, pdurrant@amazon.co.uk
+Date: Thu, 17 Oct 2024 17:27:05 +0100
+In-Reply-To: <ZwnBGtdbvmKHc4in@google.com>
+References: <20240927161657.68110-1-iorlov@amazon.com>
+	 <20240927161657.68110-4-iorlov@amazon.com> <ZwnBGtdbvmKHc4in@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-YBZdbWoH7U/eDoLgehY0"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240927161657.68110-1-iorlov@amazon.com> <20240927161657.68110-3-iorlov@amazon.com>
- <Zwm9TmRpNY6EeGKu@google.com> <2b954265-9ec0-4ee6-99c8-6ac080687d02@gmail.com>
-Message-ID: <ZxE5PZ-tY4f8mNBp@google.com>
-Subject: Re: [PATCH 2/3] KVM: vmx, svm, mmu: Process MMIO during event delivery
-From: Sean Christopherson <seanjc@google.com>
-To: Ivan Orlov <ivan.orlov0322@gmail.com>
-Cc: Ivan Orlov <iorlov@amazon.com>, bp@alien8.de, dave.hansen@linux.intel.com, 
-	mingo@redhat.com, pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, x86@kernel.org, jalliste@amazon.com, 
-	nh-open-source@amazon.com, pdurrant@amazon.co.uk
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Oct 16, 2024, Ivan Orlov wrote:
-> On 10/12/24 01:05, Sean Christopherson wrote:
-> > 
-> > > +			 * without VMM intervention, so return a corresponding internal error
-> > > +			 * instead (otherwise, vCPU will fall into infinite loop trying to
-> > > +			 * deliver the event again and again).
-> > > +			 */
-> > > +			if (error_code & PFERR_EVT_DELIVERY) {
-> > 
-> > Hmm, I'm 99% certain handling error in this location is wrong, and I'm also pretty
-> > sure it's unnecessary.  Or rather, the synthetic error code is unnecessary.
-> > 
-> > It's wrong because this path specifically handles "cached" MMIO, i.e. emulated
-> > MMIO that is triggered by a special MMIO SPTE.  KVM should punt to userspace on
-> > _any_ MMIO emulation.  KVM has gotten away with the flaw because SVM is completely
-> > broken, and VMX can always generate reserved EPTEs.  But with SVM, on CPUs with
-> > MAXPHYADDR=52, KVM can't generate a reserved #PF, i.e. can't do cached MMIO, and
-> > so I'm pretty sure your test would fail on those CPUs since they'll never come
-> > down this path.
-> > 
-> 
-> Ah, alright, I see... Probably, I need to test the next version with
-> enable_mmio_caching=false as well.
-> 
-> > Heh, though I bet the introduction of RET_PF_WRITE_PROTECTED has regressed
-> > shadow paging on CPUs with PA52.
-> 
-> Is it because it doesn't process write-protected gfn correctly if it is in
-> MMIO range when mmio caching is disabled?
 
-Ignore this, I was thinking lack of cached MMIO SPTEs would result in no
-EPT Misconfig, but it's shadow paging, there is no EPT.
+--=-YBZdbWoH7U/eDoLgehY0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > Anyways, the synthetic PFERR flag is unnecessary because the information is readily
-> > available to {vmx,svm}_check_emulate_instruction().  Ha!  And EMULTYPE_WRITE_PF_TO_SP
-> > means vendor code can even precisely identify MMIO.
-> 
-> Hmm, do you mean EMULTYPE_PF? It looks like EMULTYPE_WRITE_PF_TO_SP has
-> nothing to do with MMIO...
+On Fri, 2024-10-11 at 17:21 -0700, Sean Christopherson wrote:
+>=20
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* We should never reach thi=
+s point */
+>=20
+> No pronouns.=C2=A0 Yes, it's nitpicky, but "we" gets _very_ ambiguous whe=
+n "we" could
+> mean the admin, the user, the VMM, KVM, the guest, etc.
+>=20
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GUEST_ASSERT(0);
 
-Nope.  Well, both.  EMULTYPE_PF is set if *any* page fault triggers emulation.
-EMULTYPE_WRITE_PF_TO_SP is set if emulation was triggered by a write protection
-violation due to write-tracking, and write-tracking requires an underlying memslot.
-I.e. if EMULTYPE_WRITE_PF_TO_SP is set, then emulation *can't* be for emulated
-MMIO.
 
-> I thought about processing the error in check_emulate_instruction as it
-> seems logical, however I hadn't found a way to detect MMIO without page
-> walking on SVM. I'll validate that EMULTYPE_PF gets set in all of the MMIO
-> cases and move the handling into this function in V2 if it works.
-> 
-> > I think another X86EMUL_* return type is needed, but that's better than a synthetic
-> > #PF error code flag.
-> > 
-> 
-> If I understand correctly, you suggest returning this new
-> X86EMUL_<something> code from {svm,vmx}_check_emulate_instruction and
-> process it in the common code, right? I agree that it's much better than
-> handling the error in MMU code. We are gonna return this return type from
-> vendor code and handle it in the common code this way, which is neat!
+Is there really *any* way that can be interpreted as anything other
+than "the CPU executing this code will never get to this point and
+that's why there's an ASSERT(0) right after this comment"?
 
-Yep, exactly.
+I don't believe there's *any* way that particular pronoun can be
+ambiguous, and now we've got to the point of fetishising the bizarre
+"no pronouns" rule just for the sake of it.
 
-> > Ugh, and the manual call to vmx_check_emulate_instruction() in handle_ept_misconfig()
-> > is similarly flawed, though encountering that is even more contrived as that only
-> > affects accesses from SGX enclaves.
-> > 
-> > Hmm, and looking at all of this, SVM doesn't take advantage of KVM_FAST_MMIO_BUS.
-> > Unless I'm forgetting some fundamental incompatibility, SVM can do fast MMIO so
-> > long as next_rip is valid.
-> > 
-> > Anyways, no need to deal with vmx_check_emulate_instruction() or fast MMIO, I'll
-> > tackle that in a separate series.  But for this series, please do the EPT misconfig
-> > in a separate patch from fixing SVM.  E.g. extract the helper, convert VMX to the
-> > new flow, and then teach SVM to do the same.
-> > 
-> 
-> Hmm, implementing KVM_FAST_MMIO_BUS for SVM sounds like an interesting thing
-> to do, please let me know if I could help. By the way, why can't we move the
-> call to kvm_io_bus_write into the common code (e.g. MMU)? It would remove
-> the need of implementing KVM_FAST_MMIO_BUS specifically for each vendor.
+I get it, especially for some individuals it *can* be difficult to take
+context into account, and the wilful use of pronouns instead of
+spelling things out explicitly *every* *single* *time* can sometimes
+help. But at a cost of conciseness and brevity.
 
-That would work too, but vendor code needs to be aware of "fast" MMIO no matter
-what, because there are vendor specific conditions that make fast MMIO impossible
-(KVM needs the CPU to provide the instruction length, otherwise KVM needs to
-emulate the instruction in order to decode it, which makes fast MMIO not-fast).
+--=-YBZdbWoH7U/eDoLgehY0
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-> > >   		gpa_t gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
-> > > -		bool is_mmio = exit_reason.basic == EXIT_REASON_EPT_MISCONFIG;
-> > > -
-> > 
-> > Blank newline after variable declarations.
-> > 
-> > > -		kvm_prepare_ev_delivery_failure_exit(vcpu, gpa, is_mmio);
-> > > +		kvm_prepare_ev_delivery_failure_exit(vcpu, gpa, false);
-> > >   		return 0;
-> > >   	}
-> > 
-> > All in all, I think this is the basic gist?  Definitely feel free to propose a
-> > better name than X86EMUL_UNHANDLEABLE_VECTORING.
-> > 
-> 
-> It sounds OK, but maybe something more precise would work, like
-> X86EMUL_VECTORING_IO_NEEDED (by analogy with X86EMUL_IO_NEEDED)?
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQxMDE3MTYyNzA1WjAvBgkqhkiG9w0BCQQxIgQgtd0ql09R
+YGmFdO7Mm/QsedLNgLbPf/GPFGpHWeuTRIMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBAFOQR3vWV9emWrCloEmWVIAhdqACGqSFM
+n4zvp08kxyB9a0zYkimGJosUPPA5wyYTZ9y6kDM9ZDZ9cZSkzVbgXf8uspEgtQzpZuDYBivGkaVq
+Gbyc1ywH6pAtRcxkGjhhOWA1Qd6PYkBFUABHgmLdAd1NuGHhzBO+dLe9bzgzq7yAhD5JSH2eMhEW
+KWKMnV2qKp/wjlwundvAY/9pwLneJycb04eWg8kBR5U8VGJ/2M0JSLwmTXqC9h48VZuyGTG4ZpwH
+TAfOn8YgzXxQDvKW0dRJ+61P66qt1rEGwYLm3prruZLJ/b54tBaw0w2KIRZtRmzAN24IZOETIkse
+jtWEdSRGM554SzadascCesbEVoSW6cJ4jrEwi17+uGrQtBPR2Tr7bPGFMm4BPEbEsObQyJdpjMEt
+oa3O4jui0xL4M9KTga+wMID5vlCDNMYDbS0aOVDjPjlgbTdaqOzG8imTyJXFIp8k6gQk9l9wz4P4
+juw/SMXJafcJLGR1OEYESZEbx+iuGT6OGuHKc9ohAcrJmg1bj4yWHzJ2X6BnQAa/cxU34d2hsDsv
+LF3d9xFW4fPjvB8w+Zh5H2nhD+HUu/+zMez+Hl8uSpFq9qYs+W8g02/qgUHJ0J9tA3Otx9GhQ/rq
+VIE9xRTyBo3DjkkHTPe6HkYoDDgm6JGAR6YL2W6eLQAAAAAAAA==
 
-Hmm, I definitely want X86EMUL_UNHANDLEABLE_XXX, so that it's super clear that
-emulation failed.  Maybe X86EMUL_UNHANDLEABLE_IO_VECTORING?  Sadly, I think we
-need VECTORING (or similar) in the name, because it will be morphed to
-KVM_INTERNAL_ERROR_DELIVERY_EV.  E.g. simply X86EMUL_UNHANDLEABLE_IO would be
-nice, but is wildly misleading as there are other scenarios where KVM can't
-handled emulated MMIO during instruction emulation.  :-/
+
+--=-YBZdbWoH7U/eDoLgehY0--
 
