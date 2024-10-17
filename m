@@ -1,155 +1,233 @@
-Return-Path: <kvm+bounces-29053-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29054-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCD2B9A1D00
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 10:20:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20FEE9A1D1B
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 10:24:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 671411F22ADE
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 08:20:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69D59B22B1F
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 08:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01C91D4141;
-	Thu, 17 Oct 2024 08:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BA31D2F73;
+	Thu, 17 Oct 2024 08:24:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NCa8o7M5"
+	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="ABLosHbA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GmKk7qR0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CFE5199944;
-	Thu, 17 Oct 2024 08:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800F725776;
+	Thu, 17 Oct 2024 08:23:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729153193; cv=none; b=tEUcq9xjF876EcGjMsbX9eP22zYBlhKqWHAKicYL1ghXt8qV3dXLEAnNpme/hgqkUZBX/1fnX8I8HOSJE06aFJ0CCR1/ZhSX2JYLS/a2xSQeONfibmx2xbRDtyTww5D8nShb2kf0ORd+28txbznG+FpEEnlOlKVwvpggLiRPO6c=
+	t=1729153439; cv=none; b=VkgpK+CXP3oTWJ9/mBSknI0wLSyZ/HAT8P4edgNrHF3oqtF2T+RCySq2go3QflDUeWoEbPLvQ9pU+6Br4rQVf69FKYGHNtVebIkmJGyNA+BA1zyVuvXo/7iYsORZ8/pRQXAIqRVxG97Qq5UlJUTR2KDr9x3g4w6khB1Ql+aQ+MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729153193; c=relaxed/simple;
-	bh=GInnBn+NilFxTVvAPhppcfdBhV7v8zyNPgMLAjfhsQo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VJN/b1RqvqsHCBtaTNO7eoGamQwV6pecs8LgoMOwRB5/WzXdXXOvABdhE9JK29Sd6ycjqN6raUkqmI40ai6DAd7jQrcZvVZggDa+BTNT72X0G1qq5ED1/p/TLlOTMNgCgGgqh9GJs8dBvy+wvi+ic4+nYs28QwHo+xDfZR817+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NCa8o7M5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08C0C4CEC3;
-	Thu, 17 Oct 2024 08:19:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729153192;
-	bh=GInnBn+NilFxTVvAPhppcfdBhV7v8zyNPgMLAjfhsQo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NCa8o7M5nHa+FK/+KHfno1zUrcmbPZJE0vROcSMmvepPJnZpDXPlyoDNxM4wN2xkL
-	 gQZjPMmC3otKdK68P+T/C11hStPc9YiF5mo6vr2THaENJ/c1+XHM2NSD8Tc4Rc1yuq
-	 D8GFv69HBeFOw7O5CK5QLFJh1fX6wyS5Bk4LBBoEsxJe4nmmavI7zbh6MbFZNtteip
-	 kV/ZKgKaPlkRsl8zuRgclmOGg1qVrvSCaui3FXpBemsXzz9NwZPFXrxj/8kv8Ac/yT
-	 QicNm+C1wv59fIrZYpQzMEQCe8JlSb5mGvPHVY+XdrqndiXvWYOFoMtu6Yb5tFETJI
-	 MUniEkXjrdmmA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1t1LjZ-004M2D-TO;
-	Thu, 17 Oct 2024 09:19:50 +0100
-Date: Thu, 17 Oct 2024 09:19:48 +0100
-Message-ID: <86sesv3zvf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ankur Arora <ankur.a.arora@oracle.com>
-Cc: linux-pm@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	pbonzini@redhat.com,
-	wanpengli@tencent.com,
-	vkuznets@redhat.com,
-	rafael@kernel.org,
-	daniel.lezcano@linaro.org,
-	peterz@infradead.org,
-	arnd@arndb.de,
-	lenb@kernel.org,
-	mark.rutland@arm.com,
-	harisokn@amazon.com,
-	mtosatti@redhat.com,
-	sudeep.holla@arm.com,
-	cl@gentwo.org,
-	misono.tomohiro@fujitsu.com,
-	maobibo@loongson.cn,
-	joao.m.martins@oracle.com,
-	boris.ostrovsky@oracle.com,
-	konrad.wilk@oracle.com
-Subject: Re: [PATCH v8 00/11] Enable haltpoll on arm64
-In-Reply-To: <87plnzpvb6.fsf@oracle.com>
-References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
-	<8634kx5yqd.wl-maz@kernel.org>
-	<87plnzpvb6.fsf@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1729153439; c=relaxed/simple;
+	bh=r/lBsogBVa1Y5PrZ6xNPTJQ1j/tdMwHgD77thc74r7g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OI/raG2hYZrZOiuT1Y8MVbQ3e4HnMOaI1gY3UgT9jmyn4V1jpduXmIj4ntX4rORGOzwxBk4GiG/HbHw5iWoRcIKX78sTQPzZwPGHt0F2HPkttN7nm8HCJJkTxnvzUaieX91vQz24pc4AGuJ172UHrnSIAdTFmnvwNT5OTdc6zQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=ABLosHbA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GmKk7qR0; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id 7BBD7138012D;
+	Thu, 17 Oct 2024 04:23:56 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Thu, 17 Oct 2024 04:23:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1729153436; x=
+	1729239836; bh=S+oeyrBXw3nGPntY41yaCTg/6DEfwIvZNsKzRzEm0y4=; b=A
+	BLosHbAsPPQW12tOkQo0SMRPbKqz8N/YGstIZ5XdSsV3dgpfkPX0D7/rGu7sSUFt
+	S2havpUmdWr5PQFbvkYMRsYAR4DZXWD+1iWlWCvarUmnWhFWToWO8qG/qQZWDRKF
+	paXdPip6gI+2+28vSVCsv2qO43zTsO2el/U6yAv0M4W0Q4yT1TSvP4CNGEMDPakF
+	e71fihDbkBXQpHbCV/qreKhkzSOZeCC6z3aMFufDJOVB9Tvm/wIlZN3eMhxNuywu
+	aNOcOSYrnLFsi0u6neOZRQYOO7sobBQVJ2448zqxMzdIEPYN5rn4WR48LXc9ZjPI
+	m9Om5BFEvizkkoQ4kR2uA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1729153436; x=1729239836; bh=S+oeyrBXw3nGPntY41yaCTg/6DEf
+	wIvZNsKzRzEm0y4=; b=GmKk7qR0j0pf5DR2z5QPp9oHBgAUsE5TTb1WRKvrzH9W
+	9VR5VYL1LGT9MHNVVFxkppxp9XCJR4hcw0RvunlRnJzC8AtamBxE3EsRt4mNb8WE
+	cHxOn7ieJGEcxqETJWArJ+l5gErLcloUIn6BLvUsNSN8mKPTKwKr1uKHLVTTADxK
+	cjpnF24tYm4fYTLN/EaZTibOxYTxSkjzUz6ewdnRuh4Z1uD8VHXm0Hxt0GpxVDH6
+	UDBo5gljj46MV480s396tD8Qjn+5oKAuJqg/WkOj31GazctQuorTimGWW8+9sOgh
+	0BC4aaA+DiZlyNxkaWyq9P3Omaq2PfrLug/NW1SOXw==
+X-ME-Sender: <xms:m8kQZ502zBS5pIaHkeMAf61LGICrzXfqGUsTTakxdNja2GFEFs-_WQ>
+    <xme:m8kQZwFrthpnVeQ4pOriiyBFjCPfaxL1i_6LZu4JaCtvkYSshg9VXC0F1Us26IQIF
+    OrgxbFZwyKBI38Gxmo>
+X-ME-Received: <xmr:m8kQZ57NGr45XW0vArsJ4qKoD5v_iflF8DV8NGc3CI8KXTKRynLhkkT8yKL6j0b43tuWsQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdehuddgtdefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvden
+    ucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlse
+    hshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpeeltedugedtgfehuddu
+    hfetleeiuedvtdehieejjedufeejfeegteetuddtgefgudenucffohhmrghinhepkhgvrh
+    hnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
+    rhhomhepkhhirhhilhhlsehshhhuthgvmhhovhdrnhgrmhgvpdhnsggprhgtphhtthhope
+    dukedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnhgvvghrrghjrdhuphgrughh
+    higrhiesrghmugdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvg
+    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehtghhlgieslhhinhhuthhrohhnihig
+    rdguvgdprhgtphhtthhopehmihhnghhosehrvgguhhgrthdrtghomhdprhgtphhtthhope
+    gurghvvgdrhhgrnhhsvghnsehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtohep
+    thhhohhmrghsrdhlvghnuggrtghkhiesrghmugdrtghomhdprhgtphhtthhopehnihhkuh
+    hnjhesrghmugdrtghomhdprhgtphhtthhopehsrghnthhoshhhrdhshhhukhhlrgesrghm
+    ugdrtghomhdprhgtphhtthhopehvrghsrghnthdrhhgvghguvgesrghmugdrtghomh
+X-ME-Proxy: <xmx:m8kQZ23ssNxLswwliumbNBYTx4UuvaD5Ou9LOY16q4lKInktjJZo7g>
+    <xmx:m8kQZ8FcfqIQtDzRxhZds1v1njnLZNuzD1bDZAkqnZnCpwS7CVMcxg>
+    <xmx:m8kQZ3-A9Rc5ey4hZrE44Qllgyi3HpQVI3Oq_RUKH6l7tDF07K-R1A>
+    <xmx:m8kQZ5lhq85RFmlCtVGVsJpA-EuvGzxTRJae5aKQTwO4LTckEzAN2g>
+    <xmx:nMkQZ6_NPSnfGra52_kpnDW4ByyWlHmxPxcrD5TZRrXjvYGw13qIbHKc>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 17 Oct 2024 04:23:49 -0400 (EDT)
+Date: Thu, 17 Oct 2024 11:23:45 +0300
+From: "Kirill A. Shutemov" <kirill@shutemov.name>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com, 
+	Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, bp@alien8.de, 
+	David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org, 
+	seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
+Subject: Re: [RFC 00/14] AMD: Add Secure AVIC Guest Support
+Message-ID: <vo2oavwp2p4gbenistkq2demqtorisv24zjq2jgotuw6i5i7oy@uq5k2wcg3j5z>
+References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ankur.a.arora@oracle.com, linux-pm@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com, wanpengli@tencent.com, vkuznets@redhat.com, rafael@kernel.org, daniel.lezcano@linaro.org, peterz@infradead.org, arnd@arndb.de, lenb@kernel.org, mark.rutland@arm.com, harisokn@amazon.com, mtosatti@redhat.com, sudeep.holla@arm.com, cl@gentwo.org, misono.tomohiro@fujitsu.com, maobibo@loongson.cn, joao.m.martins@oracle.com, boris.ostrovsky@oracle.com, konrad.wilk@oracle.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
 
-On Wed, 16 Oct 2024 22:55:09 +0100,
-Ankur Arora <ankur.a.arora@oracle.com> wrote:
+On Fri, Sep 13, 2024 at 05:06:51PM +0530, Neeraj Upadhyay wrote:
+> Introduction
+> ------------
+> 
+> Secure AVIC is a new hardware feature in the AMD64 architecture to
+> allow SEV-SNP guests to prevent hypervisor from generating unexpected
+> interrupts to a vCPU or otherwise violate architectural assumptions
+> around APIC behavior.
+> 
+> One of the significant differences from AVIC or emulated x2APIC is that
+> Secure AVIC uses a guest-owned and managed APIC backing page. It also
+> introduces additional fields in both the VMCB and the Secure AVIC backing
+> page to aid the guest in limiting which interrupt vectors can be injected
+> into the guest.
+> 
+> Guest APIC Backing Page
+> -----------------------
+> Each vCPU has a guest-allocated APIC backing page of size 4K, which
+> maintains APIC state for that vCPU. The x2APIC MSRs are mapped at
+> their corresposing x2APIC MMIO offset within the guest APIC backing
+> page. All x2APIC accesses by guest or Secure AVIC hardware operate
+> on this backing page. The backing page should be pinned and NPT entry
+> for it should be always mapped while the corresponding vCPU is running.
 > 
 > 
-> Marc Zyngier <maz@kernel.org> writes:
+> MSR Accesses
+> ------------
+> Secure AVIC only supports x2APIC MSR accesses. xAPIC MMIO offset based
+> accesses are not supported.
 > 
-> > On Thu, 26 Sep 2024 00:24:14 +0100,
-> > Ankur Arora <ankur.a.arora@oracle.com> wrote:
-> >>
-> >> This patchset enables the cpuidle-haltpoll driver and its namesake
-> >> governor on arm64. This is specifically interesting for KVM guests by
-> >> reducing IPC latencies.
-> >>
-> >> Comparing idle switching latencies on an arm64 KVM guest with
-> >> perf bench sched pipe:
-> >>
-> >>                                      usecs/op       %stdev
-> >>
-> >>   no haltpoll (baseline)               13.48       +-  5.19%
-> >>   with haltpoll                         6.84       +- 22.07%
-> >>
-> >>
-> >> No change in performance for a similar test on x86:
-> >>
-> >>                                      usecs/op        %stdev
-> >>
-> >>   haltpoll w/ cpu_relax() (baseline)     4.75      +-  1.76%
-> >>   haltpoll w/ smp_cond_load_relaxed()    4.78      +-  2.31%
-> >>
-> >> Both sets of tests were on otherwise idle systems with guest VCPUs
-> >> pinned to specific PCPUs. One reason for the higher stdev on arm64
-> >> is that trapping of the WFE instruction by the host KVM is contingent
-> >> on the number of tasks on the runqueue.
-> >
-> > Sorry to state the obvious, but if that's the variable trapping of
-> > WFI/WFE is the cause of your trouble, why don't you simply turn it off
-> > (see 0b5afe05377d for the details)? Given that you pin your vcpus to
-> > physical CPUs, there is no need for any trapping.
+> Some of the MSR accesses such as ICR writes (with shorthand equal to
+> self), SELF_IPI, EOI, TPR writes are accelerated by Secure AVIC
+> hardware. Other MSR accesses generate a #VC exception. The #VC
+> exception handler reads/writes to the guest APIC backing page.
+> As guest APIC backing page is accessible to the guest, the Secure
+> AVIC driver code optimizes APIC register access by directly
+> reading/writing to the guest APIC backing page (instead of taking
+> the #VC exception route).
 > 
-> Good point. Thanks. That should help reduce the guessing games around
-> the variance in these tests.
+> In addition to the architected MSRs, following new fields are added to
+> the guest APIC backing page which can be modified directly by the
+> guest:
+> 
+> a. ALLOWED_IRR
+> 
+> ALLOWED_IRR vector indicates the interrupt vectors which the guest
+> allows the hypervisor to send. The combination of host-controlled
+> REQUESTED_IRR vectors (part of VMCB) and ALLOWED_IRR is used by
+> hardware to update the IRR vectors of the Guest APIC backing page.
+> 
+> #Offset        #bits        Description
+> 204h           31:0         Guest allowed vectors 0-31
+> 214h           31:0         Guest allowed vectors 32-63
+> ...
+> 274h           31:0         Guest allowed vectors 224-255
+> 
+> ALLOWED_IRR is meant to be used specifically for vectors that the
+> hypervisor is allowed to inject, such as device interrupts.  Interrupt
+> vectors used exclusively by the guest itself (like IPI vectors) should
+> not be allowed to be injected into the guest for security reasons.
+> 
+> b. NMI Request
+>  
+> #Offset        #bits        Description
+> 278h           0            Set by Guest to request Virtual NMI
+> 
+> 
+> LAPIC Timer Support
+> -------------------
+> LAPIC timer is emulated by hypervisor. So, APIC_LVTT, APIC_TMICT and
+> APIC_TDCR, APIC_TMCCT APIC registers are not read/written to the guest
+> APIC backing page and are communicated to the hypervisor using SVM_EXIT_MSR
+> VMGEXIT. 
+> 
+> IPI Support
+> -----------
+> Only SELF_IPI is accelerated by Secure AVIC hardware. Other IPIs require
+> writing (from the Secure AVIC driver) to the IRR vector of the target CPU
+> backing page and then issuing VMGEXIT for the hypervisor to notify the
+> target vCPU.
+> 
+> Driver Implementation Open Points
+> ---------------------------------
+> 
+> The Secure AVIC driver only supports physical destination mode. If
+> logical destination mode need to be supported, then a separate x2apic
+> driver would be required for supporting logical destination mode.
+> 
+> Setting of ALLOWED_IRR vectors is done from vector.c for IOAPIC and MSI
+> interrupts. ALLOWED_IRR vector is not cleared when an interrupt vector
+> migrates to different CPU. Using a cleaner approach to manage and
+> configure allowed vectors needs more work.
+> 
+> 
+> Testing
+> -------
+> 
+> This series is based on top of commit 196145c606d0 "Merge
+> tag 'clk-fixes-for-linus' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux."
+> 
+> Host Secure AVIC support patch series is at [1].
+> 
+> Following tests are done:
+> 
+> 1) Boot to Prompt using initramfs and ubuntu fs.
+> 2) Verified timer and IPI as part of the guest bootup.
+> 3) Verified long run SCF TORTURE IPI test.
+> 4) Verified FIO test with NVME passthrough.
 
-I'd be interested to find out whether there is still some benefit in
-this series once you disable the WFx trapping heuristics.
+One case that is missing is kexec.
 
-Thanks,
+If the first kernel set ALLOWED_IRR, but the target kernel doesn't know
+anything about Secure AVIC, there are going to be a problem I assume.
 
-	M.
+I think we need ->setup() counterpart (->teardown() ?) to get
+configuration back to the boot state. And get it called from kexec path.
 
 -- 
-Without deviation from the norm, progress is not possible.
+  Kiryl Shutsemau / Kirill A. Shutemov
 
