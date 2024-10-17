@@ -1,157 +1,298 @@
-Return-Path: <kvm+bounces-29045-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29046-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E409A1823
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 03:53:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D2DF9A1A0C
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 06:54:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1BF71C24DE3
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 01:53:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C18D7288B27
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 04:54:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0945928E0F;
-	Thu, 17 Oct 2024 01:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700EF1779BA;
+	Thu, 17 Oct 2024 04:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u4r7fRY9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ccweTbJ1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA381C695
-	for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 01:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5F8166F3D
+	for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 04:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729130019; cv=none; b=g3nJOKKR0f7yTVt1VorjZ5zAS6bQP56E7f6zotZ5QCPJ3XUlpGvmiAi/UAJfI8gSCtm7XIoEw8Lf7t2ET2dJWJlWu9mE0QkzPmNdckX97zOWOsQQbJKsBUujb2uuTPXQUd36kaHbsdj5qrYnDBRFeBzr0tsmseAd68P/rKhGqzs=
+	t=1729140835; cv=none; b=n76Zv7Tx8S6CNBiTLX0YNUpz57s9ZySRG7kUnkqt8ZZ79ISYMWXVpEZgij9zD/Jw8KBWWVVjfFH8Gy7KrFlc78xd55OddZx04+mdtvTDH5s63UbnuplvYmqdcZFaDkxfLj2i+f1d3aSd6C94LTYm57ErwLFwCmKw/TvGCU9T96s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729130019; c=relaxed/simple;
-	bh=T8K6e1vE2wCLDVf7N8pVhUM3BmOSL3JyhQ3sMTdPLa8=;
+	s=arc-20240116; t=1729140835; c=relaxed/simple;
+	bh=97DNx9gdVThlibrCf7mEAf4DJ7ZUx62BwJubMb0Yg7c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WVN0zqDWbwbzlwC/+Hvm4X9NYRFAxAOUxSHCrFcgGk/Y3H9pKcv5Yx3ZhEakgRM/9j0x4aHRrrnOFrU3daKIIPxNT2J9mf+TYf6+/92nt3YucTnW9hFwpVOw7ljKi4qy5TZ1xbe02hN7j3DsCChPyMeRIuem68pDubmP5CdSfw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=u4r7fRY9; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539fb49c64aso591486e87.0
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 18:53:35 -0700 (PDT)
+	 To:Cc:Content-Type; b=j3q2mYfgMAAk7I8na/sbklvccwlR5Ao+zVhu+7tBeMj9PzSjjXF9cf9d9prqidocO8MaaTCcYzzDFhT3f9g9j1yaG1YTsZBct0Qlnj+BKD+8ftEqCCS4R9E4YcIi3sXkx2Y4bpCfURzi92JEdjLSff9g1G0ycus6w2lhXqMdmKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ccweTbJ1; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c932b47552so15744a12.0
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2024 21:53:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729130014; x=1729734814; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PLiuItL1UL/0YbxnoapkbJfbI3ajFc+JHUChCko5gAM=;
-        b=u4r7fRY9ol+/OW/UNw8BI+3176Mb3ct4qTu4I4Ar2OaFHakwEE5vSGYQm6Oy0ZVjZF
-         AQnTzeXmNO55QdxOP+PRN3QT4sCWp589YN6h+ngSG74AABZfZrA+Z79pDdx7QBZ7+HBm
-         qpzZ1oFtgFgjngx6Fw+wU+p6R+yXmYUYnrFBp4zCk8aax3yr8NeA1k+X9yfnLwNPwBKI
-         Xgt0D0z1WJ5v8jyKUDSW3LF+/if4BDzn60c++uhsmkt6mfTcQqfCTyZTgcrVY5iNF3An
-         EvHRryFWeE6emCB7QKQyX30U6NmjPD9TbKtgXW3+TVfMqhcLbENlesX6p9HKVI9tCgxA
-         +AjQ==
+        d=google.com; s=20230601; t=1729140832; x=1729745632; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BnKl1QwbwUsKFMP4HLrcYnPjaoTQ17Jib2qe3x9b52Q=;
+        b=ccweTbJ1kl/T162izeTUMnGFo+V4NXz1Hr+FY+3DBkttEJyrHOlYQl6/PZLdZSnGza
+         FPoBu1r9JzsfNbqwg/+5/JClDErWaVUYmWAJqoZMGqsQuYTeJdNTiT5B2cnO1mMDpBcb
+         VrgAaD/cLniKfDDCocaM7mGhRYzT2Q42xJfg+6yIDuJol1EMt1d5cyLlp7wr90C9zhxK
+         CqIR+cyIUIbGg0LUX9PiXp4VEiTBQoOsntZoHP3/M00zkGOF8O7rn3yUumFpwoO0A5v/
+         /Gqh5xyPlW7hT9gX5OUkJmjDRZS7xivNlv+Dc37wqQw4qSeRg+sH5KAB8y0crcVsVFOZ
+         pTqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729130014; x=1729734814;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PLiuItL1UL/0YbxnoapkbJfbI3ajFc+JHUChCko5gAM=;
-        b=HV/lwLU1aZ2L4HDUtgqCjI5gypF3HGdVh6ppuVkBinrfHbKe7Sa0BKs8ppAIS5hw0H
-         Q83j1YCBBk6gyL4aZQajOTzHsm5JM2lnQGvjLS+Eq/JTR7FQr+JS6jC+HKHPWhYA4A6L
-         fEbsSisZ9de3ue+xRhisVpu3K7XOrE20nLmjNR2WUF47NlBjcIJXZcP8tbc3goqB1bQW
-         rgu338uH8Y7Gi3cyjgohgiBpcKFvVFrAtAqJRl9sZ4jQbknxPORDOJ9mvX8vx6QdnnwD
-         w3ou1ehk55w1Kn10a28pjwKyJmqaRMvBNY+drnwRw4MDEEYMLqgnmvv7rviOWSCuzPw/
-         9WCw==
-X-Forwarded-Encrypted: i=1; AJvYcCXceczaf37hllG/NdELn9poI6SED5lrgjtPAMCQa7U3+VHZ882whfR1oP5KcGYEQevLQ28=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6TaCvASPx/volkKJXe2UU6FI4QXlGxPkdopF3JANpSZGnfjlN
-	cDtkAjYKiTGWUVxuW2gDbZU6FXV3+R9DH0+iIlx3sWJIWPmFTpuwK+/ySz9Dh2Zxzclr5H31wrJ
-	QBS3CN+Of+aVLmA0QxAueL7Kx5bjZF6m/wGbtPQ==
-X-Google-Smtp-Source: AGHT+IHmRyfMbHywLHUFamzust4bs2j0uBfSYysgkZSLZifh1MxXQEHcbM8EVQlN/EZKeVoV9osv3HRdY3nD8AfzzMA=
-X-Received: by 2002:a05:6512:1252:b0:539:e0e6:cf42 with SMTP id
- 2adb3069b0e04-539e571ce19mr12017134e87.43.1729130013488; Wed, 16 Oct 2024
- 18:53:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729140832; x=1729745632;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BnKl1QwbwUsKFMP4HLrcYnPjaoTQ17Jib2qe3x9b52Q=;
+        b=S+UK9OuZBn4J5r+13Be2Sr9NrQClTjy13U3wwjmVkG4JDN67TemTG5oqAdnfbUoC7q
+         2CKIkiCOsvc9jiYz4FkSSluwGezToGrGw7c9THVwQurx6ZPUyoKaexlUVWdzNOPoj/cL
+         bTdsfJwStFvFMnqQ8snILfaP8ijPSzg2xcWXwPQ1po/h+m9I9qNFq/bA/D/ygSy7tP0e
+         QOx1qQUNsk42LtbEzh4MdT8nskueGs88/kqAs405l7Q3RIbIf2I/sktKTQJmcp/ESZK4
+         fPckGepZuJCAyuLVnWzlFtDmXOzvNH7zNivoyYXKJyZjpzcEBdNeqrcy2p24jcezZLMk
+         g4zw==
+X-Forwarded-Encrypted: i=1; AJvYcCVBSgZdY63zKSuzRcmGtvSfPRHB0IHyHeG2zS4bkKtaqJSD98KRGtFXa0q6v+SbBsOIgr0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfThsH/2LKLK4UKfHIP3DkvKAcPV1VkAk/cnK/qr/Mtaa0119d
+	0GnR22qDK+w6OsDz4zH6Ani5lcneJMZyXqvrYc9NgMGnUV9k7eyM0g0rahzSgM6GUTbArYmthIC
+	Q1tm/Mt9e1xI3Xed4wZCILcXFktBJDuLbtIEH
+X-Google-Smtp-Source: AGHT+IFCcmMy3OXU8QksT8UF+eXw1a4ADFyOFkBS5bVywWQA6mQyQwUxzFuW9jnMvnjqseJvwvlsa8cfN9d+elGiJq8=
+X-Received: by 2002:a05:6402:2355:b0:5c8:84b5:7e78 with SMTP id
+ 4fb4d7f45d1cf-5c9a6613d7fmr307679a12.4.1729140831633; Wed, 16 Oct 2024
+ 21:53:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0-v2-621370057090+91fec-smmuv3_nesting_jgg@nvidia.com>
- <Zs5Fom+JFZimFpeS@Asurada-Nvidia> <CABQgh9HChfeD-H-ghntqBxA3xHrySShy+3xJCNzHB74FuncFNw@mail.gmail.com>
- <ee50c648-3fb5-4cb4-bc59-2283489be10e@linux.intel.com> <CABQgh9ESU51ReMa1JXRanPr4AugKM6gJDGDPz9=2TfQ3BaAUyw@mail.gmail.com>
- <20241015130936.GM3394334@nvidia.com>
-In-Reply-To: <20241015130936.GM3394334@nvidia.com>
-From: Zhangfei Gao <zhangfei.gao@linaro.org>
-Date: Thu, 17 Oct 2024 09:53:22 +0800
-Message-ID: <CABQgh9GF9vm=9Yv2AWe5wbN-mfr6Grn9=+c5zTgOvaMU+3bNSQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/8] Initial support for SMMUv3 nested translation
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Baolu Lu <baolu.lu@linux.intel.com>, Nicolin Chen <nicolinc@nvidia.com>, 
-	acpica-devel@lists.linux.dev, Hanjun Guo <guohanjun@huawei.com>, iommu@lists.linux.dev, 
-	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
-	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>, 
-	Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Moritz Fischer <mdf@kernel.org>, 
-	Michael Shavit <mshavit@google.com>, patches@lists.linux.dev, 
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Mostafa Saleh <smostafa@google.com>
+References: <20240805093245.889357-1-jgowans@amazon.com>
+In-Reply-To: <20240805093245.889357-1-jgowans@amazon.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Thu, 17 Oct 2024 10:23:38 +0530
+Message-ID: <CAGtprH949pMq0GrQzyMvHNCFet+5MrcYBd=qPEscW1KtV5LjXg@mail.gmail.com>
+Subject: Re: [PATCH 00/10] Introduce guestmemfs: persistent in-memory filesystem
+To: James Gowans <jgowans@amazon.com>
+Cc: linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Steve Sistare <steven.sistare@oracle.com>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Anthony Yznaga <anthony.yznaga@oracle.com>, Mike Rapoport <rppt@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
+	Jason Gunthorpe <jgg@ziepe.ca>, linux-fsdevel@vger.kernel.org, 
+	Usama Arif <usama.arif@bytedance.com>, kvm@vger.kernel.org, 
+	Alexander Graf <graf@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>, 
+	Paul Durrant <pdurrant@amazon.co.uk>, Nicolas Saenz Julienne <nsaenz@amazon.es>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 15 Oct 2024 at 21:09, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Mon, Aug 5, 2024 at 3:03=E2=80=AFPM James Gowans <jgowans@amazon.com> wr=
+ote:
 >
-> On Tue, Oct 15, 2024 at 11:21:54AM +0800, Zhangfei Gao wrote:
-> > On Thu, 12 Sept 2024 at 12:29, Baolu Lu <baolu.lu@linux.intel.com> wrote:
-> >
-> > > > Have you tested the user page fault?
-> > > >
-> > > > I got an issue, when a user page fault happens,
-> > > >   group->attach_handle = iommu_attach_handle_get(pasid)
-> > > > return NULL.
-> > > >
-> > > > A bit confused here, only find IOMMU_NO_PASID is used when attaching
-> > > >
-> > > >   __fault_domain_replace_dev
-> > > > ret = iommu_replace_group_handle(idev->igroup->group, hwpt->domain,
-> > > > &handle->handle);
-> > > > curr = xa_store(&group->pasid_array, IOMMU_NO_PASID, handle, GFP_KERNEL);
-> > > >
-> > > > not find where the code attach user pasid with the attach_handle.
-> > >
-> > > Have you set iommu_ops::user_pasid_table for SMMUv3 driver?
-> >
-> > Thanks Baolu
-> >
-> > Can we send a patch to make it as default?
-> >
-> > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > @@ -3570,6 +3570,7 @@ static struct iommu_ops arm_smmu_ops = {
-> >         .viommu_alloc           = arm_vsmmu_alloc,
-> >         .pgsize_bitmap          = -1UL, /* Restricted during device attach */
-> >         .owner                  = THIS_MODULE,
-> > +       .user_pasid_table       = 1,
+> In this patch series a new in-memory filesystem designed specifically
+> for live update is implemented. Live update is a mechanism to support
+> updating a hypervisor in a way that has limited impact to running
+> virtual machines. This is done by pausing/serialising running VMs,
+> kexec-ing into a new kernel, starting new VMM processes and then
+> deserialising/resuming the VMs so that they continue running from where
+> they were. To support this, guest memory needs to be preserved.
 >
-> You shouldn't need this right now as smmu3 doesn't support nesting
-> domains yet.
-
-I am testing with  .user_pasid_table = 1 and IOMMU_NO_PASID
-It works for user page faults.
-
+> Guestmemfs implements preservation acrosss kexec by carving out a large
+> contiguous block of host system RAM early in boot which is then used as
+> the data for the guestmemfs files. As well as preserving that large
+> block of data memory across kexec, the filesystem metadata is preserved
+> via the Kexec Hand Over (KHO) framework (still under review):
+> https://lore.kernel.org/all/20240117144704.602-1-graf@amazon.com/
 >
->                         if (!ops->user_pasid_table)
->                                 return NULL;
->                         /*
->                          * The iommu driver for this device supports user-
->                          * managed PASID table. Therefore page faults for
->                          * any PASID should go through the NESTING domain
->                          * attached to the device RID.
->                          */
->                         attach_handle = iommu_attach_handle_get(
->                                         dev->iommu_group, IOMMU_NO_PASID,
->                                         IOMMU_DOMAIN_NESTED);
->                         if (IS_ERR(attach_handle))
->                         ^^^^^^^^^^^^^^^^^^^^^ Will always fail
+> Filesystem metadata is structured to make preservation across kexec
+> easy: inodes are one large contiguous array, and each inode has a
+> "mappings" block which defines which block from the filesystem data
+> memory corresponds to which offset in the file.
+>
+> There are additional constraints/requirements which guestmemfs aims to
+> meet:
+>
+> 1. Secret hiding: all filesystem data is removed from the kernel direct
+> map so immune from speculative access. read()/write() are not supported;
+> the only way to get at the data is via mmap.
+>
+> 2. Struct page overhead elimination: the memory is not managed by the
+> buddy allocator and hence has no struct pages.
+>
+> 3. PMD and PUD level allocations for TLB performance: guestmemfs
+> allocates PMD-sized pages to back files which improves TLB perf (caveat
+> below!). PUD size allocations are a next step.
+>
+> 4. Device assignment: being able to use guestmemfs memory for
+> VFIO/iommufd mappings, and allow those mappings to survive and continue
+> to be used across kexec.
 >
 >
-> But I will add it to the patch that adds IOMMU_DOMAIN_NESTED
+> Next steps
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> The idea is that this patch series implements a minimal filesystem to
+> provide the foundations for in-memory persistent across kexec files.
+> One this foundation is in place it will be extended:
+>
+> 1. Improve the filesystem to be more comprehensive - currently it's just
+> functional enough to demonstrate the main objective of reserved memory
+> and persistence via KHO.
+>
+> 2. Build support for iommufd IOAS and HWPT persistence, and integrate
+> that with guestmemfs. The idea is that if VMs have DMA devices assigned
+> to them, DMA should continue running across kexec. A future patch series
+> will add support for this in iommufd and connect iommufd to guestmemfs
+> so that guestmemfs files can remain mapped into the IOMMU during kexec.
+>
+> 3. Support a guest_memfd interface to files so that they can be used for
+> confidential computing without needing to mmap into userspace.
 
-OK, cool.
+I am guessing this goal was before we discussed the need of supporting
+mmap on guest_memfd for confidential computing usecases to support
+hugepages [1]. This series [1] as of today tries to leverage hugetlb
+allocator functionality to allocate huge pages which seems to be along
+the lines of what you are aiming for. There are also discussions to
+support NUMA mempolicy [2] for guest memfd. In order to use
+guest_memfd to back non-confidential VMs with hugepages, core-mm will
+need to support PMD/PUD level mappings in future.
 
-Thanks
+David H's suggestion from the other thread to extend guest_memfd to
+support guest memory persistence over kexec instead of introducing
+guestmemfs as a parallel subsystem seems appealing to me.
+
+[1] https://lore.kernel.org/kvm/cover.1726009989.git.ackerleytng@google.com=
+/T/
+[2] https://lore.kernel.org/kvm/47476c27-897c-4487-bcd2-7ef6ec089dd1@amd.co=
+m/T/
+
+>
+> 3. Gigantic PUD level mappings for even better TLB perf.
+>
+> Caveats
+> =3D=3D=3D=3D=3D=3D=3D
+>
+> There are a issues with the current implementation which should be
+> solved either in this patch series or soon in follow-on work:
+>
+> 1. Although PMD-size allocations are done, PTE-level page tables are
+> still created. This is because guestmemfs uses remap_pfn_range() to set
+> up userspace pgtables. Currently remap_pfn_range() only creates
+> PTE-level mappings. I suggest enhancing remap_pfn_range() to support
+> creating higher level mappings where possible, by adding pmd_special
+> and pud_special flags.
+>
+> 2. NUMA support is currently non-existent. To make this more generally
+> useful it's necessary to have NUMA-awareness. One thought on how to do
+> this is to be able to specify multiple allocations with wNUMA affinity
+> on the kernel cmdline and have multiple mount points, one per NUMA node.
+> Currently, for simplicity, only a single contiguous filesystem data
+> allocation and a single mount point is supported.
+>
+> 3. MCEs are currently not handled - we need to add functionality for
+> this to be able to track block ownership and deliver an MCE correctly.
+>
+> 4. Looking for reviews from filesystem experts to see if necessary
+> callbacks, refcounting, locking, etc, is done correctly.
+>
+> Open questions
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> It is not too clear if or how guestmemfs should use DAX as a source of
+> memory. Seeing as guestmemfs has an in-memory design, it seems that it
+> is not necessary to use DAX as a source of memory, but I am keen for
+> guidance/input on whether DAX should be used here.
+>
+> The filesystem data memory is removed from the direct map for secret
+> hiding, but it is still necessary to mmap it to be accessible to KVM.
+> For improving secret hiding even more a guest_memfd-style interface
+> could be used to remove the need to mmap. That introduces a new problem
+> of the memory being completely inaccessible to KVM for this like MMIO
+> instruction emulation. How can this be handled?
+>
+> Related Work
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> There are similarities to a few attempts at solving aspects of this
+> problem previously.
+>
+> The original was probably PKRAM from Oracle; a tempfs filesystem with
+> persistence:
+> https://lore.kernel.org/kexec/1682554137-13938-1-git-send-email-anthony.y=
+znaga@oracle.com/
+> guestmemfs will additionally provide secret hiding, PMD/PUD allocations
+> and a path to DMA persistence and NUMA support.
+>
+> Dmemfs from Tencent aimed to remove the need for struct page overhead:
+> https://lore.kernel.org/kvm/cover.1602093760.git.yuleixzhang@tencent.com/
+> Guestmemfs provides this benefit too, along with persistence across
+> kexec and secret hiding.
+>
+> Pkernfs attempted to solve guest memory persistence and IOMMU
+> persistence all in one:
+> https://lore.kernel.org/all/20240205120203.60312-1-jgowans@amazon.com/
+> Guestmemfs is a re-work of that to only persist guest RAM in the
+> filesystem, and to use KHO for filesystem metadata. IOMMU persistence
+> will be implemented independently with persistent iommufd domains via
+> KHO.
+>
+> Testing
+> =3D=3D=3D=3D=3D=3D=3D
+>
+> The testing for this can be seen in the Documentation file in this patch
+> series. Essentially it is using a guestmemfs file for a QEMU VM's RAM,
+> doing a kexec, restoring the QEMU VM and confirming that the VM picked
+> up from where it left off.
+>
+> James Gowans (10):
+>   guestmemfs: Introduce filesystem skeleton
+>   guestmemfs: add inode store, files and dirs
+>   guestmemfs: add persistent data block allocator
+>   guestmemfs: support file truncation
+>   guestmemfs: add file mmap callback
+>   kexec/kho: Add addr flag to not initialise memory
+>   guestmemfs: Persist filesystem metadata via KHO
+>   guestmemfs: Block modifications when serialised
+>   guestmemfs: Add documentation and usage instructions
+>   MAINTAINERS: Add maintainers for guestmemfs
+>
+>  Documentation/filesystems/guestmemfs.rst |  87 +++++++
+>  MAINTAINERS                              |   8 +
+>  arch/x86/mm/init_64.c                    |   2 +
+>  fs/Kconfig                               |   1 +
+>  fs/Makefile                              |   1 +
+>  fs/guestmemfs/Kconfig                    |  11 +
+>  fs/guestmemfs/Makefile                   |   8 +
+>  fs/guestmemfs/allocator.c                |  40 +++
+>  fs/guestmemfs/dir.c                      |  43 ++++
+>  fs/guestmemfs/file.c                     | 106 ++++++++
+>  fs/guestmemfs/guestmemfs.c               | 160 ++++++++++++
+>  fs/guestmemfs/guestmemfs.h               |  60 +++++
+>  fs/guestmemfs/inode.c                    | 189 ++++++++++++++
+>  fs/guestmemfs/serialise.c                | 302 +++++++++++++++++++++++
+>  include/linux/guestmemfs.h               |  16 ++
+>  include/uapi/linux/kexec.h               |   6 +
+>  kernel/kexec_kho_in.c                    |  12 +-
+>  kernel/kexec_kho_out.c                   |   4 +
+>  18 files changed, 1055 insertions(+), 1 deletion(-)
+>  create mode 100644 Documentation/filesystems/guestmemfs.rst
+>  create mode 100644 fs/guestmemfs/Kconfig
+>  create mode 100644 fs/guestmemfs/Makefile
+>  create mode 100644 fs/guestmemfs/allocator.c
+>  create mode 100644 fs/guestmemfs/dir.c
+>  create mode 100644 fs/guestmemfs/file.c
+>  create mode 100644 fs/guestmemfs/guestmemfs.c
+>  create mode 100644 fs/guestmemfs/guestmemfs.h
+>  create mode 100644 fs/guestmemfs/inode.c
+>  create mode 100644 fs/guestmemfs/serialise.c
+>  create mode 100644 include/linux/guestmemfs.h
+>
+> --
+> 2.34.1
+>
+>
 
