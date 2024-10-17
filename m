@@ -1,152 +1,162 @@
-Return-Path: <kvm+bounces-29099-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29100-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6F999A2ACE
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 19:23:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72DD89A2A56
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 19:09:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B867AB2CB92
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 17:06:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0878F1F28509
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 17:09:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FB01FBC92;
-	Thu, 17 Oct 2024 16:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647371E0B70;
+	Thu, 17 Oct 2024 17:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dDS4lzqE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfzY6Kqi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF631EF94D
-	for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 16:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118621E0B67
+	for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 17:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729184288; cv=none; b=f2uALv4U6I0g/qdHU9cv5d5UP+sMkadC5CL3YHOcDxEEonfW1JqdWHWoWA4H5Glyt9h4MkrLzbTRlAxcOVEC5qIPMZCiZotuh5j1UtjGnIpi38LctkcBoYCRYgtNCseN0Vu4uj8roauE2tKhKaP6LbrnEUQN09eA2FK1i6CMmNo=
+	t=1729184757; cv=none; b=YjoBejVs5cG7h4cW2BnoIl1kpbQ+rnuqR+GdjPfe0mhivhB16naofpuNcI3UxL7mvYQ30QMBhQcUgDYO05fAuCQLJj7IourD6briXDCT3sAvBimEhvgSYsciAJO50iRmHsbM3cyTJQRXvqQEsMgd4a7yMtp4eA0jpmF51VbWnbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729184288; c=relaxed/simple;
-	bh=PrFPdr0NKJQKUfFjYkGfH7X4s8YeIB65gqZrdgLFzgg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=W0fYUfNrucp7/S0fAcMNru1btLVWJCmOBronfYEL2/VuqM51f5vt9lLIdRQHSW1qmASefWDfFtMV7guayIHwPxVnfcRXTrWvJCWkk4/A1ORs6CFfIkBTx3kJXcJuNbtxn1CagdKswryzK3jPXGw0ZC3y0ATSvv/nBT14m8jJ2LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dDS4lzqE; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e315a5b199so20197497b3.2
-        for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 09:58:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729184286; x=1729789086; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JPTate8nHmfNvm5RLlOrViAXjwxlfzdSZEYjXEbaR7Q=;
-        b=dDS4lzqE+qvGsIXjESIHfbSiHuUkgmRuua1qeCfqtdFdLhGDXK6aDNl7HXYVCKo71/
-         Y2loqRt/wXqvaCY+Ob7nw15H42rqOrPWGhc0c7d0ZsyEs+iIo6XfEsTE7EzhcYFYF3Ay
-         HPkpv9Wa1q6rFoa9vO6oGaicPXO1xeAorbrVtbeuIRf47JxpLmuDBvvett906w+r4WcL
-         MZdwWfpe/mdlGsbA62xEAD2QsHIxtpGYgH04XltImtK+f6YzI5dQyw84QXWGF7PAv60f
-         qkvEerPsuqSYodb9nmdhUIXH/KXBeT37ztQsfIJhxQTSILU0NgHMA+Vyp7cCx9neBPW4
-         Ne1w==
+	s=arc-20240116; t=1729184757; c=relaxed/simple;
+	bh=nwUmW3HwWk2L8wzAarlBvpMicClGRl1zSOHwmH7o7OM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fa5hzhaSP3CODNj41dn9nG3jHVDavu3AeGBd0h1Vg7sSmei6Gs33q1KFYtN3rWSPKzJc29rVO+c2XF/VFW1vY7J4N/CP6MXAu6tllcYoIfXXO0ujCVQB9GPg5hvtMqMxtWa8oIW1+vlBq65vAUdeit6EG7RfqmfQmp1Ig1nVCMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PfzY6Kqi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729184755;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pTxdalYG31XpePFBi14kwyLsxFtz4ngJLPKLlOmswew=;
+	b=PfzY6KqiKPiFyvF0qNrKWt8hVKUDJ55D7Q6OWmFLJlMBomZ98jjZ9YNUjPc1nsjHIintwE
+	OHcH8y9u0dDlErAH67lSn6+5IqniKcRJBw5hcdCGNMkvKBQhhVgoEU300829ZsBiOPMleg
+	FfmCMLRLTBcoYLuwjBJ34pfvBGSdovg=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-302-uVXzrEYgP0CX2EdBPbwqMg-1; Thu, 17 Oct 2024 13:05:54 -0400
+X-MC-Unique: uVXzrEYgP0CX2EdBPbwqMg-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7aed2d01616so183238085a.1
+        for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 10:05:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729184286; x=1729789086;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JPTate8nHmfNvm5RLlOrViAXjwxlfzdSZEYjXEbaR7Q=;
-        b=BrqSQfj0ie8z9lrL0xJUaxp/E0/wURulIOVsFtDPL4k4qdm7z/3JOZAWYClbPdFln5
-         rbYl5ScurZt6vdUL/5aLiKaenPC0s7iUYFRkh4IgzM/ToLklpw6QJpBRX02+ASJLQOxn
-         mDVEbOl2nGGg3ORLskKBqJr4hdH/eZX9GInPZlBG9xspIxBNSXCnlaYYbetJm1+05Dg7
-         6cm+SRiYlHenazItcbHSaAVbReaXTw3bkvv++Xt8lnQOdK6IMWG6qCKJn+y4mWqzE47/
-         IFb8GU+p/3kKe8OMYRZP84KykS7fzmoBLK36BisDwzVMYMaF6fDWEsg/O+qJf1IJeOR+
-         22HQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKWYtx6scqqfs18NSgzCU5opEpvBqBayMP8nwAZrPKqpPyRvQH/mB447qdjoA8mnFy+Vs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx85vWpuIpgrNDZgi+w669OWsH8IG19p3EBco7C/xOSH4hgp21
-	ksgBnVT63NrjiL0e2nHG/H36O98PxJt/qvXXrMRRIsKuyHT8ErgPn/ooA6XpbOyTqaMhYc8HAbF
-	fOQ==
-X-Google-Smtp-Source: AGHT+IF7B084V115Sr72nxCNj1jAu1r6gImTDt3pvbXTzRx/HxKwq71Gvz4aJ0aVLn+pxpF6UyiW5mTVJRo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
- (user=seanjc job=sendgmr) by 2002:a25:9bc9:0:b0:e2b:a511:2e51 with SMTP id
- 3f1490d57ef6-e2ba5112f27mr2946276.11.1729184285606; Thu, 17 Oct 2024 09:58:05
- -0700 (PDT)
-Date: Thu, 17 Oct 2024 09:58:03 -0700
-In-Reply-To: <bd116c27908111619b6cfffbe9a25e98e0e7cc20.camel@infradead.org>
+        d=1e100.net; s=20230601; t=1729184753; x=1729789553;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pTxdalYG31XpePFBi14kwyLsxFtz4ngJLPKLlOmswew=;
+        b=XS+B1HQrxfnAOR2QozIakeiAM9tpcqBid/P29gIoV9Tw9TPx9H2GaFfjEc2LGlpcFp
+         Y1oiojdEYRByhTWCqzwNp2DsOgTApQfRjHXiU8/HYjlZPzzb6LaVNDEHyYwGyDp1V0rX
+         KA1osuwwFM7sJhT3Hk/CBRsQT2HHbb/RlGiccq4Nd10qzqUwQsfhHZqMfRERBTDzaihj
+         Hp4y5X3EvouW+++nsohkEEB0DiC01PqSdYORgzCVgPKkHe/qrArHAlOcBppH26YVgR9A
+         ZVbiu8Ry8kjhOJSRRCIe3iW46EzGqSzfd4thY0G0/ml9qmDpu/kPZ0jL/prwV2FhcHaK
+         xIuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV1F7qK68El7DWmXLWjTS6o4JVtjVTfHjmYwbpewLANHSPaCo7E1lO7UWGfGCwJ5ZWIt9I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRA3tpNcbMVrQRPH2SJt2SwNmoCBPT5E0iz1dfoap89SyOYCbj
+	Ar1mUXsM2vVQFt3sW0mP3Eq67n3I6M1Swuj/eZSWRj336WoKV7fbRu9lk2JUzPX5JeYddibv88U
+	7+wsSo6dncYocJl18KrW7NbcuEacWQ5Nc0IEEH34z9osyLVhl0g==
+X-Received: by 2002:a05:620a:372c:b0:7a9:aba6:d037 with SMTP id af79cd13be357-7b1417b3191mr1094413985a.13.1729184753037;
+        Thu, 17 Oct 2024 10:05:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHD0En3wQDJBS0nydKh7vHrLHOJlIadS3w4LKE69c5NsvIujdsOvlVIWDnzPR18WON37rexWg==
+X-Received: by 2002:a05:620a:372c:b0:7a9:aba6:d037 with SMTP id af79cd13be357-7b1417b3191mr1094408885a.13.1729184752627;
+        Thu, 17 Oct 2024 10:05:52 -0700 (PDT)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b136170dd7sm308639185a.53.2024.10.17.10.05.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2024 10:05:51 -0700 (PDT)
+Date: Thu, 17 Oct 2024 13:05:34 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: David Hildenbrand <david@redhat.com>,
+	Ackerley Tng <ackerleytng@google.com>, tabba@google.com,
+	quic_eberman@quicinc.com, roypat@amazon.co.uk, rientjes@google.com,
+	fvdl@google.com, jthoughton@google.com, seanjc@google.com,
+	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com,
+	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev,
+	erdemaktas@google.com, vannapurve@google.com, qperret@google.com,
+	jhubbard@nvidia.com, willy@infradead.org, shuah@kernel.org,
+	brauner@kernel.org, bfoster@redhat.com, kent.overstreet@linux.dev,
+	pvorel@suse.cz, rppt@kernel.org, richard.weiyang@gmail.com,
+	anup@brainfault.org, haibo1.xu@intel.com, ajones@ventanamicro.com,
+	vkuznets@redhat.com, maciej.wieczor-retman@intel.com,
+	pgonda@google.com, oliver.upton@linux.dev,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
+ struct kvm_gmem_private
+Message-ID: <ZxFD3kYfKY0b-qFz@x1n>
+References: <diqz8quunrlw.fsf@ackerleytng-ctop.c.googlers.com>
+ <Zw7f3YrzqnH-iWwf@x1n>
+ <diqz1q0hndb3.fsf@ackerleytng-ctop.c.googlers.com>
+ <1d243dde-2ddf-4875-890d-e6bb47931e40@redhat.com>
+ <ZxAfET87vwVwuUfJ@x1n>
+ <20241016225157.GQ3559746@nvidia.com>
+ <ZxBRC-v9w7xS0xgk@x1n>
+ <20241016235424.GU3559746@nvidia.com>
+ <ZxEmFY1FcrRtylJW@x1n>
+ <20241017164713.GF3559746@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240927161657.68110-1-iorlov@amazon.com> <20240927161657.68110-4-iorlov@amazon.com>
- <ZwnBGtdbvmKHc4in@google.com> <bd116c27908111619b6cfffbe9a25e98e0e7cc20.camel@infradead.org>
-Message-ID: <ZxFCG7pxWXs1D0p5@google.com>
-Subject: Re: [PATCH 3/3] selftests: KVM: Add test case for MMIO during event delivery
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Ivan Orlov <iorlov@amazon.com>, bp@alien8.de, dave.hansen@linux.intel.com, 
-	mingo@redhat.com, pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, x86@kernel.org, jalliste@amazon.com, 
-	nh-open-source@amazon.com, pdurrant@amazon.co.uk
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241017164713.GF3559746@nvidia.com>
 
-On Thu, Oct 17, 2024, David Woodhouse wrote:
-> On Fri, 2024-10-11 at 17:21 -0700, Sean Christopherson wrote:
-> >=20
-> > > +
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* We should never reach t=
-his point */
-> >=20
-> > No pronouns.=C2=A0 Yes, it's nitpicky, but "we" gets _very_ ambiguous w=
-hen "we" could
-> > mean the admin, the user, the VMM, KVM, the guest, etc.
-> >=20
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GUEST_ASSERT(0);
->=20
->=20
-> Is there really *any* way that can be interpreted as anything other
-> than "the CPU executing this code will never get to this point and
-> that's why there's an ASSERT(0) right after this comment"?
->=20
-> I don't believe there's *any* way that particular pronoun can be
-> ambiguous, and now we've got to the point of fetishising the bizarre
-> "no pronouns" rule just for the sake of it.
+On Thu, Oct 17, 2024 at 01:47:13PM -0300, Jason Gunthorpe wrote:
+> On Thu, Oct 17, 2024 at 10:58:29AM -0400, Peter Xu wrote:
+> 
+> > My question was more torwards whether gmemfd could still expose the
+> > possibility to be used in VA forms to other modules that may not support
+> > fd+offsets yet.
+> 
+> I keep hearing they don't want to support page pinning on a guestmemfd
+> mapping, so VA based paths could not work.
 
-No, it's not just for the sake of it.  In this case, "we" isn't all that am=
-biguous,
-(though my interpretation of it is "the test", not "the CPU"), but only bec=
-ause the
-comment is utterly useless.  The GUEST_ASSERT(0) communicates very clearly =
-that it's
-supposed to be unreachable.
+Do you remember the reasoning of it?  Is it because CoCo still needs to
+have a bounded time window to convert from shared back to private?  If so,
+maybe that's a non-issue for non-CoCo, where the VM object / gmemfd object
+(when created) can have a flag marking that it's always shared and can
+never be converted to private for any page within.
 
-And if the comment were rewritten to explain _why_ the code is unreachable,=
- then
-"we" is all bug guaranateed to become ambiguous, because explaining "why" l=
-ikely
-means preciesly describing the behavior the userspace side, the guest side,=
- and/or
-KVM.  In other words, using "we" or "us" is often a hint that either the st=
-atement
-is likely ambiguous or doesn't add value.
+So how would VFIO's DMA work even with iommufd if pages cannot be pinned?
+Is some form of bounce buffering required, then?
 
-And irrespective of whether or not you agree with the above, having a hard =
-rule of
-"no we, no us" eliminates all subjectivity, and for me that is sufficient r=
-eason
-to enforce the rule.
+It sounds like if so there'll be a lot of use cases that won't work with
+current infrastructure..
 
-> I get it, especially for some individuals it *can* be difficult to take
-> context into account, and the wilful use of pronouns instead of
-> spelling things out explicitly *every* *single* *time* can sometimes
-> help. But at a cost of conciseness and brevity.
+> 
+> > I think as long as we can provide gmemfd VMAs like what this series
+> > provides, it sounds possible to reuse the old VA interfaces before the CoCo
+> > interfaces are ready, so that people can already start leveraging gmemfd
+> > backing pages.
+> 
+> And you definitely can't get the private pages out of the VA interface
+> because all the VMA PTEs of private pages are non-present by definition.
 
-In this particular case, I am more than willing to sacrifice brevity.  I 10=
-0%
-agree that there is value in having to-the-point comments and changelogs, b=
-ut I
-can't recall a single time where avoiding a "we" or "us" made a statement
-meaningfully harder to read and understand.  On ther hand, I can recall man=
-y, many
-changelogs I had to re-read multiple times because I struggled to figure ou=
-t how
-the author _intended_ "we" or "us" to be interpreted.
+It's the same as "not present" if the fault() gets a SIGBUS always for
+private pages, IIUC.
+
+My prior references to "VA ranges" are mostly only for shared / faultable
+pages. And they'll get zapped too when requested to be converted from
+shared -> private, aka, always not present for private.
+
+> 
+> Hence, you must use the FD for a lot of use cases here.
+
+Thanks,
+
+-- 
+Peter Xu
+
 
