@@ -1,192 +1,152 @@
-Return-Path: <kvm+bounces-29098-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29099-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A3249A29ED
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 19:01:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6F999A2ACE
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 19:23:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADF571C20A61
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 17:01:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B867AB2CB92
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 17:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718B91E0DBD;
-	Thu, 17 Oct 2024 16:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FB01FBC92;
+	Thu, 17 Oct 2024 16:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WAK1xX1v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dDS4lzqE"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107F41E0DBF
-	for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 16:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF631EF94D
+	for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 16:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729184159; cv=none; b=GI9Q48buZcueizkcPNF2owHzfTtIJFcX/9nsR2PA1kuBuAwjMF0lSPCc0AfxX98qPgaPhopPIwgB1aKr4qPMxKVT6Ydycn6aZUYyYSor8lyrn/K+UJV1a9OfXdYow4tdS10vdP/UUA0VLPzICifnTw6jA1dpQcgMxpCl0r7e1I4=
+	t=1729184288; cv=none; b=f2uALv4U6I0g/qdHU9cv5d5UP+sMkadC5CL3YHOcDxEEonfW1JqdWHWoWA4H5Glyt9h4MkrLzbTRlAxcOVEC5qIPMZCiZotuh5j1UtjGnIpi38LctkcBoYCRYgtNCseN0Vu4uj8roauE2tKhKaP6LbrnEUQN09eA2FK1i6CMmNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729184159; c=relaxed/simple;
-	bh=A3Bik+uED0TcCq0mhqgECk3LPeT4BajnICFHkP82o8E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZOGmndeEKK6WFQgOw8zjGuQVt+/QN9Sok98lXU/1mmbruxaREzn0EaZj1dSNoaXXgUoCFYfK/JGivoMogR4SoU4cBqeQJvkp7KrtCFJAvFjsz4RlP5ZaD9upCJYn642MvhY9h5LF0m23JujnIwW2kUEJvljGrUUUTqwA2qEs/ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WAK1xX1v; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729184157;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=+TF4EjUQe4akBV6YOBjHNWotRzFr1rk74khyhgxzXjA=;
-	b=WAK1xX1vFin5xiHSQgZe2YtIPBMNlkHYCg76nC9a6fiXcmNFIc0YKHpDnJmjvrr3GlYoXH
-	K2+J8jiQr+NEhO0Y6IkE8mL5vKME75E4RDSEfBdzTPS7BRYiVkYLJ64P5k+Y8LP+5F9tQ8
-	pvU/Jdsc16/8kOmKkz1klNLcFFV88qQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-223-laEk7Jf6NuaoMSSa8pLOPg-1; Thu, 17 Oct 2024 12:55:56 -0400
-X-MC-Unique: laEk7Jf6NuaoMSSa8pLOPg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d458087c0so1345437f8f.1
-        for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 09:55:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729184154; x=1729788954;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+	s=arc-20240116; t=1729184288; c=relaxed/simple;
+	bh=PrFPdr0NKJQKUfFjYkGfH7X4s8YeIB65gqZrdgLFzgg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=W0fYUfNrucp7/S0fAcMNru1btLVWJCmOBronfYEL2/VuqM51f5vt9lLIdRQHSW1qmASefWDfFtMV7guayIHwPxVnfcRXTrWvJCWkk4/A1ORs6CFfIkBTx3kJXcJuNbtxn1CagdKswryzK3jPXGw0ZC3y0ATSvv/nBT14m8jJ2LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dDS4lzqE; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e315a5b199so20197497b3.2
+        for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 09:58:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729184286; x=1729789086; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+TF4EjUQe4akBV6YOBjHNWotRzFr1rk74khyhgxzXjA=;
-        b=lA8VucmbNq01tWFHUamofSC2q88HPTyN1J03zF3kgn77yuy6q+5k7ykE63HvVb8gzX
-         o94phSsstqKyeIGmCdq8ZSS1/qBvLW4tOS/oU2+BTgVQgEAP0h+ee7IxOb/F19iyc0AY
-         IFq7WNf3HS2p9K7Ee4/2c6xDZFjSDntGgubJc9OVe2gYndu1cEn2TZIDqd8XrsPSXWpr
-         jxY141xGlJ26FsfEuYM3cNXfAzaGNS9NhR4G5EMqHfvKYicIjLgSMHmFIDvrO6LW07HW
-         kXfbp12PtUGPCQIBSbg/r4IpXxNxEw5YVbYHjXIXpAJiTESgQkrDOeYcBzfgmbn2CTPW
-         tjww==
-X-Gm-Message-State: AOJu0Yy4at7VTBb0inpUK+aYItVrzKG5l0zWXyHGtnONYkld25LJW9tq
-	+WieZzVHBPeNol5rDGhwpErhXt2PuGcR5dtKVN++7V4KlYj272x1pHV22CnQ6pFtcf2fFuS+No5
-	jdm2BTkTTOuCHpR/40AdxmDz5UzBCT/1VKURmeQyqx35DgwIxRHnGd4IaHd0d
-X-Received: by 2002:a05:600c:46c7:b0:431:5475:3cd1 with SMTP id 5b1f17b1804b1-4315875fb2fmr24947555e9.17.1729184154475;
-        Thu, 17 Oct 2024 09:55:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGftvJZcxEKWFhN/3/ufIEpcdyKySAIL5OLAG96TfSpAvg7JFTk4Yz8MPMsb+oJ1rNYefBfRw==
-X-Received: by 2002:a05:600c:46c7:b0:431:5475:3cd1 with SMTP id 5b1f17b1804b1-4315875fb2fmr24947435e9.17.1729184154064;
-        Thu, 17 Oct 2024 09:55:54 -0700 (PDT)
-Received: from [192.168.10.28] ([151.95.144.54])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-431606c64b8sm899815e9.38.2024.10.17.09.55.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Oct 2024 09:55:53 -0700 (PDT)
-Message-ID: <1012877d-1a99-4d0c-92bc-53025dfaf489@redhat.com>
-Date: Thu, 17 Oct 2024 18:55:52 +0200
+        bh=JPTate8nHmfNvm5RLlOrViAXjwxlfzdSZEYjXEbaR7Q=;
+        b=dDS4lzqE+qvGsIXjESIHfbSiHuUkgmRuua1qeCfqtdFdLhGDXK6aDNl7HXYVCKo71/
+         Y2loqRt/wXqvaCY+Ob7nw15H42rqOrPWGhc0c7d0ZsyEs+iIo6XfEsTE7EzhcYFYF3Ay
+         HPkpv9Wa1q6rFoa9vO6oGaicPXO1xeAorbrVtbeuIRf47JxpLmuDBvvett906w+r4WcL
+         MZdwWfpe/mdlGsbA62xEAD2QsHIxtpGYgH04XltImtK+f6YzI5dQyw84QXWGF7PAv60f
+         qkvEerPsuqSYodb9nmdhUIXH/KXBeT37ztQsfIJhxQTSILU0NgHMA+Vyp7cCx9neBPW4
+         Ne1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729184286; x=1729789086;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JPTate8nHmfNvm5RLlOrViAXjwxlfzdSZEYjXEbaR7Q=;
+        b=BrqSQfj0ie8z9lrL0xJUaxp/E0/wURulIOVsFtDPL4k4qdm7z/3JOZAWYClbPdFln5
+         rbYl5ScurZt6vdUL/5aLiKaenPC0s7iUYFRkh4IgzM/ToLklpw6QJpBRX02+ASJLQOxn
+         mDVEbOl2nGGg3ORLskKBqJr4hdH/eZX9GInPZlBG9xspIxBNSXCnlaYYbetJm1+05Dg7
+         6cm+SRiYlHenazItcbHSaAVbReaXTw3bkvv++Xt8lnQOdK6IMWG6qCKJn+y4mWqzE47/
+         IFb8GU+p/3kKe8OMYRZP84KykS7fzmoBLK36BisDwzVMYMaF6fDWEsg/O+qJf1IJeOR+
+         22HQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVKWYtx6scqqfs18NSgzCU5opEpvBqBayMP8nwAZrPKqpPyRvQH/mB447qdjoA8mnFy+Vs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx85vWpuIpgrNDZgi+w669OWsH8IG19p3EBco7C/xOSH4hgp21
+	ksgBnVT63NrjiL0e2nHG/H36O98PxJt/qvXXrMRRIsKuyHT8ErgPn/ooA6XpbOyTqaMhYc8HAbF
+	fOQ==
+X-Google-Smtp-Source: AGHT+IF7B084V115Sr72nxCNj1jAu1r6gImTDt3pvbXTzRx/HxKwq71Gvz4aJ0aVLn+pxpF6UyiW5mTVJRo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a25:9bc9:0:b0:e2b:a511:2e51 with SMTP id
+ 3f1490d57ef6-e2ba5112f27mr2946276.11.1729184285606; Thu, 17 Oct 2024 09:58:05
+ -0700 (PDT)
+Date: Thu, 17 Oct 2024 09:58:03 -0700
+In-Reply-To: <bd116c27908111619b6cfffbe9a25e98e0e7cc20.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/18] KVM: x86/mmu: A/D cleanups (on top of
- kvm_follow_pfn)
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Yan Zhao <yan.y.zhao@intel.com>, Sagi Shahar <sagis@google.com>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- David Matlack <dmatlack@google.com>, James Houghton <jthoughton@google.com>
-References: <20241011021051.1557902-1-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20241011021051.1557902-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240927161657.68110-1-iorlov@amazon.com> <20240927161657.68110-4-iorlov@amazon.com>
+ <ZwnBGtdbvmKHc4in@google.com> <bd116c27908111619b6cfffbe9a25e98e0e7cc20.camel@infradead.org>
+Message-ID: <ZxFCG7pxWXs1D0p5@google.com>
+Subject: Re: [PATCH 3/3] selftests: KVM: Add test case for MMIO during event delivery
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Ivan Orlov <iorlov@amazon.com>, bp@alien8.de, dave.hansen@linux.intel.com, 
+	mingo@redhat.com, pbonzini@redhat.com, shuah@kernel.org, tglx@linutronix.de, 
+	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, x86@kernel.org, jalliste@amazon.com, 
+	nh-open-source@amazon.com, pdurrant@amazon.co.uk
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/11/24 04:10, Sean Christopherson wrote:
-> This is effectively an extensive of the kvm_follow_pfn series[*] (and
-> applies on top of said series), but is x86-specific and is *almost*
-> entirely related to Accessed and Dirty bits.
-> 
-> There's no central theme beyond cleaning up things that were discovered
-> when digging deep for the kvm_follow_pfn overhaul, and to a lesser extent
-> the series to add MGLRU support in KVM x86.
+On Thu, Oct 17, 2024, David Woodhouse wrote:
+> On Fri, 2024-10-11 at 17:21 -0700, Sean Christopherson wrote:
+> >=20
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* We should never reach t=
+his point */
+> >=20
+> > No pronouns.=C2=A0 Yes, it's nitpicky, but "we" gets _very_ ambiguous w=
+hen "we" could
+> > mean the admin, the user, the VMM, KVM, the guest, etc.
+> >=20
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GUEST_ASSERT(0);
+>=20
+>=20
+> Is there really *any* way that can be interpreted as anything other
+> than "the CPU executing this code will never get to this point and
+> that's why there's an ASSERT(0) right after this comment"?
+>=20
+> I don't believe there's *any* way that particular pronoun can be
+> ambiguous, and now we've got to the point of fetishising the bizarre
+> "no pronouns" rule just for the sake of it.
 
-Very nice - looks obvious in retrospect, as it often happens.
+No, it's not just for the sake of it.  In this case, "we" isn't all that am=
+biguous,
+(though my interpretation of it is "the test", not "the CPU"), but only bec=
+ause the
+comment is utterly useless.  The GUEST_ASSERT(0) communicates very clearly =
+that it's
+supposed to be unreachable.
 
-Paolo
+And if the comment were rewritten to explain _why_ the code is unreachable,=
+ then
+"we" is all bug guaranateed to become ambiguous, because explaining "why" l=
+ikely
+means preciesly describing the behavior the userspace side, the guest side,=
+ and/or
+KVM.  In other words, using "we" or "us" is often a hint that either the st=
+atement
+is likely ambiguous or doesn't add value.
 
-> [*] https://lore.kernel.org/all/20241010182427.1434605-1-seanjc@google.com
-> 
-> Sean Christopherson (18):
->    KVM: x86/mmu: Flush remote TLBs iff MMU-writable flag is cleared from
->      RO SPTE
->    KVM: x86/mmu: Always set SPTE's dirty bit if it's created as writable
->    KVM: x86/mmu: Fold all of make_spte()'s writable handling into one
->      if-else
->    KVM: x86/mmu: Don't force flush if SPTE update clears Accessed bit
->    KVM: x86/mmu: Don't flush TLBs when clearing Dirty bit in shadow MMU
->    KVM: x86/mmu: Drop ignored return value from
->      kvm_tdp_mmu_clear_dirty_slot()
->    KVM: x86/mmu: Fold mmu_spte_update_no_track() into mmu_spte_update()
->    KVM: x86/mmu: WARN and flush if resolving a TDP MMU fault clears
->      MMU-writable
->    KVM: x86/mmu: Add a dedicated flag to track if A/D bits are globally
->      enabled
->    KVM: x86/mmu: Set shadow_accessed_mask for EPT even if A/D bits
->      disabled
->    KVM: x86/mmu: Set shadow_dirty_mask for EPT even if A/D bits disabled
->    KVM: x86/mmu: Use Accessed bit even when _hardware_ A/D bits are
->      disabled
->    KVM: x86/mmu: Process only valid TDP MMU roots when aging a gfn range
->    KVM: x86/mmu: Stop processing TDP MMU roots for test_age if young SPTE
->      found
->    KVM: x86/mmu: Dedup logic for detecting TLB flushes on leaf SPTE
->      changes
->    KVM: x86/mmu: Set Dirty bit for new SPTEs, even if _hardware_ A/D bits
->      are disabled
->    KVM: Allow arch code to elide TLB flushes when aging a young page
->    KVM: x86: Don't emit TLB flushes when aging SPTEs for mmu_notifiers
-> 
->   arch/x86/kvm/Kconfig       |   1 +
->   arch/x86/kvm/mmu/mmu.c     |  72 +++++++-----------------
->   arch/x86/kvm/mmu/spte.c    |  59 ++++++++------------
->   arch/x86/kvm/mmu/spte.h    |  72 ++++++++++++------------
->   arch/x86/kvm/mmu/tdp_mmu.c | 109 +++++++++++++++++--------------------
->   arch/x86/kvm/mmu/tdp_mmu.h |   2 +-
->   virt/kvm/Kconfig           |   4 ++
->   virt/kvm/kvm_main.c        |  20 ++-----
->   8 files changed, 142 insertions(+), 197 deletions(-)
-> 
-> 
-> base-commit: 3f9cf3d569fdf7fb451294b636991291965573ce
+And irrespective of whether or not you agree with the above, having a hard =
+rule of
+"no we, no us" eliminates all subjectivity, and for me that is sufficient r=
+eason
+to enforce the rule.
 
+> I get it, especially for some individuals it *can* be difficult to take
+> context into account, and the wilful use of pronouns instead of
+> spelling things out explicitly *every* *single* *time* can sometimes
+> help. But at a cost of conciseness and brevity.
+
+In this particular case, I am more than willing to sacrifice brevity.  I 10=
+0%
+agree that there is value in having to-the-point comments and changelogs, b=
+ut I
+can't recall a single time where avoiding a "we" or "us" made a statement
+meaningfully harder to read and understand.  On ther hand, I can recall man=
+y, many
+changelogs I had to re-read multiple times because I struggled to figure ou=
+t how
+the author _intended_ "we" or "us" to be interpreted.
 
