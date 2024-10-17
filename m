@@ -1,135 +1,128 @@
-Return-Path: <kvm+bounces-29090-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29091-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC8C9A273A
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 17:45:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5EF29A27EF
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 18:05:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D3A91C25FE1
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 15:45:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F8EA2822C0
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 16:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4CF61DEFF3;
-	Thu, 17 Oct 2024 15:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477AF1DEFD7;
+	Thu, 17 Oct 2024 16:05:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NgHglzpn"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8D21DEFD9;
-	Thu, 17 Oct 2024 15:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D0C1DE2A6
+	for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 16:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729179909; cv=none; b=p9XoPqKe8c4tuVsoJLyaDkP1iZTkmBQH8bnIxxTaQpiye9ubA6AUg3Xceh1Bu8K4QmneOIbDwCwgxBBKAUmzqrXlZ9cERklnPT60YzD9hv2AxkU8KCNCWiBOZ3xhpkFKmD/Ux5J0PBhAhlbmXYEsjFoXNBoAUtFjBYiq4tr07MY=
+	t=1729181111; cv=none; b=rTM4+cwXDUN9hpqInBuAmOB5372H7tLcInbIUW+UatC3lMp8MNSyLDJrZh7ARm7TIMGQGWBgGpYzrws6ikJ1tRrjZvm3My6wf5Yu3qYy5p/71FuCTsub6eBsEtz+NslfX6hrruHzHysmzSTFGfHSVVcjGC4pddS5V01MZdeUrb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729179909; c=relaxed/simple;
-	bh=z+KqskxnvtsvBDQHH6tuFMnvuSwgd5QQRptn8yELwJ4=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OMa+BPQlTNecRfpYklqTJUC2E3sL5pgnVDTI52lhCzzoB9gD2yT7qU2bzM0ukAuOX0cEmaHqv0h3cae5mh4pl6ShSO653+W62NzsNY8lFSS9AhDMK41lPXZ87PXHGUYidkfaTQ/6McNZWt51r/KUW4wx6ZNe23ZvL62ZKnr0wN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XTsVP5jXsz6D9SR;
-	Thu, 17 Oct 2024 23:40:29 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 876A51400C9;
-	Thu, 17 Oct 2024 23:45:01 +0800 (CST)
-Received: from localhost (10.126.174.164) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 17 Oct
- 2024 17:45:00 +0200
-Date: Thu, 17 Oct 2024 16:44:58 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Zhi Wang <zhiw@nvidia.com>
-CC: <kvm@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-	<alex.williamson@redhat.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>,
-	<alison.schofield@intel.com>, <dan.j.williams@intel.com>,
-	<dave.jiang@intel.com>, <dave@stgolabs.net>, <ira.weiny@intel.com>,
-	<vishal.l.verma@intel.com>, <alucerop@amd.com>, <acurrid@nvidia.com>,
-	<cjia@nvidia.com>, <smitra@nvidia.com>, <ankita@nvidia.com>,
-	<aniketa@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
-	<zhiwang@kernel.org>
-Subject: Re: [RFC 02/13] cxl: introduce cxl_get_hdm_info()
-Message-ID: <20241017164458.00003c1f@Huawei.com>
-In-Reply-To: <20240920223446.1908673-3-zhiw@nvidia.com>
-References: <20240920223446.1908673-1-zhiw@nvidia.com>
-	<20240920223446.1908673-3-zhiw@nvidia.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1729181111; c=relaxed/simple;
+	bh=7iSCUy4hsd7mlFixKAw5QSrayk3PCs1zC5I7vexFMBk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=k0xpsX1U4VAd46GWA2rvyyG1LOZKPOX1Z64LfXczzl8/euzffTxlQJQs6PIieDXqvxqRHmrt+4QLJ0vDiohd2+Za/po4YyCbxtLwXEQBG6KXuu2nj66YSFX7BORjEVdtxA+gqNkMlLPbYZ56YecRULAVk9Zidbm3MGOXZ53xFs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NgHglzpn; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7e9b2d75d6dso843274a12.1
+        for <kvm@vger.kernel.org>; Thu, 17 Oct 2024 09:05:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729181109; x=1729785909; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uPGvpskT3qQS7A2X2wMCHyl1PllSmHhCFZoJsQqYtGE=;
+        b=NgHglzpnPcgECbl64vItt0Ii+BbdB8ehHUTYLafIp3KvKJQMbRBfVIUIQJCHh6AXjj
+         MH3ZvdVnxe3QcF0LuE3kc25fcN/ypKnF6SkXvJHaOsrEUyDYywj9WpXlHuRqi/mFPa/g
+         mRmNHmHdtFjleFKiSKamxBrLu7P5IHSbh3Tby35p8LS/y2zdMQoUk1BUu+jR9XJsGddw
+         SBxgSA9wcQ4NXz+tDT08dmJAxkZbrR/0KzGqzJy4PAzl6t8zdgTIAUyBJEHdbgyQ+unG
+         LUtUUX979FhHYfIKLUysmLrgqpjAMmP6PKsNaKyAD/vF3hu7yMClVL4Hdz+zs/0ib1+M
+         9Y+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729181109; x=1729785909;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uPGvpskT3qQS7A2X2wMCHyl1PllSmHhCFZoJsQqYtGE=;
+        b=woHiUiWkIzNedccpV/CawGIx7/rPN1uxkIwgHCOvhk3oDe2OSnqNT3uV1yt4dxxggV
+         vTAeUywKfi4m4rG+Wut49Dg/tpxkK/HJdBbYVyZEmndRRvk3y83iJvqOaSiCCEq8xybV
+         VOGTpxvBttb8xTOMua40zdwIHZfbBjUNQhvdDdlI+N/m0wDrWr0QTr7NL8aaBhLrPf3I
+         X92yNGMtQS/U8VdTTmLW2p76C9tQBNcZ2oNY1PsfIrbGWJHrjXDxKooehbD7pURZruwx
+         Z4RMan3un9QIgIKwvmTnFakGwOLUmOErVIqt0n/+kJrwH2a2M49up8JMwpGw8q/lcbu7
+         E/oA==
+X-Forwarded-Encrypted: i=1; AJvYcCW88/2IOouEdJ9SOojD5wpibEcpSID29zsUSLhyi29Yggb+F1I4upLIWawpZ3tPrgVty8c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaIqtUR0xUWQ0dyIIxGMfzFkldmHPkuzPLe5MtwXum83puK5DJ
+	80nk37XOWX00DNMC/bbXib/CkPUiZrqXiCs7dfXb1BcJk2Zcn+Yiso5AiQNug+2orZrqfE/GP9N
+	u8g==
+X-Google-Smtp-Source: AGHT+IEquI/dcGuvHtAD+d8/HkmmYalvr5Dpl8EjyXsUW0Mn0a/8F/NJjbLqp6zWRl9i1E0sX+PTajVAI8c=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a63:f706:0:b0:7e6:c3f2:24d1 with SMTP id
+ 41be03b00d2f7-7eaa6c6493bmr8214a12.4.1729181109079; Thu, 17 Oct 2024 09:05:09
+ -0700 (PDT)
+Date: Thu, 17 Oct 2024 09:05:07 -0700
+In-Reply-To: <ZxEQz6uGqNtNs5Ph@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Mime-Version: 1.0
+References: <Zu0vvRyCyUaQ2S2a@google.com> <20241002124324.14360-1-mankku@gmail.com>
+ <Zv1gbzT1KTYpNgY1@google.com> <Zv15trTQIBxxiSFy@google.com>
+ <Zv2Ay9Y3TswTwW_B@google.com> <ZwezvcaZJOg7A9el@intel.com>
+ <ZxAL6thxEH67CpW7@google.com> <ZxEQz6uGqNtNs5Ph@intel.com>
+Message-ID: <ZxE1s6FWPkH07usG@google.com>
+Subject: Re: [PATCH 1/1] KVM: nVMX: update VPPR on vmlaunch/vmresume
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: "Markku =?utf-8?Q?Ahvenj=C3=A4rvi?=" <mankku@gmail.com>, bp@alien8.de, dave.hansen@linux.intel.com, 
+	hpa@zytor.com, janne.karhunen@gmail.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com, 
+	tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 20 Sep 2024 15:34:35 -0700
-Zhi Wang <zhiw@nvidia.com> wrote:
-
-> CXL core has the information of what CXL register groups a device has.
-> When initializing the device, the CXL core probes the register groups
-> and saves the information. The probing sequence is quite complicated.
+On Thu, Oct 17, 2024, Chao Gao wrote:
+> >> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> >> index 5bb481aefcbc..d6a03c30f085 100644
+> >> --- a/arch/x86/kvm/lapic.c
+> >> +++ b/arch/x86/kvm/lapic.c
+> >> @@ -800,6 +800,9 @@ static inline void apic_clear_isr(int vec, struct kvm_lapic *apic)
+> >>  	if (!__apic_test_and_clear_vector(vec, apic->regs + APIC_ISR))
+> >>  		return;
+> >>  
+> >> +	if (is_guest_mode(apic->vcpu))
+> >
+> >As above, I think this needs to be
+> >
+> >	if (is_guest_mode(apic->vcpu) && !nested_cpu_has_vid(get_vmcs12(vcpu)))
+> >
+> >because if virtual interrupt delivery is enabled, then EOIs are virtualized.
+> >Which means that this needs to be handled in vmx_hwapic_isr_update().
 > 
-> vfio-cxl requires the HDM register information to emualte the HDM decoder
-Hi Zhi,
-
-I know these were a bit rushed out so I'll only comment once.
-Give your patch descriptions a spell check (I always forget :)
-emulate
-
-> registers.
+> I'm not sure if nested_cpu_has_vid() is necessary. My understanding is that
+> when a bit in the vCPU's vISR is cleared, the vCPU's SVI (i.e., SVI in vmcs01)
+> may be stale and so needs an update if vmcs01 isn't the active VMCS (i.e., the
+> vCPU is in guest mode).
 > 
-> Introduce cxl_get_hdm_info() for vfio-cxl to leverage the HDM
-> register information in the CXL core. Thus, it doesn't need to implement
-> its own probing sequence.
-> 
-> Signed-off-by: Zhi Wang <zhiw@nvidia.com>
-> ---
->  drivers/cxl/core/pci.c        | 28 ++++++++++++++++++++++++++++
->  drivers/cxl/cxlpci.h          |  3 +++
->  include/linux/cxl_accel_mem.h |  2 ++
->  3 files changed, 33 insertions(+)
-> 
-> diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
-> index a663e7566c48..7b6c2b6211b3 100644
-> --- a/drivers/cxl/core/pci.c
-> +++ b/drivers/cxl/core/pci.c
-> @@ -502,6 +502,34 @@ int cxl_hdm_decode_init(struct cxl_dev_state *cxlds, struct cxl_hdm *cxlhdm,
->  }
->  EXPORT_SYMBOL_NS_GPL(cxl_hdm_decode_init, CXL);
->  
-> +int cxl_get_hdm_info(struct cxl_dev_state *cxlds, u32 *hdm_count,
-> +		     u64 *hdm_reg_offset, u64 *hdm_reg_size)
-> +{
-> +	struct pci_dev *pdev = to_pci_dev(cxlds->dev);
-> +	int d = cxlds->cxl_dvsec;
-> +	u16 cap;
-> +	int rc;
-> +
-> +	if (!cxlds->reg_map.component_map.hdm_decoder.valid) {
-> +		*hdm_reg_offset = *hdm_reg_size = 0;
-Probably want to zero out the hdm_count as well?
+> If L1 enables VID and EOIs from L2 are virtualized by KVM (L0), KVM shouldn't
+> call this function in the first place. Because KVM should update the
+> 'virt-APIC' page in VMCS12, rather than updating the vISR of the vCPU.
 
-> +	} else {
-> +		struct cxl_component_reg_map *map =
-> +			&cxlds->reg_map.component_map;
-> +
-> +		*hdm_reg_offset = map->hdm_decoder.offset;
-> +		*hdm_reg_size = map->hdm_decoder.size;
-> +	}
-> +
-> +	rc = pci_read_config_word(pdev,
-> +				  d + CXL_DVSEC_CAP_OFFSET, &cap);
-> +	if (rc)
-> +		return rc;
-> +
-> +	*hdm_count = FIELD_GET(CXL_DVSEC_HDM_COUNT_MASK, cap);
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_NS_GPL(cxl_get_hdm_info, CXL);
+Ah, right.  And KVM handles that in nested_vmx_l1_wants_exit(), by forwarding all
+APICv exits to L1:
+
+	case EXIT_REASON_APIC_ACCESS:
+	case EXIT_REASON_APIC_WRITE:
+	case EXIT_REASON_EOI_INDUCED:
+		/*
+		 * The controls for "virtualize APIC accesses," "APIC-
+		 * register virtualization," and "virtual-interrupt
+		 * delivery" only come from vmcs12.
+		 */
+		return true;
 
