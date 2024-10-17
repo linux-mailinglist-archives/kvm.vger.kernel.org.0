@@ -1,73 +1,107 @@
-Return-Path: <kvm+bounces-29079-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29080-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AF8E9A2470
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 16:02:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6AC89A2520
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 16:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCB321F23BF5
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 14:02:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7351A1F273BF
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2024 14:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6D41DE3AF;
-	Thu, 17 Oct 2024 14:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E2A01DF26C;
+	Thu, 17 Oct 2024 14:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oPVXLRa4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA96439FE5;
-	Thu, 17 Oct 2024 14:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DA61DE4EA;
+	Thu, 17 Oct 2024 14:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729173714; cv=none; b=APEKMNaaSkJY3ZrMv3CbYP+hKWbPFu+GX1do4KpEVf7gCvGOAtaML8Hrlgz/Em/cN2rIAj6CMiphy7Ym7pntI0ZkhaZA5KcBf62lSmqH9Gj+K6mfQqRBYNmOHI0hGu+o9bWVrZ2B9nmZs7rVI6yoDiKnq9m6Li+Nexqt8pZBVY0=
+	t=1729175545; cv=none; b=GFuPepQ0zsEXJIX18HkDG1e5t0EO6NsaFFiREqr0T30uvsKmx1d5aJPMiJ7ZmobNuV49qO4xg4mi+duSYmhXgyQi1cFFeT2ExHtQNQ7RmqHcjS9uVaETLuj88pVyoU5ieoRh1R2uFpseRk+qSDyOW6RgGD5/Nc1AiBXbMVcEx34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729173714; c=relaxed/simple;
-	bh=YIGa7aKF3zPBjTfPQwEODkjyQxe13e+PbHCs5IPylfQ=;
+	s=arc-20240116; t=1729175545; c=relaxed/simple;
+	bh=lqwk6LYhIvZ4BuQ+y9qMS+/LMg+fUflKiZ7c5mJ07yM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LqX/Fj4v7D1CHtaOjLwSkdrdSEzQDusF8li+I4TgINOkYbB2dPK4f6QiTh3xAEMmXQ44wdtSLYRJZ6sveV+caz+VO81BxnJkHIZmZtt7UqjQqFiVYNfOeCf5rqBQRTGPX4TM8jIKGisReT/FYoKlQ2PFTEeTMcYqWASv9Q2bN7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70D0FC4CEC3;
-	Thu, 17 Oct 2024 14:01:49 +0000 (UTC)
-Date: Thu, 17 Oct 2024 15:01:47 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Okanovic, Haris" <harisokn@amazon.com>
-Cc: "ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"rafael@kernel.org" <rafael@kernel.org>,
-	"sudeep.holla@arm.com" <sudeep.holla@arm.com>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-	"wanpengli@tencent.com" <wanpengli@tencent.com>,
-	"cl@gentwo.org" <cl@gentwo.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"maobibo@loongson.cn" <maobibo@loongson.cn>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>,
-	"daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"lenb@kernel.org" <lenb@kernel.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"bp@alien8.de" <bp@alien8.de>,
-	"mtosatti@redhat.com" <mtosatti@redhat.com>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>
-Subject: Re: [PATCH v8 01/11] cpuidle/poll_state: poll via
- smp_cond_load_relaxed()
-Message-ID: <ZxEYy9baciwdLnqh@arm.com>
-References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
- <20240925232425.2763385-2-ankur.a.arora@oracle.com>
- <Zw5aPAuVi5sxdN5-@arm.com>
- <7f7ffdcdb79eee0e8a545f544120495477832cd5.camel@amazon.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WBdnFC4xJtv6PPFYZKLPN0eJQ2LqjvQcqijCBiStdFalveLFtf6j8H744eWG14bFSbIJmu6VlJ84Dg6pmGie7ks6r3+99Q8GIlpQdX075NCqxAhiHLiUTwdWfAGs0dPxJ46HYeda2PkUJyq4HBi74MmFeEV2wE849WD2nOf140Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oPVXLRa4; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49HBnpDp030939;
+	Thu, 17 Oct 2024 14:32:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=x9M7OqCmvYwJLYp7viWiXrPFfxDnW3
+	xZHfW7zLFJR0w=; b=oPVXLRa46MOc6Sf+5LBNZDM0qkdDCDe2W+Ef2UqLTdqR1R
+	mt1HSka4pBPv67fk3O7RPoDXwiupI6N4Ex7naatzPHyjB+GL/9aW6uBfHEug5GvN
+	ZH6RAyI6rrA7u5ESXRlf5vwelKAC/D+mw4kYd5X5Yzzvf10eDW5zEUuFDHSbpG/0
+	a59f9iyZn1Xq8L0f851CeK/LHvCRORqZPnr2OMo9Ap6sweb9Ghig8N8TQItzoVsO
+	47ssd8S4GR87Rgt0oubL3bfNteAlYdBl9EUCY1kORvH1DxLHAQRSvu3xBOuppg38
+	V1taPJrS9eJx1nwkM6b1f4OjDKAzMk1hgqWA1meg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42asbd3a3y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Oct 2024 14:32:16 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49HERF9H018368;
+	Thu, 17 Oct 2024 14:32:15 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42asbd3a3r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Oct 2024 14:32:15 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49HDr3Bj005377;
+	Thu, 17 Oct 2024 14:32:14 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4285njf5dv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Oct 2024 14:32:14 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49HEWAhP48628210
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 17 Oct 2024 14:32:10 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A8B7B20049;
+	Thu, 17 Oct 2024 14:32:10 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C59BF20040;
+	Thu, 17 Oct 2024 14:32:09 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 17 Oct 2024 14:32:09 +0000 (GMT)
+Date: Thu, 17 Oct 2024 16:32:08 +0200
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>, Mario Casquero <mcasquer@redhat.com>
+Subject: Re: [PATCH v2 4/7] s390/physmem_info: query diag500(STORAGE LIMIT)
+ to support QEMU/KVM memory devices
+Message-ID: <ZxEf6NOs1hDFZd1E@tuxmaker.boeblingen.de.ibm.com>
+References: <20241014144622.876731-1-david@redhat.com>
+ <20241014144622.876731-5-david@redhat.com>
+ <ZxC+mr5PcGv4fBcY@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <04d5169f-3289-4aac-abca-90b20ad4e9c9@redhat.com>
+ <ZxDetq73hETPMjln@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <1c7ef09e-9ba2-488e-a249-4db3f65e077d@redhat.com>
+ <45de474c-9af3-4d71-959f-6dbc223b432b@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,57 +110,56 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7f7ffdcdb79eee0e8a545f544120495477832cd5.camel@amazon.com>
+In-Reply-To: <45de474c-9af3-4d71-959f-6dbc223b432b@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: cHhgOMeaziZtns-QiP2HmAZDEba7eikD
+X-Proofpoint-GUID: 2uY6DRZW2AitsKuflnkKSDREZnezK4Ep
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ malwarescore=0 spamscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0
+ clxscore=1015 adultscore=0 priorityscore=1501 mlxlogscore=512
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410170100
 
-On Wed, Oct 16, 2024 at 03:13:33PM +0000, Okanovic, Haris wrote:
-> On Tue, 2024-10-15 at 13:04 +0100, Catalin Marinas wrote:
-> > On Wed, Sep 25, 2024 at 04:24:15PM -0700, Ankur Arora wrote:
-> > > diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
-> > > index 9b6d90a72601..fc1204426158 100644
-> > > --- a/drivers/cpuidle/poll_state.c
-> > > +++ b/drivers/cpuidle/poll_state.c
-> > > @@ -21,21 +21,20 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
-> > > 
-> > >       raw_local_irq_enable();
-> > >       if (!current_set_polling_and_test()) {
-> > > -             unsigned int loop_count = 0;
-> > >               u64 limit;
-> > > 
-> > >               limit = cpuidle_poll_time(drv, dev);
-> > > 
-> > >               while (!need_resched()) {
-> > > -                     cpu_relax();
-> > > -                     if (loop_count++ < POLL_IDLE_RELAX_COUNT)
-> > > -                             continue;
-> > > -
-> > > -                     loop_count = 0;
-> > > +                     unsigned int loop_count = 0;
-> > >                       if (local_clock_noinstr() - time_start > limit) {
-> > >                               dev->poll_time_limit = true;
-> > >                               break;
-> > >                       }
-> > > +
-> > > +                     smp_cond_load_relaxed(&current_thread_info()->flags,
-> > > +                                           VAL & _TIF_NEED_RESCHED ||
-> > > +                                           loop_count++ >= POLL_IDLE_RELAX_COUNT);
-> > 
-> > The above is not guaranteed to make progress if _TIF_NEED_RESCHED is
-> > never set. With the event stream enabled on arm64, the WFE will
-> > eventually be woken up, loop_count incremented and the condition would
-> > become true. However, the smp_cond_load_relaxed() semantics require that
-> > a different agent updates the variable being waited on, not the waiting
-> > CPU updating it itself. Also note that the event stream can be disabled
-> > on arm64 on the kernel command line.
+On Thu, Oct 17, 2024 at 02:07:12PM +0200, David Hildenbrand wrote:
+> On 17.10.24 12:00, David Hildenbrand wrote:
+> > Well, DIAGNOSE 260 is z/VM only and DIAG 500 is KVM only. So there are
+> > currently not really any other reasonable ways besides SCLP.
 > 
-> Alternately could we condition arch_haltpoll_want() on
-> arch_timer_evtstrm_available(), like v7?
+> Correction: Staring at the code again, in detect_physmem_online_ranges()
+> we will indeed try:
+> 
+> a) sclp_early_read_storage_info()
+> b) diag260()
 
-No. The problem is about the smp_cond_load_relaxed() semantics - it
-can't wait on a variable that's only updated in its exit condition. We
-need a new API for this, especially since we are changing generic code
-here (even it was arm64 code only, I'd still object to such
-smp_cond_load_*() constructs).
+So why care to call diag260() in case of DIAGNOSE 500? What about the below?
 
--- 
-Catalin
+void detect_physmem_online_ranges(unsigned long max_physmem_end)
+{
+	if (!sclp_early_read_storage_info()) {
+		physmem_info.info_source = MEM_DETECT_SCLP_STOR_INFO;
+	} else if (physmem_info.info_source == MEM_DETECT_DIAG500_STOR_LIMIT) {
+		unsigned long online_end;
+
+		if (!sclp_early_get_memsize(&online_end)) {
+			physmem_info.info_source = MEM_DETECT_SCLP_READ_INFO;
+			add_physmem_online_range(0, online_end);
+		}
+	} else if (!diag260()) {
+		physmem_info.info_source = MEM_DETECT_DIAG260;
+	} else if (max_physmem_end) {
+		add_physmem_online_range(0, max_physmem_end);
+	}
+}
+
+> But if neither works, we cannot blindly add all that memory, something is
+> messed up. So we'll fallback to
+> 
+> c) sclp_early_get_memsize()
+> 
+> But if none of that works, something is seriously wrong.
+
+Ok, thanks for the clarification.
 
