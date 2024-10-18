@@ -1,205 +1,170 @@
-Return-Path: <kvm+bounces-29156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29159-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A4539A390B
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 10:47:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 391B49A3A18
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 11:35:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC0E41C24DD3
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 08:47:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B012B1F24D84
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 09:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A5C18F2FA;
-	Fri, 18 Oct 2024 08:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C361F6694;
+	Fri, 18 Oct 2024 09:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IAN4Z1j1"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="gBB1KtDd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCFF18EFDC
-	for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 08:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEED9192B95;
+	Fri, 18 Oct 2024 09:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729241263; cv=none; b=brpON13hxkk6JVa9go9R4HJ13tjvLKJ45cyybgEoQkhbpAy6hfpIXiW1NviciSIB62ggH4BAUkTb3yXmhtqsPfgzsvGqijgC+AUpt9oYjbRAj4PPgBMgzN4sDEbyzjrSy6Q2W3NL0VNMMV625sxRuuiFsASLMBeoL6RfwB7sBUA=
+	t=1729244100; cv=none; b=kCSgzI69FnesA7a4f0hw/buvPAZVOTa2Hy69hU02fN3k3TwDwkAERxJTUGUpssL25Un9d65aXpyOkHp5hzvZYi3iv16HBXZJcP+6OCsSiuogIlSrh9smi9c+bB+XFqXEW5jV1f/OqnJfdFp4PdFRAMYZP/n1fzvnugZRdk51sJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729241263; c=relaxed/simple;
-	bh=plBfgMHQMuI+dLmqLkuBbIQUiwBm4swhKQlf4bzVhk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UVinEKnFsPRsxXpWAiVyiziYkPBv/Oa2ai7k9OP/F8VVhXyWR8aKVWMHIJWvBmTU4aPhFgVj8nVNw/QlPQjYjApwIOJqYrxi3g3UaStyKmcGHxbpVHakFA7G97VNzqu76dkEFuLcNAypBDFODijZ/kJBuj0dHZ2SZzqTtzeNVuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IAN4Z1j1; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729241261; x=1760777261;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=plBfgMHQMuI+dLmqLkuBbIQUiwBm4swhKQlf4bzVhk8=;
-  b=IAN4Z1j11zuqGU0ob44KkSJrpWlZdp8dPzk7f4GojtoxdraKOXBsHGc0
-   8jd/zut9CIbq+dg+VsyR8QXiU4LAcFTOa2x2j4aDwdgwZpfZ+ZU5yt2QX
-   owcY1JsXLSaIpZJaxF4noeAEjC5vv7e1poS0W0aLg43zuEaywEA5oFES8
-   qywXpOJyzA9mQSjxJgFiD88fgL572apOMRYeZ5i6qfZbKF7VJPUZyfPEV
-   LTxPB70I/cwJLcSTPfATR+Tf2+kRuui1gmb9eszPGG7dzU6i6+66ybLKJ
-   +/lSxmcXstzeDAVIdhhdy6V071YdcvSsRZjTwzGNVhholJ0M+aSKMoS1D
-   w==;
-X-CSE-ConnectionGUID: UpLIx/NGSTakxp+Mj717pA==
-X-CSE-MsgGUID: ljeE+uCgQzOGpmjHLPMymw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="39306045"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="39306045"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 01:47:40 -0700
-X-CSE-ConnectionGUID: 1X6bbWVLRPKGDBLVB3+qyQ==
-X-CSE-MsgGUID: 0qGpU8v8T3qusDQ6TdvBUg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
-   d="scan'208";a="102105838"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmviesa002.fm.intel.com with ESMTP; 18 Oct 2024 01:47:35 -0700
-Date: Fri, 18 Oct 2024 17:03:51 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>,
-	Alireza Sanaee <alireza.sanaee@huawei.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [PATCH v3 6/7] i386/pc: Support cache topology in -machine for
- PC machine
-Message-ID: <ZxIkdyJ2ysibi74R@intel.com>
-References: <20241012104429.1048908-1-zhao1.liu@intel.com>
- <20241012104429.1048908-7-zhao1.liu@intel.com>
- <ZxEs3DGGgCqGT5yK@redhat.com>
- <ZxHcsPyqT6MLJ9hG@intel.com>
- <ZxIVC-XQaMqOy6Fw@redhat.com>
+	s=arc-20240116; t=1729244100; c=relaxed/simple;
+	bh=+xQ5pEBdbDVjjALPMWPySdyGzngXUy9divuJUeAZ/Uw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=P6s8Ib5YMhmk5mO1gmgP3EgR0wKn/eMXRBpaNnxhkE1LtTQXJeNFq9i7wOZZwPefJU7TsBcHT4pBP9vLKgrpJ99Dn+VCjZRwW1bn35GCGGfHEmlldAw9HAqJXkPRl+hXaangK970aSiagmXGudu2bwyDV7UEXZrQVv1ZyP4YjkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=gBB1KtDd; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1729244098; x=1760780098;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=BpK3TfvA/aJJBGezkvWLQTG+09sgEOAIsRn2y8OahHU=;
+  b=gBB1KtDdp0CrY3wHcx3OJEEkStzz1tkf+voyw4q3aaCBRhlPCCcVMk8j
+   ydL4mryV8TbAVICmS3UEVVFQ1zkbxdDODkKPEGRjK4LAPzfYuUeISEj3U
+   LYG8U5w3Z22Up0udrvqFwaUbS7vt7OuO8htLexx1ReirDUkxcs+VcRpSA
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.11,213,1725321600"; 
+   d="scan'208";a="139152822"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 09:34:56 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:55009]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
+ id e4886bcc-8a61-48fc-987b-7c7278cb980c; Fri, 18 Oct 2024 09:34:55 +0000 (UTC)
+X-Farcaster-Flow-ID: e4886bcc-8a61-48fc-987b-7c7278cb980c
+Received: from EX19EXOUWB001.ant.amazon.com (10.250.64.229) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 18 Oct 2024 09:34:51 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19EXOUWB001.ant.amazon.com (10.250.64.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 18 Oct 2024 09:34:49 +0000
+Received: from email-imr-corp-prod-iad-all-1a-059220b4.us-east-1.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.34 via Frontend Transport; Fri, 18 Oct 2024 09:34:48 +0000
+Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
+	by email-imr-corp-prod-iad-all-1a-059220b4.us-east-1.amazon.com (Postfix) with ESMTPS id 688E44050D;
+	Fri, 18 Oct 2024 09:34:44 +0000 (UTC)
+Message-ID: <799e5861-c91c-4756-982c-033ebef476b4@amazon.co.uk>
+Date: Fri, 18 Oct 2024 10:34:41 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZxIVC-XQaMqOy6Fw@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 26/39] KVM: guest_memfd: Track faultability within a
+ struct kvm_gmem_private
+To: David Hildenbrand <david@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>,
+	Peter Xu <peterx@redhat.com>
+CC: Ackerley Tng <ackerleytng@google.com>, <tabba@google.com>,
+	<quic_eberman@quicinc.com>, <rientjes@google.com>, <fvdl@google.com>,
+	<jthoughton@google.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
+	<zhiquan1.li@intel.com>, <fan.du@intel.com>, <jun.miao@intel.com>,
+	<isaku.yamahata@intel.com>, <muchun.song@linux.dev>, <erdemaktas@google.com>,
+	<vannapurve@google.com>, <qperret@google.com>, <jhubbard@nvidia.com>,
+	<willy@infradead.org>, <shuah@kernel.org>, <brauner@kernel.org>,
+	<bfoster@redhat.com>, <kent.overstreet@linux.dev>, <pvorel@suse.cz>,
+	<rppt@kernel.org>, <richard.weiyang@gmail.com>, <anup@brainfault.org>,
+	<haibo1.xu@intel.com>, <ajones@ventanamicro.com>, <vkuznets@redhat.com>,
+	<maciej.wieczor-retman@intel.com>, <pgonda@google.com>,
+	<oliver.upton@linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <1d243dde-2ddf-4875-890d-e6bb47931e40@redhat.com>
+ <ZxAfET87vwVwuUfJ@x1n> <20241016225157.GQ3559746@nvidia.com>
+ <ZxBRC-v9w7xS0xgk@x1n> <20241016235424.GU3559746@nvidia.com>
+ <ZxEmFY1FcrRtylJW@x1n> <20241017164713.GF3559746@nvidia.com>
+ <ZxFD3kYfKY0b-qFz@x1n> <20241017171010.GK3559746@nvidia.com>
+ <ZxFhTtEs2Mz7Dj-O@x1n> <20241017191829.GA3559746@nvidia.com>
+ <2686a5ae-e1e5-48d6-ae4b-31face5284ca@amazon.co.uk>
+ <257d5578-f256-49cf-affe-6255ff224ed0@redhat.com>
+From: Patrick Roy <roypat@amazon.co.uk>
+Content-Language: en-US
+Autocrypt: addr=roypat@amazon.co.uk; keydata=
+ xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
+ NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
+ wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
+ CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
+ AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
+ AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
+ IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
+ 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
+ 8hlxFQM=
+In-Reply-To: <257d5578-f256-49cf-affe-6255ff224ed0@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 18, 2024 at 08:58:03AM +0100, Daniel P. Berrangé wrote:
-> Date: Fri, 18 Oct 2024 08:58:03 +0100
-> From: "Daniel P. Berrangé" <berrange@redhat.com>
-> Subject: Re: [PATCH v3 6/7] i386/pc: Support cache topology in -machine for
->  PC machine
-> 
-> On Fri, Oct 18, 2024 at 11:57:36AM +0800, Zhao Liu wrote:
-> > Hi Daniel,
-> > 
-> > > > +    ``smp-cache.0.cache=cachename,smp-cache.0.topology=topologylevel``
-> > > > +        Define cache properties for SMP system.
-> > > > +
-> > > > +        ``cache=cachename`` specifies the cache that the properties will be
-> > > > +        applied on. This field is the combination of cache level and cache
-> > > > +        type. It supports ``l1d`` (L1 data cache), ``l1i`` (L1 instruction
-> > > > +        cache), ``l2`` (L2 unified cache) and ``l3`` (L3 unified cache).
-> > > > +
-> > > > +        ``topology=topologylevel`` sets the cache topology level. It accepts
-> > > > +        CPU topology levels including ``thread``, ``core``, ``module``,
-> > > > +        ``cluster``, ``die``, ``socket``, ``book``, ``drawer`` and a special
-> > > > +        value ``default``. If ``default`` is set, then the cache topology will
-> > > > +        follow the architecture's default cache topology model. If another
-> > > > +        topology level is set, the cache will be shared at corresponding CPU
-> > > > +        topology level. For example, ``topology=core`` makes the cache shared
-> > > > +        by all threads within a core.
-> > > > +
-> > > > +        Example:
-> > > > +
-> > > > +        ::
-> > > > +
-> > > > +            -machine smp-cache.0.cache=l1d,smp-cache.0.topology=core,smp-cache.1.cache=l1i,smp-cache.1.topology=core
-> > > 
-> > > There are 4 cache types, l1d, l1i, l2, l3.
-> > > 
-> > > In this example you've only set properties for l1d, l1i caches.
-> > > 
-> > > What does this mean for l2 / l3 caches ?
-> > 
-> > Omitting "cache" will default to using the "default" level.
-> > 
-> > I think I should add the above description to the documentation.
-> > 
-> > > Are they reported as not existing, or are they to be reported at
-> > > some built-in default topology level.
-> > 
-> > It's the latter.
-> > 
-> > If a machine doesn't support l2/l3, then QEMU will also report the error
-> > like:
-> > 
-> > qemu-system-*: l2 cache topology not supported by this machine
-> 
-> Ok, that's good.
-> 
-> > > If the latter, how does the user know what that built-in default is, 
-> > 
-> > Currently, the default cache model for x86 is L1 per core, L2 per core,
-> > and L3 per die. Similar to the topology levels, there is still no way to
-> > expose this to users. I can descript default cache model in doc.
-> > 
-> > But I feel like we're back to the situation we discussed earlier:
-> > "default" CPU topology support should be related to the CPU model, but
-> > in practice, QEMU supports it at the machine level. The cache topology
-> > depends on CPU topology support and can only continue to be added on top
-> > of the machine.
-> > 
-> > So do you think we can add topology and cache information in CpuModelInfo
-> > so that query-cpu-model-expansion can expose default CPU/cache topology
-> > information to users?
-> > 
-> > This way, users can customize CPU/cache topology in -smp and
-> > -machine smp-cache. Although the QMP command is targeted at the CPU model
-> > while our CLI is at the machine level, at least we can expose the
-> > information to users.
-> > 
-> > If you agree to expose the default topology/cache info in
-> > query-cpu-model-expansion, can I work on this in a separate series? :)
-> 
-> Yeah, lets worry about that another day.
-> 
-> It it sufficient to just encourage users to always specify
-> the full set of caches.
 
-Thanks!
 
-> > > Can we explicitly disable a l2/l3 cache, or must it always exists ?
-> > 
-> > Now we can't disable it through -machine smp-cache (while x86 CPU support
-> > l3-cache=off), but as you mentioned, I can try using "invalid" to support
-> > this scenario, which would be more general. Similarly, if you agree, I
-> > can also add this support in a separate series.
+On Fri, 2024-10-18 at 08:50 +0100, David Hildenbrand wrote:
+> On 18.10.24 09:15, Patrick Roy wrote:
+>>
+>>
+>> On Thu, 2024-10-17 at 20:18 +0100, Jason Gunthorpe wrote:
+>>> On Thu, Oct 17, 2024 at 03:11:10PM -0400, Peter Xu wrote:
+>>>> On Thu, Oct 17, 2024 at 02:10:10PM -0300, Jason Gunthorpe wrote:
+>>>>>> If so, maybe that's a non-issue for non-CoCo, where the VM object /
+>>>>>> gmemfd object (when created) can have a flag marking that it's
+>>>>>> always shared and can never be converted to private for any page
+>>>>>> within.
+>>>>>
+>>>>> What is non-CoCo? Does it include the private/shared concept?
+>>>>
+>>>> I used that to represent the possible gmemfd use cases outside confidential
+>>>> computing.
+>>>>
+>>>> So the private/shared things should still be around as fundamental property
+>>>> of gmemfd, but it should be always shared and no convertion needed for the
+>>>> whole lifecycle of the gmemfd when marked !CoCo.
+>>>
+>>> But what does private mean in this context?
+>>>
+>>> Is it just like a bit of additional hypervisor security that the page
+>>> is not mapped anyplace except the KVM stage 2 and the hypervisor can
+>>> cause it to become mapped/shared at any time? But the guest has no
+>>> idea about this?
+>>>
+>>> Jason
+>>
+>> Yes, this is pretty much exactly what I'm after when I say "non-CoCo".
 > 
-> If we decide to offer a way to disable caches, probably better to have
-> a name like 'disabled' for such a setting, and yes, we don't need todo
-> that now.
+> It's likely not what Peter meant, though.
+> 
+> I think there are three scenarios:
+> 
+> (a) Secure CoCo VMs: private is protected by HW
+> (b) Semi-secured non-CoCo VMs: private is removed from the directmap
+> (c) Non-CoCo VMs: only shared memory
+> 
+> Does that match what you have in mind? Are there other cases?
 
-Yes, "disabled" is better.
+Yeah, I'm after your case (b). I suppose I will not call it just
+"non-CoCo" anymore then :)
 
-Regards,
-Zhao
-
- 
+> -- 
+> Cheers,
+> 
+> David / dhildenb
+> 
 
