@@ -1,137 +1,165 @@
-Return-Path: <kvm+bounces-29166-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29168-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C83BC9A3C82
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 13:01:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 891169A3CD5
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 13:10:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03B041C239EC
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 11:01:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FC911F25C0D
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 11:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BAB204094;
-	Fri, 18 Oct 2024 10:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tN1mp8mz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9398520493C;
+	Fri, 18 Oct 2024 11:05:46 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E8E2022C3;
-	Fri, 18 Oct 2024 10:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F66204923;
+	Fri, 18 Oct 2024 11:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729248981; cv=none; b=uYr2pywWcqSXP3yIQASwzPhU262q/QUaMlngeEu5AplDtaFwS4NT2xTbxlKO3rM+Qze4hxjIzA9U35VJ4GTKiUDk2fZmpBx+p084pvmg/zohcZkz86zGyMHTefVF+BgI/dOPPxFdKdfngXi5T9R0F+1cKq1TLGnFZYfrAMK/lGs=
+	t=1729249546; cv=none; b=inwGFS55QMoIjvP4zfbA34JlHghsJd6v2IENOBf4JkgdmSPOLTbh0dVctd1lG5Qs83UoIMIYQVENDHTu3AqkPakoUHT3Igc8Y9ZVl3fLam+YwmvWWUtuaHTKyBscmDkFZcAMirDt3kX6sVBf0LQKBB8ofH8pZ1GZl7fChLXAbvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729248981; c=relaxed/simple;
-	bh=aIfATgPT2r3L16kqOwd+kbWy7o5B3gL0vouhworFFBQ=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=INHJaAQoNSoT6aJab4azrgXXEqQtc87xslxlevjBlG7KNWFEAsg4a3u2vpEd3Uy38umOtpZpFmkCxAtmKR4Ud52Dwub+N+bhQIkH9pU1H89oyfrzHAL6+kTg89GW2g4/ADvA05HUO5HnNSm8n93/186qzgqgziKRY1RixxSoFX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tN1mp8mz; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49I8oFeT007998;
-	Fri, 18 Oct 2024 10:56:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=HxNID/
-	LRBGejTk7PjBHzmGeXpivOHFj2wDF4gutex9s=; b=tN1mp8mzoJ2fkh9+hIr+FK
-	o6BaZbTa2dzogJFOBUvcAVBqfda0F5oWyXdNZF3mjGu6m/fz701NJWCHTGzI5DzB
-	ynZQTQcmGvrDyqSmudgMV+/yfGSYYuxqEMbsyXu9tBeu1dCw0rbC/wZaHZ8CNTQV
-	/ObwuaqOwP8eLkNT6lP6dQkDPxC2IVmDvcGKJjMb5mSgc/HJHpUF6syGR7j1UFQh
-	pNvSi4leE3Hjd5nHUt7urRpFPx1X7AFzCFrnpqsYQWTOiZWQgeIN2p47Ap1u9alY
-	ePCJif5VmZ0VmesUh6/FJZer6UGzUV9pG9ditAPk6wL0/StWQcQIUuwfy3VNlYkw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42as8a7wv9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 10:56:17 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49IAuH3E013334;
-	Fri, 18 Oct 2024 10:56:17 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42as8a7wv8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 10:56:17 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49I7UhbL027480;
-	Fri, 18 Oct 2024 10:56:16 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4283ty43s4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 10:56:16 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49IAuC2p46203228
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 18 Oct 2024 10:56:12 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D180B2004B;
-	Fri, 18 Oct 2024 10:56:12 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AF81220043;
-	Fri, 18 Oct 2024 10:56:12 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.13.120])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 18 Oct 2024 10:56:12 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729249546; c=relaxed/simple;
+	bh=9hDVWgN9eP3gLsc0lzjrta/0kQpsyqMF5QbErKfyG2A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gQ1acgqPttoW9idM1vXNoSaYQP3P342u1w5wbaV5L2o6GqalhIzfHTomg8JlOolhyarRdF937xh++H5oliCo5jjUdL/JEAy2fpg17kJY/22RstycxRYmMdDk4XBPFpEaed9wuxIJ/SUuzdo3oZ1VSfARwbP5sI4WFQMvWudMZas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92BF1C4CEC3;
+	Fri, 18 Oct 2024 11:05:40 +0000 (UTC)
+Date: Fri, 18 Oct 2024 12:05:38 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Ankur Arora <ankur.a.arora@oracle.com>
+Cc: "Okanovic, Haris" <harisokn@amazon.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"rafael@kernel.org" <rafael@kernel.org>,
+	"sudeep.holla@arm.com" <sudeep.holla@arm.com>,
+	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+	"wanpengli@tencent.com" <wanpengli@tencent.com>,
+	"cl@gentwo.org" <cl@gentwo.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"maobibo@loongson.cn" <maobibo@loongson.cn>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>,
+	"daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"lenb@kernel.org" <lenb@kernel.org>,
+	"will@kernel.org" <will@kernel.org>,
+	"hpa@zytor.com" <hpa@zytor.com>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+	"bp@alien8.de" <bp@alien8.de>,
+	"mtosatti@redhat.com" <mtosatti@redhat.com>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"mark.rutland@arm.com" <mark.rutland@arm.com>
+Subject: Re: [PATCH v8 01/11] cpuidle/poll_state: poll via
+ smp_cond_load_relaxed()
+Message-ID: <ZxJBAubok8pc5ek7@arm.com>
+References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
+ <20240925232425.2763385-2-ankur.a.arora@oracle.com>
+ <Zw5aPAuVi5sxdN5-@arm.com>
+ <7f7ffdcdb79eee0e8a545f544120495477832cd5.camel@amazon.com>
+ <ZxEYy9baciwdLnqh@arm.com>
+ <87h69amjng.fsf@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <e649996c-559f-425e-833f-ca83bad59372@linux.ibm.com>
-References: <20241016180320.686132-1-nsg@linux.ibm.com> <20241016180320.686132-5-nsg@linux.ibm.com> <e649996c-559f-425e-833f-ca83bad59372@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v4 4/6] s390x: Add library functions for exiting from snippet
-From: Nico Boehr <nrb@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>, linux-s390@vger.kernel.org
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Date: Fri, 18 Oct 2024 12:56:11 +0200
-Message-ID: <172924897145.324297.7466880604426455626@t14-nrb.local>
-User-Agent: alot/0.10
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NMfHCuccsRDQfSkdrc68ahAigzR9m_N6
-X-Proofpoint-ORIG-GUID: LIR1yEB77envDzp5WGfmp04aEKMwBNyK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=929 phishscore=0
- adultscore=0 impostorscore=0 priorityscore=1501 spamscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410180070
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87h69amjng.fsf@oracle.com>
 
-Quoting Janosch Frank (2024-10-18 10:02:37)
-[...]
-> > +static inline uint64_t snippet_get_force_exit_value(struct vm *vm)
-> > +{
-> > +     struct kvm_s390_sie_block *sblk =3D vm->sblk;
-> > +
-> > +     assert(snippet_is_force_exit_value(vm));
-> > +
-> > +     return vm->save_area.guest.grs[sblk_ip_as_diag(sblk).r_1];
-> > +}
->=20
-> The cpu address parameter for 9C is 16 bit.
-> While we could make it 64 bit for snippets I don't see a reason to do=20
-> so. The 16 bits are enough to indicate something to the host which can=20
-> then go and fetch memory for more data.
+On Thu, Oct 17, 2024 at 03:47:31PM -0700, Ankur Arora wrote:
+> Catalin Marinas <catalin.marinas@arm.com> writes:
+> > On Wed, Oct 16, 2024 at 03:13:33PM +0000, Okanovic, Haris wrote:
+> >> On Tue, 2024-10-15 at 13:04 +0100, Catalin Marinas wrote:
+> >> > On Wed, Sep 25, 2024 at 04:24:15PM -0700, Ankur Arora wrote:
+> >> > > +                     smp_cond_load_relaxed(&current_thread_info()->flags,
+> >> > > +                                           VAL & _TIF_NEED_RESCHED ||
+> >> > > +                                           loop_count++ >= POLL_IDLE_RELAX_COUNT);
+> >> >
+> >> > The above is not guaranteed to make progress if _TIF_NEED_RESCHED is
+> >> > never set. With the event stream enabled on arm64, the WFE will
+> >> > eventually be woken up, loop_count incremented and the condition would
+> >> > become true. However, the smp_cond_load_relaxed() semantics require that
+> >> > a different agent updates the variable being waited on, not the waiting
+> >> > CPU updating it itself. Also note that the event stream can be disabled
+> >> > on arm64 on the kernel command line.
+> >>
+> >> Alternately could we condition arch_haltpoll_want() on
+> >> arch_timer_evtstrm_available(), like v7?
+> >
+> > No. The problem is about the smp_cond_load_relaxed() semantics - it
+> > can't wait on a variable that's only updated in its exit condition. We
+> > need a new API for this, especially since we are changing generic code
+> > here (even it was arm64 code only, I'd still object to such
+> > smp_cond_load_*() constructs).
+> 
+> Right. The problem is that smp_cond_load_relaxed() used in this context
+> depends on the event-stream side effect when the interface does not
+> encode those semantics anywhere.
+> 
+> So, a smp_cond_load_timeout() like in [1] that continues to depend on
+> the event-stream is better because it explicitly accounts for the side
+> effect from the timeout.
+> 
+> This would cover both the WFxT and the event-stream case.
 
-Mh, how exactly would you "fetch memory"? That requires knowledge on where
-things are in guest memory which can be painful to figure out from the
-host.
+Indeed.
 
-I've found it useful to be able to pass a pointer from guest to host. Maybe
-a diag500 is the better option? gr2 contains the cookie which is a 64-bit
-value - see Linux' Documentation/virt/kvm/s390/s390-diag.rst.
+> The part I'm a little less sure about is the case where WFxT and the
+> event-stream are absent.
+> 
+> As you said earlier, for that case on arm64, we use either short
+> __delay() calls or spin in cpu_relax(), both of which are essentially
+> the same thing.
 
-P.S. Did I miss the part in the docs where the 16-bit restriction of 9c is
-documented or is it missing?
+Something derived from __delay(), not exactly this function. We can't
+use it directly as we also want it to wake up if an event is generated
+as a result of a memory write (like the current smp_cond_load().
+
+> Now on x86 cpu_relax() is quite optimal. The spec explicitly recommends
+> it and from my measurement a loop doing "while (!cond) cpu_relax()" gets
+> an IPC of something like 0.1 or similar.
+> 
+> On my arm64 systems however the same loop gets an IPC of 2.  Now this
+> likely varies greatly but seems like it would run pretty hot some of
+> the time.
+
+For the cpu_relax() fall-back, it wouldn't be any worse than the current
+poll_idle() code, though I guess in this instance we'd not enable idle
+polling.
+
+I expect the event stream to be on in all production deployments. The
+reason we have a way to disable it is for testing. We've had hardware
+errata in the past where the event on spin_unlock doesn't cross the
+cluster boundary. We'd not notice because of the event stream.
+
+> So maybe the right thing to do would be to keep smp_cond_load_timeout()
+> but only allow polling if WFxT or event-stream is enabled. And enhance
+> cpuidle_poll_state_init() to fail if the above condition is not met.
+
+We could do this as well. Maybe hide this behind another function like
+arch_has_efficient_smp_cond_load_timeout() (well, some shorter name),
+checked somewhere in or on the path to cpuidle_poll_state_init(). Well,
+it might be simpler to do this in haltpoll_want(), backed by an
+arch_haltpoll_want() function.
+
+I assume we want poll_idle() to wake up as soon as a task becomes
+available. Otherwise we could have just used udelay() for some fraction
+of cpuidle_poll_time() instead of cpu_relax().
+
+-- 
+Catalin
 
