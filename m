@@ -1,159 +1,205 @@
-Return-Path: <kvm+bounces-29158-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 515399A3964
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 11:04:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A4539A390B
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 10:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F093285DF8
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 09:04:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC0E41C24DD3
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 08:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3353F190462;
-	Fri, 18 Oct 2024 09:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A5C18F2FA;
+	Fri, 18 Oct 2024 08:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ohz5l6zp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IAN4Z1j1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D60D19005E;
-	Fri, 18 Oct 2024 09:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCFF18EFDC
+	for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 08:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729242233; cv=none; b=AoVQ1yzOWTipRd7SnW5lJ76y083+BP0+owOcUI3K17Duwp+wJy/VafYZTvrvxllQ2c0pMx/YB7BabPA8It3DWhvqPsfIJLxZARUQjrKTMJlbrjhtO5E+XnZ+niLLNb7ysPE215A3Ai4uvrqKeBZRSZ7woGKyItcQ0V0f5JG8jcY=
+	t=1729241263; cv=none; b=brpON13hxkk6JVa9go9R4HJ13tjvLKJ45cyybgEoQkhbpAy6hfpIXiW1NviciSIB62ggH4BAUkTb3yXmhtqsPfgzsvGqijgC+AUpt9oYjbRAj4PPgBMgzN4sDEbyzjrSy6Q2W3NL0VNMMV625sxRuuiFsASLMBeoL6RfwB7sBUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729242233; c=relaxed/simple;
-	bh=lGXZDdasYKEnFlv2mzNK2Z+xdDWSlyxeS0oofZeQIRw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VfkSAH+TNPo+3goKZpmQlL7mHqAWoBjJN2hTEybTm1wTJafXsu9+Ei7BxlcwRSXo6rzT9DSA4xkMbvZY6Jxd6QW+/KHwBG/aRrMoG19oRwC59T2wrcIwf6eQkzwoQsMspl4qnijxZvT/bSRLN7fHcEGKFm/yJx1izu/GeVSgJ3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ohz5l6zp; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49I5a5or013887;
-	Fri, 18 Oct 2024 09:03:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=PiSI6j
-	1MtOwTiFNJHvrYIgaf6ieP1ybkj9J8bqKVcCM=; b=ohz5l6zpljUxai3ZmHz2U5
-	nxWu2Y9iNQqNkjPDhujNOQrO7+Zt1cE/K/KI+S+xUPDBFaTz1m6egFbx9ArPkyI4
-	iXrxrdPpdNGqQ00dSPTRGp+YqFh0Lehm1QgyEqzcMIWEqYY2BJkChxtZz4BnzfrE
-	YX20K5WPNogmsWISKe0kdEU/BO/o7HLaDwEcX7OPwFPW85Sq3huaJrHm3X5B8jiG
-	0WXm4dtev108yvW3a0tf44NpGMFo1FFqUm+JKJdlhlx6eVhXAYZWWDfae5gga69m
-	EBtNqryCofrRNR+ntNF7tUDdPRPD/BAfBJ9ElUbN5WWYf58NeNopB/w+bgNG1Yug
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42bhnf904q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 09:03:46 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49I61TIY006338;
-	Fri, 18 Oct 2024 09:03:46 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 428651b527-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 09:03:46 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49I93gsk45416784
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 18 Oct 2024 09:03:42 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 715722004B;
-	Fri, 18 Oct 2024 09:03:42 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1130F20043;
-	Fri, 18 Oct 2024 09:03:42 +0000 (GMT)
-Received: from [9.171.57.243] (unknown [9.171.57.243])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 18 Oct 2024 09:03:41 +0000 (GMT)
-Message-ID: <33070d84-d261-4cec-8272-aef4757af353@linux.ibm.com>
-Date: Fri, 18 Oct 2024 11:03:41 +0200
+	s=arc-20240116; t=1729241263; c=relaxed/simple;
+	bh=plBfgMHQMuI+dLmqLkuBbIQUiwBm4swhKQlf4bzVhk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UVinEKnFsPRsxXpWAiVyiziYkPBv/Oa2ai7k9OP/F8VVhXyWR8aKVWMHIJWvBmTU4aPhFgVj8nVNw/QlPQjYjApwIOJqYrxi3g3UaStyKmcGHxbpVHakFA7G97VNzqu76dkEFuLcNAypBDFODijZ/kJBuj0dHZ2SZzqTtzeNVuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IAN4Z1j1; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729241261; x=1760777261;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=plBfgMHQMuI+dLmqLkuBbIQUiwBm4swhKQlf4bzVhk8=;
+  b=IAN4Z1j11zuqGU0ob44KkSJrpWlZdp8dPzk7f4GojtoxdraKOXBsHGc0
+   8jd/zut9CIbq+dg+VsyR8QXiU4LAcFTOa2x2j4aDwdgwZpfZ+ZU5yt2QX
+   owcY1JsXLSaIpZJaxF4noeAEjC5vv7e1poS0W0aLg43zuEaywEA5oFES8
+   qywXpOJyzA9mQSjxJgFiD88fgL572apOMRYeZ5i6qfZbKF7VJPUZyfPEV
+   LTxPB70I/cwJLcSTPfATR+Tf2+kRuui1gmb9eszPGG7dzU6i6+66ybLKJ
+   +/lSxmcXstzeDAVIdhhdy6V071YdcvSsRZjTwzGNVhholJ0M+aSKMoS1D
+   w==;
+X-CSE-ConnectionGUID: UpLIx/NGSTakxp+Mj717pA==
+X-CSE-MsgGUID: ljeE+uCgQzOGpmjHLPMymw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="39306045"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="39306045"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 01:47:40 -0700
+X-CSE-ConnectionGUID: 1X6bbWVLRPKGDBLVB3+qyQ==
+X-CSE-MsgGUID: 0qGpU8v8T3qusDQ6TdvBUg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
+   d="scan'208";a="102105838"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa002.fm.intel.com with ESMTP; 18 Oct 2024 01:47:35 -0700
+Date: Fri, 18 Oct 2024 17:03:51 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>,
+	Alireza Sanaee <alireza.sanaee@huawei.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [PATCH v3 6/7] i386/pc: Support cache topology in -machine for
+ PC machine
+Message-ID: <ZxIkdyJ2ysibi74R@intel.com>
+References: <20241012104429.1048908-1-zhao1.liu@intel.com>
+ <20241012104429.1048908-7-zhao1.liu@intel.com>
+ <ZxEs3DGGgCqGT5yK@redhat.com>
+ <ZxHcsPyqT6MLJ9hG@intel.com>
+ <ZxIVC-XQaMqOy6Fw@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/5] selftests: kvm: s390: Add uc_skey VM test case
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-References: <D4WF2493HS7M.QHC37L73T9L5@linux.ibm.com>
- <20241015141539.57638-1-schlameuss@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20241015141539.57638-1-schlameuss@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vjJf-AuTvSGVj3XZQtAI0KuaxeuRrG_e
-X-Proofpoint-ORIG-GUID: vjJf-AuTvSGVj3XZQtAI0KuaxeuRrG_e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=713
- malwarescore=0 bulkscore=0 adultscore=0 spamscore=0 phishscore=0
- clxscore=1011 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410180056
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZxIVC-XQaMqOy6Fw@redhat.com>
 
-On 10/15/24 4:15 PM, Christoph Schlameuss wrote:
-> Add a test case manipulating s390 storage keys from within the ucontrol
-> VM.
+On Fri, Oct 18, 2024 at 08:58:03AM +0100, Daniel P. Berrangé wrote:
+> Date: Fri, 18 Oct 2024 08:58:03 +0100
+> From: "Daniel P. Berrangé" <berrange@redhat.com>
+> Subject: Re: [PATCH v3 6/7] i386/pc: Support cache topology in -machine for
+>  PC machine
 > 
-> Storage key instruction (ISKE, SSKE and RRBE) intercepts and
-> Keyless-subset facility are disabled on first use, where the skeys are
-> setup by KVM in non ucontrol VMs.
+> On Fri, Oct 18, 2024 at 11:57:36AM +0800, Zhao Liu wrote:
+> > Hi Daniel,
+> > 
+> > > > +    ``smp-cache.0.cache=cachename,smp-cache.0.topology=topologylevel``
+> > > > +        Define cache properties for SMP system.
+> > > > +
+> > > > +        ``cache=cachename`` specifies the cache that the properties will be
+> > > > +        applied on. This field is the combination of cache level and cache
+> > > > +        type. It supports ``l1d`` (L1 data cache), ``l1i`` (L1 instruction
+> > > > +        cache), ``l2`` (L2 unified cache) and ``l3`` (L3 unified cache).
+> > > > +
+> > > > +        ``topology=topologylevel`` sets the cache topology level. It accepts
+> > > > +        CPU topology levels including ``thread``, ``core``, ``module``,
+> > > > +        ``cluster``, ``die``, ``socket``, ``book``, ``drawer`` and a special
+> > > > +        value ``default``. If ``default`` is set, then the cache topology will
+> > > > +        follow the architecture's default cache topology model. If another
+> > > > +        topology level is set, the cache will be shared at corresponding CPU
+> > > > +        topology level. For example, ``topology=core`` makes the cache shared
+> > > > +        by all threads within a core.
+> > > > +
+> > > > +        Example:
+> > > > +
+> > > > +        ::
+> > > > +
+> > > > +            -machine smp-cache.0.cache=l1d,smp-cache.0.topology=core,smp-cache.1.cache=l1i,smp-cache.1.topology=core
+> > > 
+> > > There are 4 cache types, l1d, l1i, l2, l3.
+> > > 
+> > > In this example you've only set properties for l1d, l1i caches.
+> > > 
+> > > What does this mean for l2 / l3 caches ?
+> > 
+> > Omitting "cache" will default to using the "default" level.
+> > 
+> > I think I should add the above description to the documentation.
+> > 
+> > > Are they reported as not existing, or are they to be reported at
+> > > some built-in default topology level.
+> > 
+> > It's the latter.
+> > 
+> > If a machine doesn't support l2/l3, then QEMU will also report the error
+> > like:
+> > 
+> > qemu-system-*: l2 cache topology not supported by this machine
 > 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> Ok, that's good.
+> 
+> > > If the latter, how does the user know what that built-in default is, 
+> > 
+> > Currently, the default cache model for x86 is L1 per core, L2 per core,
+> > and L3 per die. Similar to the topology levels, there is still no way to
+> > expose this to users. I can descript default cache model in doc.
+> > 
+> > But I feel like we're back to the situation we discussed earlier:
+> > "default" CPU topology support should be related to the CPU model, but
+> > in practice, QEMU supports it at the machine level. The cache topology
+> > depends on CPU topology support and can only continue to be added on top
+> > of the machine.
+> > 
+> > So do you think we can add topology and cache information in CpuModelInfo
+> > so that query-cpu-model-expansion can expose default CPU/cache topology
+> > information to users?
+> > 
+> > This way, users can customize CPU/cache topology in -smp and
+> > -machine smp-cache. Although the QMP command is targeted at the CPU model
+> > while our CLI is at the machine level, at least we can expose the
+> > information to users.
+> > 
+> > If you agree to expose the default topology/cache info in
+> > query-cpu-model-expansion, can I work on this in a separate series? :)
+> 
+> Yeah, lets worry about that another day.
+> 
+> It it sufficient to just encourage users to always specify
+> the full set of caches.
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+Thanks!
+
+> > > Can we explicitly disable a l2/l3 cache, or must it always exists ?
+> > 
+> > Now we can't disable it through -machine smp-cache (while x86 CPU support
+> > l3-cache=off), but as you mentioned, I can try using "invalid" to support
+> > this scenario, which would be more general. Similarly, if you agree, I
+> > can also add this support in a separate series.
+> 
+> If we decide to offer a way to disable caches, probably better to have
+> a name like 'disabled' for such a setting, and yes, we don't need todo
+> that now.
+
+Yes, "disabled" is better.
+
+Regards,
+Zhao
+
+ 
 
