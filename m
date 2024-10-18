@@ -1,325 +1,192 @@
-Return-Path: <kvm+bounces-29182-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29183-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEED09A470B
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 21:34:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C1949A4773
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 21:55:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C83811C21299
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 19:34:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DAE81C20B21
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 19:55:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1E8205ACE;
-	Fri, 18 Oct 2024 19:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B2B205E3B;
+	Fri, 18 Oct 2024 19:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=atishpatra.org header.i=@atishpatra.org header.b="thxLGaBH"
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="o5OkhPZT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F06205144
-	for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 19:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D67205AA9
+	for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 19:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729280057; cv=none; b=ixOp6zgoMwKLG5kM4+SGxDQH4uoHk15o3FWx3njHESkmKz5h12EqTBEc9HDiBccpMwmmtRT+NbZTi/txKGoxcvZtoY0DkCZSHDVLBsHc7Dk/XbaM13lg6en/nZfvcX6eE1T+g5xILNn2x4pDpH3kBxatW/4SpK0i1506Ch38tGk=
+	t=1729281329; cv=none; b=m+p9VfNTXZBeJvUmZNubUcho9gXRaBjUZzO4ApThRE9e8vaDzVnBdwW4ZJVZCnPxenBz1uUP3+gbY9CbAG/5qd0uWXGIqeF8PwfFgcWRoufGQZVFC6Yi8Ow3Uwjei1f74JhaO04WnvcAfvIpapeRohN0u/8+q5k0XAAjXqB8zFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729280057; c=relaxed/simple;
-	bh=54Z/Xu+GM77sjxtWU4gFHis9QE1ftBTxluVfk56kmZ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V/wW3RUSwCAuQXmWttHg7GYxxX2HtZR5kkk3mbHe3fWoBdAm+F08UrXeytioaAoYcpBguJd65TIpFcTAGUY+kTeqmg0VvVwLjvx61T6ABC1g1ghsKhBUU5d72Jhic/NJPobOmrfGPXlBaeStTdrKwPMmZjOWV7ZD6P/uCedmT70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atishpatra.org; spf=pass smtp.mailfrom=atishpatra.org; dkim=pass (1024-bit key) header.d=atishpatra.org header.i=@atishpatra.org header.b=thxLGaBH; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atishpatra.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atishpatra.org
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53a007743e7so3171025e87.1
-        for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 12:34:14 -0700 (PDT)
+	s=arc-20240116; t=1729281329; c=relaxed/simple;
+	bh=RmylGS6Qr0WvETJPAnY4axDK5fjypcsmHzFNSYzPXwI=;
+	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
+	 Content-Type; b=HdtGQXJ2cfNA5nHtmlNkK7BWds7gjonpdkNtmjO1SZ7rivV9SflZo5Hdz/G9yO3eLfJbGsu6fmA468png+/OCJQ1TT0nBe84RPDsDs6D+fwVTXqvZfHbKxZB4IK1uVqsy+mT5kPldHsoLlitskZT34tidY6GoD6fId8mJM2vtns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=o5OkhPZT; arc=none smtp.client-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-28854674160so1181221fac.2
+        for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 12:55:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atishpatra.org; s=google; t=1729280053; x=1729884853; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gykfHwEhvZn9OouPG+xeH4hENJCq3IryA0U1CzVeZMw=;
-        b=thxLGaBHS3BccBn1kERmZ3W7Ax3/6u3NIStw8j+fnJC6uSQLN6TqL5SErAa520KbS6
-         +iHsZU0py/KtARFit3xPH8rxeOFZyoGVJH1UaqQjRtHSSpxzfQf6BzpbSfoTqW+94XQI
-         OeBhQUEMCh2IR5ovr8iUTo9ePpUHN8hZiD4eU=
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1729281326; x=1729886126; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g7oEArfVPSnqpsijZaXynZDVD27FkpdWWYcqDGTZCjw=;
+        b=o5OkhPZTZVX9QIbbxwdcFBp9AstGQ2SXYC+eJMtL11/6HiRMNwEaYwQybKmRBKRJSi
+         zF7D4xwyHLasBXhJcpoc+wByEV/zxfmToOZONXtF8NxTynZcqlseWkMi400hkNYAdYce
+         9Wp0HFhz7xvQpKJZrH5ohUp6fnxmEOW5HfpHnAPwlnSpRmL/20vL4tdU6LB3RhfReWBL
+         Ls9ZcWX6ig2QIymlCB3lGhUkpC/Yq7mbmsa5cVtGWGTcTmDHqEq2EOnvIxVDCr+0H9eJ
+         F7cBRInIWzlwQli9cSvDNZywnVCIrS1r8OwHqnebgL8SWEWQsoVRySoJXMdADDU62d0O
+         NznQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729280053; x=1729884853;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gykfHwEhvZn9OouPG+xeH4hENJCq3IryA0U1CzVeZMw=;
-        b=ZHrJCUjKCbqNNGflOhm+aAM0uI6OGzjcDr6QV9tgVYzrnWi5slzZbsSrMyGaOEynkh
-         X98ca2768QvOLtZwP2SbrUCTPCBxrSBepocGnK7pYFSRt7Mqci9GLXtT5Hq8A1BcA2sb
-         cauvoJiYDq3cru6vSC6AJycmZ/gjTxd0/S2bT7p1jAiYfFWRtNUMwZJVhDqNZcAzpJUm
-         41aXQDYoX0ozmQOrp+t7/PGhagJZ3SK/Ew7E2xxuyhfpOquFvBS6BVF23/+grX0ZOky4
-         0lSDz4VPnQTHm9qYZGueKlh71eO81kxpam8MtBuGLjImUUjHAgDXiTKiTXNgzbK2pQ7t
-         e7zA==
-X-Forwarded-Encrypted: i=1; AJvYcCVsibxJ/Ws/i6AwjRj+xIn2uy/EhSF4HNGCzXcY1GVncHCGoewPm4Vtl4NTz2YfXXkiSK8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycEE5EE+uwbGsnFMhLdvqKF3ufVatzcs8pmM5mvjYrDBcH5pV2
-	04GCyElxZxlDk9gBiRtsTtTlm+MRDUOtfLO5hWLVSzJ47jNFAzMt2IgbXFeGc3KSoiGnflHBxch
-	2oRxND4UQTeSChS2mbWLBM8ISYStGF+rTkDjK
-X-Google-Smtp-Source: AGHT+IFemzNnwJ2CcScOOlMoI+DNU01cHF4Dq4xF5Q1M3NP3Ac9xEwqfjEJ8BnZEk27S3/xO4XqteeQkRFdqNfK6+94=
-X-Received: by 2002:a05:6512:128f:b0:539:f1ce:5fa8 with SMTP id
- 2adb3069b0e04-53a1550b9e6mr2524845e87.49.1729280053088; Fri, 18 Oct 2024
- 12:34:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729281326; x=1729886126;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g7oEArfVPSnqpsijZaXynZDVD27FkpdWWYcqDGTZCjw=;
+        b=atu1vARrlnJ1dhNZuDfTYp1rmZROnCDDUnLWK0wh1eo9Zu1DsXGFJ92JIWmz+JR53W
+         o25bLMMglQO/l5VpKplDuh5G7vHuDbt1KUYGK1izJLttSQStqUw7ZpLzcSzs47hexwYl
+         ByrHi9y6Ka5xfPdx+sPddGZZRM3FxnZuE++JA8gKUd6qXASgh5dBkd7m8x7YHu+7QRZE
+         NGfAtLSOIx8n6wwpqrVslWMUF10NVBoknskzloAWuqMRiYkyDXEHLSHDdZaehQ5kW4xH
+         xei8MDpbQdj8V7EJ//PKsXBLu65PPD1TPcgU7F7rBfbT6ai43AgUMgUuMr6Gd14wHVTs
+         16pg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZAgWt/76qE+Fa8aBirsId+pezC1BDFj3S3KZghf7NEnUdBFM202zJTaCCfRK/pA6sCQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ/XQli7UictYOuAE9S3f2cjXp6JJgvEJ3DUIX0RPKm/Tvm6uh
+	SjzrXIlG1l91qRdqfAspZqXRkTw5qs2PgLnZUNqFbTxR/AF99uTH28ziVd+bxzU=
+X-Google-Smtp-Source: AGHT+IGY1tzB8tvAIhD1Nhz0GdPFPRb4Y+29JKXvh/Pt6G+JZiqk0pPm8ialvF1A0Tuv6DdzKtllhw==
+X-Received: by 2002:a05:6870:82a0:b0:277:d360:8971 with SMTP id 586e51a60fabf-2892c549c2amr3875076fac.43.1729281325632;
+        Fri, 18 Oct 2024 12:55:25 -0700 (PDT)
+Received: from localhost ([50.145.13.30])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7eacc226816sm1742765a12.24.2024.10.18.12.55.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Oct 2024 12:55:25 -0700 (PDT)
+Date: Fri, 18 Oct 2024 12:55:25 -0700 (PDT)
+X-Google-Original-Date: Fri, 18 Oct 2024 12:55:21 PDT (-0700)
+Subject:     Re: [PATCH v5 1/2] riscv: perf: add guest vs host distinction
+In-Reply-To: <a67d527dc1b11493fe11f7f53584772fdd983744.1728980031.git.zhouquan@iscas.ac.cn>
+CC: anup@brainfault.org, ajones@ventanamicro.com, atishp@atishpatra.org,
+  Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu, Mark Rutland <mark.rutland@arm.com>,
+  alexander.shishkin@linux.intel.com, jolsa@kernel.org, linux-kernel@vger.kernel.org,
+  linux-riscv@lists.infradead.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+  linux-perf-users@vger.kernel.org, zhouquan@iscas.ac.cn
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: zhouquan@iscas.ac.cn, Marc Zyngier <maz@kernel.org>
+Message-ID: <mhng-c9ba919e-b4a4-4bb9-bdba-f4d3295a930b@palmer-ri-x1c9a>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240719160913.342027-1-apatel@ventanamicro.com> <20240719160913.342027-11-apatel@ventanamicro.com>
-In-Reply-To: <20240719160913.342027-11-apatel@ventanamicro.com>
-From: Atish Patra <atishp@atishpatra.org>
-Date: Fri, 18 Oct 2024 12:34:01 -0700
-Message-ID: <CAOnJCUK7Bbq=X4e-z1SbVLOA_DLB+QrA7VO3dAMgdDOzEAK0jw@mail.gmail.com>
-Subject: Re: [PATCH 10/13] RISC-V: KVM: Use nacl_csr_xyz() for accessing AIA CSRs
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 19, 2024 at 9:10=E2=80=AFAM Anup Patel <apatel@ventanamicro.com=
-> wrote:
+On Tue, 15 Oct 2024 01:42:50 PDT (-0700), zhouquan@iscas.ac.cn wrote:
+> From: Quan Zhou <zhouquan@iscas.ac.cn>
 >
-> When running under some other hypervisor, prefer nacl_csr_xyz()
-> for accessing AIA CSRs in the run-loop. This makes CSR access
-> faster whenever SBI nested acceleration is available.
+> Introduce basic guest support in perf, enabling it to distinguish
+> between PMU interrupts in the host or guest, and collect
+> fundamental information.
 >
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
 > ---
->  arch/riscv/kvm/aia.c | 97 ++++++++++++++++++++++++++++----------------
->  1 file changed, 63 insertions(+), 34 deletions(-)
+>  arch/riscv/include/asm/perf_event.h |  6 +++++
+>  arch/riscv/kernel/perf_callchain.c  | 38 +++++++++++++++++++++++++++++
+>  2 files changed, 44 insertions(+)
 >
-> diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
-> index 8ffae0330c89..dcced4db7fe8 100644
-> --- a/arch/riscv/kvm/aia.c
-> +++ b/arch/riscv/kvm/aia.c
-> @@ -16,6 +16,7 @@
->  #include <linux/percpu.h>
->  #include <linux/spinlock.h>
->  #include <asm/cpufeature.h>
-> +#include <asm/kvm_nacl.h>
+> diff --git a/arch/riscv/include/asm/perf_event.h b/arch/riscv/include/asm/perf_event.h
+> index 665bbc9b2f84..38926b4a902d 100644
+> --- a/arch/riscv/include/asm/perf_event.h
+> +++ b/arch/riscv/include/asm/perf_event.h
+> @@ -8,7 +8,11 @@
+>  #ifndef _ASM_RISCV_PERF_EVENT_H
+>  #define _ASM_RISCV_PERF_EVENT_H
 >
->  struct aia_hgei_control {
->         raw_spinlock_t lock;
-> @@ -88,7 +89,7 @@ void kvm_riscv_vcpu_aia_sync_interrupts(struct kvm_vcpu=
- *vcpu)
->         struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
-r;
+> +#ifdef CONFIG_PERF_EVENTS
+>  #include <linux/perf_event.h>
+> +extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+> +extern unsigned long perf_misc_flags(struct pt_regs *regs);
+> +#define perf_misc_flags(regs) perf_misc_flags(regs)
+>  #define perf_arch_bpf_user_pt_regs(regs) (struct user_regs_struct *)regs
 >
->         if (kvm_riscv_aia_available())
-> -               csr->vsieh =3D csr_read(CSR_VSIEH);
-> +               csr->vsieh =3D ncsr_read(CSR_VSIEH);
+>  #define perf_arch_fetch_caller_regs(regs, __ip) { \
+> @@ -17,4 +21,6 @@
+>  	(regs)->sp = current_stack_pointer; \
+>  	(regs)->status = SR_PP; \
 >  }
->  #endif
->
-> @@ -115,7 +116,7 @@ bool kvm_riscv_vcpu_aia_has_interrupts(struct kvm_vcp=
-u *vcpu, u64 mask)
->
->         hgei =3D aia_find_hgei(vcpu);
->         if (hgei > 0)
-> -               return !!(csr_read(CSR_HGEIP) & BIT(hgei));
-> +               return !!(ncsr_read(CSR_HGEIP) & BIT(hgei));
->
->         return false;
->  }
-> @@ -128,45 +129,73 @@ void kvm_riscv_vcpu_aia_update_hvip(struct kvm_vcpu=
- *vcpu)
->                 return;
->
->  #ifdef CONFIG_32BIT
-> -       csr_write(CSR_HVIPH, vcpu->arch.aia_context.guest_csr.hviph);
-> +       ncsr_write(CSR_HVIPH, vcpu->arch.aia_context.guest_csr.hviph);
->  #endif
-> -       csr_write(CSR_HVICTL, aia_hvictl_value(!!(csr->hvip & BIT(IRQ_VS_=
-EXT))));
-> +       ncsr_write(CSR_HVICTL, aia_hvictl_value(!!(csr->hvip & BIT(IRQ_VS=
-_EXT))));
->  }
->
->  void kvm_riscv_vcpu_aia_load(struct kvm_vcpu *vcpu, int cpu)
->  {
->         struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
-r;
-> +       void *nsh;
->
->         if (!kvm_riscv_aia_available())
->                 return;
->
-> -       csr_write(CSR_VSISELECT, csr->vsiselect);
-> -       csr_write(CSR_HVIPRIO1, csr->hviprio1);
-> -       csr_write(CSR_HVIPRIO2, csr->hviprio2);
-> +       if (kvm_riscv_nacl_sync_csr_available()) {
-> +               nsh =3D nacl_shmem();
-> +               nacl_csr_write(nsh, CSR_VSISELECT, csr->vsiselect);
-> +               nacl_csr_write(nsh, CSR_HVIPRIO1, csr->hviprio1);
-> +               nacl_csr_write(nsh, CSR_HVIPRIO2, csr->hviprio2);
-> +#ifdef CONFIG_32BIT
-> +               nacl_csr_write(nsh, CSR_VSIEH, csr->vsieh);
-> +               nacl_csr_write(nsh, CSR_HVIPH, csr->hviph);
-> +               nacl_csr_write(nsh, CSR_HVIPRIO1H, csr->hviprio1h);
-> +               nacl_csr_write(nsh, CSR_HVIPRIO2H, csr->hviprio2h);
 > +#endif
-> +       } else {
-> +               csr_write(CSR_VSISELECT, csr->vsiselect);
-> +               csr_write(CSR_HVIPRIO1, csr->hviprio1);
-> +               csr_write(CSR_HVIPRIO2, csr->hviprio2);
->  #ifdef CONFIG_32BIT
-> -       csr_write(CSR_VSIEH, csr->vsieh);
-> -       csr_write(CSR_HVIPH, csr->hviph);
-> -       csr_write(CSR_HVIPRIO1H, csr->hviprio1h);
-> -       csr_write(CSR_HVIPRIO2H, csr->hviprio2h);
-> +               csr_write(CSR_VSIEH, csr->vsieh);
-> +               csr_write(CSR_HVIPH, csr->hviph);
-> +               csr_write(CSR_HVIPRIO1H, csr->hviprio1h);
-> +               csr_write(CSR_HVIPRIO2H, csr->hviprio2h);
->  #endif
-> +       }
->  }
->
->  void kvm_riscv_vcpu_aia_put(struct kvm_vcpu *vcpu)
+> +
+>  #endif /* _ASM_RISCV_PERF_EVENT_H */
+> diff --git a/arch/riscv/kernel/perf_callchain.c b/arch/riscv/kernel/perf_callchain.c
+> index c7468af77c66..c2c81a80f816 100644
+> --- a/arch/riscv/kernel/perf_callchain.c
+> +++ b/arch/riscv/kernel/perf_callchain.c
+> @@ -28,11 +28,49 @@ static bool fill_callchain(void *entry, unsigned long pc)
+>  void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
+>  			 struct pt_regs *regs)
 >  {
->         struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
-r;
-> +       void *nsh;
->
->         if (!kvm_riscv_aia_available())
->                 return;
->
-> -       csr->vsiselect =3D csr_read(CSR_VSISELECT);
-> -       csr->hviprio1 =3D csr_read(CSR_HVIPRIO1);
-> -       csr->hviprio2 =3D csr_read(CSR_HVIPRIO2);
-> +       if (kvm_riscv_nacl_available()) {
-> +               nsh =3D nacl_shmem();
-> +               csr->vsiselect =3D nacl_csr_read(nsh, CSR_VSISELECT);
-> +               csr->hviprio1 =3D nacl_csr_read(nsh, CSR_HVIPRIO1);
-> +               csr->hviprio2 =3D nacl_csr_read(nsh, CSR_HVIPRIO2);
->  #ifdef CONFIG_32BIT
-> -       csr->vsieh =3D csr_read(CSR_VSIEH);
-> -       csr->hviph =3D csr_read(CSR_HVIPH);
-> -       csr->hviprio1h =3D csr_read(CSR_HVIPRIO1H);
-> -       csr->hviprio2h =3D csr_read(CSR_HVIPRIO2H);
-> +               csr->vsieh =3D nacl_csr_read(nsh, CSR_VSIEH);
-> +               csr->hviph =3D nacl_csr_read(nsh, CSR_HVIPH);
-> +               csr->hviprio1h =3D nacl_csr_read(nsh, CSR_HVIPRIO1H);
-> +               csr->hviprio2h =3D nacl_csr_read(nsh, CSR_HVIPRIO2H);
->  #endif
-> +       } else {
-> +               csr->vsiselect =3D csr_read(CSR_VSISELECT);
-> +               csr->hviprio1 =3D csr_read(CSR_HVIPRIO1);
-> +               csr->hviprio2 =3D csr_read(CSR_HVIPRIO2);
-> +#ifdef CONFIG_32BIT
-> +               csr->vsieh =3D csr_read(CSR_VSIEH);
-> +               csr->hviph =3D csr_read(CSR_HVIPH);
-> +               csr->hviprio1h =3D csr_read(CSR_HVIPRIO1H);
-> +               csr->hviprio2h =3D csr_read(CSR_HVIPRIO2H);
-> +#endif
-> +       }
+> +	if (perf_guest_state()) {
+> +		/* TODO: We don't support guest os callchain now */
+> +		return;
+
+That seems kind of weird, but it looks like almost exactly the same 
+thing Marc did in 75e424620a4f ("arm64: perf: add guest vs host 
+discrimination").  I think it's safe, as we'll basically just silently 
+display no backtrace and we can always just fail to backtrace.
+
+That said: I don't understand why we can't backtrace inside a guest?  If 
+we can get the registers and memory it seems like we should be able to.  
+Maybe I'm missing something?
+
+> +	}
+> +
+>  	arch_stack_walk_user(fill_callchain, entry, regs);
 >  }
 >
->  int kvm_riscv_vcpu_aia_get_csr(struct kvm_vcpu *vcpu,
-> @@ -250,20 +279,20 @@ static u8 aia_get_iprio8(struct kvm_vcpu *vcpu, uns=
-igned int irq)
->
->         switch (bitpos / BITS_PER_LONG) {
->         case 0:
-> -               hviprio =3D csr_read(CSR_HVIPRIO1);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO1);
->                 break;
->         case 1:
->  #ifndef CONFIG_32BIT
-> -               hviprio =3D csr_read(CSR_HVIPRIO2);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO2);
->                 break;
->  #else
-> -               hviprio =3D csr_read(CSR_HVIPRIO1H);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO1H);
->                 break;
->         case 2:
-> -               hviprio =3D csr_read(CSR_HVIPRIO2);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO2);
->                 break;
->         case 3:
-> -               hviprio =3D csr_read(CSR_HVIPRIO2H);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO2H);
->                 break;
->  #endif
->         default:
-> @@ -283,20 +312,20 @@ static void aia_set_iprio8(struct kvm_vcpu *vcpu, u=
-nsigned int irq, u8 prio)
->
->         switch (bitpos / BITS_PER_LONG) {
->         case 0:
-> -               hviprio =3D csr_read(CSR_HVIPRIO1);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO1);
->                 break;
->         case 1:
->  #ifndef CONFIG_32BIT
-> -               hviprio =3D csr_read(CSR_HVIPRIO2);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO2);
->                 break;
->  #else
-> -               hviprio =3D csr_read(CSR_HVIPRIO1H);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO1H);
->                 break;
->         case 2:
-> -               hviprio =3D csr_read(CSR_HVIPRIO2);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO2);
->                 break;
->         case 3:
-> -               hviprio =3D csr_read(CSR_HVIPRIO2H);
-> +               hviprio =3D ncsr_read(CSR_HVIPRIO2H);
->                 break;
->  #endif
->         default:
-> @@ -308,20 +337,20 @@ static void aia_set_iprio8(struct kvm_vcpu *vcpu, u=
-nsigned int irq, u8 prio)
->
->         switch (bitpos / BITS_PER_LONG) {
->         case 0:
-> -               csr_write(CSR_HVIPRIO1, hviprio);
-> +               ncsr_write(CSR_HVIPRIO1, hviprio);
->                 break;
->         case 1:
->  #ifndef CONFIG_32BIT
-> -               csr_write(CSR_HVIPRIO2, hviprio);
-> +               ncsr_write(CSR_HVIPRIO2, hviprio);
->                 break;
->  #else
-> -               csr_write(CSR_HVIPRIO1H, hviprio);
-> +               ncsr_write(CSR_HVIPRIO1H, hviprio);
->                 break;
->         case 2:
-> -               csr_write(CSR_HVIPRIO2, hviprio);
-> +               ncsr_write(CSR_HVIPRIO2, hviprio);
->                 break;
->         case 3:
-> -               csr_write(CSR_HVIPRIO2H, hviprio);
-> +               ncsr_write(CSR_HVIPRIO2H, hviprio);
->                 break;
->  #endif
->         default:
-> @@ -377,7 +406,7 @@ int kvm_riscv_vcpu_aia_rmw_ireg(struct kvm_vcpu *vcpu=
-, unsigned int csr_num,
->                 return KVM_INSN_ILLEGAL_TRAP;
->
->         /* First try to emulate in kernel space */
-> -       isel =3D csr_read(CSR_VSISELECT) & ISELECT_MASK;
-> +       isel =3D ncsr_read(CSR_VSISELECT) & ISELECT_MASK;
->         if (isel >=3D ISELECT_IPRIO0 && isel <=3D ISELECT_IPRIO15)
->                 return aia_rmw_iprio(vcpu, isel, val, new_val, wr_mask);
->         else if (isel >=3D IMSIC_FIRST && isel <=3D IMSIC_LAST &&
-> --
-> 2.34.1
->
-
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
-
---=20
-Regards,
-Atish
+>  void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
+>  			   struct pt_regs *regs)
+>  {
+> +	if (perf_guest_state()) {
+> +		/* TODO: We don't support guest os callchain now */
+> +		return;
+> +	}
+> +
+>  	walk_stackframe(NULL, regs, fill_callchain, entry);
+>  }
+> +
+> +unsigned long perf_instruction_pointer(struct pt_regs *regs)
+> +{
+> +	if (perf_guest_state())
+> +		return perf_guest_get_ip();
+> +
+> +	return instruction_pointer(regs);
+> +}
+> +
+> +unsigned long perf_misc_flags(struct pt_regs *regs)
+> +{
+> +	unsigned int guest_state = perf_guest_state();
+> +	unsigned long misc = 0;
+> +
+> +	if (guest_state) {
+> +		if (guest_state & PERF_GUEST_USER)
+> +			misc |= PERF_RECORD_MISC_GUEST_USER;
+> +		else
+> +			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
+> +	} else {
+> +		if (user_mode(regs))
+> +			misc |= PERF_RECORD_MISC_USER;
+> +		else
+> +			misc |= PERF_RECORD_MISC_KERNEL;
+> +	}
+> +
+> +	return misc;
+> +}
 
