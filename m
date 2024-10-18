@@ -1,250 +1,176 @@
-Return-Path: <kvm+bounces-29149-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF6109A37B9
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 09:55:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC7F9A37BF
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 09:56:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D4761C259A1
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 07:55:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E6741C2597B
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 07:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E1318CC15;
-	Fri, 18 Oct 2024 07:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF50D18C34C;
+	Fri, 18 Oct 2024 07:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="bacZkfUE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bZ8f1Rbi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJTommeU"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC1A18CBE6;
-	Fri, 18 Oct 2024 07:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F26B18C031
+	for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 07:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729238076; cv=none; b=XQ9VNbdv5nkFpJTLVz5h39iHX203hsc1gzXo7zO/+5E7/xjiQe+oWfoj/LnFce3lJYTCJl9TcfzxFUfmTjFxnX+YuiP3d+TpXTGhn44SqWCYNpBuB+iyZYsXkdWHFDnkN8NDroQTzsHkjMhgAOzsUs9LHKLVAc+KRgkihItvfOU=
+	t=1729238154; cv=none; b=QsdZLQITQkIgb5y1wiVWLpvjPCqxM8hxWp+P6SKp68IxbGf6cnKo3ieHGiq22E8yViBUSHkCRaNOOzhq/7GVB066WbI6ZmEOFjI/SPxYvcIWOv7fQM0mz8cjUvqBSyz2w3tAC5F3yYtsgtazndp7pV3/ozFIwaZlhfXEUcOkVQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729238076; c=relaxed/simple;
-	bh=X8haYsb381neW+dETbhktpqU3lK2inRGLWQPz8R0D4E=;
+	s=arc-20240116; t=1729238154; c=relaxed/simple;
+	bh=8asUYfjnaUsiA5EFMOoRsQABRXkZFCtTM4jh2+oP37Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gDghC8YwKO/34H3aSLkBY9ZDNEHyQ6vVQRcvsr4B8SuQjL+dwePsvjLogs1udhFjRsUGZ+SfZ+xJqYnBlxp88DqDRNsbMMPYOyCWz8hYLKDYQNOKRzp16s1GZ4Ir2x7covHuODOGT6FMMvLzt1l2NT/yPDsi4WHyiUjI//JZbn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=bacZkfUE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bZ8f1Rbi; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 008361140215;
-	Fri, 18 Oct 2024 03:54:33 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-07.internal (MEProxy); Fri, 18 Oct 2024 03:54:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1729238072; x=
-	1729324472; bh=u3sl/1PSnM1FXF1JtFpDhiIVcuz0H5aAevpo8M62y+o=; b=b
-	acZkfUESHOkaEH95Kb7E0jPX2oI01YdsE9t0+ZzxzzVcRhdx15ViFRaDh2qBxx8I
-	fTMTdvOAK/b1x71ljVoR24R+xvMy0TBgZAtgsfznZ5tmm5OqElFGPRbndfW6rsGm
-	WBjw0yVlzcVMwfb2rHd7ai1sq23lzqcUH5ENur+E+XMetcWL3cqsJh+ya/knSGNW
-	duDpOd5N6ctIKQzBrzCZWs9X1hAVATPCHeV2m2DJwXPUjdzsNzwSHivUwy1TQzuN
-	OUXkDAEx844sgphrJpr9+SsbIbLgvYkCbifpLeV4EU/yfrEKjDsiTyqQjobVcfyd
-	FEe7TC9330pP3leiz4cuA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1729238072; x=1729324472; bh=u3sl/1PSnM1FXF1JtFpDhiIVcuz0
-	H5aAevpo8M62y+o=; b=bZ8f1Rbi5jkgG6AyOWA7eO6wMvuteXAArTJBMC/G1nLf
-	shHMG7U4mqcFnRwjMcNbC8AlYty1CfsNxOcVReYy08nqXMVi+d20puL6f9wFdQ6r
-	NbqMqIS6okHeiv/+6kNIBoUpdOUHkHiWyfY1GEpQP5JJ2MvxiUesExLueuydaWTH
-	avn2Mw4FsDK1g8pQT9SlsmIWr+uBg8HXPSKZH7iEWMlsByYRgcOjIq/fCcaeUijA
-	DISWjDKHbRjRNSkzCSIjzfeIVmJjnYQ9WtIHj7+LRYR6jx3MbIkKjBgSFTWIDQUq
-	1GPV41XvzuqaBAlW18DExHHQe7OynT/l2SN90lygiA==
-X-ME-Sender: <xms:OBQSZ1ICxP0tAZFaRJoIgnxiMqYhTGlya_unY5NXPQV-9zDbzAKq-w>
-    <xme:OBQSZxLFGK4Yl9-t_N4Owgjy8LDjCYtYp1skZJiNLKvJUMCXvElCc9l7YL90q8C-s
-    B4e6bKvFw8kaRjr__I>
-X-ME-Received: <xmr:OBQSZ9tskqFEwAPXB2spEnV-a15HKRb3SHKi2N5QECsiU5_mqNgkGdN64KVmifJ82xeDkQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdehvddguddvgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddttddv
-    necuhfhrohhmpedfmfhirhhilhhlucetrdcuufhhuhhtvghmohhvfdcuoehkihhrihhllh
-    esshhhuhhtvghmohhvrdhnrghmvgeqnecuggftrfgrthhtvghrnhepleetudegtdfghedu
-    udfhteelieeuvddtheeijeejudefjeefgeettedutdeggfdunecuffhomhgrihhnpehkvg
-    hrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhl
-    fhhrohhmpehkihhrihhllhesshhhuhhtvghmohhvrdhnrghmvgdpnhgspghrtghpthhtoh
-    epudekpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehnvggvrhgrjhdruhhprggu
-    hhihrgihsegrmhgurdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvgh
-    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhglhigsehlihhnuhhtrhhonhhi
-    gidruggvpdhrtghpthhtohepmhhinhhgohesrhgvughhrghtrdgtohhmpdhrtghpthhtoh
-    epuggrvhgvrdhhrghnshgvnheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthho
-    pehthhhomhgrshdrlhgvnhgurggtkhihsegrmhgurdgtohhmpdhrtghpthhtohepnhhikh
-    hunhhjsegrmhgurdgtohhmpdhrtghpthhtohepshgrnhhtohhshhdrshhhuhhklhgrsegr
-    mhgurdgtohhmpdhrtghpthhtohepvhgrshgrnhhtrdhhvghguggvsegrmhgurdgtohhm
-X-ME-Proxy: <xmx:OBQSZ2aH7OElaZOw_Lsf04fZZWI4icLv32MEBcDf3x6YCII9hwO8-Q>
-    <xmx:OBQSZ8YOpzXCyIibgQi02yGr9IpJol_i55ENYACo6x7gA9kCotlWqg>
-    <xmx:OBQSZ6DK1cK53_dVxciIjYwRpdWCeejle6sBS-jrNjstHGdWKrZgVg>
-    <xmx:OBQSZ6aXMAf3pWLKIWih1sFHTcKSHu5Fo3bPUC7UpVVyxAGj5EuTig>
-    <xmx:OBQSZ5SO6YCoLqpWYY5n9EJqv1_FivC85uvxF6FhtxjOnDHJmdlhkWoo>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 18 Oct 2024 03:54:26 -0400 (EDT)
-Date: Fri, 18 Oct 2024 10:54:21 +0300
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
-	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com, 
-	Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, bp@alien8.de, 
-	David.Kaplan@amd.com, x86@kernel.org, hpa@zytor.com, peterz@infradead.org, 
-	seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Subject: Re: [RFC 00/14] AMD: Add Secure AVIC Guest Support
-Message-ID: <ramttkbttoyswpl7fkz25jwsxs4iuoqdogfllp57ltigmgb3vd@txz4azom56ej>
-References: <20240913113705.419146-1-Neeraj.Upadhyay@amd.com>
- <vo2oavwp2p4gbenistkq2demqtorisv24zjq2jgotuw6i5i7oy@uq5k2wcg3j5z>
- <378fb9dd-dfb9-48aa-9304-18367a60af58@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=D8kwyRZvzhm/T6fIIAqniEjDiwDPEBdJagCvmi500NJKnj0Ikb3T9vqu/mEt1wjxeLaBhoqMptGP/YLH/1iVPsAVTEPryNtA1ksjmd+6IyjS4dsaPsw+CDoNpuZOv1lPd+s0DGlPuawoBo+0hcDpq7CwSkxri0YxkJmBoOsLNuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YJTommeU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729238151;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=gNyzRNiHs0oc+XzfsXtXom6AwYaOyQqog0N49F4HPNQ=;
+	b=YJTommeUu/j4QcKxnHGi5XI6x0mFGYVvcIyguOvdeFsR+jAIBLNVPAIFSuaCfF38N3ChHV
+	XnSd8eEtv6leNFSCuj6UwaD420e/dH9QLVyQ552Gzv7fRqGOn5Kcanu3WOsFGwqfj4/yWk
+	VCYhn6l+ahyvGJOwvo2CjK3JaSlEjDU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-316-Sj6d6TAHOwuj_38ez3pBHw-1; Fri,
+ 18 Oct 2024 03:55:49 -0400
+X-MC-Unique: Sj6d6TAHOwuj_38ez3pBHw-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BC94E19560B8;
+	Fri, 18 Oct 2024 07:55:45 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.61])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BBA3A19560AD;
+	Fri, 18 Oct 2024 07:55:38 +0000 (UTC)
+Date: Fri, 18 Oct 2024 08:55:35 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>,
+	Alireza Sanaee <alireza.sanaee@huawei.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
+Subject: Re: [PATCH v3 1/7] hw/core: Make CPU topology enumeration
+ arch-agnostic
+Message-ID: <ZxIUd9tMi9o1UVOS@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20241012104429.1048908-1-zhao1.liu@intel.com>
+ <20241012104429.1048908-2-zhao1.liu@intel.com>
+ <ZxEte1KBwWuCdkb1@redhat.com>
+ <ZxHJri+rgdGKf/0L@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <378fb9dd-dfb9-48aa-9304-18367a60af58@amd.com>
+In-Reply-To: <ZxHJri+rgdGKf/0L@intel.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Fri, Oct 18, 2024 at 08:03:20AM +0530, Neeraj Upadhyay wrote:
-> Hi Kirill,
+On Fri, Oct 18, 2024 at 10:36:30AM +0800, Zhao Liu wrote:
+> Hi Daniel,
 > 
-> On 10/17/2024 1:53 PM, Kirill A. Shutemov wrote:
-> > On Fri, Sep 13, 2024 at 05:06:51PM +0530, Neeraj Upadhyay wrote:
-> >> Introduction
-> >> ------------
-> >>
-> >> Secure AVIC is a new hardware feature in the AMD64 architecture to
-> >> allow SEV-SNP guests to prevent hypervisor from generating unexpected
-> >> interrupts to a vCPU or otherwise violate architectural assumptions
-> >> around APIC behavior.
-> >>
-> >> One of the significant differences from AVIC or emulated x2APIC is that
-> >> Secure AVIC uses a guest-owned and managed APIC backing page. It also
-> >> introduces additional fields in both the VMCB and the Secure AVIC backing
-> >> page to aid the guest in limiting which interrupt vectors can be injected
-> >> into the guest.
-> >>
-> >> Guest APIC Backing Page
-> >> -----------------------
-> >> Each vCPU has a guest-allocated APIC backing page of size 4K, which
-> >> maintains APIC state for that vCPU. The x2APIC MSRs are mapped at
-> >> their corresposing x2APIC MMIO offset within the guest APIC backing
-> >> page. All x2APIC accesses by guest or Secure AVIC hardware operate
-> >> on this backing page. The backing page should be pinned and NPT entry
-> >> for it should be always mapped while the corresponding vCPU is running.
-> >>
-> >>
-> >> MSR Accesses
-> >> ------------
-> >> Secure AVIC only supports x2APIC MSR accesses. xAPIC MMIO offset based
-> >> accesses are not supported.
-> >>
-> >> Some of the MSR accesses such as ICR writes (with shorthand equal to
-> >> self), SELF_IPI, EOI, TPR writes are accelerated by Secure AVIC
-> >> hardware. Other MSR accesses generate a #VC exception. The #VC
-> >> exception handler reads/writes to the guest APIC backing page.
-> >> As guest APIC backing page is accessible to the guest, the Secure
-> >> AVIC driver code optimizes APIC register access by directly
-> >> reading/writing to the guest APIC backing page (instead of taking
-> >> the #VC exception route).
-> >>
-> >> In addition to the architected MSRs, following new fields are added to
-> >> the guest APIC backing page which can be modified directly by the
-> >> guest:
-> >>
-> >> a. ALLOWED_IRR
-> >>
-> >> ALLOWED_IRR vector indicates the interrupt vectors which the guest
-> >> allows the hypervisor to send. The combination of host-controlled
-> >> REQUESTED_IRR vectors (part of VMCB) and ALLOWED_IRR is used by
-> >> hardware to update the IRR vectors of the Guest APIC backing page.
-> >>
-> >> #Offset        #bits        Description
-> >> 204h           31:0         Guest allowed vectors 0-31
-> >> 214h           31:0         Guest allowed vectors 32-63
-> >> ...
-> >> 274h           31:0         Guest allowed vectors 224-255
-> >>
-> >> ALLOWED_IRR is meant to be used specifically for vectors that the
-> >> hypervisor is allowed to inject, such as device interrupts.  Interrupt
-> >> vectors used exclusively by the guest itself (like IPI vectors) should
-> >> not be allowed to be injected into the guest for security reasons.
-> >>
-> >> b. NMI Request
-> >>  
-> >> #Offset        #bits        Description
-> >> 278h           0            Set by Guest to request Virtual NMI
-> >>
-> >>
-> >> LAPIC Timer Support
-> >> -------------------
-> >> LAPIC timer is emulated by hypervisor. So, APIC_LVTT, APIC_TMICT and
-> >> APIC_TDCR, APIC_TMCCT APIC registers are not read/written to the guest
-> >> APIC backing page and are communicated to the hypervisor using SVM_EXIT_MSR
-> >> VMGEXIT. 
-> >>
-> >> IPI Support
-> >> -----------
-> >> Only SELF_IPI is accelerated by Secure AVIC hardware. Other IPIs require
-> >> writing (from the Secure AVIC driver) to the IRR vector of the target CPU
-> >> backing page and then issuing VMGEXIT for the hypervisor to notify the
-> >> target vCPU.
-> >>
-> >> Driver Implementation Open Points
-> >> ---------------------------------
-> >>
-> >> The Secure AVIC driver only supports physical destination mode. If
-> >> logical destination mode need to be supported, then a separate x2apic
-> >> driver would be required for supporting logical destination mode.
-> >>
-> >> Setting of ALLOWED_IRR vectors is done from vector.c for IOAPIC and MSI
-> >> interrupts. ALLOWED_IRR vector is not cleared when an interrupt vector
-> >> migrates to different CPU. Using a cleaner approach to manage and
-> >> configure allowed vectors needs more work.
-> >>
-> >>
-> >> Testing
-> >> -------
-> >>
-> >> This series is based on top of commit 196145c606d0 "Merge
-> >> tag 'clk-fixes-for-linus' of
-> >> git://git.kernel.org/pub/scm/linux/kernel/git/clk/linux."
-> >>
-> >> Host Secure AVIC support patch series is at [1].
-> >>
-> >> Following tests are done:
-> >>
-> >> 1) Boot to Prompt using initramfs and ubuntu fs.
-> >> 2) Verified timer and IPI as part of the guest bootup.
-> >> 3) Verified long run SCF TORTURE IPI test.
-> >> 4) Verified FIO test with NVME passthrough.
+> > > -/*
+> > > - * CPUTopoLevel is the general i386 topology hierarchical representation,
+> > > - * ordered by increasing hierarchical relationship.
+> > > - * Its enumeration value is not bound to the type value of Intel (CPUID[0x1F])
+> > > - * or AMD (CPUID[0x80000026]).
+> > > - */
+> > > -enum CPUTopoLevel {
+> > > -    CPU_TOPO_LEVEL_INVALID,
+> > > -    CPU_TOPO_LEVEL_SMT,
+> > > -    CPU_TOPO_LEVEL_CORE,
+> > > -    CPU_TOPO_LEVEL_MODULE,
+> > > -    CPU_TOPO_LEVEL_DIE,
+> > > -    CPU_TOPO_LEVEL_PACKAGE,
+> > > -    CPU_TOPO_LEVEL_MAX,
+> > > -};
+> > > -
 > > 
-> > One case that is missing is kexec.
+> > snip
 > > 
-> > If the first kernel set ALLOWED_IRR, but the target kernel doesn't know
-> > anything about Secure AVIC, there are going to be a problem I assume.
+> > > @@ -18,3 +18,47 @@
+> > >  ##
+> > >  { 'enum': 'S390CpuEntitlement',
+> > >    'data': [ 'auto', 'low', 'medium', 'high' ] }
+> > > +
+> > > +##
+> > > +# @CpuTopologyLevel:
+> > > +#
+> > > +# An enumeration of CPU topology levels.
+> > > +#
+> > > +# @invalid: Invalid topology level.
 > > 
-> > I think we need ->setup() counterpart (->teardown() ?) to get
-> > configuration back to the boot state. And get it called from kexec path.
-> > 
+> > Previously all topology levels were internal to QEMU, and IIUC
+> > this CPU_TOPO_LEVEL_INVALID appears to have been a special
+> > value to indicate  the cache was absent ?
 > 
-> Agree, I haven't fully investigated the changes required to support kexec.
-> Yes, teardown step might be required to disable Secure AVIC in control msr
-> and possibly resetting other Secure AVIC configuration.
+> Now I haven't support this logic.
+> x86 CPU has a "l3-cache" property, and maybe that property can be
+> implemented or replaced by the "invalid" level support you mentioned.
 > 
-> Thanks for pointing it out! I will update the details with kexec support
-> being missing in this series.
+> > Now we're exposing this directly to the user as a settable
+> > option. We need to explain what effect setting 'invalid'
+> > has on the CPU cache config.
+> 
+> If user set "invalid", QEMU will report the error message:
+> 
+> qemu-system-x86_64: Invalid cache topology level: invalid. The topology should match valid CPU topology level
+> 
+> Do you think this error message is sufficient?
 
-I think it has to be addressed before it got merged. Or we will get a
-regression.
+If the user cannot set 'invalid' as an input, and no QEMU interface
+will emit, then ideally we would not define 'invalid' in the QAPI
+schema at all.
 
+This woudl require us to have some internal only way to record
+"invalid", separately from the topology level, or with a magic
+internal only constant that doesn't clash with the public enum
+constants. I guess the latter would be less work e.g. we could
+"abuse" the 'MAX' constant value
+
+   #define CPU_TOPOLOGY_LEVEL_INVALID CPU_TOPOLOGY_LEVEL_MAX
+
+or separate it with a negative value
+
+   #define CPU_TOPOLOGY_LEVEL_INVALID -1
+
+
+With regards,
+Daniel
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
