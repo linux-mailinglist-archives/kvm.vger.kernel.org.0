@@ -1,167 +1,181 @@
-Return-Path: <kvm+bounces-29153-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29154-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A009A37F4
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 10:03:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A4859A3849
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 10:15:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4956F1C210A7
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 08:03:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D94232888A3
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 08:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C426518C903;
-	Fri, 18 Oct 2024 08:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D1C18C937;
+	Fri, 18 Oct 2024 08:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WDJT90HR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LNeddTMH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB8E35894;
-	Fri, 18 Oct 2024 08:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16DD17BEC6
+	for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 08:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729238625; cv=none; b=lZAh4DsDgU8WSRU9LmTt1GCng8HZLfZOOkMddWMvlPHZ++yoEEgftd0ozUkVdICjB6W4zOa12J8fExXnqpkqf5nT5wRuYVu75qoEVcqJgr2OSdgTaa/Qgy24jrhHr7EayiMMixnARVqWKckx0LwhhaVNyyyYj3ipE7gYnB2DWJ8=
+	t=1729239329; cv=none; b=f0Q5DV4RgBrdFSMxewtBO5GVolOlqOlA8MlqaN90DPRzlXeMCNgXHHBP0Nk+B1ndWMQCRCTk+btI28qJfbTXM2xKWkTOSFnd/bo5eFAQeLfOpVI19k6M0q/P1YW8gn5WU+RxqoBIsmhKm/iWzpRT6A0LnL8JyiXdhrOw6iTjG20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729238625; c=relaxed/simple;
-	bh=KuDuWula4PgTw8pNnCR7DOGG2nCTn9VOQIiIOXdbpzk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LI8iBZfIpDRXT51obQozd6/qbRcUP6ASgh0abxlzhDHv/0QdxMcVcozMsDnLX1UX5jnksHELB9ORaEkNh+7nQ5EvbEevhMTziabQ17m4fk78VrXMI4psep1sm76JRVEuk/Ve6eY761yAYzPaBFDLTXzh4iIwD0nmZ+YMx5n7un0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WDJT90HR; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49HJSAsF014016;
-	Fri, 18 Oct 2024 08:03:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=9hlr2e
-	Qq96n/qPaVyElEvGhwGwn/7U7AQmnDbJS1PZw=; b=WDJT90HRqnGGb+xJ6g1Lkx
-	wbbUEWzLgBoRpQHRYVitBZydn8nreaRNEiwT7AmaIXMUV4llcWuLOpv803WMjZue
-	Z2Vvtr9uK79ZQ71ZwFhH+ZGAXeJhFoJm5/3Lgx6ffFsL4llyJKszAc4w968Nx61g
-	C+TAZBWLkh9dDbdGrU4nRAlM6eyBLwRSOhz6A0kIsuazDgj9XzSvoBbBGZeanBq7
-	/bCxlnjglzY0nRXU4GYr/v69CFKGfc4VmWfzvnVA2yNmi8rmH9TGjxLJvGJ5nJzS
-	xgrqmF2xHI8NXkJwNOHuAHYpaBMaTe5xTcXqHdOfTcub8te1UJkxp5DQkIqm1Y1w
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42aqk2r33p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 08:03:40 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49I83e1x011344;
-	Fri, 18 Oct 2024 08:03:40 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42aqk2r33m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 08:03:40 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49I7FNb4006690;
-	Fri, 18 Oct 2024 08:03:39 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4283esbfxq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 08:03:39 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49I83Zml49021298
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 18 Oct 2024 08:03:35 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7D65520040;
-	Fri, 18 Oct 2024 08:03:35 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 179282004D;
-	Fri, 18 Oct 2024 08:03:35 +0000 (GMT)
-Received: from [9.171.57.243] (unknown [9.171.57.243])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 18 Oct 2024 08:03:35 +0000 (GMT)
-Message-ID: <aeabd77d-6b3b-4e14-a6bb-4db65de275e9@linux.ibm.com>
-Date: Fri, 18 Oct 2024 10:03:34 +0200
+	s=arc-20240116; t=1729239329; c=relaxed/simple;
+	bh=RyCuiX7Z7beQNgjkYjzS1E6I9EFHABI+uLFOdorHDUA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LcQSO1XA0C0kujMcJwA0FAxngmLsiDVeNVgPXoYct2L+TuGzWb3gYxkviu0EUXymfnnaAJr1pl/xlrM67r7Z+ZBCoEgMbEeu0DEQy+VkCUIFKumU/QANsPFRbmQkVpr3Ho+Shwv2wC4S8jxXnyBQ0DqdDi6zCHZ2zG52U19HMhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LNeddTMH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729239326;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yr2YuJLh1oBlVb3LAJ7sYOHk9wkq05eBctRIWz59ZDw=;
+	b=LNeddTMH8AlEWYJBJR6TdYyS31gX1hZoA0dU3PXI4KA1Zq127bA1bepsU/kJ1uukFAeUzo
+	ibTjBKCgQYEhDhu1B1yhW/zLc7/8Iua9Z2/hD6eqkHdQGrm9T3pjdCtdZEiUfy4hyY5Dsg
+	EbroMNA6cxm6ZCUgt9XoaX1P/O9kfwE=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-644-AFeSO2b3PHmhtc-nmeDyeA-1; Fri, 18 Oct 2024 04:15:25 -0400
+X-MC-Unique: AFeSO2b3PHmhtc-nmeDyeA-1
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-71e4ece7221so2466595b3a.0
+        for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 01:15:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729239324; x=1729844124;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yr2YuJLh1oBlVb3LAJ7sYOHk9wkq05eBctRIWz59ZDw=;
+        b=g9pPhkgOrCoQI4JZYcZsaTJBRZDs1zG094H9/O3IZFe/CKCrzC+D9wOUpL4iHA3HV0
+         rSMG3lDOc0ztneW9iUN0PEbhet7/enSvP5tWCy03jcJNCox5+yO2LiBHYfmjq9GzhpET
+         qwvoOfcwDzuDxSMkePW11uIuOUqScIHBfk+O8b0rBWmo5ikeJiujHKMSq/gZuAzbH74+
+         zdgg8wHikobSOMk9N1ziqMSgKb7k7Jlfkmb/XNKfSAUMC3itPpFQAODnfF9CVjRAILqm
+         bXr4gxKrTWI0knDyhWUxL7QcFmMZV2Kqzm16EMJelT6HtCQr+UdF1G5PO/JwytPHtdbn
+         yMuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHYk9dGI6iBTHWXaDOby0xPxHnQLoJ0l3A8kZSBO7ffb49HJQcj7eB4u5yZG1tG7Y5nPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqKg9yoMhbGN/4q/dSio2uq8W8kFwYAJJTj2pXdJY2n2zsyH3O
+	6YUaFHRvQlnNJn53Yna5SjAwyCgf6OuCq9r4IhAJOs34YYZvST5wU9bcfPpZtFuQNU/4feB1y11
+	LNFY4Y0R9fq7AZ0CABDbsN8H48LdQNY6TeEmBp3eO0BFIRwATZSctIesGg+FYSG1w05ws4bz5rX
+	wp7DBe4fJUWSMyf6HJ5I88fVuo
+X-Received: by 2002:a05:6a21:178a:b0:1d8:aa1d:b30c with SMTP id adf61e73a8af0-1d92c9f8becmr2035173637.1.1729239324404;
+        Fri, 18 Oct 2024 01:15:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGLD3LtPmdn3YgZFunCmr4YCke9ZeVKhkDNBtOgm6i/o4DVa5u2WpwUUag2e6tVVnOKvDE1CSmiKahP3Ex3VII=
+X-Received: by 2002:a05:6a21:178a:b0:1d8:aa1d:b30c with SMTP id
+ adf61e73a8af0-1d92c9f8becmr2035126637.1.1729239323920; Fri, 18 Oct 2024
+ 01:15:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 5/6] s390x: Use library functions for
- snippet exit
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        =?UTF-8?Q?Nico_B=C3=B6hr?=
- <nrb@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>
-References: <20241016180320.686132-1-nsg@linux.ibm.com>
- <20241016180320.686132-6-nsg@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20241016180320.686132-6-nsg@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: DAeytmaGmfDoXMGmhLKdkmHTp8xqeiyq
-X-Proofpoint-ORIG-GUID: MTvxv-Y35gYjE9ql4sNrF73L0Hv9N1S7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- spamscore=0 priorityscore=1501 phishscore=0 clxscore=1015 mlxlogscore=925
- impostorscore=0 bulkscore=0 malwarescore=0 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410180048
+References: <20241008-rss-v5-0-f3cf68df005d@daynix.com> <20241008-rss-v5-7-f3cf68df005d@daynix.com>
+ <CACGkMEsPNTr3zcstsQGoOiQdCFQ+6EG6cSGiZzNxONsH9Xm=Aw@mail.gmail.com> <4bc7dfaa-a7cd-41f4-a917-e71b5c7241f7@daynix.com>
+In-Reply-To: <4bc7dfaa-a7cd-41f4-a917-e71b5c7241f7@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 18 Oct 2024 16:15:12 +0800
+Message-ID: <CACGkMEtt7a4+gadQt2=3zz+MCUtueuWj+zwaHR_gXCvLg=0PcQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v5 07/10] tun: Introduce virtio-net RSS
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/16/24 8:03 PM, Nina Schoetterl-Glausch wrote:
-> Replace the existing code for exiting from snippets with the newly
-> introduced library functionality.
-> 
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+On Sat, Oct 12, 2024 at 6:29=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> On 2024/10/09 17:14, Jason Wang wrote:
+> > On Tue, Oct 8, 2024 at 2:55=E2=80=AFPM Akihiko Odaki <akihiko.odaki@day=
+nix.com> wrote:
+> >>
+> >> RSS is a receive steering algorithm that can be negotiated to use with
+> >> virtio_net. Conventionally the hash calculation was done by the VMM.
+> >> However, computing the hash after the queue was chosen defeats the
+> >> purpose of RSS.
+> >>
+> >> Another approach is to use eBPF steering program. This approach has
+> >> another downside: it cannot report the calculated hash due to the
+> >> restrictive nature of eBPF steering program.
+> >>
+> >> Introduce the code to perform RSS to the kernel in order to overcome
+> >> thse challenges. An alternative solution is to extend the eBPF steerin=
+g
+> >> program so that it will be able to report to the userspace, but I didn=
+'t
+> >> opt for it because extending the current mechanism of eBPF steering
+> >> program as is because it relies on legacy context rewriting, and
+> >> introducing kfunc-based eBPF will result in non-UAPI dependency while
+> >> the other relevant virtualization APIs such as KVM and vhost_net are
+> >> UAPIs.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >> ---
+> >>   drivers/net/tap.c           | 11 +++++-
+> >>   drivers/net/tun.c           | 57 ++++++++++++++++++++-------
+> >>   drivers/net/tun_vnet.h      | 96 +++++++++++++++++++++++++++++++++++=
+++++++----
+> >>   include/linux/if_tap.h      |  4 +-
+> >>   include/uapi/linux/if_tun.h | 27 +++++++++++++
+> >>   5 files changed, 169 insertions(+), 26 deletions(-)
+> >>
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+[...]
+
+> >> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+> >> index d11e79b4e0dc..4887f97500a8 100644
+> >> --- a/include/uapi/linux/if_tun.h
+> >> +++ b/include/uapi/linux/if_tun.h
+> >> @@ -75,6 +75,14 @@
+> >>    *
+> >>    * The argument is a pointer to &struct tun_vnet_hash.
+> >>    *
+> >> + * The argument is a pointer to the compound of the following in orde=
+r if
+> >> + * %TUN_VNET_HASH_RSS is set:
+> >> + *
+> >> + * 1. &struct tun_vnet_hash
+> >> + * 2. &struct tun_vnet_hash_rss
+> >> + * 3. Indirection table
+> >> + * 4. Key
+> >> + *
+> >
+> > Let's try not modify uAPI. We can introduce new ioctl if necessary.
+>
+> 2, 3, and 4 are new additions. Adding a separate ioctl for them means we
+> need to call two ioctls to configure RSS and it is hard to design the
+> interactions with them.
+>
+> For example, if we set TUN_VNET_HASH_RSS with TUNSETVNETHASH before
+> setting struct tun_vnet_hash_rss with another ioctl, tuntap will enable
+> RSS with undefined parameters. Setting struct tun_vnet_hash_rss with
+> TUN_VNET_HASH_RSS unset also sounds unreasnoable.
+>
+> Letting the new ioctl set TUN_VNET_HASH_RSS does not help either.
+> TUNSETVNETHASH still sets the bitmask of allowed hash types so RSS will
+> depend on two ioctls.
+
+I meant let's avoid introducing an ioctl with function 1 in one patch,
+and adding 2,3,4 in exactly the same ioctl in the following. It breaks
+the uABI consistency and bisection.
+
+We can add all in one patch.
+
+Thanks
 
 
