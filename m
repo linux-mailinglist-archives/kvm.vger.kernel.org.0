@@ -1,205 +1,236 @@
-Return-Path: <kvm+bounces-29170-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29171-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECD889A3EE7
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 14:53:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63CC19A3F29
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 15:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78E771F27BD7
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 12:53:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A08B3B20C9B
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2024 13:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E92815B12F;
-	Fri, 18 Oct 2024 12:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C94918FC79;
+	Fri, 18 Oct 2024 13:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IQCryw08"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="sFJTHVcA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699B41F947;
-	Fri, 18 Oct 2024 12:53:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729256024; cv=none; b=MxD5dvPhaJSmd2Bgg/quUmKTNhofOUpAdNmGfSnXv3WmKNkE44h/yOn1SLA5J+MRJrXliApPsOPwRAWjw2OSVKAmMODuiWZ6qv1o4UoNzOnEYrJsdHX8mtYhTXlqDvTeqNbX/rlOmv13zBZzWLHrdYJsPYToVgbrCQhYmshCqCM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729256024; c=relaxed/simple;
-	bh=WfYXoctg9AnLQVgyFAc3XLj2mKLTsuq13nGgQDclHM0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=myKyUMWZ9lBnjWWC1z/dumRSEsBzSA9oahFcLZbuQalVvMrLzpdDwijW4AGZlmGyNMrYpP6Pp3vAgiFjUQzZgoJEr3fTi0KRss74EvC1TpMdqu386UUciKl3WJ4dw6P6H7z5Uxbz2opdHDhnqBt3doP90S2dpa09DjPPu8vMm6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IQCryw08; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49I5Z5AD011672;
-	Fri, 18 Oct 2024 12:53:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=lZxcao
-	yyyWjrWeE3hOicpwd3jpA5jdNNfx2N3jR26Xc=; b=IQCryw08OmVzURLjXMHu96
-	+oj/XCUG7Ksuba22DAqOfikaNrIlkTHszuDJ7yjKM+dppr+Law7MuHcvwi5vvvgD
-	RE6ZIur9s9pTeDCBCPnFaQZpttdAMIZYHSLF2F4OCsKuoeiS4ctsC8I5SNHtMFzd
-	wMpM5qEBdWTUuW/iM9RKiKyoTA1qnrEKgEg/lp84TAVXeHt8qNWNwWjC2kTX3W0m
-	KgyAzp3H3GzxNZA8zIO4rmTrv+uuC2jE0Hjr1hzTjsG5WIhoZyr8eHAcJApT7UGi
-	XWK5q8uypbUfb3j3q+MoLX59CUzUU4djA5vu3M3HEzJYQuevo1caJo5gMXx6e3aw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42bhnfa7r8-1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B6D1CD2B
+	for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 13:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729256937; cv=fail; b=VoyQzfdLMF5EmLYHb4cY+Al7h7VFZGPwd7fVR77h4YnUDQZ6E6vgF5SxtyLZutfBUeSS9b4JYkbgnObBHbMCPEzgFLXJcVrZi2aF9VShZ023fuKhL61qRMtso+PlKBTIZvLdaK2ECIn/1Xij9s8+JekdwTF7SPisTgjHfirLLP0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729256937; c=relaxed/simple;
+	bh=u0aN4eb7PdfDNd+XnvPo/rWKF733AS8fNifnQyiV99k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=nR+TM6/6FuCbp/gyBP/Z8c3Pig2guUOJGgbZ+Iq+AO2xlTLBgicDcg4ullrSJfv1AbMEvVLCDHEG0rSXpAfFSNJPCqnqgus9UyBmzv2Z7RZ3FtwvSqdg1i1yFY8jUfvmvsKmvda+drUVVR4FuD8DoxTpV6uDkNFwxQq8blhprdE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=fail (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=sFJTHVcA reason="signature verification failed"; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49IAPGaT023317;
+	Fri, 18 Oct 2024 06:08:41 -0700
+Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2044.outbound.protection.outlook.com [104.47.56.44])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 42bnvug9c3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 12:53:40 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49ICreSn000521;
-	Fri, 18 Oct 2024 12:53:40 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42bhnfa7r4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 12:53:40 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49IBG8DE002408;
-	Fri, 18 Oct 2024 12:53:39 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4284en4m37-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 12:53:38 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49ICrYJs52035886
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 18 Oct 2024 12:53:35 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DEE262004B;
-	Fri, 18 Oct 2024 12:53:34 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 837A020049;
-	Fri, 18 Oct 2024 12:53:34 +0000 (GMT)
-Received: from [9.171.57.243] (unknown [9.171.57.243])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 18 Oct 2024 12:53:34 +0000 (GMT)
-Message-ID: <606b3c63-f4e1-449a-b3de-6fbb5e8211d7@linux.ibm.com>
-Date: Fri, 18 Oct 2024 14:53:34 +0200
+	Fri, 18 Oct 2024 06:08:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Znaar6nONDEZo+pIuRJD+1mRPXLyg44uKaeGBY1tKVjWOMnot2VeskOlCJrL6i4MzebLXjdf54VyhxFhYbQPj4osuwAe44X0CfEMPGFiQW9D5OX8QnmS3E9Ym4Bi718Gh6kBMwhOHliZ8iSX2Bu57DpZjgCY3/eVMSQWT1Kf4vJVesyJapvCJ5eZ63Ge3P3UtP0KODApnAS60yTLeVGZhXJ2HvLVon9b50Be9bjJVW42H0/WN0ATQ+LY0arQtfcXO9NYjshcf0H5OEd+5AzcoeqH3ez4gmrhogX+zzm54krZ+L4UXCElxIJukP2EcbG/k2pd55Di8zznLN2TeNtfTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bRz0yxinlIUya/qkdJgK1uvvgHCojMzRmC5+YguFzho=;
+ b=dY0gBLKh/V3EdQ9Vf0neajjQFukvYptd8x59Krojp5Gda2fYIk0ff4YipoARnp9Bt07mXO1gbGgOLbckHLRTqAGmrH4BrKBW1cX7dRLHastmuRXTxdfNzhoUBlp7h6Q8i9CV0/5bq4NlYQUp83a+zbS+AHFCusmETVRy5jr4biHeeGupn4wLB3qzzx6iFqjD8urXkZ00Zrop77LEdyhGyDRlfOWBR/4/CkE1sBs0X5+vCO5rdnzsGopRUCsvUm6Cl+l1kOfq74YDAZoYDESSQtax6Vw6sBPesKRzcNr9NhZyZ26JCiZ39kfvXew2aRQX+Mjg6f9hjgwqgNgPndBeFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bRz0yxinlIUya/qkdJgK1uvvgHCojMzRmC5+YguFzho=;
+ b=sFJTHVcAaHgQbUyAoNmp4kOgsopxKEPZpsudwhbej73EQGt4/Lg3t6lKT78bEykkNSbB6uLZrEeYuncH6R3Z9WXazn54g/aOD/sCmKJMFJmWd/025qZ4/EJAFFeX4RbGIR2DAAQUiyYgaQg9z+AHUSKXAOzZamFnxeQxd07GUeo=
+Received: from PH7PR18MB5354.namprd18.prod.outlook.com (2603:10b6:510:24d::11)
+ by PH0PR18MB4040.namprd18.prod.outlook.com (2603:10b6:510:2::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.20; Fri, 18 Oct
+ 2024 13:08:37 +0000
+Received: from PH7PR18MB5354.namprd18.prod.outlook.com
+ ([fe80::7f70:2c74:a8e2:a610]) by PH7PR18MB5354.namprd18.prod.outlook.com
+ ([fe80::7f70:2c74:a8e2:a610%5]) with mapi id 15.20.8069.016; Fri, 18 Oct 2024
+ 13:08:37 +0000
+From: Srujana Challa <schalla@marvell.com>
+To: Christoph Hellwig <hch@infradead.org>
+CC: "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mst@redhat.com"
+	<mst@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        Nithin Kumar Dabilpuram
+	<ndabilpuram@marvell.com>,
+        Jerin Jacob <jerinj@marvell.com>
+Subject: RE: [EXTERNAL] Re: [PATCH v2 0/2] vhost-vdpa: Add support for
+ NO-IOMMU mode
+Thread-Topic: [EXTERNAL] Re: [PATCH v2 0/2] vhost-vdpa: Add support for
+ NO-IOMMU mode
+Thread-Index:
+ AQHbE96PlQaeJdnt006ohvbKHfff0rKGTA1AgAD2ZICAAnCmAIAA3iwAgAALuYCAAXcsgIAATAOQ
+Date: Fri, 18 Oct 2024 13:08:36 +0000
+Message-ID:
+ <PH7PR18MB5354CF1D29BDEAC106C641E5A0402@PH7PR18MB5354.namprd18.prod.outlook.com>
+References: <20240920140530.775307-1-schalla@marvell.com>
+ <Zvu3HktM4imgHpUw@infradead.org>
+ <DS0PR18MB5368BC2C0778D769C4CAC835A0442@DS0PR18MB5368.namprd18.prod.outlook.com>
+ <Zw3mC3Ej7m0KyZVv@infradead.org>
+ <DS0PR18MB5368CB509A66A6617E519672A0462@DS0PR18MB5368.namprd18.prod.outlook.com>
+ <ZxCsaMSBpoozpEQH@infradead.org>
+ <DS0PR18MB53686815E2F86EFC5DFE1E45A0472@DS0PR18MB5368.namprd18.prod.outlook.com>
+ <ZxHw9dZ-EolHR0k3@infradead.org>
+In-Reply-To: <ZxHw9dZ-EolHR0k3@infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR18MB5354:EE_|PH0PR18MB4040:EE_
+x-ms-office365-filtering-correlation-id: 2ec26069-7aca-4d58-ef5c-08dcef75fa49
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?dEJYd081TzZYaDJnSnhtUzd2OXRyREVkd09YYWhBZlVBWVgyR3ZtYStTV3lM?=
+ =?utf-8?B?SWFjclRReS9INURKYWtHNndKK1hYYVNnZGdkcW1HT2JwZTdyWEtMZFdZTjRn?=
+ =?utf-8?B?Wk1BanFjNDFrTktvSnNST2p1bFNVSFNWMEVaOEdFOVpWRk8zeENqWFkvbnNq?=
+ =?utf-8?B?MFZOaS9mTDhrQXEzMFNkdzgxZmxQZkhzWk83RHl2NzloMS9Fdm5uSlF2UGRM?=
+ =?utf-8?B?dWIwOGMxcTl1TUl1YSthYzRRcVBZbzZIdWFLUHV0V3FNdm5DVnpBeC9iOFBS?=
+ =?utf-8?B?enEwN3dEQmU2OU9TNDBxdVNFdlRwd1ZjQldPamFuVEp1MEw4YnkvR3RzL0tF?=
+ =?utf-8?B?T0NkQ1J6ZVRjVHNtbkh1MkZMc0xkYXFIaTQvK1lMcnZvRnc1NnR4YndleWxM?=
+ =?utf-8?B?SnI2KzBaMHdWZ0UvK09xVFZUNm1lNnJKN1VQNS9tUHBsdE82ZEZiVFJuYVFw?=
+ =?utf-8?B?aTVFSUI1TGZsN0U2NjduNldoOW9rQW1DQ1o5aXVjZGxrK0JYbmllK3EyWGd2?=
+ =?utf-8?B?dmUvVXBSMmxkVGxwT1U5bGtJVkgzU1dyKzJuakpmeW5uUmh6YVRQekx6S3pN?=
+ =?utf-8?B?NXdZNnYzWFhkMkV3VHRMc1ZZYjdmSTVKUG1CV0x3ci9DNmVXUlJxTmVDM2N1?=
+ =?utf-8?B?V0FsS291ZzNFS3ovc0EyMWxoZ0dVY1BNcHBpVzZKZnEvdTJNNGFrK093VC9R?=
+ =?utf-8?B?K2lMY1dXK0J2S3N4WkFjR2cra1N0Y2Z5YlJWOTd0RjVkSlhIMDdoQnF2VENp?=
+ =?utf-8?B?b21LdVFDanAyZnlUeGFJU1dGdWM4MU1QNGpndEZGU2szTjlpUjZ1c2JlVEV5?=
+ =?utf-8?B?MklSRXpqa3lSNDJYZ2xxeDdaVHB1WEFjVGJnL2JHZlk0SXJZSWJVTTJhNUU1?=
+ =?utf-8?B?UlN5K25xNTYvNVlrL3dJdGpJYXZ3YUVvM0VjUlJCdnBFWitkTTcrcFhXTzM4?=
+ =?utf-8?B?OUxYWjZBWmZPREpscDViZE96OUNya3pFT2paOXpKV2YxQXhQR0pJcWZVMkVP?=
+ =?utf-8?B?VVB5REtMbUdGS25YMFBBNnpNVDY1RDlzcUpJc2pCWE8zeGoyVEJYZ3BDYTQy?=
+ =?utf-8?B?SkFmOWlkTHpRSml4aXlWTFcxN25ZM3hEZ29GWms3WEc2bVo4Q0F4MXJ5Z0Zv?=
+ =?utf-8?B?dWJ1QzNiNDhkeWdWM29PbHJ1MUpTdjRwdVNDQXJUenZwZi82dm9OS2lyckVE?=
+ =?utf-8?B?KzJPbHIzbGJiR05rUGx0RFl5NGJwa3Z4OWpZNFFZbklHMWZKTXF0Yms5NXQ5?=
+ =?utf-8?B?N2UxUVFuVXZDUUlKSWIxcUJRNlFZUlFPNU1hcmlnVE1hbHI5U2pUajFYNWli?=
+ =?utf-8?B?K2NneS9kK3FIQUhaZ0hibHRkbUtobC95dDlkV2lGZzl3QUNydVJMY0tabGhR?=
+ =?utf-8?B?M1ZoWlFzTVJhdjlGMFVMVVAxbnc5UlVld2lxZFdaSkt4LzVLTklCcmtLVW9v?=
+ =?utf-8?B?cnQwTWFUZzVaZGpoenRzMnh5clZ3K0d1Nk5iYzJ3ZXJhcVpVaTRWcjZKOXMw?=
+ =?utf-8?B?OW80ZFpuclZxWDZ4dGJhMkpvdDZ2d3ZYZkZ2c2gvWjI0eWlWSTRoYWJhLzNM?=
+ =?utf-8?B?dG9kSFVtUlFVMmZ5ckxBc2R5Y0c1RUxoOUVpN2I0d3RoNUpWcUR2eWM2aDFw?=
+ =?utf-8?B?YW95YWdwcTBidDJtK0JGRk5nZU05NEpKQm5PdjlCb0NUT0dZaXB1RzVFckRm?=
+ =?utf-8?B?NmR5Z2dxc2hnZWtXamtTNWl0M0lmK251RU1zVUsvWDgxY3NFU1Rhd0pMUGVS?=
+ =?utf-8?Q?98fP7C6Zn5M5cDhqibJpv3qsVPvm1KnxuY2FPJ/?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR18MB5354.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?T25CdCtPZHZaMGVGT0lCYjZ5QjFpbU1pa1JZMHM4b2syYXA4SnlQbStZcWFN?=
+ =?utf-8?B?VlkzNGhSd3dLYStueWwreWdtcmhsTEkwVzI0L3dJaStOODhxMnQ4eVdScTQv?=
+ =?utf-8?B?T2hsMGRPZ0dhUWpYTnQxZ2t1Zkdkc3ZzU0lIZCs1MHM4b2xTS25xUDB2b1B6?=
+ =?utf-8?B?QVhlV1VrU1o2ZXVzZGNmZVJTQ3JDZzlEWFBBc0gwcXdyeXdWYm5wZlM1ZDQy?=
+ =?utf-8?B?Uk44SktQV2VwdGVGUUg5cDR6NDVSSS9iM3ZkYU0yT0hDUXZsS1ZTb1FENmk2?=
+ =?utf-8?B?YVljakJPUHIzeXNJVkNRWUdNSHphRVlQTUQrTG45YnY3S0s3WXl0dzF2SXJY?=
+ =?utf-8?B?Y2J0WU1iWlJ0WnFneDVnNE5aUGNoTktVY0oxNk5qb3dvUTRBZXg3N05sM3dH?=
+ =?utf-8?B?M2ViUlBKd1VNVEN1VGlJeUtIMTNZNmd1Vnp4ZnR4SWtOZVJvSGJ1a3RWOFhO?=
+ =?utf-8?B?Vi9rb21MdldwbXJRMlF2TzlUTUhYVk1mMmFsMmJTUmx1NkhmdmE2UTNSTEJo?=
+ =?utf-8?B?djc4MTJCZm0zejI0Nk0yZXhmalZYZGtKL0JKZ3pWQUZpZTFzLyt6YUZmMG9v?=
+ =?utf-8?B?S3hEa29zS2UwcXdYQUE1MmRHQnJCQnEycTVkM2xkb08zZWJXUGduWjd4WDg0?=
+ =?utf-8?B?ZnlWRE9oai9MM0pTN0ZTaVdCRFVDa0F1SFZvMitOUHNZUm9rbDFvc0hRU3pi?=
+ =?utf-8?B?K09EUVJSMm8zL3IyeUNOL1RPNjEzME5NNlpvNU5FTjhaNDY0L2kzVE5RSDF5?=
+ =?utf-8?B?Yk5VRUUxRWIrdlAvSWpJS2J0ZmVqSXNmeFA3MlBPUDJyTmtSZE5Za1pOUWdZ?=
+ =?utf-8?B?UXo4Q2lOenlDeHB6YzZqRW9hMEJzcXFFMmRFMXhQY2VhZDF4dWZCYktVMDVC?=
+ =?utf-8?B?UDJzcEFPMjlTZG1ZMTNWaUVCSlB2ZC9DeHZmK2VLU0VrSWdPSjVHcGE5SVkz?=
+ =?utf-8?B?TDdkdHI3d2pzM2Vvem0xYy9DTk93NjIyenN1cDFJWjBOSzBjdmF2UFZrM0U2?=
+ =?utf-8?B?ZzBuckt5UkNRSlhESi9WUVlsK1ZTTWRrcVY0djByUkZTdmI2dmJya3FyaWls?=
+ =?utf-8?B?eHRCcVBaaG5hMTByUG9LSm50WUpoeGtCZkFjRmNDdUtOWWtHMXBkMXpvU2ZP?=
+ =?utf-8?B?SnFQaFRXNTlTdXRXUityZ3JDVFV1TjhXUU9tUE5WK0JtdnNZNUZaRFNQaVY5?=
+ =?utf-8?B?QjdZd0VKbDlWdVNVTlZVTkRKejI5RkUwSk5HTkNmRmRpQlBMSmh5VitWNllr?=
+ =?utf-8?B?OG1XaU9OZGJpb2s2STUzTjg3a1V5VlZzVFllWkdBT0NITnVhQ0lPZGNoZ0t5?=
+ =?utf-8?B?U2xoS3RMYTliVmRNb1N3NTg3eGZFR0lZVDlWdkZtMFdaWVk2WEpKOHpuY3Z6?=
+ =?utf-8?B?eVhvTXNkL1pxWnZaRllOeTUzeUdKejBjaVk0S2k0bVBvcTlyT01GNDJQMHpa?=
+ =?utf-8?B?cmhXTitSWWRVa2ZaN0p1ZWpWK1M3MzN3WDRtREp5Sys4TnFPazNGRmtSVHQ4?=
+ =?utf-8?B?anFmck51V2hPWEhKWXYwMWJXRDVxbmhqYlphMDVsN0NCNnNFMTY5VjhxTExG?=
+ =?utf-8?B?NGZPeHVMd2dzL0FaZE44eGVvTGlnRFJONThWaDg3UE5qNHlESlpNWDhLOWx1?=
+ =?utf-8?B?Y1hjRk5WV3NpTmZxMnJEdXRIbWEyTW1TQjN2WGFPY1NRbERnejFuNzBuQmhC?=
+ =?utf-8?B?YnZJbi85NktnYUtYTWFVYXpJSUF3dEhNeUZGZkloaXZRMWhJOTQ1M2NtMXl1?=
+ =?utf-8?B?MWtSdHBzcHNwbjBwbGJ3VEFZVFB2eEZmd3duT3BFcmlyZCtwb2VQN0lOamtU?=
+ =?utf-8?B?TnhhWnN3L3JoeTBhbWk3U01jVVIvTmtqVmNEdmorRnM1SGg3K3dDSS8vVjBm?=
+ =?utf-8?B?WmNnelZmNWZFbHF0T0FlR2NGYWFUdHZJbWh2ZTRJRDVERWJLRVdPQUw5YUVX?=
+ =?utf-8?B?dkJGUHNwaUxjMDFoV1VEdjBDejdmVk5nRXluODNDQlNIRnc0em13bS9wWWlU?=
+ =?utf-8?B?VEU3aSs2YkJCdEJhM29IUWVma3BIK2NPM3JsNXQ2Y1ZtS0NQSXpZeVIwRXhV?=
+ =?utf-8?B?WXBvcmR3bFhVelp0VFNDbGNSOUd6NjQzRUNPN0EvNjcwN1FrYkhPU2R0TTV0?=
+ =?utf-8?Q?x+X3tFPf3AjKOeVEhfdwzyQNl?=
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 4/6] s390x: Add library functions for
- exiting from snippet
-To: Nico Boehr <nrb@linux.ibm.com>, Claudio Imbrenda
- <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>, linux-s390@vger.kernel.org
-References: <20241016180320.686132-1-nsg@linux.ibm.com>
- <20241016180320.686132-5-nsg@linux.ibm.com>
- <e649996c-559f-425e-833f-ca83bad59372@linux.ibm.com>
- <172924897145.324297.7466880604426455626@t14-nrb.local>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <172924897145.324297.7466880604426455626@t14-nrb.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gfBLOAT76LbO_7hPea2-iWgmpSLItPL4
-X-Proofpoint-ORIG-GUID: miO1jMj-Pifjt0obxcvw2wlri37g9RII
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR18MB5354.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ec26069-7aca-4d58-ef5c-08dcef75fa49
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Oct 2024 13:08:36.8676
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1Spm8sdSx/3SpzGYh0YMZd/9fthUHiMsgkvyE6ONVfpMJ3w3Oveokl3PdTMOUar5mUaQ8tE/FRGy11A+nkWVqg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR18MB4040
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-GUID: Qy2Jrg1PPMC43HwPDTn-j6wDpFuQIr20
+X-Proofpoint-ORIG-GUID: Qy2Jrg1PPMC43HwPDTn-j6wDpFuQIr20
 X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=924
- malwarescore=0 bulkscore=0 adultscore=0 spamscore=0 phishscore=0
- clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410180080
+ engine=ICAP:2.0.293,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
 
-On 10/18/24 12:56 PM, Nico Boehr wrote:
-> Quoting Janosch Frank (2024-10-18 10:02:37)
-> [...]
->>> +static inline uint64_t snippet_get_force_exit_value(struct vm *vm)
->>> +{
->>> +     struct kvm_s390_sie_block *sblk = vm->sblk;
->>> +
->>> +     assert(snippet_is_force_exit_value(vm));
->>> +
->>> +     return vm->save_area.guest.grs[sblk_ip_as_diag(sblk).r_1];
->>> +}
->>
->> The cpu address parameter for 9C is 16 bit.
->> While we could make it 64 bit for snippets I don't see a reason to do
->> so. The 16 bits are enough to indicate something to the host which can
->> then go and fetch memory for more data.
-> 
-> Mh, how exactly would you "fetch memory"? That requires knowledge on where
-> things are in guest memory which can be painful to figure out from the
-> host.
-> 
-> I've found it useful to be able to pass a pointer from guest to host. Maybe
-> a diag500 is the better option? gr2 contains the cookie which is a 64-bit
-> value - see Linux' Documentation/virt/kvm/s390/s390-diag.rst.
-> 
-> P.S. Did I miss the part in the docs where the 16-bit restriction of 9c is
-> documented or is it missing?
+> Subject: Re: [EXTERNAL] Re: [PATCH v2 0/2] vhost-vdpa: Add support for NO-
+> IOMMU mode
+>=20
+> On Thu, Oct 17, 2024 at 08:=E2=80=8A53:=E2=80=8A08AM +0000, Srujana Chall=
+a wrote: > We
+> observed better performance with "intel_iommu=3Don" in high-end x86
+> machines, > indicating that the performance limitations are specific to l=
+ow-
+> end x86 hardware. What does=20
+> On Thu, Oct 17, 2024 at 08:53:08AM +0000, Srujana Challa wrote:
+> > We observed better performance with "intel_iommu=3Don" in high-end x86
+> > machines, indicating that the performance limitations are specific to l=
+ow-
+> end x86 hardware.
+>=20
+> What does "low-end" vs "high-end" mean?  Atom vs other cores?
+ High-end, model name      : Intel(R) Xeon(R) Platinum 8462Y+,  64 Cores
+ Low-end,  model name      : 13th Gen Intel(R) Core(TM) i9-13900K, 32 Cores
+>  =09
+> > This presents a trade-off between performance and security. Since
+> > intel_iommu is enabled by default, users who prioritize security over
+> > performance do not need to disable this option.
+>=20
+> Either way, just disabling essential protection because it is slow is a n=
+o-go.
+> We'll need to either fix your issues, or you need to use more suitable
+> hardware for your workload.
+I disagree. Why to pay more HW cost if the use case does not need demand fo=
+r it?
+fox example, embedded environment and trusted application are running.
+It is the same thing is done for VFIO scheme. I don't understand your reser=
+vation
+on a mode you are not planning to use and default is protected.
+There are a lot kernel options, which does the correct trade between various
+parameter like performance, security, power and HW cost etc.
 
-For ASM snippets addresses 0x2000 to 0x4000 are a free area.
-For C snippets that area is the stack.
-The 16 bits should be good enough to point into that area.
-
-If the snippet requires a lot of memory then you can use constant 
-addresses which are way over the snippet binary or just store a 64 bit 
-address in a "free" lowcore location.
-
-As you mentioned we also have diag500 which has the drawback of 
-requiring to specify a couple more registers but that's not a huge 
-hassle. For some yet to be released PV tests I use the diag500 to 
-transfer 64 bits without the unshare.
-
-If you want to write some funky code just do 4 diag9Cs to pass all 64 
-bits. Just don't ever show me that code :)
-
-
-I've looked at the LPAR spec and that specifies bits 48-63 as the cpu 
-address. Send me a DM if you find a different specification.
 
