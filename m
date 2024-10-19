@@ -1,113 +1,136 @@
-Return-Path: <kvm+bounces-29187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29188-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 273C59A4ABF
-	for <lists+kvm@lfdr.de>; Sat, 19 Oct 2024 02:49:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A6619A4ADB
+	for <lists+kvm@lfdr.de>; Sat, 19 Oct 2024 03:30:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 358EB1C21C0D
-	for <lists+kvm@lfdr.de>; Sat, 19 Oct 2024 00:49:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFE10B21726
+	for <lists+kvm@lfdr.de>; Sat, 19 Oct 2024 01:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DCF1990CD;
-	Sat, 19 Oct 2024 00:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020B41BDAB2;
+	Sat, 19 Oct 2024 01:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e4CMuT6S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C1GEIIsX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02062192D9A
-	for <kvm@vger.kernel.org>; Sat, 19 Oct 2024 00:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC2E1922D6
+	for <kvm@vger.kernel.org>; Sat, 19 Oct 2024 01:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729298932; cv=none; b=D18Ji8bGiv7khx6RAqmVLB9J3+dlX15NOqtLLS6cZuZ4SxrZ+hiYLlw/XCZ0C29MToWtGmAeaK7DARKzF4nizDGgLiwj9wQO1ZjPFFnnQiOFAVajydHTjUmi5A4Xof6NfVq+if5V43pkgro+4cnOu5jkKJkcOta/SEfiToqPbhU=
+	t=1729301387; cv=none; b=jnUJ3B+FDVH2x3nUzmH59IIS8HhWMYF1WF6WQ9u1kr4augw0+zlnPEAJWEtbln1Yoo9IZ3Kzgzl/G5v/6kzxwgc+6YM6sAmWV7UddeAR+FMVaP5ngZrMUYhF2Cy9Kmq06fvYDSFespDSJ8xFw1Ku4xbJbGTmTQ9IHwLnZ61Zz4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729298932; c=relaxed/simple;
-	bh=zxy6CVaPGBT/4hy8i0ysqF5Vh5/hv0JzciEqXjlH0T8=;
-	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=GYQDRwvmNY3wFCwKHNUunpBoSMwvgvtYydgRop5wayPTZnLCR4W3F0NHsnL4Ck9oNP4SqzYmXSkBw4FAYH5RY9UUDQ1IeDWoEVfhgW8pRaJBAHMju39rjOwtkild5G+axUDJY3SlnDsj6os3XMi7gHQKl1Rw27vAoKtp+P87Gmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e4CMuT6S; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729298929;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JgCLbnQyx/xtWKFjluiXxC49uB//JvT7pDOfovgSmM0=;
-	b=e4CMuT6SKFZkQVAcgtQIjGO+b7I4qNWeyMPAgFW6ndAsBeIFh91AQEpbp5xamuxxAaRVP8
-	5OgW38jCfl/uhm577ioXnTxgslZQofwgl2Xc6ADpirt9/4MdLGs8SnRFkCOLAszUAAjqYM
-	qrKxoL4U8qap4CvCKhQnTkmheLfB8jU=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-WGZ3T-7iPKySPM8U41ekVA-1; Fri, 18 Oct 2024 20:48:48 -0400
-X-MC-Unique: WGZ3T-7iPKySPM8U41ekVA-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b14cb9f6f5so531766685a.0
-        for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 17:48:48 -0700 (PDT)
+	s=arc-20240116; t=1729301387; c=relaxed/simple;
+	bh=3mtGNq9cGSGYrfQFZeSpQbC6OnKLuvDcJ3My6WR3hg8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=X23aVLzYlT4x2FuN0sfNW1Goyl4zON3q/Bx8Y7aGK5enxfEdLFbtG4zqH4Lx/MWttEKvqmExvDfWh7PbWzgboA6NF8RhpA+SYThZD5601z+3moVs4efeK+1YT0oV2T4XCcb6CRoQYqbTzBDWFdDzCRSG/tGBq69ocn22IwSzwwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C1GEIIsX; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e035949cc4eso3869290276.1
+        for <kvm@vger.kernel.org>; Fri, 18 Oct 2024 18:29:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729301384; x=1729906184; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YuCuzNJhXO6NMFow4//rMdfOZm/3Ta56iibLMueqV4o=;
+        b=C1GEIIsX0Grr6+TDcrAUL+w5wqRsARy485p3C6OArX6GycOuzV9D3kU/6WDhVX/HVS
+         NGDfPC0NGKlTATdn5A+4L40gdy/4Xpu85Q+0P6qICzVwyLLsnz2Wmr+K7ffPyncmoEct
+         g5Ctj6/bHQddFexJUt775QlZ6tBjJtIPGBNCvQ11gZv6EdwOMA1U79XEsw2dHQMYL6lK
+         kmjEk83BsSTycScO353qcGOnlM2rU+hLN+hzZlyHFYCFW0A7hnV0HE6+qsfgyVNFi6OE
+         1wlurTQgF4YiQDtyYBB2ACM5XOtRqANIg7frtm37pT3TJXOtn3KJuPb/GETdaMlCTGTv
+         A74Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729298927; x=1729903727;
-        h=content-transfer-encoding:mime-version:user-agent:date:cc:to:from
-         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JgCLbnQyx/xtWKFjluiXxC49uB//JvT7pDOfovgSmM0=;
-        b=BI6w3WoKjtcQ8vn4ISrwOcbsPrG+hbMOLIv2Cex4vmMxoDiG1Aqu/+jy7ikw2kHr8t
-         M2vER2XYfydI7KSwZLb+W2eB7PpAB4lV0hmJGtwC4F6flKKGElNj1XUFV+3Vu0kT4zHB
-         N3kvvaSvXZSxJjLYYyEmFHYNAP8ZNWXfgYB0vbIq2FLO/91o/A40X/BWlS6L7UgmWjvR
-         3/6+P9g9NUNklcADc7E9lDjr3mvGJa1kB5T/UOSJFFnJippi6xKrdA9R+qnBVPDoYzRv
-         RwWWShQtmkg6Ha2doZlIeRYNkzUhXWQnQk8ABPop2Hv38Dk1X8dzNhRvXRVxt2exRo7R
-         vRRQ==
-X-Gm-Message-State: AOJu0YxgRFcKRo3QujPYUgUz20bXsL9yDVbek0AOhNCPoOULXcQprwJV
-	/sjfKQD1BrCeIWIMeelpWILn9awsSIURXSo8KquAfLdPlsy4ikKLJ75cyvslMk+z3PspHt1L4eU
-	BkqQLEB3EKVpbha2nLPHW/ekC5CvUr6SNaMo0AzZlzChtBbQwPuWUcY3EY5LKQFA/WIM6lIT8gL
-	UkfX45u4BkIwdQTRQ5zvjceA3nBYRsBTquuA==
-X-Received: by 2002:a05:620a:4003:b0:7b1:168f:52f5 with SMTP id af79cd13be357-7b157c08dffmr432595385a.57.1729298927420;
-        Fri, 18 Oct 2024 17:48:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHbE+fH5q/tzPt4fAPBab7mipkiwt2i+4EmfiwvNgIQgqm7/iIcs96vJqnUL1fCVgCWkk0D4Q==
-X-Received: by 2002:a05:620a:4003:b0:7b1:168f:52f5 with SMTP id af79cd13be357-7b157c08dffmr432593685a.57.1729298927022;
-        Fri, 18 Oct 2024 17:48:47 -0700 (PDT)
-Received: from starship ([2607:fea8:fc01:760d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b156f9509fsm117950685a.30.2024.10.18.17.48.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Oct 2024 17:48:46 -0700 (PDT)
-Message-ID: <c9d8269bff69f6359731d758e3b1135dedd7cc61.camel@redhat.com>
-Subject: vmx_pmu_caps_test fails on Skylake based CPUS due to read only LBRs
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Date: Fri, 18 Oct 2024 20:48:45 -0400
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1729301384; x=1729906184;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YuCuzNJhXO6NMFow4//rMdfOZm/3Ta56iibLMueqV4o=;
+        b=B1pnUyGQUP+cU/VxkyPTwGgcuhLpHbT4iJekeWAcnHMzw4xh9EsUkep5YxYSCi98+Q
+         uV9w9Oga4sv2hxmTj8bi+MN1mR5Th/RqTNQcd3hY1u21fIESIcxEQ83icVFv3skz7WaX
+         iu8RzwIlElp1ur53srSK70O7sXYmzc2PiJzqD3pQvzg4F3A4bwYguInPfW3/PtOfCCqL
+         phqVV96T7mLpnf2hRUCTb12TEojw8Cr/iafxnQvJW6iVv+kCG1VSfdnUqkw2LbbzGHem
+         OaunBX8xMnSbUB4Gq6IiYVM/J5Iov5UFXIdcbfp3KdnAaHZ0gyaHbrST9B+dceA3ceRa
+         Lbeg==
+X-Forwarded-Encrypted: i=1; AJvYcCWuKcw0XbiQZVeW00lxbE+8Ehxck0DUerQAaSadRnBDV1+egDJaEzh0RU9fs09okE+W4Gk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzH6QA6soSROiGJqRI/PIl5oNxt7XG7sTDppQEdKgnAPtKN1crm
+	Y5+LB3teO6Ncj7G9PFTfvwVRMEoJUAIlAGPLRpa4kPTqwuCfDOR/MT0c+re1jopKNUgTVu2RWuk
+	YfuHYmTSeWiCComLh8A==
+X-Google-Smtp-Source: AGHT+IFmq0/1EPi5496WrRokUU9WA5t7S1WG8rkiw/MIseZ9iZLjY0dGBCILI69xXidmtmdxWEdpgYhtiPqAdLd2
+X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:13d:fb22:ac12:a84b])
+ (user=jthoughton job=sendgmr) by 2002:a25:81d0:0:b0:e28:eaba:356a with SMTP
+ id 3f1490d57ef6-e2bb16d53e4mr14075276.9.1729301383632; Fri, 18 Oct 2024
+ 18:29:43 -0700 (PDT)
+Date: Sat, 19 Oct 2024 01:29:37 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.105.g07ac214952-goog
+Message-ID: <20241019012940.3656292-1-jthoughton@google.com>
+Subject: [PATCH 0/2] mm: multi-gen LRU: Have secondary MMUs participate in MM_WALK
+From: James Houghton <jthoughton@google.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Houghton <jthoughton@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	David Stevens <stevensd@google.com>, Yu Zhao <yuzhao@google.com>, Wei Xu <weixugc@google.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Today, the MM_WALK capability causes MGLRU to clear the young bit from
+PMDs and PTEs during the page table walk before eviction, but MGLRU does
+not call the clear_young() MMU notifier in this case. By not calling
+this notifier, the MM walk takes less time/CPU, but it causes pages that
+are accessed mostly through KVM / secondary MMUs to appear younger than
+they should be.
 
-Our CI found another issue, this time with vmx_pmu_caps_test.
+We do call the clear_young() notifier today, but only when attempting to
+evict the page, so we end up clearing young/accessed information less
+frequently for secondary MMUs than for mm PTEs, and therefore they
+appear younger and are less likely to be evicted. Therefore, memory that
+is *not* being accessed mostly by KVM will be evicted *more* frequently,
+worsening performance.
 
-On 'Intel(R) Xeon(R) Gold 6328HL CPU' I see that all LBR msrs (from/to and TOS),
-are always read only - even when LBR is disabled - once I disable the feature in DEBUG_CTL,
-all LBR msrs reset to 0, and you can't change their value manually.
-Freeze LBRS on PMI seems not to affect this behavior.
+ChromeOS observed a tab-open latency regression when enabling MGLRU with
+a setup that involved running a VM:
 
-I don't know if this is how the hardware is supposed to work (Intel's manual doesn't mention anything about this), 
-or if it is something platform specific, because this system also was found to have LBRs enabled 
-(IA32_DEBUGCTL.LBR == 1) after a fresh boot, as if BIOS left them enabled - I don't have an idea on why.
+		Tab-open latency histogram (ms)
+Version		p50	mean	p95	p99	max
+base		1315	1198	2347	3454	10319
+mglru		2559	1311	7399	12060	43758
+fix		1119	926	2470	4211	6947
 
-The problem is that vmx_pmu_caps_test writes 0 to LBR_TOS via KVM_SET_MSRS, and KVM actually passes this write to
-actual hardware msr (this is somewhat wierd), and since the MSR is not writable and silently drops writes instead,
-once the test tries to read it, it gets some random value instead.
+This series replaces the final non-selftest patchs from this series[1],
+which introduced a similar change (and a new MMU notifier) with KVM
+optimizations. I'll send a separate series (to Sean and Paolo) for the
+KVM optimizations.
 
-Any advice?
+This series also makes proactive reclaim with MGLRU possible for KVM
+memory. I have verified that this functions correctly with the selftest
+from [1], but given that that test is a KVM selftest, I'll send it with
+the rest of the KVM optimizations later. Andrew, let me know if you'd
+like to take the test now anyway.
 
-Best regards,
-	Maxim Levitsky
+[1]: https://lore.kernel.org/linux-mm/20240926013506.860253-18-jthoughton@google.com/
 
+Yu Zhao (2):
+  mm: multi-gen LRU: remove MM_LEAF_OLD and MM_NONLEAF_TOTAL stats
+  mm: multi-gen LRU: use {ptep,pmdp}_clear_young_notify()
+
+ include/linux/mmzone.h |   7 ++-
+ mm/rmap.c              |   9 ++--
+ mm/vmscan.c            | 105 +++++++++++++++++++++--------------------
+ 3 files changed, 60 insertions(+), 61 deletions(-)
+
+
+base-commit: b5d43fad926a3f542cd06f3c9d286f6f489f7129
+-- 
+2.47.0.105.g07ac214952-goog
 
 
