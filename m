@@ -1,234 +1,127 @@
-Return-Path: <kvm+bounces-29199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29202-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 759229A5011
-	for <lists+kvm@lfdr.de>; Sat, 19 Oct 2024 19:26:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3868D9A51C3
+	for <lists+kvm@lfdr.de>; Sun, 20 Oct 2024 02:17:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA6D1B25B38
-	for <lists+kvm@lfdr.de>; Sat, 19 Oct 2024 17:26:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D87B01F22E02
+	for <lists+kvm@lfdr.de>; Sun, 20 Oct 2024 00:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80319192D6E;
-	Sat, 19 Oct 2024 17:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC3F28FF;
+	Sun, 20 Oct 2024 00:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aJMdKFy7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6lNs9NC"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3011917E6;
-	Sat, 19 Oct 2024 17:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9146A7E1
+	for <kvm@vger.kernel.org>; Sun, 20 Oct 2024 00:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729358718; cv=none; b=Nyj+fFX5rqgMdSbd44wnqr4fGli56antfK0IbL7byuXCJm7wjQIYzu0f9LO9YgZbVB1NuN9Y4K3nMKepQzyn34VfcYNjoyt0dfCLthsdgaIOjzT4SRzqwoJOJmtkN4lOqui9Q7z3ne+f157bUp7LISZjQSI7Xtc/SsZpd3IlH/s=
+	t=1729383415; cv=none; b=ZK1V7EVS8wOWjTX0PBp7IgSIC3N6S5NP3Ifh1z83PC2pSzhD8N4c0Q2k/+pvR1NUBWfw0TrjRIF7zCGABkvj5KH4+UkmiA0Qnc81bNsP6ZTieHMYgTdPiaoTyMVCmv+gc6241C2fOSG9eFGW91aS6Wlo+BeCPJwRnKm4cq/S4D4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729358718; c=relaxed/simple;
-	bh=K2m8obFhWuwPQuikGUdYpspkIHuhwoUO0TZOETINH7I=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hlQYFIk3KVTck5f0rCeCAhufN/+fiWco35JUyL98adgJxXZf1GKax9x36k3pin2+gW3OqqPESYrzyudICGHlSc7z05Krc8nJeivwM8HN6tH/nW7bIbsQ/XSbR4Kq+rqa7K4kOo6ChpZ6Usy8xB4OAm/hgZI3qAgkl0jpfVsZUbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aJMdKFy7; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:To:From:Reply-To:
-	Cc:Content-Type:Content-ID:Content-Description;
-	bh=T/6p2P3AuQICDZdTmCqeIRHYUbD9P11W996yxXSWcPU=; b=aJMdKFy7DJvlTP1XnRcUjL6xbY
-	Q5EoK5K3U51yRlgxxEb40YRiBgw/w7hBzAWytf0A1aXUXARRqTR8mw4PqxNKx+HwUEscYrVaMJ6UG
-	liArW3tl3xOmGMt4Dpt5nfhKf9vp8d8pBn8fEF0P4V48jTe19emOfLUMSKevdrre9oaVr0tzxPX68
-	KfkJ/EsRHkgLLB5dH7lDB4jVFjJfjpSy7Y5Mw2LDmiGnt1LIQ4CxfZRhtcrH3zNvWAd2AAUQHcieH
-	OM3tssMkLM/axWzt9O7aiyFjtlV312lwVSI0HPBT/9ylp6SB+/poGIBPaux2rtzL8LJBP7GtVHMPr
-	/yWn6Ahw==;
-Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1t2DCK-0000000EUiq-3cTV;
-	Sat, 19 Oct 2024 17:25:07 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1t2DCI-00000009TKv-3xjU;
-	Sat, 19 Oct 2024 18:25:02 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>,
-	Len Brown <len.brown@intel.com>,
-	Shuah Khan <shuah@kernel.org>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-pm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	Miguel Luis <miguel.luis@oracle.com>
-Subject: [PATCH v6 6/6] arm64: Use SYSTEM_OFF2 PSCI call to power off for hibernate
-Date: Sat, 19 Oct 2024 18:15:47 +0100
-Message-ID: <20241019172459.2241939-7-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241019172459.2241939-1-dwmw2@infradead.org>
-References: <20241019172459.2241939-1-dwmw2@infradead.org>
+	s=arc-20240116; t=1729383415; c=relaxed/simple;
+	bh=4nWCcVgNwZmT+J155u8sQ6LHY+zidjsozMsC45vxYmo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S5D6LRuicAHQbcLZqaL17Wl1QHDAWkcJRbym4RTHn3Mggzu/qJbxF1X0oqyJJJjH/8au1RKWTvBICOH2gzV9lwXtoM7KpCmI5aCyJHxDCrNIvb29zLvJrBDuwFPGotsVohI2Ub+y7W2dZSiG74enx23hhqwkcRy5E4PqUz9WNAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6lNs9NC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729383412;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=or/yiB9Bu3RiCaJk2pWKK99jtEnWq4g9dV4LlVxDLOc=;
+	b=d6lNs9NCvVKc1hO87pZwpqRra47voKkxLWUwbH7NTeWgRcADtCrG77GmIKwDuR57SK+o22
+	TFASrhUvBI0eNRR2vTLv13b07v1HTwsYrTzc2CxJSx+pu4Ef3v3Qmgzk2bL+d74/RDaKMi
+	1BXBYrvvg9F4ah2dquVxHwb3mByQPBQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-283-rRvsM5pUP9ee6XqdMoKJWA-1; Sat, 19 Oct 2024 20:16:51 -0400
+X-MC-Unique: rRvsM5pUP9ee6XqdMoKJWA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d4922d8c7so1737487f8f.1
+        for <kvm@vger.kernel.org>; Sat, 19 Oct 2024 17:16:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729383410; x=1729988210;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=or/yiB9Bu3RiCaJk2pWKK99jtEnWq4g9dV4LlVxDLOc=;
+        b=s0mmyhhJeC3LLwQm1GK0T5Kx3rNm/PM2N1QTilMrj+vGZU6c5ICEpxiv6zLjj6SYZH
+         qhfg9aaj/WymB+xX+W7jYS7QHI2G2Us9f2mSQxXQKTFwX7SM6noCew32HhCGe8PRloy5
+         x295e+E9QuimsfSHxDoFucWNd6XKailZQ4y8Qdq611WcXkspryoxx2l6EGTXw7R7f9eL
+         idW/sXNLq6bXhtyEV2+X8FtI4K0I5gxaLi/h9jQjpZ4DhsEsouDlaXoIrkEhyZtDV3WT
+         z2YALNPEtnFlawc+fYRSyx0sSNXPdh58M5vwWsxqjZFqltk+GnDiO6Pdnk3eZmQYD+/w
+         irOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVm1buufCeLSHgpkgtkYIrEimGF5qh6A7BkSX6ofAxOH9IPraqOBe5pw26P565toxMlqiA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+KA8kgxRFETcUWEumeJfAq99ZwIfiXKiZ0KdzzHPllHmpy8h6
+	khC8MGMrbI4HSj8/lQ7D2PaG/uL+GjWvSpQtWtb9GwPXopUNkz7gI/KyccSWJnDLe9fLJAO7gFw
+	0LAJkeUQ0Ovl/mTo8lhhLXPUcslsdUNGJmWBJBues8mHfV/ky/A==
+X-Received: by 2002:a5d:4952:0:b0:374:fa0a:773c with SMTP id ffacd0b85a97d-37eab4ed869mr4187052f8f.47.1729383409833;
+        Sat, 19 Oct 2024 17:16:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFW8rNNSMLfWH/xZFL3V72aDhzOhHJhrgTxKwJDJWnDH+yL3bJWVtZvNkVfYNU8FESgNMMTWg==
+X-Received: by 2002:a5d:4952:0:b0:374:fa0a:773c with SMTP id ffacd0b85a97d-37eab4ed869mr4187044f8f.47.1729383409436;
+        Sat, 19 Oct 2024 17:16:49 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:7405:9900:56a3:401a:f419:5de9])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b94131sm585161f8f.81.2024.10.19.17.16.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Oct 2024 17:16:47 -0700 (PDT)
+Date: Sat, 19 Oct 2024 20:16:44 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Srujana Challa <schalla@marvell.com>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"eperezma@redhat.com" <eperezma@redhat.com>,
+	Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>
+Subject: Re: [EXTERNAL] Re: [PATCH v2 0/2] vhost-vdpa: Add support for
+ NO-IOMMU mode
+Message-ID: <20241019201059-mutt-send-email-mst@kernel.org>
+References: <20240920140530.775307-1-schalla@marvell.com>
+ <Zvu3HktM4imgHpUw@infradead.org>
+ <DS0PR18MB5368BC2C0778D769C4CAC835A0442@DS0PR18MB5368.namprd18.prod.outlook.com>
+ <Zw3mC3Ej7m0KyZVv@infradead.org>
+ <20241016134127-mutt-send-email-mst@kernel.org>
+ <ZxCrqPPbidzZb6w1@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZxCrqPPbidzZb6w1@infradead.org>
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Wed, Oct 16, 2024 at 11:16:08PM -0700, Christoph Hellwig wrote:
+> On Wed, Oct 16, 2024 at 01:41:51PM -0400, Michael S. Tsirkin wrote:
+> > It's basically because vfio does, so we have to follow suit.
+> 
+> That's a very bold argument, especially without any rationale of
+> 
+>  a) why you need to match the feature set
 
-The PSCI v1.3 specification adds support for a SYSTEM_OFF2 function
-which is analogous to ACPI S4 state. This will allow hosting
-environments to determine that a guest is hibernated rather than just
-powered off, and handle that state appropriately on subsequent launches.
+Because people want to move from some vendor specific solution with vfio
+to a standard vdpa compatible one with vdpa.
 
-Since commit 60c0d45a7f7a ("efi/arm64: use UEFI for system reset and
-poweroff") the EFI shutdown method is deliberately preferred over PSCI
-or other methods. So register a SYS_OFF_MODE_POWER_OFF handler which
-*only* handles the hibernation, leaving the original PSCI SYSTEM_OFF as
-a last resort via the legacy pm_power_off function pointer.
+We could just block them since we don't support tainted kernels anyway,
+but it's a step in the right direction since it allows moving to
+virtio, and the kernel is tained so no big support costs (although
+qe costs do exist, as with any code).
 
-The hibernation code already exports a system_entering_hibernation()
-function which is be used by the higher-priority handler to check for
-hibernation. That existing function just returns the value of a static
-boolean variable from hibernate.c, which was previously only set in the
-hibernation_platform_enter() code path. Set the same flag in the simpler
-code path around the call to kernel_power_off() too.
+>  b) how even adding it to vfio was agood idea
 
-An alternative way to hook SYSTEM_OFF2 into the hibernation code would
-be to register a platform_hibernation_ops structure with an ->enter()
-method which makes the new SYSTEM_OFF2 call. But that would have the
-unwanted side-effect of making hibernation take a completely different
-code path in hibernation_platform_enter(), invoking a lot of special dpm
-callbacks.
+That ship has sailed.
 
-Another option might be to add a new SYS_OFF_MODE_HIBERNATE mode, with
-fallback to SYS_OFF_MODE_POWER_OFF. Or to use the sys_off_data to
-indicate whether the power off is for hibernation.
-
-But this version works and is relatively simple.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Acked-by: Rafael J. Wysocki <rafael@kernel.org>
----
- drivers/firmware/psci/psci.c | 42 ++++++++++++++++++++++++++++++++++++
- kernel/power/hibernate.c     |  5 ++++-
- 2 files changed, 46 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-index 2328ca58bba6..8809455a61a6 100644
---- a/drivers/firmware/psci/psci.c
-+++ b/drivers/firmware/psci/psci.c
-@@ -78,6 +78,7 @@ struct psci_0_1_function_ids get_psci_0_1_function_ids(void)
- 
- static u32 psci_cpu_suspend_feature;
- static bool psci_system_reset2_supported;
-+static bool psci_system_off2_hibernate_supported;
- 
- static inline bool psci_has_ext_power_state(void)
- {
-@@ -333,6 +334,33 @@ static void psci_sys_poweroff(void)
- 	invoke_psci_fn(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
- }
- 
-+#ifdef CONFIG_HIBERNATION
-+static int psci_sys_hibernate(struct sys_off_data *data)
-+{
-+	/*
-+	 * Zero is an acceptable alternative to PSCI_1_3_OFF_TYPE_HIBERNATE_OFF
-+	 * and is supported by hypervisors implementing an earlier version
-+	 * of the pSCI v1.3 spec.
-+	 */
-+	if (system_entering_hibernation())
-+		invoke_psci_fn(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2),
-+			       0 /*PSCI_1_3_OFF_TYPE_HIBERNATE_OFF*/, 0, 0);
-+	return NOTIFY_DONE;
-+}
-+
-+static int __init psci_hibernate_init(void)
-+{
-+	if (psci_system_off2_hibernate_supported) {
-+		/* Higher priority than EFI shutdown, but only for hibernate */
-+		register_sys_off_handler(SYS_OFF_MODE_POWER_OFF,
-+					 SYS_OFF_PRIO_FIRMWARE + 2,
-+					 psci_sys_hibernate, NULL);
-+	}
-+	return 0;
-+}
-+subsys_initcall(psci_hibernate_init);
-+#endif
-+
- static int psci_features(u32 psci_func_id)
- {
- 	return invoke_psci_fn(PSCI_1_0_FN_PSCI_FEATURES,
-@@ -364,6 +392,7 @@ static const struct {
- 	PSCI_ID_NATIVE(1_1, SYSTEM_RESET2),
- 	PSCI_ID(1_1, MEM_PROTECT),
- 	PSCI_ID_NATIVE(1_1, MEM_PROTECT_CHECK_RANGE),
-+	PSCI_ID_NATIVE(1_3, SYSTEM_OFF2),
- };
- 
- static int psci_debugfs_read(struct seq_file *s, void *data)
-@@ -525,6 +554,18 @@ static void __init psci_init_system_reset2(void)
- 		psci_system_reset2_supported = true;
- }
- 
-+static void __init psci_init_system_off2(void)
-+{
-+	int ret;
-+
-+	ret = psci_features(PSCI_FN_NATIVE(1_3, SYSTEM_OFF2));
-+	if (ret < 0)
-+		return;
-+
-+	if (ret & PSCI_1_3_OFF_TYPE_HIBERNATE_OFF)
-+		psci_system_off2_hibernate_supported = true;
-+}
-+
- static void __init psci_init_system_suspend(void)
- {
- 	int ret;
-@@ -655,6 +696,7 @@ static int __init psci_probe(void)
- 		psci_init_cpu_suspend();
- 		psci_init_system_suspend();
- 		psci_init_system_reset2();
-+		psci_init_system_off2();
- 		kvm_init_hyp_services();
- 	}
- 
-diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-index e35829d36039..1f87aa01ba44 100644
---- a/kernel/power/hibernate.c
-+++ b/kernel/power/hibernate.c
-@@ -685,8 +685,11 @@ static void power_down(void)
- 		}
- 		fallthrough;
- 	case HIBERNATION_SHUTDOWN:
--		if (kernel_can_power_off())
-+		if (kernel_can_power_off()) {
-+			entering_platform_hibernation = true;
- 			kernel_power_off();
-+			entering_platform_hibernation = false;
-+		}
- 		break;
- 	}
- 	kernel_halt();
 -- 
-2.44.0
+MST
 
 
