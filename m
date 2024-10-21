@@ -1,115 +1,119 @@
-Return-Path: <kvm+bounces-29279-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29281-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B03EC9A677B
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 14:03:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 728269A67A2
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 14:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72078283029
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 12:03:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFC64B2276A
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 12:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D681EABDE;
-	Mon, 21 Oct 2024 12:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8E61EE029;
+	Mon, 21 Oct 2024 12:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="TIPSoaVi"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E451E9090;
-	Mon, 21 Oct 2024 12:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645AB1EBA1E
+	for <kvm@vger.kernel.org>; Mon, 21 Oct 2024 12:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729512184; cv=none; b=XnmGjtJAn8uXyKl8roHPuTnKweicvgyX6OyV4NBz37m/16eiOlzKXsrs6NkE9LL5za0f3c8TOMDAciIKRJDWSKgQUNBl1AaUZaMzUlhIJUVTojib4O/IEwFmC5zWjtdIuB3OLPDl3lxin0VvGle+z1pSwVcxN9mhNV2VN6Oiu3g=
+	t=1729512535; cv=none; b=TmaCLe1DeqMcd6dobs/ksxSrszmixCUm/gbf36/N1yj9zjwlAHtq8xEpOc2okGZFsfCy8DSCBVT4D9+SzaFD/CRsnIEW9bByXJSCtfejwcMuXWj9aB5Up0OorlPjDdBQfRsIlX4GAnZgHbNb/k+AkKd1Of7U7K330iQkOZSmQfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729512184; c=relaxed/simple;
-	bh=wLc56yfBrI+GsGTQNi0QL709D7IVdO7b1wOCRHOM9O0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UYAB7k/hL3rI/kL387S57VWg5OFsel3XjOvq6IJKMd81Vq6X1vKbRMck6pB7lPOt9QcAmwQzZSn1JOeAcIe+H2r/WUYdw0Fd5odYxOuau5iX40oV4PfeEdXjx0zk1CsjG/6gq1/0I0WSHsUbiZta3rBq7x67UPJmgiJYccNz6aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E27C4CEE6;
-	Mon, 21 Oct 2024 12:02:58 +0000 (UTC)
-Date: Mon, 21 Oct 2024 13:02:56 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Ankur Arora <ankur.a.arora@oracle.com>
-Cc: "Okanovic, Haris" <harisokn@amazon.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"rafael@kernel.org" <rafael@kernel.org>,
-	"sudeep.holla@arm.com" <sudeep.holla@arm.com>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-	"wanpengli@tencent.com" <wanpengli@tencent.com>,
-	"cl@gentwo.org" <cl@gentwo.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"maobibo@loongson.cn" <maobibo@loongson.cn>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>,
-	"daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"lenb@kernel.org" <lenb@kernel.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"bp@alien8.de" <bp@alien8.de>,
-	"mtosatti@redhat.com" <mtosatti@redhat.com>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>
-Subject: Re: [PATCH v8 01/11] cpuidle/poll_state: poll via
- smp_cond_load_relaxed()
-Message-ID: <ZxZC8Pg1qwULeirJ@arm.com>
-References: <20240925232425.2763385-1-ankur.a.arora@oracle.com>
- <20240925232425.2763385-2-ankur.a.arora@oracle.com>
- <Zw5aPAuVi5sxdN5-@arm.com>
- <7f7ffdcdb79eee0e8a545f544120495477832cd5.camel@amazon.com>
- <ZxEYy9baciwdLnqh@arm.com>
- <87h69amjng.fsf@oracle.com>
- <ZxJBAubok8pc5ek7@arm.com>
- <87jze5kzhp.fsf@oracle.com>
+	s=arc-20240116; t=1729512535; c=relaxed/simple;
+	bh=3bSMN63SS0O1JqxMVL2Km5ADBcS94qUikfjIm2ZiteY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=b1AnECAIKosp5FyTVICl+XTPBc7nouRyRT7xYw1hU4EXAIbh4XjrA+dFifGfWCXyHv+0fWoABCstZvDKo8TThR+HHrtiRp3gi4SB18OJgDHKYEAIml1bknn8/wv+elMvTuL5NJ5J11wq2eBkWVVnfKaGSRxWAB6mBfCag5BoTAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=TIPSoaVi; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49L8P3dr001682;
+	Mon, 21 Oct 2024 05:08:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=5NaK/CokaNbKYqs5HlYd8Jt
+	Q1ROW7axkdLFpvxIYc08=; b=TIPSoaVif1Y+kjXiMyuZ4zobfe6RilXsYuMEUMM
+	5wPeutaSBoLtrfaOwHjK+9TAKJWnUHr0vZLFfm/eKi1Zv0INAhteKkxelRPUpExK
+	GT2CDOyggBbspOUK4XV2o5osx/Sy9g6EJ8Gw4+w0OqNtLaEndvi73ssHDOp5V+2c
+	ZmeFw3PA6q+Ubqv2fYhgIrTjcql0DlHrLkFRblqNao6ddUjCE4NN90jnwXXrYOed
+	F48wZTpP+DzVsF2fGl75XY2SQaFV4l9ABuW++a7h0Bk6h7VvR7yx3+FU8e4FZssf
+	z7ANZVqCph6dLLK8aliFnFHY5dGWcPXZ4VW22ZzAjJI8hFQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 42dke60dby-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Oct 2024 05:08:42 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 21 Oct 2024 05:08:40 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 21 Oct 2024 05:08:40 -0700
+Received: from localhost.localdomain (unknown [10.28.36.175])
+	by maili.marvell.com (Postfix) with ESMTP id 4B1843F7052;
+	Mon, 21 Oct 2024 05:08:38 -0700 (PDT)
+From: Srujana Challa <schalla@marvell.com>
+To: <virtualization@lists.linux.dev>, <kvm@vger.kernel.org>
+CC: <mst@redhat.com>, <jasowang@redhat.com>, <eperezma@redhat.com>,
+        <ndabilpuram@marvell.com>, <jerinj@marvell.com>
+Subject: [PATCH v3 0/2] vhost-vdpa: Add support for NO-IOMMU mode
+Date: Mon, 21 Oct 2024 17:38:35 +0530
+Message-ID: <20241021120837.1438628-1-schalla@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87jze5kzhp.fsf@oracle.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Qo4ARWR9KKoUMu5Lyqf9LpcM4rmK9peE
+X-Proofpoint-ORIG-GUID: Qo4ARWR9KKoUMu5Lyqf9LpcM4rmK9peE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-On Fri, Oct 18, 2024 at 12:00:34PM -0700, Ankur Arora wrote:
-> Catalin Marinas <catalin.marinas@arm.com> writes:
-> > On Thu, Oct 17, 2024 at 03:47:31PM -0700, Ankur Arora wrote:
-> >> So maybe the right thing to do would be to keep smp_cond_load_timeout()
-> >> but only allow polling if WFxT or event-stream is enabled. And enhance
-> >> cpuidle_poll_state_init() to fail if the above condition is not met.
-> >
-> > We could do this as well. Maybe hide this behind another function like
-> > arch_has_efficient_smp_cond_load_timeout() (well, some shorter name),
-> > checked somewhere in or on the path to cpuidle_poll_state_init(). Well,
-> > it might be simpler to do this in haltpoll_want(), backed by an
-> > arch_haltpoll_want() function.
-> 
-> Yeah, checking in arch_haltpoll_want() would mean that we can leave all
-> the cpuidle_poll_state_init() call sites unchanged.
-> 
-> However, I suspect that even acpi-idle on arm64 might end up using
-> poll_idle() (as this patch tries to do:
-> https://lore.kernel.org/lkml/f8a1f85b-c4bf-4c38-81bf-728f72a4f2fe@huawei.com/).
-> 
-> So, let me try doing it both ways to see which one is simpler.
-> Given that the event-stream can be assumed to be always-on it might just
-> be more straight-forward to fallback to cpu_relax() in that edge case.
+This patchset introduces support for an UNSAFE, no-IOMMU mode in the
+vhost-vdpa driver. When enabled, this mode provides no device isolation,
+no DMA translation, no host kernel protection, and cannot be used for
+device assignment to virtual machines. It requires RAWIO permissions
+and will taint the kernel.
 
-I agree, let's go with the simplest. If one has some strong case for
-running with the event stream disabled and idle polling becomes too
-energy inefficient, we can revisit and add some run-time checks.
+This mode requires enabling the "enable_vhost_vdpa_unsafe_noiommu_mode"
+option on the vhost-vdpa driver and also negotiate the feature flag
+VHOST_BACKEND_F_NOIOMMU. This mode would be useful to get
+better performance on specifice low end machines and can be leveraged
+by embedded platforms where applications run in controlled environment.
+
+First patch introduces a module parameter
+"enable_vhost_vdpa_unsafe_noiommu_mode", while the second patch
+introduces a feature flag VHOST_BACKEND_F_NOIOMMU to the vhost vdpa
+driver to support NO-IOMMU mode.
+
+This feature flag indicates to userspace that the driver can safely
+operate in NO-IOMMU mode. If the flag is not present, userspace should
+assume NO-IOMMU mode is unsupported and must not proceed.
+
+v1->v2:
+- Introduced new feature flag to vhost backend features for negotiating
+  NO-IOMMU feature.
+v1->v3:
+- Resolved the sparse error reported by kernel test robot.
+
+Srujana Challa (2):
+  vhost-vdpa: introduce module parameter for no-IOMMU mode
+  vhost-vdpa: introduce NO-IOMMU backend feature bit
+
+ drivers/vhost/vdpa.c             | 39 +++++++++++++++++++++++++++++++-
+ include/uapi/linux/vhost_types.h |  2 ++
+ 2 files changed, 40 insertions(+), 1 deletion(-)
 
 -- 
-Catalin
+2.25.1
+
 
