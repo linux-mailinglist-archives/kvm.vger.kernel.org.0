@@ -1,186 +1,145 @@
-Return-Path: <kvm+bounces-29311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-29312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3353B9A9116
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 22:24:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A950B9A914C
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 22:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AB6B1C21A42
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 20:24:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10C5CB215F9
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2024 20:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E031FEFBE;
-	Mon, 21 Oct 2024 20:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DADA41FDFB7;
+	Mon, 21 Oct 2024 20:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="I3bekNpA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EY4nDpd3"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2043.outbound.protection.outlook.com [40.107.220.43])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC721FE0FE;
-	Mon, 21 Oct 2024 20:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729542248; cv=fail; b=j8PR6s9IZ5QPymfD1y5g0fFGUHZB7cJSgI92f2CM3uf8TSqkenPcS9sud06gKkcW9fJ9EC07fZ98EgZALb6WktRXMasuqyJpfNSW2/8+4yknVtwzhR481SnE9guodJ6/PzBxyxDpuy5Lpn3d3xXN+uVRhu+YQ2cJC5hL+f7/tk0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729542248; c=relaxed/simple;
-	bh=1jrdzJjbJD7pai/lWLfo6GpyPqKzKbTFoa/Qmf5LZ8w=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=M/D+E2Shw6RyaLZvIRxvlSFxUED8IlwpdveHosSpCnQsaEr7kbSV0qPSIp2w72AAl/WoYJcur3beFlJ5miy3H2x0LiT9yHUilpkUjnDkgVwtmFo6B8fgt3lqnsqmQa/fudCwQIPAPMQSSlmYARm7TzIA8M5z0U+qgMCKWeEUBiU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=I3bekNpA; arc=fail smtp.client-ip=40.107.220.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G6YFrL3sxc+GQJHD1KhnsnCOCWwIP39yPD0dHCWbLe0MCeh6dGWSZHog/vazFPC7Aj3DvAOqBIn+bauktBJ1Iy7YvoyskBgaxibeSRRFlhkxdy/3idKH7nv8UT24s/oZOMmIBmD+hnDQ1poG0EhFFtUqAlf39xROG1u18hk+ztT1vcHcYf51ihKbk3yk1hkXpb0MybP4ARjnkvUE4ntdAE93iJv7t24aK8AvoIZ+5dSpa/z/339pEIxF8SV0F4i/xQTdAjMtX7UdTzhKS0D7xzTtmwYnyeJWpE73R/afB/1DHnuvUAI75KPTAQRCtUZVeSLvFPSOeZ21KYlxIoZJ6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YkqTk4lbJPcv7rcOnDTtiTUguYlf+38EB4HzPQ2RqGY=;
- b=mYPisEaMQBZ1QFttCJrTzLQzp2WrMKOqLRYo7DdZrSIjyfIvNayhDZ0IS3XyXOe27J/UZosUEZx7vrlYfByh72zcFyBGp9GEx9cOKu9Ys0BjiF5nRmz+Sy+ovLXnO/qfbzTjlwTLMzWeU15QIM11jmwclYqe7SkaIKcDUqaQAJ08eXErF6hd7FnNnXAoFPTY4MI73KclgiqpCH64YUcv/nUm1YqPWhX7APeREP1bLraC6tFfdI9YbPaLhXP7gNnmQ6IYUGeWWy4rDipcRyXPDhmZCprbuDPKGEg56hP82c/c2T7ZHQByeSPZlc4EZNY6n1tLQZHYhFlpF02M/WSoSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YkqTk4lbJPcv7rcOnDTtiTUguYlf+38EB4HzPQ2RqGY=;
- b=I3bekNpAFyoFPBMqjbDXcRvd3HyUmoXOPw8z5Ujg7cdCshKWVC5++LhDEbrNXE7SkLZ1Hank7D1N9yKI2tOP1G/LSN/xdwblzRFV1Kmwfny31QkFo7e8YdK2hTyleGxLsfXqeVmw00Gi+qSNVUywS1Sel3KGXIg/x6d9x1Wt1VE=
-Received: from SJ0PR05CA0172.namprd05.prod.outlook.com (2603:10b6:a03:339::27)
- by LV3PR12MB9118.namprd12.prod.outlook.com (2603:10b6:408:1a1::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Mon, 21 Oct
- 2024 20:24:04 +0000
-Received: from SJ5PEPF000001F1.namprd05.prod.outlook.com
- (2603:10b6:a03:339:cafe::50) by SJ0PR05CA0172.outlook.office365.com
- (2603:10b6:a03:339::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.15 via Frontend
- Transport; Mon, 21 Oct 2024 20:24:03 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001F1.mail.protection.outlook.com (10.167.242.69) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8093.14 via Frontend Transport; Mon, 21 Oct 2024 20:24:03 +0000
-Received: from [10.236.186.64] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 21 Oct
- 2024 15:24:00 -0500
-Message-ID: <87115c3a-4e8b-4cad-901a-07c7f4f77ac9@amd.com>
-Date: Mon, 21 Oct 2024 15:23:55 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1DE1494DB;
+	Mon, 21 Oct 2024 20:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729542839; cv=none; b=QVRPYM1MnSZtN+4njRT24qQenmLHDqKFiIWwuwxRzfePHlm6UMqaLYVqgmei5QPLBbRF1J1zwzhPsFFAbYPQuoCQFe7s/4Jja+bcSbva7W755eZfhij2WN9UKn6DaUAU5HnrqZWTUOGNmEstkcCPQeO3IsSqM4paw7TCqTDzu94=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729542839; c=relaxed/simple;
+	bh=PUti+uJWhKGSDKiDdachxwWsPeCcSML5pWVjgslBJJI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UCxSaJRmLQ2subMO8oPjT+bxUiPAxwj9SIZlG21wRAVwmmlfe/P8f4hm5YIlzbXaVt6V6dPcgUqDLTXQe+orUDFzOq92xQVILXRkX+nu+Ilmf+smxpgNDEWlENu3kuzNFMe6JLdc2LAK/UIMOxQ0gyGN++2dWcwJlILJTMRLnYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EY4nDpd3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2266FC4CEC7;
+	Mon, 21 Oct 2024 20:33:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729542838;
+	bh=PUti+uJWhKGSDKiDdachxwWsPeCcSML5pWVjgslBJJI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EY4nDpd32222igTTRgePtEVwvwcoAqF6WMoPkuKlkDZqISe+dyC3vbZKnElrpbuAl
+	 y6Gi2G8kyT4EAchk3kWvbXpuOhN0vp0a9MPvwflNKEAsJ+CTXqn+RBadjiyS06saxI
+	 +GTHOMRmkJAEMI9iCz+CFxFfxEY2lvD8bcoKemiz0PK+RmlDvMVwKF/dWLktJnVPmt
+	 eyFBufV/zHZ0DujGDXyaiRgGpPD38dJ9OUmOjRgrxFk+IccpmmPnpWEVNnItutSjHo
+	 FoKdW7YxHv4iIJSYNyxsJWes0qgupDlrGyzkopzLsj0JdAPSxj13/eDg0Y3Ysj69ev
+	 aSE0fxF8mnMMw==
+Date: Mon, 21 Oct 2024 21:33:54 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Jan Richter <jarichte@redhat.com>, linux-kernel@vger.kernel.org,
+	Aishwarya.TCV@arm.com, torvalds@linux-foundation.org
+Subject: Re: [PATCH] KVM: selftests: x86: Avoid using SSE/AVX instructions
+Message-ID: <5071a694-150b-4f6f-8e48-8b96998bdd23@sirena.org.uk>
+References: <20240920154422.2890096-1-vkuznets@redhat.com>
+ <9a160e3d-501b-4759-9067-17cd822617ec@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>
-Subject: Re: [PATCH v3 0/9] SEV Kernel Selftests
-To: Sean Christopherson <seanjc@google.com>
-CC: <kvm@vger.kernel.org>, <pbonzini@redhat.com>, <pgonda@google.com>,
-	<thomas.lendacky@amd.com>, <michael.roth@amd.com>, <shuah@kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240905124107.6954-1-pratikrajesh.sampat@amd.com>
- <Zw2Z3WUYjOZ1rP59@google.com>
-Content-Language: en-US
-In-Reply-To: <Zw2Z3WUYjOZ1rP59@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F1:EE_|LV3PR12MB9118:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2aba8a99-6e3c-47ac-9bea-08dcf20e4e41
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?N0tpaVRmZDhkSFNLZi9mNlVPa1ZIU0g3czNvWFFnemZVa2NsK0M5blowbVgv?=
- =?utf-8?B?bTVPUFRsSXJoVFREY0VqSGQ0dTdFaTFLaTBGQ3Z4VGxxQndLRExDQU9pc2ZQ?=
- =?utf-8?B?RS9oU0J6RzRMYzRLQlFwelNUQ0JYOWMzUVRnMkNwelkyMHF5dU5IWS93TVJa?=
- =?utf-8?B?YXZ5SWpIbm44R2F1LzQxY3hHUUZOWC91eXdCcHI1dmJkbm52Q2VmWmk1eVAw?=
- =?utf-8?B?c0V5MGthUXNiL21ramtqRWpYdWpvUzEyb3VoQUZIRGFFV01sUVJJVEZPdlhD?=
- =?utf-8?B?d20raXhVRS9vOGRqck1uNnlyakJZT2ViM2ExV09NY2oyVW5MNXZOWWt3dGYz?=
- =?utf-8?B?UFJnam5LVGpYU1dhMUJTWFFwQWZ6a05kUlQvQmJyWStNTzU1UUZvejM4dDJU?=
- =?utf-8?B?amhPZURhZjF3aXE4M21icEhDYkthVEhTTW10OUpyWTRTY1ZKa2tlUjAzYUpw?=
- =?utf-8?B?R2grWWFCUlFiR0I4L2trb3FieUE1eDZObE5nTkd2aG1zZlRvNlREUXJuMTR6?=
- =?utf-8?B?QzBnR01mamRWTGZBN0ZGWVI4Q2czTXpDZDNHOFFIbXE5VERzZmhjbnV6UDk1?=
- =?utf-8?B?Yi9EM0JVNCtkMm54a3VjZzlXay9BZlVYTkNzZUpTR3RGUjU3ZFcxd2Jkc25Q?=
- =?utf-8?B?YUcrUVNZYTJhN1RrWkZNckVoa3pZSW5rbVpVMjNZYko0c3lQZVhNN3ZHbUxJ?=
- =?utf-8?B?dktEQjMreXhaYytUWmlTTTdRK2xMWDVFV2ZzZzBrQlhPMEJraHJFTjZneWtL?=
- =?utf-8?B?WCtEZ0hjOEFPMURJREFBOCt5ZDFxSzFKMStqWS9rYUo5ZlR2eFEwZjVGZ3V3?=
- =?utf-8?B?UnR6YlVPUTJWY2I2ajMrdGJ1Ui85VFdack9zVHltbmlndk9NU3NjbVRic3Rp?=
- =?utf-8?B?bVErM01oaUNXZVAyZnVJeWdwblZjSG45a25xRHl3aTk4OHBlbDhhT3hkQWh3?=
- =?utf-8?B?WHkwNkRoUEJsa2lJMmc2V1JUT1JLRTl6UTQ2SWx1U0hBNmJlUGJnZXE4N21U?=
- =?utf-8?B?Nk5IaDJZbW1ud2owRTFLbTZ2NkpxUndSc0VaVHNWNW5hQ3FyZXFhbVhTR1Ax?=
- =?utf-8?B?Vkt5b3Y1SnhNQ3NYRW55OXBpcjJieVlPTkZFTzlSckNkSG9nSUNLRkZLM1Ri?=
- =?utf-8?B?WlBLeTNPaFpWazJNWWR4SER3M2ZCd1NUZHVoczlBOXlTNkp5NmhXWGk1ZjZw?=
- =?utf-8?B?ejZ0ZjJJTUZvRkI1aEdRaDNETGs5YmpRcFZlTjN4Ym9MUUdreXZCQW5EMTFJ?=
- =?utf-8?B?T1dkMmRyWFRGRDBpdzEwbWUxdzZMOEdIaDZmT2VkVURnWlg4N3lUMHdFa2Ux?=
- =?utf-8?B?UzhnWjRpU2Y5a2xWV29lRFVCQklDc1BVTXd2aDlNelozOU5JWE9hQnpJY1JB?=
- =?utf-8?B?R0NwYUt4TnZKL05PNFFHdkVQUmUzUGh5NDNPUGFMWG5ZYnh4VVI5ZVhxR1pL?=
- =?utf-8?B?RVlOUG1JZDlwM25Uc0VNNXFaajhNR1VOU09NWnFJKzdlSUMveFRaMmVsUWZi?=
- =?utf-8?B?Q3c5T1VrbUkrcmVwUkJJdit1K0NiQkxBazZRWmxRNEMxcldZVHY0aXQrUkF2?=
- =?utf-8?B?YUM2djJJTVUvOE9DNDdCR0QxQ3c1TWJjQ0FWamlrOGRmVVJBdkxmcGlnbEtU?=
- =?utf-8?B?MmlmMndSN1BZVXNQdFVNRkpjL2dJcndNemVUc3hIRnQzRzgwK2JNYzY4RTV4?=
- =?utf-8?B?NGRCT20wUytkRXJFRFJFOVRqczNNQjYzbnB3dS95bWE3QzJva09abms4c3lH?=
- =?utf-8?B?QVpSaDVwVjdVWkFLMFBMQVlaUGNmczJxZTJIbHJCREgzZ2tkODNEQUU0SEQ1?=
- =?utf-8?B?a3Q1MDNXSXlnRWJTcUM3ZFlLZG85WkY5TzFURm9kOEhhV1dqRDA0a1NrNEhk?=
- =?utf-8?B?QUtJMG52dTdLZkhIS0hERnhiWjZlSkNraytSUExwKzRZblE9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2024 20:24:03.4435
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2aba8a99-6e3c-47ac-9bea-08dcf20e4e41
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001F1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9118
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="b3t00YNSmqbEVgwS"
+Content-Disposition: inline
+In-Reply-To: <9a160e3d-501b-4759-9067-17cd822617ec@sirena.org.uk>
+X-Cookie: Do not write below this line.
 
-Hi Sean,
 
-On 10/14/2024 5:23 PM, Sean Christopherson wrote:
-> On Thu, Sep 05, 2024, Pratik R. Sampat wrote:
->> This series primarily introduces SEV-SNP test for the kernel selftest
->> framework. It tests boot, ioctl, pre fault, and fallocate in various
->> combinations to exercise both positive and negative launch flow paths.
->>
->> Patch 1 - Adds a wrapper for the ioctl calls that decouple ioctl and
->> asserts, which enables the use of negative test cases. No functional
->> change intended.
->> Patch 2 - Extend the sev smoke tests to use the SNP specific ioctl
->> calls and sets up memory to boot a SNP guest VM
->> Patch 3 - Adds SNP to shutdown testing
->> Patch 4, 5 - Tests the ioctl path for SEV, SEV-ES and SNP
->> Patch 6 - Adds support for SNP in KVM_SEV_INIT2 tests
->> Patch 7,8,9 - Enable Prefault tests for SEV, SEV-ES and SNP
-> 
-> There are three separate series here:
-> 
->  1. Smoke test support for SNP
->  2. Negative tests for SEV+
->  3. Prefault tests for SEV+
-> 
-> #3 likely has a dependency on #1, and probably on #2 as well (for style if nothing
-> else).  But that's really just an argument for focuing on #1 first, and the moving
-> onto the others once that's ready to go.
+--b3t00YNSmqbEVgwS
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Based on your feedback on the rest of this patchset, this makes sense to
-me. I will first prep for the changes for patchset #1 and once we lock
-that down I can introduce patchset #2 and #3 based on that design.
+On Mon, Oct 21, 2024 at 07:32:17PM +0100, Mark Brown wrote:
+> On Fri, Sep 20, 2024 at 05:44:22PM +0200, Vitaly Kuznetsov wrote:
+>=20
+> > Some distros switched gcc to '-march=3Dx86-64-v3' by default and while =
+it's
+> > hard to find a CPU which doesn't support it today, many KVM selftests f=
+ail
+> > with
+>=20
+> This patch, which is queued in -next as 9a400068a1586bc4 targeted as a
+> fix, breaks the build on non-x86 architectures:
 
-Thank you again for your feedback!
-Pratik
+This patch is now in Linus' tree, having been applied on Sunday and as a
+result appeared in -next today.
 
+>=20
+> aarch64-linux-gnu-gcc -D_GNU_SOURCE=3D  -Wall -Wstrict-prototypes -Wunini=
+tialized=20
+> -O2 -g -std=3Dgnu99 -Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCON=
+FIG_64BIT
+>  -fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset -fno-builtin=
+-strnlen -fno-stack-protector -fno-PIE -I/build/stage/linux/tools/testing/s=
+elftests/../../../tools/include -I/build/stage/linux/tools/testing/selftest=
+s/../../../tools/arch/arm64/include -I/build/stage/linux/tools/testing/self=
+tests/../../../usr/include/ -Iinclude -Iaarch64 -Iinclude/aarch64 -I ../rse=
+q -I..  -march=3Dx86-64-v2 -isystem /build/stage/build-work/usr/include -I/=
+build/stage/linux/tools/testing/selftests/../../../tools/arch/arm64/include=
+/generated/   -c aarch64/aarch32_id_regs.c -o /build/stage/build-work/kself=
+test/kvm/aarch64/aarch32_id_regs.o
+> cc1: error: unknown value =E2=80=98x86-64-v2=E2=80=99 for =E2=80=98-march=
+=E2=80=99
+>=20
+> This is because:
+>=20
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selft=
+ests/kvm/Makefile
+> > index 48d32c5aa3eb..3f1b24ed7245 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -238,6 +238,7 @@ CFLAGS +=3D -Wall -Wstrict-prototypes -Wuninitializ=
+ed -O2 -g -std=3Dgnu99 \
+> >  	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+> >  	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+> >  	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
+> > +	-march=3Dx86-64-v2 \
+> >  	$(KHDR_INCLUDES)
+> >  ifeq ($(ARCH),s390)
+> >  	CFLAGS +=3D -march=3Dz10
+>=20
+> unconditionally sets an architecture specific flag which is obviously
+> not going to work on anything except x86.  This should be set under an
+> architecture check like the similar S/390 flag that can be seen in the
+> context for the diff.
+
+
+
+--b3t00YNSmqbEVgwS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcWurEACgkQJNaLcl1U
+h9DDhQf7B0Ld7EHcmwkrKIc7LAI+Xy4en/oQ6RxXnotJq3+hBzI9qNM722BR/j/C
+VcFyoodyHy3w2vROFuM1W4luP6gHzAWmP6BxZAKEeZR6oxu/hgJljrDQMrmF/QLF
+PeU4Mbj73J4LhfjpGVUgtAbeQ+e3GPfzL96EttpcDxBvpwv7tf9SnK2YvjgPL6Yk
+butevDwiCDxkyRn+GJwn3CPU4oFn0dwT9qOQutrc/xC8ie/mr2PXCOniIrJo3dVF
+jIJV9/mIEx2hfVRZGLL6RvCglZmHSSsrhRLSpmlVzhOA8DTxsHy/XO8B6sl0rlIC
+Chj2rvcnfQEQ79Svu9NBKnpAW3W4dA==
+=KcLo
+-----END PGP SIGNATURE-----
+
+--b3t00YNSmqbEVgwS--
 
